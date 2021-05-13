@@ -3,40 +3,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75489C43617
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F5E3C43611
 	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D68A61443
+	by mail.kernel.org (Postfix) with ESMTP id 5F14561354
 	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233658AbhEMWdc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 18:33:32 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:58990 "EHLO
+        id S233669AbhEMWdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 18:33:33 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:59016 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233574AbhEMWd1 (ORCPT
+        with ESMTP id S233620AbhEMWd3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 May 2021 18:33:27 -0400
+        Thu, 13 May 2021 18:33:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:MIME-Version:Message-Id:Date:Cc:To:From
-        :references:content-disposition:in-reply-to;
-        bh=iEMTzht1OWcJNBYhS5s3qHl4AFHEGpyftzhjsptY00E=; b=J+TX9vcQOO3ZAfxX7+MJPatZLC
-        IgMRxndkvM+1RJiSpNNWbESxiGwgqd2bOUHtzdwP25biUz/9cG9xe6XgXmktyMlN2gTR4vAvwmqhb
-        MKygHYng0wNG4iH+3zWCguQ7e5D2x+3w2w5BJKbGiNBrJhhGeluoGizm/zPVsh5RDKPhxSZ1dFQIP
-        FDaWPdypRbXwmHHjBgu5NYxKitqfVZKPkjavKpx0fXff7dEqqUM0P3gO4ukeBoiIdPk/wMBGYdEYr
-        Ys5Jq08iNMN+9Dp0k04WkKmYXjc+Xw4RfWoGr3ozpc3N9u3vqsR3j0+VVoRw63GhgX9Omk2A/sOGb
-        rBFlmogA==;
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Cc:To:From:content-disposition;
+        bh=/UEifQb1uV56XbCPPXZkMtwQU9Qf0p/pPMKOkgy5W2o=; b=jGA49pPoSP1ZCvD0TfobRIVRDR
+        FIAQmqkwAg1zlBcl1n/OGvVOqKPlcNeUGsb0kayWRZK8tV0rW1/Cyb+1PQ2V1uxm6+NvchWV+Bbw1
+        Z9jMg+9ALkS/wte/xLYYmDLrdap12nQ4YXCfUydQ8ahBWlVlU0fWOUSvB9gSFiNmfX8mWJt3uocug
+        vlrGF2Cr4QEwXR/KNxuGtYh7rltUK9P7RlD8kVtkQJ4kPwe1jTrK3+/k7PmgpZmUhMXS2BncTwBp/
+        Ee7JVIX23YSUiTWmGaXRNDV/njXNxifIDUnf17SPJVovjR14pVCJzOqc8UcFzzKTZSp+Y9gSHmVQH
+        EEP0t7ng==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1lhJsL-0000nB-QQ; Thu, 13 May 2021 16:32:15 -0600
+        id 1lhJsP-0000nD-EI; Thu, 13 May 2021 16:32:18 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1lhJsF-0001ST-Ld; Thu, 13 May 2021 16:32:07 -0600
+        id 1lhJsI-0001TQ-OW; Thu, 13 May 2021 16:32:10 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -59,126 +59,73 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Ira Weiny <ira.weiny@intel.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 13 May 2021 16:31:41 -0600
-Message-Id: <20210513223203.5542-1-logang@deltatee.com>
+Date:   Thu, 13 May 2021 16:32:01 -0600
+Message-Id: <20210513223203.5542-21-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210513223203.5542-1-logang@deltatee.com>
+References: <20210513223203.5542-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v2 00/22] Add new DMA mapping operation for P2PDMA
+Subject: [PATCH v2 20/22] RDMA/core: Introduce ib_dma_pci_p2p_dma_supported()
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Introduce the helper function ib_dma_pci_p2p_dma_supported() to check
+if a given ib_device can be used in P2PDMA transfers. This ensures
+the ib_device is not using virt_dma and also that the underlying
+dma_device supports P2PDMA.
 
-This patchset continues my work to to add P2PDMA support to the common
-dma map operations. This allows for creating SGLs that have both P2PDMA
-and regular pages which is a necessary step to allowing P2PDMA pages in
-userspace.
+Use the new helper in nvme-rdma to replace the existing check for
+ib_uses_virt_dma(). Adding the dma_pci_p2pdma_supported() check allows
+switching away from pci_p2pdma_[un]map_sg().
 
-The earlier RFC[1] and v1[2] postings generated a lot of great feedback.
-This version adds a bunch more cleanup at the start of the series. I'll
-probably look to split the earlier patches off and get them merged
-indpendantly after a round of review with this series as this series
-has gotten quite long.
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ drivers/nvme/target/rdma.c |  2 +-
+ include/rdma/ib_verbs.h    | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-I'm happy to do a few more passes if anyone has any further feedback
-or better ideas.
-
-This series is based on v5.13-rc1 and a git branch can be found here:
-
-  https://github.com/sbates130272/linux-p2pmem/  p2pdma_map_ops_v2
-
-Thanks,
-
-Logan
-
-[1] https://lore.kernel.org/linux-block/20210311233142.7900-1-logang@deltatee.com/
-[2] https://lore.kernel.org/linux-block/20210408170123.8788-1-logang@deltatee.com/
-
-Changes sine v1:
- * Rebased onto v5.13-rc1
- * Add some cleanup to the existing P2PDMA code to fix up some naming
-   conventions and documentation as the code has evolved a bit since the
-   names were chosen. (As suggested by John)
- * Add a patch that adds a warning if a host bridge is not in the whitelist
-   (as suggested by Don)
- * Change to using dma_map_sgtable() instead of creating a new
-   interface. For this, a couple of .map_sg implementations were changed
-   to return full error codes. (as per Christoph)
- * Renamed the scatterlist functions to include the term "dma" to
-   indicate that they apply to the DMA side of the sg. (per Jason)
- * Introduce ib_dma_pci_p2p_dma_supported() helper instead of open
-   coding the check (per Jason)
- * Numerous minor adjustments and documentation fixes
-
-Changes since the RFC:
- * Added comment and fixed up the pci_get_slot patch. (per Bjorn)
- * Fixed glaring sg_phys() double offset bug. (per Robin)
- * Created a new map operation (dma_map_sg_p2pdma()) with a new calling
-   convention instead of modifying the calling convention of
-   dma_map_sg(). (per Robin)
- * Integrated the two similar pci_p2pdma_dma_map_type() and
-   pci_p2pdma_map_type() functions into one (per Ira)
- * Reworked some of the logic in the map_sg() implementations into
-   helpers in the p2pdma code. (per Christoph)
- * Dropped a bunch of unnecessary symbol exports (per Christoph)
- * Expanded the code in dma_pci_p2pdma_supported() for clarity. (per
-   Ira and Christoph)
- * Finished off using the new dma_map_sg_p2pdma() call in rdma_rw
-   and removed the old pci_p2pdma_[un]map_sg(). (per Jason)
-
---
-
-Logan Gunthorpe (22):
-  PCI/P2PDMA: Rename upstream_bridge_distance() and rework documentation
-  PCI/P2PDMA: Use a buffer on the stack for collecting the acs list
-  PCI/P2PDMA: Cleanup type for return value of calc_map_type_and_dist()
-  PCI/P2PDMA: Avoid pci_get_slot() which sleeps
-  PCI/P2PDMA: Print a warning if the host bridge is not in the whitelist
-  PCI/P2PDMA: Attempt to set map_type if it has not been set
-  PCI/P2PDMA: Refactor pci_p2pdma_map_type() to take pagemap and device
-  dma-mapping: Allow map_sg() ops to return negative error codes
-  dma-direct: Return appropriate error code from dma_direct_map_sg()
-  iommu: Return full error code from iommu_map_sg[_atomic]()
-  dma-iommu: Return error code from iommu_dma_map_sg()
-  lib/scatterlist: Add flag for indicating P2PDMA segments in an SGL
-  PCI/P2PDMA: Make pci_p2pdma_map_type() non-static
-  PCI/P2PDMA: Introduce helpers for dma_map_sg implementations
-  dma-direct: Support PCI P2PDMA pages in dma-direct map_sg
-  dma-mapping: Add flags to dma_map_ops to indicate PCI P2PDMA support
-  iommu/dma: Support PCI P2PDMA pages in dma-iommu map_sg
-  nvme-pci: Check DMA ops when indicating support for PCI P2PDMA
-  nvme-pci: Convert to using dma_map_sgtable()
-  RDMA/core: Introduce ib_dma_pci_p2p_dma_supported()
-  RDMA/rw: use dma_map_sgtable()
-  PCI/P2PDMA: Remove pci_p2pdma_[un]map_sg()
-
- drivers/infiniband/core/rw.c |  75 ++++------
- drivers/iommu/dma-iommu.c    |  86 +++++++++--
- drivers/iommu/iommu.c        |  15 +-
- drivers/nvme/host/core.c     |   3 +-
- drivers/nvme/host/nvme.h     |   2 +-
- drivers/nvme/host/pci.c      |  80 +++++-----
- drivers/nvme/target/rdma.c   |   2 +-
- drivers/pci/Kconfig          |   2 +-
- drivers/pci/p2pdma.c         | 273 +++++++++++++++++++----------------
- include/linux/dma-map-ops.h  |  18 ++-
- include/linux/dma-mapping.h  |  46 +++++-
- include/linux/iommu.h        |  22 +--
- include/linux/pci-p2pdma.h   |  81 ++++++++---
- include/linux/scatterlist.h  |  50 ++++++-
- include/rdma/ib_verbs.h      |  30 ++++
- kernel/dma/direct.c          |  44 +++++-
- kernel/dma/mapping.c         |  31 +++-
- 17 files changed, 570 insertions(+), 290 deletions(-)
-
-
-base-commit: 6efb943b8616ec53a5e444193dccf1af9ad627b5
---
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 6c1f3ab7649c..86f0bf4dc1ca 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -414,7 +414,7 @@ static int nvmet_rdma_alloc_rsp(struct nvmet_rdma_device *ndev,
+ 	if (ib_dma_mapping_error(ndev->device, r->send_sge.addr))
+ 		goto out_free_rsp;
+ 
+-	if (!ib_uses_virt_dma(ndev->device))
++	if (ib_dma_pci_p2p_dma_supported(ndev->device))
+ 		r->req.p2p_client = &ndev->device->dev;
+ 	r->send_sge.length = sizeof(*r->req.cqe);
+ 	r->send_sge.lkey = ndev->pd->local_dma_lkey;
+diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
+index 7e2f3699b898..724e80a656f7 100644
+--- a/include/rdma/ib_verbs.h
++++ b/include/rdma/ib_verbs.h
+@@ -3943,6 +3943,17 @@ static inline bool ib_uses_virt_dma(struct ib_device *dev)
+ 	return IS_ENABLED(CONFIG_INFINIBAND_VIRT_DMA) && !dev->dma_device;
+ }
+ 
++/*
++ * Check if a IB device's underlying DMA mapping supports P2PDMA transfers.
++ */
++static inline bool ib_dma_pci_p2p_dma_supported(struct ib_device *dev)
++{
++	if (ib_uses_virt_dma(dev))
++		return false;
++
++	return dma_pci_p2pdma_supported(dev->dma_device);
++}
++
+ /**
+  * ib_dma_mapping_error - check a DMA addr for error
+  * @dev: The device for which the dma_addr was created
+-- 
 2.20.1
+
