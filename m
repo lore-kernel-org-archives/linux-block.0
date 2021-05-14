@@ -7,98 +7,198 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 369E9C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 00:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CE9C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 02:03:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0087E61175
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 00:56:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E56C7611AE
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 02:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231799AbhENA5T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 20:57:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31338 "EHLO
+        id S230428AbhENCEw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 22:04:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50581 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230305AbhENA5T (ORCPT
+        by vger.kernel.org with ESMTP id S229583AbhENCEw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 May 2021 20:57:19 -0400
+        Thu, 13 May 2021 22:04:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620953768;
+        s=mimecast20190719; t=1620957820;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Z+NGT/XiZFt8URJ5ME7n+FHpFG+LPcTCZIcJxDXp8wM=;
-        b=BxAtmPETRvsO5mEPVqwzNRHTMT7ULjIbpTgwqAORHccBaQ2UX2pHSEqw4w9i77IloHN06D
-        eMXXAiwPu+zh0hVhY1xKnzwulGiTsZ33FurIGeNHs/3L3bDmf1AM6EgSb1fCap1URxFaqw
-        hlAhSadQI90Ggmj7F/lFf8wKIDpJhQc=
+        bh=XUUlvqNyvKlyLaPFHB8CAatW7xT4Gd7RHo/V7t5+CpQ=;
+        b=H1E7bnT7Ml8ehbv5szxD3F9jfYxUdCTDS5dtZ7WBz3U44zDHyYSK3pdObIFs6U3bL+BlOG
+        S3br41AqhQXH25NGiaKEfKTspuCm5eCZvFIIEx0R0Wz6R8vo5u8rk5sjwztR8yj9Yz8fO9
+        bDY/FfdJn0BcClYAXEuw7QGZMQIIsmQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-UjEd4xMPPtaFW2MesTAzzQ-1; Thu, 13 May 2021 20:56:04 -0400
-X-MC-Unique: UjEd4xMPPtaFW2MesTAzzQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-145-49BR4mfAMaepo9kVjmidrQ-1; Thu, 13 May 2021 22:03:39 -0400
+X-MC-Unique: 49BR4mfAMaepo9kVjmidrQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A182FFC91;
-        Fri, 14 May 2021 00:56:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AC7CFC93;
+        Fri, 14 May 2021 02:03:37 +0000 (UTC)
 Received: from T590 (ovpn-12-87.pek2.redhat.com [10.72.12.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6EE0B687E2;
-        Fri, 14 May 2021 00:55:56 +0000 (UTC)
-Date:   Fri, 14 May 2021 08:55:51 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AF41F60CC6;
+        Fri, 14 May 2021 02:03:29 +0000 (UTC)
+Date:   Fri, 14 May 2021 10:03:25 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH] blk-mq: Swap two calls in blk_mq_exit_queue()
-Message-ID: <YJ3Kl37kPJo650mv@T590>
-References: <20210513171529.7977-1-bvanassche@acm.org>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        kashyap.desai@broadcom.com, chenxiang66@hisilicon.com,
+        yama@redhat.com, dgilbert@interlog.com
+Subject: Re: [PATCH v3 1/2] blk-mq: Some tag allocation code refactoring
+Message-ID: <YJ3abcOPU3rvh51i@T590>
+References: <1620907258-30910-1-git-send-email-john.garry@huawei.com>
+ <1620907258-30910-2-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210513171529.7977-1-bvanassche@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <1620907258-30910-2-git-send-email-john.garry@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 13, 2021 at 10:15:29AM -0700, Bart Van Assche wrote:
-> If a tag set is shared across request queues (e.g. SCSI LUNs) then the
-> block layer core keeps track of the number of active request queues in
-> tags->active_queues. blk_mq_tag_busy() and blk_mq_tag_idle() update that
-> atomic counter if the hctx flag BLK_MQ_F_TAG_QUEUE_SHARED is set. Make
-> sure that blk_mq_exit_queue() calls blk_mq_tag_idle() before that flag is
-> cleared by blk_mq_del_queue_tag_set().
+On Thu, May 13, 2021 at 08:00:57PM +0800, John Garry wrote:
+> The tag allocation code to alloc the sbitmap pairs is common for regular
+> bitmaps tags and shared sbitmap, so refactor into a common function.
 > 
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Fixes: 0d2602ca30e4 ("blk-mq: improve support for shared tags maps")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> Also remove superfluous "flags" argument from blk_mq_init_shared_sbitmap().
+> 
+> Signed-off-by: John Garry <john.garry@huawei.com>
 > ---
->  block/blk-mq.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  block/blk-mq-tag.c | 54 ++++++++++++++++++++++++++++------------------
+>  block/blk-mq-tag.h |  9 +++++---
+>  block/blk-mq.c     |  2 +-
+>  3 files changed, 40 insertions(+), 25 deletions(-)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1ea012de60eb..96b8e3164835 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3289,10 +3289,12 @@ EXPORT_SYMBOL(blk_mq_init_allocated_queue);
->  /* tags can _not_ be used after returning from blk_mq_exit_queue */
->  void blk_mq_exit_queue(struct request_queue *q)
->  {
-> -	struct blk_mq_tag_set	*set = q->tag_set;
-> +	struct blk_mq_tag_set *set = q->tag_set;
->  
-> -	blk_mq_del_queue_tag_set(q);
-> +	/* Checks hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED. */
->  	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
-> +	/* May clear BLK_MQ_F_TAG_QUEUE_SHARED in hctx->flags. */
-> +	blk_mq_del_queue_tag_set(q);
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 2a37731e8244..45479c0f88a2 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -445,39 +445,54 @@ static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
+>  				       node);
 >  }
 >  
->  static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+> -static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+> -				   int node, int alloc_policy)
+> +int blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
+> +			struct sbitmap_queue *breserved_tags,
+> +			unsigned int queue_depth, unsigned int reserved,
+> +			int node, int alloc_policy)
+>  {
+> -	unsigned int depth = tags->nr_tags - tags->nr_reserved_tags;
+> +	unsigned int depth = queue_depth - reserved;
+>  	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
+>  
+> -	if (bt_alloc(&tags->__bitmap_tags, depth, round_robin, node))
+> +	if (bt_alloc(bitmap_tags, depth, round_robin, node))
+>  		return -ENOMEM;
+> -	if (bt_alloc(&tags->__breserved_tags, tags->nr_reserved_tags,
+> -		     round_robin, node))
+> +	if (bt_alloc(breserved_tags, reserved, round_robin, node))
+>  		goto free_bitmap_tags;
+>  
+> +	return 0;
+> +
+> +free_bitmap_tags:
+> +	sbitmap_queue_free(bitmap_tags);
+> +	return -ENOMEM;
+> +}
+> +
+> +static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+> +				   int node, int alloc_policy)
+> +{
+> +	int ret;
+> +
+> +	ret = blk_mq_init_bitmaps(&tags->__bitmap_tags,
+> +				  &tags->__breserved_tags,
+> +				  tags->nr_tags, tags->nr_reserved_tags,
+> +				  node, alloc_policy);
+> +	if (ret)
+> +		return ret;
+> +
+>  	tags->bitmap_tags = &tags->__bitmap_tags;
+>  	tags->breserved_tags = &tags->__breserved_tags;
+>  
+>  	return 0;
+> -free_bitmap_tags:
+> -	sbitmap_queue_free(&tags->__bitmap_tags);
+> -	return -ENOMEM;
+>  }
+>  
+> -int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
+> +int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set)
+>  {
+> -	unsigned int depth = set->queue_depth - set->reserved_tags;
+>  	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags);
+> -	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
+> -	int i, node = set->numa_node;
+> +	int i, ret;
+>  
+> -	if (bt_alloc(&set->__bitmap_tags, depth, round_robin, node))
+> -		return -ENOMEM;
+> -	if (bt_alloc(&set->__breserved_tags, set->reserved_tags,
+> -		     round_robin, node))
+> -		goto free_bitmap_tags;
+> +	ret = blk_mq_init_bitmaps(&set->__bitmap_tags, &set->__breserved_tags,
+> +				  set->queue_depth, set->reserved_tags,
+> +				  set->numa_node, alloc_policy);
+> +	if (ret)
+> +		return ret;
+>  
+>  	for (i = 0; i < set->nr_hw_queues; i++) {
+>  		struct blk_mq_tags *tags = set->tags[i];
+> @@ -487,9 +502,6 @@ int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
+>  	}
+>  
+>  	return 0;
+> -free_bitmap_tags:
+> -	sbitmap_queue_free(&set->__bitmap_tags);
+> -	return -ENOMEM;
+>  }
+>  
+>  void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
+> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+> index 7d3e6b333a4a..2a718c8d080f 100644
+> --- a/block/blk-mq-tag.h
+> +++ b/block/blk-mq-tag.h
+> @@ -26,11 +26,14 @@ extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
+>  					unsigned int reserved_tags,
+>  					int node, unsigned int flags);
+>  extern void blk_mq_free_tags(struct blk_mq_tags *tags, unsigned int flags);
+> +extern int blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
+> +			       struct sbitmap_queue *breserved_tags,
+> +			       unsigned int queue_depth,
+> +			       unsigned int reserved,
+> +			       int node, int alloc_policy);
+>  
+> -extern int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set,
+> -				      unsigned int flags);
+> +extern int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set);
+>  extern void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set);
+> -
+>  extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
+>  extern void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
+>  			   unsigned int tag);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 466676bc2f0b..499ad5462f7e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3488,7 +3488,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+>  	if (blk_mq_is_sbitmap_shared(set->flags)) {
+>  		atomic_set(&set->active_queues_shared_sbitmap, 0);
+>  
+> -		if (blk_mq_init_shared_sbitmap(set, set->flags)) {
+> +		if (blk_mq_init_shared_sbitmap(set)) {
+>  			ret = -ENOMEM;
+>  			goto out_free_mq_rq_maps;
+>  		}
+> -- 
+> 2.26.2
 > 
-
-Looks fine:
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
