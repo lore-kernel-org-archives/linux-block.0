@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B4BEC433B4
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 14:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F171EC43616
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 14:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B552F6144C
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 14:59:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFCD961451
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 14:59:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234549AbhENPAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 May 2021 11:00:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59340 "EHLO
+        id S234631AbhENPA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 May 2021 11:00:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233314AbhENPAb (ORCPT
+        with ESMTP id S234662AbhENPA4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 May 2021 11:00:31 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24974C061574
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 07:59:20 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id k25so28362622iob.6
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 07:59:20 -0700 (PDT)
+        Fri, 14 May 2021 11:00:56 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E8F5C06175F
+        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 07:59:45 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id r5so33928ilb.2
+        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 07:59:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vUiYa7NOZ3uEFHnN8U9tZoFZ0U9y8xDO2tLCrk/MPAE=;
-        b=ZS+fdo2g9KKlIF+D3Jp3SjQn6Fq9t3lyrptDZZUQ+Y+8whquEBBPuDYYh8/+32RKhc
-         6D38kDJQ+v+IDajiOZVyX21EPo86/PQ1Te7PmKGxMcKMiFd12/LVhSNd3OAo78/AVLxk
-         v9nkfc2CAGco0yOXAwYd7D5ouWazxP3ADHBE8KDcDT7UwCU37KHKo2jqRWR4o8UB+/sY
-         LBZeKbJpT9LcR+JROwmldt/5enh0jOq3IEk/cM8fFPHFQctbX9ibZbimBESHXeYMYGCX
-         5RSVtA++UQXTACdES4jrVCCyxswFPFT4aclwMbkW8yfPLyeEORip1LrwNbRg71KFbuqg
-         q6Lw==
+        bh=GzynzZ+rXRsfhWtJSmTNBxQob7k+raOQQzgjWUhQlb8=;
+        b=Wi/clFw7/zAXKPe4NpK+FbiqdcakrHonQNzAjH+eAQREiOtXah0W6AkXP2OP5V9J9l
+         tynl7tLCpxl+4bZBWgxhfcetcvpkwO3BPZBK7F+iVVnXpMxf/BLTT5JdbXhTvPzDmDkK
+         8kV0/h86OkRCw5hSRkjXiVKxbOOMt6xEuT87cnB856mrAAi7kZ44RkLwsBOLQyOUS0p1
+         oEzOoimdxSXWlocQUodntTzM543UOplh/c5AGCR2Ys4FS5Z254Ha6sMJcrkReeMpLc0U
+         qJWGjhDERgSqLOpo8rt2iqd0ERr90wa5GkoKMhfC0iUajE99O3LNPJGwd0h9ZtZDuH1/
+         ooeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=vUiYa7NOZ3uEFHnN8U9tZoFZ0U9y8xDO2tLCrk/MPAE=;
-        b=rNgN1C1iN5Qx1dZKu1dbGsN8j2Y/h7IDevex0bhWbl6imodytFfQr9J/Pbwh+ul9Sj
-         qFpHyivPeoJiE491cZh43732Uj/kBEFY7YcPkY10MkRxgEBHNoQKgP2Y4UViTjB3cp9N
-         5X/iyZKAr4FNTjxDndJF7KIGWD8Ei6XnQoiFxGgemF2WSVBCp9HYFvuo0O0wDleeWXKP
-         wCD7mLB7+kntf6hhy3oSUXbrGTMQ9YSzzxbkiz8i+lWtiN5d1BnavDLhoScdd6VazzoQ
-         eFC2NlOvnIau5vli3ksvJWWIs4q+6+Ny3DvZrgH5GGHssS5xEc6zkB4rPnMcnbNdM3lM
-         IB4g==
-X-Gm-Message-State: AOAM53036Jj1ruvHM3wt+JBUotWcmh04fS8l+GrBFJ+T85VABoC/WFKx
-        f3xUM/ANoyzqoCwudoEfe8Kcbg==
-X-Google-Smtp-Source: ABdhPJzmC4zlVNLeIz2TT/ukU4SABhrZHj1IBQR2CqDkC1DFc5f4w18uvraxdczmzECw1iJsaNOV6Q==
-X-Received: by 2002:a05:6602:1815:: with SMTP id t21mr13156198ioh.193.1621004359647;
-        Fri, 14 May 2021 07:59:19 -0700 (PDT)
+        bh=GzynzZ+rXRsfhWtJSmTNBxQob7k+raOQQzgjWUhQlb8=;
+        b=sWImJVEiOQnzTgiEl9rEk9W80qp1oLBA4lHGmhSotin+zsi13RFHioB3UQuhGe//e+
+         uoIWWYj+1xY1AuyM+yVLZrX3uvRSmpGzTkog7JJZq9GBR2QKofYeYPVOQHam3XM2Piud
+         mCE8Drtd10wsWIRQVmAcQaOiVh963WlaUcrGcehPy9ldagdx51bCWGJ/utnzYGvKsNfn
+         uhRjmhXPk9O2Wdc2rA70ZIX2UGiZFxKDX/fJz+6p1nxCv1WuursnboeSROT1YZFrSjVn
+         Iht+ZQz2K5Bc2ERWF3s1wdGcrymrmt3Tu3OtKXfGCagv1Yown386ER0yrH3qA/1REj7F
+         5utg==
+X-Gm-Message-State: AOAM5323qDKI6dkQEClu7h5FBII/hEAXKENsXFxMQaeFOKBhR2z/i1oo
+        qAXGQFzedcmY+z3dPWuJAod2jw==
+X-Google-Smtp-Source: ABdhPJyhtNYPD7IA8NrXTsQJrJ53f81y+54eGOTOTYerMSzg8qqSGrhx4EHigc5SklCuztumFAF+EA==
+X-Received: by 2002:a92:c0cd:: with SMTP id t13mr31767488ilf.280.1621004384568;
+        Fri, 14 May 2021 07:59:44 -0700 (PDT)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id r11sm3126299ilq.29.2021.05.14.07.59.18
+        by smtp.gmail.com with ESMTPSA id r6sm2718730ioc.5.2021.05.14.07.59.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 May 2021 07:59:19 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: plug request for shared sbitmap
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Yanhui Ma <yama@redhat.com>,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        kashyap.desai@broadcom.com
-References: <20210514022052.1047665-1-ming.lei@redhat.com>
+        Fri, 14 May 2021 07:59:44 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: Swap two calls in blk_mq_exit_queue()
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
+References: <20210513171529.7977-1-bvanassche@acm.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <75ca571b-c132-245f-2fb0-159cc6aa4923@kernel.dk>
-Date:   Fri, 14 May 2021 08:59:18 -0600
+Message-ID: <d1b1f123-9b47-8805-0b86-2fa9f6b19bb5@kernel.dk>
+Date:   Fri, 14 May 2021 08:59:43 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210514022052.1047665-1-ming.lei@redhat.com>
+In-Reply-To: <20210513171529.7977-1-bvanassche@acm.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,20 +77,16 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/13/21 8:20 PM, Ming Lei wrote:
-> In case of shared sbitmap, request won't be held in plug list any more
-> sine commit 32bc15afed04 ("blk-mq: Facilitate a shared sbitmap per
-> tagset"), this way makes request merge from flush plug list & batching
-> submission not possible, so cause performance regression.
-> 
-> Yanhui reports performance regression when running sequential IO
-> test(libaio, 16 jobs, 8 depth for each job) in VM, and the VM disk
-> is emulated with image stored on xfs/megaraid_sas.
-> 
-> Fix the issue by recovering original behavior to allow to hold request
-> in plug list.
+On 5/13/21 11:15 AM, Bart Van Assche wrote:
+> If a tag set is shared across request queues (e.g. SCSI LUNs) then the
+> block layer core keeps track of the number of active request queues in
+> tags->active_queues. blk_mq_tag_busy() and blk_mq_tag_idle() update that
+> atomic counter if the hctx flag BLK_MQ_F_TAG_QUEUE_SHARED is set. Make
+> sure that blk_mq_exit_queue() calls blk_mq_tag_idle() before that flag is
+> cleared by blk_mq_del_queue_tag_set().
 
 Applied, thanks.
+
 
 -- 
 Jens Axboe
