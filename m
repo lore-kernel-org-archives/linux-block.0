@@ -2,81 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CEFC43461
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 11:45:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52942C433ED
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 13:18:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E39456145D
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 11:45:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3360061451
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 13:18:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231926AbhENLq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 May 2021 07:46:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60286 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229445AbhENLq6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 May 2021 07:46:58 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C1B826145A;
-        Fri, 14 May 2021 11:45:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1620992747;
-        bh=vPOcLTJAbLQBPG5xiHyVQ/jk3if4qn+FmRdZHvC68CA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZW68/04MHR/aUrnt8Phfslq713qqBllSrQ21S+z9KeMjDIeSxC51N1RnJvXr6KNBr
-         ffbMUYam24ZbzOqeSiN2SshVx9KUVdzSB3Z2ZO8geE+Yph3WRcBcOR1fqkzhqnT4HO
-         VbsWDRCBOU50msMTFGA0euQyw9MjZ1yZ1M+rnMpI=
-Date:   Fri, 14 May 2021 13:45:44 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     David Miller <davem@davemloft.net>, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel@pengutronix.de, netdev@vger.kernel.org,
-        sparclinux@vger.kernel.org, kuba@kernel.org, jirislaby@kernel.org
-Subject: Re: [PATCH] sparc/vio: make remove callback return void
-Message-ID: <YJ5i6F4zHPAR+HCF@kroah.com>
-References: <20210505201449.195627-1-u.kleine-koenig@pengutronix.de>
- <20210505.132739.2022645880622422332.davem@davemloft.net>
- <20210506061121.3flqmvm4jok6zj5z@pengutronix.de>
+        id S233843AbhENNUI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 May 2021 09:20:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36704 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233913AbhENNUH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 May 2021 09:20:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE18C06174A
+        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 06:18:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=wq07GzW5+dy29qEQNilChQ2Aoc10PSztzJzKzTeesyQ=; b=ow5sDqvJdkuaPrCCgr0K7n4fIb
+        a7O/v+k1+61aRaWeJnZ8iA3n8q90ZrPS85HEOjJxdRI0J9ovNcR1ANMzc4xCdOiS9E0/q40hVFLkg
+        DVDKDKDxodYprTwGoMWz/JDW0BCIgFoULTBAZhvK+DYxduIJNRQhAY/EF4zHGiX427LJFJV8WBAt3
+        T+svhlIMaWjmANzIx0NJ9A37wMZrUZ5W4qZlINcze0A5HtM/l71CIXRLAaS2Jf7LthLNIOKRvs9E8
+        xyGNvcH29nNtFseNunS/ZmR68USwmarhKCWEOP3vXxxCSU1oRZg2pDW64JihcxOGqbb6tHi1ZVGXb
+        faxT4/PQ==;
+Received: from [2001:4bb8:198:fbc8:cf38:8667:24ad:8b9e] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lhXiH-00BzyK-1d; Fri, 14 May 2021 13:18:45 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     Gulam Mohamed <gulam.mohamed@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Subject: fix a race between del_gendisk and BLKRRPART v2
+Date:   Fri, 14 May 2021 15:18:40 +0200
+Message-Id: <20210514131842.1600568-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210506061121.3flqmvm4jok6zj5z@pengutronix.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 06, 2021 at 08:11:21AM +0200, Uwe Kleine-König wrote:
-> Hi Dave,
-> 
-> On Wed, May 05, 2021 at 01:27:39PM -0700, David Miller wrote:
-> > From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > Date: Wed,  5 May 2021 22:14:49 +0200
-> > 
-> > > The driver core ignores the return value of struct bus_type::remove()
-> > > because there is only little that can be done. To simplify the quest to
-> > > make this function return void, let struct vio_driver::remove() return
-> > > void, too. All users already unconditionally return 0, this commit makes
-> > > it obvious that returning an error code is a bad idea and should prevent
-> > > that future driver authors consider returning an error code.
-> > > 
-> > > Note there are two nominally different implementations for a vio bus:
-> > > one in arch/sparc/kernel/vio.c and the other in
-> > > arch/powerpc/platforms/pseries/vio.c. This patch only addresses the
-> > > former.
-> > > 
-> > > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > 
-> > Acked-by: David S. Miller <davem@davemloft.net>
-> 
-> Thanks for your Ack. My expectation was that this patch will go via a
-> sparc tree. Does your Ack mean that you think it should take a different
-> path?
+Hi all,
 
-I'll pick it up, thanks.
+this is based of a patch from Gulam and suggestions from Ming and fixes a
+race between del_gendisk and BLKRRPART while also removing a global lock.
 
-greg k-h
+Changes since v1:
+ - fix the GENHD_FL_UP check in __blkdev_get
+ - don't change where remove_inode_hash is called for now
+ - improve the commit message
+
+Diffstat:
+ block/genhd.c         |   11 +----------
+ fs/block_dev.c        |   18 ++++++++----------
+ include/linux/genhd.h |    2 --
+ 3 files changed, 9 insertions(+), 22 deletions(-)
