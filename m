@@ -2,133 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8ABC433ED
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 17:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69145C43460
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 17:49:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B230613EC
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 17:33:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5101C6144C
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 17:49:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235163AbhENReT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 May 2021 13:34:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37306 "EHLO
+        id S235238AbhENRuW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 May 2021 13:50:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235144AbhENReS (ORCPT
+        with ESMTP id S235236AbhENRuW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 May 2021 13:34:18 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C803C061756
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 10:33:07 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id k10so14488787ejj.8
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 10:33:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3bmbAftPboaY7hu+DnMgt2b6hH50EmPqKJHrC7bAGn8=;
-        b=OCUpNcjguSpqlmqGqLclnsNCOhgzU3pBtJ+0aWvCc2SR59QNIHWTyn2iHNnFIXoHb/
-         IlrJnYgxa3QKa7TD5DPjuhh0hv9dsnnG2SJC44eepw5A/YU6NsZQR/5smJrlWciM7Uz7
-         oY/UTgSqeb9/fYqELWpyA+6END7cpdJzA1bkA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3bmbAftPboaY7hu+DnMgt2b6hH50EmPqKJHrC7bAGn8=;
-        b=uI9c+gcEmsaGUcsMx2pRJiFeuPPyRA/7MTftOnn68vrdUzhYwqLLhF5McMORX+Ad+M
-         m9ER5ZBd/7OFM51P7q62RNZWN+R+PC0sSUaE0epg6OV0nmhI4wZ2BaNR+N9t2EsxKVyH
-         b9HwhADiAANtdZ8tP5KkuKWy3ExwyyJsDlGbGwbV6NXuUbVVg48zA9d4ZhKX0bKSIhAx
-         15qCXXCAvwMj/Q5NnEwd8lShkNQ9skYO4md9RZd1XsvBeH85Ott0q/hP17P1qvIVWVW5
-         iEvoCx5pE7QYwMapijtU6dUfjbDGVIW6oVkYabILJtYVg42fyo0rLPYeZRMuwIQsdmnh
-         oYfQ==
-X-Gm-Message-State: AOAM5306/bipXWR1+db0GXD6jgRirEPuR6TpYcXC9SkTPpp/yx6W9pZi
-        HpB7w86pKeInTGts/X8WoGsvJ/zW7gBdNzpWw1w=
-X-Google-Smtp-Source: ABdhPJyW87OlhEekXSagsfCSoxpYiG2nsK4EbKVAJtgmDKSMZjVcdAwxcqL74p34Q1U8kso5I7Bs9Q==
-X-Received: by 2002:a17:906:c2cc:: with SMTP id ch12mr48370494ejb.402.1621013585543;
-        Fri, 14 May 2021 10:33:05 -0700 (PDT)
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
-        by smtp.gmail.com with ESMTPSA id bn5sm3934354ejb.97.2021.05.14.10.33.04
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 May 2021 10:33:04 -0700 (PDT)
-Received: by mail-ej1-f44.google.com with SMTP id m12so45754523eja.2
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 10:33:04 -0700 (PDT)
-X-Received: by 2002:a2e:9251:: with SMTP id v17mr38807472ljg.507.1621013573543;
- Fri, 14 May 2021 10:32:53 -0700 (PDT)
+        Fri, 14 May 2021 13:50:22 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DE8C061574;
+        Fri, 14 May 2021 10:49:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2pAe91SWzc/6riCJTnq7kqxW30iWZ5ZzX7m8q/+xTL0=; b=pxBgiq2xmX4brOJjhFnslcv0it
+        MmKEA6uhuUypxWEc3UG6F1Wp650xb/5yQzn09Tqc9aJ4pnsXBpgk2zl5T/eiWto8mOykLDJ1lbnf1
+        6ZyM7o7qGX3h6fHDf5e2mcVTXr2BCpli8AJsT2vKKgaWdmw6EAZbo4LtKmdz5VmuJAeyJ/kdfOuj7
+        4b9SOEQPkp96VlcfvuqnozuLOQ3koM0kxl6BiARLyqvR/gq2ISejZm3FjS6N027kuaqQdSfAQSV72
+        y2x/473TwS/oB+ykEC+G0nCJblIVfUMF9LU+lz/5Gn+n9u0pXX+cUIhlqb5WhazNmPjaYln0v3z4b
+        eyqkiIBA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lhbvG-00AaXL-9i; Fri, 14 May 2021 17:48:31 +0000
+Date:   Fri, 14 May 2021 18:48:26 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [LSF/MM/BPF TOPIC] Memory folios
+Message-ID: <YJ636tQhuc9X7ZzR@casper.infradead.org>
+References: <YJlzwcADaxO/JHRE@casper.infradead.org>
 MIME-Version: 1.0
-References: <20210514100106.3404011-1-arnd@kernel.org>
-In-Reply-To: <20210514100106.3404011-1-arnd@kernel.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 14 May 2021 10:32:37 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whGObOKruA_bU3aPGZfoDqZM1_9wBkwREp0H0FgR-90uQ@mail.gmail.com>
-Message-ID: <CAHk-=whGObOKruA_bU3aPGZfoDqZM1_9wBkwREp0H0FgR-90uQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/13] Unify asm/unaligned.h around struct helper
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     linux-arch <linux-arch@vger.kernel.org>,
-        Vineet Gupta <vgupta@synopsys.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Amitkumar Karwar <amitkarwar@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Ganapathi Bhat <ganapathi017@gmail.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        James Morris <jmorris@namei.org>, Jens Axboe <axboe@kernel.dk>,
-        John Johansen <john.johansen@canonical.com>,
-        Jonas Bonn <jonas@southpole.se>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Rich Felker <dalias@libc.org>,
-        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
-        Russell King <linux@armlinux.org.uk>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
-        Stafford Horne <shorne@gmail.com>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Xinming Hu <huxinming820@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        openrisc@lists.librecores.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Linux-sh list <linux-sh@vger.kernel.org>,
-        linux-sparc <sparclinux@vger.kernel.org>,
-        linux-ntfs-dev@lists.sourceforge.net,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YJlzwcADaxO/JHRE@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 14, 2021 at 3:02 AM Arnd Bergmann <arnd@kernel.org> wrote:
->
-> I've included this version in the asm-generic tree for 5.14 already,
-> addressing the few issues that were pointed out in the RFC. If there
-> are any remaining problems, I hope those can be addressed as follow-up
-> patches.
+On Mon, May 10, 2021 at 06:56:17PM +0100, Matthew Wilcox wrote:
+> I don't know exactly how much will be left to discuss about supporting
+> larger memory allocation units in the page cache by December.  In my
+> ideal world, all the patches I've submitted so far are accepted, I
+> persuade every filesystem maintainer to convert their own filesystem
+> and struct page is nothing but a bad memory by December.  In reality,
+> I'm just not that persuasive.
+> 
+> So, probably some kind of discussion will be worthwhile about
+> converting the remaining filesystems to use folios, when it's worth
+> having filesystems opt-in to multi-page folios, what we can do about
+> buffer-head based filesystems, and so on.
+> 
+> Hopefully we aren't still discussing whether folios are a good idea
+> or not by then.
 
-This continues to look great to me, and now has the even simpler
-remaining implementation.
+I got an email from Hannes today asking about memory folios as they
+pertain to the block layer, and I thought this would be a good chance
+to talk about them.  If you're not familiar with the term "folio",
+https://lore.kernel.org/lkml/20210505150628.111735-10-willy@infradead.org/
+is not a bad introduction.
 
-I'd be tempted to just pull it in for 5.13, but I guess we don't
-actually have any _outstanding_ bug in this area (the bug was in our
-zlib code, required -O3 to trigger, has been fixed now, and the biggy
-case didn't even use "get_unaligned()").
+Thanks to the work done by Ming Lei in 2017, the block layer already
+supports multipage bvecs, so to a first order of approximation, I don't
+need anything from the block layer on down through the various storage
+layers.  Which is why I haven't been talking to anyone in storage!
 
-So I guess your 5.14 timing is the right thing to do.
+It might change (slightly) the contents of bios.  For example,
+bvec[n]->bv_offset might now be larger than PAGE_SIZE.  Drivers should
+handle this OK, but probably haven't been audited to make sure they do.
+Mostly, it's simply that drivers will now see fewer, larger, segments
+in their bios.  Once a filesystem supports multipage folios, we will
+allocate order-N pages as part of readahead (and sufficiently large
+writes).  Dirtiness is tracked on a per-folio basis (not per page),
+so folios take trips around the LRU as a single unit and finally make
+it to being written back as a single unit.
 
-        Linus
+Drivers still need to cope with sub-folio-sized reads and writes.
+O_DIRECT still exists and (eg) doing a sub-page, block-aligned write
+will not necessarily cause readaround to happen.  Filesystems may read
+and write their own metadata at whatever granularity and alignment they
+see fit.  But the vast majority of pagecache I/O will be folio-sized
+and folio-aligned.
+
+I do have two small patches which make it easier for the one
+filesystem that I've converted so far (iomap/xfs) to add folios to bios
+and get folios back out of bios:
+
+https://lore.kernel.org/lkml/20210505150628.111735-72-willy@infradead.org/
+https://lore.kernel.org/lkml/20210505150628.111735-73-willy@infradead.org/
+
+as well as a third patch that estimates how large a bio to allocate,
+given the current folio that it's working on:
+https://git.infradead.org/users/willy/pagecache.git/commitdiff/89541b126a59dc7319ad618767e2d880fcadd6c2
+
+It would be possible to make other changes in future.  For example, if
+we decide it'd be better, we could change bvecs from being (page, offset,
+length) to (folio, offset, length).  I don't know that it's worth doing;
+it would need to be evaluated on its merits.  Personally, I'd rather
+see us move to a (phys_addr, length) pair, but I'm a little busy at the
+moment.
+
+Hannes has some fun ideas about using the folio work to support larger
+sector sizes, and I think they're doable.
