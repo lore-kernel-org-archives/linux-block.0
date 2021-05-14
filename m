@@ -2,95 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52939C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 00:43:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 369E9C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 00:56:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2ECEA61421
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 00:43:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0087E61175
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 00:56:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231159AbhENApC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 20:45:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28538 "EHLO
+        id S231799AbhENA5T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 20:57:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31338 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231826AbhENApC (ORCPT
+        by vger.kernel.org with ESMTP id S230305AbhENA5T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 May 2021 20:45:02 -0400
+        Thu, 13 May 2021 20:57:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620953031;
+        s=mimecast20190719; t=1620953768;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fSpObU/MutR7JjIlPvkAIGgdfX9rUhAqm4YtXAKuWAw=;
-        b=XnVBFuBci8FPO7H7388vE4QT1eHRUNRnjzy4xM4HoXvJ1NHwYVS+qzpRjDwDG1Qxry8WkA
-        yxLEtKVc8NUoEtZmizKnSJALmbuKFfdPpnNDe0dI4pWf/MvpH7BlFJ0BADNu/jX8df4oZU
-        bYRXYCMQKCW7xfabr3zIUB/m8lejRKk=
+        bh=Z+NGT/XiZFt8URJ5ME7n+FHpFG+LPcTCZIcJxDXp8wM=;
+        b=BxAtmPETRvsO5mEPVqwzNRHTMT7ULjIbpTgwqAORHccBaQ2UX2pHSEqw4w9i77IloHN06D
+        eMXXAiwPu+zh0hVhY1xKnzwulGiTsZ33FurIGeNHs/3L3bDmf1AM6EgSb1fCap1URxFaqw
+        hlAhSadQI90Ggmj7F/lFf8wKIDpJhQc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-_4lbc2wFPxmVUBnbnPfouQ-1; Thu, 13 May 2021 20:43:47 -0400
-X-MC-Unique: _4lbc2wFPxmVUBnbnPfouQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-594-UjEd4xMPPtaFW2MesTAzzQ-1; Thu, 13 May 2021 20:56:04 -0400
+X-MC-Unique: UjEd4xMPPtaFW2MesTAzzQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E148107ACE3;
-        Fri, 14 May 2021 00:43:46 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A182FFC91;
+        Fri, 14 May 2021 00:56:03 +0000 (UTC)
 Received: from T590 (ovpn-12-87.pek2.redhat.com [10.72.12.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EF955D9E3;
-        Fri, 14 May 2021 00:43:39 +0000 (UTC)
-Date:   Fri, 14 May 2021 08:43:34 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6EE0B687E2;
+        Fri, 14 May 2021 00:55:56 +0000 (UTC)
+Date:   Fri, 14 May 2021 08:55:51 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
-        David Jeffery <djeffery@redhat.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH V7 0/4] blk-mq: fix request UAF related with iterating
- over tagset requests
-Message-ID: <YJ3Htj8rlJ6uunqn@T590>
-References: <20210511152236.763464-1-ming.lei@redhat.com>
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH] blk-mq: Swap two calls in blk_mq_exit_queue()
+Message-ID: <YJ3Kl37kPJo650mv@T590>
+References: <20210513171529.7977-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210511152236.763464-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20210513171529.7977-1-bvanassche@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 11, 2021 at 11:22:32PM +0800, Ming Lei wrote:
-> Hi Jens,
+On Thu, May 13, 2021 at 10:15:29AM -0700, Bart Van Assche wrote:
+> If a tag set is shared across request queues (e.g. SCSI LUNs) then the
+> block layer core keeps track of the number of active request queues in
+> tags->active_queues. blk_mq_tag_busy() and blk_mq_tag_idle() update that
+> atomic counter if the hctx flag BLK_MQ_F_TAG_QUEUE_SHARED is set. Make
+> sure that blk_mq_exit_queue() calls blk_mq_tag_idle() before that flag is
+> cleared by blk_mq_del_queue_tag_set().
 > 
-> This patchset fixes the request UAF issue by one simple approach,
-> without clearing ->rqs[] in fast path, please consider it for 5.13.
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Fixes: 0d2602ca30e4 ("blk-mq: improve support for shared tags maps")
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-mq.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> 1) grab request's ref before calling ->fn in blk_mq_tagset_busy_iter,
-> and release it after calling ->fn, so ->fn won't be called for one
-> request if its queue is frozen, done in 2st patch
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 1ea012de60eb..96b8e3164835 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3289,10 +3289,12 @@ EXPORT_SYMBOL(blk_mq_init_allocated_queue);
+>  /* tags can _not_ be used after returning from blk_mq_exit_queue */
+>  void blk_mq_exit_queue(struct request_queue *q)
+>  {
+> -	struct blk_mq_tag_set	*set = q->tag_set;
+> +	struct blk_mq_tag_set *set = q->tag_set;
+>  
+> -	blk_mq_del_queue_tag_set(q);
+> +	/* Checks hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED. */
+>  	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
+> +	/* May clear BLK_MQ_F_TAG_QUEUE_SHARED in hctx->flags. */
+> +	blk_mq_del_queue_tag_set(q);
+>  }
+>  
+>  static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
 > 
-> 2) clearing any stale request referred in ->rqs[] before freeing the
-> request pool, one per-tags spinlock is added for protecting
-> grabbing request ref vs. clearing ->rqs[tag], so UAF by refcount_inc_not_zero
-> in bt_tags_iter() is avoided, done in 3rd patch.
-> 
-> V7:
-> 	- fix one null-ptr-deref during updating nr_hw_queues, because
-> 	blk_mq_clear_flush_rq_mapping() may touch non-mapped hw queue's
-> 	tags, only patch 4/4 is modified, reported and verified by
-> 	Shinichiro Kawasaki
-> 	- run blktests and not see regression
 
-Hi Jens,
+Looks fine:
 
-We have been working on this issue for a bit long, so any chance to get
-the fixes merged? Either 5.13 or 5.14 is fine.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-
-Thanks,
+-- 
 Ming
 
