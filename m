@@ -2,109 +2,227 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39374C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 09:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 149E8C43461
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 10:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CF8761451
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 09:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D79D76145B
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 10:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232281AbhENJwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 May 2021 05:52:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47591 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232269AbhENJwK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 May 2021 05:52:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620985858;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0v2WTfoTYYFvI5g3TxNROF/jrQek1EySSdju9KXEFoA=;
-        b=PG6dlv+kcGF4BYU8kCgNxFC/2VLAWWk9jiKXDFgiGHIYZkZcr2b16biC02wSKHQQbQ5kea
-        rSsgxnNh9EagftB/KRZE8DACjhRGdbc9NXqetcgJ4C2RG2+dr/9R82cdw4NruUlyEZs2Ow
-        M0sNqoBQqth03LeFJPSEe/kvfwSy7n8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-i_GH1KlpNd-xW5uWh3gvOQ-1; Fri, 14 May 2021 05:50:57 -0400
-X-MC-Unique: i_GH1KlpNd-xW5uWh3gvOQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC9C38042A9;
-        Fri, 14 May 2021 09:50:54 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2C986788A;
-        Fri, 14 May 2021 09:50:41 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 14E9of0U023228;
-        Fri, 14 May 2021 05:50:41 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 14E9oebu023224;
-        Fri, 14 May 2021 05:50:40 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Fri, 14 May 2021 05:50:40 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Milan Broz <gmazyland@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Changheun Lee <nanich.lee@samsung.com>
-cc:     alex_y_xu@yahoo.ca, axboe@kernel.dk, bgoncalv@redhat.com,
-        dm-crypt@saout.de, hch@lst.de, jaegeuk@kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        ming.lei@redhat.com, yi.zhang@redhat.com, dm-devel@redhat.com
-Subject: Re: regression: data corruption with ext4 on LUKS on nvme with
- torvalds master
-In-Reply-To: <alpine.LRH.2.02.2105131510330.21927@file01.intranet.prod.int.rdu2.redhat.com>
-Message-ID: <alpine.LRH.2.02.2105140544010.22439@file01.intranet.prod.int.rdu2.redhat.com>
-References: <a01ab479-69e8-9395-7d24-9de1eec28aff@acm.org> <0e7b0b6e-e78c-f22d-af8d-d7bdcb597bea@gmail.com> <alpine.LRH.2.02.2105131510330.21927@file01.intranet.prod.int.rdu2.redhat.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S232060AbhENKDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 May 2021 06:03:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58672 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230023AbhENKDR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 May 2021 06:03:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CB4D2613BC;
+        Fri, 14 May 2021 10:01:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620986526;
+        bh=GrjPHc36lucdUSuooC9aqhL2Od7+jfK0fPUigqnZcVA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=iCIXGblwqBis0HCCaKglHVxXgHdjY+ZnJUEpxhS25qd0YTOmPIMwFqlt0gAwqFaCn
+         H6TYlYBWCxImWVPxQaXnme+hpROYqMTCLF2Ei6uKrfHadRhs+ayz5bA3lk5FtTeO/J
+         kbiLtSut3lU229IM7sF582cRjJivSN3xcEhAoo9aZUac6zWidfJ8NHVAJjY3Rp7yEE
+         dYKIekHBKs/JVyWBTb6nx0reJMz2nGFhAf8LBgLNfsP72b9qNOGH6t05d70F9GjPY+
+         8sZc7aQR/6sMfmjSb+dYlYAWu/wuLtjPqPhcgnm4RJEAMEiB7smvyJnpuMYADmfYdd
+         sGrgg1bm/9cMA==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     linux-arch@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Vineet Gupta <vgupta@synopsys.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        James Morris <jmorris@namei.org>, Jens Axboe <axboe@kernel.dk>,
+        John Johansen <john.johansen@canonical.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Rich Felker <dalias@libc.org>,
+        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
+        Russell King <linux@armlinux.org.uk>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
+        Stafford Horne <shorne@gmail.com>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, linux-crypto@vger.kernel.org,
+        openrisc@lists.librecores.org, linuxppc-dev@lists.ozlabs.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v2 00/13] Unify asm/unaligned.h around struct helper
+Date:   Fri, 14 May 2021 12:00:48 +0200
+Message-Id: <20210514100106.3404011-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Arnd Bergmann <arnd@arndb.de>
+
+The get_unaligned()/put_unaligned() helpers are traditionally architecture
+specific, with the two main variants being the "access-ok.h" version
+that assumes unaligned pointer accesses always work on a particular
+architecture, and the "le-struct.h" version that casts the data to a
+byte aligned type before dereferencing, for architectures that cannot
+always do unaligned accesses in hardware.
+
+Based on the discussion linked below, it appears that the access-ok
+version is not realiable on any architecture, but the struct version
+probably has no downsides. This series changes the code to use the
+same implementation on all architectures, addressing the few exceptions
+separately.
+
+I've included this version in the asm-generic tree for 5.14 already,
+addressing the few issues that were pointed out in the RFC. If there
+are any remaining problems, I hope those can be addressed as follow-up
+patches.
+
+        Arnd
+
+Link: https://lore.kernel.org/lkml/75d07691-1e4f-741f-9852-38c0b4f520bc@synopsys.com/
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100363
+Link: https://lore.kernel.org/lkml/20210507220813.365382-14-arnd@kernel.org/
+Link: git://git.kernel.org/pub/scm/linux/kernel/git/arnd/asm-generic.git unaligned-rework-v2
 
 
-On 5/13/21 7:15 AM, Theodore Ts'o wrote:
-> On Thu, May 13, 2021 at 06:42:22PM +0900, Changheun Lee wrote:
->>
->> Problem might be casued by exhausting of memory. And memory exhausting
->> would be caused by setting of small bio_max_size. Actually it was not
->> reproduced in my VM environment at first. But, I reproduced same problem
->> when bio_max_size is set with 8KB forced. Too many bio allocation would
->> be occurred by setting of 8KB bio_max_size.
-> 
-> Hmm... I'm not sure how to align your diagnosis with the symptoms in
-> the bug report.  If we were limited by memory, that should slow down
-> the I/O, but we should still be making forward progress, no?  And a
-> forced reboot should not result in data corruption, unless maybe there
+Arnd Bergmann (13):
+  asm-generic: use asm-generic/unaligned.h for most architectures
+  openrisc: always use unaligned-struct header
+  sh: remove unaligned access for sh4a
+  m68k: select CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+  powerpc: use linux/unaligned/le_struct.h on LE power7
+  asm-generic: unaligned: remove byteshift helpers
+  asm-generic: unaligned always use struct helpers
+  partitions: msdos: fix one-byte get_unaligned()
+  apparmor: use get_unaligned() only for multi-byte words
+  mwifiex: re-fix for unaligned accesses
+  netpoll: avoid put_unaligned() on single character
+  asm-generic: uaccess: 1-byte access is always aligned
+  asm-generic: simplify asm/unaligned.h
 
-If you use data=writeback, data writes and journal writes are not 
-synchronized. So, it may be possible that a journal write made it through, 
-a data write didn't - the end result would be a file containing random 
-contents that was on the disk.
+ arch/alpha/include/asm/unaligned.h          |  12 --
+ arch/arm/include/asm/unaligned.h            |  27 ---
+ arch/ia64/include/asm/unaligned.h           |  12 --
+ arch/m68k/Kconfig                           |   1 +
+ arch/m68k/include/asm/unaligned.h           |  26 ---
+ arch/microblaze/include/asm/unaligned.h     |  27 ---
+ arch/mips/crypto/crc32-mips.c               |   2 +-
+ arch/openrisc/include/asm/unaligned.h       |  47 -----
+ arch/parisc/include/asm/unaligned.h         |   6 +-
+ arch/powerpc/include/asm/unaligned.h        |  22 ---
+ arch/sh/include/asm/unaligned-sh4a.h        | 199 --------------------
+ arch/sh/include/asm/unaligned.h             |  13 --
+ arch/sparc/include/asm/unaligned.h          |  11 --
+ arch/x86/include/asm/unaligned.h            |  15 --
+ arch/xtensa/include/asm/unaligned.h         |  29 ---
+ block/partitions/ldm.h                      |   2 +-
+ block/partitions/msdos.c                    |   2 +-
+ drivers/net/wireless/marvell/mwifiex/pcie.c |  10 +-
+ include/asm-generic/uaccess.h               |   4 +-
+ include/asm-generic/unaligned.h             | 141 +++++++++++---
+ include/linux/unaligned/access_ok.h         |  68 -------
+ include/linux/unaligned/be_byteshift.h      |  71 -------
+ include/linux/unaligned/be_memmove.h        |  37 ----
+ include/linux/unaligned/be_struct.h         |  37 ----
+ include/linux/unaligned/generic.h           | 115 -----------
+ include/linux/unaligned/le_byteshift.h      |  71 -------
+ include/linux/unaligned/le_memmove.h        |  37 ----
+ include/linux/unaligned/le_struct.h         |  37 ----
+ include/linux/unaligned/memmove.h           |  46 -----
+ net/core/netpoll.c                          |   4 +-
+ security/apparmor/policy_unpack.c           |   2 +-
+ 31 files changed, 131 insertions(+), 1002 deletions(-)
+ delete mode 100644 arch/alpha/include/asm/unaligned.h
+ delete mode 100644 arch/arm/include/asm/unaligned.h
+ delete mode 100644 arch/ia64/include/asm/unaligned.h
+ delete mode 100644 arch/m68k/include/asm/unaligned.h
+ delete mode 100644 arch/microblaze/include/asm/unaligned.h
+ delete mode 100644 arch/openrisc/include/asm/unaligned.h
+ delete mode 100644 arch/powerpc/include/asm/unaligned.h
+ delete mode 100644 arch/sh/include/asm/unaligned-sh4a.h
+ delete mode 100644 arch/sh/include/asm/unaligned.h
+ delete mode 100644 arch/sparc/include/asm/unaligned.h
+ delete mode 100644 arch/x86/include/asm/unaligned.h
+ delete mode 100644 arch/xtensa/include/asm/unaligned.h
+ delete mode 100644 include/linux/unaligned/access_ok.h
+ delete mode 100644 include/linux/unaligned/be_byteshift.h
+ delete mode 100644 include/linux/unaligned/be_memmove.h
+ delete mode 100644 include/linux/unaligned/be_struct.h
+ delete mode 100644 include/linux/unaligned/generic.h
+ delete mode 100644 include/linux/unaligned/le_byteshift.h
+ delete mode 100644 include/linux/unaligned/le_memmove.h
+ delete mode 100644 include/linux/unaligned/le_struct.h
+ delete mode 100644 include/linux/unaligned/memmove.h
 
-Changheun - do you use data=writeback? Did the corruption happen only in 
-newly created files? Or did it corrupt existing files?
+-- 
+2.29.2
 
-> was a missing check for a failed memory allocation, causing data to be
-> written to the wrong location, a missing error check leading to the
-> block or file system layer not noticing that a write had failed
-> (although again, memory exhaustion should not lead to failed writes;
-> it might slow us down, sure, but if writes are being failed, something
-> is Badly Going Wrong --- things like writes to the swap device or
-> writes by the page cleaner must succeed, or else Things Would Go Bad
-> In A Hurry).
+Cc: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Ganapathi Bhat <ganapathi017@gmail.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: James Morris <jmorris@namei.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: John Johansen <john.johansen@canonical.com>
+Cc: Jonas Bonn <jonas@southpole.se>
+Cc: Kalle Valo <kvalo@codeaurora.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Rich Felker <dalias@libc.org>
+Cc: "Richard Russon (FlatCap)" <ldm@flatcap.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: Sharvari Harisangam <sharvari.harisangam@nxp.com>
+Cc: Stafford Horne <shorne@gmail.com>
+Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Xinming Hu <huxinming820@gmail.com>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-crypto@vger.kernel.org
+Cc: openrisc@lists.librecores.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-sh@vger.kernel.org
+Cc: sparclinux@vger.kernel.org
+Cc: linux-ntfs-dev@lists.sourceforge.net
+Cc: linux-block@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
 
-Mikulas
 
