@@ -2,88 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFF0C433ED
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 15:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D435C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 16:16:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F0496144F
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 15:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DCB7613F1
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 16:16:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234938AbhENPhl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 May 2021 11:37:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39662 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234932AbhENPhl (ORCPT
+        id S233241AbhENQRP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 May 2021 12:17:15 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:60748 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233166AbhENQRO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 May 2021 11:37:41 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64284C06174A
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 08:36:29 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id j12so123889ils.4
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 08:36:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4/GUoS/s/pmKCrrW4dpmT6VyHP1dRyQUpvAxP6l+m+4=;
-        b=c/J6awobOutwsD8qM65lKbpitWshdM0Z3jJuwxILQ6ZhdwOTgg7+Q4QqgKLGH09LiQ
-         eYe6ECuHYExhZOU1TzMshCSmCu5Z5pVwlAvAtpfyLXNrCQNwttgPE0vvS197KKDfxZvA
-         hlcp0d2PbZxB/7DNYSQC4dmNbOZzr+/+hIUGgvyYder5bqiKqyWjVH0HDtA05YAU1uvd
-         EnRvJFEOUeRGGvFNRMKXVl0xdUwP9ZU8YGE4Mq9ab49QmEmSvL6Zk3RQIykZsGlSvvrr
-         IJj5nwwSk+pwSYxxmSq/wtplyXwYrB8jHSGEB06BvGG2zwpQSZTxuv7/T5ZSIjDEylUs
-         974w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4/GUoS/s/pmKCrrW4dpmT6VyHP1dRyQUpvAxP6l+m+4=;
-        b=EYQV+ezZzbZbeRJk08t0igCHQVZbdjIT6xD4Cr9dAwOUOLVuOx70qREPOoiA+/nBeQ
-         nAgCnx4FrdjhYz77SJ9GDgBcLwNkIMwNfXMo9NOj8aJjRU4gAo3Xnd5SCeflaPMf4rFX
-         Zic98+k86PgNRo9j7RlUKGnrdQGF2xrCHfXewQVwFnFm6Ne0RKCeVApcv6LEaa0tlrhR
-         tzeHkmrb/hjPFrwSdhIeBXus6ozreZ28FjlxB8WEtYiN38HPBnRG0bHatG7R+p9pdSMh
-         8s1hFoC240b93Y/e0Kd3PPirJg50criPA11H41ITz5/HyYmRi7X+dP0/f4ebeV1WrfXw
-         NwsQ==
-X-Gm-Message-State: AOAM532HF1O4lq3syy+qfpLqwoabGBniRP4xNqK+sPz/LZyYlcNW3q/Q
-        vVgSi5ghjSyCv7Fm36301UAWKw==
-X-Google-Smtp-Source: ABdhPJyvIbSzncjDIb1dxsq2wEqhStDkWRXqtgyPV4HOJ6yW8EigZ4R0exjw+BiFUMHrrJ7pt2CVxQ==
-X-Received: by 2002:a92:d1c4:: with SMTP id u4mr30973664ilg.286.1621006588857;
-        Fri, 14 May 2021 08:36:28 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id n184sm2922523iod.0.2021.05.14.08.36.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 May 2021 08:36:28 -0700 (PDT)
-Subject: Re: [PATCH v3 0/2] blk-mq: Request queue-wide tags for shared sbitmap
-To:     John Garry <john.garry@huawei.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, ming.lei@redhat.com,
-        kashyap.desai@broadcom.com, chenxiang66@hisilicon.com,
-        yama@redhat.com, dgilbert@interlog.com
-References: <1620907258-30910-1-git-send-email-john.garry@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2d136383-7728-e680-7d1a-71c9f180fb28@kernel.dk>
-Date:   Fri, 14 May 2021 09:36:27 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 14 May 2021 12:17:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=E4eKfLLPwxlNLjuttUuI8VaOne71TO7fgDfREp6VqWo=; b=sPRxOlEMD/ZVQ88LgoGLL9OjBW
+        Wx0+B2uNVHava/VVSM9gB4FJtOz6aiI72TospMuM4DTR6YiCUjKsyUOFus7PH/19HYF72JItnGrXW
+        vLLue47wtV1XdyCo9lXQkyk8vp82wx6TPOdDnUwXhjOophg0NxfdhWMpLuolM5ISe/FynxCSvGtSn
+        JJsuJooWId8Qr8z3RExNK6gc34i19s93IGYSCWBOAxS9DTtnHVWXzpIfK9FdD6uCsHV5a5kGmOum/
+        rXiAGakNoK/7PHlxa2iM/+f2Q+Ns8rzVCrKhqZN6zgA9a10xmb4hzYQ25BXQ/JHXfvK25hlMlmWo3
+        CP907NSA==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtp (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1lhaTZ-00066P-MN; Fri, 14 May 2021 10:15:46 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>
+References: <20210513223203.5542-1-logang@deltatee.com>
+ <20210513223203.5542-9-logang@deltatee.com> <20210514135126.GB4715@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <241e7dad-8d38-9f0c-5e54-8b7df32b8bac@deltatee.com>
+Date:   Fri, 14 May 2021 10:15:44 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <1620907258-30910-1-git-send-email-john.garry@huawei.com>
+In-Reply-To: <20210514135126.GB4715@lst.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v2 08/22] dma-mapping: Allow map_sg() ops to return
+ negative error codes
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/13/21 6:00 AM, John Garry wrote:
-> This is v3 of patch/series. I have spun off a new patch for tag allocation
-> refactoring.
 
-Applied for 5.14, thanks.
 
--- 
-Jens Axboe
+On 2021-05-14 7:51 a.m., Christoph Hellwig wrote:
+>> +int __dma_map_sg_attrs(struct device *dev, struct scatterlist *sg, int nents,
+>>  		enum dma_data_direction dir, unsigned long attrs);
+> 
+> I don't think it makes sense to expose this __dma_map_sg_attrs helper.
+> Just keep it static and move the sgtable helper to kernel/dma/mapping.c
+> as well.
 
+Makes sense. I'll fix this for v3.
+
+Logan
