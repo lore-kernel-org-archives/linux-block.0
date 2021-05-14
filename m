@@ -2,100 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66593C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 09:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C41FC433ED
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 09:43:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34FC261415
-	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 09:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED90161415
+	for <linux-block@archiver.kernel.org>; Fri, 14 May 2021 09:43:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231197AbhENJjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 May 2021 05:39:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230236AbhENJjl (ORCPT
+        id S230509AbhENJpF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 May 2021 05:45:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32440 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230175AbhENJpF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 May 2021 05:39:41 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC63C061574
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 02:38:28 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id gc22-20020a17090b3116b02901558435aec1so1363818pjb.4
-        for <linux-block@vger.kernel.org>; Fri, 14 May 2021 02:38:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=IE6DoBHuj1BTNAGdOQwF+HuP5Ow58xWKxeF4GoigiB8=;
-        b=eIer510lqTQCjTZLmOq26i+2NhOrI1u28jlyH/4DhTSGkvf6fezrqLpfuI1Nza0Xz4
-         1F24TELAq5p+YfbTifoRKWRvxqh/O5lXJjyXezMaMwIUaC5eBcSxBx8hokSqvPoz55nX
-         y34wWMfY1v0xcVO3cXfrq+8KTlHSWc1BzICtzWSYBsVdIC/JI+RmE8vkH5GRoMieLBeJ
-         IMP23XRt6AQh7nuirgNNTIl4qg+kq23npRB31E/FlxD/pSn8RJB/UG3noCtwXeotlYis
-         NR+8/cJzA3YtFtbv/MT4FhVNQtwNki1hMEkdBu0DQt63qkvGy9iYSq0GYUUP71IWHPKM
-         X30w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=IE6DoBHuj1BTNAGdOQwF+HuP5Ow58xWKxeF4GoigiB8=;
-        b=BqscnQxNFYSv5YSIOBt6y0rkgyzX+9qM6o2VfniDklP8xBBOgo2LulkY+3GZSqGcWQ
-         ltN5cxvU6ivIhDb23tm9xaR8Z257QAVWFpFGa6LhYZ+e45OONqc6HnZAh2poVu9i/OTd
-         kxF5V2YnmUgaZrD4UTCMdt8wkBjKmdUSBRH9lBZYNvab3OACe6INAcUgix7yQHgXMBpp
-         JHrr7JJU9KQV8CRz5DMw2cn04rhEX+BwoPhoAcOD1pjUBnHk3LEnPmTdzyjD4goylqoS
-         yZ6Ci4KMTeO8gm04RWFusdPp5J7y9cBMpQa/PaYv02Sj9A+C3UYRiEVpk3A77U2tTFuJ
-         a5rw==
-X-Gm-Message-State: AOAM533SDQsTFE6vD1MVhizIPGbiPqpmfh1nM2YJVN9XME0blUaVx+wo
-        7+bgOVyM7lvmh9wbvn0gwbI=
-X-Google-Smtp-Source: ABdhPJyjp1IWShvMcvIob5BUaLxL4D0Wg399LbwZOqRZPwhzddbzp6Az1oD+r0JKIKgQOu4eWDikyQ==
-X-Received: by 2002:a17:902:6901:b029:ee:e531:ca5f with SMTP id j1-20020a1709026901b02900eee531ca5fmr45004486plk.37.1620985107198;
-        Fri, 14 May 2021 02:38:27 -0700 (PDT)
-Received: from yguoaz-VirtualBox.hz.ali.com ([106.11.30.42])
-        by smtp.googlemail.com with ESMTPSA id w12sm3848421pff.42.2021.05.14.02.38.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 May 2021 02:38:26 -0700 (PDT)
-From:   Yiyuan GUO <yguoaz@gmail.com>
-X-Google-Original-From: Yiyuan GUO <yguoaz@cse.ust.hk>
-To:     hare@suse.de
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, yguoaz@cse.ust.hk,
-        yguoaz@gmail.com
-Subject: [PATCH v2] block: add protection for divide by zero in blk_mq_map_queues
-Date:   Fri, 14 May 2021 17:38:16 +0800
-Message-Id: <20210514093816.66612-1-yguoaz@cse.ust.hk>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <274501fd-3115-3015-3577-3ed64e4038a0@suse.de>
-References: <274501fd-3115-3015-3577-3ed64e4038a0@suse.de>
+        Fri, 14 May 2021 05:45:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620985433;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=05Af3bVZXrGJRy2+GfagSd6JI7OZwal3JL9/7JcdoT8=;
+        b=ZkdaEcxcldo0XiLP+unIZ62NBCaLEv6wBqZ1GjXYiHrW67WGpKIiTXqxajOOcw1Y7H6+oI
+        tLzPq58Lzpnnwcbs8gJW636TYgHaOKr+rgvWBsTk4EckMMEm13fe8buvsxfOZfqQqM9IFs
+        e7k/PpR5ZxxS8rdKRuUE43ofWL+dyYs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-WqmhRHU7PHCcJPYyjHCMaA-1; Fri, 14 May 2021 05:43:52 -0400
+X-MC-Unique: WqmhRHU7PHCcJPYyjHCMaA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 203D61007480;
+        Fri, 14 May 2021 09:43:50 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A507F1971B;
+        Fri, 14 May 2021 09:43:39 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 14E9hd7S022799;
+        Fri, 14 May 2021 05:43:39 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 14E9haED022795;
+        Fri, 14 May 2021 05:43:36 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 14 May 2021 05:43:36 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Bart Van Assche <bvanassche@acm.org>
+cc:     Milan Broz <gmazyland@gmail.com>, "Theodore Ts'o" <tytso@mit.edu>,
+        Changheun Lee <nanich.lee@samsung.com>, alex_y_xu@yahoo.ca,
+        axboe@kernel.dk, bgoncalv@redhat.com, dm-crypt@saout.de,
+        hch@lst.de, jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, ming.lei@redhat.com,
+        yi.zhang@redhat.com, dm-devel@redhat.com
+Subject: Re: regression: data corruption with ext4 on LUKS on nvme with
+ torvalds master
+In-Reply-To: <fdee795d-7a4b-9506-b9ca-359b9bcbec34@acm.org>
+Message-ID: <alpine.LRH.2.02.2105140514560.20018@file01.intranet.prod.int.rdu2.redhat.com>
+References: <a01ab479-69e8-9395-7d24-9de1eec28aff@acm.org> <0e7b0b6e-e78c-f22d-af8d-d7bdcb597bea@gmail.com> <alpine.LRH.2.02.2105131510330.21927@file01.intranet.prod.int.rdu2.redhat.com> <fdee795d-7a4b-9506-b9ca-359b9bcbec34@acm.org>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In function blk_mq_map_queues, qmap->nr_queues may equal zero
-and thus it needs to be checked before we pass it to function
-queue_index.
 
-Signed-off-by: Yiyuan GUO <yguoaz@cse.ust.hk>
----
- block/blk-mq-cpumap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 3db84d319..c2163658e 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -64,7 +64,7 @@ int blk_mq_map_queues(struct blk_mq_queue_map *qmap)
- 			map[cpu] = queue_index(qmap, nr_queues, q++);
- 		} else {
- 			first_sibling = get_first_sibling(cpu);
--			if (first_sibling == cpu)
-+			if ((first_sibling == cpu) && nr_queues)
- 				map[cpu] = queue_index(qmap, nr_queues, q++);
- 			else
- 				map[cpu] = map[first_sibling];
--- 
-2.25.1
+On Thu, 13 May 2021, Bart Van Assche wrote:
+
+> On 5/13/21 12:22 PM, Mikulas Patocka wrote:
+> > We already had problems with too large bios in dm-crypt and we fixed it by 
+> > adding this piece of code:
+> > 
+> >         /*
+> >          * Check if bio is too large, split as needed.
+> >          */
+> >         if (unlikely(bio->bi_iter.bi_size > (BIO_MAX_VECS << PAGE_SHIFT)) &&
+> >             (bio_data_dir(bio) == WRITE || cc->on_disk_tag_size))
+> >                 dm_accept_partial_bio(bio, ((BIO_MAX_VECS << PAGE_SHIFT) >> SECTOR_SHIFT));
+> > 
+> > It will ask the device mapper to split the bio if it is too large. So, 
+> > crypt_alloc_buffer can't receive a bio that is larger than BIO_MAX_VECS << 
+> > PAGE_SHIFT.
+> 
+> Hi Mikulas,
+> 
+> Are you perhaps referring to commit 4e870e948fba ("dm crypt: fix error
+> with too large bios")? Did that commit go upstream before multi-page
+> bvec support?
+
+Yes. It's from 2016.
+
+> Can larger bios be supported in case of two or more
+> contiguous pages now that multi-page bvec support is upstream?
+
+No - we need to allocate a buffer for the written data. The buffer size is 
+limited to PAGE_SIZE * BIO_MAX_VECS.
+
+> Thanks,
+> 
+> Bart.
+
+Mikulas
 
