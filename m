@@ -2,64 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03355C433B4
-	for <linux-block@archiver.kernel.org>; Sat, 15 May 2021 16:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2DABC433B4
+	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 15:03:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD3746143C
-	for <linux-block@archiver.kernel.org>; Sat, 15 May 2021 16:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C735861182
+	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 15:03:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233504AbhEOQaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 May 2021 12:30:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52662 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233441AbhEOQaO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 May 2021 12:30:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 97122613C5;
-        Sat, 15 May 2021 16:29:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621096140;
-        bh=NrnOBVVfgSJFz/PXufx7OglURM0DP7l0gHuRWauD03U=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=E/LADsIQLzbMC9zkCThZnoBJ0tZo8rjBq+5ZuL5++2Pn8eSG0pmWadAw38h1JHOe7
-         H+AxedHZucO2kIR3AQIu4eaJXK0KYsa+dFvW+JcwXVmG6AnjqtnIeDQRWXys51aMAQ
-         BwZuwpShHtUbCeE8r9S8TdxAvD328qyMV/jFeyc6aBe034EcfYBvUMk2ML2HVFBikG
-         24/MZZ/uerLqPzygTVyi5jRs2yVYNq6qbWwoX1kfV7mNyuMPiO8jCcPpmpbt0sgHBt
-         SJ8u8LMGJdUZA5p3Z7l8ugcn0utXNQ7NY7nhUG6ogQNc0JwZxrcdAyeoAQDuhtCBEa
-         6I1HJ451/x0OQ==
-Subject: Re: [GIT PULL] Block fixes for 5.13-rc
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <e1e84296-62d5-ba60-82f7-f33ff9988ca7@kernel.dk>
-References: <e1e84296-62d5-ba60-82f7-f33ff9988ca7@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <e1e84296-62d5-ba60-82f7-f33ff9988ca7@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.13-2021-05-14
-X-PR-Tracked-Commit-Id: 4bc2082311311892742deb2ce04bc335f85ee27a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8f4ae0f68c5cb796cda02b7d68b5b5c1ff6365b8
-Message-Id: <162109614059.13678.3580327215405286598.pr-tracker-bot@kernel.org>
-Date:   Sat, 15 May 2021 16:29:00 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S234389AbhEPPEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 May 2021 11:04:54 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:40470 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234318AbhEPPEy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 16 May 2021 11:04:54 -0400
+Received: from mail-lj1-f197.google.com ([209.85.208.197])
+        by youngberry.canonical.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <juerg.haefliger@canonical.com>)
+        id 1liIIs-0007DC-Sc
+        for linux-block@vger.kernel.org; Sun, 16 May 2021 15:03:38 +0000
+Received: by mail-lj1-f197.google.com with SMTP id x26-20020a2e9c9a0000b02900eaf62d380eso2119267lji.2
+        for <linux-block@vger.kernel.org>; Sun, 16 May 2021 08:03:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XTCfpt/56FbqDOoQ8sUsaMXNebh06g9CZvsUJW9+jNY=;
+        b=LDYVzlBIhSSkbjKKMrlObYmWHgSfkPBLFSvxcv1Gli6pdPGjoil+DPIhC48OFTweqL
+         KPUhF5FZLwsogiJ2Fy4ey5AgJsdvisduKD3G1nI3sUpkMj1NK5zkgWI82exAZgIHxEAh
+         TqI/fJIAtkDxIswkh2/6kZqxZccybA0KXMR+jgwEzXdEksuc8s/V6IAmREHbAeBIjXRf
+         oiVIJvRlgRj8aDXFAN7CgeSkHCI8DEAl/C0Ss6z0liv1GRxmMWUutJw1KDknAAPlTGhd
+         XV58tiLNpuxvmUAOX+/v4BIUWL9MjV8ubt/oDfNqXEgKCdCBsgQ0klrHUNs4+Xri+PYw
+         ncyQ==
+X-Gm-Message-State: AOAM531P9drmS6H2HiqQolvErjcZIghzE5sj7P9ehk5taHW/j+rC/UzX
+        SYpG84DucuAikUTpM0Um7Hsd8PC14nYnoYAn1KaFBI+izgnOnaNZldpwHKF5ZVpLEuyvDrm0QEy
+        OzWhmAD7G9+2qJIGbKYtCK5n7La5MrEO9mpuZSYke
+X-Received: by 2002:aa7:c781:: with SMTP id n1mr30536214eds.108.1621177058174;
+        Sun, 16 May 2021 07:57:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzgjPgNxbUF7hm+COhC/ooKGZrl9JgiTHUHstCcL7r40Cj4zYM5f1bEMCKhdjiXTEnIoj121A==
+X-Received: by 2002:aa7:c781:: with SMTP id n1mr30536192eds.108.1621177057984;
+        Sun, 16 May 2021 07:57:37 -0700 (PDT)
+Received: from gollum.fritz.box ([194.191.244.86])
+        by smtp.gmail.com with ESMTPSA id q26sm7164708ejc.3.2021.05.16.07.57.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 May 2021 07:57:37 -0700 (PDT)
+From:   Juerg Haefliger <juerg.haefliger@canonical.com>
+X-Google-Original-From: Juerg Haefliger <juergh@canonical.com>
+To:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Juerg Haefliger <juergh@canonical.com>
+Subject: [PATCH] init/Kconfig: Fix BLK_CGROUP help text indentation
+Date:   Sun, 16 May 2021 16:57:31 +0200
+Message-Id: <20210516145731.61253-1-juergh@canonical.com>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 14 May 2021 21:06:01 -0600:
+The convention for help text indentation seems to be tab + 2 spaces.
+Do that for BLK_CGROUP which currently only uses a single tab.
 
-> git://git.kernel.dk/linux-block.git tags/block-5.13-2021-05-14
+Signed-off-by: Juerg Haefliger <juergh@canonical.com>
+---
+ init/Kconfig | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8f4ae0f68c5cb796cda02b7d68b5b5c1ff6365b8
-
-Thank you!
-
+diff --git a/init/Kconfig b/init/Kconfig
+index 9f1cde503739..5beaa0249071 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -926,22 +926,23 @@ config BLK_CGROUP
+ 	depends on BLOCK
+ 	default n
+ 	help
+-	Generic block IO controller cgroup interface. This is the common
+-	cgroup interface which should be used by various IO controlling
+-	policies.
+-
+-	Currently, CFQ IO scheduler uses it to recognize task groups and
+-	control disk bandwidth allocation (proportional time slice allocation)
+-	to such task groups. It is also used by bio throttling logic in
+-	block layer to implement upper limit in IO rates on a device.
+-
+-	This option only enables generic Block IO controller infrastructure.
+-	One needs to also enable actual IO controlling logic/policy. For
+-	enabling proportional weight division of disk bandwidth in CFQ, set
+-	CONFIG_BFQ_GROUP_IOSCHED=y; for enabling throttling policy, set
+-	CONFIG_BLK_DEV_THROTTLING=y.
+-
+-	See Documentation/admin-guide/cgroup-v1/blkio-controller.rst for more information.
++	  Generic block IO controller cgroup interface. This is the common
++	  cgroup interface which should be used by various IO controlling
++	  policies.
++
++	  Currently, CFQ IO scheduler uses it to recognize task groups and
++	  control disk bandwidth allocation (proportional time slice allocation)
++	  to such task groups. It is also used by bio throttling logic in
++	  block layer to implement upper limit in IO rates on a device.
++
++	  This option only enables generic Block IO controller infrastructure.
++	  One needs to also enable actual IO controlling logic/policy. For
++	  enabling proportional weight division of disk bandwidth in CFQ, set
++	  CONFIG_BFQ_GROUP_IOSCHED=y; for enabling throttling policy, set
++	  CONFIG_BLK_DEV_THROTTLING=y.
++
++	  See Documentation/admin-guide/cgroup-v1/blkio-controller.rst for more
++	  information.
+ 
+ config CGROUP_WRITEBACK
+ 	bool
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.27.0
+
