@@ -2,123 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2DABC433B4
-	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 15:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C7DC433ED
+	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 18:02:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C735861182
-	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 15:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7704B61166
+	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 18:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234389AbhEPPEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 May 2021 11:04:54 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:40470 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234318AbhEPPEy (ORCPT
+        id S229772AbhEPSDV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 May 2021 14:03:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50208 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229445AbhEPSDV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 May 2021 11:04:54 -0400
-Received: from mail-lj1-f197.google.com ([209.85.208.197])
-        by youngberry.canonical.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <juerg.haefliger@canonical.com>)
-        id 1liIIs-0007DC-Sc
-        for linux-block@vger.kernel.org; Sun, 16 May 2021 15:03:38 +0000
-Received: by mail-lj1-f197.google.com with SMTP id x26-20020a2e9c9a0000b02900eaf62d380eso2119267lji.2
-        for <linux-block@vger.kernel.org>; Sun, 16 May 2021 08:03:38 -0700 (PDT)
+        Sun, 16 May 2021 14:03:21 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3443C061573;
+        Sun, 16 May 2021 11:02:04 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id f75-20020a1c1f4e0000b0290171001e7329so2278629wmf.1;
+        Sun, 16 May 2021 11:02:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=v5QeMzC7egI7pjAS/w22YSUqGDibggEE9rbaYoIGpqU=;
+        b=jJ13KUi89rkNTv5tEp/or85ah2IUrc70DM23VD2NFuKqNXgbGkxRibfZ1yAv3qhGz+
+         he7zfD+uCJJZqQtGUv8Jlrs+c6G1WzUzpODftpLvaiEGqEJCD+2TCQJqlRAHWUsRMVIq
+         ZdaQVjzjaWmXSNhnya5mX2xStw+rRNkB8dMy/68hO9shWxp4ICdobyQh1325TaIb5CTI
+         pJxNJIqSUnBWUW5YL7z2UHv4dJpUdMhezplO4j3Sn03+rdASCUUdJlsqvrzTFw+IbWeJ
+         CSmboMAyYaBs5LwZiggmQnaVhdr8a92HVxaa4IzHaxJss7T1K0dIGvLwR1IVXaP2IoDV
+         UhEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XTCfpt/56FbqDOoQ8sUsaMXNebh06g9CZvsUJW9+jNY=;
-        b=LDYVzlBIhSSkbjKKMrlObYmWHgSfkPBLFSvxcv1Gli6pdPGjoil+DPIhC48OFTweqL
-         KPUhF5FZLwsogiJ2Fy4ey5AgJsdvisduKD3G1nI3sUpkMj1NK5zkgWI82exAZgIHxEAh
-         TqI/fJIAtkDxIswkh2/6kZqxZccybA0KXMR+jgwEzXdEksuc8s/V6IAmREHbAeBIjXRf
-         oiVIJvRlgRj8aDXFAN7CgeSkHCI8DEAl/C0Ss6z0liv1GRxmMWUutJw1KDknAAPlTGhd
-         XV58tiLNpuxvmUAOX+/v4BIUWL9MjV8ubt/oDfNqXEgKCdCBsgQ0klrHUNs4+Xri+PYw
-         ncyQ==
-X-Gm-Message-State: AOAM531P9drmS6H2HiqQolvErjcZIghzE5sj7P9ehk5taHW/j+rC/UzX
-        SYpG84DucuAikUTpM0Um7Hsd8PC14nYnoYAn1KaFBI+izgnOnaNZldpwHKF5ZVpLEuyvDrm0QEy
-        OzWhmAD7G9+2qJIGbKYtCK5n7La5MrEO9mpuZSYke
-X-Received: by 2002:aa7:c781:: with SMTP id n1mr30536214eds.108.1621177058174;
-        Sun, 16 May 2021 07:57:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzgjPgNxbUF7hm+COhC/ooKGZrl9JgiTHUHstCcL7r40Cj4zYM5f1bEMCKhdjiXTEnIoj121A==
-X-Received: by 2002:aa7:c781:: with SMTP id n1mr30536192eds.108.1621177057984;
-        Sun, 16 May 2021 07:57:37 -0700 (PDT)
-Received: from gollum.fritz.box ([194.191.244.86])
-        by smtp.gmail.com with ESMTPSA id q26sm7164708ejc.3.2021.05.16.07.57.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 May 2021 07:57:37 -0700 (PDT)
-From:   Juerg Haefliger <juerg.haefliger@canonical.com>
-X-Google-Original-From: Juerg Haefliger <juergh@canonical.com>
-To:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Juerg Haefliger <juergh@canonical.com>
-Subject: [PATCH] init/Kconfig: Fix BLK_CGROUP help text indentation
-Date:   Sun, 16 May 2021 16:57:31 +0200
-Message-Id: <20210516145731.61253-1-juergh@canonical.com>
-X-Mailer: git-send-email 2.27.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=v5QeMzC7egI7pjAS/w22YSUqGDibggEE9rbaYoIGpqU=;
+        b=I3RkU3B60d8ynkLIyfJUDcv+GyF5hVnIGH91ICpWzmGxvbYZrNoPoD/rA9busi6TF9
+         cTFEuOaggL6ENNi2dFH/pg3BenVMbxDzgaDwZkWKMoKFrWE500+X7PHvC6GLk7a8ZySW
+         59o/uiS5IKzcvHZS76SGLmMG7ujpzng+FCtwRBOdn74n++Pj6CQj7k1pl8zudnwNexqj
+         u/HJ9Rqyi5DzhQTH+KW/sT8hXg8XBByVDRCL0Dun9f2mzoxLjwNQvXVHt9o1V/n8Pbhu
+         3RY1Ff8CgUJ/8tC62evoWTGYNjMeriRYWZm56AvE3P28zGOzrD6dRwyoFjBjN+Iu2H9s
+         Bx6g==
+X-Gm-Message-State: AOAM531ze9H+t8CMW4E0kTU2SKzoijepWH/qRJ62PqocqnSqo61AKPWk
+        RF1txNBEuGnnYKW5psIsM3ylmh+E2DxGCxsRSoS2aXheO2o=
+X-Google-Smtp-Source: ABdhPJy/YKSh7Ymq0zYxR42sFCU6UUWGDIoSiLs09paq3ntNO3TKKfvRjNNb8S60ZlbPFETzHSzEp2EIVBGwPdhpQBI=
+X-Received: by 2002:a1c:a442:: with SMTP id n63mr12383114wme.25.1621188123406;
+ Sun, 16 May 2021 11:02:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210512131545.495160-1-hch@lst.de> <20210512131545.495160-3-hch@lst.de>
+In-Reply-To: <20210512131545.495160-3-hch@lst.de>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Sun, 16 May 2021 23:31:35 +0530
+Message-ID: <CA+1E3r+8HrUymD-4Q06drqi_qV_L40OjgPCsw6C_Y6Gn_3FVSg@mail.gmail.com>
+Subject: Re: [PATCH 02/15] block: don't try to poll multi-bio I/Os in __blkdev_direct_IO
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
+        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The convention for help text indentation seems to be tab + 2 spaces.
-Do that for BLK_CGROUP which currently only uses a single tab.
+On Wed, May 12, 2021 at 6:50 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> If an iocb is split into multiple bios we can't poll for both.  So don't
+> bother to even try to poll in that case.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/block_dev.c | 37 ++++++++++++++-----------------------
+>  1 file changed, 14 insertions(+), 23 deletions(-)
+>
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index b8abccd03e5d..0080a3b710b4 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -375,7 +375,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+>         struct blk_plug plug;
+>         struct blkdev_dio *dio;
+>         struct bio *bio;
+> -       bool is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
+> +       bool is_poll = (iocb->ki_flags & IOCB_HIPRI), do_poll = false;
+>         bool is_read = (iov_iter_rw(iter) == READ), is_sync;
+>         loff_t pos = iocb->ki_pos;
+>         blk_qc_t qc = BLK_QC_T_NONE;
+> @@ -437,22 +437,9 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+>                 pos += bio->bi_iter.bi_size;
+>
+>                 nr_pages = bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS);
+> -               if (!nr_pages) {
+> -                       bool polled = false;
+> -
+> -                       if (iocb->ki_flags & IOCB_HIPRI) {
+> -                               bio_set_polled(bio, iocb);
+> -                               polled = true;
+> -                       }
+> -
+> -                       qc = submit_bio(bio);
+> -
+> -                       if (polled)
+> -                               WRITE_ONCE(iocb->ki_cookie, qc);
+> -                       break;
+> -               }
+> -
+> -               if (!dio->multi_bio) {
+> +               if (dio->multi_bio) {
+> +                       atomic_inc(&dio->ref);
+> +               } else if (nr_pages) {
+>                         /*
+>                          * AIO needs an extra reference to ensure the dio
+>                          * structure which is embedded into the first bio
+> @@ -462,11 +449,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+>                                 bio_get(bio);
+>                         dio->multi_bio = true;
+>                         atomic_set(&dio->ref, 2);
+> -               } else {
+> -                       atomic_inc(&dio->ref);
+> +               } else if (is_poll) {
+> +                       bio_set_polled(bio, iocb);
+> +                       do_poll = true;
+> +               }
+> +               qc = submit_bio(bio);
+> +               if (!nr_pages) {
+> +                       if (do_poll)
+> +                               WRITE_ONCE(iocb->ki_cookie, qc);
+> +                       break;
+>                 }
+> -
+> -               submit_bio(bio);
+>                 bio = bio_alloc(GFP_KERNEL, nr_pages);
+>         }
 
-Signed-off-by: Juerg Haefliger <juergh@canonical.com>
----
- init/Kconfig | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+dio->ref update goes amiss here.
+For multi-bio, if the original code sets it as N, this will set it as
+N+1, causing endless-wait for the caller.
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 9f1cde503739..5beaa0249071 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -926,22 +926,23 @@ config BLK_CGROUP
- 	depends on BLOCK
- 	default n
- 	help
--	Generic block IO controller cgroup interface. This is the common
--	cgroup interface which should be used by various IO controlling
--	policies.
--
--	Currently, CFQ IO scheduler uses it to recognize task groups and
--	control disk bandwidth allocation (proportional time slice allocation)
--	to such task groups. It is also used by bio throttling logic in
--	block layer to implement upper limit in IO rates on a device.
--
--	This option only enables generic Block IO controller infrastructure.
--	One needs to also enable actual IO controlling logic/policy. For
--	enabling proportional weight division of disk bandwidth in CFQ, set
--	CONFIG_BFQ_GROUP_IOSCHED=y; for enabling throttling policy, set
--	CONFIG_BLK_DEV_THROTTLING=y.
--
--	See Documentation/admin-guide/cgroup-v1/blkio-controller.rst for more information.
-+	  Generic block IO controller cgroup interface. This is the common
-+	  cgroup interface which should be used by various IO controlling
-+	  policies.
-+
-+	  Currently, CFQ IO scheduler uses it to recognize task groups and
-+	  control disk bandwidth allocation (proportional time slice allocation)
-+	  to such task groups. It is also used by bio throttling logic in
-+	  block layer to implement upper limit in IO rates on a device.
-+
-+	  This option only enables generic Block IO controller infrastructure.
-+	  One needs to also enable actual IO controlling logic/policy. For
-+	  enabling proportional weight division of disk bandwidth in CFQ, set
-+	  CONFIG_BFQ_GROUP_IOSCHED=y; for enabling throttling policy, set
-+	  CONFIG_BLK_DEV_THROTTLING=y.
-+
-+	  See Documentation/admin-guide/cgroup-v1/blkio-controller.rst for more
-+	  information.
- 
- config CGROUP_WRITEBACK
- 	bool
 -- 
-2.27.0
-
+Kanchan
