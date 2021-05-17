@@ -2,153 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C7DC433ED
-	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 18:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D59CC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 06:16:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7704B61166
-	for <linux-block@archiver.kernel.org>; Sun, 16 May 2021 18:02:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B11261007
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 06:16:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbhEPSDV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 May 2021 14:03:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50208 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbhEPSDV (ORCPT
+        id S234737AbhEQGR7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 May 2021 02:17:59 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:4175 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234766AbhEQGR5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 May 2021 14:03:21 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3443C061573;
-        Sun, 16 May 2021 11:02:04 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id f75-20020a1c1f4e0000b0290171001e7329so2278629wmf.1;
-        Sun, 16 May 2021 11:02:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=v5QeMzC7egI7pjAS/w22YSUqGDibggEE9rbaYoIGpqU=;
-        b=jJ13KUi89rkNTv5tEp/or85ah2IUrc70DM23VD2NFuKqNXgbGkxRibfZ1yAv3qhGz+
-         he7zfD+uCJJZqQtGUv8Jlrs+c6G1WzUzpODftpLvaiEGqEJCD+2TCQJqlRAHWUsRMVIq
-         ZdaQVjzjaWmXSNhnya5mX2xStw+rRNkB8dMy/68hO9shWxp4ICdobyQh1325TaIb5CTI
-         pJxNJIqSUnBWUW5YL7z2UHv4dJpUdMhezplO4j3Sn03+rdASCUUdJlsqvrzTFw+IbWeJ
-         CSmboMAyYaBs5LwZiggmQnaVhdr8a92HVxaa4IzHaxJss7T1K0dIGvLwR1IVXaP2IoDV
-         UhEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=v5QeMzC7egI7pjAS/w22YSUqGDibggEE9rbaYoIGpqU=;
-        b=I3RkU3B60d8ynkLIyfJUDcv+GyF5hVnIGH91ICpWzmGxvbYZrNoPoD/rA9busi6TF9
-         cTFEuOaggL6ENNi2dFH/pg3BenVMbxDzgaDwZkWKMoKFrWE500+X7PHvC6GLk7a8ZySW
-         59o/uiS5IKzcvHZS76SGLmMG7ujpzng+FCtwRBOdn74n++Pj6CQj7k1pl8zudnwNexqj
-         u/HJ9Rqyi5DzhQTH+KW/sT8hXg8XBByVDRCL0Dun9f2mzoxLjwNQvXVHt9o1V/n8Pbhu
-         3RY1Ff8CgUJ/8tC62evoWTGYNjMeriRYWZm56AvE3P28zGOzrD6dRwyoFjBjN+Iu2H9s
-         Bx6g==
-X-Gm-Message-State: AOAM531ze9H+t8CMW4E0kTU2SKzoijepWH/qRJ62PqocqnSqo61AKPWk
-        RF1txNBEuGnnYKW5psIsM3ylmh+E2DxGCxsRSoS2aXheO2o=
-X-Google-Smtp-Source: ABdhPJy/YKSh7Ymq0zYxR42sFCU6UUWGDIoSiLs09paq3ntNO3TKKfvRjNNb8S60ZlbPFETzHSzEp2EIVBGwPdhpQBI=
-X-Received: by 2002:a1c:a442:: with SMTP id n63mr12383114wme.25.1621188123406;
- Sun, 16 May 2021 11:02:03 -0700 (PDT)
+        Mon, 17 May 2021 02:17:57 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R821e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UZ4SGva_1621232199;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UZ4SGva_1621232199)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 17 May 2021 14:16:39 +0800
+Subject: Re: [PATCH V6 00/12] block: support bio based io polling
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, Hannes Reinecke <hare@suse.de>
+References: <20210422122038.2192933-1-ming.lei@redhat.com>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <630a63ef-f9e0-6ad6-d6be-ec7a46e5ec45@linux.alibaba.com>
+Date:   Mon, 17 May 2021 14:16:39 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
-References: <20210512131545.495160-1-hch@lst.de> <20210512131545.495160-3-hch@lst.de>
-In-Reply-To: <20210512131545.495160-3-hch@lst.de>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Sun, 16 May 2021 23:31:35 +0530
-Message-ID: <CA+1E3r+8HrUymD-4Q06drqi_qV_L40OjgPCsw6C_Y6Gn_3FVSg@mail.gmail.com>
-Subject: Re: [PATCH 02/15] block: don't try to poll multi-bio I/Os in __blkdev_direct_IO
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210422122038.2192933-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 12, 2021 at 6:50 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> If an iocb is split into multiple bios we can't poll for both.  So don't
-> bother to even try to poll in that case.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/block_dev.c | 37 ++++++++++++++-----------------------
->  1 file changed, 14 insertions(+), 23 deletions(-)
->
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index b8abccd03e5d..0080a3b710b4 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -375,7 +375,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
->         struct blk_plug plug;
->         struct blkdev_dio *dio;
->         struct bio *bio;
-> -       bool is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
-> +       bool is_poll = (iocb->ki_flags & IOCB_HIPRI), do_poll = false;
->         bool is_read = (iov_iter_rw(iter) == READ), is_sync;
->         loff_t pos = iocb->ki_pos;
->         blk_qc_t qc = BLK_QC_T_NONE;
-> @@ -437,22 +437,9 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
->                 pos += bio->bi_iter.bi_size;
->
->                 nr_pages = bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS);
-> -               if (!nr_pages) {
-> -                       bool polled = false;
-> -
-> -                       if (iocb->ki_flags & IOCB_HIPRI) {
-> -                               bio_set_polled(bio, iocb);
-> -                               polled = true;
-> -                       }
-> -
-> -                       qc = submit_bio(bio);
-> -
-> -                       if (polled)
-> -                               WRITE_ONCE(iocb->ki_cookie, qc);
-> -                       break;
-> -               }
-> -
-> -               if (!dio->multi_bio) {
-> +               if (dio->multi_bio) {
-> +                       atomic_inc(&dio->ref);
-> +               } else if (nr_pages) {
->                         /*
->                          * AIO needs an extra reference to ensure the dio
->                          * structure which is embedded into the first bio
-> @@ -462,11 +449,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
->                                 bio_get(bio);
->                         dio->multi_bio = true;
->                         atomic_set(&dio->ref, 2);
-> -               } else {
-> -                       atomic_inc(&dio->ref);
-> +               } else if (is_poll) {
-> +                       bio_set_polled(bio, iocb);
-> +                       do_poll = true;
-> +               }
-> +               qc = submit_bio(bio);
-> +               if (!nr_pages) {
-> +                       if (do_poll)
-> +                               WRITE_ONCE(iocb->ki_cookie, qc);
-> +                       break;
->                 }
-> -
-> -               submit_bio(bio);
->                 bio = bio_alloc(GFP_KERNEL, nr_pages);
->         }
+Hi all,
 
-dio->ref update goes amiss here.
-For multi-bio, if the original code sets it as N, this will set it as
-N+1, causing endless-wait for the caller.
+What's the latest progress of this bio-based polling feature?
+
+I've noticed that hch has also sent a patch set on this [1]. But as far
+as I know, hch's patch set only refactors the interface of polling in
+the block layer. It indeed helps bio-based polling for some kind of
+bio-based driver, but for DM/MD where one bio could be mapped to several
+split bios, more work is obviously needed, just like Lei Ming's
+io_context related code in this patch set.
+
+hch may have better idea, after all [1] is just a preparation patch set.
+
+
+[1]
+https://lore.kernel.org/linux-block/20210427161619.1294399-2-hch@lst.de/T/
+
 
 -- 
-Kanchan
+Thanks,
+Jeffle
+
+
+On 4/22/21 8:20 PM, Ming Lei wrote:
+> Hi Jens,
+> 
+> Add per-task io poll context for holding HIPRI blk-mq/underlying bios
+> queued from bio based driver's io submission context, and reuse one bio
+> padding field for storing 'cookie' returned from submit_bio() for these
+> bios. Also explicitly end these bios in poll context by adding two
+> new bio flags.
+> 
+> In this way, we needn't to poll all underlying hw queues any more,
+> which is implemented in Jeffle's patches. And we can just poll hw queues
+> in which there is HIPRI IO queued.
+> 
+> Usually io submission and io poll share same context, so the added io
+> poll context data is just like one stack variable, and the cost for
+> saving bios is cheap.
+> 
+> V6:
+> 	- move poll code into block/blk-poll.c, as suggested by Christoph
+> 	- define bvec_iter as __packed, and add one new field to bio, as
+> 	  suggested by Christoph
+> 	- re-organize patch order, as suggested by Christoph
+> 	- add one flag for checking if the disk is capable of bio polling
+> 	  and remove .poll_capable(), as suggested by Christoph
+> 	- fix type of .bi_poll
+> 
+> V5:
+> 	- fix one use-after-free issue in case that polling is from another
+> 	context: adds one new cookie of BLK_QC_T_NOT_READY for preventing
+> 	this issue in patch 8/12
+> 	- add reviewed-by & tested-by tag
+> 
+> V4:
+> 	- cover one more test_bit(QUEUE_FLAG_POLL, ...) suggested by
+> 	  Jeffle(01/12)
+> 	- drop patch of 'block: add helper of blk_create_io_context'
+> 	- add new helper of blk_create_io_poll_context() (03/12)
+> 	- drain submission queues in exit_io_context(), suggested by
+> 	  Jeffle(08/13)
+> 	- considering shared io context case for blk_bio_poll_io_drain()
+> 	(08/13)
+> 	- fix one issue in blk_bio_poll_pack_groups() as suggested by
+> 	Jeffle(08/13)
+> 	- add reviewed-by tag
+> V3:
+> 	- fix cookie returned for bio based driver, as suggested by Jeffle Xu
+> 	- draining pending bios when submission context is exiting
+> 	- patch style and comment fix, as suggested by Mike
+> 	- allow poll context data to be NULL by always polling on submission queue
+> 	- remove RFC, and reviewed-by
+> 
+> V2:
+> 	- address queue depth scalability issue reported by Jeffle via bio
+> 	group list. Reuse .bi_end_io for linking bios which share same
+> 	.bi_end_io, and support 32 such groups in submit queue. With this way,
+> 	the scalability issue caused by kfifio is solved. Before really
+> 	ending bio, .bi_end_io is recovered from the group head.
+> 
+> 
+> 
+> Jeffle Xu (2):
+>   block: extract one helper function polling hw queue
+>   dm: support IO polling for bio-based dm device
+> 
+> Ming Lei (10):
+>   block: add helper of blk_queue_poll
+>   block: define 'struct bvec_iter' as packed
+>   block: add one helper to free io_context
+>   block: move block polling code into one dedicated source file
+>   block: prepare for supporting bio_list via other link
+>   block: create io poll context for submission and poll task
+>   block: add req flag of REQ_POLL_CTX
+>   block: use per-task poll context to implement bio based io polling
+>   block: limit hw queues to be polled in each blk_poll()
+>   block: allow to control FLAG_POLL via sysfs for bio poll capable queue
+> 
+>  block/Makefile                |   3 +-
+>  block/bio.c                   |   5 +
+>  block/blk-core.c              |  68 +++-
+>  block/blk-ioc.c               |  15 +-
+>  block/blk-mq.c                | 231 -------------
+>  block/blk-mq.h                |  40 +++
+>  block/blk-poll.c              | 632 ++++++++++++++++++++++++++++++++++
+>  block/blk-sysfs.c             |  16 +-
+>  block/blk.h                   | 112 ++++++
+>  drivers/md/dm-table.c         |  24 ++
+>  drivers/md/dm.c               |   2 +
+>  drivers/nvme/host/core.c      |   2 +-
+>  include/linux/bio.h           | 132 +++----
+>  include/linux/blk_types.h     |  31 +-
+>  include/linux/blkdev.h        |   1 +
+>  include/linux/bvec.h          |   2 +-
+>  include/linux/device-mapper.h |   1 +
+>  include/linux/genhd.h         |   2 +
+>  include/linux/iocontext.h     |   2 +
+>  19 files changed, 1003 insertions(+), 318 deletions(-)
+>  create mode 100644 block/blk-poll.c
+> 
+
+
