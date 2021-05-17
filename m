@@ -2,138 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48632C43470
-	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 14:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A42C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 14:25:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34DB461584
-	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 14:13:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2C4761490
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 14:25:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238275AbhEQOOz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 May 2021 10:14:55 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50952 "EHLO mx2.suse.de"
+        id S239103AbhEQO0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 May 2021 10:26:31 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53618 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236862AbhEQOM1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 May 2021 10:12:27 -0400
+        id S239609AbhEQOYa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 May 2021 10:24:30 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1621260669; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1621261392; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=S44vK4RdOnJ04XbS2vkRaVaifdqAqJWbTuWTIISy/hw=;
-        b=iR3+DbGvkyg7WQ8Z8cDFgxHoRSgvWIAeS4+DecIQb7fAJrKhgLBfc5ZSxuiHq2XmAhBmQR
-        luVDcXvc2cLSQkLIAonFcQrRB/311xaPJMSYV7yGraVt/7uAQ3jJ8z8lfm7f3GQAxi1t5K
-        7z9s9bPIyZSS3xPTHT1+bekE/mf2q0Y=
+        bh=l0UfPfd8q4JFoy/Gm6qLKY+Gv2/rFgvF9TXVY1oORvg=;
+        b=e9BZ6Kdl3nJMZU0ppxyFtdn0Phjh0jmK4TVR7JmHJWSH/+iXIA95y8g3jMI6CsFW6eN9La
+        TSABvjb7BjHvRl3nzK8ZbCXF+3lhkPvZO/MLTxDG5iOXhCqk++XLa3svj1iHXNokHdfBUQ
+        jE6etTanday/Omsjn2Ioza+tXyEr26o=
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 96EB6B231;
-        Mon, 17 May 2021 14:11:09 +0000 (UTC)
-Subject: Re: [PATCH 3/8] xen/blkfront: don't take local copy of a request from
- the ring page
+        by mx2.suse.de (Postfix) with ESMTP id 75198B231;
+        Mon, 17 May 2021 14:23:12 +0000 (UTC)
 To:     Jan Beulich <jbeulich@suse.com>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
         Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20210513100302.22027-1-jgross@suse.com>
- <20210513100302.22027-4-jgross@suse.com>
- <4cbf7b7f-5f00-4aba-4d54-06aa73d1bc32@suse.com>
+ <20210513100302.22027-5-jgross@suse.com>
+ <315ad8b9-8a98-8d3e-f66c-ab32af2731a8@suse.com>
 From:   Juergen Gross <jgross@suse.com>
-Message-ID: <278182af-044a-9445-bbdb-fdbb65d0da7c@suse.com>
-Date:   Mon, 17 May 2021 16:11:08 +0200
+Subject: Re: [PATCH 4/8] xen/blkfront: don't trust the backend response data
+ blindly
+Message-ID: <6095c4b9-a9bb-8a38-fb6c-a5483105b802@suse.com>
+Date:   Mon, 17 May 2021 16:23:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <4cbf7b7f-5f00-4aba-4d54-06aa73d1bc32@suse.com>
+In-Reply-To: <315ad8b9-8a98-8d3e-f66c-ab32af2731a8@suse.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="r1814kCXy88HKlk6GseNHQ5Jl1bQjvzK4"
+ boundary="uFelNYe0WoxMBWJXMM8pj0dKp98OxKi7g"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---r1814kCXy88HKlk6GseNHQ5Jl1bQjvzK4
-Content-Type: multipart/mixed; boundary="3z0SaXV9bT9EMUHkBlogZ1gUM2CrDn6LJ";
+--uFelNYe0WoxMBWJXMM8pj0dKp98OxKi7g
+Content-Type: multipart/mixed; boundary="BxGqQncOtjZqp2zBgNsSAzrhnURnu5KtO";
  protected-headers="v1"
 From: Juergen Gross <jgross@suse.com>
 To: Jan Beulich <jbeulich@suse.com>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
  =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Message-ID: <278182af-044a-9445-bbdb-fdbb65d0da7c@suse.com>
-Subject: Re: [PATCH 3/8] xen/blkfront: don't take local copy of a request from
- the ring page
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <6095c4b9-a9bb-8a38-fb6c-a5483105b802@suse.com>
+Subject: Re: [PATCH 4/8] xen/blkfront: don't trust the backend response data
+ blindly
 References: <20210513100302.22027-1-jgross@suse.com>
- <20210513100302.22027-4-jgross@suse.com>
- <4cbf7b7f-5f00-4aba-4d54-06aa73d1bc32@suse.com>
-In-Reply-To: <4cbf7b7f-5f00-4aba-4d54-06aa73d1bc32@suse.com>
+ <20210513100302.22027-5-jgross@suse.com>
+ <315ad8b9-8a98-8d3e-f66c-ab32af2731a8@suse.com>
+In-Reply-To: <315ad8b9-8a98-8d3e-f66c-ab32af2731a8@suse.com>
 
---3z0SaXV9bT9EMUHkBlogZ1gUM2CrDn6LJ
+--BxGqQncOtjZqp2zBgNsSAzrhnURnu5KtO
 Content-Type: multipart/mixed;
- boundary="------------D884FEC9E12ABF923568C4A9"
+ boundary="------------186FB5FB25262D3342EC3271"
 Content-Language: en-US
 
 This is a multi-part message in MIME format.
---------------D884FEC9E12ABF923568C4A9
+--------------186FB5FB25262D3342EC3271
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-On 17.05.21 16:01, Jan Beulich wrote:
+On 17.05.21 16:11, Jan Beulich wrote:
 > On 13.05.2021 12:02, Juergen Gross wrote:
->> In order to avoid a malicious backend being able to influence the loca=
-l
->> copy of a request build the request locally first and then copy it to
->> the ring page instead of doing it the other way round as today.
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
+>> @@ -1574,10 +1580,16 @@ static irqreturn_t blkif_interrupt(int irq, vo=
+id *dev_id)
+>>   	spin_lock_irqsave(&rinfo->ring_lock, flags);
+>>    again:
+>>   	rp =3D rinfo->ring.sring->rsp_prod;
+>> +	if (RING_RESPONSE_PROD_OVERFLOW(&rinfo->ring, rp)) {
+>> +		pr_alert("%s: illegal number of responses %u\n",
+>> +			 info->gd->disk_name, rp - rinfo->ring.rsp_cons);
+>> +		goto err;
+>> +	}
+>>   	rmb(); /* Ensure we see queued responses up to 'rp'. */
 >=20
-> Reviewed-by: Jan Beulich <jbeulich@suse.com>
-> with one remark/question:
->=20
->> @@ -703,6 +704,7 @@ static int blkif_queue_rw_req(struct request *req,=20
-struct blkfront_ring_info *ri
->>   {
->>   	struct blkfront_info *info =3D rinfo->dev_info;
->>   	struct blkif_request *ring_req, *extra_ring_req =3D NULL;
->> +	struct blkif_request *final_ring_req, *final_extra_ring_req;
->=20
-> Without setting final_extra_ring_req to NULL just like is done for
-> extra_ring_req, ...
->=20
->> @@ -840,10 +845,10 @@ static int blkif_queue_rw_req(struct request *re=
-q, struct blkfront_ring_info *ri
->>   	if (setup.segments)
->>   		kunmap_atomic(setup.segments);
->>  =20
->> -	/* Keep a private copy so we can reissue requests when recovering. *=
-/
->> -	rinfo->shadow[id].req =3D *ring_req;
->> +	/* Copy request(s) to the ring page. */
->> +	*final_ring_req =3D *ring_req;
->>   	if (unlikely(require_extra_req))
->> -		rinfo->shadow[extra_id].req =3D *extra_ring_req;
->> +		*final_extra_ring_req =3D *extra_ring_req;
->=20
-> ... are you sure all supported compilers will recognize the
-> conditional use and not warn about use of a possibly uninitialized
-> variable?
+> I think you want to insert after the barrier.
 
-Hmm, probably better safe than sorry. Will change it.
+Why? The relevant variable which is checked is "rp". The result of the
+check is in no way depending on the responses themselves. And any change
+of rsp_cons is protected by ring_lock, so there is no possibility of
+reading an old value here.
+
+>=20
+>> @@ -1680,6 +1707,11 @@ static irqreturn_t blkif_interrupt(int irq, voi=
+d *dev_id)
+>>   	spin_unlock_irqrestore(&rinfo->ring_lock, flags);
+>>  =20
+>>   	return IRQ_HANDLED;
+>> +
+>> + err:
+>> +	info->connected =3D BLKIF_STATE_ERROR;
+>> +	pr_alert("%s disabled for further use\n", info->gd->disk_name);
+>> +	return IRQ_HANDLED;
+>>   }
+>=20
+> Am I understanding that a suspend (and then resume) can be used to
+> recover from error state? If so - is this intentional? If so in turn,
+> would it make sense to spell this out in the description?
+
+I'd call it a nice side effect rather than intention. I can add a remark
+to the commit message if you want.
 
 
 Juergen
 
---------------D884FEC9E12ABF923568C4A9
+--------------186FB5FB25262D3342EC3271
 Content-Type: application/pgp-keys;
  name="OpenPGP_0xB0DE9DD628BF132F.asc"
 Content-Transfer-Encoding: quoted-printable
@@ -225,24 +223,24 @@ ZDn8R38=3D
 =3D2wuH
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------D884FEC9E12ABF923568C4A9--
+--------------186FB5FB25262D3342EC3271--
 
---3z0SaXV9bT9EMUHkBlogZ1gUM2CrDn6LJ--
+--BxGqQncOtjZqp2zBgNsSAzrhnURnu5KtO--
 
---r1814kCXy88HKlk6GseNHQ5Jl1bQjvzK4
+--uFelNYe0WoxMBWJXMM8pj0dKp98OxKi7g
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmCieXwFAwAAAAAACgkQsN6d1ii/Ey8E
-nwf/b6Rnrwjrlv1zmZ3HhUue7Q9cl/SAVFjVfclytWJgqiZVWDpMOksl6hC1n93jfIItXpYQDtyn
-9dvJ6u7gOKrKV+XFmJfhoxMevjfpznM68qdiEIxgbAf+nI/7EbyV6w2keI/FkR5SFcQcLgO8QhSv
-beCxfIaVphAAvcCQo1Pd3QW0s9jqfyQY+GYuSjzLtrLggZFbwGhBwCCcyiofV6scsAwVYEmTF+Sg
-zU/nVqZEM5FgpGj/ITxXCDK1LcIGkWwzTBub7lGK/0wPv9c5pIcLlWFOAApAPv6HL37e9f8Ul9Ot
-VnCoqPVtM8ZgRnhNmleb5LNbGV/nn49CbDfyHuEyig==
-=BHS7
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmCifE8FAwAAAAAACgkQsN6d1ii/Ey/s
+3Qf9HTZOC5syO0wOHlDd2ImlJLkEvymVnZeq/cv6R/zVD85g8sRgRbKW9Kk5YYous1E6EfxSZnIY
+kqZeqH3gRL+Tn3NAcn1fUHKUEhzYAHgpwzuUqm2vj9t43B83IatRzcmAn1zERvvGL6wXpkJnDc86
+OVohuIaeecTCEbFzynnB7JpQIM5XGLaTmPUtwOGVDVEQzCRlIAl5qEPNkJ4OWiVUgfJ4DqaFdxil
+fQSMnBI6l3V5Lr6Hbkejus0bfNJKZX1GDiry6HS4RFfKssw8JlXJLUaHGEcc6Go2bVK2qsB+Lt7P
+BOMjevMUX8GBurmcCt74HCmhUUgY1L7RYv5YjxENvg==
+=98zG
 -----END PGP SIGNATURE-----
 
---r1814kCXy88HKlk6GseNHQ5Jl1bQjvzK4--
+--uFelNYe0WoxMBWJXMM8pj0dKp98OxKi7g--
