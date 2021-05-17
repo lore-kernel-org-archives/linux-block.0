@@ -2,233 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB587C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E15C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:50:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA0A361042
-	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:23:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 996E3611BF
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:50:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242777AbhEQQZC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 May 2021 12:25:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54668 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346267AbhEQQY2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 May 2021 12:24:28 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 5B527B038;
-        Mon, 17 May 2021 16:23:10 +0000 (UTC)
-From:   colyli@suse.de
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Coly Li <colyli@suse.de>,
-        Diego Ercolani <diego.ercolani@gmail.com>,
-        Jan Szubiak <jan.szubiak@linuxpolska.pl>,
-        Marco Rebhan <me@dblsaiko.net>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        Thorsten Knabe <linux@thorsten-knabe.de>,
-        Victor Westerhuis <victor@westerhu.is>,
-        Vojtech Pavlik <vojtech@suse.cz>, stable@vger.kernel.org,
-        Takashi Iwai <tiwai@suse.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH] bcache: avoid oversized read request in cache missing code path
-Date:   Tue, 18 May 2021 00:22:56 +0800
-Message-Id: <20210517162256.128236-1-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
+        id S241921AbhEQQwB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 May 2021 12:52:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43532 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239779AbhEQQvo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 May 2021 12:51:44 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84F74C0753BE;
+        Mon, 17 May 2021 09:40:01 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id b19-20020a05600c06d3b029014258a636e8so3978273wmn.2;
+        Mon, 17 May 2021 09:40:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mJg/+7GYl1kUJvfa8nmmRMcNriQOvuN6MAq6Cn+ONao=;
+        b=QljiQ+uaASZtSxfuEI8hK1tI3a4Y6o+6ZIacfUmOJb0k0fVi7Sqo0U56LxQQ9n0D7H
+         OxzEbcNqyB3z1vQNEnR5Zrv17/IW60UCKTt0DkFBfAkpNKRBn3/qqDDNQHQ+gKicApoK
+         IEUakbF//Mlmww+fZRhyglLfSqybZ2w6kt78ttIvat3UjfCgjAdZre8u2bdxxvh7b7Oh
+         0OORdS0W6PfJcfoRcPXrwXLnXkv26W4BkQolDkROWbWxKCd0pVsI/yPSXNZS74FXWI36
+         09YJ3c55dOmix4700cyb4PhvAdUTQWISqO7u6Nx5VlJSOoo6z2UJd6lpY5WpnMFD8J+Y
+         H+Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mJg/+7GYl1kUJvfa8nmmRMcNriQOvuN6MAq6Cn+ONao=;
+        b=Vo/pu0TVdinu+MW74Hmdb8aVTxfTJqaooxLF6M0yQZo88ZHS25J5/eD57NFFSd2/rd
+         NP/l/KtvGGC0hOfZFmrRMpAPwHYZWffmDykvCBMt9sB9UOXiXdtJ5jFY7xJry/YqIftu
+         1JwygOvgcK+QPEYVzh4IVo90zHgF1AYax71BwAkO95n9NerP2/73Z9xllJj+LWx2T07P
+         jZP9W38ky0yICwOZph7sc4/GAA1KgrfosMO89xJJHMNmtmxQikc2sk0N3Pdygrq5Kbbe
+         JAe2DrqqlNZUAXmkmXgHPEtZ03gwtegzXlblcI5QOYHlvIRiEvxD9dAjuuIyFBvhZ0oX
+         6HcQ==
+X-Gm-Message-State: AOAM530xjsRTLNFhkoKpEM0+A9pkqR+BpYrMOicE5xcdT33aq7aO1CKv
+        oNwLsEV2W60ulwn8iolnfantfY1Ub0hwktZJ3qPRLC0vRWg=
+X-Google-Smtp-Source: ABdhPJztcjSsj0J/JNFDHQf/JgaBAZUnQRFLtkWcpXIR+qh9ia6xfQrYTY+eZZzHSaCUmybr7ASuRfMEoFGty1cPlx0=
+X-Received: by 2002:a1c:a442:: with SMTP id n63mr510553wme.25.1621269600181;
+ Mon, 17 May 2021 09:40:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
+In-Reply-To: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Mon, 17 May 2021 22:09:32 +0530
+Message-ID: <CA+1E3rJO-HzZu5q+8ac1wxsnkGeST1epE8Ro00RNBAF340Dgeg@mail.gmail.com>
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "msnitzer@redhat.com" <msnitzer@redhat.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "rwheeler@redhat.com" <rwheeler@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Coly Li <colyli@suse.de>
+> * What we will discuss in the proposed session ?
+> -----------------------------------------------------------------------
+>
+> I'd like to propose a session to go over this topic to understand :-
+>
+> 1. What are the blockers for Copy Offload implementation ?
+> 2. Discussion about having a file system interface.
+> 3. Discussion about having right system call for user-space.
+> 4. What is the right way to move this work forward ?
+> 5. How can we help to contribute and move this work forward ?
+>
+> * Required Participants :-
+> -----------------------------------------------------------------------
+>
+> I'd like to invite file system, block layer, and device drivers
+> developers to:-
+>
+> 1. Share their opinion on the topic.
+> 2. Share their experience and any other issues with [4].
+> 3. Uncover additional details that are missing from this proposal.
+>
+I'd like to participate in discussion.
+Hopefully we can get consensus on some elements (or discover new
+issues) before Dec.
+An async-interface (via io_uring) would be good to be discussed while
+we are at it.
 
-In the cache missing code path of cached device, if a proper location
-from the internal B+ tree is matched for a cache miss range, function
-cached_dev_cache_miss() will be called in cache_lookup_fn() in the
-following code block,
-[code block 1]
-  526         unsigned int sectors = KEY_INODE(k) == s->iop.inode
-  527                 ? min_t(uint64_t, INT_MAX,
-  528                         KEY_START(k) - bio->bi_iter.bi_sector)
-  529                 : INT_MAX;
-  530         int ret = s->d->cache_miss(b, s, bio, sectors);
 
-Here s->d->cache_miss() is the call backfunction pointer initialized as
-cached_dev_cache_miss(), the last parameter 'sectors' is an important
-hint to calculate the size of read request to backing device of the
-missing cache data.
-
-Current calculation in above code block may generate oversized value of
-'sectors', which consequently may trigger 2 different potential kernel
-panics by BUG() or BUG_ON() as listed below,
-
-1) BUG_ON() inside bch_btree_insert_key(),
-[code block 2]
-   886         BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
-2) BUG() inside biovec_slab(),
-[code block 3]
-   51         default:
-   52                 BUG();
-   53                 return NULL;
-
-All the above panics are original from cached_dev_cache_miss() by the
-oversized parameter 'sectors'.
-
-Inside cached_dev_cache_miss(), parameter 'sectors' is used to calculate
-the size of data read from backing device for the cache missing. This
-size is stored in s->insert_bio_sectors by the following lines of code,
-[code block 4]
-  909    s->insert_bio_sectors = min(sectors, bio_sectors(bio) + reada);
-
-Then the actual key inserting to the internal B+ tree is generated and
-stored in s->iop.replace_key by the following lines of code,
-[code block 5]
-  911   s->iop.replace_key = KEY(s->iop.inode,
-  912                    bio->bi_iter.bi_sector + s->insert_bio_sectors,
-  913                    s->insert_bio_sectors);
-The oversized parameter 'sectors' may trigger panic 1) by BUG_ON() from
-the above code block.
-
-And the bio sending to backing device for the missing data is allocated
-with hint from s->insert_bio_sectors by the following lines of code,
-[code block 6]
-  926    cache_bio = bio_alloc_bioset(GFP_NOWAIT,
-  927                 DIV_ROUND_UP(s->insert_bio_sectors, PAGE_SECTORS),
-  928                 &dc->disk.bio_split);
-The oversized parameter 'sectors' may trigger panic 2) by BUG() from the
-agove code block.
-
-Now let me explain how the panics happen with the oversized 'sectors'.
-In code block 5, replace_key is generated by macro KEY(). From the
-definition of macro KEY(),
-[code block 7]
-  71 #define KEY(inode, offset, size)                                  \
-  72 ((struct bkey) {                                                  \
-  73      .high = (1ULL << 63) | ((__u64) (size) << 20) | (inode),     \
-  74      .low = (offset)                                              \
-  75 })
-
-Here 'size' is 16bits width embedded in 64bits member 'high' of struct
-bkey. But in code block 1, if "KEY_START(k) - bio->bi_iter.bi_sector" is
-very probably to be larger than (1<<16) - 1, which makes the bkey size
-calculation in code block 5 is overflowed. In one bug report the value
-of parameter 'sectors' is 131072 (= 1 << 17), the overflowed 'sectors'
-results the overflowed s->insert_bio_sectors in code block 4, then makes
-size field of s->iop.replace_key to be 0 in code block 5. Then the 0-
-sized s->iop.replace_key is inserted into the internal B+ tree as cache
-missing check key (a special key to detect and avoid a racing between
-normal write request and cache missing read request) as,
-[code block 8]
-  915   ret = bch_btree_insert_check_key(b, &s->op, &s->iop.replace_key);
-
-Then the 0-sized s->iop.replace_key as 3rd parameter triggers the bkey
-size check BUG_ON() in code block 2, and causes the kernel panic 1).
-
-Another kernel panic is from code block 6, is from the oversized value
-s->insert_bio_sectors resulted by the oversized 'sectors'. From a bug
-report the result of "DIV_ROUND_UP(s->insert_bio_sectors, PAGE_SECTORS)"
-from code block 6 can be 344, 282, 946, 342 and many other values which
-larther than BIO_MAX_VECS (a.k.a 256). When calling bio_alloc_bioset()
-with such larger-than-256 value as the 2nd parameter, this value will
-eventually be sent to biovec_slab() as parameter 'nr_vecs' in following
-code path,
-   bio_alloc_bioset() ==> bvec_alloc() ==> biovec_slab()
-
-Because parameter 'nr_vecs' is larger-than-256 value, the panic by BUG()
-in code block 3 is triggered inside biovec_slab().
-
-From the above analysis, it is obvious that in order to avoid the kernel
-panics in code block 2 and code block 3, the calculated 'sectors' in
-code block 1 should not generate overflowed value in code block 5 and
-code block 6.
-
-To avoid overflow in code block 5, the maximum 'sectors' value should be
-equal or less than (1 << KEY_SIZE_BITS) - 1. And to avoid overflow in
-code block 6, the maximum 'sectors' value should be euqal or less than
-BIO_MAX_VECS * PAGE_SECTORS. Considering the kernel page size can be
-variable, a reasonable maximum limitation of 'sectors' in code block 1
-should be smaller on from "(1 << KEY_SIZE_BITS) - 1" and "BIO_MAX_VECS *
-PAGE_SECTORS".
-
-In this patch, a local variable inside cache_lookup_fn() is added as,
-     max_cache_miss_size = min_t(uint32_t,
-		(1 << KEY_SIZE_BITS) - 1, BIO_MAX_VECS * PAGE_SECTORS);
-Then code block 1 uses max_cache_miss_size to limit the maximum value of
-'sectors' calculation as,
-  533        unsigned int sectors = KEY_INODE(k) == s->iop.inode
-  534                 ? min_t(uint64_t, max_cache_miss_size,
-  535                         KEY_START(k) - bio->bi_iter.bi_sector)
-  536                 : max_cache_miss_size;
-
-Now the calculated 'sectors' value sent into cached_dev_cache_miss()
-won't trigger neither of the above kernel panics.
-
-Current problmatic code can be partially found since Linux v5.13-rc1,
-therefore all maintained stable kernels should try to apply this fix.
-
-Reported-by: Diego Ercolani <diego.ercolani@gmail.com>
-Reported-by: Jan Szubiak <jan.szubiak@linuxpolska.pl>
-Reported-by: Marco Rebhan <me@dblsaiko.net>
-Reported-by: Matthias Ferdinand <bcache@mfedv.net>
-Reported-by: Thorsten Knabe <linux@thorsten-knabe.de>
-Reported-by: Victor Westerhuis <victor@westerhu.is>
-Reported-by: Vojtech Pavlik <vojtech@suse.cz>
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: stable@vger.kernel.org
-Cc: Takashi Iwai <tiwai@suse.com>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
----
- drivers/md/bcache/request.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 29c231758293..90fa9ac47661 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -515,18 +515,25 @@ static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
- 	struct search *s = container_of(op, struct search, op);
- 	struct bio *n, *bio = &s->bio.bio;
- 	struct bkey *bio_key;
--	unsigned int ptr;
-+	unsigned int ptr, max_cache_miss_size;
- 
- 	if (bkey_cmp(k, &KEY(s->iop.inode, bio->bi_iter.bi_sector, 0)) <= 0)
- 		return MAP_CONTINUE;
- 
-+	/*
-+	 * Make sure the cache missing size won't exceed the restrictions of
-+	 * max bkey size and max bio's bi_max_vecs.
-+	 */
-+	max_cache_miss_size = min_t(uint32_t,
-+		(1 << KEY_SIZE_BITS) - 1, BIO_MAX_VECS * PAGE_SECTORS);
-+
- 	if (KEY_INODE(k) != s->iop.inode ||
- 	    KEY_START(k) > bio->bi_iter.bi_sector) {
- 		unsigned int bio_sectors = bio_sectors(bio);
- 		unsigned int sectors = KEY_INODE(k) == s->iop.inode
--			? min_t(uint64_t, INT_MAX,
-+			? min_t(uint64_t, max_cache_miss_size,
- 				KEY_START(k) - bio->bi_iter.bi_sector)
--			: INT_MAX;
-+			: max_cache_miss_size;
- 		int ret = s->d->cache_miss(b, s, bio, sectors);
- 
- 		if (ret != MAP_CONTINUE)
-@@ -547,7 +554,7 @@ static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
- 	if (KEY_DIRTY(k))
- 		s->read_dirty_data = true;
- 
--	n = bio_next_split(bio, min_t(uint64_t, INT_MAX,
-+	n = bio_next_split(bio, min_t(uint64_t, max_cache_miss_size,
- 				      KEY_OFFSET(k) - bio->bi_iter.bi_sector),
- 			   GFP_NOIO, &s->d->bio_split);
- 
 -- 
-2.26.2
-
+Kanchan
