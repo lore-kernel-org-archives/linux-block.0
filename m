@@ -2,115 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E15C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0164FC433B4
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:51:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 996E3611BF
-	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2742611BF
+	for <linux-block@archiver.kernel.org>; Mon, 17 May 2021 16:51:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241921AbhEQQwB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 May 2021 12:52:01 -0400
+        id S242293AbhEQQwb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 May 2021 12:52:31 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239779AbhEQQvo (ORCPT
+        with ESMTP id S240877AbhEQQwX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 May 2021 12:51:44 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84F74C0753BE;
-        Mon, 17 May 2021 09:40:01 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id b19-20020a05600c06d3b029014258a636e8so3978273wmn.2;
-        Mon, 17 May 2021 09:40:01 -0700 (PDT)
+        Mon, 17 May 2021 12:52:23 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A026BC06134E
+        for <linux-block@vger.kernel.org>; Mon, 17 May 2021 09:44:19 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id a4so7154173wrr.2
+        for <linux-block@vger.kernel.org>; Mon, 17 May 2021 09:44:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=mJg/+7GYl1kUJvfa8nmmRMcNriQOvuN6MAq6Cn+ONao=;
-        b=QljiQ+uaASZtSxfuEI8hK1tI3a4Y6o+6ZIacfUmOJb0k0fVi7Sqo0U56LxQQ9n0D7H
-         OxzEbcNqyB3z1vQNEnR5Zrv17/IW60UCKTt0DkFBfAkpNKRBn3/qqDDNQHQ+gKicApoK
-         IEUakbF//Mlmww+fZRhyglLfSqybZ2w6kt78ttIvat3UjfCgjAdZre8u2bdxxvh7b7Oh
-         0OORdS0W6PfJcfoRcPXrwXLnXkv26W4BkQolDkROWbWxKCd0pVsI/yPSXNZS74FXWI36
-         09YJ3c55dOmix4700cyb4PhvAdUTQWISqO7u6Nx5VlJSOoo6z2UJd6lpY5WpnMFD8J+Y
-         H+Tw==
+        bh=+VtV8nX+Uzjp9W9nmFCJu2nrfmzR8I0bnxqoUhqRYCQ=;
+        b=XCDef7VXfeqXqKqRbwsg7GLiUQSoUtfM70wDpmSftyUGC5VZLlm+DTZn6cjRNVLPZQ
+         G3jsMNHRUNtGB1J1naBe93gwijRQ2i5Kcp0kGtiFj8X2cAgDohcD591gEWVPyc2k+Qkm
+         1oLPAJU6DpHgqQMdLOsYjRMbKF76Kvhle182Wsy+SDTAvrb0DGZmsfOzhE3M+DvE6Hrl
+         ClML2Ycta174wRcocZyE9py6Ngs4uuFWWQGYScTIBsqN0xQYnUC2Ie9fPs6sVf/FZBuI
+         hUeBJRj76vT6cLqNxPv1Y9zISHi6dH5INjV3SGLCU0UH6f/VsFY19KQPqUCxBVfJWehU
+         DCkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=mJg/+7GYl1kUJvfa8nmmRMcNriQOvuN6MAq6Cn+ONao=;
-        b=Vo/pu0TVdinu+MW74Hmdb8aVTxfTJqaooxLF6M0yQZo88ZHS25J5/eD57NFFSd2/rd
-         NP/l/KtvGGC0hOfZFmrRMpAPwHYZWffmDykvCBMt9sB9UOXiXdtJ5jFY7xJry/YqIftu
-         1JwygOvgcK+QPEYVzh4IVo90zHgF1AYax71BwAkO95n9NerP2/73Z9xllJj+LWx2T07P
-         jZP9W38ky0yICwOZph7sc4/GAA1KgrfosMO89xJJHMNmtmxQikc2sk0N3Pdygrq5Kbbe
-         JAe2DrqqlNZUAXmkmXgHPEtZ03gwtegzXlblcI5QOYHlvIRiEvxD9dAjuuIyFBvhZ0oX
-         6HcQ==
-X-Gm-Message-State: AOAM530xjsRTLNFhkoKpEM0+A9pkqR+BpYrMOicE5xcdT33aq7aO1CKv
-        oNwLsEV2W60ulwn8iolnfantfY1Ub0hwktZJ3qPRLC0vRWg=
-X-Google-Smtp-Source: ABdhPJztcjSsj0J/JNFDHQf/JgaBAZUnQRFLtkWcpXIR+qh9ia6xfQrYTY+eZZzHSaCUmybr7ASuRfMEoFGty1cPlx0=
-X-Received: by 2002:a1c:a442:: with SMTP id n63mr510553wme.25.1621269600181;
- Mon, 17 May 2021 09:40:00 -0700 (PDT)
+        bh=+VtV8nX+Uzjp9W9nmFCJu2nrfmzR8I0bnxqoUhqRYCQ=;
+        b=pBYPkhHi2oDiRPK4ypPN7ZvnD5mwhpYk8XFWLxk2+mvf7jx63aDJIvHC/rVMEfvNyF
+         5Gq5w0MMqkfaMMp2+E/JMUE2kO8HceNbUk5gm/+kYwAfqWBvjvqkTp4I/heQO8mSA8K2
+         qSR/QGT+EXbh6+JEmdBwb/mnX5qgBhhT0Q6P9W//kMmGL0Pzoo0n59otg1+DUdw5rEFs
+         aKEhC0N2DTx/TfdxOEY2DezO1Lcy9qKhD2vycSFASJR5PoPamj70L8Ny0bp2q3z8Cp6e
+         NQ+3VHoD/43yeyqkZOhnuZHOBudAMgQ/cJGx5cW9dwQMjn/eEdyZ8hXH0VVWT77dQCcY
+         QpmQ==
+X-Gm-Message-State: AOAM532esoUsAFwZ719zCBlhmDd7eSEbT6jS+w6g5r3d7mGUSfQ/2Tw6
+        Q2vhrFQgpoe8mLovQ7RQ7jf8ij5ZI7ps5XsdcSpxqchRJjDpiA==
+X-Google-Smtp-Source: ABdhPJyDb61mqECC+gWc/B1MpMTWknlMBd7wXO1WQfHD5X73NOFTBrqoZSArpY6r+YDZ0TO3HXMxu+IYMPYs7fLn058=
+X-Received: by 2002:a5d:5508:: with SMTP id b8mr693279wrv.278.1621269858262;
+ Mon, 17 May 2021 09:44:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
-In-Reply-To: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20210423220558.40764-1-kbusch@kernel.org> <20210423220558.40764-2-kbusch@kernel.org>
+In-Reply-To: <20210423220558.40764-2-kbusch@kernel.org>
 From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Mon, 17 May 2021 22:09:32 +0530
-Message-ID: <CA+1E3rJO-HzZu5q+8ac1wxsnkGeST1epE8Ro00RNBAF340Dgeg@mail.gmail.com>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>
+Date:   Mon, 17 May 2021 22:13:50 +0530
+Message-ID: <CA+1E3r+3dDW0Hbc8MCsxAnwcpY=kWAqDLh0h9+j501VnKvgwqA@mail.gmail.com>
+Subject: Re: [PATCHv2 1/5] block: support polling through blk_execute_rq
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, Sagi Grimberg <sagi@grimberg.me>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Yuanyuan Zhong <yzhong@purestorage.com>,
+        Casey Chen <cachen@purestorage.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> * What we will discuss in the proposed session ?
-> -----------------------------------------------------------------------
+On Sat, Apr 24, 2021 at 3:37 AM Keith Busch <kbusch@kernel.org> wrote:
 >
-> I'd like to propose a session to go over this topic to understand :-
+> Poll for completions if the request's hctx is a polling type.
 >
-> 1. What are the blockers for Copy Offload implementation ?
-> 2. Discussion about having a file system interface.
-> 3. Discussion about having right system call for user-space.
-> 4. What is the right way to move this work forward ?
-> 5. How can we help to contribute and move this work forward ?
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  block/blk-exec.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 >
-> * Required Participants :-
-> -----------------------------------------------------------------------
+> diff --git a/block/blk-exec.c b/block/blk-exec.c
+> index beae70a0e5e5..b960ad187ba5 100644
+> --- a/block/blk-exec.c
+> +++ b/block/blk-exec.c
+> @@ -63,6 +63,11 @@ void blk_execute_rq_nowait(struct gendisk *bd_disk, struct request *rq,
+>  }
+>  EXPORT_SYMBOL_GPL(blk_execute_rq_nowait);
 >
-> I'd like to invite file system, block layer, and device drivers
-> developers to:-
+> +static bool blk_rq_is_poll(struct request *rq)
+> +{
+> +       return rq->mq_hctx && rq->mq_hctx->type == HCTX_TYPE_POLL;
+> +}
+> +
+>  /**
+>   * blk_execute_rq - insert a request into queue for execution
+>   * @bd_disk:   matching gendisk
+> @@ -83,7 +88,12 @@ void blk_execute_rq(struct gendisk *bd_disk, struct request *rq, int at_head)
 >
-> 1. Share their opinion on the topic.
-> 2. Share their experience and any other issues with [4].
-> 3. Uncover additional details that are missing from this proposal.
->
-I'd like to participate in discussion.
-Hopefully we can get consensus on some elements (or discover new
-issues) before Dec.
-An async-interface (via io_uring) would be good to be discussed while
-we are at it.
+>         /* Prevent hang_check timer from firing at us during very long I/O */
+>         hang_check = sysctl_hung_task_timeout_secs;
+> -       if (hang_check)
+> +       if (blk_rq_is_poll(rq)) {
+> +               do {
+> +                       blk_poll(rq->q, request_to_qc_t(rq->mq_hctx, rq), true);
+> +                       cond_resched();
+> +               } while (!completion_done(&wait));
+> +       } else if (hang_check)
+>                 while (!wait_for_completion_io_timeout(&wait, hang_check * (HZ/2)));
+>         else
+>                 wait_for_completion_io(&wait);
+> --
 
+Looks good.
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
--- 
+--
 Kanchan
