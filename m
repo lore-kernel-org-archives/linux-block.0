@@ -2,247 +2,200 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E2EDC43461
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 04:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C28C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 07:52:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 620B16112F
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 04:03:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74437611B0
+	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 07:52:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240891AbhEREEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 May 2021 00:04:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57456 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230378AbhEREEg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 May 2021 00:04:36 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 4998AB007;
-        Tue, 18 May 2021 04:03:17 +0000 (UTC)
-Subject: Re: [PATCH] bcache: avoid oversized read request in cache missing
- code path
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Diego Ercolani <diego.ercolani@gmail.com>,
-        Jan Szubiak <jan.szubiak@linuxpolska.pl>,
-        Marco Rebhan <me@dblsaiko.net>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        Thorsten Knabe <linux@thorsten-knabe.de>,
-        Victor Westerhuis <victor@westerhu.is>,
-        Vojtech Pavlik <vojtech@suse.cz>, stable@vger.kernel.org,
-        Takashi Iwai <tiwai@suse.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-References: <20210517162256.128236-1-colyli@suse.de>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <36999d42-d70e-04a3-fd56-30a560a05b53@suse.de>
-Date:   Tue, 18 May 2021 12:03:10 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.1
+        id S1347295AbhERHxv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 May 2021 03:53:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30312 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238641AbhERHxv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 May 2021 03:53:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621324353;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=p9kYQX9+jlMVrfT7LlQkoPwBVtgy2VXVBykxVLkyCrs=;
+        b=b3jVCR6rnYB8rKjrrdTpU0lQNS06CC4YnLpt8AclIU/ygtU0Xde1cgcwbrJHdkKuJtUsIz
+        DUFXFQ8Ibhzz599oXo6T6AF73jeczmFlzDSSZJTyI9WlC+bSt9l0fGf29hnhxzhlP5OIYx
+        6shvexg5YT8nqSjTYScC1Jj196oVlvw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-SFh4mEBSPNymX2cDtoYYZA-1; Tue, 18 May 2021 03:52:31 -0400
+X-MC-Unique: SFh4mEBSPNymX2cDtoYYZA-1
+Received: by mail-wm1-f70.google.com with SMTP id k188-20020a1c24c50000b0290174eacd2b39so652628wmk.7
+        for <linux-block@vger.kernel.org>; Tue, 18 May 2021 00:52:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=p9kYQX9+jlMVrfT7LlQkoPwBVtgy2VXVBykxVLkyCrs=;
+        b=o8UmalwMWJgregwBG3MNZBHldOXuAU7f3Xcf2fgv1MRYfjlIgaWttEPWvDSqTz1Cpb
+         kmzQt2QFp+4hCkOji4xuLza8aR4TUcKFKfegQhUyXSXQgCYgWwR61m9JmIArJID+Q8rT
+         WF8IpjFlsfZ4qIWUcS+pCt2rS0edTQAR8bokWdVOrRmD5tEb8Q2AIgra6m0eHTx0ve30
+         5Y3k1XbExO3renWp2Ub2yWJMlg6bJ2t7udXqQftbYlKXyiLNjduop0hjNX6yBqWC8URx
+         ChzZR9S4Y5GNz1p0Wvr+w8E3n7859AboQ73hguzebg0EcxAmvAITLrnNVS2H/dMWe8t3
+         WAWw==
+X-Gm-Message-State: AOAM530AsovK6RCKSX10bvCXQkS9u9NsC5An/rc4FSUj35QNhgzqjX3s
+        RVogeA+G5R7jRSKQT9pSFYMPa1q5PKHPWVfNKoJVQjvuU0fFequJ4rUv1ISUYF3snf18Z2kQ/07
+        gxi+yDf9ze/sqk441e5L4LWj1ABhH41Cgghk1XGs=
+X-Received: by 2002:a05:6000:43:: with SMTP id k3mr5161719wrx.222.1621324350514;
+        Tue, 18 May 2021 00:52:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy57QWx1Ov1vyh0TzbyrOH0cj+e32NvnYKAZJPCRd1Ls4ChobMxvXgL27Lpb43iGPVsbefTsMUY9jLvCUeu7wk=
+X-Received: by 2002:a05:6000:43:: with SMTP id k3mr5161689wrx.222.1621324350215;
+ Tue, 18 May 2021 00:52:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210517162256.128236-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210429102828.31248-1-prasanna.kalever@redhat.com> <YKMKdHPFCNhR1SXx@T590>
+In-Reply-To: <YKMKdHPFCNhR1SXx@T590>
+From:   Prasanna Kalever <pkalever@redhat.com>
+Date:   Tue, 18 May 2021 13:22:19 +0530
+Message-ID: <CANwsLLH0HyZ-VGPMc+VmuLivG1fiZHnSqUyLx3UWb76ZMCgYSg@mail.gmail.com>
+Subject: Re: [PATCH] nbd: provide a way for userspace processes to identify
+ device backends
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Prasanna Kumar Kalever <prasanna.kalever@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        nbd@other.debian.org, Josef Bacik <josef@toxicpanda.com>,
+        axboe@kernel.dk, Ilya Dryomov <idryomov@redhat.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Matteo Croce <mcroce@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi folks,
+On Tue, May 18, 2021 at 6:00 AM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> Hello Prasanna,
+>
+> On Thu, Apr 29, 2021 at 03:58:28PM +0530, Prasanna Kumar Kalever wrote:
+> > Problem:
+> > On reconfigure of device, there is no way to defend if the backend
+> > storage is matching with the initial backend storage.
+> >
+> > Say, if an initial connect request for backend "pool1/image1" got
+> > mapped to /dev/nbd0 and the userspace process is terminated. A next
+> > reconfigure request within NBD_ATTR_DEAD_CONN_TIMEOUT is allowed to
+> > use /dev/nbd0 for a different backend "pool1/image2"
+> >
+> > For example, an operation like below could be dangerous:
+>
 
-Please hold on, this patch fails on a large size read test case this
-morning. I will post a new version after the issue fixed.
+Hello Ming,
 
-Thanks.
+> Can you explain a bit why it is dangerous?
 
-Coly Li
+Yes, sure. Please check the below comments inline,
 
-On 5/18/21 12:22 AM, colyli@suse.de wrote:
-> From: Coly Li <colyli@suse.de>
-> 
-> In the cache missing code path of cached device, if a proper location
-> from the internal B+ tree is matched for a cache miss range, function
-> cached_dev_cache_miss() will be called in cache_lookup_fn() in the
-> following code block,
-> [code block 1]
->   526         unsigned int sectors = KEY_INODE(k) == s->iop.inode
->   527                 ? min_t(uint64_t, INT_MAX,
->   528                         KEY_START(k) - bio->bi_iter.bi_sector)
->   529                 : INT_MAX;
->   530         int ret = s->d->cache_miss(b, s, bio, sectors);
-> 
-> Here s->d->cache_miss() is the call backfunction pointer initialized as
-> cached_dev_cache_miss(), the last parameter 'sectors' is an important
-> hint to calculate the size of read request to backing device of the
-> missing cache data.
-> 
-> Current calculation in above code block may generate oversized value of
-> 'sectors', which consequently may trigger 2 different potential kernel
-> panics by BUG() or BUG_ON() as listed below,
-> 
-> 1) BUG_ON() inside bch_btree_insert_key(),
-> [code block 2]
->    886         BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
-> 2) BUG() inside biovec_slab(),
-> [code block 3]
->    51         default:
->    52                 BUG();
->    53                 return NULL;
-> 
-> All the above panics are original from cached_dev_cache_miss() by the
-> oversized parameter 'sectors'.
-> 
-> Inside cached_dev_cache_miss(), parameter 'sectors' is used to calculate
-> the size of data read from backing device for the cache missing. This
-> size is stored in s->insert_bio_sectors by the following lines of code,
-> [code block 4]
->   909    s->insert_bio_sectors = min(sectors, bio_sectors(bio) + reada);
-> 
-> Then the actual key inserting to the internal B+ tree is generated and
-> stored in s->iop.replace_key by the following lines of code,
-> [code block 5]
->   911   s->iop.replace_key = KEY(s->iop.inode,
->   912                    bio->bi_iter.bi_sector + s->insert_bio_sectors,
->   913                    s->insert_bio_sectors);
-> The oversized parameter 'sectors' may trigger panic 1) by BUG_ON() from
-> the above code block.
-> 
-> And the bio sending to backing device for the missing data is allocated
-> with hint from s->insert_bio_sectors by the following lines of code,
-> [code block 6]
->   926    cache_bio = bio_alloc_bioset(GFP_NOWAIT,
->   927                 DIV_ROUND_UP(s->insert_bio_sectors, PAGE_SECTORS),
->   928                 &dc->disk.bio_split);
-> The oversized parameter 'sectors' may trigger panic 2) by BUG() from the
-> agove code block.
-> 
-> Now let me explain how the panics happen with the oversized 'sectors'.
-> In code block 5, replace_key is generated by macro KEY(). From the
-> definition of macro KEY(),
-> [code block 7]
->   71 #define KEY(inode, offset, size)                                  \
->   72 ((struct bkey) {                                                  \
->   73      .high = (1ULL << 63) | ((__u64) (size) << 20) | (inode),     \
->   74      .low = (offset)                                              \
->   75 })
-> 
-> Here 'size' is 16bits width embedded in 64bits member 'high' of struct
-> bkey. But in code block 1, if "KEY_START(k) - bio->bi_iter.bi_sector" is
-> very probably to be larger than (1<<16) - 1, which makes the bkey size
-> calculation in code block 5 is overflowed. In one bug report the value
-> of parameter 'sectors' is 131072 (= 1 << 17), the overflowed 'sectors'
-> results the overflowed s->insert_bio_sectors in code block 4, then makes
-> size field of s->iop.replace_key to be 0 in code block 5. Then the 0-
-> sized s->iop.replace_key is inserted into the internal B+ tree as cache
-> missing check key (a special key to detect and avoid a racing between
-> normal write request and cache missing read request) as,
-> [code block 8]
->   915   ret = bch_btree_insert_check_key(b, &s->op, &s->iop.replace_key);
-> 
-> Then the 0-sized s->iop.replace_key as 3rd parameter triggers the bkey
-> size check BUG_ON() in code block 2, and causes the kernel panic 1).
-> 
-> Another kernel panic is from code block 6, is from the oversized value
-> s->insert_bio_sectors resulted by the oversized 'sectors'. From a bug
-> report the result of "DIV_ROUND_UP(s->insert_bio_sectors, PAGE_SECTORS)"
-> from code block 6 can be 344, 282, 946, 342 and many other values which
-> larther than BIO_MAX_VECS (a.k.a 256). When calling bio_alloc_bioset()
-> with such larger-than-256 value as the 2nd parameter, this value will
-> eventually be sent to biovec_slab() as parameter 'nr_vecs' in following
-> code path,
->    bio_alloc_bioset() ==> bvec_alloc() ==> biovec_slab()
-> 
-> Because parameter 'nr_vecs' is larger-than-256 value, the panic by BUG()
-> in code block 3 is triggered inside biovec_slab().
-> 
-> From the above analysis, it is obvious that in order to avoid the kernel
-> panics in code block 2 and code block 3, the calculated 'sectors' in
-> code block 1 should not generate overflowed value in code block 5 and
-> code block 6.
-> 
-> To avoid overflow in code block 5, the maximum 'sectors' value should be
-> equal or less than (1 << KEY_SIZE_BITS) - 1. And to avoid overflow in
-> code block 6, the maximum 'sectors' value should be euqal or less than
-> BIO_MAX_VECS * PAGE_SECTORS. Considering the kernel page size can be
-> variable, a reasonable maximum limitation of 'sectors' in code block 1
-> should be smaller on from "(1 << KEY_SIZE_BITS) - 1" and "BIO_MAX_VECS *
-> PAGE_SECTORS".
-> 
-> In this patch, a local variable inside cache_lookup_fn() is added as,
->      max_cache_miss_size = min_t(uint32_t,
-> 		(1 << KEY_SIZE_BITS) - 1, BIO_MAX_VECS * PAGE_SECTORS);
-> Then code block 1 uses max_cache_miss_size to limit the maximum value of
-> 'sectors' calculation as,
->   533        unsigned int sectors = KEY_INODE(k) == s->iop.inode
->   534                 ? min_t(uint64_t, max_cache_miss_size,
->   535                         KEY_START(k) - bio->bi_iter.bi_sector)
->   536                 : max_cache_miss_size;
-> 
-> Now the calculated 'sectors' value sent into cached_dev_cache_miss()
-> won't trigger neither of the above kernel panics.
-> 
-> Current problmatic code can be partially found since Linux v5.13-rc1,
-> therefore all maintained stable kernels should try to apply this fix.
-> 
-> Reported-by: Diego Ercolani <diego.ercolani@gmail.com>
-> Reported-by: Jan Szubiak <jan.szubiak@linuxpolska.pl>
-> Reported-by: Marco Rebhan <me@dblsaiko.net>
-> Reported-by: Matthias Ferdinand <bcache@mfedv.net>
-> Reported-by: Thorsten Knabe <linux@thorsten-knabe.de>
-> Reported-by: Victor Westerhuis <victor@westerhu.is>
-> Reported-by: Vojtech Pavlik <vojtech@suse.cz>
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: stable@vger.kernel.org
-> Cc: Takashi Iwai <tiwai@suse.com>
-> Cc: Kent Overstreet <kent.overstreet@gmail.com>
-> ---
->  drivers/md/bcache/request.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> index 29c231758293..90fa9ac47661 100644
-> --- a/drivers/md/bcache/request.c
-> +++ b/drivers/md/bcache/request.c
-> @@ -515,18 +515,25 @@ static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
->  	struct search *s = container_of(op, struct search, op);
->  	struct bio *n, *bio = &s->bio.bio;
->  	struct bkey *bio_key;
-> -	unsigned int ptr;
-> +	unsigned int ptr, max_cache_miss_size;
->  
->  	if (bkey_cmp(k, &KEY(s->iop.inode, bio->bi_iter.bi_sector, 0)) <= 0)
->  		return MAP_CONTINUE;
->  
-> +	/*
-> +	 * Make sure the cache missing size won't exceed the restrictions of
-> +	 * max bkey size and max bio's bi_max_vecs.
-> +	 */
-> +	max_cache_miss_size = min_t(uint32_t,
-> +		(1 << KEY_SIZE_BITS) - 1, BIO_MAX_VECS * PAGE_SECTORS);
-> +
->  	if (KEY_INODE(k) != s->iop.inode ||
->  	    KEY_START(k) > bio->bi_iter.bi_sector) {
->  		unsigned int bio_sectors = bio_sectors(bio);
->  		unsigned int sectors = KEY_INODE(k) == s->iop.inode
-> -			? min_t(uint64_t, INT_MAX,
-> +			? min_t(uint64_t, max_cache_miss_size,
->  				KEY_START(k) - bio->bi_iter.bi_sector)
-> -			: INT_MAX;
-> +			: max_cache_miss_size;
->  		int ret = s->d->cache_miss(b, s, bio, sectors);
->  
->  		if (ret != MAP_CONTINUE)
-> @@ -547,7 +554,7 @@ static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
->  	if (KEY_DIRTY(k))
->  		s->read_dirty_data = true;
->  
-> -	n = bio_next_split(bio, min_t(uint64_t, INT_MAX,
-> +	n = bio_next_split(bio, min_t(uint64_t, max_cache_miss_size,
->  				      KEY_OFFSET(k) - bio->bi_iter.bi_sector),
->  			   GFP_NOIO, &s->d->bio_split);
->  
-> 
+>
+> >
+> > $ sudo rbd-nbd map --try-netlink rbd-pool/ext4-image
+> > /dev/nbd0
+> > $ sudo blkid /dev/nbd0
+> > /dev/nbd0: UUID="bfc444b4-64b1-418f-8b36-6e0d170cfc04" TYPE="ext4"
+
+On Map the rbd-nbd attempting to send NBD_CMD_CONNECT, for backend
+'rbd-pool/ext4-image'. Post which kernel will allocate a new device
+say /dev/nbd0 for backend file rbd-pool/ext4-image (format:
+<pool>/<backendfile>)
+
+> > $ sudo pkill -9 rbd-nbd
+
+Assume normally or abnormally the userspace process (rbd-nbd here) is
+terminated, but then as per the settings the device /dev/nbd0 is not
+returned immediately, the kernel will wait for the
+NBD_ATTR_DEAD_CONN_TIMEOUT to expire.
+
+At this point two things could be possible:
+1. if there is a reconfigure request from userspace within the timeout
+then the kernel might reassign the same device /dev/nbd0.
+2. if the timeout has expired, then the device will be relieved.
+
+> > $ sudo rbd-nbd attach --try-netlink --device /dev/nbd0 rbd-pool/xfs-image
+> > /dev/nbd0
+> > $ sudo blkid /dev/nbd0
+> > /dev/nbd0: UUID="d29bf343-6570-4069-a9ea-2fa156ced908" TYPE="xfs"
+
+On attach the rbd-nbd attempt to send NBD_CMD_RECONFIGURE, after which
+the kernel will assign '--device /dev/nbd0' to specified backend.
+
+But there is a chance that userspace processes might accidentally send
+NBD_CMD_RECONFIGURE claiming for /dev/nbd0 for a different backend
+(rbd-pool/xfs-image instead of original rbd-pool/ext4-image).
+Currently, there is no mechanism to verify if the backend provided
+later with attach(NBD_CMD_RECONFIGURE) is matching with the one
+provided originally with map(NBD_CMD_CONNECT) before granting for a
+attach or reconfigure.
+
+For example in the above-explained scenario:
+Assume EXT4 on rbd-pool/ext4-image was mounted, after attach (Note:
+device /dev/nbd0 is reconfigured to a different backend file) XFS on
+rbd-pool/xfs-image would get corrupted. If there was an application
+using /dev/nbd0 directly (as a raw block volume), it wouldn't be happy
+either.
+
+> >
+> > Solution:
+> > Provide a way for userspace processes to keep some metadata to identify
+> > between the device and the backend, so that when a reconfigure request is
+> > made, we can compare and avoid such dangerous operations.
+> >
+> > With this solution, as part of the initial connect request, backend
+> > path can be stored in the sysfs per device config, so that on a reconfigure
+> > request it's easy to check if the backend path matches with the initial
+> > connect backend path.
+> >
+> > Please note, ioctl interface to nbd will not have these changes, as there
+> > won't be any reconfigure.
+>
+> BTW, loop has similar issue, and patch of 'block: add a sequence number to disks'
+> is added for addressing this issue, what do you think of that generic
+> approach wrt. this nbd's issue? such as used the exposed sysfs sequence number
+> for addressing this issue?
+>
+> https://lore.kernel.org/linux-block/YH81n34d2G3C4Re+@gardel-login/#r
+
+If I understand the changes and the background of the fix correctly, I
+think with that fix author is trying to monotonically increase the seq
+number and add it to the disk on every single device map/attach and
+expose it through the sysfs, which will help the userspace processes
+further to correlate events for particular and specific devices that
+reuse the same loop device.
+
+Coming back to my changes:
+I think here with this fix, we are trying to solve a different
+problem. The fix with this patch accepts a cookie or a backend string
+(could be file-path or whatever id userspace choose to provide) from
+userspace at the time of map and stores it in the sysfs
+/sys/block/nbdX/backend path and persists it until unmap is issued on
+the device (meaning that identity stays throughout the life cycle of
+that device, no matter how many detach and attaches happen). If there
+is a detach request in between (not unmap) then on the next attach
+(reconfigure request to reuse the same device) the stored
+cookie/UUID/backend-string will stand as a reference to verify if the
+newly passed backend is matching with the actual backend passed at map
+time to avoid any misconfigurations by accident and to safely proceed
+with attach.
+
+
+Thank you for the review.
+
+BRs,
+--
+Prasanna
+
+>
+> Thanks,
+> Ming
+>
 
