@@ -2,79 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MIME_BASE64_TEXT,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A9ECC433B4
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 15:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD537C43461
+	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 16:02:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E4516108B
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 15:04:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCBCD610CB
+	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 16:02:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344081AbhERPFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 May 2021 11:05:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33415 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343903AbhERPFj (ORCPT
+        id S1350243AbhERQDl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 May 2021 12:03:41 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3588 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344303AbhERQDk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 May 2021 11:05:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621350260;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=+bQ9SJNaGOJTT/Ip80Zm/iZNd8qbzj+zVIqxvcFO7kk=;
-        b=ILlMI3q4qZlrnSHC34onWRzM8pMVORuGF9Z2Y0ICE0UwlWDiqOl8YvWELRQwitN563UoK1
-        YMvHXtEdGsvqNY9OBjDGnHV59C1Q4WXgeBsojlFjUUZXWMLHYphg/vQHrp0fQNgJkNK6bU
-        p0QzRp/+R3JNi2qd2pa0j6FRHS0Pr6c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-1QKLHYpSO2i-ljSdkmC-mw-1; Tue, 18 May 2021 11:04:19 -0400
-X-MC-Unique: 1QKLHYpSO2i-ljSdkmC-mw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D21048049CD;
-        Tue, 18 May 2021 15:04:17 +0000 (UTC)
-Received: from localhost (ovpn-115-196.ams2.redhat.com [10.36.115.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 369EA5D9C0;
-        Tue, 18 May 2021 15:04:17 +0000 (UTC)
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     linux-block@vger.kernel.org
-Cc:     jasowang@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [PATCH] virtio-blk: limit seg_max to a safe value
-Date:   Tue, 18 May 2021 16:04:15 +0100
-Message-Id: <20210518150415.152730-1-stefanha@redhat.com>
+        Tue, 18 May 2021 12:03:40 -0400
+Received: from dggems703-chm.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Fl10R4FdXzsRnY;
+        Tue, 18 May 2021 23:59:35 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 19 May 2021 00:02:20 +0800
+Received: from [10.47.83.99] (10.47.83.99) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 18 May
+ 2021 17:02:17 +0100
+Subject: Re: [PATCH] blk-mq: plug request for shared sbitmap
+From:   John Garry <john.garry@huawei.com>
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        <linux-block@vger.kernel.org>, Yanhui Ma <yama@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        <kashyap.desai@broadcom.com>, chenxiang <chenxiang66@hisilicon.com>
+References: <20210514022052.1047665-1-ming.lei@redhat.com>
+ <b38d671a-530b-244a-bc0f-0b926c796243@huawei.com> <YKOiClSTyHl5lbXV@T590>
+ <185d1d58-f4e3-2024-e5e4-0831af151e3d@huawei.com> <YKOsQ4StDThlbMko@T590>
+ <12a651a2-5a0e-15dc-ec40-fc3c57265cd2@huawei.com>
+Message-ID: <676e9667-3022-7fde-4518-e82eb0503ec8@huawei.com>
+Date:   Tue, 18 May 2021 17:01:16 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <12a651a2-5a0e-15dc-ec40-fc3c57265cd2@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.83.99]
+X-ClientProxiedBy: lhreml716-chm.china.huawei.com (10.201.108.67) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-VGhlIHN0cnVjdCB2aXJ0aW9fYmxrX2NvbmZpZyBzZWdfbWF4IHZhbHVlIGlzIHJlYWQgZnJvbSB0
-aGUgZGV2aWNlIGFuZAppbmNyZW1lbnRlZCBieSAyIHRvIGFjY291bnQgZm9yIHRoZSByZXF1ZXN0
-IGhlYWRlciBhbmQgc3RhdHVzIGJ5dGUKZGVzY3JpcHRvcnMgYWRkZWQgYnkgdGhlIGRyaXZlci4K
-CkluIHByZXBhcmF0aW9uIGZvciBzdXBwb3J0aW5nIHVudHJ1c3RlZCB2aXJ0aW8tYmxrIGRldmlj
-ZXMsIHByb3RlY3QKYWdhaW5zdCBpbnRlZ2VyIG92ZXJmbG93IGFuZCBsaW1pdCB0aGUgdmFsdWUg
-dG8gYSBzYWZlIG1heGltdW0KKFNHX01BWF9TRUdNRU5UUykuCgpTaWduZWQtb2ZmLWJ5OiBTdGVm
-YW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Ci0tLQogZHJpdmVycy9ibG9jay92aXJ0
-aW9fYmxrLmMgfCA1ICsrKystCiAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAxIGRl
-bGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMgYi9kcml2
-ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYwppbmRleCBiOWZhM2VmNWI1N2MuLjRkZmQ1ZmM3YWVlYSAx
-MDA2NDQKLS0tIGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMKKysrIGIvZHJpdmVycy9ibG9j
-ay92aXJ0aW9fYmxrLmMKQEAgLTcyOCw3ICs3MjgsMTAgQEAgc3RhdGljIGludCB2aXJ0YmxrX3By
-b2JlKHN0cnVjdCB2aXJ0aW9fZGV2aWNlICp2ZGV2KQogCWlmIChlcnIgfHwgIXNnX2VsZW1zKQog
-CQlzZ19lbGVtcyA9IDE7CiAKLQkvKiBXZSBuZWVkIGFuIGV4dHJhIHNnIGVsZW1lbnRzIGF0IGhl
-YWQgYW5kIHRhaWwuICovCisJLyogUHJldmVudCBpbnRlZ2VyIG92ZXJmbG93cyBhbmQgZXhjZXNz
-aXZlIGJsay1tcSByZXEgY21kX3NpemUgKi8KKwlzZ19lbGVtcyA9IG1pbl90KHUzMiwgc2dfZWxl
-bXMsIFNHX01BWF9TRUdNRU5UUyk7CisKKwkvKiBXZSBuZWVkIGV4dHJhIHNnIGVsZW1lbnRzIGF0
-IGhlYWQgYW5kIHRhaWwuICovCiAJc2dfZWxlbXMgKz0gMjsKIAl2ZGV2LT5wcml2ID0gdmJsayA9
-IGttYWxsb2Moc2l6ZW9mKCp2YmxrKSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCF2YmxrKSB7Ci0tIAoy
-LjMxLjEKCg==
+On 18/05/2021 13:51, John Garry wrote:
+> n 18/05/2021 13:00, Ming Lei wrote:
+>>>> 'Before 620K' could be caused by busy queue when batching submission 
+>>>> isn't
+>>>> applied, so merge chance is increased. This patch applies batching
+>>>> submission, so queue becomes not busy enough.
+>>>>
+>>>> BTW, what is the queue depth of sdev and can_queue of shost for your 
+>>>> hisilision SAS?
+>>> sdev queue depth is 64 (see hisi_sas_slave_configure()) and host 
+>>> depth is
+>>> 4096 - 96 (for reserved tags) = 4000
+>> OK, so queue depth should get IO merged if there are too many requests
+>> queued.
+>>
+>> What is the same read test result without shared tags? still 430K?
+> 
+> I never left a driver switch in place to disable it.
+> 
+> I can forward-port "reply-map" support, which is not too difficult and I 
+> will let you know the result.
 
+The 'after' results are similar to without shared sbitmap, i.e using 
+reply-map:
+
+reply-map:
+450K (read), 430K IOPs (randread)
+
+For reference, with shared shared sbitmap:
+Before 620K (read), 300K IOPs (randread)
+After  460K (read), 430K (randread)*
+
+These are all mq-deadline.
+
+* I mixed read and randread result earlier by accident
+
+> 
+>> And what is your exact read test script? And how many cpu cores in
+>> your system?
+> 
+
+Thanks,
+John
