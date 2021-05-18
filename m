@@ -6,57 +6,46 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64457C433B4
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 11:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A136C433ED
+	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 11:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40B6D60BD3
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 11:43:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73788610A2
+	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 11:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231655AbhERLos (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 May 2021 07:44:48 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4660 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348845AbhERLop (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 May 2021 07:44:45 -0400
-Received: from dggems701-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FkvFh1hG8z16QLQ;
-        Tue, 18 May 2021 19:40:40 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- dggems701-chm.china.huawei.com (10.3.19.178) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 18 May 2021 19:43:24 +0800
-Received: from [10.47.83.99] (10.47.83.99) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 18 May
- 2021 12:43:22 +0100
-Subject: Re: [PATCH] blk-mq: plug request for shared sbitmap
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        <linux-block@vger.kernel.org>, Yanhui Ma <yama@redhat.com>,
+        id S245096AbhERLz5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 May 2021 07:55:57 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49864 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243045AbhERLzz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 May 2021 07:55:55 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 3ABF6ACB1;
+        Tue, 18 May 2021 11:54:34 +0000 (UTC)
+To:     Ming Lei <ming.lei@redhat.com>, John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, Yanhui Ma <yama@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        <kashyap.desai@broadcom.com>, chenxiang <chenxiang66@hisilicon.com>
+        kashyap.desai@broadcom.com, chenxiang <chenxiang66@hisilicon.com>
 References: <20210514022052.1047665-1-ming.lei@redhat.com>
  <b38d671a-530b-244a-bc0f-0b926c796243@huawei.com> <YKOiClSTyHl5lbXV@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <185d1d58-f4e3-2024-e5e4-0831af151e3d@huawei.com>
-Date:   Tue, 18 May 2021 12:42:22 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+From:   Hannes Reinecke <hare@suse.de>
+Organization: SUSE Linux GmbH
+Subject: Re: [PATCH] blk-mq: plug request for shared sbitmap
+Message-ID: <108caf1d-c31d-2303-57a8-8fe0f7bde22b@suse.de>
+Date:   Tue, 18 May 2021 13:54:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
 In-Reply-To: <YKOiClSTyHl5lbXV@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.83.99]
-X-ClientProxiedBy: lhreml716-chm.china.huawei.com (10.201.108.67) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18/05/2021 12:16, Ming Lei wrote:
+On 5/18/21 1:16 PM, Ming Lei wrote:
 > On Tue, May 18, 2021 at 10:44:43AM +0100, John Garry wrote:
 >> On 14/05/2021 03:20, Ming Lei wrote:
 >>> In case of shared sbitmap, request won't be held in plug list any more
@@ -81,9 +70,6 @@ On 18/05/2021 12:16, Ming Lei wrote:
 > 
 > This kind of hang or lockup is usually related with cpu utilization, and
 > this patch may reduce cpu utilization in submission context.
-
-Right.
-
 > 
 >>
 >> So I wonder about throughput performance (I had hoped to test before it was
@@ -97,13 +83,7 @@ Right.
 > submission, so queue becomes not busy enough.
 > 
 > BTW, what is the queue depth of sdev and can_queue of shost for your hisilision SAS?
-
-sdev queue depth is 64 (see hisi_sas_slave_configure()) and host depth 
-is 4096 - 96 (for reserved tags) = 4000
-
-IIRC, megaraid sas and mpt3sas use 256 for SAS sdev queue depth
-
->   
+>  
 >>
 >> none IO sched is always about 450K (read) and 500K (randread)
 >>
@@ -114,6 +94,36 @@ IIRC, megaraid sas and mpt3sas use 256 for SAS sdev queue depth
 > sequential write(dio, libaio, 16 jobs) to XFS. And it is observed that
 > IO merge is recovered to level of disabling host tags.
 > 
+I've found a good testcase for this by using null_blk:
 
-Thanks,
-John
+modprobe null_blk submit_queues=32 queue_mode=2 irqmode=0 bs=4096
+hw_queue_depth=2048 completion_nsec=1 nr_devices=4 shared_tags=1
+shared_tag_bitmap=1
+
+and using a simple fio job with libaio and rw=read and numjobs=32 will
+do the trick:
+
+[nullb]
+rw=read
+size=16g
+ioengine=libaio
+direct=1
+buffered=0
+group_reporting=1
+bs=4096
+numjobs=32
+
+(of course, the 'numjobs' and 'submit_queues' parameter would need to be
+adjusted to your machine).
+Omitting the 'shared_tag_bitmap' module parameter would yield around 12M
+iops; adding it would see a rather dramatic drop to 172k iops.
+With this patchset it's back to the expected iops value.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		        Kernel Storage Architect
+hare@suse.de			               +49 911 74053 688
+SUSE Software Solutions Germany GmbH, 90409 Nürnberg
+GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
