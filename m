@@ -2,75 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FBEC433ED
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 15:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39230C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 15:52:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26119611BD
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 15:45:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 190056024A
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 15:52:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346309AbhESPrK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 May 2021 11:47:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59278 "EHLO
+        id S241363AbhESPxX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 May 2021 11:53:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240572AbhESPrJ (ORCPT
+        with ESMTP id S233708AbhESPxX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 May 2021 11:47:09 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D2B6C06175F
-        for <linux-block@vger.kernel.org>; Wed, 19 May 2021 08:45:49 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id d11so14506170wrw.8
-        for <linux-block@vger.kernel.org>; Wed, 19 May 2021 08:45:49 -0700 (PDT)
+        Wed, 19 May 2021 11:53:23 -0400
+X-Greylist: delayed 60 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 May 2021 08:52:03 PDT
+Received: from resdmta-ch2-02v.sys.comcast.net (resdmta-ch2-02v.sys.comcast.net [IPv6:2001:558:fe21:29:69:252:207:82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5344C06175F
+        for <linux-block@vger.kernel.org>; Wed, 19 May 2021 08:52:03 -0700 (PDT)
+Received: from resqmta-ch2-08v.sys.comcast.net ([69.252.207.40])
+        by resdmta-ch2-02v.sys.comcast.net with ESMTP
+        id jOJ5l8NnOLnUajOUNlUwz3; Wed, 19 May 2021 15:52:03 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=HoKYm+RjM06T+m3egtchaR58vmg5foFNNoFnXFUB4KY=;
-        b=phFLT6WX5XjFqlAJ2BgYX842reXlESb1xa0R+IiKVQ6WIIKoKdPG43/E3kpo7zNRNB
-         nrXDAsOZniI1FT34Vhyuqc1X726KIogvzJSoGKh3uW25RH2h+jFAhALb2ltwbwAQs+u2
-         Sof4k1V/Fg32JefxEeDOnkuVSdbbxDHnuaXe6Um1licTwRl4B5zRDpUbDIJ8ewyCxpP0
-         dP87iU7gHnsfaDd19MyyoymjcJikUgqAfmzDTwxU3DawPtz+CArVq2H+ybJ+5aqzlOsL
-         lrdJknxv44rGDMZFkPHK2EH4zY8CJgWVKeUkG+Pl08PzzCTxRTiUZL2I6qUzvZ8rWGix
-         w2DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HoKYm+RjM06T+m3egtchaR58vmg5foFNNoFnXFUB4KY=;
-        b=rWniBgNsVnFW4A5RWBw4mQaI4VpnJeHf5uV9uLzsqZtLnz9ZcwJnFby1yANT3NTVrh
-         ihHmfZ/cp/W/2iCECUtKjLRTz72m8JkaEn5Qwl+PhIAR7ePywxj1iWGfGc0cI2EYm3IU
-         OJmWd0lvd5ZuOVtTWQkge0z4wSUBWU8Yz+Tois1l6dtcd9lD4pEVoS4iBp6ClJaluD6j
-         edeGEAnLLGh+iRt2bFwAVw7NQsC3sEfhP4YqZudvOMvRagPyPf6uXCzlJ2G/7Gylucx1
-         EkCxC4iucQx7f5eAGxAREdIVne5bJ6Lmsn9c2eY1AQkZPDcz+g1083EqOT6l/b2VZUWo
-         3Fog==
-X-Gm-Message-State: AOAM530exDcX79YJ0b2oceCmU+QjJ1qh0WT59fGHtN0Z78XMr7nYAqiv
-        MnvVQKhWe9zdZEb1wMWcJ2Q=
-X-Google-Smtp-Source: ABdhPJw1u1uMzrO7DRYw/EmjZmzNxiFE44IwvHFTvvcnJYVrkdDG8gz/h5qX98I3BBLxrENzbKmEbQ==
-X-Received: by 2002:a5d:64e5:: with SMTP id g5mr15623125wri.30.1621439148157;
-        Wed, 19 May 2021 08:45:48 -0700 (PDT)
-Received: from [192.168.2.27] (39.35.broadband4.iol.cz. [85.71.35.39])
-        by smtp.gmail.com with ESMTPSA id j14sm6534412wmj.19.2021.05.19.08.45.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 May 2021 08:45:47 -0700 (PDT)
-Subject: Re: [dm-devel] [PATCH 11/11] dm crypt: Fix zoned block device support
-To:     Damien Le Moal <damien.lemoal@wdc.com>, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-References: <20210519025529.707897-1-damien.lemoal@wdc.com>
- <20210519025529.707897-12-damien.lemoal@wdc.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Message-ID: <cbbf8310-cc46-7925-c8e9-1edb23d245ca@gmail.com>
-Date:   Wed, 19 May 2021 17:45:46 +0200
+        d=comcastmailservice.net; s=20180828_2048; t=1621439523;
+        bh=AtpN7XokfCmtNz4fE2d1fHQyikNAN1wi6PNzEpHOoLo=;
+        h=Received:Received:Received:Reply-To:Subject:To:From:Message-ID:
+         Date:MIME-Version:Content-Type;
+        b=VbowhQnXX677nZ02lwiXfXt/H2kpNHtgVSVU38I+ahp0WsF04EFnXxf1k3EA5IhWz
+         Er/F2DxHqJ8fEr4if90VcitM76AqtUekEMw87ukhY7+kJibHrY6KYLRBuzD4rFYzqS
+         AufWOj2ZvyWEBJ1p9d/DOkB32l6sN+4FGZ+gUTcKO12CBWD4behosSSW3V1IkcsOAo
+         bSRGWknmhRp9DFHssQbpilB+INLgB4gLlZYIc8O7tZ1F83G5YPxaPdxXXMsbpF/e9A
+         ukgOfb9LmZ7YJ8lB05KYTSolfstEMX5+ogpv/bBDZreqe2ZDrbFW3YxrpyTAn2oyOS
+         C1DaODsjj+tbw==
+Received: from resomta-ch2-07v.sys.comcast.net ([69.252.207.103])
+        by resqmta-ch2-08v.sys.comcast.net with ESMTP
+        id jNOjlsSk05RiAjOTOlwJhe; Wed, 19 May 2021 15:51:02 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=comcastmailservice.net; s=20180828_2048; t=1621439462;
+        bh=AtpN7XokfCmtNz4fE2d1fHQyikNAN1wi6PNzEpHOoLo=;
+        h=Received:Received:Reply-To:Subject:To:From:Message-ID:Date:
+         MIME-Version:Content-Type;
+        b=ePXnJieLwW3STTuWGUpT5Gp2ulHM74DiY7Rsm0EA0dI9SDPFkgWGRJah1+U/u1kdl
+         eFDGh8Ay+zbwavK420u7qH57UELG9tj6ckRtXSLtvRdNg07p4nOeKHRjh9yt9HEAPZ
+         RxV1Uza1x7iNrvLGYuWo3BVLp2hMvDe8dDbkz3p9Iv5gU2sqZa0My76JLWA/7xELAo
+         u6Alt8l6AsmS/UgupaTN7C9QeydEKDLgnrQMsq6DOJBxdvXmlXxBppOmg5J4l1jY4g
+         CR/leRwm3wRrM9OexT2pPib0D3Fy7CY8ug2Hl5pUBYXwdPZGjQ74N65vxEZPYLEyM9
+         knhmkpVDP1J5Q==
+Received: from [IPv6:2001:558:6040:22:2171:426f:b27e:296d]
+ ([IPv6:2001:558:6040:22:2171:426f:b27e:296d])
+        by resomta-ch2-07v.sys.comcast.net with ESMTPSA
+        id jOTMlmJqKUPp4jOTMllpl9; Wed, 19 May 2021 15:51:01 +0000
+X-Xfinity-VMeta: sc=-100.00;st=legit
+Reply-To: james@nurealm.net
+Subject: Re: linux 5.12 - fails to boot - soft lockup - CPU#0 stuck for 23s! -
+ RIP smp_call_function_single
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-smp@vger.kernel.org, linux-block@vger.kernel.org
+References: <3516e776-6c69-2a83-6da4-19de77621b18@nurealm.net>
+ <20210517122709.GC15150@lst.de>
+From:   James Feeney <james@nurealm.net>
+Message-ID: <6b22e76e-1e37-fda0-0dd5-3021e2f0b9e2@nurealm.net>
+Date:   Wed, 19 May 2021 09:50:59 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210519025529.707897-12-damien.lemoal@wdc.com>
+In-Reply-To: <20210517122709.GC15150@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,85 +78,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19/05/2021 04:55, Damien Le Moal wrote:
-> Zone append BIOs (REQ_OP_ZONE_APPEND) always specify the start sector
-> of the zone to be written instead of the actual sector location to
-> write. The write location is determined by the device and returned to
-> the host upon completion of the operation. This interface, while simple
-> and efficient for writing into sequential zones of a zoned block
-> device, is incompatible with the use of sector values to calculate a
-> cypher block IV. All data written in a zone end up using the same IV
-> values corresponding to the first sectors of the zone, but read
-> operation will specify any sector within the zone resulting in an IV
-> mismatch between encryption and decryption.
-> 
-> To solve this problem, report to DM core that zone append operations are
-> not supported. This result in the zone append operations being emulated
-> using regular write operations.
-
-Yes, I think this is definitive better approach and it does not need
-to fiddle with dm-crypt crypto, thanks.
-
-Just one comment below:
-
-> 
-> Reported-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> ---
->  drivers/md/dm-crypt.c | 24 +++++++++++++++++++-----
->  1 file changed, 19 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index f410ceee51d7..44339823371c 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -3280,14 +3280,28 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  	}
->  	cc->start = tmpll;
->  
-> -	/*
-> -	 * For zoned block devices, we need to preserve the issuer write
-> -	 * ordering. To do so, disable write workqueues and force inline
-> -	 * encryption completion.
-> -	 */
->  	if (bdev_is_zoned(cc->dev->bdev)) {
-> +		/*
-> +		 * For zoned block devices, we need to preserve the issuer write
-> +		 * ordering. To do so, disable write workqueues and force inline
-> +		 * encryption completion.
-> +		 */
->  		set_bit(DM_CRYPT_NO_WRITE_WORKQUEUE, &cc->flags);
->  		set_bit(DM_CRYPT_WRITE_INLINE, &cc->flags);
-> +
-> +		/*
-> +		 * All zone append writes to a zone of a zoned block device will
-> +		 * have the same BIO sector, the start of the zone. When the
-> +		 * cypher IV mode uses sector values, all data targeting a
-> +		 * zone will be encrypted using the first sector numbers of the
-> +		 * zone. This will not result in write errors but will
-> +		 * cause most reads to fail as reads will use the sector values
-> +		 * for the actual data locations, resulting in IV mismatch.
-> +		 * To avoid this problem, ask DM core to emulate zone append
-> +		 * operations with regular writes.
-> +		 */
-> +		DMWARN("Zone append operations will be emulated");
-
-Do we really want to fill log with these?
-
-(I know it is not a good example in this context - but during online reencryption,
-dm-crypt table segments are continuously reloaded and because the message is in in table constructor,
-it will flood the syslog with repeated message.)
-
-Maybe move it to debug or remove it completely?
-What would be nice to have some zoned info extension to lsblk so we can investigate
-storage stack over zoned device (if there is some sysfs knob to detect it, it should be trivial)... 
-
-Thanks,
-Milan
-
-> +		ti->emulate_zone_append = true;
->  	}
->  
->  	if (crypt_integrity_aead(cc) || cc->integrity_iv_size) {
+On 5/17/21 6:27 AM, Christoph Hellwig wrote:
+> Any information of the system?  What block driver(s) do you use, how
+> many CPUs, kernel config?
 > 
 
+Hey Chris
+
+I see that Markus followed-up with:
+
+====
+Well, turns out I should've googled (or at least looked at the bcache wiki entry) at first, which points to a known bug involving bcache and 5.12: https://www.spinics.net/lists/linux-bcache/msg10077.html
+
+I still find it interesting that I get the same symptoms that James describes, but other than that the issues don't seem to be related.
+====
+
+For my part, I also had to re-run my bisect, with more thorough testing.  The result changed, and we are currently investigating the final commit, at 4f432e8bb15b x86/mce: Get rid of mcheck_intel_therm_init().
+
+So now, I expect that my issue has nothing to do with your patch set.  Sorry about the noise.  If you still have an interest in my issue, there are posts going to linux-smp and lkml.
+
+James
+
+> On Fri, May 14, 2021 at 12:39:59PM -0600, James Feeney wrote:
+>> With the patch to kernel/smp.c in linux 5.12.4, "smp: Fix smp_call_function_single_async prototype", by Arnd Bergmann, I thought maybe there was a fix.  But no.  The error is the same, except the top of the Call Trace is different:
+>>
+>> ...
+>> watchdog: BUG: soft lockup - CPU#0 stuck for 23s! ...
+>> ...
+>> RIP: 0010:smp_call_function_single+0xeb/0x130
+>> ...
+>> Call Trace:
+>> ? text_poke_loc_init+0x160/0x160
+>> ? text_poke_loc_init+0x160/0x160
+>> on_each_cpu+0x39/0x90
+>> ...
+>>
+>> and repeats indefinitely.
+>>
+>> Again, smp_call_function_single is defined in kernel/smp.c
+>>
+>> It seems that my git bisect is probably off, since apparently the system may sometimes boot to a temporarily working state, and some "exercise" is needed to identify the failure.  However, see another git bisect for possibly the same issue at
+>>
+>>  https://bugs.archlinux.org/task/70663#comment199765
+>>
+>> with "bisect-result.txt"
+>>
+>>  https://bugs.archlinux.org/task/70663?getfile=20255
+>>
+>> Markus says, in part:
+>>
+>> ====
+>> Trying to bisect, I arrived at a different set of commits though.
+>> 7a800a20ae6329e803c5c646b20811a6ae9ca136 showed the issue described, where a seemingly working kernel will lock up rather quickly.
+>> f007a3d66c5480c8dae3fa20a89a06861ef1f5db worked flawlessly, without any hiccups doing random internet browsing while I was compiling the next bisect step.
+>> However, there are six commits between those, that did not boot and left me stuck with a black screen right after the bootloader (so no systemd startup message or similar). The system did not react to any inputs (Alt+SysRq) or to a short press of the PC's power button, and thus a hard shutdown was necessary.
+>> ====
+>>
+>> These 8 commits - total - are from Christopher Hellwig, 2021 Feb 02.  Perhaps something closer to the real issue is in there.  As with Markus, I've also noticed that a "warm" reboot can result in a frozen system immediately after the boot loader has run.  A full power-off reboot is needed to get past the early screen initialization.
+>>
+>> I'll have to re-do my git bisect, with more extensive system "exercise", to see if something more useful results.
+>>
+>> James
+> ---end quoted text---
+> 
