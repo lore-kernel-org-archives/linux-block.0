@@ -2,102 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD537C43461
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 16:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14621C433ED
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 00:22:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCBCD610CB
-	for <linux-block@archiver.kernel.org>; Tue, 18 May 2021 16:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E145A61353
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 00:22:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350243AbhERQDl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 May 2021 12:03:41 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3588 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344303AbhERQDk (ORCPT
+        id S234706AbhESAXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 May 2021 20:23:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34680 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233756AbhESAXX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 May 2021 12:03:40 -0400
-Received: from dggems703-chm.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Fl10R4FdXzsRnY;
-        Tue, 18 May 2021 23:59:35 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 19 May 2021 00:02:20 +0800
-Received: from [10.47.83.99] (10.47.83.99) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 18 May
- 2021 17:02:17 +0100
-Subject: Re: [PATCH] blk-mq: plug request for shared sbitmap
-From:   John Garry <john.garry@huawei.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        <linux-block@vger.kernel.org>, Yanhui Ma <yama@redhat.com>,
+        Tue, 18 May 2021 20:23:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621383724;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bfJ3M7RnbPtNH2FUWu2oZP6hfkEcT5WfiT7nzkh6yVE=;
+        b=O4fuIhPlZMaqLHT9T9cCRb/iqThkSnz2T70Azzv+Baps956XBem8FrIZd/ZQm8FPqrSrMK
+        gHLuy5XHRV5WR/lK3kL+7VwSDF0lmOrppS+crPs9gPQZQ9Dq5yzMD51GbAaiv+UGnBQQUu
+        m2XI3/PGmbBbmho1m+aB1+11FIrg8KA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-512-PNyYYzozMJiBrke-Q9NOaw-1; Tue, 18 May 2021 20:22:02 -0400
+X-MC-Unique: PNyYYzozMJiBrke-Q9NOaw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DDBC801107;
+        Wed, 19 May 2021 00:22:01 +0000 (UTC)
+Received: from T590 (ovpn-12-62.pek2.redhat.com [10.72.12.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 50D1D1A868;
+        Wed, 19 May 2021 00:21:50 +0000 (UTC)
+Date:   Wed, 19 May 2021 08:21:45 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, Yanhui Ma <yama@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        <kashyap.desai@broadcom.com>, chenxiang <chenxiang66@hisilicon.com>
+        kashyap.desai@broadcom.com, chenxiang <chenxiang66@hisilicon.com>
+Subject: Re: [PATCH] blk-mq: plug request for shared sbitmap
+Message-ID: <YKRaGT5PjCvH+12p@T590>
 References: <20210514022052.1047665-1-ming.lei@redhat.com>
- <b38d671a-530b-244a-bc0f-0b926c796243@huawei.com> <YKOiClSTyHl5lbXV@T590>
- <185d1d58-f4e3-2024-e5e4-0831af151e3d@huawei.com> <YKOsQ4StDThlbMko@T590>
+ <b38d671a-530b-244a-bc0f-0b926c796243@huawei.com>
+ <YKOiClSTyHl5lbXV@T590>
+ <185d1d58-f4e3-2024-e5e4-0831af151e3d@huawei.com>
+ <YKOsQ4StDThlbMko@T590>
  <12a651a2-5a0e-15dc-ec40-fc3c57265cd2@huawei.com>
-Message-ID: <676e9667-3022-7fde-4518-e82eb0503ec8@huawei.com>
-Date:   Tue, 18 May 2021 17:01:16 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+ <676e9667-3022-7fde-4518-e82eb0503ec8@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <12a651a2-5a0e-15dc-ec40-fc3c57265cd2@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.83.99]
-X-ClientProxiedBy: lhreml716-chm.china.huawei.com (10.201.108.67) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <676e9667-3022-7fde-4518-e82eb0503ec8@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18/05/2021 13:51, John Garry wrote:
-> n 18/05/2021 13:00, Ming Lei wrote:
->>>> 'Before 620K' could be caused by busy queue when batching submission 
->>>> isn't
->>>> applied, so merge chance is increased. This patch applies batching
->>>> submission, so queue becomes not busy enough.
->>>>
->>>> BTW, what is the queue depth of sdev and can_queue of shost for your 
->>>> hisilision SAS?
->>> sdev queue depth is 64 (see hisi_sas_slave_configure()) and host 
->>> depth is
->>> 4096 - 96 (for reserved tags) = 4000
->> OK, so queue depth should get IO merged if there are too many requests
->> queued.
->>
->> What is the same read test result without shared tags? still 430K?
+On Tue, May 18, 2021 at 05:01:16PM +0100, John Garry wrote:
+> On 18/05/2021 13:51, John Garry wrote:
+> > n 18/05/2021 13:00, Ming Lei wrote:
+> > > > > 'Before 620K' could be caused by busy queue when batching
+> > > > > submission isn't
+> > > > > applied, so merge chance is increased. This patch applies batching
+> > > > > submission, so queue becomes not busy enough.
+> > > > > 
+> > > > > BTW, what is the queue depth of sdev and can_queue of shost
+> > > > > for your hisilision SAS?
+> > > > sdev queue depth is 64 (see hisi_sas_slave_configure()) and host
+> > > > depth is
+> > > > 4096 - 96 (for reserved tags) = 4000
+> > > OK, so queue depth should get IO merged if there are too many requests
+> > > queued.
+> > > 
+> > > What is the same read test result without shared tags? still 430K?
+> > 
+> > I never left a driver switch in place to disable it.
+> > 
+> > I can forward-port "reply-map" support, which is not too difficult and I
+> > will let you know the result.
 > 
-> I never left a driver switch in place to disable it.
+> The 'after' results are similar to without shared sbitmap, i.e using
+> reply-map:
 > 
-> I can forward-port "reply-map" support, which is not too difficult and I 
-> will let you know the result.
+> reply-map:
+> 450K (read), 430K IOPs (randread)
 
-The 'after' results are similar to without shared sbitmap, i.e using 
-reply-map:
+OK, that is expected result. After shared sbitmap, IO merge gets improved
+when batching submission is bypassed, meantime IOPS of random IO drops
+because cpu utilization is increased.
 
-reply-map:
-450K (read), 430K IOPs (randread)
+So that isn't a regression, let's live with this awkward situation, :-(
 
-For reference, with shared shared sbitmap:
-Before 620K (read), 300K IOPs (randread)
-After  460K (read), 430K (randread)*
-
-These are all mq-deadline.
-
-* I mixed read and randread result earlier by accident
-
-> 
->> And what is your exact read test script? And how many cpu cores in
->> your system?
-> 
 
 Thanks,
-John
+Ming
+
