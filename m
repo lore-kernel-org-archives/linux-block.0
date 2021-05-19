@@ -2,105 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6841C433B4
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 20:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A2EC433B4
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 20:20:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A72B061355
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 20:09:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12E12611BD
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 20:20:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232761AbhESUKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 May 2021 16:10:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34390 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232746AbhESUKc (ORCPT
+        id S229534AbhESUVv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 May 2021 16:21:51 -0400
+Received: from mail-pl1-f180.google.com ([209.85.214.180]:45611 "EHLO
+        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230050AbhESUVq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 May 2021 16:10:32 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FDA5C06175F;
-        Wed, 19 May 2021 13:09:12 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id s20so7680406plr.13;
-        Wed, 19 May 2021 13:09:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=lriiXlwHl41FtaV5CoBrV98HLQ9Gp2N1i35WCPU1eqA=;
-        b=dKEqkRVfGgMyoGeqNU/Wv8pn+ukFifp9q8JivcHVlOQdrprqGZxxNJ6xf3JaNyTUdx
-         pMGL8dFzJxihPpRu6DYg3c8Vu9xAfxna2Zx5q+Ak4PwluGAsqPvoIp54sV4sfWJ+MpXB
-         xBqb5J6izMjs/JFnOGZM4x9jbI+5pFH5xj5KRz2nMPb3eNCbrlTFHH9RgC/waFkMpQ6J
-         PdM/PQEfOZx0LNTlyZGomnoOfcPoW0pI/pDUhufucnT5YcTJ9HnsnuEP9JFkni9u3lIJ
-         pk+uSvgXTn8WHo+TdY8l0jw5umUnOVGFfHHkZFOgyviTtwwllUl/c6HxowplQ2Eo1XnV
-         4PZA==
+        Wed, 19 May 2021 16:21:46 -0400
+Received: by mail-pl1-f180.google.com with SMTP id s4so6145747plg.12;
+        Wed, 19 May 2021 13:20:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=lriiXlwHl41FtaV5CoBrV98HLQ9Gp2N1i35WCPU1eqA=;
-        b=ltebFBV7d6jCjyw8TEqRmThZRw0ZDMboIx08p69+L+3bvVvUNzpM1nAtScDL/M0Iju
-         pONFj538m+3Mha6dcW+XiRNtRZh1rSvLX/2FZ/cNDRSTiopUEK9ORbuhd2QfJ/r+V41O
-         e3rbNAMcPORzWs6X+Wt4+ayZfGodKYZdvAYkTUAnAxmOS3emiJnxo1wTDxvttYTqDXxo
-         qY4LeA5+vfWy9/eNzPvcO9FF6bAMzln1l6H2RPm/wSa4cFIgI2xh5zH6CgDSU8SzOuF/
-         QFIHl4wQk1I1CiQHdVAswNuHykTRqtmDyVQ8jPTIee/v5goog7YqTI/nEwV0xOt1qL7v
-         Q6iA==
-X-Gm-Message-State: AOAM532up/4PWjPihTQp6Ocq+tB7s3prxOHt/xYxO7seTE88jS7Cglrl
-        qvxXqV8Xb0p8Rk9vkIUqaqM=
-X-Google-Smtp-Source: ABdhPJyRIP2OET6BhmkttYHpZgBQw+uanaslQBGyKVZRHgg4WwBOqHzuR/+zFxeGcOxN1nzy5O6zSw==
-X-Received: by 2002:a17:90b:116:: with SMTP id p22mr718929pjz.186.1621454951706;
-        Wed, 19 May 2021 13:09:11 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:4102:f4c7:9246:e6c4])
-        by smtp.gmail.com with ESMTPSA id 10sm181025pgl.39.2021.05.19.13.09.10
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=o7pIVQq0PnktpSK+lfLROl6H6C/pzsbZBvrItiTclLY=;
+        b=oBj4eCnv6yrihUX5AsiUXEvlxbqeY28SBsP8csIuj3W1vHbEOUodEFzQz5WBD+seSY
+         xKQ3E4OcEuhDzn9tKfub81R23RBTrkGGcjnfe2m6TXgJB4+a0it2DkVPQo/zPXuojEHW
+         7ZbkdWEA3lriinTnWdJEONZudQCD3RvyPChjHa8XdMtqFlt+gLuqqAm1qXpSn6FdOBfH
+         Or1xS9CrtSNk3hDrLkYi/4/I9S4qNh9tN5bk4ivySj5t6ZRJuY3XrQ2Mbv7Wg7BaqRes
+         tOAKwN8DUQ3OexwIvOkmvlxCyeyoaQNe6S/D8D0V+uFRcJ8jPlkyosYLEH/1bic3J3+9
+         xcug==
+X-Gm-Message-State: AOAM533LxPUGp4Werpa5YKoHZiyoWRS3WyYVZZGMetUEL/gxk9hTqpbF
+        TXs0BLeUB7/MZLdgwz6RjHU=
+X-Google-Smtp-Source: ABdhPJxM/U4TCGgtxjcCaOQo0b0hukqDOiRHuf7ZbAmq+/PbvuDjkIuXHmqAWMEVcaQF7USSNnT66A==
+X-Received: by 2002:a17:90b:70c:: with SMTP id s12mr770606pjz.98.1621455625777;
+        Wed, 19 May 2021 13:20:25 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id n23sm210960pff.93.2021.05.19.13.20.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 13:09:11 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Wed, 19 May 2021 13:09:09 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
+        Wed, 19 May 2021 13:20:24 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 69C7A40321; Wed, 19 May 2021 20:20:23 +0000 (UTC)
+Date:   Wed, 19 May 2021 20:20:23 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Minchan Kim <minchan@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Douglas Gilbert <dgilbert@interlog.com>
 Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
         axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
         tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
         rostedt@goodmis.org, peterz@infradead.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 0/4] zram: fix few sysfs races
-Message-ID: <YKVwZVcbZBNXUpKm@google.com>
+Message-ID: <20210519202023.GU4332@42.do-not-panic.com>
 References: <20210423011108.11988-1-mcgrof@kernel.org>
+ <YKVwZVcbZBNXUpKm@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210423011108.11988-1-mcgrof@kernel.org>
+In-Reply-To: <YKVwZVcbZBNXUpKm@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 23, 2021 at 01:11:04AM +0000, Luis Chamberlain wrote:
-> This 2nd series documents the fixes better and includes a bdgrab() fix
-> for the issue noted by Minchan. A general fix has been proposed for two
-> of these issues however they are not yet deemed required upstream and so
-> we just open code individual solutions on the driver.
+Greg,
+
+your feedback would be appreciated here.
+
+On Wed, May 19, 2021 at 01:09:09PM -0700, Minchan Kim wrote:
+> On Fri, Apr 23, 2021 at 01:11:04AM +0000, Luis Chamberlain wrote:
+> > This 2nd series documents the fixes better and includes a bdgrab() fix
+> > for the issue noted by Minchan. A general fix has been proposed for two
+> > of these issues however they are not yet deemed required upstream and so
+> > we just open code individual solutions on the driver.
+> > 
+> > Luis Chamberlain (4):
+> >   zram: fix crashes due to use of cpu hotplug multistate
+> >   zram: avoid disksize setting when device is being claimed
+> >   zram: fix deadlock with sysfs attribute usage and driver removal
+> >   zram: fix possible races between sysfs use and bdev access
+> > 
+> >  drivers/block/zram/zram_drv.c | 473 +++++++++++++++++++++++++++++-----
+> >  1 file changed, 414 insertions(+), 59 deletions(-)
 > 
-> Luis Chamberlain (4):
->   zram: fix crashes due to use of cpu hotplug multistate
->   zram: avoid disksize setting when device is being claimed
->   zram: fix deadlock with sysfs attribute usage and driver removal
->   zram: fix possible races between sysfs use and bdev access
+> Hi Luis,
 > 
->  drivers/block/zram/zram_drv.c | 473 +++++++++++++++++++++++++++++-----
->  1 file changed, 414 insertions(+), 59 deletions(-)
+> First of all, I am sorry too late review. Now I see [3/4] and [4/4] would
+> be not only zram issue since you shed a light in the descriptions.
+> Yeah, that would be helpful if it could be deal with under general
+> layer but looks like arguable or would take some times at least, IIUC.
+> 
+> On the case, yeah, we could fix it for zram first until the issue will
+> bring up further. Anyway, I'd like to see some wrapper rather than annotating
+> for every sysfs files for maintainance point of view.
+> At least, could you introduce one more patch "introduce zram sysfs wrapper"
+> on top of this series to centralize the work?
+> 
+> Thanks for your works!
 
-Hi Luis,
+Since I did the work for a general fix as an alternative proof of
+concept to the ugliness reflected on those two last patches, I'd like
+instead for Greg to re-consider merging a general fix.
 
-First of all, I am sorry too late review. Now I see [3/4] and [4/4] would
-be not only zram issue since you shed a light in the descriptions.
-Yeah, that would be helpful if it could be deal with under general
-layer but looks like arguable or would take some times at least, IIUC.
+Greg, can you comment on technical levels why a general core fix is not
+desirable upstream for those two issues?
 
-On the case, yeah, we could fix it for zram first until the issue will
-bring up further. Anyway, I'd like to see some wrapper rather than annotating
-for every sysfs files for maintainance point of view.
-At least, could you introduce one more patch "introduce zram sysfs wrapper"
-on top of this series to centralize the work?
+Based on feedback from folks, it does not seem the argument that we
+don't support rmmod holds water.  Specially given we are now even
+discussing using live patching to suport error injection as a strategy
+to not incur more code / boiler plate code even on the block layer [0].
+The live patching approach would mean for testing purposes we'd
+temporarily use error injection via live patching and then remove the
+module after done testing.
 
-Thanks for your works!
+[0] http://lkml.kernel.org/r/989175a7-5533-02ef-c096-b24b2769c9cf@suse.de
+
+  Luis
