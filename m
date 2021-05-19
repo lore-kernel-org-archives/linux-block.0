@@ -2,129 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D88C433ED
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 19:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6841C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 20:09:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85DBF6124C
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 19:57:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A72B061355
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 20:09:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232442AbhEST7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 May 2021 15:59:13 -0400
-Received: from mail-pl1-f176.google.com ([209.85.214.176]:38792 "EHLO
-        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232333AbhEST7K (ORCPT
+        id S232761AbhESUKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 May 2021 16:10:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34390 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232746AbhESUKc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 May 2021 15:59:10 -0400
-Received: by mail-pl1-f176.google.com with SMTP id 69so7676842plc.5;
-        Wed, 19 May 2021 12:57:51 -0700 (PDT)
+        Wed, 19 May 2021 16:10:32 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FDA5C06175F;
+        Wed, 19 May 2021 13:09:12 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id s20so7680406plr.13;
+        Wed, 19 May 2021 13:09:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=lriiXlwHl41FtaV5CoBrV98HLQ9Gp2N1i35WCPU1eqA=;
+        b=dKEqkRVfGgMyoGeqNU/Wv8pn+ukFifp9q8JivcHVlOQdrprqGZxxNJ6xf3JaNyTUdx
+         pMGL8dFzJxihPpRu6DYg3c8Vu9xAfxna2Zx5q+Ak4PwluGAsqPvoIp54sV4sfWJ+MpXB
+         xBqb5J6izMjs/JFnOGZM4x9jbI+5pFH5xj5KRz2nMPb3eNCbrlTFHH9RgC/waFkMpQ6J
+         PdM/PQEfOZx0LNTlyZGomnoOfcPoW0pI/pDUhufucnT5YcTJ9HnsnuEP9JFkni9u3lIJ
+         pk+uSvgXTn8WHo+TdY8l0jw5umUnOVGFfHHkZFOgyviTtwwllUl/c6HxowplQ2Eo1XnV
+         4PZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ye6B2Mg3FnnXaKb9M8n5F28Q2Kx9wSYWuGuUQsghp/c=;
-        b=ocjYioAN0eaX267+zJuqI1HUDzaT1sLMbdLxDgDGrMuBxTB8zL0XMw+yGsdCyTcLEz
-         pJfn0y5185yqa/s7eWd1IpPMuIkduPWpLxAzONYTTnWs/9n7e8wrRJyiie8G+0gufGZz
-         beZqUYpVjDC9rN9/KwUTxjg0fXBBXBOaJc5PhMUB2oNIVIV6q9NkU8TUXqvpYJd53zeE
-         7z7tEW58C3p/Ph1KGOVsixsjBsUeFRzQndYlOBEY5252xOWRida0s+JjLOANctwOsrpc
-         o2SXQhCaK87HGbBnphGkdGS/4Ae+VmWs+YoKG3pejNVlFWvjo9TstPI62Azt6V4dQp4u
-         chrg==
-X-Gm-Message-State: AOAM532kEnTYCcpxja6XoXBtXOoiqFTx6Rx+TwqvhAeCULsU5jYQkHCZ
-        LVpEpDr1BEcawKYZRGraH80=
-X-Google-Smtp-Source: ABdhPJzi5Cw65WIz3Pny24uTwGtgUWorOHFBTN4uLW0DqWpiLoByp4FgN4fGEhFqnJ4gr4YckHBtxQ==
-X-Received: by 2002:a17:90a:de16:: with SMTP id m22mr1039091pjv.60.1621454270555;
-        Wed, 19 May 2021 12:57:50 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id u12sm180554pfh.122.2021.05.19.12.57.49
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=lriiXlwHl41FtaV5CoBrV98HLQ9Gp2N1i35WCPU1eqA=;
+        b=ltebFBV7d6jCjyw8TEqRmThZRw0ZDMboIx08p69+L+3bvVvUNzpM1nAtScDL/M0Iju
+         pONFj538m+3Mha6dcW+XiRNtRZh1rSvLX/2FZ/cNDRSTiopUEK9ORbuhd2QfJ/r+V41O
+         e3rbNAMcPORzWs6X+Wt4+ayZfGodKYZdvAYkTUAnAxmOS3emiJnxo1wTDxvttYTqDXxo
+         qY4LeA5+vfWy9/eNzPvcO9FF6bAMzln1l6H2RPm/wSa4cFIgI2xh5zH6CgDSU8SzOuF/
+         QFIHl4wQk1I1CiQHdVAswNuHykTRqtmDyVQ8jPTIee/v5goog7YqTI/nEwV0xOt1qL7v
+         Q6iA==
+X-Gm-Message-State: AOAM532up/4PWjPihTQp6Ocq+tB7s3prxOHt/xYxO7seTE88jS7Cglrl
+        qvxXqV8Xb0p8Rk9vkIUqaqM=
+X-Google-Smtp-Source: ABdhPJyRIP2OET6BhmkttYHpZgBQw+uanaslQBGyKVZRHgg4WwBOqHzuR/+zFxeGcOxN1nzy5O6zSw==
+X-Received: by 2002:a17:90b:116:: with SMTP id p22mr718929pjz.186.1621454951706;
+        Wed, 19 May 2021 13:09:11 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:4102:f4c7:9246:e6c4])
+        by smtp.gmail.com with ESMTPSA id 10sm181025pgl.39.2021.05.19.13.09.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 12:57:49 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 2FEF640321; Wed, 19 May 2021 19:57:49 +0000 (UTC)
-Date:   Wed, 19 May 2021 19:57:49 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     axboe@kernel.dk, bvanassche@acm.org, ming.lei@redhat.com,
-        hch@infradead.org, jack@suse.cz, osandov@fb.com,
+        Wed, 19 May 2021 13:09:11 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Wed, 19 May 2021 13:09:09 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 7/8] null_blk: add error handling support for
- add_disk()
-Message-ID: <20210519195749.GT4332@42.do-not-panic.com>
-References: <20210512064629.13899-1-mcgrof@kernel.org>
- <20210512064629.13899-8-mcgrof@kernel.org>
- <842b6a8d-8880-a0da-a38b-39378dc6ebb9@suse.de>
- <20210512164709.GA4332@42.do-not-panic.com>
- <d519b9ce-ad28-a266-786f-4128e0b91b9f@suse.de>
- <20210512172039.GQ4332@42.do-not-panic.com>
- <096c9d6f-b765-ab70-098e-ab64d8b411df@suse.de>
+Subject: Re: [PATCH v2 0/4] zram: fix few sysfs races
+Message-ID: <YKVwZVcbZBNXUpKm@google.com>
+References: <20210423011108.11988-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <096c9d6f-b765-ab70-098e-ab64d8b411df@suse.de>
+In-Reply-To: <20210423011108.11988-1-mcgrof@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 12, 2021 at 07:28:16PM +0200, Hannes Reinecke wrote:
-> On 5/12/21 7:20 PM, Luis Chamberlain wrote:
-> > On Wed, May 12, 2021 at 07:12:03PM +0200, Hannes Reinecke wrote:
-> > > On 5/12/21 6:47 PM, Luis Chamberlain wrote:
-> > > > On Wed, May 12, 2021 at 05:16:39PM +0200, Hannes Reinecke wrote:
-> > > > > On 5/12/21 8:46 AM, Luis Chamberlain wrote:
-> > > > > > We never checked for errors on add_disk() as this function
-> > > > > > returned void. Now that this is fixed, use the shiny new
-> > > > > > error handling.
-> > > > > > 
-> > > > > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > > > > > ---
-> > > > > >     drivers/block/null_blk/main.c | 9 +++++++--
-> > > > > >     1 file changed, 7 insertions(+), 2 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> > > > > > index 5f006d9e1472..2346d1292b26 100644
-> > > > > > --- a/drivers/block/null_blk/main.c
-> > > > > > +++ b/drivers/block/null_blk/main.c
-> > > > > > @@ -1699,6 +1699,7 @@ static int init_driver_queues(struct nullb *nullb)
-> > > > > >     static int null_gendisk_register(struct nullb *nullb)
-> > > > > >     {
-> > > > > > +	int ret;
-> > > > > >     	sector_t size = ((sector_t)nullb->dev->size * SZ_1M) >> SECTOR_SHIFT;
-> > > > > >     	struct gendisk *disk;
-> > > > > > @@ -1719,13 +1720,17 @@ static int null_gendisk_register(struct nullb *nullb)
-> > > > > >     	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
-> > > > > >     	if (nullb->dev->zoned) {
-> > > > > > -		int ret = null_register_zoned_dev(nullb);
-> > > > > > +		ret = null_register_zoned_dev(nullb);
-> > > > > >     		if (ret)
-> > > > > >     			return ret;
-> > > > > >     	}
-> > > > > > -	add_disk(disk);
-> > > > > > +	ret = add_disk(disk);
-> > > > > > +	if (ret) {
-> > > > > 
-> > > > > unregister_zoned_device() ?
-> > > > 
-> > > > That function does not exist, do you mean null_free_zoned_dev()? If so
-> > > > that is done by the caller.
-> > > > 
-> > > What I intended to say is that you are calling 'null_register_zoned_dev()'
-> > > at one point, but don't call a cleanup function if there is an error later
-> > > in the path, leaving the caller to guess whether null_register_zoned_dev()
-> > > has been called or not.
-> > > So we should call the cleanup function here, too.
-> > 
-> > The cleanup for zone stuff is done on the caller.
-> > 
-> My point being: how does he know?
+On Fri, Apr 23, 2021 at 01:11:04AM +0000, Luis Chamberlain wrote:
+> This 2nd series documents the fixes better and includes a bdgrab() fix
+> for the issue noted by Minchan. A general fix has been proposed for two
+> of these issues however they are not yet deemed required upstream and so
+> we just open code individual solutions on the driver.
+> 
+> Luis Chamberlain (4):
+>   zram: fix crashes due to use of cpu hotplug multistate
+>   zram: avoid disksize setting when device is being claimed
+>   zram: fix deadlock with sysfs attribute usage and driver removal
+>   zram: fix possible races between sysfs use and bdev access
+> 
+>  drivers/block/zram/zram_drv.c | 473 +++++++++++++++++++++++++++++-----
+>  1 file changed, 414 insertions(+), 59 deletions(-)
 
-The person who is maintainer of the code would.
+Hi Luis,
 
-> The zone stuff might or might not be initialized.
-> Why not do the cleanup action in the error path of this function?
+First of all, I am sorry too late review. Now I see [3/4] and [4/4] would
+be not only zram issue since you shed a light in the descriptions.
+Yeah, that would be helpful if it could be deal with under general
+layer but looks like arguable or would take some times at least, IIUC.
 
-Because its not currently allocated in that function, its done in
-the caller function.
+On the case, yeah, we could fix it for zram first until the issue will
+bring up further. Anyway, I'd like to see some wrapper rather than annotating
+for every sysfs files for maintainance point of view.
+At least, could you introduce one more patch "introduce zram sysfs wrapper"
+on top of this series to centralize the work?
 
-  Luis
+Thanks for your works!
