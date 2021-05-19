@@ -2,66 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B71C433B4
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 09:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC943C433ED
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 09:21:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19096610CC
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 09:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF282610A2
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 09:21:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344569AbhESJMq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 May 2021 05:12:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344419AbhESJMq (ORCPT
+        id S1345570AbhESJXI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 May 2021 05:23:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23356 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345638AbhESJWm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 May 2021 05:12:46 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3661C06175F;
-        Wed, 19 May 2021 02:11:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=S+GXIxnyztqO6WpluIWtZxNepeT0kBKu2hEqSTJxobU=; b=IkAmWIHe0jueEAQlaREsEzo0f8
-        TKeHznwF8uW08WoJ+YIgODPYSl3GGAeFvIuhSMr8MXx6V6GlXkpxL/ZGx9ZnXdzC7wGhrXt06bCbD
-        ZP29KLxMauKxGoEP2j7NlwhRGDDQQ+tpc4RgnvayWm52AT+trmflBgK+dHA26UjkzFKriMHUOazjJ
-        WgpAl84+1X9OM0cKCrAgth3p0wzVuBcseHPktB9FZkOKx8GvHNmarHqfiqAHB0+9AAKfJH3rfcVOi
-        xLUHx/TmEVOyo4tgqYls1nVybghNzuLb5pD3ieaWjDCtJ8TxXxJjfCCT71NsXuTazwH+iGLx7xxc5
-        cMzmI7Yw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1ljID6-00EnJl-3V; Wed, 19 May 2021 09:10:02 +0000
-Date:   Wed, 19 May 2021 10:09:48 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Juerg Haefliger <juerg.haefliger@canonical.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Juerg Haefliger <juergh@canonical.com>
-Subject: Re: [PATCH v2 3/3] block/Kconfig.iosched: Whitespace and indentation
- cleanups
-Message-ID: <YKTV3Gr4mBznVfZL@infradead.org>
-References: <20210519085615.12101-1-juergh@canonical.com>
- <20210519085615.12101-4-juergh@canonical.com>
+        Wed, 19 May 2021 05:22:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621416083;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=J7Sstcm/XS+sd5snufYPwZMEgEGKfXoYui6wco+MXec=;
+        b=BMXjzE1ToXg4ZjomjJ0QeDOwK6f2lPBjgMz9Xd6nNUDKhe39bHRfzLryEVRby8/3UlgdgZ
+        yOIPgDwQFT8JhaRqd78eTpREBMrmRpwoNwEjawgM9tJNL+wC3hLGnRmOwvGBWOooW7wdSS
+        FDAtYFCfwYAm6kH+t82d4etj7wT8sc0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421-L7JyPNgvOaqVDUZlgDT4Hg-1; Wed, 19 May 2021 05:21:21 -0400
+X-MC-Unique: L7JyPNgvOaqVDUZlgDT4Hg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 757E2107ACCA;
+        Wed, 19 May 2021 09:21:19 +0000 (UTC)
+Received: from T590 (ovpn-12-143.pek2.redhat.com [10.72.12.143])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 253401037EA6;
+        Wed, 19 May 2021 09:21:09 +0000 (UTC)
+Date:   Wed, 19 May 2021 17:21:05 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 1/8] block: split __blkdev_get
+Message-ID: <YKTYgaL4nAej+jeY@T590>
+References: <20210512061856.47075-1-hch@lst.de>
+ <20210512061856.47075-2-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210519085615.12101-4-juergh@canonical.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210512061856.47075-2-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 19, 2021 at 10:56:15AM +0200, Juerg Haefliger wrote:
-> Replace multiple whitespaces with a tab and make the help text indendation
-> 1 tab + 2 spaces which seems to be the convention.
+On Wed, May 12, 2021 at 08:18:49AM +0200, Christoph Hellwig wrote:
+> Split __blkdev_get into one helper for the whole device, and one for
+> opening partitions.  This removes the (bounded) recursion when opening
+> a partition.
 > 
-> Signed-off-by: Juerg Haefliger <juergh@canonical.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Looks good,
+Nice cleanup, now the blkdev get code becomes more readable than before:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming
+
