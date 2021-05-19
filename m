@@ -2,142 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39230C433B4
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 15:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5D4C433ED
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 17:52:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 190056024A
-	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 15:52:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F6E961019
+	for <linux-block@archiver.kernel.org>; Wed, 19 May 2021 17:52:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241363AbhESPxX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 May 2021 11:53:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60690 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233708AbhESPxX (ORCPT
+        id S230006AbhESRxx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 May 2021 13:53:53 -0400
+Received: from mail-pj1-f48.google.com ([209.85.216.48]:39913 "EHLO
+        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229638AbhESRxw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 May 2021 11:53:23 -0400
-X-Greylist: delayed 60 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 May 2021 08:52:03 PDT
-Received: from resdmta-ch2-02v.sys.comcast.net (resdmta-ch2-02v.sys.comcast.net [IPv6:2001:558:fe21:29:69:252:207:82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5344C06175F
-        for <linux-block@vger.kernel.org>; Wed, 19 May 2021 08:52:03 -0700 (PDT)
-Received: from resqmta-ch2-08v.sys.comcast.net ([69.252.207.40])
-        by resdmta-ch2-02v.sys.comcast.net with ESMTP
-        id jOJ5l8NnOLnUajOUNlUwz3; Wed, 19 May 2021 15:52:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=comcastmailservice.net; s=20180828_2048; t=1621439523;
-        bh=AtpN7XokfCmtNz4fE2d1fHQyikNAN1wi6PNzEpHOoLo=;
-        h=Received:Received:Received:Reply-To:Subject:To:From:Message-ID:
-         Date:MIME-Version:Content-Type;
-        b=VbowhQnXX677nZ02lwiXfXt/H2kpNHtgVSVU38I+ahp0WsF04EFnXxf1k3EA5IhWz
-         Er/F2DxHqJ8fEr4if90VcitM76AqtUekEMw87ukhY7+kJibHrY6KYLRBuzD4rFYzqS
-         AufWOj2ZvyWEBJ1p9d/DOkB32l6sN+4FGZ+gUTcKO12CBWD4behosSSW3V1IkcsOAo
-         bSRGWknmhRp9DFHssQbpilB+INLgB4gLlZYIc8O7tZ1F83G5YPxaPdxXXMsbpF/e9A
-         ukgOfb9LmZ7YJ8lB05KYTSolfstEMX5+ogpv/bBDZreqe2ZDrbFW3YxrpyTAn2oyOS
-         C1DaODsjj+tbw==
-Received: from resomta-ch2-07v.sys.comcast.net ([69.252.207.103])
-        by resqmta-ch2-08v.sys.comcast.net with ESMTP
-        id jNOjlsSk05RiAjOTOlwJhe; Wed, 19 May 2021 15:51:02 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=comcastmailservice.net; s=20180828_2048; t=1621439462;
-        bh=AtpN7XokfCmtNz4fE2d1fHQyikNAN1wi6PNzEpHOoLo=;
-        h=Received:Received:Reply-To:Subject:To:From:Message-ID:Date:
-         MIME-Version:Content-Type;
-        b=ePXnJieLwW3STTuWGUpT5Gp2ulHM74DiY7Rsm0EA0dI9SDPFkgWGRJah1+U/u1kdl
-         eFDGh8Ay+zbwavK420u7qH57UELG9tj6ckRtXSLtvRdNg07p4nOeKHRjh9yt9HEAPZ
-         RxV1Uza1x7iNrvLGYuWo3BVLp2hMvDe8dDbkz3p9Iv5gU2sqZa0My76JLWA/7xELAo
-         u6Alt8l6AsmS/UgupaTN7C9QeydEKDLgnrQMsq6DOJBxdvXmlXxBppOmg5J4l1jY4g
-         CR/leRwm3wRrM9OexT2pPib0D3Fy7CY8ug2Hl5pUBYXwdPZGjQ74N65vxEZPYLEyM9
-         knhmkpVDP1J5Q==
-Received: from [IPv6:2001:558:6040:22:2171:426f:b27e:296d]
- ([IPv6:2001:558:6040:22:2171:426f:b27e:296d])
-        by resomta-ch2-07v.sys.comcast.net with ESMTPSA
-        id jOTMlmJqKUPp4jOTMllpl9; Wed, 19 May 2021 15:51:01 +0000
-X-Xfinity-VMeta: sc=-100.00;st=legit
-Reply-To: james@nurealm.net
-Subject: Re: linux 5.12 - fails to boot - soft lockup - CPU#0 stuck for 23s! -
- RIP smp_call_function_single
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-smp@vger.kernel.org, linux-block@vger.kernel.org
-References: <3516e776-6c69-2a83-6da4-19de77621b18@nurealm.net>
- <20210517122709.GC15150@lst.de>
-From:   James Feeney <james@nurealm.net>
-Message-ID: <6b22e76e-1e37-fda0-0dd5-3021e2f0b9e2@nurealm.net>
-Date:   Wed, 19 May 2021 09:50:59 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Wed, 19 May 2021 13:53:52 -0400
+Received: by mail-pj1-f48.google.com with SMTP id o17-20020a17090a9f91b029015cef5b3c50so3931587pjp.4
+        for <linux-block@vger.kernel.org>; Wed, 19 May 2021 10:52:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lD/Lgoh2nB1cYE78Z6b0L8aWk9CbKl0Y1i42yGy55PA=;
+        b=Ous20v3sfLeQ2C49W1jf9O86LhjgDN0lx/XLBF5wH5e+v+Ae6K6beyebS3nJ28Ey0A
+         J1Od7R86JxREQZpG5QvHzM0DDgB/n4u5yPgWymKr7YVNGBgi6cTMYWKTBUtVwbgS2pJm
+         kRgiTnUwU+Wa2R0inv6nux9yKTkOEaDsR6ibDqUB87KvOKKCjWXp7W20sj8o4p6sVJKo
+         NzfD2hoUNzs8AI01AuSm+4gLv7PcwxI6MCpzNJMxRLVdmA/OyapsSxElbtXx/vXlvF6y
+         WTZMHvk5EYXEDOhgJUR/XBsZKJwRt4v/yNJU/kTIotTODguxNP4BhAvrTfiipIKeIwiV
+         fIxA==
+X-Gm-Message-State: AOAM530lidfqxDj77saqbE3TvZVqbUYLlIGEMB4F7sNoIEzZXx1xnFEo
+        4vArd8Wb6BJn7iI7AGwS2yw=
+X-Google-Smtp-Source: ABdhPJzeZ8mbsgtJWFeGLNkqRXVUjbcG3BKLFctqdrZCaVmE0qWBmxZCw/oBujNdi5912SWjjIBnTA==
+X-Received: by 2002:a17:90a:b382:: with SMTP id e2mr134053pjr.171.1621446752250;
+        Wed, 19 May 2021 10:52:32 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:db5a:2bf3:3617:be1c])
+        by smtp.gmail.com with ESMTPSA id q24sm120849pjp.6.2021.05.19.10.52.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 May 2021 10:52:31 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH] block: Update blk_update_request() documentation
+Date:   Wed, 19 May 2021 10:52:26 -0700
+Message-Id: <20210519175226.8853-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20210517122709.GC15150@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/21 6:27 AM, Christoph Hellwig wrote:
-> Any information of the system?  What block driver(s) do you use, how
-> many CPUs, kernel config?
-> 
+Although the original intent was to use blk_update_request() in stacking
+block drivers only, it is used much more widely today. Reflect this in the
+documentation block above this function. See also:
+* commit 32fab448e5e8 ("block: add request update interface").
+* commit 2e60e02297cf ("block: clean up request completion API").
+* commit ed6565e73424 ("block: handle partial completions for special
+  payload requests").
 
-Hey Chris
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-core.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-I see that Markus followed-up with:
-
-====
-Well, turns out I should've googled (or at least looked at the bcache wiki entry) at first, which points to a known bug involving bcache and 5.12: https://www.spinics.net/lists/linux-bcache/msg10077.html
-
-I still find it interesting that I get the same symptoms that James describes, but other than that the issues don't seem to be related.
-====
-
-For my part, I also had to re-run my bisect, with more thorough testing.  The result changed, and we are currently investigating the final commit, at 4f432e8bb15b x86/mce: Get rid of mcheck_intel_therm_init().
-
-So now, I expect that my issue has nothing to do with your patch set.  Sorry about the noise.  If you still have an interest in my issue, there are posts going to linux-smp and lkml.
-
-James
-
-> On Fri, May 14, 2021 at 12:39:59PM -0600, James Feeney wrote:
->> With the patch to kernel/smp.c in linux 5.12.4, "smp: Fix smp_call_function_single_async prototype", by Arnd Bergmann, I thought maybe there was a fix.  But no.  The error is the same, except the top of the Call Trace is different:
->>
->> ...
->> watchdog: BUG: soft lockup - CPU#0 stuck for 23s! ...
->> ...
->> RIP: 0010:smp_call_function_single+0xeb/0x130
->> ...
->> Call Trace:
->> ? text_poke_loc_init+0x160/0x160
->> ? text_poke_loc_init+0x160/0x160
->> on_each_cpu+0x39/0x90
->> ...
->>
->> and repeats indefinitely.
->>
->> Again, smp_call_function_single is defined in kernel/smp.c
->>
->> It seems that my git bisect is probably off, since apparently the system may sometimes boot to a temporarily working state, and some "exercise" is needed to identify the failure.  However, see another git bisect for possibly the same issue at
->>
->>  https://bugs.archlinux.org/task/70663#comment199765
->>
->> with "bisect-result.txt"
->>
->>  https://bugs.archlinux.org/task/70663?getfile=20255
->>
->> Markus says, in part:
->>
->> ====
->> Trying to bisect, I arrived at a different set of commits though.
->> 7a800a20ae6329e803c5c646b20811a6ae9ca136 showed the issue described, where a seemingly working kernel will lock up rather quickly.
->> f007a3d66c5480c8dae3fa20a89a06861ef1f5db worked flawlessly, without any hiccups doing random internet browsing while I was compiling the next bisect step.
->> However, there are six commits between those, that did not boot and left me stuck with a black screen right after the bootloader (so no systemd startup message or similar). The system did not react to any inputs (Alt+SysRq) or to a short press of the PC's power button, and thus a hard shutdown was necessary.
->> ====
->>
->> These 8 commits - total - are from Christopher Hellwig, 2021 Feb 02.  Perhaps something closer to the real issue is in there.  As with Markus, I've also noticed that a "warm" reboot can result in a frozen system immediately after the boot loader has run.  A full power-off reboot is needed to get past the early screen initialization.
->>
->> I'll have to re-do my git bisect, with more extensive system "exercise", to see if something more useful results.
->>
->> James
-> ---end quoted text---
-> 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 689aac2625d2..b65da5a33e20 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1385,26 +1385,22 @@ void blk_steal_bios(struct bio_list *list, struct request *rq)
+ EXPORT_SYMBOL_GPL(blk_steal_bios);
+ 
+ /**
+- * blk_update_request - Special helper function for request stacking drivers
++ * blk_update_request - Complete multiple bytes without completing the request
+  * @req:      the request being processed
+  * @error:    block status code
+- * @nr_bytes: number of bytes to complete @req
++ * @nr_bytes: number of bytes to complete for @req
+  *
+  * Description:
+  *     Ends I/O on a number of bytes attached to @req, but doesn't complete
+  *     the request structure even if @req doesn't have leftover.
+  *     If @req has leftover, sets it up for the next range of segments.
+  *
+- *     This special helper function is only for request stacking drivers
+- *     (e.g. request-based dm) so that they can handle partial completion.
+- *     Actual device drivers should use blk_mq_end_request instead.
+- *
+  *     Passing the result of blk_rq_bytes() as @nr_bytes guarantees
+  *     %false return from this function.
+  *
+  * Note:
+- *	The RQF_SPECIAL_PAYLOAD flag is ignored on purpose in both
+- *	blk_rq_bytes() and in blk_update_request().
++ *	The RQF_SPECIAL_PAYLOAD flag is ignored on purpose in this function
++ *      except in the consistency check at the end of this function.
+  *
+  * Return:
+  *     %false - this request doesn't have any more data
