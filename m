@@ -2,113 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB34CC433B4
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 01:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F58C433B4
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 04:22:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6F81611AD
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 01:23:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4A89611AE
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 04:22:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230049AbhETBZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 May 2021 21:25:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34614 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229498AbhETBZR (ORCPT
+        id S229498AbhETEXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 May 2021 00:23:51 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:63405 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229449AbhETEXu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 May 2021 21:25:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621473836;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bilSsvR+MBv+YsXPw447CV9ksYbBHkM2TMAGPVrj4BY=;
-        b=IMLonclV+Itl6eq9M3L8HDd60XMoPtXYYPsDbNANaE8uQmYw/m7f8Bq2DXRrA9I0k54nPa
-        8Yj6t+gn5umamtYrxfYJ6AS9z2tOFsqbliQTHKKaBP2qV+Doiy4cLpS5AmViYO3eTDXYAL
-        46dyznB366S16SZwXF+2l08NrNFBYyg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-552-PL8gCMOrNayLLLkXG9MgHg-1; Wed, 19 May 2021 21:23:54 -0400
-X-MC-Unique: PL8gCMOrNayLLLkXG9MgHg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 627916D585;
-        Thu, 20 May 2021 01:23:53 +0000 (UTC)
-Received: from T590 (ovpn-12-84.pek2.redhat.com [10.72.12.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 905395C224;
-        Thu, 20 May 2021 01:23:43 +0000 (UTC)
-Date:   Thu, 20 May 2021 09:23:39 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, Yanhui Ma <yama@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        kashyap.desai@broadcom.com, chenxiang <chenxiang66@hisilicon.com>
-Subject: Re: [PATCH] blk-mq: plug request for shared sbitmap
-Message-ID: <YKW6G1flax9vkfIR@T590>
-References: <20210514022052.1047665-1-ming.lei@redhat.com>
- <b38d671a-530b-244a-bc0f-0b926c796243@huawei.com>
- <YKOiClSTyHl5lbXV@T590>
- <185d1d58-f4e3-2024-e5e4-0831af151e3d@huawei.com>
- <YKOsQ4StDThlbMko@T590>
- <12a651a2-5a0e-15dc-ec40-fc3c57265cd2@huawei.com>
- <676e9667-3022-7fde-4518-e82eb0503ec8@huawei.com>
- <YKRaGT5PjCvH+12p@T590>
- <aa667e0d-0b42-08c2-35e1-387e2e92dc43@huawei.com>
+        Thu, 20 May 2021 00:23:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1621484550; x=1653020550;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BeEbylTxICYxyd5YyldDLa97h4tezbzf3NQx15RvkeY=;
+  b=XzPBEM0JD/nKRmNDjdXjnU19G+qclz5kLqCjBu74yJA4uAAkxdzQJeqe
+   jb8WyEIn6U6G+Vr4tdimOtkgDrL5JHN3NKbLYVE30Cz7zMZK5HcIeft5k
+   5KdczSkE26XxGw7uMwc1v5ZNsUdlVwH+9onR9lITCTavlVr8bbA17gFF3
+   ro+6McGU8JnTwlcovmGuTqHIbkPTlkN5c3Wet6p3zMsO2ETQze6wtW6CT
+   KL16SCHNkmLXEFYaEMSGmPMcd9Yzl+mQucoyAKZG3CKqiu6vvInRrQqUL
+   Smjs42vZmWfh8TTWkThJWxUAqvQYqFpCddjsyO6jR+/W9kOGQXc3ruSvy
+   A==;
+IronPort-SDR: E9XPQr3CbIYgKx4v7/KHSlYj8a1ydruCE3oka+e4Vv+XBrgXPwixjLqgCTHIOyBJGT7MeVH1XH
+ mKLGaDiVavRA6x7twrHjGD3dzp95OYDh0J8wykcnoJ4BZmel/3fhZBb30/lA+lzxcH2QtSyozs
+ 7KVSctPAOlooRMzqeuTsDl8Ec9t5np40lYIjzDlhRKNGd85o4TDskrXxMgCKMzNLEWGjuA1s47
+ UpvtcyRL8pOzMvanUJJvO6+Q61pKM1Lbg5db5ASJ//2gQu25TLpIvguh5T5XDeqhZ2Nx+kjpRm
+ c5w=
+X-IronPort-AV: E=Sophos;i="5.82,313,1613404800"; 
+   d="scan'208";a="168105829"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 20 May 2021 12:22:29 +0800
+IronPort-SDR: lkUBY52D8F92aZNrgckpEiAuBMCeOntfT5UZrIEufCQ5sEw2TJkfXc5B3xXQRg6gqhES4ZE9K5
+ j9QDD17r0ybBND1h91PaDU+v5ahHgYRyMLX2rwGeg8Nd2Btoy76dao83QpSUBUR0R6JWz6o0TP
+ eWn/sV/8WjKZnfwpU97rlha2hrV4ZF9AsdKT5DzbM9OgOfdb/JuI2qZOmARUmkfLmjvjgdBzlJ
+ Nqm2R1ZxG0OQRe1Sh03UvZtMaWho3CtOtbc4pKNZ2mS4r1cBoelhNIwoTrJpxZDZlA2bNHFvvm
+ S4Wf774oBliVPMuOMgtwU8Fl
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 21:02:06 -0700
+IronPort-SDR: kqkx6Wgss/J1P0XbNojevRZX6KCllmhPyNFdKU7WOHMBrlhfHpIfJW142FtWDL8KffHOxpgJuw
+ AB4cOEMViGbThbO0F68lgS/H3lobe5cow8FMHOpjnM+OEo2BZSviEHcx3qtOmmar427AEESGxY
+ zbYuKYqz9wxHxcgbpi/dq8WmFKefB5fYDOfWaTHJ9FxkTKyMyO/cWN6Vfgxis17pDZykmUXZ5g
+ 6BwEPysC09/VvoiHQP1fYX332HqZYJ5Sc9Tm7DU8NCN950O4SPRaeK4jvyfINuzbvEJFLKYx79
+ NTI=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 May 2021 21:22:28 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v2 00/11] dm: Improve zoned block device support
+Date:   Thu, 20 May 2021 13:22:17 +0900
+Message-Id: <20210520042228.974083-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa667e0d-0b42-08c2-35e1-387e2e92dc43@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 19, 2021 at 09:41:01AM +0100, John Garry wrote:
-> On 19/05/2021 01:21, Ming Lei wrote:
-> > > The 'after' results are similar to without shared sbitmap, i.e using
-> > > reply-map:
-> > > 
-> > > reply-map:
-> > > 450K (read), 430K IOPs (randread)
-> > OK, that is expected result. After shared sbitmap, IO merge gets improved
-> > when batching submission is bypassed, meantime IOPS of random IO drops
-> > because cpu utilization is increased.
-> > 
-> > So that isn't a regression, let's live with this awkward situation,:-(
-> 
-> Well at least we have ~ parity with non-shared sbitmap now. And also know
-> higher performance is possible for "read" (vs "randread") scenario, FWIW.
+This series improve device mapper support for zoned block devices and
+of targets exposing a zoned device.
 
-NVMe too, but never see it becomes true, :-)
+The first patch improve support for user requests to reset all zones of
+the target device. With the fix, such operation behave similarly to
+physical block devices implementation based on the single zone reset
+command with the ALL bit set.
 
-> 
-> BTW, recently we have seen 2x optimisation/improvement for shared sbitmap
-> which were under/related to nr_hw_queues == 1 check - this patch and the
-> changing of the default IO sched.
+The following 2 patches are preparatory block layer patches.
 
-You mean you saw 2X improvement in your hisilicon SAS compared with
-non-shared sbitmap? In Yanhui's virt test, we just bring back the perf
-to non-shared sbitmap's level.
+Patch 4 and 5 are 2 small fixes to DM core zoned block device support.
 
-> 
-> I am wondering how you detected/analyzed this issue, and whether we need to
-> audit other nr_hw_queues == 1 checks? I did a quick scan, and the only
-> possible thing I see is the other q->nr_hw_queues > 1 check for direct issue
-> in blk_mq_subit_bio() - I suspect you know more about that topic.
+Patch 6 reorganizes DM core code, moving conditionally defined zoned
+block device code into the new dm-zone.c file. This avoids sprinkly DM
+with zone related code defined under an #ifdef CONFIG_BLK_DEV_ZONED.
 
-IMO, the direct issue code path is fine.
+Patch 7 improves DM zone report helper functions for target drivers.
 
-For slow devices, we won't use none, so the code path can't be reached.
+Patch 8 fixes a potential problem with BIO requeue on zoned target.
 
-For fast device, direct issue is often a win.
+Finally, patch 9 to 11 implement zone append emulation using regular
+writes for target drivers that cannot natively support this BIO type.
+The only target currently needing this emulation is dm-crypt. With this
+change, a zoned dm-crypt device behaves exactly like a regular zoned
+block device, correctly executing user zone append BIOs.
 
-Also looks your test on non has shown that perf is fine.
+This series passes the following tests:
+1) zonefs tests on top of dm-crypt with a zoned nullblk device
+2) zonefs tests on top of dm-crypt+dm-linear with an SMR HDD
+3) btrfs fstests on top of dm-crypt with zoned nullblk devices.
 
-Thanks,
-Ming
+Comments are as always welcome.
+
+Changes from v1:
+* Use Christoph proposed approach for patch 1 (split reset all
+  processing into different functions)
+* Changed helpers introduced in patch 2 to remove the request_queue
+  argument
+* Improve patch 3 commit message as suggested by Christoph (explaining
+  that the flag is a special case that cannot use a REQ_XXX flag)
+* Changed DMWARN() into DMDEBUG in patch 11 as suggested by Milan
+* Added reviewed-by tags
+
+Damien Le Moal (11):
+  block: improve handling of all zones reset operation
+  block: introduce bio zone helpers
+  block: introduce BIO_ZONE_WRITE_LOCKED bio flag
+  dm: Fix dm_accept_partial_bio()
+  dm: cleanup device_area_is_invalid()
+  dm: move zone related code to dm-zone.c
+  dm: Introduce dm_report_zones()
+  dm: Forbid requeue of writes to zones
+  dm: rearrange core declarations
+  dm: introduce zone append emulation
+  dm crypt: Fix zoned block device support
+
+ block/blk-zoned.c             | 117 ++++--
+ drivers/md/Makefile           |   4 +
+ drivers/md/dm-core.h          |  66 ++++
+ drivers/md/dm-crypt.c         |  31 +-
+ drivers/md/dm-flakey.c        |   7 +-
+ drivers/md/dm-linear.c        |   7 +-
+ drivers/md/dm-table.c         |  21 +-
+ drivers/md/dm-zone.c          | 689 ++++++++++++++++++++++++++++++++++
+ drivers/md/dm.c               | 203 +++-------
+ drivers/md/dm.h               |  32 +-
+ include/linux/blk_types.h     |   1 +
+ include/linux/blkdev.h        |  12 +
+ include/linux/device-mapper.h |   9 +-
+ 13 files changed, 992 insertions(+), 207 deletions(-)
+ create mode 100644 drivers/md/dm-zone.c
+
+-- 
+2.31.1
 
