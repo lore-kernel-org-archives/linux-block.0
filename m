@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 008F1C433B4
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 04:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CC8C43460
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 04:22:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBADB611BD
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 04:22:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25192611AE
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 04:22:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229526AbhETEX5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 May 2021 00:23:57 -0400
+        id S229955AbhETEX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 May 2021 00:23:59 -0400
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:63405 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbhETEX5 (ORCPT
+        with ESMTP id S229681AbhETEX6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 May 2021 00:23:57 -0400
+        Thu, 20 May 2021 00:23:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1621484556; x=1653020556;
+  t=1621484557; x=1653020557;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=MgrOAN1o4/1fpwx6e37zXOJtnBRopBpCpAEqiVV+/r0=;
-  b=E1/wTk83nIYlHvPTT+b1CCSAGkTWznXllVnbAXJ9RkscmNP1mb7PGXyv
-   i9lSwn0YBC+KbhZ010EzS9c1tRu5/ZWM1TGankNs27hr8TDSlzNyGRNn8
-   9jrRl6FWcdZlnt2crqcrPc54ruTBWliDGM7xVKaPAg8mCppvBhFIYOEG+
-   3a11OAYVIyprOEBjOIbjnxgkW+z7ZFNpb9S78fJ9Z14AczEH5gEmzTqfQ
-   N9R2MIMd6I81mwRXo05w+kaW4qAUakJTAoCcIwLW3XyH0GMtGMQv8yPTt
-   XXL/n3MVvrsCfCY0lbuaokm5B+Zhd8e/MrKo0lZCLOCX+MoYXF2A9G1AT
-   A==;
-IronPort-SDR: Kv1gbtDuDFhMZLQc6AxYatFXTphmwG589nKQYKGsiGxcS/6HAP5ChJ5QWNZRopO5rj0qcIOSHe
- 8j9msxaOdmLt0QKO1ZCtj3XuAhsj19ha6aBc72aHB9gtfckQaYF/YXsTF+8hYyzYCLyNxOwySr
- cOdvyxGN0ekEwoeYRaP0gwRMu6Kf4eAedVwHu2VEYwtcx4PdgoNCmeiE8+e6JcvlhnEm6Q8CV1
- Ii9dLmsXlyBDYxNkkkO3zntGWDVSqYCDrSdVi8Y2Xh898D1KO0L7tN9PtQ+JpvAZ6Wlr2NS+4l
- RQs=
+  bh=ig1LCLNVNN/TAqyjRgCT7Z4n/o7x3VRmirTRPRre1Dw=;
+  b=YDGWb+2GDOSBqX6DJ7aXXZoQnHIvOLi1KGDnqbrt44lbBVdPxEX8ZabA
+   R9iuFIXU+vYWTejyBM31+XIWTdSQWR0Cpw8fECtYXcstt2+H4AunpmQE9
+   3A3ZKHVEv0fxLXKuQAdvI1bHvrg2plEWQeEhspiaigDyjz92XxvQNFnWQ
+   waWjaY8dJp70D7hJB1u7ptCYsI+mBk4vt+bOkubK9XVWvMbc3PjWsa18p
+   LhEqfBuoIJuSen0Pf6nHWdpWTm9skr5B+vh474zjDlh5SUwQkCdxHDrEu
+   4Y+f+Qub+KYM++Z9LS17V7lHeD8oxUCKdMq+9s1kYXgpnlqsATMl3WF1a
+   g==;
+IronPort-SDR: H74MrWBf5jssPjDu0t3v+HLQTQcUG5WDA3LMH2tfnLIcZdgucc4eKegDpA7VocItdvqqweIhmk
+ 3howi17I9DY557ZZx4DbPF45lpoIKF9yzJI05gQ3ak6wUM2Z14cRkpCGK0s0sNPg1eNKINlWxA
+ +e81rCeEjEBaYWehI8KkJ3FQzBmp0cEF8BP7dGdcTQ/FJxtNOUCBXz20/bE1I6KUdu2G9C2LxP
+ ntqWkoPPsZGF1Q/m6vQE3cL5oUphIrH9vncJsFmE23B3Bh95bDPW6HGDNA5e9v4Vks/jfbr/bP
+ uYQ=
 X-IronPort-AV: E=Sophos;i="5.82,313,1613404800"; 
-   d="scan'208";a="168105844"
+   d="scan'208";a="168105845"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 20 May 2021 12:22:36 +0800
-IronPort-SDR: ijJ2Ftl00Cx7ZXp0F6UN1L24C/jRWFhhrnn3i3i2tNDYcsQLJZJwPN21O63h9QvYFtbWYb2c9I
- xE7L7d9hXKGD5N+bKmffOXBA8nZRApTYN7G11gpR/jeisKBEzxgC9GgKuNie6ifq9iIELDKxKw
- AuQWACGsF8O124A2WOlPflT5Dh8XuQPLMWjmNeLHhmgAH/In8kBY65eymN9CVMja2S5POh08BU
- H16beMzcRvOK6VXLK+ux0IF09s+jq2HbT7MtZg6IDRPu+mvbxwD3HOnu/3VhknOlkPwSit7EGp
- a5mZp4escayxRCrveZnM2wIA
+  by ob1.hgst.iphmx.com with ESMTP; 20 May 2021 12:22:37 +0800
+IronPort-SDR: Q2euIYXnS2h9QpXspzlz9zaLgHhj6RWe6d5weExG3pDBrggqKP9ENRX25evZvUZ4ZHPeKRxjxF
+ uulkCQwH09aNuPDZifG9qUfHZAqwaeRGVZ/1dr200gr/dCpH+icmMDuave2H+suHJrv2+fo0W0
+ Qka774JTjcFItDJsaYOnjgkwXUUAzRXc1IKJs6XO+DKRITOSoAcXGrx5MEBxsbL3z9V4fSvPgr
+ IjtEkb/eDxLCmmSGB9/ZXLUPdcRYNl2ojmEsrqdEikv85zTwqaFQMT5+/3mu9uqHj4EZ4fDPtt
+ vowhyaaWJH/FAeoxD1usdObo
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 21:02:13 -0700
-IronPort-SDR: 6CLLGNogmHoAL7lQIK0JrqY1VTi154qviNec+jXeqn8czq0qwNEqI8S5jdZGO0wzbN0TGYHD4I
- LRlu+YIdC7I5Stuj1GJxbjv0kovjuCWiqg0xG5XOcmOVldED+udXyTz9ChoAk0dTclh/ALHxgq
- VNzScIj3MX2pUds8AECkiC6Wj94HBxb13vcRrXA3OH8qrcWs+gb3fqbncOD0yluqFquchayq+P
- SliZXFP5zUn0NN7UdEll2hjS3ox9MD4mJ/vVBoOSL7ofPszT9tr0NZ3SVElyzLimLUpqmKG13/
- jwU=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 21:02:14 -0700
+IronPort-SDR: cG7vf1BhVMia8mihm4DOpw3HfRP7lqYzKMtAthqTj2Y3m04ur5pUNCGoLDYh08R4sAaL0RgXF+
+ 8NH9za11LIb/k5FgFpwqRXNZQylKfvu0UZtZYT4Hr7fZPuTRdWNIyPBZyTk0K+WWB7Oe6Ppi7U
+ cO0bpkWBTUHuyoUPrFZsN5Dr3Vl1m82lOlZFqim2/NPPCbDhab+793byUy3KggVFhL81tOXoUR
+ 8wupFwd9HjtHPjuwTUDOF1ZZgrV6xxrvk/AqZt0hqOWyQ5EX8uNOKMcMPpzVoUlLRn7qCuITJI
+ irk=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 19 May 2021 21:22:35 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 May 2021 21:22:37 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 06/11] dm: move zone related code to dm-zone.c
-Date:   Thu, 20 May 2021 13:22:23 +0900
-Message-Id: <20210520042228.974083-7-damien.lemoal@wdc.com>
+Subject: [PATCH v2 07/11] dm: Introduce dm_report_zones()
+Date:   Thu, 20 May 2021 13:22:24 +0900
+Message-Id: <20210520042228.974083-8-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210520042228.974083-1-damien.lemoal@wdc.com>
 References: <20210520042228.974083-1-damien.lemoal@wdc.com>
@@ -72,283 +72,140 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move core and table code used for zoned targets and conditionally
-defined with #ifdef CONFIG_BLK_DEV_ZONED to the new file dm-zone.c.
-This file is conditionally compiled depending on CONFIG_BLK_DEV_ZONED.
-The small helper dm_set_zones_restrictions() is introduced to
-initialize a mapped device request queue zone attributes in
-dm_table_set_restrictions().
+To simplify the implementation of the report_zones operation of a zoned
+target, introduce the function dm_report_zones() to set a target
+mapping start sector in struct dm_report_zones_args and call
+blkdev_report_zones(). This new function is exported and the report
+zones callback function dm_report_zones_cb() is not.
+
+dm-linear, dm-flakey and dm-crypt are modified to use dm_report_zones().
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/md/Makefile   |   4 ++
- drivers/md/dm-table.c |  14 ++----
- drivers/md/dm-zone.c  | 102 ++++++++++++++++++++++++++++++++++++++++++
- drivers/md/dm.c       |  78 --------------------------------
- drivers/md/dm.h       |  11 +++++
- 5 files changed, 120 insertions(+), 89 deletions(-)
- create mode 100644 drivers/md/dm-zone.c
+ drivers/md/dm-crypt.c         |  7 +++----
+ drivers/md/dm-flakey.c        |  7 +++----
+ drivers/md/dm-linear.c        |  7 +++----
+ drivers/md/dm-zone.c          | 23 ++++++++++++++++++++---
+ include/linux/device-mapper.h |  3 ++-
+ 5 files changed, 31 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-index ef7ddc27685c..a74aaf8b1445 100644
---- a/drivers/md/Makefile
-+++ b/drivers/md/Makefile
-@@ -92,6 +92,10 @@ ifeq ($(CONFIG_DM_UEVENT),y)
- dm-mod-objs			+= dm-uevent.o
- endif
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index b0ab080f2567..f410ceee51d7 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -3138,11 +3138,10 @@ static int crypt_report_zones(struct dm_target *ti,
+ 		struct dm_report_zones_args *args, unsigned int nr_zones)
+ {
+ 	struct crypt_config *cc = ti->private;
+-	sector_t sector = cc->start + dm_target_offset(ti, args->next_sector);
  
-+ifeq ($(CONFIG_BLK_DEV_ZONED),y)
-+dm-mod-objs			+= dm-zone.o
-+endif
-+
- ifeq ($(CONFIG_DM_VERITY_FEC),y)
- dm-verity-objs			+= dm-verity-fec.o
- endif
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 21fd9cd4da32..dd9f648ab598 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -2064,17 +2064,9 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	    dm_table_any_dev_attr(t, device_is_not_random, NULL))
- 		blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
+-	args->start = cc->start;
+-	return blkdev_report_zones(cc->dev->bdev, sector, nr_zones,
+-				   dm_report_zones_cb, args);
++	return dm_report_zones(cc->dev->bdev, cc->start,
++			cc->start + dm_target_offset(ti, args->next_sector),
++			args, nr_zones);
+ }
+ #else
+ #define crypt_report_zones NULL
+diff --git a/drivers/md/dm-flakey.c b/drivers/md/dm-flakey.c
+index b7fee9936f05..5877220c01ed 100644
+--- a/drivers/md/dm-flakey.c
++++ b/drivers/md/dm-flakey.c
+@@ -463,11 +463,10 @@ static int flakey_report_zones(struct dm_target *ti,
+ 		struct dm_report_zones_args *args, unsigned int nr_zones)
+ {
+ 	struct flakey_c *fc = ti->private;
+-	sector_t sector = flakey_map_sector(ti, args->next_sector);
  
--	/*
--	 * For a zoned target, the number of zones should be updated for the
--	 * correct value to be exposed in sysfs queue/nr_zones. For a BIO based
--	 * target, this is all that is needed.
--	 */
--#ifdef CONFIG_BLK_DEV_ZONED
--	if (blk_queue_is_zoned(q)) {
--		WARN_ON_ONCE(queue_is_mq(q));
--		q->nr_zones = blkdev_nr_zones(t->md->disk);
--	}
--#endif
-+	/* For a zoned target, setup the zones related queue attributes */
-+	if (blk_queue_is_zoned(q))
-+		dm_set_zones_restrictions(t, q);
+-	args->start = fc->start;
+-	return blkdev_report_zones(fc->dev->bdev, sector, nr_zones,
+-				   dm_report_zones_cb, args);
++	return dm_report_zones(fc->dev->bdev, fc->start,
++			       flakey_map_sector(ti, args->next_sector),
++			       args, nr_zones);
+ }
+ #else
+ #define flakey_report_zones NULL
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 92db0f5e7f28..c91f1e2e2f65 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -140,11 +140,10 @@ static int linear_report_zones(struct dm_target *ti,
+ 		struct dm_report_zones_args *args, unsigned int nr_zones)
+ {
+ 	struct linear_c *lc = ti->private;
+-	sector_t sector = linear_map_sector(ti, args->next_sector);
  
- 	dm_update_keyslot_manager(q, t);
- 	blk_queue_update_readahead(q);
+-	args->start = lc->start;
+-	return blkdev_report_zones(lc->dev->bdev, sector, nr_zones,
+-				   dm_report_zones_cb, args);
++	return dm_report_zones(lc->dev->bdev, lc->start,
++			       linear_map_sector(ti, args->next_sector),
++			       args, nr_zones);
+ }
+ #else
+ #define linear_report_zones NULL
 diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-new file mode 100644
-index 000000000000..3243c42b7951
---- /dev/null
+index 3243c42b7951..b42474043249 100644
+--- a/drivers/md/dm-zone.c
 +++ b/drivers/md/dm-zone.c
-@@ -0,0 +1,102 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2021 Western Digital Corporation or its affiliates.
-+ */
-+
-+#include <linux/blkdev.h>
-+
-+#include "dm-core.h"
-+
-+/*
-+ * User facing dm device block device report zone operation. This calls the
-+ * report_zones operation for each target of a device table. This operation is
-+ * generally implemented by targets using dm_report_zones().
-+ */
-+int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
-+			unsigned int nr_zones, report_zones_cb cb, void *data)
-+{
-+	struct mapped_device *md = disk->private_data;
-+	struct dm_table *map;
-+	int srcu_idx, ret;
-+	struct dm_report_zones_args args = {
-+		.next_sector = sector,
-+		.orig_data = data,
-+		.orig_cb = cb,
-+	};
-+
-+	if (dm_suspended_md(md))
-+		return -EAGAIN;
-+
-+	map = dm_get_live_table(md, &srcu_idx);
-+	if (!map) {
-+		ret = -EIO;
-+		goto out;
-+	}
-+
-+	do {
-+		struct dm_target *tgt;
-+
-+		tgt = dm_table_find_target(map, args.next_sector);
-+		if (WARN_ON_ONCE(!tgt->type->report_zones)) {
-+			ret = -EIO;
-+			goto out;
-+		}
-+
-+		args.tgt = tgt;
-+		ret = tgt->type->report_zones(tgt, &args,
-+					      nr_zones - args.zone_idx);
-+		if (ret < 0)
-+			goto out;
-+	} while (args.zone_idx < nr_zones &&
-+		 args.next_sector < get_capacity(disk));
-+
-+	ret = args.zone_idx;
-+out:
-+	dm_put_live_table(md, srcu_idx);
-+	return ret;
-+}
-+
-+int dm_report_zones_cb(struct blk_zone *zone, unsigned int idx, void *data)
-+{
-+	struct dm_report_zones_args *args = data;
-+	sector_t sector_diff = args->tgt->begin - args->start;
-+
-+	/*
-+	 * Ignore zones beyond the target range.
-+	 */
-+	if (zone->start >= args->start + args->tgt->len)
-+		return 0;
-+
-+	/*
-+	 * Remap the start sector and write pointer position of the zone
-+	 * to match its position in the target range.
-+	 */
-+	zone->start += sector_diff;
-+	if (zone->type != BLK_ZONE_TYPE_CONVENTIONAL) {
-+		if (zone->cond == BLK_ZONE_COND_FULL)
-+			zone->wp = zone->start + zone->len;
-+		else if (zone->cond == BLK_ZONE_COND_EMPTY)
-+			zone->wp = zone->start;
-+		else
-+			zone->wp += sector_diff;
-+	}
-+
-+	args->next_sector = zone->start + zone->len;
-+	return args->orig_cb(zone, args->zone_idx++, args->orig_data);
-+}
-+EXPORT_SYMBOL_GPL(dm_report_zones_cb);
-+
-+void dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
-+{
-+	if (!blk_queue_is_zoned(q))
-+		return;
-+
-+	/*
-+	 * For a zoned target, the number of zones should be updated for the
-+	 * correct value to be exposed in sysfs queue/nr_zones. For a BIO based
-+	 * target, this is all that is needed.
-+	 */
-+	WARN_ON_ONCE(queue_is_mq(q));
-+	q->nr_zones = blkdev_nr_zones(t->md->disk);
-+}
-+
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index a9211575bfed..45d2dc2ee844 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -444,84 +444,6 @@ static int dm_blk_getgeo(struct block_device *bdev, struct hd_geometry *geo)
- 	return dm_get_geometry(md, geo);
+@@ -56,7 +56,8 @@ int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
+ 	return ret;
  }
  
--#ifdef CONFIG_BLK_DEV_ZONED
 -int dm_report_zones_cb(struct blk_zone *zone, unsigned int idx, void *data)
--{
--	struct dm_report_zones_args *args = data;
--	sector_t sector_diff = args->tgt->begin - args->start;
--
--	/*
--	 * Ignore zones beyond the target range.
--	 */
--	if (zone->start >= args->start + args->tgt->len)
--		return 0;
--
--	/*
--	 * Remap the start sector and write pointer position of the zone
--	 * to match its position in the target range.
--	 */
--	zone->start += sector_diff;
--	if (zone->type != BLK_ZONE_TYPE_CONVENTIONAL) {
--		if (zone->cond == BLK_ZONE_COND_FULL)
--			zone->wp = zone->start + zone->len;
--		else if (zone->cond == BLK_ZONE_COND_EMPTY)
--			zone->wp = zone->start;
--		else
--			zone->wp += sector_diff;
--	}
--
--	args->next_sector = zone->start + zone->len;
--	return args->orig_cb(zone, args->zone_idx++, args->orig_data);
--}
--EXPORT_SYMBOL_GPL(dm_report_zones_cb);
--
--static int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
--		unsigned int nr_zones, report_zones_cb cb, void *data)
--{
--	struct mapped_device *md = disk->private_data;
--	struct dm_table *map;
--	int srcu_idx, ret;
--	struct dm_report_zones_args args = {
--		.next_sector = sector,
--		.orig_data = data,
--		.orig_cb = cb,
--	};
--
--	if (dm_suspended_md(md))
--		return -EAGAIN;
--
--	map = dm_get_live_table(md, &srcu_idx);
--	if (!map) {
--		ret = -EIO;
--		goto out;
--	}
--
--	do {
--		struct dm_target *tgt;
--
--		tgt = dm_table_find_target(map, args.next_sector);
--		if (WARN_ON_ONCE(!tgt->type->report_zones)) {
--			ret = -EIO;
--			goto out;
--		}
--
--		args.tgt = tgt;
--		ret = tgt->type->report_zones(tgt, &args,
--					      nr_zones - args.zone_idx);
--		if (ret < 0)
--			goto out;
--	} while (args.zone_idx < nr_zones &&
--		 args.next_sector < get_capacity(disk));
--
--	ret = args.zone_idx;
--out:
--	dm_put_live_table(md, srcu_idx);
--	return ret;
--}
--#else
--#define dm_blk_report_zones		NULL
--#endif /* CONFIG_BLK_DEV_ZONED */
--
- static int dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
- 			    struct block_device **bdev)
++static int dm_report_zones_cb(struct blk_zone *zone, unsigned int idx,
++			      void *data)
  {
-diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-index b441ad772c18..fdf1536a4b62 100644
---- a/drivers/md/dm.h
-+++ b/drivers/md/dm.h
-@@ -100,6 +100,17 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t);
-  */
- #define dm_target_hybrid(t) (dm_target_bio_based(t) && dm_target_request_based(t))
- 
-+/*
-+ * Zoned targets related functions.
-+ */
-+void dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q);
-+#ifdef CONFIG_BLK_DEV_ZONED
-+int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
-+			unsigned int nr_zones, report_zones_cb cb, void *data);
-+#else
-+#define dm_blk_report_zones	NULL
-+#endif
+ 	struct dm_report_zones_args *args = data;
+ 	sector_t sector_diff = args->tgt->begin - args->start;
+@@ -84,7 +85,24 @@ int dm_report_zones_cb(struct blk_zone *zone, unsigned int idx, void *data)
+ 	args->next_sector = zone->start + zone->len;
+ 	return args->orig_cb(zone, args->zone_idx++, args->orig_data);
+ }
+-EXPORT_SYMBOL_GPL(dm_report_zones_cb);
 +
- /*-----------------------------------------------------------------
-  * A registry of target types.
-  *---------------------------------------------------------------*/
++/*
++ * Helper for drivers of zoned targets to implement struct target_type
++ * report_zones operation.
++ */
++int dm_report_zones(struct block_device *bdev, sector_t start, sector_t sector,
++		    struct dm_report_zones_args *args, unsigned int nr_zones)
++{
++	/*
++	 * Set the target mapping start sector first so that
++	 * dm_report_zones_cb() can correctly remap zone information.
++	 */
++	args->start = start;
++
++	return blkdev_report_zones(bdev, sector, nr_zones,
++				   dm_report_zones_cb, args);
++}
++EXPORT_SYMBOL_GPL(dm_report_zones);
+ 
+ void dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
+ {
+@@ -99,4 +117,3 @@ void dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
+ 	WARN_ON_ONCE(queue_is_mq(q));
+ 	q->nr_zones = blkdev_nr_zones(t->md->disk);
+ }
+-
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index ff700fb6ce1d..caea0a079d2d 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -478,7 +478,8 @@ struct dm_report_zones_args {
+ 	/* must be filled by ->report_zones before calling dm_report_zones_cb */
+ 	sector_t start;
+ };
+-int dm_report_zones_cb(struct blk_zone *zone, unsigned int idx, void *data);
++int dm_report_zones(struct block_device *bdev, sector_t start, sector_t sector,
++		    struct dm_report_zones_args *args, unsigned int nr_zones);
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+ /*
 -- 
 2.31.1
 
