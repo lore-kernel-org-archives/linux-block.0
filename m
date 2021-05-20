@@ -2,112 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88555C43460
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 13:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D88C433B4
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 13:55:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DF03611AB
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 13:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8BB460FE5
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 13:55:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237308AbhETNmb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 May 2021 09:42:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
+        id S232384AbhETN44 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 May 2021 09:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236894AbhETNma (ORCPT
+        with ESMTP id S237515AbhETN4w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 May 2021 09:42:30 -0400
-Received: from forwardcorp1j.mail.yandex.net (forwardcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::183])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1110C061574;
-        Thu, 20 May 2021 06:41:08 -0700 (PDT)
-Received: from sas1-6b1512233ef6.qloud-c.yandex.net (sas1-6b1512233ef6.qloud-c.yandex.net [IPv6:2a02:6b8:c14:44af:0:640:6b15:1223])
-        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 574722E15E6;
-        Thu, 20 May 2021 16:39:38 +0300 (MSK)
-Received: from sas2-d40aa8807eff.qloud-c.yandex.net (sas2-d40aa8807eff.qloud-c.yandex.net [2a02:6b8:c08:b921:0:640:d40a:a880])
-        by sas1-6b1512233ef6.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id AfBgisBlzm-db1ewMOF;
-        Thu, 20 May 2021 16:39:38 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1621517978; bh=MgIFZUM23snZbrtJKwnzK4vDNOyka8LaHXdQ4sh/ipw=;
-        h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
-        b=e5rywHlnHxuj6xMcssjmvUOHDilA/Z+0BhL0UO/hTXt21/raFmE4Gwvsd0I9LaHn3
-         H4q6jgKpBzVPkYTmQN/QAM1VgxD7mdjp4wupio+6FzBgE11Ibz6YHbwYOlqbmJrYuw
-         ecXj9IjGzJg8MOFmr18/HMZVofyyOwL2u40DTMko=
-Authentication-Results: sas1-6b1512233ef6.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from 172.31.109.104-vpn.dhcp.yndx.net (172.31.109.104-vpn.dhcp.yndx.net [172.31.109.104])
-        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id kx0LBZ7Ldj-dboCjjet;
-        Thu, 20 May 2021 16:39:37 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-From:   Yury Kamenev <damtev@yandex-team.ru>
-To:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Yury Kamenev <damtev@yandex-team.ru>
-Subject: [PATCH 1/1] virtio: disable partitions scanning for no partitions block
-Date:   Thu, 20 May 2021 16:39:08 +0300
-Message-Id: <20210520133908.98891-2-damtev@yandex-team.ru>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20210520133908.98891-1-damtev@yandex-team.ru>
-References: <20210520133908.98891-1-damtev@yandex-team.ru>
+        Thu, 20 May 2021 09:56:52 -0400
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B3CC061574
+        for <linux-block@vger.kernel.org>; Thu, 20 May 2021 06:55:21 -0700 (PDT)
+Received: by mail-il1-x12f.google.com with SMTP id o10so14334150ilm.13
+        for <linux-block@vger.kernel.org>; Thu, 20 May 2021 06:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KlRT2t87jzR9AoIxkuqmz5/xBBHeZ8SD/zJz2pWVYTY=;
+        b=B4Vz4LKPVzfnxGC3z6gKpL8MFZ4JxhGdfM5sLuxLo+5a0XcwIoIPBb2pecz6U4jsz1
+         U1HTBTOs8qMutNDy6rrQcEaNSsHJDIqF5j1MI+iwWaGls5kDdvJbhUefY5uiv0cvsZzX
+         iSBacin0T/s81F1zPF2dpJDHoVL8N+2S2V2c0Jqe3AE48eFQqP7Q+gvyGHox3R1hkJHW
+         q0RDzxxYIkkrfJUeQBP7+sfSRKc/EaLxtxPVH1R3s/q1FQMgBgiE2mzin3Dl+UUadXjN
+         4C3u+qXz/tfiKBnZwBQHiRpsJIMgTyfKPB4eQm1jMNlb088kSLOorJ1GQciD7J/kjT7X
+         8rrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KlRT2t87jzR9AoIxkuqmz5/xBBHeZ8SD/zJz2pWVYTY=;
+        b=Gw8+7jJthxnYbij1A5DVEB2IZ/8sLBUkKSY3XR/pnd/Ik/bsroxROzAkMHRydE1AfM
+         R1N1y4V4a7MrPehNI9j9y0qTkxCSRh3PenSWXZiIoxM6V1fmIU7oQBARx3DbLSEjhcR3
+         kpn0v6+xfpXWXcYUrssYDrlXnr6Uq9RsFHwr11GTHbTKOpwzxMafzT1QQUiZqQwuJblH
+         E+kK9MShO7mMW55kZ5xgUahfheLsXOeBa4M0PmhAzBNQrmsYdIMWYGfIBQI4XxzQfpjl
+         J2s8z+t1KNH/66WAcyVrVT9IHJrTaG1NHehbBPGmSP7R3fvtmJf71phS2rPC/C2Y7pTY
+         Xuow==
+X-Gm-Message-State: AOAM532ifA3Zr4enPOlm3OMksUacWNQz3sl8/ZlnjVKXNnolaXrFtNwh
+        +CyS5G1Z/8PsSIp3zRbcB05scg==
+X-Google-Smtp-Source: ABdhPJyUhtsCctwo71Bt9kB2q5XPk2ob6bHsjyAe5htfoo7ksaRYypXcBvQFnuSAUJhyO33G8fXPjg==
+X-Received: by 2002:a92:db11:: with SMTP id b17mr6139820iln.277.1621518921087;
+        Thu, 20 May 2021 06:55:21 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id u9sm2758707ilv.66.2021.05.20.06.55.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 May 2021 06:55:20 -0700 (PDT)
+Subject: Re: [GIT PULL] nvme fixes for Linux 5.13
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.or
+References: <YKYXGnF6ywgyBTsB@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <30838259-bd6b-8000-c881-3610c16d6c5a@kernel.dk>
+Date:   Thu, 20 May 2021 07:55:20 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YKYXGnF6ywgyBTsB@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Yury Kamenev <damtev@yandex-team.ru>
----
- drivers/block/virtio_blk.c      | 6 ++++++
- include/uapi/linux/virtio_blk.h | 1 +
- 2 files changed, 7 insertions(+)
+On 5/20/21 2:00 AM, Christoph Hellwig wrote:
+> The following changes since commit 4bc2082311311892742deb2ce04bc335f85ee27a:
+> 
+>   block/partitions/efi.c: Fix the efi_partition() kernel-doc header (2021-05-14 09:00:06 -0600)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-5.13-2021-05-20
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index b9fa3ef5b57c..17edcfee2208 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -799,6 +799,10 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	vblk->disk->flags |= GENHD_FL_EXT_DEVT;
- 	vblk->index = index;
- 
-+	/*Disable partitions scanning for no-partitions block*/
-+	if (virtio_has_feature(vdev, VIRTIO_BLK_F_NO_PS))
-+		vblk->disk->flags |= GENHD_FL_NO_PART_SCAN;
-+
- 	/* configure queue flush support */
- 	virtblk_update_cache_mode(vdev);
- 
-@@ -977,6 +981,7 @@ static unsigned int features_legacy[] = {
- 	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
- 	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-+	VIRTIO_BLK_F_NO_PS,
- }
- ;
- static unsigned int features[] = {
-@@ -984,6 +989,7 @@ static unsigned int features[] = {
- 	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
- 	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-+	VIRTIO_BLK_F_NO_PS,
- };
- 
- static struct virtio_driver virtio_blk = {
-diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-index d888f013d9ff..f197d07afb05 100644
---- a/include/uapi/linux/virtio_blk.h
-+++ b/include/uapi/linux/virtio_blk.h
-@@ -40,6 +40,7 @@
- #define VIRTIO_BLK_F_MQ		12	/* support more than one vq */
- #define VIRTIO_BLK_F_DISCARD	13	/* DISCARD is supported */
- #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
-+#define VIRTIO_BLK_F_NO_PS      16      /* No partitions */
- 
- /* Legacy feature bits */
- #ifndef VIRTIO_BLK_NO_LEGACY
+Pulled, thanks.
+
 -- 
-2.24.3 (Apple Git-128)
+Jens Axboe
 
