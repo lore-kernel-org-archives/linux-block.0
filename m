@@ -2,41 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D09C433B4
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 05:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A51B3C433ED
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 05:50:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EFBF611BD
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 05:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 815D36108D
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 05:50:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbhETFux (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 May 2021 01:50:53 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45146 "EHLO mx2.suse.de"
+        id S229547AbhETFv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 May 2021 01:51:29 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45364 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229547AbhETFuw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 May 2021 01:50:52 -0400
+        id S229536AbhETFv2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 May 2021 01:51:28 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 77D53AF95;
-        Thu, 20 May 2021 05:49:30 +0000 (UTC)
-Subject: Re: [PATCH v2 01/11] block: improve handling of all zones reset
- operation
+        by mx2.suse.de (Postfix) with ESMTP id 87BB7AF03;
+        Thu, 20 May 2021 05:50:06 +0000 (UTC)
+Subject: Re: [PATCH v2 02/11] block: introduce bio zone helpers
 To:     Damien Le Moal <damien.lemoal@wdc.com>, dm-devel@redhat.com,
         Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>
 References: <20210520042228.974083-1-damien.lemoal@wdc.com>
- <20210520042228.974083-2-damien.lemoal@wdc.com>
+ <20210520042228.974083-3-damien.lemoal@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <de53c430-6eaf-ad09-73be-771f243decab@suse.de>
-Date:   Thu, 20 May 2021 07:49:29 +0200
+Message-ID: <c4b2a9b8-3d0e-1266-dcdd-cc11e5567c60@suse.de>
+Date:   Thu, 20 May 2021 07:50:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210520042228.974083-2-damien.lemoal@wdc.com>
+In-Reply-To: <20210520042228.974083-3-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -45,47 +44,41 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 5/20/21 6:22 AM, Damien Le Moal wrote:
-> SCSI, ZNS and null_blk zoned devices support resetting all zones using
-> a single command (REQ_OP_ZONE_RESET_ALL), as indicated using the device
-> request queue flag QUEUE_FLAG_ZONE_RESETALL. This flag is not set for
-> device mapper targets creating zoned devices. In this case, a user
-> request for resetting all zones of a device is processed in
-> blkdev_zone_mgmt() by issuing a REQ_OP_ZONE_RESET operation for each
-> zone of the device. This leads to different behaviors of the
-> BLKRESETZONE ioctl() depending on the target device support for the
-> reset all operation. E.g.
-> 
-> blkzone reset /dev/sdX
-> 
-> will reset all zones of a SCSI device using a single command that will
-> ignore conventional, read-only or offline zones.
-> 
-> But a dm-linear device including conventional, read-only or offline
-> zones cannot be reset in the same manner as some of the single zone
-> reset operations issued by blkdev_zone_mgmt() will fail. E.g.:
-> 
-> blkzone reset /dev/dm-Y
-> blkzone: /dev/dm-0: BLKRESETZONE ioctl failed: Remote I/O error
-> 
-> To simplify applications and tools development, unify the behavior of
-> the all-zone reset operation by modifying blkdev_zone_mgmt() to not
-> issue a zone reset operation for conventional, read-only and offline
-> zones, thus mimicking what an actual reset-all device command does on a
-> device supporting REQ_OP_ZONE_RESET_ALL. This emulation is done using
-> the new function blkdev_zone_reset_all_emulated(). The zones needing a
-> reset are identified using a bitmap that is initialized using a zone
-> report. Since empty zones do not need a reset, also ignore these zones.
-> The function blkdev_zone_reset_all() is introduced for block devices
-> natively supporting reset all operations. blkdev_zone_mgmt() is modified
-> to call either function to execute an all zone reset request.
+> Introduce the helper functions bio_zone_no() and bio_zone_is_seq().
+> Both are the BIO counterparts of the request helpers blk_rq_zone_no()
+> and blk_rq_zone_is_seq(), respectively returning the number of the
+> target zone of a bio and true if the BIO target zone is sequential.
 > 
 > Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> [hch: split into multiple functions]
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   block/blk-zoned.c | 117 +++++++++++++++++++++++++++++++++++-----------
->   1 file changed, 90 insertions(+), 27 deletions(-)
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+>   include/linux/blkdev.h | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index f69c75bd6d27..2db0f376f5d9 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1008,6 +1008,18 @@ static inline unsigned int blk_rq_stats_sectors(const struct request *rq)
+>   /* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */
+>   const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);
+>   
+> +static inline unsigned int bio_zone_no(struct bio *bio)
+> +{
+> +	return blk_queue_zone_no(bdev_get_queue(bio->bi_bdev),
+> +				 bio->bi_iter.bi_sector);
+> +}
+> +
+> +static inline unsigned int bio_zone_is_seq(struct bio *bio)
+> +{
+> +	return blk_queue_zone_is_seq(bdev_get_queue(bio->bi_bdev),
+> +				     bio->bi_iter.bi_sector);
+> +}
+> +
+>   static inline unsigned int blk_rq_zone_no(struct request *rq)
+>   {
+>   	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
 
