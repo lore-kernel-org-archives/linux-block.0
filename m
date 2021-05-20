@@ -2,90 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87610C433B4
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 08:00:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF6DC433B4
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 08:06:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6671C6101D
-	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 08:00:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1A576101E
+	for <linux-block@archiver.kernel.org>; Thu, 20 May 2021 08:06:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbhETIBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 May 2021 04:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52892 "EHLO
+        id S229978AbhETIHp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 May 2021 04:07:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230383AbhETIBy (ORCPT
+        with ESMTP id S229953AbhETIHo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 May 2021 04:01:54 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A011CC061574
-        for <linux-block@vger.kernel.org>; Thu, 20 May 2021 01:00:32 -0700 (PDT)
+        Thu, 20 May 2021 04:07:44 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0571C061574;
+        Thu, 20 May 2021 01:06:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=dE8Lo+3vJDjvMKY8HxjGzIEklnY+Y10fde7MXLYU6KQ=; b=ESJBNKmDRtma+DN/PXXmAJEdjd
-        QkLpJHYP5CZ1bcxaEjghJQXHITnZJGPHRiAkW8JyzCfouoRA0g0YOnF1wQI468ZlyE/lLGzGC7N+c
-        EqwVl47C7GM+iwxM6w3zbWd+iaV0O9pgX6WzpBhZLAds1akCWLNA6HbtiJQxb2BEX3KMbE7yjqWfQ
-        E5drchuOA8D/S/AloXjukBNyrzqlkl7SZYfcsiJYPVwDP07w79rVc78CcE6kxhadMzXhl2QGRJqBq
-        XUd/lI8Ih1Q7gk+3JFt8HYiWkCA3s4MpscFbWB7MBlc0m851Bvtxl3HtAAo5gsIDnoihhccO0ohwK
-        XbjOnMaA==;
-Received: from [2001:4bb8:180:5add:a633:7cce:5450:3d63] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1ljdbY-00G3DO-Op; Thu, 20 May 2021 08:00:29 +0000
-Date:   Thu, 20 May 2021 10:00:26 +0200
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=EnMP33KD+v1NrZLekTHVvqXVLcSZIAG5TyluA2WJ8xo=; b=VBOQN5YQLqy9hFu1pzd15ldk0y
+        iAt19jFhSEpbvZ1+Q5i649CVOMlTcX4wJFDz0K2mS6FalkPvOwtApOyYYTE6ztaWgacQD5nXnK8WP
+        xKZpNhvwKwiNHg8tWrb3zJvmOcHGoplx2s1DbyJrkQMrDGizj50ZiK0jcODlFJuasSrlrGz9Fobyj
+        iZ5z2jSSyGMJzyaephsd/TyQWpDQShzjsf51XJ6PjHFoLQBPdYsBu2K8u8mdfrvbcR0A9VurYVnQc
+        HmwYVZHicIjB2xZjcen1GpH2xP3B65fgz6pQJIymEoDFwumw8YBsiCpD4qnplFzTGb0KxLz6L7Rx1
+        09J8yQjw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1ljdg5-00FiuP-QZ; Thu, 20 May 2021 08:05:38 +0000
+Date:   Thu, 20 May 2021 09:05:09 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.or
-Subject: [GIT PULL] nvme fixes for Linux 5.13
-Message-ID: <YKYXGnF6ywgyBTsB@infradead.org>
+To:     colyli@suse.de
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Diego Ercolani <diego.ercolani@gmail.com>,
+        Jan Szubiak <jan.szubiak@linuxpolska.pl>,
+        Marco Rebhan <me@dblsaiko.net>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        Thorsten Knabe <linux@thorsten-knabe.de>,
+        Victor Westerhuis <victor@westerhu.is>,
+        Vojtech Pavlik <vojtech@suse.cz>, stable@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Subject: Re: [PATCH v3] bcache: avoid oversized read request in cache missing
+ code path
+Message-ID: <YKYYNVD+NsXaOFNe@infradead.org>
+References: <20210518110009.11413-1-colyli@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210518110009.11413-1-colyli@suse.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 4bc2082311311892742deb2ce04bc335f85ee27a:
+This fix is pretty gross.  Adding pages to bios can fail for all kinds
+of reasons, so the fix is to use bio_add_page and check its return
+value, and if it needs another bio keep looping and chaining more bios.
 
-  block/partitions/efi.c: Fix the efi_partition() kernel-doc header (2021-05-14 09:00:06 -0600)
-
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git tags/nvme-5.13-2021-05-20
-
-for you to fetch changes up to a7d139145a6640172516b193abf6d2398620aa14:
-
-  nvme-fc: clear q_live at beginning of association teardown (2021-05-19 08:40:24 +0200)
-
-----------------------------------------------------------------
-nvme fixes for Linux 5.13:
-
- - nvme-tcp corruption and timeout fixes (Sagi Grimberg, Keith Busch)
- - nvme-fc teardown fix (James Smart)
- - nvmet/nvme-loop memory leak fixes (Wu Bo)
-
-----------------------------------------------------------------
-James Smart (1):
-      nvme-fc: clear q_live at beginning of association teardown
-
-Keith Busch (1):
-      nvme-tcp: rerun io_work if req_list is not empty
-
-Sagi Grimberg (1):
-      nvme-tcp: fix possible use-after-completion
-
-Wu Bo (2):
-      nvmet: fix memory leak in nvmet_alloc_ctrl()
-      nvme-loop: fix memory leak in nvme_loop_create_ctrl()
-
- drivers/nvme/host/fc.c     | 12 ++++++++++++
- drivers/nvme/host/tcp.c    |  5 +++--
- drivers/nvme/target/core.c |  2 +-
- drivers/nvme/target/loop.c |  4 +++-
- 4 files changed, 19 insertions(+), 4 deletions(-)
+And maybe capping the readahead to some sane upper bound still makes
+sense, but it should never look at BIO_MAX_VECS for that.
