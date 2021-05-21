@@ -2,127 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A497AC2B9FD
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 05:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 904D3C433ED
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 06:08:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98C1C613B4
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 05:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BE5D613BB
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 06:08:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234661AbhEUFye (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 May 2021 01:54:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37526 "EHLO
+        id S232531AbhEUGKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 May 2021 02:10:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237557AbhEUFyV (ORCPT
+        with ESMTP id S231224AbhEUGIw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 May 2021 01:54:21 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F92DC061574;
-        Thu, 20 May 2021 22:52:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=g3lrORorOGdlA+chhXFoiRZ083wZZP/c6LDvo2P6/hA=; b=Hx8+vU+9P2K36yQ0fT1qbYbTtq
-        yirGfRIknOCtiXRt/vnn4dIFJns8tfyH6dBItpgN6uR7pEYfx6LlbhKMLF0kdz7ZhBIylIKKM7yH9
-        hGyRo+/4ktzM1LfhQvqtepRp8CkrTFBnWY56Md0SbPS/JDONzNUP7liIckX3mfrRTfbbULVpSg4S+
-        VYdVdJ1t9Oz+ia/vjUXJTCMWZnBD0/hpkLzXXajvdMWrxEpyZIpUygPwv/KeKlY86FVoDS5wFCllh
-        M6oJj8Wk0MOkR6vK7ZODkzykR5XMrTLgJJM82nK9TloNiCbG+kw4aqQ6F8PGn723aFIqoGvcChblj
-        zEkBOQTw==;
-Received: from [2001:4bb8:180:5add:4fd7:4137:d2f2:46e6] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1ljy5W-00GqHh-Vr; Fri, 21 May 2021 05:52:47 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jim Paris <jim@jtan.com>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Matias Bjorling <mb@lightnvm.io>, Coly Li <colyli@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-m68k@lists.linux-m68k.org, linux-xtensa@linux-xtensa.org,
-        drbd-dev@lists.linbit.com, linuxppc-dev@lists.ozlabs.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mmc@vger.kernel.org, nvdimm@lists.linux.dev,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: [PATCH 26/26] block: unexport blk_alloc_queue
-Date:   Fri, 21 May 2021 07:51:16 +0200
-Message-Id: <20210521055116.1053587-27-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210521055116.1053587-1-hch@lst.de>
-References: <20210521055116.1053587-1-hch@lst.de>
+        Fri, 21 May 2021 02:08:52 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68E5C061574;
+        Thu, 20 May 2021 23:07:28 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 27so12122442pgy.3;
+        Thu, 20 May 2021 23:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PUAwe7z2INATtYcfD83zTSIPkMgwdGGQMjVc8v5Lil4=;
+        b=WIbeOp4S2aqnx4XsSExMR+dhKwalXxtFGvkfdu9TP7GFr7HfpPiOX9mp4ayJsOaC9K
+         pbbmAfEqyS5O0HA7iYuAv0TX7t26duCviI5+HoRXt4xv7NXTndzUSZUoRz+hqOSQAQeq
+         q2cHFud4EunrkRR6DmcYUGui8T1uUwPauaKvlSviEsBpb+bFQ3OOzoRKFZrFggf6IlVC
+         Ucymo/DqssqIac9ss/s6Gwac2FAndz+3NfotVOeld6pI0osV/+rjj0gsjOdOhOJAa7Oh
+         bsp0WOPasLsPSXmIyrIaWRxALrAksgp7DkG7m2gLovpHmsXz0L2gwoAyg0PNV45RzAmz
+         0+9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PUAwe7z2INATtYcfD83zTSIPkMgwdGGQMjVc8v5Lil4=;
+        b=JhteJEpE8YDi3pcnDZ8yH71ua1+Zd5y5x6EHqXbv/y9AXcICzzb+buL1uWjhFUo5zv
+         cOie0jol++awZfjDMK2A57GBJxJfQjTSeN21KE63YxRclyRE1JmVagHfLGyQFjif0dNB
+         uaI85jCnbv27ExljDoQSGqwbn8rzL9YSktk9avGhHGasIVfHMk0K9q+xZnR3ctMJUC4N
+         +q/PEKn+8kLc5sE2mbShhQLTynmKJqYx5B+4Db9RYoF7liskfurN7Y6rsGES/WqFJuFH
+         jUjh4nwTpvbjVIXWDqHovzQWZwo284Yv9sUBZyXmUnVabGkxy2rU7a2Wmig8LIiG5Y7q
+         Rzaw==
+X-Gm-Message-State: AOAM533vaOyoLA/O1s4R+sT4KnB1vRVYqiFPOkPs4qy+/3PQRQ6Q1P7c
+        3KBNAUI4vDCZR3VaGTtX7+k=
+X-Google-Smtp-Source: ABdhPJz+LBV3lvzMoJzg1w1HatzdXU+k4aTYpDNH8M9egmVDm51nbSxFuavyvTtVOx1HL1IaZe8F/Q==
+X-Received: by 2002:a63:cd01:: with SMTP id i1mr5347208pgg.294.1621577248395;
+        Thu, 20 May 2021 23:07:28 -0700 (PDT)
+Received: from tj.ccdomain.com ([103.220.76.197])
+        by smtp.gmail.com with ESMTPSA id n21sm3563793pfu.99.2021.05.20.23.07.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 May 2021 23:07:28 -0700 (PDT)
+From:   Yue Hu <zbestahu@gmail.com>
+To:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        huyue2@yulong.com, zbestahu@163.com,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+Subject: [PATCH][RESEND] zram: move backing_dev under macro CONFIG_ZRAM_WRITEBACK
+Date:   Fri, 21 May 2021 14:05:44 +0800
+Message-Id: <20210521060544.2385-1-zbestahu@gmail.com>
+X-Mailer: git-send-email 2.29.2.windows.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_alloc_queue is just an internal helper now, unexport it and remove
-it from the public header.
+From: Yue Hu <huyue2@yulong.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+backing_dev is never used when not enable CONFIG_ZRAM_WRITEBACK and
+it's introduced from writeback feature. So it's needless also affect
+readability in that case.
+
+Signed-off-by: Yue Hu <huyue2@yulong.com>
+Reviewed-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+Acked-by: Minchan Kim <minchan@kernel.org>
 ---
- block/blk-core.c       | 1 -
- block/blk.h            | 2 ++
- include/linux/blkdev.h | 1 -
- 3 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/zram/zram_drv.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 689aac2625d2..3515a66022d7 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -599,7 +599,6 @@ struct request_queue *blk_alloc_queue(int node_id)
- 	kmem_cache_free(blk_requestq_cachep, q);
- 	return NULL;
- }
--EXPORT_SYMBOL(blk_alloc_queue);
- 
- /**
-  * blk_get_queue - increment the request_queue refcount
-diff --git a/block/blk.h b/block/blk.h
-index cba3a94aabfa..3440142f029b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -359,4 +359,6 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
- 		struct page *page, unsigned int len, unsigned int offset,
- 		unsigned int max_sectors, bool *same_page);
- 
-+struct request_queue *blk_alloc_queue(int node_id);
-+
- #endif /* BLK_INTERNAL_H */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 2c28577b50f4..d66d0da72529 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1213,7 +1213,6 @@ static inline int blk_rq_map_sg(struct request_queue *q, struct request *rq,
- extern void blk_dump_rq_flags(struct request *, char *);
- 
- bool __must_check blk_get_queue(struct request_queue *);
--struct request_queue *blk_alloc_queue(int node_id);
- extern void blk_put_queue(struct request_queue *);
- extern void blk_set_queue_dying(struct request_queue *);
- 
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index 419a7e8..6e73dc3 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -113,8 +113,8 @@ struct zram {
+ 	 * zram is claimed so open request will be failed
+ 	 */
+ 	bool claim; /* Protected by bdev->bd_mutex */
+-	struct file *backing_dev;
+ #ifdef CONFIG_ZRAM_WRITEBACK
++	struct file *backing_dev;
+ 	spinlock_t wb_limit_lock;
+ 	bool wb_limit_enable;
+ 	u64 bd_wb_limit;
 -- 
-2.30.2
+1.9.1
 
