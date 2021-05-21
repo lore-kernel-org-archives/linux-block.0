@@ -2,104 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904D3C433ED
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 06:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1D7C43461
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 06:15:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5BE5D613BB
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 06:08:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5280D613BF
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 06:15:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232531AbhEUGKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 May 2021 02:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40760 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbhEUGIw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 May 2021 02:08:52 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68E5C061574;
-        Thu, 20 May 2021 23:07:28 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 27so12122442pgy.3;
-        Thu, 20 May 2021 23:07:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PUAwe7z2INATtYcfD83zTSIPkMgwdGGQMjVc8v5Lil4=;
-        b=WIbeOp4S2aqnx4XsSExMR+dhKwalXxtFGvkfdu9TP7GFr7HfpPiOX9mp4ayJsOaC9K
-         pbbmAfEqyS5O0HA7iYuAv0TX7t26duCviI5+HoRXt4xv7NXTndzUSZUoRz+hqOSQAQeq
-         q2cHFud4EunrkRR6DmcYUGui8T1uUwPauaKvlSviEsBpb+bFQ3OOzoRKFZrFggf6IlVC
-         Ucymo/DqssqIac9ss/s6Gwac2FAndz+3NfotVOeld6pI0osV/+rjj0gsjOdOhOJAa7Oh
-         bsp0WOPasLsPSXmIyrIaWRxALrAksgp7DkG7m2gLovpHmsXz0L2gwoAyg0PNV45RzAmz
-         0+9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PUAwe7z2INATtYcfD83zTSIPkMgwdGGQMjVc8v5Lil4=;
-        b=JhteJEpE8YDi3pcnDZ8yH71ua1+Zd5y5x6EHqXbv/y9AXcICzzb+buL1uWjhFUo5zv
-         cOie0jol++awZfjDMK2A57GBJxJfQjTSeN21KE63YxRclyRE1JmVagHfLGyQFjif0dNB
-         uaI85jCnbv27ExljDoQSGqwbn8rzL9YSktk9avGhHGasIVfHMk0K9q+xZnR3ctMJUC4N
-         +q/PEKn+8kLc5sE2mbShhQLTynmKJqYx5B+4Db9RYoF7liskfurN7Y6rsGES/WqFJuFH
-         jUjh4nwTpvbjVIXWDqHovzQWZwo284Yv9sUBZyXmUnVabGkxy2rU7a2Wmig8LIiG5Y7q
-         Rzaw==
-X-Gm-Message-State: AOAM533vaOyoLA/O1s4R+sT4KnB1vRVYqiFPOkPs4qy+/3PQRQ6Q1P7c
-        3KBNAUI4vDCZR3VaGTtX7+k=
-X-Google-Smtp-Source: ABdhPJz+LBV3lvzMoJzg1w1HatzdXU+k4aTYpDNH8M9egmVDm51nbSxFuavyvTtVOx1HL1IaZe8F/Q==
-X-Received: by 2002:a63:cd01:: with SMTP id i1mr5347208pgg.294.1621577248395;
-        Thu, 20 May 2021 23:07:28 -0700 (PDT)
-Received: from tj.ccdomain.com ([103.220.76.197])
-        by smtp.gmail.com with ESMTPSA id n21sm3563793pfu.99.2021.05.20.23.07.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 23:07:28 -0700 (PDT)
-From:   Yue Hu <zbestahu@gmail.com>
-To:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
-        axboe@kernel.dk
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        huyue2@yulong.com, zbestahu@163.com,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Subject: [PATCH][RESEND] zram: move backing_dev under macro CONFIG_ZRAM_WRITEBACK
-Date:   Fri, 21 May 2021 14:05:44 +0800
-Message-Id: <20210521060544.2385-1-zbestahu@gmail.com>
-X-Mailer: git-send-email 2.29.2.windows.3
+        id S231638AbhEUGRG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 May 2021 02:17:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:34600 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230381AbhEUGRG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 May 2021 02:17:06 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id C9DB4AC87;
+        Fri, 21 May 2021 06:15:41 +0000 (UTC)
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-m68k@lists.linux-m68k.org, linux-xtensa@linux-xtensa.org,
+        drbd-dev@lists.linbit.com, linuxppc-dev@lists.ozlabs.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jim Paris <jim@jtan.com>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-mmc@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
+References: <20210521055116.1053587-1-hch@lst.de>
+ <20210521055116.1053587-13-hch@lst.de>
+From:   Coly Li <colyli@suse.de>
+Subject: Re: [PATCH 12/26] bcache: convert to blk_alloc_disk/blk_cleanup_disk
+Message-ID: <d4f1c005-2ce0-51b5-c861-431f0ffb3dcf@suse.de>
+Date:   Fri, 21 May 2021 14:15:32 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.1
 MIME-Version: 1.0
+In-Reply-To: <20210521055116.1053587-13-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yue Hu <huyue2@yulong.com>
+On 5/21/21 1:51 PM, Christoph Hellwig wrote:
+> Convert the bcache driver to use the blk_alloc_disk and blk_cleanup_disk
+> helpers to simplify gendisk and request_queue allocation.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/md/bcache/super.c | 15 ++++-----------
+>  1 file changed, 4 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index bea8c4429ae8..185246a0d855 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -890,13 +890,9 @@ static void bcache_device_free(struct bcache_device *d)
+>  		if (disk_added)
+>  			del_gendisk(disk);
+>  
+> -		if (disk->queue)
+> -			blk_cleanup_queue(disk->queue);
+> -
+> +		blk_cleanup_disk(disk);
+>  		ida_simple_remove(&bcache_device_idx,
+>  				  first_minor_to_idx(disk->first_minor));
+> -		if (disk_added)
+> -			put_disk(disk);
 
-backing_dev is never used when not enable CONFIG_ZRAM_WRITEBACK and
-it's introduced from writeback feature. So it's needless also affect
-readability in that case.
+The  above 2 lines are added on purpose to prevent an refcount
+underflow. It is from commit 86da9f736740 ("bcache: fix refcount
+underflow in bcache_device_free()").
 
-Signed-off-by: Yue Hu <huyue2@yulong.com>
-Reviewed-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Acked-by: Minchan Kim <minchan@kernel.org>
----
- drivers/block/zram/zram_drv.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Maybe add a parameter to blk_cleanup_disk() or checking (disk->flags &
+GENHD_FL_UP) inside blk_cleanup_disk() ?
 
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index 419a7e8..6e73dc3 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -113,8 +113,8 @@ struct zram {
- 	 * zram is claimed so open request will be failed
- 	 */
- 	bool claim; /* Protected by bdev->bd_mutex */
--	struct file *backing_dev;
- #ifdef CONFIG_ZRAM_WRITEBACK
-+	struct file *backing_dev;
- 	spinlock_t wb_limit_lock;
- 	bool wb_limit_enable;
- 	u64 bd_wb_limit;
--- 
-1.9.1
+Coly Li
 
+
+>  	}
+>  
+>  	bioset_exit(&d->bio_split);
+> @@ -946,7 +942,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+>  			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
+>  		goto err;
+>  
+> -	d->disk = alloc_disk(BCACHE_MINORS);
+> +	d->disk = blk_alloc_disk(NUMA_NO_NODE);
+>  	if (!d->disk)
+>  		goto err;
+>  
+> @@ -955,14 +951,11 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+>  
+>  	d->disk->major		= bcache_major;
+>  	d->disk->first_minor	= idx_to_first_minor(idx);
+> +	d->disk->minors		= BCACHE_MINORS;
+>  	d->disk->fops		= ops;
+>  	d->disk->private_data	= d;
+>  
+> -	q = blk_alloc_queue(NUMA_NO_NODE);
+> -	if (!q)
+> -		return -ENOMEM;
+> -
+> -	d->disk->queue			= q;
+> +	q = d->disk->queue;
+>  	q->limits.max_hw_sectors	= UINT_MAX;
+>  	q->limits.max_sectors		= UINT_MAX;
+>  	q->limits.max_segment_size	= UINT_MAX;
+> 
+
+The rested looks fine to me.
+
+Thanks.
+
+Coly Li
