@@ -2,94 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BFFBC433ED
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 13:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65636C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 13:12:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CA72613D8
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 13:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F69261244
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 13:12:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230269AbhEUNMA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 May 2021 09:12:00 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54502 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230137AbhEUNL6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 May 2021 09:11:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 222F9AC87;
-        Fri, 21 May 2021 13:10:35 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id DD91F1F2C73; Fri, 21 May 2021 15:10:34 +0200 (CEST)
-Date:   Fri, 21 May 2021 15:10:34 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Subject: Re: False waker detection in BFQ
-Message-ID: <20210521131034.GL18952@quack2.suse.cz>
-References: <20210505162050.GA9615@quack2.suse.cz>
- <FFFA8EE2-3635-4873-9F2C-EC3206CC002B@linaro.org>
+        id S231174AbhEUNN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 May 2021 09:13:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48711 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229915AbhEUNNx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 May 2021 09:13:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621602749;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PoQu4/RJUKE4oJ7zZaBjFI6JNdpGnPnDJZVJlZEylVU=;
+        b=CbGiMN8oi4KXh+JJmUjJbwVq/us6ApI3oD7WWVqchA4khze8QHU6r+JOB1hRo4JOMZ+lUQ
+        rnKmFkLaMVL+PUfEvmsE7FOGEhffiy+G3mPo0crldha+c7e90iBMdbwAYXD/vzeBHqwdxN
+        ayTE5CFTwQecjYwMn4ybDE2yPNag73A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-563-c8M2MgEtNS-kl1yZo1D1Qw-1; Fri, 21 May 2021 09:12:27 -0400
+X-MC-Unique: c8M2MgEtNS-kl1yZo1D1Qw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 000CB107ACC7;
+        Fri, 21 May 2021 13:12:25 +0000 (UTC)
+Received: from T590 (ovpn-12-67.pek2.redhat.com [10.72.12.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 30A175D74B;
+        Fri, 21 May 2021 13:12:18 +0000 (UTC)
+Date:   Fri, 21 May 2021 21:12:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Khazhy Kumykov <khazhy@google.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH 1/2] block: Do not merge recursively in
+ elv_attempt_insert_merge()
+Message-ID: <YKexrshH5i7mvF6U@T590>
+References: <20210520223353.11561-1-jack@suse.cz>
+ <20210520223353.11561-2-jack@suse.cz>
+ <YKcB6Hxhe3a1St31@T590>
+ <20210521115354.GJ18952@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <FFFA8EE2-3635-4873-9F2C-EC3206CC002B@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210521115354.GJ18952@quack2.suse.cz>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 20-05-21 17:05:45, Paolo Valente wrote:
-> > Il giorno 5 mag 2021, alle ore 18:20, Jan Kara <jack@suse.cz> ha scritto:
+On Fri, May 21, 2021 at 01:53:54PM +0200, Jan Kara wrote:
+> On Fri 21-05-21 08:42:16, Ming Lei wrote:
+> > On Fri, May 21, 2021 at 12:33:52AM +0200, Jan Kara wrote:
+> > > Most of the merging happens at bio level. There should not be much
+> > > merging happening at request level anymore. Furthermore if we backmerged
+> > > a request to the previous one, the chances to be able to merge the
+> > > result to even previous request are slim - that could succeed only if
+> > > requests were inserted in 2 1 3 order. Merging more requests in
 > > 
-> > Hi Paolo!
+> > Right, but some workload has this kind of pattern.
 > > 
-> > I have two processes doing direct IO writes like:
+> > For example of qemu IO emulation, it often can be thought as single job,
+> > native aio, direct io with high queue depth. IOs is originated from one VM, but
+> > may be from multiple jobs in the VM, so bio merge may not hit much because of IO
+> > emulation timing(virtio-scsi/blk's MQ, or IO can be interleaved from multiple
+> > jobs via the SQ transport), but request merge can really make a difference, see
+> > recent patch in the following link:
 > > 
-> > dd if=/dev/zero of=/mnt/file$i bs=128k oflag=direct count=4000M
-> > 
-> > Now each of these processes belongs to a different cgroup and it has
-> > different bfq.weight. I was looking into why these processes do not split
-> > bandwidth according to BFQ weights. Or actually the bandwidth is split
-> > accordingly initially but eventually degrades into 50/50 split. After some
-> > debugging I've found out that due to luck, one of the processes is decided
-> > to be a waker of the other process and at that point we loose isolation
-> > between the two cgroups. This pretty reliably happens sometime during the
-> > run of these two processes on my test VM. So can we tweak the waker logic
-> > to reduce the chances for false positives? Essentially when there are only
-> > two processes doing heavy IO against the device, the logic in
-> > bfq_check_waker() is such that they are very likely to eventually become
-> > wakers of one another. AFAICT the only condition that needs to get
-> > fulfilled is that they need to submit IO within 4 ms of the completion of
-> > IO of the other process 3 times.
->
-> as I happened to tell you moths ago, I feared some likely cover case
-> to show up eventually.  Actually, I was even more pessimistic than how
-> reality proved to be :)
-
-:)
-
-> I'm sorry for my delay, but I've had to think about this issue for a
-> while.  Being too strict would easily run out journald as a waker for
-> processes belonging to a different group.
+> > https://lore.kernel.org/linux-block/3f61e939-d95a-1dd1-6870-e66795cfc1b1@suse.de/T/#t
 > 
-> So, what do you think of this proposal: add the extra filter that a
-> waker must belong to the same group of the woken, or, at most, to the
-> root group?
+> Oh, request merging definitely does make a difference. But the elevator
+> hash & merge logic I'm modifying here is used only by BFQ and MQ-DEADLINE
+> AFAICT. And these IO schedulers will already call blk_mq_sched_try_merge()
+> from their \.bio_merge handler which gets called from blk_mq_submit_bio().
+> So all the merging that can happen in the code I remove should have already
+> happened. Or am I missing something?
 
-I thought you will suggest that :) Well, I'd probably allow waker-wakee
-relationship if the two cgroups are in 'ancestor' - 'successor'
-relationship. Not necessarily only root cgroup vs some cgroup. That being
-said in my opinion it is just a poor mans band aid fixing this particular
-setup. It will not fix e.g. a similar problem when those two processes are
-in the same cgroup but have say different IO priorities.
+There might be at least two reasons:
 
-The question is how we could do better. But so far I have no great idea
-either.
+1) when .bio_merge() is called, some requests are kept in plug list, so
+the bio may not be merged to requests in scheduler queue; when flushing plug
+list and inserts these requests to scheduler queue, we have to try to
+merge them further
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2) only blk_mq_sched_try_insert_merge() is capable of doing aggressive
+request merge, such as, when req A is merged to req B, the function will
+continue to try to merge req B with other in-queue requests, until no
+any further merge can't be done; neither blk_mq_sched_try_merge() nor
+blk_attempt_plug_merge can do such aggressive request merge.
+
+
+
+Thanks,
+Ming
+
