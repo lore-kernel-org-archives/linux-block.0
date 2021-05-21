@@ -2,151 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DA2C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 02:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B41D4C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 03:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25B236121E
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 02:50:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 834816121E
+	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 03:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233790AbhEUCwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 May 2021 22:52:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59097 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233648AbhEUCwO (ORCPT
+        id S232858AbhEUDCn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 May 2021 23:02:43 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:25389 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232046AbhEUDCn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 May 2021 22:52:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621565451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xZtf0jHx+2rKPyHTNoh/t8QQN1j1nYziUDCyxqSr+1A=;
-        b=OFPNZ6lbA1LvRbU0KdHmMgl41wXk/taBbrCHkLwzrSHH6GFIM9wXxb/7WBerNOCQVSeju1
-        jUKA+qdT6rb+20ViudETZCre8Uc9yyCkvAfYZFOCbo8xV5DXg6WamGOr0Tt7ur3km529JT
-        T+t+GpwbIVG6PYazeQhBsArney/Qxoc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-gnJ6J7rzPsWtu6eOCU5Lpg-1; Thu, 20 May 2021 22:50:50 -0400
-X-MC-Unique: gnJ6J7rzPsWtu6eOCU5Lpg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42C70343A2;
-        Fri, 21 May 2021 02:50:48 +0000 (UTC)
-Received: from T590 (ovpn-12-75.pek2.redhat.com [10.72.12.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EE555C261;
-        Fri, 21 May 2021 02:50:39 +0000 (UTC)
-Date:   Fri, 21 May 2021 10:50:35 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [bugreport 5.9-rc8] general protection fault in
- __bfq_deactivate_entity
-Message-ID: <YKcf+xN/G4O75vZp@T590>
-References: <CABXGCsP63mN+G1xE7UBfVRuDRcJiRRC7EXU2y25f9rXkoU-0LQ@mail.gmail.com>
- <CACVXFVOy8928GNowCQRGQKQxuLtHn0V+pYk1kzeOyc0pyDvkjQ@mail.gmail.com>
- <20210305090022.1863-1-hdanton@sina.com>
- <CACVXFVPp_byzrYVwyo05u0v3zoPP42FKZhfWMb6GMBno1rCZRw@mail.gmail.com>
- <E28250BB-FBFF-4F02-B7A2-9530340E481E@linaro.org>
- <20210307021524.13260-1-hdanton@sina.com>
+        Thu, 20 May 2021 23:02:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1621566081; x=1653102081;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XCJD+7N6tk0F5upMycnIBKbx/cj9V2Tc3B8pA0JgAT0=;
+  b=qJ1ad4D1DhoB6ScngzgZ+jLKrQKNlQGLR4aKnZPhziKpmMPlYyOCXDym
+   HU8sV5SWGIoO4bpUHI9VlSLz71jwfrAYQ6xz91OUG+U4IhoM0p7GhHWVy
+   WOgI/dTEX+yhoe+/dLAQNaBSIPzM9FSupPOtDWb2F+vLMNohasy2+Qh2D
+   GIdRfJ1tmAfuDSCUYUC1UWAhwYOIg0cBgG6PvD/HhIJ2hWbtQQ35T3KMt
+   U8JsQTBH2STjYJa4dtiUQG4ZIwq4lrd0gEidICJ9oLMtiWYH+z/JcImMp
+   8E9UFmn+j60do6xUsmMsuRrv8sTYM5GibCqfY5I8//TVKKvKqgz4s1OZE
+   w==;
+IronPort-SDR: ivvbesDdTV/DqT/NhTN9Ow8V+82NBReB670BbXZcWZ2jcHb5DNAE6XKevxxh//0xW/+SC0fEjZ
+ NEQyqIM41tZfIKYu6/4MhfyqNm2SUrXXOcV9LljCk7i+ww4mvTJo0gkPJRhBM4xCbRgYMwpCnB
+ mqmEmMTEqfDrZyNNrK5I4izKqWui0PZEAkrm21188H9JeXdfkUqycSVCAHRSf35lS76z8fqXB3
+ Qk5Mz6sYqqS6b6bvoYjWboVjK+6OX/R50qip2G50L8SKqo1dMHot04uamFapaulKKXFa6e3DTp
+ NbU=
+X-IronPort-AV: E=Sophos;i="5.82,313,1613404800"; 
+   d="scan'208";a="168943789"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 21 May 2021 11:01:20 +0800
+IronPort-SDR: JW/IcndtvKblyfRDcZTDgypfiMLBAtDcq6wwDy9wRBpc9Im0OJeBTKMDHuwpk2L/2SUmUGqtBo
+ 4kG1SO0zFOWKv9mmeY6oCJKtF2T/zIO/r/ZPtCrF/X2fsMJNHEl3go5yb3wEglCK00yArjvWgG
+ kzaVD/8q8ANNCJZCrswGh7HSwDMe6USTuWW/7csXepQrwd+eZkoxMiqOHF+mfx3HGP+k+VlPhd
+ TQIM1uWJ64M7/RF6ZgnTNORf9FRCE7dwigJ53J9untP31ZhCbgwkC5FIzebkDIJXlYK4klmZ84
+ E+u5ztevb1O7ZLrAtySSmjMP
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2021 19:40:56 -0700
+IronPort-SDR: G8GtJBclerJvhX1yly86IfVF6GTofO/iVFe1yIMjDh7WiizhIGHVjghuG6S6/jfl9MC6yo9/l0
+ TXSKR144Tna19FuYAQLNIp0sK4pe7eeAyufFUdSp7gKtEn5iRSxz5tXfokgKns6hMib30CXOrq
+ npEtXs68TM5d1p4+f5ntgiZOdYYwoIxaFE8vRgi4mxBA0Ow1zfJd3FSQMM3J4G0tFETN+rGyyB
+ VDeSisecljL9OYeVOzIqwNfnR8UymPSZH0pkjrDcFvvcHn0oTT4Ab+T1DcLb5FgTgAYRWF/bJ8
+ uBQ=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 20 May 2021 20:01:20 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v3 00/11] dm: Improve zoned block device support
+Date:   Fri, 21 May 2021 12:01:08 +0900
+Message-Id: <20210521030119.1209035-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210307021524.13260-1-hdanton@sina.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 06, 2021 at 07:15:24PM -0700, Hillf Danton wrote:
-> On Fri, 5 Mar 2021 18:01:04 +0800  Ming Lei wrote:
-> > On Fri, Mar 05, 2021 at 10:32:04AM +0100, Paolo Valente wrote:
-> > > I'm thinking of a way to debug this too.  The symptom may hint at a
-> > > use-after-free.  Could you enable KASAN in your tests?  (On the flip
-> > > side, I know this might change timings, thereby making the fault
-> > > disappear).
-> > 
-> > I have asked our QE to reproduce the issue with debug kernel, which may take a
-> > while. And I can't trigger it in my box.
-> > 
-> > BTW, for the 2nd 'kernel NULL pointer dereference', the RIP points to:
-> > 
-> > (gdb) l *(__bfq_deactivate_entity+0x5b)
-> > 0xffffffff814c31cb is in __bfq_deactivate_entity (block/bfq-wf2q.c:1181).
-> > 1176		 * bfq_group_set_parent has already been invoked for the group
-> > 1177		 * represented by entity. Therefore, the field
-> > 1178		 * entity->sched_data has been set, and we can safely use it.
-> > 1179		 */
-> > 1180		st = bfq_entity_service_tree(entity);
-> > 1181		is_in_service = entity == sd->in_service_entity;
-> > 1182
-> > 1183		bfq_calc_finish(entity, entity->service);
-> > 1184
-> > 1185		if (is_in_service)
-> > 
-> > Seems entity->sched_data points to NULL.
-> 
-> Hi Ming,
-> 
-> Thanks for your report.
-> 
-> Given the invalid pointer cannot explain line 1180, you are reporting
-> a different issue from what Mike reported, and we can do nothing now
-> for both without a reproducer.
+This series improve device mapper support for zoned block devices and
+of targets exposing a zoned device.
 
-BTW, we get this report 2 times on 5.12 kernel, following the kernel log, and this
-time there is hard LOCKUP.
+The first patch improve support for user requests to reset all zones of
+the target device. With the fix, such operation behave similarly to
+physical block devices implementation based on the single zone reset
+command with the ALL bit set.
 
+The following 2 patches are preparatory block layer patches.
 
-[  337.526984] systemd-shutdown[1]: Not all DM devices detached, 1 left.
-[  337.526988] systemd-shutdown[1]: Cannot finalize remaining DM devices, continuing.
-[  337.531043] systemd-shutdown[1]: Successfully changed into root pivot.
-[  337.531046] systemd-shutdown[1]: Returning to initrd...
-[  337.533136] watchdog: watchdog0: watchdog did not stop!
-[  337.569177] dracut Warning: Killing all remaining processes
-[  337.706605] XFS (dm-0): Unmounting Filesystem
-[  351.593888] NMI watchdog: Watchdog detected hard LOCKUP on cpu 2
-[  351.593890] Modules linked in: dm_multipath rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace nfs_ssc fscache rfkill sunrpc intel_rapl_msr intel_rapl_common sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm mgag200 dcdbas iTCO_wdt irqbypass i2c_algo_bit iTCO_vendor_support rapl drm_kms_helper intel_cstate syscopyarea sysfillrect sysimgblt fb_sys_fops cec intel_uncore pcspkr ipmi_ssif mei_me mei lpc_ich ipmi_si ipmi_devintf ipmi_msghandler acpi_power_meter drm fuse ip_tables xfs libcrc32c sd_mod qla2xxx ahci libahci nvme_fc crct10dif_pclmul crc32_pclmul crc32c_intel nvme_fabrics libata ghash_clmulni_intel tg3 nvme_core megaraid_sas t10_pi scsi_transport_fc wmi dm_mirror dm_region_hash dm_log dm_mod
-[  351.593929] CPU: 2 PID: 95 Comm: kworker/2:1 Kdump: loaded Tainted: G               X --------- ---  5.12.0-1.el9.x86_64 #1
-[  351.593930] Hardware name: Dell Inc. PowerEdge R430/0HFG24, BIOS 1.6.2 01/08/2016
-[  351.593931] Workqueue: cgwb_release cgwb_release_workfn
-[  351.593932] RIP: 0010:rb_prev+0x18/0x50
-[  351.593933] Code: 31 c0 eb db 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 8b 17 48 39 d7 74 35 48 8b 47 10 48 85 c0 74 1c 49 89 c0 48 8b 40 08 <48> 85 c0 75 f4 4c 89 c0 c3 48 3b 78 10 75 f6 48 8b 10 48 89 c7 48
-[  351.593934] RSP: 0018:ffffb7280048fd70 EFLAGS: 00000086
-[  351.593935] RAX: ffff98bc30f448a0 RBX: ffff98bc10d1e150 RCX: 0000000000000014
-[  351.593936] RDX: 0000000000000001 RSI: ffff98bc00b39098 RDI: ffff98bc00b39098
-[  351.593937] RBP: ffff98bc00b39098 R08: ffff98bc30f448a0 R09: 0000000000000000
-[  351.593938] R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000000
-[  351.593939] R13: 0000000000000001 R14: ffff98bc10d1e110 R15: 0000000000000000
-[  351.593940] FS:  0000000000000000(0000) GS:ffff98c37fa80000(0000) knlGS:0000000000000000
-[  351.593941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  351.593941] CR2: 00007fffeeceaea0 CR3: 0000000105b40003 CR4: 00000000001706e0
-[  351.593942] Call Trace:
-[  351.593943]  bfq_idle_extract+0x98/0xb0
-[  351.593943]  __bfq_deactivate_entity+0x224/0x240
-[  351.593944]  bfq_pd_offline+0xaa/0xd0
-[  351.593945]  blkg_destroy+0x52/0xf0
-[  351.593945]  blkcg_destroy_blkgs+0x46/0xc0
-[  351.593946]  cgwb_release_workfn+0xbe/0x150
-[  351.593947]  process_one_work+0x1e6/0x380
-[  351.593947]  worker_thread+0x53/0x3d0
-[  351.593948]  ? process_one_work+0x380/0x380
-[  351.593949]  kthread+0x11b/0x140
-[  351.593949]  ? kthread_associate_blkcg+0xa0/0xa0
-[  351.593950]  ret_from_fork+0x22/0x30
-[  351.593950] Kernel panic - not syncing: Hard LOCKUP
+Patch 4 and 5 are 2 small fixes to DM core zoned block device support.
 
+Patch 6 reorganizes DM core code, moving conditionally defined zoned
+block device code into the new dm-zone.c file. This avoids sprinkly DM
+with zone related code defined under an #ifdef CONFIG_BLK_DEV_ZONED.
 
-Thanks,
-Ming
+Patch 7 improves DM zone report helper functions for target drivers.
+
+Patch 8 fixes a potential problem with BIO requeue on zoned target.
+
+Finally, patch 9 to 11 implement zone append emulation using regular
+writes for target drivers that cannot natively support this BIO type.
+The only target currently needing this emulation is dm-crypt. With this
+change, a zoned dm-crypt device behaves exactly like a regular zoned
+block device, correctly executing user zone append BIOs.
+
+This series passes the following tests:
+1) zonefs tests on top of dm-crypt with a zoned nullblk device
+2) zonefs tests on top of dm-crypt+dm-linear with an SMR HDD
+3) btrfs fstests on top of dm-crypt with zoned nullblk devices.
+
+Comments are as always welcome.
+
+Changes from v2:
+* Replace use of spinlock to protect the zone write pointer offset
+  array in patch 11 with READ_ONCE/WRITE_ONCE as suggested by Hannes.
+* Added reviewed-by tags
+
+Changes from v1:
+* Use Christoph proposed approach for patch 1 (split reset all
+  processing into different functions)
+* Changed helpers introduced in patch 2 to remove the request_queue
+  argument
+* Improve patch 3 commit message as suggested by Christoph (explaining
+  that the flag is a special case that cannot use a REQ_XXX flag)
+* Changed DMWARN() into DMDEBUG in patch 11 as suggested by Milan
+* Added reviewed-by tags
+
+Damien Le Moal (11):
+  block: improve handling of all zones reset operation
+  block: introduce bio zone helpers
+  block: introduce BIO_ZONE_WRITE_LOCKED bio flag
+  dm: Fix dm_accept_partial_bio()
+  dm: cleanup device_area_is_invalid()
+  dm: move zone related code to dm-zone.c
+  dm: Introduce dm_report_zones()
+  dm: Forbid requeue of writes to zones
+  dm: rearrange core declarations
+  dm: introduce zone append emulation
+  dm crypt: Fix zoned block device support
+
+ block/blk-zoned.c             | 117 ++++--
+ drivers/md/Makefile           |   4 +
+ drivers/md/dm-core.h          |  65 ++++
+ drivers/md/dm-crypt.c         |  31 +-
+ drivers/md/dm-flakey.c        |   7 +-
+ drivers/md/dm-linear.c        |   7 +-
+ drivers/md/dm-table.c         |  21 +-
+ drivers/md/dm-zone.c          | 654 ++++++++++++++++++++++++++++++++++
+ drivers/md/dm.c               | 202 +++--------
+ drivers/md/dm.h               |  30 +-
+ include/linux/blk_types.h     |   1 +
+ include/linux/blkdev.h        |  12 +
+ include/linux/device-mapper.h |   9 +-
+ 13 files changed, 953 insertions(+), 207 deletions(-)
+ create mode 100644 drivers/md/dm-zone.c
+
+-- 
+2.31.1
 
