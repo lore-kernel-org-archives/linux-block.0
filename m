@@ -2,190 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD6CC4707E
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 23:26:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61AA8C2B9F2
+	for <linux-block@archiver.kernel.org>; Sat, 22 May 2021 07:48:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D934613FE
-	for <linux-block@archiver.kernel.org>; Fri, 21 May 2021 23:26:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CD326120D
+	for <linux-block@archiver.kernel.org>; Sat, 22 May 2021 07:48:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbhEUX1a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 May 2021 19:27:30 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:58960 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230148AbhEUX1a (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 May 2021 19:27:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1621639566; x=1653175566;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=HXK/j+lEyP0rxWy+Z+L+PpxKIyIi90pkXNtC6nTx6kc=;
-  b=eeXr3HjxegAw0IxvuUeOJTYY+HWayKhrDbYBDXVbco7LDDF+yWIFTHmm
-   8eDl5wyRfhgeX5KzvAD5GmNYLlYviACRBZNRXFnToN3DJ0wOCjb+UfVvQ
-   4yxG6Z4b/QZEesoanPoDZo5MrMRmM95enQsIS0a09QSv8e5QeVKgz1Mqg
-   sNZFrs2Y5zGP4P0bdA8Y+ThUS255ZfskUQUi+E/54ND0dUWS+1F0j04Nv
-   PHUrE6KIY57URrI4fyKZCH1fDKIY9+Dr9iMb+RVokKGnGRB7K0y/CRQ5e
-   s2BhoBPxNT5WPstkx1cxt/x2lWAtJZRyOosZwlHxcrlpjd04yKOaoFjaV
-   w==;
-IronPort-SDR: tc3+yEoMYuPEhYkbJa6WiCiEV6q8+qmrqhGY+UthKogSVX31CgqcQ41nnroAsnmpGOxsoXE/zD
- +7+/jv495WpmpO648EYPgNaBxA6nI95V6UFm5BGxRNCkEN/JoTeiqoKoF0lIYYhKWawXO6JkXU
- Dps8jN4mKC8Y/fza+JyOubQ6rtPelX6mH/J93mtM9jg1kOEFNZ/wPTThjxQHHIePohqEwN344s
- tmZUh8iytaW42qqV87AScSGBqTtPMz4DEFfa6no7soXQMQCi53FjnOkZk/xcpAUrfkbVp9IC11
- 5Ig=
-X-IronPort-AV: E=Sophos;i="5.82,319,1613404800"; 
-   d="scan'208";a="169600412"
-Received: from mail-bn8nam11lp2169.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.169])
-  by ob1.hgst.iphmx.com with ESMTP; 22 May 2021 07:26:04 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gg0Wz2BBo1yBy9ji043ndsKb4O+N5155P/iec9fcHz2Kok7By/ko0Of0A8tPZMJmxLK9fiqtT35lopSEEiXKYn2Akc7SNdBrArzVt96qU0PaHoPJ9ikZ8Qqkxg9XYg7sopccaVdyBxCSiv1wC9KU1IyJgFSGYq+SOv7lh+QIphR/qIoHOLzOJJLTeIBIJ+5I+q/vLS+c45TentiyNktqcmQu5AeSeSFVXho3nKl48vvEwkhld+3dg4ub0kdaNk8xVvPDJKgMrPHLlzHlRfzsPUr3yjZJsHIgsNC9ghfX4lAWF608G9V5bXS9ZdG6UHN75X1HxD8A9wEWHhcBg1WW5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OWmcYfR6+PhP9X7fKJug2f/71oE/Bsbf6a1vYnCcfts=;
- b=kiWsyukEkA+KIg9EzqBhjaol2wRrOG8Ye/IcrMviOPLJXEdhoqlklXYDMxNLh+kB9BOaHx3h9e7mzuiz6TifqlgR3lxEjB1JNVRYumBiFkr6C5jNxW06AmXv8IAqy30WYuKUaNMCaDx/V840STqfR+ddJjAGUzMdgzpZuXVQxsar6m2IBA3vYh+Hic2hKqHwINJOnf1nJsYZvBVyA4f1G4RVYCeO327xEvoZY+44miCCNWsod13jcVqOrebparD5qCZ/8Fha8JAjtWxCPKFnzjhJPt1eC8WMXw8zx39M0yJbALOPfM4pIvnGBaXKQyt8WU1pQsbb3x363b6QJoGFzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OWmcYfR6+PhP9X7fKJug2f/71oE/Bsbf6a1vYnCcfts=;
- b=xYmOOQLeIK9VBu4VA4EFUa/VpSS/hiz4UY5X3+v7OUrfgX1yOh5zRS2Njppslh0vv4MlKFAaaoa6E6vQio/VeQmH8vPRKmNFYGEdi9IxeEPAR6tTgIeLfTgfeW0xVk1A5phGYQ6PhETa+2MJXcMjXjV1QReXCmDn3jNSUof6TJE=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (52.135.233.89) by
- BY5PR04MB6551.namprd04.prod.outlook.com (10.255.68.76) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4129.26; Fri, 21 May 2021 23:25:58 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0%7]) with mapi id 15.20.4150.023; Fri, 21 May 2021
- 23:25:58 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Omar Sandoval <osandov@osandov.com>
-CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "mb@lightnvm.io" <mb@lightnvm.io>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "clm@fb.com" <clm@fb.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "dsterba@suse.com" <dsterba@suse.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
-        "hch@lst.de" <hch@lst.de>
-Subject: Re: [RFC PATCH 0/8] block: fix bio_add_XXX_page() return type
-Thread-Topic: [RFC PATCH 0/8] block: fix bio_add_XXX_page() return type
-Thread-Index: AQHXTUCZbkdV5W8mbU+6O2TFfy2HFA==
-Date:   Fri, 21 May 2021 23:25:58 +0000
-Message-ID: <BYAPR04MB4965118B90DE39ADA629865B86299@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210520062255.4908-1-chaitanya.kulkarni@wdc.com>
- <PH0PR04MB74169D71E3DCB347DFCBFCB59B299@PH0PR04MB7416.namprd04.prod.outlook.com>
- <BYAPR04MB496577D8AC414B1FFD44722486299@BYAPR04MB4965.namprd04.prod.outlook.com>
- <YKg2J5n3oY9RpgVb@relinquished.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: osandov.com; dkim=none (message not signed)
- header.d=none;osandov.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 63bb9dcd-83c8-44cc-2911-08d91cafca1e
-x-ms-traffictypediagnostic: BY5PR04MB6551:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR04MB655143C3924BCEB03325F45486299@BY5PR04MB6551.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: B9gapiL9Rhe4cCdaHNh8eApkQOmBXssSXbCeCKmZyWeh3ixSXLwfH7nC13VjsDv8kSY0edadPdsYg7gZhcs7j16MHRUxr14pQv8KauQ0rV2qaYFL9zQNTC9lldPGLfPmWwkpvfU2SLIVfRaa8ERQ9l4/7ASY6i0qrot0BHbhjbMkeZYEXoj2i7gCjSmjHCs6xjrnoEyfQvdOCK96F8AkgF1luyHH+DPZotxICXQwMB7rav7El5IHRgOnBnkRo/yFMK7dAQN/Ma1UnXVhMwkEBDQ3Gtzxi/ISVp19vfrNoVoZKG6orDUtz7bH1JSJqmqRCcZpbVvaswV0bw/OlsSA4TsGhBBJlOTchCnDQi0BPxKFCdEw9hrfWLp3tCAX3tlymrcSNTuyKsPweUi7nhzOXJ4Dy4xFYhZdGER0HB+OR/atZFMhlyh7tjAyz78Wb/hAZwDyWiRIj597tfFtP8ZP198Wq5m95owQNsRKt1cNYTM1So0BN+I0EGWR8gxUHUAQv9bP7cfrf4YVOo+2JKSNl9bpyNwVkUqibRCjDcZqRKqVwZV4ga39b8Z64blpcxS0e4Gh5c5cwDkVOp4ucbTNBv3ROIllNMfV4JFqvc5MnKI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(39860400002)(376002)(366004)(136003)(26005)(54906003)(2906002)(6506007)(53546011)(66476007)(66446008)(8676002)(6916009)(52536014)(66556008)(86362001)(4326008)(9686003)(66946007)(55016002)(38100700002)(76116006)(122000001)(186003)(64756008)(5660300002)(316002)(7696005)(8936002)(7416002)(478600001)(33656002)(71200400001)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?cKrcGjEQcrcAEB3eJozTYXdssuWne8IUL/gMEdNpypeZqlUSHTv4HPquyzIO?=
- =?us-ascii?Q?GNNBHVeodPVVSZTww+0/3G331F4sdT8tFba6cqPxjRiDqdvMfB24OH0lE+58?=
- =?us-ascii?Q?wNBRVKOhyN36iBR5o6VR8WVCfw9H/aNrsfkURwnfj1qdy/Qvb6oFjgo/QDuS?=
- =?us-ascii?Q?8sELnuwmv4WLIeXYY72J9nD7TxgnU9fr308JsP7GdysLAwpmziG0voo2/iBC?=
- =?us-ascii?Q?5hTvzaDrE+SKzt2fmPHjKyaZDBkHf+RxknBg3BVgjUCT9MqTmnOJbN+NSwZp?=
- =?us-ascii?Q?J8eUxEAgo979O23wLvIVv3pwAsLm6zqV1F92H5nxlYkBBtnWNY1MW8aaztlB?=
- =?us-ascii?Q?5bQPxnXahaDX/NGk5gRxzTJevJGSi7niFwebD1zmZ35VcEIcutdZOOB85JNi?=
- =?us-ascii?Q?6Jpf+JDIB6aZVjRV9/1WK7zwhn9LZ85cRCPtj1kA6hS8IKqP/ysSVL41Ev2h?=
- =?us-ascii?Q?wpmyIF9ktBgIAeNZ360raAXbBl3HG5aEZShXxAWtfpyteDD8QQkUrRHaNb50?=
- =?us-ascii?Q?FTIcjqIWkwBMhi4RknaEMCR9qMg71tyQ5fKcf7OwEKAiI+o/tus63Klnlx2A?=
- =?us-ascii?Q?oXHXYe3GupF823fFZKHEIySvnQRDEUK2ceEp6agN56wIjxVILhyAiD1fiT3/?=
- =?us-ascii?Q?n1XX2fy789z0n6M5mXfyKbwemhk0SYxZ4YiOuXqPl6/cvkiIDHAHbfIfYbZU?=
- =?us-ascii?Q?4ubazncLh7iOTfdlO+2NYVCVvEGy5QjEI+F9a4U1UH2h2+tq/wzUqJmQ9zwH?=
- =?us-ascii?Q?qq9351gFbFTc4DkVGxLQKcWPgvUBFqlFy3Od0IEHYNkIovivRY8741/v6J4D?=
- =?us-ascii?Q?f0SuItDzG2zW1WDyYTUGO6SZlRfG0TluK5B/lQUWN1oMElFYPsHJ0ndUdf2J?=
- =?us-ascii?Q?Yvnu4vLC3iQfWprGR5eyCOoUWfKX7q6wBrrCNZYN65AU+eQMUs34s2R/LewX?=
- =?us-ascii?Q?KEUer7/8DiIhheTiEICV5Dm95aOC3hh/X2jYgZBW9z37ftJmfitGWP1+LVU6?=
- =?us-ascii?Q?DbXS7Ez24qkFQvP25tiHg1PhpmZNC7Ba6wRFbqfvOZlkIcZgbqz6vYSKakC7?=
- =?us-ascii?Q?IqTGjirjmN7EuvBfoZISHfpdeeIjdXYE59jwhvsJSl1GF3xDmlHLZ7uuA62L?=
- =?us-ascii?Q?3DgjEYth5SLbzXuo7IJhpgZf8g3EC9BWRXeHbeVHn52Q9UhDRvjmifGwal3Z?=
- =?us-ascii?Q?RokFpLw0lNYuFa5FQFs6qFI4+gcSs85If+88sB2fIR/1wgXG1WrW2aJQqrcD?=
- =?us-ascii?Q?f4k71VSt/S4SsaXq+UuzD5huwkRTh9bUGFLyiK9DGrj8vrFpNWwZ/LGbJeST?=
- =?us-ascii?Q?P2MyQxNW8JL4CNjjORpln3Ng?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S230028AbhEVHuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 May 2021 03:50:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34626 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229990AbhEVHuC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 May 2021 03:50:02 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 28F3B611ED;
+        Sat, 22 May 2021 07:48:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1621669716;
+        bh=ItPVf32V/JWLFVBmSIyXUA7rG+RBAb+2CJPBKMiVZxs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=iEm6eeg5BkcM1lgPpCd68Ryv1MiH0N6mNy45DPSn+JHHkXJi3DZLeWvF5zXAWrmaU
+         zpsF5frtYhW31/tAODKZrIMx7oLj4raJwSlhIhYX/AnyF03n6R8XvQcgVnjvnRYEKD
+         Ya1EmiP88mP8eDKMv4Nlt25L/1kXpPFFCcajRaPo=
+Date:   Sat, 22 May 2021 09:48:34 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Minchan Kim <minchan@kernel.org>, Hannes Reinecke <hare@suse.de>,
+        Douglas Gilbert <dgilbert@interlog.com>, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
+        mbenes@suse.com, jpoimboe@redhat.com, tglx@linutronix.de,
+        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
+        peterz@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] zram: fix few sysfs races
+Message-ID: <YKi3UpQm0HUxJi87@kroah.com>
+References: <20210423011108.11988-1-mcgrof@kernel.org>
+ <YKVwZVcbZBNXUpKm@google.com>
+ <20210519202023.GU4332@42.do-not-panic.com>
+ <YKgRsCzwp2O2mYcp@kroah.com>
+ <20210521201618.GX4332@42.do-not-panic.com>
+ <YKgbzO0AkYN4J7Ye@kroah.com>
+ <20210521210817.GY4332@42.do-not-panic.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63bb9dcd-83c8-44cc-2911-08d91cafca1e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 May 2021 23:25:58.4345
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EoVKgs+yQRQFLHKAWuQX1DWVjzrS2LWwrS7KHf4mVTP4OnhHphEmvDlhpQgF2fBctBU9Q22u/zrlZraZYcPUCvvT5N2IOGTUmnz7d12KdxM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6551
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210521210817.GY4332@42.do-not-panic.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/21/21 15:37, Omar Sandoval wrote:=0A=
-> On Fri, May 21, 2021 at 09:37:43PM +0000, Chaitanya Kulkarni wrote:=0A=
->> On 5/21/21 03:25, Johannes Thumshirn wrote:=0A=
->>> I couldn't spot any errors, but I'm not sure it's worth the effort.=0A=
->>>=0A=
->>> If Jens decides to take it:=0A=
->>> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
->>>=0A=
->> It does create confusion on the code level which can result in=0A=
->> invalid error checks.=0A=
-> Do you have any examples of bugs caused by this confusion (whether they=
-=0A=
-> were fixed in the past, currently exist, or were caught in code review)?=
-=0A=
-> That would be good justification for doing this.=0A=
->=0A=
-=0A=
-Yes, while implementing the ZBD over NVMeOF I accidentally ended up checkin=
-g=0A=
-the error value < 0 based on the function following declaration :-=0A=
-=0A=
-  1 F   f    bio_add_zone_append_page  block/bio.c=0A=
-  int bio_add_zone_append_page(struct bio *bio, struct page *page,=0A=
-=0A=
-I did fix it later when doing the next code review myself, maybe that is=0A=
-just=0A=
-me :P.=0A=
-=0A=
-Also, new functions inherit the same style such as=0A=
-bio_add_zone_append_page() from bio_add_page() and bio_add_pc_page() we=0A=
-can prevent that.=0A=
-=0A=
-What you do you think about the approach suggested by Matthew  size_t ?=0A=
-=0A=
-=0A=
-If it is too much trouble we can drop it.=0A=
-=0A=
-=0A=
+On Fri, May 21, 2021 at 09:08:17PM +0000, Luis Chamberlain wrote:
+> On Fri, May 21, 2021 at 10:45:00PM +0200, Greg Kroah-Hartman wrote:
+> > On Fri, May 21, 2021 at 08:16:18PM +0000, Luis Chamberlain wrote:
+> > > On Fri, May 21, 2021 at 10:01:52PM +0200, Greg Kroah-Hartman wrote:
+> > > > On Wed, May 19, 2021 at 08:20:23PM +0000, Luis Chamberlain wrote:
+> > > > > Greg,
+> > > > > 
+> > > > > your feedback would be appreciated here.
+> > > > 
+> > > > Appreciated where?  This is a zram patchset, what do I need to mess with
+> > > > it for?
+> > > 
+> > > This patchset has 2 issues which I noted in the last series that are
+> > > generic, and could best be dealt with on sysfs, and suggested
+> > > how this could actually be dealt with on sysfs / kernfs.
+> > > 
+> > > > > Greg, can you comment on technical levels why a general core fix is not
+> > > > > desirable upstream for those two issues?
+> > > > 
+> > > > What issues exactly?
+> > > 
+> > > When I suggested the generic way to fix this your main argument against
+> > > a generic solution was that we don't support module removal. Given that
+> > > argument did not seem to hold any water it begs the question if you
+> > > still would rather not see this fixed in sysfs / kernfs.
+> > > 
+> > > If you however are more open to it now, I can instead take that work, and
+> > > send a proper patch for review.
+> > 
+> > I looked at the last patch here and I really do not see the issue.
+> > 
+> > In order for the module to be removed, zram_exit() has to return, right?
+> 
+> Yes, but the race is for when a module removal is ongoing, in other
+> words, it has not yet completed, and at the same time we race touching
+> sysfs files.
+> 
+> > So how can a show/store function in zram_drv.c be called after
+> > destroy_devices() returns?
+> 
+> The issue can come up if we have something poke at the sysfs files *while* a
+> removal is happening.
+
+And have you seen this in the real world?  I keep asking this as module
+removal is not an automated process so what triggers this?
+
+> > The changelog text in patch 4/4 is odd, destroy_devices() shouldn't be
+> > racing with anything as devices have reference counts in order to
+> > protect this type of thing from happening, right?
+> 
+> The race is beyond the scope of the driver in that the sysfs file can be
+> poked at while a removal is ongoing. After that consider the possible
+> races that can happen.
+> 
+> > How can a store
+> > function be called when a device is somehow removed from memory at the
+> > same time?  Don't we properly incremement/decrement the device
+> > structure's reference count?  If not, wouldn't that be the simplest
+> > solution here?
+> 
+> In this case the proper refcounting has to be down on the type of
+> device, and so bdgrab(dev_to_bdev(dev)), because otherwise the pointer
+> for the zram device is just not valid, so we can't do sanity checks
+> on the sysfs calls for the zram device as the pointer can be invalid.
+> To validate the pointer we must do refcounting below a layer. In this
+> case for a disk.
+> 
+> And so genericaly this would be:
+> 
+> diff --git a/drivers/base/core.c b/drivers/base/core.c
+> index 4a8bf8cda52b..7c897e3f4135 100644
+> --- a/drivers/base/core.c
+> +++ b/drivers/base/core.c
+> @@ -29,6 +29,7 @@
+>  #include <linux/sched/mm.h>
+>  #include <linux/sysfs.h>
+>  #include <linux/dma-map-ops.h> /* for dma_default_coherent */
+> +#include <linux/blkdev.h>
+>  
+>  #include "base.h"
+>  #include "power/power.h"
+> @@ -1988,11 +1989,20 @@ static inline int device_is_not_partition(struct device *dev)
+>  {
+>  	return !(dev->type == &part_type);
+>  }
+> +static inline bool device_is_disk(struct device *dev)
+> +{
+> +	return (dev->type == &disk_type);
+> +}
+>  #else
+>  static inline int device_is_not_partition(struct device *dev)
+>  {
+>  	return 1;
+>  }
+> +
+> +static inline bool device_is_disk(struct device *dev)
+> +{
+> +	return false;
+> +}
+>  #endif
+>  
+>  static int
+> @@ -2037,6 +2047,19 @@ const char *dev_driver_string(const struct device *dev)
+>  }
+>  EXPORT_SYMBOL(dev_driver_string);
+>  
+> +static int dev_type_get(struct device *dev)
+> +{
+> +	if (device_is_disk(dev))
+> +		return !!bdgrab(dev_to_bdev(dev));
+> +	return 1;
+> +}
+
+Why do you feel that block devices are somehow more "special" here?
+
+They are not, either this is "broken" for everyone, or it works for
+everyone, don't special-case one tiny class of devices for unknown
+reasons.
+
+Your change causes another problem, if a sysfs file has show/store
+happening, the reference count will always be bumped and so the module
+would NOT be able to be freed.  That looks like a lovely DoS that any
+user could cause, right?
+
+In sleeping on this the "correct" solution is to grab the bus lock (or
+ktype lock) for the device during show/store so that the "delete device"
+process can not race with it.  Also let's make sure that the kref of the
+kobject is being properly bumped during show/store as well, I don't
+think that's happening which isn't a good thing no matter what
+(different type of bug).
+
+If that lock addition ends up showing up in benchmarks, then we can
+always move it to rcu.
+
+So in conclusion, the "correct" thing here seems to be two independant
+things:
+	- make sure the reference count of the kobject is properly
+	  incremented during show/store callbacks
+	- grab the kobject's type/bus/whatever lock during show/store so
+	  that it can not race with deleting the device.
+
+No bus/type should be special cased here, block devices are not special
+by any means.
+
+And don't mess with module reference counts, that way lies madness.  We
+want to lock data, not code :)
+
+thanks,
+
+greg k-h
