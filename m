@@ -2,94 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CADC2B9F7
-	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 11:35:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 414CDC2B9F8
+	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 13:24:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D23B610FA
-	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 11:35:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EEE7613AD
+	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 13:24:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232667AbhEXLhK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 May 2021 07:37:10 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5755 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232070AbhEXLhJ (ORCPT
+        id S232409AbhEXN0T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 May 2021 09:26:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31842 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232483AbhEXN0T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 May 2021 07:37:09 -0400
-Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FpZn14ldCzmkgb;
-        Mon, 24 May 2021 19:32:05 +0800 (CST)
-Received: from dggpemm500009.china.huawei.com (7.185.36.225) by
- dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 24 May 2021 19:35:40 +0800
-Received: from huawei.com (10.175.113.32) by dggpemm500009.china.huawei.com
- (7.185.36.225) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Mon, 24 May
- 2021 19:35:40 +0800
-From:   Liu Shixin <liushixin2@huawei.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Liu Shixin <liushixin2@huawei.com>
-Subject: [PATCH -next] block: Replaced simple_strtol() with kstrtoint()/kstrtoul()
-Date:   Mon, 24 May 2021 20:08:33 +0800
-Message-ID: <20210524120833.1580295-1-liushixin2@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
+        Mon, 24 May 2021 09:26:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621862691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4XLlEUkhiAcP2K4ZB+J18mgQ/icUCahgsIUqJqs8aT8=;
+        b=SqvncyvCWhYb4xJAaDTu1poG8C0Pr7ODLSo3VVdjssvqhwXtjZ7H5WGKH28NQvKast9RDr
+        qTZvS4tEn9KLDV/YnyngMOlW5ErsapYnKxXb17vU46p1CFlBrsuVGfH9sZmjihXzBqcLLc
+        yp4NWPpaPoFsDWscHurCn5rR10JGwLw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-jomfIlbHN1CH-3P2nYiTDA-1; Mon, 24 May 2021 09:24:46 -0400
+X-MC-Unique: jomfIlbHN1CH-3P2nYiTDA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B747B100A241;
+        Mon, 24 May 2021 13:24:44 +0000 (UTC)
+Received: from localhost (ovpn-113-244.ams2.redhat.com [10.36.113.244])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D599E50233;
+        Mon, 24 May 2021 13:24:38 +0000 (UTC)
+Date:   Mon, 24 May 2021 14:24:37 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+        pbonzini@redhat.com, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, joe.jin@oracle.com,
+        junxiao.bi@oracle.com, srinivas.eeda@oracle.com
+Subject: Re: [RFC] virtio_scsi: to poll and kick the virtqueue in timeout
+ handler
+Message-ID: <YKupFeOtc6Pr5KS2@stefanha-x1.localdomain>
+References: <20210523063843.1177-1-dongli.zhang@oracle.com>
+ <ac161748-15d2-2962-402e-23abca469623@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.113.32]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500009.china.huawei.com (7.185.36.225)
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="S/KzmU9AGl0WrRAq"
+Content-Disposition: inline
+In-Reply-To: <ac161748-15d2-2962-402e-23abca469623@suse.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The simple_strtol() function is deprecated in some situation since
-it does not check for the range overflow. Use kstrtoint()/kstrtoul()
-instead.
-Attention, if the end of the input string isn't '\n', simple_strtol() will
-ignore following characters and return the value but kstrtoint()/kstrtoul()
-will return an error code.
 
-Signed-off-by: Liu Shixin <liushixin2@huawei.com>
----
- drivers/block/brd.c  | 3 +--
- drivers/block/loop.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+--S/KzmU9AGl0WrRAq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 7562cf30b14e..5b43f6b2d506 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -358,8 +358,7 @@ MODULE_ALIAS("rd");
- /* Legacy boot options - nonmodular */
- static int __init ramdisk_size(char *str)
- {
--	rd_size = simple_strtol(str, NULL, 0);
--	return 1;
-+	return !kstrtoul(str, 0, &rd_size);
- }
- __setup("ramdisk_size=", ramdisk_size);
- #endif
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d58d68f3c7cd..9fe595afa9cf 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2415,8 +2415,7 @@ module_exit(loop_exit);
- #ifndef MODULE
- static int __init max_loop_setup(char *str)
- {
--	max_loop = simple_strtol(str, NULL, 0);
--	return 1;
-+	return !kstrtoint(str, 0, &max_loop);
- }
- 
- __setup("max_loop=", max_loop_setup);
--- 
-2.18.0.huawei.25
+On Sun, May 23, 2021 at 09:39:51AM +0200, Hannes Reinecke wrote:
+> On 5/23/21 8:38 AM, Dongli Zhang wrote:
+> > This RFC is to trigger the discussion about to poll and kick the
+> > virtqueue on purpose in virtio-scsi timeout handler.
+> >=20
+> > The virtio-scsi relies on the virtio vring shared between VM and host.
+> > The VM side produces requests to vring and kicks the virtqueue, while t=
+he
+> > host side produces responses to vring and interrupts the VM side.
+> >=20
+> > By default the virtio-scsi handler depends on the host timeout handler
+> > by BLK_EH_RESET_TIMER to give host a chance to perform EH.
+> >=20
+> > However, this is not helpful for the case that the responses are availa=
+ble
+> > on vring but the notification from host to VM is lost.
+> >=20
+> How can this happen?
+> If responses are lost the communication between VM and host is broken, and
+> we should rather reset the virtio rings themselves.
+
+I agree. In principle it's fine to poll the virtqueue at any time, but I
+don't understand the failure scenario here. It's not clear to me why the
+device-to-driver vq notification could be lost.
+
+Stefan
+
+--S/KzmU9AGl0WrRAq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmCrqRUACgkQnKSrs4Gr
+c8ja+gf9GSHdRkmM60mxLZ82ONQ0mRq3/yKUUtqLg3POUVan4p1AT+T6YazetRxA
+1ux2OmVeDXzAfe9mawQXQLZ5ArlNGYGR+hfi30ECCfXGMkmdhJN42JO57bzYhyfM
+ezn5v4l8Dk6d6sdTwQbqaj0KJ8MGS3OqZ4Sd/zanTVlOEi3fuiY0NRYRRQG8xWkr
+TFB8ZqPqQvFfdtrjZQHufl9GaZr/pn3xP3bKNXwKWTGCO4zUsgNzddvjGjcAsDh8
+a9dX8ujl+N2xQYcp/EpWbeg3H8S/kyMv2834ZHaBH9FEG2K/Z25HfXTzInOSZiRs
+vyysHy57N24AFAeVx11lAKTqkkvxcQ==
+=8nHX
+-----END PGP SIGNATURE-----
+
+--S/KzmU9AGl0WrRAq--
 
