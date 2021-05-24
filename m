@@ -2,99 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF33C47080
-	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 04:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475A6C47084
+	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 07:20:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C987661185
-	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 04:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1784C61151
+	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 07:20:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbhEXEkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 May 2021 00:40:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42550 "EHLO mail.kernel.org"
+        id S232300AbhEXHVq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 May 2021 03:21:46 -0400
+Received: from verein.lst.de ([213.95.11.211]:53368 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229530AbhEXEkP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 May 2021 00:40:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 42A0C611CB;
-        Mon, 24 May 2021 04:38:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621831128;
-        bh=/zWIZI3ezQM1Dl4LaC/TzYoxUOHy+syxhazkSgtgJF8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ZF+LOPrAnrLDCgopnhj0LMIECYdOElH0IDNpJlvbFHj6aiityQiaI00NlsEpt1/2a
-         79UTpUQy8n/KISa8tNXX7Z9hlmGyiJDx6r9Ls590oI5MkXKEaRJ9TCnrI+LaFdztIV
-         VLF9u6zrYC3LxtM97eFLx9raX7CIkxWVdn5frXF9tijAwOG8MJrqwSugNS6DlUgeqE
-         Frwwcw2XGYFSn7nfS1GVUaWNsqVYMcu42ZfhS/m3y+gl6EC+97s8YT8G2xz2vXI+aP
-         DMw5P/fAxj3cXfqwpoMdWA5L7Ke4glGGrS3L+ISGfqFiapOX960FAu7CJlpOs/wiqT
-         uOXDbj4/F1DyQ==
-Received: by mail-lf1-f52.google.com with SMTP id v8so33788601lft.8;
-        Sun, 23 May 2021 21:38:48 -0700 (PDT)
-X-Gm-Message-State: AOAM533UWLDHfxCWHohCOsLQFfTLj7w4SzEfG7a4WqvUO+j1p0MVaZrC
-        SyDbaAi6p7KJYHTAbPFuTFmw3hw0BMUG5GkGSno=
-X-Google-Smtp-Source: ABdhPJyLNqdxUBHx9zXjZwtz6wj73jwvOrpWkNHgy6aHajFit9H2vAMzKEAIrUmX5a4lvwXpEwG07ltEmWpq5qCYwYE=
-X-Received: by 2002:a19:6a10:: with SMTP id u16mr9425700lfu.281.1621831126540;
- Sun, 23 May 2021 21:38:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210519062215.4111256-1-hch@lst.de> <1102825331.165797.1621422078235@ox.hosteurope.de>
-In-Reply-To: <1102825331.165797.1621422078235@ox.hosteurope.de>
-From:   Song Liu <song@kernel.org>
-Date:   Sun, 23 May 2021 21:38:35 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW7W7NfBTHY3A87py1No=FOPZgxMP4Ms43Re3uRnT0JzkQ@mail.gmail.com>
-Message-ID: <CAPhsuW7W7NfBTHY3A87py1No=FOPZgxMP4Ms43Re3uRnT0JzkQ@mail.gmail.com>
-Subject: Re: [PATCH] md/raid5: remove an incorect assert in in_chunk_boundary
-To:     wp1083705-spam02 wp1083705-spam02 <spam02@dazinger.net>
+        id S232128AbhEXHVq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 May 2021 03:21:46 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id A686B67373; Mon, 24 May 2021 09:20:13 +0200 (CEST)
+Date:   Mon, 24 May 2021 09:20:13 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Luis Chamberlain <mcgrof@kernel.org>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jim Paris <jim@jtan.com>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Matias Bjorling <mb@lightnvm.io>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-xtensa@linux-xtensa.org, linux-m68k@vger.kernel.org,
+        linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-s390@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        drbd-dev@tron.linbit.com, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [dm-devel] [PATCH 01/26] block: refactor device number setup
+ in __device_add_disk
+Message-ID: <20210524072013.GA23890@lst.de>
+References: <20210521055116.1053587-1-hch@lst.de> <20210521055116.1053587-2-hch@lst.de> <20210521171646.GA25017@42.do-not-panic.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210521171646.GA25017@42.do-not-panic.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 19, 2021 at 4:36 AM wp1083705-spam02 wp1083705-spam02
-<spam02@dazinger.net> wrote:
->
->
-> > Christoph Hellwig <hch@lst.de> hat am 19.05.2021 08:22 geschrieben:
-> >
-> >
-> > Now that the original bdev is stored in the bio this assert is incorrect
-> > and will trigge for any partitioned raid5 device.
-> >
-> > Reported-by:  Florian D. <spam02@dazinger.net>
-> > Fixes: 309dca309fc3 ("block: store a block_device pointer in struct bio"),
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  drivers/md/raid5.c | 2 --
-> >  1 file changed, 2 deletions(-)
-> >
-> > diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> > index 841e1c1aa5e6..7d4ff8a5c55e 100644
-> > --- a/drivers/md/raid5.c
-> > +++ b/drivers/md/raid5.c
-> > @@ -5311,8 +5311,6 @@ static int in_chunk_boundary(struct mddev *mddev, struct bio *bio)
-> >       unsigned int chunk_sectors;
-> >       unsigned int bio_sectors = bio_sectors(bio);
-> >
-> > -     WARN_ON_ONCE(bio->bi_bdev->bd_partno);
+On Fri, May 21, 2021 at 05:16:46PM +0000, Luis Chamberlain wrote:
+> > -	/* in consecutive minor range? */
+> > -	if (bdev->bd_partno < disk->minors) {
+> > -		*devt = MKDEV(disk->major, disk->first_minor + bdev->bd_partno);
+> > -		return 0;
+> > -	}
 > > -
-> >       chunk_sectors = min(conf->chunk_sectors, conf->prev_chunk_sectors);
-> >       return  chunk_sectors >=
-> >               ((sector & (chunk_sectors - 1)) + bio_sectors);
-> > --
-> > 2.30.2
->
-> yes, this solves it, I can confirm with this patch the error/warning message when booting linux-5.12 is gone!
+> 
+> It is not obviously clear to me, why this was part of add_disk()
+> path, and ...
+> 
+> > diff --git a/block/partitions/core.c b/block/partitions/core.c
+> > index dc60ecf46fe6..504297bdc8bf 100644
+> > --- a/block/partitions/core.c
+> > +++ b/block/partitions/core.c
+> > @@ -379,9 +380,15 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+> >  	pdev->type = &part_type;
+> >  	pdev->parent = ddev;
+> >  
+> > -	err = blk_alloc_devt(bdev, &devt);
+> > -	if (err)
+> > -		goto out_put;
+> > +	/* in consecutive minor range? */
+> > +	if (bdev->bd_partno < disk->minors) {
+> > +		devt = MKDEV(disk->major, disk->first_minor + bdev->bd_partno);
+> > +	} else {
+> > +		err = blk_alloc_ext_minor();
+> > +		if (err < 0)
+> > +			goto out_put;
+> > +		devt = MKDEV(BLOCK_EXT_MAJOR, err);
+> > +	}
+> >  	pdev->devt = devt;
+> >  
+> >  	/* delay uevent until 'holders' subdir is created */
+> 
+> ... and why we only add this here now.
 
-Applied to md-fixes. Thanks all.
-
-@ Florian, would you like to update the Reported-by tag (with your
-full name and/or
-different email)?
-
-Thanks,
-Song
+For the genhd minors == 0 (aka GENHD_FL_EXT_DEVT) implies having to
+allocate a dynamic dev_t, so it can be folded into another conditional.
