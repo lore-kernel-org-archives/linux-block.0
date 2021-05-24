@@ -2,115 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641DAC47085
-	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 08:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 974DDC47085
+	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 10:05:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49E29610A2
-	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 08:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C6EB61028
+	for <linux-block@archiver.kernel.org>; Mon, 24 May 2021 10:05:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232279AbhEXI2r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 May 2021 04:28:47 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43162 "EHLO mx2.suse.de"
+        id S232433AbhEXKGr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 May 2021 06:06:47 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43836 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232311AbhEXI2r (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 May 2021 04:28:47 -0400
+        id S232494AbhEXKGl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 May 2021 06:06:41 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1621844838; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q1F35rBDncf+ODcVO5jTKQ+c6J+Bpaijj4tb+WLiO1U=;
-        b=hWbnJCzrn8D8sq7QiamSboM/nv6TN+2iWleusnloao35oVE4OyeDX0eKAMzya8OGGThQFh
-        zl1nxRchNuFxstuajSgFtmryku8O1hRGBIRcM0SbrM2Dt3hLAz/KodIIf9vgrdWDs21AJk
-        09tFtAADDGOyfSpK1oh2IZudvgHfbuQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1621844838;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1621850663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=AEA9FbjKUlmrCtCSHfAW6FbjDjJhiccWRjC1Jfn0xW0=;
+        b=t2heHzJC7hTQODgw8j6Q5GhZ7AKYSVnFMlRQBa2MkJt1LmFRXg1tHUp1C0iDiq9ICr54oc
+        IyAcB8qes0OdUIqdripfw/vARAzZTkuWYiZHaaXj/LXEB6tAD5RYNsNRhZUO+pQSL2Cees
+        4u20eLAqxdGt9nN4TEwXmMRrbU9r5wI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1621850663;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q1F35rBDncf+ODcVO5jTKQ+c6J+Bpaijj4tb+WLiO1U=;
-        b=/Ey/RBTrd/apAViE3Xd9DP0Lfre1LBpPPlJZl5IzG70TmMypTfoLUolyItvUQoIO9R6YkJ
-        B6psOuCyZCUW50Cw==
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=AEA9FbjKUlmrCtCSHfAW6FbjDjJhiccWRjC1Jfn0xW0=;
+        b=GNY2YlA7eRHGdlCf8Tsku18JBItwWqiY4AiKZesFOtAKPg66SJY/T7Czmaw+0yGlkG9xUO
+        7bDTzdFHtVuOfkAQ==
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id CBD6EAB6D;
-        Mon, 24 May 2021 08:27:17 +0000 (UTC)
-Subject: Re: [PATCH 14/26] md: convert to blk_alloc_disk/blk_cleanup_disk
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jim Paris <jim@jtan.com>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Matias Bjorling <mb@lightnvm.io>, Coly Li <colyli@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-m68k@lists.linux-m68k.org, linux-xtensa@linux-xtensa.org,
-        drbd-dev@lists.linbit.com, linuxppc-dev@lists.ozlabs.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mmc@vger.kernel.org, nvdimm@lists.linux.dev,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
-References: <20210521055116.1053587-1-hch@lst.de>
- <20210521055116.1053587-15-hch@lst.de>
- <e65de9e6-337c-3e41-b5c2-d033ff236582@suse.de>
- <20210524072642.GF23890@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <1360c598-44a9-e0c5-dd81-695cb1ec8ccf@suse.de>
-Date:   Mon, 24 May 2021 10:27:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        by mx2.suse.de (Postfix) with ESMTP id 95A8DAB6D;
+        Mon, 24 May 2021 10:04:23 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 71BAA1F2CA2; Mon, 24 May 2021 12:04:23 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>, Khazhy Kumykov <khazhy@google.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 0/2 v2] block: Fix deadlock when merging requests with BFQ
+Date:   Mon, 24 May 2021 12:04:14 +0200
+Message-Id: <20210524100416.3578-1-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20210524072642.GF23890@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/24/21 9:26 AM, Christoph Hellwig wrote:
-> On Sun, May 23, 2021 at 10:12:49AM +0200, Hannes Reinecke wrote:
->>> +	blk_set_stacking_limits(&mddev->queue->limits);
->>>    	blk_queue_write_cache(mddev->queue, true, true);
->>>    	/* Allow extended partitions.  This makes the
->>>    	 * 'mdp' device redundant, but we can't really
->>>
->> Wouldn't it make sense to introduce a helper 'blk_queue_from_disk()' or
->> somesuch to avoid having to keep an explicit 'queue' pointer?
-> 
-> My rought plan is that a few series from now bio based drivers will
-> never directly deal with the request_queue at all.
-> 
-Go for it.
+Hello,
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+This patch series fixes a lockdep complaint and a possible deadlock that
+can happen when blk_mq_sched_try_insert_merge() merges and frees a request.
 
-Cheers,
+Changes since v1:
+* Remove patch disabling recursing request merging during request insertion
+* Modified BFQ to cleanup merged request already in its .merge_requests handler
+* Added code to handle multiple requests that need freeing after being merged
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+								Honza
