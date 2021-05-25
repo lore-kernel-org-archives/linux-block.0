@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21579C2B9F8
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 02:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDBCFC2B9F7
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 02:25:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E40FA6141E
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 02:25:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3DFA6141F
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 02:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbhEYC1K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 May 2021 22:27:10 -0400
+        id S230100AbhEYC1M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 May 2021 22:27:12 -0400
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:34067 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230074AbhEYC1K (ORCPT
+        with ESMTP id S230074AbhEYC1L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 May 2021 22:27:10 -0400
+        Mon, 24 May 2021 22:27:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1621909541; x=1653445541;
+  t=1621909542; x=1653445542;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=ATmg89G+Dct0ontkWU+SFfZLt4WC7pezEH5Lnl8QCgw=;
-  b=kfjwzMQTgdSmQUHq5B4vWBP8TA9Y8U+wcbREJ7CbTxKE4ENLuPwDP5bg
-   yIzBeKzboTyc1cCZMdEb9N/rC2CZ7O5x7deDw8Cyf/Kz0icnBsMt/0I7E
-   sLEetb3hPZjJJJ490G3++HNxD+qjQW4AMAI+uQwhkHK9p4cU/a0tPkdeu
-   mqByWGkLZlu5lv1HqqJ3wpxdel3VGyKVzmHF8O3faQnCkImAuFO2z0eX0
-   b0E8n7ZKgv6FGjzskuglaC7GShnvIz48+wdXxtVJCTOKaisJk+N3el77g
-   hpzx9ndfWqK3G3xwn4YYwrg+fCSuWVt5+RdA/CULskkaf3cguzaMluU4G
-   Q==;
-IronPort-SDR: sGs2P02kzZ1Mt57IbM6gBgB9YxzgYG+pt10ODaFrKn4y02h3RKZRv/5Fid4IQ66uoNbMJ2Lv4W
- MtM1dSoCR10icodIORIN5tR/J+MY2wDlahRs+QZ2z/zTWfAJ2MmwXGsGeqiblEfBLLeoZF2p/M
- HDWRrnkyglSRFCvcW0i1hHETQQQrsGRX6LgCPzsOZWSuFql/ZYx1HElrXYWNHJAgK0ZSfSKGgw
- j+uvVBlI7ADUzj9bulO455mxawk4k+virDqD8HnFY8i+b1U3V526D4vaLtOeFheTdN948jldBl
- VoI=
+  bh=24PAAoOmT724oNWtauCM1gI/ZykcUIUfra8Qktvr20Y=;
+  b=Zn4ItAskBO7RTmVvxqbntjGWQSn6S4DeGOREdZJKVQP4sQ3B3bI/7+J9
+   oPzAQdzigy4ehO0QfLITgkXKvtYlXxRC3ixkziKpcO3hxZhYgEZBY3Jjx
+   KMmJhI9P/XhZvZ5IGMvom1BBi0Tkeu7VxAD6XtrnqL1LbCoxf5IESdMS8
+   TkpWwSxBI5FCzNCvM1W7bvd/CKqBNkMhCyuLZMGO2M6q/ylN1kMZZSAkD
+   rfYum4tE9HeH/ZEukEPENn2lUZc/zVcCoIOoHfDpStILQxe1+AJlnyFMT
+   JynSIEk+9KeD/5FKeEnlC7EAZicVeVyCRXOXcn1gudcCPHeZexfEsXEze
+   w==;
+IronPort-SDR: D4vAOYa/3YbcfRqnveV0tT6jCqegHIX7GnokZ4N9vnK+emMcHIsrlrFlLyDDFRz4OeI50zLbgS
+ tUmxF3+prCs/w2WJIiStgTZovOeXR1c0toiM0A1VNFgTPRAiXh8zczQbXUQjcLnVEGUFxI5mZj
+ Xc235LKkZynRzO4K/C5nelqXwzmJm8hohQT9Ber07QAA8Pd8jJV0M0DCAWCn/TWH+ROMtwSS0a
+ W7vJAAigr6qWQmBW1BpVPCSjBfQJVUvpubRVdxjp1qqOE9iEYJD8YrTrpwdG0pMCAdcx+A8A0m
+ jUo=
 X-IronPort-AV: E=Sophos;i="5.82,327,1613404800"; 
-   d="scan'208";a="173981316"
+   d="scan'208";a="173981321"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 May 2021 10:25:41 +0800
-IronPort-SDR: MUk3m9RB70eEd1FHOKrRv+EDykmnYiQbiUIyWls8IBuRtjCJJLzjc+u9VqIkbf7ExQBYtkyzGv
- xPCERL2BB2y+afpBxz3kRut3j3c8uHaGtYCVqnhFs5Tnz/H/Uz9mcH/7DoN4pjaSH0R4/fA8FO
- PmqLDL5Cr/n+HVJObp10yT0t2De+alVPFSwMr4DMA4Vb8KfMRMFZQvUHEUz3ayTSJvdPm4hS2W
- ifUL98x2s3h8R24ay8qMSo7JjLe/4NtusuM6vPRsYIOuQiWgb7fkFwHzHiLZy3Y8RfurC7xYZ7
- TwerlkrJFmLex3D9iXqOyFQM
+  by ob1.hgst.iphmx.com with ESMTP; 25 May 2021 10:25:42 +0800
+IronPort-SDR: Vvwd5TqWEt4N4IqPz80KbpR37Vyh9ZZOmXbT1niPQMQ6zJHtYYD+SntgVxx5Gb8kWRbv4kK+WB
+ qsAESw5/15drwOJ60xIga/tDys/aacUHLP/ipurXEgHr+aaGzZPyatQHrxoN/+t1quSc1yOXxj
+ deHn6/ysm5qb3u1dUZ3k9y7obL3SRqP19gMPMgvI2DxVFSjar8uypu0I3O/uooFGFXj5eUZytn
+ 8S1hItpoLLmH+179yFcFeCx1A8r6jAr+9FsZ7FFWlWRx4gY41XheP6ATh/Q03sZjQiZCa2p4rY
+ uUbyXGTyeDU9ebLVHaaWhnD3
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2021 19:03:56 -0700
-IronPort-SDR: g0nzjXDYk9USvQNTYRlrx6tvADftuBjMMTNnHDjQ6FypnGlaq9hRyk3ahpDRSa4DnLCVoJbEhP
- BUbxSz0o9eRDF92xz4xPNwT9LnoCNO7EKzoo8bW531qxQWK4VWYzqu4YjPDzx7EZVYIh6y4CRj
- Zgnjbdkkj5zIHaWAl7Zr2fBNx0XplFDkFn7Ozdol8YyL00Ge8ITbM599aLKpUNFL7YPYTxnC0T
- vep4vekioQEPuUj7ALbjfj/vyZ9At6ZpsZyg8dQwcThyQI8JkeASIax4YRz0dgd3vLDiGJfQh7
- 0Xk=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2021 19:03:57 -0700
+IronPort-SDR: NHHM0i1sJS3FHaVrSYdGlgfhUUIKd/cnRyMYpUNwNCcLGZ3UptgvhlRrPKZpAqwNLaSOs6oaOA
+ 04lB0OgTsfG5zsCdUENSZFXBEIDdUJ+fKHM6y7d2DOJajY3vi161k91tJO33+m3qFEEs1Edx6Y
+ Y1bFSHFxmZWPS1EJaELtyRL8dlgm566w04LpoiPCV/GMBsqjm/mvcqXL0kKMyKzqI05LijKAQ2
+ Lnv7YpXYjsBLcN/7HmCiV6+/B8ZC043SEP+JmYNxbFa6//RbtGiMHcyK6hZN97VvRGoBOHAXGN
+ VVA=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 24 May 2021 19:25:40 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 24 May 2021 19:25:42 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v4 01/11] block: improve handling of all zones reset operation
-Date:   Tue, 25 May 2021 11:25:29 +0900
-Message-Id: <20210525022539.119661-2-damien.lemoal@wdc.com>
+Subject: [PATCH v4 02/11] block: introduce bio zone helpers
+Date:   Tue, 25 May 2021 11:25:30 +0900
+Message-Id: <20210525022539.119661-3-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210525022539.119661-1-damien.lemoal@wdc.com>
 References: <20210525022539.119661-1-damien.lemoal@wdc.com>
@@ -72,205 +72,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SCSI, ZNS and null_blk zoned devices support resetting all zones using
-a single command (REQ_OP_ZONE_RESET_ALL), as indicated using the device
-request queue flag QUEUE_FLAG_ZONE_RESETALL. This flag is not set for
-device mapper targets creating zoned devices. In this case, a user
-request for resetting all zones of a device is processed in
-blkdev_zone_mgmt() by issuing a REQ_OP_ZONE_RESET operation for each
-zone of the device. This leads to different behaviors of the
-BLKRESETZONE ioctl() depending on the target device support for the
-reset all operation. E.g.
-
-blkzone reset /dev/sdX
-
-will reset all zones of a SCSI device using a single command that will
-ignore conventional, read-only or offline zones.
-
-But a dm-linear device including conventional, read-only or offline
-zones cannot be reset in the same manner as some of the single zone
-reset operations issued by blkdev_zone_mgmt() will fail. E.g.:
-
-blkzone reset /dev/dm-Y
-blkzone: /dev/dm-0: BLKRESETZONE ioctl failed: Remote I/O error
-
-To simplify applications and tools development, unify the behavior of
-the all-zone reset operation by modifying blkdev_zone_mgmt() to not
-issue a zone reset operation for conventional, read-only and offline
-zones, thus mimicking what an actual reset-all device command does on a
-device supporting REQ_OP_ZONE_RESET_ALL. This emulation is done using
-the new function blkdev_zone_reset_all_emulated(). The zones needing a
-reset are identified using a bitmap that is initialized using a zone
-report. Since empty zones do not need a reset, also ignore these zones.
-The function blkdev_zone_reset_all() is introduced for block devices
-natively supporting reset all operations. blkdev_zone_mgmt() is modified
-to call either function to execute an all zone reset request.
+Introduce the helper functions bio_zone_no() and bio_zone_is_seq().
+Both are the BIO counterparts of the request helpers blk_rq_zone_no()
+and blk_rq_zone_is_seq(), respectively returning the number of the
+target zone of a bio and true if the BIO target zone is sequential.
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-[hch: split into multiple functions]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-zoned.c | 119 +++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 92 insertions(+), 27 deletions(-)
+ include/linux/blkdev.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 250cb76ee615..f47f688b6ea6 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -161,18 +161,89 @@ int blkdev_report_zones(struct block_device *bdev, sector_t sector,
- }
- EXPORT_SYMBOL_GPL(blkdev_report_zones);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f69c75bd6d27..2db0f376f5d9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1008,6 +1008,18 @@ static inline unsigned int blk_rq_stats_sectors(const struct request *rq)
+ /* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */
+ const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);
  
--static inline bool blkdev_allow_reset_all_zones(struct block_device *bdev,
--						sector_t sector,
--						sector_t nr_sectors)
-+static inline unsigned long *blk_alloc_zone_bitmap(int node,
-+						   unsigned int nr_zones)
++static inline unsigned int bio_zone_no(struct bio *bio)
++{
++	return blk_queue_zone_no(bdev_get_queue(bio->bi_bdev),
++				 bio->bi_iter.bi_sector);
++}
++
++static inline unsigned int bio_zone_is_seq(struct bio *bio)
++{
++	return blk_queue_zone_is_seq(bdev_get_queue(bio->bi_bdev),
++				     bio->bi_iter.bi_sector);
++}
++
+ static inline unsigned int blk_rq_zone_no(struct request *rq)
  {
--	if (!blk_queue_zone_resetall(bdev_get_queue(bdev)))
--		return false;
-+	return kcalloc_node(BITS_TO_LONGS(nr_zones), sizeof(unsigned long),
-+			    GFP_NOIO, node);
-+}
- 
-+static int blk_zone_need_reset_cb(struct blk_zone *zone, unsigned int idx,
-+				  void *data)
-+{
- 	/*
--	 * REQ_OP_ZONE_RESET_ALL can be executed only if the number of sectors
--	 * of the applicable zone range is the entire disk.
-+	 * For an all-zones reset, ignore conventional, empty, read-only
-+	 * and offline zones.
- 	 */
--	return !sector && nr_sectors == get_capacity(bdev->bd_disk);
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_NOT_WP:
-+	case BLK_ZONE_COND_EMPTY:
-+	case BLK_ZONE_COND_READONLY:
-+	case BLK_ZONE_COND_OFFLINE:
-+		return 0;
-+	default:
-+		set_bit(idx, (unsigned long *)data);
-+		return 0;
-+	}
-+}
-+
-+static int blkdev_zone_reset_all_emulated(struct block_device *bdev,
-+					  gfp_t gfp_mask)
-+{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	sector_t capacity = get_capacity(bdev->bd_disk);
-+	sector_t zone_sectors = blk_queue_zone_sectors(q);
-+	unsigned long *need_reset;
-+	struct bio *bio = NULL;
-+	sector_t sector =  0;
-+	int ret;
-+
-+	need_reset = blk_alloc_zone_bitmap(q->node, q->nr_zones);
-+	if (!need_reset)
-+		return -ENOMEM;
-+
-+	ret = bdev->bd_disk->fops->report_zones(bdev->bd_disk, 0,
-+				q->nr_zones, blk_zone_need_reset_cb,
-+				need_reset);
-+	if (ret < 0)
-+		goto out_free_need_reset;
-+
-+	ret = 0;
-+	while (sector < capacity) {
-+		if (!test_bit(blk_queue_zone_no(q, sector), need_reset)) {
-+			sector += zone_sectors;
-+			continue;
-+		}
-+
-+		bio = blk_next_bio(bio, 0, gfp_mask);
-+		bio_set_dev(bio, bdev);
-+		bio->bi_opf = REQ_OP_ZONE_RESET | REQ_SYNC;
-+		bio->bi_iter.bi_sector = sector;
-+		sector += zone_sectors;
-+
-+		/* This may take a while, so be nice to others */
-+		cond_resched();
-+	}
-+
-+	if (bio) {
-+		ret = submit_bio_wait(bio);
-+		bio_put(bio);
-+	}
-+
-+out_free_need_reset:
-+	kfree(need_reset);
-+	return ret;
-+}
-+
-+static int blkdev_zone_reset_all(struct block_device *bdev, gfp_t gfp_mask)
-+{
-+	struct bio bio;
-+
-+	bio_init(&bio, NULL, 0);
-+	bio_set_dev(&bio, bdev);
-+	bio.bi_opf = REQ_OP_ZONE_RESET_ALL | REQ_SYNC;
-+
-+	return submit_bio_wait(&bio);
- }
- 
- /**
-@@ -200,7 +271,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
- 	sector_t capacity = get_capacity(bdev->bd_disk);
- 	sector_t end_sector = sector + nr_sectors;
- 	struct bio *bio = NULL;
--	int ret;
-+	int ret = 0;
- 
- 	if (!blk_queue_is_zoned(q))
- 		return -EOPNOTSUPP;
-@@ -222,20 +293,21 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
- 	if ((nr_sectors & (zone_sectors - 1)) && end_sector != capacity)
- 		return -EINVAL;
- 
-+	/*
-+	 * In the case of a zone reset operation over all zones,
-+	 * REQ_OP_ZONE_RESET_ALL can be used with devices supporting this
-+	 * command. For other devices, we emulate this command behavior by
-+	 * identifying the zones needing a reset.
-+	 */
-+	if (op == REQ_OP_ZONE_RESET && sector == 0 && nr_sectors == capacity) {
-+		if (!blk_queue_zone_resetall(q))
-+			return blkdev_zone_reset_all_emulated(bdev, gfp_mask);
-+		return blkdev_zone_reset_all(bdev, gfp_mask);
-+	}
-+
- 	while (sector < end_sector) {
- 		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio_set_dev(bio, bdev);
--
--		/*
--		 * Special case for the zone reset operation that reset all
--		 * zones, this is useful for applications like mkfs.
--		 */
--		if (op == REQ_OP_ZONE_RESET &&
--		    blkdev_allow_reset_all_zones(bdev, sector, nr_sectors)) {
--			bio->bi_opf = REQ_OP_ZONE_RESET_ALL | REQ_SYNC;
--			break;
--		}
--
- 		bio->bi_opf = op | REQ_SYNC;
- 		bio->bi_iter.bi_sector = sector;
- 		sector += zone_sectors;
-@@ -396,13 +468,6 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
- 	return ret;
- }
- 
--static inline unsigned long *blk_alloc_zone_bitmap(int node,
--						   unsigned int nr_zones)
--{
--	return kcalloc_node(BITS_TO_LONGS(nr_zones), sizeof(unsigned long),
--			    GFP_NOIO, node);
--}
--
- void blk_queue_free_zone_bitmaps(struct request_queue *q)
- {
- 	kfree(q->conv_zones_bitmap);
+ 	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
 -- 
 2.31.1
 
