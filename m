@@ -2,197 +2,229 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9959DC4707F
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A750C47084
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:33:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74D3C610FC
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:29:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 035CA61413
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230509AbhEYGam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 02:30:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52594 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230453AbhEYGal (ORCPT
+        id S231190AbhEYGfV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 02:35:21 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:35592 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230500AbhEYGfT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 02:30:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621924152;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Xmg+jKMuyj8kCoSvApnyzVNUBfF8MHu5WWzJfFH3+RY=;
-        b=BkWS8wAKuHsomsyWs/yREP2mnW2FQ0J8JlDcTUzorId8XdGpolZbgr7THWaXwvEJ8tzNLx
-        71gIIqO/b6MAON5AyEJWhuLlOUH6KGZrZdcfLskXC1lpjKCjvGF1jk6G+MwXa3EHYY4+05
-        Qy1+LdcJE/hBhCrJtoSRSCax9+fRsGg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-yOExd4ABPSafQwy7v9rgDw-1; Tue, 25 May 2021 02:29:08 -0400
-X-MC-Unique: yOExd4ABPSafQwy7v9rgDw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DAC21007477;
-        Tue, 25 May 2021 06:29:07 +0000 (UTC)
-Received: from T590 (ovpn-13-203.pek2.redhat.com [10.72.13.203])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D26DE60855;
-        Tue, 25 May 2021 06:28:59 +0000 (UTC)
-Date:   Tue, 25 May 2021 14:28:54 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Brian Foster <bfoster@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: iomap: writeback ioend/bio allocation deadlock risk
-Message-ID: <YKyZJiY7GySlIsZ7@T590>
-References: <YKcouuVR/y/L4T58@T590>
- <20210521071727.GA11473@lst.de>
- <YKdhuUZBtKMxDpsr@T590>
- <20210521073547.GA11955@lst.de>
- <YKdwtzp+WWQ3krhI@T590>
- <20210521083635.GA15311@lst.de>
- <YKd1VS5gkzQRn+7x@T590>
- <20210524235538.GI2817@dread.disaster.area>
- <YKyDCw430gD6pTBC@T590>
+        Tue, 25 May 2021 02:35:19 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14P6Pnax044303;
+        Tue, 25 May 2021 06:33:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=kpqBswRmoTBz1yb+1jyhPzKy3jjw5mNq5lnu6kg/TkM=;
+ b=eDnycDiIODBIJK55WrhOiPnuDpsp80S9sSgv2mGtfPbuBqdgxD+Dzgz4G26RxrNE8Ayw
+ JOlJQM4x9AYaNXjpY3WU5Ax3oOBOFdPvw7jx0XxOB2yFSveF9dSYetRiVlpJxUon8CkO
+ lK88k6b7A+l+tQ7r/1gpIDlbsuk8c5A4EheDdse+ShZ8X/ls6ORECNwwzaHj+/5bzQkW
+ nWT26IdFwyoFlntMdch0d459LRVZMbq63jCil2ZluZ6eGAKqN44Br47bs4+idn2zfBWZ
+ RKqdQJAphsluClWLRMFCTb0B8VyShWxYcuighQs019KABu+4MnhBHlF5x8dl4dH5AWTd Dg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 38q3q8vesq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 May 2021 06:33:40 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14P6OoIY084263;
+        Tue, 25 May 2021 06:33:39 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2168.outbound.protection.outlook.com [104.47.55.168])
+        by aserp3020.oracle.com with ESMTP id 38reh8yn26-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 May 2021 06:33:39 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UpCu35oFZnsNOcoS6clsaHrDkdepSF3cKjDSOGddp+vEk8r8jZn1Z6sYTaceF6/kCjZzHXWTETkRpEIdlTQ0OykBdSzgNbZvwXmP/uuoIVvDoqtI47xxp9FEVYd8tkeDmSG6kVOqbalujg+vUWlrlOjCcHSdmh/qfUaV4L57Kv+NOm8fRSfiL0UcpR2MHe6zY2Iz0FiXuyy87/jvzmxidJFL/w/cBvWdGIFqdTT7iGHh8dI9mBP+MDicyxSsuziu8Gwek7RTCAdOScECImo2jfnOxi3zEnL0T4q5jZea6nRdrTFZ0wcqSzt0LJOC4tftVYJC9842W7Wk8dPvl6Ko4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kpqBswRmoTBz1yb+1jyhPzKy3jjw5mNq5lnu6kg/TkM=;
+ b=V8zFxoGUfCLRaeluwfHTYuLSiCfNpbSIOrOqTEE6tsNraB/mkOGab18YGofX8yHKcmMlR7ZoqLGUty4NHBYK6SD0wHAUwMjiKVNbQ2rLHkPKvUodtZkb5abOd1tqKpfUr7gHVofoMFEfcRgCSk1DB5nA7Fr8Gw1kXuWfm8FSVIZo8bp48SXUv4VmzIDYylXMB0TvXtNhr/PdT9BZPkXegk4G90SW6gOOdpAtNGMYtdeblEW5IxsmB8m9iEJHtA0CTegboJ2lpSnUhPh2qhWrN5fCVfKtDhr2ZsoYGvAk05bw5zdlgSGAQGHEm2thxR5pspWaxtzgIviFhMi8Gffslg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kpqBswRmoTBz1yb+1jyhPzKy3jjw5mNq5lnu6kg/TkM=;
+ b=ldYqu3cJWTelUlBiDt6s7H1d9GGJ4KDxo4aZaCMgvih1Hrt02rS4NSefF2wQjn82shxs39RG/HuJXCh3o6UnahsiKUhzOwsBfSoIIZq4ATU+VCnt+JglJEWJqb5VFsHIPURh1RRruiZNPas8GsfV7tt1jtJh3Fbs/U8qe9zUEak=
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
+ by BYAPR10MB3448.namprd10.prod.outlook.com (2603:10b6:a03:88::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.27; Tue, 25 May
+ 2021 06:33:36 +0000
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::18a:7c1f:bf20:ba6c]) by BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::18a:7c1f:bf20:ba6c%3]) with mapi id 15.20.4129.034; Tue, 25 May 2021
+ 06:33:35 +0000
+Subject: Re: [RFC] virtio_scsi: to poll and kick the virtqueue in timeout
+ handler
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Hannes Reinecke <hare@suse.de>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+        pbonzini@redhat.com, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, joe.jin@oracle.com,
+        junxiao.bi@oracle.com, srinivas.eeda@oracle.com
+References: <20210523063843.1177-1-dongli.zhang@oracle.com>
+ <ac161748-15d2-2962-402e-23abca469623@suse.de>
+ <YKupFeOtc6Pr5KS2@stefanha-x1.localdomain>
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <a0404035-2ab7-6b9c-f393-0bb0417c4b3d@oracle.com>
+Date:   Mon, 24 May 2021 23:33:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
+In-Reply-To: <YKupFeOtc6Pr5KS2@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [2601:646:c303:6700:18ee:a622:17a0:6b68]
+X-ClientProxiedBy: SJ0PR03CA0038.namprd03.prod.outlook.com
+ (2603:10b6:a03:33e::13) To BYAPR10MB2663.namprd10.prod.outlook.com
+ (2603:10b6:a02:a9::20)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YKyDCw430gD6pTBC@T590>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [IPv6:2601:646:c303:6700:18ee:a622:17a0:6b68] (2601:646:c303:6700:18ee:a622:17a0:6b68) by SJ0PR03CA0038.namprd03.prod.outlook.com (2603:10b6:a03:33e::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.23 via Frontend Transport; Tue, 25 May 2021 06:33:35 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: acf4e2e3-2c6e-4847-ad0b-08d91f47061b
+X-MS-TrafficTypeDiagnostic: BYAPR10MB3448:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BYAPR10MB3448647A046CB4FFFDB92298F0259@BYAPR10MB3448.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rOkf0PwIBoBtSpPJ0ilpEGu6P+PX12ftBJAFzb9+B8Ki2xwCaoGL6yshhrstfPE5lsoGBXLShOrkq3u0DC/2iELaf0TsbyXLGc+iyiCxgw+1lCcMf5q7lvPWzwpJygKItaoOK7EOJjTROWYEXQR2Mbqq8akeW5+zYKfbor62joVgdmRqlCApZ7Ka0lzhdIAteYGM1M2m2zzKT0ufbvL6WrVFXGP3xfg98B2TYUffNJF3qdusict0BhTZrsTb3SMB7yq+6+js6s94ZWVsD72I6z/ImUJysoWlm9N1APkqATXh7SLuQgJFGZhQpPCJPCJSAQ39TvqEvsZOQG0Uy3caii1Q0BD8bGIQ1SfpSXRI9OQPEPLwfAjr65PUJTmO6ZV6+cnEz5vS3tvL2mOsv6El/yHspzhLVgZefufXl9X5lQMKDG97w3xBUSdzFXT5N0V8hMJFkDDwEzl/h9RGLWlLnzAuWJAOG1/zG2TgdEIkfleptI2obx2b6YmT5isyA0gG7POlGA+evAQ7S2jblkz9/aUjU2ytEbagMVDjN7Gt8/6Y4zmOsQ0bEvShj2qmgAqZ9AHOAwyc7Dp+/8TlfpY9/Y87aBVERmoeQSEguQnCp462XE609I976JUxEcWtsD+4vQ2MXCIBWNGPWC1Nv1IRH6TwOMKcOYOo4Os4VjGNmPk3YahiRV9RSwuODNNYkMYH
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(396003)(136003)(366004)(346002)(39860400002)(44832011)(7416002)(2616005)(66556008)(38100700002)(53546011)(66946007)(66476007)(86362001)(8936002)(83380400001)(110136005)(8676002)(107886003)(5660300002)(4326008)(31686004)(2906002)(16526019)(316002)(186003)(6486002)(31696002)(36756003)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?Windows-1252?Q?OnIE3aOShigdwpy0cC9uNmtqILGgAQ7i4ctGBAkNXG2q5UpJ97xpaauq?=
+ =?Windows-1252?Q?Ef45/sTkJD0h93YpGvN4KamZ87D6ZQ/Sd2Wg8BLdmE/42WHRQvw9J6Pr?=
+ =?Windows-1252?Q?xbT2b9zyRkU5mKq4Gu3qFSZZVbO4LWoOeRheVvfnL42Rhn6wKHyTMBYY?=
+ =?Windows-1252?Q?WhwTqxZ23RKQ9qxvg1UghrFZabxydiCEiJwn3Wm3xzktcjbj995+9Z08?=
+ =?Windows-1252?Q?4XHzRgPBAmIIrzVxg46H7pn2fQDw2yH2ecLe4s7Od4nfOSBcKVtkkK2J?=
+ =?Windows-1252?Q?McsWBQCdE+0u0jAu9GJY4o17UF5z1fBjJEFevaFWJWWVoW49VFeBdgyw?=
+ =?Windows-1252?Q?O/jqlOicBp4Nfz2cAC7EKD9d09LAdpbjGZNb+XJN0pIc/LLnVGQQdRvh?=
+ =?Windows-1252?Q?Qd7d3zGYTIk4pbgFq+rrpmhE4UAwjCVM44XuBDGDkq59r2RN9BcX0VHV?=
+ =?Windows-1252?Q?D/Mmyy4YI7ygMAqFCkpHVaMK8pEHcSOnfoZ6zPhTocCSXzRhcGG/DYRQ?=
+ =?Windows-1252?Q?6M7sTrHOC/WOXC1szgUHbPCSF3SmJ+2epBUcsCKbZ2R9lGt5WzXWZuXy?=
+ =?Windows-1252?Q?LQEnnBxjM8ToNMr1JR7AEgOo7dX7fObbbrAJoXpPBXBtxRNhEAaUyjKH?=
+ =?Windows-1252?Q?eEETrJAeERvabfnbm5IcpTIdeSIkD2g/NSzxmsOpJvaCY1xzhthMT7lU?=
+ =?Windows-1252?Q?lap/ubU3NghWQzfarqDSXtYO2hHYai/ALFtww0EGVO8W+QtiUbFIseBZ?=
+ =?Windows-1252?Q?15vujXj+ddikFtTD/tQuilBXe8YZ8Nc546W54PBvF6YIN5U/e2FQojUU?=
+ =?Windows-1252?Q?YWFXQZkJn3EQJ1zV9KroW18eaiVWHdLpHWDxbwJKIF2/i+XLu877DAZj?=
+ =?Windows-1252?Q?xqPW/e5ACsm67iGL9wtkY2udUHligIv3wf6bOAXC7vuxFzF8Hwpqz79/?=
+ =?Windows-1252?Q?OO3Q5ggJXwsDU4JL0hqUJtnLIbRDt1qJWaFYFrmdJF0AZcM0AoL+lNQH?=
+ =?Windows-1252?Q?GUlea83oDCSvKxdgRblVF+hqUojMfcgOpiq5N0q7Th7cZr16ByEq/Ls8?=
+ =?Windows-1252?Q?0an/Kho719MU8OvuJOOhdSdwUXN6c0vt4qZKpnhwgb13Vp1S05x7dHGN?=
+ =?Windows-1252?Q?H4VmBC+MR+opzRrStinMmmiSqOgBIetklHqhrIfDRJjLot9BcYQZArsn?=
+ =?Windows-1252?Q?aoTFmJp7u9ivJAKGv+wBdG5TCDL4yH1WpSuyWPmjv5+F4m177TcMxSIJ?=
+ =?Windows-1252?Q?QxoeveXNacF9MTQXv/CLa4GVx1vK59mYkPim1xVPg0b/8j5So0rhV+I9?=
+ =?Windows-1252?Q?Rt5AqF1ESp5ikslPDSWo0RhhAkeWWgngToTP2Lf2A17Wq3BB0ilnAOql?=
+ =?Windows-1252?Q?ktRyWVDAJHYRclIDd1lHEqVN6Nf7gQWsK7VxlqgbhkwhlY13Y1kQK1Uj?=
+ =?Windows-1252?Q?Om8BaPGIBA7a7pSPqYG6H5JEW5wHn3ap/v/p6psrnfmlna0osiOFvir4?=
+ =?Windows-1252?Q?T4IoJUYI?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: acf4e2e3-2c6e-4847-ad0b-08d91f47061b
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2021 06:33:35.7120
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nZA49KYLNmvLMRjDO68zYAHtp+gTBqz2JJiVQgojHJ7VXFqyBpi1FQon2Izi4licCajaNZx5LijSySMe8CfGzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB3448
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9994 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 adultscore=0
+ mlxscore=0 mlxlogscore=999 malwarescore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2105250045
+X-Proofpoint-GUID: 0MW9WyoUiD-fseeOGX88lu-a8XISUoDk
+X-Proofpoint-ORIG-GUID: 0MW9WyoUiD-fseeOGX88lu-a8XISUoDk
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9994 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 clxscore=1015
+ malwarescore=0 bulkscore=0 impostorscore=0 phishscore=0 spamscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2105250045
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 25, 2021 at 12:54:35PM +0800, Ming Lei wrote:
-> On Tue, May 25, 2021 at 09:55:38AM +1000, Dave Chinner wrote:
-> > On Fri, May 21, 2021 at 04:54:45PM +0800, Ming Lei wrote:
-> > > On Fri, May 21, 2021 at 10:36:35AM +0200, Christoph Hellwig wrote:
-> > > > On Fri, May 21, 2021 at 04:35:03PM +0800, Ming Lei wrote:
-> > > > > Just wondering why the ioend isn't submitted out after it becomes full?
-> > > > 
-> > > > block layer plugging?  Although failing bio allocations will kick that,
-> > > > so that is not a deadlock risk.
-> > > 
-> > > These ioends are just added to one list stored on local stack variable(submit_list),
-> > > how can block layer plugging observe & submit them out?
-> > 
-> > We ignore that, as the commit histoy says:
-> > 
-> > commit e10de3723c53378e7cf441529f563c316fdc0dd3
-> > Author: Dave Chinner <dchinner@redhat.com>
-> > Date:   Mon Feb 15 17:23:12 2016 +1100
-> > 
-> >     xfs: don't chain ioends during writepage submission
-> > 
-> >     Currently we can build a long ioend chain during ->writepages that
-> >     gets attached to the writepage context. IO submission only then
-> >     occurs when we finish all the writepage processing. This means we
-> >     can have many ioends allocated and pending, and this violates the
-> >     mempool guarantees that we need to give about forwards progress.
-> >     i.e. we really should only have one ioend being built at a time,
-> >     otherwise we may drain the mempool trying to allocate a new ioend
-> >     and that blocks submission, completion and freeing of ioends that
-> >     are already in progress.
-> > 
-> >     To prevent this situation from happening, we need to submit ioends
-> >     for IO as soon as they are ready for dispatch rather than queuing
-> >     them for later submission. This means the ioends have bios built
-> >     immediately and they get queued on any plug that is current active.
-> >     Hence if we schedule away from writeback, the ioends that have been
-> >     built will make forwards progress due to the plug flushing on
-> >     context switch. This will also prevent context switches from
-> >     creating unnecessary IO submission latency.
-> > 
-> >     We can't completely avoid having nested IO allocation - when we have
-> >     a block size smaller than a page size, we still need to hold the
-> >     ioend submission until after we have marked the current page dirty.
-> >     Hence we may need multiple ioends to be held while the current page
-> >     is completely mapped and made ready for IO dispatch. We cannot avoid
-> >     this problem - the current code already has this ioend chaining
-> >     within a page so we can mostly ignore that it occurs.
-> > 
-> >     Signed-off-by: Dave Chinner <dchinner@redhat.com>
-> >     Reviewed-by: Christoph Hellwig <hch@lst.de>
-> >     Signed-off-by: Dave Chinner <david@fromorbit.com>
-> > 
-> > IOWs, this nesting for block size < page size has been out there
-> > for many years now and we've yet to have anyone report that
-> > writeback deadlocks have occurred.
-> > 
-> > There's a mistake in that commit message - we can't submit the
-> > ioends on a page until we've marked the page as under writeback, not
-> > dirty. That's because we cannot have ioends completing on a a page
-> > that isn't under writeback because calling end_page_writeback() on
-> > it when it isn't under writeback will BUG(). Hence we have to build
-> > all the submission state before we mark the page as under writeback
-> > and perform the submission(s) to avoid completion racing with
-> > submission.
-> > 
-> > Hence we can't actually avoid nesting ioend allocation here within a
-> > single page - the constraints of page cache writeback require it.
-> > Hence the construction of the iomap_ioend_bioset uses a pool size of:
-> > 
-> > 	4 * (PAGE_SIZE / SECTOR_SIZE)
-> > 
-> > So that we always have enough ioends cached in the mempool to
-> > guarantee forwards progress of writeback of any single page under
-> > writeback.
-> 
-> OK, looks it is just for subpage IO, so there isn't such issue
-> in case of multiple ioends.
+Hi Stefan and Hannes,
 
-Thinking of further, this way is still fragile, suppose there are 8
-contexts in which writeback is working on at the same time, and each
-needs to allocate 6 ioends, so all contexts may not move on when
-allocating its 6th ioend.
-
+On 5/24/21 6:24 AM, Stefan Hajnoczi wrote:
+> On Sun, May 23, 2021 at 09:39:51AM +0200, Hannes Reinecke wrote:
+>> On 5/23/21 8:38 AM, Dongli Zhang wrote:
+>>> This RFC is to trigger the discussion about to poll and kick the
+>>> virtqueue on purpose in virtio-scsi timeout handler.
+>>>
+>>> The virtio-scsi relies on the virtio vring shared between VM and host.
+>>> The VM side produces requests to vring and kicks the virtqueue, while the
+>>> host side produces responses to vring and interrupts the VM side.
+>>>
+>>> By default the virtio-scsi handler depends on the host timeout handler
+>>> by BLK_EH_RESET_TIMER to give host a chance to perform EH.
+>>>
+>>> However, this is not helpful for the case that the responses are available
+>>> on vring but the notification from host to VM is lost.
+>>>
+>> How can this happen?
+>> If responses are lost the communication between VM and host is broken, and
+>> we should rather reset the virtio rings themselves.
 > 
-> > 
-> > But that is a completely separate problem to this:
-> > 
-> > > Chained bios have been submitted already, but all can't be completed/freed
-> > > until the whole ioend is done, that submission won't make forward progress.
-> > 
-> > This is a problem caused by having unbound contiguous ioend sizes,
-> > not a problem caused by chaining bios. We can throw 256 pages into
-> > a bio, so when we are doing huge contiguous IOs, we can map a
-> > lot of sequential dirty pages into a contiguous extent into a very
-> > long bio chain. But if we cap the max ioend size to, say, 4096
-> > pages, then we've effectively capped the number of bios that can be
-> > nested by such a writeback chain.
+> I agree. In principle it's fine to poll the virtqueue at any time, but I
+> don't understand the failure scenario here. It's not clear to me why the
+> device-to-driver vq notification could be lost.
 > 
-> If the 4096 pages are not continuous, there may be 4096/256=16 bios
-> allocated for single ioend, and one is allocated from iomap_ioend_bioset,
-> another 15 is allocated by bio_alloc() from fs_bio_set which just
-> reserves 2 bios.
-> 
-> > 
-> > I was about to point you at the patchset that fixes this, but you've
-> > already found it and are claiming that this nesting is an unfixable
-> > problem. Capping the size of the ioend also bounds the depth of the
-> > allocation nesting that will occur, and that fixes the whole nseting
-> > deadlock problem: If the mempool reserves are deeper than than the
-> > maximum chain nesting that can occur, then there is no deadlock.
-> > 
-> > However, this points out what the real problem here is: that bio
-> > allocation is designed to deadlock when nesting bio allocation rather
-> > than fail. Hence at the iomap level we've go no way of knowing that
-> > we should terminate and submit the current bio chain and start a new
-> > ioend+bio chain because we will hang before there's any indication
-> > that a deadlock could occur.
-> 
-> Most of reservation is small, such as fs_bio_set, so bio_alloc_bioset()
-> documents that 'never allocate more than 1 bio at a time'. Actually
-> iomap_chain_bio() does allocate a new one, then submits the old one.
-> 'fs_bio_set' reserves two bios, so the order(alloc before submit) is fine,
 
-It may not be fine when more than one context is involved in writeback.
+One example is the CPU hotplug issue before the commit bf0beec0607d ("blk-mq:
+drain I/O when all CPUs in a hctx are offline") was available. The issue is
+equivalent to loss of interrupt. Without the CPU hotplug fix, while NVMe driver
+relies on the timeout handler to complete inflight IO requests, the PV
+virtio-scsi may hang permanently.
 
-Thanks,
-Ming
+In addition, as the virtio/vhost/QEMU are complex software, we are not able to
+guarantee there is no further lost of interrupt/kick issue in the future. It is
+really painful if we encounter such issue in production environment.
 
+
+About to reset vring, if this is just due to loss of interrupt, I do not think
+it is necessary to reset the entire vring. To poll the vring should be enough.
+The NVMe PCI does the same by assuming there may be loss of interrupt.
+
+Once there is request timeout, the NVMe PCI driver first polls the ring buffer
+and confirm if the request is completed, instead of reset/abort immediately.
+
+
+1254 static enum blk_eh_timer_return nvme_timeout(struct request *req, bool
+reserved)
+... ...
+1280         /*
+1281          * Did we miss an interrupt?
+1282          */
+1283         if (test_bit(NVMEQ_POLLED, &nvmeq->flags))
+1284                 nvme_poll(req->mq_hctx);
+1285         else
+1286                 nvme_poll_irqdisable(nvmeq);
+1287
+1288         if (blk_mq_request_completed(req)) {
+1289                 dev_warn(dev->ctrl.device,
+1290                          "I/O %d QID %d timeout, completion polled\n",
+1291                          req->tag, nvmeq->qid);
+1292                 return BLK_EH_DONE;
+1293         }
+
+
+Thank you very much!
+
+Dongli Zhang
