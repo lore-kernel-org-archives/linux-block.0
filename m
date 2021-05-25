@@ -2,179 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4CBC2B9F7
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 00:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E23C2B9F7
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 00:29:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4261C61420
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 00:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0F2F6141E
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 00:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbhEYAWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 May 2021 20:22:16 -0400
-Received: from mail109.syd.optusnet.com.au ([211.29.132.80]:38357 "EHLO
-        mail109.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229540AbhEYAWQ (ORCPT
+        id S229540AbhEYAbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 May 2021 20:31:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35985 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229539AbhEYAbJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 May 2021 20:22:16 -0400
-X-Greylist: delayed 1505 seconds by postgrey-1.27 at vger.kernel.org; Mon, 24 May 2021 20:22:16 EDT
-Received: from dread.disaster.area (pa49-180-237-17.pa.nsw.optusnet.com.au [49.180.237.17])
-        by mail109.syd.optusnet.com.au (Postfix) with ESMTPS id 4DCF66B337;
-        Tue, 25 May 2021 09:55:40 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1llKQ6-004r2D-NQ; Tue, 25 May 2021 09:55:38 +1000
-Date:   Tue, 25 May 2021 09:55:38 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Brian Foster <bfoster@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: iomap: writeback ioend/bio allocation deadlock risk
-Message-ID: <20210524235538.GI2817@dread.disaster.area>
-References: <YKcouuVR/y/L4T58@T590>
- <20210521071727.GA11473@lst.de>
- <YKdhuUZBtKMxDpsr@T590>
- <20210521073547.GA11955@lst.de>
- <YKdwtzp+WWQ3krhI@T590>
- <20210521083635.GA15311@lst.de>
- <YKd1VS5gkzQRn+7x@T590>
+        Mon, 24 May 2021 20:31:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621902580;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2Z7UbDZyMl/Qo6U1QF1YyOwntqJKyBsFeG9yBtgLF3E=;
+        b=bYCN4kEYKK/iACu0wwawI42seGUdzLfNjxZvdBZLCUiYF32yhJqMeODwkejRi0q5lhjDdW
+        e0ucz50iIfqH/UVAdzjnPD9rlxXC+Rf81ztBtp5C0fA+OsqxXpTSj/2NXTZMiEclu3T918
+        s/h8yBvL5RMRt3a9eqPIk4lfnx223Rw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-m2e2-1LnPMKCrPEcZPcoWQ-1; Mon, 24 May 2021 20:29:38 -0400
+X-MC-Unique: m2e2-1LnPMKCrPEcZPcoWQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E297E801817;
+        Tue, 25 May 2021 00:29:36 +0000 (UTC)
+Received: from T590 (ovpn-12-91.pek2.redhat.com [10.72.12.91])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 425695D767;
+        Tue, 25 May 2021 00:29:29 +0000 (UTC)
+Date:   Tue, 25 May 2021 08:29:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Khazhy Kumykov <khazhy@google.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH 2/2] blk: Fix lock inversion between ioc lock and bfqd
+ lock
+Message-ID: <YKxE5efsGCD49NaB@T590>
+References: <20210524100416.3578-1-jack@suse.cz>
+ <20210524100416.3578-3-jack@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YKd1VS5gkzQRn+7x@T590>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0
-        a=oWiKotyBKwPJNwc9RtRBNA==:117 a=oWiKotyBKwPJNwc9RtRBNA==:17
-        a=kj9zAlcOel0A:10 a=5FLXtPjwQuUA:10 a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8
-        a=--ljmbci5Jw-3h57E20A:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <20210524100416.3578-3-jack@suse.cz>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 21, 2021 at 04:54:45PM +0800, Ming Lei wrote:
-> On Fri, May 21, 2021 at 10:36:35AM +0200, Christoph Hellwig wrote:
-> > On Fri, May 21, 2021 at 04:35:03PM +0800, Ming Lei wrote:
-> > > Just wondering why the ioend isn't submitted out after it becomes full?
-> > 
-> > block layer plugging?  Although failing bio allocations will kick that,
-> > so that is not a deadlock risk.
+On Mon, May 24, 2021 at 12:04:16PM +0200, Jan Kara wrote:
+> Lockdep complains about lock inversion between ioc->lock and bfqd->lock:
 > 
-> These ioends are just added to one list stored on local stack variable(submit_list),
-> how can block layer plugging observe & submit them out?
+> bfqd -> ioc:
+>  put_io_context+0x33/0x90 -> ioc->lock grabbed
+>  blk_mq_free_request+0x51/0x140
+>  blk_put_request+0xe/0x10
+>  blk_attempt_req_merge+0x1d/0x30
+>  elv_attempt_insert_merge+0x56/0xa0
+>  blk_mq_sched_try_insert_merge+0x4b/0x60
+>  bfq_insert_requests+0x9e/0x18c0 -> bfqd->lock grabbed
+>  blk_mq_sched_insert_requests+0xd6/0x2b0
+>  blk_mq_flush_plug_list+0x154/0x280
+>  blk_finish_plug+0x40/0x60
+>  ext4_writepages+0x696/0x1320
+>  do_writepages+0x1c/0x80
+>  __filemap_fdatawrite_range+0xd7/0x120
+>  sync_file_range+0xac/0xf0
+> 
+> ioc->bfqd:
+>  bfq_exit_icq+0xa3/0xe0 -> bfqd->lock grabbed
+>  put_io_context_active+0x78/0xb0 -> ioc->lock grabbed
+>  exit_io_context+0x48/0x50
+>  do_exit+0x7e9/0xdd0
+>  do_group_exit+0x54/0xc0
+> 
+> To avoid this inversion we change blk_mq_sched_try_insert_merge() to not
+> free the merged request but rather leave that upto the caller similarly
+> to blk_mq_sched_try_merge(). And in bfq_insert_requests() we make sure
+> to free all the merged requests after dropping bfqd->lock.
+> 
+> Fixes: aee69d78dec0 ("block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler")
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-We ignore that, as the commit histoy says:
+Looks fine,
 
-commit e10de3723c53378e7cf441529f563c316fdc0dd3
-Author: Dave Chinner <dchinner@redhat.com>
-Date:   Mon Feb 15 17:23:12 2016 +1100
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-    xfs: don't chain ioends during writepage submission
+Thanks, 
+Ming
 
-    Currently we can build a long ioend chain during ->writepages that
-    gets attached to the writepage context. IO submission only then
-    occurs when we finish all the writepage processing. This means we
-    can have many ioends allocated and pending, and this violates the
-    mempool guarantees that we need to give about forwards progress.
-    i.e. we really should only have one ioend being built at a time,
-    otherwise we may drain the mempool trying to allocate a new ioend
-    and that blocks submission, completion and freeing of ioends that
-    are already in progress.
-
-    To prevent this situation from happening, we need to submit ioends
-    for IO as soon as they are ready for dispatch rather than queuing
-    them for later submission. This means the ioends have bios built
-    immediately and they get queued on any plug that is current active.
-    Hence if we schedule away from writeback, the ioends that have been
-    built will make forwards progress due to the plug flushing on
-    context switch. This will also prevent context switches from
-    creating unnecessary IO submission latency.
-
-    We can't completely avoid having nested IO allocation - when we have
-    a block size smaller than a page size, we still need to hold the
-    ioend submission until after we have marked the current page dirty.
-    Hence we may need multiple ioends to be held while the current page
-    is completely mapped and made ready for IO dispatch. We cannot avoid
-    this problem - the current code already has this ioend chaining
-    within a page so we can mostly ignore that it occurs.
-
-    Signed-off-by: Dave Chinner <dchinner@redhat.com>
-    Reviewed-by: Christoph Hellwig <hch@lst.de>
-    Signed-off-by: Dave Chinner <david@fromorbit.com>
-
-IOWs, this nesting for block size < page size has been out there
-for many years now and we've yet to have anyone report that
-writeback deadlocks have occurred.
-
-There's a mistake in that commit message - we can't submit the
-ioends on a page until we've marked the page as under writeback, not
-dirty. That's because we cannot have ioends completing on a a page
-that isn't under writeback because calling end_page_writeback() on
-it when it isn't under writeback will BUG(). Hence we have to build
-all the submission state before we mark the page as under writeback
-and perform the submission(s) to avoid completion racing with
-submission.
-
-Hence we can't actually avoid nesting ioend allocation here within a
-single page - the constraints of page cache writeback require it.
-Hence the construction of the iomap_ioend_bioset uses a pool size of:
-
-	4 * (PAGE_SIZE / SECTOR_SIZE)
-
-So that we always have enough ioends cached in the mempool to
-guarantee forwards progress of writeback of any single page under
-writeback.
-
-But that is a completely separate problem to this:
-
-> Chained bios have been submitted already, but all can't be completed/freed
-> until the whole ioend is done, that submission won't make forward progress.
-
-This is a problem caused by having unbound contiguous ioend sizes,
-not a problem caused by chaining bios. We can throw 256 pages into
-a bio, so when we are doing huge contiguous IOs, we can map a
-lot of sequential dirty pages into a contiguous extent into a very
-long bio chain. But if we cap the max ioend size to, say, 4096
-pages, then we've effectively capped the number of bios that can be
-nested by such a writeback chain.
-
-I was about to point you at the patchset that fixes this, but you've
-already found it and are claiming that this nesting is an unfixable
-problem. Capping the size of the ioend also bounds the depth of the
-allocation nesting that will occur, and that fixes the whole nseting
-deadlock problem: If the mempool reserves are deeper than than the
-maximum chain nesting that can occur, then there is no deadlock.
-
-However, this points out what the real problem here is: that bio
-allocation is designed to deadlock when nesting bio allocation rather
-than fail. Hence at the iomap level we've go no way of knowing that
-we should terminate and submit the current bio chain and start a new
-ioend+bio chain because we will hang before there's any indication
-that a deadlock could occur.
-
-And then the elephant in the room: reality.
-
-We've been nesting bio allocations via this chaining in production
-systems under heavy memory pressure for 5 years now and we don't
-have a single bug report indicating that this code deadlocks. So
-while there's a theoretical problem, evidence points to it not being
-an issue in practice.
-
-Hence I don't think there is any need to urgently turn this code
-upside down. I'd much prefer that bio allocation would fail rather
-than deadlock, because then we can set a flag in the writepage
-context that says "do single bio ioend submission only" for the
-duration of that writeback context. And with that, the forwards
-progress problem is solved whilst still allowing us to chain as
-deeply as we want when there is no memory pressure....
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
