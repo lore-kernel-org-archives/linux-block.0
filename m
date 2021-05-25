@@ -2,65 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D400C2B9F8
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E32AC47086
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AB4E613F9
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74E1B611C9
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231319AbhEYIPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 04:15:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46422 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231133AbhEYIPs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 04:15:48 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07D3AC061574
-        for <linux-block@vger.kernel.org>; Tue, 25 May 2021 01:14:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IS8oe6DWcJGa9bQBBDi4fccLjfq1qMG9DdtD8Ef9/pA=; b=aiGi4Md1RIbLISctPoP6SRTcG3
-        OwRilm7WXXMZln8sJRa9s8mLMuBmxt8mR6p5Fvu7B7C2124hVmzWe29C0VG25AhXc8j1Q9L1e7DLd
-        ql0Kh62XJVHxRaQO9xu9ATLkOI4hNUlHSpChLLY6ldsVTKThQEq4pTCzsOqwM9LkbRnjqj8TjL8Sb
-        K9MTg3O+i6I7wh3YNJGqe3GLWRzlVz5F+7Pn8mMR8qg714lBRLoCqWv41wtUG6oZDfDCRcSTLBJ32
-        ptnS6ymrx6uccViu0zU+NN5ZQVWDRyFp0DWCi03Z3fR9U8o1SeNq9U3paviyeC2NA6DNLKJtbenT+
-        2yOXsitQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1llSC4-003GjB-W0; Tue, 25 May 2021 08:13:47 +0000
-Date:   Tue, 25 May 2021 09:13:40 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v4 05/11] dm: cleanup device_area_is_invalid()
-Message-ID: <YKyxtD/1erFemA1p@infradead.org>
-References: <20210525022539.119661-1-damien.lemoal@wdc.com>
- <20210525022539.119661-6-damien.lemoal@wdc.com>
+        id S232203AbhEYIT4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 04:19:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59476 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230370AbhEYIT4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 May 2021 04:19:56 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1621930705; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dx8Mp3xhIbC9s7UG8etfxN0DUmZKH5uLGFLLxpPpF5k=;
+        b=IymtYxBd/wEomXEep83nc/rgBdMCvkjFvi0Pb3VwB43kQA3t6IEPjQXylOT5wYQ/UNRmmL
+        43ny40FmOF/eLaRtZsXREkQ4fFxp5EDBtL/egvxW8mUvtyrQOlA1uW6WINlcAAj+wQugx/
+        EfqaPh03/0yuSlZkpygKJMJyIGAJ3Ew=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1621930705;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dx8Mp3xhIbC9s7UG8etfxN0DUmZKH5uLGFLLxpPpF5k=;
+        b=FaJrILtbZNsCTNOxN7pTJBozXaRRhC58JWUc7EKPEGNbX7MjJbFQWaVI8ACjsRBXR7lCpI
+        y9GvtmRLf0yd7tAg==
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 75937AE1F;
+        Tue, 25 May 2021 08:18:25 +0000 (UTC)
+Subject: Re: [PATCH 4/8] block: move adjusting bd_part_count out of
+ __blkdev_get
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <song@kernel.org>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20210525061301.2242282-1-hch@lst.de>
+ <20210525061301.2242282-5-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <e0927e9e-9bfc-45a7-5924-c0a0988d6fbe@suse.de>
+Date:   Tue, 25 May 2021 10:18:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210525022539.119661-6-damien.lemoal@wdc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210525061301.2242282-5-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 25, 2021 at 11:25:33AM +0900, Damien Le Moal wrote:
-> In device_area_is_invalid(), use bdev_is_zoned() instead of open
-> coding the test on the zoned model returned by bdev_zoned_model().
+On 5/25/21 8:12 AM, Christoph Hellwig wrote:
+> Keep in the callers and thus remove the for_part argument.  This mirrors
+> what is done on the blkdev_get side and slightly simplifies
+> blkdev_get_part as well.
 > 
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   fs/block_dev.c | 16 +++++++---------
+>   1 file changed, 7 insertions(+), 9 deletions(-)
 > Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Looks good,
+Cheers,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
