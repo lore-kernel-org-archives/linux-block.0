@@ -2,364 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F439C2B9F7
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 03:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 917FEC4707F
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 04:54:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75D256117A
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 03:21:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D29F613BF
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 04:54:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230085AbhEYDXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 May 2021 23:23:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37974 "EHLO
+        id S230314AbhEYE4S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 00:56:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41841 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229575AbhEYDXW (ORCPT
+        by vger.kernel.org with ESMTP id S229476AbhEYE4R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 May 2021 23:23:22 -0400
+        Tue, 25 May 2021 00:56:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621912913;
+        s=mimecast20190719; t=1621918488;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hN/qmFSWE4X1/1WyvflertyODujEppC5hAfuD6ka3nI=;
-        b=ed8W5poqBJoXUeo4AFCqvRWNXI0zEUFSwbvumx+9GNklEkEXA3TmGqQbEfJNPbhmn2CaQI
-        WzG1EtmhvlaHRMXGSJugmei33K0l6jECZao+zf/m2yIZs5G0r/6O7K1SpMEoVpggq8i13O
-        y1gP2OlTyfhBG4/0MR2U1X8/vQAVcyM=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-3AZnjRV5N66ECl3m5wGy0w-1; Mon, 24 May 2021 23:21:51 -0400
-X-MC-Unique: 3AZnjRV5N66ECl3m5wGy0w-1
-Received: by mail-pf1-f197.google.com with SMTP id a141-20020a621a930000b02902de0bf944f8so15137124pfa.10
-        for <linux-block@vger.kernel.org>; Mon, 24 May 2021 20:21:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=hN/qmFSWE4X1/1WyvflertyODujEppC5hAfuD6ka3nI=;
-        b=iqObrVgEnM/0hu2s6eayHG2x++8lXw8ypCDQDeUvmaIwhAGZDw3VR/DQgAmGH2TiAu
-         cIKRuykEJyQdbqEvPTlvpPsSn6n1ZxS+O3cZEn7AT+ihYq+lNj3k+LIrZ4JWyz/rajhS
-         ONXjCbwsC3cXW1WGUxRCsaUu8QIkXGot9GW8x44USLumaB9/FgQHKoo1bK74qxHUmCGz
-         dZpcGPwDf7r3BJWpUI5VvEv3pGLA9Tc0P5s2YmTXEQaXPZ15gjd1VfdqWsoAn+KPdkEg
-         J1durE2kiIdNFLHxKd8/soNrzbDXcp4f9/OdHOZ0zf9xiFAwlHlsMrhQFM8FOEkxW/OG
-         E9yQ==
-X-Gm-Message-State: AOAM5334rO7tiB7t1ia847c4l+Hg2hIG9yJIPLUhWuhCeNdUz9+ZvU15
-        U5n/HRcNpSFqazvtW7mFKnpwIb0/36A1q3thOEmfkmIAiOWhVkncjT8hfjz2cyTrcXDgIJev9R1
-        dKakoduipePmx7Xoyp1Wv9CU=
-X-Received: by 2002:a17:902:f784:b029:ef:8e2f:430e with SMTP id q4-20020a170902f784b02900ef8e2f430emr28826879pln.28.1621912910735;
-        Mon, 24 May 2021 20:21:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzDUbseCl+SvcFZTnoFf+aRPtbg6SWGAQweGkBDt3D+VDTBF5zU1ukESHVEzVi0j0Heq4PiHA==
-X-Received: by 2002:a17:902:f784:b029:ef:8e2f:430e with SMTP id q4-20020a170902f784b02900ef8e2f430emr28826854pln.28.1621912910345;
-        Mon, 24 May 2021 20:21:50 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id jz7sm666619pjb.32.2021.05.24.20.21.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 May 2021 20:21:49 -0700 (PDT)
-Subject: Re: [PATCH 3/3] virtio_blk: implement blk_mq_ops->poll()
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, slp@redhat.com,
-        sgarzare@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20210520141305.355961-1-stefanha@redhat.com>
- <20210520141305.355961-4-stefanha@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <eefac014-0361-b554-ffdc-2ce920810fa5@redhat.com>
-Date:   Tue, 25 May 2021 11:21:41 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        bh=e1ylxpy47HeQDM0h6efF3HEY5ADA+4SCgoc7H3zInTM=;
+        b=i0sYnGorWu44N6rr17waxU+sTPAC3p2WgEekNVkTymbjxt97B8s69Zx5PYJV8M1UjVRnj1
+        6OjKogYsDrSbMhuejTLUgz2jUbfu98xOUX3U7b9Tk2nMXaVHMzdV+j7Hrm7F1RGBd+RaF7
+        Go7nHT1eyLyXjANJUlmcoEMGZNQYrvo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-oUkHKAR-PwODgyD5q332TQ-1; Tue, 25 May 2021 00:54:44 -0400
+X-MC-Unique: oUkHKAR-PwODgyD5q332TQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5665D801106;
+        Tue, 25 May 2021 04:54:43 +0000 (UTC)
+Received: from T590 (ovpn-12-45.pek2.redhat.com [10.72.12.45])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B35E65D9C0;
+        Tue, 25 May 2021 04:54:39 +0000 (UTC)
+Date:   Tue, 25 May 2021 12:54:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Brian Foster <bfoster@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: iomap: writeback ioend/bio allocation deadlock risk
+Message-ID: <YKyDCw430gD6pTBC@T590>
+References: <YKcouuVR/y/L4T58@T590>
+ <20210521071727.GA11473@lst.de>
+ <YKdhuUZBtKMxDpsr@T590>
+ <20210521073547.GA11955@lst.de>
+ <YKdwtzp+WWQ3krhI@T590>
+ <20210521083635.GA15311@lst.de>
+ <YKd1VS5gkzQRn+7x@T590>
+ <20210524235538.GI2817@dread.disaster.area>
 MIME-Version: 1.0
-In-Reply-To: <20210520141305.355961-4-stefanha@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210524235538.GI2817@dread.disaster.area>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, May 25, 2021 at 09:55:38AM +1000, Dave Chinner wrote:
+> On Fri, May 21, 2021 at 04:54:45PM +0800, Ming Lei wrote:
+> > On Fri, May 21, 2021 at 10:36:35AM +0200, Christoph Hellwig wrote:
+> > > On Fri, May 21, 2021 at 04:35:03PM +0800, Ming Lei wrote:
+> > > > Just wondering why the ioend isn't submitted out after it becomes full?
+> > > 
+> > > block layer plugging?  Although failing bio allocations will kick that,
+> > > so that is not a deadlock risk.
+> > 
+> > These ioends are just added to one list stored on local stack variable(submit_list),
+> > how can block layer plugging observe & submit them out?
+> 
+> We ignore that, as the commit histoy says:
+> 
+> commit e10de3723c53378e7cf441529f563c316fdc0dd3
+> Author: Dave Chinner <dchinner@redhat.com>
+> Date:   Mon Feb 15 17:23:12 2016 +1100
+> 
+>     xfs: don't chain ioends during writepage submission
+> 
+>     Currently we can build a long ioend chain during ->writepages that
+>     gets attached to the writepage context. IO submission only then
+>     occurs when we finish all the writepage processing. This means we
+>     can have many ioends allocated and pending, and this violates the
+>     mempool guarantees that we need to give about forwards progress.
+>     i.e. we really should only have one ioend being built at a time,
+>     otherwise we may drain the mempool trying to allocate a new ioend
+>     and that blocks submission, completion and freeing of ioends that
+>     are already in progress.
+> 
+>     To prevent this situation from happening, we need to submit ioends
+>     for IO as soon as they are ready for dispatch rather than queuing
+>     them for later submission. This means the ioends have bios built
+>     immediately and they get queued on any plug that is current active.
+>     Hence if we schedule away from writeback, the ioends that have been
+>     built will make forwards progress due to the plug flushing on
+>     context switch. This will also prevent context switches from
+>     creating unnecessary IO submission latency.
+> 
+>     We can't completely avoid having nested IO allocation - when we have
+>     a block size smaller than a page size, we still need to hold the
+>     ioend submission until after we have marked the current page dirty.
+>     Hence we may need multiple ioends to be held while the current page
+>     is completely mapped and made ready for IO dispatch. We cannot avoid
+>     this problem - the current code already has this ioend chaining
+>     within a page so we can mostly ignore that it occurs.
+> 
+>     Signed-off-by: Dave Chinner <dchinner@redhat.com>
+>     Reviewed-by: Christoph Hellwig <hch@lst.de>
+>     Signed-off-by: Dave Chinner <david@fromorbit.com>
+> 
+> IOWs, this nesting for block size < page size has been out there
+> for many years now and we've yet to have anyone report that
+> writeback deadlocks have occurred.
+> 
+> There's a mistake in that commit message - we can't submit the
+> ioends on a page until we've marked the page as under writeback, not
+> dirty. That's because we cannot have ioends completing on a a page
+> that isn't under writeback because calling end_page_writeback() on
+> it when it isn't under writeback will BUG(). Hence we have to build
+> all the submission state before we mark the page as under writeback
+> and perform the submission(s) to avoid completion racing with
+> submission.
+> 
+> Hence we can't actually avoid nesting ioend allocation here within a
+> single page - the constraints of page cache writeback require it.
+> Hence the construction of the iomap_ioend_bioset uses a pool size of:
+> 
+> 	4 * (PAGE_SIZE / SECTOR_SIZE)
+> 
+> So that we always have enough ioends cached in the mempool to
+> guarantee forwards progress of writeback of any single page under
+> writeback.
 
-ÔÚ 2021/5/20 ÏÂÎç10:13, Stefan Hajnoczi Ð´µÀ:
-> Request completion latency can be reduced by using polling instead of
-> irqs. Even Posted Interrupts or similar hardware support doesn't beat
-> polling. The reason is that disabling virtqueue notifications saves
-> critical-path CPU cycles on the host by skipping irq injection and in
-> the guest by skipping the irq handler. So let's add blk_mq_ops->poll()
-> support to virtio_blk.
->
-> The approach taken by this patch differs from the NVMe driver's
-> approach. NVMe dedicates hardware queues to polling and submits
-> REQ_HIPRI requests only on those queues. This patch does not require
-> exclusive polling queues for virtio_blk. Instead, it switches between
-> irqs and polling when one or more REQ_HIPRI requests are in flight on a
-> virtqueue.
->
-> This is possible because toggling virtqueue notifications is cheap even
-> while the virtqueue is running. NVMe cqs can't do this because irqs are
-> only enabled/disabled at queue creation time.
->
-> This toggling approach requires no configuration. There is no need to
-> dedicate queues ahead of time or to teach users and orchestration tools
-> how to set up polling queues.
->
-> Possible drawbacks of this approach:
->
-> - Hardware virtio_blk implementations may find virtqueue_disable_cb()
->    expensive since it requires DMA.
+OK, looks it is just for subpage IO, so there isn't such issue
+in case of multiple ioends.
 
+> 
+> But that is a completely separate problem to this:
+> 
+> > Chained bios have been submitted already, but all can't be completed/freed
+> > until the whole ioend is done, that submission won't make forward progress.
+> 
+> This is a problem caused by having unbound contiguous ioend sizes,
+> not a problem caused by chaining bios. We can throw 256 pages into
+> a bio, so when we are doing huge contiguous IOs, we can map a
+> lot of sequential dirty pages into a contiguous extent into a very
+> long bio chain. But if we cap the max ioend size to, say, 4096
+> pages, then we've effectively capped the number of bios that can be
+> nested by such a writeback chain.
 
-Note that it's probably not related to the behavior of the driver but 
-the design of the event suppression mechanism.
+If the 4096 pages are not continuous, there may be 4096/256=16 bios
+allocated for single ioend, and one is allocated from iomap_ioend_bioset,
+another 15 is allocated by bio_alloc() from fs_bio_set which just
+reserves 2 bios.
 
-Device can choose to ignore the suppression flag and keep sending 
-interrupts.
+> 
+> I was about to point you at the patchset that fixes this, but you've
+> already found it and are claiming that this nesting is an unfixable
+> problem. Capping the size of the ioend also bounds the depth of the
+> allocation nesting that will occur, and that fixes the whole nseting
+> deadlock problem: If the mempool reserves are deeper than than the
+> maximum chain nesting that can occur, then there is no deadlock.
+> 
+> However, this points out what the real problem here is: that bio
+> allocation is designed to deadlock when nesting bio allocation rather
+> than fail. Hence at the iomap level we've go no way of knowing that
+> we should terminate and submit the current bio chain and start a new
+> ioend+bio chain because we will hang before there's any indication
+> that a deadlock could occur.
 
+Most of reservation is small, such as fs_bio_set, so bio_alloc_bioset()
+documents that 'never allocate more than 1 bio at a time'. Actually
+iomap_chain_bio() does allocate a new one, then submits the old one.
+'fs_bio_set' reserves two bios, so the order(alloc before submit) is fine,
+but all bios allocated from iomap_chain_bio() can only be freed after the
+whole ioend is done, this way is fragile to deadlock, because submission
+can't provide forward progress an more, such as, flushing plug list before
+schedule out can't work as expected.
 
->   If such devices become popular then
->    the virtio_blk driver could use a similar approach to NVMe when
->    VIRTIO_F_ACCESS_PLATFORM is detected in the future.
->
-> - If a blk_poll() thread is descheduled it not only hurts polling
->    performance but also delays completion of non-REQ_HIPRI requests on
->    that virtqueue since vq notifications are disabled.
+One question is why the chained bios in ioend aren't completed individually?
+What is the advantage to complete all bios in iomap_finish_ioend()?
 
+> 
+> And then the elephant in the room: reality.
+> 
+> We've been nesting bio allocations via this chaining in production
+> systems under heavy memory pressure for 5 years now and we don't
+> have a single bug report indicating that this code deadlocks. So
+> while there's a theoretical problem, evidence points to it not being
+> an issue in practice.
+> 
+> Hence I don't think there is any need to urgently turn this code
+> upside down. I'd much prefer that bio allocation would fail rather
 
-Can we poll only when only high pri requests are pending?
-
-If the backend is a remote one, I think the polling may cause more cpu 
-cycles.
-
-
->
-> Performance:
->
-> - Benchmark: fio ioengine=pvsync2 numjobs=4 direct=1
-> - Guest: 4 vCPUs with one virtio-blk device (4 virtqueues)
-> - Disk: Intel Corporation NVMe Datacenter SSD [Optane] [8086:2701]
-> - CPU: Intel(R) Xeon(R) Silver 4214 CPU @ 2.20GHz
->
-> rw          bs hipri=0 hipri=1
-> ------------------------------
-> randread    4k 149,426 170,763 +14%
-> randread   16k 118,939 134,269 +12%
-> randread   64k  34,886  34,906   0%
-> randread  128k  17,655  17,667   0%
-> randwrite   4k 138,578 163,600 +18%
-> randwrite  16k 102,089 120,950 +18%
-> randwrite  64k  32,364  32,561   0%
-> randwrite 128k  16,154  16,237   0%
-> read        4k 146,032 170,620 +16%
-> read       16k 117,097 130,437 +11%
-> read       64k  34,834  35,037   0%
-> read      128k  17,680  17,658   0%
-> write       4k 134,562 151,422 +12%
-> write      16k 101,796 107,606  +5%
-> write      64k  32,364  32,594   0%
-> write     128k  16,259  16,265   0%
->
-> Larger block sizes do not benefit from polling as much but the
-> improvement is worthwhile for smaller block sizes.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   drivers/block/virtio_blk.c | 92 +++++++++++++++++++++++++++++++++++---
->   1 file changed, 87 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index fc0fb1dcd399..f0243dcd745a 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -29,6 +29,16 @@ static struct workqueue_struct *virtblk_wq;
->   struct virtio_blk_vq {
->   	struct virtqueue *vq;
->   	spinlock_t lock;
-> +
-> +	/* Number of non-REQ_HIPRI requests in flight. Protected by lock. */
-> +	unsigned int num_lopri;
-> +
-> +	/* Number of REQ_HIPRI requests in flight. Protected by lock. */
-> +	unsigned int num_hipri;
-> +
-> +	/* Are vq notifications enabled? Protected by lock. */
-> +	bool cb_enabled;
-
-
-We had event_flag_shadow, is it sufficient to introduce a new helper 
-virtqueue_cb_is_enabled()?
-
-
-> +
->   	char name[VQ_NAME_LEN];
->   } ____cacheline_aligned_in_smp;
->   
-> @@ -171,33 +181,67 @@ static inline void virtblk_request_done(struct request *req)
->   	blk_mq_end_request(req, virtblk_result(vbr));
->   }
->   
-> -static void virtblk_done(struct virtqueue *vq)
-> +/* Returns true if one or more requests completed */
-> +static bool virtblk_complete_requests(struct virtqueue *vq)
->   {
->   	struct virtio_blk *vblk = vq->vdev->priv;
->   	struct virtio_blk_vq *vbq = &vblk->vqs[vq->index];
->   	bool req_done = false;
-> +	bool last_hipri_done = false;
->   	struct virtblk_req *vbr;
->   	unsigned long flags;
->   	unsigned int len;
->   
->   	spin_lock_irqsave(&vbq->lock, flags);
-> +
->   	do {
-> -		virtqueue_disable_cb(vq);
-> +		if (vbq->cb_enabled)
-> +			virtqueue_disable_cb(vq);
->   		while ((vbr = virtqueue_get_buf(vq, &len)) != NULL) {
->   			struct request *req = blk_mq_rq_from_pdu(vbr);
->   
-> +			if (req->cmd_flags & REQ_HIPRI) {
-> +				if (--vbq->num_hipri == 0)
-> +					last_hipri_done = true;
-> +			} else
-> +				vbq->num_lopri--;
-> +
->   			if (likely(!blk_should_fake_timeout(req->q)))
->   				blk_mq_complete_request(req);
->   			req_done = true;
->   		}
->   		if (unlikely(virtqueue_is_broken(vq)))
->   			break;
-> -	} while (!virtqueue_enable_cb(vq));
-> +
-> +		/* Enable vq notifications if non-polled requests remain */
-> +		if (last_hipri_done && vbq->num_lopri > 0) {
-> +			last_hipri_done = false;
-> +			vbq->cb_enabled = true;
-> +		}
-> +	} while (vbq->cb_enabled && !virtqueue_enable_cb(vq));
->   
->   	/* In case queue is stopped waiting for more buffers. */
->   	if (req_done)
->   		blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
->   	spin_unlock_irqrestore(&vbq->lock, flags);
-> +
-> +	return req_done;
-> +}
-> +
-> +static int virtblk_poll(struct blk_mq_hw_ctx *hctx)
-> +{
-> +	struct virtio_blk *vblk = hctx->queue->queuedata;
-> +	struct virtqueue *vq = vblk->vqs[hctx->queue_num].vq;
-> +
-> +	if (!virtqueue_more_used(vq))
+GFP_NOWAIT can be passed to bio_alloc() if you like, but the caller has
+to handle out of allocation. So far iomap ioend code supposes all bio
+allocation can succeed.
 
 
-I'm not familiar with block polling but what happens if a buffer is made 
-available after virtqueue_more_used() returns false here?
-
-Thanks
-
-
-> +		return 0;
-> +
-> +	return virtblk_complete_requests(vq);
-> +}
-> +
-> +static void virtblk_done(struct virtqueue *vq)
-> +{
-> +	virtblk_complete_requests(vq);
->   }
->   
->   static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
-> @@ -275,6 +319,16 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->   	}
->   
->   	spin_lock_irqsave(&vbq->lock, flags);
-> +
-> +	/* Re-enable vq notifications if first req is non-polling */
-> +	if (!(req->cmd_flags & REQ_HIPRI) &&
-> +	    vbq->num_lopri == 0 && vbq->num_hipri == 0 &&
-> +	    !vbq->cb_enabled) {
-> +		/* Can't return false since there are no in-flight reqs */
-> +		virtqueue_enable_cb(vbq->vq);
-> +		vbq->cb_enabled = true;
-> +	}
-> +
->   	err = virtblk_add_req(vbq->vq, vbr, vbr->sg, num);
->   	if (err) {
->   		virtqueue_kick(vbq->vq);
-> @@ -294,6 +348,21 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->   		}
->   	}
->   
-> +	/*
-> +	 * Disable vq notifications when polled reqs are submitted.
-> +	 *
-> +	 * The virtqueue lock is held so req is still valid here even if the
-> +	 * device polls the virtqueue and completes the request before we call
-> +	 * virtqueue_notify().
-> +	 */
-> +	if (req->cmd_flags & REQ_HIPRI) {
-> +		if (vbq->num_hipri++ == 0 && vbq->cb_enabled) {
-> +			virtqueue_disable_cb(vbq->vq);
-> +			vbq->cb_enabled = false;
-> +		}
-> +	} else
-> +		vbq->num_lopri++;
-> +
->   	if (bd->last && virtqueue_kick_prepare(vbq->vq))
->   		notify = true;
->   	spin_unlock_irqrestore(&vbq->lock, flags);
-> @@ -533,6 +602,9 @@ static int init_vq(struct virtio_blk *vblk)
->   	for (i = 0; i < num_vqs; i++) {
->   		spin_lock_init(&vblk->vqs[i].lock);
->   		vblk->vqs[i].vq = vqs[i];
-> +		vblk->vqs[i].num_lopri = 0;
-> +		vblk->vqs[i].num_hipri = 0;
-> +		vblk->vqs[i].cb_enabled = true;
->   	}
->   	vblk->num_vqs = num_vqs;
->   
-> @@ -681,8 +753,16 @@ static int virtblk_map_queues(struct blk_mq_tag_set *set)
->   {
->   	struct virtio_blk *vblk = set->driver_data;
->   
-> -	return blk_mq_virtio_map_queues(&set->map[HCTX_TYPE_DEFAULT],
-> -					vblk->vdev, 0);
-> +	set->map[HCTX_TYPE_DEFAULT].nr_queues = vblk->num_vqs;
-> +	blk_mq_virtio_map_queues(&set->map[HCTX_TYPE_DEFAULT], vblk->vdev, 0);
-> +
-> +	set->map[HCTX_TYPE_READ].nr_queues = 0;
-> +
-> +	/* HCTX_TYPE_DEFAULT queues are shared with HCTX_TYPE_POLL */
-> +	set->map[HCTX_TYPE_POLL].nr_queues = vblk->num_vqs;
-> +	blk_mq_virtio_map_queues(&set->map[HCTX_TYPE_POLL], vblk->vdev, 0);
-> +
-> +	return 0;
->   }
->   
->   static const struct blk_mq_ops virtio_mq_ops = {
-> @@ -691,6 +771,7 @@ static const struct blk_mq_ops virtio_mq_ops = {
->   	.complete	= virtblk_request_done,
->   	.init_request	= virtblk_init_request,
->   	.map_queues	= virtblk_map_queues,
-> +	.poll		= virtblk_poll,
->   };
->   
->   static unsigned int virtblk_queue_depth;
-> @@ -768,6 +849,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->   
->   	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
->   	vblk->tag_set.ops = &virtio_mq_ops;
-> +	vblk->tag_set.nr_maps = 3; /* default, read, and poll */
->   	vblk->tag_set.queue_depth = queue_depth;
->   	vblk->tag_set.numa_node = NUMA_NO_NODE;
->   	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+Thanks, 
+Ming
 
