@@ -4,127 +4,128 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0059EC2B9F8
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 13:19:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AACC47084
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 13:21:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7F8261420
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 13:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 182FF61420
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 13:21:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233151AbhEYNVR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 09:21:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46738 "EHLO
+        id S233189AbhEYNWk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 09:22:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25592 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233172AbhEYNVK (ORCPT
+        by vger.kernel.org with ESMTP id S232285AbhEYNWg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 09:21:10 -0400
+        Tue, 25 May 2021 09:22:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621948780;
+        s=mimecast20190719; t=1621948866;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=zZxaIXMKBL2xYZBd8FBb6gCvi6cm3iqOYV73SsLQBnI=;
-        b=U1yHlL5oDVAYzoc+HD9+BMX796k6Zwp6Tuv7BGdsQGaEjI4mQ0vuDi2r4HdNbgbAkEcaKe
-        glJrrylUZfOot7MxMA5L372a8wUpP9F1iBEc39t+7ARt8D0MHwzkhGmSjXDRNI4wrpxNoG
-        C7yohMvteSvtpz365oVngM2G2W+VD5E=
+        bh=mNt+DjVfGGIxrVvGjGmM2V8MGzWk+ZVdoTSHQp30M6w=;
+        b=Llq6nAkrJQ3nYldz/rdojmyhG5Byz4Wm/evoEIxu32+pe23S+dLuVTGQDpd7jMji+P0ju+
+        Sv5KTdND+vCB7rTBB9HiwPc0vvLRZUe6LN51BfIldClqYBsQQXMD6AZ+dxWnBP1ArAyy7t
+        o9MUqhRisV8CKzd4Ik+BKQ9AH/4KX+M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-4G8AXiD4MC6vQu30vdl2ng-1; Tue, 25 May 2021 09:19:32 -0400
-X-MC-Unique: 4G8AXiD4MC6vQu30vdl2ng-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-200-c7s7ocZ1NLmyw36_7g7jGg-1; Tue, 25 May 2021 09:21:02 -0400
+X-MC-Unique: c7s7ocZ1NLmyw36_7g7jGg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D733100945E;
-        Tue, 25 May 2021 13:19:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11D28107ACCD;
+        Tue, 25 May 2021 13:21:01 +0000 (UTC)
 Received: from localhost (ovpn-115-80.ams2.redhat.com [10.36.115.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 15982100760F;
-        Tue, 25 May 2021 13:19:23 +0000 (UTC)
-Date:   Tue, 25 May 2021 14:19:22 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8C1205D6AC;
+        Tue, 25 May 2021 13:20:49 +0000 (UTC)
+Date:   Tue, 25 May 2021 14:20:49 +0100
 From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     virtualization@lists.linux-foundation.org,
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, slp@redhat.com,
-        sgarzare@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        slp@redhat.com, sgarzare@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>
 Subject: Re: [PATCH 3/3] virtio_blk: implement blk_mq_ops->poll()
-Message-ID: <YKz5WqaeU0R0jQMu@stefanha-x1.localdomain>
+Message-ID: <YKz5sQPPNdccztHh@stefanha-x1.localdomain>
 References: <20210520141305.355961-1-stefanha@redhat.com>
  <20210520141305.355961-4-stefanha@redhat.com>
  <20210524145928.GA3873@lst.de>
+ <7cc7f19b-34b3-1501-898d-3f41e047d766@redhat.com>
+ <YKypgi2qcYVTgYdv@T590>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="FcfGVErKD3SlOPsb"
+        protocol="application/pgp-signature"; boundary="GTdFGyW7Xz8tnV5A"
 Content-Disposition: inline
-In-Reply-To: <20210524145928.GA3873@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <YKypgi2qcYVTgYdv@T590>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---FcfGVErKD3SlOPsb
+--GTdFGyW7Xz8tnV5A
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 24, 2021 at 04:59:28PM +0200, Christoph Hellwig wrote:
-> On Thu, May 20, 2021 at 03:13:05PM +0100, Stefan Hajnoczi wrote:
-> > Possible drawbacks of this approach:
+On Tue, May 25, 2021 at 03:38:42PM +0800, Ming Lei wrote:
+> On Tue, May 25, 2021 at 09:22:48AM +0200, Paolo Bonzini wrote:
+> > On 24/05/21 16:59, Christoph Hellwig wrote:
+> > > On Thu, May 20, 2021 at 03:13:05PM +0100, Stefan Hajnoczi wrote:
+> > > > Possible drawbacks of this approach:
+> > > >=20
+> > > > - Hardware virtio_blk implementations may find virtqueue_disable_cb=
+()
+> > > >    expensive since it requires DMA. If such devices become popular =
+then
+> > > >    the virtio_blk driver could use a similar approach to NVMe when
+> > > >    VIRTIO_F_ACCESS_PLATFORM is detected in the future.
+> > > >=20
+> > > > - If a blk_poll() thread is descheduled it not only hurts polling
+> > > >    performance but also delays completion of non-REQ_HIPRI requests=
+ on
+> > > >    that virtqueue since vq notifications are disabled.
+> > >=20
+> > > Yes, I think this is a dangerous configuration.  What argument exists
+> > > again just using dedicated poll queues?
 > >=20
-> > - Hardware virtio_blk implementations may find virtqueue_disable_cb()
-> >   expensive since it requires DMA. If such devices become popular then
-> >   the virtio_blk driver could use a similar approach to NVMe when
-> >   VIRTIO_F_ACCESS_PLATFORM is detected in the future.
-> >=20
-> > - If a blk_poll() thread is descheduled it not only hurts polling
-> >   performance but also delays completion of non-REQ_HIPRI requests on
-> >   that virtqueue since vq notifications are disabled.
+> > There isn't an equivalent of the admin queue in virtio-blk, which would
+> > allow the guest to configure the desired number of poll queues.  The nu=
+mber
+> > of queues is fixed.
 >=20
-> Yes, I think this is a dangerous configuration.  What argument exists
-> again just using dedicated poll queues?
+> Dedicated vqs can be used for poll only, and I understand VM needn't to k=
+now
+> if the vq is polled or driven by IRQ in VM.
+>=20
+> I tried that in v5.4, but not see obvious IOPS boost, so give up.
+>=20
+> https://github.com/ming1/linux/commits/my_v5.4-virtio-irq-poll
 
-Aside from what Paolo described (the lack of a hardware interface to
-designate polling queues), the poll_queues=3DN parameter needs to be added
-to the full guest and host software stack. Users also need to learn
-about this so they can enable it in all the places. This is much more
-hassle for users to configure. The dynamic polling mode approach
-requires no configuration.
-
-Paolo's suggestion is to notify the driver when irqs need to be
-re-enabled if the polling thread is descheduled. I actually have a
-prototype that achieves something similar here:
-https://gitlab.com/stefanha/linux/-/commits/cpuidle-haltpoll-virtqueue
-
-It's a different approach from the current patch series: the cpuidle
-driver provides poll_start/stop() callbacks and virtio_blk participates
-in cpuidle-haltpoll. That means all virtio-blk devices temporarily use
-polling mode while the vCPU is doing cpuidle-haltpoll polling. The neat
-thing about the cpuidle approach is:
-1. Applications don't need to set the RWF_HIPRI flag!
-2. Other drivers besides virtio_blk can participate in polling too.
-
-Maybe we should go with cpuidle polling instead?
+Hey, that's cool. I see a lot of similarity between our patches :).
 
 Stefan
 
---FcfGVErKD3SlOPsb
+--GTdFGyW7Xz8tnV5A
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmCs+VoACgkQnKSrs4Gr
-c8iQxwgAmR9W7hmYqTRjXDc7N6m7WlEUvC5lJOdzS6z9lyWow8E4NbsDC3bWMGRA
-FqBeqV/uXR7quNHf2SlUJRYU8vCiHklVo2GuEVi28frjrI+a1jNIAYqgreDPruWp
-raBsSoXtEiYp7hbNFxTbRV78h/NiM/YB5SaVLSW5X+0JTbIDvQ3Too7VZeDfvdki
-ia88AtFEQ19hFnvIMnnEPu/Lh6J71U2opqacHvBqJMfFJGIQotpBlnHc/uwW+GQ6
-Uys7SGQ073N8tZStszYefcPI0QRiptiIAE08DO40KlLjKtBHt1hc5QAd3y89y5el
-ZSupk+mYJLpzLXQUB+VvLAINMtu2Og==
-=PIq+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmCs+bEACgkQnKSrs4Gr
+c8gpvwf9Gsszvx3thnjSlUHG86t1HZE4scSNI6lprmUa91+ClXSNycaUbWeVwhFb
+RtBBVcKmNyhhn/GKBlczjmVd5BepVijB8cQflfk2gVVol4c/4IfckdlAuhn4SM2F
+FAcyRrUqV17bUzOMCWpnN50nSHaGFBGxnJncMb04WdaM23J+Mi8PfD/ixcRkJCQq
+ZDAR51KF4iHXK5eSC4dPnQ3MI40NZRBnyxT+09k8c522XdAT55GUbQeAxAtvA5Mm
+5jr5DfO1SRrCZyKstnEVZTu6cN+2Y7sunsJ/9sR+VNKTAMpCuX29EyDOxTZBB8fd
+SVNiZeqFPX42bPVbwvacmEC35OHJ7w==
+=wyc4
 -----END PGP SIGNATURE-----
 
---FcfGVErKD3SlOPsb--
+--GTdFGyW7Xz8tnV5A--
 
