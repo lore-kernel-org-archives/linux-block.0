@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45157C4707F
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 402B0C47086
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FBEB61417
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 234E661417
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230269AbhEYV0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 17:26:38 -0400
+        id S231685AbhEYV0j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 17:26:39 -0400
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:36430 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229976AbhEYV0i (ORCPT
+        with ESMTP id S231614AbhEYV0j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 17:26:38 -0400
+        Tue, 25 May 2021 17:26:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1621977908; x=1653513908;
+  t=1621977909; x=1653513909;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=6kRIuS/fUul5WvYm1RwOlXRDAyrR8fnPc2uP9r0LZSo=;
-  b=OtMngLOAhXuzazCr/J0DDOA8RX2s4kNKmAHMSNisn++i95U1ebItJF3z
-   lGyAvqLhIH4SqKXTCtV7AjbguXiMgI1yt4Ele8qNWVhqXS1iJQMppc1Ct
-   hueZBAF+4H0DfQ003nQEkQT4aRJhxpcCUAGdbwsXpmxZYX+1jG1YFJOTr
-   cxsaAc2t31yZuIl21jnIWjgBgCEReotGK9qOZxOG5Qo08nSLQ0/JvwZ/o
-   jj3MmLamuN4RsqqJsbL6rk+zw8215jxWv1myB9K6VhA93hifcEwSTyIeJ
-   RGMF+G95Bi9eOd4X4cqEQTQIrjHI6L6vA4cCt5bwlctXFWvQ6NtI/MAHu
-   w==;
-IronPort-SDR: oVknKXiiR96A0FRWVp7vF6d/vRhk7VUjOZtJ08CWUwwW0RHdyatrLaH2xKViqwApI6naEJdCnz
- 8JbUsTz23T70dFiX1AC2EDpzdj1spuq/7X5cqWN3lsXYV4y1cEfTu3vvt2lX+yqm1iYSIcaKF/
- jEBqL0JprInrF5SfC+k20i1tXfGQc+EA2QqEAlItdzJdNnoTAyQkKLCgJkJPvX3sCuSTm1tqz3
- x6qPEcBbOazgMNc0gYu3kT1chNNNkasUaM/ZLqc09BosGB4O96E6I77f+4yzSX64volLlKyE74
- dDA=
+  bh=/0Fs2t/8Lct+NB2zQOgVL64FvfANBQSa/F9el7DrQpI=;
+  b=hfpq35XNvQ74CNj2BrGviw7kmQc6y4jggSCEkTKnjkqZUyYfB55vT9aD
+   vwfqkdqMRpcukHzib28vbPpxAIOh11xp3/HlNJg09yMCMhVgmy+zdAg1z
+   29sI3ahUXNDvZvlrHYNupdI8tbSLYKMcuEq6ZK/1mjOI+YWlbub2oIdGB
+   rW5VDrwlMjJntirSAewvMEyPIoCBc7cP9aEQ5YlGAmiM6rJqsolfPhOOQ
+   BLoOD4gyHRgZuk0sjXIg3d93Yc/KkM20ZAtRa/Bmlc9gCG+Ifvmo84k0V
+   +tjCNPNQMuRLJ5ajoFlnJ/jc4xeBUBz1+vf3Hikl7DuKYc9NbOp84Q5/q
+   A==;
+IronPort-SDR: +K1J4ZWh1T94S7Ab8U6qBpa0IKvnlC2vF9+fkKcEia6yzkI603NMiAqoJtWEjDvuf13Oadjclm
+ skwQq+rCd3qG+XXHh2knUyPyNrHBBt8oI19OybaBsfcFfEtAJLHhouNwbUnZZAJ7I/GJkueJWo
+ LSarhnrOlkdDuU7I0SoK/pkeinFuoMvGSwVWx/qQblbtZNgO1cJaAPgXERuF3FqJI4BmQdJvXR
+ N0t5gEDV7xEtK6XSNn4nomE9N/kCp+RlH7ZrN1EhbFvy9qW1TExgvhIYcls8K/AJSaEZ5pwgh1
+ ahY=
 X-IronPort-AV: E=Sophos;i="5.82,329,1613404800"; 
-   d="scan'208";a="168717517"
+   d="scan'208";a="168717521"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 May 2021 05:25:07 +0800
-IronPort-SDR: mqnDTol9pcB/H5Kxjt659KtIUT9r3hdXiWD77/wfHBOKYwpOhOIhFuuht5YQpgthYLHfc0jEQi
- yfmzi5lN/YLeWsVbFfM9DesbunfrA3HS3Zxx7CkLwmigDJ9fi/0ylHvgzrJY/t5dNM+LXE/mW/
- 9RTp6ZqR0qshM1AXUQuYwbJuXSxiaBnbGVWGScgBRFW6QtOrAWukCcLMc/WNzqsaUCxZgruwML
- +IjkZPlmYzr6URM8Wmz1XXgKQ9qdZ5GKyczBBmUPG+siQR3iqPcRjKgH+6CXzFfEpT6VTjS0g8
- xm1wgo1WLP6H7UFS9UMQztAK
+  by ob1.hgst.iphmx.com with ESMTP; 26 May 2021 05:25:09 +0800
+IronPort-SDR: OxATa0SMAN5fewINGwCGYfT5JgEkva7M/i8CEZaOS8SfWwYb9DhmeW+bldd4rj6wH1rxA8P0Q+
+ dAsI6lffzNDtPpPyR5KU2puoGux/CwfEESyTfCc/a4ZJDxC38Z9UtDxrjUgnnLcrWqVjr3kFVx
+ 5hje+MxwvXqoc7mOyI28LTlvJqOeM12ErB0nWBrVKBqhPWqu2DFh8AXPAYrRq6FiMoL2XWufxp
+ Br+FqWZk+7LZsLuH9wqSG9Zk7bl3ZGTUgXgW1ikra15YThN7kuC6Zoqm2PrXx2DXftjZpwgKNG
+ rxYGLM+GAhUXEFAAi1wIMtLH
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 14:04:35 -0700
-IronPort-SDR: cs03JQLS7hcWIucz1TPDpUrFjTrNuBxSxEa0ivmhTBQZlYUdzzUf0LsQmP1wn5ZwLyox9oAJul
- 7A/Ft9j4Kbu5eFHderB/Nkfvjd2fU4N7j/SQXDU8THQ9+g4NBCJexgQ7U1WEVwM0Oz6w1qV5L0
- d/I0x1HE9tizeAKl7iRnrWJVPwi4HhsvP5qSLwoRZmrXJtmhohds7u930lzts9qBPl36SD0ycV
- RzLbC4oSSOxtpzuJRcKK7Q9sweMu8KAwG6MEkk1Y/VtPPq8oasAyDEUuH/erj6S+a/a8RWs9Ev
- JgQ=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 14:04:36 -0700
+IronPort-SDR: 3WNVVCsgoR+ULzKivcrpIeAvbOp+kxOVyC48DtAIJxBDV5vcEXViErn5CAUrjJQMKqfidv6Nmn
+ lW4Bg5t3O66RzOS5xKoyVViesIm8tMGdOlCpsqFHGufkP5rGYHsGX7RlmFhbYMsT2IfulamBmL
+ mB7wkTHfZUs7VDnI13816sg/w+4Zx8k7tQhufvjmRMMR8poDM1pV7kBtqNnBEUJba7UsoT9Rz3
+ 1LtKYOjwWvvRvRLBKX62ZoFKG0/THsY8cfbQ9toC+X1FKFXWKX+1V5m47kED3THFGonbQhIKBI
+ scs=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 25 May 2021 14:25:07 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 25 May 2021 14:25:08 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v5 03/11] block: introduce BIO_ZONE_WRITE_LOCKED bio flag
-Date:   Wed, 26 May 2021 06:24:53 +0900
-Message-Id: <20210525212501.226888-4-damien.lemoal@wdc.com>
+Subject: [PATCH v5 04/11] dm: Fix dm_accept_partial_bio()
+Date:   Wed, 26 May 2021 06:24:54 +0900
+Message-Id: <20210525212501.226888-5-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210525212501.226888-1-damien.lemoal@wdc.com>
 References: <20210525212501.226888-1-damien.lemoal@wdc.com>
@@ -72,40 +72,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce the BIO flag BIO_ZONE_WRITE_LOCKED to indicate that a BIO owns
-the write lock of the zone it is targeting. This is the counterpart of
-the struct request flag RQF_ZONE_WRITE_LOCKED.
+Fix dm_accept_partial_bio() to actually check that zone management
+commands are not passed as explained in the function documentation
+comment. Also, since a zone append operation cannot be split, add
+REQ_OP_ZONE_APPEND as a forbidden command.
 
-This new BIO flag is reserved for now for zone write locking control
-for device mapper targets exposing a zoned block device. Since in this
-case, the lock flag must not be propagated to the struct request that
-will be used to process the BIO, a BIO private flag is used rather than
-changing the RQF_ZONE_WRITE_LOCKED request flag into a common REQ_XXX
-flag that could be used for both BIO and request. This avoids conflicts
-down the stack with the block IO scheduler zone write locking
-(in mq-deadline).
+White lines are added around the group of BUG_ON() calls to make the
+code more legible.
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
 ---
- include/linux/blk_types.h | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/md/dm.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index db026b6ec15a..e5cf12f102a2 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -304,6 +304,7 @@ enum {
- 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
- 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
- 	BIO_REMAPPED,
-+	BIO_ZONE_WRITE_LOCKED,	/* Owns a zoned device zone write lock */
- 	BIO_FLAG_LAST
- };
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index ca2aedd8ee7d..11af20080639 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1237,8 +1237,8 @@ static int dm_dax_zero_page_range(struct dax_device *dax_dev, pgoff_t pgoff,
  
+ /*
+  * A target may call dm_accept_partial_bio only from the map routine.  It is
+- * allowed for all bio types except REQ_PREFLUSH, REQ_OP_ZONE_RESET,
+- * REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH.
++ * allowed for all bio types except REQ_PREFLUSH, REQ_OP_ZONE_* zone management
++ * operations and REQ_OP_ZONE_APPEND (zone append writes).
+  *
+  * dm_accept_partial_bio informs the dm that the target only wants to process
+  * additional n_sectors sectors of the bio and the rest of the data should be
+@@ -1268,9 +1268,13 @@ void dm_accept_partial_bio(struct bio *bio, unsigned n_sectors)
+ {
+ 	struct dm_target_io *tio = container_of(bio, struct dm_target_io, clone);
+ 	unsigned bi_size = bio->bi_iter.bi_size >> SECTOR_SHIFT;
++
+ 	BUG_ON(bio->bi_opf & REQ_PREFLUSH);
++	BUG_ON(op_is_zone_mgmt(bio_op(bio)));
++	BUG_ON(bio_op(bio) == REQ_OP_ZONE_APPEND);
+ 	BUG_ON(bi_size > *tio->len_ptr);
+ 	BUG_ON(n_sectors > bi_size);
++
+ 	*tio->len_ptr -= bi_size - n_sectors;
+ 	bio->bi_iter.bi_size = n_sectors << SECTOR_SHIFT;
+ }
 -- 
 2.31.1
 
