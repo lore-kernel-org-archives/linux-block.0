@@ -2,103 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E23C2B9F7
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 00:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E048C2B9F7
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 01:16:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0F2F6141E
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 00:29:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6561E613F9
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 01:16:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbhEYAbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 May 2021 20:31:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35985 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229539AbhEYAbJ (ORCPT
+        id S229651AbhEYBRk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 May 2021 21:17:40 -0400
+Received: from mail-pl1-f178.google.com ([209.85.214.178]:36659 "EHLO
+        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229543AbhEYBRk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 May 2021 20:31:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621902580;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2Z7UbDZyMl/Qo6U1QF1YyOwntqJKyBsFeG9yBtgLF3E=;
-        b=bYCN4kEYKK/iACu0wwawI42seGUdzLfNjxZvdBZLCUiYF32yhJqMeODwkejRi0q5lhjDdW
-        e0ucz50iIfqH/UVAdzjnPD9rlxXC+Rf81ztBtp5C0fA+OsqxXpTSj/2NXTZMiEclu3T918
-        s/h8yBvL5RMRt3a9eqPIk4lfnx223Rw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-m2e2-1LnPMKCrPEcZPcoWQ-1; Mon, 24 May 2021 20:29:38 -0400
-X-MC-Unique: m2e2-1LnPMKCrPEcZPcoWQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E297E801817;
-        Tue, 25 May 2021 00:29:36 +0000 (UTC)
-Received: from T590 (ovpn-12-91.pek2.redhat.com [10.72.12.91])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 425695D767;
-        Tue, 25 May 2021 00:29:29 +0000 (UTC)
-Date:   Tue, 25 May 2021 08:29:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Khazhy Kumykov <khazhy@google.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: [PATCH 2/2] blk: Fix lock inversion between ioc lock and bfqd
- lock
-Message-ID: <YKxE5efsGCD49NaB@T590>
-References: <20210524100416.3578-1-jack@suse.cz>
- <20210524100416.3578-3-jack@suse.cz>
+        Mon, 24 May 2021 21:17:40 -0400
+Received: by mail-pl1-f178.google.com with SMTP id a7so6824972plh.3;
+        Mon, 24 May 2021 18:16:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2/peoYV4qfip+Dwi6jSaAkkCqQ4rv2ijweu+Ayxgdr4=;
+        b=YTl1Y6TQKfmmPxiKy3vkU6V2+cGpZy86YiZowbbWoHT0TkeuvpVTHQYQ+DiYNOM2TD
+         pz6zPRh7ua1g2QpH9tFsX4QneDLbfRQ68lf4IbAKSfQULrFysb8WFfZSFlnXO4y3hAFV
+         iSKtsbMuZz/ajQp8ozKCvCTdOCA4mBFSxXNcXNbc8h3k4n4vYU12WrtPKyJdtJLHybyY
+         87sH5NWDcMH/jsJJZmfDR2BgORLXj7/mUuw2s+9vAqViN+qctAPVH9lYotKDZsF2BkD0
+         z1OCYOnprm8i7ZROJcxuNb27sj4XSmtChHD1Hh1apb+NF1agbV6wzKWdOy7IkJ6qeyCC
+         G9sA==
+X-Gm-Message-State: AOAM533Rday2aY1/YraKF2dJ09EEe1w24bKWhEBwodDOnukhdrhwTMB0
+        TsTbwfoM++x5HYQu1aiddtE=
+X-Google-Smtp-Source: ABdhPJzYJitVnQtIvnlWUqvDZsOPAXFl5JCXJTdVYLBDTD3VuKj3wdspErXHeHie8oFHzeVrRl7vNg==
+X-Received: by 2002:a17:902:7c94:b029:e6:e1d7:62b7 with SMTP id y20-20020a1709027c94b02900e6e1d762b7mr28252285pll.29.1621905370455;
+        Mon, 24 May 2021 18:16:10 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id r28sm12304686pgm.53.2021.05.24.18.16.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 May 2021 18:16:09 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 099CA4025E; Tue, 25 May 2021 01:16:08 +0000 (UTC)
+Date:   Tue, 25 May 2021 01:16:07 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Minchan Kim <minchan@kernel.org>, Hannes Reinecke <hare@suse.de>,
+        Douglas Gilbert <dgilbert@interlog.com>, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
+        mbenes@suse.com, jpoimboe@redhat.com, tglx@linutronix.de,
+        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
+        peterz@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Davidlohr Bueso <dave@stgolabs.net>
+Subject: Re: [PATCH v2 0/4] zram: fix few sysfs races
+Message-ID: <20210525011607.GG4332@42.do-not-panic.com>
+References: <20210423011108.11988-1-mcgrof@kernel.org>
+ <YKVwZVcbZBNXUpKm@google.com>
+ <20210519202023.GU4332@42.do-not-panic.com>
+ <YKgRsCzwp2O2mYcp@kroah.com>
+ <20210521201618.GX4332@42.do-not-panic.com>
+ <YKgbzO0AkYN4J7Ye@kroah.com>
+ <20210521210817.GY4332@42.do-not-panic.com>
+ <YKi3UpQm0HUxJi87@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210524100416.3578-3-jack@suse.cz>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <YKi3UpQm0HUxJi87@kroah.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 24, 2021 at 12:04:16PM +0200, Jan Kara wrote:
-> Lockdep complains about lock inversion between ioc->lock and bfqd->lock:
+On Sat, May 22, 2021 at 09:48:34AM +0200, Greg Kroah-Hartman wrote:
+> On Fri, May 21, 2021 at 09:08:17PM +0000, Luis Chamberlain wrote:
+> > On Fri, May 21, 2021 at 10:45:00PM +0200, Greg Kroah-Hartman wrote:
+> > > I looked at the last patch here and I really do not see the issue.
+> > > 
+> > > In order for the module to be removed, zram_exit() has to return, right?
+> > 
+> > Yes, but the race is for when a module removal is ongoing, in other
+> > words, it has not yet completed, and at the same time we race touching
+> > sysfs files.
+> > 
+> > > So how can a show/store function in zram_drv.c be called after
+> > > destroy_devices() returns?
+> > 
+> > The issue can come up if we have something poke at the sysfs files *while* a
+> > removal is happening.
 > 
-> bfqd -> ioc:
->  put_io_context+0x33/0x90 -> ioc->lock grabbed
->  blk_mq_free_request+0x51/0x140
->  blk_put_request+0xe/0x10
->  blk_attempt_req_merge+0x1d/0x30
->  elv_attempt_insert_merge+0x56/0xa0
->  blk_mq_sched_try_insert_merge+0x4b/0x60
->  bfq_insert_requests+0x9e/0x18c0 -> bfqd->lock grabbed
->  blk_mq_sched_insert_requests+0xd6/0x2b0
->  blk_mq_flush_plug_list+0x154/0x280
->  blk_finish_plug+0x40/0x60
->  ext4_writepages+0x696/0x1320
->  do_writepages+0x1c/0x80
->  __filemap_fdatawrite_range+0xd7/0x120
->  sync_file_range+0xac/0xf0
+> And have you seen this in the real world?  I keep asking this as module
+> removal is not an automated process so what triggers this?
+
+No, its not seen in the real world. It was theoretical, and noted as
+possible by Minchan Kim. I reviewed it, and I agree the race is
+possible.
+
+> > And so genericaly this would be:
+> > 
+> > diff --git a/drivers/base/core.c b/drivers/base/core.c
+> > index 4a8bf8cda52b..7c897e3f4135 100644
+> > --- a/drivers/base/core.c
+> > +++ b/drivers/base/core.c
+> > @@ -29,6 +29,7 @@
+> >  #include <linux/sched/mm.h>
+> >  #include <linux/sysfs.h>
+> >  #include <linux/dma-map-ops.h> /* for dma_default_coherent */
+> > +#include <linux/blkdev.h>
+> >  
+> >  #include "base.h"
+> >  #include "power/power.h"
+> > @@ -1988,11 +1989,20 @@ static inline int device_is_not_partition(struct device *dev)
+> >  {
+> >  	return !(dev->type == &part_type);
+> >  }
+> > +static inline bool device_is_disk(struct device *dev)
+> > +{
+> > +	return (dev->type == &disk_type);
+> > +}
+> >  #else
+> >  static inline int device_is_not_partition(struct device *dev)
+> >  {
+> >  	return 1;
+> >  }
+> > +
+> > +static inline bool device_is_disk(struct device *dev)
+> > +{
+> > +	return false;
+> > +}
+> >  #endif
+> >  
+> >  static int
+> > @@ -2037,6 +2047,19 @@ const char *dev_driver_string(const struct device *dev)
+> >  }
+> >  EXPORT_SYMBOL(dev_driver_string);
+> >  
+> > +static int dev_type_get(struct device *dev)
+> > +{
+> > +	if (device_is_disk(dev))
+> > +		return !!bdgrab(dev_to_bdev(dev));
+> > +	return 1;
+> > +}
 > 
-> ioc->bfqd:
->  bfq_exit_icq+0xa3/0xe0 -> bfqd->lock grabbed
->  put_io_context_active+0x78/0xb0 -> ioc->lock grabbed
->  exit_io_context+0x48/0x50
->  do_exit+0x7e9/0xdd0
->  do_group_exit+0x54/0xc0
+> Why do you feel that block devices are somehow more "special" here?
+
+I am not saying they are.
+
+> They are not, either this is "broken" for everyone, or it works for
+> everyone, don't special-case one tiny class of devices for unknown
+> reasons.
+
+The reason dev_type_get() was implemented was precisely to allow for
+this to be expanded with the other types as they the *get* is specific to
+the type.
+
+> Your change causes another problem, if a sysfs file has show/store
+> happening, the reference count will always be bumped and so the module
+> would NOT be able to be freed.  That looks like a lovely DoS that any
+> user could cause, right?
+
+Yes true. I think the better way to resolve that is to introduce and use
+*try* methods, and so rmmod always trumps a new *get* for these
+operations.
+
+That would sole the possible "DOS" issue, precisely how I resolved this
+same concern for resolving the deadlock with try_module_get().
+
+> In sleeping on this 
+
+Sorry, did you mean you thought about this, or you meant sleep as in
+the sleep context?
+
+> the "correct" solution is to grab the bus lock (or
+> ktype lock) for the device during show/store so that the "delete device"
+> process can not race with it.
+
+The still presents the DOS issue, which I actually did want to avoid.
+I avoided it on the other deadlock issue, and so ideally I'd also
+want to avoid it here. But indeed, the bus route is simple and clean.
+And an alternative to the DOS issue is we just use capability checks,
+if we don't do that already.
+
+> Also let's make sure that the kref of the
+> kobject is being properly bumped during show/store as well, I don't
+> think that's happening which isn't a good thing no matter what
+> (different type of bug).
+
+Yup...
+
+> If that lock addition ends up showing up in benchmarks, then we can
+> always move it to rcu.
+
+OK.
+
+> So in conclusion, the "correct" thing here seems to be two independant
+> things:
+> 	- make sure the reference count of the kobject is properly
+> 	  incremented during show/store callbacks
+> 	- grab the kobject's type/bus/whatever lock during show/store so
+> 	  that it can not race with deleting the device.
+
+Yup. The above was a proof of concept solution using type, but indeed,
+the downside is we'd have to implement try methods when not found, and
+likely the list of types is endless.
+
+Are there places where we cannot use the bus?
+
+> No bus/type should be special cased here, block devices are not special
+> by any means.
 > 
-> To avoid this inversion we change blk_mq_sched_try_insert_merge() to not
-> free the merged request but rather leave that upto the caller similarly
-> to blk_mq_sched_try_merge(). And in bfq_insert_requests() we make sure
-> to free all the merged requests after dropping bfqd->lock.
-> 
-> Fixes: aee69d78dec0 ("block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler")
-> Signed-off-by: Jan Kara <jack@suse.cz>
+> And don't mess with module reference counts, that way lies madness.  We
+> want to lock data, not code :)
 
-Looks fine,
+Live patching needs to lock code ;) and hey it works ;)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Addressing the kobject refecount here should in theory address most
+deadlocks (what my third patch addresses) as well becuase, as you imply,
+our protection of the kobject should prevent removal, but that's not
+always the case. I think you're failing to consider a shared global
+driver lock, which can be used on sysfs files, which in turn have
+*nothing* kref'd. And so the module removal can still try to nuke sysfs
+files, if those sysfs files like to mess with the shared global driver
+lock.
 
-Thanks, 
-Ming
-
+  Luis
