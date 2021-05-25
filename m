@@ -8,154 +8,154 @@ X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FECC2B9F8
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 19:17:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E36C2B9F8
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 19:40:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8A7F61417
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 19:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42393613F5
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 19:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231365AbhEYTSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 15:18:52 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:48690 "EHLO
+        id S231434AbhEYTmH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 15:42:07 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56652 "EHLO
         userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230029AbhEYTSv (ORCPT
+        with ESMTP id S229962AbhEYTmG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 15:18:51 -0400
+        Tue, 25 May 2021 15:42:06 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14PJFf9h146637;
-        Tue, 25 May 2021 19:17:16 GMT
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14PJZfW2167708;
+        Tue, 25 May 2021 19:40:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
  references : from : message-id : date : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=Gj2c25yl4XY8fw9ROx4O+SVpnfMSnJA2zKk6qOYuppo=;
- b=tT9eGS9F0NSQmIX/BPzkHRr8rxMd+kJkYsCxWAMyCfFM30VGj7hiXHPANqFchTHchg/P
- CKOoCXFAd0+LIeyEwndxWuK6sim84sxtVdK5I2bXOHVhdtaor2ZMypm0lhsHT3+2SBK1
- Q7nSvtCdr8S15DVHicdhaIcn5vUD81Ar9tGvIPza3EloRAS71aYc7/e4KJBxt6uhnioH
- a4exNhcpBCHblFZ1s3xjl55vR8K5ZHS0kR3xkqyVzfIJzkKyUQH8PLbYsNKYIyqVw6Ry
- nh1umO9SVQex7DgKaxhy+dIdY5F3lNDud/0NPS4Is15z7x2eTC5zFlzryl2i3D0N34sF uA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 38ptkp70qe-1
+ bh=I3Xg+mEQfVdSNl54easAqEVPL9aRvfOWlyFGDqAtlHw=;
+ b=oONC+R57SHqdMP97OwIUh7tJUMborEKXGA3JTqmwvjVzUiQCIY8oe+rOF/EjCZD1CpNQ
+ 03HdvlOFnY720eWivOuKTKWPEz/BnG/GMNSNpmWL7hpkxN3Z9Ogc2Qyc2bvjSjVeg5Vs
+ o970nwWZtHyOvUC14iJBUyWReNePfJ2rw7RJgo+79N5Bp58GssCavQbjVjpPPBLf0rF5
+ L1oG6GyFFLzVFmshQcwVbzJhDheDLojfrlfFtZsbPmoil4H6odgXTOduGt3T7Qh1qwOk
+ 2hgzPlD/VoULr57rtEo1jUmYSWT6XMAxH64bMDRgGX3uHWGCVSbAIwugCVDC/bapK6Rm Xg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 38ptkp7256-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 May 2021 19:17:16 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14PJGEsA125357;
-        Tue, 25 May 2021 19:17:16 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2105.outbound.protection.outlook.com [104.47.70.105])
-        by userp3020.oracle.com with ESMTP id 38qbqshrbb-1
+        Tue, 25 May 2021 19:40:31 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14PJe4C8078575;
+        Tue, 25 May 2021 19:40:31 GMT
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam07lp2046.outbound.protection.outlook.com [104.47.56.46])
+        by aserp3030.oracle.com with ESMTP id 38pr0c2s98-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 May 2021 19:17:15 +0000
+        Tue, 25 May 2021 19:40:30 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G4hJVmV8wevntKxjgnvR18P/I1EwyOn5opwCB76v+khYkSr3v5hvV+tTYF/PVjrxpxLF6mYfJRS8hU0KQQl11fKll29r1AqCX3b5JLQIaN0LxWqwjrnQBcaE7OgGI0kc1loR/QBDQ9qEomjjMYI/PN8PRJToOx5OndUXs5XP+SUTn2y7NqkdD+jt6dW94zVzBZWQJbbongjqe8Ax0PFnCc2BsYAtT6GFAcAXQT3x0e6jKqAVtluO+P1nlj4CTejViQ0uxZ+r3oNWCwZ3TBzvSO1PavAMR/oYEMdWv4HJ/oYb5nGyyc1awqGS+zxcnheXFUGli62A4nnAIcJtNZYdxg==
+ b=Y+yNbdr855CFs/dgelFlqBpIKUqdARQUuOwViq7hh0b7CC5XRrxL4WNgjuIEN2tnCC1qMGvK5nIF16sr+DjOlylQXpeBvumdxXl8O1zdaPslu09scHy1pmM/q0WMv9sdfofC8biy368g3qGPHZni9PdGIPwR/fMp2Tp4VorL9fnquQzVrjIJjogYkbYNBo48cE+W80jiJVcy1LyQnlK0YJQ9rmpp7ZpRofh1r0jIQL0KKoBBeNKhFOEsyMxrdV11zkhgj+R8aLOnnpUBkYnF8a0l50AcacY0tWWsURoYEvhCaVHFbY8KpNFQWPpb2yf0lBHy8IE8r+b+EE7ZbVoq+Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gj2c25yl4XY8fw9ROx4O+SVpnfMSnJA2zKk6qOYuppo=;
- b=bKKnyYHSXKXosP1ucrZV7BvMH79BVsOGtxgGGPDdkZ4GTg5GxU1X5lU+ZBHlm5ZJ99EvUCyOdbpt6NMTtm3U0mk0Kz7juVG97KgzbvkoXpMTzdzHa/GsVbc7wzChKzBkVEIoW/q5YBHJqVCk0PL7O+ca4/x79U3NB3DXm46u/une8gpzGaS948hzAI+pg3cYLsu6kmxCg3zJc6bBVETfu1pWU+RBpON8E845M4k07KYX6zzz6wuPwL2Z88d6Ma67bMeW+cbXBYAT3+E8UsJcmQMpAVEkGHUFSc6sel/bV2unozcnGNtftzl287HozHaMcuEhNkjcO75bZEEu7WEYNQ==
+ bh=I3Xg+mEQfVdSNl54easAqEVPL9aRvfOWlyFGDqAtlHw=;
+ b=X/h8G12McJN630KLz3HQxu2cNtyAFmGUiBZm4GVX23kbqTeTYo7iplIDy+ifpI8n26HPfIDUuACweCxj+KqjEd/C/TaLMXS+C47mhbn3bKjGlLdXIHGdHn+v7+3E6uPHhbEwGk8ltsSnQUc9kO0+FPKpMMWaf1u7yUu6u7V+VxcTen4SMmF3c/Ft7NhQgs/Tp/d/OUKVecdR8SdOJ79ViWGUb0aS370srGkOos3zBSzXkmZAKjXGoKBjnwjaHkTm8vR+ONq5O8U3aZUHvouYUiff+6vIEji1M81ESxmafsD6u9oYk1ZHRjUoaEEFiwfAfuWwTbuvmvxEqM94e4mZsg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gj2c25yl4XY8fw9ROx4O+SVpnfMSnJA2zKk6qOYuppo=;
- b=sDhscAK2ldSSEIa+iWZQ1FuAPp8QUIRpyG/4lC1vKZpCzv3CRUVlQwDp1QGgi7wdfn5jFtAUfzCjnBZf5MfkfJaWd/rc+goT8rhtY5GfuvnrbuBz653n/CLS0TrwzjE2L2Lu+Jo2tA/DZFAWGefhFyjAD2S2xDXaP96XQSfYzfo=
+ bh=I3Xg+mEQfVdSNl54easAqEVPL9aRvfOWlyFGDqAtlHw=;
+ b=l3O3RDNDElb0FXtAFXYDWBUB1CDjxTjaF4lwFqswmilRMuw+6H+/4bK+ybLesgoUmHYjA/kMSnu/mWNiZARgB+ucKUxQN1d9Tdak0ULQNPdSwrD8qEQhSMLq3FVVg7X5TrbziBRshoTt0LVKxb0lbiptSCM4FIFqKVi+zbxa53E=
 Authentication-Results: kernel.dk; dkim=none (message not signed)
  header.d=none;kernel.dk; dmarc=none action=none header.from=oracle.com;
 Received: from SN6PR10MB2943.namprd10.prod.outlook.com (2603:10b6:805:d4::19)
- by SN6PR10MB2768.namprd10.prod.outlook.com (2603:10b6:805:4a::25) with
+ by SA2PR10MB4537.namprd10.prod.outlook.com (2603:10b6:806:116::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.26; Tue, 25 May
- 2021 19:17:14 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.27; Tue, 25 May
+ 2021 19:40:28 +0000
 Received: from SN6PR10MB2943.namprd10.prod.outlook.com
  ([fe80::168:1a9:228:46f3]) by SN6PR10MB2943.namprd10.prod.outlook.com
  ([fe80::168:1a9:228:46f3%7]) with mapi id 15.20.4150.027; Tue, 25 May 2021
- 19:17:14 +0000
-Subject: Re: [PATCH v4 09/11] dm: rearrange core declarations
+ 19:40:28 +0000
+Subject: Re: [PATCH v4 10/11] dm: introduce zone append emulation
 To:     Damien Le Moal <damien.lemoal@wdc.com>, dm-devel@redhat.com,
         Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>
 References: <20210525022539.119661-1-damien.lemoal@wdc.com>
- <20210525022539.119661-10-damien.lemoal@wdc.com>
+ <20210525022539.119661-11-damien.lemoal@wdc.com>
 From:   Himanshu Madhani <himanshu.madhani@oracle.com>
 Organization: Oracle
-Message-ID: <ce4477cb-64b9-27e2-6f6c-3204fac8ed24@oracle.com>
-Date:   Tue, 25 May 2021 14:17:12 -0500
+Message-ID: <3cae5436-ad50-e777-6cd6-e7891c152ffd@oracle.com>
+Date:   Tue, 25 May 2021 14:40:27 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
-In-Reply-To: <20210525022539.119661-10-damien.lemoal@wdc.com>
+In-Reply-To: <20210525022539.119661-11-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [70.114.128.235]
-X-ClientProxiedBy: SN7PR04CA0080.namprd04.prod.outlook.com
- (2603:10b6:806:121::25) To SN6PR10MB2943.namprd10.prod.outlook.com
+X-ClientProxiedBy: SN4PR0701CA0035.namprd07.prod.outlook.com
+ (2603:10b6:803:2d::25) To SN6PR10MB2943.namprd10.prod.outlook.com
  (2603:10b6:805:d4::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.28] (70.114.128.235) by SN7PR04CA0080.namprd04.prod.outlook.com (2603:10b6:806:121::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.23 via Frontend Transport; Tue, 25 May 2021 19:17:13 +0000
+Received: from [192.168.1.28] (70.114.128.235) by SN4PR0701CA0035.namprd07.prod.outlook.com (2603:10b6:803:2d::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.24 via Frontend Transport; Tue, 25 May 2021 19:40:28 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e26a4611-d332-48a6-f566-08d91fb1b3ea
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2768:
-X-Microsoft-Antispam-PRVS: <SN6PR10MB2768E4C546132CB2DBF3003BE6259@SN6PR10MB2768.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Office365-Filtering-Correlation-Id: 1d2a19d8-7055-4d5e-b79a-08d91fb4f329
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4537:
+X-Microsoft-Antispam-PRVS: <SA2PR10MB4537E2354DE19FDFABF62702E6259@SA2PR10MB4537.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:800;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZPeuy5K6rn80wnxQlD7bk7XYFXCSsgbAXerlt+fRatLNq7n8uR9tEAUNwLD4AM/4PZ2uWjKHEtI8svrCRzk/6hYC+n4qwgdUY+owOKdR2gcLr/ZaeIO7v6nJIa2OgXm6XlOokubou23Pyh7jBNzCWXU35/+cj1KC0PxGJYTRQ6zyY+KwZ+YmhAhF/5zaTGKD5YGuP9qLvltF536I1QoMLEG5WfE/87B0kF2xW6E/vHzMitBbDWR6EA+tyUnv4ALvsSmVxDb/Z2HW+Y0vMaYVwXnS55sLLI1+yuFvb9nSt5mFrBhT4wORCEMwJYCW60G/w/PT7TuExTczkv5esSisqLzQ+kb/XIDNAwVD/+yWMYy+T+91tb4X1IzXS3P5TtOw2dK6T08RZIVbhk4cRrHzuzu6CJaiaf8oiysIw27ol1BUoh/iroGRULk9eVtYPH9sn1ZhaDpPu8Osf9glzZj02R/O6NDZpGHXEnDhYmP62mBZbnPeSclXHFke4GdJkhHWHLhaFpVaOwnNWGRfNFxf+yxsdbnoObKMKm/5pkuaXHqVEb3P334nZ4M/JnOXNsGdKrGhnY3ZMzUmiNQJ8VqGZZ0Vf+Zc+aqgI+gZrAF7yhWPi3flMy6tpIzOANNH93WybrPpHW3yHAgaheBdFUEs+GOQBTHjY+qNRDTtLKWXiZm0LBQkCz6kF96dhss1lW2T
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2943.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(136003)(366004)(39860400002)(376002)(346002)(26005)(956004)(44832011)(2906002)(31696002)(16526019)(478600001)(8936002)(6486002)(186003)(2616005)(110136005)(36756003)(66476007)(31686004)(5660300002)(66556008)(83380400001)(66946007)(38100700002)(36916002)(86362001)(16576012)(316002)(8676002)(53546011)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MjF3RU4xNURpR2VLTXd6aEl6NnkvMkVRR2Z5L1BqK2RVYzdUbDI3Y0hmbzBX?=
- =?utf-8?B?OFowOGZUbzVoOFNFOU9OQ2ZUOVdoTVFxajY5WTVNWmt1MEF6T0dUR01reFkw?=
- =?utf-8?B?VVVDMWgzcytNUXdsU09qbDRhYVJRYlM5Y2lDZlhNM0NHT1VwenJXUXJqTmVZ?=
- =?utf-8?B?a21XUVhzUnZyaGp6OU96VUx2WHp3ekxNV0dmbEM2NW9ISEhnWEE4TksxUmFE?=
- =?utf-8?B?UHI5TDRLNWNrY0FEbTZZalplamZXWng2Y1dLYkYyd3NzRE1hNVRUbXdJQXBs?=
- =?utf-8?B?dzR1c2VZcEZFSmZPV3ZqN21UTWIyWk1oUVVET3B6RmpLY2hCcStoRWQ3cnV6?=
- =?utf-8?B?cEZjelhtVm45WmZRWVpaNW91eW1Da21EcnJmK1NKdDdFV0pKMmdMdUsxMmJ1?=
- =?utf-8?B?WmVsdWpVOXhHbFljREdHakdrcjhzVlhHVjNuSzhGWndacDV0SlFYb2NVR0VE?=
- =?utf-8?B?RmJ0VEY1bzE1MnAzTkJiTkIzWHBwc05sbVB2VlhaZDdvQjIwZmpJanNtV0hr?=
- =?utf-8?B?M1pFUnVzOVhHZTB3TzluZUNseEdtUWZMelNPSHZ4cDJIY3NLam54ajUxWlcr?=
- =?utf-8?B?eUk0bGt3VnErUXlIREJXYU5tMWRGSU1XbngrZEx1V3dNRFZiRUJ6d01KTjVx?=
- =?utf-8?B?cTJWbU1ndDB1RWtEazlCbmpTL29QbUoyS2s2TFEwZ0JOUm5hbDZVbVZrVzcv?=
- =?utf-8?B?QklHSUJ6M0lGT3hJdnZQUGNqS0s1dE1FSmxWcE42bG92NnQ2ZlkveFpZN0xV?=
- =?utf-8?B?anZyemFDTWdTQ2p1dm9lKy9IYlRETDlYZGIxT09VaFg2eHB0UGd3TS9jK21Y?=
- =?utf-8?B?V0tkSzRPZ1dZaExwSExYR3pjQWxPdHhCTDhsQi9NdzRlTFBBUTUvK1locXVJ?=
- =?utf-8?B?L2xhK3I4RDd1MG1iVE1Neit0RWpSQ0dVcmxCdlpiM3dZMEhTQVhsYlB4Uk9y?=
- =?utf-8?B?RktmZHYzbGNjRmlHV3BFWVJ6VFQ5S2VsNzFudVl4RnBSZ1VyaTJHOHZnQnNz?=
- =?utf-8?B?L0pRNThGcElHcjYvdVhmbEZXZldzQ0JIWjdtaHJpQm9UVWpXOEp4VlEwaU5j?=
- =?utf-8?B?Y1BPTnVOaW9zNkxyeTZ1WS9VejJjajgwelpjekpXNStFbXVhQjNBU1ZjMmNZ?=
- =?utf-8?B?ZkFEclRkRm42R2NmeHdycTZmVDlGKyt2VzkyR1NmQ3VEWWlubWJqVTVxZGdv?=
- =?utf-8?B?YUVTOUJuUVBqdmJ2NDcxTTBBQkRBQUZxMGdCYUx0UDhZeGFBYmlhZXRSQ1Jq?=
- =?utf-8?B?dXF6WE1iYXBpVnAxc1duZnBVa3JnUjVuV0M5M1pPbHVjbWMrVG9aS0kraFZh?=
- =?utf-8?B?anRZWFRydG1iTUxGQmFTVkx5clhYVUNoSDJRbVlxN0hYN0RhWlFEbDY1aEh2?=
- =?utf-8?B?dW94S1lUYXd0cGJDSHk2bmxtVmZFOGNySjhlNkRRQitlRnpQN0RTV3pFTitP?=
- =?utf-8?B?VDdFYUk5SEF3V3JlYTFEYXUxUDIxdWw3MXFqWjhIN0hXWmFCOTJ1VEViK2xC?=
- =?utf-8?B?ZHhnVzBkelVpckFITVg3NnlNR2FvZTBaSGVDYjVVMlp6S3RxTTBLWDF0MVI2?=
- =?utf-8?B?TWpUNElUenE4bUd6YlFMdUJWajBzbzJUSEFScE8yTTZQYjVCaHV5NVZQOXo5?=
- =?utf-8?B?QmYyMWFGUXVaWCtEQ204SzZObk4rSURaTDZOVnlWT1pUMXhaeFc4c2d1dFpM?=
- =?utf-8?B?WHFwZklkc0hwQTliNU15eWxJTXVleCt0TVU1NHJ4UkZDZ2FZMTNHbkZtVVVq?=
- =?utf-8?Q?8KrX3X5zZ/q2pEN92D/ReqxNJvQTnCsFedEEERy?=
+X-Microsoft-Antispam-Message-Info: Ovg/m/NfXPE2TlklwFaw00+lEKOFs08g3jZTvI5DjPvrdA+1udbBbDBmQSdaqVJ6kGXq2CspXcwbb1YEq5Q1QNKQFNYYfdZqpjdjwsbejtNm10qxUP4hEp10jRTSEItgcgl8MXRO4S2KtNw/3qYVoq6shGg9Yfo2R4v3dfh801HfeaoQ/XvnZi4TmWA4ePvYljxKL66rhhgt71DlklHclzVgVfL/oVu+RBEgHf1mjn0rPeg/K/2T84D2bfBcylvMg/0iXhnzgyGL/w1wYFH8inY/5m3xIWAfunJR/hrc44BaWzoi3vnIoW4fNzgiL00XBew23EUMRN4VlM2jjwD0IDnNKbkcZePc0SBpXfAM851Qg+7dFE97ibZykxeexU0rh92AtconDtDd1h4o7QL2ALvZauWOwWjncbghcsGlQ+i+w8yXbTqUfywa1Qi6R9CueG09B+lWgf24MZGS3OGURt66UCg4iiamoFrn4IB9PC14U2vU2t5nCw4ceptvvzHEIR0NofoDfY8RZWKS/li4HJVEa2WUV3dPLNcH+QXbwYOERtZqKqreaol8FzLV5gnlr8brxvlk2pjXR4eq6TaGmo46reqkc8cJd0OPbuKqvctHFOKZROIzQby+CPq8PsgGJVyVGTa4YJBPuF6EUPO8pBWCs3yR2umYZ19MVmwmbI6PANayYB98Scf8+EPRCDFc
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2943.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(396003)(136003)(39860400002)(376002)(366004)(31686004)(8936002)(36916002)(36756003)(8676002)(2906002)(83380400001)(66946007)(5660300002)(38100700002)(53546011)(478600001)(31696002)(66476007)(6486002)(44832011)(2616005)(30864003)(16526019)(66556008)(26005)(86362001)(186003)(110136005)(316002)(16576012)(956004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?dC8vc2dOT3dPQkRnVStnak1hVGd3RUxSZ2U2ZzdlWklQOUJrSmRFYTh1NDBr?=
+ =?utf-8?B?SXdRWU5xTHRlbXM1ME1vck8vNXJFVlVmZVVpZGFGWjJ6blhaQkhlWDlDNjR5?=
+ =?utf-8?B?MFE3aGRrQjNSOXp0RURicmQwZWJINUlNWVBsamZ2TC91azh6RWhGdy9FK1o0?=
+ =?utf-8?B?YlFldm1uWWd6YXlzWWRiZERRdTNFbnhrYVhpNVBiVXl3VXpQVi9aUW9pUVlz?=
+ =?utf-8?B?VXFKQllQckdocEJQOU5lSURIb3BxcGJTR2JCYWJ0eWNycGkzaGxlV2lIbWhU?=
+ =?utf-8?B?ODJ4NlNnYmtvR1RvTjV2MjhIdGd1UEpOR04yNDliVElTb3VSMXNSUFdrRlRT?=
+ =?utf-8?B?c2diQjRUdk02TEZCV3FIZzdVMUlQWGR0MTRRU0cxclJMR0FHY3VOSDl3cFQ3?=
+ =?utf-8?B?QXZYdnVaUmJ2UnNxVTlubGYvcWgvTllJNGJlN29Dd2g5VU5hVEREWlNjdDlv?=
+ =?utf-8?B?WStCRWV4TXZFNmJ4bXQ3RGdmNVZQSCsrTFpYdkVzT3MrSmRIWk1PZ0puMTFt?=
+ =?utf-8?B?YTR4dm5Qa3RPRGVVTEdmSWpKMS9uc0k3bVFyWEp5djkraWwxRjRycUZINUds?=
+ =?utf-8?B?UlZtaWlobndIcERzS0pmWkFMaGczVXJXQ0p6WlJJNVVFaFhYWWIyRHBYd0Mz?=
+ =?utf-8?B?WVRsbVJFOEhhYmpoWTVBejdndzRXZVV2TmwzbEhHY3FMMXlNeTBIdXA0T05L?=
+ =?utf-8?B?R0o0T3drNGR0L25ncm4reWhJS2p4dEMyTURndklubVpDOTlnRGtFbW9RR3FM?=
+ =?utf-8?B?bmtzbjhzbHNXZGNEcm1nMEloWHFiSDhCR29OU2o2a3krNUFZQ2IxRzNzOGlk?=
+ =?utf-8?B?Y21VTzI1aFUwVWZxWjk3by9IMDViMXBoS0p2Tm02V0JTKzNVZTZoZzNxbWxO?=
+ =?utf-8?B?eUxRckFreUxEQ1J6a3B4UFpsNHFiS3JLL1VoNU0vNzRCYXNvSVp1Zm1ZaGJj?=
+ =?utf-8?B?Zk5GeSs0by9HNkhrb2FhVWYrdTVOM0ZHNjhORXZXSFRWTGkzTHg2V0tkYXJ3?=
+ =?utf-8?B?N2I4T3ZGVXp4TDl3YnF0OHNhTDdoQzVEL091QVoyeHRDQndFYmJQY2gzcXNa?=
+ =?utf-8?B?MmUxcVBWNnJRWmF6bVM4Mld5djdSZUh5OE9oNnQ2UHQvYWlxU1Yyajl1TnRs?=
+ =?utf-8?B?anBSa2ZCbktGQ1hZOGNGbHo0Unh5djVnem03L1lYbmlPcWUxTnh1OG1udFRG?=
+ =?utf-8?B?T3hmTzlseVFRdGJ1N0V1OXNxUTJ5RTBNZGhyM1EwYXUvbXhvelJXMVJIeDEr?=
+ =?utf-8?B?R2VBVU1tWFRJNlNEaTNlbm1qTTA2TytRdVFKemZnRnBIQkt2em5HczdoRis0?=
+ =?utf-8?B?VWdWaG9IL2c1SlpidU02R040S2kybXJseGxMaEplNXc1L0IzaGs0MERwSDA2?=
+ =?utf-8?B?YnowMWV5R1BLYVRPK250WEM4d1pOSFNHUjFKNXdkTndLMFdVUmgxMlJ6cXox?=
+ =?utf-8?B?cnk2b3RzQytFQXlVcHIxSGFHeHFNVUJYbUpNMlJHVEZaVXhyWGc2YXVHRnBC?=
+ =?utf-8?B?dVdNMDVRbllodWh4MnRTZDdpNXdGSlhsUEc2RWR3aDI1V3QyMzlPV255WEZC?=
+ =?utf-8?B?NmZoeHl4MmpreHJ6ZGZsMytGZUpQaWE3a3V3dmpIVGZoNUxTZDlEakM4VUtz?=
+ =?utf-8?B?QzFCQVFsWnA2dEVrU04zZ1pSSm94OWdQTTJCQ2dIaXpnZ3I4WmtOa2VuVGZK?=
+ =?utf-8?B?ZUhuSXgxUndXeW1MNVphbWpYMnRBRXFDQVNGMUl5SFBHUGhmOTBBL0RydjlL?=
+ =?utf-8?Q?RAEXxS7Byn7HwWWchSS86C8+1U8J9PrSBgk1SZi?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e26a4611-d332-48a6-f566-08d91fb1b3ea
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d2a19d8-7055-4d5e-b79a-08d91fb4f329
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2943.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2021 19:17:13.8947
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2021 19:40:28.4877
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QlFRQl3S1V5CJmnCC8jPFtGACzracn4RgESKy0/Z0oESIZo9rgE0bzluf/Glsqkfd78cH74cBut/TjeBCm+fbvGmIYZkuDK9SHoB9SP4HOg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2768
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0aXB8yBEWFIQPygnPWOq6OI/JNOu2KUceNMkDS6qpm8wRH7vyybpjy7O5kactFSVZ3bu2X7qGYJGrrkD5SgMlqpEnr9dw0r03IxuGO0X3AA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4537
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9995 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 bulkscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 suspectscore=0 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2105250118
-X-Proofpoint-GUID: pwnjXsAZZJFXtGQ8cXWscZ7ldAVMgRxr
-X-Proofpoint-ORIG-GUID: pwnjXsAZZJFXtGQ8cXWscZ7ldAVMgRxr
+ definitions=main-2105250120
+X-Proofpoint-GUID: YMY1euU4M9a6W3ynfcvo98lLJOFKmj4g
+X-Proofpoint-ORIG-GUID: YMY1euU4M9a6W3ynfcvo98lLJOFKmj4g
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9995 signatures=668682
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 mlxscore=0
  suspectscore=0 bulkscore=0 adultscore=0 mlxlogscore=999 phishscore=0
  malwarescore=0 clxscore=1015 lowpriorityscore=0 spamscore=0
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105250118
+ engine=8.12.0-2104190000 definitions=main-2105250119
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -163,217 +163,928 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 On 5/24/21 9:25 PM, Damien Le Moal wrote:
-> Move the definitions of struct dm_target_io, struct dm_io and of the
-> bits of the flags field of struct mapped_device from dm.c to dm-core.h
-> to make them usable from dm-zone.c.
-> For the same reason, declare dec_pending() in dm-core.h after renaming
-> it to dm_io_dec_pending(). And for symmetry of the function names,
-> introduce the inline helper dm_io_inc_pending() instead of directly
-> using atomic_inc() calls.
+> For zoned targets that cannot support zone append operations, implement
+> an emulation using regular write operations. If the original BIO
+> submitted by the user is a zone append operation, change its clone into
+> a regular write operation directed at the target zone write pointer
+> position.
+> 
+> To do so, an array of write pointer offsets (write pointer position
+> relative to the start of a zone) is added to struct mapped_device. All
+> operations that modify a sequential zone write pointer (writes, zone
+> reset, zone finish and zone append) are intersepted in __map_bio() and
+> processed using the new functions dm_zone_map_bio().
+> 
+> Detection of the target ability to natively support zone append
+> operations is done from dm_table_set_restrictions() by calling the
+> function dm_set_zones_restrictions(). A target that does not support
+> zone append operation, either by explicitly declaring it using the new
+> struct dm_target field zone_append_not_supported, or because the device
+> table contains a non-zoned device, has its mapped device marked with the
+> new flag DMF_ZONE_APPEND_EMULATED. The helper function
+> dm_emulate_zone_append() is introduced to test a mapped device for this
+> new flag.
+> 
+> Atomicity of the zones write pointer tracking and updates is done using
+> a zone write locking mechanism based on a bitmap. This is similar to
+> the block layer method but based on BIOs rather than struct request.
+> A zone write lock is taken in dm_zone_map_bio() for any clone BIO with
+> an operation type that changes the BIO target zone write pointer
+> position. The zone write lock is released if the clone BIO is failed
+> before submission or when dm_zone_endio() is called when the clone BIO
+> completes.
+> 
+> The zone write lock bitmap of the mapped device, together with a bitmap
+> indicating zone types (conv_zones_bitmap) and the write pointer offset
+> array (zwp_offset) are allocated and initialized with a full device zone
+> report in dm_set_zones_restrictions() using the function
+> dm_revalidate_zones().
+> 
+> For failed operations that may have modified a zone write pointer, the
+> zone write pointer offset is marked as invalid in dm_zone_endio().
+> Zones with an invalid write pointer offset are checked and the write
+> pointer updated using an internal report zone operation when the
+> faulty zone is accessed again by the user.
+> 
+> All functions added for this emulation have a minimal overhead for
+> zoned targets natively supporting zone append operations. Regular
+> device targets are also not affected. The added code also does not
+> impact builds with CONFIG_BLK_DEV_ZONED disabled by stubbing out all
+> dm zone related functions.
 > 
 > Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
 > ---
->   drivers/md/dm-core.h | 52 ++++++++++++++++++++++++++++++++++++++
->   drivers/md/dm.c      | 59 ++++++--------------------------------------
->   2 files changed, 59 insertions(+), 52 deletions(-)
+>   drivers/md/dm-core.h          |  13 +
+>   drivers/md/dm-table.c         |  19 +-
+>   drivers/md/dm-zone.c          | 580 ++++++++++++++++++++++++++++++++--
+>   drivers/md/dm.c               |  38 ++-
+>   drivers/md/dm.h               |  16 +-
+>   include/linux/device-mapper.h |   6 +
+>   6 files changed, 618 insertions(+), 54 deletions(-)
 > 
 > diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-> index 5953ff2bd260..cfabc1c91f9f 100644
+> index cfabc1c91f9f..edc1553c4eea 100644
 > --- a/drivers/md/dm-core.h
 > +++ b/drivers/md/dm-core.h
-> @@ -116,6 +116,19 @@ struct mapped_device {
+> @@ -114,6 +114,11 @@ struct mapped_device {
+>   	bool init_tio_pdu:1;
+>   
 >   	struct srcu_struct io_barrier;
+> +
+> +#ifdef CONFIG_BLK_DEV_ZONED
+> +	unsigned int nr_zones;
+> +	unsigned int *zwp_offset;
+> +#endif
 >   };
->   
-> +/*
-> + * Bits for the flags field of struct mapped_device.
-> + */
-> +#define DMF_BLOCK_IO_FOR_SUSPEND 0
-> +#define DMF_SUSPENDED 1
-> +#define DMF_FROZEN 2
-> +#define DMF_FREEING 3
-> +#define DMF_DELETING 4
-> +#define DMF_NOFLUSH_SUSPENDING 5
-> +#define DMF_DEFERRED_REMOVE 6
-> +#define DMF_SUSPENDED_INTERNALLY 7
-> +#define DMF_POST_SUSPENDING 8
-> +
->   void disable_discard(struct mapped_device *md);
->   void disable_write_same(struct mapped_device *md);
->   void disable_write_zeroes(struct mapped_device *md);
-> @@ -173,6 +186,45 @@ struct dm_table {
->   #endif
->   };
->   
-> +/*
-> + * One of these is allocated per clone bio.
-> + */
-> +#define DM_TIO_MAGIC 7282014
-> +struct dm_target_io {
-> +	unsigned int magic;
-> +	struct dm_io *io;
-> +	struct dm_target *ti;
-> +	unsigned int target_bio_nr;
-> +	unsigned int *len_ptr;
-> +	bool inside_dm_io;
-> +	struct bio clone;
-> +};
-> +
-> +/*
-> + * One of these is allocated per original bio.
-> + * It contains the first clone used for that original.
-> + */
-> +#define DM_IO_MAGIC 5191977
-> +struct dm_io {
-> +	unsigned int magic;
-> +	struct mapped_device *md;
-> +	blk_status_t status;
-> +	atomic_t io_count;
-> +	struct bio *orig_bio;
-> +	unsigned long start_time;
-> +	spinlock_t endio_lock;
-> +	struct dm_stats_aux stats_aux;
-> +	/* last member of dm_target_io is 'struct bio' */
-> +	struct dm_target_io tio;
-> +};
-> +
-> +static inline void dm_io_inc_pending(struct dm_io *io)
-> +{
-> +	atomic_inc(&io->io_count);
-> +}
-> +
-> +void dm_io_dec_pending(struct dm_io *io, blk_status_t error);
-> +
->   static inline struct completion *dm_get_completion_from_kobject(struct kobject *kobj)
->   {
->   	return &container_of(kobj, struct dm_kobject_holder, kobj)->completion;
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 4426019a89cc..563504163b74 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -74,38 +74,6 @@ struct clone_info {
->   	unsigned sector_count;
->   };
->   
-> -/*
-> - * One of these is allocated per clone bio.
-> - */
-> -#define DM_TIO_MAGIC 7282014
-> -struct dm_target_io {
-> -	unsigned magic;
-> -	struct dm_io *io;
-> -	struct dm_target *ti;
-> -	unsigned target_bio_nr;
-> -	unsigned *len_ptr;
-> -	bool inside_dm_io;
-> -	struct bio clone;
-> -};
-> -
-> -/*
-> - * One of these is allocated per original bio.
-> - * It contains the first clone used for that original.
-> - */
-> -#define DM_IO_MAGIC 5191977
-> -struct dm_io {
-> -	unsigned magic;
-> -	struct mapped_device *md;
-> -	blk_status_t status;
-> -	atomic_t io_count;
-> -	struct bio *orig_bio;
-> -	unsigned long start_time;
-> -	spinlock_t endio_lock;
-> -	struct dm_stats_aux stats_aux;
-> -	/* last member of dm_target_io is 'struct bio' */
-> -	struct dm_target_io tio;
-> -};
-> -
->   #define DM_TARGET_IO_BIO_OFFSET (offsetof(struct dm_target_io, clone))
->   #define DM_IO_BIO_OFFSET \
->   	(offsetof(struct dm_target_io, clone) + offsetof(struct dm_io, tio))
-> @@ -137,19 +105,6 @@ EXPORT_SYMBOL_GPL(dm_bio_get_target_bio_nr);
->   
->   #define MINOR_ALLOCED ((void *)-1)
->   
-> -/*
-> - * Bits for the md->flags field.
-> - */
-> -#define DMF_BLOCK_IO_FOR_SUSPEND 0
-> -#define DMF_SUSPENDED 1
-> -#define DMF_FROZEN 2
-> -#define DMF_FREEING 3
-> -#define DMF_DELETING 4
-> -#define DMF_NOFLUSH_SUSPENDING 5
-> -#define DMF_DEFERRED_REMOVE 6
-> -#define DMF_SUSPENDED_INTERNALLY 7
-> -#define DMF_POST_SUSPENDING 8
-> -
->   #define DM_NUMA_NODE NUMA_NO_NODE
->   static int dm_numa_node = DM_NUMA_NODE;
->   
-> @@ -825,7 +780,7 @@ static int __noflush_suspending(struct mapped_device *md)
->    * Decrements the number of outstanding ios that a bio has been
->    * cloned into, completing the original io if necc.
->    */
-> -static void dec_pending(struct dm_io *io, blk_status_t error)
-> +void dm_io_dec_pending(struct dm_io *io, blk_status_t error)
->   {
->   	unsigned long flags;
->   	blk_status_t io_error;
-> @@ -978,7 +933,7 @@ static void clone_endio(struct bio *bio)
->   	}
->   
->   	free_tio(tio);
-> -	dec_pending(io, error);
-> +	dm_io_dec_pending(io, error);
->   }
 >   
 >   /*
-> @@ -1247,7 +1202,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
->   	 * anything, the target has assumed ownership of
->   	 * this io.
->   	 */
-> -	atomic_inc(&io->io_count);
-> +	dm_io_inc_pending(io);
->   	sector = clone->bi_iter.bi_sector;
+> @@ -128,6 +133,7 @@ struct mapped_device {
+>   #define DMF_DEFERRED_REMOVE 6
+>   #define DMF_SUSPENDED_INTERNALLY 7
+>   #define DMF_POST_SUSPENDING 8
+> +#define DMF_EMULATE_ZONE_APPEND 9
 >   
->   	if (unlikely(swap_bios_limit(ti, clone))) {
-> @@ -1273,7 +1228,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
->   			up(&md->swap_bios_semaphore);
->   		}
->   		free_tio(tio);
-> -		dec_pending(io, BLK_STS_IOERR);
-> +		dm_io_dec_pending(io, BLK_STS_IOERR);
->   		break;
->   	case DM_MAPIO_REQUEUE:
->   		if (unlikely(swap_bios_limit(ti, clone))) {
-> @@ -1281,7 +1236,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
->   			up(&md->swap_bios_semaphore);
->   		}
->   		free_tio(tio);
-> -		dec_pending(io, BLK_STS_DM_REQUEUE);
-> +		dm_io_dec_pending(io, BLK_STS_DM_REQUEUE);
->   		break;
->   	default:
->   		DMWARN("unimplemented target map return value: %d", r);
-> @@ -1570,7 +1525,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+>   void disable_discard(struct mapped_device *md);
+>   void disable_write_same(struct mapped_device *md);
+> @@ -143,6 +149,13 @@ static inline struct dm_stats *dm_get_stats(struct mapped_device *md)
+>   	return &md->stats;
+>   }
 >   
->   	if (bio->bi_opf & REQ_PREFLUSH) {
->   		error = __send_empty_flush(&ci);
-> -		/* dec_pending submits any data associated with flush */
-> +		/* dm_io_dec_pending submits any data associated with flush */
->   	} else if (op_is_zone_mgmt(bio_op(bio))) {
->   		ci.bio = bio;
->   		ci.sector_count = 0;
-> @@ -1611,7 +1566,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
->   	}
+> +static inline bool dm_emulate_zone_append(struct mapped_device *md)
+> +{
+> +	if (blk_queue_is_zoned(md->queue))
+> +		return test_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> +	return false;
+> +}
+> +
+>   #define DM_TABLE_MAX_DEPTH 16
 >   
->   	/* drop the extra reference count */
-> -	dec_pending(ci.io, errno_to_blk_status(error));
-> +	dm_io_dec_pending(ci.io, errno_to_blk_status(error));
+>   struct dm_table {
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index dd9f648ab598..21fdccfb16cf 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -1981,11 +1981,12 @@ static int device_requires_stable_pages(struct dm_target *ti,
+>   	return blk_queue_stable_writes(q);
+>   }
+>   
+> -void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> -			       struct queue_limits *limits)
+> +int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> +			      struct queue_limits *limits)
+>   {
+>   	bool wc = false, fua = false;
+>   	int page_size = PAGE_SIZE;
+> +	int r;
+>   
+>   	/*
+>   	 * Copy table's limits to the DM device's request_queue
+> @@ -2064,12 +2065,20 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+>   	    dm_table_any_dev_attr(t, device_is_not_random, NULL))
+>   		blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
+>   
+> -	/* For a zoned target, setup the zones related queue attributes */
+> -	if (blk_queue_is_zoned(q))
+> -		dm_set_zones_restrictions(t, q);
+> +	/*
+> +	 * For a zoned target, setup the zones related queue attributes
+> +	 * and resources necessary for zone append emulation if necessary.
+> +	 */
+> +	if (blk_queue_is_zoned(q)) {
+> +		r = dm_set_zones_restrictions(t, q);
+> +		if (r)
+> +			return r;
+> +	}
+>   
+>   	dm_update_keyslot_manager(q, t);
+>   	blk_queue_update_readahead(q);
+> +
+> +	return 0;
+>   }
+>   
+>   unsigned int dm_table_get_num_targets(struct dm_table *t)
+> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+> index edc3bbb45637..c2f26949f5ee 100644
+> --- a/drivers/md/dm-zone.c
+> +++ b/drivers/md/dm-zone.c
+> @@ -4,55 +4,72 @@
+>    */
+>   
+>   #include <linux/blkdev.h>
+> +#include <linux/mm.h>
+> +#include <linux/sched/mm.h>
+> +#include <linux/slab.h>
+>   
+>   #include "dm-core.h"
+>   
+> +#define DM_MSG_PREFIX "zone"
+> +
+> +#define DM_ZONE_INVALID_WP_OFST		UINT_MAX
+> +
+>   /*
+> - * User facing dm device block device report zone operation. This calls the
+> - * report_zones operation for each target of a device table. This operation is
+> - * generally implemented by targets using dm_report_zones().
+> + * For internal zone reports bypassing the top BIO submission path.
+>    */
+> -int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
+> -			unsigned int nr_zones, report_zones_cb cb, void *data)
+> +static int dm_blk_do_report_zones(struct mapped_device *md, struct dm_table *t,
+> +				  sector_t sector, unsigned int nr_zones,
+> +				  report_zones_cb cb, void *data)
+>   {
+> -	struct mapped_device *md = disk->private_data;
+> -	struct dm_table *map;
+> -	int srcu_idx, ret;
+> +	struct gendisk *disk = md->disk;
+> +	int ret;
+>   	struct dm_report_zones_args args = {
+>   		.next_sector = sector,
+>   		.orig_data = data,
+>   		.orig_cb = cb,
+>   	};
+>   
+> -	if (dm_suspended_md(md))
+> -		return -EAGAIN;
+> -
+> -	map = dm_get_live_table(md, &srcu_idx);
+> -	if (!map) {
+> -		ret = -EIO;
+> -		goto out;
+> -	}
+> -
+>   	do {
+>   		struct dm_target *tgt;
+>   
+> -		tgt = dm_table_find_target(map, args.next_sector);
+> -		if (WARN_ON_ONCE(!tgt->type->report_zones)) {
+> -			ret = -EIO;
+> -			goto out;
+> -		}
+> +		tgt = dm_table_find_target(t, args.next_sector);
+> +		if (WARN_ON_ONCE(!tgt->type->report_zones))
+> +			return -EIO;
+>   
+>   		args.tgt = tgt;
+>   		ret = tgt->type->report_zones(tgt, &args,
+>   					      nr_zones - args.zone_idx);
+>   		if (ret < 0)
+> -			goto out;
+> +			return ret;
+>   	} while (args.zone_idx < nr_zones &&
+>   		 args.next_sector < get_capacity(disk));
+>   
+> -	ret = args.zone_idx;
+> -out:
+> +	return args.zone_idx;
+> +}
+> +
+> +/*
+> + * User facing dm device block device report zone operation. This calls the
+> + * report_zones operation for each target of a device table. This operation is
+> + * generally implemented by targets using dm_report_zones().
+> + */
+> +int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
+> +			unsigned int nr_zones, report_zones_cb cb, void *data)
+> +{
+> +	struct mapped_device *md = disk->private_data;
+> +	struct dm_table *map;
+> +	int srcu_idx, ret;
+> +
+> +	if (dm_suspended_md(md))
+> +		return -EAGAIN;
+> +
+> +	map = dm_get_live_table(md, &srcu_idx);
+> +	if (!map)
+> +		return -EIO;
+> +
+> +	ret = dm_blk_do_report_zones(md, map, sector, nr_zones, cb, data);
+> +
+>   	dm_put_live_table(md, srcu_idx);
+> +
 >   	return ret;
 >   }
 >   
+> @@ -121,16 +138,517 @@ bool dm_is_zone_write(struct mapped_device *md, struct bio *bio)
+>   	}
+>   }
+>   
+> -void dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
+> +void dm_cleanup_zoned_dev(struct mapped_device *md)
+>   {
+> -	if (!blk_queue_is_zoned(q))
+> -		return;
+> +	struct request_queue *q = md->queue;
+> +
+> +	if (q) {
+> +		kfree(q->conv_zones_bitmap);
+> +		q->conv_zones_bitmap = NULL;
+> +		kfree(q->seq_zones_wlock);
+> +		q->seq_zones_wlock = NULL;
+> +	}
+> +
+> +	kvfree(md->zwp_offset);
+> +	md->zwp_offset = NULL;
+> +	md->nr_zones = 0;
+> +}
+> +
+> +static unsigned int dm_get_zone_wp_offset(struct blk_zone *zone)
+> +{
+> +	switch (zone->cond) {
+> +	case BLK_ZONE_COND_IMP_OPEN:
+> +	case BLK_ZONE_COND_EXP_OPEN:
+> +	case BLK_ZONE_COND_CLOSED:
+> +		return zone->wp - zone->start;
+> +	case BLK_ZONE_COND_FULL:
+> +		return zone->len;
+> +	case BLK_ZONE_COND_EMPTY:
+> +	case BLK_ZONE_COND_NOT_WP:
+> +	case BLK_ZONE_COND_OFFLINE:
+> +	case BLK_ZONE_COND_READONLY:
+> +	default:
+> +		/*
+> +		 * Conventional, offline and read-only zones do not have a valid
+> +		 * write pointer. Use 0 as for an empty zone.
+> +		 */
+> +		return 0;
+> +	}
+> +}
+> +
+> +static int dm_zone_revalidate_cb(struct blk_zone *zone, unsigned int idx,
+> +				 void *data)
+> +{
+> +	struct mapped_device *md = data;
+> +	struct request_queue *q = md->queue;
+> +
+> +	switch (zone->type) {
+> +	case BLK_ZONE_TYPE_CONVENTIONAL:
+> +		if (!q->conv_zones_bitmap) {
+> +			q->conv_zones_bitmap =
+> +				kcalloc(BITS_TO_LONGS(q->nr_zones),
+> +					sizeof(unsigned long), GFP_NOIO);
+> +			if (!q->conv_zones_bitmap)
+> +				return -ENOMEM;
+> +		}
+> +		set_bit(idx, q->conv_zones_bitmap);
+> +		break;
+> +	case BLK_ZONE_TYPE_SEQWRITE_REQ:
+> +	case BLK_ZONE_TYPE_SEQWRITE_PREF:
+> +		if (!q->seq_zones_wlock) {
+> +			q->seq_zones_wlock =
+> +				kcalloc(BITS_TO_LONGS(q->nr_zones),
+> +					sizeof(unsigned long), GFP_NOIO);
+> +			if (!q->seq_zones_wlock)
+> +				return -ENOMEM;
+> +		}
+> +		if (!md->zwp_offset) {
+> +			md->zwp_offset =
+> +				kvcalloc(q->nr_zones, sizeof(unsigned int),
+> +					 GFP_NOIO);
+> +			if (!md->zwp_offset)
+> +				return -ENOMEM;
+> +		}
+> +		md->zwp_offset[idx] = dm_get_zone_wp_offset(zone);
+> +
+> +		break;
+> +	default:
+> +		DMERR("Invalid zone type 0x%x at sectors %llu",
+> +		      (int)zone->type, zone->start);
+> +		return -ENODEV;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Revalidate the zones of a mapped device to initialize resource necessary
+> + * for zone append emulation. Note that we cannot simply use the block layer
+> + * blk_revalidate_disk_zones() function here as the mapped device is suspended
+> + * (this is called from __bind() context).
+> + */
+> +static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
+> +{
+> +	struct request_queue *q = md->queue;
+> +	int ret;
+> +
+> +	/*
+> +	 * Check if something changed. If yes, cleanup the current resources
+> +	 * and reallocate everything.
+> +	 */
+> +	if (!q->nr_zones || q->nr_zones != md->nr_zones)
+> +		dm_cleanup_zoned_dev(md);
+> +	if (md->nr_zones)
+> +		return 0;
+> +
+> +	/* Scan all zones to initialize everything */
+> +	ret = dm_blk_do_report_zones(md, t, 0, q->nr_zones,
+> +				     dm_zone_revalidate_cb, md);
+> +	if (ret < 0)
+> +		goto err;
+> +	if (ret != q->nr_zones) {
+> +		ret = -EIO;
+> +		goto err;
+> +	}
+> +
+> +	md->nr_zones = q->nr_zones;
+> +
+> +	return 0;
+> +
+> +err:
+> +	DMERR("Revalidate zones failed %d", ret);
+> +	dm_cleanup_zoned_dev(md);
+> +	return ret;
+> +}
+> +
+> +static int device_not_zone_append_capable(struct dm_target *ti,
+> +					  struct dm_dev *dev, sector_t start,
+> +					  sector_t len, void *data)
+> +{
+> +	return !blk_queue_is_zoned(bdev_get_queue(dev->bdev));
+> +}
+> +
+> +static bool dm_table_supports_zone_append(struct dm_table *t)
+> +{
+> +	struct dm_target *ti;
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < dm_table_get_num_targets(t); i++) {
+> +		ti = dm_table_get_target(t, i);
+> +
+> +		if (ti->emulate_zone_append)
+> +			return false;
+> +
+> +		if (!ti->type->iterate_devices ||
+> +		    ti->type->iterate_devices(ti, device_not_zone_append_capable, NULL))
+> +			return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
+> +{
+> +	struct mapped_device *md = t->md;
+>   
+>   	/*
+>   	 * For a zoned target, the number of zones should be updated for the
+> -	 * correct value to be exposed in sysfs queue/nr_zones. For a BIO based
+> -	 * target, this is all that is needed.
+> +	 * correct value to be exposed in sysfs queue/nr_zones.
+>   	 */
+>   	WARN_ON_ONCE(queue_is_mq(q));
+> -	q->nr_zones = blkdev_nr_zones(t->md->disk);
+> +	q->nr_zones = blkdev_nr_zones(md->disk);
+> +
+> +	/* Check if zone append is natively supported */
+> +	if (dm_table_supports_zone_append(t)) {
+> +		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> +		dm_cleanup_zoned_dev(md);
+> +		return 0;
+> +	}
+> +
+> +	/*
+> +	 * Mark the mapped device as needing zone append emulation and
+> +	 * initialize the emulation resources once the capacity is set.
+> +	 */
+> +	set_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> +	if (!get_capacity(md->disk))
+> +		return 0;
+> +
+> +	return dm_revalidate_zones(md, t);
+> +}
+> +
+> +static int dm_update_zone_wp_offset_cb(struct blk_zone *zone, unsigned int idx,
+> +				       void *data)
+> +{
+> +	unsigned int *wp_offset = data;
+> +
+> +	*wp_offset = dm_get_zone_wp_offset(zone);
+> +
+> +	return 0;
+> +}
+> +
+> +static int dm_update_zone_wp_offset(struct mapped_device *md, unsigned int zno,
+> +				    unsigned int *wp_ofst)
+> +{
+> +	sector_t sector = zno * blk_queue_zone_sectors(md->queue);
+> +	unsigned int noio_flag;
+> +	struct dm_table *t;
+> +	int srcu_idx, ret;
+> +
+> +	t = dm_get_live_table(md, &srcu_idx);
+> +	if (!t)
+> +		return -EIO;
+> +
+> +	/*
+> +	 * Ensure that all memory allocations in this context are done as if
+> +	 * GFP_NOIO was specified.
+> +	 */
+> +	noio_flag = memalloc_noio_save();
+> +	ret = dm_blk_do_report_zones(md, t, sector, 1,
+> +				     dm_update_zone_wp_offset_cb, wp_ofst);
+> +	memalloc_noio_restore(noio_flag);
+> +
+> +	dm_put_live_table(md, srcu_idx);
+> +
+> +	if (ret != 1)
+> +		return -EIO;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * First phase of BIO mapping for targets with zone append emulation:
+> + * check all BIO that change a zone writer pointer and change zone
+> + * append operations into regular write operations.
+> + */
+> +static bool dm_zone_map_bio_begin(struct mapped_device *md,
+> +				  struct bio *orig_bio, struct bio *clone)
+> +{
+> +	sector_t zsectors = blk_queue_zone_sectors(md->queue);
+> +	unsigned int zno = bio_zone_no(orig_bio);
+> +	unsigned int zwp_offset = READ_ONCE(md->zwp_offset[zno]);
+> +
+> +	/*
+> +	 * If the target zone is in an error state, recover by inspecting the
+> +	 * zone to get its current write pointer position. Note that since the
+> +	 * target zone is already locked, a BIO issuing context should never
+> +	 * see the zone write in the DM_ZONE_UPDATING_WP_OFST state.
+> +	 */
+> +	if (zwp_offset == DM_ZONE_INVALID_WP_OFST) {
+> +		if (dm_update_zone_wp_offset(md, zno, &zwp_offset))
+> +			return false;
+> +		WRITE_ONCE(md->zwp_offset[zno], zwp_offset);
+> +	}
+> +
+> +	switch (bio_op(orig_bio)) {
+> +	case REQ_OP_ZONE_RESET:
+> +	case REQ_OP_ZONE_FINISH:
+> +		return true;
+> +	case REQ_OP_WRITE_ZEROES:
+> +	case REQ_OP_WRITE_SAME:
+> +	case REQ_OP_WRITE:
+> +		/* Writes must be aligned to the zone write pointer */
+> +		if ((clone->bi_iter.bi_sector & (zsectors - 1)) != zwp_offset)
+> +			return false;
+> +		break;
+> +	case REQ_OP_ZONE_APPEND:
+> +		/*
+> +		 * Change zone append operations into a non-mergeable regular
+> +		 * writes directed at the current write pointer position of the
+> +		 * target zone.
+> +		 */
+> +		clone->bi_opf = REQ_OP_WRITE | REQ_NOMERGE |
+> +			(orig_bio->bi_opf & (~REQ_OP_MASK));
+> +		clone->bi_iter.bi_sector =
+> +			orig_bio->bi_iter.bi_sector + zwp_offset;
+> +		break;
+> +	default:
+> +		DMWARN_LIMIT("Invalid BIO operation");
+> +		return false;
+> +	}
+> +
+> +	/* Cannot write to a full zone */
+> +	if (zwp_offset >= zsectors)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +/*
+> + * Second phase of BIO mapping for targets with zone append emulation:
+> + * update the zone write pointer offset array to account for the additional
+> + * data written to a zone. Note that at this point, the remapped clone BIO
+> + * may already have completed, so we do not touch it.
+> + */
+> +static blk_status_t dm_zone_map_bio_end(struct mapped_device *md,
+> +					struct bio *orig_bio,
+> +					unsigned int nr_sectors)
+> +{
+> +	unsigned int zno = bio_zone_no(orig_bio);
+> +	unsigned int zwp_offset = READ_ONCE(md->zwp_offset[zno]);
+> +
+> +	/* The clone BIO may already have been completed and failed */
+> +	if (zwp_offset == DM_ZONE_INVALID_WP_OFST)
+> +		return BLK_STS_IOERR;
+> +
+> +	/* Update the zone wp offset */
+> +	switch (bio_op(orig_bio)) {
+> +	case REQ_OP_ZONE_RESET:
+> +		WRITE_ONCE(md->zwp_offset[zno], 0);
+> +		return BLK_STS_OK;
+> +	case REQ_OP_ZONE_FINISH:
+> +		WRITE_ONCE(md->zwp_offset[zno],
+> +			   blk_queue_zone_sectors(md->queue));
+> +		return BLK_STS_OK;
+> +	case REQ_OP_WRITE_ZEROES:
+> +	case REQ_OP_WRITE_SAME:
+> +	case REQ_OP_WRITE:
+> +		WRITE_ONCE(md->zwp_offset[zno], zwp_offset + nr_sectors);
+> +		return BLK_STS_OK;
+> +	case REQ_OP_ZONE_APPEND:
+> +		/*
+> +		 * Check that the target did not truncate the write operation
+> +		 * emulating a zone append.
+> +		 */
+> +		if (nr_sectors != bio_sectors(orig_bio)) {
+> +			DMWARN_LIMIT("Truncated write for zone append");
+> +			return BLK_STS_IOERR;
+> +		}
+> +		WRITE_ONCE(md->zwp_offset[zno], zwp_offset + nr_sectors);
+> +		return BLK_STS_OK;
+> +	default:
+> +		DMWARN_LIMIT("Invalid BIO operation");
+> +		return BLK_STS_IOERR;
+> +	}
+> +}
+> +
+> +static inline void dm_zone_lock(struct request_queue *q,
+> +				unsigned int zno, struct bio *clone)
+> +{
+> +	if (WARN_ON_ONCE(bio_flagged(clone, BIO_ZONE_WRITE_LOCKED)))
+> +		return;
+> +
+> +	wait_on_bit_lock_io(q->seq_zones_wlock, zno, TASK_UNINTERRUPTIBLE);
+> +	bio_set_flag(clone, BIO_ZONE_WRITE_LOCKED);
+> +}
+> +
+> +static inline void dm_zone_unlock(struct request_queue *q,
+> +				  unsigned int zno, struct bio *clone)
+> +{
+> +	if (!bio_flagged(clone, BIO_ZONE_WRITE_LOCKED))
+> +		return;
+> +
+> +	WARN_ON_ONCE(!test_bit(zno, q->seq_zones_wlock));
+> +	clear_bit_unlock(zno, q->seq_zones_wlock);
+> +	smp_mb__after_atomic();
+> +	wake_up_bit(q->seq_zones_wlock, zno);
+> +
+> +	bio_clear_flag(clone, BIO_ZONE_WRITE_LOCKED);
+> +}
+> +
+> +static bool dm_need_zone_wp_tracking(struct bio *orig_bio)
+> +{
+> +	/*
+> +	 * Special processing is not needed for operations that do not need the
+> +	 * zone write lock, that is, all operations that target conventional
+> +	 * zones and all operations that do not modify directly a sequential
+> +	 * zone write pointer.
+> +	 */
+> +	if (op_is_flush(orig_bio->bi_opf) && !bio_sectors(orig_bio))
+> +		return false;
+> +	switch (bio_op(orig_bio)) {
+> +	case REQ_OP_WRITE_ZEROES:
+> +	case REQ_OP_WRITE_SAME:
+> +	case REQ_OP_WRITE:
+> +	case REQ_OP_ZONE_RESET:
+> +	case REQ_OP_ZONE_FINISH:
+> +	case REQ_OP_ZONE_APPEND:
+> +		return bio_zone_is_seq(orig_bio);
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+> +/*
+> + * Special IO mapping for targets needing zone append emulation.
+> + */
+> +int dm_zone_map_bio(struct dm_target_io *tio)
+> +{
+> +	struct dm_io *io = tio->io;
+> +	struct dm_target *ti = tio->ti;
+> +	struct mapped_device *md = io->md;
+> +	struct request_queue *q = md->queue;
+> +	struct bio *orig_bio = io->orig_bio;
+> +	struct bio *clone = &tio->clone;
+> +	unsigned int zno;
+> +	blk_status_t sts;
+> +	int r;
+> +
+> +	/*
+> +	 * IOs that do not change a zone write pointer do not need
+> +	 * any additional special processing.
+> +	 */
+> +	if (!dm_need_zone_wp_tracking(orig_bio))
+> +		return ti->type->map(ti, clone);
+> +
+> +	/* Lock the target zone */
+> +	zno = bio_zone_no(orig_bio);
+> +	dm_zone_lock(q, zno, clone);
+> +
+> +	/*
+> +	 * Check that the bio and the target zone write pointer offset are
+> +	 * both valid, and if the bio is a zone append, remap it to a write.
+> +	 */
+> +	if (!dm_zone_map_bio_begin(md, orig_bio, clone)) {
+> +		dm_zone_unlock(q, zno, clone);
+> +		return DM_MAPIO_KILL;
+> +	}
+> +
+> +	/*
+> +	 * The target map function may issue and complete the IO quickly.
+> +	 * Take an extra reference on the IO to make sure it does disappear
+> +	 * until we run dm_zone_map_bio_end().
+> +	 */
+> +	dm_io_inc_pending(io);
+> +
+> +	/* Let the target do its work */
+> +	r = ti->type->map(ti, clone);
+> +	switch (r) {
+> +	case DM_MAPIO_SUBMITTED:
+> +		/*
+> +		 * The target submitted the clone BIO. The target zone will
+> +		 * be unlocked on completion of the clone.
+> +		 */
+> +		sts = dm_zone_map_bio_end(md, orig_bio, *tio->len_ptr);
+> +		break;
+> +	case DM_MAPIO_REMAPPED:
+> +		/*
+> +		 * The target only remapped the clone BIO. In case of error,
+> +		 * unlock the target zone here as the clone will not be
+> +		 * submitted.
+> +		 */
+> +		sts = dm_zone_map_bio_end(md, orig_bio, *tio->len_ptr);
+> +		if (sts != BLK_STS_OK)
+> +			dm_zone_unlock(q, zno, clone);
+> +		break;
+> +	case DM_MAPIO_REQUEUE:
+> +	case DM_MAPIO_KILL:
+> +	default:
+> +		dm_zone_unlock(q, zno, clone);
+> +		sts = BLK_STS_IOERR;
+> +		break;
+> +	}
+> +
+> +	/* Drop the extra reference on the IO */
+> +	dm_io_dec_pending(io, sts);
+> +
+> +	if (sts != BLK_STS_OK)
+> +		return DM_MAPIO_KILL;
+> +
+> +	return r;
+> +}
+> +
+> +/*
+> + * IO completion callback called from clone_endio().
+> + */
+> +void dm_zone_endio(struct dm_io *io, struct bio *clone)
+> +{
+> +	struct mapped_device *md = io->md;
+> +	struct request_queue *q = md->queue;
+> +	struct bio *orig_bio = io->orig_bio;
+> +	unsigned int zwp_offset;
+> +	unsigned int zno;
+> +
+> +	/*
+> +	 * For targets that do not emulate zone append, we only need to
+> +	 * handle native zone-append bios.
+> +	 */
+> +	if (!dm_emulate_zone_append(md)) {
+> +		/*
+> +		 * Get the offset within the zone of the written sector
+> +		 * and add that to the original bio sector position.
+> +		 */
+> +		if (clone->bi_status == BLK_STS_OK &&
+> +		    bio_op(clone) == REQ_OP_ZONE_APPEND) {
+> +			sector_t mask = (sector_t)blk_queue_zone_sectors(q) - 1;
+> +
+> +			orig_bio->bi_iter.bi_sector +=
+> +				clone->bi_iter.bi_sector & mask;
+> +		}
+> +
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * For targets that do emulate zone append, if the clone BIO does not
+> +	 * own the target zone write lock, we have nothing to do.
+> +	 */
+> +	if (!bio_flagged(clone, BIO_ZONE_WRITE_LOCKED))
+> +		return;
+> +
+> +	zno = bio_zone_no(orig_bio);
+> +
+> +	if (clone->bi_status != BLK_STS_OK) {
+> +		/*
+> +		 * BIOs that modify a zone write pointer may leave the zone
+> +		 * in an unknown state in case of failure (e.g. the write
+> +		 * pointer was only partially advanced). In this case, set
+> +		 * the target zone write pointer as invalid unless it is
+> +		 * already being updated.
+> +		 */
+> +		WRITE_ONCE(md->zwp_offset[zno], DM_ZONE_INVALID_WP_OFST);
+> +	} else if (bio_op(orig_bio) == REQ_OP_ZONE_APPEND) {
+> +		/*
+> +		 * Get the written sector for zone append operation that were
+> +		 * emulated using regular write operations.
+> +		 */
+> +		zwp_offset = READ_ONCE(md->zwp_offset[zno]);
+> +		if (WARN_ON_ONCE(zwp_offset < bio_sectors(orig_bio)))
+> +			WRITE_ONCE(md->zwp_offset[zno],
+> +				   DM_ZONE_INVALID_WP_OFST);
+> +		else
+> +			orig_bio->bi_iter.bi_sector +=
+> +				zwp_offset - bio_sectors(orig_bio);
+> +	}
+> +
+> +	dm_zone_unlock(q, zno, clone);
+>   }
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index 563504163b74..6c570abc1417 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -875,7 +875,6 @@ static void clone_endio(struct bio *bio)
+>   	struct dm_io *io = tio->io;
+>   	struct mapped_device *md = tio->io->md;
+>   	dm_endio_fn endio = tio->ti->type->end_io;
+> -	struct bio *orig_bio = io->orig_bio;
+>   	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+>   
+>   	if (unlikely(error == BLK_STS_TARGET)) {
+> @@ -890,17 +889,8 @@ static void clone_endio(struct bio *bio)
+>   			disable_write_zeroes(md);
+>   	}
+>   
+> -	/*
+> -	 * For zone-append bios get offset in zone of the written
+> -	 * sector and add that to the original bio sector pos.
+> -	 */
+> -	if (bio_op(orig_bio) == REQ_OP_ZONE_APPEND) {
+> -		sector_t written_sector = bio->bi_iter.bi_sector;
+> -		struct request_queue *q = orig_bio->bi_bdev->bd_disk->queue;
+> -		u64 mask = (u64)blk_queue_zone_sectors(q) - 1;
+> -
+> -		orig_bio->bi_iter.bi_sector += written_sector & mask;
+> -	}
+> +	if (blk_queue_is_zoned(q))
+> +		dm_zone_endio(io, bio);
+>   
+>   	if (endio) {
+>   		int r = endio(tio->ti, bio, &error);
+> @@ -1213,7 +1203,16 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
+>   		down(&md->swap_bios_semaphore);
+>   	}
+>   
+> -	r = ti->type->map(ti, clone);
+> +	/*
+> +	 * Check if the IO needs a special mapping due to zone append emulation
+> +	 * on zoned target. In this case, dm_zone_map_begin() calls the target
+> +	 * map operation.
+> +	 */
+> +	if (dm_emulate_zone_append(io->md))
+> +		r = dm_zone_map_bio(tio);
+> +	else
+> +		r = ti->type->map(ti, clone);
+> +
+>   	switch (r) {
+>   	case DM_MAPIO_SUBMITTED:
+>   		break;
+> @@ -1711,6 +1710,7 @@ static void cleanup_mapped_device(struct mapped_device *md)
+>   	mutex_destroy(&md->swap_bios_lock);
+>   
+>   	dm_mq_cleanup_mapped_device(md);
+> +	dm_cleanup_zoned_dev(md);
+>   }
+>   
+>   /*
+> @@ -1956,11 +1956,16 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
+>   		goto out;
+>   	}
+>   
+> +	ret = dm_table_set_restrictions(t, q, limits);
+> +	if (ret) {
+> +		old_map = ERR_PTR(ret);
+> +		goto out;
+> +	}
+> +
+>   	old_map = rcu_dereference_protected(md->map, lockdep_is_held(&md->suspend_lock));
+>   	rcu_assign_pointer(md->map, (void *)t);
+>   	md->immutable_target_type = dm_table_get_immutable_target_type(t);
+>   
+> -	dm_table_set_restrictions(t, q, limits);
+>   	if (old_map)
+>   		dm_sync_table(md);
+>   
+> @@ -2079,7 +2084,10 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
+>   		DMERR("Cannot calculate initial queue limits");
+>   		return r;
+>   	}
+> -	dm_table_set_restrictions(t, md->queue, &limits);
+> +	r = dm_table_set_restrictions(t, md->queue, &limits);
+> +	if (r)
+> +		return r;
+> +
+>   	blk_register_queue(md->disk);
+>   
+>   	return 0;
+> diff --git a/drivers/md/dm.h b/drivers/md/dm.h
+> index 39c243258e24..742d9c80efe1 100644
+> --- a/drivers/md/dm.h
+> +++ b/drivers/md/dm.h
+> @@ -45,6 +45,8 @@ struct dm_dev_internal {
+>   
+>   struct dm_table;
+>   struct dm_md_mempools;
+> +struct dm_target_io;
+> +struct dm_io;
+>   
+>   /*-----------------------------------------------------------------
+>    * Internal table functions.
+> @@ -56,8 +58,8 @@ struct dm_target *dm_table_find_target(struct dm_table *t, sector_t sector);
+>   bool dm_table_has_no_data_devices(struct dm_table *table);
+>   int dm_calculate_queue_limits(struct dm_table *table,
+>   			      struct queue_limits *limits);
+> -void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> -			       struct queue_limits *limits);
+> +int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> +			      struct queue_limits *limits);
+>   struct list_head *dm_table_get_devices(struct dm_table *t);
+>   void dm_table_presuspend_targets(struct dm_table *t);
+>   void dm_table_presuspend_undo_targets(struct dm_table *t);
+> @@ -103,17 +105,25 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t);
+>   /*
+>    * Zoned targets related functions.
+>    */
+> -void dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q);
+> +int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q);
+> +void dm_zone_endio(struct dm_io *io, struct bio *clone);
+>   #ifdef CONFIG_BLK_DEV_ZONED
+> +void dm_cleanup_zoned_dev(struct mapped_device *md);
+>   int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
+>   			unsigned int nr_zones, report_zones_cb cb, void *data);
+>   bool dm_is_zone_write(struct mapped_device *md, struct bio *bio);
+> +int dm_zone_map_bio(struct dm_target_io *io);
+>   #else
+> +static inline void dm_cleanup_zoned_dev(struct mapped_device *md) {}
+>   #define dm_blk_report_zones	NULL
+>   static inline bool dm_is_zone_write(struct mapped_device *md, struct bio *bio)
+>   {
+>   	return false;
+>   }
+> +static inline int dm_zone_map_bio(struct dm_target_io *tio)
+> +{
+> +	return DM_MAPIO_KILL;
+> +}
+>   #endif
+>   
+>   /*-----------------------------------------------------------------
+> diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+> index caea0a079d2d..7457d49acf9a 100644
+> --- a/include/linux/device-mapper.h
+> +++ b/include/linux/device-mapper.h
+> @@ -361,6 +361,12 @@ struct dm_target {
+>   	 * Set if we need to limit the number of in-flight bios when swapping.
+>   	 */
+>   	bool limit_swap_bios:1;
+> +
+> +	/*
+> +	 * Set if this target implements a a zoned device and needs emulation of
+> +	 * zone append operations using regular writes.
+> +	 */
+> +	bool emulate_zone_append:1;
+>   };
+>   
+>   void *dm_per_bio_data(struct bio *bio, size_t data_size);
 > 
 
 Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
