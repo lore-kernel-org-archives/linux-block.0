@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D976C47087
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B4D0C4707F
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59A6E6138C
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4117C6142E
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 21:25:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231614AbhEYV0s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 17:26:48 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:36441 "EHLO
+        id S231338AbhEYV0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 17:26:49 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:36450 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232778AbhEYV0p (ORCPT
+        with ESMTP id S232508AbhEYV0r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 17:26:45 -0400
+        Tue, 25 May 2021 17:26:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1621977915; x=1653513915;
+  t=1621977917; x=1653513917;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=qHj3M9XFL/tykUsf56Cg90qnsKbQHFHiajzEaN4c+7Y=;
-  b=lb4WMvI45zpFU3Yis245VL5Bk2RTgx8BlVpwRorW+6oubXpFLxe20CQF
-   iIik1kzEuUvvGUVGHH26EQzkLdmLN+PBoErh1KAW/0TwK+565YXTIa+lU
-   DANixe3lgqPTwnvWddC3tXFTl6hAHZKmQJ850MyBDLoTeblFHjS+I+3fr
-   bfIv9fZowbX66Mk3pubDV7lO8flU0FayUZd93AI9wLYG1JvKRtaFwYxmD
-   6/KTVH2BmR7Ab4ISO8ywi1WapUZBLcWCp5VATc+zQXb1dYswL6Zsss+G4
-   LRS07pLsDgKWjcxqmY6KBMGlkoO2UPN3UpveAb6mosQtxfswwo6QkQayy
-   Q==;
-IronPort-SDR: 4aqBaFOPxIWwtAQ2cMd1FST12Kkp1hTzLsycO/JQbKZGGPmJRugj2GUgRc+LMlbV1Ns9hw5pQw
- wCMMd5TyNjY/LIQI28hK3P741xeruFFKDsql6uDmEqBXbT2BMZr/QMkT5W9wvWAQ9LmY0hy/xc
- RStPvaLYPY4p0tRSYjtWYVsXrWnH8dk5KjvAVZ+PGWySnOQrPtYcswMAoORKKrAOqUUvesWhe+
- 63wEXW4LbcTdXwSoRaMx7g8aGU5SgP7f9rQNqKK5cZ+kiov2SiAXUSAF/SkCia1+hRPiF8PB+r
- HDE=
+  bh=bFcRaggZ9tBN12RVTPVwAzImTsSc/VkMzkTVeX3Uo8g=;
+  b=HyayAsfXi2EJ+XHR5ykqc/SdLHwKSW3xM645Ah5RW+Z9kJCRGgvFjykW
+   gseSApcjol8/HQhDd/nxmLRS0FjYVs9N+taVSV9OKMDALeXNUzFoQ3gK5
+   platCEo2MOtoIE7GtLoJ3n8rookhql2yE7D0J9VrPUg8l5U+s+uhpTw8D
+   i0VOBqDL4UwWdTdX5QfKndaM2g/fT5uTgMzqZBCeLPQIrqKUurtSUSc2v
+   lGBnK0Gs0hZp5slSoK4Nv5YVuSkZMWNp6ARaxNns6EnIJEDBpRnZMDi7h
+   74lbF+QhCnwtFsZ0VRgeMtqbwUf1aXuPCemGggXCZRXWk00G5bYmx0tG8
+   w==;
+IronPort-SDR: 0j8o+QnfmfuARJ3/B1gTKcwDjmkfdLlAqz5IBV/yiq2NrYJdZOL6KN3P6UU6mwcYnW7JyDnJJ7
+ aKbaBVOIBKeY7rQXl/96Pc18Qz4BueDAhl9wjk2h9OC3+KnyETCCZy/zzSygnFehsG8+qEwXX8
+ fZzbx3xDqTVp8LsR0d1ofhY7RZBkQK05PLxvxqDzKmYdMPE/FkRZgP+tmJSszHD6Tk1goD6ffR
+ cjAi6Z1EiZScstKrhOz41XHNnGCIKYefvceGFy8/4LME1AjpMoH8C8wGdMOWMVug/COaenhwBp
+ IsM=
 X-IronPort-AV: E=Sophos;i="5.82,329,1613404800"; 
-   d="scan'208";a="168717544"
+   d="scan'208";a="168717550"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 May 2021 05:25:15 +0800
-IronPort-SDR: rc+Pe9SwTQTrsvgorcjsPqao+Mx4cSXQ8fQD4WQN9yxBCsWw/MGDBGc0IoOkZ44UpoR8NS7ofV
- ZE6218DUkc0r8eI4GDVxjDW3hHO2dBo3cz3S5Ip8G+fsY2gbyBPzQzcPYCeFpAoKao4W9yqDlc
- QDfe39Co9/DwtMezXBd0yxxgatbe+eHsiHcgL0e9eHRy8pB6cbvvynGZ0KIf0Zs5057qzziuX2
- vb299YVpN+LaMByhb+rkz7iEUK1MM4fefYb3WD2nDHHNA1Mgqgj0whGKhftpHumBCBX+TrAmgf
- h4bv68Bvk4gCwYm64M35fiR8
+  by ob1.hgst.iphmx.com with ESMTP; 26 May 2021 05:25:17 +0800
+IronPort-SDR: 1QfQARWClb/cmw6YSKcfDEQ5e4eOMQ25ohk6kmiLsdw/WCiIv5dAcXrz/l0CRabD2qrv9mEvWK
+ e9v+RBTSaO8e0qq6dumBMH726z6+dqCy9wr3O9XhIKd32X9y6EB40MwaWxG4jTmNUCfdVGUuoQ
+ aY/SFKE8qR3UJ8D2S5jWfVhIPMuGynGbQsWUOcjIYGH92uwPn2VL1+3YZy62XUgPrr7L6Nijp+
+ PTXk007YQORBbZRzgDZH1HUFNPUO54ifDShZ/nYzARohE+r3SJxP0IYMsOCaZvZrNxsYszvbUV
+ BP3ICFCO3Hy0g2triUJMrH1p
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 14:04:42 -0700
-IronPort-SDR: xEuFmaKQgjMwJH+B41lM58oV43m0MVuK4NhI2z06SszfC0Lf2a6om3NjXE2LgFLumNV7I5x9Pc
- BZNUkf5C5s3Znc46xCyUH140EwnXtkLIv+zNItNDstCLg94ITt7pV7PgbIcMfbqc+K16mzxpgR
- hBuZ05VbsVJ3LNVdOuXY4uBqPDN3JDADN58NL9VaOKu0KQHjwGPajQ8xRKlnsn14MZnucoJk3A
- mVBqLniix6kaKbR1JstC0wEStQrpEbJzc4aHs+Yp/I7JWCkmJVGevbWuhavr8UxcT5zetSCOIe
- WRc=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 14:04:44 -0700
+IronPort-SDR: FNmk77p8RaJkKJ4Lf3DM2Ud9DNupkU6U5O1zROkYxyKxSGhxq4OJunGO10+o4L6MuRYtE2H1Fm
+ po1vbCpBIFroKqFEYU3NDhTff2xyL58bH+mLvyJ5deJuKcgsD6BBAh8lLqygUWRQlH8k/Cu6yl
+ FafTPsK47Kcw2TinMkQH+7J/7/yP8tQe69m71KK4x49inIVgLiBsngobFb6vHGIIibRq+0dC78
+ ey/iqrz7U2rHkRpxzRP+MaA9lgOO/OAGdLY3rFFte99MK8UsGuQtYi5VZJKkQdR0wOtAoPsExe
+ IUU=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 25 May 2021 14:25:14 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 25 May 2021 14:25:17 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v5 09/11] dm: rearrange core declarations
-Date:   Wed, 26 May 2021 06:24:59 +0900
-Message-Id: <20210525212501.226888-10-damien.lemoal@wdc.com>
+Subject: [PATCH v5 11/11] dm crypt: Fix zoned block device support
+Date:   Wed, 26 May 2021 06:25:01 +0900
+Message-Id: <20210525212501.226888-12-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210525212501.226888-1-damien.lemoal@wdc.com>
 References: <20210525212501.226888-1-damien.lemoal@wdc.com>
@@ -72,218 +72,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the definitions of struct dm_target_io, struct dm_io and of the
-bits of the flags field of struct mapped_device from dm.c to dm-core.h
-to make them usable from dm-zone.c.
-For the same reason, declare dec_pending() in dm-core.h after renaming
-it to dm_io_dec_pending(). And for symmetry of the function names,
-introduce the inline helper dm_io_inc_pending() instead of directly
-using atomic_inc() calls.
+Zone append BIOs (REQ_OP_ZONE_APPEND) always specify the start sector
+of the zone to be written instead of the actual sector location to
+write. The write location is determined by the device and returned to
+the host upon completion of the operation. This interface, while simple
+and efficient for writing into sequential zones of a zoned block
+device, is incompatible with the use of sector values to calculate a
+cypher block IV. All data written in a zone end up using the same IV
+values corresponding to the first sectors of the zone, but read
+operation will specify any sector within the zone resulting in an IV
+mismatch between encryption and decryption.
 
+To solve this problem, report to DM core that zone append operations are
+not supported. This result in the zone append operations being emulated
+using regular write operations.
+
+Reported-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
 ---
- drivers/md/dm-core.h | 52 ++++++++++++++++++++++++++++++++++++++
- drivers/md/dm.c      | 59 ++++++--------------------------------------
- 2 files changed, 59 insertions(+), 52 deletions(-)
+ drivers/md/dm-crypt.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-index 5953ff2bd260..cfabc1c91f9f 100644
---- a/drivers/md/dm-core.h
-+++ b/drivers/md/dm-core.h
-@@ -116,6 +116,19 @@ struct mapped_device {
- 	struct srcu_struct io_barrier;
- };
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index f410ceee51d7..50f4cbd600d5 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -3280,14 +3280,28 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	}
+ 	cc->start = tmpll;
  
-+/*
-+ * Bits for the flags field of struct mapped_device.
-+ */
-+#define DMF_BLOCK_IO_FOR_SUSPEND 0
-+#define DMF_SUSPENDED 1
-+#define DMF_FROZEN 2
-+#define DMF_FREEING 3
-+#define DMF_DELETING 4
-+#define DMF_NOFLUSH_SUSPENDING 5
-+#define DMF_DEFERRED_REMOVE 6
-+#define DMF_SUSPENDED_INTERNALLY 7
-+#define DMF_POST_SUSPENDING 8
+-	/*
+-	 * For zoned block devices, we need to preserve the issuer write
+-	 * ordering. To do so, disable write workqueues and force inline
+-	 * encryption completion.
+-	 */
+ 	if (bdev_is_zoned(cc->dev->bdev)) {
++		/*
++		 * For zoned block devices, we need to preserve the issuer write
++		 * ordering. To do so, disable write workqueues and force inline
++		 * encryption completion.
++		 */
+ 		set_bit(DM_CRYPT_NO_WRITE_WORKQUEUE, &cc->flags);
+ 		set_bit(DM_CRYPT_WRITE_INLINE, &cc->flags);
 +
- void disable_discard(struct mapped_device *md);
- void disable_write_same(struct mapped_device *md);
- void disable_write_zeroes(struct mapped_device *md);
-@@ -173,6 +186,45 @@ struct dm_table {
- #endif
- };
- 
-+/*
-+ * One of these is allocated per clone bio.
-+ */
-+#define DM_TIO_MAGIC 7282014
-+struct dm_target_io {
-+	unsigned int magic;
-+	struct dm_io *io;
-+	struct dm_target *ti;
-+	unsigned int target_bio_nr;
-+	unsigned int *len_ptr;
-+	bool inside_dm_io;
-+	struct bio clone;
-+};
-+
-+/*
-+ * One of these is allocated per original bio.
-+ * It contains the first clone used for that original.
-+ */
-+#define DM_IO_MAGIC 5191977
-+struct dm_io {
-+	unsigned int magic;
-+	struct mapped_device *md;
-+	blk_status_t status;
-+	atomic_t io_count;
-+	struct bio *orig_bio;
-+	unsigned long start_time;
-+	spinlock_t endio_lock;
-+	struct dm_stats_aux stats_aux;
-+	/* last member of dm_target_io is 'struct bio' */
-+	struct dm_target_io tio;
-+};
-+
-+static inline void dm_io_inc_pending(struct dm_io *io)
-+{
-+	atomic_inc(&io->io_count);
-+}
-+
-+void dm_io_dec_pending(struct dm_io *io, blk_status_t error);
-+
- static inline struct completion *dm_get_completion_from_kobject(struct kobject *kobj)
- {
- 	return &container_of(kobj, struct dm_kobject_holder, kobj)->completion;
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index ed8c5a8df2e5..c200658d8bcb 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -74,38 +74,6 @@ struct clone_info {
- 	unsigned sector_count;
- };
- 
--/*
-- * One of these is allocated per clone bio.
-- */
--#define DM_TIO_MAGIC 7282014
--struct dm_target_io {
--	unsigned magic;
--	struct dm_io *io;
--	struct dm_target *ti;
--	unsigned target_bio_nr;
--	unsigned *len_ptr;
--	bool inside_dm_io;
--	struct bio clone;
--};
--
--/*
-- * One of these is allocated per original bio.
-- * It contains the first clone used for that original.
-- */
--#define DM_IO_MAGIC 5191977
--struct dm_io {
--	unsigned magic;
--	struct mapped_device *md;
--	blk_status_t status;
--	atomic_t io_count;
--	struct bio *orig_bio;
--	unsigned long start_time;
--	spinlock_t endio_lock;
--	struct dm_stats_aux stats_aux;
--	/* last member of dm_target_io is 'struct bio' */
--	struct dm_target_io tio;
--};
--
- #define DM_TARGET_IO_BIO_OFFSET (offsetof(struct dm_target_io, clone))
- #define DM_IO_BIO_OFFSET \
- 	(offsetof(struct dm_target_io, clone) + offsetof(struct dm_io, tio))
-@@ -137,19 +105,6 @@ EXPORT_SYMBOL_GPL(dm_bio_get_target_bio_nr);
- 
- #define MINOR_ALLOCED ((void *)-1)
- 
--/*
-- * Bits for the md->flags field.
-- */
--#define DMF_BLOCK_IO_FOR_SUSPEND 0
--#define DMF_SUSPENDED 1
--#define DMF_FROZEN 2
--#define DMF_FREEING 3
--#define DMF_DELETING 4
--#define DMF_NOFLUSH_SUSPENDING 5
--#define DMF_DEFERRED_REMOVE 6
--#define DMF_SUSPENDED_INTERNALLY 7
--#define DMF_POST_SUSPENDING 8
--
- #define DM_NUMA_NODE NUMA_NO_NODE
- static int dm_numa_node = DM_NUMA_NODE;
- 
-@@ -825,7 +780,7 @@ static int __noflush_suspending(struct mapped_device *md)
-  * Decrements the number of outstanding ios that a bio has been
-  * cloned into, completing the original io if necc.
-  */
--static void dec_pending(struct dm_io *io, blk_status_t error)
-+void dm_io_dec_pending(struct dm_io *io, blk_status_t error)
- {
- 	unsigned long flags;
- 	blk_status_t io_error;
-@@ -978,7 +933,7 @@ static void clone_endio(struct bio *bio)
++		/*
++		 * All zone append writes to a zone of a zoned block device will
++		 * have the same BIO sector, the start of the zone. When the
++		 * cypher IV mode uses sector values, all data targeting a
++		 * zone will be encrypted using the first sector numbers of the
++		 * zone. This will not result in write errors but will
++		 * cause most reads to fail as reads will use the sector values
++		 * for the actual data locations, resulting in IV mismatch.
++		 * To avoid this problem, ask DM core to emulate zone append
++		 * operations with regular writes.
++		 */
++		DMDEBUG("Zone append operations will be emulated");
++		ti->emulate_zone_append = true;
  	}
  
- 	free_tio(tio);
--	dec_pending(io, error);
-+	dm_io_dec_pending(io, error);
- }
- 
- /*
-@@ -1246,7 +1201,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
- 	 * anything, the target has assumed ownership of
- 	 * this io.
- 	 */
--	atomic_inc(&io->io_count);
-+	dm_io_inc_pending(io);
- 	sector = clone->bi_iter.bi_sector;
- 
- 	if (unlikely(swap_bios_limit(ti, clone))) {
-@@ -1272,7 +1227,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
- 			up(&md->swap_bios_semaphore);
- 		}
- 		free_tio(tio);
--		dec_pending(io, BLK_STS_IOERR);
-+		dm_io_dec_pending(io, BLK_STS_IOERR);
- 		break;
- 	case DM_MAPIO_REQUEUE:
- 		if (unlikely(swap_bios_limit(ti, clone))) {
-@@ -1280,7 +1235,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
- 			up(&md->swap_bios_semaphore);
- 		}
- 		free_tio(tio);
--		dec_pending(io, BLK_STS_DM_REQUEUE);
-+		dm_io_dec_pending(io, BLK_STS_DM_REQUEUE);
- 		break;
- 	default:
- 		DMWARN("unimplemented target map return value: %d", r);
-@@ -1569,7 +1524,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
- 
- 	if (bio->bi_opf & REQ_PREFLUSH) {
- 		error = __send_empty_flush(&ci);
--		/* dec_pending submits any data associated with flush */
-+		/* dm_io_dec_pending submits any data associated with flush */
- 	} else if (op_is_zone_mgmt(bio_op(bio))) {
- 		ci.bio = bio;
- 		ci.sector_count = 0;
-@@ -1610,7 +1565,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
- 	}
- 
- 	/* drop the extra reference count */
--	dec_pending(ci.io, errno_to_blk_status(error));
-+	dm_io_dec_pending(ci.io, errno_to_blk_status(error));
- 	return ret;
- }
- 
+ 	if (crypt_integrity_aead(cc) || cc->integrity_iv_size) {
 -- 
 2.31.1
 
