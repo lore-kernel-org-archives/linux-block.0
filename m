@@ -2,121 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F8F4C47085
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FF2C47084
 	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:08:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31A646135F
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0378C6141D
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:08:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231840AbhEYIJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232040AbhEYIJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 25 May 2021 04:09:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26912 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232030AbhEYIJN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 04:09:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621930051;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+Received: from mx2.suse.de ([195.135.220.15]:34662 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231946AbhEYIJI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 May 2021 04:09:08 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1621929980; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QfbH5K2Li7C6JOcU0ZHr9pnyMBOIBWyuDHESoquF3rc=;
-        b=cF+S/tgZbWm+L2QpsSn06zD10UkFDvVOxUyygPWBwCce3zt3JrfLgjYarssz4czjtKmcX7
-        d/Scv2s/vpfvBovoit5MQ34WzdwY0hzbbWgGkuxkX2ogFRNYXjt0rNUpFtjUupvrFPF0nl
-        G51h/DHj9K1PFWObc17g0IaxoXEtQXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-483-rfH4WQqdOfGTUe-rv6GEwA-1; Tue, 25 May 2021 04:05:25 -0400
-X-MC-Unique: rfH4WQqdOfGTUe-rv6GEwA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06CCC107ACE8;
-        Tue, 25 May 2021 08:05:24 +0000 (UTC)
-Received: from localhost (ovpn-13-203.pek2.redhat.com [10.72.13.203])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 151856E53E;
-        Tue, 25 May 2021 08:05:15 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH 4/4] block: mark queue init done at the end of blk_register_queue
-Date:   Tue, 25 May 2021 16:04:42 +0800
-Message-Id: <20210525080442.1896417-5-ming.lei@redhat.com>
-In-Reply-To: <20210525080442.1896417-1-ming.lei@redhat.com>
-References: <20210525080442.1896417-1-ming.lei@redhat.com>
+        bh=szeRdhgdMogyeTFchLFXMKvq8Aq37OBkprO//rw53jU=;
+        b=toZXb1uxWtXlHCyRMGIg5D0LZxjoX2nS6rz1AJIeeOyIbRs45sCf12RLJ/Ga50h9uXk0+F
+        +NgqygZiieR5AMy3waEdLJZ512o7Oq2S5T08wK1F0Q1QBa91Aojw52/Iz9MRyY4Jj7jEvW
+        SVl56puAWec8mMXVSstJG+lFTXircgk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1621929980;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=szeRdhgdMogyeTFchLFXMKvq8Aq37OBkprO//rw53jU=;
+        b=27fZmbkLpRaBUagGXPQ8fbO9hxJvE17Em7lgTXFTKGr4NXiJiqP7fw+dQNVPdZ3lUgzHBu
+        97HwAGXkIOTd7CCQ==
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id ACB6CAE92;
+        Tue, 25 May 2021 08:06:20 +0000 (UTC)
+Subject: Re: [PATCH 3/8] block: move bd_mutex to struct gendisk
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <song@kernel.org>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20210525061301.2242282-1-hch@lst.de>
+ <20210525061301.2242282-4-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <53b953d0-9ba3-3ad6-1004-e96e3141d121@suse.de>
+Date:   Tue, 25 May 2021 10:06:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
+In-Reply-To: <20210525061301.2242282-4-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Mark queue init done when everything is done well in blk_register_queue(),
-so that wbt_enable_default() can be run quickly without any RCU period
-involved.
+On 5/25/21 8:12 AM, Christoph Hellwig wrote:
+> Replace the per-block device bd_mutex with a per-gendisk open_mutex,
+> thus simplifying locking wherever we deal with partitions.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   Documentation/filesystems/locking.rst |  2 +-
+>   block/genhd.c                         |  7 ++---
+>   block/partitions/core.c               | 24 ++++++++---------
+>   drivers/block/loop.c                  | 14 +++++-----
+>   drivers/block/xen-blkfront.c          |  8 +++---
+>   drivers/block/zram/zram_drv.c         | 18 ++++++-------
+>   drivers/block/zram/zram_drv.h         |  2 +-
+>   drivers/md/md.h                       |  6 ++---
+>   drivers/s390/block/dasd_genhd.c       |  8 +++---
+>   drivers/scsi/sd.c                     |  4 +--
+>   fs/block_dev.c                        | 37 +++++++++++----------------
+>   fs/btrfs/volumes.c                    |  2 +-
+>   fs/super.c                            |  8 +++---
+>   include/linux/blk_types.h             |  1 -
+>   include/linux/genhd.h                 |  3 +++
+>   15 files changed, 68 insertions(+), 76 deletions(-)
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Also no any side effect by delaying to mark queue init done.
+Cheers,
 
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-sysfs.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 925043f926c5..aef7bfd8e600 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -847,20 +847,6 @@ int blk_register_queue(struct gendisk *disk)
- 		  "%s is registering an already registered queue\n",
- 		  kobject_name(&dev->kobj));
- 
--	/*
--	 * SCSI probing may synchronously create and destroy a lot of
--	 * request_queues for non-existent devices.  Shutting down a fully
--	 * functional queue takes measureable wallclock time as RCU grace
--	 * periods are involved.  To avoid excessive latency in these
--	 * cases, a request_queue starts out in a degraded mode which is
--	 * faster to shut down and is made fully functional here as
--	 * request_queues for non-existent devices never get registered.
--	 */
--	if (!blk_queue_init_done(q)) {
--		blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
--		percpu_ref_switch_to_percpu(&q->q_usage_counter);
--	}
--
- 	blk_queue_update_readahead(q);
- 
- 	ret = blk_trace_init_sysfs(dev);
-@@ -920,6 +906,21 @@ int blk_register_queue(struct gendisk *disk)
- 	ret = 0;
- unlock:
- 	mutex_unlock(&q->sysfs_dir_lock);
-+
-+	/*
-+	 * SCSI probing may synchronously create and destroy a lot of
-+	 * request_queues for non-existent devices.  Shutting down a fully
-+	 * functional queue takes measureable wallclock time as RCU grace
-+	 * periods are involved.  To avoid excessive latency in these
-+	 * cases, a request_queue starts out in a degraded mode which is
-+	 * faster to shut down and is made fully functional here as
-+	 * request_queues for non-existent devices never get registered.
-+	 */
-+	if (!blk_queue_init_done(q)) {
-+		blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
-+		percpu_ref_switch_to_percpu(&q->q_usage_counter);
-+	}
-+
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_register_queue);
+Hannes
 -- 
-2.29.2
-
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
