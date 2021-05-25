@@ -2,203 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81059C2B9F8
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 12:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C812C4707F
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 12:50:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 626B761417
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 12:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E576261408
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 12:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232310AbhEYMFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 08:05:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42360 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232333AbhEYMFn (ORCPT
+        id S232854AbhEYMvn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 08:51:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58174 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231847AbhEYMvm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 08:05:43 -0400
-X-Greylist: delayed 180 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 25 May 2021 05:04:12 PDT
-Received: from forwardcorp1o.mail.yandex.net (forwardcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C95C061574;
-        Tue, 25 May 2021 05:04:12 -0700 (PDT)
-Received: from vla1-fdfb804fb3f3.qloud-c.yandex.net (vla1-fdfb804fb3f3.qloud-c.yandex.net [IPv6:2a02:6b8:c0d:3199:0:640:fdfb:804f])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id DC3DA2E1AA4;
-        Tue, 25 May 2021 15:01:05 +0300 (MSK)
-Received: from vla1-81430ab5870b.qloud-c.yandex.net (vla1-81430ab5870b.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:8143:ab5])
-        by vla1-fdfb804fb3f3.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id JpeZ6PSFUr-151GRSB9;
-        Tue, 25 May 2021 15:01:05 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1621944065; bh=aigr+WKrVt1ocq4yhrHl8FrUviBzCQg0datyEmAK6MU=;
-        h=In-Reply-To:References:Date:Message-ID:From:To:Subject:Cc;
-        b=05DzBrnCTJBST4u8yJtJY14DfmAjCewlI0oVUs8k2OlddnnIWo+7568w7sJmdeJQx
-         oXH2MFq1s0dNZHQh8u3TLbs8L5cywUr7hYA/LXGaz/W3o2551FPJRZHclH09uY0kGc
-         XrtWY3voIPVjZh2Y4riTco9taio0npFVdBqjZyKE=
-Authentication-Results: vla1-fdfb804fb3f3.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b081:7209::1:15])
-        by vla1-81430ab5870b.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id pDtZrO7kJP-15oWwC24;
-        Tue, 25 May 2021 15:01:05 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH 1/1] virtio: disable partitions scanning for no partitions
- block
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20210520133908.98891-1-damtev@yandex-team.ru>
- <20210520133908.98891-2-damtev@yandex-team.ru>
- <YKu4Qovv1KMplifY@stefanha-x1.localdomain>
- <90021621883891@mail.yandex-team.ru>
- <21b08ea7-71c6-1b4b-3833-1c51d0e1d310@redhat.com>
-From:   Iurii Kamenev <damtev@yandex-team.ru>
-Message-ID: <d7665bc7-1806-ba88-9d7d-0c1352df43d3@yandex-team.ru>
-Date:   Tue, 25 May 2021 15:00:37 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        Tue, 25 May 2021 08:51:42 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14PCXIWk135521;
+        Tue, 25 May 2021 08:50:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=UNSHIvb3ylepQx8JAx/nvBvccCSjMNhdss0IoKGIWSg=;
+ b=ZmYyM9ISWHX3DThR1PwyPg5gly3B1oWWPXMYjzOSeU7Yz9WSnnilqBc2sfLtgTDwMVqL
+ MaQTEPJKyYpgHKbV2Y/x3LpgvVa1rvH0kiuDcU5Z7kH+lRrVU39wckTY85o5bwLv3SGc
+ uXbJ2XzaLvE0Zx+NcWmp9X2u7Z0Hj0lLb05Sbdm/DjB9p8FSazZEmQSrz9jXOiYXu1pI
+ EF+p17uZOfSYG5oD+CzGg3neLnWbcVxyghGJIp+lFtKicpzsTTUJaRVDvMx9yr2t8iFc
+ 4ParfYsM6uTNq09BKL7O8qgdwBu6alJgl6OF3twQ+yJk9EPcdKGMewtkkQCySV0GS7gl hA== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38s1adrqh5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 May 2021 08:50:12 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14PCmY2i015892;
+        Tue, 25 May 2021 12:50:10 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 38s1jn801p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 May 2021 12:50:10 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14PCnc8B33423694
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 May 2021 12:49:38 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1453311C05E;
+        Tue, 25 May 2021 12:50:07 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0C3A811C05B;
+        Tue, 25 May 2021 12:50:07 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 25 May 2021 12:50:07 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id ACCF6E06BE; Tue, 25 May 2021 14:50:06 +0200 (CEST)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH 1/1] s390/dasd: add missing discipline function
+Date:   Tue, 25 May 2021 14:50:06 +0200
+Message-Id: <20210525125006.157531-2-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210525125006.157531-1-sth@linux.ibm.com>
+References: <20210525125006.157531-1-sth@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <21b08ea7-71c6-1b4b-3833-1c51d0e1d310@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: ru
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: XnxfX2KS_IBLOiCmyJPJI7ZoiBCoG5YL
+X-Proofpoint-GUID: XnxfX2KS_IBLOiCmyJPJI7ZoiBCoG5YL
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-25_06:2021-05-25,2021-05-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxlogscore=957 malwarescore=0 adultscore=0 lowpriorityscore=0
+ phishscore=0 suspectscore=0 mlxscore=0 spamscore=0 impostorscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105250077
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for your remark. I guess it is possible, I will try to rewrite it 
-that way.
+Fix crash with illegal operation exception in dasd_device_tasklet.
+Commit b72949328869 ("s390/dasd: Prepare for additional path event handling")
+renamed the verify_path function for ECKD but not for FBA and DIAG.
+This leads to a panic when the path verification function is called for a
+FBA or DIAG device.
 
-24.05.2021 22:41, Paolo Bonzini пишет:
-> On 24/05/21 21:34, Юрий Каменев wrote:
->> Hi
->>
->>     Is your goal to avoid accidentally detecting partitions because it's
->>     confusing when that happens?
->>
->> The main goal is reducing the kernel start time. It might be use 
->> useful in tiny systems that use, for example, squashfs images with 
->> certainly no partitions. Disabling partitions scanning for these 
->> images can save a few tens of milliseconds which can be a significant 
->> acceleration for starting such systems.
->
-> Perhaps that could be configured in the image, for example in the 
-> kernel command line?
->
-> Paolo
->
->> 24.05.2021, 17:29, "Stefan Hajnoczi" <stefanha@redhat.com>:
->>
->>     On Thu, May 20, 2021 at 04:39:08PM +0300, Yury Kamenev wrote:
->>
->>     Hi,
->>     Is there a VIRTIO spec change for the new VIRTIO_BLK_F_NO_PS feature
->>     bit? Please send one:
->> https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=virtio#feedback
->> <https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=virtio#feedback>
->>
->>     GENHD_FL_NO_PART_SCAN is not used much in other drivers. This 
->> makes me
->>     wonder if the same use case is addressed through other means with 
->> SCSI,
->>     NVMe, etc devices. Maybe Christoph or Jens can weigh in on whether
->>     adding a bit to disable partition scanning for a virtio-blk fits 
->> into
->>     the big picture?
->>
->>     Is your goal to avoid accidentally detecting partitions because it's
->>     confusing when that happens?
->>
->>     VIRTIO is currently undergoing auditing and changes to support 
->> untrusted
->>     devices. From that perspective adding a device feature bit to 
->> disable
->>     partition scanning does not help protect the guest from an untrusted
->>     disk. The guest cannot trust the device, instead the guest itself 
->> would
->>     need to be configured to avoid partition scanning of untrusted 
->> devices.
->>
->>     Stefan
->>
->>           Signed-off-by: Yury Kamenev <damtev@yandex-team.ru
->>         <mailto:damtev@yandex-team.ru>>
->>           ---
->>            drivers/block/virtio_blk.c | 6 ++++++
->>            include/uapi/linux/virtio_blk.h | 1 +
->>            2 files changed, 7 insertions(+)
->>
->>           diff --git a/drivers/block/virtio_blk.c
->>         b/drivers/block/virtio_blk.c
->>           index b9fa3ef5b57c..17edcfee2208 100644
->>           --- a/drivers/block/virtio_blk.c
->>           +++ b/drivers/block/virtio_blk.c
->>           @@ -799,6 +799,10 @@ static int virtblk_probe(struct
->>         virtio_device *vdev)
->>                    vblk->disk->flags |= GENHD_FL_EXT_DEVT;
->>                    vblk->index = index;
->>
->>           + /*Disable partitions scanning for no-partitions block*/
->>
->>
->>     Formatting cleanup and rephrasing:
->>
->>        /* Disable partition scanning for devices with no partitions */
->>
->>           + if (virtio_has_feature(vdev, VIRTIO_BLK_F_NO_PS))
->>
->>
->>     I suggest user a more obvious name:
->>
->>        VIRTIO_BLK_F_NO_PART_SCAN
->>
->>           + vblk->disk->flags |= GENHD_FL_NO_PART_SCAN;
->>           +
->>                    /* configure queue flush support */
->>                    virtblk_update_cache_mode(vdev);
->>
->>           @@ -977,6 +981,7 @@ static unsigned int features_legacy[] = {
->>                    VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
->>                    VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY,
->>         VIRTIO_BLK_F_CONFIG_WCE,
->>                    VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD,
->>         VIRTIO_BLK_F_WRITE_ZEROES,
->>           + VIRTIO_BLK_F_NO_PS,
->>            }
->>            ;
->>            static unsigned int features[] = {
->>           @@ -984,6 +989,7 @@ static unsigned int features[] = {
->>                    VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
->>                    VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY,
->>         VIRTIO_BLK_F_CONFIG_WCE,
->>                    VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD,
->>         VIRTIO_BLK_F_WRITE_ZEROES,
->>           + VIRTIO_BLK_F_NO_PS,
->>            };
->>
->>            static struct virtio_driver virtio_blk = {
->>           diff --git a/include/uapi/linux/virtio_blk.h
->>         b/include/uapi/linux/virtio_blk.h
->>           index d888f013d9ff..f197d07afb05 100644
->>           --- a/include/uapi/linux/virtio_blk.h
->>           +++ b/include/uapi/linux/virtio_blk.h
->>           @@ -40,6 +40,7 @@
->>            #define VIRTIO_BLK_F_MQ 12 /* support more than one vq */
->>            #define VIRTIO_BLK_F_DISCARD 13 /* DISCARD is supported */
->>            #define VIRTIO_BLK_F_WRITE_ZEROES 14 /* WRITE ZEROES is
->>         supported */
->>           +#define VIRTIO_BLK_F_NO_PS 16 /* No partitions */
->>
->>            /* Legacy feature bits */
->>            #ifndef VIRTIO_BLK_NO_LEGACY
->>           --
->>           2.24.3 (Apple Git-128)
->>
->
+Fix by defining a wrapper function for dasd_generic_verify_path().
+
+Fixes: b72949328869 ("s390/dasd: Prepare for additional path event handling")
+
+Cc: <stable@vger.kernel.org> #5.11
+Reviewed-by: Jan Hoeppner <hoeppner@linux.ibm.com>
+Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+---
+ drivers/s390/block/dasd_diag.c | 8 +++++++-
+ drivers/s390/block/dasd_fba.c  | 8 +++++++-
+ drivers/s390/block/dasd_int.h  | 1 -
+ 3 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/s390/block/dasd_diag.c b/drivers/s390/block/dasd_diag.c
+index 1b9e1442e6a5..fd42a5fffaed 100644
+--- a/drivers/s390/block/dasd_diag.c
++++ b/drivers/s390/block/dasd_diag.c
+@@ -642,12 +642,18 @@ static void dasd_diag_setup_blk_queue(struct dasd_block *block)
+ 	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
+ }
+ 
++static int dasd_diag_pe_handler(struct dasd_device *device,
++				__u8 tbvpm, __u8 fcsecpm)
++{
++	return dasd_generic_verify_path(device, tbvpm);
++}
++
+ static struct dasd_discipline dasd_diag_discipline = {
+ 	.owner = THIS_MODULE,
+ 	.name = "DIAG",
+ 	.ebcname = "DIAG",
+ 	.check_device = dasd_diag_check_device,
+-	.verify_path = dasd_generic_verify_path,
++	.pe_handler = dasd_diag_pe_handler,
+ 	.fill_geometry = dasd_diag_fill_geometry,
+ 	.setup_blk_queue = dasd_diag_setup_blk_queue,
+ 	.start_IO = dasd_start_diag,
+diff --git a/drivers/s390/block/dasd_fba.c b/drivers/s390/block/dasd_fba.c
+index 4789410885e4..3ad319aee51e 100644
+--- a/drivers/s390/block/dasd_fba.c
++++ b/drivers/s390/block/dasd_fba.c
+@@ -794,13 +794,19 @@ static void dasd_fba_setup_blk_queue(struct dasd_block *block)
+ 	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+ }
+ 
++static int dasd_fba_pe_handler(struct dasd_device *device,
++			       __u8 tbvpm, __u8 fcsecpm)
++{
++	return dasd_generic_verify_path(device, tbvpm);
++}
++
+ static struct dasd_discipline dasd_fba_discipline = {
+ 	.owner = THIS_MODULE,
+ 	.name = "FBA ",
+ 	.ebcname = "FBA ",
+ 	.check_device = dasd_fba_check_characteristics,
+ 	.do_analysis = dasd_fba_do_analysis,
+-	.verify_path = dasd_generic_verify_path,
++	.pe_handler = dasd_fba_pe_handler,
+ 	.setup_blk_queue = dasd_fba_setup_blk_queue,
+ 	.fill_geometry = dasd_fba_fill_geometry,
+ 	.start_IO = dasd_start_IO,
+diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
+index 1c59b0e86a9f..155428bfed8a 100644
+--- a/drivers/s390/block/dasd_int.h
++++ b/drivers/s390/block/dasd_int.h
+@@ -297,7 +297,6 @@ struct dasd_discipline {
+ 	 * e.g. verify that new path is compatible with the current
+ 	 * configuration.
+ 	 */
+-	int (*verify_path)(struct dasd_device *, __u8);
+ 	int (*pe_handler)(struct dasd_device *, __u8, __u8);
+ 
+ 	/*
+-- 
+2.25.1
+
