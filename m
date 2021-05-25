@@ -2,101 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FF2C47084
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F3CC2B9F8
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:08:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0378C6141D
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:08:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE8496141B
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 08:08:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232040AbhEYIJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 04:09:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34662 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231946AbhEYIJI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 04:09:08 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1621929980; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        id S232113AbhEYIJj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 04:09:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31022 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232043AbhEYIJP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 May 2021 04:09:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621930039;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=szeRdhgdMogyeTFchLFXMKvq8Aq37OBkprO//rw53jU=;
-        b=toZXb1uxWtXlHCyRMGIg5D0LZxjoX2nS6rz1AJIeeOyIbRs45sCf12RLJ/Ga50h9uXk0+F
-        +NgqygZiieR5AMy3waEdLJZ512o7Oq2S5T08wK1F0Q1QBa91Aojw52/Iz9MRyY4Jj7jEvW
-        SVl56puAWec8mMXVSstJG+lFTXircgk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1621929980;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=szeRdhgdMogyeTFchLFXMKvq8Aq37OBkprO//rw53jU=;
-        b=27fZmbkLpRaBUagGXPQ8fbO9hxJvE17Em7lgTXFTKGr4NXiJiqP7fw+dQNVPdZ3lUgzHBu
-        97HwAGXkIOTd7CCQ==
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id ACB6CAE92;
-        Tue, 25 May 2021 08:06:20 +0000 (UTC)
-Subject: Re: [PATCH 3/8] block: move bd_mutex to struct gendisk
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Song Liu <song@kernel.org>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20210525061301.2242282-1-hch@lst.de>
- <20210525061301.2242282-4-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <53b953d0-9ba3-3ad6-1004-e96e3141d121@suse.de>
-Date:   Tue, 25 May 2021 10:06:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        bh=iAV4w3sWqpWD8znrzsx5RFjgMg+JBp27Mp120boUdJU=;
+        b=CiLZvUbfQGcHGiWmO3dbnvJzEIWW0dP4M9ZkVjQOQWx/NKNEcDutwd0mqDPwVkq2vaHp/6
+        UAzYdEevxkpo+r0+8p9NS5t0dIs+/hKoxeHw/83VE5XkNJa6YIm7nfJx1/Pqdctlj1mj22
+        FYe6+m/DzGhtR0AXr4MEOupBg9fuqDk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-moOgLD9rNsSQxMgIQhsHwA-1; Tue, 25 May 2021 04:05:14 -0400
+X-MC-Unique: moOgLD9rNsSQxMgIQhsHwA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 704DB800FF0;
+        Tue, 25 May 2021 08:05:13 +0000 (UTC)
+Received: from localhost (ovpn-13-203.pek2.redhat.com [10.72.13.203])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA56B2ED8E;
+        Tue, 25 May 2021 08:05:05 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH 3/4] block: reuse wbt_set_min_lat for setting wbt->min_lat_nsec
+Date:   Tue, 25 May 2021 16:04:41 +0800
+Message-Id: <20210525080442.1896417-4-ming.lei@redhat.com>
+In-Reply-To: <20210525080442.1896417-1-ming.lei@redhat.com>
+References: <20210525080442.1896417-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210525061301.2242282-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/25/21 8:12 AM, Christoph Hellwig wrote:
-> Replace the per-block device bd_mutex with a per-gendisk open_mutex,
-> thus simplifying locking wherever we deal with partitions.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   Documentation/filesystems/locking.rst |  2 +-
->   block/genhd.c                         |  7 ++---
->   block/partitions/core.c               | 24 ++++++++---------
->   drivers/block/loop.c                  | 14 +++++-----
->   drivers/block/xen-blkfront.c          |  8 +++---
->   drivers/block/zram/zram_drv.c         | 18 ++++++-------
->   drivers/block/zram/zram_drv.h         |  2 +-
->   drivers/md/md.h                       |  6 ++---
->   drivers/s390/block/dasd_genhd.c       |  8 +++---
->   drivers/scsi/sd.c                     |  4 +--
->   fs/block_dev.c                        | 37 +++++++++++----------------
->   fs/btrfs/volumes.c                    |  2 +-
->   fs/super.c                            |  8 +++---
->   include/linux/blk_types.h             |  1 -
->   include/linux/genhd.h                 |  3 +++
->   15 files changed, 68 insertions(+), 76 deletions(-)
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+We need to freeze queue when setting wbt->min_lat_nsec because
+wbt enabled state can be changed, so reuse wbt_set_min_lat() for doing
+that for users of wbt_init().
 
-Cheers,
+Meantime move wbt_enable_default() out of q->sysfs_lock, since we
+don't need that lock for enabling wbt.
 
-Hannes
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-sysfs.c | 16 +++-------------
+ block/blk-wbt.c   | 29 ++++++++++++++++++++++-------
+ block/blk-wbt.h   |  4 ++--
+ 3 files changed, 27 insertions(+), 22 deletions(-)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 7fd4ffadcdfa..925043f926c5 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -498,18 +498,7 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
+ 	if (wbt_get_min_lat(q) == val)
+ 		return count;
+ 
+-	/*
+-	 * Ensure that the queue is idled, in case the latency update
+-	 * ends up either enabling or disabling wbt completely. We can't
+-	 * have IO inflight if that happens.
+-	 */
+-	blk_mq_freeze_queue(q);
+-	blk_mq_quiesce_queue(q);
+-
+-	wbt_set_min_lat(q, val);
+-
+-	blk_mq_unquiesce_queue(q);
+-	blk_mq_unfreeze_queue(q);
++	wbt_set_min_lat(q, val, true);
+ 
+ 	return count;
+ }
+@@ -918,7 +907,6 @@ int blk_register_queue(struct gendisk *disk)
+ 	}
+ 
+ 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+-	wbt_enable_default(q);
+ 	blk_throtl_register_queue(q);
+ 
+ 	/* Now everything is ready and send out KOBJ_ADD uevent */
+@@ -927,6 +915,8 @@ int blk_register_queue(struct gendisk *disk)
+ 		kobject_uevent(&q->elevator->kobj, KOBJ_ADD);
+ 	mutex_unlock(&q->sysfs_lock);
+ 
++	wbt_enable_default(q);
++
+ 	ret = 0;
+ unlock:
+ 	mutex_unlock(&q->sysfs_dir_lock);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 5da48294e3e9..5d2db197cce6 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -24,6 +24,7 @@
+ #include <linux/slab.h>
+ #include <linux/backing-dev.h>
+ #include <linux/swap.h>
++#include <linux/blk-mq.h>
+ 
+ #include "blk-wbt.h"
+ #include "blk-rq-qos.h"
+@@ -425,13 +426,27 @@ u64 wbt_get_min_lat(struct request_queue *q)
+ 	return RQWB(rqos)->min_lat_nsec;
+ }
+ 
+-void wbt_set_min_lat(struct request_queue *q, u64 val)
++void wbt_set_min_lat(struct request_queue *q, u64 val, bool manual)
+ {
+ 	struct rq_qos *rqos = wbt_rq_qos(q);
+ 
++	/*
++	 * Ensure that the queue is idled, in case the latency update
++	 * ends up either enabling or disabling wbt completely. We can't
++	 * have IO inflight if that happens.
++	 */
++	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
++
+ 	RQWB(rqos)->min_lat_nsec = val;
+-	RQWB(rqos)->enable_state = WBT_STATE_ON_MANUAL;
++	if (manual)
++		RQWB(rqos)->enable_state = WBT_STATE_ON_MANUAL;
++	else
++		RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
+ 	wbt_update_limits(RQWB(rqos));
++
++	blk_mq_unquiesce_queue(q);
++	blk_mq_unfreeze_queue(q);
+ }
+ 
+ 
+@@ -844,11 +859,11 @@ int wbt_alloc(struct request_queue *q)
+ 
+ void wbt_init(struct request_queue *q)
+ {
+-	struct rq_wb *rwb = RQWB(wbt_rq_qos(q));
+-
+-	rwb->enable_state = WBT_STATE_ON_DEFAULT;
+-	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
++	struct rq_qos *rqos = wbt_rq_qos(q);
++	struct rq_wb *rwb = RQWB(rqos);
+ 
+-	wbt_queue_depth_changed(&rwb->rqos);
++	rwb->rq_depth.queue_depth = blk_queue_depth(rqos->q);
+ 	wbt_set_write_cache(q, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
++
++	wbt_set_min_lat(q, wbt_default_latency_nsec(q), false);
+ }
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index de07963f3544..d9b643a55407 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -93,7 +93,7 @@ void wbt_disable_default(struct request_queue *);
+ void wbt_enable_default(struct request_queue *);
+ 
+ u64 wbt_get_min_lat(struct request_queue *q);
+-void wbt_set_min_lat(struct request_queue *q, u64 val);
++void wbt_set_min_lat(struct request_queue *q, u64 val, bool manual);
+ 
+ void wbt_set_write_cache(struct request_queue *, bool);
+ 
+@@ -124,7 +124,7 @@ static inline u64 wbt_get_min_lat(struct request_queue *q)
+ {
+ 	return 0;
+ }
+-static inline void wbt_set_min_lat(struct request_queue *q, u64 val)
++static inline void wbt_set_min_lat(struct request_queue *q, u64 val, bool manual)
+ {
+ }
+ static inline u64 wbt_default_latency_nsec(struct request_queue *q)
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.29.2
+
