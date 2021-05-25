@@ -2,188 +2,197 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7EEC2B9F8
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:15:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9959DC4707F
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:29:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C66E161417
-	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:15:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74D3C610FC
+	for <linux-block@archiver.kernel.org>; Tue, 25 May 2021 06:29:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230382AbhEYGRY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 May 2021 02:17:24 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:46165 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbhEYGRX (ORCPT
+        id S230509AbhEYGam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 May 2021 02:30:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52594 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230453AbhEYGal (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 May 2021 02:17:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1621923354; x=1653459354;
-  h=from:to:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=1R85ZEi+aLNE5288xgE4Ndu1JlSWBBUbpzFD5EHAdyk=;
-  b=LccgyYeiCz1S3sUDNxkdecG/GzyFRjs86e3Ql2hiSPxWH8b2qbbY42x7
-   kZ96LQPBqDcswqGlfWGf4lJePmeHML2alipVLcn6FhVJenjd/vvt2r0LI
-   X3v4ai8A8BLpS/KenLsxGmLUCOdgZ5OmvKScFmlANQucvGzK6fLBrLWW+
-   QvqSCGmxjLHjqmElYi48thV+5QB19VknsbPjfAF+7dyQQGjxl1gNSDycd
-   0WT9GdR5MNPDjRQW3HNSEWwQAd1MbiinNSKXImrtEn/gK3HOiyNk0XV6d
-   FT1qqFD9Z/u+8mZle0mFDYRBqNrPPB1r13lOdtH55kGk0tUPwTWdBWjmv
-   Q==;
-IronPort-SDR: zE8nL6paKzQEyhUR4L/al16TXp8a9PKF23vpvdvhStPzS2o/WA9IHEjwG6L4s6WT4RnjjOU2aI
- Dtkdg5jpyjSPaOiOnTvaaX7VSDzvJ5ukz0pM+8Lrzzhb1zAa/DEWFYorfs7qLYhrayu4QN9kWE
- AX04TE8Q+hzoRk2Yrj/kYwJGotaBEG6c/hRAFa6iztmH/NwkDyir1v2+Way9QMZYBxDhSR2eHB
- jXYuWAigmq9swmEQgqOsVvdQrZJ0lsT9ES4my8f5wrpVw0zH2LJH3pzIWC9NAp8iFGEetncNwW
- 4Wo=
-X-IronPort-AV: E=Sophos;i="5.82,327,1613404800"; 
-   d="scan'208";a="280621378"
-Received: from mail-mw2nam12lp2043.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.43])
-  by ob1.hgst.iphmx.com with ESMTP; 25 May 2021 14:15:53 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BHJC/S2JSOMSjoBqlrlcezlIC5VnM5OOdvVW7CsRApQurmCsCrytp4CiE98HmHZNSNCommhODEfijkCYEwwgQOn3IaDqXZsCepksv+XjoVXUfr/8u5PAsnUKDHCrc9UoiatJS9S4X3lcOkvSKa8vTWW6JwI6snCiT+g6h9aQGGQhjhHjjJZW0P9j8PUXm2e63vh/c8YcV4KAjR9DoHI1HBmvb4xLFDO5Alt3kXCOw4m1rM0SYCBH3zDpw62uPdM851PKHxpUvU9/SVYIXqR/+PYvJ9HYrAZxDaHal2nI3hGWrARrvfBqpn38X7rf4ZX08FmFqvtSyMdabZE1WM7bhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1R85ZEi+aLNE5288xgE4Ndu1JlSWBBUbpzFD5EHAdyk=;
- b=oJ2OBHvTm7wKsD111uIZOST/ooMpA1TYHzd34FKrYABUo4A9lgpJHqMunoSbdOMufgpRH2Lps5yaQOyDwh3541FIG3fQlJSn2BOlYyxlA4k8At6gUCoWVIjdt/9+Jyrx8OCJrWxqlOZ3WTRwE0j36GBRPG8OiM+cWX9lutmIl9wUC1heft88Os5jmIyZbS1NOsdx0xv8XnAJDhEKWJyqyhgSIAe8hymURZs5QZxs4wkY2BhnEc4xpz/dFnI5tAx7XOmw6ZU1GYPDBaJ+XO8cbrz6yECGBvbByofllL6tpggtQ7wl74YMM5sLIIV5mwXCnPgBTHRqVGEf4f6nJG6xGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1R85ZEi+aLNE5288xgE4Ndu1JlSWBBUbpzFD5EHAdyk=;
- b=B7j+D2nCA0FoApoiZIjLDqC0MOhs66bqT4IeOcO95huvQlh52kn1+RXhKJsDRb6+FLx1qYpXQqmpBANhrhoAbX87qIqzpwJLiXEau7lqL2Eukt+RPz+5la890c+BQTP7l4/DQvevjFoZ6J3KO26wnaS/EvX2wmgII82CnEVh1qk=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (52.135.233.89) by
- SJ0PR04MB7456.namprd04.prod.outlook.com (20.181.254.203) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4150.27; Tue, 25 May 2021 06:15:53 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0%7]) with mapi id 15.20.4150.027; Tue, 25 May 2021
- 06:15:53 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v4 01/11] block: improve handling of all zones reset
- operation
-Thread-Topic: [PATCH v4 01/11] block: improve handling of all zones reset
- operation
-Thread-Index: AQHXUQ1F6jb1VNqY+kaEwGILkKYOng==
-Date:   Tue, 25 May 2021 06:15:53 +0000
-Message-ID: <BYAPR04MB496571E36CF14B9647FDD21186259@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210525022539.119661-1-damien.lemoal@wdc.com>
- <20210525022539.119661-2-damien.lemoal@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [70.175.137.120]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f0e4a19a-96b7-4c37-0681-08d91f448ce8
-x-ms-traffictypediagnostic: SJ0PR04MB7456:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SJ0PR04MB745669D9E3103C0D836AEF7C86259@SJ0PR04MB7456.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: eza9Ygdx0Sv/i7MpKlo2hp233kDPfYKw55D7tyVs8JwpowqQOERKlNlUw9ok3jGD6i9UPbMe/gPjyhIpgZ4kGUKHlHylMZW8kD1CT66hkB4OWHFm+q3ECTZClUtRrLjChcZzjwRz6CqlEZywxvV5Wsv3XpbfZOKuR/yTpiHQivtqPVlTSFoWUh9sVE3L0rzjhEW3Q8z7cM5meg0PTG1bA2j8+Fq6msS+GPCXzTfX3jLab+Bax38syBX6+GTSnr9ddXnPL7RNtx/1ouxv4FsG3vxoYKLnmolyz8V2/3kLVwvxRtDqknva1WD6dRnTb9lm4xFFTyGucEQqudACSzMUY6phLJAVKmqPFmWojxkVJSEgB1kuKeoe88B//gLyADOGY9X4gF04r1CzjRAgw2fgmLzWDNbWAAVsmlm4wKoCTvBjdz6D2wampM4FhC2a68zui0HZGFvqciI70pSgTDfVsE8JvEH5CojXImHgNcgzN0J5RUF4iYoU3dVhSPbaTQpxNqzDNTyHFA5ZUfmGqJ8oqshzYGlpcDXeekTNNaGQ95v48PaDZPUA4Aj1kZGZGHtJ/EA2e/zNmNlx53bN7Jh8zeh646ohDdFqqSSNzyb5Jk4=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(39850400004)(136003)(366004)(376002)(66476007)(76116006)(66446008)(66946007)(9686003)(8936002)(64756008)(66556008)(71200400001)(86362001)(186003)(478600001)(110136005)(7696005)(6506007)(52536014)(8676002)(5660300002)(122000001)(83380400001)(38100700002)(2906002)(55016002)(26005)(33656002)(53546011)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?CCi9eMi55+ucK60Xe6tQIjV7D3Bn55zr2W4J7BdyFYInd1KV7A9kPJcieabV?=
- =?us-ascii?Q?AX5GTmK4Yn4GDxCygV31UKA/h1C5zoXiR3FXK4rB87JnIPM0doTVmxNvUEfG?=
- =?us-ascii?Q?UlwR2S1/dwd4/eMr+BW82wfmNJG4NG+6/Bws8VULPrz+pYYKDYRH5r950sVI?=
- =?us-ascii?Q?HyLP759i1jfSknMdVpmPhUdtyxG2O4UdwYovC7k15tHGN2cp3HK5A8BGfGUZ?=
- =?us-ascii?Q?rS7Lfdvgki/W3YIELguqcoyvH/1/lcMxCOJTrJ2usuClE0E5F0ADE1BjO9no?=
- =?us-ascii?Q?wVa9AL58WZ+zQQ6qQwqTwdf//TPiAXdlmMmewnJUu6f4duJ2MNQb85XMzj14?=
- =?us-ascii?Q?DUvfDuLw+nbA41tez+bad/iqYRXJZZKGhKRIqkP+iRLueAM9LF+U1hkrGyqi?=
- =?us-ascii?Q?BdxQcd7g5egPVwVy8mJ1C0Qr3kTdJI0Kt5Rvb3mGDZ68ysPU4XDMIl/VPKXQ?=
- =?us-ascii?Q?DrWDWlaeinT7X/KvD5TWwJdxKNBwAePlw7+hbf5rJmF+Bd2pJUFca7gtAUjs?=
- =?us-ascii?Q?XUGLxl17VCae19NotRgNYXvGkV9xidmvRSThgjJxbmYtfnmooPgjUw7va/fk?=
- =?us-ascii?Q?u9hmHPP5p2It1cepAs63WWV9uaE7cARXiLMeegjzKoPdUcAycrAnE2xqlUSx?=
- =?us-ascii?Q?QG7uIe9+tW+ug+rKypWCJIH5lujTZVJx/mD5J6WHvDgUR9qIL6r+6P+n3RiF?=
- =?us-ascii?Q?0/3nMay9UKBsxumpLkC5zz980gEVAQYBaAdvZ6Ts2IGfTnL3QU0ttUK/lpEt?=
- =?us-ascii?Q?DDypFSGXF0/u+0/vk6tbfUqKRApCi2aNWNlLgzvTJcWeAD43euMjdYe6FysD?=
- =?us-ascii?Q?QU3o8jmshlEMs3HVaDHPBvBSUc32JQGhG1AKdDYAYTrXEJST67uU9ZhXcL4o?=
- =?us-ascii?Q?f4k3f/Vuo9T3lJ1W498kDPeKZPCq9L5YNOEe2RUfT/H2So47ZGYVUCkY3uZa?=
- =?us-ascii?Q?dn5fDLLoP67QC9u68fM4IBPDeT8bLWSMbRnLeYo/I2UMZ4i2Y+RQYMNpsT1A?=
- =?us-ascii?Q?bCfIwvVtrnxH8U+YyKYTeejXDxFehWa+GFCsreQbsGCPViGYcr9UYg0Y/I9k?=
- =?us-ascii?Q?CHXQkIreK714Y2kiiYYKRfUIpepK3FE/jA2sdEfpI2l+9z0FiiKMZwP6FRG0?=
- =?us-ascii?Q?bfw1qRkmQqCXG9FLmrTbHotO7VUausWCadz215c2INeFB3cdxLvjpFM2dGY4?=
- =?us-ascii?Q?mRDsOr00gp7EYhgZ9VtkM7xh3iQp7ZNI+jLCM11wgXJy4dVMjtW7p0ejTVb1?=
- =?us-ascii?Q?ItYHZwmB08tHS05VXyTWLL5QHk1FpH186avgHwJNY9KyQw0KFhqopa0ZZKk7?=
- =?us-ascii?Q?3jPsBoOY7WJ8duAvCPVeaCm8w52u1HPmeuUn0xken51mAg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 25 May 2021 02:30:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621924152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xmg+jKMuyj8kCoSvApnyzVNUBfF8MHu5WWzJfFH3+RY=;
+        b=BkWS8wAKuHsomsyWs/yREP2mnW2FQ0J8JlDcTUzorId8XdGpolZbgr7THWaXwvEJ8tzNLx
+        71gIIqO/b6MAON5AyEJWhuLlOUH6KGZrZdcfLskXC1lpjKCjvGF1jk6G+MwXa3EHYY4+05
+        Qy1+LdcJE/hBhCrJtoSRSCax9+fRsGg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-491-yOExd4ABPSafQwy7v9rgDw-1; Tue, 25 May 2021 02:29:08 -0400
+X-MC-Unique: yOExd4ABPSafQwy7v9rgDw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DAC21007477;
+        Tue, 25 May 2021 06:29:07 +0000 (UTC)
+Received: from T590 (ovpn-13-203.pek2.redhat.com [10.72.13.203])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D26DE60855;
+        Tue, 25 May 2021 06:28:59 +0000 (UTC)
+Date:   Tue, 25 May 2021 14:28:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Brian Foster <bfoster@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: iomap: writeback ioend/bio allocation deadlock risk
+Message-ID: <YKyZJiY7GySlIsZ7@T590>
+References: <YKcouuVR/y/L4T58@T590>
+ <20210521071727.GA11473@lst.de>
+ <YKdhuUZBtKMxDpsr@T590>
+ <20210521073547.GA11955@lst.de>
+ <YKdwtzp+WWQ3krhI@T590>
+ <20210521083635.GA15311@lst.de>
+ <YKd1VS5gkzQRn+7x@T590>
+ <20210524235538.GI2817@dread.disaster.area>
+ <YKyDCw430gD6pTBC@T590>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0e4a19a-96b7-4c37-0681-08d91f448ce8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 May 2021 06:15:53.0200
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cu7XPUYRsL2MX8G3JpLimFKVNjIz55bYjJARvXcwwiGVGrneWOp3GmR+8Vd35nTT3sIjMczIegLzdwHfAo20dbxJuySzn+5sKQEpRqSWl9g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7456
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YKyDCw430gD6pTBC@T590>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/24/21 7:25 PM, Damien Le Moal wrote:=0A=
-> SCSI, ZNS and null_blk zoned devices support resetting all zones using=0A=
-> a single command (REQ_OP_ZONE_RESET_ALL), as indicated using the device=
-=0A=
-> request queue flag QUEUE_FLAG_ZONE_RESETALL. This flag is not set for=0A=
-> device mapper targets creating zoned devices. In this case, a user=0A=
-> request for resetting all zones of a device is processed in=0A=
-> blkdev_zone_mgmt() by issuing a REQ_OP_ZONE_RESET operation for each=0A=
-> zone of the device. This leads to different behaviors of the=0A=
-> BLKRESETZONE ioctl() depending on the target device support for the=0A=
-> reset all operation. E.g.=0A=
->=0A=
-> blkzone reset /dev/sdX=0A=
->=0A=
-> will reset all zones of a SCSI device using a single command that will=0A=
-> ignore conventional, read-only or offline zones.=0A=
->=0A=
-> But a dm-linear device including conventional, read-only or offline=0A=
-> zones cannot be reset in the same manner as some of the single zone=0A=
-> reset operations issued by blkdev_zone_mgmt() will fail. E.g.:=0A=
->=0A=
-> blkzone reset /dev/dm-Y=0A=
-> blkzone: /dev/dm-0: BLKRESETZONE ioctl failed: Remote I/O error=0A=
->=0A=
-> To simplify applications and tools development, unify the behavior of=0A=
-> the all-zone reset operation by modifying blkdev_zone_mgmt() to not=0A=
-> issue a zone reset operation for conventional, read-only and offline=0A=
-> zones, thus mimicking what an actual reset-all device command does on a=
-=0A=
-> device supporting REQ_OP_ZONE_RESET_ALL. This emulation is done using=0A=
-> the new function blkdev_zone_reset_all_emulated(). The zones needing a=0A=
-> reset are identified using a bitmap that is initialized using a zone=0A=
-> report. Since empty zones do not need a reset, also ignore these zones.=
-=0A=
-> The function blkdev_zone_reset_all() is introduced for block devices=0A=
-> natively supporting reset all operations. blkdev_zone_mgmt() is modified=
-=0A=
-> to call either function to execute an all zone reset request.=0A=
->=0A=
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-> [hch: split into multiple functions]=0A=
-> Signed-off-by: Christoph Hellwig <hch@lst.de>=0A=
-=0A=
-Apart from nit mentioned earlier, looks good.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-=0A=
+On Tue, May 25, 2021 at 12:54:35PM +0800, Ming Lei wrote:
+> On Tue, May 25, 2021 at 09:55:38AM +1000, Dave Chinner wrote:
+> > On Fri, May 21, 2021 at 04:54:45PM +0800, Ming Lei wrote:
+> > > On Fri, May 21, 2021 at 10:36:35AM +0200, Christoph Hellwig wrote:
+> > > > On Fri, May 21, 2021 at 04:35:03PM +0800, Ming Lei wrote:
+> > > > > Just wondering why the ioend isn't submitted out after it becomes full?
+> > > > 
+> > > > block layer plugging?  Although failing bio allocations will kick that,
+> > > > so that is not a deadlock risk.
+> > > 
+> > > These ioends are just added to one list stored on local stack variable(submit_list),
+> > > how can block layer plugging observe & submit them out?
+> > 
+> > We ignore that, as the commit histoy says:
+> > 
+> > commit e10de3723c53378e7cf441529f563c316fdc0dd3
+> > Author: Dave Chinner <dchinner@redhat.com>
+> > Date:   Mon Feb 15 17:23:12 2016 +1100
+> > 
+> >     xfs: don't chain ioends during writepage submission
+> > 
+> >     Currently we can build a long ioend chain during ->writepages that
+> >     gets attached to the writepage context. IO submission only then
+> >     occurs when we finish all the writepage processing. This means we
+> >     can have many ioends allocated and pending, and this violates the
+> >     mempool guarantees that we need to give about forwards progress.
+> >     i.e. we really should only have one ioend being built at a time,
+> >     otherwise we may drain the mempool trying to allocate a new ioend
+> >     and that blocks submission, completion and freeing of ioends that
+> >     are already in progress.
+> > 
+> >     To prevent this situation from happening, we need to submit ioends
+> >     for IO as soon as they are ready for dispatch rather than queuing
+> >     them for later submission. This means the ioends have bios built
+> >     immediately and they get queued on any plug that is current active.
+> >     Hence if we schedule away from writeback, the ioends that have been
+> >     built will make forwards progress due to the plug flushing on
+> >     context switch. This will also prevent context switches from
+> >     creating unnecessary IO submission latency.
+> > 
+> >     We can't completely avoid having nested IO allocation - when we have
+> >     a block size smaller than a page size, we still need to hold the
+> >     ioend submission until after we have marked the current page dirty.
+> >     Hence we may need multiple ioends to be held while the current page
+> >     is completely mapped and made ready for IO dispatch. We cannot avoid
+> >     this problem - the current code already has this ioend chaining
+> >     within a page so we can mostly ignore that it occurs.
+> > 
+> >     Signed-off-by: Dave Chinner <dchinner@redhat.com>
+> >     Reviewed-by: Christoph Hellwig <hch@lst.de>
+> >     Signed-off-by: Dave Chinner <david@fromorbit.com>
+> > 
+> > IOWs, this nesting for block size < page size has been out there
+> > for many years now and we've yet to have anyone report that
+> > writeback deadlocks have occurred.
+> > 
+> > There's a mistake in that commit message - we can't submit the
+> > ioends on a page until we've marked the page as under writeback, not
+> > dirty. That's because we cannot have ioends completing on a a page
+> > that isn't under writeback because calling end_page_writeback() on
+> > it when it isn't under writeback will BUG(). Hence we have to build
+> > all the submission state before we mark the page as under writeback
+> > and perform the submission(s) to avoid completion racing with
+> > submission.
+> > 
+> > Hence we can't actually avoid nesting ioend allocation here within a
+> > single page - the constraints of page cache writeback require it.
+> > Hence the construction of the iomap_ioend_bioset uses a pool size of:
+> > 
+> > 	4 * (PAGE_SIZE / SECTOR_SIZE)
+> > 
+> > So that we always have enough ioends cached in the mempool to
+> > guarantee forwards progress of writeback of any single page under
+> > writeback.
+> 
+> OK, looks it is just for subpage IO, so there isn't such issue
+> in case of multiple ioends.
+
+Thinking of further, this way is still fragile, suppose there are 8
+contexts in which writeback is working on at the same time, and each
+needs to allocate 6 ioends, so all contexts may not move on when
+allocating its 6th ioend.
+
+> 
+> > 
+> > But that is a completely separate problem to this:
+> > 
+> > > Chained bios have been submitted already, but all can't be completed/freed
+> > > until the whole ioend is done, that submission won't make forward progress.
+> > 
+> > This is a problem caused by having unbound contiguous ioend sizes,
+> > not a problem caused by chaining bios. We can throw 256 pages into
+> > a bio, so when we are doing huge contiguous IOs, we can map a
+> > lot of sequential dirty pages into a contiguous extent into a very
+> > long bio chain. But if we cap the max ioend size to, say, 4096
+> > pages, then we've effectively capped the number of bios that can be
+> > nested by such a writeback chain.
+> 
+> If the 4096 pages are not continuous, there may be 4096/256=16 bios
+> allocated for single ioend, and one is allocated from iomap_ioend_bioset,
+> another 15 is allocated by bio_alloc() from fs_bio_set which just
+> reserves 2 bios.
+> 
+> > 
+> > I was about to point you at the patchset that fixes this, but you've
+> > already found it and are claiming that this nesting is an unfixable
+> > problem. Capping the size of the ioend also bounds the depth of the
+> > allocation nesting that will occur, and that fixes the whole nseting
+> > deadlock problem: If the mempool reserves are deeper than than the
+> > maximum chain nesting that can occur, then there is no deadlock.
+> > 
+> > However, this points out what the real problem here is: that bio
+> > allocation is designed to deadlock when nesting bio allocation rather
+> > than fail. Hence at the iomap level we've go no way of knowing that
+> > we should terminate and submit the current bio chain and start a new
+> > ioend+bio chain because we will hang before there's any indication
+> > that a deadlock could occur.
+> 
+> Most of reservation is small, such as fs_bio_set, so bio_alloc_bioset()
+> documents that 'never allocate more than 1 bio at a time'. Actually
+> iomap_chain_bio() does allocate a new one, then submits the old one.
+> 'fs_bio_set' reserves two bios, so the order(alloc before submit) is fine,
+
+It may not be fine when more than one context is involved in writeback.
+
+Thanks,
+Ming
+
