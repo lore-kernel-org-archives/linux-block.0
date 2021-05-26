@@ -2,248 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528C3C47082
-	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 15:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C9FC4708B
+	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 21:07:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 281456101E
-	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 15:15:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FC82613DE
+	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 21:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234910AbhEZPQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 May 2021 11:16:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52776 "EHLO mx2.suse.de"
+        id S233701AbhEZVJT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 May 2021 17:09:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38132 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235223AbhEZPQd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 May 2021 11:16:33 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622042100; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=84Awo9QiSUfGV4Ojnvze3ojF0GValm1K/C8M/ACw/W4=;
-        b=fjJHxht5IAPoARxHwu2FdkBbgq0leUL+3cFH3lMrDRPLg46oQruD9PBbaR7MoOQC4yRRqI
-        lIhpBfL736bTDXHDVDz/TCdFfeeY3VMZskkFIhcHrlK/R7VKIlad1VOp5F5xpbfdZy+Y8N
-        wNFvIT2S9CgRl0Po1s+GWpeuZzn7968=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622042100;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=84Awo9QiSUfGV4Ojnvze3ojF0GValm1K/C8M/ACw/W4=;
-        b=XIzejofgtGhNyJlPnjrXH4JZnFsGsHnbjgz7SeIlDKBmkRacpA0sofckCvx5VwpE5IDdDK
-        J4mXDltjP6h+91AQ==
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 9770BAEE7;
-        Wed, 26 May 2021 15:15:00 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Coly Li <colyli@suse.de>,
-        Diego Ercolani <diego.ercolani@gmail.com>,
-        Jan Szubiak <jan.szubiak@linuxpolska.pl>,
-        Marco Rebhan <me@dblsaiko.net>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        Thorsten Knabe <linux@thorsten-knabe.de>,
-        Victor Westerhuis <victor@westerhu.is>,
-        Vojtech Pavlik <vojtech@suse.cz>, stable@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>
-Subject: [PATCH v4] bcache: avoid oversized read request in cache missing code path
-Date:   Wed, 26 May 2021 23:14:50 +0800
-Message-Id: <20210526151450.45211-1-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
+        id S230499AbhEZVJR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 May 2021 17:09:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D8EF7613D7;
+        Wed, 26 May 2021 21:07:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1622063265;
+        bh=h6hDfGXPxmlIkGsnH0b8u2EKoXb9irFLw9MCylg2Paw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LNluHNmru4wGy0TaWP+m0QdGm2A43bD1dhtku/fDb+bN2pposzRo1g/t6UUJ2uhcZ
+         Vq7xNd+nwGbNSHYfTX10W4rnX2QztQJc8xy93QrBUFteQd0AnReRvkyIKLadrv1YYJ
+         BIqVe5p6QmpqrYH58hf6dMXlxwIkQ8ChqsDdLwgLinEwV17NMSxoiFENVGfxGr2tP/
+         DcmBL54G0I7LhyzQ/tEavVRuXbdpzMbOJapRM9Ei2xCC5WhcmcVV7XP5Xxcza2n2ql
+         R3XjwPtaq78v2pEAssp9oVDFhe7dqrRXSJ77e0vYOFPTMEOUp/uyxnen41O8BCo/SN
+         KfDjVgPMVAwTg==
+Date:   Wed, 26 May 2021 14:07:42 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [LSF/MM/BPF TOPIC] Memory folios
+Message-ID: <20210526210742.GA3706388@dhcp-10-100-145-180.wdc.com>
+References: <YJlzwcADaxO/JHRE@casper.infradead.org>
+ <YJ636tQhuc9X7ZzR@casper.infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YJ636tQhuc9X7ZzR@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the cache missing code path of cached device, if a proper location
-from the internal B+ tree is matched for a cache miss range, function
-cached_dev_cache_miss() will be called in cache_lookup_fn() in the
-following code block,
-[code block 1]
-  526         unsigned int sectors = KEY_INODE(k) == s->iop.inode
-  527                 ? min_t(uint64_t, INT_MAX,
-  528                         KEY_START(k) - bio->bi_iter.bi_sector)
-  529                 : INT_MAX;
-  530         int ret = s->d->cache_miss(b, s, bio, sectors);
+On Fri, May 14, 2021 at 06:48:26PM +0100, Matthew Wilcox wrote:
+> On Mon, May 10, 2021 at 06:56:17PM +0100, Matthew Wilcox wrote:
+> > I don't know exactly how much will be left to discuss about supporting
+> > larger memory allocation units in the page cache by December.  In my
+> > ideal world, all the patches I've submitted so far are accepted, I
+> > persuade every filesystem maintainer to convert their own filesystem
+> > and struct page is nothing but a bad memory by December.  In reality,
+> > I'm just not that persuasive.
+> > 
+> > So, probably some kind of discussion will be worthwhile about
+> > converting the remaining filesystems to use folios, when it's worth
+> > having filesystems opt-in to multi-page folios, what we can do about
+> > buffer-head based filesystems, and so on.
+> > 
+> > Hopefully we aren't still discussing whether folios are a good idea
+> > or not by then.
+> 
+> I got an email from Hannes today asking about memory folios as they
+> pertain to the block layer, and I thought this would be a good chance
+> to talk about them.  If you're not familiar with the term "folio",
+> https://lore.kernel.org/lkml/20210505150628.111735-10-willy@infradead.org/
+> is not a bad introduction.
+> 
+> Thanks to the work done by Ming Lei in 2017, the block layer already
+> supports multipage bvecs, so to a first order of approximation, I don't
+> need anything from the block layer on down through the various storage
+> layers.  Which is why I haven't been talking to anyone in storage!
+> 
+> It might change (slightly) the contents of bios.  For example,
+> bvec[n]->bv_offset might now be larger than PAGE_SIZE.  Drivers should
+> handle this OK, but probably haven't been audited to make sure they do.
+> Mostly, it's simply that drivers will now see fewer, larger, segments
+> in their bios.  Once a filesystem supports multipage folios, we will
+> allocate order-N pages as part of readahead (and sufficiently large
+> writes).  Dirtiness is tracked on a per-folio basis (not per page),
+> so folios take trips around the LRU as a single unit and finally make
+> it to being written back as a single unit.
+> 
+> Drivers still need to cope with sub-folio-sized reads and writes.
+> O_DIRECT still exists and (eg) doing a sub-page, block-aligned write
+> will not necessarily cause readaround to happen.  Filesystems may read
+> and write their own metadata at whatever granularity and alignment they
+> see fit.  But the vast majority of pagecache I/O will be folio-sized
+> and folio-aligned.
+> 
+> I do have two small patches which make it easier for the one
+> filesystem that I've converted so far (iomap/xfs) to add folios to bios
+> and get folios back out of bios:
+> 
+> https://lore.kernel.org/lkml/20210505150628.111735-72-willy@infradead.org/
+> https://lore.kernel.org/lkml/20210505150628.111735-73-willy@infradead.org/
+> 
+> as well as a third patch that estimates how large a bio to allocate,
+> given the current folio that it's working on:
+> https://git.infradead.org/users/willy/pagecache.git/commitdiff/89541b126a59dc7319ad618767e2d880fcadd6c2
+> 
+> It would be possible to make other changes in future.  For example, if
+> we decide it'd be better, we could change bvecs from being (page, offset,
+> length) to (folio, offset, length).  I don't know that it's worth doing;
+> it would need to be evaluated on its merits.  Personally, I'd rather
+> see us move to a (phys_addr, length) pair, but I'm a little busy at the
+> moment.
+> 
+> Hannes has some fun ideas about using the folio work to support larger
+> sector sizes, and I think they're doable.
 
-Here s->d->cache_miss() is the call backfunction pointer initialized as
-cached_dev_cache_miss(), the last parameter 'sectors' is an important
-hint to calculate the size of read request to backing device of the
-missing cache data.
-
-Current calculation in above code block may generate oversized value of
-'sectors', which consequently may trigger 2 different potential kernel
-panics by BUG() or BUG_ON() as listed below,
-
-1) BUG_ON() inside bch_btree_insert_key(),
-[code block 2]
-   886         BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
-2) BUG() inside biovec_slab(),
-[code block 3]
-   51         default:
-   52                 BUG();
-   53                 return NULL;
-
-All the above panics are original from cached_dev_cache_miss() by the
-oversized parameter 'sectors'.
-
-Inside cached_dev_cache_miss(), parameter 'sectors' is used to calculate
-the size of data read from backing device for the cache missing. This
-size is stored in s->insert_bio_sectors by the following lines of code,
-[code block 4]
-  909    s->insert_bio_sectors = min(sectors, bio_sectors(bio) + reada);
-
-Then the actual key inserting to the internal B+ tree is generated and
-stored in s->iop.replace_key by the following lines of code,
-[code block 5]
-  911   s->iop.replace_key = KEY(s->iop.inode,
-  912                    bio->bi_iter.bi_sector + s->insert_bio_sectors,
-  913                    s->insert_bio_sectors);
-The oversized parameter 'sectors' may trigger panic 1) by BUG_ON() from
-the above code block.
-
-And the bio sending to backing device for the missing data is allocated
-with hint from s->insert_bio_sectors by the following lines of code,
-[code block 6]
-  926    cache_bio = bio_alloc_bioset(GFP_NOWAIT,
-  927                 DIV_ROUND_UP(s->insert_bio_sectors, PAGE_SECTORS),
-  928                 &dc->disk.bio_split);
-The oversized parameter 'sectors' may trigger panic 2) by BUG() from the
-agove code block.
-
-Now let me explain how the panics happen with the oversized 'sectors'.
-In code block 5, replace_key is generated by macro KEY(). From the
-definition of macro KEY(),
-[code block 7]
-  71 #define KEY(inode, offset, size)                                  \
-  72 ((struct bkey) {                                                  \
-  73      .high = (1ULL << 63) | ((__u64) (size) << 20) | (inode),     \
-  74      .low = (offset)                                              \
-  75 })
-
-Here 'size' is 16bits width embedded in 64bits member 'high' of struct
-bkey. But in code block 1, if "KEY_START(k) - bio->bi_iter.bi_sector" is
-very probably to be larger than (1<<16) - 1, which makes the bkey size
-calculation in code block 5 is overflowed. In one bug report the value
-of parameter 'sectors' is 131072 (= 1 << 17), the overflowed 'sectors'
-results the overflowed s->insert_bio_sectors in code block 4, then makes
-size field of s->iop.replace_key to be 0 in code block 5. Then the 0-
-sized s->iop.replace_key is inserted into the internal B+ tree as cache
-missing check key (a special key to detect and avoid a racing between
-normal write request and cache missing read request) as,
-[code block 8]
-  915   ret = bch_btree_insert_check_key(b, &s->op, &s->iop.replace_key);
-
-Then the 0-sized s->iop.replace_key as 3rd parameter triggers the bkey
-size check BUG_ON() in code block 2, and causes the kernel panic 1).
-
-Another kernel panic is from code block 6, is by the bvecs number
-oversized value s->insert_bio_sectors from code block 4,
-	min(sectors, bio_sectors(bio) + reada)
-There are two possibility for oversized reresult,
-- bio_sectors(bio) is valid, but bio_sectors(bio) + reada is oversized.
-- sectors < bio_sectors(bio) + reada, but sectors is oversized.
-
-From a bug report the result of "DIV_ROUND_UP(s->insert_bio_sectors,
-PAGE_SECTORS)" from code block 6 can be 344, 282, 946, 342 and many
-other values which larther than BIO_MAX_VECS (a.k.a 256). When calling
-bio_alloc_bioset() with such larger-than-256 value as the 2nd parameter,
-this value will eventually be sent to biovec_slab() as parameter
-'nr_vecs' in following code path,
-   bio_alloc_bioset() ==> bvec_alloc() ==> biovec_slab()
-Because parameter 'nr_vecs' is larger-than-256 value, the panic by BUG()
-in code block 3 is triggered inside biovec_slab().
-
-From the above analysis, we know that the 4th parameter 'sector' sent
-into cached_dev_cache_miss() may cause overflow in code block 5 and 6,
-and finally cause kernel panic in code block 2 and 3. And if result of
-bio_sectors(bio) + reada exceeds valid bvecs number, it may also trigger
-kernel panic in code block 3 from code block 6.
-
-In this patch, the above two panics are avoided by the following
-changes,
-- If DIV_ROUND_UP(bio_sectors(bio) + reada, PAGE_SECTORS) exceeds the
-  maximum bvecs counter, reduce reada to make sure the DIV_ROUND_UP()
-  result won't generate a oversized s->insert_bio_sectors to cause
-  invalid bvecs number to cache_bio.
-- If sectors exceeds the maximum bkey size, then set the maximum valid
-  bkey size to sectors.
-
-By the above changes, in code block 5 the size value in KEY() macro will
-always be in valid range. As well in code block 6, the nr_iovecs
-parameter of bio_alloc_bioset() calculated by
-DIV_ROUND_UP(s->insert_bio_sectors, PAGE_SECTORS) will always be a valid
-bvecs number. Now both panics won't happen anymore.
-
-Current problmatic code can be partially found since Linux v5.13-rc1,
-therefore all maintained stable kernels should try to apply this fix.
-
-Reported-by: Diego Ercolani <diego.ercolani@gmail.com>
-Reported-by: Jan Szubiak <jan.szubiak@linuxpolska.pl>
-Reported-by: Marco Rebhan <me@dblsaiko.net>
-Reported-by: Matthias Ferdinand <bcache@mfedv.net>
-Reported-by: Thorsten Knabe <linux@thorsten-knabe.de>
-Reported-by: Victor Westerhuis <victor@westerhu.is>
-Reported-by: Vojtech Pavlik <vojtech@suse.cz>
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: stable@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Takashi Iwai <tiwai@suse.com>
----
-Changelog:
-v4, not directly access BIO_MAX_VECS and reduce reada value to avoid
-    oversized bvecs number, by hint from Christoph Hellwig. 
-v3, fix typo in v2.
-v2, fix the bypass bio size calculation in v1.
-v1, the initial version
-
- drivers/md/bcache/request.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 29c231758293..054948f037ed 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -883,6 +883,7 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
- 	unsigned int reada = 0;
- 	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
- 	struct bio *miss, *cache_bio;
-+	unsigned int nr_bvecs, max_segs;
- 
- 	s->cache_missed = 1;
- 
-@@ -899,6 +900,24 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
- 			      get_capacity(bio->bi_bdev->bd_disk) -
- 			      bio_end_sector(bio));
- 
-+	/*
-+	 * If "bio_sectors(bio) + reada" may causes an oversized bio bvecs
-+	 * number, reada size must be deducted to make sure the following
-+	 * calculated s->insert_bio_sectors won't cause oversized bvecs number
-+	 * to cache_bio.
-+	 */
-+	nr_bvecs = DIV_ROUND_UP(bio_sectors(bio) + reada, PAGE_SECTORS);
-+	max_segs = bio_max_segs(nr_bvecs);
-+	if (nr_bvecs > max_segs)
-+		reada = max_segs * PAGE_SECTORS - bio_sectors(bio);
-+
-+	/*
-+	 * Make sure sectors won't exceed (1 << KEY_SIZE_BITS) - 1, which is
-+	 * the maximum bkey size in unit of sector. Then s->insert_bio_sectors
-+	 * will always be a valid bio in valid bkey size range.
-+	 */
-+	if (sectors > ((1 << KEY_SIZE_BITS) - 1))
-+		sectors = (1 << KEY_SIZE_BITS) - 1;
- 	s->insert_bio_sectors = min(sectors, bio_sectors(bio) + reada);
- 
- 	s->iop.replace_key = KEY(s->iop.inode,
--- 
-2.26.2
-
+I'm also interested in this, and was looking into the exact same thing
+recently. Some of the very high capacity SSDs that can really benefit
+from better large sector support. If this is a topic for the conference,
+I would like to attend this session.
