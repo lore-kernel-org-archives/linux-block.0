@@ -2,127 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D39C47088
-	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 08:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4B6C2B9F7
+	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 08:17:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6C3B613E1
-	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 08:08:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E21C613CD
+	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 08:17:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232918AbhEZIJk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 May 2021 04:09:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231871AbhEZIJj (ORCPT
+        id S231960AbhEZISq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 May 2021 04:18:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36029 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231982AbhEZISl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 May 2021 04:09:39 -0400
-Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05EADC061761
-        for <linux-block@vger.kernel.org>; Wed, 26 May 2021 01:08:09 -0700 (PDT)
-Received: by mail-ua1-x932.google.com with SMTP id w28so302386uae.4
-        for <linux-block@vger.kernel.org>; Wed, 26 May 2021 01:08:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GrfL+UvsoUYJEVH3FOBXMPqeLzeAwHNpUWgDzMspWKw=;
-        b=woqt8BnxKZukeBLeJd4w4lKnQ3cKCzoRk7QnVN0RWefRH0Lak2HbQbLhx/frNziCrW
-         vzOd63E9Idh6uhMeJbijddzANEGlwhq2a94sp+UT6X33w/HJrP0R4Xxsur3qtd3UJ9V3
-         RXhO2WmDqsPWGOOFe4Z1vXtU3Ajlf9H69hO1WGEkh2/q7XWi3knfCY64J+SzmkNKOe36
-         kp6uvOs+ndgfRymDdtUOUv9NQPYP8RiXXMABsN8MVSRmmehasPQ8UDsDcWRSt1e77qBG
-         1jHw1+BN8mfEhYZIvRTg/wyYkLYEyw3TBricpiOdb+JF5bZQWiaQ0RSSDpINkEteioTM
-         z8Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GrfL+UvsoUYJEVH3FOBXMPqeLzeAwHNpUWgDzMspWKw=;
-        b=XArraLp9zruOFwz/N3AqsFH+Fj4dhCLkX5jg3ehO9ahqadkxF/scJnMKfCm5TJvKsN
-         jk150HUioh0WI0vSHD+23P+zGP3tt2tSLr+4UUlnhP4Fsr6aEVBWCFSDV6TsVC9L7/IC
-         KEXUlFu8nC/9RZWghutXvjcZmFrpXfEOOGvznz08iSMhFZZjMvuvgNYVruiEPtIrb8rL
-         4yEsgb0tNaRKqglCVyQOOp2VuyY+jtVMAeqQDs4Fl7pd5ev1Kxp50A+65AoQ0kRDahLi
-         RXqjEhL1R8Y45WoXiRzatKpWY75TI2ARUoGZ7eqfso7k6Zj+j9Djx5U1wFM+OqObRAN/
-         yi0A==
-X-Gm-Message-State: AOAM5328GWYRxeJCKdVWSrVk19y8Lj2OQRqnYIJxtNfd4X9p/ISQDzsK
-        bwK7WFCMsFgDfxPOs0EqFIpF04RBuguwG9wLFHTQwg==
-X-Google-Smtp-Source: ABdhPJxEKZ+yyN+wbXXVH9CKQ94TxTUrIX6SVT7ztQ9Bwftr62IUqVIB3GNBh5QlN3mdzVdDkjsC7QK+8McmDny5XO0=
-X-Received: by 2002:ab0:3351:: with SMTP id h17mr31776765uap.15.1622016487939;
- Wed, 26 May 2021 01:08:07 -0700 (PDT)
+        Wed, 26 May 2021 04:18:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622017030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GPzbOUdLDB1kxTXxDyLQuPw6KP2rbbpd7VzwwvU6XsA=;
+        b=RxGfT8z6vXzzlF1JAAWmcd440Lp7CzVZBXTPBAip8ZxsEnN2ZUDtcexx0Iq+H+aYLpugVs
+        kXBHYQ8VQWE7M2E1oNxQnt28MDITgWJr+LCs3J21hGw6rBB9xd2jA92yTGlGHziNw+NGQ4
+        9zASs4hSWOL44NaQMxDMUxJC5+owCEM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-va0V2lwMN6OiCBFS1C2ZIg-1; Wed, 26 May 2021 04:17:06 -0400
+X-MC-Unique: va0V2lwMN6OiCBFS1C2ZIg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 352A91009446;
+        Wed, 26 May 2021 08:17:05 +0000 (UTC)
+Received: from T590 (ovpn-13-243.pek2.redhat.com [10.72.13.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 550641001281;
+        Wed, 26 May 2021 08:16:56 +0000 (UTC)
+Date:   Wed, 26 May 2021 16:16:52 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        Yuanyuan Zhong <yzhong@purestorage.com>,
+        Casey Chen <cachen@purestorage.com>
+Subject: Re: [PATCHv3 1/4] block: support polling through blk_execute_rq
+Message-ID: <YK4D9HZjBtg5AK/2@T590>
+References: <20210521202145.3674904-1-kbusch@kernel.org>
+ <20210521202145.3674904-2-kbusch@kernel.org>
 MIME-Version: 1.0
-References: <20210521055116.1053587-1-hch@lst.de> <CAPDyKFpqdSYeA+Zg=9Ewi46CmSWNpXQbju6HQo7aviCcRzyAAg@mail.gmail.com>
- <20210526044943.GA28551@lst.de>
-In-Reply-To: <20210526044943.GA28551@lst.de>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Wed, 26 May 2021 10:07:31 +0200
-Message-ID: <CAPDyKFpR0maO_Dj6bxWSLvh_jcGnrcZ=na42atXfNdkmMkmdig@mail.gmail.com>
-Subject: Re: simplify gendisk and request_queue allocation for bio based drivers
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jim Paris <jim@jtan.com>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Matias Bjorling <mb@lightnvm.io>, Coly Li <colyli@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>, dm-devel@redhat.com,
-        linux-m68k@lists.linux-m68k.org, linux-xtensa@linux-xtensa.org,
-        drbd-dev@lists.linbit.com,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mmc <linux-mmc@vger.kernel.org>, nvdimm@lists.linux.dev,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210521202145.3674904-2-kbusch@kernel.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 26 May 2021 at 06:49, Christoph Hellwig <hch@lst.de> wrote:
->
-> On Wed, May 26, 2021 at 12:41:37AM +0200, Ulf Hansson wrote:
-> > On Fri, 21 May 2021 at 07:51, Christoph Hellwig <hch@lst.de> wrote:
-> > >
-> > > Hi all,
-> > >
-> > > this series is the first part of cleaning up lifetimes and allocation of
-> > > the gendisk and request_queue structure.  It adds a new interface to
-> > > allocate the disk and queue together for bio based drivers, and a helper
-> > > for cleanup/free them when a driver is unloaded or a device is removed.
-> >
-> > May I ask what else you have in the pipe for the next steps?
-> >
-> > The reason why I ask is that I am looking into some issues related to
-> > lifecycle problems of gendisk/mmc, typically triggered at SD/MMC card
-> > removal.
->
-> In the short run not much more than superficial cleanups.  Eventually
-> I want bio based drivers to not require a separate request_queue, leaving
-> that purely as a data structure for blk-mq based drivers.  But it will
-> take a while until we get there, so it should not block any fixes.
+On Fri, May 21, 2021 at 01:21:42PM -0700, Keith Busch wrote:
+> Poll for completions if the request's hctx is a polling type.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+> v1->v2:
+> 
+>   Moved blk_execute_rq's poll handling into a small helper function
 
-Alright, thanks for clarifying.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
->
-> For hot unplug handling it might be worth to take a look at nvme, as it
-> is tested a lot for that case.
+-- 
+Ming
 
-Okay, thanks for the hint.
-
-Kind regards
-Uffe
