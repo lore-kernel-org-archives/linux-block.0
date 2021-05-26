@@ -2,125 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A58B4C47082
-	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 08:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE25BC47088
+	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 14:14:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BCDB6143E
-	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 08:48:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEFAA613D3
+	for <linux-block@archiver.kernel.org>; Wed, 26 May 2021 14:14:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233304AbhEZIta (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 May 2021 04:49:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39574 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233348AbhEZItW (ORCPT
+        id S233897AbhEZOPc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 May 2021 10:15:32 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:45408 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233484AbhEZOPb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 May 2021 04:49:22 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6075DC061761
-        for <linux-block@vger.kernel.org>; Wed, 26 May 2021 01:47:51 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id f20-20020a05600c4e94b0290181f6edda88so8109996wmq.2
-        for <linux-block@vger.kernel.org>; Wed, 26 May 2021 01:47:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FCSkBSvzfP1tQL/xuysG7GaKjz/QYEyGy+/ZR44/MpI=;
-        b=Kz25S1AjIss1JudYM2S4TtdSeANHutDr9XSb/t+lsyI4XF32T608KZIVw6rx0PeJHV
-         bHQPAf6NPDfwahUDau+GYCaaSZM5jSBzdXZpZLmbdyqIpgojSb3Kxly382KYQxRo186g
-         EtwsbXKVnUI+ZhQe1gZH/Uhl/YCLtjOntpYb8ZDiQv/Moj0VzfHaXbwCHKIwV3D9KoNs
-         e9x8qQU9LD3FkAV7YU/ICS7g/0GRBKlfN8gME1C8ROjmrnPEiU61JTtn3PILhMCuUkDF
-         cC/235xUWLWXaR7WPia81u7DTDkoQ26CqUYcDXKXXU0sjELiTkZLDkIxQw6o+8fmxLcg
-         s9Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FCSkBSvzfP1tQL/xuysG7GaKjz/QYEyGy+/ZR44/MpI=;
-        b=tz/IBBU5x0ODHa3CrGlZJIcrfBfzyvC4k/0apldnRrJ0sXbMjviQkJky/sU1dUKXmK
-         ZucAc1Q56hT35IwWqAzkpH8NEt/NfkY+x04Qzk/m2PU4ba2oem0R33JrDWDGYoSF7AO4
-         7MF3CUAA3IOXRhfgLdBI9iPDfK6I409Ty4vpSrOtNpEuVr0xxnA+sMyvoyoHXsA5lOID
-         JWMsVxeyvRldLWLoomaOoRaVs/0G8IJGX1QG9DE7VGKUbgXF2+hOK9z6bdFVdMEdtfLP
-         6Y3CWpjJxQ8LJ1XltsbiZTCloBxCPDGJNZsAqhLxcok9jummsWHkgUBrnXtUtH3YerQX
-         jpqA==
-X-Gm-Message-State: AOAM530N0CQv7NVb/G8ea1/Fw7ZzrHRHddf1NoS6c3Mi841oMGdJezeX
-        GV1Lpxli260dURJdbZBMoZBQb4XY2zpup2gU/2Q=
-X-Google-Smtp-Source: ABdhPJzEaZz77g5pREKeKLYuDF6x5VBcjS4q7bhAOnDUvid+sQ13JtScj1DKIF1vmxJYosL3pFKwxD7rRl4qbDvvkgI=
-X-Received: by 2002:a05:600c:b58:: with SMTP id k24mr2280461wmr.155.1622018869929;
- Wed, 26 May 2021 01:47:49 -0700 (PDT)
+        Wed, 26 May 2021 10:15:31 -0400
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 4B95120B8008;
+        Wed, 26 May 2021 07:14:00 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4B95120B8008
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1622038440;
+        bh=Hlv5sVjAjS61KZitQI4F9HNXJAk2eb1GHkwnsjqNczM=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=XijCPxjbXsVWuQd5w2/NKKrCDn1KFc1qqftWyVwwLldTOLNwQ1VAdsdqSsWs1yuhl
+         +WpTSEF55jXChbTVJiPdsBZ56vXgEKHtLqfGflnoH5SyRHaqRn9mKejgb55jG04WEa
+         aT29+eAbifRmlgC3ORqSqAMc0/MoxlatKxJ+NMFE=
+Received: by mail-pj1-f47.google.com with SMTP id ne24-20020a17090b3758b029015f2dafecb0so417076pjb.4;
+        Wed, 26 May 2021 07:14:00 -0700 (PDT)
+X-Gm-Message-State: AOAM5308JhgexHgHV/giY6zLG4ge+TQUzM/2KayeEgJK5zDK9FBNbVkw
+        1SLDr/HWfMsQICR2Dddp4uMiSiRw7YnqmPrgEgM=
+X-Google-Smtp-Source: ABdhPJy7mWPbmKxQg3/RQzr4uqXII36pbymjkkiQuMGs+L2mrLJuRksCyOGyyVNyAYM/bMeHO4FGyF30cYDf5+Y2+UU=
+X-Received: by 2002:a17:90a:7892:: with SMTP id x18mr3472341pjk.39.1622038439875;
+ Wed, 26 May 2021 07:13:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210521202145.3674904-1-kbusch@kernel.org> <20210521202145.3674904-3-kbusch@kernel.org>
-In-Reply-To: <20210521202145.3674904-3-kbusch@kernel.org>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Wed, 26 May 2021 14:17:23 +0530
-Message-ID: <CA+1E3rJM3sGLsOuPbYVH6kaTR8S9ogfe+wryuyWpqnA-pgDsEw@mail.gmail.com>
-Subject: Re: [PATCHv3 2/4] nvme: use blk_execute_rq() for passthrough commands
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, Sagi Grimberg <sagi@grimberg.me>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Yuanyuan Zhong <yzhong@purestorage.com>,
-        Casey Chen <cachen@purestorage.com>,
-        Ming Lei <ming.lei@redhat.com>
+References: <20210429102828.31248-1-prasanna.kalever@redhat.com>
+ <YKMKdHPFCNhR1SXx@T590> <CANwsLLH0HyZ-VGPMc+VmuLivG1fiZHnSqUyLx3UWb76ZMCgYSg@mail.gmail.com>
+ <CAFnufp3ZzrKHiV1Vy9_bAymy0oEr288dL4yWo4EjqUzhJV6J-A@mail.gmail.com>
+In-Reply-To: <CAFnufp3ZzrKHiV1Vy9_bAymy0oEr288dL4yWo4EjqUzhJV6J-A@mail.gmail.com>
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+Date:   Wed, 26 May 2021 16:13:23 +0200
+X-Gmail-Original-Message-ID: <CAFnufp0V7X_nvN3RGK-C0AXappQ+qjMS_rb7iQhcjT8E0OVpzA@mail.gmail.com>
+Message-ID: <CAFnufp0V7X_nvN3RGK-C0AXappQ+qjMS_rb7iQhcjT8E0OVpzA@mail.gmail.com>
+Subject: Re: [PATCH] nbd: provide a way for userspace processes to identify
+ device backends
+To:     Prasanna Kalever <pkalever@redhat.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Prasanna Kumar Kalever <prasanna.kalever@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        nbd@other.debian.org, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Ilya Dryomov <idryomov@redhat.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 22, 2021 at 2:05 AM Keith Busch <kbusch@kernel.org> wrote:
+On Wed, May 19, 2021 at 4:33 PM Matteo Croce <mcroce@linux.microsoft.com> wrote:
 >
-> The generic blk_execute_rq() knows how to handle polled completions. Use
-> that instead of implementing an nvme specific handler.
+> On Tue, May 18, 2021 at 9:52 AM Prasanna Kalever <pkalever@redhat.com> wrote:
+> > > BTW, loop has similar issue, and patch of 'block: add a sequence number to disks'
+> > > is added for addressing this issue, what do you think of that generic
+> > > approach wrt. this nbd's issue? such as used the exposed sysfs sequence number
+> > > for addressing this issue?
+> > >
+> > > https://lore.kernel.org/linux-block/YH81n34d2G3C4Re+@gardel-login/#r
+> >
+> > If I understand the changes and the background of the fix correctly, I
+> > think with that fix author is trying to monotonically increase the seq
+> > number and add it to the disk on every single device map/attach and
+> > expose it through the sysfs, which will help the userspace processes
+> > further to correlate events for particular and specific devices that
+> > reuse the same loop device.
+> >
 >
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
-> No changes since v2
+> Yes, but nothing prevents to use diskseq in nbd, and increase it on reconfigure.
+> That would allow to detect if the device has been reconfigured.
 >
->  drivers/nvme/host/core.c    | 38 +++++--------------------------------
->  drivers/nvme/host/fabrics.c | 13 ++++++-------
->  drivers/nvme/host/fabrics.h |  2 +-
->  drivers/nvme/host/fc.c      |  2 +-
->  drivers/nvme/host/nvme.h    |  2 +-
->  drivers/nvme/host/rdma.c    |  3 +--
->  drivers/nvme/host/tcp.c     |  2 +-
->  drivers/nvme/target/loop.c  |  2 +-
->  8 files changed, 17 insertions(+), 47 deletions(-)
->
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 762125f2905f..1a73eed61eee 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -1012,31 +1012,6 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req)
->  }
->  EXPORT_SYMBOL_GPL(nvme_setup_cmd);
->
-> -static void nvme_end_sync_rq(struct request *rq, blk_status_t error)
-> -{
-> -       struct completion *waiting = rq->end_io_data;
-> -
-> -       rq->end_io_data = NULL;
-> -       complete(waiting);
-> -}
-> -
-> -static void nvme_execute_rq_polled(struct request_queue *q,
-> -               struct gendisk *bd_disk, struct request *rq, int at_head)
-> -{
-> -       DECLARE_COMPLETION_ONSTACK(wait);
-> -
-> -       WARN_ON_ONCE(!test_bit(QUEUE_FLAG_POLL, &q->queue_flags));
-> -
-> -       rq->cmd_flags |= REQ_HIPRI;
+> Regards,
+> --
+> per aspera ad upstream
 
-The new code doesn't retain this flag.
-Looks good otherwise.
+FYI: I just sent a v2 of the diskseq change
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>.
-
+https://lore.kernel.org/linux-block/20210520135622.44625-1-mcroce@linux.microsoft.com/
 
 -- 
-Kanchan
+per aspera ad upstream
