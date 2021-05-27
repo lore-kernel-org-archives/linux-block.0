@@ -2,109 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAB2C4707F
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 18:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0276AC47089
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 18:53:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BB62613D4
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 18:52:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8CA0613D4
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 18:53:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235262AbhE0SyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 May 2021 14:54:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51900 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbhE0SyC (ORCPT
+        id S234897AbhE0Sz2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 May 2021 14:55:28 -0400
+Received: from mail-pf1-f171.google.com ([209.85.210.171]:40517 "EHLO
+        mail-pf1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229712AbhE0Sz2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 May 2021 14:54:02 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C90C8C061574
-        for <linux-block@vger.kernel.org>; Thu, 27 May 2021 11:52:27 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id eb9so655572qvb.6
-        for <linux-block@vger.kernel.org>; Thu, 27 May 2021 11:52:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=irFDTmhfj5+mUVkDlWzm45eHLPkDZVXsNY0Yh4yvFJw=;
-        b=B2Vno50b+KVzrQ4rqN8eP1ghuEtK/8XNra8/vuCGe6oktf6StT+YIIdvhSHyvJtvrc
-         H6S1EspJTJFuO55Y+oWy1vhT2f4xF/4KGKF5yI60C679T54RfcKm2RfTuk6Q2MPV7IZb
-         d2FDLGGeNJDlG+zPhd6YJGzgKczsFbVt7YsWUO9bDMEj9913aOdYR/1AD8CwkCloySiU
-         Wg8buAeOByXwatatbikV0ekmko1sSPIV89CiUPoOqowbGsW/pkdve5zY5iRXm+dlM+sk
-         FmLoz8pbMSA4jIk1nB+y0+MZ2TsYpklBc7EKnsAk0H+poO1YPOpgu9glKEr3AnER5FPo
-         1BJg==
+        Thu, 27 May 2021 14:55:28 -0400
+Received: by mail-pf1-f171.google.com with SMTP id x188so1289649pfd.7
+        for <linux-block@vger.kernel.org>; Thu, 27 May 2021 11:53:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=irFDTmhfj5+mUVkDlWzm45eHLPkDZVXsNY0Yh4yvFJw=;
-        b=XkEbQkxvIdV7tO2aotjDpnn6TyJekNnx0kaC+fZ5/ou2sxuxFT2fJOe2JHtMzyjynB
-         /IszKq9lBuIFWpHFL+NlbfM3ze1vDb9DNCxioh6i1wPOufPIC2bJolJnqEzV9wqDJBmV
-         w7XuAenDaXjEURCtFyVYeir1ariJFPnpa8DYhO/vuWQpOXLlV7kmrfK67KzycLDKBqYf
-         LBnwBUTaEKEkFZfAB+SmDx85Ye9lL37d5cFdH94aa5bLBRyT1ObLOptWB5oi3cRIRz6k
-         xGNKzoPyNBqjK4Ao0l3972QGvDCr6v2cTa/CrwVl16M+h8+rBpVQDlxB4sVa9ss+GWXs
-         dXrQ==
-X-Gm-Message-State: AOAM531vIkdYcVwhDRw2swZ5gt7HlVzb+GyOuP+RHWqDIGicT7OZBDxN
-        xVEki+ks28IqarpeC6MFNgw=
-X-Google-Smtp-Source: ABdhPJwInFMBWXlkNnFR9FRuaRgbtnyYV/fylItuyWAkS+lZHcG75OJCcPhS64Js4i72av7+Sa+RXA==
-X-Received: by 2002:a0c:fa4e:: with SMTP id k14mr5243918qvo.51.1622141546756;
-        Thu, 27 May 2021 11:52:26 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id d200sm1934340qkc.44.2021.05.27.11.52.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 May 2021 11:52:26 -0700 (PDT)
-Sender: Mike Snitzer <snitzer@gmail.com>
-Date:   Thu, 27 May 2021 14:52:25 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        John Keeping <john@metanate.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Subject: [git pull] device mapper fixes for 5.13-rc4
-Message-ID: <YK/qaSCdhqDlKh1l@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=CXdSaRbt6suRAs9kbAFES8YfJO9Vc4nrXY8elND08JU=;
+        b=YYKS9BvTXFMd+/yRfiXnhMv3gABIp4UBo72xBDoKdDYWpzX7sWd5LAGGPZfRy0E9Yp
+         YK2DzX9VTpnNkpZ6POiUcWNpIJd6MvDXYEmT99xwPgsMf9i1UKq4k4znTBHPhKOiiFXn
+         2gYWDEKjyyE77CMk9FlMnqJdYfxj0RN6rctfAAbEb+m/5FJIlsAu7LyeeMAk1qB+eF7i
+         Om6l3q6DwioVgrG11jAhkx1EmRr6d4/uPJbPmEjqy8JiWICJIedTlZUG4zRpOlkT+3DJ
+         Hcbih9DXH4yWAk1DaUubUmxVp5m+xcoUT/Xr3L9RIAAZnRfmHptqR+OGW9HCdUX8AA4r
+         k8Sg==
+X-Gm-Message-State: AOAM532AdlAhju33K9mnvSJ0dngzUTA5jWOhrA75BrrA9tba+k7d66d5
+        HGgmuQ+Pnpt6MFqbDLFlm1sZMV1bzUU=
+X-Google-Smtp-Source: ABdhPJzYTAhGojjY94Ru3WcZuKdgq9PUCrYz+3lllnF2CXHnnNDxPAftOSx2AnhJMr6UGWdtocRgRA==
+X-Received: by 2002:a63:b008:: with SMTP id h8mr5046027pgf.236.1622141633895;
+        Thu, 27 May 2021 11:53:53 -0700 (PDT)
+Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id s14sm2641689pfs.108.2021.05.27.11.53.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 May 2021 11:53:53 -0700 (PDT)
+Subject: Re: [PATCH 0/9] Improve I/O priority support
+To:     Adam Manzanares <Adam.Manzanares@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc:     "hch@lst.de" <hch@lst.de>,
+        "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20210527010134.32448-1-bvanassche@acm.org>
+ <7c34db067cde1a4920dac73c1d38720597c948ca.camel@wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <a4846eaf-a53d-0413-04d5-b95fce5ad779@acm.org>
+Date:   Thu, 27 May 2021 11:53:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <7c34db067cde1a4920dac73c1d38720597c948ca.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 5/27/21 10:58 AM, Adam Manzanares wrote:
+> On Wed, 2021-05-26 at 18:01 -0700, Bart Van Assche wrote:
+>> A feature that is missing from the Linux kernel for storage
+>> devices that support I/O priorities is to set the I/O priority in
+>> requests involving page cache writeback.
+> 
+> When I worked in this area the goal was to control tail latencies for
+> a prioritized app. Once the page cache is involved app control over
+> IO is handed off suggesting that the priorities passed down to the
+> device aren't as meaningful anymore.
+> 
+> Is passing the priority to the device making an impact to
+> performance with your test case? If not, could BFQ be seen as a
+> viable alternative.
 
-The following changes since commit c4681547bcce777daf576925a966ffa824edd09d:
+Hi Adam,
 
-  Linux 5.13-rc3 (2021-05-23 11:42:48 -1000)
+As we all know complexity is the enemy of reliability. BFQ is
+complicated so I am hesitant to use BFQ in a context where reliability
+is important. Additionally, the BFQ scheduler uses heuristics to detect
+the application type. As became clear recently, there heuristics can be
+misled easily and fixing this is nontrivial (see also
+https://lore.kernel.org/linux-block/20210521131034.GL18952@quack2.suse.cz/).
+I want the application launcher to create one cgroup for foreground
+applications and another cgroup for background applications. Configuring
+different I/O priorities per cgroup is an easy and reliable approach to
+communicate information about the application type and latency
+expectations to the block layer.
 
-are available in the Git repository at:
+Some database applications use buffered I/O and flush that data by
+calling fsync(). We want to support such applications. So it seems like
+we have a different opinion about whether or not an I/O priority should
+be assigned to I/O that is the result of page cache writeback?
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.13/dm-fixes-2
+Thanks,
 
-for you to fetch changes up to 7e768532b2396bcb7fbf6f82384b85c0f1d2f197:
+Bart.
 
-  dm snapshot: properly fix a crash when an origin has no snapshots (2021-05-25 16:19:58 -0400)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Fix DM verity target's 'require_signatures' module_param permissions.
-
-- Revert DM snapshot fix from v5.13-rc3 and then properly fix crash
-  when an origin has no snapshots. This allows only the proper fix to
-  go to stable@ (since the original fix was successfully dropped).
-
-----------------------------------------------------------------
-John Keeping (1):
-      dm verity: fix require_signatures module_param permissions
-
-Mikulas Patocka (2):
-      dm snapshot: revert "fix a crash when an origin has no snapshots"
-      dm snapshot: properly fix a crash when an origin has no snapshots
-
- drivers/md/dm-snap.c              | 3 ++-
- drivers/md/dm-verity-verify-sig.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
