@@ -4,68 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6F6C4707F
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3D1C4707F
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:33:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6BC3613D4
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:27:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 426C9613D3
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:33:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232956AbhE0D3S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 May 2021 23:29:18 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:60192 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232985AbhE0D3R (ORCPT
+        id S233429AbhE0Dep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 May 2021 23:34:45 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:53880 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231470AbhE0Dep (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 May 2021 23:29:17 -0400
+        Wed, 26 May 2021 23:34:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1622086065; x=1653622065;
+  t=1622086392; x=1653622392;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=b0JG8MR0tOJ38tEFIZ6o1ZsjmTeqzo3H10btqpcmlxY=;
-  b=Iz9yK1aimDfb/8MErQR+SNPaSp2OsckimfC6G/KKeFSgN7xKmKCZr0Gb
-   9aE66QvhviZp8gGJ7xZS16qLg8wQD4GQ6LXsu31+rAHRCVKhRJkuVu2Wh
-   oYw5I6x5MjO9297fXyPf+fH+L7dvynGhQnxuTkmi4Tqh11P8XmYPL8/pA
-   4RojvPmMbZ8LzlQ95emj9F7IFK464laAFEMNST5eSdu7byS093+OJRsr/
-   JfKqjkMnIwLAOZD/C7xgbtDeO+ZHP9yEIdmgB7Rdee8i9xBNLsZdnHbnS
-   uTYaQEeRlpzxqd+SfEudBjsw7X28kfmSbZhWuYcbynpxdunkmIdV+7SxN
+  bh=nkPVVCuPP3dabssplunxgDHYg74/Q0v7JdDxjdEyCDg=;
+  b=Wz4mYmQVcgjvwI6NZw9AxTFPzOrcjfqwngreR9JALZB863yXRBq4jSaC
+   5vxvBemcWI9EAJsacnGhzYAZVRWu0t1j4ZQriuqs7db8VZL3A+TJ0MR8f
+   DE61AQgFbL3TxNVS5Olnw5Za/Rv8qWD7bSytSFMhLTYH5KwFMmbJL4xDq
+   jMKVHFu4stTHqTbDSmw6N0MsS0UO/LHQOyyqoRhM9J0/MZW7lRsLoNFtQ
+   14psdxHpF8afkG+K5EPziA3Hue7fae+84rkoIUCuDisv5jqRyZUYGFM1Q
+   et4KHbj9gtpIsVEjmasUL0ae0EarE5phuencHctfuNu0W0UdKFP+gmYZg
    g==;
-IronPort-SDR: Z/tKHXcoVtDQcscUg12HLJ1acwV79X5vRzqSkwirJbFqxAhYksf1Q7D9dfQhu2mA1HeDho4Pne
- dHBBELr9Q9IEG3F2DcllFW4fItZsNqif6aP83Mfo0ZnF+UAwEwNEWc8qmSPmqo/clJhgiR8k0G
- Ikh+tXh+muvgnUxw+Fh/tTLObqCGBYU//7a+0KGXoO+M2wKXX+I9Q04mQ32y3kZ+jrNsCFKrGD
- lQhxsPz8TRrGXtem5toaYn+AI3JBZdzEKJmm33Th5BpYCk+dV76gFmAZnX0eFYKu4hHDCS4oMz
- ElU=
+IronPort-SDR: D/ardbIsMeIP/Hv5TrITem2smNzM30ZI3vSDyD2l1flBktXu4sHCXO5a8vk+uAt8frj4VBQ04K
+ afdE02hCOcxcioHsvoFSURr6j3d5vSSeoj68BpGn4BSAnjVcqS/lHAKaDEolxw3+Yf3LFC9dJW
+ sDvqo8zT50yH/pyVs32eMZx/ZkUN8s304BYMuHLlWwvkLBXJPohm8NoQNzvD/5CpPRCmcsx42L
+ DKT0FvN+jJ9YxBZ5XkSFoP8dVpO3yx13WEu8ZTEdq2eMOKXqZtprfn7Ym32I7x/5bJlCn7JFm7
+ gQg=
 X-IronPort-AV: E=Sophos;i="5.82,333,1613404800"; 
-   d="scan'208";a="280905100"
-Received: from mail-bn8nam11lp2170.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.170])
-  by ob1.hgst.iphmx.com with ESMTP; 27 May 2021 11:27:44 +0800
+   d="scan'208";a="168889860"
+Received: from mail-dm6nam10lp2104.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.104])
+  by ob1.hgst.iphmx.com with ESMTP; 27 May 2021 11:33:12 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RcrGdd+KEcHl55ts7GfkuIhMxH1k4NoW/OY8xTKs/HnzbH26Zh1epWcIiUGknMAdwFCn8SC3ztMZxX1SGF8Pyvn9cjUEaV2qrKNQjPBLUUJ9cw9Aa7NThW3K0nVgxnIkfYD7gpRHNFBLxkQhe1GGadHeNMUTUyYkmE9ZoNvgAYKZ9QpK88qo5qxZDRR6YWEutsIsBsU8OfiGz/BYhJKOC7bIFNK5RrRH2LeDRMHv/FxRZIqjg/3VNbk9+eNbgnZJVP8sKIz9TaofZYsWBK3VyA28zx/ydNgDXS+yjRfsKjSPHZHm7/GADbIVGZVmzPrEpkK+4DPdLAM85G7mvsK+iQ==
+ b=F6Hpwquy7MQ9ks0UCh/jCiZDIxGNGHrQ3VHABh8SN2p9o3k0ArxHlaZUYr5EymGaf+efSztF5i6A0Hg1yi6Q20JM3VubHXFXuDkiRN6tPgVCY7vt7yS+w8FIJprbi03Mzo72ACBzI/HZIwzSkZAlVb1L+nZRLVkvpO8HSEOEqijUGdPwQLn31tRFL0Y97MdT/5yZtYfiM15NAeLb0EiRNEhda5szWWK0Q4w1scHEvGoFpGZXoJwDnfUt2WdeUh5zo+8Udwx58GUAn7Cz6Lp4H01zXc+f0CQAsEebFcSzaLUsZOqYO3WIeczZt8KHLKTVpYGvB0wkpWW8OTp77bAzFw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=48+70Qe/9R0wLsA4oh6xDudcLvj+JY0CdxhBYPHQKpw=;
- b=hXx4IXio44nAif2Yvsg1inOLOiveeemybHRSG/gqruANIyfSZ7yWVMfO3Ouj4BUC2Aj1IPonR8v2o9UVCu4p1k966rNASJ5Ps5DKSmy9zgUcoFrCoqY1g9hFT9mb+58M9ibyNi/ZuuKbX8ox2KIbx8zOAIevgRnEbubNprZmmVVJ5UwUWORbpoJodW8Oy7XWA7z3dKMt74oImjxR3EQX5+a+2JBwqNTsm229+PBw65DVG++MBg0cSqNoIA7dX4s6gVZ+DgxbBog6OP5VeixMVwnlzO7doFgiYL+YslNDtO1780gFX1XGWiw/eqTz/Vkw0lk7YJvuplVMddSkznNuvQ==
+ bh=kecGiuJy+x6QoneacmnpSvGeH6/gNE8YP5pmpRjwg6I=;
+ b=X+3ENDLqQb2MYg5oDq/Ly26PYWGjxlC8AhE7ZBZ834cW2w4D3en1zD+ESCd5Hmok078deemZJ7WW4VOdkl3XIQEqmc5j3fFvJHhGHckYO/IrW/kLUwBzHDmfjPjQHrzthuQg/xslsRYpWnOsHMPR5kX5D+yY0kxMSWrcYL7UbTvsR71cfOXzVJDS/+EH7ltGSz0GTbPShJjYg8ywO54ruoKGJ3kfOS/wbtE0vNaxNhv+szex/uxNMU1N47IeTeMg85GEvEjNST2K6tpFNMehkkiuj7EBb/pCuK+XjH3Qik6Z08qONlCEgCtcr10eQClpdu7kAFsCUz1ss8niRi7ojg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=48+70Qe/9R0wLsA4oh6xDudcLvj+JY0CdxhBYPHQKpw=;
- b=rjTkEBVs6Ylj7xjL4/Uo4rLnDd02h1DV8drp+3VOmvc2gaoh32NjeMWEWIgtx0aft9pMXBJQOIFOaLMM351omcenKiaFKunT8frph75iB8U0vx5/96oFFhUSieOGHlXUrgN38IsGgBLUh4is8AEKsdmWdPtVhU7i27ojEwvUr4M=
+ bh=kecGiuJy+x6QoneacmnpSvGeH6/gNE8YP5pmpRjwg6I=;
+ b=UwxFQc1H/oX19sS6zLX9B4zrL5Cw7LUqD7v4YsW2ep7aTszJPfOKoDUir6yvWQ+A3bHtH8ubdWPROSdIWyATqSgV8TuL9VqlF7E9ENimzFd5lgbh5PYSyKHyDMnl3oDHCbp9ftzb8O6c0rJkeOqFriH3fcAFiUxDUY9mbLmHb7s=
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
- by DM5PR04MB0253.namprd04.prod.outlook.com (2603:10b6:3:6d::22) with
+ by DM6PR04MB4347.namprd04.prod.outlook.com (2603:10b6:5:a0::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22; Thu, 27 May
- 2021 03:27:43 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.23; Thu, 27 May
+ 2021 03:33:10 +0000
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::64f9:51d2:1e04:f806]) by DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::64f9:51d2:1e04:f806%9]) with mapi id 15.20.4173.020; Thu, 27 May 2021
- 03:27:43 +0000
+ 03:33:10 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -73,15 +73,15 @@ CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Adam Manzanares <Adam.Manzanares@wdc.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 6/9] block/mq-deadline: Reduce the read expiry time for
- non-rotational media
-Thread-Topic: [PATCH 6/9] block/mq-deadline: Reduce the read expiry time for
- non-rotational media
-Thread-Index: AQHXUpPnvsB7fzwtrE6mHrz2UNvIdQ==
-Date:   Thu, 27 May 2021 03:27:43 +0000
-Message-ID: <DM6PR04MB7081C2ED7E71979FED8CF68EE7239@DM6PR04MB7081.namprd04.prod.outlook.com>
+Subject: Re: [PATCH 7/9] block/mq-deadline: Reserve 25% of tags for
+ synchronous requests
+Thread-Topic: [PATCH 7/9] block/mq-deadline: Reserve 25% of tags for
+ synchronous requests
+Thread-Index: AQHXUpPoJJ9O2wpAS0uclnEqU+OQ/g==
+Date:   Thu, 27 May 2021 03:33:10 +0000
+Message-ID: <DM6PR04MB7081C21724FE9742E1A16C13E7239@DM6PR04MB7081.namprd04.prod.outlook.com>
 References: <20210527010134.32448-1-bvanassche@acm.org>
- <20210527010134.32448-7-bvanassche@acm.org>
+ <20210527010134.32448-8-bvanassche@acm.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -90,112 +90,195 @@ authentication-results: acm.org; dkim=none (message not signed)
  header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [129.253.182.60]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7ddc72f1-b208-4632-138b-08d920bf63f1
-x-ms-traffictypediagnostic: DM5PR04MB0253:
+x-ms-office365-filtering-correlation-id: eee961e1-6cd7-421c-8388-08d920c026ce
+x-ms-traffictypediagnostic: DM6PR04MB4347:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR04MB0253E54A096143E1C437201CE7239@DM5PR04MB0253.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <DM6PR04MB434793D76C00E33A62FB1887E7239@DM6PR04MB4347.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fKEiH/FOQYctjCZJG9LxC3pRv/aSuh1jXHxsJhJY6ULKApZCP0cxx8oCtH+4EPzgS5VqIdPMoOWixQ6ogzCtlbTS78yl/Dg2mow0VesdBim6JNBaaiOXs1b29eURl5LNjKVM6T+PjPV/OMMVcQnLgH60nqhKHP1hWUr279qWd0Hk+EDMeF/EyX7KZhk8PXo128NTDzHbYmhQIg6L5v6aX38RoSJfzB3oXQAUGtiM6TiPMmWqqTmmbUkwcdiT1Iu8TYGbsuP7hVsvIFNQ1emAy8Ih9jUqxqNqSjQ8r8s6+yexsVaCc3vhdqxiR2OHFsZ4h36H2t/0TK/j/HkSR/QEawB3iesW3ydYT9DvzPgOA5KB4KLXnNichyWyJ/ESQuzykA3OgIhEMiXMbL7yjAAJPYDKpj9WSK7pOm/jWC0xJn87ZTwTl3ORZpavUYc5Oph/Y9OVxTCsIUo3hO6sYAkCb1iHGP7kvU/xjTkcFtO88x95srU5x/BmmHTBcRzwHPVOATK/z7tSv/w0a8a3oRIclA4MWA0DBHrbxMHpoHdUEZnC4n557FHGIsBFcuJO8tB04T6JjSCamlpceXR5o3CC3RHcLqGoWGxzECqLcFcXlgo=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(376002)(136003)(39860400002)(396003)(4326008)(26005)(33656002)(71200400001)(53546011)(7696005)(6506007)(55016002)(122000001)(86362001)(38100700002)(64756008)(91956017)(186003)(76116006)(52536014)(2906002)(8936002)(5660300002)(9686003)(316002)(478600001)(110136005)(66446008)(54906003)(83380400001)(66946007)(8676002)(66476007)(66556008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?oqYi+cER48FCr+JJASmEXWGekRU9xOv5tDo1DV8jq1E0iYjxEaRnjUkyNcgx?=
- =?us-ascii?Q?9oVV5hAENJnBvNREqde/0ACqtX2gxs8YaG3iWuEm87LlT1c6wJa5W3otIjGn?=
- =?us-ascii?Q?KaQckvXO8NsALLPbLu8RRWCrwFa+vtN3gqRYKwvMDJim+w5afOvlY32IGvIJ?=
- =?us-ascii?Q?D3w2J0dL/FPQPqahU5+q8POMY3P1GJVJVt4I5O/T66I0DxSZZbWzw/F4xnI+?=
- =?us-ascii?Q?pIVum6ouhSH1Q9kWazbNlh73DxkR5wK5O41D4sgFIK5dSHgdxjXKzm5+u/d/?=
- =?us-ascii?Q?fkArRtyDgSuqkZU29f+o221yiPhdz7XL4v0bty2IedoYUOQSPAU4fsinxGp0?=
- =?us-ascii?Q?BvuUquN2qKM4N8vcoLKyX02bT8MRlBRIuwltQeOAw2cwOu1ZaAf1ffTfFYJY?=
- =?us-ascii?Q?UwIvq0AACzsFlwZvIn0cVDGs7dyBUsMVbX7LpodTlm+jYEKR5VoTW1yyTlVo?=
- =?us-ascii?Q?wCAr/9axPl5GW/aBto5BjOGyhfsAZ/Y0Uoe4u57rnQDytX5ovWOi8OsZA7Ku?=
- =?us-ascii?Q?bxapCJ4bC6NiANudtIe/kkG35eM03YUSuz/3iSrX59QVoK7iTP/zWHqEG4o0?=
- =?us-ascii?Q?A5AH8Foz+U2ouKMgHHOQq7Xx4QwsUdh6n6TEtRglSOEc8FS4rlUlP570/xUg?=
- =?us-ascii?Q?AhZRHG/1JZEazlmE5eJ+CaNud1O8dJQBWS3AV+/Zq5ke4gDt+KEwIIbssETV?=
- =?us-ascii?Q?1EpEA+sYnn4A8zsdwta08qtXacvtGvtbrGPkTItFU9Z3HTRBcA3mSHWOFRGg?=
- =?us-ascii?Q?kacRtR+kfPIVpRp6LP0al80orGRCqLBAUhKlzmJhGaA/gQs8EvNmPKu2qWKR?=
- =?us-ascii?Q?bkP5U9IExLoSDX74GY0eXpfXivc36ZElin5dOAtjbuwQf5PTp6zYgqjYMuhr?=
- =?us-ascii?Q?9m2cCAVWI3z4QulwMBDWYJLCd54MesXOk5IZ99ReewFjDZBN3BOxQv6/HJB4?=
- =?us-ascii?Q?3+c8XTDZWeXopmSd0OWDEC97/jY7m/oeCd14gGF9T/c3we81A9J8BymqclMS?=
- =?us-ascii?Q?kKPUq9KGSWQByrTvE3/LHKlOkkRoHEL8wzJT8VysmAAVKppm55FZFy1MUlq1?=
- =?us-ascii?Q?gELXg3fJvGBnN9uvW47eapmmFdd35Pfp/C14HGaeGEj2jhRqvqwoyB0ovVvL?=
- =?us-ascii?Q?J8+kSM9THufDiy7+meT8XtKg3Z7FlM5XeqOJfQW8iJSgBiQr9vQRoBrp8tiY?=
- =?us-ascii?Q?YjWZ67kDIm6kLQ5Eq1fXeIlfxzdnTr0ZDqXiYUAUZWMNMp1FX7WtDaRMZYKq?=
- =?us-ascii?Q?SjdlXRAfABOnJQbx+bVhpVpwizbz70UoBVtTvds7CoHnd6KVT3uju7osew85?=
- =?us-ascii?Q?4WthB4HmrC9JO9OOvSLkSCrsrcLmpg738/Doj6fKLV9efg=3D=3D?=
+x-microsoft-antispam-message-info: 99x9WGXu0jDBZkBtTtjBNFo2hoXjf/pvwqOajDh0l9VpItsmNJDpIvwjW7w+1DZdJGyYmWWX8+78Om8sekbTcVlx9NK+TzFZAAzPL5bfKYYpU2KZqUcQDs2JAuQw7NPdk9AY9EIFAoH37zJEKuzf1b97Zr9FU05BNr8Ia5WVv0N81oXo9Zr41E5s+hQF/udRBPdzO9DfwrJbuJogOYyyCVl7/dRFt+2S55QOF79wo2MSBbXDJAfCsUUvb85UITv9GmqSNmOgvbLsSE6AQjc7EdtshrVdXCoyUdLGRNoqg2SQ0iLb5WGdxkTa00gw2X8hwke9Y8z31q/UO/Bca2tWXqsMd85HiHmZtzIGSOJJzfrnh0dBJyNa1BeELK7WPNYIzploqKRdUHjMuhRGex7AXLb1M+xxP95r/N+NA5KSmpW1NwAVlVplKs6uFDLGsXnoqGYmG0lIi3Emu1UXUU6ZwiX7uk95PT3QJ+eMacVCYcF0we5QvAPlOtzP98PfjVZMLpDKqnu9ptLFK2wf69XLUxiN1bSfgwgZRlzZCMqim0aAeN/ymNHnyZpssfEfb5kreah3vnh34+7/nWc6z9k6GkXxt9Mg+t+CLNeei1oKKwg=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(136003)(346002)(39860400002)(396003)(122000001)(66946007)(52536014)(54906003)(110136005)(316002)(76116006)(4326008)(8936002)(26005)(33656002)(186003)(71200400001)(2906002)(6506007)(83380400001)(5660300002)(66556008)(53546011)(55016002)(64756008)(66476007)(9686003)(38100700002)(478600001)(7696005)(8676002)(66446008)(91956017)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?N4N366xek0cJhg54BI7Udx0D2rMr+b6GEBRImWxhAhmpQ3XvTBvXqRsESz97?=
+ =?us-ascii?Q?NrWbFznpXRWyKHIh/u26sx514Iw9K1JBq+Hqb3AEGVlQ09IxXTFi7vQ0pHft?=
+ =?us-ascii?Q?xymtU+zTBS/MLDJ7LjgiDDXsfEi+eTf1fpgQ5jGwtROp8BYVIj307LrMVUOD?=
+ =?us-ascii?Q?p2DWrtS6BqNRvkDayngBO0mSOc0SDLKTBlw5mjhqmYcNoSbxfDS+Y/4SWtyy?=
+ =?us-ascii?Q?7Mx0O653n9oYFv5BBeeN6axyp2jq/p5wtN35U2OJAQGnocBNpGuYvlle97WK?=
+ =?us-ascii?Q?67ZhWhj8Umv5XrELZaZ3OkAwZRDzcju7KaYc6Qv4UtB3+uKq+laTDE7vUiL3?=
+ =?us-ascii?Q?ZZE6GsT8Emrex1d30IxJFsyU1o8+jYX/y/4rM2ysrespNhKzWylfWHTJ0os2?=
+ =?us-ascii?Q?GhjdrJLsqWh7VkaZAAVomnZ3/gZVNeicSytTrHu5tzwOfk9mJFeOJO4fnoZq?=
+ =?us-ascii?Q?oX7+fSmN5dEok1ymteZ7xORXN3UrgwNMD6Zz3p/7aAwiJaFVwxHkjwr8ORNL?=
+ =?us-ascii?Q?p6xsnj7BcQmv+chy4E6N9qXwBA+1+Flzj6yrx+WiFmZGYBVerejy+q4l2N9S?=
+ =?us-ascii?Q?v8GptoHhTqsfu3icYckapiMeUjsnRoMZetcqEoRIcWZ8zNQkfm426bR7z2gP?=
+ =?us-ascii?Q?i6noLy4CaUlpFvR41XwDiS4yEJEpA9gPwBS9sQYsy0cVmCg60U1WABKvc2GX?=
+ =?us-ascii?Q?AxvLrVRHgDEElXZ2nfNt7LAJ8RHek01Fenn2Au2ja/eaDDWHNv4+gvuCBEWc?=
+ =?us-ascii?Q?SOFYgiMaozwqDf3jrlMX8SS9RpimS8YU8ZLDWAZtvbJTYeQdu3VokwtOp9A6?=
+ =?us-ascii?Q?I8spvFhV6TvFsbgyDLNo7Anfi8fZJvKstDju+cE/wb9pDru4KGsTihUA0pzN?=
+ =?us-ascii?Q?fUuxyJHmV5FIMmGziYwRCaxMibbw8yXnlfwWRKcD7ZtCp5mVENdTUYVOBHFT?=
+ =?us-ascii?Q?nFwqu0+uKWJLxPobm5u9E2uUovLV8f2wOFOZO+HwXbBVKf2Ty8aqMBxJpHF7?=
+ =?us-ascii?Q?zESGMs6ZXLYklPlvB93TlCbvdWoy82EzRbwnw3NhohLZJT1njKMQGlb6J5mz?=
+ =?us-ascii?Q?lTo1KZJruDpQ38zkzfPnHdo+EuCy0Rp4G3N8GLGwXU/eN+3xOLgQzPJgvyeS?=
+ =?us-ascii?Q?zOdGlTRRlcVL5eShpwEDGFY3xAfTGAd9ifh3ErCiim20i52q+KWHxNw+bUWS?=
+ =?us-ascii?Q?0QnlCsfsFV34ZtNnueLhqfa8/hzKUCfQm0a5pEdOH7XwYV0DSf5y5zUjXkPt?=
+ =?us-ascii?Q?ezSTHvdD2MMYgQqEHPpfHRj1ng22yotvqTj8zLif/VaXaa1aQ+O5JsUxs36b?=
+ =?us-ascii?Q?ZnVJjJFDYDsztZ/jAN1r69OstNCwlG7qFNSru+ve/RBbgQ=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ddc72f1-b208-4632-138b-08d920bf63f1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2021 03:27:43.5738
+X-MS-Exchange-CrossTenant-Network-Message-Id: eee961e1-6cd7-421c-8388-08d920c026ce
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2021 03:33:10.4522
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kXMUT/Azk8PVVh4V0szRvYBk0vy2IPMW95Uiy1XPk3hbChKbNGYT7i7YqP7qlrGb3HIttgsg2m+47vsRdzRPSA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0253
+X-MS-Exchange-CrossTenant-userprincipalname: 5PWCiwCAsgA4Vlyy/ewbUyti1CZnSCBZ78uJNqiUjEkJQwKUBiLNZLtsAQZzA/oIwBmZfk42nrVJz9ykzxpWEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4347
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2021/05/27 10:02, Bart Van Assche wrote:=0A=
-> Rotational media (hard disks) benefit more from merging requests than=0A=
-> non-rotational media. Reduce the read expire time for non-rotational medi=
-a=0A=
+> For interactive workloads it is important that synchronous requests are=
 =0A=
-"Reduce the read expire time for non-rotational..." -> "Reduce the default =
-read=0A=
-expire time for non-rotational..."=0A=
+> not delayed. Hence reserve 25% of tags for synchronous requests. This pat=
+ch=0A=
 =0A=
-> to reduce read latency.=0A=
+s/tags/scheduler tags=0A=
 =0A=
-I am not against this, but I wonder if we should not let udev do that with =
-some=0A=
-rules instead of adding totally arbitrary values here...=0A=
+to be clear that we are not talking about the device tags. Same in the patc=
+h=0A=
+title may be.=0A=
 =0A=
+> still allows asynchronous requests to fill the hardware queues since=0A=
+> blk_mq_init_sched() makes sure that the number of scheduler requests is t=
+he=0A=
+> double of the hardware queue depth. From blk_mq_init_sched():=0A=
+> =0A=
+> 	q->nr_requests =3D 2 * min_t(unsigned int, q->tag_set->queue_depth,=0A=
+> 				   BLKDEV_MAX_RQ);=0A=
 > =0A=
 > Cc: Damien Le Moal <damien.lemoal@wdc.com>=0A=
 > Cc: Christoph Hellwig <hch@lst.de>=0A=
 > Cc: Ming Lei <ming.lei@redhat.com>=0A=
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>=0A=
 > ---=0A=
->  block/mq-deadline.c | 7 +++++--=0A=
->  1 file changed, 5 insertions(+), 2 deletions(-)=0A=
+>  block/mq-deadline.c | 46 +++++++++++++++++++++++++++++++++++++++++++++=
+=0A=
+>  1 file changed, 46 insertions(+)=0A=
 > =0A=
 > diff --git a/block/mq-deadline.c b/block/mq-deadline.c=0A=
-> index dfbc6b77fa71..2ab844a4b6b5 100644=0A=
+> index 2ab844a4b6b5..81f487d77e09 100644=0A=
 > --- a/block/mq-deadline.c=0A=
 > +++ b/block/mq-deadline.c=0A=
-> @@ -29,7 +29,9 @@=0A=
->  /*=0A=
->   * See Documentation/block/deadline-iosched.rst=0A=
->   */=0A=
-> -static const int read_expire =3D HZ / 2;  /* max time before a read is s=
-ubmitted. */=0A=
-> +/* max time before a read is submitted. */=0A=
-> +static const int read_expire_rot =3D HZ / 2;=0A=
-> +static const int read_expire_nonrot =3D 1;=0A=
->  static const int write_expire =3D 5 * HZ; /* ditto for writes, these lim=
-its are SOFT! */=0A=
->  static const int writes_starved =3D 2;    /* max times reads can starve =
-a write */=0A=
->  static const int fifo_batch =3D 16;       /* # of sequential requests tr=
-eated as one=0A=
-> @@ -430,7 +432,8 @@ static int dd_init_sched(struct request_queue *q, str=
-uct elevator_type *e)=0A=
->  	INIT_LIST_HEAD(&dd->fifo_list[DD_WRITE]);=0A=
->  	dd->sort_list[DD_READ] =3D RB_ROOT;=0A=
->  	dd->sort_list[DD_WRITE] =3D RB_ROOT;=0A=
-> -	dd->fifo_expire[DD_READ] =3D read_expire;=0A=
-> +	dd->fifo_expire[DD_READ] =3D blk_queue_nonrot(q) ? read_expire_nonrot :=
+> @@ -69,6 +69,7 @@ struct deadline_data {=0A=
+>  	int fifo_batch;=0A=
+>  	int writes_starved;=0A=
+>  	int front_merges;=0A=
+> +	u32 async_depth;=0A=
+>  =0A=
+>  	spinlock_t lock;=0A=
+>  	spinlock_t zone_lock;=0A=
+> @@ -399,6 +400,38 @@ static struct request *dd_dispatch_request(struct bl=
+k_mq_hw_ctx *hctx)=0A=
+>  	return rq;=0A=
+>  }=0A=
+>  =0A=
+> +static void dd_limit_depth(unsigned int op, struct blk_mq_alloc_data *da=
+ta)=0A=
 =0A=
-> +		read_expire_rot;=0A=
->  	dd->fifo_expire[DD_WRITE] =3D write_expire;=0A=
->  	dd->writes_starved =3D writes_starved;=0A=
->  	dd->front_merges =3D 1;=0A=
+Similarly as you did in patch 1, may be add a comment about this operation =
+and=0A=
+when it is called ?=0A=
+=0A=
+> +{=0A=
+> +	struct deadline_data *dd =3D data->q->elevator->elevator_data;=0A=
+> +=0A=
+> +	/* Do not throttle synchronous reads. */=0A=
+> +	if (op_is_sync(op) && !op_is_write(op))=0A=
+> +		return;=0A=
+> +=0A=
+> +	/*=0A=
+> +	 * Throttle asynchronous requests and writes such that these requests=
+=0A=
+> +	 * do not block the allocation of synchronous requests.=0A=
+> +	 */=0A=
+> +	data->shallow_depth =3D dd->async_depth;=0A=
+> +}=0A=
+> +=0A=
+> +static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)=0A=
+> +{=0A=
+> +	struct request_queue *q =3D hctx->queue;=0A=
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;=0A=
+> +	struct blk_mq_tags *tags =3D hctx->sched_tags;=0A=
+> +=0A=
+> +	dd->async_depth =3D 3 * q->nr_requests / 4;=0A=
+=0A=
+I think that nr_requests is always at least 2, but it may be good to have a=
+=0A=
+sanity check here that we do not end up with async_depth =3D=3D 0, no ?=0A=
+=0A=
+> +=0A=
+> +	sbitmap_queue_min_shallow_depth(tags->bitmap_tags, dd->async_depth);=0A=
+> +}=0A=
+> +=0A=
+> +static int dd_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_id=
+x)=0A=
+> +{=0A=
+> +	dd_depth_updated(hctx);=0A=
+> +	return 0;=0A=
+> +}=0A=
+> +=0A=
+>  static void dd_exit_sched(struct elevator_queue *e)=0A=
+>  {=0A=
+>  	struct deadline_data *dd =3D e->elevator_data;=0A=
+> @@ -744,6 +777,15 @@ static int deadline_starved_show(void *data, struct =
+seq_file *m)=0A=
+>  	return 0;=0A=
+>  }=0A=
+>  =0A=
+> +static int dd_async_depth_show(void *data, struct seq_file *m)=0A=
+> +{=0A=
+> +	struct request_queue *q =3D data;=0A=
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;=0A=
+> +=0A=
+> +	seq_printf(m, "%u\n", dd->async_depth);=0A=
+> +	return 0;=0A=
+> +}=0A=
+> +=0A=
+>  static void *deadline_dispatch_start(struct seq_file *m, loff_t *pos)=0A=
+>  	__acquires(&dd->lock)=0A=
+>  {=0A=
+> @@ -786,6 +828,7 @@ static const struct blk_mq_debugfs_attr deadline_queu=
+e_debugfs_attrs[] =3D {=0A=
+>  	DEADLINE_QUEUE_DDIR_ATTRS(write),=0A=
+>  	{"batching", 0400, deadline_batching_show},=0A=
+>  	{"starved", 0400, deadline_starved_show},=0A=
+> +	{"async_depth", 0400, dd_async_depth_show},=0A=
+>  	{"dispatch", 0400, .seq_ops =3D &deadline_dispatch_seq_ops},=0A=
+>  	{},=0A=
+>  };=0A=
+> @@ -794,6 +837,8 @@ static const struct blk_mq_debugfs_attr deadline_queu=
+e_debugfs_attrs[] =3D {=0A=
+>  =0A=
+>  static struct elevator_type mq_deadline =3D {=0A=
+>  	.ops =3D {=0A=
+> +		.depth_updated		=3D dd_depth_updated,=0A=
+> +		.limit_depth		=3D dd_limit_depth,=0A=
+>  		.insert_requests	=3D dd_insert_requests,=0A=
+>  		.dispatch_request	=3D dd_dispatch_request,=0A=
+>  		.prepare_request	=3D dd_prepare_request,=0A=
+> @@ -807,6 +852,7 @@ static struct elevator_type mq_deadline =3D {=0A=
+>  		.has_work		=3D dd_has_work,=0A=
+>  		.init_sched		=3D dd_init_sched,=0A=
+>  		.exit_sched		=3D dd_exit_sched,=0A=
+> +		.init_hctx		=3D dd_init_hctx,=0A=
+>  	},=0A=
+>  =0A=
+>  #ifdef CONFIG_BLK_DEBUG_FS=0A=
 > =0A=
 =0A=
 =0A=
