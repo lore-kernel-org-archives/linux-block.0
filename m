@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E739C4707F
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 20:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A260C4707F
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 20:12:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC132613C9
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 20:00:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27295613D8
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 20:12:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235283AbhE0UB5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 May 2021 16:01:57 -0400
-Received: from mail-pg1-f174.google.com ([209.85.215.174]:34566 "EHLO
-        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235034AbhE0UBz (ORCPT
+        id S235762AbhE0UNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 May 2021 16:13:50 -0400
+Received: from mail-pf1-f170.google.com ([209.85.210.170]:34379 "EHLO
+        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235034AbhE0UNu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 May 2021 16:01:55 -0400
-Received: by mail-pg1-f174.google.com with SMTP id l70so784639pga.1
-        for <linux-block@vger.kernel.org>; Thu, 27 May 2021 13:00:22 -0700 (PDT)
+        Thu, 27 May 2021 16:13:50 -0400
+Received: by mail-pf1-f170.google.com with SMTP id q25so1466208pfn.1
+        for <linux-block@vger.kernel.org>; Thu, 27 May 2021 13:12:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=B7RxuUhYvQN8rfWjQpeq5F1bfTbqCbdjaOBi3pA1oHQ=;
-        b=ZISrZ6PFwEz1oC52KJ/hADUUc8fJdEWgZD6YQ1l9siWbwdNMZRb0QyjdklGfo3bI/n
-         Y+zFW5vlsNojNmttpChJz3sm78gKLSNHt71LDNXmWEx/WZPg8dSVy+LaxT076MN1IZMP
-         W8YQaiebes2RQi5R96NaTRVCEZAAVcf6ToXoebCtH5UFwSjvpUnnLjeAKkAeo1p5evNa
-         IqJC69ytNXy1jc5Z6T0iYnYH0K3+SMBmxMJuK4o4w9yu5wlhON+ysCvg2Jm42hk6tXfd
-         RkZ5nS+Y47RrhyjcRzaI9LZwG4pHkzHlUBWy4gOBhc6oNnBHUrfETGjNvzY3K2de2kuZ
-         NY3g==
-X-Gm-Message-State: AOAM530ALRxDPw9sMngLjxkU5L53qBCqPU9Gdvj1ztun1W5VitQwwTKn
-        u0vVeWgbrb4JxXXYkuJJDWzpvE6LSUQ=
-X-Google-Smtp-Source: ABdhPJxkjC9oi23dYc9/NUDymBOUvRiQ5yVmcOBEGzoz/rfb5ZC2qaw6UpPqagSlsXBbE2EGmctTyg==
-X-Received: by 2002:a63:36c1:: with SMTP id d184mr5247530pga.47.1622145621757;
-        Thu, 27 May 2021 13:00:21 -0700 (PDT)
+        bh=/p1hHTLINmVHF/0lKbVJ9Ndy5v+D57LrwKetIFpXLhk=;
+        b=eQMBzJHRhX79FLtYFJE5+T8Bms7/9IGiYtcsiURO5kq3NHPV2lJ7SlpxtPG47PfSQq
+         x9+DkYjv+6fHP8UtXWpq7M0I/RbBMoIB37TNkWd3B2czbeAPSbRXPpmVZcekhYyWQ7u3
+         ggzo8wVe0kK8wDi+qL+HqXv+UJgYYI3iSyxPOF5AeA5CQDdiRIU/ABfjv3IOcTFcfotY
+         wFNJCqC2jKjqXsn6/Pz+GGdiY6lF81zW4uIv+1/n3v8E7pIzTetmSwCeqQnku3tIATNV
+         WFEts4SxAZZo4iCxaNFQ3IJRABRZrLZNeVs2X9TjNeoiaeMrihUkpCMN1gv0eerkQd2U
+         6YEg==
+X-Gm-Message-State: AOAM533euJlrjbNxlA0yj+ufE7UG3voBuweWcdrHDAguTrbri8OtBmdx
+        iVvNVdGwEvkrki18AUC8LT0=
+X-Google-Smtp-Source: ABdhPJx20jUTEH1N5U/evNuV91TyXw5nu6CChIU2hzum203eAO3bis6pOAnMns6Ba/DHTSQ3wBfsww==
+X-Received: by 2002:a63:6784:: with SMTP id b126mr5250518pgc.209.1622146335407;
+        Thu, 27 May 2021 13:12:15 -0700 (PDT)
 Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id z19sm2425911pjn.0.2021.05.27.13.00.19
+        by smtp.gmail.com with ESMTPSA id m20sm2506395pfd.133.2021.05.27.13.12.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 May 2021 13:00:21 -0700 (PDT)
-Subject: Re: [PATCH 7/9] block/mq-deadline: Reserve 25% of tags for
- synchronous requests
+        Thu, 27 May 2021 13:12:14 -0700 (PDT)
+Subject: Re: [PATCH 8/9] block/mq-deadline: Add I/O priority support
 To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
         Jens Axboe <axboe@kernel.dk>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -52,15 +52,15 @@ Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Adam Manzanares <Adam.Manzanares@wdc.com>,
         Ming Lei <ming.lei@redhat.com>
 References: <20210527010134.32448-1-bvanassche@acm.org>
- <20210527010134.32448-8-bvanassche@acm.org>
- <DM6PR04MB7081C21724FE9742E1A16C13E7239@DM6PR04MB7081.namprd04.prod.outlook.com>
+ <20210527010134.32448-9-bvanassche@acm.org>
+ <DM6PR04MB7081661E924716B91E4E0899E7239@DM6PR04MB7081.namprd04.prod.outlook.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <141c7185-4f9e-2b5f-a255-9d30d03ba46a@acm.org>
-Date:   Thu, 27 May 2021 13:00:19 -0700
+Message-ID: <d1cf99a8-df7a-f33d-cee0-2906813256ce@acm.org>
+Date:   Thu, 27 May 2021 13:12:12 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.2
 MIME-Version: 1.0
-In-Reply-To: <DM6PR04MB7081C21724FE9742E1A16C13E7239@DM6PR04MB7081.namprd04.prod.outlook.com>
+In-Reply-To: <DM6PR04MB7081661E924716B91E4E0899E7239@DM6PR04MB7081.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -68,38 +68,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/26/21 8:33 PM, Damien Le Moal wrote:
+On 5/26/21 8:48 PM, Damien Le Moal wrote:
 > On 2021/05/27 10:02, Bart Van Assche wrote:
->> For interactive workloads it is important that synchronous requests are
->> not delayed. Hence reserve 25% of tags for synchronous requests. This patch
+>> +	if (next->elv.priv[0]) {
+>> +		atomic_inc(&dd->merged[prio]);
+>> +	} else {
+>> +		WARN_ON_ONCE(true);
+>> +	}
 > 
-> s/tags/scheduler tags
+> I do not think you need the curly braces here.
+
+These are present because patch 9/9 adds more code in this if-statement
+and to improve readability of patch 9/9.
+
+>> @@ -392,9 +453,14 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+>>  {
+>>  	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+>>  	struct request *rq;
+>> +	enum dd_prio prio;
+>>  
+>>  	spin_lock(&dd->lock);
+>> -	rq = __dd_dispatch_request(dd);
+>> +	for (prio = 0; prio <= DD_PRIO_MAX; prio++) {
+>> +		rq = __dd_dispatch_request(dd, prio);
+>> +		if (rq || dd_queued(dd, prio))
+>> +			break;
+>> +	}
+>>  	spin_unlock(&dd->lock);
 > 
-> to be clear that we are not talking about the device tags. Same in the patch
-> title may be.
-
-OK.
-
->> +static void dd_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
+> Unless I missed something, this means that the aging (fifo list expire)
+> mechanism is per prio list but there is no aging between the prio classes. This
+> means that an application doing lots of RT direct IOs will completely starve
+> other prio classes and hang the applications using them.
 > 
-> Similarly as you did in patch 1, may be add a comment about this operation and
-> when it is called ?
+> I think we need aging between the prio classes too to avoid that.
 
-Will do.
-
->> +static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
->> +{
->> +	struct request_queue *q = hctx->queue;
->> +	struct deadline_data *dd = q->elevator->elevator_data;
->> +	struct blk_mq_tags *tags = hctx->sched_tags;
->> +
->> +	dd->async_depth = 3 * q->nr_requests / 4;
-> 
-> I think that nr_requests is always at least 2, but it may be good to have a
-> sanity check here that we do not end up with async_depth == 0, no ?
-
-OK, I will add a check.
-
-Thanks,
+OK, I will add an aging mechanism.
 
 Bart.
