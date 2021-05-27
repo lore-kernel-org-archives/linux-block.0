@@ -2,139 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 776F9C4707F
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 08:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A26C47089
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 08:43:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A241613BF
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 08:05:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8C9B613CC
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 08:43:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233657AbhE0IHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 May 2021 04:07:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44994 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbhE0IHO (ORCPT
+        id S235530AbhE0IpX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 May 2021 04:45:23 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:53650 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235496AbhE0IpW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 May 2021 04:07:14 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4A9C061574
-        for <linux-block@vger.kernel.org>; Thu, 27 May 2021 01:05:41 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id e17so3045459pfl.5
-        for <linux-block@vger.kernel.org>; Thu, 27 May 2021 01:05:41 -0700 (PDT)
+        Thu, 27 May 2021 04:45:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1622105029; x=1653641029;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=5rJKibo9Bd3pNEIrZ/kFtYQCFwYihoej8qmsVyUiGo8=;
+  b=Q/SEFchImPBmNH4oXp894b3okqadNFvfwhRQmLdBgNSCSlztfNBTstFd
+   IIt/8NcvG4ZjyuuEHezDT4vy4NZWFcd1xSpFh9pJTezFdRi4T6MmpgrPY
+   RyFM52rCfQ+sxG60cqN1GP1jwbjiJlChQAxduJg3Im+0mqqkYaAAKhCoS
+   pZ7u8IXcOjpEqH0RQreg78OKdld9ZcYXYA2h/MA+21Rlaq9tHFnTfbdAh
+   QZCvDF7JIxLtgbpOMDnE0mgy6qFJKp4MBqcOeEFmPFwgpWt3dJyIz6bSF
+   TkcKMQC9UXwXUx7TZp40AdWrxXK/szEpNCKBuJCclytrsnCoBo8GJDRGD
+   g==;
+IronPort-SDR: I7UM6Y4yU+88Ml8lx/v1sN4NKpplu6LBnXui5eVbIMZzX1aXv/esaLz095GbKo6IHcO8MDhgeL
+ d+rVkGfoOzKaAnmLXq+DdoyyoWSoyorOuKFWrBQuWLDibqLip14QIvnGLL06MR9P40Xe9eRfBu
+ qse3vColf/KRLZOq9OW9yKdO80xqfB7VS9JMYARNhjILEis9a0J+QRUpF7bFENh7PyXjvTZVTA
+ LE3V9iJCEi/8euJntOyeEM8Hx8gCc/GpXiNSyf9BW4sZVewcTtlfyBPdQOwx4Ixib/Dd4mjTtk
+ OeA=
+X-IronPort-AV: E=Sophos;i="5.82,334,1613404800"; 
+   d="scan'208";a="174309774"
+Received: from mail-dm6nam08lp2045.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.45])
+  by ob1.hgst.iphmx.com with ESMTP; 27 May 2021 16:43:48 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZNLfjMJ4bogJsF35Aw91K9rTeSWcfDKTevfbJws8zE04DvgNzRh+7zMMV2dFVjXkRzAb733iKn9eepJhdMqastmKl/iOdVFhkaDduVKt1uW9M67ge7xYML0zgmy2nrj3dcU2Dk72QoHwbowpfhI8/89CecNvRq7/DayzgnbVccQdUsksaNKbwqaxXf3/nmUKJNMHQ+Hn0M/KRZdqdnI2fOY3f8dRXHRhjX/a+qtEBsv0H80WeN0Jh6my67kNyhgP3wiVooZEQkOxJ2AkIjB+3J38uaenSBxhOCxAvmHvhSzZ3la7itIhtG2gnkAgsFtBTSA5sC85zTb2oC4pFTxlpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5rJKibo9Bd3pNEIrZ/kFtYQCFwYihoej8qmsVyUiGo8=;
+ b=gvOYngeNfL8tg7mur8ohid4vCVrH2wHajSM6pqkBcP/pFwJnPKhRhWDz+acPSEkiN2TmICNceido/2KseTZpSSdxKFDIDhhsvcThvBZfBcrr4WXk8dxPheIqUdVrdysyYwFGrAk/1jeCo+NffgeQaF0LM8pfONQcTR6sXvKHiNX3nfTCXR9E7nlZP6rRtIdLfkxSpV00CX9V+DQheSHdNryeeTL/3LXRI4nE3KLU2TUhLVP7xvJbm8SckAcHOlFF7EqcY19VwZBNDLeT3nBKcpqT61ObBGU4YcmTgTyDiw6dy69o2ww/rOr/0p0gRsLteNRdul5RMIeNx7AKfacVVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CTJO92LlAFaS91oBcJVV9BkySIxOVsEFLvnkpyaXMOI=;
-        b=D+X+8tZVCjIM3ZHe1JshWPkJq5pAd2mMDAMrEp21Z2bGA+L/60ehnU9Np6nZel1UqM
-         13CoHKaY0CPdMANbkS4xX5vYcf92IJ6veNRTSBlD7yegOBfvITtqyZzr/VBlCsC5CxoV
-         QZ7NkkCvQkG25pK2TSQZZZr7bxMh0ZQ5GR0D1EXO6F+O4wfKs/LDLOqN5w6/A9tsLSvv
-         wOwWpw12g0e5Shs9WXI6mC+o759yCIPcRr3034/R+L3KZbnOnu5R6SIEqfal24MheAaC
-         pu+JkxZCvJdi1QGo/SpJjzefp09aNbcbdXQkbupZySAgbV57dAU/pxr0Z/bvJ8ul1uum
-         6w4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CTJO92LlAFaS91oBcJVV9BkySIxOVsEFLvnkpyaXMOI=;
-        b=tvj8Z+kygiPE6T+7Xl/jYO+PcRoyX2s+NQXViqLtjbTxsK7FW9BYAXI0tKY5cxXEnP
-         S0qgJHoVyo0+C5jtZk6F8WjRMxJVTh2Pj5HyI46jIUuUridyzKMKTSwT26YFK6kFcaX1
-         9jCS2N5+D8f9u8fmuXyJ5sIYziUPIhbng0u3fX9ZYLocvIv/Q0CGICPWGDbGJZ6QeTIX
-         rPkyOeojpmEZzrETN3SxWvsiUiqXU6eeaulEAQUd+48dPc8xD7qwsRs+kfnG8KkSDLmV
-         8db3wvximSJOB+Ltw2YWt9EPU/gQOoSzUAlQtODKKYkemQhekXpEydLhK75qtVtJacCT
-         GQNw==
-X-Gm-Message-State: AOAM531/RZjxNDBrWMrvVlSq5kSPIIV4KJ29zTiJPbeN+Wmn+GzKD2ZU
-        ThosfYxXv8furzLDnUFVgXwnOJnocVwuh3jx
-X-Google-Smtp-Source: ABdhPJzVjCWkeWT4wM4S7Z5nNv89MfysPXiakHTqjAaWdtVBaQz4Jna8SC6qGTVafNGSVAYJX9GQ3A==
-X-Received: by 2002:a63:7703:: with SMTP id s3mr2582336pgc.339.1622102741133;
-        Thu, 27 May 2021 01:05:41 -0700 (PDT)
-Received: from jianchwadeMacBook-Pro.local ([154.48.252.66])
-        by smtp.gmail.com with ESMTPSA id h76sm1435766pfe.161.2021.05.27.01.05.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 May 2021 01:05:40 -0700 (PDT)
-Subject: Re: [PATCH 0/9] Improve I/O priority support
-From:   Wang Jianchao <jianchao.wan9@gmail.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5rJKibo9Bd3pNEIrZ/kFtYQCFwYihoej8qmsVyUiGo8=;
+ b=zoKJELYHrsnRRrEoIWeNFiVDfBYIkPVCll5Dnc1D1BZbAVAt22tnPobc34uPyTJMd1tWhlrX/FvDTAgxNDf7W/vEt6QudQF2M5ZSJNnRjPKuip+8Zl2i5H1aaRVQ0Oi/7PDuLA+ZdCGBbaLmJqk9SNGA0sICEA++TXkpBzEO++s=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by PH0PR04MB7622.namprd04.prod.outlook.com (2603:10b6:510:4f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.24; Thu, 27 May
+ 2021 08:43:48 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::99a5:9eaa:4863:3ef3]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::99a5:9eaa:4863:3ef3%4]) with mapi id 15.20.4150.027; Thu, 27 May 2021
+ 08:43:48 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
-        Adam Manzanares <adam.manzanares@wdc.com>
+        Adam Manzanares <Adam.Manzanares@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 1/9] block/mq-deadline: Add several comments
+Thread-Topic: [PATCH 1/9] block/mq-deadline: Add several comments
+Thread-Index: AQHXUpPm69d+T8F0e0WW+uHcgzKZsA==
+Date:   Thu, 27 May 2021 08:43:47 +0000
+Message-ID: <PH0PR04MB741685956668B11D2636A34D9B239@PH0PR04MB7416.namprd04.prod.outlook.com>
 References: <20210527010134.32448-1-bvanassche@acm.org>
- <b58840a8-0122-26cd-e756-92562064075a@gmail.com>
-Message-ID: <ef81558a-cab2-ca2f-dba8-e032ecdb8154@gmail.com>
-Date:   Thu, 27 May 2021 16:05:36 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
-MIME-Version: 1.0
-In-Reply-To: <b58840a8-0122-26cd-e756-92562064075a@gmail.com>
-Content-Type: text/plain; charset=utf-8
+ <20210527010134.32448-2-bvanassche@acm.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: acm.org; dkim=none (message not signed)
+ header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [129.253.240.67]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f402624d-4b5c-4c15-be5b-08d920eb8b93
+x-ms-traffictypediagnostic: PH0PR04MB7622:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <PH0PR04MB76222B22EC1AAA2794CB9F5E9B239@PH0PR04MB7622.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: fERAHhvUa9pwT45cye+S+2KExzDa1Lgdr1+6FCEvPEEFtV1AJHzElWl7bhPqi95YMWnfUHRcF4hyqsgzc4GJOTPCUM2AkSoBzOa4/j/dartyD1ERZMAck7NVmPRgzO0AeXk8VEZu4076lpilM9Mn7n+kaOLI6ULVd397d4c3k+0aXD6yx7Fz/jvtvdF9x1ZNI6iozKg+e6A3MtgBWyylRGomL/pvP0+dBbTV7oHKY/DR86Y80bACDtdd+eSAB5Wzw5vVODEsF007H58iUAOJlVsCcifCOQnihJF4g8g/NM15H+URQg76vzEuk5K1ifdnnm3tZfD1ogxGKOV59EFGQatOdgu4RqT7xFa44/m/M4dLVk4JkUmP7d5+wye9knFm0+MmjZgZe/kLboBA1ZMQH4VMe8hNodeOa7eEPmuPivIlbhgAKpAua+yyKyXfC4+/Zp09pE3Ilrp7j89o+D+E4ZCumbLTXt+0/BAg8fyaVJoRyzvb+LShc0d04Ky/QGVOoeFWjOjDpuV/vmTn6WfSkA63rUQ2Pt5KwG3gMZm+6NfmssqOtURqMF6oNcj7PkCqqNw8ctieQ36BmOL7VB40CUkpw1GW3DoUnTVAmNd6GB0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(136003)(346002)(39860400002)(396003)(26005)(7696005)(478600001)(6506007)(86362001)(4270600006)(55016002)(186003)(558084003)(2906002)(71200400001)(9686003)(33656002)(54906003)(110136005)(316002)(4326008)(19618925003)(8676002)(8936002)(5660300002)(122000001)(52536014)(66946007)(38100700002)(76116006)(64756008)(66446008)(66476007)(66556008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?ZwrS1GXmLzkTpmS0r7jjlAWF2DKXQ1WKzQmBG//RmtfoGBMUMCLnt5MeUWuE?=
+ =?us-ascii?Q?CkOb6Z2ZPCjOqRLGkJzVRHaACORuMeAOKFuw7DR9GZn+Xf/yHDxiSaYONKuO?=
+ =?us-ascii?Q?7jk49X4RgaXkWWJKR+8hKANjpfr44sV1XvEPRVX7R+u7q2GmGLHBy82aSz5N?=
+ =?us-ascii?Q?Jpaxqq/KsgjIq2xD91uaOhN+MTA6gdEukFSvQvqiDvaj1fWeWX4R951wT2dj?=
+ =?us-ascii?Q?139DL3SmeiLTYYsPppbQ6RhV6y1c1ljPlFcB9nRegDzkADsqKC6zxpZb20TK?=
+ =?us-ascii?Q?O4Wd/P5sHOlR/iYvboqeIZrIoBtMQi1Zw8+uA8lGjYo72Zw6iJACRsJQfVXI?=
+ =?us-ascii?Q?bQk7RC5d6p/KG7m743d3ZT2scpgyJe9TCN9X2ZP98Bu3Vg9hvMQVA3IuWvaj?=
+ =?us-ascii?Q?1izqfo1EpWuDd/E1XHz3fs/GxhLdORS8It3g4shn9kzkAf3q7WO+i6/v5d9G?=
+ =?us-ascii?Q?pI0Jnfr85zG55Bdty3ZFYAdcfdAHZjeEs99AhjoR8m0oqqihFE/QlMIEJkxR?=
+ =?us-ascii?Q?Gp/IwLSG34uKqfbVqQtiZ/sbIYaDQ1AVqLuXCIjXMfQoCHVwgIpbXAp17qOs?=
+ =?us-ascii?Q?vRYD1jk9vIk7qiM3mlx2iCi+e+zvkiVGihr/wiuCP2pScPZLWryChHdgBI+U?=
+ =?us-ascii?Q?2W5MK9phd2jB0ACaq+M5QrBZ9MSO/r05gPwRQVrzM0bEyzDerHeAub22PfVj?=
+ =?us-ascii?Q?VHzunxANF1+RbNN99Ibuo5dTfO6fxcGAtjLktTDYvflVdDx38gFtlW9+zpHx?=
+ =?us-ascii?Q?IkeVde4gKIMcgcIe7uGwXSFFs+GS5DOwl4bABEFDsLKA0rkdwY0HDTgFgloa?=
+ =?us-ascii?Q?0kFsvkZ/hMuO8JFMf6vNIavR6G9xU2VCPmkvz8uEeayumQRY7J0g/7KVGLhQ?=
+ =?us-ascii?Q?Scd6mwg40tANN7ymf+WunFiXZtsfC7MVhD9hOdApc2mDfTgo2xSke5yYBHia?=
+ =?us-ascii?Q?cQ44A8kxjkwxMwqZaZdx64nPfkTfSgQphU/qq722/S6CIfw/q3zSw7cmaME0?=
+ =?us-ascii?Q?StLKoEgjurGNYnFXeEec6SClFr/P861B0uj6IFst0HeTEJlmgDsO6VWb+ly/?=
+ =?us-ascii?Q?0kVF6wmY5xwHqJvtmJjdn0i/HsAc3/Ukt2tlk6tanlKqfk/VAs4U2Z/PhRbr?=
+ =?us-ascii?Q?TXG17CvHJRZ3kZXMul5w9q1jmdGASxjFAmmbcslFh3dfQgaboApSMMJZ5rw1?=
+ =?us-ascii?Q?5/4GrCNDL/Open/4NBjfb9gBQMRzPjZZ3UMAsimkR9YQNdTZTFmv11mzy2l1?=
+ =?us-ascii?Q?OwKxNCbWDiNVVka1Xxj/pKZKXNgMaW41U9ZB6Dlu1oM7FMVJcioB+CTmIQIU?=
+ =?us-ascii?Q?NzDXyWtM+okTWftmGIn7EEbAx32o3OhUOKJ4+n9CzxQ9CA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f402624d-4b5c-4c15-be5b-08d920eb8b93
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2021 08:43:47.9271
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: JbjPzC5OKuHkMGSvfQjsW17vCVEw+7pBF+wzkQqHNHGJuXMAFhaCEGdAntUqDcXk/t52uNGL01AwCmdxwmNuzZqzH0NQR4/KuxMDWXXPX+Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7622
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2021/5/27 2:25 PM, Wang Jianchao wrote:
-> 
-> 
-> On 2021/5/27 9:01 AM, Bart Van Assche wrote:
->> Hi Jens,
->>
->> A feature that is missing from the Linux kernel for storage devices that
->> support I/O priorities is to set the I/O priority in requests involving page
->> cache writeback. Since the identity of the process that triggers page cache
->> writeback is not known in the writeback code, the priority set by ioprio_set()
->> is ignored. However, an I/O cgroup is associated with writeback requests
->> by certain filesystems. Hence this patch series that implements the following
->> changes for the mq-deadline scheduler:
-> Hi Bart
-> 
-> How about implement this feature based on the rq-qos framework ?
-> Maybe it is better to make mq-deadline a pure io-scheduler.
-
-In addition, it is more flexible to combine different io-scheduler and rq-qos policy
-if we take io priority as a new policy ;)
-
-> 
-> Best regards
-> Jianchao
-> 
->> * Make the I/O priority configurable per I/O cgroup.
->> * Change the I/O priority of requests to the lower of (request I/O priority,
->>   cgroup I/O priority).
->> * Introduce one queue per I/O priority in the mq-deadline scheduler.
->>
->> Please consider this patch series for kernel v5.14.
->>
->> Thanks,
->>
->> Bart.
->>
->> Bart Van Assche (9):
->>   block/mq-deadline: Add several comments
->>   block/mq-deadline: Add two lockdep_assert_held() statements
->>   block/mq-deadline: Remove two local variables
->>   block/mq-deadline: Rename dd_init_queue() and dd_exit_queue()
->>   block/mq-deadline: Improve compile-time argument checking
->>   block/mq-deadline: Reduce the read expiry time for non-rotational
->>     media
->>   block/mq-deadline: Reserve 25% of tags for synchronous requests
->>   block/mq-deadline: Add I/O priority support
->>   block/mq-deadline: Add cgroup support
->>
->>  block/Kconfig.iosched      |   6 +
->>  block/Makefile             |   1 +
->>  block/mq-deadline-cgroup.c | 206 +++++++++++++++
->>  block/mq-deadline-cgroup.h |  73 ++++++
->>  block/mq-deadline.c        | 524 +++++++++++++++++++++++++++++--------
->>  5 files changed, 695 insertions(+), 115 deletions(-)
->>  create mode 100644 block/mq-deadline-cgroup.c
->>  create mode 100644 block/mq-deadline-cgroup.h
->>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com?=0A=
