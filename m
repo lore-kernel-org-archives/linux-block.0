@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5E6C47089
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 232E2C4707F
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:24:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E63C0613D4
-	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA76B613BA
+	for <linux-block@archiver.kernel.org>; Thu, 27 May 2021 03:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234500AbhE0DOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 May 2021 23:14:46 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:37460 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234503AbhE0DOo (ORCPT
+        id S233785AbhE0DZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 May 2021 23:25:48 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:48109 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233542AbhE0DZr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 May 2021 23:14:44 -0400
+        Wed, 26 May 2021 23:25:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1622085206; x=1653621206;
+  t=1622085856; x=1653621856;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=uwN4dQ5AswNc9nFWah5rn4grCm2VUerGn/16jGyXc3M=;
-  b=qAabF9D/1/Mpw85SiGZfdMR/GFbJQxmKCmi/nbPmG4kASnPBYMO/N+Vl
-   ACxCTHqECSdyfynm4Mm3Ezw8Ut41mzI9ebOHlTCvjPkdV+2dQ3kGRzouo
-   J6M5d0SzDUxaZ7TjG5gbTlsFlkvPcJ1hj+/9wg0sQO2lbJsAtj5v4rYEC
-   TnwNstDwhD7pemeKGv7ykT6Kf9COxX3jO1QtJL4q1grAaobwWsOc16F+s
-   uXEeg0B2BBY13WhwzdE0d8Yko2ilhn9ChTFlMz/YcKRaST2XpzCKLSzoH
-   o1QBQU3D/h22RMDYiV4AYAMgiJzLHw275arOfivX48VVh4dwtxNWaHC4b
-   A==;
-IronPort-SDR: DY7sHiO9xn5wV2W3ZAZWdceiPoDtELPFy811CV0PO2FDB2MtUz1f/pqpz41YbVMnWdS6Vpq9Lo
- nklFcpVWepbHwSa8PSAD/t4cYgoh+95mpMddLN5cVfJLS8MfIgBSEB05DwKxkRvP3/rAS8FTrw
- /wihZ7n3rVLjDF0Se9GvINyZDYKcZEodTHgj184eKsUJ4C134wdqkocRPSGqlw4jJZRxCEjKBJ
- fbtIQQiU+Re07VxL9BNNn4yiqJp8TfRlGyfTIi9PW1rmdLj/PVCUfTtCAZJoQayokzAh8bV2S/
- oQk=
+  bh=1YQN3rqJ8tzRhMHhsc1V5G7iGuMOSWdANUeBa255yUo=;
+  b=M7A7Orcjw7QaJ134D59lZUucCxwQJ3PDJOjgwXmRc/7It/HqfDIRHgwl
+   +SHZE/bMYuS1AnRHFtQdPk60KD1DUKTU/2rhFUjKvrTKpod/zoR4FIEdC
+   ZZ1a5XTFoEneHro+xGrPCLljuJdKqkmyfi4VwOrcEn5z4+OWhr4GHnC0p
+   NQf+mXXdUmIwinMcwmeUYmRPFTxZsselDflfN1K11j+R/uExPXaeuWgx0
+   3gLiGo+XdB0H4S3qQEGqE21MnC2v7y/qGTQAq36Fe7Ltned1yURj7EPw5
+   mKhjfblfXG8uOUWqhreMCxviuVzJZeZBRpkvdOCw4kQEZcXK3FgCd7GM3
+   w==;
+IronPort-SDR: A9Vl557fpP4KyzW7lGXx90Eu/hgrcX22E5hODbM2FuKdDPUM2ph8QC9UpkZSWfa5FMIGbvHxxE
+ LGVx6U0ZvBlroerrWk9pYeRUGdX1sn/Hog0qKORDQFrDqqsbadfKDOSy9kZ+Hc5jXFOpo0GaOp
+ 3+FHneQNKkLBcuKxIckhIIg5IyT5/vkwSh1egGb55qF87WmdB5G/L1rnQA95SdXzb2UGK4rcaD
+ jEaad7KLtSngM72rnH/21mO5NPyH0vfQrkzVdtiNYJwA56FuhAiLA4cY4WjshivB7Asjuji6ia
+ D3Q=
 X-IronPort-AV: E=Sophos;i="5.82,333,1613404800"; 
-   d="scan'208";a="273500839"
-Received: from mail-sn1anam02lp2046.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.57.46])
-  by ob1.hgst.iphmx.com with ESMTP; 27 May 2021 11:13:24 +0800
+   d="scan'208";a="170122927"
+Received: from mail-bn7nam10lp2101.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.101])
+  by ob1.hgst.iphmx.com with ESMTP; 27 May 2021 11:24:14 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BtDMUQEF5jIfRjwtp2I6/PFtYyu9JO7mZF3H4cjwxbNUDSZyBK+ps81ZScgb+H+BqnIiGO7HrGbdRk8YOGOy44TfBZKvuqUgGwxcYjFuK9N0qfxdtSme30+/UxCWxoldcOeIfZKuss6c9hn4DT/AJFpNNMuyrf5jfg3MmOh9dhhi+28lebzE9N4PxMq7NwUz19oPYH2ftmVUAEUrn31MLxdO9+d5vcqJRsro9hTkg6d+NJGqAO0GWlFlcjbTZ37s7LdJ+5EQYPg1fYYewPiI+oCedtpeqbdINvtFZEOiSwrI8cb9XMAOQmkrcdiDHqsdFVMxd/uPIAbV7NpWzb1E1g==
+ b=FmpSZPWjnq4fEaj8IoWUPnGrke3SNIaSWHh5UXAp0jq1MmuM4oU13loKV9fd3VcdZtZ1wePWp8xkuZT6u5oX83afwMpkLhhYGCXY7bdw0PMKGXugdyD2MK9aF/sdBxFYG/8e/U3R+Y/YHY9dtdkeM1i9LK31uFXubVNIxYLeSSd4zxPeyj1m1UIo3rl/d8/mTTsTW/TtvLvFip1aG+95ckyQYQwtzqJTROikcB+ut26AgrNMMHCSxtMfI2UWXbPUAC3EFRm/rrgFT7A3D3dAK28Re+zKTEK/elGVZoX0SpZRh4rNTKzVNPwyPgS+LHnyTM5PACzd4AKK90EoKmqiGQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e7RpxeukxjSfraSpA+azxXDik5Q4tpwVKDt+DuGj9h0=;
- b=Rof/FE4O1FabFOG/jYhaCEHPt+3ILFKKA+XsR1OOR0hl1DScDvG7nyTo78egSZ7SMDdbW8GQiSBLr2HnFxKP4wu0AYRgkA7ukdvarqSD/WqfPjC+/iBvugbfP+GfHprThAdPXM3xNIMlwUdFkV/R2lbhyIXHHjvSM3T4syGg8rZvuiQ5gEW6cnkDiSf+obBnXjw2BQeXLPGYLnVPJqzxi0QOsnjskcyPBuiXKjzOu6WMioPHPIYHe/8+orUv1H8Tabd3VHp6K1cxSWAN7JhC3Kkd2sYdbSyFZbZD4eEcUJPGN7foV70RthHx39t0Ah2mfZiwX30GyznDiA0orejdwQ==
+ bh=qTR2kb6J85ofq76uby/DXrWL+Y72LnxTzbJiBEoHHZA=;
+ b=S8zN7zV8YQmDQoBKmAmgnrKsu7/3ZWMMQp9TjYy0nQWwgEfdDoYzBJOuU8qHqianJYNrpe2EIlpRdqz0QotV2d1whe5L8Rlv8mugXHyY8LC2Ux4LQhlCruV9WyEGeaI39Znh/Fqga0NDGmJ2oiqU4cY7ahYMXYXRU1qpm8ybI6+Q7CisV8eitQC3ApHGYjURgIaP1efex/xN2xAop1yVBXgCijSeTIgL0uuG35sx31FXBt/yi70P9xIXxq8tXJypV1xZ7O64gD5smuyPAIxt8IqU8YWAzO2PZccQREFC00sEV/cKFtV5dJ3pKEjiimk9Fi8RR72bUXPB7TwybgLlhw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e7RpxeukxjSfraSpA+azxXDik5Q4tpwVKDt+DuGj9h0=;
- b=B/6X+VY0tqO+IFR8xBGpF991NFawVbtfG8ierSmpY/oIJkMNlrPAPd08riD26IfU1J2MXbZjx8wtJc8YsFJZHIpC+PYlymugeiyIruoflVq+8fxr3fwl+7CvIBn478qdk2C/bVBBiY/v/yvca0o5PQFfgMmxe9SFMONI/vEIPjo=
+ bh=qTR2kb6J85ofq76uby/DXrWL+Y72LnxTzbJiBEoHHZA=;
+ b=iuMB4xiqhmV9toeSPq9atml6tA+bdd/3W04HkzaZEBCCI2kMTLEyL9XqxN+rvQ4sXoXQ/LGaQSfLW8ItNJdjrlM/wCO8nhKsMdP3NlQECwqnsMzNYtvATUhdQ1pMDuXsePwkWEQQ8sCd8iAbFRVP/sTmLSVnZ+23M8NJcrLysiU=
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
- by DM5PR04MB1194.namprd04.prod.outlook.com (2603:10b6:3:a1::23) with
+ by DM6PR04MB5595.namprd04.prod.outlook.com (2603:10b6:5:16b::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.26; Thu, 27 May
- 2021 03:13:10 +0000
+ 2021 03:24:13 +0000
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::64f9:51d2:1e04:f806]) by DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::64f9:51d2:1e04:f806%9]) with mapi id 15.20.4173.020; Thu, 27 May 2021
- 03:13:10 +0000
+ 03:24:12 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -73,15 +73,15 @@ CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Adam Manzanares <Adam.Manzanares@wdc.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 4/9] block/mq-deadline: Rename dd_init_queue() and
- dd_exit_queue()
-Thread-Topic: [PATCH 4/9] block/mq-deadline: Rename dd_init_queue() and
- dd_exit_queue()
-Thread-Index: AQHXUpPkbijb4+An1Uex74mMpbpurg==
-Date:   Thu, 27 May 2021 03:13:10 +0000
-Message-ID: <DM6PR04MB7081E7FC163109B4082627DEE7239@DM6PR04MB7081.namprd04.prod.outlook.com>
+Subject: Re: [PATCH 5/9] block/mq-deadline: Improve compile-time argument
+ checking
+Thread-Topic: [PATCH 5/9] block/mq-deadline: Improve compile-time argument
+ checking
+Thread-Index: AQHXUpPnRe2tZsOQw0aU6HOrY5bcLg==
+Date:   Thu, 27 May 2021 03:24:12 +0000
+Message-ID: <DM6PR04MB70810C07E70C25EF512B4A45E7239@DM6PR04MB7081.namprd04.prod.outlook.com>
 References: <20210527010134.32448-1-bvanassche@acm.org>
- <20210527010134.32448-5-bvanassche@acm.org>
+ <20210527010134.32448-6-bvanassche@acm.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -90,117 +90,383 @@ authentication-results: acm.org; dkim=none (message not signed)
  header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [129.253.182.60]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5e246a7b-064b-423b-d4a5-08d920bd5b8d
-x-ms-traffictypediagnostic: DM5PR04MB1194:
+x-ms-office365-filtering-correlation-id: bfc72143-ff52-4529-b360-08d920bee655
+x-ms-traffictypediagnostic: DM6PR04MB5595:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR04MB1194773727B663BB4CDDA5E3E7239@DM5PR04MB1194.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <DM6PR04MB5595008396B27D41746AAD9BE7239@DM6PR04MB5595.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1443;
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ln2L6iCxMVid1HbwLWpvvx5665f0tX4py9r3r7WjiXqBpV9frIU890uz1K600kskEjS9VbCQNC9/tizp7c6HZsx3S0RSuxG5BHLwPlWAh6TcCY8w0eYVxClnCRudBtTCLmGG63ESA5RKr0yz/gOXOB62i8e4GK23RfWzF8fw8s8Nc2KAtgwXZqgqcCcRQu1WDTF8+IIqHX5qMJxbH3CVQPuwr/4eCUnZXen1q4ZzIuV648rTWk9ExfkOTrM7ENYUw2QxgGiaV/gdKl62NT1DH+lpuJIj2iOzoeiLkxL2eW2wt10JkDgUdg+f4Cy5McuwP7XmmVX43GC8549CEPAtaa6sm3F2dVzokXQqd1GAIvH9niNJeLtda7H7G3xrKr1HJ1anlqJ5RDDNsisoeB2RBdX0Erz+W0nKlthhWHfG1chF0actV5oiLh52TnivpZ4fFB3a2ynCxx6MoYXRUG6Rgk0Fol+Mow7Od09b/EDJvejvtkeArvaiksAAE7pjjgaOGIiF1EjmqyQu3hKvgmtgjZsXq+33hKZ0TZr86XA5k7OjJSZRUtwIJQO9WRAcm6IdKo7VZAMQRQwuaZNRwjcdAzU9su7JftiWqeUu1SJBDdo=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(39860400002)(376002)(136003)(346002)(478600001)(55016002)(33656002)(66476007)(66946007)(7696005)(66446008)(26005)(6506007)(4326008)(2906002)(110136005)(53546011)(9686003)(71200400001)(316002)(64756008)(8676002)(54906003)(86362001)(66556008)(83380400001)(52536014)(122000001)(186003)(8936002)(91956017)(76116006)(5660300002)(38100700002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?kbdYE8efeohZ2FHG0San0TTPwSVuAyI7bdb1hOn2A+0yxKQFkdQ4mT3FmlyM?=
- =?us-ascii?Q?EoH40lKIVaFs+R8pt9ktSolwCa7PjBfj/8vJLolIOjDved93CKHXYEkq2VhX?=
- =?us-ascii?Q?0wwEUOJwBrEIUrSsB9iIKggQwBdpFSwqUwRL+fIPWsE2uqaEfOOoUyY6gz0V?=
- =?us-ascii?Q?XPAPUxeCEHR4J/AIIAC22jXEF/CMoE8XtzxjF4T+R6kKRSLs4VSkgUO7zDy3?=
- =?us-ascii?Q?xXla8nZbF3T1YUWQZJrnVXXh+vw1IGE8RYut+1rqnEHA1JqG7EiyWiuKVKHv?=
- =?us-ascii?Q?qvPrXUd6f21wNT82VvpnsKc64Swg2jTD44OaMWNcC3v4GbIblTWtw7paSf8u?=
- =?us-ascii?Q?89jfDmGtw89MejXYkUWv0MYxQw0j7mrfTOa2NCeLiaPCmEYg4OwRWagbpgIw?=
- =?us-ascii?Q?sF4xv84hM6YLxQQ4zf7/oZPXsK+9Cm4+ga8TCOYFfd8tEexEfQ9L7sQDxzTR?=
- =?us-ascii?Q?11Z11SZBROr9ymO0J+VUYhnE3UZneWD1MXHfdzIsClDnZ5ivdVeXb9+kXoaH?=
- =?us-ascii?Q?isdrBA+eQEdGqF614l2h7Q62/fEptXFCcuZeIQINIIYibd2rbrDMf9zlwfVx?=
- =?us-ascii?Q?xLXceSQNB3w2+N+T0cWrK3GsycnPE+sNtTdU5RESbVXKi/3sT+QIM23snLVd?=
- =?us-ascii?Q?9Ma8U3jW7+k8JYe1QJJ68rza0Dq3AhKk4GFFqiWqQWrV/8iE988Y/UvSPesl?=
- =?us-ascii?Q?IJvRkW9cIVlOyzR5iDOA5Yi8UjmWha/ke9SJmxXUSnD2nXZNUHY0NNH+nuYr?=
- =?us-ascii?Q?TQI0jjQ3QGa7l/KA6KSYhLZTDwA9RynvgdPRusnl4BxdXiy75pw7iWWLjXF1?=
- =?us-ascii?Q?b/5XxA909hDGK6kI9QL9b0HAPnV9/AxKxn7ufsiiPhm+peaBIgmYktqfG0Yp?=
- =?us-ascii?Q?Zg5/RVaFGlwp14bxSfOpAv9dFG/u79CtEClyJscxn9L0pCtUfSA8mOWtIuYS?=
- =?us-ascii?Q?GrLjVy7d43Dnar6R5ul452UMeBb8oXgfNh8G8AKgscF8krGSLB9Mnxb81VQ4?=
- =?us-ascii?Q?f0oYiHFJSuvFOXVn8iCJCZzTwok7vLvpaUVTqKXrasil/0omeK8/3+Hajp9u?=
- =?us-ascii?Q?lblgpSBGx60YHhYhe8XXTor9emSAuVaLeDUfozkI+C5iL4THW3/e0/xYQ3Z5?=
- =?us-ascii?Q?usGgzTj0g6Q/3jUfYwAgEWbm8Sn40LeNGvwxWZC1haPMWSciY0C7qu7Sp21T?=
- =?us-ascii?Q?OwktiDtAarPOJ8THT1ZTsvTnLEYHqjOujMj29fB1CE9zndHNInCTHhjLtyQA?=
- =?us-ascii?Q?h8LmgL5Tb8kKt70/DeonFqmeOX5jJiD7I1pgO4WSUt7KP9nvSOXiPF85r9+e?=
- =?us-ascii?Q?R1twcnQZOId8PouhSna6NKFzHTsAhcFER0kRsuA3r17MFw=3D=3D?=
+x-microsoft-antispam-message-info: QX32ArVYNMWisHTKdIoNZVd03iUM5x+Jr2lsPEMSMItqfdulQXMWLDOw2frWpWXeN2J0BBlnnZiHc+VNjPxSaShQeugOy7z2eY1qaw60gQB9baNUXRQHesBVfZCKM/d1C7lvwPQgDDYhHQuksLz3Uk2X7hx3noE8oBwpuCPhKojMEuC82mSALffOBIOL6CXaq0zWr7AOdZxVQnxPnFFEqVQJsSuPovA4CkHSh83xcKpaSPYmsnBFpA95CZveDcz/AjK0gC5NzaLIk/7LD57yHWfyR4T4MGzDElX4yLyY4o8ivo2j2NecMWeUUpO/fF/rGWi30yHlDqqBv/JkKnpO20IrdNcig2ZuJtYMQbXWGFizSTSbSBviNodHznJsgCGZNtIAw02uQ1BBsDJ/Ekp7B9l1K0RVIal20T7/REuOrJZqEb5v6Yb7MtidBWc+KAJOvncdtpPwhyM05265l5LX9VpgDco775qKYDhjJIyzFeLzvwlv/HEUUeX5MMTmiGmnTIadAXyox7MdUMU4m6F6CvGnzpxUkQuIwkkdDV1rDhJulE7Tyn+Gb8+q7tFH/inW9wh3WV0LHVcq1tO8QBQnLDGOTY9ADhIKJsawRyKNpw0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(376002)(366004)(396003)(39860400002)(316002)(54906003)(9686003)(110136005)(66946007)(4326008)(83380400001)(2906002)(52536014)(71200400001)(30864003)(186003)(66446008)(64756008)(76116006)(91956017)(66556008)(66476007)(8676002)(8936002)(5660300002)(53546011)(55016002)(26005)(38100700002)(86362001)(7696005)(478600001)(33656002)(6506007)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?tAgYTXXv2fQ1aNfOHqyXs8kbovWA7JNgXF/zlDOO+PNy6Ke3mv08naqv+0WY?=
+ =?us-ascii?Q?juLYNhDHw9sLtk5L+h7zmWA4L0mtToLqw7Umli9nP90udGjz1G+pSgJZr9QF?=
+ =?us-ascii?Q?2Bb5TjlceJpJXQqRJlsFEh8ha9J4h52KW/tSfkCWynoV82dtmdLxk74StTNq?=
+ =?us-ascii?Q?GzHzlzrjaPiST/BfY+w2KjXIEEtxW1sYm/m/fyok6WhQCEGxDolycMMLhbA8?=
+ =?us-ascii?Q?ATu+c3rTjiS79lV6j+4EC/MEa8k0gda8YD6Q34IAGXaFD6MhyGg0CjHxkd9z?=
+ =?us-ascii?Q?nmMibYPLHVEGtB1DR3fe/pBhH5DnNpJliDuN6ZGM/yvlbMsb38d1z4LsCm8+?=
+ =?us-ascii?Q?JMUnPM+OJ1Vk9uwaK1dy1/ormFpHZGlPMr4us/I6HAEpiDNeX6aixc6Xmur7?=
+ =?us-ascii?Q?vNxiRRlb2w0CkXgAjecKNH+kYId7eih/UiFQyPzKb9txPIuA6eZ1QSEJXnqf?=
+ =?us-ascii?Q?+e7UKh3jeGdIq27DAEQZYLGnQZ7SblrdVbx4c8HgwDR72gmKhsA5g8HLHBYM?=
+ =?us-ascii?Q?eimegV/VbWfB/BBGMnx+iAn0vo7yfSsKEjgXEJeaEEK3dT1YTgGyt1vTPqZm?=
+ =?us-ascii?Q?T87r7D+2aGK+cWlbdKDMqH8RHLOAxYuy/PE22FiQAHc8TC5zKVwDv7C54BqU?=
+ =?us-ascii?Q?U4e2q/pf9Iq1h1Wpm2Il9kUlcqOrLiqDgZDBwx0p62x00Q15ygEyUNyJ6LOb?=
+ =?us-ascii?Q?zjuJNtkQL6abJnTTjh/zqj12SM1rwESJk/1pGiPL+6q8Q+Tz+dIdlu8XLwGw?=
+ =?us-ascii?Q?aM5qzp/kphOsHAMdOh9xM6fmLNms2MhdPALnJ4K/9jnOOWAxof/w6nWn6gj0?=
+ =?us-ascii?Q?Npi56xV3oeYEDowM149gTmYtGNAmcPO6Sc5yjUuMJwqqejxRD5DgYhObtSB5?=
+ =?us-ascii?Q?SJtGgYoa5w6dg87kFyAR17ZVN2+9xnfpSOR1ma1ZU7L8/CfxMM8iGH+m60sl?=
+ =?us-ascii?Q?j666aFgaMQgUPxu0Kx4Ru4ufzl6hbM9zSrdmXp76eHde7IeIJXH4MCl9A3tA?=
+ =?us-ascii?Q?P75ZKbZTISn29l2ZVxZAxlTS5EHMxgafjqfzhuucPUihZoYeAYKiKNmvuXls?=
+ =?us-ascii?Q?ZMRDZZ2aXf/xw0zn67GBncOlx0Pf4vbAGBJA7ECI9HKgjVixIaZwVGNhp7I3?=
+ =?us-ascii?Q?3xt7UoVu0KUNEikTvMUIH+Zu+5BUBSpOiUbXdvQUQAkleXDlWSAOL0Z/33ld?=
+ =?us-ascii?Q?00ALON4y9D6+Rt5GabUcDisP8GTi4wvKsBDrQpKUaBzG2M9oZuCerBczFdmk?=
+ =?us-ascii?Q?rC/HD35N5tqAdCNGr1ozdlqSE/PXdHBilayv8PRwV4jUQl6xikpy7gh2ODIh?=
+ =?us-ascii?Q?+M3TOXCL7oSWRlcWK8JFgw35EKRWl9nmyv4+MZvAo2roXg=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e246a7b-064b-423b-d4a5-08d920bd5b8d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2021 03:13:10.4733
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfc72143-ff52-4529-b360-08d920bee655
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2021 03:24:12.8313
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sxz8itLv1vWswsmHVw9yuTu47uDyMFpxej057UHhEflet/nEIJA08U/YU/iq92h9XOF8JoN6MgJZ1+D9gpzaAw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB1194
+X-MS-Exchange-CrossTenant-userprincipalname: llzwgL7/49WKJkLVOxRwNfPnkQhK3ChcKDB71eimNQGFCJ/UV3LLxa/mG4TS60GMR7sZ8sDp+tt+aQ4o8sW9HQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5595
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/05/27 10:01, Bart Van Assche wrote:=0A=
-> Change "queue" into "sched" to make the function names reflect better the=
-=0A=
-> purpose of these functions.=0A=
-=0A=
-Nit: may be change this to:=0A=
-=0A=
-Change "queue" into "sched" to make the function names match the elevator t=
-ype=0A=
-operation names.=0A=
-=0A=
+On 2021/05/27 10:02, Bart Van Assche wrote:=0A=
+> Modern compilers complain if an out-of-range value is passed to a functio=
+n=0A=
+> argument that has an enumeration type. Let the compiler detect out-of-ran=
+ge=0A=
+> data direction arguments instead of verifying the data_dir argument at=0A=
+> runtime.=0A=
 > =0A=
 > Cc: Damien Le Moal <damien.lemoal@wdc.com>=0A=
 > Cc: Christoph Hellwig <hch@lst.de>=0A=
 > Cc: Ming Lei <ming.lei@redhat.com>=0A=
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>=0A=
 > ---=0A=
->  block/mq-deadline.c | 8 ++++----=0A=
->  1 file changed, 4 insertions(+), 4 deletions(-)=0A=
+>  block/mq-deadline.c | 96 +++++++++++++++++++++++----------------------=
+=0A=
+>  1 file changed, 49 insertions(+), 47 deletions(-)=0A=
 > =0A=
 > diff --git a/block/mq-deadline.c b/block/mq-deadline.c=0A=
-> index cc9d0fc72db2..c4f51e7884fb 100644=0A=
+> index c4f51e7884fb..dfbc6b77fa71 100644=0A=
 > --- a/block/mq-deadline.c=0A=
 > +++ b/block/mq-deadline.c=0A=
-> @@ -395,7 +395,7 @@ static struct request *dd_dispatch_request(struct blk=
-_mq_hw_ctx *hctx)=0A=
->  	return rq;=0A=
->  }=0A=
+> @@ -35,6 +35,13 @@ static const int writes_starved =3D 2;    /* max times=
+ reads can starve a write */=0A=
+>  static const int fifo_batch =3D 16;       /* # of sequential requests tr=
+eated as one=0A=
+>  				     by the above parameters. For throughput. */=0A=
 >  =0A=
-> -static void dd_exit_queue(struct elevator_queue *e)=0A=
-> +static void dd_exit_sched(struct elevator_queue *e)=0A=
+> +enum dd_data_dir {=0A=
+> +	DD_READ		=3D READ,=0A=
+> +	DD_WRITE	=3D WRITE,=0A=
+> +} __packed;=0A=
+=0A=
+Why the "__packed" here ?=0A=
+=0A=
+> +=0A=
+> +enum { DD_DIR_COUNT =3D 2 };=0A=
+=0A=
+Why not a simple #define for this one ?=0A=
+=0A=
+> +=0A=
+>  struct deadline_data {=0A=
+>  	/*=0A=
+>  	 * run time data=0A=
+> @@ -43,20 +50,20 @@ struct deadline_data {=0A=
+>  	/*=0A=
+>  	 * requests (deadline_rq s) are present on both sort_list and fifo_list=
+=0A=
+>  	 */=0A=
+> -	struct rb_root sort_list[2];=0A=
+> -	struct list_head fifo_list[2];=0A=
+> +	struct rb_root sort_list[DD_DIR_COUNT];=0A=
+> +	struct list_head fifo_list[DD_DIR_COUNT];=0A=
+>  =0A=
+>  	/*=0A=
+>  	 * next in sort order. read, write or both are NULL=0A=
+>  	 */=0A=
+> -	struct request *next_rq[2];=0A=
+> +	struct request *next_rq[DD_DIR_COUNT];=0A=
+>  	unsigned int batching;		/* number of sequential requests made */=0A=
+>  	unsigned int starved;		/* times reads have starved writes */=0A=
+>  =0A=
+>  	/*=0A=
+>  	 * settings that change how the i/o scheduler behaves=0A=
+>  	 */=0A=
+> -	int fifo_expire[2];=0A=
+> +	int fifo_expire[DD_DIR_COUNT];=0A=
+>  	int fifo_batch;=0A=
+>  	int writes_starved;=0A=
+>  	int front_merges;=0A=
+> @@ -97,7 +104,7 @@ deadline_add_rq_rb(struct deadline_data *dd, struct re=
+quest *rq)=0A=
+>  static inline void=0A=
+>  deadline_del_rq_rb(struct deadline_data *dd, struct request *rq)=0A=
+>  {=0A=
+> -	const int data_dir =3D rq_data_dir(rq);=0A=
+> +	const enum dd_data_dir data_dir =3D rq_data_dir(rq);=0A=
+>  =0A=
+>  	if (dd->next_rq[data_dir] =3D=3D rq)=0A=
+>  		dd->next_rq[data_dir] =3D deadline_latter_request(rq);=0A=
+> @@ -169,10 +176,10 @@ static void dd_merged_requests(struct request_queue=
+ *q, struct request *req,=0A=
+>  static void=0A=
+>  deadline_move_request(struct deadline_data *dd, struct request *rq)=0A=
+>  {=0A=
+> -	const int data_dir =3D rq_data_dir(rq);=0A=
+> +	const enum dd_data_dir data_dir =3D rq_data_dir(rq);=0A=
+>  =0A=
+> -	dd->next_rq[READ] =3D NULL;=0A=
+> -	dd->next_rq[WRITE] =3D NULL;=0A=
+> +	dd->next_rq[DD_READ] =3D NULL;=0A=
+> +	dd->next_rq[DD_WRITE] =3D NULL;=0A=
+>  	dd->next_rq[data_dir] =3D deadline_latter_request(rq);=0A=
+>  =0A=
+>  	/*=0A=
+> @@ -185,9 +192,10 @@ deadline_move_request(struct deadline_data *dd, stru=
+ct request *rq)=0A=
+>   * deadline_check_fifo returns 0 if there are no expired requests on the=
+ fifo,=0A=
+>   * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])=0A=
+>   */=0A=
+> -static inline int deadline_check_fifo(struct deadline_data *dd, int ddir=
+)=0A=
+> +static inline int deadline_check_fifo(struct deadline_data *dd,=0A=
+> +				      enum dd_data_dir data_dir)=0A=
+>  {=0A=
+> -	struct request *rq =3D rq_entry_fifo(dd->fifo_list[ddir].next);=0A=
+> +	struct request *rq =3D rq_entry_fifo(dd->fifo_list[data_dir].next);=0A=
+>  =0A=
+>  	/*=0A=
+>  	 * rq is expired!=0A=
+> @@ -203,19 +211,16 @@ static inline int deadline_check_fifo(struct deadli=
+ne_data *dd, int ddir)=0A=
+>   * dispatch using arrival ordered lists.=0A=
+>   */=0A=
+>  static struct request *=0A=
+> -deadline_fifo_request(struct deadline_data *dd, int data_dir)=0A=
+> +deadline_fifo_request(struct deadline_data *dd, enum dd_data_dir data_di=
+r)=0A=
+>  {=0A=
+>  	struct request *rq;=0A=
+>  	unsigned long flags;=0A=
+>  =0A=
+> -	if (WARN_ON_ONCE(data_dir !=3D READ && data_dir !=3D WRITE))=0A=
+> -		return NULL;=0A=
+> -=0A=
+>  	if (list_empty(&dd->fifo_list[data_dir]))=0A=
+>  		return NULL;=0A=
+>  =0A=
+>  	rq =3D rq_entry_fifo(dd->fifo_list[data_dir].next);=0A=
+> -	if (data_dir =3D=3D READ || !blk_queue_is_zoned(rq->q))=0A=
+> +	if (data_dir =3D=3D DD_READ || !blk_queue_is_zoned(rq->q))=0A=
+>  		return rq;=0A=
+>  =0A=
+>  	/*=0A=
+> @@ -223,7 +228,7 @@ deadline_fifo_request(struct deadline_data *dd, int d=
+ata_dir)=0A=
+>  	 * an unlocked target zone.=0A=
+>  	 */=0A=
+>  	spin_lock_irqsave(&dd->zone_lock, flags);=0A=
+> -	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {=0A=
+> +	list_for_each_entry(rq, &dd->fifo_list[DD_WRITE], queuelist) {=0A=
+>  		if (blk_req_can_dispatch_to_zone(rq))=0A=
+>  			goto out;=0A=
+>  	}=0A=
+> @@ -239,19 +244,16 @@ deadline_fifo_request(struct deadline_data *dd, int=
+ data_dir)=0A=
+>   * dispatch using sector position sorted lists.=0A=
+>   */=0A=
+>  static struct request *=0A=
+> -deadline_next_request(struct deadline_data *dd, int data_dir)=0A=
+> +deadline_next_request(struct deadline_data *dd, enum dd_data_dir data_di=
+r)=0A=
+>  {=0A=
+>  	struct request *rq;=0A=
+>  	unsigned long flags;=0A=
+>  =0A=
+> -	if (WARN_ON_ONCE(data_dir !=3D READ && data_dir !=3D WRITE))=0A=
+> -		return NULL;=0A=
+> -=0A=
+>  	rq =3D dd->next_rq[data_dir];=0A=
+>  	if (!rq)=0A=
+>  		return NULL;=0A=
+>  =0A=
+> -	if (data_dir =3D=3D READ || !blk_queue_is_zoned(rq->q))=0A=
+> +	if (data_dir =3D=3D DD_READ || !blk_queue_is_zoned(rq->q))=0A=
+>  		return rq;=0A=
+>  =0A=
+>  	/*=0A=
+> @@ -276,7 +278,7 @@ deadline_next_request(struct deadline_data *dd, int d=
+ata_dir)=0A=
+>  static struct request *__dd_dispatch_request(struct deadline_data *dd)=
+=0A=
+>  {=0A=
+>  	struct request *rq, *next_rq;=0A=
+> -	int data_dir;=0A=
+> +	enum dd_data_dir data_dir;=0A=
+>  =0A=
+>  	lockdep_assert_held(&dd->lock);=0A=
+>  =0A=
+> @@ -289,9 +291,9 @@ static struct request *__dd_dispatch_request(struct d=
+eadline_data *dd)=0A=
+>  	/*=0A=
+>  	 * batches are currently reads XOR writes=0A=
+>  	 */=0A=
+> -	rq =3D deadline_next_request(dd, WRITE);=0A=
+> +	rq =3D deadline_next_request(dd, DD_WRITE);=0A=
+>  	if (!rq)=0A=
+> -		rq =3D deadline_next_request(dd, READ);=0A=
+> +		rq =3D deadline_next_request(dd, DD_READ);=0A=
+>  =0A=
+>  	if (rq && dd->batching < dd->fifo_batch)=0A=
+>  		/* we have a next request are still entitled to batch */=0A=
+> @@ -302,14 +304,14 @@ static struct request *__dd_dispatch_request(struct=
+ deadline_data *dd)=0A=
+>  	 * data direction (read / write)=0A=
+>  	 */=0A=
+>  =0A=
+> -	if (!list_empty(&dd->fifo_list[READ])) {=0A=
+> -		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));=0A=
+> +	if (!list_empty(&dd->fifo_list[DD_READ])) {=0A=
+> +		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[DD_READ]));=0A=
+>  =0A=
+> -		if (deadline_fifo_request(dd, WRITE) &&=0A=
+> +		if (deadline_fifo_request(dd, DD_WRITE) &&=0A=
+>  		    (dd->starved++ >=3D dd->writes_starved))=0A=
+>  			goto dispatch_writes;=0A=
+>  =0A=
+> -		data_dir =3D READ;=0A=
+> +		data_dir =3D DD_READ;=0A=
+>  =0A=
+>  		goto dispatch_find_request;=0A=
+>  	}=0A=
+> @@ -318,13 +320,13 @@ static struct request *__dd_dispatch_request(struct=
+ deadline_data *dd)=0A=
+>  	 * there are either no reads or writes have been starved=0A=
+>  	 */=0A=
+>  =0A=
+> -	if (!list_empty(&dd->fifo_list[WRITE])) {=0A=
+> +	if (!list_empty(&dd->fifo_list[DD_WRITE])) {=0A=
+>  dispatch_writes:=0A=
+> -		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[WRITE]));=0A=
+> +		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[DD_WRITE]));=0A=
+>  =0A=
+>  		dd->starved =3D 0;=0A=
+>  =0A=
+> -		data_dir =3D WRITE;=0A=
+> +		data_dir =3D DD_WRITE;=0A=
+>  =0A=
+>  		goto dispatch_find_request;=0A=
+>  	}=0A=
+> @@ -399,8 +401,8 @@ static void dd_exit_sched(struct elevator_queue *e)=
+=0A=
 >  {=0A=
 >  	struct deadline_data *dd =3D e->elevator_data;=0A=
 >  =0A=
-> @@ -408,7 +408,7 @@ static void dd_exit_queue(struct elevator_queue *e)=
-=0A=
->  /*=0A=
->   * initialize elevator private data (deadline_data).=0A=
->   */=0A=
-> -static int dd_init_queue(struct request_queue *q, struct elevator_type *=
-e)=0A=
-> +static int dd_init_sched(struct request_queue *q, struct elevator_type *=
-e)=0A=
->  {=0A=
->  	struct deadline_data *dd;=0A=
->  	struct elevator_queue *eq;=0A=
-> @@ -800,8 +800,8 @@ static struct elevator_type mq_deadline =3D {=0A=
->  		.requests_merged	=3D dd_merged_requests,=0A=
->  		.request_merged		=3D dd_request_merged,=0A=
->  		.has_work		=3D dd_has_work,=0A=
-> -		.init_sched		=3D dd_init_queue,=0A=
-> -		.exit_sched		=3D dd_exit_queue,=0A=
-> +		.init_sched		=3D dd_init_sched,=0A=
-> +		.exit_sched		=3D dd_exit_sched,=0A=
->  	},=0A=
+> -	BUG_ON(!list_empty(&dd->fifo_list[READ]));=0A=
+> -	BUG_ON(!list_empty(&dd->fifo_list[WRITE]));=0A=
+> +	BUG_ON(!list_empty(&dd->fifo_list[DD_READ]));=0A=
+> +	BUG_ON(!list_empty(&dd->fifo_list[DD_WRITE]));=0A=
 >  =0A=
->  #ifdef CONFIG_BLK_DEBUG_FS=0A=
-> =0A=
+>  	kfree(dd);=0A=
+>  }=0A=
+> @@ -424,12 +426,12 @@ static int dd_init_sched(struct request_queue *q, s=
+truct elevator_type *e)=0A=
+>  	}=0A=
+>  	eq->elevator_data =3D dd;=0A=
+>  =0A=
+> -	INIT_LIST_HEAD(&dd->fifo_list[READ]);=0A=
+> -	INIT_LIST_HEAD(&dd->fifo_list[WRITE]);=0A=
+> -	dd->sort_list[READ] =3D RB_ROOT;=0A=
+> -	dd->sort_list[WRITE] =3D RB_ROOT;=0A=
+> -	dd->fifo_expire[READ] =3D read_expire;=0A=
+> -	dd->fifo_expire[WRITE] =3D write_expire;=0A=
+> +	INIT_LIST_HEAD(&dd->fifo_list[DD_READ]);=0A=
+> +	INIT_LIST_HEAD(&dd->fifo_list[DD_WRITE]);=0A=
+> +	dd->sort_list[DD_READ] =3D RB_ROOT;=0A=
+> +	dd->sort_list[DD_WRITE] =3D RB_ROOT;=0A=
+> +	dd->fifo_expire[DD_READ] =3D read_expire;=0A=
+> +	dd->fifo_expire[DD_WRITE] =3D write_expire;=0A=
+>  	dd->writes_starved =3D writes_starved;=0A=
+>  	dd->front_merges =3D 1;=0A=
+>  	dd->fifo_batch =3D fifo_batch;=0A=
+> @@ -497,7 +499,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *h=
+ctx, struct request *rq,=0A=
+>  {=0A=
+>  	struct request_queue *q =3D hctx->queue;=0A=
+>  	struct deadline_data *dd =3D q->elevator->elevator_data;=0A=
+> -	const int data_dir =3D rq_data_dir(rq);=0A=
+> +	const enum dd_data_dir data_dir =3D rq_data_dir(rq);>=0A=
+>  	lockdep_assert_held(&dd->lock);=0A=
+>  =0A=
+> @@ -585,7 +587,7 @@ static void dd_finish_request(struct request *rq)=0A=
+>  =0A=
+>  		spin_lock_irqsave(&dd->zone_lock, flags);=0A=
+>  		blk_req_zone_write_unlock(rq);=0A=
+> -		if (!list_empty(&dd->fifo_list[WRITE]))=0A=
+> +		if (!list_empty(&dd->fifo_list[DD_WRITE]))=0A=
+>  			blk_mq_sched_mark_restart_hctx(rq->mq_hctx);=0A=
+>  		spin_unlock_irqrestore(&dd->zone_lock, flags);=0A=
+>  	}=0A=
+> @@ -626,8 +628,8 @@ static ssize_t __FUNC(struct elevator_queue *e, char =
+*page)		\=0A=
+>  		__data =3D jiffies_to_msecs(__data);			\=0A=
+>  	return deadline_var_show(__data, (page));			\=0A=
+>  }=0A=
+> -SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[READ], 1);=0A=
+> -SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[WRITE], 1);=0A=
+> +SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[DD_READ], 1);=
 =0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+> +SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[DD_WRITE], 1);=
+=0A=
+>  SHOW_FUNCTION(deadline_writes_starved_show, dd->writes_starved, 0);=0A=
+>  SHOW_FUNCTION(deadline_front_merges_show, dd->front_merges, 0);=0A=
+>  SHOW_FUNCTION(deadline_fifo_batch_show, dd->fifo_batch, 0);=0A=
+> @@ -649,8 +651,8 @@ static ssize_t __FUNC(struct elevator_queue *e, const=
+ char *page, size_t count)=0A=
+>  		*(__PTR) =3D __data;					\=0A=
+>  	return count;							\=0A=
+>  }=0A=
+> -STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[READ], 0, IN=
+T_MAX, 1);=0A=
+> -STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[WRITE], 0, =
+INT_MAX, 1);=0A=
+> +STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[DD_READ], 0,=
+ INT_MAX, 1);=0A=
+> +STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], =
+0, INT_MAX, 1);=0A=
+>  STORE_FUNCTION(deadline_writes_starved_store, &dd->writes_starved, INT_M=
+IN, INT_MAX, 0);=0A=
+>  STORE_FUNCTION(deadline_front_merges_store, &dd->front_merges, 0, 1, 0);=
+=0A=
+>  STORE_FUNCTION(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX, 0=
+);=0A=
+> @@ -717,8 +719,8 @@ static int deadline_##name##_next_rq_show(void *data,=
+			\=0A=
+>  		__blk_mq_debugfs_rq_show(m, rq);			\=0A=
+>  	return 0;							\=0A=
+>  }=0A=
+> -DEADLINE_DEBUGFS_DDIR_ATTRS(READ, read)=0A=
+> -DEADLINE_DEBUGFS_DDIR_ATTRS(WRITE, write)=0A=
+> +DEADLINE_DEBUGFS_DDIR_ATTRS(DD_READ, read)=0A=
+> +DEADLINE_DEBUGFS_DDIR_ATTRS(DD_WRITE, write)=0A=
+>  #undef DEADLINE_DEBUGFS_DDIR_ATTRS=0A=
+>  =0A=
+>  static int deadline_batching_show(void *data, struct seq_file *m)=0A=
+> =0A=
 =0A=
 =0A=
 -- =0A=
