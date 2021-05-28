@@ -2,153 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBD9C4708D
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 16:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D060DC2B9F7
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 16:28:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A3EA613DA
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 16:04:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E1BC613E3
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 16:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236415AbhE1QGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 May 2021 12:06:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236267AbhE1QGG (ORCPT
+        id S236711AbhE1QaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 May 2021 12:30:21 -0400
+Received: from mail-pg1-f170.google.com ([209.85.215.170]:37821 "EHLO
+        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234880AbhE1QaV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 May 2021 12:06:06 -0400
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE819C061574;
-        Fri, 28 May 2021 09:04:31 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 8E5EB1280B1F;
-        Fri, 28 May 2021 09:04:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1622217871;
-        bh=BQsrHDhyxeGmu8aQeFMcjsCrAm3fi/y8UTQs0WsxccM=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=NTkbkb973Nd1bSKSs+DE/dfGQ75YMyIT095+n+UbtL9hHk6XHJfkjFHzoGxq3JJQ7
-         pXc928sZuDyZf/mk0NkH0hku+ThG6SXMBYJTL7mfR445yrF/nXw80OAPMY1S4dnoCK
-         /gbjoj7ea2iAD4fsCi9MCTRxc9w8L31sTh9/1FUo=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id CM7fZO3TGdez; Fri, 28 May 2021 09:04:31 -0700 (PDT)
-Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::527])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id CDA5D1280B06;
-        Fri, 28 May 2021 09:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1622217871;
-        bh=BQsrHDhyxeGmu8aQeFMcjsCrAm3fi/y8UTQs0WsxccM=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=NTkbkb973Nd1bSKSs+DE/dfGQ75YMyIT095+n+UbtL9hHk6XHJfkjFHzoGxq3JJQ7
-         pXc928sZuDyZf/mk0NkH0hku+ThG6SXMBYJTL7mfR445yrF/nXw80OAPMY1S4dnoCK
-         /gbjoj7ea2iAD4fsCi9MCTRxc9w8L31sTh9/1FUo=
-Message-ID: <df8c7c855279ff82e05e5142440149ae531a24e9.camel@HansenPartnership.com>
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, Greg KH <greg@kroah.com>,
-        Christoph Lameter <cl@gentwo.de>,
-        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
-        ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
-Date:   Fri, 28 May 2021 09:04:29 -0700
-In-Reply-To: <YLESaAP/Bu95ACvU@pendragon.ideasonboard.com>
-References: <YH2hs6EsPTpDAqXc@mit.edu>
-         <nycvar.YFH.7.76.2104281228350.18270@cbobk.fhfr.pm>
-         <YIx7R6tmcRRCl/az@mit.edu>
-         <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
-         <YK+esqGjKaPb+b/Q@kroah.com>
-         <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
-         <YLEIKk7IuWu6W4Sy@casper.infradead.org>
-         <a8bbc5dab99a4af6e89a9521a5eb4cb4747d2afe.camel@HansenPartnership.com>
-         <YLEM2WE0ezdrfMPt@pendragon.ideasonboard.com>
-         <15419fa8e5c0047327395387b28c09d775b35a55.camel@HansenPartnership.com>
-         <YLESaAP/Bu95ACvU@pendragon.ideasonboard.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        Fri, 28 May 2021 12:30:21 -0400
+Received: by mail-pg1-f170.google.com with SMTP id t193so2928643pgb.4
+        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 09:28:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=t+PzXrg39UDcIn84flOZlOx80R3VdZb8jorx3LvJRVM=;
+        b=OPeTndy8j/+eugJSUKmV1EhP69dRakEU3F8EHDqoqiNtAkSCIXi80sfmZ38LD8cBAS
+         gv8r/xBCsZBRLwGu5PCUjSMwt5ilI5uh5d9P7hKa0WRGcQBYot0nUfpBAdKDQm1UG3xC
+         znO/sdCpaxEykskpEPz1exSDc7DCPDjLya5VKY+yYCqHYr5SpQAODgdlZtBh9WpUmLp5
+         LPj6ObO/nln813hgvBq2esjGV1FykEtLxbvczqzkss3HQlyAyn1fVUlpXkTfjNKTYcOK
+         UOUvPuOw0SUl0CVBJBOFRlVfb+la0Rc2YyQuc+WzjijklrEAVpa+T/OYJFm7rPw0Hriv
+         Zxgg==
+X-Gm-Message-State: AOAM531r/9Ad4hanVjgM+EIJEBWXW3bopkRcBA91D1ickeCYHDBvRxOg
+        J+hMDPYeUmMx5LfrPQm44yst4i7VQTY=
+X-Google-Smtp-Source: ABdhPJzTbyyGwDqDRN6XkYXd7W9i4g0ZdxvNn1cgudLedAS2pVQgZGHrid9z4idwVrlLEUILd7ru+w==
+X-Received: by 2002:a65:424b:: with SMTP id d11mr9667259pgq.171.1622219325779;
+        Fri, 28 May 2021 09:28:45 -0700 (PDT)
+Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id u19sm4724642pfn.158.2021.05.28.09.28.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 May 2021 09:28:45 -0700 (PDT)
+Subject: Re: [PATCH 0/9] Improve I/O priority support
+To:     Wang Jianchao <jianchao.wan9@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Adam Manzanares <adam.manzanares@wdc.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+References: <20210527010134.32448-1-bvanassche@acm.org>
+ <b58840a8-0122-26cd-e756-92562064075a@gmail.com>
+ <ef81558a-cab2-ca2f-dba8-e032ecdb8154@gmail.com>
+ <22c245e9-469c-0a0f-ad31-455a33f1e073@acm.org>
+ <b3878299-ae9b-d03a-eaa8-b1890afcbfe2@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <feca5738-690c-3842-e5a8-998f0f5e3228@acm.org>
+Date:   Fri, 28 May 2021 09:28:43 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 MIME-Version: 1.0
+In-Reply-To: <b3878299-ae9b-d03a-eaa8-b1890afcbfe2@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2021-05-28 at 18:55 +0300, Laurent Pinchart wrote:
-> Hi James,
+On 5/27/21 7:05 PM, Wang Jianchao wrote:
+> Does it really matter that issue IO request by the order of io priority ?
 > 
-> On Fri, May 28, 2021 at 08:44:23AM -0700, James Bottomley wrote:
-> > On Fri, 2021-05-28 at 18:31 +0300, Laurent Pinchart wrote:
-> > > On Fri, May 28, 2021 at 08:27:44AM -0700, James Bottomley wrote:
-> > [...]
-> > > > Well, I'm not going to get into a debate over the effectiveness
-> > > > of the current vaccines.  I will say that all conferences have
-> > > > to now recognize that a sizeable proportion of former attendees
-> > > > will have fears about travelling and therefore remote
-> > > > components are going to be a fixture of conferences going
-> > > > forward.
-> > > > 
-> > > > However, while we should accommodate them, we can't let these
-> > > > fears override people willing to take the risk and meet in
-> > > > person.
-> > > 
-> > > The interesting question is how we'll make sure that those people
-> > > will not be de facto excluded from the community, or end up as
-> > > second-class citizens.
-> > 
-> > Before the pandemic, there was a small contingent who refused to
-> > fly for various reasons.  We did sort of accommodate that by
-> > rotating the conference to Europe where more people could come in
-> > by train (like they did in Lisbon) but we didn't govern the whole
-> > conference by trying to make aerophobes first class citizens.
-> > 
-> > The bottom line is that as long as enough people are willing to
-> > meet in person and in-person delivers more value that remote (even
-> > though we'll try to make remote as valuable as possible) we should
-> > do it.   We should not handicap the desires of the one group by the
-> > fears of the other because that's a false equality ... it's
-> > reducing everyone to the level of the lowest common denominator
-> > rather than trying to elevate people.
+> Given a device with a 32 depth queue and doesn't support io priority, even if
+> we issue the request by the order of io priority, will the fw of device handle
+> them by the same order ? Or in the other word, we always issue 32 io requests
+> to device one time and then the fw of device decides how to handle them.
+> The order of dispatching request from queue may only work when the device's
+> queue is full and we have a deeper queue in io scheduler. And at this moment,
+> maybe the user needs to check why their application saturates the block device.
 > 
-> This should take into account the size of each group, and I believe
-> even then it won't be a binary decision, there's lots of variation in
-> local situations, creating more than just two groups of
-> coward/careless people (let's not debate those two words if possible,
-> they're not meant to insult anyway, but to emphasize that there are
-> more categories). While I believe that in-person meetings will become
-> the norm again in a reasonably near future, 2021 seems a bit
-> premature to me.
+> As for the qos policy of io priority, it seems similar with wbt in which read,
+> sync write and background write have different priority. Since we always want
+> the io with higher priority to be served more by the device, adapting the depth
+> of queue of different io priority may work ;)
 
-Well, this is why Plumbers and Kernel Summit are fully virtual for this
-year, so you won't miss any content.  The idea of meetups is just to
-test the water for restarting the social side.  In 2021 it's
-necessarily going to be governed by which country is on which other
-country's friends list, but hopefully that won't be the case in 2022.
+Hi Jianchao,
 
-> If we want to brainstorm alternate solutions, an option could be to
-> split the monolithic conference location into a small set of
-> geographically distributed groups (assuming local travel would be
-> easier and generally seen as an accepted solution compared to
-> intercontinental travels) and link those through video conferencing.
-> I don't have high hopes that this would be feasible in practice given
-> the increase in efforts and costs to organize multiple locations in
-> parallel, but maybe something interesting could come out of
-> discussing different options.
+Our conclusion from the extensive measurements we ran is that we cannot
+reach our latency goals for high-priority I/O without I/O priority
+support in the storage device. This is why we are working with device
+vendors on implementing I/O priority support in the storage devices that
+matter to us.
 
-Remember, remote isn't always the best solution either.  We got
-complaints last year that we were disadvantaging people without high
-speed internet by using video (i.e. large swathes of Africa and Asia). 
-In a physical conference we can try to counteract this disadvantage by
-offering attendance sponsorship, but I can't sponsor a fibre connection
-on a continental scale.  I think we need to feel our way here, and
-trying out meetups for size (which are traditionally more
-geographically local) could be one way to do this.
+Thanks,
 
-James
-
+Bart.
 
