@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2026EC47087
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D755C47087
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03D1B6128B
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:29:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2021C60E0B
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234405AbhE1JbO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 May 2021 05:31:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50498 "EHLO
+        id S235818AbhE1JfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 May 2021 05:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234226AbhE1JbO (ORCPT
+        with ESMTP id S235526AbhE1JfC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 May 2021 05:31:14 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D179C061574
-        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 02:29:39 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id n2so2677934wrm.0
-        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 02:29:39 -0700 (PDT)
+        Fri, 28 May 2021 05:35:02 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF57C061763
+        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 02:33:27 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id f17so317443wmf.2
+        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 02:33:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=y1vlYKDI+52vWzlMTTJWQDk0AsKqpUApam7hveS8Lyk=;
-        b=tUE4UA6dvxVW4EiZpUjZmbv16HoA255mc5TODbgGRoPHd69srCYk+9yQu6sU1bUivA
-         jUhB0Z7g1PsgLGkjzJbRB+f6xG8mGuJXLXUfEaZp0RR4R7zYMUxzmLS8soTlaEGBkQh+
-         zJmbdHk0tq36SM+Of80pRWzWexQE+Z7owU6dC2H2dHMxqbUj7xuCFN7F2ArT6Qxqa03y
-         7EgIB023x9m9GnkTQ5ojLUAChUS0g5dEO5o0YV0ELlix/B5GoUam6i/AOsCbLtfUZPSy
-         tCO0cOV2Ujxvqi797/SJrA/K/WE4igmE8PX36+mIVmB5IuHlwT1NNxln+mLT1XOruThL
-         T8kw==
+        bh=qI80K2AH8M5E/gOyv0r5yZj6mzImIecz2Ms4kDGaT8A=;
+        b=Ik/OYOKag/YpJjx2cFGQCiYvGzM1Y4AwB0GGozbD5L7hOaLFcnhaJ1AQUvloFQwKc/
+         30IHDYI5JDCjUy9cpS4JIpkTzYJ7HD+mJh8WHz5Ai8TDRX7M7NbQ43IHtfnl49PvHiqI
+         k/9kDf59Xcv0rysxcRH1A4siIf80uLB+HB7Xc6X+qg3oV4suOvYxfJI1Zx4Hmfa73UvU
+         YugRrdwzDuzJ2E2N2RHEnlDgCl3lF//Y7BPuHnBcESB96wCmCWGa/CakYZsYOZYMYkFq
+         KkTnos8sQz2N+Hiw7Xjzc/hEzyo49GmotmU9N1SvCZCqpiIQgpo8uclbwJAIEyz2kJ/N
+         Aydw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=y1vlYKDI+52vWzlMTTJWQDk0AsKqpUApam7hveS8Lyk=;
-        b=mv1xb1MFZ2VIu6aNKgXmRsLmiICMjLST3W8WWN0RTH+b2yo/F5+jp9Y1bfhI5Uixw+
-         isuTuw8q4U4cf854ZhCc49nsW3vQDZSzY8yB9twDBrkDoXvkmlBY2UeIzjr3k5j8g9am
-         UDM/PjQdKkN0BZ9FCetp14kaqfolJIbL7ftKC9eWK+jYUQ2j31ik//FL0Ekwea68ZKsX
-         JVQKjYOsy5Ta2POKrUeTTy+CQL6lrmCX+TDotlSXetPEvW1sPo0uRqHha8mowbuup1uo
-         o5d6s0um0NK0YYH06IW0ebfYmD/74sIbLviCc1H065PHGZJUE6g1BuZEkUgvkUDtKYGL
-         h2ZQ==
-X-Gm-Message-State: AOAM531t44Sj1xZNxM/dZRAKHqG0OYLi37WvF/OPE6ftdc5P3yeV6LEM
-        oiGa0tX/W1OdUJRUwtv1Qen1vw==
-X-Google-Smtp-Source: ABdhPJy19tTJew3kMK4hGuiv98gi4h/Dq9biHzYMzkKyWIpbDbtGlmtRHhyjh91kAubZoxyqUt2JjA==
-X-Received: by 2002:a5d:4a4f:: with SMTP id v15mr7907301wrs.154.1622194177914;
-        Fri, 28 May 2021 02:29:37 -0700 (PDT)
+        bh=qI80K2AH8M5E/gOyv0r5yZj6mzImIecz2Ms4kDGaT8A=;
+        b=AC0Pk2QtWq6WhJqEQ6sUdI7hGgDvh00BOAzADS7FgtwvHXl0EI2uJ9X8UcxhAnXhTd
+         Y2GfC/bwTxqrJA0kRdu3/sFwjY90kPwVqaX8H6eqc6T+1I6LmnLnW+npby77Nab/84DR
+         oUpbXfB9M9AuwRW3qxxzJFzlvDV9McbnqThnNy47Vwt9xXiYsgZ7Om58YiyVCqppAyE6
+         q4JdvGTZFdkIxBfIcaFzQZZKDr/3PcRYlD5ROEdf1fo8aZdysqvZLscs8vk/HxtXsl5i
+         MXaDXcD9KU9iH6vpDlxDp0RJPXMbXMPDLAx8d5W2C7BO7TRqKUSC8KDnz1zIe/Ii8ovp
+         t5UQ==
+X-Gm-Message-State: AOAM531JCWVjDqr+b/9ae1327rAAZg06RNKxlb7UnqSdwFZKoE1CiOTs
+        eYXJo61v7cO3B5PsTTwzcFqpkCDpOlTWUrFN
+X-Google-Smtp-Source: ABdhPJwerCzAC+wR1QZgMHbO5S2LtLNISwhmdWZgyRpIlN7Ne/3P4p7WG+oPLvM9t2IeOPag7fiiKQ==
+X-Received: by 2002:a7b:cc10:: with SMTP id f16mr7773809wmh.24.1622194406243;
+        Fri, 28 May 2021 02:33:26 -0700 (PDT)
 Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id p5sm7643538wrd.25.2021.05.28.02.29.37
+        by smtp.gmail.com with ESMTPSA id t14sm6372356wra.60.2021.05.28.02.33.24
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 May 2021 02:29:37 -0700 (PDT)
+        Fri, 28 May 2021 02:33:25 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 1/2] bfq: Remove merged request already in
- bfq_requests_merged()
+Subject: Re: [PATCH 2/2] blk: Fix lock inversion between ioc lock and bfqd
+ lock
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20210524100416.3578-2-jack@suse.cz>
-Date:   Fri, 28 May 2021 11:29:36 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
+In-Reply-To: <20210524100416.3578-3-jack@suse.cz>
+Date:   Fri, 28 May 2021 11:33:24 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Khazhy Kumykov <khazhy@google.com>,
         Ming Lei <ming.lei@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <36A5F676-7720-400A-8127-CECF54FFA587@linaro.org>
+Message-Id: <5C330252-E3D5-4274-B377-39FF6DBBD9C2@linaro.org>
 References: <20210524100416.3578-1-jack@suse.cz>
- <20210524100416.3578-2-jack@suse.cz>
+ <20210524100416.3578-3-jack@suse.cz>
 To:     Jan Kara <jack@suse.cz>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
@@ -83,117 +82,305 @@ X-Mailing-List: linux-block@vger.kernel.org
 > Il giorno 24 mag 2021, alle ore 12:04, Jan Kara <jack@suse.cz> ha =
 scritto:
 >=20
-> Currently, bfq does very little in bfq_requests_merged() and handles =
-all
-> the request cleanup in bfq_finish_requeue_request() called from
-> blk_mq_free_request(). That is currently safe only because
-> blk_mq_free_request() is called shortly after bfq_requests_merged()
-> while bfqd->lock is still held. However to fix a lock inversion =
-between
-> bfqd->lock and ioc->lock, we need to call blk_mq_free_request() after
-> dropping bfqd->lock. That would mean that already merged request could
-> be seen by other processes inside bfq queues and possibly dispatched =
-to
-> the device which is wrong. So move cleanup of the request from
-> bfq_finish_requeue_request() to bfq_requests_merged().
+> Lockdep complains about lock inversion between ioc->lock and =
+bfqd->lock:
+>=20
+> bfqd -> ioc:
+> put_io_context+0x33/0x90 -> ioc->lock grabbed
+> blk_mq_free_request+0x51/0x140
+> blk_put_request+0xe/0x10
+> blk_attempt_req_merge+0x1d/0x30
+> elv_attempt_insert_merge+0x56/0xa0
+> blk_mq_sched_try_insert_merge+0x4b/0x60
+> bfq_insert_requests+0x9e/0x18c0 -> bfqd->lock grabbed
+> blk_mq_sched_insert_requests+0xd6/0x2b0
+> blk_mq_flush_plug_list+0x154/0x280
+> blk_finish_plug+0x40/0x60
+> ext4_writepages+0x696/0x1320
+> do_writepages+0x1c/0x80
+> __filemap_fdatawrite_range+0xd7/0x120
+> sync_file_range+0xac/0xf0
+>=20
+> ioc->bfqd:
+> bfq_exit_icq+0xa3/0xe0 -> bfqd->lock grabbed
+> put_io_context_active+0x78/0xb0 -> ioc->lock grabbed
+> exit_io_context+0x48/0x50
+> do_exit+0x7e9/0xdd0
+> do_group_exit+0x54/0xc0
+>=20
+> To avoid this inversion we change blk_mq_sched_try_insert_merge() to =
+not
+> free the merged request but rather leave that upto the caller =
+similarly
+> to blk_mq_sched_try_merge(). And in bfq_insert_requests() we make sure
+> to free all the merged requests after dropping bfqd->lock.
 >=20
 
-I didn't even remember any longer why I had to handle that deferred
-removal in bfq_finish_requeue_request() :)
-
-Your solution seems very clean to me.
-
+I see you added a (short) loop. Apart from that,
 Acked-by: Paolo Valente <paolo.valente@linaro.org>
 
+Thanks,
+Paolo
+
+> Fixes: aee69d78dec0 ("block, bfq: introduce the BFQ-v0 I/O scheduler =
+as an extra scheduler")
 > Signed-off-by: Jan Kara <jack@suse.cz>
 > ---
-> block/bfq-iosched.c | 41 +++++++++++++----------------------------
-> 1 file changed, 13 insertions(+), 28 deletions(-)
+> block/bfq-iosched.c      |  6 ++++--
+> block/blk-merge.c        | 19 ++++++++-----------
+> block/blk-mq-sched.c     |  5 +++--
+> block/blk-mq-sched.h     |  3 ++-
+> block/blk-mq.h           | 11 +++++++++++
+> block/blk.h              |  2 +-
+> block/elevator.c         | 11 ++++++++---
+> block/mq-deadline.c      |  5 ++++-
+> include/linux/elevator.h |  3 ++-
+> 9 files changed, 43 insertions(+), 22 deletions(-)
 >=20
 > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index acd1f881273e..50a29fdf51da 100644
+> index 50a29fdf51da..5e076396b588 100644
 > --- a/block/bfq-iosched.c
 > +++ b/block/bfq-iosched.c
-> @@ -2405,7 +2405,7 @@ static void bfq_requests_merged(struct =
-request_queue *q, struct request *rq,
-> 		*next_bfqq =3D bfq_init_rq(next);
+> @@ -2317,9 +2317,9 @@ static bool bfq_bio_merge(struct request_queue =
+*q, struct bio *bio,
 >=20
-> 	if (!bfqq)
-> -		return;
-> +		goto remove;
+> 	ret =3D blk_mq_sched_try_merge(q, bio, nr_segs, &free);
 >=20
-> 	/*
-> 	 * If next and rq belong to the same bfq_queue and next is older
-> @@ -2428,6 +2428,14 @@ static void bfq_requests_merged(struct =
-request_queue *q, struct request *rq,
-> 		bfqq->next_rq =3D rq;
+> +	spin_unlock_irq(&bfqd->lock);
+> 	if (free)
+> 		blk_mq_free_request(free);
+> -	spin_unlock_irq(&bfqd->lock);
 >=20
-> 	bfqg_stats_update_io_merged(bfqq_group(bfqq), next->cmd_flags);
-> +remove:
-> +	/* Merged request may be in the IO scheduler. Remove it. */
-> +	if (!RB_EMPTY_NODE(&next->rb_node)) {
-> +		bfq_remove_request(next->q, next);
-> +		if (next_bfqq)
-> +			=
-bfqg_stats_update_io_remove(bfqq_group(next_bfqq),
-> +						    next->cmd_flags);
-> +	}
+> 	return ret;
+> }
+> @@ -5933,14 +5933,16 @@ static void bfq_insert_request(struct =
+blk_mq_hw_ctx *hctx, struct request *rq,
+> 	struct bfq_queue *bfqq;
+> 	bool idle_timer_disabled =3D false;
+> 	unsigned int cmd_flags;
+> +	LIST_HEAD(free);
+>=20
+> #ifdef CONFIG_BFQ_GROUP_IOSCHED
+> 	if (!cgroup_subsys_on_dfl(io_cgrp_subsys) && rq->bio)
+> 		bfqg_stats_update_legacy_io(q, rq);
+> #endif
+> 	spin_lock_irq(&bfqd->lock);
+> -	if (blk_mq_sched_try_insert_merge(q, rq)) {
+> +	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
+> 		spin_unlock_irq(&bfqd->lock);
+> +		blk_mq_free_requests(&free);
+> 		return;
+> 	}
+>=20
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 4d97fb6dd226..1398b52a24b4 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -846,18 +846,15 @@ static struct request =
+*attempt_front_merge(struct request_queue *q,
+> 	return NULL;
 > }
 >=20
-> /* Must be called with bfqq !=3D NULL */
-> @@ -6376,6 +6384,7 @@ static void bfq_finish_requeue_request(struct =
-request *rq)
+> -int blk_attempt_req_merge(struct request_queue *q, struct request =
+*rq,
+> -			  struct request *next)
+> +/*
+> + * Try to merge 'next' into 'rq'. Return true if the merge happened, =
+false
+> + * otherwise. The caller is responsible for freeing 'next' if the =
+merge
+> + * happened.
+> + */
+> +bool blk_attempt_req_merge(struct request_queue *q, struct request =
+*rq,
+> +			   struct request *next)
 > {
-> 	struct bfq_queue *bfqq =3D RQ_BFQQ(rq);
-> 	struct bfq_data *bfqd;
-> +	unsigned long flags;
+> -	struct request *free;
+> -
+> -	free =3D attempt_merge(q, rq, next);
+> -	if (free) {
+> -		blk_put_request(free);
+> -		return 1;
+> -	}
+> -
+> -	return 0;
+> +	return attempt_merge(q, rq, next);
+> }
 >=20
-> 	/*
-> 	 * rq either is not associated with any icq, or is an already
-> @@ -6393,39 +6402,15 @@ static void bfq_finish_requeue_request(struct =
+> bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 714e678f516a..bf0a3dec8226 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -400,9 +400,10 @@ bool __blk_mq_sched_bio_merge(struct =
+request_queue *q, struct bio *bio,
+> 	return ret;
+> }
+>=20
+> -bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
 request *rq)
-> 					     rq->io_start_time_ns,
-> 					     rq->cmd_flags);
+> +bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
+request *rq,
+> +				   struct list_head *free)
+> {
+> -	return rq_mergeable(rq) && elv_attempt_insert_merge(q, rq);
+> +	return rq_mergeable(rq) && elv_attempt_insert_merge(q, rq, =
+free);
+> }
+> EXPORT_SYMBOL_GPL(blk_mq_sched_try_insert_merge);
 >=20
-> +	spin_lock_irqsave(&bfqd->lock, flags);
-> 	if (likely(rq->rq_flags & RQF_STARTED)) {
-> -		unsigned long flags;
-> -
-> -		spin_lock_irqsave(&bfqd->lock, flags);
-> -
-> 		if (rq =3D=3D bfqd->waited_rq)
-> 			bfq_update_inject_limit(bfqd, bfqq);
+> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+> index 5b18ab915c65..8b70de4b8d23 100644
+> --- a/block/blk-mq-sched.h
+> +++ b/block/blk-mq-sched.h
+> @@ -11,7 +11,8 @@ bool blk_mq_sched_try_merge(struct request_queue *q, =
+struct bio *bio,
+> 		unsigned int nr_segs, struct request **merged_request);
+> bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio =
+*bio,
+> 		unsigned int nr_segs);
+> -bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
+request *rq);
+> +bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
+request *rq,
+> +				   struct list_head *free);
+> void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx);
+> void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
 >=20
-> 		bfq_completed_request(bfqq, bfqd);
-> -		bfq_finish_requeue_request_body(bfqq);
-> -
-> -		spin_unlock_irqrestore(&bfqd->lock, flags);
-> -	} else {
-> -		/*
-> -		 * Request rq may be still/already in the scheduler,
-> -		 * in which case we need to remove it (this should
-> -		 * never happen in case of requeue). And we cannot
-> -		 * defer such a check and removal, to avoid
-> -		 * inconsistencies in the time interval from the end
-> -		 * of this function to the start of the deferred work.
-> -		 * This situation seems to occur only in process
-> -		 * context, as a consequence of a merge. In the
-> -		 * current version of the code, this implies that the
-> -		 * lock is held.
-> -		 */
-> -
-> -		if (!RB_EMPTY_NODE(&rq->rb_node)) {
-> -			bfq_remove_request(rq->q, rq);
-> -			bfqg_stats_update_io_remove(bfqq_group(bfqq),
-> -						    rq->cmd_flags);
-> -		}
-> -		bfq_finish_requeue_request_body(bfqq);
-> 	}
-> +	bfq_finish_requeue_request_body(bfqq);
-> +	spin_unlock_irqrestore(&bfqd->lock, flags);
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 81a775171be7..20ef743a3ff6 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -301,6 +301,17 @@ static inline struct blk_plug *blk_mq_plug(struct =
+request_queue *q,
+> 	return NULL;
+> }
+>=20
+> +/* Free all requests on the list */
+> +static inline void blk_mq_free_requests(struct list_head *list)
+> +{
+> +	while (!list_empty(list)) {
+> +		struct request *rq =3D list_entry_rq(list->next);
+> +
+> +		list_del_init(&rq->queuelist);
+> +		blk_mq_free_request(rq);
+> +	}
+> +}
+> +
+> /*
+>  * For shared tag users, we track the number of currently active users
+>  * and attempt to provide a fair share of the tag depth for each of =
+them.
+> diff --git a/block/blk.h b/block/blk.h
+> index 8b3591aee0a5..99ef4f7e7a70 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -225,7 +225,7 @@ ssize_t part_timeout_store(struct device *, struct =
+device_attribute *,
+> void __blk_queue_split(struct bio **bio, unsigned int *nr_segs);
+> int ll_back_merge_fn(struct request *req, struct bio *bio,
+> 		unsigned int nr_segs);
+> -int blk_attempt_req_merge(struct request_queue *q, struct request =
+*rq,
+> +bool blk_attempt_req_merge(struct request_queue *q, struct request =
+*rq,
+> 				struct request *next);
+> unsigned int blk_recalc_rq_segments(struct request *rq);
+> void blk_rq_set_mixed_merge(struct request *rq);
+> diff --git a/block/elevator.c b/block/elevator.c
+> index 440699c28119..62e9c672da7c 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -350,9 +350,11 @@ enum elv_merge elv_merge(struct request_queue *q, =
+struct request **req,
+>  * we can append 'rq' to an existing request, so we can throw 'rq' =
+away
+>  * afterwards.
+>  *
+> - * Returns true if we merged, false otherwise
+> + * Returns true if we merged, false otherwise. 'free' will contain =
+all
+> + * requests that need to be freed.
+>  */
+> -bool elv_attempt_insert_merge(struct request_queue *q, struct request =
+*rq)
+> +bool elv_attempt_insert_merge(struct request_queue *q, struct request =
+*rq,
+> +			      struct list_head *free)
+> {
+> 	struct request *__rq;
+> 	bool ret;
+> @@ -363,8 +365,10 @@ bool elv_attempt_insert_merge(struct =
+request_queue *q, struct request *rq)
+> 	/*
+> 	 * First try one-hit cache.
+> 	 */
+> -	if (q->last_merge && blk_attempt_req_merge(q, q->last_merge, =
+rq))
+> +	if (q->last_merge && blk_attempt_req_merge(q, q->last_merge, =
+rq)) {
+> +		list_add(&rq->queuelist, free);
+> 		return true;
+> +	}
+>=20
+> 	if (blk_queue_noxmerges(q))
+> 		return false;
+> @@ -378,6 +382,7 @@ bool elv_attempt_insert_merge(struct request_queue =
+*q, struct request *rq)
+> 		if (!__rq || !blk_attempt_req_merge(q, __rq, rq))
+> 			break;
+>=20
+> +		list_add(&rq->queuelist, free);
+> 		/* The merged request could be merged with others, try =
+again */
+> 		ret =3D true;
+> 		rq =3D __rq;
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index 8eea2cbf2bf4..7136262819f1 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -487,6 +487,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx =
+*hctx, struct request *rq,
+> 	struct request_queue *q =3D hctx->queue;
+> 	struct deadline_data *dd =3D q->elevator->elevator_data;
+> 	const int data_dir =3D rq_data_dir(rq);
+> +	LIST_HEAD(free);
 >=20
 > 	/*
-> 	 * Reset private fields. In case of a requeue, this allows
+> 	 * This may be a requeue of a write request that has locked its
+> @@ -494,8 +495,10 @@ static void dd_insert_request(struct =
+blk_mq_hw_ctx *hctx, struct request *rq,
+> 	 */
+> 	blk_req_zone_write_unlock(rq);
+>=20
+> -	if (blk_mq_sched_try_insert_merge(q, rq))
+> +	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
+> +		blk_mq_free_requests(&free);
+> 		return;
+> +	}
+>=20
+> 	trace_block_rq_insert(rq);
+>=20
+> diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+> index dcb2f9022c1d..1a5965174f5b 100644
+> --- a/include/linux/elevator.h
+> +++ b/include/linux/elevator.h
+> @@ -117,7 +117,8 @@ extern void elv_merge_requests(struct =
+request_queue *, struct request *,
+> 			       struct request *);
+> extern void elv_merged_request(struct request_queue *, struct request =
+*,
+> 		enum elv_merge);
+> -extern bool elv_attempt_insert_merge(struct request_queue *, struct =
+request *);
+> +extern bool elv_attempt_insert_merge(struct request_queue *, struct =
+request *,
+> +				     struct list_head *);
+> extern struct request *elv_former_request(struct request_queue *, =
+struct request *);
+> extern struct request *elv_latter_request(struct request_queue *, =
+struct request *);
+>=20
 > --=20
 > 2.26.2
 >=20
