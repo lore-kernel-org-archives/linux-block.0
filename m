@@ -2,386 +2,237 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D755C47087
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E1E1C4708C
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:57:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2021C60E0B
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4ADD761090
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 09:57:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235818AbhE1JfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 May 2021 05:35:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51350 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235526AbhE1JfC (ORCPT
+        id S229774AbhE1J72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 May 2021 05:59:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29012 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235845AbhE1J72 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 May 2021 05:35:02 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF57C061763
-        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 02:33:27 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id f17so317443wmf.2
-        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 02:33:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=qI80K2AH8M5E/gOyv0r5yZj6mzImIecz2Ms4kDGaT8A=;
-        b=Ik/OYOKag/YpJjx2cFGQCiYvGzM1Y4AwB0GGozbD5L7hOaLFcnhaJ1AQUvloFQwKc/
-         30IHDYI5JDCjUy9cpS4JIpkTzYJ7HD+mJh8WHz5Ai8TDRX7M7NbQ43IHtfnl49PvHiqI
-         k/9kDf59Xcv0rysxcRH1A4siIf80uLB+HB7Xc6X+qg3oV4suOvYxfJI1Zx4Hmfa73UvU
-         YugRrdwzDuzJ2E2N2RHEnlDgCl3lF//Y7BPuHnBcESB96wCmCWGa/CakYZsYOZYMYkFq
-         KkTnos8sQz2N+Hiw7Xjzc/hEzyo49GmotmU9N1SvCZCqpiIQgpo8uclbwJAIEyz2kJ/N
-         Aydw==
+        Fri, 28 May 2021 05:59:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622195873;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6B0Ptc4WeqZD1WTpaHtitViZ5JdLWn36Ce4r1GKbJMc=;
+        b=IUhjdR2SCcSy6r2DiOqsFz5CwpNetof4O7LDD98tNaHU7gaPluxzP5esSdgtmhFEbZXnhh
+        Yd4nMitRTDaZxJWEi2oR35sIblhJVpM1WtW6FKnf8ldEiKEzZ+HEHIQBCBFWfn0T5CGyUX
+        eIXtIgy84ZWzb/RJDOnzLsl0Dmxov0E=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-_xPl8zg_OlqHVWzdWUNYlg-1; Fri, 28 May 2021 05:57:51 -0400
+X-MC-Unique: _xPl8zg_OlqHVWzdWUNYlg-1
+Received: by mail-yb1-f198.google.com with SMTP id x187-20020a25e0c40000b029052a5f0bf9acso3900541ybg.1
+        for <linux-block@vger.kernel.org>; Fri, 28 May 2021 02:57:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=qI80K2AH8M5E/gOyv0r5yZj6mzImIecz2Ms4kDGaT8A=;
-        b=AC0Pk2QtWq6WhJqEQ6sUdI7hGgDvh00BOAzADS7FgtwvHXl0EI2uJ9X8UcxhAnXhTd
-         Y2GfC/bwTxqrJA0kRdu3/sFwjY90kPwVqaX8H6eqc6T+1I6LmnLnW+npby77Nab/84DR
-         oUpbXfB9M9AuwRW3qxxzJFzlvDV9McbnqThnNy47Vwt9xXiYsgZ7Om58YiyVCqppAyE6
-         q4JdvGTZFdkIxBfIcaFzQZZKDr/3PcRYlD5ROEdf1fo8aZdysqvZLscs8vk/HxtXsl5i
-         MXaDXcD9KU9iH6vpDlxDp0RJPXMbXMPDLAx8d5W2C7BO7TRqKUSC8KDnz1zIe/Ii8ovp
-         t5UQ==
-X-Gm-Message-State: AOAM531JCWVjDqr+b/9ae1327rAAZg06RNKxlb7UnqSdwFZKoE1CiOTs
-        eYXJo61v7cO3B5PsTTwzcFqpkCDpOlTWUrFN
-X-Google-Smtp-Source: ABdhPJwerCzAC+wR1QZgMHbO5S2LtLNISwhmdWZgyRpIlN7Ne/3P4p7WG+oPLvM9t2IeOPag7fiiKQ==
-X-Received: by 2002:a7b:cc10:: with SMTP id f16mr7773809wmh.24.1622194406243;
-        Fri, 28 May 2021 02:33:26 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id t14sm6372356wra.60.2021.05.28.02.33.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 May 2021 02:33:25 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 2/2] blk: Fix lock inversion between ioc lock and bfqd
- lock
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20210524100416.3578-3-jack@suse.cz>
-Date:   Fri, 28 May 2021 11:33:24 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Khazhy Kumykov <khazhy@google.com>,
-        Ming Lei <ming.lei@redhat.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=6B0Ptc4WeqZD1WTpaHtitViZ5JdLWn36Ce4r1GKbJMc=;
+        b=iavn3J4htaQW+KlrySOmW7HJP0j2yYVeRVoNbOQekprlyy6df0lDHClI4CHzt0icX/
+         LpVbzj6+OcnQRl3kz8agKO3Zs7SYReo+ASm0kEFBi6Ac3tNSUjdsDZyQtO+0sT+RtAaM
+         Rmv1vw8gbhui9lwflmKmoQQu2mAc+Gr/oz4hcE8EzXYMlWHcTQSWnL+Uho0Lxbqd2Cyh
+         lZdkz1XO057XedcTUMPph8iD/pMsy0iLwViiZUfQJ92Fj39BTZGrwPRKFwbxVuoD0u6l
+         VpI6o4gjVPtuVMB071iBiaeg6t4PU0G3V1unVTDLDg43+6VbwDHCJ1imH8uoTWXvQp5u
+         VZxA==
+X-Gm-Message-State: AOAM530TQnZJu8H1Lm3yInzf/QewPXhk0o+7HxtnxcuhphTN4K7Vp6dU
+        Ts2PpnTHoqdIDCS7D1+nGcaXAxKLHIX5q/XGxGju/6imNnsggw0d/0gfKhHLvC9ym7egVHk37Ee
+        WJTTQcnCx4uYOiPLYfihAuTyprX3iobNZSVnk9es=
+X-Received: by 2002:a25:2c0b:: with SMTP id s11mr10923007ybs.205.1622195870981;
+        Fri, 28 May 2021 02:57:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyVKciuorwvYQtSdtWhPPE76tJF70Yp1Uv4XTnum52VaSXN1o3igXE1DsivFE0PV6znjIg6XHlvLxkBWyZS8ls=
+X-Received: by 2002:a25:2c0b:: with SMTP id s11mr10922984ybs.205.1622195870671;
+ Fri, 28 May 2021 02:57:50 -0700 (PDT)
+MIME-Version: 1.0
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Fri, 28 May 2021 17:57:39 +0800
+Message-ID: <CAHj4cs-NPs=xC6Q05M8Uf5K1v4GEUOY5e0=+PY4dQu+EstPJ3g@mail.gmail.com>
+Subject: [bug report][regression] device node still exists after blktests
+ nvme/011 finished
+To:     linux-block <linux-block@vger.kernel.org>,
+        linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <5C330252-E3D5-4274-B377-39FF6DBBD9C2@linaro.org>
-References: <20210524100416.3578-1-jack@suse.cz>
- <20210524100416.3578-3-jack@suse.cz>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi
+I would like to report one regression issue we found recently, after
+blktests nvme/011 finished, the device node still exists and seems
+there is a lock issue from the log, let me know if you need any
+testing for it, thanks.
+
+# ./check nvme/011
+nvme/011 (run data verification fio job on NVMeOF file-backed ns) [passed]
+    runtime  71.350s  ...  77.131s
+# lsblk
+NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda       8:0    0 465.8G  0 disk
+=E2=94=9C=E2=94=80sda1    8:1    0     1G  0 part /boot
+=E2=94=9C=E2=94=80sda2    8:2    0  31.5G  0 part [SWAP]
+=E2=94=9C=E2=94=80sda3    8:3    0    15G  0 part
+=E2=94=9C=E2=94=80sda4    8:4    0     1K  0 part
+=E2=94=9C=E2=94=80sda5    8:5    0    15G  0 part
+=E2=94=9C=E2=94=80sda6    8:6    0     5G  0 part
+=E2=94=94=E2=94=80sda7    8:7    0 398.3G  0 part /
+zram0   253:0    0     4G  0 disk [SWAP]
+nvme0n1 259:1    0     1G  0 disk
+
+#dmesg
+[  793.719149] run blktests nvme/011 at 2021-05-28 05:45:49
+[  793.899062] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+[  793.950783] nvmet: creating controller 1 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:d39240f497c64fc8bf7ca767d256a394.
+[  793.964271] nvme nvme0: creating 48 I/O queues.
+[  793.973187] nvme nvme0: new ctrl: "blktests-subsystem-1"
+[  863.401172] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
+[  863.656534] block nvme0n1: no available path - failing I/O
+[  863.662039] block nvme0n1: no available path - failing I/O
+[  863.667546] block nvme0n1: no available path - failing I/O
+[  863.673029] block nvme0n1: no available path - failing I/O
+[  863.678530] block nvme0n1: no available path - failing I/O
+[  863.684032] block nvme0n1: no available path - failing I/O
+[  863.689523] block nvme0n1: no available path - failing I/O
+[  863.695014] block nvme0n1: no available path - failing I/O
+[  863.700502] block nvme0n1: no available path - failing I/O
+[  863.705994] Buffer I/O error on dev nvme0n1, logical block 262016,
+async page read
+[ 1108.488647] INFO: task systemd-udevd:2400 blocked for more than 122 seco=
+nds.
+[ 1108.495699]       Not tainted 5.13.0-rc3+ #8
+[ 1108.499972] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[ 1108.507797] task:systemd-udevd   state:D stack:    0 pid: 2400
+ppid:  1134 flags:0x00004004
+[ 1108.516140] Call Trace:
+[ 1108.518589]  __schedule+0x247/0x6f0
+[ 1108.522088]  schedule+0x46/0xb0
+[ 1108.525233]  schedule_preempt_disabled+0xa/0x10
+[ 1108.529767]  __mutex_lock.constprop.0+0x2a4/0x470
+[ 1108.534472]  ? __kernfs_remove.part.0+0x174/0x1f0
+[ 1108.539178]  ? kernfs_remove_by_name_ns+0x5c/0x90
+[ 1108.543885]  del_gendisk+0x99/0x230
+[ 1108.547378]  nvme_mpath_remove_disk+0x97/0xb0 [nvme_core]
+[ 1108.552787]  nvme_put_ns_head+0x2a/0xb0 [nvme_core]
+[ 1108.557664]  __blkdev_put+0x115/0x160
+[ 1108.561339]  blkdev_put+0x4c/0x130
+[ 1108.564745]  blkdev_close+0x22/0x30
+[ 1108.568238]  __fput+0x94/0x240
+[ 1108.571307]  task_work_run+0x5f/0x90
+[ 1108.574885]  exit_to_user_mode_loop+0x119/0x120
+[ 1108.579428]  exit_to_user_mode_prepare+0x97/0xa0
+[ 1108.584047]  syscall_exit_to_user_mode+0x12/0x40
+[ 1108.588664]  do_syscall_64+0x4d/0x80
+[ 1108.592254]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[ 1108.597314] RIP: 0033:0x7f222e799627
+[ 1108.600903] RSP: 002b:00007ffd07c2b518 EFLAGS: 00000246 ORIG_RAX:
+0000000000000003
+[ 1108.608477] RAX: 0000000000000000 RBX: 00007f222d801240 RCX: 00007f222e7=
+99627
+[ 1108.615620] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000=
+00006
+[ 1108.622762] RBP: 0000000000000006 R08: 000055badf77ba70 R09: 00000000000=
+00000
+[ 1108.629901] R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffd07c=
+2b5c0
+[ 1108.637026] R13: 0000000000000000 R14: 000055bae0be5820 R15: 000055bae0b=
+8bec0
+[ 1231.370531] INFO: task systemd-udevd:2400 blocked for more than 245 seco=
+nds.
+[ 1231.377579]       Not tainted 5.13.0-rc3+ #8
+[ 1231.381853] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[ 1231.389679] task:systemd-udevd   state:D stack:    0 pid: 2400
+ppid:  1134 flags:0x00004004
+[ 1231.398024] Call Trace:
+[ 1231.400478]  __schedule+0x247/0x6f0
+[ 1231.403970]  schedule+0x46/0xb0
+[ 1231.407112]  schedule_preempt_disabled+0xa/0x10
+[ 1231.411638]  __mutex_lock.constprop.0+0x2a4/0x470
+[ 1231.416345]  ? __kernfs_remove.part.0+0x174/0x1f0
+[ 1231.421051]  ? kernfs_remove_by_name_ns+0x5c/0x90
+[ 1231.425765]  del_gendisk+0x99/0x230
+[ 1231.429268]  nvme_mpath_remove_disk+0x97/0xb0 [nvme_core]
+[ 1231.434692]  nvme_put_ns_head+0x2a/0xb0 [nvme_core]
+[ 1231.439581]  __blkdev_put+0x115/0x160
+[ 1231.443255]  blkdev_put+0x4c/0x130
+[ 1231.446668]  blkdev_close+0x22/0x30
+[ 1231.450171]  __fput+0x94/0x240
+[ 1231.453232]  task_work_run+0x5f/0x90
+[ 1231.456809]  exit_to_user_mode_loop+0x119/0x120
+[ 1231.461351]  exit_to_user_mode_prepare+0x97/0xa0
+[ 1231.465980]  syscall_exit_to_user_mode+0x12/0x40
+[ 1231.470608]  do_syscall_64+0x4d/0x80
+[ 1231.474187]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[ 1231.479247] RIP: 0033:0x7f222e799627
+[ 1231.482835] RSP: 002b:00007ffd07c2b518 EFLAGS: 00000246 ORIG_RAX:
+0000000000000003
+[ 1231.490392] RAX: 0000000000000000 RBX: 00007f222d801240 RCX: 00007f222e7=
+99627
+[ 1231.497537] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000=
+00006
+[ 1231.504670] RBP: 0000000000000006 R08: 000055badf77ba70 R09: 00000000000=
+00000
+[ 1231.511800] R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffd07c=
+2b5c0
+[ 1231.518925] R13: 0000000000000000 R14: 000055bae0be5820 R15: 000055bae0b=
+8bec0
+[ 1354.252532] INFO: task systemd-udevd:2400 blocked for more than 368 seco=
+nds.
+[ 1354.259581]       Not tainted 5.13.0-rc3+ #8
+[ 1354.263853] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[ 1354.271678] task:systemd-udevd   state:D stack:    0 pid: 2400
+ppid:  1134 flags:0x00004004
+[ 1354.280025] Call Trace:
+[ 1354.282469]  __schedule+0x247/0x6f0
+[ 1354.285962]  schedule+0x46/0xb0
+[ 1354.289105]  schedule_preempt_disabled+0xa/0x10
+[ 1354.293630]  __mutex_lock.constprop.0+0x2a4/0x470
+[ 1354.298327]  ? __kernfs_remove.part.0+0x174/0x1f0
+[ 1354.303027]  ? kernfs_remove_by_name_ns+0x5c/0x90
+[ 1354.307732]  del_gendisk+0x99/0x230
+[ 1354.311226]  nvme_mpath_remove_disk+0x97/0xb0 [nvme_core]
+[ 1354.316628]  nvme_put_ns_head+0x2a/0xb0 [nvme_core]
+[ 1354.321506]  __blkdev_put+0x115/0x160
+[ 1354.325171]  blkdev_put+0x4c/0x130
+[ 1354.328576]  blkdev_close+0x22/0x30
+[ 1354.332070]  __fput+0x94/0x240
+[ 1354.335127]  task_work_run+0x5f/0x90
+[ 1354.338717]  exit_to_user_mode_loop+0x119/0x120
+[ 1354.343249]  exit_to_user_mode_prepare+0x97/0xa0
+[ 1354.347860]  syscall_exit_to_user_mode+0x12/0x40
+[ 1354.352480]  do_syscall_64+0x4d/0x80
+[ 1354.356059]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[ 1354.361111] RIP: 0033:0x7f222e799627
+[ 1354.364684] RSP: 002b:00007ffd07c2b518 EFLAGS: 00000246 ORIG_RAX:
+0000000000000003
+[ 1354.372247] RAX: 0000000000000000 RBX: 00007f222d801240 RCX: 00007f222e7=
+99627
+[ 1354.379371] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000=
+00006
+[ 1354.386501] RBP: 0000000000000006 R08: 000055badf77ba70 R09: 00000000000=
+00000
+[ 1354.393629] R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffd07c=
+2b5c0
+[ 1354.400754] R13: 0000000000000000 R14: 000055bae0be5820 R15: 000055bae0b=
+8bec0
 
 
-> Il giorno 24 mag 2021, alle ore 12:04, Jan Kara <jack@suse.cz> ha =
-scritto:
->=20
-> Lockdep complains about lock inversion between ioc->lock and =
-bfqd->lock:
->=20
-> bfqd -> ioc:
-> put_io_context+0x33/0x90 -> ioc->lock grabbed
-> blk_mq_free_request+0x51/0x140
-> blk_put_request+0xe/0x10
-> blk_attempt_req_merge+0x1d/0x30
-> elv_attempt_insert_merge+0x56/0xa0
-> blk_mq_sched_try_insert_merge+0x4b/0x60
-> bfq_insert_requests+0x9e/0x18c0 -> bfqd->lock grabbed
-> blk_mq_sched_insert_requests+0xd6/0x2b0
-> blk_mq_flush_plug_list+0x154/0x280
-> blk_finish_plug+0x40/0x60
-> ext4_writepages+0x696/0x1320
-> do_writepages+0x1c/0x80
-> __filemap_fdatawrite_range+0xd7/0x120
-> sync_file_range+0xac/0xf0
->=20
-> ioc->bfqd:
-> bfq_exit_icq+0xa3/0xe0 -> bfqd->lock grabbed
-> put_io_context_active+0x78/0xb0 -> ioc->lock grabbed
-> exit_io_context+0x48/0x50
-> do_exit+0x7e9/0xdd0
-> do_group_exit+0x54/0xc0
->=20
-> To avoid this inversion we change blk_mq_sched_try_insert_merge() to =
-not
-> free the merged request but rather leave that upto the caller =
-similarly
-> to blk_mq_sched_try_merge(). And in bfq_insert_requests() we make sure
-> to free all the merged requests after dropping bfqd->lock.
->=20
-
-I see you added a (short) loop. Apart from that,
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-
-Thanks,
-Paolo
-
-> Fixes: aee69d78dec0 ("block, bfq: introduce the BFQ-v0 I/O scheduler =
-as an extra scheduler")
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
-> block/bfq-iosched.c      |  6 ++++--
-> block/blk-merge.c        | 19 ++++++++-----------
-> block/blk-mq-sched.c     |  5 +++--
-> block/blk-mq-sched.h     |  3 ++-
-> block/blk-mq.h           | 11 +++++++++++
-> block/blk.h              |  2 +-
-> block/elevator.c         | 11 ++++++++---
-> block/mq-deadline.c      |  5 ++++-
-> include/linux/elevator.h |  3 ++-
-> 9 files changed, 43 insertions(+), 22 deletions(-)
->=20
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 50a29fdf51da..5e076396b588 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -2317,9 +2317,9 @@ static bool bfq_bio_merge(struct request_queue =
-*q, struct bio *bio,
->=20
-> 	ret =3D blk_mq_sched_try_merge(q, bio, nr_segs, &free);
->=20
-> +	spin_unlock_irq(&bfqd->lock);
-> 	if (free)
-> 		blk_mq_free_request(free);
-> -	spin_unlock_irq(&bfqd->lock);
->=20
-> 	return ret;
-> }
-> @@ -5933,14 +5933,16 @@ static void bfq_insert_request(struct =
-blk_mq_hw_ctx *hctx, struct request *rq,
-> 	struct bfq_queue *bfqq;
-> 	bool idle_timer_disabled =3D false;
-> 	unsigned int cmd_flags;
-> +	LIST_HEAD(free);
->=20
-> #ifdef CONFIG_BFQ_GROUP_IOSCHED
-> 	if (!cgroup_subsys_on_dfl(io_cgrp_subsys) && rq->bio)
-> 		bfqg_stats_update_legacy_io(q, rq);
-> #endif
-> 	spin_lock_irq(&bfqd->lock);
-> -	if (blk_mq_sched_try_insert_merge(q, rq)) {
-> +	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
-> 		spin_unlock_irq(&bfqd->lock);
-> +		blk_mq_free_requests(&free);
-> 		return;
-> 	}
->=20
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 4d97fb6dd226..1398b52a24b4 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -846,18 +846,15 @@ static struct request =
-*attempt_front_merge(struct request_queue *q,
-> 	return NULL;
-> }
->=20
-> -int blk_attempt_req_merge(struct request_queue *q, struct request =
-*rq,
-> -			  struct request *next)
-> +/*
-> + * Try to merge 'next' into 'rq'. Return true if the merge happened, =
-false
-> + * otherwise. The caller is responsible for freeing 'next' if the =
-merge
-> + * happened.
-> + */
-> +bool blk_attempt_req_merge(struct request_queue *q, struct request =
-*rq,
-> +			   struct request *next)
-> {
-> -	struct request *free;
-> -
-> -	free =3D attempt_merge(q, rq, next);
-> -	if (free) {
-> -		blk_put_request(free);
-> -		return 1;
-> -	}
-> -
-> -	return 0;
-> +	return attempt_merge(q, rq, next);
-> }
->=20
-> bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 714e678f516a..bf0a3dec8226 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -400,9 +400,10 @@ bool __blk_mq_sched_bio_merge(struct =
-request_queue *q, struct bio *bio,
-> 	return ret;
-> }
->=20
-> -bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
-request *rq)
-> +bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
-request *rq,
-> +				   struct list_head *free)
-> {
-> -	return rq_mergeable(rq) && elv_attempt_insert_merge(q, rq);
-> +	return rq_mergeable(rq) && elv_attempt_insert_merge(q, rq, =
-free);
-> }
-> EXPORT_SYMBOL_GPL(blk_mq_sched_try_insert_merge);
->=20
-> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-> index 5b18ab915c65..8b70de4b8d23 100644
-> --- a/block/blk-mq-sched.h
-> +++ b/block/blk-mq-sched.h
-> @@ -11,7 +11,8 @@ bool blk_mq_sched_try_merge(struct request_queue *q, =
-struct bio *bio,
-> 		unsigned int nr_segs, struct request **merged_request);
-> bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio =
-*bio,
-> 		unsigned int nr_segs);
-> -bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
-request *rq);
-> +bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct =
-request *rq,
-> +				   struct list_head *free);
-> void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx);
-> void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
->=20
-> diff --git a/block/blk-mq.h b/block/blk-mq.h
-> index 81a775171be7..20ef743a3ff6 100644
-> --- a/block/blk-mq.h
-> +++ b/block/blk-mq.h
-> @@ -301,6 +301,17 @@ static inline struct blk_plug *blk_mq_plug(struct =
-request_queue *q,
-> 	return NULL;
-> }
->=20
-> +/* Free all requests on the list */
-> +static inline void blk_mq_free_requests(struct list_head *list)
-> +{
-> +	while (!list_empty(list)) {
-> +		struct request *rq =3D list_entry_rq(list->next);
-> +
-> +		list_del_init(&rq->queuelist);
-> +		blk_mq_free_request(rq);
-> +	}
-> +}
-> +
-> /*
->  * For shared tag users, we track the number of currently active users
->  * and attempt to provide a fair share of the tag depth for each of =
-them.
-> diff --git a/block/blk.h b/block/blk.h
-> index 8b3591aee0a5..99ef4f7e7a70 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -225,7 +225,7 @@ ssize_t part_timeout_store(struct device *, struct =
-device_attribute *,
-> void __blk_queue_split(struct bio **bio, unsigned int *nr_segs);
-> int ll_back_merge_fn(struct request *req, struct bio *bio,
-> 		unsigned int nr_segs);
-> -int blk_attempt_req_merge(struct request_queue *q, struct request =
-*rq,
-> +bool blk_attempt_req_merge(struct request_queue *q, struct request =
-*rq,
-> 				struct request *next);
-> unsigned int blk_recalc_rq_segments(struct request *rq);
-> void blk_rq_set_mixed_merge(struct request *rq);
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 440699c28119..62e9c672da7c 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -350,9 +350,11 @@ enum elv_merge elv_merge(struct request_queue *q, =
-struct request **req,
->  * we can append 'rq' to an existing request, so we can throw 'rq' =
-away
->  * afterwards.
->  *
-> - * Returns true if we merged, false otherwise
-> + * Returns true if we merged, false otherwise. 'free' will contain =
-all
-> + * requests that need to be freed.
->  */
-> -bool elv_attempt_insert_merge(struct request_queue *q, struct request =
-*rq)
-> +bool elv_attempt_insert_merge(struct request_queue *q, struct request =
-*rq,
-> +			      struct list_head *free)
-> {
-> 	struct request *__rq;
-> 	bool ret;
-> @@ -363,8 +365,10 @@ bool elv_attempt_insert_merge(struct =
-request_queue *q, struct request *rq)
-> 	/*
-> 	 * First try one-hit cache.
-> 	 */
-> -	if (q->last_merge && blk_attempt_req_merge(q, q->last_merge, =
-rq))
-> +	if (q->last_merge && blk_attempt_req_merge(q, q->last_merge, =
-rq)) {
-> +		list_add(&rq->queuelist, free);
-> 		return true;
-> +	}
->=20
-> 	if (blk_queue_noxmerges(q))
-> 		return false;
-> @@ -378,6 +382,7 @@ bool elv_attempt_insert_merge(struct request_queue =
-*q, struct request *rq)
-> 		if (!__rq || !blk_attempt_req_merge(q, __rq, rq))
-> 			break;
->=20
-> +		list_add(&rq->queuelist, free);
-> 		/* The merged request could be merged with others, try =
-again */
-> 		ret =3D true;
-> 		rq =3D __rq;
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 8eea2cbf2bf4..7136262819f1 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -487,6 +487,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx =
-*hctx, struct request *rq,
-> 	struct request_queue *q =3D hctx->queue;
-> 	struct deadline_data *dd =3D q->elevator->elevator_data;
-> 	const int data_dir =3D rq_data_dir(rq);
-> +	LIST_HEAD(free);
->=20
-> 	/*
-> 	 * This may be a requeue of a write request that has locked its
-> @@ -494,8 +495,10 @@ static void dd_insert_request(struct =
-blk_mq_hw_ctx *hctx, struct request *rq,
-> 	 */
-> 	blk_req_zone_write_unlock(rq);
->=20
-> -	if (blk_mq_sched_try_insert_merge(q, rq))
-> +	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
-> +		blk_mq_free_requests(&free);
-> 		return;
-> +	}
->=20
-> 	trace_block_rq_insert(rq);
->=20
-> diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-> index dcb2f9022c1d..1a5965174f5b 100644
-> --- a/include/linux/elevator.h
-> +++ b/include/linux/elevator.h
-> @@ -117,7 +117,8 @@ extern void elv_merge_requests(struct =
-request_queue *, struct request *,
-> 			       struct request *);
-> extern void elv_merged_request(struct request_queue *, struct request =
-*,
-> 		enum elv_merge);
-> -extern bool elv_attempt_insert_merge(struct request_queue *, struct =
-request *);
-> +extern bool elv_attempt_insert_merge(struct request_queue *, struct =
-request *,
-> +				     struct list_head *);
-> extern struct request *elv_former_request(struct request_queue *, =
-struct request *);
-> extern struct request *elv_latter_request(struct request_queue *, =
-struct request *);
->=20
-> --=20
-> 2.26.2
->=20
+--=20
+Best Regards,
+  Yi Zhang
 
