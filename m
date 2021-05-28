@@ -2,97 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-21.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1380C2B9F7
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 18:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12087C4708D
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 20:02:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEE0C613DD
-	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 18:55:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E588B613D1
+	for <linux-block@archiver.kernel.org>; Fri, 28 May 2021 20:02:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbhE1S5K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 May 2021 14:57:10 -0400
-Received: from condef-02.nifty.com ([202.248.20.67]:21179 "EHLO
-        condef-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbhE1S5K (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 May 2021 14:57:10 -0400
-Received: from conuserg-12.nifty.com ([10.126.8.75])by condef-02.nifty.com with ESMTP id 14SIjpQH018216
-        for <linux-block@vger.kernel.org>; Sat, 29 May 2021 03:45:51 +0900
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 14SIibCo014551;
-        Sat, 29 May 2021 03:44:40 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 14SIibCo014551
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1622227480;
-        bh=ldEXN72R4ZQPqoN770mx5epfuTtmbUuSqubynOtJnH0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Jx3HmzBTmRuFXHwp2jTaBcC6mdAbK2SjbLdSEgG4jzFDVPH4iDPS/5F8jeEUVXMnx
-         /nH5QBsXiR6E5egGiEx1kaW86fLnKPAJjEcGLbUEAxH5aAqbW5HrUoWicu0pTfh5i5
-         drRCv1nS3H8jq7SyAM8n/bZABJOxTPSgPWwodypKHyt7Mc1KZXpya7QG79fjycr89i
-         OwzQ/xQMYQt7VboM0zEtKQpzaNvsN/ow/YJZk+lNSW77h1cIDCph0IV4xZF71LIbIA
-         ZCIKqCNhhZGIjBJSYYZMrksAH5+JrhQlIcoyUiX4IiBlr9HLpDL16YY49eMGZ4EtbC
-         o7LX1tPTphmQQ==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] block: move CONFIG_BLOCK guard to top Makefile
-Date:   Sat, 29 May 2021 03:44:35 +0900
-Message-Id: <20210528184435.252924-4-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210528184435.252924-1-masahiroy@kernel.org>
-References: <20210528184435.252924-1-masahiroy@kernel.org>
+        id S229492AbhE1UEL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 May 2021 16:04:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37928 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229476AbhE1UEL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 May 2021 16:04:11 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 097B46108E;
+        Fri, 28 May 2021 20:02:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1622232156;
+        bh=aoRfbiX1k99A9DONFyxs9o8ZYMTI4WvZ4hie4ER+JH0=;
+        h=Date:From:To:Cc:Subject:From;
+        b=fgpbc9kn8nllhKToLvC03nmoNRp8SCEGkChFLjxjrkmHGu6aRknSJgdQTRfNbnMMI
+         wB/SS+5CjCRGYbVXG8gm6q/zFxrhfQJJSpIGnlfHYmEwFZcdAZaXyiPx3x/zenOcvS
+         IRmIFdv5H4aNYG5qbCrNx2ztM2l+W5xmy8u88bTJo8oAMiHTdb7cBXi1PmJJc0v+co
+         EYo8AoAnzbceDcsBYfUe8A76ONhd0fqG/WzQtfQP8mZ6FXiXmIEFYfvaWKzkt4hxhd
+         wR6mq0yPZR3GGY1ZJ1jSfnBKc9fHjw8kxkw6gEta7w/fc1PHpmz0uxMOEfQAp7Y6PF
+         AFuiTpVkfuwQw==
+Date:   Fri, 28 May 2021 15:03:35 -0500
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH v2][next] floppy: Fix fall-through warning for Clang
+Message-ID: <20210528200335.GA39252@embeddedor>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Every object under block/ depends on CONFIG_BLOCK.
+In preparation to enable -Wimplicit-fallthrough for Clang, fix a warning
+by explicitly adding a break statement instead of letting the code fall
+through to the next case.
 
-Move the guard to the top Makefile since there is no point to
-descend into block/ if CONFIG_BLOCK=n.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Link: https://github.com/KSPP/linux/issues/115
+Link: https://lore.kernel.org/linux-hardening/47bcd36a-6524-348b-e802-0691d1b3c429@kernel.dk/
+Suggested-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
+Changes in v2:
+ - Add a break statement instead of fallthrough;
 
- Makefile       | 3 ++-
- block/Makefile | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ drivers/block/floppy.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Makefile b/Makefile
-index 88cb5b59109c..055dcf5a2704 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1095,7 +1095,8 @@ export MODORDER := $(extmod_prefix)modules.order
- export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
- 
- ifeq ($(KBUILD_EXTMOD),)
--core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-+core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/
-+core-$(CONFIG_BLOCK)	+= block/
- 
- vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, \
- 		     $(core-y) $(core-m) $(drivers-y) $(drivers-m) \
-diff --git a/block/Makefile b/block/Makefile
-index 8d841f5f986f..99f0757a3aa5 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -3,7 +3,7 @@
- # Makefile for the kernel block layer
- #
- 
--obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-sysfs.o \
-+obj-y		:= bio.o elevator.o blk-core.o blk-sysfs.o \
- 			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
- 			blk-exec.o blk-merge.o blk-timeout.o \
- 			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 8a9d22207c59..803af2a72520 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -2123,6 +2123,7 @@ static void format_interrupt(void)
+ 	switch (interpret_errors()) {
+ 	case 1:
+ 		cont->error();
++		break;
+ 	case 2:
+ 		break;
+ 	case 0:
 -- 
 2.27.0
 
