@@ -2,64 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC3DC4708F
-	for <linux-block@archiver.kernel.org>; Sat, 29 May 2021 00:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B96EFC4708E
+	for <linux-block@archiver.kernel.org>; Sat, 29 May 2021 06:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 330BD61358
-	for <linux-block@archiver.kernel.org>; Sat, 29 May 2021 00:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C217611AE
+	for <linux-block@archiver.kernel.org>; Sat, 29 May 2021 06:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229563AbhE2Awg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 May 2021 20:52:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42388 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229541AbhE2Awg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 May 2021 20:52:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 0F0BC61358;
-        Sat, 29 May 2021 00:51:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622249461;
-        bh=FYkbVCkqngifjysGMYGWIyiikaouKjLeaJNXbfk75Fw=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=tB2i6O8cALWT5Uwfet/sYwsdwOJvCCkjsCicK9GDo3fWUEI/Yaae5P4SEtmd3nCv8
-         2OhJ11dku3ncMomRLXcJZJ0MJUIzs4MGI/23fRiomRzj9G9m1ZYXq1hkO2KTZwICda
-         4vkqoa/S8rUKMWdyNHgFybZIigmO6kHXjlCj4NcCWf9xif5dQICu/ZR21psKpiJAoU
-         JC4dvdd4EJmUAAx902BQ4mKpS7gimCocqGVcEqbXADeDELYGsMY1YbdeaZgUokojY3
-         8p4QtafYdIwJV5kJCj0oHkYZgOAOzHyswRCBaQN6QWdMnLl/db2ySJwzq6NAMD3SxQ
-         ZO8sMXZXDKK/Q==
-Subject: Re: [GIT PULL] Block fixes for 5.13-rc4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <d2e82bd5-21a7-f170-1da8-5528fb5724cd@kernel.dk>
-References: <d2e82bd5-21a7-f170-1da8-5528fb5724cd@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <d2e82bd5-21a7-f170-1da8-5528fb5724cd@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.13-2021-05-28
-X-PR-Tracked-Commit-Id: a4b58f1721eb4d7d27e0fdcaba60d204248dcd25
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0217a27e4d19f6ecc81a14de7c5e2d7886af845f
-Message-Id: <162224946091.17808.14581072858261564751.pr-tracker-bot@kernel.org>
-Date:   Sat, 29 May 2021 00:51:00 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S229560AbhE2Gid (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 May 2021 02:38:33 -0400
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:33763 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229547AbhE2Gic (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 May 2021 02:38:32 -0400
+Received: by mail-lj1-f182.google.com with SMTP id o8so8049234ljp.0;
+        Fri, 28 May 2021 23:36:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tA8bN2YzNQKfw1BCEp767KuRQbdDjks5njClJ7GzgoE=;
+        b=L53Entvy7d+f4S5YKcEc2PyN4tx8sfimPUSBWSN1VZHLUkB+ZdhIduWAkXciCOndIN
+         Vi8ijLQhY5dI0ztDjISaGD0KbCP/SvA01Tc840JYFymItsC09AnYxBj+zcf2loC0b0QP
+         gphd734sgkrhMt1VOh8C4viAFsc5ad63rgFAxJzJyQzDrqDJzBwXdI76ondK9wScwKj6
+         rtlZxbpwIKYzqngK5PEwilghgW7k5elSXkgw0JGIQskpKoJeeE4ww82RWe0keMb+p8PZ
+         5FKNWGkWy8BfchL4P/KrQFjpMaV8aweO0W8gMQr0HJjdyjqD6fJFRZXo16X8VoYta+0t
+         MX+A==
+X-Gm-Message-State: AOAM531cdFBE3QybSP7344GynCOtFAfonoAnqltT+3fAYavHlwGHE13p
+        HsK++px4hVOdqEtUzkGErWOresIHArg=
+X-Google-Smtp-Source: ABdhPJy2msKRIPpG5RG0X2hDv0JePHQpL7qN4mDo6L5U8y7eTL2BiOPqM7vB/5cfs+7FOT5olRjfUw==
+X-Received: by 2002:a2e:a54d:: with SMTP id e13mr9026970ljn.266.1622270214132;
+        Fri, 28 May 2021 23:36:54 -0700 (PDT)
+Received: from [10.68.32.147] (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.gmail.com with ESMTPSA id z132sm652646lfa.66.2021.05.28.23.36.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 May 2021 23:36:53 -0700 (PDT)
+Subject: Re: [PATCH v2][next] floppy: Fix fall-through warning for Clang
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+References: <20210528200335.GA39252@embeddedor>
+From:   Denis Efremov <efremov@linux.com>
+Message-ID: <07887f9c-c33d-9398-4939-2f23ebb1d094@linux.com>
+Date:   Sat, 29 May 2021 09:37:49 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
+MIME-Version: 1.0
+In-Reply-To: <20210528200335.GA39252@embeddedor>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 28 May 2021 15:57:35 -0600:
+Hi,
 
-> git://git.kernel.dk/linux-block.git tags/block-5.13-2021-05-28
+On 5/28/21 11:03 PM, Gustavo A. R. Silva wrote:
+> In preparation to enable -Wimplicit-fallthrough for Clang, fix a warning
+> by explicitly adding a break statement instead of letting the code fall
+> through to the next case.
+> 
+> Link: https://github.com/KSPP/linux/issues/115
+> Link: https://lore.kernel.org/linux-hardening/47bcd36a-6524-348b-e802-0691d1b3c429@kernel.dk/
+> Suggested-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0217a27e4d19f6ecc81a14de7c5e2d7886af845f
+Applied, thanks!
+https://github.com/evdenis/linux-floppy/commit/6eaddb2a2aa3acd0660537f9f6a12785be0ae830
 
-Thank you!
+I will send it to Jens with other floppy patches.
+It will be in 5.14
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Regards,
+Denis
+
+> ---
+> Changes in v2:
+>   - Add a break statement instead of fallthrough;
+> 
+>   drivers/block/floppy.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index 8a9d22207c59..803af2a72520 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -2123,6 +2123,7 @@ static void format_interrupt(void)
+>   	switch (interpret_errors()) {
+>   	case 1:
+>   		cont->error();
+> +		break;
+>   	case 2:
+>   		break;
+>   	case 0:
+> 
