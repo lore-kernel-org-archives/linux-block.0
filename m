@@ -2,145 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A85C47094
-	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 08:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4741C47082
+	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 12:04:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7C9A610A8
-	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 08:24:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84B1D6135C
+	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 12:04:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230463AbhEaI01 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 May 2021 04:26:27 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:39950 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230498AbhEaI0O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 May 2021 04:26:14 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E44AE2191F;
-        Mon, 31 May 2021 08:24:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622449473; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        id S231496AbhEaMGW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 May 2021 08:06:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53446 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231474AbhEaMGP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 May 2021 08:06:15 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1622462675; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
-        b=IG4LEwJvHGirCDc1Lh1d0DONz8EoqPOwZeJUbUm//hC4iTNL8Bka4Rb1mVu2mNANEWQl6y
-        5IDeRYa92bH4wMaPMKfF7/xSzOctVb9m8jwOZA20rpQcfTFZTyX1VzLbv6ve4XuDnGeOsY
-        DLm9Ut0npH0djdtovyYmNbtFeJQu8bQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622449473;
+        bh=RH9+Kd8V7sTyxG42KUVjkdL2tsMCgNmqqsFlFhYEQXI=;
+        b=cw/PULhQy9CVpYVQQI07Uq+uX5DImUpTOf6hXz6I1aDnuQKtIG97n+SUB6ZYE1ljVvb4G/
+        qfIy0O6bYJJbTLqlo4aMoCQcMy1OlPWBBbHHQBWSrqGqdwXADVoevGpfcv2vLZvw/6gySH
+        Z8Nasyf9PHaxTY08oogJYVDG/z3rwVI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1622462675;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
-        b=BD4cQyVGaw8EUOCwylWkJc7diFOa+7+h8voTDO5Zyb4GirSqtAn0echvCDcCNU6kjVJaPI
-        wl64J5i4XKYfAcCg==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 86671118DD;
-        Mon, 31 May 2021 08:24:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622449473; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
-        b=IG4LEwJvHGirCDc1Lh1d0DONz8EoqPOwZeJUbUm//hC4iTNL8Bka4Rb1mVu2mNANEWQl6y
-        5IDeRYa92bH4wMaPMKfF7/xSzOctVb9m8jwOZA20rpQcfTFZTyX1VzLbv6ve4XuDnGeOsY
-        DLm9Ut0npH0djdtovyYmNbtFeJQu8bQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622449473;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
-        b=BD4cQyVGaw8EUOCwylWkJc7diFOa+7+h8voTDO5Zyb4GirSqtAn0echvCDcCNU6kjVJaPI
-        wl64J5i4XKYfAcCg==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id t880IEGdtGAFNAAALh3uQQ
-        (envelope-from <hare@suse.de>); Mon, 31 May 2021 08:24:33 +0000
-Subject: Re: [PATCH] remove the raw driver
-To:     Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-References: <20210531072526.97052-1-hch@lst.de> <YLSSgyznnaUPmRaT@kroah.com>
- <CAK8P3a0sctUYZnRBxS+PLted8_O1mT8JisLqO4jMHQaU=Q5iNw@mail.gmail.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <3665636f-6a74-e24f-e4b7-ff7790ebb3e4@suse.de>
-Date:   Mon, 31 May 2021 10:24:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        bh=RH9+Kd8V7sTyxG42KUVjkdL2tsMCgNmqqsFlFhYEQXI=;
+        b=KJsD0sm563RsNCkbboEcFbyEnT2SBLpEypZC+mJUK8ouOYy135iP1JLQP07P1YqW9VPBeW
+        dOr0Mvk475t05UCQ==
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 2E3ECAE72;
+        Mon, 31 May 2021 12:04:35 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id DED0E1F2CB0; Mon, 31 May 2021 14:04:34 +0200 (CEST)
+Date:   Mon, 31 May 2021 14:04:34 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: update hctx->dispatch_busy in case of real
+ scheduler
+Message-ID: <20210531120434.GB5349@quack2.suse.cz>
+References: <20210528032055.2242080-1-ming.lei@redhat.com>
+ <20210528122631.GA28653@quack2.suse.cz>
+ <YLQ9vdTarVAA+y+Z@T590>
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a0sctUYZnRBxS+PLted8_O1mT8JisLqO4jMHQaU=Q5iNw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Authentication-Results: imap.suse.de;
-        none
-X-Spamd-Result: default: False [0.00 / 100.00];
-         ARC_NA(0.00)[];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         FROM_HAS_DN(0.00)[];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         MIME_GOOD(-0.10)[text/plain];
-         RCPT_COUNT_FIVE(0.00)[5];
-         DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-         TO_DN_ALL(0.00)[];
-         RCVD_NO_TLS_LAST(0.10)[];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+];
-         RCVD_COUNT_TWO(0.00)[2];
-         MID_RHS_MATCH_FROM(0.00)[]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YLQ9vdTarVAA+y+Z@T590>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/31/21 10:21 AM, Arnd Bergmann wrote:
-> On Mon, May 31, 2021 at 9:38 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->>
->> On Mon, May 31, 2021 at 10:25:26AM +0300, Christoph Hellwig wrote:
->>> The raw driver used to provide direct unbuffered access to block devices
->>> before O_DIRECT was invented.  It has been obsolete for more than a
->>> decade.
->>
->> What?  Really?  We can finally do this?  Yes!
->>
->> For some reason, I thought there was some IBM userspace tools that
->> relied on this device, if not, then great!
->>
->>> Signed-off-by: Christoph Hellwig <hch@lst.de>
->>
->> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On Mon 31-05-21 09:37:01, Ming Lei wrote:
+> On Fri, May 28, 2021 at 02:26:31PM +0200, Jan Kara wrote:
+> > On Fri 28-05-21 11:20:55, Ming Lei wrote:
+> > > Commit 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+> > > starts to support io batching submission by using hctx->dispatch_busy.
+> > > 
+> > > However, blk_mq_update_dispatch_busy() isn't changed to update hctx->dispatch_busy
+> > > in that commit, so fix the issue by updating hctx->dispatch_busy in case
+> > > of real scheduler.
+> > > 
+> > > Reported-by: Jan Kara <jack@suse.cz>
+> > > Fixes: 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > ---
+> > >  block/blk-mq.c | 3 ---
+> > >  1 file changed, 3 deletions(-)
+> > 
+> > Looks good to me. You can add:
+> > 
+> > Reviewed-by: Jan Kara <jack@suse.cz>
+> > 
+> > BTW: Do you plan to submit also your improvement to
+> > __blk_mq_do_dispatch_sched() to update dispatch_busy during the fetching
+> > requests from the scheduler to avoid draining all requests from the IO
+> > scheduler?
 > 
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> Link: https://lore.kernel.org/lkml/Pine.LNX.4.64.0703180754060.6605@CPE00045a9c397f-CM001225dbafb6/
+> I understand that kind of change isn't needed. When more requests are
+> dequeued, hctx->dispatch_busy will be updated, then __blk_mq_do_dispatch_sched()
+> won't dequeue at batch any more if either .queue_rq() returns
+> STS_RESOURCE or running out of driver tag/budget.
 > 
-> The discussion from 2007 is the last one I could find on lore that has
-> useful information on when and why this was not removed in the past.
-> The driver was scheduled from a 2005 removal in 2004, but not removed
-> because both Red Hat and SuSE relied on the feature in their distros.
-> 
->  From what I could find out, this continued to be the case in Red Hat
-> Enterprise Linux 6 and SUSE Linux Enterprise server 11 that were
-> supported between 2009 and 2020, but the following versions dropped
-> the support.
-> 
-Which I can confirm for SUSE.
+> Or do you still see related issues after this patch is applied?
 
-Cheers,
+I was suspicious that __blk_mq_do_dispatch_sched() would be still pulling
+requests too aggressively from the IO scheduler (which effectively defeats
+impact of cgroup IO weights on observed throughput). Now I did a few more
+experiments with the workload doing multiple iterations for each kernel and
+comparing ratios of achieved throughput when cgroup weights were in 2:1
+ratio.
 
-Hannes
+With this patch alone, I've got no significant distinction between IO from
+two cgroups in 4 out of 5 test iterations. With your patch to update
+max_dispatch in __blk_mq_do_dispatch_sched() applied on top the results
+were not significantly different (my previous test result was likely a
+lucky chance). With my original patch to allocate driver tags early in
+__blk_mq_do_dispatch_sched() I get reliable distinction between cgroups -
+the worst ratio from all the iterations is 1.4, average ratio is ~1.75.
+This last result is btw very similar to ratios I can see when using
+virtio-scsi instead of virtio-blk for the backing storage which is kind of
+natural because virtio-scsi ends up using the dispatch-budget logic of SCSI
+subsystem. I'm not saying my patch is the right way to do things but it
+clearly shows that __blk_mq_do_dispatch_sched() is still too aggressive
+pulling requests out of the IO scheduler.
+
+								Honza
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
