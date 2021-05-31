@@ -2,91 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84957C47082
-	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 08:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A85C47094
+	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 08:24:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64CC06103E
-	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 08:22:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7C9A610A8
+	for <linux-block@archiver.kernel.org>; Mon, 31 May 2021 08:24:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230296AbhEaIYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 May 2021 04:24:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:32901 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbhEaIYW (ORCPT
+        id S230463AbhEaI01 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 May 2021 04:26:27 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:39950 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230498AbhEaI0O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 May 2021 04:24:22 -0400
-Received: from mail-wr1-f51.google.com ([209.85.221.51]) by
- mrelayeu.kundenserver.de (mreue009 [213.165.67.97]) with ESMTPSA (Nemesis) id
- 1MQMm9-1m19q83Uav-00MK4X for <linux-block@vger.kernel.org>; Mon, 31 May 2021
- 10:22:37 +0200
-Received: by mail-wr1-f51.google.com with SMTP id z8so4882513wrp.12
-        for <linux-block@vger.kernel.org>; Mon, 31 May 2021 01:22:37 -0700 (PDT)
-X-Gm-Message-State: AOAM531askt3faAp5WK9RoBF57q0BAUjLnuoSszUWQ6815TTYciTuPYJ
-        azHTLnkR3b44ij4SA6Qyxm3rFpx9jdUDIQ1h6cQ=
-X-Google-Smtp-Source: ABdhPJxOYtsOixNCZiK/8HlnT3HHFZ2l8YEwvKBqAheSyPF6MziazabvRPY06vDT8xNIJ6jI18dOJqKsS+M2N4Dgd60=
-X-Received: by 2002:adf:a28c:: with SMTP id s12mr21969150wra.105.1622449357396;
- Mon, 31 May 2021 01:22:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210531072526.97052-1-hch@lst.de> <YLSSgyznnaUPmRaT@kroah.com>
-In-Reply-To: <YLSSgyznnaUPmRaT@kroah.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Mon, 31 May 2021 10:21:02 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a0sctUYZnRBxS+PLted8_O1mT8JisLqO4jMHQaU=Q5iNw@mail.gmail.com>
-Message-ID: <CAK8P3a0sctUYZnRBxS+PLted8_O1mT8JisLqO4jMHQaU=Q5iNw@mail.gmail.com>
+        Mon, 31 May 2021 04:26:14 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id E44AE2191F;
+        Mon, 31 May 2021 08:24:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622449473; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
+        b=IG4LEwJvHGirCDc1Lh1d0DONz8EoqPOwZeJUbUm//hC4iTNL8Bka4Rb1mVu2mNANEWQl6y
+        5IDeRYa92bH4wMaPMKfF7/xSzOctVb9m8jwOZA20rpQcfTFZTyX1VzLbv6ve4XuDnGeOsY
+        DLm9Ut0npH0djdtovyYmNbtFeJQu8bQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622449473;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
+        b=BD4cQyVGaw8EUOCwylWkJc7diFOa+7+h8voTDO5Zyb4GirSqtAn0echvCDcCNU6kjVJaPI
+        wl64J5i4XKYfAcCg==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 86671118DD;
+        Mon, 31 May 2021 08:24:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622449473; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
+        b=IG4LEwJvHGirCDc1Lh1d0DONz8EoqPOwZeJUbUm//hC4iTNL8Bka4Rb1mVu2mNANEWQl6y
+        5IDeRYa92bH4wMaPMKfF7/xSzOctVb9m8jwOZA20rpQcfTFZTyX1VzLbv6ve4XuDnGeOsY
+        DLm9Ut0npH0djdtovyYmNbtFeJQu8bQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622449473;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K7IUpnFl8MiyaREqhYO3UJlM9LtjduOHzIC1QfHta58=;
+        b=BD4cQyVGaw8EUOCwylWkJc7diFOa+7+h8voTDO5Zyb4GirSqtAn0echvCDcCNU6kjVJaPI
+        wl64J5i4XKYfAcCg==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id t880IEGdtGAFNAAALh3uQQ
+        (envelope-from <hare@suse.de>); Mon, 31 May 2021 08:24:33 +0000
 Subject: Re: [PATCH] remove the raw driver
-To:     Greg KH <gregkh@linuxfoundation.org>
+To:     Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:wiSyxuayVQKCIoB8sVijJ+wwAeT8wxxYze+S22Fd9CKzfSfkDUk
- RulzfMWYTOBvVoGSOl98csRZPCJyrs+twKtHxAvrSDazdUzU172QE1SNYDpUhjXp7Yuk4of
- MhP7Y2ogEhTuDh2IrB9ASfqJ+tJE4194Vozs2Hyu4FEPOPWTPBh6mW/+7PWubOMGPVh7AKl
- KPl0eb4Ru4FkC+z0kpSzg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:dmnHFlkSKVw=:iTZe3OP+Eglk8nGq/o4YDS
- yOYkVJJF/+RA7kFw8Dqm4+7jtEec2kf3bj3T6Bl4HGzM2/IqBrHEFsXJq6XI5DSZNjtB3WXwE
- 4Mg3oFIEeI/31Qttw6VIaXj1yDYNlJE7xGR8J+lp1ZKNi2c8K+5L1QIku02IlueOvBKn/lKji
- SjKc2/0m1Qk4BG7bxO9psNp5qaOm5Gar18V0vjOFTdJg5WcbJYjzg5KbiYs0mNqfnmHDHNuDh
- 2SfsSry6dP6WWUsPJCoFzN9V4+rx+RvO/db0dkDBJ10K+Q36PKRc7sop84qr+HKyk5wREt9wP
- 92rEzTBrfjvCtwen/s5tE8VQJxCcjvkL/S8Eu8ZhuU6ELnmuZ3rPvr5byPWSVBVcdew+z93z3
- siwhexBqe/dWaePQTjtNhtnMYxc5Y+/HgCbjQROZUDRaRvgXARazrhZ734kmAXb+Kj4j+Tr8L
- wdAp8/0cjj3ZjbndA4ybB0TIW0sebff5PohHAWGbTAeSzNf4TBECNVYAc5RkQdDKA3g6jCTTf
- fHIyljzmdftQL0wkQlqA4c=
+References: <20210531072526.97052-1-hch@lst.de> <YLSSgyznnaUPmRaT@kroah.com>
+ <CAK8P3a0sctUYZnRBxS+PLted8_O1mT8JisLqO4jMHQaU=Q5iNw@mail.gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <3665636f-6a74-e24f-e4b7-ff7790ebb3e4@suse.de>
+Date:   Mon, 31 May 2021 10:24:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
+MIME-Version: 1.0
+In-Reply-To: <CAK8P3a0sctUYZnRBxS+PLted8_O1mT8JisLqO4jMHQaU=Q5iNw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Authentication-Results: imap.suse.de;
+        none
+X-Spamd-Result: default: False [0.00 / 100.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         RCPT_COUNT_FIVE(0.00)[5];
+         DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+         TO_DN_ALL(0.00)[];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         RCVD_COUNT_TWO(0.00)[2];
+         MID_RHS_MATCH_FROM(0.00)[]
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 31, 2021 at 9:38 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Mon, May 31, 2021 at 10:25:26AM +0300, Christoph Hellwig wrote:
-> > The raw driver used to provide direct unbuffered access to block devices
-> > before O_DIRECT was invented.  It has been obsolete for more than a
-> > decade.
->
-> What?  Really?  We can finally do this?  Yes!
->
-> For some reason, I thought there was some IBM userspace tools that
-> relied on this device, if not, then great!
->
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
->
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On 5/31/21 10:21 AM, Arnd Bergmann wrote:
+> On Mon, May 31, 2021 at 9:38 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+>>
+>> On Mon, May 31, 2021 at 10:25:26AM +0300, Christoph Hellwig wrote:
+>>> The raw driver used to provide direct unbuffered access to block devices
+>>> before O_DIRECT was invented.  It has been obsolete for more than a
+>>> decade.
+>>
+>> What?  Really?  We can finally do this?  Yes!
+>>
+>> For some reason, I thought there was some IBM userspace tools that
+>> relied on this device, if not, then great!
+>>
+>>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>>
+>> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> 
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> Link: https://lore.kernel.org/lkml/Pine.LNX.4.64.0703180754060.6605@CPE00045a9c397f-CM001225dbafb6/
+> 
+> The discussion from 2007 is the last one I could find on lore that has
+> useful information on when and why this was not removed in the past.
+> The driver was scheduled from a 2005 removal in 2004, but not removed
+> because both Red Hat and SuSE relied on the feature in their distros.
+> 
+>  From what I could find out, this continued to be the case in Red Hat
+> Enterprise Linux 6 and SUSE Linux Enterprise server 11 that were
+> supported between 2009 and 2020, but the following versions dropped
+> the support.
+> 
+Which I can confirm for SUSE.
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
-Link: https://lore.kernel.org/lkml/Pine.LNX.4.64.0703180754060.6605@CPE00045a9c397f-CM001225dbafb6/
+Cheers,
 
-The discussion from 2007 is the last one I could find on lore that has
-useful information on when and why this was not removed in the past.
-The driver was scheduled from a 2005 removal in 2004, but not removed
-because both Red Hat and SuSE relied on the feature in their distros.
-
-From what I could find out, this continued to be the case in Red Hat
-Enterprise Linux 6 and SUSE Linux Enterprise server 11 that were
-supported between 2009 and 2020, but the following versions dropped
-the support.
-
-       Arnd
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
