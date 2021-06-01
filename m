@@ -2,111 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C91FDC4708F
-	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 04:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44408C47080
+	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 08:39:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AEC861375
-	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 04:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FC8A61263
+	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 08:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232126AbhFAEtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Jun 2021 00:49:05 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:35809 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231630AbhFAEtC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Jun 2021 00:49:02 -0400
-Received: by mail-io1-f70.google.com with SMTP id w17-20020a6b4a110000b0290492680338ecso6192304iob.2
-        for <linux-block@vger.kernel.org>; Mon, 31 May 2021 21:47:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=cQ/WsXAPZ6FCnqmHJD4ME6qu+k7CkFxG85S8nmtGEvg=;
-        b=J8wvSWTHCh8oNu40AuT7CDnNTUxLw9CfU8t/o8KIpIfoHApNUKMB5kWlLfvNHHJHiy
-         x0Y7aDFnB+2Eo68MnDXvr+kJwzkucIo3eElbSZugxiTx6ONICk3HeyVM5gZOZyqu/+H3
-         mntu0AoKzUguv4nOq19iiy62dEaW5T+P7fxohs2KPDeujQTkG1rCLcDMCDNxlAiGOdet
-         cmWTUMp/VCR5Kg6ye+tcKBUWSejYNp7zsvkj8f8VtLjhuUararqODmnVq0RQg4BcdNFj
-         9VxK4gGke2WRHx1Pzk133bi+xWLerJiGCdmcAR5xZqxM6eOTfkxIhOfYa08VSGSLpeqU
-         u6kQ==
-X-Gm-Message-State: AOAM531aDiBI7uo97LdEl4IS+1d1DdItWfS6ItEwSwly/RjBaRad3bni
-        QwsVb67zNS2P2yJHiom0wQDT97bpcK1p88zAPu+KvbeAqzXG
-X-Google-Smtp-Source: ABdhPJxwffnwptzUI5ttAL7HOq4FD5LtER+oQQJjKXiBAlzVzs0RqL49Z3pB9xvHk5jnhhb6LhwuGxu58m0jTh3s6/mNaYmetmhB
+        id S233305AbhFAIlK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Jun 2021 04:41:10 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:23924 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232869AbhFAIlK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Jun 2021 04:41:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1622536768; x=1654072768;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=o7Yt0fVvsU5pE5v66Qp1x5LtL9qknyVNOjPHQ9qC0nk=;
+  b=dg/swW436t//oQ+ASedOTTEXKYmy1kvTZIzgPaP64awKbxdy5IANHUmU
+   51EPGIRq3HOaO8UinWy8GSBJqBY/AwVkTqG5w1RaOzo8FSgSZJ+D2pMng
+   HZpub3+O8m3pYEJooBMQlp9MdzcpLtfNXkM3sF9EfFwZ8nn3GOJgM3zuY
+   u1PrOG4bCEL/2oirVM56Bi/Hm/PuOtDQ9zWiATF4jFh/XQso5c8+wtUpJ
+   ba4glkZ/wwE8MltXx8vMY/1UuVvTp9kHvsytwSsmoD2IuJp/bwmHrZpYe
+   VH8f3gP/doAMblFZnRcDP8jlmvNX0hJ1bxDah5GBUnfp5zBIbzBupXgwH
+   A==;
+IronPort-SDR: o7gMsoqb3fOrBk6SArwRr+Lt4dS0Gdc+A+DMdzQXqNNV7RioYRzQERe2ho4Y0Lkf+T5cuyG97Z
+ Afs+vCTCLHN0jVqvNCQWrDlfeFAlHuTN2HwDg4VbhTS0lWjkLEiITOK2bcVVuULVkSn5Ol/w8y
+ yjLfCGUCxBg15lgrHy6cfg4HOeitxY0KkU3jnd/ibro5MEx58Boj4n2ars1D4tdA72LYEst0mu
+ AYRkHuNkSzy46ajThuwsb7ADXWvWiGVY1KvMFdexaE1mWGuxu9u9/lnzEnhSQ6A26qEZNEqCiE
+ M5w=
+X-IronPort-AV: E=Sophos;i="5.83,239,1616428800"; 
+   d="scan'208";a="170253876"
+Received: from mail-mw2nam08lp2176.outbound.protection.outlook.com (HELO NAM04-MW2-obe.outbound.protection.outlook.com) ([104.47.73.176])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Jun 2021 16:39:27 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d8WLF+V8Ig/V/bJZpCAnqExQI+ytRAPkvyMRfxL1bvXWRLbGe7b4PQexx/79U4+IkCIkAewGAU4379Wyxw7Xqkd+OH5K+cR4v764Ll2/dCrGYSXmK7XNvEB8UvuJd9Odfq9v4Q9aGsGv8k8Zs/cSmhq3hqM0sUo692/A2EXH7HF+/ls8Wj3ye1DWywXmhzwWwjdDuUKupqIojclVCdnGr5Eg8TnZeXkYpc1dBDqkaeylDNat2+neHv96HtUaN9Z97zqxEb/0n7JizmHBOsmydxkg7Na4DaFkQOcxXSUc8jDga5ODCc1rhZ9lO0ZqaC0t5mT8wkSEvG/ATsOJYzpB8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x7clz0PbtWw0rkqiNSXEQu73jWP6Lo+bYgEDgIWQJdg=;
+ b=ackrC/Eul9h8devu5xf8jjg6g7GMKxK1Ku8xJzhm2aFUk68mR3GlagAOiNLdMjjjvhDFsxnIPPaDcJ1ReG0XLVJtyKMo9RXSxRla9lbbRIKqhit9HOG6z1zUzNwufFPSVaoISmkDn+4e1xPy/ShEqR70GMN5w1Q+xn9cimh5EjYCpZkENNgTztwRyERcD+Bn5An3rNRhHizz1XOFDUIox51ftUhnz8aJD2fVsUSITSXvopsYY2JzfoKiGDZABZACeQHzmnR/wNjSVIqXCnLe6ZAgjDqhUOG1K2G4tlp6eul2AY36sxQqstHKuKEBNnyx+BvcFoW8ewn0ZA8n6K7t2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x7clz0PbtWw0rkqiNSXEQu73jWP6Lo+bYgEDgIWQJdg=;
+ b=RSrY1FQL/HZvLkD24QVAEuVcCiBl+PXvWV6TPTgyF4iXWiQXHjMmBdB9ZgSEbi/+4OaIcQFiyKVu6xNTl0jfFyExjaT4Vons5gSHAXClTsDOW4DFFt9m+5msFGW0OpFB3RDfH5dqs84XNEae6YRtji1xbxm+v3Svkno+nFCF+9w=
+Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
+ by PH0PR04MB7317.namprd04.prod.outlook.com (2603:10b6:510:1e::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20; Tue, 1 Jun
+ 2021 08:39:24 +0000
+Received: from PH0PR04MB7158.namprd04.prod.outlook.com
+ ([fe80::45d7:388e:5cbb:ae1e]) by PH0PR04MB7158.namprd04.prod.outlook.com
+ ([fe80::45d7:388e:5cbb:ae1e%6]) with mapi id 15.20.4173.030; Tue, 1 Jun 2021
+ 08:39:24 +0000
+From:   Niklas Cassel <Niklas.Cassel@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, Shaun Tancheff <shaun@tancheff.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 0/2] allow blk-zoned ioctls without CAP_SYS_ADMIN
+Thread-Topic: [PATCH v2 0/2] allow blk-zoned ioctls without CAP_SYS_ADMIN
+Thread-Index: AQHXVsGfFY7pG1hAmkCFCeeByrGZWQ==
+Date:   Tue, 1 Jun 2021 08:39:24 +0000
+Message-ID: <20210601083915.156476-1-Niklas.Cassel@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: git-send-email 2.31.1
+authentication-results: kernel.dk; dkim=none (message not signed)
+ header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [85.226.244.4]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2af908bd-16c1-4cd8-8737-08d924d8c286
+x-ms-traffictypediagnostic: PH0PR04MB7317:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <PH0PR04MB731705170511C80AD3611BAEF23E9@PH0PR04MB7317.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:4941;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: xn9UX0YWyRNvqB0Z8A6Peoz3Q7q56ikJYGrgQQIGQApcUepDMVRcIlLaxKh8JHIembUlXND9pmwjBtFa1AFTXkGcfk0CfpR0U0mRv+Ppm60dDCJ6/FArwIrOzRF36iBn76k/oqsnzhe9QC1aZ7TCwtMBR9BabvqfuSrkL3A5R2nvFtDeR6C2V2K8CrqiBXgpIwMNg/Lu1rruO7Gm7k5Vk0MxyOnpMZT3SO9radBQYPz7ns9mKBa4XBHZjs5nWTB0jpaPQsiXH6cWsvF3BPQpSk5gBaJ+lzhERiV0qEEDLTNEoiIMsW6S6MaBF3JAeei8hXYu4MfZgevbRfXiMWHwh1Oi3j3DXMnDzAriaYpyS1g7qMHhjcnMXiLfThNR9P6ygppl60xvmC4eCNbXZOl4YOy+7LSPxqS+gHMcAF5kxG/XAoqsL4XyxwW4CNq0mGExv17Na9OUcHZK+aasFWfWtP1e3w7Yvcg1x2bFoFzA5iwvNIfag1DKEToPQ4YSqbqHBSFOCfQ8mQpEzIPSZlPE0++Ajh9iLAV1QlnTf+Regka9g0XtJkFjAmY2dFZnG511NkcruorkU3diARb1cS6xdPkSp6byMIDDZb1agTIAQ9k=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(136003)(346002)(376002)(39860400002)(122000001)(110136005)(186003)(54906003)(38100700002)(66446008)(4326008)(64756008)(316002)(478600001)(36756003)(5660300002)(76116006)(2616005)(66476007)(66946007)(91956017)(8936002)(4744005)(6512007)(86362001)(26005)(8676002)(1076003)(83380400001)(2906002)(6486002)(71200400001)(6506007)(66556008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?iso-8859-1?Q?awGfd8cvYfI/J/RE8eVfK/RUjcAd7RhhS5WcUNUd8BsaJXZil5gxEraMho?=
+ =?iso-8859-1?Q?Tsw/NuHe8kvRqxzWaZspZHliHMPgnBDn2VlFdKtJZBeay61jEgz0gGKKlj?=
+ =?iso-8859-1?Q?4nS6IoKSLDztPe8CRBzcwstB0O5NyVJPzl5INtkPJHFrvjo8UuM+mHk9+1?=
+ =?iso-8859-1?Q?RwKv4bW1xpjR2MYB0y11et3tMWO61O6D4OB0juGgYRQLcjm9LjR3/gfXWz?=
+ =?iso-8859-1?Q?s4J/zvzuipD59m2r/OhUC/mmLkpWNCkE9FDKIGvnthPbwW8tKfKWIa0rSS?=
+ =?iso-8859-1?Q?rKBgIFTIPMTxgr+Biikmf4HAEGDNK8WdPmW/nbKZsFCRrjbNrEm8okTmDW?=
+ =?iso-8859-1?Q?Pv/CyXfIfHrvB92Gt7qKvbWO2tjZDSOexoxJJY8gjjLlzOMeRg4EKSPyip?=
+ =?iso-8859-1?Q?3Ozxi1hhetbw6UL6iLET4T/ve/FPJ0cG3NcuJtVeHQlGLseHP+kjBoxkkr?=
+ =?iso-8859-1?Q?4PXKk1JJBQKjxFVfoS2mBupB88lZloqtb6zUKwTli4x5h0+J5ut9uk+X4a?=
+ =?iso-8859-1?Q?3KG4CC+YQ8HL8Zo9xzW9VintIwpY8qRaFurKuF+aTa6pODPHI/1+R0gj7+?=
+ =?iso-8859-1?Q?/RBcc4wC1DWIdKanELnaMJHy/DmM/ALihBLy/SnFH/MKqX1iMH4Luh2aeB?=
+ =?iso-8859-1?Q?p3ItwMaUSUmDI3QdFiEvLTs0145Yw1H1Q4r9fkfJ1JM9c8TXrZpvriYKPo?=
+ =?iso-8859-1?Q?3iSyMrRrBvZYq62nalgdckrFPbr16kLntVm0tUdG+pafUypWV6H278iwyt?=
+ =?iso-8859-1?Q?xZ1T79FHhwGUswOKfd/Er+FCMB4gPpd67V0aHHEIhDoUb2xYaj5QDh8EJc?=
+ =?iso-8859-1?Q?MMvGNVxcYpT80Pk/RtuT+InyXWZlKR/MBSSrHTWA69z566tBhlrwHbaP7H?=
+ =?iso-8859-1?Q?fZK+8pvOVs4iKLculw4zSVliIik0T2YqWauzcWAfsIwYq/gXDrwYl/bVsy?=
+ =?iso-8859-1?Q?zKt81yBk03rwD8nQVJeJvHa46hLuMUQ8U1+aZ+klpDnBN9b+W3/BBCWVoS?=
+ =?iso-8859-1?Q?5trbrwU7gFrN7kSd3UHdCDobVyWABmZDDjdN1n0jJprS18Bcsr2elHNRrF?=
+ =?iso-8859-1?Q?pEMA9j+ckrtb6kVp6ZoSRLiepJuXHtUYxcgSL592N9Cf5j+vdI3SPAzO7Y?=
+ =?iso-8859-1?Q?1PSbPM80z3w41nhAJoag/hTplzQtrQUEZvUyAijJ06xYMc+PrFAIRzhTUc?=
+ =?iso-8859-1?Q?dQ47Lic0JhljYhpf76f6BqNJGFiWL5BXtu3q6oPP7KcNzBvQV/+dSqeOi/?=
+ =?iso-8859-1?Q?gOzNDXXZIiOw/XozBsHWR/oVUkdsaFyBNoICUo5dQk5bVxSS7vWUR1x5wt?=
+ =?iso-8859-1?Q?97oLqn10dASX8rU51H6xSGPtFLMbTP+cAWqaXObILEO55ymj2dYlBZ53V5?=
+ =?iso-8859-1?Q?n2llXr3y9r?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:11b1:: with SMTP id 17mr9683133ilj.225.1622522840953;
- Mon, 31 May 2021 21:47:20 -0700 (PDT)
-Date:   Mon, 31 May 2021 21:47:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000093372a05c3ad0902@google.com>
-Subject: [syzbot] WARNING: refcount bug in blk_mq_free_request (3)
-From:   syzbot <syzbot+836f6f41af3c5867a8b9@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2af908bd-16c1-4cd8-8737-08d924d8c286
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2021 08:39:24.2916
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: El6BRMKiUfwJWRc3ECgAQbQBVQ1YcLZHw2zgLlip3SEjvdN0boeuTLEkE5OmiuyB+EDGeWYWH42WUq9AiwO0gA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7317
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+From: Niklas Cassel <niklas.cassel@wdc.com>
 
-syzbot found the following issue on:
+Allow the following blk-zoned ioctls: BLKREPORTZONE, BLKRESETZONE,
+BLKOPENZONE, BLKCLOSEZONE, and BLKFINISHZONE to be performed without
+CAP_SYS_ADMIN.
 
-HEAD commit:    d7c5303f Merge tag 'net-5.13-rc4' of git://git.kernel.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=125b6e37d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aeeaaad9464418bb
-dashboard link: https://syzkaller.appspot.com/bug?extid=836f6f41af3c5867a8b9
+These ioctls instead only requires that the corresponding R/W access
+control flag to be successfully set on the opened file descriptor.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+(open()/openat() will fail with -EPERM if you try to open a file with
+flags that you lack permission for.)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+836f6f41af3c5867a8b9@syzkaller.appspotmail.com
+Niklas Cassel (2):
+  blk-zoned: allow zone management send operations without CAP_SYS_ADMIN
+  blk-zoned: allow BLKREPORTZONE without CAP_SYS_ADMIN
 
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 0 PID: 2924 at lib/refcount.c:28 refcount_warn_saturate+0x1d1/0x1e0 lib/refcount.c:28
-Modules linked in:
-CPU: 0 PID: 2924 Comm: kworker/0:1H Not tainted 5.13.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: kblockd blk_mq_run_work_fn
-RIP: 0010:refcount_warn_saturate+0x1d1/0x1e0 lib/refcount.c:28
-Code: e9 db fe ff ff 48 89 df e8 4c 31 e9 fd e9 8a fe ff ff e8 62 a8 a4 fd 48 c7 c7 60 21 c2 89 c6 05 be 76 e5 09 01 e8 fc c0 05 05 <0f> 0b e9 af fe ff ff 0f 1f 84 00 00 00 00 00 41 56 41 55 41 54 55
-RSP: 0018:ffffc90008cd78c0 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88801fb18000 RSI: ffffffff815c1805 RDI: fffff5200119af0a
-RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815bb63e R11: 0000000000000000 R12: ffff8880a9d70ae8
-R13: ffffe8ffffc45300 R14: 0000000000000001 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000185f848 CR3: 00000000543ac000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- __refcount_sub_and_test include/linux/refcount.h:283 [inline]
- __refcount_dec_and_test include/linux/refcount.h:315 [inline]
- refcount_dec_and_test include/linux/refcount.h:333 [inline]
- blk_mq_free_request+0x4d0/0x640 block/blk-mq.c:533
- __blk_mq_end_request block/blk-mq.c:558 [inline]
- blk_mq_end_request+0x41a/0x510 block/blk-mq.c:567
- blk_mq_dispatch_rq_list+0xf4d/0x1fa0 block/blk-mq.c:1398
- __blk_mq_do_dispatch_sched+0x3bc/0x910 block/blk-mq-sched.c:191
- blk_mq_do_dispatch_sched block/blk-mq-sched.c:204 [inline]
- __blk_mq_sched_dispatch_requests+0x361/0x490 block/blk-mq-sched.c:325
- blk_mq_sched_dispatch_requests+0xfb/0x180 block/blk-mq-sched.c:351
- __blk_mq_run_hw_queue+0xd8/0x150 block/blk-mq.c:1499
- blk_mq_run_work_fn+0x55/0x70 block/blk-mq.c:1831
- process_one_work+0x98d/0x1600 kernel/workqueue.c:2276
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2422
- kthread+0x3b1/0x4a0 kernel/kthread.c:313
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+ block/blk-zoned.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+--=20
+2.31.1
