@@ -2,149 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E311BC47080
-	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 13:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59041C47096
+	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 13:48:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBD2360C3E
-	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 13:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F911613B4
+	for <linux-block@archiver.kernel.org>; Tue,  1 Jun 2021 13:48:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233900AbhFANnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Jun 2021 09:43:18 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:55944 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233584AbhFANnS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Jun 2021 09:43:18 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 51A3B1FD2A;
-        Tue,  1 Jun 2021 13:41:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622554896; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/6GnZ67hvwfub3i576yXgkqNR8+ZAzFSY3dzkZnZmeI=;
-        b=BtLVtDUM+A+vs5eTv02sPPkdaQGfHCylM0edVAk68M1AQjXNSHznlybwb0atBcQszKwk0W
-        huu6ogaD4LG3wp1xAdqZNNEDiHjXtbmZ2lHU/2FXOz/8THupF1YDylsMqdii0IarSeVnqt
-        P8WB/8QjagkzwjY4eGSPyTUUd5674eU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622554896;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/6GnZ67hvwfub3i576yXgkqNR8+ZAzFSY3dzkZnZmeI=;
-        b=EPZQush8dbsRRZbeJ91xasGoKVkXzXaK5M3hSLMGKUH8R8hN1kEIjLit4oSiZGJ1AI5gRs
-        7pWO58PFnmWK9IBg==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 2E635118DD;
-        Tue,  1 Jun 2021 13:41:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622554896; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/6GnZ67hvwfub3i576yXgkqNR8+ZAzFSY3dzkZnZmeI=;
-        b=BtLVtDUM+A+vs5eTv02sPPkdaQGfHCylM0edVAk68M1AQjXNSHznlybwb0atBcQszKwk0W
-        huu6ogaD4LG3wp1xAdqZNNEDiHjXtbmZ2lHU/2FXOz/8THupF1YDylsMqdii0IarSeVnqt
-        P8WB/8QjagkzwjY4eGSPyTUUd5674eU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622554896;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/6GnZ67hvwfub3i576yXgkqNR8+ZAzFSY3dzkZnZmeI=;
-        b=EPZQush8dbsRRZbeJ91xasGoKVkXzXaK5M3hSLMGKUH8R8hN1kEIjLit4oSiZGJ1AI5gRs
-        7pWO58PFnmWK9IBg==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id e7bQChA5tmBNDwAALh3uQQ
-        (envelope-from <hare@suse.de>); Tue, 01 Jun 2021 13:41:36 +0000
-Subject: Re: [PATCH] block/genhd: use atomic_t for disk_event->block
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>
-References: <20210601110145.113365-1-hare@suse.de> <YLY1V/dTMeo3RGZd@T590>
-From:   Hannes Reinecke <hare@suse.de>
-Organization: SUSE Linux GmbH
-Message-ID: <73783f6f-a3ec-907f-ea19-966e9d1457dc@suse.de>
-Date:   Tue, 1 Jun 2021 15:41:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S234073AbhFANty (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Jun 2021 09:49:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44804 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234085AbhFANtw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Jun 2021 09:49:52 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F84C06174A
+        for <linux-block@vger.kernel.org>; Tue,  1 Jun 2021 06:48:10 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id a21so4657736oiw.3
+        for <linux-block@vger.kernel.org>; Tue, 01 Jun 2021 06:48:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=QlGkt7fWsHM9mcKdq1bDx/YwBl/iUUk0WEjc5rg04fY=;
+        b=SJMAgBW5mswAe1ZmlZlRdAFuvYPDEVLqi723Nnx1S4FLz3Yy3Tj3lQWVdZ0F6Qr4eS
+         SMIy05Vpx5EU+XswU9cem+w+MzG0a62ahvk23Tf2SUyNvaWPkh1rlmu3OkVCdEssPf8k
+         xwwmCV/LazyU6UjgCMJxdw//dP9UOpzUM54yyNCR3QG30hScN/IqdhxGg71hNvOalyX+
+         pO6I2f3s4rBYqGHOnzUAspl9mEOwDLA0qywJ9pSLvD5fVKPzw+UNtHhfYY4OA0aw1ASO
+         zcdxwDDiGjJD5VEZLuOr0Rlq6ubnYTbGW3SYaGllJ+Xvfy3vmm5YD3DkNvXi1rVEGPqw
+         8g9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QlGkt7fWsHM9mcKdq1bDx/YwBl/iUUk0WEjc5rg04fY=;
+        b=FohNov28H07zjx4xBD2hY+TcRk74O9psEbYOkPq5Q3WlbNUz15LYTJHrv8whl4do+p
+         4HC/cOmgI0N0xXj/sHCmUzo0Le3WR36p+BvyimY3jZeN8whOf/grDNiHYkCFgMA00cJa
+         Q2IPBTA6Ny2kffwRHDbIwLfTASHGNRgMdXc4ol9GdR1hjpDxGK8I5i9CoUw/bPX2rq4g
+         wI8UzI0X8Q/kEwaiLd7bIFq1HxZ41W2u3S/5pkCGtezc4SK8LGnGBIlZckiB/rTo8jon
+         GUyxmYsNr2snnZAxamPjg350JVZCHiTJdzMVw9C+OqVi0Qf/u9BD3r4pWoiL8D1oXs4M
+         qYvA==
+X-Gm-Message-State: AOAM532/u+omR8A1UvNOl7imVWrK4x1dPpAo8B2pI1SR5stL6oo27LD+
+        ZsFOovLdRZAuUs9EN0nlhaWtRw==
+X-Google-Smtp-Source: ABdhPJyRtEOQYxSXItYfv2Xv0el0nwhIYWVK6zfd5YIEz7fo5+/L3t2bxzT7qaz6PyG5RR7CPJmZJA==
+X-Received: by 2002:a05:6808:245:: with SMTP id m5mr18302900oie.6.1622555290008;
+        Tue, 01 Jun 2021 06:48:10 -0700 (PDT)
+Received: from [192.168.1.134] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id i4sm3456045oih.13.2021.06.01.06.48.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Jun 2021 06:48:09 -0700 (PDT)
+Subject: Re: simplify gendisk and request_queue allocation for bio based
+ drivers
+To:     Christoph Hellwig <hch@lst.de>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jim Paris <jim@jtan.com>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Matias Bjorling <mb@lightnvm.io>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-m68k@lists.linux-m68k.org, linux-xtensa@linux-xtensa.org,
+        drbd-dev@lists.linbit.com, linuxppc-dev@lists.ozlabs.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-mmc@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
+References: <20210521055116.1053587-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a5d7127f-b422-5556-6810-cf4c98c038ac@kernel.dk>
+Date:   Tue, 1 Jun 2021 07:48:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YLY1V/dTMeo3RGZd@T590>
+In-Reply-To: <20210521055116.1053587-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/1/21 3:25 PM, Ming Lei wrote:
-> On Tue, Jun 01, 2021 at 01:01:45PM +0200, Hannes Reinecke wrote:
->> __disk_unblock_events() will call queue_delayed_work() with a '0' argument
->> under a spin lock. This might cause the queue_work item to be executed
->> immediately, and run into a deadlock in disk_check_events() waiting for
->> the lock to be released.
+On 5/20/21 11:50 PM, Christoph Hellwig wrote:
+> Hi all,
 > 
-> Do you have lockdep warning on this 'deadlock'?
+> this series is the first part of cleaning up lifetimes and allocation of
+> the gendisk and request_queue structure.  It adds a new interface to
+> allocate the disk and queue together for bio based drivers, and a helper
+> for cleanup/free them when a driver is unloaded or a device is removed.
 > 
-> Executed immediately doesn't mean the work fn is run in the current
-> task context, and it is actually run in one wq worker(task) context, so
-> __queue_work() usually wakes up one wq worker for running the work fn,
-> then there shouldn't be the 'deadlock' you mentioned.
-> 
+> Together this removes the need to treat the gendisk and request_queue
+> as separate entities for bio based drivers.
 
-That's what I thought, too, but then we have a customer report
-complaining about a stuck installation, and this kernel message:
+Applied, thanks.
 
-> [  990.305908] INFO: task init:1 blocked for more than 491 seconds.
-> [  990.311904]       Not tainted 5.3.18-22-default #1
-> [  990.316682] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-disables this message.
-> [  990.324483] init            D    0     1      0 0x00000000
-> [  990.329950] Call Trace:
-> [  990.332396]  __schedule+0x28a/0x6d0
-> [  990.335876]  ? work_busy+0x80/0x80
-> [  990.339267]  schedule+0x2f/0xa0
-> [  990.342399]  schedule_timeout+0x1dd/0x300
-> [  990.346399]  ? check_preempt_curr+0x29/0x80
-> [  990.350569]  ? ttwu_do_wakeup+0x19/0x150
-> [  990.354480]  ? work_busy+0x80/0x80
-> [  990.357869]  wait_for_completion+0xba/0x140
-> [  990.362040]  ? wake_up_q+0xa0/0xa0
-> [  990.365430]  __flush_work+0x177/0x1d0
-> [  990.369080]  ? worker_detach_from_pool+0xa0/0xa0
-> [  990.373682]  __cancel_work_timer+0x12b/0x1b0
-> [  990.377940]  ? exact_lock+0xd/0x20
-> [  990.381329]  ? kobj_lookup+0x113/0x160
-> [  990.385067]  disk_block_events+0x78/0x90
-> [  990.388979]  __blkdev_get+0x6d/0x7e0
-> [  990.392542]  ? blkdev_get_by_dev+0x40/0x40
-> [  990.396627]  do_dentry_open+0x1ea/0x380
-> [  990.400450]  path_openat+0x2fc/0x1520
-> [  990.404103]  do_filp_open+0x9b/0x110
-> [  990.407667]  ? kmem_cache_alloc+0x3d/0x250
-> [  990.411749]  ? do_sys_open+0x1bd/0x250
-> [  990.415486]  do_sys_open+0x1bd/0x250
-> [  990.419052]  do_syscall_64+0x5b/0x1e0
-> [  990.422701]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Which does vanish with this patch.
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke		        Kernel Storage Architect
-hare@suse.de			               +49 911 74053 688
-SUSE Software Solutions Germany GmbH, 90409 Nürnberg
-GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
+Jens Axboe
+
