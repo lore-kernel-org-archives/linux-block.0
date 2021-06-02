@@ -2,51 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6281DC4708F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8842CC47097
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4076B61168
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72D2E61168
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbhFBNc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 09:32:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53926 "EHLO
+        id S229967AbhFBNc6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 09:32:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229746AbhFBNc4 (ORCPT
+        with ESMTP id S229867AbhFBNc4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 09:32:56 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8D3C06174A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDDF1C061756;
         Wed,  2 Jun 2021 06:31:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=ZM/OZzCTna+H0NVHgaZG9RysfqZrZbVctmrXuvKDhRg=; b=Y4KjVcAVs++u5aWG8t3gz7Zmdm
-        2GCCs43oozUZx+EtBSVivOvona+vh800bFDlXP3+vZhGLq9LHKpyLPPoBAn1rRYCCcALnq2iBn3qi
-        MaERsXXM6+x7+/J8899O1kiYvL9TAxD6Zljthg0HfcVxNIohePy8ytwNYVprNkPCZjTMttAfDdM5g
-        5KwiCrJMDzwRbGhdMjmXxhzxS1ITsVDM6G31nZqJOA7KWsEk8nkmFZWwCwuPLepKXuKwII1/UGGIB
-        +DR2n/OyDqazhheBKOtqI7M+p0fenDjIhPGAkcT4D/YDi1MNXCIEjbsoIuoh4Bzi5lhHvKvOR/Ja3
-        YhspdwAA==;
+        bh=xAgXF5452HulRjyD+JrT6Ce1EM30lHGgXf0FUiEeuf8=; b=VvpK7YiNmJCX41zrA8okNEybDp
+        eQ6B/no5m3jpzjv3vtsCvj/I+JC23a6uedcV8jgSiowQRskTunxDthNkfNGhTAFIlNg7Mp34lDO1v
+        cJi7jUAN8r25x997QWW1iZ1s0mJEO/4TCJLBsUD/Lwvj8V5xmtHLkWqJ3/i+cAuwKhHWJJh3gK3Ih
+        vP6xpGukyGIL5aEjAbdHmS9jRaDI483T3jnwPxONjWNDG4udVku6TL780C9Ec0NINGrPz5nI2nlsi
+        VM1b+8ilWKuCZZyiB9PWMQ/LkZFJTj3o+rZcyBY6BUTJfo/Lky1rn8D/U1takW/WZq9JTYU9U5iTx
+        ooUsJycA==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1loQxa-002toe-JV; Wed, 02 Jun 2021 13:31:09 +0000
+        id 1loQxX-002toZ-ED; Wed, 02 Jun 2021 13:31:06 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 57FAA300513;
-        Wed,  2 Jun 2021 15:31:05 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B7F0F3002A3;
+        Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id A55642C1AB5EA; Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
-Message-ID: <20210602133040.524487671@infradead.org>
+        id 950C12016D6C5; Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
+Message-ID: <20210602133040.271625424@infradead.org>
 User-Agent: quilt/0.66
-Date:   Wed, 02 Jun 2021 15:12:30 +0200
+Date:   Wed, 02 Jun 2021 15:12:26 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -97,7 +96,7 @@ Cc:     Borislav Petkov <bp@alien8.de>, x86@kernel.org,
         kgdb-bugreport@lists.sourceforge.net,
         linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
         rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Subject: [PATCH 5/6] sched,timer: Use __set_current_state()
+Subject: [PATCH 1/6] sched: Unbreak wakeups
 References: <20210602131225.336600299@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -105,22 +104,130 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Remove broken task->state references and let wake_up_process() DTRT.
+
+The anti-pattern in these patches breaks the ordering of ->state vs
+COND as described in the comment near set_current_state() and can lead
+to missed wakeups:
+
+	(OoO load, observes RUNNING)<-.
+	for (;;) {                    |
+	  t->state = UNINTERRUPTIBLE; |
+	  smp_mb();          ,-----> ,' (OoO load, observed !COND)
+                             |       |
+	                     |       |	COND = 1;
+			     |	     `- if (t->state != RUNNING)
+                             |		  wake_up_process(t); // not done
+	  if (COND) ---------'
+	    break;
+	  schedule(); // forever waiting
+	}
+	t->state = TASK_RUNNING;
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- kernel/time/timer.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/qualcomm/qca_spi.c |    6 ++----
+ drivers/usb/gadget/udc/max3420_udc.c    |   15 +++++----------
+ drivers/usb/host/max3421-hcd.c          |    3 +--
+ kernel/softirq.c                        |    2 +-
+ 4 files changed, 9 insertions(+), 17 deletions(-)
 
---- a/kernel/time/timer.c
-+++ b/kernel/time/timer.c
-@@ -1879,7 +1879,7 @@ signed long __sched schedule_timeout(sig
- 			printk(KERN_ERR "schedule_timeout: wrong timeout "
- 				"value %lx\n", timeout);
- 			dump_stack();
--			current->state = TASK_RUNNING;
-+			__set_current_state(TASK_RUNNING);
- 			goto out;
- 		}
+--- a/drivers/net/ethernet/qualcomm/qca_spi.c
++++ b/drivers/net/ethernet/qualcomm/qca_spi.c
+@@ -653,8 +653,7 @@ qcaspi_intr_handler(int irq, void *data)
+ 	struct qcaspi *qca = data;
+ 
+ 	qca->intr_req++;
+-	if (qca->spi_thread &&
+-	    qca->spi_thread->state != TASK_RUNNING)
++	if (qca->spi_thread)
+ 		wake_up_process(qca->spi_thread);
+ 
+ 	return IRQ_HANDLED;
+@@ -777,8 +776,7 @@ qcaspi_netdev_xmit(struct sk_buff *skb,
+ 
+ 	netif_trans_update(dev);
+ 
+-	if (qca->spi_thread &&
+-	    qca->spi_thread->state != TASK_RUNNING)
++	if (qca->spi_thread)
+ 		wake_up_process(qca->spi_thread);
+ 
+ 	return NETDEV_TX_OK;
+--- a/drivers/usb/gadget/udc/max3420_udc.c
++++ b/drivers/usb/gadget/udc/max3420_udc.c
+@@ -509,8 +509,7 @@ static irqreturn_t max3420_vbus_handler(
+ 			     ? USB_STATE_POWERED : USB_STATE_NOTATTACHED);
+ 	spin_unlock_irqrestore(&udc->lock, flags);
+ 
+-	if (udc->thread_task &&
+-	    udc->thread_task->state != TASK_RUNNING)
++	if (udc->thread_task)
+ 		wake_up_process(udc->thread_task);
+ 
+ 	return IRQ_HANDLED;
+@@ -529,8 +528,7 @@ static irqreturn_t max3420_irq_handler(i
  	}
+ 	spin_unlock_irqrestore(&udc->lock, flags);
+ 
+-	if (udc->thread_task &&
+-	    udc->thread_task->state != TASK_RUNNING)
++	if (udc->thread_task)
+ 		wake_up_process(udc->thread_task);
+ 
+ 	return IRQ_HANDLED;
+@@ -1093,8 +1091,7 @@ static int max3420_wakeup(struct usb_gad
+ 
+ 	spin_unlock_irqrestore(&udc->lock, flags);
+ 
+-	if (udc->thread_task &&
+-	    udc->thread_task->state != TASK_RUNNING)
++	if (udc->thread_task)
+ 		wake_up_process(udc->thread_task);
+ 	return ret;
+ }
+@@ -1117,8 +1114,7 @@ static int max3420_udc_start(struct usb_
+ 	udc->todo |= UDC_START;
+ 	spin_unlock_irqrestore(&udc->lock, flags);
+ 
+-	if (udc->thread_task &&
+-	    udc->thread_task->state != TASK_RUNNING)
++	if (udc->thread_task)
+ 		wake_up_process(udc->thread_task);
+ 
+ 	return 0;
+@@ -1137,8 +1133,7 @@ static int max3420_udc_stop(struct usb_g
+ 	udc->todo |= UDC_START;
+ 	spin_unlock_irqrestore(&udc->lock, flags);
+ 
+-	if (udc->thread_task &&
+-	    udc->thread_task->state != TASK_RUNNING)
++	if (udc->thread_task)
+ 		wake_up_process(udc->thread_task);
+ 
+ 	return 0;
+--- a/drivers/usb/host/max3421-hcd.c
++++ b/drivers/usb/host/max3421-hcd.c
+@@ -1169,8 +1169,7 @@ max3421_irq_handler(int irq, void *dev_i
+ 	struct spi_device *spi = to_spi_device(hcd->self.controller);
+ 	struct max3421_hcd *max3421_hcd = hcd_to_max3421(hcd);
+ 
+-	if (max3421_hcd->spi_thread &&
+-	    max3421_hcd->spi_thread->state != TASK_RUNNING)
++	if (max3421_hcd->spi_thread)
+ 		wake_up_process(max3421_hcd->spi_thread);
+ 	if (!test_and_set_bit(ENABLE_IRQ, &max3421_hcd->todo))
+ 		disable_irq_nosync(spi->irq);
+--- a/kernel/softirq.c
++++ b/kernel/softirq.c
+@@ -76,7 +76,7 @@ static void wakeup_softirqd(void)
+ 	/* Interrupts are disabled: no need to stop preemption */
+ 	struct task_struct *tsk = __this_cpu_read(ksoftirqd);
+ 
+-	if (tsk && tsk->state != TASK_RUNNING)
++	if (tsk)
+ 		wake_up_process(tsk);
+ }
+ 
 
 
