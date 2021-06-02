@@ -2,50 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2145EC47092
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22E2C47083
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:17:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 028EE613BA
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A3A7613D8
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbhFBOSd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 10:18:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231415AbhFBOQa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 10:16:30 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D0EC061354;
-        Wed,  2 Jun 2021 07:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Sziljs0Kulfo1/57Liy6kTpQt/mrzjVM95lhyl4pzA4=; b=di9dQnw7YWomw7sRDOsQo7PUMD
-        TJInYkPIDn+/QK90Sos0c8Rezc7X8ImBRnaDqxkesZTzU3zBWgy4G6U4xXqLz09/hpYATAA8slRuH
-        z5QgLBkbaBJf/nxSrsbFRF31HH3ARg56XBhL22G9hLm1sHL0quLpRuKbqF/t2jaxsG2aoKnSpz0J6
-        JwRCyVRR/4oZYywGxUDYGOan1B+cIaFO1YcfQl0rAlpcHTiWKkj2/IJRMvkKXL0znHPsw7bjE4bnM
-        9Z7WPFFotrWHc/x+VwwKdH54p9rhGCj4A2ocBzrxy0h4dJrMU7v/Kb9Xu0TyOL8TyMumyZPfiWVKG
-        NNissGXA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1loRZn-00BBJ8-0J; Wed, 02 Jun 2021 14:10:35 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 27D8F30008D;
-        Wed,  2 Jun 2021 16:10:29 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 10B2A20223DA5; Wed,  2 Jun 2021 16:10:29 +0200 (CEST)
-Date:   Wed, 2 Jun 2021 16:10:29 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+        id S231931AbhFBOTC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 10:19:02 -0400
+Received: from mail.efficios.com ([167.114.26.124]:40642 "EHLO
+        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232154AbhFBORA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 10:17:00 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 678EE302DAA;
+        Wed,  2 Jun 2021 10:15:17 -0400 (EDT)
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 8RvjTnc1vjOW; Wed,  2 Jun 2021 10:15:17 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 9F3AF302B63;
+        Wed,  2 Jun 2021 10:15:16 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 9F3AF302B63
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+        s=default; t=1622643316;
+        bh=wTS/crR/26N4BDTiNFNNZoqsETfUenagK9Jc/umukAM=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=HjuuxeCx/W0ucWdgkdPe4Ltmueov6LEz9QoWVQ9n275sUH5V2BfBx2uLemee8nOgV
+         iEPOUdYsPm3Mmmkxyd2M/xe2NzuiK0lte25kNJqF/D6aBdMudEsd6+/AvYnVI3XvQB
+         I3eKlxdMnA/4sIrtiEyziYHBHFsURA8x1tU1usHbZhQ+Nqw4zpB4HKNzuSQ6QLswXS
+         8VevSWMXfGVlYdJrwg5WBPwEe4w0fAdx0pE768+FRtKKL3etA75RfRjkypdxFoVZY5
+         KUm3EJy+oFxv1WaIjL0MV00CLSuspl8VcSBxV1CpXr+Or5zRpRWJvt+/OT6gN/Sqjt
+         hvtczOpS4cKPQ==
+X-Virus-Scanned: amavisd-new at efficios.com
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id INsgB7HWhvRx; Wed,  2 Jun 2021 10:15:16 -0400 (EDT)
+Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
+        by mail.efficios.com (Postfix) with ESMTP id 702A6302A65;
+        Wed,  2 Jun 2021 10:15:16 -0400 (EDT)
+Date:   Wed, 2 Jun 2021 10:15:16 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
         Juri Lelli <juri.lelli@redhat.com>,
@@ -94,48 +97,49 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
         rcu <rcu@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
         KVM list <kvm@vger.kernel.org>
+Message-ID: <1524365960.5868.1622643316351.JavaMail.zimbra@efficios.com>
+In-Reply-To: <20210602133040.398289363@infradead.org>
+References: <20210602131225.336600299@infradead.org> <20210602133040.398289363@infradead.org>
 Subject: Re: [PATCH 3/6] sched,perf,kvm: Fix preemption condition
-Message-ID: <YLeRVQbXt2hCiO8f@hirez.programming.kicks-ass.net>
-References: <20210602131225.336600299@infradead.org>
- <20210602133040.398289363@infradead.org>
- <1873020549.5854.1622642347895.JavaMail.zimbra@efficios.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1873020549.5854.1622642347895.JavaMail.zimbra@efficios.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [167.114.26.124]
+X-Mailer: Zimbra 8.8.15_GA_4018 (ZimbraWebClient - FF88 (Linux)/8.8.15_GA_4026)
+Thread-Topic: sched,perf,kvm: Fix preemption condition
+Thread-Index: NELkknquBPwUAC7hR8bH+DhrqDwz1A==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 09:59:07AM -0400, Mathieu Desnoyers wrote:
-> ----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
+----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
+[...]
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -8568,13 +8568,12 @@ static void perf_event_switch(struct tas
+> 		},
+> 	};
 > 
-> > When ran from the sched-out path (preempt_notifier or perf_event),
-> > p->state is irrelevant to determine preemption. You can get preempted
-> > with !task_is_running() just fine.
-> > 
-> > The right indicator for preemption is if the task is still on the
-> > runqueue in the sched-out path.
-> > 
-> > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> > ---
-> > kernel/events/core.c |    7 +++----
-> > virt/kvm/kvm_main.c  |    2 +-
-> > 2 files changed, 4 insertions(+), 5 deletions(-)
-> > 
-> > --- a/kernel/events/core.c
-> > +++ b/kernel/events/core.c
-> > @@ -8568,13 +8568,12 @@ static void perf_event_switch(struct tas
-> > 		},
-> > 	};
-> > 
-> > -	if (!sched_in && task->state == TASK_RUNNING)
-> > +	if (!sched_in && current->on_rq) {
+> -	if (!sched_in && task->state == TASK_RUNNING)
+> +	if (!sched_in && current->on_rq) {
+> 		switch_event.event_id.header.misc |=
+> 				PERF_RECORD_MISC_SWITCH_OUT_PREEMPT;
+> +	}
 > 
-> This changes from checking task->state to current->on_rq, but this change
-> from "task" to "current" is not described in the commit message, which is odd.
-> 
-> Are we really sure that task == current here ?
+> -	perf_iterate_sb(perf_event_switch_output,
+> -		       &switch_event,
+> -		       NULL);
+> +	perf_iterate_sb(perf_event_switch_output, &switch_event, NULL);
+> }
 
-Yeah, @task == @prev == current at this point, but yes, not sure why I
-changed that... lemme change that back to task.
+There is a lot of code cleanup going on here which does not seem to belong
+to a "Fix" patch.
+
+Thanks,
+
+Mathieu
+
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
