@@ -2,400 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8122CC47083
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 07:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8BFC47093
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 07:49:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60DB7613AD
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 07:44:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFA3261396
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 07:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232047AbhFBHqZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 03:46:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24389 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232045AbhFBHqY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Jun 2021 03:46:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622619881;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DLGpkDE1IQ5Z6ghLy17vYVsC5JFNhgBxA3y2/XyFEdA=;
-        b=Kj78VhVlgumNSZZOv6o2W4XufbFO5RGXf6visohiZ41tFJnrNCSXMdSMCHZbNYmDrYeKpj
-        ZKfAKsUgLLMIdmwovS5dIo06ivjg/RDa+v16gKdk3knDxXeOFLCdr4/raX/S4jLOh1f9NK
-        pGS7kwL4zr7Ph8F3rl6HyWusoq2Ls14=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-UOj76_SMMWGvfqHQL86DCw-1; Wed, 02 Jun 2021 03:44:39 -0400
-X-MC-Unique: UOj76_SMMWGvfqHQL86DCw-1
-Received: by mail-wm1-f70.google.com with SMTP id h18-20020a05600c3512b029018434eb1bd8so1826829wmq.2
-        for <linux-block@vger.kernel.org>; Wed, 02 Jun 2021 00:44:39 -0700 (PDT)
+        id S232233AbhFBHvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 03:51:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60848 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232237AbhFBHvX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 03:51:23 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38399C06175F
+        for <linux-block@vger.kernel.org>; Wed,  2 Jun 2021 00:49:40 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id o5so1780547edc.5
+        for <linux-block@vger.kernel.org>; Wed, 02 Jun 2021 00:49:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IviQGHXbohDYlY4Kaxm/cxlbY44V3tAurEYksJ8dtbE=;
+        b=jCNYXrovW1sUHaOT/+lw4PCDhP0eyRFf+ELw7YXWBCDBnLin+ptT9Qqbj9mRkWWaUg
+         wGBYm/DlmYSjFuDFdCiAFeYUhwBx3bN1zWIfEq4U/R6NzUaRvMrhsPRnKTgM5MVFJVxB
+         CmVxljvKTCN3ZyT1LwzUVWKZgE4x9cRuQaj0TjoJvUnlN68E3Mt+4zAfSoenpZB5Ofxb
+         0XLwmhqFLm1lOHsISGA/CxlwAihZibid3kenEAmMklVKKOHOy1nSq3KrSTTjFuaKWHai
+         u516kaTGPG4uhGM5WuZ/+lvOuzezIo89jko54Ak3T4r5ol1iQsDze8x0V5mTappbPtSr
+         aaWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:organization:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=DLGpkDE1IQ5Z6ghLy17vYVsC5JFNhgBxA3y2/XyFEdA=;
-        b=gg8zrFqh7RzBp0W6kSRGVC9tKVCMw299MWyfHl8ZPTaZP6fFUFelf3d/WyZCM6nrKn
-         XPU43zzNmUS45Eau1uPy4L7WBiQi5KYj8Z2XG58G9YNaYLQzp/krQ/R9HrKvc3B3/nhX
-         iWPSlVING0LJeM35H+fvPAlXPbIcm6aNZv7bhsdxoaBcANEI15eNGAUXA++EJixnBloI
-         hn/Zmtf9qHbsZA1tQUq27Jg3OWCU2VBO2rtwPPGr0d/oRjKp+wPbz6FJX2D5DFrekGOd
-         yAhtFI6zS6Kf+IDG1xGd/DbhoaVLoP2zuGjPqI5Aeg81wsOuE8OXesw6CkBBB3U9hh2A
-         69/w==
-X-Gm-Message-State: AOAM532Xd0byJyCl1WR0rJOkLBBkeEvx0Uv5fqlm4gpDffPcVzhUCm5G
-        F+RmV1v7v5mLZupTq0/qCmgZqr++pVbULHyjRUnPuW9n1P4AJ1QCXlPydd8zeqK4ScrrmlMePpH
-        j6yLUJw++cDg8IhYRkJzDjlI=
-X-Received: by 2002:a05:6000:1542:: with SMTP id 2mr1386663wry.4.1622619878314;
-        Wed, 02 Jun 2021 00:44:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzI3CiFMzRRi7muHGRTn1JgPXeq0ijBTSXMaKWHp06UrdyFomSIUI6/+cnQbSdUADSp0rrJTQ==
-X-Received: by 2002:a05:6000:1542:: with SMTP id 2mr1386639wry.4.1622619877932;
-        Wed, 02 Jun 2021 00:44:37 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6b6d.dip0.t-ipconnect.de. [91.12.107.109])
-        by smtp.gmail.com with ESMTPSA id z12sm5549022wrv.68.2021.06.02.00.44.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jun 2021 00:44:37 -0700 (PDT)
-To:     yong w <yongw.pur@gmail.com>
-Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
-        axboe@kernel.dk, akpm@linux-foundation.org,
-        songmuchun@bytedance.com, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-References: <CAOH5QeCiBF8AYsF853YRFw=kKq+7ps_a30qOFwYOwbinYLbUEw@mail.gmail.com>
- <13c28e69-cfd9-bcf6-ab77-445c6fa4cc6e@redhat.com>
- <CAOH5QeDapb6zsUZK3QA66PNfWJovqR4gWMODnckVdfbvte0Vqg@mail.gmail.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [RFC PATCH V1] zram:calculate available memory when zram is used
-Message-ID: <4350ee16-15d0-1d37-6074-cea5185aac51@redhat.com>
-Date:   Wed, 2 Jun 2021 09:44:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IviQGHXbohDYlY4Kaxm/cxlbY44V3tAurEYksJ8dtbE=;
+        b=eoCrMqWnayJu1vuKhG8pIaY2CA3ZJNwN/54+2yt3nBw6pEgR+KFLBui3amrhxHMRXI
+         bY2okrutKLD0WlCEH9d1Tc2mNWI2k+ghJyGnGLzXuggCurkXFlC5nWrwfAW4FYAuZZ4t
+         DE+aO/NmhRIbrqoH66/Fyg7J7uvElFz9VuKGXbRtFD7JVG7H6IhB3NcD5l2LCIVBEMm5
+         u2jFIclJ9/u1Dg7CBxBkcnHETmXTFvt4bKh2d5Jn43h5QG3vNK/p23oMUns6p5ZfGZrO
+         rksipi5RYTySNIJhENJ9Xf8n9dg7Ukcf2HYa2hF6uZRiWvQbsSpfO+4KyiYJKpzRjVub
+         nogw==
+X-Gm-Message-State: AOAM531UMS5gT0e+Ze5aCdGWNpR9uV7jukoPCWKtivT8IwqYc+YYThkn
+        qb0jwkqKX2TGLiFRcd0z4swzxY2pni1ddRZPPmr2Ng==
+X-Google-Smtp-Source: ABdhPJzRCVGimPnGT3qQlEAMsZsY3IxcZZF186UcWgTyI7ay8iWe4IlRIEG5WowCojeDoPju71hCmgBQ+xR7PgbbWL0=
+X-Received: by 2002:aa7:c693:: with SMTP id n19mr33130385edq.35.1622620178044;
+ Wed, 02 Jun 2021 00:49:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAOH5QeDapb6zsUZK3QA66PNfWJovqR4gWMODnckVdfbvte0Vqg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210602065345.355274-1-hch@lst.de> <20210602065345.355274-24-hch@lst.de>
+In-Reply-To: <20210602065345.355274-24-hch@lst.de>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Wed, 2 Jun 2021 09:49:27 +0200
+Message-ID: <CAMGffEn7aCmTOTsuzbSr=DwomFKfizkNhzsZnAONHBq1neW2Og@mail.gmail.com>
+Subject: Re: [PATCH 23/30] rnbd: use blk_mq_alloc_disk and blk_cleanup_disk
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Tim Waugh <tim@cyberelk.net>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>, nbd@other.debian.org,
+        linuxppc-dev@lists.ozlabs.org,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 02.06.21 02:06, yong w wrote:
-> Thanks for your reply!
-> 
-> Indeed, when zram is not triggered, MemAvalible will be greater than Memtotal.
-> As you said, this modification will have program compatibility issues,
->   when there
-> are some user space scripts use MemAvailable for calculation.
-> 
-> How about providing another proc interface?
-> Such as /proc/xxx, When execute “cat /proc/xxx”, it returns "available
-> + swapfree - swapfree * compress ratio" value.
+On Wed, Jun 2, 2021 at 8:55 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Use blk_mq_alloc_disk and blk_cleanup_disk to simplify the gendisk and
+> request_queue allocation.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/rnbd/rnbd-clt.c | 35 ++++++++---------------------------
+>  1 file changed, 8 insertions(+), 27 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+> index c604a402cd5c..f4fa45d24c0b 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -1353,18 +1353,6 @@ static void rnbd_init_mq_hw_queues(struct rnbd_clt_dev *dev)
+>         }
+>  }
+>
+> -static int setup_mq_dev(struct rnbd_clt_dev *dev)
+> -{
+> -       dev->queue = blk_mq_init_queue(&dev->sess->tag_set);
+> -       if (IS_ERR(dev->queue)) {
+> -               rnbd_clt_err(dev, "Initializing multiqueue queue failed, err: %ld\n",
+> -                             PTR_ERR(dev->queue));
+> -               return PTR_ERR(dev->queue);
+> -       }
+> -       rnbd_init_mq_hw_queues(dev);
+> -       return 0;
+> -}
+> -
+>  static void setup_request_queue(struct rnbd_clt_dev *dev)
+>  {
+>         blk_queue_logical_block_size(dev->queue, dev->logical_block_size);
+> @@ -1393,13 +1381,13 @@ static void setup_request_queue(struct rnbd_clt_dev *dev)
+>         blk_queue_io_opt(dev->queue, dev->sess->max_io_size);
+>         blk_queue_virt_boundary(dev->queue, SZ_4K - 1);
+>         blk_queue_write_cache(dev->queue, dev->wc, dev->fua);
+> -       dev->queue->queuedata = dev;
+>  }
+>
+>  static void rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
+>  {
+>         dev->gd->major          = rnbd_client_major;
+>         dev->gd->first_minor    = idx << RNBD_PART_BITS;
+> +       dev->gd->minors         = 1 << RNBD_PART_BITS;
+>         dev->gd->fops           = &rnbd_client_ops;
+>         dev->gd->queue          = dev->queue;
+>         dev->gd->private_data   = dev;
+> @@ -1426,24 +1414,18 @@ static void rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
+>
+>  static int rnbd_client_setup_device(struct rnbd_clt_dev *dev)
+>  {
+> -       int err, idx = dev->clt_device_id;
+> +       int idx = dev->clt_device_id;
+>
+>         dev->size = dev->nsectors * dev->logical_block_size;
+>
+> -       err = setup_mq_dev(dev);
+> -       if (err)
+> -               return err;
+> +       dev->gd = blk_mq_alloc_disk(&dev->sess->tag_set, dev);
+> +       if (IS_ERR(dev->gd))
+> +               return PTR_ERR(dev->gd);
+> +       dev->queue = dev->gd->queue;
+> +       rnbd_init_mq_hw_queues(dev);
+>
+>         setup_request_queue(dev);
+> -
+> -       dev->gd = alloc_disk_node(1 << RNBD_PART_BITS,  NUMA_NO_NODE);
+> -       if (!dev->gd) {
+> -               blk_cleanup_queue(dev->queue);
+> -               return -ENOMEM;
+> -       }
+> -
+>         rnbd_clt_setup_gen_disk(dev, idx);
+> -
+>         return 0;
+>  }
+>
+> @@ -1650,8 +1632,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+>  static void destroy_gen_disk(struct rnbd_clt_dev *dev)
+>  {
+>         del_gendisk(dev->gd);
+> -       blk_cleanup_queue(dev->queue);
+> -       put_disk(dev->gd);
+> +       blk_cleanup_disk(dev->gd);
+>  }
+>
+>  static void destroy_sysfs(struct rnbd_clt_dev *dev,
+> --
+> 2.30.2
 
-Good question. What would be an appropriate name and description for 
-this entry?
-
-We do have in /proc/meminfo already:
-
-MemTotal:
-MemAvailable:
-SwapTotal:
-SwapFree:
-
-I wonder if we could add an entry either for "swapfree - swapfree * 
-compress" or "swapfree * compress". But even then, I struggle to find a 
-fitting name. We could either define something like
-
-"SwapAvailable:" An estimate of how much swap space is available for 
-starting new applications. Note that SwapAvailable is different to 
-SwapFree when swap compression, as implemented by zram, is being performed.
-
-So a user can compute
-
-"TotalAvailable = MemAvailable + SwapAvailable".
-
-or if that doesn't make any sense:
-
-"TotalAvailable:" An estimate of how much memory and swap space is 
-available for starting new applications. Usually, the value corresponds 
-to "MemAvailable + SwapFree", however, swap compression, as implemented 
-by zram, might allow for making more efficient use of free swap space.
-
-
-I'd prefer the first -- if it makes any sense.
-
-You should CC linux-api on follow up patches.
-
-> Thanks in advance！
-> 
-> 
-> David Hildenbrand <david@redhat.com> 于2021年5月31日周一 下午4:17写道：
->>
->> On 30.05.21 19:18, yong w wrote:
->>> When zram is used, available+Swap free memory is obviously bigger than
->>> I actually can use, because zram can compress memory by compression
->>> algorithm and zram compressed data will occupy memory too.
->>>
->>> So, I count the compression rate of zram in the kernel. The available
->>> memory  is calculated as follows:
->>> available + swapfree - swapfree * compress ratio
->>> MemAvailable in /proc/meminfo returns available + zram will save space
->>>
->>
->> This will mean that we can easily have MemAvailable > MemTotal, right?
->> I'm not sure if there are some user space scripts that will be a little
->> disrupted by that. Like calculating "MemUnavailable = MemTotal -
->> MemAvailable".
->>
->> MemAvailable: "An estimate of how much memory is available for starting
->> new applications, without swapping"
->>
->> Although zram isn't "traditional swapping", there is still a performance
->> impact when having to go to zram because it adds an indirection and
->> requires (de)compression. Similar to having very fast swap space (like
->> PMEM). Let's not call something "memory" that doesn't have the same
->> semantics as real memory as in "MemTotal".
->>
->> This doesn't feel right.
->>
->>> Signed-off-by: wangyong <yongw.pur@gmail.com <mailto:yongw.pur@gmail.com>>
->>> ---
->>>    drivers/block/zram/zcomp.h    |  1 +
->>>    drivers/block/zram/zram_drv.c |  4 ++
->>>    drivers/block/zram/zram_drv.h |  1 +
->>>    fs/proc/meminfo.c             |  2 +-
->>>    include/linux/swap.h          | 10 +++++
->>>    mm/swapfile.c                 | 95
->>> +++++++++++++++++++++++++++++++++++++++++++
->>>    mm/vmscan.c                   |  1 +
->>>    7 files changed, 113 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
->>> index 40f6420..deb2dbf 100644
->>> --- a/drivers/block/zram/zcomp.h
->>> +++ b/drivers/block/zram/zcomp.h
->>> @@ -40,4 +40,5 @@ int zcomp_decompress(struct zcomp_strm *zstrm,
->>>     const void *src, unsigned int src_len, void *dst);
->>>
->>>    bool zcomp_set_max_streams(struct zcomp *comp, int num_strm);
->>> +int get_zram_major(void);
->>>    #endif /* _ZCOMP_H_ */
->>> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
->>> index cf8deec..1c6cbd4 100644
->>> --- a/drivers/block/zram/zram_drv.c
->>> +++ b/drivers/block/zram/zram_drv.c
->>> @@ -59,6 +59,10 @@ static void zram_free_page(struct zram *zram, size_t
->>> index);
->>>    static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
->>>     u32 index, int offset, struct bio *bio);
->>>
->>> +int get_zram_major(void)
->>> +{
->>> + return zram_major;
->>> +}
->>>
->>>    static int zram_slot_trylock(struct zram *zram, u32 index)
->>>    {
->>> diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
->>> index 6e73dc3..5d8701a 100644
->>> --- a/drivers/block/zram/zram_drv.h
->>> +++ b/drivers/block/zram/zram_drv.h
->>> @@ -88,6 +88,7 @@ struct zram_stats {
->>>     atomic64_t bd_reads; /* no. of reads from backing device */
->>>     atomic64_t bd_writes; /* no. of writes from backing device */
->>>    #endif
->>> + atomic_t min_compr_ratio;
->>>    };
->>>
->>>    struct zram {
->>> diff --git a/fs/proc/meminfo.c b/fs/proc/meminfo.c
->>> index 6fa761c..f7bf350 100644
->>> --- a/fs/proc/meminfo.c
->>> +++ b/fs/proc/meminfo.c
->>> @@ -57,7 +57,7 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
->>>
->>>     show_val_kb(m, "MemTotal:       ", i.totalram);
->>>     show_val_kb(m, "MemFree:        ", i.freeram);
->>> - show_val_kb(m, "MemAvailable:   ", available);
->>> + show_val_kb(m, "MemAvailable:   ", available + count_avail_swaps());
->>>     show_val_kb(m, "Buffers:        ", i.bufferram);
->>>     show_val_kb(m, "Cached:         ", cached);
->>>     show_val_kb(m, "SwapCached:     ", total_swapcache_pages());
->>> diff --git a/include/linux/swap.h b/include/linux/swap.h
->>> index 032485e..3225a2f 100644
->>> --- a/include/linux/swap.h
->>> +++ b/include/linux/swap.h
->>> @@ -514,6 +514,8 @@ extern int init_swap_address_space(unsigned int
->>> type, unsigned long nr_pages);
->>>    extern void exit_swap_address_space(unsigned int type);
->>>    extern struct swap_info_struct *get_swap_device(swp_entry_t entry);
->>>    sector_t swap_page_sector(struct page *page);
->>> +extern void update_zram_zstats(void);
->>> +extern u64 count_avail_swaps(void);
->>>
->>>    static inline void put_swap_device(struct swap_info_struct *si)
->>>    {
->>> @@ -684,6 +686,14 @@ static inline swp_entry_t get_swap_page(struct page
->>> *page)
->>>     return entry;
->>>    }
->>>
->>> +void update_zram_zstats(void)
->>> +{
->>> +}
->>> +
->>> +u64 count_avail_swaps(void)
->>> +{
->>> +}
->>> +
->>>    #endif /* CONFIG_SWAP */
->>>
->>>    #ifdef CONFIG_THP_SWAP
->>> diff --git a/mm/swapfile.c b/mm/swapfile.c
->>> index cbb4c07..93a9dcb 100644
->>> --- a/mm/swapfile.c
->>> +++ b/mm/swapfile.c
->>> @@ -44,6 +44,7 @@
->>>    #include <asm/tlbflush.h>
->>>    #include <linux/swapops.h>
->>>    #include <linux/swap_cgroup.h>
->>> +#include "../drivers/block/zram/zram_drv.h"
->>>
->>>    static bool swap_count_continued(struct swap_info_struct *, pgoff_t,
->>>     unsigned char);
->>> @@ -3408,6 +3409,100 @@ SYSCALL_DEFINE2(swapon, const char __user *,
->>> specialfile, int, swap_flags)
->>>     return error;
->>>    }
->>>
->>> +u64 count_avail_swap(struct swap_info_struct *si)
->>> +{
->>> + u64 result;
->>> + struct zram *z;
->>> + unsigned int free;
->>> + unsigned int ratio;
->>> +
->>> + result = 0;
->>> + if (!si)
->>> + return 0;
->>> +
->>> + //zram calculate available mem
->>> + if (si->flags & SWP_USED && si->swap_map) {
->>> + if (si->bdev->bd_disk->major == get_zram_major()) {
->>> + z = (struct zram *)si->bdev->bd_disk->private_data;
->>> + down_read(&z->init_lock);
->>> + ratio = atomic_read(&z->stats.min_compr_ratio);
->>> + free = (si->pages << (PAGE_SHIFT - 10))
->>> + - (si->inuse_pages << (PAGE_SHIFT - 10));
->>> + if (!ratio)
->>> + result += free / 2;
->>> + else
->>> + result = free * (100 - 10000 / ratio) / 100;
->>> + up_read(&z->init_lock);
->>> + }
->>> + } else
->>> + result += (si->pages << (PAGE_SHIFT - 10))
->>> + - (si->inuse_pages << (PAGE_SHIFT - 10));
->>> +
->>> + return result;
->>> +}
->>> +
->>> +u64 count_avail_swaps(void)
->>> +{
->>> + int type;
->>> + u64 result;
->>> + struct swap_info_struct *si;
->>> +
->>> + result = 0;
->>> + spin_lock(&swap_lock);
->>> + for (type = 0; type < nr_swapfiles; type++) {
->>> + si = swap_info[type];
->>> + spin_lock(&si->lock);
->>> + result += count_avail_swap(si);
->>> + spin_unlock(&si->lock);
->>> + }
->>> + spin_unlock(&swap_lock);
->>> +
->>> + return result;
->>> +}
->>> +
->>> +void update_zram_zstat(struct swap_info_struct *si)
->>> +{
->>> + struct zram *z;
->>> + struct zram_stats *stat;
->>> + int ratio;
->>> + u64 orig_size, compr_data_size;
->>> +
->>> + if (!si)
->>> + return;
->>> +
->>> + //update zram min compress ratio
->>> + if (si->flags & SWP_USED && si->swap_map) {
->>> + if (si->bdev->bd_disk->major == get_zram_major()) {
->>> + z = (struct zram *)si->bdev->bd_disk->private_data;
->>> + down_read(&z->init_lock);
->>> + stat = &z->stats;
->>> + ratio = atomic_read(&stat->min_compr_ratio);
->>> + orig_size = atomic64_read(&stat->pages_stored) << PAGE_SHIFT;
->>> + compr_data_size = atomic64_read(&stat->compr_data_size);
->>> + if (compr_data_size && (!ratio
->>> +     || ((orig_size * 100) / compr_data_size < ratio)))
->>> + atomic_set(&stat->min_compr_ratio,
->>> +    (orig_size * 100) / compr_data_size);
->>> + up_read(&z->init_lock);
->>> + }
->>> + }
->>> +}
->>> +
->>> +void update_zram_zstats(void)
->>> +{
->>> + int type;
->>> + struct swap_info_struct *si;
->>> +
->>> + spin_lock(&swap_lock);
->>> + for (type = 0; type < nr_swapfiles; type++) {
->>> + si = swap_info[type];
->>> + spin_lock(&si->lock);
->>> + update_zram_zstat(si);
->>> + spin_unlock(&si->lock);
->>> + }
->>> + spin_unlock(&swap_lock);
->>> +}
->>> +
->>>    void si_swapinfo(struct sysinfo *val)
->>>    {
->>>     unsigned int type;
->>> diff --git a/mm/vmscan.c b/mm/vmscan.c
->>> index eb31452..ffaf59b 100644
->>> --- a/mm/vmscan.c
->>> +++ b/mm/vmscan.c
->>> @@ -4159,6 +4159,7 @@ static int kswapd(void *p)
->>>     alloc_order);
->>>     reclaim_order = balance_pgdat(pgdat, alloc_order,
->>>     highest_zoneidx);
->>> + update_zram_zstats();
->>>     if (reclaim_order < alloc_order)
->>>     goto kswapd_try_sleep;
->>>     }
->>> --
->>> 2.7.4
->>
->>
->> --
->> Thanks,
->>
->> David / dhildenb
->>
-> 
-
-
--- 
-Thanks,
-
-David / dhildenb
-
+Looks good to me, thx!
+Reviewed-by: Jack Wang <jinpu.wang@ionos.com>
+>
