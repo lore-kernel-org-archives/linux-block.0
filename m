@@ -7,38 +7,37 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2614C47093
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 083AFC47092
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:31:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0AF2613F0
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:31:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E65C8613D8
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:31:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232281AbhFBPdG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 11:33:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53040 "EHLO
+        id S232045AbhFBPdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 11:33:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232045AbhFBPdG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 11:33:06 -0400
-X-Greylist: delayed 120 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Jun 2021 08:31:22 PDT
+        with ESMTP id S230445AbhFBPdH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 11:33:07 -0400
 Received: from forwardcorp1o.mail.yandex.net (forwardcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7432C06174A;
-        Wed,  2 Jun 2021 08:31:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11BB0C061574;
+        Wed,  2 Jun 2021 08:31:23 -0700 (PDT)
 Received: from sas1-6b1512233ef6.qloud-c.yandex.net (sas1-6b1512233ef6.qloud-c.yandex.net [IPv6:2a02:6b8:c14:44af:0:640:6b15:1223])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 1C6472E1D2E;
-        Wed,  2 Jun 2021 18:29:22 +0300 (MSK)
+        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 0F9C92E1D33;
+        Wed,  2 Jun 2021 18:29:17 +0300 (MSK)
 Received: from sas2-d40aa8807eff.qloud-c.yandex.net (sas2-d40aa8807eff.qloud-c.yandex.net [2a02:6b8:c08:b921:0:640:d40a:a880])
-        by sas1-6b1512233ef6.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id XrUECaB8IF-TL1qV7d2;
-        Wed, 02 Jun 2021 18:29:22 +0300
+        by sas1-6b1512233ef6.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id TrKQoVFGJF-TG1CIAZV;
+        Wed, 02 Jun 2021 18:29:16 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1622647762; bh=8wJcLLg+BillrJ9UHnzlrqTLTSwh0Y5dlFFF7RlJ/k4=;
+        t=1622647756; bh=hYwqJA+O6ykw0/VyumwMuZ4OaZmd9yXQuhWfv1prTx4=;
         h=Message-Id:References:Date:Subject:To:From:In-Reply-To:Cc;
-        b=Ka38oQsGBLcIKLSPnYT9CKvdUTpqODcyH83nm/tW55bqB1fLgFyEMvE93Bg1J2RfN
-         mAh1XrdUTD/4uSn/EJLjE6QMP13ies7cLWxGqYqF1dYITDOUNZYE9ZuArAOPE3ITya
-         Jsoxr2dKyrADsXrOJctGPdwYdm9BKrfCstTDmfcA=
+        b=itM/SBRtK6q1EUtoIt4/NTP8K+XZRv+Hyh/ZijB76wQJVQ+0HmnWi5aJa+uLSekEa
+         twwWHpGO2LJTv1Qnhsf0mKGww8U/Xi+OjYjaoe08iyzxmQRn3Ic0UpdiAExuVk7T4y
+         AUzf3a/Hj2pQRyq8a/Bv/iPEeQDMfWEoYzZpdfYg=
 Authentication-Results: sas1-6b1512233ef6.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
 Received: from warwish-linux.sas.yp-c.yandex.net (warwish-linux.sas.yp-c.yandex.net [2a02:6b8:c1b:2920:0:696:cc9e:0])
-        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 42DbdVHlBw-TLoinGKp;
-        Wed, 02 Jun 2021 18:29:21 +0300
+        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 42DbdVHlBw-TGoiNLM6;
+        Wed, 02 Jun 2021 18:29:16 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
 From:   Anton Suvorov <warwish@yandex-team.ru>
@@ -46,9 +45,9 @@ To:     linux-kernel@vger.kernel.org
 Cc:     warwish@yandex-team.ru, linux-fsdevel@vger.kernel.org,
         dmtrmonakhov@yandex-team.ru, linux-block@vger.kernel.org,
         viro@zeniv.linux.org.uk
-Subject: [PATCH 08/10] ext4: reduce stack footprint in ext4_end_bio()
-Date:   Wed,  2 Jun 2021 18:29:01 +0300
-Message-Id: <20210602152903.910190-9-warwish@yandex-team.ru>
+Subject: [PATCH 02/10] dax: reduce stack footprint dealing with block device names
+Date:   Wed,  2 Jun 2021 18:28:55 +0300
+Message-Id: <20210602152903.910190-3-warwish@yandex-team.ru>
 In-Reply-To: <20210602152903.910190-1-warwish@yandex-team.ru>
 References: <20210602152903.910190-1-warwish@yandex-team.ru>
 MIME-Version: 1.0
@@ -59,30 +58,112 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Stack usage reduced (measured with allyesconfig):
 
-./fs/ext4/page-io.c     ext4_end_bio    224     88      -136
+./drivers/dax/super.c   __bdev_dax_supported    192     56      -136
+./drivers/dax/super.c   __generic_fsdax_supported       344     280     -64
 
 Signed-off-by: Anton Suvorov <warwish@yandex-team.ru>
 ---
- fs/ext4/page-io.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/dax/super.c | 34 ++++++++++++++++------------------
+ 1 file changed, 16 insertions(+), 18 deletions(-)
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index f038d578d8d8..56074f2f5e63 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -323,10 +323,9 @@ static void ext4_end_bio(struct bio *bio)
+diff --git a/drivers/dax/super.c b/drivers/dax/super.c
+index 5fa6ae9dbc8b..f694e25fe6af 100644
+--- a/drivers/dax/super.c
++++ b/drivers/dax/super.c
+@@ -73,7 +73,6 @@ bool __generic_fsdax_supported(struct dax_device *dax_dev,
  {
- 	ext4_io_end_t *io_end = bio->bi_private;
- 	sector_t bi_sector = bio->bi_iter.bi_sector;
--	char b[BDEVNAME_SIZE];
+ 	bool dax_enabled = false;
+ 	pgoff_t pgoff, pgoff_end;
+-	char buf[BDEVNAME_SIZE];
+ 	void *kaddr, *end_kaddr;
+ 	pfn_t pfn, end_pfn;
+ 	sector_t last_page;
+@@ -81,29 +80,29 @@ bool __generic_fsdax_supported(struct dax_device *dax_dev,
+ 	int err, id;
  
--	if (WARN_ONCE(!io_end, "io_end is NULL: %s: sector %Lu len %u err %d\n",
--		      bio_devname(bio, b),
-+	if (WARN_ONCE(!io_end, "io_end is NULL: %pg: sector %llu len %u err %d\n",
-+		      bio->bi_bdev,
- 		      (long long) bio->bi_iter.bi_sector,
- 		      (unsigned) bio_sectors(bio),
- 		      bio->bi_status)) {
+ 	if (blocksize != PAGE_SIZE) {
+-		pr_info("%s: error: unsupported blocksize for dax\n",
+-				bdevname(bdev, buf));
++		pr_info("%pg: error: unsupported blocksize for dax\n",
++			bdev);
+ 		return false;
+ 	}
+ 
+ 	if (!dax_dev) {
+-		pr_debug("%s: error: dax unsupported by block device\n",
+-				bdevname(bdev, buf));
++		pr_debug("%pg: error: dax unsupported by block device\n",
++			 bdev);
+ 		return false;
+ 	}
+ 
+ 	err = bdev_dax_pgoff(bdev, start, PAGE_SIZE, &pgoff);
+ 	if (err) {
+-		pr_info("%s: error: unaligned partition for dax\n",
+-				bdevname(bdev, buf));
++		pr_info("%pg: error: unaligned partition for dax\n",
++			bdev);
+ 		return false;
+ 	}
+ 
+ 	last_page = PFN_DOWN((start + sectors - 1) * 512) * PAGE_SIZE / 512;
+ 	err = bdev_dax_pgoff(bdev, last_page, PAGE_SIZE, &pgoff_end);
+ 	if (err) {
+-		pr_info("%s: error: unaligned partition for dax\n",
+-				bdevname(bdev, buf));
++		pr_info("%pg: error: unaligned partition for dax\n",
++			bdev);
+ 		return false;
+ 	}
+ 
+@@ -112,8 +111,8 @@ bool __generic_fsdax_supported(struct dax_device *dax_dev,
+ 	len2 = dax_direct_access(dax_dev, pgoff_end, 1, &end_kaddr, &end_pfn);
+ 
+ 	if (len < 1 || len2 < 1) {
+-		pr_info("%s: error: dax access failed (%ld)\n",
+-				bdevname(bdev, buf), len < 1 ? len : len2);
++		pr_info("%pg: error: dax access failed (%ld)\n",
++			bdev, len < 1 ? len : len2);
+ 		dax_read_unlock(id);
+ 		return false;
+ 	}
+@@ -147,8 +146,8 @@ bool __generic_fsdax_supported(struct dax_device *dax_dev,
+ 	dax_read_unlock(id);
+ 
+ 	if (!dax_enabled) {
+-		pr_info("%s: error: dax support not enabled\n",
+-				bdevname(bdev, buf));
++		pr_info("%pg: error: dax support not enabled\n",
++			bdev);
+ 		return false;
+ 	}
+ 	return true;
+@@ -169,21 +168,20 @@ bool __bdev_dax_supported(struct block_device *bdev, int blocksize)
+ {
+ 	struct dax_device *dax_dev;
+ 	struct request_queue *q;
+-	char buf[BDEVNAME_SIZE];
+ 	bool ret;
+ 	int id;
+ 
+ 	q = bdev_get_queue(bdev);
+ 	if (!q || !blk_queue_dax(q)) {
+-		pr_debug("%s: error: request queue doesn't support dax\n",
+-				bdevname(bdev, buf));
++		pr_debug("%pg: error: request queue doesn't support dax\n",
++			 bdev);
+ 		return false;
+ 	}
+ 
+ 	dax_dev = dax_get_by_host(bdev->bd_disk->disk_name);
+ 	if (!dax_dev) {
+-		pr_debug("%s: error: device does not support dax\n",
+-				bdevname(bdev, buf));
++		pr_debug("%pg: error: device does not support dax\n",
++			 bdev);
+ 		return false;
+ 	}
+ 
 -- 
 2.25.1
 
