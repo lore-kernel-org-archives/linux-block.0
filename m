@@ -3,41 +3,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF49C4708F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDE9C4708F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:34:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95E2D6138C
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:32:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D94561263
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:34:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231463AbhFBPeH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 11:34:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53292 "EHLO
+        id S231691AbhFBPfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 11:35:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231200AbhFBPeG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 11:34:06 -0400
-Received: from forwardcorp1o.mail.yandex.net (forwardcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F5D4C061574;
-        Wed,  2 Jun 2021 08:32:23 -0700 (PDT)
+        with ESMTP id S231200AbhFBPfs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 11:35:48 -0400
+Received: from forwardcorp1j.mail.yandex.net (forwardcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::183])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846ECC061574;
+        Wed,  2 Jun 2021 08:34:04 -0700 (PDT)
 Received: from sas1-6b1512233ef6.qloud-c.yandex.net (sas1-6b1512233ef6.qloud-c.yandex.net [IPv6:2a02:6b8:c14:44af:0:640:6b15:1223])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id ADC562E1D28;
-        Wed,  2 Jun 2021 18:29:20 +0300 (MSK)
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id B4B5D2E16E7;
+        Wed,  2 Jun 2021 18:29:15 +0300 (MSK)
 Received: from sas2-d40aa8807eff.qloud-c.yandex.net (sas2-d40aa8807eff.qloud-c.yandex.net [2a02:6b8:c08:b921:0:640:d40a:a880])
-        by sas1-6b1512233ef6.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id GmqcA41Nf1-TJ1mkN3p;
-        Wed, 02 Jun 2021 18:29:20 +0300
+        by sas1-6b1512233ef6.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id QfSGlawkec-TF1m5VGG;
+        Wed, 02 Jun 2021 18:29:15 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1622647760; bh=CK9yOrypVPtvStyIHv45RQwCxZOuMnmfxcH0vFg/HM4=;
-        h=Message-Id:References:Date:Subject:To:From:In-Reply-To:Cc;
-        b=r0RWbFGRrYflZylCxI5eCX+BhRkrn/35zU9QRALOwyNQysMzBDDLG4Uf8/9+q9pyT
-         U1+RIGQHn0DayZ9BiA2P//QYrlPUTD0M4eXQc5ixprgr9SiCPESkJPQ0XBWK+uudFp
-         MvVsUykkHXN/oOh0NBaGjokkATwK/1GDgjI7qkZo=
+        t=1622647755; bh=GHYHVjFgXMyBYXX9g5Vm44kIc3wPx/6lZzof53ArujY=;
+        h=Cc:Message-Id:Date:Subject:To:From;
+        b=J/92j8ZuZ+yMAOwCD78oNs5yFWA3WzuqHvE6UaGKJwGFvTIg/bUSW9HYlkmQ5rdh4
+         pG8KPYslrzw8+ngiPZ3xckDHKvmyH9eyhQUys55+fbUg0o/AcxlRFDmrTbcih5t5vA
+         05HdEG5dgChXLvlB4k1zM2N33dChXSw780eet7RI=
 Authentication-Results: sas1-6b1512233ef6.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
 Received: from warwish-linux.sas.yp-c.yandex.net (warwish-linux.sas.yp-c.yandex.net [2a02:6b8:c1b:2920:0:696:cc9e:0])
-        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 42DbdVHlBw-TJoiKvUR;
-        Wed, 02 Jun 2021 18:29:19 +0300
+        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 42DbdVHlBw-TEoiZoxf;
+        Wed, 02 Jun 2021 18:29:14 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
 From:   Anton Suvorov <warwish@yandex-team.ru>
@@ -45,264 +45,172 @@ To:     linux-kernel@vger.kernel.org
 Cc:     warwish@yandex-team.ru, linux-fsdevel@vger.kernel.org,
         dmtrmonakhov@yandex-team.ru, linux-block@vger.kernel.org,
         viro@zeniv.linux.org.uk
-Subject: [PATCH 05/10] block: reduce stack footprint dealing with block device names
-Date:   Wed,  2 Jun 2021 18:28:58 +0300
-Message-Id: <20210602152903.910190-6-warwish@yandex-team.ru>
-In-Reply-To: <20210602152903.910190-1-warwish@yandex-team.ru>
-References: <20210602152903.910190-1-warwish@yandex-team.ru>
+Subject: [PATCH 00/10] reduce stack footprint printing bdev names
+Date:   Wed,  2 Jun 2021 18:28:53 +0300
+Message-Id: <20210602152903.910190-1-warwish@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Stack usage reduced (measured with allyesconfig):
+Dmitry Monakhov <dmtrmonakhov@yandex-team.ru> started "kernel newbies"
+initiative at Yandex allowing developers unfamiliar with kernel
+development process to join kernel development. Initiative includes easy
+to fix bugs and some small improvments. This patchset was tailored as part
+of the initiative.
 
-./block/blk-core.c	submit_bio_checks	248	112	-136
-./block/blk-lib.c	__blkdev_issue_discard	240	104	-136
-./block/blk-settings.c	disk_stack_limits	256	192	-64
-./block/partitions/amiga.c	amiga_partition	424	368	-56
-./block/partitions/sgi.c	sgi_partition	352	288	-64
-./block/partitions/sun.c	sun_partition	392	328	-64
-./drivers/block/drbd/drbd_req.c	drbd_report_io_error	200	72	-128
-./drivers/block/pktcdvd.c	pkt_seq_show	288	224	-64
-./drivers/block/pktcdvd.c	pkt_setup_dev	272	136	-136
-./drivers/block/pktcdvd.c	pkt_submit_bio	288	224	-64
+Few years ago Dmitry Monakhov introduced %pg formatter for vsprintf()
+(https://lore.kernel.org/lkml/1428928300-9132-1-git-send-email-dmonakhov@openvz.org/)
+and switched some hot code paths to it instead of allocating temporary
+buffer for device name on stack. This patchset continues his work and
+expands to most places where temporary buffer with BDEVNAME_SIZE size
+allocated on stack. There are also some changes in printk() calls
+advised by checkpatch.pl script.
 
-Signed-off-by: Anton Suvorov <warwish@yandex-team.ru>
----
- block/blk-core.c         | 12 ++++--------
- block/blk-lib.c          |  5 +----
- block/blk-settings.c     |  7 ++-----
- block/partitions/amiga.c | 13 ++++++-------
- block/partitions/sgi.c   |  5 ++---
- block/partitions/sun.c   |  5 ++---
- drivers/block/pktcdvd.c  | 15 ++++++---------
- 7 files changed, 23 insertions(+), 39 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 689aac2625d2..d85693882e6e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -650,11 +650,9 @@ EXPORT_SYMBOL(blk_put_request);
- 
- static void handle_bad_sector(struct bio *bio, sector_t maxsector)
- {
--	char b[BDEVNAME_SIZE];
--
- 	pr_info_ratelimited("attempt to access beyond end of device\n"
--			    "%s: rw=%d, want=%llu, limit=%llu\n",
--			    bio_devname(bio, b), bio->bi_opf,
-+			    "%pg: rw=%d, want=%llu, limit=%llu\n",
-+			    bio->bi_bdev, bio->bi_opf,
- 			    bio_end_sector(bio), maxsector);
- }
- 
-@@ -696,14 +694,12 @@ static inline bool should_fail_request(struct block_device *part,
- static inline bool bio_check_ro(struct bio *bio)
- {
- 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
--		char b[BDEVNAME_SIZE];
--
- 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
- 			return false;
- 
- 		WARN_ONCE(1,
--		       "Trying to write to read-only block-device %s (partno %d)\n",
--			bio_devname(bio, b), bio->bi_bdev->bd_partno);
-+		       "Trying to write to read-only block-device %pg (partno %d)\n",
-+			bio->bi_bdev, bio->bi_bdev->bd_partno);
- 		/* Older lvm-tools actually trigger this */
- 		return false;
- 	}
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 7b256131b20b..6fe52f7f3f48 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -49,10 +49,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 
- 	/* In case the discard granularity isn't set by buggy device driver */
- 	if (WARN_ON_ONCE(!q->limits.discard_granularity)) {
--		char dev_name[BDEVNAME_SIZE];
--
--		bdevname(bdev, dev_name);
--		pr_err_ratelimited("%s: Error: discard_granularity is 0.\n", dev_name);
-+		pr_err_ratelimited("%pg: Error: discard_granularity is 0.\n", bdev);
- 		return -EOPNOTSUPP;
- 	}
- 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 902c40d67120..01972174b1b9 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -662,13 +662,10 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
- 
- 	if (blk_stack_limits(&t->limits, &bdev_get_queue(bdev)->limits,
- 			get_start_sect(bdev) + (offset >> 9)) < 0) {
--		char top[BDEVNAME_SIZE], bottom[BDEVNAME_SIZE];
-+		char top[BDEVNAME_SIZE];
- 
- 		disk_name(disk, 0, top);
--		bdevname(bdev, bottom);
--
--		printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
--		       top, bottom);
-+		pr_notice("%s: Warning: Device %pg is misaligned\n", top, bdev);
- 	}
- 
- 	blk_queue_update_readahead(disk->queue);
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index 9526491d9aed..36255fba6863 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -34,15 +34,14 @@ int amiga_partition(struct parsed_partitions *state)
- 	int start_sect, nr_sects, blk, part, res = 0;
- 	int blksize = 1;	/* Multiplier for disk block size */
- 	int slot = 1;
--	char b[BDEVNAME_SIZE];
- 
- 	for (blk = 0; ; blk++, put_dev_sector(sect)) {
- 		if (blk == RDB_ALLOCATION_LIMIT)
- 			goto rdb_done;
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			pr_err("Dev %s: unable to read RDB block %d\n",
--			       bdevname(state->bdev, b), blk);
-+			pr_err("Dev %pg: unable to read RDB block %d\n",
-+			       state->bdev, blk);
- 			res = -1;
- 			goto rdb_done;
- 		}
-@@ -63,8 +62,8 @@ int amiga_partition(struct parsed_partitions *state)
- 			break;
- 		}
- 
--		pr_err("Dev %s: RDB in block %d has bad checksum\n",
--		       bdevname(state->bdev, b), blk);
-+		pr_err("Dev %pg: RDB in block %d has bad checksum\n",
-+		       state->bdev, blk);
- 	}
- 
- 	/* blksize is blocks per 512 byte standard block */
-@@ -83,8 +82,8 @@ int amiga_partition(struct parsed_partitions *state)
- 		blk *= blksize;	/* Read in terms partition table understands */
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			pr_err("Dev %s: unable to read partition block %d\n",
--			       bdevname(state->bdev, b), blk);
-+			pr_err("Dev %pg: unable to read partition block %d\n",
-+			       state->bdev, blk);
- 			res = -1;
- 			goto rdb_done;
- 		}
-diff --git a/block/partitions/sgi.c b/block/partitions/sgi.c
-index 4273f1bb0515..65cf137760ac 100644
---- a/block/partitions/sgi.c
-+++ b/block/partitions/sgi.c
-@@ -43,7 +43,6 @@ int sgi_partition(struct parsed_partitions *state)
- 	Sector sect;
- 	struct sgi_disklabel *label;
- 	struct sgi_partition *p;
--	char b[BDEVNAME_SIZE];
- 
- 	label = read_part_sector(state, 0, &sect);
- 	if (!label)
-@@ -62,8 +61,8 @@ int sgi_partition(struct parsed_partitions *state)
- 		csum += be32_to_cpu(cs);
- 	}
- 	if(csum) {
--		printk(KERN_WARNING "Dev %s SGI disklabel: csum bad, label corrupted\n",
--		       bdevname(state->bdev, b));
-+		pr_warn("Dev %pg SGI disklabel: csum bad, label corrupted\n",
-+			state->bdev);
- 		put_dev_sector(sect);
- 		return 0;
- 	}
-diff --git a/block/partitions/sun.c b/block/partitions/sun.c
-index 47dc53eccf77..483be15f2800 100644
---- a/block/partitions/sun.c
-+++ b/block/partitions/sun.c
-@@ -65,7 +65,6 @@ int sun_partition(struct parsed_partitions *state)
- 	} * label;
- 	struct sun_partition *p;
- 	unsigned long spc;
--	char b[BDEVNAME_SIZE];
- 	int use_vtoc;
- 	int nparts;
- 
-@@ -85,8 +84,8 @@ int sun_partition(struct parsed_partitions *state)
- 	for (csum = 0; ush >= ((__be16 *) label);)
- 		csum ^= *ush--;
- 	if (csum) {
--		printk("Dev %s Sun disklabel: Csum bad, label corrupted\n",
--		       bdevname(state->bdev, b));
-+		pr_info("Dev %pg Sun disklabel: Csum bad, label corrupted\n",
-+			state->bdev);
- 		put_dev_sector(sect);
- 		return 0;
- 	}
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index bd3556585122..765c2d1567ba 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2405,14 +2405,13 @@ static void pkt_make_request_write(struct request_queue *q, struct bio *bio)
- static blk_qc_t pkt_submit_bio(struct bio *bio)
- {
- 	struct pktcdvd_device *pd;
--	char b[BDEVNAME_SIZE];
- 	struct bio *split;
- 
- 	blk_queue_split(&bio);
- 
- 	pd = bio->bi_bdev->bd_disk->queue->queuedata;
- 	if (!pd) {
--		pr_err("%s incorrect request queue\n", bio_devname(bio, b));
-+		pr_err("%pg incorrect request queue\n", bio->bi_bdev);
- 		goto end_io;
- 	}
- 
-@@ -2476,11 +2475,10 @@ static int pkt_seq_show(struct seq_file *m, void *p)
- {
- 	struct pktcdvd_device *pd = m->private;
- 	char *msg;
--	char bdev_buf[BDEVNAME_SIZE];
- 	int states[PACKET_NUM_STATES];
- 
--	seq_printf(m, "Writer %s mapped to %s:\n", pd->name,
--		   bdevname(pd->bdev, bdev_buf));
-+	seq_printf(m, "Writer %s mapped to %pg:\n", pd->name,
-+		   pd->bdev);
- 
- 	seq_printf(m, "\nSettings:\n");
- 	seq_printf(m, "\tpacket size:\t\t%dkB\n", pd->settings.size / 2);
-@@ -2537,7 +2535,6 @@ static int pkt_seq_show(struct seq_file *m, void *p)
- static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- {
- 	int i;
--	char b[BDEVNAME_SIZE];
- 	struct block_device *bdev;
- 
- 	if (pd->pkt_dev == dev) {
-@@ -2549,8 +2546,8 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 		if (!pd2)
- 			continue;
- 		if (pd2->bdev->bd_dev == dev) {
--			pkt_err(pd, "%s already setup\n",
--				bdevname(pd2->bdev, b));
-+			pkt_err(pd, "%pg already setup\n",
-+				pd2->bdev);
- 			return -EBUSY;
- 		}
- 		if (pd2->pkt_dev == dev) {
-@@ -2583,7 +2580,7 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 	}
- 
- 	proc_create_single_data(pd->name, 0, pkt_proc, pkt_seq_show, pd);
--	pkt_dbg(1, pd, "writer mapped to %s\n", bdevname(bdev, b));
-+	pkt_dbg(1, pd, "writer mapped to %pg\n", bdev);
- 	return 0;
- 
- out_mem:
+The patchset shows significant reduce of stack footprint:
+
+	./block/blk-core.c	submit_bio_checks	248	112	-136
+	./block/blk-lib.c	__blkdev_issue_discard	240	104	-136
+	./block/blk-settings.c	disk_stack_limits	256	192	-64
+	./block/partitions/amiga.c	amiga_partition	424	368	-56
+	./block/partitions/sgi.c	sgi_partition	352	288	-64
+	./block/partitions/sun.c	sun_partition	392	328	-64
+	./drivers/block/drbd/drbd_req.c	drbd_report_io_error	200	72	-128
+	./drivers/block/pktcdvd.c	pkt_seq_show	288	224	-64
+	./drivers/block/pktcdvd.c	pkt_setup_dev	272	136	-136
+	./drivers/block/pktcdvd.c	pkt_submit_bio	288	224	-64
+	./drivers/dax/super.c	__bdev_dax_supported	192	56	-136
+	./drivers/dax/super.c	__generic_fsdax_supported	344	280	-64
+	./drivers/md/dm-cache-target.c	cache_ctr	392	328	-64
+	./drivers/md/dm-cache-target.c	cache_io_hints	208	72	-136
+	./drivers/md/dm-clone-target.c	clone_ctr	416	352	-64
+	./drivers/md/dm-clone-target.c	clone_io_hints	216	80	-136
+	./drivers/md/dm-crypt.c	crypt_convert_block_aead	408	272	-136
+	./drivers/md/dm-crypt.c	kcryptd_async_done	192	56	-136
+	./drivers/md/dm-integrity.c	integrity_metadata	872	808	-64
+	./drivers/md/dm-mpath.c	parse_priority_group	368	304	-64
+	./drivers/md/dm-table.c	device_area_is_invalid	216	80	-136
+	./drivers/md/dm-table.c	dm_set_device_limits	200	72	-128
+	./drivers/md/dm-thin.c	pool_io_hints	216	80	-136
+	./drivers/md/md-linear.c	linear_make_request	248	112	-136
+	./drivers/md/md-multipath.c	multipath_end_request	232	96	-136
+	./drivers/md/md-multipath.c	multipath_error	208	72	-136
+	./drivers/md/md-multipath.c	multipathd	248	112	-136
+	./drivers/md/md-multipath.c	print_multipath_conf	208	64	-144
+	./drivers/md/md.c	autorun_devices	312	184	-128
+	./drivers/md/md.c	export_rdev	168	32	-136
+	./drivers/md/md.c	md_add_new_disk	280	80	-200
+	./drivers/md/md.c	md_import_device	200	56	-144
+	./drivers/md/md.c	md_integrity_add_rdev	192	56	-136
+	./drivers/md/md.c	md_ioctl	560	496	-64
+	./drivers/md/md.c	md_reload_sb	224	88	-136
+	./drivers/md/md.c	md_run	408	288	-120
+	./drivers/md/md.c	md_seq_show	232	96	-136
+	./drivers/md/md.c	md_update_sb	304	168	-136
+	./drivers/md/md.c	read_disk_sb	184	48	-136
+	./drivers/md/md.c	super_1_load	392	192	-200
+	./drivers/md/md.c	super_90_load	304	112	-192
+	./drivers/md/md.c	unbind_rdev_from_array	200	64	-136
+	./drivers/md/raid0.c	create_strip_zones	400	200	-200
+	./drivers/md/raid0.c	dump_zones	536	464	-72
+	./drivers/md/raid1.c	fix_read_error	352	288	-64
+	./drivers/md/raid1.c	print_conf	224	80	-144
+	./drivers/md/raid1.c	raid1_end_read_request	216	80	-136
+	./drivers/md/raid1.c	raid1_error	216	96	-120
+	./drivers/md/raid1.c	sync_request_write	344	208	-136
+	./drivers/md/raid10.c	fix_read_error	392	320	-72
+	./drivers/md/raid10.c	print_conf	216	72	-144
+	./drivers/md/raid10.c	raid10_end_read_request	216	80	-136
+	./drivers/md/raid10.c	raid10_error	216	80	-136
+	./drivers/md/raid5-cache.c	r5l_init_log	224	88	-136
+	./drivers/md/raid5-ppl.c	ppl_do_flush	256	136	-120
+	./drivers/md/raid5-ppl.c	ppl_flush_endio	192	56	-136
+	./drivers/md/raid5-ppl.c	ppl_modify_log	192	56	-136
+	./drivers/md/raid5-ppl.c	ppl_recover_entry	1296	1232	-64
+	./drivers/md/raid5-ppl.c	ppl_submit_iounit_bio	192	56	-136
+	./drivers/md/raid5-ppl.c	ppl_validate_rdev	184	48	-136
+	./drivers/md/raid5.c	print_raid5_conf	208	64	-144
+	./drivers/md/raid5.c	raid5_end_read_request	272	128	-144
+	./drivers/md/raid5.c	raid5_error	216	80	-136
+	./drivers/md/raid5.c	setup_conf	360	296	-64
+	./drivers/target/target_core_iblock.c	iblock_show_configfs_dev_params	192	56	-136
+	./fs/block_dev.c	__blkdev_put	224	80	-144
+	./fs/ext4/page-io.c	ext4_end_bio	224	88	-136
+	./security/loadpin/loadpin.c	loadpin_read_file	200	56	-144
+
+Patchset was tested with kvm-xfstests -c 4k full using 
+https://github.com/tytso/xfstests-bld/blob/master/kernel-configs/x86_64-config-5.10
+kernel config:
+	-------------------- Summary report
+	KERNEL:    kernel 5.13.0-rc4-next-20210601-xfstests-00001-gf10818e9d103 #8 SMP Tue Jun 1 19:52:19 MSK 2021 x86_64
+	CMDLINE:   -c 4k full
+	CPUS:      2
+	MEM:       1961.41
+	
+	ext4/4k: 537 tests, 45 skipped, 5331 seconds
+	Totals: 492 tests, 45 skipped, 0 failures, 0 errors, 5281s
+	
+	FSTESTVER: blktests 4bc88ef (Sun, 7 Mar 2021 12:38:37 -0800)
+	FSTESTVER: fio  fio-3.26 (Mon, 8 Mar 2021 17:44:38 -0700)
+	FSTESTVER: fsverity v1.3-2-gcf8fa5e (Wed, 24 Feb 2021 13:32:36 -0800)
+	FSTESTVER: ima-evm-utils v1.3.2 (Wed, 28 Oct 2020 13:18:08 -0400)
+	FSTESTVER: nvme-cli v1.13 (Tue, 20 Oct 2020 16:50:31 -0700)
+	FSTESTVER: quota  v4.05-40-g25f16b1 (Tue, 16 Mar 2021 17:57:19 +0100)
+	FSTESTVER: util-linux v2.36.2 (Fri, 12 Feb 2021 14:59:56 +0100)
+	FSTESTVER: xfsprogs v5.11.0 (Fri, 12 Mar 2021 15:05:13 -0500)
+	FSTESTVER: xfstests linux-v3.8-3068-g4072b9d3 (Mon, 5 Apr 2021 15:44:33 -0400)
+	FSTESTVER: xfstests-bld 4ec07f9 (Mon, 12 Apr 2021 23:49:18 -0400)
+	FSTESTCFG: 4k
+	FSTESTSET: -g auto
+	FSTESTOPT: aex
+
+Anton Suvorov (10):
+  drbd: reduce stack footprint in drbd_report_io_error()
+  dax: reduce stack footprint dealing with block device names
+  raid-md: reduce stack footprint dealing with block device names
+  dm: reduce stack footprint dealing with block device names
+  block: reduce stack footprint dealing with block device names
+  target: reduce stack footprint in iblock_show_configfs_dev_params()
+  vfs: reduce stack footprint in __blkdev_put()
+  ext4: reduce stack footprint in ext4_end_bio()
+  security: reduce stack footprint in loadpin_read_file()
+  block: remove unused symbol bio_devname()
+
+ block/bio.c                         |   6 --
+ block/blk-core.c                    |  12 +--
+ block/blk-lib.c                     |   5 +-
+ block/blk-settings.c                |   7 +-
+ block/partitions/amiga.c            |  13 ++-
+ block/partitions/sgi.c              |   5 +-
+ block/partitions/sun.c              |   5 +-
+ drivers/block/drbd/drbd_req.c       |  12 +--
+ drivers/block/pktcdvd.c             |  15 ++-
+ drivers/dax/super.c                 |  34 +++----
+ drivers/md/dm-cache-target.c        |  10 +-
+ drivers/md/dm-clone-target.c        |  10 +-
+ drivers/md/dm-crypt.c               |   6 +-
+ drivers/md/dm-integrity.c           |   4 +-
+ drivers/md/dm-mpath.c               |   6 +-
+ drivers/md/dm-table.c               |  34 +++----
+ drivers/md/dm-thin.c                |   8 +-
+ drivers/md/md-linear.c              |   5 +-
+ drivers/md/md-multipath.c           |  24 ++---
+ drivers/md/md.c                     | 146 ++++++++++++----------------
+ drivers/md/raid0.c                  |  28 +++---
+ drivers/md/raid1.c                  |  25 ++---
+ drivers/md/raid10.c                 |  66 +++++--------
+ drivers/md/raid5-cache.c            |   5 +-
+ drivers/md/raid5-ppl.c              |  41 ++++----
+ drivers/md/raid5.c                  |  39 ++++----
+ drivers/target/target_core_iblock.c |   5 +-
+ fs/block_dev.c                      |   6 +-
+ fs/ext4/page-io.c                   |   5 +-
+ include/linux/bio.h                 |   2 -
+ security/loadpin/loadpin.c          |   5 +-
+ 31 files changed, 242 insertions(+), 352 deletions(-)
+
 -- 
 2.25.1
 
