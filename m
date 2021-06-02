@@ -2,195 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DADC47092
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 12:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F8EC4708F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 12:29:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD55061361
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 12:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF19F613BF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 12:29:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229953AbhFBMGk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 08:06:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16118 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229844AbhFBMGi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Jun 2021 08:06:38 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 152C2cPO189409;
-        Wed, 2 Jun 2021 08:03:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=7wC8Y59HiMIthB9xfz5dL+I0HD65zOwRPB4cvu5JQYY=;
- b=QRLGyPounpLaRIZgsSUK1LazhFSMWWWVFIpjfvUyvXqdSXI7p94FVQMtSFG3bMtHNL86
- rLVrJ3SvpT994x2pe7o0yL3iXXDeNBst8Q4A8KEa89vx85ZQSTDkkYsEjLQaMo+eb8VZ
- +GFr8IfErHwDLNlYl+L0v9/qNIinOxFcyNlMJhpRMjSZcskv/o9bM0Y0jNVwjZETIKG0
- IXpmjsLB5CkqOhxt84ImzKiTyn/t0QZlZGbbzTco4+M0nPgqtd7mDQbl31t9d+7DOxJc
- iYhombbX7dZq4eRMaB6F1ITduKcVH4H0X0f5lSV3QvlOH2CDPoe61GoP3QIOjHTOkYh/ DA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38x7kr3h5n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Jun 2021 08:03:00 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 152C2cNZ189527;
-        Wed, 2 Jun 2021 08:02:59 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38x7kr3h4k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Jun 2021 08:02:59 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 152BwHfr023191;
-        Wed, 2 Jun 2021 12:02:57 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 38ud87s9cx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Jun 2021 12:02:56 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 152C2r4H26280248
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Jun 2021 12:02:53 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0364A405F;
-        Wed,  2 Jun 2021 12:02:53 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 479C3A4040;
-        Wed,  2 Jun 2021 12:02:52 +0000 (GMT)
-Received: from sig-9-145-17-43.uk.ibm.com (unknown [9.145.17.43])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  2 Jun 2021 12:02:52 +0000 (GMT)
-Message-ID: <e4891689c7651611020bdf3b4db9895819da345a.camel@linux.ibm.com>
-Subject: Re: [PATCH 27/30] scm_blk: use blk_mq_alloc_disk and
- blk_cleanup_disk
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Justin Sanders <justin@coraid.com>,
-        Denis Efremov <efremov@linux.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Tim Waugh <tim@cyberelk.net>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?ISO-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linuxppc-dev@lists.ozlabs.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
-Date:   Wed, 02 Jun 2021 14:02:51 +0200
-In-Reply-To: <20210602065345.355274-28-hch@lst.de>
-References: <20210602065345.355274-1-hch@lst.de>
-         <20210602065345.355274-28-hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9Pi9MTQ_S8CJ1ewvOnGa4xYgtn5KH1ib
-X-Proofpoint-ORIG-GUID: -LAzjZA1VGIxMM3aVX5RPubiT3GLOjUz
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-02_06:2021-06-02,2021-06-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 clxscore=1011 suspectscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106020078
+        id S229734AbhFBMa6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 08:30:58 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:62677 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229718AbhFBMa5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 08:30:57 -0400
+Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210602122913epoutp02bea8cdd43ae5ed98726a546f27ee18c8~Ew7Y9TfGv0259302593epoutp02K
+        for <linux-block@vger.kernel.org>; Wed,  2 Jun 2021 12:29:13 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210602122913epoutp02bea8cdd43ae5ed98726a546f27ee18c8~Ew7Y9TfGv0259302593epoutp02K
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1622636953;
+        bh=woOP6Geg9KvqiLtlElYG3X44Jz/VfEkIs7qnjn4k4Ss=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=ZeeaJHl9WxtE90fNf8UhhTTq4JexaMp7rm7xg+1J4ItANaRSw1Wrho30+zV71obl9
+         hIZNpCwD8z0ecVu1mIlNkKjKG9etB9OvVlBI3SYw4u0pRaI6sW48Lw0B6dBKw17726
+         q/885OMgkMxT3lMTbymVaw/e1jaJquzGONZ9dgCI=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
+        20210602122912epcas1p39079b0f078a6aeecb6c9775a69a89531~Ew7X2iyM_0844208442epcas1p3x;
+        Wed,  2 Jun 2021 12:29:12 +0000 (GMT)
+Received: from epsmges1p4.samsung.com (unknown [182.195.40.164]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4Fw7ck5jt3z4x9Pq; Wed,  2 Jun
+        2021 12:29:10 +0000 (GMT)
+Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
+        epsmges1p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        BA.C5.10258.69977B06; Wed,  2 Jun 2021 21:29:10 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210602122909epcas1p4f4cad512dd31ed9458ca6049c5074b71~Ew7VDBZdU2784327843epcas1p4o;
+        Wed,  2 Jun 2021 12:29:09 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210602122909epsmtrp2a55e7d3a95a98289fe2c1f5ffccbb1ff~Ew7VBwV9S2283522835epsmtrp2X;
+        Wed,  2 Jun 2021 12:29:09 +0000 (GMT)
+X-AuditID: b6c32a38-42fff70000002812-ec-60b779963542
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        9D.0C.08637.49977B06; Wed,  2 Jun 2021 21:29:08 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210602122908epsmtip1cad040e318db0dc23284976f6611222f~Ew7Uudnja0104801048epsmtip1P;
+        Wed,  2 Jun 2021 12:29:08 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     hch@infradead.org, Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
+        asml.silence@gmail.com, axboe@kernel.dk, bgoncalv@redhat.com,
+        bvanassche@acm.org, damien.lemoal@wdc.com,
+        gregkh@linuxfoundation.org, jaegeuk@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com, osandov@fb.com, patchwork-bot@kernel.org,
+        tj@kernel.org, tom.leiming@gmail.com, yi.zhang@redhat.com
+Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
+        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
+        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
+        yt0928.kim@samsung.com, Changheun Lee <nanich.lee@samsung.com>
+Subject: [PATCH v11 0/3] bio: control bio max size
+Date:   Wed,  2 Jun 2021 21:10:34 +0900
+Message-Id: <20210602121037.11083-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.29.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Ta0xTZxjO10NPW7HsUJh+1BtrxhJwXMrNT0c3Fwg76LKw6eJmIFDoGTSW
+        tvYUY1lERhWwMC2QlQwouIGXMbURikIXxlLcFLllAiMhAyTUgUyunQTGhLWcmfHveZ73eb43
+        7/vl5WKCNVzIlSu1lEYpVYjwLR53OgKDg026u6lhC48C0K3fb3BQdcMdgL4fuYQj26+1AJnm
+        VzB0vnCJhfR1Fhx1Gb9lIYelEkMljnw2emEYZaHn4zRqG96L+m3VOLKX61mooqkaQ7+NdXNQ
+        x+igBxqvL8VQb+ciG9VMHER/X/sZoLnlIQ562FKOoaFeE44sbSv4QSHZP3CYLNXPcsjWyhEO
+        2XQ9iOzvySYbGy7gZLv5Boec+3EQJy9aGwDpbNxNFv5UzCLt9qtY4tbjiphMSiqjNP6UMl0l
+        kyszJKLDR1JiU6Kiw8TB4v1on8hfKc2iJKK49xOD4+UK1wpE/qekimyXlCilaVHo2zEaVbaW
+        8s9U0VqJiFLLFGpxmDqElmbR2cqMkHRV1gFxWFh4lMuZqsic/cME1FbuaVt/HTsPGHED4HIh
+        EQkHpkUGsIUrIFoAdPzVizNkEcB7hvb/yBKARSMGzAB4G4n7M1Y2U2gD8MGjSQ5DnAAalxc2
+        XDjxJrw4M4y7sS9Ri0HbCO02YcQEgAOdBRsFHyIc5ln6NrAHEQBnrGXAjfnEW/Bc7RTOtNsD
+        /xkrwRjdG3Z+7fBwY8yl65urMPejkCjkwaFfVtlMIA7eHlsDDPaB0/etHAYLoXO2DWcCxQDq
+        C2oBQ4wA1k9eZTGuCLjodAL3bjAiEFpsoYz8GmxdNQOmsxecfV7CZtbHh0UFAsbyOuw+N4a9
+        7DV5s5XFWEjoaPZzywIiGT7oqsKNYE/lpnEqN41T+X/fywBrANsoNZ2VQdFideTmb20EG4cQ
+        hFqAeWY+xA5YXGAHkIuJfPnvKZtTBXyZVJdDaVQpmmwFRdtBlGvBpZjw1XSV65KU2hRxVHhE
+        RASKjN4XHRUh2s7PiP08VUBkSLXUCYpSU5qXORaXJ8xjQb9n+x9aHLfrfvCy7fBMPik/I+tb
+        fWJL6zldcOnLD+flxUVBdyc/u/Zn4C5TyLP1CfPo8FK7BI+fCT3xzl6oG6ipybnyTZVR5XWM
+        V77YuJD/3XW+Yeqo9t2q1iz/2JIzklPJj4+Vxu2aM+3cnZRrF3ZxsUOGYt7gTd/6L/IPBW1r
+        7L5iPqJt8jT3lM3zjoev75hPmmbr0wfiDfdW2LNpi77jCWVnOYbulkFvyS3lk0/riSSdT85H
+        1TEclU7YV3qgTffx06JXcv2S0s6Dr7avPZU5vS5vte58w7HMj24h10/2efZJKhI6kiy5Fz4h
+        Ao4meE9Y5BVTk2d7C1+Eez8O0H0wIfKgM6XiIExDS/8F4o9s1ZEEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNIsWRmVeSWpSXmKPExsWy7bCSnO6Uyu0JBldum1msu7OG3WLOqm2M
+        Fqvv9rNZ7Lo4n9Fi2oefzBat7d+YLJoXr2ezOD1hEZPFk/WzmC16njSxWvztusdk8fVhscXe
+        W9oWl3fNYbM4NLmZyWL65jnMFtfun2G3OHzvKovFwyUTmS3OnfzEajHvsYPFr+VHGS3e/7jO
+        bnFqx2Rmi+vnprFZrN/7k81ByuPyFW+Pic3v2D12zrrL7rF5hZbH5bOlHptWdbJ57J+7ht3j
+        /b6rbB59W1YxenzeJOfRfqCbyePQoWXMATxRXDYpqTmZZalF+nYJXBnvnk1jLNjCUbHr8mLW
+        BsYJbF2MnBwSAiYSx99uYe1i5OIQEtjNKHFszWlWiISUxPETb4FsDiBbWOLw4WKImo+MEl8f
+        zWEBqWET0JHoe3sLbJCIwFZmicct8iBFzAKvGSW6Hi8CKxIWMJJoWH8erIhFQFXi7ZZJjCA2
+        r4C1RMv8F1BXyEv8ud/DDBEXlDg58wlYLzNQvHnrbOYJjHyzkKRmIUktYGRaxSiZWlCcm55b
+        bFhgmJdarlecmFtcmpeul5yfu4kRHJ9amjsYt6/6oHeIkYmD8RCjBAezkgive97WBCHelMTK
+        qtSi/Pii0pzU4kOM0hwsSuK8F7pOxgsJpCeWpGanphakFsFkmTg4pRqYqoQXMr2sWOYgeVZB
+        yqrCyis19N6j3nmOV4SbOBolDnRf3/rSXHthl8yDBVN3X/MxvGB84BfbupxFvef9vst0LL4c
+        X/7c/vyZh4e9Ild9+cHy9auUd0vDpHsib5VSrHfb9R1NKtvm3edveFnp/44roc4JesfPdbNp
+        nmdxWZ36UvvC3OXH779ddPcJs2q5S/jmosX2Sndvlpim/1x0eummdyd8Vhy/aTU1enu/9Z17
+        r49UMu2wUk3VvhPPwHaiudzkttJC6zuPYkOO33xxZf/keRvtbeOmSR6b3SChaizo9vfMt+SK
+        g0fmMIomhx2wZHX1nMLb4Jj02GnrgXP2Psznqy8m8E3TYW784+ilF3rLT4mlOCPRUIu5qDgR
+        AKL5TTk+AwAA
+X-CMS-MailID: 20210602122909epcas1p4f4cad512dd31ed9458ca6049c5074b71
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210602122909epcas1p4f4cad512dd31ed9458ca6049c5074b71
+References: <CGME20210602122909epcas1p4f4cad512dd31ed9458ca6049c5074b71@epcas1p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2021-06-02 at 09:53 +0300, Christoph Hellwig wrote:
-> Use blk_mq_alloc_disk and blk_cleanup_disk to simplify the gendisk and
-> request_queue allocation.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/s390/block/scm_blk.c | 21 ++++++---------------
->  1 file changed, 6 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/s390/block/scm_blk.c b/drivers/s390/block/scm_blk.c
-> index a4f6f2e62b1d..88cba6212ee2 100644
-> --- a/drivers/s390/block/scm_blk.c
-> +++ b/drivers/s390/block/scm_blk.c
-> @@ -462,12 +462,12 @@ int scm_blk_dev_setup(struct scm_blk_dev *bdev, struct scm_device *scmdev)
->  	if (ret)
->  		goto out;
->  
-> -	rq = blk_mq_init_queue(&bdev->tag_set);
-> -	if (IS_ERR(rq)) {
-> -		ret = PTR_ERR(rq);
-> +	bdev->gendisk = blk_mq_alloc_disk(&bdev->tag_set, scmdev);
-> +	if (IS_ERR(bdev->gendisk)) {
-> +		ret = PTR_ERR(bdev->gendisk);
->  		goto out_tag;
->  	}
-> -	bdev->rq = rq;
-> +	rq = bdev->rq = bdev->gendisk->queue;
->  	nr_max_blk = min(scmdev->nr_max_block,
->  			 (unsigned int) (PAGE_SIZE / sizeof(struct aidaw)));
->  
-> @@ -477,17 +477,11 @@ int scm_blk_dev_setup(struct scm_blk_dev *bdev, struct scm_device *scmdev)
->  	blk_queue_flag_set(QUEUE_FLAG_NONROT, rq);
->  	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, rq);
->  
-> -	bdev->gendisk = alloc_disk(SCM_NR_PARTS);
-> -	if (!bdev->gendisk) {
-> -		ret = -ENOMEM;
-> -		goto out_queue;
-> -	}
-> -	rq->queuedata = scmdev;
->  	bdev->gendisk->private_data = scmdev;
->  	bdev->gendisk->fops = &scm_blk_devops;
-> -	bdev->gendisk->queue = rq;
->  	bdev->gendisk->major = scm_major;
->  	bdev->gendisk->first_minor = devindex * SCM_NR_PARTS;
-> +	bdev->gendisk->minors = SCM_NR_PARTS;
->  
->  	len = snprintf(bdev->gendisk->disk_name, DISK_NAME_LEN, "scm");
->  	if (devindex > 25) {
-> @@ -504,8 +498,6 @@ int scm_blk_dev_setup(struct scm_blk_dev *bdev, struct scm_device *scmdev)
->  	device_add_disk(&scmdev->dev, bdev->gendisk, NULL);
->  	return 0;
->  
-> -out_queue:
-> -	blk_cleanup_queue(rq);
->  out_tag:
->  	blk_mq_free_tag_set(&bdev->tag_set);
->  out:
-> @@ -516,9 +508,8 @@ int scm_blk_dev_setup(struct scm_blk_dev *bdev, struct scm_device *scmdev)
->  void scm_blk_dev_cleanup(struct scm_blk_dev *bdev)
->  {
->  	del_gendisk(bdev->gendisk);
-> -	blk_cleanup_queue(bdev->gendisk->queue);
-> +	blk_cleanup_disk(bdev->gendisk);
->  	blk_mq_free_tag_set(&bdev->tag_set);
-> -	put_disk(bdev->gendisk);
->  }
->  
->  void scm_blk_set_available(struct scm_blk_dev *bdev)
+bio size can grow up to 4GB after muli-page bvec has been enabled.
+But sometimes large size of bio would lead to inefficient behaviors.
+Control of bio max size will be helpful to improve inefficiency.
 
-Not an expert on SCM or this code but I gave this a quick test and it
-seems to work fine.
+blk_queue_max_bio_bytes() is added to enable be set the max_bio_bytes in
+each driver layer. And max_bio_bytes sysfs is added to show current
+max_bio_bytes for each request queue.
+bio size can be controlled via max_bio_bytes.
 
-Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
+Changheun Lee (3):
+  bio: control bio max size
+  blk-sysfs: add max_bio_bytes
+  scsi: set max_bio_bytes with queue max sectors
 
+ Documentation/ABI/testing/sysfs-block | 10 ++++++++++
+ Documentation/block/queue-sysfs.rst   |  7 +++++++
+ block/bio.c                           | 17 ++++++++++++++---
+ block/blk-settings.c                  | 19 +++++++++++++++++++
+ block/blk-sysfs.c                     |  7 +++++++
+ drivers/scsi/scsi_lib.c               |  2 ++
+ include/linux/bio.h                   |  4 +++-
+ include/linux/blkdev.h                |  3 +++
+ 8 files changed, 65 insertions(+), 4 deletions(-)
 
+-- 
+2.29.0
 
