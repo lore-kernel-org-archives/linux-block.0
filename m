@@ -2,50 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8342EC4708F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E465C4709E
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DBB7613EE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 749DD61168
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 13:31:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230131AbhFBNdI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 09:33:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53972 "EHLO
+        id S230139AbhFBNdJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 09:33:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbhFBNdG (ORCPT
+        with ESMTP id S230114AbhFBNdG (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 09:33:06 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48FCCC06174A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D10CC061761;
         Wed,  2 Jun 2021 06:31:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
-        Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To;
-        bh=Sj4Xan1+3aJ6Po5iAXxX9E8AwNGjzz5eYxQ6hRhen0g=; b=hMlj520jMnvNI6O5tUqcyzOgHW
-        EHiJoaUSJQ6hVJ7Wpebgbxf98jjwH5xRoh67t9mLVd2A/HfLxY2Yx4h5lqvgKDYtgGojEvu4IefSN
-        3DS6NOM57KiQOuJ7YRpVuKxZsMsiHqnRArRHs23pjdvHMQBl6lq9QREaZLgYa75oH3MWB+gJ1tC1J
-        +wH4gCxswnyNBmjCumjXo1vOZE8FBxAebh/yrQhXJi8Y54MOt/nDCRBdOX3lrbMZSfd4Wjc7Ev0IX
-        oIeI/gLN/0oqtU5QOuXfbcGteiSWIxBhDz2ucFEF9xi8LFZyzr9Fj0M1df6hbsxkqYJsywFl4l0AK
-        rwAquI9Q==;
+        d=infradead.org; s=casper.20170209; h=Subject:Cc:To:From:Date:Message-ID:
+        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=+0GJIyUeezLFp/ym4/vP+fC11EDSc+9M3QstIcNFnoM=; b=HwUP711Hi7fk/GRlHwhhfYuQB5
+        K5vYCOeQPuOhkpRqo74FjxBE7Qmwx8Wj6GWtoLKoGosJHAwdRgo9jNLQy1TmIkJWwpfsGoVcLemhp
+        yE/DBMFhvtilIfo4dv1JJaSo/mfYt/uX/LfisWcd+3wnlJLAvfkdTdiO1+HtsYKFPZ/tV6bjzqFeK
+        4bo4vY52aoMqPrC7we688zYhvu7+dOw4A1kcJpeVTuCoCOtBGxbR88VN+otXu+yI9l3xV+f66r/TA
+        vzFWO4ght7JIQB07yN0JwJ0Lzx83FvV5EUgJ9xU0ODmz2KYDDLO3n44qTW1zqH17jqyBTMXum4Ngk
+        tEM+eMIg==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1loQxe-00B8na-5I; Wed, 02 Jun 2021 13:31:08 +0000
+        id 1loQxe-00B8nb-51; Wed, 02 Jun 2021 13:31:08 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4E49F3004FB;
-        Wed,  2 Jun 2021 15:31:05 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B184A300299;
+        Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 9ED912C189403; Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
-Message-ID: <20210602133040.461908001@infradead.org>
+        id 90C662C08A5B8; Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
+Message-ID: <20210602131225.336600299@infradead.org>
 User-Agent: quilt/0.66
-Date:   Wed, 02 Jun 2021 15:12:29 +0200
+Date:   Wed, 02 Jun 2021 15:12:25 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -96,77 +95,25 @@ Cc:     Borislav Petkov <bp@alien8.de>, x86@kernel.org,
         kgdb-bugreport@lists.sourceforge.net,
         linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
         rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Subject: [PATCH 4/6] sched: Add get_current_state()
-References: <20210602131225.336600299@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 0/6] sched: Cleanup task_struct::state
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove yet another few p->state accesses.
+Hi!
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- block/blk-mq.c        |    2 +-
- include/linux/sched.h |    2 ++
- kernel/freezer.c      |    2 +-
- kernel/sched/core.c   |    6 +++---
- 4 files changed, 7 insertions(+), 5 deletions(-)
+The task_struct::state variable is a bit odd in a number of ways:
 
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3891,7 +3891,7 @@ int blk_poll(struct request_queue *q, bl
- 
- 	hctx->poll_considered++;
- 
--	state = current->state;
-+	state = get_current_state();
- 	do {
- 		int ret;
- 
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -212,6 +212,8 @@ struct task_group;
- 
- #endif
- 
-+#define get_current_state()	READ_ONCE(current->state)
-+
- /* Task command name length: */
- #define TASK_COMM_LEN			16
- 
---- a/kernel/freezer.c
-+++ b/kernel/freezer.c
-@@ -58,7 +58,7 @@ bool __refrigerator(bool check_kthr_stop
- 	/* Hmm, should we be allowed to suspend when there are realtime
- 	   processes around? */
- 	bool was_frozen = false;
--	long save = current->state;
-+	unsigned int save = get_current_state();
- 
- 	pr_debug("%s entered refrigerator\n", current->comm);
- 
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -8273,15 +8273,15 @@ static inline int preempt_count_equals(i
- 
- void __might_sleep(const char *file, int line, int preempt_offset)
- {
-+	unsigned int state = get_current_state();
- 	/*
- 	 * Blocking primitives will set (and therefore destroy) current->state,
- 	 * since we will exit with TASK_RUNNING make sure we enter with it,
- 	 * otherwise we will destroy state.
- 	 */
--	WARN_ONCE(current->state != TASK_RUNNING && current->task_state_change,
-+	WARN_ONCE(state != TASK_RUNNING && current->task_state_change,
- 			"do not call blocking ops when !TASK_RUNNING; "
--			"state=%lx set at [<%p>] %pS\n",
--			current->state,
-+			"state=%x set at [<%p>] %pS\n", state,
- 			(void *)current->task_state_change,
- 			(void *)current->task_state_change);
- 
+ - it's declared 'volatile' (against current practises);
+ - it's 'unsigned long' which is a weird size;
+ - it's type is inconsistent when used for function arguments.
+
+These patches clean that up by making it consistently 'unsigned int', and
+replace (almost) all accesses with READ_ONCE()/WRITE_ONCE(). In order to not
+miss any, the variable is renamed, ensuring a missed conversion results in a
+compile error.
+
+The first few patches fix a number of pre-existing errors and introduce a few
+helpers to make the final conversion less painful.
 
 
