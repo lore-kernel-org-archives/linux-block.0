@@ -2,137 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C7FC47083
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04203C4708F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:30:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E548761360
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:10:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D98EE613D2
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:30:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231603AbhFBPMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 11:12:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38692 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230456AbhFBPML (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Jun 2021 11:12:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 73C1A61182;
-        Wed,  2 Jun 2021 15:10:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622646628;
-        bh=MmmB5edNPbRN/+c+2On4lV0BgwteW7Cw405ip5Z8YuI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eoW8oxXoywj95HF19beDzh3Wa+WhWkiyj9FjvvSEw7ScJ8OuGQbEy6+2TGjP0xVYN
-         XSSJAJXvhI5MOj1+GRdHIbg46k9rJSpJMlo/HDJefXpEwJPCDFcYn8COIR/VQO5DZl
-         47yzM30C6QaWLqEpy6LeVNCLBHEk+aKjfkrC6CQ5ViDR3bMQ0fCKMIt+zFjJNZMY+v
-         SNl2CwOo9QKvwQF6AUEFLQH9ccSyIziiULTl3YApDUWutkiYOLv0+Q04TM9wwWdkfx
-         bdsysjlbcoFBsmj9C1l84fr+oHwMhBsnHonyI6jC2MFd17CoX0BlIS16/UkYyFRS6U
-         MochfZ+/mAepQ==
-Date:   Wed, 2 Jun 2021 16:10:11 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jason Wessel <jason.wessel@windriver.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Waiman Long <longman@redhat.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
-        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 6/6] sched: Change task_struct::state
-Message-ID: <20210602151010.GE31179@willie-the-truck>
-References: <20210602131225.336600299@infradead.org>
- <20210602133040.587042016@infradead.org>
+        id S232164AbhFBPcV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 11:32:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231961AbhFBPcV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 11:32:21 -0400
+X-Greylist: delayed 78 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Jun 2021 08:30:37 PDT
+Received: from forwardcorp1j.mail.yandex.net (forwardcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::183])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D451AC061574;
+        Wed,  2 Jun 2021 08:30:37 -0700 (PDT)
+Received: from sas1-6b1512233ef6.qloud-c.yandex.net (sas1-6b1512233ef6.qloud-c.yandex.net [IPv6:2a02:6b8:c14:44af:0:640:6b15:1223])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 127D62E1A0B;
+        Wed,  2 Jun 2021 18:29:21 +0300 (MSK)
+Received: from sas2-d40aa8807eff.qloud-c.yandex.net (sas2-d40aa8807eff.qloud-c.yandex.net [2a02:6b8:c08:b921:0:640:d40a:a880])
+        by sas1-6b1512233ef6.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id 26KXIAE1hn-TK1Sxcka;
+        Wed, 02 Jun 2021 18:29:20 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1622647760; bh=rZfoT/F84j27juZBJ33q9fQrzmHqKaf/Bc0i0dABbDQ=;
+        h=Message-Id:References:Date:Subject:To:From:In-Reply-To:Cc;
+        b=qN9P9qFuvQip5KAYgKRE3AIppIUEBZvY1H7evs0vPDH9QZEXK21Iu2MGzx8u2lNge
+         QBsjMdzeK6GWfF8HoI432FS6cNyHq+R/nzdgGtTNbdfYmt5/91VK8OpQbQ/oN/YJ8U
+         FNf6X1WiV5CduBj4MRrTxMYlvZv/iASSdKAF08Ds=
+Authentication-Results: sas1-6b1512233ef6.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from warwish-linux.sas.yp-c.yandex.net (warwish-linux.sas.yp-c.yandex.net [2a02:6b8:c1b:2920:0:696:cc9e:0])
+        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 42DbdVHlBw-TKoi8GXV;
+        Wed, 02 Jun 2021 18:29:20 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+From:   Anton Suvorov <warwish@yandex-team.ru>
+To:     linux-kernel@vger.kernel.org
+Cc:     warwish@yandex-team.ru, linux-fsdevel@vger.kernel.org,
+        dmtrmonakhov@yandex-team.ru, linux-block@vger.kernel.org,
+        viro@zeniv.linux.org.uk
+Subject: [PATCH 06/10] target: reduce stack footprint in iblock_show_configfs_dev_params()
+Date:   Wed,  2 Jun 2021 18:28:59 +0300
+Message-Id: <20210602152903.910190-7-warwish@yandex-team.ru>
+In-Reply-To: <20210602152903.910190-1-warwish@yandex-team.ru>
+References: <20210602152903.910190-1-warwish@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210602133040.587042016@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 03:12:31PM +0200, Peter Zijlstra wrote:
-> Change the type and name of task_struct::state. Drop the volatile and
-> shrink it to an 'unsigned int'. Rename it in order to find all uses
-> such that we can use READ_ONCE/WRITE_ONCE as appropriate.
-> 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> ---
->  block/blk-mq.c                 |    2 -
->  drivers/md/dm.c                |    6 ++--
->  fs/binfmt_elf.c                |    8 +++---
->  fs/userfaultfd.c               |    4 +--
->  include/linux/sched.h          |   31 +++++++++++------------
->  include/linux/sched/debug.h    |    2 -
->  include/linux/sched/signal.h   |    2 -
->  init/init_task.c               |    2 -
->  kernel/cgroup/cgroup-v1.c      |    2 -
->  kernel/debug/kdb/kdb_support.c |   18 +++++++------
->  kernel/fork.c                  |    4 +--
->  kernel/hung_task.c             |    2 -
->  kernel/kthread.c               |    4 +--
->  kernel/locking/mutex.c         |    6 ++--
->  kernel/locking/rtmutex.c       |    4 +--
->  kernel/locking/rwsem.c         |    2 -
->  kernel/ptrace.c                |   12 ++++-----
->  kernel/rcu/rcutorture.c        |    4 +--
->  kernel/rcu/tree_stall.h        |   12 ++++-----
->  kernel/sched/core.c            |   53 +++++++++++++++++++++--------------------
->  kernel/sched/deadline.c        |   10 +++----
->  kernel/sched/fair.c            |   11 +++++---
->  lib/syscall.c                  |    4 +--
->  net/core/dev.c                 |    2 -
->  24 files changed, 108 insertions(+), 99 deletions(-)
+Stack usage reduced (measured with allyesconfig):
 
-I think this makes the code a _lot_ easier to understand, so:
+./drivers/target/target_core_iblock.c   iblock_show_configfs_dev_params 192     56      -136
 
-Acked-by: Will Deacon <will@kernel.org>
+Signed-off-by: Anton Suvorov <warwish@yandex-team.ru>
+---
+ drivers/target/target_core_iblock.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-on the assumption that you'll fix get_wchan() for !x86 as well.
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 44d9d028f716..b3425a5bbac2 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -634,12 +634,11 @@ static ssize_t iblock_show_configfs_dev_params(struct se_device *dev, char *b)
+ {
+ 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
+ 	struct block_device *bd = ib_dev->ibd_bd;
+-	char buf[BDEVNAME_SIZE];
+ 	ssize_t bl = 0;
+ 
+ 	if (bd)
+-		bl += sprintf(b + bl, "iBlock device: %s",
+-				bdevname(bd, buf));
++		bl += sprintf(b + bl, "iBlock device: %pg",
++				bd);
+ 	if (ib_dev->ibd_flags & IBDF_HAS_UDEV_PATH)
+ 		bl += sprintf(b + bl, "  UDEV PATH: %s",
+ 				ib_dev->ibd_udev_path);
+-- 
+2.25.1
 
-Cheers,
-
-Will
