@@ -2,53 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3C6C47098
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10707C47099
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:16:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D12C613BF
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:09:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED5BC613EA
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:16:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231929AbhFBOKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 10:10:42 -0400
-Received: from mail.efficios.com ([167.114.26.124]:37948 "EHLO
-        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231597AbhFBOIr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 10:08:47 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 33F8E302B4C;
-        Wed,  2 Jun 2021 10:07:03 -0400 (EDT)
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id g1z0V_wT7FT6; Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 84F0C302AEF;
-        Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 84F0C302AEF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1622642818;
-        bh=GwH0GdcKUFmXjwdSc5PC6qayNfPYEbeSfo7iFd8LGlc=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=IzY7rj9bG67qO5MhQCvNkTZ6NmKLl+j7CGAPSRZx3M3VXN4GE9cW/xiqKbb0lMrag
-         set1cTsKpmrC3scRLhvadBwRFL0ucET03FgN+RYhAetywU7SMjz4Jzot43Al7b42/w
-         wRf/j9ODOuM7qSvP03brlcfNA9m+dmMrwW5plmJFJwkQAs2hFyj/Dx0kstoADKFw0s
-         PShGdCuiX9KikFibuSZcET8LNklvf4YN8WFNh0QHjOaoJ5JxioNYTizyl5WrJqstOz
-         gIo6cZK3qsMar7jMzCrxaFOM5us8879gVttQyPgo4y+VuhrGp7sB3x4o9l+rwPGYzG
-         yQHn8ljzHTpmw==
-X-Virus-Scanned: amavisd-new at efficios.com
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id l6BO-UHNT1BK; Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
-Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id 548823029F3;
-        Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
-Date:   Wed, 2 Jun 2021 10:06:58 -0400 (EDT)
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To:     Peter Zijlstra <peterz@infradead.org>
+        id S232142AbhFBOS2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 10:18:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232304AbhFBOQ0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 10:16:26 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2232DC061353;
+        Wed,  2 Jun 2021 07:13:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=FzJfBljo4B8RxU2ilIDhSLr34HFST0rQLNCYNw/HW+w=; b=L9vjUarjZTu6NzihPxyvfr9SrD
+        cXp2K8L/lswul4alVU9a5KXYcmiYKaI0pVqEPrOTObk1bWVjIa727CcohFhQnptUDt9rVM7+wZokD
+        bdiAP5TkdYqfBQHbyzuL3QwjL5RpkYojkJ5M5vFeN5hhURZOWxGVnCDXhqvgtesERKVZoPVmmu+1u
+        zvBuQ/5U6yi+c+8BHLKEGRhN8+mOxmjvdNXmQvv5K7kABrgsWq6TQpgiZuniSUsdWGatjG0TQN4HN
+        iyi9j9XYfQaN+mhBZrOglYAeu1Bmuw53jmWdaNNlHNX9gCtb8Ta+n9yUYscEboZQaYK4WTzPQHe3/
+        3aLE6Hfw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1loRbc-002uVW-Rw; Wed, 02 Jun 2021 14:12:31 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D1A2330008D;
+        Wed,  2 Jun 2021 16:12:30 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id B760020223DA5; Wed,  2 Jun 2021 16:12:30 +0200 (CEST)
+Date:   Wed, 2 Jun 2021 16:12:30 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
         Juri Lelli <juri.lelli@redhat.com>,
@@ -99,85 +96,37 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         linux-perf-users <linux-perf-users@vger.kernel.org>,
         linux-pm <linux-pm@vger.kernel.org>, rcu <rcu@vger.kernel.org>,
         linux-mm <linux-mm@kvack.org>, KVM list <kvm@vger.kernel.org>
-Message-ID: <896642516.5866.1622642818225.JavaMail.zimbra@efficios.com>
-In-Reply-To: <20210602133040.587042016@infradead.org>
-References: <20210602131225.336600299@infradead.org> <20210602133040.587042016@infradead.org>
-Subject: Re: [PATCH 6/6] sched: Change task_struct::state
+Subject: Re: [PATCH 4/6] sched: Add get_current_state()
+Message-ID: <YLeRzlEmbdsMrFcG@hirez.programming.kicks-ass.net>
+References: <20210602131225.336600299@infradead.org>
+ <20210602133040.461908001@infradead.org>
+ <1731339790.5856.1622642489232.JavaMail.zimbra@efficios.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [167.114.26.124]
-X-Mailer: Zimbra 8.8.15_GA_4018 (ZimbraWebClient - FF88 (Linux)/8.8.15_GA_4026)
-Thread-Topic: sched: Change task_struct::state
-Thread-Index: DzXPoSkxk24gPNa4OEu5k5Jl7651YA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1731339790.5856.1622642489232.JavaMail.zimbra@efficios.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
------ On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
+On Wed, Jun 02, 2021 at 10:01:29AM -0400, Mathieu Desnoyers wrote:
+> ----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
+> 
+> > Remove yet another few p->state accesses.
+> 
+> [...]
+> 
+> > 
+> > --- a/include/linux/sched.h
+> > +++ b/include/linux/sched.h
+> > @@ -212,6 +212,8 @@ struct task_group;
+> > 
+> > #endif
+> > 
+> > +#define get_current_state()	READ_ONCE(current->state)
+> 
+> Why use a macro rather than a static inline here ?
 
-> Change the type and name of task_struct::state. Drop the volatile and
-> shrink it to an 'unsigned int'. Rename it in order to find all uses
-> such that we can use READ_ONCE/WRITE_ONCE as appropriate.
-> 
-[...]
-> 
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-
-[...]
-> @@ -1559,7 +1560,8 @@ static int fill_psinfo(struct elf_prpsin
-> 	psinfo->pr_pgrp = task_pgrp_vnr(p);
-> 	psinfo->pr_sid = task_session_vnr(p);
-> 
-> -	i = p->state ? ffz(~p->state) + 1 : 0;
-> +	state = READ_ONCE(p->__state);
-> +	i = state ? ffz(~state) + 1 : 0;
-> 	psinfo->pr_state = i;
-> 	psinfo->pr_sname = (i > 5) ? '.' : "RSDTZW"[i];
-> 	psinfo->pr_zomb = psinfo->pr_sname == 'Z';
-
-[...]
-
-> --- a/include/linux/sched.h
-> +++ b/include/linux/sched.h
-> @@ -113,13 +113,13 @@ struct task_group;
-> 					 __TASK_TRACED | EXIT_DEAD | EXIT_ZOMBIE | \
-> 					 TASK_PARKED)
-> 
-> -#define task_is_running(task)		(READ_ONCE((task)->state) == TASK_RUNNING)
-> +#define task_is_running(task)		(READ_ONCE((task)->__state) == TASK_RUNNING)
-> 
-> -#define task_is_traced(task)		((task->state & __TASK_TRACED) != 0)
-> +#define task_is_traced(task)		((READ_ONCE(task->__state) & __TASK_TRACED) != 0)
-> 
-> -#define task_is_stopped(task)		((task->state & __TASK_STOPPED) != 0)
-> +#define task_is_stopped(task)		((READ_ONCE(task->__state) & __TASK_STOPPED) !=
-> 0)
-> 
-> -#define task_is_stopped_or_traced(task)	((task->state & (__TASK_STOPPED |
-> __TASK_TRACED)) != 0)
-> +#define task_is_stopped_or_traced(task)	((READ_ONCE(task->__state) &
-> (__TASK_STOPPED | __TASK_TRACED)) != 0)
-> 
-> #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
-> 
-> @@ -134,14 +134,14 @@ struct task_group;
-> 	do {							\
-> 		WARN_ON_ONCE(is_special_task_state(state_value));\
-> 		current->task_state_change = _THIS_IP_;		\
-> -		current->state = (state_value);			\
-> +		WRITE_ONCE(current->__state, (state_value));	\
-> 	} while (0)
-
-Why not introduce set_task_state(p) and get_task_state(p) rather than sprinkle
-READ_ONCE() and WRITE_ONCE() all over the kernel ?
-
-Thanks,
-
-Mathieu
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-http://www.efficios.com
+Mostly to be consistent, all that state stuff is macros. I suppose we
+could try and make them inlines at the end or so -- if the header maze
+allows.
