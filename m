@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71225C47093
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3C6C47098
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:09:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57016613E1
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:01:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D12C613BF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 14:09:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbhFBODO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 10:03:14 -0400
-Received: from mail.efficios.com ([167.114.26.124]:36082 "EHLO
+        id S231929AbhFBOKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 10:10:42 -0400
+Received: from mail.efficios.com ([167.114.26.124]:37948 "EHLO
         mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbhFBODO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 10:03:14 -0400
+        with ESMTP id S231597AbhFBOIr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 10:08:47 -0400
 Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 805643029EA;
-        Wed,  2 Jun 2021 10:01:30 -0400 (EDT)
+        by mail.efficios.com (Postfix) with ESMTP id 33F8E302B4C;
+        Wed,  2 Jun 2021 10:07:03 -0400 (EDT)
 Received: from mail.efficios.com ([127.0.0.1])
         by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 5aXZqKFUnM5u; Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
+        with ESMTP id g1z0V_wT7FT6; Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 78F88302B31;
-        Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 78F88302B31
+        by mail.efficios.com (Postfix) with ESMTP id 84F0C302AEF;
+        Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 84F0C302AEF
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1622642489;
-        bh=ildkMTk0vYSZK39yeI6C0NluRoGntZ1yA5EuqMA4g8k=;
+        s=default; t=1622642818;
+        bh=GwH0GdcKUFmXjwdSc5PC6qayNfPYEbeSfo7iFd8LGlc=;
         h=Date:From:To:Message-ID:MIME-Version;
-        b=L/w8o2fJN3kmP73a2vMCtFWwO5YPeIOe9ZmTydEyFWmyEaOlcyFybIdRWoe8hmy34
-         bHqWF5FDpTTdDr9jNR/6ossgQUg8/lo1uSvmOEMQI+8PvcMWXQjFHlESOaJErckXTB
-         oIuIBEBiJQ9FvKa8qYSLXZLHpWnciBfTelSzOSmbORnUr52zBvJXfWQpx94UqNlbmY
-         Y6yF4/4xX5ToklNVtEYeJ+rmH/TXxAzWx0JJ6vQD3FMua0nJmkIgpXS7yGiTDiDM65
-         T6y687zdG38LDyLZ4Slpb06ysgcGN+OXRe4bfPmRBCeqmhnbNwAWPu5258Lpn1Ta7C
-         10t9Cfwl8X+bQ==
+        b=IzY7rj9bG67qO5MhQCvNkTZ6NmKLl+j7CGAPSRZx3M3VXN4GE9cW/xiqKbb0lMrag
+         set1cTsKpmrC3scRLhvadBwRFL0ucET03FgN+RYhAetywU7SMjz4Jzot43Al7b42/w
+         wRf/j9ODOuM7qSvP03brlcfNA9m+dmMrwW5plmJFJwkQAs2hFyj/Dx0kstoADKFw0s
+         PShGdCuiX9KikFibuSZcET8LNklvf4YN8WFNh0QHjOaoJ5JxioNYTizyl5WrJqstOz
+         gIo6cZK3qsMar7jMzCrxaFOM5us8879gVttQyPgo4y+VuhrGp7sB3x4o9l+rwPGYzG
+         yQHn8ljzHTpmw==
 X-Virus-Scanned: amavisd-new at efficios.com
 Received: from mail.efficios.com ([127.0.0.1])
         by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 6Pg28DJCgmhR; Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
+        with ESMTP id l6BO-UHNT1BK; Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
 Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id 44D173029E9;
-        Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
-Date:   Wed, 2 Jun 2021 10:01:29 -0400 (EDT)
+        by mail.efficios.com (Postfix) with ESMTP id 548823029F3;
+        Wed,  2 Jun 2021 10:06:58 -0400 (EDT)
+Date:   Wed, 2 Jun 2021 10:06:58 -0400 (EDT)
 From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
@@ -99,37 +99,79 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         linux-perf-users <linux-perf-users@vger.kernel.org>,
         linux-pm <linux-pm@vger.kernel.org>, rcu <rcu@vger.kernel.org>,
         linux-mm <linux-mm@kvack.org>, KVM list <kvm@vger.kernel.org>
-Message-ID: <1731339790.5856.1622642489232.JavaMail.zimbra@efficios.com>
-In-Reply-To: <20210602133040.461908001@infradead.org>
-References: <20210602131225.336600299@infradead.org> <20210602133040.461908001@infradead.org>
-Subject: Re: [PATCH 4/6] sched: Add get_current_state()
+Message-ID: <896642516.5866.1622642818225.JavaMail.zimbra@efficios.com>
+In-Reply-To: <20210602133040.587042016@infradead.org>
+References: <20210602131225.336600299@infradead.org> <20210602133040.587042016@infradead.org>
+Subject: Re: [PATCH 6/6] sched: Change task_struct::state
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [167.114.26.124]
 X-Mailer: Zimbra 8.8.15_GA_4018 (ZimbraWebClient - FF88 (Linux)/8.8.15_GA_4026)
-Thread-Topic: sched: Add get_current_state()
-Thread-Index: E1ntXBdpTHBBRaSFxkm2wa7EtTrnhg==
+Thread-Topic: sched: Change task_struct::state
+Thread-Index: DzXPoSkxk24gPNa4OEu5k5Jl7651YA==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 ----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
 
-> Remove yet another few p->state accesses.
+> Change the type and name of task_struct::state. Drop the volatile and
+> shrink it to an 'unsigned int'. Rename it in order to find all uses
+> such that we can use READ_ONCE/WRITE_ONCE as appropriate.
+> 
+[...]
+> 
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+
+[...]
+> @@ -1559,7 +1560,8 @@ static int fill_psinfo(struct elf_prpsin
+> 	psinfo->pr_pgrp = task_pgrp_vnr(p);
+> 	psinfo->pr_sid = task_session_vnr(p);
+> 
+> -	i = p->state ? ffz(~p->state) + 1 : 0;
+> +	state = READ_ONCE(p->__state);
+> +	i = state ? ffz(~state) + 1 : 0;
+> 	psinfo->pr_state = i;
+> 	psinfo->pr_sname = (i > 5) ? '.' : "RSDTZW"[i];
+> 	psinfo->pr_zomb = psinfo->pr_sname == 'Z';
 
 [...]
 
-> 
 > --- a/include/linux/sched.h
 > +++ b/include/linux/sched.h
-> @@ -212,6 +212,8 @@ struct task_group;
+> @@ -113,13 +113,13 @@ struct task_group;
+> 					 __TASK_TRACED | EXIT_DEAD | EXIT_ZOMBIE | \
+> 					 TASK_PARKED)
 > 
-> #endif
+> -#define task_is_running(task)		(READ_ONCE((task)->state) == TASK_RUNNING)
+> +#define task_is_running(task)		(READ_ONCE((task)->__state) == TASK_RUNNING)
 > 
-> +#define get_current_state()	READ_ONCE(current->state)
+> -#define task_is_traced(task)		((task->state & __TASK_TRACED) != 0)
+> +#define task_is_traced(task)		((READ_ONCE(task->__state) & __TASK_TRACED) != 0)
+> 
+> -#define task_is_stopped(task)		((task->state & __TASK_STOPPED) != 0)
+> +#define task_is_stopped(task)		((READ_ONCE(task->__state) & __TASK_STOPPED) !=
+> 0)
+> 
+> -#define task_is_stopped_or_traced(task)	((task->state & (__TASK_STOPPED |
+> __TASK_TRACED)) != 0)
+> +#define task_is_stopped_or_traced(task)	((READ_ONCE(task->__state) &
+> (__TASK_STOPPED | __TASK_TRACED)) != 0)
+> 
+> #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+> 
+> @@ -134,14 +134,14 @@ struct task_group;
+> 	do {							\
+> 		WARN_ON_ONCE(is_special_task_state(state_value));\
+> 		current->task_state_change = _THIS_IP_;		\
+> -		current->state = (state_value);			\
+> +		WRITE_ONCE(current->__state, (state_value));	\
+> 	} while (0)
 
-Why use a macro rather than a static inline here ?
+Why not introduce set_task_state(p) and get_task_state(p) rather than sprinkle
+READ_ONCE() and WRITE_ONCE() all over the kernel ?
 
 Thanks,
 
