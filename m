@@ -2,74 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDABC4708F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 790A1C47083
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:54:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41DBB61026
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:47:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A5006135D
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:54:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbhFBGtU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 02:49:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41672 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229890AbhFBGtP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Jun 2021 02:49:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622616452;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HVcJbN/KT1+fyetrnk2iAeiqGIXFm+abamxXaSbzX64=;
-        b=SAbflSVcx9S/HOJ3lPTCgvfGmByacCbDKjw4MBcPkXDwpfB2PjXq9+xZQayap7yamz1s3i
-        DuYZn4oH4FRkEuSpOrGAqNzLBLuh8y64C727w7VjlHC5kt54kNORaVuzMK1LIKVPbuABGs
-        08KL3v6p2YMj7aYGPnzX3WnkfTa3jTU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-09wOAkscMgeBsiscxpu5_A-1; Wed, 02 Jun 2021 02:47:31 -0400
-X-MC-Unique: 09wOAkscMgeBsiscxpu5_A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5B6E107ACE8;
-        Wed,  2 Jun 2021 06:47:29 +0000 (UTC)
-Received: from T590 (ovpn-13-164.pek2.redhat.com [10.72.13.164])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 459DFE460;
-        Wed,  2 Jun 2021 06:47:22 +0000 (UTC)
-Date:   Wed, 2 Jun 2021 14:47:16 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCHv2] block/genhd: use atomic_t for disk_event->block
-Message-ID: <YLcpdKnt28vS6waI@T590>
-References: <20210602062015.33605-1-hare@suse.de>
+        id S230226AbhFBG4E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 02:56:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230075AbhFBG4D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 02:56:03 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D682C06174A;
+        Tue,  1 Jun 2021 23:54:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=SnRF2RasuO3TzWzCcWD7psRmahwH4O2DjzNGyzgJCxM=; b=RfiXqx1buYxjqGM6Ru6s2uXbtK
+        szP8Lp35KdwoBLpRViL7iCBQHBOTXZ4Qu5LJOvN43OaaHCTJwbYuBSl2SqXNEe3Ty441iVm62zV/q
+        FK7bqtRTYnR/sNzxWhxA2AWxTTSYR0R47li/OgrbNqJ/z/C247XNi+vyVCBUJz2HWLNRhHDg9jROf
+        W37wVhanz0woIFa4DI1Hiypd6xGuMEzMDW+t6oSvgQDur5ioE4KQTAUXWM04CshX1rW4l4k5bAsYt
+        fMWsLaqDTkxSQegnpPyUc9dgQ8DJelIKHSJsddjUREuKapJzcCJM+AP8gSr/w6bRFlEnBsoDVPXvd
+        WWIbvGOQ==;
+Received: from shol69.static.otenet.gr ([83.235.170.67] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1loKlG-0025Fb-J7; Wed, 02 Jun 2021 06:53:55 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Justin Sanders <justin@coraid.com>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Tim Waugh <tim@cyberelk.net>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linuxppc-dev@lists.ozlabs.org,
+        ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
+Subject: [PATCH 01/30] blk-mq: factor out a blk_mq_alloc_sq_tag_set helper
+Date:   Wed,  2 Jun 2021 09:53:16 +0300
+Message-Id: <20210602065345.355274-2-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210602065345.355274-1-hch@lst.de>
+References: <20210602065345.355274-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210602062015.33605-1-hare@suse.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 08:20:15AM +0200, Hannes Reinecke wrote:
-> __disk_unblock_events() will call queue_delayed_work() with a '0' argument
-> under a spin lock. This might cause the queue_work item to be executed
-> immediately, and run into a deadlock in disk_check_events() waiting for
-> the lock to be released.
+Factour out a helper to initialize a simple single hw queue tag_set from
+blk_mq_init_sq_queue.  This will allow to phase out blk_mq_init_sq_queue
+in favor of a more symmetric and general API.
 
-The above commit log isn't correct, and the current usage shouldn't cause such
-deadlock, so can you root cause the task hang report[1] on 5.3.18?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c         | 32 ++++++++++++++++++--------------
+ include/linux/blk-mq.h |  3 +++
+ 2 files changed, 21 insertions(+), 14 deletions(-)
 
-[1] https://lore.kernel.org/linux-block/73783f6f-a3ec-907f-ea19-966e9d1457dc@suse.de/T/#mcde381522bdb95740e04ced555ec017a25c993cc
-
-Thanks,
-Ming
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f11d4018ce2e..eaacfa963a73 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3152,24 +3152,12 @@ struct request_queue *blk_mq_init_sq_queue(struct blk_mq_tag_set *set,
+ 	struct request_queue *q;
+ 	int ret;
+ 
+-	memset(set, 0, sizeof(*set));
+-	set->ops = ops;
+-	set->nr_hw_queues = 1;
+-	set->nr_maps = 1;
+-	set->queue_depth = queue_depth;
+-	set->numa_node = NUMA_NO_NODE;
+-	set->flags = set_flags;
+-
+-	ret = blk_mq_alloc_tag_set(set);
++	ret = blk_mq_alloc_sq_tag_set(set, ops, queue_depth, set_flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+-
+ 	q = blk_mq_init_queue(set);
+-	if (IS_ERR(q)) {
++	if (IS_ERR(q))
+ 		blk_mq_free_tag_set(set);
+-		return q;
+-	}
+-
+ 	return q;
+ }
+ EXPORT_SYMBOL(blk_mq_init_sq_queue);
+@@ -3589,6 +3577,22 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ }
+ EXPORT_SYMBOL(blk_mq_alloc_tag_set);
+ 
++/* allocate and initialize a tagset for a simple single-queue device */
++int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set *set,
++		const struct blk_mq_ops *ops, unsigned int queue_depth,
++		unsigned int set_flags)
++{
++	memset(set, 0, sizeof(*set));
++	set->ops = ops;
++	set->nr_hw_queues = 1;
++	set->nr_maps = 1;
++	set->queue_depth = queue_depth;
++	set->numa_node = NUMA_NO_NODE;
++	set->flags = set_flags;
++	return blk_mq_alloc_tag_set(set);
++}
++EXPORT_SYMBOL_GPL(blk_mq_alloc_sq_tag_set);
++
+ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+ {
+ 	int i, j;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 359486940fa0..bb950fc669ef 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -439,6 +439,9 @@ struct request_queue *blk_mq_init_sq_queue(struct blk_mq_tag_set *set,
+ void blk_mq_unregister_dev(struct device *, struct request_queue *);
+ 
+ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set);
++int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set *set,
++		const struct blk_mq_ops *ops, unsigned int queue_depth,
++		unsigned int set_flags);
+ void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
+ 
+ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule);
+-- 
+2.30.2
 
