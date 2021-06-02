@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 871FFC4709D
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB84C47098
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:56:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 689056135D
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:56:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C5CF60FDA
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 06:56:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230511AbhFBG6M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jun 2021 02:58:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47796 "EHLO
+        id S231297AbhFBG6Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jun 2021 02:58:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231450AbhFBG5z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 02:57:55 -0400
+        with ESMTP id S231530AbhFBG6C (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 02:58:02 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 956B8C061756;
-        Tue,  1 Jun 2021 23:56:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FC4C061761;
+        Tue,  1 Jun 2021 23:56:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=3eCT5ADUsi1wXGQC5ROk8G/iPsdy5HF5nCZ/CzuEH9g=; b=CHpdvSdDQx2S7VBfw36yFJIOKW
-        u3raTq1dP6Gu10/PJ+IzNfdJsTGDfodiKpWnXSrAPsiiXAil4FixRR4LHQx/r2/2WajLehYqseurF
-        +SXOVenwMIEvShMpPI3TV0igiPSTDc1jus2MS134mkHJE4fSKWXJgTMpWUETOWUQR+sQvpcZNrvGr
-        ImONWbqeM3vG4waS2LyqljTVK2xihrO+4vFy94tUR5AZHm4zAb5VJXdTbeKyJ5b1ZyVapnUITJgc0
-        rAK1o1WbLZZ2lIkx0tqU86DqYL3xaSap2ZyjXquU1Hz/pJyGXKGtlKYDaGKwU57VNJwF/m1NojREe
-        Jk3wMbUQ==;
+        bh=e/ctmVcBKo8/4TfSYThwuDhurHZGsQmtrWLVmP8rYA8=; b=0A/jGm6O4Kj2j/Kx7dvigliFHC
+        rITdmfIP63MHFDu3WSFM5d7dMu7+beFsioI4GrDpda176/3PUgnVrUbqyRWbSjWdcuAiJqiob1gTK
+        AvRYkCVCw9w56bk5jObu58cLFiy6YDR/IPuribWTRblB+Qy/UxnevwGEDkt/f/knnTFZf15Y8vlCM
+        5ocB4AhVAL+iOilDAuQ8GJXKzc8ZFMa3OISnsDLeHTuB1dBage0GQubfEEJs2dxaTysO0wL6PENPG
+        HsubMhTFqnBjdPbq87DlkaqfHQIsjrwpF/ip3GpPNqk0nBPScEi1aAKtroJznPZbqZYyddYJMUb2K
+        Z/qjGhrw==;
 Received: from shol69.static.otenet.gr ([83.235.170.67] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1loKnA-0026PT-6J; Wed, 02 Jun 2021 06:55:53 +0000
+        id 1loKnJ-0026XD-03; Wed, 02 Jun 2021 06:56:01 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -64,9 +64,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         virtualization@lists.linux-foundation.org,
         xen-devel@lists.xenproject.org, linux-mmc@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: [PATCH 26/30] ubi: use blk_mq_alloc_disk and blk_cleanup_disk
-Date:   Wed,  2 Jun 2021 09:53:41 +0300
-Message-Id: <20210602065345.355274-27-hch@lst.de>
+Subject: [PATCH 28/30] amiflop: use blk_mq_alloc_disk and blk_cleanup_disk
+Date:   Wed,  2 Jun 2021 09:53:43 +0300
+Message-Id: <20210602065345.355274-29-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210602065345.355274-1-hch@lst.de>
 References: <20210602065345.355274-1-hch@lst.de>
@@ -82,131 +82,46 @@ request_queue allocation.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/mtd/ubi/block.c | 68 ++++++++++++++++++-----------------------
- 1 file changed, 29 insertions(+), 39 deletions(-)
+ drivers/block/amiflop.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
-index e1a2ae21dfd3..e003b4b44ffa 100644
---- a/drivers/mtd/ubi/block.c
-+++ b/drivers/mtd/ubi/block.c
-@@ -394,53 +394,46 @@ int ubiblock_create(struct ubi_volume_info *vi)
- 	dev->vol_id = vi->vol_id;
- 	dev->leb_size = vi->usable_leb_size;
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 9e2d0c6a3877..8b1714021498 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1781,15 +1781,13 @@ static int fd_alloc_disk(int drive, int system)
+ {
+ 	struct gendisk *disk;
  
-+	dev->tag_set.ops = &ubiblock_mq_ops;
-+	dev->tag_set.queue_depth = 64;
-+	dev->tag_set.numa_node = NUMA_NO_NODE;
-+	dev->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+	dev->tag_set.cmd_size = sizeof(struct ubiblock_pdu);
-+	dev->tag_set.driver_data = dev;
-+	dev->tag_set.nr_hw_queues = 1;
-+
-+	ret = blk_mq_alloc_tag_set(&dev->tag_set);
-+	if (ret) {
-+		dev_err(disk_to_dev(dev->gd), "blk_mq_alloc_tag_set failed");
-+		goto out_free_dev;;
-+	}
-+
-+
- 	/* Initialize the gendisk of this ubiblock device */
--	gd = alloc_disk(1);
--	if (!gd) {
--		pr_err("UBI: block: alloc_disk failed\n");
--		ret = -ENODEV;
--		goto out_free_dev;
-+	gd = blk_mq_alloc_disk(&dev->tag_set, dev);
-+	if (IS_ERR(gd)) {
-+		ret = PTR_ERR(gd);
-+		goto out_free_tags;
- 	}
- 
- 	gd->fops = &ubiblock_ops;
- 	gd->major = ubiblock_major;
-+	gd->minors = 1;
- 	gd->first_minor = idr_alloc(&ubiblock_minor_idr, dev, 0, 0, GFP_KERNEL);
- 	if (gd->first_minor < 0) {
- 		dev_err(disk_to_dev(gd),
- 			"block: dynamic minor allocation failed");
- 		ret = -ENODEV;
+-	disk = alloc_disk(1);
+-	if (!disk)
+-		goto out;
+-	disk->queue = blk_mq_init_queue(&unit[drive].tag_set);
+-	if (IS_ERR(disk->queue))
 -		goto out_put_disk;
-+		goto out_cleanup_disk;
- 	}
- 	gd->private_data = dev;
- 	sprintf(gd->disk_name, "ubiblock%d_%d", dev->ubi_num, dev->vol_id);
- 	set_capacity(gd, disk_capacity);
- 	dev->gd = gd;
++	disk = blk_mq_alloc_disk(&unit[drive].tag_set, NULL);
++	if (IS_ERR(disk))
++		return PTR_ERR(disk);
  
--	dev->tag_set.ops = &ubiblock_mq_ops;
--	dev->tag_set.queue_depth = 64;
--	dev->tag_set.numa_node = NUMA_NO_NODE;
--	dev->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
--	dev->tag_set.cmd_size = sizeof(struct ubiblock_pdu);
--	dev->tag_set.driver_data = dev;
--	dev->tag_set.nr_hw_queues = 1;
--
--	ret = blk_mq_alloc_tag_set(&dev->tag_set);
--	if (ret) {
--		dev_err(disk_to_dev(dev->gd), "blk_mq_alloc_tag_set failed");
--		goto out_remove_minor;
--	}
--
--	dev->rq = blk_mq_init_queue(&dev->tag_set);
--	if (IS_ERR(dev->rq)) {
--		dev_err(disk_to_dev(gd), "blk_mq_init_queue failed");
--		ret = PTR_ERR(dev->rq);
--		goto out_free_tags;
--	}
-+	dev->rq = gd->queue;
- 	blk_queue_max_segments(dev->rq, UBI_MAX_SG_COUNT);
- 
--	dev->rq->queuedata = dev;
--	dev->gd->queue = dev->rq;
--
- 	/*
- 	 * Create one workqueue per volume (per registered block device).
- 	 * Rembember workqueues are cheap, they're not threads.
-@@ -448,7 +441,7 @@ int ubiblock_create(struct ubi_volume_info *vi)
- 	dev->wq = alloc_workqueue("%s", 0, 0, gd->disk_name);
- 	if (!dev->wq) {
- 		ret = -ENOMEM;
--		goto out_free_queue;
-+		goto out_remove_minor;
- 	}
- 
- 	list_add_tail(&dev->list, &ubiblock_devices);
-@@ -460,14 +453,12 @@ int ubiblock_create(struct ubi_volume_info *vi)
- 	mutex_unlock(&devices_mutex);
+ 	disk->major = FLOPPY_MAJOR;
+ 	disk->first_minor = drive + system;
++	disk->minors = 1;
+ 	disk->fops = &floppy_fops;
+ 	disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 	if (system)
+@@ -1802,12 +1800,6 @@ static int fd_alloc_disk(int drive, int system)
+ 	unit[drive].gendisk[system] = disk;
+ 	add_disk(disk);
  	return 0;
- 
--out_free_queue:
--	blk_cleanup_queue(dev->rq);
--out_free_tags:
--	blk_mq_free_tag_set(&dev->tag_set);
- out_remove_minor:
- 	idr_remove(&ubiblock_minor_idr, gd->first_minor);
+-
 -out_put_disk:
--	put_disk(dev->gd);
-+out_cleanup_disk:
-+	blk_cleanup_disk(dev->gd);
-+out_free_tags:
-+	blk_mq_free_tag_set(&dev->tag_set);
- out_free_dev:
- 	kfree(dev);
- out_unlock:
-@@ -483,11 +474,10 @@ static void ubiblock_cleanup(struct ubiblock *dev)
- 	/* Flush pending work */
- 	destroy_workqueue(dev->wq);
- 	/* Finally destroy the blk queue */
--	blk_cleanup_queue(dev->rq);
--	blk_mq_free_tag_set(&dev->tag_set);
- 	dev_info(disk_to_dev(dev->gd), "released");
-+	blk_cleanup_disk(dev->gd);
-+	blk_mq_free_tag_set(&dev->tag_set);
- 	idr_remove(&ubiblock_minor_idr, dev->gd->first_minor);
--	put_disk(dev->gd);
+-	disk->queue = NULL;
+-	put_disk(disk);
+-out:
+-	return -ENOMEM;
  }
  
- int ubiblock_remove(struct ubi_volume_info *vi)
+ static int fd_alloc_drive(int drive)
 -- 
 2.30.2
 
