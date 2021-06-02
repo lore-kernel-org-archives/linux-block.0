@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D087C4708F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2614C47093
 	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:31:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35A45613BF
+	by mail.kernel.org (Postfix) with ESMTP id B0AF2613F0
 	for <linux-block@archiver.kernel.org>; Wed,  2 Jun 2021 15:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232231AbhFBPdG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232281AbhFBPdG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 2 Jun 2021 11:33:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53038 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbhFBPdF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 11:33:05 -0400
-X-Greylist: delayed 122 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Jun 2021 08:31:22 PDT
-Received: from forwardcorp1p.mail.yandex.net (forwardcorp1p.mail.yandex.net [IPv6:2a02:6b8:0:1472:2741:0:8b6:217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EB5FC061574;
+        with ESMTP id S232045AbhFBPdG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jun 2021 11:33:06 -0400
+X-Greylist: delayed 120 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Jun 2021 08:31:22 PDT
+Received: from forwardcorp1o.mail.yandex.net (forwardcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7432C06174A;
         Wed,  2 Jun 2021 08:31:22 -0700 (PDT)
-Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net (sas1-ec30c78b6c5b.qloud-c.yandex.net [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
-        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 5A8FF2E157E;
-        Wed,  2 Jun 2021 18:29:16 +0300 (MSK)
+Received: from sas1-6b1512233ef6.qloud-c.yandex.net (sas1-6b1512233ef6.qloud-c.yandex.net [IPv6:2a02:6b8:c14:44af:0:640:6b15:1223])
+        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 1C6472E1D2E;
+        Wed,  2 Jun 2021 18:29:22 +0300 (MSK)
 Received: from sas2-d40aa8807eff.qloud-c.yandex.net (sas2-d40aa8807eff.qloud-c.yandex.net [2a02:6b8:c08:b921:0:640:d40a:a880])
-        by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id 3yRf5Welph-TF1Ol7bg;
-        Wed, 02 Jun 2021 18:29:16 +0300
+        by sas1-6b1512233ef6.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id XrUECaB8IF-TL1qV7d2;
+        Wed, 02 Jun 2021 18:29:22 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1622647756; bh=2Zn8QKK4xousuCUlCWjAKT/AXeO6YfqAZ4AsRrA38Nc=;
+        t=1622647762; bh=8wJcLLg+BillrJ9UHnzlrqTLTSwh0Y5dlFFF7RlJ/k4=;
         h=Message-Id:References:Date:Subject:To:From:In-Reply-To:Cc;
-        b=qbOPDswRqqhK4f3ZED91wOgadbf4DEyRvhCD2/VIPKVAe3wNTDri8WsKB9DPVFxyV
-         PV6iEt+bt3gCrtOJNWFtbFuT4rvNY0IA4eZ8GTSUaOnO7GoY44MOMIphF1NUK2heWk
-         xd1gtkt1uLs9XSHECWGnFJwazvT5nxME3RULoJLI=
-Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+        b=Ka38oQsGBLcIKLSPnYT9CKvdUTpqODcyH83nm/tW55bqB1fLgFyEMvE93Bg1J2RfN
+         mAh1XrdUTD/4uSn/EJLjE6QMP13ies7cLWxGqYqF1dYITDOUNZYE9ZuArAOPE3ITya
+         Jsoxr2dKyrADsXrOJctGPdwYdm9BKrfCstTDmfcA=
+Authentication-Results: sas1-6b1512233ef6.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
 Received: from warwish-linux.sas.yp-c.yandex.net (warwish-linux.sas.yp-c.yandex.net [2a02:6b8:c1b:2920:0:696:cc9e:0])
-        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 42DbdVHlBw-TFoiEBs6;
-        Wed, 02 Jun 2021 18:29:15 +0300
+        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 42DbdVHlBw-TLoinGKp;
+        Wed, 02 Jun 2021 18:29:21 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
 From:   Anton Suvorov <warwish@yandex-team.ru>
@@ -46,9 +46,9 @@ To:     linux-kernel@vger.kernel.org
 Cc:     warwish@yandex-team.ru, linux-fsdevel@vger.kernel.org,
         dmtrmonakhov@yandex-team.ru, linux-block@vger.kernel.org,
         viro@zeniv.linux.org.uk
-Subject: [PATCH 01/10] drbd: reduce stack footprint in drbd_report_io_error()
-Date:   Wed,  2 Jun 2021 18:28:54 +0300
-Message-Id: <20210602152903.910190-2-warwish@yandex-team.ru>
+Subject: [PATCH 08/10] ext4: reduce stack footprint in ext4_end_bio()
+Date:   Wed,  2 Jun 2021 18:29:01 +0300
+Message-Id: <20210602152903.910190-9-warwish@yandex-team.ru>
 In-Reply-To: <20210602152903.910190-1-warwish@yandex-team.ru>
 References: <20210602152903.910190-1-warwish@yandex-team.ru>
 MIME-Version: 1.0
@@ -59,39 +59,30 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Stack usage reduced (measured with allyesconfig):
 
-./drivers/block/drbd/drbd_req.c drbd_report_io_error    200     72      -128
+./fs/ext4/page-io.c     ext4_end_bio    224     88      -136
 
 Signed-off-by: Anton Suvorov <warwish@yandex-team.ru>
 ---
- drivers/block/drbd/drbd_req.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ fs/ext4/page-io.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 13beb98a7c5a..bd7265edf614 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -510,16 +510,14 @@ static void mod_rq_state(struct drbd_request *req, struct bio_and_error *m,
- 
- static void drbd_report_io_error(struct drbd_device *device, struct drbd_request *req)
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index f038d578d8d8..56074f2f5e63 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -323,10 +323,9 @@ static void ext4_end_bio(struct bio *bio)
  {
--        char b[BDEVNAME_SIZE];
--
- 	if (!__ratelimit(&drbd_ratelimit_state))
- 		return;
+ 	ext4_io_end_t *io_end = bio->bi_private;
+ 	sector_t bi_sector = bio->bi_iter.bi_sector;
+-	char b[BDEVNAME_SIZE];
  
--	drbd_warn(device, "local %s IO error sector %llu+%u on %s\n",
--			(req->rq_state & RQ_WRITE) ? "WRITE" : "READ",
--			(unsigned long long)req->i.sector,
--			req->i.size >> 9,
--			bdevname(device->ldev->backing_bdev, b));
-+	drbd_warn(device, "local %s IO error sector %llu+%u on %pg\n",
-+		  (req->rq_state & RQ_WRITE) ? "WRITE" : "READ",
-+		  (unsigned long long)req->i.sector,
-+		  req->i.size >> 9,
-+		  device->ldev->backing_bdev);
- }
- 
- /* Helper for HANDED_OVER_TO_NETWORK.
+-	if (WARN_ONCE(!io_end, "io_end is NULL: %s: sector %Lu len %u err %d\n",
+-		      bio_devname(bio, b),
++	if (WARN_ONCE(!io_end, "io_end is NULL: %pg: sector %llu len %u err %d\n",
++		      bio->bi_bdev,
+ 		      (long long) bio->bi_iter.bi_sector,
+ 		      (unsigned) bio_sectors(bio),
+ 		      bio->bi_status)) {
 -- 
 2.25.1
 
