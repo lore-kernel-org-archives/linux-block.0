@@ -2,313 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BB3C47097
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 14:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C64DBC47082
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 14:59:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB2B8613F4
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 14:58:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA978613E3
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 14:59:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231328AbhFCPAZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 11:00:25 -0400
-Received: from mail-qt1-f169.google.com ([209.85.160.169]:39909 "EHLO
-        mail-qt1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbhFCPAY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 11:00:24 -0400
-Received: by mail-qt1-f169.google.com with SMTP id c15so4564714qte.6;
-        Thu, 03 Jun 2021 07:58:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=c+EIp65u7CnvGA4YOpWY4+dQ+JFnWDJnwM5TFDGkhLQ=;
-        b=esWH56Jj5mjUO5dlhJcjbEx3yzuluv5sQBhVMUn4CCIQt/paQ2vZlbg47Fetyo6KcH
-         pMZzMQP7l1PY7mENEzi4gheIG6/Ge4M3ul/mdJ5DRW3nHY4uWEqgy6GN6mUgZtUVRqaO
-         NF4+Htefvhi9FegNuB68SMK4EET56+Yg//siTS8ZrnX/Ir0QlSIzbLwCyuaondicWYFp
-         A4bKzScYsjDt9hOv7b+bAUtpUe4JdXQSY62z23/igjbxtZkVf+HDic1zik/4ZV5/tCcS
-         kMtp87In25/EAW+hTtYTnTSr2a3PDJJ9ruC1JtHwUbrl/qlw7JFa0+HXG3Y1gbN2tnyU
-         zjkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=c+EIp65u7CnvGA4YOpWY4+dQ+JFnWDJnwM5TFDGkhLQ=;
-        b=FsfN9npXBwdd9Yjb+wtJOku/dZe5xf3a9hUWq6P3ZU6yUrNv6Z1DjCIf5y8SQn8seh
-         3Fsq4vWsBDdsz1Zz2IvinrpoIQbesb9rKc+qtYE7AgkDXMr9PtTtheyb7/xeHT8p8LsM
-         +yNMSJdhqrg53Ff56sQqhluHickjgyWX591xBCJKhHVch3EsvKPhfrNjbaI071b0QPpZ
-         xb9UrcS3HpBg8pP+NL8Lcwn/8L9V7/1RIvli4td5K9LIw0fb9nvWWrBn4emziAHXNK6e
-         7uB9/6+m4SJk4Y5EXB+exTMeYJ6m6P40u6bqpsAbQ5D4sMiRxXRnIlQAOtN/iAoXtARM
-         wfzg==
-X-Gm-Message-State: AOAM530YO1Dgu3HDXZEUQrY2jJrZ8DpxqZ7V15wr/Ln2WCd47svyZLk9
-        4TG79G90JgWndN/74T4EMyelz0hU5uQ=
-X-Google-Smtp-Source: ABdhPJyX6GBFuIkFEyXDi2l1SCB8GxwZBG7mxd7MXNHvqBnTJmE0qZhQjmEKwyl3L1v5E/7ROlH1QA==
-X-Received: by 2002:a05:622a:c6:: with SMTP id p6mr281527qtw.99.1622732259560;
-        Thu, 03 Jun 2021 07:57:39 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:8008])
-        by smtp.gmail.com with ESMTPSA id i12sm2035143qke.59.2021.06.03.07.57.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 07:57:39 -0700 (PDT)
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org (open list:BLOCK LAYER),
-        linux-kernel@vger.kernel.org (open list),
-        cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
-        linux-mm@kvack.org (open list:MEMORY MANAGEMENT),
-        Johannes Weiner <hannes@cmpxchg.org>
-Subject: [PATCH 3/3] loop: Charge i/o to mem and blk cg
-Date:   Thu,  3 Jun 2021 07:57:07 -0700
-Message-Id: <20210603145707.4031641-4-schatzberg.dan@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210603145707.4031641-1-schatzberg.dan@gmail.com>
-References: <20210603145707.4031641-1-schatzberg.dan@gmail.com>
+        id S231713AbhFCPB0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 11:01:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30665 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231411AbhFCPB0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Jun 2021 11:01:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622732381;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ADu76+p4nf9ImDidUf9vbCKDqxKYVQlnVlPUSkX62Eo=;
+        b=aiCyjwzzhHCRp3w4WGq0zpty53rV4zTffQJt2mTpzpDHjMkT+B8qxRaa4weDaPIFkv7G1e
+        3Cir9KieSJ60QIZAjbT4+yNFQN17Oe7Z8KMJGCsPm/w+h7bbiP5ulKkc/V+f38JcLSzx73
+        G5af81ND1RwVcz+CoTwhhx6a8IbjffI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-__Uq8riSP36JWWtMS6wYyg-1; Thu, 03 Jun 2021 10:59:35 -0400
+X-MC-Unique: __Uq8riSP36JWWtMS6wYyg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44E2780EDAA;
+        Thu,  3 Jun 2021 14:59:34 +0000 (UTC)
+Received: from localhost (ovpn-114-228.ams2.redhat.com [10.36.114.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B1C5A5D6AB;
+        Thu,  3 Jun 2021 14:59:30 +0000 (UTC)
+Date:   Thu, 3 Jun 2021 15:59:29 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-block@vger.kernel.org, Xie Yongji <xieyongji@bytedance.com>,
+        Christoph Hellwig <hch@lst.de>, jasowang@redhat.com
+Subject: Re: [PATCH v2] virtio-blk: limit seg_max to a safe value
+Message-ID: <YLjuUdNN9CGnOPkd@stefanha-x1.localdomain>
+References: <20210524154020.98195-1-stefanha@redhat.com>
+ <20210524164202-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="2Z67iQIxteW+CnbL"
+Content-Disposition: inline
+In-Reply-To: <20210524164202-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The current code only associates with the existing blkcg when aio is
-used to access the backing file. This patch covers all types of i/o to
-the backing file and also associates the memcg so if the backing file is
-on tmpfs, memory is charged appropriately.
 
-This patch also exports cgroup_get_e_css and int_active_memcg so it
-can be used by the loop module.
+--2Z67iQIxteW+CnbL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-Acked-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/block/loop.c       | 61 +++++++++++++++++++++++++-------------
- drivers/block/loop.h       |  3 +-
- include/linux/memcontrol.h |  6 ++++
- kernel/cgroup/cgroup.c     |  1 +
- mm/memcontrol.c            |  1 +
- 5 files changed, 51 insertions(+), 21 deletions(-)
+On Mon, May 24, 2021 at 04:47:37PM -0400, Michael S. Tsirkin wrote:
+> On Mon, May 24, 2021 at 04:40:20PM +0100, Stefan Hajnoczi wrote:
+> > The struct virtio_blk_config seg_max value is read from the device and
+> > incremented by 2 to account for the request header and status byte
+> > descriptors added by the driver.
+> >=20
+> > In preparation for supporting untrusted virtio-blk devices, protect
+> > against integer overflow and limit the value to a safe maximum.
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> > v2:
+> >  * Limit to a virtio-specific value instead of using SG_MAX_SEGMENTS
+> >    [Christoph]
+> > ---
+> >  drivers/block/virtio_blk.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index b9fa3ef5b57c..1635d4289202 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -21,6 +21,9 @@
+> >  #define VQ_NAME_LEN 16
+> >  #define MAX_DISCARD_SEGMENTS 256u
+> > =20
+> > +/* The maximum number of sg elements that fit into a virtqueue */
+> > +#define VIRTIO_BLK_MAX_SG_ELEMS 32768
+>=20
+> 32768 is what it says for split queues but for packed queues
+> it says 2^15.
+>=20
+> So 0x8000 then?
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 935edcf7c7b1..b38115c91288 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -78,6 +78,7 @@
- #include <linux/uio.h>
- #include <linux/ioprio.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/sched/mm.h>
- 
- #include "loop.h"
- 
-@@ -516,8 +517,6 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
- 
--	if (cmd->css)
--		css_put(cmd->css);
- 	cmd->ret = ret;
- 	lo_rw_aio_do_completion(cmd);
- }
-@@ -578,8 +577,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
- 	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
--	if (cmd->css)
--		kthread_associate_blkcg(cmd->css);
- 
- 	if (rw == WRITE)
- 		ret = call_write_iter(file, &cmd->iocb, &iter);
-@@ -587,7 +584,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		ret = call_read_iter(file, &cmd->iocb, &iter);
- 
- 	lo_rw_aio_do_completion(cmd);
--	kthread_associate_blkcg(NULL);
- 
- 	if (ret != -EIOCBQUEUED)
- 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
-@@ -928,7 +924,7 @@ struct loop_worker {
- 	struct list_head cmd_list;
- 	struct list_head idle_list;
- 	struct loop_device *lo;
--	struct cgroup_subsys_state *css;
-+	struct cgroup_subsys_state *blkcg_css;
- 	unsigned long last_ran_at;
- };
- 
-@@ -943,7 +939,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 
- 	spin_lock_irq(&lo->lo_work_lock);
- 
--	if (!cmd->css)
-+	if (!cmd->blkcg_css)
- 		goto queue_work;
- 
- 	node = &lo->worker_tree.rb_node;
-@@ -951,10 +947,10 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	while (*node) {
- 		parent = *node;
- 		cur_worker = container_of(*node, struct loop_worker, rb_node);
--		if (cur_worker->css == cmd->css) {
-+		if (cur_worker->blkcg_css == cmd->blkcg_css) {
- 			worker = cur_worker;
- 			break;
--		} else if ((long)cur_worker->css < (long)cmd->css) {
-+		} else if ((long)cur_worker->blkcg_css < (long)cmd->blkcg_css) {
- 			node = &(*node)->rb_left;
- 		} else {
- 			node = &(*node)->rb_right;
-@@ -966,13 +962,18 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
- 	/*
- 	 * In the event we cannot allocate a worker, just queue on the
--	 * rootcg worker
-+	 * rootcg worker and issue the I/O as the rootcg
- 	 */
--	if (!worker)
-+	if (!worker) {
-+		cmd->blkcg_css = NULL;
-+		if (cmd->memcg_css)
-+			css_put(cmd->memcg_css);
-+		cmd->memcg_css = NULL;
- 		goto queue_work;
-+	}
- 
--	worker->css = cmd->css;
--	css_get(worker->css);
-+	worker->blkcg_css = cmd->blkcg_css;
-+	css_get(worker->blkcg_css);
- 	INIT_WORK(&worker->work, loop_workfn);
- 	INIT_LIST_HEAD(&worker->cmd_list);
- 	INIT_LIST_HEAD(&worker->idle_list);
-@@ -1291,7 +1292,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 				idle_list) {
- 		list_del(&worker->idle_list);
- 		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->css);
-+		css_put(worker->blkcg_css);
- 		kfree(worker);
- 	}
- 	spin_unlock_irq(&lo->lo_work_lock);
-@@ -2096,13 +2097,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- 	/* always use the first bio's css */
-+	cmd->blkcg_css = NULL;
-+	cmd->memcg_css = NULL;
- #ifdef CONFIG_BLK_CGROUP
--	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
--		cmd->css = &bio_blkcg(rq->bio)->css;
--		css_get(cmd->css);
--	} else
-+	if (rq->bio && rq->bio->bi_blkg) {
-+		cmd->blkcg_css = &bio_blkcg(rq->bio)->css;
-+#ifdef CONFIG_MEMCG
-+		cmd->memcg_css =
-+			cgroup_get_e_css(cmd->blkcg_css->cgroup,
-+					&memory_cgrp_subsys);
-+#endif
-+	}
- #endif
--		cmd->css = NULL;
- 	loop_queue_work(lo, cmd);
- 
- 	return BLK_STS_OK;
-@@ -2114,13 +2120,28 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	const bool write = op_is_write(req_op(rq));
- 	struct loop_device *lo = rq->q->queuedata;
- 	int ret = 0;
-+	struct mem_cgroup *old_memcg = NULL;
- 
- 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
- 		ret = -EIO;
- 		goto failed;
- 	}
- 
-+	if (cmd->blkcg_css)
-+		kthread_associate_blkcg(cmd->blkcg_css);
-+	if (cmd->memcg_css)
-+		old_memcg = set_active_memcg(
-+			mem_cgroup_from_css(cmd->memcg_css));
-+
- 	ret = do_req_filebacked(lo, rq);
-+
-+	if (cmd->blkcg_css)
-+		kthread_associate_blkcg(NULL);
-+
-+	if (cmd->memcg_css) {
-+		set_active_memcg(old_memcg);
-+		css_put(cmd->memcg_css);
-+	}
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
-@@ -2199,7 +2220,7 @@ static void loop_free_idle_workers(struct timer_list *timer)
- 			break;
- 		list_del(&worker->idle_list);
- 		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->css);
-+		css_put(worker->blkcg_css);
- 		kfree(worker);
- 	}
- 	if (!list_empty(&lo->idle_worker_list))
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 9289c1cd6374..cd24a81e00e6 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -76,7 +76,8 @@ struct loop_cmd {
- 	long ret;
- 	struct kiocb iocb;
- 	struct bio_vec *bvec;
--	struct cgroup_subsys_state *css;
-+	struct cgroup_subsys_state *blkcg_css;
-+	struct cgroup_subsys_state *memcg_css;
- };
- 
- /* Support for loadable transfer modules */
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index c193be760709..542d9cae336b 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -1255,6 +1255,12 @@ static inline struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_struct *mm)
- 	return NULL;
- }
- 
-+static inline
-+struct mem_cgroup *mem_cgroup_from_css(struct cgroup_subsys_state *css)
-+{
-+	return NULL;
-+}
-+
- static inline void mem_cgroup_put(struct mem_cgroup *memcg)
- {
- }
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 21ecc6ee6a6d..9cc8c3a686b1 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -577,6 +577,7 @@ struct cgroup_subsys_state *cgroup_get_e_css(struct cgroup *cgrp,
- 	rcu_read_unlock();
- 	return css;
- }
-+EXPORT_SYMBOL_GPL(cgroup_get_e_css);
- 
- static void cgroup_get_live(struct cgroup *cgrp)
- {
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 26dc2dc0056a..8a8222df44b5 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -78,6 +78,7 @@ struct mem_cgroup *root_mem_cgroup __read_mostly;
- 
- /* Active memory cgroup to use from an interrupt context */
- DEFINE_PER_CPU(struct mem_cgroup *, int_active_memcg);
-+EXPORT_PER_CPU_SYMBOL_GPL(int_active_memcg);
- 
- /* Socket memory accounting disabled? */
- static bool cgroup_memory_nosocket;
--- 
-2.30.2
+Yes.
+
+2^15 =3D 0x8000 =3D 32768
+
+> > +
+> >  static int major;
+> >  static DEFINE_IDA(vd_index_ida);
+> > =20
+> > @@ -728,7 +731,10 @@ static int virtblk_probe(struct virtio_device *vde=
+v)
+> >  	if (err || !sg_elems)
+> >  		sg_elems =3D 1;
+> > =20
+> > -	/* We need an extra sg elements at head and tail. */
+>=20
+> s/an extra/extra/
+
+That line is being removed by this patch :).
+
+--2Z67iQIxteW+CnbL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmC47lEACgkQnKSrs4Gr
+c8jCdAf9ExoKopvbspJTdbq/1GnyoPZzQWa0pCvWFLL3/ujutt1lGChMGTJCLT6v
+R0i1kZzc7TJJc59nA2VyFIkYN0l4IWe5ab2dl296zeBExD6Yj1f/a2/sxqG5ih2J
+lljY1gVEHDzh1xISfE0ZGNman02FoFxRppOR/5aCrGLySvF+vI23PHFEP/BV00AN
+9WUihDm7ocaMQJq48asMJCjPWeY93eipmr37qJgs4OgWNc7nzbRAfSGhhjoIXRfR
+bdQYgg8kvKgUWq3xyxwE92mOKT6fiWzf49LuipxTSX1QbjKA95YParjuxlTbDx6D
+FGn8Rq/Fig6vlEL1s+DOwrpVCsYwYw==
+=Dx9Z
+-----END PGP SIGNATURE-----
+
+--2Z67iQIxteW+CnbL--
 
