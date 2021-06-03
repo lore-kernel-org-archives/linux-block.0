@@ -2,167 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDBBC47082
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 15:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3D7C47082
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 15:54:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38CA66100B
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 15:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B1B1613DC
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 15:54:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbhFCPkN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 11:40:13 -0400
-Received: from mail-ua1-f42.google.com ([209.85.222.42]:33490 "EHLO
-        mail-ua1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbhFCPkI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 11:40:08 -0400
-Received: by mail-ua1-f42.google.com with SMTP id l12so3566084uai.0
-        for <linux-block@vger.kernel.org>; Thu, 03 Jun 2021 08:38:23 -0700 (PDT)
+        id S229823AbhFCP4f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 11:56:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34348 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229924AbhFCP4d (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 11:56:33 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6D9C06174A
+        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 08:54:47 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id r4so6811436iol.6
+        for <linux-block@vger.kernel.org>; Thu, 03 Jun 2021 08:54:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7DKVf+GiS9951bpd4cfEBh88PiRutTQ//wVEud26id8=;
-        b=XGhrfqnzBbfnTVSNkFDv5GHmpnKX09udhfIYlIGvsHf5udWupM3hEeaCuAp1/iGcK2
-         itxazCeDLeGnN0Ew9V7mjQKrXGASjKXLT43xef2dS4qB5N1wZq329ew5d1FZXKKcqiVw
-         6FD/vr0CrXQkvA5Vx5CUZuiBjtgVFz1ZbiUU7kgR3MEWuPhMcO948V0XjU30zv2QSu9a
-         tohz+jrjUWOtrbk55SyLep3Y8Ie2TFo0EIpc+U1g5ZdabSEhCf2ga/7pzz9IJem82LbC
-         xz7dKg0/t3XaDdcBysnSaVg/DwjADlBkyj4crHUSmvNFlYRf/JXspkWoLbMUskTXooPD
-         5/eQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=OQ8/izGugLT2mg1DaIwELKOTXax/WeIQBPj5/sAmtrM=;
+        b=sWRObvHAN4uM8PnmujHncknfBPxl21ZOniXu3Dux67+WGcu23NMh3W6RrJOkoxB8QA
+         2OU+0KkLfMZIVPk1kNPOPv7swr00MTbUX6ZKkP/YEFnc/WK+mf58qnArZuxOspM88n0y
+         LpTS5ZXOO2bJ7nVweslbdch4xpF6+GL+r+TVUGMoXsRIw7N1rJM0wvnJabdSSjXtkRnc
+         g4LnDYFI35vBVCcwun/cXvfB+zOKM9jMUBIZnA2+uZFzKEZzUn2jJ/EdPb4vo6PjTHw9
+         N9HUkRZU6hA2vXjjzTFurjLEkd6gbsPzExUJazanOQoj3bVj3VlB/VnM3okLFx+MtMq1
+         /Lbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7DKVf+GiS9951bpd4cfEBh88PiRutTQ//wVEud26id8=;
-        b=MTeD0/UJMs3CMeo8bzbpPNHUU2wVoWy+5oZFGgAF2Wdd8ly8kbcHCGZ2iGrU/H0uoL
-         aOOacymb5BVtWjKyHYD7Kd4AfVv4GIC9n8Ee0M6GQqx2HgDwtiHjMCjkN7dnc2AQQWT1
-         4bJtJqPHhCcAz0Wwp6I8/HedGA1RtVvGpJwL+Mqixvn4Yn6L2MoeYrwILUm1kXUkKM9t
-         l6YKgkZhCfp2IRtRPIBD2/BkUJ84A5MrVpVIPwtBRoNQSL0gou7jhsqcCDuPZ44dw9IC
-         gbRbrjCA6z19BPj317ig55QqnKEuUmmYlzuO2CaY0asEnb/FlZsu5D1/0ghC50bog49M
-         WCKA==
-X-Gm-Message-State: AOAM5302asatpWuxGrDnQJfvDbf5mMKWhXZg+2ISU/Q0xOFuPeaUA2/H
-        cvXjjFovg0KZyTjaskDbUSX5RlHgakPZorpCWRkGlA==
-X-Google-Smtp-Source: ABdhPJyc/MDglzj7ZqHuKLnfpO6vVPHNJJJjAhghObYaMjdvGQtxzeGy+jhwPjnJIpGZowWwyMtWi1MuD2fSyYUnfEo=
-X-Received: by 2002:ab0:7c5b:: with SMTP id d27mr407242uaw.15.1622734642855;
- Thu, 03 Jun 2021 08:37:22 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OQ8/izGugLT2mg1DaIwELKOTXax/WeIQBPj5/sAmtrM=;
+        b=oW9uC9A2ApilZTxuIZFbWOonK4/rSs35cz/neJC7IfQ4483RdYARFLzYOw00L71kja
+         cext0cBXXFykih83hvaRpZcNVPjag1kYObGUMk4m4mNQ7edaojihrao8UQVCaF9uCv8t
+         y172NN8o165pF5bNs4yBLohtFbv+dhoctKe6fCaqnDHUwlS2CPolhzne2ZhmffPHX/z1
+         ll01Mw7ubdPCmba6tdoeUFEFhCIdAbvplSxIP+O/A1K/lK54bV3dLbmEIJz+y8uuolzQ
+         1qo4YbQ73eX1UXCEEt/5WRZJUhnf2HReogK1H80Q4rEZYcUZIVxvEqYEzalNGfAGY+6o
+         ajWQ==
+X-Gm-Message-State: AOAM533PRI4rF7eYsaepwYRG0fFGXPTjcBIs/tdFuHTYmLGI8i/ilkEG
+        LFUul2w9TnhJ0AGnzH+ui5tw6w==
+X-Google-Smtp-Source: ABdhPJzaVvt+H2s1I25emL3iM4LnUpQGECU4+1p6n6DiGlCBOlOcFHd7oP51g1mmEsRRfRUYZSP7rA==
+X-Received: by 2002:a6b:7b0a:: with SMTP id l10mr6024iop.120.1622735686716;
+        Thu, 03 Jun 2021 08:54:46 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id x6sm2002769ilg.87.2021.06.03.08.54.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Jun 2021 08:54:46 -0700 (PDT)
+Subject: Re: [PATCH][next] null_blk: Fix null pointer dereference on
+ nullb->disk on blk_cleanup_disk call
+To:     Colin King <colin.king@canonical.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210602100659.11058-1-colin.king@canonical.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ce16729c-01c6-7ce8-6c06-c43439186683@kernel.dk>
+Date:   Thu, 3 Jun 2021 09:54:45 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210602065345.355274-1-hch@lst.de> <20210602065345.355274-9-hch@lst.de>
-In-Reply-To: <20210602065345.355274-9-hch@lst.de>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 3 Jun 2021 17:36:45 +0200
-Message-ID: <CAPDyKFoh6HKx2rHHRXvw--Ou53TR2wLFGrKCDuetigxQ8QbvfQ@mail.gmail.com>
-Subject: Re: [PATCH 08/30] mspro: use blk_mq_alloc_disk
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
-        Denis Efremov <efremov@linux.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Tim Waugh <tim@cyberelk.net>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        dm-devel@redhat.com, linux-block <linux-block@vger.kernel.org>,
-        nbd@other.debian.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210602100659.11058-1-colin.king@canonical.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2 Jun 2021 at 08:54, Christoph Hellwig <hch@lst.de> wrote:
->
-> Use the blk_mq_alloc_disk API to simplify the gendisk and request_queue
-> allocation.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On 6/2/21 4:06 AM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> The error handling on a nullb->disk allocation currently jumps to
+> out_cleanup_disk that calls blk_cleanup_disk with a null pointer causing
+> a null pointer dereference issue. Fix this by jumping to out_cleanup_tags
+> instead.
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+Applied, thanks.
 
-Kind regards
-Uffe
+-- 
+Jens Axboe
 
-
-> ---
->  drivers/memstick/core/mspro_block.c | 26 +++++++++++---------------
->  1 file changed, 11 insertions(+), 15 deletions(-)
->
-> diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
-> index cf7fe0d58ee7..22778d0e24f5 100644
-> --- a/drivers/memstick/core/mspro_block.c
-> +++ b/drivers/memstick/core/mspro_block.c
-> @@ -1205,21 +1205,17 @@ static int mspro_block_init_disk(struct memstick_dev *card)
->         if (disk_id < 0)
->                 return disk_id;
->
-> -       msb->disk = alloc_disk(1 << MSPRO_BLOCK_PART_SHIFT);
-> -       if (!msb->disk) {
-> -               rc = -ENOMEM;
-> +       rc = blk_mq_alloc_sq_tag_set(&msb->tag_set, &mspro_mq_ops, 2,
-> +                                    BLK_MQ_F_SHOULD_MERGE);
-> +       if (rc)
->                 goto out_release_id;
-> -       }
->
-> -       msb->queue = blk_mq_init_sq_queue(&msb->tag_set, &mspro_mq_ops, 2,
-> -                                               BLK_MQ_F_SHOULD_MERGE);
-> -       if (IS_ERR(msb->queue)) {
-> -               rc = PTR_ERR(msb->queue);
-> -               msb->queue = NULL;
-> -               goto out_put_disk;
-> +       msb->disk = blk_mq_alloc_disk(&msb->tag_set, card);
-> +       if (IS_ERR(msb->disk)) {
-> +               rc = PTR_ERR(msb->disk);
-> +               goto out_free_tag_set;
->         }
-> -
-> -       msb->queue->queuedata = card;
-> +       msb->queue = msb->disk->queue;
->
->         blk_queue_max_hw_sectors(msb->queue, MSPRO_BLOCK_MAX_PAGES);
->         blk_queue_max_segments(msb->queue, MSPRO_BLOCK_MAX_SEGS);
-> @@ -1228,10 +1224,10 @@ static int mspro_block_init_disk(struct memstick_dev *card)
->
->         msb->disk->major = major;
->         msb->disk->first_minor = disk_id << MSPRO_BLOCK_PART_SHIFT;
-> +       msb->disk->minors = 1 << MSPRO_BLOCK_PART_SHIFT;
->         msb->disk->fops = &ms_block_bdops;
->         msb->usage_count = 1;
->         msb->disk->private_data = msb;
-> -       msb->disk->queue = msb->queue;
->
->         sprintf(msb->disk->disk_name, "mspblk%d", disk_id);
->
-> @@ -1247,8 +1243,8 @@ static int mspro_block_init_disk(struct memstick_dev *card)
->         msb->active = 1;
->         return 0;
->
-> -out_put_disk:
-> -       put_disk(msb->disk);
-> +out_free_tag_set:
-> +       blk_mq_free_tag_set(&msb->tag_set);
->  out_release_id:
->         mutex_lock(&mspro_block_disk_lock);
->         idr_remove(&mspro_block_disk_idr, disk_id);
-> --
-> 2.30.2
->
