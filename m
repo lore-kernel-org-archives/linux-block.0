@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD1D1C47096
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 08:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4187BC47096
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 09:47:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6D30613DE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 08:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EADB613F0
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 09:47:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229916AbhFCIw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 04:52:57 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:17240 "EHLO
+        id S229665AbhFCJsu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 05:48:50 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:37983 "EHLO
         mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbhFCIw4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 04:52:56 -0400
-Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210603085110epoutp0301b75cb30d80fe48373f95dfedde3a21~FBmTUXACN3263932639epoutp03V
-        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 08:51:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210603085110epoutp0301b75cb30d80fe48373f95dfedde3a21~FBmTUXACN3263932639epoutp03V
+        with ESMTP id S229611AbhFCJst (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 05:48:49 -0400
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210603094703epoutp030b40d340004bbdcc327979541ec02a1f~FCXF7XSkG1890618906epoutp03R
+        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 09:47:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210603094703epoutp030b40d340004bbdcc327979541ec02a1f~FCXF7XSkG1890618906epoutp03R
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1622710270;
-        bh=ROInMEp5LWFDYW5/MsWYnCMtBjhdQPxdGfaQbz4PS8Y=;
+        s=mail20170921; t=1622713623;
+        bh=a5Wku6KPwfauJgdkL6loMj/OZS4Ji+rfubuNDIVzE78=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Rbl7EE0FpzZ47HOPD6AJuyABbVdL+QmZ4CXXqpd2/Yf8eaUf+JMxedIPk4Gg6tw9n
-         4CMx3U8K1gsHWail3bNCsbxoZ+o1s4s7AvpfUeH4XDqDN4Guy/Qr2oIOy2qAR2MXI9
-         t4QpFQbEm/hVqBi7N4xl90YJJdVQNpv9r7G+c2+Y=
+        b=tPgpSsiHL/t2wDu5LBRXEKP3t2eCqXX+uPu0SMQT/G+6Ey4LnrmiI/3ek4MfvGxSX
+         UDnBP4/6fggxnKPCupzAxSQ8nxMGOtWak2zwVnnZA4Hbihm8/CXX/oGwOV6pUm0mSP
+         8TKfTPCfXYrTg9+7hyuJSpqwQ33iUBMBIIXicMfE=
 Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
-        20210603085109epcas1p389366153a5f299bd0bb7f7daa7a030e2~FBmSYR-5Z1342013420epcas1p3q;
-        Thu,  3 Jun 2021 08:51:09 +0000 (GMT)
-Received: from epsmges1p4.samsung.com (unknown [182.195.40.166]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4Fwfkh2LjVz4x9Q8; Thu,  3 Jun
-        2021 08:51:08 +0000 (GMT)
-Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
-        epsmges1p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        EB.60.10258.CF798B06; Thu,  3 Jun 2021 17:51:08 +0900 (KST)
+        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
+        20210603094702epcas1p448c8940afb3a3b7e90957d5b54c39bb3~FCXEzEUdJ1308213082epcas1p4C;
+        Thu,  3 Jun 2021 09:47:02 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.40.165]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4Fwgz91MTZz4x9Pp; Thu,  3 Jun
+        2021 09:47:01 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F9.AB.09736.515A8B06; Thu,  3 Jun 2021 18:47:01 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210603085107epcas1p223fb68f0d992fd9b64df84d8bcfea1f0~FBmQCIt472678326783epcas1p2x;
-        Thu,  3 Jun 2021 08:51:07 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
+        20210603094700epcas1p3921df0cd92caca7b098205d35d861eb9~FCXCpmCDj1375413754epcas1p33;
+        Thu,  3 Jun 2021 09:47:00 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210603085107epsmtrp24f8374617cf0c1880d26d6278affe983~FBmQAsUAC1016010160epsmtrp2B;
-        Thu,  3 Jun 2021 08:51:07 +0000 (GMT)
-X-AuditID: b6c32a38-42fff70000002812-77-60b897fcd6f0
+        20210603094700epsmtrp2a38268049e6174cd5e8550b1ca45400b~FCXCoTleD0392503925epsmtrp2P;
+        Thu,  3 Jun 2021 09:47:00 +0000 (GMT)
+X-AuditID: b6c32a39-8efff70000002608-c7-60b8a515c8fe
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D6.63.08163.BF798B06; Thu,  3 Jun 2021 17:51:07 +0900 (KST)
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2D.DD.08637.315A8B06; Thu,  3 Jun 2021 18:46:59 +0900 (KST)
 Received: from localhost.localdomain (unknown [10.253.99.105]) by
         epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210603085106epsmtip12c2d2e90f0b66e09e00dc77ad723ac92~FBmPtwKJ10300903009epsmtip11;
-        Thu,  3 Jun 2021 08:51:06 +0000 (GMT)
+        20210603094659epsmtip11e0af06f75930f869fabb312b5deec3c~FCXCSQNmX2799727997epsmtip1q;
+        Thu,  3 Jun 2021 09:46:59 +0000 (GMT)
 From:   Changheun Lee <nanich.lee@samsung.com>
-To:     damien.lemoal@wdc.com
+To:     bvanassche@acm.org
 Cc:     Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
         asml.silence@gmail.com, axboe@kernel.dk, bgoncalv@redhat.com,
-        bvanassche@acm.org, gregkh@linuxfoundation.org, hch@infradead.org,
-        jaegeuk@kernel.org, jisoo2146.oh@samsung.com,
+        damien.lemoal@wdc.com, gregkh@linuxfoundation.org,
+        hch@infradead.org, jaegeuk@kernel.org, jisoo2146.oh@samsung.com,
         junho89.kim@samsung.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, ming.lei@redhat.com,
         mj0123.lee@samsung.com, nanich.lee@samsung.com, osandov@fb.com,
@@ -70,63 +70,63 @@ Cc:     Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
         woosung2.lee@samsung.com, yi.zhang@redhat.com,
         yt0928.kim@samsung.com
 Subject: Re: [PATCH v11 3/3] scsi: set max_bio_bytes with queue max sectors
-Date:   Thu,  3 Jun 2021 17:32:36 +0900
-Message-Id: <20210603083236.18161-1-nanich.lee@samsung.com>
+Date:   Thu,  3 Jun 2021 18:28:30 +0900
+Message-Id: <20210603092830.27062-1-nanich.lee@samsung.com>
 X-Mailer: git-send-email 2.29.0
-In-Reply-To: <DM6PR04MB7081BDEC7ECFB63D3E6345D0E73D9@DM6PR04MB7081.namprd04.prod.outlook.com>
+In-Reply-To: <10c02317-7528-bbad-3cfb-75db54d2ab91@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0zbVRTHvf21v7YMsJTNXRm42uAUHI9SHhcGg2yoP8diMCTOsRGo8EvB
-        lbZpwceGrth1QNdNCArSgZ2sIgG2LoDYVl4pmg4YRGXQsAhIJFs2KCyUxyaw2FJQ/vuecz7n
-        fnPOzWFgbA3dj5EnLiBlYoGIi3tQO/qCwkLWq41Z4dVKb3TzzxY6qm3qAKh54kscmX/XAVT1
-        +CmGVCUrFKS8bsDRYHk9Bc0YtBjSzHxBQxvqSQpanpajrnuvoxFzLY4slUoKqm6rxdDY1B06
-        6pscpaJpfQWGhvsXaejbv5PQPz/8CtDCExsdDRgrMWQbrsKRoespnuRHjNxNISqU83TCpJ2g
-        E22NwcTIUCHR2lSGEz11LXRioXsUJ660NwHC0foSUdJ7iUJYLA1Yqme6KD6XFOSQMg4pzpbk
-        5ImFCdyUtMyjmVHR4bwQXiyK4XLEgnwygZt8PDXkzTyRcwVczkcCUaEzlSqQy7lhh+NlksIC
-        kpMrkRckcElpjkjKC5eGygX58kKxMDRbkh/HCw+PiHKSWaJcteoJXTru8YmuW6IAXQw1YDIg
-        KxIu2cuBGngw2CwjgCrbGtUdLAK4MGTYqjgAbP7+OthuaVIP0NwFM4CD1h7af5RmrJXmonDW
-        QXjFfg936d2sF+HAwyXcBWEsGxWq2vo3C76sFFinsWw+S2W9AlU9vZt5L9Yh+Ehv3bLbD9en
-        NJhLM1kZ8Jl5leZmfGB/zQzVpTEno/zxKuYygCwdEzavLGPu5mS40nyT6ta+8JG1ne7WftAx
-        34W7Gy4BqLyoA+6gHED9gwaKm+LDRYfDWWA4LYKgwRzmTr8MTWt1wO3sDeeXNTQXAllesPQi
-        240EwjsXprBtrwc3TFsvEtDaf3VrqbcArFnuoZUDjnbHQNodA2n/d74GsCbwAimV5wtJOU8a
-        ufOTW8HmWQQjI6izPw61AAoDWABkYNzdXp0HjFlsrxzBp2dJmSRTVigi5RYQ5Vx3Bea3J1vi
-        vCtxQSYvKoLP56PI6JjoKD53r5fw6LksNksoKCDPkKSUlG33URhMPwVF1lIpM6x9HEQ7gscP
-        dOjuYp6nFTGztzHtXKPv9Nn50ezX8nd9ILXri+Yja1oCDh+S3ufuvTXU1Tj3Of+vMeupMt3B
-        9jHK24ETAScWBxUm2+34lPXBV0/6v3W++4y+z3ZE+dDzWllaQEYzc/wrxzuiJCO/88PLs94x
-        nf5tpTfsJCe4OPeE+bh9svLZymeneT6qXxLTG3yOJcaWFEu5Sjb7t6G56KKKjVPMaoGSE3i/
-        /ph/Yqkie+b8RsSSYmF2TVy/kR76nbD4jYiUql1fp72rj20p2FMxLIhLTbYOy0zfTFD2wecy
-        9p8cv/BT3PjzaHV1vdf0/r7L2IGfi+LN6j/OOXjvcanyXAEvGJPJBf8CSn6e6p8EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Ra0hTYRyHe8/ZzjmuFsdp+TbTaLY+qJmV1AtZrSI6dCFNKIxCl55Uck52
-        mqUZaWajZWUkzk1NMdGaojBrzXlZnFGpaSiWkZRmmt3LLmZmRW4S9O3h/zzw+/CncAkvkFJJ
-        KUdYTYoyWUaIBFanzH/ZlMEWG1rbNAfVPa0lUYnZClDNs4sEsveUAVQ4NomjXN13DOVcrSfQ
-        /fwKDI3Um3CUN3JKiH7rBzA0PsShlv4g1GsvIRB/OQdDhoYSHPUNdpLIOfBIgIYqL+HoQfsX
-        IboyrEA/q+8A9OnHYxJ12C7j6PGDQgLVt0wSCinT+3A7cynnI8k0mp6RTMO1QKa3S8tYzGcJ
-        xlFaSzKfWh8RzIUbZsB8tfgzutvnMIbnq/CIOftE4fFsclIaq1m+PlaUqM/9QaY+ER0ra1Vn
-        gRZKDzwoSIdBs75DqAciSkLbAKxsaMRnhBTea/swLahp9oJOJzfTfAawqfsL4WoIOhhe+NDv
-        Zm96Aex4841wRTg9IYAO3ahbeNHbYWkeD1wsoOUw13HbfRfTa+HbyntgZmwR/DWY5x72oA/A
-        P/YJoYsl9H5omnqBzfSesN04InAxPt3n3CzG8wFt+k+Z/lPlADODBWwqp0pQcStSV6awR0M4
-        pYrTpiSExKlVFuB+c2CgDTSbx0J4gFGAB5DCZd7i5qW2WIk4XpmewWrUMRptMsvxwJcSyHzE
-        3fr2GAmdoDzCHmbZVFbzz2KUhzQLqyOzD53pWi+O3gK7MhcJ1beax3TG7Maf6SUHfclNua87
-        x+cbdLLIoP1NRWhhUUdw9ebFx05GduN/SKIYyD9qtO/6rQq/K/Kl108g53uz33PrVMFdvc+y
-        VeNhhg2WtX47NmCjkRNdC4u/y1XGG5a0+MIKW83sgtNDNcffANHX5mvhmeV9rfOlW+1bDdEv
-        qz2H+yaWlG5rdSgy20I7jXvljsqkoILE13vIAFHTgHZuXNyoaNSyr+ehNCh8950E666oOKN9
-        Xn/AOs9faRvzJ1+F5mX3qIfZ0lgv5nzfu8ONPe/Jef54RN3uLO823yh+dXrDTluGYlZ2VXSt
-        T0bioag1MgGXqFwRiGs45V/aGOU+VQMAAA==
-X-CMS-MailID: 20210603085107epcas1p223fb68f0d992fd9b64df84d8bcfea1f0
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Ta0xTZxjOd045LbK6Q1X2jSyOVTGTa0stfApsEHU7ESSwxWWTLaWDk8JW
+        2tqC2XBBIgIDOqRzglQuKgiMi3WIrDRjmupE5LIJIg65jEGUGQvKTZm2ruVAxr/nfZ/n+Z68
+        75eXg/Py2e6cJEUKrVZI5XxiDavl6laB74ZzxjhB7RMWOj/UwEaldS0A1Q8fI5DpVgVARY8X
+        cZSVs4ChzEoDgToLz2JowqDHkXbiiBOy5o1gaH5Mg9oGvVGfqZRA5uOZGCq+WIqjO6NdbHR1
+        pJ+Fxqp0OOrpmHFC5eNh6N+a3wCafjbARjeNx3E00FNEIEPbIhHmTvXdjqB0mVNsqlU/zKYu
+        1npRfd2pVFNdLkFdLmtgU9O/9hNUQXMdoGabNlI5V/IxymyuxqNf2S8PSaSlCbTag1bEKxOS
+        FLJQfsSHkp0ScaBA6CvcjoL4HgppMh3K3xUZ7ftekty+Ar7HQak81d6Klmo0fP93QtTK1BTa
+        I1GpSQnl06oEuUooUPlppMmaVIXML16ZvEMoEASI7co4eeIj0xlcZeB9ZTLo8Azw59o84MyB
+        5DZ49/ktpzywhsMjjQDOXO/GmWIGQP1PL5eLBQDrszpZKxZLcT/BEG0Ajk/eXyJ45CyAva0p
+        DkyQPrDAMkg48HrSDfbNLQCHAScHWfDs33ecHMQ6MgKWac3AgVmkJ/xRa1sycMlg+FdjOZtJ
+        exO+GNXiDuxs71d1NOGMxhV2lEwsBeN2TealUzijr3CGs0McBu+CNbYWgsHr4MP25uU33eHs
+        VNvSBJDMBzAzuwIwRSGAVQ+qMUYlgjOzs3aCY0/YCg0mf6b9Fmx9XgaY4LVwal7r5JBAkgu/
+        zeYxks2w6+govpL1oLF1+UUKvrzXzGI2VwBg2UwzUQg89Kvm0a+aR/9/8mmA1wE3WqVJltEa
+        oUq8+o+bwNJVeG03gmLLYz8zwDjADCAH56/n/rLFGMfjJki/TqPVSok6VU5rzEBs37YOd98Q
+        r7SflSJFIhQHiEQitC0wKFAs4r/Gle08FMcjZdIU+kuaVtHqFR/GcXbPwC6cyt7dL3vXZ/J+
+        +IGRqHyb6UL10XYszCwRWBO8bQFdxYVvlyQ9Lagt+l1s+bQ+vXLP4pRPrzXG9fDJdNfzb9y4
+        Rlo3l48/NTflsHSbeq9zY5ICJVkuornY5B8+8R9Y8K59dq7c2l7j7xmwJzc0pNETawha3GiL
+        wMhY+dxdrxOs7G8mXj8ISwuH3T64URy7N/i77kdSneALSSWIKtrxRNvzvrbm+yub5v+Yx6b/
+        cR8Kfnh5Ib/+sOae5dDHn40duR0znH7SpeHm4H7D5D7PAydszv69LhZZq6Ly0u6cjGvGyBZd
+        iGXL50Aennvm1foXJR9x0tKKjoWrTu/7md0ZJbbujaSMfJYmUSr0wtUa6X9lq3HLngQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02RfVAMcRiA/Xa33e2I7ZysM4obGV1Ek+FHTRgfrSHThGH44+5iFbrktsvn
+        0NTQ2I7TNGWk8hGuDp25ipw+2GO6SOQquhFOh2Fc8lGUj9FdY8Z/z7zP8877x0uiYismJbel
+        pLGaFFWyDBdh162ywJmSizXK2XcforDi+RUCFhmvA3i5S49DS+sZAAt6B1B4OLsfgVmlJhw+
+        OHEegS5TIQp1rkwf+Jt/gcA+JwfrHKHQbinCoZCXhcCTlUUo7HjZTEDri3YMOi/korCl6YsP
+        LOleBAcN9wD89OMpAe/X5KHwaUsBDk11A/giKWNvW8nkZvUQzM3CLoKpLJMz9odaxmw8ijMN
+        xVcI5lN9O84crzIC5qs5kMm+nYMwgnAJjRu1URS1hU3els5qZkUrRUkfLefQVJN4j8WUi2aA
+        ztE88CVpag7tPtmO80BEiqlbgDYPPEOHhZRutLl9eEAO8VjaauWGm8+A1rsFwtPg1Az6uNuB
+        e1hCBdD2b/3AE6HUIEa/f/0K8Yix1Eq6WCcAD2NUMF2u++Nd8KMi6VdXS4jhY0H0r5c672Hf
+        ofmFJrOXxdQCuvpILTbc+9NNp1xeRof6rOrT6AlAFf6nCv9TZwFiBBPYVE6dqObCU8NT2N1h
+        nErNaVMSwzbvVJuB98/ykBpww9gbJgCEBAKgSVQm8audVqMU+21R7d3HanYqNNpklhPARBKT
+        jfd7zDcpxFSiKo3dwbKprOafRUhfaQYSaOnOtmOqvpmdvDhv8WTbevebKQc6Ap6kHbNZuw8P
+        bIIJATbEcSwoMnP+mxGkogHv+dm7TAvaHMy6isp0PqixsrnqQXiUdm1ErE5yMH/q4PSQ02vr
+        JzkMYGu/Lb86XWivKo2JzsM6DZZxUc0bJo9892WfPWm3Ppi5FHEtuK/zK5Ex7/ss5X1FzgyJ
+        z7wIvbrreyw3wn1Ef+OOk393a8neqnjXI+XPfueY4NBdLWpyTUXZIWlm38bykOUGvmh1XKTt
+        c0LrB7lCuT39R8GKpa09C40rYuRv958tWxUajTcq1C7/lo4zs3PIulVtc+MWqhrjDfNjpiSr
+        /aOXr3E674hkGJekCpejGk71F1twXMBWAwAA
+X-CMS-MailID: 20210603094700epcas1p3921df0cd92caca7b098205d35d861eb9
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: SVC_REQ_APPROVE
 CMS-TYPE: 101P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210603085107epcas1p223fb68f0d992fd9b64df84d8bcfea1f0
-References: <DM6PR04MB7081BDEC7ECFB63D3E6345D0E73D9@DM6PR04MB7081.namprd04.prod.outlook.com>
-        <CGME20210603085107epcas1p223fb68f0d992fd9b64df84d8bcfea1f0@epcas1p2.samsung.com>
+X-CMS-RootMailID: 20210603094700epcas1p3921df0cd92caca7b098205d35d861eb9
+References: <10c02317-7528-bbad-3cfb-75db54d2ab91@acm.org>
+        <CGME20210603094700epcas1p3921df0cd92caca7b098205d35d861eb9@epcas1p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On 2021/06/02 21:29, Changheun Lee wrote:
+> On 6/2/21 5:10 AM, Changheun Lee wrote:
 > > Set max_bio_bytes same with queue max sectors. It will lead to fast bio
 > > submit when bio size is over than queue max sectors. And it might be helpful
 > > to align submit bio size in some case.
@@ -145,23 +145,50 @@ X-Mailing-List: linux-block@vger.kernel.org
 > >  	dma_set_max_seg_size(dev, queue_max_segment_size(q));
 > >  
 > > +	blk_queue_max_bio_bytes(q, queue_max_sectors(q));
-> 
-> Doing this unconditionally for all scsi block devices is probably not a good
-> idea. Cannot this be moved to the LLD handling the devices that actually need it ?
-
-OK, I'll try to check more nice location in LLD.
-
-> 
 > > +
 > >  	/*
 > >  	 * Set a reasonable default alignment:  The larger of 32-byte (dword),
 > >  	 * which is a common minimum for HBAs, and the minimum DMA alignment,
-> > 
 > 
+> Has this patch been tested with dm-crypt on top of a SCSI device? I'm
+> concerned that this patch will trigger data corruption with dm-crypt on
+> top because the above change will make the following dm-crypt code fail
+> for a sufficiently large bio:
 > 
-> -- 
-> Damien Le Moal
-> Western Digital Research
+> bio_add_page(clone, page, len, 0);
+> 
+> When testing dm-crypt on top of this patch series, please change the
+> above dm-crypt code into the following before running any tests:
+> 
+> WARN_ON(bio_add_page(clone, page, len, 0) < len);
+> 
+> Thanks,
+> 
+> Bart.
+
+I think it will be OK if nr_iovecs is not over BIO_MAX_VECS in
+crypt_alloc_buffer(). Because page is added to bio in PAGE_SIZE as maximum,
+and the minimum of max_bio_bytes is "BIO_MAX_VECS * PAGE_SIZE".
+
+for (i = 0; i < nr_iovecs; i++) {
+	page = mempool_alloc(&cc->page_pool, gfp_mask);
+	if (!page) {
+		crypt_free_buffer_pages(cc, clone);
+		bio_put(clone);
+		gfp_mask |= __GFP_DIRECT_RECLAIM;
+		goto retry;
+	}
+
+	len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
+
+	bio_add_page(clone, page, len, 0);
+
+	remaining_size -= len;
+}
+
+Anyway as your advise, I'm checking it in my test environment. There are no
+problem by now yet. I'm testing with 1MB max_bio_bytes of SCSI, and UINT_MAX
+max_bio_bytes of dm-crypt.
 
 Thank you,
-Changheun Lee
+Changheun Lee.
