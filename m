@@ -2,116 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34210C47096
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 06:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C09FC47082
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 07:05:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14E1F613AC
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 06:41:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2759060E09
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 07:05:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbhFCGn2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 02:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54138 "EHLO
+        id S229635AbhFCHHH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 03:07:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbhFCGn1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 02:43:27 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A12C06174A;
-        Wed,  2 Jun 2021 23:41:43 -0700 (PDT)
+        with ESMTP id S229567AbhFCHHH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 03:07:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470A7C06174A
+        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 00:05:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kX55QmPWFxDII3Sge2GJJeSnbWWFYdnRducRMGOGHKQ=; b=hARedGyAr0sDE+BtvdYhtLLhqT
-        xBRJL5OHbgF/0VaAM6QvlBJXr83HT5NVS7V8DRpuXyYFELaqdsUVDKE7xdQXCUsOoQxD+ZryBn0Lj
-        TQUUpF9nIf+OhCYb2DCINiYA10TI8AImzzNG9gBDI61JDK4y9IyT9HC7swn3WceMAMX+pproGTr+z
-        euH2oJmi+z8yDYk4o986bBSmMqnp2oduWzGnBnR6zXjKvIqpkjAsnYAK7TaquLehFRzRkMRw2LFzB
-        sQkU84q2RHe9CpB6m2+QJnfPaODcV/HKj6IpiHproIA95ZpBeuavpXhNkqQKbgxpRXe24aJvU2Taj
-        vd1R75YA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1loh0W-00Bsrp-Tp; Thu, 03 Jun 2021 06:39:12 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A34D330018A;
-        Thu,  3 Jun 2021 08:39:05 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8DD1F20223DB5; Thu,  3 Jun 2021 08:39:05 +0200 (CEST)
-Date:   Thu, 3 Jun 2021 08:39:05 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jason Wessel <jason.wessel@windriver.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Will Deacon <will@kernel.org>,
-        Waiman Long <longman@redhat.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Oleg Nesterov <oleg@redhat.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
-        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 5/6] sched,timer: Use __set_current_state()
-Message-ID: <YLh5CaqPHBhBhfVu@hirez.programming.kicks-ass.net>
-References: <20210602131225.336600299@infradead.org>
- <20210602133040.524487671@infradead.org>
- <20210602195458.uj3rsci4suz4mufj@offworld>
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=xT5O0Opq9u5tn/WoDUi6tfqFD1xG+k4ekLP4Sd65ClI=; b=g7fK+MY7ilELzc9Pfj7oaa3/iy
+        u8NOFgpWScSmCwjWCNgzuqmDprggVM7resLqiX2YwDZf+OhMf9q3wqKGhUflcKWBXutnIjEPHRI9z
+        9NIpK4U4qiigPI+xpwI/3Zz+0vTuh6oguDh/tpI2IvmQ6eT/OFGuUmSi7tfeCre3pHdA4fmKspCi5
+        ZOnM9rVDGUOXSJqNAQ+FAPqlFQNctKZIM5NUhek0WlehOCzsXsAAnmlWGf5/R0XKBR9S5RtMg5HA0
+        Z4DExylmQc2100CxQSBhwCSuTx+Bq68pr/5UDfQqDGvKRSvXs31AUr0bhcL/a8FhRzJJ3BXb1wt1s
+        T7xJ4ZGg==;
+Received: from shol69.static.otenet.gr ([83.235.170.67] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1lohPs-007OWW-2k; Thu, 03 Jun 2021 07:05:20 +0000
+Date:   Thu, 3 Jun 2021 10:05:15 +0300
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 5.13
+Message-ID: <YLh/K7UbJFnA2HPa@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210602195458.uj3rsci4suz4mufj@offworld>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 12:54:58PM -0700, Davidlohr Bueso wrote:
-> On Wed, 02 Jun 2021, Peter Zijlstra wrote:
-> 
-> -ENOCHANGELONG
+The following changes since commit a4b58f1721eb4d7d27e0fdcaba60d204248dcd25:
 
-I completely failed to come up with something useful, still do. Subject
-says it all.
+  Merge tag 'nvme-5.13-2021-05-27' of git://git.infradead.org/nvme into block-5.13 (2021-05-27 07:38:12 -0600)
 
-> But yeah, I thought we had gotten rid of all these.
+are available in the Git repository at:
 
-I too was surprised to find it :-)
+  git://git.infradead.org/nvme.git tags/nvme-5.13-2021-06-03
+
+for you to fetch changes up to bcd9a0797d73eeff659582f23277e7ab6e5f18f3:
+
+  nvmet: fix freeing unallocated p2pmem (2021-06-02 10:10:38 +0300)
+
+----------------------------------------------------------------
+nvme fixes for Linux 5.13:
+
+ - fix corruption in RDMA in-capsule SGLs (Sagi Grimberg)
+ - nvme-loop reset fixes (Hannes Reinecke)
+ - nvmet fix for freeing unallocated p2pmem (Max Gurtovoy)
+
+----------------------------------------------------------------
+Hannes Reinecke (4):
+      nvme-loop: reset queue count to 1 in nvme_loop_destroy_io_queues()
+      nvme-loop: clear NVME_LOOP_Q_LIVE when nvme_loop_configure_admin_queue() fails
+      nvme-loop: check for NVME_LOOP_Q_LIVE in nvme_loop_destroy_admin_queue()
+      nvme-loop: do not warn for deleted controllers during reset
+
+Max Gurtovoy (1):
+      nvmet: fix freeing unallocated p2pmem
+
+Sagi Grimberg (1):
+      nvme-rdma: fix in-casule data send for chained sgls
+
+ drivers/nvme/host/rdma.c   |  5 +++--
+ drivers/nvme/target/core.c | 33 ++++++++++++++++-----------------
+ drivers/nvme/target/loop.c | 11 ++++++++---
+ 3 files changed, 27 insertions(+), 22 deletions(-)
