@@ -2,76 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3D7C47082
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 15:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D821C47096
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 16:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B1B1613DC
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 15:54:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6543261001
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 16:47:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbhFCP4f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 11:56:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34348 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbhFCP4d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 11:56:33 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6D9C06174A
-        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 08:54:47 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id r4so6811436iol.6
-        for <linux-block@vger.kernel.org>; Thu, 03 Jun 2021 08:54:47 -0700 (PDT)
+        id S229719AbhFCQs4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 12:48:56 -0400
+Received: from mail-io1-f45.google.com ([209.85.166.45]:40717 "EHLO
+        mail-io1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229576AbhFCQs4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 12:48:56 -0400
+Received: by mail-io1-f45.google.com with SMTP id e17so7005744iol.7
+        for <linux-block@vger.kernel.org>; Thu, 03 Jun 2021 09:47:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=OQ8/izGugLT2mg1DaIwELKOTXax/WeIQBPj5/sAmtrM=;
-        b=sWRObvHAN4uM8PnmujHncknfBPxl21ZOniXu3Dux67+WGcu23NMh3W6RrJOkoxB8QA
-         2OU+0KkLfMZIVPk1kNPOPv7swr00MTbUX6ZKkP/YEFnc/WK+mf58qnArZuxOspM88n0y
-         LpTS5ZXOO2bJ7nVweslbdch4xpF6+GL+r+TVUGMoXsRIw7N1rJM0wvnJabdSSjXtkRnc
-         g4LnDYFI35vBVCcwun/cXvfB+zOKM9jMUBIZnA2+uZFzKEZzUn2jJ/EdPb4vo6PjTHw9
-         N9HUkRZU6hA2vXjjzTFurjLEkd6gbsPzExUJazanOQoj3bVj3VlB/VnM3okLFx+MtMq1
-         /Lbw==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=PCSbcBf0W31nsxy3qW3PzBxpDwMQqcUZjWB1w5IxHgs=;
+        b=LOv8mB0xUFrdpg6792KXyuxCXJTYx1sFYWKDsOgK3hYM3Tj7ikeyWmyjwYdcNp/23J
+         r2EMCyr5YY/wD107bRRhVgVZ4ooq54aD2p28WyjNisB2H2WpktAmTVowZn0qNXBFz7qb
+         TGCp/pl5rKbrMFYT+LWZDJ8sMhbimNhgUvrat7+9FfZ5WH3FHXojYIYVs84gRa6j2wzg
+         npfJY8mh4IFL78S6MgozTuwYgeuuCd7tV8qKjDweHXP8IjH0YjGqtwnheJul8iame9Qy
+         YRPO5ct9OWuMxzh8Y9SWSdg/AiuXXa2s88fDPg/oiwuKkwZnJM1LLSDtXi2uqfTZVm75
+         3rPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OQ8/izGugLT2mg1DaIwELKOTXax/WeIQBPj5/sAmtrM=;
-        b=oW9uC9A2ApilZTxuIZFbWOonK4/rSs35cz/neJC7IfQ4483RdYARFLzYOw00L71kja
-         cext0cBXXFykih83hvaRpZcNVPjag1kYObGUMk4m4mNQ7edaojihrao8UQVCaF9uCv8t
-         y172NN8o165pF5bNs4yBLohtFbv+dhoctKe6fCaqnDHUwlS2CPolhzne2ZhmffPHX/z1
-         ll01Mw7ubdPCmba6tdoeUFEFhCIdAbvplSxIP+O/A1K/lK54bV3dLbmEIJz+y8uuolzQ
-         1qo4YbQ73eX1UXCEEt/5WRZJUhnf2HReogK1H80Q4rEZYcUZIVxvEqYEzalNGfAGY+6o
-         ajWQ==
-X-Gm-Message-State: AOAM533PRI4rF7eYsaepwYRG0fFGXPTjcBIs/tdFuHTYmLGI8i/ilkEG
-        LFUul2w9TnhJ0AGnzH+ui5tw6w==
-X-Google-Smtp-Source: ABdhPJzaVvt+H2s1I25emL3iM4LnUpQGECU4+1p6n6DiGlCBOlOcFHd7oP51g1mmEsRRfRUYZSP7rA==
-X-Received: by 2002:a6b:7b0a:: with SMTP id l10mr6024iop.120.1622735686716;
-        Thu, 03 Jun 2021 08:54:46 -0700 (PDT)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=PCSbcBf0W31nsxy3qW3PzBxpDwMQqcUZjWB1w5IxHgs=;
+        b=nzghix5eUKhQdOjebodS6SawxhuDvJiB2vqz0E3ZxL+bp0cQf6lNhRHTEMCfNubsPD
+         yq3kr0GG4zjj9byOG5OJQ0gBv1lIkPFPcaqtYFlLsTs/W5lJe12Rpe7zugMKHblS0o0M
+         bfl+yl4RZw5hzcIpwsMKEEKeLh3vp6mLIWSlO/UDedCVqhR0U4u6tkdEO5qfWPI2lFAR
+         mwEYSFGfSTVyq/+U0QcGJjUzSyUzBtGuq7FYRzjQJ9Yu3JVXqlacpCGmxO+ZU+aN6Md5
+         CWtCghj4ubuMoZInmqpMJ9OJhO10xCtXF4WgJ3PxACeIkZj1TQ5RoHVXTl5o+Ikk/taQ
+         HezA==
+X-Gm-Message-State: AOAM530kZECcC6hnUf/yqsmfAaWpN01hNy0ICnW1WFwUjZxv15hYUsdA
+        1XcoNeL5FOdBxZ+VE6B/2YFf9H1A6ciziQLU
+X-Google-Smtp-Source: ABdhPJwVI0s2ddt9UvcqkiqMAY7QsV4rHbzzd94Tvbz4szlh1lF5cGR6fuFFCdiuLtLRFudZYYKWkA==
+X-Received: by 2002:a02:a784:: with SMTP id e4mr6115jaj.18.1622738770971;
+        Thu, 03 Jun 2021 09:46:10 -0700 (PDT)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id x6sm2002769ilg.87.2021.06.03.08.54.45
+        by smtp.gmail.com with ESMTPSA id l15sm2282550ilt.1.2021.06.03.09.46.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Jun 2021 08:54:46 -0700 (PDT)
-Subject: Re: [PATCH][next] null_blk: Fix null pointer dereference on
- nullb->disk on blk_cleanup_disk call
-To:     Colin King <colin.king@canonical.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210602100659.11058-1-colin.king@canonical.com>
+        Thu, 03 Jun 2021 09:46:10 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ce16729c-01c6-7ce8-6c06-c43439186683@kernel.dk>
-Date:   Thu, 3 Jun 2021 09:54:45 -0600
+Subject: [GIT PULL] Block fixes for 5.13-rc5
+Message-ID: <cdd66f53-8316-a4cf-6cb1-0050dcf8cfe9@kernel.dk>
+Date:   Thu, 3 Jun 2021 10:46:09 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210602100659.11058-1-colin.king@canonical.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,15 +68,52 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/2/21 4:06 AM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> The error handling on a nullb->disk allocation currently jumps to
-> out_cleanup_disk that calls blk_cleanup_disk with a null pointer causing
-> a null pointer dereference issue. Fix this by jumping to out_cleanup_tags
-> instead.
+Hi Linus,
 
-Applied, thanks.
+Pull request from Christoph with NVMe fixes:
+
+- Fix corruption in RDMA in-capsule SGLs (Sagi Grimberg)
+- nvme-loop reset fixes (Hannes Reinecke)
+- nvmet fix for freeing unallocated p2pmem (Max Gurtovoy)
+
+Please pull!
+
+
+The following changes since commit a4b58f1721eb4d7d27e0fdcaba60d204248dcd25:
+
+  Merge tag 'nvme-5.13-2021-05-27' of git://git.infradead.org/nvme into block-5.13 (2021-05-27 07:38:12 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.13-2021-06-03
+
+for you to fetch changes up to e369edbb0d8cee50efa6375d5c598a04b7cb3032:
+
+  Merge tag 'nvme-5.13-2021-06-03' of git://git.infradead.org/nvme into block-5.13 (2021-06-03 07:42:27 -0600)
+
+----------------------------------------------------------------
+block-5.13-2021-06-03
+
+----------------------------------------------------------------
+Hannes Reinecke (4):
+      nvme-loop: reset queue count to 1 in nvme_loop_destroy_io_queues()
+      nvme-loop: clear NVME_LOOP_Q_LIVE when nvme_loop_configure_admin_queue() fails
+      nvme-loop: check for NVME_LOOP_Q_LIVE in nvme_loop_destroy_admin_queue()
+      nvme-loop: do not warn for deleted controllers during reset
+
+Jens Axboe (1):
+      Merge tag 'nvme-5.13-2021-06-03' of git://git.infradead.org/nvme into block-5.13
+
+Max Gurtovoy (1):
+      nvmet: fix freeing unallocated p2pmem
+
+Sagi Grimberg (1):
+      nvme-rdma: fix in-casule data send for chained sgls
+
+ drivers/nvme/host/rdma.c   |  5 +++--
+ drivers/nvme/target/core.c | 33 ++++++++++++++++-----------------
+ drivers/nvme/target/loop.c | 11 ++++++++---
+ 3 files changed, 27 insertions(+), 22 deletions(-)
 
 -- 
 Jens Axboe
