@@ -2,225 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBCBC47097
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 12:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1F4C47097
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 13:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85437613E6
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 12:00:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AFA1601FA
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 13:02:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbhFCMBo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 08:01:44 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:32537 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbhFCMBn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 08:01:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1622721598; x=1654257598;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=aA7MzJS89CXdR7S2zT+WDxaJrxsnLrxhQGqCFumOq0E=;
-  b=FwcsT4dm5CSBVv9EqO47X3dJOL/CpWmjpllv7gosM2GDiCQh22ij1+nA
-   tdC3r4YMCF+idI8l9O7M9fXjVbyOM7Gxd93nirXeORSxT/+1LjszVYd4C
-   XOQQMakbxHMw6S232UHNEvvXTwtG2K8WloxnJiFLAzK2aVwGH/cbIyn01
-   lQRh9kYSaehrCeZAdvcuk2P5LW7YfMuwZXzT/1IlS7sMgn3qfryjy5T/o
-   4NMCo3hGDqzb9njy/Weh1D7PYi0kdxTdX8fhZGvnNrbn9CcfeQUgrNXdO
-   pq1VKor0Ia/JC5itOFNKCiOYVNz6GUoWfK776xnv+QuDGYQWXazRaU9hn
-   w==;
-IronPort-SDR: iAWUoYi/cPNikzvVoxL6cy441Bq+jISv8D5DCAq3oIcRCwqKU4FFm95Bc6zmKTPl3Qfpa9pcuf
- PKKAh3buVrG5pCoJHVXSYCWcBu/m7O26j04RTFmn1/I2FBrKPm7C/iKcG+EspghW4Ix1QkqSwB
- +ds9axfC7N9BZsErKD1QupqX4Wr9H1C361djdq2D05lk5zisEKxCvFAI4jymarSmx7u8Boxy8Q
- 3yUef1TpY0i22t8T4pN7BF4W6EdbwXq3FCE6JDDqfIu/TFESjsA6+D6NqWtBkxWojAzxZI3qZW
- dKQ=
-X-IronPort-AV: E=Sophos;i="5.83,244,1616428800"; 
-   d="scan'208";a="175305256"
-Received: from mail-bn8nam11lp2175.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.175])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jun 2021 19:59:53 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CX/ZdiGaNbsN6HHcAdcZ7GbZXuq69BIMj+wKQiET6NCqtE+8td0ZmFoXI3zaGXwLs/rwzBB5RDeTDboRPzwcH3kELHOJ5cYilcaEQ0IH1SQstZrPSqZ5K8yQ1QUrNjqwtsj2lM58L93xwY1kT6giV1EKq8NMG5O2de+oFkpnCD5cElvFoQ9cQeXYm6ao3RCPOnZ4IWjzq3CHXDuK/VwrQmqElHFYnd9uiEHcDl8bvOMZmhFoRklHgNb1Bu2eCvWlpDOC+eOvnl9x9Yi6RQ7KcGDNRcOCMU2V7ZBoyyCofEkghHx7/oGMkzk7Ec5vDA1/daOMYr+TZECM9n9pQxkC6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aA7MzJS89CXdR7S2zT+WDxaJrxsnLrxhQGqCFumOq0E=;
- b=ntjZcHrHH1Yl+lBslpnm4BJQDO+tn3fDVRX46zhBucep3XkQ1LHw2ag5VYjAdKg3sBjyjVhsO6dRCCUnFpnECqyCXMqrR8nkkA6wrhbi7ABYD9budkmfJNlTw8j5lswVhWLJN1AVjTPnIjfBa5L1GS+/ZpwIuSgOGbr0FooT8nbSGm0Oi6Rd+wkJMnQlebhmBzKMaj5M+npEme3pArEfmngTkqFsnOh7/Xq1PSLJvv9NBM396wDKycbVacTCN9PyxUR6+nbDkzNGls/3kb7Z0mxct8YR0fB1xQTC2p3u7/BSnJhwEULo2NtfyauKwYYzrdXLh1Pp4tAdh14Jmt0WNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aA7MzJS89CXdR7S2zT+WDxaJrxsnLrxhQGqCFumOq0E=;
- b=AUgshT9g943y7V7hfitZlHNr1CZUCaWFFpfC7VX0EH8TOFn4AUVXylRjmFTQEHWO/JA6XL6OBHAClMxVrHvgQhL3HnHHDLXNYacekf3fyLN48HE+tE2POFHY0SZfLzeCKd2Op+n0VlI7MJcCnzE2Yt3oARJO55WE8aO/r4xUmPA=
-Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
- by PH0PR04MB7733.namprd04.prod.outlook.com (2603:10b6:510:55::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.24; Thu, 3 Jun
- 2021 11:59:53 +0000
-Received: from PH0PR04MB7158.namprd04.prod.outlook.com
- ([fe80::45d7:388e:5cbb:ae1e]) by PH0PR04MB7158.namprd04.prod.outlook.com
- ([fe80::45d7:388e:5cbb:ae1e%6]) with mapi id 15.20.4195.023; Thu, 3 Jun 2021
- 11:59:53 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-CC:     "dsterba@suse.cz" <dsterba@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] blk-zoned: allow BLKREPORTZONE without CAP_SYS_ADMIN
-Thread-Topic: [PATCH 2/2] blk-zoned: allow BLKREPORTZONE without CAP_SYS_ADMIN
-Thread-Index: AQHXViSH/N9K56jFnkyIxAVcrCvP9asCM6IA
-Date:   Thu, 3 Jun 2021 11:59:53 +0000
-Message-ID: <YLjEOMaxk8/8GOex@x1-carbon>
-References: <20210531135444.122018-1-Niklas.Cassel@wdc.com>
- <20210531135444.122018-3-Niklas.Cassel@wdc.com>
- <20210603095117.GU31483@twin.jikos.cz>
- <DM6PR04MB7081B69E31BB7ADDF02E2D9BE73C9@DM6PR04MB7081.namprd04.prod.outlook.com>
- <20210603100436.GV31483@twin.jikos.cz>
- <DM6PR04MB708127C72BDC03B446997DACE73C9@DM6PR04MB7081.namprd04.prod.outlook.com>
-In-Reply-To: <DM6PR04MB708127C72BDC03B446997DACE73C9@DM6PR04MB7081.namprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [85.226.244.4]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a021abab-9796-4783-86bd-08d926871935
-x-ms-traffictypediagnostic: PH0PR04MB7733:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR04MB773394FBABDFB4510FCDA4BEF23C9@PH0PR04MB7733.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nsuoFKP9+t1liBdmP7/YuU2dOIG3fzr6uzXmlbgRjrE+7HZgnWG5THWQvbJ7ed0iwWD1ERLbjOsMIXhc2VZ7MfFevXJLMvbajcCnQjSqMc9sqMF2i0hZXj4ZY9nrOBpNIIq/sdiR3NTLrVTiDi8XcVd7fQrEnYVLDG0IGI0iveLWfGqQ+BwzVzp0FymxS4iQj4OIdtkBd9bIwkYAyqXSgL8Jc51YK3IMU883V6nv48vaj4zLERi0yTVbTzoF7BjNROMVvCSbPYsbrzsJRns4yDGNXkFeYC984wZavAI9VBCjGGi1EsqFLxSdM79gx4sdLF1PkiIXUtuWarHml/K3t9VcxNjymMhqR9+ou4HWLtO/YI5uQpv/8dpeatwmFxdCv3N/ogzeoCbLaC9qIJnX97Kbf+vC0Pk2aBeeb0qObqWuRcA2+MHtqOi2uVqeLq4mxaPx19EXCV70EBNp6Ry6Dc57RmgBFrJa1jFfUMpcJeHGKoC5U0BF8O3Hrb6BZb2y9HD+2NaWJ6dGZCzdfvkR5MGSneQ+SHooIEGDkcuMXCj7XfJ6qrohjd+uaiPjuemiodQZJ7WSI/8Y4xzvg9IFeawQ4EBtTGcEm2P1Ho/WzxM=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(346002)(136003)(366004)(376002)(39860400002)(396003)(6486002)(33716001)(6512007)(8676002)(9686003)(2906002)(6862004)(478600001)(6636002)(186003)(54906003)(26005)(71200400001)(316002)(6506007)(66446008)(122000001)(4326008)(66946007)(64756008)(91956017)(66476007)(66556008)(76116006)(5660300002)(83380400001)(38100700002)(8936002)(53546011)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?BqiUEom2fLrG1XO+gjZuuK2KW1V98xOhYNhPET73AnSAuSXEqMaor7KYbnuN?=
- =?us-ascii?Q?7ESwYaCOi3V2GSsvaMYwQwzdRXi1VK2DqQzlsQ7UJax9eQ8dFjA00e4bFkO6?=
- =?us-ascii?Q?3Xq263ARdvtTedM9rYycDsRorOMqINQysXX6gRMBhFLVYQvX1qmJsprYOdKG?=
- =?us-ascii?Q?Fh0bLzO6LtVgwdDts285ZVEnQxamjy8GNBk0uqy3EypGubPMcFJ1/NzR7XOm?=
- =?us-ascii?Q?mOh4geCzV9K8avJv1q4ufR1oHiKbiYCb2o6HZcm9QJPhTAPPquRI8XvDvgUW?=
- =?us-ascii?Q?NL3vKbCx64ds6hkMZrZYDO9NcfK6e4L0QsQVomqleC2uOnM/z3BStzMp8sCx?=
- =?us-ascii?Q?LiOyKsr5r/3m/H0IiPiRaw3ytaZWgEiA/BmDliDHoGkHg087jBa/WT4a/7jk?=
- =?us-ascii?Q?P/sSAApsANTPobrM3DoETc2jwnFuzNbQbIPOrnJyDZ4r2tQm9YVvYJNTD4ha?=
- =?us-ascii?Q?m3vSuT+Cs1Qa3xYnx5JQBuqX30OCayhY1geBLAuv/nqEZRPa8S4fZpK8LWSA?=
- =?us-ascii?Q?eyjGt6mAdFll2YRjaD9U7XocBf4W9SlgxPXjlAfe00Dxsiu5ax1aCbY5n+Vr?=
- =?us-ascii?Q?VA9zsrP1zzgQa2EwpBq2Wvy3HF5kvU21Ijnln86uhsL45b/eKHg10ogHAeyN?=
- =?us-ascii?Q?pscrVpzqtVNrykPC6D7ToRzZ52i30YwxJjy9Q/g+rg6HP0YujTZHdJKY0BBN?=
- =?us-ascii?Q?0dUPEeg9lsR2plSx22NVmw7RIcybUD0pwrEaXKRbKvLjHkYRSi5oBayCDH+b?=
- =?us-ascii?Q?TVJzozhCzzil4X1x+XFYz6qG1/8H6t4zlNuo1yaauYVTN3tRMiqwdcJhQTzz?=
- =?us-ascii?Q?Nd8reX8ZqUqtIwDNP7n6PIasN+BW3jvWU/OJbbOKhT4tQTL5hrQmP/QJlR/Z?=
- =?us-ascii?Q?Oq1zKWXv8OkDtbnur8ppijh0ZCOjt1zF6NBv952OoX36VUbe5YBwQfniTQbS?=
- =?us-ascii?Q?S3jkAFfjeu6AZ2vYcZLgXDYjxhg8FYLgigvOilsTPKurmat6al50H2jJ19PM?=
- =?us-ascii?Q?9arCeQHkcKqmDrF60FyAMVCXGpJxVr9Nz8BAy99at4z/d+KFy0Vbm037T7aF?=
- =?us-ascii?Q?6P6rFMYd+0ARiMGgKdQCmDNux25BqrywOKcgrAOiVNvrwUZo8dN+Bjz38LI9?=
- =?us-ascii?Q?WHaCpOQJJutFHKVRdzokzaPuOE0U3+WspfCMxXeCjCFb3501Ft3wHK7mHugs?=
- =?us-ascii?Q?Av1D+D8ljj9spef2Xoa7Oc3MLHXZu4i2KknnJKOwEJGm57onmb2fGDYApVmV?=
- =?us-ascii?Q?4H926REcP0Khbttkm0eXXJn9ihfyOQ8v76qwkOqDuz60SMuxs8jTTzWZay91?=
- =?us-ascii?Q?Z6rRHy3dgY50YMpTNjdc/cmO?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <860A9E52A96BE54C8AA69B4BC30A70DE@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S230445AbhFCNDx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 09:03:53 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:41074 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230443AbhFCNDx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 09:03:53 -0400
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210603130207epoutp01c5f1f5d0886b01a9f4285ef6fb1b7d5d~FFBZ7a4ma1697516975epoutp01H
+        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 13:02:07 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210603130207epoutp01c5f1f5d0886b01a9f4285ef6fb1b7d5d~FFBZ7a4ma1697516975epoutp01H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1622725327;
+        bh=zQhfS0Lj3SAwdFUKVAAVoUgCr3fQIu09ai64tr89oZE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=O24ZTnnPFQTeGods98329EcQt5untY0Txf2yu+qYYLVnqa+lkJhSp1OorRs/SMlgU
+         SDW/26jy2eGwBfQpgkv+kLJrSKWOYJTBE23pPB42VUhrjARn045oX71KTIov/1K/ot
+         RQCRvtfEsvo70eJUmTrW3zjpePoddDqBnfpeoeiE=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210603130206epcas1p284958fb8987ac5ad847a930d3a39e867~FFBYx1ES82399423994epcas1p2T;
+        Thu,  3 Jun 2021 13:02:06 +0000 (GMT)
+Received: from epsmges1p3.samsung.com (unknown [182.195.40.162]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4FwmJD6Wb8z4x9Pr; Thu,  3 Jun
+        2021 13:02:04 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
+        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        BE.B3.09824.CC2D8B06; Thu,  3 Jun 2021 22:02:04 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84~FFBWqMb-_1372713727epcas1p1L;
+        Thu,  3 Jun 2021 13:02:04 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210603130203epsmtrp247ee3459d58b8c324701e54c9758ad45~FFBWo6MfP3023530235epsmtrp2V;
+        Thu,  3 Jun 2021 13:02:03 +0000 (GMT)
+X-AuditID: b6c32a37-04bff70000002660-7b-60b8d2cc105d
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        58.E9.08637.BC2D8B06; Thu,  3 Jun 2021 22:02:03 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210603130203epsmtip1fa7e7324c97cc52bbcad4f5c25673ed0~FFBWYWFCb2075520755epsmtip1t;
+        Thu,  3 Jun 2021 13:02:03 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
+        asml.silence@gmail.com, axboe@kernel.dk, bgoncalv@redhat.com,
+        bvanassche@acm.org, damien.lemoal@wdc.com,
+        gregkh@linuxfoundation.org, hch@infradead.org, jaegeuk@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com, osandov@fb.com, patchwork-bot@kernel.org,
+        tj@kernel.org, tom.leiming@gmail.com, yi.zhang@redhat.com
+Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
+        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
+        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
+        yt0928.kim@samsung.com
+Subject: Re: [PATCH v11 3/3] scsi: set max_bio_bytes with queue max sectors
+Date:   Thu,  3 Jun 2021 21:43:32 +0900
+Message-Id: <20210603124332.17435-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.29.0
+In-Reply-To: <20210603083236.18161-1-nanich.lee@samsung.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a021abab-9796-4783-86bd-08d926871935
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2021 11:59:53.3640
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: h3+bAl47gS1bHuv5WyxNMY1jY13MOJ1bCX0yr9EjaIX7rQhRqcOGl1nXTHkB/hSz1hYkCGhlFlam4MW8C4wj+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7733
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TbVBUZRSe91727kKsXBbQV8Zyu5iNxMcuy8IbQYOhdouaUKaZckrY2Osu
+        sexueyFRm4YBkc8QYqLk0xBX3CAKEBbiQxc2R1BmkHDNRDIoDAN0d3TCwFq4MPHvnOc8z/uc
+        c945AlyUz/cVJGvTGINWoaEIN5f2/h3BgVeumRMlNXYJ+vZWIx9VmdoB+mb8BIG6RmoBKr+/
+        gKOc3EcYyj7dTKChkjoMTTVX4KhoKouHlgpuY+jhHRb13HwBjXZVEchSlo2hL1urcNR/e8wF
+        3akvxdHwZTsP1UxGo8dnrQDN/23jo0FzGY5sw+UEau5ZIKI306M/xdKl2XN8urNinE+3NvjT
+        o1fT6RZTPkH3VTfy6fneMYIubjMB2tHyDJ17oRCjLRYjHue+XxOpZhRKxiBmtEk6ZbJWFUXF
+        xifEJMjDJNJA6YsonBJrFalMFLXrjbjAPcka5/SU+GOFJt0JxSlYlgp+OdKgS09jxGodmxZF
+        MXqlRi+V6INYRSqbrlUFJelSI6QSSYjcyUzUqG1Ls5i+ySNjrtFMZIJK9wLgKoBkKDR2/wUK
+        gJtARJoBHH3wGcYldgBvnFqrPALQ9kWmy5pkbsC6WugB0HK6hOASB4BV/dPYMosgA2Dx7M2V
+        gjdZi8Oms9fx5QQnOwG811GJL7O8yFhYXWQBy7EL+Ry8YJpfwYXkS9Ax30Jwflvh4kTRCu5K
+        RkLLj3cJjuMJL5+cWukJd3Kyz1euGECy0hXeuDfI48S7YLWxa7VxLzhzqY3Pxb7QMddDcIJC
+        ALOP1wIuKQGwftqIcSwZtDsczoLAabEDNncFc/CzsPOfasA5b4BzD4t4yxRICmHecRFH2Qav
+        HJvA17ymmzpXX6Rhw/gin9vXCQDzC+14CRBXrBuoYt1AFf87nwK4CWxk9GyqimGletn6b24B
+        KzfhH24G5bP3gywAEwALgAKc8hZ2bzcnioRKxeEjjEGXYEjXMKwFyJ3rLsV9fZJ0zqPSpiVI
+        5SEymQyFhoWHyWXUJqEq5miiiFQp0pgUhtEzhjUdJnD1zcQ+enPSZro2I1d6tErtvXFn9vkE
+        1H2X2OzXeWx78cXfYzd+GBkzFeUx/9vdDVvSOqa0XgmvPdk9kq9+9RybS7WRkqot+b1bv36d
+        ykvuGxCf++GDt3zOVAe1to/E5mz+M+s6pD7ns/G/PjmcFclLXpK2tvwRfGhPRFTE829bQ8QP
+        hE/dKhvyzNmkEhkrBur7DnTlYe8s+NURYR1q4y/hQxPueYf8FtXSnTz/3TMpn+wtuJrRrWwb
+        WHCUWyXWVzxPnt9mPXjkwNMjuXHenn6XQif3e7Px73p9HxLwad/jf8eaRnd+dTTj/Zqfh1Lw
+        hkG3fe8tBjhCZmwXw4v25hTafA/OEMPRHTGOIMqFVSuk/riBVfwHJWcSCpwEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHIsWRmVeSWpSXmKPExsWy7bCSnO7pSzsSDKb2mFmsu7OG3WLOqm2M
+        Fqvv9rNZ7Lo4n9Fi2oefzBat7d+YLJoXr2ezOD1hEZPFk/WzmC16njSxWvztusdk8fVhscXe
+        W9oWl3fNYbM4NLmZyWL65jnMFofvXWWxeLhkIrPFuZOfWC3mPXaw+LX8KKPF+x/X2S1O7ZjM
+        bHH93DQ2i/V7f7I5SHpcvuLtMbH5HbvHzll32T02r9DyuHy21GPTqk42j/1z17B7vN93lc2j
+        b8sqRo/Pm+Q82g90M3kcOrSMOYAnissmJTUnsyy1SN8ugSvj+t+3TAVr+SverdnB1sA4m6eL
+        kZNDQsBE4t2Ro4xdjFwcQgK7GSU+zV7JApGQkjh+4i1rFyMHkC0scfhwMUTNR0aJLY8WMIPU
+        sAnoSPS9vcUGYosIbGWW+Ls8DKSIWeAgo8Tx2WcYQRLCAt4Sc3sOgdksAqoSB1a9B2vmFbCW
+        +Px+ExvEMnmJP/d7wOKcAjYSh469AIsLAdVM+P+SCaJeUOLkzCdgxzED1Tdvnc08gVFgFpLU
+        LCSpBYxMqxglUwuKc9Nziw0LDPNSy/WKE3OLS/PS9ZLzczcxgqNYS3MH4/ZVH/QOMTJxMB5i
+        lOBgVhLh3aO2I0GINyWxsiq1KD++qDQntfgQozQHi5I474Wuk/FCAumJJanZqakFqUUwWSYO
+        TqkGpklGZjnhf3qYUt0i7mUxz+oSfJ63aLtOsBCLpov/xYid8lOuTpTnYX315aJL2NuwA36C
+        hSePr0zMYtl45Elq4eejZ7m2v6yS3i1hcsVEr3brVrti5hKzT9Or0tZ+mWhze2Lh2T2nl5Qp
+        7Ba0t9jUn3J3pl2novQXZj91hpx4ZbVFJqKPrUIT7niwnVeofvbmx5IsMelZ13j5LL6YxZvX
+        JfR+kTw4/+8WiWzr5E9r4oKyg5apNXFzHTz5cPaZ0EbhzD0a2rJsDzItu1q51kS/0k98f7v2
+        qv7aCHVOQb3UADvvRLnCVLG06NVKtWtf+zOU7tohuUzz4Pe1KbpGmcee6H96tvpy/cEmIaUr
+        TKFKLMUZiYZazEXFiQBBxnUkUQMAAA==
+X-CMS-MailID: 20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84
+References: <20210603083236.18161-1-nanich.lee@samsung.com>
+        <CGME20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84@epcas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 03, 2021 at 11:20:33AM +0000, Damien Le Moal wrote:
-> On 2021/06/03 19:07, David Sterba wrote:
-> > On Thu, Jun 03, 2021 at 10:00:08AM +0000, Damien Le Moal wrote:
-> >> On 2021/06/03 18:54, David Sterba wrote:
-> >>> On Mon, May 31, 2021 at 01:54:53PM +0000, Niklas Cassel wrote:
-> >>>> From: Niklas Cassel <niklas.cassel@wdc.com>
-> >>>>
-> >>>> Performing a BLKREPORTZONE operation should be allowed under the sam=
-e
-> >>>> permissions as read(). (read() does not require CAP_SYS_ADMIN).
-> >>>>
-> >>>> Remove the CAP_SYS_ADMIN requirement, and instead check that the fd =
-was
-> >>>> successfully opened with FMODE_READ. This way BLKREPORTZONE will mat=
-ch
-> >>>> the access control requirement of read().
-> >>>
-> >>> Does this mean that a process that does not have read nor write acces=
-s
-> >>> to the device itself (blocks) is capable of reading the zone
-> >>> information? Eg. some monitoring tool.
-> >>
-> >> With this change, to do a report zones, the process will only need to =
-have read
-> >> access to the device. And if it has read access, it also means that it=
- can read
-> >> the zones content.
-> >=20
-> > Ok, so this is a bit restricting. The zone information is like block
-> > device metadata, comparing it to a file that has permissionx 0600 I can
-> > see the all the stat info (name, tiemstamps) but can't read the data.
-> >=20
-> > But as the ioctl work, it needs a file descriptor and there's probably
-> > no way to separate the permissions to read blocks and just the metadata=
-.
-> > For a monitoring/reporting tool this would be useful. Eg. for btrfs it
-> > could be part of filesystem status overview regarding full or near-full
-> > zones and emitting an early warning or poking some service to start the
-> > reclaim.
->=20
-> You lost me... the change is less restrictive than before because the pro=
-cess
-> does not need SYS_CAP_ADMIN anymore. The block device file open is untouc=
-hed, no
-> change. So whatever process could open it before, will still be able to d=
-o so as
-> is. More processes will be able to do report zones with the change. That =
-is all
-> really that changes, so I do not see what potentially breaks, nor how thi=
-s may
-> prevent writing some monitoring tool. Whoever can open the block device f=
-ile has
-> FMODE_READ rights, no ? Am I missing something here ?
+> > On 2021/06/02 21:29, Changheun Lee wrote:
+> > > Set max_bio_bytes same with queue max sectors. It will lead to fast bio
+> > > submit when bio size is over than queue max sectors. And it might be helpful
+> > > to align submit bio size in some case.
+> > > 
+> > > Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+> > > ---
+> > >  drivers/scsi/scsi_lib.c | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > > 
+> > > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > > index 532304d42f00..f6269268b0e0 100644
+> > > --- a/drivers/scsi/scsi_lib.c
+> > > +++ b/drivers/scsi/scsi_lib.c
+> > > @@ -1837,6 +1837,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+> > >  	blk_queue_virt_boundary(q, shost->virt_boundary_mask);
+> > >  	dma_set_max_seg_size(dev, queue_max_segment_size(q));
+> > >  
+> > > +	blk_queue_max_bio_bytes(q, queue_max_sectors(q));
+> > 
+> > Doing this unconditionally for all scsi block devices is probably not a good
+> > idea. Cannot this be moved to the LLD handling the devices that actually need it ?
+> 
+> OK, I'll try to check more nice location in LLD.
+> 
+> > 
+> > > +
+> > >  	/*
+> > >  	 * Set a reasonable default alignment:  The larger of 32-byte (dword),
+> > >  	 * which is a common minimum for HBAs, and the minimum DMA alignment,
+> > > 
+> > 
+> > 
+> > -- 
+> > Damien Le Moal
+> > Western Digital Research
+> 
+> Thank you,
+> Changheun Lee
 
-What David is saying is that for e.g. stat(), you can get metadata when you
-don't even have read permission for a device, since stat() takes a pathname=
-.
+I think below location might be good. feedback to me please.
 
-An ioctl requires you to first do an open(), which will will check permissi=
-ons,
-so implementing the same is not really possible for an ioctl like BLKREPORT=
-ZONE.
+diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+index 3eb54937f1d8..0f97b7d275ee 100644
+--- a/drivers/scsi/ufs/ufshcd.c
++++ b/drivers/scsi/ufs/ufshcd.c
+@@ -4831,6 +4831,9 @@ static int ufshcd_slave_alloc(struct scsi_device *sdev)
+ 
+ 	ufshcd_get_lu_power_on_wp_status(hba, sdev);
+ 
++	blk_queue_max_bio_bytes(sdev->request_queue,
++				queue_max_sectors(sdev->request_queue));
++
+ 	return 0;
+ }
 
-However, I think the current ioctl is fine.
-The amount of data that is transferred from a zoned block device for the zo=
-ne
-report is more than the data that is transferred when someone does a stat()=
-,
-so in one way getting the zone report is more like a read.
-
-Doing what David suggests would, as far as I can tell, require another solu=
-tion
-than the existing ioctl method, which this patch changes.
-
-We can think about his suggestion, but it would need to be addressed is a
-separate patch series. (If his suggestion is something that we want to purs=
-ue.)
-
-
-Kind regards,
-Niklas
+Thank you,
+Changheun Lee
