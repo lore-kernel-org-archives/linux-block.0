@@ -2,184 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1F4C47097
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 13:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2D22C47082
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 13:42:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AFA1601FA
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 13:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 981D8613E7
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jun 2021 13:42:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230445AbhFCNDx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 09:03:53 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:41074 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230443AbhFCNDx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 09:03:53 -0400
-Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210603130207epoutp01c5f1f5d0886b01a9f4285ef6fb1b7d5d~FFBZ7a4ma1697516975epoutp01H
-        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 13:02:07 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210603130207epoutp01c5f1f5d0886b01a9f4285ef6fb1b7d5d~FFBZ7a4ma1697516975epoutp01H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1622725327;
-        bh=zQhfS0Lj3SAwdFUKVAAVoUgCr3fQIu09ai64tr89oZE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=O24ZTnnPFQTeGods98329EcQt5untY0Txf2yu+qYYLVnqa+lkJhSp1OorRs/SMlgU
-         SDW/26jy2eGwBfQpgkv+kLJrSKWOYJTBE23pPB42VUhrjARn045oX71KTIov/1K/ot
-         RQCRvtfEsvo70eJUmTrW3zjpePoddDqBnfpeoeiE=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210603130206epcas1p284958fb8987ac5ad847a930d3a39e867~FFBYx1ES82399423994epcas1p2T;
-        Thu,  3 Jun 2021 13:02:06 +0000 (GMT)
-Received: from epsmges1p3.samsung.com (unknown [182.195.40.162]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4FwmJD6Wb8z4x9Pr; Thu,  3 Jun
-        2021 13:02:04 +0000 (GMT)
-Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
-        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        BE.B3.09824.CC2D8B06; Thu,  3 Jun 2021 22:02:04 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84~FFBWqMb-_1372713727epcas1p1L;
-        Thu,  3 Jun 2021 13:02:04 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210603130203epsmtrp247ee3459d58b8c324701e54c9758ad45~FFBWo6MfP3023530235epsmtrp2V;
-        Thu,  3 Jun 2021 13:02:03 +0000 (GMT)
-X-AuditID: b6c32a37-04bff70000002660-7b-60b8d2cc105d
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        58.E9.08637.BC2D8B06; Thu,  3 Jun 2021 22:02:03 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.99.105]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210603130203epsmtip1fa7e7324c97cc52bbcad4f5c25673ed0~FFBWYWFCb2075520755epsmtip1t;
-        Thu,  3 Jun 2021 13:02:03 +0000 (GMT)
-From:   Changheun Lee <nanich.lee@samsung.com>
-To:     Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
-        asml.silence@gmail.com, axboe@kernel.dk, bgoncalv@redhat.com,
-        bvanassche@acm.org, damien.lemoal@wdc.com,
-        gregkh@linuxfoundation.org, hch@infradead.org, jaegeuk@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, osandov@fb.com, patchwork-bot@kernel.org,
-        tj@kernel.org, tom.leiming@gmail.com, yi.zhang@redhat.com
-Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
-        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-Subject: Re: [PATCH v11 3/3] scsi: set max_bio_bytes with queue max sectors
-Date:   Thu,  3 Jun 2021 21:43:32 +0900
-Message-Id: <20210603124332.17435-1-nanich.lee@samsung.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <20210603083236.18161-1-nanich.lee@samsung.com>
+        id S230099AbhFCNod (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 09:44:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229957AbhFCNod (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jun 2021 09:44:33 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA78C06174A
+        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 06:42:48 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id z24so6351406ioi.3
+        for <linux-block@vger.kernel.org>; Thu, 03 Jun 2021 06:42:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=1RDUISF2jsikTWwm3f0Zbh1NDK4OuRR1Slpow+Un5vU=;
+        b=V0esR9S3/wJ1cAgfIL6tcbRBlsmNwi2vKK3YrDvqflsD91/iwrmHxvH8CbELUFZQox
+         aeCJjjhsY7P42mzQXAuo/d7357fSe4fxy5uoKn2geR4F3F37jp1RI/4054a+/UYpdOs9
+         Jvb8ftpaiTgyRR0D0rKsesxUZMYKgtTKuHf7yrS1V8eKLYQm3LlnZ6cA7TE+nKC9LzPm
+         icAZQVKej/EOz4OdXH6qNys+XuFtphqPGkFZyEb4mhJl2oe9x1jg1tfBQO+CLk7kjbe6
+         VX7gcU1io4Lnn6pWFJxB7KitqjQfg95OJxQ97uBhgvH+BZNf+SbYusOrb8CPzEimchZO
+         EUFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1RDUISF2jsikTWwm3f0Zbh1NDK4OuRR1Slpow+Un5vU=;
+        b=hvqM5mSM4m6SThY7PaymRK0F4i/b16uvgf6bEKRUWKAqIdbqGakKgwUupU4OzXxxMp
+         EyHZbPHHBitbUzhnrObzQzBXKEGCsl6XHZ9hRhDjxGhNZzCEREVkNN10kyBqmnEquVv7
+         0gyWGHyZCpVsHSeJd2DrLN6XcswYOsCyAI83u/AFVngX3qB2rmnrxl9YkQ75B6X4apHT
+         vX+y3upTQzgBoTg5+aLX1lOdydqOLXPGN2kYNa7ggcLNWXOJp2jDJKw9m8igqtkEn01U
+         DWQOYwz5CoehiwOQ5dwAizSnwEcGUkXeWegqgiWe/+KuFh1mZu9ySanw9NqEvMcwpwJf
+         OvBA==
+X-Gm-Message-State: AOAM530c2BCGNT4hwv/cRg9SlSI3FeogpuHA758fODj0B4FP/tEdW1ZR
+        zbmQXvPqPAEigb25K0u3398DP4MLUK8qZoZ8
+X-Google-Smtp-Source: ABdhPJyvhFMKNbIdh+lPzLE0icitYuwpRQlqqSNC6QqRYx52mr6hKPoq2evVj57bwfkUobA6EM817g==
+X-Received: by 2002:a05:6638:197:: with SMTP id a23mr10487867jaq.77.1622727767427;
+        Thu, 03 Jun 2021 06:42:47 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id g3sm1571814ioq.42.2021.06.03.06.42.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Jun 2021 06:42:47 -0700 (PDT)
+Subject: Re: [GIT PULL] nvme fixes for Linux 5.13
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YLh/K7UbJFnA2HPa@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <4e58ee70-d923-cb66-44de-5e9f82408189@kernel.dk>
+Date:   Thu, 3 Jun 2021 07:42:49 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01TbVBUZRSe91727kKsXBbQV8Zyu5iNxMcuy8IbQYOhdouaUKaZckrY2Osu
-        sexueyFRm4YBkc8QYqLk0xBX3CAKEBbiQxc2R1BmkHDNRDIoDAN0d3TCwFq4MPHvnOc8z/uc
-        c945AlyUz/cVJGvTGINWoaEIN5f2/h3BgVeumRMlNXYJ+vZWIx9VmdoB+mb8BIG6RmoBKr+/
-        gKOc3EcYyj7dTKChkjoMTTVX4KhoKouHlgpuY+jhHRb13HwBjXZVEchSlo2hL1urcNR/e8wF
-        3akvxdHwZTsP1UxGo8dnrQDN/23jo0FzGY5sw+UEau5ZIKI306M/xdKl2XN8urNinE+3NvjT
-        o1fT6RZTPkH3VTfy6fneMYIubjMB2tHyDJ17oRCjLRYjHue+XxOpZhRKxiBmtEk6ZbJWFUXF
-        xifEJMjDJNJA6YsonBJrFalMFLXrjbjAPcka5/SU+GOFJt0JxSlYlgp+OdKgS09jxGodmxZF
-        MXqlRi+V6INYRSqbrlUFJelSI6QSSYjcyUzUqG1Ls5i+ySNjrtFMZIJK9wLgKoBkKDR2/wUK
-        gJtARJoBHH3wGcYldgBvnFqrPALQ9kWmy5pkbsC6WugB0HK6hOASB4BV/dPYMosgA2Dx7M2V
-        gjdZi8Oms9fx5QQnOwG811GJL7O8yFhYXWQBy7EL+Ry8YJpfwYXkS9Ax30Jwflvh4kTRCu5K
-        RkLLj3cJjuMJL5+cWukJd3Kyz1euGECy0hXeuDfI48S7YLWxa7VxLzhzqY3Pxb7QMddDcIJC
-        ALOP1wIuKQGwftqIcSwZtDsczoLAabEDNncFc/CzsPOfasA5b4BzD4t4yxRICmHecRFH2Qav
-        HJvA17ymmzpXX6Rhw/gin9vXCQDzC+14CRBXrBuoYt1AFf87nwK4CWxk9GyqimGletn6b24B
-        KzfhH24G5bP3gywAEwALgAKc8hZ2bzcnioRKxeEjjEGXYEjXMKwFyJ3rLsV9fZJ0zqPSpiVI
-        5SEymQyFhoWHyWXUJqEq5miiiFQp0pgUhtEzhjUdJnD1zcQ+enPSZro2I1d6tErtvXFn9vkE
-        1H2X2OzXeWx78cXfYzd+GBkzFeUx/9vdDVvSOqa0XgmvPdk9kq9+9RybS7WRkqot+b1bv36d
-        ykvuGxCf++GDt3zOVAe1to/E5mz+M+s6pD7ns/G/PjmcFclLXpK2tvwRfGhPRFTE829bQ8QP
-        hE/dKhvyzNmkEhkrBur7DnTlYe8s+NURYR1q4y/hQxPueYf8FtXSnTz/3TMpn+wtuJrRrWwb
-        WHCUWyXWVzxPnt9mPXjkwNMjuXHenn6XQif3e7Px73p9HxLwad/jf8eaRnd+dTTj/Zqfh1Lw
-        hkG3fe8tBjhCZmwXw4v25hTafA/OEMPRHTGOIMqFVSuk/riBVfwHJWcSCpwEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHIsWRmVeSWpSXmKPExsWy7bCSnO7pSzsSDKb2mFmsu7OG3WLOqm2M
-        Fqvv9rNZ7Lo4n9Fi2oefzBat7d+YLJoXr2ezOD1hEZPFk/WzmC16njSxWvztusdk8fVhscXe
-        W9oWl3fNYbM4NLmZyWL65jnMFofvXWWxeLhkIrPFuZOfWC3mPXaw+LX8KKPF+x/X2S1O7ZjM
-        bHH93DQ2i/V7f7I5SHpcvuLtMbH5HbvHzll32T02r9DyuHy21GPTqk42j/1z17B7vN93lc2j
-        b8sqRo/Pm+Q82g90M3kcOrSMOYAnissmJTUnsyy1SN8ugSvj+t+3TAVr+SverdnB1sA4m6eL
-        kZNDQsBE4t2Ro4xdjFwcQgK7GSU+zV7JApGQkjh+4i1rFyMHkC0scfhwMUTNR0aJLY8WMIPU
-        sAnoSPS9vcUGYosIbGWW+Ls8DKSIWeAgo8Tx2WcYQRLCAt4Sc3sOgdksAqoSB1a9B2vmFbCW
-        +Px+ExvEMnmJP/d7wOKcAjYSh469AIsLAdVM+P+SCaJeUOLkzCdgxzED1Tdvnc08gVFgFpLU
-        LCSpBYxMqxglUwuKc9Nziw0LDPNSy/WKE3OLS/PS9ZLzczcxgqNYS3MH4/ZVH/QOMTJxMB5i
-        lOBgVhLh3aO2I0GINyWxsiq1KD++qDQntfgQozQHi5I474Wuk/FCAumJJanZqakFqUUwWSYO
-        TqkGpklGZjnhf3qYUt0i7mUxz+oSfJ63aLtOsBCLpov/xYid8lOuTpTnYX315aJL2NuwA36C
-        hSePr0zMYtl45Elq4eejZ7m2v6yS3i1hcsVEr3brVrti5hKzT9Or0tZ+mWhze2Lh2T2nl5Qp
-        7Ba0t9jUn3J3pl2novQXZj91hpx4ZbVFJqKPrUIT7niwnVeofvbmx5IsMelZ13j5LL6YxZvX
-        JfR+kTw4/+8WiWzr5E9r4oKyg5apNXFzHTz5cPaZ0EbhzD0a2rJsDzItu1q51kS/0k98f7v2
-        qv7aCHVOQb3UADvvRLnCVLG06NVKtWtf+zOU7tohuUzz4Pe1KbpGmcee6H96tvpy/cEmIaUr
-        TKFKLMUZiYZazEXFiQBBxnUkUQMAAA==
-X-CMS-MailID: 20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84
-References: <20210603083236.18161-1-nanich.lee@samsung.com>
-        <CGME20210603130204epcas1p1f33c937feb12b181af0c57f464a19f84@epcas1p1.samsung.com>
+In-Reply-To: <YLh/K7UbJFnA2HPa@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > On 2021/06/02 21:29, Changheun Lee wrote:
-> > > Set max_bio_bytes same with queue max sectors. It will lead to fast bio
-> > > submit when bio size is over than queue max sectors. And it might be helpful
-> > > to align submit bio size in some case.
-> > > 
-> > > Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
-> > > ---
-> > >  drivers/scsi/scsi_lib.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> > > index 532304d42f00..f6269268b0e0 100644
-> > > --- a/drivers/scsi/scsi_lib.c
-> > > +++ b/drivers/scsi/scsi_lib.c
-> > > @@ -1837,6 +1837,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
-> > >  	blk_queue_virt_boundary(q, shost->virt_boundary_mask);
-> > >  	dma_set_max_seg_size(dev, queue_max_segment_size(q));
-> > >  
-> > > +	blk_queue_max_bio_bytes(q, queue_max_sectors(q));
-> > 
-> > Doing this unconditionally for all scsi block devices is probably not a good
-> > idea. Cannot this be moved to the LLD handling the devices that actually need it ?
+On 6/3/21 1:05 AM, Christoph Hellwig wrote:
+> The following changes since commit a4b58f1721eb4d7d27e0fdcaba60d204248dcd25:
 > 
-> OK, I'll try to check more nice location in LLD.
+>   Merge tag 'nvme-5.13-2021-05-27' of git://git.infradead.org/nvme into block-5.13 (2021-05-27 07:38:12 -0600)
 > 
-> > 
-> > > +
-> > >  	/*
-> > >  	 * Set a reasonable default alignment:  The larger of 32-byte (dword),
-> > >  	 * which is a common minimum for HBAs, and the minimum DMA alignment,
-> > > 
-> > 
-> > 
-> > -- 
-> > Damien Le Moal
-> > Western Digital Research
+> are available in the Git repository at:
 > 
-> Thank you,
-> Changheun Lee
+>   git://git.infradead.org/nvme.git tags/nvme-5.13-2021-06-03
 
-I think below location might be good. feedback to me please.
+Pulled, thanks.
 
-diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-index 3eb54937f1d8..0f97b7d275ee 100644
---- a/drivers/scsi/ufs/ufshcd.c
-+++ b/drivers/scsi/ufs/ufshcd.c
-@@ -4831,6 +4831,9 @@ static int ufshcd_slave_alloc(struct scsi_device *sdev)
- 
- 	ufshcd_get_lu_power_on_wp_status(hba, sdev);
- 
-+	blk_queue_max_bio_bytes(sdev->request_queue,
-+				queue_max_sectors(sdev->request_queue));
-+
- 	return 0;
- }
+-- 
+Jens Axboe
 
-Thank you,
-Changheun Lee
