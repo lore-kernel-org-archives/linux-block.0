@@ -2,143 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D048FC47097
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 01:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BAAC47096
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 03:03:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABE0B61404
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 01:53:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87EEA6140B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 03:03:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230044AbhFDBzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 21:55:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40618 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229576AbhFDBzR (ORCPT
+        id S229769AbhFDDFE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 23:05:04 -0400
+Received: from gateway36.websitewelcome.com ([192.185.186.5]:23194 "EHLO
+        gateway36.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229695AbhFDDFD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Jun 2021 21:55:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622771611;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vqFUmniCC488GUpp4xBAu68FfZpCcKh9+CsQQqre8x4=;
-        b=NqnWnKq8VqLs5ExvaDi1oVYRAufrO3NATPP3UwvuSNUD9A03jCLRgklp4CNdetMxf/bxR4
-        XPXG9WvDcoSCw3TqpkNONbMWgT3mBqGkA+owkwRVIcgdNDIx3cpSTnUeiERFC7cpljB73z
-        o8C+U4Bp2cvjcBZAN0JE/oixariuuFA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-J9nU4BbfOg6zaCj2GQz7qw-1; Thu, 03 Jun 2021 21:53:30 -0400
-X-MC-Unique: J9nU4BbfOg6zaCj2GQz7qw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 357EE3FD4;
-        Fri,  4 Jun 2021 01:53:28 +0000 (UTC)
-Received: from T590 (ovpn-12-139.pek2.redhat.com [10.72.12.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5276460C17;
-        Fri,  4 Jun 2021 01:53:18 +0000 (UTC)
-Date:   Fri, 4 Jun 2021 09:53:15 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     longli@linuxonhyperv.com
-Cc:     linux-block@vger.kernel.org, Long Li <longli@microsoft.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Tejun Heo <tj@kernel.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] block: return the correct bvec when checking for gaps
-Message-ID: <YLmHi27PT5LAwJji@T590>
-References: <1622759671-14059-1-git-send-email-longli@linuxonhyperv.com>
+        Thu, 3 Jun 2021 23:05:03 -0400
+X-Greylist: delayed 1337 seconds by postgrey-1.27 at vger.kernel.org; Thu, 03 Jun 2021 23:05:03 EDT
+Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
+        by gateway36.websitewelcome.com (Postfix) with ESMTP id 3CD20400CBE93
+        for <linux-block@vger.kernel.org>; Thu,  3 Jun 2021 21:40:58 -0500 (CDT)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id ozlalrLHAR1jIozlalSzeO; Thu, 03 Jun 2021 21:40:58 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=qMM0cCD/sS3bgXzvDEFA6YM7lCN465P/MHPHDxJbKus=; b=ARZ4xLXo1tOVFZDeo4AzSMeP52
+        0mLTPCiJym4n3xXY/KH8vvfvunSUUXtQ2tHBBgBzNMJ4q2frjjKa4CJK/KfJky1Q4iIVkt+u+Np5j
+        RvvL30zTgNE8weSa1cVfNzKS5WOOGxCEpKEW+dhLA+dnhDbuQq9PwZPi3qac2+5NyO5lbF+xUAbIC
+        NesBQBo16pf0btS89UItxKzDgSvxxu3717peKLLiDZNYkygt4+NW3YAekCxweATgVLbxZLsso8Qlu
+        WQpNNJDjqX3fv7Go02a9IojZB81qDOzQV2ycC2Kd5g0JsFoxLyJ2AGHP01B+RZUg7xxPWwwPQJ6n+
+        Yx+d6cCg==;
+Received: from 187-162-31-110.static.axtel.net ([187.162.31.110]:33686 helo=[192.168.15.8])
+        by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1lozlX-003UeG-RN; Thu, 03 Jun 2021 21:40:55 -0500
+Subject: Re: [PATCH v2][next] floppy: Fix fall-through warning for Clang
+To:     Denis Efremov <efremov@linux.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+References: <20210528200335.GA39252@embeddedor>
+ <07887f9c-c33d-9398-4939-2f23ebb1d094@linux.com>
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Message-ID: <6d120554-3c51-59f1-80d9-e4be0a0ace3e@embeddedor.com>
+Date:   Thu, 3 Jun 2021 21:42:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1622759671-14059-1-git-send-email-longli@linuxonhyperv.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <07887f9c-c33d-9398-4939-2f23ebb1d094@linux.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 187.162.31.110
+X-Source-L: No
+X-Exim-ID: 1lozlX-003UeG-RN
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 187-162-31-110.static.axtel.net ([192.168.15.8]) [187.162.31.110]:33686
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Long,
 
-On Thu, Jun 03, 2021 at 03:34:31PM -0700, longli@linuxonhyperv.com wrote:
-> From: Long Li <longli@microsoft.com>
+
+On 5/29/21 01:37, Denis Efremov wrote:
+> Hi,
 > 
-> After commit 07173c3ec276 ("block: enable multipage bvecs"), a bvec can
-> have multiple pages. But bio_will_gap() still assumes one page bvec while
-> checking for merging. This causes data corruption on drivers relying on
-> the correct merging on virt_boundary_mask.
-
-Can you explain the data corruption a bit? 
-
-IMO, either single page bvec or multipage bvec should be fine, because
-bio_will_gap() just checks if the last bvec of prev bio and the 1st bvec
-of next bio can be merged.
-
+> On 5/28/21 11:03 PM, Gustavo A. R. Silva wrote:
+>> In preparation to enable -Wimplicit-fallthrough for Clang, fix a warning
+>> by explicitly adding a break statement instead of letting the code fall
+>> through to the next case.
+>>
+>> Link: https://github.com/KSPP/linux/issues/115
+>> Link: https://lore.kernel.org/linux-hardening/47bcd36a-6524-348b-e802-0691d1b3c429@kernel.dk/
+>> Suggested-by: Jens Axboe <axboe@kernel.dk>
+>> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 > 
-> Fix this by returning the multi-page bvec for testing gaps for merging.
+> Applied, thanks!
+> https://github.com/evdenis/linux-floppy/commit/6eaddb2a2aa3acd0660537f9f6a12785be0ae830
 > 
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Cc: Pavel Begunkov <asml.silence@gmail.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-> Cc: Jeffle Xu <jefflexu@linux.alibaba.com>
-> Cc: linux-kernel@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> Fixes: 07173c3ec276 ("block: enable multipage bvecs")
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->  include/linux/bio.h | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index a0b4cfdf62a4..6b2f609ccfbf 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -44,9 +44,6 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
->  #define bio_offset(bio)		bio_iter_offset((bio), (bio)->bi_iter)
->  #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
->  
-> -#define bio_multiple_segments(bio)				\
-> -	((bio)->bi_iter.bi_size != bio_iovec(bio).bv_len)
-> -
->  #define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
->  #define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors((iter)))
->  
-> @@ -271,7 +268,7 @@ static inline void bio_clear_flag(struct bio *bio, unsigned int bit)
->  
->  static inline void bio_get_first_bvec(struct bio *bio, struct bio_vec *bv)
->  {
-> -	*bv = bio_iovec(bio);
-> +	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
->  }
->  
->  static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
-> @@ -279,10 +276,10 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
->  	struct bvec_iter iter = bio->bi_iter;
->  	int idx;
->  
-> -	if (unlikely(!bio_multiple_segments(bio))) {
-> -		*bv = bio_iovec(bio);
-> +	/* this bio has only one bvec */
-> +	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
-> +	if (bv->bv_len == bio->bi_iter.bi_size)
->  		return;
-> -	}
->  
->  	bio_advance_iter(bio, &iter, iter.bi_size);
+> I will send it to Jens with other floppy patches.
+> It will be in 5.14
 
-The patch itself looks fine, given both bio_get_first_bvec() and bio_get_last_bvec()
-are used in bio_will_gap() only.
+Awesome. :)
 
-
-Thanks,
-Ming
-
+Thanks, Denis.
+--
+Gustavo
