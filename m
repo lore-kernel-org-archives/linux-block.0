@@ -2,167 +2,238 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F86C47097
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 05:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E46C47083
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 06:38:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF5876140C
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 05:22:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF00B6140F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 06:38:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbhFDFXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Jun 2021 01:23:54 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:35995 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230037AbhFDFXw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jun 2021 01:23:52 -0400
-Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210604052205epoutp01dac8e1f6e287968aaa3fb16fb9574b0d~FSZBhpvq-1453114531epoutp012
-        for <linux-block@vger.kernel.org>; Fri,  4 Jun 2021 05:22:05 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210604052205epoutp01dac8e1f6e287968aaa3fb16fb9574b0d~FSZBhpvq-1453114531epoutp012
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1622784125;
-        bh=rZO51Mk7B139Snj8jqy48Ck58v6JJKw1P5EeJY4VRY0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PAXD7v849JlqSLw6mzh7OoooSDq6f8cp3Bt9DjyhkMBqq0MN4v2YTdFwzQBCOTnh8
-         opw90PkSw4oo1n+dtL+vQq9CtZuloCh7stXaJDFSDja+5bOmJj4j8pHkFDCED8e4SK
-         Mzhv+Ne63I/iMcHnSP3oVkXIdcTh9zIl5ZDxegnY=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210604052203epcas1p19d5a2bc9e6ada62c39b0bd0b6adb1a66~FSZAU8PGO0722107221epcas1p1C;
-        Fri,  4 Jun 2021 05:22:03 +0000 (GMT)
-Received: from epsmges1p5.samsung.com (unknown [182.195.40.164]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4FxB2y3yqgz4x9Pt; Fri,  4 Jun
-        2021 05:22:02 +0000 (GMT)
-Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
-        08.7F.09736.A78B9B06; Fri,  4 Jun 2021 14:22:02 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
-        20210604052201epcas1p41a27660b20d70b7fc4295c8f131d33ce~FSY_aI2jr2460424604epcas1p4N;
-        Fri,  4 Jun 2021 05:22:01 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210604052201epsmtrp22d5dc7dfcb41d74b8215bf29e9e73783~FSY_Yo09v3149731497epsmtrp2w;
-        Fri,  4 Jun 2021 05:22:01 +0000 (GMT)
-X-AuditID: b6c32a39-8d9ff70000002608-c7-60b9b87a1549
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        69.31.08637.978B9B06; Fri,  4 Jun 2021 14:22:01 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.99.105]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210604052201epsmtip197db2faddef4d760ee11fb730a5f385b~FSY_EnKSQ0192801928epsmtip1W;
-        Fri,  4 Jun 2021 05:22:01 +0000 (GMT)
-From:   Changheun Lee <nanich.lee@samsung.com>
-To:     Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
-        asml.silence@gmail.com, axboe@kernel.dk, bgoncalv@redhat.com,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        cang@codeaurora.org, avri.altman@wdc.com, alim.akhtar@samsung.com,
-        bvanassche@acm.org, damien.lemoal@wdc.com,
-        gregkh@linuxfoundation.org, hch@infradead.org, jaegeuk@kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com, osandov@fb.com,
-        patchwork-bot@kernel.org, tj@kernel.org, tom.leiming@gmail.com,
-        yi.zhang@redhat.com
-Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
-        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com, Changheun Lee <nanich.lee@samsung.com>
-Subject: [PATCH v12 3/3] ufs: set max_bio_bytes with queue max sectors
-Date:   Fri,  4 Jun 2021 14:03:24 +0900
-Message-Id: <20210604050324.28670-4-nanich.lee@samsung.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <20210604050324.28670-1-nanich.lee@samsung.com>
+        id S229844AbhFDGkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Jun 2021 02:40:33 -0400
+Received: from mail-dm6nam12on2124.outbound.protection.outlook.com ([40.107.243.124]:62593
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229826AbhFDGkc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Jun 2021 02:40:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uyp9buw9GPI0YkPNnpIN+fjoFqfZDY5yPHgu00wSB7reDNhUga6SR+zcHb8aETlxNscwFVaRyHb0CvVjvecRJmC1KnL5QwncLiItb4U2lsHBSpDWoVxrahMU6WNifRz4E52zQT+YRqM7jDvss9yD+icwm+kWmMDz58DHzoQPlwcNIO0n/XR/nrTLrmnvqaHN6/gWuABcNeWGIsb1yQ1nez9WwP9HaH+gftH5/PNkancDlaSsNJL/SNMAnuLLXPHNkZR+fDmqkaQWrJ/5TBrFXKapYmnWtJNfnycFe2GIYDtvOIcmLjy23z6X+1RxTPPuhc68kKM/2EcJg/Jg6ZvDFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oaS9br27HCBOWqFo8+cbIOAEunHmDH5YGQpQY3Ur0FQ=;
+ b=aUkkp4l9jhz80ZjuNJpHKUegyEXk4qidOpbSV/IhKytQM42Sj3CIPuSRpIef01L/NLUGwF0jICTW2+DNWduwhhi7gma14knOK2o6hOMKbN6AEVMb8C4loTlFU2gV/TOczVZ9OMS5erwu/XWPQQBp75uCbuYNsT0ha52qEs/7q/Ijz6qZISwacFEu8cwDDbCRXQ06eSp1cRD5tawq/rdBboqiwsY+0Y9engFaXgZT4SQ51jgEOauxFiaiPJzCEb6lzhyX4QHxt9UCiBilFgjPB4M5JBzcqIZ93snQuqDMdsiqmLlmw97IJ7kvfM1+Gh+x6GZkh0Vqbadt0uqhKufNAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oaS9br27HCBOWqFo8+cbIOAEunHmDH5YGQpQY3Ur0FQ=;
+ b=by0VB5bAF3pOoBOhK9/DPReu9W9NYjS2IKoD4WjlLBBsYQJ9T5HFcLbmp5bJkbShMjgnVGHJyeoXE4ZlkBktMXktRsP8yWqezPvniEr0H7OqJUtYPqS3wF98nYYY/a2zi188MZf9jyE6vHZEh5h2kZO/lWdC3N28VH71sN6eE/c=
+Received: from DM6PR21MB1513.namprd21.prod.outlook.com (2603:10b6:5:25c::19)
+ by DM5PR2101MB0726.namprd21.prod.outlook.com (2603:10b6:4:7b::39) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.3; Fri, 4 Jun
+ 2021 06:38:45 +0000
+Received: from DM6PR21MB1513.namprd21.prod.outlook.com
+ ([fe80::c1bb:3431:eedf:cd08]) by DM6PR21MB1513.namprd21.prod.outlook.com
+ ([fe80::c1bb:3431:eedf:cd08%9]) with mapi id 15.20.4219.012; Fri, 4 Jun 2021
+ 06:38:45 +0000
+From:   Long Li <longli@microsoft.com>
+To:     Ming Lei <ming.lei@redhat.com>,
+        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Tejun Heo <tj@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [PATCH] block: return the correct bvec when checking for gaps
+Thread-Topic: [PATCH] block: return the correct bvec when checking for gaps
+Thread-Index: AQHXWMilfqxountagkCztc+hnNyp6KsDFzKAgABFe+A=
+Date:   Fri, 4 Jun 2021 06:38:45 +0000
+Message-ID: <DM6PR21MB1513F1E0E0DDD017A4ED3B73CE3B9@DM6PR21MB1513.namprd21.prod.outlook.com>
+References: <1622759671-14059-1-git-send-email-longli@linuxonhyperv.com>
+ <YLmHi27PT5LAwJji@T590>
+In-Reply-To: <YLmHi27PT5LAwJji@T590>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=a4ce6acc-3402-49db-92e8-e47b30359e32;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2021-06-04T06:01:56Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=microsoft.com;
+x-originating-ip: [76.22.9.184]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d32adf8d-bc57-406d-5696-08d9272366cd
+x-ms-traffictypediagnostic: DM5PR2101MB0726:
+x-microsoft-antispam-prvs: <DM5PR2101MB0726E6C8B106C72426C7C1AACE3B9@DM5PR2101MB0726.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: se/RnQx6BKWzISD3vC3ja/aui37+Pxg/rwWIrkvKXYBbcrWUrvIl4IDRIlLf2KJ/duHb/R1O3ROyy2ux6fGhr8NEjvZotkN1g4he6W0j8dyuQZjnEQzURRNTmBxEqnfia+HHqULc/EPbUZMAt0Q7Wxc/vSzjBGLSqpHxKMl0zzHLlb2QBhL07Bnq/IkrFB3B9LYddJk9/Dr+ROG3rYPX7lceYcyYOEvncCQtPPs3jzg42ElUfNNRG9yL9dxAbt20wmz7RwDUyp1VZEkXUAMdMlNIDagRF+jED4YnrC27sZpzTyzxoKinHDbXhSAAXHyrIkPMvzBhW3bKk0KnYugiIiWeuiJxJo88vmOq/7+F/tfIq8S4lPsLGe98Ms0coKogBruuNuceTKkOi2/znctIKk0M8oqkqMkxjSLnvAU9o086adNqyxK2GD3cM4aT6JPpTJ6tlPGisGZ2K+9mKnMaRyVNWOp/MkbMbtO6Ai2RJMgL9DohYybD+mfPQgfXaCmeFzw/2bavfncK5O2pMgfNiJZucyMqDwzB9Ra3gnW1kBgLgC20YCryEc+m9hjND0wq1V4oG0KvoMiJmrg45VUqG3fF1mGDqcWsMHlESlw7NWH8h1rG5qmy5OtSFHOvF+HelLZGZZOMEJXaw+VBR+SCvw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR21MB1513.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66556008)(54906003)(64756008)(26005)(8990500004)(52536014)(66446008)(82960400001)(82950400001)(316002)(66476007)(110136005)(76116006)(38100700002)(66946007)(2906002)(86362001)(5660300002)(122000001)(4326008)(186003)(33656002)(10290500003)(7696005)(478600001)(71200400001)(8936002)(83380400001)(8676002)(9686003)(6506007)(55016002)(7416002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?E7LYOqFhTyIbfIsblWwQJk+j+rDeS0XytwSNh8fQ4Los7Wkc2TT0mtwnSqPW?=
+ =?us-ascii?Q?OsdlaCwHMqdugEiMmIeahmv9dtDBGnXNNF8u/RjaNNPkf8h4UlTut8tY1GHo?=
+ =?us-ascii?Q?fhSCJCVHDFjDKJNeQjMxTNf6BU8EyjC8VmDgqI1wMDaEJO+bF08JG3bsKuLG?=
+ =?us-ascii?Q?xoK7Qmdf6rawXLKN4TAqm/ZIYDz4d2Ha1oJTuwj27Quiv4pckheHV+mJV/rG?=
+ =?us-ascii?Q?O1eR/AswINnqxWAC3Wx65sg8aEs+dEpXI/1ICKtjfhj37sTl6i+unBp7X71U?=
+ =?us-ascii?Q?GgzWF7H0ubRQ1Ks2fugiVDztTHIJ6ao58h87sYkP+aPXSlk2poFmtLHsbAh3?=
+ =?us-ascii?Q?krZARnQx9yliz6mLaPe3a4+fNnphHiVQKvQB8bAWc0oWS/x1GrrgBqnImO3U?=
+ =?us-ascii?Q?ipekKCc83PMu55Jyt+/Yh9vIyvCKQyY8QyERZD9IH7hH4AQxoEQo4VtrP0UD?=
+ =?us-ascii?Q?eiO4OWGnirTQF4bKHurj6n2uJe9kN/kEZ5c98rFG6ZTsHyq5W/7ZZXw1ERNY?=
+ =?us-ascii?Q?+YzAEWnyzq/cvGchdY8zTenbowMipYgKiooVkuTicxotmf3Kb+cSBR0vksc3?=
+ =?us-ascii?Q?wCxkhcn6reauhlD6o35Ff1A25kGsA/XPrYy0rAajWm2P+xihqgMPgSY17NE5?=
+ =?us-ascii?Q?LvViqDPDuGn+eWOKaIIRzXuQM3cBAQrANYOwvoaeX2W6q8mSHCuaxwHSCZxS?=
+ =?us-ascii?Q?zhf1tipT/Wep8ZaFzozqfWJVATYvIscarpY6YnSUrhUq1zFBzx9A4CRt7cZ5?=
+ =?us-ascii?Q?iR3DUpnMFruzgTI8/quoLVXkrlE7cVY7mcK1E88QTK9IOLrlykLcW0BZDK98?=
+ =?us-ascii?Q?DRBhMCig1N0FcZJxk2yVheNUq+XAEaUi6RViSo+rpWsu6ckyrpjZVeOK6JWR?=
+ =?us-ascii?Q?6MfEltYUE30qDCgzPKKpp96NnAQsJ1aSteMo913bCuCa69z3i7jGrderekUI?=
+ =?us-ascii?Q?g5F7n10z5ABico5UKoCJb04nQn6Z8j9DfGCVymcZ7Ah+4wDrZzEoB0LsB1iK?=
+ =?us-ascii?Q?Vdd5OmH9tMcrzjvb+tE07dITWkG+HO9JR3iFilHY/V8+zMYJcmN1UgNqbMA+?=
+ =?us-ascii?Q?8aOcBmxEqPITjTErP/Fdt4pA/ZBgs8pluh/XvHp5GUQeqiTjix61//o3V08H?=
+ =?us-ascii?Q?ViPqYTzorZQj5ApFrVK2VHEVUoRNwfspQbKNTvhGVNIJBumNLfHCwvnz1KKl?=
+ =?us-ascii?Q?Ry994jVvryyke69frsiyK8jSqxcb/Ouyp4R9f7bWpQPErnPguNm1qDcBxJPD?=
+ =?us-ascii?Q?aFEDotAdskOTUbpKNsw4fyTKPirBOTPqhqm4NRX4YlZg8DAqXnwpBpKplNqX?=
+ =?us-ascii?Q?qfY=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xbZRTPd2+5LWjZpZvsCy6IFRfHa3RQ+JiwLMLwLsOEZMYsM5Fe4Voa
-        S9v1MQVNBMsb1vJQ3gxTkWmHkBTGCsokBaU45LGOx2AUlqHbXGAbDWQwh7YUIv+dc36/c37f
-        73w5HJzXw/bjSGRqRimjpXzCi9XVfyg0NMvcLQqv/u5l1Ha7lY0WLnYRqMHYBdCD9QkCXZ7T
-        E6hnvAmgqsfrOFppb/FAeQVrGNJ+206g62UGDC221+HIMN2FodLFLz3Q82I7hlbvqFDvTDCy
-        9TQQqGTKTKBLg5sYslRqMVTd0YCjyflhNuq3T7DQneZyHI0MrXigi3ePo41LvwL06OkUG/1u
-        rsTR1EgVgdp714njAZTt5inKpruAUeXaZTbVXTfHpjq+D6Jsf2gok7GIoMoMfYD6pbGVTT35
-        c4ZFPbo2QVC6TiOgHCZ/qqCvBKMslhY8ec9ZaWw6Q6cxygBGlipPk8jEcfxTp1PiU4RR4YJQ
-        QQyK5gfI6Awmjp+QlByaKJE698UPOE9LNc5SMq1S8Q8fi1XKNWomIF2uUsfxGUWaVCEIV4Sp
-        6AyVRiYOS5VnHBWEhx8ROpkiafrAFTtQaD0/XajJYWeDIXYx8ORAMhKa71vxYuDF4ZFmAPX/
-        bm4BPHIFQHvuaTewBuCkoZDY6XjQ+dzDDfQCeF97me1OHABWPNMCF4sgQ6BuaYZwAftIEwva
-        igqBK8HJuwDeHMrfmrWXTIRT1pktQRb5OnxYqMdcMZd8E3Z0Gjzceq/Af+ZLcVfsScbCyYGS
-        bY4PHKpdZLli3MnRXqnfcgHJvzxhY0PF9mMToLXYwXLHe+Hfg53btv2gY7mXcDeUAKjNbwLu
-        pAzA5nstmJsVAVccDifAcUocgu09h93lV2H3s0bgVvaGy6ulHi4KJLmwMJ/npgTC4dx5fEfr
-        3o/d2xMpWGpsxtz70gM40niDVQYC6nYZqttlqO5/5W8AbgS+jEKVIWZUAoVw9y+bwNYRBcWY
-        QfXS4zALwDjAAiAH5+/j/nzQLOJx0+jMLEYpT1FqpIzKAoTOdZfjfi+lyp1XKFOnCIRHIiIi
-        UGRUdJQwgr+fK47/TMQjxbSa+ZhhFIxypw/jePplY82itSxsXD0013/MpEukR/PfW7AYjXZ7
-        jP9oVZL/UeLds5oLB078RPxWG2Ktbl3aLK8YSxwoTlqxMu3Kyh+mT3oXq0Zp33MHPve+0Ro+
-        IJ/1vK2Z0URk1wJxrYQu8lketOe91RlYF++TOKLJXNNvzmM1bX0PO/o/FOpe+yLzTJlkY4pX
-        MNhmu5rzdmvri/M1uiC2ucnbcatA73V+9o1S7WYtTx8cqJPveRjnWDAsTg8H13Dr59K/smp6
-        fYNNc/uvbVRUvrPuGzv2NCGuPteAf7J00itn9sx1wRM/0RovIS/kav9SlK35/Ujf2P7QW1bR
-        By+s4gejyeBzH31dMjaeJuGzVOm0IAhXquj/AAeXn2fNBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrIIsWRmVeSWpSXmKPExsWy7bCSnG7ljp0JBidXaVusu7OG3eLBvG1s
-        FnNWbWO0ePnzKpvF6rv9bBa7Ls5ntJj24Sezxaf1y1gtWtu/MVk0L17PZnF6wiImiyfrZzFb
-        LLqxjcmi50kTq8XfrntMFl8fFlvsvaVtcXnXHDaL7us72CyWH//HZHFocjOTxfTNc5gtrt0/
-        w25x+N5VFouHSyYyW5w7+YnVYt5jB4tfy48yWrz/cZ3d4tSOycwW189NY7NYv/cnm4OCx+Ur
-        3h6X+3qZPCY2v2P32DnrLrvH5hVaHpfPlnpsWtXJ5jFh0QFGj/1z17B7fHx6i8Xj/b6rbB59
-        W1YxenzeJOfRfqCbyePQoWXMAfxRXDYpqTmZZalF+nYJXBlHtt5jLGjmrHgwo5G9gfEkexcj
-        J4eEgInEyy1/WbsYuTiEBHYzShzonckCkZCSOH7iLVCCA8gWljh8uBii5iOjRPunBawgNWwC
-        OhJ9b2+xgSREBC6wSGxoe8MM4jALvGaU6Hq8CGySsICbxPUTt8DWsQioSrzu6GcCsXkFrCU2
-        b1nECrFNXuLP/R5mEJtTwEbi2pFusBohoJqZBy6yQ9QLSpyc+QRsJjNQffPW2cwTGAVmIUnN
-        QpJawMi0ilEytaA4Nz232LDAMC+1XK84Mbe4NC9dLzk/dxMjOFVoae5g3L7qg94hRiYOxkOM
-        EhzMSiK8e9R2JAjxpiRWVqUW5ccXleakFh9ilOZgURLnvdB1Ml5IID2xJDU7NbUgtQgmy8TB
-        KdXAtPenPdd2Wd8nXMXMhR7hz16tPDt/3W0PyW2nvI9E8e3fJhN8pFbocaC97KbT6kZJYedP
-        le/qznn15cLy7frVoexv7tuL3Ncul2dZODXSkdnvm727v5r9nq9WL1bmP3wsYirPsFTEdNvz
-        +ESZnT7n3WRnWUs8exrc4ut0LEluovnGcLvO3iWpRb5WgXVOyVLHHu2/sObp3r3LnL+dYjtX
-        HrunX0nfZ/uKH1H/r7dwGcjw2Xiv54vndz4XqF17beobltxPrROKA90fuKy/1GuYyWxRcWmH
-        VIcwY75Lasqk+6KPTziWCMdOfJvUXr8uW/nsVovF/N0KmjW/sye5HblwJ//rwV1XmnWqGJu+
-        zjNVYinOSDTUYi4qTgQA9SDou4QDAAA=
-X-CMS-MailID: 20210604052201epcas1p41a27660b20d70b7fc4295c8f131d33ce
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210604052201epcas1p41a27660b20d70b7fc4295c8f131d33ce
-References: <20210604050324.28670-1-nanich.lee@samsung.com>
-        <CGME20210604052201epcas1p41a27660b20d70b7fc4295c8f131d33ce@epcas1p4.samsung.com>
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR21MB1513.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d32adf8d-bc57-406d-5696-08d9272366cd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2021 06:38:45.0960
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cKIWWt7w5g208+aFtw4+KgsaFS55i4Txezi3QpUZIwk0DqtxSXY2Wl/umlWhReglb8Wi+urmFXGyo1rNv9eMsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR2101MB0726
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set max_bio_bytes same with queue max sectors. It will lead to fast bio
-submit when bio size is over than queue max sectors. And it might be helpful
-to align submit bio size in some case.
+> Subject: Re: [PATCH] block: return the correct bvec when checking for gap=
+s
+>=20
+> Hello Long,
+>=20
+> On Thu, Jun 03, 2021 at 03:34:31PM -0700, longli@linuxonhyperv.com wrote:
+> > From: Long Li <longli@microsoft.com>
+> >
+> > After commit 07173c3ec276 ("block: enable multipage bvecs"), a bvec
+> > can have multiple pages. But bio_will_gap() still assumes one page
+> > bvec while checking for merging. This causes data corruption on
+> > drivers relying on the correct merging on virt_boundary_mask.
+>=20
+> Can you explain the data corruption a bit?
+>=20
+> IMO, either single page bvec or multipage bvec should be fine, because
+> bio_will_gap() just checks if the last bvec of prev bio and the 1st bvec =
+of next
+> bio can be merged.
 
-Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
----
- drivers/scsi/ufs/ufshcd.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Hi Ming,
 
-diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-index 3eb54937f1d8..37365a726517 100644
---- a/drivers/scsi/ufs/ufshcd.c
-+++ b/drivers/scsi/ufs/ufshcd.c
-@@ -4858,6 +4858,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
- {
- 	struct ufs_hba *hba = shost_priv(sdev->host);
- 	struct request_queue *q = sdev->request_queue;
-+	unsigned int max_bio_bytes;
- 
- 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
- 	if (hba->quirks & UFSHCD_QUIRK_ALIGN_SG_WITH_PAGE_SIZE)
-@@ -4868,6 +4869,10 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
- 
- 	ufshcd_crypto_setup_rq_keyslot_manager(hba, q);
- 
-+	if (!check_shl_overflow(queue_max_sectors(q),
-+				SECTOR_SHIFT, &max_bio_bytes))
-+		blk_queue_max_bio_bytes(q, max_bio_bytes);
-+
- 	return 0;
- }
- 
--- 
-2.29.0
+When bio_will_gap() calls into biovec_phys_mergeable (), seg_boundary_mask =
+(queue_segment_boundary()) is used to test if the two bio_vecs can be merge=
+d. This test can succeed if only the 1st page in bvec is used, but at the s=
+ame time it can fail if all the pages in bvec are used. In other words, if =
+the pages in bvec go across the seg_boundary_mask, the test can potentially=
+ succeed if only the 1st page is tested, but can fail if all the pages are =
+tested.
+
+Later, when SCSI builds the SG list from BIOs (that calls into __blk_bios_m=
+ap_sg), __blk_segment_map_sg_merge() calls biovec_phys_mergeable() doing th=
+e same test . This time it may fail if the pages in bvec go across the seg_=
+boundary_mask (but tested okay in bio_will_gap() earlier, so those two BIOs=
+ were merged). If __blk_segment_map_sg_merge() fails, we end up with a brok=
+en SG list for drivers assuming the SG list not having offsets in intermedi=
+ate pages.
+
+In practice, usually a duplicate page (because merging fails) is put to the=
+ SG list. This page and all the pages afterwards in the SG list end up writ=
+ing to the wrong sectors on disk.
+
+Thanks,
+Long
+
+>=20
+> >
+> > Fix this by returning the multi-page bvec for testing gaps for merging.
+> >
+> > Cc: Jens Axboe <axboe@kernel.dk>
+> > Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> > Cc: Pavel Begunkov <asml.silence@gmail.com>
+> > Cc: Ming Lei <ming.lei@redhat.com>
+> > Cc: Tejun Heo <tj@kernel.org>
+> > Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+> > Cc: Jeffle Xu <jefflexu@linux.alibaba.com>
+> > Cc: linux-kernel@vger.kernel.org
+> > Cc: stable@vger.kernel.org
+> > Fixes: 07173c3ec276 ("block: enable multipage bvecs")
+> > Signed-off-by: Long Li <longli@microsoft.com>
+> > ---
+> >  include/linux/bio.h | 11 ++++-------
+> >  1 file changed, 4 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/include/linux/bio.h b/include/linux/bio.h index
+> > a0b4cfdf62a4..6b2f609ccfbf 100644
+> > --- a/include/linux/bio.h
+> > +++ b/include/linux/bio.h
+> > @@ -44,9 +44,6 @@ static inline unsigned int bio_max_segs(unsigned int
+> nr_segs)
+> >  #define bio_offset(bio)		bio_iter_offset((bio), (bio)->bi_iter)
+> >  #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
+> >
+> > -#define bio_multiple_segments(bio)				\
+> > -	((bio)->bi_iter.bi_size !=3D bio_iovec(bio).bv_len)
+> > -
+> >  #define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
+> >  #define bvec_iter_end_sector(iter) ((iter).bi_sector +
+> > bvec_iter_sectors((iter)))
+> >
+> > @@ -271,7 +268,7 @@ static inline void bio_clear_flag(struct bio *bio,
+> > unsigned int bit)
+> >
+> >  static inline void bio_get_first_bvec(struct bio *bio, struct bio_vec
+> > *bv)  {
+> > -	*bv =3D bio_iovec(bio);
+> > +	*bv =3D mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> >  }
+> >
+> >  static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec
+> > *bv) @@ -279,10 +276,10 @@ static inline void bio_get_last_bvec(struct
+> bio *bio, struct bio_vec *bv)
+> >  	struct bvec_iter iter =3D bio->bi_iter;
+> >  	int idx;
+> >
+> > -	if (unlikely(!bio_multiple_segments(bio))) {
+> > -		*bv =3D bio_iovec(bio);
+> > +	/* this bio has only one bvec */
+> > +	*bv =3D mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> > +	if (bv->bv_len =3D=3D bio->bi_iter.bi_size)
+> >  		return;
+> > -	}
+> >
+> >  	bio_advance_iter(bio, &iter, iter.bi_size);
+>=20
+> The patch itself looks fine, given both bio_get_first_bvec() and
+> bio_get_last_bvec() are used in bio_will_gap() only.
+>=20
+>=20
+> Thanks,
+> Ming
 
