@@ -5,93 +5,142 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFBDC4743D
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 20:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DD3C4743D
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 21:09:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D94FF613EC
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 20:00:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CA1C613AC
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 21:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230443AbhFDUCi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Jun 2021 16:02:38 -0400
-Received: from mail-qv1-f74.google.com ([209.85.219.74]:44575 "EHLO
-        mail-qv1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229930AbhFDUCh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jun 2021 16:02:37 -0400
-Received: by mail-qv1-f74.google.com with SMTP id i16-20020a0cf4900000b029022023514900so3063331qvm.11
-        for <linux-block@vger.kernel.org>; Fri, 04 Jun 2021 13:00:40 -0700 (PDT)
+        id S230228AbhFDVLG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Jun 2021 17:11:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51178 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230209AbhFDVLG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jun 2021 17:11:06 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2042CC061766
+        for <linux-block@vger.kernel.org>; Fri,  4 Jun 2021 14:09:19 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id n3-20020a0cee630000b029020e62abfcbdso3654035qvs.16
+        for <linux-block@vger.kernel.org>; Fri, 04 Jun 2021 14:09:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=iozWCMAtYKCt6ZARG1CR093QIL86BP6w5zG4UHfXEaY=;
-        b=b/kMgaiP4rlyi9fuWXIOgNTdRw55igKDtzrELiZWocSzKWGap6DizpaWVP+Lfjm+ln
-         /cPr3m1S2oel7iIXg+Fk1im2HQZ2fT67rNzIKydVKheLsJS5z0Sf8Z0B0XuEu3tiJKRF
-         qIfcfJdTI5zlglUpYLUxdazXc+jaV+Mq6y5HSNYZwrQF+g9FE3xoes7rwLqulvdfgzg4
-         xWn2ABcu9/h2szpHEjkSJlWQ3x7adfX2f/3z+4j8fq/yb4kHyqujPx1VhNW2EgQytzMK
-         NiROUYq89hZBQ0UzVhNsA1gPWgP5kviimgtGgAwZgHSfdPSTtqeMZ3dQUNuD+625uC/d
-         Y2Mw==
+        bh=9BcqtLCkYahip03kuRnuf7gXu/E/crKmMbXBSPc/Uvg=;
+        b=QW5Kxzl6EXIE5ugNtoOGXViSlNInd8SrlO8Beh/QzLyDbfSyMdTdmYKbRpLpu68sod
+         XDCQBa4ui+uU1IuoV4WMm3lNyBElOUbgc7+HQyR9AIl6hQ5XEqQ1V0rji9JD/Nspg6y4
+         RakQjBXdNV9KepJ9OqowwQvnDS8Ouo0vJGyEJe47wFSn7tbgQ4Zh3NuuG+9FVTwsZsFd
+         ZiYbIprwR+8eyGGwjm98fHgm3bY3Q699yk5zFWUsRxSkon77390wrHMmB8vtjUsLC5af
+         9+OCpw8xRk1QegJsOwD64XDcoYUtUYbbiBMJC9RgHShDwlE7+QaapU57T6I+Yt8FYaqR
+         h71A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=iozWCMAtYKCt6ZARG1CR093QIL86BP6w5zG4UHfXEaY=;
-        b=G3EuVvZsfwDLIJ2kdFD6Pu88g4Sbj1ZWs/yCWjoLn1nQEGITnEpIcpCYeTOCwkIwfi
-         eRca5TZOPh/vB7fMI/vt6muGyMnlh8NxZyHyUNQR7iFLBC6kRm+AygAqAnCXnpjnR5L5
-         9bqVabAVhET95f9Wc0/TUyOyUxBsEBi6yN4c6C/aXmB69KNClOF/FzgnM/KtKAnMYuo7
-         4LlTKRgL06s6MJTQ2Xey1gSGcWmltjoALKYpxoYY6oP2Jm4i/a5vTvk2+YGCAM8zCdZ1
-         x/8gAmzNEk9mX1y2PGRJW2568mbVe0XaipTp3rDDpn4jqJFF3/7lFB60eLvavo1pvJmJ
-         HHeQ==
-X-Gm-Message-State: AOAM5331PnNdcZgVMoBRAkoonTfgh2AuLPjWm7SjR0DA/wBCgfYpM6xL
-        64gTwrgqokwKDYuPKs76S/XkJVkMvFh9Fg57OftEcia2KajXDL2NkloOzBnuvhSO2IYFlP3FqNz
-        YvA9D5Mab6dCVO3S0VwRc0iKKnUW709SCDH6QSo4D6Z4hKp5310DnumoBA1WkfZUSlbb6
-X-Google-Smtp-Source: ABdhPJxOCXfXppSqFV4bTzkHDML8kpyuDCPBL7nXZkg5gEUEj9B5DzrhhwOgM13tbDILoEWyZdZmaQq+gIs=
+        bh=9BcqtLCkYahip03kuRnuf7gXu/E/crKmMbXBSPc/Uvg=;
+        b=g8TJ4yU52aMND+20b6FUYj71W9/ndNDtZG6yH9Qp9GGysGsFCMTQ2mmGbNfBGuTlqB
+         jhWmC8GfMYSUyyc3VBXDSB/A87jlcsLCb8kP1K6OSOq2oL9GuXjJ130fXEQ6Q6KYBsIJ
+         UB5GiOzP50L5jGvlnc+C5D6FfQfBOFHhAXGl7uH/fLjbzuecgKz+pGX5b16V9dTMHJTL
+         fX4kunNNrGBxZ1ZBuodaPe35s75ESGhyzNRTuGJMYOF5tE0gR9sRamn4XqFliuCKlf98
+         ZskXpa1Y9M0BNFq8aIvXWrdpwtdSusIyzl11LCTLSmfM9lFDrqF6lpZ6lLLNR/WNtsaN
+         znZg==
+X-Gm-Message-State: AOAM530IDBAauxVB3jegxXg9aG+4Wp4a4E6eFOkCVcY6nUTqGjy4yFvc
+        g59zkBIw5r2F+S7hh5CbRbkMPl+5Ibs=
+X-Google-Smtp-Source: ABdhPJxgk02c9+fXdTtbO2iZcSrGJNMdNgq2Ji6Xc1aRp0U/sfalFFR8mjElyDxbEU1XEUxA6IbhvBZxcCk=
 X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
- (user=satyat job=sendgmr) by 2002:a05:6214:62a:: with SMTP id
- a10mr6531397qvx.5.1622836780529; Fri, 04 Jun 2021 12:59:40 -0700 (PDT)
-Date:   Fri,  4 Jun 2021 19:59:00 +0000
-In-Reply-To: <20210604195900.2096121-1-satyat@google.com>
-Message-Id: <20210604195900.2096121-11-satyat@google.com>
+ (user=satyat job=sendgmr) by 2002:a0c:e84b:: with SMTP id l11mr6830971qvo.52.1622840958230;
+ Fri, 04 Jun 2021 14:09:18 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 21:09:03 +0000
+In-Reply-To: <20210604210908.2105870-1-satyat@google.com>
+Message-Id: <20210604210908.2105870-5-satyat@google.com>
 Mime-Version: 1.0
-References: <20210604195900.2096121-1-satyat@google.com>
+References: <20210604210908.2105870-1-satyat@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v3 10/10] block: add WARN_ON_ONCE() to bio_split() for sector alignment
+Subject: [PATCH v9 4/9] direct-io: add support for fscrypt using blk-crypto
 From:   Satya Tangirala <satyat@google.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
+To:     "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>, Chao Yu <chao@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Eric Biggers <ebiggers@google.com>,
         Satya Tangirala <satyat@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The number of sectors passed to bio_split() should be aligned to
-bio_required_sector_alignment(). All callers (other than bounce.c) have
-been updated to ensure this, so add a WARN_ON_ONCE() if the number of
-sectors is not aligned. (bounce.c was not updated since it's legacy code -
-any device that enables bounce buffering won't declare inline
-encryption support, so bounce.c will never see a bio with an encryption
-context).
+From: Eric Biggers <ebiggers@google.com>
 
+Set bio crypt contexts on bios by calling into fscrypt when required,
+and explicitly check for DUN continuity when adding pages to the bio.
+(While DUN continuity is usually implied by logical block contiguity,
+this is not the case when using certain fscrypt IV generation methods
+like IV_INO_LBLK_32).
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Co-developed-by: Satya Tangirala <satyat@google.com>
 Signed-off-by: Satya Tangirala <satyat@google.com>
+Reviewed-by: Jaegeuk Kim <jaegeuk@kernel.org>
 ---
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/direct-io.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 44205dfb6b60..32f75f31bb5c 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1436,6 +1436,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index b2e86e739d7a..328ed7ac0094 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -24,6 +24,7 @@
+ #include <linux/module.h>
+ #include <linux/types.h>
+ #include <linux/fs.h>
++#include <linux/fscrypt.h>
+ #include <linux/mm.h>
+ #include <linux/slab.h>
+ #include <linux/highmem.h>
+@@ -392,6 +393,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+ 	      sector_t first_sector, int nr_vecs)
+ {
+ 	struct bio *bio;
++	struct inode *inode = dio->inode;
  
- 	BUG_ON(sectors <= 0);
- 	BUG_ON(sectors >= bio_sectors(bio));
-+	WARN_ON_ONCE(!IS_ALIGNED(sectors, bio_required_sector_alignment(bio)));
+ 	/*
+ 	 * bio_alloc() is guaranteed to return a bio when allowed to sleep and
+@@ -399,6 +401,9 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+ 	 */
+ 	bio = bio_alloc(GFP_KERNEL, nr_vecs);
  
- 	/* Zone append commands cannot be split */
- 	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
++	fscrypt_set_bio_crypt_ctx(bio, inode,
++				  sdio->cur_page_fs_offset >> inode->i_blkbits,
++				  GFP_KERNEL);
+ 	bio_set_dev(bio, bdev);
+ 	bio->bi_iter.bi_sector = first_sector;
+ 	bio_set_op_attrs(bio, dio->op, dio->op_flags);
+@@ -765,9 +770,17 @@ static inline int dio_send_cur_page(struct dio *dio, struct dio_submit *sdio,
+ 		 * current logical offset in the file does not equal what would
+ 		 * be the next logical offset in the bio, submit the bio we
+ 		 * have.
++		 *
++		 * When fscrypt inline encryption is used, data unit number
++		 * (DUN) contiguity is also required.  Normally that's implied
++		 * by logical contiguity.  However, certain IV generation
++		 * methods (e.g. IV_INO_LBLK_32) don't guarantee it.  So, we
++		 * must explicitly check fscrypt_mergeable_bio() too.
+ 		 */
+ 		if (sdio->final_block_in_bio != sdio->cur_page_block ||
+-		    cur_offset != bio_next_offset)
++		    cur_offset != bio_next_offset ||
++		    !fscrypt_mergeable_bio(sdio->bio, dio->inode,
++					   cur_offset >> dio->inode->i_blkbits))
+ 			dio_bio_submit(dio, sdio);
+ 	}
+ 
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
