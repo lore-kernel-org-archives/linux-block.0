@@ -2,95 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA059C47096
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 01:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D048FC47097
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 01:53:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1DF3613E3
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 01:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABE0B61404
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 01:53:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbhFDBYJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 21:24:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22671 "EHLO
+        id S230044AbhFDBzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 21:55:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40618 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229576AbhFDBYJ (ORCPT
+        by vger.kernel.org with ESMTP id S229576AbhFDBzR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Jun 2021 21:24:09 -0400
+        Thu, 3 Jun 2021 21:55:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622769744;
+        s=mimecast20190719; t=1622771611;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=aNgQp5Eo66crYUqMd0jTriz542Fx6DGFm1W5YzQhOxw=;
-        b=fXqD/64DiQoldufL4kt7FqLFOxIneUeFafGuIfi6GaOfQdPgDjbm1m0ETvBnOY/MBIA1JU
-        wz4t/m77twNM+/1j4fWt0f7kC2RgFZ11se63ndKSCz8+ieG8c3a4tj0hI2A0uLqmwlDgV5
-        uiKsfqvSQ4mSTyvgXR0Jq601V9zM+jY=
+        bh=vqFUmniCC488GUpp4xBAu68FfZpCcKh9+CsQQqre8x4=;
+        b=NqnWnKq8VqLs5ExvaDi1oVYRAufrO3NATPP3UwvuSNUD9A03jCLRgklp4CNdetMxf/bxR4
+        XPXG9WvDcoSCw3TqpkNONbMWgT3mBqGkA+owkwRVIcgdNDIx3cpSTnUeiERFC7cpljB73z
+        o8C+U4Bp2cvjcBZAN0JE/oixariuuFA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-551-ZQkmDysnNY60rlaXjm5d2Q-1; Thu, 03 Jun 2021 21:22:22 -0400
-X-MC-Unique: ZQkmDysnNY60rlaXjm5d2Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-5-J9nU4BbfOg6zaCj2GQz7qw-1; Thu, 03 Jun 2021 21:53:30 -0400
+X-MC-Unique: J9nU4BbfOg6zaCj2GQz7qw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1FF5425E9;
-        Fri,  4 Jun 2021 01:22:21 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 357EE3FD4;
+        Fri,  4 Jun 2021 01:53:28 +0000 (UTC)
 Received: from T590 (ovpn-12-139.pek2.redhat.com [10.72.12.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2AFF19C44;
-        Fri,  4 Jun 2021 01:22:12 +0000 (UTC)
-Date:   Fri, 4 Jun 2021 09:22:08 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5276460C17;
+        Fri,  4 Jun 2021 01:53:18 +0000 (UTC)
+Date:   Fri, 4 Jun 2021 09:53:15 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH 2/4] block: move wbt allocation into blk_alloc_queue
-Message-ID: <YLmAQIy7kkPqdTz1@T590>
-References: <20210525080442.1896417-1-ming.lei@redhat.com>
- <20210525080442.1896417-3-ming.lei@redhat.com>
- <35a0f0b7-ad44-26cb-7fb7-d4f56241ff62@acm.org>
+To:     longli@linuxonhyperv.com
+Cc:     linux-block@vger.kernel.org, Long Li <longli@microsoft.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Tejun Heo <tj@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] block: return the correct bvec when checking for gaps
+Message-ID: <YLmHi27PT5LAwJji@T590>
+References: <1622759671-14059-1-git-send-email-longli@linuxonhyperv.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <35a0f0b7-ad44-26cb-7fb7-d4f56241ff62@acm.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <1622759671-14059-1-git-send-email-longli@linuxonhyperv.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 03, 2021 at 05:44:00PM -0700, Bart Van Assche wrote:
-> On 5/25/21 1:04 AM, Ming Lei wrote:
-> > wbt_init() calls wbt_alloc() which adds allocated wbt instance into
-> > q->rq_qos. This way is very dangerous because q->rq_qos is accessed in
-> > IO fast path.
-> > 
-> > So far wbt_init() is called in the two code paths:
-> > 
-> > 1) blk_register_queue(), when the block device has been exposed to
-> > usespace, so IO may come when adding wbt into q->rq_qos
-> > 
-> > 2) sysfs attribute store, in which normal IO is definitely allowed
-> > 
-> > Move wbt allocation into blk_alloc_queue() for avoiding to add wbt
-> > instance dynamically to q->rq_qos. And before calling wbt_init(), the
-> > wbt is disabled, so functionally it works as expected.
-> 
-> I don't like this change since it is not generic - it only helps the WBT
-> implementation.
+Hello Long,
 
-OK, actually except for wbt, the only one left is iocost which adds
-rq_qos via cgroup attribute. 
+On Thu, Jun 03, 2021 at 03:34:31PM -0700, longli@linuxonhyperv.com wrote:
+> From: Long Li <longli@microsoft.com>
+> 
+> After commit 07173c3ec276 ("block: enable multipage bvecs"), a bvec can
+> have multiple pages. But bio_will_gap() still assumes one page bvec while
+> checking for merging. This causes data corruption on drivers relying on
+> the correct merging on virt_boundary_mask.
+
+Can you explain the data corruption a bit? 
+
+IMO, either single page bvec or multipage bvec should be fine, because
+bio_will_gap() just checks if the last bvec of prev bio and the 1st bvec
+of next bio can be merged.
 
 > 
-> All rq-qos policies call rq_qos_add() and all these policies take effect
-> before rq_qos_add() returns. Does the q->rq_qos list perhaps have to be
-> protected with RCU? Would that be sufficient to fix the crashes reported
-> in the cover letter?
+> Fix this by returning the multi-page bvec for testing gaps for merging.
+> 
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Cc: Pavel Begunkov <asml.silence@gmail.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+> Cc: Jeffle Xu <jefflexu@linux.alibaba.com>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> Fixes: 07173c3ec276 ("block: enable multipage bvecs")
+> Signed-off-by: Long Li <longli@microsoft.com>
+> ---
+>  include/linux/bio.h | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index a0b4cfdf62a4..6b2f609ccfbf 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -44,9 +44,6 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
+>  #define bio_offset(bio)		bio_iter_offset((bio), (bio)->bi_iter)
+>  #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
+>  
+> -#define bio_multiple_segments(bio)				\
+> -	((bio)->bi_iter.bi_size != bio_iovec(bio).bv_len)
+> -
+>  #define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
+>  #define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors((iter)))
+>  
+> @@ -271,7 +268,7 @@ static inline void bio_clear_flag(struct bio *bio, unsigned int bit)
+>  
+>  static inline void bio_get_first_bvec(struct bio *bio, struct bio_vec *bv)
+>  {
+> -	*bv = bio_iovec(bio);
+> +	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+>  }
+>  
+>  static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+> @@ -279,10 +276,10 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+>  	struct bvec_iter iter = bio->bi_iter;
+>  	int idx;
+>  
+> -	if (unlikely(!bio_multiple_segments(bio))) {
+> -		*bv = bio_iovec(bio);
+> +	/* this bio has only one bvec */
+> +	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> +	if (bv->bv_len == bio->bi_iter.bi_size)
+>  		return;
+> -	}
+>  
+>  	bio_advance_iter(bio, &iter, iter.bi_size);
 
-Freezing queue should be easier for providing the protection, and I will try
-that approach.
+The patch itself looks fine, given both bio_get_first_bvec() and bio_get_last_bvec()
+are used in bio_will_gap() only.
 
 
 Thanks,
