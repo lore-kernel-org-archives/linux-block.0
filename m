@@ -2,88 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2E9C47083
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 16:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B98C4743E
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 19:59:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65CCA6140B
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 16:13:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DFD8613F8
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 19:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231289AbhFDQPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Jun 2021 12:15:09 -0400
-Received: from mail-pj1-f50.google.com ([209.85.216.50]:35476 "EHLO
-        mail-pj1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbhFDQPJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jun 2021 12:15:09 -0400
-Received: by mail-pj1-f50.google.com with SMTP id fy24-20020a17090b0218b029016c5a59021fso1184061pjb.0;
-        Fri, 04 Jun 2021 09:13:06 -0700 (PDT)
+        id S229913AbhFDUBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Jun 2021 16:01:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231225AbhFDUBA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jun 2021 16:01:00 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8727BC061767
+        for <linux-block@vger.kernel.org>; Fri,  4 Jun 2021 12:59:13 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 22-20020a250d160000b0290532b914c9f4so13154341ybn.9
+        for <linux-block@vger.kernel.org>; Fri, 04 Jun 2021 12:59:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=08ngW/6ouUjDi/wpMdVaPAEKWapsl3xNTLfVKkU+m5Y=;
+        b=JDRTNf9J3ToOzwgDWEPGtKVPxO+kW3G7lO/Ja39i6iJVtmjdTC6z7d4SG0Nk34X17w
+         Uw6MyFloGKyph4f73tQ88uuoVLDriLqHxKZJFNgWvRoLVOe7pkFv0xbugv+Y54ulivvF
+         oZ2LTT+KwbktGUmNj8H3DGivs/PFnvronFpDpFHPCKdD94HrBZB63hP3V1YUeuqrlxw5
+         VYGnxk+HH1++nT9zCh06Epc8xwbafe+8z5LV+5IKPfxX4XgOwUw9mdneMs/OPiMOqh2f
+         mp/X0H0zkSjdfyWIfyFpV71FW39Rx0gLE1lzDE3RLp8AoDURCdiK3ZLZqLzNC8HLOJxE
+         NF0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gmm8KlnIo/nuK5ud9oSk0ktzCTOuNeA4tmOo0gRaut8=;
-        b=mYocplnxAY6qMT6hyyPnGbI98DszmDXfL4MHG+HRgkaLE0OXUyu7SS5/wqeW7SF5yt
-         6ZhuFax6RdyOITzuWrKAVyJpKaXVIi9UA3fNnk091r6hQfbFmNIIGsXYYO8SD5WvYHcI
-         9yD3pFoZheJlRBH7fFdeSe9BEIJVhPk3mT+6ssmWt40s2fQ9vNTYOkEMZyioNvNaRMBA
-         ZDVu+CGU3yn27w474c8yI8++7eAqZFGU8poAJJ729iPu+CE3wOAewEVx04yMhaw0Stli
-         Py3jaI0VrVYc4dgdjaqB+5N4Co76nWCD5ZRDsMd5J1+cQhUqwn99yUJvY//DFPqRj3PA
-         eZ8g==
-X-Gm-Message-State: AOAM533DtWirHB4kPlCAbizd67m6805Ou3c7m1IbjLsrAcjbwURpLQFB
-        5+3yJxR/V5glFh02HOnyqRI=
-X-Google-Smtp-Source: ABdhPJz0VSZ0d2HnuXgK560zrDLOhqWYxGflmdVC+KLAhx45ksnzqoY/KuwnAaBbTgE0CRmghEiYHA==
-X-Received: by 2002:a17:90a:520f:: with SMTP id v15mr5558604pjh.23.1622823186456;
-        Fri, 04 Jun 2021 09:13:06 -0700 (PDT)
-Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id 190sm2439582pgd.1.2021.06.04.09.13.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jun 2021 09:13:05 -0700 (PDT)
-Subject: Re: [PATCH v12 0/3] bio: control bio max size
-To:     Changheun Lee <nanich.lee@samsung.com>, Johannes.Thumshirn@wdc.com,
-        alex_y_xu@yahoo.ca, asml.silence@gmail.com, axboe@kernel.dk,
-        bgoncalv@redhat.com, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, cang@codeaurora.org,
-        avri.altman@wdc.com, alim.akhtar@samsung.com,
-        damien.lemoal@wdc.com, gregkh@linuxfoundation.org,
-        hch@infradead.org, jaegeuk@kernel.org, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, osandov@fb.com, patchwork-bot@kernel.org,
-        tj@kernel.org, tom.leiming@gmail.com, yi.zhang@redhat.com
-Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
-        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-References: <CGME20210604052157epcas1p2e5eebb52d08b06174696290e11fdd5a4@epcas1p2.samsung.com>
- <20210604050324.28670-1-nanich.lee@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <9e1c43a8-1c6d-95c6-ce4c-34ac194b9022@acm.org>
-Date:   Fri, 4 Jun 2021 09:13:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.2
-MIME-Version: 1.0
-In-Reply-To: <20210604050324.28670-1-nanich.lee@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=08ngW/6ouUjDi/wpMdVaPAEKWapsl3xNTLfVKkU+m5Y=;
+        b=WJtpQXCu9eMNMBaOtExhSfaQ1PGqiXYTk85acc3woaKibo/LlhhJgVAKj0wSJTmLMc
+         9ZmACCdeByzPXFDk86QLwyUHipqznb6uyttKjGBqglYpb3QSTd8Tfr+xCvGxch5YL3Ob
+         wPtkRZWmfoqg/ZXLNSmcYc5vHjUJOVNXUQApa9z0k5zfJJZKLiIhQZvptt5A4uGyn0hf
+         pg1iekWKMy/w+VaCIGU/gAePG0RXz5PFZ3C77TuYsG+B+kBRHdDx20XJROoN/Lcr9aj3
+         SmhjbvXt6T9uCGBI7SamQhoERO+05vA7qtEPTGiZeD/f8wOerQpVLr6ZAYDYgROZ9Obb
+         sHQg==
+X-Gm-Message-State: AOAM532+sxf2OsSr1Mcf1Lj887heNk/ZsTESzF2DDferYeQRzhdylL/Z
+        jbcoA/Mn/SmafP0EDYq4MWhAB41KmfRMP+n8aul/qWLBy6EWgl7sZ1gqgN2df5yVrwDAoc8AVHd
+        OdQe6x5eIygPO7PnVGbKyhwlQEcAiS4TMeIt4VMvrrB/OYWZl518H+OHc9qQjjKtuo054
+X-Google-Smtp-Source: ABdhPJySrTkm2ZZQhHIET6BVacdS/IIJwe+EXCFPY8X8aCXyuEC7h3HWa6Hi7G41FKirusQld9i5BZkyqos=
+X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
+ (user=satyat job=sendgmr) by 2002:a25:6b42:: with SMTP id o2mr7686789ybm.244.1622836752705;
+ Fri, 04 Jun 2021 12:59:12 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 19:58:52 +0000
+In-Reply-To: <20210604195900.2096121-1-satyat@google.com>
+Message-Id: <20210604195900.2096121-3-satyat@google.com>
+Mime-Version: 1.0
+References: <20210604195900.2096121-1-satyat@google.com>
+X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
+Subject: [PATCH v3 02/10] block: blk-crypto: introduce blk_crypto_bio_sectors_alignment()
+From:   Satya Tangirala <satyat@google.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
+        Satya Tangirala <satyat@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/3/21 10:03 PM, Changheun Lee wrote:
-> bio size can grow up to 4GB after muli-page bvec has been enabled.
-> But sometimes large size of bio would lead to inefficient behaviors.
-> Control of bio max size will be helpful to improve inefficiency.
-> 
-> blk_queue_max_bio_bytes() is added to enable be set the max_bio_bytes in
-> each driver layer. And max_bio_bytes sysfs is added to show current
-> max_bio_bytes for each request queue.
-> bio size can be controlled via max_bio_bytes.
+The size of any bio must be aligned to the data unit size of the bio crypt
+context (if it exists) of that bio. This must also be ensured whenever a
+bio is split. Introduce blk_crypto_bio_sectors_alignment() that returns the
+required alignment in sectors. The number of sectors passed to any call of
+bio_split() must be aligned to blk_crypto_bio_sectors_alignment().
 
-Where is the version history for this patch series?
+Signed-off-by: Satya Tangirala <satyat@google.com>
+---
+ block/blk-crypto-internal.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-Has this patch series been tested in combination with dm-crypt?
+diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+index 0d36aae538d7..7f1535cc7e7c 100644
+--- a/block/blk-crypto-internal.h
++++ b/block/blk-crypto-internal.h
+@@ -60,6 +60,21 @@ static inline bool blk_crypto_rq_is_encrypted(struct request *rq)
+ 	return rq->crypt_ctx;
+ }
+ 
++/*
++ * Returns the alignment requirement for the number of sectors in this bio based
++ * on its bi_crypt_context. Any bios split from this bio must follow this
++ * alignment requirement as well. Note that a bio must contain a whole number of
++ * crypto data units (which is selected by the submitter of bio), since
++ * encryption/decryption can only be performed on a complete crypto data unit.
++ */
++static inline unsigned int blk_crypto_bio_sectors_alignment(struct bio *bio)
++{
++	if (!bio_has_crypt_ctx(bio))
++		return 1;
++	return bio->bi_crypt_context->bc_key->crypto_cfg.data_unit_size >>
++								SECTOR_SHIFT;
++}
++
+ #else /* CONFIG_BLK_INLINE_ENCRYPTION */
+ 
+ static inline bool bio_crypt_rq_ctx_compatible(struct request *rq,
+@@ -93,6 +108,11 @@ static inline bool blk_crypto_rq_is_encrypted(struct request *rq)
+ 	return false;
+ }
+ 
++static inline unsigned int blk_crypto_bio_sectors_alignment(struct bio *bio)
++{
++	return 1;
++}
++
+ #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
+ 
+ void __bio_crypt_advance(struct bio *bio, unsigned int bytes);
+-- 
+2.32.0.rc1.229.g3e70b5a671-goog
 
-Bart.
