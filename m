@@ -7,48 +7,47 @@ X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC75C47096
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 00:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF422C47096
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 00:09:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4385C61406
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 00:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B63356140B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 00:09:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbhFDAGZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Jun 2021 20:06:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31009 "EHLO
+        id S229721AbhFDALN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jun 2021 20:11:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29391 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229656AbhFDAGZ (ORCPT
+        by vger.kernel.org with ESMTP id S229576AbhFDALN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Jun 2021 20:06:25 -0400
+        Thu, 3 Jun 2021 20:11:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622765079;
+        s=mimecast20190719; t=1622765367;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=d+bFfr6Xa5feZyHtnlj3QldeQG0fhNp8nYtTUpuhfSE=;
-        b=PCtzA7HMF/wb4gJxzxgCyYT7lpJhB5ZyhRskdrrln3UKWuStIkVjTgQX7EUtRZxml7Mm+x
-        VMruCYwugW78gaPBN8/rgt+A0ylWv9Jb3EdgDzFtilgALim+hqzRMlDYMy5pGCa6m93/pl
-        FZLcKXzFa1WCFT729rq4gIT8OtCffSM=
+        bh=7jNl3LQFL9mHkTr7R8kJUO4wmJ8XVHENbDMxcxTKdME=;
+        b=S7yTZ0dYuNccQ9aIfjAdpSb5WAyu7Yzd5q4vlxIQFQym383TTWnsaZt7EN5H3VVXO5w0Mq
+        QlpVx7F7cr2UTi4/3Ajn2RW64M+GrmO+OByZAwhiIbjZNv9P95tJbK8DOp/vdNJNsYwZRC
+        6eeLJQGXKLjqHHSl/gN5zbSR/N6j760=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349--J68nE8fNUq9gTmesS2l9g-1; Thu, 03 Jun 2021 20:04:36 -0400
-X-MC-Unique: -J68nE8fNUq9gTmesS2l9g-1
+ us-mta-96-Nqlip1PvPlihNyeJs57V-Q-1; Thu, 03 Jun 2021 20:09:26 -0400
+X-MC-Unique: Nqlip1PvPlihNyeJs57V-Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 253F3101371D;
-        Fri,  4 Jun 2021 00:04:35 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DD116D5C1;
+        Fri,  4 Jun 2021 00:09:25 +0000 (UTC)
 Received: from localhost (ovpn-12-139.pek2.redhat.com [10.72.12.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C92060657;
-        Fri,  4 Jun 2021 00:04:30 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D1F02C169;
+        Fri,  4 Jun 2021 00:09:21 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>
-Subject: [PATCH] block: loop: fix deadlock between open and remove
-Date:   Fri,  4 Jun 2021 08:04:24 +0800
-Message-Id: <20210604000424.189928-1-ming.lei@redhat.com>
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH V2] blk-mq: update hctx->dispatch_busy in case of real scheduler
+Date:   Fri,  4 Jun 2021 08:09:15 +0800
+Message-Id: <20210604000915.192286-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
@@ -56,92 +55,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit c76f48eb5c08 ("block: take bd_mutex around delete_partitions in
-del_gendisk") adds disk->part0->bd_mutex in del_gendisk(), this way
-causes the following AB/BA deadlock between removing loop and opening
-loop:
+Commit 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+starts to support io batching submission by using hctx->dispatch_busy.
 
-1) loop_control_ioctl(LOOP_CTL_REMOVE)
-- mutex_lock(&loop_ctl_mutex)
-- mutex_lock(&disk->part0->bd_mutex)	//del_gendisk
+However, blk_mq_update_dispatch_busy() isn't changed to update hctx->dispatch_busy
+in that commit, so fix the issue by updating hctx->dispatch_busy in case
+of real scheduler.
 
-2) open look device
-- mutex_lock(&disk->part0->bd_mutex)	//blkdev_get_by_dev
-- mutex_lock(&loop_ctl_mutex)		//lo_open() <- __blkdev_get
-
-Fixes the issue by not holding loop_ctl_mutex in lo_open(), and cover
-the protection on bdev->bd_disk->private_data via disk->part0->bd_mutex.
-
-Reported-by: Colin Ian King <colin.king@canonical.com>
-Fixes: c76f48eb5c08 ("block: take bd_mutex around delete_partitions in del_gendisk")
-Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
+Reported-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Fixes: 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c | 31 +++++++++++++++----------------
- 1 file changed, 15 insertions(+), 16 deletions(-)
+ block/blk-mq.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d58d68f3c7cd..b03d8f4c1cdf 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1883,20 +1883,14 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- 	int err;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4261adee9964..5af4f099cdb0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1224,9 +1224,6 @@ static void blk_mq_update_dispatch_busy(struct blk_mq_hw_ctx *hctx, bool busy)
+ {
+ 	unsigned int ewma;
  
- 	/*
--	 * take loop_ctl_mutex to protect lo pointer from race with
--	 * loop_control_ioctl(LOOP_CTL_REMOVE), however, to reduce contention
--	 * release it prior to updating lo->lo_refcnt.
-+	 * both ->private_data and ->lo_refcnt are covered by disk's
-+	 * open_mutex, so race between open and remove can be avoided
- 	 */
--	err = mutex_lock_killable(&loop_ctl_mutex);
--	if (err)
--		return err;
- 	lo = bdev->bd_disk->private_data;
--	if (!lo) {
--		mutex_unlock(&loop_ctl_mutex);
-+	if (!lo)
- 		return -ENXIO;
--	}
-+
- 	err = mutex_lock_killable(&lo->lo_mutex);
--	mutex_unlock(&loop_ctl_mutex);
- 	if (err)
- 		return err;
- 	atomic_inc(&lo->lo_refcnt);
-@@ -2272,21 +2266,26 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 		ret = loop_lookup(&lo, parm);
- 		if (ret < 0)
- 			break;
--		ret = mutex_lock_killable(&lo->lo_mutex);
-+		/* cover removing vs. opening loop device */
-+		ret = mutex_lock_killable(&lo->lo_disk->part0->bd_mutex);
- 		if (ret)
- 			break;
--		if (lo->lo_state != Lo_unbound) {
--			ret = -EBUSY;
--			mutex_unlock(&lo->lo_mutex);
-+		ret = mutex_lock_killable(&lo->lo_mutex);
-+		if (ret) {
-+			mutex_unlock(&lo->lo_disk->part0->bd_mutex);
- 			break;
- 		}
--		if (atomic_read(&lo->lo_refcnt) > 0) {
-+		if (lo->lo_state != Lo_unbound ||
-+				atomic_read(&lo->lo_refcnt) > 0) {
- 			ret = -EBUSY;
- 			mutex_unlock(&lo->lo_mutex);
-+			mutex_unlock(&lo->lo_disk->part0->bd_mutex);
- 			break;
- 		}
--		lo->lo_disk->private_data = NULL;
- 		mutex_unlock(&lo->lo_mutex);
-+		lo->lo_disk->private_data = NULL;
-+		mutex_unlock(&lo->lo_disk->part0->bd_mutex);
-+
- 		idr_remove(&loop_index_idr, lo->lo_number);
- 		loop_remove(lo);
- 		break;
+-	if (hctx->queue->elevator)
+-		return;
+-
+ 	ewma = hctx->dispatch_busy;
+ 
+ 	if (!ewma && !busy)
 -- 
-2.29.2
+2.31.1
 
