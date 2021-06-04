@@ -5,59 +5,59 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9110FC4743E
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 20:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B07C4743C
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 20:00:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AEFC613EC
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 20:00:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 518BE613F8
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jun 2021 20:00:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231374AbhFDUCQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Jun 2021 16:02:16 -0400
-Received: from mail-yb1-f201.google.com ([209.85.219.201]:45736 "EHLO
+        id S231443AbhFDUCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Jun 2021 16:02:21 -0400
+Received: from mail-yb1-f201.google.com ([209.85.219.201]:51885 "EHLO
         mail-yb1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231421AbhFDUCL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jun 2021 16:02:11 -0400
-Received: by mail-yb1-f201.google.com with SMTP id d63-20020a254f420000b02904f91ef33453so13129179ybb.12
-        for <linux-block@vger.kernel.org>; Fri, 04 Jun 2021 13:00:11 -0700 (PDT)
+        with ESMTP id S231384AbhFDUCV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jun 2021 16:02:21 -0400
+Received: by mail-yb1-f201.google.com with SMTP id d6-20020a2568060000b0290535b52251cfso13146594ybc.18
+        for <linux-block@vger.kernel.org>; Fri, 04 Jun 2021 13:00:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=wt2qxnxy/b8IZ2QO+GAswkwuO0WmiwjICqpUWuqeT7k=;
-        b=BfgL5Q+yv1Gzkf9o/f8X1rtUSSA6murv+6sH8j0ykCJia1piKw55urpOJDjgFIA3d/
-         w5f5IcTOuWS+JBGTk+bguWV5C12rMZXZtB0xm7lZDCQUJOpo3W/o3HhYzRCz+j3nd4Na
-         2MG4BJwFIlnlVeOPF1RTCXrVb+lxsdrYUGneWMEAB5qYNO9WJg90ztm3pH6jIb1q9pRB
-         y8gfQ8jdWPSXMskZmMcnFpdu5RwSp207haB+zUlq0h3mhcegzHaqlHMHliNz9P6/0j9b
-         nH0IJycwD2kbfSUwzBN/MhBwvwxPBtL6vmgkKmEvT4RMFHgdXsacye8S76Y6+Yqvmgn/
-         14Ag==
+        bh=pgZaEyBtBsTzFRJDI8Jnnog0gKADt58CJnoqBCP+in8=;
+        b=uUV7BqO4f+Zte/lFb383yyVYOK3VdXuD3Okwqz87OPd2B5NgUxxaz3ZxJyVyMfYOgY
+         9ZE5AgKFLwNVu2wqFDTPs77c+t9PbozjYepuv1BD8/amxLlelOC4N762wZRM75mO3lVR
+         +zfxCnxGAMJfSJ+A4aHfeATlTMM2VyItnu3Pr7UzFN7nJKdf26X8LdHY/maLK/99t0zt
+         s4kaQhIr6a1YQEvCT11A5fhX0e19eKkFow3v7vcMQe0ZzksnSRmGjvJfxgn55pbpOshX
+         84Qx/HB6cA9Sgnjpc1iG4+8J+p/foxRGtsH8ebHDgiauvDmr3kFmyDKFIgNT+WaUMdE9
+         BzDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=wt2qxnxy/b8IZ2QO+GAswkwuO0WmiwjICqpUWuqeT7k=;
-        b=DArE3e4DZPg2MDGxcrD/R5x6Ko8XyAqbPIeBn86OQ1neCqsVegZBiieSR03ro7PKg8
-         QAkjZR9JZZfFemUupdJFDzrJVY/h4WHoDZY9i7JOUoxJWVSfp5P5w8oDewGY58xey5CO
-         sKJJIKJPaJmE5rm4TuJ5osbbFcIFIi/fSUqWnRvi+Boc5khPWL+u5C6+PSzia5LOG8yt
-         Jc8wCKyW+plS/3VOrZmMt+AgSmDEbviHp9jyCafrcQHIBvWILz3yLVlz+SPYfCPwNnr3
-         qOT7hKqxpSjnoa7iyp4EZ+DlsPMCbgAC/dkUe4rUq99MqFpymTSDkHlsZX4UPmQu/nDS
-         cybg==
-X-Gm-Message-State: AOAM530Kk6aH79SmiNIZmWx37jDRTpkFkPrYPJKViqidxdGABHRZW8UR
-        LO7xEI++6HBfZSEvH58OhzZhQ8uhxs8l55kC58WLYI2cw7hkIoxpX0PPy7xg/J7Nd0y1f+I2Jji
-        Mzm/DBRFw1togqM/z2hSZ8J023yqtx96eZQtPLDwww5OLP4jylj5IPC18BFs+UBlrxus4
-X-Google-Smtp-Source: ABdhPJyLk0AvyZyFGRqqG2Cq3AZd0VBGrOlLaB7qb3b7G+q4lx5yzm3JQXDwZUkv/saaoV5YgDjx1rjc46E=
+        bh=pgZaEyBtBsTzFRJDI8Jnnog0gKADt58CJnoqBCP+in8=;
+        b=PbbriIjT1iqNTyc/9sDD23VEbsVsO9GEUpFkO6yZGSbU5X90bPCwBU6yix8sHRmJE6
+         iOq9z+Ok8XV034T5yeeTdd1kS17gpFy+7ETJtJiM+yVZ4KzZv7fbAhZpEzZIMzTyWjJj
+         VkHSRRhzhF4z3Xmxg8B1FCUI2U0UT+ht4IgdQ+EgKfKnZ9AAoZFFuGKi72SQULs7+8gy
+         SCXhuxd/H6qdDPh3taKlXrx/vVukFZHJRPi9hVLEDxdoKpCKr6ZJqKz2cLiwLVIYEavF
+         ETP+pwreKOPU9ZEUxSKJ96BzRumAjEfWyPu205RVyw3n39b6q1Wn7fjgNh5HZqwDV294
+         B2Hw==
+X-Gm-Message-State: AOAM530yKGs0ykuGGbzCGZfkNRzQWx9AUDqPj1bA3QZ2gyG+E9DPTt6K
+        2NXpC6JswUF8PQpTfxg8hfxYVgfDBoOmT7CB6kkvLD97mdFzV681nolxx0Sv7tmX8u6ZfMASzoJ
+        eG76Ue7wsuwJRNMQdJC99N9n1x3hnUWGmiu4u8wx6RtOCOLCkBgFn2kGAe8IkvlHgB3Sk
+X-Google-Smtp-Source: ABdhPJy3hxJvjiN/TAAfv2M9Py0zD+C14+X3vu2qbb0PQB99gWO5CrTeHtdS1YqnXjKPQIXY/tSGHL83z8c=
 X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
- (user=satyat job=sendgmr) by 2002:a05:6902:1343:: with SMTP id
- g3mr7100296ybu.283.1622836750940; Fri, 04 Jun 2021 12:59:10 -0700 (PDT)
-Date:   Fri,  4 Jun 2021 19:58:51 +0000
+ (user=satyat job=sendgmr) by 2002:a25:4d04:: with SMTP id a4mr7276497ybb.311.1622836774525;
+ Fri, 04 Jun 2021 12:59:34 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 19:58:57 +0000
 In-Reply-To: <20210604195900.2096121-1-satyat@google.com>
-Message-Id: <20210604195900.2096121-2-satyat@google.com>
+Message-Id: <20210604195900.2096121-8-satyat@google.com>
 Mime-Version: 1.0
 References: <20210604195900.2096121-1-satyat@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v3 01/10] block: introduce blk_ksm_is_empty()
+Subject: [PATCH v3 07/10] mmc: handle error from blk_ksm_register()
 From:   Satya Tangirala <satyat@google.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
@@ -67,90 +67,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This function checks if a given keyslot manager supports any encryption
-mode/data unit size combination (and returns true if there is no such
-supported combination). Helps clean up code a little.
+Handle any error from blk_ksm_register() in the callers. Previously,
+the callers ignored the return value because blk_ksm_register() wouldn't
+fail as long as the request_queue didn't have integrity support too, but
+as this is no longer the case, it's safer for the callers to just handle
+the return value appropriately.
 
 Signed-off-by: Satya Tangirala <satyat@google.com>
 ---
- block/keyslot-manager.c         | 21 +++++++++++++++++++++
- drivers/md/dm-table.c           | 11 +----------
- include/linux/keyslot-manager.h |  2 ++
- 3 files changed, 24 insertions(+), 10 deletions(-)
+ drivers/mmc/core/crypto.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
-index 2c4a55bea6ca..88211581141a 100644
---- a/block/keyslot-manager.c
-+++ b/block/keyslot-manager.c
-@@ -437,6 +437,27 @@ void blk_ksm_destroy(struct blk_keyslot_manager *ksm)
- }
- EXPORT_SYMBOL_GPL(blk_ksm_destroy);
+diff --git a/drivers/mmc/core/crypto.c b/drivers/mmc/core/crypto.c
+index 419a368f8402..cccd8c7d7e7a 100644
+--- a/drivers/mmc/core/crypto.c
++++ b/drivers/mmc/core/crypto.c
+@@ -21,8 +21,17 @@ void mmc_crypto_set_initial_state(struct mmc_host *host)
  
-+/**
-+ * blk_ksm_is_empty() - Checks if the keyslot manager has any crypto
-+ *			capabilities at all.
-+ * @ksm: The input keyslot manager to check
-+ *
-+ * Return: true if @ksm doesn't have any crypto capabilities at all, and
-+ *	   false otherwise.
-+ */
-+bool blk_ksm_is_empty(struct blk_keyslot_manager *ksm)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(ksm->crypto_modes_supported); i++) {
-+		if (ksm->crypto_modes_supported[i])
-+			return false;
-+	}
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(blk_ksm_is_empty);
-+
- bool blk_ksm_register(struct blk_keyslot_manager *ksm, struct request_queue *q)
+ void mmc_crypto_setup_queue(struct request_queue *q, struct mmc_host *host)
  {
- 	if (blk_integrity_queue_supports_integrity(q)) {
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index ee47a332b462..29cbfc3e3c4b 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1295,7 +1295,6 @@ static int dm_table_construct_keyslot_manager(struct dm_table *t)
- 	struct blk_keyslot_manager *ksm;
- 	struct dm_target *ti;
- 	unsigned int i;
--	bool ksm_is_empty = true;
- 
- 	dksm = kmalloc(sizeof(*dksm), GFP_KERNEL);
- 	if (!dksm)
-@@ -1332,15 +1331,7 @@ static int dm_table_construct_keyslot_manager(struct dm_table *t)
- 	 * If the new KSM doesn't actually support any crypto modes, we may as
- 	 * well represent it with a NULL ksm.
- 	 */
--	ksm_is_empty = true;
--	for (i = 0; i < ARRAY_SIZE(ksm->crypto_modes_supported); i++) {
--		if (ksm->crypto_modes_supported[i]) {
--			ksm_is_empty = false;
--			break;
--		}
--	}
--
--	if (ksm_is_empty) {
-+	if (blk_ksm_is_empty(ksm)) {
- 		dm_destroy_keyslot_manager(ksm);
- 		ksm = NULL;
- 	}
-diff --git a/include/linux/keyslot-manager.h b/include/linux/keyslot-manager.h
-index a27605e2f826..0f09b4f310f7 100644
---- a/include/linux/keyslot-manager.h
-+++ b/include/linux/keyslot-manager.h
-@@ -106,6 +106,8 @@ void blk_ksm_reprogram_all_keys(struct blk_keyslot_manager *ksm);
- 
- void blk_ksm_destroy(struct blk_keyslot_manager *ksm);
- 
-+bool blk_ksm_is_empty(struct blk_keyslot_manager *ksm);
-+
- void blk_ksm_intersect_modes(struct blk_keyslot_manager *parent,
- 			     const struct blk_keyslot_manager *child);
+-	if (host->caps2 & MMC_CAP2_CRYPTO)
+-		blk_ksm_register(&host->ksm, q);
++	if (host->caps2 & MMC_CAP2_CRYPTO) {
++		/*
++		 * This WARN_ON should never trigger since &host->ksm won't be
++		 * "empty" (i.e. will support at least 1 crypto capability), an
++		 * MMC device's request queue doesn't support integrity, and
++		 * it also satisfies all the block layer constraints (i.e.
++		 * supports SG gaps, doesn't have chunk sectors, has a
++		 * sufficiently large supported max_segments per bio)
++		 */
++		WARN_ON(!blk_ksm_register(&host->ksm, q));
++	}
+ }
+ EXPORT_SYMBOL_GPL(mmc_crypto_setup_queue);
  
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
