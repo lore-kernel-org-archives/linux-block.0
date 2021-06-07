@@ -2,173 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2A3C47082
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 18:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96945C47094
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 19:34:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C9AB61139
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 18:52:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E3ED61182
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 19:34:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231287AbhFGSye (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 14:54:34 -0400
-Received: from mail-ej1-f42.google.com ([209.85.218.42]:35406 "EHLO
-        mail-ej1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230463AbhFGSyd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 14:54:33 -0400
-Received: by mail-ej1-f42.google.com with SMTP id h24so28424959ejy.2
-        for <linux-block@vger.kernel.org>; Mon, 07 Jun 2021 11:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nametag.social; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ScXrC8JzROe4oik0nKr4Zt97X1eNIvPR3vNcHFbWFVw=;
-        b=zNYJK3b0Nb8HpGi/aABY5z2iapsdx7yAQtFWXWDFPJbKUfJQRiCc4K3VvQzVgBNVV7
-         WmcbojERHJ6iCdEs9d2RqP7whPvdiFbmY/hEO9hD7unbLU1FJCZjPcn0fa3AXh17EJvt
-         n1bDhfDzsCeih8kV5nUptWol/9UYaSzIPzwsjT6P4otB7wjamQ/cdTSrNoBOxdMm2TCw
-         nzGkMLQXg75dYNSIbXaUv9J7X2nnp+CO2+Xss/4obDx7I5daox9uJ0pE142qL5X+MKzy
-         svxWHQMtvw3F2N1yxMEHFRXR17tTdive8JPi5xi9sSzu7+c5DTerRO422bt36YGuJTMy
-         v2Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ScXrC8JzROe4oik0nKr4Zt97X1eNIvPR3vNcHFbWFVw=;
-        b=IzXrssreKZ8azK10eLvQ4jYrgtTT8PeDDKc9lW/bSTnsmzEbYKVHg9dw0YD9NeI8ML
-         LTzh7hJFr++1mBFOzTfEOoelhU/B0l2uwUIab2gJN1ALH2IBUKbZcxI7ay7UoyCA0Rz/
-         cgzWkgu3zEfr9THTeIpFvuB+B7Pvhjo/c90WcS98HqHyEZJO8FYhwS80zXMZCxOB5ivW
-         TrqRL/9TXNrgtKvtXzwKLDVXrBBPnh5eXYYTyRU4WgKDwyUYfL7GFX+qXR834ObKTJKx
-         zNFmXHwGJZ0/b9qtHYiBCQ6ab1w8xJFRuFWoQ8jEYQf/nmwiBAqHavVnLQB3KIFPcf2m
-         R0Yw==
-X-Gm-Message-State: AOAM533szgFLOTMBXHZ+jd08pgo/5Q6ZritJuptO3zSgeWdcZslIa569
-        5aBFnzvV4J34BpxlFY6w1Ww6qYqUmbUJWTOfVV1pYA==
-X-Google-Smtp-Source: ABdhPJzGcWFGWbIbsY89L7lxhJBfNHplKZCa8ow1UNqgMe/NUtgdE/5lRdP7v1aSFE5Cm6Z9w/5qLJg6WT/lTXHQNYY=
-X-Received: by 2002:a17:906:c010:: with SMTP id e16mr19541841ejz.214.1623091890615;
- Mon, 07 Jun 2021 11:51:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <23168ac0-0f05-3cd7-90dc-08855dd275b2@gmail.com>
-In-Reply-To: <23168ac0-0f05-3cd7-90dc-08855dd275b2@gmail.com>
-From:   Victor Stewart <v@nametag.social>
-Date:   Mon, 7 Jun 2021 14:51:19 -0400
-Message-ID: <CAM1kxwjHrf74u5OLB=acP2fBy+cPG4NNxa-51O35caY4VKdkkg@mail.gmail.com>
-Subject: Re: io_uring: BPF controlled I/O
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     io-uring <io-uring@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
-        lsf-pc@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+        id S230351AbhFGTgA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 15:36:00 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:57162 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230311AbhFGTgA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 15:36:00 -0400
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+        id A309520B83D0; Mon,  7 Jun 2021 12:34:08 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A309520B83D0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+        s=default; t=1623094448;
+        bh=VpnHUDEF9AccYFVvo2kPdN3Gw49CLQLaBsY8vvbjUiE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=h5kY0IfDu/+yWnaNaPR06Olpy3SnlNiBe8Z3xnHkElkxK+AeXv96uQkybYBy/evCq
+         t41YBxDCKP353h1RxPB+wBWMrQo+Hdz22+nPGX1OIoNqgPM+lovPm+dbdxAR+2PPFc
+         rUor92gL2HyqnyW4b0CTQnBCRP0F0/YiDp2d5gVM=
+From:   longli@linuxonhyperv.com
+To:     linux-block@vger.kernel.org
+Cc:     Long Li <longli@microsoft.com>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [Patch v3] block: return the correct bvec when checking for gaps
+Date:   Mon,  7 Jun 2021 12:34:05 -0700
+Message-Id: <1623094445-22332-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 5, 2021 at 5:09 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
->
-> One of the core ideas behind io_uring is passing requests via memory
-> shared b/w the userspace and the kernel, a.k.a. queues or rings. That
-> serves a purpose of reducing number of context switches or bypassing
-> them, but the userspace is responsible for controlling the flow,
-> reaping and processing completions (a.k.a. Completion Queue Entry, CQE),
-> and submitting new requests, adding extra context switches even if there
-> is not much work to do. A simple illustration is read(open()), where
-> io_uring is unable to propagate the returned fd to the read, with more
-> cases piling up.
->
-> The big picture idea stays the same since last year, to give out some
-> of this control to BPF, allow it to check results of completed requests,
-> manipulate memory if needed and submit new requests. Apart from being
-> just a glue between two requests, it might even offer more flexibility
-> like keeping a QD, doing reduce/broadcast and so on.
->
-> The prototype [1,2] is in a good shape but some work need to be done.
-> However, the main concern is getting an understanding what features and
-> functionality have to be added to be flexible enough. Various toy
-> examples can be found at [3] ([1] includes an overview of cases).
->
-> Discussion points:
-> - Use cases, feature requests, benchmarking
+From: Long Li <longli@microsoft.com>
 
-hi Pavel,
+After commit 07173c3ec276 ("block: enable multipage bvecs"), a bvec can
+have multiple pages. But bio_will_gap() still assumes one page bvec while
+checking for merging. If the pages in the bvec go across the
+seg_boundary_mask, this check for merging can potentially succeed if only
+the 1st page is tested, and can fail if all the pages are tested.
 
-coincidentally i'm tossing around in my mind at the moment an idea for
-offloading
-the PING/PONG of a QUIC server/client into the kernel via eBPF.
+Later, when SCSI builds the SG list the same check for merging is done in
+__blk_segment_map_sg_merge() with all the pages in the bvec tested. This
+time the check may fail if the pages in bvec go across the
+seg_boundary_mask (but tested okay in bio_will_gap() earlier, so those
+BIOs were merged). If this check fails, we end up with a broken SG list
+for drivers assuming the SG list not having offsets in intermediate pages.
+This results in incorrect pages written to the disk.
 
-problem being, being that QUIC is userspace run transport and that NAT-ed UDP
-mappings can't be expected to stay open longer than 30 seconds, QUIC
-applications
-bare a large cost of context switching wake-up to conduct connection lifetime
-maintenance... especially when managing a large number of mostly idle long lived
-connections. so offloading this maintenance service into the kernel
-would be a great
-efficiency boon.
+Fix this by returning the multi-page bvec when testing gaps for merging.
 
-the main impediment is that access to the kernel crypto libraries
-isn't currently possible
-from eBPF. that said, connection wide crypto offload into the NIC is a
-frequently mentioned
-subject in QUIC circles, so one could argue better to allocate the
-time to NIC crypto offload
-and then simply conduct this PING/PONG offload in plain text.
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc: Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org
+Fixes: 07173c3ec276 ("block: enable multipage bvecs")
+Signed-off-by: Long Li <longli@microsoft.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+Changes
+v2: added commit details on how data corruption happens
+v3: reorganized the code/comments in bio_get_last_bvec
 
-CQEs would provide a great way for the offloaded service to be able to
-wake up the
-application when it's input is required.
+ include/linux/bio.h | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-anyway food for thought.
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index a0b4cfdf62a4..d2b98efb5cc5 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -44,9 +44,6 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
+ #define bio_offset(bio)		bio_iter_offset((bio), (bio)->bi_iter)
+ #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
+ 
+-#define bio_multiple_segments(bio)				\
+-	((bio)->bi_iter.bi_size != bio_iovec(bio).bv_len)
+-
+ #define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
+ #define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors((iter)))
+ 
+@@ -271,7 +268,7 @@ static inline void bio_clear_flag(struct bio *bio, unsigned int bit)
+ 
+ static inline void bio_get_first_bvec(struct bio *bio, struct bio_vec *bv)
+ {
+-	*bv = bio_iovec(bio);
++	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+ }
+ 
+ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+@@ -279,10 +276,9 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+ 	struct bvec_iter iter = bio->bi_iter;
+ 	int idx;
+ 
+-	if (unlikely(!bio_multiple_segments(bio))) {
+-		*bv = bio_iovec(bio);
+-		return;
+-	}
++	bio_get_first_bvec(bio, bv);
++	if (bv->bv_len == bio->bi_iter.bi_size)
++		return;		/* this bio only has a single bvec */
+ 
+ 	bio_advance_iter(bio, &iter, iter.bi_size);
+ 
+-- 
+2.17.1
 
-Victor
-
-> - Userspace programming model, code reuse (e.g. liburing)
-> - BPF-BPF and userspace-BPF synchronisation. There is
->   CQE based notification approach and plans (see design
->   notes), however need to discuss what else might be
->   needed.
-> - Do we need more contexts passed apart from user_data?
->   e.g. specifying a BPF map/array/etc fd io_uring requests?
-> - Userspace atomics and efficiency of userspace reads/writes. If
->   proved to be not performant enough there are potential ways to take
->   on it, e.g. inlining, having it in BPF ISA, and pre-verifying
->   userspace pointers.
->
-> [1] https://lore.kernel.org/io-uring/a83f147b-ea9d-e693-a2e9-c6ce16659749@gmail.com/T/#m31d0a2ac6e2213f912a200f5e8d88bd74f81406b
-> [2] https://github.com/isilence/linux/tree/ebpf_v2
-> [3] https://github.com/isilence/liburing/tree/ebpf_v2/examples/bpf
->
->
-> -----------------------------------------------------------------------
-> Design notes:
->
-> Instead of basing it on hooks it adds support of a new type of io_uring
-> requests as it gives a better control and let's to reuse internal
-> infrastructure. These requests run a new type of io_uring BPF programs
-> wired with a bunch of new helpers for submitting requests and dealing
-> with CQEs, are allowed to read/write userspace memory in virtue of a
-> recently added sleepable BPF feature. and also provided with a token
-> (generic io_uring token, aka user_data, specified at submission and
-> returned in an CQE), which may be used to pass a userspace pointer used
-> as a context.
->
-> Besides running BPF programs, they are able to request waiting.
-> Currently it supports CQ waiting for a number of completions, but others
-> might be added and/or needed, e.g. futex and/or requeueing the current
-> BPF request onto an io_uring request/link being submitted. That hides
-> the overhead of creating BPF requests by keeping them alive and
-> invoking multiple times.
->
-> Another big chunk solved is figuring out a good way of feeding CQEs
-> (potentially many) to a BPF program. The current approach
-> is to enable multiple completion queues (CQ), and specify for each
-> request to which one steer its CQE, so all the synchronisation
-> is in control of the userspace. For instance, there may be a separate
-> CQ per each in-flight BPF request, and they can work with their own
-> queues and send an CQE to the main CQ so notifying the userspace.
-> It also opens up a notification-like sync through CQE posting to
-> neighbours' CQs.
->
->
-> --
-> Pavel Begunkov
