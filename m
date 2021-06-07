@@ -2,125 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96945C47094
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 19:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EBFC47082
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 23:31:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E3ED61182
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 19:34:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5885761182
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 23:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230351AbhFGTgA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 15:36:00 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:57162 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230311AbhFGTgA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 15:36:00 -0400
-Received: by linux.microsoft.com (Postfix, from userid 1004)
-        id A309520B83D0; Mon,  7 Jun 2021 12:34:08 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A309520B83D0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-        s=default; t=1623094448;
-        bh=VpnHUDEF9AccYFVvo2kPdN3Gw49CLQLaBsY8vvbjUiE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=h5kY0IfDu/+yWnaNaPR06Olpy3SnlNiBe8Z3xnHkElkxK+AeXv96uQkybYBy/evCq
-         t41YBxDCKP353h1RxPB+wBWMrQo+Hdz22+nPGX1OIoNqgPM+lovPm+dbdxAR+2PPFc
-         rUor92gL2HyqnyW4b0CTQnBCRP0F0/YiDp2d5gVM=
-From:   longli@linuxonhyperv.com
-To:     linux-block@vger.kernel.org
-Cc:     Long Li <longli@microsoft.com>, Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: [Patch v3] block: return the correct bvec when checking for gaps
-Date:   Mon,  7 Jun 2021 12:34:05 -0700
-Message-Id: <1623094445-22332-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S230398AbhFGXc4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 19:32:56 -0400
+Received: from mga01.intel.com ([192.55.52.88]:59145 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230251AbhFGXcz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Jun 2021 19:32:55 -0400
+IronPort-SDR: 5eKMecSBd5JDeb7E6vJ5U+TBZSmMsMe/aHWOAsNPDwkHkgU6D49ruZu0t6I51Jx+sal8hIakTz
+ 7X0bLTItH61w==
+X-IronPort-AV: E=McAfee;i="6200,9189,10008"; a="226076483"
+X-IronPort-AV: E=Sophos;i="5.83,256,1616482800"; 
+   d="scan'208";a="226076483"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2021 16:31:03 -0700
+IronPort-SDR: W3dspCDkbCxzCDbE4kaCmB4/JnDzW5+/WmymGvff2AqghGNL1jAlcNvGlBg8Dfu9NFjHGx+iW/
+ LSQyds8najVA==
+X-IronPort-AV: E=Sophos;i="5.83,256,1616482800"; 
+   d="scan'208";a="449288977"
+Received: from dwillia2-desk3.jf.intel.com (HELO dwillia2-desk3.amr.corp.intel.com) ([10.54.39.25])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2021 16:31:03 -0700
+Subject: [PATCH] libnvdimm/pmem: Fix blk_cleanup_disk() usage
+From:   Dan Williams <dan.j.williams@intel.com>
+To:     axboe@kernel.dk
+Cc:     Sachin Sant <sachinp@linux.vnet.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>, nvdimm@lists.linux.dev,
+        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Date:   Mon, 07 Jun 2021 16:31:02 -0700
+Message-ID: <162310861219.1571453.6561642225122047071.stgit@dwillia2-desk3.amr.corp.intel.com>
+User-Agent: StGit/0.18-3-g996c
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Long Li <longli@microsoft.com>
+The queue_to_disk() helper can not be used after del_gendisk()
+communicate @disk via the pgmap->owner.
 
-After commit 07173c3ec276 ("block: enable multipage bvecs"), a bvec can
-have multiple pages. But bio_will_gap() still assumes one page bvec while
-checking for merging. If the pages in the bvec go across the
-seg_boundary_mask, this check for merging can potentially succeed if only
-the 1st page is tested, and can fail if all the pages are tested.
-
-Later, when SCSI builds the SG list the same check for merging is done in
-__blk_segment_map_sg_merge() with all the pages in the bvec tested. This
-time the check may fail if the pages in bvec go across the
-seg_boundary_mask (but tested okay in bio_will_gap() earlier, so those
-BIOs were merged). If this check fails, we end up with a broken SG list
-for drivers assuming the SG list not having offsets in intermediate pages.
-This results in incorrect pages written to the disk.
-
-Fix this by returning the multi-page bvec when testing gaps for merging.
-
+Reported-by: Sachin Sant <sachinp@linux.vnet.ibm.com>
+Fixes: 87eb73b2ca7c ("nvdimm-pmem: convert to blk_alloc_disk/blk_cleanup_disk")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
 Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-Fixes: 07173c3ec276 ("block: enable multipage bvecs")
-Signed-off-by: Long Li <longli@microsoft.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
-Changes
-v2: added commit details on how data corruption happens
-v3: reorganized the code/comments in bio_get_last_bvec
+Jens,
 
- include/linux/bio.h | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+Please take or fold this into your tree after Sachin has a chance
+to test it out. It's passing my tests.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index a0b4cfdf62a4..d2b98efb5cc5 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -44,9 +44,6 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
- #define bio_offset(bio)		bio_iter_offset((bio), (bio)->bi_iter)
- #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
- 
--#define bio_multiple_segments(bio)				\
--	((bio)->bi_iter.bi_size != bio_iovec(bio).bv_len)
--
- #define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
- #define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors((iter)))
- 
-@@ -271,7 +268,7 @@ static inline void bio_clear_flag(struct bio *bio, unsigned int bit)
- 
- static inline void bio_get_first_bvec(struct bio *bio, struct bio_vec *bv)
+ drivers/nvdimm/pmem.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 31f3c4bd6f72..fc6b78dd2d24 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -337,8 +337,9 @@ static void pmem_pagemap_cleanup(struct dev_pagemap *pgmap)
  {
--	*bv = bio_iovec(bio);
-+	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+ 	struct request_queue *q =
+ 		container_of(pgmap->ref, struct request_queue, q_usage_counter);
++	struct pmem_device *pmem = pgmap->owner;
+ 
+-	blk_cleanup_disk(queue_to_disk(q));
++	blk_cleanup_disk(pmem->disk);
  }
  
- static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
-@@ -279,10 +276,9 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
- 	struct bvec_iter iter = bio->bi_iter;
- 	int idx;
+ static void pmem_release_queue(void *pgmap)
+@@ -427,6 +428,7 @@ static int pmem_attach_disk(struct device *dev,
+ 	q = disk->queue;
  
--	if (unlikely(!bio_multiple_segments(bio))) {
--		*bv = bio_iovec(bio);
--		return;
--	}
-+	bio_get_first_bvec(bio, bv);
-+	if (bv->bv_len == bio->bi_iter.bi_size)
-+		return;		/* this bio only has a single bvec */
- 
- 	bio_advance_iter(bio, &iter, iter.bi_size);
- 
--- 
-2.17.1
+ 	pmem->disk = disk;
++	pmem->pgmap.owner = pmem;
+ 	pmem->pfn_flags = PFN_DEV;
+ 	pmem->pgmap.ref = &q->q_usage_counter;
+ 	if (is_nd_pfn(dev)) {
 
