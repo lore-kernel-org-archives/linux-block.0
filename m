@@ -2,77 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B3BC4743F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 03:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0227C4743F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 04:43:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C77661209
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 03:39:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B059861242
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 04:43:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbhFGDlW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Jun 2021 23:41:22 -0400
-Received: from m12-17.163.com ([220.181.12.17]:49769 "EHLO m12-17.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230222AbhFGDlV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 6 Jun 2021 23:41:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=8bb3/
-        arATzshbVOCtIxpXZ1GbxdUXtfBuqWkUCoYffo=; b=Zaoa843o6bRryKQo8nAyv
-        qW0XTiNxnpB8CJI6hDi+STOIA2juy8w60fG61cnKEl56nRPKHKV8yws4LiPqcg1C
-        1ecisFq18akctQYJ3JUjWmgtIhN3F+TDhNaeRzuvXguCIAuosXkKvhroCnok/rZ4
-        oT+HxSPV5ItJ7D/TcioRJ4=
-Received: from localhost.localdomain (unknown [218.17.89.92])
-        by smtp13 (Coremail) with SMTP id EcCowADn7IzrlL1gn+GC5w--.44105S2;
-        Mon, 07 Jun 2021 11:39:24 +0800 (CST)
-From:   lijian_8010a29@163.com
-To:     viro@zeniv.linux.org.uk, axboe@kernel.dk
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lijian <lijian@yulong.com>
-Subject: [PATCH] fs: block_dev: Fix a typo
-Date:   Mon,  7 Jun 2021 11:38:26 +0800
-Message-Id: <20210607033826.127596-1-lijian_8010a29@163.com>
-X-Mailer: git-send-email 2.25.1
+        id S229923AbhFGEpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 00:45:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36164 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229470AbhFGEpF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 00:45:05 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBDC4C061787
+        for <linux-block@vger.kernel.org>; Sun,  6 Jun 2021 21:43:14 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id x10so7953554plg.3
+        for <linux-block@vger.kernel.org>; Sun, 06 Jun 2021 21:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CRj471fcopWwQDLwVjladgw5/TWtqNQ37b4ozfCN7s8=;
+        b=mUwrryrMK2/51rlcR19uFKtt3Uz+vhowS1qfTyT3U4jbSFAWkNWauh6vZ1LO5VmIVs
+         5ECi3fnIpqEf7SJMnMZB8oq3crwKNTWITd/ZeOFm876BQIrYAX3u/vNdV2CgZCK01tkz
+         C8YU7ud0HQKax1RxO59EYt6KRwvWGHRSNo9PWsgDov28KfdcU8hcxJqxXgxw+nPdjo7K
+         342fva71vreSrrP8Kmd82X7Kbm8YcsSnvq3hNSryExEQqxyEuVJkiKabNqk+zLsUk8un
+         QX0WKhwpmqtVabr66aXRDGAcLJ6aoyf/DzL3OqIqE10TWaZPFDhN5OQPz3qcG9KZwqa3
+         ZqZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CRj471fcopWwQDLwVjladgw5/TWtqNQ37b4ozfCN7s8=;
+        b=hN2IB9A1tlHZ7riHLfEridrMRXu80tSVq4ikxheRXo2TkSC3mP3u7WfjJxFWcSxQZ7
+         /d4CSzXctI+DcFtPvJRdK+j8ScLRtz165EW7/99x/UYTpYPeib3VDz7Q1o2KiTgN279B
+         O6ZgS6TAHjF8xCFAmX0fxusDp72mHX0u0JbSgB6mBrivHo185dATPWBvq6gDPEno9tzc
+         6cSNA15nmCullPH0FvT75tOcQ9qKLIz018eN6oBwvBr73V2FlPjXXUOuPoI9F8MXGMzh
+         MkXvYwLLv8ucwTIeV1icJVMgUeUarM1K2cGKF8pSkTPRjGR70K0yKUAUed5tmBQuTYky
+         W7zQ==
+X-Gm-Message-State: AOAM531L6KauL70lEZTEeL8ev2DK7TfoqBPz5bahqpeWTbInlflrO+3Q
+        kcLsM53Bl5hzpDtzpLjwsuSPKnG4q27UlwGpPm+NNQ==
+X-Google-Smtp-Source: ABdhPJylkfr3HkdoqNF9xRMFqCn7oO5cpDCL+nuDgN1ppB6ZETr18hlSAOgBmuySRxZfODa5nUP7K4JpxKKLUl+WZPE=
+X-Received: by 2002:a17:902:f1cb:b029:10c:5c6d:88b with SMTP id
+ e11-20020a170902f1cbb029010c5c6d088bmr16307416plc.52.1623040994149; Sun, 06
+ Jun 2021 21:43:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: EcCowADn7IzrlL1gn+GC5w--.44105S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7XF18ZrWUGrWDtFy5GFy7Awb_yoWxZFb_Xa
-        18ZrWkuw4xAw4ruw45Cr1avr1ktr92yrWayFnrJF95uryUWayfXFWDJ3yjvFn8WayUuas8
-        ZFWrurW5Cr1kKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUnPDGUUUUUU==
-X-Originating-IP: [218.17.89.92]
-X-CM-SenderInfo: 5olmxttqbyiikqdsmqqrwthudrp/1tbiqwyqUFUMZuZjpgAAsB
+References: <20210521055116.1053587-1-hch@lst.de> <20210521055116.1053587-18-hch@lst.de>
+In-Reply-To: <20210521055116.1053587-18-hch@lst.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Sun, 6 Jun 2021 21:43:03 -0700
+Message-ID: <CAPcyv4gFEbZH4sXbkvQ32Xv1HiZ6JPL04efGpAWCqaJP_X9jaA@mail.gmail.com>
+Subject: Re: [PATCH 17/26] nvdimm-pmem: convert to blk_alloc_disk/blk_cleanup_disk
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jim Paris <jim@jtan.com>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Matias Bjorling <mb@lightnvm.io>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-block@vger.kernel.org,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-m68k@lists.linux-m68k.org, linux-xtensa@linux-xtensa.org,
+        drbd-dev@lists.linbit.com,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-bcache@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-mmc@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-nvme@lists.infradead.org,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Sachin Sant <sachinp@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: lijian <lijian@yulong.com>
+[ add Sachin who reported this commit in -next ]
 
-Change 'beeing' to 'being'.
+On Thu, May 20, 2021 at 10:52 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Convert the nvdimm-pmem driver to use the blk_alloc_disk and
+> blk_cleanup_disk helpers to simplify gendisk and request_queue
+> allocation.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/nvdimm/pmem.c | 15 +++++----------
+>  1 file changed, 5 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+> index 968b8483c763..9fcd05084564 100644
+> --- a/drivers/nvdimm/pmem.c
+> +++ b/drivers/nvdimm/pmem.c
+> @@ -338,7 +338,7 @@ static void pmem_pagemap_cleanup(struct dev_pagemap *pgmap)
+>         struct request_queue *q =
+>                 container_of(pgmap->ref, struct request_queue, q_usage_counter);
+>
+> -       blk_cleanup_queue(q);
+> +       blk_cleanup_disk(queue_to_disk(q));
 
-Signed-off-by: lijian <lijian@yulong.com>
----
- fs/block_dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b8abccd03e5d..b696be2c8eb4 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -935,7 +935,7 @@ static struct block_device *bdget(dev_t dev)
-  * @bdev:	Block device to grab a reference to.
-  *
-  * Returns the block_device with an additional reference when successful,
-- * or NULL if the inode is already beeing freed.
-+ * or NULL if the inode is already being freed.
-  */
- struct block_device *bdgrab(struct block_device *bdev)
- {
--- 
-2.25.1
-
-
+This is broken. This comes after del_gendisk() which means the queue
+device is no longer associated with its disk parent. Perhaps @pmem
+could be stashed in pgmap->owner and then this can use pmem->disk? Not
+see any other readily available ways to get back to the disk from here
+after del_gendisk().
