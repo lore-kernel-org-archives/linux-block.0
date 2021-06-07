@@ -2,154 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F288AC47082
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC43C47082
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:41:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1E22610A8
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:26:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 054046120F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:41:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230289AbhFGL2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 07:28:15 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:53620 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230139AbhFGL2O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 07:28:14 -0400
+        id S231614AbhFGLnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 07:43:19 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:36668 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230463AbhFGLnS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 07:43:18 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 424941FDA1;
-        Mon,  7 Jun 2021 11:26:22 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTP id 39EA521A93;
+        Mon,  7 Jun 2021 11:41:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1623065182; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=VYk3TJrFrr+lHEsnNaXKyTcVO01puS4pzK82H1hP8Tw=;
-        b=GtVhp/vFPwT52Kmu+aPd9eUXBqVx470QHrSFr3Wi+GEZ4FCFJWVORVIBAcEzJLNj+2QjT9
-        4ICAkXJAN1LpLPfJM1sa+kL57D5J9WTx8A9CHPQXo49ZqnZNtv/lRRFtiYhDN5EhNzfCq3
-        0LRSSXJEPF0tOKA0B01zZXmf7E9fVQ0=
+        t=1623066087; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y1p34XXNGh13rgcmV89i0Hv1PANOTcFOPO8k8eP1M4Y=;
+        b=SHkREpPwnPLgvg4Hr1PyJ8+pT6ZSTMXxkT2yuB8OK+6Ut/3Gpn56H8lPU2gcIf5t5pFPS/
+        3oZ2ayP4XrTlHYgHO0KftMfpb9LaVNCXzQvkZpCB4DkCrBSVyGD5BDc2sNj9o/czg/lzJw
+        NGwY0paYWx+leJTIGJbB2ytQhFCGcaQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1623065182;
+        s=susede2_ed25519; t=1623066087;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=VYk3TJrFrr+lHEsnNaXKyTcVO01puS4pzK82H1hP8Tw=;
-        b=dQ6YM3Z4cmOR6ltwqi03dwdE5E99vYpusbf9kaQpvz+4gE86FCNrHCkhd5w6Tli4wE8dKT
-        hjFokvOd0L1+CzAQ==
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y1p34XXNGh13rgcmV89i0Hv1PANOTcFOPO8k8eP1M4Y=;
+        b=BNu3OcxPPM6wI9r7VyWpHjeqymUvNelFDLsR21xhARu1mXX/B3RcYq5IEwcspHKuKJKcMQ
+        HIhQluYwS94zOQAw==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 1FC8CA3B8F;
-        Mon,  7 Jun 2021 11:26:22 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 2E3F3A3B8A;
+        Mon,  7 Jun 2021 11:41:27 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id EA0041F2CA8; Mon,  7 Jun 2021 13:26:21 +0200 (CEST)
+        id 0CE5A1F2CA8; Mon,  7 Jun 2021 13:41:27 +0200 (CEST)
+Date:   Mon, 7 Jun 2021 13:41:27 +0200
 From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        Oleg Nesterov <oleg@redhat.com>, <linux-block@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, stable@vger.kernel.org
-Subject: [PATCH] rq-qos: fix missed wake-ups in rq_qos_throttle try two
-Date:   Mon,  7 Jun 2021 13:26:13 +0200
-Message-Id: <20210607112613.25344-1-jack@suse.cz>
-X-Mailer: git-send-email 2.26.2
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH v2] block: Do not pull requests from the scheduler when
+ we cannot dispatch them
+Message-ID: <20210607114127.GG30275@quack2.suse.cz>
+References: <20210603104721.6309-1-jack@suse.cz>
+ <42e2e0f1-acf4-a5eb-2c3e-cb20706430a4@suse.de>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3920; h=from:subject; bh=fVXFw/MPglpM4nIVTV3vrCGL71nEBjBfatViHSO0Twk=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBgvgI4xJ4VX6B/zfqu0DwwCGSIJ4HtDmC9bPIi4utp 9qbVMQ2JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYL4COAAKCRCcnaoHP2RA2UFtCA CZLfOIqozkfUq3czdJfH7X/W2qfZMe8w7UPsLc08wmzjHDvEqsQ461QekrEvLMOitphVA/MOS+NWbI OLL0RO9N5mpLUrLWFIIPXXSvOtLLUF/jXuMZqfX/V6MeYEAuxQmB0jgQ/4GPW16jSnjbmLbp2nwOmA z4L9KZUbNdjpsFmY3udg6kITd1sbxJo6yCnXGkMLExJo4czOMkg2ElpDo48ub2lNCzzzYVzkz8of/s V7HdD42hAziQUHe1Pzw4ZtilR+xX9Zs+QaQL9GyrtPNHI5/pXenaeOSzLazQN1CC4ulQTu3mYn02hu tDdVw7v6RCdIazDkpTG3M+iapVUBZD
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42e2e0f1-acf4-a5eb-2c3e-cb20706430a4@suse.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 545fbd0775ba ("rq-qos: fix missed wake-ups in rq_qos_throttle")
-tried to fix a problem that a process could be sleeping in rq_qos_wait()
-without anyone to wake it up. However the fix is not complete and the
-following can still happen:
+On Mon 07-06-21 12:05:52, Hannes Reinecke wrote:
+> On 6/3/21 12:47 PM, Jan Kara wrote:
+> > Provided the device driver does not implement dispatch budget accounting
+> > (which only SCSI does) the loop in __blk_mq_do_dispatch_sched() pulls
+> > requests from the IO scheduler as long as it is willing to give out any.
+> > That defeats scheduling heuristics inside the scheduler by creating
+> > false impression that the device can take more IO when it in fact
+> > cannot.
+> > 
+> > For example with BFQ IO scheduler on top of virtio-blk device setting
+> > blkio cgroup weight has barely any impact on observed throughput of
+> > async IO because __blk_mq_do_dispatch_sched() always sucks out all the
+> > IO queued in BFQ. BFQ first submits IO from higher weight cgroups but
+> > when that is all dispatched, it will give out IO of lower weight cgroups
+> > as well. And then we have to wait for all this IO to be dispatched to
+> > the disk (which means lot of it actually has to complete) before the
+> > IO scheduler is queried again for dispatching more requests. This
+> > completely destroys any service differentiation.
+> > 
+> > So grab request tag for a request pulled out of the IO scheduler already
+> > in __blk_mq_do_dispatch_sched() and do not pull any more requests if we
+> > cannot get it because we are unlikely to be able to dispatch it. That
+> > way only single request is going to wait in the dispatch list for some
+> > tag to free.
+> > 
+> > Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
+> >  block/blk-mq-sched.c | 12 +++++++++++-
+> >  block/blk-mq.c       |  2 +-
+> >  block/blk-mq.h       |  2 ++
+> >  3 files changed, 14 insertions(+), 2 deletions(-)
+> > 
+> > Jens, can you please merge the patch? Thanks!
+> > 
+> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> > index 996a4b2f73aa..714e678f516a 100644
+> > --- a/block/blk-mq-sched.c
+> > +++ b/block/blk-mq-sched.c
+> > @@ -168,9 +168,19 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >  		 * in blk_mq_dispatch_rq_list().
+> >  		 */
+> >  		list_add_tail(&rq->queuelist, &rq_list);
+> > +		count++;
+> >  		if (rq->mq_hctx != hctx)
+> >  			multi_hctxs = true;
+> > -	} while (++count < max_dispatch);
+> > +
+> > +		/*
+> > +		 * If we cannot get tag for the request, stop dequeueing
+> > +		 * requests from the IO scheduler. We are unlikely to be able
+> > +		 * to submit them anyway and it creates false impression for
+> > +		 * scheduling heuristics that the device can take more IO.
+> > +		 */
+> > +		if (!blk_mq_get_driver_tag(rq))
+> > +			break;
+> > +	} while (count < max_dispatch);
+> >  
+> >  	if (!count) {
+> >  		if (run_queue)
+> 
+> Doesn't this lead to a double accounting of the allocated tags?
+> From what I can see we don't really check if the tag is already
+> allocated in blk_mq_get_driver_tag() ...
 
-CPU1 (waiter1)		CPU2 (waiter2)		CPU3 (waker)
-rq_qos_wait()		rq_qos_wait()
-  acquire_inflight_cb() -> fails
-			  acquire_inflight_cb() -> fails
+I think we do check. blk_mq_get_driver_tag() has:
 
-						completes IOs, inflight
-						  decreased
-  prepare_to_wait_exclusive()
-			  prepare_to_wait_exclusive()
-  has_sleeper = !wq_has_single_sleeper() -> true as there are two sleepers
-			  has_sleeper = !wq_has_single_sleeper() -> true
-  io_schedule()		  io_schedule()
+        if (rq->tag == BLK_MQ_NO_TAG && !__blk_mq_get_driver_tag(rq))
+                return false;
 
-Deadlock as now there's nobody to wakeup the two waiters. The logic
-automatically blocking when there are already sleepers is really subtle
-and the only way to make it work reliably is that we check whether there
-are some waiters in the queue when adding ourselves there. That way, we
-are guaranteed that at least the first process to enter the wait queue
-will recheck the waiting condition before going to sleep and thus
-guarantee forward progress.
-
-Fixes: 545fbd0775ba ("rq-qos: fix missed wake-ups in rq_qos_throttle")
-CC: stable@vger.kernel.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/blk-rq-qos.c   | 4 ++--
- include/linux/wait.h | 2 +-
- kernel/sched/wait.c  | 9 +++++++--
- 3 files changed, 10 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 656460636ad3..e83af7bc7591 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -266,8 +266,8 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 	if (!has_sleeper && acquire_inflight_cb(rqw, private_data))
- 		return;
+        if ((hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) &&
+                        !(rq->rq_flags & RQF_MQ_INFLIGHT)) {
+                rq->rq_flags |= RQF_MQ_INFLIGHT;
+                __blk_mq_inc_active_requests(hctx);
+        }
+        hctx->tags->rqs[rq->tag] = rq;
  
--	prepare_to_wait_exclusive(&rqw->wait, &data.wq, TASK_UNINTERRUPTIBLE);
--	has_sleeper = !wq_has_single_sleeper(&rqw->wait);
-+	has_sleeper = !prepare_to_wait_exclusive(&rqw->wait, &data.wq,
-+						 TASK_UNINTERRUPTIBLE);
- 	do {
- 		/* The memory barrier in set_task_state saves us here. */
- 		if (data.got_token)
-diff --git a/include/linux/wait.h b/include/linux/wait.h
-index fe10e8570a52..6598ae35e1b5 100644
---- a/include/linux/wait.h
-+++ b/include/linux/wait.h
-@@ -1136,7 +1136,7 @@ do {										\
-  * Waitqueues which are removed from the waitqueue_head at wakeup time
-  */
- void prepare_to_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state);
--void prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state);
-+bool prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state);
- long prepare_to_wait_event(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state);
- void finish_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry);
- long wait_woken(struct wait_queue_entry *wq_entry, unsigned mode, long timeout);
-diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
-index 183cc6ae68a6..76577d1642a5 100644
---- a/kernel/sched/wait.c
-+++ b/kernel/sched/wait.c
-@@ -264,17 +264,22 @@ prepare_to_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_ent
- }
- EXPORT_SYMBOL(prepare_to_wait);
- 
--void
-+/* Returns true if we are the first waiter in the queue, false otherwise. */
-+bool
- prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
- {
- 	unsigned long flags;
-+	bool was_empty = false;
- 
- 	wq_entry->flags |= WQ_FLAG_EXCLUSIVE;
- 	spin_lock_irqsave(&wq_head->lock, flags);
--	if (list_empty(&wq_entry->entry))
-+	if (list_empty(&wq_entry->entry)) {
-+		was_empty = list_empty(&wq_head->head);
- 		__add_wait_queue_entry_tail(wq_head, wq_entry);
-+	}
- 	set_current_state(state);
- 	spin_unlock_irqrestore(&wq_head->lock, flags);
-+	return was_empty;
- }
- EXPORT_SYMBOL(prepare_to_wait_exclusive);
- 
+So once we call it, rq->tag will be != BLK_MQ_NO_TAG and RQF_MQ_INFLIGHT
+will be set. So neither __blk_mq_get_driver_tag() nor
+__blk_mq_inc_active_requests() will get repeated.
+
+								Honza
 -- 
-2.26.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
