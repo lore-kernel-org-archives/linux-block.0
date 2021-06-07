@@ -2,262 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FD3C47095
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 12:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04EA3C47094
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 13:07:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D2AC61208
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 12:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D055C60FDA
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 13:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230409AbhFGMxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 08:53:52 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:36162 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230242AbhFGMxv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 08:53:51 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 913B01FDA5;
-        Mon,  7 Jun 2021 12:51:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623070318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        id S230127AbhFGNJN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 09:09:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22290 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230145AbhFGNJN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Jun 2021 09:09:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623071241;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=XBQr6H8ri4vWm9Xy7iNag9IvGXyic7/DyTx09M050lo=;
-        b=nPT5l+P/2jV4efxRb4D1EUFUabSV1XNGHM8oYfxKKiCVbS+hmK5xzcjw+IfFO8WLP7qYYJ
-        AtMQIf/RA88zmlcaIUd9P04M/N5LrHrO2DnTuXCeKV20yIeDVVr/vC91v3GhvNyENsvP33
-        x45mxQ2IsZS7V03JTBvs2UbDS1iUseo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623070318;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XBQr6H8ri4vWm9Xy7iNag9IvGXyic7/DyTx09M050lo=;
-        b=3aDoVIqDVJa7S1/HyEyMc5ZcirLobfVBQoAzqN/JO9yn+5whthRfyuMT7QAAQR+ahKfUMk
-        dU/xukskVJa3QfCA==
-Received: from localhost.localdomain (unknown [10.163.16.22])
-        by relay2.suse.de (Postfix) with ESMTP id 6DD21A3B92;
-        Mon,  7 Jun 2021 12:51:40 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de, Coly Li <colyli@suse.de>,
-        Alexander Ullrich <ealex1979@gmail.com>,
-        Diego Ercolani <diego.ercolani@gmail.com>,
-        Jan Szubiak <jan.szubiak@linuxpolska.pl>,
-        Marco Rebhan <me@dblsaiko.net>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        Victor Westerhuis <victor@westerhu.is>,
-        Vojtech Pavlik <vojtech@suse.cz>,
-        Rolf Fokkens <rolf@rolffokkens.nl>,
-        Thorsten Knabe <linux@thorsten-knabe.de>,
-        stable@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Nix <nix@esperi.org.uk>, Takashi Iwai <tiwai@suse.com>
-Subject: [PATCH 2/2] bcache: avoid oversized read request in cache missing code path
-Date:   Mon,  7 Jun 2021 20:50:52 +0800
-Message-Id: <20210607125052.21277-3-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210607125052.21277-1-colyli@suse.de>
-References: <20210607125052.21277-1-colyli@suse.de>
+        bh=VX9AapVWbvG4dPoiFZct8u8sifqhhNzwplReUpf1Qp8=;
+        b=TIw1hHnzZfOa85IrZ+RgqtGHhR2c9hlK+Va8qT/jYvqFIw/LHKiNyXMiDtDRG6juw8n1RW
+        +jjxHS8WytDRuYiszokRIewDiReRiFvMYMZbTpW0UgYCFCyvY16fo7BinoCnDsi3hte33J
+        TbOfs1LdIM0hBkJ6dJlhJS6N3PChMiU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-0zlwCBJ9OWGAX_w4jN6uYA-1; Mon, 07 Jun 2021 09:07:20 -0400
+X-MC-Unique: 0zlwCBJ9OWGAX_w4jN6uYA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFEAC802939;
+        Mon,  7 Jun 2021 13:07:18 +0000 (UTC)
+Received: from T590 (ovpn-13-182.pek2.redhat.com [10.72.13.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6416419C66;
+        Mon,  7 Jun 2021 13:07:13 +0000 (UTC)
+Date:   Mon, 7 Jun 2021 21:07:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Wang Shanker <shankerwangmiao@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: [Bug Report] Discard bios cannot be correctly merged in blk-mq
+Message-ID: <YL4Z/QJCKc0NCV5L@T590>
+References: <85F98DA6-FB28-4C1F-A47D-C410A7C22A3D@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <85F98DA6-FB28-4C1F-A47D-C410A7C22A3D@gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the cache missing code path of cached device, if a proper location
-from the internal B+ tree is matched for a cache miss range, function
-cached_dev_cache_miss() will be called in cache_lookup_fn() in the
-following code block,
-[code block 1]
-  526         unsigned int sectors = KEY_INODE(k) == s->iop.inode
-  527                 ? min_t(uint64_t, INT_MAX,
-  528                         KEY_START(k) - bio->bi_iter.bi_sector)
-  529                 : INT_MAX;
-  530         int ret = s->d->cache_miss(b, s, bio, sectors);
+On Sun, Jun 06, 2021 at 04:54:09AM +0800, Wang Shanker wrote:
+> Hi, all
+> 
+> I'm writing to report my recent findings about the handling of discard 
+> operations. As indicated by a few tests, discard operation cannot be 
+> correctly merged, which leads to poor performance of RAID456 on discard
+> requests. I'm not quite familiar with block subsystem, so please correct
+> me if there are any mistakes in the following analysis.
+> 
+> In blk_discard_mergable(), we can see the handling of merging discard 
+> operations goes through different processes, decided by whether we have
+> more than one queue_max_discard_segments. If the device requires the 
+> sectors should be contiguous in one discard operation, the merging process
+> will be the same as that for normal read/write operations. Otherwise, 
+> bio_attempt_discard_merge will try to merge as many bios as the device
+> allows, ignoring the contiguity. Sadly, for both cases, there are problems.
+> 
+> For devices requiring contiguous sector ranges(such as scsi disks), 
+> bio_attempt_front_merge() or bio_attempt_back_merge() will be handling 
+> the merging process, and both control flows will arrive at 
+> ll_new_hw_segment(), where the following statement:
+> 
+>     req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req)
+> 
+> can never be true, since blk_rq_get_max_segments(req) will always be 1.
+> As a result, no discard operations shall be merged.
 
-Here s->d->cache_miss() is the call backfunction pointer initialized as
-cached_dev_cache_miss(), the last parameter 'sectors' is an important
-hint to calculate the size of read request to backing device of the
-missing cache data.
+OK, that looks a bug, and the following change may fix the issue:
 
-Current calculation in above code block may generate oversized value of
-'sectors', which consequently may trigger 2 different potential kernel
-panics by BUG() or BUG_ON() as listed below,
-
-1) BUG_ON() inside bch_btree_insert_key(),
-[code block 2]
-   886         BUG_ON(b->ops->is_extents && !KEY_SIZE(k));
-2) BUG() inside biovec_slab(),
-[code block 3]
-   51         default:
-   52                 BUG();
-   53                 return NULL;
-
-All the above panics are original from cached_dev_cache_miss() by the
-oversized parameter 'sectors'.
-
-Inside cached_dev_cache_miss(), parameter 'sectors' is used to calculate
-the size of data read from backing device for the cache missing. This
-size is stored in s->insert_bio_sectors by the following lines of code,
-[code block 4]
-  909    s->insert_bio_sectors = min(sectors, bio_sectors(bio) + reada);
-
-Then the actual key inserting to the internal B+ tree is generated and
-stored in s->iop.replace_key by the following lines of code,
-[code block 5]
-  911   s->iop.replace_key = KEY(s->iop.inode,
-  912                    bio->bi_iter.bi_sector + s->insert_bio_sectors,
-  913                    s->insert_bio_sectors);
-The oversized parameter 'sectors' may trigger panic 1) by BUG_ON() from
-the above code block.
-
-And the bio sending to backing device for the missing data is allocated
-with hint from s->insert_bio_sectors by the following lines of code,
-[code block 6]
-  926    cache_bio = bio_alloc_bioset(GFP_NOWAIT,
-  927                 DIV_ROUND_UP(s->insert_bio_sectors, PAGE_SECTORS),
-  928                 &dc->disk.bio_split);
-The oversized parameter 'sectors' may trigger panic 2) by BUG() from the
-agove code block.
-
-Now let me explain how the panics happen with the oversized 'sectors'.
-In code block 5, replace_key is generated by macro KEY(). From the
-definition of macro KEY(),
-[code block 7]
-  71 #define KEY(inode, offset, size)                                  \
-  72 ((struct bkey) {                                                  \
-  73      .high = (1ULL << 63) | ((__u64) (size) << 20) | (inode),     \
-  74      .low = (offset)                                              \
-  75 })
-
-Here 'size' is 16bits width embedded in 64bits member 'high' of struct
-bkey. But in code block 1, if "KEY_START(k) - bio->bi_iter.bi_sector" is
-very probably to be larger than (1<<16) - 1, which makes the bkey size
-calculation in code block 5 is overflowed. In one bug report the value
-of parameter 'sectors' is 131072 (= 1 << 17), the overflowed 'sectors'
-results the overflowed s->insert_bio_sectors in code block 4, then makes
-size field of s->iop.replace_key to be 0 in code block 5. Then the 0-
-sized s->iop.replace_key is inserted into the internal B+ tree as cache
-missing check key (a special key to detect and avoid a racing between
-normal write request and cache missing read request) as,
-[code block 8]
-  915   ret = bch_btree_insert_check_key(b, &s->op, &s->iop.replace_key);
-
-Then the 0-sized s->iop.replace_key as 3rd parameter triggers the bkey
-size check BUG_ON() in code block 2, and causes the kernel panic 1).
-
-Another kernel panic is from code block 6, is by the bvecs number
-oversized value s->insert_bio_sectors from code block 4,
-        min(sectors, bio_sectors(bio) + reada)
-There are two possibility for oversized reresult,
-- bio_sectors(bio) is valid, but bio_sectors(bio) + reada is oversized.
-- sectors < bio_sectors(bio) + reada, but sectors is oversized.
-
-From a bug report the result of "DIV_ROUND_UP(s->insert_bio_sectors,
-PAGE_SECTORS)" from code block 6 can be 344, 282, 946, 342 and many
-other values which larther than BIO_MAX_VECS (a.k.a 256). When calling
-bio_alloc_bioset() with such larger-than-256 value as the 2nd parameter,
-this value will eventually be sent to biovec_slab() as parameter
-'nr_vecs' in following code path,
-   bio_alloc_bioset() ==> bvec_alloc() ==> biovec_slab()
-Because parameter 'nr_vecs' is larger-than-256 value, the panic by BUG()
-in code block 3 is triggered inside biovec_slab().
-
-From the above analysis, we know that the 4th parameter 'sector' sent
-into cached_dev_cache_miss() may cause overflow in code block 5 and 6,
-and finally cause kernel panic in code block 2 and 3. And if result of
-bio_sectors(bio) + reada exceeds valid bvecs number, it may also trigger
-kernel panic in code block 3 from code block 6.
-
-Now the almost-useless readahead size for cache missing request back to
-backing device is removed, this patch can fix the oversized issue with
-more simpler method.
-- add a local variable size_limit,  set it by the minimum value from
-  the max bkey size and max bio bvecs number.
-- set s->insert_bio_sectors by the minimum value from size_limit,
-  sectors, and the sectors size of bio.
-- replace sectors by s->insert_bio_sectors to do bio_next_split.
-
-By the above method with size_limit, s->insert_bio_sectors will never
-result oversized replace_key size or bio bvecs number. And split bio
-'miss' from bio_next_split() will always match the size of 'cache_bio',
-that is the current maximum bio size we can sent to backing device for
-fetching the cache missing data.
-
-Current problmatic code can be partially found since Linux v3.13-rc1,
-therefore all maintained stable kernels should try to apply this fix.
-
-Reported-by: Alexander Ullrich <ealex1979@gmail.com>
-Reported-by: Diego Ercolani <diego.ercolani@gmail.com>
-Reported-by: Jan Szubiak <jan.szubiak@linuxpolska.pl>
-Reported-by: Marco Rebhan <me@dblsaiko.net>
-Reported-by: Matthias Ferdinand <bcache@mfedv.net>
-Reported-by: Victor Westerhuis <victor@westerhu.is>
-Reported-by: Vojtech Pavlik <vojtech@suse.cz>
-Reported-and-tested-by: Rolf Fokkens <rolf@rolffokkens.nl>
-Reported-and-tested-by: Thorsten Knabe <linux@thorsten-knabe.de>
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: stable@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Takashi Iwai <tiwai@suse.com>
----
-Changelog,
-v6, Use BIO_MAX_VECS back and keep 80 chars line limit by request
-    from Christoph Hellwig.
-v5, improvement and fix based on v4 comments from Christoph Hellwig
-    and Nix.
-v4, not directly access BIO_MAX_VECS and reduce reada value to avoid
-    oversized bvecs number, by hint from Christoph Hellwig.
-v3, fix typo in v2.
-v2, fix the bypass bio size calculation in v1.
-v1, the initial version.
-
- drivers/md/bcache/request.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index ab8ff18df32a..6d1de889baeb 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -882,6 +882,7 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
- 	int ret = MAP_CONTINUE;
- 	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
- 	struct bio *miss, *cache_bio;
-+	unsigned int size_limit;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 4d97fb6dd226..65210e9a8efa 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -559,10 +559,14 @@ static inline unsigned int blk_rq_get_max_segments(struct request *rq)
+ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
+ 		unsigned int nr_phys_segs)
+ {
+-	if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
++	if (blk_integrity_merge_bio(req->q, req, bio) == false)
+ 		goto no_merge;
  
- 	s->cache_missed = 1;
+-	if (blk_integrity_merge_bio(req->q, req, bio) == false)
++	/* discard request merge won't add new segment */
++	if (req_op(req) == REQ_OP_DISCARD)
++		return 1;
++
++	if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
+ 		goto no_merge;
  
-@@ -891,7 +892,10 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
- 		goto out_submit;
- 	}
- 
--	s->insert_bio_sectors = min(sectors, bio_sectors(bio));
-+	/* Limitation for valid replace key size and cache_bio bvecs number */
-+	size_limit = min_t(unsigned int, BIO_MAX_VECS * PAGE_SECTORS,
-+			   (1 << KEY_SIZE_BITS) - 1);
-+	s->insert_bio_sectors = min3(size_limit, sectors, bio_sectors(bio));
- 
- 	s->iop.replace_key = KEY(s->iop.inode,
- 				 bio->bi_iter.bi_sector + s->insert_bio_sectors,
-@@ -903,7 +907,8 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
- 
- 	s->iop.replace = true;
- 
--	miss = bio_next_split(bio, sectors, GFP_NOIO, &s->d->bio_split);
-+	miss = bio_next_split(bio, s->insert_bio_sectors, GFP_NOIO,
-+			      &s->d->bio_split);
- 
- 	/* btree_search_recurse()'s btree iterator is no good anymore */
- 	ret = miss == bio ? MAP_DONE : -EINTR;
--- 
-2.26.2
+ 	/*
+
+> 
+> For devices supporting multiple segments of sector ranges, 
+> bio_attempt_discard_merge() will take over the process. Indeed it will merge
+> some bios. But how many bios can be merged into one request? In the 
+> implementation, the maximum number of bios is limited mainly by 
+> queue_max_discard_segments (also by blk_rq_get_max_sectors, but it's not where
+> the problem is). However, it is not the case, since bio_attempt_discard_merge
+> is not aware of the contiguity of bios. Suppose there are 20 contiguous bios.
+> They should be considered as only one segment instead 20 of them.
+
+Right, so far ELEVATOR_DISCARD_MERGE doesn't merge bios actually, but it
+can be supported without much difficulty.
+
+> 
+> You may wonder the importance of merging discard operations. In the 
+> implementation of RAID456, bios are committed in 4k trunks (they call
+> them as stripes in the code and the size is determined by DEFAULT_STRIPE_SIZE).
+> The proper merging of the bios is of vital importance for a reasonable 
+> operating performance of RAID456 devices. In fact, I met this problem
+> when attempting to create a raid5 volume on a bunch of Nvme SSDs enabling trim
+> support. Someone also reported similar issues in the linux-raid list
+> (https://www.spinics.net/lists/raid/msg62108.html). In that post, the author
+> reported that ``lots of small 4k discard requests that get merged into larger
+> 512k chunks submitted to devices". This can be explained by my above discovery
+> because nvme allows 128 segments at the maximum in a dsm instruction.
+> 
+> The above two scenarios can be reproduced utilizing latest QEMU, with emulated
+> scsi drives (for the first scenario) or nvme drives (for the second scenario)
+> and enabling the trace of scsi_disk_emulate_command_UNMAP or pci_nvme_dsm_deallocate.
+> The detailed process reproducing is as follows:
+> 
+> 1. create a rootfs (e.g. using debootstrap) under ./rootfs/ ;
+> 2. obtain a kernel image vmlinuz and generate a initramfs image initrd.img ;
+> 3. create 3 empty sparse disk images:
+>   # truncate -s 1T disk1 disk2 disk3
+> 4. using the following qemu command to start the guest vm (here 9p is used 
+>  as the rootfs because we don't want the io operations on the rootfs influence
+>  the debugging of the block layer of the guest vm)
+>   # qemu-system-x86_64 \
+>         -cpu kvm64 -machine pc,accel=kvm -smp cpus=2,cores=2,sockets=1 -m 2G  \
+>         -chardev stdio,mux=on,id=char0,signal=off  \
+>         -fsdev local,path=./rootfs,security_model=passthrough,id=rootfs \
+>         -device virtio-9p,fsdev=rootfs,mount_tag=rootfs \
+>         -monitor chardev:char0 \
+>         -device isa-serial,baudbase=1500000,chardev=char0,index=0,id=ttyS0  \
+>         -nographic \
+>         -kernel vmlinuz -initrd initrd.img  \
+>         -append 'root=rootfs rw rootfstype=9p rootflags=trans=virtio,msize=524288 console=ttyS0,1500000 nokaslr' \
+>         -blockdev driver=raw,node-name=nvme1,file.driver=file,file.filename=disk1 \
+>         -blockdev driver=raw,node-name=nvme2,file.driver=file,file.filename=disk2 \
+>         -blockdev driver=raw,node-name=nvme3,file.driver=file,file.filename=disk3 \
+>         -trace pci_nvme_dsm_deallocate,file=nvmetrace.log \
+>         -device nvme,drive=nvme1,logical_block_size=4096,discard_granularity=2097152,physical_block_size=4096,serial=NVME1 \
+>         -device nvme,drive=nvme2,logical_block_size=4096,discard_granularity=2097152,physical_block_size=4096,serial=NVME2 \
+>         -device nvme,drive=nvme3,logical_block_size=4096,discard_granularity=2097152,physical_block_size=4096,serial=NVME3
+> 5. enable trim support of the raid456 module:
+>   # modprobe raid456
+>   # echo Y > /sys/module/raid456/parameters/devices_handle_discard_safely
+> 6. using mdaam to create a raid5 device in the guest vm:
+>   # mdadm --create --level=5 --raid-devices=3 /dev/md/test /dev/nvme*n1
+> 7. and issue a discard request on the dm device: (limit the size of 
+>  discard request because discarding all the 2T data is too slow)
+>   # blkdiscard -o 0 -l 1M -p 1M --verbose /dev/md/test
+> 8. in nvmetrace.log, there are many pci_nvme_dsm_deallocate events of 4k 
+>  length (nlb 1).
+
+4kb should be the discard segment length, instead of discard request
+length, which should be 512k in the above test.
+
+> 
+> Similarly, the problem with scsi devices can be emulated using the following 
+> options for qemu:
+> 
+>         -device virtio-scsi,id=scsi \
+>         -device scsi-hd,drive=nvme1,bus=scsi.0,logical_block_size=4096,discard_granularity=2097152,physical_block_size=4096,serial=NVME1 \
+>         -device scsi-hd,drive=nvme2,bus=scsi.0,logical_block_size=4096,discard_granularity=2097152,physical_block_size=4096,serial=NVME2 \
+>         -device scsi-hd,drive=nvme3,bus=scsi.0,logical_block_size=4096,discard_granularity=2097152,physical_block_size=4096,serial=NVME3 \
+>         -trace scsi_disk_emulate_command_UNMAP,file=scsitrace.log
+> 
+> 
+> Despite the discovery, I cannot come up with a proper fix of this issue due
+> to my lack of familiarity of the block subsystem. I expect your kind feedback
+> on this. Thanks in advance.
+
+In the above setting and raid456 test, I observe that rq->nr_phys_segments can
+reach 128, but queue_max_discard_segments() reports 256. So discard
+request size can be 512KB, which is the max size when you run 1MB discard on
+raid456. However, if the discard length on raid456 is increased, the
+current way will become inefficient.
+
+
+Thanks,
+Ming
 
