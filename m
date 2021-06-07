@@ -2,395 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8FCC47082
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 07:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9860C47082
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 09:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2FA761185
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 07:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF77461107
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 09:40:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230131AbhFGH2L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 03:28:11 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3443 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbhFGH2K (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 03:28:10 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Fz4bN17lCz6wT2;
-        Mon,  7 Jun 2021 15:23:12 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 7 Jun 2021 15:26:04 +0800
-Received: from thunder-town.china.huawei.com (10.174.177.72) by
- dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 7 Jun 2021 15:26:03 +0800
-From:   Zhen Lei <thunder.leizhen@huawei.com>
-To:     Jason Baron <jbaron@akamai.com>,
-        Stefani Seibold <stefani@seibold.net>,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Thomas Graf <tgraf@suug.ch>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        Jens Axboe <axboe@kernel.dk>, Petr Mladek <pmladek@suse.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Zhen Lei <thunder.leizhen@huawei.com>
-Subject: [PATCH 1/1] lib: Fix spelling mistakes
-Date:   Mon, 7 Jun 2021 15:25:55 +0800
-Message-ID: <20210607072555.12416-1-thunder.leizhen@huawei.com>
-X-Mailer: git-send-email 2.26.0.windows.1
+        id S230333AbhFGJm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 05:42:29 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:16666 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230127AbhFGJm2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 05:42:28 -0400
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210607094035epoutp044f1f9fa1df5b31846b8c0d6e93a2f8c8~GQ2lMgEId2718727187epoutp04n
+        for <linux-block@vger.kernel.org>; Mon,  7 Jun 2021 09:40:35 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210607094035epoutp044f1f9fa1df5b31846b8c0d6e93a2f8c8~GQ2lMgEId2718727187epoutp04n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1623058835;
+        bh=5QbUxacVjicXIUqFWDDC3OxkkBRcg5dBU0ahGmISkxc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VRt9crE4KIfg5K8Tzy3M6lokB52HhlOlBoIbcNU1hH+rCDP+6A4U1fJkDTne26ofx
+         rpyE7tPdwgu8/XnILRd5z8uMT4iEKk/LiWXgmbWeIM0Pc4pCwKHECHFP92a8umj/tp
+         9VjfImk3K9//EAlXF8C2r4kDyBHTcmhxbQi8GRqg=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210607094033epcas1p2769ecd2b169e74dbb9a9cf5cac9566c3~GQ2j0mu5m2009220092epcas1p2b;
+        Mon,  7 Jun 2021 09:40:33 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.40.165]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4Fz7dr3Hlpz4x9Py; Mon,  7 Jun
+        2021 09:40:32 +0000 (GMT)
+Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
+        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A6.67.09736.099EDB06; Mon,  7 Jun 2021 18:40:32 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210607094031epcas1p1f4a9ee01eaa4652ba0e8eb6a4964c952~GQ2hwV9LS2551625516epcas1p1r;
+        Mon,  7 Jun 2021 09:40:31 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210607094031epsmtrp2ba1e4997e34ef5f4867334171326fc37~GQ2hvEmsB1681416814epsmtrp2g;
+        Mon,  7 Jun 2021 09:40:31 +0000 (GMT)
+X-AuditID: b6c32a39-8d9ff70000002608-43-60bde9909318
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        AB.43.08637.F89EDB06; Mon,  7 Jun 2021 18:40:31 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210607094031epsmtip16d3917880caace85b863b6dcd8582d28~GQ2hZaeAF1612816128epsmtip1Y;
+        Mon,  7 Jun 2021 09:40:31 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     bvanassche@acm.org
+Cc:     Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
+        alim.akhtar@samsung.com, asml.silence@gmail.com,
+        avri.altman@wdc.com, axboe@kernel.dk, bgoncalv@redhat.com,
+        cang@codeaurora.org, damien.lemoal@wdc.com,
+        gregkh@linuxfoundation.org, hch@infradead.org, jaegeuk@kernel.org,
+        jejb@linux.ibm.com, jisoo2146.oh@samsung.com,
+        junho89.kim@samsung.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com, ming.lei@redhat.com,
+        mj0123.lee@samsung.com, nanich.lee@samsung.com, osandov@fb.com,
+        patchwork-bot@kernel.org, seunghwan.hyun@samsung.com,
+        sookwan7.kim@samsung.com, tj@kernel.org, tom.leiming@gmail.com,
+        woosung2.lee@samsung.com, yi.zhang@redhat.com,
+        yt0928.kim@samsung.com
+Subject: Re: [PATCH v12 3/3] ufs: set max_bio_bytes with queue max sectors
+Date:   Mon,  7 Jun 2021 18:21:56 +0900
+Message-Id: <20210607092156.16774-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.29.0
+In-Reply-To: <004bef40-1667-3b60-adaf-bea2b15f2514@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.177.72]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500006.china.huawei.com (7.185.36.236)
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf0xTVxTHd99rXwsR7QpjN4RJV7dsMPlRELygMBKNPsFkkM1lY1tKhbfC
+        6K+0xSkzSqiUDRBKjBg7fjhgyFAHQegKA9QSbZBSR8qvIcoYMAYbv4VRcGQtDzP+u+fcz/d+
+        zzk3h41zDSwvdqpMTSllIgmfcGUYOnz9/XVTbYlBa6Uc9OPwTRb6rcxAoJJaA0BT9j4C3XhS
+        SKCWnnKAiuftOFqsq2ai7JwVDGkq6wjUpavA0HidHkcVgwYM5Y9nMdG/uU8xtDyqQm1D7yBb
+        SwmB8gaMBLpu3sCQ6ZIGQ1dul+Cof8TCQh1P+xhotKoIR9bORSYqG4tGa9fvAzS3OsBCD42X
+        cDRgLSZQXZudiOaRtt5Y0lZwESOLNLMssln/hEXervEjbd3pZEPtNwSpq7gLyDulN1nkwsQQ
+        g5xr7yPIgsZaQC417CZz7uZhpMlUjcftSpAcTKFEyZSSR8mS5MmpMnEkP/Z94SFhaFiQwF8Q
+        jvbzeTKRlIrkHz4e538kVeKYF593SiRJd6TiRCoVPzDqoFKerqZ4KXKVOpJPKZIlCkGQIkAl
+        kqrSZeKAJLk0QhAUFBzqIBMlKYYOK6Hocj89PXIPZIJnu3IBmw05+2B/f0wucGFzOUYAH5ik
+        ucDVcV4EsOhxHYMOVgC0P75FOCmnYK31GpO+aAPwvrZyK1gC0KRZwJwUwdkLC2aGNhUeHE9o
+        e7YCnBDOmWHCekshcHq7c2Jg5eSnTobBeRPaF2ybvBvnALywoGfQbj7w+Ug+7sRdHPm5R540
+        8jLsvDq+ieAORNP0Le58HnL+cIHtpVaM1h6GP2k1W1W7w2lzI4s+e8Gl2TaCFuQBqNGWAzrQ
+        AVg1Wb2lDoGLS0ubheIcX1jXEkinX4fN66WAdt4JZ5fzmfQc3eDXWi6NvAEtF0bwF16Tt5q3
+        XiThX4XNBD2sAgBnxkZxHeDptzWk39aQ/n/nawCvBZ6UQiUVUyqBInT7DzeAzQXyCzeCKzPz
+        ASaAsYEJQDbO93CL8W5N5Loli85kUEq5UJkuoVQmEOqYdhHu9UqS3LGBMrVQEBocEhKC9oXt
+        DwsN4b/qJj70VSKXIxapqTSKUlDKFzqM7eKVieWci31QFJHicj5cG7ZT2Dk8re3d4Xvgy5qu
+        73S/W3nLtSuv5XrzWVm6mB7QdARGV73tP22eP7ZafJbnHd1YHMJzvVHs41Hf8PmHINuU/XNR
+        4Mfl4uYT8Z/9UPOwv37GKu1mLGc0nGSVLcTbuPnhf34SxTypWW8yl6whon49Stnzvdh8Lj5b
+        dOeopU9/PK0+w2d3QoN2cNy7bEq4IuvJUX7xd5k6fTrh9NmWxGDBoziVeU+r6Iw5x3hvw55m
+        ic/K8zlvX5hQJF/WtQ++d+qXw7WNV/f+80FmbLxh+GLvxAnf/EK2VX050Tj6UVXXu3vGnr+l
+        6XbpWj06FvfShqUH7Ij4tY3PUKWIBH64UiX6Dwympl7JBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrDIsWRmVeSWpSXmKPExsWy7bCSnG7/y70JBjvXSVisu7OG3eLBvG1s
+        FnNWbWO0ePnzKpvF6rv9bBa7Ls5ntJj24Sezxaf1y1gtWtu/MVk0L17PZnF6wiImiyfrZzFb
+        LLqxjcmi50kTq8XfrntMFl8fFlvsvaVtcXnXHDaL7us72CyWH//HZHFocjOTxfTNc5gtrt0/
+        w25x+N5VFouHSyYyW5w7+YnVYt5jB4tfy48yWrz/cZ3d4tSOycwW189NY7NYv/cnm4OCx+Ur
+        3h6X+3qZPCY2v2P32DnrLrvH5hVaHpfPlnpsWtXJ5jFh0QFGj/1z17B7fHx6i8Xj/b6rbB59
+        W1YxenzeJOfRfqCbyePQoWXMAfxRXDYpqTmZZalF+nYJXBnbDp9jKzgtXPHq/kHGBsYv/F2M
+        nBwSAiYSv/YsYO1i5OIQEtjNKNH4s48JIiElcfzEW6AEB5AtLHH4cDFIWEjgI6NEc382iM0m
+        oCPR9/YWG4gtIiAmcfnLN0aQOcwCU9kkZj0/wwTSKyzgJbH4eQxIDYuAqsTPj5fB6nkFrCVa
+        Ps5igVglL/Hnfg8zSDknUPz9eTEQU0jASmLf9wiIakGJkzOfgFUzA1U3b53NPIFRYBaS1Cwk
+        qQWMTKsYJVMLinPTc4sNCwzzUsv1ihNzi0vz0vWS83M3MYIThJbmDsbtqz7oHWJk4mA8xCjB
+        wawkwuslsydBiDclsbIqtSg/vqg0J7X4EKM0B4uSOO+FrpPxQgLpiSWp2ampBalFMFkmDk6p
+        BqatK+wnrfG+tW6P2/7nFiKR4R55vM9vbXbfaHFHravD8PGsv3tNYzezOLhPm6H8JdXNlmcb
+        S4b+xavK/42mnalbo2axccc+IR6n50+0eo8cTuSdsMTk/QwhsdtXfql+Tk8w+PbzTVdOztYd
+        Ju6PZ/ivel8qejSK/+fHpTJP36WyHq4Pun4tYmUG28284HsHXV2Lp7SLWf/NYg1m2vjMk8fj
+        i/0avluM13wOWG+S43AxabA98OG8368Gb2Gnx1IJ/nY/ZoQ8zFg8+6HxriAZ2f8nXli6nbC+
+        L1H24/RxmXP6SRNjGVp7ZZiPRzpfsmO3t/229EV+Q8Ph2qWJv0v1l3+YELLowtQDvq5KWdEf
+        1nUpsRRnJBpqMRcVJwIAtf7lrn8DAAA=
+X-CMS-MailID: 20210607094031epcas1p1f4a9ee01eaa4652ba0e8eb6a4964c952
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
 X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210607094031epcas1p1f4a9ee01eaa4652ba0e8eb6a4964c952
+References: <004bef40-1667-3b60-adaf-bea2b15f2514@acm.org>
+        <CGME20210607094031epcas1p1f4a9ee01eaa4652ba0e8eb6a4964c952@epcas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix some spelling mistakes in comments:
-permanentely ==> permanently
-wont ==> won't
-remaning ==> remaining
-succed ==> succeed
-shouldnt ==> shouldn't
-alpha-numeric ==> alphanumeric
-storeing ==> storing
-funtion ==> function
-documenation ==> documentation
-Determin ==> Determine
-intepreted ==> interpreted
-ammount ==> amount
-obious ==> obvious
-interupts ==> interrupts
-occured ==> occurred
-asssociated ==> associated
-taking into acount ==> taking into account
-squence ==> sequence
-stil ==> still
-contiguos ==> contiguous
-matchs ==> matches
+> On 6/3/21 10:03 PM, Changheun Lee wrote:
+> > Set max_bio_bytes same with queue max sectors. It will lead to fast bio
+> > submit when bio size is over than queue max sectors. And it might be helpful
+> > to align submit bio size in some case.
+> > 
+> > Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+> > ---
+> >  drivers/scsi/ufs/ufshcd.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+> > index 3eb54937f1d8..37365a726517 100644
+> > --- a/drivers/scsi/ufs/ufshcd.c
+> > +++ b/drivers/scsi/ufs/ufshcd.c
+> > @@ -4858,6 +4858,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
+> >  {
+> >  	struct ufs_hba *hba = shost_priv(sdev->host);
+> >  	struct request_queue *q = sdev->request_queue;
+> > +	unsigned int max_bio_bytes;
+> >  
+> >  	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
+> >  	if (hba->quirks & UFSHCD_QUIRK_ALIGN_SG_WITH_PAGE_SIZE)
+> > @@ -4868,6 +4869,10 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
+> >  
+> >  	ufshcd_crypto_setup_rq_keyslot_manager(hba, q);
+> >  
+> > +	if (!check_shl_overflow(queue_max_sectors(q),
+> > +				SECTOR_SHIFT, &max_bio_bytes))
+> > +		blk_queue_max_bio_bytes(q, max_bio_bytes);
+> > +
+> >  	return 0;
+> >  }
+> 
+> Just like previous versions of this patch series, this approach will
+> trigger data corruption if dm-crypt is stacked on top of the UFS driver
+> since ufs_max_sectors << SECTOR_SHIFT = 1024 * 512 is less than the size
+> of the dm-crypt buffer (BIO_MAX_VECS << PAGE_SHIFT = 256 * 4096).
 
-Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
----
- lib/Kconfig.debug             | 6 +++---
- lib/asn1_encoder.c            | 2 +-
- lib/devres.c                  | 2 +-
- lib/dynamic_debug.c           | 2 +-
- lib/fonts/font_pearl_8x8.c    | 2 +-
- lib/kfifo.c                   | 2 +-
- lib/list_sort.c               | 2 +-
- lib/nlattr.c                  | 4 ++--
- lib/oid_registry.c            | 2 +-
- lib/pldmfw/pldmfw.c           | 2 +-
- lib/reed_solomon/test_rslib.c | 2 +-
- lib/refcount.c                | 2 +-
- lib/rhashtable.c              | 2 +-
- lib/sbitmap.c                 | 2 +-
- lib/scatterlist.c             | 4 ++--
- lib/seq_buf.c                 | 2 +-
- lib/sort.c                    | 2 +-
- lib/stackdepot.c              | 2 +-
- lib/vsprintf.c                | 2 +-
- 19 files changed, 23 insertions(+), 23 deletions(-)
+max_bio_bytes can't be smaller than "BIO_MAX_VECS * PAGE_SIZE". Large value
+will be selected between input parameter and  "BIO_MAX_VECS * PAGE_SIZE" in
+blk_queue_max_bio_bytes(). I think bio max size should be larger than
+"BIO_MAX_VECS * PAGE_SIZE" for kernel stability.
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 150f13baa6cc..3cf48998a374 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1293,7 +1293,7 @@ config PROVE_RAW_LOCK_NESTING
- 	 option expect lockdep splats until these problems have been fully
- 	 addressed which is work in progress. This config switch allows to
- 	 identify and analyze these problems. It will be removed and the
--	 check permanentely enabled once the main issues have been fixed.
-+	 check permanently enabled once the main issues have been fixed.
- 
- 	 If unsure, select N.
- 
-@@ -1459,7 +1459,7 @@ config DEBUG_LOCKING_API_SELFTESTS
- 	  Say Y here if you want the kernel to run a short self-test during
- 	  bootup. The self-test checks whether common types of locking bugs
- 	  are detected by debugging mechanisms or not. (if you disable
--	  lock debugging then those bugs wont be detected of course.)
-+	  lock debugging then those bugs won't be detected of course.)
- 	  The following locking APIs are covered: spinlocks, rwlocks,
- 	  mutexes and rwsems.
- 
-@@ -1945,7 +1945,7 @@ config FAIL_IO_TIMEOUT
- 	  thus exercising the error handling.
- 
- 	  Only works with drivers that use the generic timeout handling,
--	  for others it wont do anything.
-+	  for others it won't do anything.
- 
- config FAIL_FUTEX
- 	bool "Fault-injection capability for futexes"
-diff --git a/lib/asn1_encoder.c b/lib/asn1_encoder.c
-index 41e71aae3ef6..27bbe891714f 100644
---- a/lib/asn1_encoder.c
-+++ b/lib/asn1_encoder.c
-@@ -181,7 +181,7 @@ EXPORT_SYMBOL_GPL(asn1_encode_oid);
- /**
-  * asn1_encode_length() - encode a length to follow an ASN.1 tag
-  * @data: pointer to encode at
-- * @data_len: pointer to remaning length (adjusted by routine)
-+ * @data_len: pointer to remaining length (adjusted by routine)
-  * @len: length to encode
-  *
-  * This routine can encode lengths up to 65535 using the ASN.1 rules.
-diff --git a/lib/devres.c b/lib/devres.c
-index bdb06898a977..b0e1c6702c71 100644
---- a/lib/devres.c
-+++ b/lib/devres.c
-@@ -355,7 +355,7 @@ static void pcim_iomap_release(struct device *gendev, void *res)
-  * detach.
-  *
-  * This function might sleep when the table is first allocated but can
-- * be safely called without context and guaranteed to succed once
-+ * be safely called without context and guaranteed to succeed once
-  * allocated.
-  */
- void __iomem * const *pcim_iomap_table(struct pci_dev *pdev)
-diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
-index d3ce78298832..cb5abb42c16a 100644
---- a/lib/dynamic_debug.c
-+++ b/lib/dynamic_debug.c
-@@ -991,7 +991,7 @@ static int ddebug_dyndbg_param_cb(char *param, char *val,
- 
- 	ddebug_exec_queries((val ? val : "+p"), modname);
- 
--	return 0; /* query failure shouldnt stop module load */
-+	return 0; /* query failure shouldn't stop module load */
- }
- 
- /* handle both dyndbg and $module.dyndbg params at boot */
-diff --git a/lib/fonts/font_pearl_8x8.c b/lib/fonts/font_pearl_8x8.c
-index b1678ed0017c..ae98ca17982e 100644
---- a/lib/fonts/font_pearl_8x8.c
-+++ b/lib/fonts/font_pearl_8x8.c
-@@ -3,7 +3,7 @@
- /*                                            */
- /*       Font file generated by cpi2fnt       */
- /*       ------------------------------       */
--/*       Combined with the alpha-numeric      */
-+/*       Combined with the alphanumeric       */
- /*       portion of Greg Harp's old PEARL     */
- /*       font (from earlier versions of       */
- /*       linux-m86k) by John Shifflett        */
-diff --git a/lib/kfifo.c b/lib/kfifo.c
-index 70dab9ac7827..12f5a347aa13 100644
---- a/lib/kfifo.c
-+++ b/lib/kfifo.c
-@@ -415,7 +415,7 @@ static unsigned int __kfifo_peek_n(struct __kfifo *fifo, size_t recsize)
- 	)
- 
- /*
-- * __kfifo_poke_n internal helper function for storeing the length of
-+ * __kfifo_poke_n internal helper function for storing the length of
-  * the record into the fifo
-  */
- static void __kfifo_poke_n(struct __kfifo *fifo, unsigned int n, size_t recsize)
-diff --git a/lib/list_sort.c b/lib/list_sort.c
-index 1e1e37762799..0fb59e92ca2d 100644
---- a/lib/list_sort.c
-+++ b/lib/list_sort.c
-@@ -104,7 +104,7 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
-  * @head: the list to sort
-  * @cmp: the elements comparison function
-  *
-- * The comparison funtion @cmp must return > 0 if @a should sort after
-+ * The comparison function @cmp must return > 0 if @a should sort after
-  * @b ("@a > @b" if you want an ascending sort), and <= 0 if @a should
-  * sort before @b *or* their original order should be preserved.  It is
-  * always called with the element that came first in the input in @a,
-diff --git a/lib/nlattr.c b/lib/nlattr.c
-index 1d051ef66afe..86029ad5ead4 100644
---- a/lib/nlattr.c
-+++ b/lib/nlattr.c
-@@ -619,7 +619,7 @@ static int __nla_validate_parse(const struct nlattr *head, int len, int maxtype,
-  * Validates all attributes in the specified attribute stream against the
-  * specified policy. Validation depends on the validate flags passed, see
-  * &enum netlink_validation for more details on that.
-- * See documenation of struct nla_policy for more details.
-+ * See documentation of struct nla_policy for more details.
-  *
-  * Returns 0 on success or a negative error code.
-  */
-@@ -633,7 +633,7 @@ int __nla_validate(const struct nlattr *head, int len, int maxtype,
- EXPORT_SYMBOL(__nla_validate);
- 
- /**
-- * nla_policy_len - Determin the max. length of a policy
-+ * nla_policy_len - Determine the max. length of a policy
-  * @policy: policy to use
-  * @n: number of policies
-  *
-diff --git a/lib/oid_registry.c b/lib/oid_registry.c
-index 3dfaa836e7c5..e592d48b1974 100644
---- a/lib/oid_registry.c
-+++ b/lib/oid_registry.c
-@@ -124,7 +124,7 @@ EXPORT_SYMBOL_GPL(parse_OID);
-  * @bufsize: The size of the buffer
-  *
-  * The OID is rendered into the buffer in "a.b.c.d" format and the number of
-- * bytes is returned.  -EBADMSG is returned if the data could not be intepreted
-+ * bytes is returned.  -EBADMSG is returned if the data could not be interpreted
-  * and -ENOBUFS if the buffer was too small.
-  */
- int sprint_oid(const void *data, size_t datasize, char *buffer, size_t bufsize)
-diff --git a/lib/pldmfw/pldmfw.c b/lib/pldmfw/pldmfw.c
-index e5d4b3b2af81..6e77eb6d8e72 100644
---- a/lib/pldmfw/pldmfw.c
-+++ b/lib/pldmfw/pldmfw.c
-@@ -82,7 +82,7 @@ pldm_check_fw_space(struct pldmfw_priv *data, size_t offset, size_t length)
-  * @bytes_to_move: number of bytes to move the offset forward by
-  *
-  * Check that there is enough space past the current offset, and then move the
-- * offset forward by this ammount.
-+ * offset forward by this amount.
-  *
-  * Returns: zero on success, or -EFAULT if the image is too small to fit the
-  * expected length.
-diff --git a/lib/reed_solomon/test_rslib.c b/lib/reed_solomon/test_rslib.c
-index 4eb29f365ece..d9d1c33aebda 100644
---- a/lib/reed_solomon/test_rslib.c
-+++ b/lib/reed_solomon/test_rslib.c
-@@ -385,7 +385,7 @@ static void test_bc(struct rs_control *rs, int len, int errs,
- 
- 			/*
- 			 * We check that the returned word is actually a
--			 * codeword. The obious way to do this would be to
-+			 * codeword. The obvious way to do this would be to
- 			 * compute the syndrome, but we don't want to replicate
- 			 * that code here. However, all the codes are in
- 			 * systematic form, and therefore we can encode the
-diff --git a/lib/refcount.c b/lib/refcount.c
-index ebac8b7d15a7..a207a8f22b3c 100644
---- a/lib/refcount.c
-+++ b/lib/refcount.c
-@@ -164,7 +164,7 @@ EXPORT_SYMBOL(refcount_dec_and_lock);
-  * @flags: saved IRQ-flags if the is acquired
-  *
-  * Same as refcount_dec_and_lock() above except that the spinlock is acquired
-- * with disabled interupts.
-+ * with disabled interrupts.
-  *
-  * Return: true and hold spinlock if able to decrement refcount to 0, false
-  *         otherwise
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index c949c1e3b87c..e12bbfb240b8 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -703,7 +703,7 @@ EXPORT_SYMBOL_GPL(rhashtable_walk_exit);
-  *
-  * Returns zero if successful.
-  *
-- * Returns -EAGAIN if resize event occured.  Note that the iterator
-+ * Returns -EAGAIN if resize event occurred.  Note that the iterator
-  * will rewind back to the beginning and you may use it immediately
-  * by calling rhashtable_walk_next.
-  *
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 47b3691058eb..b25db9be938a 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -583,7 +583,7 @@ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
- 	/*
- 	 * Once the clear bit is set, the bit may be allocated out.
- 	 *
--	 * Orders READ/WRITE on the asssociated instance(such as request
-+	 * Orders READ/WRITE on the associated instance(such as request
- 	 * of blk_mq) by this bit for avoiding race with re-allocation,
- 	 * and its pair is the memory barrier implied in __sbitmap_get_word.
- 	 *
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index a59778946404..27efa6178153 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -38,7 +38,7 @@ EXPORT_SYMBOL(sg_next);
-  * @sg:		The scatterlist
-  *
-  * Description:
-- * Allows to know how many entries are in sg, taking into acount
-+ * Allows to know how many entries are in sg, taking into account
-  * chaining as well
-  *
-  **/
-@@ -59,7 +59,7 @@ EXPORT_SYMBOL(sg_nents);
-  *
-  * Description:
-  * Determines the number of entries in sg that are required to meet
-- * the supplied length, taking into acount chaining as well
-+ * the supplied length, taking into account chaining as well
-  *
-  * Returns:
-  *   the number of sg entries needed, negative error on failure
-diff --git a/lib/seq_buf.c b/lib/seq_buf.c
-index 707453f5d58e..b81e87ab34f6 100644
---- a/lib/seq_buf.c
-+++ b/lib/seq_buf.c
-@@ -285,7 +285,7 @@ int seq_buf_path(struct seq_buf *s, const struct path *path, const char *esc)
- }
- 
- /**
-- * seq_buf_to_user - copy the squence buffer to user space
-+ * seq_buf_to_user - copy the sequence buffer to user space
-  * @s: seq_buf descriptor
-  * @ubuf: The userspace memory location to copy to
-  * @cnt: The amount to copy
-diff --git a/lib/sort.c b/lib/sort.c
-index 3ad454411997..aa18153864d2 100644
---- a/lib/sort.c
-+++ b/lib/sort.c
-@@ -51,7 +51,7 @@ static bool is_aligned(const void *base, size_t size, unsigned char align)
-  * which basically all CPUs have, to minimize loop overhead computations.
-  *
-  * For some reason, on x86 gcc 7.3.0 adds a redundant test of n at the
-- * bottom of the loop, even though the zero flag is stil valid from the
-+ * bottom of the loop, even though the zero flag is still valid from the
-  * subtract (since the intervening mov instructions don't alter the flags).
-  * Gcc 8.1.0 doesn't have that problem.
-  */
-diff --git a/lib/stackdepot.c b/lib/stackdepot.c
-index df9179f4f441..0a2e417f83cb 100644
---- a/lib/stackdepot.c
-+++ b/lib/stackdepot.c
-@@ -11,7 +11,7 @@
-  * Instead, stack depot maintains a hashtable of unique stacktraces. Since alloc
-  * and free stacks repeat a lot, we save about 100x space.
-  * Stacks are never removed from depot, so we store them contiguously one after
-- * another in a contiguos memory allocation.
-+ * another in a contiguous memory allocation.
-  *
-  * Author: Alexander Potapenko <glider@google.com>
-  * Copyright (C) 2016 Google, Inc.
-diff --git a/lib/vsprintf.c b/lib/vsprintf.c
-index 1d6bca047690..87acf66f0e4c 100644
---- a/lib/vsprintf.c
-+++ b/lib/vsprintf.c
-@@ -3422,7 +3422,7 @@ int vsscanf(const char *buf, const char *fmt, va_list args)
- 
- 	while (*fmt) {
- 		/* skip any white space in format */
--		/* white space in format matchs any amount of
-+		/* white space in format matches any amount of
- 		 * white space, including none, in the input.
- 		 */
- 		if (isspace(*fmt)) {
--- 
-2.25.1
+void blk_queue_max_bio_bytes(struct request_queue *q, unsigned int bytes)
+{
+	struct queue_limits *limits = &q->limits;
+	unsigned int max_bio_bytes = round_up(bytes, PAGE_SIZE);
 
+	limits->max_bio_bytes = max_t(unsigned int, max_bio_bytes,
+				      BIO_MAX_VECS * PAGE_SIZE);
+}
+EXPORT_SYMBOL(blk_queue_max_bio_bytes);
 
+> 
+> I am not recommending to increase max_sectors for the UFS driver. We
+> need a solution that is independent of the dm-crypt internals.
+> 
+> Bart.
+
+No need to increase max_sectors in driver to set max_bio_bytes. There are
+no dependency with dm-crypt I think.
+
+Thank you,
+Changheun Lee
