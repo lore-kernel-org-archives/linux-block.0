@@ -2,72 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4664AC4743C
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 06:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5611C4743F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 07:09:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2AD09611C0
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 06:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C1406108E
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 07:09:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230200AbhFGGiZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 02:38:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32800 "EHLO
+        id S229923AbhFGHLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 03:11:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230193AbhFGGiY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 02:38:24 -0400
+        with ESMTP id S229436AbhFGHLB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 03:11:01 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F18EC061766;
-        Sun,  6 Jun 2021 23:36:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2C2C061766;
+        Mon,  7 Jun 2021 00:09:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Zg3Z5zg3zGE7efXmuaQFxaAI12lHroFjA1H1ShFPy3s=; b=TIBLuF9+KKCV6cBbPMYH8ikhVZ
-        IR6tjJMCeklxGkFm5ZM3FtmR3KUBv4noW129cD6e7so/Cijd6+jdzs3DQZYN3Z4M5lrwMqmPIL2+1
-        +X7HEGc8qCvCkV2Ilz06IMo9EHU+xsoVd5tNDi3xWfJoVB6iXvD8SGr2+atumIrHYeh08vktzEuw+
-        dV0oozBDRcMO0B4xdczG04FaaijvmQ6ALlcct3gw17wmkEhOwanNFhcPS5R4JyWf+1dFdPvIK5tiy
-        J1FKtGCCEeAqR4zptmCxzFueEtB9DbbELoTnfqRoz0ZasdREnC/309myai9kP8QSp5ZnlN0JLcqWE
-        xPQbNbdA==;
+        bh=TuqDyFF8ffS2jCcc39LRp7FhGd3Sbm44R1NXmZ9SKuU=; b=H3Es/7FrTJ7eDudl/jWxe5zNO/
+        1At0Lm3R4OdtBubx7/5X8RZRmenGJ/p7mLSFKYzxP8i0kYg58VMARJW3lFwMexyFZ6ebE3QBXcxnB
+        WbQRWEV8ztXgEI6mTTFU+xihOHQ2VyMMGXdUilyKYXDrk18Myjv2OBtvI36Ba9a8o4U4DAgikUrrs
+        RfaIXFHsIwzDraLHgxsDe1htFrd8S0kjWbv1Rb580TM9UorUSUCt81SkGPsuR44EjyUFY6G/VSewu
+        DZtvPiq8XehZI0brOQAVen7CrJiwu3VePu11Pz92+P7JP3dQXawzj20eqirawZ+TGjPKDTZ0sRgka
+        JWm72ahg==;
 Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lq8qs-00FRjs-0C; Mon, 07 Jun 2021 06:35:14 +0000
-Date:   Mon, 7 Jun 2021 07:35:09 +0100
+        id 1lq9Nc-00FTGd-GQ; Mon, 07 Jun 2021 07:09:02 +0000
+Date:   Mon, 7 Jun 2021 08:09:00 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Changheun Lee <nanich.lee@samsung.com>, damien.lemoal@wdc.com,
-        Avri.Altman@wdc.com, Johannes.Thumshirn@wdc.com,
-        alex_y_xu@yahoo.ca, alim.akhtar@samsung.com,
-        asml.silence@gmail.com, axboe@kernel.dk, bgoncalv@redhat.com,
-        cang@codeaurora.org, gregkh@linuxfoundation.org, hch@infradead.org,
-        jaegeuk@kernel.org, jejb@linux.ibm.com, jisoo2146.oh@samsung.com,
-        junho89.kim@samsung.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com, ming.lei@redhat.com,
-        mj0123.lee@samsung.com, osandov@fb.com, patchwork-bot@kernel.org,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        tj@kernel.org, tom.leiming@gmail.com, woosung2.lee@samsung.com,
-        yi.zhang@redhat.com, yt0928.kim@samsung.com
-Subject: Re: [PATCH v12 1/3] bio: control bio max size
-Message-ID: <YL2+HeyKVMHsLNe2@infradead.org>
-References: <DM6PR04MB70812AF342F46F453696A447E73B9@DM6PR04MB7081.namprd04.prod.outlook.com>
- <CGME20210604075331epcas1p13bb57f9ddfc7b112dec1ba8cf40fdc74@epcas1p1.samsung.com>
- <20210604073459.29235-1-nanich.lee@samsung.com>
- <63afd2d3-9fa3-9f90-a2b3-37235739f5e2@acm.org>
+To:     longli@linuxonhyperv.com
+Cc:     linux-block@vger.kernel.org, Long Li <longli@microsoft.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [Patch v2] block: return the correct bvec when checking for gaps
+Message-ID: <YL3GDF5KiM9e69eW@infradead.org>
+References: <1622849839-5407-1-git-send-email-longli@linuxonhyperv.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <63afd2d3-9fa3-9f90-a2b3-37235739f5e2@acm.org>
+In-Reply-To: <1622849839-5407-1-git-send-email-longli@linuxonhyperv.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 04, 2021 at 07:52:35AM -0700, Bart Van Assche wrote:
->  Damien is right. bd_disk can be NULL. From
+On Fri, Jun 04, 2021 at 04:37:19PM -0700, longli@linuxonhyperv.com wrote:
+> From: Long Li <longli@microsoft.com>
+> 
+> After commit 07173c3ec276 ("block: enable multipage bvecs"), a bvec can
+> have multiple pages. But bio_will_gap() still assumes one page bvec while
+> checking for merging. If the pages in the bvec go across the
+> seg_boundary_mask, this check for merging can potentially succeed if only
+> the 1st page is tested, and can fail if all the pages are tested.
+> 
+> Later, when SCSI builds the SG list the same check for merging is done in
+> __blk_segment_map_sg_merge() with all the pages in the bvec tested. This
+> time the check may fail if the pages in bvec go across the
+> seg_boundary_mask (but tested okay in bio_will_gap() earlier, so those
+> BIOs were merged). If this check fails, we end up with a broken SG list
+> for drivers assuming the SG list not having offsets in intermediate pages.
+> This results in incorrect pages written to the disk.
+> 
+> Fix this by returning the multi-page bvec when testing gaps for merging.
+> 
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Cc: Pavel Begunkov <asml.silence@gmail.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+> Cc: Jeffle Xu <jefflexu@linux.alibaba.com>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> Fixes: 07173c3ec276 ("block: enable multipage bvecs")
+> Signed-off-by: Long Li <longli@microsoft.com>
+> ---
+> Change from v1: add commit details on how data corruption happens
+> 
+>  include/linux/bio.h | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index a0b4cfdf62a4..6b2f609ccfbf 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -44,9 +44,6 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
+>  #define bio_offset(bio)		bio_iter_offset((bio), (bio)->bi_iter)
+>  #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
+>  
+> -#define bio_multiple_segments(bio)				\
+> -	((bio)->bi_iter.bi_size != bio_iovec(bio).bv_len)
+> -
+>  #define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
+>  #define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors((iter)))
+>  
+> @@ -271,7 +268,7 @@ static inline void bio_clear_flag(struct bio *bio, unsigned int bit)
+>  
+>  static inline void bio_get_first_bvec(struct bio *bio, struct bio_vec *bv)
+>  {
+> -	*bv = bio_iovec(bio);
+> +	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+>  }
+>  
+>  static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+> @@ -279,10 +276,10 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+>  	struct bvec_iter iter = bio->bi_iter;
+>  	int idx;
+>  
+> -	if (unlikely(!bio_multiple_segments(bio))) {
+> -		*bv = bio_iovec(bio);
+> +	/* this bio has only one bvec */
+> +	*bv = mp_bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> +	if (bv->bv_len == bio->bi_iter.bi_size)
+>  		return;
 
-bd_disk is initialized in bdev_alloc, so it should never be NULL.
-bi_bdev OTOH is only set afer bio_add_page in various places or not at
-all in case of passthrough bios.  Which is a bit of a mess and I have
-plans to fix it.
+Nit: I'd move the comment a bit as the current placement confused me at
+first.  Also maybe use bio_get_first_bvec here to make it even more
+obvious:
+
+	bio_get_first_bvec(bio, bv);
+	if (bv->bv_len == bio->bi_iter.bi_size)
+		return;		/* this bio only has a single bvec */
