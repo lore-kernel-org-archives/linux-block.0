@@ -2,149 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC43C47082
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D54CC4743F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:55:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 054046120F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47EFB61208
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 11:55:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231614AbhFGLnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 07:43:19 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:36668 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230463AbhFGLnS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 07:43:18 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 39EA521A93;
-        Mon,  7 Jun 2021 11:41:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1623066087; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        id S230197AbhFGL5X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 07:57:23 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:56274 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230193AbhFGL5W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 07:57:22 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 79F211FDC5;
+        Mon,  7 Jun 2021 11:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1623066930; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Y1p34XXNGh13rgcmV89i0Hv1PANOTcFOPO8k8eP1M4Y=;
-        b=SHkREpPwnPLgvg4Hr1PyJ8+pT6ZSTMXxkT2yuB8OK+6Ut/3Gpn56H8lPU2gcIf5t5pFPS/
-        3oZ2ayP4XrTlHYgHO0KftMfpb9LaVNCXzQvkZpCB4DkCrBSVyGD5BDc2sNj9o/czg/lzJw
-        NGwY0paYWx+leJTIGJbB2ytQhFCGcaQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1623066087;
+        bh=BqFN536PDnP3Zynyosw+raEhWyH991Zb94ulbNCCUPI=;
+        b=TfZh0rTwQFOmv60JXi81ZTOEXzkiIC1f08hfqAXbhh1wptG/d6HMQAUAD/Ryh4w+KpVOtG
+        hyb6wjs/6d5YEPr+tMVAUkxW/quPnjDnt2acUPxKG6rE6C3mKgqqGIbffeukTGRxf6/CDO
+        5nfRX0xDEGrLF1VnvcCW5Il7ybSn7sk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1623066930;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Y1p34XXNGh13rgcmV89i0Hv1PANOTcFOPO8k8eP1M4Y=;
-        b=BNu3OcxPPM6wI9r7VyWpHjeqymUvNelFDLsR21xhARu1mXX/B3RcYq5IEwcspHKuKJKcMQ
-        HIhQluYwS94zOQAw==
-Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 2E3F3A3B8A;
-        Mon,  7 Jun 2021 11:41:27 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 0CE5A1F2CA8; Mon,  7 Jun 2021 13:41:27 +0200 (CEST)
-Date:   Mon, 7 Jun 2021 13:41:27 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: [PATCH v2] block: Do not pull requests from the scheduler when
- we cannot dispatch them
-Message-ID: <20210607114127.GG30275@quack2.suse.cz>
-References: <20210603104721.6309-1-jack@suse.cz>
- <42e2e0f1-acf4-a5eb-2c3e-cb20706430a4@suse.de>
+        bh=BqFN536PDnP3Zynyosw+raEhWyH991Zb94ulbNCCUPI=;
+        b=hJe2nXU8SuQLJ2QccHgBR3B8xjhz/y+SDzvWX2OFp2igGZoqWQXShRhJ6YJzTIA7AnuqH4
+        d/LwCpFdA+dK72BA==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 1CD94118DD;
+        Mon,  7 Jun 2021 11:55:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1623066930; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BqFN536PDnP3Zynyosw+raEhWyH991Zb94ulbNCCUPI=;
+        b=TfZh0rTwQFOmv60JXi81ZTOEXzkiIC1f08hfqAXbhh1wptG/d6HMQAUAD/Ryh4w+KpVOtG
+        hyb6wjs/6d5YEPr+tMVAUkxW/quPnjDnt2acUPxKG6rE6C3mKgqqGIbffeukTGRxf6/CDO
+        5nfRX0xDEGrLF1VnvcCW5Il7ybSn7sk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1623066930;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BqFN536PDnP3Zynyosw+raEhWyH991Zb94ulbNCCUPI=;
+        b=hJe2nXU8SuQLJ2QccHgBR3B8xjhz/y+SDzvWX2OFp2igGZoqWQXShRhJ6YJzTIA7AnuqH4
+        d/LwCpFdA+dK72BA==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id hgKGNSwJvmCYaAAALh3uQQ
+        (envelope-from <colyli@suse.de>); Mon, 07 Jun 2021 11:55:24 +0000
+Subject: Re: [PATCH v5 2/2] bcache: avoid oversized read request in cache
+ missing code path
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alexander Ullrich <ealex1979@gmail.com>,
+        Diego Ercolani <diego.ercolani@gmail.com>,
+        Jan Szubiak <jan.szubiak@linuxpolska.pl>,
+        Marco Rebhan <me@dblsaiko.net>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        Victor Westerhuis <victor@westerhu.is>,
+        Vojtech Pavlik <vojtech@suse.cz>,
+        Rolf Fokkens <rolf@rolffokkens.nl>,
+        Thorsten Knabe <linux@thorsten-knabe.de>,
+        stable@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Nix <nix@esperi.org.uk>, Takashi Iwai <tiwai@suse.com>
+References: <20210607103539.12823-1-colyli@suse.de>
+ <20210607103539.12823-3-colyli@suse.de> <20210607110657.GB6729@lst.de>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <6d08d23b-b778-4e5f-a5f3-7106a42e26a1@suse.de>
+Date:   Mon, 7 Jun 2021 19:55:22 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42e2e0f1-acf4-a5eb-2c3e-cb20706430a4@suse.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210607110657.GB6729@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 07-06-21 12:05:52, Hannes Reinecke wrote:
-> On 6/3/21 12:47 PM, Jan Kara wrote:
-> > Provided the device driver does not implement dispatch budget accounting
-> > (which only SCSI does) the loop in __blk_mq_do_dispatch_sched() pulls
-> > requests from the IO scheduler as long as it is willing to give out any.
-> > That defeats scheduling heuristics inside the scheduler by creating
-> > false impression that the device can take more IO when it in fact
-> > cannot.
-> > 
-> > For example with BFQ IO scheduler on top of virtio-blk device setting
-> > blkio cgroup weight has barely any impact on observed throughput of
-> > async IO because __blk_mq_do_dispatch_sched() always sucks out all the
-> > IO queued in BFQ. BFQ first submits IO from higher weight cgroups but
-> > when that is all dispatched, it will give out IO of lower weight cgroups
-> > as well. And then we have to wait for all this IO to be dispatched to
-> > the disk (which means lot of it actually has to complete) before the
-> > IO scheduler is queried again for dispatching more requests. This
-> > completely destroys any service differentiation.
-> > 
-> > So grab request tag for a request pulled out of the IO scheduler already
-> > in __blk_mq_do_dispatch_sched() and do not pull any more requests if we
-> > cannot get it because we are unlikely to be able to dispatch it. That
-> > way only single request is going to wait in the dispatch list for some
-> > tag to free.
-> > 
-> > Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >  block/blk-mq-sched.c | 12 +++++++++++-
-> >  block/blk-mq.c       |  2 +-
-> >  block/blk-mq.h       |  2 ++
-> >  3 files changed, 14 insertions(+), 2 deletions(-)
-> > 
-> > Jens, can you please merge the patch? Thanks!
-> > 
-> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > index 996a4b2f73aa..714e678f516a 100644
-> > --- a/block/blk-mq-sched.c
-> > +++ b/block/blk-mq-sched.c
-> > @@ -168,9 +168,19 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> >  		 * in blk_mq_dispatch_rq_list().
-> >  		 */
-> >  		list_add_tail(&rq->queuelist, &rq_list);
-> > +		count++;
-> >  		if (rq->mq_hctx != hctx)
-> >  			multi_hctxs = true;
-> > -	} while (++count < max_dispatch);
-> > +
-> > +		/*
-> > +		 * If we cannot get tag for the request, stop dequeueing
-> > +		 * requests from the IO scheduler. We are unlikely to be able
-> > +		 * to submit them anyway and it creates false impression for
-> > +		 * scheduling heuristics that the device can take more IO.
-> > +		 */
-> > +		if (!blk_mq_get_driver_tag(rq))
-> > +			break;
-> > +	} while (count < max_dispatch);
-> >  
-> >  	if (!count) {
-> >  		if (run_queue)
-> 
-> Doesn't this lead to a double accounting of the allocated tags?
-> From what I can see we don't really check if the tag is already
-> allocated in blk_mq_get_driver_tag() ...
+On 6/7/21 7:06 PM, Christoph Hellwig wrote:
+> On Mon, Jun 07, 2021 at 06:35:39PM +0800, Coly Li wrote:
+>> +	/* Limitation for valid replace key size and cache_bio bvecs number */
+>> +	size_limit = min_t(unsigned int, bio_max_segs(UINT_MAX) * PAGE_SECTORS,
+>> +			   (1 << KEY_SIZE_BITS) - 1);
+> bio_max_segs kaps the argument to BIO_MAX_VECS, so you might as well
 
-I think we do check. blk_mq_get_driver_tag() has:
+It was suggested to not directly access BIO_MAX_VECS by you, maybe I
+misunderstood you.
 
-        if (rq->tag == BLK_MQ_NO_TAG && !__blk_mq_get_driver_tag(rq))
-                return false;
 
-        if ((hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) &&
-                        !(rq->rq_flags & RQF_MQ_INFLIGHT)) {
-                rq->rq_flags |= RQF_MQ_INFLIGHT;
-                __blk_mq_inc_active_requests(hctx);
-        }
-        hctx->tags->rqs[rq->tag] = rq;
- 
-So once we call it, rq->tag will be != BLK_MQ_NO_TAG and RQF_MQ_INFLIGHT
-will be set. So neither __blk_mq_get_driver_tag() nor
-__blk_mq_inc_active_requests() will get repeated.
+> directly write BIO_MAX_VECS.  Can you explain the PAGE_SECTORS here a bit
+> more? Does this code path use discontiguous per-sector allocations?
+> Preferably in a comment.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+
+It is just because bch_bio_map() assume the maximum bio size is 1MB. It
+was not true since the multiple pages bvecs
+was merged in mainline kernel.
+ 
+The PAGE_SECTORS part is legacy for 1MB maximum size bio (256*4KB), it
+should be fixed/improved later to
+use multiple pages for bio size > 1MB and replace bch_bio_map().
+
+
+>> +	s->insert_bio_sectors = min3(size_limit, sectors, bio_sectors(bio));
+> Also I don't really understand the units involved here.
+> s->insert_bio_sectors, sectors, and bio_sectors is in unit of 512 byte
+> sectors.  
+
+Yes, they are in sectors, this is the maximum permitted bio size for 1MB
+bio size. Now we can have bio > 1MB, and you modify
+bio_alloc_bioset() parameter 'nr_iovecs from unsigned int to unsigned
+short, so bio-size/page-size can be > 256 and overflow,
+e.g. 258 overflows to 2, then the BUG in biovec_slab() is triggered.
+
+I feel this is a long time existing issue in bcache code, and should be
+fixed from bcache side, and your change helps to trigger
+the problem explicitly.
+
+>> -	miss = bio_next_split(bio, sectors, GFP_NOIO, &s->d->bio_split);
+>> +	miss = bio_next_split(bio, s->insert_bio_sectors, GFP_NOIO, &s->d->bio_split);
+> Overly long line.
+
+Not any more. Now the line limit is 100 characters. Though I still
+prefer 80 characters, place 86 characters in single line
+makes the change more obvious.
+
+Thanks.
+
+Coly Li
