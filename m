@@ -2,163 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFA5C47082
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 10:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37122C47095
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 10:16:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FAE561090
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 10:05:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A70C610C7
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jun 2021 10:16:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230282AbhFGKHp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jun 2021 06:07:45 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:56256 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230267AbhFGKHo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 06:07:44 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 5564821A82;
-        Mon,  7 Jun 2021 10:05:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623060353; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PCUgVnd4rWL5dLkzFcY7UgSM/LxqZ20XsX3i91iV+Gg=;
-        b=O8yT6lQExYQzgxakdBaHq1BxuGZs6MdrHY+lk61h1HwJEEhbsW/qgEMISzTUKeLUxW3TDP
-        rQQTFDGSFdD0mo8C8o7ENDHAGU+OVRqiGTqevht0w3AxN1Dwl/SCckBaFNCGLNe0lWSDd1
-        W+2eACYWnz0eG4+VZJztkQsQUNPpn5M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623060353;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PCUgVnd4rWL5dLkzFcY7UgSM/LxqZ20XsX3i91iV+Gg=;
-        b=rz0J05SxJukfzoL0VWcvHwPMqKus8mRQYrHkwFvChgGzyXpZ5e8MVrw6wJWbesZys6qua+
-        C/fM+rFpCUpLHpBA==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 171E6118DD;
-        Mon,  7 Jun 2021 10:05:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623060353; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PCUgVnd4rWL5dLkzFcY7UgSM/LxqZ20XsX3i91iV+Gg=;
-        b=O8yT6lQExYQzgxakdBaHq1BxuGZs6MdrHY+lk61h1HwJEEhbsW/qgEMISzTUKeLUxW3TDP
-        rQQTFDGSFdD0mo8C8o7ENDHAGU+OVRqiGTqevht0w3AxN1Dwl/SCckBaFNCGLNe0lWSDd1
-        W+2eACYWnz0eG4+VZJztkQsQUNPpn5M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623060353;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PCUgVnd4rWL5dLkzFcY7UgSM/LxqZ20XsX3i91iV+Gg=;
-        b=rz0J05SxJukfzoL0VWcvHwPMqKus8mRQYrHkwFvChgGzyXpZ5e8MVrw6wJWbesZys6qua+
-        C/fM+rFpCUpLHpBA==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id K5HsBIHvvWC1KAAALh3uQQ
-        (envelope-from <hare@suse.de>); Mon, 07 Jun 2021 10:05:53 +0000
-Subject: Re: [PATCH v2] block: Do not pull requests from the scheduler when we
- cannot dispatch them
-To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <20210603104721.6309-1-jack@suse.cz>
-From:   Hannes Reinecke <hare@suse.de>
-Organization: SUSE Linux GmbH
-Message-ID: <42e2e0f1-acf4-a5eb-2c3e-cb20706430a4@suse.de>
-Date:   Mon, 7 Jun 2021 12:05:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S230197AbhFGKSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jun 2021 06:18:07 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:47120 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230173AbhFGKSH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jun 2021 06:18:07 -0400
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210607101614epoutp04062a4c34770382946d32b3fe3dcdd6ff~GRVtgjpB22057820578epoutp043
+        for <linux-block@vger.kernel.org>; Mon,  7 Jun 2021 10:16:14 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210607101614epoutp04062a4c34770382946d32b3fe3dcdd6ff~GRVtgjpB22057820578epoutp043
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1623060974;
+        bh=bE9zcyEnTp8w/rwfszgmU80V2rXo0gTRP0lnTfh49uQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=u0Aqz5Awt112MuYerz1ebHa5DayRmCX9ULsAHyaU21wosgxYwAoyZqIqLMUktzvNE
+         f7Wiz6GVsKA0LBAa60/Y71f492nPvgVBMJvFFuAVLuzgpfIvMZX9wHOB4wcnNPuWGW
+         aJBH9cMi+KwLCd0t7l2mas91iCnSQayct4RfuiXg=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
+        20210607101613epcas1p4092cb9e9f634854999ee6909ca6c3fda~GRVsY1Zmk1836418364epcas1p4Z;
+        Mon,  7 Jun 2021 10:16:13 +0000 (GMT)
+Received: from epsmges1p4.samsung.com (unknown [182.195.40.163]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4Fz8Qx6rPMz4x9Q3; Mon,  7 Jun
+        2021 10:16:09 +0000 (GMT)
+Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
+        epsmges1p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2B.33.10258.9E1FDB06; Mon,  7 Jun 2021 19:16:09 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
+        20210607101609epcas1p392324f6d215e329d632a615c4b1adf4c~GRVorpnUp1861918619epcas1p3z;
+        Mon,  7 Jun 2021 10:16:09 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210607101609epsmtrp24b6ff4c4821db2d26e3b81cba3919886~GRVoqRd400034300343epsmtrp2K;
+        Mon,  7 Jun 2021 10:16:09 +0000 (GMT)
+X-AuditID: b6c32a38-42fff70000002812-4e-60bdf1e969a1
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        6A.C6.08637.9E1FDB06; Mon,  7 Jun 2021 19:16:09 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210607101608epsmtip121b83c11f8d79fd546f0ac9dff3e0a4e~GRVoRYTYE3115431154epsmtip1O;
+        Mon,  7 Jun 2021 10:16:08 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     bvanassche@acm.org
+Cc:     Johannes.Thumshirn@wdc.com, alex_y_xu@yahoo.ca,
+        alim.akhtar@samsung.com, asml.silence@gmail.com,
+        avri.altman@wdc.com, axboe@kernel.dk, bgoncalv@redhat.com,
+        cang@codeaurora.org, damien.lemoal@wdc.com,
+        gregkh@linuxfoundation.org, hch@infradead.org, jaegeuk@kernel.org,
+        jejb@linux.ibm.com, jisoo2146.oh@samsung.com,
+        junho89.kim@samsung.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com, ming.lei@redhat.com,
+        mj0123.lee@samsung.com, nanich.lee@samsung.com, osandov@fb.com,
+        patchwork-bot@kernel.org, seunghwan.hyun@samsung.com,
+        sookwan7.kim@samsung.com, tj@kernel.org, tom.leiming@gmail.com,
+        woosung2.lee@samsung.com, yi.zhang@redhat.com,
+        yt0928.kim@samsung.com
+Subject: Re: [PATCH v12 0/3] bio: control bio max size
+Date:   Mon,  7 Jun 2021 18:57:32 +0900
+Message-Id: <20210607095732.16896-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.29.0
+In-Reply-To: <9e1c43a8-1c6d-95c6-ce4c-34ac194b9022@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20210603104721.6309-1-jack@suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf1CTdRzH7/s827PBHfUEpF850jHCAmRsjB9fAzw6LJ8LujhKNC+CBU/A
+        Oba5DY2oOwwFBOJHEiaCBPLDJkQNmIyLpBGHGEIdP1YoEAqnUAzYkESF2njg8r/Pj9f7877P
+        53tfLu6o57hwU2RqWimTSPmEPUvX7SnwmV3qjBde/94PfXu7kYP+vKgjUIVGB9Ds6giBrowX
+        EajjtyqAyhZXcWRurmej0zkrGMq61EygX4prMDTdXI6jmt91GCqY/oyN1vImMPRgSoU6x7zR
+        UEcFgfKN7QRq6F3HkOFsFobOtVTgaHSyn4O6J0ZYaKq2BEcDfWY2ung3DD1q6AFo4aGRg260
+        n8WRcaCMQM2dq0QYjxoajqCGCj/HqJIsE4fSl49zqJbLXtTQzTRKqzlDUMU1XYC6VtnIoZZm
+        xljUwo8jBFXYqgGURbuTyunKxyiDoR6PevaINCSZliTSSh4tS5AnpsiSQvkRb8eFxwUECkU+
+        or0oiM+TSVLpUP7+yCif11Ok1nvxeccl0jRrKUqiUvF994Uo5WlqmpcsV6lD+bQiUaoQCRUC
+        lSRVlSZLEiTIU18RCYV+AVYyXpr8qGgAV+jsPyr8x8zJBFe4ecCOC0l/eCn3C5AH7LmOZDuA
+        Oe1LLCYxA1hVXYrZKEdyBcCfvlRuKQbWbhEM1AngOeP6psICYNfcH7iNIsg9sHB+jLDFzuQ2
+        OLS8suGBk/Ns+F1/EbA1nMhAmGkY4NhiFukB++e1G3YOZDA8rz3JYex2wSeTBRtD7az1uvke
+        NsM8B/vOT7NsMW5lstou4DYDSM7ZwamOCRYj3g//1s3gTOwE53pbN4e6QIupk2AE+QBmZVcB
+        JikGsPZePcZQYmi2WKwNrtXCEzZ3+DJlN6h/XAkY52eg6UEB24ZA0gHmZjsyyIuw/9QkvuV1
+        r0m/OZGCJ6s0bOZchQAaBxtBMeCVP7VQ+VMLlf/v/DXANWAbrVClJtEqkcL/6UfWgo0/5IXa
+        QeX8osAAMC4wAMjF+c4Ob7j+EO/okChJ/5hWyuOUaVJaZQAB1nOX4C7PJ8itn1CmjhMF+InF
+        YuQfGBQYIOZvd0gKz4h3JJMkavooTSto5ZYO49q5ZGJO3bqGQ1/terfB/n122PJdyym/xJkY
+        YQj0yJ6+j5O5EYpv8gTsf6/HCE4YW06vHt7dd1mjr91e/pJ+gNcWPXXtRmQF73BDcCkr9er4
+        gRNvNd2MEfeUBUaELWcfSR+vHB9Oioisexh64MPFoNgU8PIdU+yIf8KK0i1gh+vs49Zj4bde
+        4PxaSnoPJngK6gbdqVGtqfZMt3NGRt+h+rSRT3dLR1ue/LVi+eR4lP/Bq8G1xnRuac3E+gfJ
+        3tHhwc1rTWrX2LmfNW/ehjtUOQtt2tf47Or31u+7H6w3z1V77Tu699U9xcGlrhNouPZOZ767
+        yVfYSBrdLvQuejTqundGH3sHazEE8lmqZInIC1eqJP8B8VAEs8wEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrAIsWRmVeSWpSXmKPExsWy7bCSnO7Lj3sTDFo3s1isu7OG3eLBvG1s
+        FnNWbWO0ePnzKpvF6rv9bBa7Ls5ntJj24Sezxaf1y1gtWtu/MVk0L17PZnF6wiImiyfrZzFb
+        LLqxjcmi50kTq8XfrntMFl8fFlvsvaVtcXnXHDaL7us72CyWH//HZHFocjOTxfTNc5gtrt0/
+        w25x+N5VFouHSyYyW5w7+YnVYt5jB4tfy48yWrz/cZ3d4tSOycwW189NY7NYv/cnm4OCx+Ur
+        3h6X+3qZPCY2v2P32DnrLrvH5hVaHpfPlnpsWtXJ5jFh0QFGj/1z17B7fHx6i8Xj/b6rbB59
+        W1YxenzeJOfRfqCbyePQoWXMAfxRXDYpqTmZZalF+nYJXBm/+s8xF2zjquj7/om9gXE1Rxcj
+        J4eEgInEub+32boYuTiEBHYzSix8tIYFIiElcfzEW9YuRg4gW1ji8OFiiJqPjBKfp/1lB6lh
+        E9CR6Ht7iw3EFhEQk7j85RsjSBGzwFQ2iVnPzzCBJIQFzCQaDp0Da2ARUJU483YTWJxXwFpi
+        5qZGdohl8hJ/7vcwg9icQPGlb4+ygthCAlYSK1sXM0PUC0qcnPkE7DhmoPrmrbOZJzAKzEKS
+        moUktYCRaRWjZGpBcW56brFhgWFearlecWJucWleul5yfu4mRnCi0NLcwbh91Qe9Q4xMHIyH
+        GCU4mJVEeL1k9iQI8aYkVlalFuXHF5XmpBYfYpTmYFES573QdTJeSCA9sSQ1OzW1ILUIJsvE
+        wSnVwBTaGu+fvd9458dldyOl3vHMquqz+GexfeGt0J6dAp8YNLP+rF36Zu+errZ1MT2Hoiez
+        mTcu3LTgzMEDfq0+F3+a85b9mc7przzNsfqG0IdpfS/6Nh4/e8Pk7Ly+h0kJQak31u2L0Nfc
+        0GX58rK3j+z9DRd6O8p32z88YfBgYtGlZ4xc+ckNn8yW9NxccaLwcWiv8BG3ztlV18xehP+Q
+        TdivMzewa4GzmsRm/t0LOeXLFt97p+rIF33u4zPXa/1nmMztTpmZhDb9LHSbeMs6f43lxRi5
+        PvaD8wR28Xx2jK3h3Lq6f8+EE37Ht1/JL2Nc9iP/W/Bppcqip7JJPAyMn7PtPk7u5bmQFdE0
+        r07MfpUSS3FGoqEWc1FxIgAdekm4gwMAAA==
+X-CMS-MailID: 20210607101609epcas1p392324f6d215e329d632a615c4b1adf4c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210607101609epcas1p392324f6d215e329d632a615c4b1adf4c
+References: <9e1c43a8-1c6d-95c6-ce4c-34ac194b9022@acm.org>
+        <CGME20210607101609epcas1p392324f6d215e329d632a615c4b1adf4c@epcas1p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/3/21 12:47 PM, Jan Kara wrote:
-> Provided the device driver does not implement dispatch budget accounting
-> (which only SCSI does) the loop in __blk_mq_do_dispatch_sched() pulls
-> requests from the IO scheduler as long as it is willing to give out any.
-> That defeats scheduling heuristics inside the scheduler by creating
-> false impression that the device can take more IO when it in fact
-> cannot.
+> On 6/3/21 10:03 PM, Changheun Lee wrote:
+> > bio size can grow up to 4GB after muli-page bvec has been enabled.
+> > But sometimes large size of bio would lead to inefficient behaviors.
+> > Control of bio max size will be helpful to improve inefficiency.
+> > 
+> > blk_queue_max_bio_bytes() is added to enable be set the max_bio_bytes in
+> > each driver layer. And max_bio_bytes sysfs is added to show current
+> > max_bio_bytes for each request queue.
+> > bio size can be controlled via max_bio_bytes.
 > 
-> For example with BFQ IO scheduler on top of virtio-blk device setting
-> blkio cgroup weight has barely any impact on observed throughput of
-> async IO because __blk_mq_do_dispatch_sched() always sucks out all the
-> IO queued in BFQ. BFQ first submits IO from higher weight cgroups but
-> when that is all dispatched, it will give out IO of lower weight cgroups
-> as well. And then we have to wait for all this IO to be dispatched to
-> the disk (which means lot of it actually has to complete) before the
-> IO scheduler is queried again for dispatching more requests. This
-> completely destroys any service differentiation.
-> 
-> So grab request tag for a request pulled out of the IO scheduler already
-> in __blk_mq_do_dispatch_sched() and do not pull any more requests if we
-> cannot get it because we are unlikely to be able to dispatch it. That
-> way only single request is going to wait in the dispatch list for some
-> tag to free.
-> 
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->  block/blk-mq-sched.c | 12 +++++++++++-
->  block/blk-mq.c       |  2 +-
->  block/blk-mq.h       |  2 ++
->  3 files changed, 14 insertions(+), 2 deletions(-)
-> 
-> Jens, can you please merge the patch? Thanks!
-> 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 996a4b2f73aa..714e678f516a 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -168,9 +168,19 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
->  		 * in blk_mq_dispatch_rq_list().
->  		 */
->  		list_add_tail(&rq->queuelist, &rq_list);
-> +		count++;
->  		if (rq->mq_hctx != hctx)
->  			multi_hctxs = true;
-> -	} while (++count < max_dispatch);
-> +
-> +		/*
-> +		 * If we cannot get tag for the request, stop dequeueing
-> +		 * requests from the IO scheduler. We are unlikely to be able
-> +		 * to submit them anyway and it creates false impression for
-> +		 * scheduling heuristics that the device can take more IO.
-> +		 */
-> +		if (!blk_mq_get_driver_tag(rq))
-> +			break;
-> +	} while (count < max_dispatch);
->  
->  	if (!count) {
->  		if (run_queue)
+> Where is the version history for this patch series?
 
-Doesn't this lead to a double accounting of the allocated tags?
-From what I can see we don't really check if the tag is already
-allocated in blk_mq_get_driver_tag() ...
+Sorry. I didn't know about it. I'll do next. Thank you for advise.
 
-Hmm?
+> 
+> Has this patch series been tested in combination with dm-crypt?
 
-Cheers,
+This patch has been tested in android device. And dm-crypt on the top of scsi
+has tested with below scsi modification in VM too.
 
-Hannes
--- 
-Dr. Hannes Reinecke		        Kernel Storage Architect
-hare@suse.de			               +49 911 74053 688
-SUSE Software Solutions Germany GmbH, 90409 Nürnberg
-GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
+@@ -1837,6 +1837,8 @@  void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+	blk_queue_virt_boundary(q, shost->virt_boundary_mask);
+	dma_set_max_seg_size(dev, queue_max_segment_size(q));
+			 
++	blk_queue_max_bio_bytes(q, queue_max_sectors(q) << SECTOR_SHIFT);
++
+	/*
+	 * Set a reasonable default alignment:  The larger of 32-byte (dword),
+	 * which is a common minimum for HBAs, and the minimum DMA alignment,
+
+> 
+> Bart.
+> 
+
+Thank you,
+Changheun Lee
