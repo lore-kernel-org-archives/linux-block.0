@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AA0C47082
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EBC8C4743E
 	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:07:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EFF861278
+	by mail.kernel.org (Postfix) with ESMTP id 4BDE2610A2
 	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:07:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232000AbhFHQJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 12:09:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53056 "EHLO
+        id S232528AbhFHQJV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 12:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232800AbhFHQIk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jun 2021 12:08:40 -0400
+        with ESMTP id S232635AbhFHQIp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jun 2021 12:08:45 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF11C061787;
-        Tue,  8 Jun 2021 09:06:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76247C06178B;
+        Tue,  8 Jun 2021 09:06:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=HwW7/FcNSPjoRVBBgiBQclHiHBGFA68ApXQNMgI7IuU=; b=ZySEe4D5FHucQqfuf1IfwHVuKW
-        WEHowatN5Tz2b3Z9grV/ImybjMv//WEMk+nNaqsU/kHB1CkTwBz9uwV6tqL+NLTC16eFXX4KUjdlm
-        KNe+VlkXw296qZipYK9wua0s0mArIUMI5dTf7VnXNQACY7jfkA0ecBfVzsyPgispTyntJziaW50av
-        bxo55suRvkOWzp3BY6bVQf82DwObcQ9EC8uIvE37Y8razpBbm9ai7HDfedZaZTWb5CjY0Y0uFMxvS
-        xqYCerXgjUgMWiaesg9WqaPvdlFa/PXNUX/k+E9vjO/L20OtCWESv7G+isYWlB5y2kI5cj2BK3k6N
-        RoH6CpdA==;
+        bh=rADL90S3oRiyRdCFkcJ9oLhZvXcChQZEzORShMtqGjI=; b=fAhFUBN7Oc5BAEM6sORmoH6JDn
+        sA7j6sp/njH1e/DfVaccAfoQX5UE5IFfNBERRtuswcYno9hlov73RUW8L80YIlgzUZJwT8ma5YmJc
+        mExGOPVRIFR/Nc3HFgNHk6IHOsJDVHbX8oVmEjnj0LkiLvx48A2UatdpveMhgZVrfKszj04iZqH31
+        RehyDVGENeMdIRBKZhmU1IK/Yzlj2kaEVWh8MW2VMYwPaO2VPbLnpdl5fU9GM0J7DoPkDwUeQpPfY
+        9MDj2/MorS5EwuEz29zobjxozUL9M2dGB6AuzgY11N+r3k1auMeuObPi6fJn/MTove72mkACrAMy8
+        bUrNAULA==;
 Received: from [2001:4bb8:192:ff5f:74ed:7c4f:a5ee:8dcb] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lqeFQ-009Rge-Pv; Tue, 08 Jun 2021 16:06:37 +0000
+        id 1lqeFX-009RiV-I9; Tue, 08 Jun 2021 16:06:44 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
@@ -46,9 +46,9 @@ Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
         linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         ceph-devel@vger.kernel.org
-Subject: [PATCH 09/16] ps3disk: use memcpy_{from,to}_bvec
-Date:   Tue,  8 Jun 2021 18:05:56 +0200
-Message-Id: <20210608160603.1535935-10-hch@lst.de>
+Subject: [PATCH 11/16] block: rewrite bio_copy_data_iter to use bvec_kmap_local and memcpy_to_bvec
+Date:   Tue,  8 Jun 2021 18:05:58 +0200
+Message-Id: <20210608160603.1535935-12-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210608160603.1535935-1-hch@lst.de>
 References: <20210608160603.1535935-1-hch@lst.de>
@@ -59,47 +59,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the bvec helpers instead of open coding the copy.
+Use the proper helpers instead of open coding the copy.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/ps3disk.c | 19 +++----------------
- 1 file changed, 3 insertions(+), 16 deletions(-)
+ block/bio.c | 28 ++++++++--------------------
+ 1 file changed, 8 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/block/ps3disk.c b/drivers/block/ps3disk.c
-index ba3ece56cbb3..f2eb0225814f 100644
---- a/drivers/block/ps3disk.c
-+++ b/drivers/block/ps3disk.c
-@@ -84,26 +84,13 @@ static void ps3disk_scatter_gather(struct ps3_storage_device *dev,
- 	unsigned int offset = 0;
- 	struct req_iterator iter;
- 	struct bio_vec bvec;
--	unsigned int i = 0;
--	size_t size;
--	void *buf;
- 
- 	rq_for_each_segment(bvec, req, iter) {
--		unsigned long flags;
--		dev_dbg(&dev->sbd.core, "%s:%u: bio %u: %u sectors from %llu\n",
--			__func__, __LINE__, i, bio_sectors(iter.bio),
--			iter.bio->bi_iter.bi_sector);
+diff --git a/block/bio.c b/block/bio.c
+index 1d7abdb83a39..c14d2e66c084 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1186,27 +1186,15 @@ EXPORT_SYMBOL(bio_advance);
+ void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 			struct bio *src, struct bvec_iter *src_iter)
+ {
+-	struct bio_vec src_bv, dst_bv;
+-	void *src_p, *dst_p;
+-	unsigned bytes;
 -
--		size = bvec.bv_len;
--		buf = bvec_kmap_irq(&bvec, &flags);
- 		if (gather)
--			memcpy(dev->bounce_buf+offset, buf, size);
-+			memcpy_from_bvec(dev->bounce_buf + offset, &bvec);
- 		else
--			memcpy(buf, dev->bounce_buf+offset, size);
--		offset += size;
--		flush_kernel_dcache_page(bvec.bv_page);
--		bvec_kunmap_irq(buf, &flags);
--		i++;
-+			memcpy_to_bvec(&bvec, dev->bounce_buf + offset);
-+		offset += bvec.bv_len;
- 	}
- }
+ 	while (src_iter->bi_size && dst_iter->bi_size) {
+-		src_bv = bio_iter_iovec(src, *src_iter);
+-		dst_bv = bio_iter_iovec(dst, *dst_iter);
+-
+-		bytes = min(src_bv.bv_len, dst_bv.bv_len);
+-
+-		src_p = kmap_atomic(src_bv.bv_page);
+-		dst_p = kmap_atomic(dst_bv.bv_page);
+-
+-		memcpy(dst_p + dst_bv.bv_offset,
+-		       src_p + src_bv.bv_offset,
+-		       bytes);
+-
+-		kunmap_atomic(dst_p);
+-		kunmap_atomic(src_p);
+-
+-		flush_dcache_page(dst_bv.bv_page);
++		struct bio_vec src_bv = bio_iter_iovec(src, *src_iter);
++		struct bio_vec dst_bv = bio_iter_iovec(dst, *dst_iter);
++		unsigned int bytes = min(src_bv.bv_len, dst_bv.bv_len);
++		void *src_buf;
++
++		src_buf = bvec_kmap_local(&src_bv);
++		memcpy_to_bvec(&dst_bv, src_buf);
++		kunmap_local(src_buf);
  
+ 		bio_advance_iter_single(src, src_iter, bytes);
+ 		bio_advance_iter_single(dst, dst_iter, bytes);
 -- 
 2.30.2
 
