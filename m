@@ -2,58 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC83C4743E
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0FAC4743E
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 17:07:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49DB561278
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:38:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1111261354
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 17:07:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232164AbhFHQj7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 12:39:59 -0400
-Received: from verein.lst.de ([213.95.11.211]:51622 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232123AbhFHQj7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Jun 2021 12:39:59 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9D48367373; Tue,  8 Jun 2021 18:38:02 +0200 (CEST)
-Date:   Tue, 8 Jun 2021 18:38:02 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ira Weiny <ira.weiny@intel.com>, dm-devel@redhat.com,
-        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ceph-devel@vger.kernel.org
-Subject: Re: [PATCH 08/16] dm-writecache: use bvec_kmap_local instead of
- bvec_kmap_irq
-Message-ID: <20210608163802.GA12173@lst.de>
-References: <20210608160603.1535935-1-hch@lst.de> <20210608160603.1535935-9-hch@lst.de> <4c248453-713f-9da8-04e8-7939388be49a@acm.org>
+        id S233673AbhFHRJq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 13:09:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38378 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232516AbhFHRJq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jun 2021 13:09:46 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 302DBC061574;
+        Tue,  8 Jun 2021 10:07:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=Nfy7uHyPPkAWxLl39aLZblVFB7
+        0vwbycBZf/vrgq0OMEhKhsgDEH0Egmu4lo26/o7ub+2LWA2WnxqaiWi0mY0P4mcGiOoHAd1P0fUFV
+        vPG3JNOTyJd84AYKjmMtyFDX97Hebo6tnkVmablx7T14R3G/3tQVCXjLzsnaIirU8zKDEx1iwDUct
+        MM69W1nxXe/T8O3/En2V/2jegx7uk4APqwpvWFO7NiiWUBqhelaye+p1aIWjhq1tjYdLfm6ru+fGr
+        ku8arZlwmYam9VpPVFmK5cCVLydyG+qT2uhYuCzKBPJ/BfdP+O+wQyTe7BITV2tw47D4PSpdjeUBj
+        pm3pPpyQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lqfBy-00HBTn-VX; Tue, 08 Jun 2021 17:07:14 +0000
+Date:   Tue, 8 Jun 2021 18:07:06 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     longli@linuxonhyperv.com
+Cc:     linux-block@vger.kernel.org, Long Li <longli@microsoft.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [Patch v3] block: return the correct bvec when checking for gaps
+Message-ID: <YL+jusm3DVsWpQ5b@infradead.org>
+References: <1623094445-22332-1-git-send-email-longli@linuxonhyperv.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4c248453-713f-9da8-04e8-7939388be49a@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <1623094445-22332-1-git-send-email-longli@linuxonhyperv.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 08, 2021 at 09:30:56AM -0700, Bart Van Assche wrote:
-> >From one of the functions called by kunmap_local():
-> 
-> unsigned long addr = (unsigned long) vaddr & PAGE_MASK;
-> 
-> This won't work well if bvec->bv_offset >= PAGE_SIZE I assume?
+Looks good,
 
-It won't indeed.  Both the existing and new helpers operate on single
-page bvecs only, and all callers only use those.  I should have
-probably mentioned that in the cover letter and documented the
-assumptions in the code, though.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
