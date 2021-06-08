@@ -2,82 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D16DBC47082
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39B72C4743D
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:14:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A40E961183
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:13:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2191E6128E
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 16:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbhFHQP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 12:15:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54568 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230205AbhFHQP2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jun 2021 12:15:28 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CACC061574;
-        Tue,  8 Jun 2021 09:13:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=/xv5Jd1LwNtxUXxsgwOwvaHap3qm6MsdrqO3O+zcubA=; b=KpCZpuPjzDDgo7hKOjKWoYKdrx
-        3ijnLI0y/XyeyHf4+WjkzsgiULBb4KZq5ltjJeEQWXm7DI37AWZgBzxyx5/kTWVpOQtkh4kkOsZCn
-        tOdNzMrsBUrbUCwXIAd9n9JVXQAbZYoWWUwYd7bo8zSkl7WGf75Wb2baR5K8erQQ+UA+jd5rsVYxw
-        pfi91HDJ6P1HE7FMalEUeWhL30npvOeaZo3JeyudlfanXaSWTLGWkRexoaA/TfYl3cihWiA/FOXvt
-        xY0lhA5WuHKmP4xwUAVPxB6Uq6HKUkGuom9C3j2KVXdgFON3/zqxrauY2FAlHviwkihCGC6LKiN6l
-        l/biNxJQ==;
-Received: from [2001:4bb8:192:ff5f:74ed:7c4f:a5ee:8dcb] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lqeM5-009SvR-SW; Tue, 08 Jun 2021 16:13:30 +0000
+        id S231678AbhFHQQV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 12:16:21 -0400
+Received: from verein.lst.de ([213.95.11.211]:51530 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231626AbhFHQQS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Jun 2021 12:16:18 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2DE1667373; Tue,  8 Jun 2021 18:14:23 +0200 (CEST)
+Date:   Tue, 8 Jun 2021 18:14:22 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     keescook@chromium.org, anton@enomsg.org, ccross@android.com,
-        tony.luck@intel.com, gmpy.liaowx@gmail.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] mark pstore-blk as broken
-Date:   Tue,  8 Jun 2021 18:13:27 +0200
-Message-Id: <20210608161327.1537919-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     Bhaskara Budiredla <bbudiredla@marvell.com>,
+        Kees Cook <keescook@chromium.org>,
+        Colin Cross <ccross@android.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [EXT] Re: [PATCH v5 1/2] mmc: Support kmsg dumper based on
+ pstore/blk
+Message-ID: <20210608161422.GA10298@lst.de>
+References: <20210120121047.2601-1-bbudiredla@marvell.com> <20210120121047.2601-2-bbudiredla@marvell.com> <CAPDyKFoF7jz-mbsY8kPUGca5civFKRRyPpHbRkj9P=xevRRfbA@mail.gmail.com> <CY4PR1801MB2070F43EFCB9139D8168164FDE3A9@CY4PR1801MB2070.namprd18.prod.outlook.com> <CAPDyKFrVQbALjSeFBckaZQgkgwcBVuwHy563pdBxHQNA7bxRnQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPDyKFrVQbALjSeFBckaZQgkgwcBVuwHy563pdBxHQNA7bxRnQ@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-pstore-blk just pokes directly into the pagecache for the block
-device without going through the file operations for that by faking
-up it's own file operations that do not match the block device ones.
-
-As this breaks the control of the block layer of it's page cache,
-and even now just works by accident only the best thing is to just
-disable this driver.
-
-Fixes: 17639f67c1d6 ("pstore/blk: Introduce backend for block devices")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/pstore/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/pstore/Kconfig b/fs/pstore/Kconfig
-index 8adabde685f1..328da35da390 100644
---- a/fs/pstore/Kconfig
-+++ b/fs/pstore/Kconfig
-@@ -173,6 +173,7 @@ config PSTORE_BLK
- 	tristate "Log panic/oops to a block device"
- 	depends on PSTORE
- 	depends on BLOCK
-+	depends on BROKEN
- 	select PSTORE_ZONE
- 	default n
- 	help
--- 
-2.30.2
-
+Given that Kees was unwilling to take the series to unbreak the pstore
+block support I've sent a patch to Jens to mark it broken and thus
+effectively disable it.  We can't really let this spread any further.
