@@ -2,147 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DACC47082
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 05:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0AD3C47082
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 07:19:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48D49610E5
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 05:43:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C819061287
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 07:19:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbhFHFpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 01:45:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38292 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229507AbhFHFpq (ORCPT
+        id S229526AbhFHHVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 03:21:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49940 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229512AbhFHHVP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Jun 2021 01:45:46 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1585XG3v073391;
-        Tue, 8 Jun 2021 01:43:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type : subject :
- from : in-reply-to : date : cc : message-id : references : to :
- content-transfer-encoding : mime-version; s=pp1;
- bh=PQPmzEQcdaoBnOuS7ZevmiX8i2v1FJ8/+mtIRXMQ42o=;
- b=gU5xRTM1iA2Bw+LR13YQSweFGyn9tnVZNWpRH1nfJoJuOxtKC1samtxYaOx8LnhS8wQm
- ywLVfOCLVuXxNa4m/5T37355h0C+isZFHegc+e9YkaueX7/CCkYZC/6Vzd4m29kHopER
- elk1DNbfzc3aHjv1BUYeJqgKXqGDwOUQVAPT5eOHWjKdi7bNUP9I4iPyJpNdBGIFptI7
- YXy+/tb+BaVzjZDwTPRx2O0ONnPLSnGCzj4IuLy0PqtyFm6+A4VQdCHh3WGtqJEsvT+V
- URcLSDLjeA7weuoWSnHprFYYuzWCTzZvkrXUrPHgaPoe0j3fsowDzrl6h2WwPbzk22M9 VA== 
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39228drjyt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 01:43:38 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1585bsPE027773;
-        Tue, 8 Jun 2021 05:43:36 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3900w8rqcx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 05:43:36 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1585hXoE33620238
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Jun 2021 05:43:34 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DB56C42042;
-        Tue,  8 Jun 2021 05:43:33 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 984F94203F;
-        Tue,  8 Jun 2021 05:43:32 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.199.59.176])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Jun 2021 05:43:32 +0000 (GMT)
-Content-Type: text/plain;
-        charset=utf-8
-Subject: Re: [PATCH v2] libnvdimm/pmem: Fix blk_cleanup_disk() usage
-From:   Sachin Sant <sachinp@linux.vnet.ibm.com>
-In-Reply-To: <162310994435.1571616.334551212901820961.stgit@dwillia2-desk3.amr.corp.intel.com>
-Date:   Tue, 8 Jun 2021 11:13:31 +0530
-Cc:     axboe@kernel.dk, nvdimm@lists.linux.dev,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Christoph Hellwig <hch@lst.de>
-Message-Id: <637B91E6-B4DD-4DF3-BAA2-0C60B6B6B3C5@linux.vnet.ibm.com>
-References: <162310861219.1571453.6561642225122047071.stgit@dwillia2-desk3.amr.corp.intel.com>
- <162310994435.1571616.334551212901820961.stgit@dwillia2-desk3.amr.corp.intel.com>
-To:     Dan Williams <dan.j.williams@intel.com>
-X-Mailer: Apple Mail (2.3654.80.0.2.43)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: f1SCacZwDL47-u1DPvXhD6RO1n8SNoVb
-X-Proofpoint-ORIG-GUID: f1SCacZwDL47-u1DPvXhD6RO1n8SNoVb
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Tue, 8 Jun 2021 03:21:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623136763;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JKRRC84E0OIYQ/P5AoK+syWxBWg0gWjtBYn62R6KGdo=;
+        b=VJM2Mco6xYr3c3n07Il25/dcMfDLbzpI2AYNQQ/zjHEUf8GOXvJ7z0zHXMTIzkMNP1/hYe
+        qtiBHteH6lzFjcRT868x92mXtRCBUxjDnun7KxkJghv8ZTWcQ7b7x0v8JxDpvaZB98lEFL
+        0xaEGZNuhAhxktu/fr0fUWpzV8SZ0go=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-426-kPhUXU7iPi-fN4wXnSQH4g-1; Tue, 08 Jun 2021 03:19:21 -0400
+X-MC-Unique: kPhUXU7iPi-fN4wXnSQH4g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E95A88049C5;
+        Tue,  8 Jun 2021 07:19:20 +0000 (UTC)
+Received: from localhost (ovpn-12-142.pek2.redhat.com [10.72.12.142])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BA38D19C66;
+        Tue,  8 Jun 2021 07:19:13 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH V2 0/2] block: fix race between adding wbt and normal IO 
+Date:   Tue,  8 Jun 2021 15:19:01 +0800
+Message-Id: <20210608071903.431195-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-08_05:2021-06-04,2021-06-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- priorityscore=1501 suspectscore=0 adultscore=0 malwarescore=0 bulkscore=0
- mlxscore=0 lowpriorityscore=0 clxscore=1011 mlxlogscore=999
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106080035
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-> Reported-by: Sachin Sant <sachinp@linux.vnet.ibm.com>
-> Fixes: 87eb73b2ca7c ("nvdimm-pmem: convert to blk_alloc_disk/blk_cleanup_=
-disk")
-> Link: http://lore.kernel.org/r/DFB75BA8-603F-4A35-880B-C5B23EF8FA7D@linux=
-.vnet.ibm.com
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-> ---
+Yi reported several kernel panics on:
 
-Thanks Dan. This patch fixes the reported crash for me.
+[16687.001777] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
+...
+[16687.163549] pc : __rq_qos_track+0x38/0x60
 
-Tested-by: Sachin Sant <sachinp@linux.vnet.ibm.com>
->=20
-> Changes in v2 Improve the changelog.
->=20
-> drivers/nvdimm/pmem.c |    4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-> index 31f3c4bd6f72..fc6b78dd2d24 100644
-> --- a/drivers/nvdimm/pmem.c
-> +++ b/drivers/nvdimm/pmem.c
-> @@ -337,8 +337,9 @@ static void pmem_pagemap_cleanup(struct dev_pagemap *=
-pgmap)
-> {
-> 	struct request_queue *q =3D
-> 		container_of(pgmap->ref, struct request_queue, q_usage_counter);
+or
 
-With this change variable =E2=80=98q' is no longer needed and can be remove=
-d.
+[  997.690455] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
+...
+[  997.850347] pc : __rq_qos_done+0x2c/0x50
 
-drivers/nvdimm/pmem.c: In function 'pmem_pagemap_cleanup':
-drivers/nvdimm/pmem.c:338:24: warning: unused variable 'q' [-Wunused-variab=
-le]
-  struct request_queue *q =3D=20=20
-                                      ^
-> +	struct pmem_device *pmem =3D pgmap->owner;
->=20
-> -	blk_cleanup_disk(queue_to_disk(q));
-> +	blk_cleanup_disk(pmem->disk);
-> }
->=20
-> static void pmem_release_queue(void *pgmap)
-> @@ -427,6 +428,7 @@ static int pmem_attach_disk(struct device *dev,
-> 	q =3D disk->queue;
->=20
-> 	pmem->disk =3D disk;
-> +	pmem->pgmap.owner =3D pmem;
-> 	pmem->pfn_flags =3D PFN_DEV;
-> 	pmem->pgmap.ref =3D &q->q_usage_counter;
-> 	if (is_nd_pfn(dev)) {
->=20
+Turns out it is caused by race between adding wbt and normal IO.
 
-Thanks
--Sachin=
+Fix the issue by freezing request queue when adding/deleting rq qos.
+
+V2:
+	- switch to the approach of freezing queue, which is more generic
+	  than V1.
+
+
+Ming Lei (2):
+  block: fix race between adding/removing rq qos and normal IO
+  block: mark queue init done at the end of blk_register_queue
+
+ block/blk-rq-qos.h | 13 +++++++++++++
+ block/blk-sysfs.c  | 29 +++++++++++++++--------------
+ 2 files changed, 28 insertions(+), 14 deletions(-)
+
+Cc: Yi Zhang <yi.zhang@redhat.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+-- 
+2.31.1
+
