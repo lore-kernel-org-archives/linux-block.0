@@ -2,111 +2,302 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFA3C47082
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 09:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D287C4743D
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 09:28:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9009961208
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 09:20:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76D696128B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 09:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbhFHJWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 05:22:51 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:5291 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbhFHJWu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jun 2021 05:22:50 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Fzl392Zmnz1BJwj;
-        Tue,  8 Jun 2021 17:16:05 +0800 (CST)
-Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 8 Jun 2021 17:20:55 +0800
-Received: from huawei.com (10.175.101.6) by dggpeml500009.china.huawei.com
- (7.185.36.209) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 8 Jun 2021
- 17:20:55 +0800
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <jack@suse.cz>, <hare@suse.de>,
-        <ming.lei@redhat.com>, <damien.lemoal@wdc.com>
-Subject: [PATCH] block: check disk exist before trying to add partition
-Date:   Tue, 8 Jun 2021 17:27:07 +0800
-Message-ID: <20210608092707.1062259-1-yuyufen@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        id S230190AbhFHJ35 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 05:29:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37756 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229507AbhFHJ34 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Jun 2021 05:29:56 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 72D166124C;
+        Tue,  8 Jun 2021 09:28:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1623144484;
+        bh=u/yn7qdyg2jplF/gHxRTO0ZByTH2g4Z41ES/bS2ZEpE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=vtlPXWHw03L/hDmiA5HUErLr5DckpuwpDtSY6cbWuMI9ey8p5BwoEf8QH0IFQ71FC
+         +BG2oHucIybGH7+JBhwG/k4l3j3bhUNsuh4yWD3cOEy//fBTyCi3JStstMsH8TRA0n
+         s2owd6UyymeLJCI3V1vEuD+gzCFu1R7uFRbjOTpo=
+Date:   Tue, 8 Jun 2021 11:28:01 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     yongw.pur@gmail.com
+Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        axboe@kernel.dk, akpm@linux-foundation.org,
+        songmuchun@bytedance.com, david@redhat.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, willy@infradead.org, linux-api@vger.kernel.org,
+        lu.zhongjun@zte.com.cn, yang.yang29@zte.com.cn,
+        zhang.wenya1@zte.com.cn, wang.yong12@zte.com.cn
+Subject: Re: [RFC PATCH V3] zram:calculate available memory when zram is used
+Message-ID: <YL84IUIQ0XAvv16D@kroah.com>
+References: <1623080354-21453-1-git-send-email-yongw.pur@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500009.china.huawei.com (7.185.36.209)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1623080354-21453-1-git-send-email-yongw.pur@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If disk have been deleted, we should return fail for ioctl
-BLKPG_DEL_PARTITION. Otherwise, the directory /sys/class/block
-may remain invalid symlinks file. The race as following:
+On Mon, Jun 07, 2021 at 08:39:14AM -0700, yongw.pur@gmail.com wrote:
+> From: wangyong <wang.yong12@zte.com.cn>
+> 
+> When zram is used, available+Swap free memory is obviously bigger than we
+> actually can use, because zram can compress memory by compression
+> algorithm and zram compressed data will occupy memory too.
+> 
+> So, we can count the compression ratio of zram in the kernel. The space
+> will be saved by zram and other swap device are calculated as follows:
+> zram[swapfree - swapfree * compress ratio] + swapdev[swapfree]
+> We can evaluate the available memory of the whole system as:
+> MemAvailable+zram[swapfree - swapfree * compress ratio]+swapdev[swapfree]
+> 
+> Add an entry to the /proc/meminfo file, returns swap will save space.
+> Which name is more appropriate is still under consideration.
+> There are several alternative names: SwapAvailable, SwapSaved,
+> SwapCompressible, Which is better?
+> 
+> Adding new entries has little effect on user program, since parsers
+> usually parse by keywords
+> 
+> Changes from v2:
+> *Add interface description document
+> *Other mistakes and problems fix
+> 
+> Changes from v1:
+> *Use a new interface to return memory savings when using swap devices
+> *Zram add min_compr_ratio attr
 
-blkdev_open
-				del_gendisk
-				    disk->flags &= ~GENHD_FL_UP;
-				    blk_drop_partitions
-blkpg_ioctl
-    bdev_add_partition
-    add_partition
-        device_add
-	    device_add_class_symlinks
+These "Changes" need to go below the --- line please.
 
-ioctl may add_partition after del_gendisk() have tried to delete
-partitions. Then, symlinks file will be created.
+> 
+> Signed-off-by: wangyong <wang.yong12@zte.com.cn>
+> ---
+>  Documentation/admin-guide/blockdev/zram.rst |  6 ++
+>  Documentation/filesystems/proc.rst          |  4 ++
+>  drivers/block/zram/zcomp.h                  |  8 +++
+>  drivers/block/zram/zram_drv.c               | 19 ++++++
+>  drivers/block/zram/zram_drv.h               |  1 +
+>  fs/proc/meminfo.c                           |  1 +
+>  include/linux/swap.h                        | 11 ++++
+>  mm/swapfile.c                               | 95 +++++++++++++++++++++++++++++
+>  mm/vmscan.c                                 |  1 +
+>  9 files changed, 146 insertions(+)
+> 
+> diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
+> index 700329d..3b7c4c4 100644
+> --- a/Documentation/admin-guide/blockdev/zram.rst
+> +++ b/Documentation/admin-guide/blockdev/zram.rst
+> @@ -283,6 +283,12 @@ a single line of text and contains the following stats separated by whitespace:
+>  		Unit: 4K bytes
+>   ============== =============================================================
+>  
+> +File /sys/block/zram<id>/min_compr_ratio
+> +
+> +The min_compr_ratio file represents the min_compr_ratio during zram swapping out.The calculation formula is as follows:
+> +(orig_size * 100) / compr_data_size
+> +
+> +
 
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
----
- block/partitions/core.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index dc60ecf46fe6..58662a0f48e4 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -449,17 +449,26 @@ int bdev_add_partition(struct block_device *bdev, int partno,
- 		sector_t start, sector_t length)
- {
- 	struct block_device *part;
-+	struct gendisk *disk = bdev->bd_disk;
-+	int ret;
- 
- 	mutex_lock(&bdev->bd_mutex);
--	if (partition_overlaps(bdev->bd_disk, start, length, -1)) {
--		mutex_unlock(&bdev->bd_mutex);
--		return -EBUSY;
-+	if (!(disk->flags & GENHD_FL_UP)) {
-+		ret = -ENXIO;
-+		goto out;
- 	}
- 
--	part = add_partition(bdev->bd_disk, partno, start, length,
-+	if (partition_overlaps(disk, start, length, -1)) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	part = add_partition(disk, partno, start, length,
- 			ADDPART_FLAG_NONE, NULL);
-+	ret = PTR_ERR_OR_ZERO(part);
-+out:
- 	mutex_unlock(&bdev->bd_mutex);
--	return PTR_ERR_OR_ZERO(part);
-+	return ret;
- }
- 
- int bdev_del_partition(struct block_device *bdev, int partno)
--- 
-2.25.4
+sysfs files need to be documented in Documentation/ABI/ files.  You can
+reference them in other documentation files, but they need to be in the
+ABI/ directory as well.
 
+Also please wrap your lines at the proper length and use a ' ' after a
+'.'
+
+
+
+
+>  9) Deactivate
+>  =============
+>  
+> diff --git a/Documentation/filesystems/proc.rst b/Documentation/filesystems/proc.rst
+> index 042c418..15d35ae 100644
+> --- a/Documentation/filesystems/proc.rst
+> +++ b/Documentation/filesystems/proc.rst
+> @@ -961,6 +961,7 @@ You may not have all of these fields.
+>      LowFree:          4432 kB
+>      SwapTotal:           0 kB
+>      SwapFree:            0 kB
+> +    SwapAvailable:       0 kB
+>      Dirty:             968 kB
+>      Writeback:           0 kB
+>      AnonPages:      861800 kB
+> @@ -1032,6 +1033,9 @@ SwapTotal
+>  SwapFree
+>                Memory which has been evicted from RAM, and is temporarily
+>                on the disk
+> +SwapAvailable
+> +              The memory savings when use swap devices. it takes zram
+> +              compression ratio into considerations, when zram is used    
+
+Trailing whitespace?
+
+Did you run your patch through scripts/checkpatch.pl first before
+sending it out?
+
+
+>  Dirty
+>                Memory which is waiting to get written back to the disk
+>  Writeback
+> diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+> index 40f6420..9c9cb96 100644
+> --- a/drivers/block/zram/zcomp.h
+> +++ b/drivers/block/zram/zcomp.h
+> @@ -40,4 +40,12 @@ int zcomp_decompress(struct zcomp_strm *zstrm,
+>  		const void *src, unsigned int src_len, void *dst);
+>  
+>  bool zcomp_set_max_streams(struct zcomp *comp, int num_strm);
+> +#ifdef CONFIG_ZRAM
+> +int get_zram_major(void);
+> +#else
+> +int get_zram_major(void)
+> +{
+> +	return -1;
+> +}
+> +#endif
+>  #endif /* _ZCOMP_H_ */
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index fcaf275..8f527e0 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -59,6 +59,10 @@ static void zram_free_page(struct zram *zram, size_t index);
+>  static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+>  				u32 index, int offset, struct bio *bio);
+>  
+> +int get_zram_major(void)
+> +{
+> +	return zram_major;
+
+Why does anyone need the zram major number?
+
+
+> +}
+>  
+>  static int zram_slot_trylock(struct zram *zram, u32 index)
+>  {
+> @@ -1040,6 +1044,19 @@ static ssize_t compact_store(struct device *dev,
+>  	return len;
+>  }
+>  
+> +static ssize_t min_compr_ratio_show(struct device *dev,
+> +		struct device_attribute *attr, char *buf)
+> +{
+> +	struct zram *zram = dev_to_zram(dev);
+> +	ssize_t ret;
+> +
+> +	down_read(&zram->init_lock);
+> +	ret = scnprintf(buf, PAGE_SIZE, "%d\n", atomic_read(&zram->stats.min_compr_ratio));
+> +	up_read(&zram->init_lock);
+
+You are using an atomic variable _AND_ a read lock?  Are you sure that
+makes sense?
+
+And please use sysfs_emit() for sysfs files.
+
+
+> +
+> +	return ret;
+> +}
+> +
+>  static ssize_t io_stat_show(struct device *dev,
+>  		struct device_attribute *attr, char *buf)
+>  {
+> @@ -1132,6 +1149,7 @@ static ssize_t debug_stat_show(struct device *dev,
+>  	return ret;
+>  }
+>  
+> +static DEVICE_ATTR_RO(min_compr_ratio);
+>  static DEVICE_ATTR_RO(io_stat);
+>  static DEVICE_ATTR_RO(mm_stat);
+>  #ifdef CONFIG_ZRAM_WRITEBACK
+> @@ -1859,6 +1877,7 @@ static struct attribute *zram_disk_attrs[] = {
+>  	&dev_attr_idle.attr,
+>  	&dev_attr_max_comp_streams.attr,
+>  	&dev_attr_comp_algorithm.attr,
+> +	&dev_attr_min_compr_ratio.attr,
+>  #ifdef CONFIG_ZRAM_WRITEBACK
+>  	&dev_attr_backing_dev.attr,
+>  	&dev_attr_writeback.attr,
+> diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+> index 80c3b43..5717e06 100644
+> --- a/drivers/block/zram/zram_drv.h
+> +++ b/drivers/block/zram/zram_drv.h
+> @@ -88,6 +88,7 @@ struct zram_stats {
+>  	atomic64_t bd_reads;		/* no. of reads from backing device */
+>  	atomic64_t bd_writes;		/* no. of writes from backing device */
+>  #endif
+> +	atomic_t min_compr_ratio;
+>  };
+>  
+>  struct zram {
+> diff --git a/fs/proc/meminfo.c b/fs/proc/meminfo.c
+> index 6fa761c..34a174b 100644
+> --- a/fs/proc/meminfo.c
+> +++ b/fs/proc/meminfo.c
+> @@ -86,6 +86,7 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
+>  
+>  	show_val_kb(m, "SwapTotal:      ", i.totalswap);
+>  	show_val_kb(m, "SwapFree:       ", i.freeswap);
+> +	show_val_kb(m, "SwapAvailable:	", count_avail_swaps());
+>  	show_val_kb(m, "Dirty:          ",
+>  		    global_node_page_state(NR_FILE_DIRTY));
+>  	show_val_kb(m, "Writeback:      ",
+> diff --git a/include/linux/swap.h b/include/linux/swap.h
+> index bb48893..deed141 100644
+> --- a/include/linux/swap.h
+> +++ b/include/linux/swap.h
+> @@ -515,6 +515,8 @@ extern int init_swap_address_space(unsigned int type, unsigned long nr_pages);
+>  extern void exit_swap_address_space(unsigned int type);
+>  extern struct swap_info_struct *get_swap_device(swp_entry_t entry);
+>  sector_t swap_page_sector(struct page *page);
+> +extern void update_zram_zstats(void);
+> +extern u64 count_avail_swaps(void);
+>  
+>  static inline void put_swap_device(struct swap_info_struct *si)
+>  {
+> @@ -689,6 +691,15 @@ static inline swp_entry_t get_swap_page(struct page *page)
+>  	return entry;
+>  }
+>  
+> +void update_zram_zstats(void)
+> +{
+> +}
+> +
+> +u64 count_avail_swaps(void)
+> +{
+> +	return 0;
+> +}
+> +
+>  #endif /* CONFIG_SWAP */
+>  
+>  #ifdef CONFIG_THP_SWAP
+> diff --git a/mm/swapfile.c b/mm/swapfile.c
+> index 1e07d1c..5ce5100 100644
+> --- a/mm/swapfile.c
+> +++ b/mm/swapfile.c
+> @@ -44,6 +44,7 @@
+>  #include <asm/tlbflush.h>
+>  #include <linux/swapops.h>
+>  #include <linux/swap_cgroup.h>
+> +#include "../drivers/block/zram/zram_drv.h"
+
+That's a big hint that this is not correct, please do not do this :(
+
+The core kernel should not depend on a random block driver's code.
+
+thanks,
+
+greg k-h
