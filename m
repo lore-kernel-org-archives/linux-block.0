@@ -4,54 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0FAC4743E
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 17:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7976EC47082
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 17:11:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1111261354
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 17:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 605826128E
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jun 2021 17:11:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233673AbhFHRJq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 13:09:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38378 "EHLO
+        id S231919AbhFHRND (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 13:13:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232516AbhFHRJq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jun 2021 13:09:46 -0400
+        with ESMTP id S232788AbhFHRNA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jun 2021 13:13:00 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 302DBC061574;
-        Tue,  8 Jun 2021 10:07:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E853C061574
+        for <linux-block@vger.kernel.org>; Tue,  8 Jun 2021 10:11:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=Nfy7uHyPPkAWxLl39aLZblVFB7
-        0vwbycBZf/vrgq0OMEhKhsgDEH0Egmu4lo26/o7ub+2LWA2WnxqaiWi0mY0P4mcGiOoHAd1P0fUFV
-        vPG3JNOTyJd84AYKjmMtyFDX97Hebo6tnkVmablx7T14R3G/3tQVCXjLzsnaIirU8zKDEx1iwDUct
-        MM69W1nxXe/T8O3/En2V/2jegx7uk4APqwpvWFO7NiiWUBqhelaye+p1aIWjhq1tjYdLfm6ru+fGr
-        ku8arZlwmYam9VpPVFmK5cCVLydyG+qT2uhYuCzKBPJ/BfdP+O+wQyTe7BITV2tw47D4PSpdjeUBj
-        pm3pPpyQ==;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=StseGrna69MbN/skOCLk29Jv0N
+        zmleI6KI2sn9XoyIv6hg8oP0AGqWmznEe2AiNJ6gIE+A1AOyJoRYxvWCV36ffdJRf5IpbVKsszjZJ
+        7WgLx8QlQ9BpFibiD7yf1x/OSPtJsMZkgjiD1tu/hkAfydPYKrvGCQ1sfi5/ym7m2sxgIm2NtrBos
+        duVbyKb7baIVfeOzXRsKqAooiyx53qXF9L36Ldkz86dJ/AdV+DISr8GMfenrNywV8n//Zq08nV7jg
+        VB1AXludo2Z6Zo6nK+UaDyC45LtbuAzVDaGkAmFiMEkkLWGALtu6qXmksel4b/kf7/NVBDJ8RKVCi
+        /1SiB1uQ==;
 Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lqfBy-00HBTn-VX; Tue, 08 Jun 2021 17:07:14 +0000
-Date:   Tue, 8 Jun 2021 18:07:06 +0100
+        id 1lqfFQ-00HBgu-Pe; Tue, 08 Jun 2021 17:10:46 +0000
+Date:   Tue, 8 Jun 2021 18:10:40 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     longli@linuxonhyperv.com
-Cc:     linux-block@vger.kernel.org, Long Li <longli@microsoft.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [Patch v3] block: return the correct bvec when checking for gaps
-Message-ID: <YL+jusm3DVsWpQ5b@infradead.org>
-References: <1623094445-22332-1-git-send-email-longli@linuxonhyperv.com>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jack@suse.cz,
+        hare@suse.de, ming.lei@redhat.com, damien.lemoal@wdc.com
+Subject: Re: [PATCH] block: check disk exist before trying to add partition
+Message-ID: <YL+kkLIZ+1Vwpip4@infradead.org>
+References: <20210608092707.1062259-1-yuyufen@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1623094445-22332-1-git-send-email-longli@linuxonhyperv.com>
+In-Reply-To: <20210608092707.1062259-1-yuyufen@huawei.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
