@@ -2,123 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D8EC4743D
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A09C48BCD
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:59:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C95C61287
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:58:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DFC56128A
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:59:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233286AbhFICAt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 22:00:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40925 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233277AbhFICAt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Jun 2021 22:00:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623203935;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q8nKU7UnSp5v/Pw/LbxaxGvU7HBGXpGdDckUuWp0QKM=;
-        b=KeYh+8UiKmKAwcnpzzfx6JRzIiwodm9Hsur78Euy9MJxCQljoAXKwEPRlaT14YJZPTRIm7
-        liE/Z2XcqRKHP+tapApmLmFIyVwzadv3LNpQvcalcDEDJFXRV6mi72skYwDicJPkmpdN6T
-        6yJqq6yMP8+uQonuAKnA/meFYjLh9gM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-fnfkVLO8PdCwpKghEMNoHQ-1; Tue, 08 Jun 2021 21:58:54 -0400
-X-MC-Unique: fnfkVLO8PdCwpKghEMNoHQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 704AE1854E27;
-        Wed,  9 Jun 2021 01:58:53 +0000 (UTC)
-Received: from localhost (ovpn-12-143.pek2.redhat.com [10.72.12.143])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 408B119C45;
-        Wed,  9 Jun 2021 01:58:45 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V3 2/2] block: mark queue init done at the end of blk_register_queue
-Date:   Wed,  9 Jun 2021 09:58:22 +0800
-Message-Id: <20210609015822.103433-3-ming.lei@redhat.com>
-In-Reply-To: <20210609015822.103433-1-ming.lei@redhat.com>
-References: <20210609015822.103433-1-ming.lei@redhat.com>
+        id S233308AbhFICBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 22:01:38 -0400
+Received: from mga07.intel.com ([134.134.136.100]:29091 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233303AbhFICBi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Jun 2021 22:01:38 -0400
+IronPort-SDR: QuqK2AfQBH5SR3aZ+/OC+eIwTGcibSsd/qUNvBIFl3jDSyoBaz4k5mJhJiinGtYH1bnYDdP+Gj
+ 0kX+kus9ntWg==
+X-IronPort-AV: E=McAfee;i="6200,9189,10009"; a="268841742"
+X-IronPort-AV: E=Sophos;i="5.83,259,1616482800"; 
+   d="scan'208";a="268841742"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2021 18:59:44 -0700
+IronPort-SDR: l5m0zsMDo0S/BY6flob2JC9Z0fcbfXs0snnKIkUOGNUZsN5SIUPiUFSjvaStBruug7QhFYdMqJ
+ TyBwGFTSV0lA==
+X-IronPort-AV: E=Sophos;i="5.83,259,1616482800"; 
+   d="scan'208";a="482201365"
+Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2021 18:59:44 -0700
+Date:   Tue, 8 Jun 2021 18:59:43 -0700
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        ceph-devel@vger.kernel.org
+Subject: Re: switch the block layer to use kmap_local_page
+Message-ID: <20210609015943.GV3697498@iweiny-DESK2.sc.intel.com>
+References: <20210608160603.1535935-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210608160603.1535935-1-hch@lst.de>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Mark queue init done when everything is done well in blk_register_queue(),
-so that wbt_enable_default() can be run quickly without any RCU period
-involved since adding rq qos requires to freeze queue.
+On Tue, Jun 08, 2021 at 06:05:47PM +0200, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series switches the core block layer code and all users of the
+> existing bvec kmap helpers to use kmap_local_page.  Drivers that
+> currently use open coded kmap_atomic calls will converted in a follow
+> on series.
 
-Also no any side effect by delaying to mark queue init done.
+Other than the missing flush_dcache's.
 
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-sysfs.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+For the series.
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f89e2fc3963b..370d83c18057 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -866,20 +866,6 @@ int blk_register_queue(struct gendisk *disk)
- 		  "%s is registering an already registered queue\n",
- 		  kobject_name(&dev->kobj));
- 
--	/*
--	 * SCSI probing may synchronously create and destroy a lot of
--	 * request_queues for non-existent devices.  Shutting down a fully
--	 * functional queue takes measureable wallclock time as RCU grace
--	 * periods are involved.  To avoid excessive latency in these
--	 * cases, a request_queue starts out in a degraded mode which is
--	 * faster to shut down and is made fully functional here as
--	 * request_queues for non-existent devices never get registered.
--	 */
--	if (!blk_queue_init_done(q)) {
--		blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
--		percpu_ref_switch_to_percpu(&q->q_usage_counter);
--	}
--
- 	blk_queue_update_readahead(q);
- 
- 	ret = blk_trace_init_sysfs(dev);
-@@ -938,6 +924,21 @@ int blk_register_queue(struct gendisk *disk)
- 	ret = 0;
- unlock:
- 	mutex_unlock(&q->sysfs_dir_lock);
-+
-+	/*
-+	 * SCSI probing may synchronously create and destroy a lot of
-+	 * request_queues for non-existent devices.  Shutting down a fully
-+	 * functional queue takes measureable wallclock time as RCU grace
-+	 * periods are involved.  To avoid excessive latency in these
-+	 * cases, a request_queue starts out in a degraded mode which is
-+	 * faster to shut down and is made fully functional here as
-+	 * request_queues for non-existent devices never get registered.
-+	 */
-+	if (!blk_queue_init_done(q)) {
-+		blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
-+		percpu_ref_switch_to_percpu(&q->q_usage_counter);
-+	}
-+
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_register_queue);
--- 
-2.31.1
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
+> 
+> Diffstat:
+>  arch/mips/include/asm/mach-rc32434/rb.h |    2 -
+>  block/bio-integrity.c                   |   14 ++++------
+>  block/bio.c                             |   37 +++++++---------------------
+>  block/blk-map.c                         |    2 -
+>  block/bounce.c                          |   35 ++++++--------------------
+>  block/t10-pi.c                          |   16 ++++--------
+>  drivers/block/ps3disk.c                 |   19 ++------------
+>  drivers/block/rbd.c                     |   15 +----------
+>  drivers/md/dm-writecache.c              |    5 +--
+>  include/linux/bio.h                     |   42 --------------------------------
+>  include/linux/bvec.h                    |   27 ++++++++++++++++++--
+>  include/linux/highmem.h                 |    4 +--
+>  12 files changed, 64 insertions(+), 154 deletions(-)
