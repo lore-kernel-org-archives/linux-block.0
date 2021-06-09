@@ -2,126 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F769C48BCD
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 15:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1E1C48BCD
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 15:10:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CA066124C
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 15:00:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 949E46128A
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 15:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235511AbhFIPCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 11:02:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36224 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238378AbhFIPCI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Jun 2021 11:02:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 46166611CC;
-        Wed,  9 Jun 2021 15:00:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1623250800;
-        bh=49nXecvhsLBHihPFzr4F1shvMNvWEV2skUmEodggHXs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=N7/Nd/zuds8aJM/XE8CD7Qy708zqWC+oTwV5MoOmEHCPALfB37ouXaY5eSmS4j4eO
-         HNjLgTrAPIM5H3TRpZQQQpErtoQZAjEhuly03r7j3mv0Vv2sbCrJN1Bc0IivMIxPrg
-         zlugSh2FzNlpApkjnRjS3w7t+Mv+Nz7VUM2t1/oQ=
-Date:   Wed, 9 Jun 2021 16:59:58 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     yong w <yongw.pur@gmail.com>
-Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
-        axboe@kernel.dk, akpm@linux-foundation.org,
-        songmuchun@bytedance.com, David Hildenbrand <david@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, willy@infradead.org, linux-api@vger.kernel.org,
-        lu.zhongjun@zte.com.cn, yang.yang29@zte.com.cn,
-        zhang.wenya1@zte.com.cn, wang.yong12@zte.com.cn
-Subject: Re: [RFC PATCH V3] zram:calculate available memory when zram is used
-Message-ID: <YMDXbh0H20MPG87V@kroah.com>
-References: <1623080354-21453-1-git-send-email-yongw.pur@gmail.com>
- <YL84boGKozWE+n23@kroah.com>
- <CAOH5QeBV5zq=SpMSxZHJqgmfKegdgc7ehpots6AKjjgEYq5rGg@mail.gmail.com>
+        id S231179AbhFIPMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 11:12:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231934AbhFIPMF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 11:12:05 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B455C061574
+        for <linux-block@vger.kernel.org>; Wed,  9 Jun 2021 08:10:02 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id q15so19702547pgg.12
+        for <linux-block@vger.kernel.org>; Wed, 09 Jun 2021 08:10:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=IBXcSszBYphaifHgOC2J5NicZzuUQ/7ILUQKgpfvwwk=;
+        b=C2gl0t8sa0OyDrmf3CGQvVpN7nKMUYnmoNEFFTwsu1rvQew7e5y/VeHC/86fkQDjj4
+         kS0WkTlD8Ceci0rRgBKGIOxxqx5mmfAnsGvIW4D2hP0H2CT8FkfLRyfO4wnEn3CRImXQ
+         6hODDRY2KZ2bteVDwMEgv89PWnibSd6Icuq5M/TzFpQgWtOnTzVmHILLuywqqKJ8IWvN
+         /GmlpLSyFKiWDVC3wFptS7roPpZxXJqRptRC78LSgz5Q0HQe6Gdy7IRSYoP7kDF1ahzd
+         BhDgkaAtBM/PIMwxNDJcCpkOKifkUn+sZTr+VKvHFOtBW0z2aMry+BxYol6/GICuQnbX
+         Bomw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IBXcSszBYphaifHgOC2J5NicZzuUQ/7ILUQKgpfvwwk=;
+        b=B8Mc5tdC4NPdLcJ/83dB9fOHzhce1lb1Lo9EAySIP+etdmhWyjdA8pKooZNiRhYo1M
+         Y/klKIUweeLYfeUheRq0u/vUSj2mbwEnL/meNALexkRIdjQm7n2O60555k+mmGjoAbp0
+         HTvbWwt1FEphvTriPzweLkDb0JPf1UIkof2cJg5SJzOKnXCB07kLoA7rKxHZSF93uHs2
+         lY/HRVHTTvtpkhJeap3Ev5QljuazvV2jHgiF5isGBoP8u9WXvVQUHs1ZQ7t7tdt+Jw7s
+         8YIKihVEHh9qAthKIv60hehriLZhO9iU/vGE8pBxfjB9NVd62NUGOPXJ2ayTTuBy63rn
+         IqLg==
+X-Gm-Message-State: AOAM5305pZxIzfsqL7D4aD3CviLRLQ064J3j1rG1d9HQWCUJj7+Yki/e
+        6blZ30FoK6XRutdRqefiFwMsM8Snz9mccA==
+X-Google-Smtp-Source: ABdhPJz/wOFlRsZKTXHwHzYsamAIgxhiZCMsps1pYK3Xqq2UY0/65dNFjGGQY7E5ydXHaeMf6n8wUw==
+X-Received: by 2002:a63:1114:: with SMTP id g20mr132875pgl.385.1623251401815;
+        Wed, 09 Jun 2021 08:10:01 -0700 (PDT)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id u14sm77968pjx.14.2021.06.09.08.10.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Jun 2021 08:10:00 -0700 (PDT)
+Subject: Re: [PATCH] libnvdimm/pmem: Fix pmem_pagemap_cleanup compile warning
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-kernel@vger.kernel.org
+References: <20210609135237.22bde319@canb.auug.org.au>
+ <162321342919.2151549.7438715629081965798.stgit@dwillia2-desk3.amr.corp.intel.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d3a32947-80b1-3d12-e96c-88f599d486a3@kernel.dk>
+Date:   Wed, 9 Jun 2021 09:10:02 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <162321342919.2151549.7438715629081965798.stgit@dwillia2-desk3.amr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOH5QeBV5zq=SpMSxZHJqgmfKegdgc7ehpots6AKjjgEYq5rGg@mail.gmail.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 09, 2021 at 10:23:36PM +0800, yong w wrote:
-> Greg KH <gregkh@linuxfoundation.org> 于2021年6月8日周二 下午5:29写道：
+On 6/8/21 10:37 PM, Dan Williams wrote:
+> The recent fix to pmem_pagemap_cleanup() to solve a NULL pointer
+> dereference with the queue_to_disk() helper neglected to remove the @q
+> variable when queue_to_disk() was replaced.
 > 
-> >
-> > On Mon, Jun 07, 2021 at 08:39:14AM -0700, yongw.pur@gmail.com wrote:
-> > > From: wangyong <wang.yong12@zte.com.cn>
-> > >
-> > > When zram is used, available+Swap free memory is obviously bigger than we
-> > > actually can use, because zram can compress memory by compression
-> > > algorithm and zram compressed data will occupy memory too.
-> > >
-> > > So, we can count the compression ratio of zram in the kernel. The space
-> > > will be saved by zram and other swap device are calculated as follows:
-> > > zram[swapfree - swapfree * compress ratio] + swapdev[swapfree]
-> > > We can evaluate the available memory of the whole system as:
-> > > MemAvailable+zram[swapfree - swapfree * compress ratio]+swapdev[swapfree]
-> >
-> > Why is this needed to be exported by userspace?  Who is going to use
-> > this information and why can't they just calculate it from the exported
-> > information already?
-> 
-> In embedded devices, it is necessary to assess how much memory is available.
+> Drop the conversion of @pgmap to its containing 'struct request_queue'
+> since pgmap->owner supersedes the need to reference @q.
 
-Why is that any different from a server?  Or a laptop?  Or any other
-system running Linux?  "embedded" isn't special here :)
+I folded this in.
 
-> If the memory allocation is based on available+swapfree, it may cause oom and
-> affect the normal use of the devices. And it is more accurate and safe
-> to calculate
-> the swap available memory through minimum compression ratio.
-> 
-> Although mm_stat interface provides compressed information，but it is not easy to
-> get the minimum compression ratio during swaping out. Kernel provides a common
-> interface, which makes it easier to use and judge the state of system memory
+-- 
+Jens Axboe
 
-If you are running up against this type of limit, how is a proc file
-guess going to help much?  What are you going to do based on the result?
-And as it's always going to be a guess, how reliable is it?
-
-> > What tool requires this new information and what is it going to be used
-> > for?
-> 
-> It can be used in embedded devices to evaluate the memory condition
-> and avoid causing oom; Also If we wants to know more accurate available
-> memory information when zram is used.
-
-Why not rely on the oom logic instead?  What is wrong with that as this
-is always going to be just a guess.  You are never going to be able to
-react fast enough to reading this value to be able to do anything better
-than you could through the existing oom notifier/logic, right?
-
-> > And why add a block driver's information to a core proc file?  Shouldn't
-> > the information only be in the block driver's sysfs directory only?
-> >
-> > thanks,
-> >
-> > greg k-h
-> 
-> I thought it would be better to put it there.
-
-If no one needs it, why add it?  :)
-
-> In the first patch, MemAvailable returned with swap available memory, and
-> David recommended a separate interface.
-
-A sysfs file makes more sense to me, and seems simpler.
-
-But again, this is just a guess, trying to do real work based on it
-feels really risky.
-
-thanks,
-
-greg k-h
