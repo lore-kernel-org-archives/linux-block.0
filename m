@@ -2,119 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9772CC48BCF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 16:46:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE1FC48BCF
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 16:49:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74244613CA
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 16:46:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA4A5613CB
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 16:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbhFIQsi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 12:48:38 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:40880 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbhFIQsh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 12:48:37 -0400
-Received: from sequoia (162-237-133-238.lightspeed.rcsntx.sbcglobal.net [162.237.133.238])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 3400420B7188;
-        Wed,  9 Jun 2021 09:46:42 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3400420B7188
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1623257202;
-        bh=Bqt1lVTZISrS178wzklg4SHx5gFwo1MfoQwvBPoV7aM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HR9QMe6V9Nvprm7jqe5A6zaZU87b1aYbEhzqE9wA/yYI3t4zdVeJ+gfogPor7kXlG
-         3UbpIKX9g48D4/KeKYNxNVX/GtB+wsjEyoEzujgRII44ouUwazO3/KZ//1PnhtO6lE
-         4+3EIzQ6NHkQBsySXZR7qzaigc8MHmuQvhh2R6YU=
-Date:   Wed, 9 Jun 2021 11:46:39 -0500
-From:   Tyler Hicks <tyhicks@linux.microsoft.com>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
-        Petr Vorel <pvorel@suse.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Tejun Heo <tj@kernel.org>
-Subject: Re: [syzbot] possible deadlock in del_gendisk
-Message-ID: <20210609164639.GM4910@sequoia>
-References: <000000000000ae236f05bfde0678@google.com>
- <1435f266-9f6d-22ef-ba7d-f031c616aede@I-love.SAKURA.ne.jp>
- <7b8c9eeb-789d-e5e6-04d6-130ee8be7305@i-love.sakura.ne.jp>
+        id S229935AbhFIQu5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 12:50:57 -0400
+Received: from mail-pg1-f174.google.com ([209.85.215.174]:36601 "EHLO
+        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229504AbhFIQu4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 12:50:56 -0400
+Received: by mail-pg1-f174.google.com with SMTP id 27so19976411pgy.3
+        for <linux-block@vger.kernel.org>; Wed, 09 Jun 2021 09:49:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RIUHYBL0iS/fQGaq+Gpqnh2rKlcwfYTghmItuHEbiqI=;
+        b=ECEtV+lFxqBNdw6qo1L9AAoPaiAFs08hXC6G8qdLubXceyaGq4szxH12NlZxk4MLLP
+         6hbGZOqsK7YQfrgPzF4WB78hA+gj8XbOOdH/HnmXns59MYLxRRIo4u3Qy4rBa+BjrDKd
+         mXfdTBYMSXQQaAVsAy6jAKQPZhzkB3LwQEymn6CW9ZikBoUcNmXWjJZYTvCA2Beh1pUi
+         W/xLelvtDwVF6vtNnPrjm0NyugKKm6jC0CamTvQeWvfFw845Muxz+OZRBt1BI9srIBKy
+         eRzMmGCFKer0MhYq+rGwY2obM/Kt4ili+B2Nm9W5v05nENjacc/d5sqYGjwMon25s47c
+         iQhw==
+X-Gm-Message-State: AOAM530AQNADjfqt6dhNJT0HgkasBFn5ZBvWkflCSBslSKpiEhU+pDk7
+        ahF9anvkN1qGaAwJ3OcPq9mr52gINM0=
+X-Google-Smtp-Source: ABdhPJzK+a3cs2I5z8Bvpes0a1igthl8SwkNncX05Wu+vv2UHiQ206S2j/SC1Dg5v1jr4HN1a1HULg==
+X-Received: by 2002:a63:1022:: with SMTP id f34mr610725pgl.334.1623257341786;
+        Wed, 09 Jun 2021 09:49:01 -0700 (PDT)
+Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id u12sm154299pfm.2.2021.06.09.09.49.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Jun 2021 09:49:01 -0700 (PDT)
+Subject: Re: [PATCH 04/14] block: Introduce the ioprio rq-qos policy
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+References: <20210608230703.19510-1-bvanassche@acm.org>
+ <20210608230703.19510-5-bvanassche@acm.org>
+ <DM6PR04MB708135D0C71D2042E6674E23E7369@DM6PR04MB7081.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <98dbb3dc-d925-f2a8-7f34-94f9c56bb257@acm.org>
+Date:   Wed, 9 Jun 2021 09:48:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b8c9eeb-789d-e5e6-04d6-130ee8be7305@i-love.sakura.ne.jp>
+In-Reply-To: <DM6PR04MB708135D0C71D2042E6674E23E7369@DM6PR04MB7081.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-06-10 01:31:17, Tetsuo Handa wrote:
-> Hello, Christoph.
-> 
-> I'm currently trying full bisection.
-> 
->   # bad: [fc0586062816559defb14c947319ef8c4c326fb3] Merge tag 'for-5.13/drivers-2021-04-27' of git://git.kernel.dk/linux-block
->   # good: [42dec9a936e7696bea1f27d3c5a0068cd9aa95fd] Merge tag 'perf-core-2021-04-28' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
->   # good: [68a32ba14177d4a21c4a9a941cf1d7aea86d436f] Merge tag 'drm-next-2021-04-28' of git://anongit.freedesktop.org/drm/drm
->   # good: [a800abd3ecb9acc55821f7ac9bba6c956b36a595] net: enetc: move skb creation into enetc_build_skb
->   # good: [6cc8e7430801fa238bd7d3acae1eb406c6e02fe1] loop: scale loop device by introducing per device lock
+On 6/8/21 9:40 PM, Damien Le Moal wrote:
+> On 2021/06/09 8:07, Bart Van Assche wrote:
 
-Thanks for doing this. I haven't had a chance to retry this commit with
-lockdep but I did re-review it and didn't think that it would be the
-cause of this lockdep report since it strictly reduced the usage of the
-loop_ctl_mutex.
+[ ... ]
 
-Tyler
+>> +/*
+>> + * The accepted I/O priority values are 0..IOPRIO_CLASS_MAX(3). 0 (default)
+>> + * means do not modify the I/O priority. Values 1..3 are used to restrict the
+>> + * I/O priority for a cgroup to the specified priority. See also
+>> + * <linux/ioprio.h>.
+>> + */
+>> +#define IOPRIO_CLASS_MAX IOPRIO_CLASS_IDLE
 
->   git bisect start 'fc0586062816559defb14c947319ef8c4c326fb3' '42dec9a936e7696bea1f27d3c5a0068cd9aa95fd' '68a32ba14177d4a21c4a9a941cf1d7aea86d436f' 'a800abd3ecb9acc55821f7ac9bba6c956b36a595' '6cc8e7430801fa238bd7d3acae1eb406c6e02fe1'
->   # good: [2958a995edc94654df690318df7b9b49e5a3ef88] block/rnbd-clt: Support polling mode for IO latency optimization
->   git bisect good 2958a995edc94654df690318df7b9b49e5a3ef88
+[ ... ]
+
+>> +static int ioprio_set_prio_class(struct cgroup_subsys_state *css,
+>> +				 struct cftype *cft, u64 val)
+>> +{
+>> +	struct ioprio_blkcg *blkcg = ioprio_blkcg_from_css(css);
+>> +
+>> +	if (val > IOPRIO_CLASS_MAX)
+>> +		return -EINVAL;
 > 
-> I think we will bisect this problem to
-> 
->   commit c76f48eb5c084b1e ("block: take bd_mutex around delete_partitions in del_gendisk")
-> 
-> because that commit introduced new locking dependency bdev_lookup_sem => disk->part0->bd_mutex
-> which matches the lockdep's report.
-> 
->   ======================================================
->   WARNING: possible circular locking dependency detected
->   5.12.0-rc6-next-20210409-syzkaller #0 Not tainted
->   ------------------------------------------------------
->   syz-executor.4/10285 is trying to acquire lock:
->   ffff8881423245a0 (&bdev->bd_mutex){+.+.}-{3:3}, at: del_gendisk+0x250/0x9e0 block/genhd.c:618
->   
->   but task is already holding lock:
->   ffffffff8c7d9430 (bdev_lookup_sem){++++}-{3:3}, at: del_gendisk+0x222/0x9e0 block/genhd.c:616
-> 
-> Do we need to revert "partition iteration simplifications" work?
-> 
-> On 2021/06/07 19:56, Tetsuo Handa wrote:
-> > Hello.
-> > 
-> > syzbot is reporting "possible deadlock in del_gendisk" problem.
-> > 
-> > I guess this is caused by commit 6cc8e7430801fa23 ("loop: scale loop device
-> > by introducing per device lock") because it touches loop_ctl_mutex usage
-> > between v5.11 and v5.12-rc1. Please have a look.
-> > 
-> > On 2021/04/14 2:33, syzbot wrote:
-> >> Hello,
-> >>
-> >> syzbot found the following issue on:
-> >>
-> >> HEAD commit:    e99d8a84 Add linux-next specific files for 20210409
-> >> git tree:       linux-next
-> >> console output: https://syzkaller.appspot.com/x/log.txt?x=13b01681d00000
-> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=7cd69574979bfeb7
-> >> dashboard link: https://syzkaller.appspot.com/bug?extid=61e04e51b7ac86930589
-> >> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=148265d9d00000
-> >> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16a981a1d00000
-> > 
-> 
+> Where is IOPRIO_CLASS_MAX defined ? I do not see it.
+
+Near the start of the new block/blk-ioprio.c file.
+
+> Why not use ioprio_valid() ?
+
+The definition of that macro is as follows:
+
+#define ioprio_valid(mask)	\
+	(IOPRIO_PRIO_CLASS((mask)) != IOPRIO_CLASS_NONE)
+
+So that macro accepts I/O priority classes 1..7 while the above code
+accepts I/O priority classes 0..3. I think that ioprio_set_prio_class()
+should only accept I/O priority class values 0..3.
+
+Thanks,
+
+Bart.
