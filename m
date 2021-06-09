@@ -6,84 +6,122 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A2CC48BD1
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0058EC48BCD
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:36:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 405BC613D5
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:30:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC01561376
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:36:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbhFIScj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 14:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35980 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbhFISch (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 14:32:37 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F429C061574;
-        Wed,  9 Jun 2021 11:30:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MjblxCUCOzYHrNducYPCvaRb+3zgVqvJu23vUfKX0+k=; b=c5rt3jzGtTLNFja84l9vIEupml
-        eGOEFlvj9dNmIfk+6Cwy9PcL/LQVt3cMEVZtSmnByl1QZEO6YIPYfa6AB6/PqIFaAuyIwlo9D06/W
-        s3SEiMt2QEDk6eHyiUM6BulEH6DNkGAVHJ/kc95mjKQh64MJQNFrSkZqF5H12dAXEqP2WzzfoYCCI
-        7bRbx6/GMAyC8S+P5A4/fxJwlOWib2T27rZw/L75Fav5lwUYJ2AJ5bnCDsH+RhyhLExhggdOBHs5K
-        v9nmZGEQbLijJOgIBFIxLpuPUDFaJFl867U1Cxcs1vgq+hffNi3AARq4+T7ArTxC6jvyumMy+ltho
-        xFW/g8Cg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lr2xw-000nJ2-9z; Wed, 09 Jun 2021 18:30:14 +0000
-Date:   Wed, 9 Jun 2021 19:30:12 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Ric Wheeler <ricwheeler@gmail.com>,
-        lsf-pc@lists.linux-foundation.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] durability vs performance for flash devices
- (especially embedded!)
-Message-ID: <YMEItMNXG2bHgJE+@casper.infradead.org>
-References: <55d3434d-6837-3a56-32b7-7354e73eb258@gmail.com>
- <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
+        id S229507AbhFISih (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 14:38:37 -0400
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:45958 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229472AbhFISih (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Jun 2021 14:38:37 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 85AD91280BFB;
+        Wed,  9 Jun 2021 11:36:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1623263802;
+        bh=8E8YKM08zSHfgTf3XjWtoAyBeXxzwQfdx7IcdysE4Ak=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=Ij+9FJMYjcHbTV812FtaOf0Wz75pVsyP6BuDpTFhtbzHHhLVxkRIOhx81nENT6Hx7
+         18Enbes52dfELuBVNm7FpkbD+e1BUlJQhxeMwPAcHS17XtxjCOVglUpXRmSrunGOV0
+         SgNwLQSZCnvqBc8YHwA9/E3nDyXs2q+VX89crh08=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id Jze5ftrexVPf; Wed,  9 Jun 2021 11:36:42 -0700 (PDT)
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::c447])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 215791280BF7;
+        Wed,  9 Jun 2021 11:36:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1623263802;
+        bh=8E8YKM08zSHfgTf3XjWtoAyBeXxzwQfdx7IcdysE4Ak=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=Ij+9FJMYjcHbTV812FtaOf0Wz75pVsyP6BuDpTFhtbzHHhLVxkRIOhx81nENT6Hx7
+         18Enbes52dfELuBVNm7FpkbD+e1BUlJQhxeMwPAcHS17XtxjCOVglUpXRmSrunGOV0
+         SgNwLQSZCnvqBc8YHwA9/E3nDyXs2q+VX89crh08=
+Message-ID: <485837f392401bf35fb7fc8231d7a051f47b53d7.camel@HansenPartnership.com>
+Subject: Re: [LSF/MM/BPF TOPIC] block namespaces
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Hannes Reinecke <hare@suse.de>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>
+Date:   Wed, 09 Jun 2021 11:36:41 -0700
+In-Reply-To: <a189ec50-4c11-9ee9-0b9e-b492507adc1e@suse.de>
+References: <a189ec50-4c11-9ee9-0b9e-b492507adc1e@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 09, 2021 at 11:05:22AM -0700, Bart Van Assche wrote:
-> On 6/9/21 3:53 AM, Ric Wheeler wrote:
-> > Consumer devices are pushed to use the highest capacity emmc class
-> > devices, but they have horrible write durability.
-> > 
-> > At the same time, we layer on top of these devices our normal stack -
-> > device mapper and ext4 or f2fs are common configurations today - which
-> > causes write amplification and can burn out storage even faster. I think
-> > it would be useful to discuss how we can minimize the write
-> > amplification when we need to run on these low end parts & see where the
-> > stack needs updating.
-> > 
-> > Great background paper which inspired me to spend time tormenting emmc
-> > parts is:
-> > 
-> > http://www.cs.unc.edu/~porter/pubs/hotos17-final29.pdf
+On Thu, 2021-05-27 at 10:01 +0200, Hannes Reinecke wrote:
+> Hi all,
 > 
-> Without having read that paper, has zoned storage been considered? F2FS
-> already supports zoned block devices. I'm not aware of a better solution
-> to reduce write amplification for flash devices. Maybe I'm missing
-> something?
-
-maybe you should read the paper.
-
-" Thiscomparison demonstrates that using F2FS, a flash-friendly file
-sys-tem, does not mitigate the wear-out problem, except inasmuch asit
-inadvertently rate limitsallI/O to the device"
-
-> More information is available in this paper:
-> https://dl.acm.org/doi/pdf/10.1145/3458336.3465300.
+> I guess it's time to tick off yet another item on my long-term to-do
+> list:
 > 
-> Thanks,
+> Block namespaces
+> ----------------
 > 
-> Bart.
+> Idea is similar to what network already does: allowing each user
+> namespace to have a different 'view' on the existing block devices.
+> EG if the admin creates a ramdisk in one namespace this device should
+> not be visible to other namespaces.
+> But for me the most important use-case would be qemu; currently the
+> devices need to be set up in the host, even though the host has no
+> business touching it as they really belong to the qemu instance. This
+> is causing quite some irritation eg when this device has LVM or MD
+> metadata and udev is trying to activate it on the host.
+
+I suppose the first question is "why block only?"  There are several
+existing device namespace proposals which would be more generic.
+
+> Overall plan is to restrict views of '/dev', '/sys/dev/block' and
+> '/sys/block' to only present the devices 'visible' for this
+> namespace.
+
+We actually already have a devices cgroup that does some of this:
+
+https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt
+
+However, visibility isn't the only problem, for direct passthrough
+there's also uevent handling and people have even asked about module
+loading.
+
+>  Initially the drivers would keep their global enumeration, but plan
+> is to make the drivers namespace-aware, too, such that each namespace
+> could have its own driver-specific device enumeration.
+
+I really wouldn't do this.  Namespace/Cgroup separation should be kept
+as high as possible.  If it leaks into the drivers it will become
+unmaintainable.  Why do you think you need the drivers to be aware?  If
+it's just enumeration, that should all be doable with the visibility
+driver unless you want to do things like compact numbering?
+
+> Goal of this topic is to get a consensus on whether block namespaces
+> are a feature which would find interest, and also to discuss some
+> design details here:
+> - Only in certain cases can a namespace be assigned (eg by calling
+> 'modprobe', starting iscsiadm, or calling nvme-cli); how do we handle
+> devices for which no namespace can be identified?
+> - Shall we allow for different device enumeration per namespace?
+> - Into which level should we go with hiding sysfs structures?
+>   Is blanking out the higher-level interfaces in /dev and /sys/block
+>   enough?
+
+First question is does the device cgroup do enough for you and if not
+what's missing?
+
+James
+
+
