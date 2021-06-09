@@ -2,187 +2,247 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC7AC48BD1
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 11:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF99C48BCD
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 11:49:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D24BF61364
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 11:36:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ECEA61108
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 11:49:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234139AbhFILiH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 07:38:07 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:31319 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238474AbhFILiG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 07:38:06 -0400
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210609113610epoutp0363d0a3145dfe68e0e3d246fe8cc4a024~G5uEQBAHD1430314303epoutp03e
-        for <linux-block@vger.kernel.org>; Wed,  9 Jun 2021 11:36:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210609113610epoutp0363d0a3145dfe68e0e3d246fe8cc4a024~G5uEQBAHD1430314303epoutp03e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1623238570;
-        bh=VCC1ocTa+pfE1YBQEhmF6TG5sDdJYTYPM8fYYtuGelk=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=X9dFWGYjoufBBZKpcLBRjKFVoUjW8opKlAltIO7nwuzeq7ZDVay6+L2UGlKkj/HHp
-         eZRlsNUrg5b75qd+ryYAdS52RfWebuifzJ9NpGO5Ko6NKGi1DNtu2VQ79Z9NY4iTI5
-         FVJrd+dTULh5fr5KO78U0rH05KY4hYY4bioiWgSI=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20210609113609epcas5p21235af4b27c4c7e7b253521dc1b2958b~G5uDrE7_v2107321073epcas5p24;
-        Wed,  9 Jun 2021 11:36:09 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A4.BA.09697.9A7A0C06; Wed,  9 Jun 2021 20:36:09 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20210609105347epcas5p42ab916655fca311157a38d54f79f95e7~G5JEleDmZ1718217182epcas5p4O;
-        Wed,  9 Jun 2021 10:53:47 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210609105347epsmtrp11f28ff6a44abcbac76dab9ce1534baa2~G5JEkus3_1421214212epsmtrp1V;
-        Wed,  9 Jun 2021 10:53:47 +0000 (GMT)
-X-AuditID: b6c32a4a-64fff700000025e1-44-60c0a7a9df8d
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        55.98.08163.BBD90C06; Wed,  9 Jun 2021 19:53:47 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.110.206.5]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210609105345epsmtip139d160f4a440ad7b08683a6b96ab98c1~G5JC8NJ832853528535epsmtip1B;
-        Wed,  9 Jun 2021 10:53:45 +0000 (GMT)
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     lsf-pc@lists.linux-foundation.org, linux-nvme@lists.infradead.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, javier@javigon.com,
-        anuj20.g@samsung.com, joshiiitr@gmail.com,
-        Kanchan Joshi <joshi.k@samsung.com>
-Subject: [LSF/MM/BPF Topic] Towards more useful nvme-passthrough
-Date:   Wed,  9 Jun 2021 16:20:50 +0530
-Message-Id: <20210609105050.127009-1-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.25.1
+        id S239560AbhFILvE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 07:51:04 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3185 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239639AbhFILum (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 07:50:42 -0400
+Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G0Q676PQNz6J9VY;
+        Wed,  9 Jun 2021 19:35:59 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 9 Jun 2021 13:48:46 +0200
+Received: from [10.47.80.201] (10.47.80.201) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Wed, 9 Jun 2021
+ 12:48:45 +0100
+Subject: Re: [PATCH] blk-mq: fix use-after-free in blk_mq_exit_sched
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        <linux-block@vger.kernel.org>,
+        <syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com>
+References: <20210609063046.122843-1-ming.lei@redhat.com>
+ <f5fbc650-5bd3-32ee-1d31-8b1dd1d7fa19@huawei.com> <YMCU+iuHs4ULN0lb@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <81c38feb-9d3e-7adc-57e6-54bccf0d3142@huawei.com>
+Date:   Wed, 9 Jun 2021 12:42:52 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPKsWRmVeSWpSXmKPExsWy7bCmpu7K5QcSDE7e5rNomvCX2WL13X42
-        i5WrjzJZvGs9x2LRefoCk8XR/2/ZLM6/PcxkMenQNUaLvbe0LeYve8puse/1XmYHbo+ds+6y
-        ezQvuMPicflsqcemVZ1sHpuX1HtMvrGc0WP3zQY2j74tqxg9Pm+SC+CM4rJJSc3JLEst0rdL
-        4MpYtvIWe8EVqYr/6/YyNjBuE+li5OSQEDCRaN91lrWLkYtDSGA3o8TvpkMsEM4nRomeHW+Z
-        IJzPjBILDmxnhGl5+fg5VGIXo8Sdk0tZ4Kom7j/O3sXIwcEmoClxYXIpSIOIQJ3E9NOn2EBq
-        mAVmMUrsPbaTDSQhLOAg8fvKf7CpLAKqEvc+7mQCsXkFLCX2dT9khdgmLzHz0nd2iLigxMmZ
-        T1hAbGagePPW2cwgQyUEWjkkvry/ww7R4CJxcOJuJghbWOLV8S1QcSmJl/1tUHaxxK87R6Ga
-        OxglrjfMZIFI2Etc3POXCeQDZqAP1u/ShwjLSkw9tY4JYjGfRO/vJ1DzeSV2zIOxFSXuTXoK
-        dbS4xMMZS6BsD4nnM7rAbCGBWImlPzawTmCUn4Xkn1lI/pmFsHkBI/MqRsnUguLc9NRi0wKj
-        vNRyveLE3OLSvHS95PzcTYzgNKXltYPx4YMPeocYmTgYDzFKcDArifCWGe5LEOJNSaysSi3K
-        jy8qzUktPsQozcGiJM674uHkBCGB9MSS1OzU1ILUIpgsEwenVAPTkg2CpuI3eQI0z5/h+8Ln
-        0nN4anTQ4wcNN9V48u9Nu7zJZPak99wPmjyy1OyKJmvr/2TrrW+67sl9pIjNcX7e9XfCVTJ7
-        D+j+nKhpKNntHXf6s4bxDI0jW7RerY/JrFu60+C48t7qSM9KzxnfZXQ+yJ9Zd3HO+alcRTJt
-        r7TvCS2YsjmFb9GKd8d/bPDW8+xerHRtJxvXksL/L+W6vG9zeXlbzYx+bXHkzr2vgX8733p4
-        tIr+vLQvVzs050jzmbf1vjHnqj+3ey59Fsdy9X3honmPrqpvP3zInPmz59XK587lyis+b35e
-        /9i+esl6H3vxxE4hwertWg+trs5SOxZ3+b5qdKra4hpJY57d33UUlFiKMxINtZiLihMByGuZ
-        CcIDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrCLMWRmVeSWpSXmKPExsWy7bCSnO7uuQcSDCY2q1k0TfjLbLH6bj+b
-        xcrVR5ks3rWeY7HoPH2ByeLo/7dsFuffHmaymHToGqPF3lvaFvOXPWW32Pd6L7MDt8fOWXfZ
-        PZoX3GHxuHy21GPTqk42j81L6j0m31jO6LH7ZgObR9+WVYwenzfJBXBGcdmkpOZklqUW6dsl
-        cGUsW3mLveCKVMX/dXsZGxi3iXQxcnJICJhIvHz8nKmLkYtDSGAHo8SVnqUsEAlxieZrP9gh
-        bGGJlf+es0MUfWSUuL9zHZDDwcEmoClxYXIpSFxEoIlRYtqu84wgDcwCixgl7tzyArGFBRwk
-        fl/5DxZnEVCVuPdxJxOIzStgKbGv+yErxAJ5iZmXvrNDxAUlTs58wgIxR16ieets5gmMfLOQ
-        pGYhSS1gZFrFKJlaUJybnltsWGCUl1quV5yYW1yal66XnJ+7iREc8FpaOxj3rPqgd4iRiYPx
-        EKMEB7OSCG+Z4b4EId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rwXuk7GCwmkJ5akZqemFqQWwWSZ
-        ODilGpgmmJaKZOxRu3hi9yIW4e4l0t7mW6WEY41VNs0uYqidUMlTVdRz6FiSt/eVKVxhNTda
-        HXK/zc+rncpXv6fbf51MKqO6WX/elY3cD+3ZpD0OtEZ+X71EftYf1zvnuJzXd769tiO3cnvt
-        pu1n2Fxtr/d+6VdlrD2wo/NRtXrRJi2lrdvlrEoyuSbmvusUMVvktydjW6T+DlMpn77D+757
-        fbx0VarPtl3M8NmTYzMOszu+vbDDM/3ftWMRn7OftEbwVhnub4jJSpIo0v7wXls5as2kjvvS
-        dotDHFb2zfUX+cdtYqm5dpdrruQJF3Hryw5rRRe6CMxysL8iammfv3LOw4srm/c+lI2aZ1Ty
-        /+VXCyWW4oxEQy3mouJEAKDvwqDnAgAA
-X-CMS-MailID: 20210609105347epcas5p42ab916655fca311157a38d54f79f95e7
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20210609105347epcas5p42ab916655fca311157a38d54f79f95e7
-References: <CGME20210609105347epcas5p42ab916655fca311157a38d54f79f95e7@epcas5p4.samsung.com>
+In-Reply-To: <YMCU+iuHs4ULN0lb@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.80.201]
+X-ClientProxiedBy: lhreml749-chm.china.huawei.com (10.201.108.199) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Background & objectives:
-------------------------
+On 09/06/2021 11:16, Ming Lei wrote:
+> On Wed, Jun 09, 2021 at 09:59:43AM +0100, John Garry wrote:
+>> On 09/06/2021 07:30, Ming Lei wrote:
+>>
+>> Thanks for the fix
+>>
+>>> tagset can't be used after blk_cleanup_queue() is returned because
+>>> freeing tagset usually follows blk_clenup_queue(). Commit d97e594c5166
+>>> ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap") adds
+>>> check on q->tag_set->flags in blk_mq_exit_sched(), and causes
+>>> use-after-free.
+>>>
+>>> Fixes it by using hctx->flags.
+>>>
+>>
+>> The tagset is a member of the Scsi_Host structure. So it is true that this
+>> memory may be freed before the request_queue is exited?
+> 
+> Yeah, please see commit c3e2219216c9 ("block: free sched's request pool in
+> blk_cleanup_queue")
 
-The NVMe passthrough interface
+JFYI, I could recreate with the following simple steps:
 
-Good part: allows new device-features to be usable (at least in raw
-form) without having to build block-generic cmds, in-kernel users,
-emulations and file-generic user-interfaces - all this take some time to
-evolve.
+root@(none)$ mount /dev/sda1 mnt
+[   27.252887] FAT-fs (sda1): Volume was not properly unmounted. Some 
+data may be corrupt. Please run fsck.
+_hw/unbind)$ echo HISI0162:01 > ./sys/bus/platform/drivers/hisi_sas_v2
+[   31.262274] sas: ex 500e004aaaaaaa1f phys DID NOT change
+[   31.270314] sas: ex 500e004aaaaaaa1f phys DID NOT change
+[   31.278262] sas: ex 500e004aaaaaaa1f phys DID NOT change
+[   31.286245] sas: ex 500e004aaaaaaa1f phys DID NOT change
+[   31.294164] sas: ex 500e004aaaaaaa1f phys DID NOT change
+[   31.302143] sas: ex 500e004aaaaaaa1f phys DID NOT change
+[   31.310097] sas: ex 500e004aaaaaaa1f phys DID NOT change
+[   31.321599] hisi_sas_v2_hw HISI0162:01: dev[9:1] is gone
+[   31.429245] hisi_sas_v2_hw HISI0162:01: dev[8:1] is gone
+[   31.533461] hisi_sas_v2_hw HISI0162:01: dev[7:1] is gone
+[   31.637338] hisi_sas_v2_hw HISI0162:01: dev[6:1] is gone
+[   31.740840] hisi_sas_v2_hw HISI0162:01: dev[5:1] is gone
+[   31.750659] sd 0:0:3:0: [sdd] Synchronizing SCSI cache
+[   31.833500] hisi_sas_v2_hw HISI0162:01: dev[4:1] is gone
+[   31.937351] hisi_sas_v2_hw HISI0162:01: dev[3:1] is gone
+[   31.947749] sd 0:0:1:0: [sdb] Synchronizing SCSI cache
+[   31.953195] sd 0:0:1:0: [sdb] Stopping disk
 
-Bad part: passthrough interface has remain tied to synchronous ioctl,
-which is a blocker for performance-centric usage scenarios. User-space
-can take the pain of implementing async-over-sync on its own but it does
-not make much sense in a world that already has io_uring.
+[   32.690815] hisi_sas_v2_hw HISI0162:01: dev[2:5] is gone
+[   32.771526] hisi_sas_v2_hw HISI0162:01: dev[1:1] is gone
+[   32.790406] hisi_sas_v2_hw HISI0162:01: dev[0:2] is gone
 
-Passthrough is lean in the sense it cuts through layers of abstractions
-and reaches to NVMe fast. One of the objective here is to build a
-scalable pass-through that can be readily used to play with new/emerging
-NVMe features.  Another is to surpass/match existing raw/direct block
-I/O performance with this new in-kernel path.
+root@(none)$
+root@(none)$
+root@(none)$ umount mnt
+[   37.323039] 
+==================================================================
+[   37.330262] BUG: KASAN: use-after-free in blk_mq_exit_sched+0x110/0x1c8
+[   37.336880] Read of size 4 at addr ffff001051e80100 by task umount/547
+[   37.343401]
+[   37.344884] CPU: 4 PID: 547 Comm: umount Not tainted 
+5.13.0-rc5-next-20210608 #80
+[   37.352362] Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon 
+D05 IT21 Nemo 2.0 RC0 04/18/2018
+[   37.361486] Call trace:
+[   37.363924]  dump_backtrace+0x0/0x2d0
+[   37.367586]  show_stack+0x18/0x28
+[   37.370898]  dump_stack_lvl+0xfc/0x138
+[   37.374643]  print_address_description.constprop.13+0x78/0x314
+[   37.380472]  kasan_report+0x1e0/0x248
+[   37.384131]  __asan_load4+0x9c/0xd8
+[   37.387615]  blk_mq_exit_sched+0x110/0x1c8
+[   37.391706]  __elevator_exit+0x34/0x58
+[   37.395451]  blk_release_queue+0x108/0x1d8
+[   37.399545]  kobject_put+0xa8/0x180
+[   37.403029]  blk_put_queue+0x14/0x20
+[   37.406601]  disk_release+0xcc/0x100
+[   37.410171]  device_release+0x94/0x110
+[   37.413918]  kobject_put+0xa8/0x180
+[   37.417401]  put_device+0x14/0x28
+[   37.420712]  put_disk+0x2c/0x40
+[   37.423848]  blkdev_put_no_open+0x54/0x78
+[   37.427853]  blkdev_put+0x108/0x258
+[   37.431335]  kill_block_super+0x5c/0x78
+[   37.435166]  deactivate_locked_super+0x6c/0xd0
+[   37.439605]  deactivate_super+0x8c/0xa8
+[   37.443435]  cleanup_mnt+0x110/0x1c0
+[   37.447007]  __cleanup_mnt+0x14/0x20
+[   37.450578]  task_work_run+0xbc/0x1a8
+[   37.454236]  do_notify_resume+0x2cc/0x590
+[   37.458242]  work_pending+0xc/0x3c8
+[   37.461725]
+[   37.463207] The buggy address belongs to the page:
+[   37.467990] page:(____ptrval____) refcount:0 mapcount:-128 
+mapping:0000000000000000 index:0x0 pfn:0x1051e80
+[   37.477724] flags: 0xbfffc0000000000(node=0|zone=2|lastcpupid=0xffff)
+[   37.484164] raw: 0bfffc0000000000 fffffc00415a9008 ffff0017fbffebb0 
+0000000000000000
+[   37.491900] raw: 0000000000000000 0000000000000006 00000000ffffff7f 
+0000000000000000
+[   37.499635] page dumped because: kasan: bad access detected
+[   37.505198]
+[   37.506680] Memory state around the buggy address:
+[   37.511463]  ffff001051e80000: ff ff ff ff ff ff ff ff ff ff ff ff ff 
+ff ff ff
+[   37.518677]  ffff001051e80080: ff ff ff ff ff ff ff ff ff ff ff ff ff 
+ff ff ff
+[   37.525891] >ffff001051e80100: ff ff ff ff ff ff ff ff ff ff ff ff ff 
+ff ff ff
+[   37.533104]^
+[   37.536324]  ffff001051e80180: ff ff ff ff ff ff ff ff ff ff ff ff ff 
+ff ff ff
+[   37.543538]  ffff001051e80200: ff ff ff ff ff ff ff ff ff ff ff ff ff 
+ff ff ff
+[   37.550751] 
+==================================================================
+[   37.557963] Disabling lock debugging due to kernel taint
+root@(none)$
+root@(none)$
 
-Recent developments:
---------------------
-- NVMe now has a per-namespace char interface that remains available/usable
-  even for unsupported features and for new command-sets [1].
+And this patch fixes it:
+Tested-by: John Garry <john.garry@huawei.com>
 
-- Jens has proposed async-ioctl like facility 'uring_cmd' in io_uring. This
-  introduces new possibilities (beyond storage); async-passthrough is one of
-those. Last posted version is V4 [2].
+> 
+>>
+>>> Reported-by: syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
+>>> Fixes: d97e594c5166 ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap")
+>>> Cc: John Garry <john.garry@huawei.com>
+>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>> ---
+>>>    block/blk-mq-sched.c | 4 +++-
+>>>    1 file changed, 3 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+>>> index a9182d2f8ad3..80273245d11a 100644
+>>> --- a/block/blk-mq-sched.c
+>>> +++ b/block/blk-mq-sched.c
+>>> @@ -680,6 +680,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>>>    {
+>>>    	struct blk_mq_hw_ctx *hctx;
+>>>    	unsigned int i;
+>>> +	unsigned int flags = 0;
+>>>    	queue_for_each_hw_ctx(q, hctx, i) {
+>>>    		blk_mq_debugfs_unregister_sched_hctx(hctx);
+>>> @@ -687,12 +688,13 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>>>    			e->type->ops.exit_hctx(hctx, i);
+>>>    			hctx->sched_data = NULL;
+>>>    		}
+>>> +		flags = hctx->flags;
+>>
+>> I know the choice is limited, but it is unfortunate that we must set flags
+>> in a loop
+> 
+> Does it matter?
 
-- I have posted work on async nvme passthrough over block-dev [3]. Posted work
-  is in V4 (in sync with the infra of [2]).
+It's just a nit on the coding style: it's not an especially good 
+practice to set the same value in a loop.
 
-Early performance numbers:
---------------------------
-fio, randread, 4k bs, 1 job
-Kiops, with varying QD:
+But, as I said, choice is limited.
 
-QD      Sync-PT         io_uring        Async-PT
-1         10.8            10.6            10.6
-2         10.9            24.5            24
-4         10.6            45              46
-8         10.9            90              89
-16        11.0            169             170
-32        10.6            308             307
-64        10.8            503             506
-128       10.9            592             596
+> 
+>>
+>>>    	}
+>>>    	blk_mq_debugfs_unregister_sched(q);
+>>>    	if (e->type->ops.exit_sched)
+>>>    		e->type->ops.exit_sched(e);
+>>>    	blk_mq_sched_tags_teardown(q);
+>>> -	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+>>> +	if (blk_mq_is_sbitmap_shared(flags))
+>>>    		blk_mq_exit_sched_shared_sbitmap(q);
+>>
+>> this is
+>>
+>> blk_mq_exit_sched_shared_sbitmap(struct request_queue *queue)
+>> {
+>> 	sbitmap_queue_free(&queue->sched_bitmap_tags);
+>> 	..
+>> }
+>>
+>> And isn't it safe to call sbitmap_queue_free() when
+>> sbitmap_queue_init_node() has not been called?
+>>
+>> I'm just wondering if we can always call blk_mq_exit_sched_shared_sbitmap()?
+>> I know it's not an ideal choice either.
+> 
+> So far it may work, not sure if it can in future, I suggest to follow
+> the traditional alloc & free pattern.
+> 
+> 
 
-Further steps/discussion points:
---------------------------------
-1.Async-passthrough over nvme char-dev
-It is in a shape to receive feedback, but I am not sure if community
-would like to take a look at that before settling on uring-cmd infra.
+Fine
 
-2.Once above gets in shape, bring other perf-centric features of io_uring to
-this path -
-A. SQPoll and register-file: already functional.
-B. Passthrough polling: This can be enabled for block and looks feasible for
-char-interface as well.  Keith recently posted enabling polling for user
-pass-through [4]
-C. Pre-mapped buffers: Early thought is to let the buffers registered by
-io_uring, and add a new passthrough ioctl/uring_cmd in driver which does
-everything that passthrough does except pinning/unpinning the pages.
-
-3. Are there more things in the "io_uring->nvme->[block-layer]->nvme" path
-which can be optimized.
-
-Ideally I'd like to cover good deal of ground before Dec. But there seems
-plenty of possibilities on this path.  Discussion would help in how best to
-move forward, and cement the ideas.
-
-[1] https://lore.kernel.org/linux-nvme/20210421074504.57750-1-minwoo.im.dev@gmail.com/
-[2] https://lore.kernel.org/linux-nvme/20210317221027.366780-1-axboe@kernel.dk/
-[3] https://lore.kernel.org/linux-nvme/20210325170540.59619-1-joshi.k@samsung.com/
-[4] https://lore.kernel.org/linux-block/20210517171443.GB2709391@dhcp-10-100-145-180.wdc.com/#t
-
--- 
-2.25.1
-
+Thanks,
+John
