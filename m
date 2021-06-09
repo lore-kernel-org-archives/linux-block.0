@@ -7,116 +7,98 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B637C47095
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 06:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEDA9C47095
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 06:31:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A40261278
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 06:12:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95ED061040
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 06:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231258AbhFIGOm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 02:14:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42633 "EHLO
+        id S232007AbhFIGcx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 02:32:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39809 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230353AbhFIGOm (ORCPT
+        by vger.kernel.org with ESMTP id S231847AbhFIGcx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Jun 2021 02:14:42 -0400
+        Wed, 9 Jun 2021 02:32:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623219167;
+        s=mimecast20190719; t=1623220259;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wsM4h3EkGEQmgmsNgnC2R5LoMvPDTkfK4KK+tHDX7DY=;
-        b=jREiR5MLg6e/khI1QMCftYjm+3h0ZTQO955e3RoFDWMGtOq9g61PdAigRefYqjxtaErRR3
-        bLEu7qH9I//M36mQ/mstE6gqEEoTfbnNanb7ml9JO9qsowFjQ0Pxq5uwmLEOiS9TxH9up+
-        muKX80lJ4bNfllUsuw4D9RiDALb2YGI=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NA2hhxeIjW6frsqSwuiHUgf8TX8b1wswVenUR3poUA8=;
+        b=dScO66nxXPnENg1DnYyNuh66AzNgrxtOMqTLXKq4R6ZONi0gldIyNjXSOiqvgNeUCTR00S
+        +stwxRcty8ABBBhPxpQThsm906BpDusT95/fF3f5jAebI4P4y1asLJtn5KC8ynCGKFErJ7
+        Bb3QCTG7AqDZ8j99x67/K1Dmd9spnsk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-n1pWRk-7On6jWsatSSV6uw-1; Wed, 09 Jun 2021 02:12:44 -0400
-X-MC-Unique: n1pWRk-7On6jWsatSSV6uw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-310-L9as9uWaO0GM_6Ck1aAchQ-1; Wed, 09 Jun 2021 02:30:57 -0400
+X-MC-Unique: L9as9uWaO0GM_6Ck1aAchQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69B3E801106;
-        Wed,  9 Jun 2021 06:12:43 +0000 (UTC)
-Received: from T590 (ovpn-12-143.pek2.redhat.com [10.72.12.143])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F64260C04;
-        Wed,  9 Jun 2021 06:12:36 +0000 (UTC)
-Date:   Wed, 9 Jun 2021 14:12:32 +0800
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52BC418D6A2E;
+        Wed,  9 Jun 2021 06:30:56 +0000 (UTC)
+Received: from localhost (ovpn-12-143.pek2.redhat.com [10.72.12.143])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 90A4E5D9DE;
+        Wed,  9 Jun 2021 06:30:50 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Wang Shanker <shankerwangmiao@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: support bio merge for multi-range discard
-Message-ID: <YMBb0E01P/nXq8fJ@T590>
-References: <20210609004556.46928-1-ming.lei@redhat.com>
- <20210609004556.46928-3-ming.lei@redhat.com>
- <AAAB68D1-3F92-4F88-B192-2A202F7CE53D@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH] blk-mq: fix use-after-free in blk_mq_exit_sched
+Date:   Wed,  9 Jun 2021 14:30:46 +0800
+Message-Id: <20210609063046.122843-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <AAAB68D1-3F92-4F88-B192-2A202F7CE53D@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 09, 2021 at 11:05:59AM +0800, Wang Shanker wrote:
-> 
-> 
-> > 2021年06月09日 08:45，Ming Lei <ming.lei@redhat.com> 写道：
-> > 
-> > So far multi-range discard treats each bio as one segment(range) of single
-> > discard request. This way becomes not efficient if lots of small sized
-> > discard bios are submitted, and one example is raid456.
-> > 
-> > Support bio merge for multi-range discard for improving lots of small
-> > sized discard bios.
-> > 
-> > Turns out it is easy to support it:
-> > 
-> > 1) always try to merge bio first
-> > 
-> > 2) run into multi-range discard only if bio merge can't be done
-> > 
-> > 3) add rq_for_each_discard_range() for retrieving each range(segment)
-> > of discard request
-> > 
-> > Reported-by: Wang Shanker <shankerwangmiao@gmail.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> > block/blk-merge.c          | 12 ++++-----
-> > drivers/block/virtio_blk.c |  9 ++++---
-> > drivers/nvme/host/core.c   |  8 +++---
-> > include/linux/blkdev.h     | 51 ++++++++++++++++++++++++++++++++++++++
-> > 4 files changed, 66 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/block/blk-merge.c b/block/blk-merge.c
-> > index bcdff1879c34..65210e9a8efa 100644
-> > --- a/block/blk-merge.c
-> > +++ b/block/blk-merge.c
-> > @@ -724,10 +724,10 @@ static inline bool blk_discard_mergable(struct request *req)
-> > static enum elv_merge blk_try_req_merge(struct request *req,
-> > 					struct request *next)
-> > {
-> > -	if (blk_discard_mergable(req))
-> > -		return ELEVATOR_DISCARD_MERGE;
-> > -	else if (blk_rq_pos(req) + blk_rq_sectors(req) == blk_rq_pos(next))
-> > +	if (blk_rq_pos(req) + blk_rq_sectors(req) == blk_rq_pos(next))
-> > 		return ELEVATOR_BACK_MERGE;
-> > +	else if (blk_discard_mergable(req))
-> 
-> Shall we adjust how req->nr_phys_segments is calculated in 
-> bio_attempt_discard_merge() so that multiple contiguous bio's can
-> be seen as one segment?
+tagset can't be used after blk_cleanup_queue() is returned because
+freeing tagset usually follows blk_clenup_queue(). Commit d97e594c5166
+("blk-mq: Use request queue-wide tags for tagset-wide sbitmap") adds
+check on q->tag_set->flags in blk_mq_exit_sched(), and causes
+use-after-free.
 
-I think it isn't necessary, because we try to merge discard IOs first
-just like plain IO. So when bio_attempt_discard_merge() is reached, it
-means that IOs can't be merged, so req->nr_phys_segments should be
-increased by 1.
+Fixes it by using hctx->flags.
 
+Reported-by: syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
+Fixes: d97e594c5166 ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap")
+Cc: John Garry <john.garry@huawei.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
-Ming
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index a9182d2f8ad3..80273245d11a 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -680,6 +680,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned int i;
++	unsigned int flags = 0;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		blk_mq_debugfs_unregister_sched_hctx(hctx);
+@@ -687,12 +688,13 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+ 			e->type->ops.exit_hctx(hctx, i);
+ 			hctx->sched_data = NULL;
+ 		}
++		flags = hctx->flags;
+ 	}
+ 	blk_mq_debugfs_unregister_sched(q);
+ 	if (e->type->ops.exit_sched)
+ 		e->type->ops.exit_sched(e);
+ 	blk_mq_sched_tags_teardown(q);
+-	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
++	if (blk_mq_is_sbitmap_shared(flags))
+ 		blk_mq_exit_sched_shared_sbitmap(q);
+ 	q->elevator = NULL;
+ }
+-- 
+2.31.1
 
