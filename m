@@ -2,90 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBAD8C48BCF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A2CC48BD1
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:30:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFC05613DA
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 405BC613D5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 18:30:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231901AbhFISHU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 14:07:20 -0400
-Received: from mail-pf1-f180.google.com ([209.85.210.180]:46844 "EHLO
-        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbhFISHU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 14:07:20 -0400
-Received: by mail-pf1-f180.google.com with SMTP id u126so15057804pfu.13;
-        Wed, 09 Jun 2021 11:05:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tsG2vaYvQdsKPU22yVSS/01hRddm/EYSOLT0Jl+RAWg=;
-        b=NdIVcZXG1ZTfKccG5eX1Z8CMUwAnfD4ZtJGT71isAQVbHtavoLxmAanMQR6pWdHLSx
-         8U4U0VFaaYZ4KRamr+0vPpjEB5tmwBBY2khpVnMGQjVRNiUPCvA9+SUhp9xipaKsMFLg
-         5NiFoxKBK6wK9Fs3wS6FYyzibOrI8nZ34Vw0FogMf1E/eUTgeP3JBbbUrX1+MHSwUK+1
-         jXdU6s/kY9oKZVMCI72/tKsbWRSJnoE9/vBLctsyHKlQ8h2OojAIIrPvYKKb8tkvl47n
-         8651rVEAiXcEvFD59yejYEif5Povu5WC4kLGGYF4Fr8kNb8LwTzyP9xX71Uq3kch9WeO
-         q5pg==
-X-Gm-Message-State: AOAM530nbp5qbDDuq3macelzFyvHc2lQuAEy3nBYyogZPtwSWW0URtF/
-        h++/zfYyqDH/WK3CDNXPDMtfk+tXU7M=
-X-Google-Smtp-Source: ABdhPJwiyuIter/swQY3pmVDFdPLJluOoHfavogqfTx6tTfv6Cz1YMd5zHC5FpTpzhrMGj7ZqDZ2bg==
-X-Received: by 2002:a63:fc06:: with SMTP id j6mr933048pgi.226.1623261924921;
-        Wed, 09 Jun 2021 11:05:24 -0700 (PDT)
-Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id x20sm219024pfu.205.2021.06.09.11.05.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 11:05:24 -0700 (PDT)
+        id S229976AbhFIScj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 14:32:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35980 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229578AbhFISch (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 14:32:37 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F429C061574;
+        Wed,  9 Jun 2021 11:30:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=MjblxCUCOzYHrNducYPCvaRb+3zgVqvJu23vUfKX0+k=; b=c5rt3jzGtTLNFja84l9vIEupml
+        eGOEFlvj9dNmIfk+6Cwy9PcL/LQVt3cMEVZtSmnByl1QZEO6YIPYfa6AB6/PqIFaAuyIwlo9D06/W
+        s3SEiMt2QEDk6eHyiUM6BulEH6DNkGAVHJ/kc95mjKQh64MJQNFrSkZqF5H12dAXEqP2WzzfoYCCI
+        7bRbx6/GMAyC8S+P5A4/fxJwlOWib2T27rZw/L75Fav5lwUYJ2AJ5bnCDsH+RhyhLExhggdOBHs5K
+        v9nmZGEQbLijJOgIBFIxLpuPUDFaJFl867U1Cxcs1vgq+hffNi3AARq4+T7ArTxC6jvyumMy+ltho
+        xFW/g8Cg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lr2xw-000nJ2-9z; Wed, 09 Jun 2021 18:30:14 +0000
+Date:   Wed, 9 Jun 2021 19:30:12 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Ric Wheeler <ricwheeler@gmail.com>,
+        lsf-pc@lists.linux-foundation.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org
 Subject: Re: [LSF/MM/BPF TOPIC] durability vs performance for flash devices
  (especially embedded!)
-To:     Ric Wheeler <ricwheeler@gmail.com>,
-        lsf-pc@lists.linux-foundation.org
-Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org
+Message-ID: <YMEItMNXG2bHgJE+@casper.infradead.org>
 References: <55d3434d-6837-3a56-32b7-7354e73eb258@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
-Date:   Wed, 9 Jun 2021 11:05:22 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.2
+ <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <55d3434d-6837-3a56-32b7-7354e73eb258@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/9/21 3:53 AM, Ric Wheeler wrote:
-> Consumer devices are pushed to use the highest capacity emmc class
-> devices, but they have horrible write durability.
+On Wed, Jun 09, 2021 at 11:05:22AM -0700, Bart Van Assche wrote:
+> On 6/9/21 3:53 AM, Ric Wheeler wrote:
+> > Consumer devices are pushed to use the highest capacity emmc class
+> > devices, but they have horrible write durability.
+> > 
+> > At the same time, we layer on top of these devices our normal stack -
+> > device mapper and ext4 or f2fs are common configurations today - which
+> > causes write amplification and can burn out storage even faster. I think
+> > it would be useful to discuss how we can minimize the write
+> > amplification when we need to run on these low end parts & see where the
+> > stack needs updating.
+> > 
+> > Great background paper which inspired me to spend time tormenting emmc
+> > parts is:
+> > 
+> > http://www.cs.unc.edu/~porter/pubs/hotos17-final29.pdf
 > 
-> At the same time, we layer on top of these devices our normal stack -
-> device mapper and ext4 or f2fs are common configurations today - which
-> causes write amplification and can burn out storage even faster. I think
-> it would be useful to discuss how we can minimize the write
-> amplification when we need to run on these low end parts & see where the
-> stack needs updating.
+> Without having read that paper, has zoned storage been considered? F2FS
+> already supports zoned block devices. I'm not aware of a better solution
+> to reduce write amplification for flash devices. Maybe I'm missing
+> something?
+
+maybe you should read the paper.
+
+" Thiscomparison demonstrates that using F2FS, a flash-friendly file
+sys-tem, does not mitigate the wear-out problem, except inasmuch asit
+inadvertently rate limitsallI/O to the device"
+
+> More information is available in this paper:
+> https://dl.acm.org/doi/pdf/10.1145/3458336.3465300.
 > 
-> Great background paper which inspired me to spend time tormenting emmc
-> parts is:
+> Thanks,
 > 
-> http://www.cs.unc.edu/~porter/pubs/hotos17-final29.pdf
-
-Without having read that paper, has zoned storage been considered? F2FS
-already supports zoned block devices. I'm not aware of a better solution
-to reduce write amplification for flash devices. Maybe I'm missing
-something?
-
-More information is available in this paper:
-https://dl.acm.org/doi/pdf/10.1145/3458336.3465300.
-
-Thanks,
-
-Bart.
+> Bart.
