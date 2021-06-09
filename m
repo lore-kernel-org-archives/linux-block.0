@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC79C48BCF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 16:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D81C48BCD
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 17:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0751261354
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 16:54:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBB44613CA
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 17:00:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230380AbhFIQ40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 12:56:26 -0400
-Received: from mail-pl1-f179.google.com ([209.85.214.179]:35652 "EHLO
-        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230215AbhFIQ4Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 12:56:25 -0400
-Received: by mail-pl1-f179.google.com with SMTP id x19so5719255pln.2
-        for <linux-block@vger.kernel.org>; Wed, 09 Jun 2021 09:54:17 -0700 (PDT)
+        id S230451AbhFIRB7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 13:01:59 -0400
+Received: from mail-pf1-f178.google.com ([209.85.210.178]:44990 "EHLO
+        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230205AbhFIRB6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 13:01:58 -0400
+Received: by mail-pf1-f178.google.com with SMTP id u18so18833293pfk.11
+        for <linux-block@vger.kernel.org>; Wed, 09 Jun 2021 09:59:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XKd+RKYmRJ/ehnIZu3C4oSnNDXVsKmqQWXWGW+e5ErE=;
-        b=RnRediUSIBGlhbReHqgcko7RetRZQEvP7u5j82W7A18/ZOHEi1ypecaMbBPhpSCwbv
-         5Cb5e4laxKEGffkZQfLnjhfT1N0dyKkcE1qM54mgygBnRhf1C+1Vxps97brCL/bucTnk
-         NDkVV8kkTH0BJbLyDTd236LaydjUBfgY17j5WrlaRsKM8eOT2pKmasRSNIRD9WRrq8Rt
-         ziULSxioDegI56gEfCx5/ztCVUweBUH8wtUYdr0a6qJ0gUvp6u4N0Gxy1AErc0r49VQt
-         3W5BmBQurwCF6uJ3K7uXuQq6ATgk7o6d/X6P9KG5ZC/7xra1jDk7xj+czCJw4JeNqBx7
-         Tq+Q==
-X-Gm-Message-State: AOAM530EY/wCYbI5c8yH4z6yn6BG68qEo1sFvwTM9yCKZoaMywRjtDDU
-        98ORfgNAW02NZE2gGBFN5Qk=
-X-Google-Smtp-Source: ABdhPJx8jTZKtIxxLBRP05vjoqgRH1cTC6PNtY8Pq0JRM3pgHNShqI+mxxEsQY9qh/+YiS34u45CMw==
-X-Received: by 2002:a17:902:f291:b029:104:9bae:f569 with SMTP id k17-20020a170902f291b02901049baef569mr629133plc.13.1623257657273;
-        Wed, 09 Jun 2021 09:54:17 -0700 (PDT)
+        bh=aJbb24CYOSpj/K6vGY9QDRQSFa0sxnuqji2MPt4xQRo=;
+        b=Qc6avV5EOpDFXYznVQ/wbGtEaMErsuhqG8C6tsLcJxmLxGNw+pE9mS0FnbdGDSSaBw
+         DZA/a3jQGShxwm2mu9D8tKKYOAYsBB+s2MgjSGI7z/Wbuf9MuJqPtonwPFcOWJ5iwn5P
+         I7jvbDatCKb2zQs3PtHN+B1Pfeh5p71dL55Dlh+w3L93ntR1L6JFw9oYD8CWadTbUWRJ
+         JLsMfLydxbPoNvX4JBymJ6grRR76TYHh34mm0EntqHoBZqqDdlKED5WixTLakqz6u/Uf
+         DuPYfovKluZK4Jbh2HxevdjZFBCy5eHEcvgXnxFZ4jpgrQVgV4ucvdUFVK6Rv9vANbwf
+         fWJg==
+X-Gm-Message-State: AOAM533Te1xKpXNKdNQNNeW4DwK6wk7779KN4fAmdt4wWIcYsiOlEmiF
+        2t2bJG6GFgsreuva2ui/Phk=
+X-Google-Smtp-Source: ABdhPJzXcV/H0x6qc7i+Q5NFMILxYzh4fFyCCWnkQrPu8VzH7fUbon8u8TuPO4zO1T/FVuHGajqOiQ==
+X-Received: by 2002:a63:fd17:: with SMTP id d23mr687783pgh.68.1623257989289;
+        Wed, 09 Jun 2021 09:59:49 -0700 (PDT)
 Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id v7sm144315pfi.187.2021.06.09.09.54.15
+        by smtp.gmail.com with ESMTPSA id s20sm5680859pjn.23.2021.06.09.09.59.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 09:54:16 -0700 (PDT)
+        Wed, 09 Jun 2021 09:59:42 -0700 (PDT)
 Subject: Re: [PATCH 10/14] block/mq-deadline: Improve the sysfs show and store
  macros
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         Jens Axboe <axboe@kernel.dk>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>
 References: <20210608230703.19510-1-bvanassche@acm.org>
  <20210608230703.19510-11-bvanassche@acm.org>
- <DM6PR04MB7081916EE79D419357373085E7369@DM6PR04MB7081.namprd04.prod.outlook.com>
+ <PH0PR04MB74169450017D5A976BA91E1E9B369@PH0PR04MB7416.namprd04.prod.outlook.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <8547812b-c8b5-93c1-0189-f8ce4c01ff99@acm.org>
-Date:   Wed, 9 Jun 2021 09:54:15 -0700
+Message-ID: <cfc07d2f-ff4d-47dc-2f5b-9add0cc78cb3@acm.org>
+Date:   Wed, 9 Jun 2021 09:59:39 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.2
 MIME-Version: 1.0
-In-Reply-To: <DM6PR04MB7081916EE79D419357373085E7369@DM6PR04MB7081.namprd04.prod.outlook.com>
+In-Reply-To: <PH0PR04MB74169450017D5A976BA91E1E9B369@PH0PR04MB7416.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -68,8 +68,8 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/8/21 9:46 PM, Damien Le Moal wrote:
-> On 2021/06/09 8:07, Bart Van Assche wrote:
+On 6/9/21 12:11 AM, Johannes Thumshirn wrote:
+> On 09/06/2021 01:07, Bart Van Assche wrote:
 >> +#define SHOW_INT(__FUNC, __VAR)						\
 >>  static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
 >>  {									\
@@ -88,15 +88,13 @@ On 6/8/21 9:46 PM, Damien Le Moal wrote:
 >> +									\
 >> +	return sysfs_emit((page), "%d\n", __VAR);			\
 >> +}
->> +#define SHOW_JIFFIES(__FUNC, __VAR) SHOW_INT(__FUNC, jiffies_to_msecs(__VAR))
 > 
-> jiffies_to_msecs() returns an unsigned int but sysfs_emit() in SHOW_INT() uses a
-> %d format. That will cause problems, no ?
+> Nit: the () around page aren't needed
 
-The corresponding store functions restrict values that represent a time
-in jiffies to the interval [0, INT_MAX] milliseconds so I think that
-using %d to format a time in milliseconds is fine.
+Right, I will remove these parentheses.
 
 Thanks,
 
 Bart.
+
+
