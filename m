@@ -2,113 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE12C48BCF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 09:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1F8C47095
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 09:05:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7844B61181
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 09:04:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDBF761285
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 09:05:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237634AbhFIJGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 05:06:37 -0400
-Received: from mail-pj1-f54.google.com ([209.85.216.54]:53038 "EHLO
-        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237085AbhFIJGh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 05:06:37 -0400
-Received: by mail-pj1-f54.google.com with SMTP id h16so975392pjv.2;
-        Wed, 09 Jun 2021 02:04:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=p509XquklGPlHgIgLviWSLP6RC8IGBzAqX0rlKOEPB0=;
-        b=arQmByQXbbDKQBLqyclwq5I0Fm2ow+XetxFCyzjadndLtrmHo+Lf/AWvEu7/LACjJS
-         2KcfUQCQRXfyX1u4c4CdC/v+L3WM6A7wTdCzA0Ih7/UKkJGcWZ2IGxum+H0y1euuO80P
-         sh1jo528WfjWEfVXbJJ9mkUuIScDKOK0ArRP9uque7qjTXfDHE+1wyBaJz92PyLTtGq/
-         Q/5RMnTncYG6Zwu55T5JUmuHQlY7x5qgUQyBDLomrrfhGBZgZ2+Euz38KsHm82KZGeMQ
-         mUnV0Fa9d65Dk5dO9vHjlHEItRx+k1WkD+bu7GSupweYzRgJNbY/3vkr7dBn8m1uE5ep
-         FC1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=p509XquklGPlHgIgLviWSLP6RC8IGBzAqX0rlKOEPB0=;
-        b=VMtLDqPC9kZIucM10Gu58q4Gg3NTPw/N1mgnjBuZdlEcvbFqXTj+TiTkuEUl5MgbEu
-         L3+OUwSrkQiQER71LwBL7ifWPvf6ZemMMhy+ZkeC6kBpVLP+aHSFtt9/1BlRmtop8/qR
-         vfaijGRvVTBDwbLfALCAzu1Hq7JRcJ578vvOwQa/ZqJdOQGWc8pU5QtZtX53oj/Cr/vS
-         gprXlP80S0Zty8c5xY5fZ+Eb4NG4++scZh3eUF1yehrbUXmn3lG4Sv2r2x0AUWePFgC4
-         vge1CeLTNtjm3GppanAymCiN+wCDOQJ3cHbigpuFyYnEe1Z2ZWE5mB7+CW4UXGvqLJtD
-         ouQA==
-X-Gm-Message-State: AOAM531XeMvF1iTZJ0W4XpswD9NmPPHcKAmdODnv2b7JZYocWdwHGKI6
-        zpiwMn5sXWGHDjwXjQL0EmM=
-X-Google-Smtp-Source: ABdhPJwnJjEeG/UnQ9HkZG2AGk2j8LX0p5mr5IbXIQAQlGbykdC126JUSdkQ3T1basqET5VuuDBk3Q==
-X-Received: by 2002:a17:902:8484:b029:101:7016:fb7b with SMTP id c4-20020a1709028484b02901017016fb7bmr4015286plo.23.1623229407608;
-        Wed, 09 Jun 2021 02:03:27 -0700 (PDT)
-Received: from [10.7.3.1] ([133.130.111.179])
-        by smtp.gmail.com with ESMTPSA id s3sm14846565pgs.62.2021.06.09.02.03.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Jun 2021 02:03:27 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.6\))
-Subject: Re: [Bug Report] Discard bios cannot be correctly merged in blk-mq
-From:   Wang Shanker <shankerwangmiao@gmail.com>
-In-Reply-To: <CALTww28L7afRdVdBf-KsyF6Hvf-8-CORSCpZJAvnVbDRo6chDQ@mail.gmail.com>
-Date:   Wed, 9 Jun 2021 17:03:22 +0800
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <ED5B1993-9D44-4B9C-A7DF-72BD2375A216@gmail.com>
-References: <85F98DA6-FB28-4C1F-A47D-C410A7C22A3D@gmail.com>
- <YL4Z/QJCKc0NCV5L@T590> <C866C380-7A71-4722-957F-2CE65BDACF26@gmail.com>
- <YMAOO3XjOUl2IG+4@T590> <1C6DB607-B7BE-4257-8384-427BB490C9C0@gmail.com>
- <CALTww28L7afRdVdBf-KsyF6Hvf-8-CORSCpZJAvnVbDRo6chDQ@mail.gmail.com>
-To:     Xiao Ni <xni@redhat.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.6)
+        id S237815AbhFIJHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 05:07:38 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3181 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233853AbhFIJHh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 05:07:37 -0400
+Received: from fraeml709-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G0LYx66Twz6G8Mq;
+        Wed,  9 Jun 2021 16:56:21 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml709-chm.china.huawei.com (10.206.15.37) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 9 Jun 2021 11:05:36 +0200
+Received: from [10.47.80.201] (10.47.80.201) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Wed, 9 Jun 2021
+ 10:05:35 +0100
+Subject: Re: [PATCH] blk-mq: fix use-after-free in blk_mq_exit_sched
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        "Christoph Hellwig" <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>,
+        <syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com>
+References: <20210609063046.122843-1-ming.lei@redhat.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f5fbc650-5bd3-32ee-1d31-8b1dd1d7fa19@huawei.com>
+Date:   Wed, 9 Jun 2021 09:59:43 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
+MIME-Version: 1.0
+In-Reply-To: <20210609063046.122843-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.80.201]
+X-ClientProxiedBy: lhreml749-chm.china.huawei.com (10.201.108.199) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 09/06/2021 07:30, Ming Lei wrote:
 
-> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 16:44=EF=BC=8CXiao Ni =
-<xni@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Hi all
->=20
-> Thanks for reporting about this. I did a test in my environment.
-> time blkdiscard /dev/nvme5n1  (477GB)
-> real    0m0.398s
-> time blkdiscard /dev/md0
-> real    9m16.569s
->=20
-> I'm not familiar with the block layer codes. I'll try to understand
-> the codes related with discard request and
-> try to fix this problem.
->=20
-> I have a question for raid5 discard, it needs to consider more than
-> raid0 and raid10. For example, there is a raid5 with 3 disks.
-> D11 D21 P1 (stripe size is 4KB)
-> D12 D22 P2
-> D13 D23 P3
-> D14 D24 P4
-> ...  (chunk size is 512KB)
-> If there is a discard request on D13 and D14, and there is no discard
-> request on D23 D24. It can't send
-> discard request to D13 and D14, right? P3 =3D D23 xor D13. If we =
-discard
-> D13 and disk2 is broken, it can't
-> get the right data from D13 and P3. The discard request on D13 can
-> write 0 to the discard region, right?
+Thanks for the fix
 
-Yes. It can be seen at the beginning of make_discard_request(), where
-the requested range being discarded is aligned to ``stripe_sectors",=20
-which should be chunk_sectors * nr_data_disks.
+> tagset can't be used after blk_cleanup_queue() is returned because
+> freeing tagset usually follows blk_clenup_queue(). Commit d97e594c5166
+> ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap") adds
+> check on q->tag_set->flags in blk_mq_exit_sched(), and causes
+> use-after-free.
+> 
+> Fixes it by using hctx->flags.
+> 
 
-Cheers,
+The tagset is a member of the Scsi_Host structure. So it is true that 
+this memory may be freed before the request_queue is exited?
 
-Miao Wang
+> Reported-by: syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
+> Fixes: d97e594c5166 ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap")
+> Cc: John Garry <john.garry@huawei.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-mq-sched.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index a9182d2f8ad3..80273245d11a 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -680,6 +680,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>   {
+>   	struct blk_mq_hw_ctx *hctx;
+>   	unsigned int i;
+> +	unsigned int flags = 0;
+>   
+>   	queue_for_each_hw_ctx(q, hctx, i) {
+>   		blk_mq_debugfs_unregister_sched_hctx(hctx);
+> @@ -687,12 +688,13 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>   			e->type->ops.exit_hctx(hctx, i);
+>   			hctx->sched_data = NULL;
+>   		}
+> +		flags = hctx->flags;
+
+I know the choice is limited, but it is unfortunate that we must set 
+flags in a loop
+
+>   	}
+>   	blk_mq_debugfs_unregister_sched(q);
+>   	if (e->type->ops.exit_sched)
+>   		e->type->ops.exit_sched(e);
+>   	blk_mq_sched_tags_teardown(q);
+> -	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+> +	if (blk_mq_is_sbitmap_shared(flags))
+>   		blk_mq_exit_sched_shared_sbitmap(q);
+
+this is
+
+blk_mq_exit_sched_shared_sbitmap(struct request_queue *queue)
+{
+	sbitmap_queue_free(&queue->sched_bitmap_tags);
+	..
+}
+
+And isn't it safe to call sbitmap_queue_free() when 
+sbitmap_queue_init_node() has not been called?
+
+I'm just wondering if we can always call 
+blk_mq_exit_sched_shared_sbitmap()? I know it's not an ideal choice either.
+
+Thanks,
+John
+
+>   	q->elevator = NULL;
+>   }
+> 
 
