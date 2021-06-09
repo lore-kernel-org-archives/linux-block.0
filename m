@@ -2,89 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 405A7C48BCD
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 10:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC7AC48BD1
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 11:36:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E9056139A
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 10:53:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D24BF61364
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 11:36:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235506AbhFIKzg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 06:55:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234882AbhFIKze (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 06:55:34 -0400
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EA54C061574;
-        Wed,  9 Jun 2021 03:53:31 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id e18so12509069qvm.10;
-        Wed, 09 Jun 2021 03:53:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-transfer-encoding:content-language;
-        bh=0YVz+Tp9c/+BLdLLg/dEk8hVG2/4HLSUp+VXgepDnM0=;
-        b=pf8nagyssHGUxyRjUvhABlSHergN77+RWaufZevQ2p17UnOXHE69CPPhR31vtc84sw
-         WY5huLOmWveUt3LadLXtF34q/Q1CCQk0Q7x0PIw50J3+KuJUKlg9WGLrCgjVFzq6KIbZ
-         XyuRt523PBVclEE3MKoU67oIXabWh2iGyC2Pm9DOHaOvusEy4LJtcAuQUZ4Yin9dnCeY
-         LbGWTuSz9X5wQkaQZIiLPtpd0+f/vievjZT2nLfHxj7SPgoKQI0TVfRXeWM5BTKuvwWv
-         ixn8BZRxbfGxvR/WZ3iDcC5wsa5yybvAnbzMrhYj1xVTsxbKlubyB0jrU/OBJp7YPuvc
-         8qfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-transfer-encoding:content-language;
-        bh=0YVz+Tp9c/+BLdLLg/dEk8hVG2/4HLSUp+VXgepDnM0=;
-        b=DeeMYR2UTA3UlRVXuWeuy6uVmGOgin+Lu+W/yGyjy8fN8TR04p0Y3jHpQFKtVuqa6o
-         Uvjd4/nTVSstg6Y5f9Ugq1dZKpiL8sTrteJaXo72NB56Kx6IaYDid1m0jivGLCrKSuzr
-         SagrxatjXfNw+pz9JVxqbcy8o5Sm7xKQxj8RKp9aAKvp1F8bx0UHR1AgNyi8RUeBU8Wz
-         r6WdwRCtVPmR4Z21C6TlD/1Vdfp7h6pG6dB/vSLrAcenjaI44GT1GNi6W6aTfSi4rwnX
-         K0e0BipUFmAQoqkZKbcpjxf/7QnLQgWU/J0Ok6EG40jUzAXZVvH1hkVwAv7/6taHeMp7
-         p2QQ==
-X-Gm-Message-State: AOAM530/rzZYLKpus0I7kgp8JYRAtVFrWxHCN3xYYkm7PGoA2cigBXyG
-        wqiFDg+FeAQpetGwMqO7IMzv7fIVSnmwbg==
-X-Google-Smtp-Source: ABdhPJwtZMHelbQEQM4fDC9UawbdbSF72e8Udsuo0J0026QmwPoeJr/GjVYT4nkOd+EDafShg6WIkA==
-X-Received: by 2002:a0c:d784:: with SMTP id z4mr5162868qvi.27.1623236009982;
-        Wed, 09 Jun 2021 03:53:29 -0700 (PDT)
-Received: from localhost.localdomain (pool-173-48-195-35.bstnma.fios.verizon.net. [173.48.195.35])
-        by smtp.gmail.com with ESMTPSA id z2sm4794746qke.23.2021.06.09.03.53.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 03:53:29 -0700 (PDT)
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-From:   Ric Wheeler <ricwheeler@gmail.com>
-Subject: [LSF/MM/BPF TOPIC] durability vs performance for flash devices
- (especially embedded!)
-Message-ID: <55d3434d-6837-3a56-32b7-7354e73eb258@gmail.com>
-Date:   Wed, 9 Jun 2021 06:53:29 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S234139AbhFILiH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 07:38:07 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:31319 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238474AbhFILiG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 07:38:06 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210609113610epoutp0363d0a3145dfe68e0e3d246fe8cc4a024~G5uEQBAHD1430314303epoutp03e
+        for <linux-block@vger.kernel.org>; Wed,  9 Jun 2021 11:36:10 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210609113610epoutp0363d0a3145dfe68e0e3d246fe8cc4a024~G5uEQBAHD1430314303epoutp03e
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1623238570;
+        bh=VCC1ocTa+pfE1YBQEhmF6TG5sDdJYTYPM8fYYtuGelk=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=X9dFWGYjoufBBZKpcLBRjKFVoUjW8opKlAltIO7nwuzeq7ZDVay6+L2UGlKkj/HHp
+         eZRlsNUrg5b75qd+ryYAdS52RfWebuifzJ9NpGO5Ko6NKGi1DNtu2VQ79Z9NY4iTI5
+         FVJrd+dTULh5fr5KO78U0rH05KY4hYY4bioiWgSI=
+Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20210609113609epcas5p21235af4b27c4c7e7b253521dc1b2958b~G5uDrE7_v2107321073epcas5p24;
+        Wed,  9 Jun 2021 11:36:09 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A4.BA.09697.9A7A0C06; Wed,  9 Jun 2021 20:36:09 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210609105347epcas5p42ab916655fca311157a38d54f79f95e7~G5JEleDmZ1718217182epcas5p4O;
+        Wed,  9 Jun 2021 10:53:47 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20210609105347epsmtrp11f28ff6a44abcbac76dab9ce1534baa2~G5JEkus3_1421214212epsmtrp1V;
+        Wed,  9 Jun 2021 10:53:47 +0000 (GMT)
+X-AuditID: b6c32a4a-64fff700000025e1-44-60c0a7a9df8d
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        55.98.08163.BBD90C06; Wed,  9 Jun 2021 19:53:47 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210609105345epsmtip139d160f4a440ad7b08683a6b96ab98c1~G5JC8NJ832853528535epsmtip1B;
+        Wed,  9 Jun 2021 10:53:45 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     lsf-pc@lists.linux-foundation.org, linux-nvme@lists.infradead.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, javier@javigon.com,
+        anuj20.g@samsung.com, joshiiitr@gmail.com,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [LSF/MM/BPF Topic] Towards more useful nvme-passthrough
+Date:   Wed,  9 Jun 2021 16:20:50 +0530
+Message-Id: <20210609105050.127009-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPKsWRmVeSWpSXmKPExsWy7bCmpu7K5QcSDE7e5rNomvCX2WL13X42
+        i5WrjzJZvGs9x2LRefoCk8XR/2/ZLM6/PcxkMenQNUaLvbe0LeYve8puse/1XmYHbo+ds+6y
+        ezQvuMPicflsqcemVZ1sHpuX1HtMvrGc0WP3zQY2j74tqxg9Pm+SC+CM4rJJSc3JLEst0rdL
+        4MpYtvIWe8EVqYr/6/YyNjBuE+li5OSQEDCRaN91lrWLkYtDSGA3o8TvpkMsEM4nRomeHW+Z
+        IJzPjBILDmxnhGl5+fg5VGIXo8Sdk0tZ4Kom7j/O3sXIwcEmoClxYXIpSIOIQJ3E9NOn2EBq
+        mAVmMUrsPbaTDSQhLOAg8fvKf7CpLAKqEvc+7mQCsXkFLCX2dT9khdgmLzHz0nd2iLigxMmZ
+        T1hAbGagePPW2cwgQyUEWjkkvry/ww7R4CJxcOJuJghbWOLV8S1QcSmJl/1tUHaxxK87R6Ga
+        OxglrjfMZIFI2Etc3POXCeQDZqAP1u/ShwjLSkw9tY4JYjGfRO/vJ1DzeSV2zIOxFSXuTXoK
+        dbS4xMMZS6BsD4nnM7rAbCGBWImlPzawTmCUn4Xkn1lI/pmFsHkBI/MqRsnUguLc9NRi0wKj
+        vNRyveLE3OLSvHS95PzcTYzgNKXltYPx4YMPeocYmTgYDzFKcDArifCWGe5LEOJNSaysSi3K
+        jy8qzUktPsQozcGiJM674uHkBCGB9MSS1OzU1ILUIpgsEwenVAPTkg2CpuI3eQI0z5/h+8Ln
+        0nN4anTQ4wcNN9V48u9Nu7zJZPak99wPmjyy1OyKJmvr/2TrrW+67sl9pIjNcX7e9XfCVTJ7
+        D+j+nKhpKNntHXf6s4bxDI0jW7RerY/JrFu60+C48t7qSM9KzxnfZXQ+yJ9Zd3HO+alcRTJt
+        r7TvCS2YsjmFb9GKd8d/bPDW8+xerHRtJxvXksL/L+W6vG9zeXlbzYx+bXHkzr2vgX8733p4
+        tIr+vLQvVzs050jzmbf1vjHnqj+3ey59Fsdy9X3honmPrqpvP3zInPmz59XK587lyis+b35e
+        /9i+esl6H3vxxE4hwertWg+trs5SOxZ3+b5qdKra4hpJY57d33UUlFiKMxINtZiLihMByGuZ
+        CcIDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrCLMWRmVeSWpSXmKPExsWy7bCSnO7uuQcSDCY2q1k0TfjLbLH6bj+b
+        xcrVR5ks3rWeY7HoPH2ByeLo/7dsFuffHmaymHToGqPF3lvaFvOXPWW32Pd6L7MDt8fOWXfZ
+        PZoX3GHxuHy21GPTqk42j81L6j0m31jO6LH7ZgObR9+WVYwenzfJBXBGcdmkpOZklqUW6dsl
+        cGUsW3mLveCKVMX/dXsZGxi3iXQxcnJICJhIvHz8nKmLkYtDSGAHo8SVnqUsEAlxieZrP9gh
+        bGGJlf+es0MUfWSUuL9zHZDDwcEmoClxYXIpSFxEoIlRYtqu84wgDcwCixgl7tzyArGFBRwk
+        fl/5DxZnEVCVuPdxJxOIzStgKbGv+yErxAJ5iZmXvrNDxAUlTs58wgIxR16ieets5gmMfLOQ
+        pGYhSS1gZFrFKJlaUJybnltsWGCUl1quV5yYW1yal66XnJ+7iREc8FpaOxj3rPqgd4iRiYPx
+        EKMEB7OSCG+Z4b4EId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rwXuk7GCwmkJ5akZqemFqQWwWSZ
+        ODilGpgmmJaKZOxRu3hi9yIW4e4l0t7mW6WEY41VNs0uYqidUMlTVdRz6FiSt/eVKVxhNTda
+        HXK/zc+rncpXv6fbf51MKqO6WX/elY3cD+3ZpD0OtEZ+X71EftYf1zvnuJzXd769tiO3cnvt
+        pu1n2Fxtr/d+6VdlrD2wo/NRtXrRJi2lrdvlrEoyuSbmvusUMVvktydjW6T+DlMpn77D+757
+        fbx0VarPtl3M8NmTYzMOszu+vbDDM/3ftWMRn7OftEbwVhnub4jJSpIo0v7wXls5as2kjvvS
+        dotDHFb2zfUX+cdtYqm5dpdrruQJF3Hryw5rRRe6CMxysL8iammfv3LOw4srm/c+lI2aZ1Ty
+        /+VXCyWW4oxEQy3mouJEAKDvwqDnAgAA
+X-CMS-MailID: 20210609105347epcas5p42ab916655fca311157a38d54f79f95e7
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20210609105347epcas5p42ab916655fca311157a38d54f79f95e7
+References: <CGME20210609105347epcas5p42ab916655fca311157a38d54f79f95e7@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Background & objectives:
+------------------------
 
-Consumer devices are pushed to use the highest capacity emmc class devices, but 
-they have horrible write durability.
+The NVMe passthrough interface
 
-At the same time, we layer on top of these devices our normal stack - device 
-mapper and ext4 or f2fs are common configurations today - which causes write 
-amplification and can burn out storage even faster. I think it would be useful 
-to discuss how we can minimize the write amplification when we need to run on 
-these low end parts & see where the stack needs updating.
+Good part: allows new device-features to be usable (at least in raw
+form) without having to build block-generic cmds, in-kernel users,
+emulations and file-generic user-interfaces - all this take some time to
+evolve.
 
-Great background paper which inspired me to spend time tormenting emmc parts is:
+Bad part: passthrough interface has remain tied to synchronous ioctl,
+which is a blocker for performance-centric usage scenarios. User-space
+can take the pain of implementing async-over-sync on its own but it does
+not make much sense in a world that already has io_uring.
 
-http://www.cs.unc.edu/~porter/pubs/hotos17-final29.pdf
+Passthrough is lean in the sense it cuts through layers of abstractions
+and reaches to NVMe fast. One of the objective here is to build a
+scalable pass-through that can be readily used to play with new/emerging
+NVMe features.  Another is to surpass/match existing raw/direct block
+I/O performance with this new in-kernel path.
 
+Recent developments:
+--------------------
+- NVMe now has a per-namespace char interface that remains available/usable
+  even for unsupported features and for new command-sets [1].
+
+- Jens has proposed async-ioctl like facility 'uring_cmd' in io_uring. This
+  introduces new possibilities (beyond storage); async-passthrough is one of
+those. Last posted version is V4 [2].
+
+- I have posted work on async nvme passthrough over block-dev [3]. Posted work
+  is in V4 (in sync with the infra of [2]).
+
+Early performance numbers:
+--------------------------
+fio, randread, 4k bs, 1 job
+Kiops, with varying QD:
+
+QD      Sync-PT         io_uring        Async-PT
+1         10.8            10.6            10.6
+2         10.9            24.5            24
+4         10.6            45              46
+8         10.9            90              89
+16        11.0            169             170
+32        10.6            308             307
+64        10.8            503             506
+128       10.9            592             596
+
+Further steps/discussion points:
+--------------------------------
+1.Async-passthrough over nvme char-dev
+It is in a shape to receive feedback, but I am not sure if community
+would like to take a look at that before settling on uring-cmd infra.
+
+2.Once above gets in shape, bring other perf-centric features of io_uring to
+this path -
+A. SQPoll and register-file: already functional.
+B. Passthrough polling: This can be enabled for block and looks feasible for
+char-interface as well.  Keith recently posted enabling polling for user
+pass-through [4]
+C. Pre-mapped buffers: Early thought is to let the buffers registered by
+io_uring, and add a new passthrough ioctl/uring_cmd in driver which does
+everything that passthrough does except pinning/unpinning the pages.
+
+3. Are there more things in the "io_uring->nvme->[block-layer]->nvme" path
+which can be optimized.
+
+Ideally I'd like to cover good deal of ground before Dec. But there seems
+plenty of possibilities on this path.  Discussion would help in how best to
+move forward, and cement the ideas.
+
+[1] https://lore.kernel.org/linux-nvme/20210421074504.57750-1-minwoo.im.dev@gmail.com/
+[2] https://lore.kernel.org/linux-nvme/20210317221027.366780-1-axboe@kernel.dk/
+[3] https://lore.kernel.org/linux-nvme/20210325170540.59619-1-joshi.k@samsung.com/
+[4] https://lore.kernel.org/linux-block/20210517171443.GB2709391@dhcp-10-100-145-180.wdc.com/#t
+
+-- 
+2.25.1
 
