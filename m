@@ -2,114 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 376BCC48BCF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7DFC4743D
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:58:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 146246128D
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEF4761287
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 01:58:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233202AbhFICAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jun 2021 22:00:14 -0400
-Received: from mga01.intel.com ([192.55.52.88]:29232 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229685AbhFICAO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Jun 2021 22:00:14 -0400
-IronPort-SDR: aIXev9uo9voKZ2Rz8fxzOe3O4f5qxZxWSaHHrDcUJRzF9ZcOxTb5ovmwZayXzilUx2AUazqi3s
- uZFqVvhuTfxg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10009"; a="226348637"
-X-IronPort-AV: E=Sophos;i="5.83,259,1616482800"; 
-   d="scan'208";a="226348637"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2021 18:58:20 -0700
-IronPort-SDR: KYJW5Refe0V9ltnuDGlVJ6TLopiUWwZYULWIqWG34N4OkvARGXzz0Av7vRHCtdujeOQY9X1fyQ
- 6/vheDgG7Nyg==
-X-IronPort-AV: E=Sophos;i="5.83,259,1616482800"; 
-   d="scan'208";a="482201138"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2021 18:58:19 -0700
-Date:   Tue, 8 Jun 2021 18:58:19 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ceph-devel@vger.kernel.org
-Subject: Re: [PATCH 14/16] block: use memcpy_from_bvec in __blk_queue_bounce
-Message-ID: <20210609015819.GU3697498@iweiny-DESK2.sc.intel.com>
-References: <20210608160603.1535935-1-hch@lst.de>
- <20210608160603.1535935-15-hch@lst.de>
+        id S229685AbhFICAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jun 2021 22:00:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31740 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233277AbhFICAc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Jun 2021 22:00:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623203917;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6zmqsfPY6wG03La3cZsPHv0Do5L7TUEifn99iN90JsI=;
+        b=LfBDnft04ex872z7mENxKiXwQ/WB/RRi/vUXkgxQxv+3PoDM+fk6F1DH5c8+oqECoAkFND
+        nZ47eO0CzHetvqll1p427Mco/jfR4sDB6Vy76hgvbP66VWLIpNX1u76eOBvekORfsgsVB5
+        /+gWSAknKyRQJMncVkClTna3+3+qyRU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-juqJNryFPaqW3bAT-fXa6w-1; Tue, 08 Jun 2021 21:58:36 -0400
+X-MC-Unique: juqJNryFPaqW3bAT-fXa6w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08F6D100945F;
+        Wed,  9 Jun 2021 01:58:35 +0000 (UTC)
+Received: from localhost (ovpn-12-143.pek2.redhat.com [10.72.12.143])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FD685C1BB;
+        Wed,  9 Jun 2021 01:58:28 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH V3 0/2] block: fix race between adding wbt and normal IO 
+Date:   Wed,  9 Jun 2021 09:58:20 +0800
+Message-Id: <20210609015822.103433-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210608160603.1535935-15-hch@lst.de>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 08, 2021 at 06:06:01PM +0200, Christoph Hellwig wrote:
-> Rewrite the actual bounce buffering loop in __blk_queue_bounce to that
-> the memcpy_to_bvec helper can be used to perform the data copies.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/bounce.c | 21 +++++++--------------
->  1 file changed, 7 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/bounce.c b/block/bounce.c
-> index a2fc6326b6c9..b5ad09e07bcf 100644
-> --- a/block/bounce.c
-> +++ b/block/bounce.c
-> @@ -243,24 +243,17 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
->  	 * because the 'bio' is single-page bvec.
->  	 */
->  	for (i = 0, to = bio->bi_io_vec; i < bio->bi_vcnt; to++, i++) {
-> -		struct page *page = to->bv_page;
-> +		struct page *bounce_page;
->  
-> -		if (!PageHighMem(page))
-> +		if (!PageHighMem(to->bv_page))
->  			continue;
->  
-> -		to->bv_page = mempool_alloc(&page_pool, GFP_NOIO);
-> -		inc_zone_page_state(to->bv_page, NR_BOUNCE);
-> +		bounce_page = mempool_alloc(&page_pool, GFP_NOIO);
-> +		inc_zone_page_state(bounce_page, NR_BOUNCE);
->  
-> -		if (rw == WRITE) {
-> -			char *vto, *vfrom;
-> -
-> -			flush_dcache_page(page);
-> -
-> -			vto = page_address(to->bv_page) + to->bv_offset;
-> -			vfrom = kmap_atomic(page) + to->bv_offset;
-> -			memcpy(vto, vfrom, to->bv_len);
-> -			kunmap_atomic(vfrom);
-> -		}
-> +		if (rw == WRITE)
-> +			memcpy_from_bvec(page_address(bounce_page), to);
+Hello,
 
-NIT: the fact that the copy is from 'to' makes my head hurt...  But I don't
-see a good way to change that without declaring unnecessary variables...  :-(
+Yi reported several kernel panics on:
 
-The logic seems right.
+[16687.001777] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
+...
+[16687.163549] pc : __rq_qos_track+0x38/0x60
 
-Ira
+or
 
-> +		to->bv_page = bounce_page;
->  	}
->  
->  	trace_block_bio_bounce(*bio_orig);
-> -- 
-> 2.30.2
-> 
+[  997.690455] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
+...
+[  997.850347] pc : __rq_qos_done+0x2c/0x50
+
+Turns out it is caused by race between adding wbt and normal IO.
+
+Fix the issue by freezing request queue when adding/deleting rq qos.
+
+V3:
+	- use ->queue_lock for protecting concurrent adding/deleting rqos on
+	  same queue
+
+V2:
+	- switch to the approach of freezing queue, which is more generic
+	  than V1.
+
+
+
+Ming Lei (2):
+  block: fix race between adding/removing rq qos and normal IO
+  block: mark queue init done at the end of blk_register_queue
+
+ block/blk-rq-qos.h | 24 ++++++++++++++++++++++++
+ block/blk-sysfs.c  | 29 +++++++++++++++--------------
+ 2 files changed, 39 insertions(+), 14 deletions(-)
+
+Cc: Yi Zhang <yi.zhang@redhat.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+-- 
+2.31.1
+
