@@ -2,362 +2,297 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B92C47095
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 05:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D261C47095
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 05:23:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D7DA61287
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 05:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4231D611AE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jun 2021 05:23:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231401AbhFIFMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 01:12:49 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:11019 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbhFIFMt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 01:12:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1623215455; x=1654751455;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=twkrkXCnpd16Pro5ODBMmhu2pcxjleBYFiiRp9PjzUM=;
-  b=XdmgzGxtADvrYV8D19biMTm/70h+yhNbRyo52ajVViLuw2KtNNi/DNqg
-   tj0k1rxmil1xI1ebZGcEMv1tUQZoS7vZg8WfUN6ho/+dupZfD5iPd6iRL
-   958z1vS8DwgJOFiT29fT33LJDDkHjunTzUCLLRqT7aGMLiwQTI4zQIeko
-   0TQsspx42QY5OvDVGK0o5QVCeQHnzV3PAA9ACoQb443AThNi4YnA33ABl
-   IZdhNHS0NouaBinX5I15MMVsiMZUGZ+P5vGKE71v6utC7ybClKzioYBSV
-   xqIMLr+kOv6Mtb8PCRnKOR97+RDNDHi7qtkfwSJnUx01KqLltTc4/VbS6
-   A==;
-IronPort-SDR: 6x9PuKFwIFYPM4q1lK9E/05ACtfDs4hPUtKcFn8Aye/dbI1z+ag+eVtydxfu4JTOyIMRDOLsKC
- 6CcwtsX0ltfJUM8g6T/zdDdf4Oh/itUahuDK5IW9iZ4UNY3RD87+gn77ISigZgs4jE15ByHz8Q
- 5OU6UaIev5wfR0NQk6j7eUmqtqm6RkR3JSdz0AkrzGwuyxOJjgpCOrJUh36fhUkNNnrtolzZBf
- ZnYpo7s6NkVslAEKgn5Xm1fmUP5i2KGR4Rr21WUShClnUpALgBNG9A0M+Bm40vRlE1ssniqnY6
- omE=
-X-IronPort-AV: E=Sophos;i="5.83,260,1616428800"; 
-   d="scan'208";a="282686648"
-Received: from mail-dm6nam12lp2175.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.175])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jun 2021 13:10:54 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MC1HgZIqaqATsao86CRGqKjkjA1GLb1nndYNy+L8mXMO2oaUJNRyn1lNlbzLaGsaDHRZfpE1r/XpPa7fe6WnZwa0reMGmH2rUABN50GAqx0Mf5cCbLN33oiI+v7YhS6Gsj5oAJKTa5ahN+CJTw/J5hTr3U3Bs61TF5FCOEFR1/26VzldTrrKp55sgkyPU9XrJk/MRSa4KFpxCEeDBNKTiqR9mHk84tGRCyzqaAsckaJM56d7aCWw2EwC8uu7RCAmci05PyXoxNsrMj193Lcj0MFonNm/fUyjODNt/LbQGOanTqm+dINmES7JgN2a7uyWvAnov7y30eGfj84X0uGEGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hRUDysAwXl8GDQxz3ERFPScRTeDSj3MoedB7r5fcnts=;
- b=BmajlM16eSC/GRXwsvDSlV57aEGuOwAkBbiwPgU4RQBAZlA5FZ4lYCsRCwqMZSh2PeGGXY9QnIpYLKQVcMBDrsqxSDleNHYRoPQ/pwOhoANW8xyQTfMk0rKTdpgk1ZePXFtTNpkOcWneSbOKNIvBSUmAheAW+D8bQPRnivg3w/pLcqNcJNZUAfwIRFpg2SwFTQbuaeRmRTsfYzbpIJWgIJy3/3qkDEHGiuy3u3gSvKM3I2VzC0XsqQS3ZeycTEBH86NNkaiCGv6l2CMjvI0wescBqFDi5jitX8cc1pnPbXiwWSr9ALCHLTcXxdW+HeKMpq1/syXNMZhw4tzMdJ3oZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hRUDysAwXl8GDQxz3ERFPScRTeDSj3MoedB7r5fcnts=;
- b=EFnxvzWiffqkFSBYPo5+M2x+FIwcdrIYyDomeSzYVFq8wFv3GOSPnXylb0zfCTOLqSqJmt2SMZysOPIV8u8+N9o6ygYtrKSCoFGUt3UlLdXWDx7w4c17tpWpUzA15HTHaZqn8qZNNiumwCC6Y93rKhfzoCD8joj6N9bugzb+xo4=
-Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
- by DM6PR04MB6681.namprd04.prod.outlook.com (2603:10b6:5:24c::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.24; Wed, 9 Jun
- 2021 05:10:53 +0000
-Received: from DM6PR04MB7081.namprd04.prod.outlook.com
- ([fe80::64f9:51d2:1e04:f806]) by DM6PR04MB7081.namprd04.prod.outlook.com
- ([fe80::64f9:51d2:1e04:f806%9]) with mapi id 15.20.4195.030; Wed, 9 Jun 2021
- 05:10:53 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH 14/14] block/mq-deadline: Prioritize high-priority
- requests
-Thread-Topic: [PATCH 14/14] block/mq-deadline: Prioritize high-priority
- requests
-Thread-Index: AQHXXLsV6v8auRj8d0CVQCJpNBgnIw==
-Date:   Wed, 9 Jun 2021 05:10:53 +0000
-Message-ID: <DM6PR04MB7081853B525156C4F4FF0C0AE7369@DM6PR04MB7081.namprd04.prod.outlook.com>
-References: <20210608230703.19510-1-bvanassche@acm.org>
- <20210608230703.19510-15-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: acm.org; dkim=none (message not signed)
- header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:513e:a3fe:98aa:a7ae]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: dd95de04-5f28-461a-3351-08d92b04f4d2
-x-ms-traffictypediagnostic: DM6PR04MB6681:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR04MB6681F1BF9504DF12E3030C65E7369@DM6PR04MB6681.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: z8zRbvXrruuJFZR0P7VUpnyhyg6uR8CuWnk6FqoFT8nDmO7mv1Xb4ZOPsnr9YJW8G3fVYl+HTOGlqlcNBq5J8jMu4eLeBhBaDPsPyqgEetMLqUbWrvQLzTP945jho2eNcI9lf95LHJOiIdsXUF+pyqFPuO/F+4NMv8UsVOz3qZtBLs9DjCYYsK+S/tB8OG738DXFYkmZBeWuf71l2BT8GKzor3AyiuWI1eUXc/zF0R2gKF/ko8UUzZo8WgKoMgBAjB0vBzxx3kudoFG+aEdqywLazUkbk/fF6DVfmHBgQ1H4G8brk5DVOhE08cuqMuOJDMzM4Ys9CWaA6nxKhdmHLpg15Ag8oSHgbpiv3dOcXG4IRtqdUrH9BTRJx2U5NQ2TqfwRK/QfdULYmC96K8hsItCLy+v/IdQljKRgNBV94JgtxmDySeqI+U4k53nnq8uEq5BJB7IuD/40nHHTHxhfbX0IyguMCNzYeXTFxvn1VC5MtpTTfgdvLSyt1tZdClTENu8OeSSyNa9xVSqJSr/G4sTWFv6o2wd5hq3ZyQHovP1aE7lrCvSQ1ShoCcpNJK7z/xPjUqWR1pAQIqo8aYTxUjXdTxcPXdh1ZrBsuPth6q0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(39860400002)(136003)(396003)(366004)(33656002)(83380400001)(52536014)(2906002)(5660300002)(86362001)(186003)(66446008)(66476007)(122000001)(38100700002)(53546011)(64756008)(91956017)(66556008)(76116006)(66946007)(54906003)(316002)(110136005)(71200400001)(8936002)(8676002)(55016002)(6506007)(478600001)(4326008)(7696005)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ZQdAyHw9Qsg1lxU2VXVIgZo2z3/1aKS/00X9gv86yXyoIT4U/VSxG0H0zqYq?=
- =?us-ascii?Q?I1tl3ZN/guVihIgGr0qZD5jO8/dqdZ/cLBKhyjfrBjnqY0wqqPr4ZWsdcTum?=
- =?us-ascii?Q?H6CEB46mDN4C3KxmP6q7vtCVh+3+xBNNJtaF53tl1b6pP92p968zY5puWUqf?=
- =?us-ascii?Q?IvewxFQcWzgwpsSiJbqXnYtFT2fE6wMUMktnz7ck77Okh+P5thl9D+HiZFzn?=
- =?us-ascii?Q?KMPnCm2rSmFQFQR1TKrYCQudKfNSKd626k9ZJ9otRjDKtncSMkuYFMiDN+/a?=
- =?us-ascii?Q?MLA0s+Z82bB/jpCe615RBUdMcFHrhqoRgCJA6HwE/Hn4xl8MhbqVMi7pynCg?=
- =?us-ascii?Q?t15aBXGg2Q/0eLOQGi0ae4atFGMzli3+0y+/ryYnWeritbJCYTGtpDWJspEq?=
- =?us-ascii?Q?cr43tH7UbpxU30s4uo4LUAFFxoAcvO7I3wzlvQY0OCvhoEnCrFy6UO4dYlkk?=
- =?us-ascii?Q?O08+PkwxwR7SBrzdGa+ArcUXWNrwEycU7hnbwOZ1Q6tOGwDUXbJH63R3vfXN?=
- =?us-ascii?Q?KA9clhDtdv0K/AJXZostsjWzKGFWv/Yaaf6jDyo4nYUYsCj1X+B45W5JWdgW?=
- =?us-ascii?Q?p6Dn0UGBRMCDmosm+PbsPyP7UHXY4cVpjijt4KV2x6O1lGC7OMWWR3qQyi9J?=
- =?us-ascii?Q?dJNID7Lhy/mu7bRXMqF6V4iQclLgHFKo9//N6ZHS9JCRU7J5uH/H6IaidozE?=
- =?us-ascii?Q?/HZ1l8qpfo0+w9qs+riXM/qMG3gxzF1kPQcXdno4Vzpnz7kdUUlDiUNUvux1?=
- =?us-ascii?Q?xfHzU4vNRPdZ/4uX1bYt2alA3lrhlZ2M71put9N6g8aJkHWFLJ3MgsXHKxvq?=
- =?us-ascii?Q?3XKeNPqiKsLEhEqJInVGoON9gjfxh6UE1pPpJzMlD+d/+zb6qb5T5vr8jySp?=
- =?us-ascii?Q?D7+H2ZovQdLpRNCSrMYE45kx42DW/tZrE84QbeAQm2YJq4fYxomywGOKJiLc?=
- =?us-ascii?Q?VoirhyfgHD1+wdErTMc0FWp413v18OQ0UBujdsp0z6N8lvR0T8XYF5Y28N3P?=
- =?us-ascii?Q?TrcMP8krfJAsr+r7n9Ln/CdgWcZR459uWAexph9Ir7gZ5BKzPeixObYogZOK?=
- =?us-ascii?Q?9LDP0C/miSMi+OwO6HIAFucJbQ6IGmtkrmCAuVRHk0AoY1YDcnlRfpry6iOB?=
- =?us-ascii?Q?+YkWkvt7tku5lQQvNC43kvwtf55CVQdxg5sJwyrI4YIxi4Ks9y2U9nJgYJA8?=
- =?us-ascii?Q?hZd5o8z+tBEha/0LIy0P7xu2MGeRwvMTkm0Ikm9hLrYSru+MSKrl7XzWU5on?=
- =?us-ascii?Q?Xqyq+G1Za9S14Scc2xLpL5CAXodoOGlwSz64omokimSHN5qJHRLpuyLuyI+r?=
- =?us-ascii?Q?WPD7yY7fHAIbu2e/8lkTmzU406WmKwXv+u2HcczrXMxpK3rWy48TVsqA19wb?=
- =?us-ascii?Q?3QSrLA3k0R27POihQMpTfbuyWugaxNMLC2z6tGBDLuny1fqJWQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S230266AbhFIFZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 01:25:31 -0400
+Received: from mail-il1-f199.google.com ([209.85.166.199]:40549 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232799AbhFIFZa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 01:25:30 -0400
+Received: by mail-il1-f199.google.com with SMTP id b4-20020a920b040000b02901dc81bf7e72so17718461ilf.7
+        for <linux-block@vger.kernel.org>; Tue, 08 Jun 2021 22:23:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=7MV9DRegZs9jKCYPVOE+0qW44siF1lHbYWbAK9CIcjg=;
+        b=pDTZVPU0zkV3gINXXxc8eSrECTGbEx83Go770FbjxS69Y+nEgodiOrsciEx4GXcTlN
+         iKoUzUPfkRVZYML9R/0uv3ONVAKXfRpzy8Uee1VbRb9FAP3jik6yZiCg2KTQbsQSFIW5
+         hprnSuuB8gdRfWvppdFPrkzVayoyOljk7mmNCiw8V2U/oqi192rm8xaiCaOFm+XtNRKC
+         AqK6kHtiwK+ftoy95YBPLdJ1SaLwrPBgU5yPGSbrCWFRFhU+AGByMCJ/RMti3AaD1oLy
+         CeeCoW7P7WP3h2QBEfP6kBJx8SweMyXJvasW9RNm8DykS03HhiS0HrnagbvCcCoURnyG
+         ZoyA==
+X-Gm-Message-State: AOAM532mlpCLHr9QWU+sJqEa+2HQ4atv01oGqWkRL9Fn5vQlyn6bCIta
+        yIOSJduUwGItbn3T3ygPl4Q+uXXcqBAINJQKVTijLULtyFQ8
+X-Google-Smtp-Source: ABdhPJxWDUVeJFMxLkRE/xyBk/xtEGUPfTZIyDPbbGhpka+jq6YNXwPh1CFYxurZFcn3B//BJTQNyd/p0A4CeujqrwOAj1XPeH6s
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd95de04-5f28-461a-3351-08d92b04f4d2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jun 2021 05:10:53.5482
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hyGdOMUNRoMNXKzPOwaEyv+p4D7CFTuL+8qo4CGchBfWZyyjGdKz9B3F5wb/SValWx7En6rClIpj35ABcEzD5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6681
+X-Received: by 2002:a92:dc42:: with SMTP id x2mr16811288ilq.58.1623216203775;
+ Tue, 08 Jun 2021 22:23:23 -0700 (PDT)
+Date:   Tue, 08 Jun 2021 22:23:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003842c805c44e7951@google.com>
+Subject: [syzbot] KASAN: use-after-free Read in blk_mq_exit_sched
+From:   syzbot <syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/06/09 8:07, Bart Van Assche wrote:=0A=
-> While one or more requests with a certain I/O priority are pending, do no=
-t=0A=
-> dispatch lower priority requests. Dispatch lower priority requests anyway=
-=0A=
-> after the "aging" time has expired.=0A=
-> =0A=
-> This patch has been tested as follows:=0A=
-> =0A=
-> modprobe scsi_debug ndelay=3D1000000 max_queue=3D16 &&=0A=
-> sd=3D'' &&=0A=
-> while [ -z "$sd" ]; do=0A=
->   sd=3D/dev/$(basename /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/=
-target*/*/block/*)=0A=
-> done &&=0A=
-> echo $((100*1000)) > /sys/block/$sd/queue/iosched/aging_expire &&=0A=
-> cd /sys/fs/cgroup/blkio/ &&=0A=
-> echo $$ >cgroup.procs &&=0A=
-> echo 2 >blkio.prio.class &&=0A=
-> mkdir -p hipri &&=0A=
-> cd hipri &&=0A=
-> echo 1 >blkio.prio.class &&=0A=
-> { max-iops -a1 -d32 -j1 -e mq-deadline $sd >& ~/low-pri.txt & } &&=0A=
-> echo $$ >cgroup.procs &&=0A=
-> max-iops -a1 -d32 -j1 -e mq-deadline $sd >& ~/hi-pri.txt=0A=
-> =0A=
-> Result:=0A=
-> * 11000 IOPS for the high-priority job=0A=
-> *   400 IOPS for the low-priority job=0A=
-> =0A=
-> If the aging expiry time is changed from 100s into 0, the IOPS results ch=
-ange=0A=
-> into 6712 and 6796 IOPS.=0A=
-> =0A=
-> The max-iops script is a script that runs fio with the following argument=
-s:=0A=
-> --bs=3D4K --gtod_reduce=3D1 --ioengine=3Dlibaio --ioscheduler=3D${arg_e} =
---runtime=3D60=0A=
-> --norandommap --rw=3Dread --thread --buffered=3D0 --numjobs=3D${arg_j}=0A=
-> --iodepth=3D${arg_d} --iodepth_batch_submit=3D${arg_a}=0A=
-> --iodepth_batch_complete=3D$((arg_d / 2)) --name=3D${positional_argument_=
-1}=0A=
-> --filename=3D${positional_argument_1}=0A=
-> =0A=
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-> Cc: Hannes Reinecke <hare@suse.de>=0A=
-> Cc: Christoph Hellwig <hch@lst.de>=0A=
-> Cc: Ming Lei <ming.lei@redhat.com>=0A=
-> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
-> Cc: Himanshu Madhani <himanshu.madhani@oracle.com>=0A=
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>=0A=
-> ---=0A=
->  block/mq-deadline-main.c | 42 +++++++++++++++++++++++++++++++++++-----=
-=0A=
->  1 file changed, 37 insertions(+), 5 deletions(-)=0A=
-> =0A=
-> diff --git a/block/mq-deadline-main.c b/block/mq-deadline-main.c=0A=
-> index 1b2b6c1de5b8..cecdb475a610 100644=0A=
-> --- a/block/mq-deadline-main.c=0A=
-> +++ b/block/mq-deadline-main.c=0A=
-> @@ -32,6 +32,11 @@=0A=
->   */=0A=
->  static const int read_expire =3D HZ / 2;  /* max time before a read is s=
-ubmitted. */=0A=
->  static const int write_expire =3D 5 * HZ; /* ditto for writes, these lim=
-its are SOFT! */=0A=
-> +/*=0A=
-> + * Time after which to dispatch lower priority requests even if higher=
-=0A=
-> + * priority requests are pending.=0A=
-> + */=0A=
-> +static const int aging_expire =3D 10 * HZ;=0A=
->  static const int writes_starved =3D 2;    /* max times reads can starve =
-a write */=0A=
->  static const int fifo_batch =3D 16;       /* # of sequential requests tr=
-eated as one=0A=
->  				     by the above parameters. For throughput. */=0A=
-> @@ -90,6 +95,7 @@ struct deadline_data {=0A=
->  	int writes_starved;=0A=
->  	int front_merges;=0A=
->  	u32 async_depth;=0A=
-> +	int aging_expire;=0A=
->  =0A=
->  	spinlock_t lock;=0A=
->  	spinlock_t zone_lock;=0A=
-> @@ -363,10 +369,10 @@ deadline_next_request(struct deadline_data *dd, enu=
-m dd_prio prio,=0A=
->  =0A=
->  /*=0A=
->   * deadline_dispatch_requests selects the best request according to=0A=
-> - * read/write expire, fifo_batch, etc=0A=
-> + * read/write expire, fifo_batch, etc and with a start time <=3D @latest=
-.=0A=
->   */=0A=
->  static struct request *__dd_dispatch_request(struct deadline_data *dd,=
-=0A=
-> -					     enum dd_prio prio)=0A=
-> +					enum dd_prio prio, u64 latest_start_ns)=0A=
->  {=0A=
->  	struct request *rq, *next_rq;=0A=
->  	enum dd_data_dir data_dir;=0A=
-> @@ -378,6 +384,8 @@ static struct request *__dd_dispatch_request(struct d=
-eadline_data *dd,=0A=
->  	if (!list_empty(&dd->dispatch[prio])) {=0A=
->  		rq =3D list_first_entry(&dd->dispatch[prio], struct request,=0A=
->  				      queuelist);=0A=
-> +		if (rq->start_time_ns > latest_start_ns)=0A=
-> +			return NULL;=0A=
->  		list_del_init(&rq->queuelist);=0A=
->  		goto done;=0A=
->  	}=0A=
-> @@ -457,6 +465,8 @@ static struct request *__dd_dispatch_request(struct d=
-eadline_data *dd,=0A=
->  	dd->batching =3D 0;=0A=
->  =0A=
->  dispatch_request:=0A=
-> +	if (rq->start_time_ns > latest_start_ns)=0A=
-> +		return NULL;=0A=
->  	/*=0A=
->  	 * rq is the selected appropriate request.=0A=
->  	 */=0A=
-> @@ -493,15 +503,32 @@ static struct request *__dd_dispatch_request(struct=
- deadline_data *dd,=0A=
->  static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)=
-=0A=
->  {=0A=
->  	struct deadline_data *dd =3D hctx->queue->elevator->elevator_data;=0A=
-> -	struct request *rq;=0A=
-> +	const u64 now_ns =3D ktime_get_ns();=0A=
-> +	struct request *rq =3D NULL;=0A=
->  	enum dd_prio prio;=0A=
->  =0A=
->  	spin_lock(&dd->lock);=0A=
-> -	for (prio =3D 0; prio <=3D DD_PRIO_MAX; prio++) {=0A=
-> -		rq =3D __dd_dispatch_request(dd, prio);=0A=
-> +	/*=0A=
-> +	 * Start with dispatching requests whose deadline expired more than=0A=
-> +	 * aging_expire jiffies ago.=0A=
-> +	 */=0A=
-> +	for (prio =3D DD_BE_PRIO; prio <=3D DD_PRIO_MAX; prio++) {=0A=
-> +		rq =3D __dd_dispatch_request(dd, prio, now_ns -=0A=
-> +					   jiffies_to_nsecs(dd->aging_expire));=0A=
->  		if (rq)=0A=
-> +			goto unlock;=0A=
-> +	}=0A=
-> +	/*=0A=
-> +	 * Next, dispatch requests in priority order. Ignore lower priority=0A=
-> +	 * requests if any higher priority requests are pending.=0A=
-> +	 */=0A=
-> +	for (prio =3D 0; prio <=3D DD_PRIO_MAX; prio++) {=0A=
-> +		rq =3D __dd_dispatch_request(dd, prio, now_ns);=0A=
-> +		if (rq || dd_queued(dd, prio))=0A=
->  			break;=0A=
->  	}=0A=
-> +=0A=
-> +unlock:=0A=
->  	spin_unlock(&dd->lock);=0A=
->  =0A=
->  	return rq;=0A=
-> @@ -607,6 +634,7 @@ static int dd_init_sched(struct request_queue *q, str=
-uct elevator_type *e)=0A=
->  	dd->writes_starved =3D writes_starved;=0A=
->  	dd->front_merges =3D 1;=0A=
->  	dd->fifo_batch =3D fifo_batch;=0A=
-> +	dd->aging_expire =3D aging_expire;=0A=
->  	spin_lock_init(&dd->lock);=0A=
->  	spin_lock_init(&dd->zone_lock);=0A=
->  =0A=
-> @@ -725,6 +753,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *h=
-ctx, struct request *rq,=0A=
->  	trace_block_rq_insert(rq);=0A=
->  =0A=
->  	if (at_head) {=0A=
-> +		rq->fifo_time =3D jiffies;=0A=
->  		list_add(&rq->queuelist, &dd->dispatch[prio]);=0A=
->  	} else {=0A=
->  		deadline_add_rq_rb(dd, rq);=0A=
-> @@ -841,6 +870,7 @@ static ssize_t __FUNC(struct elevator_queue *e, char =
-*page)		\=0A=
->  #define SHOW_JIFFIES(__FUNC, __VAR) SHOW_INT(__FUNC, jiffies_to_msecs(__=
-VAR))=0A=
->  SHOW_JIFFIES(deadline_read_expire_show, dd->fifo_expire[DD_READ]);=0A=
->  SHOW_JIFFIES(deadline_write_expire_show, dd->fifo_expire[DD_WRITE]);=0A=
-> +SHOW_JIFFIES(deadline_aging_expire_show, dd->aging_expire);=0A=
->  SHOW_INT(deadline_writes_starved_show, dd->writes_starved);=0A=
->  SHOW_INT(deadline_front_merges_show, dd->front_merges);=0A=
->  SHOW_INT(deadline_fifo_batch_show, dd->fifo_batch);=0A=
-> @@ -869,6 +899,7 @@ static ssize_t __FUNC(struct elevator_queue *e, const=
- char *page, size_t count)=0A=
->  	STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, msecs_to_jiffies)=0A=
->  STORE_JIFFIES(deadline_read_expire_store, &dd->fifo_expire[DD_READ], 0, =
-INT_MAX);=0A=
->  STORE_JIFFIES(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], 0=
-, INT_MAX);=0A=
-> +STORE_JIFFIES(deadline_aging_expire_store, &dd->aging_expire, 0, INT_MAX=
-);=0A=
->  STORE_INT(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, I=
-NT_MAX);=0A=
->  STORE_INT(deadline_front_merges_store, &dd->front_merges, 0, 1);=0A=
->  STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);=0A=
-> @@ -885,6 +916,7 @@ static struct elv_fs_entry deadline_attrs[] =3D {=0A=
->  	DD_ATTR(writes_starved),=0A=
->  	DD_ATTR(front_merges),=0A=
->  	DD_ATTR(fifo_batch),=0A=
-> +	DD_ATTR(aging_expire),=0A=
->  	__ATTR_NULL=0A=
->  };=0A=
->  =0A=
-> =0A=
-=0A=
-Looks good.=0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    a1f92694 Add linux-next specific files for 20210518
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=123aeeafd00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d612e75ffd53a6d3
+dashboard link: https://syzkaller.appspot.com/bug?extid=77ba3d171a25c56756ea
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
+
+sd 1:0:0:7: [sdi] Test Unit Ready failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
+==================================================================
+BUG: KASAN: use-after-free in blk_mq_exit_sched+0x53e/0x6a0 block/blk-mq-sched.c:685
+Read of size 4 at addr ffff88801d4d81e0 by task systemd-udevd/13794
+
+CPU: 0 PID: 13794 Comm: systemd-udevd Not tainted 5.13.0-rc2-next-20210518-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x13e/0x1d6 lib/dump_stack.c:129
+ print_address_description.constprop.0.cold+0x6c/0x309 mm/kasan/report.c:233
+ __kasan_report mm/kasan/report.c:419 [inline]
+ kasan_report.cold+0x83/0xdf mm/kasan/report.c:436
+ blk_mq_exit_sched+0x53e/0x6a0 block/blk-mq-sched.c:685
+ __elevator_exit+0x28/0x40 block/elevator.c:194
+ blk_exit_queue block/blk-sysfs.c:760 [inline]
+ blk_release_queue+0x25e/0x4d0 block/blk-sysfs.c:821
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ disk_release+0x1cd/0x250 block/genhd.c:1138
+ device_release+0x9f/0x240 drivers/base/core.c:2186
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3428
+ put_disk+0x44/0x60 block/genhd.c:1340
+ blkdev_put_no_open fs/block_dev.c:1400 [inline]
+ blkdev_put+0x12c/0x580 fs/block_dev.c:1639
+ blkdev_close+0x8c/0xb0 fs/block_dev.c:1646
+ __fput+0x288/0x920 fs/file_table.c:280
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:164
+ tracehook_notify_resume include/linux/tracehook.h:189 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:174 [inline]
+ exit_to_user_mode_prepare+0x26f/0x280 kernel/entry/common.c:208
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:290 [inline]
+ syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:301
+ do_syscall_64+0x3e/0xb0 arch/x86/entry/common.c:57
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fa8e1223270
+Code: 73 01 c3 48 8b 0d 38 7d 20 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 59 c1 20 00 00 75 10 b8 03 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 ee fb ff ff 48 89 04 24
+RSP: 002b:00007ffcb788b128 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 0000000000000007 RCX: 00007fa8e1223270
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000007
+RBP: 00007fa8e20dd710 R08: 0000556cdaf47210 R09: 0000556cdaf46f00
+R10: 00007fa8e20dd8c0 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000556cdaf4c6a0 R14: 0000000000000003 R15: 000000000000000e
+
+Allocated by task 33:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:431 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:510 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:469 [inline]
+ __kasan_kmalloc+0x9b/0xd0 mm/kasan/common.c:519
+ kmalloc include/linux/slab.h:595 [inline]
+ kzalloc include/linux/slab.h:720 [inline]
+ scsi_host_alloc+0x2c/0xfc0 drivers/scsi/hosts.c:376
+ usb_stor_probe1+0x45/0x162b drivers/usb/storage/usb.c:952
+ storage_probe+0x6f5/0xaa0 drivers/usb/storage/usb.c:1134
+ usb_probe_interface+0x315/0x7f0 drivers/usb/core/driver.c:396
+ really_probe+0x291/0xf60 drivers/base/dd.c:576
+ driver_probe_device+0x298/0x410 drivers/base/dd.c:763
+ __device_attach_driver+0x203/0x2c0 drivers/base/dd.c:870
+ bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:431
+ __device_attach+0x228/0x4a0 drivers/base/dd.c:938
+ bus_probe_device+0x1e4/0x290 drivers/base/bus.c:491
+ device_add+0xbe0/0x2100 drivers/base/core.c:3320
+ usb_set_configuration+0x113f/0x1910 drivers/usb/core/message.c:2164
+ usb_generic_driver_probe+0xba/0x100 drivers/usb/core/generic.c:238
+ usb_probe_device+0xd9/0x2c0 drivers/usb/core/driver.c:293
+ really_probe+0x291/0xf60 drivers/base/dd.c:576
+ driver_probe_device+0x298/0x410 drivers/base/dd.c:763
+ __device_attach_driver+0x203/0x2c0 drivers/base/dd.c:870
+ bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:431
+ __device_attach+0x228/0x4a0 drivers/base/dd.c:938
+ bus_probe_device+0x1e4/0x290 drivers/base/bus.c:491
+ device_add+0xbe0/0x2100 drivers/base/core.c:3320
+ usb_new_device.cold+0x721/0x1058 drivers/usb/core/hub.c:2556
+ hub_port_connect drivers/usb/core/hub.c:5276 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5416 [inline]
+ port_event drivers/usb/core/hub.c:5562 [inline]
+ hub_event+0x2357/0x4330 drivers/usb/core/hub.c:5644
+ process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
+ process_scheduled_works kernel/workqueue.c:2337 [inline]
+ worker_thread+0x82b/0x1120 kernel/workqueue.c:2423
+ kthread+0x3b1/0x4a0 kernel/kthread.c:313
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+
+Freed by task 13794:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:357
+ ____kasan_slab_free mm/kasan/common.c:363 [inline]
+ ____kasan_slab_free mm/kasan/common.c:328 [inline]
+ __kasan_slab_free+0xfb/0x130 mm/kasan/common.c:371
+ kasan_slab_free include/linux/kasan.h:212 [inline]
+ slab_free_hook mm/slub.c:1623 [inline]
+ slab_free_freelist_hook+0xdf/0x240 mm/slub.c:1648
+ slab_free mm/slub.c:3208 [inline]
+ kfree+0xeb/0x650 mm/slub.c:4274
+ device_release+0x9f/0x240 drivers/base/core.c:2186
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3428
+ device_release+0x9f/0x240 drivers/base/core.c:2186
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3428
+ scsi_device_dev_release_usercontext+0x927/0xd50 drivers/scsi/scsi_sysfs.c:503
+ execute_in_process_context+0x37/0x150 kernel/workqueue.c:3327
+ device_release+0x9f/0x240 drivers/base/core.c:2186
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3428
+ scsi_disk_put drivers/scsi/sd.c:692 [inline]
+ sd_release+0x124/0x290 drivers/scsi/sd.c:1493
+ __blkdev_put+0x5d4/0x790 fs/block_dev.c:1585
+ blkdev_put+0x92/0x580 fs/block_dev.c:1638
+ blkdev_close+0x8c/0xb0 fs/block_dev.c:1646
+ __fput+0x288/0x920 fs/file_table.c:280
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:164
+ tracehook_notify_resume include/linux/tracehook.h:189 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:174 [inline]
+ exit_to_user_mode_prepare+0x26f/0x280 kernel/entry/common.c:208
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:290 [inline]
+ syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:301
+ do_syscall_64+0x3e/0xb0 arch/x86/entry/common.c:57
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
+ insert_work+0x48/0x370 kernel/workqueue.c:1331
+ __queue_work+0x5c1/0xed0 kernel/workqueue.c:1497
+ call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1417
+ expire_timers kernel/time/timer.c:1457 [inline]
+ __run_timers.part.0+0x4a6/0xa50 kernel/time/timer.c:1731
+ __run_timers kernel/time/timer.c:1712 [inline]
+ run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1744
+ __do_softirq+0x29b/0x9fb kernel/softirq.c:559
+
+The buggy address belongs to the object at ffff88801d4d8000
+ which belongs to the cache kmalloc-8k of size 8192
+The buggy address is located 480 bytes inside of
+ 8192-byte region [ffff88801d4d8000, ffff88801d4da000)
+The buggy address belongs to the page:
+page:ffffea0000753600 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1d4d8
+head:ffffea0000753600 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000010200 0000000000000000 0000000100000001 ffff888011042280
+raw: 0000000000000000 0000000080020002 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd28c0(GFP_NOWAIT|__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 8500, ts 203379539844, free_ts 203367663569
+ prep_new_page mm/page_alloc.c:2377 [inline]
+ get_page_from_freelist+0x125c/0x2ed0 mm/page_alloc.c:4038
+ __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5239
+ alloc_pages+0x18c/0x2a0 mm/mempolicy.c:2272
+ alloc_slab_page mm/slub.c:1686 [inline]
+ allocate_slab+0x2c2/0x4c0 mm/slub.c:1826
+ new_slab mm/slub.c:1889 [inline]
+ new_slab_objects mm/slub.c:2635 [inline]
+ ___slab_alloc+0x4ba/0x820 mm/slub.c:2798
+ __slab_alloc.constprop.0+0xa7/0xf0 mm/slub.c:2838
+ slab_alloc_node mm/slub.c:2920 [inline]
+ __kmalloc_node_track_caller+0x2e3/0x360 mm/slub.c:4653
+ kmalloc_reserve net/core/skbuff.c:354 [inline]
+ __alloc_skb+0xde/0x340 net/core/skbuff.c:425
+ alloc_skb include/linux/skbuff.h:1107 [inline]
+ netlink_dump+0x2c9/0xb70 net/netlink/af_netlink.c:2250
+ __netlink_dump_start+0x642/0x900 net/netlink/af_netlink.c:2381
+ genl_family_rcv_msg_dumpit+0x2af/0x310 net/netlink/genetlink.c:686
+ genl_family_rcv_msg net/netlink/genetlink.c:780 [inline]
+ genl_rcv_msg+0x434/0x580 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x84c/0xd90 net/netlink/af_netlink.c:1927
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1305 [inline]
+ __free_pages_ok+0x4cb/0xf30 mm/page_alloc.c:1586
+ unfreeze_partials+0x17c/0x1d0 mm/slub.c:2416
+ put_cpu_partial+0x13d/0x230 mm/slub.c:2452
+ qlink_free mm/kasan/quarantine.c:146 [inline]
+ qlist_free_all+0x5a/0xc0 mm/kasan/quarantine.c:165
+ kasan_quarantine_reduce+0x180/0x200 mm/kasan/quarantine.c:272
+ __kasan_slab_alloc+0x8e/0xa0 mm/kasan/common.c:441
+ kasan_slab_alloc include/linux/kasan.h:236 [inline]
+ slab_post_alloc_hook mm/slab.h:512 [inline]
+ slab_alloc_node mm/slub.c:2954 [inline]
+ slab_alloc mm/slub.c:2962 [inline]
+ kmem_cache_alloc_trace+0x26d/0x3c0 mm/slub.c:2979
+ kmalloc include/linux/slab.h:590 [inline]
+ syslog_print+0xb2/0x430 kernel/printk/printk.c:1492
+ do_syslog.part.0+0x367/0x830 kernel/printk/printk.c:1662
+ do_syslog+0x49/0x60 kernel/printk/printk.c:1642
+ kmsg_read+0x90/0xb0 fs/proc/kmsg.c:40
+ pde_read fs/proc/inode.c:311 [inline]
+ proc_reg_read+0x119/0x300 fs/proc/inode.c:321
+ vfs_read+0x1b5/0x570 fs/read_write.c:494
+ ksys_read+0x12d/0x250 fs/read_write.c:634
+ do_syscall_64+0x31/0xb0 arch/x86/entry/common.c:47
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Memory state around the buggy address:
+ ffff88801d4d8080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88801d4d8100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88801d4d8180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                       ^
+ ffff88801d4d8200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88801d4d8280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
