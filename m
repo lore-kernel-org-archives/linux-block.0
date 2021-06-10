@@ -2,315 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9DAC48BDF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D372C48BDF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:58:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A485C613F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:41:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FA15613FF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:58:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231140AbhFJRnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 13:43:13 -0400
-Received: from mail-qk1-f173.google.com ([209.85.222.173]:35552 "EHLO
-        mail-qk1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230452AbhFJRnJ (ORCPT
+        id S230086AbhFJSAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 14:00:36 -0400
+Received: from mail-oi1-f170.google.com ([209.85.167.170]:38758 "EHLO
+        mail-oi1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230001AbhFJSAf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 13:43:09 -0400
-Received: by mail-qk1-f173.google.com with SMTP id j189so28228072qkf.2;
-        Thu, 10 Jun 2021 10:41:01 -0700 (PDT)
+        Thu, 10 Jun 2021 14:00:35 -0400
+Received: by mail-oi1-f170.google.com with SMTP id z3so3017212oib.5
+        for <linux-block@vger.kernel.org>; Thu, 10 Jun 2021 10:58:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=tJIm18e4PpawbVoKgbHVrGJrxEY+IxOXNktYagljzSs=;
-        b=QdXJaINwy/NpNcHfO6r+pZO7yxptiQfjs8olLYZlteZrLcCfhawLTv/sm/ZXiyIvkq
-         MuwF31YELaSBsWzo4eZ8lx9NNQ/x3zb2BrHhhFSP4pGeg9OI4fgFeUEynH9qv0ToCqy9
-         rVVsWsv1PWppqQ/x+ajUCzRl5gMbqkxvvoaShvIwCFf9KMGAfXYLO2/veCp7+SkELo+M
-         FHBgvxzKSL/MSLvA4TVTBjLDZlfDKWUZaNaWvL/7cNRjGlmHn4op5AFbTyMxRfbvwmTn
-         Z78QRlZGA1KT9tT1JpRVRw/zk4Be8/4/PPUtbYWTJ29BGASmIr7KjZ+gtyCkAAa8Ciwr
-         aRqA==
+        d=dubeyko-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=AZ3YqRmR3v8qpJWVlW+h7dFt8AAllw39DawhyDxuAHA=;
+        b=mywSRb8veBcmHJ9q3Zg0eLzlNA7O6JQ4YJNeYQHPSK6vCzimgYMSnw7EwXEaZyb49k
+         Xrk+FJx8e/92HLroUm8YJ7X4NaMLesTCusuJdXT0uoLMmiLO3ME9axzw/aPKY2ZbO7QX
+         ZsfkWVfidCKaBrWF8qfZxsqxPkR57VsZvyD+vnJzJ5PDUigeO/03cTcPSmBYLBqkWojR
+         vf9QpypJ+4HWQ2ytrTyWvwMbuUq+JlZhlCSfSXUqCftbB5DAqJOonunB/Hs1r8RW1Mpx
+         kn0aqbcIMhiZK2yez6+KiPUsKIPgAcuGwZdbDJrbSqARjxM8egu0q9zF+u4xFEVDdgjj
+         /G0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=tJIm18e4PpawbVoKgbHVrGJrxEY+IxOXNktYagljzSs=;
-        b=ke9DE7DHCdtpw+fMiJJA+diss4JH3jylRdixogamSmf7CT57jVpZK8PHiaUsYIVTjf
-         s5kF30SrfziaTjXe9y4nxmqiG7AmJRH7Pb40I6hycR/fFa9j7U1c+oSU5+pqJEOufrNv
-         34i+B7vCGGvR3p+D9tf9eGjbNRFs/KrLiTfiGECHLpolymmA8ay9oNRRTEq5FpLi03dv
-         zScuneoQiA5SGbQwTuXvap0BFBfRFzQ0/3iMeDJBDnQ6tqToxviiY5H8jk13kX2JwujA
-         ndvyzCfOkXuNB2LJCxdd+Ny2kat+6SN0HDqnhaoZsw/7/CATl8uLTeqVUwWUi20HvUxP
-         Kd8Q==
-X-Gm-Message-State: AOAM533FmPWcmeAZC38lR51D+sfgzar40N4swzL6Q6j3F1s9jpsxluhS
-        pzAjmuavXwham8oUxMhD3h6jUYEumLmkyA==
-X-Google-Smtp-Source: ABdhPJzNsA8mpG1QH1phmDuCkqfzvwRflB+jk+YhkTbnLsGobBVg/k69jshudORFoFO6BYHq2/Ktyg==
-X-Received: by 2002:a37:a505:: with SMTP id o5mr641495qke.355.1623346801224;
-        Thu, 10 Jun 2021 10:40:01 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:be7a])
-        by smtp.gmail.com with ESMTPSA id w2sm2567401qkf.88.2021.06.10.10.40.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jun 2021 10:40:00 -0700 (PDT)
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-block@vger.kernel.org (open list:BLOCK LAYER),
-        linux-kernel@vger.kernel.org (open list),
-        cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
-        linux-mm@kvack.org (open list:MEMORY MANAGEMENT),
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/3] loop: Charge i/o to mem and blk cg
-Date:   Thu, 10 Jun 2021 10:39:44 -0700
-Message-Id: <20210610173944.1203706-4-schatzberg.dan@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
-References: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=AZ3YqRmR3v8qpJWVlW+h7dFt8AAllw39DawhyDxuAHA=;
+        b=ZuxdnZ2Y0DxbKymbqG/8XQx4fZXq2iLzn+JYhA8UNy5tAylmrIz/TDMoQWuAXf7IX1
+         mL+Z9RncppsFjkfN6Cr1asDmAi/Vz557cnbZfJFz3kdBKoZPnULM8xPzByNU2wbfVBE/
+         26MyV2H5yZMWp4n1oAi50uu3lVZ9FOznIhLXYYPY/2GcMR7x1xkrPjAmz0TlPfpeHBxO
+         web7ZSLGfo5IvhikC7oop9xQHalI8QHBDqndCc855bBZemCHs1OBfgsawny8JaaZdJkq
+         /2PXopvQZKQQ0sy/msikf1EeAHIqSBO/q6S4QgyllzIO+M9X2htfbvt8GHEeLgAZ96yD
+         SThA==
+X-Gm-Message-State: AOAM531CAaCFPur0L51ihEtTfnF+Ni1Ocs3d3tUQTtTlVdSGlgRCvXTX
+        DVPqoXNWkLs1O1co5KNTdwaqfg==
+X-Google-Smtp-Source: ABdhPJxElrlse/A/8ExkMkCIRy0cOS1SkxlnjBWSpeu5xICJpMuBAAx7UHNE/TEky/jASpnZIDD7Og==
+X-Received: by 2002:a05:6808:6c4:: with SMTP id m4mr4367989oih.88.1623347859107;
+        Thu, 10 Jun 2021 10:57:39 -0700 (PDT)
+Received: from smtpclient.apple ([2600:1700:42f0:6600:6d23:ba39:5608:8e4d])
+        by smtp.gmail.com with ESMTPSA id d20sm739658otq.62.2021.06.10.10.57.37
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Jun 2021 10:57:38 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [LSF/MM/BPF TOPIC] durability vs performance for flash devices
+ (especially embedded!)
+From:   Viacheslav Dubeyko <slava@dubeyko.com>
+In-Reply-To: <eafad7a6-4784-dd9c-cc1d-36e463370aeb@gmail.com>
+Date:   Thu, 10 Jun 2021 10:57:35 -0700
+Cc:     Jaegeuk Kim <jaegeuk.kim@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        lsf-pc@lists.linux-foundation.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <973FD16E-0F60-4709-924E-8D15245C4EDB@dubeyko.com>
+References: <55d3434d-6837-3a56-32b7-7354e73eb258@gmail.com>
+ <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
+ <YMEItMNXG2bHgJE+@casper.infradead.org>
+ <e9eaf87d-5c04-8974-4f0f-0fc9bac9a3b1@acm.org>
+ <CAOtxgyeRf=+grEoHxVLEaSM=Yfx4KrSG5q96SmztpoWfP=QrDg@mail.gmail.com>
+ <eafad7a6-4784-dd9c-cc1d-36e463370aeb@gmail.com>
+To:     Ric Wheeler <ricwheeler@gmail.com>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The current code only associates with the existing blkcg when aio is
-used to access the backing file. This patch covers all types of i/o to
-the backing file and also associates the memcg so if the backing file is
-on tmpfs, memory is charged appropriately.
 
-This patch also exports cgroup_get_e_css and int_active_memcg so it
-can be used by the loop module.
 
-Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-Acked-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/block/loop.c       | 61 +++++++++++++++++++++++++-------------
- drivers/block/loop.h       |  3 +-
- include/linux/memcontrol.h |  6 ++++
- kernel/cgroup/cgroup.c     |  1 +
- mm/memcontrol.c            |  1 +
- 5 files changed, 51 insertions(+), 21 deletions(-)
+> On Jun 10, 2021, at 9:22 AM, Ric Wheeler <ricwheeler@gmail.com> wrote:
+>=20
+> On 6/9/21 5:32 PM, Jaegeuk Kim wrote:
+>> On Wed, Jun 9, 2021 at 11:47 AM Bart Van Assche <bvanassche@acm.org =
+<mailto:bvanassche@acm.org>> wrote:
+>>=20
+>>    On 6/9/21 11:30 AM, Matthew Wilcox wrote:
+>>    > maybe you should read the paper.
+>>    >
+>>    > " Thiscomparison demonstrates that using F2FS, a flash-friendly =
+file
+>>    > sys-tem, does not mitigate the wear-out problem, except inasmuch =
+asit
+>>    > inadvertently rate limitsallI/O to the device"
+>>=20
+>>=20
+>> Do you agree with that statement based on your insight? At least to =
+me, that
+>> paper is missing the fundamental GC problem which was supposed to be
+>> evaluated by real workloads instead of using a simple benchmark =
+generating
+>> 4KB random writes only. And, they had to investigate more details in =
+FTL/IO
+>> patterns including UNMAP and LBA alignment between host and storage, =
+which
+>> all affect WAF. Based on that, the point of the zoned device is quite =
+promising
+>> to me, since it can address LBA alignment entirely and give a way =
+that host
+>> SW stack can control QoS.
+>=20
+> Just a note, using a pretty simple and optimal streaming write =
+pattern, I have been able to burn out emmc parts in a little over a =
+week.
+>=20
+> My test case creating a 1GB file (filled with random data just in case =
+the device was looking for zero blocks to ignore) and then do a loop to =
+cp and sync that file until the emmc device life time was shown as =
+exhausted.
+>=20
+> This was a clean, best case sequential write so this is not just an =
+issue with small, random writes.
+>=20
+> Of course, this is normal to wear them out, but for the super low end =
+parts, taking away any of the device writes in our stack is costly given =
+how little life they have....
+>=20
+> Regards,
+>=20
+>=20
+> Ric
+>=20
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index fc4a0186d381..5198d8ad181c 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -78,6 +78,7 @@
- #include <linux/uio.h>
- #include <linux/ioprio.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/sched/mm.h>
- 
- #include "loop.h"
- 
-@@ -516,8 +517,6 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
- 
--	if (cmd->css)
--		css_put(cmd->css);
- 	cmd->ret = ret;
- 	lo_rw_aio_do_completion(cmd);
- }
-@@ -578,8 +577,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
- 	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
--	if (cmd->css)
--		kthread_associate_blkcg(cmd->css);
- 
- 	if (rw == WRITE)
- 		ret = call_write_iter(file, &cmd->iocb, &iter);
-@@ -587,7 +584,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		ret = call_read_iter(file, &cmd->iocb, &iter);
- 
- 	lo_rw_aio_do_completion(cmd);
--	kthread_associate_blkcg(NULL);
- 
- 	if (ret != -EIOCBQUEUED)
- 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
-@@ -928,7 +924,7 @@ struct loop_worker {
- 	struct list_head cmd_list;
- 	struct list_head idle_list;
- 	struct loop_device *lo;
--	struct cgroup_subsys_state *css;
-+	struct cgroup_subsys_state *blkcg_css;
- 	unsigned long last_ran_at;
- };
- 
-@@ -957,7 +953,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 
- 	spin_lock_irq(&lo->lo_work_lock);
- 
--	if (queue_on_root_worker(cmd->css))
-+	if (queue_on_root_worker(cmd->blkcg_css))
- 		goto queue_work;
- 
- 	node = &lo->worker_tree.rb_node;
-@@ -965,10 +961,10 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	while (*node) {
- 		parent = *node;
- 		cur_worker = container_of(*node, struct loop_worker, rb_node);
--		if (cur_worker->css == cmd->css) {
-+		if (cur_worker->blkcg_css == cmd->blkcg_css) {
- 			worker = cur_worker;
- 			break;
--		} else if ((long)cur_worker->css < (long)cmd->css) {
-+		} else if ((long)cur_worker->blkcg_css < (long)cmd->blkcg_css) {
- 			node = &(*node)->rb_left;
- 		} else {
- 			node = &(*node)->rb_right;
-@@ -980,13 +976,18 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
- 	/*
- 	 * In the event we cannot allocate a worker, just queue on the
--	 * rootcg worker
-+	 * rootcg worker and issue the I/O as the rootcg
- 	 */
--	if (!worker)
-+	if (!worker) {
-+		cmd->blkcg_css = NULL;
-+		if (cmd->memcg_css)
-+			css_put(cmd->memcg_css);
-+		cmd->memcg_css = NULL;
- 		goto queue_work;
-+	}
- 
--	worker->css = cmd->css;
--	css_get(worker->css);
-+	worker->blkcg_css = cmd->blkcg_css;
-+	css_get(worker->blkcg_css);
- 	INIT_WORK(&worker->work, loop_workfn);
- 	INIT_LIST_HEAD(&worker->cmd_list);
- 	INIT_LIST_HEAD(&worker->idle_list);
-@@ -1306,7 +1307,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 				idle_list) {
- 		list_del(&worker->idle_list);
- 		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->css);
-+		css_put(worker->blkcg_css);
- 		kfree(worker);
- 	}
- 	spin_unlock_irq(&lo->lo_work_lock);
-@@ -2111,13 +2112,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- 	/* always use the first bio's css */
-+	cmd->blkcg_css = NULL;
-+	cmd->memcg_css = NULL;
- #ifdef CONFIG_BLK_CGROUP
--	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
--		cmd->css = &bio_blkcg(rq->bio)->css;
--		css_get(cmd->css);
--	} else
-+	if (rq->bio && rq->bio->bi_blkg) {
-+		cmd->blkcg_css = &bio_blkcg(rq->bio)->css;
-+#ifdef CONFIG_MEMCG
-+		cmd->memcg_css =
-+			cgroup_get_e_css(cmd->blkcg_css->cgroup,
-+					&memory_cgrp_subsys);
-+#endif
-+	}
- #endif
--		cmd->css = NULL;
- 	loop_queue_work(lo, cmd);
- 
- 	return BLK_STS_OK;
-@@ -2129,13 +2135,28 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	const bool write = op_is_write(req_op(rq));
- 	struct loop_device *lo = rq->q->queuedata;
- 	int ret = 0;
-+	struct mem_cgroup *old_memcg = NULL;
- 
- 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
- 		ret = -EIO;
- 		goto failed;
- 	}
- 
-+	if (cmd->blkcg_css)
-+		kthread_associate_blkcg(cmd->blkcg_css);
-+	if (cmd->memcg_css)
-+		old_memcg = set_active_memcg(
-+			mem_cgroup_from_css(cmd->memcg_css));
-+
- 	ret = do_req_filebacked(lo, rq);
-+
-+	if (cmd->blkcg_css)
-+		kthread_associate_blkcg(NULL);
-+
-+	if (cmd->memcg_css) {
-+		set_active_memcg(old_memcg);
-+		css_put(cmd->memcg_css);
-+	}
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
-@@ -2214,7 +2235,7 @@ static void loop_free_idle_workers(struct timer_list *timer)
- 			break;
- 		list_del(&worker->idle_list);
- 		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->css);
-+		css_put(worker->blkcg_css);
- 		kfree(worker);
- 	}
- 	if (!list_empty(&lo->idle_worker_list))
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 9289c1cd6374..cd24a81e00e6 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -76,7 +76,8 @@ struct loop_cmd {
- 	long ret;
- 	struct kiocb iocb;
- 	struct bio_vec *bvec;
--	struct cgroup_subsys_state *css;
-+	struct cgroup_subsys_state *blkcg_css;
-+	struct cgroup_subsys_state *memcg_css;
- };
- 
- /* Support for loadable transfer modules */
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index bd0644d3a6df..360e61de53d7 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -1230,6 +1230,12 @@ static inline struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_struct *mm)
- 	return NULL;
- }
- 
-+static inline
-+struct mem_cgroup *mem_cgroup_from_css(struct cgroup_subsys_state *css)
-+{
-+	return NULL;
-+}
-+
- static inline void mem_cgroup_put(struct mem_cgroup *memcg)
- {
- }
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 74e3cc801615..90329cfff48d 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -577,6 +577,7 @@ struct cgroup_subsys_state *cgroup_get_e_css(struct cgroup *cgrp,
- 	rcu_read_unlock();
- 	return css;
- }
-+EXPORT_SYMBOL_GPL(cgroup_get_e_css);
- 
- static void cgroup_get_live(struct cgroup *cgrp)
- {
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 919736ee656b..ae1f5d0cb581 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -78,6 +78,7 @@ struct mem_cgroup *root_mem_cgroup __read_mostly;
- 
- /* Active memory cgroup to use from an interrupt context */
- DEFINE_PER_CPU(struct mem_cgroup *, int_active_memcg);
-+EXPORT_PER_CPU_SYMBOL_GPL(int_active_memcg);
- 
- /* Socket memory accounting disabled? */
- static bool cgroup_memory_nosocket __ro_after_init;
--- 
-2.30.2
+I think that we need to distinguish various cases here. If we have =
+pretty aged volume then GC plays the important role in write =
+amplification issue. I believe that F2FS still has not very efficient GC =
+subsystem. And, potentially, there is competition between FS=E2=80=99s =
+GC and FTL=E2=80=99s GC. So, F2FS GC subsystem can be optimized in some =
+way to reduce write amplification and GC competition. But I believe that =
+the fundamental nature of F2FS GC subsystem doesn=E2=80=99t provide the =
+way to exclude the write amplification issue completely. However, if GC =
+is not playing then this source of write amplification can be excluded =
+from the consideration.
+
+The F2FS in-place update area is another source of write amplification =
+issue that expected to be managed by FTL. This architectural decision =
+doesn=E2=80=99t provide some room to make optimization here. Only if =
+some metadata will be moved into the area that is living under =
+Copy-On-Write policy. But it could be hard and time-consuming change.
+
+Another source of write amplification issue in F2FS is the block mapping =
+technique. Every update of logical block with user data results in =
+update of block mapping metadata. So, this architectural solution still =
+doesn=E2=80=99t provide a lot of room for optimization. Maybe, if some =
+another metadata structure or mapping technique will be introduced.
+
+So, if we exclude GC, in-place area, block mapping technique and other =
+architectural decisions then the next possible direction to decrease =
+write amplification could be not to update logical blocks frequently or =
+to make lesser number of write operations. The most obvious solutions =
+for this are: (1) compression, (2) deduplication, (3) combine several =
+small files into one NAND page, (4) use inline technique to store small =
+files=E2=80=99 content into the inode=E2=80=99s area.
+
+I believe that additional potential issue of F2FS is the metadata =
+reservation technique. I mean here that creation of a volume implies the =
+reservation and initialization of metadata structures. It means that =
+even if the metadata doesn=E2=80=99t contain yet any valuable info then, =
+anyway, FTL implies that it=E2=80=99s valid data that needs to be =
+managed to guarantee access to this content. Finally, FTL will move this =
+data among erase blocks and it could decrease the lifetime of the =
+device. Especially, if we are talking about NAND flash with not good =
+endurance then read disturbance could play significant role.
+
+Thanks,
+Slava.
+
+
+
+
+
 
