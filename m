@@ -2,183 +2,300 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 413C5C47094
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 11:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0CFC47094
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 13:37:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E3F061359
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 11:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B982761374
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 13:37:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbhFJLQR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 07:16:17 -0400
-Received: from esa.hc4959-67.iphmx.com ([216.71.153.94]:58940 "EHLO
-        esa.hc4959-67.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbhFJLQP (ORCPT
+        id S230318AbhFJNjw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 09:39:52 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:64614 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230280AbhFJNjv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 07:16:15 -0400
-X-Greylist: delayed 426 seconds by postgrey-1.27 at vger.kernel.org; Thu, 10 Jun 2021 07:16:15 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=seagate.com; i=@seagate.com; q=dns/txt; s=stxiport;
-  t=1623323659; x=1654859659;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=jWUbJITQkbv4HUYgvWuJgZZ4eU9kQ5zlFiCaj10XH1Y=;
-  b=FDocBE2PAsIQVdteNHeSd2k2GkfgmVx0R0xK+ETqAbp/mdiTi6ILBnFb
-   LYQyXESSJgY5HpxtVM1fzIx8envTS4uKVD4cCpCsb9pZXXsSMYjEgXqaO
-   3q/KxBv6O2ED5CWKa0mf/l2P0xeSs70osoUgxlvmqbqav1fGBMWMh11sN
-   8=;
-IronPort-SDR: Noq9T0NsKNrQ4LItwQOwZWZrcap5q5km/QjQcap6kMEFHyGBoZrumv5kw659laqK/QMgtgab4R
- r1JuAQ7JgtNwggKzMua8FBXurdyJk49ovEu4OxyVGXjsSQCZ9RrBRZbo+hBWd8h6HCqDwAFnSc
- eI3FShZ7R+1kOPHKgfilmnAOEGXmahmqMxLErKBgNgQtZMw9QIeezrh7zskHJHzBNdMHZuu9/N
- 9NhbkVfk4hY7bHSQ9FyqG3cW5w7f0p47n7IGXaAFuu0Dnpw7OiY+nLnx4cauJvUV6flERyFCmJ
- qs4=
-Received: from mail-mw2nam10lp2100.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.100])
-  by ob1.hc4959-67.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2021 04:07:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Di4x9AhEB/7sB25tsSGeHI4wALTYreYCD0VdQ7pULL4c/mmVy52z3WnJwyyzOwYXbxrHxoH6EGbBO04z/oLTCkCPUphG1P8qttvlg0N8tlUNfLAiacwr6sIZQ6uaWMxXMd+c1EdArdBnN7L3Tek1hZ5GifUbg3kp18LyzK10giHDkyWOINV/fnZSd2XKvInrydCKAn6BeEjbDPVZTCMxKaLf987Uw6fPaiEBGqhAtOENhjg2Is4oBKjPV8JpDBNdefqATBMDzfREC1njPOI+KWdhazcULWC2pH2by0SDX1Rd/JQ2DesN56RHK5lytHIs270/9yYGdYiQ14Frktfe0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jWUbJITQkbv4HUYgvWuJgZZ4eU9kQ5zlFiCaj10XH1Y=;
- b=A1twzpiJEJgnc8DXGIF1vPzalHcG+67G1SzF4fqdCsHnSLH3iqi7I9d4/l9jC+Zp5RCGzFlDs08cisp/ZBhSvgmDZyJYjY1pSVMVUXd0ocQV5TLulYZjJmEnMOIJKC5f+uZ9L1BfHr/Rm4CLpROzYEEODbt4rUQVcuMQAk+Uncgud85ZuVcl/f742s5AWYQWHzMeSc9aAmPHT4pWMjam8wSUfOtP53v8/ojn+rUPxthWT6rPl9AvSkbhQw4rypbyeRoVCOIdvYilqGm/3NYLY8vTFciQdZvVcNoTKaHPTaC6fod6ahs6+mpyR/H3yQw21ZuvMOk1yzkjOmbGPQFPZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=seagate.com; dmarc=pass action=none header.from=seagate.com;
- dkim=pass header.d=seagate.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seagate.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jWUbJITQkbv4HUYgvWuJgZZ4eU9kQ5zlFiCaj10XH1Y=;
- b=WLED/Hna2xBennVS5kJxw9TPUeeKwD5O57XIA+QoA3ItCtU43t417qdJ+lEq6G8dOewPqPh3yAIqLXwG0h9MojNrmqkdNr1VRxo3aUyl29m5YOtadp1UsHyjw0BHrDbfTYsYw+nNjQSL2Oug1AkVJeJW2KZPatpgm9ndZRNPPCk=
-Received: from BN6PR2001MB0979.namprd20.prod.outlook.com
- (2603:10b6:404:af::13) by BN6PR20MB1219.namprd20.prod.outlook.com
- (2603:10b6:404:88::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.22; Thu, 10 Jun
- 2021 11:07:09 +0000
-Received: from BN6PR2001MB0979.namprd20.prod.outlook.com
- ([fe80::d180:59f2:f359:4f49]) by BN6PR2001MB0979.namprd20.prod.outlook.com
- ([fe80::d180:59f2:f359:4f49%8]) with mapi id 15.20.4219.022; Thu, 10 Jun 2021
- 11:07:09 +0000
-From:   Tim Walker <tim.t.walker@seagate.com>
-To:     Ric Wheeler <ricwheeler@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Matthew Wilcox <willy@infradead.org>
-CC:     "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [LSF/MM/BPF TOPIC] durability vs performance for flash devices
- (especially embedded!)
-Thread-Topic: [LSF/MM/BPF TOPIC] durability vs performance for flash devices
- (especially embedded!)
-Thread-Index: AQHXXR24nwc6Kq/CbE2x3x2srcjo7asL+csAgAAG8QCAAATJAIAAbeMAgABg0AA=
-Date:   Thu, 10 Jun 2021 11:07:09 +0000
-Message-ID: <45A42D25-FB2A-43EB-8123-9F7B25590018@seagate.com>
-References: <55d3434d-6837-3a56-32b7-7354e73eb258@gmail.com>
- <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
- <YMEItMNXG2bHgJE+@casper.infradead.org>
- <e9eaf87d-5c04-8974-4f0f-0fc9bac9a3b1@acm.org>
- <e191c791-4646-bf47-0435-5b0d665eca89@gmail.com>
-In-Reply-To: <e191c791-4646-bf47-0435-5b0d665eca89@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=seagate.com;
-x-originating-ip: [174.58.199.161]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 051ab0db-3232-451f-a397-08d92bffe441
-x-ms-traffictypediagnostic: BN6PR20MB1219:
-x-microsoft-antispam-prvs: <BN6PR20MB1219082D19EA14C585370885D7359@BN6PR20MB1219.namprd20.prod.outlook.com>
-stx-hosted-ironport-oubound: True
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: gti7/Oh63We+a7T1+LE37wHr/xxBzVUQqtw+W5HGfhUL00jy4CdChh6LtjsIqdekt7ABy67+JoLZEt1rVvF6B3vXq2UwUNh7y3sdXBb5nk1/kb3yOafDTOO7XwtTJwYfwl0BFsFW2VNxYqW8G1RD7xVLjmzBjrbJufE6TDDZ5FQ4wDlvWvo+2JEaef3ANX2zXyaJQCZOvFeocyJ4bzR6MAqp7oKqhsPaqsmWLIq4XCTJrYYWCcoUTdUtnphLRKxM5LlhudHkZjyfXlAwaPVLmXc77Rcbcujg2Gdh4ynVdwQMN+BPelVJjQj0VuCjafaGukIuC+x7aGWRWlq3wtjsl+OMl/53isXtIpSZl3ywolaYCAtaMHNuych+8hWvJXjLFeHvbYS4dPrFB9HyP9ve56B9GyTkxZkT6IgW8wsFy77tmSg/DZigcpjEgNmGEW3bVPaYZwMuL4Gp9GA494XMZ3xjRc3HGjY+4/JFzruz/37UWlUr3a11siKCUWXXpS0gRE0SEPyEl+HTSteCg0YU+CslG/sZ3pRJfnF5nZSpruEsMc3gRLxu8STSc8rDwITnS3zblB3peNhLQbLbsUQSiRvGcpfpwrBHupjrtcl4qpAEto9GNFXYzjfsgLxqwrkfgQfsdB2SBaDh7omWNbLCGC8q8dUczeThZl2+xd7P8I0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR2001MB0979.namprd20.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(346002)(396003)(39860400002)(366004)(136003)(71200400001)(38100700002)(122000001)(110136005)(6512007)(86362001)(64756008)(91956017)(4326008)(33656002)(26005)(186003)(2906002)(66476007)(66946007)(66446008)(6486002)(76116006)(66556008)(53546011)(8676002)(316002)(6506007)(8936002)(54906003)(5660300002)(478600001)(83380400001)(36756003)(2616005)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SkVmSytEU3B6ZE1odHNIcm8vNlJ3Wmcxa1FPeWlLbWxnTCt1azVIYk85SXVj?=
- =?utf-8?B?bjNDRU5OeXJxeU5xNUZ2WHJMclVwd203N1hZdHpzM2hqRVZFU05GVE81aU1x?=
- =?utf-8?B?aFFNbG84aGwzK1NIQlpFWkRnVDFJbXpUWUsyUEQzeVZ5bUR5Q2dZNTJLeGtX?=
- =?utf-8?B?S01VTmIvbTg0ZklkRlc4ZTl5b3hOR0grbVgrUFROUmM0bFl6dHpPd3dsTzc3?=
- =?utf-8?B?aHpYdTVKUEdXbUNGamI0Z05HaHp5N1ZWVlhITTdXL2VZdENtbGNPSEt4SWwv?=
- =?utf-8?B?N0E5NXprWVFQQjBTa0h1NHRQT2swZzdZQkNpbHVZdEhCVUJvNlFYUm5IdnVX?=
- =?utf-8?B?cjRKQStXTCtlb09ueXYrem96R2dHQkNWNWRzVGllNnhCNTdaR1A1blo2NEJa?=
- =?utf-8?B?RzBqNFNFdVpzWm9jSEtXaExRS3hEM0p2UVNsWHJRaThKZzRHZ3ErTEQ0bmhp?=
- =?utf-8?B?dWpDRlpsa0NJSUpVVjV6NzVJcjVxeGErL2JrOGZpaWVDcmtieitTK2tjTVpW?=
- =?utf-8?B?R2o2bWtFRjhUOUY2UUZEZlJFcUVUeG8vMUJPUDJjNTdmTVJkYUNSVVp3eG9Y?=
- =?utf-8?B?K01kYVlKTUVBRVhWbUliRlRNdlBrdWdaNEdLR2JUWG1hTTBKMnpMckVCNXFK?=
- =?utf-8?B?by9Lc1paSDdwalI5MUxmdzJhb1h4TnpGS2FCck9kNnM2eFhQMktldUFWL2t1?=
- =?utf-8?B?SXl0TG1hWnRBNVBNNXRZVS9xaWlVMU0ra1Y1VlZQQmFjUWFGZmNoQ205a2Fu?=
- =?utf-8?B?RDduQjgrbkVEUFV1M1FIK3NUaWVqa2ZNOFpsOXplUlZlVzFCcmFFdktNZzU1?=
- =?utf-8?B?Z2lGa2RFbGd3SEZxWWtvR013MHRiOFpGZURob0NGMGxlQVNRamVlQ1kzT0xo?=
- =?utf-8?B?OFpCdEdYOFdYcUhRWklhUFAxZ2dNaFZpRWhINGlqOTVaTW5pRjZHZWJnVTFE?=
- =?utf-8?B?UUNkSEp6VmI0bG82VWFweENpdSt2T1llT1M3Q0M4OGYrZWVFVlgwUXU1aDhl?=
- =?utf-8?B?ejJhT0tYUUZFUitLcWROMy9WTFB0bkN2L3JEVGVzVDFuTzM5TUhtZXpBdkQr?=
- =?utf-8?B?VGxqSG5SdjJhRTRLdEh5UFM2Y2pEZklVRHN5SHZZclRiaDlBcU9EWUtoWUtC?=
- =?utf-8?B?eVhKenNjenZhVTExMVE2N0pvSkoxcU5ZS0lXRHMzWndROERBZVpGSGMxQm9t?=
- =?utf-8?B?SG91bnNNZXp2YUN3WTBLbmFIeGtqdmtKMWdRRnQwb0JxUFVwYmEvTEE3N1pa?=
- =?utf-8?B?bWFHR2dUOVQ2MVF0U0lwSTBoRWlxWDBLSnJIbDc1QXVZa0ZpdHdJK21pOVJl?=
- =?utf-8?B?Q1F1L25WRVNVSk4wdGlVYzU2RlVXVVRjblcwQ1I4emlDWEJYUTI0TG1lZWZI?=
- =?utf-8?B?cnREV1VRMHBDYURsS0pLbkdTVDcybEdXRUFybW55RkVKN0p5Z05RdnZjV01o?=
- =?utf-8?B?bWZMNnN0THNBcWUvWjZzVy9iL2JybUNuWVdMUUhYWWQwcS9LZEplWFBBbFpr?=
- =?utf-8?B?NEVwdXRwNDduV2VBWHlyVUpidE84b3ZLcGFXdk1lZWNJU0huMG9acnQwR1h6?=
- =?utf-8?B?VDFCWTg3cHF1QXh5OEdOZ3U0V1Z4OGpFdGYyaC94MThkZldTRzZaeDR0OUQw?=
- =?utf-8?B?cjd0QXcrVTJVaTlDWVVIU1FzRlhyN1JTYmVYZ3VpOXp1cER5SnNad3VXeXhr?=
- =?utf-8?B?cGhqc2Q1TGNmaktjNUZtV012aThTMUFBTit0Z3pnalJZRmFhZ3loTGdmQmls?=
- =?utf-8?B?TW40YnhqQUozM2U1NFk3TG1TVkdqMjdNTzUxRkNSc0d1cStQODBUVjFyUTBK?=
- =?utf-8?B?UUI1ZnlOaEJNMUpZZlpkZz09?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <968B63C9F0A2354E9B2B469AF032E546@namprd20.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Thu, 10 Jun 2021 09:39:51 -0400
+Received: from fsav303.sakura.ne.jp (fsav303.sakura.ne.jp [153.120.85.134])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 15ADbs8X002584;
+        Thu, 10 Jun 2021 22:37:54 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav303.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav303.sakura.ne.jp);
+ Thu, 10 Jun 2021 22:37:54 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav303.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 15ADbrdu002580
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Thu, 10 Jun 2021 22:37:54 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [syzbot] possible deadlock in del_gendisk
+To:     Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Petr Vorel <pvorel@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
+        Tejun Heo <tj@kernel.org>
+References: <000000000000ae236f05bfde0678@google.com>
+ <1435f266-9f6d-22ef-ba7d-f031c616aede@I-love.SAKURA.ne.jp>
+ <7b8c9eeb-789d-e5e6-04d6-130ee8be7305@i-love.sakura.ne.jp>
+ <20210609164639.GM4910@sequoia>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <718b44b5-a230-1907-e1e1-9f609cb67322@i-love.sakura.ne.jp>
+Date:   Thu, 10 Jun 2021 22:37:48 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-X-OriginatorOrg: seagate.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN6PR2001MB0979.namprd20.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 051ab0db-3232-451f-a397-08d92bffe441
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2021 11:07:09.3978
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d466216a-c643-434a-9c2e-057448c17cbe
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 07dSNwqEKxrtWBYaT5OamFLBWknDxR0+3fvysnxqQ4zRejX/Z1/jTkL6hMu5Ea0tu3nm/r3wyQicdiANxrSQbHu6RCeFDk0RFF16jSYfRiE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR20MB1219
+In-Reply-To: <20210609164639.GM4910@sequoia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkgYWxsLQ0KDQrvu79PbiAgV2VkbmVzZGF5LCBKdW5lIDksIDIwMjEgYXQgOToyMDo1MiBQTSBS
-aWMgV2hlZWxlciB3cm90ZToNCg0KPk9uIDYvOS8yMSAyOjQ3IFBNLCBCYXJ0IFZhbiBBc3NjaGUg
-d3JvdGU6DQo+PiBPbiA2LzkvMjEgMTE6MzAgQU0sIE1hdHRoZXcgV2lsY294IHdyb3RlOg0KPj4+
-IG1heWJlIHlvdSBzaG91bGQgcmVhZCB0aGUgcGFwZXIuDQo+Pj4NCj4+PiAiIFRoaXNjb21wYXJp
-c29uIGRlbW9uc3RyYXRlcyB0aGF0IHVzaW5nIEYyRlMsIGEgZmxhc2gtZnJpZW5kbHkgZmlsZQ0K
-Pj4+IHN5cy10ZW0sIGRvZXMgbm90IG1pdGlnYXRlIHRoZSB3ZWFyLW91dCBwcm9ibGVtLCBleGNl
-cHQgaW5hc211Y2ggYXNpdA0KPj4+IGluYWR2ZXJ0ZW50bHkgcmF0ZSBsaW1pdHNhbGxJL08gdG8g
-dGhlIGRldmljZSINCj4+IEl0IHNlZW1zIGxpa2UgbXkgZW1haWwgd2FzIG5vdCBjbGVhciBlbm91
-Z2g/IFdoYXQgSSB0cmllZCB0byBtYWtlIGNsZWFyDQo+PiBpcyB0aGF0IEkgdGhpbmsgdGhhdCB0
-aGVyZSBpcyBubyB3YXkgdG8gc29sdmUgdGhlIGZsYXNoIHdlYXIgaXNzdWUgd2l0aA0KPj4gdGhl
-IHRyYWRpdGlvbmFsIGJsb2NrIGludGVyZmFjZS4gSSB0aGluayB0aGF0IEYyRlMgaW4gY29tYmlu
-YXRpb24gd2l0aA0KPj4gdGhlIHpvbmUgaW50ZXJmYWNlIGlzIGFuIGVmZmVjdGl2ZSBzb2x1dGlv
-bi4NCj4+DQo+PiBXaGF0IGlzIGFsc28gcmVsZXZhbnQgaW4gdGhpcyBjb250ZXh0IGlzIHRoYXQg
-dGhlICJGbGFzaCBkcml2ZSBsaWZlc3Bhbg0KPj4gaXMgYSBwcm9ibGVtIiBwYXBlciB3YXMgcHVi
-bGlzaGVkIGluIDIwMTcuIEkgdGhpbmsgdGhhdCB0aGUgZmlyc3QNCj4+IGNvbW1lcmNpYWwgU1NE
-cyB3aXRoIGEgem9uZSBpbnRlcmZhY2UgYmVjYW1lIGF2YWlsYWJsZSBhdCBhIGxhdGVyIHRpbWUN
-Cj4+IChzdW1tZXIgb2YgMjAyMD8pLg0KPj4NCj4+IEJhcnQuDQo+DQo+SnVzdCB0byBhZGRyZXNz
-IHRoZSB6b25lIGludGVyZmFjZSBzdXBwb3J0LCBpdCB1bmZvcnR1bmF0ZWx5IHRha2VzIGEgdmVy
-eSBsb25nIA0KPnRpbWUgdG8gbWFrZSBpdCBkb3duIGludG8gdGhlIHdvcmxkIG9mIGVtYmVkZGVk
-IHBhcnRzIChlbW1jIGlzIHN1cGVyIGNvbW1vbiBhbmQgDQo+dmVyeSBwcmltaXRpdmUgZm9yIGV4
-YW1wbGUpLiBVRlMgcGFydHMgYXJlIGluIGhpZ2hlciBlbmQgZGV2aWNlcywgaGF2ZSBub3QgaGFk
-IGEgDQo+Y2hhbmNlIHRvIGxvb2sgYXQgd2hhdCB0aGV5IG9mZmVyLg0KPg0KPlJpYw0KPg0KPg0K
-Pg0KDQpGb3Igem9uZWQgYmxvY2sgZGV2aWNlcywgcGFydGljdWxhcmx5IHRoZSBzZXF1ZW50aWFs
-IHdyaXRlIHpvbmVzLCBtYXliZSBpdCBtYWtlcyBtb3JlIHNlbnNlIGZvciB0aGUgZGV2aWNlIHRv
-IG1hbmFnZSB3ZWFyIGxldmVsaW5nIG9uIGEgem9uZS1ieS16b25lIGJhc2lzLiBJdCBzZWVtcyBs
-aWtlIGl0IGNvdWxkIGJlIHByZXR0eSBlYXN5IGZvciBhIGRldmljZSB0byBkZWNpZGUgd2hpY2gg
-aGVhZC9kaWUgdG8gc2VsZWN0IGZvciBhIGdpdmVuIHpvbmUgd2hlbiB0aGUgem9uZSBpcyBpbml0
-aWFsbHkgb3BlbmVkIGFmdGVyIHRoZSBsYXN0IHJlc2V0IHdyaXRlIHBvaW50ZXIuDQoNCkJlc3Qg
-cmVnYXJkcywNCi1UaW0NCg0KDQo=
+On 2021/06/10 1:46, Tyler Hicks wrote:
+> On 2021-06-10 01:31:17, Tetsuo Handa wrote:
+>> Hello, Christoph.
+>>
+>> I'm currently trying full bisection.
+
+I reached commit c76f48eb5c084b1e ("block: take bd_mutex around delete_partitions in del_gendisk").
+
+  # bad: [fc0586062816559defb14c947319ef8c4c326fb3] Merge tag 'for-5.13/drivers-2021-04-27' of git://git.kernel.dk/linux-block
+  # good: [42dec9a936e7696bea1f27d3c5a0068cd9aa95fd] Merge tag 'perf-core-2021-04-28' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+  # good: [68a32ba14177d4a21c4a9a941cf1d7aea86d436f] Merge tag 'drm-next-2021-04-28' of git://anongit.freedesktop.org/drm/drm
+  # good: [a800abd3ecb9acc55821f7ac9bba6c956b36a595] net: enetc: move skb creation into enetc_build_skb
+  # good: [6cc8e7430801fa238bd7d3acae1eb406c6e02fe1] loop: scale loop device by introducing per device lock
+  git bisect start 'fc0586062816559defb14c947319ef8c4c326fb3' '42dec9a936e7696bea1f27d3c5a0068cd9aa95fd' '68a32ba14177d4a21c4a9a941cf1d7aea86d436f' 'a800abd3ecb9acc55821f7ac9bba6c956b36a595' '6cc8e7430801fa238bd7d3acae1eb406c6e02fe1'
+  # good: [2958a995edc94654df690318df7b9b49e5a3ef88] block/rnbd-clt: Support polling mode for IO latency optimization
+  git bisect good 2958a995edc94654df690318df7b9b49e5a3ef88
+  # good: [16b3d0cf5bad844daaf436ad2e9061de0fe36e5c] Merge tag 'sched-core-2021-04-28' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+  git bisect good 16b3d0cf5bad844daaf436ad2e9061de0fe36e5c
+  # bad: [cbb749cf377aa8aa32a036ebe9dd9f2d89037bf0] block: remove an incorrect check from blk_rq_append_bio
+  git bisect bad cbb749cf377aa8aa32a036ebe9dd9f2d89037bf0
+  # good: [9bb33f24abbd0fa2fadad01ec75438d7cc239189] block: refactor the bounce buffering code
+  git bisect good 9bb33f24abbd0fa2fadad01ec75438d7cc239189
+  # bad: [c76f48eb5c084b1e15c931ae8cc1826cd771d70d] block: take bd_mutex around delete_partitions in del_gendisk
+  git bisect bad c76f48eb5c084b1e15c931ae8cc1826cd771d70d
+  # good: [b896fa85e0ee4f09ba4be48a3f405fc82c38afb4] dasd: use bdev_disk_changed instead of blk_drop_partitions
+  git bisect good b896fa85e0ee4f09ba4be48a3f405fc82c38afb4
+  # good: [473338be3aaea117a7133720305f240eb7f68951] block: move more syncing and invalidation to delete_partition
+  git bisect good 473338be3aaea117a7133720305f240eb7f68951
+  # good: [d3c4a43d9291279c28b26757351a6ab72c110753] block: refactor blk_drop_partitions
+  git bisect good d3c4a43d9291279c28b26757351a6ab72c110753
+  # first bad commit: [c76f48eb5c084b1e15c931ae8cc1826cd771d70d] block: take bd_mutex around delete_partitions in del_gendisk
+
+> 
+> Thanks for doing this. I haven't had a chance to retry this commit with
+> lockdep but I did re-review it and didn't think that it would be the
+> cause of this lockdep report since it strictly reduced the usage of the
+> loop_ctl_mutex.
+
+OK. It seems that a patch shown below avoids this warning.
+
+Since I think loop_remove() does not access resources in
+loop module, I think we can drop loop_ctl_mutex as soon as
+idr_remove(&loop_index_idr, lo->lo_number) completes.
+
+Hmm, what protects lo_open() from loop_exit() destroying everything?
+Is module's refcount taken before calling lo_open() ? If yes, does
+module_exiting and/or loop_ctl_mutex in loop_exit() help protecting
+something? If no, nothing protects and just crashes the kernel?
+
+Is my understanding correct? Do you think this approach is OK?
+
+ drivers/block/loop.c |   32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d58d68f3c7cd..5baa0207512e 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -80,18 +80,19 @@
+ #include <linux/ioprio.h>
+ #include <linux/blk-cgroup.h>
+ 
+ #include "loop.h"
+ 
+ #include <linux/uaccess.h>
+ 
+ static DEFINE_IDR(loop_index_idr);
+ static DEFINE_MUTEX(loop_ctl_mutex);
++static bool module_exiting;
+ 
+ static int max_part;
+ static int part_shift;
+ 
+ static int transfer_xor(struct loop_device *lo, int cmd,
+ 			struct page *raw_page, unsigned raw_off,
+ 			struct page *loop_page, unsigned loop_off,
+ 			int size, sector_t real_block)
+ {
+@@ -1877,25 +1878,29 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ }
+ #endif
+ 
+ static int lo_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct loop_device *lo;
+ 	int err;
+ 
+ 	/*
+-	 * take loop_ctl_mutex to protect lo pointer from race with
+-	 * loop_control_ioctl(LOOP_CTL_REMOVE), however, to reduce contention
+-	 * release it prior to updating lo->lo_refcnt.
++	 * Take loop_ctl_mutex to protect lo pointer from race with
++	 * loop_control_ioctl(LOOP_CTL_REMOVE) and loop_exit(). However,
++	 * to reduce contention, release it prior to updating lo->lo_refcnt.
+ 	 */
+ 	err = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (err)
+ 		return err;
++	if (unlikely(module_exiting)) {
++		mutex_unlock(&loop_ctl_mutex);
++		return -EINVAL;
++	}
+ 	lo = bdev->bd_disk->private_data;
+ 	if (!lo) {
+ 		mutex_unlock(&loop_ctl_mutex);
+ 		return -ENXIO;
+ 	}
+ 	err = mutex_lock_killable(&lo->lo_mutex);
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	if (err)
+ 		return err;
+@@ -2073,18 +2078,19 @@ static int loop_init_request(struct blk_mq_tag_set *set, struct request *rq,
+ 	return 0;
+ }
+ 
+ static const struct blk_mq_ops loop_mq_ops = {
+ 	.queue_rq       = loop_queue_rq,
+ 	.init_request	= loop_init_request,
+ 	.complete	= lo_complete_rq,
+ };
+ 
++/* Must be called with loop_ctl_mutex held. */
+ static int loop_add(struct loop_device **l, int i)
+ {
+ 	struct loop_device *lo;
+ 	struct gendisk *disk;
+ 	int err;
+ 
+ 	err = -ENOMEM;
+ 	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
+ 	if (!lo)
+@@ -2180,18 +2186,19 @@ static int loop_add(struct loop_device **l, int i)
+ 	blk_mq_free_tag_set(&lo->tag_set);
+ out_free_idr:
+ 	idr_remove(&loop_index_idr, i);
+ out_free_dev:
+ 	kfree(lo);
+ out:
+ 	return err;
+ }
+ 
++/* Must not be called with loop_ctl_mutex or lo->lo_mutex held. */
+ static void loop_remove(struct loop_device *lo)
+ {
+ 	del_gendisk(lo->lo_disk);
+ 	blk_cleanup_queue(lo->lo_queue);
+ 	blk_mq_free_tag_set(&lo->tag_set);
+ 	put_disk(lo->lo_disk);
+ 	mutex_destroy(&lo->lo_mutex);
+ 	kfree(lo);
+ }
+@@ -2251,18 +2258,22 @@ static void loop_probe(dev_t dev)
+ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 			       unsigned long parm)
+ {
+ 	struct loop_device *lo;
+ 	int ret;
+ 
+ 	ret = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (ret)
+ 		return ret;
++	if (unlikely(module_exiting)) {
++		mutex_unlock(&loop_ctl_mutex);
++		return -EINVAL;
++	}
+ 
+ 	ret = -ENOSYS;
+ 	switch (cmd) {
+ 	case LOOP_CTL_ADD:
+ 		ret = loop_lookup(&lo, parm);
+ 		if (ret >= 0) {
+ 			ret = -EEXIST;
+ 			break;
+ 		}
+@@ -2282,19 +2293,21 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 		}
+ 		if (atomic_read(&lo->lo_refcnt) > 0) {
+ 			ret = -EBUSY;
+ 			mutex_unlock(&lo->lo_mutex);
+ 			break;
+ 		}
+ 		lo->lo_disk->private_data = NULL;
+ 		mutex_unlock(&lo->lo_mutex);
+ 		idr_remove(&loop_index_idr, lo->lo_number);
++		mutex_unlock(&loop_ctl_mutex);
+ 		loop_remove(lo);
++		return ret;
+ 		break;
+ 	case LOOP_CTL_GET_FREE:
+ 		ret = loop_lookup(&lo, -1);
+ 		if (ret >= 0)
+ 			break;
+ 		ret = loop_add(&lo, -1);
+ 	}
+ 	mutex_unlock(&loop_ctl_mutex);
+ 
+@@ -2391,28 +2404,35 @@ static int loop_exit_cb(int id, void *ptr, void *data)
+ {
+ 	struct loop_device *lo = ptr;
+ 
+ 	loop_remove(lo);
+ 	return 0;
+ }
+ 
+ static void __exit loop_exit(void)
+ {
+-	mutex_lock(&loop_ctl_mutex);
++	module_exiting = true;
+ 
++	/* Block future lo_open()/loop_control_ioctl() callers. */
++	mutex_lock(&loop_ctl_mutex);
++	mutex_unlock(&loop_ctl_mutex);
++	/*
++	 * Since loop_exit_cb() calls loop_remove(), we can not take
++	 * loop_ctl_mutex here. But since module_exiting == true is blocking
++	 * lo_open() and loop_control_ioctl(), it is safe to access
++	 * loop_index_idr without taking loop_ctl_mutex here.
++	 */
+ 	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
+ 	idr_destroy(&loop_index_idr);
+ 
+ 	unregister_blkdev(LOOP_MAJOR, "loop");
+ 
+ 	misc_deregister(&loop_misc);
+-
+-	mutex_unlock(&loop_ctl_mutex);
+ }
+ 
+ module_init(loop_init);
+ module_exit(loop_exit);
+ 
+ #ifndef MODULE
+ static int __init max_loop_setup(char *str)
+ {
+ 	max_loop = simple_strtol(str, NULL, 0);
+
+
