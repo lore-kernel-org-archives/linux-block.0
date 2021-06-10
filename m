@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C695C48BCD
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 00:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17017C48BCD
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 00:39:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A70A613EC
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 00:31:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6C43613F4
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 00:39:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbhFJAdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jun 2021 20:33:01 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:15776 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbhFJAdB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 20:33:01 -0400
+        id S229659AbhFJAlX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jun 2021 20:41:23 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:4673 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229639AbhFJAlW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jun 2021 20:41:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1623285114; x=1654821114;
+  t=1623285568; x=1654821568;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=0GwzGL18A4GpLOEvehZoK65RCAZGrjEOuBwQeT7ZlO4=;
-  b=I7a71eo+1nOSZvRCfcqX/r5ojTHcYKFOwnPTdLYAbN2G2Cw/dpmo2Ued
-   zGqhD7MxbIubVZdRTlD0GdGqJQeLJkl10+dWDLvSvZ6jlcMA4HdRyfpx+
-   IJViR0pCVty0Sw8h8tPIY2YMpsGNtTWlvCh9w8DLguJR5cBlperXYNoqz
-   ytSK5rUIvRobcJ1b4p8GOHW6A/OJLCUYVYO4N5B4Za6Aj2o3bHJEHdNDO
-   qcGs4uAggJaPF08iLdGDy/MPRj0ZubghtGkBEaKoYOGjBIgakR3LnJuIL
-   C1uRx5yMNutQvJiKS7lAZ8bmZdzlMLBODiXhAKZsYXQp5h6dOVAx8KBBF
-   Q==;
-IronPort-SDR: mlZBx3duf7GHxaNB80e48bSeaBXEh9JeKhhoNqTuEEoIKqoW7+jb8cFuXSVuRKBusgYEQcPJer
- A2dO7mP0M3VAv3II98Mm0WQttt+ArdJq+vbQ7ycNn10LnXaY4KQVNaXR8MUz3SyaN6jPzx6c+f
- ZumrlKtInp5Xa9jwC0h7Qqe8BQom2p1rIzqesTNWz1yceBOO35KgcM9sPDUja1L3+Jpor9iMTr
- pgu7e847b3H3vepq08l4BhtA55XkQCs9at3xTBrjIo8iYW2Bp/jShgnYyQk20CN+ZXSe0/FVKI
- kiY=
+  bh=vdL5prOFOe1U5rRWpCEWdGcqzIVloyQWMSHMRTlecn4=;
+  b=eYSaEAf3YGUZkeFpLF01WB8Alf4EDV73vmiVYBH8FwoBsY+j8syjo4nn
+   jwYt8saS+REMk6xPPdnDRgqCKIieso3TfGMUzxw4DA+m/jY7MxcczTrC0
+   5usvz9AEdi/r1FoNhp1tgBoZrp+QGoj1xgbsfftWhXRHjWTWQJ4DU1ONN
+   rqP56luPupxFseDl9IBQCljGfFW0O+2L56wK6A8B+haMwgxkaILqDXbVH
+   0X+Icmr48Z0VoFVmSOd4wWZbpSvALAP7y6Do1qm8czYTdd8uRY0Czuq3V
+   RTS4Q/gSURtf49abSbH/fpdUJ+p2rJmKb3GWtguJ9TgXXasMajfgyuRPF
+   w==;
+IronPort-SDR: JQn1R0ed4Zai0cU974mI8ppzUvki0LRPRdGE+9vSOrfOl0Cu5Ev+zgGIUi7y5SY8N4IUHCPhBu
+ UZr+EynEhy/V1jNI0dC2KQyRpmWgGFjSZTNdiAmBxdqjkwxyo7gKyokG1+ZqSRoxO86sXtqvml
+ INX70HVX2jOi5C5x4wawIXzg1MFZMuyqSe6KpQrQofMkoNMVKmf20Yjr5rfxpWt9Pd7PC/LbLE
+ fMOODVw3oBrry7kT9Er9BhT9RbJOPBX+FTcspOnnIOiap+W7f+qY1fznsDqIlZIhjXDE57US8j
+ bxk=
 X-IronPort-AV: E=Sophos;i="5.83,262,1616428800"; 
-   d="scan'208";a="275187158"
-Received: from mail-co1nam11lp2172.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.172])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jun 2021 08:31:52 +0800
+   d="scan'208";a="171922595"
+Received: from mail-mw2nam10lp2101.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.101])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jun 2021 08:39:27 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cuD6RDiv6I7Pz3Qsd4Hjkodk4XMTD7ZkkOwVC7qVd/yH75FwW361J+2FLIIFCfRkBTzNw35DyWzqtCcN5tbRQvAr4xU2JjvOPIh+bKGGp0XmzRuPOcWtyWQ00L5hhxoPQqADYREDWKa2mVxURIMlvPxM4OhoIlzD3K6Q2fAF1wg+TIBhaLmGqoRWjGxyS6BlsE7VEsq7Pibqi+qxVPGImxjUyr62f5RGPdJIZCbk8fWM3xWRVSHEOBqogXcxJThjUKiVtArzghWQL5/o3lrmXvEWBvgSaC2sC0Qr4WQjhXAaBfCr45kpV8MvnXvaBaTEEx7aliMo/UgwgKxkqtsqLA==
+ b=E3pCFRyBifnSNuVT9cI/j/UfAd9Mpmk2Mhr6+OudQXpctue+k/IWoDGmyV8kciz1Nn7vZ6xZe3B46XqIHsCkJvdUckoLbhQ5RFVSXa6mzv3ONs79Vm5YVS0eVFs9pMdjtIQv/Hu/KWGuDIQNJLEjB+2dyBHrfOosbik+Mnt8xGOhRdnYIwzLQdibA/IaWS1w+g4n6SGQqGjHb2qkp+ZehQyladHFGgGwuQGjvRxInNav//HMYJoovZqTYmSg1oRraEXn+cCJGv3YJx0LIsPoPjGcr+PXKQhkKnGOOred1r9gtu3kahGbx+GfFHFZfQtWJmjt9qc/xxhYyZPkm05Ezw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EdNNOTsWcHG9zA+dzZ71dA1gpt4Zj2BCpxBRIUUV1kQ=;
- b=Vlt9d79guMn515MssdrADH/MIn0eQoEeaMDQMS3Vg5/jBriRY4I2z8wCYPt0tYu1Rdigcx2lYIPC0C9n3o/3PWCx+7vFuHR4htHAq7ixGHrDO4gnFIh0gYZjz5FrR80bEuXjgoBYUa/XjHQyWTosFOOcDvSjCsM3MGVgKbNTsuPmW4JZ7WrEEGNs+yILUJ9pKb1CGuprPpnEWA6wakX+B9talaZFE6LV0q5a3Kdj02pmYSyS8CowwWpuxSCHhRKB8cCOXTJrbPt7iqnkT6joA2IN5XjarCcgfZvx6gil5mc5NPWXTw65kci9Spi+B0vVF12Q/1IHAyvmSLukz4GtOg==
+ bh=SUDIsjIl+O/ce4nEz6KxiSBOteew0S3urKkLUwYLUuw=;
+ b=cHSlChrtFK5juh9haQ09lx23gjEwAZb9kT4zAusxFnN8PN+ZxgBd+SSrtJ/kbRcDUzIO6BqAQ7dPDQzvcUj4ixZdKb9ioQuGWNsS93RBmW6n+DhVx8goaIKXYOU5nFPUtC3Byr9iVDVf0aOZBMltBuB6DhOEJ3meI+UeVVvA/UBWU9IZqui4j2Kz582ecxlsSXBLBBcfdNqzAwuiy6CpgvpC2fj15T4Kz0+n8WH0xfbmbGuYmVpII1IATzmfwMrMFrlikijmXDnIRXLJ6lU+3s5NQV0Co8J6nQC7tf6IdhlEMna5yCZgsGAOFh9WJuo+fqWWNlHqQ1GpRKQz3pXnKQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EdNNOTsWcHG9zA+dzZ71dA1gpt4Zj2BCpxBRIUUV1kQ=;
- b=s6UtxFdBpG6HOVNGkUalBR8i8ki/yd0jVSTvUQwXcjJ5IMBWIyxzS95X09J36XlFDESgPiJx9WPuIcm4EWXH23njxLUugCjIIQLsqugfY1Nw6ebU3xknZ123RGKs8pvqT8CY2jPN9s/Uee6p1vajKTb9xjHT1vdupgHWbqGbqqI=
+ bh=SUDIsjIl+O/ce4nEz6KxiSBOteew0S3urKkLUwYLUuw=;
+ b=FwxZdYXzZRF3NVz8ofg536bfJ1P3mZr5DllTglJomhpeWK4Win6HRMDdUiLx1yZXFGuZNM3aVKRWosiFgwbr76jdYsSXCC3Uswi6IgERmV3x09bJROGiF69Wv0wgNrYOdIWGKZ8VsZxHokeriucxrtkAqwEPgUPLNoJ3wDZenv0=
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
- by DM6PR04MB5100.namprd04.prod.outlook.com (2603:10b6:5:16::10) with
+ by DM5PR0401MB3528.namprd04.prod.outlook.com (2603:10b6:4:76::24) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.29; Thu, 10 Jun
- 2021 00:31:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21; Thu, 10 Jun
+ 2021 00:39:25 +0000
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::64f9:51d2:1e04:f806]) by DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::64f9:51d2:1e04:f806%9]) with mapi id 15.20.4195.030; Thu, 10 Jun 2021
- 00:31:03 +0000
+ 00:39:25 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -73,17 +73,15 @@ CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
         Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH 10/14] block/mq-deadline: Improve the sysfs show and store
- macros
-Thread-Topic: [PATCH 10/14] block/mq-deadline: Improve the sysfs show and
- store macros
-Thread-Index: AQHXXLsU2GDeuvY6R0ez1NAOsbFOwg==
-Date:   Thu, 10 Jun 2021 00:31:03 +0000
-Message-ID: <DM6PR04MB7081640D3A83F3621E94433DE7359@DM6PR04MB7081.namprd04.prod.outlook.com>
+Subject: Re: [PATCH 12/14] block/mq-deadline: Add I/O priority support
+Thread-Topic: [PATCH 12/14] block/mq-deadline: Add I/O priority support
+Thread-Index: AQHXXLsQrNfwnSgnmUyY0OBm4aL5wQ==
+Date:   Thu, 10 Jun 2021 00:39:25 +0000
+Message-ID: <DM6PR04MB70815D5E4E64C6B78CCD410FE7359@DM6PR04MB7081.namprd04.prod.outlook.com>
 References: <20210608230703.19510-1-bvanassche@acm.org>
- <20210608230703.19510-11-bvanassche@acm.org>
- <DM6PR04MB7081916EE79D419357373085E7369@DM6PR04MB7081.namprd04.prod.outlook.com>
- <8547812b-c8b5-93c1-0189-f8ce4c01ff99@acm.org>
+ <20210608230703.19510-13-bvanassche@acm.org>
+ <DM6PR04MB70818D0058A0B1249AC7EBFCE7369@DM6PR04MB7081.namprd04.prod.outlook.com>
+ <7fa81169-6c94-f7b1-f086-6f2caa775d41@acm.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -92,94 +90,141 @@ authentication-results: acm.org; dkim=none (message not signed)
  header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [129.253.182.60]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e5d2fc42-033a-475a-aa14-08d92ba7078b
-x-ms-traffictypediagnostic: DM6PR04MB5100:
+x-ms-office365-filtering-correlation-id: 3a66ea5c-d25a-47bc-9fff-08d92ba832c1
+x-ms-traffictypediagnostic: DM5PR0401MB3528:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR04MB5100E74BFB448D84A0F3FDBDE7359@DM6PR04MB5100.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <DM5PR0401MB3528776C89342E0EB41EFB13E7359@DM5PR0401MB3528.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: hEGuDVQdDs4pjMay+w1doB9ybXRlI9jXHBhWy8OyRDz5ZExGXvZtCroU5jpUYbCw2jl5stAKjjPxdbAeokOGC53TlfRc2RDafmWxIWV5LE2Iuqw7Lv1cb+CPF3pSNtPkS8+dFmZQdor1Y4nPtde8wChVz4ol6UB1H+BoG6gSl8GJrgfSSf7ga+6wthqRqzsdQJxdEyTYXaNbOhefr2Co2EDswsHt2O+eFtyx4m6J0tSJwgfjCPQV9Nuw40Zi15fMM6UPHX/Ff3jQHpQKbjyCLBLtyHEs0GgStjbUMwuCimbjRaHumdCHAlWy2zXZRzkKhlAyu1fh5Rs2UC4E5I2ikmEJUDlKCS23iMDzvJbIhqL0GVkkleGQ5KiGJu7iiiwX1NA3MiP9PVrY6S3l8Okz9z09dP/HoelPvnVdO2IwTklZ0FcpCIArytmmrW8bTHncgxtZ+hxu1iB4sCwB1vcLMY0WNsZkkTzXrkgI+EcsvI7kGFZxnWqqtNTxvhHktoyEwpPobu50YF7fcEj5R1+6N6XIzmOz7VXkrgcBwUjmoLOb7zgMFRMljp6Yk6yOOdLi2YyRmJALBjbooasb2DFM2ussSFjKBUcgE3kYNuMY0pI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(346002)(39860400002)(396003)(376002)(5660300002)(8676002)(8936002)(6506007)(9686003)(33656002)(122000001)(55016002)(54906003)(316002)(76116006)(4326008)(66946007)(66476007)(110136005)(64756008)(478600001)(2906002)(66446008)(52536014)(71200400001)(7696005)(186003)(26005)(53546011)(38100700002)(91956017)(83380400001)(86362001)(66556008);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: b7ZTdUSRBqdXW7ff9wz9oZhfGZXpHH4cAskE7SHbj6zAxDLGbCQ/sagqoo8JTIlN3wdv/B3FVgrCrPrw3ktkoAHE7ShmVjmY4Sw7S9OU6dEL2LJOWaAWDps9BIR2hkti9mzi17LcpYU2xhA7owCTxvdCPejzHoSSwxzrY1QtYIvTylwfCKNmCv4XfTRo4zGHWwQLyBez13R1OAyE8MfZFEFMCW+6LIiyK6mxRNCyxH2a/JieE+805wTQC4RuPx52Pe0wSKTDj/tjcuZs/UV3zU2fk6bvUnVVrVm8jwm/e7EryiiKlqsuvHzFTuW3aYhm5oO5Tgct/dicxY24JuCQTUXAktk5Fvw0gFAlYYxsFsE9bHN/Sj+ZFRyWRjWzAYKtqXU3ccE+xxhqsBeecuZ3k2knzSNalHmrSnGx126yVrOvlRmonzGUeDQ/C0qRKscsZe3QgzqVjwSH/1bWPHf/1GhTojHJuJsJWnDDqd0xSAsToaqE5iEMIbCrFgK1eqbbY27PLN6EeF5YCIgL6ImH2h4dx/Xt+UhW4TNj4kW1ytPQB4I38RDqyLoda1O9jLdoXLGf6yWVrh66+8y6ZUh7Sbv2Y+gYIs/6yu0gaycWi/E=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(366004)(39860400002)(376002)(478600001)(8936002)(66476007)(66446008)(66946007)(66556008)(71200400001)(64756008)(83380400001)(8676002)(9686003)(55016002)(91956017)(76116006)(122000001)(33656002)(5660300002)(6506007)(52536014)(38100700002)(53546011)(4326008)(7696005)(316002)(110136005)(54906003)(26005)(186003)(2906002)(86362001);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?O9EJWPK0R0w/1BtEIB53v2USMfg4JBmJ8V+MkriNDswVtTzJ4r9Qi/kV8l1s?=
- =?us-ascii?Q?65TQBkU5LzXcEQHK+jTSRZOO34XuNnOKpeiuZ6PWCV8/35ZLOMZ2TMhWmb3F?=
- =?us-ascii?Q?IEfm426Mv1l6IRhhAj4cjZAQlN5RTAgz2qDXXnXRuhe3p3CCNd8IHdldwLJ+?=
- =?us-ascii?Q?kC4oMShEU9rh1K5bK7li3cPm1cMPtfIiyoWUMbPIRpZpsBFV6lrMk7vkLe+1?=
- =?us-ascii?Q?8cwRqIFkLulxupfFcjtLWAXblOQOVX4JG8YKqG3dQ1NCibh96QfV16OQ/GEN?=
- =?us-ascii?Q?gCyZvvM6cPbjHjw2hyK4KmYemHTN8C07vL6DnFq+cvutBjxThMku93AdvxIg?=
- =?us-ascii?Q?I7uAXEpVyQ9HXjVvu4nFyhAGZUP1SiGls8qJVfewC24X/yDT2X0TPGcXLznE?=
- =?us-ascii?Q?ChEqYeQ570ME/LOFUOrg8uJL/A4rlHa8d9zTcft8Azt5BH8IbqJqlGtYi4Al?=
- =?us-ascii?Q?exmfJM6oeArVVPeqloUMObReM2+r3ptPWUX767YuIpH91XkFuwo7Wbh09ua4?=
- =?us-ascii?Q?bI/L3VFkQx6zFBeHCAKwMgrl7bGoF140ul/MlBd7B5DGv/0Dvkhkhg6pbim+?=
- =?us-ascii?Q?Q0msCT5mWhTk9vQ/NYCP2DY4XHmVfz+LxCKpWaxRfuxt8revqMSRUvJNXl4F?=
- =?us-ascii?Q?/rnPFs0y2mYID1QeZxBjRYCM5IXWHj/SY6ibTTua1GNdi0nSsb7j5F2MFl48?=
- =?us-ascii?Q?QrOsU21GRYTLc55D2YQcytwoMe/NnxWo9JxHBV+gke+RnI2IGLSCP9ArZmx2?=
- =?us-ascii?Q?yuYuadfxGhr3/1gSZ2klbtAQGtlFrvHsPTfmIq2DZvCCtJv63h86TfCPwv23?=
- =?us-ascii?Q?pRPZViOwj0VZhO1RTutSodZ/PgNwQGWXJ2iABx3nGrgfshSpm5x1iiG1R9kW?=
- =?us-ascii?Q?G+UuDluJWBcpqyn4kUOOwKFKVHbzva5k+SGrn4glgcqW1LRtqp5qFUV81gaR?=
- =?us-ascii?Q?5/2m5GbA+bGKYejuLw9pLbZFfL5Ln+dERe2bJH1wozHaifK1g3a1nJ0756lw?=
- =?us-ascii?Q?UtopHgr9aB/GqLKtOHHSO2bshyNvyRBzgPhaqYykMe9rBnFzUx9YUJQEgArz?=
- =?us-ascii?Q?cBJOH60CN173oOCaO991ovhd3ESDMfYcUMbKxAH+NoLPruxRbem6ijNmX4nK?=
- =?us-ascii?Q?oztS20WCCkyUyvU01ceu7i38NxPdKuTOL8FegoXONccwgjsvnN4iiamE+Aax?=
- =?us-ascii?Q?g8XNjcQTTh3KX4j8b3SORc85hTGnvTG1V6s6fKnqA9qqfOWB7LeIIz3ROWVN?=
- =?us-ascii?Q?ccH8V2jhZkwy2Zblw8Mk8Mi3MWBWbV2jvcnsD+LjpGgotbJEjpjSjMbkUxnZ?=
- =?us-ascii?Q?KA8EjCh3++KBOnEQdR/rFNc9uny1oX7AtpmjiInsYMvDUw=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?v8Nr3j3pradmh9851pR9VQqnxxdPAIYWThsiBHzsy33686lhZHPS6lL5cAX3?=
+ =?us-ascii?Q?djWDYQOQMo6nEIlaTXjsITsJ7J1C//mHx0BjDtbyfB/XIc97NFKk4zA4h+RZ?=
+ =?us-ascii?Q?qLhzDIQPhfVOqMu0p3eF7euGOd87PhFG/HMTiKNnsFVK2Jr7NSPyyA3pr93d?=
+ =?us-ascii?Q?0FYycfLiSWblfGU+BtOJonaMddylaKXtEAmiLeDOzQN1am1y3OXNaJwjQl/3?=
+ =?us-ascii?Q?cRxVgX1+yLOauDkxggOTbhN/HHUiRpvWqftTEnAhL/OKlOIKEyO2qtDrK89o?=
+ =?us-ascii?Q?sxFR902UexNZUyNwRS1Zaun7HnN8dpP0MzMUAmhaWbYEqnohMV4QjWwBKnX/?=
+ =?us-ascii?Q?3lSzKHWRxa56Zw+8nazeH/BMtsmVK3u9Ep3JIhBgZXp5JBZ3Yie+eiieRHPJ?=
+ =?us-ascii?Q?oJ7m7R23dfIuOzOHpkwjzE2buhiOgssilbljr7WyR5Juml6rYSNaWwpXWl0j?=
+ =?us-ascii?Q?3DBgBnlUbbwZzGlRzO2YN18/c9dN59ELAnIEAzY/IkayWrrzZ7g07hjWvrI7?=
+ =?us-ascii?Q?JcPOV8WeeiSGOctlbh7RLmTtv7AJwXsfKTnqPJfghQjk43trtpy6HsAOqUgY?=
+ =?us-ascii?Q?VqrRM/3yKub6iPmspRQ2WN9r74j81crdpQuvWGTYiOgCu+O4A5gyUj04CwlM?=
+ =?us-ascii?Q?ITwOdrKlcaBV7mdWhjzl/ev+9k5kyJG1YFozgiM2CaSVn9WP6iHTvQxRV2rE?=
+ =?us-ascii?Q?GPCfP3omTh0guLGtDF1LA2hcAkUThaBg/etk53pMeQf78iB8KvfLHVDB/CeO?=
+ =?us-ascii?Q?vH7iQlL38EnNUfdtibvfR0ckGsLVzfTWT33d0FxLiSaVB4N9XTYsbUVCNhZy?=
+ =?us-ascii?Q?sbCnpoFj4u08PykvovUqCBlKHoFPu9hXPylNASjf+PiyTDNJRguxb1kTwYmC?=
+ =?us-ascii?Q?GI547yRahpotOWjqxpp6kM1uiY/lG8m6IoFtGCIqgV8FWcOREc+bAC59JoWw?=
+ =?us-ascii?Q?xfnDT2aeKSHrh4nxkc4Jl1rCkBU33utLra/JofadmTLcAuLpNz8q2kU5sKit?=
+ =?us-ascii?Q?ARm0mHJvhNuOwzQ/9217LLe0fp0gEaQNVxgTbDFr8Hc7YLCeKrrW2D7JuwBK?=
+ =?us-ascii?Q?STNBRrdKScpfmO0Nnqg7p6N5/d7QUtqo8r/oeUeVzsIedGKl+2RLgR792N4k?=
+ =?us-ascii?Q?7Mepjx0kWfO/RqIIwh44QqGwG3GBGtsnEZz6IPh6nIcEDJf17riUYGGMRJQV?=
+ =?us-ascii?Q?xB6Hro6RaERSwkKoIYSYwOI+wRz+UjZsjDAh2v/H3jjBjcuCY4QoGO98RdGn?=
+ =?us-ascii?Q?qM5X/Wc32ciH3irT1RQf3xYKUL1wvmqeIjTd4qe6UywdJzA6W82QiLnqRHqT?=
+ =?us-ascii?Q?LBmCiKo32ptIuLoy/FYL/KuRrqR+YuvVxxtHIAsEMe8/9A=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e5d2fc42-033a-475a-aa14-08d92ba7078b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2021 00:31:03.4577
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a66ea5c-d25a-47bc-9fff-08d92ba832c1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2021 00:39:25.4939
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zsFZWOI9tcACRiQpcdBIoNpK/zp45IyOhK5byCJOP2bG156s52DgmfMhJkai2rTPtlD5ZRP+tg/wfco13N6Icg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5100
+X-MS-Exchange-CrossTenant-userprincipalname: DiJlmSvTwHjnUvNZBKJZC9hgH4FttRmHstN7sF35n1Lo3AkVXyjyTc1I91MvOL91yxMNXljqSTyNPbFavBoIbA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR0401MB3528
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/06/10 1:54, Bart Van Assche wrote:=0A=
-> On 6/8/21 9:46 PM, Damien Le Moal wrote:=0A=
+On 2021/06/10 2:25, Bart Van Assche wrote:=0A=
+> On 6/8/21 10:03 PM, Damien Le Moal wrote:=0A=
 >> On 2021/06/09 8:07, Bart Van Assche wrote:=0A=
->>> +#define SHOW_INT(__FUNC, __VAR)						\=0A=
->>>  static ssize_t __FUNC(struct elevator_queue *e, char *page)		\=0A=
->>>  {									\=0A=
->>>  	struct deadline_data *dd =3D e->elevator_data;			\=0A=
->>> -	int __data =3D __VAR;						\=0A=
->>> -	if (__CONV)							\=0A=
->>> -		__data =3D jiffies_to_msecs(__data);			\=0A=
->>> -	return deadline_var_show(__data, (page));			\=0A=
->>> -}=0A=
->>> -SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[DD_READ], 1);=
-=0A=
->>> -SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[DD_WRITE], 1=
-);=0A=
->>> -SHOW_FUNCTION(deadline_writes_starved_show, dd->writes_starved, 0);=0A=
->>> -SHOW_FUNCTION(deadline_front_merges_show, dd->front_merges, 0);=0A=
->>> -SHOW_FUNCTION(deadline_fifo_batch_show, dd->fifo_batch, 0);=0A=
->>> -#undef SHOW_FUNCTION=0A=
->>> +									\=0A=
->>> +	return sysfs_emit((page), "%d\n", __VAR);			\=0A=
->>> +}=0A=
->>> +#define SHOW_JIFFIES(__FUNC, __VAR) SHOW_INT(__FUNC, jiffies_to_msecs(=
-__VAR))=0A=
+>>>  struct deadline_data {=0A=
+>>>  	/*=0A=
+>>>  	 * run time data=0A=
+>>>  	 */=0A=
+>>>  =0A=
+>>>  	/*=0A=
+>>> -	 * requests (deadline_rq s) are present on both sort_list and fifo_li=
+st=0A=
+>>> +	 * Requests are present on both sort_list[] and fifo_list[][]. The=0A=
+>>> +	 * first index of fifo_list[][] is the I/O priority class (DD_*_PRIO)=
+.=0A=
+>>> +	 * The second index is the data direction (rq_data_dir(rq)).=0A=
+>>>  	 */=0A=
+>>>  	struct rb_root sort_list[DD_DIR_COUNT];=0A=
+>>> -	struct list_head fifo_list[DD_DIR_COUNT];=0A=
+>>> +	struct list_head fifo_list[DD_PRIO_COUNT][DD_DIR_COUNT];=0A=
 >>=0A=
->> jiffies_to_msecs() returns an unsigned int but sysfs_emit() in SHOW_INT(=
-) uses a=0A=
->> %d format. That will cause problems, no ?=0A=
+>> Would it make sense to pack these 2 into a sub structure ? e.g.:=0A=
+>>=0A=
+>> struct deadline_lists {=0A=
+>> 	struct rb_root sort_list;=0A=
+>> 	struct list_head fifo_list[DD_PRIO_COUNT];=0A=
+>> };=0A=
+>>=0A=
+>> struct deadline_data {=0A=
+>> 	...=0A=
+>> 	/*=0A=
+>> 	 * Requests are present on both sort_list[] and fifo_list[][]. The=0A=
+>> 	 * first index of fifo_list[][] is the I/O priority class (DD_*_PRIO).=
+=0A=
+>> 	 * The second index is the data direction (rq_data_dir(rq)).=0A=
+>>  	 */=0A=
+>> 	struct deadline_lists	lists[DD_DIR_COUNT];=0A=
+>  The deadline_fifo_request() function and several other functions=0A=
+> examine both directions so I think that grouping per direction would=0A=
+> complicate these functions. Grouping per I/O priority might help to make=
+=0A=
+> these functions easier to read. Do you want me to look further into this?=
+=0A=
+=0A=
+If the code is simplified, yes, let's do it ! And Hannes will be happy as t=
+he=0A=
+array of arrays will be removed :)=0A=
+=0A=
+>>> +	struct deadline_data *dd =3D q->elevator->elevator_data;=0A=
+>>> +	const u8 ioprio_class =3D dd_rq_ioclass(next);=0A=
+>>> +	const enum dd_prio prio =3D ioprio_class_to_prio[ioprio_class];=0A=
+>>> +=0A=
+>>> +	if (next->elv.priv[0]) {=0A=
+>>> +		dd_count(dd, merged, prio);=0A=
+>>> +	} else {=0A=
+>>> +		WARN_ON_ONCE(true);=0A=
+>>> +	}=0A=
+>>=0A=
+>> No need for the curly brackets I think.=0A=
 > =0A=
-> The corresponding store functions restrict values that represent a time=
+> I can leave these out but you may want to know that leaving the curly=0A=
+> brackets out from this patch will make it necessary to introduce these=0A=
+> in the next patch in this series.=0A=
+> =0A=
+>>> +/* Number of requests queued for a given priority level. */=0A=
+>>> +static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)=0A=
+>>> +{=0A=
+>>> +	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);=0A=
+>>=0A=
+>> This also includes requests that are being executed on the device. Is th=
+at OK ?=0A=
+> =0A=
+> Yes, and that's on purpose. Please note that this function is only used=
 =0A=
-> in jiffies to the interval [0, INT_MAX] milliseconds so I think that=0A=
-> using %d to format a time in milliseconds is fine.=0A=
+> to export statistics to user space.=0A=
 =0A=
-Missed that part :) OK then.=0A=
+Yes, I got it that it is only for stats shown to the user. I am just wonder=
+ing=0A=
+if we need to separate in-flight requests and queued requests. That should =
+be=0A=
+easy to do since you also have the dispatched count.=0A=
+But again, not entirely sure if it is useful to have such level of detail. =
+So I=0A=
+guess it is OK as is for now. We can revisit later if needed.=0A=
 =0A=
 > =0A=
 > Thanks,=0A=
