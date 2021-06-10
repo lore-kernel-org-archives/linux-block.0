@@ -8,61 +8,58 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCE1C47094
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 07:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B756C47094
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 07:23:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B736C613C9
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 07:23:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 640F8613C9
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 07:23:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbhFJHZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 03:25:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35422 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbhFJHY7 (ORCPT
+        id S230267AbhFJHZm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 03:25:42 -0400
+Received: from mail-pl1-f182.google.com ([209.85.214.182]:37857 "EHLO
+        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230393AbhFJHZj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 03:24:59 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83D2C06175F;
-        Thu, 10 Jun 2021 00:22:47 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso4992207pjx.1;
-        Thu, 10 Jun 2021 00:22:47 -0700 (PDT)
+        Thu, 10 Jun 2021 03:25:39 -0400
+Received: by mail-pl1-f182.google.com with SMTP id h12so508339plf.4;
+        Thu, 10 Jun 2021 00:23:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :in-reply-to:references;
-        bh=kfQ3tysIoxsatHCHD/2ZhyT8LCxPccS8PgExkIm8Ohw=;
-        b=YuNTH/WPBz0RcBqYDcg7MOg05TkYxAeFC6uTvZHLnQtsB55wVeI8iXMoqkeXqd0jqT
-         B22YepKsHMZTVdraNru3SOZB07/IGW9adclkEo5jbL9CNYZ+NoQtboc1bVbMbz1kl3Js
-         IuLlTdDFaSqX8/jsprCpa2MFa2OSutCArAoX3qUfgltlQzprcifXA7T+k7hLyDtBgzLg
-         IrT00i3xPovMloatCmVkom5MssMYdP0BdrHEtpNxh4VXimzOQcQfz47qMZGgKFhqMmz8
-         tDMo7JubsQpRvkHVctK9b/FNwfn/5ojmEspcIJ1wFBMwtgg8sb4B+615ouEspBUGYbyS
-         1dqQ==
+        bh=GxLL6QnmEPTEzqADHSi/TrcJeIj4iMdkXLkWOx3ig7I=;
+        b=Vcj2iPzdqscLRGdr+q354xSBqw6bXuq9O5vYlPsWUBaS48a/P9zzT1XqICMHISNEaf
+         sTK2VU1i0ZOAh85T0vorfHzlHUgu6d7uzFnIc3DslGB9JnBmYFWo6A2D27onhz1n8RnS
+         thyrcm3uJ/EzaZWOY0EI/AGN6McVByhFOCrZxBKy8IcZ7xgxNJ3Igg3tQH+5uroE2yLr
+         v3s/DahvZC/UeppYPHuk0FoKzUHGXWXd74cAMJlPNafoCyLTJiE6yIn4xYzPCh+60J/l
+         LZnfiSZ3naUUDqGB+S+vmgIaYwPtrv9U80a/UoYgpiH/SxFDeAoKa0i7GxJXV5BVUgKa
+         YOdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:in-reply-to:references;
-        bh=kfQ3tysIoxsatHCHD/2ZhyT8LCxPccS8PgExkIm8Ohw=;
-        b=PUGfGTrZkvU73KYIPciDB/3fQrh2a7W4proVbn+jOGMoWLUojI56ArR21PJTfm1Xo8
-         SatpMNBPn9cDpRMmjMfm/tSBOybRt+oc/wx2h+Ub2NEXAliz4qBKohMOepESCEBFyhFA
-         KXIPcDsGzwPqp4z6MHvly0C6hqbGIPepKmeAYp+4orSCzVITkhS2J2IUgL4EDOls/9mZ
-         8zHGe52PH7R4mQP6KbAoBli+sqUs6HD7lFaEroq0TqZQHSvWzxsXZ2o2cAa/p1a0SGVt
-         l0SNc9scl/ldOtOUFviVr7DqK7M+XCp4XzyI0Sud6BqzlaaZyWepHzNsWXPJ1eEVulwM
-         /a0w==
-X-Gm-Message-State: AOAM5303M6Hx/8aYFdUNESWCxehLsilHCifaJoGIzLK3w3J//7Di5r09
-        fP4mZQf5jTWyba2CiibbaEY=
-X-Google-Smtp-Source: ABdhPJzmtp4vb1n3UQjfUtiT5FOILGB2PveaNJ4ICvMaNmjRI5PSbEWClY2dhEYcTllc/SARGzVgTA==
-X-Received: by 2002:a17:90a:ee84:: with SMTP id i4mr2033827pjz.34.1623309767559;
-        Thu, 10 Jun 2021 00:22:47 -0700 (PDT)
+        bh=GxLL6QnmEPTEzqADHSi/TrcJeIj4iMdkXLkWOx3ig7I=;
+        b=h9zSYDgC9JgawwO1bhNKrwE/Z9URc+WEmhHrcjh4qsf/xixEKTDDDj0co6FAL73Ddv
+         X2WwHRTQYpO3OPjeG5pVpLh5Sabh0hpTHqyeiG2CSDaBAYMmEI/jqHzs3rty/d4AJUR9
+         p3si9F0lEUBTRLEJ06WqlJccFKDbnHq55ZFYSmx6BkSSw55/YXsTuMd/XG4tRbQ8QlU+
+         Zo7QnSJmF7kRDIoP+pwCyP7eV3ZLi4oC9QYPvrkADnkd52JkFR91zgfEU5RRx7kz6gUv
+         z2/XigROq5wlf2P62cCto/6zofW49Kq6EMHHxVJ7M3YPp52hxe9LavT7RkxL/Ga15N+n
+         qEtQ==
+X-Gm-Message-State: AOAM533Zm99LAUa7503U6R3o8kvbpJopNTS+Wk+I0HOBxijHqiOXIjzs
+        4ZmDYpoufpMUaaQaHjRH3Uw=
+X-Google-Smtp-Source: ABdhPJzTpsHkyCqWi/r5iKPtQH+F0Igw9fTmnl8q9J2nWrDMQAzlfKQfuAW/iIzKzK9KX6SBIYluSA==
+X-Received: by 2002:a17:90a:3f17:: with SMTP id l23mr1919689pjc.229.1623309763612;
+        Thu, 10 Jun 2021 00:22:43 -0700 (PDT)
 Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id u24sm1591310pfm.200.2021.06.10.00.22.46
+        by smtp.gmail.com with ESMTPSA id u24sm1591310pfm.200.2021.06.10.00.22.42
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Jun 2021 00:22:47 -0700 (PDT)
+        Thu, 10 Jun 2021 00:22:43 -0700 (PDT)
 From:   brookxu <brookxu.cn@gmail.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RESEND PATCH 6/8] bfq: optimize the calculation of bfq_weight_to_ioprio()
-Date:   Thu, 10 Jun 2021 15:22:35 +0800
-Message-ID: <d824bd955851ea5cb5af54b6b901045f058207b2.1618916839.git.brookxu@tencent.com>
+Subject: [RESEND PATCH 3/8] bfq: limit the IO depth of CLASS_IDLE to 1
+Date:   Thu, 10 Jun 2021 15:22:32 +0800
+Message-ID: <34edd545a9f6f6b327fc6779fbd17fd3a519ed4c.1618916839.git.brookxu@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1ce935f1bb10e0c7ecea7b79b826ff4cfc89acf0.1618916839.git.brookxu@tencent.com>
 References: <1ce935f1bb10e0c7ecea7b79b826ff4cfc89acf0.1618916839.git.brookxu@tencent.com>
@@ -71,35 +68,44 @@ References: <cover.1618916839.git.brookxu@tencent.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
-Message-ID: <20210610072235.TcwN2nMpCtTpp1wh34mviKP_xpVox8LxGUMaTbTzJxQ@z>
+Message-ID: <20210610072232.lT9oUiJ6U64HauWNK7SMhy2JbSaW-Y-GYlZoFFqf5LA@z>
 
 From: Chunguang Xu <brookxu@tencent.com>
 
-The value range of ioprio is [0, 7], but the result of
-bfq_weight_to_ioprio() may exceed this range, so simple
-optimization is required.
+The IO depth of queues belong to CLASS_IDLE is limited to 1,
+so that it can avoid introducing a larger tail latency under
+a device with a larger IO depth. Although limiting the IO
+depth may reduce the performance of idle_class, it is
+generally not a big problem, because idle_class usually does
+not have strict performance requirements.
 
 Signed-off-by: Chunguang Xu <brookxu@tencent.com>
 ---
- block/bfq-wf2q.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/bfq-iosched.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 619ed21..ea5b90d 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -527,8 +527,9 @@ unsigned short bfq_ioprio_to_weight(int ioprio)
-  */
- static unsigned short bfq_weight_to_ioprio(int weight)
- {
--	return max_t(int, 0,
--		     IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF - weight);
-+	int ioprio = IOPRIO_BE_NR  - weight / BFQ_WEIGHT_CONVERSION_COEFF;
-+
-+	return ioprio < 0 ? 0 : min_t(int, ioprio, IOPRIO_BE_NR - 1);
- }
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index ec482e6..29940ec 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4808,6 +4808,17 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	if (!bfqq)
+ 		goto exit;
  
- static void bfq_get_entity(struct bfq_entity *entity)
++	/*
++	 * Here, the IO depth of queues belong to CLASS_IDLE is limited
++	 * to 1, so that it can avoid introducing a larger tail latency
++	 * under a device with a larger IO depth. Although limiting the
++	 * IO depth may reduce the performance of idle_class, it is
++	 * generally not a big problem, because idle_class usually
++	 * does not have strict performance requirements.
++	 */
++	if (bfq_class_idle(bfqq) && bfqq->dispatched)
++		goto exit;
++
+ 	rq = bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
+ 
+ 	if (rq) {
 -- 
 1.8.3.1
 
