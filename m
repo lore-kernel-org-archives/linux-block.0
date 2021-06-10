@@ -2,164 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226D9C47094
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22940C48BDF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:40:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01255613C9
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:25:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0235761040
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 17:40:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230113AbhFJR1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 13:27:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57042 "EHLO
+        id S229990AbhFJRl5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 13:41:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbhFJR1y (ORCPT
+        with ESMTP id S229823AbhFJRl4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 13:27:54 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7B0C061574;
-        Thu, 10 Jun 2021 10:25:44 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id u30so28123882qke.7;
-        Thu, 10 Jun 2021 10:25:44 -0700 (PDT)
+        Thu, 10 Jun 2021 13:41:56 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FACFC061760;
+        Thu, 10 Jun 2021 10:40:00 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id i67so28172184qkc.4;
+        Thu, 10 Jun 2021 10:40:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=4CbH0oxqWjWybjwnc7vATc9qIBqCZvVekuNecAP/vew=;
-        b=MMC3bPr+SEYnKoWDRnrnWAPVc9j3G1+TGfdLktOvSdfh79M9ynmHYiiQyu+9E3tSki
-         2IQ9xigRrIUjKFMp+T7ORXimNtN/CAkn+AtoUCSsBGmJtXU2M2+Bzrm4aEdGf89SIuvi
-         llZsoe22QBaNMolPCe8WGD5zw0qzFf2GBejPxw5xYuXIcat+NMC3ADqmXLByw2RJs72+
-         6wpC3FPFe/nZVDjcK/st+PoOyAG/BC6Fv/dLdr1wgJzKYZpPGkV9Z9e1xMMHGoDS3NaH
-         Tt7kEDLw7N7psspxptlB7HoJyf3ofIWn5Ah9qHbV+Ah0vfCHn26uONM3bAdh18fVS1SS
-         axCA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=lCRNE9exhy9WFifL3FriooCp94kazhT9QF+anNMPc+4=;
+        b=dI1xhGmDysXuwpJBMly8vuj6ZM3geTPTQNJnlNbuNn1TvzYLVZIAlunDY8WjPNCQD0
+         SHoNxvOLSL7p9GkdGgqn37dwEZ+LUV7qQUuI/uCl1LPgyZrPo//RN3ZqAwVDTugPnW7r
+         CDx3JGc6pq8zDTyCYP76qQYlKn5lodwZUqJNFtsiyTTvQBYVU143jfaaf1/bV/jkpzsk
+         AIO+v3rZMLkvxDe/ucUme7O1n5RT9S/eyFr1wILK09Hv+lwqlU2ztuUg/1BA05eJdkBP
+         G3RHRZUrS73Ssw5Z+S9VQ8T7vYtRpxi0d7thnsFRl+4zJ6aSoo1RtUMsmr19OIpatJX2
+         hdfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=4CbH0oxqWjWybjwnc7vATc9qIBqCZvVekuNecAP/vew=;
-        b=lUkQsjz+iTS9mHMRNL4+pc7shE3KJnvmlRAzpxpPNtwRIJmHH7j8W71W2c7Y/IkfJ0
-         Fpzf6XGG+WWX2YbudhZp7Iogx2ngDDUPxxC6pe4ooWzEq/lBdTi5AQJTZ54jkUwFel+6
-         6rf0uRlTomXyiLpHhm/aLMdRHKmzJMFcb/gb21Hgd7KBmVEPZ4VLgc5uAhOJBE7WWAHt
-         yb+3kJKHwhJs2ZfOo0EeLITAZJefHtNSYiTP+m74vFf9cgxowhGoonYfCBqrfRIDDT3H
-         hOYOyswdDohHe9EWahD4Jyb+AF2/6aLiTOVsn4vErw9O6YjWkqndOz6wN8AIKt80hq3V
-         jgVw==
-X-Gm-Message-State: AOAM533cji1UaBEa4VL2UNNPypshmhdEGMzZSzrdtn6vqt7KLupcOAaj
-        /Od8DgvM0WVMP0CHfscPEV0DYod8x1wmapa0
-X-Google-Smtp-Source: ABdhPJyR9uB8qh+MPr+c6X0rAhfgf25q3yo9yVVaHLu3A7hi4PbOnPLbS2MXt45uL4Webz+HuIj0SQ==
-X-Received: by 2002:a05:620a:1662:: with SMTP id d2mr573258qko.289.1623345940302;
-        Thu, 10 Jun 2021 10:25:40 -0700 (PDT)
-Received: from localhost.localdomain (pool-173-48-195-35.bstnma.fios.verizon.net. [173.48.195.35])
-        by smtp.gmail.com with ESMTPSA id v25sm2581889qtf.68.2021.06.10.10.25.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 10:25:39 -0700 (PDT)
-Subject: Re: [LSF/MM/BPF TOPIC] durability vs performance for flash devices
- (especially embedded!)
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jaegeuk Kim <jaegeuk.kim@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        lsf-pc@lists.linux-foundation.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-References: <55d3434d-6837-3a56-32b7-7354e73eb258@gmail.com>
- <0e1ed05f-4e83-7c84-dee6-ac0160be8f5c@acm.org>
- <YMEItMNXG2bHgJE+@casper.infradead.org>
- <e9eaf87d-5c04-8974-4f0f-0fc9bac9a3b1@acm.org>
- <CAOtxgyeRf=+grEoHxVLEaSM=Yfx4KrSG5q96SmztpoWfP=QrDg@mail.gmail.com>
- <eafad7a6-4784-dd9c-cc1d-36e463370aeb@gmail.com>
- <YMJGqkwL87KczMS+@casper.infradead.org>
-From:   Ric Wheeler <ricwheeler@gmail.com>
-Message-ID: <97ecb393-db84-c71d-6162-d8309400b0ee@gmail.com>
-Date:   Thu, 10 Jun 2021 13:25:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=lCRNE9exhy9WFifL3FriooCp94kazhT9QF+anNMPc+4=;
+        b=YTsKJ7C+z4OwPWxzRA7WttK2FJnMuxAeumRdAg0bupropCMmJ9MgxOJAVGdfapHmII
+         4OhiNqRJmRpPawsUFYnIotZ8+wg9n0vTd0hHSBNAlhf+N/hVS/fnoDr7szQ+iPdh/4TZ
+         9SJVUvBp3PuoJIZz1/yvrL+Wl0diNCJUsxrTmhzixzedObn0lbjeRHJaOu4rdaTjqIff
+         mGdt0UqEiDl0HjfK8nZQoe8/hQymjGoskrZTgM4+qMIii/etm7fZ7vLD/f6a/lDvbTrV
+         AmHdrCs/0Y1zSWuTHPk0eg5qmHacN7RRaGX0jI3SH3r/OuqInNWm7YbbYTI39zNLanfd
+         7xoQ==
+X-Gm-Message-State: AOAM5309WYCQ7W2yJdrTYtQSzpk7/jxsDbD5q3sSOup0ceAdipFWxUVY
+        DqQv5x865SkxYAwULF2yYxr5YPchpnJOtQ==
+X-Google-Smtp-Source: ABdhPJzFS+uzwQQDi9zLu+5+kiu1XvD6gyrC+7sETMR5NPRMnlEXNi5JljAeEI6pFSx88iJ07lbaCw==
+X-Received: by 2002:a37:9a91:: with SMTP id c139mr657570qke.50.1623346799488;
+        Thu, 10 Jun 2021 10:39:59 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:be7a])
+        by smtp.gmail.com with ESMTPSA id t8sm2542697qtp.7.2021.06.10.10.39.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jun 2021 10:39:59 -0700 (PDT)
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list),
+        cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
+        linux-mm@kvack.org (open list:MEMORY MANAGEMENT),
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Tejun Heo <tj@kernel.org>, Chris Down <chris@chrisdown.name>,
+        Jens Axboe <axboe@kernel.dk>,
+        Shakeel Butt <shakeelb@google.com>
+Subject: [PATCH 2/3] mm: Charge active memcg when no mm is set
+Date:   Thu, 10 Jun 2021 10:39:43 -0700
+Message-Id: <20210610173944.1203706-3-schatzberg.dan@gmail.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
+References: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YMJGqkwL87KczMS+@casper.infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/10/21 1:06 PM, Matthew Wilcox wrote:
-> On Thu, Jun 10, 2021 at 12:22:40PM -0400, Ric Wheeler wrote:
->> On 6/9/21 5:32 PM, Jaegeuk Kim wrote:
->>> On Wed, Jun 9, 2021 at 11:47 AM Bart Van Assche <bvanassche@acm.org
->>> <mailto:bvanassche@acm.org>> wrote:
->>>
->>>      On 6/9/21 11:30 AM, Matthew Wilcox wrote:
->>>      > maybe you should read the paper.
->>>      >
->>>      > " Thiscomparison demonstrates that using F2FS, a flash-friendly file
->>>      > sys-tem, does not mitigate the wear-out problem, except inasmuch asit
->>>      > inadvertently rate limitsallI/O to the device"
->>>
->>>
->>> Do you agree with that statement based on your insight? At least to me, that
->>> paper is missing the fundamental GC problem which was supposed to be
->>> evaluated by real workloads instead of using a simple benchmark generating
->>> 4KB random writes only. And, they had to investigate more details in FTL/IO
->>> patterns including UNMAP and LBA alignment between host and storage, which
->>> all affect WAF. Based on that, the point of the zoned device is quite promising
->>> to me, since it can address LBA alignment entirely and give a way that host
->>> SW stack can control QoS.
->> Just a note, using a pretty simple and optimal streaming write pattern, I
->> have been able to burn out emmc parts in a little over a week.
->>
->> My test case creating a 1GB file (filled with random data just in case the
->> device was looking for zero blocks to ignore) and then do a loop to cp and
->> sync that file until the emmc device life time was shown as exhausted.
->>
->> This was a clean, best case sequential write so this is not just an issue
->> with small, random writes.
-> How many LBAs were you using?  My mental model of a FTL (which may
-> be out of date) is that it's essentially a log-structured filesystem.
-> When there are insufficient empty erase-blocks available, the device
-> finds a suitable victim erase-block, copies all the still-live LBAs into
-> an active erase-block, updates the FTL and erases the erase-block.
->
-> So the key is making sure that LBAs are reused as much as possible.
-> Short of modifying a filesystem to make this happen, I force it by
-> short-stroking my SSD.  We can model it statistically, but intuitively,
-> if there are more "live" LBAs, the higher the write amplification and
-> wear on the drive will be because the victim erase-blocks will have
-> more live LBAs to migrate.
->
-> This is why the paper intrigued me; it seemed like they were rewriting
-> a 100MB file in place.  That _shouldn't_ cause ridiculous wear, unless
-> the emmc device was otherwise almost full.
+set_active_memcg() worked for kernel allocations but was silently
+ignored for user pages.
 
-During the test run, I did not look at which LBA's that got written to over the 
-couple of weeks.
+This patch establishes a precedence order for who gets charged:
 
-Roughly, I tried to make sure that the file system ranged in fullness from 50% 
-to 75% (did not let it get too close to full).
+1. If there is a memcg associated with the page already, that memcg is
+   charged. This happens during swapin.
 
-Any vendor (especially on the low end parts) might do something really 
-primitive, but the hope I would have is similar to what you describe - if there 
-is sufficient free space, the firmware should be able to wear level across all 
-of the cells in the device. Overwriting in place or writing (and then 
-freeing/discarded) each LBA *should* be roughly equivalent. Free space being 
-defined as LBA's that are not known to the device as those without valid, 
-un-discarded data.
+2. If an explicit mm is passed, mm->memcg is charged. This happens
+   during page faults, which can be triggered in remote VMs (eg gup).
 
-Also important to write enough to flush through any possible DRAM/SRAM like 
-cache a device might have that could absorb tiny writes.
+3. Otherwise consult the current process context. If there is an
+   active_memcg, use that. Otherwise, current->mm->memcg.
 
-The parts I played with ranged from what seemed to be roughly 3x write 
-amplification for the workload I ran down to more like 1.3x write amplification 
-(measured super coarsely as app level IO dispatched so all metadata, etc counted 
-as "WA" in my coarse look). Just trying to figure out for a given IO/fs stack, 
-how specific devices handle the user workload.
+Previously, if a NULL mm was passed to mem_cgroup_charge (case 3) it
+would always charge the root cgroup. Now it looks up the active_memcg
+first (falling back to charging the root cgroup if not set).
 
-Regards,
+Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Chris Down <chris@chrisdown.name>
+Acked-by: Jens Axboe <axboe@kernel.dk>
+Reviewed-by: Shakeel Butt <shakeelb@google.com>
+---
+ mm/filemap.c    |  2 +-
+ mm/memcontrol.c | 41 +++++++++++++++++++++++++++--------------
+ mm/shmem.c      |  4 ++--
+ 3 files changed, 30 insertions(+), 17 deletions(-)
 
-Ric
-
+diff --git a/mm/filemap.c b/mm/filemap.c
+index ba1068a1837f..bde9c167c056 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -872,7 +872,7 @@ noinline int __add_to_page_cache_locked(struct page *page,
+ 	page->index = offset;
+ 
+ 	if (!huge) {
+-		error = mem_cgroup_charge(page, current->mm, gfp);
++		error = mem_cgroup_charge(page, NULL, gfp);
+ 		if (error)
+ 			goto error;
+ 		charged = true;
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index 4e6c6658ca0d..919736ee656b 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -902,13 +902,24 @@ struct mem_cgroup *mem_cgroup_from_task(struct task_struct *p)
+ }
+ EXPORT_SYMBOL(mem_cgroup_from_task);
+ 
++static __always_inline struct mem_cgroup *active_memcg(void)
++{
++	if (in_interrupt())
++		return this_cpu_read(int_active_memcg);
++	else
++		return current->active_memcg;
++}
++
+ /**
+  * get_mem_cgroup_from_mm: Obtain a reference on given mm_struct's memcg.
+  * @mm: mm from which memcg should be extracted. It can be NULL.
+  *
+- * Obtain a reference on mm->memcg and returns it if successful. Otherwise
+- * root_mem_cgroup is returned. However if mem_cgroup is disabled, NULL is
+- * returned.
++ * Obtain a reference on mm->memcg and returns it if successful. If mm
++ * is NULL, then the memcg is chosen as follows:
++ * 1) The active memcg, if set.
++ * 2) current->mm->memcg, if available
++ * 3) root memcg
++ * If mem_cgroup is disabled, NULL is returned.
+  */
+ struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_struct *mm)
+ {
+@@ -926,8 +937,17 @@ struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_struct *mm)
+ 	 * counting is disabled on the root level in the
+ 	 * cgroup core. See CSS_NO_REF.
+ 	 */
+-	if (unlikely(!mm))
+-		return root_mem_cgroup;
++	if (unlikely(!mm)) {
++		memcg = active_memcg();
++		if (unlikely(memcg)) {
++			/* remote memcg must hold a ref */
++			css_get(&memcg->css);
++			return memcg;
++		}
++		mm = current->mm;
++		if (unlikely(!mm))
++			return root_mem_cgroup;
++	}
+ 
+ 	rcu_read_lock();
+ 	do {
+@@ -940,14 +960,6 @@ struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_struct *mm)
+ }
+ EXPORT_SYMBOL(get_mem_cgroup_from_mm);
+ 
+-static __always_inline struct mem_cgroup *active_memcg(void)
+-{
+-	if (in_interrupt())
+-		return this_cpu_read(int_active_memcg);
+-	else
+-		return current->active_memcg;
+-}
+-
+ static __always_inline bool memcg_kmem_bypass(void)
+ {
+ 	/* Allow remote memcg charging from any context. */
+@@ -6716,7 +6728,8 @@ static int __mem_cgroup_charge(struct page *page, struct mem_cgroup *memcg,
+  * @gfp_mask: reclaim mode
+  *
+  * Try to charge @page to the memcg that @mm belongs to, reclaiming
+- * pages according to @gfp_mask if necessary.
++ * pages according to @gfp_mask if necessary. if @mm is NULL, try to
++ * charge to the active memcg.
+  *
+  * Do not use this for pages allocated for swapin.
+  *
+diff --git a/mm/shmem.c b/mm/shmem.c
+index 34d84465ce3e..9af4b2173fe9 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -1695,7 +1695,7 @@ static int shmem_swapin_page(struct inode *inode, pgoff_t index,
+ {
+ 	struct address_space *mapping = inode->i_mapping;
+ 	struct shmem_inode_info *info = SHMEM_I(inode);
+-	struct mm_struct *charge_mm = vma ? vma->vm_mm : current->mm;
++	struct mm_struct *charge_mm = vma ? vma->vm_mm : NULL;
+ 	struct swap_info_struct *si;
+ 	struct page *page = NULL;
+ 	swp_entry_t swap;
+@@ -1828,7 +1828,7 @@ static int shmem_getpage_gfp(struct inode *inode, pgoff_t index,
+ 	}
+ 
+ 	sbinfo = SHMEM_SB(inode->i_sb);
+-	charge_mm = vma ? vma->vm_mm : current->mm;
++	charge_mm = vma ? vma->vm_mm : NULL;
+ 
+ 	page = pagecache_get_page(mapping, index,
+ 					FGP_ENTRY | FGP_HEAD | FGP_LOCK, 0);
+-- 
+2.30.2
 
