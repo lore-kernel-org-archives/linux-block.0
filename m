@@ -2,145 +2,242 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F28CEC47094
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 14:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A69C48BDF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 15:05:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9BDB60E08
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 14:45:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B639613DD
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 15:05:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231400AbhFJOrp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 10:47:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36112 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230280AbhFJOrn (ORCPT
+        id S231374AbhFJPHG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 11:07:06 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:38348 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230445AbhFJPHF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 10:47:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623336346;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DaR8EEvOWwwKbyA2/NyEHgRAALNGyhbJ1RDxYMv5YZk=;
-        b=RPYkLoYy2FhUPXR5DbG7WrROWl0m0IZE3TRpA8yX6M6FkJpNF796uxLrYA5G3WMBqScHsJ
-        jw0pngNYs8egiay7yXRXaa8VoNcY3atDo8BGPQD1IyLcZOa0H/iB1jqiOTuDXsgeq/N0xt
-        XPOytiUTkPvJWyxwkOC0vBsP1CROhtk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-xsx70SySNLuKK79ZOrNWiQ-1; Thu, 10 Jun 2021 10:45:43 -0400
-X-MC-Unique: xsx70SySNLuKK79ZOrNWiQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 10 Jun 2021 11:07:05 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 782A58049CD;
-        Thu, 10 Jun 2021 14:45:41 +0000 (UTC)
-Received: from T590 (ovpn-13-145.pek2.redhat.com [10.72.13.145])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1067B100760F;
-        Thu, 10 Jun 2021 14:45:34 +0000 (UTC)
-Date:   Thu, 10 Jun 2021 22:45:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ingo Franzki <ifranzki@linux.ibm.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Juergen Christ <jchrist@linux.ibm.com>
-Subject: Re: loop_set_block_size: loop0 () has still dirty pages (nrpages=2)
-Message-ID: <YMIliuPi2tTLUJxv@T590>
-References: <8bed44f2-273c-856e-0018-69f127ea4258@linux.ibm.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 4B1BD1FD3F;
+        Thu, 10 Jun 2021 15:05:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1623337508; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y1u6AVXRqlu9Q/BYkByDk+dwsGv2BpsoWcFSiM1eZAU=;
+        b=gD3MnDSL952svG7i4msvjAWWr72iYzVvTciBz5lHhAJPAj/IkV253S8NBTUeDnX0bSgZcZ
+        /6pSkekO40Un1XOq6M5vBWRUHMIJmn3VZoR9E2OvEGjRzFUZ2gzdz/FhmzzZZy1NGtt7gu
+        fwC9agBXevDdxq2fCgf9Ufi+k+211SY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1623337508;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y1u6AVXRqlu9Q/BYkByDk+dwsGv2BpsoWcFSiM1eZAU=;
+        b=yHuuP+5+YnKwICFKNivdTbWdBcxp+klbxFAt22JPjW7UQuTlnqi0HRMeYiAdOpKqJ7LG74
+        V3HPidN50qtYVZCw==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 26674118DD;
+        Thu, 10 Jun 2021 15:05:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1623337508; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y1u6AVXRqlu9Q/BYkByDk+dwsGv2BpsoWcFSiM1eZAU=;
+        b=gD3MnDSL952svG7i4msvjAWWr72iYzVvTciBz5lHhAJPAj/IkV253S8NBTUeDnX0bSgZcZ
+        /6pSkekO40Un1XOq6M5vBWRUHMIJmn3VZoR9E2OvEGjRzFUZ2gzdz/FhmzzZZy1NGtt7gu
+        fwC9agBXevDdxq2fCgf9Ufi+k+211SY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1623337508;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y1u6AVXRqlu9Q/BYkByDk+dwsGv2BpsoWcFSiM1eZAU=;
+        b=yHuuP+5+YnKwICFKNivdTbWdBcxp+klbxFAt22JPjW7UQuTlnqi0HRMeYiAdOpKqJ7LG74
+        V3HPidN50qtYVZCw==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id EZ2bCCQqwmCjfQAALh3uQQ
+        (envelope-from <hare@suse.de>); Thu, 10 Jun 2021 15:05:08 +0000
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>
+References: <a189ec50-4c11-9ee9-0b9e-b492507adc1e@suse.de>
+ <485837f392401bf35fb7fc8231d7a051f47b53d7.camel@HansenPartnership.com>
+ <539b35c6-34f7-62e0-4d93-6d27145bb78f@suse.de>
+ <f31fbb6d2f374a39d22e3fca122d757e905d2711.camel@HansenPartnership.com>
+From:   Hannes Reinecke <hare@suse.de>
+Organization: SUSE Linux GmbH
+Subject: Re: [LSF/MM/BPF TOPIC] block namespaces
+Message-ID: <33f720ce-484b-0c42-b14a-0a7df3e09e81@suse.de>
+Date:   Thu, 10 Jun 2021 17:05:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8bed44f2-273c-856e-0018-69f127ea4258@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <f31fbb6d2f374a39d22e3fca122d757e905d2711.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 08, 2021 at 02:01:29PM +0200, Ingo Franzki wrote:
-> Hi all,
+On 6/10/21 4:29 PM, James Bottomley wrote:
+> On Thu, 2021-06-10 at 07:49 +0200, Hannes Reinecke wrote:
+>> On 6/9/21 8:36 PM, James Bottomley wrote:
+>>> On Thu, 2021-05-27 at 10:01 +0200, Hannes Reinecke wrote:
+>>>> Hi all,
+>>>>
+>>>> I guess it's time to tick off yet another item on my long-term
+>>>> to-do list:
+>>>>
+>>>> Block namespaces
+>>>> ----------------
+>>>>
+>>>> Idea is similar to what network already does: allowing each user
+>>>> namespace to have a different 'view' on the existing block
+>>>> devices.  EG if the admin creates a ramdisk in one namespace this
+>>>> device should not be visible to other namespaces.  But for me the
+>>>> most important use-case would be qemu; currently the devices need
+>>>> to be set up in the host, even though the host has no business
+>>>> touching it as they really belong to the qemu instance.  This
+>>>> is causing quite some irritation eg when this device has LVM or
+>>>> MD metadata and udev is trying to activate it on the host.
+>>>
+>>> I suppose the first question is "why block only?"  There are
+>>> several existing device namespace proposals which would be more
+>>> generic.
+>>>
+>>
+>> Well; I'm more of a storage person, and do know the needs and 
+>> shortcomings in that area. Less well so in other areas...
 > 
-> we occasionally encounter a problem when setting up a loop device in one of our automated testcases.
+> OK, but this should work for all devices, just like the device cgroup
+> if it's going to be an adjunct to it.
 > 
-> We set up a loop device as follows:
+>>>> Overall plan is to restrict views of '/dev', '/sys/dev/block' and
+>>>> '/sys/block' to only present the devices 'visible' for this
+>>>> namespace.
+>>>
+>>> We actually already have a devices cgroup that does some of this:
+>>>
+>>> https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt
+>>>
+>> I know. But this essentially is a filter on '/dev' only, and needs to
+>> be configured. Which makes it very unwieldy to use.
+>> And the contents of sysfs are not modified, so there's a mismatch 
+>> between contents in /dev and /sys.
+>> Which might cause issues with monitoring tools.
 > 
->     # dd if=/dev/zero of=/var/tmp/loopbackfile1.img bs=1M count=2500 status=none
->     # losetup --sector-size 4096 -fP --show /var/tmp/loopbackfile1.img
+> Firstly, since it does part of what you want, we at least need to
+> understand why you think it can't be enhanced to do everything.
 > 
-> This works fine most of the times, but in the seldom case of the error, we get 'losetup: /var/tmp/loopbackfile1.img: failed to set up loop device: Resource temporarily unavailable'.
+> The /sys problem has been discussed many times.  GregKH really doesn't
+> like the idea of filtering /sys (and most container people agree), so
+> the options available seem to be don't mount /sys in a container or
+> emulate it via fuse.  If you pick either does the device cgroup now
+> work for you?
 > 
-> I am sure that no other loop device is currently defined, so we don't run out of loop devices.
-> 
-> We also see the following message in the syslog when the error occurs:
-> 
->      loop_set_block_size: loop0 () has still dirty pages (nrpages=2)
-> 
-> The nrpages number varies from time to time. 
-> 
-> "Resource temporarily unavailable" is EAGAIN, and function loop_set_block_size() in drivers/block/loop.c returns this after printing the syslog message via pr_warn:
-> 
-> static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
-> {
-> 	int err = 0;
-> 
-> 	if (lo->lo_state != Lo_bound)
-> 		return -ENXIO;
-> 
-> 	err = loop_validate_block_size(arg);
-> 	if (err)
-> 		return err;
-> 
-> 	if (lo->lo_queue->limits.logical_block_size == arg)
-> 		return 0;
-> 
-> 	sync_blockdev(lo->lo_device);
-> 	invalidate_bdev(lo->lo_device);
-> 
-> 	blk_mq_freeze_queue(lo->lo_queue);
-> 
-> 	/* invalidate_bdev should have truncated all the pages */
-> 	if (lo->lo_device->bd_inode->i_mapping->nrpages) {
-> 		err = -EAGAIN;
-> 		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-> 			__func__, lo->lo_number, lo->lo_file_name,
-> 			lo->lo_device->bd_inode->i_mapping->nrpages);
-> 		goto out_unfreeze;
-> 	}
-> 
-> 	blk_queue_logical_block_size(lo->lo_queue, arg);
-> 	blk_queue_physical_block_size(lo->lo_queue, arg);
-> 	blk_queue_io_min(lo->lo_queue, arg);
-> 	loop_update_dio(lo);
-> out_unfreeze:
-> 	blk_mq_unfreeze_queue(lo->lo_queue);
-> 
-> 	return err;
-> }
-> 
-> So looks like invalidate_bdev() did actually not truncate all the pages under some circumstances....
-> 
-> The problem only happens when '--sector-size 4096' is specified, with the default sector size is always works. It does not call loop_set_block_size() in the default case I guess.
-> 
-> The loop0 device has certainly be used by other testcases before, most likely with the default block size. But at the time of this run, no loop device is currently active (losetup shows nothing). 
-> 
-> Anyone have an idea what goes wrong here? 
 
-It returns '-EAGAIN' to ask userspace to try again.
+... begging the question why he relented for network namespaces.
+They _do_ modify sysfs, and that via generic hooks (ie making struct
+class namespace-aware).
+And as this is a public interface I don't see why I can't be using it...
 
-I understand loop_set_block_size() doesn't prevent page cache of this
-loop disk from being dirtied, so it isn't strange to
-see lo_device->bd_inode->i_mapping->nrpages isn't zero after sync_blockdev()
-& invalidate_bdev() on loop.
-
+>>> However, visibility isn't the only problem, for direct passthrough
+>>> there's also uevent handling and people have even asked about
+>>> module loading.
+>>>
+>> I am aware, and that's another reason why device cgroup doesn't cut
+>> it.
 > 
-> This happens on upstream kernels on the s390x platform, but I can't tell if is related to the platform or a specific kernel version. 
+> Christian Brauner is looking at this ... apparently Ubuntu has some
+> thumb drive inside lxc container use case that needs it.
+> 
 
-It can be reproduced easily when you run buffered write on loop disk,
-meantime keeping to change block size from one to another on this loop.
+Guess with whom I'm discussing on how to implement this.
 
+>>>>   Initially the drivers would keep their global enumeration, but
+>>>> plan is to make the drivers namespace-aware, too, such that each
+>>>> namespace could have its own driver-specific device enumeration.
+>>>
+>>> I really wouldn't do this.  Namespace/Cgroup separation should be
+>>> kept as high as possible.  If it leaks into the drivers it will
+>>> become unmaintainable.  Why do you think you need the drivers to be
+>>> aware?  If it's just enumeration, that should all be doable with
+>>> the visibility driver unless you want to do things like compact
+>>> numbering?
+>>>
+>> Which is precisely why I mentioned device modifications.
+>> On a generic level we can influence the visibility of devices in 
+>> relation to namespaces, we cannot influence the devices themselves.
+>> This will lead to namespaces seeing disjunct device numbers (ie 8:0
+>> and 8:8 on ns 1, 8:4 on ns 2). Not that I think that will be an
+>> issue, but  certainly a change in behaviour.
+> 
+> Well, not necessarily, the pid namespace is an example of a remapping
+> namespace.  The same thing could be done for device numbering, but
+> there really needs to be a compelling case.  Given our use of hotplug,
+> why would any tool assume compact numbering?  And if you don't need
+> compact numbering there's no need to bother with remapping.
+> 
 
-Thanks,
-Ming
+Which is my assumption, too. I have just mentioned it here for
+completeness sake. It's not that I'll be implementing it for now.
 
+>>>> Goal of this topic is to get a consensus on whether block
+>>>> namespaces are a feature which would find interest, and also to
+>>>> discuss some design details here:
+>>>> - Only in certain cases can a namespace be assigned (eg by
+>>>> calling
+>>>> 'modprobe', starting iscsiadm, or calling nvme-cli); how do we
+>>>> handle
+>>>> devices for which no namespace can be identified?
+>>>> - Shall we allow for different device enumeration per namespace?
+>>>> - Into which level should we go with hiding sysfs structures?
+>>>>    Is blanking out the higher-level interfaces in /dev and
+>>>> /sys/block    enough?
+>>>
+>>> First question is does the device cgroup do enough for you and if
+>>> not what's missing?
+>>>
+>> See above. sysfs modifications and uevent filtering are missing.
+>> This infrastructure for that is already in place thanks to network 
+>> namespaces, we 'just' need to make use of it.
+>> Additional drawback is the manual configuration of device-cgroup.
+> 
+> OK, so still, why not fix or enhance the device cgroup?  The current
+> proposal seems to want to duplicate it as a namespace.
+> 
+Primarily because device-group is really limited in its functionality,
+and the interface into the device core is, quite frankly, horrible.
+(Implementing it under security/device_cgroup.c, and having direct
+function calls from fs/block_dev.c and fs/namei.c?
+hch will yet at me if I attempted that.)
+
+Re-implementing that as a namespace is the cleaner solution.
+Actually, it should be possible to re-implementing device-cgroup on to
+of the block namespaces; for that we'll have to expand it to cover all
+devices, but you're arguing for that anyway.
+So, let's see.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		        Kernel Storage Architect
+hare@suse.de			               +49 911 74053 688
+SUSE Software Solutions Germany GmbH, 90409 Nürnberg
+GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
