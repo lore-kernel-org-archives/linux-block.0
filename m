@@ -2,183 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B111CC48BD1
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 05:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C474C47094
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 06:02:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AB2C61406
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 05:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A151613C1
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 06:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229895AbhFJFvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 01:51:12 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:34280 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbhFJFvM (ORCPT
+        id S229692AbhFJGEV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 02:04:21 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:51784 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229634AbhFJGEU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 01:51:12 -0400
+        Thu, 10 Jun 2021 02:04:20 -0400
 Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
         (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 8A17C219A4;
-        Thu, 10 Jun 2021 05:49:15 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id F1E7C1FD37;
+        Thu, 10 Jun 2021 06:02:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623304155; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+        t=1623304944; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=szkljEzgCRdiHyAjgWdsyJCWn5descVJMM5wdYasVZc=;
-        b=pzUivnuGijG3apDNfz9DY3puqkeIciuB40Qu+jm5HTJXrzFwQFUwd+0W/VrqjgN6yUO2wd
-        RsojuFbHuti5cNrooNi98+8HmsXzdDpgBMuxZi/mF44FIEmklSKrP7fEIU4F4ZwtaHdJY7
-        OpN8zLgAd9UhTOltI+DB1lmAWDcbsfQ=
+        bh=XSVQItQbYbReMS/BBmDFyK6JJvVJu3Ehn28b115N1rY=;
+        b=wVpGkA7byDpYXj2R2yvne/8gfkCDbtgxRKLrCcZGiFywPgzQh170tMp3l1nR3/hmEARFZ8
+        dYmUzEmruHlvLUF+LPPcgNwL9KsqyL2ecWWv5fbcNE22hB1AgcUmb+GOqhn3ANO96cfU5C
+        U2SfzA0CRm7YPmugX+YLd0C8Nh0OqGc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623304155;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+        s=susede2_ed25519; t=1623304944;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=szkljEzgCRdiHyAjgWdsyJCWn5descVJMM5wdYasVZc=;
-        b=0/1aLJsQwxN0CJJMbM+Zw7fyNCiBrG8DQd22FtuY56fj7caCogAx09Ct4PJCUqC6hMNiWR
-        rdVdWTZ2BsoLFCCQ==
+        bh=XSVQItQbYbReMS/BBmDFyK6JJvVJu3Ehn28b115N1rY=;
+        b=MvfdvkrEcWVb7CJB7UeZqg5ine4fwlSjRf7vDNTLWI4udLQM3wY85vnCRSHXZhDVZXmtUA
+        ne89oUQXR/kkOKDw==
 Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 5F81D118DD;
-        Thu, 10 Jun 2021 05:49:15 +0000 (UTC)
+        by imap.suse.de (Postfix) with ESMTP id AF313118DD;
+        Thu, 10 Jun 2021 06:02:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623304155; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+        t=1623304943; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=szkljEzgCRdiHyAjgWdsyJCWn5descVJMM5wdYasVZc=;
-        b=pzUivnuGijG3apDNfz9DY3puqkeIciuB40Qu+jm5HTJXrzFwQFUwd+0W/VrqjgN6yUO2wd
-        RsojuFbHuti5cNrooNi98+8HmsXzdDpgBMuxZi/mF44FIEmklSKrP7fEIU4F4ZwtaHdJY7
-        OpN8zLgAd9UhTOltI+DB1lmAWDcbsfQ=
+        bh=XSVQItQbYbReMS/BBmDFyK6JJvVJu3Ehn28b115N1rY=;
+        b=sZ19RMWYnVbIfOyi8TQ3FrESLxHuUFOTn4oY4dInBhWqGtO4wVw6yLrioWZ3EhVdUXsrUs
+        ayX7rx5lu+5UgYEMLaQimkenYZKfUVLX8mrWf347cR8Rz0Kxc5Tat1rFyQHf8d6WChnV0E
+        PwMR5aq0pJEpNVdhZ7jRLT4hfdGLsDc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623304155;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+        s=susede2_ed25519; t=1623304943;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=szkljEzgCRdiHyAjgWdsyJCWn5descVJMM5wdYasVZc=;
-        b=0/1aLJsQwxN0CJJMbM+Zw7fyNCiBrG8DQd22FtuY56fj7caCogAx09Ct4PJCUqC6hMNiWR
-        rdVdWTZ2BsoLFCCQ==
+        bh=XSVQItQbYbReMS/BBmDFyK6JJvVJu3Ehn28b115N1rY=;
+        b=nRi27GUbfGPg/GTvPKc2K7OMi8plHU8wV16rorypI09BlIsMEHnenMElj8xx7CKJwBdBrE
+        42FCrJj1hBDOSaAw==
 Received: from director2.suse.de ([192.168.254.72])
         by imap3-int with ESMTPSA
-        id jws+FtunwWBCTgAALh3uQQ
-        (envelope-from <hare@suse.de>); Thu, 10 Jun 2021 05:49:15 +0000
-Subject: Re: [LSF/MM/BPF TOPIC] block namespaces
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>
-References: <a189ec50-4c11-9ee9-0b9e-b492507adc1e@suse.de>
- <485837f392401bf35fb7fc8231d7a051f47b53d7.camel@HansenPartnership.com>
+        id d1ydKO+qwWClUgAALh3uQQ
+        (envelope-from <hare@suse.de>); Thu, 10 Jun 2021 06:02:23 +0000
+Subject: Re: [PATCH 01/14] block/Kconfig: Make the BLK_WBT and BLK_WBT_MQ
+ entries consecutive
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+References: <20210608230703.19510-1-bvanassche@acm.org>
+ <20210608230703.19510-2-bvanassche@acm.org>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <539b35c6-34f7-62e0-4d93-6d27145bb78f@suse.de>
-Date:   Thu, 10 Jun 2021 07:49:14 +0200
+Organization: SUSE Linux GmbH
+Message-ID: <6292d300-50ba-d1a2-2941-7f805479737e@suse.de>
+Date:   Thu, 10 Jun 2021 08:02:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <485837f392401bf35fb7fc8231d7a051f47b53d7.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210608230703.19510-2-bvanassche@acm.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/9/21 8:36 PM, James Bottomley wrote:
-> On Thu, 2021-05-27 at 10:01 +0200, Hannes Reinecke wrote:
->> Hi all,
->>
->> I guess it's time to tick off yet another item on my long-term to-do
->> list:
->>
->> Block namespaces
->> ----------------
->>
->> Idea is similar to what network already does: allowing each user
->> namespace to have a different 'view' on the existing block devices.
->> EG if the admin creates a ramdisk in one namespace this device should
->> not be visible to other namespaces.
->> But for me the most important use-case would be qemu; currently the
->> devices need to be set up in the host, even though the host has no
->> business touching it as they really belong to the qemu instance. This
->> is causing quite some irritation eg when this device has LVM or MD
->> metadata and udev is trying to activate it on the host.
+On 6/9/21 1:06 AM, Bart Van Assche wrote:
+> These entries were consecutive at the time of their introduction but are no
+> longer consecutive. Make these again consecutive. Additionally, modify the
+> help text since it refers to blk-mq and since the legacy block layer has
+> been removed.
 > 
-> I suppose the first question is "why block only?"  There are several
-> existing device namespace proposals which would be more generic.
+> Cc: Damien Le Moal <damien.lemoal@wdc.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/Kconfig | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-
-Well; I'm more of a storage person, and do know the needs and 
-shortcomings in that area. Less well so in other areas...
-
->> Overall plan is to restrict views of '/dev', '/sys/dev/block' and
->> '/sys/block' to only present the devices 'visible' for this
->> namespace.
-> 
-> We actually already have a devices cgroup that does some of this:
-> 
-> https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt
-> 
-I know. But this essentially is a filter on '/dev' only, and needs to be 
-configured. Which makes it very unwieldy to use.
-And the contents of sysfs are not modified, so there's a mismatch 
-between contents in /dev and /sys.
-Which might cause issues with monitoring tools.
-
-> However, visibility isn't the only problem, for direct passthrough
-> there's also uevent handling and people have even asked about module
-> loading.
-> 
-I am aware, and that's another reason why device cgroup doesn't cut it.
-
->>   Initially the drivers would keep their global enumeration, but plan
->> is to make the drivers namespace-aware, too, such that each namespace
->> could have its own driver-specific device enumeration.
-> 
-> I really wouldn't do this.  Namespace/Cgroup separation should be kept
-> as high as possible.  If it leaks into the drivers it will become
-> unmaintainable.  Why do you think you need the drivers to be aware?  If
-> it's just enumeration, that should all be doable with the visibility
-> driver unless you want to do things like compact numbering?
-> 
-Which is precisely why I mentioned device modifications.
-On a generic level we can influence the visibility of devices in 
-relation to namespaces, we cannot influence the devices themselves.
-This will lead to namespaces seeing disjunct device numbers (ie 8:0 and 
-8:8 on ns 1, 8:4 on ns 2). Not that I think that will be an issue, but 
-certainly a change in behaviour.
-
->> Goal of this topic is to get a consensus on whether block namespaces
->> are a feature which would find interest, and also to discuss some
->> design details here:
->> - Only in certain cases can a namespace be assigned (eg by calling
->> 'modprobe', starting iscsiadm, or calling nvme-cli); how do we handle
->> devices for which no namespace can be identified?
->> - Shall we allow for different device enumeration per namespace?
->> - Into which level should we go with hiding sysfs structures?
->>    Is blanking out the higher-level interfaces in /dev and /sys/block
->>    enough?
-> 
-> First question is does the device cgroup do enough for you and if not
-> what's missing?
-> 
-See above. sysfs modifications and uevent filtering are missing.
-This infrastructure for that is already in place thanks to network 
-namespaces, we 'just' need to make use of it.
-Additional drawback is the manual configuration of device-cgroup.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
 
 Hannes
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Dr. Hannes Reinecke		        Kernel Storage Architect
+hare@suse.de			               +49 911 74053 688
+SUSE Software Solutions Germany GmbH, 90409 Nürnberg
+GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
