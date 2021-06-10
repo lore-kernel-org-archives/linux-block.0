@@ -2,153 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4E2C48BCD
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 06:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 847A4C47094
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 07:22:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82FF1613F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 06:43:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66CB8613BD
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 07:22:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230023AbhFJGpR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 02:45:17 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:41752 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbhFJGpQ (ORCPT
+        id S230113AbhFJHYh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 03:24:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35390 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229725AbhFJHYh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 02:45:16 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id BD1E7219A3;
-        Thu, 10 Jun 2021 06:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623307399; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GYHy0SXauBqEcUKEmfbx82VNKzuoYTGiN4oj6trW1EI=;
-        b=DtvIApBlVCctaou450sRX+CCaYkSnB3m15gL8ChsWdm6eZK7Fj/5fSe3xD/KOun8Pbn8yp
-        3U2oUKtG0ysai+ez7vSSFv9qRiv2cMPrLd6ixamwnLWqT0ZG3tZh+TfVLLuH/eO1fuveIh
-        5KbCQaOfpATCvX9rO0eOR55HogOZObA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623307399;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GYHy0SXauBqEcUKEmfbx82VNKzuoYTGiN4oj6trW1EI=;
-        b=D/KMm7xPk05r9bRfItK50Y2rOGYwOL8/BEAwxM8NDuCOwcS9q3TtC3EEaSOapIlbHMLuqH
-        rPJsPCxSehmfadAQ==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 947A5118DD;
-        Thu, 10 Jun 2021 06:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623307399; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GYHy0SXauBqEcUKEmfbx82VNKzuoYTGiN4oj6trW1EI=;
-        b=DtvIApBlVCctaou450sRX+CCaYkSnB3m15gL8ChsWdm6eZK7Fj/5fSe3xD/KOun8Pbn8yp
-        3U2oUKtG0ysai+ez7vSSFv9qRiv2cMPrLd6ixamwnLWqT0ZG3tZh+TfVLLuH/eO1fuveIh
-        5KbCQaOfpATCvX9rO0eOR55HogOZObA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623307399;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GYHy0SXauBqEcUKEmfbx82VNKzuoYTGiN4oj6trW1EI=;
-        b=D/KMm7xPk05r9bRfItK50Y2rOGYwOL8/BEAwxM8NDuCOwcS9q3TtC3EEaSOapIlbHMLuqH
-        rPJsPCxSehmfadAQ==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id tK8FI4e0wWCIYgAALh3uQQ
-        (envelope-from <hare@suse.de>); Thu, 10 Jun 2021 06:43:19 +0000
-Subject: Re: [PATCH 14/14] block/mq-deadline: Prioritize high-priority
- requests
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>
-References: <20210608230703.19510-1-bvanassche@acm.org>
- <20210608230703.19510-15-bvanassche@acm.org>
-From:   Hannes Reinecke <hare@suse.de>
-Organization: SUSE Linux GmbH
-Message-ID: <2435bac3-0d5b-9e2a-bbe4-c6a02ece2395@suse.de>
-Date:   Thu, 10 Jun 2021 08:43:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210608230703.19510-15-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Thu, 10 Jun 2021 03:24:37 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF07C061574;
+        Thu, 10 Jun 2021 00:22:41 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id ei4so3107366pjb.3;
+        Thu, 10 Jun 2021 00:22:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=k7foMZZRtisGPq+uUebUl4zeTE385Qk+YuiaUy6ZRfU=;
+        b=C5PEpeo0NMyXH9P6gG9NFBgzsAw8v516ubiOgloaYRFhpu4rjOGAfnUZEnOXenI2tV
+         LKl4g77lfelBkZsnLU9FSP9mg/+2lv+vxRJoyi61Ig16hI6jZJVLggv+ixXW6pxIegi6
+         bJdDZ4mJ2zRuIHyYPsZw35d2ROtqtwOnuEn4jhLb2hbVKb6K9U//q7eGv7Egb6jHK7EK
+         z/r0hxBEPxNmvQOKY+cCnkMewZCj8Q/IKf5Uht18R1+TzMwLpFAe4c7/38eBMEVXXJM7
+         FAtJ2nCzu2427nCTdjt7HCj8rjmtQ+sQHcP+EcedaNcjgrb5dZzfb+f3x9AWtBzWHUre
+         h3HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=k7foMZZRtisGPq+uUebUl4zeTE385Qk+YuiaUy6ZRfU=;
+        b=ZHqIJE2fYdEBDcC2aLO5+p1b0hDewWKrkf7C1mFo6SF0LtwsG4LrFvvBtZDtyIwCqE
+         pQS6tBylNXyaJujpzrMHHbUSO+xtmX93iZOB2A2UbI/besgOKe0fXyaQmAS4uwvBL3H9
+         BwARrbEPpCTF88PhtZI5srdxoN63k/JeRq5cpBYGYsUlakKgAsaTA+ZuBUbfATYuWHcq
+         pOti/ZxVhLtOt8WAuT2IU/vOpMh1cuUf/yP8JiqDIeKF7wHoGsGNznFT3KU37lNjWsEu
+         TmUzBVXHiXuGXwOcQ2hWLbKxuTcpnwWwmvMRyneslyVTtTVNnFB7LTCd/hMW8P+yt/ZZ
+         W5Gg==
+X-Gm-Message-State: AOAM531tIksv1iKX4qbT4kMg3Kx/VJzWFkxChoyciiNTNIcL1iDEtkbq
+        Dk0kPQR4Wh7NndzFxJHLelQ=
+X-Google-Smtp-Source: ABdhPJwaapexTfjht5umCKz0SBc7uTgitqckUu0R1pWb7EJFAf0aHnk8aMsNgbZC9I0MF/UoqfHa3w==
+X-Received: by 2002:a17:90a:8589:: with SMTP id m9mr1915783pjn.168.1623309760922;
+        Thu, 10 Jun 2021 00:22:40 -0700 (PDT)
+Received: from VM-0-3-centos.localdomain ([101.32.213.191])
+        by smtp.gmail.com with ESMTPSA id u24sm1591310pfm.200.2021.06.10.00.22.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Jun 2021 00:22:40 -0700 (PDT)
+From:   brookxu <brookxu.cn@gmail.com>
+To:     paolo.valente@linaro.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH 1/8] bfq: introduce bfq_entity_to_bfqg helper method
+Date:   Thu, 10 Jun 2021 15:22:30 +0800
+Message-ID: <1ce935f1bb10e0c7ecea7b79b826ff4cfc89acf0.1618916839.git.brookxu@tencent.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1618916839.git.brookxu@tencent.com>
+References: <cover.1618916839.git.brookxu@tencent.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
+Message-ID: <20210610072230.TAxxdh-wsL4sihK2TJxF-Gz85ZgsFR7IwOuifnxFi0k@z>
 
-On 6/9/21 1:07 AM, Bart Van Assche wrote:
-> While one or more requests with a certain I/O priority are pending, do not
-> dispatch lower priority requests. Dispatch lower priority requests anyway
-> after the "aging" time has expired.
-> 
-> This patch has been tested as follows:
-> 
-> modprobe scsi_debug ndelay=1000000 max_queue=16 &&
-> sd='' &&
-> while [ -z "$sd" ]; do
->   sd=/dev/$(basename /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/*)
-> done &&
-> echo $((100*1000)) > /sys/block/$sd/queue/iosched/aging_expire &&
-> cd /sys/fs/cgroup/blkio/ &&
-> echo $$ >cgroup.procs &&
-> echo 2 >blkio.prio.class &&
-> mkdir -p hipri &&
-> cd hipri &&
-> echo 1 >blkio.prio.class &&
-> { max-iops -a1 -d32 -j1 -e mq-deadline $sd >& ~/low-pri.txt & } &&
-> echo $$ >cgroup.procs &&
-> max-iops -a1 -d32 -j1 -e mq-deadline $sd >& ~/hi-pri.txt
-> 
-> Result:
-> * 11000 IOPS for the high-priority job
-> *   400 IOPS for the low-priority job
-> 
-> If the aging expiry time is changed from 100s into 0, the IOPS results change
-> into 6712 and 6796 IOPS.
-> 
-> The max-iops script is a script that runs fio with the following arguments:
-> --bs=4K --gtod_reduce=1 --ioengine=libaio --ioscheduler=${arg_e} --runtime=60
-> --norandommap --rw=read --thread --buffered=0 --numjobs=${arg_j}
-> --iodepth=${arg_d} --iodepth_batch_submit=${arg_a}
-> --iodepth_batch_complete=$((arg_d / 2)) --name=${positional_argument_1}
-> --filename=${positional_argument_1}
-> 
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/mq-deadline-main.c | 42 +++++++++++++++++++++++++++++++++++-----
->  1 file changed, 37 insertions(+), 5 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+From: Chunguang Xu <brookxu@tencent.com>
 
-Cheers,
+Introduce bfq_entity_to_bfqg() to make it easier to obtain the
+bfq_group corresponding to the entity.
 
-Hannes
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+---
+ block/bfq-cgroup.c  |  6 ++----
+ block/bfq-iosched.h |  1 +
+ block/bfq-wf2q.c    | 16 ++++++++++++----
+ 3 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index b791e20..a5f544a 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -309,8 +309,7 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_entity *group_entity = bfqq->entity.parent;
+ 
+-	return group_entity ? container_of(group_entity, struct bfq_group,
+-					   entity) :
++	return group_entity ? bfq_entity_to_bfqg(group_entity) :
+ 			      bfqq->bfqd->root_group;
+ }
+ 
+@@ -610,8 +609,7 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+ 	 */
+ 	entity = &bfqg->entity;
+ 	for_each_entity(entity) {
+-		struct bfq_group *curr_bfqg = container_of(entity,
+-						struct bfq_group, entity);
++		struct bfq_group *curr_bfqg = bfq_entity_to_bfqg(entity);
+ 		if (curr_bfqg != bfqd->root_group) {
+ 			parent = bfqg_parent(curr_bfqg);
+ 			if (!parent)
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index b8e793c..a6f98e9 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -941,6 +941,7 @@ struct bfq_group {
+ #endif
+ 
+ struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity);
++struct bfq_group *bfq_entity_to_bfqg(struct bfq_entity *entity);
+ 
+ /* --------------- main algorithm interface ----------------- */
+ 
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 070e34a..5ff0028 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -149,7 +149,7 @@ struct bfq_group *bfq_bfqq_to_bfqg(struct bfq_queue *bfqq)
+ 	if (!group_entity)
+ 		group_entity = &bfqq->bfqd->root_group->entity;
+ 
+-	return container_of(group_entity, struct bfq_group, entity);
++	return bfq_entity_to_bfqg(group_entity);
+ }
+ 
+ /*
+@@ -208,7 +208,7 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+ 	if (bfq_entity_to_bfqq(entity))
+ 		return true;
+ 
+-	bfqg = container_of(entity, struct bfq_group, entity);
++	bfqg = bfq_entity_to_bfqg(entity);
+ 
+ 	/*
+ 	 * The field active_entities does not always contain the
+@@ -266,6 +266,15 @@ struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity)
+ 	return bfqq;
+ }
+ 
++struct bfq_group *bfq_entity_to_bfqg(struct bfq_entity *entity)
++{
++	struct bfq_group *bfqg = NULL;
++
++	if (entity->my_sched_data)
++		bfqg = container_of(entity, struct bfq_group, entity);
++
++	return bfqg;
++}
+ 
+ /**
+  * bfq_delta - map service into the virtual time domain.
+@@ -1001,8 +1010,7 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
+-		struct bfq_group *bfqg =
+-			container_of(entity, struct bfq_group, entity);
++		struct bfq_group *bfqg = bfq_entity_to_bfqg(entity);
+ 		struct bfq_data *bfqd = bfqg->bfqd;
+ 
+ 		if (!entity->in_groups_with_pending_reqs) {
 -- 
-Dr. Hannes Reinecke		        Kernel Storage Architect
-hare@suse.de			               +49 911 74053 688
-SUSE Software Solutions Germany GmbH, 90409 Nürnberg
-GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
+1.8.3.1
+
