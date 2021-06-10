@@ -2,85 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0F3C48BE5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 20:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5486C48BE0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 21:44:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 023B26142E
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 20:32:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D190C6141D
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 21:44:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbhFJUd6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 16:33:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37274 "EHLO mail.kernel.org"
+        id S230385AbhFJVqt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 17:46:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53884 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230083AbhFJUd6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 16:33:58 -0400
-Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 391D761287;
-        Thu, 10 Jun 2021 20:32:00 +0000 (UTC)
-Date:   Thu, 10 Jun 2021 16:31:58 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Shuah Khan <skhan@linuxfoundation.org>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        David Hildenbrand <david@redhat.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Greg KH <greg@kroah.com>, Christoph Lameter <cl@gentwo.de>,
-        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
-        ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-Message-ID: <20210610163158.017a9721@oasis.local.home>
-In-Reply-To: <YMJ0IlYGHzwBNz2t@casper.infradead.org>
-References: <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
-        <YK+esqGjKaPb+b/Q@kroah.com>
-        <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
-        <b32c8672-06ee-bf68-7963-10aeabc0596c@redhat.com>
-        <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
-        <20210610182318.jrxe3avfhkqq7xqn@nitro.local>
-        <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
-        <20210610152633.7e4a7304@oasis.local.home>
-        <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
-        <20210610160246.13722775@oasis.local.home>
-        <YMJ0IlYGHzwBNz2t@casper.infradead.org>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        id S230370AbhFJVqs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Jun 2021 17:46:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8C93E61404;
+        Thu, 10 Jun 2021 21:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623361492;
+        bh=Nm2lG9+SJgKjIstjugCTUl6kie9LX9Danvpz1BD7x3o=;
+        h=From:To:Cc:Subject:Date:From;
+        b=hvTbuus3egZkN0mDA5ZGbn+7ZHya0BQXs1jLjULpxHS1tQ4iBAwpqyKcXWEVIGaAx
+         MkSSS9Cy9RGes0b/QeG49wRfeI9d9IvD71yTSjUYWhnRBf+xJ1opkvLLpf79O/APbw
+         QehY9AjE5P8sbKu4MJP+/o93bC4QTflfa/dqtGywVlH5V7U4c+IcKe0UeN0dVM6Cfz
+         4lvZYGcIbZF1x80XySArWoTwxKEgXNKoX7wyecEKDod1WAu9lWUGhYBdssQDK2z/17
+         pUDtDCzT2mkg/psigFoWU4IteNhB060YPp6KneBtQaTGfEHw9wsrVHFFcKxweUv8Ti
+         0vo0+ocfQv6Kw==
+From:   Keith Busch <kbusch@kernel.org>
+To:     linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de,
+        linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, Yuanyuan Zhong <yzhong@purestorage.com>,
+        Casey Chen <cachen@purestorage.com>,
+        Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv4 0/4] block and nvme passthrough error handling
+Date:   Thu, 10 Jun 2021 14:44:33 -0700
+Message-Id: <20210610214437.641245-1-kbusch@kernel.org>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 10 Jun 2021 21:20:50 +0100
-Matthew Wilcox <willy@infradead.org> wrote:
+This series has blk_execute_rq() return queueing errors so the caller
+may know if their request wasn't dispatched, and adds polled hctx
+support.
 
-> Perhaps we could actually _enhance_ conferences by forbidding
-> direct audience questions and having a moderator select questions /
-> "more of a comment actually" from an official live chat platform to
-> engage the speaker directly on stage.  It would segue naturally into
-> "the speaker is now done with their presentation and here's some good
-> followup discussion".  So many times people have come up to me after
-> a presentation and asked a question that I really wish I could have
-> answered for everybody there.
+Chances since v3:
 
-For presentations, I think this is a very good idea. But it wouldn't
-work for a BoF or a microconference.
+  Added recieved "Reviewed-by:" tags.
 
-I also thought about doing this for a presentations. That is, "Please
-submit all questions online, and the presenter will answer them".
+  Retain the REQ_HIPRI flag for nvme polled passthrough requests
+  (patch 2)
 
-Of course, if you have someone that didn't bring their laptop or phone
-(there are people that do that too). They should have a way to submit a
-question as well. Perhaps instead of going in line to a microphone, go
-in line to a public laptop to type in your question.
+  Combined nvme request dispatch with the status decoding into single
+  function (patch 4)
 
--- Steve
+Keith Busch (4):
+  block: support polling through blk_execute_rq
+  nvme: use blk_execute_rq() for passthrough commands
+  block: return errors from blk_execute_rq()
+  nvme: use return value from blk_execute_rq()
+
+ block/blk-exec.c               | 25 +++++++++++--
+ drivers/nvme/host/core.c       | 65 +++++++++++++++-------------------
+ drivers/nvme/host/fabrics.c    | 13 ++++---
+ drivers/nvme/host/fabrics.h    |  2 +-
+ drivers/nvme/host/fc.c         |  2 +-
+ drivers/nvme/host/ioctl.c      |  6 +---
+ drivers/nvme/host/nvme.h       |  4 +--
+ drivers/nvme/host/rdma.c       |  3 +-
+ drivers/nvme/host/tcp.c        |  2 +-
+ drivers/nvme/target/loop.c     |  2 +-
+ drivers/nvme/target/passthru.c |  8 ++---
+ include/linux/blkdev.h         |  4 ++-
+ 12 files changed, 72 insertions(+), 64 deletions(-)
+
+-- 
+2.25.4
+
