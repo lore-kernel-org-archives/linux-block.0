@@ -2,75 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBEAC47094
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 09:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18991C48BCD
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 09:10:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02C28613FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 09:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F40F5613FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jun 2021 09:10:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230137AbhFJJIJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 05:08:09 -0400
-Received: from mail-pg1-f172.google.com ([209.85.215.172]:43679 "EHLO
-        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230118AbhFJJIJ (ORCPT
+        id S230086AbhFJJL7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 05:11:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229914AbhFJJL7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 05:08:09 -0400
-Received: by mail-pg1-f172.google.com with SMTP id e22so22044360pgv.10;
-        Thu, 10 Jun 2021 02:06:13 -0700 (PDT)
+        Thu, 10 Jun 2021 05:11:59 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A70C061574;
+        Thu, 10 Jun 2021 02:09:47 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id m18so1398255wrv.2;
+        Thu, 10 Jun 2021 02:09:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WVYZh37iLNE3J4xzwZTUdF1tvtQC8S/ydWacg9ipzgY=;
-        b=KdpAAEnO2Z2FCmbpRQ/ye4dryVfTV8KCyXdcKGPCEoWI0PEyPkZ2qof3wxuDvUHP91
-         aWFO/y9owh7OoKAdy64N22ZRZquRGuyZdh6Cq1n6v36bCiN1Y2+nMxLeiVYmmAxYZvVN
-         8GgrQ32n9oB2gj5RQxhFJGSbJG8iq9FEA2oEL+KlEe1Bd9Tp/PQVlPOch7t7CT9CB1+9
-         iJ8sWwxS2gEOcy7RyBoyiY5eiqvaKMwYXlqPpl66u0nPMchObxwZAPkZGPlscitzEMRN
-         SYN9DNI20X7Aj1V0u+v/gyzGb5CfAM38ChBCnH/oiMVdTYvYcL5jnvuJdbqyG+/T/Lbg
-         Naig==
+        bh=aA3qNpdrQMqkukZT9c2cYMIlRMYPN4cXLvEY+pr6FGE=;
+        b=mlnXzW0JDlw/F9ohxso+1nE1ibYnYhrOGRPE1df+XW8avkT5qXymLsKUaTvsrjtKeH
+         KX9KhlnLx0fQ4uRmqGTgkzclsmTyGptiW061DpN8wnA122ySA9u4YRIgyzW22HFI9lLo
+         LIGgICl8bViq0QG4qX5+nV1BpSYtvM0V/Q9u9lUY3FA/61FWI8jIxHLhC6GgyH2vWnfX
+         Rdk7z11eNncrigDnaA0yma7pISLLAiSD/nAnVEhkxmYm9X9xhAA+TotFVjyRSvCvuBWy
+         T0BgaIz2VwmiyUaIJ8kTXBGtMTMrz1448VNUM3nv3E8xYxOscygD0uoYLWLHt5qd4Drj
+         xHDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=WVYZh37iLNE3J4xzwZTUdF1tvtQC8S/ydWacg9ipzgY=;
-        b=IAYpe8Zu/JE8jc3TxOWIuaCXVEwRHMO8GroO11VVbIXPsebomR81oIH61aTesbOZ0w
-         Qig56TTJD1v6vdOhBdVNttIJVYlnXIwbH15hlk7YlhkOKu+NKJwxtXEpxH9bPOj+vbD8
-         +vEQ3lAxGO/qQofaVIxgF5sGLOGT/LABL0DS2Jr92Cvvqqn1FNYn8qCl9ZZiUUAKEb1K
-         P+ChSW0P7vJTntmqVW05o1UtQn/o+d1oJxis58pY0D0h3UURUr6TuW1X9Ov4reGuVz+g
-         Ch/5wfLhMvdbRdkcuW61Tij5shaaVGgApXVtcdrmFYP6BrYluaCvLF763hWXyyfCQfNz
-         G1EQ==
-X-Gm-Message-State: AOAM531BCY0lmWI9MxVJrLCBX3HTw6JdY+CQEp0jk6qokiZnRMoH5Ykh
-        rM1tcLNoj1OkzOPlZiHmc+E=
-X-Google-Smtp-Source: ABdhPJyxi4anbag9ZpWO3Zhn+zjYgn2lHwH/b7JXexBto/qLq4Js+VWWoON8KGSaOpcDL64NzrDuzw==
-X-Received: by 2002:aa7:8641:0:b029:2f4:7263:5524 with SMTP id a1-20020aa786410000b02902f472635524mr2083010pfo.70.1623315913522;
-        Thu, 10 Jun 2021 02:05:13 -0700 (PDT)
-Received: from [127.0.0.1] ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id u9sm2084786pgp.90.2021.06.10.02.05.06
+        bh=aA3qNpdrQMqkukZT9c2cYMIlRMYPN4cXLvEY+pr6FGE=;
+        b=nZOPpWBCpDThWaA8vyLSz2xnSdX1O8NlXjDWogEBrqOw45zgnREx3yOEWgkZuWuurU
+         gZ7L3afomofH6WPEKWoJq5Qclq4jWYovny1A+sMt3TCMRN5JzTmpWrbWv2xhccefg4CM
+         zG28eU7HE6PVNN2jzeLniV/VXLfUc8wk/EV9C9NFIpF+v7tDT+ixXTHbkzJfSIWitmNl
+         9RTbEadzdlXm0I+xfsg4xqmK/pyjrxdXbJO8nEgvxCG465rbtpvxXipUVGH9ZtiWIoAe
+         StYfaa56fH9D+GXldlauzqN7KIp1IB5Gp+DHbLTNIUdR9whPIwE/TcDsnVKa7NsDsWZ4
+         JqpA==
+X-Gm-Message-State: AOAM530bnSHszlgGXjKXpSv8C7RNHfn7nklT37u9M67vuSWN6LFkIX7/
+        tQtfP0PxDwkLlclNP9JbEZA=
+X-Google-Smtp-Source: ABdhPJxqrRuVI+dreFR9Ia4t+/Q60mfSF2kuvuRz1tIIMoka/FZFX+Q52Yl0pQNepm0ykiPHCoLIZQ==
+X-Received: by 2002:adf:fdcd:: with SMTP id i13mr4268863wrs.307.1623316185636;
+        Thu, 10 Jun 2021 02:09:45 -0700 (PDT)
+Received: from [192.168.8.197] ([148.252.133.95])
+        by smtp.gmail.com with ESMTPSA id n7sm8151882wmq.37.2021.06.10.02.09.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 02:05:13 -0700 (PDT)
-Subject: Re: [RESEND PATCH 1/8] bfq: introduce bfq_entity_to_bfqg helper
- method
-To:     Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Piotr Gorski <lucjan.lucjanov@gmail.com>
-References: <cover.1618916839.git.brookxu@tencent.com>
- <20210610072230.TAxxdh-wsL4sihK2TJxF-Gz85ZgsFR7IwOuifnxFi0k@z>
- <20210610083147.xoefokucl5ey7v32@spock.localdomain>
-From:   brookxu <brookxu.cn@gmail.com>
-Message-ID: <eac90e08-eb43-848a-7a5f-e0c84b7ea637@gmail.com>
-Date:   Thu, 10 Jun 2021 17:05:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Thu, 10 Jun 2021 02:09:44 -0700 (PDT)
+Subject: Re: io_uring: BPF controlled I/O
+To:     Victor Stewart <v@nametag.social>
+Cc:     io-uring <io-uring@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+        lsf-pc@lists.linux-foundation.org
+References: <23168ac0-0f05-3cd7-90dc-08855dd275b2@gmail.com>
+ <CAM1kxwjHrf74u5OLB=acP2fBy+cPG4NNxa-51O35caY4VKdkkg@mail.gmail.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Message-ID: <7a7d32eb-69fb-93ef-4092-c4da926dd416@gmail.com>
+Date:   Thu, 10 Jun 2021 10:09:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210610083147.xoefokucl5ey7v32@spock.localdomain>
+In-Reply-To: <CAM1kxwjHrf74u5OLB=acP2fBy+cPG4NNxa-51O35caY4VKdkkg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,117 +80,119 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/7/21 7:51 PM, Victor Stewart wrote:
+> On Sat, Jun 5, 2021 at 5:09 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> One of the core ideas behind io_uring is passing requests via memory
+>> shared b/w the userspace and the kernel, a.k.a. queues or rings. That
+>> serves a purpose of reducing number of context switches or bypassing
+>> them, but the userspace is responsible for controlling the flow,
+>> reaping and processing completions (a.k.a. Completion Queue Entry, CQE),
+>> and submitting new requests, adding extra context switches even if there
+>> is not much work to do. A simple illustration is read(open()), where
+>> io_uring is unable to propagate the returned fd to the read, with more
+>> cases piling up.
+>>
+>> The big picture idea stays the same since last year, to give out some
+>> of this control to BPF, allow it to check results of completed requests,
+>> manipulate memory if needed and submit new requests. Apart from being
+>> just a glue between two requests, it might even offer more flexibility
+>> like keeping a QD, doing reduce/broadcast and so on.
+>>
+>> The prototype [1,2] is in a good shape but some work need to be done.
+>> However, the main concern is getting an understanding what features and
+>> functionality have to be added to be flexible enough. Various toy
+>> examples can be found at [3] ([1] includes an overview of cases).
+>>
+>> Discussion points:
+>> - Use cases, feature requests, benchmarking
+> 
+> hi Pavel,
+> 
+> coincidentally i'm tossing around in my mind at the moment an idea for
+> offloading
+> the PING/PONG of a QUIC server/client into the kernel via eBPF.
+> 
+> problem being, being that QUIC is userspace run transport and that NAT-ed UDP
+> mappings can't be expected to stay open longer than 30 seconds, QUIC
+> applications
+> bare a large cost of context switching wake-up to conduct connection lifetime
+> maintenance... especially when managing a large number of mostly idle long lived
+> connections. so offloading this maintenance service into the kernel
+> would be a great
+> efficiency boon.
+> 
+> the main impediment is that access to the kernel crypto libraries
+> isn't currently possible
+> from eBPF. that said, connection wide crypto offload into the NIC is a
+> frequently mentioned
+> subject in QUIC circles, so one could argue better to allocate the
+> time to NIC crypto offload
+> and then simply conduct this PING/PONG offload in plain text.
+> 
+> CQEs would provide a great way for the offloaded service to be able to
+> wake up the
+> application when it's input is required.
+
+Interesting, want to try out the idea? All pointers are here
+and/or in the patchset's cv, but if anything is not clear,
+inconvenient, lacks needed functionality, etc. let me know
 
 
-Oleksandr Natalenko wrote on 2021/6/10 16:31:
-> Hello.
+> anyway food for thought.
 > 
-> On Thu, Jun 10, 2021 at 03:22:30PM +0800, brookxu wrote:
->> From: Chunguang Xu <brookxu@tencent.com>
->>
->> Introduce bfq_entity_to_bfqg() to make it easier to obtain the
->> bfq_group corresponding to the entity.
->>
->> Signed-off-by: Chunguang Xu <brookxu@tencent.com>
->> ---
->>  block/bfq-cgroup.c  |  6 ++----
->>  block/bfq-iosched.h |  1 +
->>  block/bfq-wf2q.c    | 16 ++++++++++++----
->>  3 files changed, 15 insertions(+), 8 deletions(-)
->>
->> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
->> index b791e20..a5f544a 100644
->> --- a/block/bfq-cgroup.c
->> +++ b/block/bfq-cgroup.c
->> @@ -309,8 +309,7 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
->>  {
->>  	struct bfq_entity *group_entity = bfqq->entity.parent;
->>  
->> -	return group_entity ? container_of(group_entity, struct bfq_group,
->> -					   entity) :
->> +	return group_entity ? bfq_entity_to_bfqg(group_entity) :
->>  			      bfqq->bfqd->root_group;
->>  }
->>  
->> @@ -610,8 +609,7 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
->>  	 */
->>  	entity = &bfqg->entity;
->>  	for_each_entity(entity) {
->> -		struct bfq_group *curr_bfqg = container_of(entity,
->> -						struct bfq_group, entity);
->> +		struct bfq_group *curr_bfqg = bfq_entity_to_bfqg(entity);
->>  		if (curr_bfqg != bfqd->root_group) {
->>  			parent = bfqg_parent(curr_bfqg);
->>  			if (!parent)
->> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
->> index b8e793c..a6f98e9 100644
->> --- a/block/bfq-iosched.h
->> +++ b/block/bfq-iosched.h
->> @@ -941,6 +941,7 @@ struct bfq_group {
->>  #endif
->>  
->>  struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity);
->> +struct bfq_group *bfq_entity_to_bfqg(struct bfq_entity *entity);
->>  
->>  /* --------------- main algorithm interface ----------------- */
->>  
->> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
->> index 070e34a..5ff0028 100644
->> --- a/block/bfq-wf2q.c
->> +++ b/block/bfq-wf2q.c
->> @@ -149,7 +149,7 @@ struct bfq_group *bfq_bfqq_to_bfqg(struct bfq_queue *bfqq)
->>  	if (!group_entity)
->>  		group_entity = &bfqq->bfqd->root_group->entity;
->>  
->> -	return container_of(group_entity, struct bfq_group, entity);
->> +	return bfq_entity_to_bfqg(group_entity);
->>  }
->>  
->>  /*
->> @@ -208,7 +208,7 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
->>  	if (bfq_entity_to_bfqq(entity))
->>  		return true;
->>  
->> -	bfqg = container_of(entity, struct bfq_group, entity);
->> +	bfqg = bfq_entity_to_bfqg(entity);
->>  
->>  	/*
->>  	 * The field active_entities does not always contain the
->> @@ -266,6 +266,15 @@ struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity)
->>  	return bfqq;
->>  }
->>  
->> +struct bfq_group *bfq_entity_to_bfqg(struct bfq_entity *entity)
->> +{
->> +	struct bfq_group *bfqg = NULL;
->> +
->> +	if (entity->my_sched_data)
->> +		bfqg = container_of(entity, struct bfq_group, entity);
->> +
->> +	return bfqg;
->> +}
->>  
->>  /**
->>   * bfq_delta - map service into the virtual time domain.
->> @@ -1001,8 +1010,7 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
->>  
->>  #ifdef CONFIG_BFQ_GROUP_IOSCHED
->>  	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
->> -		struct bfq_group *bfqg =
->> -			container_of(entity, struct bfq_group, entity);
->> +		struct bfq_group *bfqg = bfq_entity_to_bfqg(entity);
->>  		struct bfq_data *bfqd = bfqg->bfqd;
->>  
->>  		if (!entity->in_groups_with_pending_reqs) {
->> -- 
->> 1.8.3.1
->>
+> Victor
 > 
-> If it is a resend only, I can offer my Tested-by since I'm running this
-> series for quite some time already.
-> 
+>> - Userspace programming model, code reuse (e.g. liburing)
+>> - BPF-BPF and userspace-BPF synchronisation. There is
+>>   CQE based notification approach and plans (see design
+>>   notes), however need to discuss what else might be
+>>   needed.
+>> - Do we need more contexts passed apart from user_data?
+>>   e.g. specifying a BPF map/array/etc fd io_uring requests?
+>> - Userspace atomics and efficiency of userspace reads/writes. If
+>>   proved to be not performant enough there are potential ways to take
+>>   on it, e.g. inlining, having it in BPF ISA, and pre-verifying
+>>   userspace pointers.
+>>
+>> [1] https://lore.kernel.org/io-uring/a83f147b-ea9d-e693-a2e9-c6ce16659749@gmail.com/T/#m31d0a2ac6e2213f912a200f5e8d88bd74f81406b
+>> [2] https://github.com/isilence/linux/tree/ebpf_v2
+>> [3] https://github.com/isilence/liburing/tree/ebpf_v2/examples/bpf
+>>
+>>
+>> -----------------------------------------------------------------------
+>> Design notes:
+>>
+>> Instead of basing it on hooks it adds support of a new type of io_uring
+>> requests as it gives a better control and let's to reuse internal
+>> infrastructure. These requests run a new type of io_uring BPF programs
+>> wired with a bunch of new helpers for submitting requests and dealing
+>> with CQEs, are allowed to read/write userspace memory in virtue of a
+>> recently added sleepable BPF feature. and also provided with a token
+>> (generic io_uring token, aka user_data, specified at submission and
+>> returned in an CQE), which may be used to pass a userspace pointer used
+>> as a context.
+>>
+>> Besides running BPF programs, they are able to request waiting.
+>> Currently it supports CQ waiting for a number of completions, but others
+>> might be added and/or needed, e.g. futex and/or requeueing the current
+>> BPF request onto an io_uring request/link being submitted. That hides
+>> the overhead of creating BPF requests by keeping them alive and
+>> invoking multiple times.
+>>
+>> Another big chunk solved is figuring out a good way of feeding CQEs
+>> (potentially many) to a BPF program. The current approach
+>> is to enable multiple completion queues (CQ), and specify for each
+>> request to which one steer its CQE, so all the synchronisation
+>> is in control of the userspace. For instance, there may be a separate
+>> CQ per each in-flight BPF request, and they can work with their own
+>> queues and send an CQE to the main CQ so notifying the userspace.
+>> It also opens up a notification-like sync through CQE posting to
+>> neighbours' CQs.
+>>
+>>
+>> --
+>> Pavel Begunkov
 
-ok, thank you very much.
-
-> Thanks.
-> 
+-- 
+Pavel Begunkov
