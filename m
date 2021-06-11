@@ -7,69 +7,94 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D29C48BD1
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 17:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A15C7C48BD1
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 17:55:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16B60613D9
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 17:51:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 914ED613DE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 17:55:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbhFKRx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Jun 2021 13:53:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42860 "EHLO
+        id S230301AbhFKR5K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Jun 2021 13:57:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229931AbhFKRxZ (ORCPT
+        with ESMTP id S230035AbhFKR5J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Jun 2021 13:53:25 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F43DC061574
-        for <linux-block@vger.kernel.org>; Fri, 11 Jun 2021 10:51:12 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id x19so3210030pln.2
-        for <linux-block@vger.kernel.org>; Fri, 11 Jun 2021 10:51:12 -0700 (PDT)
+        Fri, 11 Jun 2021 13:57:09 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86EA9C061574
+        for <linux-block@vger.kernel.org>; Fri, 11 Jun 2021 10:55:11 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id go18-20020a17090b03d2b029016e4ae973f7so5316014pjb.0
+        for <linux-block@vger.kernel.org>; Fri, 11 Jun 2021 10:55:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=2rxRAiPtIPFYcoD9aLWTaw2AHjyQyQp4ZMkTG0TPS7E=;
-        b=ifTbSpnQJUBSZvLYFwYcfJtqZOUc2F+tqqkx585oVr1NX3yD+zW5vI1uu+m1MY+3XZ
-         RnW7Xf6XlwyGupoo+F0irbqLyd51juu87lwaNAFh8sX8G0VK9AY/uMX6ak5Yc9Lvefd1
-         gQw8Q86a6EqHDSci1uu0dAmeNkg84vi8Vja2hGim3dMSI4E880mqywQIb7UtsJRKlwGy
-         JjkK9f8nswJgVBObHusdQ9LGMJDNubWkPkxmV+ePzlW4QZMofnO5/unPhO0dG+fhb/w+
-         S932GbgOkxqEggV2Q9M6MMaClq7q70oYlUgub4umV46DRE2H2EQTBfoAOKGon5c3dCDY
-         Fisg==
+        bh=FiCqgV8kjys+3xuqiyCwJtcf1Wj53LQ5ch2SqyLytgY=;
+        b=SD6IZ6g/PQccK+DJj47BNWbjBcu51Hoxg75XX8W0NsqQBg0ABF+hnuOUc/UFnpm8im
+         oNVX3uykvZuuO5Y8ikPd3y+WsvzDFhqLGs4yWHQFnc8RzIYufWCIOXqn3AApkjH4Q2eg
+         xQaVfA+BsocsKdfD6NHf1Rfl2fMGnqoxNR3DdZP0eXDcQ/vjXZbD88x8d17C79EnssGA
+         MaA3XiWo9+AFyaOrA1MdfYif3vi99movLQHJefeIj5rihTG1TSe1D2qp8+37dXVxo+jK
+         juNRW5LpLgfCfOOUxjWz+2zHY1TAZQqD4FUpZkK9KYz4TPA/VoJTiiPZCp8OQM00GFzi
+         g76Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=2rxRAiPtIPFYcoD9aLWTaw2AHjyQyQp4ZMkTG0TPS7E=;
-        b=n5xlq/D7AihPIEgXQ3eCih4lH829vgC3MsM4gIfR1CiHxzFc7ZMT4Sat+x45RgN3gU
-         YbxabqXwxaqoT3uebFAb3Nu0My/x+lv6TVSMVJlR3qNm/02MC1/CbS8so996Y+ztkJK3
-         kMrDSm2Xovho9Nb97FCUTo9+HG/Gg1urjrfnAJfgx98xvtr0qpRylgjFKLRdhZgdyv6N
-         sF+7xVz0oIMadQDEeW+9xHqZQlLsJpgEZR76bH0aIr7q/KZ2YTpGJhQQnIJPfBD4QPRK
-         1vhfjDMDiwiDwGVD37m2BK0q+0bTK2RdWBbzrjCAVSLn6+4XU9d+3xzDDnctIoync8eb
-         g7sA==
-X-Gm-Message-State: AOAM531I6WMIRdRr9ziipXx5ILi8J/WlTmI0hsxjCDgyzHrEUlasMSE5
-        XjMYlsjH502HpOCF7GWkePbmXg==
-X-Google-Smtp-Source: ABdhPJwaRIfbEQgveMAxoYPgSHlRY9WSJZS0MiMwPMBoczZx23xnZcXY/lu7YkNPDJOJI1JH3i4Evg==
-X-Received: by 2002:a17:90a:5504:: with SMTP id b4mr5605740pji.208.1623433871462;
-        Fri, 11 Jun 2021 10:51:11 -0700 (PDT)
+        bh=FiCqgV8kjys+3xuqiyCwJtcf1Wj53LQ5ch2SqyLytgY=;
+        b=VJweIYYq0uVw/8o4zb/t+koAsGLG4oQT7t55w8OYEKXFItWKQ/evPOREOOk1MFyo7b
+         xCNjl9qyn8UWU8Xeh8aH/q9Bs3bXZY2Rr8rLioqN3gWZVIlnLMpTGd5maRGcpZPqa8YR
+         EW2QMQ/9t32wv4l26OpyNAv7+Nseohw187vlEfdsfTvGojpTg2ob+ys25aJrS3P/iJDt
+         f9iQRhp85YQrRWl/Wnu89+YQH48GyFwjW844tlYN2jkTbpqk8dmRVV4b4XvMMiAOB+NX
+         4Ias4wthLJOJ2giiXynr/qCna1J87ZqbU5TUV+zsDAXro3L4ZbsTHvKTeJGW9z+RuM+8
+         AkWQ==
+X-Gm-Message-State: AOAM531AVt0blpZMSfLzMZhugTPBHeKBEZOQFZ5Tw1+8aIng/HBcMeAE
+        2ZWEcz6YioX1BBN5SWkJ8SIQLA==
+X-Google-Smtp-Source: ABdhPJxMGSnZ9kJAsN6p7k0McSncvftPUJip5kVUuOxTF3REguFHe02Lgz4i9/8fJhn7M2nOfjp+aA==
+X-Received: by 2002:a17:90a:9481:: with SMTP id s1mr5656508pjo.48.1623434110978;
+        Fri, 11 Jun 2021 10:55:10 -0700 (PDT)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id c184sm2751867pfa.38.2021.06.11.10.51.10
+        by smtp.gmail.com with ESMTPSA id x3sm6384950pgx.8.2021.06.11.10.55.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jun 2021 10:51:10 -0700 (PDT)
-Subject: Re: [PATCH] block: loop: fix deadlock between open and remove
+        Fri, 11 Jun 2021 10:55:10 -0700 (PDT)
+Subject: Re: simplify gendisk and request_queue allocation for blk-mq based
+ drivers
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     ming.lei@redhat.com, pasha.tatashin@soleen.com,
-        linux-block@vger.kernel.org,
-        Colin Ian King <colin.king@canonical.com>
-References: <20210605140950.5800-1-hch@lst.de>
+Cc:     Justin Sanders <justin@coraid.com>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Tim Waugh <tim@cyberelk.net>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linuxppc-dev@lists.ozlabs.org,
+        ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
+References: <20210602065345.355274-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b186cfd8-5000-c712-67ca-9919451ba501@kernel.dk>
-Date:   Fri, 11 Jun 2021 11:51:12 -0600
+Message-ID: <fa9590e3-20eb-5215-d2f7-6489169c232c@kernel.dk>
+Date:   Fri, 11 Jun 2021 11:55:09 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210605140950.5800-1-hch@lst.de>
+In-Reply-To: <20210602065345.355274-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,28 +102,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/5/21 8:09 AM, Christoph Hellwig wrote:
-> Commit c76f48eb5c08 ("block: take bd_mutex around delete_partitions in
-> del_gendisk") adds disk->part0->bd_mutex in del_gendisk(), this way
-> causes the following AB/BA deadlock between removing loop and opening
-> loop:
+On 6/2/21 12:53 AM, Christoph Hellwig wrote:
+> Hi all,
 > 
->  1) loop_control_ioctl(LOOP_CTL_REMOVE)
->      -> mutex_lock(&loop_ctl_mutex)
->      -> del_gendisk
->          -> mutex_lock(&disk->part0->bd_mutex)
-> 
->  2) blkdev_get_by_dev
->      -> mutex_lock(&disk->part0->bd_mutex)
->      -> lo_open
->          -> mutex_lock(&loop_ctl_mutex)
-> 
-> Add a new Lo_deleting state to remove the need for clearing
-> ->private_data and thus holding loop_ctl_mutex in the ioctl
-> LOOP_CTL_REMOVE path.
-> 
-> Based on an analysis and earlier patch from
-> Ming Lei <ming.lei@redhat.com>.
+> this series is the scond part of cleaning up lifetimes and allocation of
+> the gendisk and request_queue structure.  It adds a new interface to
+> allocate the disk and queue together for blk based drivers, and uses that
+> in all drivers that do not have any caveats in their gendisk and
+> request_queue lifetime rules.
 
 Applied, thanks.
 
