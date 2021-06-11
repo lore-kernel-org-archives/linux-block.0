@@ -2,58 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 607F5C48BE5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 06:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4191C48BE0
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 09:13:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 478D061364
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 06:53:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE3FF613E7
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 09:13:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231268AbhFKGzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Jun 2021 02:55:40 -0400
-Received: from verein.lst.de ([213.95.11.211]:35264 "EHLO verein.lst.de"
+        id S231308AbhFKJPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Jun 2021 05:15:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35134 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229777AbhFKGzj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Jun 2021 02:55:39 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0D2A168AFE; Fri, 11 Jun 2021 08:53:39 +0200 (CEST)
-Date:   Fri, 11 Jun 2021 08:53:38 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ceph-devel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        linux-arch@vger.kernel.org
-Subject: Re: [PATCH 09/16] ps3disk: use memcpy_{from,to}_bvec
-Message-ID: <20210611065338.GA31210@lst.de>
-References: <20210608160603.1535935-1-hch@lst.de> <20210608160603.1535935-10-hch@lst.de> <20210609014822.GT3697498@iweiny-DESK2.sc.intel.com>
+        id S231609AbhFKJPM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Jun 2021 05:15:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E431D60FDA;
+        Fri, 11 Jun 2021 09:13:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623402794;
+        bh=0Tv6dk09LYXtiWu3+YyS09NcTBZcnmopruN7Ttw2A3c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qCE0A2hE5eLvV8SAX8VsVaLsmx7G+YhwHIGuIbtiETIq98w68vFvtv3s1bhzDjAJ1
+         zAwEklDt1RkuJy4xO1mhyVGn5CoqoCJlfqGcOzbWGGdCb/cl21ED/qg6om4QDr6Qgw
+         hAsXyCGbL1jtQZUE1mmW8Fz57Pe8pBJAijmfw+8qSkasiv7gs8Bn4yv5Nf3uQnoBiX
+         zxb7Zjkljrgndxxd99Pyb9NRcFNuEpikSsPzNHA+8Ye4WGjHy7LoVAmriVbgeAzAuX
+         sIG1CoqZMtlY/m4KJAESInsxp1yQtkOqy6u3nFjtUmy8jmmfx5n/O/lOLN4k8Jv3p4
+         6ODFKkgxpj1ug==
+Date:   Fri, 11 Jun 2021 11:13:07 +0200
+From:   Mauro Carvalho Chehab <mchehab@kernel.org>
+To:     Willy Tarreau <w@1wt.eu>
+Cc:     Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        David Hildenbrand <david@redhat.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Greg KH <greg@kroah.com>, Christoph Lameter <cl@gentwo.de>,
+        "Theodore Ts'o" <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
+        ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+Message-ID: <20210611111248.250e6da8@coco.lan>
+In-Reply-To: <20210611025942.GE25638@1wt.eu>
+References: <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
+        <YK+esqGjKaPb+b/Q@kroah.com>
+        <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
+        <b32c8672-06ee-bf68-7963-10aeabc0596c@redhat.com>
+        <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
+        <20210610182318.jrxe3avfhkqq7xqn@nitro.local>
+        <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
+        <20210610152633.7e4a7304@oasis.local.home>
+        <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
+        <87tum5uyrq.fsf@toke.dk>
+        <20210611025942.GE25638@1wt.eu>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210609014822.GT3697498@iweiny-DESK2.sc.intel.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 08, 2021 at 06:48:22PM -0700, Ira Weiny wrote:
-> I'm still not 100% sure that these flushes are needed but the are not no-ops on
-> every arch.  Would it be best to preserve them after the memcpy_to/from_bvec()?
-> 
-> Same thing in patch 11 and 14.
+Em Fri, 11 Jun 2021 04:59:42 +0200
+Willy Tarreau <w@1wt.eu> escreveu:
 
-To me it seems kunmap_local should basically always call the equivalent
-of flush_kernel_dcache_page.  parisc does this through
-kunmap_flush_on_unmap, but none of the other architectures with VIVT
-caches or other coherency issues does.
+> On Fri, Jun 11, 2021 at 12:43:05AM +0200, Toke H=C3=B8iland-J=C3=B8rgense=
+n wrote:
+> > Shuah Khan <skhan@linuxfoundation.org> writes: =20
+> > > I have a
+> > > couple of ideas on how we might be able to improve remote experience
+> > > without restricting in-person experience.
+> > >
+> > > - Have one or two moderators per session to watch chat and Q&A to ena=
+ble
+> > >    remote participants to chime in and participate.
+> > > - Moderators can make sure remote participation doesn't go unnoticed =
+and
+> > >    enable taking turns for remote vs. people participating in person.
+> > >
+> > > It will be change in the way we interact in all in-person sessions for
+> > > sure, however it might enhance the experience for remote attendees. =
+=20
+> >=20
+> > This is basically how IETF meetings function: At the beginning of every
+> > session, a volunteer "jabber scribe" is selected to watch the chat and
+> > relay any questions to a microphone in the room. And the video streaming
+> > platform has a "virtual queue" that remove participants can enter and
+> > the session chairs are then responsible for giving people a chance to
+> > speak. Works reasonably well, I'd say :) =20
+>=20
+> I was about to say the same. In addition, local participants line up
+> at a microphone and do not interrupt the speaker, but the organiser
+> gives them the signal to ask a question. This allows to maintain a
+> good balance between local and remote participants. Also it's common
+> to see some locals go back to their seat because someone else just
+> asked the same question. And when remote questions are asked using
+> pure text, it's easy for the organiser to skip them if already
+> responded as well.
+>=20
+> This method is rather efficient because it doesn't require to keep the
+> questions for the end of the session, yet questions do not interrupt
+> the speaker. It also solves the problem of people not speaking in the
+> microphone. The only thing is that it can be quite intimidating for
+> local participants who are too shy of standing up in front of a
+> microphone and everyone else.
 
-Does anyone have a history or other insights here?
+If someone is shy, he/she could simply type the question as a
+remote participant would do.
+
+This should work fine for a normal speech, but for BoFs and the
+usual "round table" discussions we have at Kernel Maintainers,
+this may not work well for local participants.
+
+I guess that, for such kind of discussions, I can see two
+possible alternatives:
+
+1. everyone would use their laptop cameras/mics;
+2. every round table would have their on camera/mic set.
+
+(1) is probably simpler to implement, but may provide a worse
+experience for local participants. (2) is probably harder to
+implement, as the usual conference logistics company may not
+have cameras.
+
+In either case, a moderator (or some moderating software) is needed
+in order queue requests for speech. So, basically, when someone
+(either in a table or remote) wants to speak, it adds its name to
+a queue, which will then be parsed at the queue's order. This is not
+as natural as a physical meeting, but I guess it won't bring too
+much burden to local people.
+
+Thanks,
+Mauro
