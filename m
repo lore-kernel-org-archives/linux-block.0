@@ -2,410 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FD9C48BE6
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 20:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F55C48BD1
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 23:01:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76B18613C3
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 20:39:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1C22613E9
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 23:01:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230382AbhFKUlK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Jun 2021 16:41:10 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:59444 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230392AbhFKUlJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Jun 2021 16:41:09 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 7C2CA1FD7B;
-        Fri, 11 Jun 2021 20:39:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1623443950; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+        id S229942AbhFKXDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Jun 2021 19:03:46 -0400
+Received: from mail.klausen.dk ([157.90.24.29]:53294 "EHLO mail.klausen.dk"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229572AbhFKXDq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Jun 2021 19:03:46 -0400
+X-Greylist: delayed 439 seconds by postgrey-1.27 at vger.kernel.org; Fri, 11 Jun 2021 19:03:45 EDT
+Subject: Re: [PATCH v5 11/11] loop: Add LOOP_CONFIGURE ioctl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=klausen.dk; s=dkim;
+        t=1623452065;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=U/ailFYxeGlmUbwbIPD4qOQuGcOLLg1YIIWKGwzCLcs=;
-        b=rjlruPzN8S102MRkvTcNUM2OEfOu006/TRDfwObUgAvdbIvExy1rIvmte8FTftkitkGWdC
-        BAy8HvJlyS46PQZFJg6z7XR0+tKivGP4GZxTtMzkg+AaeIgdYwkSidTzFd3xO7/JXLTetT
-        XlKQ7QW5ZXHPeawSoCBmyvhDNYcGxhY=
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 1A1CE118DD;
-        Fri, 11 Jun 2021 20:39:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1623443950; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U/ailFYxeGlmUbwbIPD4qOQuGcOLLg1YIIWKGwzCLcs=;
-        b=rjlruPzN8S102MRkvTcNUM2OEfOu006/TRDfwObUgAvdbIvExy1rIvmte8FTftkitkGWdC
-        BAy8HvJlyS46PQZFJg6z7XR0+tKivGP4GZxTtMzkg+AaeIgdYwkSidTzFd3xO7/JXLTetT
-        XlKQ7QW5ZXHPeawSoCBmyvhDNYcGxhY=
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id OLr5BO7Jw2BGEgAALh3uQQ
-        (envelope-from <mwilck@suse.com>); Fri, 11 Jun 2021 20:39:10 +0000
-From:   mwilck@suse.com
-To:     Mike Snitzer <snitzer@redhat.com>,
-        Alasdair G Kergon <agk@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        dm-devel@redhat.com, Hannes Reinecke <hare@suse.de>
-Cc:     Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Benjamin Marzinski <bmarzins@redhat.com>,
-        Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v3 2/2] dm: add CONFIG_DM_MULTIPATH_SG_IO - failover for SG_IO on dm-multipath
-Date:   Fri, 11 Jun 2021 22:25:09 +0200
-Message-Id: <20210611202509.5426-3-mwilck@suse.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210611202509.5426-1-mwilck@suse.com>
-References: <20210611202509.5426-1-mwilck@suse.com>
+        bh=WgLFKfLGzYu14ZiloJfDFndNFiDm2vYwSH1kUfP2Vw0=;
+        b=H5Aa62Up/Pyj7Lz6ofQQgYiFTcEqZdupILKfzB95O0G5iiy7TMYIY06ZPFC98UmvefqJ0F
+        yKoDmFxJi21HFUdqDJ0dZcrg4BlvfTJfEGp+WDpzMNQcU6h8bthuCHKYRsFJXHNPfpTHv0
+        D5ViA0hBw2JHuyMFNAX5dachYAq6nvQ=
+To:     Martijn Coenen <maco@android.com>, axboe@kernel.dk, hch@lst.de,
+        ming.lei@redhat.com
+Cc:     narayan@google.com, zezeozue@google.com, maco@google.com,
+        kernel-team@android.com, bvanassche@acm.org,
+        Chaitanya.Kulkarni@wdc.com, jaegeuk@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>
+References: <20200513133845.244903-1-maco@android.com>
+ <20200513133845.244903-12-maco@android.com>
+From:   Kristian Klausen <kristian@klausen.dk>
+Message-ID: <c24d7aab-a2f8-f87b-c944-046b6d059e37@klausen.dk>
+Date:   Sat, 12 Jun 2021 00:54:24 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200513133845.244903-12-maco@android.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Martin Wilck <mwilck@suse.com>
+On 13.05.2020 15.38, Martijn Coenen wrote:
+> This allows userspace to completely setup a loop device with a single
+> ioctl, removing the in-between state where the device can be partially
+> configured - eg the loop device has a backing file associated with it,
+> but is reading from the wrong offset.
+>
+> Besides removing the intermediate state, another big benefit of this
+> ioctl is that LOOP_SET_STATUS can be slow; the main reason for this
+> slowness is that LOOP_SET_STATUS(64) calls blk_mq_freeze_queue() to
+> freeze the associated queue; this requires waiting for RCU
+> synchronization, which I've measured can take about 15-20ms on this
+> device on average.
+>
+> In addition to doing what LOOP_SET_STATUS can do, LOOP_CONFIGURE can
+> also be used to:
+> - Set the correct block size immediately by setting
+>    loop_config.block_size (avoids LOOP_SET_BLOCK_SIZE)
+> - Explicitly request direct I/O mode by setting LO_FLAGS_DIRECT_IO
+>    in loop_config.info.lo_flags (avoids LOOP_SET_DIRECT_IO)
+> - Explicitly request read-only mode by setting LO_FLAGS_READ_ONLY
+>    in loop_config.info.lo_flags
+>
+> Here's setting up ~70 regular loop devices with an offset on an x86
+> Android device, using LOOP_SET_FD and LOOP_SET_STATUS:
+>
+> vsoc_x86:/system/apex # time for i in `seq 30 100`;
+> do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+>      0m03.40s real     0m00.02s user     0m00.03s system
+>
+> Here's configuring ~70 devices in the same way, but using a modified
+> losetup that uses the new LOOP_CONFIGURE ioctl:
+>
+> vsoc_x86:/system/apex # time for i in `seq 30 100`;
+> do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+>      0m01.94s real     0m00.01s user     0m00.01s system
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Martijn Coenen <maco@android.com>
+> ---
+>   drivers/block/loop.c      | 104 ++++++++++++++++++++++++++++----------
+>   include/uapi/linux/loop.h |  21 ++++++++
+>   2 files changed, 97 insertions(+), 28 deletions(-)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 13518ba191f5..a565c5aafa52 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -228,6 +228,19 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+>   		blk_mq_unfreeze_queue(lo->lo_queue);
+>   }
+>   
+> +/**
+> + * loop_validate_block_size() - validates the passed in block size
+> + * @bsize: size to validate
+> + */
+> +static int
+> +loop_validate_block_size(unsigned short bsize)
+> +{
+> +	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>   /**
+>    * loop_set_size() - sets device size and notifies userspace
+>    * @lo: struct loop_device to set the size for
+> @@ -1050,23 +1063,24 @@ loop_set_status_from_info(struct loop_device *lo,
+>   	return 0;
+>   }
+>   
+> -static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+> -		       struct block_device *bdev, unsigned int arg)
+> +static int loop_configure(struct loop_device *lo, fmode_t mode,
+> +			  struct block_device *bdev,
+> +			  const struct loop_config *config)
+>   {
+>   	struct file	*file;
+>   	struct inode	*inode;
+>   	struct address_space *mapping;
+>   	struct block_device *claimed_bdev = NULL;
+> -	int		lo_flags = 0;
+>   	int		error;
+>   	loff_t		size;
+>   	bool		partscan;
+> +	unsigned short  bsize;
+>   
+>   	/* This is safe, since we have a reference from open(). */
+>   	__module_get(THIS_MODULE);
+>   
+>   	error = -EBADF;
+> -	file = fget(arg);
+> +	file = fget(config->fd);
+>   	if (!file)
+>   		goto out;
+>   
+> @@ -1075,7 +1089,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+>   	 * here to avoid changing device under exclusive owner.
+>   	 */
+>   	if (!(mode & FMODE_EXCL)) {
+> -		claimed_bdev = bd_start_claiming(bdev, loop_set_fd);
+> +		claimed_bdev = bd_start_claiming(bdev, loop_configure);
+>   		if (IS_ERR(claimed_bdev)) {
+>   			error = PTR_ERR(claimed_bdev);
+>   			goto out_putf;
+> @@ -1097,11 +1111,26 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+>   	mapping = file->f_mapping;
+>   	inode = mapping->host;
+>   
+> +	size = get_loop_size(lo, file);
+> +
+> +	if ((config->info.lo_flags & ~LOOP_CONFIGURE_SETTABLE_FLAGS) != 0) {
+> +		error = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	if (config->block_size) {
+> +		error = loop_validate_block_size(config->block_size);
+> +		if (error)
+> +			goto out_unlock;
+> +	}
+> +
+> +	error = loop_set_status_from_info(lo, &config->info);
 
-In virtual deployments, SCSI passthrough over dm-multipath devices is a
-common setup. The qemu "pr-helper" was specifically invented for it. I
-believe that this is the most important real-world scenario for sending
-SG_IO ioctls to device-mapper devices.
+loop_set_status_from_info() doesn't call loop_config_discard() nor does 
+loop_configure(), I assume it should be called?
 
-In this configuration, guests send SCSI IO to the hypervisor in the form of
-SG_IO ioctls issued by qemu. But on the device-mapper level, these SCSI
-ioctls aren't treated like regular IO. Until commit 2361ae595352 ("dm mpath:
-switch paths in dm_blk_ioctl() code path"), no path switching was done at
-all. Worse though, if an SG_IO call fails because of a path error,
-dm-multipath doesn't retry the IO on a another path; rather, the failure is
-passed back to the guest, and paths are not marked as faulty.  This is in
-stark contrast with regular block IO of guests on dm-multipath devices, and
-certainly comes as a surprise to users who switch to SCSI passthrough in
-qemu. In general, users of dm-multipath devices would probably expect failover
-to work at least in a basic way.
+I'm asking because I upgraded to util-linux 2.37 which use the new 
+LOOP_CONFIGURE ioctl and fstrim is complaining that "the discard 
+operation is not supported" and the missing call of 
+loop_config_discard() stood out. Sadly I haven't been able to reproduce 
+the issue reliably outside CI (yet).
 
-This patch fixes this by taking a special code path for SG_IO on request-
-based device mapper targets if CONFIG_DM_MULTIPATH_SG_IO is set.  Rather then
-just choosing a single path, sending the IO to it, and failing to the caller
-if the IO on the path failed, it retries the same IO on another path for
-certain error codes, using blk_path_error() to determine if a retry would
-make sense for the given error code. Moreover, it sends a message to the
-multipath target to mark the path as failed.
-
-One problem remains open: if all paths in a multipath map are failed,
-normal multipath IO may switch to queueing mode (depending on
-configuration). This isn't possible for SG_IO, as SG_IO requests can't
-easily be queued like regular block I/O. Thus in the "no path" case, the
-guest will still see an error.
-
-Signed-off-by: Martin Wilck <mwilck@suse.com>
----
- block/scsi_ioctl.c         |   5 +-
- drivers/md/Kconfig         |  11 ++++
- drivers/md/Makefile        |   4 ++
- drivers/md/dm-core.h       |   5 ++
- drivers/md/dm-rq.h         |  11 ++++
- drivers/md/dm-scsi_ioctl.c | 127 +++++++++++++++++++++++++++++++++++++
- drivers/md/dm.c            |  20 +++++-
- include/linux/blkdev.h     |   2 +
- 8 files changed, 180 insertions(+), 5 deletions(-)
- create mode 100644 drivers/md/dm-scsi_ioctl.c
-
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index b39e0835600f..38771f4bcf18 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -279,8 +279,8 @@ static int blk_complete_sghdr_rq(struct request *rq, struct sg_io_hdr *hdr,
- 	return ret;
- }
- 
--static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
--		struct sg_io_hdr *hdr, fmode_t mode)
-+int sg_io(struct request_queue *q, struct gendisk *bd_disk,
-+	  struct sg_io_hdr *hdr, fmode_t mode)
- {
- 	unsigned long start_time;
- 	ssize_t ret = 0;
-@@ -365,6 +365,7 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
- 	blk_put_request(rq);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(sg_io);
- 
- /**
-  * sg_scsi_ioctl  --  handle deprecated SCSI_IOCTL_SEND_COMMAND ioctl
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index f2014385d48b..f28f29e3bd11 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -473,6 +473,17 @@ config DM_MULTIPATH_IOA
- 
- 	  If unsure, say N.
- 
-+config DM_MULTIPATH_SG_IO
-+       bool "Retry SCSI generic I/O on multipath devices"
-+       depends on DM_MULTIPATH && BLK_SCSI_REQUEST
-+       help
-+	 With this option, SCSI generic (SG) requests issued on multipath
-+	 devices will behave similar to regular block I/O: upon failure,
-+	 they are repeated on a different path, and the erroring device
-+	 is marked as failed.
-+
-+	 If unsure, say N.
-+
- config DM_DELAY
- 	tristate "I/O delaying target"
- 	depends on BLK_DEV_DM
-diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-index ef7ddc27685c..187ea469f64a 100644
---- a/drivers/md/Makefile
-+++ b/drivers/md/Makefile
-@@ -88,6 +88,10 @@ ifeq ($(CONFIG_DM_INIT),y)
- dm-mod-objs			+= dm-init.o
- endif
- 
-+ifeq ($(CONFIG_DM_MULTIPATH_SG_IO),y)
-+dm-mod-objs			+= dm-scsi_ioctl.o
-+endif
-+
- ifeq ($(CONFIG_DM_UEVENT),y)
- dm-mod-objs			+= dm-uevent.o
- endif
-diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-index 5953ff2bd260..8bd8a8e3916e 100644
---- a/drivers/md/dm-core.h
-+++ b/drivers/md/dm-core.h
-@@ -189,4 +189,9 @@ extern atomic_t dm_global_event_nr;
- extern wait_queue_head_t dm_global_eventq;
- void dm_issue_global_event(void);
- 
-+int __dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
-+		       struct block_device **bdev,
-+		       struct dm_target **target);
-+void dm_unprepare_ioctl(struct mapped_device *md, int srcu_idx);
-+
- #endif
-diff --git a/drivers/md/dm-rq.h b/drivers/md/dm-rq.h
-index 1eea0da641db..c6d2853e4d1d 100644
---- a/drivers/md/dm-rq.h
-+++ b/drivers/md/dm-rq.h
-@@ -44,4 +44,15 @@ ssize_t dm_attr_rq_based_seq_io_merge_deadline_show(struct mapped_device *md, ch
- ssize_t dm_attr_rq_based_seq_io_merge_deadline_store(struct mapped_device *md,
- 						     const char *buf, size_t count);
- 
-+#ifdef CONFIG_DM_MULTIPATH_SG_IO
-+int dm_sg_io_ioctl(struct block_device *bdev, fmode_t mode,
-+		   unsigned int cmd, unsigned long uarg);
-+#else
-+static inline int dm_sg_io_ioctl(struct block_device *bdev, fmode_t mode,
-+				 unsigned int cmd, unsigned long uarg)
-+{
-+	return -ENOTTY;
-+}
-+#endif
-+
- #endif
-diff --git a/drivers/md/dm-scsi_ioctl.c b/drivers/md/dm-scsi_ioctl.c
-new file mode 100644
-index 000000000000..a696e2a6557e
---- /dev/null
-+++ b/drivers/md/dm-scsi_ioctl.c
-@@ -0,0 +1,127 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2021 Martin Wilck, SUSE LLC
-+ */
-+
-+#include "dm-core.h"
-+#include <linux/types.h>
-+#include <linux/errno.h>
-+#include <linux/kernel.h>
-+#include <linux/uaccess.h>
-+#include <linux/blk_types.h>
-+#include <linux/blkdev.h>
-+#include <linux/device-mapper.h>
-+#include <scsi/sg.h>
-+#include <scsi/scsi_cmnd.h>
-+
-+#define DM_MSG_PREFIX "sg_io"
-+
-+int dm_sg_io_ioctl(struct block_device *bdev, fmode_t mode,
-+		   unsigned int cmd, unsigned long uarg)
-+{
-+	struct mapped_device *md = bdev->bd_disk->private_data;
-+	struct sg_io_hdr hdr;
-+	void __user *arg = (void __user *)uarg;
-+	int rc, srcu_idx;
-+	char path_name[BDEVNAME_SIZE];
-+
-+	if (cmd != SG_IO)
-+		return -ENOTTY;
-+
-+	if (copy_from_user(&hdr, arg, sizeof(hdr)))
-+		return -EFAULT;
-+
-+	if (hdr.interface_id != 'S')
-+		return -EINVAL;
-+
-+	if (hdr.dxfer_len > (queue_max_hw_sectors(bdev->bd_disk->queue) << 9))
-+		return -EIO;
-+
-+	for (;;) {
-+		struct dm_target *tgt;
-+		struct sg_io_hdr rhdr;
-+
-+		rc = __dm_prepare_ioctl(md, &srcu_idx, &bdev, &tgt);
-+		if (rc < 0) {
-+			DMERR("%s: failed to get path: %d",
-+			      __func__, rc);
-+			goto out;
-+		}
-+
-+		rhdr = hdr;
-+
-+		rc = sg_io(bdev->bd_disk->queue, bdev->bd_disk, &rhdr, mode);
-+
-+		DMDEBUG("SG_IO via %s: rc = %d D%02xH%02xM%02xS%02x",
-+			bdevname(bdev, path_name), rc,
-+			rhdr.driver_status, rhdr.host_status,
-+			rhdr.msg_status, rhdr.status);
-+
-+		/*
-+		 * Errors resulting from invalid parameters shouldn't be retried
-+		 * on another path.
-+		 */
-+		switch (rc) {
-+		case -ENOIOCTLCMD:
-+		case -EFAULT:
-+		case -EINVAL:
-+		case -EPERM:
-+			goto out;
-+		default:
-+			break;
-+		}
-+
-+		if (rhdr.info & SG_INFO_CHECK) {
-+			int result;
-+			blk_status_t sts;
-+
-+			result = rhdr.status |
-+				(rhdr.msg_status << 8) |
-+				(rhdr.host_status << 16) |
-+				(rhdr.driver_status << 24);
-+
-+			sts = __scsi_result_to_blk_status(&result, result);
-+			rhdr.host_status = host_byte(result);
-+
-+			/* See if this is a target or path error. */
-+			if (sts == BLK_STS_OK)
-+				rc = 0;
-+			else if (blk_path_error(sts))
-+				rc = -EIO;
-+			else {
-+				rc = blk_status_to_errno(sts);
-+				goto out;
-+			}
-+		}
-+
-+		if (rc == 0) {
-+			/* success */
-+			if (copy_to_user(arg, &rhdr, sizeof(rhdr)))
-+				rc = -EFAULT;
-+			goto out;
-+		}
-+
-+		/* Failure - fail path by sending a message to the target */
-+		if (!tgt->type->message) {
-+			DMWARN("invalid target!");
-+			rc = -EIO;
-+			goto out;
-+		} else {
-+			char bdbuf[BDEVT_SIZE];
-+			char *argv[2] = { "fail_path", bdbuf };
-+
-+			scnprintf(bdbuf, sizeof(bdbuf), "%u:%u",
-+				  MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
-+
-+			DMDEBUG("sending \"%s %s\" to target", argv[0], argv[1]);
-+			rc = tgt->type->message(tgt, 2, argv, NULL, 0);
-+			if (rc < 0)
-+				goto out;
-+		}
-+
-+		dm_unprepare_ioctl(md, srcu_idx);
-+	}
-+out:
-+	dm_unprepare_ioctl(md, srcu_idx);
-+	return rc;
-+}
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index ca2aedd8ee7d..29b93fb3929e 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -522,8 +522,9 @@ static int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
- #define dm_blk_report_zones		NULL
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
--static int dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
--			    struct block_device **bdev)
-+int __dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
-+		       struct block_device **bdev,
-+		       struct dm_target **target)
- {
- 	struct dm_target *tgt;
- 	struct dm_table *map;
-@@ -553,10 +554,19 @@ static int dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
- 		goto retry;
- 	}
- 
-+	if (r >= 0 && target)
-+		*target = tgt;
-+
- 	return r;
- }
- 
--static void dm_unprepare_ioctl(struct mapped_device *md, int srcu_idx)
-+static int dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
-+			    struct block_device **bdev)
-+{
-+	return __dm_prepare_ioctl(md, srcu_idx, bdev, NULL);
-+}
-+
-+void dm_unprepare_ioctl(struct mapped_device *md, int srcu_idx)
- {
- 	dm_put_live_table(md, srcu_idx);
- }
-@@ -567,6 +577,10 @@ static int dm_blk_ioctl(struct block_device *bdev, fmode_t mode,
- 	struct mapped_device *md = bdev->bd_disk->private_data;
- 	int r, srcu_idx;
- 
-+	if ((dm_get_md_type(md) == DM_TYPE_REQUEST_BASED) &&
-+	    ((r = dm_sg_io_ioctl(bdev, mode, cmd, arg)) != -ENOTTY))
-+		return r;
-+
- 	r = dm_prepare_ioctl(md, &srcu_idx, &bdev);
- 	if (r < 0)
- 		goto out;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 48497a77428d..b8f1d603cc7a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -923,6 +923,8 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- 			  unsigned int, void __user *);
- extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- 			 struct scsi_ioctl_command __user *);
-+extern int sg_io(struct request_queue *, struct gendisk *,
-+		 struct sg_io_hdr *, fmode_t);
- extern int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp);
- extern int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp);
- 
--- 
-2.31.1
-
+> +	if (error)
+> +		goto out_unlock;
+> +
+>   	if (!(file->f_mode & FMODE_WRITE) || !(mode & FMODE_WRITE) ||
+>   	    !file->f_op->write_iter)
+> -		lo_flags |= LO_FLAGS_READ_ONLY;
+> -
+> -	size = get_loop_size(lo, file);
+> +		lo->lo_flags |= LO_FLAGS_READ_ONLY;
+>   
+>   	error = loop_prepare_queue(lo);
+>   	if (error)
+>
