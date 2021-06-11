@@ -2,161 +2,300 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DCBFC48BDF
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 02:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B3EC48BDF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 02:14:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E047613B3
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 02:00:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D083F613AD
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 02:14:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbhFKCCf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jun 2021 22:02:35 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:35479 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbhFKCCe (ORCPT
+        id S231400AbhFKCQI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jun 2021 22:16:08 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:5331 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231389AbhFKCQI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jun 2021 22:02:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1623376838; x=1654912838;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=WbIwLodas8X1ZQmJxeEL07aVFT0NWEf8mfBNdsqg6ng=;
-  b=RmuCck8t1cwcQ+Shzac8GFnO7LzybMKFDb0xdllzcESOQfCH+CRn+FNA
-   zLqwn4INBiv97U8fSrpZ3C5kL1T6Pzh+ftg/bH+3NGLVgF6mZWJG47OdZ
-   6OynvKqpKjAO+Lfh70+LcO79DjNMuDGA6VMQjuyKfBxfhDE+JtWjaFV3u
-   1bZLji5r/iklK9TqICfK8ehMRWiKMmhVlJ/2VT1DkNur+zko0qeBHfK22
-   6zStmYPPOItMLrberd7sJzyL/9mUXuyHhiWnEcu+uVcRqTLEHSuY7IQoR
-   KLPZchdIzlNcbUtzF+BrT8ZLgcVeZbdzBcwenUZTjFfcgbqmNiA4lZLCj
-   A==;
-IronPort-SDR: fqHUxRi6LbDxHwElP4olINXT7PzVrXg045MJG3SqeuvfidMEIXtfIS2S8JOYI5+p768SrTnt34
- AzxRJbXoGxpIWuu3/28s/5yeHcIWkPusF5+d9Uqg0Bgz4jtQuDiSZfYLo0R6h8ee86FTkLBOgf
- lR3xaOtW+a/qsc6BSIy4wBDfOpH1yZ1NkPtP1T+etykalW7z6xNPZ9ZvBDqE9OUU+yWjRfBQOI
- YShWmNHbtwSorAEXajoYhxuMZrSrwgqwP5Js/iqbUqq4nl5zl8B0tYXr8MF1X0cF7reOjbjNUx
- rIc=
-X-IronPort-AV: E=Sophos;i="5.83,265,1616428800"; 
-   d="scan'208";a="282973276"
-Received: from mail-mw2nam10lp2104.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.104])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2021 10:00:37 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O2pm/seitLHv49hzeWIBJA6/70osfRcr0m5zjlCnizzhBv19pto3QsnO3+RwlQXKfY6TVSm1NuT9FcErlU4B87Yb1GZRcDzhLWzh57C1j5hcGLrzvx8ZbEqJQD97+ZlIw6W6N36XzMo9ecOfNC4OId6Sf2wWl/pJRE+h/Fv715yZ+EvLDxSyOpBG0fymRUz7q9LGJ2OkvbN+Bpu6BRg+LneugPO+vewWFCnobkQM54BllPfEAoKO+Axohyk07IPSu5oK1hewLfbX2bxeWj0Hz1Z1aBmdOaizu8mxv8LepLB+hGmzoWT9kL1/EDCLoClxcOtvs2wIb7qH2OCf5mS8Gw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbIwLodas8X1ZQmJxeEL07aVFT0NWEf8mfBNdsqg6ng=;
- b=VR9qfbB3x3SOLYP4uhUTloNpxRkanW1is0qchorJuL2PZX+SAK5yePP539ithUnSWPgrh02lTZkVHT1cY/aX0z6zRwW5Q780xMc7I8VXY9srLlKTyiunwqAEi35CrBFRghTSq5bHQTJagndpMh0Jy4XdTVV/UaXOrIKo47G9Z7Fh3KJ33PEFDuNt1eCeV+izVNtVKBvOhLC5A8gmSaQzptU1bFphwNPYH40nBH82QV3Yi4HB6jxjftej6Dda5eVlr2+5hTHBEgCPffL8mfyaTZhEOJpon56hoCM9aRu0DKGH6mIpVKmclXCnOGhVCiQ/RjRhemBNdsUSswwCCSnK6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbIwLodas8X1ZQmJxeEL07aVFT0NWEf8mfBNdsqg6ng=;
- b=ng3qL97aXO+5OMa/UdX3Zsg85/4hilj3OnxpIoCMifsMvO5DquAHF4S+X4Uinm5hMb04avJCHL9fC//e9mUdr4odrWCxze93ovyTCXGH/yNdvbnBsEf0+uB+rkgVlJqJhvIn5IGS9LPYGG0+b3tnGj70AH2Cu4523qnEDVjjLps=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB5432.namprd04.prod.outlook.com (2603:10b6:a03:d0::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.24; Fri, 11 Jun
- 2021 02:00:36 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0%7]) with mapi id 15.20.4219.021; Fri, 11 Jun 2021
- 02:00:36 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Keith Busch <kbusch@kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        Yuanyuan Zhong <yzhong@purestorage.com>,
-        Casey Chen <cachen@purestorage.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCHv4 4/4] nvme: use return value from blk_execute_rq()
-Thread-Topic: [PATCHv4 4/4] nvme: use return value from blk_execute_rq()
-Thread-Index: AQHXXkHqEAv1w4G0W0qwJEX1Nm07yA==
-Date:   Fri, 11 Jun 2021 02:00:36 +0000
-Message-ID: <BYAPR04MB4965A4FB6B655ABFAAF72CAB86349@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210610214437.641245-1-kbusch@kernel.org>
- <20210610214437.641245-5-kbusch@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 54aaf50b-e385-4ffc-75eb-08d92c7cb483
-x-ms-traffictypediagnostic: BYAPR04MB5432:
-x-microsoft-antispam-prvs: <BYAPR04MB5432BFB21FD8CCCA76A690F386349@BYAPR04MB5432.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Png98WbT9wiVc43Kn22Z2MWzzksga6uf6c6Px1mjQ/TnRjcPFIYQPhPQbEolDpQzNJYQHkaTneZ5llfcMDlNMUd7XZ4vCdEtTY+iP9VRNXpoWifGob8X8uGy3WENBExLLuZCscAZNXzSr6Sc3L7zSliKKVCkZ7FWwtlmNCRXkuW8qcrWXgb8b0WqYFpslAAz7Mlnp9KrQcdKIRn1okTyK1/fdxNJDIQ2KcwSYHJXVEPKj0Wn8JtICOIsfQppDDNtTcYHSxOGUStcvUMB2oIwMfC9lwVoNJCflFqbrQvvY75Y/w+4Rvn5wQSCOiln0onmnbqhOd9VJamXmvFSMv30q323SWWMobj23UBJXgbmX2xzlCZ3dy9TjAdfIaKKUmjKxbh2Vmofw2I4peJIRFor+QXrGxPkXOIAtHawaRQvNsTpcwHPpTJF+yiDsQrVCKftJ/UMASVz69CbVPyt1zCOapYMgSPU4yCBzwe5Z63rOa4MbBfN8PP4W6TUd+5VMLZ6nuUQk2rRuuupRoQuhTNvIG/MYchVETDxl8HojOWStbDnc1ETj3nxwzgfXrNq19vPHSlrxejnVECR2h4+8Rf5/Zn+xQgY2uOAalHT4/+bULk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(39860400002)(376002)(366004)(110136005)(53546011)(83380400001)(26005)(54906003)(52536014)(66946007)(71200400001)(8936002)(66556008)(8676002)(186003)(4326008)(66476007)(86362001)(33656002)(2906002)(76116006)(7696005)(316002)(122000001)(38100700002)(6506007)(4744005)(5660300002)(9686003)(64756008)(66446008)(478600001)(55016002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/47wenYNjDdcKC606AOHwQnNBdi6/BOVEbysn/ldfICe7RDR9dVQOxJvs81B?=
- =?us-ascii?Q?JnwE90OVln4kWY+MQ1e7OLBL2GiU4UbPz0rsE932gE66tRc5SaKBPMHMqnjm?=
- =?us-ascii?Q?Rp8/1QUSvwfure4/q3NHuObJ26SDlVbwM6BHM/aTl9n+A2vjWEQoAZZ8PcGB?=
- =?us-ascii?Q?d/LYqvHpavACVOwGxBloBmScc3LUNOefg0YZ9bKV2PI//CFfPZNCMfx2AJr8?=
- =?us-ascii?Q?VnGNn9hpC5Qa/UbxKC6aaa7whHvNN656EpPB3s6xI2uyvF6IagKU/BQb17zJ?=
- =?us-ascii?Q?HxETlPCgbQz1AJG76oCe7t9IVzH4iZe8CW8gExAwN72ZGb8kYYAiY3cNxuKC?=
- =?us-ascii?Q?76oq1sASvSuDzblvy4gcfEwgSUVbUfnPTCfJxt3bJqfzeyiZPXMSnDVmQ3PD?=
- =?us-ascii?Q?9TKD2UEcy3MHpHxEz06WZcdyknwjuQPStS3+K1g8vbPBgIz2le33TZRxWuIt?=
- =?us-ascii?Q?mhMH3VWp9FwzLVHa+4prfxxu7/L0p1KwX1Xr1sJjx3Fv37ekysPBK7Du7UjY?=
- =?us-ascii?Q?rd7U+ejr2LQxDAtGSKUwbT2v5ADmvQJyXydLGWHZGAysEQHvpjCHexvHOx9L?=
- =?us-ascii?Q?SldV7Zh8BOOlUyB67baoBZ68NUY8YoeIf80TpUCJHjAPBi2cQaJam4Ztdh+p?=
- =?us-ascii?Q?xf3xOgPJOQZsdHRjGzD+VzKY8YSuEPh8QTZTZ5VjltT6YdibG2Uz15oerm/m?=
- =?us-ascii?Q?bs8wFSCevY8848kJuzxpQZe7JIkyuOmCU81oLLXrcfqnBbpAWHgdIEBZsiOG?=
- =?us-ascii?Q?qPPmeutdGs9YWwwhPIrYyrZCMo5duthvtNYbS42loYIO7CMUZRMcb084neQ7?=
- =?us-ascii?Q?fgZBFO1lkRAQUFLfC2kMV/e+40QcUQboYhXvIMRf1ETtX6dstt2J3Ygr5F41?=
- =?us-ascii?Q?p8owwq+VdotjsYotgID37XhJY7wPkf+2nxgMrwuLdMWWxYA6wxH2lrQZ48qe?=
- =?us-ascii?Q?6ex3j+EL52ZVoY5tz3aXTDwPLaDZ1dPXBGCIyeN+JDlmC5WOO9nicS4jd76I?=
- =?us-ascii?Q?RREbFmaHKcAH7ArdfQg/WCNNSO13soe9vwHPG7/BnlKGxst9ssb5zaXmG9OC?=
- =?us-ascii?Q?8wzz2qZ8065W26qFFBNvmFnBqf9jlPIuhnJ1mqVTT3SXh7e4/JTCbs6Dxjrc?=
- =?us-ascii?Q?Alt5+9ZGvGf9HbdhkYdQkgy6dhskz/VfCLQJhX/u4pB1e3sQSG27eZ5YYzbk?=
- =?us-ascii?Q?M7guCMHk1PqJ+PsWIae+kDjuheCfDpZGwJoYyebLxHuJTD8sWkdiMOrL87gd?=
- =?us-ascii?Q?k7t1PVf4GksoaxZErB9tCDmcf8oB5IzQ/EbJtwlYYjRA2gF4Yi3OdlqLDGcV?=
- =?us-ascii?Q?HPICq+9zxgdHT8EBLdQdsQa0?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 10 Jun 2021 22:16:08 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4G1PRH4blXz1BJJy;
+        Fri, 11 Jun 2021 10:09:15 +0800 (CST)
+Received: from dggpeml500019.china.huawei.com (7.185.36.137) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 11 Jun 2021 10:14:09 +0800
+Received: from [10.174.179.189] (10.174.179.189) by
+ dggpeml500019.china.huawei.com (7.185.36.137) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 11 Jun 2021 10:14:09 +0800
+Subject: Re: [PATCH V15 4/5] nvmet: add Command Set Identifier support
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
+CC:     <axboe@kernel.dk>, <sagi@grimberg.me>, <hch@lst.de>
+References: <20210610013252.53874-1-chaitanya.kulkarni@wdc.com>
+ <20210610013252.53874-5-chaitanya.kulkarni@wdc.com>
+From:   Wu Bo <wubo40@huawei.com>
+Message-ID: <923a0c0e-2f5f-e2f7-aa3b-b4feddd754b2@huawei.com>
+Date:   Fri, 11 Jun 2021 10:14:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54aaf50b-e385-4ffc-75eb-08d92c7cb483
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2021 02:00:36.3597
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PIKQRxWxmpy1MeeYN7X+CEGxkBzh0WeKev+4ez7Zal2c43va1nPmuTp5sMYZIunkVfLJC4yF+XVp1Lk4LNKO3w2+ACH/PkjGTSlolCNXJL0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5432
+In-Reply-To: <20210610013252.53874-5-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.189]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500019.china.huawei.com (7.185.36.137)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/10/21 14:45, Keith Busch wrote:=0A=
-> We don't have an nvme status to report if the driver's .queue_rq()=0A=
-> returns an error without dispatching the requested nvme command. Check=0A=
-> the return value from blk_execute_rq() for all passthrough commands so=0A=
-> the caller may know their command was not successful.=0A=
->=0A=
-> If the command is from the target passthrough interface and fails to=0A=
-> dispatch, synthesize the response back to the host as a internal target=
-=0A=
-> error.=0A=
->=0A=
-> Signed-off-by: Keith Busch <kbusch@kernel.org>=0A=
-=0A=
-Looks good.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-=0A=
+On 2021/6/10 9:32, Chaitanya Kulkarni wrote:
+> NVMe TP 4056 allows controllers to support different command sets.
+> NVMeoF target currently only supports namespaces that contain
+> traditional logical blocks that may be randomly read and written. In
+> some applications there is a value in exposing namespaces that contain
+> logical blocks that have special access rules (e.g. sequentially write
+> required namespace such as Zoned Namespace (ZNS)).
+> 
+> In order to support the Zoned Block Devices (ZBD) backend, controllers
+> need to have support for ZNS Command Set Identifier (CSI).
+> 
+> In this preparation patch, we adjust the code such that it can now
+> support the default command set identifier. We update the namespace data
+> structure to store the CSI value which defaults to NVME_CSI_NVM
+> that represents traditional logical blocks namespace type.
+> 
+> The CSI support is required to implement the ZBD backend for NVMeOF
+> with host side NVMe ZNS interface, since ZNS commands belong to
+> the different command set than the default one.
+> 
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> ---
+>   drivers/nvme/target/admin-cmd.c | 75 +++++++++++++++++++++++++++------
+>   drivers/nvme/target/core.c      | 28 +++++++++---
+>   drivers/nvme/target/nvmet.h     |  1 +
+>   include/linux/nvme.h            |  1 +
+>   4 files changed, 87 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
+> index 3de6a6c99b01..93aaa7479e71 100644
+> --- a/drivers/nvme/target/admin-cmd.c
+> +++ b/drivers/nvme/target/admin-cmd.c
+> @@ -162,15 +162,8 @@ static void nvmet_execute_get_log_page_smart(struct nvmet_req *req)
+>   	nvmet_req_complete(req, status);
+>   }
+>   
+> -static void nvmet_execute_get_log_cmd_effects_ns(struct nvmet_req *req)
+> +static void nvmet_get_cmd_effects_nvm(struct nvme_effects_log *log)
+>   {
+> -	u16 status = NVME_SC_INTERNAL;
+> -	struct nvme_effects_log *log;
+> -
+> -	log = kzalloc(sizeof(*log), GFP_KERNEL);
+> -	if (!log)
+> -		goto out;
+> -
+>   	log->acs[nvme_admin_get_log_page]	= cpu_to_le32(1 << 0);
+>   	log->acs[nvme_admin_identify]		= cpu_to_le32(1 << 0);
+>   	log->acs[nvme_admin_abort_cmd]		= cpu_to_le32(1 << 0);
+> @@ -184,9 +177,30 @@ static void nvmet_execute_get_log_cmd_effects_ns(struct nvmet_req *req)
+>   	log->iocs[nvme_cmd_flush]		= cpu_to_le32(1 << 0);
+>   	log->iocs[nvme_cmd_dsm]			= cpu_to_le32(1 << 0);
+>   	log->iocs[nvme_cmd_write_zeroes]	= cpu_to_le32(1 << 0);
+> +}
+>   
+> -	status = nvmet_copy_to_sgl(req, 0, log, sizeof(*log));
+> +static void nvmet_execute_get_log_cmd_effects_ns(struct nvmet_req *req)
+> +{
+> +	struct nvme_effects_log *log;
+> +	u16 status = NVME_SC_SUCCESS;
+> +
+> +	log = kzalloc(sizeof(*log), GFP_KERNEL);
+> +	if (!log) {
+> +		status = NVME_SC_INTERNAL;
+> +		goto out;
+> +	}
+> +
+> +	switch (req->cmd->get_log_page.csi) {
+> +	case NVME_CSI_NVM:
+> +		nvmet_get_cmd_effects_nvm(log);
+> +		break;
+> +	default:
+> +		status = NVME_SC_INVALID_LOG_PAGE;
+> +		goto free;
+> +	}
+>   
+> +	status = nvmet_copy_to_sgl(req, 0, log, sizeof(*log));
+> +free:
+>   	kfree(log);
+>   out:
+>   	nvmet_req_complete(req, status);
+> @@ -613,6 +627,12 @@ static void nvmet_execute_identify_desclist(struct nvmet_req *req)
+>   			goto out;
+>   	}
+>   
+> +	status = nvmet_copy_ns_identifier(req, NVME_NIDT_CSI,
+> +					  NVME_NIDT_CSI_LEN,
+> +					  &req->ns->csi, &off);
+> +	if (status)
+> +		goto out;
+> +
+>   	if (sg_zero_buffer(req->sg, req->sg_cnt, NVME_IDENTIFY_DATA_SIZE - off,
+>   			off) != NVME_IDENTIFY_DATA_SIZE - off)
+>   		status = NVME_SC_INTERNAL | NVME_SC_DNR;
+> @@ -621,6 +641,17 @@ static void nvmet_execute_identify_desclist(struct nvmet_req *req)
+>   	nvmet_req_complete(req, status);
+>   }
+>   
+> +static bool nvmet_handle_identify_desclist(struct nvmet_req *req)
+> +{
+> +	switch (req->cmd->identify.csi) {
+> +	case NVME_CSI_NVM:
+> +		nvmet_execute_identify_desclist(req);
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>   static void nvmet_execute_identify(struct nvmet_req *req)
+>   {
+>   	if (!nvmet_check_transfer_len(req, NVME_IDENTIFY_DATA_SIZE))
+> @@ -628,13 +659,31 @@ static void nvmet_execute_identify(struct nvmet_req *req)
+>   
+>   	switch (req->cmd->identify.cns) {
+>   	case NVME_ID_CNS_NS:
+> -		return nvmet_execute_identify_ns(req);
+> +		switch (req->cmd->identify.csi) {
+> +		case NVME_CSI_NVM:
+> +			return nvmet_execute_identify_ns(req);
+> +		default:
+> +			break;
+> +		}
+> +		break;
+>   	case NVME_ID_CNS_CTRL:
+> -		return nvmet_execute_identify_ctrl(req);
+> +		switch (req->cmd->identify.csi) {
+> +		case NVME_CSI_NVM:
+> +			return nvmet_execute_identify_ctrl(req);
+> +		}
+
+Is it missing to add the default branch here ?
+
+> +		break;
+>   	case NVME_ID_CNS_NS_ACTIVE_LIST:
+> -		return nvmet_execute_identify_nslist(req);
+> +		switch (req->cmd->identify.csi) {
+> +		case NVME_CSI_NVM:
+> +			return nvmet_execute_identify_nslist(req);
+> +		default:
+> +			break;
+> +		}
+> +		break;
+>   	case NVME_ID_CNS_NS_DESC_LIST:
+> -		return nvmet_execute_identify_desclist(req);
+> +		if (nvmet_handle_identify_desclist(req) == true)
+> +			return;
+> +		break;
+>   	}
+>   
+>   	nvmet_req_cns_error_complete(req);
+> diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+> index 146909486b8f..ac53a1307ce4 100644
+> --- a/drivers/nvme/target/core.c
+> +++ b/drivers/nvme/target/core.c
+> @@ -692,6 +692,7 @@ struct nvmet_ns *nvmet_ns_alloc(struct nvmet_subsys *subsys, u32 nsid)
+>   
+>   	uuid_gen(&ns->uuid);
+>   	ns->buffered_io = false;
+> +	ns->csi = NVME_CSI_NVM;
+>   
+>   	return ns;
+>   }
+> @@ -887,10 +888,14 @@ static u16 nvmet_parse_io_cmd(struct nvmet_req *req)
+>   		return ret;
+>   	}
+>   
+> -	if (req->ns->file)
+> -		return nvmet_file_parse_io_cmd(req);
+> -
+> -	return nvmet_bdev_parse_io_cmd(req);
+> +	switch (req->ns->csi) {
+> +	case NVME_CSI_NVM:
+> +		if (req->ns->file)
+> +			return nvmet_file_parse_io_cmd(req);
+> +		return nvmet_bdev_parse_io_cmd(req);
+> +	default:
+> +		return NVME_SC_INVALID_IO_CMD_SET;
+> +	}
+>   }
+>   
+>   bool nvmet_req_init(struct nvmet_req *req, struct nvmet_cq *cq,
+> @@ -1112,6 +1117,17 @@ static inline u8 nvmet_cc_iocqes(u32 cc)
+>   	return (cc >> NVME_CC_IOCQES_SHIFT) & 0xf;
+>   }
+>   
+> +static inline bool nvmet_css_supported(u8 cc_css)
+> +{
+> +	switch (cc_css <<= NVME_CC_CSS_SHIFT) {
+> +	case NVME_CC_CSS_NVM:
+> +	case NVME_CC_CSS_CSI:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>   static void nvmet_start_ctrl(struct nvmet_ctrl *ctrl)
+>   {
+>   	lockdep_assert_held(&ctrl->lock);
+> @@ -1131,7 +1147,7 @@ static void nvmet_start_ctrl(struct nvmet_ctrl *ctrl)
+>   
+>   	if (nvmet_cc_mps(ctrl->cc) != 0 ||
+>   	    nvmet_cc_ams(ctrl->cc) != 0 ||
+> -	    nvmet_cc_css(ctrl->cc) != 0) {
+> +	    !nvmet_css_supported(nvmet_cc_css(ctrl->cc))) {
+>   		ctrl->csts = NVME_CSTS_CFS;
+>   		return;
+>   	}
+> @@ -1182,6 +1198,8 @@ static void nvmet_init_cap(struct nvmet_ctrl *ctrl)
+>   {
+>   	/* command sets supported: NVMe command set: */
+>   	ctrl->cap = (1ULL << 37);
+> +	/* Controller supports one or more I/O Command Sets */
+> +	ctrl->cap |= (1ULL << 43);
+>   	/* CC.EN timeout in 500msec units: */
+>   	ctrl->cap |= (15ULL << 24);
+>   	/* maximum queue entries supported: */
+> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+> index d4bcfeb570e5..4ca558b94955 100644
+> --- a/drivers/nvme/target/nvmet.h
+> +++ b/drivers/nvme/target/nvmet.h
+> @@ -83,6 +83,7 @@ struct nvmet_ns {
+>   	struct pci_dev		*p2p_dev;
+>   	int			pi_type;
+>   	int			metadata_size;
+> +	u8			csi;
+>   };
+>   
+>   static inline struct nvmet_ns *to_nvmet_ns(struct config_item *item)
+> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+> index edcbd60b88b9..c7ba83144d52 100644
+> --- a/include/linux/nvme.h
+> +++ b/include/linux/nvme.h
+> @@ -1504,6 +1504,7 @@ enum {
+>   	NVME_SC_NS_WRITE_PROTECTED	= 0x20,
+>   	NVME_SC_CMD_INTERRUPTED		= 0x21,
+>   	NVME_SC_TRANSIENT_TR_ERR	= 0x22,
+> +	NVME_SC_INVALID_IO_CMD_SET	= 0x2C,
+>   
+>   	NVME_SC_LBA_RANGE		= 0x80,
+>   	NVME_SC_CAP_EXCEEDED		= 0x81,
+> 
+
