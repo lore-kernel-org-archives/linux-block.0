@@ -2,61 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0F5C48BE0
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 15:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D29C48BD1
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 17:51:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9A47613F0
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 15:49:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16B60613D9
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jun 2021 17:51:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbhFKPvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Jun 2021 11:51:32 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:51058 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbhFKPvb (ORCPT
+        id S229985AbhFKRx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Jun 2021 13:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229931AbhFKRxZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Jun 2021 11:51:31 -0400
-Received: from fsav304.sakura.ne.jp (fsav304.sakura.ne.jp [153.120.85.135])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 15BFnWtX032169;
-        Sat, 12 Jun 2021 00:49:32 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav304.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav304.sakura.ne.jp);
- Sat, 12 Jun 2021 00:49:32 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav304.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 15BFnWRO032161
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 12 Jun 2021 00:49:32 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [syzbot] possible deadlock in del_gendisk
-To:     Pavel Tatashin <pasha.tatashin@soleen.com>
-Cc:     Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Petr Vorel <pvorel@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
-        Tejun Heo <tj@kernel.org>
-References: <000000000000ae236f05bfde0678@google.com>
- <1435f266-9f6d-22ef-ba7d-f031c616aede@I-love.SAKURA.ne.jp>
- <7b8c9eeb-789d-e5e6-04d6-130ee8be7305@i-love.sakura.ne.jp>
- <20210609164639.GM4910@sequoia>
- <49e00adb-ccf5-8024-6403-014ca82781dd@i-love.sakura.ne.jp>
- <CA+CK2bDWb2=bsoacY-eqZExObBpXuZE0a3Mr18_FXmGZTC5GnQ@mail.gmail.com>
- <CA+CK2bBe5muuGbHgfK7JjbzRE5ogf1oeD1iYeY6eJB046p9_ZQ@mail.gmail.com>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <f76628cc-8f05-56dd-fec5-b1103aedd504@i-love.sakura.ne.jp>
-Date:   Sat, 12 Jun 2021 00:49:27 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Fri, 11 Jun 2021 13:53:25 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F43DC061574
+        for <linux-block@vger.kernel.org>; Fri, 11 Jun 2021 10:51:12 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id x19so3210030pln.2
+        for <linux-block@vger.kernel.org>; Fri, 11 Jun 2021 10:51:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=2rxRAiPtIPFYcoD9aLWTaw2AHjyQyQp4ZMkTG0TPS7E=;
+        b=ifTbSpnQJUBSZvLYFwYcfJtqZOUc2F+tqqkx585oVr1NX3yD+zW5vI1uu+m1MY+3XZ
+         RnW7Xf6XlwyGupoo+F0irbqLyd51juu87lwaNAFh8sX8G0VK9AY/uMX6ak5Yc9Lvefd1
+         gQw8Q86a6EqHDSci1uu0dAmeNkg84vi8Vja2hGim3dMSI4E880mqywQIb7UtsJRKlwGy
+         JjkK9f8nswJgVBObHusdQ9LGMJDNubWkPkxmV+ePzlW4QZMofnO5/unPhO0dG+fhb/w+
+         S932GbgOkxqEggV2Q9M6MMaClq7q70oYlUgub4umV46DRE2H2EQTBfoAOKGon5c3dCDY
+         Fisg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2rxRAiPtIPFYcoD9aLWTaw2AHjyQyQp4ZMkTG0TPS7E=;
+        b=n5xlq/D7AihPIEgXQ3eCih4lH829vgC3MsM4gIfR1CiHxzFc7ZMT4Sat+x45RgN3gU
+         YbxabqXwxaqoT3uebFAb3Nu0My/x+lv6TVSMVJlR3qNm/02MC1/CbS8so996Y+ztkJK3
+         kMrDSm2Xovho9Nb97FCUTo9+HG/Gg1urjrfnAJfgx98xvtr0qpRylgjFKLRdhZgdyv6N
+         sF+7xVz0oIMadQDEeW+9xHqZQlLsJpgEZR76bH0aIr7q/KZ2YTpGJhQQnIJPfBD4QPRK
+         1vhfjDMDiwiDwGVD37m2BK0q+0bTK2RdWBbzrjCAVSLn6+4XU9d+3xzDDnctIoync8eb
+         g7sA==
+X-Gm-Message-State: AOAM531I6WMIRdRr9ziipXx5ILi8J/WlTmI0hsxjCDgyzHrEUlasMSE5
+        XjMYlsjH502HpOCF7GWkePbmXg==
+X-Google-Smtp-Source: ABdhPJwaRIfbEQgveMAxoYPgSHlRY9WSJZS0MiMwPMBoczZx23xnZcXY/lu7YkNPDJOJI1JH3i4Evg==
+X-Received: by 2002:a17:90a:5504:: with SMTP id b4mr5605740pji.208.1623433871462;
+        Fri, 11 Jun 2021 10:51:11 -0700 (PDT)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id c184sm2751867pfa.38.2021.06.11.10.51.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jun 2021 10:51:10 -0700 (PDT)
+Subject: Re: [PATCH] block: loop: fix deadlock between open and remove
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     ming.lei@redhat.com, pasha.tatashin@soleen.com,
+        linux-block@vger.kernel.org,
+        Colin Ian King <colin.king@canonical.com>
+References: <20210605140950.5800-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b186cfd8-5000-c712-67ca-9919451ba501@kernel.dk>
+Date:   Fri, 11 Jun 2021 11:51:12 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CA+CK2bBe5muuGbHgfK7JjbzRE5ogf1oeD1iYeY6eJB046p9_ZQ@mail.gmail.com>
+In-Reply-To: <20210605140950.5800-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,44 +77,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/06/12 0:18, Pavel Tatashin wrote:
->>> Well, I made commit 310ca162d779efee ("block/loop: Use global lock for ioctl() operation.")
->>> because per device lock was not sufficient. Did commit 6cc8e7430801fa23 ("loop: scale loop
->>> device by introducing per device lock") take this problem into account?
->>
->> This was my intention when I wrote 6cc8e7430801fa23 ("loop: scale loop
->> device by introducing per device lock"). This is why this change does
->> not simply revert 310ca162d779efee ("block/loop: Use global lock for
->> ioctl() operation."), but keeps loop_ctl_mutex to protect the global
->> accesses.  loop_control_ioctl() is still locked by global
->> loop_ctl_mutex.
+On 6/5/21 8:09 AM, Christoph Hellwig wrote:
+> Commit c76f48eb5c08 ("block: take bd_mutex around delete_partitions in
+> del_gendisk") adds disk->part0->bd_mutex in del_gendisk(), this way
+> causes the following AB/BA deadlock between removing loop and opening
+> loop:
+> 
+>  1) loop_control_ioctl(LOOP_CTL_REMOVE)
+>      -> mutex_lock(&loop_ctl_mutex)
+>      -> del_gendisk
+>          -> mutex_lock(&disk->part0->bd_mutex)
+> 
+>  2) blkdev_get_by_dev
+>      -> mutex_lock(&disk->part0->bd_mutex)
+>      -> lo_open
+>          -> mutex_lock(&loop_ctl_mutex)
+> 
+> Add a new Lo_deleting state to remove the need for clearing
+> ->private_data and thus holding loop_ctl_mutex in the ioctl
+> LOOP_CTL_REMOVE path.
+> 
+> Based on an analysis and earlier patch from
+> Ming Lei <ming.lei@redhat.com>.
 
-No, loop_control_ioctl() (i.e. /dev/loop-control) is irrelevant here.
-What 310ca162d779efee addressed but (I worry) 6cc8e7430801fa23 broke is
-lo_ioctl() (i.e. /dev/loop$num).
+Applied, thanks.
 
-syzbot was reporting NULL pointer dereference which is caused by
-race condition between ioctl(loop_fd, LOOP_CLR_FD, 0) versus
-ioctl(other_loop_fd, LOOP_SET_FD, loop_fd) due to traversing other
-loop devices at loop_validate_file() without holding corresponding
-lo->lo_mutex lock.
+-- 
+Jens Axboe
 
-For example, loop_change_fd("/dev/loop0") calls loop_validate_file()
-with only "/dev/loop0"->lo_mutex held. Then, loop_validate_file() finds
-that is_loop_device("/dev/loop0") == true and enters the "while" loop.
-In the "while" loop, there is
-
-	if (l->lo_state != Lo_bound) {
-		return -EINVAL;
-	}
-	f = l->lo_backing_file;
-
-which has a race window that l->lo_backing_file suddenly becomes NULL
-between these statements because __loop_clr_fd("/dev/loop1") is doing
-
-	lo->lo_backing_file = NULL;
-
-with only "/dev/loop1"->lo_mutex held.
-
-In other words, loop_validate_file() is a global accesses which are
-no longer protected by loop_ctl_mutex, isn't it?
