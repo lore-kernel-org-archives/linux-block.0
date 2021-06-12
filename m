@@ -2,419 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8713DC49EA3
-	for <linux-block@archiver.kernel.org>; Sat, 12 Jun 2021 04:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EE7C48BCF
+	for <linux-block@archiver.kernel.org>; Sat, 12 Jun 2021 15:14:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6607D61287
-	for <linux-block@archiver.kernel.org>; Sat, 12 Jun 2021 04:07:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B4F36138C
+	for <linux-block@archiver.kernel.org>; Sat, 12 Jun 2021 15:14:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbhFLEJp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 12 Jun 2021 00:09:45 -0400
-Received: from mga01.intel.com ([192.55.52.88]:9354 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229942AbhFLEJp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Jun 2021 00:09:45 -0400
-IronPort-SDR: 5bZEel/UdEykp6jgFtCeejs68XTfKtAqoOh55xQAlV49KPdc5IKuOQREw1yRh8PwWZNe7O1kdO
- jTU6GIE2OXGA==
-X-IronPort-AV: E=McAfee;i="6200,9189,10012"; a="227075885"
-X-IronPort-AV: E=Sophos;i="5.83,268,1616482800"; 
-   d="scan'208";a="227075885"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2021 21:07:45 -0700
-IronPort-SDR: w9Z6J/r97mO9lFntwTdvcFJR/T8FN7zIqOB14ZTprURZotbf+h18t1ZDpiThnaK4JmnMY6+zNE
- Gq1E7F9H+CgA==
-X-IronPort-AV: E=Sophos;i="5.83,268,1616482800"; 
-   d="scan'208";a="483489410"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2021 21:07:44 -0700
-Date:   Fri, 11 Jun 2021 21:07:43 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ceph-devel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        linux-arch@vger.kernel.org, Tero Kristo <t-kristo@ti.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 09/16] ps3disk: use memcpy_{from,to}_bvec
-Message-ID: <20210612040743.GG1600546@iweiny-DESK2.sc.intel.com>
-References: <20210608160603.1535935-1-hch@lst.de>
- <20210608160603.1535935-10-hch@lst.de>
- <20210609014822.GT3697498@iweiny-DESK2.sc.intel.com>
- <20210611065338.GA31210@lst.de>
+        id S230213AbhFLPQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 12 Jun 2021 11:16:38 -0400
+Received: from mail-pl1-f171.google.com ([209.85.214.171]:39635 "EHLO
+        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230191AbhFLPQf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 12 Jun 2021 11:16:35 -0400
+Received: by mail-pl1-f171.google.com with SMTP id v11so4310708ply.6
+        for <linux-block@vger.kernel.org>; Sat, 12 Jun 2021 08:14:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=dlKssdmEq9KNzh3jhmmsiXpyw8DnuVCke31h2mtsOwU=;
+        b=AkGSIaecRg79fSDRQLK7xKpMMdHAPJgaPGUtWrniWrqgw4syls6k0UAtoNOs0BlZ+G
+         x/oHlelT3m8Hd8PVsyQGeFCPcGkWU41ykmiOmHez24c6Amxf+hUZw0zEhS6mGihmgi87
+         xG4Uo8CMtaAPzP/QN4fC0q1H6ZMfu0aAIgT7x0O77T5v8vhkzCc+LMV8/A505FjK4mbS
+         2CV3ZO3b8pHIS07xVQdqh9HQjIfXsYQ1BKJRxchLGMC6maUXeNIbrF+ooqzbtAciDry8
+         8vWdG7G0hqeHCrq4QtWGsIiORtCLzY10eRUmx2s0ARNdW8lfBeRrAZAZXKrat7/um6AD
+         TBiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=dlKssdmEq9KNzh3jhmmsiXpyw8DnuVCke31h2mtsOwU=;
+        b=JkteEwqSI+oGZqn+/T4ULToP0mEhPrqrzfPhdyzRbLv5oJ2IRrNSsVbPtT+5GBMtUz
+         y6g52D162+cSOKxPUbhf+NwCthtJ28QEITHYySL9ZxyRAv2TqSu98waNYEuRnsPApdo+
+         zT3HX0nbJFTy89xXgcoA717M+fNlqlGWX4Nl95cupKceYwNJpUQMHebxISjQ8a+blkp+
+         Cj+YbhzIi7AVU+ZFYu1UgkDYZmKdy14HNuabLibaKW1G5pkBX2eg4JwMuv5MQnhw1eYQ
+         LLqTCyNrYhW5NLnNNoV3vEMvP/DO8U673zXW/4+DhOPsesE7HoMuL95NldRjRajXzQFp
+         6r4A==
+X-Gm-Message-State: AOAM530wW3UnbFB6GuqMTfHWhG0u5SKLx2MsslgT7J1rhgCRZxysvA7N
+        duZ4a/uxCEtjwQDfrFj+w6cQKpWu7BBKHA==
+X-Google-Smtp-Source: ABdhPJxCVa0QYMukrg9aFdjs9NHVzg5Jl1rVOpy0eSN/V0+j6s/XGo/VrjjnEHESXheG3LAS5pU1ug==
+X-Received: by 2002:a17:902:7244:b029:f5:2ffd:37f9 with SMTP id c4-20020a1709027244b02900f52ffd37f9mr8838111pll.26.1623510815520;
+        Sat, 12 Jun 2021 08:13:35 -0700 (PDT)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id s22sm8179219pfe.208.2021.06.12.08.13.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 12 Jun 2021 08:13:34 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.13-rc6
+Message-ID: <502db269-c291-5675-779b-fccae75b86d5@kernel.dk>
+Date:   Sat, 12 Jun 2021 09:13:33 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210611065338.GA31210@lst.de>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 11, 2021 at 08:53:38AM +0200, Christoph Hellwig wrote:
-> On Tue, Jun 08, 2021 at 06:48:22PM -0700, Ira Weiny wrote:
-> > I'm still not 100% sure that these flushes are needed but the are not no-ops on
-> > every arch.  Would it be best to preserve them after the memcpy_to/from_bvec()?
-> > 
-> > Same thing in patch 11 and 14.
-> 
-> To me it seems kunmap_local should basically always call the equivalent
-> of flush_kernel_dcache_page.  parisc does this through
-> kunmap_flush_on_unmap, but none of the other architectures with VIVT
-> caches or other coherency issues does.
-> 
-> Does anyone have a history or other insights here?
+Hi Linus,
 
-I went digging into the current callers of flush_kernel_dcache_page() other
-than this one.  To see if adding kunmap_flush_on_unmap() to the other arch's
-would cause any problems.
+A few fixes that should go into 5.13:
 
-In particular this call site stood out because it is not always called?!?!?!?
+- Fix a regression deadlock introduced in this release between open and
+  remove of a bdev (Christoph)
 
-void sg_miter_stop(struct sg_mapping_iter *miter)
-{
-...
-                if ((miter->__flags & SG_MITER_TO_SG) &&
-                    !PageSlab(miter->page))
-                        flush_kernel_dcache_page(miter->page);
-...
-}
+- Fix an async_xor md regression in this release (Xiao)
 
-Looking at 
+- Fix bcache oversized read issue (Coly)
 
-3d77b50c5874 lib/scatterlist.c: don't flush_kernel_dcache_page on slab page[1]
-
-It seems the restrictions they are quoting for the page are completely out of
-date.  I don't see any current way for a VM_BUG_ON() to be triggered.  So is
-this code really necessary?
-
-More recently this was added:
-
-7e34e0bbc644 crypto: omap-crypto - fix userspace copied buffer access
-
-I'm CC'ing Tero and Herbert to see why they added the SLAB check.
+Please pull!
 
 
-Then we have interesting comments like this...
+The following changes since commit e369edbb0d8cee50efa6375d5c598a04b7cb3032:
 
-...
-                /* This can go away once MIPS implements
-		 * flush_kernel_dcache_page */
-		flush_dcache_page(miter->page);
-...
+  Merge tag 'nvme-5.13-2021-06-03' of git://git.infradead.org/nvme into block-5.13 (2021-06-03 07:42:27 -0600)
 
+are available in the Git repository at:
 
-And some users optimizing.
+  git://git.kernel.dk/linux-block.git tags/block-5.13-2021-06-12
 
-...
-		/* discard mappings */
-		if (direction == DMA_FROM_DEVICE)
-			flush_kernel_dcache_page(sg_page(sg));  
-...
+for you to fetch changes up to 85f3f17b5db2dd9f8a094a0ddc665555135afd22:
 
-The uses in fs/exec.c are the most straight forward and can simply rely on the
-kunmap() code to replace the call.
+  Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.13 (2021-06-11 11:56:08 -0600)
 
-In conclusion I don't see a lot of reason to not define kunmap_flush_on_unmap()
-on arm, csky, mips, nds32, and sh...  Then remove all the
-flush_kernel_dcache_page() call sites and the documentation...
+----------------------------------------------------------------
+block-5.13-2021-06-12
 
-Something like [2] below...  Completely untested of course...
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      block: loop: fix deadlock between open and remove
 
-Ira
+Coly Li (2):
+      bcache: remove bcache device self-defined readahead
+      bcache: avoid oversized read request in cache missing code path
 
+Jens Axboe (1):
+      Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.13
 
-[1] commit 3d77b50c5874b7e923be946ba793644f82336b75
-Author: Ming Lei <ming.lei@canonical.com>
-Date:   Thu Oct 31 16:34:17 2013 -0700
+Xiao Ni (1):
+      async_xor: check src_offs is not NULL before updating it
 
-    lib/scatterlist.c: don't flush_kernel_dcache_page on slab page
-    
-    Commit b1adaf65ba03 ("[SCSI] block: add sg buffer copy helper
-    functions") introduces two sg buffer copy helpers, and calls
-    flush_kernel_dcache_page() on pages in SG list after these pages are
-    written to.
-    
-    Unfortunately, the commit may introduce a potential bug:
-    
-     - Before sending some SCSI commands, kmalloc() buffer may be passed to
-       block layper, so flush_kernel_dcache_page() can see a slab page
-       finally
-    
-     - According to cachetlb.txt, flush_kernel_dcache_page() is only called
-       on "a user page", which surely can't be a slab page.
-    
-     - ARCH's implementation of flush_kernel_dcache_page() may use page
-       mapping information to do optimization so page_mapping() will see the
-       slab page, then VM_BUG_ON() is triggered.
-    
-    Aaro Koskinen reported the bug on ARM/kirkwood when DEBUG_VM is enabled,
-    and this patch fixes the bug by adding test of '!PageSlab(miter->page)'
-    before calling flush_kernel_dcache_page().
+ crypto/async_tx/async_xor.c |  3 ++-
+ drivers/block/loop.c        | 25 +++++++------------------
+ drivers/block/loop.h        |  1 +
+ drivers/md/bcache/bcache.h  |  1 -
+ drivers/md/bcache/request.c | 20 +++++++-------------
+ drivers/md/bcache/stats.c   | 14 --------------
+ drivers/md/bcache/stats.h   |  1 -
+ drivers/md/bcache/sysfs.c   |  4 ----
+ 8 files changed, 17 insertions(+), 52 deletions(-)
 
-
-[2]
-
-
-From 70b537c31d16c2a5e4e92c35895e8c59303bcbef Mon Sep 17 00:00:00 2001
-From: Ira Weiny <ira.weiny@intel.com>
-Date: Fri, 11 Jun 2021 18:24:27 -0700
-Subject: [PATCH] COMPLETELY UNTESTED: highmem: Remove direct calls to flush_kernel_dcache_page
-
-When to call flush_kernel_dcache_page() is confusing and inconsistent.  For
-architectures which may need to do something the core kmap code should be
-leveraged to handle this when direct kernel access is needed.
-
-Like parisc define kunmap_flush_on_unmap() to be called when pages are
-unmapped on arm, csky, mpis, nds32, and sh.
-
-Remove all direct calls to flush_kernel_dcache_page() and let the
-kunmap() code do this for the users.
-
-
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-csky@vger.kernel.org
-Cc: linux-mips@vger.kernel.org
-Cc: linux-sh@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-mmc@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Ira Weiny <ira.weiny@intel.com>
----
- Documentation/core-api/cachetlb.rst  | 13 -------------
- arch/arm/include/asm/cacheflush.h    |  6 ++++++
- arch/csky/abiv1/inc/abi/cacheflush.h |  6 ++++++
- arch/mips/include/asm/cacheflush.h   |  6 ++++++
- arch/nds32/include/asm/cacheflush.h  |  6 ++++++
- arch/sh/include/asm/cacheflush.h     |  6 ++++++
- drivers/crypto/omap-crypto.c         |  3 ---
- drivers/mmc/host/mmc_spi.c           |  3 ---
- drivers/scsi/aacraid/aachba.c        |  1 -
- fs/exec.c                            |  3 ---
- include/linux/highmem.h              |  3 ---
- lib/scatterlist.c                    |  4 ----
- 12 files changed, 30 insertions(+), 30 deletions(-)
-
-diff --git a/Documentation/core-api/cachetlb.rst b/Documentation/core-api/cachetlb.rst
-index fe4290e26729..5c39de30e91f 100644
---- a/Documentation/core-api/cachetlb.rst
-+++ b/Documentation/core-api/cachetlb.rst
-@@ -351,19 +351,6 @@ maps this page at its virtual address.
- 	architectures).  For incoherent architectures, it should flush
- 	the cache of the page at vmaddr.
- 
--  ``void flush_kernel_dcache_page(struct page *page)``
--
--	When the kernel needs to modify a user page is has obtained
--	with kmap, it calls this function after all modifications are
--	complete (but before kunmapping it) to bring the underlying
--	page up to date.  It is assumed here that the user has no
--	incoherent cached copies (i.e. the original page was obtained
--	from a mechanism like get_user_pages()).  The default
--	implementation is a nop and should remain so on all coherent
--	architectures.  On incoherent architectures, this should flush
--	the kernel cache for page (using page_address(page)).
--
--
-   ``void flush_icache_range(unsigned long start, unsigned long end)``
- 
-   	When the kernel stores into addresses that it will execute
-diff --git a/arch/arm/include/asm/cacheflush.h b/arch/arm/include/asm/cacheflush.h
-index 2e24e765e6d3..1b7cb0af707f 100644
---- a/arch/arm/include/asm/cacheflush.h
-+++ b/arch/arm/include/asm/cacheflush.h
-@@ -315,6 +315,12 @@ static inline void flush_anon_page(struct vm_area_struct *vma,
- #define ARCH_HAS_FLUSH_KERNEL_DCACHE_PAGE
- extern void flush_kernel_dcache_page(struct page *);
- 
-+#define ARCH_HAS_FLUSH_ON_KUNMAP
-+static inline void kunmap_flush_on_unmap(void *addr)
-+{
-+	flush_kernel_dcache_page_addr(addr);
-+}
-+
- #define flush_dcache_mmap_lock(mapping)		xa_lock_irq(&mapping->i_pages)
- #define flush_dcache_mmap_unlock(mapping)	xa_unlock_irq(&mapping->i_pages)
- 
-diff --git a/arch/csky/abiv1/inc/abi/cacheflush.h b/arch/csky/abiv1/inc/abi/cacheflush.h
-index 6cab7afae962..e1ff554850f8 100644
---- a/arch/csky/abiv1/inc/abi/cacheflush.h
-+++ b/arch/csky/abiv1/inc/abi/cacheflush.h
-@@ -17,6 +17,12 @@ extern void flush_dcache_page(struct page *);
- #define ARCH_HAS_FLUSH_KERNEL_DCACHE_PAGE
- extern void flush_kernel_dcache_page(struct page *);
- 
-+#define ARCH_HAS_FLUSH_ON_KUNMAP
-+static inline void kunmap_flush_on_unmap(void *addr)
-+{
-+	flush_kernel_dcache_page_addr(addr);
-+}
-+
- #define flush_dcache_mmap_lock(mapping)		xa_lock_irq(&mapping->i_pages)
- #define flush_dcache_mmap_unlock(mapping)	xa_unlock_irq(&mapping->i_pages)
- 
-diff --git a/arch/mips/include/asm/cacheflush.h b/arch/mips/include/asm/cacheflush.h
-index d687b40b9fbb..c3043b600008 100644
---- a/arch/mips/include/asm/cacheflush.h
-+++ b/arch/mips/include/asm/cacheflush.h
-@@ -132,6 +132,12 @@ static inline void flush_kernel_dcache_page(struct page *page)
- 	flush_dcache_page(page);
- }
- 
-+#define ARCH_HAS_FLUSH_ON_KUNMAP
-+static inline void kunmap_flush_on_unmap(void *addr)
-+{
-+	flush_kernel_dcache_page_addr(addr);
-+}
-+
- /*
-  * For now flush_kernel_vmap_range and invalidate_kernel_vmap_range both do a
-  * cache writeback and invalidate operation.
-diff --git a/arch/nds32/include/asm/cacheflush.h b/arch/nds32/include/asm/cacheflush.h
-index 7d6824f7c0e8..bae980846e2a 100644
---- a/arch/nds32/include/asm/cacheflush.h
-+++ b/arch/nds32/include/asm/cacheflush.h
-@@ -43,6 +43,12 @@ void invalidate_kernel_vmap_range(void *addr, int size);
- #define flush_dcache_mmap_lock(mapping)   xa_lock_irq(&(mapping)->i_pages)
- #define flush_dcache_mmap_unlock(mapping) xa_unlock_irq(&(mapping)->i_pages)
- 
-+#define ARCH_HAS_FLUSH_ON_KUNMAP
-+static inline void kunmap_flush_on_unmap(void *addr)
-+{
-+	flush_kernel_dcache_page_addr(addr);
-+}
-+
- #else
- void flush_icache_user_page(struct vm_area_struct *vma, struct page *page,
- 	                     unsigned long addr, int len);
-diff --git a/arch/sh/include/asm/cacheflush.h b/arch/sh/include/asm/cacheflush.h
-index 4486a865ff62..2e23a8d71aa7 100644
---- a/arch/sh/include/asm/cacheflush.h
-+++ b/arch/sh/include/asm/cacheflush.h
-@@ -78,6 +78,12 @@ static inline void flush_kernel_dcache_page(struct page *page)
- 	flush_dcache_page(page);
- }
- 
-+#define ARCH_HAS_FLUSH_ON_KUNMAP
-+static inline void kunmap_flush_on_unmap(void *addr)
-+{
-+	flush_kernel_dcache_page_addr(addr);
-+}
-+
- extern void copy_to_user_page(struct vm_area_struct *vma,
- 	struct page *page, unsigned long vaddr, void *dst, const void *src,
- 	unsigned long len);
-diff --git a/drivers/crypto/omap-crypto.c b/drivers/crypto/omap-crypto.c
-index 94b2dba90f0d..cbc5a4151c3c 100644
---- a/drivers/crypto/omap-crypto.c
-+++ b/drivers/crypto/omap-crypto.c
-@@ -183,9 +183,6 @@ static void omap_crypto_copy_data(struct scatterlist *src,
- 
- 		memcpy(dstb, srcb, amt);
- 
--		if (!PageSlab(sg_page(dst)))
--			flush_kernel_dcache_page(sg_page(dst));
--
- 		kunmap_atomic(srcb);
- 		kunmap_atomic(dstb);
- 
-diff --git a/drivers/mmc/host/mmc_spi.c b/drivers/mmc/host/mmc_spi.c
-index 9776a03a10f5..e1aafbc6a0a1 100644
---- a/drivers/mmc/host/mmc_spi.c
-+++ b/drivers/mmc/host/mmc_spi.c
-@@ -947,9 +947,6 @@ mmc_spi_data_do(struct mmc_spi_host *host, struct mmc_command *cmd,
- 				break;
- 		}
- 
--		/* discard mappings */
--		if (direction == DMA_FROM_DEVICE)
--			flush_kernel_dcache_page(sg_page(sg));
- 		kunmap(sg_page(sg));
- 		if (dma_dev)
- 			dma_unmap_page(dma_dev, dma_addr, PAGE_SIZE, dir);
-diff --git a/drivers/scsi/aacraid/aachba.c b/drivers/scsi/aacraid/aachba.c
-index f1f62b5da8b7..8897d4ad78c6 100644
---- a/drivers/scsi/aacraid/aachba.c
-+++ b/drivers/scsi/aacraid/aachba.c
-@@ -25,7 +25,6 @@
- #include <linux/completion.h>
- #include <linux/blkdev.h>
- #include <linux/uaccess.h>
--#include <linux/highmem.h> /* For flush_kernel_dcache_page */
- #include <linux/module.h>
- 
- #include <asm/unaligned.h>
-diff --git a/fs/exec.c b/fs/exec.c
-index 18594f11c31f..da9faa2da36b 100644
---- a/fs/exec.c
-+++ b/fs/exec.c
-@@ -577,7 +577,6 @@ static int copy_strings(int argc, struct user_arg_ptr argv,
- 				}
- 
- 				if (kmapped_page) {
--					flush_kernel_dcache_page(kmapped_page);
- 					kunmap(kmapped_page);
- 					put_arg_page(kmapped_page);
- 				}
-@@ -595,7 +594,6 @@ static int copy_strings(int argc, struct user_arg_ptr argv,
- 	ret = 0;
- out:
- 	if (kmapped_page) {
--		flush_kernel_dcache_page(kmapped_page);
- 		kunmap(kmapped_page);
- 		put_arg_page(kmapped_page);
- 	}
-@@ -637,7 +635,6 @@ int copy_string_kernel(const char *arg, struct linux_binprm *bprm)
- 		kaddr = kmap_atomic(page);
- 		flush_arg_page(bprm, pos & PAGE_MASK, page);
- 		memcpy(kaddr + offset_in_page(pos), arg, bytes_to_copy);
--		flush_kernel_dcache_page(page);
- 		kunmap_atomic(kaddr);
- 		put_arg_page(page);
- 	}
-diff --git a/include/linux/highmem.h b/include/linux/highmem.h
-index 832b49b50c7b..7ef83bf52a6c 100644
---- a/include/linux/highmem.h
-+++ b/include/linux/highmem.h
-@@ -131,9 +131,6 @@ static inline void flush_anon_page(struct vm_area_struct *vma, struct page *page
- #endif
- 
- #ifndef ARCH_HAS_FLUSH_KERNEL_DCACHE_PAGE
--static inline void flush_kernel_dcache_page(struct page *page)
--{
--}
- static inline void flush_kernel_vmap_range(void *vaddr, int size)
- {
- }
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index a59778946404..579b323a8042 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -887,10 +887,6 @@ void sg_miter_stop(struct sg_mapping_iter *miter)
- 		miter->__offset += miter->consumed;
- 		miter->__remaining -= miter->consumed;
- 
--		if ((miter->__flags & SG_MITER_TO_SG) &&
--		    !PageSlab(miter->page))
--			flush_kernel_dcache_page(miter->page);
--
- 		if (miter->__flags & SG_MITER_ATOMIC) {
- 			WARN_ON_ONCE(preemptible());
- 			kunmap_atomic(miter->addr);
 -- 
-2.28.0.rc0.12.gb6a658bd00c9
+Jens Axboe
 
