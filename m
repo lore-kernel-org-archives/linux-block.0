@@ -2,64 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4271C48BE5
-	for <linux-block@archiver.kernel.org>; Sat, 12 Jun 2021 19:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C62C48BCF
+	for <linux-block@archiver.kernel.org>; Sun, 13 Jun 2021 11:02:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C26ED61186
-	for <linux-block@archiver.kernel.org>; Sat, 12 Jun 2021 19:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9787961159
+	for <linux-block@archiver.kernel.org>; Sun, 13 Jun 2021 11:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231492AbhFLTLq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 12 Jun 2021 15:11:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42594 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230492AbhFLTLq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Jun 2021 15:11:46 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 690FC61186;
-        Sat, 12 Jun 2021 19:09:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623524986;
-        bh=OGOHYP6LSk5T9eTkx2e6kHu6FpJ7CPnNjLFdwa5CJ3s=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=SV9ttTKiDaYSujRLDi7FjV1mI34yCqHeDsGTkbUYky/WuLGXG3IWpbF3pqqTykShP
-         5+ASFxNUU4sDdjhXy01J5Re4ns+hpU4gehYFEx3V+fWZJ8XGQJbn4RK7YxdmVpiojB
-         Rxx7HHJ4p1G0kFgL93n+mEjwABQyyFVHpVcto1ijyvz5NBX8i5d7+6aOtGXdskEev6
-         XlNb+aoUiprhLXSFAvbXHdq1JN6ijbLT2ahBij32DvaIcwMrE2iRR/o8XPHXFUeR7E
-         VI8/G2IzZYXLn95QgdZPwfXqHZ66G4xCNlzHp9kBEDLJG+6o2Lw1KOx5Hp2fEWVouO
-         HeWuLaDIq6YuA==
-Subject: Re: [GIT PULL] Block fixes for 5.13-rc6
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <502db269-c291-5675-779b-fccae75b86d5@kernel.dk>
-References: <502db269-c291-5675-779b-fccae75b86d5@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <502db269-c291-5675-779b-fccae75b86d5@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.13-2021-06-12
-X-PR-Tracked-Commit-Id: 85f3f17b5db2dd9f8a094a0ddc665555135afd22
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: efc1fd601a751d39a189c3ebe14008aea69a5e37
-Message-Id: <162352498529.5734.949378882447667148.pr-tracker-bot@kernel.org>
-Date:   Sat, 12 Jun 2021 19:09:45 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S231664AbhFMLEL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Jun 2021 07:04:11 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:58764 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231659AbhFMLEL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 13 Jun 2021 07:04:11 -0400
+Received: from fsav108.sakura.ne.jp (fsav108.sakura.ne.jp [27.133.134.235])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 15DB29ku027230;
+        Sun, 13 Jun 2021 20:02:09 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav108.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav108.sakura.ne.jp);
+ Sun, 13 Jun 2021 20:02:09 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav108.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 15DB20Ff027052
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sun, 13 Jun 2021 20:02:09 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [syzbot] possible deadlock in del_gendisk
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Petr Vorel <pvorel@suse.cz>, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
+        Tejun Heo <tj@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Dmitry Vyukov <dvyukov@google.com>
+References: <000000000000ae236f05bfde0678@google.com>
+ <1435f266-9f6d-22ef-ba7d-f031c616aede@I-love.SAKURA.ne.jp>
+ <7b8c9eeb-789d-e5e6-04d6-130ee8be7305@i-love.sakura.ne.jp>
+ <20210609164639.GM4910@sequoia>
+ <49e00adb-ccf5-8024-6403-014ca82781dd@i-love.sakura.ne.jp>
+ <CA+CK2bDWb2=bsoacY-eqZExObBpXuZE0a3Mr18_FXmGZTC5GnQ@mail.gmail.com>
+ <CA+CK2bBe5muuGbHgfK7JjbzRE5ogf1oeD1iYeY6eJB046p9_ZQ@mail.gmail.com>
+ <f76628cc-8f05-56dd-fec5-b1103aedd504@i-love.sakura.ne.jp>
+ <b817de92-668a-de29-0a81-eecc4124130b@i-love.sakura.ne.jp>
+Message-ID: <c18d05a0-335f-260b-67ac-1ba28814f703@i-love.sakura.ne.jp>
+Date:   Sun, 13 Jun 2021 20:01:58 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <b817de92-668a-de29-0a81-eecc4124130b@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sat, 12 Jun 2021 09:13:33 -0600:
+On 2021/06/12 11:35, Tetsuo Handa wrote:
+> On 2021/06/12 0:49, Tetsuo Handa wrote:
+>> On 2021/06/12 0:18, Pavel Tatashin wrote:
+>>>>> Well, I made commit 310ca162d779efee ("block/loop: Use global lock for ioctl() operation.")
+>>>>> because per device lock was not sufficient. Did commit 6cc8e7430801fa23 ("loop: scale loop
+>>>>> device by introducing per device lock") take this problem into account?
+>>>>
+>>>> This was my intention when I wrote 6cc8e7430801fa23 ("loop: scale loop
+>>>> device by introducing per device lock"). This is why this change does
+>>>> not simply revert 310ca162d779efee ("block/loop: Use global lock for
+>>>> ioctl() operation."), but keeps loop_ctl_mutex to protect the global
+>>>> accesses.  loop_control_ioctl() is still locked by global
+>>>> loop_ctl_mutex.
+>>
+>> No, loop_control_ioctl() (i.e. /dev/loop-control) is irrelevant here.
+>> What 310ca162d779efee addressed but (I worry) 6cc8e7430801fa23 broke is
+>> lo_ioctl() (i.e. /dev/loop$num).
+>>
+>> syzbot was reporting NULL pointer dereference which is caused by
+>> race condition between ioctl(loop_fd, LOOP_CLR_FD, 0) versus
+>> ioctl(other_loop_fd, LOOP_SET_FD, loop_fd) due to traversing other
+>> loop devices at loop_validate_file() without holding corresponding
+>> lo->lo_mutex lock.
+> 
+> Here is a reproducer and a race window widening patch.
+> Since loop_validate_file() traverses on other loop devices,
+> changing fd of loop device needs to be protected using a global lock.
+> 
 
-> git://git.kernel.dk/linux-block.git tags/block-5.13-2021-06-12
+At least LOOP_SET_FD, LOOP_CONFIGURE, LOOP_CHANGE_FD, LOOP_CLR_FD needs to be
+serialized using a global lock because loop_validate_file() traverses on other
+loop devices which can cause NULL pointer dereference like syzbot has reported
+in the past.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/efc1fd601a751d39a189c3ebe14008aea69a5e37
+And I think LOOP_SET_CAPACITY, LOOP_SET_DIRECT_IO, LOOP_SET_BLOCK_SIZE also
+needs to be serialized using a global lock because loop_change_fd() checks
+capacity and dio state of other loop device which is not serialized.
 
-Thank you!
+I'd like to apply
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+  [PATCH] loop: drop loop_ctl_mutex around del_gendisk() in loop_remove()
+
+as soon as possible because it is current top crasher (crashing on every 39 seconds).
+
+I suggest simply reverting commit 6cc8e7430801fa23 ("loop: scale loop device by
+introducing per device lock") for now. Do you want to revert 6cc8e7430801fa23
+before my patch? If yes, I'll update my patch. If no, I'll just ask Jens to send
+my patch to Linus.
