@@ -2,85 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79FE2C2B9F4
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EB7C48BE8
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:23:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49A9A611EE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D424061208
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:23:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232957AbhFNMZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jun 2021 08:25:28 -0400
+        id S232940AbhFNMZa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jun 2021 08:25:30 -0400
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:24750 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232841AbhFNMZ2 (ORCPT
+        with ESMTP id S233030AbhFNMZ3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jun 2021 08:25:28 -0400
+        Mon, 14 Jun 2021 08:25:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1623673406; x=1655209406;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=GPH0mH+lSD+9s2b9ZkHVuXOz0YoAIP/8k78TsRzNQFw=;
-  b=EljkuWL/C6RlOR92x7+PGtHAV2Cn70tg3tR68fYjj/Y9kx31d+2fP2A3
-   BTChzmvsj/ohY2bAy9a1VvySXclXu5XfEg4sSdqQkRqD7T79+1qe3S+Ye
-   thBgzGmnDX3/MtQAjQH4hsp/wmsTPjqUw43pnBvvJUb/dis0DuvyE+yt/
-   S1+0ImLmPAT+16qo1YfuWLJMICJoyVv56YfEolUN+pzgc5+KTu101jwI8
-   r39ieCgVEfqNFdjsHcFSSEXd+QQJEfwa58QAn08+lhhDkzIs3LzdeiXtp
-   GhGDvw1oeOah9nlhwcTR+DeUpCpKPuq0ha9aHABt1sFD7Y9W/zSnvMrUW
-   Q==;
-IronPort-SDR: aEgaU6e307KoXPakJYhIWAW3YYjDfBh1rkIMjSR2t3QpMXEmteo+wiXHahGwmmyjQuI9ad5IWW
- z/vCLaCvX8ONo73tO1pCFobVkdFULOzbplMuW+1NzRcjp9O4zcCML34JksOrQ3nkHD0pAHyXL2
- 3aMxsliUscPtlADuC1+NvKkT2bNdiWVhi9AiCijqOzsfxrLFwhTOZAwc+zpFj2LQwFH7yB7bqR
- /bxL2fvuIM0g/hAraDh9nmmIcKjLpFP6pDZtByS+m7I2um2PN4z8XcVnGOv73Emsm6kYyVjpQa
- NYA=
+  t=1623673407; x=1655209407;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=EmkJF251q5BpNnfYoK2Qo9HmkF8k38XQfapdRw/2Gmg=;
+  b=SeG+3el93Ovf0bxkBToHD+rG3tf7rukaxrVvYz9qzXzn1ng05wTHSpRN
+   uD6rRrokX6cX+Jhv8h7Hvp8ZDhrQvzd/KFvYy77SuyxcJ/KIUJZUUtDfe
+   o8RsKrE/rQPBV7bhTGxbM12nFKpLEpM3LtEn8j9PpPcfO2BYXFxgGl/47
+   hKgjGaYE5bQ3Aj/5D6p59divmSWBh8LaN1V295j3jiFief4mu0Lhhm3qE
+   iTXnetP4a2twE/WSCk8lGPWYV2FmRhR+d/lzjMXrsEtt7nZDNhHUeb2RN
+   G7rHVYqwLbicfFsaDBvPPqvz53YZYwQUa38jZ+wGgLtuakFPh0O9094NK
+   w==;
+IronPort-SDR: xBSf/XyKr+7zkNus1gEegPxo4d8zXxJgigAnW1yMYd//MK5WHvQzLuAjAU/03Bnjx77XOY57d6
+ Gka5Sh1el4HuU7k60zEauzTSJmr4fpQt2aTQeSiJxWt/8CKnADOsk2KrN9wtn1wlV99CX5J6UJ
+ 7wpj/h2DVc1ZYBGppGS2tSUTYgCZuxpp7FJegfLr+jq1IRs94fNiSpJ9G1iG5hq6b5qPRanzGK
+ womO3ApC47t461q+ktgWixt+6DJxYDco3M4dwawT5CQPmvhAyezIeG1VTdxDS2kyhA2SDKsYje
+ v3s=
 X-IronPort-AV: E=Sophos;i="5.83,273,1616428800"; 
-   d="scan'208";a="172386405"
+   d="scan'208";a="172386408"
 Received: from mail-bn8nam11lp2176.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.176])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Jun 2021 20:23:24 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 14 Jun 2021 20:23:25 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UcFxZqjSfDIKg704Sr6HH0XqeoDNE0myLLeGhiwL/Ue+Nu5QZC56n5Z4sArFHDBVOl6V2XqNQbEA2+/+w51Hg9Crt1gr7Nn3SLgaW76J4MTb5cs9YlkR1UYKvquX+AktAQh42W+OsROBVkuXixuh9+TqxXmUuubExG3U+VrnFrAY6kJavvD6YQeJ/I8J3oZu1GlOPE8f4RMgG8wP59qM+gvS1KuNxg5CAsf4UzxFA0lI5C9CywDpe9VhNg/bampobGT8th5o9AzdXS0tC5jxaas58iAZpxVmSPPhI6y3sKRGxatPBalc4MRCB5GYelpGF9kRlfv03kvDlCl0iq9Z4Q==
+ b=KXidY4ewGq5zIJAhQdot5lE8m7bjpzzBwS1LmOLFs5Xd7R+csEYyeN+ZOuHJjxIkcQ1447exdcF4CSH07ebbdnlJQLHCbELDB1230jY3IWPexB99/ZWDEyu7yYwKkI/kX/VVnZP5Gy8HBCPs3+bXZ0R6pLduLEqDpdtnhbqSM0MCd//c6H3B96ZLfcPkRoHdnXA00MlhrfMM5sog89Sbd4T+Xa8cEq4nufXyspYnW6LqI1mt5P7Jcjn6HLUqMf24J1f79p5ZSuwHoMFnQLYTtORLBKiL1u5zSeNgkJ+Q9u1SWIVqHe1kk9oHLJG8+qC21pm+N2K0vuF70fa5RyJXzw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HWlg8yWOm2vg4oL57EtI2J6dLlR/cNATbKwPT9gTJYY=;
- b=oeKsieG2/Z66tjp8Jez5U4QUPppB66XLcqf8R6HV5l4C8MOCepcJdXJphn2bVXhamdXCVeKEQLXdJEB/G/P6WlHpLVX2sLeKcy8oGKMgwptaiCEpP1gc5nSiHj7dO4Oc4Qh5A6jrx3u5PYmtE5aE93F1sSO9qf16ceAYPWhdeCeDopMonSTFbr9yCPvtEXaY+/38LwY3JOpOvPZUERjGkWsq/rJQVpfi8jQ1Rwped390JjmbWAITm8d/SdIlXAfB993IHj4vEufOvMzdzdmZSMrBg+uidimhxylnvfDF0aBQUSKexbvfbYdrDLIx97MkjvA9J89D2Xb4Xwe/8EFgWg==
+ bh=eWlh6+gvAAe/AD/wu11wJd+idxjqvlzYjZ2Tg52DPIY=;
+ b=LG7EOmKSzKN43O3srPUvKFPaOUGyRmlfnTIBZnHsgJBbFbc8XBunKuxVR0wRXrDaWBLK63sDd/653pYzIi7TFxYdS3Qm3yR38k/JaKUecOvGphHW54RO23Kd9eY6n7fHo88ibnaPfh5uBVo89qsxusx4DwdCyqoKqBxrFp2o6oLIjSsJj45pFercEEaLj7qRt6KLQ7b2ifVwm7x2JNGxJgzOHYsG6no3hCASCeWzB9aso/fywCY7WWekW/JHPuUW2D7DUzsCdsy+JIhANPiGmIIvZOrwCZyRR1o9REH0N6Fiyeic2glih4bFNlN70QfeGQCbQv/3WpfWxXqQjRR4jQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HWlg8yWOm2vg4oL57EtI2J6dLlR/cNATbKwPT9gTJYY=;
- b=wRAkJWP84XQOLfV9NLmtrPBMTxbzId0zXHRSYQG2q7mH44nH67HN0+ql8mAYU5SuK1gDDA3qEaBRtNZ6OYEgfw8wQBIV5h9Okf+6Cb/YVSR02CBju9vqsSnBx+kL6nSOSLDupeL02BQPKGO8KWlg5Sk/WYk11vJhZZiRCyWcSYU=
+ bh=eWlh6+gvAAe/AD/wu11wJd+idxjqvlzYjZ2Tg52DPIY=;
+ b=q9MokEHuwnmVkq0eHSaQvlT4i/OCLoEwNJYx3cdnPVLXdg75ThINKiNJSdd02G04nT8dKUVRDtDZ04AzaW6p8YVDNdqZvWe6rgReh5zJKonK0P9iyWFERl+6J+xrxI5M8kUdrA2sduO1UHMUTwklzfQdY2Bk0A1YhOaoHa4Oafg=
 Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
  by PH0PR04MB7365.namprd04.prod.outlook.com (2603:10b6:510:d::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.24; Mon, 14 Jun
- 2021 12:23:20 +0000
+ 2021 12:23:24 +0000
 Received: from PH0PR04MB7158.namprd04.prod.outlook.com
  ([fe80::45d7:388e:5cbb:ae1e]) by PH0PR04MB7158.namprd04.prod.outlook.com
  ([fe80::45d7:388e:5cbb:ae1e%6]) with mapi id 15.20.4219.025; Mon, 14 Jun 2021
- 12:23:19 +0000
+ 12:23:24 +0000
 From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, Shaun Tancheff <shaun@tancheff.com>,
-        Hannes Reinecke <hare@suse.com>,
+To:     Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Shaun Tancheff <shaun@tancheff.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
+        Hannes Reinecke <hare@suse.com>
 CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
         Niklas Cassel <Niklas.Cassel@wdc.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
         Jens Axboe <axboe@fb.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 0/2] allow blk-zoned ioctls without CAP_SYS_ADMIN
-Thread-Topic: [PATCH v3 0/2] allow blk-zoned ioctls without CAP_SYS_ADMIN
-Thread-Index: AQHXYRgPtP8+uBs1gU68gsGoV+YyFg==
-Date:   Mon, 14 Jun 2021 12:23:19 +0000
-Message-ID: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
+Subject: [PATCH v3 1/2] blk-zoned: allow zone management send operations
+ without CAP_SYS_ADMIN
+Thread-Topic: [PATCH v3 1/2] blk-zoned: allow zone management send operations
+ without CAP_SYS_ADMIN
+Thread-Index: AQHXYRgQMteA58G2kEuU7Azlx40Z/g==
+Date:   Mon, 14 Jun 2021 12:23:20 +0000
+Message-ID: <20210614122303.154378-2-Niklas.Cassel@wdc.com>
+References: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
+In-Reply-To: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -90,54 +96,54 @@ authentication-results: kernel.dk; dkim=none (message not signed)
  header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [85.226.244.4]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5a01d0de-5c87-4c7e-de40-08d92f2f3213
+x-ms-office365-filtering-correlation-id: 23f26f28-96cb-4088-e6a5-08d92f2f347b
 x-ms-traffictypediagnostic: PH0PR04MB7365:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR04MB7365D48A7E0208DA7E830DBAF2319@PH0PR04MB7365.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <PH0PR04MB73651A454DDE1E0434ED54C4F2319@PH0PR04MB7365.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: LjlS6ylekz+/anG6qdkDyfylY4vm8GplTi0SkgTkydYJDLdYsraEJzSxJkkyheeJMS7M/MfvKhTn2cJe3c6bi/GUclvEyMCEF+Vc373/Q0PuAlgt305hCRHPRpXeK8FM6ISGNzXLSQcHEQHj1TFes53iMkOw4GoA8DVNqJwdKazqT7tCHnLuY1w23Ho2zdA0n6Xh41oMs0mRDDduLf2ENzX9UtcKY2ywSTqC6DSqjN0we4nl9G0HSWHNSKNWe/AL1/TbVSoCxCi79tA1qmWX8jBWHVH3IgbK9Ual35VFzB/MqQFFjDV6oLd50MTeyx47tmVoj8GuupYdM/RztntW68QzpApMgGKS0xWZkBiB0WzxJBf1EmnkWzYMAyrb+xMq5/NEAZw+8LcFcgVY70aMI7BN1EHX8Y93dm3gMm59I1y7Z/G9deP4fwVF5+ibdZU+oYkiMi6ji86mTPhONrEOAifzee3/X0YHAKlvS5uumi0zlnYQBQJbyDEHF+XKkVELqOueC2adGqB3NEQVdENOsByNtzYwEBxhhMH/Vl2dspJ3ItQ5ZJemGBjeBNXLto/W88/7JI4rJeuz1yjZ2zdIn/6fV+4st6F+8MwQzPHCif0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(136003)(366004)(396003)(2616005)(5660300002)(6486002)(1076003)(86362001)(66446008)(122000001)(186003)(66476007)(8676002)(4744005)(64756008)(66556008)(26005)(8936002)(6506007)(6636002)(71200400001)(38100700002)(2906002)(76116006)(316002)(6512007)(54906003)(66946007)(36756003)(110136005)(83380400001)(4326008)(478600001)(91956017);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: bj7pp1uT46rSQ6Xa2p2obaOBNUusZtGpwPKc61cv6o0tzhBpILNUF47hV2QiDJm/4LxO1AQ6vgeOoZMFRTwIAHmr8+D3FAnLWLJIbuWWoysxY7mQEH0rafq1QbGr67vdnbiMHHjSRlFUi99emykuBBi5Ga1ye91BcgrJknbqDV/IYmXcvJ326ioXSq9i39fSgO/h/MHgwJkjEqf8dA2renUA63zF8bOxoS50H6JRpB0/kSBfKCqtVBUxOKjbu3IUmanePOmMR9mcdvJx5d9yYExIc2AT767HV12QRbCL269eGdwQOmj20TT9ZUwu6GtbaAaj3vVH7B71dGXm9tj3pJJrNDh0xfmz2YgX7zkPtzyOm/TOZFehCBKrCxggN9FawbU5Ey9BSng1mRHY7ZO5dpncKEtAl2mJ6Pc0XOw3Ivjt154DmBvi/LN+VPBtVO3VaoqlBwgEAJIkTFI5b+mkmEtvYW/OB6XILOGVKee65mbFSEE7SZPfSA2R7dMMAjXoE4R1O0AZ3Vjp1k5GXqPHT4Wqu57AA1dk7AZ717xnFC19xtLxVBBFTQ+B+WqW+ZNAXV1NomMOOJMHBsbFF2LVH5rxB1Lx3TOl0u0Y8CyJ/8c=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(136003)(366004)(396003)(2616005)(5660300002)(6666004)(6486002)(1076003)(86362001)(66446008)(122000001)(186003)(66476007)(8676002)(64756008)(66556008)(26005)(8936002)(6506007)(71200400001)(38100700002)(2906002)(76116006)(316002)(6512007)(54906003)(66946007)(36756003)(110136005)(83380400001)(4326008)(478600001)(91956017);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?JzkNMFI63WW7+HucuZ5mw+CBJ8ynx3Agmxhlx5BmQTVEeedQ6sdteP9DrN?=
- =?iso-8859-1?Q?i1Jf7dt5v2JuW7cVKc+MbiGYlVB20enuv9duJeBO5egnuyj+recQUiT+qx?=
- =?iso-8859-1?Q?xGeHwLwCWYWYVHcr8kfg7ObEj2TQIH7qzvZ3l0jaP2HjixsXgrN5mmr+Ep?=
- =?iso-8859-1?Q?9m//37P//E1MdFZN1sWgJCfqrP+4Ik7Fk7eo2I8JS/3muXwIi9IrIo7xNP?=
- =?iso-8859-1?Q?WVrhRazDQUSY9cjwqimNaHicdmz2diIEYMl9OT8nEKTNi+L/qszTFr9Rhi?=
- =?iso-8859-1?Q?a5sN9iW4lvaulVcdI8WKDjl/EfaVbIpZX8smv8yh/i8pL+bwonk5ZWAKQh?=
- =?iso-8859-1?Q?mzB1jxWRybNuNM+Q9jo7ZpMwPT0eYAjCxg+M1y6dmT4wcjEq18Mg9D/u2/?=
- =?iso-8859-1?Q?fW8aJv74WNGMlciuo63J2EYd9lRGZEkox+T/OUJOQRMwjZRH2c69m46G3f?=
- =?iso-8859-1?Q?Icbxcv51ppnAvAk2Vaa0YES1uG60bn9VhtxQcDUp1T+u0HJNysEDb/EI+x?=
- =?iso-8859-1?Q?1VZFt6mJj8KMXK9sHNoVDNRHH27lFJuv1OrxtHI5rj88mxpV/bAeA0jFOe?=
- =?iso-8859-1?Q?2L/y0DZH3hgBUhGpG14ht6XOiE9fC3dpfii5Ij6WvDBoM0mIjHNhnMyObN?=
- =?iso-8859-1?Q?vHgpDc0EWzVYqZcNChBS3/eLihstjhx4fAW+08BTWmjxREfkXN/Hy7HHP5?=
- =?iso-8859-1?Q?q5QkiVPBY+lJ0+lLnBkssaUfU4ByB+Bysr1ief/Ic1/R83oqgl6WFmm/eJ?=
- =?iso-8859-1?Q?D0bGCAPXOmziBOUTH4WynaO+WnTTgL626h8V/gugm4K+fnL3MgW/jgk8go?=
- =?iso-8859-1?Q?V8ONenuf6vGYvzGthdyUj0fHt1EPNWmvr8PwAkyMU+UIK7ziMHnrl2PNMR?=
- =?iso-8859-1?Q?9K2BBLIqJfYelpYnYVur3XQjA7EnLKWZCsQpgm7IYcbUSXhgkUgpwdawsB?=
- =?iso-8859-1?Q?WP/ggmQc8UI4z83vMdCtvC8C+xXt5l03CJyn2PvbpM/lZg6n2iOTCBnAfL?=
- =?iso-8859-1?Q?ZvZTCH91DpzosYHWvNUSwOzxoHaOLw79P9kfQmqSUOovSoY7G2kq2VX7bg?=
- =?iso-8859-1?Q?XR1JI/9x0lhjTKhhytZz5RNNFZThSEHCAL/iRfYmDCn1ZHRJmiyHxj5k4k?=
- =?iso-8859-1?Q?/aUO5jfMc5hNf2lYlD5xLaOB2tEtPEF6qMdmHg0vNFrN3wF1ampBn0XtGV?=
- =?iso-8859-1?Q?PnGjoc/DcDWOj42dplWvJgEitShTDJDkdTO/n8bWCaE3QKnsDDtb+syZ9S?=
- =?iso-8859-1?Q?aSJE0TPLhLUjsLf+v+7MTM3n4cRCGyLiJc15/bkpjwX0kKWUXSV1xTUGHK?=
- =?iso-8859-1?Q?NAawapH5F7bihwibgj9z8c/GoKdQ+UqsLAOob9IWSx1eo9Z+vKoImkQ21H?=
- =?iso-8859-1?Q?M1V+Vh2CtO?=
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?+486XYRypT97P4dm1lisSz2eyAQ9mzEinhd09Z/VB1x0HqqgKASRBeC7bK?=
+ =?iso-8859-1?Q?VAv++hJGHpJ+lJvsim5t8h6MOSWu9rTqLky9xopdBNX1DHJhIhV619X1Es?=
+ =?iso-8859-1?Q?VToiCU+0JfuNsNUa9UXcN1Lkxi1ismM2IJdqlz6EOxUGiUVURIJr940rPd?=
+ =?iso-8859-1?Q?23NZeLh7XEr5Mwzma6vD3oaC8HaydfLQFeWS4RybOkkn1tV8E9BjXBfJ3E?=
+ =?iso-8859-1?Q?furxAhxjQoHdWmb+XBdiVxJtD3xHLJYxIWvpu+hZ9Zh7jW2ELxcuETJPKZ?=
+ =?iso-8859-1?Q?IK1fPyebkVuOk829xkKyouUfyTlNYXyLuMUbROQy6oNeRZ1yPbSC7pRv18?=
+ =?iso-8859-1?Q?VqgLoaToiax+ANcGAeQ7Hgyb5xyXQmJuTnvsn+BOrEUWixocI3HISAxAF5?=
+ =?iso-8859-1?Q?rf1258SdYb0sDgpyqJeIegX7sA24DiLkW1JirHwHz1fScPtiw4VfDMb5hB?=
+ =?iso-8859-1?Q?TrD7GjTIOgChvEMdwK7bEqoQlp1RAoVRo/Qde9Q2UIXQJxkBo+9UdkzDZI?=
+ =?iso-8859-1?Q?YcQusFqBAVyb8WQhowSg36GHOvmL++egi0cfkDJHiU1qd/56kENEsyKu/F?=
+ =?iso-8859-1?Q?lRUJNKKztviANAPxpY7/iyKFtzJtxGp0LpmCAn3IHS1Zz6cnhdR80ai57D?=
+ =?iso-8859-1?Q?M1aGJE0SZSRGkgtoXndphoSpSWpbpCSCzD+vPHB+z81Yf7bl+cEJo/Aenp?=
+ =?iso-8859-1?Q?43qz7PIqEcMH2mmrjQ3hXBf8s/rcq6BjHtNKcVMa9FFDvQqcgWUSO1Nxjv?=
+ =?iso-8859-1?Q?7oWfR6STOuARc8Yd7sIy9DiBH9B/dD/Cp1XM4eUw70fLm8ov8NtZPTgVKq?=
+ =?iso-8859-1?Q?2Z8Y1ppDF8+3PTXQc8rALr+pTqNUGiHlaQUsC6vwizjidwAmgoJPD9vnYC?=
+ =?iso-8859-1?Q?aVMPz17BQTV/rgBkCzvWhZ07s/jSIz6ENv5AfkOR4u2WiMGc8Op5LWDf0Z?=
+ =?iso-8859-1?Q?cEyjs2KBx/wZ/6VjzBwLJNE0P8SpAnWvNwUusl+eA7GY7w9Lziz2TwPdF/?=
+ =?iso-8859-1?Q?O5PEibELoMj7jixmGrPDCBCY5Ag9adqGb8ndt/4se46ZdHK4aKgMfEsFZy?=
+ =?iso-8859-1?Q?40gPV4MOgA7y1WHtNkQNHtrvHNdWmGrKUsklbEQR2C3e34nid3E72k+Zmh?=
+ =?iso-8859-1?Q?lOowL3RyU/NqeUiqr1806KdI8qNT/9IUcMHgOtJUuyDGIcJuGxZERzXfQZ?=
+ =?iso-8859-1?Q?d7EntB4DpkgsEkBoIbXtVpFbloz1/yffgzUpbMCG4LM/fMzu0dx1eNXbfp?=
+ =?iso-8859-1?Q?60LhB3sSrjWtFPEcqCQJvnb4uf8UR0Re4fm0YoqEUTkmXEXGYrR/3HJLjI?=
+ =?iso-8859-1?Q?A/CJ6uYnChbr516jQ+ggSliySde/AaOXvSLu6QOqxSmeeZrCM8LfNwaLdP?=
+ =?iso-8859-1?Q?CJONT3zgXZ?=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a01d0de-5c87-4c7e-de40-08d92f2f3213
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2021 12:23:19.8661
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23f26f28-96cb-4088-e6a5-08d92f2f347b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2021 12:23:20.8199
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /xcm0WeufLpYvmlMMyqwvC8xId5+dcyx9KT7XSCg+K+lNnNi/yEuF6OrbzduIr6ACkITKEL2u6kNzvXrK2dxMw==
+X-MS-Exchange-CrossTenant-userprincipalname: mTfpY2bKaH+4M/gvL3r9vA/lIWE9HQIhEgD0NW/8PlMZK3CYXyURH7vfKGFskYiyCkIq7KO+aFlK/T5trBFw2Q==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7365
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -145,28 +151,51 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Niklas Cassel <niklas.cassel@wdc.com>
 
-Allow the following blk-zoned ioctls: BLKREPORTZONE, BLKRESETZONE,
-BLKOPENZONE, BLKCLOSEZONE, and BLKFINISHZONE to be performed without
-CAP_SYS_ADMIN.
+Zone management send operations (BLKRESETZONE, BLKOPENZONE, BLKCLOSEZONE
+and BLKFINISHZONE) should be allowed under the same permissions as write().
+(write() does not require CAP_SYS_ADMIN).
 
-Neither read() nor write() requires CAP_SYS_ADMIN, and considering
-the close relationship between read()/write() and these ioctls, there
-is no reason to require CAP_SYS_ADMIN for these ioctls either.
+Additionally, other ioctls like BLKSECDISCARD and BLKZEROOUT only check if
+the fd was successfully opened with FMODE_WRITE.
+(They do not require CAP_SYS_ADMIN).
 
+Currently, zone management send operations require both CAP_SYS_ADMIN
+and that the fd was successfully opened with FMODE_WRITE.
+
+Remove the CAP_SYS_ADMIN requirement, so that zone management send
+operations match the access control requirement of write(), BLKSECDISCARD
+and BLKZEROOUT.
+
+Fixes: 3ed05a987e0f ("blk-zoned: implement ioctls")
+Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: stable@vger.kernel.org # v4.10+
+---
 Changes since v2:
--Drop the FMODE_READ check from patch 2/2.
-Right now it is possible to open() the device with O_WRONLY
-and get the zone report from that fd. Therefore adding a
-FMODE_READ check on BLKREPORTZONE would break existing applications.
-Instead, just remove the existing CAP_SYS_ADMIN check.
+-None
 
+Note to backporter:
+Function was added as blkdev_reset_zones_ioctl() in v4.10.
+Function was renamed to blkdev_zone_mgmt_ioctl() in v5.5.
+The patch is valid both before and after the function rename.
 
-Niklas Cassel (2):
-  blk-zoned: allow zone management send operations without CAP_SYS_ADMIN
-  blk-zoned: allow BLKREPORTZONE without CAP_SYS_ADMIN
+ block/blk-zoned.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
- block/blk-zoned.c | 6 ------
- 1 file changed, 6 deletions(-)
-
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 250cb76ee615..0789e6e9f7db 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -349,9 +349,6 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, f=
+mode_t mode,
+ 	if (!blk_queue_is_zoned(q))
+ 		return -ENOTTY;
+=20
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EACCES;
+-
+ 	if (!(mode & FMODE_WRITE))
+ 		return -EBADF;
+=20
 --=20
 2.31.1
