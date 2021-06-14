@@ -2,192 +2,407 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D724BC2B9F4
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D44AC2B9F4
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:35:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C23256120E
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:23:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 297FC61208
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 12:35:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233339AbhFNMZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jun 2021 08:25:31 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:24750 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233210AbhFNMZa (ORCPT
+        id S233076AbhFNMhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jun 2021 08:37:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44649 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232775AbhFNMhc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jun 2021 08:25:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1623673408; x=1655209408;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=4HdD3/z15OzZSrSi2L+H9iyFWFtsZeiYQRP/aqExL5c=;
-  b=LNcPtVR2CxkGkMvuY625JB3sLTXVWAKvnIPhOfIR8RrpRypbCOq24mmx
-   tSwlaJHmwnx1+HdwW24POnlHbJVZVpF2KMT2qXiZGZUYNQng/IP1bNkGx
-   eAUXAUgjxgZyq72567bXW3QDSm7oKH89Hlo0t1Dthw0hp6F6/ZeVOjKSU
-   nYPoc9bABLQhYErumbZhhwtgUSZGkGP0ywQAAXYiL8vsFZQFvd8iZZPiW
-   CrX++PBUg4xhnD/s4izaxlxh7FMMuLFTc/pCcAGMoc8o6WRPuzuqKYgI0
-   /GEZMWCAWDLlhpgyt2a4igsNueWI8NimJjtpmT8wNpM2yHMzpQ1McRnwE
-   g==;
-IronPort-SDR: I/MjTrOgRPoRqLrrqh6u0OLgZKOhfQaBw9I3aVYXZqrLStocL7CGgzSkiyRbmNH9d3WZDCPMrd
- p4YdVwl5c+5i48yEXeS2WlIJLdI2ciQfbHzgdGbAGgCk/09eMM9VkZ/ZMHoenbnU9zWG3mfTZb
- PfaODEvSNzYBWd61bvWYuKoRvPecoSkWrZBXysjxFfEAv22z38lLuJBUBufGMT8SvZPN2D37jT
- QRd+FfnyZ1LINBkF1h0nvBJYnrtZsjQEsVUlFI1fOaAvNeask2IAHZuWUzdBbWbwaQTo57jCd3
- 050=
-X-IronPort-AV: E=Sophos;i="5.83,273,1616428800"; 
-   d="scan'208";a="172386412"
-Received: from mail-bn8nam11lp2176.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.176])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Jun 2021 20:23:27 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BhSlYWbaENVEDJvlhP36VCEkBzCKkH0phzvyBdrf7gfSk63AZJTc8QrRCw0IblqvAKyMi99mXhRLBw5IThgLpbQxuLKu7bwbztlpFshzwr2U63JxuPrtuUVOUrmAx/LGVltYLU7TZqSD94nZZ5sfT4GP5JP3nw4JZWa5115zDn5aFuQ47fp9OIDs/+djiI37XzCS6NPkl7h9prfYAxncO5hGdFJGQVpyUw+xC3odjJLvyoJGynEBRNlZe/Y7XSYdZk/3UeREGqJfNzAae1ebofrIUyBFR9R7Fu5aK7NQ5K8zLrC1h7rNxzmphR6R9Tray7fkXCzUFnaYzuhpVMpblg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2rVbzgN+XL9RpMPdMgKvn6f+EwJOo6D5DUm5l54frQ8=;
- b=KPuJ1eKHzxVbB1i2kCpZBMO797oAQqK2yyJcBTjAdM935hS9qkFRiWkG1IiR4qjnr50DI4PFNsIRyh6iWCpEjBrXFF+ZAExHJ9zm516ZEUZ6YvCHg1LOq47UdAQFU5Kd0GzjTQ/72pMdjuHQTa2z/CY9LXBW9+2zh1CX8y5sx9C2fj2OXpvlxdLF0zQSbQ5/3/YA980t91TqbkTrjJqlzc9YCIO4AwWqOMsG1IW5lhl2ENu376Ecue5Ha6ii2q5W0XVqZ37pIPLDwLL/I9dx75jIw4Ev+ciMq6uqXXibiHlLpHuKa5WDyUCCdvwOp8OIoJ7USYHXs3KQEESfv6iFOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2rVbzgN+XL9RpMPdMgKvn6f+EwJOo6D5DUm5l54frQ8=;
- b=XeeNrl6RdDZytZrnD/JUlf93TOkMkK27AO5m9Shu1RZ2104SK5KftX68gB6ohc6vaLKf3oZWgJHk2yJQ8WkMPoQBW2lyKxIeVW4I+naZDxC5uYAVeCGl4xjehSoNgn/RZX0qi4YMOK9C5uIzI1Z/PB110YxMY7Bj8J6P/u5QR6o=
-Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
- by PH0PR04MB7365.namprd04.prod.outlook.com (2603:10b6:510:d::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.24; Mon, 14 Jun
- 2021 12:23:24 +0000
-Received: from PH0PR04MB7158.namprd04.prod.outlook.com
- ([fe80::45d7:388e:5cbb:ae1e]) by PH0PR04MB7158.namprd04.prod.outlook.com
- ([fe80::45d7:388e:5cbb:ae1e%6]) with mapi id 15.20.4219.025; Mon, 14 Jun 2021
- 12:23:24 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Shaun Tancheff <shaun@tancheff.com>
-CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 2/2] blk-zoned: allow BLKREPORTZONE without CAP_SYS_ADMIN
-Thread-Topic: [PATCH v3 2/2] blk-zoned: allow BLKREPORTZONE without
- CAP_SYS_ADMIN
-Thread-Index: AQHXYRgQCVfFQ7HNWEWEcKzi48L9sg==
-Date:   Mon, 14 Jun 2021 12:23:21 +0000
-Message-ID: <20210614122303.154378-3-Niklas.Cassel@wdc.com>
-References: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
-In-Reply-To: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: git-send-email 2.31.1
-authentication-results: kernel.dk; dkim=none (message not signed)
- header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [85.226.244.4]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 66bb170c-19cb-4a17-ae1f-08d92f2f34b1
-x-ms-traffictypediagnostic: PH0PR04MB7365:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR04MB73659C0EEDCDA851DDD39F42F2319@PH0PR04MB7365.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: k/MeQ0zzZWNcYnO92M7bKCqJixWjYTnj0T50jwAdfkJoXJ8Cs82n1L/22eVSHT0G/wfKNOTNFu1B+jfE+Pjj+J35dYd6u+/yLBfKZZmGeyfxmcwRwaVNRyti0tAUTa7pK7k9jYZlkvqK0qIxRTEM8GTaUQIgk2QGPlle+Luq3K1CiZYGLbHC25F7rIJaSI7SuJKsr/+nlFChodkJ1uhHJRNDjGGHT0DlybX2u0lTQcXgkK9JROzLdCLG9Uqi8JrBabuHI8JZAmarUcHARe1mSnDChgrThKj3DU6llRGRmZIYP9kfBMnjfEg3CXHWS9sKCHODYYIFewozMugGOl4oVfjkn811nOWnjvDaMGHnwQ0EuKr/D4FU6y3NsP8Anm/hW5x20MMAv8LS1LoqfxTVK/yqVCR38Dy6u23hQLZBFlVk1Sn7lgTutAf2Ca6TNo5Jc1ACTRZuPZNSSlf0dgrPgmZmsinOWK2z/4w2es6Rd4dhuenafNfaXgq/rkD/W9Ejg7tx0AeWU1aGC5gY889c4JAcTVbU3hZQxHNDnBchBxhcjC8uxvdORdCdp6uBlUR20XYypYwJTCPQsMkvc2RSGjwQyrDFu5tRFes/8U1lXyc=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(136003)(366004)(396003)(2616005)(5660300002)(6666004)(6486002)(1076003)(86362001)(66446008)(122000001)(186003)(66476007)(8676002)(64756008)(66556008)(26005)(8936002)(6506007)(71200400001)(38100700002)(2906002)(76116006)(316002)(6512007)(54906003)(66946007)(36756003)(110136005)(83380400001)(4326008)(478600001)(91956017);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?R6+0rohg4+EOoAid6yIhSIVdejHd/9R6CsMWC3ZcP4BspyqpHZmn9aPajJ?=
- =?iso-8859-1?Q?RHcEIW0nsafeLqRAkjKWHSy+duTqCtamCsSt2XF0S1PCkEXi7RW7ufDVuv?=
- =?iso-8859-1?Q?/8AP/MeAisNXAO6DgKMGGTGiqxGPyHfvySaTT5SZ1nS7JxtP2X+GG9H7nQ?=
- =?iso-8859-1?Q?yx8QAw4xjrli8ORZQ/djTRjkt5EzVW8lU9+BTg+MvQqcuv2YFIv1iM9JuH?=
- =?iso-8859-1?Q?ajrjP5Zwwxr/XF6d1SwBGOmfGKgRPhexrsgwkIDcg6U+unsfORSYrnl6l7?=
- =?iso-8859-1?Q?/XIq9j898HT4fRrMn1dHKJydyhaoEsuXhEz7KYVUBRupIR2ic3jc+cXIAG?=
- =?iso-8859-1?Q?G0fbGR1e8aIc8TkX8souZsNcFY8v2avmWb7HwVW0jOrxabEZQja9vqGsFJ?=
- =?iso-8859-1?Q?mexx2HwG8VKQ/V+T+60Cq6SoquoHhQV5oPCWeD5vLsui6fQGybtbLZ7oYF?=
- =?iso-8859-1?Q?mrJ0t7gGqLbx8/6bHq3iKxrnavoCldMQMdAjiZP1087UviFV27m9YiNZZV?=
- =?iso-8859-1?Q?gVYcI8EiJPSo80aC9AUbiNmq6ieahWSO6RG886w/RlsWxLF7nVTN9AhLY7?=
- =?iso-8859-1?Q?56yiBydEgLYO2Dyz/0lJaSM84EAucPqJGaGi05C20JkfRBrqY2mOg5BhFg?=
- =?iso-8859-1?Q?/OOQmqR6PDakfkkpx/TwGt/D611fLuPB5s/z7ASibV6KveoznOOuu/Lc4M?=
- =?iso-8859-1?Q?z922HfxVNaaveaiKHd5pyeTUXG7NHrOkaHUEVF5RDm6djUlkHFOrumKvVP?=
- =?iso-8859-1?Q?kc20WRRq3OmQwCMDBgdD8ezPCXlUpHe48xHXKy4WFA/NQqdyYWBGHoXZF6?=
- =?iso-8859-1?Q?gsV04vQcAzlNERm30/X4QwAHpK/tMo5MQn6EscUJ5KY8ppIR/xYDxu8Az8?=
- =?iso-8859-1?Q?vfNHoDJkwq+fKGe8Q50BK5N4E200RayXXAJqxxySQkyyY3Fh3zH0Cv7AHr?=
- =?iso-8859-1?Q?6blrf0q+6rlRvgjfuPwlnPfNdBI87M+BvSis4Ujv59A0OfbyHlo9ZBN5Kc?=
- =?iso-8859-1?Q?Yh3BWi6KPHcdHnij4ME7dvRnxceksufiUvVyeeqpNLyOYZEdWf6fQjflR7?=
- =?iso-8859-1?Q?qaZZVylSNFHgYINMj/Qu5+zx3tVh7RV4uOJAl2L+/788thZlTtIc+VxGJf?=
- =?iso-8859-1?Q?c79gOQu0mNyp203wnDK87eiO0aEMAPJ9l9oGW2T4u4BCJD73NcvlryPDqd?=
- =?iso-8859-1?Q?zVOlnQLG06GD22E3F8I3BrN8djp+iaUVP4WAoxQeeHqv0gRS9Zg0yBU9aJ?=
- =?iso-8859-1?Q?WuFIQ2VcIhqthz9fMDEPWtfh2HJKARpinAQF1GRypc+trr4am5e1QlzA5E?=
- =?iso-8859-1?Q?HthkWUQwSaCZNNo+FHj+ea5t80FjqPRk2C0PxZXF/v2RLHq7T7928u82Hm?=
- =?iso-8859-1?Q?hRJczaTmSd?=
-Content-Type: text/plain; charset="iso-8859-1"
+        Mon, 14 Jun 2021 08:37:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623674129;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OKemdLxnIiJRgbg83HGeSMEW6cjIXD7j8KckKVV01D4=;
+        b=i2i0y3Doj1W5R1v9s4MTzNgEBUkel4izLZ5behtGi2OJez5bAu3EbLCPT1ollnwSi/mLsL
+        FEl4m0N3Y2Yred4pPlun64wyBF/JIb+WEi3N3GZXT4JI2ZTtfDJ6GIEK0qZhmsELmcUdlY
+        OqhowZVvwvhAnuMOGygvDJpTOi0F8Xs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-596-4VRaDH4BPFOFejfn4QF4Mw-1; Mon, 14 Jun 2021 08:35:25 -0400
+X-MC-Unique: 4VRaDH4BPFOFejfn4QF4Mw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CACA88015F8;
+        Mon, 14 Jun 2021 12:35:24 +0000 (UTC)
+Received: from [172.20.25.103] (unknown [10.0.115.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 14981100164C;
+        Mon, 14 Jun 2021 12:35:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66bb170c-19cb-4a17-ae1f-08d92f2f34b1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2021 12:23:21.7957
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ayHpFmtRVV1qBgjv7MOe9ZcMHY0FfX/vsdKE5AEQ/hnjKkdTAGsWR8VHEMHEwYzWHzTRanVNio+PsDPh6l+yrw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7365
+From:   CKI Project <cki-project@redhat.com>
+To:     skt-results-master@redhat.com, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Subject: =?utf-8?q?=F0=9F=92=A5?= PANICKED: Test report for kernel 5.13.0-rc3
+ (block, 30ec225a)
+Date:   Mon, 14 Jun 2021 12:35:17 -0000
+CC:     Fine Fan <ffan@redhat.com>, Jeff Bastian <jbastian@redhat.com>
+Message-ID: <cki.E3198A727A.0A5WS1XUPX@redhat.com>
+X-Gitlab-Pipeline-ID: 319533768
+X-Gitlab-Url: https://gitlab.com
+X-Gitlab-Path: =?utf-8?q?/redhat/red-hat-ci-tools/kernel/cki-internal-pipeli?=
+ =?utf-8?q?nes/external-triggers/pipelines/319533768?=
+X-DataWarehouse-Revision-IID: 14320
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Niklas Cassel <niklas.cassel@wdc.com>
 
-A user space process should not need the CAP_SYS_ADMIN capability set
-in order to perform a BLKREPORTZONE ioctl.
+Hello,
 
-Getting the zone report is required in order to get the write pointer.
-Neither read() nor write() requires CAP_SYS_ADMIN, so it is reasonable
-that a user space process that can read/write from/to the device, also
-can get the write pointer. (Since e.g. writes have to be at the write
-pointer.)
+We ran automated tests on a recent commit from this kernel tree:
 
-Fixes: 3ed05a987e0f ("blk-zoned: implement ioctls")
-Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-Cc: stable@vger.kernel.org # v4.10+
----
-Changes since v2:
--Drop the FMODE_READ check. Right now it is possible to open() the device w=
-ith
-O_WRONLY and get the zone report from that fd. Therefore adding a FMODE_REA=
-D
-check on BLKREPORTZONE would break existing applications. Instead, just rem=
-ove
-the existing CAP_SYS_ADMIN check.
+       Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/lin=
+ux-block.git
+            Commit: 30ec225aae2e - Merge branch 'for-5.14/block' into for-next
 
- block/blk-zoned.c | 3 ---
- 1 file changed, 3 deletions(-)
+The results of these automated tests are provided below.
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 0789e6e9f7db..457eceabed2e 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -288,9 +288,6 @@ int blkdev_report_zones_ioctl(struct block_device *bdev=
-, fmode_t mode,
- 	if (!blk_queue_is_zoned(q))
- 		return -ENOTTY;
-=20
--	if (!capable(CAP_SYS_ADMIN))
--		return -EACCES;
--
- 	if (copy_from_user(&rep, argp, sizeof(struct blk_zone_report)))
- 		return -EFAULT;
-=20
---=20
-2.31.1
+    Overall result: FAILED (see details below)
+             Merge: OK
+           Compile: OK
+             Tests: PANICKED
+
+All kernel binaries, config files, and logs are available for download here:
+
+  https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/index.html?prefi=
+x=3Ddatawarehouse-public/2021/06/11/319533768
+
+One or more kernel tests failed:
+
+    ppc64le:
+     =F0=9F=92=A5 Boot test
+
+    aarch64:
+     =E2=9D=8C storage: software RAID testing
+     =F0=9F=92=A5 stress: stress-ng
+
+We hope that these logs can help you find the problem quickly. For the full
+detail on our testing procedures, please scroll to the bottom of this message.
+
+Please reply to this email if you have any questions about the tests that we
+ran or if you have any suggestions on how to make future tests more effective.
+
+        ,-.   ,-.
+       ( C ) ( K )  Continuous
+        `-',-.`-'   Kernel
+          ( I )     Integration
+           `-'
+______________________________________________________________________________
+
+Compile testing
+---------------
+
+We compiled the kernel for 4 architectures:
+
+    aarch64:
+      make options: make -j24 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    ppc64le:
+      make options: make -j24 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    s390x:
+      make options: make -j24 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    x86_64:
+      make options: make -j24 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+
+
+Hardware testing
+----------------
+We booted each kernel and ran the following tests:
+
+  aarch64:
+    Host 1:
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9C=85 LTP
+       =E2=9C=85 CIFS Connectathon
+       =E2=9C=85 POSIX pjd-fstest suites
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory: fork_mem
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 AMTU (Abstract Machine Test Utility)
+       =E2=9C=85 Ethernet drivers sanity
+       =E2=9C=85 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9C=85 xarray-idr-radixtree-test
+
+    Host 2:
+       =E2=9C=85 Boot test
+       =E2=9C=85 xfstests - ext4
+       =E2=9C=85 xfstests - xfs
+       =E2=9D=8C storage: software RAID testing
+       =E2=9C=85 Storage: swraid mdadm raid_module test
+       =F0=9F=9A=A7 =E2=9C=85 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9C=85 Storage blktests
+       =F0=9F=9A=A7 =E2=9C=85 Storage block - filesystem fio test
+       =F0=9F=9A=A7 =E2=9C=85 Storage block - queue scheduler test
+       =F0=9F=9A=A7 =E2=9C=85 Storage nvme - tcp
+       =F0=9F=9A=A7 =E2=9C=85 Storage: lvm device-mapper test
+       =F0=9F=9A=A7 =F0=9F=92=A5 stress: stress-ng
+
+  ppc64le:
+    Host 1:
+       =E2=9C=85 Boot test
+       =E2=9C=85 LTP
+       =E2=9C=85 CIFS Connectathon
+       =E2=9C=85 POSIX pjd-fstest suites
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory: fork_mem
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 AMTU (Abstract Machine Test Utility)
+       =E2=9C=85 Ethernet drivers sanity
+       =F0=9F=9A=A7 =E2=9C=85 xarray-idr-radixtree-test
+
+    Host 2:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: software RAID testing
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: swraid mdadm raid_module test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage block - filesystem fi=
+o test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage block - queue schedul=
+er test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage nvme - tcp
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: lvm device-mapper te=
+st
+
+    Host 3:
+       =F0=9F=92=A5 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: software RAID testing
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: swraid mdadm raid_module test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage block - filesystem fi=
+o test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage block - queue schedul=
+er test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage nvme - tcp
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: lvm device-mapper te=
+st
+
+  s390x:
+    Host 1:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest suites
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory: fork_mem
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Utility)
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xarray-idr-radixtree-test
+
+    Host 2:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: swraid mdadm raid_module test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage nvme - tcp
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+
+    Host 3:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: swraid mdadm raid_module test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage nvme - tcp
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+
+    Host 4:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: swraid mdadm raid_module test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage nvme - tcp
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+
+  x86_64:
+    Host 1:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage SAN device stress - qedf driver
+
+    Host 2:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - nfsv4.2
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: software RAID testing
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: swraid mdadm raid_module test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - cifsv3.11
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage block - filesystem fi=
+o test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage block - queue schedul=
+er test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage nvme - tcp
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage: lvm device-mapper te=
+st
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+
+    Host 3:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage SAN device stress - qla2xxx driver
+
+    Host 4:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage SAN device stress - mpt3sas_gen1
+
+    Host 5:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest suites
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory: fork_mem
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Utility)
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xarray-idr-radixtree-test
+
+    Host 6:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage SAN device stress - lpfc driver
+
+    Host 7:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage SAN device stress - qedf driver
+
+    Host 8:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage SAN device stress - lpfc driver
+
+  Test sources: https://gitlab.com/cki-project/kernel-tests
+    =F0=9F=92=9A Pull requests are welcome for new tests or improvements to e=
+xisting tests!
+
+Aborted tests
+-------------
+Tests that didn't complete running successfully are marked with =E2=9A=A1=E2=
+=9A=A1=E2=9A=A1.
+If this was caused by an infrastructure issue, we try to mark that
+explicitly in the report.
+
+Waived tests
+------------
+If the test run included waived tests, they are marked with =F0=9F=9A=A7. Suc=
+h tests are
+executed but their results are not taken into account. Tests are waived when
+their results are not reliable enough, e.g. when they're just introduced or a=
+re
+being fixed.
+
+Testing timeout
+---------------
+We aim to provide a report within reasonable timeframe. Tests that haven't
+finished running yet are marked with =E2=8F=B1.
+
