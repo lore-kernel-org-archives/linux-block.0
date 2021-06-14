@@ -7,47 +7,46 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A148FC48BE6
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 08:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D38CDC48BE6
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 08:27:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8207661380
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 08:22:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A655861153
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jun 2021 08:27:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232546AbhFNIY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jun 2021 04:24:58 -0400
-Received: from ivanoab7.miniserver.com ([37.128.132.42]:42732 "EHLO
+        id S232528AbhFNI3F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jun 2021 04:29:05 -0400
+Received: from ivanoab7.miniserver.com ([37.128.132.42]:42756 "EHLO
         www.kot-begemot.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232528AbhFNIY6 (ORCPT
+        with ESMTP id S232546AbhFNI3E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jun 2021 04:24:58 -0400
+        Mon, 14 Jun 2021 04:29:04 -0400
 Received: from tun252.jain.kot-begemot.co.uk ([192.168.18.6] helo=jain.kot-begemot.co.uk)
         by www.kot-begemot.co.uk with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <anton.ivanov@cambridgegreys.com>)
-        id 1lshrx-0003mW-V4; Mon, 14 Jun 2021 08:22:54 +0000
+        id 1lshvw-0003nA-QZ; Mon, 14 Jun 2021 08:27:01 +0000
 Received: from jain.kot-begemot.co.uk ([192.168.3.3])
         by jain.kot-begemot.co.uk with esmtp (Exim 4.92)
         (envelope-from <anton.ivanov@cambridgegreys.com>)
-        id 1lshrv-0004ab-Hf; Mon, 14 Jun 2021 09:22:53 +0100
-Subject: Re: [PATCH 1/2] ubd: remove the code to register as the legacy IDE
- driver
+        id 1lshvu-0004j9-MJ; Mon, 14 Jun 2021 09:27:00 +0100
+Subject: Re: [PATCH 2/2] ubd: use blk_mq_alloc_disk and blk_cleanup_disk
 To:     Christoph Hellwig <hch@lst.de>,
         Richard Weinberger <richard@nod.at>,
         Jens Axboe <axboe@kernel.dk>
 Cc:     linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
 References: <20210614060759.3965724-1-hch@lst.de>
- <20210614060759.3965724-2-hch@lst.de>
+ <20210614060759.3965724-3-hch@lst.de>
 From:   Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Message-ID: <5a9207a0-91e9-d843-9968-2db26946be73@cambridgegreys.com>
-Date:   Mon, 14 Jun 2021 09:22:51 +0100
+Message-ID: <847f7608-1d11-1410-5394-b5aa5de9f45e@cambridgegreys.com>
+Date:   Mon, 14 Jun 2021 09:26:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210614060759.3965724-2-hch@lst.de>
+In-Reply-To: <20210614060759.3965724-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Clacks-Overhead: GNU Terry Pratchett
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -56,201 +55,132 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 On 14/06/2021 07:07, Christoph Hellwig wrote:
-> With the legacy IDE driver long deprecated, and modern userspace being
-> much more flexible about dev_t assignments there is no reason to fake
-> a registration as the legacy IDE driver in ubd.  This registeration
-> is a little problematic as it registers the same request_queue for
-> multiple gendisks, so just remove it.
+> Use blk_mq_alloc_disk and blk_cleanup_disk to simplify the gendisk and
+> request_queue allocation.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   arch/um/drivers/ubd_kern.c | 106 +++++--------------------------------
->   1 file changed, 12 insertions(+), 94 deletions(-)
+>   arch/um/drivers/ubd_kern.c | 44 ++++++++++++--------------------------
+>   1 file changed, 14 insertions(+), 30 deletions(-)
 > 
 > diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
-> index 8e0b43cf089f..f508d45f7a69 100644
+> index f508d45f7a69..0b86aa1b12f1 100644
 > --- a/arch/um/drivers/ubd_kern.c
 > +++ b/arch/um/drivers/ubd_kern.c
-> @@ -125,9 +125,7 @@ static const struct block_device_operations ubd_blops = {
+> @@ -825,7 +825,6 @@ static void ubd_device_release(struct device *dev)
+>   {
+>   	struct ubd *ubd_dev = dev_get_drvdata(dev);
+>   
+> -	blk_cleanup_queue(ubd_dev->queue);
+>   	blk_mq_free_tag_set(&ubd_dev->tag_set);
+>   	*ubd_dev = ((struct ubd) DEFAULT_UBD);
+>   }
+> @@ -865,17 +864,12 @@ static const struct attribute_group *ubd_attr_groups[] = {
+>   	NULL,
 >   };
 >   
->   /* Protected by ubd_lock */
-> -static int fake_major = UBD_MAJOR;
->   static struct gendisk *ubd_gendisk[MAX_DEV];
-> -static struct gendisk *fake_gendisk[MAX_DEV];
->   
->   #ifdef CONFIG_BLK_DEV_UBD_SYNC
->   #define OPEN_FLAGS ((struct openflags) { .r = 1, .w = 1, .s = 1, .c = 0, \
-> @@ -197,54 +195,19 @@ struct ubd {
->   /* Protected by ubd_lock */
->   static struct ubd ubd_devs[MAX_DEV] = { [0 ... MAX_DEV - 1] = DEFAULT_UBD };
->   
-> -/* Only changed by fake_ide_setup which is a setup */
-> -static int fake_ide = 0;
-> -static struct proc_dir_entry *proc_ide_root = NULL;
-> -static struct proc_dir_entry *proc_ide = NULL;
-> -
->   static blk_status_t ubd_queue_rq(struct blk_mq_hw_ctx *hctx,
->   				 const struct blk_mq_queue_data *bd);
->   
-> -static void make_proc_ide(void)
-> -{
-> -	proc_ide_root = proc_mkdir("ide", NULL);
-> -	proc_ide = proc_mkdir("ide0", proc_ide_root);
-> -}
-> -
-> -static int fake_ide_media_proc_show(struct seq_file *m, void *v)
-> -{
-> -	seq_puts(m, "disk\n");
-> -	return 0;
-> -}
-> -
-> -static void make_ide_entries(const char *dev_name)
-> -{
-> -	struct proc_dir_entry *dir, *ent;
-> -	char name[64];
-> -
-> -	if(proc_ide_root == NULL) make_proc_ide();
-> -
-> -	dir = proc_mkdir(dev_name, proc_ide);
-> -	if(!dir) return;
-> -
-> -	ent = proc_create_single("media", S_IRUGO, dir,
-> -			fake_ide_media_proc_show);
-> -	if(!ent) return;
-> -	snprintf(name, sizeof(name), "ide0/%s", dev_name);
-> -	proc_symlink(dev_name, proc_ide_root, name);
-> -}
-> -
->   static int fake_ide_setup(char *str)
+> -static int ubd_disk_register(int major, u64 size, int unit,
+> -			     struct gendisk **disk_out)
+> +static void ubd_disk_register(int major, u64 size, int unit,
+> +			      struct gendisk *disk)
 >   {
-> -	fake_ide = 1;
-> +	pr_warn("The fake_ide option has been removed\n");
->   	return 1;
->   }
+> -	struct gendisk *disk;
 > -
->   __setup("fake_ide", fake_ide_setup);
->   
->   __uml_help(fake_ide_setup,
->   "fake_ide\n"
-> -"    Create ide0 entries that map onto ubd devices.\n\n"
-> +"    Obsolete stub.\n\n"
->   );
->   
->   static int parse_unit(char **ptr)
-> @@ -296,20 +259,8 @@ static int ubd_setup_common(char *str, int *index_out, char **error_out)
->   			return err;
->   		}
->   
-> -		mutex_lock(&ubd_lock);
-> -		if (fake_major != UBD_MAJOR) {
-> -			*error_out = "Can't assign a fake major twice";
-> -			goto out1;
-> -		}
+> -	disk = alloc_disk(1 << UBD_SHIFT);
+> -	if(disk == NULL)
+> -		return -ENOMEM;
 > -
-> -		fake_major = major;
-> -
-> -		printk(KERN_INFO "Setting extra ubd major number to %d\n",
-> -		       major);
-> -		err = 0;
-> -	out1:
-> -		mutex_unlock(&ubd_lock);
-> -		return err;
-> +		pr_warn("fake major not supported any more\n");
-> +		return 0;
->   	}
->   
->   	n = parse_unit(&str);
-> @@ -917,7 +868,6 @@ static const struct attribute_group *ubd_attr_groups[] = {
->   static int ubd_disk_register(int major, u64 size, int unit,
->   			     struct gendisk **disk_out)
->   {
-> -	struct device *parent = NULL;
->   	struct gendisk *disk;
->   
->   	disk = alloc_disk(1 << UBD_SHIFT);
-> @@ -928,24 +878,17 @@ static int ubd_disk_register(int major, u64 size, int unit,
+>   	disk->major = major;
 >   	disk->first_minor = unit << UBD_SHIFT;
+> +	disk->minors = 1 << UBD_SHIFT;
 >   	disk->fops = &ubd_blops;
 >   	set_capacity(disk, size / 512);
-> -	if (major == UBD_MAJOR)
-> -		sprintf(disk->disk_name, "ubd%c", 'a' + unit);
-> -	else
-> -		sprintf(disk->disk_name, "ubd_fake%d", unit);
-> -
-> -	/* sysfs register (not for ide fake devices) */
-> -	if (major == UBD_MAJOR) {
-> -		ubd_devs[unit].pdev.id   = unit;
-> -		ubd_devs[unit].pdev.name = DRIVER_NAME;
-> -		ubd_devs[unit].pdev.dev.release = ubd_device_release;
-> -		dev_set_drvdata(&ubd_devs[unit].pdev.dev, &ubd_devs[unit]);
-> -		platform_device_register(&ubd_devs[unit].pdev);
-> -		parent = &ubd_devs[unit].pdev.dev;
-> -	}
-> +	sprintf(disk->disk_name, "ubd%c", 'a' + unit);
-> +
-> +	ubd_devs[unit].pdev.id   = unit;
-> +	ubd_devs[unit].pdev.name = DRIVER_NAME;
-> +	ubd_devs[unit].pdev.dev.release = ubd_device_release;
-> +	dev_set_drvdata(&ubd_devs[unit].pdev.dev, &ubd_devs[unit]);
-> +	platform_device_register(&ubd_devs[unit].pdev);
->   
+>   	sprintf(disk->disk_name, "ubd%c", 'a' + unit);
+> @@ -889,9 +883,6 @@ static int ubd_disk_register(int major, u64 size, int unit,
 >   	disk->private_data = &ubd_devs[unit];
 >   	disk->queue = ubd_devs[unit].queue;
-> -	device_add_disk(parent, disk, ubd_attr_groups);
-> +	device_add_disk(&ubd_devs[unit].pdev.dev, disk, ubd_attr_groups);
+>   	device_add_disk(&ubd_devs[unit].pdev.dev, disk, ubd_attr_groups);
+> -
+> -	*disk_out = disk;
+> -	return 0;
+>   }
 >   
->   	*disk_out = disk;
->   	return 0;
-> @@ -1001,17 +944,6 @@ static int ubd_add(int n, char **error_out)
+>   #define ROUND_BLOCK(n) ((n + (SECTOR_SIZE - 1)) & (-SECTOR_SIZE))
+> @@ -903,6 +894,7 @@ static const struct blk_mq_ops ubd_mq_ops = {
+>   static int ubd_add(int n, char **error_out)
+>   {
+>   	struct ubd *ubd_dev = &ubd_devs[n];
+> +	struct gendisk *disk;
+>   	int err = 0;
+>   
+>   	if(ubd_dev->file == NULL)
+> @@ -927,32 +919,24 @@ static int ubd_add(int n, char **error_out)
+>   	if (err)
+>   		goto out;
+>   
+> -	ubd_dev->queue = blk_mq_init_queue(&ubd_dev->tag_set);
+> -	if (IS_ERR(ubd_dev->queue)) {
+> -		err = PTR_ERR(ubd_dev->queue);
+> +	disk = blk_mq_alloc_disk(&ubd_dev->tag_set, ubd_dev);
+> +	if (IS_ERR(disk)) {
+> +		err = PTR_ERR(disk);
 >   		goto out_cleanup_tags;
 >   	}
+> +	ubd_dev->queue = disk->queue;
 >   
-> -	if (fake_major != UBD_MAJOR)
-> -		ubd_disk_register(fake_major, ubd_dev->size, n,
-> -				  &fake_gendisk[n]);
+> -	ubd_dev->queue->queuedata = ubd_dev;
+>   	blk_queue_write_cache(ubd_dev->queue, true, false);
 > -
-> -	/*
-> -	 * Perhaps this should also be under the "if (fake_major)" above
-> -	 * using the fake_disk->disk_name
-> -	 */
-> -	if (fake_ide)
-> -		make_ide_entries(ubd_gendisk[n]->disk_name);
+>   	blk_queue_max_segments(ubd_dev->queue, MAX_SG);
+>   	blk_queue_segment_boundary(ubd_dev->queue, PAGE_SIZE - 1);
+> -	err = ubd_disk_register(UBD_MAJOR, ubd_dev->size, n, &ubd_gendisk[n]);
+> -	if(err){
+> -		*error_out = "Failed to register device";
+> -		goto out_cleanup_tags;
+> -	}
 > -
->   	err = 0;
->   out:
->   	return err;
-> @@ -1126,12 +1058,6 @@ static int ubd_remove(int n, char **error_out)
->   		put_disk(disk);
+> -	err = 0;
+> -out:
+> -	return err;
+> +	ubd_disk_register(UBD_MAJOR, ubd_dev->size, n, disk);
+> +	ubd_gendisk[n] = disk;
+> +	return 0;
+>   
+>   out_cleanup_tags:
+>   	blk_mq_free_tag_set(&ubd_dev->tag_set);
+> -	if (!(IS_ERR(ubd_dev->queue)))
+> -		blk_cleanup_queue(ubd_dev->queue);
+> -	goto out;
+> +out:
+> +	return err;
+>   }
+>   
+>   static int ubd_config(char *str, char **error_out)
+> @@ -1055,7 +1039,7 @@ static int ubd_remove(int n, char **error_out)
+>   	ubd_gendisk[n] = NULL;
+>   	if(disk != NULL){
+>   		del_gendisk(disk);
+> -		put_disk(disk);
+> +		blk_cleanup_disk(disk);
 >   	}
 >   
-> -	if(fake_gendisk[n] != NULL){
-> -		del_gendisk(fake_gendisk[n]);
-> -		put_disk(fake_gendisk[n]);
-> -		fake_gendisk[n] = NULL;
-> -	}
-> -
 >   	err = 0;
->   	platform_device_unregister(&ubd_dev->pdev);
->   out:
-> @@ -1188,14 +1114,6 @@ static int __init ubd_init(void)
->   	if (register_blkdev(UBD_MAJOR, "ubd"))
->   		return -1;
->   
-> -	if (fake_major != UBD_MAJOR) {
-> -		char name[sizeof("ubd_nnn\0")];
-> -
-> -		snprintf(name, sizeof(name), "ubd_%d", fake_major);
-> -		if (register_blkdev(fake_major, "ubd"))
-> -			return -1;
-> -	}
-> -
->   	irq_req_buffer = kmalloc_array(UBD_REQ_BUFFER_SIZE,
->   				       sizeof(struct io_thread_req *),
->   				       GFP_KERNEL
 > 
 
-Acked-By: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+This does not build for me when applied to master:
+
+
+arch/um/drivers/ubd_kern.c: In function ‘ubd_add’:
+arch/um/drivers/ubd_kern.c:922:9: error: implicit declaration of function ‘blk_mq_alloc_disk’; did you mean ‘blk_mq_alloc_request’? [-Werror=implicit-function-declaration]
+   disk = blk_mq_alloc_disk(&ubd_dev->tag_set, ubd_dev);
+          ^~~~~~~~~~~~~~~~~
+          blk_mq_alloc_request
+arch/um/drivers/ubd_kern.c:922:7: warning: assignment to ‘struct gendisk *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+   disk = blk_mq_alloc_disk(&ubd_dev->tag_set, ubd_dev);
+        ^
+arch/um/drivers/ubd_kern.c: In function ‘ubd_remove’:
+arch/um/drivers/ubd_kern.c:1042:3: error: implicit declaration of function ‘blk_cleanup_disk’; did you mean ‘blk_cleanup_queue’? [-Werror=implicit-function-declaration]
+    blk_cleanup_disk(disk);
 
 -- 
 Anton R. Ivanov
