@@ -2,84 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3473AC48BE5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 14:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F63DC48BE8
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 14:37:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06F7B61459
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 14:07:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7011C61494
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 14:37:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230523AbhFOOJb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 10:09:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49621 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230076AbhFOOJ1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 10:09:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623766042;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UtTAmh9drC0SrvUfvER1V0LyFGa2wzxMUfvsdcM6wCo=;
-        b=dRcpQqptjwrkbf2bwfRAHuJ9oAxbW5FbrVE2l/Ix/Vr5gL8qcdQTt6XsNlybc0fK9jJpLv
-        S2HCCDXjVClzGT9DR8ktb52ucc++1UoDC3fQrzCYN2OW1bCoCMk7kNpFjCMKI1kQpthV+r
-        AE0vmvY3LbSlofcpoGqa03dlToZ9X5A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-Dc78i0rYOy-In_jZCE2b4Q-1; Tue, 15 Jun 2021 10:07:21 -0400
-X-MC-Unique: Dc78i0rYOy-In_jZCE2b4Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CA92803624;
-        Tue, 15 Jun 2021 14:07:20 +0000 (UTC)
-Received: from T590 (ovpn-12-65.pek2.redhat.com [10.72.12.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 116E660877;
-        Tue, 15 Jun 2021 14:07:14 +0000 (UTC)
-Date:   Tue, 15 Jun 2021 22:07:07 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Omar Kilani <omar.kilani@gmail.com>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: Deadlock in wbt / rq-qos
-Message-ID: <YMi0C5U0NeMdO04g@T590>
-References: <CA+8F9hggf7jOcGRxvBoa8FYxQs8ZV+XueVAd9BodpQQP_+8Pdw@mail.gmail.com>
- <YMhxY9svDeVApu95@T590>
- <CA+8F9hjFDE9b31-qsxsVJf4SV9Ctr-mwOJrsw0kVeC7DdN=5XQ@mail.gmail.com>
+        id S231309AbhFOOjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 10:39:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53888 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230208AbhFOOjN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jun 2021 10:39:13 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2475F61464;
+        Tue, 15 Jun 2021 14:37:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623767828;
+        bh=xBkTfMcRJbm0r2yuh07T27aOb/wH4z9qzwDyOpM5Gls=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Oo0UExwt0A314sDdrtZxUnok0jEzA4xHWLtCJ6GRMW6uQytwGSGmdCtapFX9IuM7t
+         q7QoKS2cHRKztaK18sa2Hwx5Iao5tcUkvauEVln7nz7R4iOdfq5QwlxfHh4YeZCTfP
+         gflDfbYrqueDUJxxSRMDnIGznkbUlDZiLjUI4YDywOIf6beuTxlog2G+tiA04ESbto
+         TsQW5PNpzZyiGgT3JMLOTC18yEWx+4xoiDcyyF8t1M5fY2WAXwxxEPX+MD25GoyhB+
+         BpubDUTmwWljXOIcs9yJJvHeMgmHoTMgezora00weH5XisSOBqXvMzlwgPEciidjuk
+         tlVIUwSlDN0kg==
+Date:   Tue, 15 Jun 2021 07:37:06 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
+        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: switch block layer polling to a bio based model v4
+Message-ID: <20210615143706.GB646237@dhcp-10-100-145-180.wdc.com>
+References: <20210615131034.752623-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+8F9hjFDE9b31-qsxsVJf4SV9Ctr-mwOJrsw0kVeC7DdN=5XQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210615131034.752623-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 15, 2021 at 06:42:40AM -0700, Omar Kilani wrote:
-> Hi Ming,
-> 
-> It looks to be the same issue based on the log timelines. I *think* that
-> patch will fix it but it’s really subtle so I’ll test.
-> 
-> I can only trigger this on an AMD Milan machine for some reason that I
-> don’t understand. Sometimes in 800 seconds, sometimes in 5 hours.
-> 
-> I have a new build with printk’s on the atomic_inc_below to check the
-> acquire condition.
-> 
-> I’ll add that patch and re-test. But I couldn’t find that change in the
-> linux-block git? Is it in a specific branch?
+On Tue, Jun 15, 2021 at 03:10:18PM +0200, Christoph Hellwig wrote:
+> Chances since v3:
+>  - rebased to the latests for-5.14/block tree
+>  - fix the refcount logic in __blkdev_direct_IO
+>  - split up a patch to make it easier to review
+>  - grab a queue reference in bio_poll
+>  - better document the RCU assumptions in bio_poll
 
-The patch is in the branch of for-5.14/block:
+It still doesn't look like a failover will work when polling through
+pvsync2. We previously discussed that here:
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.14/block&id=11c7aa0ddea8611007768d3e6b58d45dc60a19e1
-
-Thanks,
-Ming
-
+  https://marc.info/?l=linux-block&m=162100971816071&w=2
