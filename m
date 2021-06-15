@@ -2,147 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 983C8C48BDF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 17:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35244C49EA2
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 18:24:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8594061407
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 17:11:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AA68613D9
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 18:24:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbhFORNq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 13:13:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49026 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230205AbhFORNp (ORCPT
+        id S231325AbhFOS0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 14:26:40 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:50967 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231176AbhFOS0k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 13:13:45 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77668C061574;
-        Tue, 15 Jun 2021 10:11:39 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id v6so11796599qta.9;
-        Tue, 15 Jun 2021 10:11:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=CL0lPV57QQHAIoWqPYdz9D7HX33G5wLB3yUQQff9WgA=;
-        b=EhgLWtbsLi5myM7N6WT7QIQ8Lr3UIMJgrryRXwjPULCxmVSm54tBdbZvhRcZqD8q/t
-         vALCfWUHDIrihBZkCtyCihFWQ3K1glynJRiZ9T728HE4lne9+v9Bc6pE0ZcyLj/fTpHB
-         Z8amHIA8JQCYN8TJpjMS8SYI2p78vlwRbpUH1Fw4Py0dsVctnysgeok9+ae+mMQweHG3
-         QX3RGjhN76udUHYVVNQlUf+bRFPBwdWcQBLs3+FH6jHsMxiuowBXgJQcfms/MNrCRxQV
-         lxb1ey0DUolGC6hK318lx3EnmhT2hYdhZsijDuvnSDyoO9iDhhgN9k18fnXJf/jzoWMA
-         SBKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to;
-        bh=CL0lPV57QQHAIoWqPYdz9D7HX33G5wLB3yUQQff9WgA=;
-        b=O08sV53BKFhMWrTHgWTKD8FglvAPYaMf5jt03AknYmu+pAI6gJizVkPIezvzohp5eI
-         5p56OclvdFybv4/5x5vZD5x3ptFUyWUf+djSDS5y4OY29qhz/dYCwvR3UqFBYFEr3p2+
-         14/L2jQvyjbZPCJzj/i9Y3gBwaQxOMzn9XoIseYokt5oQkh2PjztXAX6bGG4DlwR/k2T
-         Wig5Ri4Jds9ZZw0kDx1YVIi8RSPkiEoFqlTfxe+AzAZ0FEHEJESXO/62jVuuQdNsNmYK
-         KTxdH5vxtFjvQPij/LHzGNwmPFd2i6KVSlK3kBmHM/gSLjVSCJE2QtXb1TGdioaoY5w0
-         Fdsg==
-X-Gm-Message-State: AOAM530fWq92ChmO5uemqCSvZZhQUNUTrRWmn32s05LFZj+Mr3zfe5tg
-        4ZQAkjGISA8csbdF8aoNJ2w=
-X-Google-Smtp-Source: ABdhPJxayfWzxz+qB4dToDDc+nMn15PJJw+LBedHSGIvCcEQmO+DY2E1QRIgLKljXIPFOl3lTC9Lag==
-X-Received: by 2002:ac8:7950:: with SMTP id r16mr609893qtt.137.1623777098552;
-        Tue, 15 Jun 2021 10:11:38 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id s69sm10922199qke.115.2021.06.15.10.11.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jun 2021 10:11:37 -0700 (PDT)
-Sender: Mike Snitzer <snitzer@gmail.com>
-Date:   Tue, 15 Jun 2021 13:11:37 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Martin Wilck <mwilck@suse.com>
-Cc:     Alasdair G Kergon <agk@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        dm-devel@redhat.com, Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Benjamin Marzinski <bmarzins@redhat.com>,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v3 0/2]  dm: dm_blk_ioctl(): implement failover for SG_IO
- on dm-multipath
-Message-ID: <YMjfSVASeTE0Sy9H@redhat.com>
-References: <20210611202509.5426-1-mwilck@suse.com>
- <YMdyh62mR/lEifMR@redhat.com>
- <44fc94278e0c4b15a611a6887c668f41c262e001.camel@suse.com>
+        Tue, 15 Jun 2021 14:26:40 -0400
+Received: from [192.168.1.155] ([95.115.9.120]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MS4WT-1lixGP0g7H-00TTUD; Tue, 15 Jun 2021 20:23:58 +0200
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+To:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Greg KH <greg@kroah.com>, Christoph Lameter <cl@gentwo.de>,
+        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
+        ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
+References: <YLEIKk7IuWu6W4Sy@casper.infradead.org> <YH2hs6EsPTpDAqXc@mit.edu>
+ <nycvar.YFH.7.76.2104281228350.18270@cbobk.fhfr.pm>
+ <YIx7R6tmcRRCl/az@mit.edu>
+ <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
+ <YK+esqGjKaPb+b/Q@kroah.com>
+ <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
+ <1745326.1623409807@warthog.procyon.org.uk>
+From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <e47706ee-3e4b-8f15-963f-292b5e47cb1d@metux.net>
+Date:   Tue, 15 Jun 2021 20:23:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <1745326.1623409807@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: tl
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <44fc94278e0c4b15a611a6887c668f41c262e001.camel@suse.com>
+X-Provags-ID: V03:K1:l1dWw5GINi5d9D6KdR/MfM5/FegWRbfl0vjxnR2yUdW9Vwv9oLT
+ MEAHr8PyP8YcC6o+Yqn4LF4f1dF2zEYvYGt60YROchUahACz9shvV58vHwPsKWuLb8rGm3P
+ IR2CxVWI5mN7CFH8hcq3ue3m5Nn8F7oX0u8tjkhXfP1fB4XQ+9VueDbHjcVaZZ82YsvanSM
+ rftvqMwBTus20ymBQFk4Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Ic+UfAApxeg=:xMi+C1LWXRsimoNEKsnwKG
+ 5mxcU0vHtj9Zm5HEjCy9h9sUq5qPtpjfzWgy0mhHsk86qbr9dJQfN7QAj9Quv1JbUcrcCRzdl
+ bUfQvSEb0KC+9hi+WwMlV38TArCl/DAouSqiCQNao7pvtjN1M9CC8E86nLAHtrAMf6E9XI1dc
+ tCA5UBAou1Z1Dm02ZUCUDV1JdZcL91ADBpOOiJ64NaVXgv2BB42jpmTg8pubJ2MJSkM4dDY1G
+ wrLS0oWdW9mIun9Og6RY3Bg0NUo09Wl5QXxyzpWw8WVYkbSpnHxhumPCGcbJMAJyLToVBeWwi
+ AC8dECaRBRfRBTG4medz4Eow5RSIuY6dBBIXI+dkdb/zBvt60HeWrL9FU76+szy+iBNrtxLYd
+ Du0Z+O4kxMoxbR+xZ9b3KnABes+BV82fRKnWKuHb9E3I6whEmhwV3KVhx3wDjdJwqTyaMePQi
+ zx08rCWC2amopXPxWcwFxvphs2Mox2d2bgIaZWix19xu5b2A6NEeZ9Y/RDvnpxnGWOKM5t0td
+ cE2C39N+fJT2AJRCXYwZLE=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 15 2021 at  6:54P -0400,
-Martin Wilck <mwilck@suse.com> wrote:
+On 11.06.21 13:10, David Howells wrote:
 
-> Hi Mike,
+> One thing that concerns me about flying to the US is going through multiple
+> busy international airports - take Heathrow which didn't separate incoming
+> travellers from red-listed countries from those of amber- or green- until like
+> a week ago.
 > 
-> On Mo, 2021-06-14 at 11:15 -0400, Mike Snitzer wrote:
-> > 
-> > This work offers a proof-of-concept but it needs further refinement
-> > for sure.
-> 
-> Thanks for looking into it again. I need some more guidance from your
-> part in order to be able to resubmit the set in a form that you
-> consider ready for merging.
-> 
-> > The proposed open-coded SCSI code (in patch 2's drivers/md/dm-
-> > scsi_ioctl.c) 
-> > is well beyond what I'm willing to take in DM.
-> 
-> I'm not sure what code you're referring to. Is it the processing of the
-> bytes of the SCSI result code? If yes, please note that I had changed
-> that to open-coded form in response to Bart's review of my v2
-> submission. If it's something else, please point it out to me.
-> 
-> To minimize the special-casing for this code path, Hannes suggested to
-> use a target-specific unprepare_ioctl() callback to to tell the generic
-> dm code whether a given ioctl could be retried.†The logic that I've put
-> into†dm-scsi_ioctl.c could then be moved into the unprepare_ioctl()
-> callback of dm-mpath.†dm_blk_ioctl() would need to check the callback's
-> return value and possibly retry the ioctl. Would hat appeal to you?
-> 
-> > † If this type of
-> > functionality is still needed (for kvm's SCSI passthru snafu) then
-> > more work is needed to negotiate proper interfaces with the SCSI
-> > subsystem (added linux-scsi to cc, odd they weren't engaged on this).
-> 
-> Not cc'ing linux-scsi was my oversight, sorry about that.†
-> 
-> But I don't quite understand what interfaces you have in mind. SCSI
-> needs to expose the SG_IO interface to dm, which it does; I just needed
-> to export sg_io() to get access to the sg_io_hdr fields. The question
-> whether a given IO can be retried is decided on the dm (-mpath) layer,
-> based on blk_status_t; no additional interface on the SCSI side is
-> necessary for that.
-> 
-> > Does it make sense to extend the SCSI device handler interface to add
-> > the required enablement? (I think it'd have to if this line of work
-> > is
-> > to ultimately get upstream).
-> 
-> My current code uses the device handler indirectly for activating paths
-> during priority group switching, via the dm-mpath prepare_ioctl()
-> method and __pg_init_all_paths(). This is what I intended - to use
-> exactly the same logic for SG_IO which is used for regular read/write
-> IO on the block device.†What additional functionality for the device
-> handler do you have in mind?
-> 
-> Regards and thanks,
-> Martin
+> Would it be practical/economical to charter a plane to fly, say, from a less
+> busy airport in Europe to a less busy airport in the US and back again if we
+> could get enough delegates together to make it worthwhile?
 
-I just replied to patch 2 with detailed suggestions.
+Wouldn't just taking prophylatic meds like CDS or HCQ and/or hi-dose
+vitamins (C, D3+K2) be way more cost effective and flexible than to
+charter a whole plane ?
 
-Thanks,
-Mike
+Don't have personal experience w/ HCQ yet, but CDS is pretty cheap and
+easy to use (prescription free). Of course, one should dig a bit into
+the specialist literature, before playing around - and take a few days
+for finding the right personal dose. especially when one's cumbered w/ 
+parasites (herxheimer)
+
+
+--mtx
+
+-- 
+---
+Hinweis: unverschl√ºsselte E-Mails k√∂nnen leicht abgeh√∂rt und manipuliert
+werden ! F√ºr eine vertrauliche Kommunikation senden Sie bitte ihren
+GPG/PGP-Schl√ºssel zu.
+---
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
