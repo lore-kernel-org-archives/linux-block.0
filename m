@@ -6,44 +6,100 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1ED0C48BE5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 11:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F302C48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 12:31:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFAE46145D
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 11:52:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6018461463
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 12:31:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230304AbhFOLyv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 07:54:51 -0400
-Received: from verein.lst.de ([213.95.11.211]:48586 "EHLO verein.lst.de"
+        id S230238AbhFOMd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 08:33:29 -0400
+Received: from verein.lst.de ([213.95.11.211]:48725 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230052AbhFOLyu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 07:54:50 -0400
+        id S229979AbhFOMd0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jun 2021 08:33:26 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1530667373; Tue, 15 Jun 2021 13:52:44 +0200 (CEST)
-Date:   Tue, 15 Jun 2021 13:52:43 +0200
+        id B778867373; Tue, 15 Jun 2021 14:31:18 +0200 (CEST)
+Date:   Tue, 15 Jun 2021 14:31:18 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Bruno Goncalves <bgoncalv@redhat.com>
-Cc:     CKI Project <cki-project@redhat.com>, hch@lst.de,
-        skt-results-master@redhat.com, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Fine Fan <ffan@redhat.com>,
-        Jeff Bastian <jbastian@redhat.com>
-Subject: Re: ? PANICKED: Test report for kernel 5.13.0-rc3 (block, 30ec225a)
-Message-ID: <20210615115243.GA12378@lst.de>
-References: <cki.E3198A727A.0A5WS1XUPX@redhat.com> <CA+QYu4qjrzyjM_zgJ8SSZ-zsodcK=uk8xToAVR3+kmOdNZfgZQ@mail.gmail.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
+        WeiXiong Liao <gmpy.liaowx@gmail.com>, axboe@kernel.dk,
+        Anton Vorontsov <anton@enomsg.org>,
+        Colin Cross <ccross@android.com>,
+        Tony Luck <tony.luck@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] pstore/blk: Use the normal block device I/O path
+Message-ID: <20210615123118.GA14239@lst.de>
+References: <20210614200421.2702002-1-keescook@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CA+QYu4qjrzyjM_zgJ8SSZ-zsodcK=uk8xToAVR3+kmOdNZfgZQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210614200421.2702002-1-keescook@chromium.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 14, 2021 at 02:40:58PM +0200, Bruno Goncalves wrote:
-> Hi,
-> 
-> We've noticed a kernel oops during the stress-ng test on aarch64 more log
-> details on [1]. Christoph, do you think this could be related to the recent
-> blk_cleanup_disk changes [2]?
+> -	if (!dev || !dev->total_size || !dev->read || !dev->write)
+> +	if (!dev || !dev->total_size || !dev->read || !dev->write) {
+> +		if (!dev)
+> +			pr_err("NULL device info\n");
+> +		else {
+> +			if (!dev->total_size)
+> +				pr_err("zero sized device\n");
+> +			if (!dev->read)
+> +				pr_err("no read handler for device\n");
+> +			if (!dev->write)
+> +				pr_err("no write handler for device\n");
+> +		}
+>  		return -EINVAL;
+> +	}
 
-It doesn't really look very related.  Any chance you could bisect it?
+This is completely unrelated and should be a separate patch.  And it
+also looks rather strange, I'd at very least split the dev check out
+and return early without the weird compound statement, but would probably
+handle each one separate.  All assuming that we really need all these
+debug printks.
+
+>  /*
+>   * This takes its configuration only from the module parameters now.
+>   */
+>  static int __register_pstore_blk(void)
+
+This needs a __init annotation now.
+
+>
+>
+>  {
+> +	struct pstore_device_info dev = {
+> +		.read = psblk_generic_blk_read,
+> +		.write = psblk_generic_blk_write,
+> +	};
+
+On-stack method tables are a little odd..
+
+> +	if (!__is_defined(MODULE)) {
+
+This looks a little weird.  Can we define a rapper for this in config.h
+that is a little more self-explanatory, e.g. in_module()?
+
+> +	if (!psblk_file->f_mapping)
+> +		pr_err("missing f_mapping\n");
+
+Can't ever be true.
+
+> +	else if (!psblk_file->f_mapping->host)
+> +		pr_err("missing host\n");
+
+Can't ever be true either.
+
+> +	else if (!I_BDEV(psblk_file->f_mapping->host))
+> +		pr_err("missing I_BDEV\n");
+> +	else if (!I_BDEV(psblk_file->f_mapping->host)->bd_inode)
+> +		pr_err("missing bd_inode\n");
+
+І_BDEV just does pointer arithmetics, so it can't ever return NULL.
+And there are no block device inodes without bd_inode either.  And
+all of this is per definition present for open S_ISBLK inodes.
