@@ -2,136 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 951E3C49361
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 05:50:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23895C48BE5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 06:56:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78B9461412
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 05:50:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E666A61417
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 06:56:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbhFOFwI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 01:52:08 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:57394 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230331AbhFOFwG (ORCPT
+        id S230038AbhFOG62 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 02:58:28 -0400
+Received: from mail-lf1-f52.google.com ([209.85.167.52]:37522 "EHLO
+        mail-lf1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229488AbhFOG61 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 01:52:06 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id C9BE8219C5;
-        Tue, 15 Jun 2021 05:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623736201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C3Np6UpmqYzZ4kH5SUJzYj4UbsK192DUNvW0ehDEFvc=;
-        b=0sdVN7Hz8iMI0Vf1UUB6ZRDa1Y58PjjZ2+7kehlOoG7SmjWCDwtmagBk14T+27yIVM4wpQ
-        ltLn00X3kKRnNDA4p1bYMWpTgise7tFN6HLgcYWI1ahXzk6sKlArSAXQtgMf6I/c/cxj5W
-        wO29l5Fd7ldSiSQFCQudC8iMg14/uTk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623736201;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C3Np6UpmqYzZ4kH5SUJzYj4UbsK192DUNvW0ehDEFvc=;
-        b=WZ1JcYJie3OGdDArDpcqNs6cfA64enkm+26hb8dGdbuVnLImafTmQ6V+FA5fqNXyKTw/s5
-        hjuekLxXWrKuy5Ag==
-Received: from localhost.localdomain (unknown [10.163.16.22])
-        by relay2.suse.de (Postfix) with ESMTP id 0B026A3BB7;
-        Tue, 15 Jun 2021 05:49:59 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>, Jianpeng Ma <jianpeng.ma@intel.com>,
-        Qiaowei Ren <qiaowei.ren@intel.com>
-Subject: [PATCH 14/14] bcache: add sysfs interface register_nvdimm_meta to register NVDIMM meta device
-Date:   Tue, 15 Jun 2021 13:49:21 +0800
-Message-Id: <20210615054921.101421-15-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210615054921.101421-1-colyli@suse.de>
-References: <20210615054921.101421-1-colyli@suse.de>
+        Tue, 15 Jun 2021 02:58:27 -0400
+Received: by mail-lf1-f52.google.com with SMTP id p7so25238232lfg.4;
+        Mon, 14 Jun 2021 23:56:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=j00yDKFRObYyA/b4kREgAOqG+iHTmLKQXoPW6ou7r8c=;
+        b=brql9yswnj4RgtT+EtUkZX9C/62dW0WyAgHgkLPhLsC4gmi1Ibk868kQQwfbp4buTJ
+         sxOPcxQSLAiYCaaH4kO9H5L09XBLAiKYjJf6tZ4RAfX0KSW19ArOBxc/wcB5+QoLkHTm
+         Yg+817smYRcICwnTaCc8QZuuGHIpNh9NrIJQY+HkEJ+Ga4f8Fq9jwUNI9Dd8sL9c0D1/
+         sV4pG8Fps36Z5/n4fCe5ouYj6/xxL7X8FiNrG+7b7lGAH+Gv6PBYZiqUX1bpXadKwefp
+         /GFQXIeRCH3YA3qrl54vMBEBoxnyOkDSUJEIPF9biH0v7LBBRZuoG3h4BYlAuAo8x6eZ
+         BnNA==
+X-Gm-Message-State: AOAM533QyGFa+FkXQ1EXhlhIVRXD4Fkj+nl6CQhTcjqzcLwfP2ZU2h8b
+        bYnqQX8C+YJ6El3xrJHZ23zgfse7YD0=
+X-Google-Smtp-Source: ABdhPJxheD2SFrmAJOYzOWf+6x7l+4UvQRWbn30OUFlVYLgjCYZ8DjXXy9RFg4ti/HuZVvkNrMXofg==
+X-Received: by 2002:ac2:43c5:: with SMTP id u5mr15512555lfl.156.1623740181831;
+        Mon, 14 Jun 2021 23:56:21 -0700 (PDT)
+Received: from [10.68.32.192] (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.gmail.com with ESMTPSA id q6sm1707271lfj.88.2021.06.14.23.56.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Jun 2021 23:56:21 -0700 (PDT)
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+From:   Denis Efremov <efremov@linux.com>
+Subject: [GIT PULL] Floppy changes for 5.14
+Message-ID: <2f80871f-a1a5-7c02-52f9-118a0e68d84c@linux.com>
+Date:   Tue, 15 Jun 2021 09:56:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds a sysfs interface register_nvdimm_meta to register
-NVDIMM meta device. The sysfs interface file only shows up when
-CONFIG_BCACHE_NVM_PAGES=y. Then a NVDIMM name space formatted by
-bcache-tools can be registered into bcache by e.g.,
-  echo /dev/pmem0 > /sys/fs/bcache/register_nvdimm_meta
+Hi Jens,
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Jianpeng Ma <jianpeng.ma@intel.com>
-Cc: Qiaowei Ren <qiaowei.ren@intel.com>
----
- drivers/md/bcache/super.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+The following changes since commit d07f3b081ee632268786601f55e1334d1f68b997:
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 4d6666d03aa7..9d506d053548 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2439,10 +2439,18 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- static ssize_t bch_pending_bdevs_cleanup(struct kobject *k,
- 					 struct kobj_attribute *attr,
- 					 const char *buffer, size_t size);
-+#if defined(CONFIG_BCACHE_NVM_PAGES)
-+static ssize_t register_nvdimm_meta(struct kobject *k,
-+				    struct kobj_attribute *attr,
-+				    const char *buffer, size_t size);
-+#endif
- 
- kobj_attribute_write(register,		register_bcache);
- kobj_attribute_write(register_quiet,	register_bcache);
- kobj_attribute_write(pendings_cleanup,	bch_pending_bdevs_cleanup);
-+#if defined(CONFIG_BCACHE_NVM_PAGES)
-+kobj_attribute_write(register_nvdimm_meta, register_nvdimm_meta);
-+#endif
- 
- static bool bch_is_open_backing(dev_t dev)
- {
-@@ -2556,6 +2564,24 @@ static void register_device_async(struct async_reg_args *args)
- 	queue_delayed_work(system_wq, &args->reg_work, 10);
- }
- 
-+#if defined(CONFIG_BCACHE_NVM_PAGES)
-+static ssize_t register_nvdimm_meta(struct kobject *k, struct kobj_attribute *attr,
-+				    const char *buffer, size_t size)
-+{
-+	ssize_t ret = size;
-+
-+	struct bch_nvm_namespace *ns = bch_register_namespace(buffer);
-+
-+	if (IS_ERR(ns)) {
-+		pr_err("register nvdimm namespace %s for meta device failed.\n",
-+			buffer);
-+		ret = -EINVAL;
-+	}
-+
-+	return ret;
-+}
-+#endif
-+
- static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 			       const char *buffer, size_t size)
- {
-@@ -2898,6 +2924,9 @@ static int __init bcache_init(void)
- 	static const struct attribute *files[] = {
- 		&ksysfs_register.attr,
- 		&ksysfs_register_quiet.attr,
-+#if defined(CONFIG_BCACHE_NVM_PAGES)
-+		&ksysfs_register_nvdimm_meta.attr,
-+#endif
- 		&ksysfs_pendings_cleanup.attr,
- 		NULL
- 	};
--- 
-2.26.2
+  mark pstore-blk as broken (2021-06-14 08:26:03 -0600)
+
+are available in the Git repository at:
+
+  https://github.com/evdenis/linux-floppy.git tags/floppy-for-5.14
+
+for you to fetch changes up to 2c9bdf6e4771a5966a4f0d6bea45a1c7f38312d7:
+
+  floppy: Fix fall-through warning for Clang (2021-06-15 09:18:55 +0300)
+
+Please pull
+
+----------------------------------------------------------------
+Floppy patches for 5.14
+
+Two oneliners to fix clang warnings:
+- -Wimplicit-fallthrough warning fix from Gustavo A. R. Silva.
+- Redundant assignment warning fix from Jiapeng Chong.
+
+No semantic and behavioural changes.
+
+----------------------------------------------------------------
+Gustavo A. R. Silva (1):
+      floppy: Fix fall-through warning for Clang
+
+Jiapeng Chong (1):
+      floppy: cleanup: remove redundant assignment to nr_sectors
+
+ drivers/block/floppy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
