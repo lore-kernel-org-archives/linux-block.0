@@ -4,38 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78342C48BDF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A19DC48BE5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:14:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D7C76145C
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:13:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45FD06109D
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:14:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230283AbhFONPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 09:15:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50612 "EHLO
+        id S230349AbhFONQL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 09:16:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbhFONPl (ORCPT
+        with ESMTP id S230120AbhFONQJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 09:15:41 -0400
+        Tue, 15 Jun 2021 09:16:09 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B69C061574;
-        Tue, 15 Jun 2021 06:13:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E11DC0617AF;
+        Tue, 15 Jun 2021 06:14:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=8YCl/XWWerF2JbQtjONY1MvsXXM/D1eQQ3PfHCRJuO4=; b=buAyY/a4gIVxGaKPi3PGMKwb3/
-        qMJNz6qeACjKyurIjtbZ07by8ElW0GEirXXKS8/+Bpzg0Dwqy7y1WWiKLZ6KgY02L1l5N8JKGeDNz
-        k0tJN63LhZ0cUlBnFxHOkkxqio2hXXEJlpbyyvej3/fT5kUy9lcU2zGZrDHbpFALOR4T4np4zfWfP
-        wha+73uVVIGOQYV0Kl+06zwBRoUtFJl41v3lgRsqMyWGQj1JwKtpeqenitJN8lXRepORzTGM7ObLp
-        nVLciaTxVsivSnrX2GYkkXRqNMeswFNWqErTBcoIW2JsaB7meOp5R+L7rVqHSfI6rhdNYgK+VgR47
-        rzqH9Hfg==;
+        bh=ymA8/apkU2u46N0j44KbXs8HBA3c16gqCeaT8NrV98c=; b=CbYGoU6ree4KBQHhwKmXF082k0
+        2H7LRQVhbpH8F9wSt81r5yo2hKbb46QMX4+0zGYtfaugLARv1U5VAiYlzbLwhze6Aq7XkLedL73YZ
+        vXwxetpU6w3OZ1xbp5m/GfOjxGxcRelIO1z6TO+PNKlTkSkMNPU92JKaio5Hh9STpp9USQp58mSbZ
+        C8stz1LjlJbysXsoTp5Sf6Nk43erhND80Q7Zv3bdnB2h7tlfvizcvu4lddVQjwM12KvDcuKsS5WF5
+        rdpYPq53wCP0T+sdHaCdvWEnlk7qsUednraFUVulhKdnVB2tGVCsWt0rXjuBWCi+OmFmnxdurd0Ib
+        lfB2rIVA==;
 Received: from [2001:4bb8:19b:fdce:9045:1e63:20f0:ca9] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lt8sI-006nJr-0P; Tue, 15 Jun 2021 13:13:04 +0000
+        id 1lt8sk-006nMX-SR; Tue, 15 Jun 2021 13:13:35 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
@@ -46,10 +46,11 @@ Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         "Wunderlich, Mark" <mark.wunderlich@intel.com>,
         "Vasudevan, Anil" <anil.vasudevan@intel.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 08/16] block: replace the spin argument to blk_iopoll with a flags argument
-Date:   Tue, 15 Jun 2021 15:10:26 +0200
-Message-Id: <20210615131034.752623-9-hch@lst.de>
+        linux-nvme@lists.infradead.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 10/16] block: rename REQ_HIPRI to REQ_POLLED
+Date:   Tue, 15 Jun 2021 15:10:28 +0200
+Message-Id: <20210615131034.752623-11-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210615131034.752623-1-hch@lst.de>
 References: <20210615131034.752623-1-hch@lst.de>
@@ -60,260 +61,214 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Switch the boolean spin argument to blk_poll to passing a set of flags
-instead.  This will allow to control polling behavior in a more fine
-grained way.
+Unlike the RWF_HIPRI userspace ABI which is intentionally kept vague,
+the bio flag is specific to the polling implementation, so rename and
+document it properly.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Tested-by: Mark Wunderlich <mark.wunderlich@intel.com>
 ---
- block/blk-mq.c           | 17 +++++++----------
- drivers/nvme/host/core.c |  2 +-
- fs/block_dev.c           |  8 ++++----
- fs/io_uring.c            | 14 +++++++-------
- fs/iomap/direct-io.c     |  6 +++---
- include/linux/blkdev.h   |  4 +++-
- include/linux/fs.h       |  2 +-
- include/linux/iomap.h    |  2 +-
- mm/page_io.c             |  2 +-
- 9 files changed, 28 insertions(+), 29 deletions(-)
+ block/blk-core.c          |  2 +-
+ block/blk-merge.c         |  2 +-
+ block/blk-mq-debugfs.c    |  2 +-
+ block/blk-mq.c            |  4 ++--
+ block/blk-mq.h            |  4 ++--
+ drivers/nvme/host/core.c  |  2 +-
+ drivers/scsi/scsi_debug.c | 10 +++++-----
+ include/linux/bio.h       |  2 +-
+ include/linux/blk_types.h |  4 ++--
+ mm/page_io.c              |  2 +-
+ 10 files changed, 17 insertions(+), 17 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 514838ccab2d..858a76858cb0 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -836,7 +836,7 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+ 	}
+ 
+ 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+-		bio->bi_opf &= ~REQ_HIPRI;
++		bio->bi_opf &= ~REQ_POLLED;
+ 
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_DISCARD:
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 4d97fb6dd226..5c9d2a4ece86 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -285,7 +285,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	 * iopoll in direct IO routine. Given performance gain of iopoll for
+ 	 * big IO can be trival, disable iopoll when split needed.
+ 	 */
+-	bio->bi_opf &= ~REQ_HIPRI;
++	bio->bi_opf &= ~REQ_POLLED;
+ 
+ 	return bio_split(bio, sectors, GFP_NOIO, bs);
+ }
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 2a75bc7401df..0b821b369ffd 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -286,7 +286,7 @@ static const char *const cmd_flag_name[] = {
+ 	CMD_FLAG_NAME(BACKGROUND),
+ 	CMD_FLAG_NAME(NOWAIT),
+ 	CMD_FLAG_NAME(NOUNMAP),
+-	CMD_FLAG_NAME(HIPRI),
++	CMD_FLAG_NAME(POLLED),
+ };
+ #undef CMD_FLAG_NAME
+ 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index cb94cf9bcf99..c2b2c7abd712 100644
+index 86e59ffcca44..a0cc1eedc15a 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -3951,7 +3951,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q, blk_qc_t qc)
- }
+@@ -667,7 +667,7 @@ bool blk_mq_complete_request_remote(struct request *rq)
+ 	 * For a polled request, always complete locallly, it's pointless
+ 	 * to redirect the completion.
+ 	 */
+-	if (rq->cmd_flags & REQ_HIPRI)
++	if (rq->cmd_flags & REQ_POLLED)
+ 		return false;
  
- static int blk_mq_poll_classic(struct request_queue *q, blk_qc_t cookie,
--		bool spin)
-+		unsigned int flags)
- {
- 	struct blk_mq_hw_ctx *hctx = blk_qc_to_hctx(q, cookie);
- 	long state = current->state;
-@@ -3974,7 +3974,7 @@ static int blk_mq_poll_classic(struct request_queue *q, blk_qc_t cookie,
- 		if (current->state == TASK_RUNNING)
- 			return 1;
+ 	if (blk_mq_complete_need_ipi(rq)) {
+@@ -2220,7 +2220,7 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
  
--		if (ret < 0 || !spin)
-+		if (ret < 0 || (flags & BLK_POLL_ONESHOT))
- 			break;
- 		cpu_relax();
- 	} while (!need_resched());
-@@ -3987,15 +3987,13 @@ static int blk_mq_poll_classic(struct request_queue *q, blk_qc_t cookie,
-  * blk_poll - poll for IO completions
-  * @q:  the queue
-  * @cookie: cookie passed back at IO submission time
-- * @spin: whether to spin for completions
-+ * @flags: BLK_POLL_* flags that control the behavior
-  *
-  * Description:
-  *    Poll for completions on the passed in queue. Returns number of
-- *    completed entries found. If @spin is true, then blk_poll will continue
-- *    looping until at least one completion is found, unless the task is
-- *    otherwise marked running (or we need to reschedule).
-+ *    completed entries found.
-  */
--int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
-+int blk_poll(struct request_queue *q, blk_qc_t cookie, unsigned int flags)
- {
- 	if (cookie == BLK_QC_T_NONE ||
- 	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-@@ -4004,12 +4002,11 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	if (current->plug)
- 		blk_flush_plug_list(current->plug, false);
+ 	rq_qos_throttle(q, bio);
  
--	/* If specified not to spin, we also should not sleep. */
--	if (spin && q->poll_nsec != BLK_MQ_POLL_CLASSIC) {
-+	if (q->poll_nsec != BLK_MQ_POLL_CLASSIC) {
- 		if (blk_mq_poll_hybrid(q, cookie))
- 			return 1;
- 	}
--	return blk_mq_poll_classic(q, cookie, spin);
-+	return blk_mq_poll_classic(q, cookie, flags);
- }
- EXPORT_SYMBOL_GPL(blk_poll);
+-	hipri = bio->bi_opf & REQ_HIPRI;
++	hipri = bio->bi_opf & REQ_POLLED;
  
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 24bcae88587a..115c8d90530a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1032,7 +1032,7 @@ static void nvme_execute_rq_polled(struct request_queue *q,
- 	blk_execute_rq_nowait(bd_disk, rq, at_head, nvme_end_sync_rq);
- 
- 	while (!completion_done(&wait)) {
--		blk_poll(q, request_to_qc_t(rq->mq_hctx, rq), true);
-+		blk_poll(q, request_to_qc_t(rq->mq_hctx, rq), 0);
- 		cond_resched();
- 	}
- }
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 8600c651b0b0..c9bdaa138909 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -286,7 +286,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 		if (!READ_ONCE(bio.bi_private))
- 			break;
- 		if (!(iocb->ki_flags & IOCB_HIPRI) ||
--		    !blk_poll(bdev_get_queue(bdev), qc, true))
-+		    !blk_poll(bdev_get_queue(bdev), qc, 0))
- 			blk_io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
-@@ -319,12 +319,12 @@ struct blkdev_dio {
- 
- static struct bio_set blkdev_dio_pool;
- 
--static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
-+static int blkdev_iopoll(struct kiocb *kiocb, unsigned int flags)
- {
- 	struct block_device *bdev = I_BDEV(kiocb->ki_filp->f_mapping->host);
- 	struct request_queue *q = bdev_get_queue(bdev);
- 
--	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
-+	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), flags);
- }
- 
- static void blkdev_bio_end_io(struct bio *bio)
-@@ -475,7 +475,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 		if (!READ_ONCE(dio->waiter))
- 			break;
- 
--		if (!do_poll || !blk_poll(bdev_get_queue(bdev), qc, true))
-+		if (!do_poll || !blk_poll(bdev_get_queue(bdev), qc, 0))
- 			blk_io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 5f82954004f6..de8d39e9a154 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2290,18 +2290,18 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
- static int io_do_iopoll(struct io_ring_ctx *ctx, unsigned int *nr_events,
- 			long min)
- {
-+	unsigned int poll_flags = 0;
- 	struct io_kiocb *req, *tmp;
- 	LIST_HEAD(done);
--	bool spin;
--	int ret;
-+	int ret = 0;
+ 	data.cmd_flags = bio->bi_opf;
+ 	rq = __blk_mq_alloc_request(&data);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 4b1ca7b7bbeb..8444e00e8d25 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -109,9 +109,9 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ 	enum hctx_type type = HCTX_TYPE_DEFAULT;
  
  	/*
- 	 * Only spin for completions if we don't have multiple devices hanging
- 	 * off our complete list, and we're under the requested amount.
+-	 * The caller ensure that if REQ_HIPRI, poll must be enabled.
++	 * The caller ensure that if REQ_POLLED, poll must be enabled.
  	 */
--	spin = !ctx->poll_multi_file && *nr_events < min;
-+	if (ctx->poll_multi_file || *nr_events >= min)
-+		poll_flags |= BLK_POLL_ONESHOT;
+-	if (flags & REQ_HIPRI)
++	if (flags & REQ_POLLED)
+ 		type = HCTX_TYPE_POLL;
+ 	else if ((flags & REQ_OP_MASK) == REQ_OP_READ)
+ 		type = HCTX_TYPE_READ;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 115c8d90530a..1f2ecb2fe9b1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1027,7 +1027,7 @@ static void nvme_execute_rq_polled(struct request_queue *q,
  
--	ret = 0;
- 	list_for_each_entry_safe(req, tmp, &ctx->iopoll_list, inflight_entry) {
- 		struct kiocb *kiocb = &req->rw.kiocb;
+ 	WARN_ON_ONCE(!test_bit(QUEUE_FLAG_POLL, &q->queue_flags));
  
-@@ -2317,7 +2317,7 @@ static int io_do_iopoll(struct io_ring_ctx *ctx, unsigned int *nr_events,
- 		if (!list_empty(&done))
- 			break;
+-	rq->cmd_flags |= REQ_HIPRI;
++	rq->cmd_flags |= REQ_POLLED;
+ 	rq->end_io_data = &wait;
+ 	blk_execute_rq_nowait(bd_disk, rq, at_head, nvme_end_sync_rq);
  
--		ret = kiocb->ki_filp->f_op->iopoll(kiocb, spin);
-+		ret = kiocb->ki_filp->f_op->iopoll(kiocb, poll_flags);
- 		if (ret < 0)
- 			break;
- 
-@@ -2325,8 +2325,8 @@ static int io_do_iopoll(struct io_ring_ctx *ctx, unsigned int *nr_events,
- 		if (READ_ONCE(req->iopoll_completed))
- 			list_move_tail(&req->inflight_entry, &done);
- 
--		if (ret && spin)
--			spin = false;
-+		if (ret)
-+			poll_flags |= BLK_POLL_ONESHOT;
- 		ret = 0;
- 	}
- 
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index d5637f467109..9b6c26da3a2d 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -49,13 +49,13 @@ struct iomap_dio {
- 	};
- };
- 
--int iomap_dio_iopoll(struct kiocb *kiocb, bool spin)
-+int iomap_dio_iopoll(struct kiocb *kiocb, unsigned int flags)
+diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+index a5d1633b5bd8..81384d28ff90 100644
+--- a/drivers/scsi/scsi_debug.c
++++ b/drivers/scsi/scsi_debug.c
+@@ -5367,7 +5367,7 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
  {
- 	struct request_queue *q = READ_ONCE(kiocb->private);
+ 	bool new_sd_dp;
+ 	bool inject = false;
+-	bool hipri = (cmnd->request->cmd_flags & REQ_HIPRI);
++	bool polled = (cmnd->request->cmd_flags & REQ_POLLED);
+ 	int k, num_in_q, qdepth;
+ 	unsigned long iflags;
+ 	u64 ns_from_boot = 0;
+@@ -5454,7 +5454,7 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
+ 	if (sdebug_host_max_queue)
+ 		sd_dp->hc_idx = get_tag(cmnd);
  
- 	if (!q)
- 		return 0;
--	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), spin);
-+	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), flags);
- }
- EXPORT_SYMBOL_GPL(iomap_dio_iopoll);
+-	if (hipri)
++	if (polled)
+ 		ns_from_boot = ktime_get_boottime_ns();
  
-@@ -640,7 +640,7 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 			if (!(iocb->ki_flags & IOCB_HIPRI) ||
- 			    !dio->submit.last_queue ||
- 			    !blk_poll(dio->submit.last_queue,
--					 dio->submit.cookie, true))
-+					 dio->submit.cookie, 0))
- 				blk_io_schedule();
+ 	/* one of the resp_*() response functions is called here */
+@@ -5514,7 +5514,7 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
+ 				kt -= d;
+ 			}
  		}
- 		__set_current_state(TASK_RUNNING);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d66d0da72529..c7061f25ee5f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -946,7 +946,9 @@ extern const char *blk_op_str(unsigned int op);
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
+-		if (hipri) {
++		if (polled) {
+ 			sd_dp->cmpl_ts = ktime_add(ns_to_ktime(ns_from_boot), kt);
+ 			spin_lock_irqsave(&sqp->qc_lock, iflags);
+ 			if (!sd_dp->init_poll) {
+@@ -5545,7 +5545,7 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
+ 		if (unlikely((sdebug_opts & SDEBUG_OPT_CMD_ABORT) &&
+ 			     atomic_read(&sdeb_inject_pending)))
+ 			sd_dp->aborted = true;
+-		if (hipri) {
++		if (polled) {
+ 			sd_dp->cmpl_ts = ns_to_ktime(ns_from_boot);
+ 			spin_lock_irqsave(&sqp->qc_lock, iflags);
+ 			if (!sd_dp->init_poll) {
+@@ -7313,7 +7313,7 @@ static int sdebug_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num)
+ 			if (kt_from_boot < sd_dp->cmpl_ts)
+ 				continue;
  
--int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin);
-+/* only poll the hardware once, don't continue until a completion was found */
-+#define BLK_POLL_ONESHOT		(1 << 0)
-+int blk_poll(struct request_queue *q, blk_qc_t cookie, unsigned int flags);
- 
- static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+-		} else		/* ignoring non REQ_HIPRI requests */
++		} else		/* ignoring non REQ_POLLED requests */
+ 			continue;
+ 		devip = (struct sdebug_dev_info *)scp->device->hostdata;
+ 		if (likely(devip))
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d2b98efb5cc5..feaebd2367a0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -813,7 +813,7 @@ static inline int bio_integrity_add_page(struct bio *bio, struct page *page,
+  */
+ static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
  {
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index c3c88fdb9b2a..483fb557d92f 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2026,7 +2026,7 @@ struct file_operations {
- 	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
- 	ssize_t (*read_iter) (struct kiocb *, struct iov_iter *);
- 	ssize_t (*write_iter) (struct kiocb *, struct iov_iter *);
--	int (*iopoll)(struct kiocb *kiocb, bool spin);
-+	int (*iopoll)(struct kiocb *kiocb, unsigned int flags);
- 	int (*iterate) (struct file *, struct dir_context *);
- 	int (*iterate_shared) (struct file *, struct dir_context *);
- 	__poll_t (*poll) (struct file *, struct poll_table_struct *);
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index c87d0cb0de6d..56e5949ccb60 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -275,7 +275,7 @@ struct iomap_dio *__iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 		const struct iomap_ops *ops, const struct iomap_dio_ops *dops,
- 		unsigned int dio_flags);
- ssize_t iomap_dio_complete(struct iomap_dio *dio);
--int iomap_dio_iopoll(struct kiocb *kiocb, bool spin);
-+int iomap_dio_iopoll(struct kiocb *kiocb, unsigned int flags);
+-	bio->bi_opf |= REQ_HIPRI;
++	bio->bi_opf |= REQ_POLLED;
+ 	if (!is_sync_kiocb(kiocb))
+ 		bio->bi_opf |= REQ_NOWAIT;
+ }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 295addd38390..bb53aaa36caf 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -388,7 +388,7 @@ enum req_flag_bits {
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
  
- #ifdef CONFIG_SWAP
- struct file;
+-	__REQ_HIPRI,
++	__REQ_POLLED,		/* caller polls for completion using blk_poll */
+ 
+ 	/* for driver use */
+ 	__REQ_DRV,
+@@ -413,7 +413,7 @@ enum req_flag_bits {
+ #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+-#define REQ_HIPRI		(1ULL << __REQ_HIPRI)
++#define REQ_POLLED		(1ULL << __REQ_POLLED)
+ 
+ #define REQ_DRV			(1ULL << __REQ_DRV)
+ #define REQ_SWAP		(1ULL << __REQ_SWAP)
 diff --git a/mm/page_io.c b/mm/page_io.c
-index c493ce9ebcf5..5d5543fcefa4 100644
+index 5d5543fcefa4..ed2eded74f3a 100644
 --- a/mm/page_io.c
 +++ b/mm/page_io.c
-@@ -428,7 +428,7 @@ int swap_readpage(struct page *page, bool synchronous)
- 		if (!READ_ONCE(bio->bi_private))
- 			break;
- 
--		if (!blk_poll(disk->queue, qc, true))
-+		if (!blk_poll(disk->queue, qc, 0))
- 			blk_io_schedule();
+@@ -416,7 +416,7 @@ int swap_readpage(struct page *page, bool synchronous)
+ 	 * attempt to access it in the page fault retry time check.
+ 	 */
+ 	if (synchronous) {
+-		bio->bi_opf |= REQ_HIPRI;
++		bio->bi_opf |= REQ_POLLED;
+ 		get_task_struct(current);
+ 		bio->bi_private = current;
  	}
- 	__set_current_state(TASK_RUNNING);
 -- 
 2.30.2
 
