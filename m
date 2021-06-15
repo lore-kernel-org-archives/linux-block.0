@@ -2,81 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A9DC48BDF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 09:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75465C48BE5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 10:08:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 228B56115C
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 09:22:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CF1B61438
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 10:08:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231187AbhFOJZA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 05:25:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38251 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231174AbhFOJZA (ORCPT
+        id S231152AbhFOKKn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 06:10:43 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3242 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230519AbhFOKKn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 05:25:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623748975;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZomdBvWBdBzyU/KO6r7jol9LTqc+0xLihxqhqLJmkTQ=;
-        b=V92+kNwK1cy1FMsAR+BZZYjGXdMOyMSoFF+OXFCz3wiwebLfU0lq+69aIhgBkuHmHievpF
-        KWiOaFxctr9cC72eHrWFfn8jatcXiCUYmz7prd/lJp8GUcQCR+4g63nf/U19xLE/jh7qW5
-        QLULFS6LolI/dZ1i9Go4rsFYxzQtEiU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-Y-vBG5rQMk6n_mSUZ2ld4w-1; Tue, 15 Jun 2021 05:22:53 -0400
-X-MC-Unique: Y-vBG5rQMk6n_mSUZ2ld4w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED2F7803621;
-        Tue, 15 Jun 2021 09:22:52 +0000 (UTC)
-Received: from T590 (ovpn-12-39.pek2.redhat.com [10.72.12.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE7115D6D1;
-        Tue, 15 Jun 2021 09:22:47 +0000 (UTC)
-Date:   Tue, 15 Jun 2021 17:22:43 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Omar Kilani <omar.kilani@gmail.com>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: Deadlock in wbt / rq-qos
-Message-ID: <YMhxY9svDeVApu95@T590>
-References: <CA+8F9hggf7jOcGRxvBoa8FYxQs8ZV+XueVAd9BodpQQP_+8Pdw@mail.gmail.com>
+        Tue, 15 Jun 2021 06:10:43 -0400
+Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G43bT1rk6z6H8Ft;
+        Tue, 15 Jun 2021 17:55:33 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 15 Jun 2021 12:08:37 +0200
+Received: from [10.47.95.26] (10.47.95.26) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 15 Jun
+ 2021 11:08:35 +0100
+Subject: Re: [PATCH] blk-mq: fix use-after-free in blk_mq_exit_sched
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        "Christoph Hellwig" <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>,
+        <syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com>
+References: <20210609063046.122843-1-ming.lei@redhat.com>
+ <YMfTBagmPCHGkhYa@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <2c2fd2b2-c622-15dc-58f6-c588cab4f79d@huawei.com>
+Date:   Tue, 15 Jun 2021 11:02:29 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+8F9hggf7jOcGRxvBoa8FYxQs8ZV+XueVAd9BodpQQP_+8Pdw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <YMfTBagmPCHGkhYa@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.95.26]
+X-ClientProxiedBy: lhreml725-chm.china.huawei.com (10.201.108.76) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jun 13, 2021 at 08:49:47AM -0700, Omar Kilani wrote:
-> Hi there,
-> 
-> I appear to have stumbled upon a deadlock in wbt or rq-qos.
-> 
-> My journal of a lot of data points is over here:
-> 
-> https://github.com/openzfs/zfs/issues/12204
-> 
-> I initially deadlocked on RHEL 8.4's 4.18.0-305.3.1.el8_4.x86_64
-> kernel, but the code in blk-wbt.c / blk-rq-qos.c is functionally
-> identical to 5.13.0-rc5, so I tried that and I'm able to deadlock that
-> as well. I believe the same code exists all the way back to 5.0.1.
+>> Reported-by:syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
+>> Fixes: d97e594c5166 ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap")
+>> Cc: John Garry<john.garry@huawei.com>
+>> Signed-off-by: Ming Lei<ming.lei@redhat.com>
+Tested-by: John Garry <john.garry@huawei.com>
+Reviewed-by: John Garry <john.garry@huawei.com>
 
-Recently Jan Kara fixed one rq-qos deadlock issue, can you check if
-the following patch fixes your issue?
+ >> ---
+>>   block/blk-mq-sched.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+>> index a9182d2f8ad3..80273245d11a 100644
+>> --- a/block/blk-mq-sched.c
+>> +++ b/block/blk-mq-sched.c
+>> @@ -680,6 +680,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>>   {
+>>   	struct blk_mq_hw_ctx *hctx;
+>>   	unsigned int i;
+>> +	unsigned int flags = 0;
+>>   
+>>   	queue_for_each_hw_ctx(q, hctx, i) {
+>>   		blk_mq_debugfs_unregister_sched_hctx(hctx);
+>> @@ -687,12 +688,13 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>>   			e->type->ops.exit_hctx(hctx, i);
+>>   			hctx->sched_data = NULL;
+>>   		}
+>> +		flags = hctx->flags;
+>>   	}
+>>   	blk_mq_debugfs_unregister_sched(q);
+>>   	if (e->type->ops.exit_sched)
+>>   		e->type->ops.exit_sched(e);
+>>   	blk_mq_sched_tags_teardown(q);
+>> -	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+>> +	if (blk_mq_is_sbitmap_shared(flags))
 
-https://lore.kernel.org/linux-block/e14aeaa7-45a3-b2f0-7738-3613189ae1d4@kernel.dk/T/#t
+I suppose we could also have this also, but not nice to snoop around 
+sbitmap internals:
+	if (q->sched_bitmap_tags.sb.map)
+		blk_mq_exit_sched_shared_sbitmap(q);
 
- 
-Thanks, 
-Ming
+>>   		blk_mq_exit_sched_shared_sbitmap(q);
+>>   	q->elevator = NULL;
+>>   }
+
+
+Thanks,
+John
+
 
