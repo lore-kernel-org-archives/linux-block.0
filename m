@@ -2,95 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CABC49EA2
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 05:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C32A0C48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 05:30:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 653946124B
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 05:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95DFA61412
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 05:30:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230130AbhFOFGX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 01:06:23 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50656 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229463AbhFOFGW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 01:06:22 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lt1Ec-0006cw-4n; Tue, 15 Jun 2021 13:03:34 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lt1E3-0001MR-0g; Tue, 15 Jun 2021 13:02:59 +0800
-Date:   Tue, 15 Jun 2021 13:02:59 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ira Weiny <ira.weiny@intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ceph-devel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        linux-arch@vger.kernel.org, Tero Kristo <t-kristo@ti.com>,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 09/16] ps3disk: use memcpy_{from,to}_bvec
-Message-ID: <20210615050258.GA5208@gondor.apana.org.au>
-References: <20210608160603.1535935-1-hch@lst.de>
- <20210608160603.1535935-10-hch@lst.de>
- <20210609014822.GT3697498@iweiny-DESK2.sc.intel.com>
- <20210611065338.GA31210@lst.de>
- <20210612040743.GG1600546@iweiny-DESK2.sc.intel.com>
+        id S229488AbhFOFcx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 01:32:53 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:57499 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229463AbhFOFct (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jun 2021 01:32:49 -0400
+Received: from fsav108.sakura.ne.jp (fsav108.sakura.ne.jp [27.133.134.235])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 15F5UeOv015935;
+        Tue, 15 Jun 2021 14:30:40 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav108.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav108.sakura.ne.jp);
+ Tue, 15 Jun 2021 14:30:40 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav108.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 15F5UchD015832
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Tue, 15 Jun 2021 14:30:40 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH] loop: drop loop_ctl_mutex around del_gendisk() in
+ loop_remove()
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
+        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Petr Vorel <pvorel@suse.cz>
+References: <000000000000ae236f05bfde0678@google.com>
+ <1435f266-9f6d-22ef-ba7d-f031c616aede@I-love.SAKURA.ne.jp>
+ <7b8c9eeb-789d-e5e6-04d6-130ee8be7305@i-love.sakura.ne.jp>
+ <20210609164639.GM4910@sequoia>
+ <718b44b5-a230-1907-e1e1-9f609cb67322@i-love.sakura.ne.jp>
+ <4e315cc1-cbb9-b00e-c4cd-ca4f6f60f202@i-love.sakura.ne.jp>
+ <d15e9392-44d0-f42c-cbac-859459a99395@i-love.sakura.ne.jp>
+Message-ID: <2af74b56-5f25-5f07-df48-86b341ad8c2a@i-love.sakura.ne.jp>
+Date:   Tue, 15 Jun 2021 14:30:33 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210612040743.GG1600546@iweiny-DESK2.sc.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <d15e9392-44d0-f42c-cbac-859459a99395@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 11, 2021 at 09:07:43PM -0700, Ira Weiny wrote:
->
-> More recently this was added:
-> 
-> 7e34e0bbc644 crypto: omap-crypto - fix userspace copied buffer access
-> 
-> I'm CC'ing Tero and Herbert to see why they added the SLAB check.
+Found that commit 990e78116d38059c ("block: loop: fix deadlock between open and remove") went to 5.13-rc6.
 
-Probably because the generic Crypto API has the same check.  This
-all goes back to
+#syz fix: block: loop: fix deadlock between open and remove
 
-commit 4f3e797ad07d52d34983354a77b365dfcd48c1b4
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Mon Feb 9 14:22:14 2009 +1100
+Now syzbot is reporting
 
-    crypto: scatterwalk - Avoid flush_dcache_page on slab pages
+ Possible unsafe locking scenario:
 
-    It's illegal to call flush_dcache_page on slab pages on a number
-    of architectures.  So this patch avoids doing so if PageSlab is
-    true.
+       CPU0                    CPU1
+       ----                    ----
+  lock(nbd_index_mutex);
+                               lock(&bdev->bd_mutex);
+                               lock(nbd_index_mutex);
+  lock(&bdev->bd_mutex);
 
-    In future we can move the flush_dcache_page call to those page
-    cache users that actually need it.
+at https://syzkaller.appspot.com/text?tag=CrashReport&x=11b8a5bbd00000 .
 
-    Reported-by: David S. Miller <davem@davemloft.net>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-But I can't find any emails discussing this so let me ask Dave
-directly and see if he can tell us what the issue was or might
-have been.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
