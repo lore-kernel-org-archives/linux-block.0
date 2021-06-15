@@ -2,107 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C6FC48BE5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 09:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A9DC48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 09:22:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8569A61429
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 09:04:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 228B56115C
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 09:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231281AbhFOJGk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 05:06:40 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:44810 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231168AbhFOJGd (ORCPT
+        id S231187AbhFOJZA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 05:25:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38251 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231174AbhFOJZA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 05:06:33 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id E3EBE1FD2A;
-        Tue, 15 Jun 2021 09:04:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1623747868; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Tue, 15 Jun 2021 05:25:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623748975;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NJoqqhsvx2sNs9lDgOIYwwi7W2f6G9EVJ5fv0zA7HuU=;
-        b=iQS0yPTnUMPsqXOO3g3QJRx+U2JeH+r1OOvYREr8pAgz6aNNOE+daDqbi8XTesZQWVB8NP
-        J9DXvHNmscJX6JW1RW+nGYqhrBFj+Y51/QOXFD3AmmI/2fYxYEnFaYvWwLTjHdRIrCMP2G
-        Vz1yO6qgiv96iVEJ3YfYLnwSab14YXk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1623747868;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NJoqqhsvx2sNs9lDgOIYwwi7W2f6G9EVJ5fv0zA7HuU=;
-        b=wlZcB/Smx73aUJOHz0iT3seRvKb3QsSjy+R/M3lrFqffwfj43eI9LFeosldkMz+gbLs8+0
-        kjBEDk8cPiIoamDg==
-Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id C7324A3B84;
-        Tue, 15 Jun 2021 09:04:28 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 645251F2C88; Tue, 15 Jun 2021 11:04:28 +0200 (CEST)
-Date:   Tue, 15 Jun 2021 11:04:28 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Petr Vorel <pvorel@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH] loop: drop loop_ctl_mutex around del_gendisk() in
- loop_remove()
-Message-ID: <20210615090428.GH29751@quack2.suse.cz>
-References: <000000000000ae236f05bfde0678@google.com>
- <1435f266-9f6d-22ef-ba7d-f031c616aede@I-love.SAKURA.ne.jp>
- <7b8c9eeb-789d-e5e6-04d6-130ee8be7305@i-love.sakura.ne.jp>
- <20210609164639.GM4910@sequoia>
- <718b44b5-a230-1907-e1e1-9f609cb67322@i-love.sakura.ne.jp>
- <4e315cc1-cbb9-b00e-c4cd-ca4f6f60f202@i-love.sakura.ne.jp>
- <d15e9392-44d0-f42c-cbac-859459a99395@i-love.sakura.ne.jp>
+        bh=ZomdBvWBdBzyU/KO6r7jol9LTqc+0xLihxqhqLJmkTQ=;
+        b=V92+kNwK1cy1FMsAR+BZZYjGXdMOyMSoFF+OXFCz3wiwebLfU0lq+69aIhgBkuHmHievpF
+        KWiOaFxctr9cC72eHrWFfn8jatcXiCUYmz7prd/lJp8GUcQCR+4g63nf/U19xLE/jh7qW5
+        QLULFS6LolI/dZ1i9Go4rsFYxzQtEiU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-Y-vBG5rQMk6n_mSUZ2ld4w-1; Tue, 15 Jun 2021 05:22:53 -0400
+X-MC-Unique: Y-vBG5rQMk6n_mSUZ2ld4w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED2F7803621;
+        Tue, 15 Jun 2021 09:22:52 +0000 (UTC)
+Received: from T590 (ovpn-12-39.pek2.redhat.com [10.72.12.39])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE7115D6D1;
+        Tue, 15 Jun 2021 09:22:47 +0000 (UTC)
+Date:   Tue, 15 Jun 2021 17:22:43 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Omar Kilani <omar.kilani@gmail.com>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: Deadlock in wbt / rq-qos
+Message-ID: <YMhxY9svDeVApu95@T590>
+References: <CA+8F9hggf7jOcGRxvBoa8FYxQs8ZV+XueVAd9BodpQQP_+8Pdw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d15e9392-44d0-f42c-cbac-859459a99395@i-love.sakura.ne.jp>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CA+8F9hggf7jOcGRxvBoa8FYxQs8ZV+XueVAd9BodpQQP_+8Pdw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat 12-06-21 00:14:20, Tetsuo Handa wrote:
-> syzbot is reporting circular locking dependency between loop_ctl_mutex and
-> bdev->bd_mutex [1] due to commit c76f48eb5c084b1e ("block: take bd_mutex
-> around delete_partitions in del_gendisk").
+On Sun, Jun 13, 2021 at 08:49:47AM -0700, Omar Kilani wrote:
+> Hi there,
 > 
-> But calling del_gendisk() from loop_remove() without loop_ctl_mutex held
-> triggers a different race problem regarding sysfs entry management. We
-> somehow need to serialize "add_disk() from loop_add()" and "del_gendisk()
->  from loop_remove()". Fortunately, since loop_control_ioctl() is called
-> with no locks held, we can use "sleep and retry" approach without risking
-> deadlock.
+> I appear to have stumbled upon a deadlock in wbt or rq-qos.
 > 
-> Since "struct loop_device"->lo_disk->private_data is set to non-NULL at
-> loop_add() and is reset to NULL before calling loop_remove(), we can use
-> it as a flag for taking appropriate action ("sleep and retry" or "skip")
-> when loop_remove() is in progress.
+> My journal of a lot of data points is over here:
 > 
-> Link: https://syzkaller.appspot.com/bug?extid=61e04e51b7ac86930589 [1]
-> Reported-by: syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Tested-by: syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>
-> Fixes: c76f48eb5c084b1e ("block: take bd_mutex around delete_partitions in del_gendisk")
+> https://github.com/openzfs/zfs/issues/12204
+> 
+> I initially deadlocked on RHEL 8.4's 4.18.0-305.3.1.el8_4.x86_64
+> kernel, but the code in blk-wbt.c / blk-rq-qos.c is functionally
+> identical to 5.13.0-rc5, so I tried that and I'm able to deadlock that
+> as well. I believe the same code exists all the way back to 5.0.1.
 
-Christoph seems to have already fixed this by 990e78116d380 ("block: loop:
-fix deadlock between open and remove").
+Recently Jan Kara fixed one rq-qos deadlock issue, can you check if
+the following patch fixes your issue?
 
-								Honza
+https://lore.kernel.org/linux-block/e14aeaa7-45a3-b2f0-7738-3613189ae1d4@kernel.dk/T/#t
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+ 
+Thanks, 
+Ming
+
