@@ -2,107 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75465C48BE5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 10:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 469D8C48BE5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 10:48:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CF1B61438
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 10:08:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21AFD6142B
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 10:48:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231152AbhFOKKn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 06:10:43 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3242 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230519AbhFOKKn (ORCPT
+        id S231502AbhFOKui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 06:50:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43922 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231337AbhFOKuh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 06:10:43 -0400
-Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G43bT1rk6z6H8Ft;
-        Tue, 15 Jun 2021 17:55:33 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 15 Jun 2021 12:08:37 +0200
-Received: from [10.47.95.26] (10.47.95.26) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 15 Jun
- 2021 11:08:35 +0100
-Subject: Re: [PATCH] blk-mq: fix use-after-free in blk_mq_exit_sched
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        "Christoph Hellwig" <hch@lst.de>
-CC:     <linux-block@vger.kernel.org>,
-        <syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com>
-References: <20210609063046.122843-1-ming.lei@redhat.com>
- <YMfTBagmPCHGkhYa@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <2c2fd2b2-c622-15dc-58f6-c588cab4f79d@huawei.com>
-Date:   Tue, 15 Jun 2021 11:02:29 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        Tue, 15 Jun 2021 06:50:37 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568C7C061574
+        for <linux-block@vger.kernel.org>; Tue, 15 Jun 2021 03:48:33 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id g22so6014462pgk.1
+        for <linux-block@vger.kernel.org>; Tue, 15 Jun 2021 03:48:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WdD620LAuh+zdkdFnt6lNMuLD4Se0RjUXXyrRg3LSdI=;
+        b=k6fGeowr5S4OWzFSVxVu59P3nQGVdL87Z7WC1vj3M4PC0ADAeYVb0bivQ+dXprQ2Uq
+         zFlMKEt4IpTxgya9f5OMRAOhUsmtVH9VC2aB0ms7vdEi+ZJRkvTOPcT5xuozuunk8y1q
+         27Cu3WdMSeW2e5ZENtq/2woUsfMHK4sxowmshZ/YA8eHHptU5nhyId9N14P/CNc8E8lv
+         BKguteD9e1J/DposFfDT/Hb60fJ7NOnIzDAPQoS2nHdrvgLTfIVKuFSaNoangf0xzDXC
+         KLsrTsw8h3TwNe34hivnGEi0jCDwfg3rGqfi6V/xa6EIHWWaYQns0Zle3wCgFmx0zUAL
+         YCiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WdD620LAuh+zdkdFnt6lNMuLD4Se0RjUXXyrRg3LSdI=;
+        b=AaM4lN4bOeLfpBLoCAZkhETzvn+nuirIV51i8VsyCFqDu70gpI6pwa25uyMS/krRes
+         QxU12EUBrfUozRgRRZvlWqgUkHufTvb9husw3kB8Un1YleURl4SxsSLGS9sEo1TPdTzs
+         ccFrCA7ySOrBKUGD9rvQuy2s/FAYN05vkGTUKYStbN934gDmAVQuH7XDGXnaX1ospGxJ
+         kUZI2SJL1dKbr/ZbvgjbFBEGa6dwzeDXD7lCTeVHYiYT+zgQ8c33AjGqOkTCVIrcBkv/
+         qQx3Dmurom22xE5qHY7smbeRh1JCKALTvf7BtlvK5LoZYbOPv5qBpUoG2OvgCPXg3B7P
+         Am4w==
+X-Gm-Message-State: AOAM53127iyopHxDW3hIbvd43MJOEFK8zBTImfgtymLAKqLiclFNFauk
+        Hv8d608dB8wzfJ2+ojDGJjRq
+X-Google-Smtp-Source: ABdhPJzl/nkn3/Z8TNrrue6WsPSXZp7LdC8FJV7fH6izqMFpnk1tNpG3TlfEYiBe6BYAWO5bg9lMqw==
+X-Received: by 2002:a62:2c92:0:b029:2ef:6118:a934 with SMTP id s140-20020a622c920000b02902ef6118a934mr3912976pfs.80.1623754112819;
+        Tue, 15 Jun 2021 03:48:32 -0700 (PDT)
+Received: from localhost ([61.120.150.78])
+        by smtp.gmail.com with ESMTPSA id w206sm15032759pff.1.2021.06.15.03.48.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jun 2021 03:48:32 -0700 (PDT)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        axboe@kernel.dk
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] virtio-blk: Add validation for block size in config space
+Date:   Tue, 15 Jun 2021 18:48:10 +0800
+Message-Id: <20210615104810.151-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <YMfTBagmPCHGkhYa@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.95.26]
-X-ClientProxiedBy: lhreml725-chm.china.huawei.com (10.201.108.76) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> Reported-by:syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
->> Fixes: d97e594c5166 ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap")
->> Cc: John Garry<john.garry@huawei.com>
->> Signed-off-by: Ming Lei<ming.lei@redhat.com>
-Tested-by: John Garry <john.garry@huawei.com>
-Reviewed-by: John Garry <john.garry@huawei.com>
+This ensures that we will not use an invalid block size
+in config space (might come from an untrusted device).
 
- >> ---
->>   block/blk-mq-sched.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
->> index a9182d2f8ad3..80273245d11a 100644
->> --- a/block/blk-mq-sched.c
->> +++ b/block/blk-mq-sched.c
->> @@ -680,6 +680,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
->>   {
->>   	struct blk_mq_hw_ctx *hctx;
->>   	unsigned int i;
->> +	unsigned int flags = 0;
->>   
->>   	queue_for_each_hw_ctx(q, hctx, i) {
->>   		blk_mq_debugfs_unregister_sched_hctx(hctx);
->> @@ -687,12 +688,13 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
->>   			e->type->ops.exit_hctx(hctx, i);
->>   			hctx->sched_data = NULL;
->>   		}
->> +		flags = hctx->flags;
->>   	}
->>   	blk_mq_debugfs_unregister_sched(q);
->>   	if (e->type->ops.exit_sched)
->>   		e->type->ops.exit_sched(e);
->>   	blk_mq_sched_tags_teardown(q);
->> -	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
->> +	if (blk_mq_is_sbitmap_shared(flags))
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+---
+ drivers/block/virtio_blk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I suppose we could also have this also, but not nice to snoop around 
-sbitmap internals:
-	if (q->sched_bitmap_tags.sb.map)
-		blk_mq_exit_sched_shared_sbitmap(q);
-
->>   		blk_mq_exit_sched_shared_sbitmap(q);
->>   	q->elevator = NULL;
->>   }
-
-
-Thanks,
-John
-
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index b9fa3ef5b57c..85ae3b27ea4b 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -827,7 +827,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
+ 				   struct virtio_blk_config, blk_size,
+ 				   &blk_size);
+-	if (!err)
++	if (!err && blk_size >= SECTOR_SIZE && blk_size <= PAGE_SIZE)
+ 		blk_queue_logical_block_size(q, blk_size);
+ 	else
+ 		blk_size = queue_logical_block_size(q);
+-- 
+2.11.0
 
