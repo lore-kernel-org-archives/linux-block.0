@@ -2,96 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E30C49EA2
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 18:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0F9C48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 19:57:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1CC66115B
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 18:40:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30C5961246
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 19:57:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231176AbhFOSmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 14:42:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40852 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbhFOSmm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 14:42:42 -0400
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [IPv6:2001:4b98:dc2:55:216:3eff:fef7:d647])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560EEC061574;
-        Tue, 15 Jun 2021 11:40:37 -0700 (PDT)
-Received: from pendragon.ideasonboard.com (62-78-145-57.bb.dnainternet.fi [62.78.145.57])
-        by perceval.ideasonboard.com (Postfix) with ESMTPSA id 291F94A3;
-        Tue, 15 Jun 2021 20:40:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-        s=mail; t=1623782434;
-        bh=3PIbXGv9WJI1oVxhJvXNkSPm3iTDDkwb4+U0QZuU0Og=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WOKnHeHlUSfcPRIdko29xFI6GP2fmpisAIJ6Onm7DlneHJGVJKPUxvVhF8FYC5NM6
-         UR2g9IMb8ZjktLcaBkak79fOt1R4hAqkpDGUuD3835VghpbN0dmve9UuPmYperfmxT
-         UdKLjXeh0fnkqPW+In7A3ix2QHQmwBRxrgekZ1yU=
-Date:   Tue, 15 Jun 2021 21:40:13 +0300
-From:   Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        David Howells <dhowells@redhat.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Greg KH <greg@kroah.com>, Christoph Lameter <cl@gentwo.de>,
-        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
-        ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-Message-ID: <YMj0Del0tnZ+dRM/@pendragon.ideasonboard.com>
-References: <YLEIKk7IuWu6W4Sy@casper.infradead.org>
- <YH2hs6EsPTpDAqXc@mit.edu>
- <nycvar.YFH.7.76.2104281228350.18270@cbobk.fhfr.pm>
- <YIx7R6tmcRRCl/az@mit.edu>
- <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
- <YK+esqGjKaPb+b/Q@kroah.com>
- <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
- <1745326.1623409807@warthog.procyon.org.uk>
- <e47706ee-3e4b-8f15-963f-292b5e47cb1d@metux.net>
- <YMjxqEY25A6bm47s@casper.infradead.org>
+        id S229965AbhFOT7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 15:59:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35700 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229898AbhFOT7O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jun 2021 15:59:14 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8C6C560FDA;
+        Tue, 15 Jun 2021 19:57:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623787029;
+        bh=aJxtpuB+Py++h4934oM5+CzxS279TVqfyJ2h9dcQ0dI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=hiMfcvcUJ3QIZwYyijPG2VL8mot+7p4olcEoiPrTvFyGV2MBnO86POR1NRX9CJQiH
+         QIEkMsgPKjKGe8gmKDZjkIiVOobQSBENz8k4XQmQ5rOOFjRfdoLBoh1PuX/mMCnpNt
+         Z536NZdLskHd5vm/2QvYxGdtIe/OEFpBgOqBJcYri9v728nSZELDoxfTs6vI9UJ1es
+         YeOfy7x8QtcYLHNCi5Rba3emCVnNTUZti1Q8eGuajI07bwGnf6RRsm8iW9qNrUWzpp
+         YYEzSJIw4exDnTPa5xWt34fGgbXmUG4iSLx2rnbcBi463kE0zA4mCNVsRXrkk2y4eX
+         VDscxs5VtHNeQ==
+Date:   Tue, 15 Jun 2021 14:57:07 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        Keith Busch <keith.busch@intel.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Subject: Re: [patch v6 3/7] genirq/affinity: Add new callback for
+ (re)calculating interrupt sets
+Message-ID: <20210615195707.GA2909907@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YMjxqEY25A6bm47s@casper.infradead.org>
+In-Reply-To: <20190216172228.512444498@linutronix.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 15, 2021 at 07:30:00PM +0100, Matthew Wilcox wrote:
-> On Tue, Jun 15, 2021 at 08:23:55PM +0200, Enrico Weigelt, metux IT consult wrote:
-> > On 11.06.21 13:10, David Howells wrote:
-> > 
-> > > One thing that concerns me about flying to the US is going through multiple
-> > > busy international airports - take Heathrow which didn't separate incoming
-> > > travellers from red-listed countries from those of amber- or green- until like
-> > > a week ago.
-> > > 
-> > > Would it be practical/economical to charter a plane to fly, say, from a less
-> > > busy airport in Europe to a less busy airport in the US and back again if we
-> > > could get enough delegates together to make it worthwhile?
-> > 
-> > Wouldn't just taking prophylatic meds like CDS or HCQ and/or hi-dose
-> > vitamins (C, D3+K2) be way more cost effective and flexible than to
-> > charter a whole plane ?
+On Sat, Feb 16, 2019 at 06:13:09PM +0100, Thomas Gleixner wrote:
+> From: Ming Lei <ming.lei@redhat.com>
 > 
-> Why don't you just shine a bright light up your arse?  It'll have the
-> same effect.
+> The interrupt affinity spreading mechanism supports to spread out
+> affinities for one or more interrupt sets. A interrupt set contains one or
+> more interrupts. Each set is mapped to a specific functionality of a
+> device, e.g. general I/O queues and read I/O queus of multiqueue block
+> devices.
+> 
+> The number of interrupts per set is defined by the driver. It depends on
+> the total number of available interrupts for the device, which is
+> determined by the PCI capabilites and the availability of underlying CPU
+> resources, and the number of queues which the device provides and the
+> driver wants to instantiate.
+> 
+> The driver passes initial configuration for the interrupt allocation via a
+> pointer to struct irq_affinity.
+> 
+> Right now the allocation mechanism is complex as it requires to have a loop
+> in the driver to determine the maximum number of interrupts which are
+> provided by the PCI capabilities and the underlying CPU resources.  This
+> loop would have to be replicated in every driver which wants to utilize
+> this mechanism. That's unwanted code duplication and error prone.
+> 
+> In order to move this into generic facilities it is required to have a
+> mechanism, which allows the recalculation of the interrupt sets and their
+> size, in the core code. As the core code does not have any knowledge about the
+> underlying device, a driver specific callback is required in struct
+> irq_affinity, which can be invoked by the core code. The callback gets the
+> number of available interupts as an argument, so the driver can calculate the
+> corresponding number and size of interrupt sets.
+> 
+> At the moment the struct irq_affinity pointer which is handed in from the
+> driver and passed through to several core functions is marked 'const', but for
+> the callback to be able to modify the data in the struct it's required to
+> remove the 'const' qualifier.
+> 
+> Add the optional callback to struct irq_affinity, which allows drivers to
+> recalculate the number and size of interrupt sets and remove the 'const'
+> qualifier.
+> 
+> For simple invocations, which do not supply a callback, a default callback
+> is installed, which just sets nr_sets to 1 and transfers the number of
+> spreadable vectors to the set_size array at index 0.
+> 
+> This is for now guarded by a check for nr_sets != 0 to keep the NVME driver
+> working until it is converted to the callback mechanism.
+> 
+> To make sure that the driver configuration is correct under all circumstances
+> the callback is invoked even when there are no interrupts for queues left,
+> i.e. the pre/post requirements already exhaust the numner of available
+> interrupts.
+> 
+> At the PCI layer irq_create_affinity_masks() has to be invoked even for the
+> case where the legacy interrupt is used. That ensures that the callback is
+> invoked and the device driver can adjust to that situation.
+> 
+> [ tglx: Fixed the simple case (no sets required). Moved the sanity check
+>   	for nr_sets after the invocation of the callback so it catches
+>   	broken drivers. Fixed the kernel doc comments for struct
+>   	irq_affinity and de-'This patch'-ed the changelog ]
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 
-Could we please, as requested early on by Konstantin, restrict
-COVID19-related discussions on this mailing list solely to how it would
-impact travel to/from the conference ?
+> @@ -1196,6 +1196,13 @@ int pci_alloc_irq_vectors_affinity(struc
+>  	/* use legacy irq if allowed */
+>  	if (flags & PCI_IRQ_LEGACY) {
+>  		if (min_vecs == 1 && dev->irq) {
+> +			/*
+> +			 * Invoke the affinity spreading logic to ensure that
+> +			 * the device driver can adjust queue configuration
+> +			 * for the single interrupt case.
+> +			 */
+> +			if (affd)
+> +				irq_create_affinity_masks(1, affd);
 
-For those who want to debate the merits of various medicines, feel free
-to create your own mailing list, or an IRC channel on Freenode.
+This looks like a leak because irq_create_affinity_masks() returns a
+pointer to kcalloc()ed space, but we throw away the pointer.
 
--- 
-Regards,
+Or is there something very subtle going on here, like this special
+case doesn't allocate anything?  I do see the "Nothing to assign?"
+case that returns NULL with no alloc, but it's not completely trivial
+to verify that we take that case here.
 
-Laurent Pinchart
+>  			pci_intx(dev, 1);
+>  			return 1;
+>  		}
