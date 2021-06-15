@@ -2,187 +2,481 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F870C48BDF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 16:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EE5C48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 17:10:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C883617ED
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 16:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C5986143D
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 17:10:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbhFOQbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 12:31:03 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:63363 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229979AbhFOQbB (ORCPT
+        id S229732AbhFORM7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 13:12:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48844 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229649AbhFORM6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 12:31:01 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20210615162855euoutp01ad6e86ce042d5d9a8c1d0cc8b7f986dd~IzlYzcF-E1226212262euoutp01G;
-        Tue, 15 Jun 2021 16:28:55 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20210615162855euoutp01ad6e86ce042d5d9a8c1d0cc8b7f986dd~IzlYzcF-E1226212262euoutp01G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1623774535;
-        bh=xlgLokA1E+ZL2R6HWaDfu9TCOox/AjjaAxkG29EvyOY=;
-        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
-        b=eXGCngLhbKBWvmZD1q//dCrYCLvpvjCmxVxNpM5R2hkZhZSuHLYtvDq66CpJGuZ3t
-         +vz3mAnsk7oXEfcQSrZKNgm3jjHeiaxibNQPz/dGglAcqD9fcYrhpOs5eMKI9Lc5/z
-         b6NF33kQ0+nbbTLJD9nkxi3x7ulcBsg/5Oruv6pA=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210615162854eucas1p16fe3d1cb9712f22c61caf1af21eda61c~IzlYcZM1U2673626736eucas1p1h;
-        Tue, 15 Jun 2021 16:28:54 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 78.59.09439.645D8C06; Tue, 15
-        Jun 2021 17:28:54 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20210615162854eucas1p12f7975e37d474ac5ffdb532fa21ef58b~IzlX3jd6f1146211462eucas1p19;
-        Tue, 15 Jun 2021 16:28:54 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210615162854eusmtrp1de18538b70433169cba9c508ea4d3c0d~IzlX2F6VP0369503695eusmtrp1k;
-        Tue, 15 Jun 2021 16:28:54 +0000 (GMT)
-X-AuditID: cbfec7f5-c1bff700000024df-f1-60c8d5467e58
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 5B.55.08705.645D8C06; Tue, 15
-        Jun 2021 17:28:54 +0100 (BST)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210615162852eusmtip2560d33f2ab723e29cbde1a513bd9cbf2~IzlWL851d0102301023eusmtip2f;
-        Tue, 15 Jun 2021 16:28:52 +0000 (GMT)
-Subject: Re: [PATCH 09/30] mtd_blkdevs: use blk_mq_alloc_disk
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
-        Denis Efremov <efremov@linux.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Tim Waugh <tim@cyberelk.net>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linuxppc-dev@lists.ozlabs.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
-Message-ID: <7f98a37c-281c-bff6-6126-a65feadcb6ca@samsung.com>
-Date:   Tue, 15 Jun 2021 18:28:52 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0)
-        Gecko/20100101 Thunderbird/78.11.0
+        Tue, 15 Jun 2021 13:12:58 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608CBC061574;
+        Tue, 15 Jun 2021 10:10:53 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id o20so11775876qtr.8;
+        Tue, 15 Jun 2021 10:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XOndezn7TQBTma5ivSk1iPTUGdSJkv/aNqYrkqV3kxQ=;
+        b=ATzs4TM6Ysd0gq+31mvvNFY0AveNfMGp0yO0XEGtmRQPdgjqvs5juBsABclpG7WwHy
+         EK6cp8nzzs1C41bTibIue7titG7VjHoI/aMajeW/5kU9d/5Z+Za9CKPs1FsmgBivmkR6
+         7bo5BuALPszqmIi+uSKdc0lwKTwMWUAHX750IpNnmYSGisT8/AOooGCF33LyKnTll1ch
+         7nSe+CtNi5Sce2i2o35ScpdlehnmmsBwVXefQmqgv7s9rw26BoMKDGeq9wcx2GmmcTG0
+         jayPjTFZkld1kMl1SUyHqKxsvtmCuUgbCR4XOhgJxFFoJWoyFsA9/igcWUeKFHUStg8B
+         yGWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=XOndezn7TQBTma5ivSk1iPTUGdSJkv/aNqYrkqV3kxQ=;
+        b=LGkqqL4CYdoH8uPZxk3tVTgPQeXoXiEtCUb0cOUc7R8kvD5xMm/J15hso8BwBHuL1m
+         5dOWfPC4ZNLrsn9ebs2lpRdKj7WlU6Tm6jLJNqgjSRUDRwmXtyZwVnakcwK6yreftjBg
+         3R/jAOQ8YQ3ZQxwqlwLLCBmWFWWukysloMPObkqGGRRzLM8jJiZjHczG7TgUcBnBnQsx
+         Xxv15fb/D7CTu+sB8kJVWbGIj4ScL1sxCm2KIVxHc9733PGTHGmnZFNU7+/FbEXwRKPV
+         wUb2xJmn4BRMtivFBVb8mfsvqBeG+IEWCvm7LPF3+sf96ItGyrbRICepO7TrF1SGKE1R
+         /LNQ==
+X-Gm-Message-State: AOAM531FQy9J+DYOL6jbc58WnupmmoM1TPiJLehai7fhh3cjRiHE5L3A
+        yZKRDcHPwSNZlZhqmwGG0EE=
+X-Google-Smtp-Source: ABdhPJxpP3AZyscKz83ej7vAoqFQXtCu7dUHKDdrqJykfdOQM1q88/h9tvKkZsSNgCcqQKq19AG3Vw==
+X-Received: by 2002:ac8:57cf:: with SMTP id w15mr643442qta.145.1623777052270;
+        Tue, 15 Jun 2021 10:10:52 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id w195sm4966891qkb.127.2021.06.15.10.10.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jun 2021 10:10:51 -0700 (PDT)
+Sender: Mike Snitzer <snitzer@gmail.com>
+Date:   Tue, 15 Jun 2021 13:10:50 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     mwilck@suse.com
+Cc:     Alasdair G Kergon <agk@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        dm-devel@redhat.com, Hannes Reinecke <hare@suse.de>,
+        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Benjamin Marzinski <bmarzins@redhat.com>,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] dm: add CONFIG_DM_MULTIPATH_SG_IO - failover for
+ SG_IO on dm-multipath
+Message-ID: <YMjfGh9hJjLkol9V@redhat.com>
+References: <20210611202509.5426-1-mwilck@suse.com>
+ <20210611202509.5426-3-mwilck@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <20210615155817.GA31047@lst.de>
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0xTZxzNd+/tvS1Z8VrZ+o25bKkb2ajA2HR+m0D2MO4mLoaMbVkMBjq4
-        K4TnWjpASaxIhBEnCBJKGUWQAuPlChXEzgdvWS0YqItAxcEoRAoOeQ4VGPTixn/n9zvnl3PO
-        l4+Pi+6S7vzI2ARWESuLlpAuRGPncq/Xwbu3Qt8p7pOi6vtZJDJoLvFQfmUTgWYGcjB07VEh
-        D1l/NwFU9jAA3dEu8lCj+VcKOXRVAP1S3YGhB7p0EpX3zWFouv48gZ6N+CKr2gOVX7QDdG1Q
-        itrXsgAypZZTKLvkFI6eLq3y0FR3KYXa0q/z0NqTSR56aq/F0EhnNY5ym6cA0vRe5KHThgWA
-        RvUVOFqzzFCowqIj0ZIxF/tIwuhqjjOO3GzAdD+8TTAdbS0U0zLaSjLN2vsU01DpyZinbBjT
-        b1ExY9Z8jMkuvQmYhrITTO69CsD0akoA0zZjJRjTgJoMfPmIi184Gx35A6vwCQh1iZhrWMLi
-        ewRJjpxdajBPZQIBH9J74Jq+yIlFdCWA2m5VJnBZx/MAdua1A26YA7DW1og9v+g4m0dwRAWA
-        mqbqTdVjAIsnOsgN1Q7aH47W9fA2sBstgfZJi1OE0+0CaD+rdhIk7QszpzOdB0I6APbo0pxB
-        CPpN2F7A2b1Ih8G/dRoep9kOuwvGiA0soHfD2eZ+pwanX4NN0z/jHBbDwbFibMMM0lMucF7r
-        4HG5D8CGqtrNDjvgZJdx8wV2QnPuGYI7OAXgSE8txQ1nAOxP1QBOtR/aep6sR+WvW7wNL131
-        4dYfw7TMK/jGGtKu8N70di6EK8xpzN9cC2HGaRGn9oDarrr/bFvu9OHZQKLdUk27pY52Sx3t
-        /74XAFEFxKxKGSNnle/FsoneSlmMUhUr9w6Li6kH6z/fvNq1cAVUTj72bgUYH7QCyMclbkIv
-        5a1QkTBclnyMVcSFKFTRrLIVvMInJGLh1cs1ISJaLktgo1g2nlU8ZzG+wF2N8b/ojlCS6vEM
-        g8fioiFO3275NP5DP0/tzbLe0tKaurb6l3YOCwdXw919tr0furB/KIAJC8rbK04xXKZwkvLf
-        VeD/ZWSYIiEey/+aHTB77JOH7wt+K2V+fCJyaHy4f2Xl3bwjzX+JjxmlwT8dTjq0/I8+LrrR
-        nhJSha96fTd0/MTKs9n0oOU477brS0vuUXq35cIXTEbbJyUniwJnv/WQfmPyPZBsrX/96MTR
-        UteMom3ewbU5r0pVs3sGqaiOyKSUR0mWc3+8IUgd96+DfiLpg8+SrLOK6IQ/s8wnZ0yFZcuJ
-        H1B7E39ssnUG7k4+d+h7ufvwVJmY+S3tRtBt4+fn5Te+ckgIZYTM1xNXKGX/Av4MyY1oBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0xTZxiH851LLxjcWYFwYC4zdSwGR6Hc/Eq0OGeWE5dNxszINknbwRko
-        l7JeVLYFqg4YyG2UjVpHEQstFiaXThQbVIqgXddqZjcBxxwdjXJTJkyGEhktLuG/X/J7njfv
-        m7wslHMPD2Xtz1XQslxJNpfhh9mfXfsj4q1fr4ujNL0s2DpaxYCdmnYc1rWcx+DscA0Cex+c
-        xKHrJwuATRNCeFP7GIfd9g4mnNKZADzTOoDAu7oSBjT8MofAma5aDC6N8aFL9Ro06D0A9o5s
-        gVeXqwC0HDUwYXXjMRQ+XXiGw2nbaSbsL7mEw+Unkzh86vkBgWODrShU90wDqLmhx2Fx5z8A
-        upuNKFx2zDKh0aFjwIUf1cgOLqVr+4KaUlcDyjbxM0YN9PcxqT63lUH1aEeZlLklnLJP/45Q
-        txxKatxVh1DVp68AytxUSKmHjIC6oWkEVP+sC6MswypGUshHvG0yqVJBb8yUyhXbuR/zYTSP
-        L4C86FgBjx+zNTUhOo4bKdyWTmfvP0jLIoViXuaceQHJc7IPT9VsUoF5Zhlgs0gilhyo/BYr
-        A34sDtEMyEsTndhqsYG0fafCV3MAufRbGWMVeghIy8lyxFsEENtJ91mnDwokuKRn0gG8EEoM
-        skmLbRx4Cw5xDCHP/lXgzQyCT5bNeCexWf6EkHTqvvKtgRFh5NUT3b6hQUQaudhe8px5kbSd
-        GPdtxCZeJx/13PIxKBFP6sxj6Gp+hTw/8/3zHEyOjDcg1YCjXaNr1yjaNYp2jXIKYCYQSCvl
-        ORk5cj5PLsmRK3MzeGnSnC6w8nHdg4vmC0A3+TfPChAWsAKShXID/SPk18Uc/3RJ/ue0TCqS
-        KbNpuRXErdzzDRoalCZdedlchYgfHxXHj40XRMUJ4mO4wf7n6ttEHCJDoqCzaDqPlv3vISx2
-        qArpLiodnRUl6Yt2V1Ym73FFBK5HghqNh24brIrL8x1FAWHrNzVcnk95o+ndr+vd9h3Hg6OT
-        qx6uO9Di9+WdwdK34/SeT4YP1A2d2vXOYIEO73tgOkLd/OCwhxexoaP/ftu997pS249O8Nxd
-        0hD1S4lbR9RRhxZl3aXJphlx4IWCcIH+eMW+hNQEJ8YqTLwi3lhjyGquL85IZAsNIWE785Ne
-        tW1uv5i/+czdf+/YPl26LX5sPacpRxMqdoYPDX8o+uxNtFbFdrTmVdQ+mUvZtzdm3V7No13a
-        g3nq+j3qF94HLx/xa2pIp5hZ14QpkVBN2Jwm+5Y/NbXGwnIZfbE4UWPD7rdxMXmmhB+OyuSS
-        /wCAOdbc+gMAAA==
-X-CMS-MailID: 20210615162854eucas1p12f7975e37d474ac5ffdb532fa21ef58b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20210615154746eucas1p1321b6f1cf38d21899632e132cf025e61
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20210615154746eucas1p1321b6f1cf38d21899632e132cf025e61
-References: <20210602065345.355274-1-hch@lst.de>
-        <20210602065345.355274-10-hch@lst.de>
-        <CGME20210615154746eucas1p1321b6f1cf38d21899632e132cf025e61@eucas1p1.samsung.com>
-        <13b21a07-b7c7-37db-fdc9-77bf174b6f8f@samsung.com>
-        <20210615155817.GA31047@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210611202509.5426-3-mwilck@suse.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On Fri, Jun 11 2021 at  4:25P -0400,
+mwilck@suse.com <mwilck@suse.com> wrote:
 
-On 15.06.2021 17:58, Christoph Hellwig wrote:
-> On Tue, Jun 15, 2021 at 05:47:44PM +0200, Marek Szyprowski wrote:
->> On 02.06.2021 08:53, Christoph Hellwig wrote:
->>> Use the blk_mq_alloc_disk API to simplify the gendisk and request_queue
->>> allocation.
->>>
->>> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> This patch landed in linux-next as commit 6966bb921def ("mtd_blkdevs:
->> use blk_mq_alloc_disk"). It causes the following regression on my QEMU
->> arm64 setup:
-> Please try the patch below:
->
-> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-> index 5dc4c966ea73..6ce4bc57f919 100644
-> --- a/drivers/mtd/mtd_blkdevs.c
-> +++ b/drivers/mtd/mtd_blkdevs.c
-> @@ -382,6 +382,7 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
->   	}
->   
->   	new->disk = gd;
-> +	new->rq = new->disk->queue;
->   	gd->private_data = new;
->   	gd->major = tr->major;
->   	gd->first_minor = (new->devnum) << tr->part_bits;
+> From: Martin Wilck <mwilck@suse.com>
+> 
+> In virtual deployments, SCSI passthrough over dm-multipath devices is a
+> common setup. The qemu "pr-helper" was specifically invented for it. I
+> believe that this is the most important real-world scenario for sending
+> SG_IO ioctls to device-mapper devices.
+> 
+> In this configuration, guests send SCSI IO to the hypervisor in the form of
+> SG_IO ioctls issued by qemu. But on the device-mapper level, these SCSI
+> ioctls aren't treated like regular IO. Until commit 2361ae595352 ("dm mpath:
+> switch paths in dm_blk_ioctl() code path"), no path switching was done at
+> all. Worse though, if an SG_IO call fails because of a path error,
+> dm-multipath doesn't retry the IO on a another path; rather, the failure is
+> passed back to the guest, and paths are not marked as faulty.  This is in
+> stark contrast with regular block IO of guests on dm-multipath devices, and
+> certainly comes as a surprise to users who switch to SCSI passthrough in
+> qemu. In general, users of dm-multipath devices would probably expect failover
+> to work at least in a basic way.
+> 
+> This patch fixes this by taking a special code path for SG_IO on request-
+> based device mapper targets if CONFIG_DM_MULTIPATH_SG_IO is set.  Rather then
+> just choosing a single path, sending the IO to it, and failing to the caller
+> if the IO on the path failed, it retries the same IO on another path for
+> certain error codes, using blk_path_error() to determine if a retry would
+> make sense for the given error code. Moreover, it sends a message to the
+> multipath target to mark the path as failed.
+> 
+> One problem remains open: if all paths in a multipath map are failed,
+> normal multipath IO may switch to queueing mode (depending on
+> configuration). This isn't possible for SG_IO, as SG_IO requests can't
+> easily be queued like regular block I/O. Thus in the "no path" case, the
+> guest will still see an error.
+> 
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
+> ---
+>  block/scsi_ioctl.c         |   5 +-
+>  drivers/md/Kconfig         |  11 ++++
+>  drivers/md/Makefile        |   4 ++
+>  drivers/md/dm-core.h       |   5 ++
+>  drivers/md/dm-rq.h         |  11 ++++
+>  drivers/md/dm-scsi_ioctl.c | 127 +++++++++++++++++++++++++++++++++++++
+>  drivers/md/dm.c            |  20 +++++-
+>  include/linux/blkdev.h     |   2 +
+>  8 files changed, 180 insertions(+), 5 deletions(-)
+>  create mode 100644 drivers/md/dm-scsi_ioctl.c
+> 
+> diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+> index b39e0835600f..38771f4bcf18 100644
+> --- a/block/scsi_ioctl.c
+> +++ b/block/scsi_ioctl.c
+> @@ -279,8 +279,8 @@ static int blk_complete_sghdr_rq(struct request *rq, struct sg_io_hdr *hdr,
+>  	return ret;
+>  }
+>  
+> -static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+> -		struct sg_io_hdr *hdr, fmode_t mode)
+> +int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+> +	  struct sg_io_hdr *hdr, fmode_t mode)
+>  {
+>  	unsigned long start_time;
+>  	ssize_t ret = 0;
+> @@ -365,6 +365,7 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+>  	blk_put_request(rq);
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(sg_io);
+>  
+>  /**
+>   * sg_scsi_ioctl  --  handle deprecated SCSI_IOCTL_SEND_COMMAND ioctl
+> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+> index f2014385d48b..f28f29e3bd11 100644
+> --- a/drivers/md/Kconfig
+> +++ b/drivers/md/Kconfig
+> @@ -473,6 +473,17 @@ config DM_MULTIPATH_IOA
+>  
+>  	  If unsure, say N.
+>  
+> +config DM_MULTIPATH_SG_IO
+> +       bool "Retry SCSI generic I/O on multipath devices"
+> +       depends on DM_MULTIPATH && BLK_SCSI_REQUEST
+> +       help
+> +	 With this option, SCSI generic (SG) requests issued on multipath
+> +	 devices will behave similar to regular block I/O: upon failure,
+> +	 they are repeated on a different path, and the erroring device
+> +	 is marked as failed.
+> +
+> +	 If unsure, say N.
+> +
 
-Right, this fixes the issue, thanks. Feel free to add:
+Given how this is all about multipath, there is no reason to bolt this
+on to DM core and then play games to issuing multipath target specific
+DM message ("fail_path") from generic code.
 
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+So the SG_IO ioctl handling code should be in dm-mpath.c and the DM
+target interface extended as needed.
 
-Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+>  config DM_DELAY
+>  	tristate "I/O delaying target"
+>  	depends on BLK_DEV_DM
+> diff --git a/drivers/md/Makefile b/drivers/md/Makefile
+> index ef7ddc27685c..187ea469f64a 100644
+> --- a/drivers/md/Makefile
+> +++ b/drivers/md/Makefile
+> @@ -88,6 +88,10 @@ ifeq ($(CONFIG_DM_INIT),y)
+>  dm-mod-objs			+= dm-init.o
+>  endif
+>  
+> +ifeq ($(CONFIG_DM_MULTIPATH_SG_IO),y)
+> +dm-mod-objs			+= dm-scsi_ioctl.o
+> +endif
+> +
+>  ifeq ($(CONFIG_DM_UEVENT),y)
+>  dm-mod-objs			+= dm-uevent.o
+>  endif
+> diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+> index 5953ff2bd260..8bd8a8e3916e 100644
+> --- a/drivers/md/dm-core.h
+> +++ b/drivers/md/dm-core.h
+> @@ -189,4 +189,9 @@ extern atomic_t dm_global_event_nr;
+>  extern wait_queue_head_t dm_global_eventq;
+>  void dm_issue_global_event(void);
+>  
+> +int __dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
+> +		       struct block_device **bdev,
+> +		       struct dm_target **target);
+> +void dm_unprepare_ioctl(struct mapped_device *md, int srcu_idx);
+> +
+>  #endif
+> diff --git a/drivers/md/dm-rq.h b/drivers/md/dm-rq.h
+> index 1eea0da641db..c6d2853e4d1d 100644
+> --- a/drivers/md/dm-rq.h
+> +++ b/drivers/md/dm-rq.h
+> @@ -44,4 +44,15 @@ ssize_t dm_attr_rq_based_seq_io_merge_deadline_show(struct mapped_device *md, ch
+>  ssize_t dm_attr_rq_based_seq_io_merge_deadline_store(struct mapped_device *md,
+>  						     const char *buf, size_t count);
+>  
+> +#ifdef CONFIG_DM_MULTIPATH_SG_IO
+> +int dm_sg_io_ioctl(struct block_device *bdev, fmode_t mode,
+> +		   unsigned int cmd, unsigned long uarg);
+> +#else
+> +static inline int dm_sg_io_ioctl(struct block_device *bdev, fmode_t mode,
+> +				 unsigned int cmd, unsigned long uarg)
+> +{
+> +	return -ENOTTY;
+> +}
+> +#endif
+> +
+>  #endif
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+There is no reason, that I can see, why bio-based dm-multipath
+shouldn't handle SG_IO too.  Why did you constrain it to
+request-based?
 
+
+> diff --git a/drivers/md/dm-scsi_ioctl.c b/drivers/md/dm-scsi_ioctl.c
+> new file mode 100644
+> index 000000000000..a696e2a6557e
+> --- /dev/null
+> +++ b/drivers/md/dm-scsi_ioctl.c
+> @@ -0,0 +1,127 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2021 Martin Wilck, SUSE LLC
+> + */
+> +
+> +#include "dm-core.h"
+> +#include <linux/types.h>
+> +#include <linux/errno.h>
+> +#include <linux/kernel.h>
+> +#include <linux/uaccess.h>
+> +#include <linux/blk_types.h>
+> +#include <linux/blkdev.h>
+> +#include <linux/device-mapper.h>
+> +#include <scsi/sg.h>
+> +#include <scsi/scsi_cmnd.h>
+> +
+> +#define DM_MSG_PREFIX "sg_io"
+> +
+> +int dm_sg_io_ioctl(struct block_device *bdev, fmode_t mode,
+> +		   unsigned int cmd, unsigned long uarg)
+> +{
+> +	struct mapped_device *md = bdev->bd_disk->private_data;
+> +	struct sg_io_hdr hdr;
+> +	void __user *arg = (void __user *)uarg;
+> +	int rc, srcu_idx;
+> +	char path_name[BDEVNAME_SIZE];
+> +
+> +	if (cmd != SG_IO)
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&hdr, arg, sizeof(hdr)))
+> +		return -EFAULT;
+> +
+> +	if (hdr.interface_id != 'S')
+> +		return -EINVAL;
+> +
+> +	if (hdr.dxfer_len > (queue_max_hw_sectors(bdev->bd_disk->queue) << 9))
+> +		return -EIO;
+> +
+> +	for (;;) {
+> +		struct dm_target *tgt;
+> +		struct sg_io_hdr rhdr;
+> +
+> +		rc = __dm_prepare_ioctl(md, &srcu_idx, &bdev, &tgt);
+> +		if (rc < 0) {
+> +			DMERR("%s: failed to get path: %d",
+> +			      __func__, rc);
+> +			goto out;
+> +		}
+> +
+> +		rhdr = hdr;
+> +
+> +		rc = sg_io(bdev->bd_disk->queue, bdev->bd_disk, &rhdr, mode);
+> +
+> +		DMDEBUG("SG_IO via %s: rc = %d D%02xH%02xM%02xS%02x",
+> +			bdevname(bdev, path_name), rc,
+> +			rhdr.driver_status, rhdr.host_status,
+> +			rhdr.msg_status, rhdr.status);
+> +
+> +		/*
+> +		 * Errors resulting from invalid parameters shouldn't be retried
+> +		 * on another path.
+> +		 */
+> +		switch (rc) {
+> +		case -ENOIOCTLCMD:
+> +		case -EFAULT:
+> +		case -EINVAL:
+> +		case -EPERM:
+> +			goto out;
+> +		default:
+> +			break;
+> +		}
+> +
+> +		if (rhdr.info & SG_INFO_CHECK) {
+> +			int result;
+> +			blk_status_t sts;
+> +
+> +			result = rhdr.status |
+> +				(rhdr.msg_status << 8) |
+> +				(rhdr.host_status << 16) |
+> +				(rhdr.driver_status << 24);
+> +
+> +			sts = __scsi_result_to_blk_status(&result, result);
+> +			rhdr.host_status = host_byte(result);
+
+It is the open-coded SCSI specific sg_io_hdr and result work that
+feels like it doesn't belong open-coded in DM.  So maybe the above
+code from this SG_INFO_CHECK block could go into an
+block/scsi_ioctl.c:sg_io_info_check() method?
+
+> +
+> +			/* See if this is a target or path error. */
+> +			if (sts == BLK_STS_OK)
+> +				rc = 0;
+> +			else if (blk_path_error(sts))
+> +				rc = -EIO;
+> +			else {
+> +				rc = blk_status_to_errno(sts);
+> +				goto out;
+> +			}
+> +		}
+> +
+> +		if (rc == 0) {
+> +			/* success */
+> +			if (copy_to_user(arg, &rhdr, sizeof(rhdr)))
+> +				rc = -EFAULT;
+> +			goto out;
+> +		}
+> +
+> +		/* Failure - fail path by sending a message to the target */
+> +		if (!tgt->type->message) {
+> +			DMWARN("invalid target!");
+> +			rc = -EIO;
+> +			goto out;
+> +		} else {
+> +			char bdbuf[BDEVT_SIZE];
+> +			char *argv[2] = { "fail_path", bdbuf };
+> +
+> +			scnprintf(bdbuf, sizeof(bdbuf), "%u:%u",
+> +				  MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
+> +
+> +			DMDEBUG("sending \"%s %s\" to target", argv[0], argv[1]);
+> +			rc = tgt->type->message(tgt, 2, argv, NULL, 0);
+> +			if (rc < 0)
+> +				goto out;
+> +		}
+
+If you factor things how I suggest below (introducing
+dm-mpath.c:dm_mpath_ioctl) then you'll have direct access to
+dm-mpath.c:fail_path() so need need to mess around with constructing
+DM messages from kernel code.
+
+> +
+> +		dm_unprepare_ioctl(md, srcu_idx);
+> +	}
+> +out:
+> +	dm_unprepare_ioctl(md, srcu_idx);
+> +	return rc;
+> +}
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index ca2aedd8ee7d..29b93fb3929e 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -522,8 +522,9 @@ static int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
+>  #define dm_blk_report_zones		NULL
+>  #endif /* CONFIG_BLK_DEV_ZONED */
+>  
+> -static int dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
+> -			    struct block_device **bdev)
+> +int __dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
+> +		       struct block_device **bdev,
+> +		       struct dm_target **target)
+>  {
+>  	struct dm_target *tgt;
+>  	struct dm_table *map;
+> @@ -553,10 +554,19 @@ static int dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
+>  		goto retry;
+>  	}
+>  
+> +	if (r >= 0 && target)
+> +		*target = tgt;
+> +
+>  	return r;
+>  }
+
+For dm-multipath you can leverage md->immutable_target always being
+multipath.
+
+So after dm_blk_ioctl's dm_prepare_ioctl: 
+
+if (cmd == SG_IO && md->immutable_target &&
+    md->immutable_target->ioctl)
+    r = md->immutable_target->ioctl(bdev, mode, cmd, arg);
+
+(doing check for SG_IO here just avoids needless call into ->ioctl for
+now, but it could be other ioctls will need specialization in future
+so checking 'cmd' should be pushed down to md->immutable_target->ioctl
+at that time?)
+
+But I'm not following you use of a for (;;) in dm_sg_io_ioctl() --
+other than to retry infinitely (you aren't checking for no paths!?,
+etc).
+
+Anyway, best to have md->immutable_target->ioctl return
+-EAGAIN and goto top of dm_blk_ioctl as needed?
+
+>  
+> -static void dm_unprepare_ioctl(struct mapped_device *md, int srcu_idx)
+> +static int dm_prepare_ioctl(struct mapped_device *md, int *srcu_idx,
+> +			    struct block_device **bdev)
+> +{
+> +	return __dm_prepare_ioctl(md, srcu_idx, bdev, NULL);
+> +}
+> +
+> +void dm_unprepare_ioctl(struct mapped_device *md, int srcu_idx)
+>  {
+>  	dm_put_live_table(md, srcu_idx);
+>  }
+> @@ -567,6 +577,10 @@ static int dm_blk_ioctl(struct block_device *bdev, fmode_t mode,
+>  	struct mapped_device *md = bdev->bd_disk->private_data;
+>  	int r, srcu_idx;
+>  
+> +	if ((dm_get_md_type(md) == DM_TYPE_REQUEST_BASED) &&
+> +	    ((r = dm_sg_io_ioctl(bdev, mode, cmd, arg)) != -ENOTTY))
+> +		return r;
+> +
+
+Again, bio-based multipath should work fine with SG_IO too.
+
+>  	r = dm_prepare_ioctl(md, &srcu_idx, &bdev);
+>  	if (r < 0)
+>  		goto out;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 48497a77428d..b8f1d603cc7a 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -923,6 +923,8 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+>  			  unsigned int, void __user *);
+>  extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+>  			 struct scsi_ioctl_command __user *);
+> +extern int sg_io(struct request_queue *, struct gendisk *,
+> +		 struct sg_io_hdr *, fmode_t);
+>  extern int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp);
+>  extern int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp);
+>  
+> -- 
+> 2.31.1
+> 
+
+Think adding block/scsi_ioctl.c:sg_io_info_check() and exporting it
+and sg_io() via blkdev.h should be done as a separate patch 2.
+
+Then patch 3 is purely DM changes to use sg_io() and
+sg_io_info_check()
+
+Mike
