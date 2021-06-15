@@ -7,91 +7,87 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22ABBC48BE8
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 08:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9CAAC48BE5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 08:43:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 085E6613D9
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 08:37:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1C7661420
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 08:43:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231152AbhFOIj0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 04:39:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47385 "EHLO
+        id S230494AbhFOIpN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 04:45:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26774 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231140AbhFOIj0 (ORCPT
+        by vger.kernel.org with ESMTP id S230454AbhFOIpN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 04:39:26 -0400
+        Tue, 15 Jun 2021 04:45:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623746241;
+        s=mimecast20190719; t=1623746589;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=baAmkgM+AWGY356VSVgLvgws69TxGo9QZingMrfUCr8=;
-        b=FvfddmPm7EMc8vj2NSg8KlNqlew4dSHDzzYKeXzNs8qKi1PL05Y5ZKAX4iyovk37f6oVnZ
-        c8Ny+HpE9drB4YoadI5gwybOH892XnheokGtMSOubYEa/B54ed4c3To6bzcJ+J4i4nIfIF
-        ezjhINfRhsXhilXXjWeyC57unCPthp0=
+        bh=7Rf5EQc2dlRjbEjOR5oC7PZqtQNIsTvI0zL1js735B4=;
+        b=GN8cO1ao0lguRq+7lE0w57LAEm7HePDxPAjOLrj2URXfmFib4Njsh8I+gPhxui41ZGShOt
+        O0K4hlya4FZdoDnOym+XMt/DA/cIwu6erSjyS3JyN/x+quN0HjmzXW+E+N6aGhEMhcgysa
+        kZrRa/6UaiWuCh13bnRIaUEpSqCjbrU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-4JEmupRkNnC2Vw9NDkZ6qg-1; Tue, 15 Jun 2021 04:37:20 -0400
-X-MC-Unique: 4JEmupRkNnC2Vw9NDkZ6qg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-477-ByxdRH-SMsG5S8STH9sNLg-1; Tue, 15 Jun 2021 04:43:07 -0400
+X-MC-Unique: ByxdRH-SMsG5S8STH9sNLg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F746107ACF6;
-        Tue, 15 Jun 2021 08:37:19 +0000 (UTC)
-Received: from T590 (ovpn-12-39.pek2.redhat.com [10.72.12.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B40F85D6DC;
-        Tue, 15 Jun 2021 08:37:13 +0000 (UTC)
-Date:   Tue, 15 Jun 2021 16:37:09 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Qu Wenruo <wqu@suse.de>
-Cc:     "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>
-Subject: Re: About `bio->bi_iter.bi_size` at write endio time
-Message-ID: <YMhmtd8doc9g23cT@T590>
-References: <18cbcd0b-8c49-00b8-558b-5d74b3664b85@suse.de>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E63B1850606;
+        Tue, 15 Jun 2021 08:43:06 +0000 (UTC)
+Received: from ws.net.home (ovpn-113-152.ams2.redhat.com [10.36.113.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D653A5D9CA;
+        Tue, 15 Jun 2021 08:43:01 +0000 (UTC)
+Date:   Tue, 15 Jun 2021 10:42:59 +0200
+From:   Karel Zak <kzak@redhat.com>
+To:     Ingo Franzki <ifranzki@linux.ibm.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Juergen Christ <jchrist@linux.ibm.com>
+Subject: Re: loop_set_block_size: loop0 () has still dirty pages (nrpages=2)
+Message-ID: <20210615084259.yj5pmyjonfqcg7lg@ws.net.home>
+References: <8bed44f2-273c-856e-0018-69f127ea4258@linux.ibm.com>
+ <YMIliuPi2tTLUJxv@T590>
+ <cf3c803f-350e-c365-afac-0a07a9b6cee2@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <18cbcd0b-8c49-00b8-558b-5d74b3664b85@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <cf3c803f-350e-c365-afac-0a07a9b6cee2@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 15, 2021 at 03:22:59PM +0800, Qu Wenruo wrote:
-> Hi,
+On Mon, Jun 14, 2021 at 09:35:30AM +0200, Ingo Franzki wrote:
+> However, shouldn't then the losetup userspace utility implement some kind of retry logic in case of -EAGAIN ?
+> I don't see that in the source of losetup.c nor in loopdev.c in the util-linux package. There is a retry loop in create_loop() in losetup.c retrying loopcxt_setup_device() in case of EBUSY, but not in case of EAGAIN.
 > 
-> Recently I got a strange case where for write bio, at its endio time, I got
-> bio->bi_iter.bi_size == 0, but bio_for_each_segment_all() reports we still
-> have some bv_len.
-
-It is normal to observe zero .bi_size in ->bi_end_io(), see req_bio_endio().
-Meantime bio_for_each_segment_all() covers all pages added to the bio via
-bio_add_page(), which is invariant after the bio is submitted.
-
+> And losetup also hides the original error code and just returns EXIT_FAILURE in case of a failure. So no real good chance for the script that uses losetup to catch that error situation and perform a retry itself.
 > 
-> And obviously, when the bio get submitted, its bi_size is not 0.
+> Adding Karel Zak (the maintainer of util-linux).
 > 
-> This is especially common for REQ_OP_ZONE_APPEND bio, but I also get rare
-> bi_size == 0 at endio time, for REQ_OP_WRITE too.
-
-It shouldn't be rare.
-
+> @Karel Zak: How about adding EAGAIN to the condition for performing a retry? 
 > 
-> So I guess bi_size at endio time is no longer reliable due to bio
-> merging/splitting?
-
-No, ->bi_size should be zero in .bi_end_io() if this bio is completed
-successfully no matter if the bio is splitted or not.
-
+> Something like this:
 > 
-> Thus the only correct way to get how large a bio really is, is through
-> bio_for_each_segment_all()?
+> -		if (errno == EBUSY && !hasdev && ntries < 64) {
+> +		if ((errno == EBUSY || errno == EAGAIN) && !hasdev && ntries < 64) {
+> 			xusleep(200000);
+> 			ntries++;
+> 			continue;
+> 		}
+ 
+EAGAIN sounds like the best reason to try it again :-) 
 
-Yeah, if you mean to get the bio's real size in ->bi_end_io().
+Committed, it will be also available in v2.37.1.
+
+  Karel
 
 
-Thanks,
-Ming
+-- 
+ Karel Zak  <kzak@redhat.com>
+ http://karelzak.blogspot.com
 
