@@ -2,57 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCDDC48BE8
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50512C49361
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:26:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B26FC6109D
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:16:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3069261477
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 13:26:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230436AbhFONSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 09:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51298 "EHLO
+        id S230218AbhFON2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 09:28:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230179AbhFONSR (ORCPT
+        with ESMTP id S230211AbhFON2H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 09:18:17 -0400
+        Tue, 15 Jun 2021 09:28:07 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4DAC061574;
-        Tue, 15 Jun 2021 06:16:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D75C06175F;
+        Tue, 15 Jun 2021 06:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=qLPGexkyYM9Stdq39YTJB+tRWuoO4z3xvBgvAqEYJLU=; b=RRVq16UdE0V95vGQQqScEwzNhN
-        Q+fKQVK9nbuQQVA19JfnpFkhzgoTpFe1Tnr9dUjR+0jpSYw4Z1Byz90/ItoHYC4izNlXsdmtvHRrf
-        qbANMlhMDfi5XXcdb0nMXMYpEd89hD3Gi+evPovwPZqX1Sp68x9Rk0poWpZCwce0CTCENpb6cBoiB
-        UtR6akwOAZvkYPOhqBPZxNGGwSxW2ToEm8b7eD2EZMgFJQZd2/Cm/e6Hm/L3IUzWufJUoZYL73XtB
-        SylnL92aEgC0lHvlOUNctypODvibW2yclPSUZ0X5bTn4iVdRWWDp/1X2yuN1a3sVpHQqOktesBaVb
-        +y690xxw==;
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=LANErqvAt5Dho8b4cxyvD6Xv2I3E/TWFG2nVLqqeNt0=; b=palQ/f5WxTm8MUXTTCoy3VZFDC
+        n8V4XRmTumCgcm0WNBknFJw6HQJiqjd54owgb8f+cYy83XUlgvRsmb+DlLDYA5wxXFpqkTqJAjB50
+        efm1YQoc8XGJEamHRMsKYvrtPZ2S181JWCEuoNqOQ7Pt7tOW4cQ8XCVrne+pRUfgChrgEsiHNND/k
+        wLywRQ9TWOnneUJ0N+Ey5Du3YzlLQW09zJMR++vzJXygwVyvD8WwNUP0G+Ch40K3M/aDfbBdo7gn/
+        QcL6T1+U3ecGgL2it0yE/+EreZ7FQj2mvuiecuAao9Hla+hgUstciBYyETsk96ZeXFsk3YIINLX0j
+        IEL5j9+w==;
 Received: from [2001:4bb8:19b:fdce:9045:1e63:20f0:ca9] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lt8uG-006nSt-7q; Tue, 15 Jun 2021 13:15:10 +0000
+        id 1lt93p-006nu2-6X; Tue, 15 Jun 2021 13:25:00 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 16/16] nvme-multipath: enable polled I/O
-Date:   Tue, 15 Jun 2021 15:10:34 +0200
-Message-Id: <20210615131034.752623-17-hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Ira Weiny <ira.weiny@intel.com>, dm-devel@redhat.com,
+        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        ceph-devel@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: switch the block layer to use kmap_local_page v2
+Date:   Tue, 15 Jun 2021 15:24:38 +0200
+Message-Id: <20210615132456.753241-1-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210615131034.752623-1-hch@lst.de>
-References: <20210615131034.752623-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -60,35 +59,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set the poll queue flag to enable polling, given that the multipath
-node just dispatches the bios to a lower queue.
+Hi all,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: Mark Wunderlich <mark.wunderlich@intel.com>
----
- drivers/nvme/host/multipath.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+this series switches the core block layer code and all users of the
+existing bvec kmap helpers to use kmap_local_page.  Drivers that
+currently use open coded kmap_atomic calls will converted in a follow
+on series.
 
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index f77b774699de..48ea649d6c24 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -450,6 +450,15 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
- 
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, head->disk->queue);
- 	blk_queue_flag_set(QUEUE_FLAG_NOWAIT, head->disk->queue);
-+	/*
-+	 * This assumes all controllers that refer to a namespace either
-+	 * support poll queues or not.  That is not a strict guarantee,
-+	 * but if the assumption is wrong the effect is only suboptimal
-+	 * performance but not correctness problem.
-+	 */
-+	if (ctrl->tagset->nr_maps > HCTX_TYPE_POLL &&
-+	    ctrl->tagset->map[HCTX_TYPE_POLL].nr_queues)
-+		blk_queue_flag_set(QUEUE_FLAG_POLL, head->disk->queue);
- 
- 	/* set to a default value of 512 until the disk is validated */
- 	blk_queue_logical_block_size(head->disk->queue, 512);
--- 
-2.30.2
+To do so a new kunmap variant is added that calls
+flush_kernel_dcache_page.  I'm not entirely sure where to call
+flush_dcache_page vs flush_kernel_dcache_page, so I've tried to follow
+the documentation here, but additional feedback would be welcome.
 
+Changes since v1:
+ - add more/better comments
+ - add a new kunmap_local_dirty helper to feal with
+   flush(_kernel)_dcache_page
+
+Diffstat:
+ arch/mips/include/asm/mach-rc32434/rb.h |    2 -
+ block/bio-integrity.c                   |   14 +++-----
+ block/bio.c                             |   37 ++++++----------------
+ block/blk-map.c                         |    2 -
+ block/bounce.c                          |   39 +++++-------------------
+ block/t10-pi.c                          |   16 +++------
+ drivers/block/ps3disk.c                 |   19 +----------
+ drivers/block/rbd.c                     |   15 +--------
+ drivers/md/dm-writecache.c              |    5 +--
+ include/linux/bio.h                     |   42 -------------------------
+ include/linux/bvec.h                    |   52 ++++++++++++++++++++++++++++++--
+ include/linux/highmem-internal.h        |    7 ++++
+ include/linux/highmem.h                 |   10 ++++--
+ 13 files changed, 102 insertions(+), 158 deletions(-)
