@@ -2,149 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AA7C48BE8
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 04:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B101DC48BE6
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 04:54:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0795461246
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 04:02:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8856E6101A
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 04:54:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbhFPEE4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jun 2021 00:04:56 -0400
-Received: from verein.lst.de ([213.95.11.211]:52296 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229476AbhFPEE4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jun 2021 00:04:56 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A23E468AFE; Wed, 16 Jun 2021 06:02:47 +0200 (CEST)
-Date:   Wed, 16 Jun 2021 06:02:47 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>, gmpy.liaowx@gmail.com,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-doc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] pstore/blk: Include zone in pstore_device_info
-Message-ID: <20210616040247.GD25873@lst.de>
-References: <20210615212121.1200820-1-keescook@chromium.org> <20210615212121.1200820-4-keescook@chromium.org>
+        id S229642AbhFPE4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jun 2021 00:56:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229514AbhFPE4L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Jun 2021 00:56:11 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDAAEC061574;
+        Tue, 15 Jun 2021 21:54:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=9Xvl3Q2BcDnn3sLPuJT0gF3XCMgyvBysAyx7WRFcD6k=; b=hoy+nfIWENzx8GAUiPRCr2RsfB
+        zNT0KOgXy30afI0OD19/gwlKp+TPc+6ca1QNb0ddVkGQT/EqZDP/twuipJwBJ/lXfUUtIsqTFc6Jy
+        5I3ZoCCVVBO3qOHC731JeUKWn7LdArOx+BuUqMT0xZ4hbA494l1u/uX0hrPd5j6jXlOk86bbuMdsC
+        34SqtVR0QDr+T71XGVaWknHNeas7VKxTKSmzIagsrOaf/nk2Ch6a8RaGanlYW8Bex86zTKUe8qA0P
+        iO4ye84sy7/5K2orTww85wALeFmyZF1HoL/B81bwqxKPDFmMKjjjEIFLiPAI8CadPavTmaSUaXB+Z
+        gDB2ccvg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ltNYM-007bdJ-Sv; Wed, 16 Jun 2021 04:53:39 +0000
+Date:   Wed, 16 Jun 2021 05:53:26 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     edwardh <edwardh@synology.com>
+Cc:     axboe@kernel.dk, neilb@suse.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, s3t@synology.com,
+        bingjingc@synology.com, cccheng@synology.com,
+        Wade Liang <wadel@synology.com>
+Subject: Re: [PATCH v3] block: fix trace completion for chained bio
+Message-ID: <YMmDxl9abff+wulm@infradead.org>
+References: <20210616030810.4901-1-edwardh@synology.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210615212121.1200820-4-keescook@chromium.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210616030810.4901-1-edwardh@synology.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +#define verify_size(name, alignsize, enabled) {				\
-> +		long _##name_;						\
-> +		if (enabled)						\
-> +			_##name_ = check_size(name, alignsize);		\
-> +		else							\
-> +			_##name_ = 0;					\
-> +		/* synchronize visible module parameters to result. */	\
-> +		name = _##name_ / 1024;					\
-> +		dev->zone.name = _##name_;				\
-> +	}
+On Wed, Jun 16, 2021 at 11:08:10AM +0800, edwardh wrote:
+> @@ -1400,18 +1404,13 @@ void bio_endio(struct bio *bio)
+>  	if (bio->bi_end_io == bio_chain_endio) {
+>  		bio = __bio_chain_endio(bio);
+>  		goto again;
+> +	} else {
+> +		blk_throtl_bio_endio(bio);
+> +		/* release cgroup info */
+> +		bio_uninit(bio);
+> +		if (bio->bi_end_io)
+> +			bio->bi_end_io(bio);
 
-The formatting here looks weird between the two-tab indent and the
-opening brace on the macro definition line.
-
-> -	if (!dev || !dev->total_size || !dev->read || !dev->write) {
-> +	if (!dev || !dev->zone.total_size || !dev->zone.read || !dev->zone.write) {
->  		if (!dev)
-> -			pr_err("NULL device info\n");
-> +			pr_err("NULL pstore_device_info\n");
->  		else {
-> -			if (!dev->total_size)
-> +			if (!dev->zone.total_size)
->  				pr_err("zero sized device\n");
-> -			if (!dev->read)
-> +			if (!dev->zone.read)
->  				pr_err("no read handler for device\n");
-> -			if (!dev->write)
-> +			if (!dev->zone.write)
->  				pr_err("no write handler for device\n");
->  		}
-
-This still looks odd to me.  Why not the somewhat more verbose but
-much more obvious:
-
-	if (!dev) {
-		pr_err("NULL pstore_device_info\n");
-		return -EINVAL;
-	}
-	if (!dev->zone.total_size) {
-		pr_err("zero sized device\n");
-		return -EINVAL;
-	}
-	...
-		
-
-> -	dev.total_size = i_size_read(I_BDEV(psblk_file->f_mapping->host)->bd_inode);
-> +	dev->zone.total_size = i_size_read(I_BDEV(psblk_file->f_mapping->host)->bd_inode);
-
-This is starting to be unreadable long.  A local variable for the inode
-might be nice, as that can also be used in the ISBLK check above.
-
-> +	if (!pstore_device_info && best_effort && blkdev[0]) {
-> +		struct pstore_device_info *best_effort_dev;
-> +
-> +		best_effort_dev = kzalloc(sizeof(*best_effort_dev), GFP_KERNEL);
-> +		if (!best_effort) {
-> +			ret = -ENOMEM;
-> +			goto unlock;
-> +		}
-> +		best_effort_dev->zone.read = psblk_generic_blk_read;
-> +		best_effort_dev->zone.write = psblk_generic_blk_write;
-> +
-> +		ret = __register_pstore_blk(best_effort_dev,
-> +					    early_boot_devpath(blkdev));
-> +		if (ret)
-> +			kfree(best_effort_dev);
-> +		else
-> +			pr_info("attached %s (%zu) (no dedicated panic_write!)\n",
-> +				blkdev, best_effort_dev->zone.total_size);
-
-Maybe split this into a little helper?
-
-> +	/* Unregister and free the best_effort device. */
-> +	if (psblk_file) {
-> +		struct pstore_device_info *dev = pstore_device_info;
-> +
-> +		__unregister_pstore_device(dev);
-> +		kfree(dev);
-> +		fput(psblk_file);
-> +		psblk_file = NULL;
->  	}
-
-Same.
-
-> +	/* If we've been asked to unload, unregister any registered device. */
-> +	if (pstore_device_info)
-> +		__unregister_pstore_device(pstore_device_info);
-
-Won't this double unregister pstore_device_info?
-
->  struct pstore_device_info {
-> -	unsigned long total_size;
->  	unsigned int flags;
-> -	pstore_zone_read_op read;
-> -	pstore_zone_write_op write;
-> -	pstore_zone_erase_op erase;
-> -	pstore_zone_write_op panic_write;
-> +	struct pstore_zone_info zone;
->  };
-
-Given that flags is only used inside of __register_pstore_device
-why not kill this struct and just pass it explicitly?
+No need for an else after a goto.
