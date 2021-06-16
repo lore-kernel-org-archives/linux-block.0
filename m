@@ -2,101 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B69C48BE6
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 14:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE690C48BE5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 15:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67B0A6115C
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 14:42:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3F21600EF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 15:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234091AbhFPOo0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jun 2021 10:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56412 "EHLO
+        id S234374AbhFPPEO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jun 2021 11:04:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234023AbhFPOo0 (ORCPT
+        with ESMTP id S234367AbhFPPEM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jun 2021 10:44:26 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F3FFC061574
-        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 07:42:20 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id d9so3287641ioo.2
-        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 07:42:20 -0700 (PDT)
+        Wed, 16 Jun 2021 11:04:12 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C47C06175F
+        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 08:02:06 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id u14so1695397qvq.6
+        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 08:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=LiH0D4iBszbElDYTuuId+s1v7sAPLxTu6PxBxnKADK0=;
-        b=kg6vvpvwDdbYHJeX9qfFTJH+ZFdh+LvF199iOZ3mOA9XJ0+9j8bm2xA/hCe1/m2h5s
-         qE3sMvKextLFkLjRLSD68qMH4/B8a8jJt2EtaeInPR8c8H3Wz25304Xq2yVeIXC+FsRX
-         J+1xBh0IikcQFJSdy+8VmGAm+hYvB+1rjrPgOohmnL4ecYfzmcDY/GDepQ/ZIh7GSCZX
-         kzAHq1ZD+S9xti8qSt4oPyM8HpXwt+TnvEOtWFLaPPQou4oe8jOhJHuaI/m+4yWEG7Fy
-         QG97bGm6WfntodOTrDpEwOQlbj94DaZH42Tz0QGWv9kOf3q+AIMbOcm7/xVXfb7wSpbr
-         m18w==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:from:to:cc:subject;
+        bh=VCvQSABjEdEuwxE7dUwxvVJle5680VQCMhFOlxSQ0RU=;
+        b=1JHFKXXWxomTbkugVQMZnpalACfTC8IlhOqgFvXblCYSIV7KNdgtakEsiLHcEej6RT
+         JMoGmH/y0ghKIyrRakbnD9xBFw8SxlZryrGCRT8fl0oiHQetebcqzmfoUogSF9v0kAIW
+         eDJreJOM1uKAxARBQLgDGsmB8eZZl1YTybntm+qGmc+RuZMpi4gM4BhV1qDurg6d0kDD
+         2T97LEdmKUz4vZZ3ssL+4B2CMbb4CCvfPD40tcjIGGkpP0vlqoEis5WjiBG1xhdz25EG
+         n0B94JW6T5shp64W3FCHZibHWYySzxnd9yvc4aK2zyBH0mnbxKxxYVV79CGpyznCfnJq
+         RY3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LiH0D4iBszbElDYTuuId+s1v7sAPLxTu6PxBxnKADK0=;
-        b=X46gGfvtdt12BYRLWy32hcGYleltXGN12bjBOGIZMcHFSDwU3EzQFKqxhySUF6qfLY
-         cHw3lpTcsg4t/nZ5ONA1CyOg47Z3ARHpLfqku+YkHuZVHARJ81PYtCLdUqfr1V1CPJma
-         e+7WguVrSrd0Hv93bi958S4/KoVqGijI7iDZ4a0nOWYahP3omsEGq+IAM13gJ7rY5aMA
-         nfa/Z0vLk9fE/I1VKuDPh1SOH4nMAg2umbOzN8CQQM4WO8zWO9skGtb0Ux2yttAwnAbB
-         1Lowc3L34vb1X3AW20ddcfktTHwSkeXoeGCX7JcJwDwYcPhVDuI9CCpGNOVnf1LxU2T7
-         k8qQ==
-X-Gm-Message-State: AOAM532+6Z3vDVQexNYLz54NzpyjO1ZNiiOUzn5x6Bhf2lEXrTVwfwP3
-        0DMVX45bQ2zZilS1OxfyWG1PVemCkOPgBJEq
-X-Google-Smtp-Source: ABdhPJzvMVFOAdjcJi7CTPPgauIMPn1MuQHiDHsFrTDse44D9/y5AMCSDFvDZXHkHBuYdmD6HlxJ/w==
-X-Received: by 2002:a05:6602:2e8a:: with SMTP id m10mr245618iow.153.1623854539663;
-        Wed, 16 Jun 2021 07:42:19 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k4sm1199274ilh.76.2021.06.16.07.42.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Jun 2021 07:42:19 -0700 (PDT)
-Subject: Re: [PATCH V3 0/2] block: fix race between adding wbt and normal IO
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20210609015822.103433-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8d369b6c-bb80-87e6-b970-1c5b7556f027@kernel.dk>
-Date:   Wed, 16 Jun 2021 08:42:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210609015822.103433-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:message-id:date:from:to:cc:subject;
+        bh=VCvQSABjEdEuwxE7dUwxvVJle5680VQCMhFOlxSQ0RU=;
+        b=gapiWKNvn2MZWxGvXxpT2r7VJxObU+U6f8GZYHA/KMYZ6A0fbPScqMtJH0Q4Umfku2
+         CRLSLYXCyEnGw3e9CjuyuZk4WiofRi0zMazBoZm23FCpZcL3uhOEMgnUN5gTSJOJaHFv
+         nRfqTuBMB/+8y+atIJh0FyyKWBqcNmQYJ64yR5rAjgk4RKt7UHTOg6KrYCJyOG9Lx6zR
+         weO8mCQs0z7cQ+OQitUyPKZmBfJdyyy0ExTdOraTlcQVDa714CzTBy9vGqTU1Ct1iQDQ
+         8QUHQOMqhT/pTvEjafbqcDPwSLPUiMJ5/Y/rTsEBMObX/Xc7L/5Zpg585v3GO33K8QNl
+         ZJJQ==
+X-Gm-Message-State: AOAM530ckpo4aV0FJbutVxAG5JmRzXbOxLTfKBdY0s8UAVpAXfkAQjXP
+        zHo5w9lRRTMe+qTbAuLgjWmYNw==
+X-Google-Smtp-Source: ABdhPJytC9l/wfvfg7sP8rjAGewkfuTAUH85RNI3r+SM2Ul/Q9EdT8cKP9pkjx6l7tAtOlLX0/G9Rw==
+X-Received: by 2002:a0c:ed46:: with SMTP id v6mr465673qvq.46.1623855724103;
+        Wed, 16 Jun 2021 08:02:04 -0700 (PDT)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id y20sm1390690qtv.64.2021.06.16.08.02.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jun 2021 08:02:03 -0700 (PDT)
+Message-ID: <60ca126b.1c69fb81.90af4.93a7@mx.google.com>
+Date:   Wed, 16 Jun 2021 11:02:02 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     lsf-pc@lists.linuxfoundation.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org, bpf@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [REMINDER] LSF/MM/BPF: 2021: Call for Proposals
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/8/21 7:58 PM, Ming Lei wrote:
-> Hello,
-> 
-> Yi reported several kernel panics on:
-> 
-> [16687.001777] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
-> ...
-> [16687.163549] pc : __rq_qos_track+0x38/0x60
-> 
-> or
-> 
-> [  997.690455] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
-> ...
-> [  997.850347] pc : __rq_qos_done+0x2c/0x50
-> 
-> Turns out it is caused by race between adding wbt and normal IO.
-> 
-> Fix the issue by freezing request queue when adding/deleting rq qos.
+Thisi is just a reminder that we're still going ahead with an in person
+LSF/MM/BPF this year.  The Linux Foundation is working out the safety
+guidelines and will update the landing page when that is nailed down.
+In the meantime there is plenty of time to register your interest in
+attending.  Thanks,
 
-Applied, thanks.
+Josef
 
--- 
-Jens Axboe
+---- Original CFP ----
 
+The annual Linux Storage, Filesystem, Memory Management, and BPF
+(LSF/MM/BPF) Summit for 2021 will be held from December 6 to December 8
+at The Margaritaville Resort Palm Springs in Palm Springs, California.
+LSF/MM/BPF is an invitation-only technical workshop to map out
+improvements to the Linux storage, filesystem, BPF, and memory
+management subsystems that will make their way into the mainline kernel
+within the coming years.
+
+COVID is at the front of our minds as we attempt to put together the
+best and safest conference we can arrange.  The logistics of how to hold
+an in person event will change and evolve as we get closer to the actual
+date, but rest assured we will do everything recommended by public
+health officials.
+
+LSF/MM/BPF 2021 will be a three day, stand-alone conference with four
+subsystem-specific tracks, cross-track discussions, as well as BoF and
+hacking sessions.
+
+On behalf of the committee I am issuing a call for agenda proposals
+that are suitable for cross-track discussion as well as technical
+subjects for the breakout sessions.
+
+If advance notice is required for visa applications then please point
+that out in your proposal or request to attend, and submit the topic as
+soon as possible.
+
+This years instructions are similar to our 2020 attempt.  We're asking
+that you please let us know you want to be invited by June 15th, 2021.
+We realize that travel is an ever changing target, but it helps us get
+an idea of possible attendance numbers.  Clearly things can and will, so
+consider the request to attend deadline more about planning and less
+about concrete plans.
+
+1) Fill out the following Google form to request attendance and
+suggest any topics
+
+	https://forms.gle/Dms7xYPXLrriFkcXA
+
+In previous years we have accidentally missed people's attendance
+requests because they either didn't cc lsf-pc@ or we simply missed them
+in the flurry of emails we get.  Our community is large and our
+volunteers are busy, filling this out will help us make sure we don't
+miss anybody.
+
+2) Proposals for agenda topics should still be sent to the following
+lists to allow for discussion among your peers.  This will help us
+figure out which topics are important for the agenda.
+
+        lsf-pc@lists.linux-foundation.org
+
+and CC the mailing lists that are relevant for the topic in question:
+
+        FS:     linux-fsdevel@vger.kernel.org
+        MM:     linux-mm@kvack.org
+        Block:  linux-block@vger.kernel.org
+        ATA:    linux-ide@vger.kernel.org
+        SCSI:   linux-scsi@vger.kernel.org
+        NVMe:   linux-nvme@lists.infradead.org
+        BPF:    bpf@vger.kernel.org
+
+Please tag your proposal with [LSF/MM/BPF TOPIC] to make it easier to
+track. In addition, please make sure to start a new thread for each
+topic rather than following up to an existing one. Agenda topics and
+attendees will be selected by the program committee, but the final
+agenda will be formed by consensus of the attendees on the day.
+
+We will try to cap attendance at around 25-30 per track to facilitate
+discussions although the final numbers will depend on the room sizes
+at the venue.
+
+For discussion leaders, slides and visualizations are encouraged to
+outline the subject matter and focus the discussions. Please refrain
+from lengthy presentations and talks; the sessions are supposed to be
+interactive, inclusive discussions.
+
+There will be no recording or audio bridge. However, we expect that
+written minutes will be published as we did in previous years:
+
+2019: https://lwn.net/Articles/lsfmm2019/
+
+2018: https://lwn.net/Articles/lsfmm2018/
+
+2017: https://lwn.net/Articles/lsfmm2017/
+
+2016: https://lwn.net/Articles/lsfmm2016/
+
+2015: https://lwn.net/Articles/lsfmm2015/
+
+2014: http://lwn.net/Articles/LSFMM2014/
+
+3) If you have feedback on last year's meeting that we can use to
+improve this year's, please also send that to:
+
+        lsf-pc@lists.linux-foundation.org
+
+Thank you on behalf of the program committee:
+
+        Josef Bacik (Filesystems)
+        Amir Goldstein (Filesystems)
+        Martin K. Petersen (Storage)
+        Omar Sandoval (Storage)
+        Michal Hocko (MM)
+        Dan Williams (MM)
+        Alexei Starovoitov (BPF)
+        Daniel Borkmann (BPF)
