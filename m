@@ -2,194 +2,223 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5ED2C48BE5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 13:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E1EC48BE8
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 13:42:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 796786024A
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 13:17:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EECE6611EE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 13:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232389AbhFPNUC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jun 2021 09:20:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37180 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230087AbhFPNUB (ORCPT
+        id S233257AbhFPNo5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jun 2021 09:44:57 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:50346 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233470AbhFPNo4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jun 2021 09:20:01 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5332C061574;
-        Wed, 16 Jun 2021 06:17:52 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id o3so2665510wri.8;
-        Wed, 16 Jun 2021 06:17:52 -0700 (PDT)
+        Wed, 16 Jun 2021 09:44:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1623850970; x=1655386970;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=slGU+C6BgQ79hfY1A7bYjzS/bPQiLwANcpuGgnIajMU=;
+  b=GYOu/Xs9izAQLkqR52Ukca8OVisqzB4uMWS0T89Bo7z/SxRBnudXRbFH
+   i9UGcoOqlRcaAeMjKJNS5QXWr68oT1/05/urLLB3arQ+P6eDJ+eolbwr7
+   WjNddS9GWjnhMySLMrou2+Vv5f2ZxLPYthXvLrZZnVN7G4IUj2IgaXcgm
+   +d8jyXNcu5LwGC7P39N2ZYFA8chLMWzhqYRYGDrXc1cYkaR42O5srZWat
+   jKdzpxoIZK/USyAKbZuJ2y1MVFzwDEpBOZ4XqaGiPgIKV7xjwR+LyKsaU
+   9e+Tk2xtIl7Vx4Og00YEchvIlnN16m9HcJQgGetqSFHSKomJX/GH8oGPm
+   Q==;
+IronPort-SDR: bQbRRKv4mVQucX46Lw6rk71W/S95/nK39tmX32jXLrknhDTyQe1nwe1JX5HPCKMUx0D6/bA471
+ fXrplec/jqu0NVOv5liFeMRVRO49ZdiphyflbDEP/RaVJUCSSwmZLvQdBpDd9h7apaQTrd0exj
+ lxMGntHKGARIOyuB0Mh6zJVbRR7WpSK1FKrmOEePDdUGstfIVIm9ba1w5EzbBYwVwqA+1Cjvvb
+ whf3hhh5gEGoa65WvGQV1MtF3LdjVdBiV6ysji9vajpRgkRR/CdsDAK2l2tmcoXegj0hb0H4C+
+ 2ig=
+X-IronPort-AV: E=Sophos;i="5.83,278,1616428800"; 
+   d="scan'208";a="172662505"
+Received: from mail-bn1nam07lp2047.outbound.protection.outlook.com (HELO NAM02-BN1-obe.outbound.protection.outlook.com) ([104.47.51.47])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Jun 2021 21:42:49 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nncCBeoh9oQY8mOKLSAjzXrfPpKtLI5XuCjJR9tag2FZUgCo7e07yMeT2HDM1onRqgl4uRTw9m/VPwNVR0q+pfp4QeFJiisNLSbT+JJKyQ9H+96HPrH2HBu7Ix6MjQdOzIH3aCGY/AFJY5Q/rKrbwK0afYlhybOF4j1Uq3JsXYsk/lgyjwxpK1bAPtj15I6KyaLUKlbD0V7LFS9GF8fMzuciZHb3bRAhAYuF42u3T4NeCx833A1559owjTb/513UprGxj8jOd/YJ1FGF+0ZJzo1QMw41DJwiu6/aTFnnr4jQqcEhfGE5cJ/gfcCNMLom9xLAAHHyX9NzQSoIIvjjPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IluvvDDcs/Ahv5yLehVaLEJ2drh5EBj8+I4B/U7oVH4=;
+ b=KuUNr7eNFJ2ku7axpuiiL4e826PSCdXbUVB5DdS2cW8m0W1PQ8enwU041Uu+XVdPw6vSmw4/97LvdhnXzDSpI30Zfsa7V3G8XRX1azVnTw6rC3WzWh4TwPapdRFA+qLBYsEMzqL1XL76r4wpDoYmk5mzhcTrGy3E9uM4WW8KuO5g582Gz5gxU8XErioePrhJrhhTfYi4fA8IpdPPmAJqsxOVH/KfYoy4xgmmEKC4uf/s5ALhsCAM4pbrGW5qUSnOjgh76oWD+E7MJ0Wzwm2Aeqqv/xEy0icIhdE6plQ8YSf0aF5eiQkvWBkV2AoqCwrzcvNvo3fOT+nrLXLPuhNC4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=qcduRcOaEb8maaCAtXSmuBLWAMPovh7sM6+Sx5gEpvU=;
-        b=MlPUPbQuHhn/A42z5U2IH5l/VxRIRP0qnCRNVml2u6ZZmHjW32n31ALjhbjneEfYK/
-         Gv5zz5hKEjJv9gFd5qwHMy4LddMppxRV0+vmB3BXbRcwaNsCiT5wiKVidKl6yA7QS31H
-         5yvMN1aWpprzkY5+GFsrm+aEUAG97oqQ8/+FePnHjz+pB7YZTDcMVjmGJxZlraxxLabq
-         P4X5+7O1xSaDsDU4UqaEX67GbPFcEExYnuSCcLoBRAGsQ99T+WvfIy6T0LlSYwd/7RR3
-         SGS8Kpj3aE6IlBezcGNdxda6A8pJ3Xx94gzko4yhk0z4Jk9W09Q0T+VGCVpLLLOlbDQO
-         7txA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=qcduRcOaEb8maaCAtXSmuBLWAMPovh7sM6+Sx5gEpvU=;
-        b=hPtoU570FiOTDGiE6AhyQZ6cQX6MGrDRzzi+hMqCFdPBh8fE0SWn5hEKyw1sKMt8Ty
-         FjIqLnzWT9gEqnlM4GlrBJ6MY4dAMJT/KJILCbb/S2vOMu/ylPlSW9pxP5e/VYtvzNNw
-         FIkozrGbMGcHODm9SRgpsgJH6QHeC+E+ACQAbxVDizVg4pZoAtCnK21KB7gf7qEo5F5E
-         6QbK9s2NOpR/xwgrfssj6nJS2n/EsBzhHqpnAA7zvJS2ga3o0yqWkXzFqsDrPWwNjG/p
-         VHICBzmE6mCizuHUGFeh+J8v65yhM+k2PEr38E21TnwiD3vU9dL9xYf5sWMBJz9e5pFt
-         CXHg==
-X-Gm-Message-State: AOAM532ETgEwLWLrJXaHEJ5ob++MoSwCooZTE6GeZ8fCOWK/4fDjw3qm
-        R5c6FpsdQK8569WDdvIbQbA=
-X-Google-Smtp-Source: ABdhPJyJOn2DwBggUaLtrvjmMg7VDxuToARc/G2Q8yz2LWTUXG+S8aOkqsPsJ5O5h2GV/EN4AKte8w==
-X-Received: by 2002:a5d:4dc4:: with SMTP id f4mr5392652wru.181.1623849470429;
-        Wed, 16 Jun 2021 06:17:50 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id l5sm4849014wmi.46.2021.06.16.06.17.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jun 2021 06:17:49 -0700 (PDT)
-Date:   Wed, 16 Jun 2021 15:17:48 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-        linux-block@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: kernel panic when scanning MTD partitions
-Message-ID: <YMn5/L4GJ1PKSAmO@Red>
-References: <YMntfiE7J8r0dtV1@Red>
- <1424d9da-5e11-3ba8-82ae-85f95f60ca9d@kernel.dk>
- <YMn1lhq4Sl9ipY9a@Red>
- <00d45681-5dfc-3c93-5699-4652c71128dd@kernel.dk>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IluvvDDcs/Ahv5yLehVaLEJ2drh5EBj8+I4B/U7oVH4=;
+ b=taig2Ppp4nX1snJ74hmjNKtVf1aKMpe3cF5fw4tmn/cLkR+OK6wTcB5bsHv5y60ZMs+JONs7V7gmjHKDzHhkvNPQGjeQzPrZn0bux/lVcBA2aTxfONSVpzhHF8m2BbXFaou8d8B8JNgo7c7ibtJfjBs817HomW66SwkJZ6JcIeY=
+Received: from BYAPR04MB4056.namprd04.prod.outlook.com (2603:10b6:a02:b4::22)
+ by BYAPR04MB6133.namprd04.prod.outlook.com (2603:10b6:a03:e3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.25; Wed, 16 Jun
+ 2021 13:42:47 +0000
+Received: from BYAPR04MB4056.namprd04.prod.outlook.com
+ ([fe80::fc71:bcb6:e18d:6973]) by BYAPR04MB4056.namprd04.prod.outlook.com
+ ([fe80::fc71:bcb6:e18d:6973%5]) with mapi id 15.20.4219.026; Wed, 16 Jun 2021
+ 13:42:47 +0000
+From:   Aravind Ramesh <Aravind.Ramesh@wdc.com>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Shaun Tancheff <shaun@tancheff.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.com>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 1/2] blk-zoned: allow zone management send operations
+ without CAP_SYS_ADMIN
+Thread-Topic: [PATCH v3 1/2] blk-zoned: allow zone management send operations
+ without CAP_SYS_ADMIN
+Thread-Index: AQHXYRgmF8KejSRZnk+qFcY64aClOqsWpS8g
+Date:   Wed, 16 Jun 2021 13:42:47 +0000
+Message-ID: <BYAPR04MB4056CD5501CAB658B2B274358C0F9@BYAPR04MB4056.namprd04.prod.outlook.com>
+References: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
+ <20210614122303.154378-2-Niklas.Cassel@wdc.com>
+In-Reply-To: <20210614122303.154378-2-Niklas.Cassel@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [87.116.37.42]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 30d8c825-6cf9-435c-0ad4-08d930cca069
+x-ms-traffictypediagnostic: BYAPR04MB6133:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB61337DCAC9A24596EF0826FF8C0F9@BYAPR04MB6133.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3rnFw1+WA2XgGlhlTp061tvUOeFQLB5ZdcQa5SApFcd8KyIn/Y9WnKagVawYC+TEXTFVpqbSQ+4BXpWUW6V+UThVpJE91OC/VaM/a0liOn4MOBw8tQUmMI28DdDMxd3m1fZORja4bNc4TR5Jcahscxdb1iXvxODY+NPp8uZt9U3YPDLM12IhsR+ce26CSvfw5GIybX0ySFBWCkucqCqO1Rjri5uGbGOCtXSZkDZFkwdquoNKfFzkMpoCV/WymDfNycrNCj1IwkcNVgv0JNxuwDDDWDNsWAvq9OWdSNbRErVHg5dGEllquXU3sQNHAqOy1SgA+e0NSw9WaQEXiZ9dXSZFIfyiEQ/xlCzmnPrNJ0lKgJ7Ocb5Yhwygv5nAzj43xFZdv+f4sfTyMx2+/N+V5GFRw749MDIatDBRS9ggNNGEio7Zofbrz1Zz7pfn0BGzwJ84lGu1slJZ1uSMeYIsyxQ2aiSPks7xzPArebEK4B/5PXrojp/E3g4uwaw9N/BKc4C7zNwvXPgAtRXwNYZBGDS/rjNZ8iHUpdF+XajLaqOgb6eZu8hV7feGrBAkML0nX9EXzM+elDwRdsR52wwN9/qev68NjzFHz3/+Rlyro+w=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4056.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(366004)(346002)(136003)(396003)(316002)(76116006)(71200400001)(110136005)(54906003)(5660300002)(52536014)(26005)(186003)(8936002)(8676002)(66946007)(6506007)(53546011)(66476007)(66556008)(66446008)(64756008)(38100700002)(2906002)(86362001)(478600001)(83380400001)(33656002)(122000001)(55016002)(7696005)(9686003)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yTnuYAarFnvtiysiJve1O1+Pdewp0Ij2eG02nH155fU71gkb42tBU9WI+z0y?=
+ =?us-ascii?Q?XhqlEtORQnlSwMB71/bXPt2T+Gpv59KpAGLR2Ft7/N5rLcsMHo4HBQNYHuRP?=
+ =?us-ascii?Q?bpIdGIWvIXG3pBmJxQXDKpG3x7eVOjU+a0HA2THCU7RjP5yiXTPuTh9eGkDi?=
+ =?us-ascii?Q?JPqsUp933Gt4F0INDtQadSOPppHBWYxBS7e+50loL79FD8kgr+l0YY0Hm4jD?=
+ =?us-ascii?Q?PwFET5JLSpMfAtnjD/I1MELwE0RRk9Hk5AG8ABN9BN+GV1eaLdai8TJ7ArKz?=
+ =?us-ascii?Q?DHpoUxIuoNrXtsZAkcTjM7Mu/zGyqNE57EAlyJ64Y8LgAJBzRWsHALtgJ/vF?=
+ =?us-ascii?Q?NFr9M1Hwxw+eVwX1kuC7xPN6wiCm48TqeA3oepQQmJKqHH7jdAdDMESlz0sD?=
+ =?us-ascii?Q?dFjaEPb3Yv0VsxzjFnpRTsEyyVjomI0HoFxE9nfD6HynG7+dCuvzf7p1CSbC?=
+ =?us-ascii?Q?u7IcdoJrfgCECaX3GMoaY9v/LdGmq/WN+z1c774/ujlwWBxqdqaLoYtZHlIM?=
+ =?us-ascii?Q?jtQymbBVhHPgLGW27p0G0rm8nU3sQhaT0KUYDCzvBH+3OFieIAi0KOVPXuWL?=
+ =?us-ascii?Q?fwa1yJxbFaxFBeCcqICdQFtTNMVMcr8HaaZlNfP96nRpqlCGlVB8NqWDCJb6?=
+ =?us-ascii?Q?dxEUcGK7I1p5Bz78Tff7JEM/UbhZs+RuHnQGCxwNLOpqShQk/hlJWhfFe9l5?=
+ =?us-ascii?Q?VSUuh4XmJwxzlOxa8t2PbFCRbS8h54q6U75I9VsOYMuIytuU/z7XgVqCKxs4?=
+ =?us-ascii?Q?zUZek+5pYYD74aOrG4g+psPddFVe3Rj2hJA1dN4gZRhY+rKylftbZTD2LQfw?=
+ =?us-ascii?Q?QAtOMMMM/+e+mLt5jqE5hV8sROxxTeC/B6CNaNeS2MxRclFspY9q2tqJ50D6?=
+ =?us-ascii?Q?D9ZNX67uF7qj93f2sZO2CSm7yHYVbughjevrt8SpYL5NXY6BHJ7TrscFoiLR?=
+ =?us-ascii?Q?gwzkTzrvNutSPAB2NOzTuH/FXDH917/jzhrkhUgFvbGyclfpusxD0JHObnY7?=
+ =?us-ascii?Q?gFs+PV2z8PMtBpm1lUwOg3AG2tNW6+MChTxOTcoK67RwsThUoFQupd05WfO1?=
+ =?us-ascii?Q?uv+p3XYk5cNpKOkf0CLbtL+7tfZORh+VVkSKJA5avy9xrizXpJ71VhKPeIZw?=
+ =?us-ascii?Q?8DD4Hd3kZgYqfR2TD3zLkDsDCHrfEa4buF/k5quSd1U+nDus7HOz6IJXWXNM?=
+ =?us-ascii?Q?2BjVya5wvXeZQN+f+OYgVv9XG6foqfh/Qi/veX9TH2rKoWQwUqgLEtY878gI?=
+ =?us-ascii?Q?SoirTrFPnEgnPLtAgdi+LG3QC9tPUP7SH0Tli7+Tlfh8g/7R3zIKZBtrQbx7?=
+ =?us-ascii?Q?Fw8=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <00d45681-5dfc-3c93-5699-4652c71128dd@kernel.dk>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4056.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30d8c825-6cf9-435c-0ad4-08d930cca069
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2021 13:42:47.1176
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vA4ndkPUMciYh7WVlDnsiGHk2hwgS5ZcP2rBTRNbH2MrDpS11UOe0+hMb4fpEyQVx8LCf+HqMBZV79o9x6CdCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6133
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Le Wed, Jun 16, 2021 at 07:00:10AM -0600, Jens Axboe a écrit :
-> On 6/16/21 6:59 AM, Corentin Labbe wrote:
-> > Le Wed, Jun 16, 2021 at 06:54:41AM -0600, Jens Axboe a écrit :
-> >> On 6/16/21 6:24 AM, Corentin Labbe wrote:
-> >>> Hello
-> >>>
-> >>> When scanning MTD partitions my kernel panic:
-> >>> Searching for RedBoot partition table in 30000000.flash at offset 0xfe0000
-> >>> 7 RedBoot partitions found on MTD device 30000000.flash
-> >>> Creating 7 MTD partitions on "30000000.flash":
-> >>> 0x000000000000-0x000000020000 : "BOOT"
-> >>> 8<--- cut here ---
-> >>> Unable to handle kernel NULL pointer dereference at virtual address 00000034
-> >>> pgd = (ptrval)
-> >>> [00000034] *pgd=00000000
-> >>> Internal error: Oops: 17 [#1] PREEMPT ARM
-> >>> Modules linked in:
-> >>> CPU: 0 PID: 1 Comm: swapper Not tainted 5.13.0-rc6-next-20210615+ #101
-> >>> Hardware name: Gemini (Device Tree)
-> >>> PC is at _set_bit+0x20/0x4c
-> >>> LR is at blk_queue_write_cache+0x20/0x5c
-> >>> pc : [<c02f2194>]    lr : [<c029d6c0>]    psr: 60000093
-> >>> sp : c1439ca0  ip : 60000013  fp : c4058c00
-> >>> r10: 00000000  r9 : c4058ab8  r8 : c1c553b8
-> >>> r7 : c3f71080  r6 : 00000000  r5 : 00000000  r4 : 00000000
-> >>> r3 : 00020000  r2 : 00000011  r1 : 00000034  r0 : 00000000
-> >>> Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment none
-> >>> Control: 0000397f  Table: 02338000  DAC: 00000053
-> >>> Register r0 information: NULL pointer
-> >>> Register r1 information: non-paged memory
-> >>> Register r2 information: non-paged memory
-> >>> Register r3 information: non-paged memory
-> >>> Register r4 information: NULL pointer
-> >>> Register r5 information: NULL pointer
-> >>> Register r6 information: NULL pointer
-> >>> Register r7 information: slab kmalloc-128 start c3f71080 pointer offset 0 size 128
-> >>> Register r8 information: slab dentry start c1c553b8 pointer offset 0 size 40
-> >>> Register r9 information: slab kmalloc-1k start c4058800 pointer offset 696 size 1024
-> >>> Register r10 information: NULL pointer
-> >>> Register r11 information: slab kmalloc-1k start c4058c00 pointer offset 0 size 1024
-> >>> Register r12 information: non-paged memory
-> >>> Process swapper (pid: 1, stack limit = 0x(ptrval))
-> >>> Stack: (0xc1439ca0 to 0xc143a000)
-> >>> 9ca0: c231a480 c07ab67c 00000000 c03cd1b8 00000000 c00f4b18 c07ab67c c231a480
-> >>> 9cc0: c4058c00 c07ab67c 05a00000 c03ce474 c07ab67c c4058c00 c07ab658 c03ccf88
-> >>> 9ce0: c4058c00 c07ab660 c07ab434 c03c7328 c068ab50 00000000 c4058cf8 c40912c0
-> >>> 9d00: ffffffff 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> >>> 9d20: 00000101 00000000 00000001 c03c6ba8 00000000 00020000 00000001 00000001
-> >>> 9d40: c4058c00 00000000 00000000 4af56ea3 00000000 c4058800 c4058800 c406f000
-> >>> 9d60: 00000007 c03ca0fc 00000000 00000000 00000007 c07ab638 c05c6c84 00000000
-> >>> 9d80: 00000007 c4058800 c1438000 00000000 00000000 c03c9f90 00000001 c05c6c88
-> >>> 9da0: 00000000 00000000 c406f000 00000007 c07ab638 4af56ea3 00002201 c4058800
-> >>> 9dc0: c05c6c84 00000000 00000000 c221c2a0 c2215810 00000000 00000000 c03c7694
-> >>> 9de0: 00000001 c4009c20 c4008500 c2215800 c221c2a0 c03dc4a0 00000000 c0196864
-> >>> 9e00: 00000000 c4008500 c4052b58 00000000 00000002 4af56ea3 00000000 00000000
-> >>> 9e20: c2215810 c07ab928 00000000 c07ab928 00000000 c07bb000 c06f73e0 c037b898
-> >>> 9e40: c2215810 c0815554 00000000 00000000 c07ab928 c03796fc c2215810 c07ab928
-> >>> 9e60: c2215854 c07ab928 c071c830 c06d408c c07bb000 c0379b4c c2215810 00000000
-> >>> 9e80: c2215854 c037a0ec 00000000 c07ab928 c2215810 c07a9fb0 c071c830 c037a17c
-> >>> 9ea0: 00000000 c07ab928 c037a0f4 c0377584 c143e11c c143e10c c140c530 4af56ea3
-> >>> 9ec0: c07ab928 c4008480 00000000 c0378a68 c068d2f4 c068d2f4 c06f73e0 c07ab928
-> >>> 9ee0: 00000000 00000000 c07bb000 c037a818 c07117f8 ffffe000 00000000 c00097ac
-> >>> 9f00: c1403b00 c1403b08 c1403aff c0035200 00000000 c0694bc0 0000009f 00000000
-> >>> 9f20: 00000000 c06f73e0 00000006 00000006 00000000 c1403b16 c1403b1d 4af56ea3
-> >>> 9f40: 00000000 00000006 0000009f 4af56ea3 c071c84c c0724380 00000007 c1403b00
-> >>> 9f60: c071c850 c06f8108 00000006 00000006 00000000 c06f73e0 00000000 0000009f
-> >>> 9f80: c0558560 00000000 c0558560 00000000 00000000 00000000 00000000 00000000
-> >>> 9fa0: 00000000 c0558570 00000000 c0008348 00000000 00000000 00000000 00000000
-> >>> 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> >>> 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000 00000000 00000000
-> >>> [<c02f2194>] (_set_bit) from [<c029d6c0>] (blk_queue_write_cache+0x20/0x5c)
-> >>> [<c029d6c0>] (blk_queue_write_cache) from [<c03cd1b8>] (add_mtd_blktrans_dev+0x218/0x3cc)
-> >>> [<c03cd1b8>] (add_mtd_blktrans_dev) from [<c03ce474>] (mtdblock_add_mtd+0x60/0x78)
-> >>> [<c03ce474>] (mtdblock_add_mtd) from [<c03ccf88>] (blktrans_notify_add+0x3c/0x54)
-> >>> [<c03ccf88>] (blktrans_notify_add) from [<c03c7328>] (add_mtd_device+0x3bc/0x5e8)
-> >>> [<c03c7328>] (add_mtd_device) from [<c03ca0fc>] (add_mtd_partitions+0xc4/0x16c)
-> >>> [<c03ca0fc>] (add_mtd_partitions) from [<c03c9f90>] (parse_mtd_partitions+0x370/0x418)
-> >>> [<c03c9f90>] (parse_mtd_partitions) from [<c03c7694>] (mtd_device_parse_register+0x74/0x2c4)
-> >>> [<c03c7694>] (mtd_device_parse_register) from [<c03dc4a0>] (physmap_flash_probe+0x5e8/0x808)
-> >>> [<c03dc4a0>] (physmap_flash_probe) from [<c037b898>] (platform_probe+0x5c/0xbc)
-> >>> [<c037b898>] (platform_probe) from [<c03796fc>] (really_probe+0xf8/0x4e8)
-> >>> [<c03796fc>] (really_probe) from [<c0379b4c>] (driver_probe_device+0x60/0xb8)
-> >>> [<c0379b4c>] (driver_probe_device) from [<c037a0ec>] (device_driver_attach+0xa8/0xb0)
-> >>> [<c037a0ec>] (device_driver_attach) from [<c037a17c>] (__driver_attach+0x88/0x11c)
-> >>> [<c037a17c>] (__driver_attach) from [<c0377584>] (bus_for_each_dev+0x78/0xc4)
-> >>> [<c0377584>] (bus_for_each_dev) from [<c0378a68>] (bus_add_driver+0xe8/0x1d0)
-> >>> [<c0378a68>] (bus_add_driver) from [<c037a818>] (driver_register+0x88/0x118)
-> >>> [<c037a818>] (driver_register) from [<c00097ac>] (do_one_initcall+0x50/0x1e0)
-> >>> [<c00097ac>] (do_one_initcall) from [<c06f8108>] (kernel_init_freeable+0x178/0x200)
-> >>> [<c06f8108>] (kernel_init_freeable) from [<c0558570>] (kernel_init+0x10/0x100)
-> >>> [<c0558570>] (kernel_init) from [<c0008348>] (ret_from_fork+0x14/0x2c)
-> >>> Exception stack(0xc1439fb0 to 0xc1439ff8)
-> >>> 9fa0:                                     00000000 00000000 00000000 00000000
-> >>> 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> >>> 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> >>> Code: e3a03001 e1a03213 e10fc000 e321f093 (e7912100) 
-> >>> ---[ end trace f3b2f52ba3b0d435 ]---
-> >>> Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
-> >>> ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]---
-> >>>
-> >>> This happen on 5.13.0-rc6-next-20210615+ on my ARM Gemini ssi1328.
-> >>
-> >> Should be fixed once for-next updates the block branch.
-> >>
-> > 
-> > Thanks, do you have a link to the fix ? or patch name.
-> 
-> Yep, this one:
-> 
-> https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.14/block&id=07a719f8fdbe4ae0f825fa1a6d2755a63deb265e
-> 
 
-Thanks, this fix my boot.
 
-Regards
+> -----Original Message-----
+> From: Niklas Cassel <Niklas.Cassel@wdc.com>
+> Sent: Monday, June 14, 2021 5:53 PM
+> To: Jens Axboe <axboe@kernel.dk>; Damien Le Moal <Damien.LeMoal@wdc.com>;
+> Shaun Tancheff <shaun@tancheff.com>; Martin K. Petersen
+> <martin.petersen@oracle.com>; Hannes Reinecke <hare@suse.com>
+> Cc: Damien Le Moal <Damien.LeMoal@wdc.com>; Niklas Cassel
+> <Niklas.Cassel@wdc.com>; stable@vger.kernel.org; Jens Axboe <axboe@fb.com=
+>;
+> linux-block@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: [PATCH v3 1/2] blk-zoned: allow zone management send operations
+> without CAP_SYS_ADMIN
+>=20
+> From: Niklas Cassel <niklas.cassel@wdc.com>
+>=20
+> Zone management send operations (BLKRESETZONE, BLKOPENZONE,
+> BLKCLOSEZONE and BLKFINISHZONE) should be allowed under the same permissi=
+ons
+> as write().
+> (write() does not require CAP_SYS_ADMIN).
+>=20
+> Additionally, other ioctls like BLKSECDISCARD and BLKZEROOUT only check i=
+f the fd
+> was successfully opened with FMODE_WRITE.
+> (They do not require CAP_SYS_ADMIN).
+>=20
+> Currently, zone management send operations require both CAP_SYS_ADMIN and
+> that the fd was successfully opened with FMODE_WRITE.
+>=20
+> Remove the CAP_SYS_ADMIN requirement, so that zone management send
+> operations match the access control requirement of write(), BLKSECDISCARD=
+ and
+> BLKZEROOUT.
+>=20
+> Fixes: 3ed05a987e0f ("blk-zoned: implement ioctls")
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Cc: stable@vger.kernel.org # v4.10+
+> ---
+> Changes since v2:
+> -None
+>=20
+> Note to backporter:
+> Function was added as blkdev_reset_zones_ioctl() in v4.10.
+> Function was renamed to blkdev_zone_mgmt_ioctl() in v5.5.
+> The patch is valid both before and after the function rename.
+>=20
+>  block/blk-zoned.c | 3 ---
+>  1 file changed, 3 deletions(-)
+>=20
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c index
+> 250cb76ee615..0789e6e9f7db 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -349,9 +349,6 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev,
+> fmode_t mode,
+>  	if (!blk_queue_is_zoned(q))
+>  		return -ENOTTY;
+>=20
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EACCES;
+> -
+>  	if (!(mode & FMODE_WRITE))
+>  		return -EBADF;
+>=20
+> --
+> 2.31.1
+
+Looks good,
+
+Reviewed-by: Aravind Ramesh <aravind.ramesh@wdc.com>
