@@ -2,109 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 045ADC48BE5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 15:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E4CC48BE5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 15:42:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC72361166
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 15:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F46A60FEE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 15:42:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234482AbhFPPJL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jun 2021 11:09:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234479AbhFPPJL (ORCPT
+        id S235501AbhFPPoo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jun 2021 11:44:44 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:45090 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235281AbhFPPmp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jun 2021 11:09:11 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EF63C061574
-        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 08:07:04 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id h24-20020a9d64180000b029036edcf8f9a6so2807039otl.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 08:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=HxnSNJO/aYru61gYChHqJrtaGhaX+s82wfcK2X596kY=;
-        b=cLvdpV7HsPoLnb9Kdl4h96EE3Te4GqhprP9XrStc/8sDTGiPx+ipNvK9JWgl6MTKSv
-         bJSTMahmtJWLTb6aw3bTOLZny0RD/yAdclWKun+HHzp5JmG9TsCrMsZpUzUKITRhbacj
-         itFDxU3d4WIMDgttLd8PA3CVfLuIa1WovM9iWkH4kPGK14eux58yUJsCX4sosCUOC8iP
-         YUoC/gfolhyw5bd9O+WCMAK9L325fFfSzBZSD72rFYF/Qx6/GOZM0jS3sB4+33TkRwgM
-         ZMYJcJJqkIYQvI/w5mHCF/+tQaD9L0WhE8tfHqz9LfV6JjrJ/X8kL7oVz7UWZWMz9T8g
-         i8bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=HxnSNJO/aYru61gYChHqJrtaGhaX+s82wfcK2X596kY=;
-        b=THxPrbPDZfYz1nTHujAA5zSUye4/woJqiKg+Ji9f4HOWZpHiAl1azLJGOSj9NgFAyq
-         JjwJWFNsIOgocI8kjQQAQ6jX/ElZnlh72dtk1pLlzwfGEWqoP1smudIATzsjOGO4kOyE
-         E/YhqvhIG4ib5ZBH/vNvYZ1u1TrbEoJ9cZPiPJ7X/wdBg2zzbQ1nzZM3+fdzChOY8mkP
-         acRINl5Gl595pYyPIkgWdIulxEAvtOH+vzX+C1zulyiCNi5TH5N0AGbiN/lJs6fDuBd6
-         5LnjFkJDC51rPWYAqRa7jXxp6RnCWSZ/P7Xcz4wo6ECTebQACLzAINw/Kye0JyFUAZ6b
-         O6oA==
-X-Gm-Message-State: AOAM533SWW0ZFK/1IfF4EEbH9VNuWcoWAz4C4UtJfLNQM7r+c3ezhqEZ
-        1AEF5wYHnH1TB9L4UNByuMDfxpXFxBuBMWdLxs6i2Mdg
-X-Google-Smtp-Source: ABdhPJxQPe9k0qs1D+Xct9/jZmbGtDdiO5/Kr77Vuw/u1wIqk5l7TjP14q2xcQAC29xxbwcvhSyo3JEZL+lmHqwTwzo=
-X-Received: by 2002:a05:6830:1387:: with SMTP id d7mr323787otq.61.1623856023384;
- Wed, 16 Jun 2021 08:07:03 -0700 (PDT)
+        Wed, 16 Jun 2021 11:42:45 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 8A9CA219C4;
+        Wed, 16 Jun 2021 15:40:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1623858038; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fBhs3PxDfyGYqctRCrzbBYGBbs2MdaXjftBxfFLQb4k=;
+        b=vknAUpsE2hdSI6ap7ocWsKmsG8pfqvAngceZmkEmpXhDQ9hywi03cf+pokIjhjOA/GArKL
+        g4sDW236I5ZZL74KMVSW5t+Y94ZwnfKaqGMIB1225Nqy6Wwj3kUGrYA7yt5q7ku1Dfjjga
+        +3hTgFN3F8hgOqYz1feM0xyjTWWkhpc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1623858038;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fBhs3PxDfyGYqctRCrzbBYGBbs2MdaXjftBxfFLQb4k=;
+        b=yvjSVVzlSNVPRPU9KZTl1APU+Tthap4JLke+jV88P+40KMWtS6Bws7HilwLMvcDNyVwDd2
+        EIxofUn6VJq4lNBw==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id 77B72A3BC7;
+        Wed, 16 Jun 2021 15:40:38 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 48D5B1F2C68; Wed, 16 Jun 2021 17:40:38 +0200 (CEST)
+Date:   Wed, 16 Jun 2021 17:40:38 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v2] block: Do not pull requests from the scheduler when
+ we cannot dispatch them
+Message-ID: <20210616154038.GA18520@quack2.suse.cz>
+References: <20210603104721.6309-1-jack@suse.cz>
 MIME-Version: 1.0
-References: <CA+8F9hggf7jOcGRxvBoa8FYxQs8ZV+XueVAd9BodpQQP_+8Pdw@mail.gmail.com>
- <YMhxY9svDeVApu95@T590> <CA+8F9hjFDE9b31-qsxsVJf4SV9Ctr-mwOJrsw0kVeC7DdN=5XQ@mail.gmail.com>
- <YMi0C5U0NeMdO04g@T590>
-In-Reply-To: <YMi0C5U0NeMdO04g@T590>
-From:   Omar Kilani <omar.kilani@gmail.com>
-Date:   Wed, 16 Jun 2021 08:06:52 -0700
-Message-ID: <CA+8F9hiKXfH2Pa_FL1M0KAqtDQRGXc6b-9rqM9CfytRfe5ha2Q@mail.gmail.com>
-Subject: Re: Deadlock in wbt / rq-qos
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210603104721.6309-1-jack@suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Thu 03-06-21 12:47:21, Jan Kara wrote:
+> Provided the device driver does not implement dispatch budget accounting
+> (which only SCSI does) the loop in __blk_mq_do_dispatch_sched() pulls
+> requests from the IO scheduler as long as it is willing to give out any.
+> That defeats scheduling heuristics inside the scheduler by creating
+> false impression that the device can take more IO when it in fact
+> cannot.
+> 
+> For example with BFQ IO scheduler on top of virtio-blk device setting
+> blkio cgroup weight has barely any impact on observed throughput of
+> async IO because __blk_mq_do_dispatch_sched() always sucks out all the
+> IO queued in BFQ. BFQ first submits IO from higher weight cgroups but
+> when that is all dispatched, it will give out IO of lower weight cgroups
+> as well. And then we have to wait for all this IO to be dispatched to
+> the disk (which means lot of it actually has to complete) before the
+> IO scheduler is queried again for dispatching more requests. This
+> completely destroys any service differentiation.
+> 
+> So grab request tag for a request pulled out of the IO scheduler already
+> in __blk_mq_do_dispatch_sched() and do not pull any more requests if we
+> cannot get it because we are unlikely to be able to dispatch it. That
+> way only single request is going to wait in the dispatch list for some
+> tag to free.
+> 
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  block/blk-mq-sched.c | 12 +++++++++++-
+>  block/blk-mq.c       |  2 +-
+>  block/blk-mq.h       |  2 ++
+>  3 files changed, 14 insertions(+), 2 deletions(-)
+> 
+> Jens, can you please merge the patch? Thanks!
 
-I can confirm after a day of running my repro tests that the patch has
-fixed the issue.
+Ping Jens?
 
-Thank you Jan.
+								Honza
 
-Regards,
-Omar
-
-On Tue, Jun 15, 2021 at 7:07 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Tue, Jun 15, 2021 at 06:42:40AM -0700, Omar Kilani wrote:
-> > Hi Ming,
-> >
-> > It looks to be the same issue based on the log timelines. I *think* tha=
-t
-> > patch will fix it but it=E2=80=99s really subtle so I=E2=80=99ll test.
-> >
-> > I can only trigger this on an AMD Milan machine for some reason that I
-> > don=E2=80=99t understand. Sometimes in 800 seconds, sometimes in 5 hour=
-s.
-> >
-> > I have a new build with printk=E2=80=99s on the atomic_inc_below to che=
-ck the
-> > acquire condition.
-> >
-> > I=E2=80=99ll add that patch and re-test. But I couldn=E2=80=99t find th=
-at change in the
-> > linux-block git? Is it in a specific branch?
->
-> The patch is in the branch of for-5.14/block:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/com=
-mit/?h=3Dfor-5.14/block&id=3D11c7aa0ddea8611007768d3e6b58d45dc60a19e1
->
-> Thanks,
-> Ming
->
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 996a4b2f73aa..714e678f516a 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -168,9 +168,19 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  		 * in blk_mq_dispatch_rq_list().
+>  		 */
+>  		list_add_tail(&rq->queuelist, &rq_list);
+> +		count++;
+>  		if (rq->mq_hctx != hctx)
+>  			multi_hctxs = true;
+> -	} while (++count < max_dispatch);
+> +
+> +		/*
+> +		 * If we cannot get tag for the request, stop dequeueing
+> +		 * requests from the IO scheduler. We are unlikely to be able
+> +		 * to submit them anyway and it creates false impression for
+> +		 * scheduling heuristics that the device can take more IO.
+> +		 */
+> +		if (!blk_mq_get_driver_tag(rq))
+> +			break;
+> +	} while (count < max_dispatch);
+>  
+>  	if (!count) {
+>  		if (run_queue)
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c86c01bfecdb..bc2cf80d2c3b 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1100,7 +1100,7 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+>  	return true;
+>  }
+>  
+> -static bool blk_mq_get_driver_tag(struct request *rq)
+> +bool blk_mq_get_driver_tag(struct request *rq)
+>  {
+>  	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+>  
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 9ce64bc4a6c8..81a775171be7 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -259,6 +259,8 @@ static inline void blk_mq_put_driver_tag(struct request *rq)
+>  	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
+>  }
+>  
+> +bool blk_mq_get_driver_tag(struct request *rq);
+> +
+>  static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>  {
+>  	int cpu;
+> -- 
+> 2.26.2
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
