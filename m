@@ -2,55 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2580C48BE5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 16:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D709C48BE8
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 16:40:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C21C1613BD
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 16:40:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F62761359
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 16:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbhFPQm4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jun 2021 12:42:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55082 "EHLO
+        id S230442AbhFPQm6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jun 2021 12:42:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230350AbhFPQmz (ORCPT
+        with ESMTP id S230410AbhFPQm4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jun 2021 12:42:55 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2CDFC0617AD
-        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 09:40:47 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id a127so2631342pfa.10
-        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 09:40:47 -0700 (PDT)
+        Wed, 16 Jun 2021 12:42:56 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D536C06175F
+        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 09:40:49 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id t9so2449852pgn.4
+        for <linux-block@vger.kernel.org>; Wed, 16 Jun 2021 09:40:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=epXDcsa+iB2IdU4Gd981bdI+VgdMiEH3uS5c66pfdMk=;
-        b=GkLCmFh/vzfPIF7v1q7mJc1wazpBYwrpHlrK8VamLK/tdnFXUDt3Jqpo/4zhnIgkB8
-         w2Pa4tHYHF/iTjxBxw7knQzMcGPxxObyF5+9fqOM24ruxemJU2JYyJ4aKfJ6/wO0ElHe
-         T6vfoZDbGX45mQjwQTttWWusehKNnlTA3+E6Y=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=eSj7QMM867fTBuxD4WinDi+YMzIWmxuOMcHgu40wLvE=;
+        b=DyQz5l7fpg7DJHxBpx+gaUleysT7fIha1KRTi2aysMIVFvhjDQdRTUQTtOQGIJSrO1
+         lsZEUc349QhacNULCXDdTjNE7YPtFtNAJ3AjHV9zZWcr8Pu8c65/NaQtOlsrvg6bV12h
+         lgZaKPCey7DRAYpFzufgp1ZgG7SfxtZxAopKQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=epXDcsa+iB2IdU4Gd981bdI+VgdMiEH3uS5c66pfdMk=;
-        b=P0W4uxkK1NiTlGiP/LQREI7rgKem+p7h489Uybhtyo8OQzHPwLikhUru2VTs/vm2h6
-         zICEJ5QyUhHxjO5gpZhV1VzJgv86OIpVTK5xmsa0z8fB+daTrvAw+7JCXiKOBz1j3KRW
-         dr3L9K8WA2h5oSVrnRoeWuAcfW2iEtZY0GAj2bR/WRFaMLyeAfdG+hBkv4+fJ+4T6j6s
-         7DREcoBhJH6xs04MfJf2TIy724jkOgHPkkkZLFZd9RdOy6ONzsyBGHV2/sLfBdCwIvz3
-         IqLI7GOX33Si4ZweQEUG03+oc7YBkObgb5/ptVa4yPE/9kkUs7SILSJHyhIDsci6Zny7
-         ZKIQ==
-X-Gm-Message-State: AOAM530INWALuP+pxgh4bXE6dZaabcU9U1PUNLFvtXC6Ju7Vuk43N1tf
-        veFurgnt/LsbbtUtiGxnyncYbw==
-X-Google-Smtp-Source: ABdhPJwSppm5irPLhD/8UhbktXBLwwAA5AGV8driRal8NYsxUQyf0Pz+CGSw19WrD/+6GFIZo7Qt8Q==
-X-Received: by 2002:a63:5c04:: with SMTP id q4mr453285pgb.127.1623861647276;
-        Wed, 16 Jun 2021 09:40:47 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=eSj7QMM867fTBuxD4WinDi+YMzIWmxuOMcHgu40wLvE=;
+        b=ax5TvjQl3byVfsinqY2KatTDeZtHTAbTvO1HPkcIZGRL6EutMab65s93UuaJLwo9Lf
+         SuZWN/BzXo1oLGA78g+EJ5ivc5aTKMmNeVnEBxzYnT3Vi3zTjU9zU+3vGpqrEYVhYHQi
+         GpZxMhgbhhgQqkHUlpMEDBPcKNJfWT8j7pTffjhuHsbQBafkE0yF3uBTI63HLuIyTps0
+         Xg+LaRmiuejPvlzUWpLCeQKAe+XMkWrk1Z0VwmhVqh974EF5nedbEeQ0Vv6Ab75nG6dZ
+         Jak1XCTIubk0/HOkKVlhC7FcRX4mIriwZvziIdHNHHByWTvPFJ3SPXYoq6aApxc3PuDF
+         e2fw==
+X-Gm-Message-State: AOAM53310EKpsCz7bBjiukk8O+vvaEojt8yYsHerCo4njeaiO1ekBRAu
+        aMA078TYC2VgvQBNcmQExFvNNA==
+X-Google-Smtp-Source: ABdhPJy3MA/bMpIrn8612O4lt2YxXA4tGPu4lGhMOvCNonn/0H42hZku6Xg6BUsLLwaushFAC8dGtw==
+X-Received: by 2002:a05:6a00:b8a:b029:2ec:761e:33e3 with SMTP id g10-20020a056a000b8ab02902ec761e33e3mr555954pfj.35.1623861648707;
+        Wed, 16 Jun 2021 09:40:48 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id c5sm2840547pfn.144.2021.06.16.09.40.45
+        by smtp.gmail.com with ESMTPSA id b21sm2773113pfp.134.2021.06.16.09.40.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 16 Jun 2021 09:40:46 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -66,43 +66,91 @@ Cc:     Kees Cook <keescook@chromium.org>, Christoph Hellwig <hch@lst.de>,
         Vignesh Raghavendra <vigneshr@ti.com>,
         linux-doc@vger.kernel.org, linux-mtd@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH v3 0/5] Use the normal block device I/O path
-Date:   Wed, 16 Jun 2021 09:40:38 -0700
-Message-Id: <20210616164043.1221861-1-keescook@chromium.org>
+Subject: [PATCH v3 4/5] pstore/blk: Fix kerndoc and redundancy on blkdev param
+Date:   Wed, 16 Jun 2021 09:40:42 -0700
+Message-Id: <20210616164043.1221861-5-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210616164043.1221861-1-keescook@chromium.org>
+References: <20210616164043.1221861-1-keescook@chromium.org>
 MIME-Version: 1.0
+X-Patch-Hashes: v=1; h=sha256; g=0cec17aa50667cf776ad33debd4d5d780669e07f; i=yTEuvN+d2QlI+CgetW2A/mnEULnwbC3Uy5kOoKgmB9Q=; m=nv3cX+zCGZ64OKaS6k3hCuIb776pM3aoPeSdwsW4l+g=; p=USoGnLZwk4a402OJka3HYldDNWjTYcaDbaDrZ+4qeFA=
+X-Patch-Sig: m=pgp; i=keescook@chromium.org; s=0x0x8972F4DFDC6DC026; b=iQIzBAABCgAdFiEEpcP2jyKd1g9yPm4TiXL039xtwCYFAmDKKYoACgkQiXL039xtwCbD5g//WUB YueFZ8I0eRHi1rVMlUFvST6Tou0jUWvjup1L9XYSQ7CObRFMf5whc9+7yjyAXu6d73aH4FI9Hu/6X T7Hyx7yu3/yh08A94+EGmCw3x3tG+u2+YsaXC61syZ655r2Y/5srYaFS3JTBDHr8secOyxNrvqtW7 JacflvvLmBnr/UYiHn65oAFthh8XAzyj1e6eNek3bCJZwYhmf/E2C8yNY6Rns7jD894FG3ce2tVAD 2h+wILUbWcrLNZRoHHosY8ma7rye5JHBtf2/2dhr3zJRHx7CtaMwNn8f8v4B8BdbHN4O039E10Tzi hD7DvJPoow6zrMy39jrThL/RccFIMlzc8EdlmZgcJaixxuIeVgy9TKO4Qzz2Rg/HvCypEKrE2xoal 04ktdhkwTCH7uOI25jkm8dPaDzmrZ5nRLaOW7iT+dMtWYiGnEq1hkqVnV9aQFBzTIE7P7cY1fmqEj Q2kdlcSwWGJRIk9hvj2E1fuM1nvf116U7ERdLjtpHA92XvKoFHEjFNF39MWQJXG3VU5LN3AuuHKc5 nlBMBAlWsbRbQs1Wlj1vv0L+9vIsZ/jHBrc4FAPdsFXMXFzZbD4EDDoDn1e3OEUkqKnd8Dk0QECDY bDtz72/3myeeQVCpSCVqY4O3Glf3Q3SN/eTwLvh2RovIV6uIgkpOHtayxGaGP6GY=
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Remove redundant details of blkdev and fix up resulting kerndoc.
 
-This fixes up pstore/blk to avoid touching block internals, and includes
-additional fixes and clean-ups.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ Documentation/admin-guide/pstore-blk.rst | 11 +++++++----
+ fs/pstore/blk.c                          | 24 +-----------------------
+ 2 files changed, 8 insertions(+), 27 deletions(-)
 
--Kees
-
-v3:
-- split verify_size move into a separate patch
-- several changes suggested by hch from the v2 thread
-- add reviewed-bys
-v2: https://lore.kernel.org/lkml/20210615212121.1200820-1-keescook@chromium.org
-v1: https://lore.kernel.org/lkml/20210614200421.2702002-1-keescook@chromium.org
-
-Kees Cook (5):
-  pstore/blk: Improve failure reporting
-  pstore/blk: Move verify_size() macro out of function
-  pstore/blk: Use the normal block device I/O path
-  pstore/blk: Fix kerndoc and redundancy on blkdev param
-  pstore/blk: Include zone in pstore_device_info
-
- Documentation/admin-guide/pstore-blk.rst |  14 +-
- drivers/mtd/mtdpstore.c                  |  10 +-
- fs/pstore/blk.c                          | 403 +++++++++--------------
- include/linux/pstore_blk.h               |  27 +-
- 4 files changed, 171 insertions(+), 283 deletions(-)
-
+diff --git a/Documentation/admin-guide/pstore-blk.rst b/Documentation/admin-guide/pstore-blk.rst
+index 79f6d23e8cda..2d22ead9520e 100644
+--- a/Documentation/admin-guide/pstore-blk.rst
++++ b/Documentation/admin-guide/pstore-blk.rst
+@@ -45,15 +45,18 @@ blkdev
+ The block device to use. Most of the time, it is a partition of block device.
+ It's required for pstore/blk. It is also used for MTD device.
+ 
+-It accepts the following variants for block device:
++When pstore/blk is built as a module, "blkdev" accepts the following variants:
+ 
+-1. <hex_major><hex_minor> device number in hexadecimal represents itself; no
+-   leading 0x, for example b302.
+-#. /dev/<disk_name> represents the device number of disk
++1. /dev/<disk_name> represents the device number of disk
+ #. /dev/<disk_name><decimal> represents the device number of partition - device
+    number of disk plus the partition number
+ #. /dev/<disk_name>p<decimal> - same as the above; this form is used when disk
+    name of partitioned disk ends with a digit.
++
++When pstore/blk is built into the kernel, "blkdev" accepts the following variants:
++
++#. <hex_major><hex_minor> device number in hexadecimal representation,
++   with no leading 0x, for example b302.
+ #. PARTUUID=00112233-4455-6677-8899-AABBCCDDEEFF represents the unique id of
+    a partition if the partition table provides it. The UUID may be either an
+    EFI/GPT UUID, or refer to an MSDOS partition using the format SSSSSSSS-PP,
+diff --git a/fs/pstore/blk.c b/fs/pstore/blk.c
+index dc5ff763d414..c373e0d73e6c 100644
+--- a/fs/pstore/blk.c
++++ b/fs/pstore/blk.c
+@@ -58,29 +58,7 @@ MODULE_PARM_DESC(best_effort, "use best effort to write (i.e. do not require sto
+ 
+ /*
+  * blkdev - the block device to use for pstore storage
+- *
+- * Usually, this will be a partition of a block device.
+- *
+- * blkdev accepts the following variants, when built as a module:
+- * 1) /dev/<disk_name> represents the device number of disk
+- * 2) /dev/<disk_name><decimal> represents the device number
+- *    of partition - device number of disk plus the partition number
+- * 3) /dev/<disk_name>p<decimal> - same as the above, that form is
+- *    used when disk name of partitioned disk ends on a digit.
+- *
+- * blkdev accepts the following variants when built into the kernel:
+- * 1) <hex_major><hex_minor> device number in hexadecimal representation,
+- *    with no leading 0x, for example b302.
+- * 2) PARTUUID=00112233-4455-6677-8899-AABBCCDDEEFF representing the
+- *    unique id of a partition if the partition table provides it.
+- *    The UUID may be either an EFI/GPT UUID, or refer to an MSDOS
+- *    partition using the format SSSSSSSS-PP, where SSSSSSSS is a zero-
+- *    filled hex representation of the 32-bit "NT disk signature", and PP
+- *    is a zero-filled hex representation of the 1-based partition number.
+- * 3) PARTUUID=<UUID>/PARTNROFF=<int> to select a partition in relation to
+- *    a partition with a known unique id.
+- * 4) <major>:<minor> major and minor number of the device separated by
+- *    a colon.
++ * See Documentation/admin-guide/pstore-blk.rst for details.
+  */
+ static char blkdev[80] = CONFIG_PSTORE_BLK_BLKDEV;
+ module_param_string(blkdev, blkdev, 80, 0400);
 -- 
 2.25.1
 
