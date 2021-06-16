@@ -2,107 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 695F5C48BE5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 05:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6314C48BE6
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 05:39:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E6F8613D3
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 05:00:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97CE2613BF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 05:39:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230269AbhFPFCH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jun 2021 01:02:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37274 "EHLO
+        id S230455AbhFPFlz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jun 2021 01:41:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbhFPFCG (ORCPT
+        with ESMTP id S229514AbhFPFlz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jun 2021 01:02:06 -0400
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409E6C061574;
-        Tue, 15 Jun 2021 22:00:01 -0700 (PDT)
-Received: by mail-oo1-xc2c.google.com with SMTP id x22-20020a4a62160000b0290245cf6b7feeso360100ooc.13;
-        Tue, 15 Jun 2021 22:00:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=kxG0wff3pxHDvDEpl2rYGsFcElm3KSrIiYBGYygsjJ4=;
-        b=rriQ6zwslKWerUuIgInYVIN1VCiCmYFXWgbBwnLWCCcUQcQh2/CJRUfuxvJiUeF7e4
-         Ny9NCTq9G1KhxFFyFK3LiLWmQyPp5qKtSgT1uAZrUx7eblFmwRorByV7+O8h2NmhRV8H
-         /GbhsQ3PC+aIWyPy7HO76zVoJ+uQlpiD26W/jDwaNCQwssqPLJgZZX89jCv6XZ9CisRt
-         //nPxULrFlAnGy+vUT9hEc/98ZW4ivT0oE6poVeNO1lWJxGNNQsKoTPk2VJTBXUc0+vq
-         umNJ8fMEkTazUvEYQI4oa2TM3AdHtC/Ra0LTeZ5o6ZwCR+Kn3e9hcuXo6x+zyLXutcue
-         GCwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=kxG0wff3pxHDvDEpl2rYGsFcElm3KSrIiYBGYygsjJ4=;
-        b=lH7Ujwcgx0VSHr1cJeOoOeToTENgH/q4IEJfQXclXThS7SlUBOzZSpYLcjp9HJPcSB
-         3MB3nbvVT0SjqG+fMDVHAaKiCQPLZqwyJjT3q8kZ1T1vcX423ZkIhBuaU5hnBHkAyE/n
-         mkViLG12HGey0Re7zs45leTkFavxs4Z7WrAXAgOnIBVBIRbwGgb3u4XCmWsC/o7RpTQs
-         KAMzUjV5jkWH6+TDIxw/l9/LHBE5OXig1UBuuFOGjt2i8qg3nzSuy7ZvTguGC5sT4hL7
-         CATMM0gAXS/ZJWbZOEEJtDEkmeRfJ9PNgbhT8b3zS52ciijIKQApjcVeHC4e1bgStkFy
-         JdAA==
-X-Gm-Message-State: AOAM530Ucdb+FUYx74ETVYP/jBRS1hnAtW3T3mggICR5CxoZ2MrOGmPa
-        vAYoTen92tTsDZnbyQ34nsJX6i02U1yD5B2HwJROU+8zIut+Qw==
-X-Google-Smtp-Source: ABdhPJzplQZ6R5qV+zXXntRt8v1aYX7BZxu3dBR/fiQh//oFnWsT7SaTNv6Y6zw8IoqUCINleNmpIOcbnssmJ6qwsJg=
-X-Received: by 2002:a4a:8802:: with SMTP id d2mr2251248ooi.28.1623819600282;
- Tue, 15 Jun 2021 22:00:00 -0700 (PDT)
+        Wed, 16 Jun 2021 01:41:55 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33EAC061574;
+        Tue, 15 Jun 2021 22:39:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=K30aY/7ywJPJb7vqcbek9Ev9guY9TjzXRgFWmfcBIq8=; b=FHImfLr5TulOBuLXfi+rAHhs5s
+        d6Rwt1SlVP9r5t6URpiKaeiSRBgCCyn/Uvvv9wv7kFh5NjR/6fqqmAO1sQSNoBEiv9S5+vZOJVD9m
+        JjcnmOwBavLS3QgDuh9qL2XhTtm+ZwaDc3JoKoz2XMIDmLReBl3bUgQdDX8qWbQJ2Y1UDoMqTzEE+
+        vfG8q/0OaPsBHiuU5Ata0Wlrty88HEux0uIdQ69TkXUK0eNZ31L836mo1Oz3+8wcd/1OnNZriRjEZ
+        QFkNroo/mNWeWWv8eCRu+CYpxkjL3ChWy6DcQ9yG3P4367Fy36gECEvG/V8ni8IidphkCxPZuWNcj
+        BbayIPtg==;
+Received: from [2001:4bb8:19b:fdce:84d:447:81f0:ca60] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ltOH3-007e7u-Er; Wed, 16 Jun 2021 05:39:39 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
+Subject: convert the mmc driver to use blk_mq_alloc_disk
+Date:   Wed, 16 Jun 2021 07:39:32 +0200
+Message-Id: <20210616053934.880951-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-From:   Gregory Szorc <gregory.szorc@gmail.com>
-Date:   Tue, 15 Jun 2021 21:59:49 -0700
-Message-ID: <CAKQoGa=6OZnqRNDsGpyY47S4SgrFCnGRTXAMgZ61axM58AWrEA@mail.gmail.com>
-Subject: Observability of filesystem syncing and device flushing
-To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-One thing I've learned from optimizing I/O performance of userland
-applications is that a surprising number of applications are
-effectively "fsync() benchmarks." What I mean by that is many
-applications call fsync() - and similar functionality incurring a
-flush to non-volatile storage - surprisingly often and that overall
-I/O performance is effectively bottlenecked by how quickly the
-underlying storage device can process repeated flushes.
+Hi Ulf,
 
-You can easily confirm the validity of this statement by running
-sync/flush heavy software (like pretty much any database software)
-with eatmydata [1], an LD_PRELOAD library / utility that effectively
-short-circuits libc functions like fsync(), fdatasync(), and msync()
-so they no-op instead of triggering a sync/flush [via a syscall].
+can you take a look at this series which converts the mmc driver to the
+new blk_mq_alloc_disk interface.  It is based upon Jens' for-5.14/block
+or for-next trees.
 
-The kernel exposes various statistics about block devices,
-filesystems, the page cache, etc via procfs. However, as far as I can
-tell there are no direct or very limited statistics on sync/flush
-operations. I've often wanted to capture/view system/kernel-level
-activity for these sync/flush operations because they are often strong
-contributors to I/O bottlenecks and it can be extremely useful to
-correlate these operations against other metrics.
-
-I've long considered sending kernel patches to add procfs
-observability for sync/flushing activity so common system monitoring
-tools can easily consume those metrics. I'm emailing linux-block@ and
-linux-fsdevel@ to a) try to assess whether these patches would be
-well-received b) gain feedback on the appropriate activity to track
-(I'm not a kernel expert).
-
-I think a reasonable response is "you can already observe this
-activity via syscall tracing and using tools like systemtap, so no
-additional procfs counters are needed." I'd counter by saying, yes,
-you can get some valuable information this way. But I believe there
-are some large holes, such as limited visibility into block layer
-activity outside of debugfs and when kernel subsystems (such as
-background flusher threads) incur work independently of an observable
-syscall.
-
-Do others feel there is an observability gap in the kernel around
-filesystem syncing and storage flushing? If so, how would you
-recommend improving matters?
-
-Gregory
-
-[1] https://www.flamingspork.com/projects/libeatmydata/
+Diffstat:
+ block.c |   28 ++++------------------------
+ queue.c |   23 ++++++++++-------------
+ queue.h |    2 +-
+ 3 files changed, 15 insertions(+), 38 deletions(-)
