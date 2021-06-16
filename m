@@ -2,96 +2,256 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9ED3C48BDF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 21:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC63C48BDF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 00:40:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9013661246
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jun 2021 21:57:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16B46613CD
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jun 2021 00:40:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231444AbhFOV7n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jun 2021 17:59:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231420AbhFOV7m (ORCPT
+        id S231821AbhFPAml (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jun 2021 20:42:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38923 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231791AbhFPAmk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jun 2021 17:59:42 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA5DEC06175F
-        for <linux-block@vger.kernel.org>; Tue, 15 Jun 2021 14:57:37 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id w127so149753oig.12
-        for <linux-block@vger.kernel.org>; Tue, 15 Jun 2021 14:57:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=RJ68jEOpuKbwPmRBXZsD218+2YyKdOc58eK+Zob4jtE=;
-        b=sSrAx1gK+umcERhNw6FVQB9nmF/D8HEu1PmrO3+WQxDAJYyoyAXkU6ZooNYw/wVtc7
-         uS+fKIl1FRSBCLWIVHHbRxhqEz4sUMxPy8K/pVtJ4afuWWadqN5QztOKSjmybrH9YOYc
-         G1dsbyRXE5dQn4Ta9MXBZG/l2GJU2Y2uCwjL4dxYvPrfdukXdcregfkKG3QP39jEXQvb
-         aVPeRSfPCiK4cZRXAmyPY/pAf8PbitTnd4Av8C3h0I41qWWj3HhJB/x69USYyT2ZHxpp
-         /nGzc+dqMfcLP5XgOGJwXG9QrsaArQlfIID0EHQy41atFc6WTzzGsoYPcKruS9lBJm45
-         HN1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RJ68jEOpuKbwPmRBXZsD218+2YyKdOc58eK+Zob4jtE=;
-        b=H2GExxcXOMsfb270bq0O9o736a1M+02lGBVPjxKLUC6/aTZUIQp7TpyjxocS2BrNyL
-         hUSr/oigD0vTrFyPUoZEvg9lvBwfu/6rvFO32aoqtd4BGiP3APsiUu+Nt/ryN5WiuB7k
-         pSRYYYDEZOCC5CXLk6e4wgokOoZx2FThijNsZxeZs1Nx2Y195a+wRtFzfn8Lwp6cPX0S
-         twY142La7imyCByyCz2WH56Db0cwtP0eFerxCuiHbTIF4jY/AiAXiZzxnJfgmaJ8Y/Ti
-         7Hfdy+Pcu4EsmM6GiWTemZNsg/0g5eRJ6HIAHI4q1K8dEoSuHpJ6IZ1SNrTabLmjG149
-         wLcQ==
-X-Gm-Message-State: AOAM5315Erscy6umjxnInzYO1flZ9Jg54xudbiXQV3mpU7fZmfxSfeh9
-        jeOu8q3GjCp7+SVjKuUwuKQjkp1crDEEBw==
-X-Google-Smtp-Source: ABdhPJy7jg90sjXl0YaBshGHsHTC0xz41iTkdqrbBIZMvbZbbeZv3mWWwBHd1KOj23u1LBLFaDK3dA==
-X-Received: by 2002:aca:618a:: with SMTP id v132mr4670614oib.144.1623794256966;
-        Tue, 15 Jun 2021 14:57:36 -0700 (PDT)
-Received: from [192.168.1.134] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id d20sm53842otq.62.2021.06.15.14.57.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jun 2021 14:57:36 -0700 (PDT)
-Subject: Re: cleanup ubd gendisk registration
-To:     Christoph Hellwig <hch@lst.de>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Cc:     linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20210614060759.3965724-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <920a6605-f920-ef10-55a0-733219abee6b@kernel.dk>
-Date:   Tue, 15 Jun 2021 15:57:35 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 15 Jun 2021 20:42:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623804034;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=327NKSVoyLXkfvSgIC6wSAcEEzB6rOENlygol386mU8=;
+        b=H1AXN8Na7VFbz6T/oxHoThve5uNLxrQbvKg5o8fuKIbLQ4I+cOBVDMgIH5X7ZLgH3mlJQV
+        tIvOlTglEf6KyKwDob54SMuHcipS6myh7lsWOsgYL+rgcbP8KR666dh7pXkAqqsHv/HLit
+        eYDTqTm1HEFRvkgBhW2XTkERIQtqt80=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-8DNMEgDgOeeiz8UMqMeYGQ-1; Tue, 15 Jun 2021 20:40:30 -0400
+X-MC-Unique: 8DNMEgDgOeeiz8UMqMeYGQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF3F71084F41;
+        Wed, 16 Jun 2021 00:40:28 +0000 (UTC)
+Received: from T590 (ovpn-12-78.pek2.redhat.com [10.72.12.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AAA76620DE;
+        Wed, 16 Jun 2021 00:40:18 +0000 (UTC)
+Date:   Wed, 16 Jun 2021 08:40:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        Keith Busch <keith.busch@intel.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Subject: Re: [patch v6 3/7] genirq/affinity: Add new callback for
+ (re)calculating interrupt sets
+Message-ID: <YMlIbt3EPyRJHNWf@T590>
+References: <20190216172228.512444498@linutronix.de>
+ <20210615195707.GA2909907@bjorn-Precision-5520>
 MIME-Version: 1.0
-In-Reply-To: <20210614060759.3965724-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210615195707.GA2909907@bjorn-Precision-5520>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/21 12:07 AM, Christoph Hellwig wrote:
-> Hi all,
+On Tue, Jun 15, 2021 at 02:57:07PM -0500, Bjorn Helgaas wrote:
+> On Sat, Feb 16, 2019 at 06:13:09PM +0100, Thomas Gleixner wrote:
+> > From: Ming Lei <ming.lei@redhat.com>
+> > 
+> > The interrupt affinity spreading mechanism supports to spread out
+> > affinities for one or more interrupt sets. A interrupt set contains one or
+> > more interrupts. Each set is mapped to a specific functionality of a
+> > device, e.g. general I/O queues and read I/O queus of multiqueue block
+> > devices.
+> > 
+> > The number of interrupts per set is defined by the driver. It depends on
+> > the total number of available interrupts for the device, which is
+> > determined by the PCI capabilites and the availability of underlying CPU
+> > resources, and the number of queues which the device provides and the
+> > driver wants to instantiate.
+> > 
+> > The driver passes initial configuration for the interrupt allocation via a
+> > pointer to struct irq_affinity.
+> > 
+> > Right now the allocation mechanism is complex as it requires to have a loop
+> > in the driver to determine the maximum number of interrupts which are
+> > provided by the PCI capabilities and the underlying CPU resources.  This
+> > loop would have to be replicated in every driver which wants to utilize
+> > this mechanism. That's unwanted code duplication and error prone.
+> > 
+> > In order to move this into generic facilities it is required to have a
+> > mechanism, which allows the recalculation of the interrupt sets and their
+> > size, in the core code. As the core code does not have any knowledge about the
+> > underlying device, a driver specific callback is required in struct
+> > irq_affinity, which can be invoked by the core code. The callback gets the
+> > number of available interupts as an argument, so the driver can calculate the
+> > corresponding number and size of interrupt sets.
+> > 
+> > At the moment the struct irq_affinity pointer which is handed in from the
+> > driver and passed through to several core functions is marked 'const', but for
+> > the callback to be able to modify the data in the struct it's required to
+> > remove the 'const' qualifier.
+> > 
+> > Add the optional callback to struct irq_affinity, which allows drivers to
+> > recalculate the number and size of interrupt sets and remove the 'const'
+> > qualifier.
+> > 
+> > For simple invocations, which do not supply a callback, a default callback
+> > is installed, which just sets nr_sets to 1 and transfers the number of
+> > spreadable vectors to the set_size array at index 0.
+> > 
+> > This is for now guarded by a check for nr_sets != 0 to keep the NVME driver
+> > working until it is converted to the callback mechanism.
+> > 
+> > To make sure that the driver configuration is correct under all circumstances
+> > the callback is invoked even when there are no interrupts for queues left,
+> > i.e. the pre/post requirements already exhaust the numner of available
+> > interrupts.
+> > 
+> > At the PCI layer irq_create_affinity_masks() has to be invoked even for the
+> > case where the legacy interrupt is used. That ensures that the callback is
+> > invoked and the device driver can adjust to that situation.
+> > 
+> > [ tglx: Fixed the simple case (no sets required). Moved the sanity check
+> >   	for nr_sets after the invocation of the callback so it catches
+> >   	broken drivers. Fixed the kernel doc comments for struct
+> >   	irq_affinity and de-'This patch'-ed the changelog ]
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 > 
-> this series sits on top of Jens' for-5.14/block branch and tries to
-> convert ubd to the new gendisk and request_queue registration helpers.
-> As part of that I found that the ide emulation code currently registers
-> two gendisk for a request_queue which leads to a bunch of problems we've
-> avoided in other drivers (only the mmc subsystem has a similar issue).
-> Given that the legacy IDE driver isn't practically used any more and
-> modern userspace doesn't hard code specific block drivers, so I think
-> we can just drop it.  Let me know if this is ok.
+> > @@ -1196,6 +1196,13 @@ int pci_alloc_irq_vectors_affinity(struc
+> >  	/* use legacy irq if allowed */
+> >  	if (flags & PCI_IRQ_LEGACY) {
+> >  		if (min_vecs == 1 && dev->irq) {
+> > +			/*
+> > +			 * Invoke the affinity spreading logic to ensure that
+> > +			 * the device driver can adjust queue configuration
+> > +			 * for the single interrupt case.
+> > +			 */
+> > +			if (affd)
+> > +				irq_create_affinity_masks(1, affd);
+> 
+> This looks like a leak because irq_create_affinity_masks() returns a
+> pointer to kcalloc()ed space, but we throw away the pointer.
+> 
+> Or is there something very subtle going on here, like this special
+> case doesn't allocate anything?  I do see the "Nothing to assign?"
+> case that returns NULL with no alloc, but it's not completely trivial
+> to verify that we take that case here.
 
-Applied, thanks.
+The purpose is to provide chance to call ->calc_sets() for single
+interrupt, maybe it can be improved by the following change:
 
--- 
-Jens Axboe
+diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
+index 217dc9f0231f..025c647279f5 100644
+--- a/drivers/pci/msi.c
++++ b/drivers/pci/msi.c
+@@ -1223,8 +1223,7 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+ 			 * the device driver can adjust queue configuration
+ 			 * for the single interrupt case.
+ 			 */
+-			if (affd)
+-				irq_create_affinity_masks(1, affd);
++			irq_affinity_calc_sets_legacy(affd);
+ 			pci_intx(dev, 1);
+ 			return 1;
+ 		}
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 4777850a6dc7..f21f93ce460b 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -368,6 +368,7 @@ irq_create_affinity_masks(unsigned int nvec, struct irq_affinity *affd);
+ 
+ unsigned int irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
+ 				       const struct irq_affinity *affd);
++void irq_affinity_calc_sets_legacy(struct irq_affinity *affd);
+ 
+ #else /* CONFIG_SMP */
+ 
+@@ -419,6 +420,10 @@ irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
+ 	return maxvec;
+ }
+ 
++static inline void irq_affinity_calc_sets_legacy(struct irq_affinity *affd)
++{
++}
++
+ #endif /* CONFIG_SMP */
+ 
+ /*
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index 4d89ad4fae3b..d01f7dfa5712 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -405,6 +405,30 @@ static void default_calc_sets(struct irq_affinity *affd, unsigned int affvecs)
+ 	affd->set_size[0] = affvecs;
+ }
+ 
++static void irq_affinity_calc_sets(unsigned int affvecs,
++		struct irq_affinity *affd)
++{
++	/*
++	 * Simple invocations do not provide a calc_sets() callback. Install
++	 * the generic one.
++	 */
++	if (!affd->calc_sets)
++		affd->calc_sets = default_calc_sets;
++
++	/* Recalculate the sets */
++	affd->calc_sets(affd, affvecs);
++
++	WARN_ON_ONCE(affd->nr_sets > IRQ_AFFINITY_MAX_SETS);
++}
++
++/* Provide a chance to call ->calc_sets for legacy */
++void irq_affinity_calc_sets_legacy(struct irq_affinity *affd)
++{
++	if (!affd)
++		return;
++	irq_affinity_calc_sets(0, affd);
++}
++
+ /**
+  * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
+  * @nvecs:	The total number of vectors
+@@ -429,17 +453,8 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
+ 	else
+ 		affvecs = 0;
+ 
+-	/*
+-	 * Simple invocations do not provide a calc_sets() callback. Install
+-	 * the generic one.
+-	 */
+-	if (!affd->calc_sets)
+-		affd->calc_sets = default_calc_sets;
+-
+-	/* Recalculate the sets */
+-	affd->calc_sets(affd, affvecs);
+-
+-	if (WARN_ON_ONCE(affd->nr_sets > IRQ_AFFINITY_MAX_SETS))
++	irq_affinity_calc_sets(affvecs, affd);
++	if (affd->nr_sets > IRQ_AFFINITY_MAX_SETS)
+ 		return NULL;
+ 
+ 	/* Nothing to assign? */
+
+
+Thanks, 
+Ming
 
