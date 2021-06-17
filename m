@@ -7,21 +7,21 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5972C49361
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jun 2021 07:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 974A5C48BE5
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jun 2021 07:57:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BF43613D5
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jun 2021 07:56:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79BC16101A
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jun 2021 07:57:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbhFQH6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jun 2021 03:58:33 -0400
-Received: from verein.lst.de ([213.95.11.211]:57648 "EHLO verein.lst.de"
+        id S229834AbhFQH7z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jun 2021 03:59:55 -0400
+Received: from verein.lst.de ([213.95.11.211]:57666 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230118AbhFQH6c (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jun 2021 03:58:32 -0400
+        id S229712AbhFQH7z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Jun 2021 03:59:55 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9AC7C68C4E; Thu, 17 Jun 2021 09:56:22 +0200 (CEST)
-Date:   Thu, 17 Jun 2021 09:56:22 +0200
+        id BB49668C4E; Thu, 17 Jun 2021 09:57:45 +0200 (CEST)
+Date:   Thu, 17 Jun 2021 09:57:45 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -35,24 +35,26 @@ Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Vignesh Raghavendra <vigneshr@ti.com>,
         linux-doc@vger.kernel.org, linux-mtd@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] pstore/blk: Move verify_size() macro out of
- function
-Message-ID: <20210617075622.GB899@lst.de>
-References: <20210616164043.1221861-1-keescook@chromium.org> <20210616164043.1221861-3-keescook@chromium.org>
+Subject: Re: [PATCH v3 5/5] pstore/blk: Include zone in pstore_device_info
+Message-ID: <20210617075745.GC899@lst.de>
+References: <20210616164043.1221861-1-keescook@chromium.org> <20210616164043.1221861-6-keescook@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210616164043.1221861-3-keescook@chromium.org>
+In-Reply-To: <20210616164043.1221861-6-keescook@chromium.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +#define verify_size(name, alignsize, enabled) {			\
+On Wed, Jun 16, 2021 at 09:40:43AM -0700, Kees Cook wrote:
+> Information was redundant between struct pstore_zone_info and struct
+> pstore_device_info. Use struct pstore_zone_info, with member name "zone".
+> 
+> Additionally untangle the logic for the "best effort" block device
+> instance.
 
-Our normal macro style would be to move the opening brace onto a separate
-line, just like we do for functions.
+I'd still prefer to kill off struct pstore_device_info, but this is
+already a huge improvement:
 
-With that fixed:
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
