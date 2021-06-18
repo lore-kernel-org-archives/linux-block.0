@@ -2,137 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBE7C2B9F4
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF89EC2B9F4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF31A613BD
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD352613BA
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233193AbhFRArN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jun 2021 20:47:13 -0400
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:44728 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232027AbhFRArN (ORCPT
+        id S233218AbhFRArP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jun 2021 20:47:15 -0400
+Received: from mail-pl1-f177.google.com ([209.85.214.177]:40735 "EHLO
+        mail-pl1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232027AbhFRArO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jun 2021 20:47:13 -0400
-Received: by mail-pl1-f181.google.com with SMTP id x22so2271855pll.11
-        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 17:45:04 -0700 (PDT)
+        Thu, 17 Jun 2021 20:47:14 -0400
+Received: by mail-pl1-f177.google.com with SMTP id m17so634481plx.7
+        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 17:45:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=asCXYMpTL2TPvjrAJY6dwYJXl4/rhc3YG8y2UZKPA/c=;
-        b=NxwNYBr6TiPC4JuHXC0JXkr3qzHtWeIOSPP3sOXTu+gEm7Htihs9LqFDS+vNP5Un3o
-         1atHaF7SDu+Me9apV/HGdVMgUuxQDeo7n7FkQAYVvJ4/wL2Ly2Z+MUXxF4pvLiW1ctJp
-         DrNZXXuij7I0OFtGp+GNImnhFQ7do4+LbAZPeeMqzDy5hmrumIW36nAW6fvfIQEVxzWY
-         PgdKyYweZzaNzsjbA69d6B5WRbKOKJzs5US3/mueqJ9+2WAleKsJSyh37xlUGlytyd6p
-         pu+Wnrtdc/QTv6jj8OUufITbAlDzJQBuTKkrfg+B6goaMkrYWIfKkRz7K8Pwc5ORnF4I
-         Zzmw==
-X-Gm-Message-State: AOAM533sJobMVaTz7I/e1dXdF62F7RNmCSeRf7z726xkxVFU9nTxZVrQ
-        CZS+za254xTzz0uQmwrsC/k=
-X-Google-Smtp-Source: ABdhPJyet+4gI4pnVezlwHnyiblpoOvx8t+PDFEnzgnISPFKXRz5qzpnU0F1RtRCO/oQ9VbxPhpPug==
-X-Received: by 2002:a17:90a:1d0a:: with SMTP id c10mr7371732pjd.39.1623977103427;
-        Thu, 17 Jun 2021 17:45:03 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=HFD4qg+WgnWfNvH7KLlSvTM461cF+t2pSBZn/xRUmw4=;
+        b=mFmntLtQwUx1eetViHEGHzqyvgb8tR0XEXt8kCC5OQcrcEZHeGJW7lAKBCOv7e/yy1
+         NawBK/7piWeEzmthGOjVQfhdPjS6s8QLkr4z53cNeCgMRy3glwR1v+6VwBK7iXXR+aaR
+         6QUHKpspa71f4ARrhKpuKGFuLS6sKJjlQGO/gS3gYu4TjIpsitTsaCyth6m9MbdTbmG0
+         ZXXxLrk/PEtYwNPU13Md0BdZYZCJ4LCnDwRA3UV6oLpkdLnyWjnaL7jJLf5S801lEvFO
+         mkVVwBYDLYx/hma+lo5JQ4YJNwOiSpelMY9usFr9xm4RWm01+/TidJgOEVaEoIzRzo1M
+         ZaHg==
+X-Gm-Message-State: AOAM533aXEqeOQtRHxUXPRFvoQtrVXd0+D1fXAdxdmR+OHSl59cKuuUi
+        Yg+cukB42eEUh975YpZFEjw=
+X-Google-Smtp-Source: ABdhPJxwIHvDWzFEjk2j9YOISARsCpxcrRAj+hlzqGMO7dXUhobUrnkvnJgPGOlGdCRfi6sK2+ulmA==
+X-Received: by 2002:a17:90b:3709:: with SMTP id mg9mr8111532pjb.47.1623977105140;
+        Thu, 17 Jun 2021 17:45:05 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id b10sm6215573pff.14.2021.06.17.17.45.02
+        by smtp.gmail.com with ESMTPSA id b10sm6215573pff.14.2021.06.17.17.45.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jun 2021 17:45:02 -0700 (PDT)
+        Thu, 17 Jun 2021 17:45:04 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Adam Manzanares <a.manzanares@samsung.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v3 00/16] Improve I/O priority support
-Date:   Thu, 17 Jun 2021 17:44:40 -0700
-Message-Id: <20210618004456.7280-1-bvanassche@acm.org>
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+Subject: [PATCH v3 01/16] block/Kconfig: Make the BLK_WBT and BLK_WBT_MQ entries consecutive
+Date:   Thu, 17 Jun 2021 17:44:41 -0700
+Message-Id: <20210618004456.7280-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210618004456.7280-1-bvanassche@acm.org>
+References: <20210618004456.7280-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+These entries were consecutive at the time of their introduction but are no
+longer consecutive. Make these again consecutive. Additionally, modify the
+help text since it refers to blk-mq and since the legacy block layer has
+been removed.
 
-A feature that is missing from the Linux kernel for storage devices that
-support I/O priorities is to set the I/O priority in requests involving page
-cache writeback. Since the identity of the process that triggers page cache
-writeback is not known in the writeback code, the priority set by ioprio_set()
-is ignored. However, an I/O cgroup is associated with writeback requests
-by certain filesystems. Hence this patch series that implements the following
-changes:
-* Add an rq-qos policy that makes the I/O priority configurable per I/O cgroup
-  and also that changes the I/O priority of requests to the lower of (request
-  I/O priority, cgroup I/O priority).
-* Introduce one queue per I/O priority in the mq-deadline scheduler.
-* Dispatch the highest priority requests first.
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/Kconfig | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Please consider this patch series for kernel v5.14.
-
-Thanks,
-
-Bart.
-
-Changes compared to v2:
-- For the blk-ioprio rq-qos policy, switched from numeric to textual policy
-  names.
-- Moved rq_qos_id_to_name() into debugfs code.
-- Moved the mq-deadline I/O statistics into io.stat.
-- Introduced the dd_per_prio data structure.
-- Switched from a single sort list to one sort list per I/O priority.
-- Removed the WARN_ON_ONCE(blkcg == NULL) statements.
-
-Changes compared to v1:
-- Moved the code for assigning an I/O priority into a new rq-qos policy.
-- Dropped patch "block/mq-deadline: Reduce the read expiry time for
-  non-rotational media".
-- Made sure that dd->async_depth >= 1.
-- Implemented an aging mechanism such that lower priority requests are not
-  postponed forever.
-
-Bart Van Assche (16):
-  block/Kconfig: Make the BLK_WBT and BLK_WBT_MQ entries consecutive
-  block/blk-cgroup: Swap the blk_throtl_init() and blk_iolatency_init()
-    calls
-  block/blk-rq-qos: Move a function from a header file into a C file
-  block: Introduce the ioprio rq-qos policy
-  block/mq-deadline: Add several comments
-  block/mq-deadline: Add two lockdep_assert_held() statements
-  block/mq-deadline: Remove two local variables
-  block/mq-deadline: Rename dd_init_queue() and dd_exit_queue()
-  block/mq-deadline: Improve compile-time argument checking
-  block/mq-deadline: Improve the sysfs show and store macros
-  block/mq-deadline: Reserve 25% of scheduler tags for synchronous
-    requests
-  block/mq-deadline: Micro-optimize the batching algorithm
-  block/mq-deadline: Add I/O priority support
-  block/mq-deadline: Track I/O statistics
-  block/mq-deadline: Add cgroup support
-  block/mq-deadline: Prioritize high-priority requests
-
- Documentation/admin-guide/cgroup-v2.rst |   55 ++
- block/Kconfig                           |   19 +-
- block/Kconfig.iosched                   |    6 +
- block/Makefile                          |    3 +
- block/blk-cgroup.c                      |   14 +-
- block/blk-ioprio.c                      |  262 +++++
- block/blk-ioprio.h                      |   19 +
- block/blk-mq-debugfs.c                  |   15 +
- block/blk-rq-qos.h                      |   14 +-
- block/mq-deadline-cgroup.c              |  126 +++
- block/mq-deadline-cgroup.h              |  114 +++
- block/mq-deadline-main.c                | 1173 +++++++++++++++++++++++
- block/mq-deadline.c                     |  815 ----------------
- 13 files changed, 1797 insertions(+), 838 deletions(-)
- create mode 100644 block/blk-ioprio.c
- create mode 100644 block/blk-ioprio.h
- create mode 100644 block/mq-deadline-cgroup.c
- create mode 100644 block/mq-deadline-cgroup.h
- create mode 100644 block/mq-deadline-main.c
- delete mode 100644 block/mq-deadline.c
-
+diff --git a/block/Kconfig b/block/Kconfig
+index a2297edfdde8..6685578b2a20 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -133,6 +133,13 @@ config BLK_WBT
+ 	dynamically on an algorithm loosely based on CoDel, factoring in
+ 	the realtime performance of the disk.
+ 
++config BLK_WBT_MQ
++	bool "Enable writeback throttling by default"
++	default y
++	depends on BLK_WBT
++	help
++	Enable writeback throttling by default for request-based block devices.
++
+ config BLK_CGROUP_IOLATENCY
+ 	bool "Enable support for latency based cgroup IO protection"
+ 	depends on BLK_CGROUP=y
+@@ -155,13 +162,6 @@ config BLK_CGROUP_IOCOST
+ 	distributes IO capacity between different groups based on
+ 	their share of the overall weight distribution.
+ 
+-config BLK_WBT_MQ
+-	bool "Multiqueue writeback throttling"
+-	default y
+-	depends on BLK_WBT
+-	help
+-	Enable writeback throttling by default on multiqueue devices.
+-
+ config BLK_DEBUG_FS
+ 	bool "Block layer debugging information in debugfs"
+ 	default y
