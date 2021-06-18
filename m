@@ -2,61 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1258C2B9F4
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 654C8C2B9F4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E315613B9
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A162613BA
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233301AbhFRAr1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jun 2021 20:47:27 -0400
-Received: from mail-pg1-f177.google.com ([209.85.215.177]:38854 "EHLO
-        mail-pg1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233270AbhFRAr1 (ORCPT
+        id S233189AbhFRAra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jun 2021 20:47:30 -0400
+Received: from mail-pl1-f178.google.com ([209.85.214.178]:37680 "EHLO
+        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232027AbhFRAra (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jun 2021 20:47:27 -0400
-Received: by mail-pg1-f177.google.com with SMTP id t17so6359304pga.5
-        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 17:45:18 -0700 (PDT)
+        Thu, 17 Jun 2021 20:47:30 -0400
+Received: by mail-pl1-f178.google.com with SMTP id h12so3814404plf.4
+        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 17:45:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=V9uU9/GDXAReAxWAZlxO0lics4XD9Pdny3ARKtCA2Ls=;
-        b=RgMEf/LRn0P3FLnussw90Yfwxe9kJP0KOX8nUo6QGJ8Ki1QKMQ+sX6K019wO+v/ELm
-         QiPPvTqGWZ6jplpQ3NmEFyF7/SlKp/w11nFWH5U1rJe5VufwFtk40LrlNUy8MddMW5AH
-         2EmA8ol9AhddHlUcuKkaRFb1y9PFRJRWdk/S3vxWOJS6W4lOEGcBPiFfcGfAr9HzSgyV
-         lvzcccqx9qjKEQfhiMnsiQqc/AJdou9+i+pqpUz9jaPBmJZuXPNbYOkNvEVkTim671mT
-         tmjGAxJdZjoBqAHazLwfGaS9QAG8gAiY25Ui5ypgJRAuBxJDHkzi0AB0qUvUMcCTeOW6
-         CVgg==
-X-Gm-Message-State: AOAM533hnC+TjMXYZ4+xxBOKg/0JE9QzWsyFOqzQUQ9SUGJFjSduEApy
-        1yVy/3+WJU1gpr84lhO+X+Q=
-X-Google-Smtp-Source: ABdhPJws+DMMJv/ka/7Z358BPTzzSs4WWNduh/296ce0gWbRdwVYtQGNSja5ZdtxnocC36PqQIQ23A==
-X-Received: by 2002:a62:3344:0:b029:28c:6f0f:cb90 with SMTP id z65-20020a6233440000b029028c6f0fcb90mr2531471pfz.58.1623977118345;
-        Thu, 17 Jun 2021 17:45:18 -0700 (PDT)
+        bh=HRzATgHvu/z80trVJpoEKwWbSzV2PA+TjCz+0Y9Py/w=;
+        b=JxCTKoUOc9/1FkmdpNEVaD5/kfj4VT9/geFWG46lbKVIngeRN2bO3uJf5blp8Xgxdb
+         18kkWVLbBLhZJsGgvHbNxUqu2NWe7/YcNvyfLMBFlcsXwaBpAeAxIdoNT0J8kV3fu4H/
+         eXkH0Nc/1UbBJ10N25ab/+olIMcLa2L3L++nk/5k7fVg8qZ1aiWva1kmMqHM8uUSLyHp
+         4x2SE4dJVtTjmo4ex95fTWmCZxVImYYCmU1ybkat0bGwRxpE+QDsg6kDhUUSbftdjvDQ
+         zRtsF0h2dfLyrDdgDxktbsaDK0g7tQcAIQxQodxJPST3cVMMgUJHWc4dsqW9hSYYXxsP
+         e4VQ==
+X-Gm-Message-State: AOAM530ppm/b7PxRPrDjfuPzPmWXIOkSZnEgbxl318CBTb3n3xURGgp6
+        QFyUVlvYJeXFc8aDFC5lsDs=
+X-Google-Smtp-Source: ABdhPJwyvkFYNHGYd+gIxVfh8R8lfcH34vph0aEnYBUF3Nzm/2QFYoWtWdezabZRMZ91tGlX/7cVRQ==
+X-Received: by 2002:a17:90b:108f:: with SMTP id gj15mr8469501pjb.124.1623977121731;
+        Thu, 17 Jun 2021 17:45:21 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id b10sm6215573pff.14.2021.06.17.17.45.16
+        by smtp.gmail.com with ESMTPSA id b10sm6215573pff.14.2021.06.17.17.45.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jun 2021 17:45:17 -0700 (PDT)
+        Thu, 17 Jun 2021 17:45:21 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Adam Manzanares <a.manzanares@samsung.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>,
         Damien Le Moal <damien.lemoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 09/16] block/mq-deadline: Improve compile-time argument checking
-Date:   Thu, 17 Jun 2021 17:44:49 -0700
-Message-Id: <20210618004456.7280-10-bvanassche@acm.org>
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+Subject: [PATCH v3 11/16] block/mq-deadline: Reserve 25% of scheduler tags for synchronous requests
+Date:   Thu, 17 Jun 2021 17:44:51 -0700
+Message-Id: <20210618004456.7280-12-bvanassche@acm.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210618004456.7280-1-bvanassche@acm.org>
 References: <20210618004456.7280-1-bvanassche@acm.org>
@@ -66,290 +64,145 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Modern compilers complain if an out-of-range value is passed to a function
-argument that has an enumeration type. Let the compiler detect out-of-range
-data direction arguments instead of verifying the data_dir argument at
-runtime.
+For interactive workloads it is important that synchronous requests are
+not delayed. Hence reserve 25% of scheduler tags for synchronous requests.
+This patch still allows asynchronous requests to fill the hardware queues
+since blk_mq_init_sched() makes sure that the number of scheduler requests
+is the double of the hardware queue depth. From blk_mq_init_sched():
 
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
+				   BLKDEV_MAX_RQ);
+
 Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Hannes Reinecke <hare@suse.de>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 96 +++++++++++++++++++++++----------------------
- 1 file changed, 49 insertions(+), 47 deletions(-)
+ block/mq-deadline.c | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
 diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index d823ba7cb084..69126beff77d 100644
+index f92224ff0256..44da481c3fea 100644
 --- a/block/mq-deadline.c
 +++ b/block/mq-deadline.c
-@@ -35,6 +35,13 @@ static const int writes_starved = 2;    /* max times reads can starve a write */
- static const int fifo_batch = 16;       /* # of sequential requests treated as one
- 				     by the above parameters. For throughput. */
- 
-+enum dd_data_dir {
-+	DD_READ		= READ,
-+	DD_WRITE	= WRITE,
-+};
-+
-+enum { DD_DIR_COUNT = 2 };
-+
- struct deadline_data {
- 	/*
- 	 * run time data
-@@ -43,20 +50,20 @@ struct deadline_data {
- 	/*
- 	 * requests (deadline_rq s) are present on both sort_list and fifo_list
- 	 */
--	struct rb_root sort_list[2];
--	struct list_head fifo_list[2];
-+	struct rb_root sort_list[DD_DIR_COUNT];
-+	struct list_head fifo_list[DD_DIR_COUNT];
- 
- 	/*
- 	 * next in sort order. read, write or both are NULL
- 	 */
--	struct request *next_rq[2];
-+	struct request *next_rq[DD_DIR_COUNT];
- 	unsigned int batching;		/* number of sequential requests made */
- 	unsigned int starved;		/* times reads have starved writes */
- 
- 	/*
- 	 * settings that change how the i/o scheduler behaves
- 	 */
--	int fifo_expire[2];
-+	int fifo_expire[DD_DIR_COUNT];
+@@ -67,6 +67,7 @@ struct deadline_data {
  	int fifo_batch;
  	int writes_starved;
  	int front_merges;
-@@ -97,7 +104,7 @@ deadline_add_rq_rb(struct deadline_data *dd, struct request *rq)
- static inline void
- deadline_del_rq_rb(struct deadline_data *dd, struct request *rq)
- {
--	const int data_dir = rq_data_dir(rq);
-+	const enum dd_data_dir data_dir = rq_data_dir(rq);
++	u32 async_depth;
  
- 	if (dd->next_rq[data_dir] == rq)
- 		dd->next_rq[data_dir] = deadline_latter_request(rq);
-@@ -169,10 +176,10 @@ static void dd_merged_requests(struct request_queue *q, struct request *req,
- static void
- deadline_move_request(struct deadline_data *dd, struct request *rq)
- {
--	const int data_dir = rq_data_dir(rq);
-+	const enum dd_data_dir data_dir = rq_data_dir(rq);
+ 	spinlock_t lock;
+ 	spinlock_t zone_lock;
+@@ -397,6 +398,44 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	return rq;
+ }
  
--	dd->next_rq[READ] = NULL;
--	dd->next_rq[WRITE] = NULL;
-+	dd->next_rq[DD_READ] = NULL;
-+	dd->next_rq[DD_WRITE] = NULL;
- 	dd->next_rq[data_dir] = deadline_latter_request(rq);
- 
- 	/*
-@@ -185,9 +192,10 @@ deadline_move_request(struct deadline_data *dd, struct request *rq)
-  * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
-  * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
-  */
--static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
-+static inline int deadline_check_fifo(struct deadline_data *dd,
-+				      enum dd_data_dir data_dir)
- {
--	struct request *rq = rq_entry_fifo(dd->fifo_list[ddir].next);
-+	struct request *rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
- 
- 	/*
- 	 * rq is expired!
-@@ -203,19 +211,16 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
-  * dispatch using arrival ordered lists.
-  */
- static struct request *
--deadline_fifo_request(struct deadline_data *dd, int data_dir)
-+deadline_fifo_request(struct deadline_data *dd, enum dd_data_dir data_dir)
- {
- 	struct request *rq;
- 	unsigned long flags;
- 
--	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
--		return NULL;
--
- 	if (list_empty(&dd->fifo_list[data_dir]))
- 		return NULL;
- 
- 	rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
--	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
- 		return rq;
- 
- 	/*
-@@ -223,7 +228,7 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
- 	 * an unlocked target zone.
- 	 */
- 	spin_lock_irqsave(&dd->zone_lock, flags);
--	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {
-+	list_for_each_entry(rq, &dd->fifo_list[DD_WRITE], queuelist) {
- 		if (blk_req_can_dispatch_to_zone(rq))
- 			goto out;
- 	}
-@@ -239,19 +244,16 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
-  * dispatch using sector position sorted lists.
-  */
- static struct request *
--deadline_next_request(struct deadline_data *dd, int data_dir)
-+deadline_next_request(struct deadline_data *dd, enum dd_data_dir data_dir)
- {
- 	struct request *rq;
- 	unsigned long flags;
- 
--	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
--		return NULL;
--
- 	rq = dd->next_rq[data_dir];
- 	if (!rq)
- 		return NULL;
- 
--	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
- 		return rq;
- 
- 	/*
-@@ -276,7 +278,7 @@ deadline_next_request(struct deadline_data *dd, int data_dir)
- static struct request *__dd_dispatch_request(struct deadline_data *dd)
- {
- 	struct request *rq, *next_rq;
--	int data_dir;
-+	enum dd_data_dir data_dir;
- 
- 	lockdep_assert_held(&dd->lock);
- 
-@@ -289,9 +291,9 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	rq = deadline_next_request(dd, WRITE);
-+	rq = deadline_next_request(dd, DD_WRITE);
- 	if (!rq)
--		rq = deadline_next_request(dd, READ);
-+		rq = deadline_next_request(dd, DD_READ);
- 
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -302,14 +304,14 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
- 	 * data direction (read / write)
- 	 */
- 
--	if (!list_empty(&dd->fifo_list[READ])) {
--		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
-+	if (!list_empty(&dd->fifo_list[DD_READ])) {
-+		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[DD_READ]));
- 
--		if (deadline_fifo_request(dd, WRITE) &&
-+		if (deadline_fifo_request(dd, DD_WRITE) &&
- 		    (dd->starved++ >= dd->writes_starved))
- 			goto dispatch_writes;
- 
--		data_dir = READ;
-+		data_dir = DD_READ;
- 
- 		goto dispatch_find_request;
- 	}
-@@ -318,13 +320,13 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
- 	 * there are either no reads or writes have been starved
- 	 */
- 
--	if (!list_empty(&dd->fifo_list[WRITE])) {
-+	if (!list_empty(&dd->fifo_list[DD_WRITE])) {
- dispatch_writes:
--		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[WRITE]));
-+		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[DD_WRITE]));
- 
- 		dd->starved = 0;
- 
--		data_dir = WRITE;
-+		data_dir = DD_WRITE;
- 
- 		goto dispatch_find_request;
- 	}
-@@ -399,8 +401,8 @@ static void dd_exit_sched(struct elevator_queue *e)
++/*
++ * Called by __blk_mq_alloc_request(). The shallow_depth value set by this
++ * function is used by __blk_mq_get_tag().
++ */
++static void dd_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
++{
++	struct deadline_data *dd = data->q->elevator->elevator_data;
++
++	/* Do not throttle synchronous reads. */
++	if (op_is_sync(op) && !op_is_write(op))
++		return;
++
++	/*
++	 * Throttle asynchronous requests and writes such that these requests
++	 * do not block the allocation of synchronous requests.
++	 */
++	data->shallow_depth = dd->async_depth;
++}
++
++/* Called by blk_mq_update_nr_requests(). */
++static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++	struct deadline_data *dd = q->elevator->elevator_data;
++	struct blk_mq_tags *tags = hctx->sched_tags;
++
++	dd->async_depth = max(1UL, 3 * q->nr_requests / 4);
++
++	sbitmap_queue_min_shallow_depth(tags->bitmap_tags, dd->async_depth);
++}
++
++/* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
++static int dd_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
++{
++	dd_depth_updated(hctx);
++	return 0;
++}
++
+ static void dd_exit_sched(struct elevator_queue *e)
  {
  	struct deadline_data *dd = e->elevator_data;
- 
--	BUG_ON(!list_empty(&dd->fifo_list[READ]));
--	BUG_ON(!list_empty(&dd->fifo_list[WRITE]));
-+	BUG_ON(!list_empty(&dd->fifo_list[DD_READ]));
-+	BUG_ON(!list_empty(&dd->fifo_list[DD_WRITE]));
- 
- 	kfree(dd);
+@@ -617,6 +656,7 @@ SHOW_JIFFIES(deadline_read_expire_show, dd->fifo_expire[DD_READ]);
+ SHOW_JIFFIES(deadline_write_expire_show, dd->fifo_expire[DD_WRITE]);
+ SHOW_INT(deadline_writes_starved_show, dd->writes_starved);
+ SHOW_INT(deadline_front_merges_show, dd->front_merges);
++SHOW_INT(deadline_async_depth_show, dd->front_merges);
+ SHOW_INT(deadline_fifo_batch_show, dd->fifo_batch);
+ #undef SHOW_INT
+ #undef SHOW_JIFFIES
+@@ -645,6 +685,7 @@ STORE_JIFFIES(deadline_read_expire_store, &dd->fifo_expire[DD_READ], 0, INT_MAX)
+ STORE_JIFFIES(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], 0, INT_MAX);
+ STORE_INT(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, INT_MAX);
+ STORE_INT(deadline_front_merges_store, &dd->front_merges, 0, 1);
++STORE_INT(deadline_async_depth_store, &dd->front_merges, 1, INT_MAX);
+ STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);
+ #undef STORE_FUNCTION
+ #undef STORE_INT
+@@ -658,6 +699,7 @@ static struct elv_fs_entry deadline_attrs[] = {
+ 	DD_ATTR(write_expire),
+ 	DD_ATTR(writes_starved),
+ 	DD_ATTR(front_merges),
++	DD_ATTR(async_depth),
+ 	DD_ATTR(fifo_batch),
+ 	__ATTR_NULL
+ };
+@@ -733,6 +775,15 @@ static int deadline_starved_show(void *data, struct seq_file *m)
+ 	return 0;
  }
-@@ -424,12 +426,12 @@ static int dd_init_sched(struct request_queue *q, struct elevator_type *e)
- 	}
- 	eq->elevator_data = dd;
  
--	INIT_LIST_HEAD(&dd->fifo_list[READ]);
--	INIT_LIST_HEAD(&dd->fifo_list[WRITE]);
--	dd->sort_list[READ] = RB_ROOT;
--	dd->sort_list[WRITE] = RB_ROOT;
--	dd->fifo_expire[READ] = read_expire;
--	dd->fifo_expire[WRITE] = write_expire;
-+	INIT_LIST_HEAD(&dd->fifo_list[DD_READ]);
-+	INIT_LIST_HEAD(&dd->fifo_list[DD_WRITE]);
-+	dd->sort_list[DD_READ] = RB_ROOT;
-+	dd->sort_list[DD_WRITE] = RB_ROOT;
-+	dd->fifo_expire[DD_READ] = read_expire;
-+	dd->fifo_expire[DD_WRITE] = write_expire;
- 	dd->writes_starved = writes_starved;
- 	dd->front_merges = 1;
- 	dd->fifo_batch = fifo_batch;
-@@ -497,7 +499,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
++static int dd_async_depth_show(void *data, struct seq_file *m)
++{
++	struct request_queue *q = data;
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	seq_printf(m, "%u\n", dd->async_depth);
++	return 0;
++}
++
+ static void *deadline_dispatch_start(struct seq_file *m, loff_t *pos)
+ 	__acquires(&dd->lock)
  {
- 	struct request_queue *q = hctx->queue;
- 	struct deadline_data *dd = q->elevator->elevator_data;
--	const int data_dir = rq_data_dir(rq);
-+	const enum dd_data_dir data_dir = rq_data_dir(rq);
+@@ -775,6 +826,7 @@ static const struct blk_mq_debugfs_attr deadline_queue_debugfs_attrs[] = {
+ 	DEADLINE_QUEUE_DDIR_ATTRS(write),
+ 	{"batching", 0400, deadline_batching_show},
+ 	{"starved", 0400, deadline_starved_show},
++	{"async_depth", 0400, dd_async_depth_show},
+ 	{"dispatch", 0400, .seq_ops = &deadline_dispatch_seq_ops},
+ 	{},
+ };
+@@ -783,6 +835,8 @@ static const struct blk_mq_debugfs_attr deadline_queue_debugfs_attrs[] = {
  
- 	lockdep_assert_held(&dd->lock);
+ static struct elevator_type mq_deadline = {
+ 	.ops = {
++		.depth_updated		= dd_depth_updated,
++		.limit_depth		= dd_limit_depth,
+ 		.insert_requests	= dd_insert_requests,
+ 		.dispatch_request	= dd_dispatch_request,
+ 		.prepare_request	= dd_prepare_request,
+@@ -796,6 +850,7 @@ static struct elevator_type mq_deadline = {
+ 		.has_work		= dd_has_work,
+ 		.init_sched		= dd_init_sched,
+ 		.exit_sched		= dd_exit_sched,
++		.init_hctx		= dd_init_hctx,
+ 	},
  
-@@ -585,7 +587,7 @@ static void dd_finish_request(struct request *rq)
- 
- 		spin_lock_irqsave(&dd->zone_lock, flags);
- 		blk_req_zone_write_unlock(rq);
--		if (!list_empty(&dd->fifo_list[WRITE]))
-+		if (!list_empty(&dd->fifo_list[DD_WRITE]))
- 			blk_mq_sched_mark_restart_hctx(rq->mq_hctx);
- 		spin_unlock_irqrestore(&dd->zone_lock, flags);
- 	}
-@@ -626,8 +628,8 @@ static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
- 		__data = jiffies_to_msecs(__data);			\
- 	return deadline_var_show(__data, (page));			\
- }
--SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[READ], 1);
--SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[WRITE], 1);
-+SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[DD_READ], 1);
-+SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[DD_WRITE], 1);
- SHOW_FUNCTION(deadline_writes_starved_show, dd->writes_starved, 0);
- SHOW_FUNCTION(deadline_front_merges_show, dd->front_merges, 0);
- SHOW_FUNCTION(deadline_fifo_batch_show, dd->fifo_batch, 0);
-@@ -649,8 +651,8 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- 		*(__PTR) = __data;					\
- 	return count;							\
- }
--STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[READ], 0, INT_MAX, 1);
--STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[WRITE], 0, INT_MAX, 1);
-+STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[DD_READ], 0, INT_MAX, 1);
-+STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], 0, INT_MAX, 1);
- STORE_FUNCTION(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, INT_MAX, 0);
- STORE_FUNCTION(deadline_front_merges_store, &dd->front_merges, 0, 1, 0);
- STORE_FUNCTION(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX, 0);
-@@ -717,8 +719,8 @@ static int deadline_##name##_next_rq_show(void *data,			\
- 		__blk_mq_debugfs_rq_show(m, rq);			\
- 	return 0;							\
- }
--DEADLINE_DEBUGFS_DDIR_ATTRS(READ, read)
--DEADLINE_DEBUGFS_DDIR_ATTRS(WRITE, write)
-+DEADLINE_DEBUGFS_DDIR_ATTRS(DD_READ, read)
-+DEADLINE_DEBUGFS_DDIR_ATTRS(DD_WRITE, write)
- #undef DEADLINE_DEBUGFS_DDIR_ATTRS
- 
- static int deadline_batching_show(void *data, struct seq_file *m)
+ #ifdef CONFIG_BLK_DEBUG_FS
