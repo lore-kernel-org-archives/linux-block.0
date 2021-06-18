@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B4BC49361
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9EDC2B9F4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2706613B9
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 969CC613BA
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 00:45:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233272AbhFRArX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jun 2021 20:47:23 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:44727 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233276AbhFRArW (ORCPT
+        id S233309AbhFRArZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jun 2021 20:47:25 -0400
+Received: from mail-pg1-f177.google.com ([209.85.215.177]:39760 "EHLO
+        mail-pg1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233276AbhFRArY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jun 2021 20:47:22 -0400
-Received: by mail-pl1-f172.google.com with SMTP id x22so2272003pll.11
-        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 17:45:13 -0700 (PDT)
+        Thu, 17 Jun 2021 20:47:24 -0400
+Received: by mail-pg1-f177.google.com with SMTP id w31so6360651pga.6
+        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 17:45:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sC//DSflrYYUUqwO5cZ8eH2Jsx8jSOvCgTNVQdA4IeM=;
-        b=fjT64s3lJHCRXZ2rPxv1tKw07LFh4aEYGB2jvill8AWjQye7bbmzAcseFiyLNMoeUv
-         9uYQiOPpTk4nbCxp2eGLbyHcGD8maKqPYpieOGt9rioWn2E9HKVaOF0N8o10pIjCrbfo
-         odZvYbgA70sq0anuw4UwfNFisQMff58dl56a3YWKoALUdBNQT0nXxg6YaRENj+8q3lQj
-         o69df+PgWP4u8vXHQBQnJI5HDRHrT6ItE1tkEeCrcgBnaX+qYIUAyosQG/en6LzZsWaJ
-         u/P9LEe/LjEOKytOkIow+xSepgDspAkqPXgR7dFPzX+SWM6p60C1CyL6x6Z3tGdlKi+5
-         9qIQ==
-X-Gm-Message-State: AOAM533PdG9+foLdtMCzhvL0yEo9+0sjbQs1g/Pyzjkz7F3mknle/KKq
-        J7pQY0+InJv/k5HFRnJZf87rU+hTHhI=
-X-Google-Smtp-Source: ABdhPJxIfR4zLfuGvcn3+vPGiN/lyl1iOzU1EJPhoxXMVclbz1dM/gqtt395sdMh4esZsbxZKAdKBQ==
-X-Received: by 2002:a17:902:bb90:b029:11a:cf7c:997c with SMTP id m16-20020a170902bb90b029011acf7c997cmr2306440pls.80.1623977113306;
-        Thu, 17 Jun 2021 17:45:13 -0700 (PDT)
+        bh=8rkBqJ3UYA2WzpE+Shn97+2YWtxkFcR7b/FvEGWfprc=;
+        b=pUwAKk1RwwFciW5jmyZuXQBVil7JRzWh3x7HqxlW1COD9/L2UMtVJ2ZQsgGQ5kWEDS
+         RlLPzpTurbY5Ckmk3tT0aGccLR6BrIAeRyV8j2KDFnazQRu9FKlF8aO5K7p6pY+86ZDk
+         L9S8+M3Ird2oVTnX87mg3dyhwkmngpphs4sURxb5qiwTCViNYrpUiRlAor+v3mP7Vfid
+         hXiHefeID6ngCPkCBpErQSFoZEhQqD+9snKcHjcW01ThJBM9oyUae0SqH+CPDCKUvfxb
+         yjN708FGut+TUp3wtk7DQ2jLaHKg2yvcQ/H8uLkFE6xOzWWbaRKYukIldopLEstBKRdX
+         /aBw==
+X-Gm-Message-State: AOAM532IDAZNu3nUlg4tE6w30GaiXUHBT/CVyWfhx98sP4Ue9o3MNsHi
+        i3SND6v/eeweAXeO/POh8LA=
+X-Google-Smtp-Source: ABdhPJzrF1plvbkaAAoCRq/B7RcJeUF/4HL0efXvOJZyGlKlrPcSkKKjkA/F9pcxg7Gxj+lHuPaYIQ==
+X-Received: by 2002:a62:76ce:0:b029:2fe:f4fc:b2db with SMTP id r197-20020a6276ce0000b02902fef4fcb2dbmr2401992pfc.12.1623977115027;
+        Thu, 17 Jun 2021 17:45:15 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id b10sm6215573pff.14.2021.06.17.17.45.11
+        by smtp.gmail.com with ESMTPSA id b10sm6215573pff.14.2021.06.17.17.45.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jun 2021 17:45:12 -0700 (PDT)
+        Thu, 17 Jun 2021 17:45:14 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -54,9 +54,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 06/16] block/mq-deadline: Add two lockdep_assert_held() statements
-Date:   Thu, 17 Jun 2021 17:44:46 -0700
-Message-Id: <20210618004456.7280-7-bvanassche@acm.org>
+Subject: [PATCH v3 07/16] block/mq-deadline: Remove two local variables
+Date:   Thu, 17 Jun 2021 17:44:47 -0700
+Message-Id: <20210618004456.7280-8-bvanassche@acm.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210618004456.7280-1-bvanassche@acm.org>
 References: <20210618004456.7280-1-bvanassche@acm.org>
@@ -66,8 +66,8 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Document the locking strategy by adding two lockdep_assert_held()
-statements.
+Make __dd_dispatch_request() easier to read by removing two local
+variables.
 
 Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
@@ -79,28 +79,46 @@ Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ block/mq-deadline.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 31418e9ce9e2..191ff5ce629c 100644
+index 191ff5ce629c..caa438f62a4d 100644
 --- a/block/mq-deadline.c
 +++ b/block/mq-deadline.c
-@@ -279,6 +279,8 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
- 	bool reads, writes;
+@@ -276,7 +276,6 @@ deadline_next_request(struct deadline_data *dd, int data_dir)
+ static struct request *__dd_dispatch_request(struct deadline_data *dd)
+ {
+ 	struct request *rq, *next_rq;
+-	bool reads, writes;
  	int data_dir;
  
-+	lockdep_assert_held(&dd->lock);
-+
- 	if (!list_empty(&dd->dispatch)) {
- 		rq = list_first_entry(&dd->dispatch, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
-@@ -501,6 +503,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int data_dir = rq_data_dir(rq);
+ 	lockdep_assert_held(&dd->lock);
+@@ -287,9 +286,6 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
+ 		goto done;
+ 	}
  
-+	lockdep_assert_held(&dd->lock);
-+
+-	reads = !list_empty(&dd->fifo_list[READ]);
+-	writes = !list_empty(&dd->fifo_list[WRITE]);
+-
  	/*
- 	 * This may be a requeue of a write request that has locked its
- 	 * target zone. If it is the case, this releases the zone lock.
+ 	 * batches are currently reads XOR writes
+ 	 */
+@@ -306,7 +302,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
+ 	 * data direction (read / write)
+ 	 */
+ 
+-	if (reads) {
++	if (!list_empty(&dd->fifo_list[READ])) {
+ 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
+ 
+ 		if (deadline_fifo_request(dd, WRITE) &&
+@@ -322,7 +318,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
+ 	 * there are either no reads or writes have been starved
+ 	 */
+ 
+-	if (writes) {
++	if (!list_empty(&dd->fifo_list[WRITE])) {
+ dispatch_writes:
+ 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[WRITE]));
+ 
