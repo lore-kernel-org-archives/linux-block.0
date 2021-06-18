@@ -2,132 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30868C48BE5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 03:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED7FC2B9F4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 03:17:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10977610A5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 03:02:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DD08613C1
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 03:17:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231852AbhFRDEI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jun 2021 23:04:08 -0400
-Received: from mga03.intel.com ([134.134.136.65]:25793 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231815AbhFRDEH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jun 2021 23:04:07 -0400
-IronPort-SDR: wde48Q8onOCWWWLuTHKh4oHb8HudVZw8WRmTCP3Oz5kFXFaK3W/IYnv/8PCSiQLY9pioGwoFmf
- c9IqvW1D4Y+A==
-X-IronPort-AV: E=McAfee;i="6200,9189,10018"; a="206524997"
-X-IronPort-AV: E=Sophos;i="5.83,281,1616482800"; 
-   d="scan'208";a="206524997"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2021 20:01:58 -0700
-IronPort-SDR: kDCIXbw7lwEjZFI+nFNOMy4qgHpPd6rsmqYlpb0ps01Z+DdBhWSAQ5G+mGTpSRcepgH2/cP20z
- fFfj3eWUWROQ==
-X-IronPort-AV: E=Sophos;i="5.83,281,1616482800"; 
-   d="scan'208";a="451243562"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2021 20:01:58 -0700
-Date:   Thu, 17 Jun 2021 20:01:57 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        dm-devel@redhat.com, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
-        linux-arch@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 01/18] mm: add a kunmap_local_dirty helper
-Message-ID: <20210618030157.GA1905674@iweiny-DESK2.sc.intel.com>
-References: <20210615132456.753241-1-hch@lst.de>
- <20210615132456.753241-2-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210615132456.753241-2-hch@lst.de>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+        id S231597AbhFRDTg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jun 2021 23:19:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36330 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231441AbhFRDTf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Jun 2021 23:19:35 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59359C061574
+        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 20:17:26 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id q192so40415pfc.7
+        for <linux-block@vger.kernel.org>; Thu, 17 Jun 2021 20:17:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=LfrcfBW7K9YITWSAX2QC2omGCKcwovHUpaDZ/95iQok=;
+        b=tF1inVfg0zkCBqzMiSnS9pGK7ooduFORNOYr1hUM7EusnfEkFZP9XEW6VGXgJ1vDHE
+         APMPnHC3TS5IhJ96UNY7wjwRgoYFYqlaaTHV4jsteX7yCRji9kVPBhq8EnIfn9WkVnA8
+         t98lYnnXUnnYf/UQuHVk9GHW+dJDT+zvJDzZPb8dDOXMB2eDiSaqpX2M+RaBi9e5tFFA
+         BVPszkJBDmXjuDFaP+koUlcUziij7+dTD4Su4V1gn/5A7Y/K2xlKPpmtmdo6uIEMG+tx
+         UznkXFEyKCKFstHRgKpkZJDIiyCBrylQauYAXIYIVc1KtqqyC+xGAqx5jMdoWFrqiUp6
+         iSyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=LfrcfBW7K9YITWSAX2QC2omGCKcwovHUpaDZ/95iQok=;
+        b=aFIRRpe3EPjRo9NPVsF+W7uhI1KQWu5zU/xmjcSH8ALCIfRRukvQYESsU12mOSZhmY
+         sFeUC0u1Oqq06tTQip50IozCyBxHJL8OrThCKNERun90aE8smtV4MIQBc6LIxpWifC1x
+         PtoP/UwDEttqB3/3yPlf75i0vZ6hYV+SuuIT5A1D/zs9Qb66Z0QJBB3wWCAqg7SgWCi1
+         vjnb/t2BoR/rnsvJLBt5stQN5jjcU+JrNNQZWvlI7soISe/GRO3N15W+WrfxJWN3Bnly
+         WTbeAgheN0PzkyDfjtDchmlJ0qFopZol6XrF2jHiue8uXZxDhdY2XfPm0Cq8oaseNOnR
+         wljw==
+X-Gm-Message-State: AOAM533D63AegBvgiKXUXX2eWmuKNIiwpgfIKqwQeWpcYTnoYIZjbQyC
+        G14XAjXDqFRrZ4s3C+534iE=
+X-Google-Smtp-Source: ABdhPJwbSLzdwDA8/9IfEbfcfJcao4Q0zAJlRynb7PiPd7O6H5ZsNhHEx15dJHdMxid9q6GtC4GpqA==
+X-Received: by 2002:a63:d40d:: with SMTP id a13mr7963555pgh.382.1623986245775;
+        Thu, 17 Jun 2021 20:17:25 -0700 (PDT)
+Received: from localhost ([209.9.72.214])
+        by smtp.gmail.com with ESMTPSA id u27sm1013320pfg.60.2021.06.17.20.17.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 17 Jun 2021 20:17:25 -0700 (PDT)
+From:   lijiazi <jqqlijiazi@gmail.com>
+X-Google-Original-From: lijiazi <lijiazi@xiaomi.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     lijiazi <lijiazi@xiaomi.com>
+Subject: [PATCH] block: remove useless comments
+Date:   Fri, 18 Jun 2021 11:17:20 +0800
+Message-Id: <1623986240-13878-1-git-send-email-lijiazi@xiaomi.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 15, 2021 at 03:24:39PM +0200, Christoph Hellwig wrote:
-> Add a helper that calls flush_kernel_dcache_page before unmapping the
-> local mapping.  flush_kernel_dcache_page is required for all pages
-> potentially mapped into userspace that were written to using kmap*,
-> so having a helper that does the right thing can be very convenient.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  include/linux/highmem-internal.h | 7 +++++++
->  include/linux/highmem.h          | 4 ++++
->  2 files changed, 11 insertions(+)
-> 
-> diff --git a/include/linux/highmem-internal.h b/include/linux/highmem-internal.h
-> index 7902c7d8b55f..bd37706db147 100644
-> --- a/include/linux/highmem-internal.h
-> +++ b/include/linux/highmem-internal.h
-> @@ -224,4 +224,11 @@ do {								\
->  	__kunmap_local(__addr);					\
->  } while (0)
->  
-> +#define kunmap_local_dirty(__page, __addr)			\
+Now wbt_wait return void, so remove useless comments.
 
-I think having to store the page and addr to return to kunmap_local_dirty() is
-going to be a pain in some code paths.  Not a show stopper but see below...
+Signed-off-by: lijiazi <lijiazi@xiaomi.com>
+---
+ block/blk-wbt.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-> +do {								\
-> +	if (!PageSlab(__page))					\
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 42aed01..b363b05 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -563,7 +563,6 @@ static void wbt_cleanup(struct rq_qos *rqos, struct bio *bio)
+ }
+ 
+ /*
+- * Returns true if the IO request should be accounted, false if not.
+  * May sleep, if we have exceeded the writeback limits. Caller can pass
+  * in an irq held spinlock, if it holds one when calling this function.
+  * If we do sleep, we'll release and re-grab it.
+-- 
+2.7.4
 
-Was there some clarification why the page can't be a Slab page?  Or is this
-just an optimization?
-
-> +		flush_kernel_dcache_page(__page);		\
-
-Is this required on 32bit systems?  Why is kunmap_flush_on_unmap() not
-sufficient on 64bit systems?  The normal kunmap_local() path does that.
-
-I'm sorry but I did not see a conclusion to my query on V1. Herbert implied the
-he just copied from the crypto code.[1]  I'm concerned that this _dirty() call
-is just going to confuse the users of kmap even more.  So why can't we get to
-the bottom of why flush_kernel_dcache_page() needs so much logic around it
-before complicating the general kernel users.
-
-I would like to see it go away if possible.
-
-Ira
-
-[1] https://lore.kernel.org/lkml/20210615050258.GA5208@gondor.apana.org.au/
-
-> +	kunmap_local(__addr);					\
-> +} while (0)
-> +
->  #endif
-> diff --git a/include/linux/highmem.h b/include/linux/highmem.h
-> index 832b49b50c7b..65f548db4f2d 100644
-> --- a/include/linux/highmem.h
-> +++ b/include/linux/highmem.h
-> @@ -93,6 +93,10 @@ static inline void kmap_flush_unused(void);
->   * On HIGHMEM enabled systems mapping a highmem page has the side effect of
->   * disabling migration in order to keep the virtual address stable across
->   * preemption. No caller of kmap_local_page() can rely on this side effect.
-> + *
-> + * If data is written to the returned kernel mapping, the callers needs to
-> + * unmap the mapping using kunmap_local_dirty(), else kunmap_local() should
-> + * be used.
->   */
->  static inline void *kmap_local_page(struct page *page);
->  
-> -- 
-> 2.30.2
-> 
