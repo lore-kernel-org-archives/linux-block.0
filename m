@@ -2,147 +2,369 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C822C48BE8
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 12:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D2FC48BDF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 13:30:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A5C8613EB
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 12:49:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C5E9613F3
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 13:30:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbhFRMvq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 08:51:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26531 "EHLO
+        id S232279AbhFRNcU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 09:32:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47117 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232246AbhFRMvp (ORCPT
+        by vger.kernel.org with ESMTP id S233003AbhFRNcU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 08:51:45 -0400
+        Fri, 18 Jun 2021 09:32:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624020576;
+        s=mimecast20190719; t=1624023010;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=h2lhGelTx8fldEun8KVVAS492ZUTRo8BC5S9GXfxSI4=;
-        b=XzG/uuF6T7QhUYRHJDTreQTyuEXXGv79i6v1WQMsL8YM2bAh55xLCyrg3OmHosAziNzxYs
-        Ajg3yBc1lA/PoG4/XvAu46fM2WN6jBx4gxIpNV9PPp7tq3ozfpLPL3uyW2S1LhGhsdex85
-        22n2W2/yJz82iXlYJek49x+7L7oE9OA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-lTs_FelUNtSIaKZgDDS5xg-1; Fri, 18 Jun 2021 08:49:35 -0400
-X-MC-Unique: lTs_FelUNtSIaKZgDDS5xg-1
-Received: by mail-ed1-f72.google.com with SMTP id q7-20020aa7cc070000b029038f59dab1c5so3507336edt.23
-        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 05:49:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=h2lhGelTx8fldEun8KVVAS492ZUTRo8BC5S9GXfxSI4=;
-        b=NbAjqjS7D2LLKaJQcel8+gO5o+gRSi5YvTerll5N8HitEvuXUzudkdvm9AXcS0k5pt
-         V+Ww9fmYQnvbfmBxbNP+vrKx6nK7raA7XFpDQcNSoD4mUtcImkpVES/FMmheKgphvVFB
-         vzBW2vguHSVif3ZaOK1S0ebtAszGRutTJIU6ODceN0S6Gka/Ip8Yz/nExUmNYutnLRJ9
-         OPIGRMluRbk/+Kx28qiOkA/RaQvIWc8PEmdp9YONisd170G2opDB3FkCLkiZBtbg4lrT
-         /CmZc4GDsOB2SCWwffV9WiIJZ3kWFKyN6sOQ5FmxmipdXu8dNXW+ZZJO3xThagS89upt
-         L/hA==
-X-Gm-Message-State: AOAM533GyPncw/TNlNrx6POSfSsUWTHBH/5GdbllDM84RtZb23KviFap
-        2zI9ElfQVUywQfOtuHhA61iCIod2h3j1lpTVEkokXgsWD43FIRd5/CPceLU5MJGFj9lTnfU8+1E
-        Nm/z5227Otl/+eWuQX4InJOo4xBuOjQVJ1rLWvTQ=
-X-Received: by 2002:a17:906:b0cb:: with SMTP id bk11mr11041364ejb.310.1624020573712;
-        Fri, 18 Jun 2021 05:49:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwF+fY2A/R4fMbZsSc/YT7Y0FTBmRZ+DuUDFSDQzLe0/Y9+PHPEU9wK2Zrgt48OFlg+PySi9f019lvxVmZzJ/A=
-X-Received: by 2002:a17:906:b0cb:: with SMTP id bk11mr11041346ejb.310.1624020573544;
- Fri, 18 Jun 2021 05:49:33 -0700 (PDT)
+        bh=40rol9KE/7vINeQN+ZOCiwENyqP3rl6xDDoVN+iv4YI=;
+        b=HQr0Q4njJDqVFMWu5TX2qTcuaZdrHeo5MKjddAMBmbfMTtqug0WNrchd7JIpDoCbg9WZig
+        hkfT6GCLQYbaHafiIbXRkTqDTxpCZvERMlsFAeoGHwu/MeDEvdlF1xtYCwWUXabAGJ8TXQ
+        zg7P7rfTdGJ0R4WuGWbvYMdiU8SC+ck=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-WCbHsvMeMUSZDbAysQ5uSQ-1; Fri, 18 Jun 2021 09:30:07 -0400
+X-MC-Unique: WCbHsvMeMUSZDbAysQ5uSQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6AAC802E62;
+        Fri, 18 Jun 2021 13:30:05 +0000 (UTC)
+Received: from T590 (ovpn-12-158.pek2.redhat.com [10.72.12.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DE04160CC9;
+        Fri, 18 Jun 2021 13:29:51 +0000 (UTC)
+Date:   Fri, 18 Jun 2021 21:29:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [dm-devel] [RFC PATCH V2 3/3] dm: support bio polling
+Message-ID: <YMyfy49I22KIlNOJ@T590>
+References: <20210617103549.930311-1-ming.lei@redhat.com>
+ <20210617103549.930311-4-ming.lei@redhat.com>
+ <5ba43dac-b960-7c85-3a89-fdae2d1e2f51@linux.alibaba.com>
 MIME-Version: 1.0
-References: <85F98DA6-FB28-4C1F-A47D-C410A7C22A3D@gmail.com>
- <YL4Z/QJCKc0NCV5L@T590> <C866C380-7A71-4722-957F-2CE65BDACF26@gmail.com>
- <YMAOO3XjOUl2IG+4@T590> <1C6DB607-B7BE-4257-8384-427BB490C9C0@gmail.com>
- <CALTww28L7afRdVdBf-KsyF6Hvf-8-CORSCpZJAvnVbDRo6chDQ@mail.gmail.com>
- <ED5B1993-9D44-4B9C-A7DF-72BD2375A216@gmail.com> <13C1B2E3-B177-4B05-9FF3-AEE57E964605@gmail.com>
-In-Reply-To: <13C1B2E3-B177-4B05-9FF3-AEE57E964605@gmail.com>
-From:   Xiao Ni <xni@redhat.com>
-Date:   Fri, 18 Jun 2021 20:49:21 +0800
-Message-ID: <CALTww29rcAwSfbpsBzM_pnVSuVTYyt-YJryeUaNkHetCjXktCg@mail.gmail.com>
-Subject: Re: [Bug Report] Discard bios cannot be correctly merged in blk-mq
-To:     Wang Shanker <shankerwangmiao@gmail.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ba43dac-b960-7c85-3a89-fdae2d1e2f51@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Miao
+Hello Jeffle,
 
-So you plan to fix this problem now? The plan is to submit the discard
-bio directly to disk similar with raid0/raid10.
-As we talked, it needs to consider the discard region. It should be
-larger than chunk_sectors * nr_data_disks. It needs
-to split the bio when its size not aligned with chunk_sectors *
-nr_data_disks. And it needs to consider the start address
-of the bio too. If it's not aligned with a start address of
-chunk_sectors, it's better to split this part too.
+On Fri, Jun 18, 2021 at 04:19:10PM +0800, JeffleXu wrote:
+> 
+> 
+> On 6/17/21 6:35 PM, Ming Lei wrote:
+> > Support bio(REQ_POLLED) polling in the following approach:
+> > 
+> > 1) only support io polling on normal READ/WRITE, and other abnormal IOs
+> > still fallback on IRQ mode, so the target io is exactly inside the dm
+> > io.
+> > 
+> > 2) hold one refcnt on io->io_count after submitting this dm bio with
+> > REQ_POLLED
+> > 
+> > 3) support dm native bio splitting, any dm io instance associated with
+> > current bio will be added into one list which head is bio->bi_end_io
+> > which will be recovered before ending this bio
+> > 
+> > 4) implement .poll_bio() callback, call bio_poll() on the single target
+> > bio inside the dm io which is retrieved via bio->bi_bio_drv_data; call
+> > dec_pending() after the target io is done in .poll_bio()
+> > 
+> > 4) enable QUEUE_FLAG_POLL if all underlying queues enable QUEUE_FLAG_POLL,
+> > which is based on Jeffle's previous patch.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/md/dm-table.c |  24 +++++++++
+> >  drivers/md/dm.c       | 111 ++++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 132 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> > index ee47a332b462..b14b379442d2 100644
+> > --- a/drivers/md/dm-table.c
+> > +++ b/drivers/md/dm-table.c
+> > @@ -1491,6 +1491,12 @@ struct dm_target *dm_table_find_target(struct dm_table *t, sector_t sector)
+> >  	return &t->targets[(KEYS_PER_NODE * n) + k];
+> >  }
+> >  
+> > +static int device_not_poll_capable(struct dm_target *ti, struct dm_dev *dev,
+> > +				   sector_t start, sector_t len, void *data)
+> > +{
+> > +	return !blk_queue_poll(bdev_get_queue(dev->bdev));
+> > +}
+> > +
+> >  /*
+> >   * type->iterate_devices() should be called when the sanity check needs to
+> >   * iterate and check all underlying data devices. iterate_devices() will
+> > @@ -1541,6 +1547,11 @@ static int count_device(struct dm_target *ti, struct dm_dev *dev,
+> >  	return 0;
+> >  }
+> >  
+> > +static int dm_table_supports_poll(struct dm_table *t)
+> > +{
+> > +	return !dm_table_any_dev_attr(t, device_not_poll_capable, NULL);
+> > +}
+> > +
+> >  /*
+> >   * Check whether a table has no data devices attached using each
+> >   * target's iterate_devices method.
+> > @@ -2078,6 +2089,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> >  
+> >  	dm_update_keyslot_manager(q, t);
+> >  	blk_queue_update_readahead(q);
+> > +
+> > +	/*
+> > +	 * Check for request-based device is remained to
+> > +	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
+> > +	 * For bio-based device, only set QUEUE_FLAG_POLL when all underlying
+> > +	 * devices supporting polling.
+> > +	 */
+> > +	if (__table_type_bio_based(t->type)) {
+> > +		if (dm_table_supports_poll(t))
+> > +			blk_queue_flag_set(QUEUE_FLAG_POLL, q);
+> > +		else
+> > +			blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
+> > +	}
+> >  }
+> >  
+> >  unsigned int dm_table_get_num_targets(struct dm_table *t)
+> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > index 363f12a285ce..9745c3deacc3 100644
+> > --- a/drivers/md/dm.c
+> > +++ b/drivers/md/dm.c
+> > @@ -39,6 +39,8 @@
+> >  #define DM_COOKIE_ENV_VAR_NAME "DM_COOKIE"
+> >  #define DM_COOKIE_LENGTH 24
+> >  
+> > +#define REQ_SAVED_END_IO             REQ_DRV
+> > +
+> >  static const char *_name = DM_NAME;
+> >  
+> >  static unsigned int major = 0;
+> > @@ -97,8 +99,11 @@ struct dm_io {
+> >  	unsigned magic;
+> >  	struct mapped_device *md;
+> >  	blk_status_t status;
+> > +	bool	submit_as_polled;
+> >  	atomic_t io_count;
+> >  	struct bio *orig_bio;
+> > +	void	*saved_bio_end_io;
+> > +	struct hlist_node  node;
+> >  	unsigned long start_time;
+> >  	spinlock_t endio_lock;
+> >  	struct dm_stats_aux stats_aux;
+> > @@ -687,6 +692,8 @@ static struct dm_target_io *alloc_tio(struct clone_info *ci, struct dm_target *t
+> >  	tio->ti = ti;
+> >  	tio->target_bio_nr = target_bio_nr;
+> >  
+> > +	WARN_ON_ONCE(ci->io->submit_as_polled && !tio->inside_dm_io);
+> > +
+> >  	return tio;
+> >  }
+> >  
+> > @@ -938,8 +945,12 @@ static void dec_pending(struct dm_io *io, blk_status_t error)
+> >  		end_io_acct(io);
+> >  		free_io(md, io);
+> >  
+> > -		if (io_error == BLK_STS_DM_REQUEUE)
+> > +		if (io_error == BLK_STS_DM_REQUEUE) {
+> > +			/* not poll any more in case of requeue */
+> > +			if (bio->bi_opf & REQ_POLLED)
+> > +				bio->bi_opf &= ~REQ_POLLED;
+> >  			return;
+> > +		}
+> 
+> Actually I'm not sure why REQ_POLLED should be cleared here.
 
-I'm working on another job. So I don't have time to do this now. If
-you submit the patches, I can help to review :)
+It this is one dm native split bio(the one returned from bio_split() in 
+__split_and_process_bio()), we will never get chance to poll it after it
+is requeued.
 
-Regards
-Xiao
+> 
+> Besides, there's one corner case where bio is submitted when dm device
+> is suspended.
+> 
+> ```
+> static blk_qc_t dm_submit_bio(struct bio *bio)
+> 
+> 	/* If suspended, queue this IO for later */
+> 	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
+> 		if (bio->bi_opf & REQ_NOWAIT)
+> 			bio_wouldblock_error(bio);
+> 		else if (bio->bi_opf & REQ_RAHEAD)
+> 			bio_io_error(bio);
+> 		else
+> 			queue_io(md, bio);
+> 		goto out;
+> 	}
+> ```
+> 
+> When the dm device is suspended with DMF_BLOCK_IO_FOR_SUSPEND, the
+> submitted bio is inserted into @md->deferred list by calling queue_io().
+> Then the following bio_poll() calling will trigger the
+> 'WARN_ON_ONCE(!saved_bi_end_io)' in dm_poll_bio(), if the previously
+> submitted bio is still buffered in @md->deferred list.
 
-On Fri, Jun 18, 2021 at 2:28 PM Wang Shanker <shankerwangmiao@gmail.com> wr=
-ote:
->
-> Hi, Xiao
->
-> Any ideas on this issue?
->
-> Cheers,
->
-> Miao Wang
->
-> > 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 17:03=EF=BC=8CWang Shanker <shanker=
-wangmiao@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
-> >
-> >>
-> >> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 16:44=EF=BC=8CXiao Ni <xni@redhat.=
-com> =E5=86=99=E9=81=93=EF=BC=9A
-> >>
-> >> Hi all
-> >>
-> >> Thanks for reporting about this. I did a test in my environment.
-> >> time blkdiscard /dev/nvme5n1  (477GB)
-> >> real    0m0.398s
-> >> time blkdiscard /dev/md0
-> >> real    9m16.569s
-> >>
-> >> I'm not familiar with the block layer codes. I'll try to understand
-> >> the codes related with discard request and
-> >> try to fix this problem.
-> >>
-> >> I have a question for raid5 discard, it needs to consider more than
-> >> raid0 and raid10. For example, there is a raid5 with 3 disks.
-> >> D11 D21 P1 (stripe size is 4KB)
-> >> D12 D22 P2
-> >> D13 D23 P3
-> >> D14 D24 P4
-> >> ...  (chunk size is 512KB)
-> >> If there is a discard request on D13 and D14, and there is no discard
-> >> request on D23 D24. It can't send
-> >> discard request to D13 and D14, right? P3 =3D D23 xor D13. If we disca=
-rd
-> >> D13 and disk2 is broken, it can't
-> >> get the right data from D13 and P3. The discard request on D13 can
-> >> write 0 to the discard region, right?
-> >
-> > Yes. It can be seen at the beginning of make_discard_request(), where
-> > the requested range being discarded is aligned to ``stripe_sectors",
-> > which should be chunk_sectors * nr_data_disks.
-> >
-> > Cheers,
-> >
-> > Miao Wang
->
+Good catch, bio_poll() shouldn't call on bio which isn't submitted
+really, we can clear REQ_POLLED for avoiding the race. 
+
+> 
+> ```
+> submit_bio()
+>   dm_submit_bio
+>     queue_io
+> 
+> bio_poll
+>   dm_poll_bio
+> ```
+> 
+> 
+> >  
+> >  		if ((bio->bi_opf & REQ_PREFLUSH) && bio->bi_iter.bi_size) {
+> >  			/*
+> > @@ -1590,6 +1601,12 @@ static int __split_and_process_non_flush(struct clone_info *ci)
+> >  	if (__process_abnormal_io(ci, ti, &r))
+> >  		return r;
+> >  
+> > +	/*
+> > +	 * Only support bio polling for normal IO, and the target io is
+> > +	 * exactly inside the dm io instance
+> > +	 */
+> > +	ci->io->submit_as_polled = !!(ci->bio->bi_opf & REQ_POLLED);
+> > +
+> >  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
+> >  
+> >  	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
+> > @@ -1608,6 +1625,22 @@ static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
+> >  	ci->map = map;
+> >  	ci->io = alloc_io(md, bio);
+> >  	ci->sector = bio->bi_iter.bi_sector;
+> > +
+> > +	if (bio->bi_opf & REQ_POLLED) {
+> > +		INIT_HLIST_NODE(&ci->io->node);
+> > +
+> > +		/*
+> > +		 * Save .bi_end_io into dm_io, so that we can reuse .bi_end_io
+> > +		 * for storing dm_io list
+> > +		 */
+> > +		if (bio->bi_opf & REQ_SAVED_END_IO) {
+> > +			ci->io->saved_bio_end_io = NULL;
+> > +		} else {
+> > +			ci->io->saved_bio_end_io = bio->bi_end_io;
+> > +			INIT_HLIST_HEAD((struct hlist_head *)&bio->bi_end_io);
+> > +			bio->bi_opf |= REQ_SAVED_END_IO;
+> > +		}
+> > +	}
+> >  }
+> >  
+> >  #define __dm_part_stat_sub(part, field, subnd)	\
+> > @@ -1666,8 +1699,19 @@ static void __split_and_process_bio(struct mapped_device *md,
+> >  		}
+> >  	}
+> >  
+> > -	/* drop the extra reference count */
+> > -	dec_pending(ci.io, errno_to_blk_status(error));
+> > +	/*
+> > +	 * Drop the extra reference count for non-POLLED bio, and hold one
+> > +	 * reference for POLLED bio, which will be released in dm_poll_bio
+> > +	 *
+> > +	 * Add every dm_io instance into the hlist_head which is stored in
+> > +	 * bio->bi_end_io, so that dm_poll_bio can poll them all.
+> > +	 */
+> > +	if (!ci.io->submit_as_polled)
+> > +		dec_pending(ci.io, errno_to_blk_status(error));
+> > +	else
+> > +		hlist_add_head(&ci.io->node,
+> > +				(struct hlist_head *)&bio->bi_end_io);
+> > +
+> >  }
+> >  
+> >  static void dm_submit_bio(struct bio *bio)
+> > @@ -1707,6 +1751,66 @@ static void dm_submit_bio(struct bio *bio)
+> >  	dm_put_live_table(md, srcu_idx);
+> >  }
+> >  
+> > +static int dm_poll_dm_io(struct dm_io *io, unsigned int flags)
+> > +{
+> > +	if (!io || !io->submit_as_polled)
+> > +		return 0;
+> 
+> Wondering if '!io->submit_as_polled' is necessary here. dm_io will be
+> added into the hash list only when 'io->submit_as_polled' is true in
+> __split_and_process_bio.
+
+OK, we can kill the above check.
+
+> 
+> 
+> > +
+> > +	WARN_ON_ONCE(!io->tio.inside_dm_io);
+> > +	bio_poll(&io->tio.clone, flags);
+> > +
+> > +	/* bio_poll holds the last reference */
+> > +	if (atomic_read(&io->io_count) == 1)
+> > +		return 1;
+> > +	return 0;
+> > +}
+> > +
+> > +static int dm_poll_bio(struct bio *bio, unsigned int flags)
+> > +{
+> > +	struct dm_io *io;
+> > +	void *saved_bi_end_io = NULL;
+> > +	struct hlist_head tmp = HLIST_HEAD_INIT;
+> > +	struct hlist_head *head = (struct hlist_head *)&bio->bi_end_io;
+> > +	struct hlist_node *next;
+> > +
+> > +	/*
+> > +	 * This bio can be submitted from FS as POLLED so that FS may keep
+> > +	 * polling even though the flag is cleared by bio splitting or
+> > +	 * requeue, so return immediately.
+> > +	 */
+> > +	if (!(bio->bi_opf & REQ_POLLED))
+> > +		return 0;
+> > +
+> > +	hlist_move_list(head, &tmp);
+> > +
+> > +	hlist_for_each_entry(io, &tmp, node) {
+> > +		if (io->saved_bio_end_io && !saved_bi_end_io) {
+> 
+> Seems that checking if saved_bi_end_io NULL here is not necessary, since
+> you will exit thte loop once saved_bi_end_io is assigned.
+
+Yeah, indeed.
+
+> 
+> 
+> 
+> > +			saved_bi_end_io = io->saved_bio_end_io;
+> > +			break;
+> > +		}
+> > +	}
+> > +
+> > +	/* restore .bi_end_io before completing dm io */
+> > +	WARN_ON_ONCE(!saved_bi_end_io);
+> 
+> Abnormal bio flagged with REQ_POLLED (is this possible?) can still be
+> called with dm_poll_bio(), and will trigger this warning.
+
+OK, I think we need to return 0 from dm_poll_bio() immediately if
+the hlist stored in bio->bi_end_io is empty.
+
+
+Thanks, 
+Ming
 
