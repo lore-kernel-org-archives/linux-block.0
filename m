@@ -2,175 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B01C49EA3
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A59BDC48BE8
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 15:16:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 654926128C
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:58:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 899F661369
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 15:16:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234825AbhFRPAp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 11:00:45 -0400
-Received: from mailout1.w2.samsung.com ([211.189.100.11]:31043 "EHLO
-        mailout1.w2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234832AbhFRPAk (ORCPT
+        id S234866AbhFRPSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 11:18:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56184 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230399AbhFRPSq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 11:00:40 -0400
-Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
-        by mailout1.w2.samsung.com (KnoxPortal) with ESMTP id 20210618144958usoutp01dbe60fb1587904053c63b483a55f60d5~JtK2bToOM0166701667usoutp01F;
-        Fri, 18 Jun 2021 14:49:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w2.samsung.com 20210618144958usoutp01dbe60fb1587904053c63b483a55f60d5~JtK2bToOM0166701667usoutp01F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1624027798;
-        bh=iUVr5JmOMO+MwdqHyU8GkgmRUeFPf/64YB/2H+HZjfs=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=SfexU4HsrPI3fbtaApn0xP13/BAv+hAHP0YMMP5YQucisbFJEbQoZTwRXdo6YU/Iu
-         rBz765PysC8fUrqvpVlU1tRVlwJmxiIiN/dgwg/f/Z37QbnTKpJX6Oad5XedHnyqc2
-         5caV5xiwslTk5RJzsakGFG5hkWclz1n9yot+GFcs=
-Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
-        [203.254.195.111]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210618144958uscas1p18dd396f8ce5c74c2332e6f742da3abc6~JtK2P33qd2510025100uscas1p1-;
-        Fri, 18 Jun 2021 14:49:58 +0000 (GMT)
-Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
-        ussmges2new.samsung.com (USCPEMTA) with SMTP id 3E.49.53491.692BCC06; Fri,
-        18 Jun 2021 10:49:58 -0400 (EDT)
-Received: from ussmgxs2new.samsung.com (u91.gpu85.samsung.co.kr
-        [203.254.195.91]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210618144957uscas1p2b49a0cb5c20870a96842a9fab548a56e~JtK1c0dWM0843908439uscas1p2o;
-        Fri, 18 Jun 2021 14:49:57 +0000 (GMT)
-X-AuditID: cbfec36f-f09ff7000001d0f3-49-60ccb296f8f9
-Received: from SSI-EX1.ssi.samsung.com ( [105.128.2.146]) by
-        ussmgxs2new.samsung.com (USCPEXMTA) with SMTP id 9E.93.26904.492BCC06; Fri,
-        18 Jun 2021 10:49:57 -0400 (EDT)
-Received: from SSI-EX1.ssi.samsung.com (105.128.2.226) by
-        SSI-EX1.ssi.samsung.com (105.128.2.226) with Microsoft SMTP Server
-        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-        15.1.2242.4; Fri, 18 Jun 2021 07:49:56 -0700
-Received: from SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3]) by
-        SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3%7]) with mapi id
-        15.01.2242.008; Fri, 18 Jun 2021 07:49:56 -0700
-From:   Adam Manzanares <a.manzanares@samsung.com>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-CC:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Shaun Tancheff <shaun@tancheff.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 2/2] blk-zoned: allow BLKREPORTZONE without
- CAP_SYS_ADMIN
-Thread-Topic: [PATCH v3 2/2] blk-zoned: allow BLKREPORTZONE without
-        CAP_SYS_ADMIN
-Thread-Index: AQHXYRgQCVfFQ7HNWEWEcKzi48L9sqsaVZAA
-Date:   Fri, 18 Jun 2021 14:49:56 +0000
-Message-ID: <20210618144956.GB33886@bgt-140510-bm01>
-In-Reply-To: <20210614122303.154378-3-Niklas.Cassel@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [105.128.2.176]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <B5CDFD0C97F7DA4584EDD78FCE32D6C1@ssi.samsung.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 18 Jun 2021 11:18:46 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32F9C061574;
+        Fri, 18 Jun 2021 08:16:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=RgVJs2i8tjM9Pp4R41S3t73s45Mwafddh6w7ln+ElM8=; b=R2PFR6jNbhLZQlpmxq/JWMwAr/
+        6/+buuKy5tLGwbjl1+xqZ6b5Z6ZvR8fhu2Z7ZdJqlU7AvMh+P1AXqVDr46MFZvjqPoc7o0lqL5IHK
+        gL69zR2N10yHqOnnBMUfcdqqoIID5L3vUHJBBTZ72+cTTRAl2PV6a+F2jCnS7JxPydBkhq4S5dNwe
+        Cfb6I/g6AncVgs1hDvitkH7bI06nS8CuNX592/uIlTlkm+J6ZTBzY3AL3ImuabxIfasxZoeaU6yNU
+        yFcMrQ/7GT6xdlU35a/Lk9UM6Hq7hjJ8e+RL5PMHITV2nXJuN/4Zwo3Q0ceWQy2EsH8jMKE2pzKun
+        Dbt0dPBA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1luGCQ-00AOje-B9; Fri, 18 Jun 2021 15:14:38 +0000
+Date:   Fri, 18 Jun 2021 16:14:26 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Steven Rostedt <rostedt@goodmis.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        David Hildenbrand <david@redhat.com>, Greg KH <greg@kroah.com>,
+        Christoph Lameter <cl@gentwo.de>,
+        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
+        ksummit@lists.linux.dev,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>, netdev <netdev@vger.kernel.org>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+Message-ID: <YMy4UjWH565ElFtZ@casper.infradead.org>
+References: <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
+ <20210610182318.jrxe3avfhkqq7xqn@nitro.local>
+ <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
+ <20210610152633.7e4a7304@oasis.local.home>
+ <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
+ <YMyjryXiAfKgS6BY@pendragon.ideasonboard.com>
+ <cd7ffbe516255c30faab7a3ee3ee48f32e9aa797.camel@HansenPartnership.com>
+ <CAMuHMdVcNfDvpPXHSkdL3VuLXCX5m=M_AQF-P8ZajSdXt8NdQg@mail.gmail.com>
+ <20210618103214.0df292ec@oasis.local.home>
+ <CAMuHMdWK4NPzanF68TMVuihLFdRzxhs0EkbZdaA=BUkZo-k6QQ@mail.gmail.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrCKsWRmVeSWpSXmKPExsWy7djXc7rTNp1JMLi9gs3i/55jbBar7/az
-        WbS2f2OyWPBmL5vF3lvaFpd3zWGzWH78H5PFgz+P2S0mnz7BarFg4yNGBy6Pic3v2D0uny31
-        +Pj0FovH+i1XWTxu3J/C5PF5k5xH+4FupgD2KC6blNSczLLUIn27BK6M1RO3sxT85Km4O+c+
-        YwPjca4uRk4OCQETiSO/DrOC2EICKxklVuyvhrBbmSR2TdSGqTn1vYWpi5ELKL6WUeLz7SeM
-        EM5HRok3T1ZBOQcYJY7duQg2ik3AQOL38Y3MILaIgKbE51NrweLMAlOZJfa1uoDYwgJBEotm
-        TmWHqAmWePrtOSOEbSSxfN0DsDiLgKrE0T+rmEBsXqAzVrb/BpvDKWAjMeHNCbB6RgExie+n
-        1jBBzBeXuPVkPhPE2YISi2bvYYawxST+7XrIBmErStz//pIdol5HYsHuT2wQtp3Elv5GFghb
-        W2LZwtfMEHsFJU7OfMIC0SspcXDFDRaQhyUEmjklOqb2sUMkXCRO74Y4SEJAWuLv3WVMEEW7
-        GCXmzP7ICuEcZpTYdGE5VJW1xI2XXYwTGFVmIbl8FpKrZiG5ahaSq2YhuWoBI+sqRvHS4uLc
-        9NRio7zUcr3ixNzi0rx0veT83E2MwIR2+t/h/B2M12991DvEyMTBeIhRgoNZSYSXM/NMghBv
-        SmJlVWpRfnxRaU5q8SFGaQ4WJXFepoiJ8UIC6YklqdmpqQWpRTBZJg5OqQYmI7YPmnc1qiRK
-        bDeb6n35m3q4du2RC/67RCU8WZeVmxrseJz/Qy5z9qMpd5sXLu2T/PR3hYBY1q3I1WEz28wK
-        uVmzNu+8ExG6RJUtTHxW7qElE2t3z3ljX2X4NvitmDTjvppTRgemmVk1FUvNWFrbsUK9QG33
-        hyt9xotP5PZqv+11Zk8+KbF2PdOe+LCsxewrPhVVfHG1Nz4XXOHG+cDn+9xfS/27LDevWlke
-        sub6Ay/j/jucc8JyT39Srn557+COjbdOL/krx3rJ+eXB+DO85yrVX+xx/SbILrVA2IXn8qPf
-        NcvzTax5e3aecd7CG71ALLhvoY7YtrM//EIPLdqzNWfS3Jc6tp9/lHWkXlX/ocRSnJFoqMVc
-        VJwIAHXQT+3XAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMIsWRmVeSWpSXmKPExsWS2cA0SXfqpjMJBkffclv833OMzWL13X42
-        i9b2b0wWC97sZbPYe0vb4vKuOWwWy4//Y7J48Ocxu8Xk0ydYLRZsfMTowOUxsfkdu8fls6Ue
-        H5/eYvFYv+Uqi8eN+1OYPD5vkvNoP9DNFMAexWWTkpqTWZZapG+XwJWxeuJ2loKfPBV359xn
-        bGA8ztXFyMkhIWAicep7C1MXIxeHkMBqRolFDz+xQDgfGSV+fbrKDuEcYJRY/aODFaSFTcBA
-        4vfxjcwgtoiApsTnU2tZQYqYBaYySzxdsZsdJCEsECSxaOZUdoiiYIm/S5+xQNhGEsvXPQCL
-        swioShz9s4oJxOYFumNl+29WiG0HGSWOr78Dto1TwEZiwpsTjCA2o4CYxPdTa8AamAXEJW49
-        mc8E8YSAxJI955khbFGJl4//sULYihL3v79kh6jXkViw+xMbhG0nsaW/kQXC1pZYtvA1M8QR
-        ghInZz5hgeiVlDi44gbLBEaJWUjWzUIyahaSUbOQjJqFZNQCRtZVjOKlxcW56RXFRnmp5XrF
-        ibnFpXnpesn5uZsYgeng9L/D0TsYb9/6qHeIkYmD8RCjBAezkggvZ+aZBCHelMTKqtSi/Pii
-        0pzU4kOM0hwsSuK8L6MmxgsJpCeWpGanphakFsFkmTg4pRqYGCqfTSj1+qFh8uZvqKSKQ4KT
-        6PS9DH8OrC2x2rBxN88DvzWOB8K+fWK2i5UxnnXwHU/jauvI4zwVAtcnLr+nueJDgGEl8zdX
-        Nn2ZsxLSOm87r4ZPVNvldXXl+zuPLCXOfNrxZe49k6poXY656fuvLe++uXKizdSGjgteHsKZ
-        j4xXWs2e/yo8xWPuef4tW/Im3s1+dChH7FR4YLr/jvPmpfFOVnN3vWS/ZCUXHjHF+G9R1ZMk
-        hxtbHwtn709b+qvkyYr7Kf6WlodKJ02/Z/lo4W4NUYuvrzxNhb7vSSiessYs3fVT7W0b7TtX
-        K24JPmEtVmt5uGFdwap3aZvbl9Tzrtmv1/Pyw6TpPWEbJK9u3q/EUpyRaKjFXFScCADjvWr5
-        dgMAAA==
-X-CMS-MailID: 20210618144957uscas1p2b49a0cb5c20870a96842a9fab548a56e
-CMS-TYPE: 301P
-X-CMS-RootMailID: 20210614122358uscas1p1b06438713a13aef1eb31a9b0a6c359dc
-References: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
-        <CGME20210614122358uscas1p1b06438713a13aef1eb31a9b0a6c359dc@uscas1p1.samsung.com>
-        <20210614122303.154378-3-Niklas.Cassel@wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdWK4NPzanF68TMVuihLFdRzxhs0EkbZdaA=BUkZo-k6QQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 14, 2021 at 12:23:21PM +0000, Niklas Cassel wrote:
-> From: Niklas Cassel <niklas.cassel@wdc.com>
->=20
-> A user space process should not need the CAP_SYS_ADMIN capability set
-> in order to perform a BLKREPORTZONE ioctl.
->=20
-> Getting the zone report is required in order to get the write pointer.
-> Neither read() nor write() requires CAP_SYS_ADMIN, so it is reasonable
-> that a user space process that can read/write from/to the device, also
-> can get the write pointer. (Since e.g. writes have to be at the write
-> pointer.)
->=20
-> Fixes: 3ed05a987e0f ("blk-zoned: implement ioctls")
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> Cc: stable@vger.kernel.org # v4.10+
-> ---
-> Changes since v2:
-> -Drop the FMODE_READ check. Right now it is possible to open() the device=
- with
-> O_WRONLY and get the zone report from that fd. Therefore adding a FMODE_R=
-EAD
-> check on BLKREPORTZONE would break existing applications. Instead, just r=
-emove
-> the existing CAP_SYS_ADMIN check.
->=20
->  block/blk-zoned.c | 3 ---
->  1 file changed, 3 deletions(-)
->=20
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-> index 0789e6e9f7db..457eceabed2e 100644
-> --- a/block/blk-zoned.c
-> +++ b/block/blk-zoned.c
-> @@ -288,9 +288,6 @@ int blkdev_report_zones_ioctl(struct block_device *bd=
-ev, fmode_t mode,
->  	if (!blk_queue_is_zoned(q))
->  		return -ENOTTY;
-> =20
-> -	if (!capable(CAP_SYS_ADMIN))
-> -		return -EACCES;
-> -
->  	if (copy_from_user(&rep, argp, sizeof(struct blk_zone_report)))
->  		return -EFAULT;
-> =20
-> --=20
-> 2.31.1
+On Fri, Jun 18, 2021 at 04:58:08PM +0200, Geert Uytterhoeven wrote:
+> Hi Steven,
+> 
+> On Fri, Jun 18, 2021 at 4:32 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+> > On Fri, 18 Jun 2021 16:28:02 +0200
+> > Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> >
+> > > What about letting people use the personal mic they're already
+> > > carrying, i.e. a phone?
+> >
+> > Interesting idea.
+> >
+> > I wonder how well that would work in practice. Are all phones good
+> > enough to prevent echo?
+> 
+> I deliberately didn't say anything about a speaker ;-)
 
-LGTM
-
-Reviewed-by: Adam Manzanares <a.manzanares@samsung.com>=
+There's usually a speaker in the room so everyone can hear the question
+...
