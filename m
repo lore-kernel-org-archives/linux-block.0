@@ -2,98 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601F6C48BE8
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 13:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C70B3C49361
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 13:46:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45A8F613E2
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 13:45:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A223761248
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 13:46:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232944AbhFRNrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 09:47:51 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:40144 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229782AbhFRNrt (ORCPT
+        id S233705AbhFRNs7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 09:48:59 -0400
+Received: from perceval.ideasonboard.com ([213.167.242.64]:44192 "EHLO
+        perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229782AbhFRNs6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 09:47:49 -0400
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15IDgsAD030678;
-        Fri, 18 Jun 2021 13:45:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=1YJmO/I1GDlFwi4XZmigbTFuokV86Zbeko9gDrEF1/I=;
- b=Bmk1fMwj72Ots9R4lglavhaUszBYlytRRDqstKfX71U5DHlbEWkF2/fN1GEk0ioRwP3f
- Ie18W2/bmgI9QVOT3zOTXPwDfdPdFEN+UOQmeqe/5uwH59J0eWtSADl1/bVsBK0/pWwu
- LrypYCnZBwLPDnTGg7t0NLhkLT67xy6pHsRmxF5cnh3+dYE5UWD5+1SH+HiCy3XyWF63
- aq/lftbZ2yhwhxARxlZlBAaEflvkUgUuI9JHsFlgGxBcfwBU2yb2rEilRk4npf9f1VV6
- QG0QETSiPXZxuco+vUrsyZcG1738ZFBG3r6jz4PunLEMShqp5NwzsCEVkVAwxI+iK85n CQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 397mptm1xm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jun 2021 13:45:36 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 15IDfIXN086792;
-        Fri, 18 Jun 2021 13:45:35 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3020.oracle.com with ESMTP id 396waxy6va-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jun 2021 13:45:35 +0000
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 15IDjZRo107358;
-        Fri, 18 Jun 2021 13:45:35 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 396waxy6uq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jun 2021 13:45:34 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 15IDjTNe005044;
-        Fri, 18 Jun 2021 13:45:31 GMT
-Received: from mwanda (/102.222.70.252)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 18 Jun 2021 06:45:29 -0700
-Date:   Fri, 18 Jun 2021 16:45:22 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] blk-mq: fix an IS_ERR() vs NULL bug
-Message-ID: <YMyjci35WBqrtqG+@mwanda>
+        Fri, 18 Jun 2021 09:48:58 -0400
+Received: from pendragon.ideasonboard.com (62-78-145-57.bb.dnainternet.fi [62.78.145.57])
+        by perceval.ideasonboard.com (Postfix) with ESMTPSA id 5244B3F0;
+        Fri, 18 Jun 2021 15:46:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+        s=mail; t=1624024007;
+        bh=cjgy0YmI5JAdyKuANvJ+TssuRnMgzRk5Q7NIsLwYWWk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tx57mkgNHFv6d3FeiSUt8xE1/yVBTvCL4VS67xaDuQl/c1RwfsCXJ9q7o+KBjt+Nt
+         u9J0NCrM5jVwPknKzctQXqaG6fIX7PJ3XZEydx7KT6UvCQF20lCgZtH1u6I6Bvr8+Q
+         Kea3fe7mOtrkryycL+OGWkQoYi27BwgtLqbGwHAE=
+Date:   Fri, 18 Jun 2021 16:46:23 +0300
+From:   Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To:     Shuah Khan <skhan@linuxfoundation.org>
+Cc:     Steven Rostedt <rostedt@goodmis.org>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        David Hildenbrand <david@redhat.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Greg KH <greg@kroah.com>, Christoph Lameter <cl@gentwo.de>,
+        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
+        ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+Message-ID: <YMyjryXiAfKgS6BY@pendragon.ideasonboard.com>
+References: <YIx7R6tmcRRCl/az@mit.edu>
+ <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
+ <YK+esqGjKaPb+b/Q@kroah.com>
+ <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
+ <b32c8672-06ee-bf68-7963-10aeabc0596c@redhat.com>
+ <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
+ <20210610182318.jrxe3avfhkqq7xqn@nitro.local>
+ <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
+ <20210610152633.7e4a7304@oasis.local.home>
+ <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-GUID: yL8gISbLYqOgcWJJTp8Zu8tet7fAEC1U
-X-Proofpoint-ORIG-GUID: yL8gISbLYqOgcWJJTp8Zu8tet7fAEC1U
+In-Reply-To: <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The __blk_mq_alloc_disk() function doesn't return NULLs it returns
-error pointers.
+Hi Shuah,
 
-Fixes: b461dfc49eb6 ("blk-mq: add the blk_mq_alloc_disk APIs")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- include/linux/blk-mq.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Jun 10, 2021 at 01:55:23PM -0600, Shuah Khan wrote:
+> On 6/10/21 1:26 PM, Steven Rostedt wrote:
+> > On Thu, 10 Jun 2021 21:39:49 +0300 Laurent Pinchart wrote:
+> > 
+> >> There will always be more informal discussions between on-site
+> >> participants. After all, this is one of the benefits of conferences, by
+> >> being all together we can easily organize ad-hoc discussions. This is
+> >> traditionally done by finding a not too noisy corner in the conference
+> >> center, would it be useful to have more break-out rooms with A/V
+> >> equipment than usual ?
+> > 
+> > I've been giving this quite some thought too, and I've come to the
+> > understanding (and sure I can be wrong, but I don't think that I am),
+> > is that when doing a hybrid event, the remote people will always be
+> > "second class citizens" with respect to the communication that is going
+> > on. Saying that we can make it the same is not going to happen unless
+> > you start restricting what people can do that are present, and that
+> > will just destroy the conference IMO.
+> > 
+> > That said, I think we should add more to make the communication better
+> > for those that are not present. Maybe an idea is to have break outs
+> > followed by the presentation and evening events that include remote
+> > attendees to discuss with those that are there about what they might
+> > have missed. Have incentives at these break outs (free stacks and
+> > beer?) to encourage the live attendees to attend and have a discussion
+> > with the remote attendees.
+> > 
+> > The presentations would have remote access, where remote attendees can
+> > at the very least write in some chat their questions or comments. If
+> > video and connectivity is good enough, perhaps have a screen where they
+> > can show up and talk, but that may have logistical limitations.
+> > 
+> 
+> You are absolutely right that the remote people will have a hard time
+> participating and keeping up with in-person participants. I have a
+> couple of ideas on how we might be able to improve remote experience
+> without restricting in-person experience.
+> 
+> - Have one or two moderators per session to watch chat and Q&A to enable
+>    remote participants to chime in and participate.
+> - Moderators can make sure remote participation doesn't go unnoticed and
+>    enable taking turns for remote vs. people participating in person.
+> 
+> It will be change in the way we interact in all in-person sessions for
+> sure, however it might enhance the experience for remote attendees.
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 02a4aab0aeac..fd2de2b422ed 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -431,7 +431,7 @@ enum {
- 	static struct lock_class_key __key;				\
- 	struct gendisk *__disk = __blk_mq_alloc_disk(set, queuedata);	\
- 									\
--	if (__disk)							\
-+	if (!IS_ERR(__disk))						\
- 		lockdep_init_map(&__disk->lockdep_map,			\
- 			"(bio completion)", &__key, 0);			\
- 	__disk;								\
+A moderator to watch online chat and relay questions is I believe very
+good for presentations, it's hard for a presenter to keep an eye on a
+screen while having to manage the interaction with the audience in the
+room (there's the usual joke of the difference between an introvert and
+an extrovert open-source developer is that the extrovert looks at *your*
+shoes when talking to you, but in many presentations the speaker
+nowadays does a fairly good job as watching the audience, at least from
+time to time :-)).
+
+For workshop or brainstorming types of sessions, the highest barrier to
+participation for remote attendees is local attendees not speaking in
+microphones. That's the number one rule that moderators would need to
+enforce, I think all the rest depends on it. This may require a larger
+number of microphones in the room than usual.
+
 -- 
-2.30.2
+Regards,
 
+Laurent Pinchart
