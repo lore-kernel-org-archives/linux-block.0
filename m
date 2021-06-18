@@ -7,69 +7,66 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8059AC49361
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7640C48BDF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:52:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64C8A610A3
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:50:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC210610A3
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:52:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234741AbhFROwu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 10:52:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
+        id S234688AbhFROyT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 10:54:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234710AbhFROwq (ORCPT
+        with ESMTP id S234383AbhFROyS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 10:52:46 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32ABEC06175F
-        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 07:50:37 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id q10so10801921oij.5
-        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 07:50:37 -0700 (PDT)
+        Fri, 18 Jun 2021 10:54:18 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75482C061574
+        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 07:52:09 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id l12so10800259oig.2
+        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 07:52:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=eNgK3ZJjTQmX4QuRyoqHtpDVpH+vzH+Vz2crquaXwXs=;
-        b=LVE4lJRsmOz10qAwI3KcmhRgiY14JzpkgnDn0bQQfg/dLCsNpzBZcrRomzVYf2QqSp
-         onGnULVdpkyt1FtCl5i4T2hlGEl0XFkdyW7+pFZNfZbBrqy7WKW/LCPUH9RnEoirw9uq
-         HDFjB5R7HN+MMKmI0fquL4yKS2wgm9IBbFKDxofoDFvFpxCQ2dxfUVa/rVH7q40+O01y
-         8FeCdwRTtA6Gjl7rD2kjNOsJ1E+VDCHrUXa9sHWTLT1jFI1OHvf7I5UTSTlYOcW7f/R3
-         znVCV7lNrvWoNix74jG7BbX67huCO1+BcJhS/LniXEOr2rx6L8Cmz7hSvPsYojyk/1ZZ
-         sEvw==
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=UZImo1VhvV6PYCVtMJ1ZtOxRSuCifEI3PziMcQ58pPQ=;
+        b=k/56LsXk0/Tp2omxXKjEcdtTDXmZE2SqTmS2CiEoFE0WQN6AeIibasb3tYYMD/Ntj7
+         TopQQ9L+StaE+VOpjWBl0gBgS3cyICNm9SS2SKpqXfbQI2ufTLIYV+sTRNthArLmSW3n
+         zVP82CtFNnuqkSZBMuZROFJ/uY+GmOd3udGPhSWT/50VJ/H6ppKkKSgVFvMbWHl40GpO
+         5vg9TajS0lY8EtfJIh0W7dUNmK97rPo1vQPnDrbBV+RASKqVnLn0iMXK9aHc/mjOyg/w
+         DYyu0NFb6R10WgADj6jlibY5u0PmBN2C/p0oIiR5rWrmyzA1E/kBc4Ryii0wVRNr8FIR
+         4KWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=eNgK3ZJjTQmX4QuRyoqHtpDVpH+vzH+Vz2crquaXwXs=;
-        b=DM8BC6k4WYi5XUgIffYiQ+GM4SriOLB5EOlkesnEZyqsOtAC10KJ4lgsfMudOvxp6Q
-         E5RTCRyzjIoDFSo+1HV4PAxgSHMrMzCMxv6OgTpOcIwtrADKpo2wC8ekzrLIv86FK9t8
-         UkIJJL9iQHfcZyCoJqYS7+YMJOuWNUnPXkHZ3lbtWR1cxlqHWbakO5r+G/Y4lIS1D1jy
-         ehMLcNLOleb60QjMxsEZpoC5VMUa8I4KVzWN7gBg8fZj339KR515TSAfPy3vGZgTwcCk
-         X0f+mqMHN75Dtd/efHIWTEZXdL2gdCUEhNPO2s9m51P/sbMMeK4To08Kepg6zWIIKCSM
-         JcMA==
-X-Gm-Message-State: AOAM532/KXmWUVdvmDXDbe82vZ4ZCoDMEevNvuiEvuGC7wrBc3J2lM1E
-        ewJE8ZGN1mm4UDL7IegfGp4zdQ==
-X-Google-Smtp-Source: ABdhPJzo9R0nSd05w5OJFyK1R6y8yc8J2XvkydL6vXbIwMGewdVLCQMaao+VTvhcxvDsKnv/XBVZfw==
-X-Received: by 2002:a05:6808:2091:: with SMTP id s17mr13987014oiw.168.1624027836584;
-        Fri, 18 Jun 2021 07:50:36 -0700 (PDT)
+        bh=UZImo1VhvV6PYCVtMJ1ZtOxRSuCifEI3PziMcQ58pPQ=;
+        b=Sncc4G+nHH76fUTOL6N0HYjHztg8IpRE9oj+jROxCtrPM8Y77/f0yR4+XV/2K+hBku
+         oiTdVBpSquWLyJEZY9apSyaJ1cpjBrskWgznL6hZjkW0WHzp6ambLLl4YsfZW3LbUTye
+         BfOXgpY1OuOsZHPQoZ0G4HhHvkHlFodVyShjuS0AjwvUkn+6876g/dzvMkKsMlVBDwC0
+         So/ozI8Q5lwOANZaYsv5drZY/dXhpZ+Z8+fmeOZNsMwIo36M4k8+nJQ5es0Gx5FfpSP9
+         Jd70MIO1i5wmcYY4r2hW+z8BHM8u/VkoSMSyRRid44oArRgoMuQcGEBT36MGqPnbvWu6
+         yatw==
+X-Gm-Message-State: AOAM532jYvgWQK3rjBw7j/o/vD1FfmukvtxNIVWefrb9LGmw24cgfKoL
+        9DqNJ3BR82TWyheC9gr6/iHR8m/gU+FrSw==
+X-Google-Smtp-Source: ABdhPJxQqYg1KZpmz38b77+pe+Qqb66GVGAFALg/Pn9ijZy9NBgUK+uvLZbqPkuYAXn7T7BxdpOIYg==
+X-Received: by 2002:aca:758f:: with SMTP id q137mr7972827oic.108.1624027928714;
+        Fri, 18 Jun 2021 07:52:08 -0700 (PDT)
 Received: from [192.168.1.134] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id m66sm1829800oia.28.2021.06.18.07.50.35
+        by smtp.gmail.com with ESMTPSA id p65sm1867498oop.0.2021.06.18.07.52.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jun 2021 07:50:36 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: fix use-after-free in blk_mq_exit_sched
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org,
-        syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com,
-        John Garry <john.garry@huawei.com>
-References: <20210609063046.122843-1-ming.lei@redhat.com>
+        Fri, 18 Jun 2021 07:52:08 -0700 (PDT)
+Subject: Re: [PATCH] block: Remove unnecessary elevator operation checks
+To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
+References: <20210618015922.713999-1-damien.lemoal@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c1b819bb-0117-577b-2edc-2abffbb9a659@kernel.dk>
-Date:   Fri, 18 Jun 2021 08:50:37 -0600
+Message-ID: <d4a52d0b-cac5-06fc-ed51-a173eeb5c3ee@kernel.dk>
+Date:   Fri, 18 Jun 2021 08:52:10 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210609063046.122843-1-ming.lei@redhat.com>
+In-Reply-To: <20210618015922.713999-1-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,14 +74,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/9/21 12:30 AM, Ming Lei wrote:
-> tagset can't be used after blk_cleanup_queue() is returned because
-> freeing tagset usually follows blk_clenup_queue(). Commit d97e594c5166
-> ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap") adds
-> check on q->tag_set->flags in blk_mq_exit_sched(), and causes
-> use-after-free.
+On 6/17/21 7:59 PM, Damien Le Moal wrote:
+> The insert_requests and dispatch_request elevator operations are
+> mandatory for the correct execution of an elevator, and all implemented
+> elevators (bfq, kyber and mq-deadline) implement them. As a result,
+> there is no need to check for these operations before calling them when
+> a queue has an elevator set. This simplifies the code in
+> __blk_mq_sched_dispatch_requests() and blk_mq_sched_insert_request().
 > 
-> Fixes it by using hctx->flags.
+> To avoid out-of-tree elevators to crash the kernel in case of bad
+> implementation, add a check in elv_register() to verify that these
+> operations are implemented.
+> 
+> A small, probably not significant, IOPS improvement of 0.1% is observed
+> with this patch applied (4.117 MIOPS to 4.123 MIOPS, average of 20 fio
+> runs doing 4K random direct reads with psync and 32 jobs).
 
 Applied, thanks.
 
