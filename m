@@ -2,80 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34428C48BE5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 03:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5C6C48BE8
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 06:03:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 077F46109D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 03:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11852611CD
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 06:03:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbhFRDki (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jun 2021 23:40:38 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50748 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229819AbhFRDki (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jun 2021 23:40:38 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lu5KJ-0000aH-Fe; Fri, 18 Jun 2021 11:37:51 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lu5Jw-0004Nh-Un; Fri, 18 Jun 2021 11:37:28 +0800
-Date:   Fri, 18 Jun 2021 11:37:28 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        dm-devel@redhat.com, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
-        linux-arch@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Christoph Lameter <cl@gentwo.de>
-Subject: Re: [PATCH 01/18] mm: add a kunmap_local_dirty helper
-Message-ID: <20210618033728.GA16787@gondor.apana.org.au>
-References: <20210615132456.753241-1-hch@lst.de>
- <20210615132456.753241-2-hch@lst.de>
- <20210618030157.GA1905674@iweiny-DESK2.sc.intel.com>
+        id S232720AbhFRGFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 02:05:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26913 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232250AbhFRGFq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Jun 2021 02:05:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623996217;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QUpTivGR5cw/8vxE6wrjCgS3JrDj7wbmIf5WsbHNX6w=;
+        b=W9McfnsaVoiKP3qdygpZ4boRL09jNUs41MJzWlpF1g1DPsjdPOCI2isCBqur+/BCnMrXg1
+        C08vGOWQJ2eP2syUwnMYQbnqaNAMB/p62ruW4LtbByO0w1Dudtl8IEOurDRkgB7iO8Xgvo
+        xJ2K3RSqemcRyiE5eG6Lg9EM5+jZA3g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-eUWZQxBnOcSM4xDhjIyS3Q-1; Fri, 18 Jun 2021 02:03:35 -0400
+X-MC-Unique: eUWZQxBnOcSM4xDhjIyS3Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEEB78015F8;
+        Fri, 18 Jun 2021 06:03:34 +0000 (UTC)
+Received: from T590 (ovpn-12-158.pek2.redhat.com [10.72.12.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CA9919D61;
+        Fri, 18 Jun 2021 06:03:28 +0000 (UTC)
+Date:   Fri, 18 Jun 2021 14:03:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
+Subject: Re: [PATCH] blk-mq: fix use-after-free in blk_mq_exit_sched
+Message-ID: <YMw3K1UVJwC17FHa@T590>
+References: <20210609063046.122843-1-ming.lei@redhat.com>
+ <YMfTBagmPCHGkhYa@T590>
+ <2c2fd2b2-c622-15dc-58f6-c588cab4f79d@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210618030157.GA1905674@iweiny-DESK2.sc.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <2c2fd2b2-c622-15dc-58f6-c588cab4f79d@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 08:01:57PM -0700, Ira Weiny wrote:
->
-> > +		flush_kernel_dcache_page(__page);		\
-> 
-> Is this required on 32bit systems?  Why is kunmap_flush_on_unmap() not
-> sufficient on 64bit systems?  The normal kunmap_local() path does that.
-> 
-> I'm sorry but I did not see a conclusion to my query on V1. Herbert implied the
-> he just copied from the crypto code.[1]  I'm concerned that this _dirty() call
-> is just going to confuse the users of kmap even more.  So why can't we get to
-> the bottom of why flush_kernel_dcache_page() needs so much logic around it
-> before complicating the general kernel users.
-> 
-> I would like to see it go away if possible.
+On Tue, Jun 15, 2021 at 11:02:29AM +0100, John Garry wrote:
+> > > Reported-by:syzbot+77ba3d171a25c56756ea@syzkaller.appspotmail.com
+> > > Fixes: d97e594c5166 ("blk-mq: Use request queue-wide tags for tagset-wide sbitmap")
+> > > Cc: John Garry<john.garry@huawei.com>
+> > > Signed-off-by: Ming Lei<ming.lei@redhat.com>
+> Tested-by: John Garry <john.garry@huawei.com>
+> Reviewed-by: John Garry <john.garry@huawei.com>
 
-This thread may be related:
+Hello Jens,
 
-https://lwn.net/Articles/240249/
+Can you merge this patch?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+
+Thanks,
+Ming
+
