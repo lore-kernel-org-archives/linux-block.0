@@ -2,87 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F91CC49361
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 033F7C49EA3
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:58:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1335C6128C
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:53:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2A77613B4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:58:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234731AbhFRO4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 10:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51038 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234717AbhFRO4G (ORCPT
+        id S234790AbhFRPAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 11:00:31 -0400
+Received: from mail-vs1-f43.google.com ([209.85.217.43]:45715 "EHLO
+        mail-vs1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234183AbhFRPAa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 10:56:06 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FF7C061574
-        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 07:53:56 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id w22-20020a0568304116b02904060c6415c7so9969295ott.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 07:53:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Psf6QI2SrWo0/tsBczZ1Er0G4CeoGKtrHAM5WMh1C9g=;
-        b=PdDdQswDz8LSPnvVV6mFxPm38oZAjMxxl4crkKLZag84b1CK6SsYXlcqM5xrw0wQtU
-         AtCpLbvTe+VEWbQYu5ccrwsmrolOx25DZSKJgT9ahjf/rDE6dWu/bgA44XRH3AQjVVjC
-         Q+Uq/bsTyAQK1fm/tuhoE27od/thfkWytccSmM6A8mEGvPLDpchsXlKULieXLQP6EUOe
-         oWEDC3pd+igoPQoIvBG76ESZOlff7mqkQ8ZNso+jEPfxpnHaYtThjPE6YPTkUZUAjBkY
-         kDYk5Gzqzffr9l+4z1CWTA766gK2QS9/6XdGoSIW/nqhjq9W/zayEjzAsL3OV/4i4ja2
-         6mlQ==
+        Fri, 18 Jun 2021 11:00:30 -0400
+Received: by mail-vs1-f43.google.com with SMTP id k8so2653719vsg.12;
+        Fri, 18 Jun 2021 07:58:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Psf6QI2SrWo0/tsBczZ1Er0G4CeoGKtrHAM5WMh1C9g=;
-        b=cCeP5KU5fyKSrBczqWB5RK6tXoB9e+1XygS/P7LAsaOvnnD+k3kdxIeM7CJQFkGT2B
-         Fwnxi1a5M/5yF6hY8JFY1DwTsmRKAyouAuJbgrQdWJr/PxhXcMrYXesbV0gvZ2j7xBte
-         QJDZC2KkQjRSjCq94iXZeWWnKS9C09qnxX/r5A+0MZXHwlnljLatWqTxCJn1XzjUOjAl
-         rhYosC1/Cf0RxMbB2W8UqeGOua7DYGDqLSKagPo2J2MHqBSjWXzU3xwKeJpKZWXgWK0o
-         lxQSl96oG8JKdZp56g7TpXi/gPy02+oJ3Z4iVGOMockV47K9OC3BGOt1kO0ZflZO8EG0
-         azKw==
-X-Gm-Message-State: AOAM533xBOCJb7wSHzEM+10KJIN5GDK5vD+emXfobUxy4ZdliwfHcyMo
-        0W3ap0Zq6aX2BlibWSWd9IRz2Q==
-X-Google-Smtp-Source: ABdhPJy4ZGA8bhu1swqfYc1PCcEkWQYemZvYVzJM1HIG2Hu95mLGVpWuH2OrwMRd312dleg+9ZLtkg==
-X-Received: by 2002:a05:6830:1598:: with SMTP id i24mr9833953otr.52.1624028036009;
-        Fri, 18 Jun 2021 07:53:56 -0700 (PDT)
-Received: from [192.168.1.134] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id w186sm1823027oib.58.2021.06.18.07.53.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jun 2021 07:53:55 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: fix an IS_ERR() vs NULL bug
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <YMyjci35WBqrtqG+@mwanda>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2ca05d8b-58f3-d195-de5f-d3dd1fb63bcf@kernel.dk>
-Date:   Fri, 18 Jun 2021 08:53:56 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sK1e1fPt0zMaEq6+4wMfGpXVrEHblA3IAhRYoTeadpQ=;
+        b=Om495HxaqidnSHxaS6vEj4rVluKt5OUKVCzjfG69FJxQxcGxvYGk3CyeEdbK6VN7yk
+         V1rEKGWCfuBYfcGrBRRVoYtKXleP21K2FxTWinvajwsvyle2YzqN3It9toTJjUuONSeN
+         Mjr0dU13rKTvY4MUAGeHpqJv64ruEsHN8U7G8OFwgE36YggFt+NwHZCkY6RBipE77jKv
+         WxNMTTKTfc/WldKK6jpA7KVibPm3lQyIX1diBnDe/pqyLfZCZa6D/KAMHParfgvxNS1L
+         5nsJGMNklcVBlBUGGWjrQGom/MWaNbkFFSbI3iYCKDlsSEqOIwpYm/E18zRA5VSls2EU
+         oa7Q==
+X-Gm-Message-State: AOAM530+HrIKr9bAPi+6gl/oYDkt3JQ7yUfPQUG4DSH+zG6GN3XKgN4i
+        26p2JGUNxw4HMK0BUaUaL4wcaJ1obwePWh2DDKc=
+X-Google-Smtp-Source: ABdhPJzg/YZ6W6Is0ERxgmyVpS1tDEBVcgjBpDhPONT5Qk7oJfA8+VdLNRMVYyTep7yhmxjZzTnU3vP2PEwuB0o2fxE=
+X-Received: by 2002:a67:3c2:: with SMTP id 185mr7549799vsd.42.1624028299731;
+ Fri, 18 Jun 2021 07:58:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YMyjci35WBqrtqG+@mwanda>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <YIx7R6tmcRRCl/az@mit.edu> <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
+ <YK+esqGjKaPb+b/Q@kroah.com> <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
+ <b32c8672-06ee-bf68-7963-10aeabc0596c@redhat.com> <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
+ <20210610182318.jrxe3avfhkqq7xqn@nitro.local> <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
+ <20210610152633.7e4a7304@oasis.local.home> <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
+ <YMyjryXiAfKgS6BY@pendragon.ideasonboard.com> <cd7ffbe516255c30faab7a3ee3ee48f32e9aa797.camel@HansenPartnership.com>
+ <CAMuHMdVcNfDvpPXHSkdL3VuLXCX5m=M_AQF-P8ZajSdXt8NdQg@mail.gmail.com> <20210618103214.0df292ec@oasis.local.home>
+In-Reply-To: <20210618103214.0df292ec@oasis.local.home>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 18 Jun 2021 16:58:08 +0200
+Message-ID: <CAMuHMdWK4NPzanF68TMVuihLFdRzxhs0EkbZdaA=BUkZo-k6QQ@mail.gmail.com>
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        David Hildenbrand <david@redhat.com>, Greg KH <greg@kroah.com>,
+        Christoph Lameter <cl@gentwo.de>,
+        "Theodore Ts'o" <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
+        ksummit@lists.linux.dev,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>, netdev <netdev@vger.kernel.org>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/18/21 7:45 AM, Dan Carpenter wrote:
-> The __blk_mq_alloc_disk() function doesn't return NULLs it returns
-> error pointers.
+Hi Steven,
 
-Applied, thanks.
+On Fri, Jun 18, 2021 at 4:32 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+> On Fri, 18 Jun 2021 16:28:02 +0200
+> Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+>
+> > What about letting people use the personal mic they're already
+> > carrying, i.e. a phone?
+>
+> Interesting idea.
+>
+> I wonder how well that would work in practice. Are all phones good
+> enough to prevent echo?
+
+I deliberately didn't say anything about a speaker ;-)
+
+Just use the mic, with a simple (web) app only doing audio input?
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 -- 
-Jens Axboe
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
