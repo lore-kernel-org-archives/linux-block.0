@@ -8,212 +8,166 @@ X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5525BC48BE8
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 22:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B33C48BE8
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 22:09:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3322961284
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 22:06:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35332613B4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 22:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234836AbhFRWIv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 18:08:51 -0400
-Received: from mailout1.w2.samsung.com ([211.189.100.11]:58404 "EHLO
-        mailout1.w2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234791AbhFRWIu (ORCPT
+        id S234790AbhFRWL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 18:11:29 -0400
+Received: from mailout2.w2.samsung.com ([211.189.100.12]:41713 "EHLO
+        mailout2.w2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234752AbhFRWL2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 18:08:50 -0400
+        Fri, 18 Jun 2021 18:11:28 -0400
 Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
-        by mailout1.w2.samsung.com (KnoxPortal) with ESMTP id 20210618220640usoutp01cdb413752c175d0826bf79d9ab4de2dc~JzIIoK8z81011010110usoutp01L;
-        Fri, 18 Jun 2021 22:06:40 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w2.samsung.com 20210618220640usoutp01cdb413752c175d0826bf79d9ab4de2dc~JzIIoK8z81011010110usoutp01L
+        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20210618220918usoutp02381bacbb3fb807a55c4db1f8bdf7948c~JzKb2999C1581915819usoutp02a;
+        Fri, 18 Jun 2021 22:09:18 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20210618220918usoutp02381bacbb3fb807a55c4db1f8bdf7948c~JzKb2999C1581915819usoutp02a
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1624054000;
-        bh=erJ2kpwOrCJ+eiP3ZdrRVJDJz0BvbY4Q5u2wF5eXyUw=;
+        s=mail20170921; t=1624054158;
+        bh=GxK81MIa8tnHtiss/E3b4tLjXnllwJQVnZIqM4ZoLdA=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=RZjklLejf2qd/kRtJvvN1BDXeyXwaCMKPdGCNtUYwsHeIsX1Nklnl4C6MKcEag0C1
-         1F8IzcVKa2qJwZJkp5c1/sxiHVIFFCbOsv7cudtdcjgQdmsI7jzMnzb/6A6MgShNen
-         6u8Y2ZPBmx7uxQPRVuOtIXyA/ZSj+kVxUDxqjEPA=
-Received: from ussmges3new.samsung.com (u112.gpu85.samsung.co.kr
-        [203.254.195.112]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210618220639uscas1p20aca014828a1ff0a17be10f1a1911b2f~JzIIZXGnd1280212802uscas1p2J;
-        Fri, 18 Jun 2021 22:06:39 +0000 (GMT)
-Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
-        ussmges3new.samsung.com (USCPEMTA) with SMTP id B4.F1.19318.FE81DC06; Fri,
-        18 Jun 2021 18:06:39 -0400 (EDT)
+        b=IQZasfg2CGdhr3Jno/LkBXsgPoksMMHQGd1UojpThJ/Am7ru324/0vnAlFtgWXY3o
+         EhUF3YvSwycVTxIKhS76AgksE7qJer/dHGPL0piXHnai7qEQzu5YZmxUI7bvJ42gqx
+         u9H4g1+ZtwX/N2FXgyI7I77mSFpVYPOzG+O/EBtg=
+Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
+        [203.254.195.111]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210618220917uscas1p1641c1db8e05b0c8084e65c3f24698068~JzKbr-kK02384223842uscas1p1X;
+        Fri, 18 Jun 2021 22:09:17 +0000 (GMT)
+Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
+        ussmges2new.samsung.com (USCPEMTA) with SMTP id 4D.E0.53491.D891DC06; Fri,
+        18 Jun 2021 18:09:17 -0400 (EDT)
 Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
-        [203.254.195.89]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210618220639uscas1p170b58115a21550d3b1c1c0ed33887617~JzIIAaLU10489504895uscas1p18;
-        Fri, 18 Jun 2021 22:06:39 +0000 (GMT)
-X-AuditID: cbfec370-c4fff70000014b76-df-60cd18efa451
-Received: from SSI-EX2.ssi.samsung.com ( [105.128.2.146]) by
-        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id FC.08.48268.FE81DC06; Fri,
-        18 Jun 2021 18:06:39 -0400 (EDT)
+        [203.254.195.89]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210618220917uscas1p2b7ac4488f7322e8ba5f460ed5e51d565~JzKbSY0Qk3175131751uscas1p2V;
+        Fri, 18 Jun 2021 22:09:17 +0000 (GMT)
+X-AuditID: cbfec36f-f09ff7000001d0f3-93-60cd198d3fa0
+Received: from SSI-EX1.ssi.samsung.com ( [105.128.2.146]) by
+        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id 53.18.48268.D891DC06; Fri,
+        18 Jun 2021 18:09:17 -0400 (EDT)
 Received: from SSI-EX1.ssi.samsung.com (105.128.2.226) by
-        SSI-EX2.ssi.samsung.com (105.128.2.227) with Microsoft SMTP Server
+        SSI-EX1.ssi.samsung.com (105.128.2.226) with Microsoft SMTP Server
         (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-        15.1.2242.4; Fri, 18 Jun 2021 15:06:38 -0700
+        15.1.2242.4; Fri, 18 Jun 2021 15:09:16 -0700
 Received: from SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3]) by
         SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3%7]) with mapi id
-        15.01.2242.008; Fri, 18 Jun 2021 15:06:38 -0700
+        15.01.2242.008; Fri, 18 Jun 2021 15:09:16 -0700
 From:   Adam Manzanares <a.manzanares@samsung.com>
 To:     Bart Van Assche <bvanassche@acm.org>
 CC:     Jens Axboe <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        "Damien Le Moal" <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
         "Johannes Thumshirn" <johannes.thumshirn@wdc.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH v3 05/16] block/mq-deadline: Add several comments
-Thread-Topic: [PATCH v3 05/16] block/mq-deadline: Add several comments
-Thread-Index: AQHXY9s270Ky0iSS60+mX+aL9AMDqqsayg0A
-Date:   Fri, 18 Jun 2021 22:06:38 +0000
-Message-ID: <20210618220638.GB210778@bgt-140510-bm01>
-In-Reply-To: <20210618004456.7280-6-bvanassche@acm.org>
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v3 06/16] block/mq-deadline: Add two
+ lockdep_assert_held() statements
+Thread-Topic: [PATCH v3 06/16] block/mq-deadline: Add two
+        lockdep_assert_held() statements
+Thread-Index: AQHXY9s2MAp/F9oD/kugmc06gKgLaqsaysoA
+Date:   Fri, 18 Jun 2021 22:09:16 +0000
+Message-ID: <20210618220916.GC210778@bgt-140510-bm01>
+In-Reply-To: <20210618004456.7280-7-bvanassche@acm.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [105.128.2.176]
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <D3B9CA5578DA184CA4F2B139A825794B@ssi.samsung.com>
+Content-ID: <CD8DA458A9649E469265C3856869BC3D@ssi.samsung.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrBKsWRmVeSWpSXmKPExsWy7djX87rvJc4mGLzdqG2x+m4/m8W0Dz+Z
-        LVrbvzFZ7Fk0icli5eqjTBY3FrxhtHiyfhazxd+ue0wWe29pWxya3MzkwOVx+Yq3x+WzpR6b
-        VnWyeey+2cDm8fHpLRaP9/uusnlsPl3t8XmTnEf7gW6mAM4oLpuU1JzMstQifbsErowFl7Yx
-        F8yVqPi98hpLA+NM4S5GTg4JAROJPy/2soDYQgIrGSUeT9XsYuQCsluZJNaeuMwKUzRl2jJW
-        iMRaRonP0zuYIZyPjBKPOtsYIZwDjBKbPsxnBGlhEzCQ+H18IzOILSKgIfHtwXKwHcwCX5gk
-        nr7iA7GFBVwltjzoYoWocZN4tWwJUxcjB5BtJLHoWBSIySKgKvFrhh2IyStgKrHpSwVIMaeA
-        uUT3hF9gAxkFxCS+n1rDBDFcXOLWk/lMEDcLSiyavYcZwhaT+LfrIRuErShx//tLdoh6HYkF
-        uz+xgYxnFrCTON0qAhHWlli28DVYKy/QmJMzn7BAtEpKHFxxgwXkWQmBbk6JQ+seQO1ykVjc
-        dZARwpaWuHp9KjNE0S5GiTmzP7JCOIeBwXNhOVSVtcSNl12MExhVZiE5fBaSo2YhHDULyVGz
-        kBy1gJF1FaN4aXFxbnpqsXFearlecWJucWleul5yfu4mRmBiO/3vcMEOxlu3PuodYmTiYDzE
-        KMHBrCTCy5l5JkGINyWxsiq1KD++qDQntfgQozQHi5I479zIifFCAumJJanZqakFqUUwWSYO
-        TqkGptAX5pLO79sCU+4373X89dfyueOj63baPodDSpfuUFzItf6S3tMVi4WvzJaX8Ld47lwp
-        qJh3M3+eWP7My+rT/3HfdmVS3Mzmam/BO1Hrx88vzi/k3jkv09z6amPZM2XFFfdcYyR8jiiy
-        TRctNr8xb/sTvUWqtd6v9srw3l71LtT1zJorfyO+l18/fXK/RJ/ZhMdfeUqfnxM/Ntkg/cRd
-        veibfS93zX0a/lczRqkzda25DOdKoVDVnhITDbkrfc7fOXoOGlgy/zjJcqyd4eDJYD8eAY+F
-        bYwPa2tO9h6023k3T/XZ6l/db2fI/bI/wno/YbX2bcaLE9yu9b5b1NASvOzDBIlG13sXN7hO
-        aZRILVNiKc5INNRiLipOBACQONoy2wMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCIsWRmVeSWpSXmKPExsWS2cA0Sfe9xNkEg+61fBar7/azWUz78JPZ
-        orX9G5PFnkWTmCxWrj7KZHFjwRtGiyfrZzFb/O26x2Sx95a2xaHJzUwOXB6Xr3h7XD5b6rFp
-        VSebx+6bDWweH5/eYvF4v+8qm8fm09UenzfJebQf6GYK4IzisklJzcksSy3St0vgylhwaRtz
-        wVyJit8rr7E0MM4U7mLk5JAQMJGYMm0ZaxcjF4eQwGpGiQ8Pr0M5Hxklpj27ygjhHGCUuPX3
-        NAtIC5uAgcTv4xuZQWwRAQ2Jbw+Wg8WZBb4wSTx9xQdiCwu4Smx50MUKUeMm8WrZEqYuRg4g
-        20hi0bEoEJNFQFXi1ww7EJNXwFRi05cKkGIhge2MEh39CiA2p4C5RPeEX2DDGQXEJL6fWsME
-        sUhc4taT+UwQ9wtILNlznhnCFpV4+fgfK4StKHH/+0t2iHodiQW7P7GBrGIWsJM43SoCEdaW
-        WLbwNVgrr4CgxMmZT1ggWiUlDq64wTKBUWIWkm2zkEyahTBpFpJJs5BMWsDIuopRvLS4ODe9
-        otgwL7Vcrzgxt7g0L10vOT93EyMwIZz+dzhyB+PRWx/1DjEycTAeYpTgYFYS4eXMPJMgxJuS
-        WFmVWpQfX1Sak1p8iFGag0VJnFfIdWK8kEB6YklqdmpqQWoRTJaJg1OqgUnil1dI5kcP4yMZ
-        uuGVp4PlViaKybjyl7IHXjtbd//EpdfFXut/BUcYOjE2XP9VdN3nSOKCe09+LlP9/UTEt7Tm
-        LrNK8vezgrwPDd9/rN50othnEpfpkocLgi9fnnNOyqw9ZZcvu+LRhatOvktYd8NW3vTm3bWW
-        2ysM30+rfZK4Xuylt6fuZ6n53S8Nf//b6Bw9LdjXfFGnZ+WVpqu6Vhbqc6JlTAqr5Li/X369
-        qER9idDJ7U4PXY70nLrcfP0Kt0z6trJ9H8T//1jSWuN8/Fm6wxTW9RO8nHxFCngOPYh6aWmb
-        vcngR79HQEXr5i8v+5kPB1WaSlpMeppyUpjzaYxb7BYdzy+ua5t3J1z0ZFJiKc5INNRiLipO
-        BADzF0+9dwMAAA==
-X-CMS-MailID: 20210618220639uscas1p170b58115a21550d3b1c1c0ed33887617
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrMKsWRmVeSWpSXmKPExsWy7djXc7q9kmcTDLrfGFisvtvPZjHtw09m
+        i1m3X7NYtLZ/Y7LYs2gSk8XK1UeZLG4seMNo8WT9LGaLv133mCz23tK2ODS5mcmB2+PyFW+P
+        y2dLPTat6mTz2H2zgc3j49NbLB7v911l89h8utrj8yY5j/YD3UwBnFFcNimpOZllqUX6dglc
+        GRcXbWUsmM5bcWvXJsYGxt9cXYycHBICJhKPl+1l62Lk4hASWMkocXTBHEYIp5VJ4s7HPSww
+        VW+f3WOCSKxllNg3+w8zhPORUaJ532cWCOcAUP/MS0wgLWwCBhK/j29kBrFFBDQkvj1YDlbE
+        LLCcWWLV3r1gc4UFoiXWvtzIClEUI7Fm4j8mCNtI4sq0Y2A2i4CqxKIFLWwgNq+AqcSsqysZ
+        QWxOAXOJizMPgMUZBcQkvp9aA1bPLCAucevJfCaIuwUlFs3ewwxhi0n82/WQDcJWlLj//SU7
+        RL2OxILdn9ggbDuJ3a83QtnaEssWvmaG2CsocXLmE2hYSEocXHED7BkJgX5OiTfzm4CKOIAc
+        F4lPz+UgaqQlrl6fygxRs4tRYs7sj6wQzmFGiU0XljNCVFlL3HjZxTiBUWUWksNnITlqFpKj
+        ZiE5ahaSoxYwsq5iFC8tLs5NTy02ykst1ytOzC0uzUvXS87P3cQITHen/x3O38F4/dZHvUOM
+        TByMhxglOJiVRHg5M88kCPGmJFZWpRblxxeV5qQWH2KU5mBREudlipgYLySQnliSmp2aWpBa
+        BJNl4uCUamByUl3o8aDMQ5NX/ami8n832YLLUq+Tn/7caWqyKFqkXf1sRmbn9TkvFmWHCE44
+        w7A5uPnzj/4bUzaaPD9y+KnggcW7jonuqZfJtg8pdsw+Zx0zkSnN+m29s2DW+Vt7eI7bds73
+        Lb5246yJAX+zOmelR+oM1eMTHsiHLey7qX8pYNUZgSPf1/Qzf2L4sXab30TO1d++azgdfqEr
+        dmT/ybJpe7+bRVZm3Z3w72Sj54V7Eup3m+zubH7Jp1o4YXP7dxtWI6NgIZYljziPVF3mmXje
+        SYXpyql/kU2P13Owx1z7NL/SNOGOWpKo2MYPKdFHjec+Z8l9dHXd+Uu5D3fe3j01fvfcf2F+
+        C3Qdt/7qLLxjqcRSnJFoqMVcVJwIAGmkNNfmAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrAIsWRmVeSWpSXmKPExsWS2cA0SbdX8myCwd6n4har7/azWUz78JPZ
+        Ytbt1ywWre3fmCz2LJrEZLFy9VEmixsL3jBaPFk/i9nib9c9Jou9t7QtDk1uZnLg9rh8xdvj
+        8tlSj02rOtk8dt9sYPP4+PQWi8f7fVfZPDafrvb4vEnOo/1AN1MAZxSXTUpqTmZZapG+XQJX
+        xsVFWxkLpvNW3Nq1ibGB8TdXFyMnh4SAicTbZ/eYuhi5OIQEVjNKHPt/gQXC+cgocefNWXYI
+        5wCjxOvfOxlBWtgEDCR+H9/IDGKLCGhIfHuwHKyDWWA5s8SqvXtZQBLCAtESu9r2MUEUxUjM
+        7PoOZRtJXJl2DMxmEVCVWLSghQ3E5hUwlZh1dSUjxLbtjBK3Tu5lB0lwCphLXJx5AKyIUUBM
+        4vupNWDNzALiEreezGeCeEJAYsme88wQtqjEy8f/WCFsRYn731+yQ9TrSCzY/YkNwraT2P16
+        I5StLbFs4WtmiCMEJU7OfMIC0SspcXDFDZYJjBKzkKybhWTULCSjZiEZNQvJqAWMrKsYxUuL
+        i3PTK4oN81LL9YoTc4tL89L1kvNzNzECE8Xpf4cjdzAevfVR7xAjEwfjIUYJDmYlEV7OzDMJ
+        QrwpiZVVqUX58UWlOanFhxilOViUxHmFXCfGCwmkJ5akZqemFqQWwWSZODilGpgY1l+6o/5u
+        RbrB0u6u1frGvyqCN3/Yu3TDkz07YptCpNalSWlsj9ggu2yB2uGL0zndE3uTU4/1ccn96a79
+        OYPf9MStMwEhR7q2HamfnVi9NWrC74inCzmfxM2uznq8Wt+7wWiO+K44kS2xkhLrrzks7otU
+        SdR4lvgkd7HdXl3urW+mbZ7HYyz4jcNh9gaV6lJf4/+bFRc0smonBvRssG3l0+Te3dD8cqO0
+        6PaOy7E5cX1aMf8kK33PvI09un3roWc6p/p4k59o+gdt6klPjL+wyejCYnb1g473sy7r7r32
+        +7Vn8b/vHHxCh81Ndyj8sNXetSPm4+7VbAeq+v7HZJsLeYZJ/lwq88QuZMZufkslluKMREMt
+        5qLiRACsHN26gwMAAA==
+X-CMS-MailID: 20210618220917uscas1p2b7ac4488f7322e8ba5f460ed5e51d565
 CMS-TYPE: 301P
-X-CMS-RootMailID: 20210618004517uscas1p154b24c3118fea6f3052436209c6c6e24
+X-CMS-RootMailID: 20210618004517uscas1p2f3b8ae04467aeb436c678b4ba21d8de9
 References: <20210618004456.7280-1-bvanassche@acm.org>
-        <CGME20210618004517uscas1p154b24c3118fea6f3052436209c6c6e24@uscas1p1.samsung.com>
-        <20210618004456.7280-6-bvanassche@acm.org>
+        <CGME20210618004517uscas1p2f3b8ae04467aeb436c678b4ba21d8de9@uscas1p2.samsung.com>
+        <20210618004456.7280-7-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 05:44:45PM -0700, Bart Van Assche wrote:
-> Make the code easier to read by adding more comments.
+On Thu, Jun 17, 2021 at 05:44:46PM -0700, Bart Van Assche wrote:
+> Document the locking strategy by adding two lockdep_assert_held()
+> statements.
 >=20
+> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 > Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 > Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+> Cc: Damien Le Moal <damien.lemoal@wdc.com>
 > Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.de>
 > Cc: Ming Lei <ming.lei@redhat.com>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->  block/mq-deadline.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+>  block/mq-deadline.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >=20
 > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 8eea2cbf2bf4..31418e9ce9e2 100644
+> index 31418e9ce9e2..191ff5ce629c 100644
 > --- a/block/mq-deadline.c
 > +++ b/block/mq-deadline.c
-> @@ -139,6 +139,9 @@ static void dd_request_merged(struct request_queue *q=
-, struct request *req,
->  	}
->  }
-> =20
-> +/*
-> + * Callback function that is invoked after @next has been merged into @r=
-eq.
-> + */
->  static void dd_merged_requests(struct request_queue *q, struct request *=
-req,
->  			       struct request *next)
->  {
-> @@ -375,6 +378,8 @@ static struct request *__dd_dispatch_request(struct d=
+> @@ -279,6 +279,8 @@ static struct request *__dd_dispatch_request(struct d=
 eadline_data *dd)
->  }
+>  	bool reads, writes;
+>  	int data_dir;
 > =20
->  /*
-> + * Called from blk_mq_run_hw_queue() -> __blk_mq_sched_dispatch_requests=
-().
-> + *
->   * One confusing aspect here is that we get called for a specific
->   * hardware queue, but we may return a request that is for a
->   * different hardware queue. This is because mq-deadline has shared
-> @@ -438,6 +443,10 @@ static int dd_init_queue(struct request_queue *q, st=
-ruct elevator_type *e)
->  	return 0;
->  }
-> =20
-> +/*
-> + * Try to merge @bio into an existing request. If @bio has been merged i=
-nto
-> + * an existing request, store the pointer to that request into *@rq.
-> + */
->  static int dd_request_merge(struct request_queue *q, struct request **rq=
-,
->  			    struct bio *bio)
->  {
-> @@ -461,6 +470,10 @@ static int dd_request_merge(struct request_queue *q,=
- struct request **rq,
->  	return ELEVATOR_NO_MERGE;
->  }
-> =20
-> +/*
-> + * Attempt to merge a bio into an existing request. This function is cal=
-led
-> + * before @bio is associated with a request.
-> + */
->  static bool dd_bio_merge(struct request_queue *q, struct bio *bio,
->  		unsigned int nr_segs)
->  {
-> @@ -518,6 +531,9 @@ static void dd_insert_request(struct blk_mq_hw_ctx *h=
+> +	lockdep_assert_held(&dd->lock);
+> +
+>  	if (!list_empty(&dd->dispatch)) {
+>  		rq =3D list_first_entry(&dd->dispatch, struct request, queuelist);
+>  		list_del_init(&rq->queuelist);
+> @@ -501,6 +503,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *h=
 ctx, struct request *rq,
->  	}
->  }
+>  	struct deadline_data *dd =3D q->elevator->elevator_data;
+>  	const int data_dir =3D rq_data_dir(rq);
 > =20
-> +/*
-> + * Called from blk_mq_sched_insert_request() or blk_mq_sched_insert_requ=
-ests().
-> + */
->  static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
->  			       struct list_head *list, bool at_head)
->  {
-> @@ -544,6 +560,8 @@ static void dd_prepare_request(struct request *rq)
->  }
-> =20
->  /*
-> + * Callback from inside blk_mq_free_request().
-> + *
->   * For zoned block devices, write unlock the target zone of
->   * completed write requests. Do this while holding the zone lock
->   * spinlock so that the zone is never unlocked while deadline_fifo_reque=
-st()
+> +	lockdep_assert_held(&dd->lock);
+> +
+>  	/*
+>  	 * This may be a requeue of a write request that has locked its
+>  	 * target zone. If it is the case, this releases the zone lock.
 
 Looks good.
 
