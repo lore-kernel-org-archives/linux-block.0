@@ -2,108 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB20C49EA2
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 16:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F2EC48BDF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 16:46:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77A4B613D1
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 16:45:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF84B613D5
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 16:46:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235969AbhFRQsE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 12:48:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50164 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235740AbhFRQsD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 12:48:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E4FB96127C;
-        Fri, 18 Jun 2021 16:45:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1624034753;
-        bh=ZTtwHmqh0rQ3M2ho9c60I0q0eOzXiN2NKnpGl1n9jAs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=R/HYr50FfFMgL8AT6+8hLyRxD/ZSJ4S2xb12SBGX3bFOa3uWO/saYDhlnVh86HZZi
-         OPDTpRuYv/2ZQouGk4fRnlCJgkL18zxi+4aIaD64YAzf49WelDhz2fEAbY0JRP/RbJ
-         VR1FI2PTAT6TbjogpFjK/WPi7QxmCYgwALtjhSbyhztW+Tjo7JUPS5dSdcGLjDT5A1
-         w5OHX7Fe1IquhO1WW9ds+tBjdvFYugD7ejgElqSQwxbbOUSkwwTVmZzxfTyxYEvOV8
-         s/Hgm/YM5MQ5/pN9z0oud2vd0ZPIKafP7cIaWCVfDbFVRZCpOjBzgT0HD4Wi/v2DQ0
-         4WeLullrbJTJg==
-Date:   Fri, 18 Jun 2021 18:45:45 +0200
-From:   Mauro Carvalho Chehab <mchehab@kernel.org>
-To:     Mark Brown <broonie@kernel.org>
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        David Hildenbrand <david@redhat.com>, Greg KH <greg@kroah.com>,
-        Christoph Lameter <cl@gentwo.de>,
-        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
-        ksummit@lists.linux.dev,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>, netdev <netdev@vger.kernel.org>,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-Message-ID: <20210618184545.33ea3d47@coco.lan>
-In-Reply-To: <20210618155829.GD4920@sirena.org.uk>
-References: <b32c8672-06ee-bf68-7963-10aeabc0596c@redhat.com>
-        <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
-        <20210610182318.jrxe3avfhkqq7xqn@nitro.local>
-        <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
-        <20210610152633.7e4a7304@oasis.local.home>
-        <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
-        <YMyjryXiAfKgS6BY@pendragon.ideasonboard.com>
-        <cd7ffbe516255c30faab7a3ee3ee48f32e9aa797.camel@HansenPartnership.com>
-        <CAMuHMdVcNfDvpPXHSkdL3VuLXCX5m=M_AQF-P8ZajSdXt8NdQg@mail.gmail.com>
-        <20210618103214.0df292ec@oasis.local.home>
-        <20210618155829.GD4920@sirena.org.uk>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S235740AbhFRQsj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 12:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232665AbhFRQsi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Jun 2021 12:48:38 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89C79C061574
+        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 09:46:29 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id q10so11179415oij.5
+        for <linux-block@vger.kernel.org>; Fri, 18 Jun 2021 09:46:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=K2FkotfuKg6pfAJpJYk+li5QNH8XPl4be8IUWffEIGg=;
+        b=lZjz7+7H0uwi3ZHgz1KExUl+2NQHK84D54h582A17pQq6XC/0S/sgNIkO8GKCQv1HX
+         qYJ5x5puhoYQVYeNK8SqF+nDAwUE2yHD6lN1w6pgPori0o93XcGj2V3WiWI0xwBjXHGs
+         /5gg9RynEKlO6i8LkQtiYblSNJNoHpCCYDa+XMKVCPWWwe5H/ILLeTNsvl8hN65aoBxQ
+         j+TTFSdL6iCykn7XUneuJp3gRj9K9G/BhJxl933XzAxV/4AQJ9s38wJ0bWzEEYa0Xv90
+         sXSp2hFRU6HrM21KittRtCSs5tHTGUbTGJxNxGr9+BIgpw73JOgBIxJNkJydKPmQ4fhh
+         fejQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=K2FkotfuKg6pfAJpJYk+li5QNH8XPl4be8IUWffEIGg=;
+        b=uG/Ra5nm5B5g2Si20+4DgmkUtl18d/3CcWKsSsMw0kYFJKgAtfe5ehDKsI8MgFg/lK
+         7YL0bG3xEUQzc+YJ2v/ZB1d2moxxBn2jW+kXFzupx68Nc/RX1ptHMU8r4qnfv+V62WRJ
+         UDusxGr72pdLmICVWcYL0Ifhoe/3rRqhvvaK8NLv+sy6faG3fe+Ns0eWo6eTJtBMyEdH
+         eUmxbeqYpTFW17XyCg8uXFtLFBYlYnaQSN7AOdhTLTRzEvemZ1PecfHKebbYTcBPCuyo
+         pNqEp+Ah+XDm+O5YqfJHGYuD8381PAEriOptFlnPaKdCOPx/gfujVlZtdzVWTyP2/Rcq
+         Qsnw==
+X-Gm-Message-State: AOAM5334+JOdqiAsj55GqIHE2dj6IGZN+a/CuQG6DE2sscweUCP8KZ0j
+        dxCwfrZtO/drZtL2Au/DR+N9ng==
+X-Google-Smtp-Source: ABdhPJz4TbEo+GvlwHE7zFx8IVnqLx1SJ/Rklb/hfB0WK3lw27OU722BHUcqKTB/P3HGAxtmU05LCw==
+X-Received: by 2002:aca:f444:: with SMTP id s65mr14669879oih.38.1624034788796;
+        Fri, 18 Jun 2021 09:46:28 -0700 (PDT)
+Received: from [192.168.1.134] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id b198sm1906809oii.19.2021.06.18.09.46.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Jun 2021 09:46:28 -0700 (PDT)
+Subject: Re: [PATCH] block: remove useless comments
+To:     lijiazi <jqqlijiazi@gmail.com>, linux-block@vger.kernel.org
+Cc:     lijiazi <lijiazi@xiaomi.com>
+References: <1623986240-13878-1-git-send-email-lijiazi@xiaomi.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <48f03363-d36d-6ebb-1646-28113abb57d7@kernel.dk>
+Date:   Fri, 18 Jun 2021 10:46:26 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1623986240-13878-1-git-send-email-lijiazi@xiaomi.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Em Fri, 18 Jun 2021 16:58:29 +0100
-Mark Brown <broonie@kernel.org> escreveu:
+On 6/17/21 9:17 PM, lijiazi wrote:
+> Now wbt_wait return void, so remove useless comments.
 
-> On Fri, Jun 18, 2021 at 10:32:14AM -0400, Steven Rostedt wrote:
-> > On Fri, 18 Jun 2021 16:28:02 +0200
-> > Geert Uytterhoeven <geert@linux-m68k.org> wrote:  
-> 
-> > > What about letting people use the personal mic they're already
-> > > carrying, i.e. a phone?  
-> 
-> > Interesting idea.  
-> 
-> > I wonder how well that would work in practice. Are all phones good
-> > enough to prevent echo?  
-> 
-> Unless you get the latency for the WebRTC<->in room speaker down lower
-> than I'd expect it to be I'd expect echo cancellation to have fun,
-> though beam forming might reject a lot of in room noise including that -
-> higher end modern phones are astonishingly good at this stuff.  I'd not
-> trust it to work reliably for all attendees though, it's the sort of
-> thing where you'll get lots of per device variation.
+Reworded a bit and applied, thanks.
 
-The local audience should be listening to the in-room audio, in order
-to avoid echo. Also, all local mics should be muted, if someone is 
-speaking from a remote location. 
+-- 
+Jens Axboe
 
-Yet, echo is unavoidable if a remote participant is speaking while 
-listening to the audio without headphones. If this ever happens, I
-guess the moderator should cut the remote audio and ask the remote
-participant to lower their speakers or use a headphone.
-
-
-Thanks,
-Mauro
