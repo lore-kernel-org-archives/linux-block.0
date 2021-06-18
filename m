@@ -2,81 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B59C49EA3
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0BC8C48BDF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:33:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C533161260
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:32:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC27161351
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 14:33:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234547AbhFROe1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 10:34:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34652 "EHLO mail.kernel.org"
+        id S233642AbhFROfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 10:35:50 -0400
+Received: from verein.lst.de ([213.95.11.211]:35199 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234348AbhFROe0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 10:34:26 -0400
-Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EDC1B611ED;
-        Fri, 18 Jun 2021 14:32:15 +0000 (UTC)
-Date:   Fri, 18 Jun 2021 10:32:14 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        David Hildenbrand <david@redhat.com>, Greg KH <greg@kroah.com>,
-        Christoph Lameter <cl@gentwo.de>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
-        ksummit@lists.linux.dev,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>, netdev <netdev@vger.kernel.org>,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-Message-ID: <20210618103214.0df292ec@oasis.local.home>
-In-Reply-To: <CAMuHMdVcNfDvpPXHSkdL3VuLXCX5m=M_AQF-P8ZajSdXt8NdQg@mail.gmail.com>
-References: <YIx7R6tmcRRCl/az@mit.edu>
-        <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
-        <YK+esqGjKaPb+b/Q@kroah.com>
-        <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
-        <b32c8672-06ee-bf68-7963-10aeabc0596c@redhat.com>
-        <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
-        <20210610182318.jrxe3avfhkqq7xqn@nitro.local>
-        <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
-        <20210610152633.7e4a7304@oasis.local.home>
-        <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
-        <YMyjryXiAfKgS6BY@pendragon.ideasonboard.com>
-        <cd7ffbe516255c30faab7a3ee3ee48f32e9aa797.camel@HansenPartnership.com>
-        <CAMuHMdVcNfDvpPXHSkdL3VuLXCX5m=M_AQF-P8ZajSdXt8NdQg@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        id S234585AbhFROfr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Jun 2021 10:35:47 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 36A0168D08; Fri, 18 Jun 2021 16:33:37 +0200 (CEST)
+Date:   Fri, 18 Jun 2021 16:33:36 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [RFC PATCH 4/4] dm: support bio polling
+Message-ID: <20210618143336.GB19284@lst.de>
+References: <20210616130533.754248-1-ming.lei@redhat.com> <20210616130533.754248-5-ming.lei@redhat.com> <YMohOUlopTcO1Bzd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YMohOUlopTcO1Bzd@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 18 Jun 2021 16:28:02 +0200
-Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+On Wed, Jun 16, 2021 at 12:05:13PM -0400, Mike Snitzer wrote:
+> In general I'm really happy to see polling switch over to using bios,
+> nice job Christoph! Are you hoping for all this to land in time for
+> 5.14 merge?
 
-> What about letting people use the personal mic they're already
-> carrying, i.e. a phone?
+Yes, although time is running out.
 
-Interesting idea.
+> Once Ming responds to my review inlined below, and I Acked-by his
+> set, would you be willing to fold it at the end of your patchset so
+> that I don't need to rebase on block to get these changes in, etc?
 
-I wonder how well that would work in practice. Are all phones good
-enough to prevent echo?
-
-It is something that needs to be tested out first before making it
-officially used.
-
--- Steve
+In principle yes, but I need to take a look first.
