@@ -2,110 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E660C48BE8
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 18:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C699C49361
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 19:19:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33B95613ED
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 18:13:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6687961264
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 19:19:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230024AbhFRSPK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 14:15:10 -0400
-Received: from mga01.intel.com ([192.55.52.88]:21508 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229816AbhFRSPK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 14:15:10 -0400
-IronPort-SDR: 4BfT8humAN2ALNjUzCLOCS4uv0cmFaxGAqim28EeRyYYtSF34bEVludBax4VEqIhmX6Z+Y46v5
- p/PHYgt9Julw==
-X-IronPort-AV: E=McAfee;i="6200,9189,10019"; a="228130352"
-X-IronPort-AV: E=Sophos;i="5.83,284,1616482800"; 
-   d="scan'208";a="228130352"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2021 11:13:00 -0700
-IronPort-SDR: fZjz2UBcjkF09ZLFZzZqWyvwCbkGqlZanM6atUtLAcrBp3dXyferraXT69g8eiZc0puz+dQdsp
- 3jQAgCFqGSuA==
-X-IronPort-AV: E=Sophos;i="5.83,284,1616482800"; 
-   d="scan'208";a="453226714"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2021 11:12:58 -0700
-Date:   Fri, 18 Jun 2021 11:12:58 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        dm-devel@redhat.com, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
-        linux-arch@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Christoph Lameter <cl@gentwo.de>
-Subject: Re: [PATCH 01/18] mm: add a kunmap_local_dirty helper
-Message-ID: <20210618181258.GC1905674@iweiny-DESK2.sc.intel.com>
-References: <20210615132456.753241-1-hch@lst.de>
- <20210615132456.753241-2-hch@lst.de>
- <20210618030157.GA1905674@iweiny-DESK2.sc.intel.com>
- <20210618033728.GA16787@gondor.apana.org.au>
+        id S233985AbhFRTVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 15:21:24 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:58504 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232433AbhFRTVY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Jun 2021 15:21:24 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1624043953;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sSLxGC3VTRMA2Whz78he85SSFCN5pOWp9Ja2rRincrE=;
+        b=Nh4soZq81bzyJPDPuk6OzK7HF4t54zEr2or1xJZHbE/JpRDaIB2XoDCYU9n1UiBMxI+SpZ
+        gYAStHegI/oNOuab4hNo8UKqfktYNa6DHie9NnNhpHnOi3ZTmOnHBRS9t6Mwni1Sw0CrRv
+        2++Ypt6yi9HJswKEy/4ehOO1ygPmj9JcbMcNedlZGwJwRriy8Sdg1U6HWjRRrw9tto4BTC
+        /TfF50Bzzxe/CTixRdGbI9ln6URYNxw0lM/9SNRLk1Q9BPybWFiwTOEWlCLd3VT237g679
+        Kl5ANInl8B/rrHu6xEerRqfVGkFhf2eavm+zWxVhvBbP6DegejfN/f65ELFQeQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1624043953;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sSLxGC3VTRMA2Whz78he85SSFCN5pOWp9Ja2rRincrE=;
+        b=RSZzBGebnC17LsPojYK3bBoRQRgGmd+zjyPW5m11as59RHQl5NDNcQRPMID7YkOywbpvre
+        Lg6856XaSEqMB/AA==
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        Keith Busch <keith.busch@intel.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Subject: Re: [patch v6 3/7] genirq/affinity: Add new callback for (re)calculating interrupt sets
+In-Reply-To: <20210615195707.GA2909907@bjorn-Precision-5520>
+References: <20210615195707.GA2909907@bjorn-Precision-5520>
+Date:   Fri, 18 Jun 2021 21:19:12 +0200
+Message-ID: <878s37f0b3.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210618033728.GA16787@gondor.apana.org.au>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 11:37:28AM +0800, Herbert Xu wrote:
-> On Thu, Jun 17, 2021 at 08:01:57PM -0700, Ira Weiny wrote:
-> >
-> > > +		flush_kernel_dcache_page(__page);		\
-> > 
-> > Is this required on 32bit systems?  Why is kunmap_flush_on_unmap() not
-> > sufficient on 64bit systems?  The normal kunmap_local() path does that.
-> > 
-> > I'm sorry but I did not see a conclusion to my query on V1. Herbert implied the
-> > he just copied from the crypto code.[1]  I'm concerned that this _dirty() call
-> > is just going to confuse the users of kmap even more.  So why can't we get to
-> > the bottom of why flush_kernel_dcache_page() needs so much logic around it
-> > before complicating the general kernel users.
-> > 
-> > I would like to see it go away if possible.
-> 
-> This thread may be related:
-> 
-> https://lwn.net/Articles/240249/
+On Tue, Jun 15 2021 at 14:57, Bjorn Helgaas wrote:
+>
+>> @@ -1196,6 +1196,13 @@ int pci_alloc_irq_vectors_affinity(struc
+>>  	/* use legacy irq if allowed */
+>>  	if (flags & PCI_IRQ_LEGACY) {
+>>  		if (min_vecs == 1 && dev->irq) {
+>> +			/*
+>> +			 * Invoke the affinity spreading logic to ensure that
+>> +			 * the device driver can adjust queue configuration
+>> +			 * for the single interrupt case.
+>> +			 */
+>> +			if (affd)
+>> +				irq_create_affinity_masks(1, affd);
+>
+> This looks like a leak because irq_create_affinity_masks() returns a
+> pointer to kcalloc()ed space, but we throw away the pointer.
+>
+> Or is there something very subtle going on here, like this special
+> case doesn't allocate anything?  I do see the "Nothing to assign?"
+> case that returns NULL with no alloc, but it's not completely trivial
+> to verify that we take that case here.
 
-Interesting!  Thanks!
+Yes, it's subtle and it's subtle crap. Sorry that I did not catch that.
 
-Digging around a bit more I found:
+Thanks,
 
-https://lore.kernel.org/patchwork/patch/439637/
-
-Auditing all the flush_dcache_page() arch code reveals that the mapping field
-is either unused, or is checked for NULL.  Furthermore, all the implementations
-call page_mapping_file() which further limits the page to not be a swap page.
-
-All flush_kernel_dcache_page() implementations appears to operate the same way
-in all arch's which define that call.
-
-So I'm confident now that additional !PageSlab(__page) checks are not needed
-and this patch is unnecessary.   Christoph, can we leave this out of the kmap
-API and just fold the flush_kernel_dcache_page() calls back into the bvec code?
-
-Unfortunately, I'm not convinced this can be handled completely by
-kunmap_local() nor the mem*_page() calls because there is a difference between
-flush_dcache_page() and flush_kernel_dcache_page() in most archs...  [parisc
-being an exception which falls back to flush_kernel_dcache_page()]...
-
-It seems like the generic unmap path _should_ be able to determine which call
-to make based on the page but I'd have to look at that more.
-
-Ira
+        tglx
