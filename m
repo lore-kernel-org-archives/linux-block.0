@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4D3C48BE8
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 17:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 165C2C48BDF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 17:22:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C31B613EB
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 17:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E92AF610C7
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 17:22:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233762AbhFRRR4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 13:17:56 -0400
-Received: from mailout1.w2.samsung.com ([211.189.100.11]:19415 "EHLO
-        mailout1.w2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232598AbhFRRRz (ORCPT
+        id S234015AbhFRRYS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 13:24:18 -0400
+Received: from mailout2.w2.samsung.com ([211.189.100.12]:63429 "EHLO
+        mailout2.w2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233845AbhFRRYS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 13:17:55 -0400
-Received: from uscas1p2.samsung.com (unknown [182.198.245.207])
-        by mailout1.w2.samsung.com (KnoxPortal) with ESMTP id 20210618171544usoutp011e8011c46f4bf3eee02d082e82119268~JvKH6tZYF1347313473usoutp01b;
-        Fri, 18 Jun 2021 17:15:44 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w2.samsung.com 20210618171544usoutp011e8011c46f4bf3eee02d082e82119268~JvKH6tZYF1347313473usoutp01b
+        Fri, 18 Jun 2021 13:24:18 -0400
+Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
+        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20210618172207usoutp02b0f8756e10a41abeffc9c2cc2a09197a~JvPszV9Cv1297912979usoutp02h;
+        Fri, 18 Jun 2021 17:22:07 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20210618172207usoutp02b0f8756e10a41abeffc9c2cc2a09197a~JvPszV9Cv1297912979usoutp02h
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1624036544;
-        bh=LHSPL6p7ApaEriCytK1GvhcqqhbeSdcLd5Q7FB+rybs=;
+        s=mail20170921; t=1624036927;
+        bh=CePfP2tzTp6vMjR/1kcLJJsTHOpNO9hv2yACWVwNJFg=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=WJJfuWERusvuxpNcGZK0oFkUirfqljgbNzX7tOfRtke/TyYYtZgt8RTIxeORF/C3Y
-         sPsOrvtsw+9WRh/rxB5Iq9W+fKLvinuEXoF2AZlT+5pyaaSDQVaKoDswKvyPHwRMzs
-         6+3QbLOufT5+ryknCdySKvAwvpbuqarJ9rZqHE7A=
-Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
-        [203.254.195.111]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210618171544uscas1p12b66d21b826cd3dcb955eed22ed847d8~JvKHtFB5V2748827488uscas1p1q;
-        Fri, 18 Jun 2021 17:15:44 +0000 (GMT)
+        b=isOhrplLs8ig1SshOBQ7lOA4B8RJZEQHUGIYGQgFkgxl0MtCjB7CwvutXLsw23ViX
+         wxlaqSlNyftisnln2lVWsUIasEEgnEFQ0DwceCF0VgAWUaUxB0gfZRFtpFETxaOlSx
+         tEo7bb9Wt+Ey4mPaESoXjqB+V0WShrhRpCz1DFY8=
+Received: from ussmges3new.samsung.com (u112.gpu85.samsung.co.kr
+        [203.254.195.112]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210618172207uscas1p27960eba51a15fe457bed01e114bbe320~JvPslxI6X1616716167uscas1p2H;
+        Fri, 18 Jun 2021 17:22:07 +0000 (GMT)
 Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
-        ussmges2new.samsung.com (USCPEMTA) with SMTP id 6A.6B.53491.0C4DCC06; Fri,
-        18 Jun 2021 13:15:44 -0400 (EDT)
+        ussmges3new.samsung.com (USCPEMTA) with SMTP id 39.BC.19318.F36DCC06; Fri,
+        18 Jun 2021 13:22:07 -0400 (EDT)
 Received: from ussmgxs3new.samsung.com (u92.gpu85.samsung.co.kr
-        [203.254.195.92]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210618171543uscas1p2f93a7127657eb1c1c3fa990d322e9d32~JvKHJz0KA3095430954uscas1p2C;
-        Fri, 18 Jun 2021 17:15:43 +0000 (GMT)
-X-AuditID: cbfec36f-f09ff7000001d0f3-72-60ccd4c0613d
+        [203.254.195.92]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210618172207uscas1p1475c882a53fd11c7d6c4b457a6272cad~JvPsUIx5x1685016850uscas1p1X;
+        Fri, 18 Jun 2021 17:22:07 +0000 (GMT)
+X-AuditID: cbfec370-c37ff70000014b76-82-60ccd63f82fb
 Received: from SSI-EX1.ssi.samsung.com ( [105.128.2.146]) by
-        ussmgxs3new.samsung.com (USCPEXMTA) with SMTP id BD.05.47882.FB4DCC06; Fri,
-        18 Jun 2021 13:15:43 -0400 (EDT)
+        ussmgxs3new.samsung.com (USCPEXMTA) with SMTP id C2.25.47882.E36DCC06; Fri,
+        18 Jun 2021 13:22:07 -0400 (EDT)
 Received: from SSI-EX1.ssi.samsung.com (105.128.2.226) by
         SSI-EX1.ssi.samsung.com (105.128.2.226) with Microsoft SMTP Server
         (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-        15.1.2242.4; Fri, 18 Jun 2021 10:15:42 -0700
+        15.1.2242.4; Fri, 18 Jun 2021 10:22:06 -0700
 Received: from SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3]) by
         SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3%7]) with mapi id
-        15.01.2242.008; Fri, 18 Jun 2021 10:15:42 -0700
+        15.01.2242.008; Fri, 18 Jun 2021 10:22:06 -0700
 From:   Adam Manzanares <a.manzanares@samsung.com>
 To:     Bart Van Assche <bvanassche@acm.org>
 CC:     Jens Axboe <axboe@kernel.dk>,
@@ -61,110 +61,137 @@ CC:     Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Damien Le Moal <damien.lemoal@wdc.com>,
-        "Johannes Thumshirn" <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, "Tejun Heo" <tj@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH v3 02/16] block/blk-cgroup: Swap the blk_throtl_init()
- and blk_iolatency_init() calls
-Thread-Topic: [PATCH v3 02/16] block/blk-cgroup: Swap the blk_throtl_init()
-        and blk_iolatency_init() calls
-Thread-Index: AQHXY9sxekxvzBc5BEKmzW4HMTEMFKsaeMQA
-Date:   Fri, 18 Jun 2021 17:15:42 +0000
-Message-ID: <20210618171542.GB89662@bgt-140510-bm01>
-In-Reply-To: <20210618004456.7280-3-bvanassche@acm.org>
+Subject: Re: [PATCH v3 03/16] block/blk-rq-qos: Move a function from a
+ header file into a C file
+Thread-Topic: [PATCH v3 03/16] block/blk-rq-qos: Move a function from a
+        header file into a C file
+Thread-Index: AQHXY9sz1vDYFZPHvkq8OJ+NXXByr6saeo4A
+Date:   Fri, 18 Jun 2021 17:22:06 +0000
+Message-ID: <20210618172206.GA94206@bgt-140510-bm01>
+In-Reply-To: <20210618004456.7280-4-bvanassche@acm.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [105.128.2.176]
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <68FE835A7D55D14BA70C4088089F04B3@ssi.samsung.com>
+Content-ID: <1D44069E1F8FAF4A9CAC2F749A9CEC26@ssi.samsung.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrAKsWRmVeSWpSXmKPExsWy7djXc7oHrpxJMOhdwmmx+m4/m8W0Dz+Z
-        LVrbvzFZ7Fk0icli5eqjTBY3FrxhtHiyfhazxd+ue0wWe29pWxya3Mxk8Wv5UUYHbo/LV7w9
-        Lp8t9di0qpPNY/fNBjaPj09vsXi833eVzWPz6WqPz5vkPNoPdDMFcEZx2aSk5mSWpRbp2yVw
-        ZRxc+YGtYClXxdopzawNjFs5uhg5OSQETCRObXzODGILCaxklLj0QqKLkQvIbmWS6Lr/hw2m
-        6OiNGewQRWsZJfa8DoEo+sgo0dj6lQXCOcAoceX7R7AqNgEDid/HN4KNFRHQkPj2YDkLiM0s
-        MJFZon2tHIgtLJAtMenYY3aImhyJT2feMkHYRhLrrlwBi7MIqEr8f98F1MvBwQt0xY116iBh
-        TgFziRnXlrCC2IwCYhLfT61hghgvLnHryXwmiKMFJRbN3sMMYYtJ/Nv1EOoZRYn731+yQ9Tr
-        SCzY/YkNwraT6LrewAxha0ssW/gazOYFmnNy5hMWiF5JiYMrboD9KyEwmVPix5oPUAtcJH5v
-        vgRlS0tMX3MZqmgXo8Sc2R9ZIZzDjBKbLixnhKiylrjxsotxAqPKLCSXz0Jy1SwkV81CctUs
-        JFctYGRdxSheWlycm55abJSXWq5XnJhbXJqXrpecn7uJEZjoTv87nL+D8fqtj3qHGJk4GA8x
-        SnAwK4nwcmaeSRDiTUmsrEotyo8vKs1JLT7EKM3BoiTOyxQxMV5IID2xJDU7NbUgtQgmy8TB
-        KdXAtFtd6bdJxNeyFXz8Zm6HdWLvsavGCj2U5rg7UUrx5ALN/PZmnYrgPcHis9ZPNvyYNU11
-        w8Nz5mFPVR7t8X2rdu8D+4wV29fImf0P0p94QaO09IfW4skSzHZ7NVj7mwsVlnTH1d74rxEf
-        wdtip1qg6R4Zde3DhqV6p1VWCu19Its6fx/zCtM1jxr948q/6njcTuM+GPEtTvSTAo+ImHOY
-        QhZbd4Ji6j1T19KS2QbfjfWv9q3fr7Tmckd1g9FE3Zim2MaahZmWHv29eobctm+e/mLYs6pI
-        WvfCzPnnVMqELk4WyHvSkbWZ81WITlehzukqp9WeN7VLkmyYb5TZLXVYEpnXYOps8CPbd7oD
-        uxJLcUaioRZzUXEiANQC5q3jAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrHIsWRmVeSWpSXmKPExsWS2cA0SXf/lTMJBt9+KVusvtvPZjHtw09m
-        i9b2b0wWexZNYrJYufook8WNBW8YLZ6sn8Vs8bfrHpPF3lvaFocmNzNZ/Fp+lNGB2+PyFW+P
-        y2dLPTat6mTz2H2zgc3j49NbLB7v911l89h8utrj8yY5j/YD3UwBnFFcNimpOZllqUX6dglc
-        GQdXfmArWMpVsXZKM2sD41aOLkZODgkBE4mjN2awdzFycQgJrGaU2Lt+HRuE85FR4uaUY1CZ
-        A4wSvXcusYG0sAkYSPw+vpEZxBYR0JD49mA5C0gRs8BEZom9DbfZQRLCAtkSv1f/YYcoypFo
-        fPiKFcI2klh35QpYnEVAVeL/+y6gZg4OXqA7bqxTBwkLCWxnlHi6rgbE5hQwl5hxbQlYK6OA
-        mMT3U2uYQGxmAXGJW0/mM0G8ICCxZM95ZghbVOLl43+sELaixP3vL9kh6nUkFuz+xAZh20l0
-        XW9ghrC1JZYtfA1m8woISpyc+YQFoldS4uCKGywTGCVmIVk3C8moWUhGzUIyahaSUQsYWVcx
-        ipcWF+emVxQb56WW6xUn5haX5qXrJefnbmIEJonT/w7H7GC8d+uj3iFGJg7GQ4wSHMxKIryc
-        mWcShHhTEiurUovy44tKc1KLDzFKc7AoifN6xE6MFxJITyxJzU5NLUgtgskycXBKNTD5Xlya
-        qaM+82yubvj8QL97ue/sl79qeMlvvrrndwGX6B6bxpxp/I/r1uSX5LcwF+yRWqk3K2ny6drX
-        r3wudWzLdVlT/kjZ80vGrfNhy1hlJU/Pjjj2bSt7WouWic+NpgiWopeRcup/ug7J3NFusDDn
-        c1k+WZ3x+CTbh61CG0y4JwjHPkpsfJW9ouTEDb7X9wRj387bqXtmc3LEtRapX+KWdWl34m33
-        H9Bu8Lsrd7NUULltWsiC52+5Xj5YO0Xq3/qQllUeVjNMjy3U5c/ji9WQbvA8vnXO8wPe7u+W
-        rfOusKxobuqQnVw4nyvX7dTB63cXHvpqWu3AvedFY1Qoq+vyKf1efyV23tt80O2lS5YSS3FG
-        oqEWc1FxIgDDxE3kgQMAAA==
-X-CMS-MailID: 20210618171543uscas1p2f93a7127657eb1c1c3fa990d322e9d32
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrDKsWRmVeSWpSXmKPExsWy7djXc7r2184kGHx6JmWx+m4/m8W0Dz+Z
+        LVrbvzFZ7Fk0icli5eqjTBY3FrxhtHiyfhazxd+ue0wWe29pWxya3MzkwOVx+Yq3x+WzpR6b
+        VnWyeey+2cDm8fHpLRaP9/uusnlsPl3t8XmTnEf7gW6mAM4oLpuU1JzMstQifbsEroy5n/Yy
+        FewWqJj18glLA+Me3i5GTg4JAROJp/M3s3UxcnEICaxklGi4u50ZJCEk0MokceN3HUzR6ye3
+        mCGK1jJKrPnxjwXC+cgo8en9ZnYI5wCjxKKWE+wgLWwCBhK/j28EGyUioCHx7cFysA5mgQ9M
+        Eofn/WbtYuTgEBZIkri6Jw2iJlni5uovrBC2kcSWy9uYQGwWAVWJdRdvgc3kBTrjdN8RZpBW
+        TgFzifl380DCjAJiEt9PrQErZxYQl7j1ZD4TxNWCEotm72GGsMUk/u16yAZhK0rc//6SHaJe
+        R2LB7k9sELadROfhy6wQtrbEsoWvmSHWCkqcnPmEBaJXUuLgihtgr0gIdHNK3Jz7ghUi4SJx
+        9ccbqMXSEtPXXIYq2sUoMWf2R1YI5zCjxKYLyxkhqqwlbrzsYpzAqDILyeWzkFw1C8lVs5Bc
+        NQvJVQsYWVcxipcWF+empxYb56WW6xUn5haX5qXrJefnbmIEJrjT/w4X7GC8deuj3iFGJg7G
+        Q4wSHMxKIrycmWcShHhTEiurUovy44tKc1KLDzFKc7AoifPOjZwYLySQnliSmp2aWpBaBJNl
+        4uCUamAq5FI6/ks24/OiT2a3Pa+r2xsYXOZevuzsqhkbj85d2ntKY8ZNuY/7vqV8eVKgvDTr
+        56RZF/f+33pz4rzdd679zompZNnc0fY499zLiOmN/e8/fbjT8kzq/5rcy/XVrfmsUj7VRz1L
+        Tm93/DDv54oduat+ZRjdkws+9HnXlJiNHw/acb232lB1pEfG/9g+tv9SD/ZN9CxlWeiy2HXr
+        Kd9JfuWZ0wu07/WL/Kwofeir8l3HQytTUGXBManVM3g3cgV+EmlX1P8iyrjkyBG5dZvnxC3s
+        eMqVl/7FKOTN4vfrDpna3ZvqeDf+ne+inuO70u4+lFrH/uajl1mUwgr286J69s9Lrl/m/Hjj
+        9/KGqlXX3NYosRRnJBpqMRcVJwIAVXsxyd8DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrJIsWRmVeSWpSXmKPExsWS2cA0Sdf+2pkEgy8bmSxW3+1ns5j24Sez
+        RWv7NyaLPYsmMVmsXH2UyeLGgjeMFk/Wz2K2+Nt1j8li7y1ti0OTm5kcuDwuX/H2uHy21GPT
+        qk42j903G9g8Pj69xeLxft9VNo/Np6s9Pm+S82g/0M0UwBnFZZOSmpNZllqkb5fAlTH3016m
+        gt0CFbNePmFpYNzD28XIySEhYCLx+skt5i5GLg4hgdWMEo1LbzBBOB8ZJW4+fA2VOcAocXz7
+        fRaQFjYBA4nfxzcyg9giAhoS3x4sZwEpYhb4wCTxY+dHsCJhgSSJX21P2CCKkiVefVrKCGEb
+        SWy5vI0JxGYRUJVYd/EWO4jNC3TH6b4jYEOFBLYzSkyeA9TLwcEpYC4x/24eSJhRQEzi+6k1
+        YK3MAuISt57MZ4J4QUBiyZ7zzBC2qMTLx/9YIWxFifvfX7JD1OtILNj9iQ3CtpPoPHyZFcLW
+        lli28DUzxAmCEidnPmGB6JWUOLjiBssERolZSNbNQjJqFpJRs5CMmoVk1AJG1lWM4qXFxbnp
+        FcXGeanlesWJucWleel6yfm5mxiBqeH0v8MxOxjv3fqod4iRiYPxEKMEB7OSCC9n5pkEId6U
+        xMqq1KL8+KLSnNTiQ4zSHCxK4rwesRPjhQTSE0tSs1NTC1KLYLJMHJxSDUzHO3WX1q/5zhjg
+        5d/3KG+1e0mU2eGpFTmOV5iPZ/9gkouxywudu033S3l8YqJ+9/+ynTwfy4WKH1kHtG0K7tv9
+        7Xgk11uXXj+zv1a5ys0Lc1+vj0o0+mp4JKKNee4EwQq97ypJbBJmbdcutXcsq9rAbtGsU1CX
+        t5u9dpWcUF/sqbI56/af+vtmf8zznNeeUiEzPXMVd9gv2VJ6U7l3gtlXocOdV7jm75mmmTnP
+        +Fj8ysvWnvvMMtYe+mn3e0P5oso7xnIMkzhPSTyfuNe/lzl4oVjQelF3oR8GN1/FeL+8mzk1
+        yvKauuL9vY9v2v3+97TMvPXz1gUXIzdUa0uomcivOWVg+exV/4nNr7Y57VdiKc5INNRiLipO
+        BAD5WdcUfAMAAA==
+X-CMS-MailID: 20210618172207uscas1p1475c882a53fd11c7d6c4b457a6272cad
 CMS-TYPE: 301P
-X-CMS-RootMailID: 20210618004509uscas1p2601aa451e11a38a4efe45e8853d2aa92
+X-CMS-RootMailID: 20210618004511uscas1p29ea44dff22f15562546c1012aa3cf87d
 References: <20210618004456.7280-1-bvanassche@acm.org>
-        <CGME20210618004509uscas1p2601aa451e11a38a4efe45e8853d2aa92@uscas1p2.samsung.com>
-        <20210618004456.7280-3-bvanassche@acm.org>
+        <CGME20210618004511uscas1p29ea44dff22f15562546c1012aa3cf87d@uscas1p2.samsung.com>
+        <20210618004456.7280-4-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 05:44:42PM -0700, Bart Van Assche wrote:
-> Before adding more calls in this function, simplify the error path.
+On Thu, Jun 17, 2021 at 05:44:43PM -0700, Bart Van Assche wrote:
+> rq_qos_id_to_name() is only used in blk-mq-debugfs.c so move that functio=
+n
+> into in blk-mq-debugfs.c.
 >=20
-> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Damien Le Moal <damien.lemoal@wdc.com>
+> Cc: Hannes Reinecke <hare@suse.de>
 > Cc: Christoph Hellwig <hch@lst.de>
 > Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 > Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->  block/blk-cgroup.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+>  block/blk-mq-debugfs.c | 13 +++++++++++++
+>  block/blk-rq-qos.h     | 13 -------------
+>  2 files changed, 13 insertions(+), 13 deletions(-)
 >=20
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index d169e2055158..3b0f6efaa2b6 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -1183,15 +1183,14 @@ int blkcg_init_queue(struct request_queue *q)
->  	if (preloaded)
->  		radix_tree_preload_end();
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 2a75bc7401df..6ac1c86f62ef 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -937,6 +937,19 @@ void blk_mq_debugfs_unregister_sched(struct request_=
+queue *q)
+>  	q->sched_debugfs_dir =3D NULL;
+>  }
 > =20
-> -	ret =3D blk_throtl_init(q);
-> +	ret =3D blk_iolatency_init(q);
->  	if (ret)
->  		goto err_destroy_all;
-> =20
-> -	ret =3D blk_iolatency_init(q);
-> -	if (ret) {
-> -		blk_throtl_exit(q);
-> +	ret =3D blk_throtl_init(q);
-> +	if (ret)
->  		goto err_destroy_all;
-> -	}
+> +static const char *rq_qos_id_to_name(enum rq_qos_id id)
+> +{
+> +	switch (id) {
+> +	case RQ_QOS_WBT:
+> +		return "wbt";
+> +	case RQ_QOS_LATENCY:
+> +		return "latency";
+> +	case RQ_QOS_COST:
+> +		return "cost";
+> +	}
+> +	return "unknown";
+> +}
 > +
->  	return 0;
+>  void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
+>  {
+>  	debugfs_remove_recursive(rqos->debugfs_dir);
+> diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+> index 2bcb3495e376..a77afbdd472c 100644
+> --- a/block/blk-rq-qos.h
+> +++ b/block/blk-rq-qos.h
+> @@ -79,19 +79,6 @@ static inline struct rq_qos *blkcg_rq_qos(struct reque=
+st_queue *q)
+>  	return rq_qos_id(q, RQ_QOS_LATENCY);
+>  }
 > =20
->  err_destroy_all:
+> -static inline const char *rq_qos_id_to_name(enum rq_qos_id id)
+> -{
+> -	switch (id) {
+> -	case RQ_QOS_WBT:
+> -		return "wbt";
+> -	case RQ_QOS_LATENCY:
+> -		return "latency";
+> -	case RQ_QOS_COST:
+> -		return "cost";
+> -	}
+> -	return "unknown";
+> -}
+> -
+>  static inline void rq_wait_init(struct rq_wait *rq_wait)
+>  {
+>  	atomic_set(&rq_wait->inflight, 0);
 
 Looks good.
 
