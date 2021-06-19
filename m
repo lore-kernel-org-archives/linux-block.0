@@ -2,248 +2,400 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-20.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 060FFC48BDF
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 23:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14698C48BDF
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 00:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9B4961205
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jun 2021 23:07:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDD2261358
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 00:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232885AbhFRXKG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 19:10:06 -0400
-Received: from mailout2.w2.samsung.com ([211.189.100.12]:18376 "EHLO
-        mailout2.w2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbhFRXKG (ORCPT
+        id S231723AbhFSA3j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 20:29:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59732 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230362AbhFSA3i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 19:10:06 -0400
-Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
-        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20210618230755usoutp022b85bd9d1a5c54f5625a6344bd4fc784~Jz9no_32f2774427744usoutp02l;
-        Fri, 18 Jun 2021 23:07:55 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20210618230755usoutp022b85bd9d1a5c54f5625a6344bd4fc784~Jz9no_32f2774427744usoutp02l
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1624057675;
-        bh=MGCXxsTqMZEWB1pLoCyeZ6MxCQyF9IAcgcU0HqxDoJI=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=FYfXghcwpUMu2di3oObdmFpntGEVs45nO3HQ8y6tlXSuCAQOfIeFiYwszgkV2ud+L
-         pxPI+d5uQGgBNizgoJoa5b2bxSAfFqrs5C9vzl6bjUJnSqrZNuDUg3qcPtCg3qUsOF
-         MhowUzaXW0BakFzFIR5KT65VOrUCew1bcy2W5s1s=
-Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
-        [203.254.195.111]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210618230755uscas1p12042ce70b4a7154278e521f495241722~Jz9nfO4_N2324523245uscas1p15;
-        Fri, 18 Jun 2021 23:07:55 +0000 (GMT)
-Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
-        ussmges2new.samsung.com (USCPEMTA) with SMTP id DB.06.53491.B472DC06; Fri,
-        18 Jun 2021 19:07:55 -0400 (EDT)
-Received: from ussmgxs2new.samsung.com (u91.gpu85.samsung.co.kr
-        [203.254.195.91]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210618230754uscas1p21b3b68d04215a12c346cb5607bbb902a~Jz9nGKtiR0475804758uscas1p2A;
-        Fri, 18 Jun 2021 23:07:54 +0000 (GMT)
-X-AuditID: cbfec36f-f21ff7000001d0f3-ea-60cd274b70e9
-Received: from SSI-EX1.ssi.samsung.com ( [105.128.2.146]) by
-        ussmgxs2new.samsung.com (USCPEXMTA) with SMTP id D2.98.26904.A472DC06; Fri,
-        18 Jun 2021 19:07:54 -0400 (EDT)
-Received: from SSI-EX1.ssi.samsung.com (105.128.2.226) by
-        SSI-EX1.ssi.samsung.com (105.128.2.226) with Microsoft SMTP Server
-        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-        15.1.2242.4; Fri, 18 Jun 2021 16:07:54 -0700
-Received: from SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3]) by
-        SSI-EX1.ssi.samsung.com ([fe80::255d:1bae:c3ae:e3c3%7]) with mapi id
-        15.01.2242.008; Fri, 18 Jun 2021 16:07:54 -0700
-From:   Adam Manzanares <a.manzanares@samsung.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH v3 10/16] block/mq-deadline: Improve the sysfs show and
- store macros
-Thread-Topic: [PATCH v3 10/16] block/mq-deadline: Improve the sysfs show and
-        store macros
-Thread-Index: AQHXY9s68Uw3dl9o2EaNgy+s5IZCLKsa2yqA
-Date:   Fri, 18 Jun 2021 23:07:53 +0000
-Message-ID: <20210618230753.GA241503@bgt-140510-bm01>
-In-Reply-To: <20210618004456.7280-11-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [105.128.2.176]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <68A26251AE69234799A37F8EC03F51DE@ssi.samsung.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 18 Jun 2021 20:29:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624062443;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hY2ZxM9djm7WWGjaRuplczy+3S/Q2dQSeN0JdsHu7Tc=;
+        b=hVXs3tj99MbYEhWtqatx53aI+7ImN7Gk/Nwl89aFPQJNNvTJlufloREhRNLvqUHuzkgMJl
+        1PQjfYWjrGhyxtlM59yrUZH+Pwyj6zyPx4642TAjLxkDeELpIAJC0ixGORmgoaMcYniCJv
+        24MA9F5O2g89YyEJ8IKjRST2wr8SHzg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-586-8Q_yXIVQN6CqVEBwt8UYeQ-1; Fri, 18 Jun 2021 20:27:21 -0400
+X-MC-Unique: 8Q_yXIVQN6CqVEBwt8UYeQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA4871084F54;
+        Sat, 19 Jun 2021 00:27:20 +0000 (UTC)
+Received: from T590 (ovpn-12-38.pek2.redhat.com [10.72.12.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 355175DD86;
+        Sat, 19 Jun 2021 00:27:06 +0000 (UTC)
+Date:   Sat, 19 Jun 2021 08:27:01 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     JeffleXu <jefflexu@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>
+Subject: Re: [RFC PATCH V2 3/3] dm: support bio polling
+Message-ID: <YM051cUoPjnymwR7@T590>
+References: <20210617103549.930311-1-ming.lei@redhat.com>
+ <20210617103549.930311-4-ming.lei@redhat.com>
+ <5ba43dac-b960-7c85-3a89-fdae2d1e2f51@linux.alibaba.com>
+ <YMywCX6nLqLiHXyy@T590>
+ <YM0IjWVuPya1SV0V@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTVxjHc869vd5Wm12QwCM16BqML0x0bMQbMeoHl9yhH4zZEsFE6ewV
-        utFCelvfZWSCxaLR4YKjGK3V8CpRsCCDbpEyQMUXDBCwC1Ai1FSI0irFDWk2elnSb7//fX7n
-        nP85uTQR+VQSS2t0Bl6vU2UrKRnZ1Dn9bP3O1U8yNpa/kLG1QxcotnTqb4ItNAUw67CVYLa6
-        tgOzg9ZJxI7dthDsnHkYs7+7EljnpdN4u4zr7dvJ9T4xcg01Zymu9UU+xfnGXST39o9+irvb
-        fYJ71xDHme4X493SdNkWNZ+tOczrN2zNkGU96+sicyfjj/5lDRL5qDTOjGgamC/hUluUGcno
-        SKYagaPXJBFDIQaPvZA0I2lIsk07sDioQ9Bm70Ni8CEYHpghxXAfwaPAODW/hGI2wmxXPTHP
-        UcwaCLgrQxLBTGFovzormR8sZdLhWs9NUpT2QZ2jkxI5CR6/ng59J5lVUNP6IOTLmWS4XGbD
-        8yxlWGgyPQ8xYqJh5tGtEBNMDLjGrmGxdwTYyh2EyNEQbBmlRP4URma8i0T/M7C2+imRt4K9
-        KF8icgJUXJ8gxHMj4GHZ2MJbLIO2qsHQZYAplkL11PTCpjvANXpxgRUwN1SBRakFwZVyn0QM
-        7QgaeiqRaKXAoNeMLqJ4S1hzS1grS1grS1grS1grK5LUoBijIGgzeSFJxx9JFFRawajLTDyY
-        o21A//1y3cH2nGY04PIlOhGmkRMBTSij5FLN44xIuVp17DivzzmgN2bzghMpaFIZI8d7fz4Q
-        yWSqDPwPPJ/L6/+fYloam48lA0/lURm6erXyVePb73FjtPs6kfwyr0m93ObRLAl+9KPUX8v6
-        Wz/MbuuqMljdQ3EFawe/XVn02/682HslgTSNGx/tLmg+6Sn4mGVQp59b3GlW+6nX7dr1ezcM
-        f2IeT5opvr1n8sxmT2pHWsWNwz/dIav2nT3tfVCy3XKw5B+/3FJ/CN1qOXGusqjszp4/lykK
-        O/wDFbW2m/YPS+7ZNQH9+TyaT9nFE4ZDxqoV6957ZNE/ziU/9DWfnKtLMUgKEsybhrRdE5fH
-        eY9ilyJtoqc/1Sn9uvQr18h33yxqlJ4yBZ9HjLqF8yNa7y9tN9Jz49VflK7gyoP7l7qq3+y4
-        60BeJSlkqT5fR+gF1b+sNZ7y4QMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNIsWRmVeSWpSXmKPExsWS2cA0SddL/WyCQcMjPYvVd/vZLKZ9+Mls
-        0dr+jcliz6JJTBYrVx9lsrix4A2jxZP1s5gt/nbdY7LYe0vb4tDkZiYHLo/LV7w9Lp8t9di0
-        qpPNY/fNBjaPj09vsXi833eVzWPz6WqPz5vkPNoPdDMFcEZx2aSk5mSWpRbp2yVwZZy/cpyl
-        4I1Kxe0F/5gbGKfJdTFyckgImEgs+rqHqYuRi0NIYDWjxLSlt1khnI+MEjN27GOGcA4wStzb
-        +IAdpIVNwEDi9/GNzCC2iICGxLcHy1lAipgFPjBJ/Nj5kQUkISwQJTH/whIWiKJoiQubzzNB
-        2EYSZ159BYuzCKhKrNp9ghXE5hUwlZg+cxHUHTsYJTbtWM0GkuAUsJDY1n4RrJlRQEzi+6k1
-        YDazgLjErSfzmSCeEJBYsuc8M4QtKvHy8T9WCFtR4v73l+wQ9ToSC3Z/YoOw7SS2dDSwQtja
-        EssWvmaGOEJQ4uTMJywQvZISB1fcYJnAKDELybpZSEbNQjJqFpJRs5CMWsDIuopRvLS4ODe9
-        otgoL7Vcrzgxt7g0L10vOT93EyMwPZz+dzh6B+PtWx/1DjEycTAeYpTgYFYS4eXMPJMgxJuS
-        WFmVWpQfX1Sak1p8iFGag0VJnPdl1MR4IYH0xJLU7NTUgtQimCwTB6dUAxNzWfD6Rbfa94fo
-        FoW/+L2FUSYmW2f7rZh7PIZ3ZfKjHv7eoPhGJcJ8e8Rlp8CaEJMDxRvXOJv3bj5RsXB7RtPt
-        vzIzGdZMZ7m9yf2P6ksNY+9Ns5+eP77mt/Kb/0EpfPwcNuc+Tea4oDr9aWulldBM9fVT90yU
-        YlmZfCzXMPWYQE7w3cMz33Lvv3LV7c/mgG1uXMtVmXf3fWcwPLY90XDq9VUJO9X/+0r8zH26
-        U3TtFnnL1ymN4cXOc9S0b+k85WH8kzXXfWO0Y9CyBq2zR6uKoyb7xn/+vsdfsfPfVZHk6pW6
-        H66yOShyq5akn4075PCy+HzRCgZdVq0iSUe1l9Y7l0jqREw699euWsXn4holluKMREMt5qLi
-        RACeyGSSfgMAAA==
-X-CMS-MailID: 20210618230754uscas1p21b3b68d04215a12c346cb5607bbb902a
-CMS-TYPE: 301P
-X-CMS-RootMailID: 20210618004523uscas1p118a3ca19aa236230fc96da78437079a6
-References: <20210618004456.7280-1-bvanassche@acm.org>
-        <CGME20210618004523uscas1p118a3ca19aa236230fc96da78437079a6@uscas1p1.samsung.com>
-        <20210618004456.7280-11-bvanassche@acm.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YM0IjWVuPya1SV0V@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 05:44:50PM -0700, Bart Van Assche wrote:
-> Define separate macros for integers and jiffies to improve readability.
-> Use sysfs_emit() and kstrtoint() instead of sprintf() and simple_strtol()=
-.
-> The former functions are the recommended functions.
->=20
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/mq-deadline.c | 66 ++++++++++++++++++++-------------------------
->  1 file changed, 29 insertions(+), 37 deletions(-)
->=20
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 69126beff77d..f92224ff0256 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -605,58 +605,50 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
->  /*
->   * sysfs parts below
->   */
-> -static ssize_t
-> -deadline_var_show(int var, char *page)
-> -{
-> -	return sprintf(page, "%d\n", var);
-> -}
-> -
-> -static void
-> -deadline_var_store(int *var, const char *page)
-> -{
-> -	char *p =3D (char *) page;
-> -
-> -	*var =3D simple_strtol(p, &p, 10);
-> -}
-> -
-> -#define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
-> +#define SHOW_INT(__FUNC, __VAR)						\
->  static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
->  {									\
->  	struct deadline_data *dd =3D e->elevator_data;			\
-> -	int __data =3D __VAR;						\
-> -	if (__CONV)							\
-> -		__data =3D jiffies_to_msecs(__data);			\
-> -	return deadline_var_show(__data, (page));			\
-> -}
-> -SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[DD_READ], 1);
-> -SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[DD_WRITE], 1);
-> -SHOW_FUNCTION(deadline_writes_starved_show, dd->writes_starved, 0);
-> -SHOW_FUNCTION(deadline_front_merges_show, dd->front_merges, 0);
-> -SHOW_FUNCTION(deadline_fifo_batch_show, dd->fifo_batch, 0);
-> -#undef SHOW_FUNCTION
-> +									\
-> +	return sysfs_emit(page, "%d\n", __VAR);				\
-> +}
-> +#define SHOW_JIFFIES(__FUNC, __VAR) SHOW_INT(__FUNC, jiffies_to_msecs(__=
-VAR))
-> +SHOW_JIFFIES(deadline_read_expire_show, dd->fifo_expire[DD_READ]);
-> +SHOW_JIFFIES(deadline_write_expire_show, dd->fifo_expire[DD_WRITE]);
-> +SHOW_INT(deadline_writes_starved_show, dd->writes_starved);
-> +SHOW_INT(deadline_front_merges_show, dd->front_merges);
-> +SHOW_INT(deadline_fifo_batch_show, dd->fifo_batch);
-> +#undef SHOW_INT
-> +#undef SHOW_JIFFIES
-> =20
->  #define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			\
->  static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t=
- count)	\
->  {									\
->  	struct deadline_data *dd =3D e->elevator_data;			\
-> -	int __data;							\
-> -	deadline_var_store(&__data, (page));				\
-> +	int __data, __ret;						\
-> +									\
-> +	__ret =3D kstrtoint(page, 0, &__data);				\
-> +	if (__ret < 0)							\
-> +		return __ret;						\
->  	if (__data < (MIN))						\
->  		__data =3D (MIN);						\
->  	else if (__data > (MAX))					\
->  		__data =3D (MAX);						\
-> -	if (__CONV)							\
-> -		*(__PTR) =3D msecs_to_jiffies(__data);			\
-> -	else								\
-> -		*(__PTR) =3D __data;					\
-> +	*(__PTR) =3D __CONV(__data);					\
->  	return count;							\
->  }
-> -STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[DD_READ], 0,=
- INT_MAX, 1);
-> -STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], =
-0, INT_MAX, 1);
-> -STORE_FUNCTION(deadline_writes_starved_store, &dd->writes_starved, INT_M=
-IN, INT_MAX, 0);
-> -STORE_FUNCTION(deadline_front_merges_store, &dd->front_merges, 0, 1, 0);
-> -STORE_FUNCTION(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX, 0=
-);
-> +#define STORE_INT(__FUNC, __PTR, MIN, MAX)				\
-> +	STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, )
-> +#define STORE_JIFFIES(__FUNC, __PTR, MIN, MAX)				\
-> +	STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, msecs_to_jiffies)
-> +STORE_JIFFIES(deadline_read_expire_store, &dd->fifo_expire[DD_READ], 0, =
-INT_MAX);
-> +STORE_JIFFIES(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], 0=
-, INT_MAX);
-> +STORE_INT(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, I=
-NT_MAX);
-> +STORE_INT(deadline_front_merges_store, &dd->front_merges, 0, 1);
-> +STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);
->  #undef STORE_FUNCTION
-> +#undef STORE_INT
-> +#undef STORE_JIFFIES
-> =20
->  #define DD_ATTR(name) \
->  	__ATTR(name, 0644, deadline_##name##_show, deadline_##name##_store)
+On Fri, Jun 18, 2021 at 04:56:45PM -0400, Mike Snitzer wrote:
+> [you really should've changed the subject of this email to
+> "[RFC PATCH V3 3/3] dm: support bio polling"]
+> 
+> On Fri, Jun 18 2021 at 10:39P -0400,
+> Ming Lei <ming.lei@redhat.com> wrote:
+> 
+> > From 47e523b9ee988317369eaadb96826323cd86819e Mon Sep 17 00:00:00 2001
+> > From: Ming Lei <ming.lei@redhat.com>
+> > Date: Wed, 16 Jun 2021 16:13:46 +0800
+> > Subject: [RFC PATCH V3 3/3] dm: support bio polling
+> > 
+> > Support bio(REQ_POLLED) polling in the following approach:
+> > 
+> > 1) only support io polling on normal READ/WRITE, and other abnormal IOs
+> > still fallback on IRQ mode, so the target io is exactly inside the dm
+> > io.
+> > 
+> > 2) hold one refcnt on io->io_count after submitting this dm bio with
+> > REQ_POLLED
+> > 
+> > 3) support dm native bio splitting, any dm io instance associated with
+> > current bio will be added into one list which head is bio->bi_end_io
+> > which will be recovered before ending this bio
+> > 
+> > 4) implement .poll_bio() callback, call bio_poll() on the single target
+> > bio inside the dm io which is retrieved via bio->bi_bio_drv_data; call
+> > dec_pending() after the target io is done in .poll_bio()
+> > 
+> > 4) enable QUEUE_FLAG_POLL if all underlying queues enable QUEUE_FLAG_POLL,
+> > which is based on Jeffle's previous patch.
+> 
+> ^ nit: two "4)", last should be 5.
+> 
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> > V3:
+> > 	- covers all comments from Jeffle
+> 
+> Would really appreciate it if Jeffle could test these changes like he
+> did previous dm IO polling patchsets he implemented.  Jeffle?
 
-Looks good.
+Yeah, I am looking forward to Jeffle's test too, :-)
 
-Reviewed by: Adam Manzanares <a.manzanares@samsung.com>=
+> 
+> > 	- fix corner cases when polling on abnormal ios
+> > 
+> >  drivers/md/dm-table.c |  24 ++++++++
+> >  drivers/md/dm.c       | 127 ++++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 147 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> > index ee47a332b462..b14b379442d2 100644
+> > --- a/drivers/md/dm-table.c
+> > +++ b/drivers/md/dm-table.c
+> > @@ -1491,6 +1491,12 @@ struct dm_target *dm_table_find_target(struct dm_table *t, sector_t sector)
+> >  	return &t->targets[(KEYS_PER_NODE * n) + k];
+> >  }
+> >  
+> > +static int device_not_poll_capable(struct dm_target *ti, struct dm_dev *dev,
+> > +				   sector_t start, sector_t len, void *data)
+> > +{
+> > +	return !blk_queue_poll(bdev_get_queue(dev->bdev));
+> > +}
+> > +
+> >  /*
+> >   * type->iterate_devices() should be called when the sanity check needs to
+> >   * iterate and check all underlying data devices. iterate_devices() will
+> > @@ -1541,6 +1547,11 @@ static int count_device(struct dm_target *ti, struct dm_dev *dev,
+> >  	return 0;
+> >  }
+> >  
+> > +static int dm_table_supports_poll(struct dm_table *t)
+> > +{
+> > +	return !dm_table_any_dev_attr(t, device_not_poll_capable, NULL);
+> > +}
+> > +
+> >  /*
+> >   * Check whether a table has no data devices attached using each
+> >   * target's iterate_devices method.
+> > @@ -2078,6 +2089,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> >  
+> >  	dm_update_keyslot_manager(q, t);
+> >  	blk_queue_update_readahead(q);
+> > +
+> > +	/*
+> > +	 * Check for request-based device is remained to
+> > +	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
+> > +	 * For bio-based device, only set QUEUE_FLAG_POLL when all underlying
+> > +	 * devices supporting polling.
+> > +	 */
+> > +	if (__table_type_bio_based(t->type)) {
+> > +		if (dm_table_supports_poll(t))
+> > +			blk_queue_flag_set(QUEUE_FLAG_POLL, q);
+> > +		else
+> > +			blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
+> > +	}
+> >  }
+> >  
+> >  unsigned int dm_table_get_num_targets(struct dm_table *t)
+> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > index 363f12a285ce..df4a6a999014 100644
+> > --- a/drivers/md/dm.c
+> > +++ b/drivers/md/dm.c
+> > @@ -39,6 +39,8 @@
+> >  #define DM_COOKIE_ENV_VAR_NAME "DM_COOKIE"
+> >  #define DM_COOKIE_LENGTH 24
+> >  
+> > +#define REQ_SAVED_END_IO             REQ_DRV
+> > +
+> >  static const char *_name = DM_NAME;
+> >  
+> >  static unsigned int major = 0;
+> > @@ -72,6 +74,7 @@ struct clone_info {
+> >  	struct dm_io *io;
+> >  	sector_t sector;
+> >  	unsigned sector_count;
+> > +	bool	submit_as_polled;
+> >  };
+> >  
+> >  /*
+> > @@ -99,6 +102,8 @@ struct dm_io {
+> >  	blk_status_t status;
+> >  	atomic_t io_count;
+> >  	struct bio *orig_bio;
+> > +	void	*saved_bio_end_io;
+> > +	struct hlist_node  node;
+> >  	unsigned long start_time;
+> >  	spinlock_t endio_lock;
+> >  	struct dm_stats_aux stats_aux;
+> 
+> I'd need to check these changes with pahole, but have you looked
+> closely at whether these new members would be better placed (e.g. is
+> there an existing hole? does the new 'struct hlist_node' span a
+> cacheline? etc).
+
+'hlist_node' won't span a cacheline, and there isn't hole in 'dm_io'
+available for the new two fields too.
+
+But looks we have to add one extra cacheline for holding the two new
+fields. Originally all fields except for the last one(dm_target_io)
+can be held in single cacheline.
+
+> 
+> Also, a zoned dm-5.14 change moved this struct out to
+> drivers/md/dm-core.h, see:
+> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.14&id=e2118b3c3d94289852417f70ec128c25f4833aad
+> 
+> So seems no matter what we'll have a merge conflict.  But that's OK,
+> I'll just let Linus know when I send the linux-dm.git pull request for
+> the 5.14 merge window (assuming hch's bio polling changes land in time
+> with Jens).
+> 
+> > @@ -687,6 +692,8 @@ static struct dm_target_io *alloc_tio(struct clone_info *ci, struct dm_target *t
+> >  	tio->ti = ti;
+> >  	tio->target_bio_nr = target_bio_nr;
+> >  
+> > +	WARN_ON_ONCE(ci->submit_as_polled && !tio->inside_dm_io);
+> > +
+> >  	return tio;
+> >  }
+> >  
+> > @@ -938,8 +945,14 @@ static void dec_pending(struct dm_io *io, blk_status_t error)
+> >  		end_io_acct(io);
+> >  		free_io(md, io);
+> >  
+> > -		if (io_error == BLK_STS_DM_REQUEUE)
+> > +		if (io_error == BLK_STS_DM_REQUEUE) {
+> > +			/*
+> > +			 * Upper layer won't help us poll split bio, so
+> > +			 * clear REQ_POLLED in case of requeue
+> > +			 */
+> 
+> This comment isn't very clear. Meaning block core cannot handle
+> preserving old bio (which is poll cookie) across requeue?
+
+bio->bi_cookie isn't used by dm queue yet, and we simply clear
+POLLED if it isn't submitted directly or needs requeue. So in future,
+bio->bi_cookie can be reused for other purpose.
+
+The upper layer(FS) can only call bio_poll() on the bio which is submitted
+via submit_bio() from upper layer code. And bio_poll() won't be called on
+split bio originated from block layer or dm driver.
+
+The above commit means that this bio may be split bio from bio_split()
+in __split_and_process_bio(). And if it is requeued, we will handle it
+in 'IRQ' mode, so it can be completed.
+
+> 
+> > +			bio->bi_opf &= ~REQ_POLLED;
+> >  			return;
+> > +		}
+> >  
+> >  		if ((bio->bi_opf & REQ_PREFLUSH) && bio->bi_iter.bi_size) {
+> >  			/*
+> > @@ -1574,6 +1587,32 @@ static bool __process_abnormal_io(struct clone_info *ci, struct dm_target *ti,
+> >  	return true;
+> >  }
+> >  
+> > +static void dm_setup_polled_io(struct clone_info *ci)
+> > +{
+> > +	struct bio *bio = ci->bio;
+> > +
+> > +	/*
+> > +	 * Only support bio polling for normal IO, and the target io is
+> > +	 * exactly inside the dm io instance
+> > +	 */
+> 
+> This comment should be clearer with:
+> 
+> > +	/*
+> > +	 * Only support bio polling for normal IO that also
+> > +	 * hasn't been split or cloned further.
+> > +	 */
+
+This bio could have been split in __split_and_process_bio() already and
+re-submitted via submit_bio_noacct(), and we still can support poll on it
+because it is always the bio originated from FS layer. All split bios(dm io)
+from this bio are added into hlist which head is stored in this FS bio's bi_end_io().
+
+> 
+> That way DM's use of 'inside_dm_io' flag isn't a factor.
+> (it just so happens 'inside_dm_io' reflects IO is first DM clone bio).
+> 
+> But wouldn't early return if !ci->io->tio.inside_dm_io also make sense
+> here?  That way you could get rid of the WARN_ON_ONCE in dm_poll_dm_io?
+
+inside_dm_io is always true here, and it will be updated in alloc_tio()
+which isn't run yet.
+
+> 
+> > +	ci->submit_as_polled = !!(bio->bi_opf & REQ_POLLED);
+> > +	if (!ci->submit_as_polled)
+> > +		return;
+> > +
+> > +	INIT_HLIST_NODE(&ci->io->node);
+> > +	/*
+> > +	 * Save .bi_end_io into dm_io, so that we can reuse .bi_end_io
+> > +	 * for storing dm_io list
+> > +	 */
+> > +	if (bio->bi_opf & REQ_SAVED_END_IO) {
+> > +		ci->io->saved_bio_end_io = NULL;
+> > +	} else {
+> > +		ci->io->saved_bio_end_io = bio->bi_end_io;
+> > +		INIT_HLIST_HEAD((struct hlist_head *)&bio->bi_end_io);
+> > +		bio->bi_opf |= REQ_SAVED_END_IO;
+> > +	}
+> > +}
+> > +
+> >  /*
+> >   * Select the correct strategy for processing a non-flush bio.
+> >   */
+> > @@ -1590,6 +1629,8 @@ static int __split_and_process_non_flush(struct clone_info *ci)
+> >  	if (__process_abnormal_io(ci, ti, &r))
+> >  		return r;
+> >  
+> > +	dm_setup_polled_io(ci);
+> > +
+> >  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
+> >  
+> >  	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
+> > @@ -1666,8 +1707,18 @@ static void __split_and_process_bio(struct mapped_device *md,
+> >  		}
+> >  	}
+> >  
+> > -	/* drop the extra reference count */
+> > -	dec_pending(ci.io, errno_to_blk_status(error));
+> > +	/*
+> > +	 * Drop the extra reference count for non-POLLED bio, and hold one
+> > +	 * reference for POLLED bio, which will be released in dm_poll_bio
+> > +	 *
+> > +	 * Add every dm_io instance into the hlist_head which is stored in
+> > +	 * bio->bi_end_io, so that dm_poll_bio can poll them all.
+> > +	 */
+> > +	if (!ci.submit_as_polled)
+> > +		dec_pending(ci.io, errno_to_blk_status(error));
+> > +	else
+> > +		hlist_add_head(&ci.io->node,
+> > +				(struct hlist_head *)&bio->bi_end_io);
+> >  }
+> >  
+> >  static void dm_submit_bio(struct bio *bio)
+> > @@ -1690,8 +1741,11 @@ static void dm_submit_bio(struct bio *bio)
+> >  			bio_wouldblock_error(bio);
+> >  		else if (bio->bi_opf & REQ_RAHEAD)
+> >  			bio_io_error(bio);
+> > -		else
+> > +		else {
+> > +			/* Not ready for poll */
+> > +			bio->bi_opf &= ~REQ_POLLED;
+> >  			queue_io(md, bio);
+> > +		}
+> 
+> "Not ready for poll" isn't really a useful comment.  Maybe?:
+> /* Cannot support polling once IO is queued */
+
+We setup dm bio polling mechanism only after __split_and_process_bio()
+is called, so 'not ready for poll'.
+
+> 
+> But should you just bio_wouldblock_error() the IO if REQ_POLLED set?
+> Same as done for REQ_NOWAIT?
+
+I guess we can't, because the two flags are independent.
+> 
+> (thought I've seen a comparable response to REQ_POLLED before but not
+> finding one now that I look, maybe it was in Jeffle's earlier patchset?).
+> 
+> But all said, I'm missing why this particular instance of queue_io()
+> is a problem relative to polling.  The bio will just block waiting to
+> be processed, if blocking is a problem then it really does seem like
+> bio_wouldblock_error() is appropriate.
+
+It was cleared because I thought we can't call dm_poll_bio() for this
+bio queued via queue_io() here, because we don't call dm_setup_polled_io
+yet.
+
+But looks we needn't to clear REQ_POLLED here, since REQ_SAVED_END_IO
+isn't set for this bio, and it won't be polled in dm_poll_bio()
+really until they are submitted finally.
+
+> 
+> And what about dm_io_dec_pending() should its use of queue_io() also
+> clear REQ_POLLED (so push clearing REQ_POLLED into queue_io?)?
+> Or is flush-with-data (via REQ_PREFLUSH) and REQ_POLLING mutually
+> exclussive?
+
+We only poll normal bio, and REQ_SAVED_END_IO isn't set for flush &
+other abnormal bios, so they won't be polled via dm_poll_bio() really
+and still rely on underlying's interrupt handler to complete.
+
+
+Thanks, 
+Ming
+
