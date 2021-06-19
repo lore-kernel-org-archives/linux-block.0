@@ -2,400 +2,239 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14698C48BDF
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 00:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6C6C49361
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 01:06:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDD2261358
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 00:32:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A8346124C
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 01:06:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231723AbhFSA3j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jun 2021 20:29:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59732 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230362AbhFSA3i (ORCPT
+        id S232127AbhFSBJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jun 2021 21:09:02 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:53553 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231819AbhFSBJC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jun 2021 20:29:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624062443;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hY2ZxM9djm7WWGjaRuplczy+3S/Q2dQSeN0JdsHu7Tc=;
-        b=hVXs3tj99MbYEhWtqatx53aI+7ImN7Gk/Nwl89aFPQJNNvTJlufloREhRNLvqUHuzkgMJl
-        1PQjfYWjrGhyxtlM59yrUZH+Pwyj6zyPx4642TAjLxkDeELpIAJC0ixGORmgoaMcYniCJv
-        24MA9F5O2g89YyEJ8IKjRST2wr8SHzg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-586-8Q_yXIVQN6CqVEBwt8UYeQ-1; Fri, 18 Jun 2021 20:27:21 -0400
-X-MC-Unique: 8Q_yXIVQN6CqVEBwt8UYeQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA4871084F54;
-        Sat, 19 Jun 2021 00:27:20 +0000 (UTC)
-Received: from T590 (ovpn-12-38.pek2.redhat.com [10.72.12.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 355175DD86;
-        Sat, 19 Jun 2021 00:27:06 +0000 (UTC)
-Date:   Sat, 19 Jun 2021 08:27:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     JeffleXu <jefflexu@linux.alibaba.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>
-Subject: Re: [RFC PATCH V2 3/3] dm: support bio polling
-Message-ID: <YM051cUoPjnymwR7@T590>
-References: <20210617103549.930311-1-ming.lei@redhat.com>
- <20210617103549.930311-4-ming.lei@redhat.com>
- <5ba43dac-b960-7c85-3a89-fdae2d1e2f51@linux.alibaba.com>
- <YMywCX6nLqLiHXyy@T590>
- <YM0IjWVuPya1SV0V@redhat.com>
+        Fri, 18 Jun 2021 21:09:02 -0400
+Received: from fsav314.sakura.ne.jp (fsav314.sakura.ne.jp [153.120.85.145])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 15J15nGa006768;
+        Sat, 19 Jun 2021 10:05:50 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav314.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp);
+ Sat, 19 Jun 2021 10:05:49 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 15J15ikI006747
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 19 Jun 2021 10:05:49 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+In-Reply-To: 
+To:     hch@infradead.org
+Cc:     axboe@kernel.dk, desmondcheongzx@gmail.com,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        miquel.raynal@bootlin.com, richard@nod.at,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        syzbot+6a8a0d93c91e8fbf2e80@syzkaller.appspotmail.com,
+        vigneshr@ti.com
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: [PATCH v2] block: genhd: don't call probe function with
+ major_names_lock held
+Message-ID: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
+Date:   Sat, 19 Jun 2021 10:05:44 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YM0IjWVuPya1SV0V@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 04:56:45PM -0400, Mike Snitzer wrote:
-> [you really should've changed the subject of this email to
-> "[RFC PATCH V3 3/3] dm: support bio polling"]
-> 
-> On Fri, Jun 18 2021 at 10:39P -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > From 47e523b9ee988317369eaadb96826323cd86819e Mon Sep 17 00:00:00 2001
-> > From: Ming Lei <ming.lei@redhat.com>
-> > Date: Wed, 16 Jun 2021 16:13:46 +0800
-> > Subject: [RFC PATCH V3 3/3] dm: support bio polling
-> > 
-> > Support bio(REQ_POLLED) polling in the following approach:
-> > 
-> > 1) only support io polling on normal READ/WRITE, and other abnormal IOs
-> > still fallback on IRQ mode, so the target io is exactly inside the dm
-> > io.
-> > 
-> > 2) hold one refcnt on io->io_count after submitting this dm bio with
-> > REQ_POLLED
-> > 
-> > 3) support dm native bio splitting, any dm io instance associated with
-> > current bio will be added into one list which head is bio->bi_end_io
-> > which will be recovered before ending this bio
-> > 
-> > 4) implement .poll_bio() callback, call bio_poll() on the single target
-> > bio inside the dm io which is retrieved via bio->bi_bio_drv_data; call
-> > dec_pending() after the target io is done in .poll_bio()
-> > 
-> > 4) enable QUEUE_FLAG_POLL if all underlying queues enable QUEUE_FLAG_POLL,
-> > which is based on Jeffle's previous patch.
-> 
-> ^ nit: two "4)", last should be 5.
-> 
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> > V3:
-> > 	- covers all comments from Jeffle
-> 
-> Would really appreciate it if Jeffle could test these changes like he
-> did previous dm IO polling patchsets he implemented.  Jeffle?
+syzbot is reporting circular locking problem at blk_request_module() [1],
+for blk_request_module() is calling probe function with major_names_lock
+held while major_names_lock is held during module's __init and __exit
+functions.
 
-Yeah, I am looking forward to Jeffle's test too, :-)
+                                         loop_exit() {
+                                           mutex_lock(&loop_ctl_mutex);
+  blk_request_module() {
+    mutex_lock(&major_names_lock);
+    loop_probe() {
+      mutex_lock(&loop_ctl_mutex); // Blocked by loop_exit()
+      mutex_unlock(&loop_ctl_mutex);
+    }
+    mutex_unlock(&major_names_lock);
+                                           unregister_blkdev() {
+                                             mutex_lock(&major_names_lock); // Blocked by blk_request_module()
+                                             mutex_unlock(&major_names_lock);
+                                           }
+                                           mutex_unlock(&loop_ctl_mutex);
+  }
+                                         }
 
-> 
-> > 	- fix corner cases when polling on abnormal ios
-> > 
-> >  drivers/md/dm-table.c |  24 ++++++++
-> >  drivers/md/dm.c       | 127 ++++++++++++++++++++++++++++++++++++++++--
-> >  2 files changed, 147 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> > index ee47a332b462..b14b379442d2 100644
-> > --- a/drivers/md/dm-table.c
-> > +++ b/drivers/md/dm-table.c
-> > @@ -1491,6 +1491,12 @@ struct dm_target *dm_table_find_target(struct dm_table *t, sector_t sector)
-> >  	return &t->targets[(KEYS_PER_NODE * n) + k];
-> >  }
-> >  
-> > +static int device_not_poll_capable(struct dm_target *ti, struct dm_dev *dev,
-> > +				   sector_t start, sector_t len, void *data)
-> > +{
-> > +	return !blk_queue_poll(bdev_get_queue(dev->bdev));
-> > +}
-> > +
-> >  /*
-> >   * type->iterate_devices() should be called when the sanity check needs to
-> >   * iterate and check all underlying data devices. iterate_devices() will
-> > @@ -1541,6 +1547,11 @@ static int count_device(struct dm_target *ti, struct dm_dev *dev,
-> >  	return 0;
-> >  }
-> >  
-> > +static int dm_table_supports_poll(struct dm_table *t)
-> > +{
-> > +	return !dm_table_any_dev_attr(t, device_not_poll_capable, NULL);
-> > +}
-> > +
-> >  /*
-> >   * Check whether a table has no data devices attached using each
-> >   * target's iterate_devices method.
-> > @@ -2078,6 +2089,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-> >  
-> >  	dm_update_keyslot_manager(q, t);
-> >  	blk_queue_update_readahead(q);
-> > +
-> > +	/*
-> > +	 * Check for request-based device is remained to
-> > +	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
-> > +	 * For bio-based device, only set QUEUE_FLAG_POLL when all underlying
-> > +	 * devices supporting polling.
-> > +	 */
-> > +	if (__table_type_bio_based(t->type)) {
-> > +		if (dm_table_supports_poll(t))
-> > +			blk_queue_flag_set(QUEUE_FLAG_POLL, q);
-> > +		else
-> > +			blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
-> > +	}
-> >  }
-> >  
-> >  unsigned int dm_table_get_num_targets(struct dm_table *t)
-> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > index 363f12a285ce..df4a6a999014 100644
-> > --- a/drivers/md/dm.c
-> > +++ b/drivers/md/dm.c
-> > @@ -39,6 +39,8 @@
-> >  #define DM_COOKIE_ENV_VAR_NAME "DM_COOKIE"
-> >  #define DM_COOKIE_LENGTH 24
-> >  
-> > +#define REQ_SAVED_END_IO             REQ_DRV
-> > +
-> >  static const char *_name = DM_NAME;
-> >  
-> >  static unsigned int major = 0;
-> > @@ -72,6 +74,7 @@ struct clone_info {
-> >  	struct dm_io *io;
-> >  	sector_t sector;
-> >  	unsigned sector_count;
-> > +	bool	submit_as_polled;
-> >  };
-> >  
-> >  /*
-> > @@ -99,6 +102,8 @@ struct dm_io {
-> >  	blk_status_t status;
-> >  	atomic_t io_count;
-> >  	struct bio *orig_bio;
-> > +	void	*saved_bio_end_io;
-> > +	struct hlist_node  node;
-> >  	unsigned long start_time;
-> >  	spinlock_t endio_lock;
-> >  	struct dm_stats_aux stats_aux;
-> 
-> I'd need to check these changes with pahole, but have you looked
-> closely at whether these new members would be better placed (e.g. is
-> there an existing hole? does the new 'struct hlist_node' span a
-> cacheline? etc).
+Based on an assumption that a probe callback passed to __register_blkdev()
+belongs to a module which calls __register_blkdev(), drop major_names_lock
+before calling probe function by holding a reference to that module which
+contains that probe function. If there is a module where this assumption
+does not hold, such module can call ____register_blkdev() directly.
 
-'hlist_node' won't span a cacheline, and there isn't hole in 'dm_io'
-available for the new two fields too.
+  blk_request_module() {
+    mutex_lock(&major_names_lock);
+    // Block loop_exit()
+    mutex_unlock(&major_names_lock);
+    loop_probe() {
+      mutex_lock(&loop_ctl_mutex);
+      mutex_unlock(&loop_ctl_mutex);
+    }
+    // Unblock loop_exit()
+  }
+                                         loop_exit() {
+                                           mutex_lock(&loop_ctl_mutex);
+                                           unregister_blkdev() {
+                                             mutex_lock(&major_names_lock);
+                                             mutex_unlock(&major_names_lock);
+                                           }
+                                           mutex_unlock(&loop_ctl_mutex);
+                                         }
 
-But looks we have to add one extra cacheline for holding the two new
-fields. Originally all fields except for the last one(dm_target_io)
-can be held in single cacheline.
+Note that regardless of this patch, it is up to probe function to
+serialize module's __init function and probe function in that module
+by using e.g. a mutex. This patch simply makes sure that module's __exit
+function won't be called when probe function is about to be called.
 
-> 
-> Also, a zoned dm-5.14 change moved this struct out to
-> drivers/md/dm-core.h, see:
-> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.14&id=e2118b3c3d94289852417f70ec128c25f4833aad
-> 
-> So seems no matter what we'll have a merge conflict.  But that's OK,
-> I'll just let Linus know when I send the linux-dm.git pull request for
-> the 5.14 merge window (assuming hch's bio polling changes land in time
-> with Jens).
-> 
-> > @@ -687,6 +692,8 @@ static struct dm_target_io *alloc_tio(struct clone_info *ci, struct dm_target *t
-> >  	tio->ti = ti;
-> >  	tio->target_bio_nr = target_bio_nr;
-> >  
-> > +	WARN_ON_ONCE(ci->submit_as_polled && !tio->inside_dm_io);
-> > +
-> >  	return tio;
-> >  }
-> >  
-> > @@ -938,8 +945,14 @@ static void dec_pending(struct dm_io *io, blk_status_t error)
-> >  		end_io_acct(io);
-> >  		free_io(md, io);
-> >  
-> > -		if (io_error == BLK_STS_DM_REQUEUE)
-> > +		if (io_error == BLK_STS_DM_REQUEUE) {
-> > +			/*
-> > +			 * Upper layer won't help us poll split bio, so
-> > +			 * clear REQ_POLLED in case of requeue
-> > +			 */
-> 
-> This comment isn't very clear. Meaning block core cannot handle
-> preserving old bio (which is poll cookie) across requeue?
+While Desmond Cheong Zhi Xi already proposed a patch for breaking ABCD
+circular dependency [2], I consider that this patch is still needed for
+safely breaking AB-BA dependency upon module unloading. (Note that syzbot
+does not test module unloading code because the syzbot kernels are built
+with almost all modules built-in. We need manual inspection.)
 
-bio->bi_cookie isn't used by dm queue yet, and we simply clear
-POLLED if it isn't submitted directly or needs requeue. So in future,
-bio->bi_cookie can be reused for other purpose.
+By doing kmalloc(GFP_KERNEL) in ____register_blkdev() before holding
+major_names_lock, we could convert major_names_lock from a mutex to
+a spinlock. But that is beyond the scope of this patch.
 
-The upper layer(FS) can only call bio_poll() on the bio which is submitted
-via submit_bio() from upper layer code. And bio_poll() won't be called on
-split bio originated from block layer or dm driver.
+Link: https://syzkaller.appspot.com/bug?id=7bd106c28e846d1023d4ca915718b1a0905444cb [1]
+Link: https://lkml.kernel.org/r/20210617160904.570111-1-desmondcheongzx@gmail.com [2]
+Reported-by: syzbot <syzbot+6a8a0d93c91e8fbf2e80@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Tested-by: syzbot <syzbot+6a8a0d93c91e8fbf2e80@syzkaller.appspotmail.com>
+---
+ block/genhd.c         | 36 +++++++++++++++++++++++++++---------
+ include/linux/genhd.h |  8 +++++---
+ 2 files changed, 32 insertions(+), 12 deletions(-)
 
-The above commit means that this bio may be split bio from bio_split()
-in __split_and_process_bio(). And if it is requeued, we will handle it
-in 'IRQ' mode, so it can be completed.
-
-> 
-> > +			bio->bi_opf &= ~REQ_POLLED;
-> >  			return;
-> > +		}
-> >  
-> >  		if ((bio->bi_opf & REQ_PREFLUSH) && bio->bi_iter.bi_size) {
-> >  			/*
-> > @@ -1574,6 +1587,32 @@ static bool __process_abnormal_io(struct clone_info *ci, struct dm_target *ti,
-> >  	return true;
-> >  }
-> >  
-> > +static void dm_setup_polled_io(struct clone_info *ci)
-> > +{
-> > +	struct bio *bio = ci->bio;
-> > +
-> > +	/*
-> > +	 * Only support bio polling for normal IO, and the target io is
-> > +	 * exactly inside the dm io instance
-> > +	 */
-> 
-> This comment should be clearer with:
-> 
-> > +	/*
-> > +	 * Only support bio polling for normal IO that also
-> > +	 * hasn't been split or cloned further.
-> > +	 */
-
-This bio could have been split in __split_and_process_bio() already and
-re-submitted via submit_bio_noacct(), and we still can support poll on it
-because it is always the bio originated from FS layer. All split bios(dm io)
-from this bio are added into hlist which head is stored in this FS bio's bi_end_io().
-
-> 
-> That way DM's use of 'inside_dm_io' flag isn't a factor.
-> (it just so happens 'inside_dm_io' reflects IO is first DM clone bio).
-> 
-> But wouldn't early return if !ci->io->tio.inside_dm_io also make sense
-> here?  That way you could get rid of the WARN_ON_ONCE in dm_poll_dm_io?
-
-inside_dm_io is always true here, and it will be updated in alloc_tio()
-which isn't run yet.
-
-> 
-> > +	ci->submit_as_polled = !!(bio->bi_opf & REQ_POLLED);
-> > +	if (!ci->submit_as_polled)
-> > +		return;
-> > +
-> > +	INIT_HLIST_NODE(&ci->io->node);
-> > +	/*
-> > +	 * Save .bi_end_io into dm_io, so that we can reuse .bi_end_io
-> > +	 * for storing dm_io list
-> > +	 */
-> > +	if (bio->bi_opf & REQ_SAVED_END_IO) {
-> > +		ci->io->saved_bio_end_io = NULL;
-> > +	} else {
-> > +		ci->io->saved_bio_end_io = bio->bi_end_io;
-> > +		INIT_HLIST_HEAD((struct hlist_head *)&bio->bi_end_io);
-> > +		bio->bi_opf |= REQ_SAVED_END_IO;
-> > +	}
-> > +}
-> > +
-> >  /*
-> >   * Select the correct strategy for processing a non-flush bio.
-> >   */
-> > @@ -1590,6 +1629,8 @@ static int __split_and_process_non_flush(struct clone_info *ci)
-> >  	if (__process_abnormal_io(ci, ti, &r))
-> >  		return r;
-> >  
-> > +	dm_setup_polled_io(ci);
-> > +
-> >  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
-> >  
-> >  	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
-> > @@ -1666,8 +1707,18 @@ static void __split_and_process_bio(struct mapped_device *md,
-> >  		}
-> >  	}
-> >  
-> > -	/* drop the extra reference count */
-> > -	dec_pending(ci.io, errno_to_blk_status(error));
-> > +	/*
-> > +	 * Drop the extra reference count for non-POLLED bio, and hold one
-> > +	 * reference for POLLED bio, which will be released in dm_poll_bio
-> > +	 *
-> > +	 * Add every dm_io instance into the hlist_head which is stored in
-> > +	 * bio->bi_end_io, so that dm_poll_bio can poll them all.
-> > +	 */
-> > +	if (!ci.submit_as_polled)
-> > +		dec_pending(ci.io, errno_to_blk_status(error));
-> > +	else
-> > +		hlist_add_head(&ci.io->node,
-> > +				(struct hlist_head *)&bio->bi_end_io);
-> >  }
-> >  
-> >  static void dm_submit_bio(struct bio *bio)
-> > @@ -1690,8 +1741,11 @@ static void dm_submit_bio(struct bio *bio)
-> >  			bio_wouldblock_error(bio);
-> >  		else if (bio->bi_opf & REQ_RAHEAD)
-> >  			bio_io_error(bio);
-> > -		else
-> > +		else {
-> > +			/* Not ready for poll */
-> > +			bio->bi_opf &= ~REQ_POLLED;
-> >  			queue_io(md, bio);
-> > +		}
-> 
-> "Not ready for poll" isn't really a useful comment.  Maybe?:
-> /* Cannot support polling once IO is queued */
-
-We setup dm bio polling mechanism only after __split_and_process_bio()
-is called, so 'not ready for poll'.
-
-> 
-> But should you just bio_wouldblock_error() the IO if REQ_POLLED set?
-> Same as done for REQ_NOWAIT?
-
-I guess we can't, because the two flags are independent.
-> 
-> (thought I've seen a comparable response to REQ_POLLED before but not
-> finding one now that I look, maybe it was in Jeffle's earlier patchset?).
-> 
-> But all said, I'm missing why this particular instance of queue_io()
-> is a problem relative to polling.  The bio will just block waiting to
-> be processed, if blocking is a problem then it really does seem like
-> bio_wouldblock_error() is appropriate.
-
-It was cleared because I thought we can't call dm_poll_bio() for this
-bio queued via queue_io() here, because we don't call dm_setup_polled_io
-yet.
-
-But looks we needn't to clear REQ_POLLED here, since REQ_SAVED_END_IO
-isn't set for this bio, and it won't be polled in dm_poll_bio()
-really until they are submitted finally.
-
-> 
-> And what about dm_io_dec_pending() should its use of queue_io() also
-> clear REQ_POLLED (so push clearing REQ_POLLED into queue_io?)?
-> Or is flush-with-data (via REQ_PREFLUSH) and REQ_POLLING mutually
-> exclussive?
-
-We only poll normal bio, and REQ_SAVED_END_IO isn't set for flush &
-other abnormal bios, so they won't be polled via dm_poll_bio() really
-and still rely on underlying's interrupt handler to complete.
-
-
-Thanks, 
-Ming
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 9f8cb7beaad1..9577c70a6bd3 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -169,6 +169,7 @@ static struct blk_major_name {
+ 	int major;
+ 	char name[16];
+ 	void (*probe)(dev_t devt);
++	struct module *owner;
+ } *major_names[BLKDEV_MAJOR_HASH_SIZE];
+ static DEFINE_MUTEX(major_names_lock);
+ 
+@@ -197,7 +198,8 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
+  * @major: the requested major device number [1..BLKDEV_MAJOR_MAX-1]. If
+  *         @major = 0, try to allocate any unused major number.
+  * @name: the name of the new block device as a zero terminated string
+- * @probe: allback that is called on access to any minor number of @major
++ * @probe: callback that is called on access to any minor number of @major
++ * @owner: the owner of @probe function (i.e. THIS_MODULE or NULL).
+  *
+  * The @name must be unique within the system.
+  *
+@@ -214,8 +216,8 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
+  *
+  * Use register_blkdev instead for any new code.
+  */
+-int __register_blkdev(unsigned int major, const char *name,
+-		void (*probe)(dev_t devt))
++int ____register_blkdev(unsigned int major, const char *name,
++			void (*probe)(dev_t devt), struct module *owner)
+ {
+ 	struct blk_major_name **n, *p;
+ 	int index, ret = 0;
+@@ -255,6 +257,7 @@ int __register_blkdev(unsigned int major, const char *name,
+ 
+ 	p->major = major;
+ 	p->probe = probe;
++	p->owner = owner;
+ 	strlcpy(p->name, name, sizeof(p->name));
+ 	p->next = NULL;
+ 	index = major_to_index(major);
+@@ -277,7 +280,7 @@ int __register_blkdev(unsigned int major, const char *name,
+ 	mutex_unlock(&major_names_lock);
+ 	return ret;
+ }
+-EXPORT_SYMBOL(__register_blkdev);
++EXPORT_SYMBOL(____register_blkdev);
+ 
+ void unregister_blkdev(unsigned int major, const char *name)
+ {
+@@ -676,14 +679,29 @@ void blk_request_module(dev_t devt)
+ {
+ 	unsigned int major = MAJOR(devt);
+ 	struct blk_major_name **n;
++	void (*probe_fn)(dev_t devt);
+ 
+ 	mutex_lock(&major_names_lock);
+ 	for (n = &major_names[major_to_index(major)]; *n; n = &(*n)->next) {
+-		if ((*n)->major == major && (*n)->probe) {
+-			(*n)->probe(devt);
+-			mutex_unlock(&major_names_lock);
+-			return;
+-		}
++		if ((*n)->major != major || !(*n)->probe)
++			continue;
++		if (!try_module_get((*n)->owner))
++			break;
++		/*
++		 * Calling probe function with major_names_lock held causes
++		 * circular locking dependency problem. Thus, call it after
++		 * releasing major_names_lock.
++		 */
++		probe_fn = (*n)->probe;
++		mutex_unlock(&major_names_lock);
++		/*
++		 * Assuming that unregister_blkdev() is called from module's
++		 * __exit function, a module refcount taken above allows us
++		 * to safely call probe function without major_names_lock held.
++		 */
++		probe_fn(devt);
++		module_put((*n)->owner);
++		return;
+ 	}
+ 	mutex_unlock(&major_names_lock);
+ 
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 6fc26f7bdf71..070b73c043e6 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -277,10 +277,12 @@ extern void put_disk(struct gendisk *disk);
+ 
+ #define alloc_disk(minors) alloc_disk_node(minors, NUMA_NO_NODE)
+ 
+-int __register_blkdev(unsigned int major, const char *name,
+-		void (*probe)(dev_t devt));
++int ____register_blkdev(unsigned int major, const char *name,
++			void (*probe)(dev_t devt), struct module *owner);
++#define __register_blkdev(major, name, probe) \
++	____register_blkdev(major, name, probe, THIS_MODULE)
+ #define register_blkdev(major, name) \
+-	__register_blkdev(major, name, NULL)
++	____register_blkdev(major, name, NULL, NULL)
+ void unregister_blkdev(unsigned int major, const char *name);
+ 
+ bool bdev_check_media_change(struct block_device *bdev);
+-- 
+2.18.4
