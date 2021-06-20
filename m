@@ -2,149 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E086C48BE5
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 23:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2EACC48BDF
+	for <linux-block@archiver.kernel.org>; Sun, 20 Jun 2021 12:19:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F2D7610C7
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jun 2021 23:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AE2461007
+	for <linux-block@archiver.kernel.org>; Sun, 20 Jun 2021 12:19:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbhFSXFD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Jun 2021 19:05:03 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:64088 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbhFSXFC (ORCPT
+        id S229603AbhFTMWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Jun 2021 08:22:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52040 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229593AbhFTMWC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Jun 2021 19:05:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1624143771; x=1655679771;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=PqMVgM9R/PkEGO3Gax0r/SXsBxLsUTFCPE3zVK0fOxI=;
-  b=fRrDF2uAtURm08jCWIXi34F6kuGZNm20up9Hp/FzP+EVOSkMq0LVr0aw
-   5siV2IX6vl0CJ+k5hwAlV3NU+7W+lAgn3C9N2szBxO0oso12vC2XsTBR9
-   8S6V3kBGLd+8AKsMpt5Sdx26SG6WLC+EUXia4yKNsWwhFzNM3uMYrdBGS
-   Vyhidgb1lgH0QEOaq0X4UuGOn36UqwNcxbneKZAPXQV9kXXEsVzQsIz5T
-   ta0uP5U47iUilIBpslj73B+gKiEQQokKeIdrdnw60HnslHElxXDwl1ptU
-   QjrhcgvTCm5cp5pdlZAe/UwMxQTpkFTtLxYHRcgZBqkUDxL/ShFHRzxIQ
-   A==;
-IronPort-SDR: O4mi7cBcaQOJVowgIKMtFOJIvzd8ykdVnTjaVVCObf+GwWJVMxF8aA+Of+7tzowbxdGMTgFkgA
- 4IAOIWOaqYjjT9qZA0JA02Celam46dp4rRpe8SDQL0QXXZhS95Vug+kfGcayHBpoRA3BOCeZa+
- /ZtgP9ZCg7uozGPJWcBiKXsBeMTCh63QTrNCT/B94rsZw6ZD019PpkQyH1yNG2xISy48ea+QHT
- vcp5QrR/pe/7rPF0c7hvVCqOcEbAUSU7MY1ZPTVj+PcB0GHECyvOhSJYOzzctSL8F1YpYSP2fL
- +9w=
-X-IronPort-AV: E=Sophos;i="5.83,285,1616428800"; 
-   d="scan'208";a="171640207"
-Received: from mail-dm6nam10lp2100.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.100])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2021 07:02:50 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mle0tMfbjzgouTm4jzJTucJ69KQ86NkkEgPTnigD68fX9byM1jEb4WeHNnZnMUDBPdjgYmiG3HjanqzDfiZysfeojpqBE3BLUhbYfbyW9ueCqD2XUcsUPkyhVlmls8TXJl4I3earatvAwpOgDcWEFYHUJQgUQ//AXkn75haRLtt8WIaHlVQ4KWpcHgZRFkSEjyqDveHgVCUARyvhBwSP3GfBZCI9sXK6OaSBaOLBxyVaqJOHJOMJ63VHVs04G9OEs4HNsQT7NvKrluzVhwGVzFw741y8zSVRhKkQwSC579/aR6jquaS3b2vwj920YRBTuG1T3nwsT3l4GSalbr+WfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PqMVgM9R/PkEGO3Gax0r/SXsBxLsUTFCPE3zVK0fOxI=;
- b=FEJYY9FaLtQ+uKKDSQwOFZ+QG0ZA12BzvoOU9UAz/TXen6CWi+stNh9BXQS4HstqTOJLY+PAxfV4rcZ+FsaVCM6db+/DcsTTPnHdBzeJ3mdjJsIWz3CUA5qS8b+oMdv5tBJQVqfMxrOfvbArmZG3xRCutnDeBQEqGRCJ4chaPY7LmehZCNBtz1iYGQ8DljZCqRWeEWQeJLEBqah7jTctXJgaCQjZsZ8gLKDQ9ThDNimfp5h7fJtUctzIzcMUCnQiXoI8iOcLV037t6k66zNpO7oKa/lAjpSFBOb9do0/kV3MWA0e0YTvbrGa5JkaaE5s9o7oiHpYRpuT75qkvU4iBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Sun, 20 Jun 2021 08:22:02 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E39BC061574;
+        Sun, 20 Jun 2021 05:19:50 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id pf4-20020a17090b1d84b029016f6699c3f2so3530448pjb.0;
+        Sun, 20 Jun 2021 05:19:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PqMVgM9R/PkEGO3Gax0r/SXsBxLsUTFCPE3zVK0fOxI=;
- b=UeOnzmkxm6HF3djeIrJXMXWXsOSU5KL80ICHpErmCuy5cbMADVTJzSoVP6FOEMfK+7PNF+Yc3AWA5ujJpAm77jjqizWGFD5oJWxTRmq8Fk6ju4k8zR4H/Z7PlFhfn2pyCUdPAq7E78M+j6j7jGv84ouE2GLwEFVf6PQ/7M+BBBM=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB4758.namprd04.prod.outlook.com (2603:10b6:a03:11::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.23; Sat, 19 Jun
- 2021 23:02:45 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::6873:3d64:8f9f:faf0%7]) with mapi id 15.20.4242.021; Sat, 19 Jun 2021
- 23:02:45 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH] blk-mq: fix an IS_ERR() vs NULL bug
-Thread-Topic: [PATCH] blk-mq: fix an IS_ERR() vs NULL bug
-Thread-Index: AQHXZEg9/p2Pgd3CvES/C6VD4Wwljg==
-Date:   Sat, 19 Jun 2021 23:02:45 +0000
-Message-ID: <BYAPR04MB496550B2490578C550993A76860C9@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <YMyjci35WBqrtqG+@mwanda>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: oracle.com; dkim=none (message not signed)
- header.d=none;oracle.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f2057b6d-c095-4e79-781f-08d9337659fc
-x-ms-traffictypediagnostic: BYAPR04MB4758:
-x-microsoft-antispam-prvs: <BYAPR04MB475873E71F93235992655E01860C9@BYAPR04MB4758.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4941;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1/QXgmESIEOh3RWv8XxdGGYt4lPQhReseJ3fyg2L0x7cGNVf8NrAmo+uE7C/9rIk1aK34et9zCPf8oNtKw1Hs+ZflGjYIDJxko+sELR0jrWG2QvtCfICunDaBz7Jnm0RVlBZ/KZM32nNtzbfrtK0QIoyS9lKRUh0EupNDdDySxzBBjM76v+rI/6uwCwQhfWCVUyibXLNa1Bd0D5sbZYQIt+mK7sFjn0KKkcc+jXvZ3SsyA7ie9PzU4Hr9UsVLqeUv76SI0AAG+kJEyR065Z+DxPcMVYNwpkMiW/j4iJUaKxZi/tzeF5K/02i1mBZPUhaqyyrs00K3UsW1Sw/g43i5t4DCWJIcJS/6vjzehTHcxBlIxjVIc9TZM/fQTgO7AYQ1GkPFiKEL6cazoZcEXcOr59Tm9K4KvbEsvFxJP88oEbit6NU6OfOC+SCx4gQWNz5KOKhSQ9gIbb58HI8LMNOeM66aflW8Z1vs2rIvAoCSv5fPfJTwdfteaaPe22ak9qml5DVCb1YbO1cooS+rkCP//1AspgItAb241h8B7JpymL1N6Js6Rzp+sKsQ9lhi6570ksOz9Dn12GeDLfL1vpUWm7mrO3CZcGEWkiN6xBmwvM=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(396003)(39860400002)(136003)(366004)(55016002)(9686003)(66446008)(64756008)(66556008)(66946007)(38100700002)(122000001)(66476007)(4326008)(76116006)(8676002)(6506007)(8936002)(71200400001)(53546011)(110136005)(54906003)(186003)(316002)(26005)(86362001)(52536014)(2906002)(33656002)(558084003)(478600001)(7696005)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GOxFmb4t3CZIW9Uw/Q0pG8pUwp00c6+1PgadtaFo9XAsR58E5dSMJF2c8JcU?=
- =?us-ascii?Q?gDMOoaZC8ifzMTWc61StRWy/uhCafw2U0CRHYYPpVHKUzE+uRt3WCZPVFuyt?=
- =?us-ascii?Q?BcgaFTr48rL4gZr1uiZ2ySNE98DgzXobwSN/JkeuatBLvSceb+hsEaK+RAho?=
- =?us-ascii?Q?CSjYhOe9aj/ENX8EaFTpoCT4y4OiCaQuRlXE4bvh+RXIE3Bt6x4yxNc7UUR4?=
- =?us-ascii?Q?LfYaeQ6gQAaCLnbMaLJxbs9Cx4bOjVLEcvPFRb++OoyEFKaFXyqhtTj0Eb9K?=
- =?us-ascii?Q?vDJ7t1rabvb+i6lKgOhje+BvHJb07NI7LExsqDQFfZvz9kPOoHqJuTUGgzpP?=
- =?us-ascii?Q?V3wPjB7wNHt/qVfzyvam9dUmyKl2ZXBpgxpXLSo7RlJP6dlR+UBhAluN7g+x?=
- =?us-ascii?Q?4lqkfgajhGlvWhn8rZIQ/jHn7k7N2KV7UqVqrP/xDO7FNOR8Vy4fwfuCfPM+?=
- =?us-ascii?Q?4fW+vKeO/zs4ilrVmEmJlzOUA7zAwhrA+jyvgD3v3qgDk7NB7zGk9WIZ3pxi?=
- =?us-ascii?Q?TZ08bCaHLYde3Bis6miN6vxES/ChRKYdasMDhhEYPhlpO/Pq4YMsBdzPZbdh?=
- =?us-ascii?Q?m/JDAQru8Ae2JKM7H3u1jgXGWX1L8Dp1kiun4j7y8fhHQ5FI8M+K9tbdzcdj?=
- =?us-ascii?Q?BpBco1P1s0zJfwKP/nI6IDTtuzekKF3vLecmc87Lv0uUyo0v95198sft5g1G?=
- =?us-ascii?Q?9gFyfrookouTDkriREJD2x7HH37jXFWzGNbufwncf4iDD1vG3fJNYjOFR/DQ?=
- =?us-ascii?Q?E6rMbSYW4pysTqrOT3J9qxRdj1vbV99kJ3EKQcrs4CQ6JvQBAGOAy/V/5va5?=
- =?us-ascii?Q?xms3uGVzk7xK0SSgvhySSrGAbBv29UdzVNgnhNp09l2Bkth+EEbEhfMKlox7?=
- =?us-ascii?Q?GTHSYJJhpVUn8Zo8+V7d8KJmoX/eTD1GMpnRAec2zbxsHbzjQPvLYi+oNVTV?=
- =?us-ascii?Q?alyQ/+diQ6J7PrRfsdcP20d46lKDGMx3SOib6QEBnBOBnaIAC/FMuTn8H885?=
- =?us-ascii?Q?e52oSSmBt9jEyNqEf1/0JlAQXg8blH3fp2yDKyHtlkZrsJYn6WZHbV1O2E1z?=
- =?us-ascii?Q?5wxHCNj7QiAtf+z4kS3q5QXEWaeOxYhjp0/jhEmZzwWI199Mby5QTgbO7i+4?=
- =?us-ascii?Q?lY8Ss2O4d5btVYVN7/dPGbl8OLyD8mp+db17hQTU5gehHbEJDJ3LrsPbVT1j?=
- =?us-ascii?Q?CSAzbv5ipDW91pR1+aRmB38EUhB9DexFgl+SRv1fuZZIjgQLUc7ZBvpChYjW?=
- =?us-ascii?Q?uXpnXLc16Ma6ovqJWetrc1w2PRJCRped1eSrLouvvY1Cxs6KqihECAIitrBF?=
- =?us-ascii?Q?HvBxN8nbPX00G6YZsRDsw+B/?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f2057b6d-c095-4e79-781f-08d9337659fc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jun 2021 23:02:45.7462
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zYYu4H514GJu7DmQtpumjBLwFLCBlR01584rE5rgXI2PMZGoaZ47DhyzobGQvDyHHDwrJYDDdqy4EFwvnB3iHTbbd1tl8TQLUAb0gVDwBKM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4758
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=BCc0kG9LkOMMwY6XxlvP8/WyTLaOkPIDy6QIabCboTs=;
+        b=i31jNnaLZaINU4tY9qZ5hrsFP11sO0JMoP8jpYVO6bSYel1QWJ6wBCTaiKZ39t7dey
+         FtAuJGM03Ymo8iAOz8uCZ/NwSw1l49nImW7CIg+LQvWZWnjo6zKVut0tK8j3iQW8NWbp
+         cyRHFzTArkR9S8emjGbpw1jI4dKKYeEubvJQRlpfn+2765gBC7hm4g8OtrwFbS56nhE7
+         rIRd++/2Jq5XklQ82YpxIjlD1Dxx252QwG7Ekw3/G/I/3uwZaw5q0Sy8EZBhDpTmvskm
+         D65g2MUObOKP7FBlpXI5H0m/5mAnybb9lGCThFNbJyLWxGopGq64nRpFX5Y7LTCj+kCn
+         nwFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=BCc0kG9LkOMMwY6XxlvP8/WyTLaOkPIDy6QIabCboTs=;
+        b=UjvnG8tEItPu/Ldjfx5/BmF2vtCGLEvxYqEYvPiwPIms0O+oQxwgejtg1kh4Dd8Q7i
+         dfjfkvmE2yybdA/BJpqVWJSt9TSyxmOBZ/ez+q/jz/qNYvoOOqfNrNFqT5zMCnTS8RjS
+         wSZ9roPRpn5SV7b+imzjaXgql/QDtrswB6yoPz2wBOD6jllRldezUYSGm31Q9zf8Ltfg
+         br0WNN+AEbcnC4NgQIa4KNeDk5G39zTNQoAIyP2X9+bGyVH96XpOJQXjO1R+MWFHdERz
+         ek5hkmb3BAq27l9soPk8NHA6Hl2d1sb4HNgb434BdAzJcAg9YNN5CGuQm3Jge3coFMSF
+         qJEQ==
+X-Gm-Message-State: AOAM5321ZYGf+C7q9onKq+9AsHGd6yBRbOHmU5NjvB87aYu84kuwenFJ
+        O2dDJSSnowcDJ+kA3lR2hg==
+X-Google-Smtp-Source: ABdhPJz6ECQ66FTEAlLfWUHxhugzdAmvRsNaBrKSpHoWi3yx8/cD6mdGckbtGCBSMhO+F812afOfVg==
+X-Received: by 2002:a17:90b:b03:: with SMTP id bf3mr32651498pjb.47.1624191589771;
+        Sun, 20 Jun 2021 05:19:49 -0700 (PDT)
+Received: from vultr.guest ([107.191.53.97])
+        by smtp.gmail.com with ESMTPSA id m3sm2870950pfa.70.2021.06.20.05.19.47
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 20 Jun 2021 05:19:49 -0700 (PDT)
+From:   Zheyu Ma <zheyuma97@gmail.com>
+To:     axboe@kernel.dk, liushixin2@huawei.com, bhelgaas@google.com,
+        lee.jones@linaro.org, ulf.hansson@linaro.org,
+        guoqing.jiang@cloud.ionos.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zheyu Ma <zheyuma97@gmail.com>
+Subject: [PATCH] block: mtip32xx: set the pointer of queue to null after cleaning
+Date:   Sun, 20 Jun 2021 12:19:17 +0000
+Message-Id: <1624191557-5385-1-git-send-email-zheyuma97@gmail.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/18/21 06:45, Dan Carpenter wrote:=0A=
-> The __blk_mq_alloc_disk() function doesn't return NULLs it returns=0A=
-> error pointers.=0A=
->=0A=
-> Fixes: b461dfc49eb6 ("blk-mq: add the blk_mq_alloc_disk APIs")=0A=
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>=0A=
-=0A=
-Thanks for the fix, looks good.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
+When 'mtip_block_initialize' fails at 'mtip_hw_get_identify', a series
+of cleanup operations will be performed. But when the execution reaches
+'put_disk', it will cause refcount underflow. The reason for this error
+is that after cleaning 'dd->queue', 'dd->disk->queue' was not set to
+null at the same time, which caused repeated cleanup work.
+
+Fix this by set 'dd->disk->queue' to null after cleaning
+
+This log reveals it:
+
+[   59.590163] refcount_t: underflow; use-after-free.
+[   59.591650] Modules linked in:
+[   59.591867] CPU: 5 PID: 1 Comm: swapper/0 Not tainted 5.12.4-g70e7f0549188-dirty #137
+[   59.592407] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+[   59.593178] RIP: 0010:refcount_warn_saturate+0x140/0x150
+[   59.593551] Code: 05 d1 3b dd 04 01 e8 af d4 5f ff 0f 0b e9 13 ff ff ff e8 b3 75 73 ff 48 c7 c7 30 31 df 85 c6 05 b4 3b dd 04 01 e8 90 d4 5f ff <0f> 0b e9 f4 fe ff ff 66 0f 1f 84 00 00 00 00 00 55 48 89 e5 41 55
+[   59.594942] RSP: 0000:ffffc90000017918 EFLAGS: 00010286
+[   59.595357] RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000000000
+[   59.595858] RDX: 0000000000000000 RSI: ffffffff8123f301 RDI: 00000000ffffffff
+[   59.596346] RBP: ffffc90000017928 R08: 0000000000000001 R09: 0000000000000001
+[   59.596926] R10: 0000000000000000 R11: 0000000000000001 R12: ffff888105494270
+[   59.597429] R13: ffff888105494270 R14: ffffffff82498b30 R15: 0000000000000000
+[   59.597931] FS:  0000000000000000(0000) GS:ffff88817bd40000(0000) knlGS:0000000000000000
+[   59.598500] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   59.598899] CR2: 0000000000000000 CR3: 000000000642e000 CR4: 00000000000006e0
+[   59.599401] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   59.599900] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[   59.600400] Call Trace:
+[   59.600579]  kobject_put+0x1b0/0x2e0
+[   59.600839]  ? dev_attr_show+0x70/0x70
+[   59.601112]  blk_put_queue+0x19/0x20
+[   59.601372]  disk_release+0xb7/0xf0
+[   59.601628]  ? show_partition_start+0x80/0x80
+[   59.601943]  device_release+0x40/0xd0
+[   59.602207]  kobject_put+0x10b/0x2e0
+[   59.602468]  put_device+0x1f/0x30
+[   59.602708]  put_disk+0x2a/0x40
+[   59.602938]  mtip_block_initialize+0x35f/0x1570
+[   59.603264]  ? __pci_enable_msi_range+0x32c/0x470
+[   59.603606]  mtip_pci_probe+0x92a/0xc80
+[   59.603899]  local_pci_probe+0x4a/0xb0
+[   59.604173]  pci_device_probe+0x126/0x1d0
+[   59.604478]  ? pci_device_remove+0x100/0x100
+[   59.604790]  really_probe+0x27e/0x650
+[   59.605059]  driver_probe_device+0x84/0x1d0
+[   59.605359]  ? mutex_lock_nested+0x16/0x20
+[   59.605660]  device_driver_attach+0x63/0x70
+[   59.605963]  __driver_attach+0x117/0x1a0
+[   59.606247]  ? device_driver_attach+0x70/0x70
+[   59.606607]  bus_for_each_dev+0xb6/0x110
+[   59.606919]  ? rdinit_setup+0x40/0x40
+[   59.607177]  driver_attach+0x22/0x30
+[   59.607431]  bus_add_driver+0x1e6/0x2a0
+[   59.607703]  driver_register+0xa4/0x180
+[   59.607974]  __pci_register_driver+0x77/0x80
+[   59.608273]  ? drbd_debugfs_init+0x78/0x78
+[   59.608560]  mtip_init+0x15c/0x18f
+[   59.608820]  do_one_initcall+0x7a/0x3d0
+[   59.609140]  ? rdinit_setup+0x40/0x40
+[   59.609464]  ? rcu_read_lock_sched_held+0x4a/0x70
+[   59.609879]  kernel_init_freeable+0x2a7/0x2f9
+[   59.610268]  ? rest_init+0x2c0/0x2c0
+[   59.610561]  kernel_init+0x13/0x180
+[   59.610807]  ? rest_init+0x2c0/0x2c0
+[   59.611058]  ? rest_init+0x2c0/0x2c0
+[   59.611312]  ret_from_fork+0x1f/0x30
+[   59.611574] Kernel panic - not syncing: panic_on_warn set ...
+[   59.611973] CPU: 5 PID: 1 Comm: swapper/0 Not tainted 5.12.4-g70e7f0549188-dirty #137
+[   59.612514] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+[   59.613303] Call Trace:
+[   59.613476]  dump_stack+0xba/0xf5
+[   59.613718]  ? refcount_warn_saturate+0x140/0x150
+[   59.614055]  panic+0x155/0x3ed
+[   59.614281]  ? __warn+0xed/0x150
+[   59.614468]  ? refcount_warn_saturate+0x140/0x150
+[   59.614468]  __warn+0x103/0x150
+[   59.614468]  ? refcount_warn_saturate+0x140/0x150
+[   59.614468]  report_bug+0x119/0x1c0
+[   59.614468]  handle_bug+0x3b/0x80
+[   59.614468]  exc_invalid_op+0x18/0x70
+[   59.614468]  asm_exc_invalid_op+0x12/0x20
+[   59.614468] RIP: 0010:refcount_warn_saturate+0x140/0x150
+[   59.614468] Code: 05 d1 3b dd 04 01 e8 af d4 5f ff 0f 0b e9 13 ff ff ff e8 b3 75 73 ff 48 c7 c7 30 31 df 85 c6 05 b4 3b dd 04 01 e8 90 d4 5f ff <0f> 0b e9 f4 fe ff ff 66 0f 1f 84 00 00 00 00 00 55 48 89 e5 41 55
+[   59.614468] RSP: 0000:ffffc90000017918 EFLAGS: 00010286
+[   59.614468] RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000000000
+[   59.614468] RDX: 0000000000000000 RSI: ffffffff8123f301 RDI: 00000000ffffffff
+[   59.614468] RBP: ffffc90000017928 R08: 0000000000000001 R09: 0000000000000001
+[   59.614468] R10: 0000000000000000 R11: 0000000000000001 R12: ffff888105494270
+[   59.614468] R13: ffff888105494270 R14: ffffffff82498b30 R15: 0000000000000000
+[   59.614468]  ? dev_attr_show+0x70/0x70
+[   59.614468]  ? vprintk_func+0x71/0x110
+[   59.614468]  ? refcount_warn_saturate+0x140/0x150
+[   59.614468]  kobject_put+0x1b0/0x2e0
+[   59.614468]  ? dev_attr_show+0x70/0x70
+[   59.614468]  blk_put_queue+0x19/0x20
+[   59.614468]  disk_release+0xb7/0xf0
+[   59.614468]  ? show_partition_start+0x80/0x80
+[   59.614468]  device_release+0x40/0xd0
+[   59.614468]  kobject_put+0x10b/0x2e0
+[   59.614468]  put_device+0x1f/0x30
+[   59.614468]  put_disk+0x2a/0x40
+[   59.614468]  mtip_block_initialize+0x35f/0x1570
+[   59.614468]  ? __pci_enable_msi_range+0x32c/0x470
+[   59.614468]  mtip_pci_probe+0x92a/0xc80
+[   59.614468]  local_pci_probe+0x4a/0xb0
+[   59.614468]  pci_device_probe+0x126/0x1d0
+[   59.614468]  ? pci_device_remove+0x100/0x100
+[   59.614468]  really_probe+0x27e/0x650
+[   59.614468]  driver_probe_device+0x84/0x1d0
+[   59.614468]  ? mutex_lock_nested+0x16/0x20
+[   59.614468]  device_driver_attach+0x63/0x70
+[   59.614468]  __driver_attach+0x117/0x1a0
+[   59.614468]  ? device_driver_attach+0x70/0x70
+[   59.614468]  bus_for_each_dev+0xb6/0x110
+[   59.614468]  ? rdinit_setup+0x40/0x40
+[   59.614468]  driver_attach+0x22/0x30
+[   59.614468]  bus_add_driver+0x1e6/0x2a0
+[   59.614468]  driver_register+0xa4/0x180
+[   59.614468]  __pci_register_driver+0x77/0x80
+[   59.614468]  ? drbd_debugfs_init+0x78/0x78
+[   59.614468]  mtip_init+0x15c/0x18f
+[   59.614468]  do_one_initcall+0x7a/0x3d0
+[   59.614468]  ? rdinit_setup+0x40/0x40
+[   59.614468]  ? rcu_read_lock_sched_held+0x4a/0x70
+[   59.614468]  kernel_init_freeable+0x2a7/0x2f9
+[   59.614468]  ? rest_init+0x2c0/0x2c0
+[   59.614468]  kernel_init+0x13/0x180
+[   59.614468]  ? rest_init+0x2c0/0x2c0
+[   59.614468]  ? rest_init+0x2c0/0x2c0
+[   59.614468]  ret_from_fork+0x1f/0x30
+[   59.614468] Dumping ftrace buffer:
+[   59.614468]    (ftrace buffer empty)
+[   59.614468] Kernel Offset: disabled
+[   59.614468] Rebooting in 1 seconds..
+
+Signed-off-by: Zheyu Ma <zheyuma97@gmail.com>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 589cb0f1e030..305be06868df 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3726,6 +3726,7 @@ static int mtip_block_initialize(struct driver_data *dd)
+ read_capacity_error:
+ init_hw_cmds_error:
+ 	blk_cleanup_queue(dd->queue);
++	dd->disk->queue = NULL;
+ block_queue_alloc_init_error:
+ 	blk_mq_free_tag_set(&dd->tags);
+ block_queue_alloc_tag_error:
+-- 
+2.17.6
+
