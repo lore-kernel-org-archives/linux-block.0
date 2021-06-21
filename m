@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B68FC4743C
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C16C4743C
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:31:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32D5960698
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:29:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A653361108
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:31:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbhFUKbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 06:31:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60408 "EHLO
+        id S229651AbhFUKeC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 06:34:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbhFUKbf (ORCPT
+        with ESMTP id S229576AbhFUKeC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 06:31:35 -0400
+        Mon, 21 Jun 2021 06:34:02 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05AB4C061574
-        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 03:29:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E530FC061574
+        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 03:31:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=ZYTWT1x1aj8+1YwAzNumqNw6wJ39vs/Vr6slb7e5rnE=; b=kIVvw1WbtsLj5cZW3oe2EceZnW
-        ZWrdrNSzd7LTbs9uKaLV/LsXytqLn31rYnaeUWo9okud2CqieCPG3b2T0JL5iBBrxTY7NmrywXAsC
-        B5VIkWShAM891bQUxi5el/oz3+GGFDHx5aCmCZv5GGwV0zAD+DiOqUpXNYFUtov+rkyhfS9LtkUhY
-        2OMi2+tbwNAhWaMzXYdjv21cyiL/FLC6WxVbCg5IjJrL3/u4ItKW9wFzkFgYAfko2NB45QFLruyKv
-        prNjMDol6zaph8cUSM5hpfMlyMruNC8gXkddAqyj09zdoB1xMw8BqEyGnmowQMZwtVIpNlAt2IzcX
-        Eu3kVkCQ==;
+        bh=gmw8EF9WxTiSU6waFXCb72REy/9/eBVGjz7nBq2+Bpw=; b=mT5bSDzXKhheOgAC3BZgVFOxFp
+        KrjIUzS2Jcu3RMrvFG2ApI/F02m+bB9wmlObXsqQrTJE6aPkCzooQ4rv0uQAtEDqO4aB1J4pDbAam
+        c64lseuaYlEnT4wpfWW5lkglFylXk8ntm/y/oWZy4oeATwJ5H5XQyDWRO6/7sXEyuydq53Zb7jjIn
+        jmi4K2dHYMymp1Tsc4otBO2GNSAkDIlDD+lzd679oxBMaj/hVcnBwvXvPICrO27/IU1eWHwjuHHs6
+        y2u7evQnz//1Mx+LbCH18lgITaYKP0aqZsp0yqEBZENlu8q5RbbOAmi0kABS1ppkysaaFFWJr7Tbj
+        JocjwKBg==;
 Received: from 089144193030.atnat0002.highway.a1.net ([89.144.193.30] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lvHAM-00Cz3b-RY; Mon, 21 Jun 2021 10:28:47 +0000
+        id 1lvHDB-00CzLC-0A; Mon, 21 Jun 2021 10:31:29 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         linux-block@vger.kernel.org
-Subject: [PATCH 4/9] loop: don't call loop_lookup before adding a loop device
-Date:   Mon, 21 Jun 2021 12:15:42 +0200
-Message-Id: <20210621101547.3764003-5-hch@lst.de>
+Subject: [PATCH 5/9] loop: split loop_control_ioctl
+Date:   Mon, 21 Jun 2021 12:15:43 +0200
+Message-Id: <20210621101547.3764003-6-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210621101547.3764003-1-hch@lst.de>
 References: <20210621101547.3764003-1-hch@lst.de>
@@ -53,45 +53,131 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-loop_add returns the right error if the slot wasn't available.
+Split loop_control_ioctl into a helper for each command.  This keeps the
+code nicely separated for the upcoming locking changes.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ drivers/block/loop.c | 93 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 60 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 8392722d0e12..b1e7e420563b 100644
+index b1e7e420563b..d55526c355e1 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -2219,14 +2219,12 @@ static int loop_lookup(struct loop_device **l, int i)
- static void loop_probe(dev_t dev)
- {
- 	int idx = MINOR(dev) >> part_shift;
--	struct loop_device *lo;
- 
- 	if (max_loop && idx >= max_loop)
- 		return;
- 
- 	mutex_lock(&loop_ctl_mutex);
--	if (loop_lookup(&lo, idx) < 0)
--		loop_add(idx);
-+	loop_add(idx);
+@@ -2228,8 +2228,51 @@ static void loop_probe(dev_t dev)
  	mutex_unlock(&loop_ctl_mutex);
  }
  
-@@ -2243,11 +2241,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 	ret = -ENOSYS;
+-static long loop_control_ioctl(struct file *file, unsigned int cmd,
+-			       unsigned long parm)
++static int loop_control_add(int idx)
++{
++	int ret;
++		
++	ret = mutex_lock_killable(&loop_ctl_mutex);
++	if (ret)
++		return ret;
++	ret = loop_add(idx);
++	mutex_unlock(&loop_ctl_mutex);
++	return ret;
++}
++
++static int loop_control_remove(int idx)
++{
++	struct loop_device *lo;
++	int ret;
++		
++	ret = mutex_lock_killable(&loop_ctl_mutex);
++	if (ret)
++		return ret;
++
++	ret = loop_lookup(&lo, idx);
++	if (ret < 0)
++		goto out_unlock_ctrl;
++
++	ret = mutex_lock_killable(&lo->lo_mutex);
++	if (ret)
++		goto out_unlock_ctrl;
++	if (lo->lo_state != Lo_unbound ||
++	    atomic_read(&lo->lo_refcnt) > 0) {
++		mutex_unlock(&lo->lo_mutex);
++		ret = -EBUSY;
++		goto out_unlock_ctrl;
++	}
++	lo->lo_state = Lo_deleting;
++	mutex_unlock(&lo->lo_mutex);
++
++	idr_remove(&loop_index_idr, lo->lo_number);
++	loop_remove(lo);
++out_unlock_ctrl:
++	mutex_unlock(&loop_ctl_mutex);
++	return ret;
++}
++
++static int loop_control_get_free(int idx)
+ {
+ 	struct loop_device *lo;
+ 	int ret;
+@@ -2237,43 +2280,27 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 	ret = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (ret)
+ 		return ret;
++	ret = loop_lookup(&lo, -1);
++	if (ret < 0)
++		ret = loop_add(-1);
++	mutex_unlock(&loop_ctl_mutex);
++
++	return ret;
++}
+ 
+-	ret = -ENOSYS;
++static long loop_control_ioctl(struct file *file, unsigned int cmd,
++			       unsigned long parm)
++{
  	switch (cmd) {
  	case LOOP_CTL_ADD:
+-		ret = loop_add(parm);
+-		break;
++		return loop_control_add(parm);
+ 	case LOOP_CTL_REMOVE:
 -		ret = loop_lookup(&lo, parm);
--		if (ret >= 0) {
--			ret = -EEXIST;
+-		if (ret < 0)
+-			break;
+-		ret = mutex_lock_killable(&lo->lo_mutex);
+-		if (ret)
+-			break;
+-		if (lo->lo_state != Lo_unbound) {
+-			ret = -EBUSY;
+-			mutex_unlock(&lo->lo_mutex);
 -			break;
 -		}
- 		ret = loop_add(parm);
- 		break;
- 	case LOOP_CTL_REMOVE:
+-		if (atomic_read(&lo->lo_refcnt) > 0) {
+-			ret = -EBUSY;
+-			mutex_unlock(&lo->lo_mutex);
+-			break;
+-		}
+-		lo->lo_state = Lo_deleting;
+-		mutex_unlock(&lo->lo_mutex);
+-		idr_remove(&loop_index_idr, lo->lo_number);
+-		loop_remove(lo);
+-		break;
++		return loop_control_remove(parm);
+ 	case LOOP_CTL_GET_FREE:
+-		ret = loop_lookup(&lo, -1);
+-		if (ret >= 0)
+-			break;
+-		ret = loop_add(-1);
++		return loop_control_get_free(parm);
++	default:
++		return -ENOSYS;
+ 	}
+-	mutex_unlock(&loop_ctl_mutex);
+-
+-	return ret;
+ }
+ 
+ static const struct file_operations loop_ctl_fops = {
 -- 
 2.30.2
 
