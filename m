@@ -7,68 +7,69 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27ADCC4743C
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 15:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F4EC48BC2
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 16:06:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 114BB61151
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 15:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F50A6120D
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 16:06:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230205AbhFUP6M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 11:58:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50406 "EHLO
+        id S230357AbhFUQJE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 12:09:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbhFUP6M (ORCPT
+        with ESMTP id S230347AbhFUQJD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 11:58:12 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3739C061574
-        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 08:55:57 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id k11so3163620ioa.5
-        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 08:55:57 -0700 (PDT)
+        Mon, 21 Jun 2021 12:09:03 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C9BFC061574
+        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 09:06:48 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id h2so4684558iob.11
+        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 09:06:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=xoGOR6bNmxcId/Ee4H0L3QqG5xTZcJdVQzkm9X75obA=;
-        b=cLyyjm85xcRaukag+4YfWF05RrRrM5THsTgk3lgojaD9eyyXlB02Y878yEtdIDexBH
-         C9PMEfIV9i0GgVpmn6kvkkXhw0pXGt+Altx9T7p620NH3gaf2/+R8ymXrc5WnPbPFEdl
-         yQIDceu8yNer6gLKy2Q+WZGWv9IbYztvTy9LPqzy53df3Yiwj+Wilr1OPQScNkq6mHFG
-         n/E8xwAKpsjkvV/Q70gd5/TwWf4oppLGjPYzeDeqljmbME4JtiSw0x5nyNgmdUyjrGgm
-         1HwWn7I3kcBILp5LbsStc8bjJ7sUildTpo6PbCJA5+6OadcY7PQ4YLv+QIqhTRFYzxy7
-         NnNQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7jUykncA5qRRmS+H7aDsCFWxcgz7WG5fMTfEwWdMFns=;
+        b=eew3+I39WntTHfr2YvhveWTpnWKnA0iCb/JEXbO5UBGYoC8F46GK/4+iEBxx/jyPMq
+         KfDauR6+ZNLGKx6P7rhMOdbSv4inqxNOPlsBwxytJMlnlovSCKjF4J8puC2/XnDv4fJa
+         4Y86bwwmY8giKYy241vOp4cBHTdXWfBQoFtoBM/PQXIZZe4mCIL08eK7GRCkOTQnFTn9
+         zk/zk/G7yybxBVMPUWtolS7YGJcQfyGi2GG4ZxrH/KV1PGxAuZBbpB4FB+tSBfBaw7Qt
+         ZcYDzb1WB5Fqg2OWWNuae10tO9WSqqOUiKhPGE9PQZIQqmO02owK8WXkVQCGT1qUC5cX
+         /ajg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xoGOR6bNmxcId/Ee4H0L3QqG5xTZcJdVQzkm9X75obA=;
-        b=pcEr8zpUS9pYFmE35BeXo9ugOo/3N5aipkFUWdRUIO8CNgj288qF2DIx6YBo+z1bsn
-         AtVhVw4ItLCKHco4eGOwoLZQWgho2Z1ozCFcwiIUoZHFsiGe7bsd1+RoFaPqMJrJfAdB
-         BG8zmdUgjlfwuNPWHucrse6y+0HQCe1ayvqA7v6QLMH+nOR6rRMwWluftBuQBtbGAJbD
-         smEo+0vOt2hxudVCA8zcWWtsJVQKYylN+kDDCPvEQkT7ve/HQGPaDlZRrXdkapaRC6YB
-         OTkSxKQK4w6/RvgDWs1+F/hPq548rzaOsn5MPO79AIXx5KO9fTT7Qx2XZEps0Zr4cQVn
-         cXGg==
-X-Gm-Message-State: AOAM5313wr5bt1suvEDrctec3Z0cSHI04OYaGwoemHL+ND/h4e8B6qyX
-        n+MFQlZCbaa6qNalxZPioKp3XJbztkMycg==
-X-Google-Smtp-Source: ABdhPJyjeB+QKOUeOmsHQDOPSMxVdqE8D40OUJJzhCP0YyuywJf0TJyUhYLoz9IlAS5JaNIltvUcfw==
-X-Received: by 2002:a5d:9059:: with SMTP id v25mr20266419ioq.113.1624290957096;
-        Mon, 21 Jun 2021 08:55:57 -0700 (PDT)
+        bh=7jUykncA5qRRmS+H7aDsCFWxcgz7WG5fMTfEwWdMFns=;
+        b=XYSqkwFhJhaqHEhpi2TOfmzSzdIiSsa+2ojvgzM7W+dcX2Kr2M9X0iJ0TmGsBp/Qbc
+         f0Yw+TU6axPKB4tM6x7DgLtPLYCox3pfu/+OWPD4bnsz0qmNs3t1gdXrUYOGs53S1+1C
+         qsFEcABbIr2RWnY8mKAILvbiQNm+uFsVn6JF7l6gMD97bj20RMbBQzppAyy4CDpp/j4G
+         Y9eyaycwVoGS4HymBMNotno0/rhR8G0keGtLG4rmyzdP7bJLbMprfSBrkUUPEngQEaL1
+         Z03XeuXJ8tSbWYpaj78epP+k4bAXGaYvvzZMkpHXUqOr5TviWryYRFt8rUDuwIporYTH
+         8H3Q==
+X-Gm-Message-State: AOAM530wcpbK2i1c4OPRPCIQmjjVmDC3kH8x4tX6bUp98wygZVhVNOOO
+        iNV6MmMHAXqcQyoQ3PK3Ekvsww==
+X-Google-Smtp-Source: ABdhPJxA2920TE+DZuJCsrwibH0ZnSPpd+acl8LGRQUErItK2iiHdtt0S1ABaO1QuOQff3kc66qfmA==
+X-Received: by 2002:a02:90cb:: with SMTP id c11mr18223919jag.53.1624291607562;
+        Mon, 21 Jun 2021 09:06:47 -0700 (PDT)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id x9sm10378909iol.2.2021.06.21.08.55.55
+        by smtp.gmail.com with ESMTPSA id j12sm6365477ilk.26.2021.06.21.09.06.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 08:55:56 -0700 (PDT)
-Subject: Re: [PATCH] block: Include mm_types.h instead of mm.h
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20210621122407.3116975-1-willy@infradead.org>
+        Mon, 21 Jun 2021 09:06:46 -0700 (PDT)
+Subject: Re: [PATCH v3 00/16] Improve I/O priority support
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>
+References: <20210618004456.7280-1-bvanassche@acm.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <490a7c73-74ce-6a17-b16d-629d433d0de1@kernel.dk>
-Date:   Mon, 21 Jun 2021 09:55:55 -0600
+Message-ID: <f7d741e9-7e9e-28d5-1ebb-124c2b8b344b@kernel.dk>
+Date:   Mon, 21 Jun 2021 10:06:46 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210621122407.3116975-1-willy@infradead.org>
+In-Reply-To: <20210618004456.7280-1-bvanassche@acm.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,12 +77,25 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/21 6:24 AM, Matthew Wilcox (Oracle) wrote:
-> There's no need to include all of mm.h in bvec.h.  It only needs a few
-> things like the definition of struct page, PAGE_SIZE, PAGE_MASK and so
-> on, all of which are provided by mm_types.h.
+On 6/17/21 6:44 PM, Bart Van Assche wrote:
+> Hi Jens,
+> 
+> A feature that is missing from the Linux kernel for storage devices that
+> support I/O priorities is to set the I/O priority in requests involving page
+> cache writeback. Since the identity of the process that triggers page cache
+> writeback is not known in the writeback code, the priority set by ioprio_set()
+> is ignored. However, an I/O cgroup is associated with writeback requests
+> by certain filesystems. Hence this patch series that implements the following
+> changes:
+> * Add an rq-qos policy that makes the I/O priority configurable per I/O cgroup
+>   and also that changes the I/O priority of requests to the lower of (request
+>   I/O priority, cgroup I/O priority).
+> * Introduce one queue per I/O priority in the mq-deadline scheduler.
+> * Dispatch the highest priority requests first.
+> 
+> Please consider this patch series for kernel v5.14.
 
-Applied, thanks.
+Applied, thanks Bart.
 
 -- 
 Jens Axboe
