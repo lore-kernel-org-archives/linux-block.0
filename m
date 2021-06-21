@@ -2,132 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E25C48BE5
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA28AC49EA2
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:54:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCB92611C1
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A582B61164
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:54:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbhFUIoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 04:44:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54534 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229618AbhFUIoU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 04:44:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624264926;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5sbzr9XPq1LgidDaQqIaLaDJS9KPyp6a/zru6azg0dE=;
-        b=Wrwf0KXG65iqyMj8PHErL3dGxaMk+IWLpmNY0IzWKx1hLtrfxRUbiImFjAixgqVzhGcrFc
-        XXkDvwljd1LMeLtOsYB01tgV/6AK6Twk1WpIwJULFJ2iN9nEKI3Xli4FMg3yF1fGkR6hD4
-        1vZH9LZ7Se3TaaYqdB0H957XPiTArjs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-RrT0RfK4MNml5i07-kcRMQ-1; Mon, 21 Jun 2021 04:42:05 -0400
-X-MC-Unique: RrT0RfK4MNml5i07-kcRMQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1A9B800C60;
-        Mon, 21 Jun 2021 08:42:03 +0000 (UTC)
-Received: from T590 (ovpn-13-237.pek2.redhat.com [10.72.13.237])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 514791ABD4;
-        Mon, 21 Jun 2021 08:41:50 +0000 (UTC)
-Date:   Mon, 21 Jun 2021 16:41:33 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        id S230232AbhFUI4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 04:56:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39730 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230272AbhFUI4u (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jun 2021 04:56:50 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2964060724;
+        Mon, 21 Jun 2021 08:54:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1624265668;
+        bh=VcbXkDe9DOW5t++lY6Mh89RpWsDOFcnF5LaCm5CLVu8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=xmzMcAcftuSuGmVHxWPyg82c8VgqbVJWe/R2fZFNNlpRxtGwcDY9wLgnE+F1a0iWQ
+         ygf32c0yBJb1/3S4EYAXdGCCAmYhbrV0VZ+x59xsXGZsjoBsiR/He9x4b9V+/nMvbN
+         JX2eRKEvBqPPPBp+I/qA1cmpLoQAu7q4l4PxgwKw=
+Date:   Mon, 21 Jun 2021 10:54:26 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Hillf Danton <hdanton@sina.com>, hch@infradead.org,
+        axboe@kernel.dk, desmondcheongzx@gmail.com,
         linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [RFC PATCH V2 2/3] block: add ->poll_bio to
- block_device_operations
-Message-ID: <YNBQvSR3glgt59J9@T590>
-References: <20210617103549.930311-1-ming.lei@redhat.com>
- <20210617103549.930311-3-ming.lei@redhat.com>
- <20210621072502.GC6651@lst.de>
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        miquel.raynal@bootlin.com, richard@nod.at,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        syzbot+6a8a0d93c91e8fbf2e80@syzkaller.appspotmail.com,
+        vigneshr@ti.com
+Subject: Re: [PATCH v2] block: genhd: don't call probe function with
+ major_names_lock held
+Message-ID: <YNBTwhbJ/uiE8iZe@kroah.com>
+References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
+ <YM2STfTN5AupWlSa@kroah.com>
+ <20210620024403.820-1-hdanton@sina.com>
+ <24b7c3a9-e10a-f983-9fde-1ae66b0bc6b0@i-love.sakura.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210621072502.GC6651@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <24b7c3a9-e10a-f983-9fde-1ae66b0bc6b0@i-love.sakura.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 21, 2021 at 09:25:02AM +0200, Christoph Hellwig wrote:
-> > +	struct gendisk *disk = bio->bi_bdev->bd_disk;
-> > +	struct request_queue *q = disk->queue;
-> >  	blk_qc_t cookie = READ_ONCE(bio->bi_cookie);
-> >  	int ret;
-> >  
-> > -	if (cookie == BLK_QC_T_NONE || !blk_queue_poll(q))
-> > +	if ((queue_is_mq(q) && cookie == BLK_QC_T_NONE) ||
-> > +			!blk_queue_poll(q))
-> >  		return 0;
+On Sun, Jun 20, 2021 at 10:54:20PM +0900, Tetsuo Handa wrote:
+> On 2021/06/20 11:44, Hillf Danton wrote:
+> > Good craft in regard to triggering the ABBA deadlock, but curious why not
+> > move unregister_blkdev out of and before loop_ctl_mutex, given it will also
+> > serialise with the prober.
+> > 
 > 
-> How does polling for a bio without a cookie make sense even when
-> polling bio based?
-
-It isn't necessary to use bio->bi_cookie, that is why I doesn't use it,
-which actually provides one free 32bit in bio for bio based driver.
-
+> Well, something like this untested diff?
 > 
-> But if we come up for a good rationale for this I'd really
-> split the conditions to make them more readable:
+> Call unregister_blkdev() as soon as __exit function starts, for calling
+> probe function after cleanup started will be unexpected for __exit function.
 > 
-> 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-> 		return 0;
-> 	if (queue_is_mq(q) && cookie == BLK_QC_T_NONE)
-> 		return 0;
-
-OK.
-
+> Keep probe function no-op until __init function ends, for probe function
+> might be called as soon as __register_blkdev() succeeded but calling probe
+> function before setup completes will be unexpected for __init function.
 > 
-> > +	if (!queue_is_mq(q)) {
-> > +		if (disk->fops->poll_bio) {
-> > +			ret = disk->fops->poll_bio(bio, flags);
-> > +		} else {
-> > +			WARN_ON_ONCE(1);
-> > +			ret = 0;
-> > +		}
-> > +	} else {
-> >  		ret = blk_mq_poll(q, cookie, flags);
+>  drivers/block/ataflop.c |    6 +++++-
+>  drivers/block/brd.c     |    8 ++++++--
+>  drivers/block/floppy.c  |    4 ++++
+>  drivers/block/loop.c    |    4 ++--
+>  drivers/ide/ide-probe.c |    8 +++++++-
+>  drivers/md/md.c         |    5 +++++
+>  drivers/scsi/sd.c       |   10 +---------
+>  7 files changed, 30 insertions(+), 15 deletions(-)
 > 
-> I'd go for someting like:
-> 
-> 	if (queue_is_mq(q))
-> 		ret = blk_mq_poll(q, cookie, flags);
-> 	else if (disk->fops->poll_bio)
-> 		ret = disk->fops->poll_bio(bio, flags);
-> 	else
-> 		WARN_ON_ONCE(1);
-> 
-> with ret initialized to 0 at declaration time.
+> diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+> index d601e49f80e0..3681e8c493b1 100644
+> --- a/drivers/block/ataflop.c
+> +++ b/drivers/block/ataflop.c
+> @@ -1995,6 +1995,7 @@ static int ataflop_alloc_disk(unsigned int drive, unsigned int type)
+>  }
+>  
+>  static DEFINE_MUTEX(ataflop_probe_lock);
+> +static bool module_initialize_completed;
 
-Fine.
+This is almost always wrong.
 
-> 
-> >  struct block_device_operations {
-> >  	void (*submit_bio)(struct bio *bio);
-> > +	/* ->poll_bio is for bio driver only */
-> 
-> I'd drop the comment, this is already nicely documented in add_disk
-> together with the actual check.  We also don't note this for submit_bio
-> here.
+>  
+>  static void ataflop_probe(dev_t dev)
+>  {
+> @@ -2006,6 +2007,8 @@ static void ataflop_probe(dev_t dev)
+>  
+>  	if (drive >= FD_MAX_UNITS || type >= NUM_DISK_MINORS)
+>  		return;
+> +	if (!module_initialize_completed)
+> +		return;
 
-OK.
-
-
+This is not correct, when you register a callback structure, it can be
+instantly called.  Do not expect it to be delayed until later.
 
 thanks,
-Ming
 
+greg k-h
