@@ -7,173 +7,85 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57457C49361
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C055C48BE5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:50:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3951061003
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:49:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF7FD6101D
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:50:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbhFUHvy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 03:51:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52210 "EHLO
+        id S229789AbhFUHwy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 03:52:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbhFUHvy (ORCPT
+        with ESMTP id S229621AbhFUHwy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 03:51:54 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06EE3C061574;
-        Mon, 21 Jun 2021 00:49:41 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id b1so1308624pls.3;
-        Mon, 21 Jun 2021 00:49:41 -0700 (PDT)
+        Mon, 21 Jun 2021 03:52:54 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B306AC061574;
+        Mon, 21 Jun 2021 00:50:40 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id 102-20020a9d0eef0000b02903fccc5b733fso16824684otj.4;
+        Mon, 21 Jun 2021 00:50:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=DjKS9vGE5sSYyaVRLzs5LXYRJqRewmPN1nZgRkw061w=;
-        b=DO7aThUgoQXk7XZNrpVhR+WukvC0BB7vCbNxFmK7I1v51EfTWi5bldqduGW+Osxgn4
-         Gc5DTqbsEqjXXNOds0b90PSfjNJ0flHT0dYGSP6y8cWPPbjhN6D2JG2ZWVvJ7VG1j4rz
-         N7yHC37j36z8Oi2HBkAcFplPUcDLdeP2q4WfO3tzn2JSL/jmzB3otnep8dGs15l401cf
-         u16djVfw6pvvg8pW7mNnLRoKhhZwFF+AuLIz9CNpHDkHrElAe4rJDCI94DKcmVmxHiYr
-         garv+ImZBtUxBE4Jvx5Ixc5tu1UJYUcqJmXeBWj9k3wd8Uun/0/Yhc7xbvc1fTMW9PPi
-         9sVQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9sXc451mgmL8ffnO6nUq628WK0zM1QnYqUBEcldksr4=;
+        b=IJFByWgCsQSIjoNm43q/sJ2VUJxkNkW4fx3mLENTeM5U9kykrIgL0XUcV4zW+wzCCV
+         F0NH74YHJ+4tDKkgI+gkus19gFmO8akvrpeZBwAmtgHzOliBzWPxwWquXgQV9OXJVHon
+         KFbsM4HB9+YBC3g2WvBkp+ch04jaS9rMyEUhjqC+9hmjYt3cgww0y2cgF1GPFXznmcCu
+         DcxigGxhqeCHKyndV66a+dATQDMcwO0FVI7Rty87M/BMBzTIb5b9F7vX5L+FqlRLCPH3
+         be80nP5L+4lTQGGJxE5FDNXiCz83vfnNpG2CFzyYg3Qk+KE3KsTx+Ap8uEAjG2ysZp11
+         4WbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=DjKS9vGE5sSYyaVRLzs5LXYRJqRewmPN1nZgRkw061w=;
-        b=S+i5c6Y8l5GzEdSBOPWQQpZTj74xXGOboZb4ovxiS1J/OsmUOolmVBKgfHaTY9N6rI
-         D1kp2LBMuoiX54rWCRQlgN+yMyu/LdooWIGz6RO5d+nohg/w1r3KCdEY9NXJnT3uRoq1
-         eXx2CaqwNcQaKS33hSxhvc2OX0dVxnTsmBrizbsqjTddm/QnAtCnitvcaopG2o7gpWSl
-         220K+gYGt2qTuVpkP6ffRYxJKaAB4I76wHHVK27eICcvLWCMe3qRKgUYHJbKkbVbnd/x
-         LHMWTStmINrORogMmMh9qjwgIzeQplfiuB7IzeWzqG8+8uxEPzCUARzymbKwJoF/gJfz
-         ZvXA==
-X-Gm-Message-State: AOAM533AOz0MrYw3UGxwJQL1qVIN0xGmvVdAIDXZX67M21LBor+6B7ZS
-        eaEQSqlRZYmOSyp1fQLubhA=
-X-Google-Smtp-Source: ABdhPJx4RcNjlv6FXz1VId2Uju31XutNajPF6PPJ2s5pERvF5C5P7G996HKvs8l6JHvxQxejSchCFA==
-X-Received: by 2002:a17:90b:393:: with SMTP id ga19mr25555736pjb.182.1624261780539;
-        Mon, 21 Jun 2021 00:49:40 -0700 (PDT)
-Received: from [10.7.3.1] ([133.130.111.179])
-        by smtp.gmail.com with ESMTPSA id z6sm15799794pgs.24.2021.06.21.00.49.37
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Jun 2021 00:49:40 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.6\))
-Subject: Re: [Bug Report] Discard bios cannot be correctly merged in blk-mq
-From:   Wang Shanker <shankerwangmiao@gmail.com>
-In-Reply-To: <CALTww29rcAwSfbpsBzM_pnVSuVTYyt-YJryeUaNkHetCjXktCg@mail.gmail.com>
-Date:   Mon, 21 Jun 2021 15:49:33 +0800
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <5EFF6838-7ED8-4B14-BD43-4D4E67628149@gmail.com>
-References: <85F98DA6-FB28-4C1F-A47D-C410A7C22A3D@gmail.com>
- <YL4Z/QJCKc0NCV5L@T590> <C866C380-7A71-4722-957F-2CE65BDACF26@gmail.com>
- <YMAOO3XjOUl2IG+4@T590> <1C6DB607-B7BE-4257-8384-427BB490C9C0@gmail.com>
- <CALTww28L7afRdVdBf-KsyF6Hvf-8-CORSCpZJAvnVbDRo6chDQ@mail.gmail.com>
- <ED5B1993-9D44-4B9C-A7DF-72BD2375A216@gmail.com>
- <13C1B2E3-B177-4B05-9FF3-AEE57E964605@gmail.com>
- <CALTww29rcAwSfbpsBzM_pnVSuVTYyt-YJryeUaNkHetCjXktCg@mail.gmail.com>
-To:     Xiao Ni <xni@redhat.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.6)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9sXc451mgmL8ffnO6nUq628WK0zM1QnYqUBEcldksr4=;
+        b=WCjSRKkQGss/dyeDTmNOrqdnjz0XWfgNy6K9AxSigs6lOYmWmRsj3f1ytqheWmyfun
+         vqFZf7G87QwlywjhaMtzLEzCuOiEH3gsKEt8R6qOetFSvCX6mYRXiQ7tOeWi7kweXzdD
+         j7pCtzyfxBBTA5dwovHJNZluYZQ3nQFhaYlRGafQ7OR8f/vSQSFD35TPs7B+Ik5GCvRg
+         9NBSoon5Slv/VGgGVOFww8AM9BZsYbGJVl6qC86G9KRPGem81yKeJjYylFWndWZQlyVE
+         OLqD+kA9nsdYaE5J8uk/ODSrYOoeLbiuAx2L1QAOanOnsSv+/GicAKqEOv6T50vcd0OY
+         cVEQ==
+X-Gm-Message-State: AOAM533tnGKcCYVDsr0auPVwe9wGoYDvIPdrHiS0DNMPgL8/axXFKS2D
+        J3tLP/FDnZWJq0q7G7DZxLZCPlSYQZ+/hXAXsg==
+X-Google-Smtp-Source: ABdhPJwZjsmiQoNIy0955HOTcsbC7nK+5GN3Nd/ts9nxc5bFtJeKT2fe9VrBtbwvY9Pl16TsK2KnhMiDEEZOo0mulbc=
+X-Received: by 2002:a9d:4a8a:: with SMTP id i10mr19620639otf.282.1624261840165;
+ Mon, 21 Jun 2021 00:50:40 -0700 (PDT)
+MIME-Version: 1.0
+References: <1624191557-5385-1-git-send-email-zheyuma97@gmail.com> <YNAupxssJ/6zNyln@infradead.org>
+In-Reply-To: <YNAupxssJ/6zNyln@infradead.org>
+From:   Zheyu Ma <zheyuma97@gmail.com>
+Date:   Mon, 21 Jun 2021 15:50:28 +0800
+Message-ID: <CAMhUBj=OH8TOtVrJSfStWT=YWr3=Od=D+-BCtGhX1nN76wOYDA@mail.gmail.com>
+Subject: Re: [PATCH] block: mtip32xx: set the pointer of queue to null after cleaning
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, liushixin2@huawei.com,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        guoqing.jiang@cloud.ionos.com, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Xiao
+On Mon, Jun 21, 2021 at 2:16 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Sun, Jun 20, 2021 at 12:19:17PM +0000, Zheyu Ma wrote:
+> > When 'mtip_block_initialize' fails at 'mtip_hw_get_identify', a series
+> > of cleanup operations will be performed. But when the execution reaches
+> > 'put_disk', it will cause refcount underflow. The reason for this error
+> > is that after cleaning 'dd->queue', 'dd->disk->queue' was not set to
+> > null at the same time, which caused repeated cleanup work.
+> >
+> > Fix this by set 'dd->disk->queue' to null after cleaning
+>
+> This should all be fixed by the switch to blk_cleanup_disk and the
+> preparation for it in linux-next.
 
-Many thanks for your reply. I realized that this problem is not limited=20=
+Thanks for your reply, I have switched to the linux-next branch.
 
-to discard requests. For normal read/write requests, they are also first
-get split into 4k-sized ones and then merged into larger ones. The =
-merging
-of bio's is limited by queue_max_segments, which leads to small trunks =
-of
-io operations issued to physical devices. It seems that such behavior is
-not optimal and should be improved.
-
-I'm not so familiar with raid456. Could you have a look of its code when =
-you
-are free? It seems that improving this may result in big changes.
-
-Cheers,
-
-Miao Wang
-
-> 2021=E5=B9=B406=E6=9C=8818=E6=97=A5 20:49=EF=BC=8CXiao Ni =
-<xni@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Hi Miao
->=20
-> So you plan to fix this problem now? The plan is to submit the discard
-> bio directly to disk similar with raid0/raid10.
-> As we talked, it needs to consider the discard region. It should be
-> larger than chunk_sectors * nr_data_disks. It needs
-> to split the bio when its size not aligned with chunk_sectors *
-> nr_data_disks. And it needs to consider the start address
-> of the bio too. If it's not aligned with a start address of
-> chunk_sectors, it's better to split this part too.
->=20
-> I'm working on another job. So I don't have time to do this now. If
-> you submit the patches, I can help to review :)
->=20
-> Regards
-> Xiao
->=20
-> On Fri, Jun 18, 2021 at 2:28 PM Wang Shanker =
-<shankerwangmiao@gmail.com> wrote:
->>=20
->> Hi, Xiao
->>=20
->> Any ideas on this issue?
->>=20
->> Cheers,
->>=20
->> Miao Wang
->>=20
->>> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 17:03=EF=BC=8CWang Shanker =
-<shankerwangmiao@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>=20
->>>>=20
->>>> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 16:44=EF=BC=8CXiao Ni =
-<xni@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>>=20
->>>> Hi all
->>>>=20
->>>> Thanks for reporting about this. I did a test in my environment.
->>>> time blkdiscard /dev/nvme5n1  (477GB)
->>>> real    0m0.398s
->>>> time blkdiscard /dev/md0
->>>> real    9m16.569s
->>>>=20
->>>> I'm not familiar with the block layer codes. I'll try to understand
->>>> the codes related with discard request and
->>>> try to fix this problem.
->>>>=20
->>>> I have a question for raid5 discard, it needs to consider more than
->>>> raid0 and raid10. For example, there is a raid5 with 3 disks.
->>>> D11 D21 P1 (stripe size is 4KB)
->>>> D12 D22 P2
->>>> D13 D23 P3
->>>> D14 D24 P4
->>>> ...  (chunk size is 512KB)
->>>> If there is a discard request on D13 and D14, and there is no =
-discard
->>>> request on D23 D24. It can't send
->>>> discard request to D13 and D14, right? P3 =3D D23 xor D13. If we =
-discard
->>>> D13 and disk2 is broken, it can't
->>>> get the right data from D13 and P3. The discard request on D13 can
->>>> write 0 to the discard region, right?
->>>=20
->>> Yes. It can be seen at the beginning of make_discard_request(), =
-where
->>> the requested range being discarded is aligned to ``stripe_sectors",
->>> which should be chunk_sectors * nr_data_disks.
->>>=20
->>> Cheers,
->>>=20
->>> Miao Wang
->>=20
->=20
-
+Best regards,
+Zheyu Ma
