@@ -2,77 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A00A4C49EA7
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65EE4C49EA3
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:35:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75FDC610EA
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4193461151
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:35:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbhFUIEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 04:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55022 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230232AbhFUIEe (ORCPT
+        id S230061AbhFUIiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 04:38:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23801 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230215AbhFUIiA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 04:04:34 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C90D0C061574;
-        Mon, 21 Jun 2021 01:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=JtH+BJ83UKkZsmM2/s6DGMHrwGxZ9Os/k7xFLgZ7ELk=; b=We8PqCjjv3Yo+mSm+mnxkdSBGc
-        JUfOpEJtP4XbbEWqDAQge8E/dVJqWaxld53jKJ65shwRsgn7RkTSQ4i23tFNowMxo8Iy3i+FWFD/6
-        gtAuPhWGhi8jJcNLVZ0Ec1La7OU88sGpkzvTRXC7z1vAh/LrFFZjb7T3IZeTyV1JZtPevMUWI1w9m
-        JzJZdBncNP+nyX8xj417jDn3HaintdGPjxx0GWVGGl38SbxtIfG4nNhMI2zzK4tC6pi2nu/4c2UQU
-        se6hdutLhX5bzw/Ikh8uh9SXd07LfaCWYEvA7fRl+bJfuAvXSKmvqCWnjzyH6aAKU2IrtYwR2QilH
-        IRjrpGXw==;
-Received: from [2001:4bb8:188:3e21:8988:c934:59d4:cfe6] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lvEsL-00Crj9-NG; Mon, 21 Jun 2021 08:01:56 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk, ulf.hansson@linaro.org
-Cc:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: [PATCH] mmc: initialized disk->minors
-Date:   Mon, 21 Jun 2021 10:01:44 +0200
-Message-Id: <20210621080144.3655131-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+        Mon, 21 Jun 2021 04:38:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624264546;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kDqaJylOpEO+y/MxTzmjHISDevTkUAwoLV6gGI0zT9E=;
+        b=U0RyjVWTT0ji5g8Zt5yOMGZOLSoOvEs243Dv66sLvG5teX91i4I82Ysxf/uyq/xZqH9cjk
+        BpyR+tFSjgtnKJ25wCalIdTvT4GjhpcQm4z1V7GRmGdBrMGXx8SCMeVBQj0F52ySDwdjBJ
+        LDZ5laQMbDy2LV5jfWITk/gaW8ad0S4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-HSBqi19DNOSAtdmrF3VSXQ-1; Mon, 21 Jun 2021 04:35:45 -0400
+X-MC-Unique: HSBqi19DNOSAtdmrF3VSXQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 741D81084F53;
+        Mon, 21 Jun 2021 08:35:43 +0000 (UTC)
+Received: from T590 (ovpn-13-237.pek2.redhat.com [10.72.13.237])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EB5F60CA1;
+        Mon, 21 Jun 2021 08:35:34 +0000 (UTC)
+Date:   Mon, 21 Jun 2021 16:35:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
+        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 13/16] block: switch polling to be bio based
+Message-ID: <YNBPUUVtxSb6/gv1@T590>
+References: <20210615131034.752623-1-hch@lst.de>
+ <20210615131034.752623-14-hch@lst.de>
+ <YMliP6sFVuPhMbOB@T590>
+ <20210618140147.GA16258@lst.de>
+ <YMytSIBm7k2pqFlc@T590>
+ <20210621072005.GA6651@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210621072005.GA6651@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix a let hunk from the blk_mq_alloc_disk conversion.
+On Mon, Jun 21, 2021 at 09:20:05AM +0200, Christoph Hellwig wrote:
+> On Fri, Jun 18, 2021 at 10:27:20PM +0800, Ming Lei wrote:
+> > > How?  On a block device the caller needs to hold the block device open
+> > > to read/write from it.  On a file systems the file systems needs to
+> > > be mounted, which also holds a bdev reference.
+> > 
+> > +       rcu_read_lock();
+> > +       bio = READ_ONCE(kiocb->private);
+> > +       if (bio && bio->bi_bdev)
+> > 
+> > The bio may be ended now from another polling job, then the disk is
+> > closed & deleted, and released. Then request queue & hctxs are released.
+> > 
+> > +               ret = bio_poll(bio, flags);
+> > 
+> > But disk & request queue & hctx can still be referred in above bio_poll().
+> 
+> I don't see how this can happen.  A bio stashed into kiocb->private needs
+> to belong to the correct device initially.  For it to point to the "wrong"
+> device it needs to have been completed on the correct one, and then be
+> reused for a different device.  At the point it is reused that device
+> must obviously have been alive, and for it to be freed a RCU grace
+> period must have been passed.  And that grace period can't have started
+> earlier than when iocb_bio_iopoll was called.
 
-Fixes: 281ea6a5bfdc ("mmc: switch to blk_mq_alloc_disk")
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
----
- drivers/mmc/core/block.c | 1 +
- 1 file changed, 1 insertion(+)
+gendisk isn't freed after a RCU grace period, so even though bio->bi_bdev
+may not be freed really, but the gendisk may have been freed already.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index e7f89cbf9232..9890a1532cb0 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2331,6 +2331,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 	md->queue.blkdata = md;
- 
- 	md->disk->major	= MMC_BLOCK_MAJOR;
-+	md->disk->minors = perdev_minors;
- 	md->disk->first_minor = devidx * perdev_minors;
- 	md->disk->fops = &mmc_bdops;
- 	md->disk->private_data = md;
--- 
-2.30.2
++       rcu_read_lock();
++       bio = READ_ONCE(kiocb->private);
++       if (bio && bio->bi_bdev)
+
+The bio may be ended now from another polling job, and it is freed
+and re-allocated & freed, then bio->bi_bdev->bd_disk is freed too, which
+will be observed in the following bio_poll().
+
++               ret = bio_poll(bio, flags);
+
+
+Thanks,
+Ming
 
