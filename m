@@ -2,113 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65EE4C49EA3
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE11DC49EA3
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:37:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4193461151
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:35:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0113611C1
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230061AbhFUIiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 04:38:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23801 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230215AbhFUIiA (ORCPT
+        id S230121AbhFUIjW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 04:39:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34632 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229890AbhFUIjW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 04:38:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624264546;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kDqaJylOpEO+y/MxTzmjHISDevTkUAwoLV6gGI0zT9E=;
-        b=U0RyjVWTT0ji5g8Zt5yOMGZOLSoOvEs243Dv66sLvG5teX91i4I82Ysxf/uyq/xZqH9cjk
-        BpyR+tFSjgtnKJ25wCalIdTvT4GjhpcQm4z1V7GRmGdBrMGXx8SCMeVBQj0F52ySDwdjBJ
-        LDZ5laQMbDy2LV5jfWITk/gaW8ad0S4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-HSBqi19DNOSAtdmrF3VSXQ-1; Mon, 21 Jun 2021 04:35:45 -0400
-X-MC-Unique: HSBqi19DNOSAtdmrF3VSXQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 741D81084F53;
-        Mon, 21 Jun 2021 08:35:43 +0000 (UTC)
-Received: from T590 (ovpn-13-237.pek2.redhat.com [10.72.13.237])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EB5F60CA1;
-        Mon, 21 Jun 2021 08:35:34 +0000 (UTC)
-Date:   Mon, 21 Jun 2021 16:35:29 +0800
-From:   Ming Lei <ming.lei@redhat.com>
+        Mon, 21 Jun 2021 04:39:22 -0400
+Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC8DC061574
+        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 01:37:07 -0700 (PDT)
+Received: by mail-vs1-xe33.google.com with SMTP id o7so1539431vss.5
+        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 01:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qzTVwqyj6nr6/LZrUm/pAB2Cc31yG9N6wdia2r1bfvg=;
+        b=cz4ywv1UMpD6shFY/vKpjD1Co8Lh1O4DYRNq/FNXBWDetUZqmJw3ZQEpiX3O8xYdCr
+         LXTxFijFLnOLA5Lx7ZvvWKsQHULNMyG95VVX3EYvxk5pF3PAegD4CMaWE4/sB6e3NVDk
+         SZuxJBGtj7scHbC9841FStBVVMXNgsowqYW1r77oNdg8EiD/MGW3+UEEoNtZhIXgTtmx
+         5eOsdFxqBVQS2r9YY4DX2mTk99kvNsVSf/PztBQ/rnoUd1H10hkBw492oEGWmSgKSRRl
+         8WXTs+mKHu1I2t30KUnIF4ptSrEgm1/6p8SLbTxiXtudY0kV1nIpqDXdL/uTheC49rUk
+         jVRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qzTVwqyj6nr6/LZrUm/pAB2Cc31yG9N6wdia2r1bfvg=;
+        b=ji1ke+6CbCd2tE1QylZfdmVJiJeyspNc025sgWX+MX3VFubkT5USXCDHVTPi0cVafI
+         rNFkO2SLysfOZj0Vl5c38i1uLOtEUCG2ohPocP0ayjFshu8XDusOMWNsJvLwZOFztJwd
+         6mwudBeDtwXQQQaKa9oBtQoV4ptHnFeStxe3lruwpiGkeaEUZ2yCHS3XNbanqQVIBl01
+         6tDgbux9tQNy7fVS7dZvWCjlhda8079XL0K1DvMzeIh99BYl235Xe7Kdual+t+q4PV/6
+         gGC+SBrtOMQ1lYsdU5jWnJDVKGjh+7j+XTZ0y+U4cuP8WEL37EKH3YltgdKwg/6qyq8T
+         KZpw==
+X-Gm-Message-State: AOAM533pNGWxco8jN4yQltKp0OZjYaM6Y5lvonkwBURVLPklRcvKGHef
+        x1HZsrogFEdI1FVjwNWpFK3zoo+j3hgw1x/vrdqZBg==
+X-Google-Smtp-Source: ABdhPJxCVASk9Qh94HPF5HKlvNiiIQ7X4GBG9yb3ZPJsXzlOHqQ5qE+ohFND9eQOQC1WGeNZvaWbLazxD/+TfaMk9JQ=
+X-Received: by 2002:a67:1087:: with SMTP id 129mr15835523vsq.42.1624264626455;
+ Mon, 21 Jun 2021 01:37:06 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210621080144.3655131-1-hch@lst.de>
+In-Reply-To: <20210621080144.3655131-1-hch@lst.de>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Mon, 21 Jun 2021 10:36:30 +0200
+Message-ID: <CAPDyKFpsdejocAGbUNWtkWnpf08tR5srOu_014NOaT+v22GVSg@mail.gmail.com>
+Subject: Re: [PATCH] mmc: initialized disk->minors
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 13/16] block: switch polling to be bio based
-Message-ID: <YNBPUUVtxSb6/gv1@T590>
-References: <20210615131034.752623-1-hch@lst.de>
- <20210615131034.752623-14-hch@lst.de>
- <YMliP6sFVuPhMbOB@T590>
- <20210618140147.GA16258@lst.de>
- <YMytSIBm7k2pqFlc@T590>
- <20210621072005.GA6651@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210621072005.GA6651@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 21, 2021 at 09:20:05AM +0200, Christoph Hellwig wrote:
-> On Fri, Jun 18, 2021 at 10:27:20PM +0800, Ming Lei wrote:
-> > > How?  On a block device the caller needs to hold the block device open
-> > > to read/write from it.  On a file systems the file systems needs to
-> > > be mounted, which also holds a bdev reference.
-> > 
-> > +       rcu_read_lock();
-> > +       bio = READ_ONCE(kiocb->private);
-> > +       if (bio && bio->bi_bdev)
-> > 
-> > The bio may be ended now from another polling job, then the disk is
-> > closed & deleted, and released. Then request queue & hctxs are released.
-> > 
-> > +               ret = bio_poll(bio, flags);
-> > 
-> > But disk & request queue & hctx can still be referred in above bio_poll().
-> 
-> I don't see how this can happen.  A bio stashed into kiocb->private needs
-> to belong to the correct device initially.  For it to point to the "wrong"
-> device it needs to have been completed on the correct one, and then be
-> reused for a different device.  At the point it is reused that device
-> must obviously have been alive, and for it to be freed a RCU grace
-> period must have been passed.  And that grace period can't have started
-> earlier than when iocb_bio_iopoll was called.
+On Mon, 21 Jun 2021 at 10:02, Christoph Hellwig <hch@lst.de> wrote:
+>
+> Fix a let hunk from the blk_mq_alloc_disk conversion.
+>
+> Fixes: 281ea6a5bfdc ("mmc: switch to blk_mq_alloc_disk")
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
 
-gendisk isn't freed after a RCU grace period, so even though bio->bi_bdev
-may not be freed really, but the gendisk may have been freed already.
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-+       rcu_read_lock();
-+       bio = READ_ONCE(kiocb->private);
-+       if (bio && bio->bi_bdev)
+Kind regards
+Uffe
 
-The bio may be ended now from another polling job, and it is freed
-and re-allocated & freed, then bio->bi_bdev->bd_disk is freed too, which
-will be observed in the following bio_poll().
-
-+               ret = bio_poll(bio, flags);
-
-
-Thanks,
-Ming
-
+> ---
+>  drivers/mmc/core/block.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index e7f89cbf9232..9890a1532cb0 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -2331,6 +2331,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+>         md->queue.blkdata = md;
+>
+>         md->disk->major = MMC_BLOCK_MAJOR;
+> +       md->disk->minors = perdev_minors;
+>         md->disk->first_minor = devidx * perdev_minors;
+>         md->disk->fops = &mmc_bdops;
+>         md->disk->private_data = md;
+> --
+> 2.30.2
+>
