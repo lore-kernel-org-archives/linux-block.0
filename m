@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77698C48BC2
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 636CBC4743C
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:39:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57AC361153
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46E616023C
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 10:39:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbhFUKjP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 06:39:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33866 "EHLO
+        id S230225AbhFUKlj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 06:41:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230047AbhFUKjM (ORCPT
+        with ESMTP id S230380AbhFUKlh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 06:39:12 -0400
+        Mon, 21 Jun 2021 06:41:37 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C090C061574
-        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 03:36:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1705DC06175F
+        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 03:39:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=aTNox3wMNhcRFzTHNUdRK30EdNvBg0L71qC11MFoIrA=; b=muT63QPOR0UAOjQNA3X4+kAUSD
-        h2UIsx99QD/FSNIdBJajzxn4jg8PsKwJv2W0Q+XISC2dwWJOpowPiPoaTStNRziENuuIDHFxCyz0C
-        m81+cOQ/kwDwnsWf+rRisAXP0elFmT5iNxx1oAdtS7aZfcbhsQ2vvOrrUb+b+5btmj2GS1sLBIUVg
-        AlUAsst82R3Sei7z7FiMF9iJ4+WyDe7SODacpDd+QQF6FtHyt6HdTG8JzrzxPpBdO/RuHG+uinSEb
-        je8zVHaeWIzz3A0fDkiCbmfQePA6UHmtqMjqYBfrp1tXHmB+TEYqblDEQRuooBDtj2eLvfxub41rV
-        7v+FTYqQ==;
+        bh=8DC+cLK5HJ7QsVGdSBUQEOFoPNsSLMqdpKgav0tDs1M=; b=Q2bk/9vSTSwnIZEDlcbNnuwRwx
+        gEhQy8CDfBcEN2XCdxzvYZXZpYYx1r68k3KLJuIFxJMBvLDbtal40D4olLRLxJLAC8vJQYxFZxG20
+        oauyGrMgmyb+ILBuq066e8p3ObFVwRXn69xSj+woiCti1szmFYeIYwi48gSEmeNpdHdmf/1OCm95+
+        bpDQPFL3jYlS+c0S6zW6yPg99Gbf0dd8dNt+5a8Igt0sqYBBzSzJBLz0Jz7n8mt4uBqzqVEmgoJMm
+        UzQw9qBpW87W758i48Dz/D1X21ImcikaKgUNebUHWJ9GJ2vdsTPKUqvtTcupo60te6oA8wF4LvBN2
+        1gfReRbw==;
 Received: from 089144193030.atnat0002.highway.a1.net ([89.144.193.30] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lvHHn-00CzWB-Nh; Mon, 21 Jun 2021 10:36:22 +0000
+        id 1lvHKJ-00CzcS-9s; Mon, 21 Jun 2021 10:38:51 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         linux-block@vger.kernel.org
-Subject: [PATCH 7/9] loop: don't allow deleting an unspecified loop device
-Date:   Mon, 21 Jun 2021 12:15:45 +0200
-Message-Id: <20210621101547.3764003-8-hch@lst.de>
+Subject: [PATCH 8/9] loop: split loop_lookup
+Date:   Mon, 21 Jun 2021 12:15:46 +0200
+Message-Id: <20210621101547.3764003-9-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210621101547.3764003-1-hch@lst.de>
 References: <20210621101547.3764003-1-hch@lst.de>
@@ -53,31 +53,104 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Passing a negative index to loop_lookup while return any unbound device.
-Doing that for a delete does not make much sense, so add check to
-explicitly reject that case.
+loop_lookup has two callers - one wants to do the a find by index and the
+other wants any unbound loop device.  Open code the respective
+functionality in each caller.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/block/loop.c | 57 ++++++++++----------------------------------
+ 1 file changed, 12 insertions(+), 45 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 3f1e934a7f9e..54e2551e339c 100644
+index 54e2551e339c..2ff5162bd28b 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -2235,6 +2235,11 @@ static int loop_control_remove(int idx)
+@@ -2184,44 +2184,6 @@ static void loop_remove(struct loop_device *lo)
+ 	kfree(lo);
+ }
+ 
+-static int find_free_cb(int id, void *ptr, void *data)
+-{
+-	struct loop_device *lo = ptr;
+-	struct loop_device **l = data;
+-
+-	if (lo->lo_state == Lo_unbound) {
+-		*l = lo;
+-		return 1;
+-	}
+-	return 0;
+-}
+-
+-static int loop_lookup(struct loop_device **l, int i)
+-{
+-	struct loop_device *lo;
+-	int ret = -ENODEV;
+-
+-	if (i < 0) {
+-		int err;
+-
+-		err = idr_for_each(&loop_index_idr, &find_free_cb, &lo);
+-		if (err == 1) {
+-			*l = lo;
+-			ret = lo->lo_number;
+-		}
+-		goto out;
+-	}
+-
+-	/* lookup and return a specific i */
+-	lo = idr_find(&loop_index_idr, i);
+-	if (lo) {
+-		*l = lo;
+-		ret = lo->lo_number;
+-	}
+-out:
+-	return ret;
+-}
+-
+ static void loop_probe(dev_t dev)
+ {
+ 	int idx = MINOR(dev) >> part_shift;
+@@ -2245,9 +2207,11 @@ static int loop_control_remove(int idx)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = loop_lookup(&lo, idx);
+-	if (ret < 0)
++	lo = idr_find(&loop_index_idr, idx);
++	if (!lo) {
++		ret = -ENODEV;
+ 		goto out_unlock_ctrl;
++	}
+ 
+ 	ret = mutex_lock_killable(&lo->lo_mutex);
+ 	if (ret)
+@@ -2271,17 +2235,20 @@ static int loop_control_remove(int idx)
+ static int loop_control_get_free(int idx)
  {
  	struct loop_device *lo;
- 	int ret;
-+
-+	if (idx < 0) {
-+		pr_warn("deleting an unspecified loop device is not supported.\n");
-+		return -EINVAL;
-+	}
- 		
+-	int ret;
++	int id, ret;
+ 
  	ret = mutex_lock_killable(&loop_ctl_mutex);
  	if (ret)
+ 		return ret;
+-	ret = loop_lookup(&lo, -1);
++	idr_for_each_entry(&loop_index_idr, lo, id) {
++		if (lo->lo_state == Lo_unbound)
++			goto found;
++	}
+ 	mutex_unlock(&loop_ctl_mutex);
+-
+-	if (ret >= 0)
+-		return ret;
+ 	return loop_add(-1);
++found:
++	mutex_unlock(&loop_ctl_mutex);
++	return lo->lo_number;
+ }
+ 
+ static long loop_control_ioctl(struct file *file, unsigned int cmd,
 -- 
 2.30.2
 
