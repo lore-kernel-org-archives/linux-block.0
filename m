@@ -7,104 +7,146 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA28AC49EA2
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D21AC48BE5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 09:10:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A582B61164
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 08:54:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3415B61002
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 09:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230232AbhFUI4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 04:56:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39730 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230272AbhFUI4u (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 04:56:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2964060724;
-        Mon, 21 Jun 2021 08:54:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1624265668;
-        bh=VcbXkDe9DOW5t++lY6Mh89RpWsDOFcnF5LaCm5CLVu8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xmzMcAcftuSuGmVHxWPyg82c8VgqbVJWe/R2fZFNNlpRxtGwcDY9wLgnE+F1a0iWQ
-         ygf32c0yBJb1/3S4EYAXdGCCAmYhbrV0VZ+x59xsXGZsjoBsiR/He9x4b9V+/nMvbN
-         JX2eRKEvBqPPPBp+I/qA1cmpLoQAu7q4l4PxgwKw=
-Date:   Mon, 21 Jun 2021 10:54:26 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Hillf Danton <hdanton@sina.com>, hch@infradead.org,
-        axboe@kernel.dk, desmondcheongzx@gmail.com,
+        id S229905AbhFUJMh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 05:12:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20395 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229618AbhFUJMh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jun 2021 05:12:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624266623;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+zXeB7TAthHPhPVdgGbQtsrg9A/nXAcsG8CZ6UNo6nk=;
+        b=M+/6FFbe4DVuQtXz0IRwJuFTH0GdFyaFEv4ROK944IvDRM8KLWgiRIF1WExpzReptZ4htW
+        Sh+w4QjA/ejpqh+ZxHaqdl3WvaAMhq2yos51LRH/sozvRAOzj5KwblG5kiCaJHyXXgbDTP
+        H8Jiq5GLwGN5V+YyFldLmEcxTVA1sGU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-uc2lZBCSPnuAF90vUI22SQ-1; Mon, 21 Jun 2021 05:10:19 -0400
+X-MC-Unique: uc2lZBCSPnuAF90vUI22SQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E149119200C1;
+        Mon, 21 Jun 2021 09:10:17 +0000 (UTC)
+Received: from T590 (ovpn-13-237.pek2.redhat.com [10.72.13.237])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E89401009962;
+        Mon, 21 Jun 2021 09:10:02 +0000 (UTC)
+Date:   Mon, 21 Jun 2021 17:09:49 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
         linux-block@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        miquel.raynal@bootlin.com, richard@nod.at,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        syzbot+6a8a0d93c91e8fbf2e80@syzkaller.appspotmail.com,
-        vigneshr@ti.com
-Subject: Re: [PATCH v2] block: genhd: don't call probe function with
- major_names_lock held
-Message-ID: <YNBTwhbJ/uiE8iZe@kroah.com>
-References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
- <YM2STfTN5AupWlSa@kroah.com>
- <20210620024403.820-1-hdanton@sina.com>
- <24b7c3a9-e10a-f983-9fde-1ae66b0bc6b0@i-love.sakura.ne.jp>
+        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [RFC PATCH V2 3/3] dm: support bio polling
+Message-ID: <YNBXXVD9lko84IEZ@T590>
+References: <20210617103549.930311-1-ming.lei@redhat.com>
+ <20210617103549.930311-4-ming.lei@redhat.com>
+ <20210621073656.GB6896@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <24b7c3a9-e10a-f983-9fde-1ae66b0bc6b0@i-love.sakura.ne.jp>
+In-Reply-To: <20210621073656.GB6896@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jun 20, 2021 at 10:54:20PM +0900, Tetsuo Handa wrote:
-> On 2021/06/20 11:44, Hillf Danton wrote:
-> > Good craft in regard to triggering the ABBA deadlock, but curious why not
-> > move unregister_blkdev out of and before loop_ctl_mutex, given it will also
-> > serialise with the prober.
-> > 
+On Mon, Jun 21, 2021 at 09:36:56AM +0200, Christoph Hellwig wrote:
+> On Thu, Jun 17, 2021 at 06:35:49PM +0800, Ming Lei wrote:
+> > +	/*
+> > +	 * Only support bio polling for normal IO, and the target io is
+> > +	 * exactly inside the dm io instance
+> > +	 */
+> > +	ci->io->submit_as_polled = !!(ci->bio->bi_opf & REQ_POLLED);
 > 
-> Well, something like this untested diff?
+> Nit: the !! is not needed.
+
+OK.
+
 > 
-> Call unregister_blkdev() as soon as __exit function starts, for calling
-> probe function after cleanup started will be unexpected for __exit function.
+> > @@ -1608,6 +1625,22 @@ static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
+> >  	ci->map = map;
+> >  	ci->io = alloc_io(md, bio);
+> >  	ci->sector = bio->bi_iter.bi_sector;
+> > +
+> > +	if (bio->bi_opf & REQ_POLLED) {
+> > +		INIT_HLIST_NODE(&ci->io->node);
+> > +
+> > +		/*
+> > +		 * Save .bi_end_io into dm_io, so that we can reuse .bi_end_io
+> > +		 * for storing dm_io list
+> > +		 */
+> > +		if (bio->bi_opf & REQ_SAVED_END_IO) {
+> > +			ci->io->saved_bio_end_io = NULL;
 > 
-> Keep probe function no-op until __init function ends, for probe function
-> might be called as soon as __register_blkdev() succeeded but calling probe
-> function before setup completes will be unexpected for __init function.
+> So if it already was saved the list gets cleared here?  Can you explain
+> this logic a little more?
+
+Inside dm_poll_bio() we recognize non-NULL ->saved_bio_end_io as
+valid, so it has to be initialized it here.
+
 > 
->  drivers/block/ataflop.c |    6 +++++-
->  drivers/block/brd.c     |    8 ++++++--
->  drivers/block/floppy.c  |    4 ++++
->  drivers/block/loop.c    |    4 ++--
->  drivers/ide/ide-probe.c |    8 +++++++-
->  drivers/md/md.c         |    5 +++++
->  drivers/scsi/sd.c       |   10 +---------
->  7 files changed, 30 insertions(+), 15 deletions(-)
+> > +		} else {
+> > +			ci->io->saved_bio_end_io = bio->bi_end_io;
+> > +			INIT_HLIST_HEAD((struct hlist_head *)&bio->bi_end_io);
 > 
-> diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-> index d601e49f80e0..3681e8c493b1 100644
-> --- a/drivers/block/ataflop.c
-> +++ b/drivers/block/ataflop.c
-> @@ -1995,6 +1995,7 @@ static int ataflop_alloc_disk(unsigned int drive, unsigned int type)
->  }
->  
->  static DEFINE_MUTEX(ataflop_probe_lock);
-> +static bool module_initialize_completed;
+> I think you want to hide these casts in helpers that clearly document
+> why this is safe rather than sprinkling the casts all over the code.
+> I also wonder if there is any better way to structur this.
 
-This is almost always wrong.
+OK, I will add a helper of dm_get_bio_hlist_head() with comment.
 
->  
->  static void ataflop_probe(dev_t dev)
->  {
-> @@ -2006,6 +2007,8 @@ static void ataflop_probe(dev_t dev)
->  
->  	if (drive >= FD_MAX_UNITS || type >= NUM_DISK_MINORS)
->  		return;
-> +	if (!module_initialize_completed)
-> +		return;
+> 
+> > +static int dm_poll_bio(struct bio *bio, unsigned int flags)
+> > +{
+> > +	struct dm_io *io;
+> > +	void *saved_bi_end_io = NULL;
+> > +	struct hlist_head tmp = HLIST_HEAD_INIT;
+> > +	struct hlist_head *head = (struct hlist_head *)&bio->bi_end_io;
+> > +	struct hlist_node *next;
+> > +
+> > +	/*
+> > +	 * This bio can be submitted from FS as POLLED so that FS may keep
+> > +	 * polling even though the flag is cleared by bio splitting or
+> > +	 * requeue, so return immediately.
+> > +	 */
+> > +	if (!(bio->bi_opf & REQ_POLLED))
+> > +		return 0;
+> 
+> I can't really parse the comment, can you explain this a little more?
+> But if we need this check, shouldn't it move to bio_poll()?
 
-This is not correct, when you register a callback structure, it can be
-instantly called.  Do not expect it to be delayed until later.
+Upper layer keeps to poll one bio with POLLED, but the flag can be
+cleared by driver or block layer. Once it is cleared, we should return
+immediately.
 
-thanks,
+Yeah, we can move it to bio_poll().
 
-greg k-h
+> 
+> > +	hlist_for_each_entry(io, &tmp, node) {
+> > +		if (io->saved_bio_end_io && !saved_bi_end_io) {
+> > +			saved_bi_end_io = io->saved_bio_end_io;
+> > +			break;
+> > +		}
+> > +	}
+> 
+> So it seems like you don't use bi_cookie at all.  Why not turn
+> bi_cookie into a union to stash the hlist_head and use that?
+
+hlist_head is 'void *', but ->bi_cookie is 'unsigned int'.
+
+
+Thanks,
+Ming
+
