@@ -2,68 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81774C48BE5
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A09C48BE5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:20:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AECE61026
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:20:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01E1861156
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jun 2021 07:20:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbhFUHW0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 03:22:26 -0400
-Received: from verein.lst.de ([213.95.11.211]:40846 "EHLO verein.lst.de"
+        id S229708AbhFUHWw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 03:22:52 -0400
+Received: from verein.lst.de ([213.95.11.211]:40848 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229597AbhFUHWZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 03:22:25 -0400
+        id S229597AbhFUHWw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jun 2021 03:22:52 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 11AB568BFE; Mon, 21 Jun 2021 09:20:06 +0200 (CEST)
-Date:   Mon, 21 Jun 2021 09:20:05 +0200
+        id 3685968BFE; Mon, 21 Jun 2021 09:20:37 +0200 (CEST)
+Date:   Mon, 21 Jun 2021 09:20:36 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 13/16] block: switch polling to be bio based
-Message-ID: <20210621072005.GA6651@lst.de>
-References: <20210615131034.752623-1-hch@lst.de> <20210615131034.752623-14-hch@lst.de> <YMliP6sFVuPhMbOB@T590> <20210618140147.GA16258@lst.de> <YMytSIBm7k2pqFlc@T590>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org,
+        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: Re: [RFC PATCH V2 1/3] block: add helper of blk_queue_poll
+Message-ID: <20210621072036.GB6651@lst.de>
+References: <20210617103549.930311-1-ming.lei@redhat.com> <20210617103549.930311-2-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YMytSIBm7k2pqFlc@T590>
+In-Reply-To: <20210617103549.930311-2-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 10:27:20PM +0800, Ming Lei wrote:
-> > How?  On a block device the caller needs to hold the block device open
-> > to read/write from it.  On a file systems the file systems needs to
-> > be mounted, which also holds a bdev reference.
+On Thu, Jun 17, 2021 at 06:35:47PM +0800, Ming Lei wrote:
+> There has been 3 users, and will be more, so add one such helper.
 > 
-> +       rcu_read_lock();
-> +       bio = READ_ONCE(kiocb->private);
-> +       if (bio && bio->bi_bdev)
-> 
-> The bio may be ended now from another polling job, then the disk is
-> closed & deleted, and released. Then request queue & hctxs are released.
-> 
-> +               ret = bio_poll(bio, flags);
-> 
-> But disk & request queue & hctx can still be referred in above bio_poll().
+> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Reviewed-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-I don't see how this can happen.  A bio stashed into kiocb->private needs
-to belong to the correct device initially.  For it to point to the "wrong"
-device it needs to have been completed on the correct one, and then be
-reused for a different device.  At the point it is reused that device
-must obviously have been alive, and for it to be freed a RCU grace
-period must have been passed.  And that grace period can't have started
-earlier than when iocb_bio_iopoll was called.
+I still don't like hiding a simple flag test like this, it just adds
+another step to grepping what is going on.
