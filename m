@@ -2,191 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86529C4743C
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 01:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C711C4743C
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 02:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63478611C1
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 01:49:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 453F76128C
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 02:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230311AbhFVBvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 21:51:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53228 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229663AbhFVBvO (ORCPT
+        id S231179AbhFVC2d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 22:28:33 -0400
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:36912 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230338AbhFVC2c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 21:51:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624326539;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bv4Y6MHLXIbEPaIpLuiXtLafLWy630ExgSl5up0FmUk=;
-        b=D8+iaj/onpIGtDCRbuREniGiv1Yl3sP5FMIrca8PU4rw4DqoXAspyRLaNCnsnsakbTVuxa
-        IW7MkyfY09gC+Gyw5NnRJ5PiErslcBAbiryq1+OTQ8WVs1LnubGN7/ahiL4X1IAn4r3gXb
-        Yf7VyBhFpU+sUgvtw/uJU3i41dw+6PQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-xIWzv7Q4MwGFM1K0BedCgg-1; Mon, 21 Jun 2021 21:48:55 -0400
-X-MC-Unique: xIWzv7Q4MwGFM1K0BedCgg-1
-Received: by mail-ej1-f72.google.com with SMTP id f1-20020a1709064941b02903f6b5ef17bfso6943399ejt.20
-        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 18:48:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=bv4Y6MHLXIbEPaIpLuiXtLafLWy630ExgSl5up0FmUk=;
-        b=hu899/no4iXzLiq9SCsqQTOXATpzfgGNgwqzT0hDdksEj1x/AL9iflYAGCEvMlhg+U
-         xqmYa/ningFOwJA//SzsqT76wywy67fLi8ftIub+lt2fCPkQRCS3YNap3ADVWb9ZI1px
-         8tIAQkTzYXkjJEJFSYhmC+R+jPK/F1qJuY3b8GOEEKmPHqLoB09v8rt6hKb0NWFNhVVX
-         RBajmYiK2g0YH5UmvHFjeT9FiTd6YOAisv/EG1n5QdQxUqSfrHRorSxxfJA3vrWuzDZA
-         xFx2YRNf2HkfnL0hlyJEilLJb2ti698AJUQy2XgzGSriNs1VkGU2R5x/7TQxGs5m0Lu2
-         do9A==
-X-Gm-Message-State: AOAM531mfpEbbfTNSv43laawgyvnQIIW4mgpXDIC9J201osJMYh1ModT
-        /0PCqefY7UAypY/g5p3rDvpr0jhxnjuS+1DB+5+cfhj6cnxlM1beuGSWVPxH1qzGXC+5XHo0fPk
-        T4yKMz3fTjInluj9qtgbrrcrlCEyrXePCu1slQL0=
-X-Received: by 2002:a17:906:2b18:: with SMTP id a24mr1124509ejg.239.1624326534447;
-        Mon, 21 Jun 2021 18:48:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy+yjNmyAf7nn7Y1v33+YFO4uB4LwGSDWxLzDQ34j5qYOJvQCGoUvLIEMCQeL4iZ4UWJeUmPfMr2gxOtbj5QrU=
-X-Received: by 2002:a17:906:2b18:: with SMTP id a24mr1124501ejg.239.1624326534313;
- Mon, 21 Jun 2021 18:48:54 -0700 (PDT)
+        Mon, 21 Jun 2021 22:28:32 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UdGhKea_1624328775;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UdGhKea_1624328775)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 22 Jun 2021 10:26:15 +0800
+Subject: Re: [dm-devel] [RFC PATCH V2 3/3] dm: support bio polling
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Christoph Hellwig <hch@lst.de>
+References: <20210617103549.930311-1-ming.lei@redhat.com>
+ <20210617103549.930311-4-ming.lei@redhat.com>
+ <5ba43dac-b960-7c85-3a89-fdae2d1e2f51@linux.alibaba.com>
+ <YMywCX6nLqLiHXyy@T590>
+ <9b42601a-ca54-4748-e592-3720b7994d7b@linux.alibaba.com>
+ <YNCchke/OxQVnSZA@T590>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <ba95e8f3-7466-7167-bcfd-49f89ee0b99c@linux.alibaba.com>
+Date:   Tue, 22 Jun 2021 10:26:15 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <85F98DA6-FB28-4C1F-A47D-C410A7C22A3D@gmail.com>
- <YL4Z/QJCKc0NCV5L@T590> <C866C380-7A71-4722-957F-2CE65BDACF26@gmail.com>
- <YMAOO3XjOUl2IG+4@T590> <1C6DB607-B7BE-4257-8384-427BB490C9C0@gmail.com>
- <CALTww28L7afRdVdBf-KsyF6Hvf-8-CORSCpZJAvnVbDRo6chDQ@mail.gmail.com>
- <ED5B1993-9D44-4B9C-A7DF-72BD2375A216@gmail.com> <13C1B2E3-B177-4B05-9FF3-AEE57E964605@gmail.com>
- <CALTww29rcAwSfbpsBzM_pnVSuVTYyt-YJryeUaNkHetCjXktCg@mail.gmail.com> <5EFF6838-7ED8-4B14-BD43-4D4E67628149@gmail.com>
-In-Reply-To: <5EFF6838-7ED8-4B14-BD43-4D4E67628149@gmail.com>
-From:   Xiao Ni <xni@redhat.com>
-Date:   Tue, 22 Jun 2021 09:48:42 +0800
-Message-ID: <CALTww29nG8URQkocUGhixU-FUPsK9d3P8yGKw8u3ohes+e9yCg@mail.gmail.com>
-Subject: Re: [Bug Report] Discard bios cannot be correctly merged in blk-mq
-To:     Wang Shanker <shankerwangmiao@gmail.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <YNCchke/OxQVnSZA@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
 
-For normal read/write requests, it needs to consider parity
-calculation. Now it uses page size as the unit. The whole design
-is based on this. So it's very hard to change this. But there are many
-efforts to improve the performance. The batch requests
-can improve the performance.
-https://www.spinics.net/lists/raid/msg47207.html. It can help to avoid
-to send many small
-bios to disks.
 
-And for the discard part, I'll try to do this job.
+On 6/21/21 10:04 PM, Ming Lei wrote:
+> On Mon, Jun 21, 2021 at 07:33:34PM +0800, JeffleXu wrote:
+>>
+>>
+>> On 6/18/21 10:39 PM, Ming Lei wrote:
+>>> From 47e523b9ee988317369eaadb96826323cd86819e Mon Sep 17 00:00:00 2001
+>>> From: Ming Lei <ming.lei@redhat.com>
+>>> Date: Wed, 16 Jun 2021 16:13:46 +0800
+>>> Subject: [RFC PATCH V3 3/3] dm: support bio polling
+>>>
+>>> Support bio(REQ_POLLED) polling in the following approach:
+>>>
+>>> 1) only support io polling on normal READ/WRITE, and other abnormal IOs
+>>> still fallback on IRQ mode, so the target io is exactly inside the dm
+>>> io.
+>>>
+>>> 2) hold one refcnt on io->io_count after submitting this dm bio with
+>>> REQ_POLLED
+>>>
+>>> 3) support dm native bio splitting, any dm io instance associated with
+>>> current bio will be added into one list which head is bio->bi_end_io
+>>> which will be recovered before ending this bio
+>>>
+>>> 4) implement .poll_bio() callback, call bio_poll() on the single target
+>>> bio inside the dm io which is retrieved via bio->bi_bio_drv_data; call
+>>> dec_pending() after the target io is done in .poll_bio()
+>>>
+>>> 4) enable QUEUE_FLAG_POLL if all underlying queues enable QUEUE_FLAG_POLL,
+>>> which is based on Jeffle's previous patch.
+>>>
+>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>> ---
+>>> V3:
+>>> 	- covers all comments from Jeffle
+>>> 	- fix corner cases when polling on abnormal ios
+>>>
+>> ...
+>>
+>> One bug and one performance issue, though I haven't investigated deep
+>> for both.
+>>
+>>
+>> kernel base: based on Jens' for-next, applying Christoph and Leiming's
+>> patchset.
+>>
+>>
+>> 1. One bug when there's DM device stack, e.g., dm-linear upon another
+>> dm-linear. Can be reproduced by following steps:
+>>
+>> ```
+>> $ sudo dmsetup create tmpdev --table '0 2097152 linear /dev/nvme0n1 0'
+>>
+>> $ cat tmp.table
+>> 0 2097152 linear /dev/mapper/tmpdev 0
+>> 2097152 2097152 linear /dev/nvme0n1 0
+>>
+>> $ cat tmp.table | dmsetup create testdev
+>>
+>> $ fio -name=test -ioengine=io_uring -iodepth=128 -numjobs=1 -thread
+>> -rw=randread -direct=1 -bs=4k -time_based -runtime=10 -cpus_allowed=6
+>> -filename=/dev/mapper/testdev -hipri=1
+>> ```
+>>
+>>
+>> BUG: unable to handle page fault for address: ffffffffc01a6208
+>> #PF: supervisor write access in kernel mode
+>> #PF: error_code(0x0003) - permissions violation
+>> PGD 39740c067 P4D 39740c067 PUD 39740e067 PMD 1035db067 PTE 1ddf6f061
+>> Oops: 0003 [#1] SMP PTI
+>> CPU: 6 PID: 5899 Comm: fio Tainted: G S
+>> 5.13.0-0.1.git.81bcdc3.al7.x86_64 #1
+>> Hardware name: Inventec     K900G3-10G/B900G3, BIOS A2.20 06/23/2017
+>> RIP: 0010:dm_submit_bio+0x171/0x3e0 [dm_mod]
+> 
+> It has been fixed in my local repo:
+> 
+> @@ -1608,6 +1649,7 @@ static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
+>         ci->map = map;
+>         ci->io = alloc_io(md, bio);
+>         ci->sector = bio->bi_iter.bi_sector;
+> +       ci->submit_as_polled = false;
+> 
 
-Regards
-Xiao
+It doesn't work in my test environment. Actually the following fix
+should be applied.
 
-On Mon, Jun 21, 2021 at 3:49 PM Wang Shanker <shankerwangmiao@gmail.com> wr=
-ote:
->
-> Hi, Xiao
->
-> Many thanks for your reply. I realized that this problem is not limited
-> to discard requests. For normal read/write requests, they are also first
-> get split into 4k-sized ones and then merged into larger ones. The mergin=
-g
-> of bio's is limited by queue_max_segments, which leads to small trunks of
-> io operations issued to physical devices. It seems that such behavior is
-> not optimal and should be improved.
->
-> I'm not so familiar with raid456. Could you have a look of its code when =
-you
-> are free? It seems that improving this may result in big changes.
->
-> Cheers,
->
-> Miao Wang
->
-> > 2021=E5=B9=B406=E6=9C=8818=E6=97=A5 20:49=EF=BC=8CXiao Ni <xni@redhat.c=
-om> =E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > Hi Miao
-> >
-> > So you plan to fix this problem now? The plan is to submit the discard
-> > bio directly to disk similar with raid0/raid10.
-> > As we talked, it needs to consider the discard region. It should be
-> > larger than chunk_sectors * nr_data_disks. It needs
-> > to split the bio when its size not aligned with chunk_sectors *
-> > nr_data_disks. And it needs to consider the start address
-> > of the bio too. If it's not aligned with a start address of
-> > chunk_sectors, it's better to split this part too.
-> >
-> > I'm working on another job. So I don't have time to do this now. If
-> > you submit the patches, I can help to review :)
-> >
-> > Regards
-> > Xiao
-> >
-> > On Fri, Jun 18, 2021 at 2:28 PM Wang Shanker <shankerwangmiao@gmail.com=
-> wrote:
-> >>
-> >> Hi, Xiao
-> >>
-> >> Any ideas on this issue?
-> >>
-> >> Cheers,
-> >>
-> >> Miao Wang
-> >>
-> >>> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 17:03=EF=BC=8CWang Shanker <shank=
-erwangmiao@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
-> >>>
-> >>>>
-> >>>> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 16:44=EF=BC=8CXiao Ni <xni@redha=
-t.com> =E5=86=99=E9=81=93=EF=BC=9A
-> >>>>
-> >>>> Hi all
-> >>>>
-> >>>> Thanks for reporting about this. I did a test in my environment.
-> >>>> time blkdiscard /dev/nvme5n1  (477GB)
-> >>>> real    0m0.398s
-> >>>> time blkdiscard /dev/md0
-> >>>> real    9m16.569s
-> >>>>
-> >>>> I'm not familiar with the block layer codes. I'll try to understand
-> >>>> the codes related with discard request and
-> >>>> try to fix this problem.
-> >>>>
-> >>>> I have a question for raid5 discard, it needs to consider more than
-> >>>> raid0 and raid10. For example, there is a raid5 with 3 disks.
-> >>>> D11 D21 P1 (stripe size is 4KB)
-> >>>> D12 D22 P2
-> >>>> D13 D23 P3
-> >>>> D14 D24 P4
-> >>>> ...  (chunk size is 512KB)
-> >>>> If there is a discard request on D13 and D14, and there is no discar=
-d
-> >>>> request on D23 D24. It can't send
-> >>>> discard request to D13 and D14, right? P3 =3D D23 xor D13. If we dis=
-card
-> >>>> D13 and disk2 is broken, it can't
-> >>>> get the right data from D13 and P3. The discard request on D13 can
-> >>>> write 0 to the discard region, right?
-> >>>
-> >>> Yes. It can be seen at the beginning of make_discard_request(), where
-> >>> the requested range being discarded is aligned to ``stripe_sectors",
-> >>> which should be chunk_sectors * nr_data_disks.
-> >>>
-> >>> Cheers,
-> >>>
-> >>> Miao Wang
-> >>
-> >
->
 
+@@ -1390,6 +1403,8 @@ static int clone_bio(struct dm_target_io *tio,
+struct bio *bio,
+        if (bio_integrity(bio))
+                bio_integrity_trim(clone);
+
++       clone->bi_opf &= ~REQ_SAVED_END_IO;
++
+        return 0;
+ }
+
+
+The rationale is that, REQ_SAVED_END_IO should be cleared once the bio
+*passes through* the device stack layer. Or the cloned bio for next
+layer will inherit REQ_SAVED_END_IO flag, in which case
+'cloned_bio->bi_end_io' (actually acts as the hlist head) won't be
+initialized in dm_setup_polled_io(), and thus it gets crashed when
+trying to insert into this hash list in __split_and_process_bio().
+
+-- 
+Thanks,
+Jeffle
