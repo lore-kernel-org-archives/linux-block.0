@@ -2,172 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3739BC4743C
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 00:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86529C4743C
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 01:49:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C9EC61289
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 00:48:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63478611C1
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 01:49:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230028AbhFVAuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jun 2021 20:50:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57646 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbhFVAue (ORCPT
+        id S230311AbhFVBvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jun 2021 21:51:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53228 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229663AbhFVBvO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jun 2021 20:50:34 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04F1C061574
-        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 17:48:18 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id q18so16948140ile.10
-        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 17:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=kbcQjN8MVAZM0FwGPkinh9qCyh3jo4RCpZr8Jex4Yd8=;
-        b=b9hwXg1j8oWHhJsnCyvgdpHPGsaq+K0eMuXe2CZcbDVW3Vi7Cx5bUumoHa6o648QY6
-         K4EdB917pTsw1WIBH9iLizCqp68spdj1T472NMnDbdM6vg4EuMEDs5gf8cqkfcUE9V8v
-         /CKWo//vlBD9X4IZ8iAVWSnaeHcKIkTw+ttkM7kaYz3tEzfIcBGr+V/cSuSrugvJbuQf
-         yGnXs+zTktxbdvFu4oQiYbsd9wqCF6zRZY6Jmaq91AxiRZM07nMVYbZn+v5wRBo8E4r5
-         6bhOw6Sr9xk+kBJWVTJtObXoLjIOYwc7WugwDyDdWUC56WAiTYYWVsSxMaHj1lgE6KmP
-         +PZw==
+        Mon, 21 Jun 2021 21:51:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624326539;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bv4Y6MHLXIbEPaIpLuiXtLafLWy630ExgSl5up0FmUk=;
+        b=D8+iaj/onpIGtDCRbuREniGiv1Yl3sP5FMIrca8PU4rw4DqoXAspyRLaNCnsnsakbTVuxa
+        IW7MkyfY09gC+Gyw5NnRJ5PiErslcBAbiryq1+OTQ8WVs1LnubGN7/ahiL4X1IAn4r3gXb
+        Yf7VyBhFpU+sUgvtw/uJU3i41dw+6PQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-xIWzv7Q4MwGFM1K0BedCgg-1; Mon, 21 Jun 2021 21:48:55 -0400
+X-MC-Unique: xIWzv7Q4MwGFM1K0BedCgg-1
+Received: by mail-ej1-f72.google.com with SMTP id f1-20020a1709064941b02903f6b5ef17bfso6943399ejt.20
+        for <linux-block@vger.kernel.org>; Mon, 21 Jun 2021 18:48:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kbcQjN8MVAZM0FwGPkinh9qCyh3jo4RCpZr8Jex4Yd8=;
-        b=jwLzxAtAxNDY9Wai13vwpsgV+IIhO83v8dcwqKnnrVEY9ecMRRSGV8sM5ep6sFecBj
-         B/5zSkJfty0LKlzngrdn51sC0+FVbSOlld3VX/nTkB55tqpsrNqm0QI2hLw4owRdVbkr
-         O8n6KH6ay/Dbfn+kvvUp5j5gtVAPc4N1DETCdgWQgUBPmpCRR5Tdsa7cRVQ/G9isGlIX
-         7zr16xOBrMdR4u04NnSxLwBzvKd1TA/yu61JYm7yjM/QT7bHFh01g37zm3M4+S9BwGWs
-         WdGi7tQraVfMhPox3vsldgAgO0mI3zc1ND48JJFVp4BLFHOpGdFsEfhv6tBqVHIp9QOg
-         FOfg==
-X-Gm-Message-State: AOAM531fOkflkE6g+nPP4JV7QMXsZwojTSwaP9xY9puyw7Pg87QNQjpf
-        rNyVbQYGPs0nAy5ekosQkb+8fSEBwZr70g==
-X-Google-Smtp-Source: ABdhPJxjzSJ21WigdMeiKr1eAL/JhW8AWeEoPoLjdtP1IYA+xppOLTXhw7s55E2i7em9JucKq4kaEw==
-X-Received: by 2002:a92:6705:: with SMTP id b5mr683868ilc.55.1624322898040;
-        Mon, 21 Jun 2021 17:48:18 -0700 (PDT)
-Received: from [192.168.1.134] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id i1sm10572906iol.16.2021.06.21.17.48.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 17:48:17 -0700 (PDT)
-Subject: =?UTF-8?Q?Re=3a_=e2=9d=8c_FAIL=3a_Test_report_for_kernel_5=2e13=2e0?=
- =?UTF-8?Q?-rc6_=28block=2c_b0740de3=29?=
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        Veronika Kabatova <vkabatov@redhat.com>,
-        CKI Project <cki-project@redhat.com>,
-        linux-block@vger.kernel.org
-References: <cki.3F4F097E3B.299V5OKJ7M@redhat.com>
- <CA+tGwn=+1Evv=ZZmOdXSpfUTG_dPvHfDsxbmLyHWr9-XkXA1LQ@mail.gmail.com>
- <CA+tGwnn4J2=WuPEFOwmC6ph30rHXJLhjH-iWmvkKLpacmR7wdQ@mail.gmail.com>
- <42b91718-9d70-4e4c-2716-6259321abd64@kernel.dk>
- <CA+tGwn=8KMpRi+6M-Lcs5MjKTkPd36YL5wv84Ji2dEWLjzfDmA@mail.gmail.com>
- <YNELoqls01MVLsuT@casper.infradead.org>
- <8a7b26a3-a17d-e851-690a-5a33b06f5dec@gmail.com>
- <YNEhq/C5/T4J8r2/@casper.infradead.org>
- <5cf4b5ae-c6aa-d64d-53ec-3e073a77baef@kernel.dk>
- <YNElkvvd83KboK3Q@casper.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b169a16a-20c2-d713-4d66-cd087c0dca23@kernel.dk>
-Date:   Mon, 21 Jun 2021 18:48:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bv4Y6MHLXIbEPaIpLuiXtLafLWy630ExgSl5up0FmUk=;
+        b=hu899/no4iXzLiq9SCsqQTOXATpzfgGNgwqzT0hDdksEj1x/AL9iflYAGCEvMlhg+U
+         xqmYa/ningFOwJA//SzsqT76wywy67fLi8ftIub+lt2fCPkQRCS3YNap3ADVWb9ZI1px
+         8tIAQkTzYXkjJEJFSYhmC+R+jPK/F1qJuY3b8GOEEKmPHqLoB09v8rt6hKb0NWFNhVVX
+         RBajmYiK2g0YH5UmvHFjeT9FiTd6YOAisv/EG1n5QdQxUqSfrHRorSxxfJA3vrWuzDZA
+         xFx2YRNf2HkfnL0hlyJEilLJb2ti698AJUQy2XgzGSriNs1VkGU2R5x/7TQxGs5m0Lu2
+         do9A==
+X-Gm-Message-State: AOAM531mfpEbbfTNSv43laawgyvnQIIW4mgpXDIC9J201osJMYh1ModT
+        /0PCqefY7UAypY/g5p3rDvpr0jhxnjuS+1DB+5+cfhj6cnxlM1beuGSWVPxH1qzGXC+5XHo0fPk
+        T4yKMz3fTjInluj9qtgbrrcrlCEyrXePCu1slQL0=
+X-Received: by 2002:a17:906:2b18:: with SMTP id a24mr1124509ejg.239.1624326534447;
+        Mon, 21 Jun 2021 18:48:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy+yjNmyAf7nn7Y1v33+YFO4uB4LwGSDWxLzDQ34j5qYOJvQCGoUvLIEMCQeL4iZ4UWJeUmPfMr2gxOtbj5QrU=
+X-Received: by 2002:a17:906:2b18:: with SMTP id a24mr1124501ejg.239.1624326534313;
+ Mon, 21 Jun 2021 18:48:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YNElkvvd83KboK3Q@casper.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <85F98DA6-FB28-4C1F-A47D-C410A7C22A3D@gmail.com>
+ <YL4Z/QJCKc0NCV5L@T590> <C866C380-7A71-4722-957F-2CE65BDACF26@gmail.com>
+ <YMAOO3XjOUl2IG+4@T590> <1C6DB607-B7BE-4257-8384-427BB490C9C0@gmail.com>
+ <CALTww28L7afRdVdBf-KsyF6Hvf-8-CORSCpZJAvnVbDRo6chDQ@mail.gmail.com>
+ <ED5B1993-9D44-4B9C-A7DF-72BD2375A216@gmail.com> <13C1B2E3-B177-4B05-9FF3-AEE57E964605@gmail.com>
+ <CALTww29rcAwSfbpsBzM_pnVSuVTYyt-YJryeUaNkHetCjXktCg@mail.gmail.com> <5EFF6838-7ED8-4B14-BD43-4D4E67628149@gmail.com>
+In-Reply-To: <5EFF6838-7ED8-4B14-BD43-4D4E67628149@gmail.com>
+From:   Xiao Ni <xni@redhat.com>
+Date:   Tue, 22 Jun 2021 09:48:42 +0800
+Message-ID: <CALTww29nG8URQkocUGhixU-FUPsK9d3P8yGKw8u3ohes+e9yCg@mail.gmail.com>
+Subject: Re: [Bug Report] Discard bios cannot be correctly merged in blk-mq
+To:     Wang Shanker <shankerwangmiao@gmail.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/21 5:49 PM, Matthew Wilcox wrote:
-> On Mon, Jun 21, 2021 at 05:42:15PM -0600, Jens Axboe wrote:
->> On 6/21/21 5:32 PM, Matthew Wilcox wrote:
->>> On Mon, Jun 21, 2021 at 11:57:06PM +0100, Pavel Begunkov wrote:
->>>> On 6/21/21 10:58 PM, Matthew Wilcox wrote:
->>>>> On Mon, Jun 21, 2021 at 11:07:16PM +0200, Veronika Kabatova wrote:
->>>>>> On Mon, Jun 21, 2021 at 11:00 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>
->>>>>>> On 6/21/21 2:57 PM, Veronika Kabatova wrote:
->>>>>>>> On Mon, Jun 21, 2021 at 9:20 PM Veronika Kabatova <vkabatov@redhat.com> wrote:
->>>>>>>>>
->>>>>>>>> On Mon, Jun 21, 2021 at 9:17 PM CKI Project <cki-project@redhat.com> wrote:
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> Hello,
->>>>>>>>>>
->>>>>>>>>> We ran automated tests on a recent commit from this kernel tree:
->>>>>>>>>>
->>>>>>>>>>        Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
->>>>>>>>>>             Commit: b0740de3330a - Merge branch 'for-5.14/drivers-late' into for-next
->>>>>>>>>>
->>>>>>>>>> The results of these automated tests are provided below.
->>>>>>>>>>
->>>>>>>>>>     Overall result: FAILED (see details below)
->>>>>>>>>>              Merge: OK
->>>>>>>>>>            Compile: FAILED
->>>>>>>>>>
->>>>>>>>>
->>>>>>>>> Hi,
->>>>>>>>>
->>>>>>>>> the failure is introduced between this commit and d142f908ebab64955eb48e.
->>>>>>>>> Currently seeing if I can bisect it closer but maybe someone already has an
->>>>>>>>> idea what went wrong.
->>>>>>>>>
->>>>>>>>
->>>>>>>> First commit failing the compilation is 7a2b0ef2a3b83733d7.
->>>>>>>
->>>>>>> Where's the log? Adding Willy...
->>>>>>>
->>>>>>
->>>>>> Logs and kernel configs for each arch are linked in the original email at
->>>>>> https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/index.html?prefix=datawarehouse-public/2021/06/21/324657779
->>>>>
->>>>> Which aren't there by the time they get to the original commit author.
->>>>> You need to do better than this; the Intel build-bot bisects to the
->>>>> commit which actually causes the error.
->>>>
->>>> Matthew, I've just followed the link out of curiosity:
->>>
->>> the link _which isn't in the first email i got_.  the redhat cki system
->>> is not very useful _because it doesn't do an automatic bisect and cc the
->>> author of the commit_.
->>
->> Kinks are still being worked out on that, nobody has claimed it's
->> perfect yet. Some manual input/labor is still required.
->>
->> But it's useful, as this report has indicated. So maybe try and be a bit
->> nicer and appreciative, instead of grumpy and dismissive. It did find a
->> problem with YOUR patch, fwiw.
-> 
-> and i've already fixed it, and tested it with a make allmodconfig.
+Hi
 
-Which should have been done before submitting a patch like this.
+For normal read/write requests, it needs to consider parity
+calculation. Now it uses page size as the unit. The whole design
+is based on this. So it's very hard to change this. But there are many
+efforts to improve the performance. The batch requests
+can improve the performance.
+https://www.spinics.net/lists/raid/msg47207.html. It can help to avoid
+to send many small
+bios to disks.
 
-> turned out to be the only missing place.
-> 
-> i get grumpy when people implement auto-harassing systems badly.
+And for the discard part, I'll try to do this job.
 
-It's a bad look of entitlement when complaints are made about everything
-not being served on a silver platter. The service has been useful to me,
-and it was useful in this particular case. Can it be improved? Surely,
-everything can, and this one is a bit more rough around the edges than
-the intel build bot. Which, coincidentally, has been around for many
-years, so hardly surprising. This one triggered quickly, the intel bot
-sometimes takes _days_ to produce anything. Improvements can be made in
-both cases.
+Regards
+Xiao
 
-And _I_ was the one that CC'ed you on the report, as it was your commit
-that broke the build, not the bot. Nobody got auto-harassed here.
-
--- 
-Jens Axboe
+On Mon, Jun 21, 2021 at 3:49 PM Wang Shanker <shankerwangmiao@gmail.com> wr=
+ote:
+>
+> Hi, Xiao
+>
+> Many thanks for your reply. I realized that this problem is not limited
+> to discard requests. For normal read/write requests, they are also first
+> get split into 4k-sized ones and then merged into larger ones. The mergin=
+g
+> of bio's is limited by queue_max_segments, which leads to small trunks of
+> io operations issued to physical devices. It seems that such behavior is
+> not optimal and should be improved.
+>
+> I'm not so familiar with raid456. Could you have a look of its code when =
+you
+> are free? It seems that improving this may result in big changes.
+>
+> Cheers,
+>
+> Miao Wang
+>
+> > 2021=E5=B9=B406=E6=9C=8818=E6=97=A5 20:49=EF=BC=8CXiao Ni <xni@redhat.c=
+om> =E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > Hi Miao
+> >
+> > So you plan to fix this problem now? The plan is to submit the discard
+> > bio directly to disk similar with raid0/raid10.
+> > As we talked, it needs to consider the discard region. It should be
+> > larger than chunk_sectors * nr_data_disks. It needs
+> > to split the bio when its size not aligned with chunk_sectors *
+> > nr_data_disks. And it needs to consider the start address
+> > of the bio too. If it's not aligned with a start address of
+> > chunk_sectors, it's better to split this part too.
+> >
+> > I'm working on another job. So I don't have time to do this now. If
+> > you submit the patches, I can help to review :)
+> >
+> > Regards
+> > Xiao
+> >
+> > On Fri, Jun 18, 2021 at 2:28 PM Wang Shanker <shankerwangmiao@gmail.com=
+> wrote:
+> >>
+> >> Hi, Xiao
+> >>
+> >> Any ideas on this issue?
+> >>
+> >> Cheers,
+> >>
+> >> Miao Wang
+> >>
+> >>> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 17:03=EF=BC=8CWang Shanker <shank=
+erwangmiao@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+> >>>
+> >>>>
+> >>>> 2021=E5=B9=B406=E6=9C=8809=E6=97=A5 16:44=EF=BC=8CXiao Ni <xni@redha=
+t.com> =E5=86=99=E9=81=93=EF=BC=9A
+> >>>>
+> >>>> Hi all
+> >>>>
+> >>>> Thanks for reporting about this. I did a test in my environment.
+> >>>> time blkdiscard /dev/nvme5n1  (477GB)
+> >>>> real    0m0.398s
+> >>>> time blkdiscard /dev/md0
+> >>>> real    9m16.569s
+> >>>>
+> >>>> I'm not familiar with the block layer codes. I'll try to understand
+> >>>> the codes related with discard request and
+> >>>> try to fix this problem.
+> >>>>
+> >>>> I have a question for raid5 discard, it needs to consider more than
+> >>>> raid0 and raid10. For example, there is a raid5 with 3 disks.
+> >>>> D11 D21 P1 (stripe size is 4KB)
+> >>>> D12 D22 P2
+> >>>> D13 D23 P3
+> >>>> D14 D24 P4
+> >>>> ...  (chunk size is 512KB)
+> >>>> If there is a discard request on D13 and D14, and there is no discar=
+d
+> >>>> request on D23 D24. It can't send
+> >>>> discard request to D13 and D14, right? P3 =3D D23 xor D13. If we dis=
+card
+> >>>> D13 and disk2 is broken, it can't
+> >>>> get the right data from D13 and P3. The discard request on D13 can
+> >>>> write 0 to the discard region, right?
+> >>>
+> >>> Yes. It can be seen at the beginning of make_discard_request(), where
+> >>> the requested range being discarded is aligned to ``stripe_sectors",
+> >>> which should be chunk_sectors * nr_data_disks.
+> >>>
+> >>> Cheers,
+> >>>
+> >>> Miao Wang
+> >>
+> >
+>
 
