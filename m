@@ -2,233 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 923F0C2B9F4
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 22:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B46DC48BE5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 22:33:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70F3A6113E
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 22:09:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3583561026
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 22:33:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229718AbhFVWLu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jun 2021 18:11:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52442 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229612AbhFVWLu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jun 2021 18:11:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 452BF60FEE;
-        Tue, 22 Jun 2021 22:09:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1624399773;
-        bh=7V34Ihn758HO093MwCoetl0OMiD6JevkPMH/EyONWvk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gaerkYQyk+y4RJslGoZu1J1PqtU6+3/+edIHDCAzF0aPwL2PpHo1jwJM76BlLaPQk
-         rtnYVzMjV98+VuYGhbcWEPR9fpOff+1BwcnKABdjWXQ3z/WDkKRrGsn9uvl+srGHRR
-         GVSdJi/c8TfcJ2DBJ1IgOMbbGyv6cl+ovvjFZ1jA=
-Date:   Wed, 23 Jun 2021 00:09:31 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     rafael@kernel.org, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] drivers/base/core: refcount kobject and bus on device
- attribute read / store
-Message-ID: <YNJfm6k/vBCz7AjG@kroah.com>
-References: <20210622215738.3936687-1-mcgrof@kernel.org>
+        id S230380AbhFVWfm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jun 2021 18:35:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43390 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230180AbhFVWfl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jun 2021 18:35:41 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E409C061760
+        for <linux-block@vger.kernel.org>; Tue, 22 Jun 2021 15:33:24 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id b5so725755ilc.12
+        for <linux-block@vger.kernel.org>; Tue, 22 Jun 2021 15:33:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=wnmRkYKboAH8zJCZrdHT+Gn/DKgpUQ6lVnKyPQDk2e0=;
+        b=AR49a0Vnv4dm3JSBho21CVzLTpAw6AKYpkMLlF0NkD583G7YZ5+wtgml5dypSZYMud
+         2hfVQyG1d5bTuI2+7TuzCftNECNvg3nMDkkcS0jnB8f2TmWBOjU2CGLh4fNOy9Ya+Pg/
+         2GtHu1wBydy6jnwS6C8nQCjyYL+cINkYFKqTM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wnmRkYKboAH8zJCZrdHT+Gn/DKgpUQ6lVnKyPQDk2e0=;
+        b=Bmv7MAWNlvJjYfncXjwwwthytN7FEQ/5pcNVmzFd+ktDNMNOckwISZLrmQlBCURMCj
+         Ov1imS09sHEM6MBIFJRIKgzjf8R9MiRsAnu+e/1LbZhYp24AtzQTQn4yw6/jjEPuR4eo
+         ni58CBHaf6/V8hc4Ndiq8iOH+DDh6n69xSnS22fsedpAlTlmfCOMx5whJGPtgQIHW9S3
+         s+AYUxs8ebxNIMXAYqfinELU1vIFOxgIdFzm/Nos6oo+Iuulh+Y7P/NGZIOlNpsPkOaL
+         JhJcDwF4WiC8UA6VvD0zwvce3s4WSeNTwRBvaokecZlP1tzI9FPBrcivoNfsl4dP06dw
+         nVmA==
+X-Gm-Message-State: AOAM533mU9HNoBqWUnZ2+mA97HiUTqGVjtQi4zNgEME0pgdYD1gO6Tko
+        AggDrb29sXRf2Bc35PU2IXTEkw==
+X-Google-Smtp-Source: ABdhPJxN9TU0oJIL6ix/vNDlgeb3nGygOZZkb/SbcRaq0bOTovZyipADlOgJDT4QhLMrlnkFt38wbw==
+X-Received: by 2002:a92:1310:: with SMTP id 16mr672327ilt.60.1624401203750;
+        Tue, 22 Jun 2021 15:33:23 -0700 (PDT)
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
+        by smtp.gmail.com with ESMTPSA id j12sm8587753ilk.26.2021.06.22.15.33.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Jun 2021 15:33:23 -0700 (PDT)
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+To:     Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc:     Steven Rostedt <rostedt@goodmis.org>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        David Hildenbrand <david@redhat.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Greg KH <greg@kroah.com>, Christoph Lameter <cl@gentwo.de>,
+        Theodore Ts'o <tytso@mit.edu>, Jiri Kosina <jikos@kernel.org>,
+        ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        Shuah Khan <skhan@linuxfoundation.org>
+References: <YIx7R6tmcRRCl/az@mit.edu>
+ <alpine.DEB.2.22.394.2105271522320.172088@gentwo.de>
+ <YK+esqGjKaPb+b/Q@kroah.com>
+ <c46dbda64558ab884af060f405e3f067112b9c8a.camel@HansenPartnership.com>
+ <b32c8672-06ee-bf68-7963-10aeabc0596c@redhat.com>
+ <5038827c-463f-232d-4dec-da56c71089bd@metux.net>
+ <20210610182318.jrxe3avfhkqq7xqn@nitro.local>
+ <YMJcdbRaQYAgI9ER@pendragon.ideasonboard.com>
+ <20210610152633.7e4a7304@oasis.local.home>
+ <37e8d1a5-7c32-8e77-bb05-f851c87a1004@linuxfoundation.org>
+ <YMyjryXiAfKgS6BY@pendragon.ideasonboard.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <ae51f636-8fb5-20b7-bbc5-37e22edb9a02@linuxfoundation.org>
+Date:   Tue, 22 Jun 2021 16:33:22 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210622215738.3936687-1-mcgrof@kernel.org>
+In-Reply-To: <YMyjryXiAfKgS6BY@pendragon.ideasonboard.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 02:57:38PM -0700, Luis Chamberlain wrote:
-> It's possible today to have a device attribute read or store
-> race against device removal. When this happens there is a small
-> chance that the dereference for the private data area of the driver
-> is NULL.
+On 6/18/21 7:46 AM, Laurent Pinchart wrote:
+> Hi Shuah,
 > 
-> Let's consider the zram driver as an example. Its possible to run into
-> a race where a sysfs knob is being used, we get preempted, and a zram
-> device is removed before we complete use of the sysfs knob. This can happen
-> for instance on block devices, where for instance the zram block devices
-> just part of the private data of the block device.
+> On Thu, Jun 10, 2021 at 01:55:23PM -0600, Shuah Khan wrote:
+>> On 6/10/21 1:26 PM, Steven Rostedt wrote:
+>>> On Thu, 10 Jun 2021 21:39:49 +0300 Laurent Pinchart wrote:
+>>>
+>>>> There will always be more informal discussions between on-site
+>>>> participants. After all, this is one of the benefits of conferences, by
+>>>> being all together we can easily organize ad-hoc discussions. This is
+>>>> traditionally done by finding a not too noisy corner in the conference
+>>>> center, would it be useful to have more break-out rooms with A/V
+>>>> equipment than usual ?
+>>>
+>>> I've been giving this quite some thought too, and I've come to the
+>>> understanding (and sure I can be wrong, but I don't think that I am),
+>>> is that when doing a hybrid event, the remote people will always be
+>>> "second class citizens" with respect to the communication that is going
+>>> on. Saying that we can make it the same is not going to happen unless
+>>> you start restricting what people can do that are present, and that
+>>> will just destroy the conference IMO.
+>>>
+>>> That said, I think we should add more to make the communication better
+>>> for those that are not present. Maybe an idea is to have break outs
+>>> followed by the presentation and evening events that include remote
+>>> attendees to discuss with those that are there about what they might
+>>> have missed. Have incentives at these break outs (free stacks and
+>>> beer?) to encourage the live attendees to attend and have a discussion
+>>> with the remote attendees.
+>>>
+>>> The presentations would have remote access, where remote attendees can
+>>> at the very least write in some chat their questions or comments. If
+>>> video and connectivity is good enough, perhaps have a screen where they
+>>> can show up and talk, but that may have logistical limitations.
+>>>
+>>
+>> You are absolutely right that the remote people will have a hard time
+>> participating and keeping up with in-person participants. I have a
+>> couple of ideas on how we might be able to improve remote experience
+>> without restricting in-person experience.
+>>
+>> - Have one or two moderators per session to watch chat and Q&A to enable
+>>     remote participants to chime in and participate.
+>> - Moderators can make sure remote participation doesn't go unnoticed and
+>>     enable taking turns for remote vs. people participating in person.
+>>
+>> It will be change in the way we interact in all in-person sessions for
+>> sure, however it might enhance the experience for remote attendees.
 > 
-> For instance this can happen in the following two situations
-> as examples to illustrate this better:
+> A moderator to watch online chat and relay questions is I believe very
+> good for presentations, it's hard for a presenter to keep an eye on a
+> screen while having to manage the interaction with the audience in the
+> room (there's the usual joke of the difference between an introvert and
+> an extrovert open-source developer is that the extrovert looks at *your*
+> shoes when talking to you, but in many presentations the speaker
+> nowadays does a fairly good job as watching the audience, at least from
+> time to time :-)).
 > 
->         CPU 1                            CPU 2
-> destroy_devices
-> ...
->                                  compact_store()
->                                  zram = dev_to_zram(dev);
-> idr_for_each(zram_remove_cb
->   zram_remove
->   ...
->   kfree(zram)
->                                  down_read(&zram->init_lock);
-> 
->         CPU 1                            CPU 2
-> hot_remove_store
->                                  compact_store()
->                                  zram = dev_to_zram(dev);
->   zram_remove
->     kfree(zram)
->                                  down_read(&zram->init_lock);
-> 
-> To ensure the private data pointer is valid we could use bdget() / bdput()
-> in between access, however that would mean doing that in all sysfs
-> reads/stores on the driver. Instead a generic solution for all drivers
-> is to ensure the device kobject is still valid and also the bus, if
-> a bus is present.
-> 
-> This issue does not fix a known crash, however this race was
-> spotted by Minchan Kim through code inspection upon code review
-> of another zram patch.
-> 
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  drivers/base/base.h |  2 ++
->  drivers/base/bus.c  |  4 ++--
->  drivers/base/core.c | 36 ++++++++++++++++++++++++++++++++----
->  3 files changed, 36 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/base/base.h b/drivers/base/base.h
-> index e5f9b7e656c3..3f95b125b667 100644
-> --- a/drivers/base/base.h
-> +++ b/drivers/base/base.h
-> @@ -127,6 +127,8 @@ static inline void auxiliary_bus_init(void) { }
->  
->  struct kobject *virtual_device_parent(struct device *dev);
->  
-> +extern struct bus_type *bus_get(struct bus_type *bus);
-> +extern void bus_put(struct bus_type *bus);
->  extern int bus_add_device(struct device *dev);
->  extern void bus_probe_device(struct device *dev);
->  extern void bus_remove_device(struct device *dev);
-> diff --git a/drivers/base/bus.c b/drivers/base/bus.c
-> index 36d0c654ea61..21c80d7d6433 100644
-> --- a/drivers/base/bus.c
-> +++ b/drivers/base/bus.c
-> @@ -39,7 +39,7 @@ static struct kset *system_kset;
->  static int __must_check bus_rescan_devices_helper(struct device *dev,
->  						void *data);
->  
-> -static struct bus_type *bus_get(struct bus_type *bus)
-> +struct bus_type *bus_get(struct bus_type *bus)
->  {
->  	if (bus) {
->  		kset_get(&bus->p->subsys);
-> @@ -48,7 +48,7 @@ static struct bus_type *bus_get(struct bus_type *bus)
->  	return NULL;
->  }
->  
-> -static void bus_put(struct bus_type *bus)
-> +void bus_put(struct bus_type *bus)
->  {
->  	if (bus)
->  		kset_put(&bus->p->subsys);
-> diff --git a/drivers/base/core.c b/drivers/base/core.c
-> index 4a8bf8cda52b..f69aa040b56d 100644
-> --- a/drivers/base/core.c
-> +++ b/drivers/base/core.c
-> @@ -2042,28 +2042,56 @@ EXPORT_SYMBOL(dev_driver_string);
->  static ssize_t dev_attr_show(struct kobject *kobj, struct attribute *attr,
->  			     char *buf)
->  {
-> -	struct device_attribute *dev_attr = to_dev_attr(attr);
-> -	struct device *dev = kobj_to_dev(kobj);
-> +	struct device_attribute *dev_attr;
-> +	struct device *dev;
-> +	struct bus_type *bus = NULL;
->  	ssize_t ret = -EIO;
->  
-> +	dev = get_device(kobj_to_dev(kobj));
-> +	if (dev->bus) {
-> +		bus = bus_get(dev->bus);
-> +		if (!bus)
-> +			goto out;
-> +	}
-> +
-> +	dev_attr = to_dev_attr(attr);
->  	if (dev_attr->show)
->  		ret = dev_attr->show(dev, dev_attr, buf);
->  	if (ret >= (ssize_t)PAGE_SIZE) {
->  		printk("dev_attr_show: %pS returned bad count\n",
->  				dev_attr->show);
->  	}
-> +
-> +	bus_put(bus);
-> +out:
-> +	put_device(dev);
-> +
->  	return ret;
->  }
->  
->  static ssize_t dev_attr_store(struct kobject *kobj, struct attribute *attr,
->  			      const char *buf, size_t count)
->  {
-> -	struct device_attribute *dev_attr = to_dev_attr(attr);
-> -	struct device *dev = kobj_to_dev(kobj);
-> +	struct device_attribute *dev_attr;
-> +	struct device *dev;
-> +	struct bus_type *bus = NULL;
->  	ssize_t ret = -EIO;
->  
-> +	dev = get_device(kobj_to_dev(kobj));
-> +	if (dev->bus) {
-> +		bus = bus_get(dev->bus);
-> +		if (!bus)
-> +			goto out;
-> +	}
-> +
-> +	dev_attr = to_dev_attr(attr);
->  	if (dev_attr->store)
->  		ret = dev_attr->store(dev, dev_attr, buf, count);
-> +
-> +	bus_put(bus);
-> +out:
-> +	put_device(dev);
-> +
->  	return ret;
->  }
->  
-> -- 
-> 2.30.2
+> For workshop or brainstorming types of sessions, the highest barrier to
+> participation for remote attendees is local attendees not speaking in
+> microphones. That's the number one rule that moderators would need to
+> enforce, I think all the rest depends on it. This may require a larger
+> number of microphones in the room than usual.
 > 
 
-Hi,
+Absolutely. Moderator has to make sure the following things happen for
+this to be effective:
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
+- Watch chat and Q&A, Raise hand from remote participants
+- Enforce some kind of taking turns to allow fairness in
+   participation
+- Have the speaker repeat questions asked in the room (we do that now
+   in some talks - both remote and in-person - chat and Q&A needs
+   reading out for recording)
+- Explore live Transcription features available in the virtual conf.
+   platform. You still need humans watching the transcription.
+- Have a running session notes combined with transcription.
 
-You are receiving this message because of the following common error(s)
-as indicated below:
+Any of these options aren't sustainable when large number of people
+are participating remotely or in-person. In general a small number of
+people participate either in person or remote in any case, based on
+my observation in remote and in-person settings.
 
-- This looks like a new version of a previously submitted patch, but you
-  did not list below the --- line any changes from the previous version.
-  Please read the section entitled "The canonical patch format" in the
-  kernel file, Documentation/SubmittingPatches for what needs to be done
-  here to properly describe this.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
+Maybe we can experiment with one or two workshops this time around
+and see how it works out. If we can figure an effective way, it would
+be beneficial for people that can't travel for one reason or the
+other.
 
 thanks,
+-- Shuah
 
-greg k-h's patch email bot
+
+
+
+
