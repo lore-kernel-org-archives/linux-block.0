@@ -2,87 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B62C2B9F4
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 15:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36496C48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 16:10:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D80A60FEB
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 15:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1107D61107
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 16:10:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232250AbhFVP3g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jun 2021 11:29:36 -0400
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:39730 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232279AbhFVP3d (ORCPT
+        id S229675AbhFVQMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jun 2021 12:12:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41158 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229674AbhFVQMn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jun 2021 11:29:33 -0400
-Received: by mail-pl1-f181.google.com with SMTP id o21so10613365pll.6;
-        Tue, 22 Jun 2021 08:27:17 -0700 (PDT)
+        Tue, 22 Jun 2021 12:12:43 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9879CC061574;
+        Tue, 22 Jun 2021 09:10:26 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id t19-20020a17090ae513b029016f66a73701so2011813pjy.3;
+        Tue, 22 Jun 2021 09:10:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=i+pKtokUfHb9UEDL49Cs/ADaX0vnVkh3TA5MqGHAFU0=;
+        b=dSOqXku68l3KNrDrATiu7AmcidU75ZovkEJ+m1Oaj7CVzeF8GVlh+HUpKBitX9YXiV
+         UCBZ0eNURtnp3raaEammg6fMZsgUPdRDWOp8swppEbWB3zTeil4gjTWBCF1s1uCbEDhs
+         upF+1O2kCw2iG9jwzdaempVXjIoYxWBJ1vQmBk8sKy7NCuUyMjZraSPmWVqgzDdodmY6
+         aQWdhJo3YArme+oAWXcrnV2GT9qlMow9MZeAtWRjQtlqnauQiOTCx6Ithz4vVV0eXVp4
+         DP2kVa9NEHCkiLWK2EfPr2XSwpSDNxepvjFDfuXqDCZBJ3zWVNTHMt2FhLKqsSB7AYjX
+         dVWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=b9Li0eWJU5Fw1KZkFQn1EnfS7gBuV+utSTj1IIdo1g4=;
-        b=HDw1GredpVvHRYrX+Za3H+Xzc/CW5GBAuGlTxISPvRG0uqiE35psyPU6EeTpurL0up
-         nLCtyCORl3qRv5QyEzpaqTbo+cT0FFnvAQ02leo5RaeBJe1bnIZ/XSbP4g+eNz2ef81m
-         FVKdr8VUVI5uu04aAZwkgQxAXHNrxmkxQlSnz/3sI45yLUCn9qD4v9G6GA1ddZOfUYsz
-         +8JejqVGNPefAwaxSfDa3wdYfm/LJjUsElxyrsP2q7kGFkjHpk7foRK9Rfm57oLtTK5q
-         qZjDFCZDXUOh49n3mqwgQv7QLuFUp+3hpOtADrVrmmasYayMw6MQyk+iYbJvB+6uNDp8
-         oi1g==
-X-Gm-Message-State: AOAM532x7uGOYAytl0FLaXxznzdC2tbmC6TSHBWGi7tmfhqhOKbg6ZJ1
-        dvfGpPT4q1EItW72Er17O3I=
-X-Google-Smtp-Source: ABdhPJwIscItml4HZYFUA1Gk8IE9BudN7XAv0fogge2W/PCJNCPnyAfSF6akvDTOoVIxMWKW/gR2RA==
-X-Received: by 2002:a17:90a:8547:: with SMTP id a7mr4634510pjw.197.1624375637038;
-        Tue, 22 Jun 2021 08:27:17 -0700 (PDT)
-Received: from garbanzo ([173.239.198.97])
-        by smtp.gmail.com with ESMTPSA id a23sm857740pfn.117.2021.06.22.08.27.15
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=i+pKtokUfHb9UEDL49Cs/ADaX0vnVkh3TA5MqGHAFU0=;
+        b=FMun6Evh7wRd/kdgJnp9sGdDyOWQjK0Z3lsKjRrjSV1geq2F3nhJkXyPQ7WyBheX+U
+         cQ3qu7KVoL3W07uqmvbN2MM/ok8sy1up2ip0PBUZMNwniQ1lYT/TZj2GaZAv4Xst//Py
+         mbSV0Aedtx4CtOpMauTBgIY0vYB4wzRhU/+b2k782/o8QQBTbvs/OOATHR2DUSQA0iqC
+         6TEu2aH7vF86ZB3S7Wza1lQZE3x3XwtfCR2GRtHN47S5/rZ4FVTtoiEiM/EpuncmlMxF
+         l/hYk2oYpCBgk4aTvQdQpDOunFnGXd4AfqhvyDQvEbg2JiHUmV0n29SWUbLWKH3O7awl
+         IkUw==
+X-Gm-Message-State: AOAM532wN2FVGZzvsh/h3+mw4Wwv4zhPSWn0FIWlGnV/X9eai0S8qGdf
+        zVGKt6W7WI0BsA8WRHcVm5Q=
+X-Google-Smtp-Source: ABdhPJy//gOo6kHUp4EzVtkFahzZ82HvTWE90I5viKpK0fG/qiqurwFIJnos1XfOMWRc+b/89ySp+w==
+X-Received: by 2002:a17:90b:1bc4:: with SMTP id oa4mr4724360pjb.18.1624378226122;
+        Tue, 22 Jun 2021 09:10:26 -0700 (PDT)
+Received: from fedora.. ([2405:201:6008:6d7c:6bfd:dac8:eafe:7bde])
+        by smtp.googlemail.com with ESMTPSA id ml5sm2780135pjb.3.2021.06.22.09.10.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 08:27:16 -0700 (PDT)
-Date:   Tue, 22 Jun 2021 08:27:13 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     minchan@kernel.org, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
-        mbenes@suse.com, jpoimboe@redhat.com, tglx@linutronix.de,
-        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
-        peterz@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] zram: fix deadlock with sysfs attribute usage and
- driver removal
-Message-ID: <20210622152713.fqwyuqpamwgaxomc@garbanzo>
-References: <20210621233013.562641-1-mcgrof@kernel.org>
- <20210621233634.595649-1-mcgrof@kernel.org>
- <YNGUIzh7aR3C/Hoz@kroah.com>
+        Tue, 22 Jun 2021 09:10:25 -0700 (PDT)
+From:   Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+To:     axboe@kernel.dk
+Cc:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+cf89d662483d6a1a0790@syzkaller.appspotmail.com
+Subject: [PATCH] loop: fix setting arbitrarily large block size
+Date:   Tue, 22 Jun 2021 21:40:19 +0530
+Message-Id: <20210622161019.130090-1-chouhan.shreyansh630@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YNGUIzh7aR3C/Hoz@kroah.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 09:41:23AM +0200, Greg KH wrote:
-> On Mon, Jun 21, 2021 at 04:36:34PM -0700, Luis Chamberlain wrote:
-> > +	ssize_t __ret; \
-> > +	if (!try_module_get(THIS_MODULE)) \
-> 
-> try_module_get(THIS_MODULE) is always racy and probably does not do what
-> you want it to do.  You always want to get/put module references from
-> code that is NOT the code calling these functions.
+loop_validate_block_size took an unsigned short argument. Passing an
+argument with size greater than the size of unsigned short would cause
+an overflow and could potentially render the upper bound check on the
+block size useless, allowing to set an arbitrarily large block size.
 
-In this case, we want it to trump module removal if it succeeds. That's all.
+Reproted-by: syzbot+cf89d662483d6a1a0790@syzkaller.appspotmail.com
+Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+---
+ drivers/block/loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > +		return -ENODEV; \
-> > +	__ret = _name ## _store(dev, attr, buf, len); \
-> > +	module_put(THIS_MODULE); \
-> 
-> This too is going to be racy.
-> 
-> While fun to poke at, I still think this is pointless.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 9a758cf66507..635baff0dd66 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -236,7 +236,7 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+  * @bsize: size to validate
+  */
+ static int
+-loop_validate_block_size(unsigned short bsize)
++loop_validate_block_size(unsigned long bsize)
+ {
+ 	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
+ 		return -EINVAL;
+-- 
+2.31.1
 
-If you have a better idea, which does not "DOS" module removal, please
-let me know!
-
-  Luis
