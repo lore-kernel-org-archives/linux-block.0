@@ -2,118 +2,212 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99EDCC48BE5
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 19:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 242FFC48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 21:07:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D80061369
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 19:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D09E61164
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 21:07:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232776AbhFVT7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jun 2021 15:59:23 -0400
-Received: from mail-pj1-f48.google.com ([209.85.216.48]:33332 "EHLO
-        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232766AbhFVT7W (ORCPT
+        id S229948AbhFVVJY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jun 2021 17:09:24 -0400
+Received: from mail-pj1-f51.google.com ([209.85.216.51]:51718 "EHLO
+        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229629AbhFVVJX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jun 2021 15:59:22 -0400
-Received: by mail-pj1-f48.google.com with SMTP id bv7-20020a17090af187b029016fb18e04cfso2368404pjb.0;
-        Tue, 22 Jun 2021 12:57:05 -0700 (PDT)
+        Tue, 22 Jun 2021 17:09:23 -0400
+Received: by mail-pj1-f51.google.com with SMTP id k5so188354pjj.1;
+        Tue, 22 Jun 2021 14:07:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=C6P1ow+pRARLgjDdjBJdEH/jZUIklYYEVSyWdXMAgBw=;
-        b=VWXvTKiEy/ZXN3SbCC6kqND2jgWPuQ5nA5a4kgfSYLqpMyXcXiPlAV2ze/u+av5zga
-         2W+vrbl+d2cI6AlLYl1ZdfPp7VeFYbZzUVYKnjH84+noUvRjh00dqA/a1vEdrl9d8CzI
-         IsB+WhWuj84oJdNzLxC83lKkSHAeO70ITL/LCLev/YSPd18rYNxAVeVDXKe5GpIyHZ3+
-         EMYMrkfj6ogUOP1DrFntD4vnFOWifEd06L0jKXqngFqHIKk3ZvHK0OjiqbJmQElmFCy9
-         HuTfW2T6Dk4fuf+3VNIROseKUsA83EJ9vpY9SqMTTZ0CL9J6VIHg+nncX/eVQdbUx3j9
-         ZxoQ==
-X-Gm-Message-State: AOAM533U/M62GWMxVGsatWX9D7DTc2dtaoeKkJX9MxKAxzMNMd3cTrgJ
-        bPqb+wBpL6/o6uX1L4i0EzU=
-X-Google-Smtp-Source: ABdhPJyjWuycNVfXuKiLx69sTDWkv3s5d6PKjujzDcKCWqMSiKe64SsQnJU1lFF1SGG2xCyOmeaXrA==
-X-Received: by 2002:a17:90a:b390:: with SMTP id e16mr5527937pjr.197.1624391825224;
-        Tue, 22 Jun 2021 12:57:05 -0700 (PDT)
-Received: from garbanzo ([173.239.198.97])
-        by smtp.gmail.com with ESMTPSA id y80sm136984pfb.204.2021.06.22.12.57.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 12:57:04 -0700 (PDT)
-Date:   Tue, 22 Jun 2021 12:57:01 -0700
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z0iF3ntSSNNKhG4jtipS972P1ucIxrjARKk0osGLruI=;
+        b=EaDeiUC5mgEi8hWju9Mb4sSegNly63zi54olifzISBdqWAJRHxtJ6uKiHBtqMlhs/R
+         xRwPdC76Uh4VIH2ATfXC/y4R/0E01JRqSVF63KtEfeKP49XDj+jRmTZoVbQi+Xj2itwv
+         gZ9Wxh5U2bn6h+8qnPHrLx40I9CwK2oOw31jdpX0GGqFRSQSOUwonq0j8SpzYvMllRQc
+         G+7Agu1ZqcOA4eT6f4pwL0fEW5B9koREeLwlfXjI0YUSu8V3gHkojCsmjWKPflVhQWY/
+         4JGHwgx4yQSw/GNZrViVWGC0f2mWXxEx23uBgC75kt2Cp7xmd1HqI2GER84BSLkZ66EU
+         Czwg==
+X-Gm-Message-State: AOAM531hks19oR6PIrg/t3DTkJzfVAciOSfLoPm93wVKKxNHztbo53CT
+        bz872P3imyv4sZ+c7uveNiYskgek7Q8=
+X-Google-Smtp-Source: ABdhPJy34SU4Bd5QukOxXys8evC97YP66yzcrRplCMR4oU3Y0PuVwjTpOQnDx1PSGXx2F1MYKcbiFw==
+X-Received: by 2002:a17:90a:9f81:: with SMTP id o1mr5785112pjp.96.1624396026843;
+        Tue, 22 Jun 2021 14:07:06 -0700 (PDT)
+Received: from localhost ([173.239.198.97])
+        by smtp.gmail.com with ESMTPSA id y1sm7938704pgr.70.2021.06.22.14.07.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Jun 2021 14:07:05 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     minchan@kernel.org, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
-        mbenes@suse.com, jpoimboe@redhat.com, tglx@linutronix.de,
-        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
-        peterz@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] zram: fix deadlock with sysfs attribute usage and
- driver removal
-Message-ID: <20210622195701.klggwzrcadcz4az2@garbanzo>
-References: <20210621233013.562641-1-mcgrof@kernel.org>
- <20210621233634.595649-1-mcgrof@kernel.org>
- <YNGVI/vKSBAM8dlh@kroah.com>
- <20210622163208.epx4lf3pv2x2d5b4@garbanzo>
- <YNIa8tym7TmZFWaZ@kroah.com>
- <20210622172712.3bdlxnsghmbn6nry@garbanzo>
- <YNImWFPbVDrpTFQP@kroah.com>
+To:     gregkh@linuxfoundation.org, rafael@kernel.org
+Cc:     jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        mcgrof@kernel.org, axboe@kernel.dk, mbenes@suse.com,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] drivers/base/core: refcount kobject and bus on device attribute read / store
+Date:   Tue, 22 Jun 2021 14:06:59 -0700
+Message-Id: <20210622210659.3708231-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YNImWFPbVDrpTFQP@kroah.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 08:05:12PM +0200, Greg KH wrote:
-> On Tue, Jun 22, 2021 at 10:27:12AM -0700, Luis Chamberlain wrote:
-> > On Tue, Jun 22, 2021 at 07:16:34PM +0200, Greg KH wrote:
-> > > On Tue, Jun 22, 2021 at 09:32:08AM -0700, Luis Chamberlain wrote:
-> > > > On Tue, Jun 22, 2021 at 09:45:39AM +0200, Greg KH wrote:
-> > > > > On Mon, Jun 21, 2021 at 04:36:34PM -0700, Luis Chamberlain wrote:
-> > > > > > @@ -2048,13 +2048,19 @@ static ssize_t hot_add_show(struct class *class,
-> > > > > >  {
-> > > > > >  	int ret;
-> > > > > >  
-> > > > > > +	if (!try_module_get(THIS_MODULE))
-> > > > > > +		return -ENODEV;
-> > > > > > +
-> > > > > 
-> > > > > You can not increment/decrement your own module's reference count and
-> > > > > expect it to work properly, as it is still a race.
-> > > > 
-> > > > The goal here is to prevent an rmmod call if this succeeds. If it
-> > > > succeeds then any subsequent rmmod will fail. Can you explain how
-> > > > this is still racy?
-> > > 
-> > > {sigh}
-> > > 
-> > > What happens if the driver core is just about to call hot_add_show() and
-> > > the module is removed from the system.  It then calls to the memory
-> > > location that hot_add_show() was previously at, but now that is not a
-> > > valid pointer to code, and boom.
-> > 
-> > The new kobject_get() on patch 3/3 ensures that the device will be up
-> > throughout the entire life of the store call, and thus prevent the
-> > code being executed being removed, no?
-> 
-> I do not know, I no longer remember what is in that patch at the moment
-> as it is long-gone from my queue.
+It's possible today to have a device attribute read or store
+race against device removal. When this happens there is a small
+chance that the derefence for the private data area of the driver
+is NULL.
 
-It was the changes *you* recommended, a generic way to ensure the
-lifetime of the derefernce is valid. I had used bdgrab()/bdget() and you
-suggested we generalize it with the kobject_get() for the device and a
-bus get. With that change, I confirm that the device will still be
-present during the lifetime of the sysfs knobs call.
+Let's consider the zram driver as an example. Its possible to run into
+a race where a sysfs knob is being used, we get preempted, and a zram
+device is removed before we complete use of the sysfs knob. This can happen
+for instance on block devices, where for instance the zram block devices
+just part of the private data of the block device.
 
-> Also, if the device will be "up" for the whole lifetime, why do you need
-> to increment the module reference count?
+For instance this can happen in the following two situations
+as examples to illustrate this better:
 
-The goal is to prevent a deadlock. The lifetime of the device is not
-an issue in this deadlock case, the issue is a race with module removal
-and that code path using a lock which is also used on a sysfs knob.
+        CPU 1                            CPU 2
+destroy_devices
+...
+                                 compact_store()
+                                 zram = dev_to_zram(dev);
+idr_for_each(zram_remove_cb
+  zram_remove
+  ...
+  kfree(zram)
+                                 down_read(&zram->init_lock);
 
-  Luis
+        CPU 1                            CPU 2
+hot_remove_store
+                                 compact_store()
+                                 zram = dev_to_zram(dev);
+  zram_remove
+    kfree(zram)
+                                 down_read(&zram->init_lock);
+
+To ensure the private data pointer is valid we could use bdget() / bdput()
+in between access, however that would mean doing that in all sysfs
+reads/stores on the driver. Instead a generic solution for all drivers
+is to ensure the device kobject is still valid and also the bus, if
+a bus is present.
+
+This issue does not fix a known crash, however this race was
+spotted by Minchan Kim through code inspection upon code review
+of another zram patch.
+
+Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ drivers/base/bus.c  |  4 ++--
+ drivers/base/core.c | 45 +++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 43 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/base/bus.c b/drivers/base/bus.c
+index 36d0c654ea61..21c80d7d6433 100644
+--- a/drivers/base/bus.c
++++ b/drivers/base/bus.c
+@@ -39,7 +39,7 @@ static struct kset *system_kset;
+ static int __must_check bus_rescan_devices_helper(struct device *dev,
+ 						void *data);
+ 
+-static struct bus_type *bus_get(struct bus_type *bus)
++struct bus_type *bus_get(struct bus_type *bus)
+ {
+ 	if (bus) {
+ 		kset_get(&bus->p->subsys);
+@@ -48,7 +48,7 @@ static struct bus_type *bus_get(struct bus_type *bus)
+ 	return NULL;
+ }
+ 
+-static void bus_put(struct bus_type *bus)
++void bus_put(struct bus_type *bus)
+ {
+ 	if (bus)
+ 		kset_put(&bus->p->subsys);
+diff --git a/drivers/base/core.c b/drivers/base/core.c
+index 4a8bf8cda52b..109bbc5b6976 100644
+--- a/drivers/base/core.c
++++ b/drivers/base/core.c
+@@ -2039,31 +2039,68 @@ EXPORT_SYMBOL(dev_driver_string);
+ 
+ #define to_dev_attr(_attr) container_of(_attr, struct device_attribute, attr)
+ 
++struct bus_type *bus_get(struct bus_type *bus);
++void bus_put(struct bus_type *bus);
++
+ static ssize_t dev_attr_show(struct kobject *kobj, struct attribute *attr,
+ 			     char *buf)
+ {
+-	struct device_attribute *dev_attr = to_dev_attr(attr);
+-	struct device *dev = kobj_to_dev(kobj);
++	struct device_attribute *dev_attr;
++	struct device *dev;
++	struct bus_type *bus = NULL;
+ 	ssize_t ret = -EIO;
+ 
++	dev = get_device(kobj_to_dev(kobj));
++	if (!dev)
++		return ret;
++
++	if (dev->bus) {
++		bus = bus_get(dev->bus);
++		if (!bus)
++			goto out;
++	}
++
++	dev_attr = to_dev_attr(attr);
+ 	if (dev_attr->show)
+ 		ret = dev_attr->show(dev, dev_attr, buf);
+ 	if (ret >= (ssize_t)PAGE_SIZE) {
+ 		printk("dev_attr_show: %pS returned bad count\n",
+ 				dev_attr->show);
+ 	}
++
++	bus_put(bus);
++out:
++	put_device(dev);
++
+ 	return ret;
+ }
+ 
+ static ssize_t dev_attr_store(struct kobject *kobj, struct attribute *attr,
+ 			      const char *buf, size_t count)
+ {
+-	struct device_attribute *dev_attr = to_dev_attr(attr);
+-	struct device *dev = kobj_to_dev(kobj);
++	struct device_attribute *dev_attr;
++	struct device *dev;
++	struct bus_type *bus = NULL;
+ 	ssize_t ret = -EIO;
+ 
++	dev = get_device(kobj_to_dev(kobj));
++	if (!dev)
++		return ret;
++
++	if (dev->bus) {
++		bus = bus_get(dev->bus);
++		if (!bus)
++			goto out;
++	}
++
++	dev_attr = to_dev_attr(attr);
+ 	if (dev_attr->store)
+ 		ret = dev_attr->store(dev, dev_attr, buf, count);
++
++	bus_put(bus);
++out:
++	put_device(dev);
++
+ 	return ret;
+ }
+ 
+-- 
+2.27.0
+
