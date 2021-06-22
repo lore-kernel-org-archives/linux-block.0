@@ -2,133 +2,380 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 249FBC2B9F4
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 10:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0D4C48BDF
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 10:19:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0901D613AB
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 10:11:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 275B361040
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 10:19:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbhFVKNc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jun 2021 06:13:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46388 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229663AbhFVKNb (ORCPT
+        id S229739AbhFVKVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jun 2021 06:21:50 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:43784 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229896AbhFVKVf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jun 2021 06:13:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624356676;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WS8d4KycsxMU7KBb2v46pT5Y072Xx9wFwYyCO/co8TM=;
-        b=a1Sux0/FZPUnpq0aPTgWw23fgYTBg4pMDs1IjNoFQpgHpAKmnJ8AQ0ojMc7r/ywhCaat/3
-        cA0QisMo/VPpm9VJAFkOcVjJ6WLo/Ak4CXudO7KMSZ0F3rZTo8opljEe2t7cjkyFWdvWs/
-        BPKU6oJjNS3RZA6ym88dNqLgVuxq/7A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-HE7C4kpjOUeqVEwQWzvwTg-1; Tue, 22 Jun 2021 06:11:12 -0400
-X-MC-Unique: HE7C4kpjOUeqVEwQWzvwTg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 22 Jun 2021 06:21:35 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20E81802C89;
-        Tue, 22 Jun 2021 10:11:11 +0000 (UTC)
-Received: from localhost (ovpn-114-192.ams2.redhat.com [10.36.114.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7537D10023AB;
-        Tue, 22 Jun 2021 10:11:07 +0000 (UTC)
-Date:   Tue, 22 Jun 2021 11:11:06 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] virtio-blk: Add validation for block size in config
- space
-Message-ID: <YNG3OvKm8XcAY/1I@stefanha-x1.localdomain>
-References: <20210617051004.146-1-xieyongji@bytedance.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 60BE02198F;
+        Tue, 22 Jun 2021 10:19:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624357159; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MtfbaTTg+ws7GUKqAtye1vUnjqGCI2NVDbfcPMpZvoI=;
+        b=MYLRnFs5XRJpc2Kq09yJrl1oLZrIZ7UT9YCXUQdAzhgX2YuVOqCMcWAWlWPgdbHxGipsCv
+        rqLeNk5B/YDb0bFMZAh6Dwl3OW6m2S8lLbPWBHZ2CaYJx/FicIbTUPe2p+fmsHwFxhV38e
+        eYxrflDLtjXkoNkEZIFWwBy4OY+G7h4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624357159;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MtfbaTTg+ws7GUKqAtye1vUnjqGCI2NVDbfcPMpZvoI=;
+        b=Z/Ae092yfFH5YLwZHbPFI6tA9qrCVG73cFeDPD+T/nNEtgp4tTB/iim8jPpCCErSqIozA6
+        0MULxivXI37nlzCw==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 4A89A118DD;
+        Tue, 22 Jun 2021 10:19:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624357159; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MtfbaTTg+ws7GUKqAtye1vUnjqGCI2NVDbfcPMpZvoI=;
+        b=MYLRnFs5XRJpc2Kq09yJrl1oLZrIZ7UT9YCXUQdAzhgX2YuVOqCMcWAWlWPgdbHxGipsCv
+        rqLeNk5B/YDb0bFMZAh6Dwl3OW6m2S8lLbPWBHZ2CaYJx/FicIbTUPe2p+fmsHwFxhV38e
+        eYxrflDLtjXkoNkEZIFWwBy4OY+G7h4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624357159;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MtfbaTTg+ws7GUKqAtye1vUnjqGCI2NVDbfcPMpZvoI=;
+        b=Z/Ae092yfFH5YLwZHbPFI6tA9qrCVG73cFeDPD+T/nNEtgp4tTB/iim8jPpCCErSqIozA6
+        0MULxivXI37nlzCw==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id l8jbESe50WB2RwAALh3uQQ
+        (envelope-from <hare@suse.de>); Tue, 22 Jun 2021 10:19:19 +0000
+To:     Coly Li <colyli@suse.de>, axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>
+References: <20210615054921.101421-1-colyli@suse.de>
+ <20210615054921.101421-4-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 03/14] bcache: add initial data structures for nvm pages
+Message-ID: <6ce89fa5-860b-9fe7-1a8f-e422798f8bcc@suse.de>
+Date:   Tue, 22 Jun 2021 12:19:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Uvqz3smAdALkpwOl"
-Content-Disposition: inline
-In-Reply-To: <20210617051004.146-1-xieyongji@bytedance.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20210615054921.101421-4-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/15/21 7:49 AM, Coly Li wrote:
+> This patch initializes the prototype data structures for nvm pages
+> allocator,
+> 
+> - struct bch_nvm_pages_sb
+> This is the super block allocated on each nvdimm namespace. A nvdimm
+> set may have multiple namespaces, bch_nvm_pages_sb->set_uuid is used
+> to mark which nvdimm set this name space belongs to. Normally we will
+> use the bcache's cache set UUID to initialize this uuid, to connect this
+> nvdimm set to a specified bcache cache set.
+> 
+> - struct bch_owner_list_head
+> This is a table for all heads of all owner lists. A owner list records
+> which page(s) allocated to which owner. After reboot from power failure,
+> the ownwer may find all its requested and allocated pages from the owner
 
---Uvqz3smAdALkpwOl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+owner
 
-On Thu, Jun 17, 2021 at 01:10:04PM +0800, Xie Yongji wrote:
-> This ensures that we will not use an invalid block size
-> in config space (might come from an untrusted device).
->=20
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> list by a handler which is converted by a UUID.
+> 
+> - struct bch_nvm_pages_owner_head
+> This is a head of an owner list. Each owner only has one owner list,
+> and a nvm page only belongs to an specific owner. uuid[] will be set to
+> owner's uuid, for bcache it is the bcache's cache set uuid. label is not
+> mandatory, it is a human-readable string for debug purpose. The pointer
+> *recs references to separated nvm page which hold the table of struct
+> bch_nvm_pgalloc_rec.
+> 
+> - struct bch_nvm_pgalloc_recs
+> This struct occupies a whole page, owner_uuid should match the uuid
+> in struct bch_nvm_pages_owner_head. recs[] is the real table contains all
+> allocated records.
+> 
+> - struct bch_nvm_pgalloc_rec
+> Each structure records a range of allocated nvm pages.
+>   - Bits  0 - 51: is pages offset of the allocated pages.
+>   - Bits 52 - 57: allocaed size in page_size * order-of-2
+>   - Bits 58 - 63: reserved.
+> Since each of the allocated nvm pages are power of 2, using 6 bits to
+> represent allocated size can have (1<<(1<<64) - 1) * PAGE_SIZE maximum
+> value. It can be a 76 bits width range size in byte for 4KB page size,
+> which is large enough currently.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Jianpeng Ma <jianpeng.ma@intel.com>
+> Cc: Qiaowei Ren <qiaowei.ren@intel.com>
 > ---
->  drivers/block/virtio_blk.c | 29 +++++++++++++++++++++++------
->  1 file changed, 23 insertions(+), 6 deletions(-)
->=20
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index b9fa3ef5b57c..bbdae989f1ea 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -696,6 +696,28 @@ static const struct blk_mq_ops virtio_mq_ops =3D {
->  static unsigned int virtblk_queue_depth;
->  module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
-> =20
-> +static int virtblk_validate(struct virtio_device *vdev)
-> +{
-> +	u32 blk_size;
+>  include/uapi/linux/bcache-nvm.h | 200 ++++++++++++++++++++++++++++++++
+>  1 file changed, 200 insertions(+)
+>  create mode 100644 include/uapi/linux/bcache-nvm.h
+> 
+> diff --git a/include/uapi/linux/bcache-nvm.h b/include/uapi/linux/bcache-nvm.h
+> new file mode 100644
+> index 000000000000..5094a6797679
+> --- /dev/null
+> +++ b/include/uapi/linux/bcache-nvm.h
+> @@ -0,0 +1,200 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 > +
-> +	if (!vdev->config->get) {
-> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> +			__func__);
-> +		return -EINVAL;
-> +	}
+> +#ifndef _UAPI_BCACHE_NVM_H
+> +#define _UAPI_BCACHE_NVM_H
 > +
-> +	if (!virtio_has_feature(vdev, VIRTIO_BLK_F_BLK_SIZE))
-> +		return 0;
+> +#if (__BITS_PER_LONG == 64)
+> +/*
+> + * Bcache on NVDIMM data structures
+> + */
 > +
-> +	blk_size =3D virtio_cread32(vdev,
-> +			offsetof(struct virtio_blk_config, blk_size));
+> +/*
+> + * - struct bch_nvm_pages_sb
+> + *   This is the super block allocated on each nvdimm namespace. A nvdimm
+> + * set may have multiple namespaces, bch_nvm_pages_sb->set_uuid is used to mark
+> + * which nvdimm set this name space belongs to. Normally we will use the
+> + * bcache's cache set UUID to initialize this uuid, to connect this nvdimm
+> + * set to a specified bcache cache set.
+> + *
+> + * - struct bch_owner_list_head
+> + *   This is a table for all heads of all owner lists. A owner list records
+> + * which page(s) allocated to which owner. After reboot from power failure,
+> + * the ownwer may find all its requested and allocated pages from the owner
+> + * list by a handler which is converted by a UUID.
+> + *
+> + * - struct bch_nvm_pages_owner_head
+> + *   This is a head of an owner list. Each owner only has one owner list,
+> + * and a nvm page only belongs to an specific owner. uuid[] will be set to
+> + * owner's uuid, for bcache it is the bcache's cache set uuid. label is not
+> + * mandatory, it is a human-readable string for debug purpose. The pointer
+> + * recs references to separated nvm page which hold the table of struct
+> + * bch_pgalloc_rec.
+> + *
+> + *- struct bch_nvm_pgalloc_recs
+> + *  This structure occupies a whole page, owner_uuid should match the uuid
+> + * in struct bch_nvm_pages_owner_head. recs[] is the real table contains all
+> + * allocated records.
+> + *
+> + * - struct bch_pgalloc_rec
+> + *   Each structure records a range of allocated nvm pages. pgoff is offset
+> + * in unit of page size of this allocated nvm page range. The adjoint page
+> + * ranges of same owner can be merged into a larger one, therefore pages_nr
+> + * is NOT always power of 2.
+> + *
+> + *
+> + * Memory layout on nvdimm namespace 0
+> + *
+> + *    0 +---------------------------------+
+> + *      |                                 |
+> + *  4KB +---------------------------------+
+> + *      |         bch_nvm_pages_sb        |
+> + *  8KB +---------------------------------+ <--- bch_nvm_pages_sb.bch_owner_list_head
+> + *      |       bch_owner_list_head       |
+> + *      |                                 |
+> + * 16KB +---------------------------------+ <--- bch_owner_list_head.heads[0].recs[0]
+> + *      |       bch_nvm_pgalloc_recs      |
+> + *      |  (nvm pages internal usage)     |
+> + * 24KB +---------------------------------+
+> + *      |                                 |
+> + *      |                                 |
+> + * 16MB  +---------------------------------+
+> + *      |      allocable nvm pages        |
+> + *      |      for buddy allocator        |
+> + * end  +---------------------------------+
+> + *
+> + *
+> + *
+> + * Memory layout on nvdimm namespace N
+> + * (doesn't have owner list)
+> + *
+> + *    0 +---------------------------------+
+> + *      |                                 |
+> + *  4KB +---------------------------------+
+> + *      |         bch_nvm_pages_sb        |
+> + *  8KB +---------------------------------+
+> + *      |                                 |
+> + *      |                                 |
+> + *      |                                 |
+> + *      |                                 |
+> + *      |                                 |
+> + *      |                                 |
+> + * 16MB  +---------------------------------+
+> + *      |      allocable nvm pages        |
+> + *      |      for buddy allocator        |
+> + * end  +---------------------------------+
+> + *
+> + */
 > +
-> +	if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)
-> +		__virtio_clear_bit(vdev, VIRTIO_BLK_F_BLK_SIZE);
+> +#include <linux/types.h>
 > +
-> +	return 0;
-> +}
+> +/* In sectors */
+> +#define BCH_NVM_PAGES_SB_OFFSET			4096
+> +#define BCH_NVM_PAGES_OFFSET			(16 << 20)
+> +
+> +#define BCH_NVM_PAGES_LABEL_SIZE		32
+> +#define BCH_NVM_PAGES_NAMESPACES_MAX		8
+> +
+> +#define BCH_NVM_PAGES_OWNER_LIST_HEAD_OFFSET	(8<<10)
+> +#define BCH_NVM_PAGES_SYS_RECS_HEAD_OFFSET	(16<<10)
+> +
+> +#define BCH_NVM_PAGES_SB_VERSION		0
+> +#define BCH_NVM_PAGES_SB_VERSION_MAX		0
+> +
+> +static const unsigned char bch_nvm_pages_magic[] = {
+> +	0x17, 0xbd, 0x53, 0x7f, 0x1b, 0x23, 0xd6, 0x83,
+> +	0x46, 0xa4, 0xf8, 0x28, 0x17, 0xda, 0xec, 0xa9 };
+> +static const unsigned char bch_nvm_pages_pgalloc_magic[] = {
+> +	0x39, 0x25, 0x3f, 0xf7, 0x27, 0x17, 0xd0, 0xb9,
+> +	0x10, 0xe6, 0xd2, 0xda, 0x38, 0x68, 0x26, 0xae };
+> +
+> +/* takes 64bit width */
+> +struct bch_pgalloc_rec {
+> +	__u64	pgoff:52;
+> +	__u64	order:6;
+> +	__u64	reserved:6;
+> +};
+> +
+> +struct bch_nvm_pgalloc_recs {
+> +union {
 
-I saw Michael asked for .validate() in v2. I would prefer to keep
-everything in virtblk_probe() instead of adding .validate() because:
+Indentation.
 
-- There is a race condition that an untrusted device can exploit since
-  virtblk_probe() fetches the value again.
+> +	struct {
+> +		struct bch_nvm_pages_owner_head	*owner;
+> +		struct bch_nvm_pgalloc_recs	*next;
+> +		unsigned char			magic[16];
+> +		unsigned char			owner_uuid[16];
+> +		unsigned int			size;
+> +		unsigned int			used;
+> +		unsigned long			_pad[4];
+> +		struct bch_pgalloc_rec		recs[];
+> +	};
+> +	unsigned char				pad[8192];
+> +};
+> +};
+> +
 
-- It's more complex now that .validate() takes a first shot at blk_size
-  and then virtblk_probe() deals with it again later on.
+Consider using __u64 and friends when specifying a structure with a
+fixed alignment; that also removes the need of the BITS_PER_LONG ifdef
+at the top.
 
---Uvqz3smAdALkpwOl
-Content-Type: application/pgp-signature; name="signature.asc"
+> +#define BCH_MAX_RECS					\
+> +	((sizeof(struct bch_nvm_pgalloc_recs) -		\
+> +	 offsetof(struct bch_nvm_pgalloc_recs, recs)) /	\
+> +	 sizeof(struct bch_pgalloc_rec))
+> +
 
------BEGIN PGP SIGNATURE-----
+What _are_ you doing here?
+You're not seriously using the 'pad' field as a placeholder to size the
+structure accordingly?
+Also, what is the size of the 'bch_nvm_pgalloc_recs' structure?
+8k + header size?
+That is very awkward, as the page allocator won't be able to handle it
+efficiently.
+Please size it to either 8k or 16k overall.
+And if you do that you can simplify this define.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmDRtzoACgkQnKSrs4Gr
-c8gDCgf+IRregxXJWDa8TNewE7DLn0qdSNPYmDbi6biBNsDw8vkFc//cSZdKUMk/
-Au7OUwklOYgGRUJ/Us+16XOuVS2e6s49t8zFT4r9zndIPI2fp7Y3KlPgMgf0kUd8
-9zCNBRUMC7x5aQ9FKpG5DjjN5/gZrywbk9/kPb8ms0/TfV3mrn7c/XBanUZDpAIS
-PFshsLVABiM/H+E/UrGGqYlDx+dGQW3uQtZOyZuWNf+3+H4O/8cNNIVOlyslenQK
-zxaIj/4GD4c3S2lKQHJ5/H3nF3gVpXPNrPsnWK1m+3bMoK0rhmj1hZwrapUJnwp7
-chQ1KlEFWphmgF3zyZNI4aagJDxhcQ==
-=KkQY
------END PGP SIGNATURE-----
+> +struct bch_nvm_pages_owner_head {
+> +	unsigned char			uuid[16];
+> +	unsigned char			label[BCH_NVM_PAGES_LABEL_SIZE];
+> +	/* Per-namespace own lists */
+> +	struct bch_nvm_pgalloc_recs	*recs[BCH_NVM_PAGES_NAMESPACES_MAX];
+> +};
+> +
+> +/* heads[0] is always for nvm_pages internal usage */
+> +struct bch_owner_list_head {
+> +union {
+> +	struct {
+> +		unsigned int			size;
+> +		unsigned int			used;
+> +		unsigned long			_pad[4];
+> +		struct bch_nvm_pages_owner_head	heads[];
+> +	};
+> +	unsigned char				pad[8192];
+> +};
+> +};
+> +#define BCH_MAX_OWNER_LIST				\
+> +	((sizeof(struct bch_owner_list_head) -		\
+> +	 offsetof(struct bch_owner_list_head, heads)) /	\
+> +	 sizeof(struct bch_nvm_pages_owner_head))
+> +
 
---Uvqz3smAdALkpwOl--
+Same here.
+Please size it that the 'bch_owner_list_head' structure fits into either
+8k or 16k.
 
+> +/* The on-media bit order is local CPU order */
+> +struct bch_nvm_pages_sb {
+> +	unsigned long				csum;
+> +	unsigned long				ns_start;
+> +	unsigned long				sb_offset;
+> +	unsigned long				version;
+> +	unsigned char				magic[16];
+> +	unsigned char				uuid[16];
+> +	unsigned int				page_size;
+> +	unsigned int				total_namespaces_nr;
+> +	unsigned int				this_namespace_nr;
+> +	union {
+> +		unsigned char			set_uuid[16];
+> +		unsigned long			set_magic;
+> +	};
+> +
+> +	unsigned long				flags;
+> +	unsigned long				seq;
+> +
+> +	unsigned long				feature_compat;
+> +	unsigned long				feature_incompat;
+> +	unsigned long				feature_ro_compat;
+> +
+> +	/* For allocable nvm pages from buddy systems */
+> +	unsigned long				pages_offset;
+> +	unsigned long				pages_total;
+> +
+> +	unsigned long				pad[8];
+> +
+> +	/* Only on the first name space */
+> +	struct bch_owner_list_head		*owner_list_head;
+> +
+> +	/* Just for csum_set() */
+> +	unsigned int				keys;
+> +	unsigned long				d[0];
+> +};
+
+And also here, use __u64 and friends.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
