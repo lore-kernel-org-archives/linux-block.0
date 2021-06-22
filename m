@@ -2,86 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BAA5C2B9F4
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 16:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7064FC2B9F4
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 16:29:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80E2561289
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 16:28:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52782611BF
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 16:29:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbhFVQaO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jun 2021 12:30:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54482 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231135AbhFVQaM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jun 2021 12:30:12 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 660A1611BF;
-        Tue, 22 Jun 2021 16:27:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1624379275;
-        bh=dJ5aLN8czXJLyCE9mU3GrqfcmvFhdzmWGyXt4pBlP3U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ikePdOKpQfn/YyA0kI2IYzbqtQU0Tj304Vljmvt/AA6ETbZY1A20sTV70TOw9RMj4
-         8CTB2YNS3jbXyul+VAcOyrKIaE6E82b5cxexoyX3+G398pLIltrAwelMGHT3Gubh1z
-         emd6V2QwrUu2VtqKMl1Gdg3B/7AXe/nSO9a04qCc=
-Date:   Tue, 22 Jun 2021 18:27:52 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     minchan@kernel.org, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
-        mbenes@suse.com, jpoimboe@redhat.com, tglx@linutronix.de,
-        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
-        peterz@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] zram: fix deadlock with sysfs attribute usage and
- driver removal
-Message-ID: <YNIPiDb3TPamz5cF@kroah.com>
-References: <20210621233013.562641-1-mcgrof@kernel.org>
- <20210621233634.595649-1-mcgrof@kernel.org>
- <YNGUIzh7aR3C/Hoz@kroah.com>
- <20210622152713.fqwyuqpamwgaxomc@garbanzo>
+        id S229801AbhFVQcG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jun 2021 12:32:06 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:59256 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229501AbhFVQcG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jun 2021 12:32:06 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 30F0E21971;
+        Tue, 22 Jun 2021 16:29:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1624379389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y+J3rTZ6rcEmt8AzcmguItPUWTQk4QSYQ2yokivFmpo=;
+        b=GOdC2HL0i61aLB8nUybGcMsdxNB1CMPHbl5xh171bIXapgAJUmNUWWo8C/5czLVz/ALHDs
+        xGAHT1YvIn1VRbvqQC42GMNCopvTEbQ5baaywwBvtB6zKSQ0BrGEc2+KnlF3kDS+KyxT8g
+        TJu2js1ex4ggRV+5AvkzUGDl+V9guLc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1624379389;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y+J3rTZ6rcEmt8AzcmguItPUWTQk4QSYQ2yokivFmpo=;
+        b=q9e6GFAlMo5ut1LBLdSeahTtH/lpNPv1nb96/vtSerNTfTjnrr5eL84KAyrD9r79n143qA
+        brfffbCIwP071HAQ==
+Received: from quack2.suse.cz (unknown [10.100.224.230])
+        by relay2.suse.de (Postfix) with ESMTP id 01BCFA3B8E;
+        Tue, 22 Jun 2021 16:29:48 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id CCCCB1E1515; Tue, 22 Jun 2021 18:29:48 +0200 (CEST)
+Date:   Tue, 22 Jun 2021 18:29:48 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Luca Mariotti <mariottiluca1@hotmail.it>,
+        Holger =?iso-8859-1?Q?Hoffst=E4tte?= 
+        <holger@applied-asynchrony.com>,
+        Pietro Pedroni <pedroni.pietro.96@gmail.com>,
+        Piotr Gorski <lucjan.lucjanov@gmail.com>,
+        Khazhy Kumykov <khazhy@google.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH FIXES/IMPROVEMENTS 0/7] block, bfq: preserve control,
+ boost throughput, fix bugs
+Message-ID: <20210622162948.GJ14261@quack2.suse.cz>
+References: <20210619140948.98712-1-paolo.valente@linaro.org>
+ <3533087.dJKXTdksHR@spock>
+ <2CDC43F9-9CD9-4F7F-BD36-CCEB168B5245@linaro.org>
+ <8003699.Qy64SzLKsf@spock>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210622152713.fqwyuqpamwgaxomc@garbanzo>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8003699.Qy64SzLKsf@spock>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 08:27:13AM -0700, Luis Chamberlain wrote:
-> On Tue, Jun 22, 2021 at 09:41:23AM +0200, Greg KH wrote:
-> > On Mon, Jun 21, 2021 at 04:36:34PM -0700, Luis Chamberlain wrote:
-> > > +	ssize_t __ret; \
-> > > +	if (!try_module_get(THIS_MODULE)) \
-> > 
-> > try_module_get(THIS_MODULE) is always racy and probably does not do what
-> > you want it to do.  You always want to get/put module references from
-> > code that is NOT the code calling these functions.
+On Tue 22-06-21 09:35:05, Oleksandr Natalenko wrote:
+> Hello.
 > 
-> In this case, we want it to trump module removal if it succeeds. That's all.
-
-True, but either you stop the race, or you do not right?  If you are so
-invested in your load/unload test, this should show up with this code
-eventually as well.
-
-> > > +		return -ENODEV; \
-> > > +	__ret = _name ## _store(dev, attr, buf, len); \
-> > > +	module_put(THIS_MODULE); \
+> On úterý 22. června 2021 9:08:43 CEST Paolo Valente wrote:
+> > CCing also Jan and Khazhy, because in your commit log I see also the
+> > commit on bfq_requests_merged().
 > > 
-> > This too is going to be racy.
-> > 
-> > While fun to poke at, I still think this is pointless.
+> > Is this OOPS reproducible for you?
 > 
-> If you have a better idea, which does not "DOS" module removal, please
-> let me know!
+> No, I haven't found a reproducer, at least yet. It took half a day of uptime 
+> to hit this, so might not be that easy.
 
-I have yet to understand why you think that the load/unload in a loop is
-a valid use case.
+Hum, if you can acquire a crash dump it would be the easiest I guess. We'd
+need to find out more about the request we crash on - whether it's
+otherwise valid, in what state it is etc...
 
-thanks,
+								Honza
 
-greg k-h
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
