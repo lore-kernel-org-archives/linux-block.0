@@ -2,72 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C5DC2B9F4
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 08:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAA9C2B9F4
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 08:35:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A0C361289
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 08:14:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4200060D07
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jun 2021 08:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbhFVIRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jun 2021 04:17:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43758 "EHLO
+        id S229817AbhFVIhe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jun 2021 04:37:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbhFVIRD (ORCPT
+        with ESMTP id S229628AbhFVIhe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jun 2021 04:17:03 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 575BCC061574;
-        Tue, 22 Jun 2021 01:14:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CJeA0+MEt1zElZXSqf4pwES0ZCFoCyVJFjupde8Xr4w=; b=OjR+ufqxV8O1RtS05VwozlyVXX
-        hQRgmWESL+3o1aESP0duhCGlBQ7Sy5UPRpN5EXeOhpaxYkBX0JCRz13MqGQTLeiocyssy1I9aUu8D
-        Y/OSMjLgBxveHcZvW1LXBGLCNBGtGJ0nqAOR68+jkopdRMqOWYrt9FH0jUzavalm+dlt0GlF99exS
-        91tm5VarRfkLBllzAg36Kb2v0GRMOyZ6wC73IYw6ZPuz2pEqwZHxoGqnW6TwSJvwp3d3Qcy3s/SYH
-        IzbyfECIi5sD8FFVizPeCd7Pvvc1PA+JgRQxno7NoNnqQrLlEE3t2WsCySFXj8xzUGtt1b5YMyRtA
-        And6scOw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lvbXw-00E2pk-HK; Tue, 22 Jun 2021 08:14:19 +0000
-Date:   Tue, 22 Jun 2021 09:14:12 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-mtd@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
-        yukuai3@huawei.com, chengzhihao1@huawei.com,
-        alexander.sverdlin@nokia.com,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Subject: Re: WARNING: at block/genhd.c:491 __device_add_disk
-Message-ID: <YNGb1CFGWljoKmsU@infradead.org>
-References: <CA+G9fYtbNfqqM6Hs9XpweFjYALHGTJ9yo3xkg8O3=Lq2grFDSQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYtbNfqqM6Hs9XpweFjYALHGTJ9yo3xkg8O3=Lq2grFDSQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        Tue, 22 Jun 2021 04:37:34 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8047C061574
+        for <linux-block@vger.kernel.org>; Tue, 22 Jun 2021 01:35:17 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id t32so4503857pfg.2
+        for <linux-block@vger.kernel.org>; Tue, 22 Jun 2021 01:35:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=r4SeXLuKmPJHHSSIECPJPtaU6BaiXCnJ5/SGzfZMyX8=;
+        b=HYnkVUgR6T+6yI7f8HX2PxHSe9jdw5HkQW4hLZ+85MlGk20trSyTfunE93SviHfJ9/
+         /Lkt6PVgzlX2AF4RxhjT2M4rgwdhPj9x9DF8hB8qZTr5ZlKEKxrF5pL9UgObAYcjDhdW
+         kDcuGaN1PZTMfmpU8xSnuwX+eO0uiX04suQa2ic11b2zNW13TqzQ+uCcSet4yxhvvn2+
+         3BGN2Q08zE5xoizov7HjFgMsTriypmOxzY2ltX5j497bnDL0uwUwnyEYCi8wWLyULBwu
+         2VR9EkC217aUcaQwtYiATDMG79emytFD5W7ClDdjicm7KK5A0sXo3bcO9s715QwJ7MsY
+         H2EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=r4SeXLuKmPJHHSSIECPJPtaU6BaiXCnJ5/SGzfZMyX8=;
+        b=NxxB77cY8DPFhvB3tTDhrflmltmZMqRajYXb8Eh0B64pf9BxF6Hhaq/CmUFDocjOda
+         0+n5B1BwuEqRjWvlVNKAVVXXRdoGt4JHbrsEiw2nUpDCAm0SDPAX/fd9tNfTZ8yyeKSS
+         Ck3FvmJJPx2cpD6ny8/dBqLp+Wh8qNASLx6LxKBFNjDGNNa6zLh2iT0ZeJ2KVMYGUJ7C
+         BhSWkSPyR/6orDgRe5grPqXo72Kqxue5UxCLJ1ACKs2BPwF3S0frb2JeL1mB0mhtrdAY
+         x0ERI6SDLn4MI+Y9qFP6qt+rEghJxm93rUxAxSHEex1zNgVEJ8GX5fQ19xAQXFP5C87o
+         nEIA==
+X-Gm-Message-State: AOAM530D0zpr0wIaT1TRSJc8QEltQNB6M+J7qzCr141KX2tVXSlGsCum
+        3amLwFAePCdycC49QlR6DgM=
+X-Google-Smtp-Source: ABdhPJwFB7Z1V4ra+NhnRFIHmrcz/ZDrnNJg+8OQvtvTB5jbshNc0RKvEOUKlOAF8IWzpe+tB5z4Qw==
+X-Received: by 2002:a63:4c5e:: with SMTP id m30mr2690212pgl.153.1624350917380;
+        Tue, 22 Jun 2021 01:35:17 -0700 (PDT)
+Received: from [10.7.3.1] ([133.130.111.179])
+        by smtp.gmail.com with ESMTPSA id f28sm19290841pgb.12.2021.06.22.01.35.14
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 22 Jun 2021 01:35:16 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.6\))
+Subject: Re: [PATCH 2/2] block: support bio merge for multi-range discard
+From:   Miao Wang <shankerwangmiao@gmail.com>
+In-Reply-To: <20210622065511.GB29691@lst.de>
+Date:   Tue, 22 Jun 2021 16:35:11 +0800
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CB477D73-2867-4907-8CEC-6EE85A4AAC21@gmail.com>
+References: <20210609004556.46928-1-ming.lei@redhat.com>
+ <20210609004556.46928-3-ming.lei@redhat.com> <20210622065511.GB29691@lst.de>
+To:     Christoph Hellwig <hch@lst.de>
+X-Mailer: Apple Mail (2.3608.120.23.2.6)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 01:34:25PM +0530, Naresh Kamboju wrote:
-> [Please ignore if is already reported]
-> 
-> Regression found,
-> 
-> The following kernel warnings reported on Linux next 20210621 while booting
-> arm64 hikey and db410c and arm BeagleBoard-X15 devices.
-> 
-> This crash is always reproducible on these devices while booting with the
-> provided config link.
 
-https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.14/drivers-late&id=7059d7cf150a1387ee72403976b81c2bf10af015
+> 2021=E5=B9=B406=E6=9C=8822=E6=97=A5 14:55=EF=BC=8CChristoph Hellwig =
+<hch@lst.de> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Wed, Jun 09, 2021 at 08:45:56AM +0800, Ming Lei wrote:
+>> diff --git a/block/blk-merge.c b/block/blk-merge.c
+>> index bcdff1879c34..65210e9a8efa 100644
+>> --- a/block/blk-merge.c
+>> +++ b/block/blk-merge.c
+>> @@ -724,10 +724,10 @@ static inline bool blk_discard_mergable(struct =
+request *req)
+>> static enum elv_merge blk_try_req_merge(struct request *req,
+>> 					struct request *next)
+>> {
+>> -	if (blk_discard_mergable(req))
+>> -		return ELEVATOR_DISCARD_MERGE;
+>> -	else if (blk_rq_pos(req) + blk_rq_sectors(req) =3D=3D =
+blk_rq_pos(next))
+>> +	if (blk_rq_pos(req) + blk_rq_sectors(req) =3D=3D =
+blk_rq_pos(next))
+>> 		return ELEVATOR_BACK_MERGE;
+>=20
+> Oh well, this breaks my previous suggestions.
+>=20
+>> +		struct req_discard_range r;
+>> +
+>> +		rq_for_each_discard_range(r, req) {
+>=20
+> ... and I can't say I like this rather complex iterator.
+>=20
+> What is the problem of just fixing the raid code to not submit =
+stupidly
+> small discard requests instead?
+
+Yes, raid code should indeed be fixed. However, the way discard
+requests are getting merged is not correct.=20
+
+I understand your concern about complex iterator. I believe it is =
+because
+the difference between discard requests and normal read/write requests.=20=
+
+Discard requests are without data and allowed to be non-contiguous, =
+while
+normal requests, which blk-merge was originally dealing with, are with=20=
+
+data buffers and should be contiguous. Actually, correct me if wrong, =
+the=20
+current request struct lacks the ability to express non-contiguous =
+bio's.
+Ming's patch, by introducing the rq_for_each_discard_range iterator,=20
+partially enables the request struct to express non-contiguous bio's.
+
+Cheers,=20
+
+Miao Wang=
