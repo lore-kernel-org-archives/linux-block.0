@@ -2,83 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A4DC48BC2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF31C4743C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:03:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85240610F7
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:58:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E066661002
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:03:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230170AbhFWMA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 08:00:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53380 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbhFWMA6 (ORCPT
+        id S230251AbhFWMFq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 08:05:46 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:38264 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230019AbhFWMFq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 08:00:58 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED8CC061574;
-        Wed, 23 Jun 2021 04:58:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=if+5vcxnYg39PHn7QTmtFHoajkkKrnrnAav0TjgSnZ4=; b=svVwbyrReSA0bEdCFvAQL0nRR6
-        pd6rdU+J/z/Uh7KtI6XWF1ddX4S6fLjMN7Ru1DAXN7TxPiqkBI6iJXlTKRC7i9Q0dG5Q1dRIqm0xJ
-        LQ6zjTzMlqnPtrU99PboitgP3+uHj+mBV3EuT0OaU+JZtX5RQ4nYXI+OvgwRRJ65Rzn8aPH4n7Vib
-        DaoFcSDaxmxLSFRhBD/L7bCK+CadMc7hL7T4zLFHNvI2R26zNrnzLsVyTfAEX6//KSbZ81KmCOPey
-        +gJJZpDjgOvNbPHrZ5O1J5lC6I2Du2zRvDe33C6lDrZvo7m0Ahc1MlYNrFoGJN0IWDvrrZpByPx5+
-        QUIeC9nQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lw1Vw-00FO5h-Jw; Wed, 23 Jun 2021 11:58:01 +0000
-Date:   Wed, 23 Jun 2021 12:57:52 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Matteo Croce <mcroce@linux.microsoft.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        Wed, 23 Jun 2021 08:05:46 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 081741FD65;
+        Wed, 23 Jun 2021 12:03:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624449808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
+        b=JEwVwd5lWr59EcR28oxtQoQeflZEtZ6GtvIqFr+3qPap9DIqlIxS16dhKGeD88AdgHhrQK
+        FnaGZl6LUbHmCXqawqEN/CTgAdCZYjbNY2Zq58VJ569soEXfRxCLgg/SnorvXx7d8ZtdW5
+        YHjUElLq6Fyl98xM/jRHIF7FsABnP5E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624449808;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
+        b=NwoYa3wurxv0LfPJNjQb5ZEd1tVjfIl9pupg76GLbPUHgiC4wWiYX5RAAVvfb5RlyXPytc
+        j4Nna4Tidn/PA9Aw==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id ADCA511A97;
+        Wed, 23 Jun 2021 12:03:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624449807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
+        b=YF5l59Liz2PwKX7sWBCPjDz8AJ/4dt0uGGV+1XjZDof0eMiBagemhhka4asURm2hQLjPHk
+        pToA+nVJaTwvciMnCOeiYAJllplYa7V3i+WBOd2tbr8Zr07nHtB757209mun/fOjmXwXHB
+        FA7WEn/722VuFam8SwPykndZg7ENp4I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624449807;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
+        b=phFHobecXngr10YyZGcNi33kkMtxHjkkaAk14F16/Y1M+JRLYUrn+0tW9Bj8hI1yrs1KWX
+        xRKybiw+NIuYoXBA==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id rhDpKA8j02B6DwAALh3uQQ
+        (envelope-from <hare@suse.de>); Wed, 23 Jun 2021 12:03:27 +0000
+Subject: Re: [PATCH v3 0/6] block: add a sequence number to disks
+To:     Matteo Croce <mcroce@linux.microsoft.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org,
         Lennart Poettering <lennart@poettering.net>,
         Luca Boccassi <bluca@debian.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Tejun Heo <tj@kernel.org>,
-        Javier Gonz??lez <javier@javigon.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
         Niklas Cassel <niklas.cassel@wdc.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
         Matthew Wilcox <willy@infradead.org>,
         Christoph Hellwig <hch@infradead.org>,
         JeffleXu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v3 6/6] loop: increment sequence number
-Message-ID: <YNMhwLMr7DiNdqC/@infradead.org>
 References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
- <20210623105858.6978-7-mcroce@linux.microsoft.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <bfdd6f56-ce2b-ef74-27b1-83b922e5f7d9@suse.de>
+Date:   Wed, 23 Jun 2021 14:03:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210623105858.6978-7-mcroce@linux.microsoft.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210623105858.6978-1-mcroce@linux.microsoft.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 12:58:58PM +0200, Matteo Croce wrote:
+On 6/23/21 12:58 PM, Matteo Croce wrote:
 > From: Matteo Croce <mcroce@microsoft.com>
 > 
-> On a very loaded system, if there are many events queued up from multiple
-> attach/detach cycles, it's impossible to match them up with the
-> LOOP_CONFIGURE or LOOP_SET_FD call, since we don't know where the position
-> of our own association in the queue is[1].
-> Not even an empty uevent queue is a reliable indication that we already
-> received the uevent we were waiting for, since with multi-partition block
-> devices each partition's event is queued asynchronously and might be
-> delivered later.
+> With this series a monotonically increasing number is added to disks,
+> precisely in the genhd struct, and it's exported in sysfs and uevent.
 > 
-> Increment the disk sequence number when setting or changing the backing
-> file, so the userspace knows which backing file generated the event:
+> This helps the userspace correlate events for devices that reuse the
+> same device, like loop.
+> 
+I'm failing to see the point here.
+Apparently you are assuming that there is a userspace tool tracking 
+events, and has a need to correlate events related to different 
+instances of the disk.
+But if you have an userspace application tracking events, why can't the 
+same application track the 'add' and 'remove' events to track the 
+lifetime of the devices, and implement its own numbering based on that?
 
-Instead of manually incrementing the sequence here, can we make loop
-generate the DISK_EVENT_MEDIA_CHANGE event on a backing device (aka
-media) change?
+Why do we need to burden the kernel with this?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
