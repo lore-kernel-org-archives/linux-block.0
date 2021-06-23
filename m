@@ -2,97 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C3AC4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CF1C4743C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:29:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE8176102A
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5976060FD9
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230243AbhFWPHO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 11:07:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39622 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbhFWPHO (ORCPT
+        id S231133AbhFWPbj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 11:31:39 -0400
+Received: from gardel.0pointer.net ([85.214.157.71]:53826 "EHLO
+        gardel.0pointer.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229523AbhFWPbh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 11:07:14 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ACA0C061574
-        for <linux-block@vger.kernel.org>; Wed, 23 Jun 2021 08:04:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=UCYBBM8y+++myQaSPaE2GtTh8JIwBF+yqfSzegrr3d8=; b=qyzoJDZTQNBuiZswQEuIoMiPtz
-        yV5ECC6LHiBm6OQ/F4zP9cVsSxYpvUBuaAFbAyb1KOIXoGrRA1vVoy0CFywRt6w1IYKvHu9EBkuD0
-        7QyxBVNk3AYWbU3QemL+9sZGXe9ystWK7dhuCIibYl75ThMXfNXIhKvOi800eSuTnEuFW4CaJWPwT
-        BXtxt5Z3LWPWGdZnVb/kwIJ0gLvR2zt1rDy9ccfHefBG9rYyaFD52hSjG3bJV3qlGDOpn+xGq1bAi
-        OUfAhW9QzpphbR2Rf1utlsgrh1q54dcykbnWsQDfHt1X22XBjhDUmLB3F4wYq5XP/gtm4qulwz/Br
-        OH6r2ZOg==;
-Received: from [2001:4bb8:188:3e21:6594:49:139:2b3f] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lw4QK-00FYA8-GG; Wed, 23 Jun 2021 15:04:23 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 9/9] loop: rewrite loop_exit using idr_for_each_entry
-Date:   Wed, 23 Jun 2021 16:59:08 +0200
-Message-Id: <20210623145908.92973-10-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210623145908.92973-1-hch@lst.de>
-References: <20210623145908.92973-1-hch@lst.de>
+        Wed, 23 Jun 2021 11:31:37 -0400
+Received: from gardel-login.0pointer.net (gardel-mail [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
+        by gardel.0pointer.net (Postfix) with ESMTP id A6871E8094B;
+        Wed, 23 Jun 2021 17:29:17 +0200 (CEST)
+Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
+        id 5CE82160DC0; Wed, 23 Jun 2021 17:29:17 +0200 (CEST)
+Date:   Wed, 23 Jun 2021 17:29:17 +0200
+From:   Lennart Poettering <mzxreary@0pointer.de>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Luca Boccassi <bluca@debian.org>,
+        Matteo Croce <mcroce@linux.microsoft.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        Javier Gonz??lez <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        JeffleXu <jefflexu@linux.alibaba.com>
+Subject: Re: [PATCH v3 6/6] loop: increment sequence number
+Message-ID: <YNNTTUYRlpXDqMgX@gardel-login>
+References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
+ <20210623105858.6978-7-mcroce@linux.microsoft.com>
+ <YNMhwLMr7DiNdqC/@infradead.org>
+ <bbd3d100ee997431b2905838575eb4bdec820ad3.camel@debian.org>
+ <YNNEdbr+0p+PzinQ@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YNNEdbr+0p+PzinQ@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use idr_for_each_entry to simplify removing all devices.
+On Mi, 23.06.21 15:25, Christoph Hellwig (hch@infradead.org) wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/block/loop.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+> On Wed, Jun 23, 2021 at 02:13:25PM +0100, Luca Boccassi wrote:
+> > On Wed, 2021-06-23 at 12:57 +0100, Christoph Hellwig wrote:
+> > > On Wed, Jun 23, 2021 at 12:58:58PM +0200, Matteo Croce wrote:
+> > > > From: Matteo Croce <mcroce@microsoft.com>
+> > > >
+> > > > On a very loaded system, if there are many events queued up from multiple
+> > > > attach/detach cycles, it's impossible to match them up with the
+> > > > LOOP_CONFIGURE or LOOP_SET_FD call, since we don't know where the position
+> > > > of our own association in the queue is[1].
+> > > > Not even an empty uevent queue is a reliable indication that we already
+> > > > received the uevent we were waiting for, since with multi-partition block
+> > > > devices each partition's event is queued asynchronously and might be
+> > > > delivered later.
+> > > >
+> > > > Increment the disk sequence number when setting or changing the backing
+> > > > file, so the userspace knows which backing file generated the event:
+> > >
+> > > Instead of manually incrementing the sequence here, can we make loop
+> > > generate the DISK_EVENT_MEDIA_CHANGE event on a backing device (aka
+> > > media) change?
+> >
+> > Hi,
+> >
+> > This was answered in the v1 thread:
+> >
+> > https://lore.kernel.org/linux-fsdevel/20210315201331.GA2577561@casper.infradead.org/t/#m8a677028572e826352cbb1e19d1b9c1f3b6bff4b
+> >
+> > The fundamental issue is that we'd be back at trying to correlate
+> > events to loopdev instances, which does not work reliably - hence this
+> > patch series. With the new ioctl, we can get the id immediately and
+> > without delay when we create the device, with no possible races. Then
+> > we can handle events reliably, as we can correlate correctly in all
+> > cases.
+>
+> I very much disagree with your reply there.  The device now points to
+> a different media.  Both for the loop device, a floppy or a CD changer
+> probably by some kind of user action.  In the last cast it might even
+> by done entirely locally through a script just like the loop device.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 93abf6d8b88c..40b7c6c470f2 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2349,21 +2349,17 @@ static int __init loop_init(void)
- 	return err;
- }
- 
--static int loop_exit_cb(int id, void *ptr, void *data)
--{
--	struct loop_device *lo = ptr;
--
--	loop_remove(lo);
--	return 0;
--}
--
- static void __exit loop_exit(void)
- {
-+	struct loop_device *lo;
-+	int id;
-+
- 	unregister_blkdev(LOOP_MAJOR, "loop");
- 	misc_deregister(&loop_misc);
- 
- 	mutex_lock(&loop_ctl_mutex);
--	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
-+	idr_for_each_entry(&loop_index_idr, lo, id)
-+		loop_remove(lo);
- 	mutex_unlock(&loop_ctl_mutex);
- 
- 	idr_destroy(&loop_index_idr);
--- 
-2.30.2
+I am not sure I grok your point.
 
+but let me try to explain why I think it's better to make media
+changes *also* trigger seqno changes, and not make media change events
+the *only* way to trigger seqno changes.
+
+1. First of all, loopback devices currently don't hook into the media
+   change logic (which so far is focussed on time-based polling
+   actually, for both CDs and floppies). Adding this would change
+   semantics visibly to userspace (since userspace would suddenly see
+   another action=change + DISK_MEDIA_CHANGE=1 uevent suddenly that it
+   needs to handle correctly). One can certainly argue that userspace
+   must be ready to get additional uevents like this any time, but
+   knowing userspace a bit I am pretty sure this will confuse some
+   userspace that doesn't expect this. I mean loopback block devices
+   already issue "change" uevents on attachment and detachment, one
+   that userpace typically expects, but adding the media change one
+   probably means sending two (?) of these out for each
+   attachment. One being the old one from the loopback device itself,
+   and then another one for the media change from the mdia change
+   logic. That's not just noisy, but also ugly.
+
+2. We want seqnums to be allocated for devices not only when doing
+   media change (e.g. when attaching or detaching a loopback device)
+   but also when allocating a block device, so that even before the
+   first media change event a block device has a sequence number. This
+   means allocating a sequence number for block devices won't be
+   limited to the media change code anyway.
+
+3. Doing the sequence number bumping in media change code exclusively
+   kinda suggests this was something we could properly abstract away,
+   to be done only there, and that the rest of the block subsystems
+   wouldn#t have to bother much. But I am pretty sure that's not
+   correct: in particular in the loopback block device code (but in
+   other block subsystems too I guess) we really want to be able to
+   atomically attach a loopback block device and return the seqnum of
+   that very attachmnt so that we can focus on uevents for it. Thus,
+   attachment, allocation and returning the seqnum to userspace in the
+   LOOP_CONFIGURE ioctl (or whatever is appropriate) kinda go hand in
+   hand.
+
+4. The media change protocol follows a protocol along with the eject
+   button handling (DISK_EVENT_EJECT_REQUEST), the locking of the tray
+   and the time based polling. i.e. it's specifically focussed on
+   certain hw features, none of which really apply to loopback block
+   devices, which have no trays to lock, but eject buttons to handle,
+   and where media change is always triggered internally by privileged
+   code, never externally by the user. I doubt it makes sense to mix
+   these up. Currently udev+udisks in userspace implement that
+   procotol for cdroms/floppies, and I doubt we would want to bother
+   to extend this for loopback devices in userspace. In fact, if media
+   change events are added to loopback devices, we probably would have
+   to change userspace to ignore them.
+
+TLDR: making loopback block devices generate media is a (probably
+minor, but unclear) API break, probably means duplicating uevent
+traffic for it, won't abstract things away anyway, won't allocate a
+seqnum on device allocation, and won't actually use anything of the
+real media change functionality.
+
+Or to say this differently: if the goal is to make loopback block
+devices to send CDROM compatible media change events to userspace,
+then I think it would probably make more sense to attach the
+DISK_MEDIA_CHANGE=1 property to the attachment/detachment uevents the
+loopback devices *already* generate, rather than to try to shoehorn the
+existing media change infrastructure into the loopback device logic,
+trying to reuse it even though nothing of it is really needed.
+
+But that said, I am not aware of anyone ever asking for CDROM
+compatible EDISK_MEDIA_CHANGE=1 uevents for loopback devices. I really
+wouldn't bother with that. Sounds like nothing anyone want with a
+chance of breaking things everywhere. (i.e. remember the
+"bind"/"unbind" uevent fiasco?)
+
+Lennart
+
+--
+Lennart Poettering, Berlin
