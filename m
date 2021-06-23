@@ -2,206 +2,502 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E88D4C4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 08:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D46C48BC2
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 09:16:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D247D61164
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 08:32:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47D26601FC
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 09:16:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229940AbhFWIfN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 04:35:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53034 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229918AbhFWIfN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 04:35:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B49D66112D;
-        Wed, 23 Jun 2021 08:32:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1624437176;
-        bh=4sn8WqZijDYpxiuDqKDq6MKI/sEkghiCWQfDl6JYqrI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GbYqSZtbYinAzslu+VRVH6zxki0aFVWoiHzllbc0M/T5rj5FBJJwo4cwwuw31ddhB
-         ezL78WptrfOLgk709+WWNTYjqNE7coKUgQERdF7TbU4P3adVvYqLFBbEJ59bipEXAx
-         qLS8ionKOOjyQNxaj3M5XwAYUSWK+lkkBGJqcaxU=
-Date:   Wed, 23 Jun 2021 10:32:53 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     rafael@kernel.org, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] drivers/base/core: refcount kobject and bus on device
- attribute read / store
-Message-ID: <YNLxtbzOm3/whYHc@kroah.com>
-References: <20210623003630.274804-1-mcgrof@kernel.org>
+        id S230124AbhFWJSs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 05:18:48 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:58122 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229833AbhFWJSs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Jun 2021 05:18:48 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 21BA721981;
+        Wed, 23 Jun 2021 09:16:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624439790; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NokfFS3lgRkXtDowvvd0f8BMjh9mmmgD1Q9zGGcCgrQ=;
+        b=A7yAKFUrSV2T4hb1dKoerxOidG9M/2Hlh35ZESLNvS/eq7+Av4ZPEGJ7ThVVIsYb+QMrUt
+        5RhYqGZhX6H6IEeZhZNALhWEjp7gKOuA4kR/QACrsDfJ9HIOFguvoaDSxX+eKX5o50SmyT
+        hHpLEfjiraje5gNtJMHc/zB7KfhR7hM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624439790;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NokfFS3lgRkXtDowvvd0f8BMjh9mmmgD1Q9zGGcCgrQ=;
+        b=c0qCwrPUYZFpBZgMxfmY+4lFOiG4j6xXgv/qfDtmN1yTjVYvpp8PC1x0KLMs5HnWSeqLff
+        PTQISNrfJG0+eqCg==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id DD9AB11A97;
+        Wed, 23 Jun 2021 09:16:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624439790; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NokfFS3lgRkXtDowvvd0f8BMjh9mmmgD1Q9zGGcCgrQ=;
+        b=A7yAKFUrSV2T4hb1dKoerxOidG9M/2Hlh35ZESLNvS/eq7+Av4ZPEGJ7ThVVIsYb+QMrUt
+        5RhYqGZhX6H6IEeZhZNALhWEjp7gKOuA4kR/QACrsDfJ9HIOFguvoaDSxX+eKX5o50SmyT
+        hHpLEfjiraje5gNtJMHc/zB7KfhR7hM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624439790;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NokfFS3lgRkXtDowvvd0f8BMjh9mmmgD1Q9zGGcCgrQ=;
+        b=c0qCwrPUYZFpBZgMxfmY+4lFOiG4j6xXgv/qfDtmN1yTjVYvpp8PC1x0KLMs5HnWSeqLff
+        PTQISNrfJG0+eqCg==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id jGlsNO370mAhOAAALh3uQQ
+        (envelope-from <hare@suse.de>); Wed, 23 Jun 2021 09:16:29 +0000
+Subject: Re: [PATCH 04/14] bcache: initialize the nvm pages allocator
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, Jianpeng Ma <jianpeng.ma@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Qiaowei Ren <qiaowei.ren@intel.com>
+References: <20210615054921.101421-1-colyli@suse.de>
+ <20210615054921.101421-5-colyli@suse.de>
+ <39c118e3-ddc9-f417-a929-fc21e761a4ac@suse.de>
+ <fc5b8586-0181-da7b-ba1f-73f7b00b8d16@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <48cab671-d4d6-d5f2-29bf-b2f19e04e533@suse.de>
+Date:   Wed, 23 Jun 2021 11:16:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210623003630.274804-1-mcgrof@kernel.org>
+In-Reply-To: <fc5b8586-0181-da7b-ba1f-73f7b00b8d16@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 05:36:30PM -0700, Luis Chamberlain wrote:
-> It's possible today to have a device attribute read or store
-> race against device removal. When this happens there is a small
-> chance that the dereference for the private data area of the driver
-> is NULL.
+On 6/23/21 7:26 AM, Coly Li wrote:
+> On 6/22/21 6:39 PM, Hannes Reinecke wrote:
+>> On 6/15/21 7:49 AM, Coly Li wrote:
+>>> From: Jianpeng Ma <jianpeng.ma@intel.com>
+>>>
+>>> This patch define the prototype data structures in memory and
+>>> initializes the nvm pages allocator.
+>>>
+>>> The nvm address space which is managed by this allocator can consist of
+>>> many nvm namespaces, and some namespaces can compose into one nvm set,
+>>> like cache set. For this initial implementation, only one set can be
+>>> supported.
+>>>
+>>> The users of this nvm pages allocator need to call register_namespace()
+>>> to register the nvdimm device (like /dev/pmemX) into this allocator as
+>>> the instance of struct nvm_namespace.
+>>>
+>>> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+>>> Signed-off-by: Jianpeng Ma <jianpeng.ma@intel.com>
+>>> Co-developed-by: Qiaowei Ren <qiaowei.ren@intel.com>
+>>> Signed-off-by: Qiaowei Ren <qiaowei.ren@intel.com>
+>>> Signed-off-by: Coly Li <colyli@suse.de>
+>>> ---
+>>>   drivers/md/bcache/Kconfig     |  10 ++
+>>>   drivers/md/bcache/Makefile    |   1 +
+>>>   drivers/md/bcache/nvm-pages.c | 295 ++++++++++++++++++++++++++++++++++
+>>>   drivers/md/bcache/nvm-pages.h |  74 +++++++++
+>>>   drivers/md/bcache/super.c     |   3 +
+>>>   5 files changed, 383 insertions(+)
+>>>   create mode 100644 drivers/md/bcache/nvm-pages.c
+>>>   create mode 100644 drivers/md/bcache/nvm-pages.h
+>>>
+>>> diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
+>>> index d1ca4d059c20..a69f6c0e0507 100644
+>>> --- a/drivers/md/bcache/Kconfig
+>>> +++ b/drivers/md/bcache/Kconfig
+>>> @@ -35,3 +35,13 @@ config BCACHE_ASYNC_REGISTRATION
+>>>   	device path into this file will returns immediately and the real
+>>>   	registration work is handled in kernel work queue in asynchronous
+>>>   	way.
+>>> +
+>>> +config BCACHE_NVM_PAGES
+>>> +	bool "NVDIMM support for bcache (EXPERIMENTAL)"
+>>> +	depends on BCACHE
+>>> +	depends on 64BIT
+>>> +	depends on LIBNVDIMM
+>>> +	depends on DAX
+>>> +	help
+>>> +	  Allocate/release NV-memory pages for bcache and provide allocated pages
+>>> +	  for each requestor after system reboot.
+>>> diff --git a/drivers/md/bcache/Makefile b/drivers/md/bcache/Makefile
+>>> index 5b87e59676b8..2397bb7c7ffd 100644
+>>> --- a/drivers/md/bcache/Makefile
+>>> +++ b/drivers/md/bcache/Makefile
+>>> @@ -5,3 +5,4 @@ obj-$(CONFIG_BCACHE)	+= bcache.o
+>>>   bcache-y		:= alloc.o bset.o btree.o closure.o debug.o extents.o\
+>>>   	io.o journal.o movinggc.o request.o stats.o super.o sysfs.o trace.o\
+>>>   	util.o writeback.o features.o
+>>> +bcache-$(CONFIG_BCACHE_NVM_PAGES) += nvm-pages.o
+>>> diff --git a/drivers/md/bcache/nvm-pages.c b/drivers/md/bcache/nvm-pages.c
+>>> new file mode 100644
+>>> index 000000000000..18fdadbc502f
+>>> --- /dev/null
+>>> +++ b/drivers/md/bcache/nvm-pages.c
+>>> @@ -0,0 +1,295 @@
+>>> +// SPDX-License-Identifier: GPL-2.0-only
+>>> +/*
+>>> + * Nvdimm page-buddy allocator
+>>> + *
+>>> + * Copyright (c) 2021, Intel Corporation.
+>>> + * Copyright (c) 2021, Qiaowei Ren <qiaowei.ren@intel.com>.
+>>> + * Copyright (c) 2021, Jianpeng Ma <jianpeng.ma@intel.com>.
+>>> + */
+>>> +
+>>> +#if defined(CONFIG_BCACHE_NVM_PAGES)
+>>> +
+>> No need for this 'if' statement as it'll be excluded by the Makefile
+>> anyway if the config option isn't set.
 > 
-> Let's consider the zram driver as an example. Its possible to run into
-> a race where a sysfs knob is being used, we get preempted, and a zram
-> device is removed before we complete use of the sysfs knob. This can happen
-> for instance on block devices, where for instance the zram block devices
-> just part of the private data of the block device.
+> Such if is necessary because stub routines are defined when
+> CONFIG_BCACHE_NVM_PAGES is not defined, e.g.
 > 
-> For instance this can happen in the following two situations
-> as examples to illustrate this better:
+> 426 +#else
+> 427 +
+> 428 +static inline struct bch_nvm_namespace
+> *bch_register_namespace(const char *dev_path)
+> 429 +{
+> 430 +       return NULL;
+> 431 +}
+> 432 +static inline int bch_nvm_init(void)
+> 433 +{
+> 434 +       return 0;
+> 435 +}
+> 436 +static inline void bch_nvm_exit(void) { }
+> 437 +
+> 438 +#endif /* CONFIG_BCACHE_NVM_PAGES */
 > 
->         CPU 1                            CPU 2
-> destroy_devices
-> ...
->                                  compact_store()
->                                  zram = dev_to_zram(dev);
-> idr_for_each(zram_remove_cb
->   zram_remove
->   ...
->   kfree(zram)
->                                  down_read(&zram->init_lock);
+But then these stubs should be defined in the header file, not here.
+
+[ .. ]
+
+>>> +			rc = -ENOMEM;
+>>> +			goto unlock;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	only_set->nss[ns->sb->this_namespace_nr] = ns;
+>>> +
+>>> +	/* Firstly attach */
+>> Initial attach?
 > 
->         CPU 1                            CPU 2
-> hot_remove_store
->                                  compact_store()
->                                  zram = dev_to_zram(dev);
->   zram_remove
->     kfree(zram)
->                                  down_read(&zram->init_lock);
+> Will fix in next post.
 > 
-> To ensure the private data pointer is valid we could use bdget() / bdput()
-> in between access, however that would mean doing that in all sysfs
-> reads/stores on the driver. Instead a generic solution for all drivers
-> is to ensure the device kobject is still valid and also the bus, if
-> a bus is present.
+>>
+>>> +	if ((unsigned long)ns->sb->owner_list_head == BCH_NVM_PAGES_OWNER_LIST_HEAD_OFFSET) {
+>>> +		struct bch_nvm_pages_owner_head *sys_owner_head;
+>>> +		struct bch_nvm_pgalloc_recs *sys_pgalloc_recs;
+>>> +
+>>> +		ns->sb->owner_list_head = ns->kaddr + BCH_NVM_PAGES_OWNER_LIST_HEAD_OFFSET;
+>>> +		sys_pgalloc_recs = ns->kaddr + BCH_NVM_PAGES_SYS_RECS_HEAD_OFFSET;
+>>> +
+>>> +		sys_owner_head = &(ns->sb->owner_list_head->heads[0]);
+>>> +		sys_owner_head->recs[0] = sys_pgalloc_recs;
+>>> +		ns->sb->csum = csum_set(ns->sb);
+>>> +
+>> Hmm. You are trying to pick up the 'list_head' structure from NVM, right?
 > 
-> This issue does not fix a known crash, however this race was
-> spotted by Minchan Kim through code inspection upon code review
-> of another zram patch.
+> No, this is not READ, it's WRITE onto NVDIMM.
 > 
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
+> sys_owner_head points to NVDIMM, since ns->sb->owner_list_head is updated,
+> the checksum of ns->sb should be updated to new value onto the NVDIMM.
+> This is what the above line does.
 > 
-> This v3 is the same as v2, but since the I got an email asking me to
-> clarify the differences between the first iteration and the second, this
-> v3 just describes what I did not explain in the v2. Namely:
 > 
->   * I removed the checks from get_device() calls as suggested
->   * The functions which are now being used outside of bus.c have
->     forwared declarations stuffed into base.h
+Ah, right.
+
+>>
+>> In doing so, don't you need to validate the structure (eg by checking
+>> the checksum) before doing so to ensure that the contents are valid?
 > 
->  drivers/base/base.h |  2 ++
->  drivers/base/bus.c  |  4 ++--
->  drivers/base/core.c | 36 ++++++++++++++++++++++++++++++++----
->  3 files changed, 36 insertions(+), 6 deletions(-)
+> The check sum checking for READ is done in read_nvdimm_meta_super() in
+> following lines,
+> 198 +       r = -EINVAL;
+> 199 +       expected_csum = csum_set(sb);
+> 200 +       if (expected_csum != sb->csum) {
+> 201 +               pr_info("csum is not match with expected one\n");
+> 202 +               goto put_page;
+> 203 +       }
 > 
-> diff --git a/drivers/base/base.h b/drivers/base/base.h
-> index e5f9b7e656c3..3f95b125b667 100644
-> --- a/drivers/base/base.h
-> +++ b/drivers/base/base.h
-> @@ -127,6 +127,8 @@ static inline void auxiliary_bus_init(void) { }
->  
->  struct kobject *virtual_device_parent(struct device *dev);
->  
-> +extern struct bus_type *bus_get(struct bus_type *bus);
-> +extern void bus_put(struct bus_type *bus);
->  extern int bus_add_device(struct device *dev);
->  extern void bus_probe_device(struct device *dev);
->  extern void bus_remove_device(struct device *dev);
-> diff --git a/drivers/base/bus.c b/drivers/base/bus.c
-> index 36d0c654ea61..21c80d7d6433 100644
-> --- a/drivers/base/bus.c
-> +++ b/drivers/base/bus.c
-> @@ -39,7 +39,7 @@ static struct kset *system_kset;
->  static int __must_check bus_rescan_devices_helper(struct device *dev,
->  						void *data);
->  
-> -static struct bus_type *bus_get(struct bus_type *bus)
-> +struct bus_type *bus_get(struct bus_type *bus)
->  {
->  	if (bus) {
->  		kset_get(&bus->p->subsys);
-> @@ -48,7 +48,7 @@ static struct bus_type *bus_get(struct bus_type *bus)
->  	return NULL;
->  }
->  
-> -static void bus_put(struct bus_type *bus)
-> +void bus_put(struct bus_type *bus)
->  {
->  	if (bus)
->  		kset_put(&bus->p->subsys);
-> diff --git a/drivers/base/core.c b/drivers/base/core.c
-> index 4a8bf8cda52b..f69aa040b56d 100644
-> --- a/drivers/base/core.c
-> +++ b/drivers/base/core.c
-> @@ -2042,28 +2042,56 @@ EXPORT_SYMBOL(dev_driver_string);
->  static ssize_t dev_attr_show(struct kobject *kobj, struct attribute *attr,
->  			     char *buf)
->  {
-> -	struct device_attribute *dev_attr = to_dev_attr(attr);
-> -	struct device *dev = kobj_to_dev(kobj);
-> +	struct device_attribute *dev_attr;
-> +	struct device *dev;
-> +	struct bus_type *bus = NULL;
->  	ssize_t ret = -EIO;
->  
-> +	dev = get_device(kobj_to_dev(kobj));
-> +	if (dev->bus) {
+> Once thing to note is, currently all NVDIMM update is not power failure
+> considered. This is the next big task to do after the first small code
+> base merged.
+> 
+> 
+>>> +		sys_pgalloc_recs->owner = sys_owner_head;
+>>> +	} else
+>>> +		BUG_ON(ns->sb->owner_list_head !=
+>>> +			(ns->kaddr + BCH_NVM_PAGES_OWNER_LIST_HEAD_OFFSET));
+>>> +
+>>> +unlock:
+>>> +	mutex_unlock(&only_set->lock);
+>>> +	return rc;
+>>> +}
+>>> +
+>>> +static int read_nvdimm_meta_super(struct block_device *bdev,
+>>> +			      struct bch_nvm_namespace *ns)
+>>> +{
+>>> +	struct page *page;
+>>> +	struct bch_nvm_pages_sb *sb;
+>>> +	int r = 0;
+>>> +	uint64_t expected_csum = 0;
+>>> +
+>>> +	page = read_cache_page_gfp(bdev->bd_inode->i_mapping,
+>>> +			BCH_NVM_PAGES_SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
+>>> +
+>>> +	if (IS_ERR(page))
+>>> +		return -EIO;
+>>> +
+>>> +	sb = (struct bch_nvm_pages_sb *)(page_address(page) +
+>>> +					offset_in_page(BCH_NVM_PAGES_SB_OFFSET));
+>>> +	r = -EINVAL;
+>>> +	expected_csum = csum_set(sb);
+>>> +	if (expected_csum != sb->csum) {
+>>> +		pr_info("csum is not match with expected one\n");
+>>> +		goto put_page;
+>>> +	}
+>>> +
+>>> +	if (memcmp(sb->magic, bch_nvm_pages_magic, 16)) {
+>>> +		pr_info("invalid bch_nvm_pages_magic\n");
+>>> +		goto put_page;
+>>> +	}
+>>> +
+>>> +	if (sb->total_namespaces_nr != 1) {
+>>> +		pr_info("currently only support one nvm device\n");
+>>> +		goto put_page;
+>>> +	}
+>>> +
+>>> +	if (sb->sb_offset != BCH_NVM_PAGES_SB_OFFSET) {
+>>> +		pr_info("invalid superblock offset\n");
+>>> +		goto put_page;
+>>> +	}
+>>> +
+>>> +	r = 0;
+>>> +	/* temporary use for DAX API */
+>>> +	ns->page_size = sb->page_size;
+>>> +	ns->pages_total = sb->pages_total;
+>>> +
+>>> +put_page:
+>>> +	put_page(page);
+>>> +	return r;
+>>> +}
+>>> +
+>>> +struct bch_nvm_namespace *bch_register_namespace(const char *dev_path)
+>>> +{
+>>> +	struct bch_nvm_namespace *ns;
+>>> +	int err;
+>>> +	pgoff_t pgoff;
+>>> +	char buf[BDEVNAME_SIZE];
+>>> +	struct block_device *bdev;
+>>> +	int id;
+>>> +	char *path = NULL;
+>>> +
+>>> +	path = kstrndup(dev_path, 512, GFP_KERNEL);
+>>> +	if (!path) {
+>>> +		pr_err("kstrndup failed\n");
+>>> +		return ERR_PTR(-ENOMEM);
+>>> +	}
+>>> +
+>>> +	bdev = blkdev_get_by_path(strim(path),
+>>> +				  FMODE_READ|FMODE_WRITE|FMODE_EXEC,
+>>> +				  only_set);
+>>> +	if (IS_ERR(bdev)) {
+>>> +		pr_info("get %s error: %ld\n", dev_path, PTR_ERR(bdev));
+>>> +		kfree(path);
+>>> +		return ERR_PTR(PTR_ERR(bdev));
+>>> +	}
+>>> +
+>>> +	err = -ENOMEM;
+>>> +	ns = kzalloc(sizeof(struct bch_nvm_namespace), GFP_KERNEL);
+>>> +	if (!ns)
+>>> +		goto bdput;
+>>> +
+>>> +	err = -EIO;
+>>> +	if (read_nvdimm_meta_super(bdev, ns)) {
+>>> +		pr_info("%s read nvdimm meta super block failed.\n",
+>>> +			bdevname(bdev, buf));
+>>> +		goto free_ns;
+>>> +	}
+>>> +
+>>> +	err = -EOPNOTSUPP;
+>>> +	if (!bdev_dax_supported(bdev, ns->page_size)) {
+>>> +		pr_info("%s don't support DAX\n", bdevname(bdev, buf));
+>>> +		goto free_ns;
+>>> +	}
+>>> +
+>>> +	err = -EINVAL;
+>>> +	if (bdev_dax_pgoff(bdev, 0, ns->page_size, &pgoff)) {
+>>> +		pr_info("invalid offset of %s\n", bdevname(bdev, buf));
+>>> +		goto free_ns;
+>>> +	}
+>>> +
+>>> +	err = -ENOMEM;
+>>> +	ns->dax_dev = fs_dax_get_by_bdev(bdev);
+>>> +	if (!ns->dax_dev) {
+>>> +		pr_info("can't by dax device by %s\n", bdevname(bdev, buf));
+>>> +		goto free_ns;
+>>> +	}
+>>> +
+>>> +	err = -EINVAL;
+>>> +	id = dax_read_lock();
+>>> +	if (dax_direct_access(ns->dax_dev, pgoff, ns->pages_total,
+>>> +			      &ns->kaddr, &ns->start_pfn) <= 0) {
+>>> +		pr_info("dax_direct_access error\n");
+>>> +		dax_read_unlock(id);
+>>> +		goto free_ns;
+>>> +	}
+>>> +	dax_read_unlock(id);
+>>> +
+>>> +	ns->sb = ns->kaddr + BCH_NVM_PAGES_SB_OFFSET;
+>>> +
+>> You already read the superblock in read_nvdimm_meta_super(), right?
+>> Wouldn't it be better to first do the 'dax_direct_access()' call, and
+>> then check the superblock?
+>> That way you'll ensure that dax_direct_access()' did the right thing;
+>> with the current code you are using two different methods of accessing
+>> the superblock, which theoretically can result in one method succeeding,
+>> the other not ...
+> 
+> We have to do it. Because the mapping size of dax_direct_access() is
+> from ns->pages_total, it is stored on NVDIMM. Before calling
+> dax_direct_acess()
+> we need to make sure ns is an valid super block stored on NVDIMM, then
+> we can
+> trust value of ns->pages_total to do the DAX mapping.
+> 
+> Another method is firstly mapping a small fixed range (e.g. 1GB), and
+> check whether the super block on NVDIMM is valid. If yes, re-map the
+> whole space indicated by ns->pages_total. But the two-times accessing cannot
+> be avoided.
+> 
+Oh, indeed, you are correct. Disregard my comments here.
 
-No need to test for this, right?
+>>> +	err = -EINVAL;
+>>> +	/* Check magic again to make sure DAX mapping is correct */
+>>> +	if (memcmp(ns->sb->magic, bch_nvm_pages_magic, 16)) {
+>>> +		pr_info("invalid bch_nvm_pages_magic after DAX mapping\n");
+>>> +		goto free_ns;
+>>> +	}
+>>> +
+>>> +	err = attach_nvm_set(ns);
+>>> +	if (err < 0)
+>>> +		goto free_ns;
+>>> +
+>>> +	ns->page_size = ns->sb->page_size;
+>>> +	ns->pages_offset = ns->sb->pages_offset;
+>>> +	ns->pages_total = ns->sb->pages_total;
+>>> +	ns->free = 0;
+>>> +	ns->bdev = bdev;
+>>> +	ns->nvm_set = only_set;
+>>> +	mutex_init(&ns->lock);
+>>> +
+>>> +	if (ns->sb->this_namespace_nr == 0) {
+>>> +		pr_info("only first namespace contain owner info\n");
+>>> +		err = init_owner_info(ns);
+>>> +		if (err < 0) {
+>>> +			pr_info("init_owner_info met error %d\n", err);
+>>> +			only_set->nss[ns->sb->this_namespace_nr] = NULL;
+>>> +			goto free_ns;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	kfree(path);
+>>> +	return ns;
+>>> +free_ns:
+>>> +	kfree(ns);
+>>> +bdput:
+>>> +	blkdev_put(bdev, FMODE_READ|FMODE_WRITE|FMODE_EXEC);
+>>> +	kfree(path);
+>>> +	return ERR_PTR(err);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(bch_register_namespace);
+>>> +
+>>> +int __init bch_nvm_init(void)
+>>> +{
+>>> +	only_set = kzalloc(sizeof(*only_set), GFP_KERNEL);
+>>> +	if (!only_set)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	only_set->total_namespaces_nr = 0;
+>>> +	only_set->owner_list_head = NULL;
+>>> +	only_set->nss = NULL;
+>>> +
+>>> +	mutex_init(&only_set->lock);
+>>> +
+>>> +	pr_info("bcache nvm init\n");
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +void bch_nvm_exit(void)
+>>> +{
+>>> +	release_nvm_set(only_set);
+>>> +	pr_info("bcache nvm exit\n");
+>>> +}
+>>> +
+>>> +#endif /* CONFIG_BCACHE_NVM_PAGES */
+>>> diff --git a/drivers/md/bcache/nvm-pages.h b/drivers/md/bcache/nvm-pages.h
+>>> new file mode 100644
+>>> index 000000000000..3e24c4dee7fd
+>>> --- /dev/null
+>>> +++ b/drivers/md/bcache/nvm-pages.h
+>>> @@ -0,0 +1,74 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>> +
+>>> +#ifndef _BCACHE_NVM_PAGES_H
+>>> +#define _BCACHE_NVM_PAGES_H
+>>> +
+>>> +#if defined(CONFIG_BCACHE_NVM_PAGES)
+>>> +#include <linux/bcache-nvm.h>
+>>> +#endif /* CONFIG_BCACHE_NVM_PAGES */
+>>> +
+>> Hmm? What is that doing here?
+>> Please move it into the source file.
+> 
+> This is temporary before the whole NVDIMM support for bcache is completed.
+> 
+> drivers/md/bcache/nvm-pages.h has to be included because there are still
+> stub
+> routines in this header. Such stub routines like,
+> 
+> +static inline struct bch_nvm_namespace *bch_register_namespace(const char *dev_path)
+> +{
+> +	return NULL;
+> +}
+> 
+> will be removed after the whole code completed and merged. So currently we have to
+> do this to make sure the NVDIMM related code won't be leaked out if such experimental
+> configure is not enabled.
+> 
+> 
+> Thanks for your review. The addressed issue will be fixed and updated in next post.
+> 
+Cheers,
 
-> +		bus = bus_get(dev->bus);
-> +		if (!bus)
-> +			goto out;
-
-How can this happen?
-
-> +	}
-> +
-> +	dev_attr = to_dev_attr(attr);
-
-Why did you move this call to way down here?  It's fine in the first
-line of the function above as-is.
-
->  	if (dev_attr->show)
->  		ret = dev_attr->show(dev, dev_attr, buf);
->  	if (ret >= (ssize_t)PAGE_SIZE) {
->  		printk("dev_attr_show: %pS returned bad count\n",
->  				dev_attr->show);
->  	}
-> +
-> +	bus_put(bus);
-
-You are incrementing the bus, which is nice, but I do not understand why
-it is needed.  What is causing the bus to go away _before_ the devices
-are going away?  Busses almost never are removed from the system, and if
-they are, all devices associated with them are removed first.  So I do
-not think you need to increment anything with that here.
-
-But step back, what prevented the kobject from decrementing between the
-call to dev_attr_show() and the first line of the function?
-
-The kobject needs to be incremented before show is called, right?  Or
-does kernfs handle this properly already?  I don't have the time at the
-moment to dig into this, but maybe this isn't an issue?  Look at how
-sysfs handles the kobject lookups for kernfs nodes to see if all is sane
-there, maybe there isn't an issue?
-
-thanks,
-
-greg k-h
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
