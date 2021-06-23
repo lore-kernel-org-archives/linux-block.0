@@ -2,209 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D784EC48BC2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 09:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2949EC4743C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 09:36:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0F5660724
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 09:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A0296113B
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 09:36:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbhFWJhH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 05:37:07 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:53420 "EHLO
+        id S230064AbhFWJi7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 05:38:59 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:53720 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230053AbhFWJhH (ORCPT
+        with ESMTP id S230052AbhFWJi6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 05:37:07 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 184201FD36;
-        Wed, 23 Jun 2021 09:34:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1624440889; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aDB1VzxYNeOQVS/1gju0LRGDKZBzWjfV0Mikq78NpCA=;
-        b=omz3WDuHza3+QZFKptDCZV0iPM6+dJtEudid3y9bHyMvbgxxNApQNAY2T7GoHeg1ELt/ln
-        GU3zaxUpSFy6iSlUh82axxocActf4iRJR6tuzG7PKezsKAsGde7DSwOVNQOWELFlxouTLT
-        h68CYXaMMMBfjrS1R3v/EyX3oFgHNkc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1624440889;
+        Wed, 23 Jun 2021 05:38:58 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id E4E4B1FD36;
+        Wed, 23 Jun 2021 09:36:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1624441000; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=B3yGronjW0nUO0aLALGsc0prv7Le7k4F1EVYjzK66pY=;
+        b=p5foeXCvzWTTNBFuGNJQmWDTsHsNx2DHy/Ue561cXlL5IPuMjDFTzlWN1j7fFjg2GZwtWq
+        hxDfB0d+lqMm6r2ZLSJxbWHEbkLJlx/5D1iiDf/uzxFIj6Hk84gTT0+R1gHP9ty/OoAxbB
+        0hrNov62aLtrMz0S0dQf9j342I/YTyg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1624441000;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aDB1VzxYNeOQVS/1gju0LRGDKZBzWjfV0Mikq78NpCA=;
-        b=din9qPqR5/pSJSRuurJr2e3Io2lKw75DWhZEwDLV0uDkmdtVBtrultcjuiUArH+jVhZ428
-        42Cstx1XuZC1l0Dw==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id A0CD311A97;
-        Wed, 23 Jun 2021 09:34:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1624440889; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aDB1VzxYNeOQVS/1gju0LRGDKZBzWjfV0Mikq78NpCA=;
-        b=omz3WDuHza3+QZFKptDCZV0iPM6+dJtEudid3y9bHyMvbgxxNApQNAY2T7GoHeg1ELt/ln
-        GU3zaxUpSFy6iSlUh82axxocActf4iRJR6tuzG7PKezsKAsGde7DSwOVNQOWELFlxouTLT
-        h68CYXaMMMBfjrS1R3v/EyX3oFgHNkc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1624440889;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aDB1VzxYNeOQVS/1gju0LRGDKZBzWjfV0Mikq78NpCA=;
-        b=din9qPqR5/pSJSRuurJr2e3Io2lKw75DWhZEwDLV0uDkmdtVBtrultcjuiUArH+jVhZ428
-        42Cstx1XuZC1l0Dw==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id tTAQHTcA02AlQgAALh3uQQ
-        (envelope-from <colyli@suse.de>); Wed, 23 Jun 2021 09:34:47 +0000
-Subject: Re: [PATCH 04/14] bcache: initialize the nvm pages allocator
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     linux-bcache@vger.kernel.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, Jianpeng Ma <jianpeng.ma@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Qiaowei Ren <qiaowei.ren@intel.com>
-References: <20210615054921.101421-1-colyli@suse.de>
- <20210615054921.101421-5-colyli@suse.de>
- <39c118e3-ddc9-f417-a929-fc21e761a4ac@suse.de>
- <fc5b8586-0181-da7b-ba1f-73f7b00b8d16@suse.de>
- <48cab671-d4d6-d5f2-29bf-b2f19e04e533@suse.de>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <5d418422-641d-0d76-3eb3-570e3706b88c@suse.de>
-Date:   Wed, 23 Jun 2021 17:34:45 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=B3yGronjW0nUO0aLALGsc0prv7Le7k4F1EVYjzK66pY=;
+        b=4aF1j7zSB6G910DyACIV5c3x2/J9AiZSMcnu5wPbjBwMm6xunTBkvC7bSgqzQ65ISoCWO+
+        blN8WTDZzGTOygAw==
+Received: from quack2.suse.cz (unknown [10.100.224.230])
+        by relay2.suse.de (Postfix) with ESMTP id 87AD8A3B81;
+        Wed, 23 Jun 2021 09:36:40 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id C9B351E14B4; Wed, 23 Jun 2021 11:36:38 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 0/2 v4] block: Fix deadlock when merging requests with BFQ
+Date:   Wed, 23 Jun 2021 11:36:32 +0200
+Message-Id: <20210623093634.27879-1-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <48cab671-d4d6-d5f2-29bf-b2f19e04e533@suse.de>
-Content-Type: text/plain; charset=utf-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=676; h=from:subject; bh=rOwuffjf5h0SlNV+SFdGKT8xWFlDcIoa04XVgjw8qLQ=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBg0wCXz4NBg3y3hQ5iQ/EcRIIVHvwuZ4R9Y5UCQzia 3aHvdx6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYNMAlwAKCRCcnaoHP2RA2ZquCA CT/HB16tbNjIN6CqK1FNkvimoPZbOFfliTB6+i6QJZIv+A3xV2JuujVD9jHtUn4SAeTMOWoi9zXYFs UDgMxJvqc+aiDgr3MEWJ9Cw9mJmizmxP7LnT4XYg90o3RYzrcUGhPocB52XqmMmc0k552CJg0CQQwe H/hRsSzEAOJI6KdLr/lmAoRCKJty3rXfzDgZWBgtlcN5K1e7ywuoahcsgaLVRddRJ7bNSsBOzMXPX3 v8rACTSj1+N8eS2+apK3+i5itr8RzJFs96iL4a83ryFtENA9dZdn7oSo6kma0j0nA0Uai80ofVnQCe gUaqLhxaK3QSKz5Jj4l1I17V/nzRJ1
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/23/21 5:16 PM, Hannes Reinecke wrote:
-> On 6/23/21 7:26 AM, Coly Li wrote:
->> On 6/22/21 6:39 PM, Hannes Reinecke wrote:
->>> On 6/15/21 7:49 AM, Coly Li wrote:
->>>> From: Jianpeng Ma <jianpeng.ma@intel.com>
->>>>
->>>> This patch define the prototype data structures in memory and
->>>> initializes the nvm pages allocator.
->>>>
->>>> The nvm address space which is managed by this allocator can
->>>> consist of
->>>> many nvm namespaces, and some namespaces can compose into one nvm set,
->>>> like cache set. For this initial implementation, only one set can be
->>>> supported.
->>>>
->>>> The users of this nvm pages allocator need to call
->>>> register_namespace()
->>>> to register the nvdimm device (like /dev/pmemX) into this allocator as
->>>> the instance of struct nvm_namespace.
->>>>
->>>> Reported-by: Randy Dunlap <rdunlap@infradead.org>
->>>> Signed-off-by: Jianpeng Ma <jianpeng.ma@intel.com>
->>>> Co-developed-by: Qiaowei Ren <qiaowei.ren@intel.com>
->>>> Signed-off-by: Qiaowei Ren <qiaowei.ren@intel.com>
->>>> Signed-off-by: Coly Li <colyli@suse.de>
->>>> ---
->>>>   drivers/md/bcache/Kconfig     |  10 ++
->>>>   drivers/md/bcache/Makefile    |   1 +
->>>>   drivers/md/bcache/nvm-pages.c | 295
->>>> ++++++++++++++++++++++++++++++++++
->>>>   drivers/md/bcache/nvm-pages.h |  74 +++++++++
->>>>   drivers/md/bcache/super.c     |   3 +
->>>>   5 files changed, 383 insertions(+)
->>>>   create mode 100644 drivers/md/bcache/nvm-pages.c
->>>>   create mode 100644 drivers/md/bcache/nvm-pages.h
->>>>
->>>> diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
->>>> index d1ca4d059c20..a69f6c0e0507 100644
->>>> --- a/drivers/md/bcache/Kconfig
->>>> +++ b/drivers/md/bcache/Kconfig
->>>> @@ -35,3 +35,13 @@ config BCACHE_ASYNC_REGISTRATION
->>>>       device path into this file will returns immediately and the real
->>>>       registration work is handled in kernel work queue in
->>>> asynchronous
->>>>       way.
->>>> +
->>>> +config BCACHE_NVM_PAGES
->>>> +    bool "NVDIMM support for bcache (EXPERIMENTAL)"
->>>> +    depends on BCACHE
->>>> +    depends on 64BIT
->>>> +    depends on LIBNVDIMM
->>>> +    depends on DAX
->>>> +    help
->>>> +      Allocate/release NV-memory pages for bcache and provide
->>>> allocated pages
->>>> +      for each requestor after system reboot.
->>>> diff --git a/drivers/md/bcache/Makefile b/drivers/md/bcache/Makefile
->>>> index 5b87e59676b8..2397bb7c7ffd 100644
->>>> --- a/drivers/md/bcache/Makefile
->>>> +++ b/drivers/md/bcache/Makefile
->>>> @@ -5,3 +5,4 @@ obj-$(CONFIG_BCACHE)    += bcache.o
->>>>   bcache-y        := alloc.o bset.o btree.o closure.o debug.o
->>>> extents.o\
->>>>       io.o journal.o movinggc.o request.o stats.o super.o sysfs.o
->>>> trace.o\
->>>>       util.o writeback.o features.o
->>>> +bcache-$(CONFIG_BCACHE_NVM_PAGES) += nvm-pages.o
->>>> diff --git a/drivers/md/bcache/nvm-pages.c
->>>> b/drivers/md/bcache/nvm-pages.c
->>>> new file mode 100644
->>>> index 000000000000..18fdadbc502f
->>>> --- /dev/null
->>>> +++ b/drivers/md/bcache/nvm-pages.c
->>>> @@ -0,0 +1,295 @@
->>>> +// SPDX-License-Identifier: GPL-2.0-only
->>>> +/*
->>>> + * Nvdimm page-buddy allocator
->>>> + *
->>>> + * Copyright (c) 2021, Intel Corporation.
->>>> + * Copyright (c) 2021, Qiaowei Ren <qiaowei.ren@intel.com>.
->>>> + * Copyright (c) 2021, Jianpeng Ma <jianpeng.ma@intel.com>.
->>>> + */
->>>> +
->>>> +#if defined(CONFIG_BCACHE_NVM_PAGES)
->>>> +
->>> No need for this 'if' statement as it'll be excluded by the Makefile
->>> anyway if the config option isn't set.
->>
->> Such if is necessary because stub routines are defined when
->> CONFIG_BCACHE_NVM_PAGES is not defined, e.g.
->>
->> 426 +#else
->> 427 +
->> 428 +static inline struct bch_nvm_namespace
->> *bch_register_namespace(const char *dev_path)
->> 429 +{
->> 430 +       return NULL;
->> 431 +}
->> 432 +static inline int bch_nvm_init(void)
->> 433 +{
->> 434 +       return 0;
->> 435 +}
->> 436 +static inline void bch_nvm_exit(void) { }
->> 437 +
->> 438 +#endif /* CONFIG_BCACHE_NVM_PAGES */
->>
-> But then these stubs should be defined in the header file, not here.
->
-> [ .. ]
+Hello,
 
-Copied, it will be improved in next post. Thanks for your review and
-comment.
+This patch series fixes a lockdep complaint and a possible deadlock that
+can happen when blk_mq_sched_try_insert_merge() merges and frees a request.
+Jens, can you please merge the series? It seems to have slipped through last
+time when I posted it. Thanks!
 
-Coly Li
+Changes since v3:
+* Rebased on top of for-next branch in axboe/linux-block.git
 
+Changes since v2:
+* Added reviewed-by tags
+
+Changes since v1:
+* Remove patch disabling recursing request merging during request insertion
+* Modified BFQ to cleanup merged request already in its .merge_requests handler
+* Added code to handle multiple requests that need freeing after being merged
+
+								Honza
