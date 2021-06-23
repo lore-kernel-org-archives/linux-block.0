@@ -2,146 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B38F7C4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B92FFC48BE5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 13:11:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9404361076
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:46:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9761D6108E
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 13:11:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230263AbhFWMtJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 08:49:09 -0400
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:46054 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbhFWMtJ (ORCPT
+        id S230274AbhFWNNQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 09:13:16 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:48892 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230019AbhFWNNP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 08:49:09 -0400
-Received: by mail-wr1-f44.google.com with SMTP id j2so2480783wrs.12;
-        Wed, 23 Jun 2021 05:46:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version;
-        bh=XOmIPJRzFakO/w4XtkertpgFPMyFgjY86X1TO7dNDw0=;
-        b=pL3LHzVCpLmFfrrj3Aeqvm/N6M24GFlC/mHho83Fpto3pl4/CYKNK4wrRWgRnM/UFF
-         oQCuEv6rhoNlI9kuONdfEo/UEL0wt6KEBvfskhufBm6m1fZitL/eSgU/KhpMNphbW5Ra
-         sehYr/MeyortaeQytuKrW6a45jvNC5zhTS8WebQ0Ix/oilXWsDrhgx4BKBMI4KdM7tNj
-         gwhtf31ab6Jm5jaPMOkNzRgqkhXHxQ0xrE7vQA6Q3WzMJN5nMZqCL5hRnLdZ9EQspzsg
-         k4vBrmLY5GyFMfDD58ToVxz/7HJRhOLYUcDCCPi5DZyqRQdDSLgA3nxQVhNU5RYS6rd3
-         ZsVQ==
-X-Gm-Message-State: AOAM530LN1Y6OIji1K3bi3LBIfRyZEEkdy6oPC/Uie7UF2nTozJ1SKKP
-        /7kl7bgATUcOy27tUpWYSzU=
-X-Google-Smtp-Source: ABdhPJxx8aaV8qjN7hGJFoqGJB5GJgItepkdKJ0B8XDDzEJkL3WD1H4tDQdxmiclFkDQtwxCuXg02g==
-X-Received: by 2002:a05:6000:8b:: with SMTP id m11mr11075087wrx.22.1624452410585;
-        Wed, 23 Jun 2021 05:46:50 -0700 (PDT)
-Received: from localhost ([137.220.125.106])
-        by smtp.gmail.com with ESMTPSA id x1sm2971082wrv.49.2021.06.23.05.46.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jun 2021 05:46:49 -0700 (PDT)
-Message-ID: <aa0ed29d1d15d06fc125bee1af0c40425bd5c6f4.camel@debian.org>
-Subject: Re: [PATCH v3 0/6] block: add a sequence number to disks
-From:   Luca Boccassi <bluca@debian.org>
-To:     Hannes Reinecke <hare@suse.de>,
-        Matteo Croce <mcroce@linux.microsoft.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org,
+        Wed, 23 Jun 2021 09:13:15 -0400
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+        by linux.microsoft.com (Postfix) with ESMTPSA id B430320B6AEE;
+        Wed, 23 Jun 2021 06:10:57 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B430320B6AEE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1624453857;
+        bh=X0fsfcHKZT74HvXRviTlryAaKv2AtX1mjJYmSzENvUc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=MiT/3muhlL9+IGywtJkQ2n5Qc/WNSVUoWcjCorFidH/MWy3QWmvIl23/J4G5/Xksj
+         /J6YvXcn5iJzTLaA04sU7h5hGWF2UPoHhSwdHUudQCH5yjI8O3ynqw97vBxgo3RxG7
+         fi+6Y1zPqIcY3IJ5ty7ftNtltnFmaHrCpv7ZF458=
+Received: by mail-pf1-f176.google.com with SMTP id i6so2303935pfq.1;
+        Wed, 23 Jun 2021 06:10:57 -0700 (PDT)
+X-Gm-Message-State: AOAM531ZeHqYFzy9hVmntGjs32cow6pvKpMsFm8nRgJiZG6hTNZ/hp1i
+        DQjMc0wsBKIjjzPAQQlIV5w/GUXRVoeYGGCQBZM=
+X-Google-Smtp-Source: ABdhPJyJo3O9WtPdcoiaPiQCJ9HGOrBerIX/T5tIZdcD7UilkOswt+R/OQZdZqOaDYgDVaHliptWFpGGtVhfdlw62G4=
+X-Received: by 2002:a05:6a00:17a5:b029:305:d4e8:7391 with SMTP id
+ s37-20020a056a0017a5b0290305d4e87391mr6751150pfg.0.1624453857011; Wed, 23 Jun
+ 2021 06:10:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
+ <20210623105858.6978-2-mcroce@linux.microsoft.com> <YNMffBWvs/Fz2ptK@infradead.org>
+In-Reply-To: <YNMffBWvs/Fz2ptK@infradead.org>
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+Date:   Wed, 23 Jun 2021 15:10:21 +0200
+X-Gmail-Original-Message-ID: <CAFnufp1gdag0rGQ8K4_2oB6_aC+EZgfgwd2eL4-AxpG0mK+_qQ@mail.gmail.com>
+Message-ID: <CAFnufp1gdag0rGQ8K4_2oB6_aC+EZgfgwd2eL4-AxpG0mK+_qQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/6] block: add disk sequence number
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Tejun Heo <tj@kernel.org>,
-        Javier =?ISO-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
+        "Javier Gonz??lez" <javier@javigon.com>,
         Niklas Cassel <niklas.cassel@wdc.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
         Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
         JeffleXu <jefflexu@linux.alibaba.com>
-Date:   Wed, 23 Jun 2021 13:46:48 +0100
-In-Reply-To: <bfdd6f56-ce2b-ef74-27b1-83b922e5f7d9@suse.de>
-References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
-         <bfdd6f56-ce2b-ef74-27b1-83b922e5f7d9@suse.de>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-siui0wSAomKlfQSo0RJc"
-User-Agent: Evolution 3.30.5-1.2 
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jun 23, 2021 at 1:49 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Wed, Jun 23, 2021 at 12:58:53PM +0200, Matteo Croce wrote:
+> > +void inc_diskseq(struct gendisk *disk)
+> > +{
+> > +     static atomic64_t diskseq;
+>
+> Please don't hide file scope variables in functions.
+>
 
---=-siui0wSAomKlfQSo0RJc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I just didn't want to clobber that file namespace, as that is the only
+point where it's used.
 
-On Wed, 2021-06-23 at 14:03 +0200, Hannes Reinecke wrote:
-> On 6/23/21 12:58 PM, Matteo Croce wrote:
-> > From: Matteo Croce <mcroce@microsoft.com>
-> >=20
-> > With this series a monotonically increasing number is added to disks,
-> > precisely in the genhd struct, and it's exported in sysfs and uevent.
-> >=20
-> > This helps the userspace correlate events for devices that reuse the
-> > same device, like loop.
-> >=20
-> I'm failing to see the point here.
-> Apparently you are assuming that there is a userspace tool tracking=20
-> events, and has a need to correlate events related to different=20
-> instances of the disk.
-> But if you have an userspace application tracking events, why can't the=
-=20
-> same application track the 'add' and 'remove' events to track the=20
-> lifetime of the devices, and implement its own numbering based on that?
->=20
-> Why do we need to burden the kernel with this?
->=20
-> Cheers,
->=20
-> Hannes
+> Can you explain a little more why we need a global sequence count vs
+> a per-disk one here?
 
-Hi,
+The point of the whole series is to have an unique sequence number for
+all the disks.
+Events can arrive to the userspace delayed or out-of-order, so this
+helps to correlate events to the disk.
+It might seem strange, but there isn't a way to do this yet, so I come
+up with a global, monotonically incrementing number.
 
-It is not an assumption, such tool does exist, and manually tracking
-does not work because of the impossibility of reliably correlating
-events to devices (we've tried, again and again and again), which is
-the purpose of this series - to solve this long standing issue, which
-has been causing problems both in testing and production for a long
-time now, despite our best efforts to add workaround after workaround.
-
-For more info please see the discussion on the v1:
-
-https://lore.kernel.org/linux-fsdevel/20210315201331.GA2577561@casper.infra=
-dead.org/t/#m5b03e48013de14b4a080c90afdc4a8b8c94c30d4
-
-and the bug linked in the cover letter:
-
-https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
-
---=20
-Kind regards,
-Luca Boccassi
-
---=-siui0wSAomKlfQSo0RJc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCSqx93EIPGOymuRKGv37813JB4FAmDTLTgACgkQKGv37813
-JB6A6Q//Z3SDBBRi6Ukl05ygOgOcNyIVCHNpxCzx+wViA4Q7RUCXnc7Q+oQwaib4
-sz7IGa0rauYCgdr1y1PF5VAqqqxZpB7iWt+qDekOY5E0q+GQfjAuKJclS/C1J4JT
-pXhvELaWFISS+OhS1HhETcEzxXBQ9htOUjKMeilFKPetv5NPZTbvITK5vtIu+Toh
-+wT1OW0WU2OE1oIALmTgouqHyrhPjgVPS1oL32E7yYmsuTbbN4GrJP57NkLKx5xZ
-oF718/1sgwXeGMuk53GQ1ntjGfze4E4eBPJxuVXsJpSLOSiW0gSAK65ZcGP03C4G
-m6bcMWFxLCSlWpZ+diGgJgJuygvglv0sU2WVY+S0gifrZXSwm/Op8N38XorZFQ/L
-5dYO+DkbyhSul1rPfG2W7OW7YYze/Xg+Gl1qqoy/vcc4Zfl0uJyxRuPHtsXd0AQs
-kpu4jtuY5BUmoM+SoULx9Bm+DpvgNbgR6kOLHBWrBvt87rppJlReFhBS0jTG85H4
-uwl8EzLCNePGRij/UzmLjTdblJSxiOlpws55A1GgGELp2sjMlyXmo5TkS97F7I70
-mK/LjFaiK3mSoE9Yl6xoj2b4PSf67PNDxCl7DGsLGkXk13NePGLcfynO8LkXUZwH
-Eas6LnpxQeuovYdmxx0ZHYJ3LoLPGwAWRdprWvcPu87hOTIs+Do=
-=z3th
------END PGP SIGNATURE-----
-
---=-siui0wSAomKlfQSo0RJc--
+-- 
+per aspera ad upstream
