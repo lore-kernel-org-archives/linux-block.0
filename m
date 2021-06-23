@@ -2,118 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96383C4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 08:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E88D4C4743C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 08:32:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F72F610F7
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 08:26:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D247D61164
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 08:32:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbhFWI24 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 04:28:56 -0400
-Received: from mailgw.kylinos.cn ([123.150.8.42]:45194 "EHLO nksmu.kylinos.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229833AbhFWI2z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 04:28:55 -0400
-X-UUID: d701f4f7734d446a8f711030b3de84c8-20210623
-X-UUID: d701f4f7734d446a8f711030b3de84c8-20210623
-X-User: jiangguoqing@kylinos.cn
-Received: from [172.30.60.82] [(106.37.198.34)] by nksmu.kylinos.cn
-        (envelope-from <jiangguoqing@kylinos.cn>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES128-GCM-SHA256 128/128)
-        with ESMTP id 1084115594; Wed, 23 Jun 2021 16:25:51 +0800
-Subject: Re: [PATCH v2 03/10] raid-md: reduce stack footprint dealing with
- block device names
-To:     Anton Suvorov <warwish@yandex-team.ru>, willy@infradead.org
-Cc:     dmtrmonakhov@yandex-team.ru, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        viro@zeniv.linux.org.uk
-References: <YLe9eDbG2c/rVjyu@casper.infradead.org>
- <20210622174424.136960-1-warwish@yandex-team.ru>
- <20210622174424.136960-4-warwish@yandex-team.ru>
-From:   Guoqing Jiang <jiangguoqing@kylinos.cn>
-Message-ID: <803a31fb-7b51-d160-5b3e-7736c0aa6d2d@kylinos.cn>
-Date:   Wed, 23 Jun 2021 16:26:30 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S229940AbhFWIfN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 04:35:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53034 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229918AbhFWIfN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Jun 2021 04:35:13 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B49D66112D;
+        Wed, 23 Jun 2021 08:32:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1624437176;
+        bh=4sn8WqZijDYpxiuDqKDq6MKI/sEkghiCWQfDl6JYqrI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GbYqSZtbYinAzslu+VRVH6zxki0aFVWoiHzllbc0M/T5rj5FBJJwo4cwwuw31ddhB
+         ezL78WptrfOLgk709+WWNTYjqNE7coKUgQERdF7TbU4P3adVvYqLFBbEJ59bipEXAx
+         qLS8ionKOOjyQNxaj3M5XwAYUSWK+lkkBGJqcaxU=
+Date:   Wed, 23 Jun 2021 10:32:53 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     rafael@kernel.org, jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] drivers/base/core: refcount kobject and bus on device
+ attribute read / store
+Message-ID: <YNLxtbzOm3/whYHc@kroah.com>
+References: <20210623003630.274804-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210622174424.136960-4-warwish@yandex-team.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210623003630.274804-1-mcgrof@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-Maybe replace "raid-md" with "md/raid" or just "md".
-
-On 6/23/21 1:44 AM, Anton Suvorov wrote:
-> Stack usage reduced (measured with allyesconfig):
->
-> ./drivers/md/md-linear.c	linear_make_request	248	112	-136
-> ./drivers/md/md-multipath.c	multipath_end_request	232	96	-136
-> ./drivers/md/md-multipath.c	multipath_error	208	72	-136
-> ./drivers/md/md-multipath.c	multipathd	248	112	-136
-> ./drivers/md/md-multipath.c	print_multipath_conf	208	64	-144
-> ./drivers/md/md.c	autorun_devices	312	184	-128
-> ./drivers/md/md.c	export_rdev	168	32	-136
-> ./drivers/md/md.c	md_add_new_disk	280	80	-200
-> ./drivers/md/md.c	md_import_device	200	56	-144
-> ./drivers/md/md.c	md_integrity_add_rdev	192	56	-136
-> ./drivers/md/md.c	md_ioctl	560	496	-64
-> ./drivers/md/md.c	md_reload_sb	224	88	-136
-> ./drivers/md/md.c	md_run	408	288	-120
-> ./drivers/md/md.c	md_seq_show	232	96	-136
-> ./drivers/md/md.c	md_update_sb	304	168	-136
-> ./drivers/md/md.c	read_disk_sb	184	48	-136
-> ./drivers/md/md.c	super_1_load	392	192	-200
-> ./drivers/md/md.c	super_90_load	304	112	-192
-> ./drivers/md/md.c	unbind_rdev_from_array	200	64	-136
-> ./drivers/md/raid0.c	create_strip_zones	400	200	-200
-> ./drivers/md/raid0.c	dump_zones	536	464	-72
-> ./drivers/md/raid1.c	fix_read_error	352	288	-64
-> ./drivers/md/raid1.c	print_conf	224	80	-144
-> ./drivers/md/raid1.c	raid1_end_read_request	216	80	-136
-> ./drivers/md/raid1.c	raid1_error	216	96	-120
-> ./drivers/md/raid1.c	sync_request_write	344	208	-136
-> ./drivers/md/raid10.c	fix_read_error	392	320	-72
-> ./drivers/md/raid10.c	print_conf	216	72	-144
-> ./drivers/md/raid10.c	raid10_end_read_request	216	80	-136
-> ./drivers/md/raid10.c	raid10_error	216	80	-136
-> ./drivers/md/raid5-cache.c	r5l_init_log	224	88	-136
-> ./drivers/md/raid5-ppl.c	ppl_do_flush	256	136	-120
-> ./drivers/md/raid5-ppl.c	ppl_flush_endio	192	56	-136
-> ./drivers/md/raid5-ppl.c	ppl_modify_log	192	56	-136
-> ./drivers/md/raid5-ppl.c	ppl_recover_entry	1296	1232	-64
-> ./drivers/md/raid5-ppl.c	ppl_submit_iounit_bio	192	56	-136
-> ./drivers/md/raid5-ppl.c	ppl_validate_rdev	184	48	-136
-> ./drivers/md/raid5.c	print_raid5_conf	208	64	-144
-> ./drivers/md/raid5.c	raid5_end_read_request	272	128	-144
-> ./drivers/md/raid5.c	raid5_error	216	80	-136
-> ./drivers/md/raid5.c	setup_conf	360	296	-64
->
-> Signed-off-by: Anton Suvorov <warwish@yandex-team.ru>
+On Tue, Jun 22, 2021 at 05:36:30PM -0700, Luis Chamberlain wrote:
+> It's possible today to have a device attribute read or store
+> race against device removal. When this happens there is a small
+> chance that the dereference for the private data area of the driver
+> is NULL.
+> 
+> Let's consider the zram driver as an example. Its possible to run into
+> a race where a sysfs knob is being used, we get preempted, and a zram
+> device is removed before we complete use of the sysfs knob. This can happen
+> for instance on block devices, where for instance the zram block devices
+> just part of the private data of the block device.
+> 
+> For instance this can happen in the following two situations
+> as examples to illustrate this better:
+> 
+>         CPU 1                            CPU 2
+> destroy_devices
+> ...
+>                                  compact_store()
+>                                  zram = dev_to_zram(dev);
+> idr_for_each(zram_remove_cb
+>   zram_remove
+>   ...
+>   kfree(zram)
+>                                  down_read(&zram->init_lock);
+> 
+>         CPU 1                            CPU 2
+> hot_remove_store
+>                                  compact_store()
+>                                  zram = dev_to_zram(dev);
+>   zram_remove
+>     kfree(zram)
+>                                  down_read(&zram->init_lock);
+> 
+> To ensure the private data pointer is valid we could use bdget() / bdput()
+> in between access, however that would mean doing that in all sysfs
+> reads/stores on the driver. Instead a generic solution for all drivers
+> is to ensure the device kobject is still valid and also the bus, if
+> a bus is present.
+> 
+> This issue does not fix a known crash, however this race was
+> spotted by Minchan Kim through code inspection upon code review
+> of another zram patch.
+> 
+> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 > ---
->   drivers/md/md-linear.c    |   5 +-
->   drivers/md/md-multipath.c |  24 +++----
->   drivers/md/md.c           | 135 ++++++++++++++------------------------
->   drivers/md/raid0.c        |  28 ++++----
->   drivers/md/raid1.c        |  25 +++----
->   drivers/md/raid10.c       |  65 ++++++++----------
->   drivers/md/raid5-cache.c  |   5 +-
->   drivers/md/raid5-ppl.c    |  40 +++++------
->   drivers/md/raid5.c        |  39 +++++------
->   9 files changed, 144 insertions(+), 222 deletions(-)
+> 
+> This v3 is the same as v2, but since the I got an email asking me to
+> clarify the differences between the first iteration and the second, this
+> v3 just describes what I did not explain in the v2. Namely:
+> 
+>   * I removed the checks from get_device() calls as suggested
+>   * The functions which are now being used outside of bus.c have
+>     forwared declarations stuffed into base.h
+> 
+>  drivers/base/base.h |  2 ++
+>  drivers/base/bus.c  |  4 ++--
+>  drivers/base/core.c | 36 ++++++++++++++++++++++++++++++++----
+>  3 files changed, 36 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/base/base.h b/drivers/base/base.h
+> index e5f9b7e656c3..3f95b125b667 100644
+> --- a/drivers/base/base.h
+> +++ b/drivers/base/base.h
+> @@ -127,6 +127,8 @@ static inline void auxiliary_bus_init(void) { }
+>  
+>  struct kobject *virtual_device_parent(struct device *dev);
+>  
+> +extern struct bus_type *bus_get(struct bus_type *bus);
+> +extern void bus_put(struct bus_type *bus);
+>  extern int bus_add_device(struct device *dev);
+>  extern void bus_probe_device(struct device *dev);
+>  extern void bus_remove_device(struct device *dev);
+> diff --git a/drivers/base/bus.c b/drivers/base/bus.c
+> index 36d0c654ea61..21c80d7d6433 100644
+> --- a/drivers/base/bus.c
+> +++ b/drivers/base/bus.c
+> @@ -39,7 +39,7 @@ static struct kset *system_kset;
+>  static int __must_check bus_rescan_devices_helper(struct device *dev,
+>  						void *data);
+>  
+> -static struct bus_type *bus_get(struct bus_type *bus)
+> +struct bus_type *bus_get(struct bus_type *bus)
+>  {
+>  	if (bus) {
+>  		kset_get(&bus->p->subsys);
+> @@ -48,7 +48,7 @@ static struct bus_type *bus_get(struct bus_type *bus)
+>  	return NULL;
+>  }
+>  
+> -static void bus_put(struct bus_type *bus)
+> +void bus_put(struct bus_type *bus)
+>  {
+>  	if (bus)
+>  		kset_put(&bus->p->subsys);
+> diff --git a/drivers/base/core.c b/drivers/base/core.c
+> index 4a8bf8cda52b..f69aa040b56d 100644
+> --- a/drivers/base/core.c
+> +++ b/drivers/base/core.c
+> @@ -2042,28 +2042,56 @@ EXPORT_SYMBOL(dev_driver_string);
+>  static ssize_t dev_attr_show(struct kobject *kobj, struct attribute *attr,
+>  			     char *buf)
+>  {
+> -	struct device_attribute *dev_attr = to_dev_attr(attr);
+> -	struct device *dev = kobj_to_dev(kobj);
+> +	struct device_attribute *dev_attr;
+> +	struct device *dev;
+> +	struct bus_type *bus = NULL;
+>  	ssize_t ret = -EIO;
+>  
+> +	dev = get_device(kobj_to_dev(kobj));
+> +	if (dev->bus) {
 
-Also a nice cleanup!  Acked-by: Guoqing Jiang <jiangguoqing@kylinos.cn>
+No need to test for this, right?
 
-Thanks,
-Guoqing
+> +		bus = bus_get(dev->bus);
+> +		if (!bus)
+> +			goto out;
 
+How can this happen?
 
+> +	}
+> +
+> +	dev_attr = to_dev_attr(attr);
+
+Why did you move this call to way down here?  It's fine in the first
+line of the function above as-is.
+
+>  	if (dev_attr->show)
+>  		ret = dev_attr->show(dev, dev_attr, buf);
+>  	if (ret >= (ssize_t)PAGE_SIZE) {
+>  		printk("dev_attr_show: %pS returned bad count\n",
+>  				dev_attr->show);
+>  	}
+> +
+> +	bus_put(bus);
+
+You are incrementing the bus, which is nice, but I do not understand why
+it is needed.  What is causing the bus to go away _before_ the devices
+are going away?  Busses almost never are removed from the system, and if
+they are, all devices associated with them are removed first.  So I do
+not think you need to increment anything with that here.
+
+But step back, what prevented the kobject from decrementing between the
+call to dev_attr_show() and the first line of the function?
+
+The kobject needs to be incremented before show is called, right?  Or
+does kernfs handle this properly already?  I don't have the time at the
+moment to dig into this, but maybe this isn't an issue?  Look at how
+sysfs handles the kobject lookups for kernfs nodes to see if all is sane
+there, maybe there isn't an issue?
+
+thanks,
+
+greg k-h
