@@ -2,83 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF53C4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 14:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F74C4743C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 14:55:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B8D960FEB
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 14:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 624AD608FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 14:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231364AbhFWOnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 10:43:53 -0400
-Received: from verein.lst.de ([213.95.11.211]:51113 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231349AbhFWOnv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 10:43:51 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 06FD867373; Wed, 23 Jun 2021 16:41:31 +0200 (CEST)
-Date:   Wed, 23 Jun 2021 16:41:30 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: loop cleanups
-Message-ID: <20210623144130.GA738@lst.de>
-References: <20210621101547.3764003-1-hch@lst.de> <48fc3b1d-37b2-3f1f-3b2d-63a5711491bd@i-love.sakura.ne.jp>
+        id S230243AbhFWO5e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 10:57:34 -0400
+Received: from gardel.0pointer.net ([85.214.157.71]:53798 "EHLO
+        gardel.0pointer.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229523AbhFWO5e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Jun 2021 10:57:34 -0400
+Received: from gardel-login.0pointer.net (gardel-mail [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
+        by gardel.0pointer.net (Postfix) with ESMTP id 2AE4FE8094B;
+        Wed, 23 Jun 2021 16:55:15 +0200 (CEST)
+Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
+        id CEA8B160DC0; Wed, 23 Jun 2021 16:55:14 +0200 (CEST)
+Date:   Wed, 23 Jun 2021 16:55:14 +0200
+From:   Lennart Poettering <mzxreary@0pointer.de>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Luca Boccassi <bluca@debian.org>,
+        Matteo Croce <mcroce@linux.microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        Javier Gonz??lez <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        JeffleXu <jefflexu@linux.alibaba.com>
+Subject: Re: [PATCH v3 1/6] block: add disk sequence number
+Message-ID: <YNNLUnGMO/gNNIJK@gardel-login>
+References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
+ <20210623105858.6978-2-mcroce@linux.microsoft.com>
+ <YNMffBWvs/Fz2ptK@infradead.org>
+ <CAFnufp1gdag0rGQ8K4_2oB6_aC+EZgfgwd2eL4-AxpG0mK+_qQ@mail.gmail.com>
+ <YNM8T44v5FTViVWM@gardel-login>
+ <3be63d9f-d8eb-7657-86dc-8d57187e5940@suse.de>
+ <1b55bc67b75e5cf982c0c1e8f45096f2eb6e8590.camel@debian.org>
+ <f84cab19-fb5c-634b-d1ca-51404907a623@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <48fc3b1d-37b2-3f1f-3b2d-63a5711491bd@i-love.sakura.ne.jp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f84cab19-fb5c-634b-d1ca-51404907a623@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 08:15:27PM +0900, Tetsuo Handa wrote:
-> On 2021/06/21 19:15, Christoph Hellwig wrote:
-> > Hi Jens,
-> > 
-> > this series contains a bunch of cleanups for the loop driver,
-> > mostly related to probing and the control device.
-> > 
-> 
-> Please fold
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index a4a5466b998f..6c10400d4d38 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2163,8 +2163,9 @@ static int loop_add(int i)
->  	disk->queue		= lo->lo_queue;
->  	sprintf(disk->disk_name, "loop%d", i);
->  	add_disk(disk);
-> +	err = lo->lo_number;
->  	mutex_unlock(&loop_ctl_mutex);
-> -	return lo->lo_number;
-> +	return err;
->  
->  out_free_queue:
->  	blk_cleanup_queue(lo->lo_queue);
-> @@ -2253,8 +2254,9 @@ static int loop_control_get_free(int idx)
->  	mutex_unlock(&loop_ctl_mutex);
->  	return loop_add(-1);
->  found:
-> +	ret = lo->lo_number;
->  	mutex_unlock(&loop_ctl_mutex);
-> -	return lo->lo_number;
-> +	return ret;
->  }
+On Mi, 23.06.21 16:21, Hannes Reinecke (hare@suse.de) wrote:
 
-Good find.  But we already have local variables holding the index
-in both functions, so we can just use those.
+> > We need this so that we can reliably correlate events to instances of a
+> > device. Events alone cannot solve this problem, because events _are_
+> > the problem.
+> >
+> In which sense?
+> Yes, events can be delayed (if you list to uevents), but if you listen to
+> kernel events there shouldn't be a delay, right?
 
-> By the way, how can we fix a regression introduced by commit 6cc8e7430801fa23
-> ("loop: scale loop device by introducing per device lock") ?
-> Conditionally holding global lock like below untested diff?
+uevents are delivered to userpace via an AF_NETLINK socket. The
+AF_NETLINK socket is basically an asynchronous buffer.
 
-It would be nice to factor the global locking into helpers, but otherwise
-this looks ok.  Maybe also rename loop_configure_mutex into
-loop_validate_mutex
+I mean, consider what you are saying: you establish the AF_NETLINK
+uevent watching socket, then you allocate /dev/loop0. Since you cannot
+do that atomically, you'll first have to do one, and then the
+other. But if you do that in two steps, then in the middle some other
+process might get scheduled that quickly allocates /dev/loop0 and
+releases it again, before your code gets to run. So now you have in
+your AF_NETLINK socket buffer the uevents for that other process' use
+of the device, and you cannot sanely distinguish them from your own.
+
+of course you could do it the other way: allocate the device first,
+and only then allocate the AF_NETLINK uevent socket. But then you
+might or might not lose the "add" event for the device you just
+allocated. And you don't know if you should wait for it or not.
+
+This isn't even a constructed issue, this is the common case if you
+have multiple processes all simultaneously trying to acquire a loopback
+block device, because they all will end up eying /dev/loop0 at the same time.
+
+But it gets worse IRL because of various factors. For example,
+partition probing is asynchronous, so if you use LO_FLAGS_PARTSCAN and
+want to watch for some partition device associated to your loopback
+block device to show up, this can take *really* long, so the race
+window is large. Or you actually use udev (like most userspace
+probably should) because you want the metainfo it collects about the
+device, in which case it will take even longer for the uevent to reach
+you, i.e. the time window where a previous user's uevents and your own
+for the same loopback device "overlap" can be quite large and you
+cannot determine if they are yours or the previous user's uevents —
+unless we have these new sequence numbers.
+
+Lennart
+
+--
+Lennart Poettering, Berlin
