@@ -2,189 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A86C48BC2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 20:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A12C48BC2
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 21:50:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F144961185
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 20:20:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFE3D613BE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 21:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbhFWUXM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 16:23:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54228 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbhFWUXM (ORCPT
+        id S229812AbhFWVwc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 17:52:32 -0400
+Received: from mail-pg1-f181.google.com ([209.85.215.181]:33687 "EHLO
+        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229800AbhFWVwc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 16:23:12 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5F91C061574;
-        Wed, 23 Jun 2021 13:20:54 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id m15so2109958qvc.9;
-        Wed, 23 Jun 2021 13:20:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=azW1zX+eO9gp+O2n94OxE29cfxyxIikc6yBHD+EhJ4A=;
-        b=gf29hBMTVf7L5OOPMDNSJYasFrvwfKfm1PZKGTqPdKNtDPaNwoRQSGcJQKgrxHeLeJ
-         p4H0WfGNvTNtfzVLzUzYtxjfKRGkyowmrZKqMR1yE2z54Zxzl9CBx52zhKRZ7dej2kzm
-         LMaRgIUHtM9R1MTmnyNKK6wZkdxouhQDyNBIwr4qFF1rbZRpwqKM+8aAA1qDSM40gKbx
-         Y2wL4LfZB/u+ofc7I6hKYF97mh87LyHqIZF1mLoU56AVPtmS8xsHAtnOW1jfmR8KGquJ
-         3UUzb1uSgKzjTYVSSU0p9GRfyLc6+Ed99vf2iOFeamhAQtUh8XiBSB+p0dzl5lB1Fbgc
-         6j+A==
+        Wed, 23 Jun 2021 17:52:32 -0400
+Received: by mail-pg1-f181.google.com with SMTP id e20so2959196pgg.0;
+        Wed, 23 Jun 2021 14:50:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=azW1zX+eO9gp+O2n94OxE29cfxyxIikc6yBHD+EhJ4A=;
-        b=fSep8zVPoUMov4fVEaYavTubI2MCRSRjpGl54TQNCCfnYr6zBc5YxspLPS/O8SpsOn
-         mkszfRjqxkESzVhnTug38jq5BVl/NedE2KdC2hBImDk1coam4Vy41KKhrTd2w2A4EUWo
-         JT1JuECOrNXDmTaAO2VhYkHpaHznGWBgH7IVAXtEaholEXsMuOLfekcV6RhgyI7aVHyU
-         AO4vEdwDK3+QrIXGPG8Qcq0+dnrLoRMdu6czUa++cdaz9SUndmqZLJXIdFzX9g9LVGdc
-         uzE00+HqvWNTmbpSVWEz2f8DnuPjnY9nGkIjaBi9st+lG4gt/fGtLRRLrK8ZxbiTjr/d
-         2/hg==
-X-Gm-Message-State: AOAM5300UA2hw4bCX+CihKwjpEhacEwzr4NHOLfsb85frLGBjLi+npki
-        EvTF0eFgATvIza9sbuAg1lM=
-X-Google-Smtp-Source: ABdhPJzKwsCpj7QvmWKxfyTmwDTTfJJiUhnXokn6nJJjvZbt1g82Lgenaw4lbAPj0tTRsol40A+dWg==
-X-Received: by 2002:a05:6214:5b1:: with SMTP id by17mr1750452qvb.7.1624479654032;
-        Wed, 23 Jun 2021 13:20:54 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id 206sm697360qke.67.2021.06.23.13.20.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jun 2021 13:20:53 -0700 (PDT)
-Sender: Mike Snitzer <snitzer@gmail.com>
-Date:   Wed, 23 Jun 2021 16:20:52 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Anton Suvorov <warwish@yandex-team.ru>
-Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dmtrmonakhov@yandex-team.ru, linux-block@vger.kernel.org,
-        viro@zeniv.linux.org.uk
-Subject: Re: [PATCH 04/10] dm: reduce stack footprint dealing with block
- device names
-Message-ID: <YNOXpHyBAD+C3Utt@redhat.com>
-References: <20210602152903.910190-1-warwish@yandex-team.ru>
- <20210602152903.910190-5-warwish@yandex-team.ru>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NcuezbW/3QXd9xoo1Wqe4V3CcqkkgQiQqDXARjEpQrQ=;
+        b=c56Ed57gWQz/r9nk52t+b9yW5Qj2IuaKDUGffsz075Iscs96rCWUOVZTBQQHPa/jK1
+         9CpIpPU+OSGfiauTMOFiXUM6LIMNnB0xnPBRVC3s96nKSSldo+rhoHf42W4rFTKv/bWX
+         gLY6tGLWHTskUn9uC9WtAfpf3Y798QgtaTqbSUoX7Mqv42yXvjvQw//PuW5BmNXzw1Sq
+         H5h1Ejt0c1amEvtf+nKRz3M8bdVt89TzS2utq+zlt4tiZgdgT/xlr0BgnfrWvoUFsgpt
+         +3GZh+B1JEvWm44KcC0KEADMwEeVYh+I/yLqE3RcUMVb/ZNcPLHCCdVcEA960BkljNsg
+         j5sA==
+X-Gm-Message-State: AOAM531xB+pXBMskZG8Y1TmAlf5I46I+09mHTygMl+Lt2gVyw7cDo9C+
+        YIUDRTm10cgqEbJH7Yg+bcI=
+X-Google-Smtp-Source: ABdhPJzDgKF3Tc86z1h/sQHaNFZ1VoEUhCcL00uHO/syYNpcu4lIF731nF/TnUYj7N75aSD6W3AmAA==
+X-Received: by 2002:a05:6a00:21c7:b029:2ec:2bfa:d0d1 with SMTP id t7-20020a056a0021c7b02902ec2bfad0d1mr1751644pfj.14.1624485014356;
+        Wed, 23 Jun 2021 14:50:14 -0700 (PDT)
+Received: from localhost ([191.96.121.71])
+        by smtp.gmail.com with ESMTPSA id 30sm461291pjz.42.2021.06.23.14.50.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Jun 2021 14:50:12 -0700 (PDT)
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     gregkh@linuxfoundation.org, rafael@kernel.org, davem@davemloft.net,
+        kuba@kernel.org, ast@kernel.org, andriin@fb.com,
+        daniel@iogearbox.net, atenart@kernel.org, alobakin@pm.me,
+        weiwan@google.com, ap420073@gmail.com
+Cc:     jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        mcgrof@kernel.org, axboe@kernel.dk, mbenes@suse.com,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v4] sysfs: fix kobject refcount to address races with kobject removal
+Date:   Wed, 23 Jun 2021 14:50:07 -0700
+Message-Id: <20210623215007.862787-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210602152903.910190-5-warwish@yandex-team.ru>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 02 2021 at 11:28P -0400,
-Anton Suvorov <warwish@yandex-team.ru> wrote:
+It's possible today to have a device attribute read or store
+race against device removal. This is known to happen as follows:
 
-> Stack usage reduced (measured with allyesconfig):
-> 
-> ./drivers/md/dm-cache-target.c	cache_ctr	392	328	-64
-> ./drivers/md/dm-cache-target.c	cache_io_hints	208	72	-136
-> ./drivers/md/dm-clone-target.c	clone_ctr	416	352	-64
-> ./drivers/md/dm-clone-target.c	clone_io_hints	216	80	-136
-> ./drivers/md/dm-crypt.c	crypt_convert_block_aead	408	272	-136
-> ./drivers/md/dm-crypt.c	kcryptd_async_done	192	56	-136
-> ./drivers/md/dm-integrity.c	integrity_metadata	872	808	-64
-> ./drivers/md/dm-mpath.c	parse_priority_group	368	304	-64
-> ./drivers/md/dm-table.c	device_area_is_invalid	216	80	-136
-> ./drivers/md/dm-table.c	dm_set_device_limits	200	72	-128
-> ./drivers/md/dm-thin.c	pool_io_hints	216	80	-136
-> 
-> Signed-off-by: Anton Suvorov <warwish@yandex-team.ru>
-> ---
->  drivers/md/dm-cache-target.c | 10 ++++------
->  drivers/md/dm-clone-target.c | 10 ++++------
->  drivers/md/dm-crypt.c        |  6 ++----
->  drivers/md/dm-integrity.c    |  4 ++--
->  drivers/md/dm-mpath.c        |  6 ++----
->  drivers/md/dm-table.c        | 34 ++++++++++++++++------------------
->  drivers/md/dm-thin.c         |  8 +++-----
->  7 files changed, 33 insertions(+), 45 deletions(-)
-> 
+write system call -->
+  ksys_write () -->
+    vfs_write() -->
+      __vfs_write() -->
+        kernfs_fop_write_iter() -->
+          sysfs_kf_write() -->
+            dev_attr_store() -->
+              null reference
 
-<snip>
+This happens because the dev_attr->store() callback can be
+removed prior to its call, after dev_attr_store() was initiated.
+The null dereference is possible because the sysfs ops can be
+removed on module removal, for instance, when device_del() is
+called, and a sysfs read / store is not doing any kobject reference
+bumps either. This allows a read/store call to initiate, a
+device_del() to kick off, and then the read/store call can be
+gone by the time to execute it.
 
-> diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-> index 20f2510db1f6..d2fec41635ff 100644
-> --- a/drivers/md/dm-integrity.c
-> +++ b/drivers/md/dm-integrity.c
-> @@ -1781,8 +1781,8 @@ static void integrity_metadata(struct work_struct *w)
->  						checksums_ptr - checksums, dio->op == REQ_OP_READ ? TAG_CMP : TAG_WRITE);
->  			if (unlikely(r)) {
->  				if (r > 0) {
-> -					char b[BDEVNAME_SIZE];
-> -					DMERR_LIMIT("%s: Checksum failed at sector 0x%llx", bio_devname(bio, b),
-> +					DMERR_LIMIT("%pg: Checksum failed at sector 0x%llx",
-> +						    bio->bi_bdev,
->  						    (sector - ((r + ic->tag_size - 1) / ic->tag_size)));
->  					r = -EILSEQ;
->  					atomic64_inc(&ic->number_of_mismatches);
-> diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-> index bced42f082b0..678e5bb0fa5a 100644
-> --- a/drivers/md/dm-mpath.c
-> +++ b/drivers/md/dm-mpath.c
-> @@ -900,10 +900,8 @@ static int setup_scsi_dh(struct block_device *bdev, struct multipath *m,
->  	if (m->hw_handler_name) {
->  		r = scsi_dh_attach(q, m->hw_handler_name);
->  		if (r == -EBUSY) {
-> -			char b[BDEVNAME_SIZE];
-> -
-> -			printk(KERN_INFO "dm-mpath: retaining handler on device %s\n",
-> -			       bdevname(bdev, b));
-> +			pr_info("dm-mpath: retaining handler on device %pg\n",
-> +				bdev);
->  			goto retain;
->  		}
->  		if (r < 0) {
+The sysfs filesystem is not doing any kobject reference bumps during a
+read / store ops to prevent this.
 
-Would appreciate it if you just left the arguments on the same line,
-for this dm-mpath.c change and the dm-integrity.c change, don't worry
-about 80 column.
+To fix this in a simplified way, just bump the kobject reference when
+we create a directory and remove it on directory removal.
 
-Also, would prefer you use DMINFO() instead of pr_info().  DMINFO()
-achieves the same but will add "device-mapper: multipath: " prefix for
-you, also you then don't need to add the newline. So use:
+The big unfortunate eye-sore is addressing the manual kobject reference
+assumption on the networking code, which leads me to believe we should
+end up replacing that eventually with another sort of check.
 
-     DMINFO("retaining handler on device %pg", bdev);
+Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
 
+This v4 moves to fixing the race condition on dev_attr_store() and
+dev_attr_read() to sysfs by bumping the kobject reference count
+on directory creation / deletion as suggested by Greg.
 
-> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> index 7e88e5e06922..175b9c7b1c48 100644
-> --- a/drivers/md/dm-table.c
-> +++ b/drivers/md/dm-table.c
-> @@ -282,20 +281,20 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
->  		return 0;
->  
->  	if (start & (logical_block_size_sectors - 1)) {
-> -		DMWARN("%s: start=%llu not aligned to h/w "
-> -		       "logical block size %u of %s",
-> +		DMWARN("%s: start=%llu not aligned to h/w logical block size %u of %pg",
->  		       dm_device_name(ti->table->md),
->  		       (unsigned long long)start,
-> -		       limits->logical_block_size, bdevname(bdev, b));
-> +		       limits->logical_block_size,
-> +		       bdev);
->  		return 1;
->  	}
->  
->  	if (len & (logical_block_size_sectors - 1)) {
-> -		DMWARN("%s: len=%llu not aligned to h/w "
-> -		       "logical block size %u of %s",
-> +		DMWARN("%s: len=%llu not aligned to h/w logical block size %u of %pg",
->  		       dm_device_name(ti->table->md),
->  		       (unsigned long long)len,
-> -		       limits->logical_block_size, bdevname(bdev, b));
-> +		       limits->logical_block_size,
-> +		       bdev);
->  		return 1;
->  	}
->  
+Unfortunately at least the networking core has a manual refcount
+assumption, which needs to be adjusted to account for this change.
+This should also mean there is runtime for other kobjects which may
+not be explored yet which may need fixing as well. We may want to
+change the check to something else on the networking front, but its
+not clear to me yet what to use.
 
-Again, please just leave 'bdev' on the previous lines.
+ fs/sysfs/dir.c | 3 +++
+ net/core/dev.c | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-If you make those few tweaks, please add:
+diff --git a/fs/sysfs/dir.c b/fs/sysfs/dir.c
+index 59dffd5ca517..6c47aa4af6f5 100644
+--- a/fs/sysfs/dir.c
++++ b/fs/sysfs/dir.c
+@@ -56,12 +56,14 @@ int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
+ 
+ 	kobject_get_ownership(kobj, &uid, &gid);
+ 
++	kobject_get(kobj);
+ 	kn = kernfs_create_dir_ns(parent, kobject_name(kobj),
+ 				  S_IRWXU | S_IRUGO | S_IXUGO, uid, gid,
+ 				  kobj, ns);
+ 	if (IS_ERR(kn)) {
+ 		if (PTR_ERR(kn) == -EEXIST)
+ 			sysfs_warn_dup(parent, kobject_name(kobj));
++		kobject_put(kobj);
+ 		return PTR_ERR(kn);
+ 	}
+ 
+@@ -100,6 +102,7 @@ void sysfs_remove_dir(struct kobject *kobj)
+ 	if (kn) {
+ 		WARN_ON_ONCE(kernfs_type(kn) != KERNFS_DIR);
+ 		kernfs_remove(kn);
++		kobject_put(kobj);
+ 	}
+ }
+ 
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 222b1d322c96..3a0ffa603d14 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10429,7 +10429,7 @@ static void netdev_wait_allrefs(struct net_device *dev)
+ 	rebroadcast_time = warning_time = jiffies;
+ 	refcnt = netdev_refcnt_read(dev);
+ 
+-	while (refcnt != 1) {
++	while (refcnt != 3) {
+ 		if (time_after(jiffies, rebroadcast_time + 1 * HZ)) {
+ 			rtnl_lock();
+ 
+@@ -10544,7 +10544,7 @@ void netdev_run_todo(void)
+ 		netdev_wait_allrefs(dev);
+ 
+ 		/* paranoia */
+-		BUG_ON(netdev_refcnt_read(dev) != 1);
++		BUG_ON(netdev_refcnt_read(dev) != 3);
+ 		BUG_ON(!list_empty(&dev->ptype_all));
+ 		BUG_ON(!list_empty(&dev->ptype_specific));
+ 		WARN_ON(rcu_access_pointer(dev->ip_ptr));
+-- 
+2.27.0
 
-Acked-by: Mike Snitzer <snitzer@redhat.com>
