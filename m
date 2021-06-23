@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 450B4C48BE5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D784C4743C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28B92608FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:01:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DF166101D
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:02:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230392AbhFWPEA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 11:04:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38834 "EHLO
+        id S230243AbhFWPEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 11:04:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbhFWPEA (ORCPT
+        with ESMTP id S229523AbhFWPEX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 11:04:00 -0400
+        Wed, 23 Jun 2021 11:04:23 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18BC5C061574
-        for <linux-block@vger.kernel.org>; Wed, 23 Jun 2021 08:01:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC72C061574
+        for <linux-block@vger.kernel.org>; Wed, 23 Jun 2021 08:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=XoP6Zb5BQuNW2F1akvMlxvEeo0gegatxAw2D0HU3vAg=; b=CjCFpFElncU+IxxVpKk51fbn7y
-        tx/ktsuxRuSSQK2Jnc2qywCPXiiJKGrAWf2JCYWf1D6fpxsApwmLSSaJ7xAtQsKbbMzpWC3ArxQ1L
-        D6Km+n1m1Y/C5/SVwtXZ14aIebunh0osM+2plHCSf05uFmMYSTG6ZZEnlpfV0JqEIQCNfzLtHloXe
-        SAjKwcKus+Xh/IR47eiTf9VSjrSMY8kDWJolM22a/h4sG+EI8jK2ta8D3LxlNheg7T0P0HjQswWci
-        Lt478vkv44CFQitNrxzl3xp1SyVB9RjFs5jWiFrMbQo4TD72AepoaNvEu4/3/pakgYFd5H/u3zrax
-        VdaLKYDw==;
+        bh=ZYTWT1x1aj8+1YwAzNumqNw6wJ39vs/Vr6slb7e5rnE=; b=TNkhv4My3FGtmxZcN+TPpbczq9
+        cuSOtwijBcn2yL0d/x0Dcvnt06wMjwzf9PoZ6XDt6RC+EvsOCGfpXc7KsxOC34OwZpgfGlQSetOFL
+        3qbJe4OWShf+HUWLEcMg8O2csupVoaM3u908zqREnaBX8+uDBOzROeygBl9tQJWHHA3IDjhlEasLR
+        6geQtisRwyk7i+OzSA18li1EuN49sx1NuT8jKxs2hwnCYEMydd/8MxB24hHesCw+QmG/8o0Z3jQeh
+        TrcJ3/ck0V2NP1qvhnoZTxkoVNYJt3GLtmw6JJDMgOUhK6eMPEyWQUUQQkxsxqQ8Qk7aqX49Bss7N
+        z9Sy7B1A==;
 Received: from [2001:4bb8:188:3e21:6594:49:139:2b3f] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lw4NL-00FXwY-38; Wed, 23 Jun 2021 15:01:18 +0000
+        id 1lw4Nk-00FXy3-Fy; Wed, 23 Jun 2021 15:01:41 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 3/9] loop: remove the l argument to loop_add
-Date:   Wed, 23 Jun 2021 16:59:02 +0200
-Message-Id: <20210623145908.92973-4-hch@lst.de>
+        linux-block@vger.kernel.org
+Subject: [PATCH 4/9] loop: don't call loop_lookup before adding a loop device
+Date:   Wed, 23 Jun 2021 16:59:03 +0200
+Message-Id: <20210623145908.92973-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210623145908.92973-1-hch@lst.de>
 References: <20210623145908.92973-1-hch@lst.de>
@@ -54,79 +53,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-None of the callers cares about the allocated struct loop_device.
+loop_add returns the right error if the slot wasn't available.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/block/loop.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ drivers/block/loop.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 9df9fb490f87..8392722d0e12 100644
+index 8392722d0e12..b1e7e420563b 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -2069,7 +2069,7 @@ static const struct blk_mq_ops loop_mq_ops = {
- 	.complete	= lo_complete_rq,
- };
- 
--static int loop_add(struct loop_device **l, int i)
-+static int loop_add(int i)
+@@ -2219,14 +2219,12 @@ static int loop_lookup(struct loop_device **l, int i)
+ static void loop_probe(dev_t dev)
  {
- 	struct loop_device *lo;
- 	struct gendisk *disk;
-@@ -2157,7 +2157,6 @@ static int loop_add(struct loop_device **l, int i)
- 	disk->queue		= lo->lo_queue;
- 	sprintf(disk->disk_name, "loop%d", i);
- 	add_disk(disk);
--	*l = lo;
- 	return lo->lo_number;
+ 	int idx = MINOR(dev) >> part_shift;
+-	struct loop_device *lo;
  
- out_cleanup_tags:
-@@ -2227,7 +2226,7 @@ static void loop_probe(dev_t dev)
+ 	if (max_loop && idx >= max_loop)
+ 		return;
  
  	mutex_lock(&loop_ctl_mutex);
- 	if (loop_lookup(&lo, idx) < 0)
--		loop_add(&lo, idx);
-+		loop_add(idx);
+-	if (loop_lookup(&lo, idx) < 0)
+-		loop_add(idx);
++	loop_add(idx);
  	mutex_unlock(&loop_ctl_mutex);
  }
  
-@@ -2249,7 +2248,7 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 			ret = -EEXIST;
- 			break;
- 		}
--		ret = loop_add(&lo, parm);
-+		ret = loop_add(parm);
+@@ -2243,11 +2241,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 	ret = -ENOSYS;
+ 	switch (cmd) {
+ 	case LOOP_CTL_ADD:
+-		ret = loop_lookup(&lo, parm);
+-		if (ret >= 0) {
+-			ret = -EEXIST;
+-			break;
+-		}
+ 		ret = loop_add(parm);
  		break;
  	case LOOP_CTL_REMOVE:
- 		ret = loop_lookup(&lo, parm);
-@@ -2277,7 +2276,7 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 		ret = loop_lookup(&lo, -1);
- 		if (ret >= 0)
- 			break;
--		ret = loop_add(&lo, -1);
-+		ret = loop_add(-1);
- 	}
- 	mutex_unlock(&loop_ctl_mutex);
- 
-@@ -2304,7 +2303,6 @@ MODULE_ALIAS("devname:loop-control");
- static int __init loop_init(void)
- {
- 	int i, nr;
--	struct loop_device *lo;
- 	int err;
- 
- 	part_shift = 0;
-@@ -2358,7 +2356,7 @@ static int __init loop_init(void)
- 	/* pre-create number of devices given by config or max_loop */
- 	mutex_lock(&loop_ctl_mutex);
- 	for (i = 0; i < nr; i++)
--		loop_add(&lo, i);
-+		loop_add(i);
- 	mutex_unlock(&loop_ctl_mutex);
- 
- 	printk(KERN_INFO "loop: module loaded\n");
 -- 
 2.30.2
 
