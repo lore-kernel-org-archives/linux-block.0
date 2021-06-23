@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63D9C4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A4DC48BC2
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:58:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BDAC60FEE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:53:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85240610F7
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:58:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbhFWL4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 07:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52286 "EHLO
+        id S230170AbhFWMA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 08:00:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbhFWL4N (ORCPT
+        with ESMTP id S230157AbhFWMA6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 07:56:13 -0400
+        Wed, 23 Jun 2021 08:00:58 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6118C061574;
-        Wed, 23 Jun 2021 04:53:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED8CC061574;
+        Wed, 23 Jun 2021 04:58:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=C76xuKc0/I/xOs/y/pdbSsixKGVcKLl7S3Wq7XHoPp8=; b=qONu4UaOXnSjh+9vZhiINjShGz
-        FvBdZHJ0lvQRldfL6CjUhxmofCzkMQQr2iCvn1SpLxI1HJauuEhANX1ALoaWfuxypO4JDw9PpR+7E
-        kSkCWU5/73MRD3NyaQwLqN7aRWY4DvMFd6c6TuAt1qRlInpDO9MUQn/qM86sK97NApbKEKpsKKaNY
-        mJL9jYmk8kJxTOL9BxIQXrZRF5WaQf6EgDOOU9tzv92t5OTKAwLTpVSVDNhhxZBtYnCuypmdcxt1N
-        G1oyvvNmsRvX406yjTgW3Y1pFc2kmJbgNFhPexxbRihTD5c8ouUUoh/yh1/W7Eslxs4ncVnpXtx9f
-        tZThuytg==;
+        bh=if+5vcxnYg39PHn7QTmtFHoajkkKrnrnAav0TjgSnZ4=; b=svVwbyrReSA0bEdCFvAQL0nRR6
+        pd6rdU+J/z/Uh7KtI6XWF1ddX4S6fLjMN7Ru1DAXN7TxPiqkBI6iJXlTKRC7i9Q0dG5Q1dRIqm0xJ
+        LQ6zjTzMlqnPtrU99PboitgP3+uHj+mBV3EuT0OaU+JZtX5RQ4nYXI+OvgwRRJ65Rzn8aPH4n7Vib
+        DaoFcSDaxmxLSFRhBD/L7bCK+CadMc7hL7T4zLFHNvI2R26zNrnzLsVyTfAEX6//KSbZ81KmCOPey
+        +gJJZpDjgOvNbPHrZ5O1J5lC6I2Du2zRvDe33C6lDrZvo7m0Ahc1MlYNrFoGJN0IWDvrrZpByPx5+
+        QUIeC9nQ==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lw1RA-00FNss-2e; Wed, 23 Jun 2021 11:53:01 +0000
-Date:   Wed, 23 Jun 2021 12:52:56 +0100
+        id 1lw1Vw-00FO5h-Jw; Wed, 23 Jun 2021 11:58:01 +0000
+Date:   Wed, 23 Jun 2021 12:57:52 +0100
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Matteo Croce <mcroce@linux.microsoft.com>
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
@@ -51,29 +51,34 @@ Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Matthew Wilcox <willy@infradead.org>,
         Christoph Hellwig <hch@infradead.org>,
         JeffleXu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v3 3/6] block: refactor sysfs code
-Message-ID: <YNMgmK2vqQPL7PWb@infradead.org>
+Subject: Re: [PATCH v3 6/6] loop: increment sequence number
+Message-ID: <YNMhwLMr7DiNdqC/@infradead.org>
 References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
- <20210623105858.6978-4-mcroce@linux.microsoft.com>
+ <20210623105858.6978-7-mcroce@linux.microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210623105858.6978-4-mcroce@linux.microsoft.com>
+In-Reply-To: <20210623105858.6978-7-mcroce@linux.microsoft.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -static void disk_add_events(struct gendisk *disk)
-> +static void disk_add_sysfs(struct gendisk *disk)
->  {
->  	/* FIXME: error handling */
-> -	if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs) < 0)
-> +	if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_sysfs_attrs) < 0)
->  		pr_warn("%s: failed to create sysfs files for events\n",
->  			disk->disk_name);
-> +}
+On Wed, Jun 23, 2021 at 12:58:58PM +0200, Matteo Croce wrote:
+> From: Matteo Croce <mcroce@microsoft.com>
+> 
+> On a very loaded system, if there are many events queued up from multiple
+> attach/detach cycles, it's impossible to match them up with the
+> LOOP_CONFIGURE or LOOP_SET_FD call, since we don't know where the position
+> of our own association in the queue is[1].
+> Not even an empty uevent queue is a reliable indication that we already
+> received the uevent we were waiting for, since with multi-partition block
+> devices each partition's event is queued asynchronously and might be
+> delivered later.
+> 
+> Increment the disk sequence number when setting or changing the backing
+> file, so the userspace knows which backing file generated the event:
 
-Actually, what we need here is a way how we can setup the ->groups
-field of the device to include all attribute groups instead of having
-to call sysfs_create_files at all.
+Instead of manually incrementing the sequence here, can we make loop
+generate the DISK_EVENT_MEDIA_CHANGE event on a backing device (aka
+media) change?
