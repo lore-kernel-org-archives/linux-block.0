@@ -2,108 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F74C4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 14:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 924CAC4743C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:00:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 624AD608FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 14:55:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 688C1608FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 15:00:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230243AbhFWO5e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 10:57:34 -0400
-Received: from gardel.0pointer.net ([85.214.157.71]:53798 "EHLO
-        gardel.0pointer.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbhFWO5e (ORCPT
+        id S231248AbhFWPCS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 11:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38452 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231229AbhFWPCR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 10:57:34 -0400
-Received: from gardel-login.0pointer.net (gardel-mail [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
-        by gardel.0pointer.net (Postfix) with ESMTP id 2AE4FE8094B;
-        Wed, 23 Jun 2021 16:55:15 +0200 (CEST)
-Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-        id CEA8B160DC0; Wed, 23 Jun 2021 16:55:14 +0200 (CEST)
-Date:   Wed, 23 Jun 2021 16:55:14 +0200
-From:   Lennart Poettering <mzxreary@0pointer.de>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Luca Boccassi <bluca@debian.org>,
-        Matteo Croce <mcroce@linux.microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        Javier Gonz??lez <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v3 1/6] block: add disk sequence number
-Message-ID: <YNNLUnGMO/gNNIJK@gardel-login>
-References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
- <20210623105858.6978-2-mcroce@linux.microsoft.com>
- <YNMffBWvs/Fz2ptK@infradead.org>
- <CAFnufp1gdag0rGQ8K4_2oB6_aC+EZgfgwd2eL4-AxpG0mK+_qQ@mail.gmail.com>
- <YNM8T44v5FTViVWM@gardel-login>
- <3be63d9f-d8eb-7657-86dc-8d57187e5940@suse.de>
- <1b55bc67b75e5cf982c0c1e8f45096f2eb6e8590.camel@debian.org>
- <f84cab19-fb5c-634b-d1ca-51404907a623@suse.de>
+        Wed, 23 Jun 2021 11:02:17 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C785C061574
+        for <linux-block@vger.kernel.org>; Wed, 23 Jun 2021 08:00:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=sCEu7NfW99+5UTq3b/aJ48oNwvCKGZQbDP7g4sPzUBE=; b=vYuREc6VntZfZkcAoEumsxn2/t
+        4YZ8fnG97WxsQrOOoNXXKUth+UMYIh5Z8nj2jcNz9a52Jum2CJTdmPcKsSEQr880sWb+prklwEq1u
+        eUl0R53sJYumkB1072IBzfezoMa29hVhk7F6494kmM5ayhUH85UI9Qh/T9ggdTA3l+2aBVMUxVXQW
+        gzTY8LHncQj63xvqVR8WbQnpiwgliJIu9wNbWNW8Iak2I+MGUqLPsaJeB99wqZPAf9U7wZtU+pV+u
+        GTaHx2kAbFDDCDwBsvYFoNkf/tkbKeKbqFnQXxm0fRizEIfzFMIQOZbe/PZRO11TCqmT9nmvDBJyv
+        yTxMTMeA==;
+Received: from [2001:4bb8:188:3e21:6594:49:139:2b3f] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1lw4LN-00FXp6-Uo; Wed, 23 Jun 2021 14:59:21 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        linux-block@vger.kernel.org
+Subject: loop cleanups v2
+Date:   Wed, 23 Jun 2021 16:58:59 +0200
+Message-Id: <20210623145908.92973-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f84cab19-fb5c-634b-d1ca-51404907a623@suse.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mi, 23.06.21 16:21, Hannes Reinecke (hare@suse.de) wrote:
+Hi Jens,
 
-> > We need this so that we can reliably correlate events to instances of a
-> > device. Events alone cannot solve this problem, because events _are_
-> > the problem.
-> >
-> In which sense?
-> Yes, events can be delayed (if you list to uevents), but if you listen to
-> kernel events there shouldn't be a delay, right?
+this series contains a bunch of cleanups for the loop driver,
+mostly related to probing and the control device.
 
-uevents are delivered to userpace via an AF_NETLINK socket. The
-AF_NETLINK socket is basically an asynchronous buffer.
-
-I mean, consider what you are saying: you establish the AF_NETLINK
-uevent watching socket, then you allocate /dev/loop0. Since you cannot
-do that atomically, you'll first have to do one, and then the
-other. But if you do that in two steps, then in the middle some other
-process might get scheduled that quickly allocates /dev/loop0 and
-releases it again, before your code gets to run. So now you have in
-your AF_NETLINK socket buffer the uevents for that other process' use
-of the device, and you cannot sanely distinguish them from your own.
-
-of course you could do it the other way: allocate the device first,
-and only then allocate the AF_NETLINK uevent socket. But then you
-might or might not lose the "add" event for the device you just
-allocated. And you don't know if you should wait for it or not.
-
-This isn't even a constructed issue, this is the common case if you
-have multiple processes all simultaneously trying to acquire a loopback
-block device, because they all will end up eying /dev/loop0 at the same time.
-
-But it gets worse IRL because of various factors. For example,
-partition probing is asynchronous, so if you use LO_FLAGS_PARTSCAN and
-want to watch for some partition device associated to your loopback
-block device to show up, this can take *really* long, so the race
-window is large. Or you actually use udev (like most userspace
-probably should) because you want the metainfo it collects about the
-device, in which case it will take even longer for the uevent to reach
-you, i.e. the time window where a previous user's uevents and your own
-for the same loopback device "overlap" can be quite large and you
-cannot determine if they are yours or the previous user's uevents —
-unless we have these new sequence numbers.
-
-Lennart
-
---
-Lennart Poettering, Berlin
+Changes since v1:
+ - use local variables instead of dereferencing struct loop_device
+   outside loop_ctl_mutex
