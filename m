@@ -2,161 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE9CC48BC2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 320ABC48BC2
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:16:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 960E16100B
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2111061076
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 11:16:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230388AbhFWLCX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 07:02:23 -0400
-Received: from mail-wm1-f48.google.com ([209.85.128.48]:36440 "EHLO
-        mail-wm1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbhFWLCS (ORCPT
+        id S230185AbhFWLSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 07:18:32 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:60600 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230031AbhFWLSc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 07:02:18 -0400
-Received: by mail-wm1-f48.google.com with SMTP id m41-20020a05600c3b29b02901dcd3733f24so3711482wms.1;
-        Wed, 23 Jun 2021 04:00:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=lIaKl1OxDgMFf5G0f4ixWy1oghSZADo8i4vWnrvSFg8=;
-        b=LcRYKQVSvYVc0icirqjWbpg325Cj/8kmUZmIsJP+CqzkwO8z3/m+oYcg2bRUukDw8x
-         diFzNSYOF48l886Qy043DaHwzJO3o1jZyBrN//NWbB1Ajyf4H2RHP7SM3giOwP1V8Wmz
-         NN8ClGltNHMhITLlxpVqTt/RwkaC6zYn/yVkQ2JO7ne8lB/skTPh9IplWY3lScBBcvsx
-         botOvINEKQOT0XTE8u+TFUq6Vj/FkBWDdLZDdvLW0GLMjGd0iIjhsMKEYKE71GN9Bz4b
-         YGMN+pnxDbMw6gxqvG+B5QmujDeUSonVbKyRKYgWPuSbtttSAvLJJKcS/L1JH7CkiLMR
-         llgA==
-X-Gm-Message-State: AOAM531f+ksIBuYB1GBgQwPPTDtB2YAT0Or5tG90cJbFGRsboK074kFm
-        r/ZYS8UxTcO6SzOgiRtOcMXRprWaKmC28g==
-X-Google-Smtp-Source: ABdhPJxWj9Nb+u4BTe2iujl/CcCTRNgLWbT5Kxb9Px4/vUMPtmzVRpUE28NaJcK84X4U2ey32Y1qzA==
-X-Received: by 2002:a7b:c395:: with SMTP id s21mr10296924wmj.164.1624446000174;
-        Wed, 23 Jun 2021 04:00:00 -0700 (PDT)
-Received: from msft-t490s.. (mob-176-246-29-26.net.vodafone.it. [176.246.29.26])
-        by smtp.gmail.com with ESMTPSA id r2sm2659458wrv.39.2021.06.23.03.59.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jun 2021 03:59:59 -0700 (PDT)
-From:   Matteo Croce <mcroce@linux.microsoft.com>
-To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Subject: [PATCH v3 6/6] loop: increment sequence number
-Date:   Wed, 23 Jun 2021 12:58:58 +0200
-Message-Id: <20210623105858.6978-7-mcroce@linux.microsoft.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210623105858.6978-1-mcroce@linux.microsoft.com>
-References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
+        Wed, 23 Jun 2021 07:18:32 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 251901FD68;
+        Wed, 23 Jun 2021 11:16:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624446974; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KV1EpNdhx/wUSqoUCCroMUV3rsSV7q8YaeMu9XhFW1w=;
+        b=NZQtUKZmTmrFVEGwfUXSMY9FqUsRi1Jw3xX+9BPq7IJbzySyg0LB+IzRSZ3sXK5JcRvoDl
+        kyQehl/IoaXmmx4ocGOYwK3wTBK4xOFOJdyCe9djg4eBMTEDNZH94XYGPW/VZ90G4PN+Oc
+        wIImZT1xG5JLuJr9G0yh0KPuOZcdw/M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624446974;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KV1EpNdhx/wUSqoUCCroMUV3rsSV7q8YaeMu9XhFW1w=;
+        b=sB5qu1IwbpJhmVRmCUOgbBcUdGkf947ZNqvNFQSWqv3Wl7DLck0vjqV/2wmk3bU+DCOrop
+        x5CeeHwJfLYx46Bg==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 8E4D711A97;
+        Wed, 23 Jun 2021 11:16:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624446974; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KV1EpNdhx/wUSqoUCCroMUV3rsSV7q8YaeMu9XhFW1w=;
+        b=NZQtUKZmTmrFVEGwfUXSMY9FqUsRi1Jw3xX+9BPq7IJbzySyg0LB+IzRSZ3sXK5JcRvoDl
+        kyQehl/IoaXmmx4ocGOYwK3wTBK4xOFOJdyCe9djg4eBMTEDNZH94XYGPW/VZ90G4PN+Oc
+        wIImZT1xG5JLuJr9G0yh0KPuOZcdw/M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624446974;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KV1EpNdhx/wUSqoUCCroMUV3rsSV7q8YaeMu9XhFW1w=;
+        b=sB5qu1IwbpJhmVRmCUOgbBcUdGkf947ZNqvNFQSWqv3Wl7DLck0vjqV/2wmk3bU+DCOrop
+        x5CeeHwJfLYx46Bg==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id UhdYFvsX02DccwAALh3uQQ
+        (envelope-from <colyli@suse.de>); Wed, 23 Jun 2021 11:16:11 +0000
+Subject: Re: Ask help for code review (was Re: [PATCH 03/14] bcache: add
+ initial data structures for nvm pages)
+From:   Coly Li <colyli@suse.de>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Huang, Ying" <ying.huang@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jan Kara <jack@suse.com>, Hannes Reinecke <hare@suse.com>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>, axboe@kernel.dk
+References: <20210615054921.101421-1-colyli@suse.de>
+ <20210615054921.101421-4-colyli@suse.de>
+ <24ad3795-813c-b50b-e983-56dccef1b0db@suse.de>
+ <875yy6l2a1.fsf@yhuang6-desk2.ccr.corp.intel.com>
+ <b1597c54-16ea-c943-8af7-25c8eab342e9@suse.de>
+ <87czsdhy0u.fsf@yhuang6-desk2.ccr.corp.intel.com>
+ <20210623070405.GA537@lst.de> <f150a8a6-26ee-8fdd-2964-be1254835bc1@suse.de>
+ <20210623072140.GA837@lst.de> <466c1678-8cdc-7240-1422-b435a599cad3@suse.de>
+Message-ID: <5702503a-56da-b981-90c6-ebd181716901@suse.de>
+Date:   Wed, 23 Jun 2021 19:16:09 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
+In-Reply-To: <466c1678-8cdc-7240-1422-b435a599cad3@suse.de>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Matteo Croce <mcroce@microsoft.com>
+On 6/23/21 6:05 PM, Coly Li wrote:
+> On 6/23/21 3:21 PM, Christoph Hellwig wrote:
+> Does the already mapped DAX base address change in runtime during memory
+> hot plugable ?
+> If not, it won't be a problem here for this specific use case.
+>> It could change between one use and another.
+> Hmm, I don't understand the implicit meaning of the above line.
+> Could you please offer a detail example ?
+>
 
-On a very loaded system, if there are many events queued up from multiple
-attach/detach cycles, it's impossible to match them up with the
-LOOP_CONFIGURE or LOOP_SET_FD call, since we don't know where the position
-of our own association in the queue is[1].
-Not even an empty uevent queue is a reliable indication that we already
-received the uevent we were waiting for, since with multi-partition block
-devices each partition's event is queued asynchronously and might be
-delivered later.
+Hi Christoph,
 
-Increment the disk sequence number when setting or changing the backing
-file, so the userspace knows which backing file generated the event:
+I feel I come to understand "It could change between
+one use and another." Yes, this is a problem for full
+pointer design. I will switch to base + offset format.
 
-    # udevadm monitor -kp |grep -e ^DEVNAME -e ^DISKSEQ &
-    [1] 263
-    # losetup -fP 3part
-    [   12.309974] loop0: detected capacity change from 0 to 2048
-    DEVNAME=/dev/loop0
-    DISKSEQ=8
-    [   12.360252]  loop0: p1 p2 p3
-    DEVNAME=/dev/loop0
-    DISKSEQ=8
-    DEVNAME=/dev/loop0p1
-    DISKSEQ=8
-    DEVNAME=/dev/loop0p2
-    DISKSEQ=8
-    DEVNAME=/dev/loop0p3
-    DISKSEQ=8
-    # losetup -D
-    DEVNAME=/dev/loop0
-    DISKSEQ=9
-    DEVNAME=/dev/loop0p1
-    DISKSEQ=9
-    DEVNAME=/dev/loop0p2
-    DISKSEQ=9
-    DEVNAME=/dev/loop0p3
-    DISKSEQ=9
-    # losetup -fP 2part
-    [   29.001344] loop0: detected capacity change from 0 to 2048
-    DEVNAME=/dev/loop0
-    DISKSEQ=10
-    [   29.040226]  loop0: p1 p2
-    DEVNAME=/dev/loop0
-    DISKSEQ=10
-    DEVNAME=/dev/loop0p1
-    DISKSEQ=10
-    DEVNAME=/dev/loop0p2
-    DISKSEQ=10
+Thank you for joining the discussion and provide your
+comments, to help me have improved understand for better
+design :-）
 
-[1] https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
-
-Signed-off-by: Matteo Croce <mcroce@microsoft.com>
----
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 76e12f3482a9..b1c638d23306 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -735,6 +735,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 		goto out_err;
- 
- 	/* and ... switch */
-+	inc_diskseq(lo->lo_disk);
- 	blk_mq_freeze_queue(lo->lo_queue);
- 	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
- 	lo->lo_backing_file = file;
-@@ -1123,6 +1124,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	if (error)
- 		goto out_unlock;
- 
-+	inc_diskseq(lo->lo_disk);
-+
- 	if (!(file->f_mode & FMODE_WRITE) || !(mode & FMODE_WRITE) ||
- 	    !file->f_op->write_iter)
- 		lo->lo_flags |= LO_FLAGS_READ_ONLY;
-@@ -1223,6 +1226,8 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 	lo->lo_backing_file = NULL;
- 	spin_unlock_irq(&lo->lo_lock);
- 
-+	inc_diskseq(lo->lo_disk);
-+
- 	loop_release_xfer(lo);
- 	lo->transfer = NULL;
- 	lo->ioctl = NULL;
--- 
-2.31.1
-
+Coly Li
