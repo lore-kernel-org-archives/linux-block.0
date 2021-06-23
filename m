@@ -7,122 +7,119 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF31C4743C
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF11BC48BE5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:09:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E066661002
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:03:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C747361002
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jun 2021 12:09:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230251AbhFWMFq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 08:05:46 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:38264 "EHLO
+        id S230170AbhFWMMA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 08:12:00 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:39010 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbhFWMFq (ORCPT
+        with ESMTP id S230157AbhFWML7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 08:05:46 -0400
+        Wed, 23 Jun 2021 08:11:59 -0400
 Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
         (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 081741FD65;
-        Wed, 23 Jun 2021 12:03:28 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id BBC201FD36;
+        Wed, 23 Jun 2021 12:09:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1624449808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1624450181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
-        b=JEwVwd5lWr59EcR28oxtQoQeflZEtZ6GtvIqFr+3qPap9DIqlIxS16dhKGeD88AdgHhrQK
-        FnaGZl6LUbHmCXqawqEN/CTgAdCZYjbNY2Zq58VJ569soEXfRxCLgg/SnorvXx7d8ZtdW5
-        YHjUElLq6Fyl98xM/jRHIF7FsABnP5E=
+        bh=Shj2SE8niP5WvMXjun7ikIAkYYmoq/GAPEpKa0VAbKw=;
+        b=V6zOpxwZ3ibpNomE4ANU88oKCgVPTKMgpkOrt/3kF2XYMasevOWE4rl/jqrfrqOem+tNlM
+        pIOD97FZ04RURUyFojM60Ljqmt2xhcSNDYYy5ItAHtZwI9VsWOXIsMuWNibiCR/yxW6E4o
+        1F4vSu5sUbVf8bBQK9KYlMqzqbarT18=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1624449808;
+        s=susede2_ed25519; t=1624450181;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
-        b=NwoYa3wurxv0LfPJNjQb5ZEd1tVjfIl9pupg76GLbPUHgiC4wWiYX5RAAVvfb5RlyXPytc
-        j4Nna4Tidn/PA9Aw==
+        bh=Shj2SE8niP5WvMXjun7ikIAkYYmoq/GAPEpKa0VAbKw=;
+        b=IFkPNpq/JVrj//USk0ZjtbAYNn/8J5Hfx9xjSwCeWfFtbI9AZf34t+cKRqFZLiqfsJDQcZ
+        iV8e1SKZ8bJ9aYAw==
 Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id ADCA511A97;
-        Wed, 23 Jun 2021 12:03:27 +0000 (UTC)
+        by imap.suse.de (Postfix) with ESMTP id 9633911A97;
+        Wed, 23 Jun 2021 12:09:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1624449807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1624450181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
-        b=YF5l59Liz2PwKX7sWBCPjDz8AJ/4dt0uGGV+1XjZDof0eMiBagemhhka4asURm2hQLjPHk
-        pToA+nVJaTwvciMnCOeiYAJllplYa7V3i+WBOd2tbr8Zr07nHtB757209mun/fOjmXwXHB
-        FA7WEn/722VuFam8SwPykndZg7ENp4I=
+        bh=Shj2SE8niP5WvMXjun7ikIAkYYmoq/GAPEpKa0VAbKw=;
+        b=V6zOpxwZ3ibpNomE4ANU88oKCgVPTKMgpkOrt/3kF2XYMasevOWE4rl/jqrfrqOem+tNlM
+        pIOD97FZ04RURUyFojM60Ljqmt2xhcSNDYYy5ItAHtZwI9VsWOXIsMuWNibiCR/yxW6E4o
+        1F4vSu5sUbVf8bBQK9KYlMqzqbarT18=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1624449807;
+        s=susede2_ed25519; t=1624450181;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pTV0UJMvjAlHC0068bqJsxAfZBAJ3v623+Gud9Q+2ok=;
-        b=phFHobecXngr10YyZGcNi33kkMtxHjkkaAk14F16/Y1M+JRLYUrn+0tW9Bj8hI1yrs1KWX
-        xRKybiw+NIuYoXBA==
+        bh=Shj2SE8niP5WvMXjun7ikIAkYYmoq/GAPEpKa0VAbKw=;
+        b=IFkPNpq/JVrj//USk0ZjtbAYNn/8J5Hfx9xjSwCeWfFtbI9AZf34t+cKRqFZLiqfsJDQcZ
+        iV8e1SKZ8bJ9aYAw==
 Received: from director2.suse.de ([192.168.254.72])
         by imap3-int with ESMTPSA
-        id rhDpKA8j02B6DwAALh3uQQ
-        (envelope-from <hare@suse.de>); Wed, 23 Jun 2021 12:03:27 +0000
-Subject: Re: [PATCH v3 0/6] block: add a sequence number to disks
-To:     Matteo Croce <mcroce@linux.microsoft.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <bfdd6f56-ce2b-ef74-27b1-83b922e5f7d9@suse.de>
-Date:   Wed, 23 Jun 2021 14:03:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id IgYZGYMk02AEEwAALh3uQQ
+        (envelope-from <colyli@suse.de>); Wed, 23 Jun 2021 12:09:39 +0000
+Subject: Re: Ask help for code review (was Re: [PATCH 03/14] bcache: add
+ initial data structures for nvm pages)
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Huang, Ying" <ying.huang@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jan Kara <jack@suse.com>, Hannes Reinecke <hare@suse.com>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>, axboe@kernel.dk
+References: <20210615054921.101421-1-colyli@suse.de>
+ <20210615054921.101421-4-colyli@suse.de>
+ <24ad3795-813c-b50b-e983-56dccef1b0db@suse.de>
+ <875yy6l2a1.fsf@yhuang6-desk2.ccr.corp.intel.com>
+ <b1597c54-16ea-c943-8af7-25c8eab342e9@suse.de>
+ <87czsdhy0u.fsf@yhuang6-desk2.ccr.corp.intel.com>
+ <20210623070405.GA537@lst.de> <f150a8a6-26ee-8fdd-2964-be1254835bc1@suse.de>
+ <20210623072140.GA837@lst.de> <466c1678-8cdc-7240-1422-b435a599cad3@suse.de>
+ <20210623114954.GA20363@lst.de>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <3d84ecc3-4ebf-3ef4-e4e3-df39e661f854@suse.de>
+Date:   Wed, 23 Jun 2021 20:09:37 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210623105858.6978-1-mcroce@linux.microsoft.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210623114954.GA20363@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/23/21 12:58 PM, Matteo Croce wrote:
-> From: Matteo Croce <mcroce@microsoft.com>
-> 
-> With this series a monotonically increasing number is added to disks,
-> precisely in the genhd struct, and it's exported in sysfs and uevent.
-> 
-> This helps the userspace correlate events for devices that reuse the
-> same device, like loop.
-> 
-I'm failing to see the point here.
-Apparently you are assuming that there is a userspace tool tracking 
-events, and has a need to correlate events related to different 
-instances of the disk.
-But if you have an userspace application tracking events, why can't the 
-same application track the 'add' and 'remove' events to track the 
-lifetime of the devices, and implement its own numbering based on that?
+On 6/23/21 7:49 PM, Christoph Hellwig wrote:
+> On Wed, Jun 23, 2021 at 06:05:51PM +0800, Coly Li wrote:
+>> The cache device (typically SSD) of bcache is designed to dedicate to a
+>> single local machine. Any
+>> storage migration between machines with different endians should firstly
+>> flush the dirty data to
+>> backing hard drive.
+> Now my G5 died and I need to recover the data using my x86 laptop,
+> what am I going to do?
+>
+>>>> If not, it won't be a problem here for this specific use case.
+>>> It could change between one use and another.
+>> Hmm, I don't understand the implicit meaning of the above line.
+>> Could you please offer a detail example ?
+> There is no guarantee you nvdimm or CXL memory device will show up
+> at the same address.
 
-Why do we need to burden the kernel with this?
+Copied, I fully understand. Now I am working on the full pointer to
+[base + offset] convert.
 
-Cheers,
+Thanks for your patient explanation :-)
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Coly Li
