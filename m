@@ -2,88 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AA02C48BDF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D7FC48BDF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:15:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CA77613E7
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:14:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65D52613DC
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:15:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231159AbhFXGQa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jun 2021 02:16:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44534 "EHLO
+        id S231128AbhFXGRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jun 2021 02:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230518AbhFXGQa (ORCPT
+        with ESMTP id S230515AbhFXGRt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jun 2021 02:16:30 -0400
+        Thu, 24 Jun 2021 02:17:49 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26ACC061574;
-        Wed, 23 Jun 2021 23:14:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5376AC061574;
+        Wed, 23 Jun 2021 23:15:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=sSFHXo3Gj4dSjFJuKq0lyHYwfOL1EKEDwVgBxUfbffw=; b=t4/xd1iRSTshzW9JK+ypF4gUvU
-        DiOLXv1n179uEuNdX25CkPiklMEzjEZvgwAVqPPFECZ7cw7Xirlw9BxwbTT3+G+VFQRWgj//+tcl5
-        fBZcyFlGX0MOBtXe+2zlZBhDGeCUvKMfW7LUvpq4wYEiz3WHQH0mEuROU84c9reuI9kUN/+UAq7FI
-        IJts0WQWke3KSLvKBUeP9HswUP6IfxrKG9EtQLd70TEJluWLme7q5vD6VkXaNsA486/ZCtQXlcPhc
-        4ACaHId9qdfCOYhJCpJmucL4SGSEs2rvkE4WSwaTNDiwkyDIXQEbv3olSWfx2lh5rhY42ZRizrzIz
-        OtKHbZ2Q==;
+        bh=cLzuPmWnT7cLiujhn4thtNqmsI+9nqkAPBiidz+Pv7g=; b=LnNOHZHtKXbwjS5bWMZWiVWL3Z
+        AKCrIW0Xtsm+v5LCP0DX3MYeglxC5rgZk4Mr1XS/fx8ucOsAXd23y4YBcSkZZCQx5ap4LZvpvOfrU
+        d5RdB6hYOUomIsh4reA72drdYZabPXDblv2uagadZOhcYpeOeaxNDImsuXDIZgc/6X62VXbB0jubU
+        mJxnJLPS2dyJJ9USrazptFdP4S4/dJjJji524AlybvVN5Ku5aLKxCGPknQd08G67u6OBrEimTLTbi
+        LZrEpPI4ZX7eOdxIUbpelNAT1KWinoRuA9MAD43B7ROOMHCsO+zytEWRCcxYBOUTUvTafnE1m4yR1
+        Z/RQ4iuA==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lwIbX-00GFEb-EP; Thu, 24 Jun 2021 06:12:55 +0000
-Date:   Thu, 24 Jun 2021 07:12:47 +0100
+        id 1lwIdI-00GFN6-4h; Thu, 24 Jun 2021 06:14:56 +0000
+Date:   Thu, 24 Jun 2021 07:14:36 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Matteo Croce <mcroce@linux.microsoft.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        Javier Gonz??lez <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v3 3/6] block: refactor sysfs code
-Message-ID: <YNQiX08k6SGz5PvD@infradead.org>
-References: <20210623105858.6978-1-mcroce@linux.microsoft.com>
- <20210623105858.6978-4-mcroce@linux.microsoft.com>
- <YNMgmK2vqQPL7PWb@infradead.org>
- <CAFnufp3=2Jhr9NqVhE2nCLcr48UvxVww=RpWHp2wpm7DWwGuEA@mail.gmail.com>
+To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+cf89d662483d6a1a0790@syzkaller.appspotmail.com
+Subject: Re: [RESEND PATCH] loop: fix setting arbitrarily large block size
+Message-ID: <YNQizOHDSM0Y2Lz/@infradead.org>
+References: <20210622161019.130090-1-chouhan.shreyansh630@gmail.com>
+ <20210623050933.140572-1-chouhan.shreyansh630@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFnufp3=2Jhr9NqVhE2nCLcr48UvxVww=RpWHp2wpm7DWwGuEA@mail.gmail.com>
+In-Reply-To: <20210623050933.140572-1-chouhan.shreyansh630@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 09:03:40PM +0200, Matteo Croce wrote:
-> On Wed, Jun 23, 2021 at 1:53 PM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > > -static void disk_add_events(struct gendisk *disk)
-> > > +static void disk_add_sysfs(struct gendisk *disk)
-> > >  {
-> > >       /* FIXME: error handling */
-> > > -     if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs) < 0)
-> > > +     if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_sysfs_attrs) < 0)
-> > >               pr_warn("%s: failed to create sysfs files for events\n",
-> > >                       disk->disk_name);
-> > > +}
-> >
-> > Actually, what we need here is a way how we can setup the ->groups
-> > field of the device to include all attribute groups instead of having
-> > to call sysfs_create_files at all.
-> 
-> I don't get this one. You mean in general or in this series?
+On Wed, Jun 23, 2021 at 10:39:33AM +0530, Shreyansh Chouhan wrote:
+> REASON FOR RESEND: Fixed spelling of the Reported-by tag.
 
-In general before we make more use of the block device provided attrs.
+That goes under a "---" deliminator.
+
+Except for that:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
