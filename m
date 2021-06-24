@@ -2,190 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3438BC48BDF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 09:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912EEC48BDF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 10:04:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16BE8613F6
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 09:24:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DBFC613FC
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 10:04:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230299AbhFXJ0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jun 2021 05:26:47 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:38178 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbhFXJ0r (ORCPT
+        id S232033AbhFXKGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jun 2021 06:06:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231881AbhFXKGg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jun 2021 05:26:47 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D48A421923;
-        Thu, 24 Jun 2021 09:24:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1624526667; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=il0/cwUtgiAD5jaqXCBVRaOIoH20XDAXjZdXMAfwrnc=;
-        b=dd1FQ/2wfsim+6JwpUX45Tb9p//E/WE/Q0+MjqRzmuzpoAKsuu3vXUya+UtVP4Uuf6XfHb
-        BvoYaA7fHO12kEWQryNc9LefuchyIsXMd2Wc35+P4DP+CCGeyMDGUrKlJJ3ow++sXsb0Wn
-        gcqBctD+00RqOSydTV2iWxQjtiTbWx4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1624526667;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=il0/cwUtgiAD5jaqXCBVRaOIoH20XDAXjZdXMAfwrnc=;
-        b=gv37xlS3BOOpuz7rxWbWXF1RGJiwzMQCRuFsmp6f4csPSmIGr4NOIK2/sPnqjCcsjJQrS3
-        ZWTM3cu9CM3U+nBQ==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id C2C7A11A97;
-        Thu, 24 Jun 2021 09:24:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1624526667; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=il0/cwUtgiAD5jaqXCBVRaOIoH20XDAXjZdXMAfwrnc=;
-        b=dd1FQ/2wfsim+6JwpUX45Tb9p//E/WE/Q0+MjqRzmuzpoAKsuu3vXUya+UtVP4Uuf6XfHb
-        BvoYaA7fHO12kEWQryNc9LefuchyIsXMd2Wc35+P4DP+CCGeyMDGUrKlJJ3ow++sXsb0Wn
-        gcqBctD+00RqOSydTV2iWxQjtiTbWx4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1624526667;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=il0/cwUtgiAD5jaqXCBVRaOIoH20XDAXjZdXMAfwrnc=;
-        b=gv37xlS3BOOpuz7rxWbWXF1RGJiwzMQCRuFsmp6f4csPSmIGr4NOIK2/sPnqjCcsjJQrS3
-        ZWTM3cu9CM3U+nBQ==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id TT5WL0tP1GBSQAAALh3uQQ
-        (envelope-from <hare@suse.de>); Thu, 24 Jun 2021 09:24:27 +0000
-Subject: Re: [LSF/MM/BPF Topic] Towards more useful nvme-passthrough
-To:     Kanchan Joshi <joshi.k@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-nvme@lists.infradead.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Doug Gilbert <dgilbert@interlog.com>
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, javier@javigon.com,
-        anuj20.g@samsung.com, joshiiitr@gmail.com
-References: <CGME20210609105347epcas5p42ab916655fca311157a38d54f79f95e7@epcas5p4.samsung.com>
- <20210609105050.127009-1-joshi.k@samsung.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <d9e6e3cc-fedb-eb45-7a3e-5df24e67455b@suse.de>
-Date:   Thu, 24 Jun 2021 11:24:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        Thu, 24 Jun 2021 06:06:36 -0400
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23ED0C061574;
+        Thu, 24 Jun 2021 03:04:18 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id o17-20020a9d76510000b02903eabfc221a9so5047723otl.0;
+        Thu, 24 Jun 2021 03:04:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Nl1+VNWKIb1LF2pwZvKJJ4GC2fkN1Iqi7Pk0zPEUOE0=;
+        b=NwZ8oiDXegfYp8rMFYg3pVmzyThIB9ROoftrwe+j8mLZDhuNZbkVklCE4/dD4J0N7/
+         yn5OR7rxSh16ndI/5WDWah6H88S5t8rq0kcfcQr/ZkmUmGjyLEBm3Jx4hXPrCMinNJwX
+         cJRM1LccyX9qEeQC4Ws2dC/k8CTui/fTKEj/M8qFECZm8luj8kHVnrVoR476HkCtS571
+         1UE7fpBELF765OnAGiLttJ7pyVIgz4AAWls31v/ujlD7m//TvYGQ/E2T5xFTTb4mwzrQ
+         CSZ7cDuCBumdhEmIMu9E/3Z1NyWsyTV0d5gG4r6J0GCC7e6DaKnzBQjh44pqJRMcQs7Q
+         X8Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Nl1+VNWKIb1LF2pwZvKJJ4GC2fkN1Iqi7Pk0zPEUOE0=;
+        b=pr7oXLDkrFPpE8AAljeKqdZE+aZGKJ2pQ5BWXe7Qz6Cx9k9tX4GhgGLNN2JFMnu88g
+         phoODwd+nEg+8oHbgN7m1WmD+8JChzcfGq1I0kcp9+cSWaNXmxCecrS08Iw3q5Pqx66p
+         /R1qJ4HTlxvhW+7N1sjZqXtK2KClZuFBRDO+YVghDDZ57b6fuxH/VHSaahaga69m4We4
+         AhC7tsF0ZIPkQhIn+j/1AQEJ91YAnL5+wt1wX60/bGnrmGf0aVGpPupBMrZzYCZeqKl5
+         oSrJQT/1gftjb3NKCXnu0/qUxJW/XMHqgv9JrKVAqicq6pUzqRTZPJbCB1zzWW7BjHRF
+         1hvg==
+X-Gm-Message-State: AOAM530h+r74gBuN3FWgyYPkQ5XVZapHBeRLD8fEbj7/emCffjLT589I
+        Q/C+KNCYb1cVpiIPJRba7kA=
+X-Google-Smtp-Source: ABdhPJzsULLTd7WyQU7NLUUKR84QFffjslMChnoKcCOBgchH6lIyHzkOq+ywjZFNKwnk5q6bUeNbEA==
+X-Received: by 2002:a05:6830:3155:: with SMTP id c21mr3873230ots.153.1624529057550;
+        Thu, 24 Jun 2021 03:04:17 -0700 (PDT)
+Received: from fractal ([2600:1700:1151:2380:2770:dacf:615a:4fe7])
+        by smtp.gmail.com with ESMTPSA id l25sm552227oie.57.2021.06.24.03.04.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jun 2021 03:04:17 -0700 (PDT)
+Date:   Thu, 24 Jun 2021 03:04:15 -0700
+From:   Satya Tangirala <satyaprateek2357@gmail.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v3 07/10] mmc: handle error from blk_ksm_register()
+Message-ID: <20210624100415.GA4845@fractal>
+References: <20210604195900.2096121-1-satyat@google.com>
+ <20210604195900.2096121-8-satyat@google.com>
+ <YMrAn7EkKkNVEjUW@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20210609105050.127009-1-joshi.k@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YMrAn7EkKkNVEjUW@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/9/21 12:50 PM, Kanchan Joshi wrote:
-> Background & objectives:
-> ------------------------
+On Wed, Jun 16, 2021 at 08:25:19PM -0700, Eric Biggers wrote:
+> On Fri, Jun 04, 2021 at 07:58:57PM +0000, Satya Tangirala wrote:
+> > +		/*
+> > +		 * This WARN_ON should never trigger since &host->ksm won't be
+> > +		 * "empty" (i.e. will support at least 1 crypto capability), an
+> > +		 * MMC device's request queue doesn't support integrity, and
+> > +		 * it also satisfies all the block layer constraints (i.e.
+> > +		 * supports SG gaps, doesn't have chunk sectors, has a
+> > +		 * sufficiently large supported max_segments per bio)
+> > +		 */
+> > +		WARN_ON(!blk_ksm_register(&host->ksm, q));
+> > +	}
+> >  }
 > 
-> The NVMe passthrough interface
+> There appear to be some MMC host drivers that set max_segments to 1, so this
+> explanation may not hold.  It may hold for every driver that actually supports
+> crypto, though.
+Yeah, I think it does hold for every driver that actually supports
+crypto. I'll check this more carefully before sending out the next
+version.
 > 
-> Good part: allows new device-features to be usable (at least in raw
-> form) without having to build block-generic cmds, in-kernel users,
-> emulations and file-generic user-interfaces - all this take some time to
-> evolve.
-> 
-> Bad part: passthrough interface has remain tied to synchronous ioctl,
-> which is a blocker for performance-centric usage scenarios. User-space
-> can take the pain of implementing async-over-sync on its own but it does
-> not make much sense in a world that already has io_uring.
-> 
-> Passthrough is lean in the sense it cuts through layers of abstractions
-> and reaches to NVMe fast. One of the objective here is to build a
-> scalable pass-through that can be readily used to play with new/emerging
-> NVMe features.  Another is to surpass/match existing raw/direct block
-> I/O performance with this new in-kernel path.
-> 
-> Recent developments:
-> --------------------
-> - NVMe now has a per-namespace char interface that remains available/usable
->   even for unsupported features and for new command-sets [1].
-> 
-> - Jens has proposed async-ioctl like facility 'uring_cmd' in io_uring. This
->   introduces new possibilities (beyond storage); async-passthrough is one of
-> those. Last posted version is V4 [2].
-> 
-> - I have posted work on async nvme passthrough over block-dev [3]. Posted work
->   is in V4 (in sync with the infra of [2]).
-> 
-> Early performance numbers:
-> --------------------------
-> fio, randread, 4k bs, 1 job
-> Kiops, with varying QD:
-> 
-> QD      Sync-PT         io_uring        Async-PT
-> 1         10.8            10.6            10.6
-> 2         10.9            24.5            24
-> 4         10.6            45              46
-> 8         10.9            90              89
-> 16        11.0            169             170
-> 32        10.6            308             307
-> 64        10.8            503             506
-> 128       10.9            592             596
-> 
-> Further steps/discussion points:
-> --------------------------------
-> 1.Async-passthrough over nvme char-dev
-> It is in a shape to receive feedback, but I am not sure if community
-> would like to take a look at that before settling on uring-cmd infra.
-> 
-> 2.Once above gets in shape, bring other perf-centric features of io_uring to
-> this path -
-> A. SQPoll and register-file: already functional.
-> B. Passthrough polling: This can be enabled for block and looks feasible for
-> char-interface as well.  Keith recently posted enabling polling for user
-> pass-through [4]
-> C. Pre-mapped buffers: Early thought is to let the buffers registered by
-> io_uring, and add a new passthrough ioctl/uring_cmd in driver which does
-> everything that passthrough does except pinning/unpinning the pages.
-> 
-> 3. Are there more things in the "io_uring->nvme->[block-layer]->nvme" path
-> which can be optimized.
-> 
-> Ideally I'd like to cover good deal of ground before Dec. But there seems
-> plenty of possibilities on this path.  Discussion would help in how best to
-> move forward, and cement the ideas.
-> 
-> [1] https://lore.kernel.org/linux-nvme/20210421074504.57750-1-minwoo.im.dev@gmail.com/
-> [2] https://lore.kernel.org/linux-nvme/20210317221027.366780-1-axboe@kernel.dk/
-> [3] https://lore.kernel.org/linux-nvme/20210325170540.59619-1-joshi.k@samsung.com/
-> [4] https://lore.kernel.org/linux-block/20210517171443.GB2709391@dhcp-10-100-145-180.wdc.com/#t
-> 
-I do like the idea.
-
-What I would like to see is to make the ioring_cmd infrastructure
-generally available, such that we can port the SCSI sg asynchronous
-interface over to this.
-Doug Gilbert has been fighting a lone battle to improve the sg
-asynchronous interface, as the current one is deemed a security hazard.
-But in the absence of a generic interface he had to design his own
-ioctls, with all the expected pushback.
-Plus there are only so many people who care about sg internals :-(
-
-Being able to use ioring_cmd would be a neat way out of this.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+> - Eric
