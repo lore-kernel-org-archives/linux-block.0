@@ -5,46 +5,44 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04A7C48BDF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 12:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 695A0C48BDF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 12:40:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95237613F6
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 12:36:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C91F613FA
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 12:40:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbhFXMiS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jun 2021 08:38:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
+        id S231630AbhFXMmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jun 2021 08:42:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231635AbhFXMiL (ORCPT
+        with ESMTP id S231610AbhFXMmU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jun 2021 08:38:11 -0400
+        Thu, 24 Jun 2021 08:42:20 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D980DC061756
-        for <linux-block@vger.kernel.org>; Thu, 24 Jun 2021 05:35:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1316C061574;
+        Thu, 24 Jun 2021 05:40:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=LsbQaWr+OntFzu3Fljjs/4+F5Gj0wSksQB7KLYXtDTQ=; b=Th1pPwYr0EoaCvDFXGWkCwMr3O
-        ifJgWvGF2na6U5y9SRH2IieYlDDzHvXFeckMVLaWgb4u3L18P98VbzdF9inGf0kwkh03Gr71bCu26
-        +SmLBhEMfdbp59lOHGRfZU40J9zWWDU9d0f6y05Pf2bTObr9UvTV9jOKGfAoSccEQm0PuyhDnS06R
-        U/9aSSnghZe2B6oJVB5ruKY5UniL8uruBcTtJl/+VcvP4xmMWpgZE1z1iErwbBWCjD0OopwAhel4C
-        dTWMdQ5/YXg6PqulLHqil+jvzAvWt9rMG1oy+HcbvcMz7zsUDoy3XkAcG89Wg70w6lkUEAFwYK3pW
-        DKAS/zow==;
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=FhT7jjrlHLjpQaVJvWJtq0damwMxwXuO2NevODqm/2M=; b=FaA0XMI3GgGp9a44zv5QhXzYii
+        vk2YbYepeR1CWi9qH4IcD+K9KbZUVTHrlVPiOxF1KyxMumUg3xUNgJAeWJdoO8WiSRj4a7XECLi9o
+        FMrtTGjc5OL7jhlVkAZa6sI5QUMzxM7Y6/aLQ2cjOPFwTi8QGG1SmwSHjPTb3C7NYONBFivtLzFyI
+        YTH1hDxOW2fEBgYDbaiaGzMc7sdG0/kOTW/lsRJOpFGACwQbX4urUzMFF7rad/6ld5323szqz8jDV
+        KBZSUj6PGjBUwLQ4OdG7xTkr/6lWCcGg12ATq6gl6b+yoO2qE8hmpJQ7yL8mGJLNIapBE45E5V7QC
+        0VzbTmfw==;
 Received: from 213-225-9-92.nat.highway.a1.net ([213.225.9.92] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lwOZo-00GZT6-Lh; Thu, 24 Jun 2021 12:35:32 +0000
+        id 1lwOdu-00GZkD-Th; Thu, 24 Jun 2021 12:39:45 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 2/2] block: pass a gendisk to bdev_disk_changed
-Date:   Thu, 24 Jun 2021 14:32:40 +0200
-Message-Id: <20210624123240.441814-3-hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH 1/2] block: remove REQ_OP_SCSI_{IN,OUT}
+Date:   Thu, 24 Jun 2021 14:39:34 +0200
+Message-Id: <20210624123935.479229-1-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210624123240.441814-1-hch@lst.de>
-References: <20210624123240.441814-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -52,229 +50,293 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bdev_disk_changed can only operate on whole devices.  Make that clear
-by passing a gendisk instead of the struct block_device.
+With the legacy IDE driver gone drivers now use either REQ_OP_DRV_*
+or REQ_OP_SCSI_*, so unify the two concepts of passthrough requests
+into a single one.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/partitions/core.c         | 22 ++++++++++------------
- drivers/block/loop.c            | 21 ++++++++++-----------
- drivers/s390/block/dasd_genhd.c |  4 ++--
- fs/block_dev.c                  |  4 ++--
- include/linux/genhd.h           |  2 +-
- 5 files changed, 25 insertions(+), 28 deletions(-)
+ block/blk-core.c                   |  2 --
+ block/bsg-lib.c                    |  2 +-
+ block/bsg.c                        |  2 +-
+ block/scsi_ioctl.c                 |  6 +++---
+ drivers/block/pktcdvd.c            |  2 +-
+ drivers/cdrom/cdrom.c              |  2 +-
+ drivers/scsi/scsi_error.c          |  2 +-
+ drivers/scsi/scsi_lib.c            |  8 ++++----
+ drivers/scsi/sg.c                  |  2 +-
+ drivers/scsi/st.c                  |  2 +-
+ drivers/target/target_core_pscsi.c |  2 +-
+ fs/nfsd/blocklayout.c              |  2 +-
+ include/linux/blk_types.h          |  3 ---
+ include/linux/blkdev.h             | 33 +++---------------------------
+ 14 files changed, 19 insertions(+), 51 deletions(-)
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index b79785f7027c..347c56a51d87 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -120,8 +120,7 @@ static void free_partitions(struct parsed_partitions *state)
- 	kfree(state);
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 514838ccab2d..3eea8d795565 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -142,8 +142,6 @@ static const char *const blk_op_name[] = {
+ 	REQ_OP_NAME(ZONE_APPEND),
+ 	REQ_OP_NAME(WRITE_SAME),
+ 	REQ_OP_NAME(WRITE_ZEROES),
+-	REQ_OP_NAME(SCSI_IN),
+-	REQ_OP_NAME(SCSI_OUT),
+ 	REQ_OP_NAME(DRV_IN),
+ 	REQ_OP_NAME(DRV_OUT),
+ };
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 330fede77271..57b082bc9017 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -45,7 +45,7 @@ static int bsg_transport_fill_hdr(struct request *rq, struct sg_io_v4 *hdr,
+ 		return PTR_ERR(job->request);
  
--static struct parsed_partitions *check_partition(struct gendisk *hd,
--		struct block_device *bdev)
-+static struct parsed_partitions *check_partition(struct gendisk *hd)
- {
- 	struct parsed_partitions *state;
- 	int i, res, err;
-@@ -136,7 +135,7 @@ static struct parsed_partitions *check_partition(struct gendisk *hd,
+ 	if (hdr->dout_xfer_len && hdr->din_xfer_len) {
+-		job->bidi_rq = blk_get_request(rq->q, REQ_OP_SCSI_IN, 0);
++		job->bidi_rq = blk_get_request(rq->q, REQ_OP_DRV_IN, 0);
+ 		if (IS_ERR(job->bidi_rq)) {
+ 			ret = PTR_ERR(job->bidi_rq);
+ 			goto out;
+diff --git a/block/bsg.c b/block/bsg.c
+index bd10922d5cbb..323e45878362 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -152,7 +152,7 @@ static int bsg_sg_io(struct request_queue *q, fmode_t mode, void __user *uarg)
+ 		return ret;
+ 
+ 	rq = blk_get_request(q, hdr.dout_xfer_len ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, 0);
++			REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(rq))
+ 		return PTR_ERR(rq);
+ 
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index 1b3fe99b83a6..41ca95bfe607 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -311,7 +311,7 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+ 		at_head = 1;
+ 
+ 	ret = -ENOMEM;
+-	rq = blk_get_request(q, writing ? REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, 0);
++	rq = blk_get_request(q, writing ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(rq))
+ 		return PTR_ERR(rq);
+ 	req = scsi_req(rq);
+@@ -433,7 +433,7 @@ int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
+ 
  	}
- 	state->pp_buf[0] = '\0';
  
--	state->bdev = bdev;
-+	state->bdev = hd->part0;
- 	disk_name(hd, 0, state->name);
- 	snprintf(state->pp_buf, PAGE_SIZE, " %s:", state->name);
- 	if (isdigit(state->name[strlen(state->name)-1]))
-@@ -546,7 +545,7 @@ void blk_drop_partitions(struct gendisk *disk)
- 	}
- }
+-	rq = blk_get_request(q, in_len ? REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, 0);
++	rq = blk_get_request(q, in_len ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(rq)) {
+ 		err = PTR_ERR(rq);
+ 		goto error_free_buffer;
+@@ -521,7 +521,7 @@ static int __blk_send_generic(struct request_queue *q, struct gendisk *bd_disk,
+ 	struct request *rq;
+ 	int err;
  
--static bool blk_add_partition(struct gendisk *disk, struct block_device *bdev,
-+static bool blk_add_partition(struct gendisk *disk,
- 		struct parsed_partitions *state, int p)
- {
- 	sector_t size = state->parts[p].size;
-@@ -596,7 +595,7 @@ static bool blk_add_partition(struct gendisk *disk, struct block_device *bdev,
- 	return true;
- }
- 
--static int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
-+static int blk_add_partitions(struct gendisk *disk)
- {
- 	struct parsed_partitions *state;
- 	int ret = -EAGAIN, p;
-@@ -604,7 +603,7 @@ static int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
- 	if (!disk_part_scan_enabled(disk))
- 		return 0;
- 
--	state = check_partition(disk, bdev);
-+	state = check_partition(disk);
- 	if (!state)
- 		return 0;
- 	if (IS_ERR(state)) {
-@@ -648,7 +647,7 @@ static int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
- 	kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
- 
- 	for (p = 1; p < state->limit; p++)
--		if (!blk_add_partition(disk, bdev, state, p))
-+		if (!blk_add_partition(disk, state, p))
- 			goto out_free_state;
- 
- 	ret = 0;
-@@ -657,9 +656,8 @@ static int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
- 	return ret;
- }
- 
--int bdev_disk_changed(struct block_device *bdev, bool invalidate)
-+int bdev_disk_changed(struct gendisk *disk, bool invalidate)
- {
--	struct gendisk *disk = bdev->bd_disk;
+-	rq = blk_get_request(q, REQ_OP_SCSI_OUT, 0);
++	rq = blk_get_request(q, REQ_OP_DRV_OUT, 0);
+ 	if (IS_ERR(rq))
+ 		return PTR_ERR(rq);
+ 	rq->timeout = BLK_DEFAULT_SG_TIMEOUT;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index f69b5c69c2a6..538446b652de 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -704,7 +704,7 @@ static int pkt_generic_packet(struct pktcdvd_device *pd, struct packet_command *
  	int ret = 0;
  
- 	lockdep_assert_held(&disk->open_mutex);
-@@ -670,8 +668,8 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
- rescan:
- 	if (disk->open_partitions)
- 		return -EBUSY;
--	sync_blockdev(bdev);
--	invalidate_bdev(bdev);
-+	sync_blockdev(disk->part0);
-+	invalidate_bdev(disk->part0);
- 	blk_drop_partitions(disk);
+ 	rq = blk_get_request(q, (cgc->data_direction == CGC_DATA_WRITE) ?
+-			     REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, 0);
++			     REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(rq))
+ 		return PTR_ERR(rq);
  
- 	clear_bit(GD_NEED_PART_SCAN, &disk->state);
-@@ -691,7 +689,7 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index 90ad34c6ef8e..feb827eefd1a 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -2186,7 +2186,7 @@ static int cdrom_read_cdda_bpc(struct cdrom_device_info *cdi, __u8 __user *ubuf,
+ 
+ 		len = nr * CD_FRAMESIZE_RAW;
+ 
+-		rq = blk_get_request(q, REQ_OP_SCSI_IN, 0);
++		rq = blk_get_request(q, REQ_OP_DRV_IN, 0);
+ 		if (IS_ERR(rq)) {
+ 			ret = PTR_ERR(rq);
+ 			break;
+diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
+index d8fafe77dbbe..03a2ff547b22 100644
+--- a/drivers/scsi/scsi_error.c
++++ b/drivers/scsi/scsi_error.c
+@@ -2011,7 +2011,7 @@ static void scsi_eh_lock_door(struct scsi_device *sdev)
+ 	struct request *req;
+ 	struct scsi_request *rq;
+ 
+-	req = blk_get_request(sdev->request_queue, REQ_OP_SCSI_IN, 0);
++	req = blk_get_request(sdev->request_queue, REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(req))
+ 		return;
+ 	rq = scsi_req(req);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 532304d42f00..6cc7dad923cb 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -215,7 +215,7 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 
+ 	req = blk_get_request(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN,
++			REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
+ 			rq_flags & RQF_PM ? BLK_MQ_REQ_PM : 0);
+ 	if (IS_ERR(req))
+ 		return ret;
+@@ -540,7 +540,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+ 	if (blk_queue_add_random(q))
+ 		add_disk_randomness(req->rq_disk);
+ 
+-	if (!blk_rq_is_scsi(req)) {
++	if (!blk_rq_is_passthrough(req)) {
+ 		WARN_ON_ONCE(!(cmd->flags & SCMD_INITIALIZED));
+ 		cmd->flags &= ~SCMD_INITIALIZED;
  	}
+@@ -1115,7 +1115,7 @@ void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
+ 	bool in_flight;
+ 	int budget_token = cmd->budget_token;
  
- 	if (get_capacity(disk)) {
--		ret = blk_add_partitions(disk, bdev);
-+		ret = blk_add_partitions(disk);
- 		if (ret == -EAGAIN)
- 			goto rescan;
- 	} else if (invalidate) {
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 40b7c6c470f2..c6e73c051790 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -647,14 +647,13 @@ static inline void loop_update_dio(struct loop_device *lo)
- 				lo->use_dio);
- }
- 
--static void loop_reread_partitions(struct loop_device *lo,
--				   struct block_device *bdev)
-+static void loop_reread_partitions(struct loop_device *lo)
- {
- 	int rc;
- 
--	mutex_lock(&bdev->bd_disk->open_mutex);
--	rc = bdev_disk_changed(bdev, false);
--	mutex_unlock(&bdev->bd_disk->open_mutex);
-+	mutex_lock(&lo->lo_disk->open_mutex);
-+	rc = bdev_disk_changed(lo->lo_disk, false);
-+	mutex_unlock(&lo->lo_disk->open_mutex);
- 	if (rc)
- 		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
- 			__func__, lo->lo_number, lo->lo_file_name, rc);
-@@ -752,7 +751,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+-	if (!blk_rq_is_scsi(rq) && !(flags & SCMD_INITIALIZED)) {
++	if (!blk_rq_is_passthrough(rq) && !(flags & SCMD_INITIALIZED)) {
+ 		flags |= SCMD_INITIALIZED;
+ 		scsi_initialize_rq(rq);
+ 	}
+@@ -1556,7 +1556,7 @@ static blk_status_t scsi_prepare_cmd(struct request *req)
+ 	 * Special handling for passthrough commands, which don't go to the ULP
+ 	 * at all:
  	 */
- 	fput(old_file);
- 	if (partscan)
--		loop_reread_partitions(lo, bdev);
-+		loop_reread_partitions(lo);
- 	return 0;
+-	if (blk_rq_is_scsi(req))
++	if (blk_rq_is_passthrough(req))
+ 		return scsi_setup_scsi_cmnd(sdev, req);
  
- out_err:
-@@ -1175,7 +1174,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	bdgrab(bdev);
- 	mutex_unlock(&lo->lo_mutex);
- 	if (partscan)
--		loop_reread_partitions(lo, bdev);
-+		loop_reread_partitions(lo);
- 	if (!(mode & FMODE_EXCL))
- 		bd_abort_claiming(bdev, loop_configure);
- 	return 0;
-@@ -1269,10 +1268,10 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 		 * current holder is released.
- 		 */
- 		if (!release)
--			mutex_lock(&bdev->bd_disk->open_mutex);
--		err = bdev_disk_changed(bdev, false);
-+			mutex_lock(&lo->lo_disk->open_mutex);
-+		err = bdev_disk_changed(lo->lo_disk, false);
- 		if (!release)
--			mutex_unlock(&bdev->bd_disk->open_mutex);
-+			mutex_unlock(&lo->lo_disk->open_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo_number, err);
-@@ -1417,7 +1416,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- out_unlock:
- 	mutex_unlock(&lo->lo_mutex);
- 	if (partscan)
--		loop_reread_partitions(lo, bdev);
-+		loop_reread_partitions(lo);
+ 	if (sdev->handler && sdev->handler->prep_fn) {
+diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+index def7ec3bbaf9..f84fa550dd15 100644
+--- a/drivers/scsi/sg.c
++++ b/drivers/scsi/sg.c
+@@ -1756,7 +1756,7 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
+ 	 * not expect an EWOULDBLOCK from this condition.
+ 	 */
+ 	rq = blk_get_request(q, hp->dxfer_direction == SG_DXFER_TO_DEV ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, 0);
++			REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(rq)) {
+ 		kfree(long_cmdp);
+ 		return PTR_ERR(rq);
+diff --git a/drivers/scsi/st.c b/drivers/scsi/st.c
+index 3b1afe1d5b27..86c951c654a8 100644
+--- a/drivers/scsi/st.c
++++ b/drivers/scsi/st.c
+@@ -549,7 +549,7 @@ static int st_scsi_execute(struct st_request *SRpnt, const unsigned char *cmd,
  
- 	return err;
+ 	req = blk_get_request(SRpnt->stp->device->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, 0);
++			REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(req))
+ 		return DRIVER_ERROR << 24;
+ 	rq = scsi_req(req);
+diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
+index f2a11414366d..4531cf47d24e 100644
+--- a/drivers/target/target_core_pscsi.c
++++ b/drivers/target/target_core_pscsi.c
+@@ -982,7 +982,7 @@ pscsi_execute_cmd(struct se_cmd *cmd)
+ 
+ 	req = blk_get_request(pdv->pdv_sd->request_queue,
+ 			cmd->data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, 0);
++			REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(req)) {
+ 		pr_err("PSCSI: blk_get_request() failed\n");
+ 		ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
+index 1058659a8d31..c99dee99a3c1 100644
+--- a/fs/nfsd/blocklayout.c
++++ b/fs/nfsd/blocklayout.c
+@@ -236,7 +236,7 @@ static int nfsd4_scsi_identify_device(struct block_device *bdev,
+ 	if (!buf)
+ 		return -ENOMEM;
+ 
+-	rq = blk_get_request(q, REQ_OP_SCSI_IN, 0);
++	rq = blk_get_request(q, REQ_OP_DRV_IN, 0);
+ 	if (IS_ERR(rq)) {
+ 		error = -ENOMEM;
+ 		goto out_free_buf;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index fd3860d18d7e..db61f7df1823 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -350,9 +350,6 @@ enum req_opf {
+ 	/* reset all the zone present on the device */
+ 	REQ_OP_ZONE_RESET_ALL	= 17,
+ 
+-	/* SCSI passthrough using struct scsi_request */
+-	REQ_OP_SCSI_IN		= 32,
+-	REQ_OP_SCSI_OUT		= 33,
+ 	/* Driver private requests */
+ 	REQ_OP_DRV_IN		= 34,
+ 	REQ_OP_DRV_OUT		= 35,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d66d0da72529..d199e51524eb 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -240,42 +240,15 @@ struct request {
+ 	void *end_io_data;
+ };
+ 
+-static inline bool blk_op_is_scsi(unsigned int op)
+-{
+-	return op == REQ_OP_SCSI_IN || op == REQ_OP_SCSI_OUT;
+-}
+-
+-static inline bool blk_op_is_private(unsigned int op)
++static inline bool blk_op_is_passthrough(unsigned int op)
+ {
++	op &= REQ_OP_MASK;
+ 	return op == REQ_OP_DRV_IN || op == REQ_OP_DRV_OUT;
  }
-diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
-index bf2082d461c7..493e8469893c 100644
---- a/drivers/s390/block/dasd_genhd.c
-+++ b/drivers/s390/block/dasd_genhd.c
-@@ -110,7 +110,7 @@ int dasd_scan_partitions(struct dasd_block *block)
- 	}
  
- 	mutex_lock(&block->gdp->open_mutex);
--	rc = bdev_disk_changed(bdev, false);
-+	rc = bdev_disk_changed(block->gdp, false);
- 	mutex_unlock(&block->gdp->open_mutex);
- 	if (rc)
- 		DBF_DEV_EVENT(DBF_ERR, block->base,
-@@ -146,7 +146,7 @@ void dasd_destroy_partitions(struct dasd_block *block)
- 	block->bdev = NULL;
- 
- 	mutex_lock(&bdev->bd_disk->open_mutex);
--	bdev_disk_changed(bdev, true);
-+	bdev_disk_changed(bdev->bd_disk, true);
- 	mutex_unlock(&bdev->bd_disk->open_mutex);
- 
- 	/* Matching blkdev_put to the blkdev_get in dasd_scan_partitions. */
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 5b3a73ecb696..34253d155f5c 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1253,7 +1253,7 @@ static int blkdev_get_whole(struct block_device *bdev, fmode_t mode)
- 			/* avoid ghost partitions on a removed medium */
- 			if (ret == -ENOMEDIUM &&
- 			     test_bit(GD_NEED_PART_SCAN, &disk->state))
--				bdev_disk_changed(bdev, true);
-+				bdev_disk_changed(disk, true);
- 			return ret;
- 		}
- 	}
-@@ -1264,7 +1264,7 @@ static int blkdev_get_whole(struct block_device *bdev, fmode_t mode)
- 			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
- 	}
- 	if (test_bit(GD_NEED_PART_SCAN, &disk->state))
--		bdev_disk_changed(bdev, false);
-+		bdev_disk_changed(disk, false);
- 	bdev->bd_openers++;
- 	return 0;;
- }
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index f5f0c9bdf1d2..13b34177cc85 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -256,7 +256,7 @@ static inline sector_t get_capacity(struct gendisk *disk)
- 	return bdev_nr_sectors(disk->part0);
+-static inline bool blk_rq_is_scsi(struct request *rq)
+-{
+-	return blk_op_is_scsi(req_op(rq));
+-}
+-
+-static inline bool blk_rq_is_private(struct request *rq)
+-{
+-	return blk_op_is_private(req_op(rq));
+-}
+-
+ static inline bool blk_rq_is_passthrough(struct request *rq)
+ {
+-	return blk_rq_is_scsi(rq) || blk_rq_is_private(rq);
+-}
+-
+-static inline bool bio_is_passthrough(struct bio *bio)
+-{
+-	unsigned op = bio_op(bio);
+-
+-	return blk_op_is_scsi(op) || blk_op_is_private(op);
+-}
+-
+-static inline bool blk_op_is_passthrough(unsigned int op)
+-{
+-	return (blk_op_is_scsi(op & REQ_OP_MASK) ||
+-			blk_op_is_private(op & REQ_OP_MASK));
++	return blk_op_is_passthrough(req_op(rq));
  }
  
--int bdev_disk_changed(struct block_device *bdev, bool invalidate);
-+int bdev_disk_changed(struct gendisk *disk, bool invalidate);
- void blk_drop_partitions(struct gendisk *disk);
- 
- extern struct gendisk *__alloc_disk_node(int minors, int node_id);
+ static inline unsigned short req_get_ioprio(struct request *req)
 -- 
 2.30.2
 
