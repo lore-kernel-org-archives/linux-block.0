@@ -2,185 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C867C48BC2
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 01:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79138C48BC2
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 02:45:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C02161360
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 01:09:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D89D613B3
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 02:45:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229796AbhFXBMC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jun 2021 21:12:02 -0400
-Received: from mail-pj1-f54.google.com ([209.85.216.54]:43999 "EHLO
-        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbhFXBMB (ORCPT
+        id S229759AbhFXCrZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jun 2021 22:47:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54744 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229758AbhFXCrZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jun 2021 21:12:01 -0400
-Received: by mail-pj1-f54.google.com with SMTP id x21-20020a17090aa395b029016e25313bfcso2436737pjp.2;
-        Wed, 23 Jun 2021 18:09:43 -0700 (PDT)
+        Wed, 23 Jun 2021 22:47:25 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C92C061574
+        for <linux-block@vger.kernel.org>; Wed, 23 Jun 2021 19:45:07 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id o5so6072245iob.4
+        for <linux-block@vger.kernel.org>; Wed, 23 Jun 2021 19:45:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/OSyVR61XD9Kg6s4o47sceyMyMjakKnzHrYWn8ryqTI=;
+        b=0+IuKPSuw+qS9m/yGUXs7gxb7ZeFTP9ErCNyvDCfCtrYP6IemPRKWOG6Z3g3yl0lhp
+         OvZ+OOfVGnyrIzbRNK7bCJaU+BM5YkJdqN0nIps8+N3upghnqprLMJIzd/XuUoF30Hzh
+         4UpGirvQ9GHmOvHHhjbUWlJqRpLF20mL1yEyifU7g8Oc//2Vy78y/UInstLMgLQfAyv3
+         lhlsNAcxCnkveVKCWicxTefUkHLV0hO5HRaWANBdDfvMyVkseivptxSAp8CZrS9++Pgl
+         gWlGobEr1TaFOrNrGUceEog0nabwOAZhAfVLzdtd7pZxN7D9zuIi5/+TMuZlC9AHI2CR
+         InPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PO+OZdeB1TBNrmdfG2tVTtR4I3d+YFWVIm9pGwjwxnE=;
-        b=cqDfDiiDKtWXhO4/aCcKIS9Msi7Koe0oMpUI4k06Jz9+JiiGzt7eNexUzogg7mmvQE
-         zOL5fDy4UaYFOrDQktuwaFPyhyXhzlX0gCXGx5wINmCDh+3T2EnZYwm2HOnNF0Z/INxK
-         0/EtOwlHDa+XMGSjdXgNlyUWQLbUOppz9XI0Mnqw5XS7MvtPA6XgZNO1NXNpEJ6dShWw
-         QZkyV44vED3YrzIMSKbpe8tWM4b8L3BI/6JGbxJ9FwBrOKhe4aJwpyi8cVT2wEjAJx/c
-         64/EXktekF7fI6teUnr/gcGCVdCmgAharfJv6jpeUkTTUxMQcc9zDtz/EFyd5QBHEBVk
-         /+lw==
-X-Gm-Message-State: AOAM532+Z2wniOOr7fqaoasypuMRxaWaNIi76v759XxbqG7XVvUDpeNW
-        M3Wlw+SSQiRNTy918bSmYEw=
-X-Google-Smtp-Source: ABdhPJz4hSR98F63n7IBaqWqCwwbKSQIvfmPp1JmZJih2MQBU+xd2rF2KWEtN3g1X+YSoC+euSnceQ==
-X-Received: by 2002:a17:902:7d8f:b029:116:4b69:c7c5 with SMTP id a15-20020a1709027d8fb02901164b69c7c5mr1980892plm.58.1624496983406;
-        Wed, 23 Jun 2021 18:09:43 -0700 (PDT)
-Received: from garbanzo ([191.96.121.71])
-        by smtp.gmail.com with ESMTPSA id o14sm289291pgk.82.2021.06.23.18.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jun 2021 18:09:42 -0700 (PDT)
-Date:   Wed, 23 Jun 2021 18:09:38 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     gregkh@linuxfoundation.org, rafael@kernel.org, davem@davemloft.net,
-        kuba@kernel.org, ast@kernel.org, andriin@fb.com,
-        daniel@iogearbox.net, atenart@kernel.org, alobakin@pm.me,
-        weiwan@google.com, ap420073@gmail.com, jeyu@kernel.org,
-        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
-        minchan@kernel.org, axboe@kernel.dk, mbenes@suse.com,
-        jpoimboe@redhat.com, tglx@linutronix.de, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] sysfs: fix kobject refcount to address races with
- kobject removal
-Message-ID: <20210624010938.h6asniijrd2nrlyy@garbanzo>
-References: <20210623215007.862787-1-mcgrof@kernel.org>
- <202106231555.871D23D50@keescook>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/OSyVR61XD9Kg6s4o47sceyMyMjakKnzHrYWn8ryqTI=;
+        b=LyDivT4eGpumtwh55AChjxyKnwUXUP0nMiyXPC+6BtRdVkfO8k24t0silzgY7gdOaJ
+         JALj/b3zbQqTekZqQLUDmtCyhWVbHASNlhdS/U0wwVZzKRY8TTVSXxWweefvRQ4GK4rO
+         0jNHwD0RZgDprx09FzHjz6260rWFSMhYlw6e6zgWBOfIl9DlxMqGYuU5Qb8rFD9ZLJT+
+         I+I0dN0gwuSeRlznTp/mm65CF/bMUmxV7V0HzMROCbnoNRO9nhJxyus1RgOhfEyw3yv/
+         IOYyIx+aVbS6sIbMBA20lcuYVSlJBSErwlrRDIjqeNajHM2IwbfzYWC/2oJGrayLLCxK
+         2CVA==
+X-Gm-Message-State: AOAM530x5uT6M8UNC+mWPiuB4fEG4ENo3/ZiWemTv/O/riJWogBGOEGP
+        SNGfx4MxhPyucTBKtWf9KBomA0r3DBEgjg==
+X-Google-Smtp-Source: ABdhPJytmyUELTPQbsNYU3SFs04l0n+65KHoSdlKe1Tt+aQBtWnIHNaPHzHQBteUv2dMsRYlq+j/nA==
+X-Received: by 2002:a02:ba0d:: with SMTP id z13mr2577746jan.80.1624502706376;
+        Wed, 23 Jun 2021 19:45:06 -0700 (PDT)
+Received: from [192.168.1.134] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id i26sm808719ila.85.2021.06.23.19.45.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Jun 2021 19:45:05 -0700 (PDT)
+Subject: Re: loop cleanups v2
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        linux-block@vger.kernel.org
+References: <20210623145908.92973-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <207a4fee-8c04-05df-3058-a5ec0e4538aa@kernel.dk>
+Date:   Wed, 23 Jun 2021 20:45:03 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202106231555.871D23D50@keescook>
+In-Reply-To: <20210623145908.92973-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 03:59:37PM -0700, Kees Cook wrote:
-> On Wed, Jun 23, 2021 at 02:50:07PM -0700, Luis Chamberlain wrote:
-> > It's possible today to have a device attribute read or store
-> > race against device removal. This is known to happen as follows:
-> > 
-> > write system call -->
-> >   ksys_write () -->
-> >     vfs_write() -->
-> >       __vfs_write() -->
-> >         kernfs_fop_write_iter() -->
-> >           sysfs_kf_write() -->
-> >             dev_attr_store() -->
-> >               null reference
-> > 
-> > This happens because the dev_attr->store() callback can be
-> > removed prior to its call, after dev_attr_store() was initiated.
-> > The null dereference is possible because the sysfs ops can be
-> > removed on module removal, for instance, when device_del() is
-> > called, and a sysfs read / store is not doing any kobject reference
-> > bumps either. This allows a read/store call to initiate, a
-> > device_del() to kick off, and then the read/store call can be
-> > gone by the time to execute it.
-> > 
-> > The sysfs filesystem is not doing any kobject reference bumps during a
-> > read / store ops to prevent this.
-> > 
-> > To fix this in a simplified way, just bump the kobject reference when
-> > we create a directory and remove it on directory removal.
-> > 
-> > The big unfortunate eye-sore is addressing the manual kobject reference
-> > assumption on the networking code, which leads me to believe we should
-> > end up replacing that eventually with another sort of check.
-> > 
-> > Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > ---
-> > 
-> > This v4 moves to fixing the race condition on dev_attr_store() and
-> > dev_attr_read() to sysfs by bumping the kobject reference count
-> > on directory creation / deletion as suggested by Greg.
-> > 
-> > Unfortunately at least the networking core has a manual refcount
-> > assumption, which needs to be adjusted to account for this change.
-> > This should also mean there is runtime for other kobjects which may
-> > not be explored yet which may need fixing as well. We may want to
-> > change the check to something else on the networking front, but its
-> > not clear to me yet what to use.
-> > 
-> >  fs/sysfs/dir.c | 3 +++
-> >  net/core/dev.c | 4 ++--
-> >  2 files changed, 5 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/fs/sysfs/dir.c b/fs/sysfs/dir.c
-> > index 59dffd5ca517..6c47aa4af6f5 100644
-> > --- a/fs/sysfs/dir.c
-> > +++ b/fs/sysfs/dir.c
-> > @@ -56,12 +56,14 @@ int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
-> >  
-> >  	kobject_get_ownership(kobj, &uid, &gid);
-> >  
-> > +	kobject_get(kobj);
-> >  	kn = kernfs_create_dir_ns(parent, kobject_name(kobj),
-> >  				  S_IRWXU | S_IRUGO | S_IXUGO, uid, gid,
-> >  				  kobj, ns);
-> >  	if (IS_ERR(kn)) {
-> >  		if (PTR_ERR(kn) == -EEXIST)
-> >  			sysfs_warn_dup(parent, kobject_name(kobj));
-> > +		kobject_put(kobj);
-> >  		return PTR_ERR(kn);
-> >  	}
-> >  
-> > @@ -100,6 +102,7 @@ void sysfs_remove_dir(struct kobject *kobj)
-> >  	if (kn) {
-> >  		WARN_ON_ONCE(kernfs_type(kn) != KERNFS_DIR);
-> >  		kernfs_remove(kn);
-> > +		kobject_put(kobj);
-> >  	}
-> >  }
+On 6/23/21 8:58 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> Shouldn't this be taken on open() not sysfs creation, or is the problem
-> that the kobject is held the module memory rather than duplicated by
-> sysfs?
-
-If you kobject_get() you also protect from module removal to complete
-until the calls ends. The issue is the dereference for the attribute
-op will be gone if we don't protect the kobject during the op.
-
-We only have an open() call for the bin sysfs files. So the alternative
-is to sprinkly the get on all calls. The goal with adding it to the
-directory creation was to simplify this.
-
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 222b1d322c96..3a0ffa603d14 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -10429,7 +10429,7 @@ static void netdev_wait_allrefs(struct net_device *dev)
-> >  	rebroadcast_time = warning_time = jiffies;
-> >  	refcnt = netdev_refcnt_read(dev);
-> >  
-> > -	while (refcnt != 1) {
-> > +	while (refcnt != 3) {
-> >  		if (time_after(jiffies, rebroadcast_time + 1 * HZ)) {
-> >  			rtnl_lock();
-> >  
-> > @@ -10544,7 +10544,7 @@ void netdev_run_todo(void)
-> >  		netdev_wait_allrefs(dev);
-> >  
-> >  		/* paranoia */
-> > -		BUG_ON(netdev_refcnt_read(dev) != 1);
-> > +		BUG_ON(netdev_refcnt_read(dev) != 3);
+> this series contains a bunch of cleanups for the loop driver,
+> mostly related to probing and the control device.
 > 
-> And surely there are things besides netdevs that would suffer from this
-> change?
+> Changes since v1:
+>  - use local variables instead of dereferencing struct loop_device
+>    outside loop_ctl_mutex
 
-Yes, I noted this possibility below the commit log, below the "---".
+Applied, thanks.
 
-  Luis
+-- 
+Jens Axboe
+
