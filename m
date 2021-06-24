@@ -2,63 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D7FC48BDF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD1EC49EA6
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:33:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65D52613DC
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C377F613E0
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:33:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231128AbhFXGRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jun 2021 02:17:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44856 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230515AbhFXGRt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jun 2021 02:17:49 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5376AC061574;
-        Wed, 23 Jun 2021 23:15:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=cLzuPmWnT7cLiujhn4thtNqmsI+9nqkAPBiidz+Pv7g=; b=LnNOHZHtKXbwjS5bWMZWiVWL3Z
-        AKCrIW0Xtsm+v5LCP0DX3MYeglxC5rgZk4Mr1XS/fx8ucOsAXd23y4YBcSkZZCQx5ap4LZvpvOfrU
-        d5RdB6hYOUomIsh4reA72drdYZabPXDblv2uagadZOhcYpeOeaxNDImsuXDIZgc/6X62VXbB0jubU
-        mJxnJLPS2dyJJ9USrazptFdP4S4/dJjJji524AlybvVN5Ku5aLKxCGPknQd08G67u6OBrEimTLTbi
-        LZrEpPI4ZX7eOdxIUbpelNAT1KWinoRuA9MAD43B7ROOMHCsO+zytEWRCcxYBOUTUvTafnE1m4yR1
-        Z/RQ4iuA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lwIdI-00GFN6-4h; Thu, 24 Jun 2021 06:14:56 +0000
-Date:   Thu, 24 Jun 2021 07:14:36 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+cf89d662483d6a1a0790@syzkaller.appspotmail.com
-Subject: Re: [RESEND PATCH] loop: fix setting arbitrarily large block size
-Message-ID: <YNQizOHDSM0Y2Lz/@infradead.org>
-References: <20210622161019.130090-1-chouhan.shreyansh630@gmail.com>
- <20210623050933.140572-1-chouhan.shreyansh630@gmail.com>
+        id S231292AbhFXGfn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jun 2021 02:35:43 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50834 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231145AbhFXGfm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Jun 2021 02:35:42 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1lwIun-0005DQ-BZ; Thu, 24 Jun 2021 14:32:41 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1lwIuN-0000Wf-O4; Thu, 24 Jun 2021 14:32:15 +0800
+Date:   Thu, 24 Jun 2021 14:32:15 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ira Weiny <ira.weiny@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        dm-devel@redhat.com, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
+        linux-arch@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Christoph Lameter <cl@gentwo.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: scatterwalk - Remove obsolete PageSlab check
+Message-ID: <20210624063215.GA31721@gondor.apana.org.au>
+References: <20210615132456.753241-1-hch@lst.de>
+ <20210615132456.753241-2-hch@lst.de>
+ <20210618030157.GA1905674@iweiny-DESK2.sc.intel.com>
+ <20210618033728.GA16787@gondor.apana.org.au>
+ <20210618181258.GC1905674@iweiny-DESK2.sc.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210623050933.140572-1-chouhan.shreyansh630@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210618181258.GC1905674@iweiny-DESK2.sc.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 10:39:33AM +0530, Shreyansh Chouhan wrote:
-> REASON FOR RESEND: Fixed spelling of the Reported-by tag.
+On Fri, Jun 18, 2021 at 11:12:58AM -0700, Ira Weiny wrote:
+>
+> Interesting!  Thanks!
+> 
+> Digging around a bit more I found:
+> 
+> https://lore.kernel.org/patchwork/patch/439637/
 
-That goes under a "---" deliminator.
+Nice find.  So we can at least get rid of the PageSlab call from
+the Crypto API.
 
-Except for that:
+---8<---
+As it is now legal to call flush_dcache_page on slab pages we
+no longer need to do the check in the Crypto API.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reported-by: Ira Weiny <ira.weiny@intel.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index c837d0775474..7af08174a721 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -81,12 +81,7 @@ static inline void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+ 		struct page *page;
+ 
+ 		page = sg_page(walk->sg) + ((walk->offset - 1) >> PAGE_SHIFT);
+-		/* Test ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE first as
+-		 * PageSlab cannot be optimised away per se due to
+-		 * use of volatile pointer.
+-		 */
+-		if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE && !PageSlab(page))
+-			flush_dcache_page(page);
++		flush_dcache_page(page);
+ 	}
+ 
+ 	if (more && walk->offset >= walk->sg->offset + walk->sg->length)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
