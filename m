@@ -2,100 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD1EC49EA6
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D03C48BDF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:50:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C377F613E0
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:33:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38C2D613CC
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jun 2021 06:50:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231292AbhFXGfn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jun 2021 02:35:43 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50834 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231145AbhFXGfm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jun 2021 02:35:42 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lwIun-0005DQ-BZ; Thu, 24 Jun 2021 14:32:41 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lwIuN-0000Wf-O4; Thu, 24 Jun 2021 14:32:15 +0800
-Date:   Thu, 24 Jun 2021 14:32:15 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        dm-devel@redhat.com, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
-        linux-arch@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Christoph Lameter <cl@gentwo.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: scatterwalk - Remove obsolete PageSlab check
-Message-ID: <20210624063215.GA31721@gondor.apana.org.au>
-References: <20210615132456.753241-1-hch@lst.de>
- <20210615132456.753241-2-hch@lst.de>
- <20210618030157.GA1905674@iweiny-DESK2.sc.intel.com>
- <20210618033728.GA16787@gondor.apana.org.au>
- <20210618181258.GC1905674@iweiny-DESK2.sc.intel.com>
+        id S231204AbhFXGxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jun 2021 02:53:11 -0400
+Received: from mail.synology.com ([211.23.38.101]:38814 "EHLO synology.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231132AbhFXGxK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Jun 2021 02:53:10 -0400
+Subject: Re: [PATCH v3] block: fix trace completion for chained bio
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synology.com; s=123;
+        t=1624517448; bh=S9PH3gMYVY8Uk41vBYmoqe9s+YbYcC3OEOnxZ09adSk=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=V2DuV9LO1rjX81uFaJ16urzZgfeoMD+BXuyqrtX/vm9hl5BUKCQxBnZmFmxek23tU
+         QIqtGHW8vL7x9AV8cqBdUeqhCybjE6a9aFVJN43v6E1lP1dHacUHvaJ1HWsjI+cJY+
+         h86ZflLo1JPFt5M7lpvoULjKWhjx7wRSV9x8nWhM=
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, neilb@suse.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, s3t@synology.com,
+        bingjingc@synology.com, cccheng@synology.com,
+        Wade Liang <wadel@synology.com>
+References: <20210616030810.4901-1-edwardh@synology.com>
+ <YMmDxl9abff+wulm@infradead.org>
+From:   Edward Hsieh <edwardh@synology.com>
+Message-ID: <1204c32a-e3b3-95dd-b2b5-b9f6eef4f022@synology.com>
+Date:   Thu, 24 Jun 2021 14:50:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210618181258.GC1905674@iweiny-DESK2.sc.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <YMmDxl9abff+wulm@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Synology-MCP-Status: no
+X-Synology-Spam-Flag: no
+X-Synology-Spam-Status: score=0, required 6, WHITELIST_FROM_ADDRESS 0
+X-Synology-Virus-Status: no
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 11:12:58AM -0700, Ira Weiny wrote:
->
-> Interesting!  Thanks!
+
+
+On 6/16/2021 12:53 PM, Christoph Hellwig wrote:
+> On Wed, Jun 16, 2021 at 11:08:10AM +0800, edwardh wrote:
+>> @@ -1400,18 +1404,13 @@ void bio_endio(struct bio *bio)
+>>   	if (bio->bi_end_io == bio_chain_endio) {
+>>   		bio = __bio_chain_endio(bio);
+>>   		goto again;
+>> +	} else {
+>> +		blk_throtl_bio_endio(bio);
+>> +		/* release cgroup info */
+>> +		bio_uninit(bio);
+>> +		if (bio->bi_end_io)
+>> +			bio->bi_end_io(bio);
 > 
-> Digging around a bit more I found:
+> No need for an else after a goto.
 > 
-> https://lore.kernel.org/patchwork/patch/439637/
 
-Nice find.  So we can at least get rid of the PageSlab call from
-the Crypto API.
+We are suggested by Neil Brown in the last version that from the
+comment, the bio_chain_endio handling is used *only* to avoid
+deep recursion so it should be at the end of the function.
+Therefore, the position of blk_throtl_bio_endio() and bio_uninit()
+are a bit odd.
 
----8<---
-As it is now legal to call flush_dcache_page on slab pages we
-no longer need to do the check in the Crypto API.
+We believe that blk_throtl_bio_endio() and bio_uninit() is in
+the correct position now. And adding an else closure is our
+attempt to make it more clear.
 
-Reported-by: Ira Weiny <ira.weiny@intel.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+If it's not necessary then V2 patch should work to fix the
+missing completion traces. Should we resend PATCH V2?
 
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index c837d0775474..7af08174a721 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -81,12 +81,7 @@ static inline void scatterwalk_pagedone(struct scatter_walk *walk, int out,
- 		struct page *page;
- 
- 		page = sg_page(walk->sg) + ((walk->offset - 1) >> PAGE_SHIFT);
--		/* Test ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE first as
--		 * PageSlab cannot be optimised away per se due to
--		 * use of volatile pointer.
--		 */
--		if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE && !PageSlab(page))
--			flush_dcache_page(page);
-+		flush_dcache_page(page);
- 	}
- 
- 	if (more && walk->offset >= walk->sg->offset + walk->sg->length)
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thank you,
+Edward
