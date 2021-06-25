@@ -2,91 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528AAC2B9F4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 19:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C101FC2B9F4
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 21:56:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F0FA613AB
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 19:14:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9782C6194B
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 21:56:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbhFYTQq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jun 2021 15:16:46 -0400
-Received: from luna.lichtvoll.de ([194.150.191.11]:46417 "EHLO
-        mail.lichtvoll.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S229531AbhFYTQp (ORCPT
+        id S229907AbhFYV60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jun 2021 17:58:26 -0400
+Received: from mail-pg1-f170.google.com ([209.85.215.170]:46912 "EHLO
+        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229531AbhFYV60 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jun 2021 15:16:45 -0400
-X-Greylist: delayed 478 seconds by postgrey-1.27 at vger.kernel.org; Fri, 25 Jun 2021 15:16:45 EDT
-Received: from ananda.localnet (unknown [IPv6:2001:a62:1a2f:d900:2fc7:e4d:d332:3965])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.lichtvoll.de (Postfix) with ESMTPSA id 05E3127A980;
-        Fri, 25 Jun 2021 21:06:20 +0200 (CEST)
-From:   Martin Steigerwald <martin@lichtvoll.de>
-To:     linux-block@vger.kernel.org
-Cc:     linux-btrfs@vger.kernel.org
-Subject: Assumption on fixed device numbers in Plasma's desktop search Baloo
-Date:   Fri, 25 Jun 2021 21:06:19 +0200
-Message-ID: <41661070.mPYKQbcTYQ@ananda>
+        Fri, 25 Jun 2021 17:58:26 -0400
+Received: by mail-pg1-f170.google.com with SMTP id w15so4732499pgk.13;
+        Fri, 25 Jun 2021 14:56:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=COkBtu1DRhiaP0VAr6IF4em+cKZJHXcKly1cODZLhlU=;
+        b=E2qXIbpbfSiZzo016OGLYvv+gB2DJ1xp6xKujSqzct07fSJX3GEMRO7v3G3/Lu0aiu
+         3Nl8HpK5GQNg/Stxux/U5GYhOAyZ6KzQ7AZuw+zKcRghQSaKwVWNsgRvFv9tvQQMqjEb
+         zwdMKacCiIun2hgEZmZYjCHBr3PyszJnW+vTShSs3fNF8/YovbxVAxrvQZMu095v7u/n
+         K1YFlBzl83ytrDreG3Tg6utR676nuA3SWP1mz+mJgvEyn7X7Bw4L3+l0/TOrJFwxE9pO
+         cUZ3qJ4Cfr0s7RW2jCagnl1SfkwxsUuxroxIAuQLPCC03LG8kreutZ7sT5TOjtPE+L3/
+         1gmw==
+X-Gm-Message-State: AOAM533jmlMZRq7b/8D4q3s59SG6+M7i7pg81kK0jaQ/3AMPiBwTe3MG
+        STo8E+ybSWcWV/g0KuBTzNI=
+X-Google-Smtp-Source: ABdhPJysJnt068twgh+M6kfI/lanpHpG9o2CTZadWdqX2+ccdXUp7CnEuUaVxvgXa6bu00QvpLZkkg==
+X-Received: by 2002:a63:d74c:: with SMTP id w12mr3194280pgi.91.1624658163667;
+        Fri, 25 Jun 2021 14:56:03 -0700 (PDT)
+Received: from garbanzo ([191.96.121.71])
+        by smtp.gmail.com with ESMTPSA id h1sm11760433pji.14.2021.06.25.14.56.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jun 2021 14:56:02 -0700 (PDT)
+Date:   Fri, 25 Jun 2021 14:55:58 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     rafael@kernel.org, davem@davemloft.net, kuba@kernel.org,
+        ast@kernel.org, andriin@fb.com, daniel@iogearbox.net,
+        atenart@kernel.org, alobakin@pm.me, weiwan@google.com,
+        ap420073@gmail.com, jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] sysfs: fix kobject refcount to address races with
+ kobject removal
+Message-ID: <20210625215558.xn4a24ts26bdyfzo@garbanzo>
+References: <20210623215007.862787-1-mcgrof@kernel.org>
+ <YNRnzxTabyoToKKJ@kroah.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Authentication-Results: mail.lichtvoll.de;
-        auth=pass smtp.auth=martin2 smtp.mailfrom=martin@lichtvoll.de
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YNRnzxTabyoToKKJ@kroah.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+On Thu, Jun 24, 2021 at 01:09:03PM +0200, Greg KH wrote:
+> thanks for making this change and sticking with it!
+> 
+> Oh, and with this change, does your modprobe/rmmod crazy test now work?
 
-I found repeatedly that Baloo indexes the same files twice or even more 
-often after a while.
+It does but I wrote a test_syfs driver and I believe I see an issue with
+this. I'll debug a bit more and see what it was, and I'll then also use
+the driver to demo the issue more clearly, and then verification can be
+an easy selftest test.
 
-I reported this upstream in:
-
-Bug 438434 - Baloo appears to be indexing twice the number of files than 
-are actually in my home directory 
-
-https://bugs.kde.org/show_bug.cgi?id=438434
-
-And got back that if the device number changes, Baloo will think it has 
-new files even tough the path is still the same. And found over time that 
-the device number for the single BTRFS filesystem on a NVMe SSD in a 
-ThinkPad T14 Gen1 AMD can change. It is not (maybe yet) RAID 1. I do 
-have BTRFS RAID 1 in another laptop and there I also had this issue 
-already.
-
-I argued that a desktop application has no business to rely on a device 
-number and got back that search/indexing is in the middle between an 
-application and system software. And that Baloo needs an "invariant" for 
-a file. See comment #11 of that bug report:
-
-https://bugs.kde.org/show_bug.cgi?id=438434#c11
-
-I got the suggestion to try to find a way to tell the kernel to use a 
-fixed device number. 
-
-I still think, an application or an infrastructure service for a desktop 
-environment or even anything else in user space should not rely on a 
-device number to be fixed and never change upon reboots.
-
-But maybe you have a different idea about that and it is okay for an 
-userspace component to do that. I would like to hear your idea about 
-that.
-
-Another question would be whether I could somehow make sure that the 
-device number does not change, even if just as a work-around. I know for 
-NFS there is a fsid= mount option, but it does not appear to be 
-something generic, at least the mount man page seems to have nothing 
-related to fsid.
-
-
-Best,
--- 
-Martin
-
-
+  Luis
