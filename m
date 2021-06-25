@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF82C2B9F4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 06:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52ECEC2B9F4
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 06:49:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7AF161421
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 06:44:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3724161423
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 06:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229445AbhFYGqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jun 2021 02:46:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36704 "EHLO
+        id S229723AbhFYGvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jun 2021 02:51:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbhFYGqh (ORCPT
+        with ESMTP id S229436AbhFYGvU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jun 2021 02:46:37 -0400
+        Fri, 25 Jun 2021 02:51:20 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4470FC061574
-        for <linux-block@vger.kernel.org>; Thu, 24 Jun 2021 23:44:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF11BC061574
+        for <linux-block@vger.kernel.org>; Thu, 24 Jun 2021 23:48:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
         Content-Description:In-Reply-To:References;
-        bh=cxZoNvpT9KG08gtLbt+m+4z1mWUVg+68R0FzPYZ/MqM=; b=WxFdG8j27SvMaPOF7SoiSEAAJm
-        l9g1a3d/Toxl9kOld/PkDRY8govD+TTZRlqDVs2adcXi7akxlzTXmCwNysmhKwsiu3PeJYPAq4ca2
-        Sihb44yR3+0cvwIifze67OYW7KMBHWd6Q534Q58aTAu5n1nR9FEmXt3mX3+MO6Nof9AfYN8WWutna
-        CxlBaFl0Q7qnP8QntA/VGWv0ySKxrpERiW5/GHtkPSl/sAgWppcLTUF3L7wpEJQPzre9Y9kcX/GOc
-        pwYpO1qRGVB+tOojyyKAuilAA7noR93ghVu1DbNIwID3e5AnduDx01U7mJ9PGUsSwXGRU6mCq4ihR
-        3QBFEIEg==;
+        bh=+4rNVD/UAVondguki6UkxGDstH9iHRoA1/gS/wfovVA=; b=fDgbBcLsf9iKgK8L39AiVnrl4X
+        8jY0tPaDlLZ/iQeZtOinkDBkOQ/naf+zLCmuMiQl4VjYtSHwoAbQhHIxy9dYSsr04mk+M8cuIrgZJ
+        lMrBPX6U891lT5g8iUhyfvWBqtlka/aOQ81z9+RbvoGz5d8cAFVCLKfmbJB3oXqpRKaJC4eyyIk8f
+        lM1gUOBLhtBWjRI0dfMmBLPvT9W6Y3jGnufZI4Y37lFrE0dDFsjC2v84/X1dNNXg1a0HxPynOHbXg
+        LKJwkPq4zf3FCzR2toIvzTS7MuwP4pBpCTWhEaHNMZrZ8WctVQuIR2Gn73cYRbtx69xmrXDwotS8O
+        Y0Yp4QrA==;
 Received: from 089144193030.atnat0002.highway.a1.net ([89.144.193.30] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lwfZS-00HNq8-BY; Fri, 25 Jun 2021 06:44:12 +0000
+        id 1lwfda-00HO0M-4P; Fri, 25 Jun 2021 06:48:29 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: pass a gendisk to bdev_{add,del,resize}_partition
-Date:   Fri, 25 Jun 2021 08:41:59 +0200
-Message-Id: <20210625064159.923557-1-hch@lst.de>
+Subject: [PATCH] block: reorder and better document the __REQ_* flags
+Date:   Fri, 25 Jun 2021 08:46:15 +0200
+Message-Id: <20210625064615.923862-1-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -50,153 +50,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These helpers deal with partition tables and thus logically operate
-on the gendisk.
+Keep the op-specific flag last and make a little more sense of the
+comments.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk.h             |  6 +++---
- block/ioctl.c           |  7 ++++---
- block/partitions/core.c | 36 ++++++++++++++++++------------------
- 3 files changed, 25 insertions(+), 24 deletions(-)
+ include/linux/blk_types.h | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index 4b885c0f6708..a18d87c8af9e 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -348,10 +348,10 @@ char *disk_name(struct gendisk *hd, int partno, char *buf);
- #define ADDPART_FLAG_NONE	0
- #define ADDPART_FLAG_RAID	1
- #define ADDPART_FLAG_WHOLEDISK	2
--int bdev_add_partition(struct block_device *bdev, int partno,
-+int bdev_add_partition(struct gendisk *disk, int partno,
- 		sector_t start, sector_t length);
--int bdev_del_partition(struct block_device *bdev, int partno);
--int bdev_resize_partition(struct block_device *bdev, int partno,
-+int bdev_del_partition(struct gendisk *disk, int partno);
-+int bdev_resize_partition(struct gendisk *disk, int partno,
- 		sector_t start, sector_t length);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index db61f7df1823..c80756e9f16e 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -381,15 +381,14 @@ enum req_flag_bits {
+ 	 * work item to avoid such priority inversions.
+ 	 */
+ 	__REQ_CGROUP_PUNT,
++	__REQ_HIPRI,		/* High Priority I/O (polled) */
++	__REQ_SWAP,		/* swap I/O */
  
- int bio_add_hw_page(struct request_queue *q, struct bio *bio,
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 24beec9ca9c9..395ec6b3c1c3 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -16,6 +16,7 @@
- static int blkpg_do_ioctl(struct block_device *bdev,
- 			  struct blkpg_partition __user *upart, int op)
- {
-+	struct gendisk *disk = bdev->bd_disk;
- 	struct blkpg_partition p;
- 	long long start, length;
+-	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+-	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
++	__REQ_DRV,		/* for driver use */
  
-@@ -30,7 +31,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 		return -EINVAL;
+-	__REQ_HIPRI,
++	/* command specific flag for REQ_OP_WRITE_ZEROES: */
++	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
  
- 	if (op == BLKPG_DEL_PARTITION)
--		return bdev_del_partition(bdev, p.pno);
-+		return bdev_del_partition(disk, p.pno);
- 
- 	start = p.start >> SECTOR_SHIFT;
- 	length = p.length >> SECTOR_SHIFT;
-@@ -40,9 +41,9 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 		/* check if partition is aligned to blocksize */
- 		if (p.start & (bdev_logical_block_size(bdev) - 1))
- 			return -EINVAL;
--		return bdev_add_partition(bdev, p.pno, start, length);
-+		return bdev_add_partition(disk, p.pno, start, length);
- 	case BLKPG_RESIZE_PARTITION:
--		return bdev_resize_partition(bdev, p.pno, start, length);
-+		return bdev_resize_partition(disk, p.pno, start, length);
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 347c56a51d87..875bf6763b0e 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -449,30 +449,30 @@ static bool partition_overlaps(struct gendisk *disk, sector_t start,
- 	return overlap;
- }
- 
--int bdev_add_partition(struct block_device *bdev, int partno,
--		sector_t start, sector_t length)
-+int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
-+		sector_t length)
- {
- 	struct block_device *part;
- 
--	mutex_lock(&bdev->bd_disk->open_mutex);
--	if (partition_overlaps(bdev->bd_disk, start, length, -1)) {
--		mutex_unlock(&bdev->bd_disk->open_mutex);
-+	mutex_lock(&disk->open_mutex);
-+	if (partition_overlaps(disk, start, length, -1)) {
-+		mutex_unlock(&disk->open_mutex);
- 		return -EBUSY;
- 	}
- 
--	part = add_partition(bdev->bd_disk, partno, start, length,
--			ADDPART_FLAG_NONE, NULL);
--	mutex_unlock(&bdev->bd_disk->open_mutex);
-+	part = add_partition(disk, partno, start, length, ADDPART_FLAG_NONE,
-+			     NULL);
-+	mutex_unlock(&disk->open_mutex);
- 	return PTR_ERR_OR_ZERO(part);
- }
- 
--int bdev_del_partition(struct block_device *bdev, int partno)
-+int bdev_del_partition(struct gendisk *disk, int partno)
- {
- 	struct block_device *part = NULL;
- 	int ret = -ENXIO;
- 
--	mutex_lock(&bdev->bd_disk->open_mutex);
--	part = xa_load(&bdev->bd_disk->part_tbl, partno);
-+	mutex_lock(&disk->open_mutex);
-+	part = xa_load(&disk->part_tbl, partno);
- 	if (!part)
- 		goto out_unlock;
- 
-@@ -483,18 +483,18 @@ int bdev_del_partition(struct block_device *bdev, int partno)
- 	delete_partition(part);
- 	ret = 0;
- out_unlock:
--	mutex_unlock(&bdev->bd_disk->open_mutex);
-+	mutex_unlock(&disk->open_mutex);
- 	return ret;
- }
- 
--int bdev_resize_partition(struct block_device *bdev, int partno,
--		sector_t start, sector_t length)
-+int bdev_resize_partition(struct gendisk *disk, int partno, sector_t start,
-+		sector_t length)
- {
- 	struct block_device *part = NULL;
- 	int ret = -ENXIO;
- 
--	mutex_lock(&bdev->bd_disk->open_mutex);
--	part = xa_load(&bdev->bd_disk->part_tbl, partno);
-+	mutex_lock(&disk->open_mutex);
-+	part = xa_load(&disk->part_tbl, partno);
- 	if (!part)
- 		goto out_unlock;
- 
-@@ -503,14 +503,14 @@ int bdev_resize_partition(struct block_device *bdev, int partno,
- 		goto out_unlock;
- 
- 	ret = -EBUSY;
--	if (partition_overlaps(bdev->bd_disk, start, length, partno))
-+	if (partition_overlaps(disk, start, length, partno))
- 		goto out_unlock;
- 
- 	bdev_set_nr_sectors(part, length);
- 
- 	ret = 0;
- out_unlock:
--	mutex_unlock(&bdev->bd_disk->open_mutex);
-+	mutex_unlock(&disk->open_mutex);
- 	return ret;
- }
+-	/* for driver use */
+-	__REQ_DRV,
+-	__REQ_SWAP,		/* swapping request. */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
  
 -- 
 2.30.2
