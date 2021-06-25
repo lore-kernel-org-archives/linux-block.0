@@ -2,146 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C736C2B9F4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 15:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C51DC2B9F4
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 15:50:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 066C66196C
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 15:01:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DEA561952
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 15:50:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231772AbhFYPD2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jun 2021 11:03:28 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:39326 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbhFYPD1 (ORCPT
+        id S230040AbhFYPxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jun 2021 11:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47764 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229774AbhFYPxL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jun 2021 11:03:27 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 1115E21BBC;
-        Fri, 25 Jun 2021 15:01:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1624633266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KYtZDXXBqmKds5ECLI57WHQ/cGmnmFmRdFQQ8+omhQE=;
-        b=Ad3QdyvjV7SEr9bcC67SXHdKQKRdG7EDQ3/jLqhiiGKnxSVQ/XvSKx64WeaqvddAvxYEeS
-        y71ooSfUBNpR3vdqQzIKMvijIwx4GLBeN2+yO/FyAbtCsBLP7SUKLzdh4ldpBEuSXRRHHp
-        5YduV78lzrexanPUQ+l4iLCc2GiGwNs=
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 8B77B11A97;
-        Fri, 25 Jun 2021 15:01:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1624633266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KYtZDXXBqmKds5ECLI57WHQ/cGmnmFmRdFQQ8+omhQE=;
-        b=Ad3QdyvjV7SEr9bcC67SXHdKQKRdG7EDQ3/jLqhiiGKnxSVQ/XvSKx64WeaqvddAvxYEeS
-        y71ooSfUBNpR3vdqQzIKMvijIwx4GLBeN2+yO/FyAbtCsBLP7SUKLzdh4ldpBEuSXRRHHp
-        5YduV78lzrexanPUQ+l4iLCc2GiGwNs=
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id UxbpILHv1WD5JQAALh3uQQ
-        (envelope-from <mkoutny@suse.com>); Fri, 25 Jun 2021 15:01:05 +0000
-Date:   Fri, 25 Jun 2021 17:01:03 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Dan Schatzberg <schatzberg.dan@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 3/3] loop: Charge i/o to mem and blk cg
-Message-ID: <YNXvr81YFzbaTxCb@blackbook>
-References: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
- <20210610173944.1203706-4-schatzberg.dan@gmail.com>
+        Fri, 25 Jun 2021 11:53:11 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4755DC061574
+        for <linux-block@vger.kernel.org>; Fri, 25 Jun 2021 08:50:50 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id n99-20020a9d206c0000b029045d4f996e62so9738570ota.4
+        for <linux-block@vger.kernel.org>; Fri, 25 Jun 2021 08:50:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=QzUZ3F0IpRWiLAQ6tT4/X794s3i+ASSo1JFj5MB7HAI=;
+        b=dCEkONOw1RUPHxGRe9JzUEc7Zih4ML+EBhhoZYxoOvhvbWeGHPdZeYjSFGwiIUQkFn
+         MKXz3uHiTHK6uQ6d7M9CkUBaMMTLK1nDXm/mqNQyr+dJZLyesJQMwTQos0PaTUW6BbK9
+         vEhplH29bt1N0ir/r44LPmYDOh2cx4ovm2mgWrbJfKWnophC4wzhc9jUOw/RWu8c2+lj
+         JVa9h+Cd5Ho4tG7YBknMZYzkmA4x1Mvh/OjhImJ1IxZQgdPLCncAS/ULamISxyZh5bLu
+         TyAyQKaRPZOIfO0IX+YNRO8+Yt5u4zQVqBoysluhtLFzKYnVHWSpk8X8t3zVP4axT0Hm
+         LPqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QzUZ3F0IpRWiLAQ6tT4/X794s3i+ASSo1JFj5MB7HAI=;
+        b=ddXbMaY/mmfurwrq36kjzdV2mB731cKgmpv+HUQXYTMMzsCfGqBEKgAqY/xHHNpBoH
+         vEDzXLvWzXDMx09DhzXcbpZaNYj2NOWG8YSk+gesvav8YpsO41W0XNw9kE06wbqsAIwC
+         Y6/sPbzoOPchTGEHP6uLwMLWnhk4pbVuzWerdpkoDRztlvb7sSvI2wmROSel4mVL6jKm
+         /5UHHBABfi5noprmBniw3qE2grZ+mkUkmk+snomubyBuGzxEEWsX0fcl99wizVo+Tgct
+         Pp/ZCsgV+tMQMSk0y/9ycVrfkLaSKeSND3K9GFPBrZQpQAJDI/Dwo7D6dtHMFpsCF6HE
+         zYPg==
+X-Gm-Message-State: AOAM532EWmUJ34ORD1yS3CjB9DUksvxpRd+1HKoq3QEwzd21LbcVWjp+
+        eeZmXs+q7/pxRxRZy2nG6pGv/w==
+X-Google-Smtp-Source: ABdhPJw5KA0cURPDZsirFYOyRO5iBPgxLWhjH4kzr2FBCl3eS52W4r6UkazlrViZGY4dSQKKwvRFKg==
+X-Received: by 2002:a9d:6d0a:: with SMTP id o10mr10190591otp.0.1624636249554;
+        Fri, 25 Jun 2021 08:50:49 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.233.147])
+        by smtp.gmail.com with ESMTPSA id 33sm1423372otr.78.2021.06.25.08.50.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jun 2021 08:50:48 -0700 (PDT)
+Subject: Re: [PATCH RESEND] blk-mq: update hctx->dispatch_busy in case of real
+ scheduler
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
+References: <20210625020248.1630497-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <97a0ae9c-359e-b54f-c662-8d885477ed75@kernel.dk>
+Date:   Fri, 25 Jun 2021 09:50:50 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="5j6/vlzLDa+2hbwL"
-Content-Disposition: inline
-In-Reply-To: <20210610173944.1203706-4-schatzberg.dan@gmail.com>
+In-Reply-To: <20210625020248.1630497-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/24/21 8:02 PM, Ming Lei wrote:
+> Commit 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+> starts to support io batching submission by using hctx->dispatch_busy.
+> 
+> However, blk_mq_update_dispatch_busy() isn't changed to update hctx->dispatch_busy
+> in that commit, so fix the issue by updating hctx->dispatch_busy in case
+> of real scheduler.
 
---5j6/vlzLDa+2hbwL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Applied, thanks.
 
-Hi.
+-- 
+Jens Axboe
 
-On Thu, Jun 10, 2021 at 10:39:44AM -0700, Dan Schatzberg <schatzberg.dan@gm=
-ail.com> wrote:
-> The current code only associates with the existing blkcg when aio is
-> used to access the backing file. This patch covers all types of i/o to
-> the backing file and also associates the memcg so if the backing file is
-> on tmpfs, memory is charged appropriately.
->=20
-> This patch also exports cgroup_get_e_css and int_active_memcg so it
-> can be used by the loop module.
-
-Wouldn't it be clearer to export (not explicitly inlined anymore)
-set_active_memcg() instead of the int_active_memcg that's rather an
-implementation detail?
-
-> @@ -2111,13 +2112,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_h=
-w_ctx *hctx,
->  	}
-> =20
->  	/* always use the first bio's css */
-> +	cmd->blkcg_css =3D NULL;
-> +	cmd->memcg_css =3D NULL;
->  #ifdef CONFIG_BLK_CGROUP
-> -	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
-> -		cmd->css =3D &bio_blkcg(rq->bio)->css;
-> -		css_get(cmd->css);
-> -	} else
-> +	if (rq->bio && rq->bio->bi_blkg) {
-> +		cmd->blkcg_css =3D &bio_blkcg(rq->bio)->css;
-> +#ifdef CONFIG_MEMCG
-> +		cmd->memcg_css =3D
-> +			cgroup_get_e_css(cmd->blkcg_css->cgroup,
-> +					&memory_cgrp_subsys);
-> +#endif
-> +	}
->  #endif
-> -		cmd->css =3D NULL;
->  	loop_queue_work(lo, cmd);
-
-I see you dropped the cmd->blkcg_css reference (while rq is handled). Is
-it intentional?=20
-
-Thanks,
-Michal
-
---5j6/vlzLDa+2hbwL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAmDV76sACgkQia1+riC5
-qSiuSQ//RuLrhmEm2tqe6ciRm5NFiZQF/gEoqlfIygG6S/Q5lzHaXfunSnld8aeQ
-mEfUp2V9cgNCloT0+TK4jwg+JMBZo5rHOwUS43uE/S36e+X1KrfvJy2Gwo5rzjuS
-Ih+8YChC2/BFILPNh7Ff3rN3yCXc35JNO8Jhd6W0sfFRWiwfydsxRJArpmyCfHZS
-K3B1T9vx7FDqwgVIF8EFkSfTV0ELERvePr9uqnBteAjWVOX4iJDxd8oOfQ9MGi1j
-NlsFe3HJJnHkB7S0fwcg+n4znvHldSbGaUWlLJceNAXvnYYKrx8uyLBn4tuCVmis
-ybVEOEJMpU3YoHFi8WJZhparWwjuvRd0fTMM+0HjdRzbi3scw+u3UzIP+Q4rF4lz
-kN3pFSKX9TS0wHOWBxdgzIhxjeea0CQWFtZ2upcx0aHtKAgT3ipHwaOpBi4ewwdA
-NlArBZPV8VMZ7pcIZiUb+7HMVmJZvHNYJdY2vaA7lKu17cDpzVbps+4XCrJnZh66
-y2knZUttm8qON1cbenO9D1j9eXvqQz1Yczn/yEWwWr6QwRAqWo94fdnvN+PPlmvY
-2zVC6tOjwmmlLMQiJnl7Nwoj26LjCdW3tzra5706RL1z0lhxo2GuEyxdF5MBzu4t
-F3fe/RPcF8/h9FL4aZ43dyqeHARpmCrqD632nRYxSSvSR6PtcDA=
-=evY+
------END PGP SIGNATURE-----
-
---5j6/vlzLDa+2hbwL--
