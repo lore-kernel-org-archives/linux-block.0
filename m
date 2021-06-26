@@ -2,78 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C101FC2B9F4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 21:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA374C2B9F4
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 00:28:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9782C6194B
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jun 2021 21:56:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D24D60720
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 00:28:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229907AbhFYV60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jun 2021 17:58:26 -0400
-Received: from mail-pg1-f170.google.com ([209.85.215.170]:46912 "EHLO
-        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbhFYV60 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jun 2021 17:58:26 -0400
-Received: by mail-pg1-f170.google.com with SMTP id w15so4732499pgk.13;
-        Fri, 25 Jun 2021 14:56:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=COkBtu1DRhiaP0VAr6IF4em+cKZJHXcKly1cODZLhlU=;
-        b=E2qXIbpbfSiZzo016OGLYvv+gB2DJ1xp6xKujSqzct07fSJX3GEMRO7v3G3/Lu0aiu
-         3Nl8HpK5GQNg/Stxux/U5GYhOAyZ6KzQ7AZuw+zKcRghQSaKwVWNsgRvFv9tvQQMqjEb
-         zwdMKacCiIun2hgEZmZYjCHBr3PyszJnW+vTShSs3fNF8/YovbxVAxrvQZMu095v7u/n
-         K1YFlBzl83ytrDreG3Tg6utR676nuA3SWP1mz+mJgvEyn7X7Bw4L3+l0/TOrJFwxE9pO
-         cUZ3qJ4Cfr0s7RW2jCagnl1SfkwxsUuxroxIAuQLPCC03LG8kreutZ7sT5TOjtPE+L3/
-         1gmw==
-X-Gm-Message-State: AOAM533jmlMZRq7b/8D4q3s59SG6+M7i7pg81kK0jaQ/3AMPiBwTe3MG
-        STo8E+ybSWcWV/g0KuBTzNI=
-X-Google-Smtp-Source: ABdhPJysJnt068twgh+M6kfI/lanpHpG9o2CTZadWdqX2+ccdXUp7CnEuUaVxvgXa6bu00QvpLZkkg==
-X-Received: by 2002:a63:d74c:: with SMTP id w12mr3194280pgi.91.1624658163667;
-        Fri, 25 Jun 2021 14:56:03 -0700 (PDT)
-Received: from garbanzo ([191.96.121.71])
-        by smtp.gmail.com with ESMTPSA id h1sm11760433pji.14.2021.06.25.14.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jun 2021 14:56:02 -0700 (PDT)
-Date:   Fri, 25 Jun 2021 14:55:58 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     rafael@kernel.org, davem@davemloft.net, kuba@kernel.org,
-        ast@kernel.org, andriin@fb.com, daniel@iogearbox.net,
-        atenart@kernel.org, alobakin@pm.me, weiwan@google.com,
-        ap420073@gmail.com, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] sysfs: fix kobject refcount to address races with
- kobject removal
-Message-ID: <20210625215558.xn4a24ts26bdyfzo@garbanzo>
-References: <20210623215007.862787-1-mcgrof@kernel.org>
- <YNRnzxTabyoToKKJ@kroah.com>
+        id S229949AbhFZAaX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jun 2021 20:30:23 -0400
+Received: from mout.gmx.net ([212.227.17.21]:46671 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229831AbhFZAaW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Jun 2021 20:30:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1624667278;
+        bh=NCGhkYdVIPHc6BhjtiBX2kS26RsrJR4Ton9//CI6MUQ=;
+        h=X-UI-Sender-Class:To:Cc:References:From:Subject:Date:In-Reply-To;
+        b=CK5AdzPf8t+HmWGcMFW7Udjp9O0pZ4jfJDMWkg4BHF3ayALlPRSYTzjuE51vWVHjO
+         vJy4c01OMcY9+1RAqp9m2SXzKeG5AfbWw9W1PGhgYX/MeF6HVLOrNNvQDv90oA/waR
+         dgNsoU/ZgWC3sQuaJHG1SgQSzcGXEV41E/08MWio=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx105
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1MYeMt-1ljLY6351v-00Vjgy; Sat, 26
+ Jun 2021 02:27:58 +0200
+To:     Martin Steigerwald <martin@lichtvoll.de>,
+        linux-block@vger.kernel.org
+Cc:     linux-btrfs@vger.kernel.org
+References: <41661070.mPYKQbcTYQ@ananda>
+From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
+Subject: Re: Assumption on fixed device numbers in Plasma's desktop search
+ Baloo
+Message-ID: <fe83dadc-bbcf-2f85-6664-bad3fcd83553@gmx.com>
+Date:   Sat, 26 Jun 2021 08:27:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YNRnzxTabyoToKKJ@kroah.com>
+In-Reply-To: <41661070.mPYKQbcTYQ@ananda>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Wqh4yPMcfZZCUfFPNwx1Qq5a6ZmIifYIna//ksz+Hv+5vrECNii
+ BdTjbA5f7dttjrpMze3lDIToAfgpySyDLLZfmZufaN30PjppGRMx2aub+pS0e330evRnMqs
+ pw83fgxnW6QS9NuQLuTZwEQyD8mmFIyZndRZDsjvWpskdoMl0Vj5eUGd/cNavYHmzvQ6chi
+ qJTsE4Nz/jkeRjPK7ifpQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:M4TzBlnbcAA=:qMZZW6+jiXon7sK5nd2xIl
+ rBhtqA9iHe9NS7a93ytkHOJ57PRZsEXsCjkNT7km0tvzxQ2zdpYT8oYXE6r+gSVst6rqZKbF4
+ TXhICSKgnE9IiQUPo8EJsBi0XyVp0Te6MN4KCVdzY2NFf+DBsPLtEJD/a2CZGirVPUz4276Rm
+ r4Omf5XLUK3fxuh8s+JU7ywEnQQMRV3kes9Jeg1IEwZX59pV/p6xjK+4mWSXfubKqKl1yoWQL
+ 2JA1NayJGrtPovDFt7P8z3o1bIdDinQHNWmNVLLhlzQVCSHtyQE5W4m0wA/C9qj3SInRZPT3Q
+ 0upsxSHT7ZCGWoZ/JlkGkMFMkRlEDpgAzpPmCTcWLVJkC59GrP1FCtnUEG7QPFm6GkH2fCGZW
+ pfvhAoBpvu2t7DfH4qRzQixGiKiB8DPgciu9EKtDu1SCqpN+sGFyliVET7/9KKd8przgEfmq1
+ 1ajhfr/U0pBk28o9XV3MJlKqK8tQmByQsRaoNBvgSkjsvhq1s1TTaLKIwD8o9xXuWgSSZevBH
+ LZNdVeb1Y1aACQb768WvryyeElIY5bveJamGGIiy7uLKm8QQRMeSQwZzeRPNyU71zuyddvA+O
+ lnsXN8ZkKjWY0WKfs0q0V1RT1yC9fQbZbQdNJH53YnHeuQpMdxbKQSsSaTtRLtp1UifSqmnkd
+ 8CBlOTghXcW+meABZ9+mjfGSUHDbOUOBt4zoJ5brygNKoOOrc9CCxqqT81sTYJkMNSLrFAuRl
+ TNxuiq1DuFM4vLGeuzzl69HEkbF+Gga+hPLw0o93PjO2LGj8Wgn8RUUYOppjJwakKXs57Yywv
+ /EhWfEvuNJo+BWRXwXThJrt3f8sS6TvNTCt65o3ouWdr3jdm7sHZNaMmf1jeFucr5WLevZHPe
+ o6zdPk4euUx6xQPUfZM8e3C4X8Yk0M445GIjIGFgNAA889SxLH1B2TZHhKu39jqKGQmt1ivCg
+ l86dSIXaXGfXBT87mVBX3ztavakVDK3qrOO8yldzCmu/nyPGcytZ2AkBxAtyWM1LTIr8Yt0mD
+ eqx9zpzgsQyyXFxHGjAwVfUK9CWvGUfIFFLqmCpHFeNEkYGh0fS6lB4Ab1Id1HcUqpIS1Amnt
+ R6kDu6VwYk7Wb5ZW7+jCKXkjq5yWXbZfQlpBlm4AKyyfvx/qgeV1VHmmg==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 24, 2021 at 01:09:03PM +0200, Greg KH wrote:
-> thanks for making this change and sticking with it!
-> 
-> Oh, and with this change, does your modprobe/rmmod crazy test now work?
 
-It does but I wrote a test_syfs driver and I believe I see an issue with
-this. I'll debug a bit more and see what it was, and I'll then also use
-the driver to demo the issue more clearly, and then verification can be
-an easy selftest test.
 
-  Luis
+On 2021/6/26 =E4=B8=8A=E5=8D=883:06, Martin Steigerwald wrote:
+> Hi!
+>
+> I found repeatedly that Baloo indexes the same files twice or even more
+> often after a while.
+>
+> I reported this upstream in:
+>
+> Bug 438434 - Baloo appears to be indexing twice the number of files than
+> are actually in my home directory
+>
+> https://bugs.kde.org/show_bug.cgi?id=3D438434
+>
+> And got back that if the device number changes, Baloo will think it has
+> new files even tough the path is still the same. And found over time tha=
+t
+> the device number for the single BTRFS filesystem on a NVMe SSD in a
+> ThinkPad T14 Gen1 AMD can change. It is not (maybe yet) RAID 1. I do
+> have BTRFS RAID 1 in another laptop and there I also had this issue
+> already.
+
+Since btrfs has multi-device support by default, it reports anonymous
+device number, just as if you use a filesystem over LVM.
+
+The problem is why the anonymous device number change.
+
+If the fs is always mounted at a fixed sequence with fixed
+snapshots/subvolume mount, it should not get a new anonymous device number=
+.
+
+But if snapshots or new subvolumes are involved, or just
+mounting/reading subvolumes in different order, then the device number
+for each subvolume will change.
+
+>
+> I argued that a desktop application has no business to rely on a device
+> number and got back that search/indexing is in the middle between an
+> application and system software. And that Baloo needs an "invariant" for
+> a file. See comment #11 of that bug report:
+>
+> https://bugs.kde.org/show_bug.cgi?id=3D438434#c11
+
+Well, a lot of tools relies on device number to distinguish filesystem
+boundary, like find.
+Thus it's a little hard to argue.
+
+But on the other hand, it also means baloo can't handle regular fs over
+LVM cases well neither.
+
+>
+> I got the suggestion to try to find a way to tell the kernel to use a
+> fixed device number.
+
+I don't think it's possible for btrfs, as each subvolume get its
+anonymous device number assigned when it gets first read.
+
+Thus it's really hard to make it fixed, as the reason for anonymous
+device number is to avoid conflicts.
+
+>
+> I still think, an application or an infrastructure service for a desktop
+> environment or even anything else in user space should not rely on a
+> device number to be fixed and never change upon reboots.
+
+Well, LVM/device mapper is doing the same thing, a lot of behavior
+change is never a good idea for the kernel.
+
+Thus for use cases where we really need a proper mapping, we use hashes,
+not just device number, like what we did in dupremover.
+
+>
+> But maybe you have a different idea about that and it is okay for an
+> userspace component to do that. I would like to hear your idea about
+> that.
+>
+> Another question would be whether I could somehow make sure that the
+> device number does not change, even if just as a work-around.
+
+If you really just want a fixed device number, you can ensure that by:
+
+- Make sure all users of anonymous devices get fixed sequence
+   Things like device mapper/LVM, btrfs should get loaded/initialized
+   in a fixed order.
+
+- Make sure the subvolume you care always get mounted/read before any
+   other subvolumes
+   So that the target subvolume always get the first device number in the
+   pool.
+
+   But this also means, all later subvolumes not in the fixed mount/read
+   sequence can not get a fixed number.
+
+Thanks,
+Qu
+
+> I know for
+> NFS there is a fsid=3D mount option, but it does not appear to be
+> something generic, at least the mount man page seems to have nothing
+> related to fsid.
+>
+>
+> Best,
+>
