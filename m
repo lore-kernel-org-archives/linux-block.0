@@ -2,73 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EE9DC49EA6
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 10:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E8DC49EA6
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 10:41:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDA386191B
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 10:18:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF3B461939
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 10:41:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbhFZKUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Jun 2021 06:20:52 -0400
-Received: from luna.lichtvoll.de ([194.150.191.11]:46345 "EHLO
-        mail.lichtvoll.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S229518AbhFZKUw (ORCPT
+        id S229556AbhFZKoG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Jun 2021 06:44:06 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:8307 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229518AbhFZKoF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Jun 2021 06:20:52 -0400
-X-Greylist: delayed 5336 seconds by postgrey-1.27 at vger.kernel.org; Sat, 26 Jun 2021 06:20:52 EDT
-Received: from ananda.localnet (unknown [IPv6:2001:a62:1a52:5a00:19da:1263:b56c:4c4])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.lichtvoll.de (Postfix) with ESMTPSA id 43B3727B021;
-        Sat, 26 Jun 2021 12:18:29 +0200 (CEST)
-From:   Martin Steigerwald <martin@lichtvoll.de>
-To:     linux-block@vger.kernel.org, Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc:     linux-btrfs@vger.kernel.org
-Subject: Re: Assumption on fixed device numbers in Plasma's desktop search Baloo
-Date:   Sat, 26 Jun 2021 12:18:26 +0200
-Message-ID: <3602587.1ANNM6WTHT@ananda>
-In-Reply-To: <d24989e1-c8e0-d6c7-706e-2b5b8e9b124c@gmx.com>
-References: <41661070.mPYKQbcTYQ@ananda> <2009039.b04VgvrTqe@ananda> <d24989e1-c8e0-d6c7-706e-2b5b8e9b124c@gmx.com>
+        Sat, 26 Jun 2021 06:44:05 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4GBqzb5X39z1BRTk;
+        Sat, 26 Jun 2021 18:36:27 +0800 (CST)
+Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 26 Jun 2021 18:41:42 +0800
+Received: from huawei.com (10.175.101.6) by dggpeml500009.china.huawei.com
+ (7.185.36.209) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Sat, 26 Jun
+ 2021 18:41:41 +0800
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>, <hch@lst.de>,
+        "Yufen Yu" <yuyufen@huawei.com>
+Subject: [PATCH] block: remove redundant bio_uninit from simple direct io
+Date:   Sat, 26 Jun 2021 18:47:36 +0800
+Message-ID: <20210626104736.911941-1-yuyufen@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Authentication-Results: mail.lichtvoll.de;
-        auth=pass smtp.auth=martin2 smtp.mailfrom=martin@lichtvoll.de
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500009.china.huawei.com (7.185.36.209)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Qu Wenruo - 26.06.21, 11:33:17 CEST:
-> > I am not aware of an option for fstab to mount this one first and
-> > then the other second, but I could set the second mount to noauto
-> > and mount it when I need it.
-> > 
-> >> But this also means, all later subvolumes not in the fixed
-> >> mount/read sequence can not get a fixed number.
-> > 
-> > I somehow thought this would get complicated.
-> 
-> It's already complicated.
-> 
-> So this just proves Neil is right, device number is only reliable at
-> the lifespan of the fs, nothing else.
+Since bio_endio() will call bio_uninit() for us, we can remove
+it from current code path.
 
-Thank you again.
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+---
+ fs/block_dev.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-I informed upstream about the conclusions from this thread.
-
-Let's see what they come up with.
-
-They have an energy efficiency goal, for that it would be desirable to 
-stop indexing files twice or thrice or even more times. :)
-
-Best,
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 6cc4d4cfe0c2..7a63fc3ce8d9 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -299,8 +299,6 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	if (vecs != inline_vecs)
+ 		kfree(vecs);
+ 
+-	bio_uninit(&bio);
+-
+ 	return ret;
+ }
+ 
 -- 
-Martin
-
+2.25.4
 
