@@ -2,106 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9039AC49EA5
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 08:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02676C49EA5
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 08:49:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64F0061920
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 08:24:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCD80616ED
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jun 2021 08:49:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbhFZI0g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Jun 2021 04:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39196 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbhFZI0g (ORCPT
+        id S229518AbhFZIv5 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Jun 2021 04:51:57 -0400
+Received: from luna.lichtvoll.de ([194.150.191.11]:51603 "EHLO
+        mail.lichtvoll.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S229635AbhFZIv5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Jun 2021 04:26:36 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1390BC061574;
-        Sat, 26 Jun 2021 01:24:14 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso8416096pjx.1;
-        Sat, 26 Jun 2021 01:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ocF7LIpSwj3vsZpHqVHvaq9IL3YwB/xApDMByqK67ds=;
-        b=Ok6ehZ3ywSEcP84JHiXhZnSr6kLHfiTzdhMbOwlbhFnO9JmqUDic3JM4CSYCs5yx3l
-         3UVfAKtH25NmZ48EcJgC5jMTnn0f/oKkD2rbRwzUz3OfbhLPPQeBT3Cnh7Lakx0AdL2h
-         CjHM6qYnHGKNYS3uZMGroZC+7ezaXW3DbDXETdNqR3vZUhiIN9NKqkOyR3mcVdF9JKlA
-         xC0nUeLcDrGklkcGMEFqvVAFC0YOvZ12bTYwoIDObSK4zxYJOtShYfVRn8WI3OmV7cQq
-         WhoynDe40Nwyrtww/YWL5JfBfrDhE9TzlKu3NvGs1nd3v/45PAxWZQ8VU/sb9MyWNvOt
-         wo0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ocF7LIpSwj3vsZpHqVHvaq9IL3YwB/xApDMByqK67ds=;
-        b=C/xjNCSkLyAF3Rdoa7GX3m9bNWaVZ/zm7nLL+Vk+Pw0R/8RwWHukdYuOIayMvfNlTf
-         8E4GWZd8NyAhXHHe/RNyMujpo/axXFKdlAbxInqj7bQ6vL/+6FWl3kqXRSIR522DKIkF
-         ZOM4//lo7+uf6ABrcs4sYodkdk5MguCRrOcdOC/8s9XXdHUVEM2zU8LTlNEBYLMlZiDz
-         ANzVYXJUIbT3L/yADx8ISP/gISJHKPS+aseVyGyJ3Efvru7o7XMrHhYpuPEBKXrS4jq3
-         7sQ6qNW3VoCZHOVIl7cZMbSdicE5DgaRAheXxx4yzfG+en8Y4XvQEBTf9fBObxxjwbSp
-         AFMg==
-X-Gm-Message-State: AOAM5311uQOXT5bK+eNmbGx9pRIGNIaEjxVZdC08uHvRmo4U39Z2AePd
-        DZfhZ6zuX2bBKhDcMsVhEBQ=
-X-Google-Smtp-Source: ABdhPJyXzXcAr0JT1E0Xnx8dUGgzY6WxtABUW/NHoZY8c2ZH8/gIcc0pHDu/rbEPJttRTk/mVga8GQ==
-X-Received: by 2002:a17:90b:3449:: with SMTP id lj9mr26237121pjb.123.1624695853420;
-        Sat, 26 Jun 2021 01:24:13 -0700 (PDT)
-Received: from fedora.. ([2405:201:6008:6d7c:6bfd:dac8:eafe:7bde])
-        by smtp.googlemail.com with ESMTPSA id h8sm8064995pfn.0.2021.06.26.01.24.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Jun 2021 01:24:12 -0700 (PDT)
-From:   Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-To:     axboe@kernel.dk, hch@infradead.org
-Cc:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+cf89d662483d6a1a0790@syzkaller.appspotmail.com
-Subject: [PATCH v2] loop: fix setting arbitrarily large block size
-Date:   Sat, 26 Jun 2021 13:54:06 +0530
-Message-Id: <20210626082406.348821-1-chouhan.shreyansh630@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210623050933.140572-1-chouhan.shreyansh630@gmail.com>
-References: <20210623050933.140572-1-chouhan.shreyansh630@gmail.com>
+        Sat, 26 Jun 2021 04:51:57 -0400
+Received: from ananda.localnet (unknown [IPv6:2001:a62:1a52:5a00:19da:1263:b56c:4c4])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.lichtvoll.de (Postfix) with ESMTPSA id 9A4C327AF7D;
+        Sat, 26 Jun 2021 10:49:31 +0200 (CEST)
+From:   Martin Steigerwald <martin@lichtvoll.de>
+To:     linux-block@vger.kernel.org, Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc:     linux-btrfs@vger.kernel.org
+Subject: Re: Assumption on fixed device numbers in Plasma's desktop search Baloo
+Date:   Sat, 26 Jun 2021 10:49:30 +0200
+Message-ID: <2009039.b04VgvrTqe@ananda>
+In-Reply-To: <fe83dadc-bbcf-2f85-6664-bad3fcd83553@gmx.com>
+References: <41661070.mPYKQbcTYQ@ananda> <fe83dadc-bbcf-2f85-6664-bad3fcd83553@gmx.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
+Authentication-Results: mail.lichtvoll.de;
+        auth=pass smtp.auth=martin2 smtp.mailfrom=martin@lichtvoll.de
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-loop_validate_block_size took an unsigned short argument. Passing an
-argument with size greater than the size of unsigned short would cause
-an overflow and could potentially render the upper bound check on the
-block size useless, allowing to set an arbitrarily large block size.
+Qu Wenruo - 26.06.21, 02:27:54 CEST:
+> On 2021/6/26 上午3:06, Martin Steigerwald wrote:
+> > Hi!
+> > 
+> > I found repeatedly that Baloo indexes the same files twice or even
+> > more often after a while.
+> > 
+> > I reported this upstream in:
+> > 
+> > Bug 438434 - Baloo appears to be indexing twice the number of files
+> > than are actually in my home directory
+> > 
+> > https://bugs.kde.org/show_bug.cgi?id=438434
+> > 
+> > And got back that if the device number changes, Baloo will think it
+> > has new files even tough the path is still the same. And found over
+> > time that the device number for the single BTRFS filesystem on a
+> > NVMe SSD in a ThinkPad T14 Gen1 AMD can change. It is not (maybe
+> > yet) RAID 1. I do have BTRFS RAID 1 in another laptop and there I
+> > also had this issue already.
+> 
+> Since btrfs has multi-device support by default, it reports anonymous
+> device number, just as if you use a filesystem over LVM.
 
-Reported-by: syzbot+cf89d662483d6a1a0790@syzkaller.appspotmail.com
-Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
----
+Ah, this!
 
-Changes from v1: Fixed the spelling of reported-by tag. Fixed the
-commit message.
+I forgot to mention that: I use BTRFS on top of LVM on top of LUKS based 
+dm-crypt on a partition on the NVMe SSD. Sorry, somehow I forgot to 
+mention that here. I mentioned it in the bug report. I'd use a different 
+approach if there would be one that give me full disk encryption. I am 
+not willing to use ecryptfs on top of BTRFS and as far as I know BTRFS 
+cannot yet encrypt by itself.
 
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I still think this could give a fixed order of loading:
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 9a758cf66507..635baff0dd66 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -236,7 +236,7 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
-  * @bsize: size to validate
-  */
- static int
--loop_validate_block_size(unsigned short bsize)
-+loop_validate_block_size(unsigned long bsize)
- {
- 	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
- 		return -EINVAL;
+1. Unlock LUKS.
+
+2. Activate LVM logical volumes. No idea whether that happens in a fixed 
+order though or whether it can have a different order on each boot.
+
+3. Mount BTRFS. /home is always on the same subvolume. So that should 
+not change.
+
+> The problem is why the anonymous device number change.
+
+Good question. Maybe I have an idea about that. See below.
+
+> > I argued that a desktop application has no business to rely on a
+> > device number and got back that search/indexing is in the middle
+> > between an application and system software. And that Baloo needs an
+> > "invariant" for a file. See comment #11 of that bug report:
+> > 
+> > https://bugs.kde.org/show_bug.cgi?id=438434#c11
+> 
+> Well, a lot of tools relies on device number to distinguish filesystem
+> boundary, like find.
+> Thus it's a little hard to argue.
+> 
+> But on the other hand, it also means baloo can't handle regular fs
+> over LVM cases well neither.
+
+Yes. Also it could not handle the case of a driver loading race 
+condition with two or more different controllers in a desktop machine.
+
+> > I got the suggestion to try to find a way to tell the kernel to use
+> > a fixed device number.
+> 
+> I don't think it's possible for btrfs, as each subvolume get its
+> anonymous device number assigned when it gets first read.
+> 
+> Thus it's really hard to make it fixed, as the reason for anonymous
+> device number is to avoid conflicts.
+
+Fair enough.
+
+> > I still think, an application or an infrastructure service for a
+> > desktop environment or even anything else in user space should not
+> > rely on a device number to be fixed and never change upon reboots.
+> 
+> Well, LVM/device mapper is doing the same thing, a lot of behavior
+> change is never a good idea for the kernel.
+> 
+> Thus for use cases where we really need a proper mapping, we use
+> hashes, not just device number, like what we did in dupremover.
+
+I think I suggested that some time ago.
+
+> > Another question would be whether I could somehow make sure that the
+> > device number does not change, even if just as a work-around.
+> 
+> If you really just want a fixed device number, you can ensure that by:
+> 
+> - Make sure all users of anonymous devices get fixed sequence
+>    Things like device mapper/LVM, btrfs should get loaded/initialized
+>    in a fixed order.
+
+Ah, I see.
+
+> - Make sure the subvolume you care always get mounted/read before any
+>    other subvolumes
+>    So that the target subvolume always get the first device number in
+> the pool.
+
+Hmm, that may be a pointer. This is what I currently have in fstab:
+
+/dev/nvme/home /home btrfs lazytime,compress=zstd 0 0
+/dev/nvme/home /zeit/home btrfs subvol=zeit 0 0
+
+In the first line the default subvolume is used which I changed 
+accordingly after creating this BTRFS. I use the approach to keep 
+(temporary) snapshots separated from the directory tree in /home.
+
+Could it be that this order between these two mounts is not the same on 
+every boot? I use Devuan with Runit, so the mounting would happen by 
+some init scripts (instead of Systemd).
+
+I am not aware of an option for fstab to mount this one first and then 
+the other second, but I could set the second mount to noauto and mount 
+it when I need it.
+
+>    But this also means, all later subvolumes not in the fixed
+> mount/read sequence can not get a fixed number.
+
+I somehow thought this would get complicated.
+
+Best,
 -- 
-2.31.1
+Martin
+
 
