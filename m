@@ -2,74 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22470C49EAB
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jun 2021 21:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 099C7C48BC2
+	for <linux-block@archiver.kernel.org>; Sun, 27 Jun 2021 22:24:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04F8061C35
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jun 2021 21:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8DAF61990
+	for <linux-block@archiver.kernel.org>; Sun, 27 Jun 2021 22:24:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231508AbhF0VOl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Jun 2021 17:14:41 -0400
-Received: from mail-pf1-f173.google.com ([209.85.210.173]:46971 "EHLO
-        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231496AbhF0VOk (ORCPT
+        id S231726AbhF0W1E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Jun 2021 18:27:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49200 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231644AbhF0W1E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Jun 2021 17:14:40 -0400
-Received: by mail-pf1-f173.google.com with SMTP id x16so12328467pfa.13;
-        Sun, 27 Jun 2021 14:12:15 -0700 (PDT)
+        Sun, 27 Jun 2021 18:27:04 -0400
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BB9C061574
+        for <linux-block@vger.kernel.org>; Sun, 27 Jun 2021 15:24:39 -0700 (PDT)
+Received: by mail-io1-xd2d.google.com with SMTP id s19so19861875ioc.3
+        for <linux-block@vger.kernel.org>; Sun, 27 Jun 2021 15:24:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=mOya+d4Av6qp+T3v/+bO5yvv69i78j2UzT/v+gbf72Q=;
+        b=azohttPBRNfBB5CSQ/joaj/ttxjAuTb4ogezUngbBB5Zr5focWxCGHO8HRvj2Jltc7
+         cc5iE5w0cd4m/lTGjeAZSsBWKbrR9CXNOA3Vetj6KnTMCS+vsSmsH+m0YQq4qpNWBEVL
+         pFJ37AWdvUaZgqsOX6w6bBDSDc9dI82LXei0RS6HQdoeRLTCMXxbOqw4IwigEh/4TtqT
+         s6dOazHSKPbQe9tBEPmB9Z7dSI/xeH6QBY5N6knl4GTsLlKOgIVJkUd56adpmxl07xah
+         XrhmALQJb/02vMvn9175Pvm9RXSphr4/UZxz4zmB16bVr5kYNrobCxZw2xHmu7aYH5YS
+         WBxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=cR0LSa7hQHxDZ8gB3Did0Bb+VeSNqfYHg3w0G+AVSOY=;
-        b=lwV52RKs7/jFSfkdsUKmIcUUevnMY7hSw0SVquuj/G89S6iNNNDEfH3QnLT7uRo0Wd
-         RIHsAtiaRTqT4ZYtIFM131VRG45+duv1XallWN2iVGXej2y7LHzoOm2bxa68VTdWWHKV
-         BJkenvJAxsahl4zGa+BurQKk5M22jaz12tuFDmG73qyRlLqVMApAd2vw87QclkCEbcaa
-         0Sw11R5tHW3E9pE2Msjsi5BnsW2clJh29c/jpPNecZHYAQMqGyrX/XL78s/7FnB2nULV
-         mVO5PF3b5EnB0lLRpWzuNTkX/ZAHDjo49b/2nLepW6ez+SUkf5mFEhUiB2RZxueWeKF8
-         uVbg==
-X-Gm-Message-State: AOAM531VVjCye/79hiSNCPlJuN9mzeJqGfzQFl5YSMWYlz7CraPty/a7
-        ZKgmbwDiYgX50Da4Xxjj8lgiENUDjHY=
-X-Google-Smtp-Source: ABdhPJz2dvDEjoTFobY6u4OvX1N/qlgiX9LWwds3dVb5opirv0byCScSz57eVmf9KYDYqsVvc2ZtXw==
-X-Received: by 2002:a63:191d:: with SMTP id z29mr20515543pgl.126.1624828335119;
-        Sun, 27 Jun 2021 14:12:15 -0700 (PDT)
-Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id z26sm7862066pfk.112.2021.06.27.14.12.13
+        bh=mOya+d4Av6qp+T3v/+bO5yvv69i78j2UzT/v+gbf72Q=;
+        b=YIMptuuBWuQNOK8ypDfk5FToUtAKK36mfwvC2Pr7rRVlh7Jg/i1IGQlJ23him9r6ZY
+         FXF0cpY1M8Sc5TXU1EyY0p07QgwWApenTGZO5UtLQhHEeOz8E5sjKupcSdldNowuMcmi
+         2Szk4ccuxx6A4tEEGnFnWIOUvi7cSPNSXwE6eWmhiX7P+UxF3q74F2Q8sSoDxxXgP9eZ
+         PK2NQGNaD8WSIhbRxlSWBJqnWJ2ReAkR4rFtrCwL3FMWE8+cm6tntVFZ9tMlnw7OIjf2
+         oZy9b4nzFOl6Qd2kSigaSnE46kPVC37AENaBZiru28tMYKHQtm5DsTf8yl2TlzrnvLRu
+         uQfQ==
+X-Gm-Message-State: AOAM533IY4pDf+4/tZIDtBjHUw18Y5dt7jYGybGW+USAMwUzMtrggF3e
+        M5mxde41ZBpSwwMqXxY8QbI7vQxX/zyBHQ==
+X-Google-Smtp-Source: ABdhPJy9jy5xKxFVITLo8QatDpU0iwSZW98Fpm0Zh8yBhXvjqSGVlXROQpZCopHx8Bt1DFgYUwd4Zg==
+X-Received: by 2002:a05:6602:3407:: with SMTP id n7mr18090985ioz.129.1624832678456;
+        Sun, 27 Jun 2021 15:24:38 -0700 (PDT)
+Received: from [192.168.1.134] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id l26sm6937013iok.26.2021.06.27.15.24.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Jun 2021 14:12:14 -0700 (PDT)
-Subject: Re: [powerpc][next-20210625] WARN block/mq-deadline-main.c:743 during
- boot
-To:     Sachin Sant <sachinp@linux.vnet.ibm.com>,
-        linux-block@vger.kernel.org
-Cc:     linux-next@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        axboe@kernel.dk
-References: <74F24228-8BC7-49FA-BD43-A9FB90269E76@linux.vnet.ibm.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <d9bb36b5-fb81-8394-e80c-1dc4562376e4@acm.org>
-Date:   Sun, 27 Jun 2021 14:12:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Sun, 27 Jun 2021 15:24:37 -0700 (PDT)
+Subject: Re: [PATCH] block: remove redundant bio_uninit from simple direct io
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com, hch@lst.de
+References: <20210626104736.911941-1-yuyufen@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <37173158-c49b-def1-6722-df7135df9d4a@kernel.dk>
+Date:   Sun, 27 Jun 2021 16:24:36 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <74F24228-8BC7-49FA-BD43-A9FB90269E76@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20210626104736.911941-1-yuyufen@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/27/21 6:30 AM, Sachin Sant wrote:
-> While booting 5.13.0-rc7-next-20210625 on POWER9 LPAR following warning
-> is seen [ ... ]
+On 6/26/21 4:47 AM, Yufen Yu wrote:
+> Since bio_endio() will call bio_uninit() for us, we can remove
+> it from current code path.
 
-Please help with testing of the patch that is available at
-https://lore.kernel.org/linux-block/20210627211112.12720-1-bvanassche@acm.org/T/#u
+What about the error path?
 
-Thanks,
+-- 
+Jens Axboe
 
-Bart.
