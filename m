@@ -2,70 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0D3C48BC2
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 01:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 618B7C48BC2
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 02:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BE08619B6
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 01:18:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AB57619C5
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 02:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231781AbhF1BVO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Jun 2021 21:21:14 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:8468 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231706AbhF1BVO (ORCPT
+        id S231815AbhF1Cf6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Jun 2021 22:35:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58844 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231678AbhF1Cf6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Jun 2021 21:21:14 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GCqRg6S0NzZnC3;
-        Mon, 28 Jun 2021 09:15:43 +0800 (CST)
-Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 28 Jun 2021 09:18:48 +0800
-Received: from [10.174.179.197] (10.174.179.197) by
- dggpeml500009.china.huawei.com (7.185.36.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 28 Jun 2021 09:18:48 +0800
-Subject: Re: [PATCH] block: remove redundant bio_uninit from simple direct io
+        Sun, 27 Jun 2021 22:35:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624847612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=7GWvzvD1JEXD7+pKSQ74zgFabbZQXl5ATXDOyRF9TmY=;
+        b=TMi7H3jgV2+tHXEvokoXcUDm2YYsAjqQcMWw6rUtWiDpm3SnE57ffN8fnTKQyCbqdS+cHA
+        nSHkUQyaxG4MB6lYOqFDzfhprVSL343WLcj8fIwaikREHOXenrPIcmIUtW8wj8ag+KfHOh
+        qTeyXKiU1PnfbCbdLDiIPoGVT8ysLz8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-d-kgWVbhOK-ILkwd51NaJA-1; Sun, 27 Jun 2021 22:33:28 -0400
+X-MC-Unique: d-kgWVbhOK-ILkwd51NaJA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F195100CF72;
+        Mon, 28 Jun 2021 02:33:27 +0000 (UTC)
+Received: from localhost (ovpn-12-212.pek2.redhat.com [10.72.12.212])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 526AD5C1CF;
+        Mon, 28 Jun 2021 02:33:23 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>, <hch@lst.de>
-References: <20210626104736.911941-1-yuyufen@huawei.com>
- <37173158-c49b-def1-6722-df7135df9d4a@kernel.dk>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <eb8deffd-4d6f-634f-9cff-5d273c7dfdba@huawei.com>
-Date:   Mon, 28 Jun 2021 09:18:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Wang Shanker <shankerwangmiao@gmail.com>
+Subject: [PATCH RESEND] block: fix discard request merge
+Date:   Mon, 28 Jun 2021 10:33:12 +0800
+Message-Id: <20210628023312.1903255-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <37173158-c49b-def1-6722-df7135df9d4a@kernel.dk>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.197]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500009.china.huawei.com (7.185.36.209)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+ll_new_hw_segment() is reached only in case of single range discard
+merge, and we don't have max discard segment size limit actually, so
+it is wrong to run the following check:
 
+if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
 
-On 2021/6/28 6:24, Jens Axboe wrote:
-> On 6/26/21 4:47 AM, Yufen Yu wrote:
->> Since bio_endio() will call bio_uninit() for us, we can remove
->> it from current code path.
-> 
-> What about the error path?
-> 
+it may be always false since req->nr_phys_segments is initialized as
+one, and bio's segment count is still 1, blk_rq_get_max_segments(reg)
+is 1 too.
 
-Before calling submit_bio(), we don't need bio_uninit(). After
-calling submit_bio(), any error path will call bio_endio() to
-end the bio. So, I think we can remove it in current path.
+Fix the issue by not doing the check and bypassing the calculation of
+discard request's nr_phys_segments.
 
-Thanks
-Yufen
+Based on analysis from Wang Shanker.
+
+Cc: Christoph Hellwig <hch@lst.de>
+Reported-by: Wang Shanker <shankerwangmiao@gmail.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-merge.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 5c9d2a4ece86..a4afa488298e 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -559,10 +559,14 @@ static inline unsigned int blk_rq_get_max_segments(struct request *rq)
+ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
+ 		unsigned int nr_phys_segs)
+ {
+-	if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
++	if (blk_integrity_merge_bio(req->q, req, bio) == false)
+ 		goto no_merge;
+ 
+-	if (blk_integrity_merge_bio(req->q, req, bio) == false)
++	/* discard request merge won't add new segment */
++	if (req_op(req) == REQ_OP_DISCARD)
++		return 1;
++
++	if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
+ 		goto no_merge;
+ 
+ 	/*
+-- 
+2.31.1
+
