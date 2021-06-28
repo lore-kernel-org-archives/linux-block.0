@@ -2,90 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 513CDC2B9F4
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 09:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C84C49EAB
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 09:52:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B40161C51
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 09:40:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0AB661C5D
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jun 2021 09:52:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232348AbhF1Jmz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jun 2021 05:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56084 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232315AbhF1Jmz (ORCPT
+        id S232559AbhF1Jy7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jun 2021 05:54:59 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:35618 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230256AbhF1Jy6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jun 2021 05:42:55 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1924C061574
-        for <linux-block@vger.kernel.org>; Mon, 28 Jun 2021 02:40:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=R66QSLbOFCWvlVRtJ6T98lmstmrk2uoFiCZavVLSWfs=; b=s6xpNRRPJahtY5xw+F+jwfWQ7B
-        rggIyCZzvrr8A0GR0Cl+FMzAZwpC6zWjlF/+XEgfFJtfsdoRX+8RQlyfrtjvOsrmeIevQapZyrTkG
-        g7bP06LRX/g/aqB1vpVybk3WaeIzcMTbzJB8xooPxhu3pGW60C8vuTG8R7qgsSrofwjA9L14uG4qo
-        Ma9RHMa3B+2enDxlA3pxMXnHcDM1lrJxuDPsUV6FvjWIWZMOhlYgsIDcuQepC+uBA1phgVAtwnwYF
-        6sKNR2dMu38Kxv6KspyOtt8Q5iPpwPYRl+9f3Gy/IyMdWWn4/R6H7EM8D9QHQv83221Dpsyl3Ubbq
-        m/EtowqA==;
-Received: from [2001:4bb8:180:285:1edd:a6ea:5791:8644] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lxnju-002nEt-EN; Mon, 28 Jun 2021 09:39:45 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk, richard@nod.at, anton.ivanov@cambridgegreys.com
-Cc:     linux-um@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [PATCH] ubd: remove dead code in ubd_setup_common
-Date:   Mon, 28 Jun 2021 11:39:37 +0200
-Message-Id: <20210628093937.1325608-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+        Mon, 28 Jun 2021 05:54:58 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id F1A412024E;
+        Mon, 28 Jun 2021 09:52:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1624873952; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=jcMOu4krSlIQ/8p/D4yLFDxD/+qBE6qXsMwq+0AZDFE=;
+        b=csWenWRu980DgF1QQBsZyDsriPESZZ7dEGJMgf3Sx7bIIvfCqaB1tVpv8xi7Ld0gpndOR4
+        ix45I5J1UQ2ulKWegNwiL6+FhHFaHnAnmrdUWmc+jQrZ23htg/V8tRx/LS6BGklfbfFj4b
+        r4VQfWkvy0l0w6xtF6Bd2GHmTY6rX9U=
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 68AD911906;
+        Mon, 28 Jun 2021 09:52:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1624873951; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=jcMOu4krSlIQ/8p/D4yLFDxD/+qBE6qXsMwq+0AZDFE=;
+        b=QR3uqo2TRlQfazgc07qKiCfSqQRDvTOVDaPS/BNH8Xi0IEKZNq/GW7uFM6Ibl2FuJpMiMh
+        2WargP5MLWvIYeUT7OmcOXpSjMG2WAbMJVjkRQHcBYE2vjUB7PTQI0EJnNlGpSX0rlcqqH
+        7Xnym5ZNCVcJ7SAc6hYdoW3ngXenBFQ=
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id qi4YF9+b2WAqagAALh3uQQ
+        (envelope-from <mwilck@suse.com>); Mon, 28 Jun 2021 09:52:31 +0000
+From:   mwilck@suse.com
+To:     Mike Snitzer <snitzer@redhat.com>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>
+Cc:     Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Benjamin Marzinski <bmarzins@redhat.com>, nkoenig@redhat.com,
+        emilne@redhat.com, Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v4 0/3] scsi/dm: dm_blk_ioctl(): implement failover for SG_IO on dm-multipath
+Date:   Mon, 28 Jun 2021 11:52:07 +0200
+Message-Id: <20210628095210.26249-1-mwilck@suse.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove some leftovers of the fake major number parsing that cause
-complains from some compilers.
+From: Martin Wilck <mwilck@suse.com>
 
-Fixes: aebbd9fdb0cc ("ubd: remove the code to register as the legacy IDE driver")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/um/drivers/ubd_kern.c | 10 ----------
- 1 file changed, 10 deletions(-)
+Hello Mike, hello Martin,
 
-diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
-index 0b86aa1b12f1..e3093071406d 100644
---- a/arch/um/drivers/ubd_kern.c
-+++ b/arch/um/drivers/ubd_kern.c
-@@ -243,22 +243,12 @@ static int ubd_setup_common(char *str, int *index_out, char **error_out)
- 	if(index_out) *index_out = -1;
- 	n = *str;
- 	if(n == '='){
--		char *end;
--		int major;
--
- 		str++;
- 		if(!strcmp(str, "sync")){
- 			global_openflags = of_sync(global_openflags);
- 			return err;
- 		}
- 
--		err = -EINVAL;
--		major = simple_strtoul(str, &end, 0);
--		if((*end != '\0') || (end == str)){
--			*error_out = "Didn't parse major number";
--			return err;
--		}
--
- 		pr_warn("fake major not supported any more\n");
- 		return 0;
- 	}
+here is v4 of my attempt to add retry logic to SG_IO on dm-multipath devices.
+
+Regards
+Martin
+
+Changes v3->v4 (thanks to Mike Snitzer):
+
+ - Added an additional helper function sg_io_to_blk_status() to
+   scsi_ioctl.c, in order to avoid open-coding handling of the SCSI result
+   code in device-mapper.
+
+ - Added a new method dm_sg_io_ioctl_fn() in struct target_type, define
+   only by the multipath target. This allows moving the bulk of the new
+   code to dm-mpath.c, and avoids the wrong limitation of the code to
+   request-based multipath.
+
+Changes v2->v3:
+
+ - un-inlined scsi_result_to_blk_status again, and move the helper
+   __scsi_result_to_blk_status to block/scsi_ioctl.c instead
+   (Bart v. Assche)
+ - open-coded the status/msg/host/driver-byte -> result conversion
+   where the standard SCSI helpers aren't usable (Bart v. Assche)
+    
+Changes v1->v2:
+
+ - applied modifications from Mike Snitzer
+ - moved SG_IO dependent code to a separate file, no scsi includes in
+   dm.c any more
+ - made the new code depend on a configuration option 
+ - separated out scsi changes, made scsi_result_to_blk_status()
+   inline to avoid dependency of dm_mod from scsi_mod (Paolo Bonzini)
+
+Martin Wilck (3):
+  scsi: scsi_ioctl: export __scsi_result_to_blk_status()
+  scsi: scsi_ioctl: add sg_io_to_blk_status()
+  dm mpath: add CONFIG_DM_MULTIPATH_SG_IO - failover for SG_IO
+
+ block/scsi_ioctl.c            |  72 ++++++++++++++++++++++-
+ drivers/md/Kconfig            |  11 ++++
+ drivers/md/dm-core.h          |   5 ++
+ drivers/md/dm-mpath.c         | 105 ++++++++++++++++++++++++++++++++++
+ drivers/md/dm.c               |  26 ++++++++-
+ drivers/scsi/scsi_lib.c       |  24 +-------
+ include/linux/blkdev.h        |   4 ++
+ include/linux/device-mapper.h |   8 ++-
+ 8 files changed, 226 insertions(+), 29 deletions(-)
+
 -- 
-2.30.2
+2.32.0
 
