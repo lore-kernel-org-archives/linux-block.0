@@ -2,140 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659F1C11F66
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 07:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E7D7C11F66
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 08:47:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D3E561DBC
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 07:50:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1590861DE0
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 08:47:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232297AbhF2Hw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jun 2021 03:52:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51701 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232284AbhF2Hw5 (ORCPT
+        id S232507AbhF2IuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jun 2021 04:50:03 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:9318 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232577AbhF2IuD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jun 2021 03:52:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624953030;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fb3NfJSaKCyP+3LF0nxY2+VvsfNZpDDwj+kt0oYzUHc=;
-        b=Sg3JzceZsUc2xKGOCze7qQL82RB5yiIP3dsALlMkKNvRnrwNcMuxp3jRZY/XfuxzHs4OGc
-        1dIAn7qUAMG+KaU8dtPKJwsmxnFsHLXhjPSAGurgZJ3uqJjHaL2YkPC41FjdHH6AI6UPEl
-        z1nFPl1+6t4KA9n91kCZJ4zpm2rznNw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-552-efNjEU4RMf-k80bsUSTaXg-1; Tue, 29 Jun 2021 03:50:25 -0400
-X-MC-Unique: efNjEU4RMf-k80bsUSTaXg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B54231023F44;
-        Tue, 29 Jun 2021 07:50:23 +0000 (UTC)
-Received: from localhost (ovpn-13-8.pek2.redhat.com [10.72.13.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AEB8B369A;
-        Tue, 29 Jun 2021 07:50:19 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
-Cc:     Ming Lei <ming.lei@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>
-Subject: [PATCH 2/2] nvme: pass BLK_MQ_F_NOT_USE_MANAGED_IRQ for fc/rdma/tcp/loop
-Date:   Tue, 29 Jun 2021 15:49:51 +0800
-Message-Id: <20210629074951.1981284-3-ming.lei@redhat.com>
-In-Reply-To: <20210629074951.1981284-1-ming.lei@redhat.com>
-References: <20210629074951.1981284-1-ming.lei@redhat.com>
+        Tue, 29 Jun 2021 04:50:03 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GDdKj4FDrz73Rw;
+        Tue, 29 Jun 2021 16:43:21 +0800 (CST)
+Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 29 Jun 2021 16:47:30 +0800
+Received: from [10.174.179.197] (10.174.179.197) by
+ dggpeml500009.china.huawei.com (7.185.36.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 29 Jun 2021 16:47:30 +0800
+Subject: Re: [PATCH v2] block: check disk exist before trying to add partition
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@lst.de>
+References: <20210610023241.3646241-1-yuyufen@huawei.com>
+From:   Yufen Yu <yuyufen@huawei.com>
+Message-ID: <155a064a-a4c9-cfa1-7ae1-4bf84e89b6da@huawei.com>
+Date:   Tue, 29 Jun 2021 16:47:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20210610023241.3646241-1-yuyufen@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.197]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500009.china.huawei.com (7.185.36.209)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All the 4 host drivers don't use managed irq for completing request, so
-it is correct to pass the flag to blk-mq.
+Hi, Jens
 
-Secondly with this flag, blk-mq will help us dispatch connect request
-allocated via blk_mq_alloc_request_hctx() to driver even though all
-CPU in the specified hctx's cpumask are offline.
+This patch is based on for-5.14/block branch. Please consider to
+apply it.
 
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Daniel Wagner <dwagner@suse.de>
-Cc: Wen Xiong <wenxiong@us.ibm.com>
-Cc: John Garry <john.garry@huawei.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/fc.c     | 3 ++-
- drivers/nvme/host/rdma.c   | 3 ++-
- drivers/nvme/host/tcp.c    | 3 ++-
- drivers/nvme/target/loop.c | 3 ++-
- 4 files changed, 8 insertions(+), 4 deletions(-)
+Thansk,
+Yufen
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 256e87721a01..c563a2b6e9fc 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2876,7 +2876,8 @@ nvme_fc_create_io_queues(struct nvme_fc_ctrl *ctrl)
- 	ctrl->tag_set.queue_depth = ctrl->ctrl.opts->queue_size;
- 	ctrl->tag_set.reserved_tags = NVMF_RESERVED_TAGS;
- 	ctrl->tag_set.numa_node = ctrl->ctrl.numa_node;
--	ctrl->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+	ctrl->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
-+		BLK_MQ_F_NOT_USE_MANAGED_IRQ;
- 	ctrl->tag_set.cmd_size =
- 		struct_size((struct nvme_fcp_op_w_sgl *)NULL, priv,
- 			    ctrl->lport->ops->fcprqst_priv_sz);
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 37943dc4c2c1..4b7bdc829109 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -817,7 +817,8 @@ static struct blk_mq_tag_set *nvme_rdma_alloc_tagset(struct nvme_ctrl *nctrl,
- 		set->queue_depth = nctrl->sqsize + 1;
- 		set->reserved_tags = NVMF_RESERVED_TAGS;
- 		set->numa_node = nctrl->numa_node;
--		set->flags = BLK_MQ_F_SHOULD_MERGE;
-+		set->flags = BLK_MQ_F_SHOULD_MERGE |
-+			BLK_MQ_F_NOT_USE_MANAGED_IRQ;
- 		set->cmd_size = sizeof(struct nvme_rdma_request) +
- 				NVME_RDMA_DATA_SGL_SIZE;
- 		if (nctrl->max_integrity_segments)
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 34f4b3402f7c..0125463b7d77 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -1600,7 +1600,8 @@ static struct blk_mq_tag_set *nvme_tcp_alloc_tagset(struct nvme_ctrl *nctrl,
- 		set->queue_depth = nctrl->sqsize + 1;
- 		set->reserved_tags = NVMF_RESERVED_TAGS;
- 		set->numa_node = nctrl->numa_node;
--		set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING;
-+		set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING |
-+			BLK_MQ_F_NOT_USE_MANAGED_IRQ;
- 		set->cmd_size = sizeof(struct nvme_tcp_request);
- 		set->driver_data = ctrl;
- 		set->nr_hw_queues = nctrl->queue_count - 1;
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index cb30cb942e1d..bf032249e010 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -524,7 +524,8 @@ static int nvme_loop_create_io_queues(struct nvme_loop_ctrl *ctrl)
- 	ctrl->tag_set.queue_depth = ctrl->ctrl.opts->queue_size;
- 	ctrl->tag_set.reserved_tags = NVMF_RESERVED_TAGS;
- 	ctrl->tag_set.numa_node = ctrl->ctrl.numa_node;
--	ctrl->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+	ctrl->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
-+		BLK_MQ_F_NOT_USE_MANAGED_IRQ;
- 	ctrl->tag_set.cmd_size = sizeof(struct nvme_loop_iod) +
- 		NVME_INLINE_SG_CNT * sizeof(struct scatterlist);
- 	ctrl->tag_set.driver_data = ctrl;
--- 
-2.31.1
-
+On 2021/6/10 10:32, Yufen Yu wrote:
+> If disk have been deleted, we should return fail for ioctl
+> BLKPG_DEL_PARTITION. Otherwise, the directory /sys/class/block
+> may remain invalid symlinks file. The race as following:
+> 
+> blkdev_open
+> 				del_gendisk
+> 				    disk->flags &= ~GENHD_FL_UP;
+> 				    blk_drop_partitions
+> blkpg_ioctl
+>      bdev_add_partition
+>      add_partition
+>          device_add
+> 	    device_add_class_symlinks
+> 
+> ioctl may add_partition after del_gendisk() have tried to delete
+> partitions. Then, symlinks file will be created.
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+>   block/partitions/core.c | 23 ++++++++++++++++-------
+>   1 file changed, 16 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/partitions/core.c b/block/partitions/core.c
+> index 186d4fbd9f09..b123ccb2cf64 100644
+> --- a/block/partitions/core.c
+> +++ b/block/partitions/core.c
+> @@ -454,17 +454,26 @@ int bdev_add_partition(struct block_device *bdev, int partno,
+>   		sector_t start, sector_t length)
+>   {
+>   	struct block_device *part;
+> +	struct gendisk *disk = bdev->bd_disk;
+> +	int ret;
+>   
+> -	mutex_lock(&bdev->bd_disk->open_mutex);
+> -	if (partition_overlaps(bdev->bd_disk, start, length, -1)) {
+> -		mutex_unlock(&bdev->bd_disk->open_mutex);
+> -		return -EBUSY;
+> +	mutex_lock(&disk->open_mutex);
+> +	if (!(disk->flags & GENHD_FL_UP)) {
+> +		ret = -ENXIO;
+> +		goto out;
+> +	}
+> +
+> +	if (partition_overlaps(disk, start, length, -1)) {
+> +		ret = -EBUSY;
+> +		goto out;
+>   	}
+>   
+> -	part = add_partition(bdev->bd_disk, partno, start, length,
+> +	part = add_partition(disk, partno, start, length,
+>   			ADDPART_FLAG_NONE, NULL);
+> -	mutex_unlock(&bdev->bd_disk->open_mutex);
+> -	return PTR_ERR_OR_ZERO(part);
+> +	ret = PTR_ERR_OR_ZERO(part);
+> +out:
+> +	mutex_unlock(&disk->open_mutex);
+> +	return ret;
+>   }
+>   
+>   int bdev_del_partition(struct block_device *bdev, int partno)
+> 
