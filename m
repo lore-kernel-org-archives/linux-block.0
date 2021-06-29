@@ -2,119 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADE8C11F6A
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 14:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8E2C11F66
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 14:17:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01F9D61DD1
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 14:03:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FDA261DB3
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 14:17:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231952AbhF2OGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jun 2021 10:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39960 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231512AbhF2OGD (ORCPT
+        id S234244AbhF2OUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jun 2021 10:20:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60938 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234381AbhF2OUA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jun 2021 10:06:03 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1A30C061760;
-        Tue, 29 Jun 2021 07:03:36 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id y29so29567524qky.12;
-        Tue, 29 Jun 2021 07:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=epo3zKiTfhS1s7uCWxNYZiOm+vo3zbXKhTVM1Kqzmbg=;
-        b=BvAsn6V+lEebL9543XNZN8ZgjQb+osEKHPTuXHALEL19Dqb6/zJ1xRDLLweEL6wFZe
-         nCCZ9qgxxMvqfBg0PIRP27jmbc8ViBnRr2O1g5R9fD2B8DKZbSkVH6hdzgMoPIUWzHeV
-         u9B76ZOBRd9zRYeaOAP24ARezCGz/5LgXUOcEzlvE1OffxKOhgMBdA+uNkK66LNl3be2
-         4qSEXMtzyF67GlNoC0wg7jZ+nuozmqOqplCuU3fIEYFxurWmsax7mrIOp7Vt3dLHEqxZ
-         NEM5Qmqlf4GdsA+ghm9u58I4sopLY1RF+S0SNXXwMWYDVwaevKsyyuATbPEouicRln0n
-         JZow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=epo3zKiTfhS1s7uCWxNYZiOm+vo3zbXKhTVM1Kqzmbg=;
-        b=k8ghkFCGTFs7p+XjM5WuTay9icRHM6gOMBgdeWskAA1aIISS+ZRrn6EeSKN6vHoalH
-         1KVzeyVFSYzhXLvuyTOvnihKg2vOb6BNWXlSxEe0h7EBr9w/ehL6a+SY25AEUgFeapKn
-         lbbQZgLdoXiwMc5eTEXGGc2Omv0gfDRHQVg4murpNL7tEGR4NId8suJajuEUHn2chMfB
-         yh2Jy3euOSLvIbM4LJLJeRikwwWQxHR5aHbW4d/stzW3IiG1b31ykWcgBkawrsD2SWia
-         fXmcULAJNQMMvYTxWRL5O4J79dQ/oh0S8PEx50f3MYzWdbc5TUr7c9RuRYrccLf2Z0AS
-         VeYw==
-X-Gm-Message-State: AOAM5310FsEF8Qs2UnH4DVM1SZxNYfFaFRQjgaOxDB8CQ4BcxrwFRhmq
-        bU4ks4MyM5/6lJvYr8uY4MubYd5wYw7B1g==
-X-Google-Smtp-Source: ABdhPJwF1jHHpUGYvGSGqrM20Y/wdjXItsUPDnGvL02uIcUIMmbhuYPgIoI1h5EDhETkH9lFL4LviA==
-X-Received: by 2002:a37:9b4b:: with SMTP id d72mr16414129qke.10.1624975415813;
-        Tue, 29 Jun 2021 07:03:35 -0700 (PDT)
-Received: from dschatzberg-fedora-PC0Y6AEN ([2620:10d:c091:480::1:85ab])
-        by smtp.gmail.com with ESMTPSA id n128sm845772qkd.93.2021.06.29.07.03.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jun 2021 07:03:35 -0700 (PDT)
-Date:   Tue, 29 Jun 2021 10:03:33 -0400
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 3/3] loop: Charge i/o to mem and blk cg
-Message-ID: <YNsoNeQNMmdplmtp@dschatzberg-fedora-PC0Y6AEN>
-References: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
- <20210610173944.1203706-4-schatzberg.dan@gmail.com>
- <YNXvr81YFzbaTxCb@blackbook>
- <YNnZ7hIRIk9dJDry@dschatzberg-fedora-PC0Y6AEN>
- <YNr1TYfBwR/tEpEJ@blackbook>
+        Tue, 29 Jun 2021 10:20:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624976253;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tEd0iL8sflC3igF9PSfknmHOeadUEAx77IF24oaHt9U=;
+        b=NSnjFvmekmQCEwEFq31jNA+gqOt8sSce8TMOnm7/1OmAeoJEIBWMv70v/rCvNQTz9+aVkE
+        SYwOOHc/OO7ItM9R/DE8gnhaA2OVvFrfrpo+DcAW1thqXRL4Uf1NRm8WHlC0ktdWmqCHBz
+        X5D6NU+ewVzuPgQUGEFNXtrKT+oc/mE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-s1GaoaQJMSGwUs5g9cf2xQ-1; Tue, 29 Jun 2021 10:17:29 -0400
+X-MC-Unique: s1GaoaQJMSGwUs5g9cf2xQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E35C804141;
+        Tue, 29 Jun 2021 14:17:28 +0000 (UTC)
+Received: from T590 (ovpn-12-23.pek2.redhat.com [10.72.12.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 84CD610016F8;
+        Tue, 29 Jun 2021 14:17:19 +0000 (UTC)
+Date:   Tue, 29 Jun 2021 22:17:15 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH 1/2] blk-mq: not deactivate hctx if the device doesn't
+ use managed irq
+Message-ID: <YNsrayg+pbVO+J7I@T590>
+References: <20210629074951.1981284-1-ming.lei@redhat.com>
+ <20210629074951.1981284-2-ming.lei@redhat.com>
+ <1a14a397-6244-928e-5aaa-85c2ccbe0e40@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YNr1TYfBwR/tEpEJ@blackbook>
+In-Reply-To: <1a14a397-6244-928e-5aaa-85c2ccbe0e40@suse.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> Non-inlining in the loop module doesn't seem like a big trouble. OTOH,
-> other callers may be more sensitive and would need to rely on inlining.
-
-Yes, this is my concern as well.
-
-> I can't currently think of a nice way to have both the exported and the
-> exlicitly inlined variant at once. It seems it's either API or perf
-> craft in the end but both are uncertain, so I guess the current approach
-> is fine in the end.
+On Tue, Jun 29, 2021 at 02:39:14PM +0200, Hannes Reinecke wrote:
+> On 6/29/21 9:49 AM, Ming Lei wrote:
+> > hctx is deactivated when all CPU in hctx->cpumask become offline by
+> > draining all requests originated from this hctx and moving new
+> > allocation to active hctx. This way is for avoiding inflight IO when
+> > the managed irq is shutdown.
+> > 
+> > Some drivers(nvme fc, rdma, tcp, loop) doesn't use managed irq, so
+> > they needn't to deactivate hctx. Also, they are the only user of
+> > blk_mq_alloc_request_hctx() which is used for connecting io queue.
+> > And their requirement is that the connect request can be submitted
+> > via one specified hctx on which all CPU in its hctx->cpumask may have
+> > become offline.
+> > 
 > 
-> > Yes it is intentional. All requests (not just aio) go through the loop
-> > worker which grabs the blkcg reference in loop_queue_work() on
-> > construction. So I believe grabbing a reference per request is
-> > unnecessary.
+> How can you submit a connect request for a hctx on which all CPUs are
+> offline? That hctx will be unusable as it'll never be able to receive
+> interrupts ...
+
+I believe BLK_MQ_F_NOT_USE_MANAGED_IRQ is self-explanatory. And the
+interrupt(non-managed) of this hctx will be migrated to online CPUs,
+see migrate_one_irq().
+
+For managed irq, we have to prevent new allocation if all CPUs of this
+hctx is offline because genirq will shutdown the interrupt.
+
 > 
-> Isn't there a window without the reference between loop_queue_rq and
-> loop_queue_work?
+> > Address the requirement for nvme fc/rdma/loop, so the reported kernel
+> > panic on the following line in blk_mq_alloc_request_hctx() can be fixed.
+> > 
+> > 	data.ctx = __blk_mq_get_ctx(q, cpu)
+> > 
+> > Cc: Sagi Grimberg <sagi@grimberg.me>
+> > Cc: Daniel Wagner <dwagner@suse.de>
+> > Cc: Wen Xiong <wenxiong@us.ibm.com>
+> > Cc: John Garry <john.garry@huawei.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >   block/blk-mq.c         | 6 +++++-
+> >   include/linux/blk-mq.h | 1 +
+> >   2 files changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index df5dc3b756f5..74632f50d969 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -494,7 +494,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+> >   	data.hctx = q->queue_hw_ctx[hctx_idx];
+> >   	if (!blk_mq_hw_queue_mapped(data.hctx))
+> >   		goto out_queue_exit;
+> > -	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
+> > +	cpu = cpumask_first(data.hctx->cpumask);
+> >   	data.ctx = __blk_mq_get_ctx(q, cpu);
+> 
+> I don't get it.
+> Doesn't this allow us to allocate a request on a dead cpu, ie the very thing
+> we try to prevent?
 
-Hmm, perhaps I'm not understanding how the reference counting works,
-but my understanding is that we enter loop_queue_rq with presumably
-some code earlier holding a reference to the blkcg, we only need to
-acquire a reference sometime before returning from loop_queue_rq. The
-"window" between loop_queue_rq and loop_queue_work is all
-straight-line code so there's no possibility for the earlier code to
-get control back and drop the reference.
+It is fine to allocate & dispatch one request to the hctx when all CPU on
+its cpumask are offline if this hctx's interrupt isn't managed.
 
-> I don't know, you seem to know better, so I'd suggest
-> dropping a comment line into the code explaining this.
 
-I wouldn't be so sure that I know any better here :D - I'm fairly
-inexperienced in this domain.
+Thanks,
+Ming
 
-Where would you suggest putting such a comment? The change in question
-removed a particular case where we explicitly grab a reference to the
-blkcg because now we do it uniformly in one place. Would you like a
-comment explaining why we acquire a reference for all loop workers or
-one explaining specifically why we don't need to acquire one for aio?
