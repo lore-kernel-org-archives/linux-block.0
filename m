@@ -2,127 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E7D7C11F66
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 08:47:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85930C11F67
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 10:26:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1590861DE0
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 08:47:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FECA61DD2
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 10:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232507AbhF2IuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jun 2021 04:50:03 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:9318 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232577AbhF2IuD (ORCPT
+        id S232892AbhF2K2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jun 2021 06:28:51 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:60660 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232772AbhF2K2v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jun 2021 04:50:03 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GDdKj4FDrz73Rw;
-        Tue, 29 Jun 2021 16:43:21 +0800 (CST)
-Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 29 Jun 2021 16:47:30 +0800
-Received: from [10.174.179.197] (10.174.179.197) by
- dggpeml500009.china.huawei.com (7.185.36.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 29 Jun 2021 16:47:30 +0800
-Subject: Re: [PATCH v2] block: check disk exist before trying to add partition
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@lst.de>
-References: <20210610023241.3646241-1-yuyufen@huawei.com>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <155a064a-a4c9-cfa1-7ae1-4bf84e89b6da@huawei.com>
-Date:   Tue, 29 Jun 2021 16:47:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        Tue, 29 Jun 2021 06:28:51 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8F0B9203CD;
+        Tue, 29 Jun 2021 10:26:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1624962382; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4nnJd/WQSpUTtWERcTYMKjk7Xm3bTS7VSG5SjPdv9Bc=;
+        b=SIOiyfS7XfAvoPmQiyHYe5i2CqhxV09toMQQiEzN+oosnPqqz8XsULnowsgVFUZwJqTTwP
+        GUzX0vNQaS1ETRJIiLWMUmwhOELlrPWsRhQL2Zvfmw1QaOY5z3ckCm/xaKpIfv9AaWwOgM
+        LUKvYk0acBAFboy9Nt9XSeD/pPvh0Qk=
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 5572711906;
+        Tue, 29 Jun 2021 10:26:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1624962382; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4nnJd/WQSpUTtWERcTYMKjk7Xm3bTS7VSG5SjPdv9Bc=;
+        b=SIOiyfS7XfAvoPmQiyHYe5i2CqhxV09toMQQiEzN+oosnPqqz8XsULnowsgVFUZwJqTTwP
+        GUzX0vNQaS1ETRJIiLWMUmwhOELlrPWsRhQL2Zvfmw1QaOY5z3ckCm/xaKpIfv9AaWwOgM
+        LUKvYk0acBAFboy9Nt9XSeD/pPvh0Qk=
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id G6qnE0712mDMAwAALh3uQQ
+        (envelope-from <mkoutny@suse.com>); Tue, 29 Jun 2021 10:26:22 +0000
+Date:   Tue, 29 Jun 2021 12:26:21 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 3/3] loop: Charge i/o to mem and blk cg
+Message-ID: <YNr1TYfBwR/tEpEJ@blackbook>
+References: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
+ <20210610173944.1203706-4-schatzberg.dan@gmail.com>
+ <YNXvr81YFzbaTxCb@blackbook>
+ <YNnZ7hIRIk9dJDry@dschatzberg-fedora-PC0Y6AEN>
 MIME-Version: 1.0
-In-Reply-To: <20210610023241.3646241-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.197]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500009.china.huawei.com (7.185.36.209)
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="8xak29pAuRs/xS4S"
+Content-Disposition: inline
+In-Reply-To: <YNnZ7hIRIk9dJDry@dschatzberg-fedora-PC0Y6AEN>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
 
-This patch is based on for-5.14/block branch. Please consider to
-apply it.
+--8xak29pAuRs/xS4S
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thansk,
-Yufen
+On Mon, Jun 28, 2021 at 10:17:18AM -0400, Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
+> Agreed that exporting int_active_memcg is an implementation detail,
+> but would this prevent set_active_memcg from being inlined?
 
-On 2021/6/10 10:32, Yufen Yu wrote:
-> If disk have been deleted, we should return fail for ioctl
-> BLKPG_DEL_PARTITION. Otherwise, the directory /sys/class/block
-> may remain invalid symlinks file. The race as following:
-> 
-> blkdev_open
-> 				del_gendisk
-> 				    disk->flags &= ~GENHD_FL_UP;
-> 				    blk_drop_partitions
-> blkpg_ioctl
->      bdev_add_partition
->      add_partition
->          device_add
-> 	    device_add_class_symlinks
-> 
-> ioctl may add_partition after del_gendisk() have tried to delete
-> partitions. Then, symlinks file will be created.
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> ---
->   block/partitions/core.c | 23 ++++++++++++++++-------
->   1 file changed, 16 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index 186d4fbd9f09..b123ccb2cf64 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -454,17 +454,26 @@ int bdev_add_partition(struct block_device *bdev, int partno,
->   		sector_t start, sector_t length)
->   {
->   	struct block_device *part;
-> +	struct gendisk *disk = bdev->bd_disk;
-> +	int ret;
->   
-> -	mutex_lock(&bdev->bd_disk->open_mutex);
-> -	if (partition_overlaps(bdev->bd_disk, start, length, -1)) {
-> -		mutex_unlock(&bdev->bd_disk->open_mutex);
-> -		return -EBUSY;
-> +	mutex_lock(&disk->open_mutex);
-> +	if (!(disk->flags & GENHD_FL_UP)) {
-> +		ret = -ENXIO;
-> +		goto out;
-> +	}
-> +
-> +	if (partition_overlaps(disk, start, length, -1)) {
-> +		ret = -EBUSY;
-> +		goto out;
->   	}
->   
-> -	part = add_partition(bdev->bd_disk, partno, start, length,
-> +	part = add_partition(disk, partno, start, length,
->   			ADDPART_FLAG_NONE, NULL);
-> -	mutex_unlock(&bdev->bd_disk->open_mutex);
-> -	return PTR_ERR_OR_ZERO(part);
-> +	ret = PTR_ERR_OR_ZERO(part);
-> +out:
-> +	mutex_unlock(&disk->open_mutex);
-> +	return ret;
->   }
->   
->   int bdev_del_partition(struct block_device *bdev, int partno)
-> 
+Non-inlining in the loop module doesn't seem like a big trouble. OTOH,
+other callers may be more sensitive and would need to rely on inlining.
+I can't currently think of a nice way to have both the exported and the
+exlicitly inlined variant at once. It seems it's either API or perf
+craft in the end but both are uncertain, so I guess the current approach
+is fine in the end.
+
+> Yes it is intentional. All requests (not just aio) go through the loop
+> worker which grabs the blkcg reference in loop_queue_work() on
+> construction. So I believe grabbing a reference per request is
+> unnecessary.
+
+Isn't there a window without the reference between loop_queue_rq and
+loop_queue_work? I don't know, you seem to know better, so I'd suggest
+dropping a comment line into the code explaining this.
+
+Thanks,
+Michal
+
+--8xak29pAuRs/xS4S
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAmDa9UkACgkQia1+riC5
+qShOvQ/+IAbayEL5mDzde7avlf2IctIAGpgzfJMiT0f2HjZlZvc+wZyRZtbY48+f
+qQvyKrqzoa8urrykaJOPImzej1n5/+LPnxg/EdPXMLf3GP69aeRWx/UFSkiPpCeJ
+jw5r2FbQE29yfQYAtuHbL6IPnfa1JDkQXroHwN+MIsNqayGiz2FbE4fxPJxR8hkt
+xCYjCyNMzBEw1b334gUvj8XrFRbzfgIJokZ3UNVIrRcv/rbYKs4LplelQ5dGEjpp
+uzFAC5QDabn78+SJ6c7h5ReTx4zdPC+9A3FlZXBWxkpSPiPEPO6b0Qdo86p4v4eA
+MGT8fNcfyvjQZdzckZ1oHylUCBbDhCIons6PmEqpEDd5ZFA5taD9G6YRGyH1G7Kb
+EieXPoCynJWRCdHat3PeqTpnf9oYPsaiBXozn2UXdK2Rvv2+g9A5am/AKN+I2Y+J
+xgzp9FPA5nRx5Z8oIAl9iqvb8mfrlYPn0CsNnzo+eHE13Zh7nxlFQrrqJsnjaQ2J
+45wPm24rg9XrKoTIpLs0O1INWqNjkweqPRLs5I/ClXRWkqXkfJ5cUchEjsLqksVJ
+SunkIX+LxIWE/Fb23d2jio51pC26W4gcAtOTTe6MZ/Iqq7LI7cpKX9bGW1dkrKgB
+nWkJth7TDCL8bIeOjDMMsNVW05el1qQcPei4GZ4sfBjJu6FlikM=
+=q9SM
+-----END PGP SIGNATURE-----
+
+--8xak29pAuRs/xS4S--
