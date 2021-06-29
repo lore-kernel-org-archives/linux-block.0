@@ -2,98 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E415C11F66
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 13:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADE8C11F6A
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 14:03:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA8D161DC4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 13:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01F9D61DD1
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jun 2021 14:03:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234090AbhF2Nn6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jun 2021 09:43:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34910 "EHLO
+        id S231952AbhF2OGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jun 2021 10:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233605AbhF2Nn5 (ORCPT
+        with ESMTP id S231512AbhF2OGD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jun 2021 09:43:57 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5024C061760
-        for <linux-block@vger.kernel.org>; Tue, 29 Jun 2021 06:41:29 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id t12so12108759ile.13
-        for <linux-block@vger.kernel.org>; Tue, 29 Jun 2021 06:41:29 -0700 (PDT)
+        Tue, 29 Jun 2021 10:06:03 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1A30C061760;
+        Tue, 29 Jun 2021 07:03:36 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id y29so29567524qky.12;
+        Tue, 29 Jun 2021 07:03:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=nr3o7XsdiG0qI89NZwngmWI5K7qu5SFlJJKAQXuzd4Y=;
-        b=ExdDdmPx9b3VSyebgWKu1kSFv2lHdHRUBi9kTxtsT0DCJa2OXOVZmXpbYeYgBikuTW
-         UFyDbKRR+D5RjorBCxQodqaj2vbfnnnDNJBTkhKyrmN+Rdmy6dADItoCaar9GmKfEwAA
-         QL+Cqi93FOBwsPLrIUk5zcEWvTTQjNWc7rwVzz7gVBGk8S1Ub6hSgrBFP1E4yHnWLtfC
-         X9WBWvK2vUulE5qJ1flONzwTLzLq2qQEUMbZYEdB/zgwiiMlZMOCIjV4Pjx4/DXp1r1W
-         F03tFY+kTD8bgcYj6xrQRa3PmHN5RIe4liV4sGDjmnogvkRte5sPYbU+KK7zBRxzivwV
-         hc1A==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=epo3zKiTfhS1s7uCWxNYZiOm+vo3zbXKhTVM1Kqzmbg=;
+        b=BvAsn6V+lEebL9543XNZN8ZgjQb+osEKHPTuXHALEL19Dqb6/zJ1xRDLLweEL6wFZe
+         nCCZ9qgxxMvqfBg0PIRP27jmbc8ViBnRr2O1g5R9fD2B8DKZbSkVH6hdzgMoPIUWzHeV
+         u9B76ZOBRd9zRYeaOAP24ARezCGz/5LgXUOcEzlvE1OffxKOhgMBdA+uNkK66LNl3be2
+         4qSEXMtzyF67GlNoC0wg7jZ+nuozmqOqplCuU3fIEYFxurWmsax7mrIOp7Vt3dLHEqxZ
+         NEM5Qmqlf4GdsA+ghm9u58I4sopLY1RF+S0SNXXwMWYDVwaevKsyyuATbPEouicRln0n
+         JZow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nr3o7XsdiG0qI89NZwngmWI5K7qu5SFlJJKAQXuzd4Y=;
-        b=DUMhemS+R8jHK8ki0P6bzCmQwdas9fFMe1BnetTr7aRrC4Oef5GWwUSf526VmUC8sq
-         EFrv3zEOkOt8U0MPQtUK00it4RXb0kivlm0C5i5s5pxY7mKLOotLlBAWKnsSqr3GuMN6
-         0JkW0qopuAIbRPNUTwPKFBvzkHnNiyafkw9qJ9IQfhbVgn9XDxbo1bWz3HaSgRAXo5tZ
-         TFM/BiJWhq1Q5oxsTQIVu8XdYUXRq985S2uLMZu7oYqKqwZuQ9WKYsKcv9Pzi/bO3jkB
-         DvMbfsVIYoHvQpLGbw5sbD0Lt0b6ombK3wjUb80iBA+XkgG5ozMdzMi6C+vEcdUEpazs
-         Kt/g==
-X-Gm-Message-State: AOAM5301eXhzDNJGJ6Yu17ZP0VKX/v/CvtnBKEQOAxm/qiwJpcxmfn5h
-        /53dCEbeRK8iiSsGAkQYGtoRuQ==
-X-Google-Smtp-Source: ABdhPJx0WELLl7f9x0a8p/89cfY/JY+v6VoIPRre4y/sxYomOgZVwFfnGNhg0q9DrUapC9X3Pf9TEg==
-X-Received: by 2002:a92:c703:: with SMTP id a3mr1844903ilp.118.1624974089215;
-        Tue, 29 Jun 2021 06:41:29 -0700 (PDT)
-Received: from [192.168.1.134] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id s5sm10127909ilh.19.2021.06.29.06.41.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Jun 2021 06:41:28 -0700 (PDT)
-Subject: Re: [PATCH RESEND] block: fix discard request merge
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Wang Shanker <shankerwangmiao@gmail.com>
-References: <20210628023312.1903255-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d3087bbe-a577-1f9b-561d-49d99f4dba62@kernel.dk>
-Date:   Tue, 29 Jun 2021 07:41:29 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=epo3zKiTfhS1s7uCWxNYZiOm+vo3zbXKhTVM1Kqzmbg=;
+        b=k8ghkFCGTFs7p+XjM5WuTay9icRHM6gOMBgdeWskAA1aIISS+ZRrn6EeSKN6vHoalH
+         1KVzeyVFSYzhXLvuyTOvnihKg2vOb6BNWXlSxEe0h7EBr9w/ehL6a+SY25AEUgFeapKn
+         lbbQZgLdoXiwMc5eTEXGGc2Omv0gfDRHQVg4murpNL7tEGR4NId8suJajuEUHn2chMfB
+         yh2Jy3euOSLvIbM4LJLJeRikwwWQxHR5aHbW4d/stzW3IiG1b31ykWcgBkawrsD2SWia
+         fXmcULAJNQMMvYTxWRL5O4J79dQ/oh0S8PEx50f3MYzWdbc5TUr7c9RuRYrccLf2Z0AS
+         VeYw==
+X-Gm-Message-State: AOAM5310FsEF8Qs2UnH4DVM1SZxNYfFaFRQjgaOxDB8CQ4BcxrwFRhmq
+        bU4ks4MyM5/6lJvYr8uY4MubYd5wYw7B1g==
+X-Google-Smtp-Source: ABdhPJwF1jHHpUGYvGSGqrM20Y/wdjXItsUPDnGvL02uIcUIMmbhuYPgIoI1h5EDhETkH9lFL4LviA==
+X-Received: by 2002:a37:9b4b:: with SMTP id d72mr16414129qke.10.1624975415813;
+        Tue, 29 Jun 2021 07:03:35 -0700 (PDT)
+Received: from dschatzberg-fedora-PC0Y6AEN ([2620:10d:c091:480::1:85ab])
+        by smtp.gmail.com with ESMTPSA id n128sm845772qkd.93.2021.06.29.07.03.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jun 2021 07:03:35 -0700 (PDT)
+Date:   Tue, 29 Jun 2021 10:03:33 -0400
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 3/3] loop: Charge i/o to mem and blk cg
+Message-ID: <YNsoNeQNMmdplmtp@dschatzberg-fedora-PC0Y6AEN>
+References: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
+ <20210610173944.1203706-4-schatzberg.dan@gmail.com>
+ <YNXvr81YFzbaTxCb@blackbook>
+ <YNnZ7hIRIk9dJDry@dschatzberg-fedora-PC0Y6AEN>
+ <YNr1TYfBwR/tEpEJ@blackbook>
 MIME-Version: 1.0
-In-Reply-To: <20210628023312.1903255-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YNr1TYfBwR/tEpEJ@blackbook>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/27/21 8:33 PM, Ming Lei wrote:
-> ll_new_hw_segment() is reached only in case of single range discard
-> merge, and we don't have max discard segment size limit actually, so
-> it is wrong to run the following check:
-> 
-> if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
-> 
-> it may be always false since req->nr_phys_segments is initialized as
-> one, and bio's segment count is still 1, blk_rq_get_max_segments(reg)
-> is 1 too.
-> 
-> Fix the issue by not doing the check and bypassing the calculation of
-> discard request's nr_phys_segments.
-> 
-> Based on analysis from Wang Shanker.
+> Non-inlining in the loop module doesn't seem like a big trouble. OTOH,
+> other callers may be more sensitive and would need to rely on inlining.
 
-Applied, thanks.
+Yes, this is my concern as well.
 
--- 
-Jens Axboe
+> I can't currently think of a nice way to have both the exported and the
+> exlicitly inlined variant at once. It seems it's either API or perf
+> craft in the end but both are uncertain, so I guess the current approach
+> is fine in the end.
+> 
+> > Yes it is intentional. All requests (not just aio) go through the loop
+> > worker which grabs the blkcg reference in loop_queue_work() on
+> > construction. So I believe grabbing a reference per request is
+> > unnecessary.
+> 
+> Isn't there a window without the reference between loop_queue_rq and
+> loop_queue_work?
 
+Hmm, perhaps I'm not understanding how the reference counting works,
+but my understanding is that we enter loop_queue_rq with presumably
+some code earlier holding a reference to the blkcg, we only need to
+acquire a reference sometime before returning from loop_queue_rq. The
+"window" between loop_queue_rq and loop_queue_work is all
+straight-line code so there's no possibility for the earlier code to
+get control back and drop the reference.
+
+> I don't know, you seem to know better, so I'd suggest
+> dropping a comment line into the code explaining this.
+
+I wouldn't be so sure that I know any better here :D - I'm fairly
+inexperienced in this domain.
+
+Where would you suggest putting such a comment? The change in question
+removed a particular case where we explicitly grab a reference to the
+blkcg because now we do it uniformly in one place. Would you like a
+comment explaining why we acquire a reference for all loop workers or
+one explaining specifically why we don't need to acquire one for aio?
