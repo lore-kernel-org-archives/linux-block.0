@@ -2,110 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1844AC11F68
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 22:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31587C11F66
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 23:59:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8C0A61476
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 22:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0948561443
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 23:59:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232664AbhF3WKo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jun 2021 18:10:44 -0400
-Received: from mail-pj1-f52.google.com ([209.85.216.52]:33526 "EHLO
-        mail-pj1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232513AbhF3WKn (ORCPT
+        id S238095AbhGAACN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jun 2021 20:02:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51475 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229864AbhGAACN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jun 2021 18:10:43 -0400
-Received: by mail-pj1-f52.google.com with SMTP id mn20-20020a17090b1894b02901707fc074e8so4665836pjb.0;
-        Wed, 30 Jun 2021 15:08:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=itel9TJ+NQ61h1BnfnOgz6HA8ahL/K/rKSKzUsDI3HM=;
-        b=LHolUMjwvcNxDY6Yye2sjB+ESSRFIpC8fuk++BHyhnApICCTt1hMeTYmj+46qdnnKb
-         YIq6rfj3mgSscWR9rjb4VpgsS9W2cl0z5dWxJgb0oiaDW34OVwWELsKCtBKrolaxZpNz
-         wSTXjfY1ecPOOe/2PskFGZUfuI6xvo6+7FkMfdEyQi8khigSMF5e5lbfyyde69cGQDOY
-         VbAFjI/dmbLFZs5vpVr9UTa9ukHDi424S5qHi7HaPPgp/toGYbdNEqNQX2luNlUGa4Wc
-         cfszQ2yKhKUNV87MkadRbuHQQTWOC1jRtIVeW3/ke/1OMpUjirwYn/m1awRyDCvqvi3z
-         fSIw==
-X-Gm-Message-State: AOAM532/5stmpL92CN2CQv0laBKFGazZifu4fWuWiJTsapvpQCRjsb8Z
-        y6JbDNfREZ4F84xThjh1+R8=
-X-Google-Smtp-Source: ABdhPJzkLCHPYFnnLC8fI4RqIsJPvxZ1rPwxyDzUQpapeaJ9De1uI/RJiqNalFcrBqZceBenrDJPHA==
-X-Received: by 2002:a17:90b:4c4b:: with SMTP id np11mr6453051pjb.125.1625090894303;
-        Wed, 30 Jun 2021 15:08:14 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:a64c:e202:83eb:cd? ([2601:647:4000:d7:a64c:e202:83eb:cd])
-        by smtp.gmail.com with ESMTPSA id t7sm22433442pfe.201.2021.06.30.15.08.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Jun 2021 15:08:13 -0700 (PDT)
-Subject: Re: [PATCH v4 1/3] scsi: scsi_ioctl: export
- __scsi_result_to_blk_status()
-To:     Martin Wilck <mwilck@suse.com>, Mike Snitzer <snitzer@gmail.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Alasdair G Kergon <agk@redhat.com>,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>, nkoenig@redhat.com,
-        emilne@redhat.com
-References: <20210628095210.26249-1-mwilck@suse.com>
- <20210628095210.26249-2-mwilck@suse.com> <20210628095341.GA4105@lst.de>
- <4fb99309463052355bb8fefe034a320085acab1b.camel@suse.com>
- <20210629125909.GB14372@lst.de>
- <2b5fd35d95668a8cba9151941c058cb8aee3e37c.camel@suse.com>
- <20210629212316.GA3367857@dhcp-10-100-145-180.wdc.com>
- <1aa1f875e7a85f9a331e88e4f8482588176bdb3a.camel@suse.com>
- <YNyVafnX09cOIZPe@redhat.com>
- <da3039c75c892f7d4031161f7c8719e50de36057.camel@suse.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <1c05c65e-64a2-0584-1888-1f544998365e@acm.org>
-Date:   Wed, 30 Jun 2021 15:08:11 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Wed, 30 Jun 2021 20:02:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625097583;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jw4lNKzQTa8WoEHtp9xHFeVAe2ctfiqLinrekfQ4TYU=;
+        b=C9UJ5OAXlE0mg8L2lfICREjfn2pwX3yuGzZQ0S1VFMv/faEEKiZrBHVme53WKavd+2Z+Do
+        1qziK9DIg50oEdnphiEaRAz2QzR/6ZVncE5IDir7U5mEKEX4aU+JYjQH+pP9HPk98fj3nW
+        yIR+ebHhzBUOW1sTXJgNy2AA8WuJ0Sc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-ECrR0RMFNkKwyZnwI0pO2w-1; Wed, 30 Jun 2021 19:59:41 -0400
+X-MC-Unique: ECrR0RMFNkKwyZnwI0pO2w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DF811084F40;
+        Wed, 30 Jun 2021 23:59:40 +0000 (UTC)
+Received: from T590 (ovpn-12-75.pek2.redhat.com [10.72.12.75])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 15D215DA60;
+        Wed, 30 Jun 2021 23:59:30 +0000 (UTC)
+Date:   Thu, 1 Jul 2021 07:59:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH 0/2] blk-mq: fix blk_mq_alloc_request_hctx
+Message-ID: <YN0FXrcwXfAwGU6w@T590>
+References: <20210629074951.1981284-1-ming.lei@redhat.com>
+ <5f304121-38ce-034b-2d17-93d136c77fe6@suse.de>
+ <YNwug8n7qGL5uXfo@T590>
+ <c1de513a-5477-9d1d-0ddc-24e9166cc717@suse.de>
+ <YNw/DcxIIMeg/2VK@T590>
+ <e106f9c4-35c3-b2da-cdd8-3c4dff8234d6@grimberg.me>
+ <89081624-fedd-aa94-1ba2-9a137708a1f1@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <da3039c75c892f7d4031161f7c8719e50de36057.camel@suse.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89081624-fedd-aa94-1ba2-9a137708a1f1@suse.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/30/21 9:54 AM, Martin Wilck wrote:
-> @Martin, @Bart, do you have a suggestion for me?
+On Wed, Jun 30, 2021 at 09:46:35PM +0200, Hannes Reinecke wrote:
+> On 6/30/21 8:59 PM, Sagi Grimberg wrote:
+> > 
+> > > > > > Shouldn't we rather modify the tagset to only refer to
+> > > > > > the current online
+> > > > > > CPUs _only_, thereby never submit a connect request for hctx with only
+> > > > > > offline CPUs?
+> > > > > 
+> > > > > Then you may setup very less io queues, and performance may suffer even
+> > > > > though lots of CPUs become online later.
+> > > > > ;
+> > > > Only if we stay with the reduced number of I/O queues. Which is
+> > > > not what I'm
+> > > > proposing; I'd rather prefer to connect and disconnect queues
+> > > > from the cpu
+> > > > hotplug handler. For starters we could even trigger a reset once
+> > > > the first
+> > > > cpu within a hctx is onlined.
+> > > 
+> > > Yeah, that need one big/complicated patchset, but not see any advantages
+> > > over this simple approach.
+> > 
+> > I tend to agree with Ming here.
+> 
+> Actually, Daniel and me came to a slightly different idea: use cpu hotplug
+> notifier.
+> Thing is, blk-mq already has cpu hotplug notifier, which should ensure that
+> no I/O is pending during cpu hotplug.
 
-The code in block/scsi_ioctl.c exists in the block layer since until
-recently most of it was used by both the IDE and SCSI code. Now that
-drivers/ide is gone (thanks Christoph!), how about moving block/bsg.c
-and block/scsi_ioctl.c to drivers/scsi/? As far as I can see the BSG
-code is only used by SCSI drivers:
+Why should we ensure that for non-managed irq?
 
-$ git grep -nH BLK_DEV_BSG | grep /Kconfig
-block/Kconfig:38:config BLK_DEV_BSG
-block/Kconfig:57:config BLK_DEV_BSGLIB
-block/Kconfig:59:	select BLK_DEV_BSG
-drivers/scsi/Kconfig:231:	select BLK_DEV_BSGLIB
-drivers/scsi/Kconfig:241:	select BLK_DEV_BSGLIB
-drivers/scsi/Kconfig:250:	select BLK_DEV_BSGLIB
-drivers/scsi/libsas/Kconfig:13:	select BLK_DEV_BSGLIB
-drivers/scsi/ufs/Kconfig:150:	select BLK_DEV_BSGLIB
+> If we now add a nvme cpu hotplug notifier which essentially kicks off a
+> reset once all cpu in a hctx are offline the reset logic will rearrange the
+> queues to match the current cpu layout.
+> And when the cpus are getting onlined we'll do another reset.
+> 
+> Daniel is currently preparing a patch; let's see how it goes.
 
-The block/scsi_ioctl.c code is used more widely however:
+What is the advantage of that big change over this simple way?
 
-$ git grep -nH BLK_SCSI_REQUEST | grep /Kconfig
-block/Kconfig:32:config BLK_SCSI_REQUEST
-block/Kconfig:41:	select BLK_SCSI_REQUEST
-block/Kconfig:60:	select BLK_SCSI_REQUEST
-drivers/block/Kconfig:77:	select BLK_SCSI_REQUEST
-drivers/block/Kconfig:309:	select BLK_SCSI_REQUEST
-drivers/block/paride/Kconfig:30:	select BLK_SCSI_REQUEST
-drivers/scsi/Kconfig:22:	select BLK_SCSI_REQUEST
-drivers/target/Kconfig:8:	select BLK_SCSI_REQUEST
-fs/nfsd/Kconfig:112:	select BLK_SCSI_REQUEST
+Thanks, 
+Ming
 
-Bart.
