@@ -2,118 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B29C11F69
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 08:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6C5C11F65
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 08:15:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EF3C61D06
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 08:12:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B0FF61D08
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 08:15:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233260AbhF3IPV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jun 2021 04:15:21 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:56934 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233288AbhF3IPU (ORCPT
+        id S233048AbhF3ISQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jun 2021 04:18:16 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:45744 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232954AbhF3ISQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jun 2021 04:15:20 -0400
+        Wed, 30 Jun 2021 04:18:16 -0400
 Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
         (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 5FF1222177;
-        Wed, 30 Jun 2021 08:12:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625040771; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 30E321FE3B;
+        Wed, 30 Jun 2021 08:15:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1625040947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ESF4as1UHsM7KZCzsh1G7q2F2uELJjQRAkK650wK854=;
-        b=HhxddL4hOZbBT1vT5K78+wwnw2hoNkikV1tyML/Na2o5P2lh5SsKjyoCl7TSSVM9/9izdV
-        yjk+lzUzk162iTIqLP9chNR275b1fsrulwFt7ERyg6VOwpEvypKHl92t35NXV8Yezb/Nyg
-        xf12vGc935sjNJPU2uwncyJbZq8rloI=
+        bh=LN6+hSCnnQVV1lBAadscEQCEm2I2cFMswDtuEyY5AQM=;
+        b=sqdBm/S1Jp4iQ5rKuwORax/+6LsKR6Mz82+GFHyXqPNErX8hTv0w9tx2Hsycc5Ta2QprYu
+        s1Jgqw372Ax5Ryoe82aq5/gIn6gysXiJSSj9wd8rGmTAFMYRppBxLAyQkgbtrb+xyyu/Ie
+        ujrnT9B+PcJgSv/LNQUNCzSxB9G8Xeg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1625040947;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LN6+hSCnnQVV1lBAadscEQCEm2I2cFMswDtuEyY5AQM=;
+        b=sdq2BggLE1xlv6d2Q78YwVNhSUSDlsqWM6fC4V29RxO68iURFseYXxgMSavoVNDdOUCu5e
+        IvOOd63+1YbqkpDQ==
 Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id DBD6B11906;
-        Wed, 30 Jun 2021 08:12:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625040771; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by imap.suse.de (Postfix) with ESMTP id 105B111906;
+        Wed, 30 Jun 2021 08:15:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1625040947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ESF4as1UHsM7KZCzsh1G7q2F2uELJjQRAkK650wK854=;
-        b=HhxddL4hOZbBT1vT5K78+wwnw2hoNkikV1tyML/Na2o5P2lh5SsKjyoCl7TSSVM9/9izdV
-        yjk+lzUzk162iTIqLP9chNR275b1fsrulwFt7ERyg6VOwpEvypKHl92t35NXV8Yezb/Nyg
-        xf12vGc935sjNJPU2uwncyJbZq8rloI=
+        bh=LN6+hSCnnQVV1lBAadscEQCEm2I2cFMswDtuEyY5AQM=;
+        b=sqdBm/S1Jp4iQ5rKuwORax/+6LsKR6Mz82+GFHyXqPNErX8hTv0w9tx2Hsycc5Ta2QprYu
+        s1Jgqw372Ax5Ryoe82aq5/gIn6gysXiJSSj9wd8rGmTAFMYRppBxLAyQkgbtrb+xyyu/Ie
+        ujrnT9B+PcJgSv/LNQUNCzSxB9G8Xeg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1625040947;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LN6+hSCnnQVV1lBAadscEQCEm2I2cFMswDtuEyY5AQM=;
+        b=sdq2BggLE1xlv6d2Q78YwVNhSUSDlsqWM6fC4V29RxO68iURFseYXxgMSavoVNDdOUCu5e
+        IvOOd63+1YbqkpDQ==
 Received: from director2.suse.de ([192.168.254.72])
         by imap3-int with ESMTPSA
-        id LfFSM4In3GBYNwAALh3uQQ
-        (envelope-from <mwilck@suse.com>); Wed, 30 Jun 2021 08:12:50 +0000
-Message-ID: <1aa1f875e7a85f9a331e88e4f8482588176bdb3a.camel@suse.com>
-Subject: Re: [PATCH v4 1/3] scsi: scsi_ioctl: export
- __scsi_result_to_blk_status()
-From:   Martin Wilck <mwilck@suse.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair G Kergon <agk@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>, nkoenig@redhat.com,
-        emilne@redhat.com
-Date:   Wed, 30 Jun 2021 10:12:50 +0200
-In-Reply-To: <20210629212316.GA3367857@dhcp-10-100-145-180.wdc.com>
-References: <20210628095210.26249-1-mwilck@suse.com>
-         <20210628095210.26249-2-mwilck@suse.com> <20210628095341.GA4105@lst.de>
-         <4fb99309463052355bb8fefe034a320085acab1b.camel@suse.com>
-         <20210629125909.GB14372@lst.de>
-         <2b5fd35d95668a8cba9151941c058cb8aee3e37c.camel@suse.com>
-         <20210629212316.GA3367857@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.40.2 
+        id arNxAzMo3GAiOQAALh3uQQ
+        (envelope-from <hare@suse.de>); Wed, 30 Jun 2021 08:15:47 +0000
+Subject: Re: [PATCH 2/2] nvme: pass BLK_MQ_F_NOT_USE_MANAGED_IRQ for
+ fc/rdma/tcp/loop
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>
+References: <20210629074951.1981284-1-ming.lei@redhat.com>
+ <20210629074951.1981284-3-ming.lei@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <46fdb02d-8d71-d465-072d-5e8d6ec3601f@suse.de>
+Date:   Wed, 30 Jun 2021 10:15:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
+In-Reply-To: <20210629074951.1981284-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Di, 2021-06-29 at 14:23 -0700, Keith Busch wrote:
-> On Tue, Jun 29, 2021 at 09:23:18PM +0200, Martin Wilck wrote:
-> > On Di, 2021-06-29 at 14:59 +0200, Christoph Hellwig wrote:
-> > > On Mon, Jun 28, 2021 at 04:57:33PM +0200, Martin Wilck wrote:
-> > > 
-> > > > The sg_io-on-multipath code needs to answer the question "is
-> > > > this a
-> > > > path or a target error?". Therefore it calls blk_path_error(),
-> > > > which
-> > > > requires obtaining a blk_status_t first. But that's not
-> > > > available
-> > > > in
-> > > > the sg_io code path. So how�should I deal with this situation?
-> > > 
-> > > Not by exporting random crap from the SCSI code.
-> > 
-> > So, you'd prefer inlining scsi_result_to_blk_status()?
+On 6/29/21 9:49 AM, Ming Lei wrote:
+> All the 4 host drivers don't use managed irq for completing request, so
+> it is correct to pass the flag to blk-mq.
 > 
-> I don't think you need to. The only scsi_result_to_blk_status()
-> caller
-> is sg_io_to_blk_status(). That's already in the same file as
-> scsi_result_to_blk_status() so no need to export it. You could even
-> make
-> it static.
+> Secondly with this flag, blk-mq will help us dispatch connect request
+> allocated via blk_mq_alloc_request_hctx() to driver even though all
+> CPU in the specified hctx's cpumask are offline.
+> 
+How is this supposed to work?
+To my understanding, only cpus in the hctx cpumask are eligible to send 
+I/O. So if all of these CPUs are offline, who exactly is submitting I/O?
+More to the point, which CPU will be submitting the connect request?
 
-Thanks for your suggestion. I'd be lucky if this was true. But the most
-important users of scsi_result_to_blk_status() are in scsi_lib.c
-(scsi_io_completion_action(), scsi_io_completion_nz_result()).
+Cheers,
 
-If I move scsi_result_to_blk_status() to vmlinux without exporting it,
-it won't be available in the SCSI core any more, at least not with
-CONFIG_SCSI=m.
-
-Regards,
-Martin
-
-
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
