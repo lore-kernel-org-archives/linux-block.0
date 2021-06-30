@@ -2,165 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2867BC11F65
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 07:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BF0C11F65
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 08:12:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2F9661D03
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 07:38:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5390361D06
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 08:12:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233051AbhF3Hkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jun 2021 03:40:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55898 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233010AbhF3Hkw (ORCPT
+        id S233048AbhF3IOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jun 2021 04:14:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54754 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233051AbhF3IOq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jun 2021 03:40:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625038703;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ygn53gMCPK5uQpNuDNfZ0SnQrRr47gyThM24mtG1Fpk=;
-        b=RR/Er+82pnaVN1OUDR2ViXd8Q/8USn9pXeaEUH87VM6EfMvPdpuNSZXZ26D9HRxYHjOfbQ
-        2tj5F2ze3oqi3cpQWu5w3MnDKayMjunz1Ztz2RRjrDhk7tcpNsgGru4LNrV29Cn0dlRpNO
-        cAKK5OL0t4Hz7VNmwHLTF/qBLpZzqvs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-0QjpzeVINYKczPN7d0kQQQ-1; Wed, 30 Jun 2021 03:38:21 -0400
-X-MC-Unique: 0QjpzeVINYKczPN7d0kQQQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A338E19200C5;
-        Wed, 30 Jun 2021 07:38:20 +0000 (UTC)
-Received: from T590 (ovpn-13-153.pek2.redhat.com [10.72.13.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F0F1E715;
-        Wed, 30 Jun 2021 07:38:15 +0000 (UTC)
-Date:   Wed, 30 Jun 2021 15:38:11 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: build default queue map via
- irq_create_affinity_masks
-Message-ID: <YNwfY6kExqJM65+L@T590>
-References: <20210630035153.2099975-1-ming.lei@redhat.com>
+        Wed, 30 Jun 2021 04:14:46 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D23C061766;
+        Wed, 30 Jun 2021 01:12:14 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id hc16so2710336ejc.12;
+        Wed, 30 Jun 2021 01:12:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zPRdx0QRo7nzdsh8ED97M0eRdszbBRIeqzvVm0DA5wI=;
+        b=Zj/QFMaYYl8hPs4a6H8kudkxgrARZRa3aHjQ9v4gBawGr1Rk44TxYOTokjotD7W+k5
+         ps6palupDfdCkxCVJL/g1XeeW+Ki2wXpumk5u+hpTw5xqrWlofhrYc8XYlk4/574tgEz
+         2eu07GWcZsYGc9BSP52qwdCZ6gnK7UihpsmPRCrLqCL5C7rVEj1TRGyc7yDmOxUnrYJU
+         qm4jqf++hcc+5Zs8aQTqT3BKNpG7aHjEQ3jNett1RV/0kIh5biHz7VnjC6URa1adbkY6
+         5tXo0z6Ds+tI9+FSQTFOQQKl1eS1/dxR8redkVrehmLcpQ1YXQQhRY9t3Z6ncJvB5TIS
+         MtSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zPRdx0QRo7nzdsh8ED97M0eRdszbBRIeqzvVm0DA5wI=;
+        b=PEQb4UDbCV1A7SXCmmtb6GJTJ/Udr7rPvmjcbNEWv35hHrJdQGZyjDx4g6gD4eAdPj
+         oMOKERwHKumt6Nz3v8vsgfzcfhahyWnAqG2YQQEeD2hnYucRgvKW5FTnEK3/4ge4uKcu
+         iJ12BDTyLtWsXpAjpiadZXG6zeSbBnLVfrBW4kzn0e7tVIsLURO8w9yBQvAIPXIlBP5R
+         6rEY53jRrAk3dFW0XrcpwIWn5yKcwjdTrOKFZbDsmQTAFuxStrMWfu6e+acQG8Q6uUd/
+         eyPIEAJXKDcJD2Bp4YX2kknYiF0AZ1mmdArEXRQheclJLkyvge+rKjFjDUWpoEVGRZpS
+         ah+g==
+X-Gm-Message-State: AOAM533Aux2lVPV9BWRc3ICPmHvISN2Z7Zg08/w7AOxsEfUNgYfa8Gvf
+        9+UKwtZFQwVDguj7mqbscaE=
+X-Google-Smtp-Source: ABdhPJzKTmHtvvcYdXvAc3Zx13bZiN3UQt8ySxYFfBKIElMmfp1fzqt5Ji6wjKmswUBxVBveb4suFA==
+X-Received: by 2002:a17:906:2985:: with SMTP id x5mr33888561eje.438.1625040733002;
+        Wed, 30 Jun 2021 01:12:13 -0700 (PDT)
+Received: from masalkhi.fritz.box (dslb-178-005-073-162.178.005.pools.vodafone-ip.de. [178.5.73.162])
+        by smtp.gmail.com with ESMTPSA id ml14sm9218318ejb.27.2021.06.30.01.12.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Jun 2021 01:12:12 -0700 (PDT)
+From:   Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+Subject: [PATCH] block: Removed a warning while compiling with a cross compiler for parisc
+Date:   Wed, 30 Jun 2021 10:10:28 +0200
+Message-Id: <20210630081028.161284-1-abd.masalkhi@gmail.com>
+X-Mailer: git-send-email 2.29.0.rc1.dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210630035153.2099975-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 30, 2021 at 11:51:53AM +0800, Ming Lei wrote:
-> The default queue mapping builder of blk_mq_map_queues doesn't take NUMA
-> topo into account, so the built mapping is pretty bad, since CPUs
-> belonging to different NUMA node are assigned to same queue. It is
-> observed that IOPS drops by ~30% when running two jobs on same hctx
-> of null_blk from two CPUs belonging to two NUMA nodes compared with
-> from same NUMA node.
-> 
-> Address the issue by reusing irq_create_affinity_masks() for building
-> the default queue mapping, so that we can re-use the mapping created
-> for managed irq.
-> 
-> Lots of drivers may benefit from the change, such as nvme pci poll,
-> nvme tcp, ...
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq-cpumap.c | 60 +++++++++----------------------------------
->  1 file changed, 12 insertions(+), 48 deletions(-)
-> 
-> diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-> index 3db84d3197f1..946e373296a3 100644
-> --- a/block/blk-mq-cpumap.c
-> +++ b/block/blk-mq-cpumap.c
-> @@ -10,67 +10,31 @@
->  #include <linux/mm.h>
->  #include <linux/smp.h>
->  #include <linux/cpu.h>
-> +#include <linux/interrupt.h>
->  
->  #include <linux/blk-mq.h>
->  #include "blk.h"
->  #include "blk-mq.h"
->  
-> -static int queue_index(struct blk_mq_queue_map *qmap,
-> -		       unsigned int nr_queues, const int q)
-> -{
-> -	return qmap->queue_offset + (q % nr_queues);
-> -}
-> -
-> -static int get_first_sibling(unsigned int cpu)
-> -{
-> -	unsigned int ret;
-> -
-> -	ret = cpumask_first(topology_sibling_cpumask(cpu));
-> -	if (ret < nr_cpu_ids)
-> -		return ret;
-> -
-> -	return cpu;
-> -}
-> -
->  int blk_mq_map_queues(struct blk_mq_queue_map *qmap)
->  {
-> +	struct irq_affinity_desc *masks = NULL;
-> +	struct irq_affinity affd = {0};
->  	unsigned int *map = qmap->mq_map;
->  	unsigned int nr_queues = qmap->nr_queues;
-> -	unsigned int cpu, first_sibling, q = 0;
-> +	unsigned int q;
->  
-> -	for_each_possible_cpu(cpu)
-> -		map[cpu] = -1;
-> +	masks = irq_create_affinity_masks(nr_queues, &affd);
-> +	if (!masks)
-> +		return -ENOMEM;
->  
-> -	/*
-> -	 * Spread queues among present CPUs first for minimizing
-> -	 * count of dead queues which are mapped by all un-present CPUs
-> -	 */
-> -	for_each_present_cpu(cpu) {
-> -		if (q >= nr_queues)
-> -			break;
-> -		map[cpu] = queue_index(qmap, nr_queues, q++);
-> -	}
-> +	for (q = 0; q < nr_queues; q++) {
-> +		unsigned int cpu;
->  
-> -	for_each_possible_cpu(cpu) {
-> -		if (map[cpu] != -1)
-> -			continue;
-> -		/*
-> -		 * First do sequential mapping between CPUs and queues.
-> -		 * In case we still have CPUs to map, and we have some number of
-> -		 * threads per cores then map sibling threads to the same queue
-> -		 * for performance optimizations.
-> -		 */
-> -		if (q < nr_queues) {
-> -			map[cpu] = queue_index(qmap, nr_queues, q++);
-> -		} else {
-> -			first_sibling = get_first_sibling(cpu);
-> -			if (first_sibling == cpu)
-> -				map[cpu] = queue_index(qmap, nr_queues, q++);
-> -			else
-> -				map[cpu] = map[first_sibling];
-> -		}
-> +		for_each_cpu(cpu, &masks[q].mask)
-> +			map[cpu] = q;
+I have compiled the kernel with a cross compiler "hppa-linux-gnu-" on
+x86-64 host machine. I got the follwing warning:
 
-oops, the above line should have been:
+block/genhd.c: In function ‘diskstats_show’:
+block/genhd.c:1227:1: warning: the frame size of 1688 bytes is larger
+than 1280 bytes [-Wframe-larger-than=]
+ 1227  |  }
 
-			map[cpu] = qmap->queue_offset + q;
+The problem was calling seq_printf function with too long argumnets list.
+Therefore, I cut it into two halves. For the second half I have defined
+a function called "print_disk_stats" to print the states of the disk.
 
-Thanks,
-Ming
+Signed-off-by: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+---
+ block/genhd.c | 75 ++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 41 insertions(+), 34 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 9f8cb7beaad1..caf5ac8b509f 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1151,6 +1151,44 @@ const struct device_type disk_type = {
+ };
+ 
+ #ifdef CONFIG_PROC_FS
++
++void print_disk_stats(struct seq_file *seqf,
++		      unsigned int inflight, struct disk_stats *stat)
++{
++	seq_printf(seqf, "%lu %lu %lu %u "
++		   "%lu %lu %lu %u "
++		   "%u %u %u "
++		   "%lu %lu %lu %u "
++		   "%lu %u"
++		   "\n",
++		   stat->ios[STAT_READ],
++		   stat->merges[STAT_READ],
++		   stat->sectors[STAT_READ],
++		   (unsigned int)div_u64(stat->nsecs[STAT_READ],
++					 NSEC_PER_MSEC),
++		   stat->ios[STAT_WRITE],
++		   stat->merges[STAT_WRITE],
++		   stat->sectors[STAT_WRITE],
++		   (unsigned int)div_u64(stat->nsecs[STAT_WRITE],
++					 NSEC_PER_MSEC),
++		   inflight,
++		   jiffies_to_msecs(stat->io_ticks),
++		   (unsigned int)div_u64(stat->nsecs[STAT_READ] +
++					 stat->nsecs[STAT_WRITE] +
++					 stat->nsecs[STAT_DISCARD] +
++					 stat->nsecs[STAT_FLUSH],
++					 NSEC_PER_MSEC),
++		   stat->ios[STAT_DISCARD],
++		   stat->merges[STAT_DISCARD],
++		   stat->sectors[STAT_DISCARD],
++		   (unsigned int)div_u64(stat->nsecs[STAT_DISCARD],
++					 NSEC_PER_MSEC),
++		   stat->ios[STAT_FLUSH],
++		   (unsigned int)div_u64(stat->nsecs[STAT_FLUSH],
++					 NSEC_PER_MSEC)
++		);
++}
++
+ /*
+  * aggregate disk stat collector.  Uses the same stats that the sysfs
+  * entries do, above, but makes them available through one seq_file.
+@@ -1185,41 +1223,10 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ 		else
+ 			inflight = part_in_flight(hd);
+ 
+-		seq_printf(seqf, "%4d %7d %s "
+-			   "%lu %lu %lu %u "
+-			   "%lu %lu %lu %u "
+-			   "%u %u %u "
+-			   "%lu %lu %lu %u "
+-			   "%lu %u"
+-			   "\n",
++		seq_printf(seqf, "%4d %7d %s ",
+ 			   MAJOR(hd->bd_dev), MINOR(hd->bd_dev),
+-			   disk_name(gp, hd->bd_partno, buf),
+-			   stat.ios[STAT_READ],
+-			   stat.merges[STAT_READ],
+-			   stat.sectors[STAT_READ],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_READ],
+-							NSEC_PER_MSEC),
+-			   stat.ios[STAT_WRITE],
+-			   stat.merges[STAT_WRITE],
+-			   stat.sectors[STAT_WRITE],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_WRITE],
+-							NSEC_PER_MSEC),
+-			   inflight,
+-			   jiffies_to_msecs(stat.io_ticks),
+-			   (unsigned int)div_u64(stat.nsecs[STAT_READ] +
+-						 stat.nsecs[STAT_WRITE] +
+-						 stat.nsecs[STAT_DISCARD] +
+-						 stat.nsecs[STAT_FLUSH],
+-							NSEC_PER_MSEC),
+-			   stat.ios[STAT_DISCARD],
+-			   stat.merges[STAT_DISCARD],
+-			   stat.sectors[STAT_DISCARD],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_DISCARD],
+-						 NSEC_PER_MSEC),
+-			   stat.ios[STAT_FLUSH],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_FLUSH],
+-						 NSEC_PER_MSEC)
+-			);
++			   disk_name(gp, hd->bd_partno, buf));
++		print_disk_stats(seqf, inflight, &stat);
+ 	}
+ 	rcu_read_unlock();
+ 
+-- 
+2.29.0.rc1.dirty
 
