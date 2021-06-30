@@ -2,136 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C96AC11F65
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 19:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CAFC11F65
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 20:10:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E86AB61474
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 19:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CA24613B4
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 20:10:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233779AbhF3TtI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jun 2021 15:49:08 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:37964 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233777AbhF3TtH (ORCPT
+        id S233825AbhF3UMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jun 2021 16:12:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46478 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233847AbhF3UMr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jun 2021 15:49:07 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D05231FEED;
-        Wed, 30 Jun 2021 19:46:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1625082397; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/sOrVdN96EFG02Nt1Orskqd1mwnvmf43ZLsBmFEb7uA=;
-        b=aS08WQOpPfT/HM02tdg+pYFp6j21Lx64JgCaLR91Vyhdzpfu0JT1DZVvY2BAITNdpkQDEU
-        6GCY9wGy2ZHXo74NwqDn36XCLKLQgVE9a+k9BwsZMQYstsLhWopDL3OEG3r0NbYf8GFPxG
-        bSRE7KJJUmsidokNf/tvxhcgdBFuMic=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1625082397;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/sOrVdN96EFG02Nt1Orskqd1mwnvmf43ZLsBmFEb7uA=;
-        b=TGY8ltgnR+psVd40iGsbS7vZeHXvNWUnRrN3rgHgw+eagngCNhrIzmXP917bZNXYvKwYmB
-        MYlvLieXu6ubcICA==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id A977D118DD;
-        Wed, 30 Jun 2021 19:46:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1625082397; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/sOrVdN96EFG02Nt1Orskqd1mwnvmf43ZLsBmFEb7uA=;
-        b=aS08WQOpPfT/HM02tdg+pYFp6j21Lx64JgCaLR91Vyhdzpfu0JT1DZVvY2BAITNdpkQDEU
-        6GCY9wGy2ZHXo74NwqDn36XCLKLQgVE9a+k9BwsZMQYstsLhWopDL3OEG3r0NbYf8GFPxG
-        bSRE7KJJUmsidokNf/tvxhcgdBFuMic=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1625082397;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/sOrVdN96EFG02Nt1Orskqd1mwnvmf43ZLsBmFEb7uA=;
-        b=TGY8ltgnR+psVd40iGsbS7vZeHXvNWUnRrN3rgHgw+eagngCNhrIzmXP917bZNXYvKwYmB
-        MYlvLieXu6ubcICA==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id hFsnJhzK3GA1QwAALh3uQQ
-        (envelope-from <hare@suse.de>); Wed, 30 Jun 2021 19:46:36 +0000
-Subject: Re: [PATCH 0/2] blk-mq: fix blk_mq_alloc_request_hctx
-To:     Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>
-References: <20210629074951.1981284-1-ming.lei@redhat.com>
- <5f304121-38ce-034b-2d17-93d136c77fe6@suse.de> <YNwug8n7qGL5uXfo@T590>
- <c1de513a-5477-9d1d-0ddc-24e9166cc717@suse.de> <YNw/DcxIIMeg/2VK@T590>
- <e106f9c4-35c3-b2da-cdd8-3c4dff8234d6@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <89081624-fedd-aa94-1ba2-9a137708a1f1@suse.de>
-Date:   Wed, 30 Jun 2021 21:46:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        Wed, 30 Jun 2021 16:12:47 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3DCC061756
+        for <linux-block@vger.kernel.org>; Wed, 30 Jun 2021 13:10:16 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id g3so2869728ilq.10
+        for <linux-block@vger.kernel.org>; Wed, 30 Jun 2021 13:10:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PKhtP/3/5SYZTsSZ4hDFHrmDZFpSEMGrUmU3Xdktx0o=;
+        b=LzYg+9OEvLIbb0PLpYeE22vnSWrGHr8SXluQSXwhtyRlQB3hCYI/lP8qfPrP+x6tgP
+         eyfPWIoQvaz0sZWmQAfddNHp6SRXtpqu0WNh/tzzBtDd148smktMbg+a7YcfPqoMbXx1
+         V7W9BOcdVtUoDjW+jEoHxJvOwLol9IdePbT2o30f0u1czQjQFgIhBDZsz40rNQ/Nioor
+         2LPwzBcTJMzzbJdMf7qwMH7Vo05KnnLfbb2QvDZ6yuVkzsjwIzjeCm6hbvVtWluuLXu/
+         5uwBB8SMdVimyARwVDGwUdBhc0SPVXJtemn9BLiXdyHXn4FxwTZoeLHmivdCPlYsuDeD
+         nqDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PKhtP/3/5SYZTsSZ4hDFHrmDZFpSEMGrUmU3Xdktx0o=;
+        b=qDjV97I537uwTKhcGHP8JYM8ZLZUZfA6tdDcBIfPK1tx4c2gpL6FXmSlK6QqIl064M
+         YWDcz/qlQEFC3jWpX5nohuetFVrEiU1AjAZkjnxRZ4Gie1jwb9J5Ev5hF729rWAaSve3
+         zFrBS5m19PONbQ2T+85XKBkGAr3tIKTwDea4NdhRD7lzkHdOMuW4EfNeNHzCNeuwk9S/
+         D+9/52Sw659Wb2roE3T6bRjJ1/JvZD+vSiRzCtOXoD5w+d+jSbnWod/dDwsSOW/MN3Fx
+         seSltdCuwMGFy8L05zlHl3VME1DFImF2SPICpelXGuti6tVVizls8ahxZ19mvbt4f4Ju
+         QhaQ==
+X-Gm-Message-State: AOAM5335F1HPcB0GXoAkwNmiiWMmSJB2B86n+xca0Km0t1ohQHXCN8M2
+        UhtrNzp87sD13QLMK4VG2WGHrM3VLvXigw==
+X-Google-Smtp-Source: ABdhPJygKVczS+aX8a1t+CzKTleWGwU92FM5EbMMBowRqBsIlXrRbnmz227NJS3ykCnmut0VtTEX5g==
+X-Received: by 2002:a05:6e02:50c:: with SMTP id d12mr14874630ils.84.1625083814953;
+        Wed, 30 Jun 2021 13:10:14 -0700 (PDT)
+Received: from [192.168.1.134] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id e24sm1736840ioe.49.2021.06.30.13.10.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Jun 2021 13:10:14 -0700 (PDT)
+Subject: Re: [GIT PULL] Block driver updates for 5.14-rc1
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <ee6c32c8-e643-f817-bf45-1280e7f254ea@kernel.dk>
+ <CAHk-=wg6axLJQuFQBNa+nMHkEdx4X75LF7_P=eC=rzKj0x2h2A@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bf8b1ca0-4362-dc86-3933-efd609fe3827@kernel.dk>
+Date:   Wed, 30 Jun 2021 14:10:12 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <e106f9c4-35c3-b2da-cdd8-3c4dff8234d6@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAHk-=wg6axLJQuFQBNa+nMHkEdx4X75LF7_P=eC=rzKj0x2h2A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/30/21 8:59 PM, Sagi Grimberg wrote:
-> 
->>>>> Shouldn't we rather modify the tagset to only refer to the current 
->>>>> online
->>>>> CPUs _only_, thereby never submit a connect request for hctx with only
->>>>> offline CPUs?
->>>>
->>>> Then you may setup very less io queues, and performance may suffer even
->>>> though lots of CPUs become online later.
->>>> ;
->>> Only if we stay with the reduced number of I/O queues. Which is not 
->>> what I'm
->>> proposing; I'd rather prefer to connect and disconnect queues from 
->>> the cpu
->>> hotplug handler. For starters we could even trigger a reset once the 
->>> first
->>> cpu within a hctx is onlined.
+On 6/30/21 1:29 PM, Linus Torvalds wrote:
+> On Tue, Jun 29, 2021 at 12:55 PM Jens Axboe <axboe@kernel.dk> wrote:
 >>
->> Yeah, that need one big/complicated patchset, but not see any advantages
->> over this simple approach.
+>> Note that this will throw a trivial merge conflict in
+>> drivers/nvme/host/fabrics.c due to the NVME_SC_HOST_PATH_ERROR addition.
 > 
-> I tend to agree with Ming here.
+> Grr.
+> 
+> I don't mind the conflict. It's trivial, as you say.
+> 
+> I *do* mind what the conflict unearthed: commit 63d20f54a3d0
+> ("nvme-fabrics: remove extra new lines in the switch").
+> 
+> That commit claims to remove new-lines. In fact, the full commit
+> message explicitly says "No functionality change in this patch".
+> 
+> Except what it does is not just non-functional whitespace cleanup. No,
+> it adds that
+> 
+>         case NVME_SC_HOST_PATH_ERROR:
+> 
+> thing that was added in mainline too by commit 4d9442bf263a
+> ("nvme-fabrics: decode host pathing error for connect").
+> 
+> THAT is not ok. Commit messages that explicitly say one thing, and
+> then do something completely different are very bad.
 
-Actually, Daniel and me came to a slightly different idea: use cpu 
-hotplug notifier.
-Thing is, blk-mq already has cpu hotplug notifier, which should ensure 
-that no I/O is pending during cpu hotplug.
-If we now add a nvme cpu hotplug notifier which essentially kicks off a 
-reset once all cpu in a hctx are offline the reset logic will rearrange 
-the queues to match the current cpu layout.
-And when the cpus are getting onlined we'll do another reset.
+Agree, that's beyond ugly, I should have caught that.
 
-Daniel is currently preparing a patch; let's see how it goes.
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Jens Axboe
+
