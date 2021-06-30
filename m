@@ -2,149 +2,200 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B913C11F65
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 442C3C11F65
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:43:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7CEB61D0B
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:42:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BADE61CBB
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:43:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233962AbhF3JpN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jun 2021 05:45:13 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:47566 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233541AbhF3JpN (ORCPT
+        id S233849AbhF3JqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jun 2021 05:46:12 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:38174 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233541AbhF3JqM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jun 2021 05:45:13 -0400
+        Wed, 30 Jun 2021 05:46:12 -0400
 Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
         (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 53DDC2223B;
-        Wed, 30 Jun 2021 09:42:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625046163; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 3065D1FE59;
+        Wed, 30 Jun 2021 09:43:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1625046223; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=A3MNoSLnXHqAMX3jqPxgl/njzLp8ToXYl4dULk/puSI=;
-        b=XfyYwT5Qi1Ku2shGh7rKtTc077cKu4YiKz6Hkm6eA5BM9h8Cyz80261+7bD1msJ3HqlCN7
-        9Rb8/wORqTX98zfvCfUhm0zX0bJ00n3IFJkAXKuzZOyEKD9nIrJ9VE1PILPZ0Tsy1TPzcG
-        Qz0OZjdAnNscjQTuOi71viTOLYCvnGE=
+        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
+        b=FYP1W55Q+UbCZnlwzcG0DvU0eogwKiE7Y052FIn0XwjJDTu1BM6tfC3RJOSbQ1njj34OPc
+        hGOFztYZUoryR4h9mGXfEmV5Whtk5NT8ya0OZKItWBFKFCB/3pKFFqM9XqguoDzijlLIau
+        OJ3uy2uIsiOj7rMExIMNuvt300Bktx8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1625046223;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
+        b=aQgP1PCWUn6Vad+J9a4c2XI39JglUKNaBjMSjFVVVLBRnZA8Ij7PCz+djbTtJDh9Z1CN9d
+        5v3rHjiuH1TfzNDg==
 Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 2044311906;
-        Wed, 30 Jun 2021 09:42:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625046163; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by imap.suse.de (Postfix) with ESMTP id 939F111906;
+        Wed, 30 Jun 2021 09:43:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1625046223; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=A3MNoSLnXHqAMX3jqPxgl/njzLp8ToXYl4dULk/puSI=;
-        b=XfyYwT5Qi1Ku2shGh7rKtTc077cKu4YiKz6Hkm6eA5BM9h8Cyz80261+7bD1msJ3HqlCN7
-        9Rb8/wORqTX98zfvCfUhm0zX0bJ00n3IFJkAXKuzZOyEKD9nIrJ9VE1PILPZ0Tsy1TPzcG
-        Qz0OZjdAnNscjQTuOi71viTOLYCvnGE=
+        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
+        b=FYP1W55Q+UbCZnlwzcG0DvU0eogwKiE7Y052FIn0XwjJDTu1BM6tfC3RJOSbQ1njj34OPc
+        hGOFztYZUoryR4h9mGXfEmV5Whtk5NT8ya0OZKItWBFKFCB/3pKFFqM9XqguoDzijlLIau
+        OJ3uy2uIsiOj7rMExIMNuvt300Bktx8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1625046223;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
+        b=aQgP1PCWUn6Vad+J9a4c2XI39JglUKNaBjMSjFVVVLBRnZA8Ij7PCz+djbTtJDh9Z1CN9d
+        5v3rHjiuH1TfzNDg==
 Received: from director2.suse.de ([192.168.254.72])
         by imap3-int with ESMTPSA
-        id jC7GBpM83GD1bAAALh3uQQ
-        (envelope-from <mkoutny@suse.com>); Wed, 30 Jun 2021 09:42:43 +0000
-Date:   Wed, 30 Jun 2021 11:42:41 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Dan Schatzberg <schatzberg.dan@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 3/3] loop: Charge i/o to mem and blk cg
-Message-ID: <YNw8kRpT6R2emuhI@blackbook>
-References: <20210610173944.1203706-1-schatzberg.dan@gmail.com>
- <20210610173944.1203706-4-schatzberg.dan@gmail.com>
- <YNXvr81YFzbaTxCb@blackbook>
- <YNnZ7hIRIk9dJDry@dschatzberg-fedora-PC0Y6AEN>
- <YNr1TYfBwR/tEpEJ@blackbook>
- <YNsoNeQNMmdplmtp@dschatzberg-fedora-PC0Y6AEN>
+        id Kr7RIM483GCnbQAALh3uQQ
+        (envelope-from <hare@suse.de>); Wed, 30 Jun 2021 09:43:42 +0000
+Subject: Re: [PATCH 0/2] blk-mq: fix blk_mq_alloc_request_hctx
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>
+References: <20210629074951.1981284-1-ming.lei@redhat.com>
+ <5f304121-38ce-034b-2d17-93d136c77fe6@suse.de> <YNwug8n7qGL5uXfo@T590>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <c1de513a-5477-9d1d-0ddc-24e9166cc717@suse.de>
+Date:   Wed, 30 Jun 2021 11:43:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="d+pAxhfHeN1kdV+F"
-Content-Disposition: inline
-In-Reply-To: <YNsoNeQNMmdplmtp@dschatzberg-fedora-PC0Y6AEN>
+In-Reply-To: <YNwug8n7qGL5uXfo@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/30/21 10:42 AM, Ming Lei wrote:
+> On Wed, Jun 30, 2021 at 10:18:37AM +0200, Hannes Reinecke wrote:
+>> On 6/29/21 9:49 AM, Ming Lei wrote:
+>>> Hi,
+>>>
+>>> blk_mq_alloc_request_hctx() is used by NVMe fc/rdma/tcp/loop to connect
+>>> io queue. Also the sw ctx is chosen as the 1st online cpu in hctx->cpumask.
+>>> However, all cpus in hctx->cpumask may be offline.
+>>>
+>>> This usage model isn't well supported by blk-mq which supposes allocator is
+>>> always done on one online CPU in hctx->cpumask. This assumption is
+>>> related with managed irq, which also requires blk-mq to drain inflight
+>>> request in this hctx when the last cpu in hctx->cpumask is going to
+>>> offline.
+>>>
+>>> However, NVMe fc/rdma/tcp/loop don't use managed irq, so we should allow
+>>> them to ask for request allocation when the specified hctx is inactive
+>>> (all cpus in hctx->cpumask are offline).
+>>>
+>>> Fix blk_mq_alloc_request_hctx() by adding/passing flag of
+>>> BLK_MQ_F_NOT_USE_MANAGED_IRQ.
+>>>
+>>>
+>>> Ming Lei (2):
+>>>     blk-mq: not deactivate hctx if the device doesn't use managed irq
+>>>     nvme: pass BLK_MQ_F_NOT_USE_MANAGED_IRQ for fc/rdma/tcp/loop
+>>>
+>>>    block/blk-mq.c             | 6 +++++-
+>>>    drivers/nvme/host/fc.c     | 3 ++-
+>>>    drivers/nvme/host/rdma.c   | 3 ++-
+>>>    drivers/nvme/host/tcp.c    | 3 ++-
+>>>    drivers/nvme/target/loop.c | 3 ++-
+>>>    include/linux/blk-mq.h     | 1 +
+>>>    6 files changed, 14 insertions(+), 5 deletions(-)
+>>>
+>>> Cc: Sagi Grimberg <sagi@grimberg.me>
+>>> Cc: Daniel Wagner <dwagner@suse. thede>
+>>> Cc: Wen Xiong <wenxiong@us.ibm.com>
+>>> Cc: John Garry <john.garry@huawei.com>
+>>>
+>>>
+>> I have my misgivings about this patchset.
+>> To my understanding, only CPUs present in the hctx cpumask are eligible to
+>> submit I/O to that hctx.
+> 
+> It is just true for managed irq, and should be CPUs online.
+> 
+> However, no such constraint for non managed irq, since irq may migrate to
+> other online CPUs if all CPUs in irq's current affinity become offline.
+> 
 
---d+pAxhfHeN1kdV+F
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+But there shouldn't be any I/O pending during CPU offline (cf 
+blk_mq_hctx_notify_offline()), so no interrupts should be triggered, 
+either, no?
 
-On Tue, Jun 29, 2021 at 10:03:33AM -0400, Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
-> Hmm, perhaps I'm not understanding how the reference counting works,
-> but my understanding is that we enter loop_queue_rq with presumably
-> some code earlier holding a reference to the blkcg, we only need to
-> acquire a reference sometime before returning from loop_queue_rq. The
-> "window" between loop_queue_rq and loop_queue_work is all
-> straight-line code so there's no possibility for the earlier code to
-> get control back and drop the reference.
+>> Consequently if all cpus in that mask are offline, where is the point of
+>> even transmitting a 'connect' request?
+> 
+> nvmef requires to submit the connect request via one specified hctx
+> which index has to be same with the io queue's index.
+> 
+> Almost all nvmef drivers fail to setup controller in case of
+> connect io queue error.
+> 
 
-I don't say the current implementation is wrong, it just looked
-suspicious to me when the css address is copied without taking the
-reference.
-The straight path is clear, I'm not sure about later invocations through
-loop_workfn where the blkcg_css is accessed via the cmd->blkcg_css.
+And I would prefer to fix that, namely allowing blk-mq to run on a 
+sparse set of io queues.
+The remaining io queues can be connected once the first cpu in the hctx 
+cpumask is onlined; we already have blk_mq_hctx_notify_online(), which 
+could easily be expanded to connect to relevant I/O queue...
 
-> Where would you suggest putting such a comment?
+> Also CPU can become offline & online, especially it is done in
+> lots of sanity test.
+> 
 
-This is how I understand it:
+True, but then again all I/O on the hctx should be quiesced during cpu 
+offline.
 
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -996,6 +996,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
-        rb_insert_color(&worker->rb_node, &lo->worker_tree);
- queue_work:
-        if (worker) {
-+               WARN_ON_ONCE(worker->blkcg_css != cmd->blkcg_css);
-                /*
-                 * We need to remove from the idle list here while
-                 * holding the lock so that the idle timer doesn't
-@@ -2106,6 +2107,8 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
-        cmd->memcg_css = NULL;
- #ifdef CONFIG_BLK_CGROUP
-        if (rq->bio && rq->bio->bi_blkg) {
-+               /* reference to blkcg_css will be held by loop_worker (outlives
-+                * cmd) or it is the eternal root css */
-                cmd->blkcg_css = &bio_blkcg(rq->bio)->css;
- #ifdef CONFIG_MEMCG
-                cmd->memcg_css =
+> So we should allow to allocate the connect request successful, and
+> submit it to drivers given it is allowed in this way for non-managed
+> irq.
+> 
 
-(On further thoughts, maybe the blkcg_css reference isn't needed even in
-the loop_worker if it can be reasoned that blkcg_css won't go away while
-there's an outstanding rq.)
+I'd rather not do this, as the 'connect' command runs on the 'normal' 
+I/O tagset, and hence runs into the risk of being issues against 
+non-existing CPUs.
 
-HTH,
-Michal
+>> Shouldn't we rather modify the tagset to only refer to the current online
+>> CPUs _only_, thereby never submit a connect request for hctx with only
+>> offline CPUs?
+> 
+> Then you may setup very less io queues, and performance may suffer even
+> though lots of CPUs become online later.
+> ;
+Only if we stay with the reduced number of I/O queues. Which is not what 
+I'm proposing; I'd rather prefer to connect and disconnect queues from 
+the cpu hotplug handler. For starters we could even trigger a reset once 
+the first cpu within a hctx is onlined.
 
---d+pAxhfHeN1kdV+F
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Cheers,
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAmDcPI4ACgkQia1+riC5
-qShVnw//Z/ZtMKu1mO3W3DY9zAZG/2xeZlqAQuz4x1tWnQOb/vdX3yqhyX0JcIjI
-8e4a2pF5XnYaPJs8kRU+4T7uUsaX/9Xb/ZAxOfcJWVFNWOZ+lO6VtK5OJSFFldVB
-SyZLb6mHnE4s5ZFGZOHVA8T9rK7oY4buwZL4LL7PCqu9gc3hMPrS9okHNjzrb5lU
-QmXUS/SZue0mqSJayQudE54BZ3y9tqWDxoE68SZ83DsxbRomVnVQ8RKFlB/3CQLc
-FtjRJ709budI1jnZ54H1O1LOlolRMT6eY+8+gcY9LCcTCWUFs5iRXCwOGzekOPED
-e39Ts7/msQv5NeQpIYNA0IqbaNW4ooJPXCAO3NKqKCwmM8zaQk66MrVfqhzbY8+I
-W2WXep5pC9+tUD/jRvWW+cb+A1RnoLQ9qhYQ1xT6My+Uiy4M1IZDSzz3zA8O+5pD
-l9SjDIe2VCi31ERgx/5s6rANquPKRx6N5CjYoxtU/KXD4HorQFKEzxBovuGtytAs
-bPGQSHHM8/Zulgk4lENFywYX8NpqxyB9cvZr9q4tybth5fqvZSV+EY08JqXoNarV
-GmQ1qaORP+0S7xoPBo+2RQweG7lm5kWzAehl4+bQKZnIOTxqqeP2aKuvcd7oELKE
-VNVS4tpqppXaC2rLpb7LleZoPL+Qq+du+7e8Czui0RaDkO0Cw4I=
-=IVGr
------END PGP SIGNATURE-----
-
---d+pAxhfHeN1kdV+F--
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
