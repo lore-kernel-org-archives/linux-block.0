@@ -2,200 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 442C3C11F65
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB529C11F65
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2BADE61CBB
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A52A161D1A
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jun 2021 09:47:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233849AbhF3JqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jun 2021 05:46:12 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:38174 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233541AbhF3JqM (ORCPT
+        id S234014AbhF3Jtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jun 2021 05:49:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48082 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234104AbhF3Jti (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jun 2021 05:46:12 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 3065D1FE59;
-        Wed, 30 Jun 2021 09:43:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1625046223; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
-        b=FYP1W55Q+UbCZnlwzcG0DvU0eogwKiE7Y052FIn0XwjJDTu1BM6tfC3RJOSbQ1njj34OPc
-        hGOFztYZUoryR4h9mGXfEmV5Whtk5NT8ya0OZKItWBFKFCB/3pKFFqM9XqguoDzijlLIau
-        OJ3uy2uIsiOj7rMExIMNuvt300Bktx8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1625046223;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
-        b=aQgP1PCWUn6Vad+J9a4c2XI39JglUKNaBjMSjFVVVLBRnZA8Ij7PCz+djbTtJDh9Z1CN9d
-        5v3rHjiuH1TfzNDg==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 939F111906;
-        Wed, 30 Jun 2021 09:43:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1625046223; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
-        b=FYP1W55Q+UbCZnlwzcG0DvU0eogwKiE7Y052FIn0XwjJDTu1BM6tfC3RJOSbQ1njj34OPc
-        hGOFztYZUoryR4h9mGXfEmV5Whtk5NT8ya0OZKItWBFKFCB/3pKFFqM9XqguoDzijlLIau
-        OJ3uy2uIsiOj7rMExIMNuvt300Bktx8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1625046223;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=syWhgjUEA3Suq9NaFjFTKKAGY+GrebcNJjzwNFC1W58=;
-        b=aQgP1PCWUn6Vad+J9a4c2XI39JglUKNaBjMSjFVVVLBRnZA8Ij7PCz+djbTtJDh9Z1CN9d
-        5v3rHjiuH1TfzNDg==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id Kr7RIM483GCnbQAALh3uQQ
-        (envelope-from <hare@suse.de>); Wed, 30 Jun 2021 09:43:42 +0000
-Subject: Re: [PATCH 0/2] blk-mq: fix blk_mq_alloc_request_hctx
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>
-References: <20210629074951.1981284-1-ming.lei@redhat.com>
- <5f304121-38ce-034b-2d17-93d136c77fe6@suse.de> <YNwug8n7qGL5uXfo@T590>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <c1de513a-5477-9d1d-0ddc-24e9166cc717@suse.de>
-Date:   Wed, 30 Jun 2021 11:43:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        Wed, 30 Jun 2021 05:49:38 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F23AC061767
+        for <linux-block@vger.kernel.org>; Wed, 30 Jun 2021 02:47:09 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id j11-20020a05600c1c0bb02901e23d4c0977so3979095wms.0
+        for <linux-block@vger.kernel.org>; Wed, 30 Jun 2021 02:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=Z6oz2a6snhnXVo8MXg6uFjLMjRtla/ZcY7D6SjSAauA=;
+        b=zLTi5aCbnypPB5E3aUA0ZTW2QZ9ElWO1rUMChAnrYkbnv5R1HppvSR83sz83GmhmUA
+         UMxwvrtyn70Zd9AoLodBjAgPxIMvZ1UB4cERbwNt9h4ezFzozjlRXTJceovl8itCNtkO
+         ZHpCXotz6yp1b1LU/oBZfpMMbHJ9z37zfQLOhI93YEXu77Z1hvbdB1hXccB0ErO3BuRM
+         2v2H3xdjL56voJXkKEkXOJouofN6tE6pWAPsziIGqT+x1uxsqXS8aHT7JlV4vp9xlNdX
+         RRmNLJxKm6216ZAGJ10+La1loxmhKlUG8r/gC+MQIkg6soAQE9aR2vguk2YO28brVd4+
+         UeDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=Z6oz2a6snhnXVo8MXg6uFjLMjRtla/ZcY7D6SjSAauA=;
+        b=IUJsX2d5d7SwveP2drdxcESNAW2vajq8hRxbVQaHyOS7vvQ31rtXLjUcGbj5oTjAvV
+         dvxBdeiMiimqsfwVYCM/cUyPGh9zxnu7VQM/Mui7FEJm+Z4tqZl9vS0LYkxdHwFhfUAr
+         veHdQ+y44MIQln++5OK04bo3JHwLKpS5Uqv3uj9HYgkvpqLgC7z7dFZItNcLzbEEQaVj
+         hzrKUhHvJCMDOprqgY4n8Lm9tgToWULvpLnekg7E7lefJgZLPx0u0mh4CBIVMeEQzX53
+         f0KkUJ1ze4fMR8QGWrguoDU9/OfgWTrRV8aYZ2gAGgITfBKw0e3Uw4L/l1IHhQ5GElmn
+         posA==
+X-Gm-Message-State: AOAM532Cy0x+Mcb8SQcs/ZayDS6SpTAB5FdXOC9xzWgUqAMK0XVvkhlF
+        iMRzk3QGjr/UAfhRlnD2pSSt6w==
+X-Google-Smtp-Source: ABdhPJysgaWNsxoQ1Ekn5yIfyUpjV6tLOTWrZta/4RIlCjFmHAXWqbWe870FTEuNbqmWvtd9IqJeZQ==
+X-Received: by 2002:a1c:7f4a:: with SMTP id a71mr3558850wmd.33.1625046428092;
+        Wed, 30 Jun 2021 02:47:08 -0700 (PDT)
+Received: from dell ([95.144.13.171])
+        by smtp.gmail.com with ESMTPSA id p7sm8990839wrr.68.2021.06.30.02.47.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Jun 2021 02:47:07 -0700 (PDT)
+Date:   Wed, 30 Jun 2021 10:47:05 +0100
+From:   Lee Jones <lee.jones@linaro.org>
+To:     Satya Tangirala <satyaprateek2357@gmail.com>
+Cc:     Satya Tangirala <satyat@google.com>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>, Chao Yu <chao@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
+Subject: Re: [PATCH v8 0/8] add support for direct I/O with fscrypt using
+ blk-crypto
+Message-ID: <YNw9me1Fd6Siy18A@dell>
+References: <20210121230336.1373726-1-satyat@google.com>
+ <CAF2Aj3jbEnnG1-bHARSt6xF12VKttg7Bt52gV=bEQUkaspDC9w@mail.gmail.com>
+ <YK09eG0xm9dphL/1@google.com>
+ <20210526080224.GI4005783@dell>
+ <20210609024556.GA11153@fractal>
 MIME-Version: 1.0
-In-Reply-To: <YNwug8n7qGL5uXfo@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210609024556.GA11153@fractal>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/30/21 10:42 AM, Ming Lei wrote:
-> On Wed, Jun 30, 2021 at 10:18:37AM +0200, Hannes Reinecke wrote:
->> On 6/29/21 9:49 AM, Ming Lei wrote:
->>> Hi,
->>>
->>> blk_mq_alloc_request_hctx() is used by NVMe fc/rdma/tcp/loop to connect
->>> io queue. Also the sw ctx is chosen as the 1st online cpu in hctx->cpumask.
->>> However, all cpus in hctx->cpumask may be offline.
->>>
->>> This usage model isn't well supported by blk-mq which supposes allocator is
->>> always done on one online CPU in hctx->cpumask. This assumption is
->>> related with managed irq, which also requires blk-mq to drain inflight
->>> request in this hctx when the last cpu in hctx->cpumask is going to
->>> offline.
->>>
->>> However, NVMe fc/rdma/tcp/loop don't use managed irq, so we should allow
->>> them to ask for request allocation when the specified hctx is inactive
->>> (all cpus in hctx->cpumask are offline).
->>>
->>> Fix blk_mq_alloc_request_hctx() by adding/passing flag of
->>> BLK_MQ_F_NOT_USE_MANAGED_IRQ.
->>>
->>>
->>> Ming Lei (2):
->>>     blk-mq: not deactivate hctx if the device doesn't use managed irq
->>>     nvme: pass BLK_MQ_F_NOT_USE_MANAGED_IRQ for fc/rdma/tcp/loop
->>>
->>>    block/blk-mq.c             | 6 +++++-
->>>    drivers/nvme/host/fc.c     | 3 ++-
->>>    drivers/nvme/host/rdma.c   | 3 ++-
->>>    drivers/nvme/host/tcp.c    | 3 ++-
->>>    drivers/nvme/target/loop.c | 3 ++-
->>>    include/linux/blk-mq.h     | 1 +
->>>    6 files changed, 14 insertions(+), 5 deletions(-)
->>>
->>> Cc: Sagi Grimberg <sagi@grimberg.me>
->>> Cc: Daniel Wagner <dwagner@suse. thede>
->>> Cc: Wen Xiong <wenxiong@us.ibm.com>
->>> Cc: John Garry <john.garry@huawei.com>
->>>
->>>
->> I have my misgivings about this patchset.
->> To my understanding, only CPUs present in the hctx cpumask are eligible to
->> submit I/O to that hctx.
-> 
-> It is just true for managed irq, and should be CPUs online.
-> 
-> However, no such constraint for non managed irq, since irq may migrate to
-> other online CPUs if all CPUs in irq's current affinity become offline.
-> 
+On Tue, 08 Jun 2021, Satya Tangirala wrote:
 
-But there shouldn't be any I/O pending during CPU offline (cf 
-blk_mq_hctx_notify_offline()), so no interrupts should be triggered, 
-either, no?
+> On Wed, May 26, 2021 at 09:02:24AM +0100, Lee Jones wrote:
+> > On Tue, 25 May 2021, Satya Tangirala wrote:
+> > 65;6200;1c
+> > > On Tue, May 25, 2021 at 01:57:28PM +0100, Lee Jones wrote:
+> > > > On Thu, 21 Jan 2021 at 23:06, Satya Tangirala <satyat@google.com> wrote:
+> > > > 
+> > > > > This patch series adds support for direct I/O with fscrypt using
+> > > > > blk-crypto.
+> > > > >
+> > > > 
+> > > > Is there an update on this set please?
+> > > > 
+> > > > I can't seem to find any reviews or follow-up since v8 was posted back in
+> > > > January.
+> > > > 
+> > > This patchset relies on the block layer fixes patchset here
+> > > https://lore.kernel.org/linux-block/20210325212609.492188-1-satyat@google.com/
+> > > That said, I haven't been able to actively work on both the patchsets
+> > > for a while, but I'll send out updates for both patchsets over the
+> > > next week or so.
+> > 
+> > Thanks Satya, I'd appreciate that.
+> FYI I sent out an updated patch series last week at
+> https://lore.kernel.org/linux-fscrypt/20210604210908.2105870-1-satyat@google.com/
 
->> Consequently if all cpus in that mask are offline, where is the point of
->> even transmitting a 'connect' request?
-> 
-> nvmef requires to submit the connect request via one specified hctx
-> which index has to be same with the io queue's index.
-> 
-> Almost all nvmef drivers fail to setup controller in case of
-> connect io queue error.
-> 
+If you end up [RESEND]ing this or submitting another version, would
+you mind adding me on Cc please?
 
-And I would prefer to fix that, namely allowing blk-mq to run on a 
-sparse set of io queues.
-The remaining io queues can be connected once the first cpu in the hctx 
-cpumask is onlined; we already have blk_mq_hctx_notify_online(), which 
-could easily be expanded to connect to relevant I/O queue...
-
-> Also CPU can become offline & online, especially it is done in
-> lots of sanity test.
-> 
-
-True, but then again all I/O on the hctx should be quiesced during cpu 
-offline.
-
-> So we should allow to allocate the connect request successful, and
-> submit it to drivers given it is allowed in this way for non-managed
-> irq.
-> 
-
-I'd rather not do this, as the 'connect' command runs on the 'normal' 
-I/O tagset, and hence runs into the risk of being issues against 
-non-existing CPUs.
-
->> Shouldn't we rather modify the tagset to only refer to the current online
->> CPUs _only_, thereby never submit a connect request for hctx with only
->> offline CPUs?
-> 
-> Then you may setup very less io queues, and performance may suffer even
-> though lots of CPUs become online later.
-> ;
-Only if we stay with the reduced number of I/O queues. Which is not what 
-I'm proposing; I'd rather prefer to connect and disconnect queues from 
-the cpu hotplug handler. For starters we could even trigger a reset once 
-the first cpu within a hctx is onlined.
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Lee Jones [李琼斯]
+Senior Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
