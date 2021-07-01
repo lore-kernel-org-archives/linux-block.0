@@ -2,115 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B964C11F6D
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 14:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 425E6C11F69
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 15:27:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE8BE61405
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 14:22:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A151613FB
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 15:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232930AbhGAOZD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jul 2021 10:25:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10268 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231844AbhGAOZD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Jul 2021 10:25:03 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 161E3xtg128197;
-        Thu, 1 Jul 2021 10:22:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=7agZkIpsC2LRYLAD4XcQ1e0Q0LX6YB0rF6KDf4uXmXI=;
- b=VS0AYFL6BmTqVD/kKrhjlhJFTuZCk8exCi+VHgWHDHIax4qXuXdhbQtUdOxC7+798+Rt
- GA9l1K6VxSrUSnbMedzfUqOxkNy2l5lBG67uQLT15cWT1wFNqrNAEjTjbrz6iQoDFzwd
- exVxulxpqs5YPMBtRMqQI7T8/5nG234qySXnuBhWRB9WCkViAHKg84U0YqF5GKXRdi2A
- kAV9o5eREWjA3K4cSo/TxSH4VpvqdbA6QWgl3mk+e8aZdEcdgLx9Pdf6/X5e8kjdiCQl
- z9QxI+bpDz2LO13XSuU2WOh6u8IH5UHqJD+94hu2VpX3AJI6vnGh6horGMas+qGgb7gY XA== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39hepr1m5u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jul 2021 10:22:27 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 161ECIe3031392;
-        Thu, 1 Jul 2021 14:22:25 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 39duv8jf5n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jul 2021 14:22:24 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 161EKf6P16974290
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Jul 2021 14:20:41 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E4DB74C04E;
-        Thu,  1 Jul 2021 14:22:21 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA0EB4C046;
-        Thu,  1 Jul 2021 14:22:21 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu,  1 Jul 2021 14:22:21 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id 87E25E0671; Thu,  1 Jul 2021 16:22:21 +0200 (CEST)
-From:   Stefan Haberland <sth@linux.ibm.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        id S232817AbhGAP36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jul 2021 11:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46224 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232969AbhGAP36 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jul 2021 11:29:58 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B06AC061764
+        for <linux-block@vger.kernel.org>; Thu,  1 Jul 2021 08:27:28 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id u11so7727700oiv.1
+        for <linux-block@vger.kernel.org>; Thu, 01 Jul 2021 08:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=UEhd9RW/Z//Yet4PSyZVFj89an0siciakTKupP0jjUk=;
+        b=v3OXxJDVG1j62VuzMZjNsHSSpeT1teaZCCWItyiwvKSMkgQSsaRL811BqZPMmc7uMP
+         F91WhYOFkhKm5y30GSCdh7fwOirS/dtTUYhc0MMoMegpXDOqYP90ampyUTOtvtVqcL5/
+         oxvHF2o2opf7IulvvbB2bV/mBE1LxCvcmvWykWY1rS5d74Ljh12kJYpZeJGOp3qwRfEs
+         w4r2oQuvVsigwCDVo97pwLzRzIEjxGFwmuh0KAvOKlxguzhTKLMLDJcn6hFTGraVMObx
+         CKXUAx0XIppnaZB20rwfltyFlqO/A6FD2MY3NnmTxRiPbtEYZ96Ffg7vfCZMHJ8qVNiB
+         Ctsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UEhd9RW/Z//Yet4PSyZVFj89an0siciakTKupP0jjUk=;
+        b=epkRlWdLuOYRpgYHfvlrtPclOFXG1WBb5fkJ8okFE68x8NqFgrsuRAXOov2/DYGFWb
+         dc79+ITgk14W854qAKaCfnQI6iDyN1tN/vHFRfgnobQNDf06MhdL1qNjA5nUJ84sD334
+         bfoeDYPsxoaI6KJwA9MyFSbWYB35OjF32LcehJ9KhMrRJlYVFwOtze2Lnuf+m6scVNAP
+         1oEanEvbdWmex1NXddwyv36i6UV2FaaSNyne7YV09/1SnQciDuR425euBzFlOeprT7pk
+         i09XdPo/BdKq9jm9GvXurLhSQTdTPX+Yax11RxBSGmJ4SoJspPbBYo0Es0mVMQ5lcJ4R
+         J9Bw==
+X-Gm-Message-State: AOAM532dljvpZBFuCns/yeCWLN1EalJbY5nSifMgPTIwSpezP58ng25O
+        CCeeCxJytJXqQbSM254kU7lJSw==
+X-Google-Smtp-Source: ABdhPJzyVbaQUppYRSCuQuMpUwGsXrurdANk3sq/OBkyeTgk4oBz0yyQ+0EjqnLVYcEX2yLeBdUSig==
+X-Received: by 2002:aca:4f83:: with SMTP id d125mr26685oib.117.1625153247479;
+        Thu, 01 Jul 2021 08:27:27 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.233.147])
+        by smtp.gmail.com with ESMTPSA id m3sm8928otf.12.2021.07.01.08.27.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Jul 2021 08:27:26 -0700 (PDT)
+Subject: Re: [PATCH 0/2] s390/dasd patches
+To:     Stefan Haberland <sth@linux.ibm.com>
 Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
         linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Christoph Hellwig <hch@lst.de>,
         Kees Cook <keescook@chromium.org>
-Subject: [PATCH 1/2] dasd: unexport dasd_set_target_state
-Date:   Thu,  1 Jul 2021 16:22:20 +0200
-Message-Id: <20210701142221.3408680-2-sth@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210701142221.3408680-1-sth@linux.ibm.com>
 References: <20210701142221.3408680-1-sth@linux.ibm.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <356adced-0e30-ac75-b3d5-83eebb292816@kernel.dk>
+Date:   Thu, 1 Jul 2021 09:27:26 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2dICG6uHjyB2yHM18MJ28da9b5seXdqF
-X-Proofpoint-GUID: 2dICG6uHjyB2yHM18MJ28da9b5seXdqF
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-01_08:2021-07-01,2021-07-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 bulkscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
- impostorscore=0 adultscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107010088
+In-Reply-To: <20210701142221.3408680-1-sth@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+On 7/1/21 8:22 AM, Stefan Haberland wrote:
+> Hi Jens,
+> 
+> please apply the following two patches that unexport a DASD symbol and improve a DASD structure.
+> 
+> 
+> Christoph Hellwig (1):
+>   dasd: unexport dasd_set_target_state
+> 
+> Kees Cook (1):
+>   s390/dasd: Avoid field over-reading memcpy()
+> 
+>  drivers/s390/block/dasd.c      | 1 -
+>  drivers/s390/block/dasd_eckd.c | 2 +-
+>  drivers/s390/block/dasd_eckd.h | 6 ++++--
+>  3 files changed, 5 insertions(+), 4 deletions(-)
 
-dasd_set_target_state is only used inside of dasd_mod.ko, so don't
-export it.
+Applied, thanks.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
----
- drivers/s390/block/dasd.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
-index c8df75e99f4c..e34c6cc61983 100644
---- a/drivers/s390/block/dasd.c
-+++ b/drivers/s390/block/dasd.c
-@@ -621,7 +621,6 @@ void dasd_set_target_state(struct dasd_device *device, int target)
- 	mutex_unlock(&device->state_mutex);
- 	dasd_put_device(device);
- }
--EXPORT_SYMBOL(dasd_set_target_state);
- 
- /*
-  * Enable devices with device numbers in [from..to].
 -- 
-2.25.1
+Jens Axboe
 
