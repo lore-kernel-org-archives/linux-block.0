@@ -6,47 +6,45 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DDFBC11F64
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6716C11F64
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:52:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E70A0613F1
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:49:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C01EC61452
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:52:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235414AbhGAJvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jul 2021 05:51:49 -0400
-Received: from verein.lst.de ([213.95.11.211]:47010 "EHLO verein.lst.de"
+        id S235868AbhGAJzA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jul 2021 05:55:00 -0400
+Received: from verein.lst.de ([213.95.11.211]:47023 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235300AbhGAJvs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Jul 2021 05:51:48 -0400
+        id S235300AbhGAJy7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Jul 2021 05:54:59 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 88A836736F; Thu,  1 Jul 2021 11:49:16 +0200 (CEST)
-Date:   Thu, 1 Jul 2021 11:49:16 +0200
+        id 188EF6736F; Thu,  1 Jul 2021 11:52:27 +0200 (CEST)
+Date:   Thu, 1 Jul 2021 11:52:26 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: grab a device refcount in disk_uevent
-Message-ID: <20210701094915.GA2066@lst.de>
-References: <20210701081638.246552-1-hch@lst.de> <20210701081638.246552-2-hch@lst.de> <YN2CrbtFEKwDGff0@T590> <20210701090232.GA31321@lst.de> <YN2IIiKUvquxqx6k@T590> <YN2KiYTtA0ribi9i@T590>
+Cc:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>
+Subject: Re: [PATCH 1/2] blk-mq: not deactivate hctx if the device doesn't
+ use managed irq
+Message-ID: <20210701095226.GB2066@lst.de>
+References: <20210629074951.1981284-1-ming.lei@redhat.com> <20210629074951.1981284-2-ming.lei@redhat.com> <c31aa259-d3a8-8c70-efce-b7af02bfd609@huawei.com> <YNu7rs7j5/KtQjAi@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YN2KiYTtA0ribi9i@T590>
+In-Reply-To: <YNu7rs7j5/KtQjAi@T590>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 01, 2021 at 05:27:37PM +0800, Ming Lei wrote:
-> 
-> Maybe the reason is that sending uevent needs the device/kobject not
-> 'released' in viewpoint of driver core world, other device resource(such
-> as device name) may be referred but have been freed.
-> 
-> If that is the reason, this patch looks fine, and
-> kobject_get_unless_zero() may be replaced with get_device() since the
-> referred memory isn't freed yet.
+On Wed, Jun 30, 2021 at 08:32:46AM +0800, Ming Lei wrote:
+> Indeed, we may replace BLK_MQ_F_STACKING with BLK_MQ_F_NOT_USE_MANAGED_IRQ
+> (BLK_MQ_F_NO_MANAGED_IRQ) too, and the latter is one general solution.
 
-Yes, sorry.  Braino while looking up the cause.  But there isn't much
-of a point in sending a uevent to a partition already deleted, so
-I think the unless_zero here still makes sense.
+And now turn the polarity around and make it a BLK_MQ_F_MANAGED_IRQ set
+by the map_queue helpers that rely on managed irqs.
