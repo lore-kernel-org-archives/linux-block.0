@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B532C11F64
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 08:17:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31474C11F64
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 08:18:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DEBC6148E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 08:17:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BB8F61480
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 08:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235117AbhGAIUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jul 2021 04:20:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35120 "EHLO
+        id S234882AbhGAIUe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jul 2021 04:20:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234635AbhGAIUB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jul 2021 04:20:01 -0400
+        with ESMTP id S234635AbhGAIUd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jul 2021 04:20:33 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00026C061756
-        for <linux-block@vger.kernel.org>; Thu,  1 Jul 2021 01:17:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAF63C061756
+        for <linux-block@vger.kernel.org>; Thu,  1 Jul 2021 01:18:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=XFUy35hk/kBhiWuhUej28etO8To3p9NspdFbhuO4xZs=; b=LjUW5dKfSPP9MzO9Ao/QqqN4Vj
-        1F/yE9cIhBQS+vOZlPmsKidnTD/CjZ+AXy1A3sf28BbXbCXtFrrYq152irOKWuZBPr0aQJw6OC/W8
-        yhVyOeFswzs5Hi3quJhslehyPL9gUaY5ld0mljVbk9Gi3keDh/E6sLvIrUpXEiGLoZ0klusvz5pss
-        JPAIVPXP6eiSz8Yq8kRQodXLOoBStfK9ufXdmtNxfz44hT72+mTLKRsqBxrLLnWrMYHqC/+1unDPx
-        sGqSbVIGEYEgBVQnXbVjCNc/SqQIWQYKrvXxmeiVbf8w3gKpJZ9e4RyX7xK7Q6uswYcOd9roZQOdK
-        JYLUXg/w==;
+        bh=VMSe1aXbttJh3PPdaTVvJi/GA9/xwFWa4Vu+8+GS59s=; b=U/sjH85TB2j7iFUgbli7mYb/YV
+        PqrnRt5JTpH1WAALtEaLUTAZlZC/cKRgVZsX07UAlmFRvlJPvODhoEDmivdaQT4u5GgLc3gy3zZAz
+        nYCQsO1A4LyR5Xax/pHNdsrKOm7msHFEo6uBpZnZ0s4Q4VjlrMn6dbGd6whYZbJm//j2jN2H0hK1r
+        skSPwxZ9aanSQpOgp2WiCprhQZg41DkSMVfuyDHbkEMZQS3jyHq/E0j3Y20040iIBvHS3gdgyl+UZ
+        VWAx8t5vaUAZ8Ogm5S2/SlbBo2u8tJoP6wkBtztbG0LxvBTedfTjekZQWrZ+ctySkDLCfSnHSQEWs
+        +pNNmuNQ==;
 Received: from [2001:4bb8:180:285:b614:ad7e:3c44:605c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lyrsc-006KsV-Nb; Thu, 01 Jul 2021 08:17:13 +0000
+        id 1lyrt4-006Kth-Ez; Thu, 01 Jul 2021 08:17:36 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: grab a device refcount in disk_uevent
-Date:   Thu,  1 Jul 2021 10:16:37 +0200
-Message-Id: <20210701081638.246552-2-hch@lst.de>
+Subject: [PATCH 2/2] block: remove the bdgrab in blk_drop_partitions
+Date:   Thu,  1 Jul 2021 10:16:38 +0200
+Message-Id: <20210701081638.246552-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210701081638.246552-1-hch@lst.de>
 References: <20210701081638.246552-1-hch@lst.de>
@@ -51,35 +51,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sending uevents requires the struct device to be alive.  To
-ensure that grab the device refcount instead of just an inode
-reference.
+There is no need to hold a bdev reference when removing the partition.
 
-Fixes: bc359d03c7ec ("block: add a disk_uevent helper")
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/partitions/core.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 79aa40b4c39c..af4d2ab4a633 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -365,12 +365,12 @@ void disk_uevent(struct gendisk *disk, enum kobject_action action)
- 	xa_for_each(&disk->part_tbl, idx, part) {
- 		if (bdev_is_partition(part) && !bdev_nr_sectors(part))
- 			continue;
--		if (!bdgrab(part))
-+		if (!kobject_get_unless_zero(&part->bd_device.kobj))
- 			continue;
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 347c56a51d87..3907cebd2be9 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -537,12 +537,8 @@ void blk_drop_partitions(struct gendisk *disk)
  
- 		rcu_read_unlock();
- 		kobject_uevent(bdev_kobj(part), action);
+ 	lockdep_assert_held(&disk->open_mutex);
+ 
+-	xa_for_each_start(&disk->part_tbl, idx, part, 1) {
+-		if (!bdgrab(part))
+-			continue;
++	xa_for_each_start(&disk->part_tbl, idx, part, 1)
+ 		delete_partition(part);
 -		bdput(part);
-+		put_device(&part->bd_device);
- 		rcu_read_lock();
- 	}
- 	rcu_read_unlock();
+-	}
+ }
+ 
+ static bool blk_add_partition(struct gendisk *disk,
 -- 
 2.30.2
 
