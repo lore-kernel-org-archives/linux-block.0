@@ -2,156 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E09C11F64
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1922CC11F64
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:17:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A3B461585
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:14:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E80EE61480
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jul 2021 09:17:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235681AbhGAJQp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jul 2021 05:16:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30202 "EHLO
+        id S235608AbhGAJUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jul 2021 05:20:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50095 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235088AbhGAJQp (ORCPT
+        by vger.kernel.org with ESMTP id S235586AbhGAJUE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Jul 2021 05:16:45 -0400
+        Thu, 1 Jul 2021 05:20:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625130854;
+        s=mimecast20190719; t=1625131054;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NWsQfkJsHozHt689Ycc7QAhEWD6ZJjZVr7BQ4llvQfI=;
-        b=aTrvpZFLwmec0QAiO4NLmcw+rXLRgWyjtcyEm6WoYgf/YbnpEqvvPq1WIq9Sd0FV4AEWCk
-        HWYfhVqdN/McfbSIDFXjj7bMKUiVp0xn1d7Q35Bh0sY5fSIg3njQfQXHpboD72jfkwTFh9
-        OW6E1Ft1/8f5l1uXbxjicnCQpkLFH0M=
+        bh=IghnoIaxu7uJc3uM459no7BK5jxdTk+9l7LwiQZXGrs=;
+        b=UzODH0L4kbw9TIcu/z2G5NG1Vnf6xx3dZUmC8JiHAa+bx3G2Xllu69p+6TS7l2V6VzD4xG
+        /ww2FqQ4vnFx7ytVP6GomYpL6nwGziaoU4UhPu74n+e6J37pdKUiSSZ7J/r0Znk0RzRr13
+        BAw+fmFzlvn9HITou5TRzOS7MOB2z3Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-vol2z-XON_SF3zKUgPjlww-1; Thu, 01 Jul 2021 05:14:08 -0400
-X-MC-Unique: vol2z-XON_SF3zKUgPjlww-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-104-tuQoVjGENzCJSDBT93OWBw-1; Thu, 01 Jul 2021 05:17:33 -0400
+X-MC-Unique: tuQoVjGENzCJSDBT93OWBw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3255100C66B;
-        Thu,  1 Jul 2021 09:14:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22F281084F40;
+        Thu,  1 Jul 2021 09:17:32 +0000 (UTC)
 Received: from T590 (ovpn-13-92.pek2.redhat.com [10.72.13.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9661160C17;
-        Thu,  1 Jul 2021 09:13:53 +0000 (UTC)
-Date:   Thu, 1 Jul 2021 17:13:49 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 77D955D6AB;
+        Thu,  1 Jul 2021 09:17:26 +0000 (UTC)
+Date:   Thu, 1 Jul 2021 17:17:22 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH 0/2] blk-mq: fix blk_mq_alloc_request_hctx
-Message-ID: <YN2HTZaygkVemw4y@T590>
-References: <20210629074951.1981284-1-ming.lei@redhat.com>
- <5f304121-38ce-034b-2d17-93d136c77fe6@suse.de>
- <YNwug8n7qGL5uXfo@T590>
- <c1de513a-5477-9d1d-0ddc-24e9166cc717@suse.de>
- <YNw/DcxIIMeg/2VK@T590>
- <e106f9c4-35c3-b2da-cdd8-3c4dff8234d6@grimberg.me>
- <89081624-fedd-aa94-1ba2-9a137708a1f1@suse.de>
- <YN0FXrcwXfAwGU6w@T590>
- <c3a3a25b-a36b-e20d-6f7f-828f22650a30@suse.de>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: grab a device refcount in disk_uevent
+Message-ID: <YN2IIiKUvquxqx6k@T590>
+References: <20210701081638.246552-1-hch@lst.de>
+ <20210701081638.246552-2-hch@lst.de>
+ <YN2CrbtFEKwDGff0@T590>
+ <20210701090232.GA31321@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c3a3a25b-a36b-e20d-6f7f-828f22650a30@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210701090232.GA31321@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 01, 2021 at 10:00:27AM +0200, Hannes Reinecke wrote:
-> On 7/1/21 1:59 AM, Ming Lei wrote:
-> > On Wed, Jun 30, 2021 at 09:46:35PM +0200, Hannes Reinecke wrote:
-> > > On 6/30/21 8:59 PM, Sagi Grimberg wrote:
-> > > > 
-> > > > > > > > Shouldn't we rather modify the tagset to only refer to
-> > > > > > > > the current online
-> > > > > > > > CPUs _only_, thereby never submit a connect request for hctx with only
-> > > > > > > > offline CPUs?
-> > > > > > > 
-> > > > > > > Then you may setup very less io queues, and performance may suffer even
-> > > > > > > though lots of CPUs become online later.
-> > > > > > > ;
-> > > > > > Only if we stay with the reduced number of I/O queues. Which is
-> > > > > > not what I'm
-> > > > > > proposing; I'd rather prefer to connect and disconnect queues
-> > > > > > from the cpu
-> > > > > > hotplug handler. For starters we could even trigger a reset once
-> > > > > > the first
-> > > > > > cpu within a hctx is onlined.
-> > > > > 
-> > > > > Yeah, that need one big/complicated patchset, but not see any advantages
-> > > > > over this simple approach.
-> > > > 
-> > > > I tend to agree with Ming here.
+On Thu, Jul 01, 2021 at 11:02:32AM +0200, Christoph Hellwig wrote:
+> On Thu, Jul 01, 2021 at 04:54:05PM +0800, Ming Lei wrote:
+> > On Thu, Jul 01, 2021 at 10:16:37AM +0200, Christoph Hellwig wrote:
+> > > Sending uevents requires the struct device to be alive.  To
+> > > ensure that grab the device refcount instead of just an inode
+> > > reference.
 > > > 
-> > > Actually, Daniel and me came to a slightly different idea: use cpu hotplug
-> > > notifier.
-> > > Thing is, blk-mq already has cpu hotplug notifier, which should ensure that
-> > > no I/O is pending during cpu hotplug.
-> > 
-> > Why should we ensure that for non-managed irq?
-> > 
-> 
-> While not strictly necessary, it does align the hctx layout with the current
-> CPU topology.
-> As such we won't have any 'stale' CPUs or queues in the hctx layout, and
-> with that avoid any issues we'll be having due to inactive CPUs in the
-> cpumask.
-
-We know the exact theory for non-managed interrupt, can you share us
-any issue you want to avoid?
-
-> 
-> > > If we now add a nvme cpu hotplug notifier which essentially kicks off a
-> > > reset once all cpu in a hctx are offline the reset logic will rearrange the
-> > > queues to match the current cpu layout.
-> > > And when the cpus are getting onlined we'll do another reset.
+> > > Fixes: bc359d03c7ec ("block: add a disk_uevent helper")
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > > ---
+> > >  block/genhd.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
 > > > 
-> > > Daniel is currently preparing a patch; let's see how it goes.
+> > > diff --git a/block/genhd.c b/block/genhd.c
+> > > index 79aa40b4c39c..af4d2ab4a633 100644
+> > > --- a/block/genhd.c
+> > > +++ b/block/genhd.c
+> > > @@ -365,12 +365,12 @@ void disk_uevent(struct gendisk *disk, enum kobject_action action)
+> > >  	xa_for_each(&disk->part_tbl, idx, part) {
+> > >  		if (bdev_is_partition(part) && !bdev_nr_sectors(part))
+> > >  			continue;
+> > > -		if (!bdgrab(part))
+> > > +		if (!kobject_get_unless_zero(&part->bd_device.kobj))
+> > >  			continue;
 > > 
-> > What is the advantage of that big change over this simple way?
-> > 
+> > ->bd_device is embedded in the block device, and it has same lifetime
+> > with the block device, even part_release() calls bdput() to release this
+> > device, so why doesn't work by holding a inode reference?
 > 
-> With the simple way we might (and, as the results show, do) run the
-> nvme_ctrl_reset() in parallel to CPU hotplug.
-> This leads to quite some complexity, and as we've seen is triggering quite
-> some race conditions.
+> Because sending a uevent on a device that has device_del called on it
+> is going to blow up.
 
-CPU hotplug isn't related with nvme reset at all, which is just for
-recovering nvme controller to make it working again. How can cpu offline
-affect nvme controller?
+But grabbing one reference can't prevent device_del() from being called.
 
-For NVMe PCI, blk-mq have drained any inflight requests before the hctx
-is becoming inactive.
+IMO, if driver core doesn't allow to sending uevent on one deleted device,
+it should return a failure instead of kernel panic.
 
-For other NVMe controller which doesn't use managed irq, the inflight
-requests can still be completed via the original interrupt, or polling
-task, both can been migrated to new online cpu.
-
-I don't know what exact race conditions you are talking about. Please
-explain it in details, otherwise it just wastes our time.
-
-> 
-> Hence I do think we need to synchronize nvme_ctrl_reset() with CPU hotplug,
-> to ensure that the reset handler is completed before the cpu is completely
-> torn down.
-
-No, you didn't provide any proof about the necessity of adding the sync. 
-
-
-
-Thanks, 
+Thanks,
 Ming
 
