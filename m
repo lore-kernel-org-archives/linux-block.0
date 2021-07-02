@@ -2,250 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5E1C11F68
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 17:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CBF9C07E97
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 19:02:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7912061430
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 17:29:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13CC56141D
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 19:02:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbhGBRbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jul 2021 13:31:41 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:57435 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbhGBRbl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 13:31:41 -0400
-Received: from fsav411.sakura.ne.jp (fsav411.sakura.ne.jp [133.242.250.110])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 162HSpgW026914;
-        Sat, 3 Jul 2021 02:28:51 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav411.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp);
- Sat, 03 Jul 2021 02:28:51 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 162HSpnU026907
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 3 Jul 2021 02:28:51 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH] loop: reintroduce global lock for safe
- loop_validate_file() traversal
-To:     Petr Vorel <pvorel@suse.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20210702153036.8089-1-penguin-kernel@I-love.SAKURA.ne.jp>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <288edd89-a33f-2561-cee9-613704c3da20@i-love.sakura.ne.jp>
-Date:   Sat, 3 Jul 2021 02:28:48 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S230127AbhGBTFJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jul 2021 15:05:09 -0400
+Received: from mail-pj1-f45.google.com ([209.85.216.45]:46622 "EHLO
+        mail-pj1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229794AbhGBTFJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 15:05:09 -0400
+Received: by mail-pj1-f45.google.com with SMTP id b5-20020a17090a9905b029016fc06f6c5bso6682127pjp.5;
+        Fri, 02 Jul 2021 12:02:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yB0ZQpA9XJtnRtrSbqsDl0rPIO7pvP8OCnrT7G8ciAM=;
+        b=itcQIXjXtf0p8inMVBt7UOqv4ZStxluiaiKctxCqOh3OgO8POztPeDV/E+kseNxmDp
+         uBTDsd4sQhdxGEJ74LGzLw4hqhjiiil0NxuNnOFpRm0eyHIWekG/W6SEKp8P806BEf4C
+         Bu4yyAaPtaFn73KzeA8L4yx1zWO89lrs2bAveJyEGFPEX8F57hLFh7PaE6boW/h1jYbM
+         aHPMI2ZOCZP5AjZrLwK+tIGZyYEbGHHdeylHQ77uU9IsxfHuAhCwWNoaMonz3uuEvdZq
+         DE6ZJFGGG5Al/O2HCmPxOLhB8Sj2HCMptjPfZ01gorCy6TNh+hhCQ5sNRLCB0zQ2D50M
+         g85g==
+X-Gm-Message-State: AOAM532SirlrIpnG1/5kbUv54zVeOEA5TXaS2WLNW8Gl37Vc3z7FODuE
+        rCz7wwQT7Re7BE8tLKZmkLs=
+X-Google-Smtp-Source: ABdhPJw+K/k5WgtbywwaL0MKsZ7NkF/S5cQbPmtspDf+gqWkxwa5FCqh5acmQsllS/twoyyGikr8vg==
+X-Received: by 2002:a17:90a:6744:: with SMTP id c4mr40645pjm.27.1625252555299;
+        Fri, 02 Jul 2021 12:02:35 -0700 (PDT)
+Received: from garbanzo ([191.96.121.144])
+        by smtp.gmail.com with ESMTPSA id z76sm4372769pfc.173.2021.07.02.12.02.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Jul 2021 12:02:34 -0700 (PDT)
+Date:   Fri, 2 Jul 2021 12:02:30 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     tj@kernel.org, shuah@kernel.org, akpm@linux-foundation.org,
+        Richard Fontana <fontana@sharpeleven.org>, rafael@kernel.org,
+        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+        andriin@fb.com, daniel@iogearbox.net, atenart@kernel.org,
+        alobakin@pm.me, weiwan@google.com, ap420073@gmail.com,
+        jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] selftests: add tests_sysfs module
+Message-ID: <20210702190230.r46bck4vib7u3qo6@garbanzo>
+References: <20210702050543.2693141-1-mcgrof@kernel.org>
+ <20210702050543.2693141-2-mcgrof@kernel.org>
+ <YN6iSKCetBrk2y8V@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <20210702153036.8089-1-penguin-kernel@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YN6iSKCetBrk2y8V@kroah.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/07/03 0:30, Tetsuo Handa wrote:
->  drivers/block/loop.c | 138 ++++++++++++++++++++++++++++---------------
->  1 file changed, 89 insertions(+), 49 deletions(-)
+On Fri, Jul 02, 2021 at 07:21:12AM +0200, Greg KH wrote:
+> On Thu, Jul 01, 2021 at 10:05:40PM -0700, Luis Chamberlain wrote:
+> > @@ -0,0 +1,953 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/*
+> > + * sysfs test driver
+> > + *
+> > + * Copyright (C) 2021 Luis Chamberlain <mcgrof@kernel.org>
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify it
+> > + * under the terms of the GNU General Public License as published by the Free
+> > + * Software Foundation; either version 2 of the License, or at your option any
+> > + * later version; or, when distributed separately from the Linux kernel or
+> > + * when incorporated into other software packages, subject to the following
+> > + * license:
 > 
-> This is a submission as a patch based on comments from Christoph Hellwig
-> at https://lkml.kernel.org/r/20210623144130.GA738@lst.de . I don't know
-> this patch can close all race windows.
-> 
-> For example, loop_change_fd() says
-> 
->   This can only work if the loop device is used read-only, and if the
->   new backing store is the same size and type as the old backing store.
-> 
-> and has
-> 
->         /* size of the new backing store needs to be the same */
->         if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
->                 goto out_err;
-> 
-> check. Then, do we also need to apply this global lock for
-> lo_simple_ioctl(LOOP_SET_CAPACITY) path because it changes the size
-> by loop_set_size(lo, get_loop_size(lo, lo->lo_backing_file)) ?
-> How serious if this check is racy?
-> 
-> Any other locations to apply this global lock?
-> 
+> This boilerplate should not be here, only the spdx line is needed.
 
-Well, apart from questions above, is this smaller patch safe?
+As per Documentation/process/license-rules.rst we use the SPDX license
+tag for the license that applies but it also states about dual
+licensing:
 
- drivers/block/loop.c |   72 ++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 55 insertions(+), 17 deletions(-)
+"Aside from that, individual files can be provided under a dual license,         
+e.g. one of the compatible GPL variants and alternatively under a               
+permissive license like BSD, MIT etc."
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cc0e8c39a48b..d3bb9c34a3e0 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -88,6 +88,29 @@
- 
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
-+static DEFINE_MUTEX(loop_validate_mutex);
-+
-+static int loop_global_lock_killable(struct loop_device *lo, bool global)
-+{
-+	int err;
-+
-+	if (global) {
-+		err = mutex_lock_killable(&loop_validate_mutex);
-+		if (err)
-+			return err;
-+	}
-+	err = mutex_lock_killable(&lo->lo_mutex);
-+	if (err && global)
-+		mutex_unlock(&loop_validate_mutex);
-+	return err;
-+}
-+
-+static void loop_global_unlock(struct loop_device *lo, bool global)
-+{
-+	mutex_unlock(&lo->lo_mutex);
-+	if (global)
-+		mutex_unlock(&loop_validate_mutex);
-+}
- 
- static int max_part;
- static int part_shift;
-@@ -672,13 +695,13 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
- 	while (is_loop_device(f)) {
- 		struct loop_device *l;
- 
-+		lockdep_assert_held(&loop_validate_mutex);
- 		if (f->f_mapping->host->i_rdev == bdev->bd_dev)
- 			return -EBADF;
- 
- 		l = I_BDEV(f->f_mapping->host)->bd_disk->private_data;
--		if (l->lo_state != Lo_bound) {
-+		if (l->lo_state != Lo_bound)
- 			return -EINVAL;
--		}
- 		f = l->lo_backing_file;
- 	}
- 	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
-@@ -697,13 +720,20 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
- static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 			  unsigned int arg)
- {
--	struct file	*file = NULL, *old_file;
-+	struct file *file = fget(arg);
-+	struct file *old_file;
- 	int		error;
- 	bool		partscan;
-+	bool is_loop;
- 
--	error = mutex_lock_killable(&lo->lo_mutex);
--	if (error)
-+	if (!file)
-+		return -EBADF;
-+	is_loop = is_loop_device(file);
-+	error = loop_global_lock_killable(lo, is_loop);
-+	if (error) {
-+		fput(file);
- 		return error;
-+	}
- 	error = -ENXIO;
- 	if (lo->lo_state != Lo_bound)
- 		goto out_err;
-@@ -713,11 +743,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
- 		goto out_err;
- 
--	error = -EBADF;
--	file = fget(arg);
--	if (!file)
--		goto out_err;
--
- 	error = loop_validate_file(file, bdev);
- 	if (error)
- 		goto out_err;
-@@ -740,7 +765,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
--	mutex_unlock(&lo->lo_mutex);
-+	loop_global_unlock(lo, is_loop);
- 	/*
- 	 * We must drop file reference outside of lo_mutex as dropping
- 	 * the file ref can take open_mutex which creates circular locking
-@@ -752,9 +777,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	return 0;
- 
- out_err:
--	mutex_unlock(&lo->lo_mutex);
--	if (file)
--		fput(file);
-+	loop_global_unlock(lo, is_loop);
-+	fput(file);
- 	return error;
- }
- 
-@@ -1143,6 +1167,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	loff_t		size;
- 	bool		partscan;
- 	unsigned short  bsize;
-+	bool is_loop;
- 
- 	/* This is safe, since we have a reference from open(). */
- 	__module_get(THIS_MODULE);
-@@ -1162,7 +1187,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 			goto out_putf;
- 	}
- 
--	error = mutex_lock_killable(&lo->lo_mutex);
-+	is_loop = is_loop_device(file);
-+	error = loop_global_lock_killable(lo, is_loop);
- 	if (error)
- 		goto out_bdev;
- 
-@@ -1253,7 +1279,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
- 	 */
- 	bdgrab(bdev);
--	mutex_unlock(&lo->lo_mutex);
-+	loop_global_unlock(lo, is_loop);
- 	if (partscan)
- 		loop_reread_partitions(lo);
- 	if (!(mode & FMODE_EXCL))
-@@ -1261,7 +1287,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	return 0;
- 
- out_unlock:
--	mutex_unlock(&lo->lo_mutex);
-+	loop_global_unlock(lo, is_loop);
- out_bdev:
- 	if (!(mode & FMODE_EXCL))
- 		bd_abort_claiming(bdev, loop_configure);
-@@ -1283,6 +1309,18 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 	int lo_number;
- 	struct loop_worker *pos, *worker;
- 
-+	/*
-+	 * Flush loop_configure() and loop_change_fd(). It is acceptable for
-+	 * loop_validate_file() to succeed, for actual clear operation has not
-+	 * started yet (i.e. effectively lo->lo_state == Lo_bound state).
-+	 */
-+	mutex_lock(&loop_validate_mutex);
-+	mutex_unlock(&loop_validate_mutex);
-+	/*
-+	 * loop_validate_file() now fails because lo->lo_state != Lo_bound
-+	 * became visible.
-+	 */
-+
- 	mutex_lock(&lo->lo_mutex);
- 	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
- 		err = -ENXIO;
+Let me know if things should change somehow here to clarify this better.
+
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify it
+> > + * under the terms of copyleft-next (version 0.3.1 or later) as published
+> > + * at http://copyleft-next.org/.
+> 
+> Please no, this is a totally different license :(
+
+Dual licensing copyleft-next / GPLv2 was discussed in 2016 and I have
+been using it since for my new drivers. As far as the kernel is
+concerned only the GPLv2 applies and this is cleary clarified with the
+MODULE_LICENSE("GPL") as per Linus' preference [0] on this topic. Later
+due to Ted's and Alans's request I ironed out an "or" language clause to
+use [1].  This was also vetted by 2 attorneys at SUSE, and one at Red
+Hat [2]. The first driver submission under this dual strategy was
+lib/test_sysctl.c through commit 9308f2f9e7f05 ("test_sysctl: add
+dedicated proc sysctl test driver") merged in July 2017. Shortly after
+that I also added test_kmod through commit d9c6a72d6fa29 ("kmod: add
+test driver to stress test the module loader") in the same month. These
+two drivers went in just a few months before the SPDX license pratice
+kicked in.
+
+And so we already have this practice in place of dual GPLv2 /
+copyleft-next. What was missing was the SPDX tag. I can go and
+update the other 2 drivers to reflect this as well, but as far as I
+can tell, due to the dual licensing the boilerplace is still needed
+in this case.
+
+Let me know!
+
+[0] https://lore.kernel.org/lkml/CA+55aFyhxcvD+q7tp+-yrSFDKfR0mOHgyEAe=f_94aKLsOu0Og@mail.gmail.com/
+[1] https://lkml.kernel.org/r/1495234558.7848.122.camel@linux.intel.com
+[2] https://lore.kernel.org/lkml/20170516232702.GL17314@wotan.suse.de/
+
+  Luis
