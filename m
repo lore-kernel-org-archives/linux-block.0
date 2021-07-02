@@ -2,67 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED26C11F6A
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 11:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4DDC11F69
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 14:21:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97979613F9
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 11:11:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D4A261402
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 14:21:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231474AbhGBLOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jul 2021 07:14:23 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:58442 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230424AbhGBLOX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 07:14:23 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <colin.king@canonical.com>)
-        id 1lzH5J-0002z5-UC; Fri, 02 Jul 2021 11:11:50 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     tim@cyberelk.net, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] paride: remove redudant space character check
-Date:   Fri,  2 Jul 2021 12:11:49 +0100
-Message-Id: <20210702111149.15517-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.31.1
+        id S232587AbhGBOXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jul 2021 10:23:35 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:60374 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232744AbhGBOXf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 10:23:35 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 32C2321BA8;
+        Fri,  2 Jul 2021 14:21:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1625235662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VdVlVyMIhZYAE1Rur9k142DKOHes23GQyE4Lr9maiIU=;
+        b=olHbqMS57DAacAU+Lg3glkWbNeqcp6j+ip15Y50wSYgxyEyicO/nen9Jf6VOZgrkd3H3xR
+        AlLf0Yt4e+JeDbmI2YBrVPgDUrJqzzNE5mUpQc/w7JTqh6QCzhZimqh8TFU0MzAC5waB5l
+        nw5HOXsraebA8/RE9ka7rTOO8b/AoJA=
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id BD73211C84;
+        Fri,  2 Jul 2021 14:21:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1625235662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VdVlVyMIhZYAE1Rur9k142DKOHes23GQyE4Lr9maiIU=;
+        b=olHbqMS57DAacAU+Lg3glkWbNeqcp6j+ip15Y50wSYgxyEyicO/nen9Jf6VOZgrkd3H3xR
+        AlLf0Yt4e+JeDbmI2YBrVPgDUrJqzzNE5mUpQc/w7JTqh6QCzhZimqh8TFU0MzAC5waB5l
+        nw5HOXsraebA8/RE9ka7rTOO8b/AoJA=
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id 1ymoLM0g32C4XgAALh3uQQ
+        (envelope-from <mwilck@suse.com>); Fri, 02 Jul 2021 14:21:01 +0000
+Message-ID: <003727e7a195cb0f525cc2d7abda3a19ff16eb98.camel@suse.com>
+Subject: Re: [dm-devel] [PATCH v5 3/3] dm mpath: add
+ CONFIG_DM_MULTIPATH_SG_IO - failover for SG_IO
+From:   Martin Wilck <mwilck@suse.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
+        Daniel Wagner <dwagner@suse.de>, emilne@redhat.com,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        nkoenig@redhat.com, Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        Alasdair G Kergon <agk@redhat.com>
+Date:   Fri, 02 Jul 2021 16:21:01 +0200
+In-Reply-To: <20210701113442.GA10793@lst.de>
+References: <20210628151558.2289-1-mwilck@suse.com>
+         <20210628151558.2289-4-mwilck@suse.com> <20210701075629.GA25768@lst.de>
+         <de1e3dcbd26a4c680b27b557ea5384ba40fc7575.camel@suse.com>
+         <20210701113442.GA10793@lst.de>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.40.2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+On Do, 2021-07-01 at 13:34 +0200, Christoph Hellwig wrote:
+> On Thu, Jul 01, 2021 at 12:35:53PM +0200, Martin Wilck wrote:
+> > I respectfully disagree. Users of dm-multipath devices expect that
+> > IO
+> > succeeds as long as there's at least one healthy path. This is a
+> > fundamental property of multipath devices. Whether IO is sent
+> > "normally" or via SG_IO doesn't make a difference wrt this
+> > expectation.
+> 
+> If you have those (pretty reasonable) expections don't use SG_IO.
+> That is what the regular read/write path is for.  SG_IO gives you
+> raw access to the SCSI logic unit, and you get to keep the pieces
+> if anything goes wrong.
 
-The check for variable l being a space character is always false, l can
-never be a space character. The check is redundant and can be removed.
+With this logic, if some paths are down, SG_IO commands on multipath
+devices yield random results. On one path a command would fail, and on
+another it would succeed. User space has no way to control or even see
+what path is being used. That's a very fragile user space API, on the
+fringe of being useless IMO.
 
-Addresses-Coverity: ("Logically dead code")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/block/paride/pg.c | 2 --
- 1 file changed, 2 deletions(-)
+If user space is interested in the error handling semantics you
+describe, it can run SG_IO on individual SCSI devices any time. With
+the change I am proposing, nothing is lost for user space. If user
+space decides to do SG_IO on a multipath device, it has a different
+expectation, which my patch set implements. IMO we should strive to
+match the semantics for ioctls on natively multipathed NVMe namespaces.
 
-diff --git a/drivers/block/paride/pg.c b/drivers/block/paride/pg.c
-index 3b5882bfb736..2f7aa8521395 100644
---- a/drivers/block/paride/pg.c
-+++ b/drivers/block/paride/pg.c
-@@ -429,8 +429,6 @@ static void xs(char *buf, char *targ, int len)
- 		if (c != ' ' && c != l)
- 			l = *targ++ = c;
- 	}
--	if (l == ' ')
--		targ--;
- 	*targ = '\0';
- }
- 
--- 
-2.31.1
+Regards
+Martin
+
 
