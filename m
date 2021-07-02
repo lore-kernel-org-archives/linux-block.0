@@ -2,192 +2,288 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B427C11F68
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 07:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E03C11F68
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 09:48:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C446613B1
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 07:11:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1CC9613EA
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 09:48:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230061AbhGBHOO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jul 2021 03:14:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44294 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230048AbhGBHOO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Jul 2021 03:14:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4C33A613EE;
-        Fri,  2 Jul 2021 07:11:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1625209901;
-        bh=eoG5+LPlW39s5b8KsuIE+kZNo2XuizVk3AMbRXID92k=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WjV577dYilmAtE4zd343jmaQBJpg+v1rMJVBq4ci97U8SnncF3zSnP0+g2DJbD33a
-         LyGbeaz0A4lEUW1lgJ6yhBjcasegZqTx2ZG2mF7ulmi4ASPXkAn4wokQRM/kXxo/F4
-         epFRA0vsBjoUaRQXyb4bo9hGxGrAot06ZNIMj/c8=
-Date:   Fri, 2 Jul 2021 09:11:39 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>, jeyu@kernel.org,
-        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
-        rafael@kernel.org, axboe@kernel.dk, tj@kernel.org, mbenes@suse.com,
-        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
-        jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 2/2] zram: fix deadlock with sysfs attribute usage and
- module removal
-Message-ID: <YN68K7JaAnM/TX69@kroah.com>
-References: <20210702043716.2692247-1-mcgrof@kernel.org>
- <20210702043716.2692247-3-mcgrof@kernel.org>
- <YN6rBKIHmLhEo36w@google.com>
+        id S231193AbhGBJub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jul 2021 05:50:31 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:41762 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231130AbhGBJu3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 05:50:29 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2315721FB4;
+        Fri,  2 Jul 2021 09:47:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1625219277; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LQejxrBRgdHn6jyss78NHSQQbF5WESo4cgDMMvQ3Qv4=;
+        b=Q8dtv8whqMkN2kfApjKcVHAEZB9mk7p84E+u/wdiRojSl/aW1e4kQ0wlNc5eNMjxNJa5J6
+        6ZDqJ5MudOyDzI9XuK89jNWzVPEU16XWcMhB2q7FmG40rAp0L3KqwnkfzlThVsn5MPtfPZ
+        wHwC67h+9tknxhOE0OcyjCxhIgjlJuQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1625219277;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LQejxrBRgdHn6jyss78NHSQQbF5WESo4cgDMMvQ3Qv4=;
+        b=HYkexFxqTPAbvKAxsGKoRz5Je+sHqDXW4MlD/P/iKEst+JGBrleA19ao15BrsxWKSHRYAv
+        xyNkJKdg6J4lSPCQ==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 116C911CD6;
+        Fri,  2 Jul 2021 09:47:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1625219277; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LQejxrBRgdHn6jyss78NHSQQbF5WESo4cgDMMvQ3Qv4=;
+        b=Q8dtv8whqMkN2kfApjKcVHAEZB9mk7p84E+u/wdiRojSl/aW1e4kQ0wlNc5eNMjxNJa5J6
+        6ZDqJ5MudOyDzI9XuK89jNWzVPEU16XWcMhB2q7FmG40rAp0L3KqwnkfzlThVsn5MPtfPZ
+        wHwC67h+9tknxhOE0OcyjCxhIgjlJuQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1625219277;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LQejxrBRgdHn6jyss78NHSQQbF5WESo4cgDMMvQ3Qv4=;
+        b=HYkexFxqTPAbvKAxsGKoRz5Je+sHqDXW4MlD/P/iKEst+JGBrleA19ao15BrsxWKSHRYAv
+        xyNkJKdg6J4lSPCQ==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id rhRAA83g3mDaSgAALh3uQQ
+        (envelope-from <dwagner@suse.de>); Fri, 02 Jul 2021 09:47:57 +0000
+Date:   Fri, 2 Jul 2021 11:47:56 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH 0/2] blk-mq: fix blk_mq_alloc_request_hctx
+Message-ID: <20210702094756.34zkja2yc6am3gyc@beryllium.lan>
+References: <20210629074951.1981284-1-ming.lei@redhat.com>
+ <5f304121-38ce-034b-2d17-93d136c77fe6@suse.de>
+ <YNwug8n7qGL5uXfo@T590>
+ <c1de513a-5477-9d1d-0ddc-24e9166cc717@suse.de>
+ <YNw/DcxIIMeg/2VK@T590>
+ <e106f9c4-35c3-b2da-cdd8-3c4dff8234d6@grimberg.me>
+ <89081624-fedd-aa94-1ba2-9a137708a1f1@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YN6rBKIHmLhEo36w@google.com>
+In-Reply-To: <89081624-fedd-aa94-1ba2-9a137708a1f1@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 01, 2021 at 10:58:28PM -0700, Minchan Kim wrote:
-> On Thu, Jul 01, 2021 at 09:37:16PM -0700, Luis Chamberlain wrote:
-> > When sysfs attributes use a lock also used on module removal we can
-> > potentially deadlock. This happens when for instance a sysfs file on
-> > a driver is used, then at the same time we have module removal call
-> > trigger. The module removal call code holds a lock, and then the sysfs
-> > file entry waits for the same lock. While holding the lock the module
-> > removal tries to remove the sysfs entries, but these cannot be removed
-> > yet as one is waiting for a lock. This won't complete as the lock is
-> > already held. Likewise module removal cannot complete, and so we deadlock.
-> > 
-> > To fix this we just *try* to get a refcount to the module when a shared
-> > lock is used, prior to mucking with a sysfs attribute. If this fails we
-> > just give up right away.
-> > 
-> > We use a try method as a full lock means we'd then make our sysfs
-> > attributes busy us out from possible module removal, and so userspace
-> > could force denying module removal, a silly form of "DOS" against module
-> > removal. A try lock on the module removal ensures we give priority to
-> > module removal and interacting with sysfs attributes only comes second.
-> > Using a full lock could mean for instance that if you don't stop poking
-> > at sysfs files you cannot remove a module.
-> > 
-> > This deadlock was first reported with the zram driver, a sketch of how
-> > this can happen follows:
-> > 
-> > CPU A                              CPU B
-> >                                    whatever_store()
-> > module_unload
-> >   mutex_lock(foo)
-> >                                    mutex_lock(foo)
-> >    del_gendisk(zram->disk);
-> >      device_del()
-> >        device_remove_groups()
-> > 
-> > In this situation whatever_store() is waiting for the mutex foo to
-> > become unlocked, but that won't happen until module removal is complete.
-> > But module removal won't complete until the sysfs file being poked
-> > completes which is waiting for a lock already held.
-> > 
-> > This is a generic kernel issue with sysfs files which use any lock also
-> > used on module removal. Different generic solutions have been proposed.
-> > One approach proposed is by directly by augmenting attributes with module
-> > information [0]. This patch implements a solution by adding macros with
-> > the prefix MODULE_DEVICE_ATTR_*() which accomplish the same. Until we
-> > don't have a generic agreed upon solution for this shared between drivers,
-> > we must implement a fix for this on each driver.
-> > 
-> > We make zram use the new MODULE_DEVICE_ATTR_*() helpers, and completely
-> > open code the solution for class attributes as there are only a few of
-> > those.
-> > 
-> > This issue can be reproduced easily on the zram driver as follows:
-> > 
-> > Loop 1 on one terminal:
-> > 
-> > while true;
-> > 	do modprobe zram;
-> > 	modprobe -r zram;
-> > done
-> > 
-> > Loop 2 on a second terminal:
-> > while true; do
-> > 	echo 1024 >  /sys/block/zram0/disksize;
-> > 	echo 1 > /sys/block/zram0/reset;
-> > done
-> > 
-> > Without this patch we end up in a deadlock, and the following
-> > stack trace is produced which hints to us what the issue was:
-> > 
-> > INFO: task bash:888 blocked for more than 120 seconds.
-> >       Tainted: G            E 5.12.0-rc1-next-20210304+ #4
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > task:bash            state:D stack:    0 pid:  888 ppid: 887 flags:<etc>
-> > Call Trace:
-> >  __schedule+0x2e4/0x900
-> >  schedule+0x46/0xb0
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.constprop.0+0x2c3/0x490
-> >  ? _kstrtoull+0x35/0xd0
-> >  reset_store+0x6c/0x160 [zram]
-> >  kernfs_fop_write_iter+0x124/0x1b0
-> >  new_sync_write+0x11c/0x1b0
-> >  vfs_write+0x1c2/0x260
-> >  ksys_write+0x5f/0xe0
-> >  do_syscall_64+0x33/0x80
-> >  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > RIP: 0033:0x7f34f2c3df33
-> > RSP: 002b:00007ffe751df6e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> > RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f34f2c3df33
-> > RDX: 0000000000000002 RSI: 0000561ccb06ec10 RDI: 0000000000000001
-> > RBP: 0000561ccb06ec10 R08: 000000000000000a R09: 0000000000000001
-> > R10: 0000561ccb157590 R11: 0000000000000246 R12: 0000000000000002
-> > R13: 00007f34f2d0e6a0 R14: 0000000000000002 R15: 00007f34f2d0e8a0
-> > INFO: task modprobe:1104 can't die for more than 120 seconds.
-> > task:modprobe        state:D stack:    0 pid: 1104 ppid: 916 flags:<etc>
-> > Call Trace:
-> >  __schedule+0x2e4/0x900
-> >  schedule+0x46/0xb0
-> >  __kernfs_remove.part.0+0x228/0x2b0
-> >  ? finish_wait+0x80/0x80
-> >  kernfs_remove_by_name_ns+0x50/0x90
-> >  remove_files+0x2b/0x60
-> >  sysfs_remove_group+0x38/0x80
-> >  sysfs_remove_groups+0x29/0x40
-> >  device_remove_attrs+0x4a/0x80
-> >  device_del+0x183/0x3e0
-> >  ? mutex_lock+0xe/0x30
-> >  del_gendisk+0x27a/0x2d0
-> >  zram_remove+0x8a/0xb0 [zram]
-> >  ? hot_remove_store+0xf0/0xf0 [zram]
-> >  zram_remove_cb+0xd/0x10 [zram]
-> >  idr_for_each+0x5e/0xd0
-> >  destroy_devices+0x39/0x6f [zram]
-> >  __do_sys_delete_module+0x190/0x2a0
-> >  do_syscall_64+0x33/0x80
-> >  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > RIP: 0033:0x7f32adf727d7
-> > RSP: 002b:00007ffc08bb38a8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-> > RAX: ffffffffffffffda RBX: 000055eea23cbb10 RCX: 00007f32adf727d7
-> > RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055eea23cbb78
-> > RBP: 000055eea23cbb10 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 00007f32adfe5ac0 R11: 0000000000000206 R12: 000055eea23cbb78
-> > R13: 0000000000000000 R14: 0000000000000000 R15: 000055eea23cbc20
-> > 
-> > [0] https://lkml.kernel.org/r/20210401235925.GR4332@42.do-not-panic.com
-> > 
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+On Wed, Jun 30, 2021 at 09:46:35PM +0200, Hannes Reinecke wrote:
+> Actually, Daniel and me came to a slightly different idea: use cpu hotplug
+> notifier.
+> Thing is, blk-mq already has cpu hotplug notifier, which should ensure that
+> no I/O is pending during cpu hotplug.
+> If we now add a nvme cpu hotplug notifier which essentially kicks off a
+> reset once all cpu in a hctx are offline the reset logic will rearrange the
+> queues to match the current cpu layout.
+> And when the cpus are getting onlined we'll do another reset.
 > 
-> Acked-by: Minchan Kim <minchan@kernel.org>
-> 
-> Much simple/clean now. Thanks for persuing the effort.
+> Daniel is currently preparing a patch; let's see how it goes.
 
-No, please let us NOT do this.  Let's revisit this after 5.14-rc1 is
-out, I still do not think this is the correct thing to do as this still
-contains races, your window is now just smaller.
+FTR, I can't say it was a huge success. I observed a real problem with
+this idea and 'maybe problem. First, we can't use nvme_ctrl_reset_sync()
+in the cpuhp path as this will block in various places due to
+percpu_rwsem_wait operations [1]. Not really a surprise I'd say.
 
-thanks,
+The maybe problem: I tried the test this time though with
+nvme_ctrl_reset() and this worked for a while (a couple of hours of FC
+port toggling with stress cpu hotplugging). Though eventually the system
+stopped to respond and died. Unfortunately, I don't have any core
+dump. So it's not totally clear what's happening.
 
-greg k-h
+BTW, I used the same test setup with Ming's patches on top of the two of
+mine. The system was still working fine after 4 hours of the stress
+testing.
+
+[1] https://paste.opensuse.org/view/raw/62287389
+
+For the fun, here is the nvme_ctrl_reset() patch:
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 66973bb56305..444756ba8dbe 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -20,6 +20,7 @@
+ #include <linux/ptrace.h>
+ #include <linux/nvme_ioctl.h>
+ #include <linux/pm_qos.h>
++#include <linux/cpuhotplug.h>
+ #include <asm/unaligned.h>
+ 
+ #include "nvme.h"
+@@ -4245,6 +4246,8 @@ EXPORT_SYMBOL_GPL(nvme_start_ctrl);
+ 
+ void nvme_uninit_ctrl(struct nvme_ctrl *ctrl)
+ {
++	cpuhp_state_remove_instance_nocalls(CPUHP_AP_NVME_QUEUE_ONLINE,
++					    &ctrl->cpuhp_node);
+ 	nvme_hwmon_exit(ctrl);
+ 	nvme_fault_inject_fini(&ctrl->fault_inject);
+ 	dev_pm_qos_hide_latency_tolerance(ctrl->device);
+@@ -4357,6 +4360,13 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	if (ret)
+ 		goto out_free_name;
+ 
++	ret = cpuhp_state_add_instance_nocalls(CPUHP_AP_NVME_QUEUE_ONLINE,
++					       &ctrl->cpuhp_node);
++	if (ret) {
++		pr_debug("failed to cpuhp notifiers %d\n", ret);
++		goto out_del_device;
++	}
++
+ 	/*
+ 	 * Initialize latency tolerance controls.  The sysfs files won't
+ 	 * be visible to userspace unless the device actually supports APST.
+@@ -4369,6 +4379,8 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	nvme_mpath_init_ctrl(ctrl);
+ 
+ 	return 0;
++out_del_device:
++	cdev_device_del(&ctrl->cdev, ctrl->device);
+ out_free_name:
+ 	nvme_put_ctrl(ctrl);
+ 	kfree_const(ctrl->device->kobj.name);
+@@ -4529,6 +4541,80 @@ static inline void _nvme_check_size(void)
+ 	BUILD_BUG_ON(sizeof(struct nvme_directive_cmd) != 64);
+ }
+ 
++static int nvme_notify_online(unsigned int cpu, struct hlist_node *node)
++{
++	struct nvme_ctrl *ctrl = hlist_entry_safe(node,
++			struct nvme_ctrl, cpuhp_node);
++	struct nvme_ns *ns;
++	struct blk_mq_hw_ctx *hctx;
++	unsigned int i;
++	bool present = false;
++
++	pr_warn("NQN %s CPU %u online\n", ctrl->opts->subsysnqn, cpu);
++
++	down_read(&ctrl->namespaces_rwsem);
++	list_for_each_entry(ns, &ctrl->namespaces, list) {
++		queue_for_each_hw_ctx(ns->disk->queue, hctx, i) {
++			if (cpumask_test_cpu(cpu, hctx->cpumask)) {
++				present = true;
++				break;
++			}
++		}
++		if (present)
++			break;
++	}
++	up_read(&ctrl->namespaces_rwsem);
++	if (present) {
++		pr_warn("trigger reset... \n");
++		nvme_reset_ctrl_sync(ctrl);
++		pr_warn("executed\n");
++	}
++
++	return 0;
++}
++
++static inline bool nvme_last_cpu_in_hctx(unsigned int cpu,
++					struct blk_mq_hw_ctx *hctx)
++{
++	if (cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) != cpu)
++		return false;
++	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
++		return false;
++	return true;
++}
++
++static int nvme_notify_offline(unsigned int cpu, struct hlist_node *node)
++{
++	struct nvme_ctrl *ctrl = hlist_entry_safe(node,
++			struct nvme_ctrl, cpuhp_node);
++	struct nvme_ns *ns;
++	struct blk_mq_hw_ctx *hctx;
++	unsigned int i;
++	bool offline = false;
++
++	pr_warn("NQN %s CPU %u offline\n", ctrl->opts->subsysnqn, cpu);
++
++	down_read(&ctrl->namespaces_rwsem);
++	list_for_each_entry(ns, &ctrl->namespaces, list) {
++		queue_for_each_hw_ctx(ns->disk->queue, hctx, i) {
++			pr_warn("htcx %p cpumask %*pbl state x%lx\n",
++				hctx, cpumask_pr_args(hctx->cpumask), hctx->state);
++			if (nvme_last_cpu_in_hctx(cpu, hctx)) {
++				offline = true;
++				break;
++			}
++		}
++		if (offline)
++			break;
++	}
++	up_read(&ctrl->namespaces_rwsem);
++	if (offline) {
++		pr_warn("trigger reset... \n");
++		nvme_reset_ctrl_sync(ctrl);
++		pr_warn("executed\n");
++	}
++	return 0;
++}
+ 
+ static int __init nvme_core_init(void)
+ {
+@@ -4580,8 +4666,17 @@ static int __init nvme_core_init(void)
+ 		goto unregister_generic_ns;
+ 	}
+ 
++	result = cpuhp_setup_state_multi(CPUHP_AP_NVME_QUEUE_ONLINE,
++					 "nvme:online",
++					 nvme_notify_online,
++					 nvme_notify_offline);
++	if (result < 0)
++		goto destroy_chr_class;
++
+ 	return 0;
+ 
++destroy_chr_class:
++	class_destroy(nvme_ns_chr_class);
+ unregister_generic_ns:
+ 	unregister_chrdev_region(nvme_ns_chr_devt, NVME_MINORS);
+ destroy_subsys_class:
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 0015860ec12b..34676ff79d40 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -352,6 +352,8 @@ struct nvme_ctrl {
+ 	unsigned long discard_page_busy;
+ 
+ 	struct nvme_fault_inject fault_inject;
++
++	struct hlist_node cpuhp_node;
+ };
+ 
+ enum nvme_iopolicy {
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index 4a62b3980642..5f6cf60bee1f 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -159,6 +159,7 @@ enum cpuhp_state {
+ 	CPUHP_AP_X86_VDSO_VMA_ONLINE,
+ 	CPUHP_AP_IRQ_AFFINITY_ONLINE,
+ 	CPUHP_AP_BLK_MQ_ONLINE,
++	CPUHP_AP_NVME_QUEUE_ONLINE,
+ 	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
+ 	CPUHP_AP_X86_INTEL_EPB_ONLINE,
+ 	CPUHP_AP_PERF_ONLINE,
