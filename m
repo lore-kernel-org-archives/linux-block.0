@@ -2,166 +2,250 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61BD6C11F6A
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 15:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5E1C11F68
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 17:29:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44968613FE
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 15:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7912061430
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jul 2021 17:29:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229807AbhGBP6V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jul 2021 11:58:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22878 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231757AbhGBP6V (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Jul 2021 11:58:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625241348;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=508AyhKpE8jUDrBFR0nb6Agup3ldPNqzk6KlIwcdo6g=;
-        b=LpvTfE/Xx+XxBOBEfTmUYI/QfsjpiHQc0Gu+BHHdR3yz83mUE4ooCVhgda5bWfcA1zOBTW
-        xytcClIOyvL59dXXPT824g80VpkdOa4Jesx3/C9QvjSknNLBabkhiZnNXeUNvEjRA+6v1r
-        dj9+KQW/eQiIvFkwdJ6vEK9nSAZeJMc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-JomhaFF6NAmtyieHslVtnA-1; Fri, 02 Jul 2021 11:55:47 -0400
-X-MC-Unique: JomhaFF6NAmtyieHslVtnA-1
-Received: by mail-wm1-f72.google.com with SMTP id k16-20020a7bc3100000b02901d849b41038so6401822wmj.7
-        for <linux-block@vger.kernel.org>; Fri, 02 Jul 2021 08:55:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=508AyhKpE8jUDrBFR0nb6Agup3ldPNqzk6KlIwcdo6g=;
-        b=mGBPHerdmQYiwm8J9nJWki6dyGKYK6mO80xVmaQi8QnRzznWRTqaOKP38mRND9+pxe
-         LknqCK4mL9BkS6rnAk2RvibWLj9ouP0uUgPK9tnmBOUSfTITx4jUc+lNt0HzwUmP1/dk
-         uxOo7mY1wCzyuqRESI3TQdH5W/0Ek8WZpDVhXq4NUtI2dJh0v7vD8sfsBXjg+NERMOdd
-         NjPxXu4E80xy9GG3oUtENhk70m7v2G99t33s53UnmAW03XhegUglL2lDIUShEpXvikaU
-         MSLxLHXovSJhOD210wCW1wJO4bc/nJUy7jEf/FGPXvFAE0vlp4HLgcYxFJol88dZj86q
-         YEuw==
-X-Gm-Message-State: AOAM533MadYxSSGM8smSTzRtv9LjLc23WqXPigxLPIyq7PGhyxjdg502
-        +jyg16AQfy8W7IXr/rzJbq+HRC7WZfQ/FEOZXpTa/qhgAyfsZsDyAWrg6u2whEkvcZocg8yfjbq
-        Y7SRUDuwDcVIwtPE0rSb31ng=
-X-Received: by 2002:a1c:1dd1:: with SMTP id d200mr205140wmd.82.1625241346471;
-        Fri, 02 Jul 2021 08:55:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw5g/VM21EKC5p1b+bedRgUGipGzZg9oN5IehHhOj+/WVKmexFW92+hQHKujHlDSVZapekDzw==
-X-Received: by 2002:a1c:1dd1:: with SMTP id d200mr205117wmd.82.1625241346342;
-        Fri, 02 Jul 2021 08:55:46 -0700 (PDT)
-Received: from redhat.com ([2.55.4.39])
-        by smtp.gmail.com with ESMTPSA id n12sm4180006wmq.5.2021.07.02.08.55.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jul 2021 08:55:45 -0700 (PDT)
-Date:   Fri, 2 Jul 2021 11:55:40 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH V2 5/6] virtio: add one field into virtio_device for
- recording if device uses managed irq
-Message-ID: <20210702115430-mutt-send-email-mst@kernel.org>
-References: <20210702150555.2401722-1-ming.lei@redhat.com>
- <20210702150555.2401722-6-ming.lei@redhat.com>
+        id S229672AbhGBRbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jul 2021 13:31:41 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:57435 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229455AbhGBRbl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 13:31:41 -0400
+Received: from fsav411.sakura.ne.jp (fsav411.sakura.ne.jp [133.242.250.110])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 162HSpgW026914;
+        Sat, 3 Jul 2021 02:28:51 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav411.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp);
+ Sat, 03 Jul 2021 02:28:51 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 162HSpnU026907
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 3 Jul 2021 02:28:51 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH] loop: reintroduce global lock for safe
+ loop_validate_file() traversal
+To:     Petr Vorel <pvorel@suse.cz>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20210702153036.8089-1-penguin-kernel@I-love.SAKURA.ne.jp>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <288edd89-a33f-2561-cee9-613704c3da20@i-love.sakura.ne.jp>
+Date:   Sat, 3 Jul 2021 02:28:48 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210702150555.2401722-6-ming.lei@redhat.com>
+In-Reply-To: <20210702153036.8089-1-penguin-kernel@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 02, 2021 at 11:05:54PM +0800, Ming Lei wrote:
-> blk-mq needs to know if the device uses managed irq, so add one field
-> to virtio_device for recording if device uses managed irq.
+On 2021/07/03 0:30, Tetsuo Handa wrote:
+>  drivers/block/loop.c | 138 ++++++++++++++++++++++++++++---------------
+>  1 file changed, 89 insertions(+), 49 deletions(-)
 > 
-> If the driver use managed irq, this flag has to be set so it can be
-> passed to blk-mq.
+> This is a submission as a patch based on comments from Christoph Hellwig
+> at https://lkml.kernel.org/r/20210623144130.GA738@lst.de . I don't know
+> this patch can close all race windows.
 > 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: virtualization@lists.linux-foundation.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-
-
-The API seems somewhat confusing. virtio does not request
-a managed irq as such, does it? I think it's a decision taken
-by the irq core.
-
-Any way to query the irq to find out if it's managed?
-
-
-> ---
->  drivers/block/virtio_blk.c         | 2 ++
->  drivers/scsi/virtio_scsi.c         | 1 +
->  drivers/virtio/virtio_pci_common.c | 1 +
->  include/linux/virtio.h             | 1 +
->  4 files changed, 5 insertions(+)
+> For example, loop_change_fd() says
 > 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index e4bd3b1fc3c2..33b9c80ac475 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -764,6 +764,8 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	vblk->tag_set.queue_depth = queue_depth;
->  	vblk->tag_set.numa_node = NUMA_NO_NODE;
->  	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-> +	if (vdev->use_managed_irq)
-> +		vblk->tag_set.flags |= BLK_MQ_F_MANAGED_IRQ;
->  	vblk->tag_set.cmd_size =
->  		sizeof(struct virtblk_req) +
->  		sizeof(struct scatterlist) * sg_elems;
-> diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-> index b9c86a7e3b97..f301917abc84 100644
-> --- a/drivers/scsi/virtio_scsi.c
-> +++ b/drivers/scsi/virtio_scsi.c
-> @@ -891,6 +891,7 @@ static int virtscsi_probe(struct virtio_device *vdev)
->  	shost->max_channel = 0;
->  	shost->max_cmd_len = VIRTIO_SCSI_CDB_SIZE;
->  	shost->nr_hw_queues = num_queues;
-> +	shost->use_managed_irq = vdev->use_managed_irq;
->  
->  #ifdef CONFIG_BLK_DEV_INTEGRITY
->  	if (virtio_has_feature(vdev, VIRTIO_SCSI_F_T10_PI)) {
-> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-> index 222d630c41fc..f2ac48fb477b 100644
-> --- a/drivers/virtio/virtio_pci_common.c
-> +++ b/drivers/virtio/virtio_pci_common.c
-> @@ -128,6 +128,7 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
->  	if (desc) {
->  		flags |= PCI_IRQ_AFFINITY;
->  		desc->pre_vectors++; /* virtio config vector */
-> +		vdev->use_managed_irq = true;
->  	}
->  
->  	err = pci_alloc_irq_vectors_affinity(vp_dev->pci_dev, nvectors,
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index b1894e0323fa..85cc773b2dc7 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -109,6 +109,7 @@ struct virtio_device {
->  	bool failed;
->  	bool config_enabled;
->  	bool config_change_pending;
-> +	bool use_managed_irq;
->  	spinlock_t config_lock;
->  	struct device dev;
->  	struct virtio_device_id id;
-> -- 
-> 2.31.1
+>   This can only work if the loop device is used read-only, and if the
+>   new backing store is the same size and type as the old backing store.
+> 
+> and has
+> 
+>         /* size of the new backing store needs to be the same */
+>         if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
+>                 goto out_err;
+> 
+> check. Then, do we also need to apply this global lock for
+> lo_simple_ioctl(LOOP_SET_CAPACITY) path because it changes the size
+> by loop_set_size(lo, get_loop_size(lo, lo->lo_backing_file)) ?
+> How serious if this check is racy?
+> 
+> Any other locations to apply this global lock?
+> 
 
+Well, apart from questions above, is this smaller patch safe?
+
+ drivers/block/loop.c |   72 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 55 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cc0e8c39a48b..d3bb9c34a3e0 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -88,6 +88,29 @@
+ 
+ static DEFINE_IDR(loop_index_idr);
+ static DEFINE_MUTEX(loop_ctl_mutex);
++static DEFINE_MUTEX(loop_validate_mutex);
++
++static int loop_global_lock_killable(struct loop_device *lo, bool global)
++{
++	int err;
++
++	if (global) {
++		err = mutex_lock_killable(&loop_validate_mutex);
++		if (err)
++			return err;
++	}
++	err = mutex_lock_killable(&lo->lo_mutex);
++	if (err && global)
++		mutex_unlock(&loop_validate_mutex);
++	return err;
++}
++
++static void loop_global_unlock(struct loop_device *lo, bool global)
++{
++	mutex_unlock(&lo->lo_mutex);
++	if (global)
++		mutex_unlock(&loop_validate_mutex);
++}
+ 
+ static int max_part;
+ static int part_shift;
+@@ -672,13 +695,13 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
+ 	while (is_loop_device(f)) {
+ 		struct loop_device *l;
+ 
++		lockdep_assert_held(&loop_validate_mutex);
+ 		if (f->f_mapping->host->i_rdev == bdev->bd_dev)
+ 			return -EBADF;
+ 
+ 		l = I_BDEV(f->f_mapping->host)->bd_disk->private_data;
+-		if (l->lo_state != Lo_bound) {
++		if (l->lo_state != Lo_bound)
+ 			return -EINVAL;
+-		}
+ 		f = l->lo_backing_file;
+ 	}
+ 	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
+@@ -697,13 +720,20 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
+ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 			  unsigned int arg)
+ {
+-	struct file	*file = NULL, *old_file;
++	struct file *file = fget(arg);
++	struct file *old_file;
+ 	int		error;
+ 	bool		partscan;
++	bool is_loop;
+ 
+-	error = mutex_lock_killable(&lo->lo_mutex);
+-	if (error)
++	if (!file)
++		return -EBADF;
++	is_loop = is_loop_device(file);
++	error = loop_global_lock_killable(lo, is_loop);
++	if (error) {
++		fput(file);
+ 		return error;
++	}
+ 	error = -ENXIO;
+ 	if (lo->lo_state != Lo_bound)
+ 		goto out_err;
+@@ -713,11 +743,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
+ 		goto out_err;
+ 
+-	error = -EBADF;
+-	file = fget(arg);
+-	if (!file)
+-		goto out_err;
+-
+ 	error = loop_validate_file(file, bdev);
+ 	if (error)
+ 		goto out_err;
+@@ -740,7 +765,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	loop_update_dio(lo);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+-	mutex_unlock(&lo->lo_mutex);
++	loop_global_unlock(lo, is_loop);
+ 	/*
+ 	 * We must drop file reference outside of lo_mutex as dropping
+ 	 * the file ref can take open_mutex which creates circular locking
+@@ -752,9 +777,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	return 0;
+ 
+ out_err:
+-	mutex_unlock(&lo->lo_mutex);
+-	if (file)
+-		fput(file);
++	loop_global_unlock(lo, is_loop);
++	fput(file);
+ 	return error;
+ }
+ 
+@@ -1143,6 +1167,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	loff_t		size;
+ 	bool		partscan;
+ 	unsigned short  bsize;
++	bool is_loop;
+ 
+ 	/* This is safe, since we have a reference from open(). */
+ 	__module_get(THIS_MODULE);
+@@ -1162,7 +1187,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 			goto out_putf;
+ 	}
+ 
+-	error = mutex_lock_killable(&lo->lo_mutex);
++	is_loop = is_loop_device(file);
++	error = loop_global_lock_killable(lo, is_loop);
+ 	if (error)
+ 		goto out_bdev;
+ 
+@@ -1253,7 +1279,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
+-	mutex_unlock(&lo->lo_mutex);
++	loop_global_unlock(lo, is_loop);
+ 	if (partscan)
+ 		loop_reread_partitions(lo);
+ 	if (!(mode & FMODE_EXCL))
+@@ -1261,7 +1287,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	return 0;
+ 
+ out_unlock:
+-	mutex_unlock(&lo->lo_mutex);
++	loop_global_unlock(lo, is_loop);
+ out_bdev:
+ 	if (!(mode & FMODE_EXCL))
+ 		bd_abort_claiming(bdev, loop_configure);
+@@ -1283,6 +1309,18 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	int lo_number;
+ 	struct loop_worker *pos, *worker;
+ 
++	/*
++	 * Flush loop_configure() and loop_change_fd(). It is acceptable for
++	 * loop_validate_file() to succeed, for actual clear operation has not
++	 * started yet (i.e. effectively lo->lo_state == Lo_bound state).
++	 */
++	mutex_lock(&loop_validate_mutex);
++	mutex_unlock(&loop_validate_mutex);
++	/*
++	 * loop_validate_file() now fails because lo->lo_state != Lo_bound
++	 * became visible.
++	 */
++
+ 	mutex_lock(&lo->lo_mutex);
+ 	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
+ 		err = -ENXIO;
