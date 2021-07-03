@@ -2,102 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444A8C07E98
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F170DC07E95
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:46:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C93761429
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:20:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C956D61436
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:46:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230249AbhGCAWy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jul 2021 20:22:54 -0400
-Received: from mail-pj1-f43.google.com ([209.85.216.43]:53036 "EHLO
-        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230274AbhGCAWq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 20:22:46 -0400
-Received: by mail-pj1-f43.google.com with SMTP id kt19so7566161pjb.2;
-        Fri, 02 Jul 2021 17:20:12 -0700 (PDT)
+        id S230085AbhGCAtL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jul 2021 20:49:11 -0400
+Received: from mail-pf1-f176.google.com ([209.85.210.176]:33634 "EHLO
+        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230017AbhGCAtL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 20:49:11 -0400
+Received: by mail-pf1-f176.google.com with SMTP id s14so10773390pfg.0;
+        Fri, 02 Jul 2021 17:46:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=h3OXQEaetOdJQLzJx+iDsq3WrFahatkljOoGHuQVfBQ=;
-        b=cDetE1Xkaj0XzfCCspAqzLPKnVR2D47mqtDApoD4Nwb/ZlWG9IH2P9SlLiFF7/TpuN
-         2MHYHRSAc2/GZd0BD1Ni1aBbbErmEmJXfNcvmkmeGQ2yf5C9hKle+nx9QoIG827t7MXN
-         NnQHLdw8wqjh+qrj+Es7Eyzp1H1m7cNxZA1f//W05t3bvDYRmHUvEdisYDClwUapnCZ0
-         EQwLVau4CPIt/n0iQeFIP5ID6vQIMXaPIH+yN3dhf4VUtkpV2BocGvmpht4qwwXDLWak
-         7Np5cChGTuPyIMtcfecffTAgWRIbAba+ZNBQUrffg72y1dE7l5TM3QZvaq+bo1LnCuJX
-         gdhQ==
-X-Gm-Message-State: AOAM533S5iv0Lm+L5N7kkogrltdgC4LPZbLDE/kdDB/uSMmm5lO/cSKX
-        t7xVyfaGMrlXEMxYjh6/fWg=
-X-Google-Smtp-Source: ABdhPJwPsFpixzje0s2OC+DwGRGE1Hbs6H+K6FI2g/cVOqacjVGW2UIym7Aegj/FVFIIQBSCasKXTg==
-X-Received: by 2002:a17:90a:ad41:: with SMTP id w1mr2072304pjv.223.1625271612031;
-        Fri, 02 Jul 2021 17:20:12 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2kl9UtuLXwqigXL0z/0Ce1Bg3PqN6wXeWZxwKnEIWoE=;
+        b=BPZ81H9+/ugQyisrsbjJllDnnoVOcWEpRFGxzrUevq6dCeyEsjGzxq6m0UDjqc1qVj
+         zpsvH61SLm9URpFXuirfZ8zyE7U/DN0MOIAQ5Unhh6uKN6Ig4WX8Gw278uUnE5kbUOUI
+         Om+b3mb+uZw+5LFMdywQphF2NCy4baIj5S6DhcpAjRUcw2TviFQmDG9u5skRpMZoHXkX
+         dwWtlyID4LRQPSf2EKsEx+ynZMjxDpjIXhF/28DEC1D/ek6kAaJRlrqUWab1z2A3yLiG
+         cQf+D1G7tRqtfHJPHpc+REyt65JsOveka5Ca9PXlgidhFjNbFwXJcyHavLk1O7Q1sM1X
+         GrQw==
+X-Gm-Message-State: AOAM532bBHTIQho+EMRZMtnqSDKh2V0UyG+MPyREYR7iLjEG1xgaWMgu
+        4IrDARMLE8KaWpqOhRdISxU=
+X-Google-Smtp-Source: ABdhPJwGJju08VhRuXSU6vHnaEQqhLvLgMpIjXX58qMb53c2M1AVO015kQMXy6Yi1waWrN3B2dyxKQ==
+X-Received: by 2002:a62:9290:0:b029:318:a43b:e99 with SMTP id o138-20020a6292900000b0290318a43b0e99mr1385332pfd.6.1625273197181;
+        Fri, 02 Jul 2021 17:46:37 -0700 (PDT)
 Received: from localhost ([191.96.121.144])
-        by smtp.gmail.com with ESMTPSA id 1sm5017898pfo.92.2021.07.02.17.20.10
+        by smtp.gmail.com with ESMTPSA id y16sm4801730pfe.70.2021.07.02.17.46.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Jul 2021 17:20:11 -0700 (PDT)
+        Fri, 02 Jul 2021 17:46:36 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     akpm@linux-foundation.org, minchan@kernel.org,
-        gregkh@linuxfoundation.org, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, rafael@kernel.org
-Cc:     mcgrof@kernel.org, axboe@kernel.dk, tj@kernel.org, mbenes@suse.com,
+To:     gregkh@linuxfoundation.org, tj@kernel.org, shuah@kernel.org,
+        akpm@linux-foundation.org, rafael@kernel.org, davem@davemloft.net,
+        kuba@kernel.org, ast@kernel.org, andriin@fb.com,
+        daniel@iogearbox.net, atenart@kernel.org, alobakin@pm.me,
+        weiwan@google.com, ap420073@gmail.com
+Cc:     jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        mcgrof@kernel.org, axboe@kernel.dk, mbenes@suse.com,
         jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
         jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 3/3] zram: use ATTRIBUTE_GROUPS
-Date:   Fri,  2 Jul 2021 17:19:58 -0700
-Message-Id: <20210703001958.620899-4-mcgrof@kernel.org>
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] selftests: add a new test driver for sysfs
+Date:   Fri,  2 Jul 2021 17:46:28 -0700
+Message-Id: <20210703004632.621662-1-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210703001958.620899-1-mcgrof@kernel.org>
-References: <20210703001958.620899-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove boilerplate code and use ATTRIBUTE_GROUPS() to
-simplify the code further. This produces no functional changes
-other than reducing the size of the group name variable.
+This v2 rebases onto the latest linux-next tag, next-20210701. A few
+changes were needed, namely:
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- drivers/block/zram/zram_drv.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+  1) changes kernfs_init_failure_injection() to return int instead
+     of void. On the latest linux-next we have a new static build
+     check for this, so this mistake was captured when building.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 205cf9287d0c..56be6817c5b2 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1902,14 +1902,7 @@ static struct attribute *zram_disk_attrs[] = {
- 	NULL,
- };
- 
--static const struct attribute_group zram_disk_attr_group = {
--	.attrs = zram_disk_attrs,
--};
--
--static const struct attribute_group *zram_disk_attr_groups[] = {
--	&zram_disk_attr_group,
--	NULL,
--};
-+ATTRIBUTE_GROUPS(zram_disk);
- 
- /*
-  * Allocate and initialize new zram device. the function returns
-@@ -1981,7 +1974,7 @@ static int zram_add(void)
- 		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
- 
- 	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, zram->disk->queue);
--	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
-+	device_add_disk(NULL, zram->disk, zram_disk_groups);
- 
- 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
- 
+  2) I made kernfs_init_failure_injection static
+
+  3) lib/test_sysfs.c moved to the new blk_alloc_disk() added by
+     Christoph as direct queue allocation is no longer supported,
+     ie, blk_alloc_queue() is no longer exported. This work was
+     done by Christoph in preparation to help make add_disk*()
+     callers eventually return an error code and make the error
+     handling much saner. Because of this same change
+     blk_cleanup_queue() is no longer needed so we embrace
+     the shiny new blk_cleanup_disk().
+
+I've put this up on my linux-next git tree [0] under the branch
+named 20210701-sysfs-fix-races-v2.
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210701-sysfs-fix-races-v2
+
+Luis Chamberlain (4):
+  selftests: add tests_sysfs module
+  kernfs: add initial failure injection support
+  test_sysfs: add support to use kernfs failure injection
+  test_sysfs: demonstrate deadlock fix
+
+ .../fault-injection/fault-injection.rst       |   22 +
+ MAINTAINERS                                   |    9 +-
+ fs/kernfs/Makefile                            |    1 +
+ fs/kernfs/failure-injection.c                 |   83 +
+ fs/kernfs/file.c                              |   13 +
+ fs/kernfs/kernfs-internal.h                   |   72 +
+ include/linux/kernfs.h                        |    5 +
+ lib/Kconfig.debug                             |   23 +
+ lib/Makefile                                  |    1 +
+ lib/test_sysfs.c                              | 1027 ++++++++++++
+ tools/testing/selftests/sysfs/Makefile        |   12 +
+ tools/testing/selftests/sysfs/config          |    5 +
+ tools/testing/selftests/sysfs/sysfs.sh        | 1376 +++++++++++++++++
+ 13 files changed, 2648 insertions(+), 1 deletion(-)
+ create mode 100644 fs/kernfs/failure-injection.c
+ create mode 100644 lib/test_sysfs.c
+ create mode 100644 tools/testing/selftests/sysfs/Makefile
+ create mode 100644 tools/testing/selftests/sysfs/config
+ create mode 100755 tools/testing/selftests/sysfs/sysfs.sh
+
 -- 
 2.27.0
 
