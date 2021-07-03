@@ -2,59 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 297E3C07E97
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 05:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFAEC07E99
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 15:52:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED0BB613E6
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 05:27:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E46861554
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 15:52:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229473AbhGCF3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Jul 2021 01:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40816 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbhGCF3o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Jul 2021 01:29:44 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A89C061762;
-        Fri,  2 Jul 2021 22:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VX6C6jpDcBYdKjazHco/JNM/nWgswOL8/+4B06FF4rQ=; b=Z0A5kfG6Q93tzG9RIz5oYOMumn
-        H42JoUtgfC/AAv+xjmFvQ5BXN0msoYhbI5soE5+Zxapt0VKThK/N89kJ80o/hnEjQWWeubnxwOeh0
-        /ayeKqNp6XAaO7LyUmQvivlyYnK6ILZ+GtiJNkjRByJS7apHsWAaykFM+iROCB7q9hi6HfY8LPVmq
-        0mDANsT2aDx65nf3FO+148ccp1do6yduy4kU8fwhE9BqH5fe4g+4fk4ZCf6or7fE0U9H9cOpw6nt3
-        RxMSpkdaAm6NQPOnj0rYweH3BDpjwhyVkzx2MSPtu7KxkTWv03wFmOe4/dwAlzvsJpZKpyDtvahLq
-        hKiFOrpg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lzYAm-008KWD-IK; Sat, 03 Jul 2021 05:26:39 +0000
-Date:   Sat, 3 Jul 2021 06:26:36 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Rajat Asthana <rajatasthana4@gmail.com>
-Cc:     axboe@kernel.dk, hare@suse.de, ming.lei@redhat.com,
-        damien.lemoal@wdc.com, jack@suse.cz, gregkh@linuxfoundation.org,
-        rafael@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+7d6c5587ec9cff5be65c@syzkaller.appspotmail.com
-Subject: Re: [PATCH] block: Avoid accessing an already freed kobject in
- delete_partition
-Message-ID: <YN/1DOeSA5ODf1AV@infradead.org>
-References: <20210702231228.261460-1-rajatasthana4@gmail.com>
+        id S229907AbhGCPyn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Jul 2021 11:54:43 -0400
+Received: from mail-pf1-f181.google.com ([209.85.210.181]:46823 "EHLO
+        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229881AbhGCPym (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Jul 2021 11:54:42 -0400
+Received: by mail-pf1-f181.google.com with SMTP id x16so11990242pfa.13;
+        Sat, 03 Jul 2021 08:52:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=oo68TW9DgSUVOHXfjGhn1pVruxN7Vi+rmUDrhhmjqGk=;
+        b=EH8V3/YM0SnJpG0fLy5DmjYGhNALu42bFAcPrPvKDA3Db0zke1FFC7HjRo9WFUBL9y
+         pIBHJ0GGw8Vqtnmr0FrIqrCNjOVELXNeC1kEqnkY6yoHtohKAerIP9UN7zshO/sAPjGk
+         nrkNYLVtkfZCZ2uCUXZxFwWf2ptTPfxfhHjCYA3QYfn0Z2/ECyZOlEeBWOO308TJEngg
+         VK1iQb/q/YPYQp+nIKUZMFjoV2WS4sKHspKiyAzc9PQNY7nVO8my9pKIvC5QbijSwMvA
+         EdPPpxGV/VV+GvC1ZF9timCzMGRlnBBr8BIGSkl0u+CioEWBz0Y5aqihuA3i3nxEZApe
+         z4tw==
+X-Gm-Message-State: AOAM531yILSUYM4RvYfNP1+Du5ruAlqZPGUwgBq/gfApSetCpBrivFoi
+        CTal8ZkdSBGkjK8GxcJWHrY=
+X-Google-Smtp-Source: ABdhPJzNQPqKxMr/ILmboBMmzzhwe5Iy9/IlxGyDLKQ7tIKIQSWt/+iFKroY2npLRCWtlYdU1xJ6gQ==
+X-Received: by 2002:a63:af53:: with SMTP id s19mr4398378pgo.147.1625327528575;
+        Sat, 03 Jul 2021 08:52:08 -0700 (PDT)
+Received: from garbanzo ([191.96.121.144])
+        by smtp.gmail.com with ESMTPSA id p24sm7520656pfh.17.2021.07.03.08.52.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Jul 2021 08:52:07 -0700 (PDT)
+Date:   Sat, 3 Jul 2021 08:52:03 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     tj@kernel.org, shuah@kernel.org, akpm@linux-foundation.org,
+        Richard Fontana <fontana@sharpeleven.org>, rafael@kernel.org,
+        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+        andriin@fb.com, daniel@iogearbox.net, atenart@kernel.org,
+        alobakin@pm.me, weiwan@google.com, ap420073@gmail.com,
+        jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] selftests: add tests_sysfs module
+Message-ID: <20210703155203.uvxcolrddswecco6@garbanzo>
+References: <20210702050543.2693141-1-mcgrof@kernel.org>
+ <20210702050543.2693141-2-mcgrof@kernel.org>
+ <YN6iSKCetBrk2y8V@kroah.com>
+ <20210702190230.r46bck4vib7u3qo6@garbanzo>
+ <YN/rtmZbd6velB1L@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210702231228.261460-1-rajatasthana4@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YN/rtmZbd6velB1L@kroah.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This should be fixed properly by:
+On Sat, Jul 03, 2021 at 06:46:46AM +0200, Greg KH wrote:
+> On Fri, Jul 02, 2021 at 12:02:30PM -0700, Luis Chamberlain wrote:
+> > On Fri, Jul 02, 2021 at 07:21:12AM +0200, Greg KH wrote:
+> > > On Thu, Jul 01, 2021 at 10:05:40PM -0700, Luis Chamberlain wrote:
+> > > > @@ -0,0 +1,953 @@
+> > > > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > > > +/*
+> > > > + * sysfs test driver
+> > > > + *
+> > > > + * Copyright (C) 2021 Luis Chamberlain <mcgrof@kernel.org>
+> > > > + *
+> > > > + * This program is free software; you can redistribute it and/or modify it
+> > > > + * under the terms of the GNU General Public License as published by the Free
+> > > > + * Software Foundation; either version 2 of the License, or at your option any
+> > > > + * later version; or, when distributed separately from the Linux kernel or
+> > > > + * when incorporated into other software packages, subject to the following
+> > > > + * license:
+> > > 
+> > > This boilerplate should not be here, only the spdx line is needed.
+> > 
+> > As per Documentation/process/license-rules.rst we use the SPDX license
+> > tag for the license that applies but it also states about dual
+> > licensing:
+> > 
+> > "Aside from that, individual files can be provided under a dual license,         
+> > e.g. one of the compatible GPL variants and alternatively under a               
+> > permissive license like BSD, MIT etc."
+> > 
+> > Let me know if things should change somehow here to clarify this better.
+> 
+> The spdx line is not matching the actual license for the file, which is
+> wrong.
 
-"block: check disk exist before trying to add partition"
+We don't have spdx license tag yet for copyleft-next, and although
+when using dual gplv2 or copyleft-next gplv2 applies I did fail to see
+can use spdx for dual licensing such as:
+
+# SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause
+
+> And "copyright-left" is not a valid license according to our list of
+> valid licenses in the LICENSES directory, so please do not add it to
+> kernel code when it is obviously not needed.
+
+You mean copyleft-next. Yes I'd have to add that. Given that we already
+have two test drivers with that license I'll go ahead and add that.
+
+> And given that this is directly interacting with sysfs, which is
+> GPLv2-only, trying to claim a different license on the code that tests
+> it is going to be a total mess for any lawyer who wants to look into
+> this.  Just keep it simple please.
+
+The faul injection code I added follows the exact license for sysfs. The
+only interaction with the test_sysfs and sysfs is an exported symbol
+for a completion structure. The other dual gpl OR copyleft-next test
+drivers already present in the kernel also use exported symbols too, so
+I see nothing new here.
+
+  Luis
