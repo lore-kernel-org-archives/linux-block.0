@@ -2,79 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF6EC07E97
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 04:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 297E3C07E97
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 05:27:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60BCA61429
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 04:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED0BB613E6
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 05:27:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229528AbhGCEwX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Jul 2021 00:52:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43264 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229461AbhGCEwX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 3 Jul 2021 00:52:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D3EA613C9;
-        Sat,  3 Jul 2021 04:49:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1625287788;
-        bh=mGZyq3JSQsP4iGY+awgr6y4sM3v63gkuGZxGC42AQJU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Qrxe9zLtWfzjmDX9BHre42DOiJuHuM8V5xGwohED6e4CSZ4K38p9MJQTvcYGjI8xM
-         jjQwyVhvc+UfyH/3tgj0L7urGLB/lTsYjDjozqus5pLbOH67LBRr4aFig8yekeG3tN
-         u5XWPLwsOrr8kSRTc1SXwzg9ImErPRTOm9W614To=
-Date:   Sat, 3 Jul 2021 06:49:46 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     tj@kernel.org, shuah@kernel.org, akpm@linux-foundation.org,
-        rafael@kernel.org, davem@davemloft.net, kuba@kernel.org,
-        ast@kernel.org, andriin@fb.com, daniel@iogearbox.net,
-        atenart@kernel.org, alobakin@pm.me, weiwan@google.com,
-        ap420073@gmail.com, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] test_sysfs: demonstrate deadlock fix
-Message-ID: <YN/sar6nGeSCn89/@kroah.com>
-References: <20210703004632.621662-1-mcgrof@kernel.org>
- <20210703004632.621662-5-mcgrof@kernel.org>
+        id S229473AbhGCF3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Jul 2021 01:29:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40816 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229461AbhGCF3o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Jul 2021 01:29:44 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A89C061762;
+        Fri,  2 Jul 2021 22:27:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=VX6C6jpDcBYdKjazHco/JNM/nWgswOL8/+4B06FF4rQ=; b=Z0A5kfG6Q93tzG9RIz5oYOMumn
+        H42JoUtgfC/AAv+xjmFvQ5BXN0msoYhbI5soE5+Zxapt0VKThK/N89kJ80o/hnEjQWWeubnxwOeh0
+        /ayeKqNp6XAaO7LyUmQvivlyYnK6ILZ+GtiJNkjRByJS7apHsWAaykFM+iROCB7q9hi6HfY8LPVmq
+        0mDANsT2aDx65nf3FO+148ccp1do6yduy4kU8fwhE9BqH5fe4g+4fk4ZCf6or7fE0U9H9cOpw6nt3
+        RxMSpkdaAm6NQPOnj0rYweH3BDpjwhyVkzx2MSPtu7KxkTWv03wFmOe4/dwAlzvsJpZKpyDtvahLq
+        hKiFOrpg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1lzYAm-008KWD-IK; Sat, 03 Jul 2021 05:26:39 +0000
+Date:   Sat, 3 Jul 2021 06:26:36 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Rajat Asthana <rajatasthana4@gmail.com>
+Cc:     axboe@kernel.dk, hare@suse.de, ming.lei@redhat.com,
+        damien.lemoal@wdc.com, jack@suse.cz, gregkh@linuxfoundation.org,
+        rafael@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+7d6c5587ec9cff5be65c@syzkaller.appspotmail.com
+Subject: Re: [PATCH] block: Avoid accessing an already freed kobject in
+ delete_partition
+Message-ID: <YN/1DOeSA5ODf1AV@infradead.org>
+References: <20210702231228.261460-1-rajatasthana4@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210703004632.621662-5-mcgrof@kernel.org>
+In-Reply-To: <20210702231228.261460-1-rajatasthana4@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 02, 2021 at 05:46:32PM -0700, Luis Chamberlain wrote:
-> +#define MODULE_DEVICE_ATTR_FUNC_STORE(_name) \
-> +static ssize_t module_ ## _name ## _store(struct device *dev, \
-> +				   struct device_attribute *attr, \
-> +				   const char *buf, size_t len) \
-> +{ \
-> +	ssize_t __ret; \
-> +	if (!try_module_get(THIS_MODULE)) \
-> +		return -ENODEV; \
-> +	__ret = _name ## _store(dev, attr, buf, len); \
-> +	module_put(THIS_MODULE); \
-> +	return __ret; \
-> +}
+This should be fixed properly by:
 
-As I have pointed out before, doing try_module_get(THIS_MODULE) is racy
-and should not be added back to the kernel tree.  We got rid of many
-instances of this "bad pattern" over the years, please do not encourage
-it to be added back as others will somehow think that it correct code.
-
-I'll go over the rest of this after 5.14-rc1 is out, am busy until then.
-
-thanks,
-
-greg k-h
+"block: check disk exist before trying to add partition"
