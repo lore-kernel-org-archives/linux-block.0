@@ -4,42 +4,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 037AEC07E95
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 444A8C07E98
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB29061427
-	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:20:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C93761429
+	for <linux-block@archiver.kernel.org>; Sat,  3 Jul 2021 00:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbhGCAWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jul 2021 20:22:44 -0400
-Received: from mail-pl1-f174.google.com ([209.85.214.174]:37642 "EHLO
-        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230228AbhGCAWn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 20:22:43 -0400
-Received: by mail-pl1-f174.google.com with SMTP id a14so6469676pls.4;
-        Fri, 02 Jul 2021 17:20:09 -0700 (PDT)
+        id S230249AbhGCAWy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jul 2021 20:22:54 -0400
+Received: from mail-pj1-f43.google.com ([209.85.216.43]:53036 "EHLO
+        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230274AbhGCAWq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jul 2021 20:22:46 -0400
+Received: by mail-pj1-f43.google.com with SMTP id kt19so7566161pjb.2;
+        Fri, 02 Jul 2021 17:20:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QuAwprfMJLH9Myf6+yGlAdaCKRGKkTLub7u+xu3B2iA=;
-        b=Ykv+8gYbDOF4Vnf+eK+1+U2KWMttRuRFH88xgg8ZJG+E5+OQHWosldnLQ7lfwkK9NZ
-         IjJBM7mFy49EFtGa7uFqJ1bRczzuIL3M5d/1POUMZUj6eSBdsdomTLMGWofWNTN7nf5P
-         fFQuBEo/z7A6t5pzwkp7FxGr7zF6DQyAsSQ66BrmlpVtCF1HY7ZmLC5Zmm5zhGxHEpM6
-         MkyNyB8WINbsRm0DPSaArWcrM8IS96TPrZpi3oAkxwRZdyZmKuiZu8Fbu2q5wFHjZ6PG
-         MWBlPt97NREJF8iwtSL3tTfTwOvKrMnjhLEcS6k58JPNF+thoOFUURPGe7rqMoGQUYu+
-         zmFQ==
-X-Gm-Message-State: AOAM533C0IsB1eHW61zOnoXYMqilj5ZVFExbJMo5stChRtLRg57c5gnL
-        iMtyHY6r2Ftq85OuToRwFZE=
-X-Google-Smtp-Source: ABdhPJxuamWW6XpIwF2aSEh6z2sWNeloeMGLIlXmKbdaDgxyw58b8EIrQwV2OOpiQ/ybM05cortaiQ==
-X-Received: by 2002:a17:903:31c3:b029:ed:6f74:49c7 with SMTP id v3-20020a17090331c3b02900ed6f7449c7mr1901120ple.12.1625271609082;
-        Fri, 02 Jul 2021 17:20:09 -0700 (PDT)
+        bh=h3OXQEaetOdJQLzJx+iDsq3WrFahatkljOoGHuQVfBQ=;
+        b=cDetE1Xkaj0XzfCCspAqzLPKnVR2D47mqtDApoD4Nwb/ZlWG9IH2P9SlLiFF7/TpuN
+         2MHYHRSAc2/GZd0BD1Ni1aBbbErmEmJXfNcvmkmeGQ2yf5C9hKle+nx9QoIG827t7MXN
+         NnQHLdw8wqjh+qrj+Es7Eyzp1H1m7cNxZA1f//W05t3bvDYRmHUvEdisYDClwUapnCZ0
+         EQwLVau4CPIt/n0iQeFIP5ID6vQIMXaPIH+yN3dhf4VUtkpV2BocGvmpht4qwwXDLWak
+         7Np5cChGTuPyIMtcfecffTAgWRIbAba+ZNBQUrffg72y1dE7l5TM3QZvaq+bo1LnCuJX
+         gdhQ==
+X-Gm-Message-State: AOAM533S5iv0Lm+L5N7kkogrltdgC4LPZbLDE/kdDB/uSMmm5lO/cSKX
+        t7xVyfaGMrlXEMxYjh6/fWg=
+X-Google-Smtp-Source: ABdhPJwPsFpixzje0s2OC+DwGRGE1Hbs6H+K6FI2g/cVOqacjVGW2UIym7Aegj/FVFIIQBSCasKXTg==
+X-Received: by 2002:a17:90a:ad41:: with SMTP id w1mr2072304pjv.223.1625271612031;
+        Fri, 02 Jul 2021 17:20:12 -0700 (PDT)
 Received: from localhost ([191.96.121.144])
-        by smtp.gmail.com with ESMTPSA id d13sm4561995pfn.136.2021.07.02.17.20.06
+        by smtp.gmail.com with ESMTPSA id 1sm5017898pfo.92.2021.07.02.17.20.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Jul 2021 17:20:08 -0700 (PDT)
+        Fri, 02 Jul 2021 17:20:11 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     akpm@linux-foundation.org, minchan@kernel.org,
         gregkh@linuxfoundation.org, jeyu@kernel.org, ngupta@vflare.org,
@@ -48,9 +48,9 @@ Cc:     mcgrof@kernel.org, axboe@kernel.dk, tj@kernel.org, mbenes@suse.com,
         jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
         jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 2/3] zram: fix deadlock with sysfs attribute usage and module removal
-Date:   Fri,  2 Jul 2021 17:19:57 -0700
-Message-Id: <20210703001958.620899-3-mcgrof@kernel.org>
+Subject: [PATCH v6 3/3] zram: use ATTRIBUTE_GROUPS
+Date:   Fri,  2 Jul 2021 17:19:58 -0700
+Message-Id: <20210703001958.620899-4-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210703001958.620899-1-mcgrof@kernel.org>
 References: <20210703001958.620899-1-mcgrof@kernel.org>
@@ -60,302 +60,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When sysfs attributes use a lock also used on module removal we can
-potentially deadlock. This happens when for instance a sysfs file on
-a driver is used, then at the same time we have module removal call
-trigger. The module removal call code holds a lock, and then the sysfs
-file entry waits for the same lock. While holding the lock the module
-removal tries to remove the sysfs entries, but these cannot be removed
-yet as one is waiting for a lock. This won't complete as the lock is
-already held. Likewise module removal cannot complete, and so we deadlock.
-
-To fix this we just *try* to get a refcount to the module when a shared
-lock is used, prior to mucking with a sysfs attribute. If this fails we
-just give up right away.
-
-We use a try method as a full lock means we'd then make our sysfs
-attributes busy us out from possible module removal, and so userspace
-could force denying module removal, a silly form of "DOS" against module
-removal. A try lock on the module removal ensures we give priority to
-module removal and interacting with sysfs attributes only comes second.
-Using a full lock could mean for instance that if you don't stop poking
-at sysfs files you cannot remove a module.
-
-This deadlock was first reported with the zram driver, a sketch of how
-this can happen follows:
-
-CPU A                              CPU B
-                                   whatever_store()
-module_unload
-  mutex_lock(foo)
-                                   mutex_lock(foo)
-   del_gendisk(zram->disk);
-     device_del()
-       device_remove_groups()
-
-In this situation whatever_store() is waiting for the mutex foo to
-become unlocked, but that won't happen until module removal is complete.
-But module removal won't complete until the sysfs file being poked
-completes which is waiting for a lock already held.
-
-This is a generic kernel issue with sysfs files which use any lock also
-used on module removal. Different generic solutions have been proposed.
-One approach proposed is by directly by augmenting attributes with module
-information [0]. This patch implements a solution by adding macros with
-the prefix MODULE_DEVICE_ATTR_*() which accomplish the same. Until we
-don't have a generic agreed upon solution for this shared between drivers,
-we must implement a fix for this on each driver.
-
-We make zram use the new MODULE_DEVICE_ATTR_*() helpers, and completely
-open code the solution for class attributes as there are only a few of
-those.
-
-This issue can be reproduced easily on the zram driver as follows:
-
-Loop 1 on one terminal:
-
-while true;
-	do modprobe zram;
-	modprobe -r zram;
-done
-
-Loop 2 on a second terminal:
-while true; do
-	echo 1024 >  /sys/block/zram0/disksize;
-	echo 1 > /sys/block/zram0/reset;
-done
-
-Without this patch we end up in a deadlock, and the following
-stack trace is produced which hints to us what the issue was:
-
-INFO: task bash:888 blocked for more than 120 seconds.
-      Tainted: G            E 5.12.0-rc1-next-20210304+ #4
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:bash            state:D stack:    0 pid:  888 ppid: 887 flags:<etc>
-Call Trace:
- __schedule+0x2e4/0x900
- schedule+0x46/0xb0
- schedule_preempt_disabled+0xa/0x10
- __mutex_lock.constprop.0+0x2c3/0x490
- ? _kstrtoull+0x35/0xd0
- reset_store+0x6c/0x160 [zram]
- kernfs_fop_write_iter+0x124/0x1b0
- new_sync_write+0x11c/0x1b0
- vfs_write+0x1c2/0x260
- ksys_write+0x5f/0xe0
- do_syscall_64+0x33/0x80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f34f2c3df33
-RSP: 002b:00007ffe751df6e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f34f2c3df33
-RDX: 0000000000000002 RSI: 0000561ccb06ec10 RDI: 0000000000000001
-RBP: 0000561ccb06ec10 R08: 000000000000000a R09: 0000000000000001
-R10: 0000561ccb157590 R11: 0000000000000246 R12: 0000000000000002
-R13: 00007f34f2d0e6a0 R14: 0000000000000002 R15: 00007f34f2d0e8a0
-INFO: task modprobe:1104 can't die for more than 120 seconds.
-task:modprobe        state:D stack:    0 pid: 1104 ppid: 916 flags:<etc>
-Call Trace:
- __schedule+0x2e4/0x900
- schedule+0x46/0xb0
- __kernfs_remove.part.0+0x228/0x2b0
- ? finish_wait+0x80/0x80
- kernfs_remove_by_name_ns+0x50/0x90
- remove_files+0x2b/0x60
- sysfs_remove_group+0x38/0x80
- sysfs_remove_groups+0x29/0x40
- device_remove_attrs+0x4a/0x80
- device_del+0x183/0x3e0
- ? mutex_lock+0xe/0x30
- del_gendisk+0x27a/0x2d0
- zram_remove+0x8a/0xb0 [zram]
- ? hot_remove_store+0xf0/0xf0 [zram]
- zram_remove_cb+0xd/0x10 [zram]
- idr_for_each+0x5e/0xd0
- destroy_devices+0x39/0x6f [zram]
- __do_sys_delete_module+0x190/0x2a0
- do_syscall_64+0x33/0x80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f32adf727d7
-RSP: 002b:00007ffc08bb38a8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-RAX: ffffffffffffffda RBX: 000055eea23cbb10 RCX: 00007f32adf727d7
-RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055eea23cbb78
-RBP: 000055eea23cbb10 R08: 0000000000000000 R09: 0000000000000000
-R10: 00007f32adfe5ac0 R11: 0000000000000206 R12: 000055eea23cbb78
-R13: 0000000000000000 R14: 0000000000000000 R15: 000055eea23cbc20
-
-[0] https://lkml.kernel.org/r/20210401235925.GR4332@42.do-not-panic.com
+Remove boilerplate code and use ATTRIBUTE_GROUPS() to
+simplify the code further. This produces no functional changes
+other than reducing the size of the group name variable.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/zram/zram_drv.c | 47 ++++++++++++++++++------------
- drivers/block/zram/zram_drv.h | 54 +++++++++++++++++++++++++++++++++++
- 2 files changed, 83 insertions(+), 18 deletions(-)
+ drivers/block/zram/zram_drv.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 43d4c9971330..205cf9287d0c 100644
+index 205cf9287d0c..56be6817c5b2 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -1134,12 +1134,12 @@ static ssize_t debug_stat_show(struct device *dev,
- 	return ret;
- }
- 
--static DEVICE_ATTR_RO(io_stat);
--static DEVICE_ATTR_RO(mm_stat);
-+MODULE_DEVICE_ATTR_RO(io_stat);
-+MODULE_DEVICE_ATTR_RO(mm_stat);
- #ifdef CONFIG_ZRAM_WRITEBACK
--static DEVICE_ATTR_RO(bd_stat);
-+MODULE_DEVICE_ATTR_RO(bd_stat);
- #endif
--static DEVICE_ATTR_RO(debug_stat);
-+MODULE_DEVICE_ATTR_RO(debug_stat);
- 
- static void zram_meta_free(struct zram *zram, u64 disksize)
- {
-@@ -1861,20 +1861,20 @@ static const struct block_device_operations zram_wb_devops = {
- 	.owner = THIS_MODULE
+@@ -1902,14 +1902,7 @@ static struct attribute *zram_disk_attrs[] = {
+ 	NULL,
  };
  
--static DEVICE_ATTR_WO(compact);
--static DEVICE_ATTR_RW(disksize);
--static DEVICE_ATTR_RO(initstate);
--static DEVICE_ATTR_WO(reset);
--static DEVICE_ATTR_WO(mem_limit);
--static DEVICE_ATTR_WO(mem_used_max);
--static DEVICE_ATTR_WO(idle);
--static DEVICE_ATTR_RW(max_comp_streams);
--static DEVICE_ATTR_RW(comp_algorithm);
-+MODULE_DEVICE_ATTR_WO(compact);
-+MODULE_DEVICE_ATTR_RW(disksize);
-+MODULE_DEVICE_ATTR_RO(initstate);
-+MODULE_DEVICE_ATTR_WO(reset);
-+MODULE_DEVICE_ATTR_WO(mem_limit);
-+MODULE_DEVICE_ATTR_WO(mem_used_max);
-+MODULE_DEVICE_ATTR_WO(idle);
-+MODULE_DEVICE_ATTR_RW(max_comp_streams);
-+MODULE_DEVICE_ATTR_RW(comp_algorithm);
- #ifdef CONFIG_ZRAM_WRITEBACK
--static DEVICE_ATTR_RW(backing_dev);
--static DEVICE_ATTR_WO(writeback);
--static DEVICE_ATTR_RW(writeback_limit);
--static DEVICE_ATTR_RW(writeback_limit_enable);
-+MODULE_DEVICE_ATTR_RW(backing_dev);
-+MODULE_DEVICE_ATTR_WO(writeback);
-+MODULE_DEVICE_ATTR_RW(writeback_limit);
-+MODULE_DEVICE_ATTR_RW(writeback_limit_enable);
- #endif
+-static const struct attribute_group zram_disk_attr_group = {
+-	.attrs = zram_disk_attrs,
+-};
+-
+-static const struct attribute_group *zram_disk_attr_groups[] = {
+-	&zram_disk_attr_group,
+-	NULL,
+-};
++ATTRIBUTE_GROUPS(zram_disk);
  
- static struct attribute *zram_disk_attrs[] = {
-@@ -2037,13 +2037,19 @@ static ssize_t hot_add_show(struct class *class,
- {
- 	int ret;
+ /*
+  * Allocate and initialize new zram device. the function returns
+@@ -1981,7 +1974,7 @@ static int zram_add(void)
+ 		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
  
-+	if (!try_module_get(THIS_MODULE))
-+		return -ENODEV;
-+
- 	mutex_lock(&zram_index_mutex);
- 	if (!zram_up) {
- 		mutex_unlock(&zram_index_mutex);
--		return -ENODEV;
-+		ret = -ENODEV;
-+		goto out;
- 	}
- 	ret = zram_add();
-+out:
- 	mutex_unlock(&zram_index_mutex);
-+	module_put(THIS_MODULE);
+ 	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, zram->disk->queue);
+-	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
++	device_add_disk(NULL, zram->disk, zram_disk_groups);
  
- 	if (ret < 0)
- 		return ret;
-@@ -2052,6 +2058,7 @@ static ssize_t hot_add_show(struct class *class,
- static struct class_attribute class_attr_hot_add =
- 	__ATTR(hot_add, 0400, hot_add_show, NULL);
+ 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
  
-+#define module_hot_remove_store hot_remove_store
- static ssize_t hot_remove_store(struct class *class,
- 			struct class_attribute *attr,
- 			const char *buf,
-@@ -2067,6 +2074,9 @@ static ssize_t hot_remove_store(struct class *class,
- 	if (dev_id < 0)
- 		return -EINVAL;
- 
-+	if (!try_module_get(THIS_MODULE))
-+		return -ENODEV;
-+
- 	mutex_lock(&zram_index_mutex);
- 
- 	if (!zram_up) {
-@@ -2085,6 +2095,7 @@ static ssize_t hot_remove_store(struct class *class,
- 
- out:
- 	mutex_unlock(&zram_index_mutex);
-+	module_put(THIS_MODULE);
- 	return ret ? ret : count;
- }
- static CLASS_ATTR_WO(hot_remove);
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index 80c3b43b4828..90f6777d7d0a 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -126,4 +126,58 @@ struct zram {
- 	struct dentry *debugfs_dir;
- #endif
- };
-+
-+#undef __ATTR_RO
-+#undef __ATTR_RW
-+#undef __ATTR_WO
-+
-+#define __ATTR_RO(_name) {						\
-+	.attr	= { .name = __stringify(_name), .mode = 0444 },		\
-+	.show	= module_##_name##_show,						\
-+}
-+#define __ATTR_RW(_name) __ATTR(_name, 0644, module_##_name##_show, module_##_name##_store)
-+#define __ATTR_WO(_name) {						\
-+	.attr	= { .name = __stringify(_name), .mode = 0200 },		\
-+	.store	= module_##_name##_store,				\
-+}
-+
-+#define MODULE_DEVICE_ATTR_FUNC_STORE(_name) \
-+static ssize_t module_ ## _name ## _store(struct device *dev, \
-+				   struct device_attribute *attr, \
-+				   const char *buf, size_t len) \
-+{ \
-+	ssize_t __ret; \
-+	if (!try_module_get(THIS_MODULE)) \
-+		return -ENODEV; \
-+	__ret = _name ## _store(dev, attr, buf, len); \
-+	module_put(THIS_MODULE); \
-+	return __ret; \
-+}
-+
-+#define MODULE_DEVICE_ATTR_FUNC_SHOW(_name) \
-+static ssize_t module_ ## _name ## _show(struct device *dev, \
-+					 struct device_attribute *attr, \
-+					 char *buf) \
-+{ \
-+	ssize_t __ret; \
-+	if (!try_module_get(THIS_MODULE)) \
-+		return -ENODEV; \
-+	__ret = _name ## _show(dev, attr, buf); \
-+	module_put(THIS_MODULE); \
-+	return __ret; \
-+}
-+
-+#define MODULE_DEVICE_ATTR_WO(_name) \
-+MODULE_DEVICE_ATTR_FUNC_STORE(_name); \
-+static DEVICE_ATTR_WO(_name)
-+
-+#define MODULE_DEVICE_ATTR_RW(_name) \
-+MODULE_DEVICE_ATTR_FUNC_STORE(_name); \
-+MODULE_DEVICE_ATTR_FUNC_SHOW(_name); \
-+static DEVICE_ATTR_RW(_name)
-+
-+#define MODULE_DEVICE_ATTR_RO(_name) \
-+MODULE_DEVICE_ATTR_FUNC_SHOW(_name); \
-+static DEVICE_ATTR_RO(_name)
-+
- #endif
 -- 
 2.27.0
 
