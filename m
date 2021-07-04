@@ -2,226 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 081BCC07E95
-	for <linux-block@archiver.kernel.org>; Sun,  4 Jul 2021 05:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9142BC07E95
+	for <linux-block@archiver.kernel.org>; Sun,  4 Jul 2021 12:50:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C65746138C
-	for <linux-block@archiver.kernel.org>; Sun,  4 Jul 2021 05:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66B95613E5
+	for <linux-block@archiver.kernel.org>; Sun,  4 Jul 2021 12:50:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229476AbhGDFpV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Jul 2021 01:45:21 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:54980 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbhGDFpV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jul 2021 01:45:21 -0400
-Received: from fsav111.sakura.ne.jp (fsav111.sakura.ne.jp [27.133.134.238])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1645gBnt095379;
-        Sun, 4 Jul 2021 14:42:11 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav111.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp);
- Sun, 04 Jul 2021 14:42:11 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1645gAGt095375
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 4 Jul 2021 14:42:11 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH] loop: reintroduce global lock for safe
- loop_validate_file() traversal
-To:     Arjan van de Ven <arjan@linux.intel.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Petr Vorel <pvorel@suse.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20210702153036.8089-1-penguin-kernel@I-love.SAKURA.ne.jp>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <258f1892-bbbe-67e2-ead9-3287a3d7578b@i-love.sakura.ne.jp>
-Date:   Sun, 4 Jul 2021 14:42:10 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S229532AbhGDMwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Jul 2021 08:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229530AbhGDMwz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jul 2021 08:52:55 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38969C061574;
+        Sun,  4 Jul 2021 05:50:19 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id m41-20020a05600c3b29b02901dcd3733f24so12155624wms.1;
+        Sun, 04 Jul 2021 05:50:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MJlLed1w+/MtdkCkK1NBTk1DZy9w9lQtOOpUJt3r8eI=;
+        b=R5PesJ9PXH7OoGGOd/laFCvdMWq+JgnvY0Fy03J+6u7H5P5Lv+fk9jYDV37aN8B5dr
+         GdB8ZrYPf6PohbYHJ0X/zkLPSNzguCcbsCAkJLCHeQ1v3OTa3rmVgH734U1++Y/6mpX8
+         GbXINKTC025A+lv2RNze6peGoAt1ZfnJFhzVdWlSRcYrVrfyHykojoXGIfoZGGbsD/lR
+         hiZ/iR0ILcE8Bvqemk/JxT/aWfa/OBgLwWYwoMfZazoqaYmgDdpwgM+Z1xzhFH2VvL/J
+         AgOEMK+wTtiHwyuBavJ4K9eu4+S6d1FOUs+PMS1biaKawjtHXmIebdJs/av7VyZX+G3g
+         nuuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MJlLed1w+/MtdkCkK1NBTk1DZy9w9lQtOOpUJt3r8eI=;
+        b=TaxTyZ4GBzyhirPyE2WLcQwH5woZJU+lXXQ3lhVs2AqI2F2iGf3/FY1ObvIPnQcvoi
+         TjANl1q0W5cIt0qzB1kkh6gV6VkQG7CBT/Y7vAZYtsRsR8SrzD1nDd2Do2+bYEeaxeDV
+         HfRfCAT7RtkLKjpBX/yVI9gUyYC5W6lk4zZyavKRWKRUzrMQI1zQ7yigRRblFDgOA8uo
+         VLLeF9T4psFqxrbDxYjPEn8raC/BqjCS8Y40TnDGC+pNZwyGNsr1AWNQF2QzS25jOldr
+         ySBKN7A46uiXkw9qMW6invFfFONa/nr1xR1npfmBwPazPWI99g68xsImZI5ymxEsFdXs
+         ZlPg==
+X-Gm-Message-State: AOAM530NYz44YpQGnOpktJikTqveKBKOp/RxerRy56mjj0lf5PCwQutG
+        xSMgReL80cBg0YEOQvBaflM=
+X-Google-Smtp-Source: ABdhPJwPsT80j7LM+fZzEqxdishZt102hgWLXn7n1A4QMJUo9UV/10NO5K36Q3d624QcVUXO1qtH0w==
+X-Received: by 2002:a1c:1bd4:: with SMTP id b203mr9877799wmb.171.1625403017727;
+        Sun, 04 Jul 2021 05:50:17 -0700 (PDT)
+Received: from masalkhi.fritz.box (dslb-178-005-073-162.178.005.pools.vodafone-ip.de. [178.5.73.162])
+        by smtp.gmail.com with ESMTPSA id o3sm9731947wrw.56.2021.07.04.05.50.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Jul 2021 05:50:17 -0700 (PDT)
+From:   Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+Subject: [PATCH v2] block: Removed a warning while compiling with a cross compiler for parisc
+Date:   Sun,  4 Jul 2021 14:48:27 +0200
+Message-Id: <20210704124826.63468-1-abd.masalkhi@gmail.com>
+X-Mailer: git-send-email 2.29.0.rc1.dirty
 MIME-Version: 1.0
-In-Reply-To: <20210702153036.8089-1-penguin-kernel@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello.
+I have compiled the kernel with a cross compiler "hppa-linux-gnu-" v9.3.0
+on x86-64 host machine. I got the following warning:
 
-On 2021/07/03 0:30, Tetsuo Handa wrote:
-> Commit 6cc8e7430801fa23 ("loop: scale loop device by introducing per
-> device lock") re-opened a race window for NULL pointer dereference at
-> loop_validate_file() where commit 310ca162d779efee ("block/loop: Use
-> global lock for ioctl() operation.") closed.
-> 
-> Although we need to guarantee that other loop devices will not change
-> during traversal, we can't take remote "struct loop_device"->lo_mutex
-> inside loop_validate_file() in order to avoid AB-BA deadlock. Therefore,
-> introduce a global lock dedicated for loop_validate_file() which is
-> conditionally taken before local "struct loop_device"->lo_mutex is taken.
-> 
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Fixes: 6cc8e7430801fa23 ("loop: scale loop device by introducing per device lock")
-> ---
->  drivers/block/loop.c | 138 ++++++++++++++++++++++++++++---------------
->  1 file changed, 89 insertions(+), 49 deletions(-)
-> 
-> This is a submission as a patch based on comments from Christoph Hellwig
-> at https://lkml.kernel.org/r/20210623144130.GA738@lst.de . I don't know
-> this patch can close all race windows.
-> 
-> For example, loop_change_fd() says
-> 
->   This can only work if the loop device is used read-only, and if the
->   new backing store is the same size and type as the old backing store.
-> 
-> and has
-> 
->         /* size of the new backing store needs to be the same */
->         if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
->                 goto out_err;
-> 
-> check. Then, do we also need to apply this global lock for
-> lo_simple_ioctl(LOOP_SET_CAPACITY) path because it changes the size
-> by loop_set_size(lo, get_loop_size(lo, lo->lo_backing_file)) ?
-> How serious if this check is racy?
-> 
-> Any other locations to apply this global lock?
-> 
+block/genhd.c: In function ‘diskstats_show’:
+block/genhd.c:1227:1: warning: the frame size of 1688 bytes is larger
+than 1280 bytes [-Wframe-larger-than=]
+ 1227  |  }
 
-LOOP_CHANGE_FD was introduced in 2.6.5 with the following changelog.
+by Reduced the stack footprint, using new printf specifier to print the
+bdevname and wrapping div_u64 function with non-inline wrapper function,
+the warning was not omitted anymore.
 
-# 04/03/12	akpm@osdl.org	1.1608.83.42
-# [PATCH] LOOP_CHANGE_FD ioctl
-# 
-# From: Arjan van de Ven <arjanv@redhat.com>
-# 
-# The patch below (written by Al Viro) solves a nasty chicken-and-egg issue
-# for operating system installers (well at least anaconda but the problem
-# domain is not exclusive to that)
-# 
-# The basic problem is this:
-# 
-# - The small first stage installer locates the image file of the second
-#   stage installer (which has X and all the graphical stuff); this image can
-#   be on the same CD, but it can come via NFS, http or ftp or ...  as well.
-# 
-# - The first stage installer loop-back mounts this image and gives control
-#   to the second stage installer by calling some binary there.
-# 
-# - The graphical installer then asks the user all those questions and
-#   starts installing packages.  Again the packages can come from the CD but
-#   also from NFS or http or ...
-# 
-# Now in case of a CD install, once all requested packages from the first CD
-# are installed, the installer wants to unmount and eject the CD and prompt
-# the user to put CD 2 in.......  EXCEPT that the unmount can't work since
-# the installer is actually running from a loopback mount of this cd.
-# 
-# The solution is a "LOOP_CHANGE_FD" ioctl, where basically the installer
-# copies the image to the harddisk (which can only be done late since only
-# late the target harddisk is mkfs'd) and then magically switches the backing
-# store FD from underneath the loop device to the one on the target harddisk
-# (and thus unbusying the CD mount).
-# 
-# This is obviously only allowed if the size of the new image is identical
-# and if the loop image is read-only in the first place.  It's the
-# responsibility of root to make sure the contents is the same (but that's of
-# the give-root-enough-rope kind)
+Signed-off-by: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+---
+ block/genhd.c | 37 ++++++++++++++++++++-----------------
+ 1 file changed, 20 insertions(+), 17 deletions(-)
 
-It is not clear why the size of old and new image files need to be the same.
-
-It would be true that the size of old and new image files will not change
-if these are stored in a read-only filesystem (e.g. isofs). But I think that
-the size of new file (obtained by get_loop_size(lo, file)) and
-the size of old file (obtained by get_loop_size(lo, old_file)) can change
-via e.g. truncate() if these files are stored in a read-write filesystem.
-Therefore,
-
-	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
-		goto out_err;
-
-check in loop_change_fd() is racy. When we hit this race, nothing can prevent
-LOOP_CHANGE_FD from succeeding, and I guess that nothing is broken by this race.
-Can we kill this check (like a diff shown below)?
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cc0e8c39a48b..14adb6d5bc07 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -691,8 +691,7 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
-  * a new file. This is useful for operating system installers to free up
-  * the original file and in High Availability environments to switch to
-  * an alternative location for the content in case of server meltdown.
-- * This can only work if the loop device is used read-only, and if the
-- * new backing store is the same size and type as the old backing store.
-+ * This can only work if the loop device is used read-only.
-  */
- static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 			  unsigned int arg)
-@@ -724,12 +723,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+diff --git a/block/genhd.c b/block/genhd.c
+index 9f8cb7beaad1..6d22b84b182b 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1151,6 +1151,11 @@ const struct device_type disk_type = {
+ };
  
- 	old_file = lo->lo_backing_file;
+ #ifdef CONFIG_PROC_FS
++static noinline u64 call_div_u64(u64 dividend, u32 divisor)
++{
++	return div_u64(dividend, divisor);
++}
++
+ /*
+  * aggregate disk stat collector.  Uses the same stats that the sysfs
+  * entries do, above, but makes them available through one seq_file.
+@@ -1162,7 +1167,6 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ {
+ 	struct gendisk *gp = v;
+ 	struct block_device *hd;
+-	char buf[BDEVNAME_SIZE];
+ 	unsigned int inflight;
+ 	struct disk_stats stat;
+ 	unsigned long idx;
+@@ -1185,40 +1189,39 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ 		else
+ 			inflight = part_in_flight(hd);
  
--	error = -EINVAL;
--
--	/* size of the new backing store needs to be the same */
--	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
--		goto out_err;
--
- 	/* and ... switch */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
-
-
-
-Also, does "the loop device is used read-only" check
-
-        /* the loop device has to be read-only */
-        error = -EINVAL;
-        if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
-                goto out_err;
-
-make sense? If it is the responsibility of root to make sure that
-the contents of the old and the new are the same, isn't it as well
-the responsibility of root to use the loop device for read-only?
-Unless there is a reason (i.e. we need this check in order to avoid
-e.g. writeback failure, oops), can we also kill LO_FLAGS_READ_ONLY
-check (like a diff shown below)?
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 14adb6d5bc07..af4ea57a4abb 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -691,7 +691,6 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
-  * a new file. This is useful for operating system installers to free up
-  * the original file and in High Availability environments to switch to
-  * an alternative location for the content in case of server meltdown.
-- * This can only work if the loop device is used read-only.
-  */
- static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 			  unsigned int arg)
-@@ -707,11 +706,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	if (lo->lo_state != Lo_bound)
- 		goto out_err;
- 
--	/* the loop device has to be read-only */
--	error = -EINVAL;
--	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
--		goto out_err;
--
- 	error = -EBADF;
- 	file = fget(arg);
- 	if (!file)
+-		seq_printf(seqf, "%4d %7d %s "
++		seq_printf(seqf, "%4d %7d %pg "
+ 			   "%lu %lu %lu %u "
+ 			   "%lu %lu %lu %u "
+ 			   "%u %u %u "
+ 			   "%lu %lu %lu %u "
+ 			   "%lu %u"
+ 			   "\n",
+-			   MAJOR(hd->bd_dev), MINOR(hd->bd_dev),
+-			   disk_name(gp, hd->bd_partno, buf),
++			   MAJOR(hd->bd_dev), MINOR(hd->bd_dev), gp,
+ 			   stat.ios[STAT_READ],
+ 			   stat.merges[STAT_READ],
+ 			   stat.sectors[STAT_READ],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_READ],
+-							NSEC_PER_MSEC),
++			   (unsigned int)call_div_u64(stat.nsecs[STAT_READ],
++						      NSEC_PER_MSEC),
+ 			   stat.ios[STAT_WRITE],
+ 			   stat.merges[STAT_WRITE],
+ 			   stat.sectors[STAT_WRITE],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_WRITE],
+-							NSEC_PER_MSEC),
++			   (unsigned int)call_div_u64(stat.nsecs[STAT_WRITE],
++						      NSEC_PER_MSEC),
+ 			   inflight,
+ 			   jiffies_to_msecs(stat.io_ticks),
+-			   (unsigned int)div_u64(stat.nsecs[STAT_READ] +
+-						 stat.nsecs[STAT_WRITE] +
+-						 stat.nsecs[STAT_DISCARD] +
+-						 stat.nsecs[STAT_FLUSH],
+-							NSEC_PER_MSEC),
++			   (unsigned int)call_div_u64(stat.nsecs[STAT_READ] +
++						      stat.nsecs[STAT_WRITE] +
++						      stat.nsecs[STAT_DISCARD] +
++						      stat.nsecs[STAT_FLUSH],
++						      NSEC_PER_MSEC),
+ 			   stat.ios[STAT_DISCARD],
+ 			   stat.merges[STAT_DISCARD],
+ 			   stat.sectors[STAT_DISCARD],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_DISCARD],
+-						 NSEC_PER_MSEC),
++			   (unsigned int)call_div_u64(stat.nsecs[STAT_DISCARD],
++						      NSEC_PER_MSEC),
+ 			   stat.ios[STAT_FLUSH],
+-			   (unsigned int)div_u64(stat.nsecs[STAT_FLUSH],
+-						 NSEC_PER_MSEC)
++			   (unsigned int)call_div_u64(stat.nsecs[STAT_FLUSH],
++						      NSEC_PER_MSEC)
+ 			);
+ 	}
+ 	rcu_read_unlock();
+-- 
+2.29.0.rc1.dirty
 
