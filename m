@@ -2,323 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5DEC07E99
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E96C07E99
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 11:27:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7448613E7
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:26:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06798613D8
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 11:27:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230511AbhGEK3f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 06:29:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46107 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230504AbhGEK3f (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jul 2021 06:29:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625480818;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hn8pfomgO0pK1pLJQsbkCNtKcqXVx3AR2wNfde8uERo=;
-        b=C4E+1I79oIHQ/ov7BgHO4/twLOoCMnJQGxqBG0Z/awJBABXD+2Kc4+T2jF7Za7fYgjo906
-        AuwMc51w8zY5/RUT3wgD5/T8lZR30x2rjGdscz9eI32hMGjvCepbtAyhqlkrgi0dLc+lpj
-        M7UBqCTKBlF4ZjJb8mdblzii4r4Z7gY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-G6fjmY5vPFqhIotmfQpqyA-1; Mon, 05 Jul 2021 06:26:56 -0400
-X-MC-Unique: G6fjmY5vPFqhIotmfQpqyA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6CF7100B3AC;
-        Mon,  5 Jul 2021 10:26:55 +0000 (UTC)
-Received: from localhost (ovpn-13-193.pek2.redhat.com [10.72.13.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C832217C5F;
-        Mon,  5 Jul 2021 10:26:54 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>
-Subject: [PATCH 6/6] loop: don't add worker into idle list
-Date:   Mon,  5 Jul 2021 18:26:07 +0800
-Message-Id: <20210705102607.127810-7-ming.lei@redhat.com>
-In-Reply-To: <20210705102607.127810-1-ming.lei@redhat.com>
-References: <20210705102607.127810-1-ming.lei@redhat.com>
+        id S231191AbhGEL3h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 07:29:37 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:52599 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230459AbhGEL3h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jul 2021 07:29:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1625484419; x=1657020419;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=c3lQ8j6nNTlDdeqHpquvIS0nWk1GuLRVt9VursybDV0=;
+  b=Q0CKfjtoLTmwZw3rmK90xhw/NMid0e+V8tJIr2fEzwgscRKHGTqY8gcF
+   9h/ogPtHzQrDNebd7gpY4MKEkBshQgFqwFxn8fV1v0mnhOtEfPR7qdCxR
+   XTb0jqJIXpEwE7uTyVStb6rSuvcYxTLHP3dXNXkYxTgYeWMvdEPG2vjgI
+   fb0LRK/Q61Aa68nxuHjMQL/UeKyUne/37TWL25vxJv1RuO6bNUATAfDHA
+   3FB+3+c2OSp1BbD8iL8exvD5n+N85rdE3a5nYtsZpWbub5cpDhT8f6kka
+   Ag4vNoTSbduypTp+uxLrWMUwLq/mgfW8WnqwXC84xWvYFLO/LPZAspMtH
+   Q==;
+IronPort-SDR: n1LOQip4dBypxwGW5BdHUgC+bcSri2icY4HYruPdWmjfLatGufKiYs4GUpEe3TGjWgkJ8JzLh5
+ Yv+8JjO/WGQhrmro1I3rn1R2jnoKiawCagXnk3ZMNcQwbSVk3mJaIyNWiwdIOdUIpLMVonJQ2s
+ emlcC3gnTQwoKCxj+Jeor+f7W8g2T6DOyMbakwGdLJNHwQoutFnC39KubsqRUgoIuqZcepLO0Y
+ tz2Vrnp/fx7wmzxUuCVGv85fvGZAExScNPM1aMPAjuTdJMEuYuLvSoudv/gCllJyLIOUhkkuXo
+ 570=
+X-IronPort-AV: E=Sophos;i="5.83,325,1616428800"; 
+   d="scan'208";a="173729532"
+Received: from mail-mw2nam12lp2049.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.49])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Jul 2021 19:26:58 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gBlgNy/7BochTxkIoNfoTAti8pqTZZjHi20LYh2LiPQ7j7HL7mAH1aVkKIQ7nZRwPV07qnpCZx7r2C/UtxdoQXoVhZASkD/nHDdVpmrnFCG7JdCA/Zb4lR7o4qQnkjvhO5rRhbDWhWgXoGwGhE4aADJUb4W4ZP3cjh42E35ZAxS8yjA5wrB6M3G0p1/I/qTEQqvZqDGVsq7fgsiA9rzHZAblm85LvPsXpSqTNhoFhmVdqqWxC+jEEaN/hsMlhU5SYlWLrGMHpGEREREjtI7XXTrTVpWe4pkrn/yB8ovIxmKRT055gXh9nYcno4x4q6In+5OTb4lf53KsljfGB6BAvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZjmJGcXDaeaTiDH3PlcBMSSgBf81jnv1CgTYfRx7Ezk=;
+ b=iiBUJLGqsN5+LIazJXrups1C4ZcalQyq+9lD0C8Yh2+P7FNzBiKvGWX4oWxi9HHr47MFT2sHWDUPP/N1VNpxYYLqnas+B6pJc9dMMeTm4uMdb/9yyeLogLuS6y068P5f5umYGTf0aULcrLom5n53Qha/qeZkpqpzIOUCaRzbJ4D9IgQvqLKK/rG27JTirWyYxaPaKMblwTvehmRZyfirLMPjYl9rSiBm/FtP8IryK1jDZ52JPGBb80HYwWnyTVSTr/Y330Pb3200k/rJ/zr6yObMoz2mJDgSXFy7+9uALe5LwhGCTiplhJh7zkXJTSzni5kKVMzykoZ57b2qLye7LQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZjmJGcXDaeaTiDH3PlcBMSSgBf81jnv1CgTYfRx7Ezk=;
+ b=hh+y/m09qcBYYxWYlkW8o/kcG6ThmsGHGCNhJLkBJsQ5AbBPIh/YKqimA2P4LpXe0nyyplDCEVcVaOeEunKVHyE3VIpQaCr00Q4VPWMOF5U7Axx5Eyn/8XfLy1MCUJSqkE/2eaHrRMXH5Z3IgQziR6bSdzL3LxyWttw3ZK2qJqc=
+Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
+ by PH0PR04MB7206.namprd04.prod.outlook.com (2603:10b6:510:1b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.20; Mon, 5 Jul
+ 2021 11:26:57 +0000
+Received: from PH0PR04MB7158.namprd04.prod.outlook.com
+ ([fe80::e88b:8b03:d4cf:fdec]) by PH0PR04MB7158.namprd04.prod.outlook.com
+ ([fe80::e88b:8b03:d4cf:fdec%5]) with mapi id 15.20.4287.033; Mon, 5 Jul 2021
+ 11:26:57 +0000
+From:   Niklas Cassel <Niklas.Cassel@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 0/2] allow blk-zoned ioctls without CAP_SYS_ADMIN
+Thread-Topic: [PATCH v3 0/2] allow blk-zoned ioctls without CAP_SYS_ADMIN
+Thread-Index: AQHXYRgPtP8+uBs1gU68gsGoV+YyFqspGeKAgAtFQAA=
+Date:   Mon, 5 Jul 2021 11:26:57 +0000
+Message-ID: <YOLsgFzIBlg/H/ba@x1-carbon.lan>
+References: <20210614122303.154378-1-Niklas.Cassel@wdc.com>
+ <YNl4LXUKOftl15M9@x1-carbon.lan>
+In-Reply-To: <YNl4LXUKOftl15M9@x1-carbon.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.dk; dkim=none (message not signed)
+ header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [85.226.244.4]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b45d7716-6228-4483-bc7d-08d93fa7ccc4
+x-ms-traffictypediagnostic: PH0PR04MB7206:
+x-microsoft-antispam-prvs: <PH0PR04MB720624512060AB0712A290CCF21C9@PH0PR04MB7206.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: WTbhErMee/PxPT+pYA00ivJiph5/C6cGEWYOpFG1ExP5meihwDYzAhNi0LPFhM+8tV30mnrE2+UVyqK4B6/kDUJd8Buh8E3eir9Flpt2gn2aw1UBsf7JF7k02gHbG4VsmGUr+Yp/tUkXNz/sssTpkbrRgpgkWf/2ZP0ne7Q/4UQc1Usxi0YAdxBvDpN9XVXWSB8xHiLIpjxEgZ2NnVIGsdc0RhIAIuUWiLyh5KKrAv+rVOiQgBfbNb9/WKmlhUjtebr3uiTZvS64zem/Q0EccHGb1VMEdXMBOikxad2su24sdAORAhBCsMRmiIkhqDvEPtGSkpOpsA1nIDRhXjuChJ8TjJmlYeVTdexl6lHUsYvU3mOaTm8ejp011r7DyOZcu5boIYWCugIxlRqPkaJaMmbJOMwbPSkZrh4V0APSH74w0cd1BUNpIHaQvUw2YipaAsKErWjpCsCo3DAOT0By+mz4c+GHGaUc8d9qVFD+7fE0Cvadiv9kRiUeLzFqmGBnHG2ugFpitFbKKvENa7ex0DTAw2SK/IIkOcf/ajGZ3UwzPqp5wf2ee2MxNWMM4j5huo2ETq+jobXi3gMx78+nPtSm8Kq6mvlgDH8McBHIoTnjJeYHrIe+c1JZi6KnjnRJjqhfwY36CC+F3AaSdB/YYQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(39860400002)(396003)(346002)(136003)(478600001)(110136005)(316002)(54906003)(2906002)(66556008)(64756008)(66476007)(66446008)(76116006)(6486002)(83380400001)(91956017)(71200400001)(4326008)(66946007)(8936002)(5660300002)(9686003)(8676002)(186003)(122000001)(38100700002)(36756003)(26005)(6506007)(86362001)(6512007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?W4TdHC4f8PiZZse0F/sE+llXz5ZcWIVc5wFZwZXfR3bgQsDs4ecZt/n0xrEX?=
+ =?us-ascii?Q?0p43GvJ0JPVVjOrR0n074nTHK0IPYcJPW34wK81Lw9kKl2GfBayhxayPagsi?=
+ =?us-ascii?Q?4pIvw3xLbHlGMyrfUKhO3q4+VMHQOUF/LhMzymeTzjDoTYWhSBS/29lEOwME?=
+ =?us-ascii?Q?iwZja4VE77CAuonO38xMk6uupB8r0QM1FXSr1uuyuf6S6uVjkkHlfhs1BEBc?=
+ =?us-ascii?Q?nR2Nf1jpBOiinYxyraifGW3p0CjfGY+zMHHiLCnN+3x2cWyuvYkRrhH54rQQ?=
+ =?us-ascii?Q?tb3UC9akenkOlrTuagZ4x0YAx60bIPbH7nY208dxokqCv9v8Tl3vUr+EJM5W?=
+ =?us-ascii?Q?0gAz1GS+JYyii51e/wzY2guWBftEi6BIHbtcBNHMjjT/t8meYDYH5+fDmzbB?=
+ =?us-ascii?Q?M4qh0lNJrvAs0uGHL0hIt+Akmpw4t+nw8IY7uvDtlV5JFq7rh5/JSBibONtu?=
+ =?us-ascii?Q?AivlIVEx+jiD/X0sQlfgmLlOcaFe6307SAUBHlV8whMT8jVsDDP3XwV3pGUE?=
+ =?us-ascii?Q?5fnRkw7NWmpGl/rFLf9MU/7Ms6ivn3icc5z6rfWC1LKueB21Zv/tWCa7cORz?=
+ =?us-ascii?Q?WiN5KNZAaD/jTI7dzVyANl/S+3/V61wL8KsgPUqJ9voAWRMrzsysbzfQzXvX?=
+ =?us-ascii?Q?OUC7proud3GiqEs/Tp9LxZMqwPJqSHhmBVKAG6ijYD+/WnMZL6PoX0Ht2yL2?=
+ =?us-ascii?Q?txHHCUrRsQjhvI6ECbzAV0a0xYwUMrn0yAnWuVd4phhiasfSQKqYcxWXcJ8O?=
+ =?us-ascii?Q?FbC+wUuCK/1EJobg8ECO0YGiB9J0R+6Thrwz/tDoADdXfS+vgjImWhTE0NIc?=
+ =?us-ascii?Q?Ysu3YMpZS5nCGcbpcoy31RYQMvZtwIYOrpxQ/TuKepp+TcL2CVB5waeqiFup?=
+ =?us-ascii?Q?sandD5LTFDIRMpUf6TIoNokw4M9VZXBV/4mvm2xtu317V39PcFZ/s8y4y1oP?=
+ =?us-ascii?Q?ktsZLG48P6oZ0ELBTOHTAffaCc3qY1mM9juq0p+eNUTWaEjtUcAM4ephmBHX?=
+ =?us-ascii?Q?RxGmFvZcZi64HcTH2R4mYrdIRzHRwHdvBF7Hv0laD/EPdJzmR5T1U4W6juxX?=
+ =?us-ascii?Q?UYl7xmKJUz2qfyY3kiOxSbuuygpjUOpsQkPBnor0rctMl4JbRGKaLlcUz/Ss?=
+ =?us-ascii?Q?T9rV6gQNGuvIZ+LQjPOsUzt3bnZ6bfhqGq7xqGn26FaO2hZ+VhA/ZoYxh8vl?=
+ =?us-ascii?Q?39+CRF/23kmo62NrJ+DzgW1ko6qfJaViloUam2iX9QHLx1fGppWbd6EWnPir?=
+ =?us-ascii?Q?DcY7T2daKzZ1Adz9mOGlLEgNFdgRWhW0jCVt6EYUyAGjUqJO9IP/nZgyVc62?=
+ =?us-ascii?Q?AcP2cuv0DAX1xsiAgBKfPQEl?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <C26826195C8A354FB35F3132B649D0D5@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b45d7716-6228-4483-bc7d-08d93fa7ccc4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jul 2021 11:26:57.6193
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ++tTNESfz59NV+ZUya6E+TYeCvO56RDW2v0zSjjstWqmo78niWvQZwT0m5VHJB58rLaF7+ltmIZ4WZzc3EXYUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7206
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We can retrieve any workers via xarray, so not add it into idle list.
-Meantime reduce .lo_work_lock coverage, especially we don't need that
-in IO path except for adding/deleting worker into xarray.
+On Mon, Jun 28, 2021 at 09:20:15AM +0200, Niklas Cassel wrote:
+> On Mon, Jun 14, 2021 at 12:23:19PM +0000, Niklas Cassel wrote:
+> > From: Niklas Cassel <niklas.cassel@wdc.com>
+> >=20
+> > Allow the following blk-zoned ioctls: BLKREPORTZONE, BLKRESETZONE,
+> > BLKOPENZONE, BLKCLOSEZONE, and BLKFINISHZONE to be performed without
+> > CAP_SYS_ADMIN.
+> >=20
+> > Neither read() nor write() requires CAP_SYS_ADMIN, and considering
+> > the close relationship between read()/write() and these ioctls, there
+> > is no reason to require CAP_SYS_ADMIN for these ioctls either.
+> >=20
+> > Changes since v2:
+> > -Drop the FMODE_READ check from patch 2/2.
+> > Right now it is possible to open() the device with O_WRONLY
+> > and get the zone report from that fd. Therefore adding a
+> > FMODE_READ check on BLKREPORTZONE would break existing applications.
+> > Instead, just remove the existing CAP_SYS_ADMIN check.
+> >=20
+> >=20
+> > Niklas Cassel (2):
+> >   blk-zoned: allow zone management send operations without CAP_SYS_ADMI=
+N
+> >   blk-zoned: allow BLKREPORTZONE without CAP_SYS_ADMIN
+> >=20
+> >  block/blk-zoned.c | 6 ------
+> >  1 file changed, 6 deletions(-)
+> >=20
+> > --=20
+> > 2.31.1
+>=20
+> Hello Jens,
+>=20
+>=20
+> A gentle ping on this series.
+>=20
+> I think it has sufficient Reviewed-by tags by now.
+>=20
+>=20
+> Kind regards,
+> Niklas
 
-Also simplify code a bit.
+Hello again Jens,
 
-Cc: Michal Koutný <mkoutny@suse.com>
-Cc: Dan Schatzberg <schatzberg.dan@gmail.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 138 ++++++++++++++++++++++++++-----------------
- 1 file changed, 84 insertions(+), 54 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 6e9725521330..146eaa03629b 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -920,10 +920,11 @@ static void loop_config_discard(struct loop_device *lo)
- struct loop_worker {
- 	struct work_struct work;
- 	struct list_head cmd_list;
--	struct list_head idle_list;
- 	struct loop_device *lo;
- 	struct cgroup_subsys_state *blkcg_css;
- 	unsigned long last_ran_at;
-+	spinlock_t lock;
-+	refcount_t refcnt;
- };
- 
- static void loop_workfn(struct work_struct *work);
-@@ -941,13 +942,56 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
- }
- #endif
- 
-+static struct loop_worker *loop_alloc_or_get_worker(struct loop_device *lo,
-+		struct cgroup_subsys_state *blkcg_css)
-+{
-+	gfp_t gfp = GFP_NOWAIT | __GFP_NOWARN;
-+	struct loop_worker *worker = kzalloc(sizeof(*worker), gfp);
-+	struct loop_worker *worker_old;
-+
-+	if (!worker)
-+		return NULL;
-+
-+	worker->blkcg_css = blkcg_css;
-+	INIT_WORK(&worker->work, loop_workfn);
-+	INIT_LIST_HEAD(&worker->cmd_list);
-+	worker->lo = lo;
-+	spin_lock_init(&worker->lock);
-+	refcount_set(&worker->refcnt, 2);	/* INIT + INC */
-+
-+	spin_lock(&lo->lo_work_lock);
-+	/* maybe someone is storing a new worker */
-+	worker_old = xa_load(&lo->workers, blkcg_css->id);
-+	if (!worker_old || !refcount_inc_not_zero(&worker_old->refcnt)) {
-+		if (xa_err(xa_store(&lo->workers, blkcg_css->id, worker, gfp))) {
-+			kfree(worker);
-+			worker = NULL;
-+		} else {
-+			css_get(worker->blkcg_css);
-+		}
-+	} else {
-+		kfree(worker);
-+		worker = worker_old;
-+	}
-+	spin_unlock(&lo->lo_work_lock);
-+
-+	return worker;
-+}
-+
-+static void loop_release_worker(struct loop_worker *worker)
-+{
-+	xa_erase(&worker->lo->workers, worker->blkcg_css->id);
-+	css_put(worker->blkcg_css);
-+	kfree(worker);
-+}
-+
- static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- {
- 	struct loop_worker *worker = NULL;
- 	struct work_struct *work;
- 	struct list_head *cmd_list;
- 	struct cgroup_subsys_state *blkcg_css = NULL;
--	gfp_t gfp = GFP_NOWAIT | __GFP_NOWARN;
-+	spinlock_t	*lock;
- #ifdef CONFIG_BLK_CGROUP
- 	struct request *rq = blk_mq_rq_from_pdu(cmd);
- 
-@@ -955,54 +999,38 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 		blkcg_css = &bio_blkcg(rq->bio)->css;
- #endif
- 
--	spin_lock(&lo->lo_work_lock);
--
--	if (queue_on_root_worker(blkcg_css))
--		goto queue_work;
--
--	/* css->id is unique in each cgroup subsystem */
--	worker = xa_load(&lo->workers, blkcg_css->id);
--	if (worker)
--		goto queue_work;
--
--	worker = kzalloc(sizeof(*worker), gfp);
--	/*
--	 * In the event we cannot allocate a worker, just queue on the
--	 * rootcg worker and issue the I/O as the rootcg
--	 */
--	if (!worker)
--		goto queue_work;
-+	if (!queue_on_root_worker(blkcg_css)) {
-+		int ret = 0;
- 
--	worker->blkcg_css = blkcg_css;
--	css_get(worker->blkcg_css);
--	INIT_WORK(&worker->work, loop_workfn);
--	INIT_LIST_HEAD(&worker->cmd_list);
--	INIT_LIST_HEAD(&worker->idle_list);
--	worker->lo = lo;
-+		rcu_read_lock();
-+		/* css->id is unique in each cgroup subsystem */
-+		worker = xa_load(&lo->workers, blkcg_css->id);
-+		if (worker)
-+			ret = refcount_inc_not_zero(&worker->refcnt);
-+		rcu_read_unlock();
- 
--	if (xa_err(xa_store(&lo->workers, blkcg_css->id, worker, gfp))) {
--		kfree(worker);
--		worker = NULL;
-+		if (!worker || !ret)
-+			worker = loop_alloc_or_get_worker(lo, blkcg_css);
-+		/*
-+		 * In the event we cannot allocate a worker, just queue on the
-+		 * rootcg worker and issue the I/O as the rootcg
-+		 */
- 	}
- 
--queue_work:
- 	if (worker) {
--		/*
--		 * We need to remove from the idle list here while
--		 * holding the lock so that the idle timer doesn't
--		 * free the worker
--		 */
--		if (!list_empty(&worker->idle_list))
--			list_del_init(&worker->idle_list);
- 		work = &worker->work;
- 		cmd_list = &worker->cmd_list;
-+		lock = &worker->lock;
- 	} else {
- 		work = &lo->rootcg_work;
- 		cmd_list = &lo->rootcg_cmd_list;
-+		lock = &lo->lo_work_lock;
- 	}
-+
-+	spin_lock(lock);
- 	list_add_tail(&cmd->list_entry, cmd_list);
-+	spin_unlock(lock);
- 	queue_work(lo->workqueue, work);
--	spin_unlock(&lo->lo_work_lock);
- }
- 
- static void loop_update_rotational(struct loop_device *lo)
-@@ -1131,20 +1159,18 @@ static void loop_set_timer(struct loop_device *lo)
- 
- static void __loop_free_idle_workers(struct loop_device *lo, bool force)
- {
--	struct loop_worker *pos, *worker;
-+	struct loop_worker *worker;
-+	unsigned long id;
- 
- 	spin_lock(&lo->lo_work_lock);
--	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
--				idle_list) {
-+	xa_for_each(&lo->workers, id, worker) {
- 		if (!force && time_is_after_jiffies(worker->last_ran_at +
- 						LOOP_IDLE_WORKER_TIMEOUT))
- 			break;
--		list_del(&worker->idle_list);
--		xa_erase(&lo->workers, worker->blkcg_css->id);
--		css_put(worker->blkcg_css);
--		kfree(worker);
-+		if (refcount_dec_and_test(&worker->refcnt))
-+			loop_release_worker(worker);
- 	}
--	if (!list_empty(&lo->idle_worker_list))
-+	if (!xa_empty(&lo->workers))
- 		loop_set_timer(lo);
- 	spin_unlock(&lo->lo_work_lock);
- }
-@@ -2148,27 +2174,29 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- }
- 
- static void loop_process_work(struct loop_worker *worker,
--			struct list_head *cmd_list, struct loop_device *lo)
-+			struct list_head *cmd_list, spinlock_t *lock)
- {
- 	int orig_flags = current->flags;
- 	struct loop_cmd *cmd;
- 	LIST_HEAD(list);
-+	int cnt = 0;
- 
- 	current->flags |= PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
- 
--	spin_lock(&lo->lo_work_lock);
-+	spin_lock(lock);
-  again:
- 	list_splice_init(cmd_list, &list);
--	spin_unlock(&lo->lo_work_lock);
-+	spin_unlock(lock);
- 
- 	while (!list_empty(&list)) {
- 		cmd = list_first_entry(&list, struct loop_cmd, list_entry);
- 		list_del_init(&cmd->list_entry);
- 
- 		loop_handle_cmd(cmd);
-+		cnt++;
- 	}
- 
--	spin_lock(&lo->lo_work_lock);
-+	spin_lock(lock);
- 	if (!list_empty(cmd_list))
- 		goto again;
- 
-@@ -2179,11 +2207,13 @@ static void loop_process_work(struct loop_worker *worker,
- 	 */
- 	if (worker && !work_pending(&worker->work)) {
- 		worker->last_ran_at = jiffies;
--		list_add_tail(&worker->idle_list, &lo->idle_worker_list);
--		loop_set_timer(lo);
-+		loop_set_timer(worker->lo);
- 	}
--	spin_unlock(&lo->lo_work_lock);
-+	spin_unlock(lock);
- 	current->flags = orig_flags;
-+
-+	if (worker && refcount_sub_and_test(cnt, &worker->refcnt))
-+		loop_release_worker(worker);
- }
- 
- static void loop_workfn(struct work_struct *work)
-@@ -2202,7 +2232,7 @@ static void loop_workfn(struct work_struct *work)
- 		old_memcg = set_active_memcg(
- 				mem_cgroup_from_css(memcg_css));
- 
--	loop_process_work(worker, &worker->cmd_list, worker->lo);
-+	loop_process_work(worker, &worker->cmd_list, &worker->lock);
- 
- 	kthread_associate_blkcg(NULL);
- 	if (memcg_css) {
-@@ -2215,7 +2245,7 @@ static void loop_rootcg_workfn(struct work_struct *work)
- {
- 	struct loop_device *lo =
- 		container_of(work, struct loop_device, rootcg_work);
--	loop_process_work(NULL, &lo->rootcg_cmd_list, lo);
-+	loop_process_work(NULL, &lo->rootcg_cmd_list, &lo->lo_work_lock);
- }
- 
- static const struct blk_mq_ops loop_mq_ops = {
--- 
-2.31.1
+any chance of this series being picked up?
 
+
+Kind regards,
+Niklas=
