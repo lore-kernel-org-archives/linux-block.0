@@ -2,106 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DD9C07E99
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 09:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BABC07E99
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:01:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B57B61375
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 09:56:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D925613C1
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230355AbhGEJ6p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 05:58:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48139 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230291AbhGEJ6o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jul 2021 05:58:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625478967;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PeaDOEsW8hmBgMT8bkDyX/sakYJ1dxNWFoVs9+ntx2c=;
-        b=EHT5yft9tINrEnnYGs5OShjjflMgW+O+Z6nxWnYuoNfWNSfQI+NQpmUU2leVraSL4IBTbp
-        SkqWzEg9IeueAJR92idkCRvNgmCtoG25LNOhtDMm3D2m9srTJYR/EbwfipdthjWJjkT1qJ
-        Q5MCz8q/ILBK3s+xnF0pKk9mphZw3jI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-L6ETD3HBN4mQzsy7WT4bmg-1; Mon, 05 Jul 2021 05:56:06 -0400
-X-MC-Unique: L6ETD3HBN4mQzsy7WT4bmg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0BA5802E29;
-        Mon,  5 Jul 2021 09:56:03 +0000 (UTC)
-Received: from T590 (ovpn-13-193.pek2.redhat.com [10.72.13.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D32B42EB04;
-        Mon,  5 Jul 2021 09:55:54 +0000 (UTC)
-Date:   Mon, 5 Jul 2021 17:55:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Subject: Re: [PATCH V2 3/6] scsi: add flag of .use_managed_irq to 'struct
- Scsi_Host'
-Message-ID: <YOLXJZF7wo/IiFMU@T590>
-References: <20210702150555.2401722-1-ming.lei@redhat.com>
- <20210702150555.2401722-4-ming.lei@redhat.com>
- <47fc5ed1-29e3-9226-a111-26c271cb6d90@huawei.com>
+        id S230050AbhGEKDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 06:03:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49012 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230000AbhGEKDj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jul 2021 06:03:39 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97E76C061760
+        for <linux-block@vger.kernel.org>; Mon,  5 Jul 2021 03:01:02 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id q91so11425435pjk.3
+        for <linux-block@vger.kernel.org>; Mon, 05 Jul 2021 03:01:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zPOrmC1RXgcNJnX31Ibadv5UuQd9PEZ0WGKKpWH0dQY=;
+        b=CecTSE6KZsVLTnN0u8fmrWPe/xgLjU6zHobrJl+2rjWm7HX3HMGsn6A+uDgr0+mbC1
+         NbfpMp9kQ3BkLhDtsFYhR8DjNIn6svn2+Ei2OheU4ZlrCkprEhA5GuHR/2ocyuaToFGJ
+         +tppQnF9dPsY2Crq5b63AaeLMEQbpYbQJEodIg08UHnejItxDI6twSiyNGIehK2naIgC
+         7LErc8V5x5EKE2SX3VrY3r80u2XIL8yJsS3ET5vNfdHuBTOZw+I9JUDryPf5+RqFW4uz
+         J9DLwifnNrUDktJjG3cbx5UNGbKxN168793V0DrnCYA1LizlAvCAqwkbC1Q9xwBkCkOP
+         s2BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zPOrmC1RXgcNJnX31Ibadv5UuQd9PEZ0WGKKpWH0dQY=;
+        b=O1yKjl0e5rzuSpiiSHb3QHiULv26ZkCCkOf74XMwS/kP2f+o8k2tJZwgqnen/RvmtU
+         GzTt+UnIq4ucyjiatTy0gWwkF0lXV/dLYZqu6oimlLp1Fs/V57qHbEE5bXZDcNjslAtE
+         JGYYE8TcbXtv7zjK0duos+8HLZl1LgFYYa3keYyM2RkJw9YIj79YC26foCKu09NuZcaP
+         OAk5ncP7O4XDMf33SfyryWbYx5YMKHREyBewPwkQwBde0nYB8edMdVNrBwyh70Tcy1qf
+         5SyPc8tK6vA4jVTRzNxJmrZFOBU9Dtq6CjJhKiMEHuFNBdM1UcqzPBNJGDqMflf89xKu
+         OJqw==
+X-Gm-Message-State: AOAM533pEhyPe6YXgAt1WdluQJMw1r7emM8X/fbNZkBKeerdjFKCUO2Q
+        ihRRf9sh3QIrVQCOyr/9z8XV
+X-Google-Smtp-Source: ABdhPJzHbop2tIyt7b+CLnVYCy4yRROCsyMt4bNGBhnLwAxog31fNWlijaENvAL2w0znsqFJHNBCVw==
+X-Received: by 2002:a17:90b:198a:: with SMTP id mv10mr14686315pjb.67.1625479262030;
+        Mon, 05 Jul 2021 03:01:02 -0700 (PDT)
+Received: from localhost ([139.177.225.237])
+        by smtp.gmail.com with ESMTPSA id s6sm1287849pjp.45.2021.07.05.03.01.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jul 2021 03:01:01 -0700 (PDT)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        axboe@kernel.dk
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v4] virtio-blk: Add validation for block size in config space
+Date:   Mon,  5 Jul 2021 18:00:06 +0800
+Message-Id: <20210705100006.90-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <47fc5ed1-29e3-9226-a111-26c271cb6d90@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 05, 2021 at 10:25:38AM +0100, John Garry wrote:
-> On 02/07/2021 16:05, Ming Lei wrote:
-> > blk-mq needs this information of using managed irq for improving
-> > deactivating hctx, so add such flag to 'struct Scsi_Host', then
-> > drivers can pass such flag to blk-mq via scsi_mq_setup_tags().
-> > 
-> > The rule is that driver has to tell blk-mq if managed irq is used.
-> > 
-> > Signed-off-by: Ming Lei<ming.lei@redhat.com>
-> 
-> As was said before, can we have something like this instead of relying on
-> the LLDs to do the setting:
-> 
-> --------->8------------
-> 
-> diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
-> index b595a94c4d16..2037a5b69fe1 100644
-> --- a/block/blk-mq-pci.c
-> +++ b/block/blk-mq-pci.c
-> @@ -37,7 +37,7 @@ int blk_mq_pci_map_queues(struct blk_mq_queue_map *qmap,
-> struct pci_dev *pdev,
->  		for_each_cpu(cpu, mask)
->  			qmap->mq_map[cpu] = qmap->queue_offset + queue;
->  	}
-> -
-> +	qmap->drain_hwq = 1;
+This ensures that we will not use an invalid block size
+in config space (might come from an untrusted device).
 
-The thing is that blk_mq_pci_map_queues() is allowed to be called for
-non-managed irqs. Also some managed irq consumers don't use blk_mq_pci_map_queues().
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+---
+ drivers/block/virtio_blk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So this way just provides hint about managed irq uses, but we really
-need to get this flag set if driver uses managed irq.
-
-
-Thanks,
-Ming
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index e4bd3b1fc3c2..e9d7747c3cc0 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -819,7 +819,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
+ 				   struct virtio_blk_config, blk_size,
+ 				   &blk_size);
+-	if (!err)
++	if (!err && blk_size >= SECTOR_SIZE && blk_size <= PAGE_SIZE)
+ 		blk_queue_logical_block_size(q, blk_size);
+ 	else
+ 		blk_size = queue_logical_block_size(q);
+-- 
+2.11.0
 
