@@ -4,45 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30EA2C07E9E
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A51C11F68
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:29:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F4CE619B1
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:29:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 826376199E
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232213AbhGEPbp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 11:31:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56354 "EHLO mail.kernel.org"
+        id S232312AbhGEPcW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 11:32:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57322 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232091AbhGEPbe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jul 2021 11:31:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DA00661999;
-        Mon,  5 Jul 2021 15:28:52 +0000 (UTC)
+        id S232109AbhGEPcG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Jul 2021 11:32:06 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 06EB060C41;
+        Mon,  5 Jul 2021 15:29:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625498933;
-        bh=hEXybyKNzNQh9GIrfXSwiHb+N8bB+QE1nn7cGPVvTAw=;
+        s=k20201202; t=1625498969;
+        bh=bccp645aujecKzLmZ40TEEhYxumqpjgAlRaLXzSLYvg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=j6LKAHP6n0wILXxxFk22Z3GRXj/WwBulBAlc7wDTIgIRHuKyer7HtDUrfLQPcFv0D
-         klBsz12bfrXqIbeEgFKVoFVKQbkTp83rRB2nURzqdZ89M+hG2HT2bvoLaU8uUGKmMT
-         7IohRprSdN+uF/AvpnRg5CopBanWSzlhImTQh3zo2ssXt85FROsJ2mkPbmx3/xCq7z
-         qm3hr+T1lRk/kVGx3e43wIJkMAFgfoyxlTSIlD7mv+o5bV3vH7PE92tlPe0ZCSBSvF
-         HFYLxQKI+BC8i4Ra/iK4th88gC+OuO1i/GVQhZrmTW/7UABnb4rGipBA2bewVt6D86
-         m6qU5aeeteisA==
+        b=BUUE93dRPvrznI0hf9QiScCO9yc9UorPZ7s/sty04OHEmIUhu9gmlUPmukKU0eIvw
+         N0oJAyhUDOicCIiTj/Uzk7WB6FDeXc8/arDpqld1zT+/tYnkB3L8gFR5ZU5tNaL1kY
+         VJf7FEGN3+s1LIERbfWuQrD9arM89GqETH+VthX0En35CVwanXAP31J6Q7PjRtnrEE
+         1JR+Wtdq3AeDaJ+5ul9MkVzzg4fqHHLjAHETQbKIJY88EZB9V3MpQioak0ACOnyD2C
+         QSsQx0Bfg6Xmco12N8rambHdqcrfMqxE5JCSbreJA9JU22QBNLZtphkhVDubiNdySS
+         98akGWnYN4a1g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, Yi Zhang <yi.zhang@redhat.com>,
+Cc:     Ming Lei <ming.lei@redhat.com>, John Garry <john.garry@huawei.com>,
+        Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 29/59] block: fix race between adding/removing rq qos and normal IO
-Date:   Mon,  5 Jul 2021 11:27:45 -0400
-Message-Id: <20210705152815.1520546-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.12 12/52] blk-mq: grab rq->refcount before calling ->fn in blk_mq_tagset_busy_iter
+Date:   Mon,  5 Jul 2021 11:28:33 -0400
+Message-Id: <20210705152913.1521036-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210705152815.1520546-1-sashal@kernel.org>
-References: <20210705152815.1520546-1-sashal@kernel.org>
+In-Reply-To: <20210705152913.1521036-1-sashal@kernel.org>
+References: <20210705152913.1521036-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,109 +54,175 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Ming Lei <ming.lei@redhat.com>
 
-[ Upstream commit 2cafe29a8d03f02a3d16193bdaae2f3e82a423f9 ]
+[ Upstream commit 2e315dc07df009c3e29d6926871f62a30cfae394 ]
 
-Yi reported several kernel panics on:
+Grab rq->refcount before calling ->fn in blk_mq_tagset_busy_iter(), and
+this way will prevent the request from being re-used when ->fn is
+running. The approach is same as what we do during handling timeout.
 
-[16687.001777] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
-...
-[16687.163549] pc : __rq_qos_track+0x38/0x60
+Fix request use-after-free(UAF) related with completion race or queue
+releasing:
 
-or
+- If one rq is referred before rq->q is frozen, then queue won't be
+frozen before the request is released during iteration.
 
-[  997.690455] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
-...
-[  997.850347] pc : __rq_qos_done+0x2c/0x50
+- If one rq is referred after rq->q is frozen, refcount_inc_not_zero()
+will return false, and we won't iterate over this request.
 
-Turns out it is caused by race between adding rq qos(wbt) and normal IO
-because rq_qos_add can be run when IO is being submitted, fix this issue
-by freezing queue before adding/deleting rq qos to queue.
+However, still one request UAF not covered: refcount_inc_not_zero() may
+read one freed request, and it will be handled in next patch.
 
-rq_qos_exit() needn't to freeze queue because it is called after queue
-has been frozen.
-
-iolatency calls rq_qos_add() during allocating queue, so freezing won't
-add delay because queue usage refcount works at atomic mode at that
-time.
-
-iocost calls rq_qos_add() when writing cgroup attribute file, that is
-fine to freeze queue at that time since we usually freeze queue when
-storing to queue sysfs attribute, meantime iocost only exists on the
-root cgroup.
-
-wbt_init calls it in blk_register_queue() and queue sysfs attribute
-store(queue_wb_lat_store() when write it 1st time in case of !BLK_WBT_MQ),
-the following patch will speedup the queue freezing in wbt_init.
-
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Tested-by: John Garry <john.garry@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
-Link: https://lore.kernel.org/r/20210609015822.103433-2-ming.lei@redhat.com
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20210511152236.763464-3-ming.lei@redhat.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-rq-qos.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ block/blk-mq-tag.c | 44 +++++++++++++++++++++++++++++++++-----------
+ block/blk-mq.c     | 14 +++++++++-----
+ block/blk-mq.h     |  1 +
+ 3 files changed, 43 insertions(+), 16 deletions(-)
 
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 2bc43e94f4c4..2bcb3495e376 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -7,6 +7,7 @@
- #include <linux/blk_types.h>
- #include <linux/atomic.h>
- #include <linux/wait.h>
-+#include <linux/blk-mq.h>
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 9c92053e704d..6772c3728865 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -199,6 +199,16 @@ struct bt_iter_data {
+ 	bool reserved;
+ };
  
- #include "blk-mq-debugfs.h"
- 
-@@ -99,8 +100,21 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
- 
- static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
++static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
++		unsigned int bitnr)
++{
++	struct request *rq = tags->rqs[bitnr];
++
++	if (!rq || !refcount_inc_not_zero(&rq->ref))
++		return NULL;
++	return rq;
++}
++
+ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
  {
-+	/*
-+	 * No IO can be in-flight when adding rqos, so freeze queue, which
-+	 * is fine since we only support rq_qos for blk-mq queue.
-+	 *
-+	 * Reuse ->queue_lock for protecting against other concurrent
-+	 * rq_qos adding/deleting
-+	 */
-+	blk_mq_freeze_queue(q);
-+
-+	spin_lock_irq(&q->queue_lock);
- 	rqos->next = q->rq_qos;
- 	q->rq_qos = rqos;
-+	spin_unlock_irq(&q->queue_lock);
-+
-+	blk_mq_unfreeze_queue(q);
+ 	struct bt_iter_data *iter_data = data;
+@@ -206,18 +216,22 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	struct blk_mq_tags *tags = hctx->tags;
+ 	bool reserved = iter_data->reserved;
+ 	struct request *rq;
++	bool ret = true;
  
- 	if (rqos->ops->debugfs_attrs)
- 		blk_mq_debugfs_register_rqos(rqos);
-@@ -110,12 +124,22 @@ static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
- {
- 	struct rq_qos **cur;
- 
-+	/*
-+	 * See comment in rq_qos_add() about freezing queue & using
-+	 * ->queue_lock.
-+	 */
-+	blk_mq_freeze_queue(q);
+ 	if (!reserved)
+ 		bitnr += tags->nr_reserved_tags;
+-	rq = tags->rqs[bitnr];
+-
+ 	/*
+ 	 * We can hit rq == NULL here, because the tagging functions
+ 	 * test and set the bit before assigning ->rqs[].
+ 	 */
+-	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx)
+-		return iter_data->fn(hctx, rq, iter_data->data, reserved);
+-	return true;
++	rq = blk_mq_find_and_get_req(tags, bitnr);
++	if (!rq)
++		return true;
 +
-+	spin_lock_irq(&q->queue_lock);
- 	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
- 		if (*cur == rqos) {
- 			*cur = rqos->next;
- 			break;
- 		}
- 	}
-+	spin_unlock_irq(&q->queue_lock);
-+
-+	blk_mq_unfreeze_queue(q);
- 
- 	blk_mq_debugfs_unregister_rqos(rqos);
++	if (rq->q == hctx->queue && rq->mq_hctx == hctx)
++		ret = iter_data->fn(hctx, rq, iter_data->data, reserved);
++	blk_mq_put_rq_ref(rq);
++	return ret;
  }
+ 
+ /**
+@@ -264,6 +278,8 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	struct blk_mq_tags *tags = iter_data->tags;
+ 	bool reserved = iter_data->flags & BT_TAG_ITER_RESERVED;
+ 	struct request *rq;
++	bool ret = true;
++	bool iter_static_rqs = !!(iter_data->flags & BT_TAG_ITER_STATIC_RQS);
+ 
+ 	if (!reserved)
+ 		bitnr += tags->nr_reserved_tags;
+@@ -272,16 +288,19 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	 * We can hit rq == NULL here, because the tagging functions
+ 	 * test and set the bit before assigning ->rqs[].
+ 	 */
+-	if (iter_data->flags & BT_TAG_ITER_STATIC_RQS)
++	if (iter_static_rqs)
+ 		rq = tags->static_rqs[bitnr];
+ 	else
+-		rq = tags->rqs[bitnr];
++		rq = blk_mq_find_and_get_req(tags, bitnr);
+ 	if (!rq)
+ 		return true;
+-	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
+-	    !blk_mq_request_started(rq))
+-		return true;
+-	return iter_data->fn(rq, iter_data->data, reserved);
++
++	if (!(iter_data->flags & BT_TAG_ITER_STARTED) ||
++	    blk_mq_request_started(rq))
++		ret = iter_data->fn(rq, iter_data->data, reserved);
++	if (!iter_static_rqs)
++		blk_mq_put_rq_ref(rq);
++	return ret;
+ }
+ 
+ /**
+@@ -348,6 +367,9 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+  *		indicates whether or not @rq is a reserved request. Return
+  *		true to continue iterating tags, false to stop.
+  * @priv:	Will be passed as second argument to @fn.
++ *
++ * We grab one request reference before calling @fn and release it after
++ * @fn returns.
+  */
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0e120547ccb7..d5370ab2eb31 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -908,6 +908,14 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+ 	return false;
+ }
+ 
++void blk_mq_put_rq_ref(struct request *rq)
++{
++	if (is_flush_rq(rq, rq->mq_hctx))
++		rq->end_io(rq, 0);
++	else if (refcount_dec_and_test(&rq->ref))
++		__blk_mq_free_request(rq);
++}
++
+ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, void *priv, bool reserved)
+ {
+@@ -941,11 +949,7 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 	if (blk_mq_req_expired(rq, next))
+ 		blk_mq_rq_timed_out(rq, reserved);
+ 
+-	if (is_flush_rq(rq, hctx))
+-		rq->end_io(rq, 0);
+-	else if (refcount_dec_and_test(&rq->ref))
+-		__blk_mq_free_request(rq);
+-
++	blk_mq_put_rq_ref(rq);
+ 	return true;
+ }
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 3616453ca28c..143afe42c63a 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -47,6 +47,7 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+ struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
+ 					struct blk_mq_ctx *start);
++void blk_mq_put_rq_ref(struct request *rq);
+ 
+ /*
+  * Internal helpers for allocating/freeing the request map
 -- 
 2.30.2
 
