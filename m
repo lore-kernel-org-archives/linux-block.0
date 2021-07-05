@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D899DC07E9B
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A186C11F69
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:32:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3468619A0
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:31:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3834661C29
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:32:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232752AbhGEPd5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 11:33:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58400 "EHLO mail.kernel.org"
+        id S233175AbhGEPe4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 11:34:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58510 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232244AbhGEPdT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jul 2021 11:33:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 789516198B;
-        Mon,  5 Jul 2021 15:30:27 +0000 (UTC)
+        id S232438AbhGEPd5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Jul 2021 11:33:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7A17A61983;
+        Mon,  5 Jul 2021 15:30:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625499028;
+        s=k20201202; t=1625499057;
         bh=hEXybyKNzNQh9GIrfXSwiHb+N8bB+QE1nn7cGPVvTAw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tL4ouPiXpCDzeCC5yJUHpgntuNrxavQBmUC29IB7FlOpeu9MUTj1eBNqTBiAgOmcl
-         woaW+2tURToJl6Qb4jtntt/4PlcJseSG2Y+Se2U6bkyVUwQupemqLLQ4oBiU7RjOVp
-         MRpswnCvir0QJviiXeWbraVezgiU0RhYBXfD2t2VgolbTI+9z7yrH+g2CQ3BvvBNJf
-         6Mr80SKS1zBNKoOj/9+/opI11RTCQKp8WV1aBxgemfae07rdeFSYhIDea2dLUgynbW
-         aUOGVlLTUWYuU7ks6Di3xK+7GqFbUuQ/97GlbbLzPHylNPK25DzRlsEI68yCTHOxYR
-         Tpod9Zaq8U3Vg==
+        b=krBuiS8p+GW/GTXwUgGZhDDps6Hi/DNxbOC9L5DdeVOdBnoXJdlVV1Pqg2MFcgUUD
+         mN2NBtu5eJjuhFmwoCkLk7tlJLeOeiK2x7L74gZNi5qwM8DS47EOJApXWOK9+/54Y/
+         RBau/Nq79e1TS5tMV00ONKkVty8RREfmhrI/UDNqzpIbRnCpkTxdkfGedVL3ycUi2n
+         5qHgiPV16/utWZcmi3RRU55DCwOFege9LAzBfXESYc47if06YXFJ0TBlrac2kSXEdH
+         0RNOUFzCtAx9P2yLCIlz/1uVJTkq6D1kXkw+wiXxDLrNcWCXQCM98VwebzN4j9LDtl
+         u+H10PdwVldeg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ming Lei <ming.lei@redhat.com>, Yi Zhang <yi.zhang@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 21/41] block: fix race between adding/removing rq qos and normal IO
-Date:   Mon,  5 Jul 2021 11:29:41 -0400
-Message-Id: <20210705153001.1521447-21-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 14/26] block: fix race between adding/removing rq qos and normal IO
+Date:   Mon,  5 Jul 2021 11:30:27 -0400
+Message-Id: <20210705153039.1521781-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210705153001.1521447-1-sashal@kernel.org>
-References: <20210705153001.1521447-1-sashal@kernel.org>
+In-Reply-To: <20210705153039.1521781-1-sashal@kernel.org>
+References: <20210705153039.1521781-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
