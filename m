@@ -7,220 +7,250 @@ X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F9DC07E99
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC55C07E99
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:26:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C60B2613F3
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:26:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 041FF613F3
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 10:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230466AbhGEK3J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 06:29:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47248 "EHLO
+        id S230468AbhGEK3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 06:29:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33151 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230355AbhGEK3J (ORCPT
+        by vger.kernel.org with ESMTP id S230355AbhGEK3O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jul 2021 06:29:09 -0400
+        Mon, 5 Jul 2021 06:29:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625480792;
+        s=mimecast20190719; t=1625480797;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+khomSlsBTaZrmb4bOTeOLJEuuMnA+00ifG+zQXawDk=;
-        b=aqELABhctNg+riQ3Qqu2oVaylH7UISpo420r8UUA1gopo5wjqhuvTQtqcx5sGHWENzRYic
-        1W+t0CeiCrEyYELMmEf71rrKPjQJGE6y6TJ0ekA9ApuozcuzmFAA/nu0XC8+v8f+pmcAsP
-        ChkXVlfdNWztpPK7M4tKpT9JvvXlCfw=
+        bh=0n1jH2bBjRzgTfq4v/PvvKY8js5fko7ujotjxSftCDI=;
+        b=h5muoSkPfJGfnKs8gqoOmdfxphDVvU4N8I47lenZn1KkDWiaidZ2rAkfajAkRUvu2lJm/S
+        +r8dozOS8+dSLDS/HK3tMKv9ZPqC2nAPDawzSAULBDgryA19EWATR3RKxDZXkq0+orc31U
+        465wsXj44n7ThBGYwU0jdfN3OqK1JqM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588--foVwoj3NESpeEV3caas8Q-1; Mon, 05 Jul 2021 06:26:29 -0400
-X-MC-Unique: -foVwoj3NESpeEV3caas8Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-600-2KyeZ3REPXCnZ6dTiFq_Cg-1; Mon, 05 Jul 2021 06:26:36 -0400
+X-MC-Unique: 2KyeZ3REPXCnZ6dTiFq_Cg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39B65800D62;
-        Mon,  5 Jul 2021 10:26:28 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D10F100B3AC;
+        Mon,  5 Jul 2021 10:26:35 +0000 (UTC)
 Received: from localhost (ovpn-13-193.pek2.redhat.com [10.72.13.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 00D611000358;
-        Mon,  5 Jul 2021 10:26:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12F255C1D0;
+        Mon,  5 Jul 2021 10:26:30 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>,
         =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
         Dan Schatzberg <schatzberg.dan@gmail.com>
-Subject: [PATCH 1/6] loop: clean up blkcg association
-Date:   Mon,  5 Jul 2021 18:26:02 +0800
-Message-Id: <20210705102607.127810-2-ming.lei@redhat.com>
+Subject: [PATCH 2/6] loop: conver timer for monitoring idle worker into dwork
+Date:   Mon,  5 Jul 2021 18:26:03 +0800
+Message-Id: <20210705102607.127810-3-ming.lei@redhat.com>
 In-Reply-To: <20210705102607.127810-1-ming.lei@redhat.com>
 References: <20210705102607.127810-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Each loop_worker is responsible for running requests originated from
-same blkcg, so:
-
-1) associate with kthread in the entry of loop_process_work(), and
-disassociate in the end of this function, then we can avoid to do
-both for each request.
-
-2) remove ->blkcg_css and ->memcg_css from 'loop_cmd' since both are
-per loop_worker.
+Not necessary to use a timer to do that, and dwork is just fine,
+then we don't need to always disable interrupt when acquiring
+->loop_work_lock.
 
 Cc: Michal Koutný <mkoutny@suse.com>
 Cc: Dan Schatzberg <schatzberg.dan@gmail.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c | 67 ++++++++++++++++++++------------------------
- drivers/block/loop.h |  2 --
- 2 files changed, 30 insertions(+), 39 deletions(-)
+ drivers/block/loop.c | 76 ++++++++++++++++++++++----------------------
+ drivers/block/loop.h |  2 +-
+ 2 files changed, 39 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 02509bc54242..8378b8455f7c 100644
+index 8378b8455f7c..7fa0c70a3ea6 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -949,10 +949,17 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	struct loop_worker *cur_worker, *worker = NULL;
- 	struct work_struct *work;
- 	struct list_head *cmd_list;
-+	struct cgroup_subsys_state *blkcg_css = NULL;
-+#ifdef CONFIG_BLK_CGROUP
-+	struct request *rq = blk_mq_rq_from_pdu(cmd);
-+
-+	if (rq->bio && rq->bio->bi_blkg)
-+		blkcg_css = &bio_blkcg(rq->bio)->css;
-+#endif
+@@ -929,7 +929,6 @@ struct loop_worker {
  
- 	spin_lock_irq(&lo->lo_work_lock);
+ static void loop_workfn(struct work_struct *work);
+ static void loop_rootcg_workfn(struct work_struct *work);
+-static void loop_free_idle_workers(struct timer_list *timer);
  
--	if (queue_on_root_worker(cmd->blkcg_css))
-+	if (queue_on_root_worker(blkcg_css))
+ #ifdef CONFIG_BLK_CGROUP
+ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
+@@ -957,7 +956,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 		blkcg_css = &bio_blkcg(rq->bio)->css;
+ #endif
+ 
+-	spin_lock_irq(&lo->lo_work_lock);
++	spin_lock(&lo->lo_work_lock);
+ 
+ 	if (queue_on_root_worker(blkcg_css))
  		goto queue_work;
- 
- 	node = &lo->worker_tree.rb_node;
-@@ -960,10 +967,10 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	while (*node) {
- 		parent = *node;
- 		cur_worker = container_of(*node, struct loop_worker, rb_node);
--		if (cur_worker->blkcg_css == cmd->blkcg_css) {
-+		if (cur_worker->blkcg_css == blkcg_css) {
- 			worker = cur_worker;
- 			break;
--		} else if ((long)cur_worker->blkcg_css < (long)cmd->blkcg_css) {
-+		} else if ((long)cur_worker->blkcg_css < (long)blkcg_css) {
- 			node = &(*node)->rb_left;
- 		} else {
- 			node = &(*node)->rb_right;
-@@ -977,15 +984,10 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	 * In the event we cannot allocate a worker, just queue on the
- 	 * rootcg worker and issue the I/O as the rootcg
- 	 */
--	if (!worker) {
--		cmd->blkcg_css = NULL;
--		if (cmd->memcg_css)
--			css_put(cmd->memcg_css);
--		cmd->memcg_css = NULL;
-+	if (!worker)
- 		goto queue_work;
--	}
- 
--	worker->blkcg_css = cmd->blkcg_css;
-+	worker->blkcg_css = blkcg_css;
- 	css_get(worker->blkcg_css);
- 	INIT_WORK(&worker->work, loop_workfn);
- 	INIT_LIST_HEAD(&worker->cmd_list);
-@@ -2100,19 +2102,6 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		break;
+@@ -1012,7 +1011,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
  	}
- 
--	/* always use the first bio's css */
--	cmd->blkcg_css = NULL;
--	cmd->memcg_css = NULL;
--#ifdef CONFIG_BLK_CGROUP
--	if (rq->bio && rq->bio->bi_blkg) {
--		cmd->blkcg_css = &bio_blkcg(rq->bio)->css;
--#ifdef CONFIG_MEMCG
--		cmd->memcg_css =
--			cgroup_get_e_css(cmd->blkcg_css->cgroup,
--					&memory_cgrp_subsys);
--#endif
--	}
--#endif
- 	loop_queue_work(lo, cmd);
- 
- 	return BLK_STS_OK;
-@@ -2124,28 +2113,14 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	const bool write = op_is_write(req_op(rq));
- 	struct loop_device *lo = rq->q->queuedata;
- 	int ret = 0;
--	struct mem_cgroup *old_memcg = NULL;
- 
- 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
- 		ret = -EIO;
- 		goto failed;
- 	}
- 
--	if (cmd->blkcg_css)
--		kthread_associate_blkcg(cmd->blkcg_css);
--	if (cmd->memcg_css)
--		old_memcg = set_active_memcg(
--			mem_cgroup_from_css(cmd->memcg_css));
--
- 	ret = do_req_filebacked(lo, rq);
- 
--	if (cmd->blkcg_css)
--		kthread_associate_blkcg(NULL);
--
--	if (cmd->memcg_css) {
--		set_active_memcg(old_memcg);
--		css_put(cmd->memcg_css);
--	}
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
-@@ -2201,7 +2176,25 @@ static void loop_workfn(struct work_struct *work)
- {
- 	struct loop_worker *worker =
- 		container_of(work, struct loop_worker, work);
-+	struct mem_cgroup *old_memcg = NULL;
-+	struct cgroup_subsys_state *memcg_css = NULL;
-+
-+	kthread_associate_blkcg(worker->blkcg_css);
-+#ifdef CONFIG_MEMCG
-+	memcg_css = cgroup_get_e_css(worker->blkcg_css->cgroup,
-+			&memory_cgrp_subsys);
-+#endif
-+	if (memcg_css)
-+		old_memcg = set_active_memcg(
-+				mem_cgroup_from_css(memcg_css));
-+
- 	loop_process_work(worker, &worker->cmd_list, worker->lo);
-+
-+	kthread_associate_blkcg(NULL);
-+	if (memcg_css) {
-+		set_active_memcg(old_memcg);
-+		css_put(memcg_css);
-+	}
+ 	list_add_tail(&cmd->list_entry, cmd_list);
+ 	queue_work(lo->workqueue, work);
+-	spin_unlock_irq(&lo->lo_work_lock);
++	spin_unlock(&lo->lo_work_lock);
  }
  
- static void loop_rootcg_workfn(struct work_struct *work)
+ static void loop_update_rotational(struct loop_device *lo)
+@@ -1134,6 +1133,34 @@ loop_set_status_from_info(struct loop_device *lo,
+ 	return 0;
+ }
+ 
++static void loop_set_timer(struct loop_device *lo)
++{
++	schedule_delayed_work(&lo->idle_work, LOOP_IDLE_WORKER_TIMEOUT);
++}
++
++static void loop_free_idle_workers(struct work_struct *work)
++{
++	struct loop_device *lo = container_of(work, struct loop_device,
++			idle_work.work);
++	struct loop_worker *pos, *worker;
++
++	spin_lock(&lo->lo_work_lock);
++	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
++				idle_list) {
++		if (time_is_after_jiffies(worker->last_ran_at +
++						LOOP_IDLE_WORKER_TIMEOUT))
++			break;
++		list_del(&worker->idle_list);
++		rb_erase(&worker->rb_node, &lo->worker_tree);
++		css_put(worker->blkcg_css);
++		kfree(worker);
++	}
++	if (!list_empty(&lo->idle_worker_list))
++		loop_set_timer(lo);
++	spin_unlock(&lo->lo_work_lock);
++}
++
++
+ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 			  struct block_device *bdev,
+ 			  const struct loop_config *config)
+@@ -1213,8 +1240,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
+ 	INIT_LIST_HEAD(&lo->idle_worker_list);
+ 	lo->worker_tree = RB_ROOT;
+-	timer_setup(&lo->timer, loop_free_idle_workers,
+-		TIMER_DEFERRABLE);
++	INIT_DELAYED_WORK(&lo->idle_work, loop_free_idle_workers);
+ 	lo->use_dio = lo->lo_flags & LO_FLAGS_DIRECT_IO;
+ 	lo->lo_device = bdev;
+ 	lo->lo_backing_file = file;
+@@ -1304,7 +1330,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
+ 	destroy_workqueue(lo->workqueue);
+-	spin_lock_irq(&lo->lo_work_lock);
++	spin_lock(&lo->lo_work_lock);
+ 	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
+ 				idle_list) {
+ 		list_del(&worker->idle_list);
+@@ -1312,8 +1338,8 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 		css_put(worker->blkcg_css);
+ 		kfree(worker);
+ 	}
+-	spin_unlock_irq(&lo->lo_work_lock);
+-	del_timer_sync(&lo->timer);
++	spin_unlock(&lo->lo_work_lock);
++	cancel_delayed_work_sync(&lo->idle_work);
+ 
+ 	spin_lock_irq(&lo->lo_lock);
+ 	lo->lo_backing_file = NULL;
+@@ -2133,11 +2159,6 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+ 	}
+ }
+ 
+-static void loop_set_timer(struct loop_device *lo)
+-{
+-	timer_reduce(&lo->timer, jiffies + LOOP_IDLE_WORKER_TIMEOUT);
+-}
+-
+ static void loop_process_work(struct loop_worker *worker,
+ 			struct list_head *cmd_list, struct loop_device *lo)
+ {
+@@ -2145,17 +2166,17 @@ static void loop_process_work(struct loop_worker *worker,
+ 	struct loop_cmd *cmd;
+ 
+ 	current->flags |= PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
+-	spin_lock_irq(&lo->lo_work_lock);
++	spin_lock(&lo->lo_work_lock);
+ 	while (!list_empty(cmd_list)) {
+ 		cmd = container_of(
+ 			cmd_list->next, struct loop_cmd, list_entry);
+ 		list_del(cmd_list->next);
+-		spin_unlock_irq(&lo->lo_work_lock);
++		spin_unlock(&lo->lo_work_lock);
+ 
+ 		loop_handle_cmd(cmd);
+ 		cond_resched();
+ 
+-		spin_lock_irq(&lo->lo_work_lock);
++		spin_lock(&lo->lo_work_lock);
+ 	}
+ 
+ 	/*
+@@ -2168,7 +2189,7 @@ static void loop_process_work(struct loop_worker *worker,
+ 		list_add_tail(&worker->idle_list, &lo->idle_worker_list);
+ 		loop_set_timer(lo);
+ 	}
+-	spin_unlock_irq(&lo->lo_work_lock);
++	spin_unlock(&lo->lo_work_lock);
+ 	current->flags = orig_flags;
+ }
+ 
+@@ -2204,27 +2225,6 @@ static void loop_rootcg_workfn(struct work_struct *work)
+ 	loop_process_work(NULL, &lo->rootcg_cmd_list, lo);
+ }
+ 
+-static void loop_free_idle_workers(struct timer_list *timer)
+-{
+-	struct loop_device *lo = container_of(timer, struct loop_device, timer);
+-	struct loop_worker *pos, *worker;
+-
+-	spin_lock_irq(&lo->lo_work_lock);
+-	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
+-				idle_list) {
+-		if (time_is_after_jiffies(worker->last_ran_at +
+-						LOOP_IDLE_WORKER_TIMEOUT))
+-			break;
+-		list_del(&worker->idle_list);
+-		rb_erase(&worker->rb_node, &lo->worker_tree);
+-		css_put(worker->blkcg_css);
+-		kfree(worker);
+-	}
+-	if (!list_empty(&lo->idle_worker_list))
+-		loop_set_timer(lo);
+-	spin_unlock_irq(&lo->lo_work_lock);
+-}
+-
+ static const struct blk_mq_ops loop_mq_ops = {
+ 	.queue_rq       = loop_queue_rq,
+ 	.complete	= lo_complete_rq,
 diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 1988899db63a..a52a3fd89457 100644
+index a52a3fd89457..9df889af1bcf 100644
 --- a/drivers/block/loop.h
 +++ b/drivers/block/loop.h
-@@ -77,8 +77,6 @@ struct loop_cmd {
- 	long ret;
- 	struct kiocb iocb;
- 	struct bio_vec *bvec;
--	struct cgroup_subsys_state *blkcg_css;
--	struct cgroup_subsys_state *memcg_css;
- };
+@@ -60,7 +60,7 @@ struct loop_device {
+ 	struct list_head        rootcg_cmd_list;
+ 	struct list_head        idle_worker_list;
+ 	struct rb_root          worker_tree;
+-	struct timer_list       timer;
++	struct delayed_work	idle_work;
+ 	bool			use_dio;
+ 	bool			sysfs_inited;
  
- /* Support for loadable transfer modules */
 -- 
 2.31.1
 
