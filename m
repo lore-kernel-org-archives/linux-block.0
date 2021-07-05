@@ -2,86 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7089EC07E9A
-	for <linux-block@archiver.kernel.org>; Sun,  4 Jul 2021 20:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8410C07E9A
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 02:49:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 523B6613F1
-	for <linux-block@archiver.kernel.org>; Sun,  4 Jul 2021 20:26:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EF40613D8
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 02:49:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbhGDU2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Jul 2021 16:28:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38036 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbhGDU2u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jul 2021 16:28:50 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4605EC061764
-        for <linux-block@vger.kernel.org>; Sun,  4 Jul 2021 13:26:13 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id f13so1838308lfh.6
-        for <linux-block@vger.kernel.org>; Sun, 04 Jul 2021 13:26:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sharpeleven-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wlUnqqhwGO2ss5CdIs4O+XCoeOXjYNdtyzXcVD3xri0=;
-        b=XgKgDo6l95RCCdzJlIBW/z4zT5vKBNadDp8QG5dOQjynV0boSEhPF0UrBcurESS5Wq
-         /X3IB2crM3pzM5qfh/JLt+LNIAQNGZOMOC1Od+DhnZkYZ3wkdAeL57Miz81y/A7ou/wE
-         8MyBDCwpg0p25eCclaO0UhbvyN9T1LkQkUyBhVPYJUt5hoirEt8SS237XRHjNCoH4Szp
-         Hon7C3jCttNWS6nbQZLsGHQYqLs5odKq/iJYB7y4q+gSWHqsjMSN5xzTktuJ7EVEmOHn
-         aDJJDUpRAk9siQDdYqLCtQoa2OMuBs1VVvZORi0nEdwEZSOnVWEqmgJpLjiDjnWyB5yP
-         XyxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wlUnqqhwGO2ss5CdIs4O+XCoeOXjYNdtyzXcVD3xri0=;
-        b=XHhwJ1+7LRghyrfEv75Eody1nWcdfO/9aU9ORkVWBYUQcN5bcGP65BfYdNm9yVeoce
-         IJINrY5iH88+irUlJcppL4FpR1VIFpnodhY4UUNRm+fr1qZrZbjkDAzgKR0/7/jeTFlH
-         Vt49kYFBDthDMMsqq7pP85RImA0CGbi+iIG9ASi+TUr8N6tOiFjVEucFqx9ZATx5fmxD
-         2Xi5szm5gtcGEoArvqBO8iDMaQKG+MjAF673ZavX6zyyJbn8sgBb2friUyWAN8EtBssA
-         nJuGp2mbeX2YPE1VjjrevHJnazdzv7TpeH2QmJuczBfhynNVj+Ptk/30kf6TkUnNgY27
-         4FAw==
-X-Gm-Message-State: AOAM532Xvm+Wnh1bPYHkVKZTc1fTY3dK+ZVsdSNKivp928XxpOPeMZc1
-        GrRZKdi+11cFQTIjCGx0g/gHUrMLe4+ZMBIyzwUi6A==
-X-Google-Smtp-Source: ABdhPJzT4kCTCfR+J5F2nu+OMI1Ah16dq9+EEowoXNfH4FF0nxjuR02KGz8ayP4IUw9c584xVK5UlyqW6aRMgEVaF1E=
-X-Received: by 2002:ac2:55a7:: with SMTP id y7mr7943415lfg.179.1625430371579;
- Sun, 04 Jul 2021 13:26:11 -0700 (PDT)
+        id S229700AbhGECvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Jul 2021 22:51:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31550 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229652AbhGECvx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 4 Jul 2021 22:51:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625453356;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BLeXj+8XKMxLFChu+De6U7Z5h/Ve0EnpqGdSTfh+Oog=;
+        b=NHJZgpONmyuxBVJzep3ZjC0iordRam/hK+we7ygjzSmoPLKDWlIogOjILg3OX4gkbdUo6D
+        Pyhxg2/44gTwtRCHjEMHFxqCiKwEb8lC1ASrVhYbjUyIwWReyjtXbymjPtbxfdE39wwh9R
+        dGN83Q6j+CwTZ5RdVCm0/sJPYAQEFmU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-xXC6zSW9MTmViJGyU_E-qA-1; Sun, 04 Jul 2021 22:49:15 -0400
+X-MC-Unique: xXC6zSW9MTmViJGyU_E-qA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD287100B3AC;
+        Mon,  5 Jul 2021 02:49:12 +0000 (UTC)
+Received: from T590 (ovpn-13-193.pek2.redhat.com [10.72.13.193])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 759025C1A1;
+        Mon,  5 Jul 2021 02:48:57 +0000 (UTC)
+Date:   Mon, 5 Jul 2021 10:48:53 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH V2 5/6] virtio: add one field into virtio_device for
+ recording if device uses managed irq
+Message-ID: <YOJzFe3xcLK279Wv@T590>
+References: <20210702150555.2401722-1-ming.lei@redhat.com>
+ <20210702150555.2401722-6-ming.lei@redhat.com>
+ <20210702115430-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <20210702050543.2693141-1-mcgrof@kernel.org> <20210702050543.2693141-2-mcgrof@kernel.org>
- <YN6iSKCetBrk2y8V@kroah.com> <20210702190230.r46bck4vib7u3qo6@garbanzo>
- <YN/rtmZbd6velB1L@kroah.com> <20210703155203.uvxcolrddswecco6@garbanzo>
-In-Reply-To: <20210703155203.uvxcolrddswecco6@garbanzo>
-From:   Richard Fontana <fontana@sharpeleven.org>
-Date:   Sun, 4 Jul 2021 16:26:00 -0400
-Message-ID: <CAGT84B1fdypvndxk97wS59=5VgQ80LhWxxs_Yx33169P9WvKZg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] selftests: add tests_sysfs module
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, tj@kernel.org,
-        shuah@kernel.org, akpm@linux-foundation.org, rafael@kernel.org,
-        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
-        andriin@fb.com, daniel@iogearbox.net, atenart@kernel.org,
-        alobakin@pm.me, weiwan@google.com, ap420073@gmail.com,
-        jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210702115430-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
- On Sat, Jul 3, 2021 at 11:52 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> We don't have spdx license tag yet for copyleft-next,
+On Fri, Jul 02, 2021 at 11:55:40AM -0400, Michael S. Tsirkin wrote:
+> On Fri, Jul 02, 2021 at 11:05:54PM +0800, Ming Lei wrote:
+> > blk-mq needs to know if the device uses managed irq, so add one field
+> > to virtio_device for recording if device uses managed irq.
+> > 
+> > If the driver use managed irq, this flag has to be set so it can be
+> > passed to blk-mq.
+> > 
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Jason Wang <jasowang@redhat.com>
+> > Cc: virtualization@lists.linux-foundation.org
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> 
+> The API seems somewhat confusing. virtio does not request
+> a managed irq as such, does it? I think it's a decision taken
+> by the irq core.
 
-https://spdx.org/licenses/copyleft-next-0.3.0.html
-https://spdx.org/licenses/copyleft-next-0.3.1.html
+vp_request_msix_vectors():
 
-Richard
+        if (desc) {
+                flags |= PCI_IRQ_AFFINITY;
+                desc->pre_vectors++; /* virtio config vector */
+                vdev->use_managed_irq = true;
+        }
+
+        err = pci_alloc_irq_vectors_affinity(vp_dev->pci_dev, nvectors,
+                                             nvectors, flags, desc);
+
+Managed irq is used once PCI_IRQ_AFFINITY is passed to
+pci_alloc_irq_vectors_affinity().
+
+> 
+> Any way to query the irq to find out if it's managed?
+
+So far the managed info isn't exported via /proc/irq, but if one irq is
+managed, its smp_affinity & smp_affinity_list attributes can't be
+changed successfully.
+
+If irq's debugfs is enabled, this info can be retrieved.
+
+
+Thanks,
+Ming
+
