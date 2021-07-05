@@ -2,78 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD070C07E98
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 09:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DD9C07E99
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 09:56:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C413A61370
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 09:34:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B57B61375
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 09:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230343AbhGEJgj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 05:36:39 -0400
-Received: from mail-m17639.qiye.163.com ([59.111.176.39]:11772 "EHLO
-        mail-m17639.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230327AbhGEJgj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jul 2021 05:36:39 -0400
-X-Greylist: delayed 479 seconds by postgrey-1.27 at vger.kernel.org; Mon, 05 Jul 2021 05:36:39 EDT
-DKIM-Signature: a=rsa-sha256;
-        b=Z6H+7hA3o20CEwBP/O/hdFZVeJf50Q6E569FxTNQqZh9Rev+kxHRD9/hWIbZG2rD27Mv6TD24+VdKEeJ1xHVfLVStFIW/kVVlaog6F9kpfUsg38z2Ig/dzxhO9pNuETywyZHe7B4ADeR2x8ekraIu85mA++djy667Wh9MZXKKak=;
-        s=default; c=relaxed/relaxed; d=vivo.com; v=1;
-        bh=AiGdhOxKK5jbqL2QYbvZgZZtHQzK5itW0Kp8ooht490=;
-        h=date:mime-version:subject:message-id:from;
-Received: from vivo-HP-ProDesk-680-G4-PCI-MT.vivo.xyz (unknown [58.251.74.232])
-        by mail-m17639.qiye.163.com (Hmail) with ESMTPA id AB2DE380510;
-        Mon,  5 Jul 2021 17:26:01 +0800 (CST)
-From:   Wang Qing <wangqing@vivo.com>
-To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-Cc:     Wang Qing <wangqing@vivo.com>,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH] block: nbd: fix order of cleaning up the queue and freeing the tagset
-Date:   Mon,  5 Jul 2021 17:25:43 +0800
-Message-Id: <1625477143-18716-1-git-send-email-wangqing@vivo.com>
-X-Mailer: git-send-email 2.7.4
-X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZS1VLWVdZKFlBSE83V1ktWUFJV1kPCR
-        oVCBIfWUFZQkgaGVZNGB8fS0xCT0NOQktVEwETFhoSFyQUDg9ZV1kWGg8SFR0UWUFZT0tIVUpKS0
-        hKQ1VLWQY+
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Ohg6Lgw5Fj9OHBkrKAoDDhUW
-        ExwKFBNVSlVKTUlOT0xMSk1JSE9IVTMWGhIXVQwaFRwKEhUcOw0SDRRVGBQWRVlXWRILWUFZTkNV
-        SU5KVUxPVUlISVlXWQgBWUFKQ0lLNwY+
-X-HM-Tid: 0a7a75fd23ebd994kuwsab2de380510
+        id S230355AbhGEJ6p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 05:58:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48139 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230291AbhGEJ6o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Jul 2021 05:58:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625478967;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PeaDOEsW8hmBgMT8bkDyX/sakYJ1dxNWFoVs9+ntx2c=;
+        b=EHT5yft9tINrEnnYGs5OShjjflMgW+O+Z6nxWnYuoNfWNSfQI+NQpmUU2leVraSL4IBTbp
+        SkqWzEg9IeueAJR92idkCRvNgmCtoG25LNOhtDMm3D2m9srTJYR/EbwfipdthjWJjkT1qJ
+        Q5MCz8q/ILBK3s+xnF0pKk9mphZw3jI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-L6ETD3HBN4mQzsy7WT4bmg-1; Mon, 05 Jul 2021 05:56:06 -0400
+X-MC-Unique: L6ETD3HBN4mQzsy7WT4bmg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0BA5802E29;
+        Mon,  5 Jul 2021 09:56:03 +0000 (UTC)
+Received: from T590 (ovpn-13-193.pek2.redhat.com [10.72.13.193])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D32B42EB04;
+        Mon,  5 Jul 2021 09:55:54 +0000 (UTC)
+Date:   Mon, 5 Jul 2021 17:55:49 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: Re: [PATCH V2 3/6] scsi: add flag of .use_managed_irq to 'struct
+ Scsi_Host'
+Message-ID: <YOLXJZF7wo/IiFMU@T590>
+References: <20210702150555.2401722-1-ming.lei@redhat.com>
+ <20210702150555.2401722-4-ming.lei@redhat.com>
+ <47fc5ed1-29e3-9226-a111-26c271cb6d90@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <47fc5ed1-29e3-9226-a111-26c271cb6d90@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Must release the queue before freeing the tagset.
+On Mon, Jul 05, 2021 at 10:25:38AM +0100, John Garry wrote:
+> On 02/07/2021 16:05, Ming Lei wrote:
+> > blk-mq needs this information of using managed irq for improving
+> > deactivating hctx, so add such flag to 'struct Scsi_Host', then
+> > drivers can pass such flag to blk-mq via scsi_mq_setup_tags().
+> > 
+> > The rule is that driver has to tell blk-mq if managed irq is used.
+> > 
+> > Signed-off-by: Ming Lei<ming.lei@redhat.com>
+> 
+> As was said before, can we have something like this instead of relying on
+> the LLDs to do the setting:
+> 
+> --------->8------------
+> 
+> diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
+> index b595a94c4d16..2037a5b69fe1 100644
+> --- a/block/blk-mq-pci.c
+> +++ b/block/blk-mq-pci.c
+> @@ -37,7 +37,7 @@ int blk_mq_pci_map_queues(struct blk_mq_queue_map *qmap,
+> struct pci_dev *pdev,
+>  		for_each_cpu(cpu, mask)
+>  			qmap->mq_map[cpu] = qmap->queue_offset + queue;
+>  	}
+> -
+> +	qmap->drain_hwq = 1;
 
-Fixes: 1c99502fae35 ("loop: use blk_mq_alloc_disk and blk_cleanup_disk")
-Reported-and-tested-by: syzbot+9ca43ff47167c0ee3466@syzkaller.appspotmail.com
-Signed-off-by: Wang Qing <wangqing@vivo.com>
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The thing is that blk_mq_pci_map_queues() is allowed to be called for
+non-managed irqs. Also some managed irq consumers don't use blk_mq_pci_map_queues().
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index b7d6637..c383179
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -239,8 +239,8 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 
- 	if (disk) {
- 		del_gendisk(disk);
--		blk_mq_free_tag_set(&nbd->tag_set);
- 		blk_cleanup_disk(disk);
-+		blk_mq_free_tag_set(&nbd->tag_set);
- 	}
- 
- 	/*
--- 
-2.7.4
+So this way just provides hint about managed irq uses, but we really
+need to get this flag set if driver uses managed irq.
+
+
+Thanks,
+Ming
 
