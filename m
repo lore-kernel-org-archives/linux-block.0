@@ -2,107 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AEA8C07E99
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 18:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B875C07E99
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 21:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22CF86197B
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 18:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32CBB6186A
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 21:47:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbhGES2R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 14:28:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49192 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229734AbhGES2R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jul 2021 14:28:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625509539;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=R1dA7LuS21CZJga9dfZTy+xFxKT35DcGT8NXfH7SV3w=;
-        b=g06k/VM7aEZ6bulPGceNdaJxMn+F5wAurDqCmlmdEE8/r3EOLHoU8jFzKBqt6fQjAm4z8b
-        k3jLM3AO09oTD2id2RRizJYZvQSreVmiMvh31tDLauIGElausMjrVHz+8H386TwYliI6DQ
-        D8vyDlaCpyVDLGUMdBSx2VEAm5QvrlU=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-6HRmLridOVK2Y3a8NzeW0A-1; Mon, 05 Jul 2021 14:25:38 -0400
-X-MC-Unique: 6HRmLridOVK2Y3a8NzeW0A-1
-Received: by mail-ed1-f71.google.com with SMTP id u13-20020aa7d88d0000b0290397eb800ae3so5458850edq.9
-        for <linux-block@vger.kernel.org>; Mon, 05 Jul 2021 11:25:38 -0700 (PDT)
+        id S233104AbhGEVuH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 17:50:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230150AbhGEVuH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jul 2021 17:50:07 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F74C061574;
+        Mon,  5 Jul 2021 14:47:29 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id j199so17264148pfd.7;
+        Mon, 05 Jul 2021 14:47:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=2ub4axo8oQjLG+aAchaPA5SsxoWA7cHX0lH8tPFAIN8=;
+        b=Oe6GkeVlv03C03b2GDeq9xWqWNrhzkLwj5E7FpgaOo0R5LWSO86WmR60GeWoyXbvqE
+         jrD+xZdSz8VX6KzQ4nmvo4tewKZyTtorcpaQqDALIX0eW32ghAP89ag63Aro5XTcv9fw
+         b2n2I41W2GzVW209tH7AvHeRc3LlAHtE1+ILW1m31QQohkuVH0ukoBc3DwSzTIJ06TjX
+         v/LTKK98eSN9qEXiL7Q4dAdgG+4tj+iYEJYssmfjfOpVsw/hsQ+f145qc4tH8AioaOWn
+         Jrsxt/JPH3bQpjnqK7h3xnwFprWM6dCAiBRxr4iCblm0P3wcEtH9GJAWdfykplcBygxL
+         y8CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=R1dA7LuS21CZJga9dfZTy+xFxKT35DcGT8NXfH7SV3w=;
-        b=POqBBmFUwxj1VcVWGRv4VKywoseVFRDYprm+SM5tbgPGO9VJsf2tr9uHL15bw54Edv
-         OrLrM6CVrNdM8cvXbIPGlQGZ3pAguqobQX34Co7SVgXZDiN6dZ20ZrNYqvRzczuSla41
-         Jp03IuGL8abjKsjtgwf3u+DiRvK5VveCODknYL92GKDRb5IOOuWQiZdBtfMtRT11mvq2
-         NS0mVYtQLLlJQr3EPOXK/tcBeoNOpm3MfwXTjkJL0T0c3g0I0BUiVoheW0pV5F/YuKYn
-         eZZC+SsKku6xA63rbBISXcfWSyklIVEyTNaHDLaa1F/y1rbtnpmtoRR1c8Izg9QT082p
-         r3UA==
-X-Gm-Message-State: AOAM531A6D0+CxkxnGnyMiWHsg3ZBy0ifs9JE8A6/d+FmNN3Izxflk4n
-        RpLPFXhvHxaJAlVx/9ER+0t+FHqoj8dlMHWbFRtAz14IcPRzHzGT3hErIUawPxrK08HaK143OUT
-        wW6fAzS3xuP6y8/mCrqizaM0=
-X-Received: by 2002:a05:6402:1c82:: with SMTP id cy2mr17477374edb.324.1625509537501;
-        Mon, 05 Jul 2021 11:25:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxyiqkphTkUX3OHsr5lvwvQkNygRb1AqpshkkZAXPOLJN5NLWa7fPK/aNr11ZHLweIF1oUb7w==
-X-Received: by 2002:a05:6402:1c82:: with SMTP id cy2mr17477367edb.324.1625509537409;
-        Mon, 05 Jul 2021 11:25:37 -0700 (PDT)
-Received: from redhat.com ([2.55.8.91])
-        by smtp.gmail.com with ESMTPSA id qo20sm522933ejb.106.2021.07.05.11.25.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jul 2021 11:25:36 -0700 (PDT)
-Date:   Mon, 5 Jul 2021 14:25:33 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     jasowang@redhat.com, stefanha@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] virtio-blk: Add validation for block size in config
- space
-Message-ID: <20210705142431-mutt-send-email-mst@kernel.org>
-References: <20210705100006.90-1-xieyongji@bytedance.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210705100006.90-1-xieyongji@bytedance.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=2ub4axo8oQjLG+aAchaPA5SsxoWA7cHX0lH8tPFAIN8=;
+        b=hO5+REMOksLz6uTlp9mxbw1iO01/G1bk2suNOpB9Id9M71bz0v6dIqXl2SYbGddWyr
+         BsEMBZcSiNhKxYmQIY1lz3l3HR/ziuBzoJdF2i9sSw46hnWPYw8PhK9F6ZWzADYKMZNW
+         Q1gkDSXaRfujo1NwToWicw4q0p6eVAJ4s6+q96bjLYe5uASgQl/u8XcViIxzIUqrAbzj
+         58U3fkwEgks1L+kVgS29DQrIruP/w3Pvlk8AHEuR8jNzISJ0M3LWKA5yPtiHF9GYDIlH
+         g4CKVgevmG9pN1W4JQByp0RMcHHC00dQrldQPVnafX/G5IILEmSYg8VzgkrvEPJgLfnc
+         8ipQ==
+X-Gm-Message-State: AOAM532/oskh3dQJpcByqkiyxJhrc91Utk/P5fiP0kyde5KrWK6qumXK
+        t212rkr2fCLZFczjqXl40agohdd4pX6Rm6Fr
+X-Google-Smtp-Source: ABdhPJxDEma7Cnmx4miYxxYUu8YBqyPi3vgpxbnoy/UN8ATOSUFAwAE+t6F+NOQ6kQ2OJKGztzjVag==
+X-Received: by 2002:aa7:8e88:0:b029:310:c85b:fc05 with SMTP id a8-20020aa78e880000b0290310c85bfc05mr17294604pfr.19.1625521649333;
+        Mon, 05 Jul 2021 14:47:29 -0700 (PDT)
+Received: from VM-0-3-centos.localdomain ([101.32.213.191])
+        by smtp.gmail.com with ESMTPSA id g3sm412007pjl.17.2021.07.05.14.47.28
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Jul 2021 14:47:29 -0700 (PDT)
+From:   brookxu <brookxu.cn@gmail.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3] block: fix the problem of io_ticks becoming smaller
+Date:   Tue,  6 Jul 2021 05:47:26 +0800
+Message-Id: <1625521646-1069-1-git-send-email-brookxu.cn@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 05, 2021 at 06:00:06PM +0800, Xie Yongji wrote:
-> This ensures that we will not use an invalid block size
-> in config space (might come from an untrusted device).
-> 
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+From: Chunguang Xu <brookxu@tencent.com>
 
-I replied on v3.
-Silently ignoring what hypervisor said is not a good idea.
+On the IO submission path, blk_account_io_start() may interrupt
+the system interruption. When the interruption returns, the value
+of part->stamp may have been updated by other cores, so the time
+value collected before the interruption may be less than part->
+stamp. So when this happens, we should do nothing to make io_ticks
+more accurate? For kernels less than 5.0, this may cause io_ticks
+to become smaller, which in turn may cause abnormal ioutil values.
 
+v3: update the commit log
+v2: sorry, fix compile error due to the missed ')'
 
-> ---
->  drivers/block/virtio_blk.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index e4bd3b1fc3c2..e9d7747c3cc0 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -819,7 +819,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
->  				   struct virtio_blk_config, blk_size,
->  				   &blk_size);
-> -	if (!err)
-> +	if (!err && blk_size >= SECTOR_SIZE && blk_size <= PAGE_SIZE)
->  		blk_queue_logical_block_size(q, blk_size);
->  	else
->  		blk_size = queue_logical_block_size(q);
-> -- 
-> 2.11.0
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+---
+ block/blk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 514838c..bbf56ae 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1243,7 +1243,7 @@ static void update_io_ticks(struct block_device *part, unsigned long now,
+ 	unsigned long stamp;
+ again:
+ 	stamp = READ_ONCE(part->bd_stamp);
+-	if (unlikely(stamp != now)) {
++	if (unlikely(time_after(now, stamp))) {
+ 		if (likely(cmpxchg(&part->bd_stamp, stamp, now) == stamp))
+ 			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
+ 	}
+-- 
+1.8.3.1
 
