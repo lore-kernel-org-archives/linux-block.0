@@ -4,43 +4,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F9C7C11F6D
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D899DC07E9B
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:31:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C2AF61983
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:30:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3468619A0
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jul 2021 15:31:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232541AbhGEPda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 11:33:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58828 "EHLO mail.kernel.org"
+        id S232752AbhGEPd5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 11:33:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58400 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232033AbhGEPcy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jul 2021 11:32:54 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6EEA46199D;
-        Mon,  5 Jul 2021 15:30:16 +0000 (UTC)
+        id S232244AbhGEPdT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Jul 2021 11:33:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 789516198B;
+        Mon,  5 Jul 2021 15:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625499017;
-        bh=4/fj7jMKvf97oJGUy609WjmY9aB7ngVl9DfQpJb7/Ro=;
+        s=k20201202; t=1625499028;
+        bh=hEXybyKNzNQh9GIrfXSwiHb+N8bB+QE1nn7cGPVvTAw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QMkVpq+cj2g4JcztQck3Vmcopbl52b0s6EP2ike1/KQyfPd+t0B0f2+EkK4x/zlDc
-         hvMMzvkWi0tQtvy9fREHqXUDAMQVrYzY2ZaN+N0VyWyvayxt8FaZl/UyqzvuZ21pOT
-         l2BWe2tWzpwlGkd4F/mapZxSEmYCB1omB1422OLxB9+oI/bBxSx99et3dcAZHnl2gZ
-         ptt1om8yiiuYsIQoKAQivN0FVOY3xKDZ0CIf7ltgjnxuwHF2dVEH2WdeuZFpLDwp1o
-         MBrM9b6b58SykfVFtTFE13D6z/KoQKZ4fOSwhDRtEv5yCsG6Zk2i4ESRThrmnCERwF
-         KJ97gFedFDRkg==
+        b=tL4ouPiXpCDzeCC5yJUHpgntuNrxavQBmUC29IB7FlOpeu9MUTj1eBNqTBiAgOmcl
+         woaW+2tURToJl6Qb4jtntt/4PlcJseSG2Y+Se2U6bkyVUwQupemqLLQ4oBiU7RjOVp
+         MRpswnCvir0QJviiXeWbraVezgiU0RhYBXfD2t2VgolbTI+9z7yrH+g2CQ3BvvBNJf
+         6Mr80SKS1zBNKoOj/9+/opI11RTCQKp8WV1aBxgemfae07rdeFSYhIDea2dLUgynbW
+         aUOGVlLTUWYuU7ks6Di3xK+7GqFbUuQ/97GlbbLzPHylNPK25DzRlsEI68yCTHOxYR
+         Tpod9Zaq8U3Vg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>,
+Cc:     Ming Lei <ming.lei@redhat.com>, Yi Zhang <yi.zhang@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 12/41] blk-mq: clear stale request in tags->rq[] before freeing one request pool
-Date:   Mon,  5 Jul 2021 11:29:32 -0400
-Message-Id: <20210705153001.1521447-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 21/41] block: fix race between adding/removing rq qos and normal IO
+Date:   Mon,  5 Jul 2021 11:29:41 -0400
+Message-Id: <20210705153001.1521447-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210705153001.1521447-1-sashal@kernel.org>
 References: <20210705153001.1521447-1-sashal@kernel.org>
@@ -54,157 +53,109 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Ming Lei <ming.lei@redhat.com>
 
-[ Upstream commit bd63141d585bef14f4caf111f6d0e27fe2300ec6 ]
+[ Upstream commit 2cafe29a8d03f02a3d16193bdaae2f3e82a423f9 ]
 
-refcount_inc_not_zero() in bt_tags_iter() still may read one freed
-request.
+Yi reported several kernel panics on:
 
-Fix the issue by the following approach:
+[16687.001777] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
+...
+[16687.163549] pc : __rq_qos_track+0x38/0x60
 
-1) hold a per-tags spinlock when reading ->rqs[tag] and calling
-refcount_inc_not_zero in bt_tags_iter()
+or
 
-2) clearing stale request referred via ->rqs[tag] before freeing
-request pool, the per-tags spinlock is held for clearing stale
-->rq[tag]
+[  997.690455] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
+...
+[  997.850347] pc : __rq_qos_done+0x2c/0x50
 
-So after we cleared stale requests, bt_tags_iter() won't observe
-freed request any more, also the clearing will wait for pending
-request reference.
+Turns out it is caused by race between adding rq qos(wbt) and normal IO
+because rq_qos_add can be run when IO is being submitted, fix this issue
+by freezing queue before adding/deleting rq qos to queue.
 
-The idea of clearing ->rqs[] is borrowed from John Garry's previous
-patch and one recent David's patch.
+rq_qos_exit() needn't to freeze queue because it is called after queue
+has been frozen.
 
-Tested-by: John Garry <john.garry@huawei.com>
-Reviewed-by: David Jeffery <djeffery@redhat.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+iolatency calls rq_qos_add() during allocating queue, so freezing won't
+add delay because queue usage refcount works at atomic mode at that
+time.
+
+iocost calls rq_qos_add() when writing cgroup attribute file, that is
+fine to freeze queue at that time since we usually freeze queue when
+storing to queue sysfs attribute, meantime iocost only exists on the
+root cgroup.
+
+wbt_init calls it in blk_register_queue() and queue sysfs attribute
+store(queue_wb_lat_store() when write it 1st time in case of !BLK_WBT_MQ),
+the following patch will speedup the queue freezing in wbt_init.
+
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20210511152236.763464-4-ming.lei@redhat.com
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+Link: https://lore.kernel.org/r/20210609015822.103433-2-ming.lei@redhat.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq-tag.c |  9 +++++++--
- block/blk-mq-tag.h |  6 ++++++
- block/blk-mq.c     | 46 +++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 54 insertions(+), 7 deletions(-)
+ block/blk-rq-qos.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 6772c3728865..c4f2f6c123ae 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -202,10 +202,14 @@ struct bt_iter_data {
- static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
- 		unsigned int bitnr)
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 2bc43e94f4c4..2bcb3495e376 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -7,6 +7,7 @@
+ #include <linux/blk_types.h>
+ #include <linux/atomic.h>
+ #include <linux/wait.h>
++#include <linux/blk-mq.h>
+ 
+ #include "blk-mq-debugfs.h"
+ 
+@@ -99,8 +100,21 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ 
+ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
  {
--	struct request *rq = tags->rqs[bitnr];
-+	struct request *rq;
-+	unsigned long flags;
- 
-+	spin_lock_irqsave(&tags->lock, flags);
-+	rq = tags->rqs[bitnr];
- 	if (!rq || !refcount_inc_not_zero(&rq->ref))
--		return NULL;
-+		rq = NULL;
-+	spin_unlock_irqrestore(&tags->lock, flags);
- 	return rq;
- }
- 
-@@ -538,6 +542,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
- 
- 	tags->nr_tags = total_tags;
- 	tags->nr_reserved_tags = reserved_tags;
-+	spin_lock_init(&tags->lock);
- 
- 	if (flags & BLK_MQ_F_TAG_HCTX_SHARED)
- 		return tags;
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 7d3e6b333a4a..f887988e5ef6 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -20,6 +20,12 @@ struct blk_mq_tags {
- 	struct request **rqs;
- 	struct request **static_rqs;
- 	struct list_head page_list;
-+
 +	/*
-+	 * used to clear request reference in rqs[] before freeing one
-+	 * request pool
-+	 */
-+	spinlock_t lock;
- };
- 
- extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 50d3527a5d97..00d6ed2fe812 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2276,6 +2276,45 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 	return BLK_QC_T_NONE;
- }
- 
-+static size_t order_to_size(unsigned int order)
-+{
-+	return (size_t)PAGE_SIZE << order;
-+}
-+
-+/* called before freeing request pool in @tags */
-+static void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
-+		struct blk_mq_tags *tags, unsigned int hctx_idx)
-+{
-+	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
-+	struct page *page;
-+	unsigned long flags;
-+
-+	list_for_each_entry(page, &tags->page_list, lru) {
-+		unsigned long start = (unsigned long)page_address(page);
-+		unsigned long end = start + order_to_size(page->private);
-+		int i;
-+
-+		for (i = 0; i < set->queue_depth; i++) {
-+			struct request *rq = drv_tags->rqs[i];
-+			unsigned long rq_addr = (unsigned long)rq;
-+
-+			if (rq_addr >= start && rq_addr < end) {
-+				WARN_ON_ONCE(refcount_read(&rq->ref) != 0);
-+				cmpxchg(&drv_tags->rqs[i], rq, NULL);
-+			}
-+		}
-+	}
-+
-+	/*
-+	 * Wait until all pending iteration is done.
++	 * No IO can be in-flight when adding rqos, so freeze queue, which
++	 * is fine since we only support rq_qos for blk-mq queue.
 +	 *
-+	 * Request reference is cleared and it is guaranteed to be observed
-+	 * after the ->lock is released.
++	 * Reuse ->queue_lock for protecting against other concurrent
++	 * rq_qos adding/deleting
 +	 */
-+	spin_lock_irqsave(&drv_tags->lock, flags);
-+	spin_unlock_irqrestore(&drv_tags->lock, flags);
-+}
++	blk_mq_freeze_queue(q);
 +
- void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		     unsigned int hctx_idx)
++	spin_lock_irq(&q->queue_lock);
+ 	rqos->next = q->rq_qos;
+ 	q->rq_qos = rqos;
++	spin_unlock_irq(&q->queue_lock);
++
++	blk_mq_unfreeze_queue(q);
+ 
+ 	if (rqos->ops->debugfs_attrs)
+ 		blk_mq_debugfs_register_rqos(rqos);
+@@ -110,12 +124,22 @@ static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
  {
-@@ -2294,6 +2333,8 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 	struct rq_qos **cur;
+ 
++	/*
++	 * See comment in rq_qos_add() about freezing queue & using
++	 * ->queue_lock.
++	 */
++	blk_mq_freeze_queue(q);
++
++	spin_lock_irq(&q->queue_lock);
+ 	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
+ 		if (*cur == rqos) {
+ 			*cur = rqos->next;
+ 			break;
  		}
  	}
- 
-+	blk_mq_clear_rq_mapping(set, tags, hctx_idx);
++	spin_unlock_irq(&q->queue_lock);
 +
- 	while (!list_empty(&tags->page_list)) {
- 		page = list_first_entry(&tags->page_list, struct page, lru);
- 		list_del_init(&page->lru);
-@@ -2353,11 +2394,6 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	return tags;
- }
++	blk_mq_unfreeze_queue(q);
  
--static size_t order_to_size(unsigned int order)
--{
--	return (size_t)PAGE_SIZE << order;
--}
--
- static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 			       unsigned int hctx_idx, int node)
- {
+ 	blk_mq_debugfs_unregister_rqos(rqos);
+ }
 -- 
 2.30.2
 
