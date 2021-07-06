@@ -2,111 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD47C07E99
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 01:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C7C6C07E99
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 01:08:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AAEAA608FE
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 01:01:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AFCA61973
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 01:08:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbhGFBD5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jul 2021 21:03:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49718 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229722AbhGFBD4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jul 2021 21:03:56 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D44C061574;
-        Mon,  5 Jul 2021 18:01:19 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id v7so19863960pgl.2;
-        Mon, 05 Jul 2021 18:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=W2+AYYofJ+i/1cuwRg61KlRr9Zka6oqIudL2SUcZpBE=;
-        b=No6NE/548bzly3HYgmlVYu9tCB7/LM6hGfO04rBB75EJ15NDkWjcKzRbInlqQvei1D
-         VteBFJEIPqCH7k5z+KEgf3JNATEuHqKJedwM3wtt6O7xUiqWHMqwEWdFgh6Xz75AWeNP
-         9CsVoT/sP5Wy76VKaFOOYJclrJLX/mBJp77wVna/ar2W9ohxVO2GoUdHmwSkWRm2hCv6
-         JVmSVhVx+z7+AG31it+rGbolw4tSE9bAK2UYtrIOHZtJ1vFYSVXrMLcyxJmuQe1E3otq
-         37JlO6ggRL/+CilEFkSHD7lTGiR7sot2h2liHZ3/8j07gt1ML6J3Tayh1KXz1PZegGmI
-         aw5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=W2+AYYofJ+i/1cuwRg61KlRr9Zka6oqIudL2SUcZpBE=;
-        b=ZnSJQ6BkwVdilaY12t2u1yaHOkvj8syFbdRiQDYDI80zAGIKTMjvzx9CjpxPR0qw8E
-         F3AYafcMhQYt8FkfLSSXjLtQseuFawQoDzrveDAXRuQN3Z96Ah0dTNbrMAiENl2zbdsZ
-         ow93S4y3MWJBVtu1OosnrYzYWNay1j3yiyuo/qHOuW8PgCqPYqwbzRMF9On51Hanq9mI
-         YOoutMfdmuN68+EHXDABTO17q3ZCo4vPMKKaKScQwRHtHvdxQDksZ0h2Iv99NAVRy49B
-         Ea28sGiRiydErdMPhk8sGiEikO12VueNcxP1U53JucLwItDbiq0TYV990IS9OwIB+6j/
-         0euw==
-X-Gm-Message-State: AOAM530LeVzPNE6sdmX0f8/laPg1rDZyd8/VPysI7pv0qInKRnz9G1/Q
-        giNa4GwLB6RMLmhXU+HxQL8=
-X-Google-Smtp-Source: ABdhPJyakDnYiSU123gmIaGGm2KFblaAwv8xMnHUd2dRdan+8hvomba5FWnMECWaEJ3UPdHxAZoZxA==
-X-Received: by 2002:a62:34c7:0:b029:28e:addf:f17a with SMTP id b190-20020a6234c70000b029028eaddff17amr17864664pfa.62.1625533278750;
-        Mon, 05 Jul 2021 18:01:18 -0700 (PDT)
-Received: from [192.168.1.18] ([122.163.155.135])
-        by smtp.gmail.com with ESMTPSA id g12sm664919pjk.25.2021.07.05.18.01.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 18:01:18 -0700 (PDT)
-Subject: Re: [PATCH] block: Avoid accessing an already freed kobject in
- delete_partition
-To:     Christoph Hellwig <hch@infradead.org>,
-        Rajat Asthana <rajatasthana4@gmail.com>
-Cc:     axboe@kernel.dk, damien.lemoal@wdc.com, jack@suse.cz,
-        rafael@kernel.org,
-        syzbot+7d6c5587ec9cff5be65c@syzkaller.appspotmail.com,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, hare@suse.de,
-        linux-kernel-mentees@lists.linuxfoundation.org
-References: <20210702231228.261460-1-rajatasthana4@gmail.com>
- <YN/1DOeSA5ODf1AV@infradead.org>
-From:   Rajat Asthana <thisisrast7@gmail.com>
-Message-ID: <0c623d71-6d99-2e0d-4d8b-63a1ff814dc1@gmail.com>
-Date:   Tue, 6 Jul 2021 06:31:11 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S229743AbhGFBKk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jul 2021 21:10:40 -0400
+Received: from out0.migadu.com ([94.23.1.103]:42186 "EHLO out0.migadu.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229722AbhGFBKj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Jul 2021 21:10:39 -0400
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1625533680;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=uY9MQ3YxTij2WZatl2iKTTHoHr3pwU5udJVdRcNhJRQ=;
+        b=xsu0+lAL74TCCayFDHbSiWBy9U9Akx8glWcc7tBoa5rBhmmxx4HJenli95sIbNt8y4amiR
+        qIhQuJ9X0uHGix5J0jYxBEz4f3D3c0P0CPxehy4g7LdNOv6pWEmGtOXloTQ4E/gGNH+wKk
+        yw/CzrUxQCv/wn18ZZlLvvc5v/n5kq8=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+To:     axboe@kernel.dk, tim@cyberelk.net, hch@lst.de
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] pd: fix order of cleaning up the queue and freeing the tagset
+Date:   Tue,  6 Jul 2021 09:07:34 +0800
+Message-Id: <20210706010734.1356066-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <YN/1DOeSA5ODf1AV@infradead.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: guoqing.jiang@linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Guoqing Jiang <jiangguoqing@kylinos.cn>
 
+We must release the queue before freeing the tagset.
 
-On 03/07/21 10:56 am, Christoph Hellwig wrote:
-> This should be fixed properly by:
-> 
-> "block: check disk exist before trying to add partition"
+Fixes: 262d431f9000 ("pd: use blk_mq_alloc_disk and blk_cleanup_disk")
+Signed-off-by: Guoqing Jiang <jiangguoqing@kylinos.cn>
+---
+ drivers/block/paride/pd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi Christoph, thanks a lot for suggesting this fix. I have been
-working on implementing this and have tried the following:
-- I checked if the the kobject of device structure embedded in
-   gendisk structure is not NULL, to add the partition.
-   This didn't work.
+diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
+index 3b2b8e872beb..9b3298926356 100644
+--- a/drivers/block/paride/pd.c
++++ b/drivers/block/paride/pd.c
+@@ -1014,8 +1014,8 @@ static void __exit pd_exit(void)
+ 		if (p) {
+ 			disk->gd = NULL;
+ 			del_gendisk(p);
+-			blk_mq_free_tag_set(&disk->tag_set);
+ 			blk_cleanup_disk(p);
++			blk_mq_free_tag_set(&disk->tag_set);
+ 			pi_release(disk->pi);
+ 		}
+ 	}
+-- 
+2.25.1
 
-- Then I checked the if kobject of the block_device struct (part0)
-   embedded in the gendisk struct is not NULL, to add the partition.
-   This also didn't work.
-
-- Then I checked the i_state of the bd_inode field of block_device
-   struct embedded in the gendisk struct. I checked if the I_FREEING or
-   I_WILL_FREE fields are not set. The reason behind doing this was
-   to confirm that we only create partition on the disks which are not
-   being freed.
-
-Am I going in the right direction? Can you point me to the correct
-direction if I am not?
-
-thanks
--- Rajat
