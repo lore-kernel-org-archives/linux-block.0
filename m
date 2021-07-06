@@ -2,114 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CCFCC07E96
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 10:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4533C11F68
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 11:17:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEF81619AF
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 10:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 925DE61C72
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 11:17:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231281AbhGFKfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jul 2021 06:35:11 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:51016 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231216AbhGFKfI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jul 2021 06:35:08 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6A2D4226DF;
-        Tue,  6 Jul 2021 10:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1625567549; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oYa45f4FhhRp+3FK6NuiOaD625cS0Uqo4Ax5m9HnxYw=;
-        b=NRj74pTdCy5DxHYIxwbfnLobgD/j6f23HzVf1OS9cvWIpyYUH8n+sd/dgaOSLmFDrHpQwW
-        ntq1sDwz1GcrYxQPfeX1lejGBgKrhFPt/zH+Y9WApyi1yPwV8pPTrRHWhe6gW3wFhzk2lU
-        RxnD8JjhQBW5aXrxZEc7cyAOxaw7AlM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1625567549;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oYa45f4FhhRp+3FK6NuiOaD625cS0Uqo4Ax5m9HnxYw=;
-        b=+GzqWh4ZemorKBDqD5TsMk/iO0aFymDwcLq1fcK+Fv9dr8pvI2650ZYx/AMlfgFtXRywqv
-        9NhBrXf50dxV8kCw==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 1A6351372D;
-        Tue,  6 Jul 2021 10:32:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id 3XK7Az0x5GAKZQAAGKfGzw
-        (envelope-from <hare@suse.de>); Tue, 06 Jul 2021 10:32:29 +0000
-Subject: Re: [PATCH V2 3/6] scsi: add flag of .use_managed_irq to 'struct
- Scsi_Host'
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-References: <20210702150555.2401722-1-ming.lei@redhat.com>
- <20210702150555.2401722-4-ming.lei@redhat.com>
- <47fc5ed1-29e3-9226-a111-26c271cb6d90@huawei.com> <YOLXJZF7wo/IiFMU@T590>
- <20210706053719.GA17027@lst.de> <YOQJD2dgeb8wobOk@T590>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <fb71bccf-0d92-68ed-ad42-cac23fede5a8@suse.de>
-Date:   Tue, 6 Jul 2021 12:32:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S232561AbhGFLTs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jul 2021 07:19:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54548 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232566AbhGFLSd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Jul 2021 07:18:33 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 466D261C73;
+        Tue,  6 Jul 2021 11:15:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1625570155;
+        bh=C7djTTCjYd0cKj88eqwliCRjLiPRX/To8ipnMZj28IM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=kMBNs7TsYsMr7p8ZSpDFz4n1LrajOJjXgJAoBKpwJayIvWWKB9XVPaS25dempyp+H
+         HA0Ct9E2Ak2oe4Vvsoi+WPOct3hoZRCHOc16PpqHKp4rfTmikHYqM2yXU3TXgq0veD
+         TC+3oujimV/17NEnwbFEenv4WRtvY15L6B6nuTs4Qr4Dj3ZVD2TwUjotc7BZn3JtYH
+         GOMTGLyA+/rRcyYWvrso4o3N9M3NbcQBEL5ReKmWFljT8M95Lfe8FyF6zwoxUZ9feU
+         uKqc/sG1B/nH6aAUvxOtoGk3dJwgZKj/C29ACGXHzWqNBVnenjqUTpGij/jkAcOmHa
+         x1s21AyPgWrsw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 077/189] block: introduce BIO_ZONE_WRITE_LOCKED bio flag
+Date:   Tue,  6 Jul 2021 07:12:17 -0400
+Message-Id: <20210706111409.2058071-77-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210706111409.2058071-1-sashal@kernel.org>
+References: <20210706111409.2058071-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <YOQJD2dgeb8wobOk@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/6/21 9:41 AM, Ming Lei wrote:
-> On Tue, Jul 06, 2021 at 07:37:19AM +0200, Christoph Hellwig wrote:
->> On Mon, Jul 05, 2021 at 05:55:49PM +0800, Ming Lei wrote:
->>> The thing is that blk_mq_pci_map_queues() is allowed to be called for
->>> non-managed irqs. Also some managed irq consumers don't use blk_mq_pci_map_queues().
->>>
->>> So this way just provides hint about managed irq uses, but we really
->>> need to get this flag set if driver uses managed irq.
->>
->> blk_mq_pci_map_queues is absolutely intended to only be used by
->> managed irqs.  I wonder if we can enforce that somehow?
-> 
-> It may break some scsi drivers.
-> 
-> And blk_mq_pci_map_queues() just calls pci_irq_get_affinity() to
-> retrieve the irq's affinity, and the irq can be one non-managed irq,
-> which affinity is set via either irq_set_affinity_hint() from kernel
-> or /proc/irq/.
-> 
-But that's static, right? IE blk_mq_pci_map_queues() will be called once 
-during module init; so what happens if the user changes the mapping 
-later on? How will that be transferred to the driver?
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Cheers,
+[ Upstream commit 9ffbbb435d8f566a0924ce4b5dc7fc1bceb6dbf8 ]
 
-Hannes
+Introduce the BIO flag BIO_ZONE_WRITE_LOCKED to indicate that a BIO owns
+the write lock of the zone it is targeting. This is the counterpart of
+the struct request flag RQF_ZONE_WRITE_LOCKED.
+
+This new BIO flag is reserved for now for zone write locking control
+for device mapper targets exposing a zoned block device. Since in this
+case, the lock flag must not be propagated to the struct request that
+will be used to process the BIO, a BIO private flag is used rather than
+changing the RQF_ZONE_WRITE_LOCKED request flag into a common REQ_XXX
+flag that could be used for both BIO and request. This avoids conflicts
+down the stack with the block IO scheduler zone write locking
+(in mq-deadline).
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+Acked-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/linux/blk_types.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index db026b6ec15a..e5cf12f102a2 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -304,6 +304,7 @@ enum {
+ 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
+ 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
+ 	BIO_REMAPPED,
++	BIO_ZONE_WRITE_LOCKED,	/* Owns a zoned device zone write lock */
+ 	BIO_FLAG_LAST
+ };
+ 
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.30.2
+
