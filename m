@@ -2,74 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC716C07E96
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 05:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 552C1C07E9C
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 05:37:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C69F061988
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 05:25:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BE0B61961
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 05:37:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbhGFF2F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jul 2021 01:28:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50184 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbhGFF2F (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jul 2021 01:28:05 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CC2C061574;
-        Mon,  5 Jul 2021 22:25:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=V9RQWVqTQeoAkXWE4Ne/8f/6vQUcvWf8z6pk/6TsLT0=; b=g787ZCRwxrrOMFbum+GrK7ZTBw
-        HhsrDl6Ucf1UNaYQJZTcDWa7fcb+NxrQv1VXAVkCNyKeeYJro3+P5MZcSb/dogGbNtfH3EXf9HFD1
-        esxHkyJccGdewMrAdZVvGQ0OvDLPQYnQTLmsecxcqZtEahFR+Mo6FT765bhN0sPwq+msyDz6DkfMK
-        YKozDJoKMrhkkrmoRPqaSfMl1YJsz8R3WDVt2j5qSt4+y18lbr2LZ1fJ/XUnb9jxjwHThWcZ0DJZ/
-        MBwY10Bth1TMSk53G/n468zN1q5st7NXtgf3xexqzFcxpxoaC7DlDovv4hqi1ZHO7/BqaHZTn1h54
-        YnlQWIJw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m0dZz-00Ardc-Db; Tue, 06 Jul 2021 05:25:11 +0000
-Date:   Tue, 6 Jul 2021 06:25:07 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     brookxu <brookxu.cn@gmail.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] block: fix the problem of io_ticks becoming smaller
-Message-ID: <YOPpM6et9rFNrBOn@infradead.org>
-References: <1625521646-1069-1-git-send-email-brookxu.cn@gmail.com>
+        id S230036AbhGFFkC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jul 2021 01:40:02 -0400
+Received: from verein.lst.de ([213.95.11.211]:59146 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230004AbhGFFkC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Jul 2021 01:40:02 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 0785068BEB; Tue,  6 Jul 2021 07:37:20 +0200 (CEST)
+Date:   Tue, 6 Jul 2021 07:37:19 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: Re: [PATCH V2 3/6] scsi: add flag of .use_managed_irq to 'struct
+ Scsi_Host'
+Message-ID: <20210706053719.GA17027@lst.de>
+References: <20210702150555.2401722-1-ming.lei@redhat.com> <20210702150555.2401722-4-ming.lei@redhat.com> <47fc5ed1-29e3-9226-a111-26c271cb6d90@huawei.com> <YOLXJZF7wo/IiFMU@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1625521646-1069-1-git-send-email-brookxu.cn@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YOLXJZF7wo/IiFMU@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 06, 2021 at 05:47:26AM +0800, brookxu wrote:
-> From: Chunguang Xu <brookxu@tencent.com>
+On Mon, Jul 05, 2021 at 05:55:49PM +0800, Ming Lei wrote:
+> The thing is that blk_mq_pci_map_queues() is allowed to be called for
+> non-managed irqs. Also some managed irq consumers don't use blk_mq_pci_map_queues().
 > 
-> On the IO submission path, blk_account_io_start() may interrupt
-> the system interruption. When the interruption returns, the value
-> of part->stamp may have been updated by other cores, so the time
-> value collected before the interruption may be less than part->
-> stamp. So when this happens, we should do nothing to make io_ticks
-> more accurate? For kernels less than 5.0, this may cause io_ticks
-> to become smaller, which in turn may cause abnormal ioutil values.
-> 
-> v3: update the commit log
-> v2: sorry, fix compile error due to the missed ')'
-> 
-> Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+> So this way just provides hint about managed irq uses, but we really
+> need to get this flag set if driver uses managed irq.
 
-The change looks good:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-
-Although I still have trouble understanding the commit log, especially
-the last sentence.
+blk_mq_pci_map_queues is absolutely intended to only be used by
+managed irqs.  I wonder if we can enforce that somehow?
