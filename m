@@ -2,104 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07388C07E9C
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 05:30:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC73AC07E9C
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 06:29:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAE0F61CB0
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 05:30:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88F5A61CB3
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 06:29:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230266AbhGGFct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jul 2021 01:32:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230324AbhGGFcl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 01:32:41 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E896C061760;
-        Tue,  6 Jul 2021 22:30:01 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id l17-20020a9d6a910000b029048a51f0bc3cso1114326otq.13;
-        Tue, 06 Jul 2021 22:30:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=GUtu6qPrt9CdnsRN6tfeZYE0y1TuRMKLEMOtOSTruJY=;
-        b=F06mQqx24VR82ubSqMr70LXkWrojQ2fAgEEriUfQhVIL5gkXPeibuMGe/8tMcuRIPb
-         632eJPDaifcKxAwzYs40NCwfFaOu/z98z/d4LcjeTmpyHgxpUP5+FyeT4SqSg5FdO/u5
-         J7pfVZKU1EsJtW62JoMp/7eKRvapOr7a+fRtPySMNDU3abOzclvWQMboc+xHZsO9IHs2
-         B2ENfiF7bNV5SH7Lq8w+9p5WFLw9uZN7PfbljRxl+F9xEQg/DU9PTzEQKwdazC+GomVq
-         UwiTPRCA+iU+z5p8q+QQ6XzGAZ1UIuVWk9EMVcEYa9fjU8mo9GA213i4vf9JjbTF2cZr
-         eZxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GUtu6qPrt9CdnsRN6tfeZYE0y1TuRMKLEMOtOSTruJY=;
-        b=en8f22dPoFLgm8j6OQe+1eeAFvW7pg3FT/xs+6EtvmHFIlXLXVjTZxaREy9ZJNF0EP
-         1uWp4azhKYZOprZMrS2JqNJ2/52Hkk6H3HSmTYfzMMW74wN4+sWxn+UHgyWCw/1NVipn
-         DEayX5SqqWs2vXjdxTEUH+exzQ3xSDneRS136GKP6vDs4hQLRrNNMliDUCz/fDjo0v62
-         plkU9RBXI3fOh5+N1Yd1fKfINr9JC0mcKYLHcYUI6LDww2y9gZP+dTgU1p0c8TUEw5lh
-         aZ4qmcGW27jXSoVnqpxX+JeWA23i13FTD61p9+8jQERg+Ir05TKdmmj2WF2IlBhnDDD1
-         NO/A==
-X-Gm-Message-State: AOAM531pome2++CdozX1kAaxFkMuyiP7H+KyurrF+rvZN9CkPYmz+Mlc
-        LkHkhh0q4tmjhP4VagbFyG1ykLFiXrU=
-X-Google-Smtp-Source: ABdhPJwRIztdZpECFdRXqSfmD9731oTE0Bqq3ahr4H0r1uAH/ZlPm3mY7WfUxJMU9+epYWRz3mp0pA==
-X-Received: by 2002:a9d:2781:: with SMTP id c1mr17536139otb.34.1625635800420;
-        Tue, 06 Jul 2021 22:30:00 -0700 (PDT)
-Received: from fractal.attlocal.net ([2600:1700:1151:2380:3ec5:124:b596:7a55])
-        by smtp.googlemail.com with ESMTPSA id l11sm3284843oou.0.2021.07.06.22.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jul 2021 22:30:00 -0700 (PDT)
-From:   Satya Tangirala <satyaprateek2357@gmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
-        Satya Tangirala <satyaprateek2357@gmail.com>,
-        Satya Tangirala <satyat@google.com>
-Subject: [PATCH v4 9/9] block: add WARN_ON_ONCE() to bio_split() for sector alignment
-Date:   Tue,  6 Jul 2021 22:29:43 -0700
-Message-Id: <20210707052943.3960-10-satyaprateek2357@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210707052943.3960-1-satyaprateek2357@gmail.com>
-References: <20210707052943.3960-1-satyaprateek2357@gmail.com>
+        id S230273AbhGGGcK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jul 2021 02:32:10 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:6438 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230263AbhGGGcK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 02:32:10 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GKTvX24r4z78hl;
+        Wed,  7 Jul 2021 14:26:00 +0800 (CST)
+Received: from dggpeml500025.china.huawei.com (7.185.36.35) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 7 Jul 2021 14:29:27 +0800
+Received: from [10.174.176.117] (10.174.176.117) by
+ dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 7 Jul 2021 14:29:27 +0800
+Subject: Re: [PATCH] block: ensure the memory order between bi_private and
+ bi_status
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "Alexander Viro" <viro@zeniv.linux.org.uk>
+CC:     <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <yukuai3@huawei.com>
+References: <20210701113537.582120-1-houtao1@huawei.com>
+From:   Hou Tao <houtao1@huawei.com>
+Message-ID: <0fde8c5a-2c1d-4439-7c75-71fa120d3b62@huawei.com>
+Date:   Wed, 7 Jul 2021 14:29:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210701113537.582120-1-houtao1@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.176.117]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500025.china.huawei.com (7.185.36.35)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Satya Tangirala <satyat@google.com>
+ping ?
 
-The number of sectors passed to bio_split() must be aligned to
-bio_required_sector_alignment(). All callers (other than bounce.c) have
-been updated to ensure this, so add a WARN_ON_ONCE() if the number of
-sectors is not aligned. (bounce.c was not updated since it's legacy code
-- any device that enables bounce buffering won't declare inline
-encryption support, so bounce.c will never see a bio with an encryption
-context).
-
-Signed-off-by: Satya Tangirala <satyat@google.com>
----
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index 1fab762e079b..4c7bfdeefe76 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1435,6 +1435,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
- 
- 	BUG_ON(sectors <= 0);
- 	BUG_ON(sectors >= bio_sectors(bio));
-+	WARN_ON_ONCE(!IS_ALIGNED(sectors, bio_required_sector_alignment(bio)));
- 
- 	/* Zone append commands cannot be split */
- 	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
--- 
-2.25.1
-
+On 7/1/2021 7:35 PM, Hou Tao wrote:
+> When running stress test on null_blk under linux-4.19.y, the following
+> warning is reported:
+>
+>   percpu_ref_switch_to_atomic_rcu: percpu ref (css_release) <= 0 (-3) after switching to atomic
+>
+> The cause is that css_put() is invoked twice on the same bio as shown below:
+>
+> CPU 1:                         CPU 2:
+>
+> // IO completion kworker       // IO submit thread
+>                                __blkdev_direct_IO_simple
+>                                  submit_bio
+>
+> bio_endio
+>   bio_uninit(bio)
+>     css_put(bi_css)
+>     bi_css = NULL
+>                                set_current_state(TASK_UNINTERRUPTIBLE)
+>   bio->bi_end_io
+>     blkdev_bio_end_io_simple
+>       bio->bi_private = NULL
+>                                // bi_private is NULL
+>                                READ_ONCE(bio->bi_private)
+>         wake_up_process
+>           smp_mb__after_spinlock
+>
+>                                bio_unint(bio)
+>                                  // read bi_css as no-NULL
+>                                  // so call css_put() again
+>                                  css_put(bi_css)
+>
+> Because there is no memory barriers between the reading and the writing of
+> bi_private and bi_css, so reading bi_private as NULL can not guarantee
+> bi_css will also be NULL on weak-memory model host (e.g, ARM64).
+>
+> For the latest kernel source, css_put() has been removed from bio_unint(),
+> but the memory-order problem still exists, because the order between
+> bio->bi_private and {bi_status|bi_blkg} is also assumed in
+> __blkdev_direct_IO_simple(). It is reproducible that
+> __blkdev_direct_IO_simple() may read bi_status as 0 event if
+> bi_status is set as an errno in req_bio_endio().
+>
+> In __blkdev_direct_IO(), the memory order between dio->waiter and
+> dio->bio.bi_status is not guaranteed neither. Until now it is unable to
+> reproduce it, maybe because dio->waiter and dio->bio.bi_status are
+> in the same cache-line. But it is better to add guarantee for memory
+> order.
+>
+> Fixing it by using smp_load_acquire() & smp_store_release() to guarantee
+> the order between {bio->bi_private|dio->waiter} and {bi_status|bi_blkg}.
+>
+> Fixes: 189ce2b9dcc3 ("block: fast-path for small and simple direct I/O requests")
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> ---
+>  fs/block_dev.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index eb34f5c357cf..a602c6315b0b 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -224,7 +224,11 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
+>  {
+>  	struct task_struct *waiter = bio->bi_private;
+>  
+> -	WRITE_ONCE(bio->bi_private, NULL);
+> +	/*
+> +	 * Paired with smp_load_acquire in __blkdev_direct_IO_simple()
+> +	 * to ensure the order between bi_private and bi_xxx
+> +	 */
+> +	smp_store_release(&bio->bi_private, NULL);
+>  	blk_wake_io_task(waiter);
+>  }
+>  
+> @@ -283,7 +287,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+>  	qc = submit_bio(&bio);
+>  	for (;;) {
+>  		set_current_state(TASK_UNINTERRUPTIBLE);
+> -		if (!READ_ONCE(bio.bi_private))
+> +		/* Refer to comments in blkdev_bio_end_io_simple() */
+> +		if (!smp_load_acquire(&bio.bi_private))
+>  			break;
+>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+>  		    !blk_poll(bdev_get_queue(bdev), qc, true))
+> @@ -353,7 +358,12 @@ static void blkdev_bio_end_io(struct bio *bio)
+>  		} else {
+>  			struct task_struct *waiter = dio->waiter;
+>  
+> -			WRITE_ONCE(dio->waiter, NULL);
+> +			/*
+> +			 * Paired with smp_load_acquire() in
+> +			 * __blkdev_direct_IO() to ensure the order between
+> +			 * dio->waiter and bio->bi_xxx
+> +			 */
+> +			smp_store_release(&dio->waiter, NULL);
+>  			blk_wake_io_task(waiter);
+>  		}
+>  	}
+> @@ -478,7 +488,8 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+>  
+>  	for (;;) {
+>  		set_current_state(TASK_UNINTERRUPTIBLE);
+> -		if (!READ_ONCE(dio->waiter))
+> +		/* Refer to comments in blkdev_bio_end_io */
+> +		if (!smp_load_acquire(&dio->waiter))
+>  			break;
+>  
+>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
