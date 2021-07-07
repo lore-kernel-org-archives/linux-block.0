@@ -2,153 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED06C07E9C
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 13:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16017C07E95
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 13:55:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7634661C81
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 13:37:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED22A61C9D
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 13:55:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231634AbhGGNjh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jul 2021 09:39:37 -0400
-Received: from mout.gmx.net ([212.227.15.18]:60437 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231357AbhGGNjh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Jul 2021 09:39:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1625664993;
-        bh=bADii7QME+i4827E0EpMZaThgfcrFZi9xhWBV6OTRkU=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=Y9m1iTWuKl37yZt4pMvkzyuUA5zh1qD16/0OerEt/rXPgwWIy9R7DAB9fYdaHQkdl
-         50kXT5X4qH7BlYWsOZxVgjB4HT8qwHxZ+ZbEefMut4T11S38sGy9PFN2pimkyau27y
-         B/3cglHBs1eypdpTTGyrLrcxB5jm7xlheGp3Sw+Y=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530 ([92.116.134.43]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MrQIv-1lMXiA1VcF-00oZF8; Wed, 07
- Jul 2021 15:36:33 +0200
-Date:   Wed, 7 Jul 2021 15:36:26 +0200
-From:   Helge Deller <deller@gmx.de>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, bernie@develer.com,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: div_u64/do_div stack size usage, was Re: [v3] block: Removed a
- warning while compiling with a cross compiler for parisc
-Message-ID: <YOWt2swxONAvhesH@ls3530>
-References: <CAK8P3a2mAQOnTxBhVzVA8q8O-uVrdidCN5h5-T2dc0=Wet2uPQ@mail.gmail.com>
- <20210706205927.4407-1-abd.masalkhi@gmail.com>
- <CAK8P3a23=tcWx8iWNAKXcT9TRgPrZbEVVy9a_ad29hSde_jkKg@mail.gmail.com>
+        id S231685AbhGGN6S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jul 2021 09:58:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32878 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231472AbhGGN6S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 09:58:18 -0400
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2ECBC061574
+        for <linux-block@vger.kernel.org>; Wed,  7 Jul 2021 06:55:37 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id d2so1055798qvh.2
+        for <linux-block@vger.kernel.org>; Wed, 07 Jul 2021 06:55:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TcKifhriFJuDa96QDzjjusft+tYNy8HINE20CAdfktI=;
+        b=PVYGBDZx8rvf5qyrSI5a5JROVUAogityQXvyuvZRzh0rCi3PPp/GA6HqEnr3pu0b7D
+         WaQIf/u3VVDK097+9M/IOVTXlpkUnltIEB3R5AJKjPSbP8mmra8EB16cm0YjMchSQ2/Z
+         uE+FjCKiOoE3JkVG6h/gNBWq8+7TbacalO0aNZ4YZkFA6tloER7tYPCBMwq74zyErtuK
+         9z1L5Slm0lbPJRdw6oFSWOOTyWBdBaKa1e9lj+CC5wmVo6O0Dt5nOcefXGhNPVYWZC0d
+         C455YNkfDCWVEWHAxiczj6EblLF1DYmrYoigzZydjlM6X2pxlS/2I5jNihzEuEF8Ep53
+         4dmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TcKifhriFJuDa96QDzjjusft+tYNy8HINE20CAdfktI=;
+        b=Sr6Pcn4X6FI+XBy9yexaRTlsqYxAeVy0WQ92WXVWdHXcV8GVAOHmTZReeSTX5bwbeB
+         V1mRIYdBiiykDKvL+4z/yw/QtNecWi5fdF9xCXNAOfe60iKpJjtjJlXsxRIboro0M+/U
+         wQXo0Crk165QkyeTToWANEeJYgDmkLhOIvIDOs7W0OSUg7mQB7V/zkK0RmIGIyQat2Dr
+         QiN1ay7P6iXCLSPaJz1bfEkPPs8mtUl3G5TnTauGrwAumTnCVtMATBUEghQeEj9qI1ad
+         0Bucg39s+QxhY/tiEhK57TNHrJjGSsswpqFEFsKdx4GNmk39h26TG7IxyhQtO0VdQarb
+         dacw==
+X-Gm-Message-State: AOAM533NxJQPbDTJMn6JYx9/eh8vEYk6WwHZCUEmRTW9Rm8ZIsc4D1jN
+        bbygdTNJEFFtu6cfoQFhxdjnTLl83Cs=
+X-Google-Smtp-Source: ABdhPJw9khmOyA3TijG31yTb1uUMTAGKr0gk84qB9Ym3ysF28ZpMKmeArziIRCYBtSE8lplsTWl9Gw==
+X-Received: by 2002:a0c:ef48:: with SMTP id t8mr23789641qvs.6.1625666137052;
+        Wed, 07 Jul 2021 06:55:37 -0700 (PDT)
+Received: from dschatzberg-fedora-PC0Y6AEN ([2620:10d:c091:480::1:3074])
+        by smtp.gmail.com with ESMTPSA id l190sm6523593qkc.120.2021.07.07.06.55.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jul 2021 06:55:36 -0700 (PDT)
+Date:   Wed, 7 Jul 2021 09:55:34 -0400
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Subject: Re: [PATCH 6/6] loop: don't add worker into idle list
+Message-ID: <YOWyVnrOTHvMB7A3@dschatzberg-fedora-PC0Y6AEN>
+References: <20210705102607.127810-1-ming.lei@redhat.com>
+ <20210705102607.127810-7-ming.lei@redhat.com>
+ <YORg2KYF7X1ZYJPG@dschatzberg-fedora-PC0Y6AEN>
+ <YOUdMjAzEw6JQjKG@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a23=tcWx8iWNAKXcT9TRgPrZbEVVy9a_ad29hSde_jkKg@mail.gmail.com>
-X-Provags-ID: V03:K1:nnhbPhVe0w4FsB/qB/wiShDLGfu12+BnEY7KLWwti1Fl5PBVH/E
- S77xnutvouWiaEN3nI8M0/NOzFl8vqGA2pjn0vjxo4+Bf+Y6uGss++TTPNSIHXIRGNjb11w
- LOntItw/iwGhXtCxvPLf3/zv/RGsWp7LNrjj/tKGWTw/ceIz30BN3DUuAoyaggzQy3vh5AT
- ENKEoZ5BLki9HHD3m7Rkg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Pt6NqcR/CpE=:d1NXX/4rxAOw2q5N1rLcSe
- w9H1UR2atQHqUEoi2GHiRm6G6qSTcro+4Qr0AY7IQAyeJyeHhKcvrWbD6F6tSoaB7zUqJZWUv
- 7RyZF5v39JXAS+0z1G06KdCYryPswtK3X6KFKI/jz2LrNkot3g+vR71L1OZ+jnogAkTT5Zt9o
- x7cp2kx6oyi9zTikm4n+ZgzsvsS/+qSj9hYzhChyNkcAiwa7kOJDH36U/V9eWiSzmRu5SexAl
- KL0aIKTklaa8mV+iwDTWOXx+QMpjNihe2QzNAqEmt+8DuomBhA5ys8TW29EeQOJBaGLgNvZef
- i6jF6HRQxSU83n+1kVquLmTypezR7ekNjLY4Gr9EZBUbj8oK/ep6e7MEVjpFYqsXhumfTvFwF
- N/92ZwHAsajPuF9/VdF82VqjktcgDSNVQmdEYWK75iXnmLVv3TkOvb3nkSX+15DWYmDdtpuSp
- jKnTXKy600lH5JB+2Wbg3hK0rnwGLEWIhdeGH6tYfuHtx7JMr8vHR1Fx6pF/PakEDg3q7BICc
- Bo/UB8FM58NPKhMt1rI6gCW80XulxrZPwP8k8uMth0WpJIQAChuReiWNVI+mmPOQAj5sDZE0F
- 5kX1aL1zOx6Ls3XFdQ7WzuS7oHFR1nG/eWlb5WrzccpuF6CkMXwL0va7S3IePaVQGK3EyzZRg
- 8Pry8VDPa7NfjmM6qs+c58htQYkS3IJCiVm0qnmcDZkfX2MBZK9PZyHLGCjEhI0/dgWpGWZaT
- 8rKI++D6MufT0a42DU6HqufI5wlllnsDWDDBzerdluFsu7SYgwsg6RSIChizdA7VP22udTiRL
- JSaZ1fe8+4iBYu0/JTT5+WaVsRmUswwx/z7SJZIuixI20UoQq1xarjmJAhO9++iJy1Cmlrflm
- JMW+tB369DpnRVo+Kj3hfuivIUoDq6SCrwun3YDgpb7sKTFaydFE5qEpC24YvB+EsCqoC2knz
- 98lPLOwPmPFnx1lZCgTjFt8qIS99y6+bDts0Pdne4Q6w40Q5n2oe82F1cqElXTZZAtR+tr0e4
- +aM+qiDD6BHDYNhK8MWCVf0OFEE63TEiBkE5RwiQx0EbqmBB4Bs1SIuj4KfGeXtVhsAXa7IOV
- Mx4NMHhR+KJJSIZObU0LgX/TzEqsPNOaHJh
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <YOUdMjAzEw6JQjKG@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-* Arnd Bergmann <arnd@arndb.de>:
-> On Tue, Jul 6, 2021 at 10:59 PM Abd-Alrhman Masalkhi
-> <abd.masalkhi@gmail.com> wrote:
-> >
-> > I have compiled the kernel with a cross compiler hppa-linux-gnu-
-> > (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0 and the conficuration was the
-> > default, Build for generic-32bit "generic-32bit_defconfig"
->
-> Ok, thanks. I have reproduced this now with gcc-9.4.0 from
-> https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/.
->
-> I have also tried it with the other gcc versions and shown that it
-> happens with every older compiler as well, but it does not happen
-> with gcc-10 or gcc-11, which bring the frame size down to 164 or
-> 172 bytes respectively. gcc-10 also fixes similar warnings for
-> net/ipv4/tcp_input.c, net/sunrpc/stats.c and lib/xxhash.c that
-> fly under the radar with the default warning level.
->
-> My first thought was this was a result of -finline-functions getting
-> enabled by default in gcc-10, but enabling it on gcc-9 did not
-> help here. It's likely that the gcc behavior was fixed in the process
-> of enabling the more aggressive inliner by default though.
->
-> I also tried building genhd.o for every architecture that has
-> gcc-9.4 support and did not find the problem anywhere except
-> on parisc.
->
-> Using CONFIG_CC_OPTIMIZE_FOR_SIZE did solve the
-> problem for me (frame size down to 164 bytes), but I could not
-> pinpoint a specific -f option that fixes it for -O2. Maybe we can
-> simply change the defconfig here? 32-bit parisc systems are
-> probably memory limited enough that building a -Os kernel
-> is a good idea anyway. 64-bit parisc already builds with -Os
-> but does not see the warning with -O2 either.
+On Wed, Jul 07, 2021 at 11:19:14AM +0800, Ming Lei wrote:
+> On Tue, Jul 06, 2021 at 09:55:36AM -0400, Dan Schatzberg wrote:
+> > On Mon, Jul 05, 2021 at 06:26:07PM +0800, Ming Lei wrote:
+> > >  	}
+> > > +
+> > > +	spin_lock(lock);
+> > >  	list_add_tail(&cmd->list_entry, cmd_list);
+> > > +	spin_unlock(lock);
+> > >  	queue_work(lo->workqueue, work);
+> > > -	spin_unlock(&lo->lo_work_lock);
+> > >  }
+> > >  
+> > >  static void loop_update_rotational(struct loop_device *lo)
+> > > @@ -1131,20 +1159,18 @@ static void loop_set_timer(struct loop_device *lo)
+> > >  
+> > >  static void __loop_free_idle_workers(struct loop_device *lo, bool force)
+> > >  {
+> > > -	struct loop_worker *pos, *worker;
+> > > +	struct loop_worker *worker;
+> > > +	unsigned long id;
+> > >  
+> > >  	spin_lock(&lo->lo_work_lock);
+> > > -	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
+> > > -				idle_list) {
+> > > +	xa_for_each(&lo->workers, id, worker) {
+> > >  		if (!force && time_is_after_jiffies(worker->last_ran_at +
+> > >  						LOOP_IDLE_WORKER_TIMEOUT))
+> > >  			break;
+> > > -		list_del(&worker->idle_list);
+> > > -		xa_erase(&lo->workers, worker->blkcg_css->id);
+> > > -		css_put(worker->blkcg_css);
+> > > -		kfree(worker);
+> > > +		if (refcount_dec_and_test(&worker->refcnt))
+> > > +			loop_release_worker(worker);
+> > 
+> > This one is puzzling to me. Can't you hit this refcount decrement
+> > superfluously each time the loop timer fires?
+> 
+> Not sure I get your point.
+> 
+> As I mentioned above, this one is the counter pair of INIT reference,
+> but one new lo_cmd may just grab it when queueing rq before erasing the
+> worker from xarray, so we can't release worker here until the command is
+> completed.
 
-I agree that the simplest solution is to increase the default value for
-parisc here.
-On parisc we have a 32k stack (either 1x32k or 2x16k when using IRQ
-stacks). I increased the default value to 1280 in 2017, but as can be
-seen here this isn't sufficient. Either way, we have an active runtime
-check for stack overflows which has never triggered yet, so let's just
-remove the compiler warning by increasing the value to 2048. Patch is
-below.
-
-Helge
-
-=2D--
-
-[PATCH] parisc: Increase gcc stack frame check to 2048 for 32- and 64-bit
-
-parisc uses much bigger frames than other architectures, so increase the
-stack frame check value to 2048 to avoid compiler warnings.
-
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Helge Deller <deller@gmx.de>
-
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 678c13967580..1d99c3194e18 100644
-=2D-- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -335,9 +335,8 @@ config FRAME_WARN
- 	int "Warn for stack frames larger than"
- 	range 0 8192
- 	default 2048 if GCC_PLUGIN_LATENT_ENTROPY
--	default 1280 if (!64BIT && PARISC)
--	default 1024 if (!64BIT && !PARISC)
--	default 2048 if 64BIT
-+	default 1024 if !(64BIT || PARISC)
-+	default 2048 if (64BIT || PARISC)
- 	help
- 	  Tell gcc to warn at build time for stack frames larger than this.
- 	  Setting this too low will cause a lot of warnings.
-
+Suppose at this point there's still an outstanding loop_cmd to be
+serviced for this worker. The refcount_dec_and_test should decrement
+the refcount and then fail the conditional, not calling
+loop_release_worker. What happens if __loop_free_idle_workers fires
+again before the loop_cmd is processed? Won't you decrement the
+refcount again, and then end up calling loop_release_worker before the
+loop_cmd is processed?
