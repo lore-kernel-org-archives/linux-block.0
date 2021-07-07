@@ -2,90 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 456DDC07E9C
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 14:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 444B4C07E95
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 15:11:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EB7161C37
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 14:42:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29D4E61CC1
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 15:11:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232082AbhGGOpd convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jul 2021 10:45:33 -0400
-Received: from mta-tor-003.bell.net ([209.71.212.30]:30552 "EHLO
-        cmx-torrgo002.bell.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S232022AbhGGOpd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 10:45:33 -0400
-X-Greylist: delayed 369 seconds by postgrey-1.27 at vger.kernel.org; Wed, 07 Jul 2021 10:45:32 EDT
-X-RG-CM-BuS: 0
-X-RG-CM-SC: 0
-X-RG-CM: Clean
-X-Originating-IP: [67.71.147.238]
-X-RG-Env-Sender: dave.anglin@bell.net
-X-RG-Rigid: 60C8802C00F99E5E
-X-CM-Envelope: MS4xfETMKvYBn9Eqc02EI8O+fnIy40QVXZoeIEweaC0ZMFOfoE+lg6IIxLDVfqeOTeDIAJSbir61aSFyqhLUprDE7by0I6G7lU9iZ5t1yOdhUtEk91Tsyr1Z
- YCvX/0B4IOGw0hYm6hz4AepydeKLBrjMfFZSwlO912HVII02toG6+5cEsAG5Qmm/hSgzviF2J/bwAIzwHNZIzMKgvlhMqvcTMUwipCV/O9NPni42eiChsZdL
- 1dWxrGiwBr7FppwnGZpoaeP7w/8Y5mO62CUHzWPanWJpc68uAWcr9wEDUXYM5FFm/sOFJE9oKbuKm8fYWytsSbNy9GUO1VCzaXSdRCZkGf5L8CjXwmh2tWa5
- tBFbkYYx8BCyVneejuc+gkFUz7/JGioHwU2v3+flDCow7aoa/Bl13kRj7EIOgGwVmBUJF2EDCKYBRLWHkEJCtUzTN79Dy/GZkhCka4cTTxSIQFrVjZpjwZ98
- d1LHomicS/3TFxDuVqz8Cy+SXGlh/8xaz+puussjSIapU0Qf7/YoI+JFThc=
-X-CM-Analysis: v=2.4 cv=Zd5+iuZA c=1 sm=1 tr=0 ts=60e5bbf8
- a=/cPhanApxV8nRKTAyWrE3w==:117 a=/cPhanApxV8nRKTAyWrE3w==:17
- a=IkcTkHD0fZMA:10 a=mDV3o1hIAAAA:8 a=FBHGMhGWAAAA:8 a=Exa40m6Ew_gtj0IxAc0A:9
- a=QEXdDO2ut3YA:10 a=_FVE-zBwftR9WsbkzFJk:22 a=9gvnlMMaQFpL9xblJ6ne:22
-Received: from [192.168.2.49] (67.71.147.238) by cmx-torrgo002.bell.net (5.8.716.03) (authenticated as dave.anglin@bell.net)
-        id 60C8802C00F99E5E; Wed, 7 Jul 2021 10:36:40 -0400
-To:     Arnd Bergmann <arnd@arndb.de>,
-        Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, bernie@develer.com,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-References: <CAK8P3a2mAQOnTxBhVzVA8q8O-uVrdidCN5h5-T2dc0=Wet2uPQ@mail.gmail.com>
- <20210706205927.4407-1-abd.masalkhi@gmail.com>
- <CAK8P3a23=tcWx8iWNAKXcT9TRgPrZbEVVy9a_ad29hSde_jkKg@mail.gmail.com>
-From:   John David Anglin <dave.anglin@bell.net>
-Subject: Re: div_u64/do_div stack size usage, was Re: [v3] block: Removed a
- warning while compiling with a cross compiler for parisc
-Message-ID: <f9293c4d-bb4e-bcf0-183e-90cf5192a725@bell.net>
-Date:   Wed, 7 Jul 2021 10:36:38 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S232227AbhGGPOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jul 2021 11:14:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50148 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232250AbhGGPOV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 11:14:21 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50086C061574;
+        Wed,  7 Jul 2021 08:11:39 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id x16so359013plg.3;
+        Wed, 07 Jul 2021 08:11:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GNDXNaZYGbMBdcYFq4ONE/0GjhVExMKqksA5/1NNflY=;
+        b=LvrF+NLV2Gy3fvh0Cp5ddJeIkz+lg/q2D1FlVmFj5Jkxj1g5kvXlTZcePJo7FPdLbj
+         lKFaGXeMxMwc73KD9WtJOg4I85I1QqKZCGrTyvBk5Y2evPdtYBrS2jOp4pf/t8d6f1K6
+         ddi7qZM+7PlvZ9QU2nzr0XnVim+klirwv4P58eNHr4INOxvVfBWrAmSzoNqvZldGgPcX
+         cJ2ox2pYtvFIXXAqsy7C3regM90zc2o1hZ2pLNxIJoRHcnP/6D4UM5U0uXE+OMk4CSR7
+         TS00FHzfDMcY8/hOaBnDEbjpA7X2iEBODNaGG15YDGU2xPnzW4GfvNAGYhHnvJCYiyyc
+         TuyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=GNDXNaZYGbMBdcYFq4ONE/0GjhVExMKqksA5/1NNflY=;
+        b=oA47QWWrtL4XUS2MiNUCF+J0I/w3THCZXwzX+ZsdnZy6+0BKHeQQjJjSCCXBlqZ7h+
+         +FgPnOa+l+mMqZW+BqlKMXZZ214xbkHlzvQeP6WXc4UDn5hTrDUH57+3VpX0oIS77HHH
+         6+4BGjdme9ytp5P2GdlTRI4AUg/3aprz2SH9kSbodtjaLLCvnglSYbphKpiFECy/18sK
+         HtATRoCeyuOvM6K0lGb+sCKVt0QctNmL8r+Ar+y9RB9RNFkWO3OFTdMrZTe7fVocs8Vp
+         Ylc2w/a2tNolgyQ8Bq6gJgjHduyXf/yqyzG/EhXlzR9txdlbLP4UTiXLWLuBjgRilhmm
+         5wPw==
+X-Gm-Message-State: AOAM5339WNRv/OHsDT/R1n0j3WGty/YWEdEhpFfPG9mHFJ2pwUxn8b74
+        gjdlITiLiRUWDxWS0iFhxkw=
+X-Google-Smtp-Source: ABdhPJwfPq97U1rGRYVrYZ1fgykOXnND9H35Tl077Tp8RuyyoPLyZr9lYn5FFTpa7OVSrObVm3rylQ==
+X-Received: by 2002:a17:90a:c595:: with SMTP id l21mr89869pjt.200.1625670698675;
+        Wed, 07 Jul 2021 08:11:38 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:da0b])
+        by smtp.gmail.com with ESMTPSA id c10sm19784889pfo.129.2021.07.07.08.11.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jul 2021 08:11:38 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 7 Jul 2021 05:11:33 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH V2] blk-cgroup: prevent rcu_sched detected stalls
+ warnings while iterating blkgs
+Message-ID: <YOXEJTI7qOY6QBjy@mtj.duckdns.org>
+References: <20210707015649.1929797-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a23=tcWx8iWNAKXcT9TRgPrZbEVVy9a_ad29hSde_jkKg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707015649.1929797-1-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-07-07 4:17 a.m., Arnd Bergmann wrote:
-> I have also tried it with the other gcc versions and shown that it
-> happens with every older compiler as well, but it does not happen
-> with gcc-10 or gcc-11, which bring the frame size down to 164 or
-> 172 bytes respectively. gcc-10 also fixes similar warnings for
-> net/ipv4/tcp_input.c, net/sunrpc/stats.c and lib/xxhash.c that
-> fly under the radar with the default warning level.
->
-> My first thought was this was a result of -finline-functions getting
-> enabled by default in gcc-10, but enabling it on gcc-9 did not
-> help here. It's likely that the gcc behavior was fixed in the process
-> of enabling the more aggressive inliner by default though.
-A number of improvements were made to the calculation of RTX costs in gcc-10 and gcc-11.
-These dramatically affect inlining and the compilation time for xxhash.c on parisc.  The problem
-is pretty much fixed for the 32-bit target but more work is needed for the 64-bit target.
+On Wed, Jul 07, 2021 at 09:56:49AM +0800, Yu Kuai wrote:
+> We run a test that create millions of cgroups and blkgs, and then trigger
+> blkg_destroy_all(). blkg_destroy_all() will hold spin lock for a long
+> time in such situation. Thus release the lock when a batch of blkgs are
+> destroyed.
+> 
+> blkcg_activate_policy() and blkcg_deactivate_policy() might have the
+> same problem, however, as they are basically only called from module
+> init/exit paths, let's leave them alone for now.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-See:
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87256
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Dave
+Thanks.
 
 -- 
-John David Anglin  dave.anglin@bell.net
-
-
+tejun
