@@ -2,92 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9863BC07E95
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 15:38:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A63C07E9C
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 16:58:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EBF6619C6
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 15:38:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6ED261CBE
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 16:58:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231730AbhGGPlh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jul 2021 11:41:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56254 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231727AbhGGPlh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 11:41:37 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4588BC061574
-        for <linux-block@vger.kernel.org>; Wed,  7 Jul 2021 08:38:57 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id l26so3805724oic.7
-        for <linux-block@vger.kernel.org>; Wed, 07 Jul 2021 08:38:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=H/u+AYAwK9mJcG4oUWcnUGsuenx4nlYeOD13u9gKYw4=;
-        b=hBe29YUOrYgfT6USN8t15IXPOdsaxaWTgbrLieT0ub7LIuxZQLgx28SKSKI2NneYaX
-         3TfqswY3vdTXnPYj/gn7E2GPnw3fzQoZ4/2cKo2U8yYmk5UOaMGBZQV4FkLxJmLZXtVU
-         WvhFUSJeZJD0jCIgSkOooNBIcaNQ9PF6I4tHzvnb41Q+vpQ2njGA69DOrhrmQUVwdRRi
-         Sh9D/0WnPlX9q+V7H0eoW9RNCAufgJnb+iMaMGxTsP5RGsfxe2RomDZSsmI9qPJ6eHFr
-         413hVjj1elDDIYi4tiXFVKvlOELXOGD7sQNBIzlhRADjBFfQJmRxGkGU8TIJv3VJCVld
-         rESw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H/u+AYAwK9mJcG4oUWcnUGsuenx4nlYeOD13u9gKYw4=;
-        b=SC74hWVXuRE5LGcwXeaxDyQXlWXFAgd2TQQ72AEA1k5H1yj3jkF+j0gc1y1dkql/DZ
-         fMWE8TS+COwZbhQ+lEAnm0B8f4xc/ahoX1DyCdtup6d4zYDEzSjEvQAi2DEC3HNvYi9o
-         dYQKEvrx4Q9gEUjBRIVK6L2E4BUbuSkfqvQaue1jk48Z2BvZZQ1axhy2IX8M0hD0YBmi
-         o7+ofVSdDmX47GDBmpn/WhMzBQt4tVNP+mp7admEKIp/FzGcPL474hYtRwkZ75s6dF8x
-         xT1fqnORO5MlyZ4IBsHe635VnKZGdAmclNRpzz3tNQzOLFRiVvfEmN+gL86xA7DQAWbn
-         9whA==
-X-Gm-Message-State: AOAM531HjoHc2j4ZMNmhui4G1MgWtp/7yrEHd2xLppNGQuKQztqMslcl
-        c1+IOPPsd5T83/uQsqPJti2vUw==
-X-Google-Smtp-Source: ABdhPJxfpHgxHg2b3kqBMIvAO3jc3igdIVCQdUBIWCICtzLhDSXduDYBwRAIqIfJAgkrJZQnFRiyqg==
-X-Received: by 2002:aca:d641:: with SMTP id n62mr154422oig.77.1625672336548;
-        Wed, 07 Jul 2021 08:38:56 -0700 (PDT)
-Received: from [192.168.1.170] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id o189sm4241409oif.54.2021.07.07.08.38.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jul 2021 08:38:56 -0700 (PDT)
-Subject: Re: [PATCH V2] blk-cgroup: prevent rcu_sched detected stalls warnings
- while iterating blkgs
-To:     Yu Kuai <yukuai3@huawei.com>, tj@kernel.org
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-References: <20210707015649.1929797-1-yukuai3@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <dc715155-f936-16ef-bcc4-3063988402ba@kernel.dk>
-Date:   Wed, 7 Jul 2021 09:38:54 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S230396AbhGGRBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jul 2021 13:01:05 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:50852 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S230376AbhGGRBE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 13:01:04 -0400
+Received: from cwcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 167Gw96L029559
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 7 Jul 2021 12:58:10 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id CA98E15C3CC6; Wed,  7 Jul 2021 12:58:09 -0400 (EDT)
+Date:   Wed, 7 Jul 2021 12:58:09 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     leah.rumancik@gmail.com, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH] ext4: fix EXT4_IOC_CHECKPOINT
+Message-ID: <YOXdIZARJ0Rwtfbd@mit.edu>
+References: <20210707085644.3041867-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20210707015649.1929797-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707085644.3041867-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/6/21 7:56 PM, Yu Kuai wrote:
-> We run a test that create millions of cgroups and blkgs, and then trigger
-> blkg_destroy_all(). blkg_destroy_all() will hold spin lock for a long
-> time in such situation. Thus release the lock when a batch of blkgs are
-> destroyed.
-> 
-> blkcg_activate_policy() and blkcg_deactivate_policy() might have the
-> same problem, however, as they are basically only called from module
-> init/exit paths, let's leave them alone for now.
+On Wed, Jul 07, 2021 at 10:56:44AM +0200, Christoph Hellwig wrote:
+> Issuing a discard for any kind of "contention deletion SLO" is highly
+> dangerous as discard as defined by Linux (as well the underlying NVMe,
+> SCSI, ATA, eMMC and virtio primitivies) are defined to not guarantee
+> erasing of data but just allow optional and nondeterministic reclamation
+> of space.  Instead issuing write zeroes is the only think to perform
+> such an operation.  Remove the highly dangerous and misleading discard
+> mode for EXT4_IOC_CHECKPOINT and only support the write zeroes based
+> on, and clean up the resulting mess including the dry run mode.
 
-Applied, thanks.
+A discard is not "dangerous"; how it behaves is simply not necessarily
+guaranteed by the standards specification.  The userspace which uses
+the ioctl simply needs to know how a particular block device might
+react when it is given a discard.
 
--- 
-Jens Axboe
+I'll note that there is a similar issue with "WRITE SAME" or "ZEROOUT.
+A WRITE SAME might take a fraction of a second --- or it might take
+days --- depending on how the storage device is implemented.  It is
+similarly unspecified by the various standards specification.  Hence,
+userspace needs to know something about the block device before
+deciding whether or not it would be good idea to issue a "WRITE SAME"
+operation for large number of blocks.
 
+This is why the API is implemented in terms of what command will be
+issued to the block device, and not what the semantic meaning is for
+that particular command.  That's up to the userspace application to
+know out of band, and we should be able to give the privileged
+application the freedom to decide which command makes the most amount
+of sense.
+
+	 	      	  	    		   - Ted
