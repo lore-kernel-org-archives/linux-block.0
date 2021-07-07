@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3AB6C11F66
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 05:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA6DC11F6B
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 05:30:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B4E4C61CC1
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 05:30:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A271F61CF4
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 05:30:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbhGGFcj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jul 2021 01:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60844 "EHLO
+        id S230256AbhGGFcs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jul 2021 01:32:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230265AbhGGFcg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 01:32:36 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86216C061574;
-        Tue,  6 Jul 2021 22:29:56 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id l21so2092311oig.3;
-        Tue, 06 Jul 2021 22:29:56 -0700 (PDT)
+        with ESMTP id S230296AbhGGFck (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jul 2021 01:32:40 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 591A7C061760;
+        Tue,  6 Jul 2021 22:30:00 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id t3so2082685oic.5;
+        Tue, 06 Jul 2021 22:30:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ajJQQ1wMsYc4K5bCPNbQMhMwwTubupfzXXLYLgtflPY=;
-        b=cHKOFmya97SUjVNq+yBAvvA85SDHvynbADkqZrv6lAmXPUO+kgTilVPYPiBeGkSYFt
-         O18wQACj++qHCCG4qyoXphK/KQeK01zZ5UJfIteSBoRopwl3s8v//XW0z/nCa8g0o5zW
-         Mwu0doASSFdYzulMORAGuuT3nL3jRGPdQFaSjxTGBiT/O++EYt4pkoWH5b9B8jnaB42U
-         SxvqSCR6hSiwuUnlJnAq51DOWYwpXjGAgm2CyTUpvupuehVKPWK4p/qCF+mMadv9LsFo
-         ro5M9bWsldHtkeiaRlHmxr+9rT3IK6pQkG/9T283o5l+Ag4uWjFwlM5FdP9haoUBPKo1
-         7DZA==
+        bh=m4lqZbjB3cGT822e5RliK4G6yObopCjhH4y/z9EF+yE=;
+        b=uarWOHfmD7XP60mVc87ksvRwc4pY1WtrYJYBCiKDVw0ui4tcLwca1vvmSbKHYsCE8B
+         1yFlTXTNgKcO8CmUyNWS6NM0wriSDqg2n/2Y6czDOWNrCsdmfLyuIaUBAPfj+df6HsYj
+         NzgPL5N9RE7TRn7nsaRk5QG6+K8zpeJB3YsKzUZ90yD3gfMm5y5tgHeHuqBzC1ZSN1RM
+         3oGu4GBv5DBXFef1P49ctr2YU+Uq3wlQQy4mjDSbqOj/QQqwwPe8OqUD6Jm2sBjOrr7x
+         dzvLrfT95pKhbEYSj7O2tDK/blZSFQYXPvrxMjmObbirSA4Fp+EXKp1LfVyr0fqodvPI
+         3qng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ajJQQ1wMsYc4K5bCPNbQMhMwwTubupfzXXLYLgtflPY=;
-        b=j6zhH1vUMWCb1V6zL8/fiSKrqfuvN3movQAUDT9/THZIxcMs2DMoBRZrBFilDi3bzg
-         YsRpnAOM3loeuoxgdLWgRCH1qAKCNU85lGCq3pdClzKMZzApu+IOrbdwx15X2XIAhlnl
-         IVyVR/pX02LyAkARd/GuZoc88t3P7tD7xbJpHbWDXUJ5fxnzJA0G296OEvny8kkYNVfk
-         hDfxASLZaDDAhBV0VlK8YR90W+WdiFXPUrYv0vEjJS/d8rpbnMS117G6cZq4WqR/LeAX
-         6Dethw9KGN2GQZZyaFgUDD0+5RTXfH0wM6TTjab1CXN/g/EnAbQX4Kay1rwyK2xZada1
-         9LWA==
-X-Gm-Message-State: AOAM530Hmw0iE89/4rVtwNfxv3QoHImQrBpNXuirWgNRiBz62lBeUwbA
-        xJw7JB47S8US4/cIf4//MxQMuGmPKxA=
-X-Google-Smtp-Source: ABdhPJwlmtO8K0u0EgvmFGour7UXe+e4StJ29DbHrk7RJ89X1ndz7QZlneDV3+CvDvm9stjACcGScQ==
-X-Received: by 2002:a05:6808:d54:: with SMTP id w20mr3456898oik.175.1625635795767;
-        Tue, 06 Jul 2021 22:29:55 -0700 (PDT)
+        bh=m4lqZbjB3cGT822e5RliK4G6yObopCjhH4y/z9EF+yE=;
+        b=OFPKxbo/OpkgPbs2edYPFDyvKqGtBjB9lrTd0PoChPMqArGVty2SbD3cRFTQT+cR2m
+         /di2Qcyqt4mr085aYluwVY8EXuL5EyT/le01v2xdosI5bMmuRLy4YKBHX/zNijzmAQsW
+         nrM1eWKvJ51E90cSOw4E0EOilyQEAnvSvZc1NvKdKlSYR+wQsl5x9ENov3QTqY9t3qJi
+         dNtW4CvDFe7z8VveWogUXOs9pgnb/eX/FWJx8Drf0a3LPNrlGFkRxf5XEOum7EULE/Q5
+         T6Xn1vWSPEpAGDNH+GaWYbf0CVYwUPJEnkKwo4KBlbdWvD3/91UumpCzyB8aq0+cCS+t
+         AkQQ==
+X-Gm-Message-State: AOAM532U1C3Mmzfv/5hFSe7lO3jqDO9hACmGGIMEG2+QaM9wbxfsdAXq
+        mOQ9rc/IHB4yPKZTfyLovLSebD9GmXo=
+X-Google-Smtp-Source: ABdhPJwvfNJLz/5wXrIprlLivN5giytnzDOg/H2mMcHim/HT0QkrRytdi2HM2uHe5HzfMbP1dg+8bg==
+X-Received: by 2002:aca:fd81:: with SMTP id b123mr6684226oii.39.1625635799466;
+        Tue, 06 Jul 2021 22:29:59 -0700 (PDT)
 Received: from fractal.attlocal.net ([2600:1700:1151:2380:3ec5:124:b596:7a55])
-        by smtp.googlemail.com with ESMTPSA id l11sm3284843oou.0.2021.07.06.22.29.54
+        by smtp.googlemail.com with ESMTPSA id l11sm3284843oou.0.2021.07.06.22.29.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jul 2021 22:29:55 -0700 (PDT)
+        Tue, 06 Jul 2021 22:29:59 -0700 (PDT)
 From:   Satya Tangirala <satyaprateek2357@gmail.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
         Satya Tangirala <satyaprateek2357@gmail.com>,
         Satya Tangirala <satyat@google.com>
-Subject: [PATCH v4 4/9] block: keyslot-manager: introduce blk_ksm_restrict_dus_to_queue_limits()
-Date:   Tue,  6 Jul 2021 22:29:38 -0700
-Message-Id: <20210707052943.3960-5-satyaprateek2357@gmail.com>
+Subject: [PATCH v4 8/9] blk-merge: Ensure bios aren't split in middle of a crypto data unit
+Date:   Tue,  6 Jul 2021 22:29:42 -0700
+Message-Id: <20210707052943.3960-9-satyaprateek2357@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210707052943.3960-1-satyaprateek2357@gmail.com>
 References: <20210707052943.3960-1-satyaprateek2357@gmail.com>
@@ -75,123 +75,95 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Satya Tangirala <satyat@google.com>
 
-Not all crypto data unit sizes might be supported by the block layer due to
-certain queue limits. This new function checks the queue limits and
-appropriately modifies the keyslot manager to reflect only the supported
-crypto data unit sizes. blk_ksm_register() runs any given ksm through this
-function before actually registering the ksm with a queue.
+Update get_max_io_size() to return a value aligned to
+bio_required_sector_alignment(). With this change, and the changes
+to blk_ksm_register() that restrict the supported data unit sizes
+based on the queue's limits, blk_bio_segment_split() won't split bios in
+the middle of a data unit anymore
 
 Signed-off-by: Satya Tangirala <satyat@google.com>
 ---
- block/keyslot-manager.c | 89 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ block/blk-merge.c | 49 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 31 insertions(+), 18 deletions(-)
 
-diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
-index 4d0794506d43..01358df66e41 100644
---- a/block/keyslot-manager.c
-+++ b/block/keyslot-manager.c
-@@ -468,12 +468,101 @@ bool blk_ksm_is_empty(struct blk_keyslot_manager *ksm)
- }
- EXPORT_SYMBOL_GPL(blk_ksm_is_empty);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a11b3b53717e..68c96dec5680 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -135,27 +135,39 @@ static struct bio *blk_bio_write_same_split(struct request_queue *q,
  
-+/*
-+ * Restrict the supported data unit sizes of the ksm based on the request queue
-+ * limits
-+ */
-+static unsigned long
-+blk_ksm_largest_dus_for_queue_limits(struct blk_keyslot_manager *ksm,
-+				     struct request_queue *q)
-+{
-+	/* The largest possible data unit size we support is PAGE_SIZE. */
-+	unsigned long largest_dus = PAGE_SIZE;
-+	struct queue_limits *limits = &q->limits;
-+
-+	/*
-+	 * If the queue doesn't support SG gaps, then a bio may have to be split
-+	 * between any two bio_vecs.  Since the size of each bio_vec is only
-+	 * guaranteed to be a multiple of logical_block_size, logical_block_size
-+	 * is also the maximum crypto data unit size that can be supported in
-+	 * this case, as bios must not be split in the middle of a data unit.
-+	 */
-+	if (limits->virt_boundary_mask)
-+		largest_dus = queue_logical_block_size(q);
-+
-+	/*
-+	 * Similarly, if chunk_sectors is set and a bio is submitted that
-+	 * crosses a chunk boundary, then that bio may have to be split at a
-+	 * boundary that is only logical_block_size aligned.  So that limits the
-+	 * crypto data unit size to logical_block_size as well.
-+	 */
-+	if (limits->chunk_sectors)
-+		largest_dus = queue_logical_block_size(q);
-+
-+	/*
-+	 * Each bio_vec can be as small as logical_block_size.  Therefore the
-+	 * crypto data unit size can't be greater than 'max_segments *
-+	 * logical_block_size', as otherwise in the worst case there would be no
-+	 * way to process the first data unit without exceeding max_segments.
-+	 */
-+	largest_dus = min(largest_dus,
-+			  rounddown_pow_of_two(limits->max_segments) *
-+			  queue_logical_block_size(q));
-+
-+	return largest_dus;
-+}
-+
-+/**
-+ * blk_ksm_register() - Sets the queue's keyslot manager to the provided ksm, if
-+ *			compatible
-+ * @ksm: The ksm to register
-+ * @q: The request_queue to register the ksm to
+ /*
+  * Return the maximum number of sectors from the start of a bio that may be
+- * submitted as a single request to a block device. If enough sectors remain,
+- * align the end to the physical block size. Otherwise align the end to the
+- * logical block size. This approach minimizes the number of non-aligned
+- * requests that are submitted to a block device if the start of a bio is not
+- * aligned to a physical block boundary.
++ * submitted as a single request to a block device. Tries to align the end to
++ * the physical block size, while also aligning the returned number of sectors
++ * to bio_required_sector_alignment(). This approach minimizes the number of
++ * non-aligned requests that are submitted to a block device if the start of a
++ * bio is not aligned to a physical block boundary.
 + *
-+ * Checks if the keyslot manager provided is compatible with the request queue
-+ * (i.e. the queue shouldn't also support integrity). After that, the crypto
-+ * capabilities of the given keyslot manager are restricted to what the queue
-+ * can support based on it's limits. Note that if @ksm won't support any
-+ * crypto capabilities if its capabilities are restricted, the queue's ksm is
-+ * set to NULL, instead of being set to a pointer to an "empty" @ksm, and @ksm
-+ * is *not* modified.
++ * More clearly, there are two conditions we're interested in satisfying.
 + *
-+ * Return: true if @q's ksm is set to the provided @ksm, false otherwise
-+ *	   (in which case @ksm will not have been modified)
-+ */
- bool blk_ksm_register(struct blk_keyslot_manager *ksm, struct request_queue *q)
++ * Condition 1) We absolutely must have @return divisible by the
++ * bio_required_sector_alignment(bio).
++ *
++ * Condition 2) *If possible*, while still satisfying Condition 1, we would like
++ * to have start_offset + @return divisible by physical block size in sectors
++ * (pbs).
+  */
+ static inline unsigned get_max_io_size(struct request_queue *q,
+ 				       struct bio *bio)
  {
-+	unsigned long largest_dus_allowed;
-+	unsigned int dus_allowed_mask;
-+	bool dus_was_restricted = false;
-+	int i;
-+
- 	if (blk_integrity_queue_supports_integrity(q)) {
- 		pr_warn("Integrity and hardware inline encryption are not supported together. Disabling hardware inline encryption.\n");
- 		return false;
- 	}
-+
-+	largest_dus_allowed = blk_ksm_largest_dus_for_queue_limits(ksm, q);
-+	dus_allowed_mask = (largest_dus_allowed << 1) - 1;
+-	unsigned sectors = blk_max_size_offset(q, bio->bi_iter.bi_sector, 0);
+-	unsigned max_sectors = sectors;
+-	unsigned pbs = queue_physical_block_size(q) >> SECTOR_SHIFT;
+-	unsigned lbs = queue_logical_block_size(q) >> SECTOR_SHIFT;
+-	unsigned start_offset = bio->bi_iter.bi_sector & (pbs - 1);
+-
+-	max_sectors += start_offset;
+-	max_sectors &= ~(pbs - 1);
+-	if (max_sectors > start_offset)
+-		return max_sectors - start_offset;
+-
+-	return sectors & ~(lbs - 1);
++	unsigned int start_offset = bio->bi_iter.bi_sector;
++	unsigned int sectors = blk_max_size_offset(q, start_offset, 0);
++	unsigned int pbs = queue_physical_block_size(q) >> SECTOR_SHIFT;
++	unsigned int req_sector_align = bio_required_sector_alignment(bio);
++	unsigned int pbs_aligned_sector = round_down(start_offset + sectors, pbs);
 +
 +	/*
-+	 * Check if ksm will become empty if we clear disallowed data unit
-+	 * sizes (in which case, don't modify the ksm)
++	 * If we can return a pbs aligned endpoint while satisfying Condition 1,
++	 * then do so.
 +	 */
-+	if (blk_ksm_is_empty_mask(ksm, dus_allowed_mask))
-+		return false;
++	if (pbs_aligned_sector > start_offset &&
++	    IS_ALIGNED(pbs_aligned_sector - start_offset, req_sector_align))
++		return pbs_aligned_sector - start_offset;
 +
-+	/* Clear all unsupported data unit sizes. */
-+	for (i = 0; i < ARRAY_SIZE(ksm->crypto_modes_supported); i++) {
-+		if (ksm->crypto_modes_supported[i] & (~dus_allowed_mask))
-+			dus_was_restricted = true;
-+		ksm->crypto_modes_supported[i] &= dus_allowed_mask;
-+	}
-+
-+	if (dus_was_restricted) {
-+		pr_warn("Device: %s - Disallowed use of encryption data unit sizes above %lu bytes with inline encryption hardware because of device request queue limits.\n",
-+			q->backing_dev_info->dev_name, largest_dus_allowed);
-+	}
-+
- 	q->ksm = ksm;
- 	return true;
++	return round_down(sectors, req_sector_align);
  }
+ 
+ static inline unsigned get_max_segment_size(const struct request_queue *q,
+@@ -235,6 +247,7 @@ static bool bvec_split_segs(const struct request_queue *q,
+  * following is guaranteed for the cloned bio:
+  * - That it has at most get_max_io_size(@q, @bio) sectors.
+  * - That it has at most queue_max_segments(@q) segments.
++ * - That the number of sectors is aligned to bio_required_sector_alignment(@bio).
+  *
+  * Except for discard requests the cloned bio will point at the bi_io_vec of
+  * the original bio. It is the responsibility of the caller to ensure that the
+@@ -286,7 +299,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	 * big IO can be trival, disable iopoll when split needed.
+ 	 */
+ 	bio->bi_opf &= ~REQ_HIPRI;
+-
++	sectors = round_down(sectors, bio_required_sector_alignment(bio));
+ 	return bio_split(bio, sectors, GFP_NOIO, bs);
+ }
+ 
 -- 
 2.25.1
 
