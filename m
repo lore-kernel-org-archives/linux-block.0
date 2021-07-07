@@ -2,76 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E81C07E9C
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 20:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C09C07E96
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 01:48:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAFE361C9D
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jul 2021 20:59:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D19C61CB6
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jul 2021 01:48:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230149AbhGFVCU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jul 2021 17:02:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34698 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229781AbhGFVCT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jul 2021 17:02:19 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8824AC061574;
-        Tue,  6 Jul 2021 13:59:40 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id i94so529329wri.4;
-        Tue, 06 Jul 2021 13:59:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=3h/6CdNDLiatwRf8U9GgK4AELHJbmk24hBENxY/7j7E=;
-        b=UH36vNJusLOCUOUwMAuunT0VngPTD7q/CvY7dPiGEu4wV671ahgXwVcsuR3AVeIgwW
-         O5ZY/h8IP0esQUob5EjhGQDkiDAe0xMCC5h7xvwSEgQdRfXc/gy4BtcGWVDHdQrUi0w3
-         nH5S94v7jjNpKY2zQuvzrcfVfJ6lCQzhcIm/5z1g6Uj+Sb1q/CQkHJYVI7V3qvDnitew
-         DuWXo2veftgK0nXtYi68G+DQh6ZLDcJSciobgEAj9cLQ5gJr0ZNpoop4QASVCQTlWLBp
-         wpl0ybs0GxdMJJLLPPbElGscDhPGC/LIxcVY5YIeSyPOExOuD2XRjJjxmsuQPRG4n/DU
-         1goQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3h/6CdNDLiatwRf8U9GgK4AELHJbmk24hBENxY/7j7E=;
-        b=hH0HtnaZsks6uMXwaWdnSG9ul/kOXQmX6KHVM62BW4U9LrWDv8P+et18UxO+Zebj2j
-         U/HFk9aPCCa85f0xVkS/MOKjKjnfIEa20RPWizjEqBDPqi95LvyW/jiy7nTTyygIhLgv
-         uVxTVDRVyz3vSd+CynXxTvlg74EaTVMgiyWguN9O7ChLl2mRBSUuWs3JdTkeDMYmGuOI
-         1djmgTQMGfSvOyYpy0t9YzV+Lt2MHpRQ8oKQrHebTPfP3RG6Szhuu1pyKeKBFMTJvbtF
-         t30er1jyMEkZMUAShpf4ZiYRG5l1d0rDD1v2EtRVdA6GId1Urn8+Kdzq0FcKJcIaHe+o
-         GPCg==
-X-Gm-Message-State: AOAM531GoEmIdOwR9xI5ETtizq5XnrDDbxHXoohg5dXbrYEtJfSC+Om5
-        kX4Joi1hfnfDblmAwbKD5/s=
-X-Google-Smtp-Source: ABdhPJyd0hCpYCFEGL2lgKo/Ar2zGNSYdm0NWjrV/EQfjjtLmHlBp45grUwOhTOWAoKQ5OOuAVRo/Q==
-X-Received: by 2002:adf:e605:: with SMTP id p5mr24541624wrm.396.1625605179250;
-        Tue, 06 Jul 2021 13:59:39 -0700 (PDT)
-Received: from masalkhi.fritz.box (dslb-178-005-073-162.178.005.pools.vodafone-ip.de. [178.5.73.162])
-        by smtp.gmail.com with ESMTPSA id o17sm3944676wmh.19.2021.07.06.13.59.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jul 2021 13:59:38 -0700 (PDT)
-From:   Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
-To:     arnd@arndb.de
-Cc:     hch@infradead.org, axboe@kernel.dk, bernie@develer.com,
-        linux-parisc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dan.carpenter@oracle.com
-Subject: Re: div_u64/do_div stack size usage, was Re: [v3] block: Removed a warning while compiling with a cross compiler for parisc
-Date:   Tue,  6 Jul 2021 22:59:27 +0200
-Message-Id: <20210706205927.4407-1-abd.masalkhi@gmail.com>
-X-Mailer: git-send-email 2.29.0.rc1.dirty
-In-Reply-To: <CAK8P3a2mAQOnTxBhVzVA8q8O-uVrdidCN5h5-T2dc0=Wet2uPQ@mail.gmail.com>
-References: <CAK8P3a2mAQOnTxBhVzVA8q8O-uVrdidCN5h5-T2dc0=Wet2uPQ@mail.gmail.com>
+        id S229993AbhGGBvF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jul 2021 21:51:05 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:6433 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229949AbhGGBvF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jul 2021 21:51:05 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GKMgD5pGQz76qf;
+        Wed,  7 Jul 2021 09:44:56 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Wed, 7 Jul 2021 09:48:23 +0800
+Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
+ (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Wed, 7 Jul
+ 2021 09:48:23 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH V2] blk-cgroup: prevent rcu_sched detected stalls warnings while iterating blkgs
+Date:   Wed, 7 Jul 2021 09:56:49 +0800
+Message-ID: <20210707015649.1929797-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I have compiled the kernel with a cross compiler hppa-linux-gnu- (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0 and the conficuration was the default, Build for generic-32bit "generic-32bit_defconfig"
+We run a test that create millions of cgroups and blkgs, and then trigger
+blkg_destroy_all(). blkg_destroy_all() will hold spin lock for a long
+time in such situation. Thus release the lock when a batch of blkgs are
+destroyed.
 
-Abd-Arhman
+blkcg_activate_policy() and blkcg_deactivate_policy() might have the
+same problem, however, as they are basically only called from module
+init/exit paths, let's leave them alone for now.
+
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+changes in V2:
+ - as suggested by Tejun, rename 'BLKG_DESTROY_BATCH_SIZE' and modify
+ blkg_destroy_all() only.
+
+ block/blk-cgroup.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 7b06a5fa3cac..575d7a2e7203 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -56,6 +56,8 @@ static LIST_HEAD(all_blkcgs);		/* protected by blkcg_pol_mutex */
+ bool blkcg_debug_stats = false;
+ static struct workqueue_struct *blkcg_punt_bio_wq;
+ 
++#define BLKG_DESTROY_BATCH_SIZE  64
++
+ static bool blkcg_policy_enabled(struct request_queue *q,
+ 				 const struct blkcg_policy *pol)
+ {
+@@ -422,7 +424,9 @@ static void blkg_destroy(struct blkcg_gq *blkg)
+ static void blkg_destroy_all(struct request_queue *q)
+ {
+ 	struct blkcg_gq *blkg, *n;
++	int count = BLKG_DESTROY_BATCH_SIZE;
+ 
++restart:
+ 	spin_lock_irq(&q->queue_lock);
+ 	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
+ 		struct blkcg *blkcg = blkg->blkcg;
+@@ -430,6 +434,17 @@ static void blkg_destroy_all(struct request_queue *q)
+ 		spin_lock(&blkcg->lock);
+ 		blkg_destroy(blkg);
+ 		spin_unlock(&blkcg->lock);
++
++		/*
++		 * in order to avoid holding the spin lock for too long, release
++		 * it when a batch of blkgs are destroyed.
++		 */
++		if (!(--count)) {
++			count = BLKG_DESTROY_BATCH_SIZE;
++			spin_unlock_irq(&q->queue_lock);
++			cond_resched();
++			goto restart;
++		}
+ 	}
+ 
+ 	q->root_blkg = NULL;
+-- 
+2.31.1
+
