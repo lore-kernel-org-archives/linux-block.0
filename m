@@ -2,314 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A18E9C07E96
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E73DCC07E96
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:58:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7560561CE0
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3AF861CD5
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:58:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229767AbhGHG6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 02:58:44 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:34738 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbhGHG6n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 02:58:43 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6D88B21F87;
-        Thu,  8 Jul 2021 06:56:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625727361; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        id S229806AbhGHHBe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 03:01:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42346 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229735AbhGHHBe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Jul 2021 03:01:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625727531;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pzpJd3wum4aNU6Y2GxC23OoRKpVJ36kzq4QF+hF+b2M=;
-        b=ZnxekhEJ4KE96uKTKCiRKpRw0ZWRYRbFPM3Vcn/Euf6ob40iij//2fXiJFRR2EvBGg6akw
-        /4xynNwA2HJN86WzVtgNEMXngDgYgzhxHl0JqMgxMxY6MSC4X5EEXJyEeFhK8rcYhtWPdv
-        8R3OZwYxVmImQ+xAD0pDDi8YNt8n4vA=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=cDDCLPX/KTvwNQIXz/L6F+rbQsJYne8csUg0Oc3cY28=;
+        b=CRmfcBzUxllzWf6XiVjkqRpFE2ccuvCxc559BKI1qgXf6d+4CMsWFYfA6zRsDlC4Tez7Zs
+        HuYqAZPurF8Nz7+h+w63y2KtN+q2oJdFRvMCRuqwErUieAf6eN6EocQYFFQHfVY04tE+y7
+        bAWq8K0NNdYUxDm/n6vy4djDQJQb4p0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-585-5Y7FuXboMumK-ya2pbOjEw-1; Thu, 08 Jul 2021 02:58:50 -0400
+X-MC-Unique: 5Y7FuXboMumK-ya2pbOjEw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 28E9613743;
-        Thu,  8 Jul 2021 06:56:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id V5kKCIGh5mDDEAAAGKfGzw
-        (envelope-from <jgross@suse.com>); Thu, 08 Jul 2021 06:56:01 +0000
-Subject: Re: [PATCH 4/8] xen/blkfront: don't trust the backend response data
- blindly
-To:     Jan Beulich <jbeulich@suse.com>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210513100302.22027-1-jgross@suse.com>
- <20210513100302.22027-5-jgross@suse.com>
- <315ad8b9-8a98-8d3e-f66c-ab32af2731a8@suse.com>
- <6095c4b9-a9bb-8a38-fb6c-a5483105b802@suse.com>
- <a19a13ba-a386-2808-ad85-338d47085fa6@suse.com>
- <030ef85e-b5af-f46e-c8dc-88b8d195c4e1@suse.com>
- <477f01cd-8793-705c-10f9-cf0c0cd6ed84@suse.com>
- <dca55162-ec2e-682a-824d-b657a6407249@suse.com>
- <5a9dcc69-385a-eda5-6974-cb962ae62601@suse.com>
- <7f606c27-173a-542d-406d-196dae784edd@suse.com>
- <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <0fec3ba6-266d-260e-716a-ae33d7670d34@suse.com>
-Date:   Thu, 8 Jul 2021 08:56:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 735D4107B47E;
+        Thu,  8 Jul 2021 06:58:49 +0000 (UTC)
+Received: from T590 (ovpn-12-112.pek2.redhat.com [10.72.12.112])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE1D310016F7;
+        Thu,  8 Jul 2021 06:58:41 +0000 (UTC)
+Date:   Thu, 8 Jul 2021 14:58:36 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Subject: Re: [PATCH 6/6] loop: don't add worker into idle list
+Message-ID: <YOaiHLD74VG5I5cD@T590>
+References: <20210705102607.127810-1-ming.lei@redhat.com>
+ <20210705102607.127810-7-ming.lei@redhat.com>
+ <YORg2KYF7X1ZYJPG@dschatzberg-fedora-PC0Y6AEN>
+ <YOUdMjAzEw6JQjKG@T590>
+ <YOWyVnrOTHvMB7A3@dschatzberg-fedora-PC0Y6AEN>
 MIME-Version: 1.0
-In-Reply-To: <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YOWyVnrOTHvMB7A3@dschatzberg-fedora-PC0Y6AEN>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9
-Content-Type: multipart/mixed; boundary="qwxjABwKaKe3ZcM8poVIJe67PZhiHrrfz";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Jan Beulich <jbeulich@suse.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-ID: <0fec3ba6-266d-260e-716a-ae33d7670d34@suse.com>
-Subject: Re: [PATCH 4/8] xen/blkfront: don't trust the backend response data
- blindly
-References: <20210513100302.22027-1-jgross@suse.com>
- <20210513100302.22027-5-jgross@suse.com>
- <315ad8b9-8a98-8d3e-f66c-ab32af2731a8@suse.com>
- <6095c4b9-a9bb-8a38-fb6c-a5483105b802@suse.com>
- <a19a13ba-a386-2808-ad85-338d47085fa6@suse.com>
- <030ef85e-b5af-f46e-c8dc-88b8d195c4e1@suse.com>
- <477f01cd-8793-705c-10f9-cf0c0cd6ed84@suse.com>
- <dca55162-ec2e-682a-824d-b657a6407249@suse.com>
- <5a9dcc69-385a-eda5-6974-cb962ae62601@suse.com>
- <7f606c27-173a-542d-406d-196dae784edd@suse.com>
- <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
-In-Reply-To: <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
+On Wed, Jul 07, 2021 at 09:55:34AM -0400, Dan Schatzberg wrote:
+> On Wed, Jul 07, 2021 at 11:19:14AM +0800, Ming Lei wrote:
+> > On Tue, Jul 06, 2021 at 09:55:36AM -0400, Dan Schatzberg wrote:
+> > > On Mon, Jul 05, 2021 at 06:26:07PM +0800, Ming Lei wrote:
+> > > >  	}
+> > > > +
+> > > > +	spin_lock(lock);
+> > > >  	list_add_tail(&cmd->list_entry, cmd_list);
+> > > > +	spin_unlock(lock);
+> > > >  	queue_work(lo->workqueue, work);
+> > > > -	spin_unlock(&lo->lo_work_lock);
+> > > >  }
+> > > >  
+> > > >  static void loop_update_rotational(struct loop_device *lo)
+> > > > @@ -1131,20 +1159,18 @@ static void loop_set_timer(struct loop_device *lo)
+> > > >  
+> > > >  static void __loop_free_idle_workers(struct loop_device *lo, bool force)
+> > > >  {
+> > > > -	struct loop_worker *pos, *worker;
+> > > > +	struct loop_worker *worker;
+> > > > +	unsigned long id;
+> > > >  
+> > > >  	spin_lock(&lo->lo_work_lock);
+> > > > -	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
+> > > > -				idle_list) {
+> > > > +	xa_for_each(&lo->workers, id, worker) {
+> > > >  		if (!force && time_is_after_jiffies(worker->last_ran_at +
+> > > >  						LOOP_IDLE_WORKER_TIMEOUT))
+> > > >  			break;
+> > > > -		list_del(&worker->idle_list);
+> > > > -		xa_erase(&lo->workers, worker->blkcg_css->id);
+> > > > -		css_put(worker->blkcg_css);
+> > > > -		kfree(worker);
+> > > > +		if (refcount_dec_and_test(&worker->refcnt))
+> > > > +			loop_release_worker(worker);
+> > > 
+> > > This one is puzzling to me. Can't you hit this refcount decrement
+> > > superfluously each time the loop timer fires?
+> > 
+> > Not sure I get your point.
+> > 
+> > As I mentioned above, this one is the counter pair of INIT reference,
+> > but one new lo_cmd may just grab it when queueing rq before erasing the
+> > worker from xarray, so we can't release worker here until the command is
+> > completed.
+> 
+> Suppose at this point there's still an outstanding loop_cmd to be
+> serviced for this worker. The refcount_dec_and_test should decrement
+> the refcount and then fail the conditional, not calling
+> loop_release_worker. What happens if __loop_free_idle_workers fires
+> again before the loop_cmd is processed? Won't you decrement the
+> refcount again, and then end up calling loop_release_worker before the
+> loop_cmd is processed?
+ 
+Good catch!
 
---qwxjABwKaKe3ZcM8poVIJe67PZhiHrrfz
-Content-Type: multipart/mixed;
- boundary="------------EDFAA6DF7F3CF735D9D48B84"
-Content-Language: en-US
+The following one line change should avoid the issue:
 
-This is a multi-part message in MIME format.
---------------EDFAA6DF7F3CF735D9D48B84
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 08.07.21 08:52, Jan Beulich wrote:
-> On 08.07.2021 08:40, Juergen Gross wrote:
->> On 08.07.21 08:37, Jan Beulich wrote:
->>> On 08.07.2021 07:47, Juergen Gross wrote:
->>>> On 17.05.21 17:33, Jan Beulich wrote:
->>>>> On 17.05.2021 17:22, Juergen Gross wrote:
->>>>>> On 17.05.21 17:12, Jan Beulich wrote:
->>>>>>> On 17.05.2021 16:23, Juergen Gross wrote:
->>>>>>>> On 17.05.21 16:11, Jan Beulich wrote:
->>>>>>>>> On 13.05.2021 12:02, Juergen Gross wrote:
->>>>>>>>>> @@ -1574,10 +1580,16 @@ static irqreturn_t blkif_interrupt(int=
- irq, void *dev_id)
->>>>>>>>>>       	spin_lock_irqsave(&rinfo->ring_lock, flags);
->>>>>>>>>>        again:
->>>>>>>>>>       	rp =3D rinfo->ring.sring->rsp_prod;
->>>>>>>>>> +	if (RING_RESPONSE_PROD_OVERFLOW(&rinfo->ring, rp)) {
->>>>>>>>>> +		pr_alert("%s: illegal number of responses %u\n",
->>>>>>>>>> +			 info->gd->disk_name, rp - rinfo->ring.rsp_cons);
->>>>>>>>>> +		goto err;
->>>>>>>>>> +	}
->>>>>>>>>>       	rmb(); /* Ensure we see queued responses up to 'rp'. */=
-
->>>>>>>>>
->>>>>>>>> I think you want to insert after the barrier.
->>>>>>>>
->>>>>>>> Why? The relevant variable which is checked is "rp". The result =
-of the
->>>>>>>> check is in no way depending on the responses themselves. And an=
-y change
->>>>>>>> of rsp_cons is protected by ring_lock, so there is no possibilit=
-y of
->>>>>>>> reading an old value here.
->>>>>>>
->>>>>>> But this is a standard double read situation: You might check a v=
-alue
->>>>>>> and then (via a separate read) use a different one past the barri=
-er.
->>>>>>
->>>>>> Yes and no.
->>>>>>
->>>>>> rsp_cons should never be written by the other side, and additional=
-ly
->>>>>> it would be read multiple times anyway.
->>>>>
->>>>> But I'm talking about rsp_prod, as that's what rp gets loaded from.=
-
->>>>
->>>> Oh, now I get your problem.
->>>>
->>>> But shouldn't that better be solved by using READ_ONCE() for reading=
- rp
->>>> instead?
->>>
->>> Not sure - the rmb() is needed anyway aiui, and hence you could as we=
-ll
->>> move your code addition.
->>
->> Sure.
->>
->> My question was rather: does the rmb() really eliminate the possibilit=
-y
->> of a double read introduced by the compiler? If yes, moving the code i=
-s
->> the correct solution.
->=20
-> It doesn't eliminate the possibility of a double read, but (leaving
-> aside split accesses) that's not what you care about here. What you
-> need is a single stable value to operate on. No matter how many
-> (non-split) reads the compiler may issue to fill "rp", the final
-> read's value will be used in the subsequent calculation. Or at
-> least that's been my understanding; thinking about it the compiler
-> might issue multiple reads into distinct registers ahead of the
-> barrier, and use different registers for different subsequent
-> operations. While this would look like intentionally inefficient
-> code generation to me, you may indeed want to play safe and use
-> ACCESS_ONCE() _and_ the barrier. I guess there are more places then
-> which would want similar treatment, and it's not a problem that
-> this change introduces ...
-
-Nevertheless I think I can change it right away. It will also help
-against load tearing.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 146eaa03629b..3cd51bddfec9 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -980,7 +980,6 @@ static struct loop_worker *loop_alloc_or_get_worker(struct loop_device *lo,
+ 
+ static void loop_release_worker(struct loop_worker *worker)
+ {
+-	xa_erase(&worker->lo->workers, worker->blkcg_css->id);
+ 	css_put(worker->blkcg_css);
+ 	kfree(worker);
+ }
+@@ -1167,6 +1166,7 @@ static void __loop_free_idle_workers(struct loop_device *lo, bool force)
+ 		if (!force && time_is_after_jiffies(worker->last_ran_at +
+ 						LOOP_IDLE_WORKER_TIMEOUT))
+ 			break;
++		xa_erase(&worker->lo->workers, worker->blkcg_css->id);
+ 		if (refcount_dec_and_test(&worker->refcnt))
+ 			loop_release_worker(worker);
+ 	}
 
 
-Juergen
+Thanks, 
+Ming
 
---------------EDFAA6DF7F3CF735D9D48B84
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------EDFAA6DF7F3CF735D9D48B84--
-
---qwxjABwKaKe3ZcM8poVIJe67PZhiHrrfz--
-
---iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmDmoYAFAwAAAAAACgkQsN6d1ii/Ey+8
-hwf9HndM8XWYHXr73UbskVZip/eM/AyRiyuc8mneuBGjivFC/ycCeFwoe+iAEsc0H2F5Edl1jAB7
-5a4NqjIBQx9tpLwsggRWDUXQNhprdY1dbK/mkeqhELciVuW1blfjqlASlbi8BgIpizHo9ep/i5uC
-97NBzCfQYUi3ZiKtFXecCX5ETPyc8OJWOMBvynDrJZ3Oahc88f8X3FYbFSYy1VYnRI7txGygEck5
-Kyf6wiZw88afh3qc+MAq5Y4EeppwMIZ2sgE5ei/YtNdkII77hyI3L7AMmqCTIGdr98fr7QID32fc
-8ZI9SiOqAXPThMQZhktOMmuBnwtH4wHGhfkM9+PGUg==
-=OUo5
------END PGP SIGNATURE-----
-
---iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9--
