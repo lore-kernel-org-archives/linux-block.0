@@ -4,61 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CE1C07E96
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A18E9C07E96
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:56:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEA3961977
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:52:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7560561CE0
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:56:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230412AbhGHGzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 02:55:21 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.111.102]:58284 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229899AbhGHGzU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Jul 2021 02:55:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1625727158;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        id S229767AbhGHG6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 02:58:44 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:34738 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229735AbhGHG6n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 02:58:43 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 6D88B21F87;
+        Thu,  8 Jul 2021 06:56:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1625727361; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MP+NHmOhOR9FUeuSZLn1wOVcE4VHHx3OuaTMn1B1Ufc=;
-        b=I/qx2XpsolWTc/wgvXX+S1m3g8w3/G+80g+z4b/AwB0XJUgiwlXSL3iL1YuQwsFNbt/l+n
-        tW5QEhMJy4dLLUHOmrIQgwpcBlHGk1nrkUoD88Wvk12NAXxH5DoCPCJJS8PrbdxmvFjL5f
-        dJF4rfD0PqESsNOYbWhfysYu5R8xpyw=
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com
- (mail-db8eur05lp2107.outbound.protection.outlook.com [104.47.17.107])
- (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-30-hrloLkyTMG-oaWVi1Q547g-1; Thu, 08 Jul 2021 08:52:37 +0200
-X-MC-Unique: hrloLkyTMG-oaWVi1Q547g-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d71zlIvzTdLpezd8srRq6i9qV61chMF9ODQbVTQVzJe2mAVDcB0+GmEvCbnu0OxjIlaiV6UjZ91JVlMRr98rtmPgyTFYZ2AIUoKI6CuoKoSmQWZ7laCLTN8OJBYZp02e1UF7lvTusPWxKC69RSWRShoXyPGl4fcDfftJTlIyNF4bkDVM28tu5HETXDHmTKQO5+bP0CZvRbIntvhBiFpJMnJOvvayRdJJb6OAFbHEoFcU6vzc2Jd7fsp59mm1B7290uxP8xdKMal7aNkuDYUkM62UAFn7plEqkIMAKATXE4j0FlEDIxLBHA18mw+69AAPazK/GeflJKxM83d5wwojkg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MP+NHmOhOR9FUeuSZLn1wOVcE4VHHx3OuaTMn1B1Ufc=;
- b=l46XNCM4JG2xHHqAy5Mrf2CiTau/4iRH9uLUy6vVHe60Kwb1geSwoV0WaHRfyFZw1HPUb3wf3LLGiCTqXbolfWFthrjc8CmuFCKcPhTq/bXs40LsJnOuR9CWkxthL+seK+kYzek+GYCDf8M64/ffZlpyh8UQYK7mcVzzJg0kNJzIclbE7mcVck9xZj+qpxxIy2WRc6GYECUS4a+doBKeWnP+RaC7yzruJ518dyBsHfO2sQCky9lR/122m9pCE9BmXeNXZlrj0u4WA3ZvG0gamACKurM1AAztQRkN/7PO+5yOyuxwHJoKKEJyz6l1zSLmX4pEkhcq3oo8Vsmi7Zbmhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR04MB5600.eurprd04.prod.outlook.com (2603:10a6:803:e7::16)
- by VI1PR04MB3117.eurprd04.prod.outlook.com (2603:10a6:802:6::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.22; Thu, 8 Jul
- 2021 06:52:33 +0000
-Received: from VI1PR04MB5600.eurprd04.prod.outlook.com
- ([fe80::99d3:99cd:8adf:3eea]) by VI1PR04MB5600.eurprd04.prod.outlook.com
- ([fe80::99d3:99cd:8adf:3eea%5]) with mapi id 15.20.4308.022; Thu, 8 Jul 2021
- 06:52:33 +0000
+        bh=pzpJd3wum4aNU6Y2GxC23OoRKpVJ36kzq4QF+hF+b2M=;
+        b=ZnxekhEJ4KE96uKTKCiRKpRw0ZWRYRbFPM3Vcn/Euf6ob40iij//2fXiJFRR2EvBGg6akw
+        /4xynNwA2HJN86WzVtgNEMXngDgYgzhxHl0JqMgxMxY6MSC4X5EEXJyEeFhK8rcYhtWPdv
+        8R3OZwYxVmImQ+xAD0pDDi8YNt8n4vA=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 28E9613743;
+        Thu,  8 Jul 2021 06:56:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id V5kKCIGh5mDDEAAAGKfGzw
+        (envelope-from <jgross@suse.com>); Thu, 08 Jul 2021 06:56:01 +0000
 Subject: Re: [PATCH 4/8] xen/blkfront: don't trust the backend response data
  blindly
-To:     Juergen Gross <jgross@suse.com>
+To:     Jan Beulich <jbeulich@suse.com>
 Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
@@ -75,142 +62,254 @@ References: <20210513100302.22027-1-jgross@suse.com>
  <dca55162-ec2e-682a-824d-b657a6407249@suse.com>
  <5a9dcc69-385a-eda5-6974-cb962ae62601@suse.com>
  <7f606c27-173a-542d-406d-196dae784edd@suse.com>
-From:   Jan Beulich <jbeulich@suse.com>
-Message-ID: <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
-Date:   Thu, 8 Jul 2021 08:52:31 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
+From:   Juergen Gross <jgross@suse.com>
+Message-ID: <0fec3ba6-266d-260e-716a-ae33d7670d34@suse.com>
+Date:   Thu, 8 Jul 2021 08:56:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
-In-Reply-To: <7f606c27-173a-542d-406d-196dae784edd@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0013.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:15::18) To VI1PR04MB5600.eurprd04.prod.outlook.com
- (2603:10a6:803:e7::16)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.156.60.236] (37.24.206.209) by FR0P281CA0013.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:15::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.8 via Frontend Transport; Thu, 8 Jul 2021 06:52:32 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 560b950d-fd9c-4978-3f35-08d941dcf63b
-X-MS-TrafficTypeDiagnostic: VI1PR04MB3117:
-X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB3117C4739CA41DD27DF6E003B3199@VI1PR04MB3117.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: A/9we6e9+DV4TdluH37oUdB9HVshATA/q/Y0PRf3604XuM4LBfX2xDSrsxVUgTvpCHSTAyp9tKYweNBLOPxzg81eOj2M0orkxr/vuaoy7O3z7AHQE6stXjl2gZqbCwTeNwJRnDGS8wrFpCIgDbTI7Ok7g3N0j7JHJpF9VsE8xVyBTGUivHsLJiX85NdGUSk/wxsWOjwJOuGwTNZf5Jn0Px6KxWmUMLqSf463M9CcdhFtAh0XNmSbE9xbAyJseo85YOB7v+Xu/ArNP6ErTUfPWZExrpVOi9YR4uDYFap7purtmqTYeu+H0VZg8MQysnYa4C/Wm24oG5PrKXRfg04r5wpm6KNpC2Nsd+t+WMFo4UHw7gWmpTryWb7Qrx1u5wHjH53gznkjNpA50jD2xjBEI0liZ4xkE+LzGB+BdDv+J56IJizu8uBInUekNCZRFQV5YKYc+BCLs/jYmANcZwjlvx1uRsczopfH7zHDHrdR33rlCVmQV4QN9pIJnfadFNs+QPbjXZYei1O04vPmOoBRN39qBQ+mBaxfyi/WvnilBbiBSqRv9lmPmyXeLfHfFfu3XS1s0vwsVTCkdA5vvF5KDsUCDgWBkWGFejMXrF655es8SP6S8RfcM1mXdLo/yIBs+C/ILQ9FrceKs8zn3NyO8DKvrk3Bymi8/wPWdVLMxupJB205CA/I+woiN3QqRlzd6qq5WKEZbXlUbG8eaPIGYSYoWMTV3t9ArEbie83+3bUudg3G7+xcZu5IRVoLZZh6
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5600.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(396003)(346002)(136003)(376002)(39850400004)(54906003)(8936002)(2906002)(6636002)(2616005)(5660300002)(83380400001)(956004)(66556008)(36756003)(37006003)(478600001)(31696002)(26005)(316002)(8676002)(66476007)(186003)(16576012)(38100700002)(66946007)(6862004)(31686004)(4326008)(86362001)(6486002)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y01mdVZDV2RQOU84Sk5mcmxjOTl4V1NDMTBjTTk4eG01RXk4bUNlN2RWVEdl?=
- =?utf-8?B?ejQ5MGIrejlIc0FvUW1wa3BKaUhsWC9PLzQ0UUNacVdZWm00UGducURxWlY1?=
- =?utf-8?B?Q2Ntc3VuOW1CNHdvZThKNVdqZmZFb2s1RlV4Mzh0REs1dDlhSFl1bGxrNVRQ?=
- =?utf-8?B?VSt2V3Z4TmNyNTBVTDNuYkxNTVdoMkh5Y0toWTdOdFV6TW92a291OUc4dzJC?=
- =?utf-8?B?T2lwVDg0ZS9ITlhRdkN6SVN5RlRsM0k1dXdBU3phR0JEc2xvL2U0bS82MTZB?=
- =?utf-8?B?MU1MSFpXRWd1V1hyOWorWnJWMmQzOWh0QkZCY2E1dElNTXkxaFUrbzVpajNW?=
- =?utf-8?B?QVRwV1lyaXlJQTVvODRzbmVUUzRqWUd2VTVISnpEUEJnTzFSZmNWNEpPOXM3?=
- =?utf-8?B?UW96cFZVcUhDMktKT2tDSHJFMUgzb2taQW9FQmVxOVdnTEFmbXh5OTRKdkRV?=
- =?utf-8?B?U1ZPMTJ3WFRkNTdUS0pGK1FuaTRMY0dma3N3dDJ0MXhzU3pDQTZmVDR5emh5?=
- =?utf-8?B?Unp1dGFHN3o3MnNsV2I0NTBnQzBmZm4wQU42ZkJsUUx2cGFkOGxpVlVaR01B?=
- =?utf-8?B?L2RUdWUwY2VrWTRQcEpOazFRSmNmOEVmQy8wR2tqcG9RS2hmVE1YVG1nL1Iw?=
- =?utf-8?B?MkY2ZUVkVmsxV3hGeWlmSFhZYk9jSkVUWGpsVGFXaVVsMjhvR0Fkd2J6b09v?=
- =?utf-8?B?OTdlUWVkZ2lWdE9aaGhLYjZpSTRxRlZzdjdKNThMcjk3eG90MjRRNFFYakRG?=
- =?utf-8?B?T2FkY1pPRGRXVktNeXEzVGRSUnNGVjUwL3kyK3dDZGdaNzNlb0Y1UHNzUXJn?=
- =?utf-8?B?SzJQNzVMVm1JbG1wcXFjcTJUMDlFQXMxNDYwdjBtVERlazh3REdQdEpyN0l1?=
- =?utf-8?B?TFdLVkZjMGlnWjdCdVFPQ0dLeGRJU0puamEvSjcxS1B5Nk5GdGVQSGg0a2tD?=
- =?utf-8?B?NmVNN2hpK0NWMW9mcTk5TzJzaW96K0tCOTRoYkhRM0lxdHc4V1F4RmNkaWg3?=
- =?utf-8?B?dWVvSzhqYlVOZ2NORUpRa0ZPVVg0Nk5oeDVlK09YZlc3TVRMWlhqQStzcnYw?=
- =?utf-8?B?NmNQNTF5Z1NPYXVkZ1Q1aFk0LzdKL08xVDBtT3ZHS25EOUlZME1oSnQzTXlR?=
- =?utf-8?B?YnpURUQ5UHVVZUJZRGM2YXpuTVNVOFc1NW9ROG1RT0F4Wi9PQzF0bTRoV3lR?=
- =?utf-8?B?SFcrT0pRN3I2aGF0ZGtka0x2WUp2QXRyb0RNY2JxQnZ3OFF3NmtJaTRyZ3cr?=
- =?utf-8?B?UXpFU3o2aVpTaHhsQjNyVmphS05TbDFWeG12djZnWkFobG55N0drU3E3YXk4?=
- =?utf-8?B?ME9RMXg1YmlBZndEQ3pxQzY2T0JLWVEzUDMvbkN2OXRMSHVBQ0Fjc0pvbW5U?=
- =?utf-8?B?cS9IczE1Q01JM1h4ZzBMODd4amsxS2V5dnpyRmdIcUp5ZERqY29BcGJHUU0x?=
- =?utf-8?B?K3VuWmZRbnJoaDlzMnhUd1hUMlZkdWFNd0gvSkhkdHlkZW96cnh1b3FTZTYy?=
- =?utf-8?B?eDd5VVpiYXBrelZyZ1BZc1VTMTFCRE52aDdZRnljWGU0L0l1U3pKeUhWWXBw?=
- =?utf-8?B?OXAzWTNVL0J3bGdhK08xMmJjM01reURET21tQStpM085ZmlyMWE2RjAvN0ww?=
- =?utf-8?B?VmdJc01BRnZmcTBPVlZXNW9XRlpBQ1Excks3bFJSaE1QUUMzV21PbWx6cnV5?=
- =?utf-8?B?NHZWeXFVckV2d3Nuek1iVWxnbEVmUE9RU1YvZ3FsTlBlVU5oWEVFK0tLUWxW?=
- =?utf-8?Q?/U2uDBzUNCHZRsB0iLbb6ALgbrbzmk1F4kLbb33?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 560b950d-fd9c-4978-3f35-08d941dcf63b
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5600.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2021 06:52:33.0923
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vli2JyaS8h1sMq4yORG4hHk8vEMxMDx0LvZ/ijBnF3Em/SFo+cdZfHCluyNhWk04C8yi/DZbtdcoOp7D1doGSw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB3117
+In-Reply-To: <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08.07.2021 08:40, Juergen Gross wrote:
-> On 08.07.21 08:37, Jan Beulich wrote:
->> On 08.07.2021 07:47, Juergen Gross wrote:
->>> On 17.05.21 17:33, Jan Beulich wrote:
->>>> On 17.05.2021 17:22, Juergen Gross wrote:
->>>>> On 17.05.21 17:12, Jan Beulich wrote:
->>>>>> On 17.05.2021 16:23, Juergen Gross wrote:
->>>>>>> On 17.05.21 16:11, Jan Beulich wrote:
->>>>>>>> On 13.05.2021 12:02, Juergen Gross wrote:
->>>>>>>>> @@ -1574,10 +1580,16 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
->>>>>>>>>      	spin_lock_irqsave(&rinfo->ring_lock, flags);
->>>>>>>>>       again:
->>>>>>>>>      	rp = rinfo->ring.sring->rsp_prod;
->>>>>>>>> +	if (RING_RESPONSE_PROD_OVERFLOW(&rinfo->ring, rp)) {
->>>>>>>>> +		pr_alert("%s: illegal number of responses %u\n",
->>>>>>>>> +			 info->gd->disk_name, rp - rinfo->ring.rsp_cons);
->>>>>>>>> +		goto err;
->>>>>>>>> +	}
->>>>>>>>>      	rmb(); /* Ensure we see queued responses up to 'rp'. */
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9
+Content-Type: multipart/mixed; boundary="qwxjABwKaKe3ZcM8poVIJe67PZhiHrrfz";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: Jan Beulich <jbeulich@suse.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <0fec3ba6-266d-260e-716a-ae33d7670d34@suse.com>
+Subject: Re: [PATCH 4/8] xen/blkfront: don't trust the backend response data
+ blindly
+References: <20210513100302.22027-1-jgross@suse.com>
+ <20210513100302.22027-5-jgross@suse.com>
+ <315ad8b9-8a98-8d3e-f66c-ab32af2731a8@suse.com>
+ <6095c4b9-a9bb-8a38-fb6c-a5483105b802@suse.com>
+ <a19a13ba-a386-2808-ad85-338d47085fa6@suse.com>
+ <030ef85e-b5af-f46e-c8dc-88b8d195c4e1@suse.com>
+ <477f01cd-8793-705c-10f9-cf0c0cd6ed84@suse.com>
+ <dca55162-ec2e-682a-824d-b657a6407249@suse.com>
+ <5a9dcc69-385a-eda5-6974-cb962ae62601@suse.com>
+ <7f606c27-173a-542d-406d-196dae784edd@suse.com>
+ <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
+In-Reply-To: <fbd099f3-4d62-e0f6-1bad-6d317428051e@suse.com>
+
+--qwxjABwKaKe3ZcM8poVIJe67PZhiHrrfz
+Content-Type: multipart/mixed;
+ boundary="------------EDFAA6DF7F3CF735D9D48B84"
+Content-Language: en-US
+
+This is a multi-part message in MIME format.
+--------------EDFAA6DF7F3CF735D9D48B84
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+
+On 08.07.21 08:52, Jan Beulich wrote:
+> On 08.07.2021 08:40, Juergen Gross wrote:
+>> On 08.07.21 08:37, Jan Beulich wrote:
+>>> On 08.07.2021 07:47, Juergen Gross wrote:
+>>>> On 17.05.21 17:33, Jan Beulich wrote:
+>>>>> On 17.05.2021 17:22, Juergen Gross wrote:
+>>>>>> On 17.05.21 17:12, Jan Beulich wrote:
+>>>>>>> On 17.05.2021 16:23, Juergen Gross wrote:
+>>>>>>>> On 17.05.21 16:11, Jan Beulich wrote:
+>>>>>>>>> On 13.05.2021 12:02, Juergen Gross wrote:
+>>>>>>>>>> @@ -1574,10 +1580,16 @@ static irqreturn_t blkif_interrupt(int=
+ irq, void *dev_id)
+>>>>>>>>>>       	spin_lock_irqsave(&rinfo->ring_lock, flags);
+>>>>>>>>>>        again:
+>>>>>>>>>>       	rp =3D rinfo->ring.sring->rsp_prod;
+>>>>>>>>>> +	if (RING_RESPONSE_PROD_OVERFLOW(&rinfo->ring, rp)) {
+>>>>>>>>>> +		pr_alert("%s: illegal number of responses %u\n",
+>>>>>>>>>> +			 info->gd->disk_name, rp - rinfo->ring.rsp_cons);
+>>>>>>>>>> +		goto err;
+>>>>>>>>>> +	}
+>>>>>>>>>>       	rmb(); /* Ensure we see queued responses up to 'rp'. */=
+
+>>>>>>>>>
+>>>>>>>>> I think you want to insert after the barrier.
 >>>>>>>>
->>>>>>>> I think you want to insert after the barrier.
+>>>>>>>> Why? The relevant variable which is checked is "rp". The result =
+of the
+>>>>>>>> check is in no way depending on the responses themselves. And an=
+y change
+>>>>>>>> of rsp_cons is protected by ring_lock, so there is no possibilit=
+y of
+>>>>>>>> reading an old value here.
 >>>>>>>
->>>>>>> Why? The relevant variable which is checked is "rp". The result of the
->>>>>>> check is in no way depending on the responses themselves. And any change
->>>>>>> of rsp_cons is protected by ring_lock, so there is no possibility of
->>>>>>> reading an old value here.
+>>>>>>> But this is a standard double read situation: You might check a v=
+alue
+>>>>>>> and then (via a separate read) use a different one past the barri=
+er.
 >>>>>>
->>>>>> But this is a standard double read situation: You might check a value
->>>>>> and then (via a separate read) use a different one past the barrier.
+>>>>>> Yes and no.
+>>>>>>
+>>>>>> rsp_cons should never be written by the other side, and additional=
+ly
+>>>>>> it would be read multiple times anyway.
 >>>>>
->>>>> Yes and no.
->>>>>
->>>>> rsp_cons should never be written by the other side, and additionally
->>>>> it would be read multiple times anyway.
+>>>>> But I'm talking about rsp_prod, as that's what rp gets loaded from.=
+
 >>>>
->>>> But I'm talking about rsp_prod, as that's what rp gets loaded from.
+>>>> Oh, now I get your problem.
+>>>>
+>>>> But shouldn't that better be solved by using READ_ONCE() for reading=
+ rp
+>>>> instead?
 >>>
->>> Oh, now I get your problem.
->>>
->>> But shouldn't that better be solved by using READ_ONCE() for reading rp
->>> instead?
+>>> Not sure - the rmb() is needed anyway aiui, and hence you could as we=
+ll
+>>> move your code addition.
 >>
->> Not sure - the rmb() is needed anyway aiui, and hence you could as well
->> move your code addition.
-> 
-> Sure.
-> 
-> My question was rather: does the rmb() really eliminate the possibility
-> of a double read introduced by the compiler? If yes, moving the code is
-> the correct solution.
+>> Sure.
+>>
+>> My question was rather: does the rmb() really eliminate the possibilit=
+y
+>> of a double read introduced by the compiler? If yes, moving the code i=
+s
+>> the correct solution.
+>=20
+> It doesn't eliminate the possibility of a double read, but (leaving
+> aside split accesses) that's not what you care about here. What you
+> need is a single stable value to operate on. No matter how many
+> (non-split) reads the compiler may issue to fill "rp", the final
+> read's value will be used in the subsequent calculation. Or at
+> least that's been my understanding; thinking about it the compiler
+> might issue multiple reads into distinct registers ahead of the
+> barrier, and use different registers for different subsequent
+> operations. While this would look like intentionally inefficient
+> code generation to me, you may indeed want to play safe and use
+> ACCESS_ONCE() _and_ the barrier. I guess there are more places then
+> which would want similar treatment, and it's not a problem that
+> this change introduces ...
 
-It doesn't eliminate the possibility of a double read, but (leaving
-aside split accesses) that's not what you care about here. What you
-need is a single stable value to operate on. No matter how many
-(non-split) reads the compiler may issue to fill "rp", the final
-read's value will be used in the subsequent calculation. Or at
-least that's been my understanding; thinking about it the compiler
-might issue multiple reads into distinct registers ahead of the
-barrier, and use different registers for different subsequent
-operations. While this would look like intentionally inefficient
-code generation to me, you may indeed want to play safe and use
-ACCESS_ONCE() _and_ the barrier. I guess there are more places then
-which would want similar treatment, and it's not a problem that
-this change introduces ...
+Nevertheless I think I can change it right away. It will also help
+against load tearing.
 
-Jan
 
+Juergen
+
+--------------EDFAA6DF7F3CF735D9D48B84
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: OpenPGP public key
+Content-Disposition: attachment;
+ filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
+cWx
+w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
+f8Z
+d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
+9bf
+IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
+G7/
+377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
+3Jv
+c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
+QIe
+AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
+hpw
+dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
+MbD
+1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
+oPH
+Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
+5QL
++qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
+2Vu
+IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
+QoL
+BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
+Wf0
+teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
+/nu
+AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
+ITT
+d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
+XBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
+80h
+SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
+AcD
+AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
+FOX
+gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
+jnD
+kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
+N51
+N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
+otu
+fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
+tqS
+EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
+hsD
+BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
+g3O
+ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
+dM7
+wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
+D+j
+LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
+V2x
+AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
+Eaw
+QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
+nHI
+s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
+wgn
+BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
+bVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
+pEd
+IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
+QAB
+wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
+Tbe
+8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
+vJz
+Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
+VGi
+wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
+svi
+uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
+zXs
+ZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------EDFAA6DF7F3CF735D9D48B84--
+
+--qwxjABwKaKe3ZcM8poVIJe67PZhiHrrfz--
+
+--iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmDmoYAFAwAAAAAACgkQsN6d1ii/Ey+8
+hwf9HndM8XWYHXr73UbskVZip/eM/AyRiyuc8mneuBGjivFC/ycCeFwoe+iAEsc0H2F5Edl1jAB7
+5a4NqjIBQx9tpLwsggRWDUXQNhprdY1dbK/mkeqhELciVuW1blfjqlASlbi8BgIpizHo9ep/i5uC
+97NBzCfQYUi3ZiKtFXecCX5ETPyc8OJWOMBvynDrJZ3Oahc88f8X3FYbFSYy1VYnRI7txGygEck5
+Kyf6wiZw88afh3qc+MAq5Y4EeppwMIZ2sgE5ei/YtNdkII77hyI3L7AMmqCTIGdr98fr7QID32fc
+8ZI9SiOqAXPThMQZhktOMmuBnwtH4wHGhfkM9+PGUg==
+=OUo5
+-----END PGP SIGNATURE-----
+
+--iZDWzuLK32AToNJitjcVRgYW0sgvaJdX9--
