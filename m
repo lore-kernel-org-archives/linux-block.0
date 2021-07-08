@@ -2,98 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A23DEC07E99
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFD8C11F6E
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:35:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E3FD61CE7
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:22:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E8BE61CD1
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 06:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229701AbhGHGZL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 02:25:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46642 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229608AbhGHGZL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Jul 2021 02:25:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 37C1C619A2;
-        Thu,  8 Jul 2021 06:22:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1625725349;
-        bh=W+h53mGiLZxvSfW/R9vFvStJYN2jtiMhpMbQkQuKTNE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RX848RGN2A6K5cMjfq7qqzvTetkvK7075GR33IAIWa9IYNaK281/hTyNaG/3WzGxH
-         z8w8fz8a5y/j8M3IZMx9PZFDQolcZSzQ31OMRDhCLjWZKZM6sox5aCW3bTywOAPjhh
-         pkOBlXEdg9o8eIKwPahTZ6S0u84i8uo47KbrhKa8=
-Date:   Thu, 8 Jul 2021 08:22:26 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     tglx@linutronix.de, akpm@linux-foundation.org, shuah@kernel.org,
-        rafael@kernel.org, rgoldwyn@suse.com, kuno@frob.nl,
-        fontana@sharpeleven.org, Ciaran.Farrell@suse.com,
-        Christopher.DeNicolo@suse.com, hch@lst.de, corbet@lwn.net,
-        linux@leemhuis.info, ast@kernel.org, andriin@fb.com,
-        daniel@iogearbox.net, atenart@kernel.org, alobakin@pm.me,
-        weiwan@google.com, ap420073@gmail.com, tj@kernel.org,
-        jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
-        peterz@infradead.org, linux-block@vger.kernel.org,
-        linux-spdx@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
-Subject: Re: [PATCH 0/2] LICENSES: add and use copyleft-next-0.3.1
-Message-ID: <YOaZohB/2Z3x5grc@kroah.com>
-References: <20210707184310.3624761-1-mcgrof@kernel.org>
+        id S230447AbhGHGiN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 02:38:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41478 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230405AbhGHGiJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Jul 2021 02:38:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625726127;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zPy2uiaqDpvQKzXrMQTnHDaQviTPg5vo1248ee1WfqU=;
+        b=EH78LwrgYqt867ZLr4ComKf2XSvcfXEBlLhfo+ZonYYZBJ5MTMVCX9ElieT3v6v2qZ6SM0
+        7u6Pd9bNHT1//6I070ZSCie5DXgbMTkHKybrVpKM/CWzqMugY5drMYp78aO2e8HgBj9MSi
+        f3SgTbI6accg+YBKQFP/jlBdnJu7uuY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-eKj7iy7QOOuaFRG8CwjXVQ-1; Thu, 08 Jul 2021 02:35:25 -0400
+X-MC-Unique: eKj7iy7QOOuaFRG8CwjXVQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39804100C660;
+        Thu,  8 Jul 2021 06:35:23 +0000 (UTC)
+Received: from T590 (ovpn-12-112.pek2.redhat.com [10.72.12.112])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A42B5D6A8;
+        Thu,  8 Jul 2021 06:35:04 +0000 (UTC)
+Date:   Thu, 8 Jul 2021 14:34:59 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH V2 5/6] virtio: add one field into virtio_device for
+ recording if device uses managed irq
+Message-ID: <YOack2zlRnGmjWWz@T590>
+References: <20210702150555.2401722-1-ming.lei@redhat.com>
+ <20210702150555.2401722-6-ming.lei@redhat.com>
+ <20210706054203.GC17027@lst.de>
+ <87bl7eqyr2.ffs@nanos.tec.linutronix.de>
+ <YOV3HgWG6F3geECm@T590>
+ <20210707140529.GA24637@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707184310.3624761-1-mcgrof@kernel.org>
+In-Reply-To: <20210707140529.GA24637@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 11:43:08AM -0700, Luis Chamberlain wrote:
-> This adds the copyleft-next-0.3.1 SPDX tag and replaces existing
-> boilerplate with the tag.
+On Wed, Jul 07, 2021 at 04:05:29PM +0200, Christoph Hellwig wrote:
+> On Wed, Jul 07, 2021 at 05:42:54PM +0800, Ming Lei wrote:
+> > The problem is that how blk-mq looks at that flag, since the device
+> > representing the controller which allocates irq vectors isn't visible
+> > to blk-mq.
 > 
-> Luis Chamberlain (2):
->   LICENSES: Add the copyleft-next-0.3.1 license
->   testing: use the copyleft-next-0.3.1 SPDX tag
-> 
->  LICENSES/dual/copyleft-next-0.3.1        | 237 +++++++++++++++++++++++
->  lib/test_kmod.c                          |  12 +-
->  lib/test_sysctl.c                        |  12 +-
->  tools/testing/selftests/kmod/kmod.sh     |  13 +-
->  tools/testing/selftests/sysctl/sysctl.sh |  12 +-
+> In blk_mq_pci_map_queues and similar helpers.
 
-As we only have 4 usages of this license in the tree, we have the
-opportunity to actually remove it and keep the list of licenses that we
-use in the kernel source smaller.
+Firstly it depends if drivers call into these helpers, so this way
+is fragile.
 
-Any chance you wish to just change the license of these files, given
-that you are the only one that has tried to use it for kernel code?
+Secondly, I think it isn't good to expose specific physical devices
+into blk-mq which shouldn't deal with physical device directly, also
+all the three helpers just duplicates same logic except for retrieving
+each vector's affinity from specific physical device.
 
-As a follow-up to this, I do not want to see your "test_sysfs.c" module
-as a dual-licensed file, as that makes no sense whatsoever.  It is
-directly testing GPL-v2-only code, so the attempt to dual license it
-makes no sense to me.  How could anyone take that code and do anything
-with it under the copyleft-next license only?  And where would that
-happen?
+I will think about how to cleanup them.
 
-I understand the appeal of copyleft-next in that it resolves many of the
-"grey" areas around gplv2, but given that no one is rushing to advise us
-to relicense all of the kernel with this thing, there is no need to
-encourage the spread of it given the added complexity and confusion that
-adding another license to our mix can only cause.
 
-So please, no, I don't want to see new licenses added to the tree, if
-anything we should be trimming them down to be less as it makes things
-simpler and more obvious.
+Thanks,
+Ming
 
-thanks,
-
-greg k-h
