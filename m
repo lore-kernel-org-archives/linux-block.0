@@ -2,164 +2,201 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A10C11F66
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 12:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C93C07E96
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 13:11:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AD1961432
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 12:43:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D405061461
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 13:11:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbhGHMqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 08:46:37 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:41612 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230456AbhGHMqg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 08:46:36 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0C3DB2198B;
-        Thu,  8 Jul 2021 12:43:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625748234; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+        id S231747AbhGHNNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 09:13:55 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:43423 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231587AbhGHNNz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Jul 2021 09:13:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1625749872;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=P4npa89ZahTLG6OBPNclvRbrcVBcLwXWzLAhBZSh1SY=;
-        b=kQxNjstg82kL4O4ZbGnRoUnxhb1jfiG/cNcdtcWx6GOnVEHDD/BIvDQn1QL50wL2g7eREQ
-        KqL6OG17bCJJPC/EAF6ca9HUJFjNj1LV9M3DbH3D37UtCY2ggjLGBQkostZ7F+AZ7jDqdi
-        6YlCyZaiFi82VevtT4x4ee0iMGO5qiQ=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id BC119133FE;
-        Thu,  8 Jul 2021 12:43:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id ADi5LAnz5mCCYAAAGKfGzw
-        (envelope-from <jgross@suse.com>); Thu, 08 Jul 2021 12:43:53 +0000
-From:   Juergen Gross <jgross@suse.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        bh=dApYUv0qBUWG/wRh9snu9rIDXsxOLh5oXW2J0EqkRjU=;
+        b=Qqx0quu3LaPpEv3UKaoxcfTUVCJdqqyZ4Ageis0pbRP2ZLUDko+GHIHIIqPV9FHjMiSWRR
+        jUM85mvNImZ++0vS79RqCcWiLh7XAyGwMCXwPJd36JGiLPCAotzNr5GEMQrjePD6G13ADX
+        F6l58zTv8KDsA9n0XAoui1KNse6jzB4=
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com
+ (mail-db8eur05lp2104.outbound.protection.outlook.com [104.47.17.104])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ de-mta-35-hNxWYglAO0O33bdWQOT1nA-2; Thu, 08 Jul 2021 15:11:11 +0200
+X-MC-Unique: hNxWYglAO0O33bdWQOT1nA-2
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MLk6rZXViFu7Y2TOTHEwfy+5qhcjUEiTjSi6kMpRGeXLTbX3cociKgiFbMBooAUrovV3rDjELkIC/xFLAivmxSI/7lEPP+ksRSarbKcIm68kBgOyjE/b2YRfIISMEB1+lE4PEfpF5omiGQQK8c8YF9Wb+8AWhcinwjQwlYQHJWxx/r6ZnVjjdHag26Sh/lMpr8oak2Z0htwisXLvRKo8S2kU/ij6nZ2nI8HAflZ9UTpf7XU5jWbAzraMs/IcvlXhZMVMP4bUgwJyq5tHK0hHDEGJ6ztg3dNRvQ9+HYT90fh+EYuBYxpDtZmRqcHThU2bsthHu+O5fgH7h7Crq7javQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dApYUv0qBUWG/wRh9snu9rIDXsxOLh5oXW2J0EqkRjU=;
+ b=VAdiMJmCCnkHquSE7nCNKxGliAxuVRHKEHKT11p5bVn2xgqH4N/LqJtEDZeDgu/H6Zb6uOWhuYl+I9NGhM0XBMpHSF/WcCncMuT6CDYDiunbP3Ww98QghFaoUsZZlfddIf+OxfBl+h3fHQLWLwAP9tik36vCfLozzFSuuTARH74GmErqSzBHFd899+WNWsyd/UqH6txXatl6Z0IIaLW8i7KjejDh9GyGbKXq6AT5WBxkUnsfTStdvu1qcRh5rsACLAp1Ay7ZZVM8BoTErPXY1CrIOg2FbiRJ7sSc0r17Zp2piXt14tQahonZz/FJQQbufDHnu9YhJ6mK9ouJcAw/xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR04MB5600.eurprd04.prod.outlook.com (2603:10a6:803:e7::16)
+ by VI1PR04MB5167.eurprd04.prod.outlook.com (2603:10a6:803:5b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.31; Thu, 8 Jul
+ 2021 13:11:08 +0000
+Received: from VI1PR04MB5600.eurprd04.prod.outlook.com
+ ([fe80::99d3:99cd:8adf:3eea]) by VI1PR04MB5600.eurprd04.prod.outlook.com
+ ([fe80::99d3:99cd:8adf:3eea%5]) with mapi id 15.20.4308.022; Thu, 8 Jul 2021
+ 13:11:08 +0000
+Subject: Re: [PATCH v2 3/3] xen/blkfront: don't trust the backend response
+ data blindly
+To:     Juergen Gross <jgross@suse.com>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Beulich <jbeulich@suse.com>
-Subject: [PATCH v2 2/3] xen/blkfront: don't take local copy of a request from the ring page
-Date:   Thu,  8 Jul 2021 14:43:44 +0200
-Message-Id: <20210708124345.10173-3-jgross@suse.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210708124345.10173-1-jgross@suse.com>
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 References: <20210708124345.10173-1-jgross@suse.com>
+ <20210708124345.10173-4-jgross@suse.com>
+From:   Jan Beulich <jbeulich@suse.com>
+Message-ID: <c33d7570-d986-749d-1e4f-85829a11babb@suse.com>
+Date:   Thu, 8 Jul 2021 15:11:06 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <20210708124345.10173-4-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PR3P191CA0008.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:102:54::13) To VI1PR04MB5600.eurprd04.prod.outlook.com
+ (2603:10a6:803:e7::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.156.60.236] (37.24.206.209) by PR3P191CA0008.EURP191.PROD.OUTLOOK.COM (2603:10a6:102:54::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18 via Frontend Transport; Thu, 8 Jul 2021 13:11:07 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 61fe5661-7176-464b-7042-08d94211d979
+X-MS-TrafficTypeDiagnostic: VI1PR04MB5167:
+X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB5167CFFD359DFFA79FC3CAA9B3199@VI1PR04MB5167.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:862;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 759rmCWBcna+LESXm5El+06QO+Q6e7T+OsR8b3PRrlz1pTEf97QY5nwzO0VTRAD5AITHyW/5RhzwRArdlA9LP+HXD5xnv4wQZ1OGyT6lZz60QU6kWxSfd1E0utFJo6MWlG2jYQQiN6p9+8zfcGyEMZhWepH2SuAQGWiHyNEQzxzdBHvp7jCLaNvAA2FJsXEcA6jZhpfvUku/gtWyLHciGhBfv4FyMwcxsT46WG6MIqn2m3549kQoAg0zE5eG6KqVJZsPqJCDXIn5N3rqsY1RBVqZTydhv2Cc5hVU0nQb0EGQe+bxOmKIKmz7PSpdq/865hpNPeb+EN0sZSxG4pOR/KdggK9Mo63ZKi+LT1rxEKdzDZvYtIO2cvFRxpiaQH1NkSy3SqbhVSLx9cD2ovGCrv3126ibKkAlMPKtO0egzPlkBxOYiXUjGsGA9jQ+dOCPDwAIrc2Vxj8F53kte6RUlOmBZiYesKfQJTZ6iY1v4CmYBXaafpPBAlZ1yviuFyjCdzqbusIge57qXj93Ube9Ni2uVBwagzpNSj3/MtK6UIKeYNCf/zCtnkF/l4essmfv38S94cVhlnd6vJczwbqLgzpPY0U+AEGTF5TslS0TKVn7LcbTwEw4/BRgvSQ0EWdQNrVLGyRXmD4MU91FtoOm3rZAladVU/+S4e8knJKiH/y2V/6uWnXVvhaUnjNjxdPK+axWhssgjrS8AATUGbZg/wksCwNqnXOVlkINpo4bQ+ZdWqELhYdUnD//+jUjkoOv
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5600.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(346002)(366004)(39850400004)(396003)(376002)(26005)(66556008)(86362001)(37006003)(16576012)(54906003)(8676002)(478600001)(5660300002)(6636002)(36756003)(53546011)(66476007)(6486002)(956004)(4326008)(2616005)(38100700002)(83380400001)(66946007)(31686004)(31696002)(6862004)(186003)(2906002)(8936002)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RkxEekdzSnduZXRsZWZ4QnJWY0RxZU5uVlN0SEM1SitLN2dkYTVnQ3hNZUow?=
+ =?utf-8?B?bVcrREhoUzNjYi9KZDdYNnRGYysxVk1sN1F4dmtsWDI1WEd0T2Y3ekhXUDNR?=
+ =?utf-8?B?M29LYWFHdkhyaUdoTGRnc05TMFM5cVB6dkQwc1BzZFVubk96N2VlVmZQWlBj?=
+ =?utf-8?B?MkxManh0V2x3NkdVMnJ6bHFqR09DYWppdVRrTjJ4OU1zaUN2OG9nNVM1Ym0w?=
+ =?utf-8?B?THVNVHdvOFNtMnA0WENLTFZ3K1hYVXlBZGszWXYzWXQwRVpDRHVtS1JDOEtw?=
+ =?utf-8?B?NlVHcmpmTS9ZUEZBY0FMTDhDVDlpNWFaWGRpeWQ0eWJ2WHZwN1d6WjZOK0sr?=
+ =?utf-8?B?YUwrcWg2THZ0Y04rSjhXNXpJcmo4UEdxSkM3czdQVEwvSXF6RE1ra1ZFSXcv?=
+ =?utf-8?B?aGlKTHZVSE5yVmNuckthUUVRM0xVUUJYUTlEd3RpUW93VW5FSENtK2d2YTZy?=
+ =?utf-8?B?R2RDSXVycTU3b01laDFXcGJXaXVqcGtRTEp0OW9ubHZFRklvMHpQc1gwMXdN?=
+ =?utf-8?B?TFdhUDNndVFQUDI0cFcxRDVvTHZqTCt6NVlHR21IZk9NZ3R0bGh0d0dpZTlB?=
+ =?utf-8?B?QmFYZUVqTG9RYXR0dHZkZVBBNS9yNDdra2xKVGRPRS80KzdXU3RlclM0Z3By?=
+ =?utf-8?B?RzB2U1c2bGVtcmxRdyt1WWZFb2lCbzJoVk9ZVzZmT2I4UG1nZjd4ZWxPNCtC?=
+ =?utf-8?B?OG5zbUxhUTBKekN4T0VCVmVtR0ZDQWdOUUlFWEQ3OHFKNCtZM3RBZDNCRW5D?=
+ =?utf-8?B?dUlwcXRnSE4zL0s5YVlhaGZBRDhNRHBxTFFFVE9OdlYyaGUyVFBnaEJSQ3Rh?=
+ =?utf-8?B?ZmsrMGlZVFBLRWNyRjRaNVFXYjhLWmlCYW80R2d6RkQyQ0p5dEFYeTYzVmE2?=
+ =?utf-8?B?SVlVN3M1OGd0eDU1Wks3UVduUCtqZ2xIbSt5R0JsMVU4SmlEb2FRWHJZdXhy?=
+ =?utf-8?B?eDhITGlCenZKRUVmSTBzOEJmbUJCc2RPZHB1MnlCVzZVQjdiN3FIcmpHV1VF?=
+ =?utf-8?B?c3J0V0Zqd05USENHei9zWmJRWWxLVVVBYkVJNU54NGo3cmJScWRyUUhUYTEx?=
+ =?utf-8?B?OU1WSTNIV1FZanRJQ041YmxobytPV3luaHFOQU5rWFJOZDlkSnFod2hoN1l4?=
+ =?utf-8?B?MUpqWGxWcVNFME1rcTdSdlpBc2VaRHVQWk1Zd1Fhby9ndklZTERXaEJML2xW?=
+ =?utf-8?B?NVdXYk1rNTJLeWRac1o3ekJZR2N1N0RtZlczZ2VvdzRPejZjQ2RmYkpmSEdu?=
+ =?utf-8?B?OUtiNkZiQ2ZteEdGUVNSZENRbXlWWitrM3BIYmRaQ291Nm43RHlLM0dDbzFa?=
+ =?utf-8?B?SUJETldTTVNJQlFnTktzWlNxNjZOYTlVZ1NNYy82WExDTTVjcVhpSXRaa2w0?=
+ =?utf-8?B?YWNVYUE4eG02WDNTR3VmZFh1WjUzb1c1QVE2TDFxUndLWTNLc0p5ZDNmb0xL?=
+ =?utf-8?B?aTZEaDJlZE12RGdkdDJLWm96N0l1bFNDZGFUSW1xbmlzZmxKNGpmYkxOUlNV?=
+ =?utf-8?B?QSt6YjBIMFlKL29NYnNFQjJtMUtJN2d2WU5GbXBQYlBOK0hlNUs3a1Z4UlFQ?=
+ =?utf-8?B?NVQ1YUZweFlLYWRJN1QrK2Fjait4bnVrSFVqMDhEVjI1OGZsWVYvT1V1MzVp?=
+ =?utf-8?B?Tkw1czRkZTFyYnA0OHBOenJzRlkxZE52VlZ3SXdReXBWMVp6cUNRVUlLRFQv?=
+ =?utf-8?B?SUlwaklBZzlNTXZRSDQvcmV6ZWtiU1RuLzlHSWFxWG1GU3RGSW1oR0F4T3NS?=
+ =?utf-8?Q?yI8EV2NI00WjuHSuVYQU0ZjybhMWs9QAGQwNOZj?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61fe5661-7176-464b-7042-08d94211d979
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5600.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2021 13:11:08.1956
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4sCOwJ3oMz+phsm4z9QPbBYGdLGN3i73yU8PrsQVHmk4uitO1FJ0I4hCLnqSjGVc/I/9/WxEWIT3Px3MFIe9bQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5167
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to avoid a malicious backend being able to influence the local
-copy of a request build the request locally first and then copy it to
-the ring page instead of doing it the other way round as today.
+On 08.07.2021 14:43, Juergen Gross wrote:
+> Today blkfront will trust the backend to send only sane response data.
+> In order to avoid privilege escalations or crashes in case of malicious
+> backends verify the data to be within expected limits. Especially make
+> sure that the response always references an outstanding request.
+> 
+> Introduce a new state of the ring BLKIF_STATE_ERROR which will be
+> switched to in case an inconsistency is being detected. Recovering from
+> this state is possible only via removing and adding the virtual device
+> again (e.g. via a suspend/resume cycle).
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
 Reviewed-by: Jan Beulich <jbeulich@suse.com>
----
-V2:
-- init variable to avoid potential compiler warning (Jan Beulich)
----
- drivers/block/xen-blkfront.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+albeit ...
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 86356014d35e..80701860870a 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -546,7 +546,7 @@ static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
- 	rinfo->shadow[id].status = REQ_WAITING;
- 	rinfo->shadow[id].associated_id = NO_ASSOCIATED_ID;
- 
--	(*ring_req)->u.rw.id = id;
-+	rinfo->shadow[id].req.u.rw.id = id;
- 
- 	return id;
- }
-@@ -554,11 +554,12 @@ static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
- static int blkif_queue_discard_req(struct request *req, struct blkfront_ring_info *rinfo)
- {
- 	struct blkfront_info *info = rinfo->dev_info;
--	struct blkif_request *ring_req;
-+	struct blkif_request *ring_req, *final_ring_req;
- 	unsigned long id;
- 
- 	/* Fill out a communications ring structure. */
--	id = blkif_ring_get_request(rinfo, req, &ring_req);
-+	id = blkif_ring_get_request(rinfo, req, &final_ring_req);
-+	ring_req = &rinfo->shadow[id].req;
- 
- 	ring_req->operation = BLKIF_OP_DISCARD;
- 	ring_req->u.discard.nr_sectors = blk_rq_sectors(req);
-@@ -569,8 +570,8 @@ static int blkif_queue_discard_req(struct request *req, struct blkfront_ring_inf
- 	else
- 		ring_req->u.discard.flag = 0;
- 
--	/* Keep a private copy so we can reissue requests when recovering. */
--	rinfo->shadow[id].req = *ring_req;
-+	/* Copy the request to the ring page. */
-+	*final_ring_req = *ring_req;
- 
- 	return 0;
- }
-@@ -703,6 +704,7 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- {
- 	struct blkfront_info *info = rinfo->dev_info;
- 	struct blkif_request *ring_req, *extra_ring_req = NULL;
-+	struct blkif_request *final_ring_req, *final_extra_ring_req = NULL;
- 	unsigned long id, extra_id = NO_ASSOCIATED_ID;
- 	bool require_extra_req = false;
- 	int i;
-@@ -747,7 +749,8 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 	}
- 
- 	/* Fill out a communications ring structure. */
--	id = blkif_ring_get_request(rinfo, req, &ring_req);
-+	id = blkif_ring_get_request(rinfo, req, &final_ring_req);
-+	ring_req = &rinfo->shadow[id].req;
- 
- 	num_sg = blk_rq_map_sg(req->q, req, rinfo->shadow[id].sg);
- 	num_grant = 0;
-@@ -798,7 +801,9 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 		ring_req->u.rw.nr_segments = num_grant;
- 		if (unlikely(require_extra_req)) {
- 			extra_id = blkif_ring_get_request(rinfo, req,
--							  &extra_ring_req);
-+							  &final_extra_ring_req);
-+			extra_ring_req = &rinfo->shadow[extra_id].req;
-+
- 			/*
- 			 * Only the first request contains the scatter-gather
- 			 * list.
-@@ -840,10 +845,10 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 	if (setup.segments)
- 		kunmap_atomic(setup.segments);
- 
--	/* Keep a private copy so we can reissue requests when recovering. */
--	rinfo->shadow[id].req = *ring_req;
-+	/* Copy request(s) to the ring page. */
-+	*final_ring_req = *ring_req;
- 	if (unlikely(require_extra_req))
--		rinfo->shadow[extra_id].req = *extra_ring_req;
-+		*final_extra_ring_req = *extra_ring_req;
- 
- 	if (new_persistent_gnts)
- 		gnttab_free_grant_references(setup.gref_head);
--- 
-2.26.2
+> @@ -1602,7 +1628,8 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+>  		case BLKIF_OP_DISCARD:
+>  			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
+>  				struct request_queue *rq = info->rq;
+> -				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+> +
+> +				pr_warn_ratelimited("blkfront: %s: %s op failed\n",
+>  					   info->gd->disk_name, op_name(bret.operation));
+>  				blkif_req(req)->error = BLK_STS_NOTSUPP;
+>  				info->feature_discard = 0;
+> @@ -1614,13 +1641,13 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+>  		case BLKIF_OP_FLUSH_DISKCACHE:
+>  		case BLKIF_OP_WRITE_BARRIER:
+>  			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
+> -				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+> +				pr_warn_ratelimited("blkfront: %s: %s op failed\n",
+>  				       info->gd->disk_name, op_name(bret.operation));
+>  				blkif_req(req)->error = BLK_STS_NOTSUPP;
+>  			}
+>  			if (unlikely(bret.status == BLKIF_RSP_ERROR &&
+>  				     rinfo->shadow[id].req.u.rw.nr_segments == 0)) {
+> -				printk(KERN_WARNING "blkfront: %s: empty %s op failed\n",
+> +				pr_warn_ratelimited("blkfront: %s: empty %s op failed\n",
+>  				       info->gd->disk_name, op_name(bret.operation));
+>  				blkif_req(req)->error = BLK_STS_NOTSUPP;
+>  			}
+> @@ -1635,8 +1662,8 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+>  		case BLKIF_OP_READ:
+>  		case BLKIF_OP_WRITE:
+>  			if (unlikely(bret.status != BLKIF_RSP_OKAY))
+> -				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
+> -					"request: %x\n", bret.status);
+> +				dev_dbg_ratelimited(&info->xbdev->dev,
+> +					"Bad return from blkdev data request: %x\n", bret.status);
+>  
+>  			break;
+>  		default:
+
+... all of these look kind of unrelated to the topic of the patch,
+and the conversion also isn't mentioned as on-purpose in the
+description.
+
+Jan
 
