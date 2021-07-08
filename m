@@ -2,56 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77831C07E9C
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 04:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB23FC07E9E
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 05:13:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5676A61CD5
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 04:14:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A91E661CDD
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 05:13:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbhGHERg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 00:17:36 -0400
-Received: from verein.lst.de ([213.95.11.211]:39111 "EHLO verein.lst.de"
+        id S229600AbhGHFPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 01:15:44 -0400
+Received: from verein.lst.de ([213.95.11.211]:39221 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229482AbhGHERg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Jul 2021 00:17:36 -0400
+        id S229541AbhGHFPo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Jul 2021 01:15:44 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0839F68BFE; Thu,  8 Jul 2021 06:14:47 +0200 (CEST)
-Date:   Thu, 8 Jul 2021 06:14:46 +0200
+        id 60C4D68C4E; Thu,  8 Jul 2021 07:13:00 +0200 (CEST)
+Date:   Thu, 8 Jul 2021 07:13:00 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     gregkh@linuxfoundation.org, tglx@linutronix.de,
-        akpm@linux-foundation.org, shuah@kernel.org, rafael@kernel.org,
-        rgoldwyn@suse.com, kuno@frob.nl, fontana@sharpeleven.org,
-        Ciaran.Farrell@suse.com, Christopher.DeNicolo@suse.com, hch@lst.de,
-        corbet@lwn.net, linux@leemhuis.info, ast@kernel.org,
-        andriin@fb.com, daniel@iogearbox.net, atenart@kernel.org,
-        alobakin@pm.me, weiwan@google.com, ap420073@gmail.com,
-        tj@kernel.org, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
-        peterz@infradead.org, linux-block@vger.kernel.org,
-        linux-spdx@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
-Subject: Re: [PATCH 0/2] LICENSES: add and use copyleft-next-0.3.1
-Message-ID: <20210708041446.GA17410@lst.de>
-References: <20210707184310.3624761-1-mcgrof@kernel.org>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Christoph Hellwig <hch@lst.de>, leah.rumancik@gmail.com,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH] ext4: fix EXT4_IOC_CHECKPOINT
+Message-ID: <20210708051300.GA18564@lst.de>
+References: <20210707085644.3041867-1-hch@lst.de> <YOXdIZARJ0Rwtfbd@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707184310.3624761-1-mcgrof@kernel.org>
+In-Reply-To: <YOXdIZARJ0Rwtfbd@mit.edu>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 11:43:08AM -0700, Luis Chamberlain wrote:
-> This adds the copyleft-next-0.3.1 SPDX tag and replaces existing
-> boilerplate with the tag.
+On Wed, Jul 07, 2021 at 12:58:09PM -0400, Theodore Ts'o wrote:
+> A discard is not "dangerous"; how it behaves is simply not necessarily
+> guaranteed by the standards specification.  The userspace which uses
+> the ioctl simply needs to know how a particular block device might
+> react when it is given a discard.
 
-Why do we need a random weirdo license in the kernel tree?  Is there
-any benefit?  If so it needs to be clearly spelled out.
+A discard itself is indeed not dangerous at all.  Using it to imply
+any kind of data erasure OTOH is extremely dangerous, and that is
+what this interface does.
+
+> I'll note that there is a similar issue with "WRITE SAME" or "ZEROOUT.
+> A WRITE SAME might take a fraction of a second --- or it might take
+> days --- depending on how the storage device is implemented.  It is
+> similarly unspecified by the various standards specification.  Hence,
+> userspace needs to know something about the block device before
+> deciding whether or not it would be good idea to issue a "WRITE SAME"
+> operation for large number of blocks.
+
+The same is true of discard.  There are plenty of devices where
+discards are horrible slow.  There also are plenty of devices where
+discard is a complete no-op.  Especially on NVMe where the discard
+command (DSM deallocate) is mandatory to implement.
+
+> This is why the API is implemented in terms of what command will be
+> issued to the block device, and not what the semantic meaning is for
+> that particular command.  That's up to the userspace application to
+> know out of band, and we should be able to give the privileged
+> application the freedom to decide which command makes the most amount
+> of sense.
+
+Stop claiming you actively misleading users with broken interfaces
+freedom.
+
+> 
+> 	 	      	  	    		   - Ted
+---end quoted text---
