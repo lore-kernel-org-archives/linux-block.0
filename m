@@ -2,170 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C911EC07E96
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD55C07E9C
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:22:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5357613C2
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C077461876
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:22:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231951AbhGHOTi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 10:19:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231828AbhGHOTi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 10:19:38 -0400
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEA3C061574
-        for <linux-block@vger.kernel.org>; Thu,  8 Jul 2021 07:16:55 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id d2so2862093qvh.2
-        for <linux-block@vger.kernel.org>; Thu, 08 Jul 2021 07:16:55 -0700 (PDT)
+        id S231749AbhGHOZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 10:25:29 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:1696 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231515AbhGHOZ3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Jul 2021 10:25:29 -0400
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 168EMXX3025875;
+        Thu, 8 Jul 2021 14:22:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2020-01-29;
+ bh=8+aqNpOIdC336lxqyNc/bD55AhEDMwUsfe+OdCIsvpw=;
+ b=LTNyKg14gbyoNV21MAfFLgnpgzRETypOrZqXWbE7dapEYl7lmZFGkO6qG/3uuuioXPXA
+ FQX3zpQa0Ao1tFjt35GcZ74JkICBk38jyUVwLU79crA5x/jtXrV3poLlVT4q3Dkod4L7
+ 5RKScWJC6DyTnmRP5lA1SZmL+ij6FC26z8obUi+NqR2tZqqP19kN/tQGlbLSFJSl7K3O
+ 12WjDki1feB9fyUo5Ii2B/brLut/+N9nAntfkG7JvkfQrkvHqsHkIhki755viU02cleq
+ /3guEjYK92/sopediQKbEP1Anm8CoOfBrxrrm7vFq1zaMKubjhXpIWNVlXaVch+b9FId Mg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 39nbsxtkt6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Jul 2021 14:22:40 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 168EKD8h037372;
+        Thu, 8 Jul 2021 14:22:39 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2175.outbound.protection.outlook.com [104.47.57.175])
+        by userp3030.oracle.com with ESMTP id 39jd15rr8k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Jul 2021 14:22:39 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mTZaeum1WY5qH2L0fakQjhybJgs1q6/zXBLJPB4U5y7JyE6Gvr+FWmFi0wG6mdkLGHnoZwWWW7WEeD4OVJbZSBbGzj5evNpc+eslaxEM8EPO/5mFWJEJk5+incV1a9AbfwIR0VNDYUk0mxsn15PBJzUpjP9AjFz+MnSvsSn/dVyNQQl3ftBppw4B+g3ecuujwlBZaJxo5WCexhxnCTJg8ZPRtK4/2TtJxGcnxWOLw/l6TYxrdhjZlhd6/YZpqdxCa1uuG+jPmB6WUQzV2d3l9+A95+dPTUr4Fj9B0XeYOgRvsjw1aULNjvsQen+5QmpiTBLXz0WKSfkIXk5ef6ayUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8+aqNpOIdC336lxqyNc/bD55AhEDMwUsfe+OdCIsvpw=;
+ b=lNdoIV+XNbb7jYR9JezJDXD8G88AGVIe3KGnp/rz0PJVYLkNKPblJcGTxG/Ip5GRKbjAiFHivxGCurXvAzJhpR9WiEfo8IuACkpylVk23XIBDtX25BueiL4jQUstQ9bUJz0ovPckk9Y4BUk838ceY/xqsF6uKRVwIvwO3W5S4HzOrs5I+u7gXqpuRNuXBod85gbVOBd60BKJVhUHYKCN/MPTGtFdAz9+SH2E4Eal0E4qpXvCwEKttGb6YPXRFlFGeXNePqrmF7JaQCGtnbghS05BXuxCyJ4Tanv3fmgnyW9mb461W/oLzBcnJQeE+OFYS+P1PNW+5BSTGkE4wLULWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=d5d/GxLmbKfY+XWVcKletUVIjk4gicqC51q3HxHrwVs=;
-        b=YGO5yj+sW1ldFLeWUq2sjY+JCHJIwjbP8HAOHYGDG3d1g4TKrWpA1QutuAtqlECRNe
-         IQajJFVRn2GE50Cx2nYEZ5/mG5x1UO4GrDKmTrX7SURJq26rbnrtwGggrBkgxHtz4QSP
-         EgEG7IpahnUtpWvO80llJPBP3MC+XYz76gpY5R7UugyGZlC/y0Mr6sRNkhCkFdlyWAG+
-         xlpJaqJMP8EMOdxq95EUhmzlfyLeDOOWxNdrlEKpkFePAgnWwS4Q1hVw2sxkVF4sG/b0
-         XCFTLOueoPJ+6TUAZY5kebl+LeKos6hc7gfiapFA3t4Cc8mx502QAN12rC+sfzNdjJ75
-         29ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=d5d/GxLmbKfY+XWVcKletUVIjk4gicqC51q3HxHrwVs=;
-        b=WUndePapaRMcWpTUokPi8rDhxpWO9ldr8hL5pRFiPjQR5NdmtYneho6+XfWES6sriD
-         27vSNo9LEgWQxnkWbtiXPXEYAD0PhY2VOlBYRnhtI4l4yFj+WHI2cgmcNmQT1u9tuMpa
-         IcF8YbnOb/zOWFRAfTz4fldIr28NFSCN0L/2L+hsj5eLfILsk8FdyEGiaBhySnUK+Ott
-         7/XRYlZZMqQrCXmLgOrXLfZlWeUQD7e0Dlue1L3HMsE05UqAKbj0BeZHwatFLdq5R7y3
-         me+599ajhfuclVfdMTMg7YCqgqX9ElMxh/ESBhiKBGQj4AJWCYqaMML8yXpbiR6EUxJ4
-         h7og==
-X-Gm-Message-State: AOAM5328Tn80rZ8eVkLQtc2XRY90Ym1H1UiV5t4NTxKh1GqV5ipKvJT1
-        fWNFrWS1pLlBKwKUnn0BFrM=
-X-Google-Smtp-Source: ABdhPJwMVaTpCtyZBV+aK+xIQoiCueEh3Bvznmah/MIuius/653uRAFVir9C9xLHKJ8Mi4Di4VNZYg==
-X-Received: by 2002:a0c:cb8f:: with SMTP id p15mr30697827qvk.13.1625753814345;
-        Thu, 08 Jul 2021 07:16:54 -0700 (PDT)
-Received: from dschatzberg-fedora-PC0Y6AEN ([2620:10d:c091:480::1:ee15])
-        by smtp.gmail.com with ESMTPSA id b7sm1011938qti.21.2021.07.08.07.16.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jul 2021 07:16:52 -0700 (PDT)
-Date:   Thu, 8 Jul 2021 10:16:50 -0400
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Subject: Re: [PATCH 6/6] loop: don't add worker into idle list
-Message-ID: <YOcI0hr3k5q+/zQ4@dschatzberg-fedora-PC0Y6AEN>
-References: <20210705102607.127810-1-ming.lei@redhat.com>
- <20210705102607.127810-7-ming.lei@redhat.com>
- <YORg2KYF7X1ZYJPG@dschatzberg-fedora-PC0Y6AEN>
- <YOUdMjAzEw6JQjKG@T590>
- <YOWyVnrOTHvMB7A3@dschatzberg-fedora-PC0Y6AEN>
- <YOaiHLD74VG5I5cD@T590>
-MIME-Version: 1.0
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8+aqNpOIdC336lxqyNc/bD55AhEDMwUsfe+OdCIsvpw=;
+ b=Avq5tnJoooPOrbPR98xd2+EB6fnWcm17UxXHEErvOc25MKmIoVjbhTK6en1TcDKF+Bs6+1x5n7n8HnKXzlxpSV5qs91VAGEglercYR3GVRUMknbt/tGM7Y+Her/etIL32ZkIMM5muOuxQeatbjwTupfy2qLZLSccF8q9bZOQEpk=
+Authentication-Results: suse.com; dkim=none (message not signed)
+ header.d=none;suse.com; dmarc=none action=none header.from=oracle.com;
+Received: from BYAPR10MB2999.namprd10.prod.outlook.com (2603:10b6:a03:85::27)
+ by SJ0PR10MB4784.namprd10.prod.outlook.com (2603:10b6:a03:2d4::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Thu, 8 Jul
+ 2021 14:22:35 +0000
+Received: from BYAPR10MB2999.namprd10.prod.outlook.com
+ ([fe80::8111:d8f1:c262:808d]) by BYAPR10MB2999.namprd10.prod.outlook.com
+ ([fe80::8111:d8f1:c262:808d%6]) with mapi id 15.20.4308.022; Thu, 8 Jul 2021
+ 14:22:35 +0000
+Date:   Thu, 8 Jul 2021 10:22:31 -0400
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v2 0/3] xen: harden blkfront against malicious backends
+Message-ID: <YOcKJ6m31tHuq2kh@char.us.oracle.com>
+References: <20210708124345.10173-1-jgross@suse.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YOaiHLD74VG5I5cD@T590>
+In-Reply-To: <20210708124345.10173-1-jgross@suse.com>
+X-ClientProxiedBy: MN2PR10CA0032.namprd10.prod.outlook.com
+ (2603:10b6:208:120::45) To BYAPR10MB2999.namprd10.prod.outlook.com
+ (2603:10b6:a03:85::27)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from char.us.oracle.com (130.44.160.152) by MN2PR10CA0032.namprd10.prod.outlook.com (2603:10b6:208:120::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19 via Frontend Transport; Thu, 8 Jul 2021 14:22:34 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d36ba2f3-bf74-4b9b-d202-08d9421bd50b
+X-MS-TrafficTypeDiagnostic: SJ0PR10MB4784:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SJ0PR10MB47849DD12284E1917D44FB4489199@SJ0PR10MB4784.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NpJNicft54NU0o5bY+ypmRKcSOJzBbttEiPos6zjQgNHWTRB6mv0vygbpsSkhlJBWcLfDP129P2h6ncn4Ao9h0ekIDnbspLQ3QBlo3cbDWJfEIC7rIizcCebUuggqrlhf0G3ugw6BbxJXAQFtHVejXMfg2eenI5RAtDn9T5oKZrbkOOR5BfO1BpTkGRk2c6DXmktXa+nrUx13MoGYRkch6b70jFFVwJQI2F+/ae3bsHJOhQ7Ncx6TXB6jNFwyrdQ4K8TZc1qblpMvwiamDNbJfb12cXOJd5a7LAy1+Ij/If1qYtS47aV1xu7iY7aeLVAGEI2lmg5x/LXUFH/fatCHidvPWI559WRWNZhFG6bP86io3u50+Kl5rquUI5GwNYs2zKVDTsth+xwCAeNdvbTuUN6wy2E5uzRTNT1lGSepZ+tX5EFRaoz7/jLRVRAlks1iZaysOFNVi/y24YBLahyyI6EIscOblnNc6iocZhBMUxTDfJv2g+cmEKo+r+3wO95Z70wbZDqkcqYXAmYsf9nWQGIlez3s+wWGA1IstH1LwlaAUBccQcEOL43yDSGL1JX8uF5QA/wbAGFU9wDowNtwXToysuPc2K3oIQjDQ3ThwJVeI0RCUjWYs8FIKyR9Z0laCsIWQr9AvtBolKGJ23MdgY+hQ9bP/42EyRaGcDtwkTq8v6144XmoqiVQCdmjJPn64/nNgFayKjuLZbYEw18FsafJIOIgeX8rYHER5cEDCHof9aqtLBvtccwJe7p7MytWEcVk4VcjLC7vrlmCzajIIF90bxLCmlgqosgnn8YAu8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2999.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(376002)(346002)(39860400002)(136003)(396003)(478600001)(316002)(38350700002)(86362001)(966005)(38100700002)(2906002)(83380400001)(52116002)(6916009)(26005)(7696005)(8936002)(54906003)(186003)(8676002)(4326008)(6666004)(66476007)(66946007)(66556008)(956004)(5660300002)(55016002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?y3ARb6nCAKV3Czv7MtYPpmokDhR/zrnUzhjSPOK7Rcq027a1q0auvcQfbfRh?=
+ =?us-ascii?Q?GrDKA0zJTL9PIf7YUB+svcFOoUY0z/OMzJ5vf73B54cgM4bdTB24ubBak0+d?=
+ =?us-ascii?Q?8CcY/ha3JbHxOzDQlDHtMfdRoKq2/M167r7MpgZPWP39CaFnaR/tm1MBVDfR?=
+ =?us-ascii?Q?nOBVmeDeYPA6dOn8SmfcOc86unJHDXZt/13wzafPAL5o6FioyRBB81T49BsX?=
+ =?us-ascii?Q?NbUaL0M97O1nmigeGpx+PhBuPPawSUYF0BKq+bCmS6pEZX5KzLZ2Lv62ZSxZ?=
+ =?us-ascii?Q?5HxGQWqwXDVK9tygyd+zm0QSA0XLv8dfeuHbLgt8lMUjkjas9MNnwaflR5Gb?=
+ =?us-ascii?Q?PuboWg/NHCL646vFWy4qpdDCTUmi7ZonVW19jIn8HYWxRgv7esjeePAPPMPY?=
+ =?us-ascii?Q?ZkTFe6RMjz67kX03nQKlle5Eu24zIAO+qg0K0cGo1ebELE78Psjym7ccxtue?=
+ =?us-ascii?Q?xPJXYgKB0spNZChvX76VetlRiogU5aqvO5fLs/7LLKiYO9OoHDLJSv/5humf?=
+ =?us-ascii?Q?tcVYDrs6U62UxAa6EaQROPJbweFBUnDgeh5aQNKFiK5licpny3I2iylvDFsj?=
+ =?us-ascii?Q?YGmeR0NaD2v3152+HRZ2jHp5J8fVWNTZ2B2ngxJJUxj1ArYvXXNBy+BOS98R?=
+ =?us-ascii?Q?N5v35WC2su+E46NwySSmhNIH3kErwjIwEbPObmXnAUdeMTJA5KXchFPn1rp9?=
+ =?us-ascii?Q?LiPb4OmXlNTm4RkttT43mDbJytFDhJVLaxSQtOYsxVXO2PKs2htM/mkxf4qP?=
+ =?us-ascii?Q?5wJvNyrY/4KyERZ/3IPI8XiEeWySqoFXb4uc2lTI13xlhzvubYQmS95tGppq?=
+ =?us-ascii?Q?Ym2e9g+fpuCzY5iptD3K1YrwbOLEJlvdDusgnCqh50IEThCcGRwaTQYzD6cq?=
+ =?us-ascii?Q?mdmW3CXXcSCqTp9ldmeKMjG+bW/WjaP/xp9PjXedqX/Hs0sgQUAb0ehogCbo?=
+ =?us-ascii?Q?tCwJAb3dqSWiC41Nz+FK9flmFQJYeWCLS4la9FDY/9X3XKQhpH3sOOKlfaVu?=
+ =?us-ascii?Q?U4SfGYWPfUHzIULcelfC0OMyiHLK0jSu8Vc+srBdhyMNxpIo5mcIrd7Il6j/?=
+ =?us-ascii?Q?Yx6/sz/FKCpOPaCN81TPqk+eZmh+HFAhvCzBQ+XaNcwOFcAhPo5+h/X4au4+?=
+ =?us-ascii?Q?FTDdUCvwVn4knty8ZhJMJmSGDWdfLpUxWcJIX7TF9ypwmNtkEPnuKFB/heVd?=
+ =?us-ascii?Q?Tw6xkEuFJy0cVUbSFKneVg5efVxxllAsZuG9yjH4rkDulgogwldYa5IH+v3k?=
+ =?us-ascii?Q?KOyrwSO3XR81IQ0kesCX+QMZw6xqLmW3ruN9nfinFlK0g9f/7WgcKQCldVPM?=
+ =?us-ascii?Q?49gueOoFptQI5UHmwPf3SHiH?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d36ba2f3-bf74-4b9b-d202-08d9421bd50b
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2999.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2021 14:22:35.6637
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tJft0CievwA0O/A/blsVuPrNFEgcrqjXzukmfT7Q9lg5oa/01dqMykVWDAbazvIS2uYBPocCX29YIdHHDW8kww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4784
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10038 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0
+ suspectscore=0 phishscore=0 mlxscore=0 bulkscore=0 adultscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107080078
+X-Proofpoint-ORIG-GUID: I-PLq_lY1OLt-zFhG7kTrumscKKdY6nu
+X-Proofpoint-GUID: I-PLq_lY1OLt-zFhG7kTrumscKKdY6nu
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 08, 2021 at 02:58:36PM +0800, Ming Lei wrote:
-> On Wed, Jul 07, 2021 at 09:55:34AM -0400, Dan Schatzberg wrote:
-> > On Wed, Jul 07, 2021 at 11:19:14AM +0800, Ming Lei wrote:
-> > > On Tue, Jul 06, 2021 at 09:55:36AM -0400, Dan Schatzberg wrote:
-> > > > On Mon, Jul 05, 2021 at 06:26:07PM +0800, Ming Lei wrote:
-> > > > >  	}
-> > > > > +
-> > > > > +	spin_lock(lock);
-> > > > >  	list_add_tail(&cmd->list_entry, cmd_list);
-> > > > > +	spin_unlock(lock);
-> > > > >  	queue_work(lo->workqueue, work);
-> > > > > -	spin_unlock(&lo->lo_work_lock);
-> > > > >  }
-> > > > >  
-> > > > >  static void loop_update_rotational(struct loop_device *lo)
-> > > > > @@ -1131,20 +1159,18 @@ static void loop_set_timer(struct loop_device *lo)
-> > > > >  
-> > > > >  static void __loop_free_idle_workers(struct loop_device *lo, bool force)
-> > > > >  {
-> > > > > -	struct loop_worker *pos, *worker;
-> > > > > +	struct loop_worker *worker;
-> > > > > +	unsigned long id;
-> > > > >  
-> > > > >  	spin_lock(&lo->lo_work_lock);
-> > > > > -	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
-> > > > > -				idle_list) {
-> > > > > +	xa_for_each(&lo->workers, id, worker) {
-> > > > >  		if (!force && time_is_after_jiffies(worker->last_ran_at +
-> > > > >  						LOOP_IDLE_WORKER_TIMEOUT))
-> > > > >  			break;
-> > > > > -		list_del(&worker->idle_list);
-> > > > > -		xa_erase(&lo->workers, worker->blkcg_css->id);
-> > > > > -		css_put(worker->blkcg_css);
-> > > > > -		kfree(worker);
-> > > > > +		if (refcount_dec_and_test(&worker->refcnt))
-> > > > > +			loop_release_worker(worker);
-> > > > 
-> > > > This one is puzzling to me. Can't you hit this refcount decrement
-> > > > superfluously each time the loop timer fires?
-> > > 
-> > > Not sure I get your point.
-> > > 
-> > > As I mentioned above, this one is the counter pair of INIT reference,
-> > > but one new lo_cmd may just grab it when queueing rq before erasing the
-> > > worker from xarray, so we can't release worker here until the command is
-> > > completed.
-> > 
-> > Suppose at this point there's still an outstanding loop_cmd to be
-> > serviced for this worker. The refcount_dec_and_test should decrement
-> > the refcount and then fail the conditional, not calling
-> > loop_release_worker. What happens if __loop_free_idle_workers fires
-> > again before the loop_cmd is processed? Won't you decrement the
-> > refcount again, and then end up calling loop_release_worker before the
-> > loop_cmd is processed?
->  
-> Good catch!
+On Thu, Jul 08, 2021 at 02:43:42PM +0200, Juergen Gross wrote:
+> Xen backends of para-virtualized devices can live in dom0 kernel, dom0
+> user land, or in a driver domain. This means that a backend might
+> reside in a less trusted environment than the Xen core components, so
+> a backend should not be able to do harm to a Xen guest (it can still
+> mess up I/O data, but it shouldn't be able to e.g. crash a guest by
+> other means or cause a privilege escalation in the guest).
 > 
-> The following one line change should avoid the issue:
+> Unfortunately blkfront in the Linux kernel is fully trusting its
+> backend. This series is fixing blkfront in this regard.
 > 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 146eaa03629b..3cd51bddfec9 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -980,7 +980,6 @@ static struct loop_worker *loop_alloc_or_get_worker(struct loop_device *lo,
->  
->  static void loop_release_worker(struct loop_worker *worker)
->  {
-> -	xa_erase(&worker->lo->workers, worker->blkcg_css->id);
->  	css_put(worker->blkcg_css);
->  	kfree(worker);
->  }
-> @@ -1167,6 +1166,7 @@ static void __loop_free_idle_workers(struct loop_device *lo, bool force)
->  		if (!force && time_is_after_jiffies(worker->last_ran_at +
->  						LOOP_IDLE_WORKER_TIMEOUT))
->  			break;
-> +		xa_erase(&worker->lo->workers, worker->blkcg_css->id);
->  		if (refcount_dec_and_test(&worker->refcnt))
->  			loop_release_worker(worker);
->  	}
+> It was discussed to handle this as a security problem, but the topic
+> was discussed in public before, so it isn't a real secret.
 
-Yeah, I think this resolves the issue. You could end up repeatedly
-allocating workers for the same blkcg in the event that you're keeping
-the worker busy for the entire LOOP_IDLE_WORKER_TIMEOUT (since it only
-updates the last_ran_at when idle). You may want to add a racy check
-if the refcount is > 1 to avoid that.
+Wow. This looks like what Marek did .. in 2018!
 
-I think there might be a separate issue with the locking here though -
-you acquire the lo->lo_work_lock in __loop_free_idle_workers and then
-check worker->last_ran_at for each worker. However you only protect
-the write to worker->last_ran_at (in loop_process_work) with the
-worker->lock which I think means there's a potential data race on
-worker->last_ran_at.
+https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg02336.html
+
+Would it be worth crediting Marek?
+> 
+> Changes in V2:
+> - put blkfront patches into own series
+> - some minor comments addressed
+> 
+> Juergen Gross (3):
+>   xen/blkfront: read response from backend only once
+>   xen/blkfront: don't take local copy of a request from the ring page
+>   xen/blkfront: don't trust the backend response data blindly
+> 
+>  drivers/block/xen-blkfront.c | 122 +++++++++++++++++++++++------------
+>  1 file changed, 80 insertions(+), 42 deletions(-)
+> 
+> -- 
+> 2.26.2
+> 
