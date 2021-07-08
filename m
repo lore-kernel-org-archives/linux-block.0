@@ -2,69 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB1FC07E96
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 13:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C99C07E9E
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 13:57:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B36876141A
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 13:56:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD7456186A
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 13:57:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231747AbhGHN70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 09:59:26 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:51882 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231631AbhGHN7Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 09:59:25 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1625752602;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S231875AbhGHN74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 09:59:56 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:58760 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231866AbhGHN74 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 09:59:56 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 439C32226F;
+        Thu,  8 Jul 2021 13:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1625752633;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VPQ2ZA0HOLGPExkWK2cisFIdzBiZzdwbASzr51cJpYU=;
-        b=UD1BJ0YUNUmAwL3JPxUEsyS3kgo6ysO2QLwV2gj57lGgc+PDqkyFwRjrJ4mr8aR3eDDUB7
-        Dtj+t7Heglo50HUG1s+0OUcAggIA1m2UYrOfXo688h2O8JHImrDoxkfK7r1NQ1Pn6qaHXk
-        PfEkNLTIWQn1uZh73o3NJZtsCHtg1z/ac/Jf1Zt45U74+YINUC6Y4Gi03cHSn2jW0W9/QM
-        15dW+TmEOap8/d4On4vG5iTmro2MnejN80HqUmZpCXe046L6co0Pjr5JOpypftNC6Us3xg
-        p3FbmHTLOx3CA/ND/teLgQgzTkpdRFKBhHbW88cMs20B5n4bS8HDbIPEg57kjQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1625752602;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        bh=JBopWsalYr8uuXUviHdUzLNft6gtAlhMYkdCJFgk5Y8=;
+        b=pcEASNZE7G5UZWlH6icFFmeSUhXTPPnyEaHwa8XJCiUNNOjk0AsDttDJ7HpIVccTkUCObZ
+        f/IL1jiEhkJLdV+RliaptDQCIQpZkd79pr82gUtRiHDpml2f8hxk0Lct/Qdw/K8Qkmzgdg
+        dfT1WxMSoEXrFVjFXrI+aFp45hWAWxQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1625752633;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VPQ2ZA0HOLGPExkWK2cisFIdzBiZzdwbASzr51cJpYU=;
-        b=svXx/Vvotn0GziFiXLpEPUJBSMqeFHe4hPQkHiOocKoxnYstASX4p+Mg29CNq5Xs0AWPFu
-        BbUNOvbLrnANX+BQ==
-To:     Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: build default queue map via irq_create_affinity_masks
-In-Reply-To: <YN2Q3XFSS7T23bih@infradead.org>
-References: <20210630035153.2099975-1-ming.lei@redhat.com> <YN2Q3XFSS7T23bih@infradead.org>
-Date:   Thu, 08 Jul 2021 15:56:42 +0200
-Message-ID: <877di0q57p.ffs@nanos.tec.linutronix.de>
+        bh=JBopWsalYr8uuXUviHdUzLNft6gtAlhMYkdCJFgk5Y8=;
+        b=ppuOYMYu1I0tANCEp2VO0msrX329XX8ktufPZtdGcEIV3TZbooomux/UmWNnKg2rBWWjaY
+        oDeNJiWIxs6HU6Dg==
+Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
+        by relay2.suse.de (Postfix) with ESMTP id 14694A3BA0;
+        Thu,  8 Jul 2021 13:57:13 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id CE2F9DAF79; Thu,  8 Jul 2021 15:54:38 +0200 (CEST)
+Date:   Thu, 8 Jul 2021 15:54:38 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Naohiro Aota <naohiro.aota@wdc.com>
+Cc:     linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: Re: [PATCH 3/3] btrfs: drop unnecessary ASSERT from
+ btrfs_submit_direct()
+Message-ID: <20210708135438.GA2610@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Naohiro Aota <naohiro.aota@wdc.com>,
+        linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+References: <20210708131057.259327-1-naohiro.aota@wdc.com>
+ <20210708131057.259327-4-naohiro.aota@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210708131057.259327-4-naohiro.aota@wdc.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 01 2021 at 10:54, Christoph Hellwig wrote:
->> Address the issue by reusing irq_create_affinity_masks() for building
->> the default queue mapping, so that we can re-use the mapping created
->> for managed irq.
->
-> This looks sensible, but adding Thomas to see if he is fine with
-> using an irq function like this.  Maybe it needs to move out of the
-> irq code and grow a new name if we use it like this.
+On Thu, Jul 08, 2021 at 10:10:57PM +0900, Naohiro Aota wrote:
+> When on SINGLE block group, btrfs_get_io_geometry() will return "the
+> size of the block group - the offset of the logical address within the
+> block group" as geom.len. Since we allow up to 8 GB zone size on zoned
+> btrfs, we can have up to 8 GB block group, so can have up to 8 GB
+> geom.len. With this setup, we easily hit the "ASSERT(geom.len <=
+> INT_MAX);".
+> 
+> The ASSERT looks like to guard btrfs_bio_clone_partial() and bio_trim()
+> which both take "int" (now "unsigned int" with the previous patch). So to
+> be precise the ASSERT should check if clone_len <= UINT_MAX. But
+> actually, clone_len is already capped by bio.bi_iter.bi_size which is
+> unsigned int. So the ASSERT is not necessary.
+> 
+> Drop the ASSERT and properly compare submit_len and geom.len in u64. Then,
+> let the implicit casting to convert it to unsigned int.
+> 
+> Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
+> ---
+>  fs/btrfs/inode.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+> index 8f60314c36c5..b6cc26dd7919 100644
+> --- a/fs/btrfs/inode.c
+> +++ b/fs/btrfs/inode.c
+> @@ -8206,8 +8206,8 @@ static blk_qc_t btrfs_submit_direct(struct inode *inode, struct iomap *iomap,
+>  	u64 start_sector;
+>  	int async_submit = 0;
+>  	u64 submit_len;
+> -	int clone_offset = 0;
+> -	int clone_len;
+> +	unsigned int clone_offset = 0;
+> +	unsigned int clone_len;
+>  	u64 logical;
+>  	int ret;
+>  	blk_status_t status;
+> @@ -8255,9 +8255,13 @@ static blk_qc_t btrfs_submit_direct(struct inode *inode, struct iomap *iomap,
+>  			status = errno_to_blk_status(ret);
+>  			goto out_err_em;
+>  		}
+> -		ASSERT(geom.len <= INT_MAX);
+>  
+> -		clone_len = min_t(int, submit_len, geom.len);
+> +		/*
+> +		 * min()'s result is always capped by bio.bi_iter.bi_size
+> +		 * which is unsigned int. So the implicit casting it to
+> +		 * unsigned int is safe.
+> +		 */
+> +		clone_len = min(submit_len, geom.len);
 
-Yes, making it less irq centric and sticking it into lib makes sense.
+I'd rather rely on explicit casts and asserts than a comment stating
+what should happen. submit_len ang geom.len are both u64 and cast to u32
+clone_len.
 
-The usage sites then can have their specific wrappers around it.
-
-Thanks,
-
-        tglx
+I think submit_len should be u32 too (to copy the bio.bi_size) to match
+the types used for the purpose and also clone_len.
