@@ -2,92 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D856C07E9C
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 15:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4C5C07E96
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 15:02:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 227F7613C1
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 15:01:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84DD4613C8
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 15:02:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231858AbhGHPET convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 11:04:19 -0400
-Received: from mta-tor-003.bell.net ([209.71.212.30]:20950 "EHLO
-        cmx-torrgo001.bell.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S229738AbhGHPES (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 11:04:18 -0400
-X-RG-CM-BuS: 0
-X-RG-CM-SC: 0
-X-RG-CM: Clean
-X-Originating-IP: [67.71.147.238]
-X-RG-Env-Sender: dave.anglin@bell.net
-X-RG-Rigid: 60C8868801068702
-X-CM-Envelope: MS4xfGyTTt95LmJz41oxT9430AOjrGfolv8+y88Ts31Mm1ggFI+mKrxElxz4+y5RQmpxz6amPnn8VN9U+OACfxSyJA11/YdDx+KK4jSqRhUqbx1UGos0AWgI
- 8WuoRSwDv2b0aY9sdjDriuUkxDDigFnp7TX/mvFx5Ck+7MwqN7OFCDNepW4VxNP9k2iOToxk4OyZJVqYUE8O9RoFg0s9eXmwLFE6mk/wK85sw1N8DECRyOnq
- K85h4eNkNBZfwPuWnfx6kj26vGAExfyLrfKGlm/yaL7T5HNE4bJePQm/9lkW3bwNyldShbPvVWTd4O31UbaF5eTGjrncYTuY2ynnvGm1BXv/Tv4iRlrUTDVz
- q3vT0X+qNKAQJeYciqGeE7C8p+8QQtJopAHGgJFZdXFG4cMz9UEMHnvI8YP+1ntQf1dyxdDaiya+t/KlAK9An467xvbL2jvY/0owXRE1L81d97L7sZe+DbB/
- DuBciMBVICGUkgJSjeFf0v+/GAto7CjcyzMPyztbL9UX2z8HyVc7z8MKpLLA34LlNZz635kniYrCYOKC
-X-CM-Analysis: v=2.4 cv=Udwy9IeN c=1 sm=1 tr=0 ts=60e7134c
- a=/cPhanApxV8nRKTAyWrE3w==:117 a=/cPhanApxV8nRKTAyWrE3w==:17
- a=IkcTkHD0fZMA:10 a=FBHGMhGWAAAA:8 a=GfkpTtF8mnDkJo9QkI0A:9 a=QEXdDO2ut3YA:10
- a=9gvnlMMaQFpL9xblJ6ne:22
-Received: from [192.168.2.49] (67.71.147.238) by cmx-torrgo001.bell.net (5.8.716.03) (authenticated as dave.anglin@bell.net)
-        id 60C8868801068702; Thu, 8 Jul 2021 11:01:32 -0400
-To:     Arnd Bergmann <arnd@arndb.de>, Helge Deller <deller@gmx.de>
-Cc:     Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bernardo Innocenti <bernie@develer.com>,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-References: <CAK8P3a2mAQOnTxBhVzVA8q8O-uVrdidCN5h5-T2dc0=Wet2uPQ@mail.gmail.com>
- <20210706205927.4407-1-abd.masalkhi@gmail.com>
- <CAK8P3a23=tcWx8iWNAKXcT9TRgPrZbEVVy9a_ad29hSde_jkKg@mail.gmail.com>
- <YOWt2swxONAvhesH@ls3530>
- <CAK8P3a1EFuqgZGdpWzib3RxFf6TXCy_CUTZx2ekd0wTbdNdoxg@mail.gmail.com>
- <bece0f60-b19e-5601-3bd9-c899c3d4cd93@gmx.de>
- <CAK8P3a0x4gba+syLqjBDG0634FNDNRTvDm4dQ9p_fmgSXBUiig@mail.gmail.com>
-From:   John David Anglin <dave.anglin@bell.net>
-Subject: Re: div_u64/do_div stack size usage, was Re: [v3] block: Removed a
- warning while compiling with a cross compiler for parisc
-Message-ID: <3453ec06-fc62-81e4-33e9-88afd51f50f9@bell.net>
-Date:   Thu, 8 Jul 2021 11:01:32 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S229741AbhGHPEw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 11:04:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47442 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229738AbhGHPEw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Jul 2021 11:04:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625756530;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BEGwjh1UEHXwUY8m1x7a7ESan27Qj9tQDS8td/jgx9A=;
+        b=e9jg2bCXApaBANWrbhJJAqyTbGLf1lAatqr+rC/XQGh7wnYnEq3q1EIUVIk1vwTcNF19TT
+        6Jzx7C0DidJ/yHWRsqbz3ShWtN0+hvDZDKKl+FIAP1UWWfYbC9/CxDCaWVZaNyjqsJMG2W
+        E1wU65h0QOC5hqlzx8EOvP1cywyHgaA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-zW7_GvXdODW6rf7LqK4vEw-1; Thu, 08 Jul 2021 11:02:06 -0400
+X-MC-Unique: zW7_GvXdODW6rf7LqK4vEw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F5B61084F4C;
+        Thu,  8 Jul 2021 15:02:05 +0000 (UTC)
+Received: from T590 (ovpn-12-93.pek2.redhat.com [10.72.12.93])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C45195C1C2;
+        Thu,  8 Jul 2021 15:01:58 +0000 (UTC)
+Date:   Thu, 8 Jul 2021 23:01:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Subject: Re: [PATCH 6/6] loop: don't add worker into idle list
+Message-ID: <YOcTYuT4GoIhugDx@T590>
+References: <20210705102607.127810-1-ming.lei@redhat.com>
+ <20210705102607.127810-7-ming.lei@redhat.com>
+ <YORg2KYF7X1ZYJPG@dschatzberg-fedora-PC0Y6AEN>
+ <YOUdMjAzEw6JQjKG@T590>
+ <YOWyVnrOTHvMB7A3@dschatzberg-fedora-PC0Y6AEN>
+ <YOaiHLD74VG5I5cD@T590>
+ <YOcI0hr3k5q+/zQ4@dschatzberg-fedora-PC0Y6AEN>
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a0x4gba+syLqjBDG0634FNDNRTvDm4dQ9p_fmgSXBUiig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YOcI0hr3k5q+/zQ4@dschatzberg-fedora-PC0Y6AEN>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-07-08 7:37 a.m., Arnd Bergmann wrote:
->>> I think setting it to 2048 is rather excessive,
->> Since parisc needs roughly twice the frame (and stack) size as x86,
->> 2048 seemed logical since that's the double of what's used on x86.
->> Of course we can reduce it, e.g. to 1536.
-> But it doesn't use twice as much for large functions at all. The stack
-> frame for a small function is much larger, so you need a larger kernel
-> stack to allow for deely nested call chains, but the frame for single
-> function with large variables is only a bit larger as most of it is used up
-> by those variables.
-Correct.  In the 32-bit target, the stack alignment is 64 bytes.  This is the main reason functions
-with small stacks use more stack than on x86.  There's also the frame marker that needs to be
-reserved.  In the 64-bit target, the stack alignment is 16 bytes.  However, the minimum allocation
-is quite large because of frame marker, 8 call registers and the argument pointer slots.  If a function
-uses a significant number of local variables, there shouldn't be much difference in stack size.
+On Thu, Jul 08, 2021 at 10:16:50AM -0400, Dan Schatzberg wrote:
+> On Thu, Jul 08, 2021 at 02:58:36PM +0800, Ming Lei wrote:
+> > On Wed, Jul 07, 2021 at 09:55:34AM -0400, Dan Schatzberg wrote:
+> > > On Wed, Jul 07, 2021 at 11:19:14AM +0800, Ming Lei wrote:
+> > > > On Tue, Jul 06, 2021 at 09:55:36AM -0400, Dan Schatzberg wrote:
+> > > > > On Mon, Jul 05, 2021 at 06:26:07PM +0800, Ming Lei wrote:
+> > > > > >  	}
+> > > > > > +
+> > > > > > +	spin_lock(lock);
+> > > > > >  	list_add_tail(&cmd->list_entry, cmd_list);
+> > > > > > +	spin_unlock(lock);
+> > > > > >  	queue_work(lo->workqueue, work);
+> > > > > > -	spin_unlock(&lo->lo_work_lock);
+> > > > > >  }
+> > > > > >  
+> > > > > >  static void loop_update_rotational(struct loop_device *lo)
+> > > > > > @@ -1131,20 +1159,18 @@ static void loop_set_timer(struct loop_device *lo)
+> > > > > >  
+> > > > > >  static void __loop_free_idle_workers(struct loop_device *lo, bool force)
+> > > > > >  {
+> > > > > > -	struct loop_worker *pos, *worker;
+> > > > > > +	struct loop_worker *worker;
+> > > > > > +	unsigned long id;
+> > > > > >  
+> > > > > >  	spin_lock(&lo->lo_work_lock);
+> > > > > > -	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
+> > > > > > -				idle_list) {
+> > > > > > +	xa_for_each(&lo->workers, id, worker) {
+> > > > > >  		if (!force && time_is_after_jiffies(worker->last_ran_at +
+> > > > > >  						LOOP_IDLE_WORKER_TIMEOUT))
+> > > > > >  			break;
+> > > > > > -		list_del(&worker->idle_list);
+> > > > > > -		xa_erase(&lo->workers, worker->blkcg_css->id);
+> > > > > > -		css_put(worker->blkcg_css);
+> > > > > > -		kfree(worker);
+> > > > > > +		if (refcount_dec_and_test(&worker->refcnt))
+> > > > > > +			loop_release_worker(worker);
+> > > > > 
+> > > > > This one is puzzling to me. Can't you hit this refcount decrement
+> > > > > superfluously each time the loop timer fires?
+> > > > 
+> > > > Not sure I get your point.
+> > > > 
+> > > > As I mentioned above, this one is the counter pair of INIT reference,
+> > > > but one new lo_cmd may just grab it when queueing rq before erasing the
+> > > > worker from xarray, so we can't release worker here until the command is
+> > > > completed.
+> > > 
+> > > Suppose at this point there's still an outstanding loop_cmd to be
+> > > serviced for this worker. The refcount_dec_and_test should decrement
+> > > the refcount and then fail the conditional, not calling
+> > > loop_release_worker. What happens if __loop_free_idle_workers fires
+> > > again before the loop_cmd is processed? Won't you decrement the
+> > > refcount again, and then end up calling loop_release_worker before the
+> > > loop_cmd is processed?
+> >  
+> > Good catch!
+> > 
+> > The following one line change should avoid the issue:
+> > 
+> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > index 146eaa03629b..3cd51bddfec9 100644
+> > --- a/drivers/block/loop.c
+> > +++ b/drivers/block/loop.c
+> > @@ -980,7 +980,6 @@ static struct loop_worker *loop_alloc_or_get_worker(struct loop_device *lo,
+> >  
+> >  static void loop_release_worker(struct loop_worker *worker)
+> >  {
+> > -	xa_erase(&worker->lo->workers, worker->blkcg_css->id);
+> >  	css_put(worker->blkcg_css);
+> >  	kfree(worker);
+> >  }
+> > @@ -1167,6 +1166,7 @@ static void __loop_free_idle_workers(struct loop_device *lo, bool force)
+> >  		if (!force && time_is_after_jiffies(worker->last_ran_at +
+> >  						LOOP_IDLE_WORKER_TIMEOUT))
+> >  			break;
+> > +		xa_erase(&worker->lo->workers, worker->blkcg_css->id);
+> >  		if (refcount_dec_and_test(&worker->refcnt))
+> >  			loop_release_worker(worker);
+> >  	}
+> 
+> Yeah, I think this resolves the issue. You could end up repeatedly
+> allocating workers for the same blkcg in the event that you're keeping
+> the worker busy for the entire LOOP_IDLE_WORKER_TIMEOUT (since it only
+> updates the last_ran_at when idle). You may want to add a racy check
+> if the refcount is > 1 to avoid that.
 
-Dave
+Given the event is very unlikely to trigger, I think we can live
+with that.
 
--- 
-John David Anglin  dave.anglin@bell.net
+> 
+> I think there might be a separate issue with the locking here though -
+> you acquire the lo->lo_work_lock in __loop_free_idle_workers and then
+> check worker->last_ran_at for each worker. However you only protect
+> the write to worker->last_ran_at (in loop_process_work) with the
+> worker->lock which I think means there's a potential data race on
+> worker->last_ran_at.
 
+It should be fine since both WRITE and READ on worker->last_ran_at is
+atomic. Even though the race is triggered, we still can live with that.
+
+
+On Thu, Jul 8, 2021 at 10:41 PM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
+>
+> On Thu, Jul 08, 2021 at 02:58:36PM +0800, Ming Lei wrote:
+...
+> Another thought - do you need to change the kfree here to kfree_rcu?
+> I'm concerned about the scenario where loop_queue_work's xa_load finds
+> the worker and subsequently __loop_free_idle_workers erases and calls
+> loop_release_worker. If the worker is freed then the subsequent
+> refcount_inc_not_zero in loop_queue_work would be a use after free.
+
+Good catch, will fix it in next version.
+
+
+Thanks,
+Ming
 
