@@ -2,242 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33C0C07E96
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27CABC07E96
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:41:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCC6561625
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:40:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1152B61625
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jul 2021 14:41:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbhGHOmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jul 2021 10:42:42 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:33786 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbhGHOml (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 10:42:41 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 25C2320200;
-        Thu,  8 Jul 2021 14:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625755199; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tGlyjvVcdB+UHOiEghzdT2fFrllDod0pSZIRp6jpzl8=;
-        b=c/JwAqgM48EfOa/u5FRuokNdPDoU7kBWVvUIilCV5TsflcU/c9wsM3Y9XAcv4W8DU2YL8M
-        sN++iTROuwvFSwSlEJtjPAvpWM20rQxYWhMQAmlLPh1pUNVSFcpZl5mEbFoHV9A9+jm3ns
-        hjdjkuAkDV1EOVRo+E3w2UU+INzWll8=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id D6F431340F;
-        Thu,  8 Jul 2021 14:39:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id HcdpMj4O52A0BgAAGKfGzw
-        (envelope-from <jgross@suse.com>); Thu, 08 Jul 2021 14:39:58 +0000
-Subject: Re: [PATCH v2 0/3] xen: harden blkfront against malicious backends
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20210708124345.10173-1-jgross@suse.com>
- <YOcKJ6m31tHuq2kh@char.us.oracle.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <0baeba93-39eb-2bae-1abd-d4e17e6e025e@suse.com>
-Date:   Thu, 8 Jul 2021 16:39:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231781AbhGHOoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jul 2021 10:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52092 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229738AbhGHOoU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jul 2021 10:44:20 -0400
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E34FC061574
+        for <linux-block@vger.kernel.org>; Thu,  8 Jul 2021 07:41:38 -0700 (PDT)
+Received: by mail-qv1-xf2e.google.com with SMTP id v17so2890423qvw.12
+        for <linux-block@vger.kernel.org>; Thu, 08 Jul 2021 07:41:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9OuGskVqA2qusAP0EWtWMxQD5LYCBw1WUf1Elc9qMZ0=;
+        b=q9yEr1XkfLFq2WNWb//fqgYRseHjthIob6iCW5BLrBihWVxihn4suavcPiju0NvtcR
+         BBvXE4CMvobC/U4bgkY47QW5odld6P9cjVncRWcO6+sonTGnDjrbMKxJXnTuvDBaIQJE
+         SINXMexhzXc6KbzKLoi4iKmAoKgSxMDXYSImX47jlU0u/qTrbZ0kCyPuoi9zaavSE7nf
+         xXdDbHXWbdJzRAETQkSceLj6W7e+oj94ZM5KhPpWDnCW6mvzlp2tBLFp0fDJ0cGdkvyo
+         m4cCcfCLHLUXI1GISeSv8WqdRsuEofNYXeyyWAH9Zv1ZlqSOwa+1AwmaiFFtpvqE9LEj
+         pXew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9OuGskVqA2qusAP0EWtWMxQD5LYCBw1WUf1Elc9qMZ0=;
+        b=FH/RIAKtfYskjurIXZi7oHtTvdoNeCcK1uy7vNaMStI/uDkcRfS4E5B75kVdxKGZEz
+         n7n9mLAhyBqcfwSMGx2uFZg/x64g6YZNaF4/eGDfy/asjDDcZI5/Jpmi/t2sEyFGrT8f
+         Rd0dG6PztaskxKfT7IXwVk13b+rilDQvMfEw3ICbzoJDagCax9BVnaRvqJCX08+OeKs1
+         KMEnaJDdnf/uT/i7pwRDmVMCNxwqGTMsYQFLFV5oCRbziTRBZI0e7hsolpm/1INemBDF
+         2iWUQUyYkRJYOEnXO01PIerPNseUhZjgyR9+trz9NRYcOcSAlMufY85O6+a26NrDl2P1
+         d+rg==
+X-Gm-Message-State: AOAM532UrpEytQoH9X01ribCDtnoicJONfUOloT1dZp2r5jLSq+1mw9V
+        wQSOgO0V9gkNJazgRWIxp3DICct06V0=
+X-Google-Smtp-Source: ABdhPJxImlYJbXtn1Gzxkylzgpwmg1UUFdqldqJfPhVGKQJXOwnCEUun503NriWSZaNhl9LcGdJhYQ==
+X-Received: by 2002:a0c:cb8f:: with SMTP id p15mr30828096qvk.13.1625755297290;
+        Thu, 08 Jul 2021 07:41:37 -0700 (PDT)
+Received: from dschatzberg-fedora-PC0Y6AEN ([2620:10d:c091:480::1:ee15])
+        by smtp.gmail.com with ESMTPSA id p64sm1078876qka.114.2021.07.08.07.41.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jul 2021 07:41:36 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 10:41:34 -0400
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Subject: Re: [PATCH 6/6] loop: don't add worker into idle list
+Message-ID: <YOcOnlqMMX1K+heE@dschatzberg-fedora-PC0Y6AEN>
+References: <20210705102607.127810-1-ming.lei@redhat.com>
+ <20210705102607.127810-7-ming.lei@redhat.com>
+ <YORg2KYF7X1ZYJPG@dschatzberg-fedora-PC0Y6AEN>
+ <YOUdMjAzEw6JQjKG@T590>
+ <YOWyVnrOTHvMB7A3@dschatzberg-fedora-PC0Y6AEN>
+ <YOaiHLD74VG5I5cD@T590>
 MIME-Version: 1.0
-In-Reply-To: <YOcKJ6m31tHuq2kh@char.us.oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="AUb03P1MDMichPalfOxIhOW2NvcAWdu9W"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YOaiHLD74VG5I5cD@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AUb03P1MDMichPalfOxIhOW2NvcAWdu9W
-Content-Type: multipart/mixed; boundary="tw3RkRTgaKFDYv3rDVnbl8TQ9vsKG9hLo";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>
-Message-ID: <0baeba93-39eb-2bae-1abd-d4e17e6e025e@suse.com>
-Subject: Re: [PATCH v2 0/3] xen: harden blkfront against malicious backends
-References: <20210708124345.10173-1-jgross@suse.com>
- <YOcKJ6m31tHuq2kh@char.us.oracle.com>
-In-Reply-To: <YOcKJ6m31tHuq2kh@char.us.oracle.com>
+On Thu, Jul 08, 2021 at 02:58:36PM +0800, Ming Lei wrote:
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 146eaa03629b..3cd51bddfec9 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -980,7 +980,6 @@ static struct loop_worker *loop_alloc_or_get_worker(struct loop_device *lo,
+>  
+>  static void loop_release_worker(struct loop_worker *worker)
+>  {
+> -	xa_erase(&worker->lo->workers, worker->blkcg_css->id);
+>  	css_put(worker->blkcg_css);
+>  	kfree(worker);
 
---tw3RkRTgaKFDYv3rDVnbl8TQ9vsKG9hLo
-Content-Type: multipart/mixed;
- boundary="------------E2D77528BDEDE4B59B780699"
-Content-Language: en-US
-
-This is a multi-part message in MIME format.
---------------E2D77528BDEDE4B59B780699
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 08.07.21 16:22, Konrad Rzeszutek Wilk wrote:
-> On Thu, Jul 08, 2021 at 02:43:42PM +0200, Juergen Gross wrote:
->> Xen backends of para-virtualized devices can live in dom0 kernel, dom0=
-
->> user land, or in a driver domain. This means that a backend might
->> reside in a less trusted environment than the Xen core components, so
->> a backend should not be able to do harm to a Xen guest (it can still
->> mess up I/O data, but it shouldn't be able to e.g. crash a guest by
->> other means or cause a privilege escalation in the guest).
->>
->> Unfortunately blkfront in the Linux kernel is fully trusting its
->> backend. This series is fixing blkfront in this regard.
->>
->> It was discussed to handle this as a security problem, but the topic
->> was discussed in public before, so it isn't a real secret.
->=20
-> Wow. This looks like what Marek did .. in 2018!
->=20
-> https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg02336.h=
-tml
-
-Yes, seems to have been a similar goal.
-
-> Would it be worth crediting Marek?
-
-I'm fine mentioning his patches, but I didn't know of his patches until
-having sent out V1 of my series.
-
-I'd be interested in learning why his patches haven't been taken back
-then.
-
-
-Juergen
-
---------------E2D77528BDEDE4B59B780699
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------E2D77528BDEDE4B59B780699--
-
---tw3RkRTgaKFDYv3rDVnbl8TQ9vsKG9hLo--
-
---AUb03P1MDMichPalfOxIhOW2NvcAWdu9W
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmDnDj4FAwAAAAAACgkQsN6d1ii/Ey/s
-NAf/ZOrEbCLL/q4BQvH8BR1lZ/HY0KLRN/w4xFr1kbbQOWLnDsGCWo/iS/MQNGP2o4SuvDxqcmDi
-VC469qLrYuaclP2V/Qmz3iqUVil1QNOg4Pp/nJEl//7NTAQ+MS5hPn7cXHPCl5ReD+78vFR2LeXm
-9VsdyVToIbL28ue4KRMRRq4Dql3f8iXqQfRA2omJK2mpOoktxeB2vFrpJ6D7yhc40zdyNokjiUYg
-oJlHhrG3tuZoXaHPHvrgT1/fnhf1s82+FBx4fO9E3gOQs2QC1MP7I+obRGtOuDyNnz8X1WhUgRjo
-weVQgoDkNtwd3H7oAWAQiDD+KyAb2gik9vBkdnvqqg==
-=v4HE
------END PGP SIGNATURE-----
-
---AUb03P1MDMichPalfOxIhOW2NvcAWdu9W--
+Another thought - do you need to change the kfree here to kfree_rcu?
+I'm concerned about the scenario where loop_queue_work's xa_load finds
+the worker and subsequently __loop_free_idle_workers erases and calls
+loop_release_worker. If the worker is freed then the subsequent
+refcount_inc_not_zero in loop_queue_work would be a use after free.
