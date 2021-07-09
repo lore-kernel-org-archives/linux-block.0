@@ -2,229 +2,249 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8348C07E99
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 13:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33022C07E9E
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 13:54:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C701061380
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 13:47:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B44C613BC
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 13:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231622AbhGINu3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 09:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50774 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbhGINu3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 09:50:29 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A127DC0613DD
-        for <linux-block@vger.kernel.org>; Fri,  9 Jul 2021 06:47:45 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id b18so9326490qkc.5
-        for <linux-block@vger.kernel.org>; Fri, 09 Jul 2021 06:47:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=EQUeRKfr59EhNaXqx/238AuLWVll4VFVIL4GFqoBf7k=;
-        b=iVBTjPuD4qf+tTpCOK1WoaFE8JKIXoxmtXGEm9P2QY/5u9oOxiKVghtaOdrsqyizoj
-         WwgjqzYs+zvh8Q12D/YqbDTRWwQGLMdg2/CbWxBFAXuw7ggLvBqlo3x88AdqWIISY0Gg
-         9Ki3GfKV+i8Dr0nwW+BOBxAhKdyDwMTMJVvVPVxgVbAzlkqZ2Q4y0KZv7plS65SInuTQ
-         Xa9QQ7cHz3gHWh440YAU2jto4SR3Y4eyIM6AbblqG72CG2E0/jkb3jya1KaAnGgu11x9
-         nnd47EqOdmkty2RXbcrdZ/XXJp/k7teJ4ihtLeVH2qZtEyf6C1k4l1iX/umByjEpsHKq
-         0U3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EQUeRKfr59EhNaXqx/238AuLWVll4VFVIL4GFqoBf7k=;
-        b=MCbGGFMjUAuDjBEQN6RvIOytyT5i/3FQTe1x/QK+Ouf/bPRPMBoEZy+knu2Q05gIb1
-         xtC/gZDKg3vNmpcB+4hRq3nYHqO8YYBeKINmPKPe/HcH7SWZlUGlZSprjCNuX43F3Ib8
-         D9X3/q4Amc6b4czYgwU/o3v0x1ptQoWE0lTQXvq+qIqJ2xB0T7468B+vAPD4DCnotDSx
-         tP/aLOABGHChsXce0lCoUb/CwIr+X9qgYWf/3fIfyOiIczcGaRfMO2cWeQRMyhiFHvxl
-         l/A7O7WAZZTGsN5DASTmBsfD63l0ImtAVKazd0dIl0tOaM6lB5TZ6NNIJSjZX+SLFLI+
-         OxJw==
-X-Gm-Message-State: AOAM5308VZmvk3sPNV4F/04Pt3xktNi0bL+EKCl86Z7ave2lDP5ey06s
-        y65HT7Q76bctoYZqQewDZRA=
-X-Google-Smtp-Source: ABdhPJz9Rre5TNQRA0YQZHDJhxc+uRithR40Lfww3HewpS+oi0CDB2Jr2LRLOkqBQVOE1mXWgjvZEw==
-X-Received: by 2002:a05:620a:1233:: with SMTP id v19mr764840qkj.33.1625838464879;
-        Fri, 09 Jul 2021 06:47:44 -0700 (PDT)
-Received: from dschatzberg-fedora-PC0Y6AEN ([2620:10d:c091:480::1:48a0])
-        by smtp.gmail.com with ESMTPSA id l206sm2436503qke.80.2021.07.09.06.47.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jul 2021 06:47:44 -0700 (PDT)
-Date:   Fri, 9 Jul 2021 09:47:42 -0400
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Subject: Re: [PATCH 6/6] loop: don't add worker into idle list
-Message-ID: <YOhTfvXURjn81E2j@dschatzberg-fedora-PC0Y6AEN>
-References: <20210705102607.127810-1-ming.lei@redhat.com>
- <20210705102607.127810-7-ming.lei@redhat.com>
- <YORg2KYF7X1ZYJPG@dschatzberg-fedora-PC0Y6AEN>
- <YOUdMjAzEw6JQjKG@T590>
- <YOWyVnrOTHvMB7A3@dschatzberg-fedora-PC0Y6AEN>
- <YOaiHLD74VG5I5cD@T590>
- <YOcI0hr3k5q+/zQ4@dschatzberg-fedora-PC0Y6AEN>
- <YOcTYuT4GoIhugDx@T590>
- <YOcWgR7Pi4+XvRZv@dschatzberg-fedora-PC0Y6AEN>
- <YOedM4dWA3j6i4rk@T590>
+        id S231857AbhGIN5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 09:57:05 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:34076 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231756AbhGIN5F (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 09:57:05 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8BA3D22312;
+        Fri,  9 Jul 2021 13:54:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1625838860; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pYcFbzVs+nt+UrJKaNfGtZEdh6esdWkryDHl6n/wINE=;
+        b=s+Wbabp+Rpuft2Pb34V0GfC9WZ2FiaSCQOPCDKhvFQy7GFymlxbHPzz2yI5kKWz1Zsnljv
+        JxzirPWhEMense2vHjfCO3rOWYkF46aHBlL+v4kFgRu0WrKz29Kkdy7N4vuOAPUV4q/Yl1
+        Uw8dXx/HbuUscaxyrYDMC4ErzzHgnG8=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 48851137F8;
+        Fri,  9 Jul 2021 13:54:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id h+nnDwxV6GAqeAAAGKfGzw
+        (envelope-from <jgross@suse.com>); Fri, 09 Jul 2021 13:54:20 +0000
+Subject: Re: [PATCH v2 2/3] xen/blkfront: don't take local copy of a request
+ from the ring page
+To:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
+Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Beulich <jbeulich@suse.com>
+References: <20210708124345.10173-1-jgross@suse.com>
+ <20210708124345.10173-3-jgross@suse.com> <YOgPCZbEF+t5DN+G@Air-de-Roger>
+From:   Juergen Gross <jgross@suse.com>
+Message-ID: <57f50e6f-4fc4-7318-9f7f-c5b4e0e63487@suse.com>
+Date:   Fri, 9 Jul 2021 15:54:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YOedM4dWA3j6i4rk@T590>
+In-Reply-To: <YOgPCZbEF+t5DN+G@Air-de-Roger>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="rmyaqJHSnZ9Q2teyceTX9GLRzbIdvZGdC"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 09, 2021 at 08:49:55AM +0800, Ming Lei wrote:
-> On Thu, Jul 08, 2021 at 11:15:13AM -0400, Dan Schatzberg wrote:
-> > On Thu, Jul 08, 2021 at 11:01:54PM +0800, Ming Lei wrote:
-> > > On Thu, Jul 08, 2021 at 10:16:50AM -0400, Dan Schatzberg wrote:
-> > > > On Thu, Jul 08, 2021 at 02:58:36PM +0800, Ming Lei wrote:
-> > > > > On Wed, Jul 07, 2021 at 09:55:34AM -0400, Dan Schatzberg wrote:
-> > > > > > On Wed, Jul 07, 2021 at 11:19:14AM +0800, Ming Lei wrote:
-> > > > > > > On Tue, Jul 06, 2021 at 09:55:36AM -0400, Dan Schatzberg wrote:
-> > > > > > > > On Mon, Jul 05, 2021 at 06:26:07PM +0800, Ming Lei wrote:
-> > > > > > > > >  	}
-> > > > > > > > > +
-> > > > > > > > > +	spin_lock(lock);
-> > > > > > > > >  	list_add_tail(&cmd->list_entry, cmd_list);
-> > > > > > > > > +	spin_unlock(lock);
-> > > > > > > > >  	queue_work(lo->workqueue, work);
-> > > > > > > > > -	spin_unlock(&lo->lo_work_lock);
-> > > > > > > > >  }
-> > > > > > > > >  
-> > > > > > > > >  static void loop_update_rotational(struct loop_device *lo)
-> > > > > > > > > @@ -1131,20 +1159,18 @@ static void loop_set_timer(struct loop_device *lo)
-> > > > > > > > >  
-> > > > > > > > >  static void __loop_free_idle_workers(struct loop_device *lo, bool force)
-> > > > > > > > >  {
-> > > > > > > > > -	struct loop_worker *pos, *worker;
-> > > > > > > > > +	struct loop_worker *worker;
-> > > > > > > > > +	unsigned long id;
-> > > > > > > > >  
-> > > > > > > > >  	spin_lock(&lo->lo_work_lock);
-> > > > > > > > > -	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
-> > > > > > > > > -				idle_list) {
-> > > > > > > > > +	xa_for_each(&lo->workers, id, worker) {
-> > > > > > > > >  		if (!force && time_is_after_jiffies(worker->last_ran_at +
-> > > > > > > > >  						LOOP_IDLE_WORKER_TIMEOUT))
-> > > > > > > > >  			break;
-> > > > > > > > > -		list_del(&worker->idle_list);
-> > > > > > > > > -		xa_erase(&lo->workers, worker->blkcg_css->id);
-> > > > > > > > > -		css_put(worker->blkcg_css);
-> > > > > > > > > -		kfree(worker);
-> > > > > > > > > +		if (refcount_dec_and_test(&worker->refcnt))
-> > > > > > > > > +			loop_release_worker(worker);
-> > > > > > > > 
-> > > > > > > > This one is puzzling to me. Can't you hit this refcount decrement
-> > > > > > > > superfluously each time the loop timer fires?
-> > > > > > > 
-> > > > > > > Not sure I get your point.
-> > > > > > > 
-> > > > > > > As I mentioned above, this one is the counter pair of INIT reference,
-> > > > > > > but one new lo_cmd may just grab it when queueing rq before erasing the
-> > > > > > > worker from xarray, so we can't release worker here until the command is
-> > > > > > > completed.
-> > > > > > 
-> > > > > > Suppose at this point there's still an outstanding loop_cmd to be
-> > > > > > serviced for this worker. The refcount_dec_and_test should decrement
-> > > > > > the refcount and then fail the conditional, not calling
-> > > > > > loop_release_worker. What happens if __loop_free_idle_workers fires
-> > > > > > again before the loop_cmd is processed? Won't you decrement the
-> > > > > > refcount again, and then end up calling loop_release_worker before the
-> > > > > > loop_cmd is processed?
-> > > > >  
-> > > > > Good catch!
-> > > > > 
-> > > > > The following one line change should avoid the issue:
-> > > > > 
-> > > > > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > > > > index 146eaa03629b..3cd51bddfec9 100644
-> > > > > --- a/drivers/block/loop.c
-> > > > > +++ b/drivers/block/loop.c
-> > > > > @@ -980,7 +980,6 @@ static struct loop_worker *loop_alloc_or_get_worker(struct loop_device *lo,
-> > > > >  
-> > > > >  static void loop_release_worker(struct loop_worker *worker)
-> > > > >  {
-> > > > > -	xa_erase(&worker->lo->workers, worker->blkcg_css->id);
-> > > > >  	css_put(worker->blkcg_css);
-> > > > >  	kfree(worker);
-> > > > >  }
-> > > > > @@ -1167,6 +1166,7 @@ static void __loop_free_idle_workers(struct loop_device *lo, bool force)
-> > > > >  		if (!force && time_is_after_jiffies(worker->last_ran_at +
-> > > > >  						LOOP_IDLE_WORKER_TIMEOUT))
-> > > > >  			break;
-> > > > > +		xa_erase(&worker->lo->workers, worker->blkcg_css->id);
-> > > > >  		if (refcount_dec_and_test(&worker->refcnt))
-> > > > >  			loop_release_worker(worker);
-> > > > >  	}
-> > > > 
-> > > > Yeah, I think this resolves the issue. You could end up repeatedly
-> > > > allocating workers for the same blkcg in the event that you're keeping
-> > > > the worker busy for the entire LOOP_IDLE_WORKER_TIMEOUT (since it only
-> > > > updates the last_ran_at when idle). You may want to add a racy check
-> > > > if the refcount is > 1 to avoid that.
-> > > 
-> > > Given the event is very unlikely to trigger, I think we can live
-> > > with that.
-> > 
-> > It doesn't seem unlikely to me - any workload that saturates the
-> > backing device would keep the loop worker constantly with at least one
-> > loop_cmd queued and trigger a free and allocate every
-> > LOOP_IDLE_WORKER_TIMEOUT. Another way to solve this is to just update
-> > last_ran_at before or after each loop_cmd. In any event, I'll defer to
-> > your decision, it's not a critical difference.
-> 
-> Sorry, I missed that ->last_ran_at is only set when the work isn't
-> pending, then we can cleanup/simplify the reclaim a bit by:
-> 
-> 1) keep lo->idle_work to be scheduled in 60 period if there is any
-> active worker allocated, which is scheduled when allocating/reclaiming
-> one worker
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rmyaqJHSnZ9Q2teyceTX9GLRzbIdvZGdC
+Content-Type: multipart/mixed; boundary="V2YEAoLTDoiLiUaHWQ3PyouYqQ5WXYqkP";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
+Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Konrad Rzeszutek Wilk
+ <konrad.wilk@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Jan Beulich <jbeulich@suse.com>
+Message-ID: <57f50e6f-4fc4-7318-9f7f-c5b4e0e63487@suse.com>
+Subject: Re: [PATCH v2 2/3] xen/blkfront: don't take local copy of a request
+ from the ring page
+References: <20210708124345.10173-1-jgross@suse.com>
+ <20210708124345.10173-3-jgross@suse.com> <YOgPCZbEF+t5DN+G@Air-de-Roger>
+In-Reply-To: <YOgPCZbEF+t5DN+G@Air-de-Roger>
 
-Makes sense, and you should have lo_work_lock held at both points so
-this is safe.
+--V2YEAoLTDoiLiUaHWQ3PyouYqQ5WXYqkP
+Content-Type: multipart/mixed;
+ boundary="------------394D9FD2988C5A38C6586243"
+Content-Language: en-US
 
-> 
-> 2) always set ->last_ran_at after retrieving the worker from xarray,
-> which can be done lockless via WRITE_ONCE(), and it is cheap
+This is a multi-part message in MIME format.
+--------------394D9FD2988C5A38C6586243
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Yes, or in loop_process_work, doesn't really matter where you do it so
-long as it is per-cmd. I think this change alone resolves the issue.
+On 09.07.21 10:55, Roger Pau Monn=C3=A9 wrote:
+> On Thu, Jul 08, 2021 at 02:43:44PM +0200, Juergen Gross wrote:
+>> In order to avoid a malicious backend being able to influence the loca=
+l
+>> copy of a request build the request locally first and then copy it to
+>> the ring page instead of doing it the other way round as today.
+>>
+>> Signed-off-by: Juergen Gross <jgross@suse.com>
+>> Reviewed-by: Jan Beulich <jbeulich@suse.com>
+>=20
+> Acked-by: Roger Pau Monn=C3=A9 <roger.pau@citrx.com>
+>=20
+> Thanks!
+>=20
+> One unrelated comment below.
+>=20
 
-> 
-> 3) inside __loop_free_idle_workers(), reclaim one worker only if the
-> worker is expired and hasn't commands in worker->cmd_list
+=2E..
 
-Be careful here - the current locking doesn't allow for this because
-you don't acquire the per-worker lock in __loop_free_idle_workers, so
-accessing worker->cmd_list is a data-race. This is why I suggested
-reading the refcount instead as it can be done without holding a lock.
+>> @@ -798,7 +801,9 @@ static int blkif_queue_rw_req(struct request *req,=
+ struct blkfront_ring_info *ri
+>>   		ring_req->u.rw.nr_segments =3D num_grant;
+>>   		if (unlikely(require_extra_req)) {
+>>   			extra_id =3D blkif_ring_get_request(rinfo, req,
+>> -							  &extra_ring_req);
+>> +							  &final_extra_ring_req);
+>> +			extra_ring_req =3D &rinfo->shadow[extra_id].req;
+>=20
+> I'm slightly confused about this extra request stuff because I cannot
+> find any check that asserts we have two empty slots on the ring before
+> getting here (I only see a RING_FULL check in blkif_queue_rq).
+>=20
+> This is AFAIK only used on Arm when guest page size > 4KB.
 
-> 
-> > 
-> > > 
-> > > > 
-> > > > I think there might be a separate issue with the locking here though -
-> > > > you acquire the lo->lo_work_lock in __loop_free_idle_workers and then
-> > > > check worker->last_ran_at for each worker. However you only protect
-> > > > the write to worker->last_ran_at (in loop_process_work) with the
-> > > > worker->lock which I think means there's a potential data race on
-> > > > worker->last_ran_at.
-> > > 
-> > > It should be fine since both WRITE and READ on worker->last_ran_at is
-> > > atomic. Even though the race is triggered, we still can live with that.
-> > 
-> > True, though in this case I think last_ran_at should be atomic_t with
-> > atomic_set and atomic_read.
-> 
-> I think READ_ONCE()/WRITE_ONCE() should be enough, and we can set/get
-> last_ran_at lockless.
+I agree that this is a bug and should be fixed.
 
-Makes sense to me
+
+Juergen
+
+--------------394D9FD2988C5A38C6586243
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: OpenPGP public key
+Content-Disposition: attachment;
+ filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
+cWx
+w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
+f8Z
+d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
+9bf
+IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
+G7/
+377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
+3Jv
+c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
+QIe
+AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
+hpw
+dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
+MbD
+1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
+oPH
+Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
+5QL
++qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
+2Vu
+IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
+QoL
+BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
+Wf0
+teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
+/nu
+AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
+ITT
+d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
+XBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
+80h
+SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
+AcD
+AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
+FOX
+gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
+jnD
+kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
+N51
+N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
+otu
+fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
+tqS
+EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
+hsD
+BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
+g3O
+ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
+dM7
+wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
+D+j
+LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
+V2x
+AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
+Eaw
+QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
+nHI
+s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
+wgn
+BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
+bVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
+pEd
+IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
+QAB
+wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
+Tbe
+8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
+vJz
+Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
+VGi
+wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
+svi
+uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
+zXs
+ZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------394D9FD2988C5A38C6586243--
+
+--V2YEAoLTDoiLiUaHWQ3PyouYqQ5WXYqkP--
+
+--rmyaqJHSnZ9Q2teyceTX9GLRzbIdvZGdC
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmDoVQsFAwAAAAAACgkQsN6d1ii/Ey8N
+3wf9EH4Rre+cHR2SHXBP//TGxZRVnHAgv6Coa8591dXk0ZDOKH8as41kE6KLMIA7PewKK+U9J56F
+YFGpBRgVFsheOz+rqRB3xEPRA/bxZjE+ADfWDuB+10JHodllNpWODj8NH34JVTLxpmnXxa1e9hkg
+s7GTFN6ycEaH7GOz6z0r8Hlap+ErnafsF6/RKIPBSz6DC3rSafuUjW6z6HBkHJGKmI0r7jd+9ygR
+T2w6h+jdWhr5r4Zru5rCUXQfTI4S/XeEH+KphbRaIS/dHDsqGJ7QUf2rw9vCc4ZJIpSey4Qp3DVJ
+XbQvEeikehlBeuGQeCwRT0pbZ8z7wA17wWCZB6iQGw==
+=x9l4
+-----END PGP SIGNATURE-----
+
+--rmyaqJHSnZ9Q2teyceTX9GLRzbIdvZGdC--
