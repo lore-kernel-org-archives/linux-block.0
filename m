@@ -2,203 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29ABDC07E99
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 05:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34686C07E99
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 08:10:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E74B16135C
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 05:01:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FB59613C3
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 08:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbhGIFEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 01:04:23 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:43296 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbhGIFEX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 01:04:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1625806899; x=1657342899;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=V76ruzJqzEtTt4x4WIUXWvUqvCKz4QSILG+l+uMcBZ4=;
-  b=Ky9VzNoLFFNoHuLRAAB7Vkngd6SpmVAPr8LPLDk+muB7Y/QG2Abv2aft
-   iiK98fKJkpDPcBjLXrNJ4Qu95E1xO5BSFZZvVs2ObYNCcyY75uzPOzyEN
-   s0H94M6N35HzGwNqirgxjgkjR+slDa3l+x99VV5zt67u769UuL7RkewXM
-   8+PbbMQsOARHWLVwOg+sDP7TWwQOuXtipCKzuHCQMA+w0ny25EqFywh0q
-   bU3KM3ZVSpePrr4iyJUqZVR/0/eq4pSnenj61Z0wjEIOhS6uwJ3BOUBF4
-   KKp3SFGLOSSXqfRzvcrNK+rntF951sQy7hSWqMtuY36YJiSktGer5lPzD
-   w==;
-IronPort-SDR: Mj4btQofMPLEpEQksyowh0rackN0q11l/0LP3rK30GEoT3cFRzL24jwcmnCf2FqtGsInZ/A47y
- RZwbuPJxjp6SIY+WP1GsY8b2igv16L+owfvo1LGQMThaJOl52ACP0m3Ky7LpWZKa20QUYubP0w
- Zl25zicuRPOC/0bidU5L/Dd3DOlcBnSQc6ISz/6wLmJA1c2Qz6ia9xXroZTklovVm+45bTkLou
- QXTmYaz3u2Z0it4jyaxwGJpNn8PQIEzGjHuJ3opxRV42cEOr2GLNqv9/sKj4sp8vLdTpFJ/2Mr
- RyQ=
-X-IronPort-AV: E=Sophos;i="5.84,226,1620662400"; 
-   d="scan'208";a="178936006"
-Received: from mail-bn8nam11lp2172.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.172])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2021 13:01:38 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ROIMt3yam/5ZdiejGLTxJJ6wVbVYkxYln01pR9ytM1Gn7At/BJiD6etxvB/8CL5jS4ZwbPFgp8JkDLXapl+sicU8QpgJZGguDfDjhopBYQ1zXXe1J4JT5FjmbxhZibK/bNBaMFFH6siEdfTMUPplklXnfrKoM+xXdXgcTlgXJp6RC+VxZfVQ2a11HJpnGWcw3UNwk5xDhZzKsICl0ljndEWK1RkhXtJrb6CT7JWP50wZrE/98oc5XbBgPeICK8Cal4FeT1T2K+YAK4l9WI+JveXMbh2s/z0GZzYXxBfTQ238qvLsk+9IXDf4s6Q4TPkRtx4Osd4wRTzrF+JwCwMCsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FclcawyNYZms2X6fqwcfB+g2ObPnIvEnE9xdl2UtwMw=;
- b=C09ocy1NU9C2pIe0cj47qoWQsK0hL5gjdp/9h1K5CSDrbKitXD70B8pV0IHeuv/mC+TJsXvyUnHfxlkuitv+tlBuZQBS2quXBOuVw9VS+sOdu1jpbU4vysXAQOHAJV2TJSqFFfv+9gUkN1JITgfVeK5Lr3bgPi840H5pLWlKwSyYCsK4MLbTFWiN4l/XK6Ohk/NKT6j2PO1KK8TbMFR+/QXWo/7imsA4TcyrmdNbRzjZVkq72U0IRReh2QRcqEmvl0Eb+yK60FW4i/2SyIn9XhHp0Mw6/75OQQvXiB5y0j9Mhqc5pO9Wa84oFseSdVRw/geRPa9rGSujCRGt+Qf1WA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FclcawyNYZms2X6fqwcfB+g2ObPnIvEnE9xdl2UtwMw=;
- b=tQdY8hSa3lItL4zCuWKBs3cKige9kjc3zVIZUwT3qZjsDyKwPsZneRgXDqkyZkhR7XRpae/ffe6tUhYummUMZvTn4nBLN+IrO8m7YMJkzyYKwh6quaqH5OFQOHHc/FOzVMYqJ4bWisbjeK3YgzPCNB1zz545EajGh0+enG0wfmc=
-Received: from BN6PR04MB0707.namprd04.prod.outlook.com (2603:10b6:404:d2::15)
- by BN6PR04MB0356.namprd04.prod.outlook.com (2603:10b6:404:95::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Fri, 9 Jul
- 2021 05:01:38 +0000
-Received: from BN6PR04MB0707.namprd04.prod.outlook.com
- ([fe80::2dd7:4b71:80b1:9a71]) by BN6PR04MB0707.namprd04.prod.outlook.com
- ([fe80::2dd7:4b71:80b1:9a71%3]) with mapi id 15.20.4308.021; Fri, 9 Jul 2021
- 05:01:38 +0000
-From:   Naohiro Aota <Naohiro.Aota@wdc.com>
-To:     "dsterba@suse.cz" <dsterba@suse.cz>
-CC:     "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH 2/3] btrfs: fix argument type of btrfs_bio_clone_partial()
-Thread-Topic: [PATCH 2/3] btrfs: fix argument type of
- btrfs_bio_clone_partial()
-Thread-Index: AQHXc/rtivEKh00VUUeSNzU4etMYM6s5LACAgADrCIA=
-Date:   Fri, 9 Jul 2021 05:01:37 +0000
-Message-ID: <20210709050137.63mo3vvf7f6wb46g@naota-xeon>
-References: <20210708131057.259327-1-naohiro.aota@wdc.com>
- <20210708131057.259327-3-naohiro.aota@wdc.com>
- <20210708150025.GE2610@twin.jikos.cz>
-In-Reply-To: <20210708150025.GE2610@twin.jikos.cz>
-Accept-Language: ja-JP, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: suse.cz; dkim=none (message not signed)
- header.d=none;suse.cz; dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 21a792f1-44e9-46b5-cd32-08d94296a201
-x-ms-traffictypediagnostic: BN6PR04MB0356:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN6PR04MB0356FC476AC2979136B621908C189@BN6PR04MB0356.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lPGE+3AfhzTqxhgCAlmLjGH7gcWVc/RL4VDjWK8RljtwM/kV0h3B9TDFxk5dH8h28wic8PgzFeTH81cdl7YojK6Yf6stgmzg8FJ5KTeUmR6dhMNCykARFjMFvgu9T7gn0qDZnx4VYoM0mQl8xI0b8MuBg8e4mn4+rxpQ2L7MrRoOHK9DJRoNn/RRBlqY7q/evGNFcMr4UsFS3oxQhO8kMlAu6Q5rL2yU+H7UH1un8IdoHGJgpripSSMwtr3R6fmxK9M8w03CG3XT63MvPqCsJJ6duDID/1ia2BPaqT76qcbRJTv2G48Pb0tWYtMJze+sO43o5fpTfiM8SWlxFJpE/iDuPW8zSmnltXvbZ/F00EXijwJRtwh12K8pUx5y6N+IfYQzBY7+/lClucDJP+ycna5aDNlCrR0I9TLC+jNvtUoUji49TkeBxs9yvL5zaikJjXI20XBsRvAmBbyG7lvs9zmz2fmHUxD9FdkCggUhwbjQUxAUWa9y9S2fjZfYnh4LDyOCP3mVuzxyfMHd6MS2IQwGu1VsI5LJmJWzmMweb9jVasD6Ifgdth0KloPAsQ2DMPdv9x0qOjWxrFy/+kzVJVsed4t7NdCgovnAT+oPa8oAYlUEj6VXg5zNrrevzY1ZFIZUNj2i6MMnDumhSL9U5w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR04MB0707.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(4636009)(136003)(346002)(39860400002)(396003)(366004)(376002)(54906003)(66946007)(4326008)(76116006)(91956017)(86362001)(6506007)(33716001)(66476007)(316002)(478600001)(64756008)(6512007)(66556008)(83380400001)(186003)(5660300002)(26005)(6486002)(6916009)(8936002)(8676002)(71200400001)(1076003)(122000001)(2906002)(38100700002)(9686003)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?JXaBSscR7WyLjxRJLxFhMD9IIorh7M5UCrFxbdrrD6AIXCSF8jxTHVmyqvgS?=
- =?us-ascii?Q?ZW5f4/RrGIMm5GcwrpVxCxMJiLL3m6QamzYJ7sKoh9B764YNvsmICDH4T549?=
- =?us-ascii?Q?fLyoTKwADaoYmkU1wL5B2MJSSrk3SUXgH/H545L2TI9Zzqemoppa/S9E2RhH?=
- =?us-ascii?Q?cTvM8oZ+g9kq1WASQj6hhgBS8GDntDxOxYfxO4FlKNuo3JY4GBg4i5Rfchur?=
- =?us-ascii?Q?deArjyjYENpnWfomtZeuDzHQz3v93KNz25zdy7vj52Q7FNxChGu4gVYM8p9C?=
- =?us-ascii?Q?N0W6Ef78yHmba/Sw6Sw4HJDlxIkl3flVFeMbhYfKt4Cn7zhMxv+DJF1AJfCY?=
- =?us-ascii?Q?H53ffQMQntS9EA5A8dJ1qRFIH2GaVHzJziRH188rpPBDAIIIEkkxXdrnC6Ox?=
- =?us-ascii?Q?jNDDQq60oe+nq3DyyDvbpNEzAc/QbC8LCWFvR8cAZLjGMleF1HvYJCA848xj?=
- =?us-ascii?Q?Cnx7iXE7Cf013gNKHlTfoSW5FyxGXFI/cTFfHYa/QIOgXpLZ1ldn2GE+9ws9?=
- =?us-ascii?Q?upoiAncva9OB77xuiBKVgI4M+YKIYfmMW7qIMlyZs8ENVi5JKAas9SWmPXQ7?=
- =?us-ascii?Q?a+oqUHv831vflD5ELiNY/8Hsd4bMgVcq8V2dzDTTfja5av3TR9dDwXxJo3bR?=
- =?us-ascii?Q?iL0Go0OW7Q1BYaPOBsslDtIr8hQNG0dr3/suZytt4FR3jm9eS4IioSwHBAB1?=
- =?us-ascii?Q?2h5SH2mAZZY4+HAR4SKzg4kfDCgaeh10455dKx8yfZ774XTWD2PNVdCQiZQP?=
- =?us-ascii?Q?BqS8VqXGemJnLyafI3hH4KqkIURYdoZm4cuq16ACgb9LmFIrz9amHDj2Duw5?=
- =?us-ascii?Q?MNjofBGedMXXWr3UuG2lrkIN5m+FZUBYywytRV48eBhE64iHNTR53lah40I3?=
- =?us-ascii?Q?7SQD0bjeY14gPVEFMPtq6h62qV8zdSXM3XxWBuSvADl1pL9mEtTHw+wzUCPb?=
- =?us-ascii?Q?DexazMp/hKKT2V2fs7BXfjrZc/R3LFXFAgXDnhArwjyvG8FCMd+hhaf/uU6n?=
- =?us-ascii?Q?pG/F//H4hErm0O8y2/t1k+4PZLmCBuApLlTj4nqK2Y4owv1l7RSObeNZRBmu?=
- =?us-ascii?Q?JpzkSxX5E51NF6yyqWEXw/LYiokZJ3OC9aLA2BfEZhKM+F3mYYvQXCGslHUx?=
- =?us-ascii?Q?emB3QDo9G+iaxlBKN2QOXmjxcWdRORQMTEIIn/v6d4FN4iED/eCNF9l3dH/F?=
- =?us-ascii?Q?qND5byqa+RmO3imowI+5pNQxsAZ4gyXfwKFuQ1lqDv4m8VXK/iAjYSDQuUqH?=
- =?us-ascii?Q?vgpZTMdCwgZbpa2Ob5w+uvJQtkkjQGdERM76MrOzbHl2loBtrLwB7zoubXe5?=
- =?us-ascii?Q?KNbag9MOVm4aL5MJiaVzi4yisNiADWn8IC9VGGRx+7xg1g=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <11EE62733EEDF84D9AD88F7A38651B91@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S231355AbhGIINP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 04:13:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20471 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231278AbhGIINO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Jul 2021 04:13:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625818231;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=C1gJOuWhuvnc9KCkfOjk/ntBVmRGSL89MKV7NbOH/eY=;
+        b=TCHWUEp9zkBsc/LWpeV8LrmNYLu3zaR/vb7pZ7yeQjHKg4MLvNDXkgfKeaJBso7tirnR29
+        mZv8sCw5mjNghsoQMyQpSU4V/JQuaoGJ16qfEIzJPXORZi9EJdHgX/s0FO7h2VVvencHGG
+        fj/APk9Qr7a13EK+YdLMZziuiXVLUYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-GedepIcWMLaOkz_xiC_LYQ-1; Fri, 09 Jul 2021 04:10:29 -0400
+X-MC-Unique: GedepIcWMLaOkz_xiC_LYQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67DD0100C609;
+        Fri,  9 Jul 2021 08:10:27 +0000 (UTC)
+Received: from localhost (ovpn-13-13.pek2.redhat.com [10.72.13.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A8D72C00F;
+        Fri,  9 Jul 2021 08:10:16 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 0/10] blk-mq: cleanup map queues & fix blk_mq_alloc_request_hctx
+Date:   Fri,  9 Jul 2021 16:09:55 +0800
+Message-Id: <20210709081005.421340-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN6PR04MB0707.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21a792f1-44e9-46b5-cd32-08d94296a201
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2021 05:01:37.6951
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 73qoh8iygDAnFZlq/VIa4kwa2qhPojBj1sHX8x+HJ3P44QrO9t0V9uP2xqdmdmsG2twxXFwOt09m5KPeIfiV5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR04MB0356
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 08, 2021 at 05:00:25PM +0200, David Sterba wrote:
-> On Thu, Jul 08, 2021 at 10:10:56PM +0900, Naohiro Aota wrote:
-> > From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> >=20
-> > The offset and can never be negative use unsigned int instead of int ty=
-pe
-> > for them.
-> >=20
-> > Tested-by: Naohiro Aota <naohiro.aota@wdc.com>
-> > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> > ---
-> >  fs/btrfs/extent_io.c | 3 ++-
-> >  fs/btrfs/extent_io.h | 3 ++-
-> >  2 files changed, 4 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-> > index 1f947e24091a..082f135bb3de 100644
-> > --- a/fs/btrfs/extent_io.c
-> > +++ b/fs/btrfs/extent_io.c
-> > @@ -3153,7 +3153,8 @@ struct bio *btrfs_io_bio_alloc(unsigned int nr_io=
-vecs)
-> >  	return bio;
-> >  }
-> > =20
-> > -struct bio *btrfs_bio_clone_partial(struct bio *orig, int offset, int =
-size)
-> > +struct bio *btrfs_bio_clone_partial(struct bio *orig, unsigned int off=
-set,
-> > +				    unsigned int size)
-> >  {
-> >  	struct bio *bio;
-> >  	struct btrfs_io_bio *btrfs_bio;
-> > diff --git a/fs/btrfs/extent_io.h b/fs/btrfs/extent_io.h
-> > index 62027f551b44..f78b365b56cf 100644
-> > --- a/fs/btrfs/extent_io.h
-> > +++ b/fs/btrfs/extent_io.h
-> > @@ -280,7 +280,8 @@ void extent_clear_unlock_delalloc(struct btrfs_inod=
-e *inode, u64 start, u64 end,
-> >  struct bio *btrfs_bio_alloc(u64 first_byte);
-> >  struct bio *btrfs_io_bio_alloc(unsigned int nr_iovecs);
-> >  struct bio *btrfs_bio_clone(struct bio *bio);
-> > -struct bio *btrfs_bio_clone_partial(struct bio *orig, int offset, int =
-size);
-> > +struct bio *btrfs_bio_clone_partial(struct bio *orig, unsigned int off=
-set,
-> > +				    unsigned int size);
->=20
-> This is passed to bio_trim that you change to take sector_t, should this
-> be the same?
+Hi,
 
-btrfs_bio_clone_partial() expects byte-based value, so using sector_t
-is misleading. Should we use u64 here? But the values must be <=3D
-UINT_MAX.
+blk_mq_alloc_request_hctx() is used by NVMe fc/rdma/tcp/loop to connect
+io queue. Also the sw ctx is chosen as the 1st online cpu in hctx->cpumask.
+However, all cpus in hctx->cpumask may be offline.
 
-> > =20
-> >  int repair_io_failure(struct btrfs_fs_info *fs_info, u64 ino, u64 star=
-t,
-> >  		      u64 length, u64 logical, struct page *page,
-> > --=20
-> > 2.32.0=
+This usage model isn't well supported by blk-mq which supposes allocator is
+always done on one online CPU in hctx->cpumask. This assumption is
+related with managed irq, which also requires blk-mq to drain inflight
+request in this hctx when the last cpu in hctx->cpumask is going to
+offline.
+
+However, NVMe fc/rdma/tcp/loop don't use managed irq, so we should allow
+them to ask for request allocation when the specified hctx is inactive
+(all cpus in hctx->cpumask are offline). Fix blk_mq_alloc_request_hctx() by
+allowing to allocate request when all CPUs of this hctx are offline.
+
+Also cleans up map queues helpers, replace current pci/virtio/rdma
+helpers with blk_mq_dev_map_queues(), and deal with the device
+difference by passing one callback from driver, and the actual only
+difference is that how to retrieve queue affinity. Finally the single helper
+can meet all driver's requirement.
+
+
+V3:
+	- cleanup map queues helpers, and remove pci/virtio/rdma queue
+	  helpers
+	- store use managed irq info into qmap
+
+
+V2:
+	- use flag of BLK_MQ_F_MANAGED_IRQ
+	- pass BLK_MQ_F_MANAGED_IRQ from driver explicitly
+	- kill BLK_MQ_F_STACKING
+
+
+Ming Lei (10):
+  blk-mq: rename blk-mq-cpumap.c as blk-mq-map.c
+  blk-mq: Introduce blk_mq_dev_map_queues
+  blk-mq: pass use managed irq info to blk_mq_dev_map_queues
+  scsi: replace blk_mq_pci_map_queues with blk_mq_dev_map_queues
+  nvme: replace blk_mq_pci_map_queues with blk_mq_dev_map_queues
+  virito: add APIs for retrieving vq affinity
+  virtio: blk/scsi: replace blk_mq_virtio_map_queues with
+    blk_mq_dev_map_queues
+  nvme: rdma: replace blk_mq_rdma_map_queues with blk_mq_dev_map_queues
+  blk-mq: remove map queue helpers for pci, rdma and virtio
+  blk-mq: don't deactivate hctx if managed irq isn't used
+
+ block/Makefile                            |  5 +-
+ block/{blk-mq-cpumap.c => blk-mq-map.c}   | 57 +++++++++++++++++++++++
+ block/blk-mq-pci.c                        | 48 -------------------
+ block/blk-mq-rdma.c                       | 44 -----------------
+ block/blk-mq-virtio.c                     | 46 ------------------
+ block/blk-mq.c                            | 27 +++++++----
+ block/blk-mq.h                            |  5 ++
+ drivers/block/virtio_blk.c                | 12 ++++-
+ drivers/nvme/host/pci.c                   | 12 ++++-
+ drivers/nvme/host/rdma.c                  | 18 +++++--
+ drivers/scsi/hisi_sas/hisi_sas_v2_hw.c    | 21 ++++-----
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c    |  5 +-
+ drivers/scsi/megaraid/megaraid_sas_base.c |  4 +-
+ drivers/scsi/mpi3mr/mpi3mr_os.c           |  9 ++--
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c      |  6 ++-
+ drivers/scsi/qla2xxx/qla_os.c             |  4 +-
+ drivers/scsi/scsi_priv.h                  |  9 ++++
+ drivers/scsi/smartpqi/smartpqi_init.c     |  7 ++-
+ drivers/scsi/virtio_scsi.c                | 11 ++++-
+ drivers/virtio/virtio.c                   | 10 ++++
+ include/linux/blk-mq.h                    |  8 +++-
+ include/linux/virtio.h                    |  2 +
+ 22 files changed, 186 insertions(+), 184 deletions(-)
+ rename block/{blk-mq-cpumap.c => blk-mq-map.c} (58%)
+ delete mode 100644 block/blk-mq-pci.c
+ delete mode 100644 block/blk-mq-rdma.c
+ delete mode 100644 block/blk-mq-virtio.c
+
+-- 
+2.31.1
+
