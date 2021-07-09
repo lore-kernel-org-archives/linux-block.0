@@ -2,279 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD2DBC07E99
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 13:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6822C07E9C
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 14:51:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7593613B2
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 13:58:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8611D613BA
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 14:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231732AbhGIOBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 10:01:23 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:35720 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231756AbhGIOBW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 10:01:22 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 742A722180;
-        Fri,  9 Jul 2021 13:58:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625839118; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TP1/uoVP2wkmjJxosE1T60JaJRCCcXfD2nkG/A4nXMI=;
-        b=c2FLhMJ8+yG3MTvCaSzH5E4acsH8MFSWwJ3O1uxntsY5+2FefFEGzc2l9qc1l305EysCBv
-        0XzaKsaaGYVuYXjWWYCbkXYO0gyM5wdc3eoAl783b0AZhdfY9hmQRG6mgiCgz1+Y/LjuoE
-        JF/qPVWOwYEk+aXuDVLSWumr7vw6BTI=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 3D7DD137F8;
-        Fri,  9 Jul 2021 13:58:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id l3W+DQ5W6GCYeQAAGKfGzw
-        (envelope-from <jgross@suse.com>); Fri, 09 Jul 2021 13:58:38 +0000
-Subject: Re: [PATCH v2 3/3] xen/blkfront: don't trust the backend response
- data blindly
-To:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20210708124345.10173-1-jgross@suse.com>
- <20210708124345.10173-4-jgross@suse.com> <YOgZ/lzDIlzIxCZp@Air-de-Roger>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <4f460d31-c4da-8a58-8ee5-7735f5260f08@suse.com>
-Date:   Fri, 9 Jul 2021 15:58:37 +0200
+        id S232231AbhGIOxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 10:53:44 -0400
+Received: from mail-pf1-f170.google.com ([209.85.210.170]:41576 "EHLO
+        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231963AbhGIOxo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 10:53:44 -0400
+Received: by mail-pf1-f170.google.com with SMTP id f17so8916038pfj.8;
+        Fri, 09 Jul 2021 07:51:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cpfPI7ngx6mlsmZd2ED2U6VHIGN9urCO9ch5mlaeWvU=;
+        b=k+J6u9DVIqCnb92UcDxLtlsc2s4Ot9s7v1fhljgBxknZI701V4j94KkEu3K5C32SNE
+         6bWNHe55T0x/vD7MOyqIYrAoA8EFK1ozM5f/LgFzSzeCKtRFMHUlqEOkIN648QBORxgr
+         9msWGGWbNJNy+Nkcl94bGvwizbRuNEeEGrBZgLdJuXPwwEVyVZ3xlThzJHETfR0CT4ZE
+         QOFTNNhXdemkv7EAIEdg245ryDDmYIJxUifPkXuY1X5xmD+yDRlCQ4jKU/ipTAYG90vm
+         OoM9I7UHTeFltI9WHGl+PUldZyhavbGfuQjKV6KFwBZK8wnEID73aI14YxE41bbtBhqw
+         Xn/A==
+X-Gm-Message-State: AOAM530ZLdBhMi4yg5Y5CNJcO67DYOLg7F2BFXCo37U8Z7sxLheHyvxC
+        TCIo2BuvN4XBFGK3bxzNLy3HT2M8E7s=
+X-Google-Smtp-Source: ABdhPJwHjqZ1rurEi8luN3B+F7vQoExkjpk1yyTpqSr7YDorUz+Zr0x4F6ElEA/Qv5tUhQBZGSALpw==
+X-Received: by 2002:a62:cd44:0:b029:316:643c:1ee3 with SMTP id o65-20020a62cd440000b0290316643c1ee3mr38229513pfg.5.1625842259356;
+        Fri, 09 Jul 2021 07:50:59 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:eeaf:c266:e6cc:b591? ([2601:647:4000:d7:eeaf:c266:e6cc:b591])
+        by smtp.gmail.com with ESMTPSA id m34sm7625673pgb.85.2021.07.09.07.50.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Jul 2021 07:50:58 -0700 (PDT)
+Subject: Re: WARNING at blktests block/008 in ttwu_queue_wakelist()
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20210609065339.aecrkqc6dj3xgbiw@shindev.dhcp.fujisawa.hgst.com>
+ <DM6PR04MB70815A73F340B0E35F91B75CE7369@DM6PR04MB7081.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <aef11aa8-1886-5460-21cd-a8e1161514db@acm.org>
+Date:   Fri, 9 Jul 2021 07:50:57 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <YOgZ/lzDIlzIxCZp@Air-de-Roger>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="PtD6XltbThet5UCMvmi5pahWMOzO45Xvp"
+In-Reply-To: <DM6PR04MB70815A73F340B0E35F91B75CE7369@DM6PR04MB7081.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PtD6XltbThet5UCMvmi5pahWMOzO45Xvp
-Content-Type: multipart/mixed; boundary="S35JlfSQdS3KAz9fiFZDLgLQ5ZAlpJMxS";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
-Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Jens Axboe <axboe@kernel.dk>
-Message-ID: <4f460d31-c4da-8a58-8ee5-7735f5260f08@suse.com>
-Subject: Re: [PATCH v2 3/3] xen/blkfront: don't trust the backend response
- data blindly
-References: <20210708124345.10173-1-jgross@suse.com>
- <20210708124345.10173-4-jgross@suse.com> <YOgZ/lzDIlzIxCZp@Air-de-Roger>
-In-Reply-To: <YOgZ/lzDIlzIxCZp@Air-de-Roger>
+On 6/8/21 11:55 PM, Damien Le Moal wrote:
+> + Jens and linux-kernel
 
---S35JlfSQdS3KAz9fiFZDLgLQ5ZAlpJMxS
-Content-Type: multipart/mixed;
- boundary="------------15EFA2D45E58C234A1B0B486"
-Content-Language: en-US
+Since console_sem is involved, could this be a printk() bug?
 
-This is a multi-part message in MIME format.
---------------15EFA2D45E58C234A1B0B486
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 09.07.21 11:42, Roger Pau Monn=C3=A9 wrote:
-> On Thu, Jul 08, 2021 at 02:43:45PM +0200, Juergen Gross wrote:
->> Today blkfront will trust the backend to send only sane response data.=
-
->> In order to avoid privilege escalations or crashes in case of maliciou=
-s
->> backends verify the data to be within expected limits. Especially make=
-
->> sure that the response always references an outstanding request.
->>
->> Introduce a new state of the ring BLKIF_STATE_ERROR which will be
->> switched to in case an inconsistency is being detected. Recovering fro=
-m
->> this state is possible only via removing and adding the virtual device=
-
->> again (e.g. via a suspend/resume cycle).
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->=20
-> Acked-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
-
->> @@ -1555,11 +1561,17 @@ static irqreturn_t blkif_interrupt(int irq, vo=
-id *dev_id)
->>  =20
->>   	spin_lock_irqsave(&rinfo->ring_lock, flags);
->>    again:
->> -	rp =3D rinfo->ring.sring->rsp_prod;
->> -	rmb(); /* Ensure we see queued responses up to 'rp'. */
->> +	rp =3D READ_ONCE(rinfo->ring.sring->rsp_prod);
->> +	virt_rmb(); /* Ensure we see queued responses up to 'rp'. */
->=20
-> Is the READ_ONCE strictly needed? Doesn't the barrier prevent rp from
-> not being loaded at this point?
-
-I asked Jan the same and he didn't want to rule that out. Additionally
-the READ_ONCE() helps against (rather improbable) load tearing of the
-compiler.
-
->> +		op =3D rinfo->shadow[id].req.operation;
->> +		if (op =3D=3D BLKIF_OP_INDIRECT)
->> +			op =3D rinfo->shadow[id].req.u.indirect.indirect_op;
->> +		if (bret.operation !=3D op) {
->> +			pr_alert("%s: response has wrong operation (%u instead of %u)\n",
->> +				 info->gd->disk_name, bret.operation, op);
->=20
-> You could also use op_name here, but I guess this could mask the
-> operation as 'unknown' for any number out of the defined ones.
-
-This case shouldn't happen normally, so having the numerical value is
-enough and will help for hiding any undefined op.
-
->> @@ -1635,8 +1662,8 @@ static irqreturn_t blkif_interrupt(int irq, void=
- *dev_id)
->>   		case BLKIF_OP_READ:
->>   		case BLKIF_OP_WRITE:
->>   			if (unlikely(bret.status !=3D BLKIF_RSP_OKAY))
->> -				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
->> -					"request: %x\n", bret.status);
->> +				dev_dbg_ratelimited(&info->xbdev->dev,
->> +					"Bad return from blkdev data request: %x\n", bret.status);
->=20
-> Since you are touching the line, could you use %#x here? It's IMO not
-> obvious from the context this status will be printed in hex base. Also
-> bret.status parameter could be split into a newline.
-
-Fine with me.
-
-
-Juergen
-
---------------15EFA2D45E58C234A1B0B486
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------15EFA2D45E58C234A1B0B486--
-
---S35JlfSQdS3KAz9fiFZDLgLQ5ZAlpJMxS--
-
---PtD6XltbThet5UCMvmi5pahWMOzO45Xvp
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmDoVg0FAwAAAAAACgkQsN6d1ii/Ey8r
-5Qf/fnwieeILe/0AWJq3TSZW//Hls69d7iMLWayHcIvKzJT/O0ycZLRSEwYdoxWuqQuqXI4kOoW+
-cTsx5YLrkLc1qHWBhEwjV0SA+56z+w3U0FNaZ0URgGEXOqWeCil5RSGvXSPIVTSHQTRrL9sK2sct
-s9FSsxQd13cN4qiYhclm0PGuCdNjXFZe8Da0S4CGNzZuQ8kG7djtPpTVjtgfHYo5aAdZIBoIkUT9
-JNr43Q+wJfO/8GDGnkMWlimzTPuUtwYRxHAb3nDHPhlRaagY+xcldl70oOy9j7afzlcWzngRHFZo
-Obl8YWBtkze41hp5T86JhzX8vonfsoE6e0ci8BVmsA==
-=jZIg
------END PGP SIGNATURE-----
-
---PtD6XltbThet5UCMvmi5pahWMOzO45Xvp--
+Bart.
