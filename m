@@ -2,91 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84A9C07E99
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 08:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 770B5C07E99
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 08:40:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA8A3613CA
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 08:25:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CFBE613C8
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 08:40:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231361AbhGII2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 04:28:15 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:57930 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231382AbhGII2P (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 04:28:15 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 235E620274;
-        Fri,  9 Jul 2021 08:25:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1625819131; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8K4H3iqSDD9YoSW7p9vhetIaRQmX4th7sJmNpjTLR9c=;
-        b=fEmdLSOhPe7NKpluWjJFBjTodSTNn3A6oJQytry6iEejtgk12xRKLjiALvrKlVWqssg9Dn
-        VGEDhmn4CdKR74eaYPMR5azEB4aQdE/kBvDM9Qcoom371hunUt6AYrtRsUvmteU1VHNCrU
-        KtvVyAZTTXLnIcX80iT8Fa/5Cp0hvoU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1625819131;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8K4H3iqSDD9YoSW7p9vhetIaRQmX4th7sJmNpjTLR9c=;
-        b=KZZl/U3IGR0oCdEhdH42sra8OgDricDFf2IEqoQhYNk1HE0nkMUM2ReWkOp20s+WZ+suUF
-        MY5e0UEGVC9PPHBg==
-Received: from localhost (unknown [10.163.25.122])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 4C39BA3B9D;
-        Fri,  9 Jul 2021 08:25:30 +0000 (UTC)
-Date:   Fri, 9 Jul 2021 10:25:30 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Subject: Re: [PATCH V3 02/10] blk-mq: Introduce blk_mq_dev_map_queues
-Message-ID: <20210709082530.eefzeucgqulr6spv@beryllium.lan>
-References: <20210709081005.421340-1-ming.lei@redhat.com>
- <20210709081005.421340-3-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        id S231494AbhGIIn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 04:43:29 -0400
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:35540 "EHLO
+        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231361AbhGIIn2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 04:43:28 -0400
+X-Greylist: delayed 426 seconds by postgrey-1.27 at vger.kernel.org; Fri, 09 Jul 2021 04:43:28 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1625820045;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=nngl7V5K6Z5vKANX18zotJU3yl28ufC4P5mgv3z8cyQ=;
+  b=e7s3iPZ+y20Nvug2d4pdaH93CzEiYCRfUuT5/eqcOCAg0o2iTBVY8jOB
+   bIw3DNcxapMo24o4IRGFqI8iL+bQe5HT5/cZJXmEDbHXTunFqUdLx3cor
+   xvvWN+nVdf4iNquFQ7wxKgDjWhrTGCT6S9cz5xFwFOGRZ9LlPIZkoR61G
+   g=;
+Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
+IronPort-SDR: ZkysGMRK8DJPx81GA2D+JhgcLE/ulq3r/iE06h+t65Y5y1rU7deQ2E9HAMmeuHDZ6qBdjfCF8z
+ RBD9SGsZ0k48Tsg16MFfSXloWB+lBDgFT18W0vKQGXvyZ2UmDYxvOy/Kz9r7FzM34TTSGKaQBu
+ QS7euSL//wrlrpHDk3nWbtH22wKy+YJXFocazMdLIKpzUnnWBhXwElRNQsGbFhjy6in8fmsa56
+ l+LdVRUFU3LMMR6RpX5SPfTyU4vzZCzD7x4/Hx3AYVXqGxDd/wj+oyeZ3a+fotZUoZ11sUoqOQ
+ bkk=
+X-SBRS: 5.1
+X-MesageID: 47615989
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+IronPort-HdrOrdr: A9a23:QcVp4q3oVcMXlEMhFoZYwQqjBU1yeYIsimQD101hICG9Lfb2qy
+ n+ppgmPEHP5Qr5OEtApTiBUJPwJk800aQFm7X5Wo3SITUO2VHYV72KiLGN/9SOIVydygcw79
+ YET0E6MqyNMbEYt7eK3ODbKadY/DDvysnB7o2/vhQdPj2CKZsQlzuRYjzrbHGeLzM2Y6bReq
+ Dsgvau8FGbCAsqh4mAdzM4dtmGg+eOuIPtYBYACRJiwA6SjQmw4Lq/NxSDxB8RXx5G3L9nqA
+ H+4kDEz5Tml8v+5g7X1mfV4ZgTsNz9yuFbDMjJrsQOMD3jhiuheYwkcbyfuzIepv2p9T8R4Z
+ TxiiZlG/42x2Laf2mzrxeo8RLnyiwS53jrzkLdqWf/oOTiLQhKSvZptMZ8SF/0+kAgtNZz3O
+ ZgxGSCradaChvGgWDU+8XIbRd3jUC5yEBS39L7t0YvErf2VYUh77D2pChuYdI99WPBmc8a+d
+ BVfYHhDK08SyLfU5ix1VMfsOBFXRwIb167qwY5y4uoOgNt7QVEJn0jtboid0c7heAAoqZ/lp
+ D524RT5flzp5wtHOlA7Nloe7rBNoWKe2OLDF6v
+X-IronPort-AV: E=Sophos;i="5.84,226,1620705600"; 
+   d="scan'208";a="47615989"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cHog8tom7xr0w4MJlBWXuUL1FOQQKZ68lFxKyrsIPpub8ygkcTBJ75R1QoIVnM78zr2qD3z+n9nhy9KVXZTnuFezNlSIftTu76hcXlAGJZNI3LVaC37rvE0agRBsTTbqUuCiYN4LLaCCvU4CEZwYiZ6/fzebFE8eNcHEVpbxiR7zQf4vfsbklPOAS9CRcneBrr4qGzwjXmOBL3w8cUB7fPDJ06A56Zw8gOnM8TnyBS13phoY8CfXkKdG6VjogW1e64ORCx5ZbeswI2MBqaiQY4KJgtmtB6fHD0o/ByYnMuMUcBNYvJgAmsfkKfRVfdwgU2tS7JpWcXr5NCEAEFsIqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E9KKl21UAmL/jws+5CN1kY0kBERKBHzSIvi3oXfE8CA=;
+ b=NkCE2W+GOmD16BdQ+su52iwVhtk1M5Eq1hmiQKPKf0ESneNpAs00VogtJhpY6VNLkMnxx7Vp4svN5+mMMepMh4y1HP9wanJyvpKap7TI4mVP9AuQRGxRy7Y8n/DkXR1esQtuATahxDtzvojt7bGwvW4HZw/bmt3VhWNOteMhpZjlYcLT+nzXflhhTVFIWaztct39akC3C0YxtrbzBApturjUFTkHw9URUefEUb2RatRh0q+UpYV6O+xGNpbNo92Bw5DEtQlJioLDiec35xrkaC/jBNFvoV1tgPJ04MF2Pw+dOMP2opIDLZlUQTtNarfFxPl/g0kqsWXXfExofwxvGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E9KKl21UAmL/jws+5CN1kY0kBERKBHzSIvi3oXfE8CA=;
+ b=f9gIfuXeqkdrD/ZR6eHoo7cr35CbnfGTKfsmXfqFAlZXKdAKfgIjINUpbE0kBDIZM7V3WEZKJM/a5U6sO+PmOusJoa3Qbc/bDdupVrLrenr+1rw/LHe7r9vOEz8kPGhQM75SpczRmpyT+4Lnr9CuQqGGMaX+UvNQXk66RpHm6wQ=
+Date:   Fri, 9 Jul 2021 10:33:24 +0200
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Juergen Gross <jgross@suse.com>
+CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Jan Beulich <jbeulich@suse.com>
+Subject: Re: [PATCH v2 1/3] xen/blkfront: read response from backend only once
+Message-ID: <YOgJ1GZFoKhRPHLX@Air-de-Roger>
+References: <20210708124345.10173-1-jgross@suse.com>
+ <20210708124345.10173-2-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210709081005.421340-3-ming.lei@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210708124345.10173-2-jgross@suse.com>
+X-ClientProxiedBy: PR3P193CA0055.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:102:51::30) To DS7PR03MB5608.namprd03.prod.outlook.com
+ (2603:10b6:5:2c9::18)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 954ae81c-7c55-478b-8abe-08d942b439f8
+X-MS-TrafficTypeDiagnostic: DM5PR03MB3291:
+X-Microsoft-Antispam-PRVS: <DM5PR03MB3291785A49076C14898A07978F189@DM5PR03MB3291.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bseVXSgx/ipDXjCVF4Kbvnch1BvEMZkbt7LV/kZH0VCDUaKec2k5tymt5XRVNyZOvjXnRShUKTkc9I0fE0HnmxKFUboEtyUhbAOEHG8DUUKjFVIHeYG3lENIQWYxwZHBQN5BmsH675wB25rP+3r3V9XD45ShwuzkzQqWUJxT+hBqO1OQHYbzZUQP/7ACjUZycUD1SWt+R2/Zc8UZSDJsynkJ9rh7HpXECuPXUyOg1iDmH+3I4UaTibrkB1hsjmzqBpcHFkeumcksmvsQFz0zeGSOZsEwMvxcc9UvSos2d+iQx4cZaPylv52+YCGLAU7uiXyvrLy9KN00cZI84r59lTPKPCJOEjwcrSua1z1HxmXk3z4Omho54QCAH/Nh5n/EjMB1Ng4FBBvFTMqE7JT8JSpIvAzEY4aZn/6remh2S7clrZhpKnUQvOUSejS5sH60Of9kmbeZ1KO1FLEwzatTL3HIjwlrXins0+JwhH5tA8Ah1IDzcLttEcqZ8jj6QT9Nvxnu8qAfWPR7n6HCgLL2VrnnNr6t1u+gXf8LfKZnsiA0TTs2C+bM4QLY2Fio37x3x/DOnNcY4/X19wVZYg7ONVVMZApvkghYubOwGWGCA/aSt5kyof9txzXsKUBhKQx/EoSfU4XgQ1igD7OYk0935Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(366004)(346002)(376002)(136003)(39860400002)(396003)(26005)(6496006)(6666004)(8676002)(86362001)(85182001)(4744005)(2906002)(316002)(478600001)(6486002)(83380400001)(33716001)(66556008)(66946007)(956004)(54906003)(186003)(6916009)(4326008)(5660300002)(8936002)(9686003)(38100700002)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SmE4bVlzdnhNczFKY0VTZWpORkpiSzlkbFNiR3NCTWthM3crM3VxcWN3RjNr?=
+ =?utf-8?B?QXVJWlRDSjRJR3NTUld4eDFBcTg3QVRpZGl5cWpqWEZmUW5FSWxuL2lWUDhB?=
+ =?utf-8?B?dDhoU2tIREtKYjk2Tlo5R1lTVzVQUjd4VWxFL01DOHhuQUxKL3VCd3g4WFZU?=
+ =?utf-8?B?QW8xeUc0anh0U243TGF1THNsTTJ4eVhrMUNLRUJoTFl5L1N3Ui83RVVjZWc5?=
+ =?utf-8?B?UE94ZndnVGU0K3dQRjJORGNQU3pGa0tQcVB6bHVvcCt3ekFhRThCK1pyU0th?=
+ =?utf-8?B?WE9KK09ZZGFOdFljcmMyWnlOdEJDRmY3MTI3NzZHVjZwQnllV1c5SnNlY1FF?=
+ =?utf-8?B?L3hLT1dlVkU1TUNxciszVURyY3VySFcrb20zOXhQSjN6T1VzdFdFMGsvbnh4?=
+ =?utf-8?B?UDkrNGVCMTRiR1BNcS9IeXB5L0hBNjlHdDhZK3lFa2kvdUNpc3dERVlGRktP?=
+ =?utf-8?B?eE1RemE4bll5c0x3aDAxRlpNcjd4Y1ZyRWozYVVUTFdmQ1FPZVVRSVZURkpu?=
+ =?utf-8?B?MDFrQTM0NmkzVk5ISVdMWExSVzdCeGFkT2h3VmlDNVRtZDl4TnREZVNHeWlF?=
+ =?utf-8?B?aVI2QUliTjZUVjk3bWFEV0ZBUkRubVZwRWZpYk1RQ2JacDZ5ZlNSL0tnNzNO?=
+ =?utf-8?B?bWdTT3hUaU9yVmlNWXZGREVRVEdFdlp1b3hxeUtuemhvVzV0OVdwaTdCWG9Z?=
+ =?utf-8?B?UTBGUVVHbzdvWHdLaGRnOTJTcThCS3hWa1k1bE9XRERzbXBCaXR2RkZkcDJo?=
+ =?utf-8?B?ZzMxZ2MwYWRlY2dSb0xpaTd4QmJUdXFiOVhpVldrVkxQbmVjTmdsaW9MLzJL?=
+ =?utf-8?B?ZDZwQjhGYzJqU2VyM0hVUjVxalRoeU04K1dnWWdRdDNNS0d5dmZLUk8rWkJu?=
+ =?utf-8?B?Q0ZiQWtSUXZla2h2ZENrd3JmWDBpNzduSHJObUg1b2ZLc1lWdUIrc1RqU0xa?=
+ =?utf-8?B?REZDcVJGeE9NY0dvYVpjN3dEVG9OM1A4bWpnaEMrS1ZHK2pMQlR6citGYktw?=
+ =?utf-8?B?QTFXV2dVSDU5dU5ZMmk2T1FxMk5YdXBUc2F5Q25GYjFKQlh4RmFuL2t2RFJK?=
+ =?utf-8?B?cGNwQ2pGRFlycmduR251UnU5ejFiVUUwTUMxd0djN1RSNGVFOUUyZnpxZGdw?=
+ =?utf-8?B?cERsSUxxRlpqRTdidUt5dDhEZzNWVDE3VVl5aVRtZUhZMFpRVlV1Nnpyc0Ew?=
+ =?utf-8?B?VmtibWZmTjVtZnFHVjJCNkY5d2pjT2NCVnhpdUlJL3NCRFg0TkI5VTZlbnhh?=
+ =?utf-8?B?OS9sNGdHVldMSlNidGo4NXAzZ2FwZThRRHhXbEF4L0VRYUlKTElOREZiaGtW?=
+ =?utf-8?B?T1pqWkFXeGREYWcrM2MzYzc2QzJ2R3JwajZRTlE0U1FTRTRoWGJBbDdSL3Zm?=
+ =?utf-8?B?OWJLd3hiTnJlSkpWWWlIemViNlN1UytjMi9KenhmZlkwVTFuZVM1VXR2M3ZF?=
+ =?utf-8?B?TmM1Q2xYT1hQdXFsWGl6RUZESFZlTkhaSHRyTlBKdzcyQTNrdHliaFI3Ymxt?=
+ =?utf-8?B?U0hvMVV2WUU5Y1grSTFMcUNLa2F5VksvRHhtRDk4bG1PcDEyWnBvOHAza0pG?=
+ =?utf-8?B?U1B2Vk0rTVVYVGlUZjRQbHJIc2RjeUl5MUFJZ1JjdFc2V1RyR1hVaGxhQnhl?=
+ =?utf-8?B?L2tLMUtraFFBRVJFUmFLTHhUaUF3RUJRenpXdEttdHV6MGllbkFyUWh6b3FS?=
+ =?utf-8?B?aUJNTDl4YStWeU0vN01wQVRsa0RYR3pLV05OVmtFVy95Tk9mRE90ZUpDUkI4?=
+ =?utf-8?Q?REjZlDHpQNp+dXoYbsacdb+k9P4AnVW8FVragAp?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 954ae81c-7c55-478b-8abe-08d942b439f8
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2021 08:33:28.4807
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NHJV/N8lmKeRjFr9WqyfE97MUrfTdcWQsfjrzzJBhMU5RqyEiFfv9uQZoKve06nSTM1F7DXqFJFfvZdEtwHWyQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR03MB3291
+X-OriginatorOrg: citrix.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 09, 2021 at 04:09:57PM +0800, Ming Lei wrote:
-> +/**
-> + * blk_mq_dev_map_queues - provide generic queue mapping
-> + * @qmap:	CPU to hardware queue map.
-> + * @dev_off:	Offset to use for the device
-> + * @get_queue_affinity:	Callback to retrieve queue affinity
-> + * @dev_data:	Device data passed to get_queue_affinity()
-> + * @fallback:	If true, fallback to default blk-mq mapping in case of
-> + * any failure
+On Thu, Jul 08, 2021 at 02:43:43PM +0200, Juergen Gross wrote:
+> In order to avoid problems in case the backend is modifying a response
+> on the ring page while the frontend has already seen it, just read the
+> response into a local buffer in one go and then operate on that buffer
+> only.
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> Reviewed-by: Jan Beulich <jbeulich@suse.com>
 
-The docs have a different order compared to the function definition (dev_data).
+Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 
-> + *
-> + * Generic function to setup each queue mapping in @qmap. It will query
-> + * each queue's affinity via @get_queue_affinity and built queue mapping
-> + * that maps a queue to the CPUs in the queue affinity.
-> + *
-> + * Driver has to set correct @dev_data, so that the driver callback
-> + * of @get_queue_affinity can work correctly.
-> + */
-> +int blk_mq_dev_map_queues(struct blk_mq_queue_map *qmap, void *dev_data,
-> +		int dev_off, get_queue_affinty_fn *get_queue_affinity,
-> +		bool fallback)
-
+Thanks, Roger.
