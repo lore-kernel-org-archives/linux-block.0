@@ -2,63 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BBCC07E9B
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 19:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFECC07E9C
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 20:45:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C5A8613D9
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 19:20:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65EA8613B2
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 20:45:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229931AbhGITXi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 15:23:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57782 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230317AbhGITXi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 9 Jul 2021 15:23:38 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 38E4D613C5;
-        Fri,  9 Jul 2021 19:20:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625858454;
-        bh=UtBLEuZqQAoGcRxBT9Tj32PuJYLkOT8KB66WApJ3BjI=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=tIcohmw4Y7w0iW6Efx7vSumicWOtrg5yu877dHMV1Ff/QrQsRRrWhD3HhOJfHF044
-         D3SaSoLus32jmoBETuGmqZlz5A66cxY7sb+9Npe76BGna/IPUMb9p95Cjl5gjAVjMv
-         ZQhxlPJCFMUDFuZG2bP1eGMWAgIb7p82TmgFRvVKQFZ09C/fddeNKhszneZclNBzYk
-         sIu8M2WZfRL2K9+43s/djR5hh75+wMMqibvIl6fwFxC/UVL5KylfIoYlIJNqxyVmHg
-         6+8dvjrhAUQ5hP7cm4cWr4pHCJEq4wVwiu5KAzGfei6vMnbpda1qHu2NsbsiVqjynN
-         71ZXg1jUKfUug==
-Subject: Re: [GIT PULL] Followup block changes for 5.14-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <80e0449b-eb7a-35e2-4d49-517c744fa371@kernel.dk>
-References: <80e0449b-eb7a-35e2-4d49-517c744fa371@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <80e0449b-eb7a-35e2-4d49-517c744fa371@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-08
-X-PR-Tracked-Commit-Id: a731763fc479a9c64456e0643d0ccf64203100c9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a022f7d575bb68c35be0a9ea68860411dec652fe
-Message-Id: <162585845419.13664.9694136429967901648.pr-tracker-bot@kernel.org>
-Date:   Fri, 09 Jul 2021 19:20:54 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S230345AbhGIUsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 16:48:08 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:18634 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229506AbhGIUsH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 16:48:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1625863524; x=1657399524;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5jYxzqwh/afUexbLAmNKPVpRdm0/qxTd9IFC6sVflLk=;
+  b=qjLm37CGL3N0/zraoeRKbwgJLnZRGiMlU7qG3R1xx1vpNkGktGb7hc9w
+   /GI8QCs1WD+pqQ53Q6sPp37zMgh6sk7PhZv1Yrm5GWFeoWrJsDasH9zxP
+   Fj82wW34d9wIrtckid26twPHGSIFZQntI2F/5mqIRdqUJD8ctC07r1/Lu
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.84,227,1620691200"; 
+   d="scan'208";a="135471522"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2c-76e0922c.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP; 09 Jul 2021 20:45:24 +0000
+Received: from EX13MTAUWA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2c-76e0922c.us-west-2.amazon.com (Postfix) with ESMTPS id 8305AE255D;
+        Fri,  9 Jul 2021 20:45:22 +0000 (UTC)
+Received: from EX13D01UWA002.ant.amazon.com (10.43.160.74) by
+ EX13MTAUWA001.ant.amazon.com (10.43.160.118) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Fri, 9 Jul 2021 20:45:22 +0000
+Received: from localhost (10.43.160.41) by EX13d01UWA002.ant.amazon.com
+ (10.43.160.74) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Fri, 9 Jul
+ 2021 20:45:21 +0000
+Date:   Fri, 9 Jul 2021 13:45:21 -0700
+From:   Samuel Mendoza-Jonas <samjonas@amazon.com>
+To:     Changheun Lee <nanich.lee@samsung.com>
+CC:     <alex_y_xu@yahoo.ca>, <gmazyland@gmail.com>, <bvanassche@acm.org>,
+        <tytso@mit.edu>, <axboe@kernel.dk>, <bgoncalv@redhat.com>,
+        <dm-crypt@saout.de>, <hch@lst.de>, <jaegeuk@kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-ext4@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <ming.lei@redhat.com>, <yi.zhang@redhat.com>, <dm-devel@redhat.com>
+Subject: Re: regression: data corruption with ext4 on LUKS on nvme with
+ torvalds master
+Message-ID: <20210709204521.y3mg7wpejqctpkmi@u87e72aa3c6c25c.ant.amazon.com>
+References: <alpine.LRH.2.02.2105140544010.22439@file01.intranet.prod.int.rdu2.redhat.com>
+ <CGME20210514104426epcas1p3ee2f22f8e18c961118795c356e6a14ae@epcas1p3.samsung.com>
+ <20210514102614.3804-1-nanich.lee@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210514102614.3804-1-nanich.lee@samsung.com>
+User-Agent: NeoMutt/20171215
+X-Originating-IP: [10.43.160.41]
+X-ClientProxiedBy: EX13D43UWC004.ant.amazon.com (10.43.162.42) To
+ EX13d01UWA002.ant.amazon.com (10.43.160.74)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Thu, 8 Jul 2021 09:36:58 -0600:
+On Fri, May 14, 2021 at 07:26:14PM +0900, Changheun Lee wrote:
+> > On 5/13/21 7:15 AM, Theodore Ts'o wrote:
+> > > On Thu, May 13, 2021 at 06:42:22PM +0900, Changheun Lee wrote:
+> > >>
+> > >> Problem might be casued by exhausting of memory. And memory exhausting
+> > >> would be caused by setting of small bio_max_size. Actually it was not
+> > >> reproduced in my VM environment at first. But, I reproduced same problem
+> > >> when bio_max_size is set with 8KB forced. Too many bio allocation would
+> > >> be occurred by setting of 8KB bio_max_size.
+> > > 
+> > > Hmm... I'm not sure how to align your diagnosis with the symptoms in
+> > > the bug report.  If we were limited by memory, that should slow down
+> > > the I/O, but we should still be making forward progress, no?  And a
+> > > forced reboot should not result in data corruption, unless maybe there
+> > 
+> > If you use data=writeback, data writes and journal writes are not 
+> > synchronized. So, it may be possible that a journal write made it through, 
+> > a data write didn't - the end result would be a file containing random 
+> > contents that was on the disk.
+> > 
+> > Changheun - do you use data=writeback? Did the corruption happen only in 
+> > newly created files? Or did it corrupt existing files?
+> 
+> Actually I didn't reproduced data corruption. I only reproduced hang during
+> making ext4 filesystem. Alex, could you check it?
+> 
+> > 
+> > > was a missing check for a failed memory allocation, causing data to be
+> > > written to the wrong location, a missing error check leading to the
+> > > block or file system layer not noticing that a write had failed
+> > > (although again, memory exhaustion should not lead to failed writes;
+> > > it might slow us down, sure, but if writes are being failed, something
+> > > is Badly Going Wrong --- things like writes to the swap device or
+> > > writes by the page cleaner must succeed, or else Things Would Go Bad
+> > > In A Hurry).
+> > 
+> > Mikulas
 
-> git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-08
+I've recently been debugging an issue that isn't this exact issue
+(it occurs in 5.10), but looks somewhat similar.
+On a host that
+- Is running a kernel 5.4 >= x >= 5.10.47 at least
+- Using an EXT4 + LUKS partition
+- Running Elasticsearch stress tests
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a022f7d575bb68c35be0a9ea68860411dec652fe
+We see that the index files used by the Elasticsearch process become
+corrupt after some time, and in each case I've seen so far the content
+of the file looks like the EXT4 extent header. 
+	#define EXT4_EXT_MAGIC          cpu_to_le16(0xf30a)
 
-Thank you!
+For example:
+$ hexdump -C /hdd1/nodes/0/indices/c6eSGDlCRjaWeIBwdeo9DQ/0/index/_23c.si
+00000000  0a f3 04 00 54 01 00 00  00 00 00 00 00 00 00 00  |....T...........|
+00000010  00 38 00 00 00 60 46 05  00 38 00 00 00 88 00 00  |.8...`F..8......|
+00000020  00 98 46 05 00 40 00 00  00 88 00 00 00 a0 46 05  |..F..@........F.|
+00000030  00 48 00 00 00 88 00 00  00 a8 46 05 00 48 00 00  |.H........F..H..|
+00000040  00 88 00 00 00 a8 46 05  00 48 00 00 00 88 00 00  |......F..H......|
+00000050  00 a8 46 05 00 48 00 00  00 88 00 00 00 a8 46 05  |..F..H........F.|
+00000060  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+000001a0  00 00                                             |..|
+000001a2
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+
+I'm working on tracing exactly when this happens, but I'd be interested
+to hear if that sounds familar or might have a similar underlying cause
+beyond the commit that was reverted above.
+
+Cheers,
+Sam Mendoza-Jonas
