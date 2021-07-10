@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75600C07E9E
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 02:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CFFC11F68
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 02:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C37A613D6
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 02:18:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABA9F613ED
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 02:22:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232078AbhGJCVJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 22:21:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37466 "EHLO mail.kernel.org"
+        id S232697AbhGJCZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 22:25:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41882 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231913AbhGJCU5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 9 Jul 2021 22:20:57 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7C9F7613C5;
-        Sat, 10 Jul 2021 02:18:12 +0000 (UTC)
+        id S232201AbhGJCZA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Jul 2021 22:25:00 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8D593613CC;
+        Sat, 10 Jul 2021 02:22:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625883493;
+        s=k20201202; t=1625883736;
         bh=NIOvFFYGolkiUWHbQp1PRNxwIQ3ks2cXnYip0cqAkgI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fVC6letm+zxcCqTzGQW8Td+lbuRZl+uUwEMOwru30ms38ANsrM6c0arIzeeCOzahJ
-         29y/Hv+dlAWkB9871dV4qH0t8BJtbh1rajforapZeJVCEX6ecashbDjEMtYtp2aAQo
-         BAHVitmUmj8dABxKqSmOllK7ayRgfiTb4XRPLF4bJwouGjMgzE/XewLshOESbUX6uQ
-         iPIa0JjUnl/l+nh8xCoFiL+FrulziE03XCeC4alm3IkCrDFA7gxSL64yTw6vm0oRaA
-         UbJN4oS3jMS8N9PPveQBvwD34eZnEBdmIyz5qzQKPh9o0IA6sPJPe1I6Mj0v9dUwvJ
-         2Uns2Bq0Fw0aQ==
+        b=iNzm+lyfQeBBGh3A15D1PA/6UF0rhOq0+7oK+Ux2d5pROnBhwQDLd0bM8PBiq4LS9
+         U0ELVrBqMHrK2GzL0Y2XxuAFchi93kRmfOozCzJ+2gy/xH5PU/T604WbyabI32Ur0h
+         YOSIFIZXAE5FBNed+up1aSYQDdhbN4vPX7EfsnzN1af6+QEb7Eg18LCB33b92ukSW1
+         XmdDtayhY15XuqE8W7jM66NC4oJSAtdN6KORMVS1Sq042PBJIOyqg9Zwt2RqZeBL5s
+         w0wq3qe7waC4FLr5LpzsDEuHWeu2Vlrn/Tt6sHJZNTJkKBtCOM5wtcW7PUx/+29vDI
+         HC17rgN0kTSLA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Arnd Bergmann <arnd@arndb.de>, Sasha Levin <sashal@kernel.org>,
         linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 017/114] partitions: msdos: fix one-byte get_unaligned()
-Date:   Fri,  9 Jul 2021 22:16:11 -0400
-Message-Id: <20210710021748.3167666-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.12 015/104] partitions: msdos: fix one-byte get_unaligned()
+Date:   Fri,  9 Jul 2021 22:20:27 -0400
+Message-Id: <20210710022156.3168825-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210710021748.3167666-1-sashal@kernel.org>
-References: <20210710021748.3167666-1-sashal@kernel.org>
+In-Reply-To: <20210710022156.3168825-1-sashal@kernel.org>
+References: <20210710022156.3168825-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
