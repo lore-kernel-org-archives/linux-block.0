@@ -2,161 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57051C07E99
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 01:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75600C07E9E
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 02:18:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33021613CC
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 01:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C37A613D6
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 02:18:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230317AbhGJBUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 21:20:52 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:52391 "EHLO
-        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229703AbhGJBUw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 9 Jul 2021 21:20:52 -0400
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 4DDDA5C00D3;
-        Fri,  9 Jul 2021 21:18:07 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Fri, 09 Jul 2021 21:18:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=bZemiW
-        HC6mJXf+fhe+/akDBGDyErdmDCwBUBBwrstFs=; b=v1jOmZPSyEypAaXv8ZWizy
-        uj8/zR28wuNNzcFqz5dRUCE8sKP6rFwYY8c/ZSPl2ifaRRphg7HKG5NXiYQWgCwc
-        H/LKqHdIyU/Vg15VhRfwxu2Ul5WQ8Ac8kXGTAjkgIW7OXzEn6xtxkHLqDpVbf2Zq
-        7BJp0/oxYqKI+YFPifTqa+NoAJaX7YwUuMiZHTkBG7WN800bNi5WjmAcz/gawOQS
-        /2UDltySyhtfAiLkqi5avdYbbGg+U3Ll+P5Akx4lKeYT2qzPhPA/OKAfjV07DvZW
-        q3e0Z3FZT/Vkhs8peZ4T+na0eKxovG0tQqwoQaRjMZflqhG8fZ/Z8m7w1tkGLcjw
-        ==
-X-ME-Sender: <xms:TvXoYCFSe4NyrgJzz6TBoSxqsgAXmcHA_cCmLhhzPtWxgiRYUiDNpw>
-    <xme:TvXoYDW6rWMZ2AeZY4RZSutQD71AQfjhONWVJnY8C5jAA-ebjssYoU-P4UcLCDZTZ
-    jDzFUna0nJX3A>
-X-ME-Received: <xmr:TvXoYMI-gBzGNZ0-i51wiO-fyqQt8fo0ZKgH7FqUvl5cRgc0Cs7hZw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrtdejgdefgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepofgrrhgvkhcu
-    ofgrrhgtiiihkhhofihskhhiqdfikphrvggtkhhiuceomhgrrhhmrghrvghksehinhhvih
-    hsihgslhgvthhhihhnghhslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepvedvlefh
-    udevlefgvddvkeeftddvudejgfethedvveelkefhleevheegfedvgfdunecuffhomhgrih
-    hnpeigvghnphhrohhjvggtthdrohhrghdpkhgvrhhnvghlrdhorhhgnecuvehluhhsthgv
-    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrrhhmrghrvghksehinh
-    hvihhsihgslhgvthhhihhnghhslhgrsgdrtghomh
-X-ME-Proxy: <xmx:TvXoYMFwuLami-TOm7JV-2p9DvvMeQcJ3qdLQvpAU6AK1dYqvnE55Q>
-    <xmx:TvXoYIUsBQ7JeqSdM81i7dEGMnrHjrVD4cwg7axesw4R5uJnyYqsLA>
-    <xmx:TvXoYPMOtn_z3__hx7s_S5VHU6xwi52aAxJvsHk8Ub6-vtNtfzIUmg>
-    <xmx:T_XoYKKBVZsRGqBIE5i2o9KXolVbCqBHgqOEt_4Fa8T7F_npwlrRrA>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 9 Jul 2021 21:18:05 -0400 (EDT)
-Date:   Sat, 10 Jul 2021 03:18:02 +0200
-From:   Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= 
-        <marmarek@invisiblethingslab.com>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 0/3] xen: harden blkfront against malicious backends
-Message-ID: <YOj1Spa1hitL61j/@mail-itl>
-References: <20210708124345.10173-1-jgross@suse.com>
- <YOcKJ6m31tHuq2kh@char.us.oracle.com>
- <0baeba93-39eb-2bae-1abd-d4e17e6e025e@suse.com>
+        id S232078AbhGJCVJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 22:21:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37466 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231913AbhGJCU5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Jul 2021 22:20:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7C9F7613C5;
+        Sat, 10 Jul 2021 02:18:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1625883493;
+        bh=NIOvFFYGolkiUWHbQp1PRNxwIQ3ks2cXnYip0cqAkgI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=fVC6letm+zxcCqTzGQW8Td+lbuRZl+uUwEMOwru30ms38ANsrM6c0arIzeeCOzahJ
+         29y/Hv+dlAWkB9871dV4qH0t8BJtbh1rajforapZeJVCEX6ecashbDjEMtYtp2aAQo
+         BAHVitmUmj8dABxKqSmOllK7ayRgfiTb4XRPLF4bJwouGjMgzE/XewLshOESbUX6uQ
+         iPIa0JjUnl/l+nh8xCoFiL+FrulziE03XCeC4alm3IkCrDFA7gxSL64yTw6vm0oRaA
+         UbJN4oS3jMS8N9PPveQBvwD34eZnEBdmIyz5qzQKPh9o0IA6sPJPe1I6Mj0v9dUwvJ
+         2Uns2Bq0Fw0aQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Arnd Bergmann <arnd@arndb.de>, Sasha Levin <sashal@kernel.org>,
+        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 017/114] partitions: msdos: fix one-byte get_unaligned()
+Date:   Fri,  9 Jul 2021 22:16:11 -0400
+Message-Id: <20210710021748.3167666-17-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210710021748.3167666-1-sashal@kernel.org>
+References: <20210710021748.3167666-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Ge6yG1DC6TeEMfry"
-Content-Disposition: inline
-In-Reply-To: <0baeba93-39eb-2bae-1abd-d4e17e6e025e@suse.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Arnd Bergmann <arnd@arndb.de>
 
---Ge6yG1DC6TeEMfry
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 10 Jul 2021 03:18:02 +0200
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: Juergen Gross <jgross@suse.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 0/3] xen: harden blkfront against malicious backends
+[ Upstream commit 1b1774998b2dec837a57d729d1a22e5eb2d6d206 ]
 
-On Thu, Jul 08, 2021 at 04:39:58PM +0200, Juergen Gross wrote:
-> On 08.07.21 16:22, Konrad Rzeszutek Wilk wrote:
-> > On Thu, Jul 08, 2021 at 02:43:42PM +0200, Juergen Gross wrote:
-> > > Xen backends of para-virtualized devices can live in dom0 kernel, dom0
-> > > user land, or in a driver domain. This means that a backend might
-> > > reside in a less trusted environment than the Xen core components, so
-> > > a backend should not be able to do harm to a Xen guest (it can still
-> > > mess up I/O data, but it shouldn't be able to e.g. crash a guest by
-> > > other means or cause a privilege escalation in the guest).
-> > >=20
-> > > Unfortunately blkfront in the Linux kernel is fully trusting its
-> > > backend. This series is fixing blkfront in this regard.
-> > >=20
-> > > It was discussed to handle this as a security problem, but the topic
-> > > was discussed in public before, so it isn't a real secret.
-> >=20
-> > Wow. This looks like what Marek did .. in 2018!
-> >=20
-> > https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg02336.h=
-tml
->=20
-> Yes, seems to have been a similar goal.
->=20
-> > Would it be worth crediting Marek?
->=20
-> I'm fine mentioning his patches, but I didn't know of his patches until
-> having sent out V1 of my series.
+A simplification of get_unaligned() clashes with callers that pass
+in a character pointer, causing a harmless warning like:
 
-Some email issue likely? You were on explicit CC in that series.
+block/partitions/msdos.c: In function 'msdos_partition':
+include/asm-generic/unaligned.h:13:22: warning: 'packed' attribute ignored for field of type 'u8' {aka 'unsigned char'} [-Wattributes]
 
-> I'd be interested in learning why his patches haven't been taken back
-> then.
+Remove the SYS_IND() macro with the get_unaligned() call
+and just use the ->ind field directly.
 
-Mostly it was waiting in limbo on "public: add RING_COPY_RESPONSE()"[1] pat=
-ch
-to the Xen tree, to be then synchronized back to Linux headers. That patch
-was finally committed in March this year. I should've followed up on it,
-earlier than 3 years later...
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/partitions/ldm.c   |  2 +-
+ block/partitions/ldm.h   |  3 ---
+ block/partitions/msdos.c | 24 +++++++++++-------------
+ 3 files changed, 12 insertions(+), 17 deletions(-)
 
-[1] https://lore.kernel.org/xen-devel/20180430215436.21062-1-marmarek@invis=
-iblethingslab.com/T/#u
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index d333786b5c7e..cc86534c80ad 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -510,7 +510,7 @@ static bool ldm_validate_partition_table(struct parsed_partitions *state)
+ 
+ 	p = (struct msdos_partition *)(data + 0x01BE);
+ 	for (i = 0; i < 4; i++, p++)
+-		if (SYS_IND (p) == LDM_PARTITION) {
++		if (p->sys_ind == LDM_PARTITION) {
+ 			result = true;
+ 			break;
+ 		}
+diff --git a/block/partitions/ldm.h b/block/partitions/ldm.h
+index d8d6beaa72c4..8693704dcf5e 100644
+--- a/block/partitions/ldm.h
++++ b/block/partitions/ldm.h
+@@ -84,9 +84,6 @@ struct parsed_partitions;
+ #define TOC_BITMAP1		"config"	/* Names of the two defined */
+ #define TOC_BITMAP2		"log"		/* bitmaps in the TOCBLOCK. */
+ 
+-/* Borrowed from msdos.c */
+-#define SYS_IND(p)		(get_unaligned(&(p)->sys_ind))
+-
+ struct frag {				/* VBLK Fragment handling */
+ 	struct list_head list;
+ 	u32		group;
+diff --git a/block/partitions/msdos.c b/block/partitions/msdos.c
+index 8f2fcc080264..c94de377c502 100644
+--- a/block/partitions/msdos.c
++++ b/block/partitions/msdos.c
+@@ -38,8 +38,6 @@
+  */
+ #include <asm/unaligned.h>
+ 
+-#define SYS_IND(p)	get_unaligned(&p->sys_ind)
+-
+ static inline sector_t nr_sects(struct msdos_partition *p)
+ {
+ 	return (sector_t)get_unaligned_le32(&p->nr_sects);
+@@ -52,9 +50,9 @@ static inline sector_t start_sect(struct msdos_partition *p)
+ 
+ static inline int is_extended_partition(struct msdos_partition *p)
+ {
+-	return (SYS_IND(p) == DOS_EXTENDED_PARTITION ||
+-		SYS_IND(p) == WIN98_EXTENDED_PARTITION ||
+-		SYS_IND(p) == LINUX_EXTENDED_PARTITION);
++	return (p->sys_ind == DOS_EXTENDED_PARTITION ||
++		p->sys_ind == WIN98_EXTENDED_PARTITION ||
++		p->sys_ind == LINUX_EXTENDED_PARTITION);
+ }
+ 
+ #define MSDOS_LABEL_MAGIC1	0x55
+@@ -193,7 +191,7 @@ static void parse_extended(struct parsed_partitions *state,
+ 
+ 			put_partition(state, state->next, next, size);
+ 			set_info(state, state->next, disksig);
+-			if (SYS_IND(p) == LINUX_RAID_PARTITION)
++			if (p->sys_ind == LINUX_RAID_PARTITION)
+ 				state->parts[state->next].flags = ADDPART_FLAG_RAID;
+ 			loopct = 0;
+ 			if (++state->next == state->limit)
+@@ -546,7 +544,7 @@ static void parse_minix(struct parsed_partitions *state,
+ 	 * a secondary MBR describing its subpartitions, or
+ 	 * the normal boot sector. */
+ 	if (msdos_magic_present(data + 510) &&
+-	    SYS_IND(p) == MINIX_PARTITION) { /* subpartition table present */
++	    p->sys_ind == MINIX_PARTITION) { /* subpartition table present */
+ 		char tmp[1 + BDEVNAME_SIZE + 10 + 9 + 1];
+ 
+ 		snprintf(tmp, sizeof(tmp), " %s%d: <minix:", state->name, origin);
+@@ -555,7 +553,7 @@ static void parse_minix(struct parsed_partitions *state,
+ 			if (state->next == state->limit)
+ 				break;
+ 			/* add each partition in use */
+-			if (SYS_IND(p) == MINIX_PARTITION)
++			if (p->sys_ind == MINIX_PARTITION)
+ 				put_partition(state, state->next++,
+ 					      start_sect(p), nr_sects(p));
+ 		}
+@@ -643,7 +641,7 @@ int msdos_partition(struct parsed_partitions *state)
+ 	p = (struct msdos_partition *) (data + 0x1be);
+ 	for (slot = 1 ; slot <= 4 ; slot++, p++) {
+ 		/* If this is an EFI GPT disk, msdos should ignore it. */
+-		if (SYS_IND(p) == EFI_PMBR_OSTYPE_EFI_GPT) {
++		if (p->sys_ind == EFI_PMBR_OSTYPE_EFI_GPT) {
+ 			put_dev_sector(sect);
+ 			return 0;
+ 		}
+@@ -685,11 +683,11 @@ int msdos_partition(struct parsed_partitions *state)
+ 		}
+ 		put_partition(state, slot, start, size);
+ 		set_info(state, slot, disksig);
+-		if (SYS_IND(p) == LINUX_RAID_PARTITION)
++		if (p->sys_ind == LINUX_RAID_PARTITION)
+ 			state->parts[slot].flags = ADDPART_FLAG_RAID;
+-		if (SYS_IND(p) == DM6_PARTITION)
++		if (p->sys_ind == DM6_PARTITION)
+ 			strlcat(state->pp_buf, "[DM]", PAGE_SIZE);
+-		if (SYS_IND(p) == EZD_PARTITION)
++		if (p->sys_ind == EZD_PARTITION)
+ 			strlcat(state->pp_buf, "[EZD]", PAGE_SIZE);
+ 	}
+ 
+@@ -698,7 +696,7 @@ int msdos_partition(struct parsed_partitions *state)
+ 	/* second pass - output for each on a separate line */
+ 	p = (struct msdos_partition *) (0x1be + data);
+ 	for (slot = 1 ; slot <= 4 ; slot++, p++) {
+-		unsigned char id = SYS_IND(p);
++		unsigned char id = p->sys_ind;
+ 		int n;
+ 
+ 		if (!nr_sects(p))
+-- 
+2.30.2
 
---=20
-Best Regards,
-Marek Marczykowski-G=C3=B3recki
-Invisible Things Lab
-
---Ge6yG1DC6TeEMfry
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmDo9UsACgkQ24/THMrX
-1yw/9gf5AU6+c7KNNXatKEEkWqWF9n+TvflptjRsFCE3FC/WAeidzxn6Rgz/mRSx
-m0BR7Q6h3UhVOTTF5c/CmcVcrHOs8BZUeL0MAZuyDDYpa8bZWgfFFsW8k5//deh6
-fRkX91YuB0uh2Bopgug/CujeGfvg4AbbDweI16OmECqx1sjqX6KrZmj8uHUz8A0f
-AX2vTmWi1tEI9E+tJY5nNxaTIjzFEmB1aTgbbFUjbtvedzpDUhWkjCcB2oSza5+c
-eiUIsuxB+Vtjbs/FOPflhSwE7mZTWeoohdhPxY9k8kRxlE7Q9FORNFMX6vSxVpLy
-hVAz0mhhmdDTi252V/zLYuABcymTQQ==
-=c9JX
------END PGP SIGNATURE-----
-
---Ge6yG1DC6TeEMfry--
