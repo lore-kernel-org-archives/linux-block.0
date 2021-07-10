@@ -2,46 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD48C07E9B
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227F5C07E9E
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:50:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 692A66135E
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:50:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D3A0613BF
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:50:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232976AbhGJXxN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Jul 2021 19:53:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39778 "EHLO mail.kernel.org"
+        id S233262AbhGJXxX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Jul 2021 19:53:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39214 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232972AbhGJXwz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Jul 2021 19:52:55 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 48A2261376;
-        Sat, 10 Jul 2021 23:50:09 +0000 (UTC)
+        id S233049AbhGJXxA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 10 Jul 2021 19:53:00 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1B669613B0;
+        Sat, 10 Jul 2021 23:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625961010;
-        bh=ncThU5zyVA1NFSuV3h44VcPp/1yXnnu1Kuh07jhcWIA=;
+        s=k20201202; t=1625961014;
+        bh=hN3qtU0dLgxD/1mxx142hFxbzrWbDbvSfmOPg1RvgpA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fQypLStg/hdXNF8cOaakzIkAYfuwHlsnwS/nd6sb/qfqAQLPUoamxKeZQP2gOnyKg
-         lGU9LAAv3cNv9S2P9hlaAIV9FXCkbHaQqHBbRqqrsBlRPz/It/oGSUsZiyQE2wkPuW
-         7hv32IXWw89UH2LbLgA9sgHSeugJSJ0RsrJlWbhCtAN6GEEpXfjm/5sUUNHU2A5YhQ
-         bunQCBKP2yYnep2/HT5nabc8LEu83N91K86XqOpuSWpOXBcNoVj1Py3tnVHZX2rwLM
-         01RVzzADFU9UhUKVuKYKwiEy2ZT2oOCNskYocO6kukyeEveltSvPjxl6t501pxnlPz
-         L9bZ5GUmotsxw==
+        b=de250sT9U1Y5a3AL+V+fvdWHhwSijcMWmchVzAB8sNH1Cgc3zNVqKfzurnDpxy0m6
+         20314aSfZjkxrbrCowH8CTQV3Qv+wHiEbi2uH/E5UXVGyV4/g26wizcPhQmMHp5EfJ
+         pbRC5Y75i1d4EAWDQ6z5iYvYgw9FORmrnlySkZxhCj6ym6BdUNoNMWDsEWLBLNa99K
+         qkdC4gQEDfjBPOmowYkIaRxeslQZlOxEgvsyceDgUA7IgsNp/rNyISPFZfNJXJCyMf
+         +DZPPBlGoG0XiTnn/yGnUb9SDEKzNBFOjTDBc6j3pwsxBteC4nmk6Q7RT8rR6YT7Zn
+         QZ5qWBkAKNVQw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Xie Yongji <xieyongji@bytedance.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Sasha Levin <sashal@kernel.org>,
-        virtualization@lists.linux-foundation.org,
+Cc:     Chunguang Xu <brookxu@tencent.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.12 39/43] virtio-blk: Fix memory leak among suspend/resume procedure
-Date:   Sat, 10 Jul 2021 19:49:11 -0400
-Message-Id: <20210710234915.3220342-39-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.12 43/43] block: fix the problem of io_ticks becoming smaller
+Date:   Sat, 10 Jul 2021 19:49:15 -0400
+Message-Id: <20210710234915.3220342-43-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210710234915.3220342-1-sashal@kernel.org>
 References: <20210710234915.3220342-1-sashal@kernel.org>
@@ -53,35 +50,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xie Yongji <xieyongji@bytedance.com>
+From: Chunguang Xu <brookxu@tencent.com>
 
-[ Upstream commit b71ba22e7c6c6b279c66f53ee7818709774efa1f ]
+[ Upstream commit d80c228d44640f0b47b57a2ca4afa26ef87e16b0 ]
 
-The vblk->vqs should be freed before we call init_vqs()
-in virtblk_restore().
+On the IO submission path, blk_account_io_start() may interrupt
+the system interruption. When the interruption returns, the value
+of part->stamp may have been updated by other cores, so the time
+value collected before the interruption may be less than part->
+stamp. So when this happens, we should do nothing to make io_ticks
+more accurate? For kernels less than 5.0, this may cause io_ticks
+to become smaller, which in turn may cause abnormal ioutil values.
 
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-Link: https://lore.kernel.org/r/20210517084332.280-1-xieyongji@bytedance.com
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/1625521646-1069-1-git-send-email-brookxu.cn@gmail.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/virtio_blk.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index b9fa3ef5b57c..425bae618131 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -948,6 +948,8 @@ static int virtblk_freeze(struct virtio_device *vdev)
- 	blk_mq_quiesce_queue(vblk->disk->queue);
- 
- 	vdev->config->del_vqs(vdev);
-+	kfree(vblk->vqs);
-+
- 	return 0;
- }
- 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fc60ff208497..e34dfa13b7bc 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1255,7 +1255,7 @@ static void update_io_ticks(struct block_device *part, unsigned long now,
+ 	unsigned long stamp;
+ again:
+ 	stamp = READ_ONCE(part->bd_stamp);
+-	if (unlikely(stamp != now)) {
++	if (unlikely(time_after(now, stamp))) {
+ 		if (likely(cmpxchg(&part->bd_stamp, stamp, now) == stamp))
+ 			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
+ 	}
 -- 
 2.30.2
 
