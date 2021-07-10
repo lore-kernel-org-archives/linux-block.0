@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5838DC07E9C
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A243CC11F69
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:56:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4059761057
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D00A61356
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:56:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234161AbhGJX6q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Jul 2021 19:58:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40226 "EHLO mail.kernel.org"
+        id S233700AbhGJX7n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Jul 2021 19:59:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234258AbhGJX52 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Jul 2021 19:57:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A2C416141D;
-        Sat, 10 Jul 2021 23:52:36 +0000 (UTC)
+        id S233461AbhGJX60 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 10 Jul 2021 19:58:26 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AB12361434;
+        Sat, 10 Jul 2021 23:52:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625961157;
-        bh=WRHelRLjnMA4hAxyeEiTdQ/LDMsClhlPHHEvqM4oXR4=;
+        s=k20201202; t=1625961180;
+        bh=qe3Gf6gXUqjrNfTGZ+MpZXhbBEVK9NZ5viLV5Q8xl/8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DyIv01qVAJUhNXhJ8MFa59Io2PqjOmWfzaggBkQ2s4BTT+VDmchnIeQcC+nN9O+tw
-         bNEX+hWTO6pcKKVGnyWGeLQeLXj2Nl/qWDsEwXiI72kqT8yv4KgCV6iFJ1IV+r7viL
-         L9QGgijyrJ7BjAjOESjt4FlhGK/1b6RdLe0oTAOUagp/vL++5Dd6B1CqzBthOfd8ei
-         r1F+7neMTK57fOEQAx2jdx2ihX0DAP55Ca4jAMdOY+pzM7x/iLmhIrOvlvSTmi694o
-         8sB052IK2MS+aTpICUI2HUFJxB9j8LlqkHx/J02WLXvCoOxG8fWkFa8IIS/h+K+2HV
-         ZR46872J51CQA==
+        b=mxLeS+kNAwu11dDtEcB7tWEHxgAQIROdbTdQ+DcGBXhJIde/PxwudGhil7k2CejvI
+         5S+4MaybOkhlkSbvwwBYG77YhV1oAMKknlHcPt72KC2hP7JcFkhZ8OndTseJqplcU2
+         B/PiuKdmcBMm9Ddd0SCVjKt/ybKAdefIVvYDP8pjd86WN4/K0dkDsw4UW+8wH6NSSE
+         Rgpy8raBdwCU6xnjOvO2f0TtBmbbXDUwuLYziZMLXegUN1TRXz3Bj7IZSFUtBey5rq
+         NY/XXVI1aQXomAGGSzBuKXvY4F/e7cLODALb9qGvzle1fkC0PgwROeCnMf4SCNhEks
+         3IvTlLejyFFVw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xie Yongji <xieyongji@bytedance.com>,
@@ -39,12 +39,12 @@ Cc:     Xie Yongji <xieyongji@bytedance.com>,
         Sasha Levin <sashal@kernel.org>,
         virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 19/21] virtio-blk: Fix memory leak among suspend/resume procedure
-Date:   Sat, 10 Jul 2021 19:52:10 -0400
-Message-Id: <20210710235212.3222375-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 15/16] virtio-blk: Fix memory leak among suspend/resume procedure
+Date:   Sat, 10 Jul 2021 19:52:39 -0400
+Message-Id: <20210710235240.3222618-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210710235212.3222375-1-sashal@kernel.org>
-References: <20210710235212.3222375-1-sashal@kernel.org>
+In-Reply-To: <20210710235240.3222618-1-sashal@kernel.org>
+References: <20210710235240.3222618-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,11 +70,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 2f15e38fb3f8..437d43747c6d 100644
+index e57a1f6e39d5..302260e9002c 100644
 --- a/drivers/block/virtio_blk.c
 +++ b/drivers/block/virtio_blk.c
-@@ -931,6 +931,8 @@ static int virtblk_freeze(struct virtio_device *vdev)
- 	blk_mq_quiesce_queue(vblk->disk->queue);
+@@ -800,6 +800,8 @@ static int virtblk_freeze(struct virtio_device *vdev)
+ 	blk_mq_stop_hw_queues(vblk->disk->queue);
  
  	vdev->config->del_vqs(vdev);
 +	kfree(vblk->vqs);
