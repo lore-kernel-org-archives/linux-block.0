@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A243CC11F69
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31405C11F6B
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:57:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D00A61356
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1529361057
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:57:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233700AbhGJX7n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Jul 2021 19:59:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48434 "EHLO mail.kernel.org"
+        id S233767AbhGJX7o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Jul 2021 19:59:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49050 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233461AbhGJX60 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Jul 2021 19:58:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AB12361434;
-        Sat, 10 Jul 2021 23:52:59 +0000 (UTC)
+        id S233235AbhGJX7A (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 10 Jul 2021 19:59:00 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D351C61433;
+        Sat, 10 Jul 2021 23:53:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625961180;
-        bh=qe3Gf6gXUqjrNfTGZ+MpZXhbBEVK9NZ5viLV5Q8xl/8=;
+        s=k20201202; t=1625961197;
+        bh=nTT+xchQK5zW6cns9KJcPWUUEfrXKrOpcI7iLsIGi1g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mxLeS+kNAwu11dDtEcB7tWEHxgAQIROdbTdQ+DcGBXhJIde/PxwudGhil7k2CejvI
-         5S+4MaybOkhlkSbvwwBYG77YhV1oAMKknlHcPt72KC2hP7JcFkhZ8OndTseJqplcU2
-         B/PiuKdmcBMm9Ddd0SCVjKt/ybKAdefIVvYDP8pjd86WN4/K0dkDsw4UW+8wH6NSSE
-         Rgpy8raBdwCU6xnjOvO2f0TtBmbbXDUwuLYziZMLXegUN1TRXz3Bj7IZSFUtBey5rq
-         NY/XXVI1aQXomAGGSzBuKXvY4F/e7cLODALb9qGvzle1fkC0PgwROeCnMf4SCNhEks
-         3IvTlLejyFFVw==
+        b=Dt7bIVdFGrkeGrhe7pvTOD+fUK2voE7K8TLWSMGDUazJJnYg0x0zEKWG28uwvWOvO
+         mYvjsJtEDlMi4s4wV1KZZYiJjAbnj4iAojdXjzLF1VZhDIRGxH//jMsMfs/2crzWEh
+         1Y3WWv31VVpBiq7vXEHS56dd9oSw0hNJV4qm2fSBq/2UHCrQLdVbKYTmdNCBSz/yRM
+         nD/LWkhiCCJmDyva9yWyaWdi+3BKezT8hk2LZm05NOi2pgOJ98/RbeMb6OJZt3dR3s
+         6dIWTf2hYjh5y8rAW0oE8i6zghVE4oqbFZ8ZkCKNQAMeEQr4so0IhvCN/XNO7Kipg6
+         Y8OBfbVC7U3ew==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xie Yongji <xieyongji@bytedance.com>,
@@ -39,12 +39,12 @@ Cc:     Xie Yongji <xieyongji@bytedance.com>,
         Sasha Levin <sashal@kernel.org>,
         virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 15/16] virtio-blk: Fix memory leak among suspend/resume procedure
-Date:   Sat, 10 Jul 2021 19:52:39 -0400
-Message-Id: <20210710235240.3222618-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 11/12] virtio-blk: Fix memory leak among suspend/resume procedure
+Date:   Sat, 10 Jul 2021 19:53:01 -0400
+Message-Id: <20210710235302.3222809-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210710235240.3222618-1-sashal@kernel.org>
-References: <20210710235240.3222618-1-sashal@kernel.org>
+In-Reply-To: <20210710235302.3222809-1-sashal@kernel.org>
+References: <20210710235302.3222809-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index e57a1f6e39d5..302260e9002c 100644
+index bdc3efacd0d2..2bcc2bc64149 100644
 --- a/drivers/block/virtio_blk.c
 +++ b/drivers/block/virtio_blk.c
-@@ -800,6 +800,8 @@ static int virtblk_freeze(struct virtio_device *vdev)
+@@ -808,6 +808,8 @@ static int virtblk_freeze(struct virtio_device *vdev)
  	blk_mq_stop_hw_queues(vblk->disk->queue);
  
  	vdev->config->del_vqs(vdev);
