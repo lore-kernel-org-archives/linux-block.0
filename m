@@ -2,140 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFECC07E9C
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 20:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57051C07E99
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 01:18:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65EA8613B2
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jul 2021 20:45:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33021613CC
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 01:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230345AbhGIUsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jul 2021 16:48:08 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:18634 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbhGIUsH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jul 2021 16:48:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1625863524; x=1657399524;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5jYxzqwh/afUexbLAmNKPVpRdm0/qxTd9IFC6sVflLk=;
-  b=qjLm37CGL3N0/zraoeRKbwgJLnZRGiMlU7qG3R1xx1vpNkGktGb7hc9w
-   /GI8QCs1WD+pqQ53Q6sPp37zMgh6sk7PhZv1Yrm5GWFeoWrJsDasH9zxP
-   Fj82wW34d9wIrtckid26twPHGSIFZQntI2F/5mqIRdqUJD8ctC07r1/Lu
-   Q=;
-X-IronPort-AV: E=Sophos;i="5.84,227,1620691200"; 
-   d="scan'208";a="135471522"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2c-76e0922c.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP; 09 Jul 2021 20:45:24 +0000
-Received: from EX13MTAUWA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2c-76e0922c.us-west-2.amazon.com (Postfix) with ESMTPS id 8305AE255D;
-        Fri,  9 Jul 2021 20:45:22 +0000 (UTC)
-Received: from EX13D01UWA002.ant.amazon.com (10.43.160.74) by
- EX13MTAUWA001.ant.amazon.com (10.43.160.118) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Fri, 9 Jul 2021 20:45:22 +0000
-Received: from localhost (10.43.160.41) by EX13d01UWA002.ant.amazon.com
- (10.43.160.74) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Fri, 9 Jul
- 2021 20:45:21 +0000
-Date:   Fri, 9 Jul 2021 13:45:21 -0700
-From:   Samuel Mendoza-Jonas <samjonas@amazon.com>
-To:     Changheun Lee <nanich.lee@samsung.com>
-CC:     <alex_y_xu@yahoo.ca>, <gmazyland@gmail.com>, <bvanassche@acm.org>,
-        <tytso@mit.edu>, <axboe@kernel.dk>, <bgoncalv@redhat.com>,
-        <dm-crypt@saout.de>, <hch@lst.de>, <jaegeuk@kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-ext4@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <ming.lei@redhat.com>, <yi.zhang@redhat.com>, <dm-devel@redhat.com>
-Subject: Re: regression: data corruption with ext4 on LUKS on nvme with
- torvalds master
-Message-ID: <20210709204521.y3mg7wpejqctpkmi@u87e72aa3c6c25c.ant.amazon.com>
-References: <alpine.LRH.2.02.2105140544010.22439@file01.intranet.prod.int.rdu2.redhat.com>
- <CGME20210514104426epcas1p3ee2f22f8e18c961118795c356e6a14ae@epcas1p3.samsung.com>
- <20210514102614.3804-1-nanich.lee@samsung.com>
+        id S230317AbhGJBUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jul 2021 21:20:52 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:52391 "EHLO
+        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229703AbhGJBUw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Jul 2021 21:20:52 -0400
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailout.nyi.internal (Postfix) with ESMTP id 4DDDA5C00D3;
+        Fri,  9 Jul 2021 21:18:07 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Fri, 09 Jul 2021 21:18:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=bZemiW
+        HC6mJXf+fhe+/akDBGDyErdmDCwBUBBwrstFs=; b=v1jOmZPSyEypAaXv8ZWizy
+        uj8/zR28wuNNzcFqz5dRUCE8sKP6rFwYY8c/ZSPl2ifaRRphg7HKG5NXiYQWgCwc
+        H/LKqHdIyU/Vg15VhRfwxu2Ul5WQ8Ac8kXGTAjkgIW7OXzEn6xtxkHLqDpVbf2Zq
+        7BJp0/oxYqKI+YFPifTqa+NoAJaX7YwUuMiZHTkBG7WN800bNi5WjmAcz/gawOQS
+        /2UDltySyhtfAiLkqi5avdYbbGg+U3Ll+P5Akx4lKeYT2qzPhPA/OKAfjV07DvZW
+        q3e0Z3FZT/Vkhs8peZ4T+na0eKxovG0tQqwoQaRjMZflqhG8fZ/Z8m7w1tkGLcjw
+        ==
+X-ME-Sender: <xms:TvXoYCFSe4NyrgJzz6TBoSxqsgAXmcHA_cCmLhhzPtWxgiRYUiDNpw>
+    <xme:TvXoYDW6rWMZ2AeZY4RZSutQD71AQfjhONWVJnY8C5jAA-ebjssYoU-P4UcLCDZTZ
+    jDzFUna0nJX3A>
+X-ME-Received: <xmr:TvXoYMI-gBzGNZ0-i51wiO-fyqQt8fo0ZKgH7FqUvl5cRgc0Cs7hZw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrtdejgdefgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepofgrrhgvkhcu
+    ofgrrhgtiiihkhhofihskhhiqdfikphrvggtkhhiuceomhgrrhhmrghrvghksehinhhvih
+    hsihgslhgvthhhihhnghhslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepvedvlefh
+    udevlefgvddvkeeftddvudejgfethedvveelkefhleevheegfedvgfdunecuffhomhgrih
+    hnpeigvghnphhrohhjvggtthdrohhrghdpkhgvrhhnvghlrdhorhhgnecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrrhhmrghrvghksehinh
+    hvihhsihgslhgvthhhihhnghhslhgrsgdrtghomh
+X-ME-Proxy: <xmx:TvXoYMFwuLami-TOm7JV-2p9DvvMeQcJ3qdLQvpAU6AK1dYqvnE55Q>
+    <xmx:TvXoYIUsBQ7JeqSdM81i7dEGMnrHjrVD4cwg7axesw4R5uJnyYqsLA>
+    <xmx:TvXoYPMOtn_z3__hx7s_S5VHU6xwi52aAxJvsHk8Ub6-vtNtfzIUmg>
+    <xmx:T_XoYKKBVZsRGqBIE5i2o9KXolVbCqBHgqOEt_4Fa8T7F_npwlrRrA>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 9 Jul 2021 21:18:05 -0400 (EDT)
+Date:   Sat, 10 Jul 2021 03:18:02 +0200
+From:   Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= 
+        <marmarek@invisiblethingslab.com>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v2 0/3] xen: harden blkfront against malicious backends
+Message-ID: <YOj1Spa1hitL61j/@mail-itl>
+References: <20210708124345.10173-1-jgross@suse.com>
+ <YOcKJ6m31tHuq2kh@char.us.oracle.com>
+ <0baeba93-39eb-2bae-1abd-d4e17e6e025e@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Ge6yG1DC6TeEMfry"
 Content-Disposition: inline
-In-Reply-To: <20210514102614.3804-1-nanich.lee@samsung.com>
-User-Agent: NeoMutt/20171215
-X-Originating-IP: [10.43.160.41]
-X-ClientProxiedBy: EX13D43UWC004.ant.amazon.com (10.43.162.42) To
- EX13d01UWA002.ant.amazon.com (10.43.160.74)
+In-Reply-To: <0baeba93-39eb-2bae-1abd-d4e17e6e025e@suse.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 14, 2021 at 07:26:14PM +0900, Changheun Lee wrote:
-> > On 5/13/21 7:15 AM, Theodore Ts'o wrote:
-> > > On Thu, May 13, 2021 at 06:42:22PM +0900, Changheun Lee wrote:
-> > >>
-> > >> Problem might be casued by exhausting of memory. And memory exhausting
-> > >> would be caused by setting of small bio_max_size. Actually it was not
-> > >> reproduced in my VM environment at first. But, I reproduced same problem
-> > >> when bio_max_size is set with 8KB forced. Too many bio allocation would
-> > >> be occurred by setting of 8KB bio_max_size.
-> > > 
-> > > Hmm... I'm not sure how to align your diagnosis with the symptoms in
-> > > the bug report.  If we were limited by memory, that should slow down
-> > > the I/O, but we should still be making forward progress, no?  And a
-> > > forced reboot should not result in data corruption, unless maybe there
-> > 
-> > If you use data=writeback, data writes and journal writes are not 
-> > synchronized. So, it may be possible that a journal write made it through, 
-> > a data write didn't - the end result would be a file containing random 
-> > contents that was on the disk.
-> > 
-> > Changheun - do you use data=writeback? Did the corruption happen only in 
-> > newly created files? Or did it corrupt existing files?
-> 
-> Actually I didn't reproduced data corruption. I only reproduced hang during
-> making ext4 filesystem. Alex, could you check it?
-> 
-> > 
-> > > was a missing check for a failed memory allocation, causing data to be
-> > > written to the wrong location, a missing error check leading to the
-> > > block or file system layer not noticing that a write had failed
-> > > (although again, memory exhaustion should not lead to failed writes;
-> > > it might slow us down, sure, but if writes are being failed, something
-> > > is Badly Going Wrong --- things like writes to the swap device or
-> > > writes by the page cleaner must succeed, or else Things Would Go Bad
-> > > In A Hurry).
-> > 
-> > Mikulas
 
-I've recently been debugging an issue that isn't this exact issue
-(it occurs in 5.10), but looks somewhat similar.
-On a host that
-- Is running a kernel 5.4 >= x >= 5.10.47 at least
-- Using an EXT4 + LUKS partition
-- Running Elasticsearch stress tests
+--Ge6yG1DC6TeEMfry
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 10 Jul 2021 03:18:02 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: Juergen Gross <jgross@suse.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v2 0/3] xen: harden blkfront against malicious backends
 
-We see that the index files used by the Elasticsearch process become
-corrupt after some time, and in each case I've seen so far the content
-of the file looks like the EXT4 extent header. 
-	#define EXT4_EXT_MAGIC          cpu_to_le16(0xf30a)
+On Thu, Jul 08, 2021 at 04:39:58PM +0200, Juergen Gross wrote:
+> On 08.07.21 16:22, Konrad Rzeszutek Wilk wrote:
+> > On Thu, Jul 08, 2021 at 02:43:42PM +0200, Juergen Gross wrote:
+> > > Xen backends of para-virtualized devices can live in dom0 kernel, dom0
+> > > user land, or in a driver domain. This means that a backend might
+> > > reside in a less trusted environment than the Xen core components, so
+> > > a backend should not be able to do harm to a Xen guest (it can still
+> > > mess up I/O data, but it shouldn't be able to e.g. crash a guest by
+> > > other means or cause a privilege escalation in the guest).
+> > >=20
+> > > Unfortunately blkfront in the Linux kernel is fully trusting its
+> > > backend. This series is fixing blkfront in this regard.
+> > >=20
+> > > It was discussed to handle this as a security problem, but the topic
+> > > was discussed in public before, so it isn't a real secret.
+> >=20
+> > Wow. This looks like what Marek did .. in 2018!
+> >=20
+> > https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg02336.h=
+tml
+>=20
+> Yes, seems to have been a similar goal.
+>=20
+> > Would it be worth crediting Marek?
+>=20
+> I'm fine mentioning his patches, but I didn't know of his patches until
+> having sent out V1 of my series.
 
-For example:
-$ hexdump -C /hdd1/nodes/0/indices/c6eSGDlCRjaWeIBwdeo9DQ/0/index/_23c.si
-00000000  0a f3 04 00 54 01 00 00  00 00 00 00 00 00 00 00  |....T...........|
-00000010  00 38 00 00 00 60 46 05  00 38 00 00 00 88 00 00  |.8...`F..8......|
-00000020  00 98 46 05 00 40 00 00  00 88 00 00 00 a0 46 05  |..F..@........F.|
-00000030  00 48 00 00 00 88 00 00  00 a8 46 05 00 48 00 00  |.H........F..H..|
-00000040  00 88 00 00 00 a8 46 05  00 48 00 00 00 88 00 00  |......F..H......|
-00000050  00 a8 46 05 00 48 00 00  00 88 00 00 00 a8 46 05  |..F..H........F.|
-00000060  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-*
-000001a0  00 00                                             |..|
-000001a2
+Some email issue likely? You were on explicit CC in that series.
 
+> I'd be interested in learning why his patches haven't been taken back
+> then.
 
-I'm working on tracing exactly when this happens, but I'd be interested
-to hear if that sounds familar or might have a similar underlying cause
-beyond the commit that was reverted above.
+Mostly it was waiting in limbo on "public: add RING_COPY_RESPONSE()"[1] pat=
+ch
+to the Xen tree, to be then synchronized back to Linux headers. That patch
+was finally committed in March this year. I should've followed up on it,
+earlier than 3 years later...
 
-Cheers,
-Sam Mendoza-Jonas
+[1] https://lore.kernel.org/xen-devel/20180430215436.21062-1-marmarek@invis=
+iblethingslab.com/T/#u
+
+--=20
+Best Regards,
+Marek Marczykowski-G=C3=B3recki
+Invisible Things Lab
+
+--Ge6yG1DC6TeEMfry
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmDo9UsACgkQ24/THMrX
+1yw/9gf5AU6+c7KNNXatKEEkWqWF9n+TvflptjRsFCE3FC/WAeidzxn6Rgz/mRSx
+m0BR7Q6h3UhVOTTF5c/CmcVcrHOs8BZUeL0MAZuyDDYpa8bZWgfFFsW8k5//deh6
+fRkX91YuB0uh2Bopgug/CujeGfvg4AbbDweI16OmECqx1sjqX6KrZmj8uHUz8A0f
+AX2vTmWi1tEI9E+tJY5nNxaTIjzFEmB1aTgbbFUjbtvedzpDUhWkjCcB2oSza5+c
+eiUIsuxB+Vtjbs/FOPflhSwE7mZTWeoohdhPxY9k8kRxlE7Q9FORNFMX6vSxVpLy
+hVAz0mhhmdDTi252V/zLYuABcymTQQ==
+=c9JX
+-----END PGP SIGNATURE-----
+
+--Ge6yG1DC6TeEMfry--
