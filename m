@@ -2,86 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31405C11F6B
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DD6C07E96
+	for <linux-block@archiver.kernel.org>; Sun, 11 Jul 2021 05:00:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1529361057
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jul 2021 23:57:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1681A613AF
+	for <linux-block@archiver.kernel.org>; Sun, 11 Jul 2021 05:00:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233767AbhGJX7o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Jul 2021 19:59:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49050 "EHLO mail.kernel.org"
+        id S229892AbhGKFDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Jul 2021 01:03:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41110 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233235AbhGJX7A (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Jul 2021 19:59:00 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D351C61433;
-        Sat, 10 Jul 2021 23:53:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625961197;
-        bh=nTT+xchQK5zW6cns9KJcPWUUEfrXKrOpcI7iLsIGi1g=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Dt7bIVdFGrkeGrhe7pvTOD+fUK2voE7K8TLWSMGDUazJJnYg0x0zEKWG28uwvWOvO
-         mYvjsJtEDlMi4s4wV1KZZYiJjAbnj4iAojdXjzLF1VZhDIRGxH//jMsMfs/2crzWEh
-         1Y3WWv31VVpBiq7vXEHS56dd9oSw0hNJV4qm2fSBq/2UHCrQLdVbKYTmdNCBSz/yRM
-         nD/LWkhiCCJmDyva9yWyaWdi+3BKezT8hk2LZm05NOi2pgOJ98/RbeMb6OJZt3dR3s
-         6dIWTf2hYjh5y8rAW0oE8i6zghVE4oqbFZ8ZkCKNQAMeEQr4so0IhvCN/XNO7Kipg6
-         Y8OBfbVC7U3ew==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Xie Yongji <xieyongji@bytedance.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Sasha Levin <sashal@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 11/12] virtio-blk: Fix memory leak among suspend/resume procedure
-Date:   Sat, 10 Jul 2021 19:53:01 -0400
-Message-Id: <20210710235302.3222809-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210710235302.3222809-1-sashal@kernel.org>
-References: <20210710235302.3222809-1-sashal@kernel.org>
+        id S229485AbhGKFDb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 11 Jul 2021 01:03:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4BEA86128C;
+        Sun, 11 Jul 2021 05:00:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1625979644;
+        bh=LabtziYmIibDl3S/j2tFIXcw/GEXbgb0a6inH+Q2Z6E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QbG0jUtv0e4NC5AXUHWyOh7xB21IjwO1L7Gdd7R/vb8tKSaB+JOrftFwPfUreVAkA
+         0HcnYGpZS52GlInwxcyP6TwmWd4AFxY2u6cFjlDB3Ws+qNzgz+V8KLxXCEFeHJ3UAo
+         DAmaHIdGqANHla5vqF8QkgTzd/XBs3WztYTowbc0=
+Date:   Sun, 11 Jul 2021 07:00:42 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, minchan@kernel.org,
+        jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, rafael@kernel.org,
+        axboe@kernel.dk, tj@kernel.org, mbenes@suse.com,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 2/3] zram: fix deadlock with sysfs attribute usage and
+ module removal
+Message-ID: <YOp6+vlBRM5RqofW@kroah.com>
+References: <20210703001958.620899-1-mcgrof@kernel.org>
+ <20210703001958.620899-3-mcgrof@kernel.org>
+ <20210710122851.aae9783ae9b1a703d565cbec@linux-foundation.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210710122851.aae9783ae9b1a703d565cbec@linux-foundation.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xie Yongji <xieyongji@bytedance.com>
+On Sat, Jul 10, 2021 at 12:28:51PM -0700, Andrew Morton wrote:
+> On Fri,  2 Jul 2021 17:19:57 -0700 Luis Chamberlain <mcgrof@kernel.org> wrote:
+> 
+> > +#define MODULE_DEVICE_ATTR_FUNC_STORE(_name) \
+> > +static ssize_t module_ ## _name ## _store(struct device *dev, \
+> > +				   struct device_attribute *attr, \
+> > +				   const char *buf, size_t len) \
+> > +{ \
+> > +	ssize_t __ret; \
+> > +	if (!try_module_get(THIS_MODULE)) \
+> > +		return -ENODEV; \
+> > +	__ret = _name ## _store(dev, attr, buf, len); \
+> > +	module_put(THIS_MODULE); \
+> > +	return __ret; \
+> > +}
+> 
+> I assume that Greg's comments on try_module_get() are applicable here
+> also.
 
-[ Upstream commit b71ba22e7c6c6b279c66f53ee7818709774efa1f ]
+Yes, this is still broken code and does not do what it says it does,
+please do not merge it.
 
-The vblk->vqs should be freed before we call init_vqs()
-in virtblk_restore().
+Again, almost anything that does try_module_get(THIS_MODULE) is broken,
+this code included.  I'll write more in a week or so when I get a chance
+to get to this series in my reviews...
 
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-Link: https://lore.kernel.org/r/20210517084332.280-1-xieyongji@bytedance.com
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/virtio_blk.c | 2 ++
- 1 file changed, 2 insertions(+)
+thanks,
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index bdc3efacd0d2..2bcc2bc64149 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -808,6 +808,8 @@ static int virtblk_freeze(struct virtio_device *vdev)
- 	blk_mq_stop_hw_queues(vblk->disk->queue);
- 
- 	vdev->config->del_vqs(vdev);
-+	kfree(vblk->vqs);
-+
- 	return 0;
- }
- 
--- 
-2.30.2
-
+greg k-h
