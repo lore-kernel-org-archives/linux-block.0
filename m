@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8B7C07E96
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E45E0C07E9C
 	for <linux-block@archiver.kernel.org>; Sun, 11 Jul 2021 17:54:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5E8D6109D
+	by mail.kernel.org (Postfix) with ESMTP id C985D610D0
 	for <linux-block@archiver.kernel.org>; Sun, 11 Jul 2021 17:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232918AbhGKR5X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Jul 2021 13:57:23 -0400
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:40931 "EHLO
-        mail-wr1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232969AbhGKR5V (ORCPT
+        id S233172AbhGKR5Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Jul 2021 13:57:24 -0400
+Received: from mail-wr1-f53.google.com ([209.85.221.53]:40935 "EHLO
+        mail-wr1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233049AbhGKR5X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Jul 2021 13:57:21 -0400
-Received: by mail-wr1-f52.google.com with SMTP id l7so20477101wrv.7;
-        Sun, 11 Jul 2021 10:54:33 -0700 (PDT)
+        Sun, 11 Jul 2021 13:57:23 -0400
+Received: by mail-wr1-f53.google.com with SMTP id l7so20477192wrv.7;
+        Sun, 11 Jul 2021 10:54:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/nmB3CtujyxBQuc9imDrnD4qPywR3Zgc9UmKQvyvHxQ=;
-        b=Oyfz3Cbeg18RcC00yZdcLiLL0BUx/r6xxBlbJwWmy1FLXKqf60KglmcEV9RRQYR/JD
-         1bMsbji1OBqdrCXiLF2jP/Ed94uC8R1Q9dyxxWmn7u4MSGMAH4ekAVBIaJnrRqr66p7a
-         nUBBOu13MjEhrsGGEhmkxaWKulawyQf+twra0MGIyVexPMsKaIVeKZ+bDIysreK32fiS
-         DwHUwXL/nuONM4qGX1ZXmgmIp6tl/2dhbqtiztTvtlJzPSitao/7U90kFW/BWHTTtnQ2
-         och0ZnYOVI4QPqHMp4405vutDSrHV+g7DzGWtuH8t6cI03Q1BKh6Q3A9Zded/x3YCDGl
-         Tdfw==
-X-Gm-Message-State: AOAM533BM+F0rdpzfEuSUvGuB1UVkmpDum+7tDtqR2DII+10fzC8VizY
-        XPdoW85R5QW1OTaDkUNDUD2PgN3QuodpWQ==
-X-Google-Smtp-Source: ABdhPJzCUoO4bPhNd2Rk6NWoIkOi6uEhpVU6EGyGk33sd4KpovFjiSpoS+NzsGLmt4mnyKZN+PRFYw==
-X-Received: by 2002:adf:dfc9:: with SMTP id q9mr21191857wrn.117.1626026072338;
-        Sun, 11 Jul 2021 10:54:32 -0700 (PDT)
+        bh=LrlTFAH0C/xNxlpM9mhI5GLrVPci93g3pcmgXyE6rhA=;
+        b=IhAj/uiceL7IjhThDpNcjjok1BjsAnLCBlcsQNk8wQJAI+K803iaj0VavzlErhpzYt
+         1/wc3aN8+l7NEIhU10AtnIleBhZqLQKzxVcliX6u0/61M26tt3Qx747BGaAtWe2fgvG0
+         e1iDyhyPoNZ/Er7JoTmy68RN9NBlrEjRg4gRu/VZ7T5AgoO6FvkHmNMtMaljmI4LWOHq
+         k9bVdjd6o3yzYiVuj9MUZMhBfJbv6Ez2M1N25q4/dnrJDsGLOVsHlBUt761/aCdA1krE
+         BwOdthc5qXwwa7woSZsx7YxCt5Mq5OyAm677OvSSzHr70WagsGIkoYmHD1W3VIm7BR+V
+         z2HA==
+X-Gm-Message-State: AOAM533959vgitkPveAHfEYY0J0CsqdV4hL42VedBgsyqKm0o05+//mc
+        S47tZzLEEcHnwBXTwHoqP6/NZdPsxACOiQ==
+X-Google-Smtp-Source: ABdhPJzpzdgg3Oi8ZDxu/OTKyc8emWdMxyy9xx6RBDkRTAvhgz6Eii5wizYWGalgcpcS/xAULUbNAw==
+X-Received: by 2002:adf:d088:: with SMTP id y8mr6370887wrh.69.1626026074435;
+        Sun, 11 Jul 2021 10:54:34 -0700 (PDT)
 Received: from msft-t490s.teknoraver.net (net-2-44-206-93.cust.vodafonedsl.it. [2.44.206.93])
-        by smtp.gmail.com with ESMTPSA id f5sm12741376wrg.67.2021.07.11.10.54.31
+        by smtp.gmail.com with ESMTPSA id f5sm12741376wrg.67.2021.07.11.10.54.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jul 2021 10:54:31 -0700 (PDT)
+        Sun, 11 Jul 2021 10:54:34 -0700 (PDT)
 From:   Matteo Croce <mcroce@linux.microsoft.com>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>
@@ -58,9 +58,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Matthew Wilcox <willy@infradead.org>,
         Christoph Hellwig <hch@infradead.org>,
         JeffleXu <jefflexu@linux.alibaba.com>
-Subject: [PATCH v4 3/5] block: add ioctl to read the disk sequence number
-Date:   Sun, 11 Jul 2021 19:54:13 +0200
-Message-Id: <20210711175415.80173-4-mcroce@linux.microsoft.com>
+Subject: [PATCH v4 5/5] loop: raise media_change event
+Date:   Sun, 11 Jul 2021 19:54:15 +0200
+Message-Id: <20210711175415.80173-6-mcroce@linux.microsoft.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210711175415.80173-1-mcroce@linux.microsoft.com>
 References: <20210711175415.80173-1-mcroce@linux.microsoft.com>
@@ -72,51 +72,123 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Matteo Croce <mcroce@microsoft.com>
 
-Add a new BLKGETDISKSEQ ioctl which retrieves the disk sequence number
-from the genhd structure.
+Make the loop device raise a DISK_MEDIA_CHANGE event on attach or detach.
 
-    # ./getdiskseq /dev/loop*
-    /dev/loop0:     13
-    /dev/loop0p1:   13
-    /dev/loop0p2:   13
-    /dev/loop0p3:   13
-    /dev/loop1:     14
-    /dev/loop1p1:   14
-    /dev/loop1p2:   14
-    /dev/loop2:     5
-    /dev/loop3:     6
+	# udevadm monitor -up |grep -e DISK_MEDIA_CHANGE -e DEVNAME &
+
+	# losetup -f zero
+	[    7.454235] loop0: detected capacity change from 0 to 16384
+	DISK_MEDIA_CHANGE=1
+	DEVNAME=/dev/loop0
+	DEVNAME=/dev/loop0
+	DEVNAME=/dev/loop0
+
+	# losetup -f zero
+	[   10.205245] loop1: detected capacity change from 0 to 16384
+	DISK_MEDIA_CHANGE=1
+	DEVNAME=/dev/loop1
+	DEVNAME=/dev/loop1
+	DEVNAME=/dev/loop1
+
+	# losetup -f zero2
+	[   13.532368] loop2: detected capacity change from 0 to 40960
+	DISK_MEDIA_CHANGE=1
+	DEVNAME=/dev/loop2
+	DEVNAME=/dev/loop2
+
+	# losetup -D
+	DEVNAME=/dev/loop1
+	DISK_MEDIA_CHANGE=1
+	DEVNAME=/dev/loop1
+	DEVNAME=/dev/loop2
+	DISK_MEDIA_CHANGE=1
+	DEVNAME=/dev/loop2
+	DEVNAME=/dev/loop0
+	DISK_MEDIA_CHANGE=1
+	DEVNAME=/dev/loop0
 
 Signed-off-by: Matteo Croce <mcroce@microsoft.com>
 ---
- block/ioctl.c           | 2 ++
- include/uapi/linux/fs.h | 1 +
- 2 files changed, 3 insertions(+)
+ drivers/block/loop.c | 20 ++++++++++++++++++++
+ drivers/block/loop.h |  1 +
+ 2 files changed, 21 insertions(+)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 24beec9ca9c9..0c3a4a53fa11 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -469,6 +469,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
- 				BLKDEV_DISCARD_SECURE);
- 	case BLKZEROOUT:
- 		return blk_ioctl_zeroout(bdev, mode, arg);
-+	case BLKGETDISKSEQ:
-+		return put_u64(argp, bdev->bd_disk->diskseq);
- 	case BLKREPORTZONE:
- 		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
- 	case BLKRESETZONE:
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 4c32e97dcdf0..bdf7b404b3e7 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -184,6 +184,7 @@ struct fsxattr {
- #define BLKSECDISCARD _IO(0x12,125)
- #define BLKROTATIONAL _IO(0x12,126)
- #define BLKZEROOUT _IO(0x12,127)
-+#define BLKGETDISKSEQ _IOR(0x12,128,__u64)
- /*
-  * A jump here: 130-136 are reserved for zoned block devices
-  * (see uapi/linux/blkzoned.h)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f37b9e3d833c..c632f9bd33ba 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -731,6 +731,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 		goto out_err;
+ 
+ 	/* and ... switch */
++	lo->changed = true;
++	bdev_check_media_change(bdev);
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
+ 	lo->lo_backing_file = file;
+@@ -1205,6 +1207,9 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		goto out_unlock;
+ 	}
+ 
++	lo->changed = true;
++	bdev_check_media_change(bdev);
++
+ 	set_disk_ro(lo->lo_disk, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
+ 
+ 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
+@@ -1349,6 +1354,8 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN && bdev;
+ 	lo_number = lo->lo_number;
++	lo->changed = true;
++	bdev_check_media_change(bdev);
+ out_unlock:
+ 	mutex_unlock(&lo->lo_mutex);
+ 	if (partscan) {
+@@ -2016,11 +2023,22 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 	mutex_unlock(&lo->lo_mutex);
+ }
+ 
++static unsigned int lo_check_events(struct gendisk *disk, unsigned int clearing)
++{
++	struct loop_device *lo = disk->private_data;
++	bool changed = lo->changed;
++
++	lo->changed = false;
++
++	return changed ? DISK_EVENT_MEDIA_CHANGE : 0;
++}
++
+ static const struct block_device_operations lo_fops = {
+ 	.owner =	THIS_MODULE,
+ 	.open =		lo_open,
+ 	.release =	lo_release,
+ 	.ioctl =	lo_ioctl,
++	.check_events = lo_check_events,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl =	lo_compat_ioctl,
+ #endif
+@@ -2325,6 +2343,8 @@ static int loop_add(int i)
+ 	disk->fops		= &lo_fops;
+ 	disk->private_data	= lo;
+ 	disk->queue		= lo->lo_queue;
++	disk->events		= DISK_EVENT_MEDIA_CHANGE;
++	disk->event_flags	= DISK_EVENT_FLAG_UEVENT;
+ 	sprintf(disk->disk_name, "loop%d", i);
+ 	add_disk(disk);
+ 	mutex_unlock(&loop_ctl_mutex);
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 1988899db63a..a2fdfd27e6a7 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -63,6 +63,7 @@ struct loop_device {
+ 	struct timer_list       timer;
+ 	bool			use_dio;
+ 	bool			sysfs_inited;
++	bool 			changed;
+ 
+ 	struct request_queue	*lo_queue;
+ 	struct blk_mq_tag_set	tag_set;
 -- 
 2.31.1
 
