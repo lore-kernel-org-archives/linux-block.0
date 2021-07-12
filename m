@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C729C07E99
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 06:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 044F6C11F69
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 06:45:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7153E61132
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 06:32:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1E3D6115C
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 06:45:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234886AbhGLGfN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jul 2021 02:35:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56384 "EHLO
+        id S236629AbhGLGsi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jul 2021 02:48:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236633AbhGLGcV (ORCPT
+        with ESMTP id S236304AbhGLGrk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jul 2021 02:32:21 -0400
+        Mon, 12 Jul 2021 02:47:40 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F0B4C0613A0;
-        Sun, 11 Jul 2021 23:29:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82064C025250;
+        Sun, 11 Jul 2021 23:31:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=o5bYCY7IOLJJ+eHcIwH3lKQ4D/
-        QKoHUXTEs0b0hl7GLlm5a+5nz60nrUR4RoOFj2QTDOUNxPMFMDrJs4uAiWFgeZ+I9+XKC2r2GE3ow
-        TDEOdezPC/lBmSUvtEXYfwwZXe3L2JqY/XtV2nQfXlB5172NfdpbP1n8IozS9FZ1K+gfXe15x5cp3
-        liLIeNt0TeoqEmdsE+RBr9Gb8d+Y/xtV8RK0jxYZASxlakUn/grJARWu+//ef1+njDL2fpGxZDe8d
-        MiqmV2PGAMfeWigXgoHhCWZZT4JHRTC90Egjhg2us6bzedEddsA6SrPKH7O21ho6kYbK+6kNZMvYi
-        piSn7efQ==;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=pJ7wPE2b09yrbp7Tcng4rHgTg9
+        ni7WAyHV5m/xY6bDgexrg8dLwIewCrBRqWLzseU6THxn+LDz2VrkhaewzGAMX8bmidr1Nz52rItBy
+        RfVN8bFcdSsXnrua2DqulZbBkHCq34QRCtE6nDn41TEVIVVkJ6gxgB+L56QL+aIxrT+TxpWNnkKY2
+        A9puZNL69awKyyC1fCZrgNHSF8JJS2p62/xCziScaAmhKZThz9ZMPsX4WNZNZP/RT6eV6fNipogY+
+        T1ZwZCXSfprl72+iw+AOlOq/CMpa5ph8pg22kVYDjZuL4/Z8BooT/k7vaRJjBp9Gy6Sii3xOELsSK
+        CGICwtng==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m2pQF-00Gy4c-ST; Mon, 12 Jul 2021 06:28:18 +0000
-Date:   Mon, 12 Jul 2021 07:28:07 +0100
+        id 1m2pRj-00Gy8y-4A; Mon, 12 Jul 2021 06:29:58 +0000
+Date:   Mon, 12 Jul 2021 07:29:39 +0100
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Matteo Croce <mcroce@linux.microsoft.com>
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
@@ -52,14 +52,14 @@ Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Matthew Wilcox <willy@infradead.org>,
         Christoph Hellwig <hch@infradead.org>,
         JeffleXu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v4 3/5] block: add ioctl to read the disk sequence number
-Message-ID: <YOvg9wncSK8GvOGe@infradead.org>
+Subject: Re: [PATCH v4 4/5] block: export diskseq in sysfs
+Message-ID: <YOvhU3heByKFl7tT@infradead.org>
 References: <20210711175415.80173-1-mcroce@linux.microsoft.com>
- <20210711175415.80173-4-mcroce@linux.microsoft.com>
+ <20210711175415.80173-5-mcroce@linux.microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210711175415.80173-4-mcroce@linux.microsoft.com>
+In-Reply-To: <20210711175415.80173-5-mcroce@linux.microsoft.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
