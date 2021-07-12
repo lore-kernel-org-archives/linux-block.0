@@ -4,150 +4,317 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F81C07E9B
-	for <linux-block@archiver.kernel.org>; Sun, 11 Jul 2021 17:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBBAFC07E96
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 03:10:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDBE86109D
-	for <linux-block@archiver.kernel.org>; Sun, 11 Jul 2021 17:54:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B99986101C
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 03:10:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233073AbhGKR5Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Jul 2021 13:57:24 -0400
-Received: from mail-wr1-f51.google.com ([209.85.221.51]:35552 "EHLO
-        mail-wr1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232985AbhGKR5V (ORCPT
+        id S232776AbhGLDMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Jul 2021 23:12:48 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:6912 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232783AbhGLDMr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Jul 2021 13:57:21 -0400
-Received: by mail-wr1-f51.google.com with SMTP id m2so10377499wrq.2;
-        Sun, 11 Jul 2021 10:54:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=gA2NrPBHWqmV7CuYNl2bPQgHZVzrHyeQuRtsWBkE9oQ=;
-        b=R+MbgiTDyCaAtZzqq6ooWg4p8nt47nFptADr7DMh+3zB6VD9iw6kT4hfwQKweKmpzg
-         NdbQ6feywn93fKkAzg7yzc44gtLlVLhSYd0VJn5zvsHA7HHGA/xtzEnjUWfnQN9xgcgl
-         vVcxMILD2HKzJ+0Rh9DTN/RmSg/tzpr3ucbEz99TkVW2G2pPQeemAe6gfGH8yUonDHPx
-         da89+53l1nV8X10ZFhD0ksPKDvQLp35AtVlxKKnS4IT6QOYap4ZCxWoOkBFEYHj/23Pf
-         2YrZODNmGodgRltuRrRVKLJ7duqmBdrbsCTx37yGRf461u1hQ9X3q+pwJaAe5vMPrpcP
-         bmhw==
-X-Gm-Message-State: AOAM533f2BsUt5PVtLwiZHqPkNSnF0NJyTK9IW5HEX85zUiWwS3Fua2V
-        y+mHQ2g407IKGJSA2xcI8OUVQJDT3zJzgw==
-X-Google-Smtp-Source: ABdhPJzpxG3p/CdRYWj//Y0fxcYW2oGVQUeXcWW3ExK7nCw4kngDly6GSOPBE0kSQOgIs61zsBnBAA==
-X-Received: by 2002:a5d:638b:: with SMTP id p11mr54877422wru.380.1626026073472;
-        Sun, 11 Jul 2021 10:54:33 -0700 (PDT)
-Received: from msft-t490s.teknoraver.net (net-2-44-206-93.cust.vodafonedsl.it. [2.44.206.93])
-        by smtp.gmail.com with ESMTPSA id f5sm12741376wrg.67.2021.07.11.10.54.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jul 2021 10:54:33 -0700 (PDT)
-From:   Matteo Croce <mcroce@linux.microsoft.com>
-To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Subject: [PATCH v4 4/5] block: export diskseq in sysfs
-Date:   Sun, 11 Jul 2021 19:54:14 +0200
-Message-Id: <20210711175415.80173-5-mcroce@linux.microsoft.com>
+        Sun, 11 Jul 2021 23:12:47 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GNTDy4wVNz72FR;
+        Mon, 12 Jul 2021 11:06:26 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Mon, 12 Jul 2021 11:09:58 +0800
+Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
+ (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Mon, 12
+ Jul 2021 11:09:57 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
+Subject: [PATCH] blk-mq: allow hardware queue to get more tag while sharing a tag set
+Date:   Mon, 12 Jul 2021 11:18:18 +0800
+Message-ID: <20210712031818.31918-1-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210711175415.80173-1-mcroce@linux.microsoft.com>
-References: <20210711175415.80173-1-mcroce@linux.microsoft.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Matteo Croce <mcroce@microsoft.com>
+If there are multiple active queues while sharing a tag set, it's not
+necessary to limit the available tags as same share for each active queue
+if no one ever failed to get driver tag. And fall back to same share if
+someone do failed to get driver tag.
 
-Add a new sysfs handle to export the new diskseq value.
-Place it in <sysfs>/block/<disk>/diskseq and document it.
+This modification will be beneficial if total queue_depth of disks
+on the same host is less than total tags.
 
-    $ grep . /sys/class/block/*/diskseq
-    /sys/class/block/loop0/diskseq:13
-    /sys/class/block/loop1/diskseq:14
-    /sys/class/block/loop2/diskseq:5
-    /sys/class/block/loop3/diskseq:6
-    /sys/class/block/ram0/diskseq:1
-    /sys/class/block/ram1/diskseq:2
-    /sys/class/block/vda/diskseq:7
-
-Signed-off-by: Matteo Croce <mcroce@microsoft.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- Documentation/ABI/testing/sysfs-block | 12 ++++++++++++
- block/genhd.c                         | 10 ++++++++++
- 2 files changed, 22 insertions(+)
+ block/blk-mq-debugfs.c |  2 ++
+ block/blk-mq-tag.c     | 43 +++++++++++++++++++++++++++++++++++++++++-
+ block/blk-mq-tag.h     | 27 ++++++++++++++++++++++++--
+ block/blk-mq.c         | 13 ++++++++++---
+ block/blk-mq.h         |  8 ++++++++
+ include/linux/blk-mq.h |  4 ++++
+ include/linux/blkdev.h |  1 +
+ 7 files changed, 92 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index e34cdeeeb9d4..a0ed87386639 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -28,6 +28,18 @@ Description:
- 		For more details refer Documentation/admin-guide/iostats.rst
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 4b66d2776eda..35f1f01d93ae 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -450,6 +450,8 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
+ 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
+ 	seq_printf(m, "active_queues=%d\n",
+ 		   atomic_read(&tags->active_queues));
++	seq_printf(m, "pending_queues=%d\n",
++		   atomic_read(&tags->pending_queues));
  
- 
-+What:		/sys/block/<disk>/diskseq
-+Date:		February 2021
-+Contact:	Matteo Croce <mcroce@microsoft.com>
-+Description:
-+		The /sys/block/<disk>/diskseq files reports the disk
-+		sequence number, which is a monotonically increasing
-+		number assigned to every drive.
-+		Some devices, like the loop device, refresh such number
-+		every time the backing file is changed.
-+		The value type is 64 bit unsigned.
-+
-+
- What:		/sys/block/<disk>/<part>/stat
- Date:		February 2008
- Contact:	Jerome Marchand <jmarchan@redhat.com>
-diff --git a/block/genhd.c b/block/genhd.c
-index 3d9c9d189ff7..422c0dbc6ce2 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -985,6 +985,14 @@ static ssize_t disk_discard_alignment_show(struct device *dev,
- 	return sprintf(buf, "%d\n", queue_discard_alignment(disk->queue));
+ 	seq_puts(m, "\nbitmap_tags:\n");
+ 	sbitmap_queue_show(tags->bitmap_tags, m);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 86f87346232a..618624b359d6 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -40,6 +40,22 @@ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 	return true;
  }
  
-+static ssize_t diskseq_show(struct device *dev,
-+			    struct device_attribute *attr, char *buf)
++void __blk_mq_dtag_busy(struct blk_mq_hw_ctx *hctx)
 +{
-+	struct gendisk *disk = dev_to_disk(dev);
++	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
++		struct request_queue *q = hctx->queue;
++		struct blk_mq_tag_set *set = q->tag_set;
 +
-+	return sprintf(buf, "%llu\n", disk->diskseq);
++		if (!test_bit(QUEUE_FLAG_HCTX_WAIT, &q->queue_flags) &&
++		    !test_and_set_bit(QUEUE_FLAG_HCTX_WAIT, &q->queue_flags))
++			atomic_inc(&set->pending_queues_shared_sbitmap);
++	} else {
++		if (!test_bit(BLK_MQ_S_DTAG_WAIT, &hctx->state) &&
++		    !test_and_set_bit(BLK_MQ_S_DTAG_WAIT, &hctx->state))
++			atomic_inc(&hctx->tags->pending_queues);
++	}
 +}
 +
- static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
- static DEVICE_ATTR(ext_range, 0444, disk_ext_range_show, NULL);
- static DEVICE_ATTR(removable, 0444, disk_removable_show, NULL);
-@@ -997,6 +1005,7 @@ static DEVICE_ATTR(capability, 0444, disk_capability_show, NULL);
- static DEVICE_ATTR(stat, 0444, part_stat_show, NULL);
- static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
- static DEVICE_ATTR(badblocks, 0644, disk_badblocks_show, disk_badblocks_store);
-+static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
+ /*
+  * Wakeup all potentially sleeping on tags
+  */
+@@ -74,6 +90,24 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 	blk_mq_tag_wakeup_all(tags, false);
+ }
  
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- ssize_t part_fail_show(struct device *dev,
-@@ -1042,6 +1051,7 @@ static struct attribute *disk_attrs[] = {
- 	&dev_attr_events.attr,
- 	&dev_attr_events_async.attr,
- 	&dev_attr_events_poll_msecs.attr,
-+	&dev_attr_diskseq.attr,
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	&dev_attr_fail.attr,
- #endif
++void __blk_mq_dtag_idle(struct blk_mq_hw_ctx *hctx)
++{
++	struct blk_mq_tags *tags = hctx->tags;
++	struct request_queue *q = hctx->queue;
++	struct blk_mq_tag_set *set = q->tag_set;
++
++	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
++		if (!test_and_clear_bit(QUEUE_FLAG_HCTX_WAIT,
++					&q->queue_flags))
++			return;
++		atomic_dec(&set->pending_queues_shared_sbitmap);
++	} else {
++		if (!test_and_clear_bit(BLK_MQ_S_DTAG_WAIT, &hctx->state))
++			return;
++		atomic_dec(&tags->pending_queues);
++	}
++}
++
+ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 			    struct sbitmap_queue *bt)
+ {
+@@ -112,8 +146,12 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	if (tag != BLK_MQ_NO_TAG)
+ 		goto found_tag;
+ 
+-	if (data->flags & BLK_MQ_REQ_NOWAIT)
++	if (data->flags & BLK_MQ_REQ_NOWAIT) {
++		if (!data->q->elevator)
++			blk_mq_dtag_busy(data->hctx);
++
+ 		return BLK_MQ_NO_TAG;
++	}
+ 
+ 	ws = bt_wait_ptr(bt, data->hctx);
+ 	do {
+@@ -140,6 +178,9 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		if (tag != BLK_MQ_NO_TAG)
+ 			break;
+ 
++		if (!data->q->elevator)
++			blk_mq_dtag_busy(data->hctx);
++
+ 		bt_prev = bt;
+ 		io_schedule();
+ 
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 8ed55af08427..badcf3693749 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -10,6 +10,11 @@ struct blk_mq_tags {
+ 	unsigned int nr_reserved_tags;
+ 
+ 	atomic_t active_queues;
++	/*
++	 * if multiple queues share a tag set, pending_queues record the
++	 * number of queues that can't get driver tag.
++	 */
++	atomic_t pending_queues;
+ 
+ 	struct sbitmap_queue *bitmap_tags;
+ 	struct sbitmap_queue *breserved_tags;
+@@ -69,8 +74,10 @@ enum {
+ 	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
+ };
+ 
+-extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
+-extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *);
++extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx);
++extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx);
++extern void __blk_mq_dtag_busy(struct blk_mq_hw_ctx *hctx);
++extern void __blk_mq_dtag_idle(struct blk_mq_hw_ctx *hctx);
+ 
+ static inline bool blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+@@ -88,6 +95,22 @@ static inline void blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 	__blk_mq_tag_idle(hctx);
+ }
+ 
++static inline void blk_mq_dtag_busy(struct blk_mq_hw_ctx *hctx)
++{
++	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
++		return;
++
++	__blk_mq_dtag_busy(hctx);
++}
++
++static inline void blk_mq_dtag_idle(struct blk_mq_hw_ctx *hctx)
++{
++	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
++		return;
++
++	__blk_mq_dtag_idle(hctx);
++}
++
+ static inline bool blk_mq_tag_is_reserved(struct blk_mq_tags *tags,
+ 					  unsigned int tag)
+ {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 2c4ac51e54eb..1bb52bd71da8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -991,8 +991,10 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 		 */
+ 		queue_for_each_hw_ctx(q, hctx, i) {
+ 			/* the hctx may be unmapped, so check it here */
+-			if (blk_mq_hw_queue_mapped(hctx))
++			if (blk_mq_hw_queue_mapped(hctx)) {
+ 				blk_mq_tag_idle(hctx);
++				blk_mq_dtag_idle(hctx);
++			}
+ 		}
+ 	}
+ 	blk_queue_exit(q);
+@@ -1097,8 +1099,10 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+ 	}
+ 
+ 	tag = __sbitmap_queue_get(bt);
+-	if (tag == BLK_MQ_NO_TAG)
++	if (tag == BLK_MQ_NO_TAG) {
++		blk_mq_dtag_busy(rq->mq_hctx);
+ 		return false;
++	}
+ 
+ 	rq->tag = tag + tag_offset;
+ 	return true;
+@@ -2676,8 +2680,10 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ {
+ 	struct request *flush_rq = hctx->fq->flush_rq;
+ 
+-	if (blk_mq_hw_queue_mapped(hctx))
++	if (blk_mq_hw_queue_mapped(hctx)) {
+ 		blk_mq_tag_idle(hctx);
++		blk_mq_dtag_idle(hctx);
++	}
+ 
+ 	blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
+ 			set->queue_depth, flush_rq);
+@@ -3536,6 +3542,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 
+ 	if (blk_mq_is_sbitmap_shared(set->flags)) {
+ 		atomic_set(&set->active_queues_shared_sbitmap, 0);
++		atomic_set(&set->pending_queues_shared_sbitmap, 0);
+ 
+ 		if (blk_mq_init_shared_sbitmap(set)) {
+ 			ret = -ENOMEM;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index d08779f77a26..9e646ade81a8 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -337,10 +337,18 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 
+ 		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+ 			return true;
++
++		if (!atomic_read(&set->pending_queues_shared_sbitmap))
++			return true;
++
+ 		users = atomic_read(&set->active_queues_shared_sbitmap);
+ 	} else {
+ 		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 			return true;
++
++		if (!atomic_read(&hctx->tags->pending_queues))
++			return true;
++
+ 		users = atomic_read(&hctx->tags->active_queues);
+ 	}
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 1d18447ebebc..3bc0faf0e2cf 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -256,6 +256,7 @@ struct blk_mq_tag_set {
+ 	unsigned int		flags;
+ 	void			*driver_data;
+ 	atomic_t		active_queues_shared_sbitmap;
++	atomic_t		pending_queues_shared_sbitmap;
+ 
+ 	struct sbitmap_queue	__bitmap_tags;
+ 	struct sbitmap_queue	__breserved_tags;
+@@ -415,6 +416,9 @@ enum {
+ 	/* hw queue is inactive after all its CPUs become offline */
+ 	BLK_MQ_S_INACTIVE	= 3,
+ 
++	/* hw queue is waiting for driver tag */
++	BLK_MQ_S_DTAG_WAIT	= 1,
++
+ 	BLK_MQ_MAX_DEPTH	= 10240,
+ 
+ 	BLK_MQ_CPU_WORK_BATCH	= 8,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 3177181c4326..55e0965c9c3c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -603,6 +603,7 @@ struct request_queue {
+ #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
+ #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
+ #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
++#define QUEUE_FLAG_HCTX_WAIT	30	/* at least one blk-mq hctx can't get driver tag */
+ 
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP) |		\
 -- 
 2.31.1
 
