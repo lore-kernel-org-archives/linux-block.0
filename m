@@ -2,59 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30EA7C07E9A
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 19:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDCFC07E99
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:01:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D7066121E
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 19:32:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E6126120A
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:01:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236249AbhGLTfT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jul 2021 15:35:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42354 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232921AbhGLTfT (ORCPT
+        id S229562AbhGLXE2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jul 2021 19:04:28 -0400
+Received: from mail-ej1-f44.google.com ([209.85.218.44]:35493 "EHLO
+        mail-ej1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229465AbhGLXE2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jul 2021 15:35:19 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBCECC0613DD;
-        Mon, 12 Jul 2021 12:32:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=5tfDk/JajaRHsi4tzH2fGSvumh37Jv1UygOEKTBXISw=; b=YJVDW8s0FfHwVeWCVLbYMWnSs1
-        N0DaXsDXMIxxjd/qlHW04NpLQ/Zf86KJKG0b1DMkcj0OmPhFnQ8C3JXU7bdoxaWHczsL4Ue771QJA
-        0/8pU17Dm02QzdDINzWuAeS+5y+W+ZC2mJp0e+za5rPpNEVm7SE3rBmP4wti1M15sYJ/ZAot06aGM
-        7AP9hfGoJRWo2jzGMdxQX1Y/MPfokaqViRpKowJWX6sSfx/a3PqUR2LpFMrPCeInu5zYo9A6sXJJ5
-        /fMYzoqrllhgdrSJ4iskx2vvCPTbeI+aVNiG4LKwPCQosJzN3xGRGkFujuq5rFUMtpJirEPbJGIwV
-        2/3QO6Xg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m31ep-000NIm-KH; Mon, 12 Jul 2021 19:32:10 +0000
-Date:   Mon, 12 Jul 2021 20:31:59 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH] sd: don't mess with SD_MINORS for
- CONFIG_DEBUG_BLOCK_EXT_DEVT
-Message-ID: <YOyYrybhQss64aFg@infradead.org>
-References: <20210712155001.125632-1-hch@lst.de>
+        Mon, 12 Jul 2021 19:04:28 -0400
+Received: by mail-ej1-f44.google.com with SMTP id gn32so37807132ejc.2;
+        Mon, 12 Jul 2021 16:01:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=H3JrpqLbXkOfBbNk0ELMh5a3qu8730rv0zgRTcWu+h8=;
+        b=hoPCif4SqlhUnUOo2OgU8p+0GopdkE3D1n8c5FpGyBUo3HVXLOH8ZK6PXy/B8Sqo4M
+         OuJBISb6m+BZisigysommeua0BouwHQEINvePys8xm0J9hQP+hYD5PgLupryifeirbml
+         vwdOhObRggojYsPodX3ORaiX0ZsA0HKb0bx2HtrXkd0a2OVTu51c24EvRw5Wyw4eFBnY
+         4I4X0xL/Jom1dPKMwdaHODjGilxsvwuyWojro9LTglUhHnOPWQv2+xT28J5z1hkdmpOc
+         DXF7TiYTezTS8elOfGRFq7ExYPqA+vnxy7EBYOiZF7tFnV5/CMqYaomkkFEXqzaRYRJ/
+         eNHw==
+X-Gm-Message-State: AOAM531X2d3cEyLGAyI2J5dxy+qnqw+ole4epUq1oZQ/iKfoloYDld5t
+        vJvPEpZGV+MfOnXR4OM7iRmrt2o4NLhDoA==
+X-Google-Smtp-Source: ABdhPJyxLwoH8Va5Knv1+9gM+trG+cG+iu8REGL8OvlC2D6907WKiFstKeHe+In9muP470d7KZJtjQ==
+X-Received: by 2002:a17:906:9c84:: with SMTP id fj4mr1662836ejc.180.1626130897088;
+        Mon, 12 Jul 2021 16:01:37 -0700 (PDT)
+Received: from msft-t490s.fritz.box (host-95-250-115-52.retail.telecomitalia.it. [95.250.115.52])
+        by smtp.gmail.com with ESMTPSA id c17sm4095895edv.6.2021.07.12.16.01.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jul 2021 16:01:36 -0700 (PDT)
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        JeffleXu <jefflexu@linux.alibaba.com>
+Subject: [PATCH v4 0/5] block: add a sequence number to disks
+Date:   Tue, 13 Jul 2021 01:01:22 +0200
+Message-Id: <20210712230128.29057-1-mcroce@linux.microsoft.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210712155001.125632-1-hch@lst.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 12, 2021 at 05:50:01PM +0200, Christoph Hellwig wrote:
-> No need to give up the original sd minor even with this option,
-> and if we did we'd also need to fix the number of minors for
-> this configuration to actually work.
+From: Matteo Croce <mcroce@microsoft.com>
 
-Linus just picked this up directly.
+Associating uevents with block devices in userspace is difficult and racy:
+the uevent netlink socket is lossy, and on slow and overloaded systems has
+a very high latency. Block devices do not have exclusive owners in
+userspace, any process can set one up (e.g. loop devices). Moreover, device
+names can be reused (e.g. loop0 can be reused again and again). A userspace
+process setting up a block device and watching for its events cannot thus
+reliably tell whether an event relates to the device it just set up or
+another earlier instance with the same name.
+
+Being able to set a UUID on a loop device would solve the race conditions.
+But it does not allow to derive orderings from uevents: if you see a uevent
+with a UUID that does not match the device you are waiting for, you cannot
+tell whether it's because the right uevent has not arrived yet, or it was
+already sent and you missed it. So you cannot tell whether you should wait
+for it or not.
+
+Being able to set devices up in a namespace would solve the race conditions
+too, but it can work only if being namespaced is feasible in the first
+place. Many userspace processes need to set devices up for the root
+namespace, so this solution cannot always work.
+
+Changing the loop devices naming implementation to always use
+monotonically increasing device numbers, instead of reusing the lowest
+free number, would also solve the problem, but it would be very disruptive
+to userspace and likely break many existing use cases. It would also be
+quite awkward to use on long-running machines, as the loop device name
+would quickly grow to many-digits length.
+
+Furthermore, this problem does not affect only loop devices - partition
+probing is asynchronous and very slow on busy systems. It is very easy to
+enter races when using LO_FLAGS_PARTSCAN and watching for the partitions to
+show up, as it can take a long time for the uevents to be delivered after
+setting them up.
+
+Associating a unique, monotonically increasing sequential number to the
+lifetime of each block device, which can be retrieved with an ioctl
+immediately upon setting it up, allows to solve the race conditions with
+uevents, and also allows userspace processes to know whether they should
+wait for the uevent they need or if it was dropped and thus they should
+move on.
+
+This does not benefit only loop devices and block devices with multiple
+partitions, but for example also removable media such as USB sticks or
+cdroms/dvdroms/etc.
+
+The first patch is the core one, the 2..4 expose the information in
+different ways, and the last one makes the loop device generate a media
+changed event upon attach, detach or reconfigure, so the sequence number
+is increased.
+
+If merged, this feature will immediately used by the userspace:
+https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
+
+v4 -> v5:
+- introduce a helper to raise media changed events
+- use the new helper in loop instead of the full event code
+- unexport inc_diskseq() which is only used by the block code now
+- rebase on top of 5.14-rc1
+
+v3 -> v4:
+- rebased on top of 5.13
+- hook the seqnum increase into the media change event
+- make the loop device raise media change events
+- merge 1/6 and 5/6
+- move the uevent part of 1/6 into a separate one
+- drop the now unneeded sysfs refactor
+- change 'diskseq' to a global static variable
+- add more comments
+- refactor commit messages
+
+v2 -> v3:
+- rebased on top of 5.13-rc7
+- resend because it appeared archived on patchwork
+
+v1 -> v2:
+- increase seqnum on media change
+- increase on loop detach
+
+Matteo Croce (6):
+  block: add disk sequence number
+  block: export the diskseq in uevents
+  block: add ioctl to read the disk sequence number
+  block: export diskseq in sysfs
+  block: add a helper to raise a media changed event
+  loop: raise media_change event
+
+ Documentation/ABI/testing/sysfs-block | 12 ++++++
+ block/disk-events.c                   | 62 +++++++++++++++++++++------
+ block/genhd.c                         | 43 +++++++++++++++++++
+ block/ioctl.c                         |  2 +
+ drivers/block/loop.c                  |  5 +++
+ include/linux/genhd.h                 |  3 ++
+ include/uapi/linux/fs.h               |  1 +
+ 7 files changed, 114 insertions(+), 14 deletions(-)
+
+-- 
+2.31.1
+
