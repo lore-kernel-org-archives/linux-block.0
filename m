@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 308C1C07E99
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A71C07E9B
 	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 06:29:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13B3C610D0
+	by mail.kernel.org (Postfix) with ESMTP id 1F3DA610E6
 	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 06:29:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236945AbhGLGcN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jul 2021 02:32:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55854 "EHLO
+        id S236908AbhGLGcP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jul 2021 02:32:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237401AbhGLGa7 (ORCPT
+        with ESMTP id S237424AbhGLGbJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jul 2021 02:30:59 -0400
+        Mon, 12 Jul 2021 02:31:09 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42633C0613BF;
-        Sun, 11 Jul 2021 23:26:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EDF7C0613E9;
+        Sun, 11 Jul 2021 23:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FG/iT78/oQ54SybYw5GKCu27WpTpEqbvYfp5VuXTjUY=; b=cwCckUHBSW2+VJCGnUnAh9jyed
-        gDjxXJiJMEHQyMebKbYi1BVDUpNKGVbHThCMUr104hxQVNQY2FKd9PicSRi40Iz1BetbVBNCwBTVD
-        9iMb+WdMOfYKfzoqq86507FJ/I+Y32o+o0+qQlR/V0h6bqG8qWDoeX5iTEVNjTBhhcaMlRZisB9ip
-        PAnciSpk33SSXJI5gGBow48qhGvtxg6IjL///9S/I+6WyJx4DF5fnyJm5WRtsS5mFoiMz8+FNmh/M
-        MsiJEsnhUL8XA8TqrZipFqMI39IZS8HYRycK4kxdCHpKhey5acg4Dp2dqgJVzMyWbG8BLWdRaLyho
-        QvnUVewA==;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=roKuq0uM79HoA9ezbjtZsQGobb
+        NU3JAamMhb0AW5oSpTRrN3prWT6N3EsS7ygbaKnkvg0hzsEluBxuCZWh2HDpeXZYQSxx7BjDizpzV
+        huFHqt9XuI+EZbnmtw8lJaxZLMpNXuB1iEgJXGFHT1+soXF1zCfOy0meF95NGDUNOSTXND3efLdj0
+        PDEj04HagJgJqG8ey4WCDjHzAxd9J+LfxZsyYhWtRk93hOP3CRF0qoheedoNtdW8kBhZeqYIqikLw
+        39WW9lXyVUJOHqDcfucakyn4CJoyVB/zTnfA+wtOirPALJexHiG9uVsODGkxmF3sFtriN8ZopqgcR
+        lQ101xhw==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m2pNZ-00Gxnx-At; Mon, 12 Jul 2021 06:25:43 +0000
-Date:   Mon, 12 Jul 2021 07:25:21 +0100
+        id 1m2pP7-00Gy2R-HJ; Mon, 12 Jul 2021 06:27:06 +0000
+Date:   Mon, 12 Jul 2021 07:26:57 +0100
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Matteo Croce <mcroce@linux.microsoft.com>
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
@@ -52,28 +52,19 @@ Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Matthew Wilcox <willy@infradead.org>,
         Christoph Hellwig <hch@infradead.org>,
         JeffleXu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v4 1/5] block: add disk sequence number
-Message-ID: <YOvgUcLeocxQxZNY@infradead.org>
+Subject: Re: [PATCH v4 2/5] block: export the diskseq in uevents
+Message-ID: <YOvgsTPba+uQLyDI@infradead.org>
 References: <20210711175415.80173-1-mcroce@linux.microsoft.com>
- <20210711175415.80173-2-mcroce@linux.microsoft.com>
+ <20210711175415.80173-3-mcroce@linux.microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210711175415.80173-2-mcroce@linux.microsoft.com>
+In-Reply-To: <20210711175415.80173-3-mcroce@linux.microsoft.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 11, 2021 at 07:54:11PM +0200, Matteo Croce wrote:
-> +void inc_diskseq(struct gendisk *disk)
-> +{
-> +	disk->diskseq = atomic64_inc_return(&diskseq);
-> +}
-> +EXPORT_SYMBOL_GPL(inc_diskseq);
-
-No need to export inc_diskseq in the new world order.
-
-Otherwise looks good:
+Looks good,
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
