@@ -2,153 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DCBC11F69
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD43FC07E99
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:17:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C9F561008
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D53A61006
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:17:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233399AbhGLXKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jul 2021 19:10:39 -0400
-Received: from mail-ej1-f41.google.com ([209.85.218.41]:37559 "EHLO
-        mail-ej1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233227AbhGLXKi (ORCPT
+        id S231976AbhGLXUI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jul 2021 19:20:08 -0400
+Received: from mail-pg1-f175.google.com ([209.85.215.175]:33490 "EHLO
+        mail-pg1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230019AbhGLXUI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jul 2021 19:10:38 -0400
-Received: by mail-ej1-f41.google.com with SMTP id i20so37789247ejw.4;
-        Mon, 12 Jul 2021 16:07:48 -0700 (PDT)
+        Mon, 12 Jul 2021 19:20:08 -0400
+Received: by mail-pg1-f175.google.com with SMTP id 37so19919832pgq.0;
+        Mon, 12 Jul 2021 16:17:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=yDu7kpWtoefW5J8ZIKzJkCaSnNc2E9IfezCix3rW6U0=;
-        b=P6QAbFR5ecW3UgzPTh86y657LQzeb4DvEaO+z0iH9BWnvUElPHelfP0aZnMNU6hS0k
-         +TpqaQm5tneQZoNXwW2qzk3zcicAnGW8P7GC0lcK2UazEkhGefv79JEQpgOj+kHSiET+
-         pqmBacw3ma2+87JxzqS6XQZPhmSmyTRE4e0HOUG0TunQWZzpZQlIvfKzEjDOo8ExePkB
-         pkIemog3s9O4cLLJf3nSm+VZVjhU32tMkUWsUhD0js4YCrRK3HE/rRjDcmDzYMK2jDbo
-         05MEOS/OWdjFGb6dkSo0w2ck7tQE8Hd6L1QeiJwNp0F1DtZLRunc0bPvAn/tVYX+YXVi
-         owuw==
-X-Gm-Message-State: AOAM530a7Pn5VQ6yLBa30Iaqx9Ia7ABEM9jTVjv9rZsh9nH0W0nI8oOz
-        Ze3UesvBU0KqiP0vnSXOoysdYG2rAr+mBA==
-X-Google-Smtp-Source: ABdhPJzuwVlDk6fjItU6Bzwexmhey6CpWcb7GumzRR2SX43H76HUPpDoB99GJj1ZCYhtsLJ27mLTxg==
-X-Received: by 2002:a17:907:d89:: with SMTP id go9mr1713628ejc.165.1626131267691;
-        Mon, 12 Jul 2021 16:07:47 -0700 (PDT)
-Received: from msft-t490s.fritz.box (host-95-250-115-52.retail.telecomitalia.it. [95.250.115.52])
-        by smtp.gmail.com with ESMTPSA id h3sm5494111ejf.53.2021.07.12.16.07.46
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XJYXu78Otmo9gjq965zqEhcSFFXNrjOldt93lGmVRWY=;
+        b=M8SLFTK1HYQrMiaAozXZDNMl/0kNdu9FNFVptwqgAuqTSwDhayYFyHiHecfbylDVF5
+         Pgd391cMU46wexHtf999zc5V54AtzP073jfdvhMajq/ouk/avdsuhDeyjACTkPgs484q
+         jAubDF/bgS/r6D6mXhFzxejqgAt9v62dI4aSqhXHdtXnxOVfnyz2uH6am43CB4/n4Sgw
+         i03HOjaWTfW1P6a7OFjCsZhxbLM/Hjk1RUDQsh30WxGt3uSxld6CvWAj/vY1l0F+D8lM
+         jdbfzasj/mn4xnrAHw4jzJi7pQMl+QYFhYwrd54asKYqwopVqEmfpghRnwtZZNKAsn96
+         caXg==
+X-Gm-Message-State: AOAM530y3DPviJSAdin99OH0WSFYnh2/TMyi7hhuE+52BRE54I3JZJd2
+        64xEREt78YTHQ+NI0lWY1XM=
+X-Google-Smtp-Source: ABdhPJyvhvuyptKDvvybAUfQSniprveC0Rop1ecCKORddZFqU4wZnKSX02PIPxefhnvmESqN2uB7Wg==
+X-Received: by 2002:a65:50ca:: with SMTP id s10mr1503440pgp.68.1626131839259;
+        Mon, 12 Jul 2021 16:17:19 -0700 (PDT)
+Received: from garbanzo ([191.96.120.37])
+        by smtp.gmail.com with ESMTPSA id b18sm482706pji.39.2021.07.12.16.17.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 16:07:47 -0700 (PDT)
-From:   Matteo Croce <mcroce@linux.microsoft.com>
-To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Subject: [PATCH v5 6/6] loop: raise media_change event
-Date:   Tue, 13 Jul 2021 01:05:30 +0200
-Message-Id: <20210712230530.29323-7-mcroce@linux.microsoft.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210712230530.29323-1-mcroce@linux.microsoft.com>
-References: <20210712230530.29323-1-mcroce@linux.microsoft.com>
+        Mon, 12 Jul 2021 16:17:17 -0700 (PDT)
+Date:   Mon, 12 Jul 2021 16:17:15 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     minchan@kernel.org, gregkh@linuxfoundation.org, jeyu@kernel.org,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        rafael@kernel.org, axboe@kernel.dk, tj@kernel.org, mbenes@suse.com,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 2/3] zram: fix deadlock with sysfs attribute usage and
+ module removal
+Message-ID: <20210712231644.eeaql22odowieomb@garbanzo>
+References: <20210703001958.620899-1-mcgrof@kernel.org>
+ <20210703001958.620899-3-mcgrof@kernel.org>
+ <20210710122851.aae9783ae9b1a703d565cbec@linux-foundation.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210710122851.aae9783ae9b1a703d565cbec@linux-foundation.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Matteo Croce <mcroce@microsoft.com>
+On Sat, Jul 10, 2021 at 12:28:51PM -0700, Andrew Morton wrote:
+> On Fri,  2 Jul 2021 17:19:57 -0700 Luis Chamberlain <mcgrof@kernel.org> wrote:
+> 
+> > +#define MODULE_DEVICE_ATTR_FUNC_STORE(_name) \
+> > +static ssize_t module_ ## _name ## _store(struct device *dev, \
+> > +				   struct device_attribute *attr, \
+> > +				   const char *buf, size_t len) \
+> > +{ \
+> > +	ssize_t __ret; \
+> > +	if (!try_module_get(THIS_MODULE)) \
+> > +		return -ENODEV; \
+> > +	__ret = _name ## _store(dev, attr, buf, len); \
+> > +	module_put(THIS_MODULE); \
+> > +	return __ret; \
+> > +}
+> 
+> I assume that Greg's comments on try_module_get() are applicable here
+> also.
 
-Make the loop device raise a DISK_MEDIA_CHANGE event on attach or detach.
+While we wait for Greg for an alternative, patch #1 is still fine.
 
-	# udevadm monitor -up |grep -e DISK_MEDIA_CHANGE -e DEVNAME &
-
-	# losetup -f zero
-	[    7.454235] loop0: detected capacity change from 0 to 16384
-	DISK_MEDIA_CHANGE=1
-	DEVNAME=/dev/loop0
-	DEVNAME=/dev/loop0
-	DEVNAME=/dev/loop0
-
-	# losetup -f zero
-	[   10.205245] loop1: detected capacity change from 0 to 16384
-	DISK_MEDIA_CHANGE=1
-	DEVNAME=/dev/loop1
-	DEVNAME=/dev/loop1
-	DEVNAME=/dev/loop1
-
-	# losetup -f zero2
-	[   13.532368] loop2: detected capacity change from 0 to 40960
-	DISK_MEDIA_CHANGE=1
-	DEVNAME=/dev/loop2
-	DEVNAME=/dev/loop2
-
-	# losetup -D
-	DEVNAME=/dev/loop1
-	DISK_MEDIA_CHANGE=1
-	DEVNAME=/dev/loop1
-	DEVNAME=/dev/loop2
-	DISK_MEDIA_CHANGE=1
-	DEVNAME=/dev/loop2
-	DEVNAME=/dev/loop0
-	DISK_MEDIA_CHANGE=1
-	DEVNAME=/dev/loop0
-
-Signed-off-by: Matteo Croce <mcroce@microsoft.com>
----
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f37b9e3d833c..f562609b6d53 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -731,6 +731,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 		goto out_err;
- 
- 	/* and ... switch */
-+	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
- 	blk_mq_freeze_queue(lo->lo_queue);
- 	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
- 	lo->lo_backing_file = file;
-@@ -1205,6 +1206,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 		goto out_unlock;
- 	}
- 
-+	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
- 	set_disk_ro(lo->lo_disk, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
- 
- 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
-@@ -1349,6 +1351,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN && bdev;
- 	lo_number = lo->lo_number;
-+	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
- out_unlock:
- 	mutex_unlock(&lo->lo_mutex);
- 	if (partscan) {
-@@ -2325,6 +2328,8 @@ static int loop_add(int i)
- 	disk->fops		= &lo_fops;
- 	disk->private_data	= lo;
- 	disk->queue		= lo->lo_queue;
-+	disk->events		= DISK_EVENT_MEDIA_CHANGE;
-+	disk->event_flags	= DISK_EVENT_FLAG_UEVENT;
- 	sprintf(disk->disk_name, "loop%d", i);
- 	add_disk(disk);
- 	mutex_unlock(&loop_ctl_mutex);
--- 
-2.31.1
-
+  Luis
