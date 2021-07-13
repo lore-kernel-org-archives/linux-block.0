@@ -2,103 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MIME_BASE64_TEXT,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 246CAC11F66
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 14:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1AE8C07E96
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 16:19:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E99D6608FE
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 13:59:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97DCA61166
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 16:19:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236744AbhGMOCs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jul 2021 10:02:48 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:44883 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236750AbhGMOCs (ORCPT
+        id S230153AbhGMQWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jul 2021 12:22:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47972 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230402AbhGMQWJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jul 2021 10:02:48 -0400
-Received: by mail-pl1-f172.google.com with SMTP id o8so1728536plg.11
-        for <linux-block@vger.kernel.org>; Tue, 13 Jul 2021 06:59:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=811SFH/xxVOzsPExEnBlyuKpX/zrfI7/n6Kfonn2mcc=;
-        b=nhn4oWxpqL8U9eWI+Uk5BW6+hz1LyPrZ/Gpg6UbJZ1DT1KuV/YuhDbOSpEr8qHidjr
-         q4rEMXqQLX/yaqm35KH1ttTy2gKPeDXsgMfiPUlhw8fmUPiq8K4F2T0BGSJx47lWfU/6
-         TbJMtHlc1vtsw7wgg6kLoolvD/LRljDtvh0O1+DmL8j9Vbt5rV94MzHZfPgJgRpkUVVF
-         fntF/KglWkZDPDztLQAsIywF8LtUlCq170HnU7d/x8TtUcsIJ51DYznh8C8yPzqMUhTC
-         2iZ9cYM71vVXzd86y6GywUYRwu4MvyJmkF/qrzZTVr9nP1TPxNsMJMBkoZVn5LbGIS3Y
-         0YKQ==
-X-Gm-Message-State: AOAM532r2/fv98oEjdABVHoEs6YajXJUsGHHtPJB+wgCL9FKRfIWORUH
-        ue2ANz8f+f0cOP3kSW5ijDM=
-X-Google-Smtp-Source: ABdhPJxqVhmKnFISCKqcEpiRodkxsjwtvFBloTj6w0JwM1MSL84ezpogs7lZ8X3Nyf2k/aAIIXIR9Q==
-X-Received: by 2002:a17:903:408c:b029:12a:f74f:4b0 with SMTP id z12-20020a170903408cb029012af74f04b0mr3609809plc.65.1626184797159;
-        Tue, 13 Jul 2021 06:59:57 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:38e:7ae8:7e71:3890? ([2601:647:4000:d7:38e:7ae8:7e71:3890])
-        by smtp.gmail.com with ESMTPSA id 31sm21692108pgu.17.2021.07.13.06.59.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jul 2021 06:59:56 -0700 (PDT)
-Subject: Re: [PATCH blktests 1/2] zbd/rc: Support dm-crypt
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
-Cc:     Omar Sandoval <osandov@fb.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-References: <20210713101239.269789-1-shinichiro.kawasaki@wdc.com>
- <20210713101239.269789-2-shinichiro.kawasaki@wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <17ed9d08-ecd2-abb6-544e-33bff88b7504@acm.org>
-Date:   Tue, 13 Jul 2021 06:59:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Tue, 13 Jul 2021 12:22:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626193159;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cPecu7ZNX7bQJ/iS17rhbYrep1HtpV5Xs2IePf8joKs=;
+        b=dDVAjOw/WKfno6rbF/DLgCMsJaY2raE2eoRRDXSuhPQqbsSK83DoLLVzTbuiUKfSkqwGXs
+        Zd0bGHzANs5wq4SK8hGK2KeQ7XTACObxMQxsTSiuHJPJFmJJ20LPdJiZfqVYV2CyLpoKtU
+        kvIR4UFbTk4Do+/fpZV/CY5k8GOqQKo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-482-WVhsITTWO6iMOj6mb1Vxlg-1; Tue, 13 Jul 2021 12:19:18 -0400
+X-MC-Unique: WVhsITTWO6iMOj6mb1Vxlg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B0D5DF8A0;
+        Tue, 13 Jul 2021 16:19:16 +0000 (UTC)
+Received: from localhost (ovpn-112-172.ams2.redhat.com [10.36.112.172])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 32C5C60C2B;
+        Tue, 13 Jul 2021 16:19:16 +0000 (UTC)
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
+        linux-block@vger.kernel.org,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        virtualization@lists.linux-foundation.org,
+        linux-pm@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [RFC 1/3] cpuidle: add poll_source API
+Date:   Tue, 13 Jul 2021 17:19:04 +0100
+Message-Id: <20210713161906.457857-2-stefanha@redhat.com>
+In-Reply-To: <20210713161906.457857-1-stefanha@redhat.com>
+References: <20210713161906.457857-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210713101239.269789-2-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/13/21 3:12 AM, Shin'ichiro Kawasaki wrote:
-> -	# Parse dm table lines for dm-linear or dm-flakey target
-> +	if _test_dev_has_dm_map crypt; then
-> +		dev_idx=6
-> +		off_idx=7
-> +	fi
-> +
-> +	# Parse dm table lines for dm-linear, dm-flakey or dm-crypt target
->  	while read -r -a tbl_line; do
->  		local -i map_start=${tbl_line[0]}
->  		local -i map_end=$((tbl_line[0] + tbl_line[1]))
-> @@ -355,10 +362,11 @@ _get_dev_container_and_sector() {
->  			continue
->  		fi
->  
-> -		offset=${tbl_line[4]}
-> -		if ! cont_dev=$(_get_dev_path_by_id "${tbl_line[3]}"); then
-> +		offset=${tbl_line[off_idx]}
-> +		if ! cont_dev=$(_get_dev_path_by_id \
-> +					"${tbl_line[dev_idx]}"); then
->  			echo -n "Cannot access to container device: "
-> -			echo "${tbl_line[3]}"
-> +			echo "${tbl_line[dev_idx]}"
->  			return 1
->  		fi
+SW50cm9kdWNlIGFuIEFQSSBmb3IgYWRkaW5nIGNwdWlkbGUgcG9sbCBjYWxsYmFja3M6CgogIHN0
+cnVjdCBwb2xsX3NvdXJjZV9vcHMgewogICAgICB2b2lkICgqc3RhcnQpKHN0cnVjdCBwb2xsX3Nv
+dXJjZSAqc3JjKTsKICAgICAgdm9pZCAoKnN0b3ApKHN0cnVjdCBwb2xsX3NvdXJjZSAqc3JjKTsK
+ICAgICAgdm9pZCAoKnBvbGwpKHN0cnVjdCBwb2xsX3NvdXJjZSAqc3JjKTsKICB9OwoKICBpbnQg
+cG9sbF9zb3VyY2VfcmVnaXN0ZXIoc3RydWN0IHBvbGxfc291cmNlICpzcmMpOwogIGludCBwb2xs
+X3NvdXJjZV91bnJlZ2lzdGVyKHN0cnVjdCBwb2xsX3NvdXJjZSAqc3JjKTsKCldoZW4gY3B1aWRs
+ZSBlbnRlcnMgdGhlIHBvbGwgc3RhdGUgaXQgaW52b2tlcyAtPnN0YXJ0KCkgYW5kIHRoZW4gaW52
+b2tlcwotPnBvbGwoKSByZXBlYXRlZGx5IGZyb20gdGhlIGJ1c3kgd2FpdCBsb29wLiBGaW5hbGx5
+IC0+c3RvcCgpIGlzIGludm9rZWQKd2hlbiB0aGUgYnVzeSB3YWl0IGxvb3AgZmluaXNoZXMuCgpU
+aGUgLT5wb2xsKCkgZnVuY3Rpb24gc2hvdWxkIGNoZWNrIGZvciBhY3Rpdml0eSBhbmQgY2F1c2UK
+VElGX05FRURfUkVTQ0hFRCB0byBiZSBzZXQgaW4gb3JkZXIgdG8gc3RvcCB0aGUgYnVzeSB3YWl0
+IGxvb3AuCgpUaGlzIEFQSSBpcyBpbnRlbmRlZCB0byBiZSB1c2VkIGJ5IGRyaXZlcnMgdGhhdCBj
+YW4gY2hlYXBseSBwb2xsIGZvcgpldmVudHMuIFBhcnRpY2lwYXRpbmcgaW4gY3B1aWRsZSBwb2xs
+aW5nIGFsbG93cyB0aGVtIHRvIGF2b2lkIGludGVycnVwdApsYXRlbmNpZXMgZHVyaW5nIHBlcmlv
+ZHMgd2hlcmUgdGhlIENQVSBpcyBnb2luZyB0byBwb2xsIGFueXdheS4KCk5vdGUgdGhhdCBlYWNo
+IHBvbGxfc291cmNlIGlzIGJvdW5kIHRvIGEgcGFydGljdWxhciBDUFUuIFRoZSBBUEkgaXMKbWFp
+bmx5IGludGVuZGVkIHRvIGJ5IHVzZWQgYnkgZHJpdmVycyB0aGF0IGhhdmUgbXVsdGlwbGUgcXVl
+dWVzIHdpdGggaXJxCmFmZmluaXR5LgoKU2lnbmVkLW9mZi1ieTogU3RlZmFuIEhham5vY3ppIDxz
+dGVmYW5oYUByZWRoYXQuY29tPgotLS0KIGRyaXZlcnMvY3B1aWRsZS9NYWtlZmlsZSAgICAgIHwg
+IDEgKwogaW5jbHVkZS9saW51eC9wb2xsX3NvdXJjZS5oICAgfCA1MyArKysrKysrKysrKysrKysr
+KysrCiBkcml2ZXJzL2NwdWlkbGUvcG9sbF9zb3VyY2UuYyB8IDk5ICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrCiBkcml2ZXJzL2NwdWlkbGUvcG9sbF9zdGF0ZS5jICB8ICA2ICsr
+KwogNCBmaWxlcyBjaGFuZ2VkLCAxNTkgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1vZGUgMTAwNjQ0
+IGluY2x1ZGUvbGludXgvcG9sbF9zb3VyY2UuaAogY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMv
+Y3B1aWRsZS9wb2xsX3NvdXJjZS5jCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcHVpZGxlL01ha2Vm
+aWxlIGIvZHJpdmVycy9jcHVpZGxlL01ha2VmaWxlCmluZGV4IDI2YmJjNWU3NDEyMy4uOTk0Zjcy
+ZDZmZTk1IDEwMDY0NAotLS0gYS9kcml2ZXJzL2NwdWlkbGUvTWFrZWZpbGUKKysrIGIvZHJpdmVy
+cy9jcHVpZGxlL01ha2VmaWxlCkBAIC03LDYgKzcsNyBAQCBvYmoteSArPSBjcHVpZGxlLm8gZHJp
+dmVyLm8gZ292ZXJub3IubyBzeXNmcy5vIGdvdmVybm9ycy8KIG9iai0kKENPTkZJR19BUkNIX05F
+RURTX0NQVV9JRExFX0NPVVBMRUQpICs9IGNvdXBsZWQubwogb2JqLSQoQ09ORklHX0RUX0lETEVf
+U1RBVEVTKQkJICArPSBkdF9pZGxlX3N0YXRlcy5vCiBvYmotJChDT05GSUdfQVJDSF9IQVNfQ1BV
+X1JFTEFYKQkgICs9IHBvbGxfc3RhdGUubworb2JqLSQoQ09ORklHX0FSQ0hfSEFTX0NQVV9SRUxB
+WCkJICArPSBwb2xsX3NvdXJjZS5vCiBvYmotJChDT05GSUdfSEFMVFBPTExfQ1BVSURMRSkJCSAg
+Kz0gY3B1aWRsZS1oYWx0cG9sbC5vCiAKICMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKZGlmZiAt
+LWdpdCBhL2luY2x1ZGUvbGludXgvcG9sbF9zb3VyY2UuaCBiL2luY2x1ZGUvbGludXgvcG9sbF9z
+b3VyY2UuaApuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwMDAwMDAuLmNjZmI0MjRl
+MTcwYgotLS0gL2Rldi9udWxsCisrKyBiL2luY2x1ZGUvbGludXgvcG9sbF9zb3VyY2UuaApAQCAt
+MCwwICsxLDUzIEBACisvKiBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vci1sYXRl
+ciAqLworLyoKKyAqIHBvbGxfc291cmNlLmggLSBjcHVpZGxlIGJ1c3kgd2FpdGluZyBBUEkKKyAq
+LworI2lmbmRlZiBfX0xJTlVYX1BPTExTT1VSQ0VfSF9fCisjZGVmaW5lIF9fTElOVVhfUE9MTFNP
+VVJDRV9IX18KKworI2luY2x1ZGUgPGxpbnV4L2xpc3QuaD4KKworc3RydWN0IHBvbGxfc291cmNl
+OworCitzdHJ1Y3QgcG9sbF9zb3VyY2Vfb3BzIHsKKwl2b2lkICgqc3RhcnQpKHN0cnVjdCBwb2xs
+X3NvdXJjZSAqc3JjKTsKKwl2b2lkICgqc3RvcCkoc3RydWN0IHBvbGxfc291cmNlICpzcmMpOwor
+CXZvaWQgKCpwb2xsKShzdHJ1Y3QgcG9sbF9zb3VyY2UgKnNyYyk7Cit9OworCitzdHJ1Y3QgcG9s
+bF9zb3VyY2UgeworCWNvbnN0IHN0cnVjdCBwb2xsX3NvdXJjZV9vcHMgKm9wczsKKwlzdHJ1Y3Qg
+bGlzdF9oZWFkIG5vZGU7CisJaW50IGNwdTsKK307CisKKy8qKgorICogcG9sbF9zb3VyY2VfcmVn
+aXN0ZXIgLSBBZGQgYSBwb2xsX3NvdXJjZSBmb3IgYSBDUFUKKyAqLworI2lmIGRlZmluZWQoQ09O
+RklHX0NQVV9JRExFKSAmJiBkZWZpbmVkKENPTkZJR19BUkNIX0hBU19DUFVfUkVMQVgpCitpbnQg
+cG9sbF9zb3VyY2VfcmVnaXN0ZXIoc3RydWN0IHBvbGxfc291cmNlICpzcmMpOworI2Vsc2UKK3N0
+YXRpYyBpbmxpbmUgaW50IHBvbGxfc291cmNlX3JlZ2lzdGVyKHN0cnVjdCBwb2xsX3NvdXJjZSAq
+c3JjKQoreworCXJldHVybiAwOworfQorI2VuZGlmCisKKy8qKgorICogcG9sbF9zb3VyY2VfdW5y
+ZWdpc3RlciAtIFJlbW92ZSBhIHByZXZpb3VzbHkgcmVnaXN0ZXJlZCBwb2xsX3NvdXJjZQorICov
+CisjaWYgZGVmaW5lZChDT05GSUdfQ1BVX0lETEUpICYmIGRlZmluZWQoQ09ORklHX0FSQ0hfSEFT
+X0NQVV9SRUxBWCkKK2ludCBwb2xsX3NvdXJjZV91bnJlZ2lzdGVyKHN0cnVjdCBwb2xsX3NvdXJj
+ZSAqc3JjKTsKKyNlbHNlCitzdGF0aWMgaW5saW5lIGludCBwb2xsX3NvdXJjZV91bnJlZ2lzdGVy
+KHN0cnVjdCBwb2xsX3NvdXJjZSAqc3JjKQoreworCXJldHVybiAwOworfQorI2VuZGlmCisKKy8q
+IFVzZWQgYnkgdGhlIGNwdWlkbGUgZHJpdmVyICovCit2b2lkIHBvbGxfc291cmNlX3N0YXJ0KHZv
+aWQpOwordm9pZCBwb2xsX3NvdXJjZV9ydW5fb25jZSh2b2lkKTsKK3ZvaWQgcG9sbF9zb3VyY2Vf
+c3RvcCh2b2lkKTsKKworI2VuZGlmIC8qIF9fTElOVVhfUE9MTFNPVVJDRV9IX18gKi8KZGlmZiAt
+LWdpdCBhL2RyaXZlcnMvY3B1aWRsZS9wb2xsX3NvdXJjZS5jIGIvZHJpdmVycy9jcHVpZGxlL3Bv
+bGxfc291cmNlLmMKbmV3IGZpbGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMDAwMDAwLi40NjEw
+MGU1YTcxZTQKLS0tIC9kZXYvbnVsbAorKysgYi9kcml2ZXJzL2NwdWlkbGUvcG9sbF9zb3VyY2Uu
+YwpAQCAtMCwwICsxLDk5IEBACisvLyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1v
+ci1sYXRlcgorLyoKKyAqIHBvbGxfc291cmNlLmMgLSBjcHVpZGxlIGJ1c3kgd2FpdGluZyBBUEkK
+KyAqLworCisjaW5jbHVkZSA8bGludXgvbG9ja2RlcC5oPgorI2luY2x1ZGUgPGxpbnV4L3BlcmNw
+dS5oPgorI2luY2x1ZGUgPGxpbnV4L3BvbGxfc291cmNlLmg+CisKKy8qIFRoZSBwZXItY3B1IGxp
+c3Qgb2YgcmVnaXN0ZXJlZCBwb2xsIHNvdXJjZXMgKi8KK0RFRklORV9QRVJfQ1BVKHN0cnVjdCBs
+aXN0X2hlYWQsIHBvbGxfc291cmNlX2xpc3QpOworCisvKiBDYWxsZWQgZnJvbSBpZGxlIHRhc2sg
+d2l0aCBUSUZfUE9MTElOR19OUkZMQUcgc2V0IGFuZCBpcnFzIGVuYWJsZWQgKi8KK3ZvaWQgcG9s
+bF9zb3VyY2Vfc3RhcnQodm9pZCkKK3sKKwlzdHJ1Y3QgcG9sbF9zb3VyY2UgKnNyYzsKKworCWxp
+c3RfZm9yX2VhY2hfZW50cnkoc3JjLCB0aGlzX2NwdV9wdHIoJnBvbGxfc291cmNlX2xpc3QpLCBu
+b2RlKQorCQlzcmMtPm9wcy0+c3RhcnQoc3JjKTsKK30KKworLyogQ2FsbGVkIGZyb20gaWRsZSB0
+YXNrIHdpdGggVElGX1BPTExJTkdfTlJGTEFHIHNldCBhbmQgaXJxcyBlbmFibGVkICovCit2b2lk
+IHBvbGxfc291cmNlX3J1bl9vbmNlKHZvaWQpCit7CisJc3RydWN0IHBvbGxfc291cmNlICpzcmM7
+CisKKwlsaXN0X2Zvcl9lYWNoX2VudHJ5KHNyYywgdGhpc19jcHVfcHRyKCZwb2xsX3NvdXJjZV9s
+aXN0KSwgbm9kZSkKKwkJc3JjLT5vcHMtPnBvbGwoc3JjKTsKK30KKworLyogQ2FsbGVkIGZyb20g
+aWRsZSB0YXNrIHdpdGggVElGX1BPTExJTkdfTlJGTEFHIHNldCBhbmQgaXJxcyBlbmFibGVkICov
+Cit2b2lkIHBvbGxfc291cmNlX3N0b3Aodm9pZCkKK3sKKwlzdHJ1Y3QgcG9sbF9zb3VyY2UgKnNy
+YzsKKworCWxpc3RfZm9yX2VhY2hfZW50cnkoc3JjLCB0aGlzX2NwdV9wdHIoJnBvbGxfc291cmNl
+X2xpc3QpLCBub2RlKQorCQlzcmMtPm9wcy0+c3RvcChzcmMpOworfQorCitzdGF0aWMgdm9pZCBw
+b2xsX3NvdXJjZV9yZWdpc3Rlcl90aGlzX2NwdSh2b2lkICpvcGFxdWUpCit7CisJc3RydWN0IHBv
+bGxfc291cmNlICpzcmMgPSBvcGFxdWU7CisKKwlsb2NrZGVwX2Fzc2VydF9pcnFzX2Rpc2FibGVk
+KCk7CisKKwlsaXN0X2FkZF90YWlsKCZzcmMtPm5vZGUsIHRoaXNfY3B1X3B0cigmcG9sbF9zb3Vy
+Y2VfbGlzdCkpOworfQorCitpbnQgcG9sbF9zb3VyY2VfcmVnaXN0ZXIoc3RydWN0IHBvbGxfc291
+cmNlICpzcmMpCit7CisJaWYgKCFsaXN0X2VtcHR5KCZzcmMtPm5vZGUpKQorCQlyZXR1cm4gLUVC
+VVNZOworCisJLyoKKwkgKiBUaGVyZSBpcyBubyByYWNlIHdpdGggc3JjLT5jcHUgaXRlcmF0aW5n
+IG92ZXIgcG9sbF9zb3VyY2VfbGlzdAorCSAqIGJlY2F1c2Ugc21wX2NhbGxfZnVuY3Rpb25fc2lu
+Z2xlKCkganVzdCBzZXRzIFRJRl9ORUVEX1JFU0NIRUQKKwkgKiBpbnN0ZWFkIG9mIHNlbmRpbmcg
+YW4gSVBJIGR1cmluZyBpZGxlLgorCSAqLworCS8qIFRPRE8gYnV0IHdoYXQgaGFwcGVucyBpZiB0
+aGUgZmxhZyBpc24ndCBzZXQgeWV0IHdoZW4gc21wX2NhbGxfZnVuY3Rpb25fc2luZ2xlKCkgaXMg
+aW52b2tlZD8gKi8KKwlyZXR1cm4gc21wX2NhbGxfZnVuY3Rpb25fc2luZ2xlKHNyYy0+Y3B1LAor
+CQkJCQlwb2xsX3NvdXJjZV9yZWdpc3Rlcl90aGlzX2NwdSwKKwkJCQkJc3JjLAorCQkJCQkxKTsK
+K30KK0VYUE9SVF9TWU1CT0xfR1BMKHBvbGxfc291cmNlX3JlZ2lzdGVyKTsKKworc3RhdGljIHZv
+aWQgcG9sbF9zb3VyY2VfdW5yZWdpc3Rlcl90aGlzX2NwdSh2b2lkICpvcGFxdWUpCit7CisJc3Ry
+dWN0IHBvbGxfc291cmNlICpzcmMgPSBvcGFxdWU7CisKKwlsb2NrZGVwX2Fzc2VydF9pcnFzX2Rp
+c2FibGVkKCk7CisKKwkvKgorCSAqIFNlZSBjb21tZW50IGluIHBvbGxfc291cmNlX3JlZ2lzdGVy
+KCkgYWJvdXQgd2h5IHRoaXMgZG9lcyBub3QgcmFjZQorCSAqIHdpdGggdGhlIGlkbGUgQ1BVIGl0
+ZXJhdGluZyBvdmVyIHBvbGxfc291cmNlX2xpc3QuCisJICovCisJbGlzdF9kZWxfaW5pdCgmc3Jj
+LT5ub2RlKTsKK30KKworaW50IHBvbGxfc291cmNlX3VucmVnaXN0ZXIoc3RydWN0IHBvbGxfc291
+cmNlICpzcmMpCit7CisJcmV0dXJuIHNtcF9jYWxsX2Z1bmN0aW9uX3NpbmdsZShzcmMtPmNwdSwK
+KwkJCQkJcG9sbF9zb3VyY2VfdW5yZWdpc3Rlcl90aGlzX2NwdSwKKwkJCQkJc3JjLAorCQkJCQkx
+KTsKK30KK0VYUE9SVF9TWU1CT0xfR1BMKHBvbGxfc291cmNlX3VucmVnaXN0ZXIpOworCisvKiBU
+T0RPIHdoYXQgaGFwcGVucyB3aGVuIGEgQ1BVIGdvZXMgb2ZmbGluZT8gKi8KK3N0YXRpYyBpbnQg
+X19pbml0IHBvbGxfc291cmNlX2luaXQodm9pZCkKK3sKKwlpbnQgaTsKKworCWZvcl9lYWNoX3Bv
+c3NpYmxlX2NwdShpKQorCQlJTklUX0xJU1RfSEVBRCgmcGVyX2NwdShwb2xsX3NvdXJjZV9saXN0
+LCBpKSk7CisKKwlyZXR1cm4gMDsKK30KK2NvcmVfaW5pdGNhbGwocG9sbF9zb3VyY2VfaW5pdCk7
+CmRpZmYgLS1naXQgYS9kcml2ZXJzL2NwdWlkbGUvcG9sbF9zdGF0ZS5jIGIvZHJpdmVycy9jcHVp
+ZGxlL3BvbGxfc3RhdGUuYwppbmRleCBmN2U4MzYxM2FlOTQuLmFhMjY4NzAwMzRhYyAxMDA2NDQK
+LS0tIGEvZHJpdmVycy9jcHVpZGxlL3BvbGxfc3RhdGUuYworKysgYi9kcml2ZXJzL2NwdWlkbGUv
+cG9sbF9zdGF0ZS5jCkBAIC03LDYgKzcsNyBAQAogI2luY2x1ZGUgPGxpbnV4L3NjaGVkLmg+CiAj
+aW5jbHVkZSA8bGludXgvc2NoZWQvY2xvY2suaD4KICNpbmNsdWRlIDxsaW51eC9zY2hlZC9pZGxl
+Lmg+CisjaW5jbHVkZSA8bGludXgvcG9sbF9zb3VyY2UuaD4KIAogI2RlZmluZSBQT0xMX0lETEVf
+UkVMQVhfQ09VTlQJMjAwCiAKQEAgLTIyLDkgKzIzLDEyIEBAIHN0YXRpYyBpbnQgX19jcHVpZGxl
+IHBvbGxfaWRsZShzdHJ1Y3QgY3B1aWRsZV9kZXZpY2UgKmRldiwKIAkJdW5zaWduZWQgaW50IGxv
+b3BfY291bnQgPSAwOwogCQl1NjQgbGltaXQ7CiAKKwkJcG9sbF9zb3VyY2Vfc3RhcnQoKTsKKwog
+CQlsaW1pdCA9IGNwdWlkbGVfcG9sbF90aW1lKGRydiwgZGV2KTsKIAogCQl3aGlsZSAoIW5lZWRf
+cmVzY2hlZCgpKSB7CisJCQlwb2xsX3NvdXJjZV9ydW5fb25jZSgpOwogCQkJY3B1X3JlbGF4KCk7
+CiAJCQlpZiAobG9vcF9jb3VudCsrIDwgUE9MTF9JRExFX1JFTEFYX0NPVU5UKQogCQkJCWNvbnRp
+bnVlOwpAQCAtMzUsNiArMzksOCBAQCBzdGF0aWMgaW50IF9fY3B1aWRsZSBwb2xsX2lkbGUoc3Ry
+dWN0IGNwdWlkbGVfZGV2aWNlICpkZXYsCiAJCQkJYnJlYWs7CiAJCQl9CiAJCX0KKworCQlwb2xs
+X3NvdXJjZV9zdG9wKCk7CiAJfQogCWN1cnJlbnRfY2xyX3BvbGxpbmcoKTsKIAotLSAKMi4zMS4x
+Cgo=
 
-To me the above code looks like code that is hard to maintain. Can the
-above parser be replaced by reading /sys/block/*/slaves? An example from
-my workstation for dm-crypt:
-
-$ ls /sys/block/dm-0/slaves
-nvme0n1p2
-
-Thanks,
-
-Bart.
