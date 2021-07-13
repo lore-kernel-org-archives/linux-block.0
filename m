@@ -2,66 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB20DC07E95
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 08:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B0FC07E95
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 10:12:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6AE2611AB
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 08:18:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1B3861249
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 10:12:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234431AbhGMIVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jul 2021 04:21:30 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:21793 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234157AbhGMIVa (ORCPT
+        id S235152AbhGMKPb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jul 2021 06:15:31 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:23428 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235143AbhGMKPa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jul 2021 04:21:30 -0400
+        Tue, 13 Jul 2021 06:15:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1626164320; x=1657700320;
-  h=from:to:subject:date:message-id:mime-version:
+  t=1626171160; x=1657707160;
+  h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=Erd4UruOIhH9MWFQzDkFvEPxiSHNH4RzYIul1nAZm30=;
-  b=jSl6R3ZAKEwbHu+N/7fDtwCUcw6xNnQs6VuncxxEs/+Sq9RGErD7MvW3
-   sH9/En/FifkmY+OlHfY1xTjm7aFrytP0nroqyIi1rkF4pfnLGs+rva1OQ
-   Q2UzDIRu21kx90bebDzZou9W57t7+UrAVQWZl13tEk4/AZJ4NF6QrEkoz
-   GPIlla2bSkD6Kdnn8o1+vOm/4HjSbEdGN/9V9acwCOPE9YkxU+t/RLdke
-   rOYXpAlb1Z0Nl586ZJPd0tRHuCPj8OK1ENFG93Em+njmN62VBM0zYLg2g
-   1nSEl2NrA2a03UTV7v5vbgQsE+vRfB8pzJn1xeqh0FoyKUueAH6gTGvRR
+  bh=fnTl48V1hvMqE+1LOwj78jm6oI3Af0znRjjZmVVHepY=;
+  b=DJMpLViEYYM4aJpg6QwBGfqL6q62ZqFbRwFq8EjL+8ojvdcUaSlqIqGm
+   7ftW7lNis85eMQAIKfPzZMr3wc+c5Ieeq/DwpBA4UvaJFTQ1Pmyj3R/e0
+   eX5q/hhW5Tk8EdCk4VzdMB+9crM5pcPEx6QGyJGjF03P1Al2TJ6bj4APC
+   htJlV09D1Dx+2FJudV+c00NnGWEaiAeGgSO1Bvcext9ErixM8X/BWHje2
+   30u3kCE80b4gHSuS7kK36rgR76f2jPaMQjjoqF0bTACSb8VjTHkE4xqKO
+   Yu16P045+1j7XN5cN18DGuNAbNekCAicx3lS7h0dC0xZnoqaw0wDixxPd
    g==;
-IronPort-SDR: EVPAK9ugVksFN/LjCAWiNyeKNxSrJFOP+FaHs3k3p7tE+4vtqphdsU+D9BsDujPmrSON+uzUGF
- pwWVHDygNwSMV9kmeqKMSJnZybcbg4XFHwYur4l731KCZN/yoPJ7XYlTnC9d0RTRCtMlrRz+Ma
- +3fpYhpN3pvaFpUDrHZTyQ6RVqqjDCXgVKBnRS3om6JJAiIdWAKHsUXcKVx2PiZ+H20a8Y1EkU
- rRp1r07x9q8RQyAbwzF+3DVD76ZKgVWEBt10XWFSVZXjNarCyqyA0PW2kmdRacgXV3s03qGnBK
- NgA=
+IronPort-SDR: NX8OEHI6OSNaN26QWJHblfGO7YO3NJvFI8LbyhZh2EDQ3Egu6Nz5HmclWxUBpROugez4rFpFjP
+ /V+gt0/CbEHuX0wcrWNMXhk69rbvODRvuQbK6JTNJ5S0dQkddjk/ezmIq1rL9meVTzwzKjAO+7
+ Ko02g0LguC3LhAuTJzL5hKe5Gne+8AG9Dh5ZX9+p1Xs6DAqXalpEWhASW87FXxIFrpRRwhWDn7
+ upTzaYV03mJXOrr0XOeoRGPleTawsQGJv3lgsZa4Kwgaw3v/dSSJ3XFY0SEHHWp6rGMvzIX8JQ
+ GR4=
 X-IronPort-AV: E=Sophos;i="5.84,236,1620662400"; 
-   d="scan'208";a="179249431"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Jul 2021 16:18:40 +0800
-IronPort-SDR: hDfDwt4tfsXSnYiQ0P7zCuhBiqXd9VhmwTSlwFjjhVMNCNMmDM0dLRNNRiZ/SF+2oP1cujaL5D
- 7oGfr8j2mapt+oWY1Ex8N8adrYQPZa3x8xcMGmlDF1d7EA1MeZPEe4CbzOP4D+XdLNOi65tGJP
- jFu+zAXZadJCOXFmfmLua3cpKdd/qjZ+6iCAEfIISFKxmOVtm+sJO8dmsJ76drkqtxU+fGn5p8
- rncq2zHo/GxqdSN4YyBJAIKsgVcYlshrvIeKMyOLubdx7b4l+6ftTOAHL9//eJxBkCIWOhsNq1
- u1lmfRX71dfz/Sok5gKIQOEV
+   d="scan'208";a="173685549"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Jul 2021 18:12:40 +0800
+IronPort-SDR: zGrCHdyO8JJt9XlItZlx64lVceygKqtSREmOXyHOT79oFjBi2E+D9MCZgVPpSuoePprmS37iY1
+ TOZWW5eUBP5Y0qeSoq53bPyoC3/5ESQFR8zi4KgHkGLFojMqQCMUN2r0blF/nQXa0LpNj7bsMt
+ Eb2JrSjtCxPTGNbOzV2vp0am3z4wY0+7+RUzP551ptMNTQhofA+hO6h+bZFU88NtQcCRVtPHaj
+ eCJ9YOz8hiv1eB/fuEKWyYxxUmxbtd3Y3KoaX0M9r0ryXIlN0mjFB4YszIlVV0jb14vFyXk5s2
+ LDEQEVVjO/q6e2bBnHvuffJy
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2021 00:55:23 -0700
-IronPort-SDR: FZini2tExTGFePXDkHYknKelRORYr52rTw6aW7pwTjR7XUFzH+BGpqQ7cpA+WZZtI3Ru9FN2HT
- QD/7qIA4oQ/zMrPzesCekR4H4nBFCM7X/Gnt1awPpyfjoB/tLyTPE8Fn089bY8B6kZtfDfQWMk
- qaduvahcsECr+hkehgF7cBLGASjGPa0c1ec8/gBsPkYwHUqFO082A+IEc1lodIYzcNI68BBjGK
- 2EqJdu5B/iOg8waeVwJG/wGPg+svQUDyKATmnYNDI82WEUL/2fCiVXwpZJ8k2vqah3/K0kSH1S
- EpU=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2021 02:49:24 -0700
+IronPort-SDR: EXrKp1QfzJle8/Wxl2mYG2kmFg0Gba3Aql9OmrPITu6H1TrQRyBxhYAEfuHX6qrNcXy77kW6hT
+ dPuoTQV8aELzb86sdIvzaHdAy9Et0UHEWxHSFKFbtpLebDWB3Nv8+Me9SayuVbZcIk/74y/ndN
+ CEp1NZkZHxT231AzEY19toUUUwa54WlrdeEwG9tNbM7ofkaFVw9xjkROjVkXCe4wvUXTUlgV/4
+ lqYHeFJGeykgrwBZOrue4MuOkNc/ml5wvHtoSDw5B2UEGRYNST2SfqUaayODuwN/JgXSOTEnLY
+ Jrw=
 WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 13 Jul 2021 01:18:40 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: remove blk-mq-sysfs dead code
-Date:   Tue, 13 Jul 2021 17:18:37 +0900
-Message-Id: <20210713081837.524422-1-damien.lemoal@wdc.com>
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.173])
+  by uls-op-cesaip02.wdc.com with ESMTP; 13 Jul 2021 03:12:40 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
+Cc:     Omar Sandoval <osandov@fb.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 0/2] zbd: Support dm-crypt
+Date:   Tue, 13 Jul 2021 19:12:37 +0900
+Message-Id: <20210713101239.269789-1-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -69,106 +74,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In block/blk-mq-sysfs.c, struct blk_mq_ctx_sysfs_entry is not used to
-define any attribute since the "mq" sysfs directory contains only
-sub-directories (no attribute files). As a result, blk_mq_sysfs_show(),
-blk_mq_sysfs_store(), and struct sysfs_ops blk_mq_sysfs_ops are all
-unused and unnecessary. Remove all this unused code.
+Linux kernel 5.9 added zoned block device support to dm-crypt. With this zoned
+dm-crypt device, zbd group test cases pass except zbd/007. This series makes
+required changes to allow the test case zbd/007 pass with zoned dm-cyrpt
+devices. The first patch adds dm-crypt support to the helper function
+_get_dev_container_and_sector(). The second patch wipes out broken data on the
+dm-crypt devices which was left after the test case run.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-mq-sysfs.c | 55 --------------------------------------------
- 1 file changed, 55 deletions(-)
+Shin'ichiro Kawasaki (2):
+  zbd/rc: Support dm-crypt
+  zbd/007: Reset test target zones at test end
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 7b52e7657b2d..253c857cba47 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -45,60 +45,12 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
- 	kfree(hctx);
- }
- 
--struct blk_mq_ctx_sysfs_entry {
--	struct attribute attr;
--	ssize_t (*show)(struct blk_mq_ctx *, char *);
--	ssize_t (*store)(struct blk_mq_ctx *, const char *, size_t);
--};
--
- struct blk_mq_hw_ctx_sysfs_entry {
- 	struct attribute attr;
- 	ssize_t (*show)(struct blk_mq_hw_ctx *, char *);
- 	ssize_t (*store)(struct blk_mq_hw_ctx *, const char *, size_t);
- };
- 
--static ssize_t blk_mq_sysfs_show(struct kobject *kobj, struct attribute *attr,
--				 char *page)
--{
--	struct blk_mq_ctx_sysfs_entry *entry;
--	struct blk_mq_ctx *ctx;
--	struct request_queue *q;
--	ssize_t res;
--
--	entry = container_of(attr, struct blk_mq_ctx_sysfs_entry, attr);
--	ctx = container_of(kobj, struct blk_mq_ctx, kobj);
--	q = ctx->queue;
--
--	if (!entry->show)
--		return -EIO;
--
--	mutex_lock(&q->sysfs_lock);
--	res = entry->show(ctx, page);
--	mutex_unlock(&q->sysfs_lock);
--	return res;
--}
--
--static ssize_t blk_mq_sysfs_store(struct kobject *kobj, struct attribute *attr,
--				  const char *page, size_t length)
--{
--	struct blk_mq_ctx_sysfs_entry *entry;
--	struct blk_mq_ctx *ctx;
--	struct request_queue *q;
--	ssize_t res;
--
--	entry = container_of(attr, struct blk_mq_ctx_sysfs_entry, attr);
--	ctx = container_of(kobj, struct blk_mq_ctx, kobj);
--	q = ctx->queue;
--
--	if (!entry->store)
--		return -EIO;
--
--	mutex_lock(&q->sysfs_lock);
--	res = entry->store(ctx, page, length);
--	mutex_unlock(&q->sysfs_lock);
--	return res;
--}
--
- static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
- 				    struct attribute *attr, char *page)
- {
-@@ -198,23 +150,16 @@ static struct attribute *default_hw_ctx_attrs[] = {
- };
- ATTRIBUTE_GROUPS(default_hw_ctx);
- 
--static const struct sysfs_ops blk_mq_sysfs_ops = {
--	.show	= blk_mq_sysfs_show,
--	.store	= blk_mq_sysfs_store,
--};
--
- static const struct sysfs_ops blk_mq_hw_sysfs_ops = {
- 	.show	= blk_mq_hw_sysfs_show,
- 	.store	= blk_mq_hw_sysfs_store,
- };
- 
- static struct kobj_type blk_mq_ktype = {
--	.sysfs_ops	= &blk_mq_sysfs_ops,
- 	.release	= blk_mq_sysfs_release,
- };
- 
- static struct kobj_type blk_mq_ctx_ktype = {
--	.sysfs_ops	= &blk_mq_sysfs_ops,
- 	.release	= blk_mq_ctx_sysfs_release,
- };
- 
+ tests/zbd/007 |  7 +++++++
+ tests/zbd/rc  | 20 ++++++++++++++------
+ 2 files changed, 21 insertions(+), 6 deletions(-)
+
 -- 
 2.31.1
 
