@@ -2,135 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9121AC07E99
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F265C11F66
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 01:14:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CBDC6115A
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jul 2021 23:25:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7D1061248
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jul 2021 01:14:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231289AbhGLX2R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jul 2021 19:28:17 -0400
-Received: from mail-ej1-f41.google.com ([209.85.218.41]:35475 "EHLO
-        mail-ej1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231205AbhGLX2R (ORCPT
+        id S233527AbhGMBR3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jul 2021 21:17:29 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:11292 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233015AbhGMBR2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jul 2021 19:28:17 -0400
-Received: by mail-ej1-f41.google.com with SMTP id gn32so37901460ejc.2;
-        Mon, 12 Jul 2021 16:25:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=H563yEm0J6K2K6xru5IzDuO+9clWz/y4OULndG63lZQ=;
-        b=n3MNN9LgrB6upN2PCZ08rT18zBbSrAtu0LV3s6pRBSkNAPPS1ykZlZ+G6NlhUwc2g5
-         JxHEhHYCI/HUk9iMHjtPIW8NogqQ2ZY0gonBF7kEhRWZTZWmrbfjZTRRR9lPJ1TShZ+2
-         aH1L2vCk7OF+k5SWgfFs9oGtCvmLgzYPTscqY1hWyl4vgsqAa+MOkeDCpOBzXwIEdqA6
-         14/qEyyhqzKB1iBgqHKBv7bJ06W9bh5elcx5Vt+KsViRdlKgsqeL/Vm/3mGngHp+sccU
-         hUreb142lSZOuKgT+6asjUtD4H3ajVJUeyDDlYgwi16Ljc8dU95NC62sH474MoigEbeW
-         dgYg==
-X-Gm-Message-State: AOAM5318u2xfy53AY/hqBrB9SA20cYmWyGZmPjTJNSZ2xHbRvfAsjWk4
-        lzLvby3wXVJr/LZZZDaw/r0=
-X-Google-Smtp-Source: ABdhPJzOxmMx2OGBYBjWUtpT596k9B7h1Eu/IV82RZK7jMwhWkMSvM5AZYmuqHZnWd0REitXiUH1RQ==
-X-Received: by 2002:a17:906:2dc4:: with SMTP id h4mr1727419eji.528.1626132327523;
-        Mon, 12 Jul 2021 16:25:27 -0700 (PDT)
-Received: from localhost (host-95-250-115-52.retail.telecomitalia.it. [95.250.115.52])
-        by smtp.gmail.com with ESMTPSA id p23sm8910919edw.94.2021.07.12.16.25.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 16:25:26 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 01:25:22 +0200
-From:   Matteo Croce <mcroce@linux.microsoft.com>
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Lennart Poettering" <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        Javier =?UTF-8?B?R29uesOhbGV6?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v4 3/5] block: add ioctl to read the disk sequence
- number
-Message-ID: <20210713012522.70abe32e@linux.microsoft.com>
-In-Reply-To: <TU4PR8401MB10558BB52D2F37CFC96FB8B8AB159@TU4PR8401MB1055.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20210711175415.80173-1-mcroce@linux.microsoft.com>
-        <20210711175415.80173-4-mcroce@linux.microsoft.com>
-        <TU4PR8401MB10558BB52D2F37CFC96FB8B8AB159@TU4PR8401MB1055.NAMPRD84.PROD.OUTLOOK.COM>
-Organization: Microsoft
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Mon, 12 Jul 2021 21:17:28 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GP2cL5jbTz78jV;
+        Tue, 13 Jul 2021 09:10:10 +0800 (CST)
+Received: from dggpeml500025.china.huawei.com (7.185.36.35) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 13 Jul 2021 09:14:38 +0800
+Received: from [10.174.176.117] (10.174.176.117) by
+ dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 13 Jul 2021 09:14:37 +0800
+Subject: Re: [PATCH] block: ensure the memory order between bi_private and
+ bi_status
+From:   Hou Tao <houtao1@huawei.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <yukuai3@huawei.com>, Ming Lei <ming.lei@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+References: <20210701113537.582120-1-houtao1@huawei.com>
+ <0fde8c5a-2c1d-4439-7c75-71fa120d3b62@huawei.com>
+Message-ID: <da5a7284-89f2-31c2-80d9-d8c6348be26a@huawei.com>
+Date:   Tue, 13 Jul 2021 09:14:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <0fde8c5a-2c1d-4439-7c75-71fa120d3b62@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.176.117]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500025.china.huawei.com (7.185.36.35)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 12 Jul 2021 19:22:43 +0000
-"Elliott, Robert (Servers)" <elliott@hpe.com> wrote:
+ping ?
 
-> 
-> 
-> > -----Original Message-----
-> > From: Matteo Croce <mcroce@linux.microsoft.com>
-> > Sent: Sunday, July 11, 2021 12:54 PM
-> ...
-> > Subject: [PATCH v4 3/5] block: add ioctl to read the disk sequence
-> > number
-> > 
-> > From: Matteo Croce <mcroce@microsoft.com>
-> > 
-> > Add a new BLKGETDISKSEQ ioctl which retrieves the disk sequence
-> > number from the genhd structure.
-> ...
-> 
-> 
-> Given:
->     static int put_u64(u64 __user *argp, u64 val)
->     {
->         return put_user(val, argp);
->     }
-> 
-> > diff --git a/block/ioctl.c b/block/ioctl.c
-> > index 24beec9ca9c9..0c3a4a53fa11 100644
-> > --- a/block/ioctl.c
-> > +++ b/block/ioctl.c
-> > @@ -469,6 +469,8 @@ static int blkdev_common_ioctl(struct
-> > block_device *bdev, fmode_t mode,
-> >  				BLKDEV_DISCARD_SECURE);
-> ...
-> 
-> > +	case BLKGETDISKSEQ:
-> > +		return put_u64(argp, bdev->bd_disk->diskseq);
-> 
-> How does that work on a system in which int is 32 bits?
-> 
-> 
-
-Hi,
-
-what's the difference with this?
-
-	case BLKGETSIZE64:
-		return put_u64(argp, i_size_read(bdev->bd_inode));
-
-The returned int is an error code, not the diskseq value itself, e.g.
-
-	case BLKFRAGET:
-		if (!argp)
-			return -EINVAL;
-
-Regards,
--- 
-per aspera ad upstream
+On 7/7/2021 2:29 PM, Hou Tao wrote:
+> ping ?
+>
+> On 7/1/2021 7:35 PM, Hou Tao wrote:
+>> When running stress test on null_blk under linux-4.19.y, the following
+>> warning is reported:
+>>
+>>   percpu_ref_switch_to_atomic_rcu: percpu ref (css_release) <= 0 (-3) after switching to atomic
+>>
+>> The cause is that css_put() is invoked twice on the same bio as shown below:
+>>
+>> CPU 1:                         CPU 2:
+>>
+>> // IO completion kworker       // IO submit thread
+>>                                __blkdev_direct_IO_simple
+>>                                  submit_bio
+>>
+>> bio_endio
+>>   bio_uninit(bio)
+>>     css_put(bi_css)
+>>     bi_css = NULL
+>>                                set_current_state(TASK_UNINTERRUPTIBLE)
+>>   bio->bi_end_io
+>>     blkdev_bio_end_io_simple
+>>       bio->bi_private = NULL
+>>                                // bi_private is NULL
+>>                                READ_ONCE(bio->bi_private)
+>>         wake_up_process
+>>           smp_mb__after_spinlock
+>>
+>>                                bio_unint(bio)
+>>                                  // read bi_css as no-NULL
+>>                                  // so call css_put() again
+>>                                  css_put(bi_css)
+>>
+>> Because there is no memory barriers between the reading and the writing of
+>> bi_private and bi_css, so reading bi_private as NULL can not guarantee
+>> bi_css will also be NULL on weak-memory model host (e.g, ARM64).
+>>
+>> For the latest kernel source, css_put() has been removed from bio_unint(),
+>> but the memory-order problem still exists, because the order between
+>> bio->bi_private and {bi_status|bi_blkg} is also assumed in
+>> __blkdev_direct_IO_simple(). It is reproducible that
+>> __blkdev_direct_IO_simple() may read bi_status as 0 event if
+>> bi_status is set as an errno in req_bio_endio().
+>>
+>> In __blkdev_direct_IO(), the memory order between dio->waiter and
+>> dio->bio.bi_status is not guaranteed neither. Until now it is unable to
+>> reproduce it, maybe because dio->waiter and dio->bio.bi_status are
+>> in the same cache-line. But it is better to add guarantee for memory
+>> order.
+>>
+>> Fixing it by using smp_load_acquire() & smp_store_release() to guarantee
+>> the order between {bio->bi_private|dio->waiter} and {bi_status|bi_blkg}.
+>>
+>> Fixes: 189ce2b9dcc3 ("block: fast-path for small and simple direct I/O requests")
+>> Signed-off-by: Hou Tao <houtao1@huawei.com>
+>> ---
+>>  fs/block_dev.c | 19 +++++++++++++++----
+>>  1 file changed, 15 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index eb34f5c357cf..a602c6315b0b 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -224,7 +224,11 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
+>>  {
+>>  	struct task_struct *waiter = bio->bi_private;
+>>  
+>> -	WRITE_ONCE(bio->bi_private, NULL);
+>> +	/*
+>> +	 * Paired with smp_load_acquire in __blkdev_direct_IO_simple()
+>> +	 * to ensure the order between bi_private and bi_xxx
+>> +	 */
+>> +	smp_store_release(&bio->bi_private, NULL);
+>>  	blk_wake_io_task(waiter);
+>>  }
+>>  
+>> @@ -283,7 +287,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+>>  	qc = submit_bio(&bio);
+>>  	for (;;) {
+>>  		set_current_state(TASK_UNINTERRUPTIBLE);
+>> -		if (!READ_ONCE(bio.bi_private))
+>> +		/* Refer to comments in blkdev_bio_end_io_simple() */
+>> +		if (!smp_load_acquire(&bio.bi_private))
+>>  			break;
+>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+>>  		    !blk_poll(bdev_get_queue(bdev), qc, true))
+>> @@ -353,7 +358,12 @@ static void blkdev_bio_end_io(struct bio *bio)
+>>  		} else {
+>>  			struct task_struct *waiter = dio->waiter;
+>>  
+>> -			WRITE_ONCE(dio->waiter, NULL);
+>> +			/*
+>> +			 * Paired with smp_load_acquire() in
+>> +			 * __blkdev_direct_IO() to ensure the order between
+>> +			 * dio->waiter and bio->bi_xxx
+>> +			 */
+>> +			smp_store_release(&dio->waiter, NULL);
+>>  			blk_wake_io_task(waiter);
+>>  		}
+>>  	}
+>> @@ -478,7 +488,8 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+>>  
+>>  	for (;;) {
+>>  		set_current_state(TASK_UNINTERRUPTIBLE);
+>> -		if (!READ_ONCE(dio->waiter))
+>> +		/* Refer to comments in blkdev_bio_end_io */
+>> +		if (!smp_load_acquire(&dio->waiter))
+>>  			break;
+>>  
+>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+> .
