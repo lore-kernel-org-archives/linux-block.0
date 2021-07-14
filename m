@@ -2,146 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9477C07E9A
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jul 2021 14:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35770C11F66
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jul 2021 15:11:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 987926117A
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jul 2021 14:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D127613BF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jul 2021 15:11:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231994AbhGNO2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jul 2021 10:28:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25424 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231977AbhGNO2A (ORCPT
+        id S239559AbhGNPOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jul 2021 11:14:07 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3403 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232360AbhGNPOH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jul 2021 10:28:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626272708;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/nNLg7RS2OdgpG2Q0vTdal+uwHMaNAnRrGcEAwkI6Yk=;
-        b=XcJY/qIRIDjmd7IpQx+bCGPn1FS2dg/ML7GPcqdpo24uI2fAqGuPQh2fMNZDeWzpCJsc01
-        ZR8pUZj9YUzouvUAjN32WC/2vW6/4xWq7KeXX4ToCzFV3hJ6NUaVEHRttAuQgllp2GWrbp
-        J+0tFWrm+PgM352MHb4Gd2KlvPZdS/Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-0Cks6rrQMmG7eyvVV8lXlg-1; Wed, 14 Jul 2021 10:25:07 -0400
-X-MC-Unique: 0Cks6rrQMmG7eyvVV8lXlg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACD81106B7D6;
-        Wed, 14 Jul 2021 14:25:05 +0000 (UTC)
-Received: from localhost (ovpn-112-200.ams2.redhat.com [10.36.112.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AE761000324;
-        Wed, 14 Jul 2021 14:25:05 +0000 (UTC)
-Date:   Wed, 14 Jul 2021 15:25:04 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Enrico Granata <egranata@google.com>,
-        virtio-dev@lists.oasis-open.org, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, hch@infradead.org
-Subject: Re: [virtio-dev] Fwd: [PATCH v2] Provide detailed specification of
- virtio-blk lifetime metrics
-Message-ID: <YO7zwKbH6OEW2z1o@stefanha-x1.localdomain>
-References: <20210505193655.2414268-1-egranata@google.com>
- <CAPR809ukYeThsPy4eg8A-G8b4Hwt7Prxh9P75=Vp9jnCKb6WqQ@mail.gmail.com>
- <YO6ro345FI0XE8vv@stefanha-x1.localdomain>
- <87pmvlck3p.fsf@redhat.com>
+        Wed, 14 Jul 2021 11:14:07 -0400
+Received: from fraeml704-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GQ12W2F5Dz6K604;
+        Wed, 14 Jul 2021 23:02:43 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml704-chm.china.huawei.com (10.206.15.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Wed, 14 Jul 2021 17:11:13 +0200
+Received: from localhost.localdomain (10.69.192.58) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 14 Jul 2021 16:11:11 +0100
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <ming.lei@redhat.com>, <linux-scsi@vger.kernel.org>,
+        <kashyap.desai@broadcom.com>, <hare@suse.de>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH 0/9] blk-mq: Reduce static requests memory footprint for shared sbitmap
+Date:   Wed, 14 Jul 2021 23:06:26 +0800
+Message-ID: <1626275195-215652-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="+Yv6eVjta5rSDZ4E"
-Content-Disposition: inline
-In-Reply-To: <87pmvlck3p.fsf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Currently a full set of static requests are allocated per hw queue per
+tagset when shared sbitmap is used.
 
---+Yv6eVjta5rSDZ4E
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+However, only tagset->queue_depth number of requests may be active at
+any given time. As such, only tagset->queue_depth number of static
+requests are required.
 
-On Wed, Jul 14, 2021 at 11:36:58AM +0200, Cornelia Huck wrote:
-> On Wed, Jul 14 2021, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->=20
-> > On Wed, May 05, 2021 at 12:37:26PM -0700, Enrico Granata wrote:
-> >> ---------- Forwarded message ---------
-> >> From: Enrico Granata <egranata@google.com>
-> >> Date: Wed, May 5, 2021 at 1:37 PM
-> >> Subject: [PATCH v2] Provide detailed specification of virtio-blk
-> >> lifetime metrics
-> >> To: <virtio-dev@lists.oasis-open.org>
-> >> Cc: <egranata@google.com>, <hch@infradead.org>, <mst@redhat.com>,
-> >> <linux-block@vger.kernel.org>,
-> >> <virtualization@lists.linux-foundation.org>
-> >>=20
-> >>=20
-> >> In the course of review, some concerns were surfaced about the
-> >> original virtio-blk lifetime proposal, as it depends on the eMMC
-> >> spec which is not open
-> >>=20
-> >> Add a more detailed description of the meaning of the fields
-> >> added by that proposal to the virtio-blk specification, as to
-> >> make it feasible to understand and implement the new lifetime
-> >> metrics feature without needing to refer to JEDEC's specification
-> >>=20
-> >> This patch does not change the meaning of those fields nor add
-> >> any new fields, but it is intended to provide an open and more
-> >> clear description of the meaning associated with those fields.
-> >>=20
-> >> Signed-off-by: Enrico Granata <egranata@google.com>
-> >> ---
-> >> Changes in v2:
-> >>   - clarified JEDEC references;
-> >>   - added VIRTIO_BLK prefix and cleaned up comment syntax;
-> >>   - clarified reserved block references
-> >>=20
-> >>  content.tex | 40 ++++++++++++++++++++++++++++++++--------
-> >>  1 file changed, 32 insertions(+), 8 deletions(-)
-> >
-> > Ping?
-> >
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> [Enrico is currently on leave of absence]
->=20
-> Is there any outstanding feedback from the linux-block folks? I've lost
-> track of this, I'm afraid. (Your R-b is the only feedback I see on this
-> list...)
->=20
-> We can certainly put up a vote. This is one of the things I wanted to
-> see fixed for the next release of the standard.
+The same goes for using an IO scheduler, which allocates a full set of
+static requests per hw queue per request queue.
 
-I have CCed Christoph, linux-block@, and virtualization@. Here is the
-link to the patch that we're discussing:
-https://patchwork.kernel.org/project/linux-block/patch/20210505193655.24142=
-68-1-egranata@google.com/
+This series very significantly reduces memory usage in both scenarios by
+allocating static rqs per tagset and per request queue, respectively,
+rather than per hw queue per tagset and per request queue.
 
-Stefan
+For megaraid sas driver on my 128-CPU arm64 system with 1x SATA disk, we
+save approx. 300MB(!) [370MB -> 60MB]
 
---+Yv6eVjta5rSDZ4E
-Content-Type: application/pgp-signature; name="signature.asc"
+A couple of patches are marked as RFC, as maybe there is a better
+implementation approach.
 
------BEGIN PGP SIGNATURE-----
+Any more testing would be appreciated also.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmDu88AACgkQnKSrs4Gr
-c8hYVAgAtnPGTJOBrka0qF+k5pZMbaxQ0R+0x3XTXkLy9ps2CboeHmh7hrmLCskK
-eQ+v6hPvAygCGNArFIqg/0AEUuXgu7xAEhwdDtFZ1ahO8ULxxrCFCWnFhhqn0U0k
-JAalGCzyTHpnDtYGWvvIEPYoF8GBrpeEWTJLrff1KReSujxuDeetB4jpPiLYwqE2
-hWNsEeQjlTNuCAGSAMAACG02JCs4thf8GNlAAkMZRD8K1O1iFkNQYmUCpebP9pl9
-qkIyPeVhpFCIO0hfDGA5TLoqdRne7vLbBeRawMf6JEESq1plQIpCNP0ez6KVmC9k
-b5Wb+AaQyWJsP0Wdf/Qb+QbiyGQoeA==
-=oGMA
------END PGP SIGNATURE-----
+John Garry (9):
+  blk-mq: Change rqs check in blk_mq_free_rqs()
+  block: Rename BLKDEV_MAX_RQ -> BLKDEV_DEFAULT_RQ
+  blk-mq: Relocate shared sbitmap resize in blk_mq_update_nr_requests()
+  blk-mq: Add blk_mq_tag_resize_sched_shared_sbitmap()
+  blk-mq: Invert check in blk_mq_update_nr_requests()
+  blk-mq: Refactor blk_mq_{alloc,free}_rqs
+  blk-mq: Allocate per tag set static rqs for shared sbitmap
+  blk-mq: Allocate per request queue static rqs for shared sbitmap
+  blk-mq: Clear mappings for shared sbitmap sched static rqs
 
---+Yv6eVjta5rSDZ4E--
+ block/blk-core.c       |   2 +-
+ block/blk-mq-sched.c   |  57 ++++++++++++--
+ block/blk-mq-sched.h   |   2 +-
+ block/blk-mq-tag.c     |  22 ++++--
+ block/blk-mq-tag.h     |   1 +
+ block/blk-mq.c         | 165 +++++++++++++++++++++++++++++++----------
+ block/blk-mq.h         |   9 +++
+ drivers/block/rbd.c    |   2 +-
+ include/linux/blk-mq.h |   4 +
+ include/linux/blkdev.h |   6 +-
+ 10 files changed, 215 insertions(+), 55 deletions(-)
+
+-- 
+2.26.2
 
