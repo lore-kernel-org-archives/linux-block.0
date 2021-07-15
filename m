@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40957C47E48
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 04:55:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E506C47E48
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 04:55:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25A9361396
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 04:55:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0829C6128B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 04:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238684AbhGOE6e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 00:58:34 -0400
-Received: from mail-pg1-f170.google.com ([209.85.215.170]:36353 "EHLO
-        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238661AbhGOE6e (ORCPT
+        id S238750AbhGOE6h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 00:58:37 -0400
+Received: from mail-pj1-f41.google.com ([209.85.216.41]:53111 "EHLO
+        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238737AbhGOE6g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 00:58:34 -0400
-Received: by mail-pg1-f170.google.com with SMTP id s18so4777405pgq.3;
-        Wed, 14 Jul 2021 21:55:38 -0700 (PDT)
+        Thu, 15 Jul 2021 00:58:36 -0400
+Received: by mail-pj1-f41.google.com with SMTP id bt15so2990065pjb.2;
+        Wed, 14 Jul 2021 21:55:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=RwWOR0IhmOLWqkK1O+cYkuwCpPGb+kOKJBNKG5jnTpU=;
-        b=LE9wWrqhfKrZn0VU411WAHANZIErX4fRvj2MHVL1yzFV48+DrUe6Pcl5teh0pX6HW1
-         HmWfbqBt679mMvZCOuxfBqv1DonNStN3zlh8dTKwFigiygrngq8MF+Lu+EcBs2KU/kBn
-         UxNaVATRmsFKiQR5PBHwtF+AKY57H2a7hP6krMurgNVZ5ON79HZ6tDVz1haZLvjCpxKx
-         O+z6sxwEJJj6YLVb5m/PwD3rKby29NeZNow1bbneKFjiV8t3bxsvCyVm+RRmiFLiAHWB
-         8No0gKxtkUoIWu4LfGE25wLqWKuPCCPW3HjJZVo01TbzY35GQoMeXDcOmzbfm/gbqCDF
-         cS5g==
-X-Gm-Message-State: AOAM530i3/MM15qKxpbQpaFSZIcilZC0/9KT9o2OYgqN40qOExfRnsx8
-        lheUx+72gEDVs3AXMVAV2+w=
-X-Google-Smtp-Source: ABdhPJxFKtIYg8/oXrVU/5djMsZbWQlaJM2lU7R9GYHkOBQe9vzWrdPOCBqgGCp0ivlpcsSc0Ec02w==
-X-Received: by 2002:aa7:8d56:0:b029:327:6dc:d254 with SMTP id s22-20020aa78d560000b029032706dcd254mr2376165pfe.69.1626324938050;
-        Wed, 14 Jul 2021 21:55:38 -0700 (PDT)
+        bh=6oo98c6UbKQTMijd+O7s8Vz8iegr55iCRTENQPQsTlE=;
+        b=MrKst64tmSoWHrAemNQQhMdez/5QoDZNnzoQhfcHCbfbL4/Z7Yv43sel1ED+8GLew5
+         l68ZQqi1dGMAWn2H45vcOVZbgZwOCuzjXtH8KxAjTTqoRiPtpFcC723BvuFmJbJzG6Dk
+         6SFHSPuZs7jOkuuoxCX/0JJWesHqZz1lAm3DTIaY4FlRepvsoeTuYhAUUlW392p5BEdD
+         QyD4geks9fa5g4lP+ah+JlFbXDLf8heqRgrJmh51AOpOLrntHKeB0rLyZqsI0aQwA2Zy
+         014PKL+Ow14UNx6JsL965BuNnv7Am+b1KbGptHVotaKnQyVZhLoeOaF7rZqUQjrqgiQ2
+         h6Cg==
+X-Gm-Message-State: AOAM531BxfvADCPSwmZd67lh1e5PPZnTflnYuWQuBcBY2yHWdBJqAAQZ
+        D2PWWOKeZO+YDQLlEfmKhN0=
+X-Google-Smtp-Source: ABdhPJwAvcBq2p3kJoCOdkLZfaE/p4uuhROOjDLOrUxpIx9yWz1XKNQ9o4drzfOFzPdXzBfOpcxl/g==
+X-Received: by 2002:a17:90b:184:: with SMTP id t4mr8073637pjs.161.1626324942651;
+        Wed, 14 Jul 2021 21:55:42 -0700 (PDT)
 Received: from localhost ([191.96.120.37])
-        by smtp.gmail.com with ESMTPSA id d2sm4665819pfa.84.2021.07.14.21.55.36
+        by smtp.gmail.com with ESMTPSA id m34sm5295387pgb.85.2021.07.14.21.55.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jul 2021 21:55:37 -0700 (PDT)
+        Wed, 14 Jul 2021 21:55:41 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk
 Cc:     hare@suse.de, bvanassche@acm.org, ming.lei@redhat.com,
         hch@infradead.org, jack@suse.cz, osandov@fb.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v2 1/6] block: refcount the request_queue early in __device_add_disk()
-Date:   Wed, 14 Jul 2021 21:55:26 -0700
-Message-Id: <20210715045531.420201-2-mcgrof@kernel.org>
+Subject: [PATCH v2 3/6] block: move disk invalidation from del_gendisk() into a helper
+Date:   Wed, 14 Jul 2021 21:55:28 -0700
+Message-Id: <20210715045531.420201-4-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210715045531.420201-1-mcgrof@kernel.org>
 References: <20210715045531.420201-1-mcgrof@kernel.org>
@@ -59,54 +59,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We refcount the request_queue right now towards the end of the
-__device_add_disk(), however when we add error handling on this
-function we'll want to refcount the request_queue first, so that
-we can simply bail right away on error. No point in doing any
-work on the queue if its invalid. Otherwise we'd also be
-unwinding all the work we had done towards the very end.
+Move the disk / partition invalidation into a helper. This will make
+reading del_gendisk easier to read, in preparation for adding support
+to add error handling later on register_disk() and to later share more
+code with del_gendisk.
+
+This change has no functional changes.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/genhd.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ block/genhd.c | 47 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 21 deletions(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index af4d2ab4a633..4dd6db3618f2 100644
+index 520e23b25ed5..e5535879d629 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -464,6 +464,15 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- {
- 	int ret;
- 
-+	/*
-+	 * Take an extra ref on queue which will be put on disk_release()
-+	 * so that it sticks around as long as @disk is there.
-+	 */
-+	if (blk_get_queue(disk->queue))
-+		set_bit(GD_QUEUE_REF, &disk->state);
-+	else
-+		WARN_ON_ONCE(1);
-+
- 	/*
- 	 * The disk queue should now be all set with enough information about
- 	 * the device for the elevator code to pick an adequate default
-@@ -528,15 +537,6 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 	if (register_queue)
- 		blk_register_queue(disk);
- 
--	/*
--	 * Take an extra ref on queue which will be put on disk_release()
--	 * so that it sticks around as long as @disk is there.
--	 */
--	if (blk_get_queue(disk->queue))
--		set_bit(GD_QUEUE_REF, &disk->state);
--	else
--		WARN_ON_ONCE(1);
--
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
+@@ -399,6 +399,31 @@ static void disk_announce(struct gendisk *disk)
+ 	disk_uevent(disk, KOBJ_ADD);
  }
+ 
++static void disk_invalidate(struct gendisk *disk)
++{
++	if (!(disk->flags & GENHD_FL_HIDDEN)) {
++		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
++
++		/*
++		 * Unregister bdi before releasing device numbers (as they can
++		 * get reused and we'd get clashes in sysfs).
++		 */
++		bdi_unregister(disk->queue->backing_dev_info);
++	}
++
++	blk_unregister_queue(disk);
++
++	kobject_put(disk->part0->bd_holder_dir);
++	kobject_put(disk->slave_dir);
++
++	part_stat_set_all(disk->part0, 0);
++	disk->part0->bd_stamp = 0;
++	if (!sysfs_deprecated)
++		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
++	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
++	device_del(disk_to_dev(disk));
++}
++
+ static void register_disk(struct device *parent, struct gendisk *disk,
+ 			  const struct attribute_group **groups)
+ {
+@@ -606,27 +631,7 @@ void del_gendisk(struct gendisk *disk)
+ 
+ 	set_capacity(disk, 0);
+ 
+-	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+-		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+-
+-		/*
+-		 * Unregister bdi before releasing device numbers (as they can
+-		 * get reused and we'd get clashes in sysfs).
+-		 */
+-		bdi_unregister(disk->queue->backing_dev_info);
+-	}
+-
+-	blk_unregister_queue(disk);
+-
+-	kobject_put(disk->part0->bd_holder_dir);
+-	kobject_put(disk->slave_dir);
+-
+-	part_stat_set_all(disk->part0, 0);
+-	disk->part0->bd_stamp = 0;
+-	if (!sysfs_deprecated)
+-		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
+-	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+-	device_del(disk_to_dev(disk));
++	disk_invalidate(disk);
+ }
+ EXPORT_SYMBOL(del_gendisk);
+ 
 -- 
 2.27.0
 
