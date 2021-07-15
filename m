@@ -2,105 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE861C07E96
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 11:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D128C07E96
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 12:09:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AF2961278
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 11:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D20D611C0
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 12:09:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240843AbhGOLZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 07:25:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45595 "EHLO
+        id S232324AbhGOMLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 08:11:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45536 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240818AbhGOLZT (ORCPT
+        by vger.kernel.org with ESMTP id S229973AbhGOMLx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 07:25:19 -0400
+        Thu, 15 Jul 2021 08:11:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626348146;
+        s=mimecast20190719; t=1626350940;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=n3XMjsLqmL6fZAAA+JBtyt58Zb9isCAphRrAoufbmyY=;
-        b=gGqXWSAqUdtKoN5RqiXiSDJUUylntgAneUf/dCPJRUcfVFBGKTyeYzC+KF+S5ICn2Uxv71
-        wW6MXE/U+n4CJ/OJyy6NLmGm0TtR5TyvIWkBCXTS7j5zbIEj70iSxQQkRFH0pdRTmFgWnb
-        HdIjhrOEZoNnoHrcpO8QW9cFSpP4kmM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-Ka_3RBDyNRm0nAaJhTW_Cw-1; Thu, 15 Jul 2021 07:22:25 -0400
-X-MC-Unique: Ka_3RBDyNRm0nAaJhTW_Cw-1
-Received: by mail-wr1-f70.google.com with SMTP id r18-20020adfce920000b029013bbfb19640so3142016wrn.17
-        for <linux-block@vger.kernel.org>; Thu, 15 Jul 2021 04:22:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=n3XMjsLqmL6fZAAA+JBtyt58Zb9isCAphRrAoufbmyY=;
-        b=dO/L1IOC99Mb214xZn05bfo8c7CzFZQDXLyTOQJsi9Wf8PC1M4NipoXCTfDkvRd+sI
-         MbVx30MMx8YY0ivd7xQmrmRGj7jxDuRrsg8fbxgzz1J605guFmmKovD2KO3G0FEhg4T4
-         u4zTCNVC3Ka6G1AjQzYeFzPJn8P7sN7Fvk9v9ChrVT/d6cUeIjNBdAa1g4NtKQ+vDIKW
-         O1OeCiOpf7BZbKr93cZy9c3FVilIqfIsuUVmR9R/8XsEZItA8Oo0ZNWTT2e+otLhDdBQ
-         2hAirHb1Piks+1z85zHp+qF3lJIFW9sXppQtq1XXBDPTKtmJN92U20r6xPUYAfQ7HAur
-         G56Q==
-X-Gm-Message-State: AOAM530p6wFaY2y4LtCWHyXTvQSjLPUdXSjv6B1v/imIHFQYxVYUEJ5L
-        mHLqznq7YnpGsjSZt4098VWXEkrsqeXpIZsoarJK4qkpramsVfZtvceIy2jhKTTkAtrBt9qri5D
-        O5vCZBEz1xTkB3qiHj1AREi0=
-X-Received: by 2002:a5d:52d0:: with SMTP id r16mr4822757wrv.323.1626348143923;
-        Thu, 15 Jul 2021 04:22:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxUBHhfe+A3WtzBYo5eZtyU+fS1EBqnOvDIUROVv21BrPU/0Ixxe0AbzLRTePqxWt25P3MgA==
-X-Received: by 2002:a5d:52d0:: with SMTP id r16mr4822740wrv.323.1626348143761;
-        Thu, 15 Jul 2021 04:22:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id w15sm8708936wmi.3.2021.07.15.04.22.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jul 2021 04:22:22 -0700 (PDT)
-Subject: Re: [PATCH 1/1] virtio: disable partitions scanning for no partitions
- block
-To:     Yury Kamenev <damtev@yandex-team.ru>, mst@redhat.com,
-        jasowang@redhat.com, stefanha@redhat.com, axboe@kernel.dk,
-        hch@lst.de, cand@gmx.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210715094707.19997-1-damtev@yandex-team.ru>
- <20210715094707.19997-2-damtev@yandex-team.ru>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9bd3c75a-63b3-427c-c54c-cd12587ba58b@redhat.com>
-Date:   Thu, 15 Jul 2021 13:22:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=VueNy71C319SH8P9/tMFkGcyyqOLngYJs4y2xiGYU50=;
+        b=P703QkheDfTHfMI5c4bHHmztC6l8KiX2ELzzzB6yXLCVQftvGyN/5TY/CYGBxQ089zFwFJ
+        hnuveC5vNFeHTPFBKUtsh078lXoFn85wXpuWHq4VXnJlhbwjiAuaaqTTlNIEBjt+9PrLH+
+        EKK/eao5KZ72KAM+XTXAhZp2/0eeumE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-553-EqtUD8mEMvWqWBpD4ujVXA-1; Thu, 15 Jul 2021 08:08:59 -0400
+X-MC-Unique: EqtUD8mEMvWqWBpD4ujVXA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D722C804142;
+        Thu, 15 Jul 2021 12:08:56 +0000 (UTC)
+Received: from localhost (ovpn-12-61.pek2.redhat.com [10.72.12.61])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1D4660C13;
+        Thu, 15 Jul 2021 12:08:51 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 0/3] blk-mq: fix blk_mq_alloc_request_hctx
+Date:   Thu, 15 Jul 2021 20:08:41 +0800
+Message-Id: <20210715120844.636968-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210715094707.19997-2-damtev@yandex-team.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 15/07/21 11:47, Yury Kamenev wrote:
-> +#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-> +	if (unlikely(partitions_scanning_disable))
-> +		/* disable partitions scanning if it was stated in virtio features*/
-> +		if (virtio_has_feature(vdev, VIRTIO_BLK_F_NO_PART_SCAN))
-> +			vblk->disk->flags |= GENHD_FL_NO_PART_SCAN;
-> +#endif
-> +
+Hi,
 
-Has this been added to the spec?  It doesn't seem like a good idea, as 
-pointed out by Stefan[1], Christoph[2] and myself[3].
+blk_mq_alloc_request_hctx() is used by NVMe fc/rdma/tcp/loop to connect
+io queue. Also the sw ctx is chosen as the 1st online cpu in hctx->cpumask.
+However, all cpus in hctx->cpumask may be offline.
 
-Paolo
+This usage model isn't well supported by blk-mq which supposes allocator is
+always done on one online CPU in hctx->cpumask. This assumption is
+related with managed irq, which also requires blk-mq to drain inflight
+request in this hctx when the last cpu in hctx->cpumask is going to
+offline.
 
-[1] 
-https://lore.kernel.org/linux-block/20210524145654.GA2632@lst.de/T/#m2697cb41578490aad49ed1d8fa6604bf0924b54d
-[2] 
-https://lore.kernel.org/linux-block/20210524145654.GA2632@lst.de/T/#mc59329fd824102f94ac2f6b29fe94a652849aca0
-[3] 
-https://lore.kernel.org/linux-block/20210524145654.GA2632@lst.de/T/#mee6787c4fd87790b64feccc9e77fd5f618c2c336
+However, NVMe fc/rdma/tcp/loop don't use managed irq, so we should allow
+them to ask for request allocation when the specified hctx is inactive
+(all cpus in hctx->cpumask are offline). Fix blk_mq_alloc_request_hctx() by
+allowing to allocate request when all CPUs of this hctx are offline.
+
+
+V4:
+	- remove patches for cleanup queue map helpers
+	- take Christoph's suggestion to add field into 'struct device' for
+	describing if managed irq is allocated from one device
+
+V3:
+	- cleanup map queues helpers, and remove pci/virtio/rdma queue
+	  helpers
+	- store use managed irq info into qmap
+
+
+V2:
+	- use flag of BLK_MQ_F_MANAGED_IRQ
+	- pass BLK_MQ_F_MANAGED_IRQ from driver explicitly
+	- kill BLK_MQ_F_STACKING
+
+
+Ming Lei (3):
+  driver core: mark device as irq affinity managed if any irq is managed
+  blk-mq: mark if one queue map uses managed irq
+  blk-mq: don't deactivate hctx if managed irq isn't used
+
+ block/blk-mq-pci.c      |  1 +
+ block/blk-mq-rdma.c     |  3 +++
+ block/blk-mq-virtio.c   |  1 +
+ block/blk-mq.c          | 27 +++++++++++++++++----------
+ block/blk-mq.h          |  8 ++++++++
+ drivers/base/platform.c |  7 +++++++
+ drivers/pci/msi.c       |  3 +++
+ include/linux/blk-mq.h  |  3 ++-
+ include/linux/device.h  |  1 +
+ 9 files changed, 43 insertions(+), 11 deletions(-)
+
+-- 
+2.31.1
 
