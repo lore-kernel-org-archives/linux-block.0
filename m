@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE97FC636C9
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 20:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DEB2C636CB
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 20:30:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5C4F613D4
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 20:30:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF4DF613D2
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 20:30:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235059AbhGOUdg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 16:33:36 -0400
-Received: from mail-pf1-f172.google.com ([209.85.210.172]:39891 "EHLO
-        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232418AbhGOUdf (ORCPT
+        id S233213AbhGOUdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 16:33:38 -0400
+Received: from mail-pg1-f174.google.com ([209.85.215.174]:46770 "EHLO
+        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235562AbhGOUdg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 16:33:35 -0400
-Received: by mail-pf1-f172.google.com with SMTP id b12so6631334pfv.6;
-        Thu, 15 Jul 2021 13:30:41 -0700 (PDT)
+        Thu, 15 Jul 2021 16:33:36 -0400
+Received: by mail-pg1-f174.google.com with SMTP id w15so7680535pgk.13;
+        Thu, 15 Jul 2021 13:30:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=m6aGqo/4LoEvB6VK2Me4DE4EY0pXu1Ka4Io47Q+9STw=;
-        b=mudBnqKZIKURj1FzngUW4UdIsbTQeuqKzvNnrYEZ/B9FIPcANGBrlldNYV9ROtUc4g
-         MPUw4dErJMphcGpFJFBp+ZyK5G+xYlrdi3X0EfIaeviqlJu6k0g94MOYjjY0i9O/cZ7E
-         zcya+ykpAbLVy8wTETtPHgyX4Ox8E1n/WxKzpif10glK9TOpX1RATS30+yAcmg/+1Kwt
-         om4fkXF3v0Gc0UqFA43TZC/0syg8SRHtaaqBohC46wWuVzamM5QgaJdptZYVNt9D7mwU
-         mNWO+v9c3ZUjiX+VLzlvvFCq7dPcEM2/p8i2GyomDX9VnqJbDSnL3jHF9BYRM43mOf0W
-         Z6Jg==
-X-Gm-Message-State: AOAM533L9Zh2RPx29T4izWgcFMkrO9kxPFG0qqevAiHCsw6Sx/uVYq3r
-        2ZXJAjNqFepugebSQRrM5zw=
-X-Google-Smtp-Source: ABdhPJxTu1u2WFOL5qZ0r1fXhYI/Qfz97b5CFS2lVSuTSQyw0zxv0gWLf5I3MVY5IM58AkzR6c+Gtw==
-X-Received: by 2002:a63:494d:: with SMTP id y13mr6474195pgk.248.1626381040676;
-        Thu, 15 Jul 2021 13:30:40 -0700 (PDT)
+        bh=AfqEur0D3iK3wyEW51FZ1fhyTp8fBt0DR6t9c5iQRFU=;
+        b=LJTI+yPMYraA7gtyGtl01g2cptfLkGFKeTSHj9npWGA7OH+LR58+7XjnVQqIRiIun4
+         OYqmm8nvCpdBnBpR1sbrOkb8t7MlQpSwSJ7zNQpus+qUbGW3gX4Y59yZ2jZecyNvlUJP
+         xQANE89GvjQRiGfKTdygdej0tTAuVRkteQyErmkS1U6n9bLzJGxaqEnmpkCV51apk2dT
+         dlSHRgcT6XK2iVaROnvReibsahWpibfV1nuh7jwktUwqny779HfB2PN+STD/KmjNttwt
+         5tJBzIBbfWRoS+SgXLr9i0f+T/m3o9iKjCoJvdSFp4HMC/6pGxZLBWxvcyY5d6n75MlU
+         3yuw==
+X-Gm-Message-State: AOAM530p1x84YNbJOVFGZqf6b6rw6BkpQjiz7TyCU7fcG38TvEvg3RtF
+        kQvGOLJh/UqYppTKUNfM1XI=
+X-Google-Smtp-Source: ABdhPJzLLk9/HVBihINhuBBcs6/6TX0zKV3W5XGbbD/4A0NdvuGBJ+D6kaoExAX9KjjzyvAm94yIgg==
+X-Received: by 2002:a62:7c16:0:b029:329:8d4c:d12d with SMTP id x22-20020a627c160000b02903298d4cd12dmr6510253pfc.47.1626381042892;
+        Thu, 15 Jul 2021 13:30:42 -0700 (PDT)
 Received: from localhost ([191.96.120.37])
-        by smtp.gmail.com with ESMTPSA id y9sm6774604pfa.197.2021.07.15.13.30.39
+        by smtp.gmail.com with ESMTPSA id a22sm7476719pfv.113.2021.07.15.13.30.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jul 2021 13:30:39 -0700 (PDT)
+        Thu, 15 Jul 2021 13:30:42 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk
 Cc:     hare@suse.de, bvanassche@acm.org, ming.lei@redhat.com,
         hch@infradead.org, jack@suse.cz, osandov@fb.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [RFC 4/5] block/sx8: add helper carm_free_all_disks()
-Date:   Thu, 15 Jul 2021 13:30:24 -0700
-Message-Id: <20210715203025.2018218-5-mcgrof@kernel.org>
+Subject: [RFC 5/5] block/sx8: add error handling support for add_disk()
+Date:   Thu, 15 Jul 2021 13:30:25 -0700
+Message-Id: <20210715203025.2018218-6-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210715203025.2018218-1-mcgrof@kernel.org>
 References: <20210715203025.2018218-1-mcgrof@kernel.org>
@@ -59,96 +59,81 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Share the code of unregistering disks in a common helper.
-Code is shifted a above so that we can later re-use this
-helper in other places.
+We never checked for errors on add_disk() as this function
+returned void. Now that this is fixed, use the shiny new
+error handling.
+
+A completion is used to notify the initial probe what is
+happening and so we must defer error handling on completion.
+Do this by remembering the error and using the shared cleanup
+function.
+
+The tags are shared and so are hanlded later for the
+driver already.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/sx8.c | 42 +++++++++++++++++++++++-------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+ drivers/block/sx8.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/sx8.c b/drivers/block/sx8.c
-index e4dfee5acf08..6a6dc3fffa5c 100644
+index 6a6dc3fffa5c..34bbd033e2fd 100644
 --- a/drivers/block/sx8.c
 +++ b/drivers/block/sx8.c
-@@ -1092,6 +1092,27 @@ static irqreturn_t carm_interrupt(int irq, void *__host)
- 	return IRQ_RETVAL(handled);
- }
+@@ -297,6 +297,7 @@ struct carm_host {
  
-+static void carm_free_disk(struct carm_host *host, unsigned int port_no)
-+{
-+	struct carm_port *port = &host->port[port_no];
-+	struct gendisk *disk = port->disk;
-+
-+	if (!disk)
-+		return;
-+
-+	del_gendisk(disk);
-+	blk_cleanup_disk(disk);
-+}
-+
-+static void carm_free_all_disks(struct carm_host *host)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < CARM_MAX_PORTS; i++)
-+		carm_free_disk(host, i);
-+	unregister_blkdev(host->major, host->name);
-+}
-+
- static void carm_fsm_task (struct work_struct *work)
- {
- 	struct carm_host *host =
-@@ -1365,18 +1386,6 @@ static int carm_init_disk(struct carm_host *host, unsigned int port_no)
+ 	struct work_struct		fsm_task;
+ 
++	int probe_err;
+ 	struct completion		probe_comp;
+ };
+ 
+@@ -1202,8 +1203,11 @@ static void carm_fsm_task (struct work_struct *work)
+ 				struct gendisk *disk = port->disk;
+ 
+ 				set_capacity(disk, port->capacity);
+-				add_disk(disk);
+-				activated++;
++				host->probe_err = add_disk(disk);
++				if (!host->probe_err)
++					activated++;
++				else
++					break;
+ 			}
+ 
+ 		printk(KERN_INFO DRV_NAME "(%s): %d ports activated\n",
+@@ -1213,11 +1217,9 @@ static void carm_fsm_task (struct work_struct *work)
+ 		reschedule = 1;
+ 		break;
+ 	}
+-
+ 	case HST_PROBE_FINISHED:
+ 		complete(&host->probe_comp);
+ 		break;
+-
+ 	case HST_ERROR:
+ 		/* FIXME: TODO */
+ 		break;
+@@ -1515,7 +1517,10 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_out_free_irq;
+ 
+ 	DPRINTK("waiting for probe_comp\n");
++	host->probe_err = -ENODEV;
+ 	wait_for_completion(&host->probe_comp);
++	if (host->probe_err)
++		goto err_out_disks;
+ 
+ 	printk(KERN_INFO "%s: pci %s, ports %d, io %llx, irq %u, major %d\n",
+ 	       host->name, pci_name(pdev), (int) CARM_MAX_PORTS,
+@@ -1526,6 +1531,8 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	pci_set_drvdata(pdev, host);
  	return 0;
- }
  
--static void carm_free_disk(struct carm_host *host, unsigned int port_no)
--{
--	struct carm_port *port = &host->port[port_no];
--	struct gendisk *disk = port->disk;
--
--	if (!disk)
--		return;
--
--	del_gendisk(disk);
--	blk_cleanup_disk(disk);
--}
--
- static int carm_init_shm(struct carm_host *host)
- {
- 	host->shm = dma_alloc_coherent(&host->pdev->dev, CARM_SHM_SIZE,
-@@ -1520,9 +1529,7 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
++err_out_disks:
++	carm_free_all_disks(host);
  err_out_free_irq:
  	free_irq(pdev->irq, host);
  err_out_blkdev_disks:
--	for (i = 0; i < CARM_MAX_PORTS; i++)
--		carm_free_disk(host, i);
--	unregister_blkdev(host->major, host->name);
-+	carm_free_all_disks(host);
- err_out_free_majors:
- 	if (host->major == 160)
- 		clear_bit(0, &carm_major_alloc);
-@@ -1546,7 +1553,6 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
- static void carm_remove_one (struct pci_dev *pdev)
- {
- 	struct carm_host *host = pci_get_drvdata(pdev);
--	unsigned int i;
- 
- 	if (!host) {
- 		printk(KERN_ERR PFX "BUG: no host data for PCI(%s)\n",
-@@ -1555,9 +1561,7 @@ static void carm_remove_one (struct pci_dev *pdev)
- 	}
- 
- 	free_irq(pdev->irq, host);
--	for (i = 0; i < CARM_MAX_PORTS; i++)
--		carm_free_disk(host, i);
--	unregister_blkdev(host->major, host->name);
-+	carm_free_all_disks(host);
- 	if (host->major == 160)
- 		clear_bit(0, &carm_major_alloc);
- 	else if (host->major == 161)
 -- 
 2.27.0
 
