@@ -2,94 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE61C636CA
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 19:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A637C636C8
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 19:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 966B46120A
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 19:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 406A9613C4
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 19:52:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245007AbhGOTiz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 15:38:55 -0400
-Received: from mail-pg1-f178.google.com ([209.85.215.178]:42701 "EHLO
-        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245710AbhGOThA (ORCPT
+        id S245639AbhGOTzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 15:55:42 -0400
+Received: from mail-pg1-f182.google.com ([209.85.215.182]:38614 "EHLO
+        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344880AbhGOTyi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 15:37:00 -0400
-Received: by mail-pg1-f178.google.com with SMTP id d12so7558831pgd.9;
-        Thu, 15 Jul 2021 12:34:07 -0700 (PDT)
+        Thu, 15 Jul 2021 15:54:38 -0400
+Received: by mail-pg1-f182.google.com with SMTP id h4so7615278pgp.5;
+        Thu, 15 Jul 2021 12:51:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zjxwp6orKMql7+9u1ifo9qLb9KJtenjBrmxBwEY+JMw=;
-        b=qzgljO+BucRWGpUbkorz9naxtIIG7mcTJIWhS++L8v1rLh3qgak74ij2Z3LQENdejR
-         Ss4MEr/QVzgPkd/+YnihrwnS7SbwfQtUl4uAIQMhQ5wJ4zOFsPRI2R4RByylcFUNLGUD
-         g+DGbw9d+oAT3kMprSf1UNmvpU/MCeb6VR+O5aj68K4GlcI4LZLFH3qnH1OBSDEJOOvj
-         /suAnpQrzpgH47eWkJLlvvHq/IjnwChWyjJy6mSajutX3nEoo/s1CN5cuua+mtXgruRc
-         z6PHo36TOxABnKVBdy/eg0VJI+DPt44+d5r19K7gRmu94MGdU106JH+9H94aolf5p7Rn
-         hgvQ==
-X-Gm-Message-State: AOAM5324Kvyc/ctwU3I8qrZE7IFUM77uG8PPc0E8D/49qskHnp+OS/Of
-        Zzfp+5U5aUGH52a3rrJKZdo=
-X-Google-Smtp-Source: ABdhPJxY8NxgGVaQ84TXeW3HbjKH0JflzassnRhJ3CpoBi9BrNalbqNRIerP4lMAdXnIKdgPMPl8Rw==
-X-Received: by 2002:a63:100e:: with SMTP id f14mr6213805pgl.95.1626377646832;
-        Thu, 15 Jul 2021 12:34:06 -0700 (PDT)
-Received: from garbanzo ([191.96.120.37])
-        by smtp.gmail.com with ESMTPSA id l6sm7542802pff.74.2021.07.15.12.34.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jul 2021 12:34:05 -0700 (PDT)
-Date:   Thu, 15 Jul 2021 12:34:03 -0700
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0tDpePIxEktVeo6ztDCtMYeEDnPO5qQ9DWScWNmXcx0=;
+        b=KRsIyOYj5O0klvDSwZmR199irTQF5Qpu4ZebWJiLOpAE6MIIMpiag6G5AXDbJ3BVg1
+         Jubr0fn6q0A9zSJZ+UcJvrX9sUVBkeQvL8+NiU9mypeDXIslluW5gN59+XnbW3q1ow9n
+         NzenzEcndOOj1JtZ6JyIlYXGggquX6Hjdv41vQ1Skb1LWEe2CWRG7R98FNzF5a9hw1Cs
+         tEYdGxwBkbayKnAhmScFKW/+vdeJV0cZkXwDHuINX2SRPnBxGktYtuh+gTxQKZ/fK156
+         XiRb8ZwV7ER6zS1VKdecsS3gXjQrMF+vQjoHTHZccT/jXzXTL/ZpC8JZOH8CNDz3hET9
+         6ABw==
+X-Gm-Message-State: AOAM532YHBmwWPxLd75jOs7toYYCN6AP6tuoQWGPr0gkOy1hDLaHxb/T
+        Mi6hocJJuuZkRJJvSEFnkGE=
+X-Google-Smtp-Source: ABdhPJxcd9wtTZS3CgMVYrHkUpnxIVHIeUmrOux6mIRfLmQCntk4c4XgNAPEIDpQ04luIkhHUkp1aw==
+X-Received: by 2002:a63:1d41:: with SMTP id d1mr6212638pgm.199.1626378704063;
+        Thu, 15 Jul 2021 12:51:44 -0700 (PDT)
+Received: from localhost ([191.96.120.37])
+        by smtp.gmail.com with ESMTPSA id a4sm7778144pfd.110.2021.07.15.12.51.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jul 2021 12:51:43 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, hare@suse.de, bvanassche@acm.org,
-        ming.lei@redhat.com, jack@suse.cz, osandov@fb.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] block: add error handling for *add_disk*()
-Message-ID: <20210715193403.qn6nlb27uf2daf65@garbanzo>
-References: <20210715045531.420201-1-mcgrof@kernel.org>
- <YO/iVNCSTWy5EmoP@infradead.org>
+To:     axboe@kernel.dk
+Cc:     hare@suse.de, bvanassche@acm.org, ming.lei@redhat.com,
+        hch@infradead.org, jack@suse.cz, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH 0/3] block: simple *add_disk*() driver conversions
+Date:   Thu, 15 Jul 2021 12:51:38 -0700
+Message-Id: <20210715195141.1882285-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YO/iVNCSTWy5EmoP@infradead.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 15, 2021 at 08:23:00AM +0100, Christoph Hellwig wrote:
-> On Wed, Jul 14, 2021 at 09:55:25PM -0700, Luis Chamberlain wrote:
-> > Although I've dropped driver conversion at this point I've
-> > converted all drivers over, but that series is about 80
-> > patches... and so should be dealt with after this basic core
-> > work is reviewed and merged.
-> 
-> I think we need at least a few sample conversions to show how
-> you intend this to be used.
+As requested by Christoph, I'm going to add a few demo driver
+conversions, to show how drivers can manage *add_disk*() error
+handling.
 
-I'll send a few out, but I'll send them as separate groups. There
-are 5 groups of further changes as part of the driver conversion:
+I've converted all drivers at this point, but I think it makes sense to
+split these conversion up into groups. This is the first group, which
+demos trivial changes. This group is larger than this, but this series
+with 3 driver examples should suffice to start review on that group type.
 
-  1) trivial changes: requires a blk_cleanup_disk() on error added
-  2) Fix uses of GENHD_FL_UP
-  3) Fix uses of GENHD_FL_UP for del_gendisk() with a block helper
-  4) make probe on blk_request_module() return an error, so to
-     take advantage of the add_disk() on probe calls. Drivers which
-     benefit:
-     - ataflop
-     - brd
-     - floppy
-     - loop
-     - scsi/sd
-  5) Once all drivers are converted, add __must_check() to add_disk()
-     and friends
+If this seems fine and the block changes get merged I can extend this
+group later to include all trivial driver conversions. But patch review
+on these would help to get started.
 
-There are so many patches I think it makes sense to only post a few
-for each group, except maybe the 4th group, that requires probe
-change to go in one full sweep. I've only build tested what fits
-in my architecture so far, waiting on 0-day complaints reports to
-fix the rest. So only the first first group will go as PATCH form
-for now.
+Luis Chamberlain (3):
+  loop: add error handling support for add_disk()
+  null_blk: add error handling support for add_disk()
+  nbd: add error handling support for add_disk()
 
-  Luis
+ drivers/block/loop.c          | 9 ++++++++-
+ drivers/block/nbd.c           | 6 +++++-
+ drivers/block/null_blk/main.c | 3 +--
+ 3 files changed, 14 insertions(+), 4 deletions(-)
+
+-- 
+2.27.0
+
