@@ -2,128 +2,363 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD448C47E48
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F81C07E96
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:47:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABB6061360
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:30:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BD15613C3
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237360AbhGONdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 09:33:22 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:57252 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231713AbhGONdV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 09:33:21 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 637A51FE25;
-        Thu, 15 Jul 2021 13:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1626355827; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=QKH7/xefNqTRCod5UCsWj+PEvi0uBm27A6j8MnKfBn4=;
-        b=oNeQI0/R85RmNJYJtzF1gt4AxYd2r2puMM1f2/IloNG26ozpF4lwYjG+37yS8goa1Wt9Xy
-        Pz4KH4iLYUOk6ZwEljCN78mMwl3kKrlPb0vADbXpPilpKgpzeKWSIzQxgmn0+e5aV8CNWN
-        BA/Bm4bE0JKQC8pbfK9jpHjqhlfqSKE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1626355827;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=QKH7/xefNqTRCod5UCsWj+PEvi0uBm27A6j8MnKfBn4=;
-        b=kGYax3nPky6Sncnm7tkTSMoR4C+83I4wuY11RuEaEQTw/L0OIjohiOgf1yIFvjfwVxMUTl
-        7bPOEI0bvFtEWlCg==
-Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 52121A3B8F;
-        Thu, 15 Jul 2021 13:30:27 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 2F8C91E0BF2; Thu, 15 Jul 2021 15:30:27 +0200 (CEST)
-From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     <linux-block@vger.kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 0/3 v2] bfq: Limit number of allocated scheduler tags per cgroup
-Date:   Thu, 15 Jul 2021 15:30:16 +0200
-Message-Id: <20210715132047.20874-1-jack@suse.cz>
-X-Mailer: git-send-email 2.26.2
+        id S234463AbhGONtx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 09:49:53 -0400
+Received: from verein.lst.de ([213.95.11.211]:38648 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229832AbhGONtx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Jul 2021 09:49:53 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id AF04D67373; Thu, 15 Jul 2021 15:46:56 +0200 (CEST)
+Date:   Thu, 15 Jul 2021 15:46:56 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Subject: Re: [BUG report] Deadlock in xen-blkfront upon device hot-unplug
+Message-ID: <20210715134656.GA4167@lst.de>
+References: <87pmvk0wep.fsf@vitty.brq.redhat.com> <20210715124622.GA32693@lst.de> <87k0lr1zta.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2873; h=from:subject:message-id; bh=I5aXUrFDZe2CAg9UOHFtqtL+0LvC4tU9TslHegcd9NE=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBg8DhJy2Dd/DNH7sIu9SqRmW6QVkhviwM3gGp7+T+W hz+AybKJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYPA4SQAKCRCcnaoHP2RA2RR3B/ 9ARBS+nmIhQRENKx2O5biTXpB4Ra/nvZBJTYmC25xh4FnAAIG6YR6fQ+4ZEhNl1Yz9nBoqkWIq+hNN FwN8ExY4TTqhKf/Xaut7CtIo4iReUnQwsp1YrrM6F8btelEKEwjDzvsLrYFLP9x84k6XveVGht4KfB HMvBGIoxS5uiJ3Nz79tHF14uZBxwCG7vqJAJKHUnq4vFz0BR5TWV/yc5TIy/FqwCI0aAG5uzOY6mZv f/qECMFezaozL2aE9acbY+ovWmSD8OsNKS3XbyHpSXBjvImKs4ZCpT63h33S5VriwoD+jrZ4br7KWF grji/5pAU25K0TYBQDrnupzGccSPbY
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87k0lr1zta.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello!
+On Thu, Jul 15, 2021 at 03:17:37PM +0200, Vitaly Kuznetsov wrote:
+> Christoph Hellwig <hch@lst.de> writes:
+> 
+> > On Thu, Jul 15, 2021 at 11:16:30AM +0200, Vitaly Kuznetsov wrote:
+> >> I'm observing a deadlock every time I try to unplug a xen-blkfront
+> >> device. With 5.14-rc1+ the deadlock looks like:
+> >
+> > I did actually stumble over this a few days ago just from code
+> > inspection.  Below is what I come up with, can you give it a spin?
+> 
+> This eliminates the deadlock, thanks! Unfortunately, this reveals the
+> same issue I observed when I just dropped taking the mutex from
+> blkfront_closing():
 
-Here is the second revision of my patches to fix how bfq weights apply on
-cgroup throughput. This version has only one change fixing how we compute
-number of tags that should be available to a cgroup. Previous version didn't
-combine weights at several levels correctly for deeper hierarchies. It is
-somewhat unfortunate that for really deep cgroup hierarchies we would now do
-memory allocation inside bfq_limit_depth(). I have an idea how we could avoid
-that if the rest of the approach proves OK so don't concentrate too much on
-that detail please.
+Yeah, this still left too much cruft in blkfront_closing.  Can you
+try this version instead?
 
-Changes since v1:
-* Fixed computation of appropriate proportion of scheduler tags for a cgroup
-  to work with deeper cgroup hierarchies.
+---
+From 4d926a44f15d2051909132182345754df23cc13d Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Tue, 29 Jun 2021 13:49:22 +0200
+Subject: xen-blkfront: sanitize the removal state machine
 
-Original cover letter:
+xen-blkfront has a weird protocol where close message from the remote
+side can be delayed, and where hot removals are treated somewhat
+differently from regular removals, all leading to potential NULL
+pointer removals.  Fix this by just performing normal hot removals
+even when the device is opened like all other Linux block drivers.
 
-I was looking into why cgroup weights do not have any measurable impact on
-writeback throughput from different cgroups. This actually a regression from
-CFQ where things work more or less OK and weights have roughly the impact they
-should. The problem can be reproduced e.g. by running the following easy fio
-job in two cgroups with different weight:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/xen-blkfront.c | 208 ++++-------------------------------
+ 1 file changed, 24 insertions(+), 184 deletions(-)
 
-[writer]
-directory=/mnt/repro/
-numjobs=1
-rw=write
-size=8g
-time_based
-runtime=30
-ramp_time=10
-blocksize=1m
-direct=0
-ioengine=sync
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 8d49f8fa98bb..09ceb7bd585a 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -502,34 +502,21 @@ static int blkif_getgeo(struct block_device *bd, struct hd_geometry *hg)
+ static int blkif_ioctl(struct block_device *bdev, fmode_t mode,
+ 		       unsigned command, unsigned long argument)
+ {
+-	struct blkfront_info *info = bdev->bd_disk->private_data;
+ 	int i;
+ 
+-	dev_dbg(&info->xbdev->dev, "command: 0x%x, argument: 0x%lx\n",
+-		command, (long)argument);
+-
+ 	switch (command) {
+ 	case CDROMMULTISESSION:
+-		dev_dbg(&info->xbdev->dev, "FIXME: support multisession CDs later\n");
+ 		for (i = 0; i < sizeof(struct cdrom_multisession); i++)
+ 			if (put_user(0, (char __user *)(argument + i)))
+ 				return -EFAULT;
+ 		return 0;
+-
+-	case CDROM_GET_CAPABILITY: {
+-		struct gendisk *gd = info->gd;
+-		if (gd->flags & GENHD_FL_CD)
++	case CDROM_GET_CAPABILITY:
++		if (bdev->bd_disk->flags & GENHD_FL_CD)
+ 			return 0;
+ 		return -EINVAL;
+-	}
+-
+ 	default:
+-		/*printk(KERN_ALERT "ioctl %08x not supported by Xen blkdev\n",
+-		  command);*/
+-		return -EINVAL; /* same return as native Linux */
++		return -EINVAL;
+ 	}
+-
+-	return 0;
+ }
+ 
+ static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
+@@ -1177,36 +1164,6 @@ static int xlvbd_alloc_gendisk(blkif_sector_t capacity,
+ 	return err;
+ }
+ 
+-static void xlvbd_release_gendisk(struct blkfront_info *info)
+-{
+-	unsigned int minor, nr_minors, i;
+-	struct blkfront_ring_info *rinfo;
+-
+-	if (info->rq == NULL)
+-		return;
+-
+-	/* No more blkif_request(). */
+-	blk_mq_stop_hw_queues(info->rq);
+-
+-	for_each_rinfo(info, rinfo, i) {
+-		/* No more gnttab callback work. */
+-		gnttab_cancel_free_callback(&rinfo->callback);
+-
+-		/* Flush gnttab callback work. Must be done with no locks held. */
+-		flush_work(&rinfo->work);
+-	}
+-
+-	del_gendisk(info->gd);
+-
+-	minor = info->gd->first_minor;
+-	nr_minors = info->gd->minors;
+-	xlbd_release_minors(minor, nr_minors);
+-
+-	blk_cleanup_disk(info->gd);
+-	info->gd = NULL;
+-	blk_mq_free_tag_set(&info->tag_set);
+-}
+-
+ /* Already hold rinfo->ring_lock. */
+ static inline void kick_pending_request_queues_locked(struct blkfront_ring_info *rinfo)
+ {
+@@ -2126,38 +2083,26 @@ static int blkfront_resume(struct xenbus_device *dev)
+ static void blkfront_closing(struct blkfront_info *info)
+ {
+ 	struct xenbus_device *xbdev = info->xbdev;
+-	struct block_device *bdev = NULL;
+-
+-	mutex_lock(&info->mutex);
++	struct blkfront_ring_info *rinfo;
++	unsigned int i;
+ 
+-	if (xbdev->state == XenbusStateClosing) {
+-		mutex_unlock(&info->mutex);
++	if (xbdev->state == XenbusStateClosing)
+ 		return;
+-	}
+-
+-	if (info->gd)
+-		bdev = bdgrab(info->gd->part0);
+ 
+-	mutex_unlock(&info->mutex);
+-
+-	if (!bdev) {
+-		xenbus_frontend_closed(xbdev);
+-		return;
+-	}
++	/* No more blkif_request(). */
++	blk_mq_stop_hw_queues(info->rq);
++	blk_set_queue_dying(info->rq);
++	set_capacity(info->gd, 0);
+ 
+-	mutex_lock(&bdev->bd_disk->open_mutex);
++	for_each_rinfo(info, rinfo, i) {
++		/* No more gnttab callback work. */
++		gnttab_cancel_free_callback(&rinfo->callback);
+ 
+-	if (bdev->bd_openers) {
+-		xenbus_dev_error(xbdev, -EBUSY,
+-				 "Device in use; refusing to close");
+-		xenbus_switch_state(xbdev, XenbusStateClosing);
+-	} else {
+-		xlvbd_release_gendisk(info);
+-		xenbus_frontend_closed(xbdev);
++		/* Flush gnttab callback work. Must be done with no locks held. */
++		flush_work(&rinfo->work);
+ 	}
+ 
+-	mutex_unlock(&bdev->bd_disk->open_mutex);
+-	bdput(bdev);
++	xenbus_frontend_closed(xbdev);
+ }
+ 
+ static void blkfront_setup_discard(struct blkfront_info *info)
+@@ -2472,8 +2417,7 @@ static void blkback_changed(struct xenbus_device *dev,
+ 			break;
+ 		fallthrough;
+ 	case XenbusStateClosing:
+-		if (info)
+-			blkfront_closing(info);
++		blkfront_closing(info);
+ 		break;
+ 	}
+ }
+@@ -2481,55 +2425,19 @@ static void blkback_changed(struct xenbus_device *dev,
+ static int blkfront_remove(struct xenbus_device *xbdev)
+ {
+ 	struct blkfront_info *info = dev_get_drvdata(&xbdev->dev);
+-	struct block_device *bdev = NULL;
+-	struct gendisk *disk;
+ 
+ 	dev_dbg(&xbdev->dev, "%s removed", xbdev->nodename);
+ 
+-	if (!info)
+-		return 0;
++	del_gendisk(info->gd);
+ 
+ 	blkif_free(info, 0);
++	xlbd_release_minors(info->gd->first_minor, info->gd->minors);
++	blk_cleanup_disk(info->gd);
++	blk_mq_free_tag_set(&info->tag_set);
+ 
+-	mutex_lock(&info->mutex);
+-
+-	disk = info->gd;
+-	if (disk)
+-		bdev = bdgrab(disk->part0);
+-
+-	info->xbdev = NULL;
+-	mutex_unlock(&info->mutex);
+-
+-	if (!bdev) {
+-		mutex_lock(&blkfront_mutex);
+-		free_info(info);
+-		mutex_unlock(&blkfront_mutex);
+-		return 0;
+-	}
+-
+-	/*
+-	 * The xbdev was removed before we reached the Closed
+-	 * state. See if it's safe to remove the disk. If the bdev
+-	 * isn't closed yet, we let release take care of it.
+-	 */
+-
+-	mutex_lock(&disk->open_mutex);
+-	info = disk->private_data;
+-
+-	dev_warn(disk_to_dev(disk),
+-		 "%s was hot-unplugged, %d stale handles\n",
+-		 xbdev->nodename, bdev->bd_openers);
+-
+-	if (info && !bdev->bd_openers) {
+-		xlvbd_release_gendisk(info);
+-		disk->private_data = NULL;
+-		mutex_lock(&blkfront_mutex);
+-		free_info(info);
+-		mutex_unlock(&blkfront_mutex);
+-	}
+-
+-	mutex_unlock(&disk->open_mutex);
+-	bdput(bdev);
++	mutex_lock(&blkfront_mutex);
++	free_info(info);
++	mutex_unlock(&blkfront_mutex);
+ 
+ 	return 0;
+ }
+@@ -2541,77 +2449,9 @@ static int blkfront_is_ready(struct xenbus_device *dev)
+ 	return info->is_ready && info->xbdev;
+ }
+ 
+-static int blkif_open(struct block_device *bdev, fmode_t mode)
+-{
+-	struct gendisk *disk = bdev->bd_disk;
+-	struct blkfront_info *info;
+-	int err = 0;
+-
+-	mutex_lock(&blkfront_mutex);
+-
+-	info = disk->private_data;
+-	if (!info) {
+-		/* xbdev gone */
+-		err = -ERESTARTSYS;
+-		goto out;
+-	}
+-
+-	mutex_lock(&info->mutex);
+-
+-	if (!info->gd)
+-		/* xbdev is closed */
+-		err = -ERESTARTSYS;
+-
+-	mutex_unlock(&info->mutex);
+-
+-out:
+-	mutex_unlock(&blkfront_mutex);
+-	return err;
+-}
+-
+-static void blkif_release(struct gendisk *disk, fmode_t mode)
+-{
+-	struct blkfront_info *info = disk->private_data;
+-	struct xenbus_device *xbdev;
+-
+-	mutex_lock(&blkfront_mutex);
+-	if (disk->part0->bd_openers)
+-		goto out_mutex;
+-
+-	/*
+-	 * Check if we have been instructed to close. We will have
+-	 * deferred this request, because the bdev was still open.
+-	 */
+-
+-	mutex_lock(&info->mutex);
+-	xbdev = info->xbdev;
+-
+-	if (xbdev && xbdev->state == XenbusStateClosing) {
+-		/* pending switch to state closed */
+-		dev_info(disk_to_dev(disk), "releasing disk\n");
+-		xlvbd_release_gendisk(info);
+-		xenbus_frontend_closed(info->xbdev);
+- 	}
+-
+-	mutex_unlock(&info->mutex);
+-
+-	if (!xbdev) {
+-		/* sudden device removal */
+-		dev_info(disk_to_dev(disk), "releasing disk\n");
+-		xlvbd_release_gendisk(info);
+-		disk->private_data = NULL;
+-		free_info(info);
+-	}
+-
+-out_mutex:
+-	mutex_unlock(&blkfront_mutex);
+-}
+-
+ static const struct block_device_operations xlvbd_block_fops =
+ {
+ 	.owner = THIS_MODULE,
+-	.open = blkif_open,
+-	.release = blkif_release,
+ 	.getgeo = blkif_getgeo,
+ 	.ioctl = blkif_ioctl,
+ 	.compat_ioctl = blkdev_compat_ptr_ioctl,
+-- 
+2.30.2
 
-I can observe there's no significat difference in the amount of data written
-from different cgroups despite their weights are in say 1:3 ratio.
-
-After some debugging I've understood the dynamics of the system. There are two
-issues:
-
-1) The amount of scheduler tags needs to be significantly larger than the
-amount of device tags. Otherwise there are not enough requests waiting in BFQ
-to be dispatched to the device and thus there's nothing to schedule on.
-
-2) Even with enough scheduler tags, writers from two cgroups eventually start
-contending on scheduler tag allocation. These are served on first come first
-served basis so writers from both cgroups feed requests into bfq with
-approximately the same speed. Since bfq prefers IO from heavier cgroup, that is
-submitted and completed faster and eventually we end up in a situation when
-there's no IO from the heavier cgroup in bfq and all scheduler tags are
-consumed by requests from the lighter cgroup. At that point bfq just dispatches
-lots of the IO from the lighter cgroup since there's no contender for disk
-throughput. As a result observed throughput for both cgroups are the same.
-
-This series fixes this problem by accounting how many scheduler tags are
-allocated for each cgroup and if a cgroup has more tags allocated than its
-fair share (based on weights) in its service tree, we heavily limit scheduler
-tag bitmap depth for it so that it is not be able to starve other cgroups from
-scheduler tags.
-
-What do people think about this?
-
-								Honza
-
-Previous versions:
-Link: http://lore.kernel.org/r/20210712171146.12231-1-jack@suse.cz # v1
