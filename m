@@ -2,173 +2,241 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 110FDC07E96
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:17:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67ACBC07E96
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:30:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5382613C9
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:17:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4156B61360
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 13:30:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235142AbhGONUe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 09:20:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28205 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232341AbhGONUe (ORCPT
+        id S237619AbhGONdV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 09:33:21 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:57256 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237525AbhGONdV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 09:20:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626355061;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        Thu, 15 Jul 2021 09:33:21 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 66AE71FE27;
+        Thu, 15 Jul 2021 13:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1626355827; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fEnFR9sLZg9aNWBfSV+Jjv4oijW9gGY7ZZ8SM1EhDyo=;
-        b=YHQlsJUpfF3QI/9XcNIXyPa0W7pofD4/CsWhMvspCdwQvqhasFVHUV36oDXt7EqG1fPblS
-        pDhsBhtZehOZlBLosTrK7DuBiYwbrJuU1v0XYOWIH6Qx3j1TwqEZqAxtNtIIBU6r5Aabrq
-        iudcXqGxdejSA70z474ZJ3/GWjgGSmk=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-zHF_tamqNYG5oWJcJy5VsQ-1; Thu, 15 Jul 2021 09:17:40 -0400
-X-MC-Unique: zHF_tamqNYG5oWJcJy5VsQ-1
-Received: by mail-ej1-f69.google.com with SMTP id r10-20020a170906350ab02904f12f4a8c69so2203107eja.12
-        for <linux-block@vger.kernel.org>; Thu, 15 Jul 2021 06:17:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=fEnFR9sLZg9aNWBfSV+Jjv4oijW9gGY7ZZ8SM1EhDyo=;
-        b=Dx75sPI1Qnzh4VYFKZYKwekOpqvIlN8n7bu99eG1ionREpSfFu+/iUyu5gUq5c06G0
-         KV3MpoO6tOEEmU1pNcmnL79JpChCraBAAvwcXXJbueO3gKkSfPF5hHUFRN3T1cw6z9OC
-         SB2kfGGda0KcGPMgc8Fnp+/Mr1EOhdoz+wkABlZkrtBT4DzbNlXlRi4IXmiJGVnlth2c
-         MK1pAlEMzgDoG1uh9I0yG94E1SwjVYHJffudtchJ27oE9sR6sVNCb/fm0R9kmsjlmcZ+
-         8FRIc8JmUlmkKV0EEKMRjJO+HiK/0ETk4yillJcFPu2u/prYT5wGsKGLbasIZ0dTdc75
-         +Zfw==
-X-Gm-Message-State: AOAM533sw/u5J3kuGP/543lsV+uEnUqKa0J0oDHyxvgfOT5BaJKsEVqO
-        m3LRGPKy2j5aP26CnJSLpAgAW7dGXxHzHCCioSm2BwdgCyi/+SEUUgois8Os4XfFST9fk4jH0K1
-        NVyRTQi/9Wim457rj0287cKU=
-X-Received: by 2002:a17:907:7293:: with SMTP id dt19mr5642592ejc.122.1626355058787;
-        Thu, 15 Jul 2021 06:17:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2vEkDU4ywXlhDnjL2xOkQcJAsMfg1xLGoIUohd2Oe+LOaHxUNb/4gntVHBypGHocKBtmQLw==
-X-Received: by 2002:a17:907:7293:: with SMTP id dt19mr5642565ejc.122.1626355058533;
-        Thu, 15 Jul 2021 06:17:38 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id kb12sm1867346ejc.35.2021.07.15.06.17.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jul 2021 06:17:38 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?utf-8?Q?Monn=C3=A9?= <roger.pau@citrix.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [BUG report] Deadlock in xen-blkfront upon device hot-unplug
-In-Reply-To: <20210715124622.GA32693@lst.de>
-References: <87pmvk0wep.fsf@vitty.brq.redhat.com>
- <20210715124622.GA32693@lst.de>
-Date:   Thu, 15 Jul 2021 15:17:37 +0200
-Message-ID: <87k0lr1zta.fsf@vitty.brq.redhat.com>
+        bh=hwo33Naj/CPFidpZeosCdaEDnv3XgY9VCBciCRXHwWw=;
+        b=FCJrhGxVLppxZASb7CGalncGBtH0S3Jb1RvaYdc/t+c8U1mPJIAhruAFzBm+v5Kmqg5Sai
+        i1Gm65iRv0RtKHkL6haH9neK/fuk6C84w45vWt+ofLgl/Qwkd2JLBLrfCttPfGgG921lKG
+        jg/O3GQ2aYKitr/QaL69kADVDhuPixM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1626355827;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hwo33Naj/CPFidpZeosCdaEDnv3XgY9VCBciCRXHwWw=;
+        b=eWQCKqD94NZUmtFrPl3D+MmBleg/RT5GAS5xVU+cW5u1mB0Ru1hpSBeyV4V7EZxhsBNUKY
+        OYU/jTi42HyAoCCg==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id 58E2EA3B9B;
+        Thu, 15 Jul 2021 13:30:27 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 39ECF1E0BF8; Thu, 15 Jul 2021 15:30:27 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 3/3] bfq: Limit number of requests consumed by each cgroup
+Date:   Thu, 15 Jul 2021 15:30:19 +0200
+Message-Id: <20210715133027.23975-3-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210715132047.20874-1-jack@suse.cz>
+References: <20210715132047.20874-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6369; h=from:subject; bh=Bp/OSDW5Rjr0UeO2reqvBpkYjy5sYrS7zC7p9jDV+Nc=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBg8Dhrq6VWQjZY4UnX53DHpzTqIe8h6p2MzOlj4Zap TTN89HKJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYPA4awAKCRCcnaoHP2RA2akCB/ 9mUxSBzvtUGjlpomqcV67PaLox+msu0iERsheXwT7Vsr/lukmy2JEO4q7L+Uijh4n78YET1UsJigdl Cm10Sn+EcrUDMzFV1hvDQuhWLe8fgF9CzX6vKSt1lgYZvsFU620OY1kU5yNxjOeysg+dARnGgDH19f 2NsG1G/Az7hqLDRs56JPwGbiENxZfdoUTHG1IXWl8mwrDkQM4B6nTlNAO1AUQ2RPl11m+F+l+KrsT4 JBKfH05G+iSXQgmMpb9sm52aWqiNjFnLf34I0biH65gu02Wae+q6jNUgQiCSiyRVTOD+kB7aHm8vBW 4MLmxwXD5kIHlfV7FEwuAgIqffvr+i
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> writes:
+When cgroup IO scheduling is used with BFQ it does not really provide
+service differentiation if the cgroup drives a big IO depth. That for
+example happens with writeback which asynchronously submits lots of IO
+but it can happen with AIO as well. The problem is that if we have two
+cgroups that submit IO with different weights, the cgroup with higher
+weight properly gets more IO time and is able to dispatch more IO.
+However this causes lower weight cgroup to accumulate more requests
+inside BFQ and eventually lower weight cgroup consumes most of IO
+scheduler tags. At that point higher weight cgroup stops getting better
+service as it is mostly blocked waiting for a scheduler tag while its
+queues inside BFQ are empty and thus lower weight cgroup gets served.
 
-> On Thu, Jul 15, 2021 at 11:16:30AM +0200, Vitaly Kuznetsov wrote:
->> I'm observing a deadlock every time I try to unplug a xen-blkfront
->> device. With 5.14-rc1+ the deadlock looks like:
->
-> I did actually stumble over this a few days ago just from code
-> inspection.  Below is what I come up with, can you give it a spin?
+Check how many requests submitting cgroup has allocated in
+bfq_limit_depth() and if it consumes more requests than what would
+correspond to its weight limit available depth to 1 so that the cgroup
+cannot consume many more requests. With this limitation the higher
+weight cgroup gets proper service even with writeback.
 
-This eliminates the deadlock, thanks! Unfortunately, this reveals the
-same issue I observed when I just dropped taking the mutex from
-blkfront_closing():
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/bfq-iosched.c | 103 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 85 insertions(+), 18 deletions(-)
 
-[   66.455122] general protection fault, probably for non-canonical address 0xf1af5e354e6da159: 0000 [#1] SMP PTI
-[   66.462802] CPU: 4 PID: 145 Comm: xenwatch Not tainted 5.14.0-rc1+ #370
-[   66.467486] Hardware name: Xen HVM domU, BIOS 4.2.amazon 08/24/2006
-[   66.472817] RIP: 0010:del_timer+0x1f/0x80
-[   66.476570] Code: 71 af a3 00 eb c1 31 c0 c3 66 90 0f 1f 44 00 00 41 55 41 54 45 31 e4 55 48 83 ec 10 65 48 8b 04 25 28 00 00 00 48 89 44 24 08 <48> 8b 47 08 48 85 c0 74 2d 48 89 e6 48 89 fd e8 dd e8 ff ff 48 89
-[   66.493967] RSP: 0018:ffffb5c10426bcd8 EFLAGS: 00010086
-[   66.499416] RAX: a49b3c9544841100 RBX: f1af5e354e6da101 RCX: 0000000000005ebf
-[   66.506386] RDX: 0000000000005ec0 RSI: 0000000000000001 RDI: f1af5e354e6da151
-[   66.512799] RBP: ffffb5c10426bd30 R08: 0000000000000001 R09: 0000000000000001
-[   66.518372] R10: 0000000000000001 R11: 0000000000000002 R12: 0000000000000000
-[   66.523681] R13: ffff9aba8df63e40 R14: 0000000000000000 R15: ffff9aba86f40000
-[   66.529365] FS:  0000000000000000(0000) GS:ffff9af609200000(0000) knlGS:0000000000000000
-[   66.536187] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   66.540806] CR2: 00007ff024600130 CR3: 000000010117a006 CR4: 00000000001706e0
-[   66.546345] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   66.552322] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   66.558501] Call Trace:
-[   66.561449]  try_to_grab_pending+0x13f/0x2e0
-[   66.565658]  cancel_delayed_work+0x2e/0xd0
-[   66.570012]  blk_mq_stop_hw_queues+0x2d/0x50
-[   66.574110]  blkfront_remove+0x30/0x130 [xen_blkfront]
-[   66.579049]  xenbus_dev_remove+0x6d/0xf0
-[   66.582473]  __device_release_driver+0x180/0x240
-[   66.586963]  device_release_driver+0x26/0x40
-[   66.591050]  bus_remove_device+0xef/0x160
-[   66.594805]  device_del+0x18c/0x3e0
-[   66.598570]  ? xenbus_probe_devices+0x120/0x120
-[   66.602987]  ? klist_iter_exit+0x14/0x20
-[   66.606915]  device_unregister+0x13/0x60
-[   66.611135]  xenbus_dev_changed+0x174/0x1e0
-[   66.615104]  xenwatch_thread+0x94/0x190
-[   66.619028]  ? do_wait_intr_irq+0xb0/0xb0
-[   66.623052]  ? xenbus_dev_request_and_reply+0x90/0x90
-[   66.628218]  kthread+0x149/0x170
-[   66.631509]  ? set_kthread_struct+0x40/0x40
-[   66.635355]  ret_from_fork+0x22/0x30
-[   66.639162] Modules linked in: vfat fat i2c_piix4 xfs libcrc32c crct10dif_pclmul crc32_pclmul crc32c_intel xen_blkfront ghash_clmulni_intel ena
-[   66.650868] ---[ end trace 7fa9da1e39697767 ]---
-[   66.655490] RIP: 0010:del_timer+0x1f/0x80
-[   66.659813] Code: 71 af a3 00 eb c1 31 c0 c3 66 90 0f 1f 44 00 00 41 55 41 54 45 31 e4 55 48 83 ec 10 65 48 8b 04 25 28 00 00 00 48 89 44 24 08 <48> 8b 47 08 48 85 c0 74 2d 48 89 e6 48 89 fd e8 dd e8 ff ff 48 89
-[   66.681045] RSP: 0018:ffffb5c10426bcd8 EFLAGS: 00010086
-[   66.685888] RAX: a49b3c9544841100 RBX: f1af5e354e6da101 RCX: 0000000000005ebf
-[   66.692153] RDX: 0000000000005ec0 RSI: 0000000000000001 RDI: f1af5e354e6da151
-[   66.698778] RBP: ffffb5c10426bd30 R08: 0000000000000001 R09: 0000000000000001
-[   66.705175] R10: 0000000000000001 R11: 0000000000000002 R12: 0000000000000000
-[   66.711696] R13: ffff9aba8df63e40 R14: 0000000000000000 R15: ffff9aba86f40000
-[   66.718035] FS:  0000000000000000(0000) GS:ffff9af609200000(0000) knlGS:0000000000000000
-[   66.725210] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   66.730291] CR2: 00007ff024600130 CR3: 000000010117a006 CR4: 00000000001706e0
-[   66.736235] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   66.742373] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   66.749026] BUG: sleeping function called from invalid context at include/linux/percpu-rwsem.h:49
-[   66.756118] in_atomic(): 0, irqs_disabled(): 1, non_block: 0, pid: 145, name: xenwatch
-[   66.763473] INFO: lockdep is turned off.
-[   66.767428] irq event stamp: 24256
-[   66.770900] hardirqs last  enabled at (24255): [<ffffffff90c32aeb>] _raw_spin_unlock_irqrestore+0x4b/0x5d
-[   66.779620] hardirqs last disabled at (24256): [<ffffffff900fe21c>] try_to_grab_pending+0x15c/0x2e0
-[   66.787763] softirqs last  enabled at (24196): [<ffffffff900e0b11>] __irq_exit_rcu+0xe1/0x100
-[   66.794519] softirqs last disabled at (24191): [<ffffffff900e0b11>] __irq_exit_rcu+0xe1/0x100
-[   66.801953] CPU: 4 PID: 145 Comm: xenwatch Tainted: G      D           5.14.0-rc1+ #370
-[   66.809315] Hardware name: Xen HVM domU, BIOS 4.2.amazon 08/24/2006
-[   66.814924] Call Trace:
-[   66.817461]  dump_stack_lvl+0x6a/0x9a
-[   66.821171]  ___might_sleep.cold+0xb6/0xc6
-[   66.825436]  exit_signals+0x1c/0x2d0
-[   66.829328]  do_exit+0xc7/0xbb0
-[   66.832364]  ? kthread+0x149/0x170
-[   66.835039]  rewind_stack_do_exit+0x17/0x20
-[   66.838710] RIP: 0000:0x0
-[   66.841671] Code: Unable to access opcode bytes at RIP 0xffffffffffffffd6.
-[   66.847271] RSP: 0000:0000000000000000 EFLAGS: 00000000 ORIG_RAX: 0000000000000000
-[   66.854271] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-[   66.860672] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-[   66.866687] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-[   66.872966] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[   66.878410] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 9ef057dc0028..8f9b4904934b 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -565,6 +565,71 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
+ 	}
+ }
+ 
++#define BFQ_LIMIT_INLINE_DEPTH 16
++
++#ifdef CONFIG_BFQ_GROUP_IOSCHED
++static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++	struct bfq_entity *entity = &bfqq->entity;
++	struct bfq_entity *inline_entities[BFQ_LIMIT_INLINE_DEPTH];
++	struct bfq_entity **entities = inline_entities;
++	int depth, level;
++	bool ret = false;
++
++	if (!entity->on_st_or_in_serv)
++		return false;
++
++	/* +1 for bfqq entity, root cgroup not included */
++	depth = bfqg_to_blkg(bfqq_group(bfqq))->blkcg->css.cgroup->level + 1;
++	if (depth > BFQ_LIMIT_INLINE_DEPTH) {
++		entities = kmalloc_array(depth, sizeof(*entities), GFP_NOIO);
++		if (!entities)
++			return false;
++	}
++
++	spin_lock_irq(&bfqd->lock);
++	if (!entity->on_st_or_in_serv)
++		goto out;
++	/* Gather our ancestors as we need to traverse them in reverse order */
++	level = 0;
++	for_each_entity(entity) {
++		/* Uh, more parents than cgroup subsystem thinks? */
++		if (WARN_ON_ONCE(level >= depth))
++			break;
++		entities[level++] = entity;
++	}
++	WARN_ON_ONCE(level != depth);
++	for (level--; level >= 0; level--) {
++		entity = entities[level];
++		/*
++		 * If the leaf entity has work to do, parents should be tracked
++		 * as well.
++		 */
++		WARN_ON_ONCE(!entity->on_st_or_in_serv);
++		limit = DIV_ROUND_CLOSEST(limit * entity->weight,
++					bfq_entity_service_tree(entity)->wsum);
++		if (entity->allocated >= limit) {
++			bfq_log_bfqq(bfqq->bfqd, bfqq,
++				"too many requests: allocated %d limit %d level %d",
++				entity->allocated, limit, level);
++			ret = true;
++			break;
++		}
++	}
++out:
++	spin_unlock_irq(&bfqd->lock);
++	if (entities != inline_entities)
++		kfree(entities);
++	return ret;
++}
++#else
++static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
++{
++	return false;
++}
++#endif
++
+ /*
+  * Async I/O can easily starve sync I/O (both sync reads and sync
+  * writes), by consuming all tags. Similarly, storms of sync writes,
+@@ -575,16 +640,28 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
+ static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
+ {
+ 	struct bfq_data *bfqd = data->q->elevator->elevator_data;
++	struct bfq_io_cq *bic = data->icq ? icq_to_bic(data->icq) : NULL;
++	struct bfq_queue *bfqq = bic ? bic_to_bfqq(bic, op_is_sync(op)) : NULL;
++	int depth;
+ 
++	/* Sync reads have full depth available */
+ 	if (op_is_sync(op) && !op_is_write(op))
+-		return;
++		depth = 0;
++	else
++		depth = bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
+ 
+-	data->shallow_depth =
+-		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
++	/*
++	 * Does queue (or any parent entity) exceed number of requests that
++	 * should be available to it? Heavily limit depth so that it cannot
++	 * consume more available requests and thus starve other entities.
++	 */
++	if (bfqq && bfqq_request_over_limit(bfqq, data->q->nr_requests))
++		depth = 1;
+ 
+ 	bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
+-			__func__, bfqd->wr_busy_queues, op_is_sync(op),
+-			data->shallow_depth);
++		__func__, bfqd->wr_busy_queues, op_is_sync(op), depth);
++	if (depth)
++		data->shallow_depth = depth;
+ }
+ 
+ static struct bfq_queue *
+@@ -6848,11 +6925,8 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+  * See the comments on bfq_limit_depth for the purpose of
+  * the depths set in the function. Return minimum shallow depth we'll use.
+  */
+-static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+-				      struct sbitmap_queue *bt)
++static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+ {
+-	unsigned int i, j, min_shallow = UINT_MAX;
+-
+ 	/*
+ 	 * In-word depths if no bfq_queue is being weight-raised:
+ 	 * leaving 25% of tags only for sync reads.
+@@ -6883,22 +6957,15 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+ 	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
+ 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+ 	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
+-
+-	for (i = 0; i < 2; i++)
+-		for (j = 0; j < 2; j++)
+-			min_shallow = min(min_shallow, bfqd->word_depths[i][j]);
+-
+-	return min_shallow;
+ }
+ 
+ static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+ 	struct blk_mq_tags *tags = hctx->sched_tags;
+-	unsigned int min_shallow;
+ 
+-	min_shallow = bfq_update_depths(bfqd, tags->bitmap_tags);
+-	sbitmap_queue_min_shallow_depth(tags->bitmap_tags, min_shallow);
++	bfq_update_depths(bfqd, tags->bitmap_tags);
++	sbitmap_queue_min_shallow_depth(tags->bitmap_tags, 1);
+ }
+ 
+ static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
 -- 
-Vitaly
+2.26.2
 
