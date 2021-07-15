@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EEACC636C9
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 21:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61857C636CA
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 21:00:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 088056120A
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 21:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BFF3613D4
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 21:00:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231710AbhGOVDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 17:03:00 -0400
-Received: from mail-pf1-f180.google.com ([209.85.210.180]:36402 "EHLO
-        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231503AbhGOVCs (ORCPT
+        id S231487AbhGOVDL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 17:03:11 -0400
+Received: from mail-pf1-f174.google.com ([209.85.210.174]:34540 "EHLO
+        mail-pf1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231443AbhGOVCp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 17:02:48 -0400
-Received: by mail-pf1-f180.google.com with SMTP id 21so6706643pfp.3;
-        Thu, 15 Jul 2021 13:59:54 -0700 (PDT)
+        Thu, 15 Jul 2021 17:02:45 -0400
+Received: by mail-pf1-f174.google.com with SMTP id o201so6712074pfd.1;
+        Thu, 15 Jul 2021 13:59:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=WSVfGQ1R8Z/Rw4wG+xwCYEvkoa1oHaXmWTWRMMqFlL0=;
-        b=oV5flFS4BPd8Ly6UEDnuMZhVVWQvkolipKDRXgItjlQ9sshIP3YIqxi5l9+a4Y6iL+
-         lUwvqvIt+PF3kMQuya3a/UTs4R4Liu1MprFXVT8ShZS7QSmNBuf4LlK3LkXmCacTyAlV
-         gObrKrEGk46R1i2wUHoshvnWjWX7kuGFrar3O+uLb2hVM7eqoQe1BLOIDFBCoEk7j0vN
-         ny5hgT7VA1QGC0gvVxolCltSqN9OsTysp6Mnw/JGgD8uMJPG2/yTdF4hgsPp7AbypXri
-         LXeEtiCQwOuiuL+zKEJAXMUmgPkIN4hEV77osI+sB/WwXObtBNoxRgyn9VIRlI5ajQiO
-         Y+IQ==
-X-Gm-Message-State: AOAM5337rHBJwMXufTPQqYBi5aBVWJvSqfFFe8QrHuNehmtLmtXYPTxK
-        +YCeeX7dVTsPFXIvxqt7rxg=
-X-Google-Smtp-Source: ABdhPJy0O+QorLEM+UZWloHx4fFjEw0Nae2ObjbDOmkUqoz32hSvSdExlbNKj0x1NZ9uydMh08OHtA==
-X-Received: by 2002:a63:4302:: with SMTP id q2mr6350916pga.428.1626382793933;
-        Thu, 15 Jul 2021 13:59:53 -0700 (PDT)
+        bh=kqmQTgkBRpmWMg0yfS7sVgm7RNMrAIBkaY+MOepqYKs=;
+        b=UqqpNYBlmyOPIOTrwpOkjX44EEs4T35vUZ6O6wKewFZX7AhSSOkHUrCArEOxe+5xD0
+         2rVG3cmwhJR0LW8QgVhYNPcSyqKBcEJk7X0Q1vjBOEjJTn0DIg3dlZUiggNOnQ62cORq
+         xfzAQFJ5gb50/rGALxjmhdMuT3O14q7ufRaoxKU9doyAzLQGRzAYGNzwuufsuZd/m8qW
+         ZccXcNtkLAeitmcaxRtLhqetkaxTtXegiMHLu8gHNkXHlQUsV1QmPW1E8o/xRd/Tb1Tx
+         8omjgLDBF0cwyYLzP4bdEt4aMi6oHDW5sg40uElDnxrHaxCvz2/+ywoClUwGWzib8ns7
+         j/GQ==
+X-Gm-Message-State: AOAM532ET0k7clIZx3h6DgnqcqPBTdYPTW4Eaej8kv932sgjfzSsuazg
+        COoxeYinVYhINYQs7HMsLAY=
+X-Google-Smtp-Source: ABdhPJxcMLzvFdqNYKT7Tq81OxvFslLarcy23ysTyw/EzXlQDYZHzZjG6LXc3cM7T3YMQVnn7j31eg==
+X-Received: by 2002:aa7:8509:0:b029:2e5:8cfe:bc17 with SMTP id v9-20020aa785090000b02902e58cfebc17mr6699115pfn.2.1626382791516;
+        Thu, 15 Jul 2021 13:59:51 -0700 (PDT)
 Received: from localhost ([191.96.120.37])
-        by smtp.gmail.com with ESMTPSA id l8sm6107970pjc.17.2021.07.15.13.59.52
+        by smtp.gmail.com with ESMTPSA id 123sm7766994pfw.33.2021.07.15.13.59.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jul 2021 13:59:53 -0700 (PDT)
+        Thu, 15 Jul 2021 13:59:50 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk
 Cc:     hare@suse.de, bvanassche@acm.org, ming.lei@redhat.com,
         hch@infradead.org, jack@suse.cz, osandov@fb.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [RFC 11/12] block/brd: add error handling support for add_disk()
-Date:   Thu, 15 Jul 2021 13:59:19 -0700
-Message-Id: <20210715205920.2023980-12-mcgrof@kernel.org>
+Subject: [RFC 10/12] block/ataflop add error handling support for add_disk()
+Date:   Thu, 15 Jul 2021 13:59:18 -0700
+Message-Id: <20210715205920.2023980-11-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210715205920.2023980-1-mcgrof@kernel.org>
 References: <20210715205920.2023980-1-mcgrof@kernel.org>
@@ -63,45 +63,45 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
+We reuse the atari_floppy_disk_remove() call.
+
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/brd.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/block/ataflop.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 95694113e38e..ca017ca315c5 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -375,6 +375,7 @@ static int brd_alloc(int i)
- 	struct brd_device *brd;
- 	struct gendisk *disk;
- 	char buf[DISK_NAME_LEN];
-+	int err = -ENOMEM;
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index 73eb80b58888..4b3f1158fa04 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -2081,7 +2081,9 @@ static int __init atari_floppy_init (void)
+ 	for (i = 0; i < FD_MAX_UNITS; i++) {
+ 		unit[i].track = -1;
+ 		unit[i].flags = 0;
+-		add_disk(unit[i].disk[0]);
++		ret = add_disk(unit[i].disk[0]);
++		if (ret)
++			goto err_out_dma;
+ 	}
  
- 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
- 	if (!brd)
-@@ -413,14 +414,19 @@ static int brd_alloc(int i)
- 	/* Tell the block layer that this is not a rotational device */
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
- 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, disk->queue);
--	add_disk(disk);
-+	err = add_disk(disk);
-+	if (err)
-+		goto out_cleanup_disk;
-+
- 	list_add_tail(&brd->brd_list, &brd_devices);
+ 	printk(KERN_INFO "Atari floppy driver: max. %cD, %strack buffering\n",
+@@ -2091,13 +2093,10 @@ static int __init atari_floppy_init (void)
  
  	return 0;
  
-+out_cleanup_disk:
-+	blk_cleanup_disk(disk);
- out_free_dev:
- 	kfree(brd);
--	return -ENOMEM;
-+	return err;
- }
- 
- static void brd_probe(dev_t dev)
++err_out_dma:
++	atari_stram_free(DMABuffer);
+ err:
+-	while (--i >= 0) {
+-		blk_cleanup_disk(unit[i].disk[0]);
+-		blk_mq_free_tag_set(&unit[i].tag_set);
+-	}
+-
+-	unregister_blkdev(FLOPPY_MAJOR, "fd");
++	atari_floppy_disk_remove();
+ out_unlock:
+ 	mutex_unlock(&ataflop_probe_lock);
+ 	return ret;
 -- 
 2.27.0
 
