@@ -2,174 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CF2C07E96
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 09:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE861C07E96
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 11:22:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8851611AB
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 09:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AF2961278
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jul 2021 11:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231177AbhGOJwr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 05:52:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45310 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240121AbhGOJwr (ORCPT
+        id S240843AbhGOLZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jul 2021 07:25:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45595 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240818AbhGOLZT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 05:52:47 -0400
-X-Greylist: delayed 66 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Jul 2021 02:49:53 PDT
-Received: from forwardcorp1p.mail.yandex.net (forwardcorp1p.mail.yandex.net [IPv6:2a02:6b8:0:1472:2741:0:8b6:217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00D9C061760;
-        Thu, 15 Jul 2021 02:49:53 -0700 (PDT)
-Received: from vla1-fdfb804fb3f3.qloud-c.yandex.net (vla1-fdfb804fb3f3.qloud-c.yandex.net [IPv6:2a02:6b8:c0d:3199:0:640:fdfb:804f])
-        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id BC8002E1700;
-        Thu, 15 Jul 2021 12:48:44 +0300 (MSK)
-Received: from vla1-81430ab5870b.qloud-c.yandex.net (vla1-81430ab5870b.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:8143:ab5])
-        by vla1-fdfb804fb3f3.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id 74KuWyvOBd-mix8WY4w;
-        Thu, 15 Jul 2021 12:48:44 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1626342524; bh=cjfhfx3Yno6tkEv/8GHdGDPNh7oLRWVFoA9ssU6mL2k=;
-        h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
-        b=ADGlAR41DjSGz+p2Kd3uCOI6BN3IEePhYhTM+JML0jCr88iB7qrJVz4A/vE93GpCm
-         /qDU6n0v+V/zmNiMi/2pATE9LcmzIE/wyPAMw5OveR7W+zH/9/EoRHXsKDhvOmhNrI
-         +pT8IKzJeUSrQC9Q6BPgxCzZFO2yi5efT0On3Gao=
-Authentication-Results: vla1-fdfb804fb3f3.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from 77.88.0.204-spb.dhcp.yndx.net (77.88.0.204-spb.dhcp.yndx.net [77.88.0.204])
-        by vla1-81430ab5870b.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id JSE0wE09V8-mi2KCkLw;
-        Thu, 15 Jul 2021 12:48:44 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-From:   Yury Kamenev <damtev@yandex-team.ru>
-To:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com, axboe@kernel.dk, hch@lst.de, cand@gmx.com,
+        Thu, 15 Jul 2021 07:25:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626348146;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=n3XMjsLqmL6fZAAA+JBtyt58Zb9isCAphRrAoufbmyY=;
+        b=gGqXWSAqUdtKoN5RqiXiSDJUUylntgAneUf/dCPJRUcfVFBGKTyeYzC+KF+S5ICn2Uxv71
+        wW6MXE/U+n4CJ/OJyy6NLmGm0TtR5TyvIWkBCXTS7j5zbIEj70iSxQQkRFH0pdRTmFgWnb
+        HdIjhrOEZoNnoHrcpO8QW9cFSpP4kmM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-Ka_3RBDyNRm0nAaJhTW_Cw-1; Thu, 15 Jul 2021 07:22:25 -0400
+X-MC-Unique: Ka_3RBDyNRm0nAaJhTW_Cw-1
+Received: by mail-wr1-f70.google.com with SMTP id r18-20020adfce920000b029013bbfb19640so3142016wrn.17
+        for <linux-block@vger.kernel.org>; Thu, 15 Jul 2021 04:22:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=n3XMjsLqmL6fZAAA+JBtyt58Zb9isCAphRrAoufbmyY=;
+        b=dO/L1IOC99Mb214xZn05bfo8c7CzFZQDXLyTOQJsi9Wf8PC1M4NipoXCTfDkvRd+sI
+         MbVx30MMx8YY0ivd7xQmrmRGj7jxDuRrsg8fbxgzz1J605guFmmKovD2KO3G0FEhg4T4
+         u4zTCNVC3Ka6G1AjQzYeFzPJn8P7sN7Fvk9v9ChrVT/d6cUeIjNBdAa1g4NtKQ+vDIKW
+         O1OeCiOpf7BZbKr93cZy9c3FVilIqfIsuUVmR9R/8XsEZItA8Oo0ZNWTT2e+otLhDdBQ
+         2hAirHb1Piks+1z85zHp+qF3lJIFW9sXppQtq1XXBDPTKtmJN92U20r6xPUYAfQ7HAur
+         G56Q==
+X-Gm-Message-State: AOAM530p6wFaY2y4LtCWHyXTvQSjLPUdXSjv6B1v/imIHFQYxVYUEJ5L
+        mHLqznq7YnpGsjSZt4098VWXEkrsqeXpIZsoarJK4qkpramsVfZtvceIy2jhKTTkAtrBt9qri5D
+        O5vCZBEz1xTkB3qiHj1AREi0=
+X-Received: by 2002:a5d:52d0:: with SMTP id r16mr4822757wrv.323.1626348143923;
+        Thu, 15 Jul 2021 04:22:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxxUBHhfe+A3WtzBYo5eZtyU+fS1EBqnOvDIUROVv21BrPU/0Ixxe0AbzLRTePqxWt25P3MgA==
+X-Received: by 2002:a5d:52d0:: with SMTP id r16mr4822740wrv.323.1626348143761;
+        Thu, 15 Jul 2021 04:22:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.gmail.com with ESMTPSA id w15sm8708936wmi.3.2021.07.15.04.22.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jul 2021 04:22:22 -0700 (PDT)
+Subject: Re: [PATCH 1/1] virtio: disable partitions scanning for no partitions
+ block
+To:     Yury Kamenev <damtev@yandex-team.ru>, mst@redhat.com,
+        jasowang@redhat.com, stefanha@redhat.com, axboe@kernel.dk,
+        hch@lst.de, cand@gmx.com,
         virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Yury Kamenev <damtev@yandex-team.ru>
-Subject: [PATCH 1/1] virtio: disable partitions scanning for no partitions block
-Date:   Thu, 15 Jul 2021 12:47:07 +0300
-Message-Id: <20210715094707.19997-2-damtev@yandex-team.ru>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20210715094707.19997-1-damtev@yandex-team.ru>
 References: <20210715094707.19997-1-damtev@yandex-team.ru>
+ <20210715094707.19997-2-damtev@yandex-team.ru>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9bd3c75a-63b3-427c-c54c-cd12587ba58b@redhat.com>
+Date:   Thu, 15 Jul 2021 13:22:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210715094707.19997-2-damtev@yandex-team.ru>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Yury Kamenev <damtev@yandex-team.ru>
----
- .../admin-guide/kernel-parameters.txt         |  3 +++
- drivers/block/Kconfig                         |  7 +++++
- drivers/block/virtio_blk.c                    | 26 +++++++++++++++++++
- include/uapi/linux/virtio_blk.h               |  2 ++
- 4 files changed, 38 insertions(+)
+On 15/07/21 11:47, Yury Kamenev wrote:
+> +#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
+> +	if (unlikely(partitions_scanning_disable))
+> +		/* disable partitions scanning if it was stated in virtio features*/
+> +		if (virtio_has_feature(vdev, VIRTIO_BLK_F_NO_PART_SCAN))
+> +			vblk->disk->flags |= GENHD_FL_NO_PART_SCAN;
+> +#endif
+> +
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index bdb22006f713..941bdaf5c167 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -6076,6 +6076,9 @@
- 			brightness level.
- 			default: 1
+Has this been added to the spec?  It doesn't seem like a good idea, as 
+pointed out by Stefan[1], Christoph[2] and myself[3].
 
-+	virtiopartscan
-+		Enable virtio block device partition scanning omission based on VIRTIO_BLK_F_NO_PART_SCAN feature flag.
-+
- 	virtio_mmio.device=
- 			[VMMIO] Memory mapped virtio (platform) device.
+Paolo
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 63056cfd4b62..69ecd3fd7037 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -399,6 +399,13 @@ config VIRTIO_BLK
- 	  This is the virtual block driver for virtio.  It can be used with
-           QEMU based VMMs (like KVM or Xen).  Say Y or M.
-
-+config VIRTIO_BLK_NO_PART_SCAN
-+	bool "Disable partition scanning for devices with no partitions"
-+	depends on VIRTIO_BLK
-+	help
-+	  Disable partition scanning for devices with no partitions.
-+	  Can reduce the kernel start time for tiny systems like squashfs images.
-+
- config BLK_DEV_RBD
- 	tristate "Rados block device (RBD)"
- 	depends on INET && BLOCK
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 4b49df2dfd23..479711d3791c 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -692,6 +692,19 @@ static const struct blk_mq_ops virtio_mq_ops = {
- static unsigned int virtblk_queue_depth;
- module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
-
-+#ifndef MODULE
-+#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-+static int partitions_scanning_disable __read_mostly;
-+
-+static int __init partitions_scanning_setup(char *__unused)
-+{
-+	partitions_scanning_disable = 1;
-+	return 1;
-+}
-+__setup("nopartscan", partitions_scanning_setup);
-+#endif
-+#endif
-+
- static int virtblk_probe(struct virtio_device *vdev)
- {
- 	struct virtio_blk *vblk;
-@@ -790,6 +803,13 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	vblk->disk->flags |= GENHD_FL_EXT_DEVT;
- 	vblk->index = index;
-
-+#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-+	if (unlikely(partitions_scanning_disable))
-+		/* disable partitions scanning if it was stated in virtio features*/
-+		if (virtio_has_feature(vdev, VIRTIO_BLK_F_NO_PART_SCAN))
-+			vblk->disk->flags |= GENHD_FL_NO_PART_SCAN;
-+#endif
-+
- 	/* configure queue flush support */
- 	virtblk_update_cache_mode(vdev);
-
-@@ -966,6 +986,9 @@ static unsigned int features_legacy[] = {
- 	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
- 	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-+#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-+	VIRTIO_BLK_F_NO_PART_SCAN,
-+#endif
- }
- ;
- static unsigned int features[] = {
-@@ -973,6 +996,9 @@ static unsigned int features[] = {
- 	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
- 	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-+#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-+	VIRTIO_BLK_F_NO_PART_SCAN,
-+#endif
- };
-
- static struct virtio_driver virtio_blk = {
-diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-index d888f013d9ff..9b381675342a 100644
---- a/include/uapi/linux/virtio_blk.h
-+++ b/include/uapi/linux/virtio_blk.h
-@@ -40,6 +40,7 @@
- #define VIRTIO_BLK_F_MQ		12	/* support more than one vq */
- #define VIRTIO_BLK_F_DISCARD	13	/* DISCARD is supported */
- #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
-+#define VIRTIO_BLK_F_NO_PART_SCAN	16	/* Disable partition scanning */
-
- /* Legacy feature bits */
- #ifndef VIRTIO_BLK_NO_LEGACY
---
-2.24.3 (Apple Git-128)
+[1] 
+https://lore.kernel.org/linux-block/20210524145654.GA2632@lst.de/T/#m2697cb41578490aad49ed1d8fa6604bf0924b54d
+[2] 
+https://lore.kernel.org/linux-block/20210524145654.GA2632@lst.de/T/#mc59329fd824102f94ac2f6b29fe94a652849aca0
+[3] 
+https://lore.kernel.org/linux-block/20210524145654.GA2632@lst.de/T/#mee6787c4fd87790b64feccc9e77fd5f618c2c336
 
