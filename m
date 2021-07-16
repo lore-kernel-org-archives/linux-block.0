@@ -2,197 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1DF2C12002
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 09:02:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFA2C07E95
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 10:19:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CAEAB613F3
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 09:02:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75BFC613D3
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 10:19:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239147AbhGPJFb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 05:05:31 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:11325 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239151AbhGPJFa (ORCPT
+        id S236908AbhGPKWe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 06:22:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231720AbhGPKWe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 05:05:30 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GR4rq23mXz7tjj;
-        Fri, 16 Jul 2021 16:58:03 +0800 (CST)
-Received: from dggpeml500025.china.huawei.com (7.185.36.35) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 16 Jul 2021 17:02:34 +0800
-Received: from [10.174.176.117] (10.174.176.117) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 16 Jul 2021 17:02:33 +0800
+        Fri, 16 Jul 2021 06:22:34 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7563C06175F;
+        Fri, 16 Jul 2021 03:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=k1yI3xZMljuco026FxHxM/0j0phJa/QvjQkg48mc0YE=; b=hzHCW9Y+Aa/rEziRwzmIBnqaTy
+        3aGyHM7oQkEp6gNB0sIw64hQAAkuK8YBie4CGCsFOp1fI1N+pPtgHf8rI0Beuu6tdFq1MN9S7GDn6
+        h89UVfXfYi34Dq03MW4rWT5aL//dnILUjzaBH9BhrimyB5ZJrA83uuPBoJPlcTFKz90yitnj+l54R
+        GiWDuVltR1MaThRQQh3I4ToK8R2QD7mtuOKKX9muCX0n2wCTu/grpUIu1qEGlgGfrxAb1yZ9GnCwb
+        29+V/IGdQ/9RKK/21Oe0yk9hMkTBPn293fjpj9kCztD5Fvk52CO02qt/2x4RU2Em/eRD0IL9PWETO
+        2lnnID2Q==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m4KwM-000Njv-Kw; Fri, 16 Jul 2021 10:19:30 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 2EACC9877DF; Fri, 16 Jul 2021 12:19:29 +0200 (CEST)
+Date:   Fri, 16 Jul 2021 12:19:29 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        yukuai3@huawei.com, paulmck@kernel.org, will@kernel.org
 Subject: Re: [PATCH] block: ensure the memory order between bi_private and
  bi_status
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <paulmck@kernel.org>, <will@kernel.org>
+Message-ID: <20210716101929.GD4717@worktop.programming.kicks-ass.net>
 References: <20210701113537.582120-1-houtao1@huawei.com>
  <20210715070148.GA8088@lst.de>
  <20210715081348.GG2725@worktop.programming.kicks-ass.net>
-From:   Hou Tao <houtao1@huawei.com>
-Message-ID: <36a122ea-d18a-9317-aadd-b6b69a6f0283@huawei.com>
-Date:   Fri, 16 Jul 2021 17:02:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ <36a122ea-d18a-9317-aadd-b6b69a6f0283@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20210715081348.GG2725@worktop.programming.kicks-ass.net>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.176.117]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500025.china.huawei.com (7.185.36.35)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <36a122ea-d18a-9317-aadd-b6b69a6f0283@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Peter,
+On Fri, Jul 16, 2021 at 05:02:33PM +0800, Hou Tao wrote:
 
-On 7/15/2021 4:13 PM, Peter Zijlstra wrote:
-> On Thu, Jul 15, 2021 at 09:01:48AM +0200, Christoph Hellwig wrote:
->> On Thu, Jul 01, 2021 at 07:35:37PM +0800, Hou Tao wrote:
->>> When running stress test on null_blk under linux-4.19.y, the following
->>> warning is reported:
->>>
->>>   percpu_ref_switch_to_atomic_rcu: percpu ref (css_release) <= 0 (-3) after switching to atomic
->>>
-snip
->>> In __blkdev_direct_IO(), the memory order between dio->waiter and
->>> dio->bio.bi_status is not guaranteed neither. Until now it is unable to
->>> reproduce it, maybe because dio->waiter and dio->bio.bi_status are
->>> in the same cache-line. But it is better to add guarantee for memory
->>> order.
-> Cachelines don't guarantee anything, you can get partial forwards.
+> > Cachelines don't guarantee anything, you can get partial forwards.
+> 
+> Could you please point me to any reference ? I can not google
+> 
+> any memory order things by using "partial forwards".
 
-Could you please point me to any reference ? I can not google
+I'm not sure I have references, but there are CPUs that can do, for
+example, store forwarding at a granularity below cachelines (ie at
+register size).
 
-any memory order things by using "partial forwards".
+In such a case a CPU might observe the stored value before it is
+committed to memory.
 
->
->>> Fixing it by using smp_load_acquire() & smp_store_release() to guarantee
->>> the order between {bio->bi_private|dio->waiter} and {bi_status|bi_blkg}.
->>>
->>> Fixes: 189ce2b9dcc3 ("block: fast-path for small and simple direct I/O requests")
->> This obviously does not look broken, but smp_load_acquire /
->> smp_store_release is way beyond my paygrade.  Adding some CCs.
-> This block stuff is a bit beyond me, lets see if we can make sense of
-> it.
->
->>> Signed-off-by: Hou Tao <houtao1@huawei.com>
->>> ---
->>>  fs/block_dev.c | 19 +++++++++++++++----
->>>  1 file changed, 15 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/fs/block_dev.c b/fs/block_dev.c
->>> index eb34f5c357cf..a602c6315b0b 100644
->>> --- a/fs/block_dev.c
->>> +++ b/fs/block_dev.c
->>> @@ -224,7 +224,11 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
->>>  {
->>>  	struct task_struct *waiter = bio->bi_private;
->>>  
->>> -	WRITE_ONCE(bio->bi_private, NULL);
->>> +	/*
->>> +	 * Paired with smp_load_acquire in __blkdev_direct_IO_simple()
->>> +	 * to ensure the order between bi_private and bi_xxx
->>> +	 */
-> This comment doesn't help me; where are the other stores? Presumably
-> somewhere before this is called, but how does one go about finding them?
 
-Yes, the change log is vague and it will be corrected. The other stores
+> >>> @@ -224,7 +224,11 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
+> >>>  {
+> >>>  	struct task_struct *waiter = bio->bi_private;
+> >>>  
+> >>> -	WRITE_ONCE(bio->bi_private, NULL);
+> >>> +	/*
+> >>> +	 * Paired with smp_load_acquire in __blkdev_direct_IO_simple()
+> >>> +	 * to ensure the order between bi_private and bi_xxx
+> >>> +	 */
+> > This comment doesn't help me; where are the other stores? Presumably
+> > somewhere before this is called, but how does one go about finding them?
+> 
+> Yes, the change log is vague and it will be corrected. The other stores
+> 
+> happen in req_bio_endio() and its callees when the request completes.
 
-happen in req_bio_endio() and its callees when the request completes.
+Aaah, right. So initially I was wondering if it would make sense to put
+the barrier there, but having looked at this a little longer, this
+really seems to be about these two DIO methods.
 
-> The Changelog seems to suggest you only care about bi_css, not bi_xxx in
-> general. In specific you can only care about stores that happen before
-> this; is all of bi_xxx written before here? If not, you have to be more
-> specific.
+> > The Changelog seems to suggest you only care about bi_css, not bi_xxx in
+> > general. In specific you can only care about stores that happen before
+> > this; is all of bi_xxx written before here? If not, you have to be more
+> > specific.
+> 
+> Actually we care about all bi_xxx which are written in req_bio_endio,
+> and all writes to bi_xxx happen before blkdev_bio_end_io_simple().
+> Here I just try to use bi_status as one example.
 
-Actually we care about all bi_xxx which are written in req_bio_endio, and all writes
+I see req_bio_endio() change bi_status, bi_flags and bi_iter, but afaict
+there's more bi_ fields.
 
-to bi_xxx happen before blkdev_bio_end_io_simple(). Here I just try to
+> >>> @@ -283,7 +287,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+> >>>  	qc = submit_bio(&bio);
+> >>>  	for (;;) {
+> >>>  		set_current_state(TASK_UNINTERRUPTIBLE);
+> >>> -		if (!READ_ONCE(bio.bi_private))
+> >>> +		/* Refer to comments in blkdev_bio_end_io_simple() */
+> >>> +		if (!smp_load_acquire(&bio.bi_private))
+> >>>  			break;
+> >>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+> >>>  		    !blk_poll(bdev_get_queue(bdev), qc, true))
+> > That comment there doesn't help me find any relevant later loads and is
+> > thus again inadequate.
+> >
+> > Here the purpose seems to be to ensure the bi_css load happens after the
+> > bi_private load, and this again is cheaper done using smp_rmb().
+> Yes and thanks again.
+> >
+> > Also, the implication seems to be -- but is not spelled out anywhere --
+> > that if bi_private is !NULL, it is stable.
+> 
+> What is the meaning of "it is stable" ? Do you mean if bi_private is NULL,
+> the values of bi_xxx should be ensured ?
 
-use bi_status as one example.
+With stable I mean that if it is !NULL the value is always the same.
 
-> Also, this being a clear, this very much isn't the typical publish
-> pattern.
->
-> On top of all that, smp_wmb() would be sufficient here and would be
-> cheaper on some platforms (ARM comes to mind).
-Thanks for your knowledge, I will use smp_wmb() instead of smp_store_release().
->
->>> +	smp_store_release(&bio->bi_private, NULL);
->>>  	blk_wake_io_task(waiter);
->>>  }
->>>  
->>> @@ -283,7 +287,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
->>>  	qc = submit_bio(&bio);
->>>  	for (;;) {
->>>  		set_current_state(TASK_UNINTERRUPTIBLE);
->>> -		if (!READ_ONCE(bio.bi_private))
->>> +		/* Refer to comments in blkdev_bio_end_io_simple() */
->>> +		if (!smp_load_acquire(&bio.bi_private))
->>>  			break;
->>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
->>>  		    !blk_poll(bdev_get_queue(bdev), qc, true))
-> That comment there doesn't help me find any relevant later loads and is
-> thus again inadequate.
->
-> Here the purpose seems to be to ensure the bi_css load happens after the
-> bi_private load, and this again is cheaper done using smp_rmb().
-Yes and thanks again.
->
-> Also, the implication seems to be -- but is not spelled out anywhere --
-> that if bi_private is !NULL, it is stable.
-
-What is the meaning of "it is stable" ? Do you mean if bi_private is NULL,
-
-the values of bi_xxx should be ensured ?
-
->>> @@ -353,7 +358,12 @@ static void blkdev_bio_end_io(struct bio *bio)
->>>  		} else {
->>>  			struct task_struct *waiter = dio->waiter;
->>>  
->>> -			WRITE_ONCE(dio->waiter, NULL);
->>> +			/*
->>> +			 * Paired with smp_load_acquire() in
->>> +			 * __blkdev_direct_IO() to ensure the order between
->>> +			 * dio->waiter and bio->bi_xxx
->>> +			 */
->>> +			smp_store_release(&dio->waiter, NULL);
->>>  			blk_wake_io_task(waiter);
->>>  		}
->>>  	}
->>> @@ -478,7 +488,8 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
->>>  
->>>  	for (;;) {
->>>  		set_current_state(TASK_UNINTERRUPTIBLE);
->>> -		if (!READ_ONCE(dio->waiter))
->>> +		/* Refer to comments in blkdev_bio_end_io */
->>> +		if (!smp_load_acquire(&dio->waiter))
->>>  			break;
->>>  
->>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
-> Idem for these...
-> .
-
-Thanks
-
-Regards,
-
-Tao
-
+I've read more code and this is indeed the case, specifically, here
+bi_private seems to be 'current' and will only be changed to NULL.
