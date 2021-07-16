@@ -2,137 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00808C07E95
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 14:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9F4C12002
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 16:09:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C64B260FE7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 14:25:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B767E611AB
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 16:09:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232808AbhGPO14 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 10:27:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41408 "EHLO
+        id S229742AbhGPQMJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 12:12:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232775AbhGPO1z (ORCPT
+        with ESMTP id S229735AbhGPQMI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 10:27:55 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECB2CC06175F
-        for <linux-block@vger.kernel.org>; Fri, 16 Jul 2021 07:25:00 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id b14-20020a056830310eb02904c7e78705f4so9990956ots.13
-        for <linux-block@vger.kernel.org>; Fri, 16 Jul 2021 07:25:00 -0700 (PDT)
+        Fri, 16 Jul 2021 12:12:08 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB9BC061760;
+        Fri, 16 Jul 2021 09:09:12 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 70so7046400pgh.2;
+        Fri, 16 Jul 2021 09:09:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=g7fCH9z1o+FhUI94OWTsT7bPkqKdjEt9wSRt8sGwj80=;
-        b=GwSnzZLLWPB7AB+0aj1LovlUAKNpDTwNS8LsEcptx37lGKn3Hj048hP+lC/mwfWNjU
-         PeVUsXhzxUb0QQEZnitsBA8gm2P8oNuCFGmruxZJDDGxUCTUbhLkHeuOeXWk/6689IOd
-         5aagQh1iotzXNAkO1+5/M1kepYFX3A2W71S4EWK/1LGoPDS09oWYPGyx1RMQEbjvGIHa
-         Yr/0WKWcqCRX4jMSib3M6EvBJi+oeY+y40se/p9eeoiJuxTj4zZaHMugndq5ZDLyo8c5
-         dDgTZ2DjCEXFOo2Zye6X8BPlmUAfvFc/XDoNHCNePKt6nONy2drPRroVVBQB7BdAwN/s
-         zqpQ==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=DZ7+7XgWM6hQZ0UFtx/++E9LOP3fUxSddmlsFwD/FAU=;
+        b=LcFKQKWZBfnq7ztPttKD1EbLu0EBOsYfhH+Xea8T15YwjWbDADhRGBr18+d6n61OVu
+         z7n5JLWPOGWy5CNStdZkiMoKjYfnMG2YTd2JNbg2iWu4a2ZBc2YIsiIuGy6jdls+3s9W
+         302dsxPjS2wQQXj29r8Jgv95+YcOpGD0QfErsc8+ssZlMky0D3o0sKhgWdYQB4xi9T04
+         wJZs7qxVFBwT2kRkPtKJFfEMKyf7wnmeQbdmaDUEAY5bOUJ0qAvGf9vvFfxzT61EVjQ4
+         6g/XIQGoDJ9V/v3YONni7BR71ImbpC4eEBzddwe3PxiP215sH627dkBSOAP/6V8ER7zz
+         5xHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=g7fCH9z1o+FhUI94OWTsT7bPkqKdjEt9wSRt8sGwj80=;
-        b=b+iUYjwwxXVrM6erSAdXCMYFpt+xGG7N+4SgvpobiQ8T1o8KiHW9tex2StGatGnJSw
-         NSYwI7lGhKKMj3fVdMQ2lxDYqQOtVWi4VYZ9LDQIE9zby600CCffxrWwppLKfJGe9TyZ
-         gUti/DdRO61dUMYVtAbRAokZeH+QMgBgFqfWlcLs4pUePijEeqoIctmm1B5H++pA7Uqa
-         pK5oMbU1rCZcvalHeuZ8W1bqcNZz4vwQmAWsMjobT/FOKphnt2K7hNtoL06+dVn1UpSQ
-         rQxibpuOTHbjKH/+4uIzfz/AnLJRcyStz8bxm5rpLxeO84lw7fQUC6SfW3zJrayNRIpG
-         CC0w==
-X-Gm-Message-State: AOAM531c4E8RepjBwVWjedaFlnnMQgU+MSL/FVANWACwlhjlGJjfcY5/
-        xd4oTo2e1MnsvkGbzuw+qOWZRGD9ddAlZ9u0
-X-Google-Smtp-Source: ABdhPJxpRUhsi7W1phU7Fksnw3T8YI8Gj3ZKUuaJAY94sr5afwzRiPJOLYyoo2X0dnQGHkiqaX5uxA==
-X-Received: by 2002:a9d:2d82:: with SMTP id g2mr8771958otb.30.1626445499932;
-        Fri, 16 Jul 2021 07:24:59 -0700 (PDT)
-Received: from [192.168.1.187] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id l7sm1878505otu.76.2021.07.16.07.24.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jul 2021 07:24:59 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.14-rc
-Message-ID: <2b7767f1-3ff0-e65f-398d-4934417dc44e@kernel.dk>
-Date:   Fri, 16 Jul 2021 08:24:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=DZ7+7XgWM6hQZ0UFtx/++E9LOP3fUxSddmlsFwD/FAU=;
+        b=jw/lFpw940wdxKAo7Ly6iktKlYj53DJNg/5hQL+byyXZle0RkXpoCTGCuYTN6noxm1
+         9ty+601F/bc6dgBfJusCkwxv40urIHq05/mmnnoGIOyBgnGv6kFRyQvcPE627gX9eQ1f
+         +OZVdO5UTmnFaKcIQqjZ3wkESREjXuKGcFABtS6cGIZPy5D3489kVp9MGQWzoD4IFQGT
+         4NtvYBDEFWJyMduSROhONsFWr4J8yufY6G5TlHIkGFLUh/spUXljrLEaojVKgPsk2WEa
+         QzWnkQqVFmTQthC9h9hWedRrv8osc6aEBcXLc0rylzWWCJVjS5UwfqQ4VF2UNkqO50dl
+         VNwQ==
+X-Gm-Message-State: AOAM532qPAqhEWdk6PIQpNI+HKGKhh9Ecw+38tfBfyB5NR2LPuhqB575
+        kbuAxa9ikJqdgtNGX1xDrqA=
+X-Google-Smtp-Source: ABdhPJyUbgcvONO40UW44ifs4qnB+E15RG/K0Ok5QmVXbx9Mo0xGOBdXsBisFJj5+L0FDrUQesQeqg==
+X-Received: by 2002:a65:6909:: with SMTP id s9mr4398634pgq.321.1626451752040;
+        Fri, 16 Jul 2021 09:09:12 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:37b9])
+        by smtp.gmail.com with ESMTPSA id u7sm11831012pgl.30.2021.07.16.09.09.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jul 2021 09:09:11 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 16 Jul 2021 06:09:07 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     brookxu <brookxu.cn@gmail.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
+Message-ID: <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Hello,
 
-A few fixes for the 5.14 release:
+On Fri, Jul 16, 2021 at 02:22:49PM +0800, brookxu wrote:
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index a11b3b5..86ff943 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+>  		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+>  		submit_bio_noacct(*bio);
+>  		*bio = split;
+> +
+> +		blk_throtl_recharge_bio(*bio);
 
-- NVMe fixes (via Christoph)
-	- fix various races in nvme-pci when shutting down just after
-	  probing (Casey Chen)
-	- fix a net_device leak in nvme-tcp (Prabhakar Kushwaha)
+I don't think we're holding the queue lock here.
 
-- Fix regression in xen-blkfront by cleaning up the removal state
-  machine (Christoph)
+>  	}
+>  }
+>  
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index b1b22d8..1967438 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -2176,6 +2176,40 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+>  }
+>  #endif
+>  
+> +void blk_throtl_recharge_bio(struct bio *bio)
+> +{
+> +	bool rw = bio_data_dir(bio);
+> +	struct blkcg_gq *blkg = bio->bi_blkg;
+> +	struct throtl_grp *tg = blkg_to_tg(blkg);
+> +	u32 iops_limit = tg_iops_limit(tg, rw);
+> +
+> +	if (iops_limit == UINT_MAX)
+> +		return;
+> +
+> +	/*
+> +	 * If previous slice expired, start a new one otherwise renew/extend
+> +	 * existing slice to make sure it is at least throtl_slice interval
+> +	 * long since now. New slice is started only for empty throttle group.
+> +	 * If there is queued bio, that means there should be an active
+> +	 * slice and it should be extended instead.
+> +	 */
+> +	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
+> +		throtl_start_new_slice(tg, rw);
+> +	else {
+> +		if (time_before(tg->slice_end[rw],
+> +		    jiffies + tg->td->throtl_slice))
+> +			throtl_extend_slice(tg, rw,
+> +				jiffies + tg->td->throtl_slice);
+> +	}
+> +
+> +	/* Recharge the bio to the group, as some BIOs will be further split
+> +	 * after passing through the throttle, causing the actual IOPS to
+> +	 * be greater than the expected value.
+> +	 */
+> +	tg->last_io_disp[rw]++;
+> +	tg->io_disp[rw]++;
+> +}
 
-- Fix tag_set and queue cleanup ordering regression in nbd (Wang)
+But blk-throtl expects queue lock to be held.
 
-- Fix tag_set and queue cleanup ordering regression in pd (Guoqing)
+How about doing something simpler? Just estimate how many bios a given bio
+is gonna be and charge it outright? The calculation will be duplicated
+between the split path but that seems like the path of least resistance
+here.
 
-Please pull!
-
-
-The following changes since commit a731763fc479a9c64456e0643d0ccf64203100c9:
-
-  blk-cgroup: prevent rcu_sched detected stalls warnings while iterating blkgs (2021-07-07 09:36:36 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-16
-
-for you to fetch changes up to 05d69d950d9d84218fc9beafd02dea1f6a70e09e:
-
-  xen-blkfront: sanitize the removal state machine (2021-07-15 09:32:34 -0600)
-
-----------------------------------------------------------------
-block-5.14-2021-07-16
-
-----------------------------------------------------------------
-Casey Chen (2):
-      nvme-pci: fix multiple races in nvme_setup_io_queues
-      nvme-pci: do not call nvme_dev_remove_admin from nvme_remove
-
-Christoph Hellwig (1):
-      xen-blkfront: sanitize the removal state machine
-
-Guoqing Jiang (1):
-      pd: fix order of cleaning up the queue and freeing the tagset
-
-Jens Axboe (1):
-      Merge tag 'nvme-5.14-2021-07-15' of git://git.infradead.org/nvme into block-5.14
-
-Prabhakar Kushwaha (1):
-      nvme-tcp: use __dev_get_by_name instead dev_get_by_name for OPT_HOST_IFACE
-
-Wang Qing (1):
-      nbd: fix order of cleaning up the queue and freeing the tagset
-
- drivers/block/nbd.c          |   2 +-
- drivers/block/paride/pd.c    |   2 +-
- drivers/block/xen-blkfront.c | 224 +++++--------------------------------------
- drivers/nvme/host/pci.c      |  67 +++++++++++--
- drivers/nvme/host/tcp.c      |   4 +-
- 5 files changed, 87 insertions(+), 212 deletions(-)
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
