@@ -2,93 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9EEC12002
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 20:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C662C636CB
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 23:07:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9EA8613F5
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 20:02:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77727613D4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 23:07:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232207AbhGPUFd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 16:05:33 -0400
-Received: from mail-pj1-f42.google.com ([209.85.216.42]:45868 "EHLO
-        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbhGPUFc (ORCPT
+        id S237208AbhGPXKX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 19:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47022 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237305AbhGPXKX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 16:05:32 -0400
-Received: by mail-pj1-f42.google.com with SMTP id b8-20020a17090a4888b02901725eedd346so7707631pjh.4;
-        Fri, 16 Jul 2021 13:02:36 -0700 (PDT)
+        Fri, 16 Jul 2021 19:10:23 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F82CC06175F;
+        Fri, 16 Jul 2021 16:07:28 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id t9so11450890pgn.4;
+        Fri, 16 Jul 2021 16:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=P6K+M5gqphiIlNgiFVLzyTugz5hPofZVAtQFiBp7d9s=;
+        b=ullVU331i6gIy4bDcdWB3Z/mYU0uuO8Zz4+zTPF4DwwlLYBpWuoLo8phBHSXV0zQ7I
+         SnHGjhyqsblUks+TDqDyRg4ZJkN2L9qsQLpMeWKT7t2h8zLaPWdo1UYACdUf3Xt6tIwd
+         xB4cZZL3MNrmfbw7bGVtnvkjs5Vu7ZmfUO4pZ8XbSiiJeBdR3nAAJ+Su2ue+vfNRElSD
+         5PG0YGgodlVwx9uT7QnwAZcpoSzxV7h1nEUvVATn3P0i1EsFusZbwh3n3m8MC2cgND5M
+         fw4uP+kNHZBoBmDmHLFdtj6j4Wj3usLgezpO6JfVgH0i+0WPB26yOjAL/vNUUtDFWces
+         mi6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DIO/p6fDXSOIZWjjd/3ZZaaDJCcqllKBKwCD2+daukg=;
-        b=QD2TcEtN7tIrex58WvptF+sESXRBgfKI56R5EkmQ70A/p0DTQ7LzG1zDH3ScsxZoGg
-         DwJeKb8nqUw007Bqzsq+Rd5z20kb6AmLQ8EkJeAv/y6lktxISpGRhhQv+MwBYXkcfPNC
-         c4b7Awvl5QJkfjLgmH34OW6lGxRLJPsi7FxML/WdBSi3KzlIU7ET7LrqIn+Z64fpf9+S
-         0EnwQQYkUhQiiIq2xtu/oeMQXZ1J0KDnErY3ZTHDZutbszBg9APsUF29RM7Geo6Mrgij
-         GbiuqIKYo9Hssb/Qq2Zzxh55LY71BVGeZaYVdV0sqAgd2tZbhuDVUGOBc8iqb636C7sj
-         urGw==
-X-Gm-Message-State: AOAM533ttyZTtXNzE9JAOHn7bgGYoULX6s/h6rtLncHJ4ZsLWv90qWcj
-        UM13TNc5eSjlgJYVpds6RL8=
-X-Google-Smtp-Source: ABdhPJwiKVyqQAieOh5gzUSTJZrIQbGqgGRMrC+DLIJrdGIiqpN5QO5TcEWbe+a49p03l6WOUeSx2g==
-X-Received: by 2002:a17:90b:1e46:: with SMTP id pi6mr1474687pjb.5.1626465756555;
-        Fri, 16 Jul 2021 13:02:36 -0700 (PDT)
-Received: from garbanzo ([191.96.120.37])
-        by smtp.gmail.com with ESMTPSA id j129sm11377948pfb.132.2021.07.16.13.02.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 13:02:35 -0700 (PDT)
-Date:   Fri, 16 Jul 2021 13:02:33 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     axboe@kernel.dk, bvanassche@acm.org, ming.lei@redhat.com,
-        hch@infradead.org, jack@suse.cz, osandov@fb.com,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=P6K+M5gqphiIlNgiFVLzyTugz5hPofZVAtQFiBp7d9s=;
+        b=DCAmJcFxMsNX9bzvKg58M7Zek3nOEPQgb4VI+Hfv9IuM/7oKAZns1p/3eSRq5iU+E7
+         qkvRI8NwZhLcAoWGt8jRPko1nc+QIGaNFq9KHBT5Im5F1YVZVrjd+npsz/Vv/P7HBwrx
+         dwMszhxWW6EUWmGj4ESwYdgEqMTvc6hRSbAcuZ+dMWBzuNoNoigBbLcG2qkAGkGp5vJc
+         bPmBTIJmEzpAgKEhy0K8E3jCAt2NrPK0R+2q5z+LwgUYohJuoVMbn8wAIqklMeMfRjuW
+         7X6U1/TkohH6VgREq+YGpL1RyVx1d35MEdeYRbxaHBaNBuvIBMjsoSNxno1gAM8AdJE1
+         s2OA==
+X-Gm-Message-State: AOAM530a2QseeSPzAIcrfprp0WGS7S8gUm7KMD0irA/3M5mtUJUxwY7F
+        T070NeV5Wbl1oaEkTKji72R8RAUlmiwROeDr
+X-Google-Smtp-Source: ABdhPJw9dJ72rSe9XLZ950WY6ydjbUXyufvsG1vehWYDSoNNiFiTRd6IP+Ld9+E2/C3EdBToTL1ZlA==
+X-Received: by 2002:a63:d811:: with SMTP id b17mr12203456pgh.286.1626476847524;
+        Fri, 16 Jul 2021 16:07:27 -0700 (PDT)
+Received: from [127.0.0.1] ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id x9sm11224635pfd.100.2021.07.16.16.07.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jul 2021 16:07:27 -0700 (PDT)
+Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 3/6] md: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED on
- is_mddev_broken()
-Message-ID: <20210716200233.3xj33cc7rmgsmkb5@garbanzo>
-References: <20210715202341.2016612-1-mcgrof@kernel.org>
- <20210715202341.2016612-4-mcgrof@kernel.org>
- <2f8c1713-2fa2-b832-9c70-c41a87df12ee@suse.de>
+References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
+ <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+From:   brookxu <brookxu.cn@gmail.com>
+Message-ID: <9d8b584a-738b-a0a8-ea8c-e617c2f79408@gmail.com>
+Date:   Sat, 17 Jul 2021 07:07:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2f8c1713-2fa2-b832-9c70-c41a87df12ee@suse.de>
+In-Reply-To: <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 07:51:00AM +0200, Hannes Reinecke wrote:
-> On 7/15/21 10:23 PM, Luis Chamberlain wrote:
-> > The GENHD_FL_DISK_ADDED flag is what we really want, as the
-> > flag GENHD_FL_UP could be set on a semi-initialized device.
-> > 
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > ---
-> >   drivers/md/md.h | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/md/md.h b/drivers/md/md.h
-> > index 832547cf038f..80561bca1f51 100644
-> > --- a/drivers/md/md.h
-> > +++ b/drivers/md/md.h
-> > @@ -766,7 +766,7 @@ static inline bool is_mddev_broken(struct md_rdev *rdev, const char *md_type)
-> >   {
-> >   	int flags = rdev->bdev->bd_disk->flags;
-> > -	if (!(flags & GENHD_FL_UP)) {
-> > +	if (!(flags & GENHD_FL_DISK_ADDED)) {
-> >   		if (!test_and_set_bit(MD_BROKEN, &rdev->mddev->flags))
-> >   			pr_warn("md: %s: %s array has a missing/failed member\n",
-> >   				mdname(rdev->mddev), md_type);
-> > 
-> Why again did you introduce the wrapper?
-> Shouldn't it be used here?
 
-Indeed, and that lets us remove the flag copy. Will fix. Thanks
-for the review.
 
-  Luis
+Tejun Heo wrote on 2021/7/17 0:09:
+> Hello,
+> 
+> On Fri, Jul 16, 2021 at 02:22:49PM +0800, brookxu wrote:
+>> diff --git a/block/blk-merge.c b/block/blk-merge.c
+>> index a11b3b5..86ff943 100644
+>> --- a/block/blk-merge.c
+>> +++ b/block/blk-merge.c
+>> @@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+>>  		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+>>  		submit_bio_noacct(*bio);
+>>  		*bio = split;
+>> +
+>> +		blk_throtl_recharge_bio(*bio);
+> 
+> I don't think we're holding the queue lock here.
 
+sorry, some kind of synchronization mechanism is really needed here. But the use of queue_lock
+here may be unsafe, since it is difficult for us to control the lock on the split path.
+
+>>  	}
+>>  }
+>>  
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index b1b22d8..1967438 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -2176,6 +2176,40 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+>>  }
+>>  #endif
+>>  
+>> +void blk_throtl_recharge_bio(struct bio *bio)
+>> +{
+>> +	bool rw = bio_data_dir(bio);
+>> +	struct blkcg_gq *blkg = bio->bi_blkg;
+>> +	struct throtl_grp *tg = blkg_to_tg(blkg);
+>> +	u32 iops_limit = tg_iops_limit(tg, rw);
+>> +
+>> +	if (iops_limit == UINT_MAX)
+>> +		return;
+>> +
+>> +	/*
+>> +	 * If previous slice expired, start a new one otherwise renew/extend
+>> +	 * existing slice to make sure it is at least throtl_slice interval
+>> +	 * long since now. New slice is started only for empty throttle group.
+>> +	 * If there is queued bio, that means there should be an active
+>> +	 * slice and it should be extended instead.
+>> +	 */
+>> +	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
+>> +		throtl_start_new_slice(tg, rw);
+>> +	else {
+>> +		if (time_before(tg->slice_end[rw],
+>> +		    jiffies + tg->td->throtl_slice))
+>> +			throtl_extend_slice(tg, rw,
+>> +				jiffies + tg->td->throtl_slice);
+>> +	}
+>> +
+>> +	/* Recharge the bio to the group, as some BIOs will be further split
+>> +	 * after passing through the throttle, causing the actual IOPS to
+>> +	 * be greater than the expected value.
+>> +	 */
+>> +	tg->last_io_disp[rw]++;
+>> +	tg->io_disp[rw]++;
+>> +}
+> 
+> But blk-throtl expects queue lock to be held.
+> 
+> How about doing something simpler? Just estimate how many bios a given bio
+> is gonna be and charge it outright? The calculation will be duplicated
+> between the split path but that seems like the path of least resistance
+> here.
+
+I have tried this method, the code redundancy is indeed a bit high, it may not be
+very convenient for code maintenance. In addition to this problem, since we add
+a large value at a time, the fluctuation of IOPS will be relatively large. Since
+blk_throtl_recharge_bio() does not need to participate in the maintenance of the
+state machine, we only need to protect some fields of tg, so can we add a new
+spin_lock to tg instead of queue_lock to solve the synchronization problem ? Just
+a idea, Thanks.
+
+> Thanks.
+> 
