@@ -2,132 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4124C07E95
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 05:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69ACDC12002
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 06:22:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7583E613E9
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 05:53:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55473613E7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 06:22:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229920AbhGPF4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 01:56:12 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:40554 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231458AbhGPF4L (ORCPT
+        id S234622AbhGPGZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 02:25:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230011AbhGPGZs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 01:56:11 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B733B1FE72;
-        Fri, 16 Jul 2021 05:53:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1626414796; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/1L17zMr3wcNoCrkI7xQiSL9TJhP/u3QrOzu6reOkYI=;
-        b=IgQhLU4DcGIrIGK9fRLTm4ZrJxe7QVD77Q0sA7GJ6urwvybP5juQRgAQtNIvKO7roHGMOv
-        1t98kao/T5Hjk0pJtnlGN/+XvS/5WlebaRbS4hJramgU9axgFbnChXUDTYEe5taclwj5nW
-        x7Idu7Jeq0IjolxH3vIlTc+nRgVSPV0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1626414796;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/1L17zMr3wcNoCrkI7xQiSL9TJhP/u3QrOzu6reOkYI=;
-        b=GhxXOHbmrdmzRs/DZqm1v/xTfHSI2dPxJ/QxAwKQCKm7s3tp+NMWii0ssGBuNHzcWfae3Q
-        KKgNe0ora8AV4VDQ==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 85A3F13357;
-        Fri, 16 Jul 2021 05:53:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id FCKqH8we8WBNOAAAGKfGzw
-        (envelope-from <hare@suse.de>); Fri, 16 Jul 2021 05:53:16 +0000
-Subject: Re: [RFC 5/6] nvme: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED
-To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk
-Cc:     bvanassche@acm.org, ming.lei@redhat.com, hch@infradead.org,
-        jack@suse.cz, osandov@fb.com, linux-block@vger.kernel.org,
+        Fri, 16 Jul 2021 02:25:48 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F34C06175F;
+        Thu, 15 Jul 2021 23:22:53 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id s18so8970728pgg.8;
+        Thu, 15 Jul 2021 23:22:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=qBZgZ1rhUXrPQtQ1RtY6PTOQRojpxXbKtuLlXE/iYow=;
+        b=A/AiFzqwhhU2cqITL0fNNzFEVtilgMAATbE5B4mhB06UhLd8ASAZbVW+cCA5x+njML
+         mCrfkD7e0dh6+yS5L/ixigSwXXPXCuldq6rRWO74AJ5gB1o26IYkBRWe682enIAeJ46S
+         7+LKvk7nouKC8MXNXbtKyqg8oej/p0TetmNNllY21dpbT6qttnJ9mMjmyUYu57vG/qFH
+         ro7Ul8bza2FdizqbcY7jc1BOVIK6gznJCZ/SFD3VtjIaYlHBFAJqy/WcdF5TqDOCJ1TP
+         +8oGL4ZPGdUzH2NS79oIkap3bZVUJK9PZaaqfBN1nk51EtZG/9Vn2b5IYXzYBfkmXpsQ
+         FWfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=qBZgZ1rhUXrPQtQ1RtY6PTOQRojpxXbKtuLlXE/iYow=;
+        b=Sldo1+jfcmQlcEFAPEMo7AERZOJy0iTm+bjGoyjkqpnrCKwTeSgeOOQEeEoG5xG1oG
+         T9vWpkP5yXFGyAgY26QQK5FuHutCThu6LreqQVHzyd+pLw3VYCMGC4E26oXOjSiPsCKe
+         9bT2+Uqk1sSBbzhRcUeBJ4izZC7MGY+UwnhgCWoA5d5/SsMPoC/J3SDSG9LeIW0FuMIQ
+         tQsSXiWKPlBnW4yODUFqSlAVTc9sVtQ8b9pX1VCNVWPZgP6ysXzlXw3x8T/NiCBH1+g2
+         WQCoJNH7jbcrUNjsAwkif56EexQBw44Yoo43uGbyIu31ORdhpWolJW448G+0hbYWzM/s
+         rIeA==
+X-Gm-Message-State: AOAM5304ch44rMHEz88bGDSn+/qftZgVH+YHTVC6lxPOz3DEt4UH6ANe
+        YQhj5VO3rsUiOrBHgWomCL8=
+X-Google-Smtp-Source: ABdhPJxKgk5DwsG81U+8j+wkhdCUBpmerUHKGMitNohYAg2bY1jSm7C7OIW4U94qdFckfe+tZT2whQ==
+X-Received: by 2002:a62:e90b:0:b029:30e:4530:8dca with SMTP id j11-20020a62e90b0000b029030e45308dcamr8801669pfh.17.1626416572760;
+        Thu, 15 Jul 2021 23:22:52 -0700 (PDT)
+Received: from VM-0-3-centos.localdomain ([101.32.213.191])
+        by smtp.gmail.com with ESMTPSA id s24sm6740794pfg.186.2021.07.15.23.22.51
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Jul 2021 23:22:52 -0700 (PDT)
+From:   brookxu <brookxu.cn@gmail.com>
+To:     axboe@kernel.dk, tj@kernel.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20210715202341.2016612-1-mcgrof@kernel.org>
- <20210715202341.2016612-6-mcgrof@kernel.org>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <e9212eb9-269c-47d1-60d8-f5282ad5c441@suse.de>
-Date:   Fri, 16 Jul 2021 07:53:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210715202341.2016612-6-mcgrof@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
+Date:   Fri, 16 Jul 2021 14:22:49 +0800
+Message-Id: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/15/21 10:23 PM, Luis Chamberlain wrote:
-> The GENHD_FL_DISK_ADDED flag is what we really want, as the
-> flag GENHD_FL_UP could be set on a semi-initialized device.
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->   drivers/nvme/host/core.c      | 4 ++--
->   drivers/nvme/host/multipath.c | 2 +-
->   2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 11779be42186..3848353fba11 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -1819,7 +1819,7 @@ static void nvme_update_disk_info(struct gendisk *disk,
->   static inline bool nvme_first_scan(struct gendisk *disk)
->   {
->   	/* nvme_alloc_ns() scans the disk prior to adding it */
-> -	return !(disk->flags & GENHD_FL_UP);
-> +	return !(disk->flags & GENHD_FL_DISK_ADDED);
->   }
->   
->   static void nvme_set_chunk_sectors(struct nvme_ns *ns, struct nvme_id_ns *id)
-> @@ -3823,7 +3823,7 @@ static void nvme_ns_remove(struct nvme_ns *ns)
->   	nvme_mpath_clear_current_path(ns);
->   	synchronize_srcu(&ns->head->srcu); /* wait for concurrent submissions */
->   
-> -	if (ns->disk->flags & GENHD_FL_UP) {
-> +	if (ns->disk->flags & GENHD_FL_DISK_ADDED) {
->   		if (!nvme_ns_head_multipath(ns->head))
->   			nvme_cdev_del(&ns->cdev, &ns->cdev_device);
->   		del_gendisk(ns->disk);
-> diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> index 0ea5298469c3..8048678969ba 100644
-> --- a/drivers/nvme/host/multipath.c
-> +++ b/drivers/nvme/host/multipath.c
-> @@ -764,7 +764,7 @@ void nvme_mpath_remove_disk(struct nvme_ns_head *head)
->   {
->   	if (!head->disk)
->   		return;
-> -	if (head->disk->flags & GENHD_FL_UP) {
-> +	if (head->disk->flags & GENHD_FL_DISK_ADDED) {
->   		nvme_cdev_del(&head->cdev, &head->cdev_device);
->   		del_gendisk(head->disk);
->   	}
-> 
-Same here: please use the wrapper.
+From: Chunguang Xu <brookxu@tencent.com>
 
-Cheers,
+After patch 54efd50 (block: make generic_make_request handle
+arbitrarily sized bios), the IO through io-throttle may be larger,
+and these IOs may be further split into more small IOs. However,
+IOPS throttle does not seem to be aware of this change, which
+makes the calculation of IOPS of large IOs incomplete, resulting
+in disk-side IOPS that does not meet expectations. Maybe we should
+fix this problem.
 
-Hannes
+We can reproduce it by set max_sectors_kb of disk to 128, set
+blkio.write_iops_throttle to 100, run a dd instance inside blkio
+and use iostat to watch IOPS:
+
+dd if=/dev/zero of=/dev/sdb bs=1M count=1000 oflag=direct
+
+As a result, without this change the average IOPS is 1995, with
+this change the IOPS is 98.
+
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+---
+ block/blk-merge.c    |  2 ++
+ block/blk-throttle.c | 34 ++++++++++++++++++++++++++++++++++
+ block/blk.h          |  2 ++
+ 3 files changed, 38 insertions(+)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a11b3b5..86ff943 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+ 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+ 		submit_bio_noacct(*bio);
+ 		*bio = split;
++
++		blk_throtl_recharge_bio(*bio);
+ 	}
+ }
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index b1b22d8..1967438 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2176,6 +2176,40 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ }
+ #endif
+ 
++void blk_throtl_recharge_bio(struct bio *bio)
++{
++	bool rw = bio_data_dir(bio);
++	struct blkcg_gq *blkg = bio->bi_blkg;
++	struct throtl_grp *tg = blkg_to_tg(blkg);
++	u32 iops_limit = tg_iops_limit(tg, rw);
++
++	if (iops_limit == UINT_MAX)
++		return;
++
++	/*
++	 * If previous slice expired, start a new one otherwise renew/extend
++	 * existing slice to make sure it is at least throtl_slice interval
++	 * long since now. New slice is started only for empty throttle group.
++	 * If there is queued bio, that means there should be an active
++	 * slice and it should be extended instead.
++	 */
++	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
++		throtl_start_new_slice(tg, rw);
++	else {
++		if (time_before(tg->slice_end[rw],
++		    jiffies + tg->td->throtl_slice))
++			throtl_extend_slice(tg, rw,
++				jiffies + tg->td->throtl_slice);
++	}
++
++	/* Recharge the bio to the group, as some BIOs will be further split
++	 * after passing through the throttle, causing the actual IOPS to
++	 * be greater than the expected value.
++	 */
++	tg->last_io_disp[rw]++;
++	tg->io_disp[rw]++;
++}
++
+ bool blk_throtl_bio(struct bio *bio)
+ {
+ 	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+diff --git a/block/blk.h b/block/blk.h
+index 4b885c0..067634a 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -293,12 +293,14 @@ struct io_cq *ioc_create_icq(struct io_context *ioc, struct request_queue *q,
+ extern int blk_throtl_init(struct request_queue *q);
+ extern void blk_throtl_exit(struct request_queue *q);
+ extern void blk_throtl_register_queue(struct request_queue *q);
++extern void blk_throtl_recharge_bio(struct bio *bio);
+ bool blk_throtl_bio(struct bio *bio);
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
+ static inline void blk_throtl_exit(struct request_queue *q) { }
+ static inline void blk_throtl_register_queue(struct request_queue *q) { }
+ static inline bool blk_throtl_bio(struct bio *bio) { return false; }
++static inline void blk_throtl_recharge_bio(struct bio *bio) { }
+ #endif /* CONFIG_BLK_DEV_THROTTLING */
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+1.8.3.1
+
