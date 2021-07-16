@@ -2,152 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259BEC12002
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 20:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9EEC12002
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 20:02:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0466A613F5
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 20:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9EA8613F5
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 20:02:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233260AbhGPUEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 16:04:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40648 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232312AbhGPUEx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 16:04:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1AFDB613F3;
-        Fri, 16 Jul 2021 20:01:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626465716;
-        bh=rFOR2qypUtELpoy2NWUoxm7klREkrZb97itZWXUaaq8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=pi9l/EsCuyB3C2oqdMBel42BqfeYCuwLFgejqa+LxYPXLcBaatM7lXFExmrtCrx3m
-         BchR35OeiH7MTAe9IsqKSuyT0fTRX5ESy75Eey5eo44I+o0GVu0+HD8q3NK2wplTV3
-         rvwLro/bCPchoWBwM+NyAEfcQNl49rj2ZswFD8SO8W9Rc1aUmIuwtzYm+wdtdEYhpA
-         TVUy3EQdryL2kJ8mkzjnJhT7t4mL0Iz5gm3c0fDBCTDIOKqTpGIXzsmdsacrDWWXNE
-         elut+xl31sz+UAVfyhC9lCXCLW98XJzlkMow/keBWtNLRRAiIDwHoTevOumlr4avmu
-         dBvchD8JHB1Ug==
-Date:   Fri, 16 Jul 2021 15:01:54 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed
- if any irq is managed
-Message-ID: <20210716200154.GA2113453@bjorn-Precision-5520>
+        id S232207AbhGPUFd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 16:05:33 -0400
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:45868 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229896AbhGPUFc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Jul 2021 16:05:32 -0400
+Received: by mail-pj1-f42.google.com with SMTP id b8-20020a17090a4888b02901725eedd346so7707631pjh.4;
+        Fri, 16 Jul 2021 13:02:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DIO/p6fDXSOIZWjjd/3ZZaaDJCcqllKBKwCD2+daukg=;
+        b=QD2TcEtN7tIrex58WvptF+sESXRBgfKI56R5EkmQ70A/p0DTQ7LzG1zDH3ScsxZoGg
+         DwJeKb8nqUw007Bqzsq+Rd5z20kb6AmLQ8EkJeAv/y6lktxISpGRhhQv+MwBYXkcfPNC
+         c4b7Awvl5QJkfjLgmH34OW6lGxRLJPsi7FxML/WdBSi3KzlIU7ET7LrqIn+Z64fpf9+S
+         0EnwQQYkUhQiiIq2xtu/oeMQXZ1J0KDnErY3ZTHDZutbszBg9APsUF29RM7Geo6Mrgij
+         GbiuqIKYo9Hssb/Qq2Zzxh55LY71BVGeZaYVdV0sqAgd2tZbhuDVUGOBc8iqb636C7sj
+         urGw==
+X-Gm-Message-State: AOAM533ttyZTtXNzE9JAOHn7bgGYoULX6s/h6rtLncHJ4ZsLWv90qWcj
+        UM13TNc5eSjlgJYVpds6RL8=
+X-Google-Smtp-Source: ABdhPJwiKVyqQAieOh5gzUSTJZrIQbGqgGRMrC+DLIJrdGIiqpN5QO5TcEWbe+a49p03l6WOUeSx2g==
+X-Received: by 2002:a17:90b:1e46:: with SMTP id pi6mr1474687pjb.5.1626465756555;
+        Fri, 16 Jul 2021 13:02:36 -0700 (PDT)
+Received: from garbanzo ([191.96.120.37])
+        by smtp.gmail.com with ESMTPSA id j129sm11377948pfb.132.2021.07.16.13.02.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jul 2021 13:02:35 -0700 (PDT)
+Date:   Fri, 16 Jul 2021 13:02:33 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     axboe@kernel.dk, bvanassche@acm.org, ming.lei@redhat.com,
+        hch@infradead.org, jack@suse.cz, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 3/6] md: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED on
+ is_mddev_broken()
+Message-ID: <20210716200233.3xj33cc7rmgsmkb5@garbanzo>
+References: <20210715202341.2016612-1-mcgrof@kernel.org>
+ <20210715202341.2016612-4-mcgrof@kernel.org>
+ <2f8c1713-2fa2-b832-9c70-c41a87df12ee@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210715120844.636968-2-ming.lei@redhat.com>
+In-Reply-To: <2f8c1713-2fa2-b832-9c70-c41a87df12ee@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 15, 2021 at 08:08:42PM +0800, Ming Lei wrote:
-> irq vector allocation with managed affinity may be used by driver, and
-> blk-mq needs this info because managed irq will be shutdown when all
-> CPUs in the affinity mask are offline.
-> 
-> The info of using managed irq is often produced by drivers(pci subsystem,
+On Fri, Jul 16, 2021 at 07:51:00AM +0200, Hannes Reinecke wrote:
+> On 7/15/21 10:23 PM, Luis Chamberlain wrote:
+> > The GENHD_FL_DISK_ADDED flag is what we really want, as the
+> > flag GENHD_FL_UP could be set on a semi-initialized device.
+> > 
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >   drivers/md/md.h | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/md/md.h b/drivers/md/md.h
+> > index 832547cf038f..80561bca1f51 100644
+> > --- a/drivers/md/md.h
+> > +++ b/drivers/md/md.h
+> > @@ -766,7 +766,7 @@ static inline bool is_mddev_broken(struct md_rdev *rdev, const char *md_type)
+> >   {
+> >   	int flags = rdev->bdev->bd_disk->flags;
+> > -	if (!(flags & GENHD_FL_UP)) {
+> > +	if (!(flags & GENHD_FL_DISK_ADDED)) {
+> >   		if (!test_and_set_bit(MD_BROKEN, &rdev->mddev->flags))
+> >   			pr_warn("md: %s: %s array has a missing/failed member\n",
+> >   				mdname(rdev->mddev), md_type);
+> > 
+> Why again did you introduce the wrapper?
+> Shouldn't it be used here?
 
-Add space between "drivers" and "(".
-s/pci/PCI/
+Indeed, and that lets us remove the flag copy. Will fix. Thanks
+for the review.
 
-Does this "managed IRQ" (or "managed affinity", not sure what the
-correct terminology is here) have something to do with devm?
+  Luis
 
-> platform device, ...), and it is consumed by blk-mq, so different subsystems
-> are involved in this info flow
-
-Add period at end of sentence.
-
-> Address this issue by adding one field of .irq_affinity_managed into
-> 'struct device'.
-> 
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/base/platform.c | 7 +++++++
->  drivers/pci/msi.c       | 3 +++
->  include/linux/device.h  | 1 +
->  3 files changed, 11 insertions(+)
-> 
-> diff --git a/drivers/base/platform.c b/drivers/base/platform.c
-> index 8640578f45e9..d28cb91d5cf9 100644
-> --- a/drivers/base/platform.c
-> +++ b/drivers/base/platform.c
-> @@ -388,6 +388,13 @@ int devm_platform_get_irqs_affinity(struct platform_device *dev,
->  				ptr->irq[i], ret);
->  			goto err_free_desc;
->  		}
-> +
-> +		/*
-> +		 * mark the device as irq affinity managed if any irq affinity
-> +		 * descriptor is managed
-> +		 */
-> +		if (desc[i].is_managed)
-> +			dev->dev.irq_affinity_managed = true;
->  	}
->  
->  	devres_add(&dev->dev, ptr);
-> diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-> index 3d6db20d1b2b..7ddec90b711d 100644
-> --- a/drivers/pci/msi.c
-> +++ b/drivers/pci/msi.c
-> @@ -1197,6 +1197,7 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
->  	if (flags & PCI_IRQ_AFFINITY) {
->  		if (!affd)
->  			affd = &msi_default_affd;
-> +		dev->dev.irq_affinity_managed = true;
-
-This is really opaque to me.  I can't tell what the connection between
-PCI_IRQ_AFFINITY and irq_affinity_managed is.
-
-AFAICT the only place irq_affinity_managed is ultimately used is
-blk_mq_hctx_notify_offline(), and there's no obvious connection
-between that and this code.
-
->  	} else {
->  		if (WARN_ON(affd))
->  			affd = NULL;
-> @@ -1215,6 +1216,8 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
->  			return nvecs;
->  	}
->  
-> +	dev->dev.irq_affinity_managed = false;
-> +
->  	/* use legacy IRQ if allowed */
->  	if (flags & PCI_IRQ_LEGACY) {
->  		if (min_vecs == 1 && dev->irq) {
-> diff --git a/include/linux/device.h b/include/linux/device.h
-> index 59940f1744c1..9ec6e671279e 100644
-> --- a/include/linux/device.h
-> +++ b/include/linux/device.h
-> @@ -569,6 +569,7 @@ struct device {
->  #ifdef CONFIG_DMA_OPS_BYPASS
->  	bool			dma_ops_bypass : 1;
->  #endif
-> +	bool			irq_affinity_managed : 1;
->  };
->  
->  /**
-> -- 
-> 2.31.1
-> 
-> 
-> _______________________________________________
-> Linux-nvme mailing list
-> Linux-nvme@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-nvme
