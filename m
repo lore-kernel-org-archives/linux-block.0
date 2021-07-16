@@ -2,211 +2,181 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9826C636C9
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 02:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C4F3C07E95
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 05:49:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B033A613E3
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 02:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1621D613D8
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 05:49:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233594AbhGPDBI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jul 2021 23:01:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32767 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233489AbhGPDBH (ORCPT
+        id S230057AbhGPFwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 01:52:46 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:39568 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231961AbhGPFwq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jul 2021 23:01:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626404293;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+        Fri, 16 Jul 2021 01:52:46 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 199FA22B37;
+        Fri, 16 Jul 2021 05:49:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1626414591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1rVaJ8XvOsDBWtaRQp3apo92CSiPixBvBUSI+5KjFdc=;
-        b=KF+3SS/lAseT6Jrqoq6bE+ecfDcVb5AngV20KFdEldKxwqxrjJnKn5zE5jcCewELEA6yRi
-        fTHHLSyHAkTBlElLKug7LONWja+Dp/CswFTk5mOlx2oAvY34zh8Yoy+WLMZDBTerbs2pe3
-        AJSHsXwLMWXTXXBl2YOesiOtZRi+sA8=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-eRV_s6jeOOGulJzNM0Uffg-1; Thu, 15 Jul 2021 22:58:11 -0400
-X-MC-Unique: eRV_s6jeOOGulJzNM0Uffg-1
-Received: by mail-pl1-f200.google.com with SMTP id e8-20020a17090301c8b029012b411f5cbaso1877594plh.20
-        for <linux-block@vger.kernel.org>; Thu, 15 Jul 2021 19:58:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=1rVaJ8XvOsDBWtaRQp3apo92CSiPixBvBUSI+5KjFdc=;
-        b=QKqKoR4j6M4qqBcmki8ENMAhYgyYg/TLIbKJGSXR6qmUurH0Z5mMkbbwOh8ZsVF1NB
-         i3G1QMj5huKK1VIaUqIHWMV727ncRTRguLN8aWrcEYqBbRQyrwcwvA7apSjEZFuH4337
-         A2YogP250OKu2jIWbWbN32YoDmJcbN/Qd9HNnIa0NY0MnIGzGjcnDKBm9ZWk48DsGWyB
-         BEfRVJb+cdt423KTpP/zmTDiugB/xknWXFhi/gpmIwI/dijwgB4rqhWwedFMKQonxA2o
-         WXgMSNOhVuOeUHCCKg6hgTSGwnABvyxEg4ehK89HM/BR0L+qO+2BVMm+kS3NwWYrAhog
-         RthQ==
-X-Gm-Message-State: AOAM530cXflO/BtFnlwNC0WxGO4hIVOQrntFqNYRgcYqoeYRnEfTCEV9
-        mCf2HwU/xJT7DimDj0N+qWE/7nOU+FKYLcF9LTOsgSUDxdLijOeSWlnaTokCQ3m2noafYbVtOsP
-        XnRXFIP7jVe1hDnpqhh7Oq0g=
-X-Received: by 2002:a63:2ad7:: with SMTP id q206mr7719142pgq.293.1626404290412;
-        Thu, 15 Jul 2021 19:58:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzcVMtGVvo/4+WELLZqICmyEEq8fuHUEaK7zlWHRei1qwUHmSCRFN0Ja84LkdQNmIXFBviGIQ==
-X-Received: by 2002:a63:2ad7:: with SMTP id q206mr7719128pgq.293.1626404290160;
-        Thu, 15 Jul 2021 19:58:10 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id w123sm8061175pfb.109.2021.07.15.19.58.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jul 2021 19:58:09 -0700 (PDT)
-Subject: Re: [PATCH 1/1] virtio: disable partitions scanning for no partitions
- block
-To:     Yury Kamenev <damtev@yandex-team.ru>, mst@redhat.com,
-        pbonzini@redhat.com, stefanha@redhat.com, axboe@kernel.dk,
-        hch@lst.de, cand@gmx.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210715094707.19997-1-damtev@yandex-team.ru>
- <20210715094707.19997-2-damtev@yandex-team.ru>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <eada95b1-a1fb-3877-9b04-ac2bd16f5fe0@redhat.com>
-Date:   Fri, 16 Jul 2021 10:57:48 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        bh=h8PAYPEK4+MS0FrJRkYupjRXBGho7fDC4xEGwlkrTCo=;
+        b=Zyl79cBchiMZFmmY+SmyrA4qyl6PehrsKFOSfz8hYYKCYyR4k+nY+aWXT3UGC2kMkDllrA
+        mqtKZFGwV4TmLd2WI+t95RB6nEgq6h1HmSk0CiF5++hiHyYYi8UP4vh/ZJ6uxEmPJW18v+
+        ERku03lb/6u/PiZgOHiGwj2Vz7meMdw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1626414591;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=h8PAYPEK4+MS0FrJRkYupjRXBGho7fDC4xEGwlkrTCo=;
+        b=76kMZhfZmqsydbvq64OBPT6Q7a0jTikUzWmU1vufa0uSCC3yCSeIWP9QvUSDCZ63lAyhMw
+        Drl/K9lB/R2X6LAQ==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id B631E13357;
+        Fri, 16 Jul 2021 05:49:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id MK06Kv4d8WCDNwAAGKfGzw
+        (envelope-from <hare@suse.de>); Fri, 16 Jul 2021 05:49:50 +0000
+Subject: Re: [RFC 2/6] block: add flag for add_disk() completion notation
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk
+Cc:     bvanassche@acm.org, ming.lei@redhat.com, hch@infradead.org,
+        jack@suse.cz, osandov@fb.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210715202341.2016612-1-mcgrof@kernel.org>
+ <20210715202341.2016612-3-mcgrof@kernel.org>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <cbaa9f73-92f8-d5a2-4fd7-c05bda112c56@suse.de>
+Date:   Fri, 16 Jul 2021 07:49:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210715094707.19997-2-damtev@yandex-team.ru>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210715202341.2016612-3-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-‘⁄ 2021/7/15 œ¬ŒÁ5:47, Yury Kamenev –¥µ¿:
-> Signed-off-by: Yury Kamenev <damtev@yandex-team.ru>
-
-
-I think we need a better commit log here.
-
-And why do we need a Kconfig for this? If there's a good reason, I guess 
-the right approach is to invent something in the virtio core (via /sys)?
-
-Thanks
-
-
+On 7/15/21 10:23 PM, Luis Chamberlain wrote:
+> Often drivers may have complex setups where it is not
+> clear if their disk completed their respective *add_disk*()
+> call. They either have to invent a setting or, they
+> incorrectly use GENHD_FL_UP. Using GENHD_FL_UP however is
+> used internally so we know when we can add / remove
+> partitions safely. We can easily fail along the way
+> prior to add_disk() completing and still have
+> GENHD_FL_UP set, so it would not be correct in that case
+> to call del_gendisk() on the disk.
+> 
+> Provide a new flag then which allows us to check if
+> *add_disk*() completed, and conversely just make
+> del_gendisk() check for this for drivers so that
+> they can safely call del_gendisk() and we'll figure
+> it out if it is safe for you to call this.
+> 
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 > ---
->   .../admin-guide/kernel-parameters.txt         |  3 +++
->   drivers/block/Kconfig                         |  7 +++++
->   drivers/block/virtio_blk.c                    | 26 +++++++++++++++++++
->   include/uapi/linux/virtio_blk.h               |  2 ++
->   4 files changed, 38 insertions(+)
->
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index bdb22006f713..941bdaf5c167 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -6076,6 +6076,9 @@
->   			brightness level.
->   			default: 1
->
-> +	virtiopartscan
-> +		Enable virtio block device partition scanning omission based on VIRTIO_BLK_F_NO_PART_SCAN feature flag.
+>   block/genhd.c         |  8 ++++++++
+>   include/linux/genhd.h | 11 ++++++++++-
+>   2 files changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index c6c9c196ff27..72703d243b44 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -630,6 +630,8 @@ static int __device_add_disk(struct device *parent, struct gendisk *disk,
+>   	if (ret)
+>   		goto exit_del_events;
+>   
+> +	disk->flags |= GENHD_FL_DISK_ADDED;
 > +
->   	virtio_mmio.device=
->   			[VMMIO] Memory mapped virtio (platform) device.
->
-> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-> index 63056cfd4b62..69ecd3fd7037 100644
-> --- a/drivers/block/Kconfig
-> +++ b/drivers/block/Kconfig
-> @@ -399,6 +399,13 @@ config VIRTIO_BLK
->   	  This is the virtual block driver for virtio.  It can be used with
->             QEMU based VMMs (like KVM or Xen).  Say Y or M.
->
-> +config VIRTIO_BLK_NO_PART_SCAN
-> +	bool "Disable partition scanning for devices with no partitions"
-> +	depends on VIRTIO_BLK
-> +	help
-> +	  Disable partition scanning for devices with no partitions.
-> +	  Can reduce the kernel start time for tiny systems like squashfs images.
-> +
->   config BLK_DEV_RBD
->   	tristate "Rados block device (RBD)"
->   	depends on INET && BLOCK
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 4b49df2dfd23..479711d3791c 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -692,6 +692,19 @@ static const struct blk_mq_ops virtio_mq_ops = {
->   static unsigned int virtblk_queue_depth;
->   module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
->
-> +#ifndef MODULE
-> +#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-> +static int partitions_scanning_disable __read_mostly;
-> +
-> +static int __init partitions_scanning_setup(char *__unused)
-> +{
-> +	partitions_scanning_disable = 1;
-> +	return 1;
-> +}
-> +__setup("nopartscan", partitions_scanning_setup);
-> +#endif
-> +#endif
-> +
->   static int virtblk_probe(struct virtio_device *vdev)
+>   	return 0;
+>   exit_del_events:
+>   	disk_del_events(disk);
+> @@ -677,6 +679,9 @@ EXPORT_SYMBOL(device_add_disk_no_queue_reg);
+>    * with put_disk(), which should be called after del_gendisk(), if
+>    * __device_add_disk() was used.
+>    *
+> + * Drivers can safely call this even if they are not sure if the respective
+> + * __device_add_disk() call succeeded.
+> + *
+>    * Drivers exist which depend on the release of the gendisk to be synchronous,
+>    * it should not be deferred.
+>    *
+> @@ -686,6 +691,9 @@ void del_gendisk(struct gendisk *disk)
 >   {
->   	struct virtio_blk *vblk;
-> @@ -790,6 +803,13 @@ static int virtblk_probe(struct virtio_device *vdev)
->   	vblk->disk->flags |= GENHD_FL_EXT_DEVT;
->   	vblk->index = index;
->
-> +#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-> +	if (unlikely(partitions_scanning_disable))
-> +		/* disable partitions scanning if it was stated in virtio features*/
-> +		if (virtio_has_feature(vdev, VIRTIO_BLK_F_NO_PART_SCAN))
-> +			vblk->disk->flags |= GENHD_FL_NO_PART_SCAN;
-> +#endif
+>   	might_sleep();
+>   
+> +	if (!blk_disk_registered(disk))
+> +		return;
 > +
->   	/* configure queue flush support */
->   	virtblk_update_cache_mode(vdev);
->
-> @@ -966,6 +986,9 @@ static unsigned int features_legacy[] = {
->   	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
->   	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
->   	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-> +#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-> +	VIRTIO_BLK_F_NO_PART_SCAN,
-> +#endif
->   }
->   ;
->   static unsigned int features[] = {
-> @@ -973,6 +996,9 @@ static unsigned int features[] = {
->   	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
->   	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
->   	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-> +#ifdef CONFIG_VIRTIO_BLK_NO_PART_SCAN
-> +	VIRTIO_BLK_F_NO_PART_SCAN,
-> +#endif
->   };
->
->   static struct virtio_driver virtio_blk = {
-> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> index d888f013d9ff..9b381675342a 100644
-> --- a/include/uapi/linux/virtio_blk.h
-> +++ b/include/uapi/linux/virtio_blk.h
-> @@ -40,6 +40,7 @@
->   #define VIRTIO_BLK_F_MQ		12	/* support more than one vq */
->   #define VIRTIO_BLK_F_DISCARD	13	/* DISCARD is supported */
->   #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
-> +#define VIRTIO_BLK_F_NO_PART_SCAN	16	/* Disable partition scanning */
->
->   /* Legacy feature bits */
->   #ifndef VIRTIO_BLK_NO_LEGACY
-> --
-> 2.24.3 (Apple Git-128)
->
+>   	if (WARN_ON_ONCE(!disk->queue))
+>   		return;
+>   
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index dc07a957c9e1..73024416d2d5 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -56,6 +56,10 @@ struct partition_meta_info {
+>    * Must not be set for devices which are removed entirely when the
+>    * media is removed.
+>    *
+> + * ``GENHD_FL_DISK_ADDED`` (0x0002): used to clarify that the
+> + * respective add_disk*() call completed successfully, so that
+> + * we know we can safely process del_gendisk() on the disk.
+> + *
+>    * ``GENHD_FL_CD`` (0x0008): the block device is a CD-ROM-style
+>    * device.
+>    * Affects responses to the ``CDROM_GET_CAPABILITY`` ioctl.
+> @@ -94,7 +98,7 @@ struct partition_meta_info {
+>    * Used for multipath devices.
+>    */
+>   #define GENHD_FL_REMOVABLE			0x0001
+> -/* 2 is unused (used to be GENHD_FL_DRIVERFS) */
+> +#define GENHD_FL_DISK_ADDED			0x0002
+>   /* 4 is unused (used to be GENHD_FL_MEDIA_CHANGE_NOTIFY) */
+>   #define GENHD_FL_CD				0x0008
+>   #define GENHD_FL_UP				0x0010
+> @@ -189,6 +193,11 @@ struct gendisk {
+>   #define disk_to_cdi(disk)	NULL
+>   #endif
+>   
+> +static inline bool blk_disk_registered(struct gendisk *disk)
+> +{
+> +	return disk && (disk->flags & GENHD_FL_DISK_ADDED);
+> +}
+> +
+>   static inline int disk_max_parts(struct gendisk *disk)
+>   {
+>   	if (disk->flags & GENHD_FL_EXT_DEVT)
+> 
+Bah. The flag is named 'DISK_ADDED', and the wrapper 'disk_registered'.
+Please use the same wording (either 'added' or 'registered') for both to 
+avoid confusion.
 
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 N√ºrnberg
+HRB 36809 (AG N√ºrnberg), Gesch√§ftsf√ºhrer: Felix Imend√∂rffer
