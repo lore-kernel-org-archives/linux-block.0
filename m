@@ -2,145 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9F4C12002
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 16:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A55BC636CA
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 19:38:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B767E611AB
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 16:09:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6287561001
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 19:38:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbhGPQMJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 12:12:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbhGPQMI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 12:12:08 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB9BC061760;
-        Fri, 16 Jul 2021 09:09:12 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id 70so7046400pgh.2;
-        Fri, 16 Jul 2021 09:09:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DZ7+7XgWM6hQZ0UFtx/++E9LOP3fUxSddmlsFwD/FAU=;
-        b=LcFKQKWZBfnq7ztPttKD1EbLu0EBOsYfhH+Xea8T15YwjWbDADhRGBr18+d6n61OVu
-         z7n5JLWPOGWy5CNStdZkiMoKjYfnMG2YTd2JNbg2iWu4a2ZBc2YIsiIuGy6jdls+3s9W
-         302dsxPjS2wQQXj29r8Jgv95+YcOpGD0QfErsc8+ssZlMky0D3o0sKhgWdYQB4xi9T04
-         wJZs7qxVFBwT2kRkPtKJFfEMKyf7wnmeQbdmaDUEAY5bOUJ0qAvGf9vvFfxzT61EVjQ4
-         6g/XIQGoDJ9V/v3YONni7BR71ImbpC4eEBzddwe3PxiP215sH627dkBSOAP/6V8ER7zz
-         5xHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=DZ7+7XgWM6hQZ0UFtx/++E9LOP3fUxSddmlsFwD/FAU=;
-        b=jw/lFpw940wdxKAo7Ly6iktKlYj53DJNg/5hQL+byyXZle0RkXpoCTGCuYTN6noxm1
-         9ty+601F/bc6dgBfJusCkwxv40urIHq05/mmnnoGIOyBgnGv6kFRyQvcPE627gX9eQ1f
-         +OZVdO5UTmnFaKcIQqjZ3wkESREjXuKGcFABtS6cGIZPy5D3489kVp9MGQWzoD4IFQGT
-         4NtvYBDEFWJyMduSROhONsFWr4J8yufY6G5TlHIkGFLUh/spUXljrLEaojVKgPsk2WEa
-         QzWnkQqVFmTQthC9h9hWedRrv8osc6aEBcXLc0rylzWWCJVjS5UwfqQ4VF2UNkqO50dl
-         VNwQ==
-X-Gm-Message-State: AOAM532qPAqhEWdk6PIQpNI+HKGKhh9Ecw+38tfBfyB5NR2LPuhqB575
-        kbuAxa9ikJqdgtNGX1xDrqA=
-X-Google-Smtp-Source: ABdhPJyUbgcvONO40UW44ifs4qnB+E15RG/K0Ok5QmVXbx9Mo0xGOBdXsBisFJj5+L0FDrUQesQeqg==
-X-Received: by 2002:a65:6909:: with SMTP id s9mr4398634pgq.321.1626451752040;
-        Fri, 16 Jul 2021 09:09:12 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:37b9])
-        by smtp.gmail.com with ESMTPSA id u7sm11831012pgl.30.2021.07.16.09.09.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 09:09:11 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 16 Jul 2021 06:09:07 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     brookxu <brookxu.cn@gmail.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
-Message-ID: <YPGvIzZUI+QxP1js@mtj.duckdns.org>
-References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
+        id S232123AbhGPTlK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 15:41:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38840 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231335AbhGPTlJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Jul 2021 15:41:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 52679613F2;
+        Fri, 16 Jul 2021 19:38:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626464294;
+        bh=EFpDd8fBlI2SspEDjpG81/KlU7mRqZr6TG5Ma0I1pUY=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=AoYmDGZdNrVYJ+qIyvWht6jPYhgPJ8a4AUWXIf6bhD7YKDCNTeSqwcO3ZMrfq8FW6
+         x420SCzqOEJ7lF9kcGwwF91xVWNgr0pRNoUG2Fg5Z4PA+7OMdu198wr5+LDqNkSaId
+         uapUOmBisp2yEt5o2shk2bS88nidH2gMpvenpcfdZa5Br8mp95H7HAvSoonBiA2oHC
+         YtFzY3fiw8d+UtA9L5og/IVq66gw4Su0XfrnMDOt7VzYozfev24V1qy4vKQxT3g7JX
+         Yni+56dP7ns6kV/7L+EoI8vG1Q72RmFVXUu7UmXx5qI4uTUmTcg1iNwAXdD8MppOSL
+         Vw10kkHCexdfA==
+Subject: Re: [GIT PULL] Block fixes for 5.14-rc
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <2b7767f1-3ff0-e65f-398d-4934417dc44e@kernel.dk>
+References: <2b7767f1-3ff0-e65f-398d-4934417dc44e@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <2b7767f1-3ff0-e65f-398d-4934417dc44e@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-16
+X-PR-Tracked-Commit-Id: 05d69d950d9d84218fc9beafd02dea1f6a70e09e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0d18c12b288a177906e31fecfab58ca2243ffc02
+Message-Id: <162646429420.9691.12889294401950003185.pr-tracker-bot@kernel.org>
+Date:   Fri, 16 Jul 2021 19:38:14 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+The pull request you sent on Fri, 16 Jul 2021 08:24:57 -0600:
 
-On Fri, Jul 16, 2021 at 02:22:49PM +0800, brookxu wrote:
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index a11b3b5..86ff943 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
->  		trace_block_split(split, (*bio)->bi_iter.bi_sector);
->  		submit_bio_noacct(*bio);
->  		*bio = split;
-> +
-> +		blk_throtl_recharge_bio(*bio);
+> git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-16
 
-I don't think we're holding the queue lock here.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0d18c12b288a177906e31fecfab58ca2243ffc02
 
->  	}
->  }
->  
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index b1b22d8..1967438 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -2176,6 +2176,40 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
->  }
->  #endif
->  
-> +void blk_throtl_recharge_bio(struct bio *bio)
-> +{
-> +	bool rw = bio_data_dir(bio);
-> +	struct blkcg_gq *blkg = bio->bi_blkg;
-> +	struct throtl_grp *tg = blkg_to_tg(blkg);
-> +	u32 iops_limit = tg_iops_limit(tg, rw);
-> +
-> +	if (iops_limit == UINT_MAX)
-> +		return;
-> +
-> +	/*
-> +	 * If previous slice expired, start a new one otherwise renew/extend
-> +	 * existing slice to make sure it is at least throtl_slice interval
-> +	 * long since now. New slice is started only for empty throttle group.
-> +	 * If there is queued bio, that means there should be an active
-> +	 * slice and it should be extended instead.
-> +	 */
-> +	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
-> +		throtl_start_new_slice(tg, rw);
-> +	else {
-> +		if (time_before(tg->slice_end[rw],
-> +		    jiffies + tg->td->throtl_slice))
-> +			throtl_extend_slice(tg, rw,
-> +				jiffies + tg->td->throtl_slice);
-> +	}
-> +
-> +	/* Recharge the bio to the group, as some BIOs will be further split
-> +	 * after passing through the throttle, causing the actual IOPS to
-> +	 * be greater than the expected value.
-> +	 */
-> +	tg->last_io_disp[rw]++;
-> +	tg->io_disp[rw]++;
-> +}
-
-But blk-throtl expects queue lock to be held.
-
-How about doing something simpler? Just estimate how many bios a given bio
-is gonna be and charge it outright? The calculation will be duplicated
-between the split path but that seems like the path of least resistance
-here.
-
-Thanks.
+Thank you!
 
 -- 
-tejun
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
