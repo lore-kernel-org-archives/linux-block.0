@@ -2,174 +2,197 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69ACDC12002
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 06:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1DF2C12002
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 09:02:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55473613E7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 06:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAEAB613F3
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 09:02:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234622AbhGPGZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 02:25:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbhGPGZs (ORCPT
+        id S239147AbhGPJFb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 05:05:31 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:11325 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239151AbhGPJFa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 02:25:48 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F34C06175F;
-        Thu, 15 Jul 2021 23:22:53 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id s18so8970728pgg.8;
-        Thu, 15 Jul 2021 23:22:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=qBZgZ1rhUXrPQtQ1RtY6PTOQRojpxXbKtuLlXE/iYow=;
-        b=A/AiFzqwhhU2cqITL0fNNzFEVtilgMAATbE5B4mhB06UhLd8ASAZbVW+cCA5x+njML
-         mCrfkD7e0dh6+yS5L/ixigSwXXPXCuldq6rRWO74AJ5gB1o26IYkBRWe682enIAeJ46S
-         7+LKvk7nouKC8MXNXbtKyqg8oej/p0TetmNNllY21dpbT6qttnJ9mMjmyUYu57vG/qFH
-         ro7Ul8bza2FdizqbcY7jc1BOVIK6gznJCZ/SFD3VtjIaYlHBFAJqy/WcdF5TqDOCJ1TP
-         +8oGL4ZPGdUzH2NS79oIkap3bZVUJK9PZaaqfBN1nk51EtZG/9Vn2b5IYXzYBfkmXpsQ
-         FWfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=qBZgZ1rhUXrPQtQ1RtY6PTOQRojpxXbKtuLlXE/iYow=;
-        b=Sldo1+jfcmQlcEFAPEMo7AERZOJy0iTm+bjGoyjkqpnrCKwTeSgeOOQEeEoG5xG1oG
-         T9vWpkP5yXFGyAgY26QQK5FuHutCThu6LreqQVHzyd+pLw3VYCMGC4E26oXOjSiPsCKe
-         9bT2+Uqk1sSBbzhRcUeBJ4izZC7MGY+UwnhgCWoA5d5/SsMPoC/J3SDSG9LeIW0FuMIQ
-         tQsSXiWKPlBnW4yODUFqSlAVTc9sVtQ8b9pX1VCNVWPZgP6ysXzlXw3x8T/NiCBH1+g2
-         WQCoJNH7jbcrUNjsAwkif56EexQBw44Yoo43uGbyIu31ORdhpWolJW448G+0hbYWzM/s
-         rIeA==
-X-Gm-Message-State: AOAM5304ch44rMHEz88bGDSn+/qftZgVH+YHTVC6lxPOz3DEt4UH6ANe
-        YQhj5VO3rsUiOrBHgWomCL8=
-X-Google-Smtp-Source: ABdhPJxKgk5DwsG81U+8j+wkhdCUBpmerUHKGMitNohYAg2bY1jSm7C7OIW4U94qdFckfe+tZT2whQ==
-X-Received: by 2002:a62:e90b:0:b029:30e:4530:8dca with SMTP id j11-20020a62e90b0000b029030e45308dcamr8801669pfh.17.1626416572760;
-        Thu, 15 Jul 2021 23:22:52 -0700 (PDT)
-Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id s24sm6740794pfg.186.2021.07.15.23.22.51
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Jul 2021 23:22:52 -0700 (PDT)
-From:   brookxu <brookxu.cn@gmail.com>
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
-Date:   Fri, 16 Jul 2021 14:22:49 +0800
-Message-Id: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+        Fri, 16 Jul 2021 05:05:30 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GR4rq23mXz7tjj;
+        Fri, 16 Jul 2021 16:58:03 +0800 (CST)
+Received: from dggpeml500025.china.huawei.com (7.185.36.35) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 16 Jul 2021 17:02:34 +0800
+Received: from [10.174.176.117] (10.174.176.117) by
+ dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 16 Jul 2021 17:02:33 +0800
+Subject: Re: [PATCH] block: ensure the memory order between bi_private and
+ bi_status
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <paulmck@kernel.org>, <will@kernel.org>
+References: <20210701113537.582120-1-houtao1@huawei.com>
+ <20210715070148.GA8088@lst.de>
+ <20210715081348.GG2725@worktop.programming.kicks-ass.net>
+From:   Hou Tao <houtao1@huawei.com>
+Message-ID: <36a122ea-d18a-9317-aadd-b6b69a6f0283@huawei.com>
+Date:   Fri, 16 Jul 2021 17:02:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+MIME-Version: 1.0
+In-Reply-To: <20210715081348.GG2725@worktop.programming.kicks-ass.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.176.117]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500025.china.huawei.com (7.185.36.35)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chunguang Xu <brookxu@tencent.com>
+Hi Peter,
 
-After patch 54efd50 (block: make generic_make_request handle
-arbitrarily sized bios), the IO through io-throttle may be larger,
-and these IOs may be further split into more small IOs. However,
-IOPS throttle does not seem to be aware of this change, which
-makes the calculation of IOPS of large IOs incomplete, resulting
-in disk-side IOPS that does not meet expectations. Maybe we should
-fix this problem.
+On 7/15/2021 4:13 PM, Peter Zijlstra wrote:
+> On Thu, Jul 15, 2021 at 09:01:48AM +0200, Christoph Hellwig wrote:
+>> On Thu, Jul 01, 2021 at 07:35:37PM +0800, Hou Tao wrote:
+>>> When running stress test on null_blk under linux-4.19.y, the following
+>>> warning is reported:
+>>>
+>>>   percpu_ref_switch_to_atomic_rcu: percpu ref (css_release) <= 0 (-3) after switching to atomic
+>>>
+snip
+>>> In __blkdev_direct_IO(), the memory order between dio->waiter and
+>>> dio->bio.bi_status is not guaranteed neither. Until now it is unable to
+>>> reproduce it, maybe because dio->waiter and dio->bio.bi_status are
+>>> in the same cache-line. But it is better to add guarantee for memory
+>>> order.
+> Cachelines don't guarantee anything, you can get partial forwards.
 
-We can reproduce it by set max_sectors_kb of disk to 128, set
-blkio.write_iops_throttle to 100, run a dd instance inside blkio
-and use iostat to watch IOPS:
+Could you please point me to any reference ? I can not google
 
-dd if=/dev/zero of=/dev/sdb bs=1M count=1000 oflag=direct
+any memory order things by using "partial forwards".
 
-As a result, without this change the average IOPS is 1995, with
-this change the IOPS is 98.
+>
+>>> Fixing it by using smp_load_acquire() & smp_store_release() to guarantee
+>>> the order between {bio->bi_private|dio->waiter} and {bi_status|bi_blkg}.
+>>>
+>>> Fixes: 189ce2b9dcc3 ("block: fast-path for small and simple direct I/O requests")
+>> This obviously does not look broken, but smp_load_acquire /
+>> smp_store_release is way beyond my paygrade.  Adding some CCs.
+> This block stuff is a bit beyond me, lets see if we can make sense of
+> it.
+>
+>>> Signed-off-by: Hou Tao <houtao1@huawei.com>
+>>> ---
+>>>  fs/block_dev.c | 19 +++++++++++++++----
+>>>  1 file changed, 15 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>>> index eb34f5c357cf..a602c6315b0b 100644
+>>> --- a/fs/block_dev.c
+>>> +++ b/fs/block_dev.c
+>>> @@ -224,7 +224,11 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
+>>>  {
+>>>  	struct task_struct *waiter = bio->bi_private;
+>>>  
+>>> -	WRITE_ONCE(bio->bi_private, NULL);
+>>> +	/*
+>>> +	 * Paired with smp_load_acquire in __blkdev_direct_IO_simple()
+>>> +	 * to ensure the order between bi_private and bi_xxx
+>>> +	 */
+> This comment doesn't help me; where are the other stores? Presumably
+> somewhere before this is called, but how does one go about finding them?
 
-Signed-off-by: Chunguang Xu <brookxu@tencent.com>
----
- block/blk-merge.c    |  2 ++
- block/blk-throttle.c | 34 ++++++++++++++++++++++++++++++++++
- block/blk.h          |  2 ++
- 3 files changed, 38 insertions(+)
+Yes, the change log is vague and it will be corrected. The other stores
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index a11b3b5..86ff943 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
- 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
- 		submit_bio_noacct(*bio);
- 		*bio = split;
-+
-+		blk_throtl_recharge_bio(*bio);
- 	}
- }
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index b1b22d8..1967438 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2176,6 +2176,40 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- }
- #endif
- 
-+void blk_throtl_recharge_bio(struct bio *bio)
-+{
-+	bool rw = bio_data_dir(bio);
-+	struct blkcg_gq *blkg = bio->bi_blkg;
-+	struct throtl_grp *tg = blkg_to_tg(blkg);
-+	u32 iops_limit = tg_iops_limit(tg, rw);
-+
-+	if (iops_limit == UINT_MAX)
-+		return;
-+
-+	/*
-+	 * If previous slice expired, start a new one otherwise renew/extend
-+	 * existing slice to make sure it is at least throtl_slice interval
-+	 * long since now. New slice is started only for empty throttle group.
-+	 * If there is queued bio, that means there should be an active
-+	 * slice and it should be extended instead.
-+	 */
-+	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
-+		throtl_start_new_slice(tg, rw);
-+	else {
-+		if (time_before(tg->slice_end[rw],
-+		    jiffies + tg->td->throtl_slice))
-+			throtl_extend_slice(tg, rw,
-+				jiffies + tg->td->throtl_slice);
-+	}
-+
-+	/* Recharge the bio to the group, as some BIOs will be further split
-+	 * after passing through the throttle, causing the actual IOPS to
-+	 * be greater than the expected value.
-+	 */
-+	tg->last_io_disp[rw]++;
-+	tg->io_disp[rw]++;
-+}
-+
- bool blk_throtl_bio(struct bio *bio)
- {
- 	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-diff --git a/block/blk.h b/block/blk.h
-index 4b885c0..067634a 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -293,12 +293,14 @@ struct io_cq *ioc_create_icq(struct io_context *ioc, struct request_queue *q,
- extern int blk_throtl_init(struct request_queue *q);
- extern void blk_throtl_exit(struct request_queue *q);
- extern void blk_throtl_register_queue(struct request_queue *q);
-+extern void blk_throtl_recharge_bio(struct bio *bio);
- bool blk_throtl_bio(struct bio *bio);
- #else /* CONFIG_BLK_DEV_THROTTLING */
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
-+static inline void blk_throtl_recharge_bio(struct bio *bio) { }
- #endif /* CONFIG_BLK_DEV_THROTTLING */
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
--- 
-1.8.3.1
+happen in req_bio_endio() and its callees when the request completes.
+
+> The Changelog seems to suggest you only care about bi_css, not bi_xxx in
+> general. In specific you can only care about stores that happen before
+> this; is all of bi_xxx written before here? If not, you have to be more
+> specific.
+
+Actually we care about all bi_xxx which are written in req_bio_endio, and all writes
+
+to bi_xxx happen before blkdev_bio_end_io_simple(). Here I just try to
+
+use bi_status as one example.
+
+> Also, this being a clear, this very much isn't the typical publish
+> pattern.
+>
+> On top of all that, smp_wmb() would be sufficient here and would be
+> cheaper on some platforms (ARM comes to mind).
+Thanks for your knowledge, I will use smp_wmb() instead of smp_store_release().
+>
+>>> +	smp_store_release(&bio->bi_private, NULL);
+>>>  	blk_wake_io_task(waiter);
+>>>  }
+>>>  
+>>> @@ -283,7 +287,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+>>>  	qc = submit_bio(&bio);
+>>>  	for (;;) {
+>>>  		set_current_state(TASK_UNINTERRUPTIBLE);
+>>> -		if (!READ_ONCE(bio.bi_private))
+>>> +		/* Refer to comments in blkdev_bio_end_io_simple() */
+>>> +		if (!smp_load_acquire(&bio.bi_private))
+>>>  			break;
+>>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+>>>  		    !blk_poll(bdev_get_queue(bdev), qc, true))
+> That comment there doesn't help me find any relevant later loads and is
+> thus again inadequate.
+>
+> Here the purpose seems to be to ensure the bi_css load happens after the
+> bi_private load, and this again is cheaper done using smp_rmb().
+Yes and thanks again.
+>
+> Also, the implication seems to be -- but is not spelled out anywhere --
+> that if bi_private is !NULL, it is stable.
+
+What is the meaning of "it is stable" ? Do you mean if bi_private is NULL,
+
+the values of bi_xxx should be ensured ?
+
+>>> @@ -353,7 +358,12 @@ static void blkdev_bio_end_io(struct bio *bio)
+>>>  		} else {
+>>>  			struct task_struct *waiter = dio->waiter;
+>>>  
+>>> -			WRITE_ONCE(dio->waiter, NULL);
+>>> +			/*
+>>> +			 * Paired with smp_load_acquire() in
+>>> +			 * __blkdev_direct_IO() to ensure the order between
+>>> +			 * dio->waiter and bio->bi_xxx
+>>> +			 */
+>>> +			smp_store_release(&dio->waiter, NULL);
+>>>  			blk_wake_io_task(waiter);
+>>>  		}
+>>>  	}
+>>> @@ -478,7 +488,8 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+>>>  
+>>>  	for (;;) {
+>>>  		set_current_state(TASK_UNINTERRUPTIBLE);
+>>> -		if (!READ_ONCE(dio->waiter))
+>>> +		/* Refer to comments in blkdev_bio_end_io */
+>>> +		if (!smp_load_acquire(&dio->waiter))
+>>>  			break;
+>>>  
+>>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+> Idem for these...
+> .
+
+Thanks
+
+Regards,
+
+Tao
 
