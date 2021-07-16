@@ -2,136 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFA2C07E95
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 10:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00808C07E95
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 14:25:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75BFC613D3
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 10:19:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C64B260FE7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jul 2021 14:25:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236908AbhGPKWe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jul 2021 06:22:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
+        id S232808AbhGPO14 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jul 2021 10:27:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231720AbhGPKWe (ORCPT
+        with ESMTP id S232775AbhGPO1z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jul 2021 06:22:34 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7563C06175F;
-        Fri, 16 Jul 2021 03:19:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=k1yI3xZMljuco026FxHxM/0j0phJa/QvjQkg48mc0YE=; b=hzHCW9Y+Aa/rEziRwzmIBnqaTy
-        3aGyHM7oQkEp6gNB0sIw64hQAAkuK8YBie4CGCsFOp1fI1N+pPtgHf8rI0Beuu6tdFq1MN9S7GDn6
-        h89UVfXfYi34Dq03MW4rWT5aL//dnILUjzaBH9BhrimyB5ZJrA83uuPBoJPlcTFKz90yitnj+l54R
-        GiWDuVltR1MaThRQQh3I4ToK8R2QD7mtuOKKX9muCX0n2wCTu/grpUIu1qEGlgGfrxAb1yZ9GnCwb
-        29+V/IGdQ/9RKK/21Oe0yk9hMkTBPn293fjpj9kCztD5Fvk52CO02qt/2x4RU2Em/eRD0IL9PWETO
-        2lnnID2Q==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m4KwM-000Njv-Kw; Fri, 16 Jul 2021 10:19:30 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 2EACC9877DF; Fri, 16 Jul 2021 12:19:29 +0200 (CEST)
-Date:   Fri, 16 Jul 2021 12:19:29 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Hou Tao <houtao1@huawei.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        yukuai3@huawei.com, paulmck@kernel.org, will@kernel.org
-Subject: Re: [PATCH] block: ensure the memory order between bi_private and
- bi_status
-Message-ID: <20210716101929.GD4717@worktop.programming.kicks-ass.net>
-References: <20210701113537.582120-1-houtao1@huawei.com>
- <20210715070148.GA8088@lst.de>
- <20210715081348.GG2725@worktop.programming.kicks-ass.net>
- <36a122ea-d18a-9317-aadd-b6b69a6f0283@huawei.com>
+        Fri, 16 Jul 2021 10:27:55 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECB2CC06175F
+        for <linux-block@vger.kernel.org>; Fri, 16 Jul 2021 07:25:00 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id b14-20020a056830310eb02904c7e78705f4so9990956ots.13
+        for <linux-block@vger.kernel.org>; Fri, 16 Jul 2021 07:25:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=g7fCH9z1o+FhUI94OWTsT7bPkqKdjEt9wSRt8sGwj80=;
+        b=GwSnzZLLWPB7AB+0aj1LovlUAKNpDTwNS8LsEcptx37lGKn3Hj048hP+lC/mwfWNjU
+         PeVUsXhzxUb0QQEZnitsBA8gm2P8oNuCFGmruxZJDDGxUCTUbhLkHeuOeXWk/6689IOd
+         5aagQh1iotzXNAkO1+5/M1kepYFX3A2W71S4EWK/1LGoPDS09oWYPGyx1RMQEbjvGIHa
+         Yr/0WKWcqCRX4jMSib3M6EvBJi+oeY+y40se/p9eeoiJuxTj4zZaHMugndq5ZDLyo8c5
+         dDgTZ2DjCEXFOo2Zye6X8BPlmUAfvFc/XDoNHCNePKt6nONy2drPRroVVBQB7BdAwN/s
+         zqpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=g7fCH9z1o+FhUI94OWTsT7bPkqKdjEt9wSRt8sGwj80=;
+        b=b+iUYjwwxXVrM6erSAdXCMYFpt+xGG7N+4SgvpobiQ8T1o8KiHW9tex2StGatGnJSw
+         NSYwI7lGhKKMj3fVdMQ2lxDYqQOtVWi4VYZ9LDQIE9zby600CCffxrWwppLKfJGe9TyZ
+         gUti/DdRO61dUMYVtAbRAokZeH+QMgBgFqfWlcLs4pUePijEeqoIctmm1B5H++pA7Uqa
+         pK5oMbU1rCZcvalHeuZ8W1bqcNZz4vwQmAWsMjobT/FOKphnt2K7hNtoL06+dVn1UpSQ
+         rQxibpuOTHbjKH/+4uIzfz/AnLJRcyStz8bxm5rpLxeO84lw7fQUC6SfW3zJrayNRIpG
+         CC0w==
+X-Gm-Message-State: AOAM531c4E8RepjBwVWjedaFlnnMQgU+MSL/FVANWACwlhjlGJjfcY5/
+        xd4oTo2e1MnsvkGbzuw+qOWZRGD9ddAlZ9u0
+X-Google-Smtp-Source: ABdhPJxpRUhsi7W1phU7Fksnw3T8YI8Gj3ZKUuaJAY94sr5afwzRiPJOLYyoo2X0dnQGHkiqaX5uxA==
+X-Received: by 2002:a9d:2d82:: with SMTP id g2mr8771958otb.30.1626445499932;
+        Fri, 16 Jul 2021 07:24:59 -0700 (PDT)
+Received: from [192.168.1.187] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id l7sm1878505otu.76.2021.07.16.07.24.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jul 2021 07:24:59 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.14-rc
+Message-ID: <2b7767f1-3ff0-e65f-398d-4934417dc44e@kernel.dk>
+Date:   Fri, 16 Jul 2021 08:24:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <36a122ea-d18a-9317-aadd-b6b69a6f0283@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 05:02:33PM +0800, Hou Tao wrote:
+Hi Linus,
 
-> > Cachelines don't guarantee anything, you can get partial forwards.
-> 
-> Could you please point me to any reference ? I can not google
-> 
-> any memory order things by using "partial forwards".
+A few fixes for the 5.14 release:
 
-I'm not sure I have references, but there are CPUs that can do, for
-example, store forwarding at a granularity below cachelines (ie at
-register size).
+- NVMe fixes (via Christoph)
+	- fix various races in nvme-pci when shutting down just after
+	  probing (Casey Chen)
+	- fix a net_device leak in nvme-tcp (Prabhakar Kushwaha)
 
-In such a case a CPU might observe the stored value before it is
-committed to memory.
+- Fix regression in xen-blkfront by cleaning up the removal state
+  machine (Christoph)
+
+- Fix tag_set and queue cleanup ordering regression in nbd (Wang)
+
+- Fix tag_set and queue cleanup ordering regression in pd (Guoqing)
+
+Please pull!
 
 
-> >>> @@ -224,7 +224,11 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
-> >>>  {
-> >>>  	struct task_struct *waiter = bio->bi_private;
-> >>>  
-> >>> -	WRITE_ONCE(bio->bi_private, NULL);
-> >>> +	/*
-> >>> +	 * Paired with smp_load_acquire in __blkdev_direct_IO_simple()
-> >>> +	 * to ensure the order between bi_private and bi_xxx
-> >>> +	 */
-> > This comment doesn't help me; where are the other stores? Presumably
-> > somewhere before this is called, but how does one go about finding them?
-> 
-> Yes, the change log is vague and it will be corrected. The other stores
-> 
-> happen in req_bio_endio() and its callees when the request completes.
+The following changes since commit a731763fc479a9c64456e0643d0ccf64203100c9:
 
-Aaah, right. So initially I was wondering if it would make sense to put
-the barrier there, but having looked at this a little longer, this
-really seems to be about these two DIO methods.
+  blk-cgroup: prevent rcu_sched detected stalls warnings while iterating blkgs (2021-07-07 09:36:36 -0600)
 
-> > The Changelog seems to suggest you only care about bi_css, not bi_xxx in
-> > general. In specific you can only care about stores that happen before
-> > this; is all of bi_xxx written before here? If not, you have to be more
-> > specific.
-> 
-> Actually we care about all bi_xxx which are written in req_bio_endio,
-> and all writes to bi_xxx happen before blkdev_bio_end_io_simple().
-> Here I just try to use bi_status as one example.
+are available in the Git repository at:
 
-I see req_bio_endio() change bi_status, bi_flags and bi_iter, but afaict
-there's more bi_ fields.
+  git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-16
 
-> >>> @@ -283,7 +287,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
-> >>>  	qc = submit_bio(&bio);
-> >>>  	for (;;) {
-> >>>  		set_current_state(TASK_UNINTERRUPTIBLE);
-> >>> -		if (!READ_ONCE(bio.bi_private))
-> >>> +		/* Refer to comments in blkdev_bio_end_io_simple() */
-> >>> +		if (!smp_load_acquire(&bio.bi_private))
-> >>>  			break;
-> >>>  		if (!(iocb->ki_flags & IOCB_HIPRI) ||
-> >>>  		    !blk_poll(bdev_get_queue(bdev), qc, true))
-> > That comment there doesn't help me find any relevant later loads and is
-> > thus again inadequate.
-> >
-> > Here the purpose seems to be to ensure the bi_css load happens after the
-> > bi_private load, and this again is cheaper done using smp_rmb().
-> Yes and thanks again.
-> >
-> > Also, the implication seems to be -- but is not spelled out anywhere --
-> > that if bi_private is !NULL, it is stable.
-> 
-> What is the meaning of "it is stable" ? Do you mean if bi_private is NULL,
-> the values of bi_xxx should be ensured ?
+for you to fetch changes up to 05d69d950d9d84218fc9beafd02dea1f6a70e09e:
 
-With stable I mean that if it is !NULL the value is always the same.
+  xen-blkfront: sanitize the removal state machine (2021-07-15 09:32:34 -0600)
 
-I've read more code and this is indeed the case, specifically, here
-bi_private seems to be 'current' and will only be changed to NULL.
+----------------------------------------------------------------
+block-5.14-2021-07-16
+
+----------------------------------------------------------------
+Casey Chen (2):
+      nvme-pci: fix multiple races in nvme_setup_io_queues
+      nvme-pci: do not call nvme_dev_remove_admin from nvme_remove
+
+Christoph Hellwig (1):
+      xen-blkfront: sanitize the removal state machine
+
+Guoqing Jiang (1):
+      pd: fix order of cleaning up the queue and freeing the tagset
+
+Jens Axboe (1):
+      Merge tag 'nvme-5.14-2021-07-15' of git://git.infradead.org/nvme into block-5.14
+
+Prabhakar Kushwaha (1):
+      nvme-tcp: use __dev_get_by_name instead dev_get_by_name for OPT_HOST_IFACE
+
+Wang Qing (1):
+      nbd: fix order of cleaning up the queue and freeing the tagset
+
+ drivers/block/nbd.c          |   2 +-
+ drivers/block/paride/pd.c    |   2 +-
+ drivers/block/xen-blkfront.c | 224 +++++--------------------------------------
+ drivers/nvme/host/pci.c      |  67 +++++++++++--
+ drivers/nvme/host/tcp.c      |   4 +-
+ 5 files changed, 87 insertions(+), 212 deletions(-)
+
+-- 
+Jens Axboe
+
