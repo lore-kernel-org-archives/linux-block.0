@@ -2,159 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08052C636C9
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 09:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B48B8C636C9
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 09:41:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D100E613BB
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 09:31:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8909B613C3
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 09:41:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232840AbhGQJeE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jul 2021 05:34:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35930 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232832AbhGQJeE (ORCPT
+        id S232755AbhGQJoG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jul 2021 05:44:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42892 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231716AbhGQJoF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jul 2021 05:34:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626514267;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qpkQ64ZywmmGid3wm2wpO4W6jPhvZtPWa6GAG8VtSbo=;
-        b=MATy+ByqVX4DaVmavjEfUmUmCl3NOGahIlBPDVIJK7POupTKbz/8lsWhYJjn/9lubYxuJB
-        3IeVsMe/DftqRs8r3gPRNd3BG7aVoGUSNVm12nmsQnhicrkfpUAp18ZLgZhPV7SgMvaFbG
-        Z9ppiCrJzFrs6qRGTJqTTiO4q+s+WaA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-541-fkIVUY3gMrKMjaSGLm28wg-1; Sat, 17 Jul 2021 05:31:03 -0400
-X-MC-Unique: fkIVUY3gMrKMjaSGLm28wg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D3B8100B3AC;
-        Sat, 17 Jul 2021 09:31:00 +0000 (UTC)
-Received: from T590 (ovpn-12-83.pek2.redhat.com [10.72.12.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DC6360C0F;
-        Sat, 17 Jul 2021 09:30:48 +0000 (UTC)
-Date:   Sat, 17 Jul 2021 17:30:43 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed
- if any irq is managed
-Message-ID: <YPKjQxZ4roigdvbq@T590>
-References: <20210715120844.636968-2-ming.lei@redhat.com>
- <20210716200154.GA2113453@bjorn-Precision-5520>
+        Sat, 17 Jul 2021 05:44:05 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0128C06175F;
+        Sat, 17 Jul 2021 02:41:08 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d1so6590082plg.0;
+        Sat, 17 Jul 2021 02:41:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5yIJkQt3GFQl4d9x0leKlizsNtZXqf9kI+djIJdlY34=;
+        b=jDur00L7znCQBRdMT8eZ6uE1OzbeM3CVkJa9zGog9JRTEtDpGcj1VgX88idel9uiDJ
+         iQ8BBLIVgmvxe1rapcEoe9/84mcIURsjYwKS5fJSwMYA519Cv6tUXfCV2pfbzDQW/rGM
+         qVKQdzJeZDmuax4Zcoi1ZuXBC+X6FrXIOVWeHSMaPZtIBmrleP0zy6fWRd12iMBZ2HAk
+         2YONGql4n7Eo6kJ5BFfmaG034Pj+J4JZxvKBbQjBCcdDOCC86Qc11IJ/Kqw1Kj1TA9QR
+         e5FGhf8GeyVIRVLfgAUDQ28YzNTs/UE2eaX6u4YbTGap/SH1kXYH/2XeczyVZNWA008h
+         WwkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5yIJkQt3GFQl4d9x0leKlizsNtZXqf9kI+djIJdlY34=;
+        b=QUKo52JQaPC1vKc1S4ZsSqxYKBqb3FnGLlROl2Frks9KGzdc0ArrRNjpwUc2SRY1M7
+         qvrbabWBgKlE1A2goEKn4V7ZCztgfDGuvRYGaki5xaT93iiSBKFFgD0/N/NZH/xVLExz
+         CPNcPUvHmNEfI5NcrKuwIKTPKV4b7psREJ4eK/QSukV/mKHMkh/VjzRpbAh8dCuiKN5z
+         I5ahzUgfmePTIUQ1bimZ20TrIarpwwuptwABK9cnWFn5WS9m30BJk1f2rwnHvwG/i7YA
+         8vgf+AU4qzHbpd6GZaKLuqVSh1noI4vrHFvtrdIwmoVR5SCvov/eelus+1LqnvG5IerC
+         au7w==
+X-Gm-Message-State: AOAM53399BgXx2jDGxZjX92J6ao0EhR6Qsaa/eOILAfsJ61XqkHXRbT8
+        OW+wrs7e+I8ixwd72nMKQDQ=
+X-Google-Smtp-Source: ABdhPJzLbnHsYSoN6Jg8HyvVaZLw+r9Ux8iqDqa2h+aIY7KU5LHIY9tdpM7rwrjR6FPD4/czUOFERQ==
+X-Received: by 2002:a17:90b:1010:: with SMTP id gm16mr20332240pjb.192.1626514868316;
+        Sat, 17 Jul 2021 02:41:08 -0700 (PDT)
+Received: from [192.168.1.237] ([118.200.190.93])
+        by smtp.gmail.com with ESMTPSA id q21sm13043739pff.55.2021.07.17.02.41.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 17 Jul 2021 02:41:07 -0700 (PDT)
+Subject: Re: [syzbot] possible deadlock in loop_add
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Hillf Danton <hdanton@sina.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        syzbot <syzbot+118992efda475c16dfb0@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <000000000000ec01e405c6c2cee3@google.com>
+ <20210710131638.605-1-hdanton@sina.com> <20210712052740.GA8599@lst.de>
+ <c3d4ebd5-5679-cd81-d1de-4f5f2cbe13db@gmail.com>
+ <20210716010028.4218b0de@xps13>
+From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+Message-ID: <77da708c-b63d-dac0-c7e6-43ced0d49982@gmail.com>
+Date:   Sat, 17 Jul 2021 17:41:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210716200154.GA2113453@bjorn-Precision-5520>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210716010028.4218b0de@xps13>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 03:01:54PM -0500, Bjorn Helgaas wrote:
-> On Thu, Jul 15, 2021 at 08:08:42PM +0800, Ming Lei wrote:
-> > irq vector allocation with managed affinity may be used by driver, and
-> > blk-mq needs this info because managed irq will be shutdown when all
-> > CPUs in the affinity mask are offline.
-> > 
-> > The info of using managed irq is often produced by drivers(pci subsystem,
+On 16/7/21 7:00 am, Miquel Raynal wrote:
+> Hello,
 > 
-> Add space between "drivers" and "(".
-> s/pci/PCI/
-
-OK.
-
+> Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com> wrote on Mon, 12 Jul
+> 2021 16:29:16 +0800:
 > 
-> Does this "managed IRQ" (or "managed affinity", not sure what the
-> correct terminology is here) have something to do with devm?
+>> On 12/7/21 1:27 pm, Christoph Hellwig wrote:
+>>> On Sat, Jul 10, 2021 at 09:16:38PM +0800, Hillf Danton wrote:
+>>>> To break the lock chain, un/register blkdev without mtd_table_mutex held.
+>>>
+>>> Yes, Desmond Cheong Zhi Xi sent pretty much the same patch on June 18th
+>>> (mtd: break circular locks in register_mtd_blktrans), but it did not get
+>>> picked up.
+>>>    
+>>
+>> I believe Miquèl was waiting for -rc1 to apply it.
 > 
-> > platform device, ...), and it is consumed by blk-mq, so different subsystems
-> > are involved in this info flow
+> Indeed, I already applied it but did not advertise yet.
 > 
-> Add period at end of sentence.
 
-OK.
+Thanks Miquèl!
 
+>>
+>> But taking a closer look, although the fix for the register path is the same, Hillf Danton's proposed patch additionally avoids inverting the lock hierarchy on the unregister path. So I believe this new patch should be more robust.
 > 
-> > Address this issue by adding one field of .irq_affinity_managed into
-> > 'struct device'.
-> > 
-> > Suggested-by: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/base/platform.c | 7 +++++++
-> >  drivers/pci/msi.c       | 3 +++
-> >  include/linux/device.h  | 1 +
-> >  3 files changed, 11 insertions(+)
-> > 
-> > diff --git a/drivers/base/platform.c b/drivers/base/platform.c
-> > index 8640578f45e9..d28cb91d5cf9 100644
-> > --- a/drivers/base/platform.c
-> > +++ b/drivers/base/platform.c
-> > @@ -388,6 +388,13 @@ int devm_platform_get_irqs_affinity(struct platform_device *dev,
-> >  				ptr->irq[i], ret);
-> >  			goto err_free_desc;
-> >  		}
-> > +
-> > +		/*
-> > +		 * mark the device as irq affinity managed if any irq affinity
-> > +		 * descriptor is managed
-> > +		 */
-> > +		if (desc[i].is_managed)
-> > +			dev->dev.irq_affinity_managed = true;
-> >  	}
-> >  
-> >  	devres_add(&dev->dev, ptr);
-> > diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-> > index 3d6db20d1b2b..7ddec90b711d 100644
-> > --- a/drivers/pci/msi.c
-> > +++ b/drivers/pci/msi.c
-> > @@ -1197,6 +1197,7 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
-> >  	if (flags & PCI_IRQ_AFFINITY) {
-> >  		if (!affd)
-> >  			affd = &msi_default_affd;
-> > +		dev->dev.irq_affinity_managed = true;
+> We can definitely do this in two steps if you want.
 > 
-> This is really opaque to me.  I can't tell what the connection between
-> PCI_IRQ_AFFINITY and irq_affinity_managed is.
 
-Comment for PCI_IRQ_AFFINITY is 'Auto-assign affinity',
-'irq_affinity_managed' basically means that irq's affinity is managed by
-kernel.
+Sounds good, I'll prepare a patch with Hillf's suggestion for the 
+unregister path.
 
-What blk-mq needs is exactly if PCI_IRQ_AFFINITY is applied when
-allocating irq vectors. When PCI_IRQ_AFFINITY is used, genirq will
-shutdown the irq when all CPUs in the assigned affinity are offline,
-then blk-mq has to drain all in-flight IOs which will be completed
-via this irq and prevent new IO. That is the connection.
-
-Or you think 'irq_affinity_managed' isn't named well?
-
+> Thanks,
+> Miquèl
 > 
-> AFAICT the only place irq_affinity_managed is ultimately used is
-> blk_mq_hctx_notify_offline(), and there's no obvious connection
-> between that and this code.
-
-I believe the connection is described in comment.
-
-
-Thanks, 
-Ming
 
