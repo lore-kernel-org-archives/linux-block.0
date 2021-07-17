@@ -2,90 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30222C636CA
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 12:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A36C636C9
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 19:07:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05DE5613D8
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 12:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D97B96115C
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jul 2021 19:07:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233382AbhGQMgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jul 2021 08:36:32 -0400
-Received: from vulcan.natalenko.name ([104.207.131.136]:55452 "EHLO
-        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbhGQMgc (ORCPT
+        id S234625AbhGQTKK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jul 2021 15:10:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53938 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234296AbhGQTKJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jul 2021 08:36:32 -0400
-Received: from localhost (unknown [151.237.229.131])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id B5A55B3A131;
-        Sat, 17 Jul 2021 14:33:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1626525214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=SD0R3zYxm1t/0uzxERpXDObXCsoS886xQ4oYuK4JvFQ=;
-        b=TUdwv1Is81UuNOHvc02lrew+ITkwqXP258zdpyM4UJqjxEHo4fA/hKv987fsuqcH7uLXnf
-        Yn36cuzPlVPYF2CFI2L1Ty74q3GF6NOBM6h4D2rZ6lQqURI6rPGFohtmUqTZoSwkwS6emy
-        n1Hl3sVJJ/Nejvs/bMgtTAYmzEg76KM=
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Sat, 17 Jul 2021 15:10:09 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB73C061762
+        for <linux-block@vger.kernel.org>; Sat, 17 Jul 2021 12:07:12 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id h4so13941925pgp.5
+        for <linux-block@vger.kernel.org>; Sat, 17 Jul 2021 12:07:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+jEgXhaGLl1WV0YBpjmwQduY0ocPMs5Y7r0OTUJrdDI=;
+        b=E7gcyRNbXHbhoLmDnXSTK/smH8zzolsGQlxb1MH7XeyOQ6l4AepQwF2c5FvzuqLR5W
+         Db8Kz6fRMpDz3GflbfhHej8HgaUtiGysHe9vPjc+xUhD0UEH0fzamjOyHMrQbJMLN9U6
+         SQ2sxggJk8Av+T5qXQB6IjSuQdYWZWcGUiD2YcvNrWPbTWAZGUaJCEQZoCwddxiDP6fv
+         6R3RqGpnsEnyTnvR8RqsEQp6vBVTWWX2WAu53Fr0uJCgu2fvxQ4kpgf9wUdH1tn9TmCY
+         ZErpshYQagso9V90GKBMpx/5yJK8WZ5SOhH8qLpnbkQs4ellc3dL+cK95rSh41XT9jtp
+         h82A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+jEgXhaGLl1WV0YBpjmwQduY0ocPMs5Y7r0OTUJrdDI=;
+        b=El89yuAzy00tOITqzQBCVIi92yVAtF3awKUALhsisUkkMJy7EUIx/QrxZQI4B3EWHi
+         Cee7n28tLeJ0+TYz4VykMp5CuYsbVBnLBZbTagRbYvSMfeOmCFGJXULHcrjcKS4Xz4d/
+         sdQ+ycI/Wg9C0SldQ2Gu3UYzvtc9cEJp4/jrSW/TdCDOz6P6z3zMC2ErQddPOGxjhvYk
+         i49TgUxYU6i+iKdL2xod0vUHfJ80dzhVTY46RQFS+h6DgqFgTtBoOAKn6CZ3Obbtymj/
+         W2/ub80R3xtpTewKvUzaruqhFYXnm/UsHLInnNYyh5Wy3K4WHqkPVD1MT3iXJsMUCxfb
+         2xaA==
+X-Gm-Message-State: AOAM532k7O016dnbX3F1+kcHKIhcatFcYBfXR/AWVbqEEftt+aDTKQW6
+        0L9yuzDi6msm4EIuicbTwbNyVg==
+X-Google-Smtp-Source: ABdhPJwXR1+2PXUCqmhlgSN5E+SwPcEdBtdhYFxJF+jFqOF/x+oWuU0QY4dD4GuBGdnoI9aV5O3Hmw==
+X-Received: by 2002:a63:1656:: with SMTP id 22mr16342661pgw.163.1626548832088;
+        Sat, 17 Jul 2021 12:07:12 -0700 (PDT)
+Received: from [192.168.1.187] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id k5sm14829885pfu.142.2021.07.17.12.07.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 17 Jul 2021 12:07:11 -0700 (PDT)
+Subject: Re: [PATCH] block: increase BLKCG_MAX_POLS
+To:     Oleksandr Natalenko <oleksandr@natalenko.name>,
+        linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
         Laurence Oberman <loberman@redhat.com>,
         Paolo Valente <paolo.valente@linaro.org>,
         David Jeffery <djeffery@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH] block: increase BLKCG_MAX_POLS
-Date:   Sat, 17 Jul 2021 14:33:28 +0200
-Message-Id: <20210717123328.945810-1-oleksandr@natalenko.name>
-X-Mailer: git-send-email 2.32.0
+References: <20210717123328.945810-1-oleksandr@natalenko.name>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <32f6b089-46fa-55ec-ce7c-88da7e224728@kernel.dk>
+Date:   Sat, 17 Jul 2021 13:07:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210717123328.945810-1-oleksandr@natalenko.name>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After mq-deadline learnt to deal with cgroups, the BLKCG_MAX_POLS value
-became too small for all the elevators to be registered properly. The
-following issue is seen:
+On 7/17/21 6:33 AM, Oleksandr Natalenko wrote:
+> After mq-deadline learnt to deal with cgroups, the BLKCG_MAX_POLS value
+> became too small for all the elevators to be registered properly. The
+> following issue is seen:
+> 
+> ```
+> calling  bfq_init+0x0/0x8b @ 1
+> blkcg_policy_register: BLKCG_MAX_POLS too small
+> initcall bfq_init+0x0/0x8b returned -28 after 507 usecs
+> ```
+> 
+> and BFQ is non-functional.
+> 
+> Increase BLKCG_MAX_POLS to allow space for everyone
 
-```
-calling  bfq_init+0x0/0x8b @ 1
-blkcg_policy_register: BLKCG_MAX_POLS too small
-initcall bfq_init+0x0/0x8b returned -28 after 507 usecs
-```
+LGTM, just needs a:
 
-and BFQ is non-functional.
+Fixes: 08a9ad8bf607 ("block/mq-deadline: Add cgroup support")
 
-Increase BLKCG_MAX_POLS to allow space for everyone
+in there too, I'll add it.
 
-Link: https://lore.kernel.org/lkml/8988303.mDXGIdCtx8@natalenko.name/
-Signed-off-by: Oleksandr Natalenko <oleksandr@natalenko.name>
----
- include/linux/blkdev.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 3177181c4326..d3afea47ade6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -57,7 +57,7 @@ struct blk_keyslot_manager;
-  * Maximum number of blkcg policies allowed to be registered concurrently.
-  * Defined here to simplify include dependency.
-  */
--#define BLKCG_MAX_POLS		5
-+#define BLKCG_MAX_POLS		6
- 
- typedef void (rq_end_io_fn)(struct request *, blk_status_t);
- 
 -- 
-2.32.0
+Jens Axboe
 
