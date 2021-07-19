@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE27AC07E95
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 22:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86271C07E9D
+	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 22:23:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7EF1F6112D
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 22:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89D956113B
+	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 22:23:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245318AbhGSV2a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jul 2021 17:28:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57672 "EHLO
+        id S1354098AbhGSV3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jul 2021 17:29:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381348AbhGSSHQ (ORCPT
+        with ESMTP id S1382562AbhGSSH5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jul 2021 14:07:16 -0400
+        Mon, 19 Jul 2021 14:07:57 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D9AC06178C;
-        Mon, 19 Jul 2021 11:32:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F6E4C0617A7;
+        Mon, 19 Jul 2021 11:34:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=N9B5ve6ovqtgjce1eRAExZZQLHs/EQ6RuhK6otFJV0c=; b=sUQPfapsAfFUCAT9eCjcP4/j/J
-        OmEricRCvhqn6ZhKtiBB1idVqanyxKN7MqJfUu6TLwQAFHmQVBSGLDzCa0179RBznoOnHobwMbRXV
-        cyRtY8VvjZKsybiBQzvOLfhHIfMryGLx2OxAjWnok4HN/QvRhBy4/wNbx02Vl3SsssmrAme0siE+R
-        OCltdb4nml7wK+e4DR0J61kI9NBc7Rwc5OmITfx4uD7XUYNJhsQdafv8j5n9MggkzPwfX223mMTZJ
-        1U0NDTFr108cQzgJa8Rqmd6h27fohIqmWG+5WZ1iiljm3qf5Eg8JYtHPAijnq7jIzO46rrOeMLNY7
-        5tq0pF+g==;
+        bh=kKwIRh+f9wsPxETlTXIuMZIZvRf6jI5cu52KEL/0IJ8=; b=QSrCIFRG2r3pi9/+NP3OnfdbHl
+        KxQzgCBEbrYNCzH67uM7WYfm7XWgcjsr4KOzKG9kEGlV1VpEijqVAp0saLueLtn2e5/j/n7MwWlJu
+        Y0IyJkxTyL2qREci6sGWM0IJsO0RCJeTwv8Fpzf5KaKIgIGhNi6uenuaDQET2MHHbMj/gGuMshZbb
+        6JTI/gyB5MwrDts+5pZGxHyve9BqETH+xQ99aUus0zeJMS6uXY7dEqNP0GkkQeKdMas4tKGfkzqOm
+        KV11f1fM/GgEAAOFiO6q70z1Wanjjqgyp3zxAVFA4Ky5vLG1Y3DnWLFOMbE/YUv36qfYUbKekEmYa
+        RkT9rvsA==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m5YE9-007LZ7-3A; Mon, 19 Jul 2021 18:43:03 +0000
+        id 1m5YGS-007Lip-O5; Mon, 19 Jul 2021 18:45:40 +0000
 From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To:     linux-fsdevel@vger.kernel.org
 Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         linux-mm@kvack.org, linux-block@vger.kernel.org,
         "Darrick J . Wong" <djwong@kernel.org>
-Subject: [PATCH v15 05/17] iomap: Convert iomap_page_release to take a folio
-Date:   Mon, 19 Jul 2021 19:39:49 +0100
-Message-Id: <20210719184001.1750630-6-willy@infradead.org>
+Subject: [PATCH v15 08/17] iomap: Pass the iomap_page into iomap_set_range_uptodate
+Date:   Mon, 19 Jul 2021 19:39:52 +0100
+Message-Id: <20210719184001.1750630-9-willy@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210719184001.1750630-1-willy@infradead.org>
 References: <20210719184001.1750630-1-willy@infradead.org>
@@ -52,79 +52,98 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-iomap_page_release() was also assuming that it was being passed a
-head page.
+All but one caller already has the iomap_page, and we can avoid getting
+it again.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 ---
- fs/iomap/buffered-io.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ fs/iomap/buffered-io.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index ec8bdc0c63df..83eb5fdcbe05 100644
+index 0d7b6ef4c5cc..62d8ebcda429 100644
 --- a/fs/iomap/buffered-io.c
 +++ b/fs/iomap/buffered-io.c
-@@ -59,18 +59,18 @@ iomap_page_create(struct inode *inode, struct folio *folio)
- 	return iop;
+@@ -134,11 +134,9 @@ iomap_adjust_read_range(struct inode *inode, struct iomap_page *iop,
+ 	*lenp = plen;
  }
  
 -static void
--iomap_page_release(struct page *page)
-+static void iomap_page_release(struct folio *folio)
+-iomap_iop_set_range_uptodate(struct page *page, unsigned off, unsigned len)
++static void iomap_iop_set_range_uptodate(struct page *page,
++		struct iomap_page *iop, unsigned off, unsigned len)
  {
--	struct iomap_page *iop = detach_page_private(page);
--	unsigned int nr_blocks = i_blocks_per_page(page->mapping->host, page);
-+	struct iomap_page *iop = folio_detach_private(folio);
-+	unsigned int nr_blocks = i_blocks_per_folio(folio->mapping->host,
-+							folio);
+-	struct folio *folio = page_folio(page);
+-	struct iomap_page *iop = to_iomap_page(folio);
+ 	struct inode *inode = page->mapping->host;
+ 	unsigned first = off >> inode->i_blkbits;
+ 	unsigned last = (off + len - 1) >> inode->i_blkbits;
+@@ -151,14 +149,14 @@ iomap_iop_set_range_uptodate(struct page *page, unsigned off, unsigned len)
+ 	spin_unlock_irqrestore(&iop->uptodate_lock, flags);
+ }
  
- 	if (!iop)
+-static void
+-iomap_set_range_uptodate(struct page *page, unsigned off, unsigned len)
++static void iomap_set_range_uptodate(struct page *page,
++		struct iomap_page *iop, unsigned off, unsigned len)
+ {
+ 	if (PageError(page))
  		return;
- 	WARN_ON_ONCE(atomic_read(&iop->read_bytes_pending));
- 	WARN_ON_ONCE(atomic_read(&iop->write_bytes_pending));
- 	WARN_ON_ONCE(bitmap_full(iop->uptodate, nr_blocks) !=
--			PageUptodate(page));
-+			folio_test_uptodate(folio));
- 	kfree(iop);
- }
  
-@@ -458,6 +458,8 @@ EXPORT_SYMBOL_GPL(iomap_is_partially_uptodate);
- int
- iomap_releasepage(struct page *page, gfp_t gfp_mask)
+-	if (page_has_private(page))
+-		iomap_iop_set_range_uptodate(page, off, len);
++	if (iop)
++		iomap_iop_set_range_uptodate(page, iop, off, len);
+ 	else
+ 		SetPageUptodate(page);
+ }
+@@ -174,7 +172,8 @@ iomap_read_page_end_io(struct bio_vec *bvec, int error)
+ 		ClearPageUptodate(page);
+ 		SetPageError(page);
+ 	} else {
+-		iomap_set_range_uptodate(page, bvec->bv_offset, bvec->bv_len);
++		iomap_set_range_uptodate(page, iop, bvec->bv_offset,
++						bvec->bv_len);
+ 	}
+ 
+ 	if (!iop || atomic_sub_and_test(bvec->bv_len, &iop->read_bytes_pending))
+@@ -256,7 +255,7 @@ iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+ 
+ 	if (iomap_block_needs_zeroing(inode, iomap, pos)) {
+ 		zero_user(page, poff, plen);
+-		iomap_set_range_uptodate(page, poff, plen);
++		iomap_set_range_uptodate(page, iop, poff, plen);
+ 		goto done;
+ 	}
+ 
+@@ -585,7 +584,7 @@ __iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, int flags,
+ 			if (status)
+ 				return status;
+ 		}
+-		iomap_set_range_uptodate(page, poff, plen);
++		iomap_set_range_uptodate(page, iop, poff, plen);
+ 	} while ((block_start += plen) < block_end);
+ 
+ 	return 0;
+@@ -647,6 +646,8 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
+ static size_t __iomap_write_end(struct inode *inode, loff_t pos, size_t len,
+ 		size_t copied, struct page *page)
  {
 +	struct folio *folio = page_folio(page);
-+
- 	trace_iomap_releasepage(page->mapping->host, page_offset(page),
- 			PAGE_SIZE);
- 
-@@ -468,7 +470,7 @@ iomap_releasepage(struct page *page, gfp_t gfp_mask)
- 	 */
- 	if (PageDirty(page) || PageWriteback(page))
- 		return 0;
--	iomap_page_release(page);
-+	iomap_page_release(folio);
- 	return 1;
- }
- EXPORT_SYMBOL_GPL(iomap_releasepage);
-@@ -476,6 +478,8 @@ EXPORT_SYMBOL_GPL(iomap_releasepage);
- void
- iomap_invalidatepage(struct page *page, unsigned int offset, unsigned int len)
- {
-+	struct folio *folio = page_folio(page);
-+
- 	trace_iomap_invalidatepage(page->mapping->host, offset, len);
++	struct iomap_page *iop = to_iomap_page(folio);
+ 	flush_dcache_page(page);
  
  	/*
-@@ -485,7 +489,7 @@ iomap_invalidatepage(struct page *page, unsigned int offset, unsigned int len)
- 	if (offset == 0 && len == PAGE_SIZE) {
- 		WARN_ON_ONCE(PageWriteback(page));
- 		cancel_dirty_page(page);
--		iomap_page_release(page);
-+		iomap_page_release(folio);
- 	}
+@@ -662,7 +663,7 @@ static size_t __iomap_write_end(struct inode *inode, loff_t pos, size_t len,
+ 	 */
+ 	if (unlikely(copied < len && !PageUptodate(page)))
+ 		return 0;
+-	iomap_set_range_uptodate(page, offset_in_page(pos), len);
++	iomap_set_range_uptodate(page, iop, offset_in_page(pos), len);
+ 	__set_page_dirty_nobuffers(page);
+ 	return copied;
  }
- EXPORT_SYMBOL_GPL(iomap_invalidatepage);
 -- 
 2.30.2
 
