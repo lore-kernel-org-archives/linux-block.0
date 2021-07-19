@@ -2,168 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C59D8C64E6E
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 22:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB2E2C07E9D
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 00:12:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D095E6115B
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 22:23:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F36761107
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 00:12:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381845AbhGSVbT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jul 2021 17:31:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57748 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383712AbhGSSJV (ORCPT
+        id S245217AbhGSXaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jul 2021 19:30:52 -0400
+Received: from mail-pf1-f174.google.com ([209.85.210.174]:35807 "EHLO
+        mail-pf1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1390741AbhGSV5n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jul 2021 14:09:21 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F4FC061762;
-        Mon, 19 Jul 2021 11:36:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=CVUbYg0GRazBihZOhNx1Lyi/5a6+wnNnvf1AHvFt9fo=; b=CGewHcaqRTg1xp5wqLf95o49n7
-        RYqaLi1e5u2SWbejLjp4Rp4bC3kQhUHy8IY0vXZjPIfe34Nqt3uWlh/lMYt3CP2huYu27ig2GcBkt
-        eKDt1s69BxczanCFjt5vZMuW/9SHjd21/L5qC+GTdCTsmf1KQyVnJOz6yNh6kxjdSPMX+JEyz36Ps
-        TCgg1HrhxxVrgerz22N9jKRcxXQl0y328TNPmOsIS8nix43d7TGPb5jOkuqKZ5+jSvilR5DAGJy6a
-        bE1GK8HEIdS8qqiDAaSuJPLkYuXU4fY+LarfK/TYfb2Oo26NpO0ayovke9G1EOsLZ+mmeI8NVGV56
-        JYZoS0DQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m5YIB-007LwP-ML; Mon, 19 Jul 2021 18:47:22 +0000
-From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To:     linux-fsdevel@vger.kernel.org
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        "Darrick J . Wong" <djwong@kernel.org>
-Subject: [PATCH v15 10/17] iomap: Convert bio completions to use folios
-Date:   Mon, 19 Jul 2021 19:39:54 +0100
-Message-Id: <20210719184001.1750630-11-willy@infradead.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210719184001.1750630-1-willy@infradead.org>
-References: <20210719184001.1750630-1-willy@infradead.org>
+        Mon, 19 Jul 2021 17:57:43 -0400
+Received: by mail-pf1-f174.google.com with SMTP id d12so17977029pfj.2;
+        Mon, 19 Jul 2021 15:38:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JqFi5pJMaEGoSC9dEPpY+x76CPFJ4ZtDUn2ezmPVmGI=;
+        b=rK5SEe/KH52zse+d2FaFslhJH0Mo6yE0cqjMCHb4JCcBvyU+u9vtcOo7MTjEklxAFd
+         hCRKA7VeeNlylxdcjIxF8ag1BtmY49FNs7qiaW0IuoJzaOaX+W2H2kRY8Km68FsDipnr
+         PUhhijBzpij5Yf1J36vVhBnIxloMaRhSQn9BuKybMdvktNCSJ2OVm7n6+Owc1R3GnDaK
+         yOOS+mK6//EkpjQ4AdFq5pdECL7a2Ul5hI7vrdx3Ex6MX42+SyWbu6yYs7bwZ6/NIexx
+         Nl88a2zWvnOzfEe/x7lUGPjlGezfoJkXIsFCYj/mbLBHgOw1DIozJNTRoW2KwPWj7iWW
+         iQvw==
+X-Gm-Message-State: AOAM530lkNnTC5QZrLTGNx2j34/4ZlLWlHcPB3OsyWs70UFHMXdMDkrC
+        UQPGpuQhwhNPvib0O1nEeAs=
+X-Google-Smtp-Source: ABdhPJx40eKuba0Npl9zrd7Bbu9gJFIOfI9Hx5NkiYMvKuHrIHVe+QYkYgYs1tC3eXW5qAJMiMiZnw==
+X-Received: by 2002:aa7:921a:0:b029:2cf:b55b:9d52 with SMTP id 26-20020aa7921a0000b02902cfb55b9d52mr27517616pfo.35.1626734293380;
+        Mon, 19 Jul 2021 15:38:13 -0700 (PDT)
+Received: from garbanzo ([191.96.121.239])
+        by smtp.gmail.com with ESMTPSA id k6sm4776847pgb.43.2021.07.19.15.38.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jul 2021 15:38:12 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 15:38:10 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, hare@suse.de, bvanassche@acm.org,
+        ming.lei@redhat.com, jack@suse.cz, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 2/6] block: add flag for add_disk() completion notation
+Message-ID: <20210719223810.5taulrnaupbxdmdv@garbanzo>
+References: <20210715202341.2016612-1-mcgrof@kernel.org>
+ <20210715202341.2016612-3-mcgrof@kernel.org>
+ <YPVNRLgBtUOb1d17@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YPVNRLgBtUOb1d17@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use bio_for_each_folio() to iterate over each folio in the bio
-instead of iterating over each page.
+On Mon, Jul 19, 2021 at 11:00:36AM +0100, Christoph Hellwig wrote:
+> >  {
+> >  	might_sleep();
+> >  
+> > +	if (!blk_disk_registered(disk))
+> > +		return;
+> > +
+> 
+> Can't say I like this all that much.  Drivers should keep some
+> basic sanity for their unregister path, and while blk_disk_registered
+> can be useful, it's uses should be kept at a minimum.
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
----
- fs/iomap/buffered-io.c | 46 +++++++++++++++++-------------------------
- 1 file changed, 18 insertions(+), 28 deletions(-)
+This just means quite a bit of drivers have to invent some scheme to
+keep tabs on if registration was completed or not on their own... I
+can't see too much downfall for us to embrace this. Anyway I'll keep
+it in the mix and respin it as proper patch as it seems you suggested
+a respin of the series.
 
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index 0f70bd185c2a..ee33a4e7b946 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -161,36 +161,29 @@ static void iomap_set_range_uptodate(struct folio *folio,
- 		folio_mark_uptodate(folio);
- }
- 
--static void
--iomap_read_page_end_io(struct bio_vec *bvec, int error)
-+static void iomap_finish_folio_read(struct folio *folio, size_t offset,
-+		size_t len, int error)
- {
--	struct page *page = bvec->bv_page;
--	struct folio *folio = page_folio(page);
- 	struct iomap_page *iop = to_iomap_page(folio);
- 
- 	if (unlikely(error)) {
- 		folio_clear_uptodate(folio);
- 		folio_set_error(folio);
- 	} else {
--		size_t off = (page - &folio->page) * PAGE_SIZE +
--				bvec->bv_offset;
--
--		iomap_set_range_uptodate(folio, iop, off, bvec->bv_len);
-+		iomap_set_range_uptodate(folio, iop, offset, len);
- 	}
- 
--	if (!iop || atomic_sub_and_test(bvec->bv_len, &iop->read_bytes_pending))
-+	if (!iop || atomic_sub_and_test(len, &iop->read_bytes_pending))
- 		folio_unlock(folio);
- }
- 
--static void
--iomap_read_end_io(struct bio *bio)
-+static void iomap_read_end_io(struct bio *bio)
- {
- 	int error = blk_status_to_errno(bio->bi_status);
--	struct bio_vec *bvec;
--	struct bvec_iter_all iter_all;
-+	struct folio_iter fi;
- 
--	bio_for_each_segment_all(bvec, bio, iter_all)
--		iomap_read_page_end_io(bvec, error);
-+	bio_for_each_folio_all(fi, bio)
-+		iomap_finish_folio_read(fi.folio, fi.offset, fi.length, error);
- 	bio_put(bio);
- }
- 
-@@ -1014,23 +1007,21 @@ vm_fault_t iomap_page_mkwrite(struct vm_fault *vmf, const struct iomap_ops *ops)
- }
- EXPORT_SYMBOL_GPL(iomap_page_mkwrite);
- 
--static void
--iomap_finish_page_writeback(struct inode *inode, struct page *page,
--		int error, unsigned int len)
-+static void iomap_finish_folio_write(struct inode *inode, struct folio *folio,
-+		size_t len, int error)
- {
--	struct folio *folio = page_folio(page);
- 	struct iomap_page *iop = to_iomap_page(folio);
- 
- 	if (error) {
--		SetPageError(page);
-+		folio_set_error(folio);
- 		mapping_set_error(inode->i_mapping, -EIO);
- 	}
- 
--	WARN_ON_ONCE(i_blocks_per_page(inode, page) > 1 && !iop);
-+	WARN_ON_ONCE(i_blocks_per_folio(inode, folio) > 1 && !iop);
- 	WARN_ON_ONCE(iop && atomic_read(&iop->write_bytes_pending) <= 0);
- 
- 	if (!iop || atomic_sub_and_test(len, &iop->write_bytes_pending))
--		end_page_writeback(page);
-+		folio_end_writeback(folio);
- }
- 
- /*
-@@ -1049,8 +1040,7 @@ iomap_finish_ioend(struct iomap_ioend *ioend, int error)
- 	bool quiet = bio_flagged(bio, BIO_QUIET);
- 
- 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
--		struct bio_vec *bv;
--		struct bvec_iter_all iter_all;
-+		struct folio_iter fi;
- 
- 		/*
- 		 * For the last bio, bi_private points to the ioend, so we
-@@ -1061,10 +1051,10 @@ iomap_finish_ioend(struct iomap_ioend *ioend, int error)
- 		else
- 			next = bio->bi_private;
- 
--		/* walk each page on bio, ending page IO on them */
--		bio_for_each_segment_all(bv, bio, iter_all)
--			iomap_finish_page_writeback(inode, bv->bv_page, error,
--					bv->bv_len);
-+		/* walk all folios in bio, ending page IO on them */
-+		bio_for_each_folio_all(fi, bio)
-+			iomap_finish_folio_write(inode, fi.folio, fi.length,
-+					error);
- 		bio_put(bio);
- 	}
- 	/* The ioend has been freed by bio_put() */
--- 
-2.30.2
-
+  Luis
