@@ -2,123 +2,285 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE78C636CE
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 16:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91471C07E95
+	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 17:01:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8AAC613AE
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 16:11:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61719610D2
+	for <linux-block@archiver.kernel.org>; Mon, 19 Jul 2021 17:01:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348497AbhGSPaY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jul 2021 11:30:24 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:33676 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346609AbhGSPRl (ORCPT
+        id S1345683AbhGSQUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jul 2021 12:20:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1352853AbhGSQPV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jul 2021 11:17:41 -0400
-Received: by mail-io1-f71.google.com with SMTP id i9-20020a0566021349b02904df6556dad4so12982883iov.0
-        for <linux-block@vger.kernel.org>; Mon, 19 Jul 2021 08:58:20 -0700 (PDT)
+        Mon, 19 Jul 2021 12:15:21 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8990C06B8D7;
+        Mon, 19 Jul 2021 09:12:52 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id o4so14931972pgs.6;
+        Mon, 19 Jul 2021 09:35:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=4kEVl6RJazubuVOQxY7IzYyGCt4KpCBPiq4YuJI+gH0=;
+        b=oeV8OB0zNpfctE1iyccIC6jgn//DX4QmA9LN0GC6Rqa+8zpdljbixJg3iW+45USJZD
+         r/Wz5KpcKpEJeTLhJkPS5THvVX7y5LQnTpruroAi/sylF+DE9Vj3qPSzyxwW8Lp5Bppb
+         KhBG20IIpg6LMd/j75wOvB3fEYic1otHQOnwWNORRkATtnMNVQzNk/iDkWUMDTdU9V1D
+         1ePAs6vJ0Ugaa11j5DF+1+FOZD1KNuqS0JW+TliD24dbD17cQI0Q84Bk4TaqWfayGlvU
+         62Tval56Sxu+q3kMMzqsAKHMGov7Tvl0liYj3LALyteXbsIhddyq/mdHpGXo+HGQEdYW
+         6NYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=nwF/dXeoCRoI2C/ceSgiuSYAcwbfabDAX5CG9siKVg4=;
-        b=o4lBz4Obvnx1F+myHwaUpcn8koRST+mL+wwM97J2vzUJnS6NrTNSNwGhc8AtsGYDjV
-         bn+eWxjpXxyxsFzLPD6OGF18gwOgrNQJWXz5h/aoMtIKKq5oHEiRmWTR/CpzKhuUd3d2
-         +vW0gFga7Iwg5fLULIIPpLl1yfR4SNkyy9QiRjw34uR0AKUGbe7h9ElUv8f3HgHs/69M
-         p9CnRkUinW9SL5R10hLHGS1AWfS90tOJ+l7aIUx3q0VYuwKEJxbaVZAV+8W+WwYQsNlF
-         1Lk30FPBj1CIB9M4qLJxPc48UdrsVyzI4eFez5Uf39JqlPCeyp05jZvTgsyi7OoAHgRp
-         Sdew==
-X-Gm-Message-State: AOAM533PGU5WxA6AoQXzO8LWWXi01XQbNI95lpmxiGodU6FSXjn4+GlO
-        +Yj18uWK/Ery1fkBB2g22v+VK98DIl5FTsNlITbb0zZPk/8J
-X-Google-Smtp-Source: ABdhPJyvXXC06oThxXg2v+XvQipalVyf/v8o5JV4y1xvR/ChnsB2CiGmQxn9aKTmYayeuSozPFCzP+/rRRby5ATu+0cuS8BTYtu1
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4kEVl6RJazubuVOQxY7IzYyGCt4KpCBPiq4YuJI+gH0=;
+        b=tkXtqzLSpE5gKF1RNPauzqydxDlY+85rj472hnmxb7lhdeFEVEkpgEbF/itm0nXWs7
+         CbeSEjyliV7uqOIWI2xwOjRIwHgodqC2OfrsYI9vbCxWPIPOE6Vte/thIFGcejttSjL1
+         tz6TIyrQt2r9Li3oDFoD3mgnfzMJHWN/jmfFvWqGZDlkUQNfvGMt0AHCoCJTTFfyz9dF
+         5aVcIL+xEG2PGYJzKecj7b4qrT77Efs3k/OLQM1yMMb27yCM0kPw6fBG0OZKdftkeU77
+         HWzRZM7HFVYwghpLp5PtoiOUzd5qMDc5RUPg94TYmgaVXKw0rvgaUo2po93OqCvjbTyv
+         bRlg==
+X-Gm-Message-State: AOAM531MIzlFQTqiXdkKvNJywHUgBtF9Uev8LdkZZLsW6WzM35Kz5S3C
+        fNkOtg2DRX3tHNZpvqyF06Tgh883EyrZWQ==
+X-Google-Smtp-Source: ABdhPJzLJ1Ul1yuCxNQA+XcWG7iOF0bdfMi1t+xEN0Sd7oSusWhZo+FAnd0o/v2vbUFTvM6gPCqFlw==
+X-Received: by 2002:a63:1e57:: with SMTP id p23mr25985149pgm.41.1626712556839;
+        Mon, 19 Jul 2021 09:35:56 -0700 (PDT)
+Received: from [127.0.0.1] ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id d25sm23513131pgn.42.2021.07.19.09.35.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Jul 2021 09:35:56 -0700 (PDT)
+Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
+ <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+From:   brookxu <brookxu.cn@gmail.com>
+Message-ID: <957ab14d-c4bc-32f0-3f7d-af98832ab955@gmail.com>
+Date:   Tue, 20 Jul 2021 00:35:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:13ca:: with SMTP id i10mr18714334jaj.90.1626710300207;
- Mon, 19 Jul 2021 08:58:20 -0700 (PDT)
-Date:   Mon, 19 Jul 2021 08:58:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000098af8e05c77c0161@google.com>
-Subject: [syzbot] WARNING in md_alloc
-From:   syzbot <syzbot+2390fceae217ab729cf7@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi Tejun:
 
-syzbot found the following issue on:
+In order to avoid code duplication and IOPS stability problems caused by estimating
+the equivalent number of IOs, and to avoid potential deadlock problems caused by
+synchronization through queue_lock. I tried to count the number of splited IOs in
+the current window through two atomic counters. Add the value of the atomic variable
+when calculating io_disp[rw], which can also avoid the problem of inaccurate IOPS in
+large IO scenarios. How do you think of this approach? Thanks for your time.
 
-HEAD commit:    8096acd7442e Merge tag 'net-5.14-rc2' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=168f0a14300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=da140227e4f25b17
-dashboard link: https://syzkaller.appspot.com/bug?extid=2390fceae217ab729cf7
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2390fceae217ab729cf7@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 2468 at block/genhd.c:523 __device_add_disk+0xb76/0xd10 block/genhd.c:523
-Modules linked in:
-CPU: 0 PID: 2468 Comm: syz-executor.5 Tainted: G        W         5.14.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:__device_add_disk+0xb76/0xd10 block/genhd.c:523
-Code: fb ff ff 4c 89 ef 89 44 24 28 e8 75 c8 f6 fd 8b 44 24 28 e9 7a fb ff ff 4c 89 ef e8 f4 c7 f6 fd e9 e0 fb ff ff e8 4a a8 b0 fd <0f> 0b e9 97 fb ff ff 4c 89 ff e8 0b c8 f6 fd e9 b1 f6 ff ff 48 8b
-RSP: 0018:ffffc90018587a30 EFLAGS: 00010246
-RAX: 0000000000040000 RBX: ffff8880863cac00 RCX: ffffc90014873000
-RDX: 0000000000040000 RSI: ffffffff83c4df76 RDI: 0000000000000003
-RBP: ffff888027440400 R08: 0000000000000000 R09: ffffffff8bac1273
-R10: ffffffff83c4db08 R11: 0000000000000000 R12: 0000000000000001
-R13: ffff8880863cb09c R14: ffff8880274404a0 R15: 0000000000000000
-FS:  00007f66b7003700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000544038 CR3: 000000003f471000 CR4: 00000000001526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- add_disk include/linux/genhd.h:217 [inline]
- md_alloc+0xa32/0x1190 drivers/md/md.c:5707
- md_probe+0x69/0x70 drivers/md/md.c:5738
- blk_request_module+0x111/0x1d0 block/genhd.c:660
- blkdev_get_no_open+0x1d5/0x250 fs/block_dev.c:1332
- blkdev_get_by_dev.part.0+0x25/0xdd0 fs/block_dev.c:1395
- blkdev_get_by_dev+0x6b/0x80 fs/block_dev.c:1448
- swsusp_check+0x4d/0x270 kernel/power/swap.c:1525
- software_resume.part.0+0x102/0x1f0 kernel/power/hibernate.c:977
- software_resume kernel/power/hibernate.c:86 [inline]
- resume_store+0x161/0x190 kernel/power/hibernate.c:1179
- kobj_attr_store+0x50/0x80 lib/kobject.c:856
- sysfs_kf_write+0x110/0x160 fs/sysfs/file.c:139
- kernfs_fop_write_iter+0x342/0x500 fs/kernfs/file.c:296
- call_write_iter include/linux/fs.h:2114 [inline]
- new_sync_write+0x426/0x650 fs/read_write.c:518
- vfs_write+0x75a/0xa40 fs/read_write.c:605
- ksys_write+0x12d/0x250 fs/read_write.c:658
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x4665d9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f66b7003188 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 000000000056bf80 RCX: 00000000004665d9
-RDX: 0000000000000012 RSI: 0000000020000140 RDI: 0000000000000003
-RBP: 00007f66b70031d0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 0000000000a9fb1f R14: 00007f66b7003300 R15: 0000000000022000
-
+The following are related changes. If that is ok, I will send the v2 version later.
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ block/blk-merge.c    |  2 ++
+ block/blk-throttle.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ block/blk.h          |  2 ++
+ 3 files changed, 64 insertions(+), 6 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a11b3b5..86ff943 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+ 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+ 		submit_bio_noacct(*bio);
+ 		*bio = split;
++
++		blk_throtl_recharge_bio(*bio);
+ 	}
+ }
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index b1b22d8..a0daa15 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -178,6 +178,9 @@ struct throtl_grp {
+ 	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
+ 	unsigned long bio_cnt_reset_time;
+ 
++	atomic_t io_split_cnt[2];
++	atomic_t last_io_split_cnt[2];
++
+ 	struct blkg_rwstat stat_bytes;
+ 	struct blkg_rwstat stat_ios;
+ };
+@@ -293,6 +296,16 @@ static uint64_t throtl_adjusted_limit(uint64_t low, struct throtl_data *td)
+ 	return low + (low >> 1) * td->scale;
+ }
+ 
++static inline unsigned int tg_io_disp(struct throtl_grp *tg, int rw)
++{
++	return tg->io_disp[rw] + atomic_read(&tg->io_split_cnt[rw]);
++}
++
++static inline unsigned int tg_last_io_disp(struct throtl_grp *tg, int rw)
++{
++	return tg->last_io_disp[rw] + atomic_read(&tg->last_io_split_cnt[rw]);
++}
++
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
+@@ -524,6 +537,11 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
+ 	tg->idletime_threshold = DFL_IDLE_THRESHOLD;
+ 	tg->idletime_threshold_conf = DFL_IDLE_THRESHOLD;
+ 
++	atomic_set(&tg->io_split_cnt[0], 0);
++	atomic_set(&tg->io_split_cnt[1], 0);
++	atomic_set(&tg->last_io_split_cnt[0], 0);
++	atomic_set(&tg->last_io_split_cnt[1], 0);
++
+ 	return &tg->pd;
+ 
+ err_exit_stat_bytes:
+@@ -777,6 +795,8 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
+ 	tg->bytes_disp[rw] = 0;
+ 	tg->io_disp[rw] = 0;
+ 
++	atomic_set(&tg->io_split_cnt[rw], 0);
++
+ 	/*
+ 	 * Previous slice has expired. We must have trimmed it after last
+ 	 * bio dispatch. That means since start of last slice, we never used
+@@ -799,6 +819,9 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
+ 	tg->io_disp[rw] = 0;
+ 	tg->slice_start[rw] = jiffies;
+ 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
++
++	atomic_set(&tg->io_split_cnt[rw], 0);
++
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
+ 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
+@@ -877,10 +900,19 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 	else
+ 		tg->bytes_disp[rw] = 0;
+ 
+-	if (tg->io_disp[rw] >= io_trim)
++	if (tg_io_disp(tg, rw) >= io_trim) {
++		int cnt = atomic_read(&tg->io_split_cnt[rw]);
++
++		if (cnt) {
++			atomic_set(&tg->io_split_cnt[rw], 0);
++			tg->io_disp[rw] += cnt;
++		}
++
+ 		tg->io_disp[rw] -= io_trim;
+-	else
++	} else {
++		atomic_set(&tg->io_split_cnt[rw], 0);
+ 		tg->io_disp[rw] = 0;
++	}
+ 
+ 	tg->slice_start[rw] += nr_slices * tg->td->throtl_slice;
+ 
+@@ -924,7 +956,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 	else
+ 		io_allowed = tmp;
+ 
+-	if (tg->io_disp[rw] + 1 <= io_allowed) {
++	if (tg_io_disp(tg, rw) + 1 <= io_allowed) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -2052,13 +2084,13 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
+ 	}
+ 
+ 	if (tg->iops[READ][LIMIT_LOW]) {
+-		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
++		iops = tg_last_io_disp(tg, READ) * HZ / elapsed_time;
+ 		if (iops >= tg->iops[READ][LIMIT_LOW])
+ 			tg->last_low_overflow_time[READ] = now;
+ 	}
+ 
+ 	if (tg->iops[WRITE][LIMIT_LOW]) {
+-		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
++		iops = tg_last_io_disp(tg, WRITE) * HZ / elapsed_time;
+ 		if (iops >= tg->iops[WRITE][LIMIT_LOW])
+ 			tg->last_low_overflow_time[WRITE] = now;
+ 	}
+@@ -2074,6 +2106,9 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
+ 	tg->last_bytes_disp[WRITE] = 0;
+ 	tg->last_io_disp[READ] = 0;
+ 	tg->last_io_disp[WRITE] = 0;
++
++	atomic_set(&tg->last_io_split_cnt[READ], 0);
++	atomic_set(&tg->last_io_split_cnt[WRITE], 0);
+ }
+ 
+ static void blk_throtl_update_idletime(struct throtl_grp *tg)
+@@ -2176,6 +2211,25 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ }
+ #endif
+ 
++void blk_throtl_recharge_bio(struct bio *bio)
++{
++	struct blkcg_gq *blkg = bio->bi_blkg;
++	struct throtl_grp *parent = blkg_to_tg(blkg);
++	struct throtl_service_queue *parent_sq;
++	bool rw = bio_data_dir(bio);
++
++	if (!parent->has_rules[rw])
++		return;
++
++	do {
++		atomic_inc(&parent->io_split_cnt[rw]);
++		atomic_inc(&parent->last_io_split_cnt[rw]);
++
++		parent_sq = parent->service_queue.parent_sq;
++		parent = sq_to_tg(parent_sq);
++	} while (parent);
++}
++
+ bool blk_throtl_bio(struct bio *bio)
+ {
+ 	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+@@ -2263,7 +2317,7 @@ bool blk_throtl_bio(struct bio *bio)
+ 		   rw == READ ? 'R' : 'W',
+ 		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
+ 		   tg_bps_limit(tg, rw),
+-		   tg->io_disp[rw], tg_iops_limit(tg, rw),
++		   tg_io_disp(tg, rw), tg_iops_limit(tg, rw),
+ 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
+ 
+ 	tg->last_low_overflow_time[rw] = jiffies;
+diff --git a/block/blk.h b/block/blk.h
+index 4b885c0..9e925bf 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -293,11 +293,13 @@ struct io_cq *ioc_create_icq(struct io_context *ioc, struct request_queue *q,
+ extern int blk_throtl_init(struct request_queue *q);
+ extern void blk_throtl_exit(struct request_queue *q);
+ extern void blk_throtl_register_queue(struct request_queue *q);
++extern void blk_throtl_recharge_bio(struct bio *bio);
+ bool blk_throtl_bio(struct bio *bio);
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
+ static inline void blk_throtl_exit(struct request_queue *q) { }
+ static inline void blk_throtl_register_queue(struct request_queue *q) { }
++static inline void blk_throtl_recharge_bio(struct bio *bio) { }
+ static inline bool blk_throtl_bio(struct bio *bio) { return false; }
+ #endif /* CONFIG_BLK_DEV_THROTTLING */
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-- 
+1.8.3.1
+
+
