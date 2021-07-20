@@ -2,133 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E4CC636C8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 11:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D70FC636C8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 11:17:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 983EE61165
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 11:10:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BC2F60FDB
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 11:17:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231177AbhGTKaH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 06:30:07 -0400
-Received: from mail-ej1-f44.google.com ([209.85.218.44]:36749 "EHLO
-        mail-ej1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237340AbhGTK3a (ORCPT
+        id S236458AbhGTKhA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 06:37:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55580 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231442AbhGTKg7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 06:29:30 -0400
-Received: by mail-ej1-f44.google.com with SMTP id nd37so33746438ejc.3;
-        Tue, 20 Jul 2021 04:10:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OHZdckbNZ18VQSZzXQt5sEXQRuXvblwckqVY5aEQJWo=;
-        b=p3X3kWJFLRpFwit+vPYjYrEZG/SAvIPOpVPICShtXOxMWKAsGbB3Z873cZou8UUohc
-         qcKpsAxHmt+Y5+kNPvENE42/5OoyKEWCn1XIs/X4/+qmAz8uFg6l6do7+sI5W1KUfUkn
-         UoqPrjHnngBsyf/tV3EHVbjtaiEVA7KnYVxHqKVuISxYeeiOWInWgX1kZyJppQh6oXy9
-         VGkGQwoDMyEP+eie4vTtETEsXeOxZevx15AekugkSmXWpUjMuG0zmU9c+cCK1C8RaUVa
-         qMWa3zhS3C+EVw58LUvFa0Om+l9WEMMakw6ObxOIw1oYb51ABeNAPxTnhsrSA7zyVZ9B
-         3vdA==
-X-Gm-Message-State: AOAM531VA1JapqLMJaFSnItSHHXM5FJ7oHKhepQ7aT1EHubL7zLoGDwo
-        cvq6b5rwyctX0z4b2yCeIWXR8sHn9EXN5eSD
-X-Google-Smtp-Source: ABdhPJx/6R3BpTygKz5Na6aXvE85FbPPIeQekl7WrNh04jNUe66RpMaHk26/Qm3CWZXW6/lJHTCZSQ==
-X-Received: by 2002:a17:906:dc0f:: with SMTP id yy15mr31349098ejb.255.1626779406409;
-        Tue, 20 Jul 2021 04:10:06 -0700 (PDT)
-Received: from ?IPv6:2a0b:e7c0:0:107::70f? ([2a0b:e7c0:0:107::70f])
-        by smtp.gmail.com with ESMTPSA id u5sm9156243edv.64.2021.07.20.04.10.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jul 2021 04:10:05 -0700 (PDT)
-Subject: Re: [Patch v4 2/3] Drivers: hv: add Azure Blob driver
-To:     longli@linuxonhyperv.com, linux-fs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Cc:     Long Li <longli@microsoft.com>, Jonathan Corbet <corbet@lwn.net>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Siddharth Gupta <sidgup@codeaurora.org>,
-        Hannes Reinecke <hare@suse.de>, linux-doc@vger.kernel.org
-References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
- <1626751866-15765-3-git-send-email-longli@linuxonhyperv.com>
-From:   Jiri Slaby <jirislaby@kernel.org>
-Message-ID: <90ed52d3-5095-9789-53f0-477ba70edc3b@kernel.org>
-Date:   Tue, 20 Jul 2021 13:10:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Tue, 20 Jul 2021 06:36:59 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD5CC061574;
+        Tue, 20 Jul 2021 04:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4FkZvqXeAIk4BuCEW9n8PvCXADxw3t7wT89TribEmJ4=; b=dGlxFd7VdA60iqtsgKTmLNv6gL
+        zuMCMdEGLQhXpslEtymGFCdaZSQ+RefhzQqO+vUjOMjCU+EhnKhnxiQdm8sCEMIK9YfIe80VY89eQ
+        mk4wGqYpWRryKk9cIT46Jld57JGhixwB1Q4yeSzwgzt7eQdChsS80zxItJTM4LCtJBHtMQIJxbC6g
+        GwNR7KGWmNytX6w85Gokb7aq1KbwHrcDdxkX1JZljXMuLomALqJZtOkyPy1+o4hVCnpgdL+MwbTyb
+        DiOZzif46Sd1RS2ObzKCdaBp9XEIN4eS+DqLdrs81vTXrZJ4y5MxyObgnL1XuVmqfVfP8F6RLPs7H
+        egrYC1zw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m5nk5-0082bU-1k; Tue, 20 Jul 2021 11:17:03 +0000
+Date:   Tue, 20 Jul 2021 12:16:53 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v15 01/17] block: Add bio_add_folio()
+Message-ID: <YPawpW8LgXDJZ5Gd@casper.infradead.org>
+References: <20210719184001.1750630-1-willy@infradead.org>
+ <20210719184001.1750630-2-willy@infradead.org>
+ <YPZwODMq1ilIeS4t@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <1626751866-15765-3-git-send-email-longli@linuxonhyperv.com>
-Content-Type: text/plain; charset=iso-8859-2; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YPZwODMq1ilIeS4t@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20. 07. 21, 5:31, longli@linuxonhyperv.com wrote:
-> --- /dev/null
-> +++ b/include/uapi/misc/hv_azure_blob.h
-> @@ -0,0 +1,34 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
-> +/* Copyright (c) 2021 Microsoft Corporation. */
-> +
-> +#ifndef _AZ_BLOB_H
-> +#define _AZ_BLOB_H
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/uuid.h>
-
-Quoting from 
-https://lore.kernel.org/linux-doc/MWHPR21MB159375586D810EC5DCB66AF0D7039@MWHPR21MB1593.namprd21.prod.outlook.com/:
-=====
-Seems like a #include of asm/ioctl.h (or something similar)
-is needed so that _IOWR is defined.  Also, a #include
-is needed for __u32, __aligned_u64, guid_t, etc.
-=====
-
-Why was no include added?
-
-> +
-> +/* user-mode sync request sent through ioctl */
-> +struct az_blob_request_sync_response {
-> +	__u32 status;
-> +	__u32 response_len;
-> +};
-> +
-> +struct az_blob_request_sync {
-> +	guid_t guid;
-> +	__u32 timeout;
-> +	__u32 request_len;
-> +	__u32 response_len;
-> +	__u32 data_len;
-> +	__u32 data_valid;
-> +	__aligned_u64 request_buffer;
-> +	__aligned_u64 response_buffer;
-> +	__aligned_u64 data_buffer;
-> +	struct az_blob_request_sync_response response;
-> +};
-> +
-> +#define AZ_BLOB_MAGIC_NUMBER	'R'
-> +#define IOCTL_AZ_BLOB_DRIVER_USER_REQUEST \
-> +		_IOWR(AZ_BLOB_MAGIC_NUMBER, 0xf0, \
-> +			struct az_blob_request_sync)
-> +
-> +#endif /* define _AZ_BLOB_H */
+On Tue, Jul 20, 2021 at 07:42:00AM +0100, Christoph Hellwig wrote:
+> On Mon, Jul 19, 2021 at 07:39:45PM +0100, Matthew Wilcox (Oracle) wrote:
+> > +/**
+> > + * bio_add_folio - Attempt to add part of a folio to a bio.
+> > + * @bio: Bio to add to.
+> > + * @folio: Folio to add.
+> > + * @len: How many bytes from the folio to add.
+> > + * @off: First byte in this folio to add.
+> > + *
+> > + * Always uses the head page of the folio in the bio.  If a submitter only
+> > + * uses bio_add_folio(), it can count on never seeing tail pages in the
+> > + * completion routine.  BIOs do not support folios that are 4GiB or larger.
+> > + *
+> > + * Return: The number of bytes from this folio added to the bio.
+> > + */
+> > +size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+> > +		size_t off)
+> > +{
+> > +	if (len > UINT_MAX || off > UINT_MAX)
+> > +		return 0;
+> > +	return bio_add_page(bio, &folio->page, len, off);
+> > +}
 > 
+> I'd use the opportunity to switch to a true/false return instead of
+> the length.  This has been on my todo list for bio_add_page for a while,
+> so it might make sense to start out the new API the right way.
 
-thanks,
--- 
-js
-suse labs
+ok.
