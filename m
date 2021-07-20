@@ -7,61 +7,70 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C37C636C9
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 06:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30AC5C07E95
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 06:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D19D61164
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 06:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1307C61004
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 06:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236216AbhGTGKz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 02:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51486 "EHLO
+        id S232183AbhGTGNe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 02:13:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231681AbhGTGKz (ORCPT
+        with ESMTP id S230213AbhGTGNI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 02:10:55 -0400
+        Tue, 20 Jul 2021 02:13:08 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CF9C061574;
-        Mon, 19 Jul 2021 23:51:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BDC8C061574;
+        Mon, 19 Jul 2021 23:53:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=x2yTm/DqDIfqPMvkKIOtJxJ8p13cI0qfPpu6o0hMD1k=; b=HOGaACrEQvhORb6IlD+mh9ZlA3
-        NgxbMGmLQBlDiZtt+ZxGf8VXp5r/HRGOcwiyQyMT/tx32W4TOrrqI0RWUNfcRe9laE5yAQ+wLySLX
-        tHnIfFBU/8pSJl63aIjfnGPeFUZtFL5+3dofs3a5XYw9+IMgfgNbYnlmwt4h7CrNkO6Oxah8EjTrk
-        uoe/kwV9bH4gJ336xFrlzQqeOYLEKmT+n2Fs9URyNHBg8fM6/I2Cybj9Rbn6xiJWdRZiNeQjgwMVY
-        //UyIMOaoBsJzNAy0ITTkht9NznF/8Ur0i8k2JmPwK/XW9cuK/pD1pml7qPJKqxJNhUBwOh9CjZ/F
-        rFT3TSYA==;
+        bh=0CmZtM83YivlMkH6ioTNkWqXqgtpPQ044+TPH2r8ezk=; b=JMG0p/ekwaaxcmSVbqjY4knyaw
+        cOHBxLrpRI+c4q70n3SsVtVm/p1t17LLU4xYNGnwOq3wA0yVBPczGbaNIZb/EyjygK1KyjGazjTHy
+        +8hZ3YqRbZRU2eJ0V3l2C9KYgH2tujnoOHTt6eGx7UEth2LbHjDk84ggwQwFN971i98ax01DPMxqB
+        OFgmCBgpnicdd6qVt+bMdCWy0188WDCaUqxB4Kx8LIsMwCt00sVUdc+A++RN99ukIYGCVSoOdpWPl
+        Z1fVDf6et68FTdZKVpzaguoUSOxNVP1C/4HMcvHYfdmaqJdsq7FBHDWvu/bxuFvqjpaoX6Iq2UNJZ
+        LOV3bN6A==;
 Received: from [2001:4bb8:193:7660:5612:5e3c:ba3d:2b3c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m5jaG-007qBP-RH; Tue, 20 Jul 2021 06:50:33 +0000
-Date:   Tue, 20 Jul 2021 08:50:27 +0200
+        id 1m5jcS-007qJ7-Ie; Tue, 20 Jul 2021 06:52:50 +0000
+Date:   Tue, 20 Jul 2021 08:52:43 +0200
 From:   Christoph Hellwig <hch@infradead.org>
 To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>
-Subject: Re: [PATCH v15 04/17] iomap: Convert iomap_page_create to take a
+Subject: Re: [PATCH v15 05/17] iomap: Convert iomap_page_release to take a
  folio
-Message-ID: <YPZyM773p3cq97Pr@infradead.org>
+Message-ID: <YPZyuyAQx9yqO9qV@infradead.org>
 References: <20210719184001.1750630-1-willy@infradead.org>
- <20210719184001.1750630-5-willy@infradead.org>
+ <20210719184001.1750630-6-willy@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210719184001.1750630-5-willy@infradead.org>
+In-Reply-To: <20210719184001.1750630-6-willy@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 07:39:48PM +0100, Matthew Wilcox (Oracle) wrote:
-> This function already assumed it was being passed a head page, so
-> just formalise that.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+On Mon, Jul 19, 2021 at 07:39:49PM +0100, Matthew Wilcox (Oracle) wrote:
+> -static void
+> -iomap_page_release(struct page *page)
+> +static void iomap_page_release(struct folio *folio)
+>  {
+> -	struct iomap_page *iop = detach_page_private(page);
+> -	unsigned int nr_blocks = i_blocks_per_page(page->mapping->host, page);
+> +	struct iomap_page *iop = folio_detach_private(folio);
+> +	unsigned int nr_blocks = i_blocks_per_folio(folio->mapping->host,
+> +							folio);
 
-Looks good,
+Nit: but I find this variant much easier to read:
+
+	unsigned int nr_blocks =
+		i_blocks_per_folio(folio->mapping->host, folio);
+
+Otherwise looks good:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
