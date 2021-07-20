@@ -2,142 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 230AEC07E95
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 02:48:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA439C636C8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 03:33:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0465A61073
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 02:48:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4B0C60249
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 03:33:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232185AbhGTCHY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jul 2021 22:07:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40220 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343810AbhGTB5v (ORCPT
+        id S1346715AbhGTCwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jul 2021 22:52:10 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:40702 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243645AbhGTCvK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jul 2021 21:57:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626748709;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=G3SWoqsOcAK0oX6I/hgpTqrzjtvMRxHWPl/NBHoZkvM=;
-        b=Wgr/TAYK91q27AD9JuZbgo8zXeuwkLXjHjblTy0d+6lQGIdJqUUIM0KKZkY6ljh/zdEeWr
-        db8HNFKy/hDzXsPAI6yv09sfHzqsjTQkBkwnEHAbmpJJVj0aAYhiEw7mg3AuVQeEaT3faU
-        wfR9F45XH/psNHtAZs0bjQvGVbjgIzM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-Ir__ZHnNMo2aKSHiw_R7PA-1; Mon, 19 Jul 2021 22:38:26 -0400
-X-MC-Unique: Ir__ZHnNMo2aKSHiw_R7PA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6318F106B7DF;
-        Tue, 20 Jul 2021 02:38:23 +0000 (UTC)
-Received: from T590 (ovpn-12-229.pek2.redhat.com [10.72.12.229])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5CFF919C79;
-        Tue, 20 Jul 2021 02:38:13 +0000 (UTC)
-Date:   Tue, 20 Jul 2021 10:38:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed
- if any irq is managed
-Message-ID: <YPY3EMngyf2JFZ3j@T590>
-References: <20210715120844.636968-1-ming.lei@redhat.com>
- <20210715120844.636968-2-ming.lei@redhat.com>
- <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com>
- <20210719094414.GC431@lst.de>
- <5153406c-e3ed-d466-5603-14fd919304f4@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5153406c-e3ed-d466-5603-14fd919304f4@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        Mon, 19 Jul 2021 22:51:10 -0400
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+        id 5F4A920B6C14; Mon, 19 Jul 2021 20:31:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5F4A920B6C14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+        s=default; t=1626751908;
+        bh=FpUpE/kH1TL3NjUJ1UQsRvPrqprv/gk6sqCAkenAfcU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=TGEjY2NB4iJndPBIFPnoUP5lq5p9H//2vZ+kRxGoLbbW6Sd/eilNJCGN+DH1REzlW
+         EKw2q2Dn4zChwvZM1bZfHUDrCwouCX3wE6BoEs17bYdfUHo72m+nsQIAJd6wPAOINd
+         n+uYiu46LZ0GrxDKybdGyZ0cpbI/g5F4gFnQr9ko=
+From:   longli@linuxonhyperv.com
+To:     linux-fs@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc:     Long Li <longli@microsoft.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>
+Subject: [Patch v4 3/3] Drivers: hv: Add to maintainer for Hyper-V/Azure drivers
+Date:   Mon, 19 Jul 2021 20:31:06 -0700
+Message-Id: <1626751866-15765-4-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
+References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 11:39:53AM +0100, John Garry wrote:
-> On 19/07/2021 10:44, Christoph Hellwig wrote:
-> > On Mon, Jul 19, 2021 at 08:51:22AM +0100, John Garry wrote:
-> > > > Address this issue by adding one field of .irq_affinity_managed into
-> > > > 'struct device'.
-> > > > 
-> > > > Suggested-by: Christoph Hellwig <hch@lst.de>
-> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > 
-> > > Did you consider that for PCI device we effectively have this info already:
-> > > 
-> > > bool dev_has_managed_msi_irq(struct device *dev)
-> > > {
-> > > 	struct msi_desc *desc;
-> > > 
-> > > 	list_for_each_entry(desc, dev_to_msi_list(dev), list)
-> 
-> I just noticed for_each_msi_entry(), which is the same
-> 
-> 
-> > > 		if (desc->affinity && desc->affinity->is_managed)
-> > > 			return true;
-> > > 	}
-> > > 
-> > > 	return false;
-> > 
-> > Just walking the list seems fine to me given that this is not a
-> > performance criticial path.  But what are the locking implications?
-> 
-> Since it would be used for sequential setup code, I didn't think any locking
-> was required. But would need to consider where that function lived and
-> whether it's public.
+From: Long Li <longli@microsoft.com>
 
-Yeah, the allocated irq vectors should be live when running map queues.
+Add longli@microsoft.com to maintainer list.
 
-> 
-> > 
-> > Also does the above imply this won't work for your platform MSI case?
-> > .
-> > 
-> 
-> Right. I think that it may be possible to reach into the platform msi
-> descriptors to get this info, but I am not sure it's worth it. There is only
-> 1x user there and there is no generic .map_queues function, so could set the
-> flag directly:
-> 
-> int blk_mq_pci_map_queues(struct blk_mq_queue_map *qmap, struct pci_dev
-> *pdev,
->  		for_each_cpu(cpu, mask)
->  			qmap->mq_map[cpu] = qmap->queue_offset + queue;
->  	}
-> +	qmap->use_managed_irq = dev_has_managed_msi_irq(&pdev->dev);
-> }
-> 
-> --- a/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-> +++ b/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-> @@ -3563,6 +3563,8 @@ static int map_queues_v2_hw(struct Scsi_Host *shost)
->                        qmap->mq_map[cpu] = qmap->queue_offset + queue;
->        }
-> 
-> +       qmap->use_managed_irq = 1;
-> +
->        return 0;
+Cc: K. Y. Srinivasan <kys@microsoft.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Stephen Hemminger <sthemmin@microsoft.com>
+Cc: Wei Liu <wei.liu@kernel.org>
+Cc: Dexuan Cui <decui@microsoft.com>
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-virtio can be populated via platform device too, but managed irq affinity
-isn't used, so seems dev_has_managed_msi_irq() is fine.
-
-
-Thanks,
-Ming
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 948706174fae..bbf062936f21 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8440,6 +8440,7 @@ M:	Haiyang Zhang <haiyangz@microsoft.com>
+ M:	Stephen Hemminger <sthemmin@microsoft.com>
+ M:	Wei Liu <wei.liu@kernel.org>
+ M:	Dexuan Cui <decui@microsoft.com>
++M:	Long Li <longli@microsoft.com>
+ L:	linux-hyperv@vger.kernel.org
+ S:	Supported
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git
+@@ -8468,6 +8469,7 @@ F:	include/asm-generic/mshyperv.h
+ F:	include/clocksource/hyperv_timer.h
+ F:	include/linux/hyperv.h
+ F:	include/uapi/linux/hyperv.h
++F:	include/uapi/misc/hv_azure_blob.h
+ F:	net/vmw_vsock/hyperv_transport.c
+ F:	tools/hv/
+ 
+-- 
+2.25.1
 
