@@ -2,204 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE00CC07E95
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 15:49:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAC8C07E95
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 16:07:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7ECB610D2
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 15:49:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E790A6100C
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 16:07:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238733AbhGTPH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 11:07:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22954 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239833AbhGTOph (ORCPT
+        id S237851AbhGTP0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 11:26:37 -0400
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:50871 "EHLO
+        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235764AbhGTPNz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 10:45:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626794762;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VvhRyI9qx2opvkzxayFq3lx3Fi91A+65gJ9KuJmJw0Y=;
-        b=ABjbqeQc8tgEuI/Wo8oTCCUnwDrfhNUnbm5xS4feM83FscDbELbsVRdwohoqtjD6vuNG/7
-        0xMe/a/YhzZkUagnIfX4r4EwvTgWirF/8baBK+3IHECar7N8gwvZTsA3teUMza+bbPIF+W
-        zfAZaBaHz9uKumFb+BOHZ1fnbSgBfV8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-t1xGmvbZPOu_b0e2Gaa-1g-1; Tue, 20 Jul 2021 11:22:40 -0400
-X-MC-Unique: t1xGmvbZPOu_b0e2Gaa-1g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7462E80414C;
-        Tue, 20 Jul 2021 15:22:39 +0000 (UTC)
-Received: from T590 (ovpn-12-98.pek2.redhat.com [10.72.12.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C4FDE60877;
-        Tue, 20 Jul 2021 15:22:30 +0000 (UTC)
-Date:   Tue, 20 Jul 2021 23:22:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        kashyap.desai@broadcom.com, hare@suse.de
-Subject: Re: [PATCH 0/9] blk-mq: Reduce static requests memory footprint for
- shared sbitmap
-Message-ID: <YPbqMSjZIA8l0jHQ@T590>
-References: <1626275195-215652-1-git-send-email-john.garry@huawei.com>
+        Tue, 20 Jul 2021 11:13:55 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.nyi.internal (Postfix) with ESMTP id D673458170D;
+        Tue, 20 Jul 2021 11:54:26 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Tue, 20 Jul 2021 11:54:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm1; bh=Qfk4XxlZp3BZHIg5ekCwZvswEk9
+        TOwHQbLRiTDcGFk8=; b=gi7Uarf6v97Nsw4SjCc8UtxORYn2ooJf7OH1qK47+Po
+        M9u/fwNKgQzDJnNw7KBT0BAATuDws4o1CxKd4Upj43AX8+vAF3wTKBW8933IuHuT
+        jmqqZvdZBDt6czVNfJwhfBPGo99US0F/pumT7x3oxRuJDIEae9ZrbGVNUZNUKizt
+        XU2lQ+Y8JpkOCxivwJZ3bgV83sl7qjrAroXX76eqNqW+Tfu1srr1xBQLw1CMYuqd
+        mvhi0O9CZ8GrTmLWPdFH55Big/IZY1m8sle0L7C3HkakLZCGDTp6vs8dPvobkk6t
+        1cnO9z/rZr66Miy07rBl+3BiNK+QBU2ctn2F6rOSm+g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=Qfk4Xx
+        lZp3BZHIg5ekCwZvswEk9TOwHQbLRiTDcGFk8=; b=tQ4pKYsMDxjgJgz1/c/e/e
+        iXIEaG4tktGsB6/9R+/xJGPlaJse6HenITryRsn3AQSsmCLmBm0MkZ5Gcna8uPDn
+        NajujkXmGCGh8D0ruXNh6mNPchRoRcCrvYqqCTSbI89qX1y1FsVVi0h9YJ+/KbwB
+        2fHEC+YGczKW6jU2/chVTD3TpCUNw/O+ZWNXupY6wZyJreMZu9xg3v8fgKR+2dmi
+        KPiO2swyi03NqJ/dOzIc/WqxWyrGWz1u3KSAJm7pWOD28coR67PPMOY/3KVW8t+1
+        NAIfXlMeabRYUCAXmGyAEvacFavnzZxbebhgLMNZFNmH5hba1HVh0bYUAEpy1BZg
+        ==
+X-ME-Sender: <xms:svH2YJ7tJtzLnHPX0Gu7uXGRXEbPqmrGvfWSMDdqpD7MoEqvDXYY3Q>
+    <xme:svH2YG48rQ8vwxYDIWSMd8DoyMA5ddpR9gkvWn_iClqkow5g_grsyXMwBJR4d8T7L
+    MV69Pnkvy3lhA>
+X-ME-Received: <xmr:svH2YAfn1WH5mZpQ2XXjufhPz9R2WFKacYr46KZjlnxZ7M0mDXi_Nxti8jYkKWy3Nsv8SXSJdNDAvOnFyrH8pz5GyS06aPpW>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrfedvgdelvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
+    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepgfevteeite
+    etkeeiueejgedtieffueetgffgfeeigeetgeektdekgeekteduiedunecuffhomhgrihhn
+    pehmihgtrhhoshhofhhtrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:svH2YCIU-yZ_dNNG1q489Lx9sMSaTiuBagzwVJuaQsvIQ3gHOasEpQ>
+    <xmx:svH2YNLimXRj5kE94J7Sw0ihk5_vvQFACah5wbG_Cx7QVoDiFp1Cgw>
+    <xmx:svH2YLzbzJ2rWeT5iBwH1-V_xo2YFNNCUSFplxOFe2RBmDqfQLgwxg>
+    <xmx:svH2YKDNZub-Z0N3H0AeA6550iENdPW6RSPSjf7ULWf0BPDuBkY6MA>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 20 Jul 2021 11:54:26 -0400 (EDT)
+Date:   Tue, 20 Jul 2021 17:54:23 +0200
+From:   Greg KH <greg@kroah.com>
+To:     longli@linuxonhyperv.com
+Cc:     linux-fs@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        Long Li <longli@microsoft.com>
+Subject: Re: [Patch v4 0/3] Introduce a driver to support host accelerated
+ access to Microsoft Azure Blob
+Message-ID: <YPbxr8XbK0IbD02r@kroah.com>
+References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1626275195-215652-1-git-send-email-john.garry@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 14, 2021 at 11:06:26PM +0800, John Garry wrote:
-> Currently a full set of static requests are allocated per hw queue per
-> tagset when shared sbitmap is used.
+On Mon, Jul 19, 2021 at 08:31:03PM -0700, longli@linuxonhyperv.com wrote:
+> From: Long Li <longli@microsoft.com>
 > 
-> However, only tagset->queue_depth number of requests may be active at
-> any given time. As such, only tagset->queue_depth number of static
-> requests are required.
+> Microsoft Azure Blob storage service exposes a REST API to applications
+> for data access.
+> (https://docs.microsoft.com/en-us/rest/api/storageservices/blob-service-rest-api)
 > 
-> The same goes for using an IO scheduler, which allocates a full set of
-> static requests per hw queue per request queue.
+> This patchset implements a VSC (Virtualization Service Consumer) that
+> communicates with a VSP (Virtualization Service Provider) on the Hyper-V
+> host to execute Blob storage access via native network stack on the host.
+> This VSC doesn't implement the semantics of REST API. Those are implemented
+> in user-space. The VSC provides a fast data path to VSP.
 > 
-> This series very significantly reduces memory usage in both scenarios by
-> allocating static rqs per tagset and per request queue, respectively,
-> rather than per hw queue per tagset and per request queue.
+> Answers to some previous questions discussing the driver:
 > 
-> For megaraid sas driver on my 128-CPU arm64 system with 1x SATA disk, we
-> save approx. 300MB(!) [370MB -> 60MB]
+> Q: Why this driver doesn't use the block layer
 > 
-> A couple of patches are marked as RFC, as maybe there is a better
-> implementation approach.
+> A: The Azure Blob is based on a model of object oriented storage. The
+> storage object is not modeled in block sectors. While it's possible to
+> present the storage object as a block device (assuming it makes sense to
+> fake all the block device attributes), we lose the ability to express
+> functionality that are defined in the REST API. 
 
-There is another candidate for addressing this issue, and looks simpler:
+What "REST API"?
 
- block/blk-mq-sched.c |  4 ++++
- block/blk-mq-tag.c   |  4 ++++
- block/blk-mq-tag.h   |  3 +++
- block/blk-mq.c       | 18 ++++++++++++++++++
- block/blk-mq.h       | 11 +++++++++++
- 5 files changed, 40 insertions(+)
+Why doesn't object oriented storage map to a file handle to read from?
+No need to mess with "blocks", why would you care about them?
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index c838d81ac058..b9236ee0fe4e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -538,6 +538,10 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
- 	if (!hctx->sched_tags)
- 		return -ENOMEM;
- 
-+	blk_mq_set_master_tags(hctx->sched_tags,
-+			q->queue_hw_ctx[0]->sched_tags, hctx->flags,
-+			hctx_idx);
-+
- 	ret = blk_mq_alloc_rqs(set, hctx->sched_tags, hctx_idx, q->nr_requests);
- 	if (ret)
- 		blk_mq_sched_free_tags(set, hctx, hctx_idx);
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 86f87346232a..c471a073234d 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -608,6 +608,10 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 				tags->nr_reserved_tags, set->flags);
- 		if (!new)
- 			return -ENOMEM;
-+
-+		blk_mq_set_master_tags(new,
-+			hctx->queue->queue_hw_ctx[0]->sched_tags, set->flags,
-+			hctx->queue_num);
- 		ret = blk_mq_alloc_rqs(set, new, hctx->queue_num, tdepth);
- 		if (ret) {
- 			blk_mq_free_rq_map(new, set->flags);
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 8ed55af08427..0a3fbbc61e06 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -21,6 +21,9 @@ struct blk_mq_tags {
- 	struct request **static_rqs;
- 	struct list_head page_list;
- 
-+	/* only used for blk_mq_is_sbitmap_shared() */
-+	struct blk_mq_tags	*master;
-+
- 	/*
- 	 * used to clear request reference in rqs[] before freeing one
- 	 * request pool
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2c4ac51e54eb..ef8a6a7e5f7c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2348,6 +2348,15 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- {
- 	struct page *page;
- 
-+	if (blk_mq_is_sbitmap_shared(set->flags)) {
-+		if (tags->master)
-+			tags = tags->master;
-+		if (hctx_idx < set->nr_hw_queues - 1) {
-+			blk_mq_clear_rq_mapping(set, tags, hctx_idx);
-+			return;
-+		}
-+	}
-+
- 	if (tags->rqs && set->ops->exit_request) {
- 		int i;
- 
-@@ -2444,6 +2453,12 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 	size_t rq_size, left;
- 	int node;
- 
-+	if (blk_mq_is_sbitmap_shared(set->flags) && tags->master) {
-+		memcpy(tags->static_rqs, tags->master->static_rqs,
-+		       sizeof(tags->static_rqs[0]) * tags->nr_tags);
-+		return 0;
-+	}
-+
- 	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
-@@ -2860,6 +2875,9 @@ static bool __blk_mq_alloc_map_and_request(struct blk_mq_tag_set *set,
- 	if (!set->tags[hctx_idx])
- 		return false;
- 
-+	blk_mq_set_master_tags(set->tags[hctx_idx], set->tags[0], flags,
-+			       hctx_idx);
-+
- 	ret = blk_mq_alloc_rqs(set, set->tags[hctx_idx], hctx_idx,
- 				set->queue_depth);
- 	if (!ret)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index d08779f77a26..a08b89be6acc 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -354,5 +354,16 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
- 	return __blk_mq_active_requests(hctx) < depth;
- }
- 
-+static inline void blk_mq_set_master_tags(struct blk_mq_tags *tags,
-+		struct blk_mq_tags *master_tags, unsigned int flags,
-+		unsigned int hctx_idx)
-+{
-+	if (blk_mq_is_sbitmap_shared(flags)) {
-+		if (hctx_idx)
-+			tags->master = master_tags;
-+		else
-+			tags->master = NULL;
-+	}
-+}
- 
- #endif
+And again, you loose all caching, this thing has got to be really slow,
+why add a slow storage interface?  What workload requires this type of
+slow block storage?
 
+> Q: You also just abandoned the POSIX model and forced people to use a
+> random-custom-library just to access their storage devices, breaking all
+> existing programs in the world?
+> 
+> A: The existing Blob applications access storage via HTTP (REST API). They
+> don't use POSIX interface. The interface for Azure Blob is not designed
+> on POSIX.
 
-Thanks,
-Ming
+I do not see a HTTP interface here, what does that have to do with the
+kernel?
 
+I see a single ioctl interface, that's all.
+
+> Q: What programs today use this new API?
+> 
+> A: Currently none is released. But per above, there are also none using
+> POSIX.
+
+Great, so no one uses this, so who is asking for and requiring this
+thing?
+
+What about just doing it all from userspace using FUSE?  Why does this
+HAVE to be a kernel driver?
+
+thanks,
+
+greg k-h
