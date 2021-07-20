@@ -7,60 +7,65 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 635A9C07E9B
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 06:59:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4ACC07E9B
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 07:01:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47C526108B
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 06:59:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7649461164
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 07:01:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239263AbhGTGSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 02:18:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53058 "EHLO
+        id S239433AbhGTGVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 02:21:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243070AbhGTGRo (ORCPT
+        with ESMTP id S243185AbhGTGUG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 02:17:44 -0400
+        Tue, 20 Jul 2021 02:20:06 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61437C061574;
-        Mon, 19 Jul 2021 23:58:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437A4C061574;
+        Tue, 20 Jul 2021 00:00:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hkCeS3d3DzM6X5it85/II9q/xV8Q+YyicN3JK3AIkcY=; b=ON9/BWXulkxGtghSvHPjG41NJ3
-        m+7vnF8DfFO0VTYvtCShHZrh1LEQQ0X+p9w2z6oIaDtBDzV3vbHm957uxwR5ZE+lr78hUE2Q9DhwF
-        xDjmcG7BHs2ui7Vfi1qvmKH8aDGcSQt265VjsSgdO6QFk9bhAF4GUHlKb3jV9p5b2s+nIIgg2VPsQ
-        otbfp/r08dupe4SsjI+FU4U8TCUoGQTWkyOEPoF0MMScouxbQqeFkbi8qVO/ABvFmqDe1wOjAVpo/
-        1U8B7/L9V2cNUF2KfHHPbIbiNbQ7m4fQeIb1fiFpX3++7ICSHBWTvGgnH+zFKtALxa7UJ49iJG7rG
-        TLY/JIUg==;
+        bh=ewfvvuAfym/iwGWCipSDLSGypAtNWJ0fgldgA5lp580=; b=ThWqMJB9PW1zFusqK+Hfh5cc1y
+        kkTgkvixxPOP5NQiA3+OYc+e14Vl6r7vhU+a2GTSMx8to/OEv1als32UFJa+3t+HM0iD8ZfGp5Sb7
+        Oy02JmuqKNMxTiJC+N0r8DDolh2Cw9y6Bm87JptEcJqYjoVLy3hf1NacUfoi9qlBAsQAzGFY0ScPZ
+        4MRRSncPYeLT2i0R3dkD6XGkw8DYTIQZUmoHUht8PG8SPClbR4CWbNhqV50qGOv4MiGUxQgLsMDsD
+        V26ZEI8oYZzWockMjW2ga2uhi9wy4ekzOEC2ZgpkfLne10qDb9b9EUe4lDjHOqTcRtW8zWQ7T9Ojx
+        S1qbAsVw==;
 Received: from [2001:4bb8:193:7660:5612:5e3c:ba3d:2b3c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m5jgh-007qaT-7d; Tue, 20 Jul 2021 06:57:22 +0000
-Date:   Tue, 20 Jul 2021 08:57:06 +0200
+        id 1m5jjG-007qkb-GK; Tue, 20 Jul 2021 06:59:55 +0000
+Date:   Tue, 20 Jul 2021 08:59:45 +0200
 From:   Christoph Hellwig <hch@infradead.org>
 To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>
-Subject: Re: [PATCH v15 08/17] iomap: Pass the iomap_page into
- iomap_set_range_uptodate
-Message-ID: <YPZzwkcNP0NQEv6+@infradead.org>
+Subject: Re: [PATCH v15 09/17] iomap: Use folio offsets instead of page
+ offsets
+Message-ID: <YPZ0YYF/7F+HG1o+@infradead.org>
 References: <20210719184001.1750630-1-willy@infradead.org>
- <20210719184001.1750630-9-willy@infradead.org>
+ <20210719184001.1750630-10-willy@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210719184001.1750630-9-willy@infradead.org>
+In-Reply-To: <20210719184001.1750630-10-willy@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 07:39:52PM +0100, Matthew Wilcox (Oracle) wrote:
-> All but one caller already has the iomap_page, and we can avoid getting
-> it again.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+> +	size_t poff = offset_in_folio(folio, *pos);
+> +	size_t plen = min_t(loff_t, folio_size(folio) - poff, length);
 
-In general reloading it from a single pointer should be faster than
-passing an extra argument.  What is the rationale here?
+These variables are a little misnamed now.  But I'm not sure what a
+better name would be.
+
+> +		size_t off = (page - &folio->page) * PAGE_SIZE +
+> +				bvec->bv_offset;
+
+Another use case for the helper I suggested earlier.
+
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
