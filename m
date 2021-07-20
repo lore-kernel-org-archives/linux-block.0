@@ -2,109 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB28C07E95
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 18:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 625C5C07E9B
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 18:21:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31B776108B
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 18:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CCA6610A0
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 18:21:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232292AbhGTRgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 13:36:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42254 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232555AbhGTRf2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 13:35:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 106746101B;
-        Tue, 20 Jul 2021 18:16:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1626804966;
-        bh=qtVSgG+A7D7xSwJx0othdtiD/Ap1K//pwigS721/SdY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=exWEcznwBv5PYBDFJUMGm142uvKdPXgvphn/JOQbPq9biO7F1Sp1tkKcA9EqPNXjz
-         7DGjpoKu4TVGCrgAnwCGCp/0oekEAZ1nktojKVGGkC62l5dyKgZZyFWA9xtO/Lwkcb
-         bkMiOzAeu0IY4pP90uGwbK739Fa/1Y1sasmy7tZc=
-Date:   Tue, 20 Jul 2021 20:16:03 +0200
-From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To:     Long Li <longli@microsoft.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
-        "linux-fs@vger.kernel.org" <linux-fs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
-Subject: Re: [Patch v4 0/3] Introduce a driver to support host accelerated
- access to Microsoft Azure Blob
-Message-ID: <YPcS41v9x6+VlQXt@kroah.com>
-References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
- <82e8bec6-4f6f-08d7-90db-9661f675749d@acm.org>
- <YPZmtOmpK6+znL0I@infradead.org>
- <DM6PR21MB15138B5D5C8647C92EA6AB99CEE29@DM6PR21MB1513.namprd21.prod.outlook.com>
- <115d864c-46c2-2bc8-c392-fd63d34c9ed0@acm.org>
- <BY5PR21MB1506822C71ED70366E1B1BCBCEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
+        id S229638AbhGTRkh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 13:40:37 -0400
+Received: from mail-pf1-f171.google.com ([209.85.210.171]:39927 "EHLO
+        mail-pf1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231450AbhGTRkO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jul 2021 13:40:14 -0400
+Received: by mail-pf1-f171.google.com with SMTP id b12so226292pfv.6;
+        Tue, 20 Jul 2021 11:20:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GmwOijgstcywD2prqSs1UO+IWPMIECWjhibmRHUTSeQ=;
+        b=pE3i5xZWTDTIG3MNwQAPWyNOtSNWg/dvbrURoSJ9ExxY8aFJ2IoSB5cEtcEAJAyUzX
+         lLzZOPAkD8w/bBJ5qALzP5OF+h34N/ldjME77heShyJUI1IV5neAYp44OC3Ce1gNDBKo
+         WNGWAzM82WQNVMAiFDNxdvoZPdMG/b+XLiZeaUSR4RJU4LodzftDux0dWqlmjYhxIw2S
+         oR8HbedVUT2OzZrS9rKtxZ3h7Jt7jkebpxISg0Vr/++PxU9h9Ladogp56s1oKcBvN7Ix
+         c4THBUxP2zohA4WXUZ3lOdpq/Bkk9j4NdsJHbmpkDaHNtE2fmt3Az8ikL5dvpVgCyIXj
+         W30Q==
+X-Gm-Message-State: AOAM531M4HHHOKoSKi05nw3wcuNlPnB7UkO2G9PVmhDh9RVetM3+MSS7
+        2vhtmf0yGwQ/XpaKQol4kQE=
+X-Google-Smtp-Source: ABdhPJwea4wx+Gse9jLKVcJyNReg5lt6o7eBJ2tadXtI13z/iv9rP5Xnrz01HCxlwMb9s+//HoB+dQ==
+X-Received: by 2002:a63:6784:: with SMTP id b126mr1958989pgc.421.1626805251978;
+        Tue, 20 Jul 2021 11:20:51 -0700 (PDT)
+Received: from localhost ([191.96.121.239])
+        by smtp.gmail.com with ESMTPSA id d20sm24147087pfn.219.2021.07.20.11.20.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jul 2021 11:20:51 -0700 (PDT)
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk
+Cc:     hare@suse.de, bvanassche@acm.org, ming.lei@redhat.com,
+        hch@infradead.org, jack@suse.cz, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH 0/5] block: replace incorrect uses of GENHD_FL_UP
+Date:   Tue, 20 Jul 2021 11:20:43 -0700
+Message-Id: <20210720182048.1906526-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY5PR21MB1506822C71ED70366E1B1BCBCEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 20, 2021 at 05:33:47PM +0000, Long Li wrote:
-> > Subject: Re: [Patch v4 0/3] Introduce a driver to support host accelerated
-> > access to Microsoft Azure Blob
-> > 
-> > On 7/20/21 12:05 AM, Long Li wrote:
-> > >> Subject: Re: [Patch v4 0/3] Introduce a driver to support host
-> > >> accelerated access to Microsoft Azure Blob
-> > >>
-> > >> On Mon, Jul 19, 2021 at 09:37:56PM -0700, Bart Van Assche wrote:
-> > >>> such that this object storage driver can be implemented as a
-> > >>> user-space library instead of as a kernel driver? As you may know
-> > >>> vfio users can either use eventfds for completion notifications or polling.
-> > >>> An interface like io_uring can be built easily on top of vfio.
-> > >>
-> > >> Yes.  Similar to say the NVMe K/V command set this does not look like
-> > >> a candidate for a kernel driver.
-> > >
-> > > The driver is modeled to support multiple processes/users over a VMBUS
-> > > channel. I don't see a way that this can be implemented through VFIO?
-> > >
-> > > Even if it can be done, this exposes a security risk as the same VMBUS
-> > > channel is shared by multiple processes in user-mode.
-> > 
-> > Sharing a VMBUS channel among processes is not necessary. I propose to
-> > assign one VMBUS channel to each process and to multiplex I/O submitted to
-> > channels associated with the same blob storage object inside e.g. the
-> > hypervisor. This is not a new idea. In the NVMe specification there is a
-> > diagram that shows that multiple NVMe controllers can provide access to the
-> > same NVMe namespace. See also diagram "Figure 416: NVM Subsystem with
-> > Three I/O Controllers" in version 1.4 of the NVMe specification.
-> > 
-> > Bart.
-> 
-> Currently, the Hyper-V is not designed to have one VMBUS channel for each process.
+I've bumped this from RFC to PATCH form as request by Christoph,
+as it seems to line up with what he wants to do. As per Hannes
+I also stuck to one form of naming, so went with blk_disk_added()
+instead of blk_disk_registered() and used that instead of open
+coding the flag check.
 
-So it's a slow interface :(
+This is rebased onto next-20210720 and I've made the patch series
+independent of my *add_disk*() error handling series. This goes
+compile and boot tested.
 
-> In Hyper-V, a channel is offered from the host to the guest VM. The host doesn't
-> know in advance how many processes are going to use this service so it can't
-> offer those channels in advance. There is no mechanism to offer dynamic
-> per-process allocated channels based on guest needs. Some devices (e.g.
-> network and storage) use multiple channels for scalability but they are not
-> for serving individual processes.
-> 
-> Assigning one VMBUS channel per process needs significant change on the Hyper-V side.
+Luis Chamberlain (5):
+  block: add flag for add_disk() completion notation
+  md: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED on is_mddev_broken()
+  mmc/core/block: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED
+  nvme: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED
+  fs/block_dev: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED
 
-What is the throughput of a single channel as-is?  You provided no
-benchmarks or numbers at all in this patchset which would justify this
-new kernel driver :(
+ block/genhd.c                 |  8 ++++++++
+ drivers/md/md.h               |  4 +---
+ drivers/mmc/core/block.c      |  2 +-
+ drivers/nvme/host/core.c      |  4 ++--
+ drivers/nvme/host/multipath.c |  2 +-
+ fs/block_dev.c                |  5 +++--
+ include/linux/genhd.h         | 11 ++++++++++-
+ 7 files changed, 26 insertions(+), 10 deletions(-)
 
-thanks,
+-- 
+2.27.0
 
-greg k-h
