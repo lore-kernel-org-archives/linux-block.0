@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A7AC07E9B
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 05:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3061FC07E9B
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 05:30:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0859C6113C
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 05:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11C296113C
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 05:30:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244419AbhGTEqV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 00:46:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60446 "EHLO mail.kernel.org"
+        id S237693AbhGTEtd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 00:49:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60852 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237572AbhGTEqO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 00:46:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7213461004;
-        Tue, 20 Jul 2021 05:26:50 +0000 (UTC)
+        id S237591AbhGTEtc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jul 2021 00:49:32 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0BC866113A;
+        Tue, 20 Jul 2021 05:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1626758810;
-        bh=wG76adtpPyP0DbYkuWx0H/oBkyeSrBGgr6j8z/70ftI=;
+        s=korg; t=1626759010;
+        bh=PxxMUXlt0OImTQvDBWqMXD7xeBnFTjxInCApPpX5SP8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Dq0Q/Why6jwvkBtkoVsH6BX7F0I9T7TiNP53EtPYD+cDQcVPXQ8RDjjH71L5BfybA
-         E6DAbq20OTayodUXK2DrTPZV3+XMmt8bZEwJX0cfLlHurNeWN1dLiBCrXxNLL8HjUP
-         6p4Re23bWwiAG0kLYfbK1XEF2f9hlpV2gJ7lePJk=
-Date:   Tue, 20 Jul 2021 07:26:48 +0200
+        b=gYjt9zUGSdKsV4I3e38DzNL99uoMjBnPemVv/XomCNZyHzEMfrmsyP/PQ/oS/+hx+
+         PhuOBlERNmsLokoZJOU02GF++QD/wzm+Xj1uwBxrJax9ecsTTq6Jo0BnBVZeSVF27h
+         9NJoFE1mpmv5WelED/p+uCCtSErfe6YZ/OjoEMM0=
+Date:   Tue, 20 Jul 2021 07:30:07 +0200
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     longli@linuxonhyperv.com
 Cc:     linux-fs@vger.kernel.org, linux-block@vger.kernel.org,
@@ -50,7 +50,7 @@ Cc:     linux-fs@vger.kernel.org, linux-block@vger.kernel.org,
         Siddharth Gupta <sidgup@codeaurora.org>,
         Hannes Reinecke <hare@suse.de>, linux-doc@vger.kernel.org
 Subject: Re: [Patch v4 2/3] Drivers: hv: add Azure Blob driver
-Message-ID: <YPZemNCOa6oGUa25@kroah.com>
+Message-ID: <YPZfX9RE4h8kAIv0@kroah.com>
 References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
  <1626751866-15765-3-git-send-email-longli@linuxonhyperv.com>
 MIME-Version: 1.0
@@ -69,12 +69,63 @@ On Mon, Jul 19, 2021 at 08:31:05PM -0700, longli@linuxonhyperv.com wrote:
 > This driver adds support for accelerated access to Azure Blob storage. As an
 > alternative to REST APIs, it provides a fast data path that uses host native
 > network stack and direct data link for storage server access.
+> 
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+> Cc: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: Stephen Hemminger <sthemmin@microsoft.com>
+> Cc: Wei Liu <wei.liu@kernel.org>
+> Cc: Dexuan Cui <decui@microsoft.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Maximilian Luz <luzmaximilian@gmail.com>
+> Cc: Mike Rapoport <rppt@kernel.org>
+> Cc: Ben Widawsky <ben.widawsky@intel.com>
+> Cc: Jiri Slaby <jirislaby@kernel.org>
+> Cc: Andra Paraschiv <andraprs@amazon.com>
+> Cc: Siddharth Gupta <sidgup@codeaurora.org>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: linux-doc@vger.kernel.org
+> Signed-off-by: Long Li <longli@microsoft.com>
+> ---
+>  .../userspace-api/ioctl/ioctl-number.rst      |   2 +
+>  drivers/hv/Kconfig                            |  11 +
+>  drivers/hv/Makefile                           |   1 +
+>  drivers/hv/channel_mgmt.c                     |   7 +
+>  drivers/hv/hv_azure_blob.c                    | 628 ++++++++++++++++++
+>  include/linux/hyperv.h                        |   9 +
+>  include/uapi/misc/hv_azure_blob.h             |  34 +
+>  7 files changed, 692 insertions(+)
+>  create mode 100644 drivers/hv/hv_azure_blob.c
+>  create mode 100644 include/uapi/misc/hv_azure_blob.h
+> 
 
-Thank you for fixing up the license info, but you did not include any
-information here about how to use this, where the userspace tools are,
-nor why you are going around the existing kernel block layer and proof
-that going around the block layer is a good idea.
+Hi,
+
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
+
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- This looks like a new version of a previously submitted patch, but you
+  did not list below the --- line any changes from the previous version.
+  Please read the section entitled "The canonical patch format" in the
+  kernel file, Documentation/SubmittingPatches for what needs to be done
+  here to properly describe this.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
 
 thanks,
 
-greg k-h
+greg k-h's patch email bot
