@@ -2,84 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E05BEC07E95
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 00:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF0DC07E95
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 01:33:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD15F6113E
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 00:12:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C950661164
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 01:33:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243945AbhGSXb2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jul 2021 19:31:28 -0400
-Received: from mail-pj1-f41.google.com ([209.85.216.41]:55101 "EHLO
-        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354527AbhGSWUn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jul 2021 18:20:43 -0400
-Received: by mail-pj1-f41.google.com with SMTP id g24so12594359pji.4;
-        Mon, 19 Jul 2021 16:00:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6pg2i/azcWb8fV5GRB9TXpG0kxE6pMvcP1mwssbbB1E=;
-        b=dY5sj4KZ1RwP34q0oi+lldDoAFu1NGM1ESIwo5khbK73EBQ6Z+OaWY+WWrge8So9jT
-         EWt997TeopT/oNYmW8QxUCZBfUINngG8LQylnk6tAEGTQKRf8QbJT7jxLkqWuW46c+Pa
-         tVR6yFAZXqoMQfj3maaeGvmTn6dGlAw9rXNwRujnw3WrUxOW7uBZNPLNgmcbuwJp9slO
-         CkJhzi/NyPKSrNdmDDUhaKSH2EAF72bNG2XCRTuAEuZj8bqZYE23AFCT/IPSyQ25FCAq
-         JFnAitp71n7QLEPrXasQ1osnQQlj6ylxP56d3H91GJFVIU4wDHAI8TMNsC/Nv7pvs4hq
-         EDsw==
-X-Gm-Message-State: AOAM530SPf8Q/qvGc9d3EZ2B/QsOprIy0wggOOyXXBXMPlWPD/5sDiqm
-        aoVMotxrwEe57xAjOzVnDAc=
-X-Google-Smtp-Source: ABdhPJyf3kntOiyFjtzdBFjhJlFSOhbtmvf1HxErtiJNE0ulq5JA34OQQeWh8FISvl2v5kb4pOH4uQ==
-X-Received: by 2002:a17:902:d4d2:b029:12b:72cf:9178 with SMTP id o18-20020a170902d4d2b029012b72cf9178mr12783201plg.53.1626735659423;
-        Mon, 19 Jul 2021 16:00:59 -0700 (PDT)
-Received: from garbanzo ([191.96.121.239])
-        by smtp.gmail.com with ESMTPSA id o184sm23823355pga.18.2021.07.19.16.00.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jul 2021 16:00:58 -0700 (PDT)
-Date:   Mon, 19 Jul 2021 16:00:56 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, hare@suse.de, bvanassche@acm.org,
-        ming.lei@redhat.com, jack@suse.cz, osandov@fb.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 6/6] block: skip queue if NULL on blk_cleanup_queue()
-Message-ID: <20210719230056.wekatjwyuzt6zzok@garbanzo>
-References: <20210715045531.420201-1-mcgrof@kernel.org>
- <20210715045531.420201-7-mcgrof@kernel.org>
- <YO/fvbe5LeAP2Mtq@infradead.org>
- <20210715190726.xlukndxddvph4fx6@garbanzo>
- <YPVK1SPI0ZWmkOgd@infradead.org>
+        id S230153AbhGTAwJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jul 2021 20:52:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46326 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235756AbhGTAtx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Jul 2021 20:49:53 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 410F161004;
+        Tue, 20 Jul 2021 01:28:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626744535;
+        bh=45got/es61xzhcsJqmAAohKb8WL0wk+ATYQu22DHInM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VDc8rfvvE0h4hOM+M7QpIwBxdgLrl/llbVOuXZZxf4/KTWlYloBlSUEl6wxiy02Ze
+         r5DqFHgNEeQx4aNl9tOK8yAywHG48gVzFn5qAEoib6J6M2VqJ0BijzwTDpHUbHLhOa
+         RvGbd8sd4C8unWKSmVUw+f00ug9zIblwRanulDZcyAiJ6ahRtZHJ/jSbM+faTUaKoV
+         8zb2OxSRI/05CytVoZfhMPsvv7fHrGvYeUOA4VXfmB0V3wliaQa59J/XGcbXPNU6yJ
+         8jzvgyggwgWss754qPBERzz8ACiRO7EqU4GfofHe6BJaNL95pMGv9vp0Qmn2aje43Q
+         R/i63DAh51pqw==
+Date:   Mon, 19 Jul 2021 18:28:54 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v15 01/17] block: Add bio_add_folio()
+Message-ID: <20210720012854.GN22357@magnolia>
+References: <20210719184001.1750630-1-willy@infradead.org>
+ <20210719184001.1750630-2-willy@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YPVK1SPI0ZWmkOgd@infradead.org>
+In-Reply-To: <20210719184001.1750630-2-willy@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 10:50:13AM +0100, Christoph Hellwig wrote:
-> On Thu, Jul 15, 2021 at 12:07:26PM -0700, Luis Chamberlain wrote:
-> > > For all drivers using blk_alloc_disk/blk_mq_alloc_disk there should
-> > > always be a queue.  The others ones aren't ready to handle errors
-> > > from add_disk yet in any way I think (and I plan to fix this up
-> > > ASAP).
-> > 
-> > Have an example in mind?
+On Mon, Jul 19, 2021 at 07:39:45PM +0100, Matthew Wilcox (Oracle) wrote:
+> This is a thin wrapper around bio_add_page().  The main advantage here
+> is the documentation that the submitter can expect to see folios in the
+> completion handler, and that stupidly large folios are not supported.
+> It's not currently possible to allocate stupidly large folios, but if
+> it ever becomes possible, this function will fail gracefully instead of
+> doing I/O to the wrong bytes.
 > 
-> The only ones left are nvme, dasd and scsi.  NVMe is trivial (attached),
-> dasd needs a little more work, I need to send up a WIP to the
-> maintainers.  scsi is the real problem and will require a fair amount
-> of work.
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-Alright, I'll wait until these changes are merged before sending those
-driver's conversions. Without this patch though, there's no way to test
-the error injection in case the driver was buggy and removed the queue
-by mistake. Recall my first patch moved that check to the beginning too.
+Looks fine to me,
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-So we either skip that error injection test ... or not sure what else to do.
+--D
 
- Luis
+> ---
+>  block/bio.c         | 21 +++++++++++++++++++++
+>  include/linux/bio.h |  3 ++-
+>  2 files changed, 23 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 1fab762e079b..c64e35548fb2 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -933,6 +933,27 @@ int bio_add_page(struct bio *bio, struct page *page,
+>  }
+>  EXPORT_SYMBOL(bio_add_page);
+>  
+> +/**
+> + * bio_add_folio - Attempt to add part of a folio to a bio.
+> + * @bio: Bio to add to.
+> + * @folio: Folio to add.
+> + * @len: How many bytes from the folio to add.
+> + * @off: First byte in this folio to add.
+> + *
+> + * Always uses the head page of the folio in the bio.  If a submitter only
+> + * uses bio_add_folio(), it can count on never seeing tail pages in the
+> + * completion routine.  BIOs do not support folios that are 4GiB or larger.
+> + *
+> + * Return: The number of bytes from this folio added to the bio.
+> + */
+> +size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+> +		size_t off)
+> +{
+> +	if (len > UINT_MAX || off > UINT_MAX)
+> +		return 0;
+> +	return bio_add_page(bio, &folio->page, len, off);
+> +}
+> +
+>  void bio_release_pages(struct bio *bio, bool mark_dirty)
+>  {
+>  	struct bvec_iter_all iter_all;
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 2203b686e1f0..ade93e2de6a1 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -462,7 +462,8 @@ extern void bio_uninit(struct bio *);
+>  extern void bio_reset(struct bio *);
+>  void bio_chain(struct bio *, struct bio *);
+>  
+> -extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
+> +int bio_add_page(struct bio *, struct page *, unsigned len, unsigned off);
+> +size_t bio_add_folio(struct bio *, struct folio *, size_t len, size_t off);
+>  extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
+>  			   unsigned int, unsigned int);
+>  int bio_add_zone_append_page(struct bio *bio, struct page *page,
+> -- 
+> 2.30.2
+> 
