@@ -2,225 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0CBC07E9B
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 17:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFFFC636C8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 17:33:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B4CFF60C40
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 17:27:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7945A600D4
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jul 2021 17:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229655AbhGTQqu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 12:46:50 -0400
-Received: from mail-wm1-f47.google.com ([209.85.128.47]:40792 "EHLO
-        mail-wm1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230092AbhGTQqr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 12:46:47 -0400
-Received: by mail-wm1-f47.google.com with SMTP id f8-20020a1c1f080000b029022d4c6cfc37so1929983wmf.5;
-        Tue, 20 Jul 2021 10:27:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version;
-        bh=N7iOkDTbFVkcyMX6wYcSBGgYmLYjg2HzoM77/UPDOg4=;
-        b=dyiL8nOUQLkjNy+1XWARapEwXMgTiXAgwiCo8tjJDnKnHmdnvG24dZ3wsUybe0WRNW
-         AKthGJE7351b5TZbmGPqwee19MrPa8iKfHIBLWhst7uH5jN/qQHiJGNuXxNkrNeCWWxs
-         RFFrHAHW8DNOw5nX6kReyoNrDOM5bfd18Z4iQLGALw2AhxYclWc8y8LBtP8TrKhTMa9U
-         UTYNKB7HwDwtu9yarSrRjXcKpIg52LKHtg2Z8dPNOMZzPfoDs1jG9V6w8U5LXtEIJAAv
-         Lk2/PqBdwAMDmKF6pLIk6M7+wz3y/jP8/YUbTZ1hDIkSoiv5uY0X+ZvkP7a3/bHMCF1e
-         +PdA==
-X-Gm-Message-State: AOAM531vFJcGqhR3gUayb3Z27qpGIrvYIh27EIIBWWwSW7A6SmL8wzop
-        tiisCAY2Wk/vLgVMUv4yPzA=
-X-Google-Smtp-Source: ABdhPJzSvRKefzCend6nJFQAsS0uaCa1fK90wXmtgi8iW/HukxV3TCuQkr/LPawh1sUR5jy9AFko3g==
-X-Received: by 2002:a05:600c:4656:: with SMTP id n22mr27973928wmo.37.1626802043421;
-        Tue, 20 Jul 2021 10:27:23 -0700 (PDT)
-Received: from localhost ([137.220.125.106])
-        by smtp.gmail.com with ESMTPSA id y16sm3000360wmq.1.2021.07.20.10.27.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 10:27:21 -0700 (PDT)
-Message-ID: <3ca56654449b53814a22e3f06179292bc959ae72.camel@debian.org>
-Subject: Re: [PATCH v5 0/5] block: add a sequence number to disks
-From:   Luca Boccassi <bluca@debian.org>
-To:     Matteo Croce <mcroce@linux.microsoft.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
+        id S229623AbhGTQxP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 12:53:15 -0400
+Received: from mail-bn7nam10on2110.outbound.protection.outlook.com ([40.107.92.110]:30112
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229632AbhGTQxO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jul 2021 12:53:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BI9BsI1XPXn7jBb9h2sPJDEaB6Ni082Vxk6V05e1YCjPG1uoUi+sJVY3wue86A8O8rlIgKTLsNyrSMTrCURrx5dmB8c1vCCJB5yGwTWmKNIcdzlipPLd/iQettMSXDcf+eGej15UUnAw2mLMBhZGnUF0l+jGZXZSFI9PQ/k/IwKoEz8Gm7Xzj3XEWYfz9WM+T2darAJUvBwdzEyAGVV3eq/rltyh8gu7uQnpWWJCpfw9xMNblrFs9Y67vQM2y32BWpM+5d+oCWAZBGFnjYrf4uA8YReXmX7B+BEPRh65Jvvm703i8e0+4Eh+IeeKPv6wMCPZ+ZxdnQjB7DM+O9pltw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QZbwDV0ZblP8081/fBd/6Yhw5oC0O0JI95FAoBe1olI=;
+ b=kp+gF/vhW7wsvdBMwKPNVtInKpWFkxeREoR5+XJ1FW5M3O08oyPWTKn6YGVxQA4pyyI7j4YSn7zHEs+Pr7W/K+40+qizBmZ/XTHsbwAJqp3AV/mORzhyAPlMlPyCvYLNI8JEIYfoSzvuwmwfvTAR3/bGntyL7T9EmiYrFZPPlw6gv0fhc9YSZWdzDImFo90+QRHZrr7SxVvigjTIU8jNLocDQgKSrGKv20EXGrRgsrCK25D7yBBxYJYCUkNzh93BqX96j4T9mGZVhvkM9ezs4ctUcfdkS+wu9yVG8V/pHRcAT9qe9tMM1vwyN4zasQeLEhGhJySvG3W3Tm6Kdm9Efg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QZbwDV0ZblP8081/fBd/6Yhw5oC0O0JI95FAoBe1olI=;
+ b=PqqhjgPlLCG78IUn7nXXromAnuIve8QvKuHLPy+ZqlQs47poOokUOW8AtE8q1hZoElfuZJ+4S6zldrgyJFPD/MxHFDsjh2uk7ihZi4SPWOi3b1wEQPcIhTGIUDIKagdXGPTq9wKfhN/8cLvM7asEfZmlG4MDcgRjIQtl+k2YjRA=
+Received: from BY5PR21MB1506.namprd21.prod.outlook.com (2603:10b6:a03:23d::12)
+ by BYAPR21MB1733.namprd21.prod.outlook.com (2603:10b6:a02:c4::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4373.6; Tue, 20 Jul
+ 2021 17:33:47 +0000
+Received: from BY5PR21MB1506.namprd21.prod.outlook.com
+ ([fe80::d97f:36c9:1b1:5d07]) by BY5PR21MB1506.namprd21.prod.outlook.com
+ ([fe80::d97f:36c9:1b1:5d07%8]) with mapi id 15.20.4373.006; Tue, 20 Jul 2021
+ 17:33:47 +0000
+From:   Long Li <longli@microsoft.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
         Christoph Hellwig <hch@infradead.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        Javier =?ISO-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Date:   Tue, 20 Jul 2021 18:27:19 +0100
-In-Reply-To: <20210712230530.29323-1-mcroce@linux.microsoft.com>
-References: <20210712230530.29323-1-mcroce@linux.microsoft.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-l95ld3mPlgVO7/HvtvnM"
-User-Agent: Evolution 3.30.5-1.2 
+CC:     "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
+        "linux-fs@vger.kernel.org" <linux-fs@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Subject: RE: [Patch v4 0/3] Introduce a driver to support host accelerated
+ access to Microsoft Azure Blob
+Thread-Topic: [Patch v4 0/3] Introduce a driver to support host accelerated
+ access to Microsoft Azure Blob
+Thread-Index: AQHXfRe50VdmS4suz0yD44Lpyf2vv6tLR9UAgAAXUgCAAA60sIAAjBwAgAAjOeA=
+Date:   Tue, 20 Jul 2021 17:33:47 +0000
+Message-ID: <BY5PR21MB1506822C71ED70366E1B1BCBCEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
+References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
+ <82e8bec6-4f6f-08d7-90db-9661f675749d@acm.org>
+ <YPZmtOmpK6+znL0I@infradead.org>
+ <DM6PR21MB15138B5D5C8647C92EA6AB99CEE29@DM6PR21MB1513.namprd21.prod.outlook.com>
+ <115d864c-46c2-2bc8-c392-fd63d34c9ed0@acm.org>
+In-Reply-To: <115d864c-46c2-2bc8-c392-fd63d34c9ed0@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=5857ec5a-5bbb-482a-9e30-e7c3a1368213;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2021-07-20T17:21:33Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 105fd2fe-3db7-4074-126c-08d94ba48805
+x-ms-traffictypediagnostic: BYAPR21MB1733:
+x-microsoft-antispam-prvs: <BYAPR21MB1733E58F5F4FE17071DB7EEDCEE29@BYAPR21MB1733.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: iapDf3pk9hxpg8MEmq+DW0Q1lwWB8dubbftXX7kvO+JBUUAcQphGHiw0ligZWw5d0RI11LlXx17qWSjXJBfu1LulDioJ5GfzDhM6MjFE3WxNtCxuCIp7Z8oz5jR0uXrloH+PNkV2pbXPcPRs06x9Mem8yhGHUD2pNRmmMkEFJEAlQ78UWMQQrSFhGtrOzODw5J3uPFszQh3EfitQ03UD+A0/tRsRjQUdmfauEBxpXaXfatQBq8vHgP65KVcFihooU2y4PgfMLwI8h3uG4o8VDeQff42BLDlhI4u3VNCg3FwZwW2ag4kuxHNCFPhI+gwSam65xjztXG8D7mKQHc2dkDcH816nsOqM18KRL5Nv5JBORczOIU/m0ErlNkyW9vsajWzbgZTP7bTL+p8iJOI3FZiyW1WYeABrr4q+dsUvDcLEWSVc6MN3eigYbs5CSIfz9wWH9vB5ZHccWxEmaKtRnNGoWCVjm57UNDg/eCiNeXmIpxx0aHFVOWK349UQMw5wWFQO2/CKvdc97Ml4Nocc4ym8a3nqrRteR+g3OCSfcZR+R0lWHwO4PobV1IFcGr+MThMx+TcP5XTIQZk+lIWWAImeqoOQb08YAdfSKWYWLbDifBI9VSj5RvdKDjFhFb8RwUsIxzAExrLrx4pUlIardMjrqHu0XnN1xfFALnk4AUFrVSKgdCRoO3XYJFanZOL6NoM3K2V+L6hlVHdZwmeFzQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1506.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(47530400004)(8936002)(110136005)(2906002)(316002)(71200400001)(26005)(5660300002)(9686003)(186003)(55016002)(82960400001)(33656002)(66946007)(4326008)(54906003)(66556008)(8990500004)(7696005)(8676002)(53546011)(508600001)(6506007)(64756008)(66446008)(76116006)(66476007)(86362001)(83380400001)(122000001)(38100700002)(10290500003)(52536014)(82950400001)(38070700004);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bzVBaTBTMnNMTU9qRVVjQlhrMzBySUdoWTQyZTVmbVBBWExUbEk4TVhSRUtK?=
+ =?utf-8?B?c2t5T1FWL3I0NlY2MmxpOWNSSGgzSmUxbHZ1N0ZPNExWeEFvT0w0L2FKeUxv?=
+ =?utf-8?B?VnIvR01QamtPdkJzQUJVaXNZdWZLb2dGSmFsYk9CbFppcVJtaEhhaUxSUld4?=
+ =?utf-8?B?WjFpNTV4RHJuYzFTMzZhV1NpUWNKeklxMHIveTY5ckFhYm1IbDJobE5qdjZR?=
+ =?utf-8?B?NHg5aGZDZnJKdGlyanVTSzMrajhaZWlWQVYzNll3T0pmeTRnYWhSY3hMb0JP?=
+ =?utf-8?B?alowRWp4d0pZUEpWQzJNYUpiZG5uMmltOFF2Rk14ZVdHSHZZbGJocVJYY0tQ?=
+ =?utf-8?B?VHRCV0oxSWpkcTJrdmZZbXQzWnBUYUcxeWlpSkgrekVWeGNSQmQ1aXNZZ1lV?=
+ =?utf-8?B?L0I5UWtLblpBWmJNN1pUUXJvVmVWSGdkL01IZFRpZXZUQjFWQlBOanplM2Yv?=
+ =?utf-8?B?QzBLOEo5dDhod3V2VEhKekdQc1ZyK0M0Y0o5aGNzald6aWpVTVNhMklZU0tP?=
+ =?utf-8?B?Vm5QOVZ6eERMS09BOWZlU3lBOFNPU1lhWVZ2ZTE5alM4T04vVmtKRWFkMUI4?=
+ =?utf-8?B?eHBBUkZFVm5PaHpQRG0yT3hlcWJwU0F3T2NKVW13cVkxYmNjUE94UEU3V0lL?=
+ =?utf-8?B?eW9YUGFENjVwdmNvVDBadzdUUlBZSkZ0cGxGdlRjSFcya0Z4T1pncE9SODBk?=
+ =?utf-8?B?ZFZyOWtmTWtuQ25WdFp1WmdJaXZOV21zL1FvWHZXcFdqVzY2aVJSeTlHRmJv?=
+ =?utf-8?B?VHp5UXU5WXFEeE42d1cwNUwweEtRZTNuMjBuQktCZVhYTXVnVGR3cGo5Tzgy?=
+ =?utf-8?B?cXQyd3BnamxZWEtJTHJUT0xOWE96RHNwNmJiOXpOVjh3QnVEWlhKVmVidEpC?=
+ =?utf-8?B?VW4zdWY5NFlaSjBOeDNUTG1mWlFiVmtaRmpKTnROS0xtSlVxZHNFYnFCQmZ5?=
+ =?utf-8?B?aU5oSHhDcEhxWitNUnpyczh1MloyOGlyS29DWldqdnJWQWJrT1JGY1hjUDY3?=
+ =?utf-8?B?VGpoMUVBVmpvT21ET3NFL2VlRUdocWZKeGdYWVV0MjAyNjhaQmVSTHpyWmhG?=
+ =?utf-8?B?K3Iwb1Vqc3QwWWJXU0I4eUNJdDlKVG15bGU3L3d0NVhxMDJBcTVNbnhmeHN1?=
+ =?utf-8?B?Rnc1cXY1eWFWQzlrQmc5THN4c2s0ek0yNTQrUkszUXZGcVZnaWh5T0w2bTVV?=
+ =?utf-8?B?bXMxd0t3UTlJTlhUL3Y1cEtuYnZndWlCeHB4c2RSNXdvUkd1Tm0zdjEwaVQ0?=
+ =?utf-8?B?c1hicmNzMGtEMnl0QXAzS0VvZHU3MkxhNDNHNWV4c012TTVRM3ZISVpLbEcz?=
+ =?utf-8?B?bmlUM2R6dEl2dksySmRBLzdKbWROcll4TWNsdDErUHFZaWQxQWZkTkM0dVhD?=
+ =?utf-8?B?RG5ELzlFMXpUS29ZUitxYU5OQUJQdG1uRDdtY1pSOEQrL05EVmU0NDdGbHhV?=
+ =?utf-8?B?U3V6ZThsSll2SVpwMFFDZm43RjkzWG9QVXFZSlBJQzFLYmQ4amlPNmVGT2FX?=
+ =?utf-8?B?TjNnUnU5SGoxMGRRcC92YUVUQ1BERjFZMnpGVzZsRS90L25BdThRVTNaYm1S?=
+ =?utf-8?B?WXdhSGdFUVFoWHl2MW13dGpGSDU1WGhIbGFIWXl0d2JYNmJKdm5zd3lsZmF3?=
+ =?utf-8?B?Z0xtWU5kNEJrc01ndjcxbjQ5eWdjeksyYy82bWJrek9DYnBDNGdodTlRYjRY?=
+ =?utf-8?B?emtpSUMwYkZGQ0Y1dXZXSVJBN1VMMkppU0ZwUlVJc3Fzb3ZZT0tzcWFmeEJ1?=
+ =?utf-8?Q?Gf4Q5Kkun3nDaaPeJ8=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1506.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 105fd2fe-3db7-4074-126c-08d94ba48805
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2021 17:33:47.7553
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3Tqm26oFOxnQ0NE5FLqyPvWPpuhrPZQeXWAFI+nj1FdiD8VGYb2U3tQrfW1luzAtCZHN9NYo5XaGCkTKhkhjwg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR21MB1733
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---=-l95ld3mPlgVO7/HvtvnM
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 2021-07-13 at 01:05 +0200, Matteo Croce wrote:
-> From: Matteo Croce <mcroce@microsoft.com>
->=20
-> Associating uevents with block devices in userspace is difficult and racy=
-:
-> the uevent netlink socket is lossy, and on slow and overloaded systems ha=
-s
-> a very high latency. Block devices do not have exclusive owners in
-> userspace, any process can set one up (e.g. loop devices). Moreover, devi=
-ce
-> names can be reused (e.g. loop0 can be reused again and again). A userspa=
-ce
-> process setting up a block device and watching for its events cannot thus
-> reliably tell whether an event relates to the device it just set up or
-> another earlier instance with the same name.
->=20
-> Being able to set a UUID on a loop device would solve the race conditions=
-.
-> But it does not allow to derive orderings from uevents: if you see a ueve=
-nt
-> with a UUID that does not match the device you are waiting for, you canno=
-t
-> tell whether it's because the right uevent has not arrived yet, or it was
-> already sent and you missed it. So you cannot tell whether you should wai=
-t
-> for it or not.
->=20
-> Being able to set devices up in a namespace would solve the race conditio=
-ns
-> too, but it can work only if being namespaced is feasible in the first
-> place. Many userspace processes need to set devices up for the root
-> namespace, so this solution cannot always work.
->=20
-> Changing the loop devices naming implementation to always use
-> monotonically increasing device numbers, instead of reusing the lowest
-> free number, would also solve the problem, but it would be very disruptiv=
-e
-> to userspace and likely break many existing use cases. It would also be
-> quite awkward to use on long-running machines, as the loop device name
-> would quickly grow to many-digits length.
->=20
-> Furthermore, this problem does not affect only loop devices - partition
-> probing is asynchronous and very slow on busy systems. It is very easy to
-> enter races when using LO_FLAGS_PARTSCAN and watching for the partitions =
-to
-> show up, as it can take a long time for the uevents to be delivered after
-> setting them up.
->=20
-> Associating a unique, monotonically increasing sequential number to the
-> lifetime of each block device, which can be retrieved with an ioctl
-> immediately upon setting it up, allows to solve the race conditions with
-> uevents, and also allows userspace processes to know whether they should
-> wait for the uevent they need or if it was dropped and thus they should
-> move on.
->=20
-> This does not benefit only loop devices and block devices with multiple
-> partitions, but for example also removable media such as USB sticks or
-> cdroms/dvdroms/etc.
->=20
-> The first patch is the core one, the 2..4 expose the information in
-> different ways, and the last one makes the loop device generate a media
-> changed event upon attach, detach or reconfigure, so the sequence number
-> is increased.
->=20
-> If merged, this feature will immediately used by the userspace:
-> https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
->=20
-> v4 -> v5:
-> - introduce a helper to raise media changed events
-> - use the new helper in loop instead of the full event code
-> - unexport inc_diskseq() which is only used by the block code now
-> - rebase on top of 5.14-rc1
->=20
-> v3 -> v4:
-> - rebased on top of 5.13
-> - hook the seqnum increase into the media change event
-> - make the loop device raise media change events
-> - merge 1/6 and 5/6
-> - move the uevent part of 1/6 into a separate one
-> - drop the now unneeded sysfs refactor
-> - change 'diskseq' to a global static variable
-> - add more comments
-> - refactor commit messages
->=20
-> v2 -> v3:
-> - rebased on top of 5.13-rc7
-> - resend because it appeared archived on patchwork
->=20
-> v1 -> v2:
-> - increase seqnum on media change
-> - increase on loop detach
->=20
-> Matteo Croce (6):
->   block: add disk sequence number
->   block: export the diskseq in uevents
->   block: add ioctl to read the disk sequence number
->   block: export diskseq in sysfs
->   block: add a helper to raise a media changed event
->   loop: raise media_change event
->=20
->  Documentation/ABI/testing/sysfs-block | 12 ++++++
->  block/disk-events.c                   | 62 +++++++++++++++++++++------
->  block/genhd.c                         | 43 +++++++++++++++++++
->  block/ioctl.c                         |  2 +
->  drivers/block/loop.c                  |  5 +++
->  include/linux/genhd.h                 |  3 ++
->  include/uapi/linux/fs.h               |  1 +
->  7 files changed, 114 insertions(+), 14 deletions(-)
-
-For the series:
-
-Tested-by: Luca Boccassi <bluca@debian.org>
-
-I have implemented the basic systemd support for this (ioctl + uevent,
-sysfs will be done later), and tested with this series on x86_64 and
-Debian 11 userspace, everything seems to work great. Thanks Matteo!
-
-Here's the implementation, in draft state until the kernel side is
-merged:
-
-https://github.com/systemd/systemd/pull/20257
-
---=20
-Kind regards,
-Luca Boccassi
-
---=-l95ld3mPlgVO7/HvtvnM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCSqx93EIPGOymuRKGv37813JB4FAmD3B3cACgkQKGv37813
-JB5IIw//fwCAii36DiHJM7gFX5uokIF0r76YmrdkwIEVLWoKf2WoipYmVctA/NcF
-Q6lyI/jrGr+0QqdmJJWvyzZRLFUid63eITUEmKPTlk5g9FPXH+kmmPqS4ROMkrBO
-AzG+znOh4HuOGo/HTp3J8AKzFLE5xi0+99Rzu3KKeCMAeJ6DWjLHYek+9KkgzSCl
-kawr2hOlCcCUDbtcOVT792DUNLtrSx66SFbwe65PA7D7TipxXDieCyIVpFHZ/j3N
-OHEthOHzijQVUOFnyZ/6HEYmYzr/D+wPd0bJW9d0+c4kdqU3eTEMXbZazDMGZdit
-XP7PfPWirYFHXPxjzBhn7DsrgIxvOHLU/JDGZsCsgTqOCNpcypV8Q+B62hR6btzt
-TBwQK5QpEE05XVwj6E6szfyczo95t8U1mde3RGmXQ9ES1MAPtsx1GzrT969vXHaA
-YIt4VtUxLiv/tiNIhDt7IwnyHuv68upoRS0Ok5BJTRjZqxCekpOeEBHLghTxlNX+
-Lii0YJOTD6ns4e2WYerlYm/Ij5Bs+eRY3Pkx3U+akEdAuyfpR8HzaWcJnVMVyoVQ
-MF/Cmc2XAOO6sdgtfxh65op3y/y7o5A0AMnRFmWNtzlqyzsQLJpLceYrI6YAxmbK
-GAc0WGsulvjb4PXBiR0v7Z5npikfgF5amkVW97S77qTRebbnmQ4=
-=nAxS
------END PGP SIGNATURE-----
-
---=-l95ld3mPlgVO7/HvtvnM--
+PiBTdWJqZWN0OiBSZTogW1BhdGNoIHY0IDAvM10gSW50cm9kdWNlIGEgZHJpdmVyIHRvIHN1cHBv
+cnQgaG9zdCBhY2NlbGVyYXRlZA0KPiBhY2Nlc3MgdG8gTWljcm9zb2Z0IEF6dXJlIEJsb2INCj4g
+DQo+IE9uIDcvMjAvMjEgMTI6MDUgQU0sIExvbmcgTGkgd3JvdGU6DQo+ID4+IFN1YmplY3Q6IFJl
+OiBbUGF0Y2ggdjQgMC8zXSBJbnRyb2R1Y2UgYSBkcml2ZXIgdG8gc3VwcG9ydCBob3N0DQo+ID4+
+IGFjY2VsZXJhdGVkIGFjY2VzcyB0byBNaWNyb3NvZnQgQXp1cmUgQmxvYg0KPiA+Pg0KPiA+PiBP
+biBNb24sIEp1bCAxOSwgMjAyMSBhdCAwOTozNzo1NlBNIC0wNzAwLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4+PiBzdWNoIHRoYXQgdGhpcyBvYmplY3Qgc3RvcmFnZSBkcml2ZXIgY2FuIGJl
+IGltcGxlbWVudGVkIGFzIGENCj4gPj4+IHVzZXItc3BhY2UgbGlicmFyeSBpbnN0ZWFkIG9mIGFz
+IGEga2VybmVsIGRyaXZlcj8gQXMgeW91IG1heSBrbm93DQo+ID4+PiB2ZmlvIHVzZXJzIGNhbiBl
+aXRoZXIgdXNlIGV2ZW50ZmRzIGZvciBjb21wbGV0aW9uIG5vdGlmaWNhdGlvbnMgb3IgcG9sbGlu
+Zy4NCj4gPj4+IEFuIGludGVyZmFjZSBsaWtlIGlvX3VyaW5nIGNhbiBiZSBidWlsdCBlYXNpbHkg
+b24gdG9wIG9mIHZmaW8uDQo+ID4+DQo+ID4+IFllcy4gIFNpbWlsYXIgdG8gc2F5IHRoZSBOVk1l
+IEsvViBjb21tYW5kIHNldCB0aGlzIGRvZXMgbm90IGxvb2sgbGlrZQ0KPiA+PiBhIGNhbmRpZGF0
+ZSBmb3IgYSBrZXJuZWwgZHJpdmVyLg0KPiA+DQo+ID4gVGhlIGRyaXZlciBpcyBtb2RlbGVkIHRv
+IHN1cHBvcnQgbXVsdGlwbGUgcHJvY2Vzc2VzL3VzZXJzIG92ZXIgYSBWTUJVUw0KPiA+IGNoYW5u
+ZWwuIEkgZG9uJ3Qgc2VlIGEgd2F5IHRoYXQgdGhpcyBjYW4gYmUgaW1wbGVtZW50ZWQgdGhyb3Vn
+aCBWRklPPw0KPiA+DQo+ID4gRXZlbiBpZiBpdCBjYW4gYmUgZG9uZSwgdGhpcyBleHBvc2VzIGEg
+c2VjdXJpdHkgcmlzayBhcyB0aGUgc2FtZSBWTUJVUw0KPiA+IGNoYW5uZWwgaXMgc2hhcmVkIGJ5
+IG11bHRpcGxlIHByb2Nlc3NlcyBpbiB1c2VyLW1vZGUuDQo+IA0KPiBTaGFyaW5nIGEgVk1CVVMg
+Y2hhbm5lbCBhbW9uZyBwcm9jZXNzZXMgaXMgbm90IG5lY2Vzc2FyeS4gSSBwcm9wb3NlIHRvDQo+
+IGFzc2lnbiBvbmUgVk1CVVMgY2hhbm5lbCB0byBlYWNoIHByb2Nlc3MgYW5kIHRvIG11bHRpcGxl
+eCBJL08gc3VibWl0dGVkIHRvDQo+IGNoYW5uZWxzIGFzc29jaWF0ZWQgd2l0aCB0aGUgc2FtZSBi
+bG9iIHN0b3JhZ2Ugb2JqZWN0IGluc2lkZSBlLmcuIHRoZQ0KPiBoeXBlcnZpc29yLiBUaGlzIGlz
+IG5vdCBhIG5ldyBpZGVhLiBJbiB0aGUgTlZNZSBzcGVjaWZpY2F0aW9uIHRoZXJlIGlzIGENCj4g
+ZGlhZ3JhbSB0aGF0IHNob3dzIHRoYXQgbXVsdGlwbGUgTlZNZSBjb250cm9sbGVycyBjYW4gcHJv
+dmlkZSBhY2Nlc3MgdG8gdGhlDQo+IHNhbWUgTlZNZSBuYW1lc3BhY2UuIFNlZSBhbHNvIGRpYWdy
+YW0gIkZpZ3VyZSA0MTY6IE5WTSBTdWJzeXN0ZW0gd2l0aA0KPiBUaHJlZSBJL08gQ29udHJvbGxl
+cnMiIGluIHZlcnNpb24gMS40IG9mIHRoZSBOVk1lIHNwZWNpZmljYXRpb24uDQo+IA0KPiBCYXJ0
+Lg0KDQpDdXJyZW50bHksIHRoZSBIeXBlci1WIGlzIG5vdCBkZXNpZ25lZCB0byBoYXZlIG9uZSBW
+TUJVUyBjaGFubmVsIGZvciBlYWNoIHByb2Nlc3MuDQpJbiBIeXBlci1WLCBhIGNoYW5uZWwgaXMg
+b2ZmZXJlZCBmcm9tIHRoZSBob3N0IHRvIHRoZSBndWVzdCBWTS4gVGhlIGhvc3QgZG9lc24ndA0K
+a25vdyBpbiBhZHZhbmNlIGhvdyBtYW55IHByb2Nlc3NlcyBhcmUgZ29pbmcgdG8gdXNlIHRoaXMg
+c2VydmljZSBzbyBpdCBjYW4ndA0Kb2ZmZXIgdGhvc2UgY2hhbm5lbHMgaW4gYWR2YW5jZS4gVGhl
+cmUgaXMgbm8gbWVjaGFuaXNtIHRvIG9mZmVyIGR5bmFtaWMNCnBlci1wcm9jZXNzIGFsbG9jYXRl
+ZCBjaGFubmVscyBiYXNlZCBvbiBndWVzdCBuZWVkcy4gU29tZSBkZXZpY2VzIChlLmcuDQpuZXR3
+b3JrIGFuZCBzdG9yYWdlKSB1c2UgbXVsdGlwbGUgY2hhbm5lbHMgZm9yIHNjYWxhYmlsaXR5IGJ1
+dCB0aGV5IGFyZSBub3QNCmZvciBzZXJ2aW5nIGluZGl2aWR1YWwgcHJvY2Vzc2VzLg0KDQpBc3Np
+Z25pbmcgb25lIFZNQlVTIGNoYW5uZWwgcGVyIHByb2Nlc3MgbmVlZHMgc2lnbmlmaWNhbnQgY2hh
+bmdlIG9uIHRoZSBIeXBlci1WIHNpZGUuDQoNCkxvbmcNCg==
