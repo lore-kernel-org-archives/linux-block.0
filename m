@@ -2,98 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD5BC07E9B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F00BC07E9B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:12:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85D2E6101B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:02:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7909F610F7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:12:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232415AbhGTXWC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 19:22:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57220 "EHLO mail.kernel.org"
+        id S230340AbhGTXbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 19:31:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34660 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232511AbhGTXVr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 19:21:47 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9370061019;
-        Wed, 21 Jul 2021 00:02:24 +0000 (UTC)
+        id S231765AbhGTXbn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jul 2021 19:31:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 97BA36101B;
+        Wed, 21 Jul 2021 00:12:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626825744;
-        bh=92Gjrop0XLyAuerlYU5OBiO3OpCjgEbq8pXa4g95YMg=;
+        s=k20201202; t=1626826339;
+        bh=E65jLqKjRMg5Qkn2BhBuKgQbm8+Mo4vJ7cckyConMrM=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HSEsFujMopdUvp/8h/Vc0fIoUMksjU9jfdH9FvJoEO7G/eylKh7A35iPv8fZOQq0p
-         +7MVyZZ72wnBFkYD9qVLyS+7p2f/3yRzQkG+Kh9R+45N+Rcllur2A9iHsvFVLQJ18r
-         rSFuT5t3tYnmCZubOLS0HgLwJd/+77CNDCS2OYMFcSlhOYaUL288u3RwfRfZmuvv5I
-         AXyjMxXp8RvrV9Xa02Oz42YzOWMrHxUpoeWKBeHawB6v70VDFGqoq9QXS/5GeBQ4z6
-         as5XpKOVLB7hyc9wUeduPF7u/OoY2LE9Vm6tX363ql0sy1Nm2f/0775xk71coepC1F
-         Xh7d+IHGYJzXA==
-Date:   Tue, 20 Jul 2021 17:02:24 -0700
+        b=aBguU6Ty/PN6IkRXHSBTi4XYh+X8QVVMD+fjGhgtbhCI5v/+LFaBwUNLGJmABMBlx
+         dAjP9CclOrrJWP/+ZcleVIZUrHBzPys/XfvbFOYXx6hx90c8QXDuzfM4/+lYuqv+01
+         lIzktlI9vcvimUPaU3FMizlT60kkagDCIU6xy3Zu5aDXEK3OBIoyPYrBPsv8FH3QMV
+         gPCJFhbE58hWo4Hv9QDicgoFudVJ1NHgx0QpxZp6/BXPGSSB4/pe5YnZOh8dzv5zHk
+         U9Zu/m0DKjFbajve8zzo+w/hSEs8YOW0haTyzOaNykWNzGpWxkuSb0qZfrGqTympdt
+         vIaNLmBsJsr5Q==
+Date:   Tue, 20 Jul 2021 17:12:19 -0700
 From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH v15 17/17] iomap: Convert iomap_migrate_page to use folios
-Message-ID: <20210721000224.GQ22357@magnolia>
+Subject: Re: [PATCH v15 16/17] iomap: Convert iomap_add_to_ioend to take a
+ folio
+Message-ID: <20210721001219.GR22357@magnolia>
 References: <20210719184001.1750630-1-willy@infradead.org>
- <20210719184001.1750630-18-willy@infradead.org>
+ <20210719184001.1750630-17-willy@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210719184001.1750630-18-willy@infradead.org>
+In-Reply-To: <20210719184001.1750630-17-willy@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 07:40:01PM +0100, Matthew Wilcox (Oracle) wrote:
-> The arguments are still pages for now, but we can use folios internally
-> and cut out a lot of calls to compound_head().
+On Mon, Jul 19, 2021 at 07:40:00PM +0100, Matthew Wilcox (Oracle) wrote:
+> We still iterate one block at a time, but now we call compound_head()
+> less often.  Rename file_offset to pos to fit the rest of the file.
 > 
 > Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-Didn't I RVb this last time? ;)
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+Everything in this patch looks ok to me, though I gather there will be
+further changes to bio_add_folio, so I'll leave this off for now.
+
+I /am/ beginning to wonder, though -- seeing as Christoph and Matthew
+both have very large patchsets changing things in fs/iomap/, how would
+you like those landed?  Christoph's iterator refactoring looks like it
+could be ready to go for 5.15.  Matthew's folio series looks like a
+mostly straightforward conversion for iomap, except that it has 91
+patches as a hard dependency.
+
+Since most of the iomap changes for 5.15 aren't directly related to
+folios, I think I prefer iomap-for-next to be based directly off -rcX
+like usual, though I don't know where that leaves the iomap folio
+conversion.  I suppose one could add them to a branch that itself is a
+result of the folio and iomap branches, or leave them off for 5.16?
+
+Other ideas?
 
 --D
-
-> ---
->  fs/iomap/buffered-io.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 60d3b7af61d1..cf56b19fb101 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -492,19 +492,21 @@ int
->  iomap_migrate_page(struct address_space *mapping, struct page *newpage,
->  		struct page *page, enum migrate_mode mode)
->  {
-> +	struct folio *folio = page_folio(page);
-> +	struct folio *newfolio = page_folio(newpage);
->  	int ret;
->  
-> -	ret = migrate_page_move_mapping(mapping, newpage, page, 0);
-> +	ret = folio_migrate_mapping(mapping, newfolio, folio, 0);
->  	if (ret != MIGRATEPAGE_SUCCESS)
->  		return ret;
->  
-> -	if (page_has_private(page))
-> -		attach_page_private(newpage, detach_page_private(page));
-> +	if (folio_test_private(folio))
-> +		folio_attach_private(newfolio, folio_detach_private(folio));
->  
->  	if (mode != MIGRATE_SYNC_NO_COPY)
-> -		migrate_page_copy(newpage, page);
-> +		folio_migrate_copy(newfolio, folio);
->  	else
-> -		migrate_page_states(newpage, page);
-> +		folio_migrate_flags(newfolio, folio);
->  	return MIGRATEPAGE_SUCCESS;
->  }
->  EXPORT_SYMBOL_GPL(iomap_migrate_page);
-> -- 
-> 2.30.2
-> 
