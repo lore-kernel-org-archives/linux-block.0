@@ -2,204 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1180CC636C9
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 10:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 921AAC12002
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 10:01:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E75D461019
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 10:01:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74E2961221
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 10:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236558AbhGUJUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 05:20:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55890 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236867AbhGUJBH (ORCPT
+        id S236867AbhGUJU1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 05:20:27 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3442 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236327AbhGUJEw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 05:01:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626860503;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TDBluuFB4Emt7468WeyjkHVbK6/rC03Tb1lfcuLDBLU=;
-        b=eCHM8pI+OZtc84DvLBB6pAI6XoYrcV1M/F3HSRDFBSe2Od4loJDG/g8SmkoaxRyNXmeN1d
-        jXLQ+0ugy1HKVQ4GaNcoq+kPY1Q4LyBt6H+PEAqp4tg6w5RmnMD5SB5ag79bR1irXsLdJU
-        SBtwkAimQ/SUVcwB5QOltKQAvFtLhLU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-5kiFAxWbPDm2L0-Gll-sLw-1; Wed, 21 Jul 2021 05:41:40 -0400
-X-MC-Unique: 5kiFAxWbPDm2L0-Gll-sLw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DF4C8B94E3;
-        Wed, 21 Jul 2021 09:41:38 +0000 (UTC)
-Received: from localhost (ovpn-114-233.ams2.redhat.com [10.36.114.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1292160E1C;
-        Wed, 21 Jul 2021 09:41:30 +0000 (UTC)
-Date:   Wed, 21 Jul 2021 10:41:29 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        virtualization@lists.linux-foundation.org,
-        linux-pm@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC 0/3] cpuidle: add poll_source API and virtio vq polling
-Message-ID: <YPfryV7qZVRbjNgP@stefanha-x1.localdomain>
-References: <20210713161906.457857-1-stefanha@redhat.com>
- <1008dee4-fce1-2462-1520-f5432bc89a07@redhat.com>
+        Wed, 21 Jul 2021 05:04:52 -0400
+Received: from fraeml712-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GV9Kb61r5z6D8nk;
+        Wed, 21 Jul 2021 17:30:11 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml712-chm.china.huawei.com (10.206.15.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 21 Jul 2021 11:44:57 +0200
+Received: from [10.47.85.43] (10.47.85.43) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Wed, 21 Jul
+ 2021 10:44:56 +0100
+Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed
+ if any irq is managed
+To:     Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+CC:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        <linux-pci@vger.kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20210715120844.636968-1-ming.lei@redhat.com>
+ <20210715120844.636968-2-ming.lei@redhat.com>
+ <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com>
+ <20210719094414.GC431@lst.de> <87lf60cevz.ffs@nanos.tec.linutronix.de>
+ <20210721072445.GA11257@lst.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <fe34623e-1074-862d-e822-7359ae4def0f@huawei.com>
+Date:   Wed, 21 Jul 2021 10:44:53 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="U3hY+f6lEQj1AEW4"
-Content-Disposition: inline
-In-Reply-To: <1008dee4-fce1-2462-1520-f5432bc89a07@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210721072445.GA11257@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.85.43]
+X-ClientProxiedBy: lhreml734-chm.china.huawei.com (10.201.108.85) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
++ Marc
 
---U3hY+f6lEQj1AEW4
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 21/07/2021 08:24, Christoph Hellwig wrote:
+> On Wed, Jul 21, 2021 at 09:20:00AM +0200, Thomas Gleixner wrote:
+>>> Just walking the list seems fine to me given that this is not a
+>>> performance criticial path.  But what are the locking implications?
+>> At the moment there are none because the list is initialized in the
+>> setup path and never modified afterwards. Though that might change
+>> sooner than later to fix the virtio wreckage vs. MSI-X.
+> What is the issue there?  Either way, if we keep the helper in the
+> IRQ code it should be easy to spot for anyone adding the locking.
+> 
+>>> Also does the above imply this won't work for your platform MSI case?
+>> The msi descriptors are attached to struct device and independent of
+>> platform/PCI/whatever.
+> That's what I assumed, but this text from John suggested there is
+> something odd about the platform case:
+> 
+> "Did you consider that for PCI .."
+> .
 
-On Wed, Jul 21, 2021 at 11:29:55AM +0800, Jason Wang wrote:
->=20
-> =E5=9C=A8 2021/7/14 =E4=B8=8A=E5=8D=8812:19, Stefan Hajnoczi =E5=86=99=E9=
-=81=93:
-> > These patches are not polished yet but I would like request feedback on=
- this
-> > approach and share performance results with you.
-> >=20
-> > Idle CPUs tentatively enter a busy wait loop before halting when the cp=
-uidle
-> > haltpoll driver is enabled inside a virtual machine. This reduces wakeup
-> > latency for events that occur soon after the vCPU becomes idle.
-> >=20
-> > This patch series extends the cpuidle busy wait loop with the new poll_=
-source
-> > API so drivers can participate in polling. Such polling-aware drivers d=
-isable
-> > their device's irq during the busy wait loop to avoid the cost of inter=
-rupts.
-> > This reduces latency further than regular cpuidle haltpoll, which still=
- relies
-> > on irqs.
-> >=20
-> > Virtio drivers are modified to use the poll_source API so all virtio de=
-vice
-> > types get this feature. The following virtio-blk fio benchmark results =
-show the
-> > improvement:
-> >=20
-> >               IOPS (numjobs=3D4, iodepth=3D1, 4 virtqueues)
-> >                 before   poll_source      io_poll
-> > 4k randread    167102  186049 (+11%)  186654 (+11%)
-> > 4k randwrite   162204  181214 (+11%)  181850 (+12%)
-> > 4k randrw      159520  177071 (+11%)  177928 (+11%)
-> >=20
-> > The comparison against io_poll shows that cpuidle poll_source achieves
-> > equivalent performance to the block layer's io_poll feature (which I
-> > implemented in a separate patch series [1]).
-> >=20
-> > The advantage of poll_source is that applications do not need to explic=
-itly set
-> > the RWF_HIPRI I/O request flag. The poll_source approach is attractive =
-because
-> > few applications actually use RWF_HIPRI and it takes advantage of CPU c=
-ycles we
-> > would have spent in cpuidle haltpoll anyway.
-> >=20
-> > The current series does not improve virtio-net. I haven't investigated =
-deeply,
-> > but it is possible that NAPI and poll_source do not combine. See the fi=
-nal
-> > patch for a starting point on making the two work together.
-> >=20
-> > I have not tried this on bare metal but it might help there too. The co=
-st of
-> > disabling a device's irq must be less than the savings from avoiding irq
-> > handling for this optimization to make sense.
-> >=20
-> > [1] https://lore.kernel.org/linux-block/20210520141305.355961-1-stefanh=
-a@redhat.com/
->=20
->=20
-> Hi Stefan:
->=20
-> Some questions:
->=20
-> 1) What's the advantages of introducing polling at virtio level instead of
-> doing it at each subsystems? Polling in virtio level may only work well if
-> all (or most) of the devices are virtio
+For this special platform MSI case there is a secondary interrupt 
+controller (called mbigen) which generates the MSI on behalf of the 
+device, which I think the MSI belongs to (and not the device, itself).
 
-I'm not sure I understand the question. cpuidle haltpoll benefits all
-devices today, except it incurs interrupt latency. The poll_source API
-eliminates the interrupt latency for drivers that can disable device
-interrupts cheaply.
+See "latter case" mentioned in commit 91f90daa4fb2.
 
-This patch adds poll_source to core virtio code so that all virtio
-drivers get this feature for free. No driver-specific changes are
-needed.
+I think Marc and Thomas can explain this much better than I could.
 
-If you mean networking, block layer, etc by "subsystems" then there's
-nothing those subsystems can do to help. Whether poll_source can be used
-depends on the specific driver, not the subsystem. If you consider
-drivers/virtio/ a subsystem, then that's exactly what the patch series
-is doing.
+Anyway, as I mentioned earlier, I think that this specific problem is 
+unique and can be solved without using a function which examines the 
+struct device.msi_list .
 
-> 2) What's the advantages of using cpuidle instead of using a thread (and
-> leverage the scheduler)?
-
-In order to combine with the existing cpuidle infrastructure. No new
-polling loop is introduced and no additional CPU cycles are spent on
-polling.
-
-If cpuidle itself is converted to threads then poll_source would
-automatically operate in a thread too, but this patch series doesn't
-change how the core cpuidle code works.
-
-> 3) Any reason it's virtio_pci specific not a general virtio one?
-
-Good idea, it is possible to move the virtio_pci changes into virtio.c.
-
-Other transports can't use this feature yet though. Only virtio_pci
-supports vq irq affinity. But the code can be generic and if other
-transports ever support vq irq affinity they'll get it for free.
-
-> (Btw, do we need to cc scheduler guys?)
-
-I'm not sure. This patch series doesn't change how cpuidle interacts
-with the scheduler. The cpuidle maintainers can pull in more people, if
-necessary.
-
-Stefan
-
---U3hY+f6lEQj1AEW4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmD368kACgkQnKSrs4Gr
-c8i8JAf9HH8W0fz2vJuNPKVE0C0NjgfddSwNS/qOC8QlvWYGeNomDImzTeWf04Dg
-F4QU7Mx2cI2kUyxo8bRCPwLp6bsRw6PZyztQSN/GAJw3Y6sGdLhgizW4GKjGwHWs
-0a5UDJ7JQUlg/4d9NNEAf6MhN3jZnvJBUpYXzsbIgEPRkiaJzZG1TpEZa3yxd8qc
-4AWL97LrIbUPV20oZULnlYtaQbEICaG/VO+ORH/3vjioqAXTr7uALXq7w66hMG6I
-gtgH5iq3V/10HSTzAhIiQHizUMQ1b2pdX9Vz4x/+KTcYsgsud2V+TCAJeBKo32bO
-JVo0XAVh6Cl0oUt4xdworkCl46gbrg==
-=U9/g
------END PGP SIGNATURE-----
-
---U3hY+f6lEQj1AEW4--
-
+Thanks,
+John
