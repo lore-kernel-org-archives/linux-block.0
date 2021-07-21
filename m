@@ -7,105 +7,87 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3EB2C07E9B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E4AC07E9B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DEED611C1
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:00:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3426860FED
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:04:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232506AbhGUETt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 00:19:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39742 "EHLO
+        id S232587AbhGUEXj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 00:23:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232359AbhGUETi (ORCPT
+        with ESMTP id S232321AbhGUEX2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 00:19:38 -0400
+        Wed, 21 Jul 2021 00:23:28 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B714EC061574;
-        Tue, 20 Jul 2021 22:00:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32BF2C061574;
+        Tue, 20 Jul 2021 22:04:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IctsTVrtwipEv00mkrFyUnMJXKowudn2hKnX1KBUBjo=; b=IXImCDQ2qlkdgYwRnUusz3CUhb
-        x3Uir6PJDYrIuiJWCCbQXFXPwpEh8Ygz9na3CmtqFlPzGL7QyppNWm2BPlCToQ+A8xvJAk9vE5uh5
-        SmXfvm9o7alqEz7CzZ9hE+WCFs8/IRthEYy0GhaTwoi2aByAbp4fIOzC1OtpxtElaeI182YIe5yyr
-        2otH1MtdwlbtYQ3ZpnEB691t+X9zOoV3WzOESfm2kC81aZxjog/LnuaMAZ75Bhf+6xdE1dox/IBgG
-        X23ZNHb9LrkQ+bWZ9FMOdPlIpuAefmEUeqKDp4krHV4W4ZEpvuJy2WUsRNRemRf6CGm7/0nHH6VRD
-        KxmAJmOw==;
+        bh=D20QS6MxrqZjpfJr3udotoWchnhZQTjbmypQCoId5Uw=; b=dlPo+cYBzFsFFxIcS4cYqT1y4v
+        5Og9QnPdR7+tgNY/mC4DDWWwn9IG6Y1NxBmegim+rvlhrYTIO4sYBBTzCbgKQiyUExae41YdthWOB
+        +iHlTPjl2Yy3lzJAT0lCtOu1qpNEg16QRSjSjY3YH+GP7i3Mm7cfgujPX0kGu7li12Q0DCLsBcAEP
+        TD2DV6pCn3bPuvPvCmnlEz816HpGzL1dZeBTuDMPz5LlqdpTfhcmgrwpWHbPA3glsfRek93dlTGpd
+        KJHjPzOvYVx96bDHgqkpcl3KG5OU2lopmvHN0bke/Z8M1V/Ash+m7zLezzViDDeoE9o1tXCTfwmri
+        KHGshupw==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m64KU-008o8T-0m; Wed, 21 Jul 2021 04:59:39 +0000
-Date:   Wed, 21 Jul 2021 05:59:34 +0100
+        id 1m64OY-008oIM-3C; Wed, 21 Jul 2021 05:03:47 +0000
+Date:   Wed, 21 Jul 2021 06:03:46 +0100
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Luis Chamberlain <mcgrof@kernel.org>
 Cc:     axboe@kernel.dk, hare@suse.de, bvanassche@acm.org,
         ming.lei@redhat.com, hch@infradead.org, jack@suse.cz,
         osandov@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/5] block: add flag for add_disk() completion notation
-Message-ID: <YPeptlG19sdu18jD@infradead.org>
+        linux-kernel@vger.kernel.org,
+        "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        Song Liu <songliubraving@fb.com>, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 2/5] md: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED on
+ is_mddev_broken()
+Message-ID: <YPeqspNQrE7PvbXR@infradead.org>
 References: <20210720182048.1906526-1-mcgrof@kernel.org>
- <20210720182048.1906526-2-mcgrof@kernel.org>
+ <20210720182048.1906526-3-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210720182048.1906526-2-mcgrof@kernel.org>
+In-Reply-To: <20210720182048.1906526-3-mcgrof@kernel.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 20, 2021 at 11:20:44AM -0700, Luis Chamberlain wrote:
-> Often drivers may have complex setups where it is not
-> clear if their disk completed their respective *add_disk*()
-> call. They either have to invent a setting or, they
-> incorrectly use GENHD_FL_UP. Using GENHD_FL_UP however is
-> used internally so we know when we can add / remove
-> partitions safely. We can easily fail along the way
-> prior to add_disk() completing and still have
-> GENHD_FL_UP set, so it would not be correct in that case
-> to call del_gendisk() on the disk.
-> 
-> Provide a new flag then which allows us to check if
-> *add_disk*() completed, and conversely just make
-> del_gendisk() check for this for drivers so that
-> they can safely call del_gendisk() and we'll figure
-> it out if it is safe for you to call this.
+On Tue, Jul 20, 2021 at 11:20:45AM -0700, Luis Chamberlain wrote:
+> The GENHD_FL_DISK_ADDED flag is what we really want, as the
+> flag GENHD_FL_UP could be set on a semi-initialized device.
 > 
 > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+
+Based on the commit log for the patch adding this check I think this
+is wrong  It actually wants to detected underlying devices for which
+del_gendisk has been called.
+
 > ---
->  block/genhd.c         |  8 ++++++++
->  include/linux/genhd.h | 11 ++++++++++-
->  2 files changed, 18 insertions(+), 1 deletion(-)
+>  drivers/md/md.h | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index af4d2ab4a633..a858eed05e55 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -539,6 +539,8 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+> diff --git a/drivers/md/md.h b/drivers/md/md.h
+> index 832547cf038f..cf70e0cfa856 100644
+> --- a/drivers/md/md.h
+> +++ b/drivers/md/md.h
+> @@ -764,9 +764,7 @@ struct md_rdev *md_find_rdev_rcu(struct mddev *mddev, dev_t dev);
 >  
->  	disk_add_events(disk);
->  	blk_integrity_add(disk);
-> +
-> +	disk->flags |= GENHD_FL_DISK_ADDED;
-
-I guess I failed to mention it last time - but I think this needs
-to go into disk->state as dynamic state.
-
-> + * Drivers can safely call this even if they are not sure if the respective
-> + * __device_add_disk() call succeeded.
-> + *
->   * Drivers exist which depend on the release of the gendisk to be synchronous,
->   * it should not be deferred.
->   *
-> @@ -578,6 +583,9 @@ void del_gendisk(struct gendisk *disk)
+>  static inline bool is_mddev_broken(struct md_rdev *rdev, const char *md_type)
 >  {
->  	might_sleep();
->  
-> +	if (!blk_disk_added(disk))
-> +		return;
-
-I still very much disagree with this check.  It just leads to really
-bad driver code.  In genral we need to _fix_ the existing abuses of
-the UP check in drivers, not spread this kind of sloppyness further.
-
+> -	int flags = rdev->bdev->bd_disk->flags;
+> -
+> -	if (!(flags & GENHD_FL_UP)) {
+> +	if (!blk_disk_added(rdev->bdev->bd_disk)) {
+>  		if (!test_and_set_bit(MD_BROKEN, &rdev->mddev->flags))
+>  			pr_warn("md: %s: %s array has a missing/failed member\n",
+>  				mdname(rdev->mddev), md_type);
+> -- 
+> 2.27.0
+> 
+---end quoted text---
