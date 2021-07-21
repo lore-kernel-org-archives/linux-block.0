@@ -2,129 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58828C636C9
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 04:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3EB2C07E9B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:00:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3895D611C1
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 04:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DEED611C1
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:00:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231905AbhGUEQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 00:16:56 -0400
-Received: from mail-ed1-f49.google.com ([209.85.208.49]:45728 "EHLO
-        mail-ed1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231168AbhGUEQe (ORCPT
+        id S232506AbhGUETt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 00:19:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39742 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232359AbhGUETi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 00:16:34 -0400
-Received: by mail-ed1-f49.google.com with SMTP id x17so747539edd.12;
-        Tue, 20 Jul 2021 21:57:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=G1CpyrlxbkQi8C3eKrGFY5ZV8sAO1WbnuAPLS/w9iyc=;
-        b=jBAPrGNXTUYVryYWhW0yT82PbMHi6faQKRsQBZ69QIjwFn9LHNNOKiwdpXDgP8eODT
-         mcjqoYgQVqE+/u2QizmTlciVzQ8XxSXZCQhaeMxhz0OVoU/CO8hro5tDPyt5buhTgBBr
-         6D79fsPpebjzEq+fElrM5fuOBHPrfoJWU+lMHYl4vSsjG+Rq9/LJsDMeC47jozKdCksK
-         MpfWnuK60gJsgIXBRWBVj/YVlx+VR3ZEUxX00Tl2Aq9gtvEAe+9lBlAhXm0+vOVxe/Xz
-         la8a+ectMxcWTj2nGpGNVq1BVW2ICDFn0qnDPCv7AqIhncIffoIROj1JWooEUGN5M4v4
-         s/vw==
-X-Gm-Message-State: AOAM530kArH/FdYWpIgzF5A83swCItLPHIOntOwM4p+KN2cA88y/oJzO
-        B+8Vnx7gJyJRzWlAodWS3pD0yToTnTkuYxn+
-X-Google-Smtp-Source: ABdhPJxO2gHuT5k9dcnnZGNk0MGMbiLxVmvaik28q18dCpokHnuwiZzoDtkaMJ2BA5ylmY0hCGjwCw==
-X-Received: by 2002:aa7:c4c7:: with SMTP id p7mr45104066edr.290.1626843430294;
-        Tue, 20 Jul 2021 21:57:10 -0700 (PDT)
-Received: from ?IPv6:2a0b:e7c0:0:107::70f? ([2a0b:e7c0:0:107::70f])
-        by smtp.gmail.com with ESMTPSA id s18sm7979195ejh.12.2021.07.20.21.57.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jul 2021 21:57:09 -0700 (PDT)
-Subject: Re: [Patch v4 2/3] Drivers: hv: add Azure Blob driver
-To:     Long Li <longli@microsoft.com>,
-        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
-        "linux-fs@vger.kernel.org" <linux-fs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Siddharth Gupta <sidgup@codeaurora.org>,
-        Hannes Reinecke <hare@suse.de>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
- <1626751866-15765-3-git-send-email-longli@linuxonhyperv.com>
- <90ed52d3-5095-9789-53f0-477ba70edc3b@kernel.org>
- <BY5PR21MB15069D0519AD92773355FCF6CEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
-From:   Jiri Slaby <jirislaby@kernel.org>
-Message-ID: <5c5dd1e5-2639-b293-b2e0-d7cfd5ca3c0c@kernel.org>
-Date:   Wed, 21 Jul 2021 06:57:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Wed, 21 Jul 2021 00:19:38 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B714EC061574;
+        Tue, 20 Jul 2021 22:00:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=IctsTVrtwipEv00mkrFyUnMJXKowudn2hKnX1KBUBjo=; b=IXImCDQ2qlkdgYwRnUusz3CUhb
+        x3Uir6PJDYrIuiJWCCbQXFXPwpEh8Ygz9na3CmtqFlPzGL7QyppNWm2BPlCToQ+A8xvJAk9vE5uh5
+        SmXfvm9o7alqEz7CzZ9hE+WCFs8/IRthEYy0GhaTwoi2aByAbp4fIOzC1OtpxtElaeI182YIe5yyr
+        2otH1MtdwlbtYQ3ZpnEB691t+X9zOoV3WzOESfm2kC81aZxjog/LnuaMAZ75Bhf+6xdE1dox/IBgG
+        X23ZNHb9LrkQ+bWZ9FMOdPlIpuAefmEUeqKDp4krHV4W4ZEpvuJy2WUsRNRemRf6CGm7/0nHH6VRD
+        KxmAJmOw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m64KU-008o8T-0m; Wed, 21 Jul 2021 04:59:39 +0000
+Date:   Wed, 21 Jul 2021 05:59:34 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, hare@suse.de, bvanassche@acm.org,
+        ming.lei@redhat.com, hch@infradead.org, jack@suse.cz,
+        osandov@fb.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] block: add flag for add_disk() completion notation
+Message-ID: <YPeptlG19sdu18jD@infradead.org>
+References: <20210720182048.1906526-1-mcgrof@kernel.org>
+ <20210720182048.1906526-2-mcgrof@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <BY5PR21MB15069D0519AD92773355FCF6CEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=iso-8859-2; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210720182048.1906526-2-mcgrof@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21. 07. 21, 0:12, Long Li wrote:
->> Subject: Re: [Patch v4 2/3] Drivers: hv: add Azure Blob driver
->>
->> On 20. 07. 21, 5:31, longli@linuxonhyperv.com wrote:
->>> --- /dev/null
->>> +++ b/include/uapi/misc/hv_azure_blob.h
->>> @@ -0,0 +1,34 @@
->>> +/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
->>> +/* Copyright (c) 2021 Microsoft Corporation. */
->>> +
->>> +#ifndef _AZ_BLOB_H
->>> +#define _AZ_BLOB_H
->>> +
->>> +#include <linux/kernel.h>
->>> +#include <linux/uuid.h>
->>
->> Quoting from
->> https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.
->> kernel.org%2Flinux-
->> doc%2FMWHPR21MB159375586D810EC5DCB66AF0D7039%40MWHPR21MB1
->> 593.namprd21.prod.outlook.com%2F&amp;data=04%7C01%7Clongli%40micr
->> osoft.com%7C7fdf2d6ed15d4d4122a308d94b6eeed0%7C72f988bf86f141af91
->> ab2d7cd011db47%7C1%7C0%7C637623762292949381%7CUnknown%7CTWFp
->> bGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVC
->> I6Mn0%3D%7C3000&amp;sdata=kv0ZkU1QL6TxlJJZEQEsT7aqLFL9lmP2SStz8k
->> U5sIs%3D&amp;reserved=0:
->> =====
->> Seems like a #include of asm/ioctl.h (or something similar) is needed so that
->> _IOWR is defined.  Also, a #include is needed for __u32, __aligned_u64,
->> guid_t, etc.
->> =====
+On Tue, Jul 20, 2021 at 11:20:44AM -0700, Luis Chamberlain wrote:
+> Often drivers may have complex setups where it is not
+> clear if their disk completed their respective *add_disk*()
+> call. They either have to invent a setting or, they
+> incorrectly use GENHD_FL_UP. Using GENHD_FL_UP however is
+> used internally so we know when we can add / remove
+> partitions safely. We can easily fail along the way
+> prior to add_disk() completing and still have
+> GENHD_FL_UP set, so it would not be correct in that case
+> to call del_gendisk() on the disk.
 > 
-> The user-space code includes "sys/ioctl.h" for calling into ioctl(). "sys/ioctl.h"
-> includes <linux/ioctl.h>, so it has no problem finding _IOWR.
+> Provide a new flag then which allows us to check if
+> *add_disk*() completed, and conversely just make
+> del_gendisk() check for this for drivers so that
+> they can safely call del_gendisk() and we'll figure
+> it out if it is safe for you to call this.
 > 
-> guid_t is defined in <uapi/linux/uuid.h>, included from <linux/uuid.h> (in this file)
-> __u32 and __aligned_u64 are defined in <uapi/linux/types.>, which is included from <linux/kernel.h> (in this file)
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  block/genhd.c         |  8 ++++++++
+>  include/linux/genhd.h | 11 ++++++++++-
+>  2 files changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index af4d2ab4a633..a858eed05e55 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -539,6 +539,8 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+>  
+>  	disk_add_events(disk);
+>  	blk_integrity_add(disk);
+> +
+> +	disk->flags |= GENHD_FL_DISK_ADDED;
 
-No, please don't rely on implicit include chains. Nor that userspace 
-solves the includes for you.
+I guess I failed to mention it last time - but I think this needs
+to go into disk->state as dynamic state.
 
-thanks,
--- 
-js
-suse labs
+> + * Drivers can safely call this even if they are not sure if the respective
+> + * __device_add_disk() call succeeded.
+> + *
+>   * Drivers exist which depend on the release of the gendisk to be synchronous,
+>   * it should not be deferred.
+>   *
+> @@ -578,6 +583,9 @@ void del_gendisk(struct gendisk *disk)
+>  {
+>  	might_sleep();
+>  
+> +	if (!blk_disk_added(disk))
+> +		return;
+
+I still very much disagree with this check.  It just leads to really
+bad driver code.  In genral we need to _fix_ the existing abuses of
+the UP check in drivers, not spread this kind of sloppyness further.
+
