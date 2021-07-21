@@ -2,84 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 944BDC12002
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E53DC636C9
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:36:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79F8161009
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:31:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 214B761009
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233594AbhGUFvG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 01:51:06 -0400
-Received: from lucky1.263xmail.com ([211.157.147.132]:52384 "EHLO
-        lucky1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233518AbhGUFvC (ORCPT
+        id S233523AbhGUF4K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 01:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33398 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234201AbhGUFzs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 01:51:02 -0400
-Received: from localhost (unknown [192.168.167.70])
-        by lucky1.263xmail.com (Postfix) with ESMTP id 952D3FAEFA;
-        Wed, 21 Jul 2021 14:31:20 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED: 0
-X-SKE-CHECKED: 1
-X-ANTISPAM-LEVEL: 2
-Received: from localhost.localdomain (unknown [113.57.152.160])
-        by smtp.263.net (postfix) whith ESMTP id P13644T140561943324416S1626849079568135_;
-        Wed, 21 Jul 2021 14:31:20 +0800 (CST)
-X-IP-DOMAINF: 1
-X-UNIQUE-TAG: <77a0db2e198c30d823326db2b8920101>
-X-RL-SENDER: liubaozhu@uniontech.com
-X-SENDER: liubaozhu@uniontech.com
-X-LOGIN-NAME: liubaozhu@uniontech.com
-X-FST-TO: paolo.valente@linaro.org
-X-RCPT-COUNT: 5
-X-SENDER-IP: 113.57.152.160
-X-ATTACHMENT-NUM: 0
-X-System-Flag: 0
-From:   liubaozhu <liubaozhu@uniontech.com>
-To:     paolo.valente@linaro.org
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, liubaozhu <liubaozhu@uniontech.com>
-Subject: [PATCH] block/bfq: the delta_from_first should be ns rather than us
-Date:   Wed, 21 Jul 2021 14:30:47 +0800
-Message-Id: <20210721063047.92122-1-liubaozhu@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Wed, 21 Jul 2021 01:55:48 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D517FC061574;
+        Tue, 20 Jul 2021 23:36:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=TbetRsKmJc4IgD/wnR8skOFHfIgN2EmIYkeFzfwMtwE=; b=FzU9XxYcf8Q7kjO/1HTYSIzGg3
+        0Q9Pbl+gGc8RIppnpiCw2Dld12vkhsRDiGtzeQO7+Oo7vcV73isvt6D/Ldjat1pdYN2+JBiQDd1Zk
+        Z6VYe1gEQrr3PzU83XiFqJGlhgi9fZgHVL0JFt5mofrd2CWO/MskD+ex2O78CNq/0pnhiqItebIqa
+        WteWReKXWpzKJS2DIy16YOsqam6lOKxgoI/y5tKTAG68P1+I5uuYEZaGfb3+DsoWwlhA9ubzgTMqa
+        WbXd7Z1Z0NvGtAhnKp9IJQvpRADzHCM59icCcLHNzaDdADssm4AZJFsaRwKJZjLNhGFvBNNMnUY+j
+        ZLM+cxUw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m65pt-008sny-FX; Wed, 21 Jul 2021 06:36:09 +0000
+Date:   Wed, 21 Jul 2021 07:36:05 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Naohiro Aota <naohiro.aota@wdc.com>
+Cc:     linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: Re: [PATCH v2 1/3] block: fix arg type of bio_trim()
+Message-ID: <YPfAVSlYdM+TAe2z@infradead.org>
+References: <cover.1626848677.git.naohiro.aota@wdc.com>
+ <6bd02746905e41dfee04f2500d6d15f9b9b73fc9.1626848677.git.naohiro.aota@wdc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6bd02746905e41dfee04f2500d6d15f9b9b73fc9.1626848677.git.naohiro.aota@wdc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the block/bfq-iosched.c,the function bfq_update_peak_rate(),
-bfqd->delta_from_first = now_ns - bfqd->first_dispatch,
-according to the subtraction operation here,now_ns is ns,
-and bfqd->first_dispatch is also ns,so bfqd->delta_from_first should be ns.
+On Wed, Jul 21, 2021 at 03:26:58PM +0900, Naohiro Aota wrote:
+> +void bio_trim(struct bio *bio, sector_t offset, sector_t size)
+>  {
+> +	const sector_t uint_max_sectors = UINT_MAX >> SECTOR_SHIFT;
 
-Signed-off-by: liubaozhu <liubaozhu@uniontech.com>
----
- block/bfq-iosched.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'd make this a #define and keep it close to the struct bio definition
+named something like BIO_MAX_SECTORS
 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 99c2a3cb0..7cf4fc8c3 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -632,7 +632,7 @@ struct bfq_data {
- 	u64 tot_sectors_dispatched;
- 	/* max rq size seen during current observation interval (sectors) */
- 	u32 last_rq_max_size;
--	/* time elapsed from first dispatch in current observ. interval (us) */
-+	/* time elapsed from first dispatch in current observ. interval (ns) */
- 	u64 delta_from_first;
- 	/*
- 	 * Current estimate of the device peak rate, measured in
--- 
-2.20.1
+> +
+> +	/*
+> +	 * 'bio' is a cloned bio which we need to trim to match the given
+> +	 * offset and size.
+>  	 */
+
+This should go into the kernel doc comment.
+
+Something like:
+
+/**
+ * bio_trim - trim a bio to the given offset and size
+ * @bio:        bio to trim
+ * @offset:     number of sectors to trim from the front of @bio
+ * @size:       size we want to trim @bio to, in sectors
+ *
+ * This function is typically used for bios that are cloned and
+ * submitted to the underlying device in parts.
+ */
 
 
+> +	/* sanity check */
+> +	if (WARN_ON(offset > uint_max_sectors || size > uint_max_sectors ||
+> +		    offset + size > bio->bi_iter.bi_size))
+> +		return;
 
+No real need for the comment. WARN_ON pretty much implies a sanity
+check.  I'd make this a WARN_ON_ONCE as otherwise you'll probably
+drown in these warnings if they ever hit.
+
+> -extern void bio_trim(struct bio *bio, int offset, int size);
+> +extern void bio_trim(struct bio *bio, sector_t offset, sector_t size);
+
+Please drop the extern while you're at it.
