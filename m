@@ -2,76 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F00BC07E9B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 474FDC636C8
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:30:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7909F610F7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:12:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24B616113A
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbhGTXbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 19:31:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34660 "EHLO mail.kernel.org"
+        id S229604AbhGTXtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 19:49:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44808 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231765AbhGTXbn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 19:31:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 97BA36101B;
-        Wed, 21 Jul 2021 00:12:19 +0000 (UTC)
+        id S229745AbhGTXtg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jul 2021 19:49:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 42F1960BBB;
+        Wed, 21 Jul 2021 00:30:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626826339;
-        bh=E65jLqKjRMg5Qkn2BhBuKgQbm8+Mo4vJ7cckyConMrM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aBguU6Ty/PN6IkRXHSBTi4XYh+X8QVVMD+fjGhgtbhCI5v/+LFaBwUNLGJmABMBlx
-         dAjP9CclOrrJWP/+ZcleVIZUrHBzPys/XfvbFOYXx6hx90c8QXDuzfM4/+lYuqv+01
-         lIzktlI9vcvimUPaU3FMizlT60kkagDCIU6xy3Zu5aDXEK3OBIoyPYrBPsv8FH3QMV
-         gPCJFhbE58hWo4Hv9QDicgoFudVJ1NHgx0QpxZp6/BXPGSSB4/pe5YnZOh8dzv5zHk
-         U9Zu/m0DKjFbajve8zzo+w/hSEs8YOW0haTyzOaNykWNzGpWxkuSb0qZfrGqTympdt
-         vIaNLmBsJsr5Q==
-Date:   Tue, 20 Jul 2021 17:12:19 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v15 16/17] iomap: Convert iomap_add_to_ioend to take a
- folio
-Message-ID: <20210721001219.GR22357@magnolia>
-References: <20210719184001.1750630-1-willy@infradead.org>
- <20210719184001.1750630-17-willy@infradead.org>
+        s=k20201202; t=1626827413;
+        bh=oA6LUVtEtIPCXpJhxFUKzyM7hTN95PCWkcpLTJ+YT4s=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=pbmtrLNrkZYFQkdU0kuOtTOeJfzUKbGu52QkdgdAuMv3fn9SroY+iz6gdFUVG5Yb/
+         enLzZ04deMTAR7bQPV3QY6J8+qIRDfmA/uh3OPf2cldVkua5juXwId6NUJv6mKE6AH
+         oS3g8bpcwuPWqhf5+Z4fzvdcsAkjAvMVQ09gqUREW/mElhJwEjl/2b/gG6+NR4seRZ
+         jieHyIu3xrHenFcCoHFtTCgnAIC/Mg13pMqC4O7czpnFnTpi0/bS6VwNCH4ILcmdYf
+         HWx+Mm8FgbuzFoPHj2djpLNP+S+CtX3V6thz08cJPHdhWZ/2JT4pF7W+gdv32zjUlG
+         twPnb45fzlmyg==
+Date:   Tue, 20 Jul 2021 19:30:11 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed
+ if any irq is managed
+Message-ID: <20210721003011.GA144876@bjorn-Precision-5520>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210719184001.1750630-17-willy@infradead.org>
+In-Reply-To: <YPKjQxZ4roigdvbq@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 07:40:00PM +0100, Matthew Wilcox (Oracle) wrote:
-> We still iterate one block at a time, but now we call compound_head()
-> less often.  Rename file_offset to pos to fit the rest of the file.
+On Sat, Jul 17, 2021 at 05:30:43PM +0800, Ming Lei wrote:
+> On Fri, Jul 16, 2021 at 03:01:54PM -0500, Bjorn Helgaas wrote:
+> > On Thu, Jul 15, 2021 at 08:08:42PM +0800, Ming Lei wrote:
+> > > irq vector allocation with managed affinity may be used by driver, and
+> > > blk-mq needs this info because managed irq will be shutdown when all
+> > > CPUs in the affinity mask are offline.
+> > > 
+> > > The info of using managed irq is often produced by drivers(pci subsystem,
+> > 
+> > Add space between "drivers" and "(".
+> > s/pci/PCI/
 > 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> OK.
+> 
+> > Does this "managed IRQ" (or "managed affinity", not sure what the
+> > correct terminology is here) have something to do with devm?
+> > 
+> > > platform device, ...), and it is consumed by blk-mq, so different subsystems
+> > > are involved in this info flow
+> > 
+> > Add period at end of sentence.
+> 
+> OK.
+> 
+> > > Address this issue by adding one field of .irq_affinity_managed into
+> > > 'struct device'.
+> > > 
+> > > Suggested-by: Christoph Hellwig <hch@lst.de>
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > ---
+> > >  drivers/base/platform.c | 7 +++++++
+> > >  drivers/pci/msi.c       | 3 +++
+> > >  include/linux/device.h  | 1 +
+> > >  3 files changed, 11 insertions(+)
+> > > 
+> > > diff --git a/drivers/base/platform.c b/drivers/base/platform.c
+> > > index 8640578f45e9..d28cb91d5cf9 100644
+> > > --- a/drivers/base/platform.c
+> > > +++ b/drivers/base/platform.c
+> > > @@ -388,6 +388,13 @@ int devm_platform_get_irqs_affinity(struct platform_device *dev,
+> > >  				ptr->irq[i], ret);
+> > >  			goto err_free_desc;
+> > >  		}
+> > > +
+> > > +		/*
+> > > +		 * mark the device as irq affinity managed if any irq affinity
+> > > +		 * descriptor is managed
+> > > +		 */
+> > > +		if (desc[i].is_managed)
+> > > +			dev->dev.irq_affinity_managed = true;
+> > >  	}
+> > >  
+> > >  	devres_add(&dev->dev, ptr);
+> > > diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
+> > > index 3d6db20d1b2b..7ddec90b711d 100644
+> > > --- a/drivers/pci/msi.c
+> > > +++ b/drivers/pci/msi.c
+> > > @@ -1197,6 +1197,7 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+> > >  	if (flags & PCI_IRQ_AFFINITY) {
+> > >  		if (!affd)
+> > >  			affd = &msi_default_affd;
+> > > +		dev->dev.irq_affinity_managed = true;
+> > 
+> > This is really opaque to me.  I can't tell what the connection between
+> > PCI_IRQ_AFFINITY and irq_affinity_managed is.
+> 
+> Comment for PCI_IRQ_AFFINITY is 'Auto-assign affinity',
+> 'irq_affinity_managed' basically means that irq's affinity is managed by
+> kernel.
+> 
+> What blk-mq needs is exactly if PCI_IRQ_AFFINITY is applied when
+> allocating irq vectors. When PCI_IRQ_AFFINITY is used, genirq will
+> shutdown the irq when all CPUs in the assigned affinity are offline,
+> then blk-mq has to drain all in-flight IOs which will be completed
+> via this irq and prevent new IO. That is the connection.
+> 
+> Or you think 'irq_affinity_managed' isn't named well?
 
-Everything in this patch looks ok to me, though I gather there will be
-further changes to bio_add_folio, so I'll leave this off for now.
+I've been looking at "devm" management where there is a concept of
+devm-managed IRQs, and you mentioned "managed IRQ" in the commit log.
+But IIUC this is a completely different sort of management.
 
-I /am/ beginning to wonder, though -- seeing as Christoph and Matthew
-both have very large patchsets changing things in fs/iomap/, how would
-you like those landed?  Christoph's iterator refactoring looks like it
-could be ready to go for 5.15.  Matthew's folio series looks like a
-mostly straightforward conversion for iomap, except that it has 91
-patches as a hard dependency.
+> > AFAICT the only place irq_affinity_managed is ultimately used is
+> > blk_mq_hctx_notify_offline(), and there's no obvious connection
+> > between that and this code.
+> 
+> I believe the connection is described in comment.
 
-Since most of the iomap changes for 5.15 aren't directly related to
-folios, I think I prefer iomap-for-next to be based directly off -rcX
-like usual, though I don't know where that leaves the iomap folio
-conversion.  I suppose one could add them to a branch that itself is a
-result of the folio and iomap branches, or leave them off for 5.16?
+You mean the comment that says "hctx needn't to be deactivated in case
+managed irq isn't used"?  Sorry, that really doesn't explain to me why
+pci_alloc_irq_vectors_affinity() needs to set irq_affinity_managed.
+There's just a lot of magic here that cannot be deduced by reading the
+code.
 
-Other ideas?
+Nit: s/needn't to be/needn't be/ in that comment.  Or maybe even
+"Deactivate hctx only when managed IRQ is used"?  I still have no idea
+what that means, but at least it's easier to read :)  Or maybe this is
+actually "draining a queue" instead of "deactivating"?
 
---D
+Bjorn
