@@ -2,126 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04EB3C07E9B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 944BDC12002
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:31:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E24706120E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:27:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79F8161009
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 06:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233773AbhGUFqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 01:46:40 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:34917 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233607AbhGUFqf (ORCPT
+        id S233594AbhGUFvG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 01:51:06 -0400
+Received: from lucky1.263xmail.com ([211.157.147.132]:52384 "EHLO
+        lucky1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233518AbhGUFvC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 01:46:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1626848832; x=1658384832;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=obmUbAlWbL9nndI5TgkOch831uwFiyDsYEvXx5RWrwo=;
-  b=XZVp/mGbTtWODrrQl8Zqm0xkyzXU10iYKvI2cf557m9ub+Nbd/UBEPr+
-   yTXrMh2oxQeMaXGXvo75R8eR+r/sbq1WOsPkAfZ5aB6CrIwDf3m2gzMAq
-   2W2yar9cd6O+ygmJ5Y4KMqDBSb+ZNlhb5ZaYrJE1Ef6aQFHw//6RwiOBk
-   MFIGZxOa/d3Hv+wcfMgQCLf4ySTIpoV5EYbU7eYzTk5abeLE72UbLibts
-   IL87Bj6Y95zh0C8XmE1GofhZV/QyT0KNJ5nGt7/UyDOXAhFIGkIdICsvh
-   7r0AUn3n7Ue33EJy7lRgskDlaRO+NVh36m4RzPhyRiGqOhGvM92Owrdx1
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.84,257,1620662400"; 
-   d="scan'208";a="179924896"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Jul 2021 14:27:11 +0800
-IronPort-SDR: ShfAYJ3a6bhTxrf6TYFZA1JQXfnsEEjo87rlt9up7xZcYvwvhfRZ8d7/z37z4I8eAoQl/n6nEo
- +Z/972Yz4xO9yeU6Rm2TJEcnyqC7NSaVhdgmjW8XL3dAHC6fImPM8WRfw1bIBsfOKZi17FSNR8
- KJ4OmwWa1XRrpFQiqIuzrLyeQG2oeG0syJRfy7Cs/hcJZyqSEb9cz0gEBL+sKXijtOZQzUo1Er
- VSUUO6X3ZsWdizWS5y4GKv57eO8E8BQlx7KinpjRuc8VZCDaE7I0H2RncwQn/VixmL6RCOVO22
- G5I7Vi5DQFs3GTAlULZr1uSu
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2021 23:03:27 -0700
-IronPort-SDR: DjI/fC4xzWDbttXeu4K/6UCGUCd4OXaEk5gnC/mKHF1sFrQXy6esqx+HsBXiypT8YNAyh0UXeR
- 60RLVHig1UY9Xqgxk4rFJgPKUu8LHFY/OU/YzNKGz9PCkzTSq+LMR5YtV7lquhK7iMcB2cNTW5
- cXzno+l0N4LRPQqJYHLosT1ZMBb5yI9NezwNl73B/8UguX9lYTyIXN4GiPN77UMOOsvzW2VKnZ
- YOwjaV1Fv492XgFNxB6pfOsohj6TBMBAHMsnt2BukV8H7ScPfwkjXdFOY7s55UHn8bbP+rtbZH
- 1o0=
-WDCIronportException: Internal
-Received: from d1zj3x2.ad.shared (HELO naota-xeon.wdc.com) ([10.225.49.44])
-  by uls-op-cesaip01.wdc.com with ESMTP; 20 Jul 2021 23:27:11 -0700
-From:   Naohiro Aota <naohiro.aota@wdc.com>
-To:     linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>
-Subject: [PATCH v2 2/3] btrfs: fix argument type of btrfs_bio_clone_partial()
-Date:   Wed, 21 Jul 2021 15:26:59 +0900
-Message-Id: <c69cf6f0b81a28dd04b62537e3b8b4f46bd36e1e.1626848677.git.naohiro.aota@wdc.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <cover.1626848677.git.naohiro.aota@wdc.com>
-References: <cover.1626848677.git.naohiro.aota@wdc.com>
+        Wed, 21 Jul 2021 01:51:02 -0400
+Received: from localhost (unknown [192.168.167.70])
+        by lucky1.263xmail.com (Postfix) with ESMTP id 952D3FAEFA;
+        Wed, 21 Jul 2021 14:31:20 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED: 0
+X-SKE-CHECKED: 1
+X-ANTISPAM-LEVEL: 2
+Received: from localhost.localdomain (unknown [113.57.152.160])
+        by smtp.263.net (postfix) whith ESMTP id P13644T140561943324416S1626849079568135_;
+        Wed, 21 Jul 2021 14:31:20 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <77a0db2e198c30d823326db2b8920101>
+X-RL-SENDER: liubaozhu@uniontech.com
+X-SENDER: liubaozhu@uniontech.com
+X-LOGIN-NAME: liubaozhu@uniontech.com
+X-FST-TO: paolo.valente@linaro.org
+X-RCPT-COUNT: 5
+X-SENDER-IP: 113.57.152.160
+X-ATTACHMENT-NUM: 0
+X-System-Flag: 0
+From:   liubaozhu <liubaozhu@uniontech.com>
+To:     paolo.valente@linaro.org
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, liubaozhu <liubaozhu@uniontech.com>
+Subject: [PATCH] block/bfq: the delta_from_first should be ns rather than us
+Date:   Wed, 21 Jul 2021 14:30:47 +0800
+Message-Id: <20210721063047.92122-1-liubaozhu@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+In the block/bfq-iosched.c,the function bfq_update_peak_rate(),
+bfqd->delta_from_first = now_ns - bfqd->first_dispatch,
+according to the subtraction operation here,now_ns is ns,
+and bfqd->first_dispatch is also ns,so bfqd->delta_from_first should be ns.
 
-The offset and can never be negative use unsigned int instead of int type
-for them.
-
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
+Signed-off-by: liubaozhu <liubaozhu@uniontech.com>
 ---
- fs/btrfs/extent_io.c | 6 ++++--
- fs/btrfs/extent_io.h | 2 +-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ block/bfq-iosched.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 1f947e24091a..0040577c2f4e 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -3153,11 +3153,13 @@ struct bio *btrfs_io_bio_alloc(unsigned int nr_iovecs)
- 	return bio;
- }
- 
--struct bio *btrfs_bio_clone_partial(struct bio *orig, int offset, int size)
-+struct bio *btrfs_bio_clone_partial(struct bio *orig, u64 offset, u64 size)
- {
- 	struct bio *bio;
- 	struct btrfs_io_bio *btrfs_bio;
- 
-+	ASSERT(offset <= UINT_MAX && size <= UINT_MAX);
-+
- 	/* this will never fail when it's backed by a bioset */
- 	bio = bio_clone_fast(orig, GFP_NOFS, &btrfs_bioset);
- 	ASSERT(bio);
-@@ -3165,7 +3167,7 @@ struct bio *btrfs_bio_clone_partial(struct bio *orig, int offset, int size)
- 	btrfs_bio = btrfs_io_bio(bio);
- 	btrfs_io_bio_init(btrfs_bio);
- 
--	bio_trim(bio, offset >> 9, size >> 9);
-+	bio_trim(bio, (sector_t)offset >> 9, (sector_t)size >> 9);
- 	btrfs_bio->iter = bio->bi_iter;
- 	return bio;
- }
-diff --git a/fs/btrfs/extent_io.h b/fs/btrfs/extent_io.h
-index 62027f551b44..53abdc280451 100644
---- a/fs/btrfs/extent_io.h
-+++ b/fs/btrfs/extent_io.h
-@@ -280,7 +280,7 @@ void extent_clear_unlock_delalloc(struct btrfs_inode *inode, u64 start, u64 end,
- struct bio *btrfs_bio_alloc(u64 first_byte);
- struct bio *btrfs_io_bio_alloc(unsigned int nr_iovecs);
- struct bio *btrfs_bio_clone(struct bio *bio);
--struct bio *btrfs_bio_clone_partial(struct bio *orig, int offset, int size);
-+struct bio *btrfs_bio_clone_partial(struct bio *orig, u64 offset, u64 size);
- 
- int repair_io_failure(struct btrfs_fs_info *fs_info, u64 ino, u64 start,
- 		      u64 length, u64 logical, struct page *page,
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 99c2a3cb0..7cf4fc8c3 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -632,7 +632,7 @@ struct bfq_data {
+ 	u64 tot_sectors_dispatched;
+ 	/* max rq size seen during current observation interval (sectors) */
+ 	u32 last_rq_max_size;
+-	/* time elapsed from first dispatch in current observ. interval (us) */
++	/* time elapsed from first dispatch in current observ. interval (ns) */
+ 	u64 delta_from_first;
+ 	/*
+ 	 * Current estimate of the device peak rate, measured in
 -- 
-2.32.0
+2.20.1
+
+
 
