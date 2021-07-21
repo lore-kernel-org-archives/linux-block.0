@@ -6,62 +6,37 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F04CC12002
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 07:27:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81217C12002
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 07:46:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40FEB60230
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 07:27:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 574146101B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 07:46:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234804AbhGUGoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 02:44:46 -0400
-Received: from verein.lst.de ([213.95.11.211]:57658 "EHLO verein.lst.de"
+        id S235237AbhGUHGP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 03:06:15 -0400
+Received: from verein.lst.de ([213.95.11.211]:57725 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235969AbhGUGoQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 02:44:16 -0400
+        id S234706AbhGUHGH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Jul 2021 03:06:07 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id B573767373; Wed, 21 Jul 2021 09:24:45 +0200 (CEST)
-Date:   Wed, 21 Jul 2021 09:24:45 +0200
+        id 25C3967373; Wed, 21 Jul 2021 09:46:43 +0200 (CEST)
+Date:   Wed, 21 Jul 2021 09:46:42 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Christoph Hellwig <hch@lst.de>, John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity
- managed if any irq is managed
-Message-ID: <20210721072445.GA11257@lst.de>
-References: <20210715120844.636968-1-ming.lei@redhat.com> <20210715120844.636968-2-ming.lei@redhat.com> <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com> <20210719094414.GC431@lst.de> <87lf60cevz.ffs@nanos.tec.linutronix.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: delay freeing the gendisk
+Message-ID: <20210721074642.GA12442@lst.de>
+References: <20210719093544.431845-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87lf60cevz.ffs@nanos.tec.linutronix.de>
+In-Reply-To: <20210719093544.431845-1-hch@lst.de>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 21, 2021 at 09:20:00AM +0200, Thomas Gleixner wrote:
-> > Just walking the list seems fine to me given that this is not a
-> > performance criticial path.  But what are the locking implications?
-> 
-> At the moment there are none because the list is initialized in the
-> setup path and never modified afterwards. Though that might change
-> sooner than later to fix the virtio wreckage vs. MSI-X.
-
-What is the issue there?  Either way, if we keep the helper in the
-IRQ code it should be easy to spot for anyone adding the locking.
-
-> > Also does the above imply this won't work for your platform MSI case?
-> 
-> The msi descriptors are attached to struct device and independent of
-> platform/PCI/whatever.
-
-That's what I assumed, but this text from John suggested there is
-something odd about the platform case:
-
-"Did you consider that for PCI .."
+Meh, as-is this doesn't even compile.  I had accidentally commited the
+fixup in the following patch.  I'll send the whole series in a bit,
+but the this particule patch once fixed is probably still a 5.14
+candidate.
