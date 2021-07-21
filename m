@@ -2,156 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 474FDC636C8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49969C07E9B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 02:54:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24B616113A
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 00:30:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C0E361019
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 02:54:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbhGTXtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 19:49:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44808 "EHLO mail.kernel.org"
+        id S231201AbhGUCNh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jul 2021 22:13:37 -0400
+Received: from out0.migadu.com ([94.23.1.103]:33985 "EHLO out0.migadu.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229745AbhGTXtg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 19:49:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 42F1960BBB;
-        Wed, 21 Jul 2021 00:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626827413;
-        bh=oA6LUVtEtIPCXpJhxFUKzyM7hTN95PCWkcpLTJ+YT4s=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=pbmtrLNrkZYFQkdU0kuOtTOeJfzUKbGu52QkdgdAuMv3fn9SroY+iz6gdFUVG5Yb/
-         enLzZ04deMTAR7bQPV3QY6J8+qIRDfmA/uh3OPf2cldVkua5juXwId6NUJv6mKE6AH
-         oS3g8bpcwuPWqhf5+Z4fzvdcsAkjAvMVQ09gqUREW/mElhJwEjl/2b/gG6+NR4seRZ
-         jieHyIu3xrHenFcCoHFtTCgnAIC/Mg13pMqC4O7czpnFnTpi0/bS6VwNCH4ILcmdYf
-         HWx+Mm8FgbuzFoPHj2djpLNP+S+CtX3V6thz08cJPHdhWZ/2JT4pF7W+gdv32zjUlG
-         twPnb45fzlmyg==
-Date:   Tue, 20 Jul 2021 19:30:11 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed
- if any irq is managed
-Message-ID: <20210721003011.GA144876@bjorn-Precision-5520>
+        id S230338AbhGUCNf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jul 2021 22:13:35 -0400
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1626836048;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=51YmTxfzNKlavCo7kR2iu6L2+V7nhQlMITqRfus3ojA=;
+        b=Z57qvvuWbcxm2Nn+VDVR4Z4vhVgvhyA1kUFtx0jZaLuiO23uJC6cKqpd6HUFJvqL+d0aTi
+        5Yx0k0fKSDI36JlzljzXutCFMx5f9TO5WDlBq4ZrTy0YtZn6o07/mlADbsVYHjWIG7VYsd
+        Q3BSkmrJGR4eHuE374NksLLdTx3lhTs=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+To:     axboe@kernel.dk, colyli@suse.de, kent.overstreet@gmail.com,
+        agk@redhat.com, snitzer@redhat.com
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org
+Subject: [PATCH] block: move some macros to blkdev.h
+Date:   Wed, 21 Jul 2021 10:53:15 +0800
+Message-Id: <20210721025315.1729118-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YPKjQxZ4roigdvbq@T590>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: guoqing.jiang@linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 17, 2021 at 05:30:43PM +0800, Ming Lei wrote:
-> On Fri, Jul 16, 2021 at 03:01:54PM -0500, Bjorn Helgaas wrote:
-> > On Thu, Jul 15, 2021 at 08:08:42PM +0800, Ming Lei wrote:
-> > > irq vector allocation with managed affinity may be used by driver, and
-> > > blk-mq needs this info because managed irq will be shutdown when all
-> > > CPUs in the affinity mask are offline.
-> > > 
-> > > The info of using managed irq is often produced by drivers(pci subsystem,
-> > 
-> > Add space between "drivers" and "(".
-> > s/pci/PCI/
-> 
-> OK.
-> 
-> > Does this "managed IRQ" (or "managed affinity", not sure what the
-> > correct terminology is here) have something to do with devm?
-> > 
-> > > platform device, ...), and it is consumed by blk-mq, so different subsystems
-> > > are involved in this info flow
-> > 
-> > Add period at end of sentence.
-> 
-> OK.
-> 
-> > > Address this issue by adding one field of .irq_affinity_managed into
-> > > 'struct device'.
-> > > 
-> > > Suggested-by: Christoph Hellwig <hch@lst.de>
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  drivers/base/platform.c | 7 +++++++
-> > >  drivers/pci/msi.c       | 3 +++
-> > >  include/linux/device.h  | 1 +
-> > >  3 files changed, 11 insertions(+)
-> > > 
-> > > diff --git a/drivers/base/platform.c b/drivers/base/platform.c
-> > > index 8640578f45e9..d28cb91d5cf9 100644
-> > > --- a/drivers/base/platform.c
-> > > +++ b/drivers/base/platform.c
-> > > @@ -388,6 +388,13 @@ int devm_platform_get_irqs_affinity(struct platform_device *dev,
-> > >  				ptr->irq[i], ret);
-> > >  			goto err_free_desc;
-> > >  		}
-> > > +
-> > > +		/*
-> > > +		 * mark the device as irq affinity managed if any irq affinity
-> > > +		 * descriptor is managed
-> > > +		 */
-> > > +		if (desc[i].is_managed)
-> > > +			dev->dev.irq_affinity_managed = true;
-> > >  	}
-> > >  
-> > >  	devres_add(&dev->dev, ptr);
-> > > diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-> > > index 3d6db20d1b2b..7ddec90b711d 100644
-> > > --- a/drivers/pci/msi.c
-> > > +++ b/drivers/pci/msi.c
-> > > @@ -1197,6 +1197,7 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
-> > >  	if (flags & PCI_IRQ_AFFINITY) {
-> > >  		if (!affd)
-> > >  			affd = &msi_default_affd;
-> > > +		dev->dev.irq_affinity_managed = true;
-> > 
-> > This is really opaque to me.  I can't tell what the connection between
-> > PCI_IRQ_AFFINITY and irq_affinity_managed is.
-> 
-> Comment for PCI_IRQ_AFFINITY is 'Auto-assign affinity',
-> 'irq_affinity_managed' basically means that irq's affinity is managed by
-> kernel.
-> 
-> What blk-mq needs is exactly if PCI_IRQ_AFFINITY is applied when
-> allocating irq vectors. When PCI_IRQ_AFFINITY is used, genirq will
-> shutdown the irq when all CPUs in the assigned affinity are offline,
-> then blk-mq has to drain all in-flight IOs which will be completed
-> via this irq and prevent new IO. That is the connection.
-> 
-> Or you think 'irq_affinity_managed' isn't named well?
+From: Guoqing Jiang <jiangguoqing@kylinos.cn>
 
-I've been looking at "devm" management where there is a concept of
-devm-managed IRQs, and you mentioned "managed IRQ" in the commit log.
-But IIUC this is a completely different sort of management.
+Move them (PAGE_SECTORS_SHIFT, PAGE_SECTORS and SECTOR_MASK) to the
+generic header file to remove redundancy.
 
-> > AFAICT the only place irq_affinity_managed is ultimately used is
-> > blk_mq_hctx_notify_offline(), and there's no obvious connection
-> > between that and this code.
-> 
-> I believe the connection is described in comment.
+Signed-off-by: Guoqing Jiang <jiangguoqing@kylinos.cn>
+---
+ drivers/block/brd.c           | 3 ---
+ drivers/block/null_blk/main.c | 4 ----
+ drivers/md/bcache/util.h      | 2 --
+ include/linux/blkdev.h        | 4 ++++
+ include/linux/device-mapper.h | 1 -
+ 5 files changed, 4 insertions(+), 10 deletions(-)
 
-You mean the comment that says "hctx needn't to be deactivated in case
-managed irq isn't used"?  Sorry, that really doesn't explain to me why
-pci_alloc_irq_vectors_affinity() needs to set irq_affinity_managed.
-There's just a lot of magic here that cannot be deduced by reading the
-code.
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 95694113e38e..58ec167aa018 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -27,9 +27,6 @@
+ 
+ #include <linux/uaccess.h>
+ 
+-#define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
+-#define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+-
+ /*
+  * Each block ramdisk device has a radix_tree brd_pages of pages that stores
+  * the pages containing the block device's contents. A brd page's ->index is
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index d734e9ee1546..f128242d1170 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -11,10 +11,6 @@
+ #include <linux/init.h>
+ #include "null_blk.h"
+ 
+-#define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
+-#define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+-#define SECTOR_MASK		(PAGE_SECTORS - 1)
+-
+ #define FREE_BATCH		16
+ 
+ #define TICKS_PER_SEC		50ULL
+diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+index bca4a7c97da7..b64460a76267 100644
+--- a/drivers/md/bcache/util.h
++++ b/drivers/md/bcache/util.h
+@@ -15,8 +15,6 @@
+ 
+ #include "closure.h"
+ 
+-#define PAGE_SECTORS		(PAGE_SIZE / 512)
+-
+ struct closure;
+ 
+ #ifdef CONFIG_BCACHE_DEBUG
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 3177181c4326..0d0b6967c954 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -941,6 +941,10 @@ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+ #define SECTOR_SIZE (1 << SECTOR_SHIFT)
+ #endif
+ 
++#define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
++#define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
++#define SECTOR_MASK		(PAGE_SECTORS - 1)
++
+ /*
+  * blk_rq_pos()			: the current sector
+  * blk_rq_bytes()		: bytes left in the entire request
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 7457d49acf9a..94f2cd6a8e83 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -151,7 +151,6 @@ typedef size_t (*dm_dax_copy_iter_fn)(struct dm_target *ti, pgoff_t pgoff,
+ 		void *addr, size_t bytes, struct iov_iter *i);
+ typedef int (*dm_dax_zero_page_range_fn)(struct dm_target *ti, pgoff_t pgoff,
+ 		size_t nr_pages);
+-#define PAGE_SECTORS (PAGE_SIZE / 512)
+ 
+ void dm_error(const char *message);
+ 
+-- 
+2.25.1
 
-Nit: s/needn't to be/needn't be/ in that comment.  Or maybe even
-"Deactivate hctx only when managed IRQ is used"?  I still have no idea
-what that means, but at least it's easier to read :)  Or maybe this is
-actually "draining a queue" instead of "deactivating"?
-
-Bjorn
