@@ -2,81 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8936C07E9B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 04:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58828C636C9
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 04:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98E7D61208
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 04:32:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3895D611C1
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 04:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231783AbhGUDvX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jul 2021 23:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33310 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232238AbhGUDu4 (ORCPT
+        id S231905AbhGUEQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 00:16:56 -0400
+Received: from mail-ed1-f49.google.com ([209.85.208.49]:45728 "EHLO
+        mail-ed1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231168AbhGUEQe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jul 2021 23:50:56 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64820C061574;
-        Tue, 20 Jul 2021 21:31:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=oXXmw0xRZx1duRhUChyatQyyj1O6vy9kc7fAFrgNi1c=; b=fIzsHCIxsD0PCsJQXquJXuNBaR
-        4aCcmn3x3h8xgBXvng6sFzappeCZKsJXdZuOfFY5hRC5zYFElLBPBA05cwFrt1WqFloPNwX7w5ya7
-        dQdasSz7A7RosEIr7rui5ggNaap7lNKfunb0p9DAwsLdgEeXlwlsv6uc5K45owvneghM4t0+vzzlJ
-        rQgPX6OYp+o5pGeH7F/oxaYj6fuwMR9/T82xk3Elo0xOLlmCnT/sKYYFpOywp6M+kzlQ+mG3pZC/g
-        onfQVrTlWcNciXXPkP49pMZajCIbAzTqmu40ZZ14eFcC2ydIw1qYzOc5rVZeEjJngkmzFcRiS2KpY
-        gucM0dIQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m63t6-008mw6-MF; Wed, 21 Jul 2021 04:31:21 +0000
-Date:   Wed, 21 Jul 2021 05:31:16 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v15 16/17] iomap: Convert iomap_add_to_ioend to take a
- folio
-Message-ID: <YPejFDYKUn6qtLo5@casper.infradead.org>
-References: <20210719184001.1750630-1-willy@infradead.org>
- <20210719184001.1750630-17-willy@infradead.org>
- <20210721001219.GR22357@magnolia>
- <YPeiRb8o+zh29Pag@infradead.org>
+        Wed, 21 Jul 2021 00:16:34 -0400
+Received: by mail-ed1-f49.google.com with SMTP id x17so747539edd.12;
+        Tue, 20 Jul 2021 21:57:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=G1CpyrlxbkQi8C3eKrGFY5ZV8sAO1WbnuAPLS/w9iyc=;
+        b=jBAPrGNXTUYVryYWhW0yT82PbMHi6faQKRsQBZ69QIjwFn9LHNNOKiwdpXDgP8eODT
+         mcjqoYgQVqE+/u2QizmTlciVzQ8XxSXZCQhaeMxhz0OVoU/CO8hro5tDPyt5buhTgBBr
+         6D79fsPpebjzEq+fElrM5fuOBHPrfoJWU+lMHYl4vSsjG+Rq9/LJsDMeC47jozKdCksK
+         MpfWnuK60gJsgIXBRWBVj/YVlx+VR3ZEUxX00Tl2Aq9gtvEAe+9lBlAhXm0+vOVxe/Xz
+         la8a+ectMxcWTj2nGpGNVq1BVW2ICDFn0qnDPCv7AqIhncIffoIROj1JWooEUGN5M4v4
+         s/vw==
+X-Gm-Message-State: AOAM530kArH/FdYWpIgzF5A83swCItLPHIOntOwM4p+KN2cA88y/oJzO
+        B+8Vnx7gJyJRzWlAodWS3pD0yToTnTkuYxn+
+X-Google-Smtp-Source: ABdhPJxO2gHuT5k9dcnnZGNk0MGMbiLxVmvaik28q18dCpokHnuwiZzoDtkaMJ2BA5ylmY0hCGjwCw==
+X-Received: by 2002:aa7:c4c7:: with SMTP id p7mr45104066edr.290.1626843430294;
+        Tue, 20 Jul 2021 21:57:10 -0700 (PDT)
+Received: from ?IPv6:2a0b:e7c0:0:107::70f? ([2a0b:e7c0:0:107::70f])
+        by smtp.gmail.com with ESMTPSA id s18sm7979195ejh.12.2021.07.20.21.57.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jul 2021 21:57:09 -0700 (PDT)
+Subject: Re: [Patch v4 2/3] Drivers: hv: add Azure Blob driver
+To:     Long Li <longli@microsoft.com>,
+        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
+        "linux-fs@vger.kernel.org" <linux-fs@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        Ben Widawsky <ben.widawsky@intel.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Siddharth Gupta <sidgup@codeaurora.org>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
+ <1626751866-15765-3-git-send-email-longli@linuxonhyperv.com>
+ <90ed52d3-5095-9789-53f0-477ba70edc3b@kernel.org>
+ <BY5PR21MB15069D0519AD92773355FCF6CEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
+From:   Jiri Slaby <jirislaby@kernel.org>
+Message-ID: <5c5dd1e5-2639-b293-b2e0-d7cfd5ca3c0c@kernel.org>
+Date:   Wed, 21 Jul 2021 06:57:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YPeiRb8o+zh29Pag@infradead.org>
+In-Reply-To: <BY5PR21MB15069D0519AD92773355FCF6CEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset=iso-8859-2; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 21, 2021 at 05:27:49AM +0100, Christoph Hellwig wrote:
-> On Tue, Jul 20, 2021 at 05:12:19PM -0700, Darrick J. Wong wrote:
-> > I /am/ beginning to wonder, though -- seeing as Christoph and Matthew
-> > both have very large patchsets changing things in fs/iomap/, how would
-> > you like those landed?  Christoph's iterator refactoring looks like it
-> > could be ready to go for 5.15.  Matthew's folio series looks like a
-> > mostly straightforward conversion for iomap, except that it has 91
-> > patches as a hard dependency.
-> > 
-> > Since most of the iomap changes for 5.15 aren't directly related to
-> > folios, I think I prefer iomap-for-next to be based directly off -rcX
-> > like usual, though I don't know where that leaves the iomap folio
-> > conversion.  I suppose one could add them to a branch that itself is a
-> > result of the folio and iomap branches, or leave them off for 5.16?
+On 21. 07. 21, 0:12, Long Li wrote:
+>> Subject: Re: [Patch v4 2/3] Drivers: hv: add Azure Blob driver
+>>
+>> On 20. 07. 21, 5:31, longli@linuxonhyperv.com wrote:
+>>> --- /dev/null
+>>> +++ b/include/uapi/misc/hv_azure_blob.h
+>>> @@ -0,0 +1,34 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
+>>> +/* Copyright (c) 2021 Microsoft Corporation. */
+>>> +
+>>> +#ifndef _AZ_BLOB_H
+>>> +#define _AZ_BLOB_H
+>>> +
+>>> +#include <linux/kernel.h>
+>>> +#include <linux/uuid.h>
+>>
+>> Quoting from
+>> https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.
+>> kernel.org%2Flinux-
+>> doc%2FMWHPR21MB159375586D810EC5DCB66AF0D7039%40MWHPR21MB1
+>> 593.namprd21.prod.outlook.com%2F&amp;data=04%7C01%7Clongli%40micr
+>> osoft.com%7C7fdf2d6ed15d4d4122a308d94b6eeed0%7C72f988bf86f141af91
+>> ab2d7cd011db47%7C1%7C0%7C637623762292949381%7CUnknown%7CTWFp
+>> bGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVC
+>> I6Mn0%3D%7C3000&amp;sdata=kv0ZkU1QL6TxlJJZEQEsT7aqLFL9lmP2SStz8k
+>> U5sIs%3D&amp;reserved=0:
+>> =====
+>> Seems like a #include of asm/ioctl.h (or something similar) is needed so that
+>> _IOWR is defined.  Also, a #include is needed for __u32, __aligned_u64,
+>> guid_t, etc.
+>> =====
 > 
-> Maybe willy has a different opinion, but I thought the plan was to have
-> the based folio enablement in 5.15, and then do things like the iomap
-> conversion in the the next merge window.  If we have everything ready
-> this window we could still add a branch that builds on top of both
-> the iomap and folio trees, though.
+> The user-space code includes "sys/ioctl.h" for calling into ioctl(). "sys/ioctl.h"
+> includes <linux/ioctl.h>, so it has no problem finding _IOWR.
+> 
+> guid_t is defined in <uapi/linux/uuid.h>, included from <linux/uuid.h> (in this file)
+> __u32 and __aligned_u64 are defined in <uapi/linux/types.>, which is included from <linux/kernel.h> (in this file)
 
-Yes, my plan was to have the iomap conversion and the second half of the
-page cache work hit 5.16.  If we're ready earlier, that's great!  Both
-you and I want to see both the folio work and the iomap_iter work
-get merged, so I don't anticipate any lack of will to get the work done.
+No, please don't rely on implicit include chains. Nor that userspace 
+solves the includes for you.
+
+thanks,
+-- 
+js
+suse labs
