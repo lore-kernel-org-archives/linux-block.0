@@ -2,86 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A5CC6377A
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 20:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFFBC6377D
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 20:33:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A4396124C
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 20:22:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EEE760FF4
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 20:33:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240524AbhGUTlh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 15:41:37 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:49336 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240512AbhGUTlf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 15:41:35 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1626898930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=13AKBfJpRbWB/hAHCzyxNaRiYHnfqT7SMZklEKL2SbM=;
-        b=IZ8vGcjKDv10xjNMxbvG9JXHQONzSs/4lNNhSqj1OtMgkdz3l7Lvm6Rpbiqp3SMOUR9tUI
-        eeoitoqe7bYwxX2/g7W2/I41DeaDVbn8G34zxPOe47CwhVPb6SecWtntqacylntcIgYlcI
-        Ujs0M4eAeBuegH0FeBSlmv8kqgv5Q9H2c9vRkV7ZsmzuMhcoBDK/jSUpYMFPp2SMq0bfWI
-        J0Reg8glcWZEcqigQOTy/k5+A3io6AyYbyM0CRwS9C69XiXREz7EoDIE/kUo++N8+RcG4K
-        gv4u8DeLuG5kHz8e7/aeju+0ZV+hc1Nyxh2XTdu9/+jpZzOOLMFNsCZskMORXA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1626898930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=13AKBfJpRbWB/hAHCzyxNaRiYHnfqT7SMZklEKL2SbM=;
-        b=ghlz/kVNYaYUjvjhF4jkU+7xzhPV9t+wujENU+wbeyY5GDazP0D7JYCidPSx2gVdW+I7lL
-        bkSzuKI8xSefxaBw==
-To:     John Garry <john.garry@huawei.com>, Christoph Hellwig <hch@lst.de>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        id S229981AbhGUTw0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 15:52:26 -0400
+Received: from verein.lst.de ([213.95.11.211]:60006 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230173AbhGUTw0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Jul 2021 15:52:26 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 691A967373; Wed, 21 Jul 2021 22:32:59 +0200 (CEST)
+Date:   Wed, 21 Jul 2021 22:32:59 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Christoph Hellwig <hch@lst.de>, John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
         Sagi Grimberg <sagi@grimberg.me>,
         Daniel Wagner <dwagner@suse.de>,
         Wen Xiong <wenxiong@us.ibm.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Keith Busch <kbusch@kernel.org>, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed if any irq is managed
-In-Reply-To: <fe34623e-1074-862d-e822-7359ae4def0f@huawei.com>
-References: <20210715120844.636968-1-ming.lei@redhat.com> <20210715120844.636968-2-ming.lei@redhat.com> <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com> <20210719094414.GC431@lst.de> <87lf60cevz.ffs@nanos.tec.linutronix.de> <20210721072445.GA11257@lst.de> <fe34623e-1074-862d-e822-7359ae4def0f@huawei.com>
-Date:   Wed, 21 Jul 2021 22:22:10 +0200
-Message-ID: <87y29zpgct.ffs@nanos.tec.linutronix.de>
+        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity
+ managed if any irq is managed
+Message-ID: <20210721203259.GA18960@lst.de>
+References: <20210715120844.636968-1-ming.lei@redhat.com> <20210715120844.636968-2-ming.lei@redhat.com> <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com> <20210719094414.GC431@lst.de> <87lf60cevz.ffs@nanos.tec.linutronix.de> <20210721072445.GA11257@lst.de> <871r7rqva6.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871r7rqva6.ffs@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 21 2021 at 10:44, John Garry wrote:
-> On 21/07/2021 08:24, Christoph Hellwig wrote:
->> On Wed, Jul 21, 2021 at 09:20:00AM +0200, Thomas Gleixner wrote:
->>>> Also does the above imply this won't work for your platform MSI case?
->>> The msi descriptors are attached to struct device and independent of
->>> platform/PCI/whatever.
->> That's what I assumed, but this text from John suggested there is
->> something odd about the platform case:
->> 
->> "Did you consider that for PCI .."
->> .
->
-> For this special platform MSI case there is a secondary interrupt 
-> controller (called mbigen) which generates the MSI on behalf of the 
-> device, which I think the MSI belongs to (and not the device, itself).
+On Wed, Jul 21, 2021 at 10:14:25PM +0200, Thomas Gleixner wrote:
+>   https://lore.kernel.org/r/87o8bxcuxv.ffs@nanos.tec.linutronix.de
+> 
+> TLDR: virtio allocates ONE irq on msix_enable() and then when the guest
+> actually unmasks another entry (e.g. request_irq()), it tears down the
+> allocated one and set's up two. On the third one this repeats ....
+> 
+> There are only two options:
+> 
+>   1) allocate everything upfront, which is undesired
+>   2) append entries, which might need locking, but I'm still trying to
+>      avoid that
+> 
+> There is another problem vs. vector exhaustion which can't be fixed that
+> way, but that's a different story.
 
-MBIGEN is a different story because it converts wired interrupts into
-MSI interrupts, IOW a MSI based interrupt pin extender.
-
-I might be wrong, but I seriously doubt that any multiqueue device which
-wants to use affinity managed interrupts is built on top of that.
-
-Thanks,
-
-        tglx
+FTI, NVMe is similar.  We need one IRQ to setup the admin queue,
+which is used to query/set how many I/O queues are supported.  Just
+two steps though and not unbound.
