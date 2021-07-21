@@ -2,270 +2,305 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 078D6C12002
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F78C07E9B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:24:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9DA06101B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:18:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93CB06101E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 05:24:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232738AbhGUEiN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 00:38:13 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:44289 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232512AbhGUEiM (ORCPT
+        id S231723AbhGUEnt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 00:43:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231219AbhGUEnq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 00:38:12 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 2B8DA581865;
-        Wed, 21 Jul 2021 01:18:49 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Wed, 21 Jul 2021 01:18:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=WhrD41ffNVn/36YzYIxJtzJhx5w
-        mUJTqLi2n9GMPzkE=; b=FSjejb7MRbDSICcqsuMdzuSjh8rWEsLU9Kgilxvohks
-        znnl/nHLkx95D1OxXrxCzWWnBwSKOL00DWCeLhQxQUVdn2LcIP5FkqHPUgj1CIPk
-        F/hnSZxroLlJZ2UgHmQc5HY3Sj2cCVm/6enlWnRNXpEJS0To3Zic+1vs1qZZ7nKP
-        FySFnJC22EsyxkXZdg1klXyu7pmbxXbE+l00Lit6EVZodvvAvgKVBjwCi3bGddJq
-        NyNub+jSgwoDJAxq3n/5qHnAsW9slaD/eeln91su7j3yt5xi+jstE9gzF3SkjTIn
-        4ZDsxN4EZ1wZiokYet+oGQIPsR14NemFf7FbY2qwloA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=WhrD41
-        ffNVn/36YzYIxJtzJhx5wmUJTqLi2n9GMPzkE=; b=iEq4rN4hH1UwfZIBRhx3d/
-        wQ2bwgGx+RWD+hZ+Ch3WoAX/BiRnOhlyOPD0mivDIwfneNS2M4K62sdNDmO2dAS3
-        mJTuHaYT2tAPZZIHluKqAqpbe2iDr8AOIQR3J9kW+9lQoMdGEOI5PCtJ9ZIOW5XN
-        2ipoi+A4a5s7ABbZonGV0HOjw214l9dIRizIhyiqxZzgt26eFPlaQRbedvj2CqDG
-        qCdywM1C3lsghLp1D5nzKx8R+IOk/KRj+D3Ucwxw+VKFSoDkf5TKlqk/V6eCiei9
-        FXn2i3Ak0WziAFs09RwYA7FkduqY5sVGMxLuzq/mJXFVmCpgUXxQDt5/AOhLaxOg
-        ==
-X-ME-Sender: <xms:OK73YLI83JT2i4oP18auMfPE2dYb9yi6kg8ofSRyPrjBqhm2ckWD2g>
-    <xme:OK73YPLfW9iRtx2ISV33U0g3WPIA-uWk-Ma4lkVE-C-vuM92NLewiu51WLhdE1Fo1
-    y7iYGhZWQ_5-g>
-X-ME-Received: <xmr:OK73YDseyvCUciRO3cljxFI6IzrD-T5Pvl4llG4JKaXOzwxcKxPD19UrKXcJX3Y4y3VnE7UWFiYYusIk_ng9Ntaha7oDfgSU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrfeefgdekgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
-    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhephfelffejgf
-    eludeljeeivdegleekveeffeeigeduheffteegveelteeuleffveeknecuffhomhgrihhn
-    pehouhhtlhhoohhkrdgtohhmpdhhthhtphdrihhnpdhgihhthhhusgdrtghomhdpmhhitg
-    hrohhsohhfthdrtghomhdphhhtthhprdhithenucevlhhushhtvghrufhiiigvpedtnecu
-    rfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:OK73YEZNf2qMmzVMsCojj13dOT5Q4wL8zY2fLhZLeB-hivP7CfNBlw>
-    <xmx:OK73YCaPbORg9Eb2UaQPfLF6JuoZiqymgIAMpVtvIR1-PV29JLBmtg>
-    <xmx:OK73YICzwzbYTpYql64YWp94GGPQ8Uozc014PU7IcOEPeeu0glTnqg>
-    <xmx:Oa73YPQ2TYbANtu5X6RkYhbk47SEfJw_MJrEohZJeYViD5CK5Exd0g>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 21 Jul 2021 01:18:48 -0400 (EDT)
-Date:   Wed, 21 Jul 2021 07:18:44 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Long Li <longli@microsoft.com>
-Cc:     "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
-        "linux-fs@vger.kernel.org" <linux-fs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
-Subject: Re: [Patch v4 0/3] Introduce a driver to support host accelerated
- access to Microsoft Azure Blob
-Message-ID: <YPeuND2rmiLnbJig@kroah.com>
-References: <1626751866-15765-1-git-send-email-longli@linuxonhyperv.com>
- <YPbxr8XbK0IbD02r@kroah.com>
- <BY5PR21MB1506D5D10F15E291BB553B50CEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
+        Wed, 21 Jul 2021 00:43:46 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2272C061574;
+        Tue, 20 Jul 2021 22:24:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4w4Rr+K4p1voERuiNUi/I4B9P8DpL0Nk0BxmYqhBMeQ=; b=VaB3KcdIdumCUAwL1TVaTjvXcr
+        VJecuz66bDlqj1EFyZ4N9x9QWajVfFwLbpwRABcr2d2EdqOS2XvW/x+env9olwWdBh8ZsltJC/dxq
+        IdG39jldxjtT7WkQP4LLzM+p8XFPfnwyVFZ8O8ai5kmvrF4FbcKrvDwh8kkFpKjNJyCQ5JPjkFce1
+        meAot8ytW//A1sb7LEkOlFh6da+4Jey72v8bEgMD/Go0vbHNWlpJ3MY2prWvisFdRDoZ4PdLM3ZWX
+        NDUhAQ8V85wzbV89zFaLpAzk5Um+1lWgodFILXA8EvWKITFr4GkGVDHcZtnk1hxRh4z46fCQi+qNy
+        x+w/EtfQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m64i7-008pFT-7V; Wed, 21 Jul 2021 05:24:00 +0000
+Date:   Wed, 21 Jul 2021 06:23:59 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, hare@suse.de, bvanassche@acm.org,
+        ming.lei@redhat.com, hch@infradead.org, jack@suse.cz,
+        osandov@fb.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 3/5] mmc/core/block: replace GENHD_FL_UP with
+ GENHD_FL_DISK_ADDED
+Message-ID: <YPevb5SpgBX6eWEZ@infradead.org>
+References: <20210720182048.1906526-1-mcgrof@kernel.org>
+ <20210720182048.1906526-4-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BY5PR21MB1506D5D10F15E291BB553B50CEE29@BY5PR21MB1506.namprd21.prod.outlook.com>
+In-Reply-To: <20210720182048.1906526-4-mcgrof@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 20, 2021 at 06:37:38PM +0000, Long Li wrote:
-> > Subject: Re: [Patch v4 0/3] Introduce a driver to support host accelerated
-> > access to Microsoft Azure Blob
-> > 
-> > On Mon, Jul 19, 2021 at 08:31:03PM -0700, longli@linuxonhyperv.com wrote:
-> > > From: Long Li <longli@microsoft.com>
-> > >
-> > > Microsoft Azure Blob storage service exposes a REST API to
-> > > applications for data access.
-> > >
-> > (https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdoc
-> > > s.microsoft.com%2Fen-us%2Frest%2Fapi%2Fstorageservices%2Fblob-
-> > service-
-> > > rest-
-> > api&amp;data=04%7C01%7Clongli%40microsoft.com%7Ce499fbe161554232e
-> > >
-> > b1608d94b96a772%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C637
-> > 623932
-> > >
-> > 843247787%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIj
-> > oiV2luMzIi
-> > >
-> > LCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C2000&amp;sdata=9CKNHAmurdBWp
-> > ZeLfkiC18
-> > > CXNg66UhKsSZzzHZkzf0Y%3D&amp;reserved=0)
-> > >
-> > > This patchset implements a VSC (Virtualization Service Consumer) that
-> > > communicates with a VSP (Virtualization Service Provider) on the
-> > > Hyper-V host to execute Blob storage access via native network stack on
-> > the host.
-> > > This VSC doesn't implement the semantics of REST API. Those are
-> > > implemented in user-space. The VSC provides a fast data path to VSP.
-> > >
-> > > Answers to some previous questions discussing the driver:
-> > >
-> > > Q: Why this driver doesn't use the block layer
-> > >
-> > > A: The Azure Blob is based on a model of object oriented storage. The
-> > > storage object is not modeled in block sectors. While it's possible to
-> > > present the storage object as a block device (assuming it makes sense
-> > > to fake all the block device attributes), we lose the ability to
-> > > express functionality that are defined in the REST API.
-> > 
-> > What "REST API"?
-> > 
-> > Why doesn't object oriented storage map to a file handle to read from?
-> > No need to mess with "blocks", why would you care about them?
-> > 
-> > And again, you loose all caching, this thing has got to be really slow, why add
-> > a slow storage interface?  What workload requires this type of slow block
-> > storage?
+On Tue, Jul 20, 2021 at 11:20:46AM -0700, Luis Chamberlain wrote:
+> The GENHD_FL_DISK_ADDED flag is what we really want, as the
+> flag GENHD_FL_UP could be set on a semi-initialized device.
 > 
-> "Blob REST API" expresses storage request semantics through HTTP. In Blob
-> REST API, each request is associated with a context meta data expressed in
-> HTTP headers. The ability to express those semantics is rich, it's only limited
-> by HTTP protocol.
-
-HTTP has nothing to do with the kernel, so I do not understand what you
-are talking about here.
-
-> There are attempts to implement the Blob as a file system.
-> Here is an example filesystem (BlobFuse) implemented for Blob:
-> (https://github.com/Azure/azure-storage-fuse).
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  drivers/mmc/core/block.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> It's doable, but at the same time you lose all the performance and
-> shareable/security features presented in the REST API for Blob.
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index ce8aed562929..e9818c79fa59 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -2644,7 +2644,7 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
+>  		 * from being accepted.
+>  		 */
+>  		card = md->queue.card;
+> -		if (md->disk->flags & GENHD_FL_UP) {
+> +		if (blk_disk_added(md->disk)) {
+>  			device_remove_file(disk_to_dev(md->disk), &md->force_ro);
+>  			if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
+>  					card->ext_csd.boot_ro_lockable)
+> -- 
 
-What sharable/security features are in this driver instead?  I saw none.
+I think the proper fix here is to just unwind the mmc initialization,
+something like this untested patch:
 
-> A POSIX
-> interface cannot express same functionality as the REST API for Blob.
 
-But you are not putting a REST api into this kernel driver, so I fail to
-understand this.
-
-> For example, The Blob API for read (Get Blob, 
-> https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob)
-> has rich meta data context that cannot easily be mapped to POSIX. The same
-> goes to other Blob API to manage security tokens and the life cycle of shareable
-> objects.
-
-How can you have sharable objects in this ioctl interface instead?
-
-> BlobFuse (above) filesystem demonstrated why Blob should not be implemented
-> on a filesystem. It's useable for data management purposes. It's not usable for an I/O
-> intensive workload. It's not usable for managing sharable objects and security tokens.
-
-What is the bottleneck for the throughput/performance issues involved?
-
-> Blob is designed not to use file system caching and block layer I/O scheduling.
-> There are many solutions existing today, that access raw disk for I/O, bypassing
-> filesystem and block layer. For example, many database applications access raw
-> disks for I/O. When the application knows the I/O pattern and its intended behavior,
-> it doesn't get much benefit from filesystem or block.
-
-Databases that use raw i/o "know what they are doing" and are constantly
-fighting with the kernel.  Don't expect kernel developers to just think
-that this is ok.
-
-But this is not what you are doing here at all, this is an object
-storage, you are still being forced to open/ioctl/close to get an object
-instead of just doing open/read/close, so I fail to understand where the
-performance issues are.
-
-And if they are in the FUSE layer, why not just write a filesystem layer
-in the kernel instead to resolve that?  Who is insisting that you do
-this through a character device driver to get filesystem data?
-
-> > > Q: You also just abandoned the POSIX model and forced people to use a
-> > > random-custom-library just to access their storage devices, breaking
-> > > all existing programs in the world?
-> > >
-> > > A: The existing Blob applications access storage via HTTP (REST API).
-> > > They don't use POSIX interface. The interface for Azure Blob is not
-> > > designed on POSIX.
-> > 
-> > I do not see a HTTP interface here, what does that have to do with the kernel?
-> > 
-> > I see a single ioctl interface, that's all.
-> 
-> The driver doesn't attempt to implement Blob API or HTTP. It presents a fast data
-> path to pass Blob requests to hosts, so the guest VM doesn't need to assemble
-> a HTTP packet for each Blob REST requests. This also eliminates additional
-> overhead in guest network stack to send the HTTP packets over TCP/IP.
-
-Again, I fail to understand how http or tcp/ip comes into play here at
-all, that's not what this driver does.
-
-> Once the request reaches the Azure host, it knows the best way to reach to the 
-> backend storage and serving the Blob request, while at the same time all the 
-> security and integrity features are preserved.
-
-I do not understand this statement at all.
-
-> > > Q: What programs today use this new API?
-> > >
-> > > A: Currently none is released. But per above, there are also none
-> > > using POSIX.
-> > 
-> > Great, so no one uses this, so who is asking for and requiring this thing?
-> > 
-> > What about just doing it all from userspace using FUSE?  Why does this HAVE
-> > to be a kernel driver?
-> 
-> We have a major workload nearing the end of development. Compared with
-> REST over HTTP, this device model presented faster data access and CPU savings
-> in that there is no overhead of sending HTTP over network.
-
-Your development cycle means nothing to us, sorry.  Please realize that
-if you submit something that is not acceptable to us, there is no
-requirement that we take it just because we feel this is implemented in
-totally the wrong way.
-
-And you have not, again, proven that there is any performance
-improvement anywhere due to lack of numbers and data.   And again, what
-does HTTP have to do with this driver.
-
-> Eventually, all the existing Blob REST API applications can use this new API, once
-> it gets to their Blob transport libraries.
-
-What applications?  What libraries?  Who is using any of this?
-
-> I have explained why BlobFuse is not suitable for production workloads. There
-> are people using BlobFuse but mostly for management purposes.
-
-I fail to see why it is not usable as you have not provided any real
-information, sorry.
-
-Please step back and write up a document that explains the problem you
-are trying to solve and then we can go from there.  Right now you are
-throwing a driver at us and expecting us to just accept it, despite it
-looking like it is completly wrong for the problem space it is
-attempting to interact with.
-
-Please work with some experienced Linux kernel developers on your team
-to do all of this _BEFORE_ submitting it to the community again.  Based
-on the mistakes made so far, it looks like you could use some guidance
-in turning this into something that might be acceptable.  As it is, you
-are a long way off.
-
-good luck!
-
-greg k-h
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 9890a1532cb0..982f0198d8ff 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2283,7 +2283,8 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 					      sector_t size,
+ 					      bool default_ro,
+ 					      const char *subname,
+-					      int area_type)
++					      int area_type,
++					      unsigned int part_type)
+ {
+ 	struct mmc_blk_data *md;
+ 	int devidx, ret;
+@@ -2329,6 +2330,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 	INIT_LIST_HEAD(&md->rpmbs);
+ 	md->usage = 1;
+ 	md->queue.blkdata = md;
++	md->part_type = part_type;
+ 
+ 	md->disk->major	= MMC_BLOCK_MAJOR;
+ 	md->disk->minors = perdev_minors;
+@@ -2381,8 +2383,43 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 		md->disk->disk_name, mmc_card_id(card), mmc_card_name(card),
+ 		cap_str, md->read_only ? "(ro)" : "");
+ 
++	device_add_disk(md->parent, md->disk, NULL);
++	md->force_ro.show = force_ro_show;
++	md->force_ro.store = force_ro_store;
++	sysfs_attr_init(&md->force_ro.attr);
++	md->force_ro.attr.name = "force_ro";
++	md->force_ro.attr.mode = S_IRUGO | S_IWUSR;
++	ret = device_create_file(disk_to_dev(md->disk), &md->force_ro);
++	if (ret)
++		goto force_ro_fail;
++
++	if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
++	     card->ext_csd.boot_ro_lockable) {
++		umode_t mode;
++
++		if (card->ext_csd.boot_ro_lock & EXT_CSD_BOOT_WP_B_PWR_WP_DIS)
++			mode = S_IRUGO;
++		else
++			mode = S_IRUGO | S_IWUSR;
++
++		md->power_ro_lock.show = power_ro_lock_show;
++		md->power_ro_lock.store = power_ro_lock_store;
++		sysfs_attr_init(&md->power_ro_lock.attr);
++		md->power_ro_lock.attr.mode = mode;
++		md->power_ro_lock.attr.name =
++					"ro_lock_until_next_power_on";
++		ret = device_create_file(disk_to_dev(md->disk),
++				&md->power_ro_lock);
++		if (ret)
++			goto power_ro_lock_fail;
++	}
+ 	return md;
+ 
++ power_ro_lock_fail:
++	device_remove_file(disk_to_dev(md->disk), &md->force_ro);
++ force_ro_fail:
++	del_gendisk(md->disk);
++ 	// XXX: undo mmc_init_queue
+  err_kfree:
+ 	kfree(md);
+  out:
+@@ -2410,7 +2447,7 @@ static struct mmc_blk_data *mmc_blk_alloc(struct mmc_card *card)
+ 	}
+ 
+ 	return mmc_blk_alloc_req(card, &card->dev, size, false, NULL,
+-					MMC_BLK_DATA_AREA_MAIN);
++					MMC_BLK_DATA_AREA_MAIN, 0);
+ }
+ 
+ static int mmc_blk_alloc_part(struct mmc_card *card,
+@@ -2424,10 +2461,9 @@ static int mmc_blk_alloc_part(struct mmc_card *card,
+ 	struct mmc_blk_data *part_md;
+ 
+ 	part_md = mmc_blk_alloc_req(card, disk_to_dev(md->disk), size, default_ro,
+-				    subname, area_type);
++				    subname, area_type, part_type);
+ 	if (IS_ERR(part_md))
+ 		return PTR_ERR(part_md);
+-	part_md->part_type = part_type;
+ 	list_add(&part_md->part, &md->part);
+ 
+ 	return 0;
+@@ -2628,27 +2664,23 @@ static int mmc_blk_alloc_parts(struct mmc_card *card, struct mmc_blk_data *md)
+ 
+ static void mmc_blk_remove_req(struct mmc_blk_data *md)
+ {
+-	struct mmc_card *card;
++	struct mmc_card *card = md->queue.card;
+ 
+-	if (md) {
+-		/*
+-		 * Flush remaining requests and free queues. It
+-		 * is freeing the queue that stops new requests
+-		 * from being accepted.
+-		 */
+-		card = md->queue.card;
+-		if (md->disk->flags & GENHD_FL_UP) {
+-			device_remove_file(disk_to_dev(md->disk), &md->force_ro);
+-			if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
+-					card->ext_csd.boot_ro_lockable)
+-				device_remove_file(disk_to_dev(md->disk),
+-					&md->power_ro_lock);
+-
+-			del_gendisk(md->disk);
+-		}
+-		mmc_cleanup_queue(&md->queue);
+-		mmc_blk_put(md);
++	/*
++	 * Flush remaining requests and free queues. It is freeing the queue
++	 * that stops new requests from being accepted.
++	 */
++	if (md->disk->flags & GENHD_FL_UP) {
++		device_remove_file(disk_to_dev(md->disk), &md->force_ro);
++		if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
++				card->ext_csd.boot_ro_lockable)
++			device_remove_file(disk_to_dev(md->disk),
++				&md->power_ro_lock);
++
++		del_gendisk(md->disk);
+ 	}
++	mmc_cleanup_queue(&md->queue);
++	mmc_blk_put(md);
+ }
+ 
+ static void mmc_blk_remove_parts(struct mmc_card *card,
+@@ -2672,51 +2704,6 @@ static void mmc_blk_remove_parts(struct mmc_card *card,
+ 	}
+ }
+ 
+-static int mmc_add_disk(struct mmc_blk_data *md)
+-{
+-	int ret;
+-	struct mmc_card *card = md->queue.card;
+-
+-	device_add_disk(md->parent, md->disk, NULL);
+-	md->force_ro.show = force_ro_show;
+-	md->force_ro.store = force_ro_store;
+-	sysfs_attr_init(&md->force_ro.attr);
+-	md->force_ro.attr.name = "force_ro";
+-	md->force_ro.attr.mode = S_IRUGO | S_IWUSR;
+-	ret = device_create_file(disk_to_dev(md->disk), &md->force_ro);
+-	if (ret)
+-		goto force_ro_fail;
+-
+-	if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
+-	     card->ext_csd.boot_ro_lockable) {
+-		umode_t mode;
+-
+-		if (card->ext_csd.boot_ro_lock & EXT_CSD_BOOT_WP_B_PWR_WP_DIS)
+-			mode = S_IRUGO;
+-		else
+-			mode = S_IRUGO | S_IWUSR;
+-
+-		md->power_ro_lock.show = power_ro_lock_show;
+-		md->power_ro_lock.store = power_ro_lock_store;
+-		sysfs_attr_init(&md->power_ro_lock.attr);
+-		md->power_ro_lock.attr.mode = mode;
+-		md->power_ro_lock.attr.name =
+-					"ro_lock_until_next_power_on";
+-		ret = device_create_file(disk_to_dev(md->disk),
+-				&md->power_ro_lock);
+-		if (ret)
+-			goto power_ro_lock_fail;
+-	}
+-	return ret;
+-
+-power_ro_lock_fail:
+-	device_remove_file(disk_to_dev(md->disk), &md->force_ro);
+-force_ro_fail:
+-	del_gendisk(md->disk);
+-
+-	return ret;
+-}
+-
+ #ifdef CONFIG_DEBUG_FS
+ 
+ static int mmc_dbg_card_status_get(void *data, u64 *val)
+@@ -2882,7 +2869,7 @@ static void mmc_blk_remove_debugfs(struct mmc_card *card,
+ 
+ static int mmc_blk_probe(struct mmc_card *card)
+ {
+-	struct mmc_blk_data *md, *part_md;
++	struct mmc_blk_data *md;
+ 	int ret = 0;
+ 
+ 	/*
+@@ -2900,6 +2887,8 @@ static int mmc_blk_probe(struct mmc_card *card)
+ 		return -ENOMEM;
+ 	}
+ 
++	dev_set_drvdata(&card->dev, md);
++
+ 	md = mmc_blk_alloc(card);
+ 	if (IS_ERR(md)) {
+ 		ret = PTR_ERR(md);
+@@ -2910,18 +2899,6 @@ static int mmc_blk_probe(struct mmc_card *card)
+ 	if (ret)
+ 		goto out;
+ 
+-	dev_set_drvdata(&card->dev, md);
+-
+-	ret = mmc_add_disk(md);
+-	if (ret)
+-		goto out;
+-
+-	list_for_each_entry(part_md, &md->part, part) {
+-		ret = mmc_add_disk(part_md);
+-		if (ret)
+-			goto out;
+-	}
+-
+ 	/* Add two debugfs entries */
+ 	mmc_blk_add_debugfs(card, md);
+ 
