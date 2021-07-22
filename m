@@ -2,140 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DB2C6377A
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 22:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B91C6377B
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 01:23:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F272661263
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jul 2021 22:38:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C41D361263
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 01:23:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230034AbhGUV5j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 17:57:39 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:50032 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229684AbhGUV5i (ORCPT
+        id S229818AbhGVAmb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 20:42:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34986 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229783AbhGVAma (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 17:57:38 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1626907093;
+        Wed, 21 Jul 2021 20:42:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626916985;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=TQLRh+7qGE3VP3wBrZZJmZAEZQxMZFNHuu8FDoGr7e4=;
-        b=ppUhdihsnmeHgT0VRBl5aEdERmntnpUGzJB5+6r2tVwqko/N7pm3Q4GLvLTL0dNSfMRfsG
-        oODtwJF4ieA/wnsOYYMJAs1mD+NFHv+avmmbGiYmNXY+viV5X3dNFczzCtVYSXR/kh82GH
-        AyYg1e356trh5/VaETln7KcZeU4q2rtayTkCC6UK/1NEYgOZV4IKNIQw7h1ZBCjzSvIRDT
-        Ue/Jxnvu31y/LXl7t6fQ0XVupJnZbF4BKwK8VgHatCNSt4Gm98IjULU77aBPaKcYbf7zT5
-        N+F8RvXwKJX0ULXCIAIln6Sm8if1o3cRFQq8QfeoshKm5l7KioZgOwTKe11zRg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1626907093;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TQLRh+7qGE3VP3wBrZZJmZAEZQxMZFNHuu8FDoGr7e4=;
-        b=FrFj5ZapdfSAF5URVUJzeKUnhZgI5j3n/xmpgAAZ7GRVpjqtPUXOHOvlzIzZ7pcohGxaMN
-        bVobF87paNH7rSCg==
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Christoph Hellwig <hch@lst.de>, John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        bh=p9hyN++sL6pwuYG+HV82gfVId8IkC3N/vYBIRXKylDc=;
+        b=bcLpCp8PA8JZA7UfpYG15Ixmw0P0hXhtM6Zh9otxV/uVLYhDDS1Sp158rd434q5k1arcJB
+        toXn0D+rfi5+ubAZlkpeq+9T8H4THl0b2MFQ/X114o8kC2KlegiyNyOX8q8Pb54459MV59
+        pR4xYw3HHvoSFsJ8hABxCudw454cK/0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-rYlm-WgpNK2QS_grL_dwig-1; Wed, 21 Jul 2021 21:23:02 -0400
+X-MC-Unique: rYlm-WgpNK2QS_grL_dwig-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61693107ACF5;
+        Thu, 22 Jul 2021 01:23:00 +0000 (UTC)
+Received: from T590 (ovpn-13-66.pek2.redhat.com [10.72.13.66])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D1661009962;
+        Thu, 22 Jul 2021 01:22:51 +0000 (UTC)
+Date:   Thu, 22 Jul 2021 09:22:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
         Sagi Grimberg <sagi@grimberg.me>,
         Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed if any irq is managed
-In-Reply-To: <20210721203259.GA18960@lst.de>
-References: <20210715120844.636968-1-ming.lei@redhat.com> <20210715120844.636968-2-ming.lei@redhat.com> <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com> <20210719094414.GC431@lst.de> <87lf60cevz.ffs@nanos.tec.linutronix.de> <20210721072445.GA11257@lst.de> <871r7rqva6.ffs@nanos.tec.linutronix.de> <20210721203259.GA18960@lst.de>
-Date:   Thu, 22 Jul 2021 00:38:07 +0200
-Message-ID: <878s1zpa28.ffs@nanos.tec.linutronix.de>
+        Wen Xiong <wenxiong@us.ibm.com>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V5 2/3] blk-mq: mark if one queue map uses managed irq
+Message-ID: <YPjIZsTZg0dx0jPC@T590>
+References: <20210721091723.1152456-1-ming.lei@redhat.com>
+ <20210721091723.1152456-3-ming.lei@redhat.com>
+ <6d2e0c81-6efd-69eb-7b00-85565533e5b4@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d2e0c81-6efd-69eb-7b00-85565533e5b4@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 21 2021 at 22:32, Christoph Hellwig wrote:
-> On Wed, Jul 21, 2021 at 10:14:25PM +0200, Thomas Gleixner wrote:
->>   https://lore.kernel.org/r/87o8bxcuxv.ffs@nanos.tec.linutronix.de
->> 
->> TLDR: virtio allocates ONE irq on msix_enable() and then when the
->> guest
+On Wed, Jul 21, 2021 at 07:53:22PM +0100, John Garry wrote:
+> On 21/07/2021 10:17, Ming Lei wrote:
+> 
+> FWIW,
+> 
+> Reviewed-by: John Garry <john.garry@huawei.com>
+> 
+> > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> > index 1d18447ebebc..d54a795ec971 100644
+> > --- a/include/linux/blk-mq.h
+> > +++ b/include/linux/blk-mq.h
+> > @@ -192,7 +192,8 @@ struct blk_mq_hw_ctx {
+> >   struct blk_mq_queue_map {
+> >   	unsigned int *mq_map;
+> >   	unsigned int nr_queues;
+> > -	unsigned int queue_offset;
+> > +	unsigned int queue_offset:31;
+> > +	unsigned int use_managed_irq:1;
+> 
+> late nit: I'd be inclined to call this "drain_hw_queue" or similar, which is
+> what it means to blk-mq
 
-OOps, sorry that should have been VFIO not virtio.
+But 'drain_hw_queue' isn't straightforward when it is checked in
+blk_mq_alloc_request_hctx().
 
->> actually unmasks another entry (e.g. request_irq()), it tears down the
->> allocated one and set's up two. On the third one this repeats ....
->> 
->> There are only two options:
->> 
->>   1) allocate everything upfront, which is undesired
->>   2) append entries, which might need locking, but I'm still trying to
->>      avoid that
->> 
->> There is another problem vs. vector exhaustion which can't be fixed that
->> way, but that's a different story.
->
-> FTI, NVMe is similar.  We need one IRQ to setup the admin queue,
-> which is used to query/set how many I/O queues are supported.  Just
-> two steps though and not unbound.
-
-That's fine because that's controlled by the driver consistently and it
-(hopefully) makes sure that the admin queue is quiesced before
-everything is torn down after the initial query.
-
-But that's not the case for VFIO. It tears down all in use interrupts
-and the guest driver is completely oblivious of that.
-
-Assume the following situation:
-
- 1) VM boots with 8 present CPUs and 16 possible CPUs
-
- 2) The passed through card (PF or VF) supports multiqueue and the
-    driver uses managed interrupts which e.g. allocates one queue and
-    one interrupt per possible CPU.
-
-    Initial setup requests all the interrupts, but only the first 8
-    queue interrupts are unmasked and therefore reallocated by the host
-    which works by some definition of works because the device is quiet
-    at that point.
-
- 3) Host admin plugs the other 8 CPUs into the guest
-
-    Onlining these CPUs in the guest will unmask the dormant managed
-    queue interrupts and cause the host to allocate the remaining 8 per
-    queue interrupts one by one thereby tearing down _all_ previously
-    allocated ones and then allocating one more than before.
-
-    Assume that while this goes on the guest has I/O running on the
-    already online CPUs and their associated queues. Depending on the
-    device this either will lose interrupts or reroute them to the
-    legacy INTx which is not handled. This might in the best case result
-    in a few "timedout" requests, but I managed it at least once to make
-    the device go into lala land state, i.e. it did not recover.
-
-The above can be fixed by adding an 'append' mode to the MSI code.
-
-But that does not fix the overcommit issue where the host runs out of
-vector space. The result is simply that the guest does not know and just
-continues to work on device/queues which will never ever recieve an
-interrupt (again).
-
-I got educated that all of this is considered unlikely and my argument
-that the concept of unlikely simply does not exist at cloud scale got
-ignored. Sure, I know it's VIRT and therefore not subject to common
-sense.
 
 Thanks,
+Ming
 
-        tglx
-
-
-
-    
-    
