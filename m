@@ -2,223 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDDDC63797
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 16:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4406C63793
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 16:28:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5727F61287
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 16:14:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2DB26128A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 16:28:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229530AbhGVPeU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 11:34:20 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:44112 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbhGVPeT (ORCPT
+        id S229669AbhGVPr0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 11:47:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229481AbhGVPr0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 11:34:19 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B53451FF25;
-        Thu, 22 Jul 2021 16:14:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1626970493; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5ng5IfXWcOXMnGCxvCfLVT7wuMduhf0fLfHw2lU8tn4=;
-        b=KrC85AGy0e2fIXGUostHedYczHE3OwfLcyb6+DqyuPhsewZhd8xZD+Z/T8wTIOHIj/vZs6
-        wJkgToFzotOnz+2NlyhdfGWcUH6ar5TMLLJwswgfoZeK/I2j10rQp6yH4b5HHqWlPTgLiE
-        9B4nitL9UDyOz6inOiSi5q12TzY8FpQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1626970493;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5ng5IfXWcOXMnGCxvCfLVT7wuMduhf0fLfHw2lU8tn4=;
-        b=BxGjnR3Iw+A/Zkb+YwWN90qaXrFry1Ff0Uu8bB7bhMfuxumwsguyiRbgkzhGB5foNy1h2r
-        7QNFW58H0hEbacBQ==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 90F8613C49;
-        Thu, 22 Jul 2021 16:14:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id n0rYIX2Z+WA7JwAAGKfGzw
-        (envelope-from <hare@suse.de>); Thu, 22 Jul 2021 16:14:53 +0000
-Subject: Re: [PATCH 2/4] scsi: sd: add concurrent positioning ranges support
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-ide@vger.kernel.org
-References: <20210721104205.885115-1-damien.lemoal@wdc.com>
- <20210721104205.885115-3-damien.lemoal@wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <c24e49dd-2605-aa9d-a6d7-47e519788d51@suse.de>
-Date:   Thu, 22 Jul 2021 18:14:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Thu, 22 Jul 2021 11:47:26 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A46C061575;
+        Thu, 22 Jul 2021 09:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8MEr16L96bOGxKrBhIZgt0+SVG6JvQfAHW+MYTYylcg=; b=TvzNICZHhKg2kYETwRHyWEfnsD
+        0Q5CTsjrbOdcDGY5Aj2GY+TFn74s9evoKF+nWwUzYL6y7BtpAO5Rk6ahQ/O9yibmq6/7rCHtKWUE3
+        Ae4bGBfntW5q38OZhHG9qq75GtELL5yvYheJHNl1kGhuLZy/ugbt7znISS/btweBZoq09iHzz8PGW
+        0NJ59+DUKVi6ZPG2wqarhgJDbEHhfl2VvnB0QSpwp92k2CVqpQEkKxcjO1e6hZRLSh8XgbHoK3IWx
+        a7G1cNScVd3ocXuWqkOH62nFRKfOIkxLZIr/g1HKUzcV+/y+RZJ997NN6BcY1y42oTgqIGFAZWizg
+        G4OyOANQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m6bXr-00AR4t-C2; Thu, 22 Jul 2021 16:27:42 +0000
+Date:   Thu, 22 Jul 2021 17:27:35 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v15 01/17] block: Add bio_add_folio()
+Message-ID: <YPmcd29EBU7s+/LY@casper.infradead.org>
+References: <20210719184001.1750630-1-willy@infradead.org>
+ <20210719184001.1750630-2-willy@infradead.org>
+ <YPZwODMq1ilIeS4t@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20210721104205.885115-3-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YPZwODMq1ilIeS4t@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/21/21 12:42 PM, Damien Le Moal wrote:
-> Add the sd_read_cpr() function to the sd scsi disk driver to discover
-> if a device has multiple concurrent positioning ranges (i.e. multiple
-> actuators on an HDD). This new function is called from
-> sd_revalidate_disk() and uses the block layer functions
-> blk_alloc_cranges() and blk_queue_set_cranges() to set a device
-> cranges according to the information retrieved from log page B9h,
-> if the device supports it.
+On Tue, Jul 20, 2021 at 07:42:00AM +0100, Christoph Hellwig wrote:
+> On Mon, Jul 19, 2021 at 07:39:45PM +0100, Matthew Wilcox (Oracle) wrote:
+> > +/**
+> > + * bio_add_folio - Attempt to add part of a folio to a bio.
+> > + * @bio: Bio to add to.
+> > + * @folio: Folio to add.
+> > + * @len: How many bytes from the folio to add.
+> > + * @off: First byte in this folio to add.
+> > + *
+> > + * Always uses the head page of the folio in the bio.  If a submitter only
+> > + * uses bio_add_folio(), it can count on never seeing tail pages in the
+> > + * completion routine.  BIOs do not support folios that are 4GiB or larger.
+> > + *
+> > + * Return: The number of bytes from this folio added to the bio.
+> > + */
+> > +size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+> > +		size_t off)
+> > +{
+> > +	if (len > UINT_MAX || off > UINT_MAX)
+> > +		return 0;
+> > +	return bio_add_page(bio, &folio->page, len, off);
+> > +}
 > 
-> The format of the Concurrent Positioning Ranges VPD page B9h is defined
-> in section 6.6.6 of SBC-5.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> ---
->   drivers/scsi/sd.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++
->   drivers/scsi/sd.h |  1 +
->   2 files changed, 81 insertions(+)
-> 
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index b8d55af763f9..b1e767a01b9f 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -3125,6 +3125,85 @@ static void sd_read_security(struct scsi_disk *sdkp, unsigned char *buffer)
->   		sdkp->security = 1;
->   }
->   
-> +static inline sector_t sd64_to_sectors(struct scsi_disk *sdkp, u8 *buf)
-> +{
-> +	return logical_to_sectors(sdkp->device, get_unaligned_be64(buf));
-> +}
-> +
-> +/**
-> + * sd_read_cpr - Query concurrent positioning ranges
-> + * @sdkp:	disk to query
-> + */
-> +static void sd_read_cpr(struct scsi_disk *sdkp)
-> +{
-> +	unsigned char *buffer, *desc;
-> +	struct blk_cranges *cr = NULL;
-> +	unsigned int nr_cpr = 0;
-> +	int i, vpd_len, buf_len = SD_BUF_SIZE;
-> +
-> +	/*
-> +	 * We need to have the capacity set first for the block layer to be
-> +	 * able to check the ranges.
-> +	 */
-> +	if (sdkp->first_scan)
-> +		return;
-> +
-> +	if (!sdkp->capacity)
-> +		goto out;
-> +
-> +	/*
-> +	 * Concurrent Positioning Ranges VPD: there can be at most 256 ranges,
-> +	 * leading to a maximum page size of 64 + 256*32 bytes.
-> +	 */
-> +	buf_len = 64 + 256*32;
-> +	buffer = kmalloc(buf_len, GFP_KERNEL);
-> +	if (!buffer || scsi_get_vpd_page(sdkp->device, 0xb9, buffer, buf_len))
-> +		goto out;
-> +
-> +	/* We must have at least a 64B header and one 32B range descriptor */
-> +	vpd_len = get_unaligned_be16(&buffer[2]) + 3;
-> +	if (vpd_len > buf_len || vpd_len < 64 + 32 || (vpd_len & 31)) {
-> +		sd_printk(KERN_ERR, sdkp,
-> +			  "Invalid Concurrent Positioning Ranges VPD page\n");
-> +		goto out;
-> +	}
-> +
-> +	nr_cpr = (vpd_len - 64) / 32;
-> +	if (nr_cpr == 1) {
-> +		nr_cpr = 0;
-> +		goto out;
-> +	}
-> +
-> +	cr = blk_alloc_cranges(sdkp->disk, nr_cpr);
-> +	if (!cr) {
-> +		nr_cpr = 0;
-> +		goto out;
-> +	}
-> +
-> +	desc = &buffer[64];
-> +	for (i = 0; i < nr_cpr; i++, desc += 32) {
-> +		if (desc[0] != i) {
-> +			sd_printk(KERN_ERR, sdkp,
-> +				"Invalid Concurrent Positioning Range number\n");
-> +			nr_cpr = 0;
-> +			break;
-> +		}
-> +
-> +		cr->ranges[i].sector = sd64_to_sectors(sdkp, desc + 8);
-> +		cr->ranges[i].nr_sectors = sd64_to_sectors(sdkp, desc + 16);
-> +	}
-> +
-> +out:
-> +	blk_queue_set_cranges(sdkp->disk, cr);
+> I'd use the opportunity to switch to a true/false return instead of
+> the length.  This has been on my todo list for bio_add_page for a while,
+> so it might make sense to start out the new API the right way.
 
-See? We are _are_ creating a new set of ranges.
-So why bother updating the old ones?
+Looking at it with fresh eyes, I decided to rewrite the docs too.
+ie this:
 
-> +	if (nr_cpr && sdkp->nr_actuators != nr_cpr) {
-> +		sd_printk(KERN_NOTICE, sdkp,
-> +			  "%u concurrent positioning ranges\n", nr_cpr);
-> +		sdkp->nr_actuators = nr_cpr;
-> +	}
-> +
-> +	kfree(buffer);
-> +}
-> +
->   /*
->    * Determine the device's preferred I/O size for reads and writes
->    * unless the reported value is unreasonably small, large, not a
-> @@ -3240,6 +3319,7 @@ static int sd_revalidate_disk(struct gendisk *disk)
->   		sd_read_app_tag_own(sdkp, buffer);
->   		sd_read_write_same(sdkp, buffer);
->   		sd_read_security(sdkp, buffer);
-> +		sd_read_cpr(sdkp);
->   	}
->   
->   	/*
-> diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-> index b59136c4125b..2e5932bde43d 100644
-> --- a/drivers/scsi/sd.h
-> +++ b/drivers/scsi/sd.h
-> @@ -106,6 +106,7 @@ struct scsi_disk {
->   	u8		protection_type;/* Data Integrity Field */
->   	u8		provisioning_mode;
->   	u8		zeroing_mode;
-> +	u8		nr_actuators;		/* Number of actuators */
->   	unsigned	ATO : 1;	/* state of disk ATO bit */
->   	unsigned	cache_override : 1; /* temp override of WCE,RCD */
->   	unsigned	WCE : 1;	/* state of disk WCE bit */
-> 
-Otherwise:
+ /**
+  * bio_add_folio - Attempt to add part of a folio to a bio.
+- * @bio: Bio to add to.
++ * @bio: BIO to add to.
+  * @folio: Folio to add.
+  * @len: How many bytes from the folio to add.
+  * @off: First byte in this folio to add.
+  *
+- * Always uses the head page of the folio in the bio.  If a submitter only
+- * uses bio_add_folio(), it can count on never seeing tail pages in the
+- * completion routine.  BIOs do not support folios that are 4GiB or larger.
++ * Filesystems that use folios can call this function instead of calling
++ * bio_add_page() for each page in the folio.  If @off is bigger than
++ * PAGE_SIZE, this function can create a bio_vec that starts in a page
++ * after the bv_page.  BIOs do not support folios that are 4GiB or larger.
+  *
+- * Return: The number of bytes from this folio added to the bio.
++ * Return: Whether the addition was successful.
+  */
+-size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
++bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+                size_t off)
+ {
+        if (len > UINT_MAX || off > UINT_MAX)
+                return 0;
+-       return bio_add_page(bio, &folio->page, len, off);
++       return bio_add_page(bio, &folio->page, len, off) > 0;
+ }
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+(i decided to go with > 0 so it's impervious to when you change
+bio_add_page())
