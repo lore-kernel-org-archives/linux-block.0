@@ -2,139 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 717E9C4338F
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBEA4C4320A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:19:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4453C60E74
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:17:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FF7160EB1
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:19:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231713AbhGVVgg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 17:36:36 -0400
-Received: from mail-pl1-f180.google.com ([209.85.214.180]:41800 "EHLO
-        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231533AbhGVVgg (ORCPT
+        id S231320AbhGVVif (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 17:38:35 -0400
+Received: from mail-pl1-f171.google.com ([209.85.214.171]:39742 "EHLO
+        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232375AbhGVVif (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 17:36:36 -0400
-Received: by mail-pl1-f180.google.com with SMTP id e14so942827plh.8;
-        Thu, 22 Jul 2021 15:17:10 -0700 (PDT)
+        Thu, 22 Jul 2021 17:38:35 -0400
+Received: by mail-pl1-f171.google.com with SMTP id e5so996870pla.6;
+        Thu, 22 Jul 2021 15:19:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KjDm2tntM7APsKw0ldKBybDQvh8O5xALMiXoPEkyZTI=;
-        b=aK9jPCxRz/gghaXzA/b2/yqVvgkg7N/H/XJceMUA3rKvUNlqwwNWoUIrbslPLCMFH2
-         LmTGbBI1tcMHs4HAgLMW6tmR+FvIvZMrLfPpQwcAWEgB5ORJV1HzH0a1LNWBglp7SdOM
-         BXEroyCdOjEzYj/EEQho2MdKYj3eapXaVUVmYVTTniKXnnTj0D/TgsRd3Pj5+821jycV
-         2C2l6d5Y28N8jyLfwsfJqK/DDbVEdJmI40+tyWKglwVE75jqTnrhNG2MhA49k2bgruF1
-         sA6LdhHWWTc19/mPtu06Fc3/1LSfz84dEdbOhHL+lM2oBsq+XTvgp7tsP+dZMclr3H1Z
-         3phw==
-X-Gm-Message-State: AOAM533fEMg96qPV1pOSrJvBqvlctwW1Uxjhl71teKF0+yq96CaFXfUc
-        30raG1w4nyVuIRWVxie9ct4=
-X-Google-Smtp-Source: ABdhPJzouoXE7Wgjzor7XhzXWq+ByqM9pelabWAXOU//gBHckMfX0mANrBFzySFWfklAhrdfb5KFUg==
-X-Received: by 2002:a63:3243:: with SMTP id y64mr2033130pgy.244.1626992229655;
-        Thu, 22 Jul 2021 15:17:09 -0700 (PDT)
-Received: from garbanzo ([191.96.121.239])
-        by smtp.gmail.com with ESMTPSA id bv22sm23528815pjb.21.2021.07.22.15.17.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jul 2021 15:17:08 -0700 (PDT)
-Date:   Thu, 22 Jul 2021 15:17:05 -0700
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lWYwLLr1F+wEohZcNxTrxT9x/1X4krqlfhkjTKwn5LU=;
+        b=Zw5P5x4B2pcmiuvW4R7oJVCjTwx72gcEgkCCMUOy5gKQ80kuskDFmKGvfeUGP/6Ufx
+         P+odj9q3IHgbF16n45gtEGoLT7M6u0EibME0h7ty7yyUL533IY3mkojcsNjNyvM/suKQ
+         VIr3AxPM0YMMMNLDZR4R76d30xvukAiArdGkS3p1HO5ZcOMYQ4MMvHtAUx2oLhfx6P4k
+         b2Nl/XnTW/jlgmryoZ1NctDWkRNTuAXy/ehpZzc3BSX04PxFzIJ0pfAxyR8b/oaUuU6l
+         /wr8GC5wvRQqcH06ZdoDCIIPvIvSiG3hH61mKzVpbwNudIlmerO0eVLrLOFN4m6FmeUY
+         xkoQ==
+X-Gm-Message-State: AOAM530Sv1GhZQIjLRz8FKGpKUZkRUA856e6HXyucw/tLsX9gRK8p47t
+        F3FiVPZEKXiNdP2oC2ORq3A=
+X-Google-Smtp-Source: ABdhPJyUsy0ro4YtJRuFm4vTMWqvS3mmCKFzmHMvFVjaECINrpaZu6M8QdvGu3PqOECaJ4mkPhFXWg==
+X-Received: by 2002:a63:449:: with SMTP id 70mr2067429pge.174.1626992349448;
+        Thu, 22 Jul 2021 15:19:09 -0700 (PDT)
+Received: from localhost ([191.96.121.239])
+        by smtp.gmail.com with ESMTPSA id q31sm8997884pjh.13.2021.07.22.15.19.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jul 2021 15:19:08 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
-        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
-        rafael@kernel.org, axboe@kernel.dk, tj@kernel.org, mbenes@suse.com,
+To:     gregkh@linuxfoundation.org, tj@kernel.org, shuah@kernel.org,
+        akpm@linux-foundation.org, rafael@kernel.org, davem@davemloft.net,
+        kuba@kernel.org, ast@kernel.org, andriin@fb.com,
+        daniel@iogearbox.net, atenart@kernel.org, alobakin@pm.me,
+        weiwan@google.com, ap420073@gmail.com
+Cc:     jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        mcgrof@kernel.org, axboe@kernel.dk, mbenes@suse.com,
         jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
         jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 2/3] zram: fix deadlock with sysfs attribute usage and
- module removal
-Message-ID: <20210722221705.kyrdkpt6fwf5k56o@garbanzo>
-References: <20210703001958.620899-1-mcgrof@kernel.org>
- <20210703001958.620899-3-mcgrof@kernel.org>
- <YPgFGd+FZQZWODY7@kroah.com>
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] kernel/module: add documentation for try_module_get()
+Date:   Thu, 22 Jul 2021 15:19:05 -0700
+Message-Id: <20210722221905.1718213-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YPgFGd+FZQZWODY7@kroah.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 21, 2021 at 01:29:29PM +0200, Greg KH wrote:
-> On Fri, Jul 02, 2021 at 05:19:57PM -0700, Luis Chamberlain wrote:
-> > +#define MODULE_DEVICE_ATTR_FUNC_STORE(_name) \
-> > +static ssize_t module_ ## _name ## _store(struct device *dev, \
-> > +				   struct device_attribute *attr, \
-> > +				   const char *buf, size_t len) \
-> > +{ \
-> > +	ssize_t __ret; \
-> > +	if (!try_module_get(THIS_MODULE)) \
-> > +		return -ENODEV; \
-> 
-> I feel like this needs to be written down somewhere as I see it come up
-> all the time.
+There is quite a bit of tribal knowledge around proper use of
+try_module_get() and that it must be used only in a context which
+can ensure the module won't be gone during the operation. Document
+this little bit of tribal knowledge.
 
-I'll go ahead and cook up a patch to do just this after I send this
-email out.
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ kernel/module.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-> Again, this is racy and broken code.  You can NEVER try to increment
-> your own module reference count unless it has already been incremented
-> by someone external first.
+diff --git a/kernel/module.c b/kernel/module.c
+index ed13917ea5f3..0d609647a54d 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -1066,6 +1066,28 @@ void __module_get(struct module *module)
+ }
+ EXPORT_SYMBOL(__module_get);
+ 
++/**
++ * try_module_get - yields to module removal and bumps reference count otherwise
++ * @module: the module we should check for
++ *
++ * This can be used to check if userspace has requested to remove a module,
++ * and if so let the caller give up. Otherwise it takes a reference count to
++ * ensure a request from userspace to remove the module cannot happen.
++ *
++ * Care must be taken to ensure the module cannot be removed during
++ * try_module_get(). This can be done by having another entity other than the
++ * module itself increment the module reference count, or through some other
++ * means which gaurantees the module could not be removed during an operation.
++ * An example of this later case is using this call in a sysfs file which the
++ * module created. The sysfs store / read file operation is ensured to exist
++ * and still be present by kernfs's active reference. If a sysfs file operation
++ * is being run, the module which created it must still exist as the module is
++ * in charge of removal of the sysfs file.
++ *
++ * The real value to try_module_get() is the module_is_live() check which
++ * ensures this the caller of try_module_get() can yields to userspace module
++ * removal requests and fail whatever it was about to process.
++ */
+ bool try_module_get(struct module *module)
+ {
+ 	bool ret = true;
+-- 
+2.30.2
 
-In the zram driver's case the sysfs files are still pegged on, because
-as we noted before the kernfs active reference will ensure the store
-operation still exists. If the driver removes the operation prior to
-getting the active reference, the write will just fail. kernfs ensures
-once a file is opened the op is not removed until the operation completes.
-
-If a file is opened then, the module cannot possibly be removed. The
-piece of information we realy care about is the use of module_is_live()
-inside try_module_get() which does:
-
-static inline bool module_is_live(struct module *mod)
-{                                                                               
-	return mod->state != MODULE_STATE_GOING;
-}
-
-The try allows module removal to trump use of the sysfs file. If
-userspace wants the module removed, it gives up in favor for that
-operation.
-
-> As "proof", what happens if this module is unloaded right _before_ this
-> call happens?  The module will be unloaded, memory zeroed out (or
-> overridden), and then the processor will resume here and try to call (or
-> return into) this code path.
-
-The use of try_module_get() is protected to be correct by the kernfs active
-reference, which in turn ensures the module is not gone. That is, when
-a sysfs file read / write op is issued, if the file was opened we *know*
-the module is not gone yet. It cannot possibly be removed. But once
-inside the operation, try_module_get() can check to see if userspace did
-want to remove the module, and if so it would immediately bail out and
-yield to that operation.
-
-Userspace cannot open a sysfs file with the module being gone.
-The kernfs active prevents that.
-
-> Boom.
-
-I think it would be good we add a self test for this particular case.
-I'll go ahead and extend my sysfs tests with one test for this case.
-
-I could do this by adding a new sysfs file to the test driver and where
-all it does is this try_module_get() thing. This can then be raced with
-module removals attempts.
-
-But it does not mean all you say is wrong.
-
-I think the value of what you are saying requires documenting as it
-was not clear to me either. I'll send a patch now.
-
-> Just say no to "try_module_get(THIS_MODULE)" as it is totally wrong.
-
-Context is required and documented. I'll end a patch.
-
-  Luis
