@@ -4,58 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FED0C63798
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 13:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF027C6377D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 13:05:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 205B961353
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 13:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A24D1610CC
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 13:05:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232089AbhGVMXm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 08:23:42 -0400
-Received: from verein.lst.de ([213.95.11.211]:34192 "EHLO verein.lst.de"
+        id S231853AbhGVMYw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 08:24:52 -0400
+Received: from verein.lst.de ([213.95.11.211]:34208 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232039AbhGVMXe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 08:23:34 -0400
+        id S231738AbhGVMYw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Jul 2021 08:24:52 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4498168D06; Thu, 22 Jul 2021 15:04:08 +0200 (CEST)
-Date:   Thu, 22 Jul 2021 15:04:08 +0200
+        id 963DF68D06; Thu, 22 Jul 2021 15:05:25 +0200 (CEST)
+Date:   Thu, 22 Jul 2021 15:05:25 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     dsterba@suse.cz, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH 6/9] btrfs: store a block_device in struct
- btrfs_ordered_extent
-Message-ID: <20210722130408.GA26825@lst.de>
-References: <20210722075402.983367-1-hch@lst.de> <20210722075402.983367-7-hch@lst.de> <20210722125859.GR19710@twin.jikos.cz>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        John Garry <john.garry@huawei.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V6 1/3] genirq: add device_has_managed_msi_irq
+Message-ID: <20210722130525.GA26872@lst.de>
+References: <20210722095246.1240526-1-ming.lei@redhat.com> <20210722095246.1240526-2-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210722125859.GR19710@twin.jikos.cz>
+In-Reply-To: <20210722095246.1240526-2-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 22, 2021 at 02:58:59PM +0200, David Sterba wrote:
-> On Thu, Jul 22, 2021 at 09:53:59AM +0200, Christoph Hellwig wrote:
-> > Store the block device instead of the gendisk in the btrfs_ordered_extent
-> > structure intead of acquiring a reference to it later.
->             instead
+On Thu, Jul 22, 2021 at 05:52:44PM +0800, Ming Lei wrote:
+> irq vector allocation with managed affinity may be used by driver, and
+> blk-mq needs this info for draining queue because genirq core will shutdown
+> managed irq when all CPUs in the affinity mask are offline.
 > 
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> The info of using managed irq is often produced by drivers, and it is
+> consumed by blk-mq, so different subsystems are involved in this info flow.
 > 
-> Reviewed-by: David Sterba <dsterba@suse.com>
-> 
-> I can add the patch to the next pull request so you can rebase your
-> series on top of it and don't need to carry it until the next merge
-> window.
+> Address this issue by adding one helper of device_has_managed_msi_irq()
+> which is suggested by John Garry.
 
-Assuming Jens is fine with starting the block tree on -rc3 that would
-be great.
+This implies non-MSI irqs can't be managed, which is true right now.
+If the irq maintaines are fine with that:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
