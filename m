@@ -2,112 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC6FC432BE
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03560C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:39:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEF1F60EB4
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:36:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF3E160EBD
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 22:39:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231858AbhGVVzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 17:55:43 -0400
-Received: from mail-pj1-f49.google.com ([209.85.216.49]:36637 "EHLO
-        mail-pj1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231596AbhGVVzm (ORCPT
+        id S231858AbhGVV7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 17:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46084 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232372AbhGVV7J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 17:55:42 -0400
-Received: by mail-pj1-f49.google.com with SMTP id ds11-20020a17090b08cbb0290172f971883bso6347633pjb.1;
-        Thu, 22 Jul 2021 15:36:17 -0700 (PDT)
+        Thu, 22 Jul 2021 17:59:09 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351EAC06175F
+        for <linux-block@vger.kernel.org>; Thu, 22 Jul 2021 15:39:44 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id a20so1203706plm.0
+        for <linux-block@vger.kernel.org>; Thu, 22 Jul 2021 15:39:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=464kg1T68pC5HwMKv9Atpe0ec1sq9kytcANNnpthBek=;
+        b=yS/hsbwawQ19QCicvuWG6QDZq0p315I7hOo/EtTmA9IHLQNCHUWlv+iOFl/Ly8W4T5
+         0At4dkxFnyw1F5/AMAwjsjEFAkxOfYyPOBGS68vy6pk+r1+FsG+aiaoCRqPDaUOgvOYR
+         umlEpbfBd0uf4HJQW1eWcFo0U/E7ZEKM7dhGKoTKtOhLFRsvJuzYzCPTTHqUDYYn3v0w
+         eQJ/PNeDz9gPOhSvqVHwbuSjw3XMo39aqPtmFh5bz0IRu7dxG1b4MNwJXV98y3vClhJL
+         CBDYyPrdKoijtYt2L8LNvOzvKuOX8msDMvBPxhomXUOhvDxXbB9/YJjywRsXe0l8PMht
+         Q3Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wVoXeyrAZeRK2qfGjVQGLsO4VdyxuMrzVeqIO5OglUw=;
-        b=mqEyuC6ZMWktzbi4VQaqT12clfewhUfjgYjhLLJWilS/BWcujWr/Tooiw+eMT6BLqh
-         /ENm/SLU5phzstl8LKPdTj8pRh1NhEXo9prCYCboNm3XiWnJH9WfPd22r7CoDTPyVWa2
-         YRgZBt2uqwUAjP78NVsxPgAAEIhFQapsvjQlUiYcYbl4bF/0bhdzgkWIJLfORzBZQxBg
-         bUnadNs+hj5iUdke/+d3SJmYADbKjDn/T01GThJmE64eObVSWraXdtDxSARVW12+vF7D
-         1jPqT4CT+VKdtsmd6EHUnmThPB9vuOilGVV1RZaeBbDPxjzE9tqgFOxo90D+R8llRBCE
-         /4EQ==
-X-Gm-Message-State: AOAM533HZJbmi0jZtuE3USzDYXo+y0mbQRF95vWAlO8YqTAaaheJQ5Sx
-        eElfN4GbPRnQqDu0d/eGNiM=
-X-Google-Smtp-Source: ABdhPJy7jpcMv/jD2qs36GnDR2A10wXz/wk2a8k4A0m6oNm6wDS10O7OF6CvUZ2cHRwmY9GgXS86CA==
-X-Received: by 2002:a17:902:9a92:b029:127:8aab:6a46 with SMTP id w18-20020a1709029a92b02901278aab6a46mr1851463plp.8.1626993377124;
-        Thu, 22 Jul 2021 15:36:17 -0700 (PDT)
-Received: from garbanzo ([191.96.121.239])
-        by smtp.gmail.com with ESMTPSA id c11sm33414756pfp.0.2021.07.22.15.36.14
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=464kg1T68pC5HwMKv9Atpe0ec1sq9kytcANNnpthBek=;
+        b=rzm1RabK29exLXJfeKJyStEWnPrXsY8RQZaMRyRoZauEN0GphChG/lhyH1DCqygrM4
+         HUe2b4+5xSsySlNz4O2hwI0gUketJTWD/pyMdYHOpgzJMC+Si7vccrhl3EsGkbydKO2I
+         +VPa87NWoX4n9oQrRK6j/svsqVPs+TqMHb/OjxtFKcuwenChVn3XuRwcvUGDOgofkkWF
+         NdZYREyYyyxkV5o/Rfo59eKLjVhVeL/l2WUMKbSDXuQD6TXsT4NBGryWX69Gp+5ArXbS
+         LNGXA899UQdbqzJFmjlePXECvHxc1WpQV+S0I09lM8JwkXPfSMX/bDqmTtCm07rdMs7k
+         K+ZQ==
+X-Gm-Message-State: AOAM531hrpn2MEa61y7KdnEmONkcdnQZvJXN/1cZsyMdYDr345g8R6JL
+        vWDlADvZg2zcjGPOIZ3vxPOK3w==
+X-Google-Smtp-Source: ABdhPJyDUgyzv99y/lDZIzirOw2rLLLDML8ftb5T/FAs9qRdcruNT4j6gmNAEv7kfBkJ19Tk0Oil2w==
+X-Received: by 2002:a63:1718:: with SMTP id x24mr2084278pgl.416.1626993583767;
+        Thu, 22 Jul 2021 15:39:43 -0700 (PDT)
+Received: from hermes.local (204-195-33-123.wavecable.com. [204.195.33.123])
+        by smtp.gmail.com with ESMTPSA id g123sm30673812pfb.187.2021.07.22.15.39.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jul 2021 15:36:16 -0700 (PDT)
-Date:   Thu, 22 Jul 2021 15:36:12 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     tj@kernel.org, shuah@kernel.org, akpm@linux-foundation.org,
-        rafael@kernel.org, davem@davemloft.net, kuba@kernel.org,
-        ast@kernel.org, andriin@fb.com, daniel@iogearbox.net,
-        atenart@kernel.org, alobakin@pm.me, weiwan@google.com,
-        ap420073@gmail.com, jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
+        Thu, 22 Jul 2021 15:39:43 -0700 (PDT)
+Date:   Thu, 22 Jul 2021 15:39:39 -0700
+From:   Stephen Hemminger <stephen@networkplumber.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     gregkh@linuxfoundation.org, tj@kernel.org, shuah@kernel.org,
+        akpm@linux-foundation.org, rafael@kernel.org, davem@davemloft.net,
+        kuba@kernel.org, ast@kernel.org, andriin@fb.com,
+        daniel@iogearbox.net, atenart@kernel.org, alobakin@pm.me,
+        weiwan@google.com, ap420073@gmail.com, jeyu@kernel.org,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        minchan@kernel.org, axboe@kernel.dk, mbenes@suse.com,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
         linux-block@vger.kernel.org, netdev@vger.kernel.org,
         linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] test_sysfs: demonstrate deadlock fix
-Message-ID: <20210722223612.bdkdolndhnr4yogt@garbanzo>
-References: <20210703004632.621662-1-mcgrof@kernel.org>
- <20210703004632.621662-5-mcgrof@kernel.org>
- <YN/sar6nGeSCn89/@kroah.com>
- <20210703172828.jphifwobf3syirzi@garbanzo>
- <YPgGIncQxcD2frBY@kroah.com>
+Subject: Re: [PATCH] kernel/module: add documentation for try_module_get()
+Message-ID: <20210722153939.08a6853c@hermes.local>
+In-Reply-To: <20210722221905.1718213-1-mcgrof@kernel.org>
+References: <20210722221905.1718213-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YPgGIncQxcD2frBY@kroah.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 21, 2021 at 01:33:54PM +0200, Greg KH wrote:
-> On Sat, Jul 03, 2021 at 10:28:28AM -0700, Luis Chamberlain wrote:
-> > On Sat, Jul 03, 2021 at 06:49:46AM +0200, Greg KH wrote:
-> > > On Fri, Jul 02, 2021 at 05:46:32PM -0700, Luis Chamberlain wrote:
-> > > > +#define MODULE_DEVICE_ATTR_FUNC_STORE(_name) \
-> > > > +static ssize_t module_ ## _name ## _store(struct device *dev, \
-> > > > +				   struct device_attribute *attr, \
-> > > > +				   const char *buf, size_t len) \
-> > > > +{ \
-> > > > +	ssize_t __ret; \
-> > > > +	if (!try_module_get(THIS_MODULE)) \
-> > > > +		return -ENODEV; \
-> > > > +	__ret = _name ## _store(dev, attr, buf, len); \
-> > > > +	module_put(THIS_MODULE); \
-> > > > +	return __ret; \
-> > > > +}
-> > > 
-> > > As I have pointed out before, doing try_module_get(THIS_MODULE) is racy
-> > > and should not be added back to the kernel tree.  We got rid of many
-> > > instances of this "bad pattern" over the years, please do not encourage
-> > > it to be added back as others will somehow think that it correct code.
-> > 
-> > It is noted this is used in lieu of any agreed upon solution to
-> > *demonstrate* how this at least does fix it. In this case (and in the
-> > generic solution I also had suggested for kernfs a while ago), if the
-> > try fails, we give up. If it succeeds, we now know we can rely on the
-> > device pointer. If the refcount succeeds, can the module still not
-> > be present? Is try_module_get() racy in that way? In what way is it
-> > racy and where is this documented? Do we have a selftest to prove the
-> > race?
-> 
-> As I say in the other email where you tried to add this, think about
-> what happens if the module is removed _right before_ you make this call.
-> 
-> Or a few instructions before that.  The race is still there, this fixes
-> nothing except make the window smaller.
+On Thu, 22 Jul 2021 15:19:05 -0700
+Luis Chamberlain <mcgrof@kernel.org> wrote:
 
-The kernfs active reference ensures that if the file is open the module
-must still exist. As such, the use within sysfs files should be safe
-as the module is the one in charge of removing the files.
+> +/**
+> + * try_module_get - yields to module removal and bumps reference count otherwise
+> + * @module: the module we should check for
 
-  Luis
+You have the right intentions, but this patch needs some work.
+
+This looks like a docbook comment format but isn't that format.
+
+The first couple of lines need to be reworded to be a complete sentence like
+the rest.
+
+In general best to make new comments the same as existing comments
+in the same area.
+
+It would be better to put this description in the header file where other
+docbook comments for module API are. See example around module_init() and module_exit().
+
+Ideally, all the api's around module reference counts would be documented there.
