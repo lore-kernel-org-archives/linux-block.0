@@ -2,101 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E05C1C6377A
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 02:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEB2C07E9D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 04:03:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B68F86127C
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 02:47:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0827608FC
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 04:03:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230420AbhGVCGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 22:06:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24157 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230146AbhGVCGp (ORCPT
+        id S231195AbhGVDXN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jul 2021 23:23:13 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:11462 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231238AbhGVDWl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 22:06:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626922040;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jwzE0vHI/rCdSa5s/04LOGn224KncNKRA39uN9p98So=;
-        b=i5ZvIKfANf9f7iFeF/cdsj4RW74WSp2LvMxZRObbBpJRwXHyeyQ8fNKFKcRMW9DNkgWItf
-        g+MB34ujGXx/NIqxuGAkLq7/46Z2BNBh5ygtWHs6O3MQ03o0hya0MuAwYslOxu1ySENx7h
-        0O1jJ1Vewr/nX3rPwmSvaFdR0ibSqL0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-i3vioKGeOA6EMuR4vlIe7w-1; Wed, 21 Jul 2021 22:47:19 -0400
-X-MC-Unique: i3vioKGeOA6EMuR4vlIe7w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E72071005D57;
-        Thu, 22 Jul 2021 02:47:17 +0000 (UTC)
-Received: from T590 (ovpn-13-66.pek2.redhat.com [10.72.13.66])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D0BA60C5F;
-        Thu, 22 Jul 2021 02:47:12 +0000 (UTC)
-Date:   Thu, 22 Jul 2021 10:47:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH 3/8] block: grab a device model reference in
- blkdev_get_no_open
-Message-ID: <YPjcLDXYKbN1yl22@T590>
-References: <20210721153523.103818-1-hch@lst.de>
- <20210721153523.103818-4-hch@lst.de>
+        Wed, 21 Jul 2021 23:22:41 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GVdxz559Jzch9T;
+        Thu, 22 Jul 2021 11:59:51 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 22 Jul 2021 12:03:15 +0800
+Received: from thunder-town.china.huawei.com (10.174.179.0) by
+ dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 22 Jul 2021 12:03:14 +0800
+From:   Zhen Lei <thunder.leizhen@huawei.com>
+To:     Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Jens Axboe <axboe@kernel.dk>,
+        Yehuda Sadeh <yehuda@hq.newdream.net>,
+        Sage Weil <sage@newdream.net>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+CC:     Zhen Lei <thunder.leizhen@huawei.com>
+Subject: [PATCH] rbd: use kref_put_lock() to fix potential UAF
+Date:   Thu, 22 Jul 2021 12:02:16 +0800
+Message-ID: <20210722040216.4090-1-thunder.leizhen@huawei.com>
+X-Mailer: git-send-email 2.26.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210721153523.103818-4-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.179.0]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500006.china.huawei.com (7.185.36.236)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 21, 2021 at 05:35:18PM +0200, Christoph Hellwig wrote:
-> Opening a block device needs to ensure it is fully present instead of
-> just the allocated memory.  Switch from an inode reference as obtained
-> by bdget to a full device model reference.
-> 
-> In fact we should not use inode references for anything in the block
-> layer.  There are three users left, two can be trivially removed
-> and the third (xen-blkfront) is a complete mess that needs more
-> attention.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/block_dev.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 9ef4f1fc2cb0..24a6970f3623 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -1342,9 +1342,16 @@ struct block_device *blkdev_get_no_open(dev_t dev)
->  		goto bdput;
->  	if ((disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
->  		goto put_disk;
-> -	if (!try_module_get(bdev->bd_disk->fops->owner))
-> +	if (!try_module_get(disk->fops->owner))
->  		goto put_disk;
-> +
-> +	/* switch to a device model reference instead of the inode one: */
-> +	if (!kobject_get_unless_zero(&bdev->bd_device.kobj))
+When the refcount is decreased to 0, the rbd_client_release() is called.
+Before CPU0 reaches the race point (1), CPU1 may obtain the spinlock
+and traverse the linked list to find 'rbdc'. Although CPU1 will call
+kref_get() to increase the refcount, it is obviously too late. CPU0 will
+release 'rbdc' directly, CPU1 then accesses 'rbdc' and triggers UAF.
 
-If bdev->bd_device.kobj is grabbed in every open, getting disk reference might
-be moved into add_partition, and drop it in part_release(). Then we can avoid
-extra disk reference in open/close().
+Use kref_put_lock() to ensure that both the operations of decrease
+refcount to 0 and link deletion are lock protected eliminates this risk.
 
-Not mention two disk references are actually grabbed in case of opening disk.
+     CPU0                      CPU1
+rbd_client_release():
+			    <-------- (1)
+spin_lock(&rbd_client_list_lock);
+list_del(&rbdc->node);
+spin_unlock(&rbd_client_list_lock);
 
-Thanks,
-Ming
+kfree(rbdc);
+			    <-------- use-after-free
+
+Fixes: 602adf400201 ("rbd: introduce rados block device (rbd), based on libceph")
+Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+---
+ drivers/block/rbd.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 531d390902dd..3a8989bf8e9c 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -875,11 +875,11 @@ static void rbd_client_release(struct kref *kref)
+ {
+ 	struct rbd_client *rbdc = container_of(kref, struct rbd_client, kref);
+ 
+-	dout("%s: rbdc %p\n", __func__, rbdc);
+-	spin_lock(&rbd_client_list_lock);
+ 	list_del(&rbdc->node);
+ 	spin_unlock(&rbd_client_list_lock);
+ 
++	dout("%s: rbdc %p\n", __func__, rbdc);
++
+ 	ceph_destroy_client(rbdc->client);
+ 	kfree(rbdc);
+ }
+@@ -891,7 +891,8 @@ static void rbd_client_release(struct kref *kref)
+ static void rbd_put_client(struct rbd_client *rbdc)
+ {
+ 	if (rbdc)
+-		kref_put(&rbdc->kref, rbd_client_release);
++		kref_put_lock(&rbdc->kref,
++			      rbd_client_release, &rbd_client_list_lock);
+ }
+ 
+ /*
+-- 
+2.25.1
 
