@@ -2,171 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-28.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74931C63793
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 09:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F394C63793
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 11:42:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5FCEF61244
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 09:53:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 388A06128A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 11:42:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231406AbhGVJMw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 05:12:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56947 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231377AbhGVJMv (ORCPT
+        id S231627AbhGVLB4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 07:01:56 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:38814 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231566AbhGVLBz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 05:12:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626947606;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Yh8JAV9b4Gs+HXXKwuFvPYfl2BOt5pM1NoQvPrO91f0=;
-        b=U3gFu6V7TFSC2sMtyMcjvnInPw/FMVo9fugGNqgUz+lYR0s4jQddIk/eNMCXbFPzHPmWpT
-        Kn5+H3I4B5mfchtRmFYSDpY7b8ZEwdFtLSPFBJo/UlUwRv64/d4zdgE+a4kA3BivWAtFNY
-        /rXw9qbckmD+jLHpofPxDXz0jvTh4mU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-9ekWXI7hMX20HFAViHTNSw-1; Thu, 22 Jul 2021 05:53:22 -0400
-X-MC-Unique: 9ekWXI7hMX20HFAViHTNSw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CA1A802C80;
-        Thu, 22 Jul 2021 09:53:21 +0000 (UTC)
-Received: from localhost (ovpn-13-219.pek2.redhat.com [10.72.13.219])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4AC375DAA5;
-        Thu, 22 Jul 2021 09:53:19 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        John Garry <john.garry@huawei.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 3/3] blk-mq: don't deactivate hctx if managed irq isn't used
-Date:   Thu, 22 Jul 2021 17:52:46 +0800
-Message-Id: <20210722095246.1240526-4-ming.lei@redhat.com>
-In-Reply-To: <20210722095246.1240526-1-ming.lei@redhat.com>
-References: <20210722095246.1240526-1-ming.lei@redhat.com>
+        Thu, 22 Jul 2021 07:01:55 -0400
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+        by linux.microsoft.com (Postfix) with ESMTPSA id C9CAC20B8016;
+        Thu, 22 Jul 2021 04:42:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C9CAC20B8016
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1626954150;
+        bh=sGwLum2AxhbtrpJ7xqyEMr2W/f/xXktE5uFvk0yKiMo=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=etVlz2pz2TaOE+R96P1w4ctlor8huZ3CIJ/Q8Qwx1k2+QfrdKxyAh17pJlpuF9ZVN
+         c41fv0aoV6GXB8/NbJ0phlK18M8YRCnsjp3cYTpTBLqWrElAfNMQdO2bZg99Slp3LS
+         UVGOcqT9TzAHjaBPx8yIluVr8bP7HR0fCX1HZchY=
+Received: by mail-pj1-f52.google.com with SMTP id i16-20020a17090acf90b02901736d9d2218so5096611pju.1;
+        Thu, 22 Jul 2021 04:42:30 -0700 (PDT)
+X-Gm-Message-State: AOAM530eJEgVA6KTEtFrwqoNbGdEMytrHMe4c536RRoWHjm7T1niBIFe
+        aUHfEEr8qpl3cn+YRHxj7+sSRQzsXDz9EQahHx8=
+X-Google-Smtp-Source: ABdhPJzz4jFqHprYZm/Tu2+suDDmD9tWwVgUUCAvbfXUJw8mK1tkTXu6QD2LFCMB2NC9biNaXqVJpmykWKoowtucTB8=
+X-Received: by 2002:a17:902:bf47:b029:12b:afd0:e39 with SMTP id
+ u7-20020a170902bf47b029012bafd00e39mr1282903pls.19.1626954150202; Thu, 22 Jul
+ 2021 04:42:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20210712230530.29323-1-mcroce@linux.microsoft.com> <3ca56654449b53814a22e3f06179292bc959ae72.camel@debian.org>
+In-Reply-To: <3ca56654449b53814a22e3f06179292bc959ae72.camel@debian.org>
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+Date:   Thu, 22 Jul 2021 13:41:54 +0200
+X-Gmail-Original-Message-ID: <CAFnufp2RmL3CQBJOmZgfsLEPKJ7g_qWJibzEhnMadhs=xC7mQw@mail.gmail.com>
+Message-ID: <CAFnufp2RmL3CQBJOmZgfsLEPKJ7g_qWJibzEhnMadhs=xC7mQw@mail.gmail.com>
+Subject: Re: [PATCH v5 0/5] block: add a sequence number to disks
+To:     Luca Boccassi <bluca@debian.org>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Lennart Poettering <lennart@poettering.net>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        JeffleXu <jefflexu@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk-mq deactivates one hctx when the last CPU in hctx->cpumask become
-offline by draining all requests originated from this hctx and moving new
-allocation to other active hctx. This way is for avoiding inflight IO in
-case of managed irq because managed irq is shutdown when the last CPU in
-the irq's affinity becomes offline.
+On Tue, Jul 20, 2021 at 7:27 PM Luca Boccassi <bluca@debian.org> wrote:
+>
+> On Tue, 2021-07-13 at 01:05 +0200, Matteo Croce wrote:
+> > From: Matteo Croce <mcroce@microsoft.com>
+> >
+> > Associating uevents with block devices in userspace is difficult and racy:
+> > the uevent netlink socket is lossy, and on slow and overloaded systems has
+> > a very high latency. Block devices do not have exclusive owners in
+> > userspace, any process can set one up (e.g. loop devices). Moreover, device
+> > names can be reused (e.g. loop0 can be reused again and again). A userspace
+> > process setting up a block device and watching for its events cannot thus
+> > reliably tell whether an event relates to the device it just set up or
+> > another earlier instance with the same name.
+> >
+> > Being able to set a UUID on a loop device would solve the race conditions.
+> > But it does not allow to derive orderings from uevents: if you see a uevent
+> > with a UUID that does not match the device you are waiting for, you cannot
+> > tell whether it's because the right uevent has not arrived yet, or it was
+> > already sent and you missed it. So you cannot tell whether you should wait
+> > for it or not.
+> >
+> > Being able to set devices up in a namespace would solve the race conditions
+> > too, but it can work only if being namespaced is feasible in the first
+> > place. Many userspace processes need to set devices up for the root
+> > namespace, so this solution cannot always work.
+> >
+> > Changing the loop devices naming implementation to always use
+> > monotonically increasing device numbers, instead of reusing the lowest
+> > free number, would also solve the problem, but it would be very disruptive
+> > to userspace and likely break many existing use cases. It would also be
+> > quite awkward to use on long-running machines, as the loop device name
+> > would quickly grow to many-digits length.
+> >
+> > Furthermore, this problem does not affect only loop devices - partition
+> > probing is asynchronous and very slow on busy systems. It is very easy to
+> > enter races when using LO_FLAGS_PARTSCAN and watching for the partitions to
+> > show up, as it can take a long time for the uevents to be delivered after
+> > setting them up.
+> >
+> > Associating a unique, monotonically increasing sequential number to the
+> > lifetime of each block device, which can be retrieved with an ioctl
+> > immediately upon setting it up, allows to solve the race conditions with
+> > uevents, and also allows userspace processes to know whether they should
+> > wait for the uevent they need or if it was dropped and thus they should
+> > move on.
+> >
+> > This does not benefit only loop devices and block devices with multiple
+> > partitions, but for example also removable media such as USB sticks or
+> > cdroms/dvdroms/etc.
+> >
+> > The first patch is the core one, the 2..4 expose the information in
+> > different ways, and the last one makes the loop device generate a media
+> > changed event upon attach, detach or reconfigure, so the sequence number
+> > is increased.
+> >
+> > If merged, this feature will immediately used by the userspace:
+> > https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
+> >
+> > v4 -> v5:
+> > - introduce a helper to raise media changed events
+> > - use the new helper in loop instead of the full event code
+> > - unexport inc_diskseq() which is only used by the block code now
+> > - rebase on top of 5.14-rc1
+> >
+> > v3 -> v4:
+> > - rebased on top of 5.13
+> > - hook the seqnum increase into the media change event
+> > - make the loop device raise media change events
+> > - merge 1/6 and 5/6
+> > - move the uevent part of 1/6 into a separate one
+> > - drop the now unneeded sysfs refactor
+> > - change 'diskseq' to a global static variable
+> > - add more comments
+> > - refactor commit messages
+> >
+> > v2 -> v3:
+> > - rebased on top of 5.13-rc7
+> > - resend because it appeared archived on patchwork
+> >
+> > v1 -> v2:
+> > - increase seqnum on media change
+> > - increase on loop detach
+> >
+> > Matteo Croce (6):
+> >   block: add disk sequence number
+> >   block: export the diskseq in uevents
+> >   block: add ioctl to read the disk sequence number
+> >   block: export diskseq in sysfs
+> >   block: add a helper to raise a media changed event
+> >   loop: raise media_change event
+> >
+> >  Documentation/ABI/testing/sysfs-block | 12 ++++++
+> >  block/disk-events.c                   | 62 +++++++++++++++++++++------
+> >  block/genhd.c                         | 43 +++++++++++++++++++
+> >  block/ioctl.c                         |  2 +
+> >  drivers/block/loop.c                  |  5 +++
+> >  include/linux/genhd.h                 |  3 ++
+> >  include/uapi/linux/fs.h               |  1 +
+> >  7 files changed, 114 insertions(+), 14 deletions(-)
+>
+> For the series:
+>
+> Tested-by: Luca Boccassi <bluca@debian.org>
+>
+> I have implemented the basic systemd support for this (ioctl + uevent,
+> sysfs will be done later), and tested with this series on x86_64 and
+> Debian 11 userspace, everything seems to work great. Thanks Matteo!
+>
+> Here's the implementation, in draft state until the kernel side is
+> merged:
+>
+> https://github.com/systemd/systemd/pull/20257
+>
 
-However, lots of drivers(nvme fc, rdma, tcp, loop, ...) don't use managed
-irq, so they needn't to deactivate hctx when the last CPU becomes offline.
-Also, some of them are the only user of blk_mq_alloc_request_hctx() which
-is used for connecting io queue. And their requirement is that the connect
-request needs to be submitted successfully via one specified hctx even though
-all CPUs in this hctx->cpumask have become offline.
+Hi Jens,
 
-Addressing the requirement for nvme fc/rdma/loop by allowing to
-allocate request from one hctx when all CPUs in this hctx are offline,
-since these drivers don't use managed irq.
+Given that the whole series has been acked and tested, and the
+userspace has a draft implementation for it, is there anything else we
+can do here?
 
-Finally don't deactivate one hctx when it doesn't use managed irq.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 27 +++++++++++++++++----------
- block/blk-mq.h |  8 ++++++++
- 2 files changed, 25 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2c4ac51e54eb..591ab07c64d8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -427,6 +427,15 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- }
- EXPORT_SYMBOL(blk_mq_alloc_request);
- 
-+static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
-+{
-+	int cpu = cpumask_first_and(hctx->cpumask, cpu_online_mask);
-+
-+	if (cpu >= nr_cpu_ids)
-+		cpu = cpumask_first(hctx->cpumask);
-+	return cpu;
-+}
-+
- struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	unsigned int op, blk_mq_req_flags_t flags, unsigned int hctx_idx)
- {
-@@ -468,7 +477,10 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	data.hctx = q->queue_hw_ctx[hctx_idx];
- 	if (!blk_mq_hw_queue_mapped(data.hctx))
- 		goto out_queue_exit;
--	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
-+
-+	WARN_ON_ONCE(blk_mq_hctx_use_managed_irq(data.hctx));
-+
-+	cpu = blk_mq_first_mapped_cpu(data.hctx);
- 	data.ctx = __blk_mq_get_ctx(q, cpu);
- 
- 	if (!q->elevator)
-@@ -1501,15 +1513,6 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	hctx_unlock(hctx, srcu_idx);
- }
- 
--static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
--{
--	int cpu = cpumask_first_and(hctx->cpumask, cpu_online_mask);
--
--	if (cpu >= nr_cpu_ids)
--		cpu = cpumask_first(hctx->cpumask);
--	return cpu;
--}
--
- /*
-  * It'd be great if the workqueue API had a way to pass
-  * in a mask and had some smarts for more clever placement.
-@@ -2556,6 +2559,10 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
- 			struct blk_mq_hw_ctx, cpuhp_online);
- 
-+	/* hctx needn't to be deactivated in case managed irq isn't used */
-+	if (!blk_mq_hctx_use_managed_irq(hctx))
-+		return 0;
-+
- 	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
- 	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
- 		return 0;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index d08779f77a26..7333b659d8f5 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -119,6 +119,14 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- 	return ctx->hctxs[type];
- }
- 
-+static inline bool blk_mq_hctx_use_managed_irq(struct blk_mq_hw_ctx *hctx)
-+{
-+	if (hctx->type == HCTX_TYPE_POLL)
-+		return false;
-+
-+	return hctx->queue->tag_set->map[hctx->type].use_managed_irq;
-+}
-+
- /*
-  * sysfs helpers
-  */
+Regards,
 -- 
-2.31.1
-
+per aspera ad upstream
