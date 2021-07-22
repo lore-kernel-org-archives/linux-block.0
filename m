@@ -2,89 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3F0C6377D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 14:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BC3C63793
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 15:40:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2214960720
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 14:48:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E80B861279
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 15:40:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232431AbhGVOIL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 10:08:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50722 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232328AbhGVOIK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 10:08:10 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0F21360FEE;
-        Thu, 22 Jul 2021 14:48:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626965325;
-        bh=kjIiN475TqYty0z7PIG+/pMDUBt+OSnFGGmVVgMKoNs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tc+SdqxggbbqbTwN0onZFGwh5ZmEywzzNR89LpVLby39UCAWx4h4yqlPURhVbOncf
-         KO6YdbeB4zmYYs42oENDY/fKUz+QoAIV4OnlbOnGxvVvgR2wJ6x43sdIHiIF9dLVfG
-         g7ILJbQio/iTJkibMqB7mJ0xtUe17Fva3M2NRpP5Tdgn73LqOJgshreiHi490eXmP0
-         50PjB4kG+vNuP/UHXTJSqknemuwEn8dw7XKd8S10eR1NRH+Oqy1g0k9EMo+iZXzKea
-         1TuenfuARM8NDdS38D33/4/2W8QGWzkHysasB3zq2IeE6c311F0/CwDQLQKIPRPh0w
-         Khg5eR81VTn5Q==
-Date:   Thu, 22 Jul 2021 07:48:43 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     Satya Tangirala <satyat@google.com>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-Subject: Re: [PATCH v9 0/9] add support for direct I/O with fscrypt using
- blk-crypto
-Message-ID: <YPmFSw4JbWnIozSZ@gmail.com>
-References: <20210604210908.2105870-1-satyat@google.com>
- <CAF2Aj3h-Gt3bOxH4wXB7aeQ3jVzR3TEqd3uLsh4T9Q=e6W6iqQ@mail.gmail.com>
+        id S232688AbhGVPAQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 11:00:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53138 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232731AbhGVPAP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Jul 2021 11:00:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626968450;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2LqkqyX7S/95pr5/lOuPctwyfim32Ia6rqADhZKhbKU=;
+        b=WzmazJWOx79+GuucUmRMmDgwOG1yHGTiaeju65gHliJ7HZqKMpkUvF2PZrzNCJq/HCXjWL
+        s/2SxhEon5CGvR04yl2qBtaLcE7zVoLzj/vMry/My6F55FyOkzRUUjmajIXrJsmnVEDbUG
+        qT3ghl101PwW2VBbiqt6BVKO7wFeWWU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-550-ItzTw8ZnPYGC3H6QLXaMpw-1; Thu, 22 Jul 2021 11:40:45 -0400
+X-MC-Unique: ItzTw8ZnPYGC3H6QLXaMpw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D60B21940956;
+        Thu, 22 Jul 2021 15:40:29 +0000 (UTC)
+Received: from T590 (ovpn-12-57.pek2.redhat.com [10.72.12.57])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 23A3560936;
+        Thu, 22 Jul 2021 15:40:23 +0000 (UTC)
+Date:   Thu, 22 Jul 2021 23:40:19 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        John Garry <john.garry@huawei.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V6 2/3] blk-mq: mark if one queue map uses managed irq
+Message-ID: <YPmRY1DvFyIpQ8uM@T590>
+References: <20210722095246.1240526-1-ming.lei@redhat.com>
+ <20210722095246.1240526-3-ming.lei@redhat.com>
+ <20210722130609.GB26872@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAF2Aj3h-Gt3bOxH4wXB7aeQ3jVzR3TEqd3uLsh4T9Q=e6W6iqQ@mail.gmail.com>
+In-Reply-To: <20210722130609.GB26872@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Lee,
-
-On Thu, Jul 22, 2021 at 12:23:47PM +0100, Lee Jones wrote:
+On Thu, Jul 22, 2021 at 03:06:09PM +0200, Christoph Hellwig wrote:
+> On Thu, Jul 22, 2021 at 05:52:45PM +0800, Ming Lei wrote:
+> 	 and nvme rdma driver can allocate
+> > +	 * and submit requests on specified hctx via
+> > +	 * blk_mq_alloc_request_hctx
 > 
-> No review after 7 weeks on the list.
-> 
-> Is there anything Satya can do to help expedite this please?
-> 
+> Why does that matter for this setting?
 
-This series is basically ready, but I can't apply it because it depends on the
-other patch series
-"[PATCH v4 0/9] ensure bios aren't split in middle of crypto data unit"
-(https://lkml.kernel.org/linux-block/20210707052943.3960-1-satyaprateek2357@gmail.com/T/#u).
-I will be re-reviewing that other patch series soon, but it primary needs review
-by the people who work more regularly with the block layer, and it will have to
-go in through the block tree (I can't apply it to the fscrypt tree).
+blk_mq_alloc_request_hctx() has been broken for long time, which
+can only work if the hctx isn't driven by non-managed irq.
 
-The original version of this series didn't require so many block layer changes,
-but it would have only allowed direct I/O with user buffer pointers aligned to
-the filesystem block size, which was too controversial with other filesystem
-developers; see the long discussion at
-https://lkml.kernel.org/linux-fscrypt/20200720233739.824943-1-satyat@google.com/T/#u.
 
-In addition, it was requested that we not add features to the "legacy" direct
-I/O implementation (fs/direct-io.c), so I have a patch series in progress
-"[PATCH 0/9] f2fs: use iomap for direct I/O"
-(https://lkml.kernel.org/linux-f2fs-devel/20210716143919.44373-1-ebiggers@kernel.org/T/#u)
-which will change f2fs to use iomap.
+Thanks,
+Ming
 
-Also please understand that Satya has left Google, so any further work from him
-on this is happening on a personal capacity in his free time.
-
-- Eric
