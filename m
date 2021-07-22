@@ -2,89 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A336C6377D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 07:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D663C63793
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 07:54:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 090CA61351
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 07:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85C5A60FDA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 07:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230090AbhGVHIK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 03:08:10 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3445 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbhGVHIK (ORCPT
+        id S230405AbhGVHOG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 03:14:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39682 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229642AbhGVHOF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 03:08:10 -0400
-Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GVkhy5rnBz6D94x;
-        Thu, 22 Jul 2021 15:33:54 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 22 Jul 2021 09:48:43 +0200
-Received: from [10.47.26.161] (10.47.26.161) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2176.2; Thu, 22 Jul
- 2021 08:48:42 +0100
-Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity managed
- if any irq is managed
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Christoph Hellwig <hch@lst.de>
-CC:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        <linux-pci@vger.kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Keith Busch <kbusch@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20210715120844.636968-1-ming.lei@redhat.com>
- <20210715120844.636968-2-ming.lei@redhat.com>
- <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com>
- <20210719094414.GC431@lst.de> <87lf60cevz.ffs@nanos.tec.linutronix.de>
- <20210721072445.GA11257@lst.de>
- <fe34623e-1074-862d-e822-7359ae4def0f@huawei.com>
- <87y29zpgct.ffs@nanos.tec.linutronix.de>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <27cf7c97-6b03-d1fd-7bfc-6aaf3cd50272@huawei.com>
-Date:   Thu, 22 Jul 2021 08:48:36 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Thu, 22 Jul 2021 03:14:05 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C98C061575;
+        Thu, 22 Jul 2021 00:54:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=nl3M9fyQJINeLUMF6gJtfDfOMcTb90OeAzKs5tU5Z40=; b=U0i+II9WbcZDBaMju7p9mNBcjU
+        hrIn1ChgqJtx9lJdLSxpIzvQJaaP2IYb7K4D+Cz9YMoChhb6SHL9TqCc/HeCf36sVfKmEZSqRZl4I
+        EQC8JxGDc0FeOWat+cVuGqaLtaCDP3fzlaQ+h53/09goYqzPqLgyZ7qc9BQqqGbQg8ft/ZZXNBLkm
+        yRXf2u43z8A4ucv2yMxEEg26GrfNOyVcL0mPq8dbPyqJeW5brldaGAK898XIvNMRmu/G+nbzlyn2r
+        RBTuuVoSkRAMLY1m3CbhpGTdGXVRU62hkh/F0XHESamA6o9iBVxejkEGF19y8j5zZVFQZgn9DzOpb
+        2xEs6XOQ==;
+Received: from [2001:4bb8:193:7660:643c:9899:473:314a] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m6TWt-00A1Dm-RB; Thu, 22 Jul 2021 07:54:11 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
+Subject: fixes and cleanups for block_device refcounting v2
+Date:   Thu, 22 Jul 2021 09:53:53 +0200
+Message-Id: <20210722075402.983367-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <87y29zpgct.ffs@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.26.161]
-X-ClientProxiedBy: lhreml706-chm.china.huawei.com (10.201.108.55) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/07/2021 21:22, Thomas Gleixner wrote:
->>> That's what I assumed, but this text from John suggested there is
->>> something odd about the platform case:
->>>
->>> "Did you consider that for PCI .."
->>> .
->> For this special platform MSI case there is a secondary interrupt
->> controller (called mbigen) which generates the MSI on behalf of the
->> device, which I think the MSI belongs to (and not the device, itself).
-> MBIGEN is a different story because it converts wired interrupts into
-> MSI interrupts, IOW a MSI based interrupt pin extender.
-> 
-> I might be wrong, but I seriously doubt that any multiqueue device which
-> wants to use affinity managed interrupts is built on top of that.
+Hi Jens,
 
-Actually the SCSI device for which platform device managed interrupts 
-support was added in commit e15f2fa959f2 uses mbigen.
+this series fixes up a possible race with the block_device lookup
+changes, and the finishes off the conversion to stop using the inode
+refcount for block devices.
 
-Thanks,
-John
+Changes since v1:
+ - clean up btrfs even more by storing a bdev instead of the disk
+ - keep a persistent disk reference in the bdev
+ - a bunch of cleanups to make the above change easier
+
+Diffstat:
+ block/genhd.c           |   12 +-----
+ block/partitions/core.c |   34 ++++++++++---------
+ drivers/block/loop.c    |    5 --
+ fs/block_dev.c          |   83 ++++++++++++++----------------------------------
+ fs/btrfs/inode.c        |    2 -
+ fs/btrfs/ordered-data.c |    2 -
+ fs/btrfs/ordered-data.h |    3 -
+ fs/btrfs/zoned.c        |   12 ++----
+ include/linux/blkdev.h  |    2 -
+ 9 files changed, 52 insertions(+), 103 deletions(-)
