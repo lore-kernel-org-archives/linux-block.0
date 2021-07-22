@@ -2,89 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1966CC6377D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 18:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1EECC4338F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 18:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE9BC60EB4
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 18:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9756360EB2
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 18:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229994AbhGVSEH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 14:04:07 -0400
-Received: from mail-pl1-f178.google.com ([209.85.214.178]:46066 "EHLO
-        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbhGVSEG (ORCPT
+        id S229545AbhGVSQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 14:16:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52034 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229510AbhGVSQi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 14:04:06 -0400
-Received: by mail-pl1-f178.google.com with SMTP id k1so32089plt.12;
-        Thu, 22 Jul 2021 11:44:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FvXZTA6mugHk4R1/Z05yoSgeTtcYooYPzjkabIbtOnI=;
-        b=i4amZnP91PLN7LJqITteD8PbLjwhVJ3BTmGgMXhUguHPTtfvuh3wEfXyPZAbmUWteJ
-         ZbNPMAyKs+6dWM6cdIw9+MOc7ulG/ptV/mIL/Mgm1P2da7xVHXOEByEe2URWYzoRrbMq
-         785hC8deTVPDSRalbvy1m8/xB5jb+6pDDypSfBvzaccm3XMrInVhvL+BiyN8fZ1dQlDb
-         FOdgW5xCZ9b5t+iSOOGH6bLco8nI33wQ1Uz2w4DyrXg93xpacFCfzw1Mt5OOQUPC6mz3
-         EP2LWGJ0w6Ir5CFMrNa/kAcHJ6F2M5LR6ThVnz2pjfBvzBkZhrUjxS+SVKWRr2U9iNiG
-         hgoQ==
-X-Gm-Message-State: AOAM533getFOUoNuNHDTCkF+pp0SHIg5hrXmhCuzBL0DEqNp0lRMeUSP
-        lc6zRHoamyaZ10/oOxwd3ARtXzkeGYwCS2yHmsQ=
-X-Google-Smtp-Source: ABdhPJxcOzpXl23Bj1vM0xld2b/z9D2P5CkYIMpJkrAvOluHH1pql9bEA8eL+/F+WxEoIwjZ+qHXJw==
-X-Received: by 2002:a17:90a:e611:: with SMTP id j17mr10179878pjy.48.1626979479252;
-        Thu, 22 Jul 2021 11:44:39 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:6539:4b6a:66a5:486f])
-        by smtp.gmail.com with ESMTPSA id g27sm34309804pgl.19.2021.07.22.11.44.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jul 2021 11:44:34 -0700 (PDT)
-Subject: Re: [PATCH 21/24] scsi: consolidate the START STOP UNIT handling
-To:     Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
-Cc:     Doug Gilbert <dgilbert@interlog.com>,
-        =?UTF-8?Q?Kai_M=c3=a4kisara?= <Kai.Makisara@kolumbus.fi>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20210712054816.4147559-1-hch@lst.de>
- <20210712054816.4147559-22-hch@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <75da1d81-4a0f-ae5e-d511-6a036d0d2472@acm.org>
-Date:   Thu, 22 Jul 2021 11:44:33 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Thu, 22 Jul 2021 14:16:38 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C2CC061575
+        for <linux-block@vger.kernel.org>; Thu, 22 Jul 2021 11:57:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=vPzicTsQNqzpGuhcoSCNUmZQidereeyfqguWHkqWm6U=; b=WBQSD29hHDGyqKeKwTFSs2KFho
+        Yzez0oJCjMaXx/1JmNW7WPOhLJpLlpQMuLFmNfzKzqIXs9uDHsSnSZrd2M38IT2iyVGHKQZaDOFnF
+        HNDR8ArI3tjPe5KA1LvxRnumhKKdsSR5mvTvbrSNyxw0LgnRxIBmqoAizRYY8k1wtWCWMLfmEDtJ+
+        KpvPCGK51S7SZjYLsBxdGtMh3OzAg4ZQgZ3BlvUrLugwlKvs5fj+cvvrigECxh2dygVLaElQCBNdL
+        ekxC5s33w7JQE21soMgSW97sNGiO5Xo2PKNayzZcBqbbDLsIaaDwN2s2xadyPyldPIjHc67apSoar
+        vqJcM6iQ==;
+Received: from [2001:4bb8:193:7660:c4c4:42f6:7449:aaf8] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m6dsK-00Aaka-Lp; Thu, 22 Jul 2021 18:56:57 +0000
+Date:   Thu, 22 Jul 2021 20:56:48 +0200
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 5.14
+Message-ID: <YPm/cHUBGJpVOS4n@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20210712054816.4147559-22-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/11/21 10:48 PM, Christoph Hellwig wrote:
-> +	char cdb[MAX_COMMAND_SIZE] = { };
+The following changes since commit ec645dc96699ea6c37b6de86c84d7288ea9a4ddf:
 
-How about using 'u8' instead of 'char'?
+  block: increase BLKCG_MAX_POLS (2021-07-17 13:07:24 -0600)
 
-Additionally, MAX_COMMAND_SIZE equals 16. According to SBC-4 6 bytes is 
-enough for the START STOP UNIT command.
+are available in the Git repository at:
 
-> +	cdb[0] = START_STOP;
-> +	cdb[4] = data;
+  git://git.infradead.org/nvme.git tags/nvme-5.14-2021-07-22
 
-Please combine the above two statements with the cdb[] declaration into 
-a single line.
+for you to fetch changes up to aaeb7bb061be545251606f4d9c82d710ca2a7c8e:
 
-Additionally, please split data into two arguments to make calls of this 
-function easier to read. This is what I found in SBC-4:
-* bit 1 of byte 4 has the name LOEJ (load eject).
-* bit 0 of byte 4 has the name START (start unit).
+  nvme: set the PRACT bit when using Write Zeroes with T10 PI (2021-07-21 17:24:10 +0200)
 
-Thanks,
+----------------------------------------------------------------
+nvme fixes for Linux 5.14:
 
-Bart.
+ - tracing fix (Keith Busch)
+ - fix multipath head refcounting (Hannes Reinecke)
+ - Write Zeroes vs PI fix (me)
+ - drop a bogus WARN_ON (Zhihao Cheng)
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme: set the PRACT bit when using Write Zeroes with T10 PI
+
+Hannes Reinecke (1):
+      nvme: fix refcounting imbalance when all paths are down
+
+Keith Busch (1):
+      nvme: fix nvme_setup_command metadata trace event
+
+Zhihao Cheng (1):
+      nvme-pci: don't WARN_ON in nvme_reset_work if ctrl.state is not RESETTING
+
+ drivers/nvme/host/core.c      | 19 +++++++++++++++----
+ drivers/nvme/host/multipath.c |  9 ++++++++-
+ drivers/nvme/host/nvme.h      | 11 ++---------
+ drivers/nvme/host/pci.c       |  4 +++-
+ drivers/nvme/host/trace.h     |  6 +++---
+ 5 files changed, 31 insertions(+), 18 deletions(-)
