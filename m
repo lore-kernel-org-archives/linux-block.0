@@ -2,114 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4406C63793
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 16:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AC1C63798
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 17:31:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2DB26128A
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 16:28:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0553161358
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 17:31:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbhGVPr0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 11:47:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbhGVPr0 (ORCPT
+        id S229575AbhGVQum (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 12:50:42 -0400
+Received: from mail-pj1-f47.google.com ([209.85.216.47]:35415 "EHLO
+        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229456AbhGVQum (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 11:47:26 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A46C061575;
-        Thu, 22 Jul 2021 09:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8MEr16L96bOGxKrBhIZgt0+SVG6JvQfAHW+MYTYylcg=; b=TvzNICZHhKg2kYETwRHyWEfnsD
-        0Q5CTsjrbOdcDGY5Aj2GY+TFn74s9evoKF+nWwUzYL6y7BtpAO5Rk6ahQ/O9yibmq6/7rCHtKWUE3
-        Ae4bGBfntW5q38OZhHG9qq75GtELL5yvYheJHNl1kGhuLZy/ugbt7znISS/btweBZoq09iHzz8PGW
-        0NJ59+DUKVi6ZPG2wqarhgJDbEHhfl2VvnB0QSpwp92k2CVqpQEkKxcjO1e6hZRLSh8XgbHoK3IWx
-        a7G1cNScVd3ocXuWqkOH62nFRKfOIkxLZIr/g1HKUzcV+/y+RZJ997NN6BcY1y42oTgqIGFAZWizg
-        G4OyOANQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m6bXr-00AR4t-C2; Thu, 22 Jul 2021 16:27:42 +0000
-Date:   Thu, 22 Jul 2021 17:27:35 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v15 01/17] block: Add bio_add_folio()
-Message-ID: <YPmcd29EBU7s+/LY@casper.infradead.org>
-References: <20210719184001.1750630-1-willy@infradead.org>
- <20210719184001.1750630-2-willy@infradead.org>
- <YPZwODMq1ilIeS4t@infradead.org>
+        Thu, 22 Jul 2021 12:50:42 -0400
+Received: by mail-pj1-f47.google.com with SMTP id pf12-20020a17090b1d8cb0290175c085e7a5so5375789pjb.0;
+        Thu, 22 Jul 2021 10:31:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=eVHHVSJjH/j4gmKR/ewmFGqTfbLl6ki6lavAgxsu1EQ=;
+        b=pnsg0T/kiezzwlzGwRmw9bZmvzfDb8IrSwC/BJctYYB28eMDgTy+6veFxGLiUuu0Rb
+         WzUzqhfWsM+VRm4FNiIwj9UaVLaFn1Tl5Tr6arucZiQ1bJ0v36zO8imB2/XQrdRTKPYQ
+         hegy649HjExvKLkXMNR6ziYlRuJuRnBlEvk/jBH1u/Ocfc5qWV4ir33dNhrICT1J4eFF
+         zL9U9+LtL2gU1bJThnNBGcUVuaKZtmHQouIvU1hBnEAAn8JdGKngqNZSD/0XWzFsVO8z
+         0thRbgdV5Y3zCwyuOz0R5xIprcOuAZWNl8s3ilA6KqBL7fUrMHRnXkfea3zd9vSXr17M
+         Vlug==
+X-Gm-Message-State: AOAM533hE7N9oJ5ZmHA5oudP0/C+7fu9AAqfsP6RiypwCYw7EBObrPc4
+        mUxY7Of/j/104fiherTrekyygOHueIhI6nO6mSs=
+X-Google-Smtp-Source: ABdhPJzoI32Y15CTTXdn9b1qibFFEWlkdl6pVaD8oYFGAZtMFUv8axwd9e2dKBbJq5DYIpj59G2M6A==
+X-Received: by 2002:a63:34a:: with SMTP id 71mr980706pgd.289.1626975076439;
+        Thu, 22 Jul 2021 10:31:16 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:6539:4b6a:66a5:486f])
+        by smtp.gmail.com with ESMTPSA id m21sm26165407pjz.36.2021.07.22.10.31.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jul 2021 10:31:15 -0700 (PDT)
+Subject: Re: [PATCH 01/24] bsg: remove support for SCSI_IOCTL_SEND_COMMAND
+To:     Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
+Cc:     Doug Gilbert <dgilbert@interlog.com>,
+        =?UTF-8?Q?Kai_M=c3=a4kisara?= <Kai.Makisara@kolumbus.fi>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20210712054816.4147559-1-hch@lst.de>
+ <20210712054816.4147559-2-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <07be7708-2084-d682-15f8-626ad0a5753f@acm.org>
+Date:   Thu, 22 Jul 2021 10:31:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YPZwODMq1ilIeS4t@infradead.org>
+In-Reply-To: <20210712054816.4147559-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 20, 2021 at 07:42:00AM +0100, Christoph Hellwig wrote:
-> On Mon, Jul 19, 2021 at 07:39:45PM +0100, Matthew Wilcox (Oracle) wrote:
-> > +/**
-> > + * bio_add_folio - Attempt to add part of a folio to a bio.
-> > + * @bio: Bio to add to.
-> > + * @folio: Folio to add.
-> > + * @len: How many bytes from the folio to add.
-> > + * @off: First byte in this folio to add.
-> > + *
-> > + * Always uses the head page of the folio in the bio.  If a submitter only
-> > + * uses bio_add_folio(), it can count on never seeing tail pages in the
-> > + * completion routine.  BIOs do not support folios that are 4GiB or larger.
-> > + *
-> > + * Return: The number of bytes from this folio added to the bio.
-> > + */
-> > +size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
-> > +		size_t off)
-> > +{
-> > +	if (len > UINT_MAX || off > UINT_MAX)
-> > +		return 0;
-> > +	return bio_add_page(bio, &folio->page, len, off);
-> > +}
+On 7/11/21 10:47 PM, Christoph Hellwig wrote:
+> SCSI_IOCTL_SEND_COMMAND has been deprecated longer than bsg exists
+> and has been warning for just as long.  More importantly it harcodes
+> SCSI CDBs and thus will do the wrong thing on non-scsi bsg nodes.
 > 
-> I'd use the opportunity to switch to a true/false return instead of
-> the length.  This has been on my todo list for bio_add_page for a while,
-> so it might make sense to start out the new API the right way.
+> Fixes: aa387cc89567 ("block: add bsg helper library")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/bsg.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bsg.c b/block/bsg.c
+> index 1f196563ae6c..79b42c5cafeb 100644
+> --- a/block/bsg.c
+> +++ b/block/bsg.c
+> @@ -373,10 +373,13 @@ static long bsg_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+>   	case SG_GET_RESERVED_SIZE:
+>   	case SG_SET_RESERVED_SIZE:
+>   	case SG_EMULATED_HOST:
+> -	case SCSI_IOCTL_SEND_COMMAND:
+>   		return scsi_cmd_ioctl(bd->queue, NULL, file->f_mode, cmd, uarg);
+>   	case SG_IO:
+>   		return bsg_sg_io(bd->queue, file->f_mode, uarg);
+> +	case SCSI_IOCTL_SEND_COMMAND:
+> +		pr_warn_ratelimited("%s: calling unsupported SCSI_IOCTL_SEND_COMMAND\n",
+> +				current->comm);
+> +		return -EINVAL;
+>   	default:
+>   		return -ENOTTY;
+>   	}
 
-Looking at it with fresh eyes, I decided to rewrite the docs too.
-ie this:
+The Fixes: tag will cause this patch to be backported to stable trees. 
+Is that intentional?
 
- /**
-  * bio_add_folio - Attempt to add part of a folio to a bio.
-- * @bio: Bio to add to.
-+ * @bio: BIO to add to.
-  * @folio: Folio to add.
-  * @len: How many bytes from the folio to add.
-  * @off: First byte in this folio to add.
-  *
-- * Always uses the head page of the folio in the bio.  If a submitter only
-- * uses bio_add_folio(), it can count on never seeing tail pages in the
-- * completion routine.  BIOs do not support folios that are 4GiB or larger.
-+ * Filesystems that use folios can call this function instead of calling
-+ * bio_add_page() for each page in the folio.  If @off is bigger than
-+ * PAGE_SIZE, this function can create a bio_vec that starts in a page
-+ * after the bv_page.  BIOs do not support folios that are 4GiB or larger.
-  *
-- * Return: The number of bytes from this folio added to the bio.
-+ * Return: Whether the addition was successful.
-  */
--size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
-+bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
-                size_t off)
- {
-        if (len > UINT_MAX || off > UINT_MAX)
-                return 0;
--       return bio_add_page(bio, &folio->page, len, off);
-+       return bio_add_page(bio, &folio->page, len, off) > 0;
- }
+Anyway:
 
-(i decided to go with > 0 so it's impervious to when you change
-bio_add_page())
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
