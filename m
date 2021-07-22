@@ -2,119 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A26C00141
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2102BC43214
 	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 19:05:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3BFB960EBD
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 19:04:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7A1B60ED6
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 19:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229737AbhGVSYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 14:24:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50118 "EHLO mail.kernel.org"
+        id S229510AbhGVSYj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 14:24:39 -0400
+Received: from verein.lst.de ([213.95.11.211]:35636 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229510AbhGVSYP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 14:24:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9748D60EB9;
-        Thu, 22 Jul 2021 19:04:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626980689;
-        bh=oWDsz2mqAq9NcEEh1BJyznZQCPm+facoTqPnYlRRhJQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QilYXNDAdzMfF+frM57wtEsK8q1xBhGM/Fw6ySzsoC5LukRf2pi9r343XIPOGGjhw
-         inNMRBNKyr2+WCSrrUv7uZJuoNSJm64GbfIJc7Nquu2D6EMLTWmWw7Xcm69xxwN3em
-         MyoZQsSMilN6DlmympazHrgl3V3HkOqFgjlkpozftLq0ixlYnwg7iEVqAdfLcbBwTk
-         ZW76MEHP/kBQ047J1PXSwSXqVmaV5PZ0ohUOezoWPe17OJPGuQKeNSN8UQV9MkpcKg
-         zqijpJkmcGOjHCLVgEUIRAlnaOnsquR9/cTWbypuBNqFkKdQ78gVo4VnpOSwqM3DnS
-         zmr2Bt9gIvk1A==
-Date:   Thu, 22 Jul 2021 12:04:49 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>, Chao Yu <chao@kernel.org>,
+        id S230262AbhGVSYj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Jul 2021 14:24:39 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 8C81268AFE; Thu, 22 Jul 2021 21:05:11 +0200 (CEST)
+Date:   Thu, 22 Jul 2021 21:05:11 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
         Jens Axboe <axboe@kernel.dk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v9 6/9] iomap: support direct I/O with fscrypt using
- blk-crypto
-Message-ID: <20210722190449.GH559212@magnolia>
-References: <20210604210908.2105870-1-satyat@google.com>
- <20210604210908.2105870-7-satyat@google.com>
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 01/24] bsg: remove support for SCSI_IOCTL_SEND_COMMAND
+Message-ID: <20210722190511.GA14806@lst.de>
+References: <20210712054816.4147559-1-hch@lst.de> <20210712054816.4147559-2-hch@lst.de> <07be7708-2084-d682-15f8-626ad0a5753f@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210604210908.2105870-7-satyat@google.com>
+In-Reply-To: <07be7708-2084-d682-15f8-626ad0a5753f@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 04, 2021 at 09:09:05PM +0000, Satya Tangirala wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Set bio crypt contexts on bios by calling into fscrypt when required.
-> No DUN contiguity checks are done - callers are expected to set up the
-> iomap correctly to ensure that each bio submitted by iomap will not have
-> blocks with incontiguous DUNs by calling fscrypt_limit_io_blocks()
-> appropriately.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> Co-developed-by: Satya Tangirala <satyat@google.com>
-> Signed-off-by: Satya Tangirala <satyat@google.com>
+On Thu, Jul 22, 2021 at 10:31:13AM -0700, Bart Van Assche wrote:
+>> +				current->comm);
+>> +		return -EINVAL;
+>>   	default:
+>>   		return -ENOTTY;
+>>   	}
+>
+> The Fixes: tag will cause this patch to be backported to stable trees. Is 
+> that intentional?
 
-Looks like a straightforward conversion...
-
-Acked-by: Darrick J. Wong <djwong@kernel.org>
-
---D
-
-> ---
->  fs/iomap/direct-io.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index 9398b8c31323..1c825deb36a9 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -6,6 +6,7 @@
->  #include <linux/module.h>
->  #include <linux/compiler.h>
->  #include <linux/fs.h>
-> +#include <linux/fscrypt.h>
->  #include <linux/iomap.h>
->  #include <linux/backing-dev.h>
->  #include <linux/uio.h>
-> @@ -185,11 +186,14 @@ static void
->  iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
->  		unsigned len)
->  {
-> +	struct inode *inode = file_inode(dio->iocb->ki_filp);
->  	struct page *page = ZERO_PAGE(0);
->  	int flags = REQ_SYNC | REQ_IDLE;
->  	struct bio *bio;
->  
->  	bio = bio_alloc(GFP_KERNEL, 1);
-> +	fscrypt_set_bio_crypt_ctx(bio, inode, pos >> inode->i_blkbits,
-> +				  GFP_KERNEL);
->  	bio_set_dev(bio, iomap->bdev);
->  	bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
->  	bio->bi_private = dio;
-> @@ -306,6 +310,8 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
->  		}
->  
->  		bio = bio_alloc(GFP_KERNEL, nr_pages);
-> +		fscrypt_set_bio_crypt_ctx(bio, inode, pos >> inode->i_blkbits,
-> +					  GFP_KERNEL);
->  		bio_set_dev(bio, iomap->bdev);
->  		bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
->  		bio->bi_write_hint = dio->iocb->ki_hint;
-> -- 
-> 2.32.0.rc1.229.g3e70b5a671-goog
-> 
+Yes, as this ioctl actively does the wrong thing for non-scsi queues.
