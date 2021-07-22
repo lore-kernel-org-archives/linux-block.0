@@ -2,113 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEB2C07E9D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 04:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C4DC63797
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 07:46:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0827608FC
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 04:03:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D3BE60249
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jul 2021 07:46:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231195AbhGVDXN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jul 2021 23:23:13 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:11462 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231238AbhGVDWl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jul 2021 23:22:41 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GVdxz559Jzch9T;
-        Thu, 22 Jul 2021 11:59:51 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 22 Jul 2021 12:03:15 +0800
-Received: from thunder-town.china.huawei.com (10.174.179.0) by
- dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 22 Jul 2021 12:03:14 +0800
-From:   Zhen Lei <thunder.leizhen@huawei.com>
-To:     Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Jens Axboe <axboe@kernel.dk>,
-        Yehuda Sadeh <yehuda@hq.newdream.net>,
-        Sage Weil <sage@newdream.net>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Zhen Lei <thunder.leizhen@huawei.com>
-Subject: [PATCH] rbd: use kref_put_lock() to fix potential UAF
-Date:   Thu, 22 Jul 2021 12:02:16 +0800
-Message-ID: <20210722040216.4090-1-thunder.leizhen@huawei.com>
-X-Mailer: git-send-email 2.26.0.windows.1
+        id S230100AbhGVHFo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 03:05:44 -0400
+Received: from verein.lst.de ([213.95.11.211]:33081 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230048AbhGVHFn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Jul 2021 03:05:43 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id DFF7167373; Thu, 22 Jul 2021 09:46:15 +0200 (CEST)
+Date:   Thu, 22 Jul 2021 09:46:15 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Christoph Hellwig <hch@lst.de>, John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Daniel Wagner <dwagner@suse.de>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH V4 1/3] driver core: mark device as irq affinity
+ managed if any irq is managed
+Message-ID: <20210722074615.GA2292@lst.de>
+References: <20210715120844.636968-1-ming.lei@redhat.com> <20210715120844.636968-2-ming.lei@redhat.com> <5e534fdc-909e-39b2-521d-31f643a10558@huawei.com> <20210719094414.GC431@lst.de> <87lf60cevz.ffs@nanos.tec.linutronix.de> <20210721072445.GA11257@lst.de> <871r7rqva6.ffs@nanos.tec.linutronix.de> <20210721203259.GA18960@lst.de> <878s1zpa28.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.179.0]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500006.china.huawei.com (7.185.36.236)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878s1zpa28.ffs@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the refcount is decreased to 0, the rbd_client_release() is called.
-Before CPU0 reaches the race point (1), CPU1 may obtain the spinlock
-and traverse the linked list to find 'rbdc'. Although CPU1 will call
-kref_get() to increase the refcount, it is obviously too late. CPU0 will
-release 'rbdc' directly, CPU1 then accesses 'rbdc' and triggers UAF.
+On Thu, Jul 22, 2021 at 12:38:07AM +0200, Thomas Gleixner wrote:
+> That's fine because that's controlled by the driver consistently and it
+> (hopefully) makes sure that the admin queue is quiesced before
+> everything is torn down after the initial query.
 
-Use kref_put_lock() to ensure that both the operations of decrease
-refcount to 0 and link deletion are lock protected eliminates this risk.
+Yes, it is.
 
-     CPU0                      CPU1
-rbd_client_release():
-			    <-------- (1)
-spin_lock(&rbd_client_list_lock);
-list_del(&rbdc->node);
-spin_unlock(&rbd_client_list_lock);
+> The above can be fixed by adding an 'append' mode to the MSI code.
 
-kfree(rbdc);
-			    <-------- use-after-free
+So IFF we get that append mode I think it would help to simplify
+drivers that have unmanaged pre and post vectors, and/or do the above
+proving.
 
-Fixes: 602adf400201 ("rbd: introduce rados block device (rbd), based on libceph")
-Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
----
- drivers/block/rbd.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 531d390902dd..3a8989bf8e9c 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -875,11 +875,11 @@ static void rbd_client_release(struct kref *kref)
- {
- 	struct rbd_client *rbdc = container_of(kref, struct rbd_client, kref);
- 
--	dout("%s: rbdc %p\n", __func__, rbdc);
--	spin_lock(&rbd_client_list_lock);
- 	list_del(&rbdc->node);
- 	spin_unlock(&rbd_client_list_lock);
- 
-+	dout("%s: rbdc %p\n", __func__, rbdc);
-+
- 	ceph_destroy_client(rbdc->client);
- 	kfree(rbdc);
- }
-@@ -891,7 +891,8 @@ static void rbd_client_release(struct kref *kref)
- static void rbd_put_client(struct rbd_client *rbdc)
- {
- 	if (rbdc)
--		kref_put(&rbdc->kref, rbd_client_release);
-+		kref_put_lock(&rbdc->kref,
-+			      rbd_client_release, &rbd_client_list_lock);
- }
- 
- /*
--- 
-2.25.1
-
+So instead of currently requesting a single unmanaged vector, do
+basic setup, tear it down, request N managed vectors with an unmanaged
+pre-vector we could just keep the unmanaged vector, never tear it down
+and just append the post vectors.  In the long run this could remove
+the need to do the pre and post vectors entirely.
