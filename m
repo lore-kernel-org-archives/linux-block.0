@@ -2,104 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C88C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB69C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 08:16:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC8F260EDF
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:40:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54C6B60EBD
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 08:16:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233231AbhGWCAF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 22:00:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231663AbhGWCAF (ORCPT
+        id S234529AbhGWHgO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jul 2021 03:36:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36098 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234497AbhGWHgM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 22:00:05 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E03AC061575;
-        Thu, 22 Jul 2021 19:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=bvpCKyJPKQ+52VGiNWJJ88JT5lIx01OMRbRWDKPTqTM=; b=NXA5uHy4/Ittca66HSknUtfumF
-        zTtO6XSGT1YO7UP6247R2NDdNion/+J6gNl8kGxNG4lMhKyn2bXw+IQAIGi+dBeKVZp4H/lxltCQk
-        ZBBiqOBKlOkf2u8fyRsznnFfC2QTdjn0E6UNW1BiMN+9A8oEBXcoXcUsHnKMqg6mIhulHlS+dymml
-        0lzzyUxAUC6WQt+DeIDwuMGSxYMY72hMHbxt6Rdnn3Z+7QWsc7ChWKZYdzmrN5+/A7C9tJ1jKqrSu
-        q9PSi9ccXXrFy9+8g2YuWvxMltN4viVvE3phGqWQ3NNu+mQAX8zzJzCqNF8uzvc/B9nt6VPAzA0r0
-        T20CUYGQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m6l6x-00Av3q-13; Fri, 23 Jul 2021 02:40:30 +0000
-Date:   Fri, 23 Jul 2021 03:40:27 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v15 02/17] block: Add bio_for_each_folio_all()
-Message-ID: <YPosG9HKRBt9+GUy@casper.infradead.org>
-References: <20210719184001.1750630-1-willy@infradead.org>
- <20210719184001.1750630-3-willy@infradead.org>
- <YPZxp6ZbRGYYBnYK@infradead.org>
+        Fri, 23 Jul 2021 03:36:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627028206;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kkHeqBN9xvRmsaZS4MvNMczkNr3D6j3+VlyTB6yFx9A=;
+        b=PyWErowDbZWqdyg8Fir0OZYG4Gw84R8qkCQ0BxkltvqixF2M2uYvDfrlUd9QrGOlr5mLRg
+        dWj2NPXT7ljTnY0jkLQagGxGf8s5KMIPaTizll8AtZt19nO/hIUKJ0nOBxw8m3HJabtQnu
+        LIxEH/GlKijMykEn2R6gBpEUrbfXA2I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-210-4FyVzKZ4NQaeJ4rMpiVKJg-1; Fri, 23 Jul 2021 04:16:42 -0400
+X-MC-Unique: 4FyVzKZ4NQaeJ4rMpiVKJg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E72F187D541;
+        Fri, 23 Jul 2021 08:16:40 +0000 (UTC)
+Received: from T590 (ovpn-12-180.pek2.redhat.com [10.72.12.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B92F55D9C6;
+        Fri, 23 Jul 2021 08:16:35 +0000 (UTC)
+Date:   Fri, 23 Jul 2021 16:16:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Wen Xiong <wenxiong@us.ibm.com>
+Cc:     dwagner@suse.de, axboe@kernel.dk, gregkh@linuxfoundation.org,
+        hare@suse.de, hch@lst.de, john.garry@huawei.com,
+        linux-block@vger.kernel.org, sagi@grimberg.me, tglx@linutronix.de
+Subject: Re: [PATCH V6 0/3] blk-mq: fix blk_mq_alloc_request_hctx
+Message-ID: <YPp63niga//Q6GLV@T590>
+References: <20210722131245.u4dhcqotepxhwgbz@beryllium.lan>
+ <20210722095246.1240526-1-ming.lei@redhat.com>
+ <OFDADF39F5.DDB99A55-ON0025871A.00794382-0025871A.00797A2E@ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <YPZxp6ZbRGYYBnYK@infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <OFDADF39F5.DDB99A55-ON0025871A.00794382-0025871A.00797A2E@ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 20, 2021 at 08:48:07AM +0200, Christoph Hellwig wrote:
-> On Mon, Jul 19, 2021 at 07:39:46PM +0100, Matthew Wilcox (Oracle) wrote:
-> >  #define bio_for_each_bvec_all(bvl, bio, i)		\
-> >  	for (i = 0, bvl = bio_first_bvec_all(bio);	\
-> > -	     i < (bio)->bi_vcnt; i++, bvl++)		\
-> > +	     i < (bio)->bi_vcnt; i++, bvl++)
+On Thu, Jul 22, 2021 at 10:06:51PM +0000, Wen Xiong wrote:
+>    > Wen Xiong has verified V4 in her nvmef test.
 > 
-> Pleae split out this unrelated fixup.
+>    >>FWIW, I am testing this series right now. I observe hanging I/Os
+>    >>again, but I am not totally sure if my test setup is working
+>    >>properly. Working on it. I'll keep you posted.
+>     
 > 
-> > +static inline
-> > +void bio_first_folio(struct folio_iter *fi, struct bio *bio, int i)
+>  I built the latest upstream(v5.14-rc2) + Ming's V6 + Daniel's V3: didn't work.
 > 
-> Please fix the strange formatting.
 
-static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
-		int i)
+Hi Wenxiong,
 
-> > +{
-> > +	struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
-> > +
-> > +	fi->folio = page_folio(bvec->bv_page);
-> > +	fi->offset = bvec->bv_offset +
-> > +			PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
-> 
-> Can we have a little helper for the offset in folio calculation, like:
-> 
-> static inline size_t offset_of_page_in_folio(struct page *page)
-> {
-> 	return (bvec->bv_page - &page_folio(page)->page) * PAGE;
-> }
-> 
-> as that makes the callers a lot easier to read.
+V6 is basically same with V4, can you figure out where the failure
+comes?(v5.14-rc2, V6 or Daniel's V3) 
 
-I've spent most of today thinking about this one.  I actually don't
-want to make this easy to read.  This is code that, in an ideal world,
-would not exist.  A bio_vec should not contain a struct page; it should
-probably be:
+I verified that V6 works as expected by tracing blk_mq_update_queue_map():
 
-struct bio_vec {
-	phys_addr_t bv_start;
-	unsigned int bv_len;
-};
+#!/usr/bin/bpftrace
+#include <linux/blk-mq.h>
+kprobe:blk_mq_update_queue_map
+{
+	@in_map[tid]=1;
+	@set[tid] = (struct blk_mq_tag_set *)arg0;
+	@ms[tid] = kstack;
+}
 
-and then the helper to get from a bio_vec to a folio_iter looks like:
+kretprobe:blk_mq_update_queue_map
+/@in_map[tid]==1/
+{
+	$s = @set[tid];
+	$m = (struct blk_mq_queue_map *)$s->map;
 
-	fi->folio = pfn_folio(bvec->bv_start >> PAGE_SHIFT);
-	fi->offset = offset_in_folio(fi->folio, bvec->bv_start);
+	printf("%s %d: %s queues %d use_managed_irq %d\n",
+		comm, pid, @ms[tid], $s->nr_hw_queues, $m->use_managed_irq);
+}
 
-If instead we decide to keep bvecs the way they are, we can at
-least turn the bv_page into bv_folio, and then we won't need this
-code either.
+
+Thanks,
+Ming
+
