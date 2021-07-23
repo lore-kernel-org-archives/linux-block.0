@@ -2,131 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1CEC00142
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 01:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759A5C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:34:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AF2560EBC
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 01:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58DB260EBF
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:34:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233070AbhGWAlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 20:41:36 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:43109 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233050AbhGWAld (ORCPT
+        id S233441AbhGWBxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 21:53:30 -0400
+Received: from mail-pj1-f43.google.com ([209.85.216.43]:50821 "EHLO
+        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233433AbhGWBxa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 20:41:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1627003329; x=1658539329;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Fpqlmg/Ix9cd3tQyYAdjWjc+IVx8h6CJqsftFHNVSGM=;
-  b=HNkapwUe74UDa5SEJWZOZtsZlAUnQAjg4alhZFxBBR97A/Rtvk64m5aw
-   0HZKs6ZZ/THMkk9xxNUWdkDYrY12mtqXNy4dfTxsq8Gb0JK5018BoowGC
-   p6HPts+NrionfJPMfv2IRdvjCPI55G38F/9pqbXS0zMIj6L7BeATIksxV
-   l69qWhA8HKdaXUGeUikH51zdgxYGta6kjtxw6zZzXngEitJVUVeTOwmxf
-   xZSgq4p1a9N/0cEpzWUZl0XLdfXVGwJICPytrKtAVuiaNMNgJrbc1/ilL
-   R0KVtE+kPm50vbpdD9t05MOasS9XzqcIWVil+KlYqDZdLmeJ3AarIafPd
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.84,262,1620662400"; 
-   d="scan'208";a="175874127"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Jul 2021 09:22:08 +0800
-IronPort-SDR: OAuTfhH1Ku7ElghWYcsAVbdMF2fINNdMDQ5Lw8LT/ydP+SwQ6gpTj7dPP6NWtyM9AcjysdkMkI
- Li0hAVvLEdPp/hp/KNo4m5sCNqzxHBSeC6Sb6OdQ2UqyEQVeS/vroBGPliV35b5PFnBwsTU5Cb
- ykYnjMf9ZTanp6yK5ja8mP0b1e21qktFJchnCbNrhNwWG7LLbaFwhf3lzsrLEyJE1Zn2AEZeyB
- mls5HparWPza2odeXshwe1COmwQ6SIQGBnCi48fI0pvR9URCDH+RAjHWGvPNen2YjcTWx5i+av
- wY+TA+IM4zf9NXZCLE9cMcW7
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 17:59:58 -0700
-IronPort-SDR: Ro+nQZ4/KBXkhCujmPzqjhLSP41jBw0T/A8simmQRMIEb2T8owBdgZFP67YRVgyS6OM/GVcWai
- KCy091i+ByoI82fMdp63P6YgDWcA/Yr6JcItgvqzZhOKKDobIdg8+qAW6M5kgmm0tz1W4k5ZGN
- l78NVgo3FZmmOZ35grDlOq35rFJi6ehn2ufU558SwT5hgMFgoOBGwamLJ+CDdBDxAG13im0Pmo
- AEpZWlkcO+LaJTN5+lHhswINPUMe9zNm1GM7+JozNuvZHDbYQ3kb3XkYse5KlG94bIbRoq2Zy7
- N0w=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 22 Jul 2021 18:22:06 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-ide@vger.kernel.org
-Cc:     Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v2 4/4] doc: document sysfs queue/cranges attributes
-Date:   Fri, 23 Jul 2021 10:22:00 +0900
-Message-Id: <20210723012200.953825-5-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210723012200.953825-1-damien.lemoal@wdc.com>
-References: <20210723012200.953825-1-damien.lemoal@wdc.com>
+        Thu, 22 Jul 2021 21:53:30 -0400
+Received: by mail-pj1-f43.google.com with SMTP id l19so318512pjz.0;
+        Thu, 22 Jul 2021 19:34:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RREWwRklaZFXt0C4quifntpsOFbK/AfnI0Sh0jnaUmg=;
+        b=U03foEPWsW2DfPCXBxWAflP/v0TXNeTiZkUSRDn3VN4ryGn2q1oioraLyzQxaRIx7R
+         awEPJuRcccvHB7WoD+0QvyhTsUyZ+FK8rl68oDrcv/XPnyY/ucLNjE5iEiwgR6TvnfNu
+         VCv/jfbj+e5Fo/ThqnMtwvR+iseWt54tz0bOxbwXBkP/oQvcCayKqxbqTYiDXeyon0f6
+         Tq7JG1KJBxHi50Cu8nMWsAdjb/zwpX0oeM1DD/HUs1osnfl54XHm8Osi6NQQ/rhnPHiE
+         liIKV1aYYS81X22fSSPU5eZiChDTjru+RihbX90NZBlgISH8HcYcW+/h4dIGE+D3Lfae
+         ch0g==
+X-Gm-Message-State: AOAM5304ajlCpEutEqEN+cM2cENxloaRbWMVqn9Wr/G3u9ksY1/K36Dl
+        1GfmY6FoQ6MGsnxFVhO4EIgM/kgwF5Gqgg==
+X-Google-Smtp-Source: ABdhPJzjHKo0c5RWosVq5DDhWmIZFHW08248o5ty3hGtbxQ6eznyCONZvxh4FQ926BfpYN3JbCEfbg==
+X-Received: by 2002:a17:902:b188:b029:11b:1549:da31 with SMTP id s8-20020a170902b188b029011b1549da31mr2169395plr.7.1627007642006;
+        Thu, 22 Jul 2021 19:34:02 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:286e:6a9d:f340:dcd9? ([2601:647:4000:d7:286e:6a9d:f340:dcd9])
+        by smtp.gmail.com with ESMTPSA id s7sm30561921pfk.12.2021.07.22.19.33.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jul 2021 19:34:00 -0700 (PDT)
+Subject: Re: [PATCH] kernel/module: add documentation for try_module_get()
+To:     Luis Chamberlain <mcgrof@kernel.org>, gregkh@linuxfoundation.org,
+        tj@kernel.org, shuah@kernel.org, akpm@linux-foundation.org,
+        rafael@kernel.org, davem@davemloft.net, kuba@kernel.org,
+        ast@kernel.org, andriin@fb.com, daniel@iogearbox.net,
+        atenart@kernel.org, alobakin@pm.me, weiwan@google.com,
+        ap420073@gmail.com
+Cc:     jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210722221905.1718213-1-mcgrof@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <2e9f16ad-5668-f15d-b3c3-f787ba55bcda@acm.org>
+Date:   Thu, 22 Jul 2021 19:33:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210722221905.1718213-1-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Update the file Documentation/block/queue-sysfs.rst to add a description
-of a device queue sysfs entries related to concurrent sector ranges
-(e.g. concurrent positioning ranges for multi-actuator hard-disks).
+On 7/22/21 3:19 PM, Luis Chamberlain wrote:
+> + * The real value to try_module_get() is the module_is_live() check which
+> + * ensures this the caller of try_module_get() can yields to userspace module
+> + * removal requests and fail whatever it was about to process.
 
-While at it, also fix a typo in this file introduction paragraph.
+can yields -> can yield?
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- Documentation/block/queue-sysfs.rst | 30 ++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+Otherwise this looks really well written to me.
 
-diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-index 4dc7f0d499a8..25f4a768f450 100644
---- a/Documentation/block/queue-sysfs.rst
-+++ b/Documentation/block/queue-sysfs.rst
-@@ -4,7 +4,7 @@ Queue sysfs files
- 
- This text file will detail the queue files that are located in the sysfs tree
- for each block device. Note that stacked devices typically do not export
--any settings, since their queue merely functions are a remapping target.
-+any settings, since their queue merely functions as a remapping target.
- These files are the ones found in the /sys/block/xxx/queue/ directory.
- 
- Files denoted with a RO postfix are readonly and the RW postfix means
-@@ -286,4 +286,32 @@ sequential zones of zoned block devices (devices with a zoned attributed
- that reports "host-managed" or "host-aware"). This value is always 0 for
- regular block devices.
- 
-+cranges (RO)
-+------------
-+
-+The presence of this sub-directory of the /sys/block/xxx/queue/ directory
-+indicates that the device is capable of executing requests targeting
-+different sector ranges in parallel. For instance, single LUN multi-actuator
-+hard-disks will likely have a cranges directory if the device correctly
-+advertizes the sector ranges of its actuators.
-+
-+The cranges directory contains one directory per concurrent range, with each
-+range described using the sector (RO) attribute file to indicate the first
-+sector of the range and the nr_sectors (RO) attribute file to indicate the
-+total number of sector in the range starting from the first sector.
-+For example, a dual-actuator hard disk will have the following cranges
-+entries.::
-+
-+        $ tree /sys/block/<device>/queue/cranges/
-+        /sys/block/<device>/queue/cranges/
-+        |-- 0
-+        |   |-- nr_sectors
-+        |   `-- sector
-+        `-- 1
-+            |-- nr_sectors
-+            `-- sector
-+
-+The sector and nr_sectors attributes use 512B sector unit, regardless of
-+the actual block size of the device.
-+
- Jens Axboe <jens.axboe@oracle.com>, February 2009
--- 
-2.31.1
-
+Bart.
