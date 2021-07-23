@@ -2,131 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C19C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 12:25:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26288C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 13:09:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBC5460720
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 12:25:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F40D460E53
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 13:09:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234830AbhGWLoz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jul 2021 07:44:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35064 "EHLO
+        id S235074AbhGWM21 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jul 2021 08:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234726AbhGWLoz (ORCPT
+        with ESMTP id S235202AbhGWM21 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jul 2021 07:44:55 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B24DFC06175F
-        for <linux-block@vger.kernel.org>; Fri, 23 Jul 2021 05:25:27 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id 19-20020a9d08930000b02904b98d90c82cso1858096otf.5
-        for <linux-block@vger.kernel.org>; Fri, 23 Jul 2021 05:25:27 -0700 (PDT)
+        Fri, 23 Jul 2021 08:28:27 -0400
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6CAC061575;
+        Fri, 23 Jul 2021 06:08:59 -0700 (PDT)
+Received: by mail-vk1-xa32.google.com with SMTP id d16so375436vkp.4;
+        Fri, 23 Jul 2021 06:08:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aRUskXGznymjiPhSPPZyhJYIsZLMytqVDg3CZ0gajkI=;
-        b=dQT4tlqWkatDtLUgzzl1zSN7dtH3n39/QVn66bgkMWjc4p4kY16tD9Z7zhPTivaasa
-         7y01sspGAtEP4d6tZIeP+GIe5MUv9rZabiNNQAVz0Cu0n9uT5ujG9tjFJ/nc395mfYr9
-         A7FqOZ9iRlG+x8bEzf2bS/V8cpKblV4LD8owGUBU2xbHck5etFryu5ohz9hc+83Yuxfr
-         I4uGojvb471OrMlDLn+pofsiy1wXFRdvYIk0OReuw5lCiNFCmspq0OOBeiJ0fWGLv/hT
-         V+24BgzruN5ybwF4UWCV3oHEKgKwCSTGT8YAwM+HbLs85kZQsyUNjP662kQyyjbcunI0
-         Bfsg==
+         :cc:content-transfer-encoding;
+        bh=kVBfC6co2VsHDzY9tpVsgW1qF6lGCAzJxuznl8I/9GE=;
+        b=S7yHpcB0mbS1di7E5oWpwhpxwwZ2/SiAg+gx57RoBO0r4PvBN81gZFYvQSTBVXpkri
+         YUOnreKPJdPh9H7ClkUAZtgq0HexnNabAP1nftaQovyy214cqPbsC6xU4xPi1+6HF1aQ
+         0/j1uTvscTLhK0PE1Z7bgekrYAnESQqxHVEzA9/3FtLOiv9IYrictiJcIOD9tYL/8BhY
+         j6G4P7zHrG+t5k0sGGAWuPMDn1svydRZ908pPwvtPqK6FntCVHG2lDxUUv55YIWuRAgq
+         egB46wg9CNEMt/9XXbGl7Q0krzeJRHgSKKZUd3NZO93FEIN9Sb3pTNA48ud83njIAzza
+         XADA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aRUskXGznymjiPhSPPZyhJYIsZLMytqVDg3CZ0gajkI=;
-        b=a7xf2U+MFCceM23+/bWeEiO0jLylmJpRqLgkG5YBe+MmWkfxzHfcAUZxe9KAnmwWEb
-         pN1Mz0DVH/YHi4Jk4b7JReYDRSGmOw8v84rg1TsA3YpMUFccWG8FV6v2de56n/qPLpSn
-         vxgCwp4Eu1wG/2+/ucmn2xWzukaNw9bRTMy3zwoJDnastWms9LAEABGjGG5njx1EqLOm
-         FMOqh8tU0/Bwqm3jn8/hHwYF1372X/3VvL0l72Ec5iTyDX9bG42wbuoWuWetWmkwNDat
-         GNEOzGzQU8JyYvHiN7+Jms+Z4INzz0lQHH2DnyxiEuPTlQ9pAtY/zIHvKz0N2vw+Y9Wx
-         kqfw==
-X-Gm-Message-State: AOAM532g6gaNTQPGnU/sBU0ZDsRUNFiYO0a+1k+BJrrYzYDHJYxoFZHV
-        Hbs8SVgQ2D68NGPTYiPCvLer8UxFVGG1uO0Dn2iz4ayKqkKOUByV
-X-Google-Smtp-Source: ABdhPJwXTpo12ME8GoDOuTPYTK33J28upzzgQJgLGzW+l1l5KobGs/3ySmoblDwwcR5fo1Pd7kAxk7/KUCLFlb24NBQ=
-X-Received: by 2002:a9d:27a4:: with SMTP id c33mr2911795otb.281.1627043126908;
- Fri, 23 Jul 2021 05:25:26 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=kVBfC6co2VsHDzY9tpVsgW1qF6lGCAzJxuznl8I/9GE=;
+        b=eywsFOmv784Gw5Yckw01Gz/2Na5yfO5kYtO5UbfvYX5tSxjAAubPYw+vZz4WPQUmnb
+         yGKqmhaXRHIPRbc9RV8nHfuZj93wJ11/dAZXMDa2RE/tnY65qS2g8FpPfbtk1SD24qoz
+         T5j3QtsTx/mZz1wbkVcN4qAnygd7jVRIvZSXME4zFNvohBLEwY+FRJzZI9TYk4SMhIAF
+         3bXHcBz2wP4exALn/nw9MKDAlbrNe0ajnJLH3OGIGpwLTggdTFIxmU9D9Jklu6XYRLtR
+         RNateaKpUrnACuYfsuhVyaG6WcC1CkPrwotHCoPAlDN20L33QKxQE3hJSiym0s+Ql6dL
+         59Rw==
+X-Gm-Message-State: AOAM5328ZzETKEnGqgoivO3GeVzjy+qFpcxDn4v9FFb8aXu2q0jk2ely
+        rzLJYreWVNga3Ppj+gb7Z2dCHdZSQCa/K5QTBTU=
+X-Google-Smtp-Source: ABdhPJzm4WOjliZN4J/jn8+c1kgtEDm9FOG1JP5fQJzmTsotnWi265Upc6UbXRPTWQZb1IP+PBk1yHG5isNcMSmo9bU=
+X-Received: by 2002:ac5:c888:: with SMTP id n8mr3669958vkl.22.1627045738539;
+ Fri, 23 Jul 2021 06:08:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210722155628.371356843@linuxfoundation.org> <CA+G9fYt_9nfDcQzKm8SZtmQXzzrybutS9vD4GgUw_0o8UD1HOQ@mail.gmail.com>
- <YPqwF7wtM6n3wHlr@kroah.com>
-In-Reply-To: <YPqwF7wtM6n3wHlr@kroah.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Fri, 23 Jul 2021 17:55:15 +0530
-Message-ID: <CA+G9fYvjgkaQxdW52sMzQm73f2xJreQzrPiCV48qD+5EN-b0Kw@mail.gmail.com>
-Subject: Re: [PATCH 5.13 000/156] 5.13.5-rc1 review
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Shuah Khan <shuah@kernel.org>, patches@kernelci.org,
-        lkft-triage@lists.linaro.org, Pavel Machek <pavel@denx.de>,
-        Jon Hunter <jonathanh@nvidia.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        linux-stable <stable@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, LTP List <ltp@lists.linux.it>,
-        Arnd Bergmann <arnd@arndb.de>
+References: <CAJfuBxxVEVwj=hGa+FoQUV6i7BtoUbiJwGunnRq26Fp=Ax2ziQ@mail.gmail.com>
+ <8057650.rSI8SBESIY@natalenko.name> <98103103-c517-59d2-a4d6-9b0758cbdfc1@kernel.dk>
+In-Reply-To: <98103103-c517-59d2-a4d6-9b0758cbdfc1@kernel.dk>
+From:   jim.cromie@gmail.com
+Date:   Fri, 23 Jul 2021 09:08:32 -0400
+Message-ID: <CAJfuBxwJam5=s3Rr06RyLoO19s3HTBomnNi6P3dw59s_b7we+Q@mail.gmail.com>
+Subject: Re: 5.14.0-rc1 KASAN use after free
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Oleksandr Natalenko <oleksandr@natalenko.name>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 23 Jul 2021 at 17:33, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
+On Sun, Jul 18, 2021 at 5:58 PM Jens Axboe <axboe@kernel.dk> wrote:
 >
-> On Fri, Jul 23, 2021 at 05:26:22PM +0530, Naresh Kamboju wrote:
-> > On Thu, 22 Jul 2021 at 22:17, Greg Kroah-Hartman
-> > <gregkh@linuxfoundation.org> wrote:
-> > >
-> > > This is the start of the stable review cycle for the 5.13.5 release.
-> > > There are 156 patches in this series, all will be posted as a response
-> > > to this one.  If anyone has any issues with these being applied, please
-> > > let me know.
-> > >
-> > > Responses should be made by Sat, 24 Jul 2021 15:56:00 +0000.
-> > > Anything received after that time might be too late.
-> > >
-> > > The whole patch series can be found in one patch at:
-> > >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.13.5-rc1.gz
-> > > or in the git tree and branch at:
-> > >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.13.y
-> > > and the diffstat can be found below.
-> > >
-> > > thanks,
-> > >
-> > > greg k-h
+> On 7/18/21 3:08 PM, Oleksandr Natalenko wrote:
+> > + Paolo, Jens et al.
 > >
-> > The following error is due to SATA drive format failing with arm64 64k-page
-> > size ( CONFIG_ARM64_64K_PAGES=y ) kernel.
-> > while running LTP syscalls test suite on running 5.13.3 and 5.13.5-rc1 kernel.
-> >
-> > First it was noticed on the stable-rc 5.13.3-rc2 kernel.
-> >
-> > Whereas 64bit kernel and 32bit kernel pass with 4K page size.
-> >
-> > Initially, I thought it could be a Hard drive fault but it is reproducible on
-> > other devices but not always. Which is a blocker to bisect the problem.
-> >
-> > The steps to reproduce:
-> >  - Boot arm64 juno device with 64k page stable-rc 5.13 kernel Image [1]
-> >    - CONFIG_ARM64_64K_PAGES=y
-> >  - format connected SATA drives and mount /scratch
-> >  - Use the mounted /scratch for LTP runs to create and delete files from this
-> >  - cd /opt/ltp
-> >  - ./runltp -d /scratch -f syscalls
+> > On =C4=8Dtvrtek 15. =C4=8Dervence 2021 16:32:29 CEST jim.cromie@gmail.c=
+om wrote:
+> >> hi all,
+> >>
+> >> I noticed this report this morning, from 3 days ago,
+> >> about 10 minutes after boot.
+> >> Its easiest to ignore it, and I dont want to make a fuss,
+> >> but it looks useful to someone
+> >>
+> >>
+> >> [   33.663464] Bluetooth: RFCOMM ver 1.11
+> >> [  646.343628]
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D [
+> >> 646.343649] BUG: KASAN: use-after-free in bfq_get_queue+0x47d/0x900 [
+> >> 646.343680] Read of size 8 at addr ffff88810d864a00 by task
+> >> journal-offline/1639
 >
-> And does that also fail for 5.13.2?
+> There are only a few commits between 5.13 and master in this area, see
+> attached. I'd just start reverting from the top, one by one, and see
+> which one is causing the issue. Jim, would that be feasible?
+>
 
-Yes. It failed on 5.13.2 also.
+oops, didn't see this earlier.
+It hasnt happened since, I can try to recreate mid-next-week
 
-Ref failed log:
-https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-5.13.y/build/v5.13.2/testrun/5147287/suite/ltp-syscalls-tests/test/copy_file_range01/log
 
-- Naresh
+> --
+> Jens Axboe
+>
