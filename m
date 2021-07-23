@@ -2,87 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C9BC4338F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7163C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:32:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FC3260EB5
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:30:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9251460EB5
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:32:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231630AbhGWQuN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jul 2021 12:50:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46208 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231430AbhGWQuM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jul 2021 12:50:12 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6E73760EB4;
-        Fri, 23 Jul 2021 17:30:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627061445;
-        bh=fTHDLla3VU2ApOlEPZLBX3MOoVxOP6SWQW5g3oZuKM4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=N3CKUYxiL5NuZ1YgChzwR4kyXJYgWneQMbpQpMhMpc9GMnVYBFe0+0214nvxGP0Oe
-         pS0FRqLwqSkMr+DgiQyx+tuzqmr28IB5u+HWhGTMGyUicskVDJz2h2ThFmI6GT4CXR
-         3TZafadYWU5vArUdwZ6wKpoV5kwfmqhJkY4HJhsZfrOcB6XLpUugf0m6jt53EVbcYD
-         mXlHopLUPbaDJZBwMi7ShdTFUKGo5ECMoSFdX+XZg1GF7pHde90VC1nBWg8QevZZrx
-         y/dowxPDsP8omTZAviy4QH1feg5cYCsonowYXBLocvqqlUSYRrxE6KiwGpQnma2ELO
-         zR0HXgqp0Ocmw==
-Date:   Fri, 23 Jul 2021 10:30:44 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyaprateek2357@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [PATCH v4 9/9] block: add WARN_ON_ONCE() to bio_split() for
- sector alignment
-Message-ID: <YPr8xOKxROn0QuAQ@gmail.com>
-References: <20210707052943.3960-1-satyaprateek2357@gmail.com>
- <20210707052943.3960-10-satyaprateek2357@gmail.com>
+        id S231590AbhGWQwW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jul 2021 12:52:22 -0400
+Received: from mail-pl1-f172.google.com ([209.85.214.172]:41599 "EHLO
+        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229571AbhGWQwW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Jul 2021 12:52:22 -0400
+Received: by mail-pl1-f172.google.com with SMTP id e14so3921812plh.8;
+        Fri, 23 Jul 2021 10:32:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4Gy1tDqQLfJ9cQoNR0QoqWZQDvrm3bO+ArzHssSxoWo=;
+        b=khw0oQvMKFbUQar/p9GoM2IUbIpxDrjK3CxYL+7qX4bRPMm/qufbPpIIfa7cZ87DoL
+         jzXeySeH2tDh3s8U7FuPLAgKDapRPN9TepCWMyZUNAkSUDn+5OAxKAYSOxo3tutli+qz
+         OjCoLbXkGDiNqzmW0e2JKtB0ye2K43eqf2MDNfczXBwXc3IjvLTTPCGlIVGTVDONflnn
+         5qFjuGiIj+A/S6OXGa5tpo9HsuGpn4WU41fLzcXsJi3szJzo/fycWy2QDBiJzxLvB7xp
+         hTFsBuB/mNoMwc/AEQw50PY/AyjjPVs8R3FKmKYQG3HCQQwvF2DRhJiSPNkQi/lzeIaf
+         v2aQ==
+X-Gm-Message-State: AOAM531N7qPJhoCv/au2w00q32+DfnSCIFccOGbAXFnqQcx1OnS0PlPd
+        ynt2WFEWbGqGUI2HpFpCT6k=
+X-Google-Smtp-Source: ABdhPJzKUmB24ujosMnylQGn9LUgkwy8UQ6nEjLnkyTrVI/rJWclOvSpWnnzX0Yh5poOLDH1PrkbAQ==
+X-Received: by 2002:a17:90a:8043:: with SMTP id e3mr3040632pjw.32.1627061574882;
+        Fri, 23 Jul 2021 10:32:54 -0700 (PDT)
+Received: from garbanzo ([191.96.121.239])
+        by smtp.gmail.com with ESMTPSA id q21sm34626650pff.55.2021.07.23.10.32.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jul 2021 10:32:53 -0700 (PDT)
+Date:   Fri, 23 Jul 2021 10:32:50 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Shuah Khan <skhan@linuxfoundation.org>, tj@kernel.org,
+        shuah@kernel.org, akpm@linux-foundation.org, rafael@kernel.org,
+        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+        andriin@fb.com, daniel@iogearbox.net, atenart@kernel.org,
+        alobakin@pm.me, weiwan@google.com, ap420073@gmail.com,
+        jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] selftests: add tests_sysfs module
+Message-ID: <20210723173250.u6444kg7a5ktnyiv@garbanzo>
+References: <20210703004632.621662-1-mcgrof@kernel.org>
+ <20210703004632.621662-2-mcgrof@kernel.org>
+ <YPgF2VAoxPIiKWX1@kroah.com>
+ <20210722223449.ot5272wpc6o5uzlk@garbanzo>
+ <YPqcIzKpEXftpZM8@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707052943.3960-10-satyaprateek2357@gmail.com>
+In-Reply-To: <YPqcIzKpEXftpZM8@kroah.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 06, 2021 at 10:29:43PM -0700, Satya Tangirala wrote:
-> From: Satya Tangirala <satyat@google.com>
+On Fri, Jul 23, 2021 at 12:38:27PM +0200, Greg KH wrote:
+> On Thu, Jul 22, 2021 at 03:34:49PM -0700, Luis Chamberlain wrote:
+> > kunit relies on UML and UML is a simple one core architecture, to start
+> > with.
 > 
-> The number of sectors passed to bio_split() must be aligned to
-> bio_required_sector_alignment(). All callers (other than bounce.c) have
-> been updated to ensure this, so add a WARN_ON_ONCE() if the number of
-> sectors is not aligned. (bounce.c was not updated since it's legacy code
-> - any device that enables bounce buffering won't declare inline
-> encryption support, so bounce.c will never see a bio with an encryption
-> context).
+> I thought the UML requirement was long gone, are you sure it is still
+> present?
 
-The last sentence could say "so bounce.c will never see a bio with
-bio_required_sector_alignment() greater than the logical block size".
+It's *the* way to run kunit.
 
+> > This means I cannot run tests for multicore with it, which is
+> > where many races do happen! Yes, you can run kunit on other
+> > architectures, but all that is new.
 > 
-> Signed-off-by: Satya Tangirala <satyat@google.com>
-> ---
->  block/bio.c | 1 +
->  1 file changed, 1 insertion(+)
+> What do you mean by "new"?  It should work today, in today's kernel
+> tree, right?
+
+That was experimental. And I know no one using it.
+
+> > In this case kunit is not ideal given I want to mimic something in
+> > userspace interaction, and expose races through error injection and
+> > if we can use as many cores to busy races out.
 > 
-> diff --git a/block/bio.c b/block/bio.c
-> index 1fab762e079b..4c7bfdeefe76 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1435,6 +1435,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
->  
->  	BUG_ON(sectors <= 0);
->  	BUG_ON(sectors >= bio_sectors(bio));
-> +	WARN_ON_ONCE(!IS_ALIGNED(sectors, bio_required_sector_alignment(bio)));
->  
->  	/* Zone append commands cannot be split */
->  	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
+> Can you not do that with kunit?  If not, why not?
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+kunit requires codifying everything in C, what we need is a lot of
+flexibility to do all sorts of races in userspace, and actually use
+userspace tools.
 
-- Eric
+I am *not* going to even try to rewrite my selftest as a kunit test.
+It is just not going to happen.
+
+  Luis
