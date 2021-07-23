@@ -2,119 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D42C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 13:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2BCBC4338F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 16:19:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEDD760EE6
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 13:19:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8F1C60E8B
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 16:19:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235005AbhGWMi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jul 2021 08:38:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48728 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234972AbhGWMiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jul 2021 08:38:55 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EF31460E53;
-        Fri, 23 Jul 2021 13:19:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627046368;
-        bh=HF9mEOeDzgAHUKTOnj4D2xJBtY+l26ejPiu1VK+Ubac=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gvRGMh3HPHQxDoyNBW2e73F2YascTeEZw4O9XwDU1k1PepwS+Eu7DosJsYEiv31Ob
-         tZc4kKovIEmp3pPVg4rc4ApjIvTS7aUQzHq47owKyzZRFIRet2X3eR2wYfXQ5VYI/9
-         rebA/1CGuiODi3D5HxgcOaHJHcoMZZfmvaB+d4G8=
-Date:   Fri, 23 Jul 2021 15:19:26 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Shuah Khan <shuah@kernel.org>, patches@kernelci.org,
-        lkft-triage@lists.linaro.org, Pavel Machek <pavel@denx.de>,
-        Jon Hunter <jonathanh@nvidia.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        linux-stable <stable@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, LTP List <ltp@lists.linux.it>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 5.13 000/156] 5.13.5-rc1 review
-Message-ID: <YPrB3rvRPjn5D8oI@kroah.com>
-References: <20210722155628.371356843@linuxfoundation.org>
- <CA+G9fYt_9nfDcQzKm8SZtmQXzzrybutS9vD4GgUw_0o8UD1HOQ@mail.gmail.com>
- <YPqwF7wtM6n3wHlr@kroah.com>
- <CA+G9fYvjgkaQxdW52sMzQm73f2xJreQzrPiCV48qD+5EN-b0Kw@mail.gmail.com>
+        id S229693AbhGWPjJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jul 2021 11:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60624 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229564AbhGWPjJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Jul 2021 11:39:09 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3E6C061575
+        for <linux-block@vger.kernel.org>; Fri, 23 Jul 2021 09:19:41 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id c3so2084205ilh.3
+        for <linux-block@vger.kernel.org>; Fri, 23 Jul 2021 09:19:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=30vpAefHG/JNasZeyk2sXioBuZ/6M9niR2X4wSDQYNE=;
+        b=v3q5e6FLkZKQHexSTV+74IjfyqJ8wM48H06jLke8tDLufoYX7LDWftZrzsn+VzNtFa
+         qJajGO3FTJ5SCxuAVyENmmt3mheRXlEN4shxlxI8KOhfhd3FypnzMo3JoME4CwrJMJae
+         m5+qUN0gzVWdVTL8X7Lqutn7lRM+X0pE/Co+S9ZagqF0Qh4X1YMCt1G8rND0QUs2u78r
+         3jiElZgFJEfolLXEFTYdFavmwROuOj+8Q68K+XdU3jdfSBjCZxYS995cFKZ2XpP2iILr
+         mfabypVvOoqtOYZnCVPbXkA2hSvzRMnmhh2VbS8REIW11ij8PPM033WnQxczP/lp110N
+         p2eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=30vpAefHG/JNasZeyk2sXioBuZ/6M9niR2X4wSDQYNE=;
+        b=Cbjc5rJnSzvL3M30aUD6SN0ay+GtZ0jJ3E+N51xEpVByCFGddaVCfA8x74Hih+6pHh
+         tVeOk4x38CAeUWICGp1sbcMwAW0IWu/XPG9S3oiZT0HbyK8OK8EETQWV6X9mJGOW5o3x
+         t1SiRokeW+naPm/FtfVibGHjEIM3KwpEgcrxhMrg+ZWM1mMjW5965Tvzi8StHkcMqNHe
+         YGS202yS49KVytHn30rjLgyuCMP3FKC96LcftyN8vDjMBiNtoKhzgPAqPkaTy1NhggH4
+         GuQ33+EtgU3ywQcKQxI4NHhZ47O7AAQm/XA1fn6OgTvF5EJtXmSvW1kb/Ra/3ATZFobQ
+         /Y0g==
+X-Gm-Message-State: AOAM530yjwHhHLCwZJqW24uZoHTd59jmehJftBb5by2aNYEmFuQaqF8f
+        9ndTg6kvs//NgKPDwlii7laZEJApuWc7gmSg
+X-Google-Smtp-Source: ABdhPJzrBB+b7tsiR2ocGDbdlJWR2cyhd5JiidAgoPISOUuZFBLkNdDCDeK1H4Cjg863/9ZuRrBBVg==
+X-Received: by 2002:a92:cac5:: with SMTP id m5mr4028044ilq.112.1627057180649;
+        Fri, 23 Jul 2021 09:19:40 -0700 (PDT)
+Received: from [192.168.1.10] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id j4sm17715572iom.28.2021.07.23.09.19.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jul 2021 09:19:40 -0700 (PDT)
+Subject: Re: [PATCH v3] loop: reintroduce global lock for safe
+ loop_validate_file() traversal
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Petr Vorel <pvorel@suse.cz>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        linux-block@vger.kernel.org
+References: <20210702153036.8089-1-penguin-kernel@I-love.SAKURA.ne.jp>
+ <288edd89-a33f-2561-cee9-613704c3da20@i-love.sakura.ne.jp>
+ <20210706054622.GE17027@lst.de>
+ <6049597b-693e-e3df-d4f0-f2cb43381b84@i-love.sakura.ne.jp>
+ <521eb103-db46-3f34-e878-0cdd585ee8bd@i-love.sakura.ne.jp>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8031a79f-5f32-3306-821d-6c783bb73413@kernel.dk>
+Date:   Fri, 23 Jul 2021 10:19:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYvjgkaQxdW52sMzQm73f2xJreQzrPiCV48qD+5EN-b0Kw@mail.gmail.com>
+In-Reply-To: <521eb103-db46-3f34-e878-0cdd585ee8bd@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 23, 2021 at 05:55:15PM +0530, Naresh Kamboju wrote:
-> On Fri, 23 Jul 2021 at 17:33, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Fri, Jul 23, 2021 at 05:26:22PM +0530, Naresh Kamboju wrote:
-> > > On Thu, 22 Jul 2021 at 22:17, Greg Kroah-Hartman
-> > > <gregkh@linuxfoundation.org> wrote:
-> > > >
-> > > > This is the start of the stable review cycle for the 5.13.5 release.
-> > > > There are 156 patches in this series, all will be posted as a response
-> > > > to this one.  If anyone has any issues with these being applied, please
-> > > > let me know.
-> > > >
-> > > > Responses should be made by Sat, 24 Jul 2021 15:56:00 +0000.
-> > > > Anything received after that time might be too late.
-> > > >
-> > > > The whole patch series can be found in one patch at:
-> > > >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.13.5-rc1.gz
-> > > > or in the git tree and branch at:
-> > > >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.13.y
-> > > > and the diffstat can be found below.
-> > > >
-> > > > thanks,
-> > > >
-> > > > greg k-h
-> > >
-> > > The following error is due to SATA drive format failing with arm64 64k-page
-> > > size ( CONFIG_ARM64_64K_PAGES=y ) kernel.
-> > > while running LTP syscalls test suite on running 5.13.3 and 5.13.5-rc1 kernel.
-> > >
-> > > First it was noticed on the stable-rc 5.13.3-rc2 kernel.
-> > >
-> > > Whereas 64bit kernel and 32bit kernel pass with 4K page size.
-> > >
-> > > Initially, I thought it could be a Hard drive fault but it is reproducible on
-> > > other devices but not always. Which is a blocker to bisect the problem.
-> > >
-> > > The steps to reproduce:
-> > >  - Boot arm64 juno device with 64k page stable-rc 5.13 kernel Image [1]
-> > >    - CONFIG_ARM64_64K_PAGES=y
-> > >  - format connected SATA drives and mount /scratch
-> > >  - Use the mounted /scratch for LTP runs to create and delete files from this
-> > >  - cd /opt/ltp
-> > >  - ./runltp -d /scratch -f syscalls
-> >
-> > And does that also fail for 5.13.2?
+On 7/6/21 8:40 AM, Tetsuo Handa wrote:
+> Commit 6cc8e7430801fa23 ("loop: scale loop device by introducing per
+> device lock") re-opened a race window for NULL pointer dereference at
+> loop_validate_file() where commit 310ca162d779efee ("block/loop: Use
+> global lock for ioctl() operation.") has closed.
 > 
-> Yes. It failed on 5.13.2 also.
-> 
-> Ref failed log:
-> https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-5.13.y/build/v5.13.2/testrun/5147287/suite/ltp-syscalls-tests/test/copy_file_range01/log
+> Although we need to guarantee that other loop devices will not change
+> during traversal, we can't take remote "struct loop_device"->lo_mutex
+> inside loop_validate_file() in order to avoid AB-BA deadlock. Therefore,
+> introduce a global lock dedicated for loop_validate_file() which is
+> conditionally taken before local "struct loop_device"->lo_mutex is taken.
 
-Great, not a new problem?
+I'll queue this up for next weeks merging. Christoph, are you happy with
+it at this point? Can't say it's a thing of beauty, but the problem does
+seem real.
 
-5.13.0?
+-- 
+Jens Axboe
 
-bisection would be most helpful.
-
-thanks,
-
-greg k-h
