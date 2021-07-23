@@ -7,92 +7,82 @@ X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B35DC4338F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C9BC4338F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:30:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21EED60EB5
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:26:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FC3260EB5
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 17:30:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbhGWQqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jul 2021 12:46:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45222 "EHLO mail.kernel.org"
+        id S231630AbhGWQuN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jul 2021 12:50:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46208 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229616AbhGWQqQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jul 2021 12:46:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 60A2F60EB1;
-        Fri, 23 Jul 2021 17:26:49 +0000 (UTC)
+        id S231430AbhGWQuM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Jul 2021 12:50:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6E73760EB4;
+        Fri, 23 Jul 2021 17:30:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627061209;
-        bh=61tmtz2gl+/5WsyTpX2fSMaphxwIAinFjgKGpsgLcgw=;
+        s=k20201202; t=1627061445;
+        bh=fTHDLla3VU2ApOlEPZLBX3MOoVxOP6SWQW5g3oZuKM4=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Qee8qdlwQxL4Dxje6UNCbGFj2WAGRxHe7xDwZKt9buwUuexQy2KhFFowzVEvIHZk/
-         gJ9eylrCtwCM85E0jVwV2ubesI2pSRQAPpqdZ0VY7Ygf7qa0arpoVRSssdFTQDefgR
-         v8k6Ll2XfV/xLNWyM+IQKhLC2vWLGYIt62A4dXO22PhyIE8QdEauPXEo0zmTVg0MUd
-         Rk+BPOsuqvelku8EhxLQ/a4eicOpV9xE6RnuNQR/bqwAt2s5LnVFHdvnXbJWGBHLgr
-         eckzX+2UWnQGvlamdQN5G/zDXZN5/vYYx3eftT/4L3QbUjlXB7qAq89B0wRaJAIvCE
-         lL/3QvmIG20mw==
-Date:   Fri, 23 Jul 2021 10:26:48 -0700
+        b=N3CKUYxiL5NuZ1YgChzwR4kyXJYgWneQMbpQpMhMpc9GMnVYBFe0+0214nvxGP0Oe
+         pS0FRqLwqSkMr+DgiQyx+tuzqmr28IB5u+HWhGTMGyUicskVDJz2h2ThFmI6GT4CXR
+         3TZafadYWU5vArUdwZ6wKpoV5kwfmqhJkY4HJhsZfrOcB6XLpUugf0m6jt53EVbcYD
+         mXlHopLUPbaDJZBwMi7ShdTFUKGo5ECMoSFdX+XZg1GF7pHde90VC1nBWg8QevZZrx
+         y/dowxPDsP8omTZAviy4QH1feg5cYCsonowYXBLocvqqlUSYRrxE6KiwGpQnma2ELO
+         zR0HXgqp0Ocmw==
+Date:   Fri, 23 Jul 2021 10:30:44 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Satya Tangirala <satyaprateek2357@gmail.com>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>,
         Satya Tangirala <satyat@google.com>
-Subject: Re: [PATCH v4 7/9] dm: handle error from blk_ksm_register()
-Message-ID: <YPr71wM9IFdWY9FK@gmail.com>
+Subject: Re: [PATCH v4 9/9] block: add WARN_ON_ONCE() to bio_split() for
+ sector alignment
+Message-ID: <YPr8xOKxROn0QuAQ@gmail.com>
 References: <20210707052943.3960-1-satyaprateek2357@gmail.com>
- <20210707052943.3960-8-satyaprateek2357@gmail.com>
+ <20210707052943.3960-10-satyaprateek2357@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707052943.3960-8-satyaprateek2357@gmail.com>
+In-Reply-To: <20210707052943.3960-10-satyaprateek2357@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 06, 2021 at 10:29:41PM -0700, Satya Tangirala wrote:
+On Tue, Jul 06, 2021 at 10:29:43PM -0700, Satya Tangirala wrote:
 > From: Satya Tangirala <satyat@google.com>
 > 
-> Handle any error from blk_ksm_register() in the callers. Previously,
-> the callers ignored the return value because blk_ksm_register() wouldn't
-> fail as long as the request_queue didn't have integrity support too, but
-> as this is no longer the case, it's safer for the callers to just handle
-> the return value appropriately.
+> The number of sectors passed to bio_split() must be aligned to
+> bio_required_sector_alignment(). All callers (other than bounce.c) have
+> been updated to ensure this, so add a WARN_ON_ONCE() if the number of
+> sectors is not aligned. (bounce.c was not updated since it's legacy code
+> - any device that enables bounce buffering won't declare inline
+> encryption support, so bounce.c will never see a bio with an encryption
+> context).
+
+The last sentence could say "so bounce.c will never see a bio with
+bio_required_sector_alignment() greater than the logical block size".
+
 > 
 > Signed-off-by: Satya Tangirala <satyat@google.com>
 > ---
->  drivers/md/dm-table.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
+>  block/bio.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> index 29cbfc3e3c4b..c79c0fbe80dd 100644
-> --- a/drivers/md/dm-table.c
-> +++ b/drivers/md/dm-table.c
-> @@ -1343,6 +1343,20 @@ static int dm_table_construct_keyslot_manager(struct dm_table *t)
->  	 */
->  	t->ksm = ksm;
+> diff --git a/block/bio.c b/block/bio.c
+> index 1fab762e079b..4c7bfdeefe76 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1435,6 +1435,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
 >  
-> +	/*
-> +	 * At this point, t->ksm is either NULL or *not* empty (i.e. will support
-> +	 * at least 1 crypto capability), the request queue doesn't support
-> +	 * integrity, and it also satisfies all the block layer constraints
-> +	 * "sufficiently" (as in the constraints of the DM device's request queue
-> +	 * won't preclude any of the intersection of the supported capabilities
-> +	 * of the underlying devices, since if some capability were precluded by
-> +	 * the DM device's request queue's constraints, that capability would
-> +	 * also have been precluded by one of the child device's request queues).
-> +	 *
-> +	 * Hence any future attempt to call blk_ksm_register() on t->ksm (if it's
-> +	 * not NULL) will succeed.
-> +	 */
-> +
->  	return 0;
+>  	BUG_ON(sectors <= 0);
+>  	BUG_ON(sectors >= bio_sectors(bio));
+> +	WARN_ON_ONCE(!IS_ALIGNED(sectors, bio_required_sector_alignment(bio)));
+>  
+>  	/* Zone append commands cannot be split */
+>  	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
 
-I don't think this properly answers the question I had on the previous version
-of this patch, which was not just how we know that blk_ksm_register() will
-succeed later, but also how we know that the blk_ksm_is_superset() check done
-above is valid when some of the crypto capabilities may be cleared by
-blk_ksm_register() later.  Is the assumption actually that in the device-mapper
-case, blk_ksm_register() will never clear any crypto capabilities at all?
-If so, can that be explained properly?
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
 - Eric
