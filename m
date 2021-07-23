@@ -7,61 +7,58 @@ X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67AF1C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 16:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20C3C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 16:46:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50C4A60E9C
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 16:45:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BF9360E73
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 16:46:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230467AbhGWQFC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jul 2021 12:05:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34684 "EHLO mail.kernel.org"
+        id S229907AbhGWQFo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jul 2021 12:05:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34810 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230098AbhGWQFC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jul 2021 12:05:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 96F8D60200;
-        Fri, 23 Jul 2021 16:45:35 +0000 (UTC)
+        id S231240AbhGWQFn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Jul 2021 12:05:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 03BDC60E73;
+        Fri, 23 Jul 2021 16:46:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627058735;
-        bh=oG9Zb9KNT9SOC+hQzLLu3rLDODvxQljE/YxTyTbn1Kk=;
+        s=k20201202; t=1627058777;
+        bh=9sl+gJhcGz9m1lZo33z2vi2L7LSNih/ApFZx1AtmfNU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=emmO3/Pm3SSqfaFQOoPFs1BtxmTdejPYPYNj5YR9hVXjgLW6zQKA3RYTUJhK5e9p0
-         AGT4Xm0/250bDC145wCUMSVIUEX1xIvLxbFMxues1eOO+E9wj/kHPbdgFZaStshU25
-         SH6gJVEY4fbce9kEE4B0gkjxGjo3bgTFj0dTmp89X6WVuUfNDRZ8yOY2A4vPEfyAtc
-         5W0aH3hZbdPdt/sm8yC6AZt4TgMLxcEiwk1wmdzHofeRk6aahXPLClMNzqsrGTIaoQ
-         XIJj7dBOzkW+NGC3Q+upsSpE+Umox22B29mEH9n2GG1n6FzRWoHOSgx2QdfzUhtrCc
-         RQkOsZT++ebNQ==
-Date:   Fri, 23 Jul 2021 09:45:34 -0700
+        b=MNNi6Egb0TBvU3eqzgXRmi0rFOS1Fdtf4sgDDmmIH0Vz1wGBMg01bzaS9LEYT7X0v
+         OaUtqT8tAIqlC+3eUo4rfPbOayqQnd0JefnxIAEExWKufPvoBv0RHIAaXgeSp/Tcpi
+         vsS8JFBKmEdV95xtZh/04c19Ok4dCHCSKEpOOTQNYzMB114PM/i6Cytqg/+WF763Cg
+         jLNhwGpw1AywNwnIPisf/dH5eRM7XClbgkrP6SSET0MVTHLudrwFbOqKOLbWc6oX3D
+         4yhLEGwKqwTanEtcxeNeOkW2Ds7eUV95Nvu+em8b9b4mmRamSq0wakQX0AM5Dijr85
+         qPTBnLnh5UauQ==
+Date:   Fri, 23 Jul 2021 09:46:15 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Satya Tangirala <satyaprateek2357@gmail.com>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>,
         Satya Tangirala <satyat@google.com>
-Subject: Re: [PATCH v4 2/9] block: blk-crypto: introduce
- blk_crypto_bio_sectors_alignment()
-Message-ID: <YPryLugFwNW+hrT8@gmail.com>
+Subject: Re: [PATCH v4 3/9] block: introduce bio_required_sector_alignment()
+Message-ID: <YPryVxdMmcFy/fJD@gmail.com>
 References: <20210707052943.3960-1-satyaprateek2357@gmail.com>
- <20210707052943.3960-3-satyaprateek2357@gmail.com>
+ <20210707052943.3960-4-satyaprateek2357@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707052943.3960-3-satyaprateek2357@gmail.com>
+In-Reply-To: <20210707052943.3960-4-satyaprateek2357@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 06, 2021 at 10:29:36PM -0700, Satya Tangirala wrote:
+On Tue, Jul 06, 2021 at 10:29:37PM -0700, Satya Tangirala wrote:
 > From: Satya Tangirala <satyat@google.com>
 > 
-> The size of any bio must be aligned to the data unit size of the bio crypt
-> context (if it exists) of that bio. This must also be ensured whenever a
-> bio is split. Introduce blk_crypto_bio_sectors_alignment() that returns the
-> required alignment in sectors. The number of sectors passed to any call of
-> bio_split() must be aligned to blk_crypto_bio_sectors_alignment().
+> This function returns the required alignment for the number of sectors in
+> a bio. In particular, the number of sectors passed to bio_split() must be
+> aligned to this value.
 > 
 > Signed-off-by: Satya Tangirala <satyat@google.com>
 > ---
->  block/blk-crypto-internal.h | 17 +++++++++++++++++
+>  block/blk.h | 17 +++++++++++++++++
 >  1 file changed, 17 insertions(+)
 
 Reviewed-by: Eric Biggers <ebiggers@google.com>
