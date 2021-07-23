@@ -7,100 +7,76 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB69C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 08:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6DCC4320A
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 10:38:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54C6B60EBD
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 08:16:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 511EB60F43
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 10:38:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234529AbhGWHgO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jul 2021 03:36:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36098 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234497AbhGWHgM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jul 2021 03:36:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627028206;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kkHeqBN9xvRmsaZS4MvNMczkNr3D6j3+VlyTB6yFx9A=;
-        b=PyWErowDbZWqdyg8Fir0OZYG4Gw84R8qkCQ0BxkltvqixF2M2uYvDfrlUd9QrGOlr5mLRg
-        dWj2NPXT7ljTnY0jkLQagGxGf8s5KMIPaTizll8AtZt19nO/hIUKJ0nOBxw8m3HJabtQnu
-        LIxEH/GlKijMykEn2R6gBpEUrbfXA2I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-4FyVzKZ4NQaeJ4rMpiVKJg-1; Fri, 23 Jul 2021 04:16:42 -0400
-X-MC-Unique: 4FyVzKZ4NQaeJ4rMpiVKJg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E72F187D541;
-        Fri, 23 Jul 2021 08:16:40 +0000 (UTC)
-Received: from T590 (ovpn-12-180.pek2.redhat.com [10.72.12.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B92F55D9C6;
-        Fri, 23 Jul 2021 08:16:35 +0000 (UTC)
-Date:   Fri, 23 Jul 2021 16:16:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Wen Xiong <wenxiong@us.ibm.com>
-Cc:     dwagner@suse.de, axboe@kernel.dk, gregkh@linuxfoundation.org,
-        hare@suse.de, hch@lst.de, john.garry@huawei.com,
-        linux-block@vger.kernel.org, sagi@grimberg.me, tglx@linutronix.de
-Subject: Re: [PATCH V6 0/3] blk-mq: fix blk_mq_alloc_request_hctx
-Message-ID: <YPp63niga//Q6GLV@T590>
-References: <20210722131245.u4dhcqotepxhwgbz@beryllium.lan>
- <20210722095246.1240526-1-ming.lei@redhat.com>
- <OFDADF39F5.DDB99A55-ON0025871A.00794382-0025871A.00797A2E@ibm.com>
+        id S232016AbhGWJ57 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jul 2021 05:57:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49926 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232001AbhGWJ56 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Jul 2021 05:57:58 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C864D60EE6;
+        Fri, 23 Jul 2021 10:38:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1627036712;
+        bh=tBUdeu52dSGAjDk/xY6fNmZKu9Ai7BBxRSfuL8mBkHs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Rge5e5zdUbmhH8MnTpq7iquBA+RJUJVqycL+V34aQdfhG4Q5Vd/a5igxEiEfDguQy
+         jJxvNe7HY4bGIHw7gaZm3HifJ0e/eNGBomQEwJgvTntMNrvC1Ij/aiUJYJ3j7x6bxU
+         o4ktjRuCmbCi0y5tosDzHA8W4TN41KL9KEhqOkYc=
+Date:   Fri, 23 Jul 2021 12:38:27 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Shuah Khan <skhan@linuxfoundation.org>, tj@kernel.org,
+        shuah@kernel.org, akpm@linux-foundation.org, rafael@kernel.org,
+        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+        andriin@fb.com, daniel@iogearbox.net, atenart@kernel.org,
+        alobakin@pm.me, weiwan@google.com, ap420073@gmail.com,
+        jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] selftests: add tests_sysfs module
+Message-ID: <YPqcIzKpEXftpZM8@kroah.com>
+References: <20210703004632.621662-1-mcgrof@kernel.org>
+ <20210703004632.621662-2-mcgrof@kernel.org>
+ <YPgF2VAoxPIiKWX1@kroah.com>
+ <20210722223449.ot5272wpc6o5uzlk@garbanzo>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <OFDADF39F5.DDB99A55-ON0025871A.00794382-0025871A.00797A2E@ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20210722223449.ot5272wpc6o5uzlk@garbanzo>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 22, 2021 at 10:06:51PM +0000, Wen Xiong wrote:
->    > Wen Xiong has verified V4 in her nvmef test.
-> 
->    >>FWIW, I am testing this series right now. I observe hanging I/Os
->    >>again, but I am not totally sure if my test setup is working
->    >>properly. Working on it. I'll keep you posted.
->     
-> 
->  I built the latest upstream(v5.14-rc2) + Ming's V6 + Daniel's V3: didn't work.
-> 
+On Thu, Jul 22, 2021 at 03:34:49PM -0700, Luis Chamberlain wrote:
+> kunit relies on UML and UML is a simple one core architecture, to start
+> with.
 
-Hi Wenxiong,
+I thought the UML requirement was long gone, are you sure it is still
+present?
 
-V6 is basically same with V4, can you figure out where the failure
-comes?(v5.14-rc2, V6 or Daniel's V3) 
+> This means I cannot run tests for multicore with it, which is
+> where many races do happen! Yes, you can run kunit on other
+> architectures, but all that is new.
 
-I verified that V6 works as expected by tracing blk_mq_update_queue_map():
+What do you mean by "new"?  It should work today, in today's kernel
+tree, right?
 
-#!/usr/bin/bpftrace
-#include <linux/blk-mq.h>
-kprobe:blk_mq_update_queue_map
-{
-	@in_map[tid]=1;
-	@set[tid] = (struct blk_mq_tag_set *)arg0;
-	@ms[tid] = kstack;
-}
+> In this case kunit is not ideal given I want to mimic something in
+> userspace interaction, and expose races through error injection and
+> if we can use as many cores to busy races out.
 
-kretprobe:blk_mq_update_queue_map
-/@in_map[tid]==1/
-{
-	$s = @set[tid];
-	$m = (struct blk_mq_queue_map *)$s->map;
+Can you not do that with kunit?  If not, why not?
 
-	printf("%s %d: %s queues %d use_managed_irq %d\n",
-		comm, pid, @ms[tid], $s->nr_hw_queues, $m->use_managed_irq);
-}
+thanks,
 
-
-Thanks,
-Ming
-
+greg k-h
