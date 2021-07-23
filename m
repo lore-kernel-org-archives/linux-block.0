@@ -2,82 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759A5C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C88C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:40:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58DB260EBF
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:34:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC8F260EDF
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jul 2021 02:40:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233441AbhGWBxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jul 2021 21:53:30 -0400
-Received: from mail-pj1-f43.google.com ([209.85.216.43]:50821 "EHLO
-        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233433AbhGWBxa (ORCPT
+        id S233231AbhGWCAF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jul 2021 22:00:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231663AbhGWCAF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jul 2021 21:53:30 -0400
-Received: by mail-pj1-f43.google.com with SMTP id l19so318512pjz.0;
-        Thu, 22 Jul 2021 19:34:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RREWwRklaZFXt0C4quifntpsOFbK/AfnI0Sh0jnaUmg=;
-        b=U03foEPWsW2DfPCXBxWAflP/v0TXNeTiZkUSRDn3VN4ryGn2q1oioraLyzQxaRIx7R
-         awEPJuRcccvHB7WoD+0QvyhTsUyZ+FK8rl68oDrcv/XPnyY/ucLNjE5iEiwgR6TvnfNu
-         VCv/jfbj+e5Fo/ThqnMtwvR+iseWt54tz0bOxbwXBkP/oQvcCayKqxbqTYiDXeyon0f6
-         Tq7JG1KJBxHi50Cu8nMWsAdjb/zwpX0oeM1DD/HUs1osnfl54XHm8Osi6NQQ/rhnPHiE
-         liIKV1aYYS81X22fSSPU5eZiChDTjru+RihbX90NZBlgISH8HcYcW+/h4dIGE+D3Lfae
-         ch0g==
-X-Gm-Message-State: AOAM5304ajlCpEutEqEN+cM2cENxloaRbWMVqn9Wr/G3u9ksY1/K36Dl
-        1GfmY6FoQ6MGsnxFVhO4EIgM/kgwF5Gqgg==
-X-Google-Smtp-Source: ABdhPJzjHKo0c5RWosVq5DDhWmIZFHW08248o5ty3hGtbxQ6eznyCONZvxh4FQ926BfpYN3JbCEfbg==
-X-Received: by 2002:a17:902:b188:b029:11b:1549:da31 with SMTP id s8-20020a170902b188b029011b1549da31mr2169395plr.7.1627007642006;
-        Thu, 22 Jul 2021 19:34:02 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:286e:6a9d:f340:dcd9? ([2601:647:4000:d7:286e:6a9d:f340:dcd9])
-        by smtp.gmail.com with ESMTPSA id s7sm30561921pfk.12.2021.07.22.19.33.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jul 2021 19:34:00 -0700 (PDT)
-Subject: Re: [PATCH] kernel/module: add documentation for try_module_get()
-To:     Luis Chamberlain <mcgrof@kernel.org>, gregkh@linuxfoundation.org,
-        tj@kernel.org, shuah@kernel.org, akpm@linux-foundation.org,
-        rafael@kernel.org, davem@davemloft.net, kuba@kernel.org,
-        ast@kernel.org, andriin@fb.com, daniel@iogearbox.net,
-        atenart@kernel.org, alobakin@pm.me, weiwan@google.com,
-        ap420073@gmail.com
-Cc:     jeyu@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, minchan@kernel.org,
-        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
-        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210722221905.1718213-1-mcgrof@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <2e9f16ad-5668-f15d-b3c3-f787ba55bcda@acm.org>
-Date:   Thu, 22 Jul 2021 19:33:57 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Thu, 22 Jul 2021 22:00:05 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E03AC061575;
+        Thu, 22 Jul 2021 19:40:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=bvpCKyJPKQ+52VGiNWJJ88JT5lIx01OMRbRWDKPTqTM=; b=NXA5uHy4/Ittca66HSknUtfumF
+        zTtO6XSGT1YO7UP6247R2NDdNion/+J6gNl8kGxNG4lMhKyn2bXw+IQAIGi+dBeKVZp4H/lxltCQk
+        ZBBiqOBKlOkf2u8fyRsznnFfC2QTdjn0E6UNW1BiMN+9A8oEBXcoXcUsHnKMqg6mIhulHlS+dymml
+        0lzzyUxAUC6WQt+DeIDwuMGSxYMY72hMHbxt6Rdnn3Z+7QWsc7ChWKZYdzmrN5+/A7C9tJ1jKqrSu
+        q9PSi9ccXXrFy9+8g2YuWvxMltN4viVvE3phGqWQ3NNu+mQAX8zzJzCqNF8uzvc/B9nt6VPAzA0r0
+        T20CUYGQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m6l6x-00Av3q-13; Fri, 23 Jul 2021 02:40:30 +0000
+Date:   Fri, 23 Jul 2021 03:40:27 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v15 02/17] block: Add bio_for_each_folio_all()
+Message-ID: <YPosG9HKRBt9+GUy@casper.infradead.org>
+References: <20210719184001.1750630-1-willy@infradead.org>
+ <20210719184001.1750630-3-willy@infradead.org>
+ <YPZxp6ZbRGYYBnYK@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20210722221905.1718213-1-mcgrof@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YPZxp6ZbRGYYBnYK@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/22/21 3:19 PM, Luis Chamberlain wrote:
-> + * The real value to try_module_get() is the module_is_live() check which
-> + * ensures this the caller of try_module_get() can yields to userspace module
-> + * removal requests and fail whatever it was about to process.
+On Tue, Jul 20, 2021 at 08:48:07AM +0200, Christoph Hellwig wrote:
+> On Mon, Jul 19, 2021 at 07:39:46PM +0100, Matthew Wilcox (Oracle) wrote:
+> >  #define bio_for_each_bvec_all(bvl, bio, i)		\
+> >  	for (i = 0, bvl = bio_first_bvec_all(bio);	\
+> > -	     i < (bio)->bi_vcnt; i++, bvl++)		\
+> > +	     i < (bio)->bi_vcnt; i++, bvl++)
+> 
+> Pleae split out this unrelated fixup.
+> 
+> > +static inline
+> > +void bio_first_folio(struct folio_iter *fi, struct bio *bio, int i)
+> 
+> Please fix the strange formatting.
 
-can yields -> can yield?
+static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
+		int i)
 
-Otherwise this looks really well written to me.
+> > +{
+> > +	struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
+> > +
+> > +	fi->folio = page_folio(bvec->bv_page);
+> > +	fi->offset = bvec->bv_offset +
+> > +			PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
+> 
+> Can we have a little helper for the offset in folio calculation, like:
+> 
+> static inline size_t offset_of_page_in_folio(struct page *page)
+> {
+> 	return (bvec->bv_page - &page_folio(page)->page) * PAGE;
+> }
+> 
+> as that makes the callers a lot easier to read.
 
-Bart.
+I've spent most of today thinking about this one.  I actually don't
+want to make this easy to read.  This is code that, in an ideal world,
+would not exist.  A bio_vec should not contain a struct page; it should
+probably be:
+
+struct bio_vec {
+	phys_addr_t bv_start;
+	unsigned int bv_len;
+};
+
+and then the helper to get from a bio_vec to a folio_iter looks like:
+
+	fi->folio = pfn_folio(bvec->bv_start >> PAGE_SHIFT);
+	fi->offset = offset_in_folio(fi->folio, bvec->bv_start);
+
+If instead we decide to keep bvecs the way they are, we can at
+least turn the bv_page into bv_folio, and then we won't need this
+code either.
