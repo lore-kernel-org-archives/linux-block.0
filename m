@@ -2,118 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEFFC4320A
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F373FC4338F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:37:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2086F60EB0
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D782760E95
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234497AbhGXGx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jul 2021 02:53:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37916 "EHLO
+        id S234538AbhGXG4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Jul 2021 02:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234287AbhGXGx0 (ORCPT
+        with ESMTP id S234524AbhGXG4g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jul 2021 02:53:26 -0400
+        Sat, 24 Jul 2021 02:56:36 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2414C061575;
-        Sat, 24 Jul 2021 00:33:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E914C061575;
+        Sat, 24 Jul 2021 00:37:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=1o20UjFSCu9RCRpp605CiAvWXYDEYwYFj5Eisgb7ePc=; b=rQvsUJVEXcuN+74mISix86T7hQ
-        aDF/GYxg0eV18S5Ljwx7i2XPH8ndwmebtb4T8gEsn41rOMes+M7fEf3Oi2GpuSyumLaYvwmCHm6aY
-        /zjH+PdURsgfU/rlig31mMrCHNzg24cPgyexYEjg9lNRKo5FKXYbXvffRDpe1TbFqeQy/VgkM1er2
-        dVetYAXIhUYmyxQUn9HHjzJNKGRGFwAIMANKt21y5rQWEEH2LTKk+CtjlB++3mHW+o0/NeTcyevTN
-        BRaMn1CLVl6CfBOP5B/3HMgxRFRpbcvpjccecXfLscN22JAyQwIkQ4HtG+1Lvsrc7ovM/EwP7FCSB
-        nn9OdtqA==;
-Received: from [2001:4bb8:184:87c5:85d0:a26b:ef67:d32c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m7C9j-00C5dR-LW; Sat, 24 Jul 2021 07:33:13 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=FqhIgv8Rf1Zf62r3AOuw/s00sKaxHUe15ND2GKynq64=; b=vNajFkx6Jv5X4wPfPRaWpwo+np
+        1PcC/dhBP5n1scFWTkeTN3sxEekyaebs4tqMrK2kQK/+5IcXCc2TlRBQgrOFR7fnzhRN5bTpbRPll
+        HCGIuyuj6fUPJJtWhc+aTKW69C+kWKnIn7oDy//pzoNjZ9va7NREzp12daD5c2LJYDkJwzJnqsrls
+        ygMyZGIqlvsaQYNcMyk5Y/xeER+0iRHj3aQqXCyvKkTyIyxvAHDxmshOYjbl/uKB48Q/1ptJ3pRg0
+        YuRs6cgJ8+7b75UKnXL5FXp9e4Tj+s2Fhg0RLg7/HJSD7GzoEV9YAssT31rsdXaHo29BIyEzpOgbd
+        AjLw7i/A==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m7CDM-00C5kP-Oi; Sat, 24 Jul 2021 07:36:57 +0000
+Date:   Sat, 24 Jul 2021 08:36:52 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Satya Tangirala <satyaprateek2357@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
-Cc:     Doug Gilbert <dgilbert@interlog.com>,
-        =?UTF-8?q?Kai=20M=C3=A4kisara?= <Kai.Makisara@kolumbus.fi>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 24/24] scsi: unexport sg_scsi_ioctl
-Date:   Sat, 24 Jul 2021 09:20:33 +0200
-Message-Id: <20210724072033.1284840-25-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210724072033.1284840-1-hch@lst.de>
-References: <20210724072033.1284840-1-hch@lst.de>
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v4 0/9] ensure bios aren't split in middle of crypto data
+ unit
+Message-ID: <YPvDFH7uAP+Jas/X@infradead.org>
+References: <20210707052943.3960-1-satyaprateek2357@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707052943.3960-1-satyaprateek2357@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just call scsi_ioctl in sg as that has the same effect.
+On Tue, Jul 06, 2021 at 10:29:34PM -0700, Satya Tangirala wrote:
+> When a bio has an encryption context, its size must be aligned to its
+> crypto data unit size. A bio must not be split in the middle of a data
+> unit. Currently, bios are split at logical block boundaries, but a crypto
+> data unit size might be larger than the logical block size - e.g. a machine
+> could be using fscrypt (which uses 4K crypto data units) with an eMMC block
+> device with inline encryption hardware that has a logical block size of 512
+> bytes.
+> 
+> Right now, the only user of blk-crypto is fscrypt (on ext4 and f2fs), which
+> (currently) only submits bios where the size of each segment is a multiple
+> of data_unit_size.  That happens to avoid most of the cases where bios
+> could be split in the middle of a data unit.  However, when support for
+> direct I/O on encrypted files is added, or when support for filesystem
+> metadata encryption is added, it will be possible for bios to have segment
+> lengths that are multiples of the logical block size, but not multiples of
+> the crypto data unit size.  So the block layer needs to start handling this
+> case appropriately.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/scsi_ioctl.c | 5 ++---
- drivers/scsi/sg.c         | 2 +-
- include/scsi/scsi_ioctl.h | 2 --
- 3 files changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/scsi/scsi_ioctl.c b/drivers/scsi/scsi_ioctl.c
-index dd07ebe6d366..ae880814b548 100644
---- a/drivers/scsi/scsi_ioctl.c
-+++ b/drivers/scsi/scsi_ioctl.c
-@@ -530,8 +530,8 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
-  *      Positive numbers returned are the compacted SCSI error codes (4
-  *      bytes in one int) where the lowest byte is the SCSI status.
-  */
--int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
--		struct scsi_ioctl_command __user *sic)
-+static int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk,
-+		fmode_t mode, struct scsi_ioctl_command __user *sic)
- {
- 	enum { OMAX_SB_LEN = 16 };	/* For backward compatibility */
- 	struct request *rq;
-@@ -643,7 +643,6 @@ int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
- 
- 	return err;
- }
--EXPORT_SYMBOL_GPL(sg_scsi_ioctl);
- 
- int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp)
- {
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index c86fa4476334..9be76deea242 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1109,7 +1109,7 @@ sg_ioctl_common(struct file *filp, Sg_device *sdp, Sg_fd *sfp,
- 	case SCSI_IOCTL_SEND_COMMAND:
- 		if (atomic_read(&sdp->detaching))
- 			return -ENODEV;
--		return sg_scsi_ioctl(sdp->device->request_queue, NULL, filp->f_mode, p);
-+		return scsi_ioctl(sdp->device, NULL, filp->f_mode, cmd_in, p);
- 	case SG_SET_DEBUG:
- 		result = get_user(val, ip);
- 		if (result)
-diff --git a/include/scsi/scsi_ioctl.h b/include/scsi/scsi_ioctl.h
-index b3918fded464..d2cb9aeaf1f1 100644
---- a/include/scsi/scsi_ioctl.h
-+++ b/include/scsi/scsi_ioctl.h
-@@ -47,8 +47,6 @@ int scsi_ioctl_block_when_processing_errors(struct scsi_device *sdev,
- 		int cmd, bool ndelay);
- int scsi_ioctl(struct scsi_device *sdev, struct gendisk *disk, fmode_t mode,
- 		int cmd, void __user *arg);
--int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
--			 struct scsi_ioctl_command __user *argp);
- int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp);
- int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp);
- bool scsi_cmd_allowed(unsigned char *cmd, fmode_t mode);
--- 
-2.30.2
-
+I'm still not sold on this case yet.  sector size aligned I/O is an
+optional feature, and I don't think it is worth this overhead.  And
+while file systems metadata can be smaller than the file system block
+size in a few cases (e.g. XFS log writes), that is usually an extra
+performance optimization and can be trivially disabled in mkfs.
