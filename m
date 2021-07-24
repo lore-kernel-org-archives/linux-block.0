@@ -2,83 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E77BDC4338F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A91C4320A
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:21:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7EE560E9C
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 659C160E91
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:21:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234245AbhGXGjM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jul 2021 02:39:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34592 "EHLO
+        id S234176AbhGXGko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Jul 2021 02:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234085AbhGXGjK (ORCPT
+        with ESMTP id S229941AbhGXGkm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jul 2021 02:39:10 -0400
+        Sat, 24 Jul 2021 02:40:42 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EB9C061575;
-        Sat, 24 Jul 2021 00:19:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D497BC061575;
+        Sat, 24 Jul 2021 00:21:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=O/XU7BaOJ1uvC1EkMCQUlQz3U2U8xvRd2MbfcwD2IpA=; b=MDgreUOWODAfOvefRAPYEl3Oia
-        dHU4LYmu8cbdWaaqhowrU9J6cLhO6rLSUkrKQy0hsdL3ePEwcProggNMwZU75a92cRzyw6YUByyPQ
-        5Y9tgXQqRw4Dlqh6wGhbGvJGcbVMxiFloSSZdc4WjU1y9Z0a0eStaG+OMLSPdiTV1bn6NuTRM9ZDF
-        xUDXHwdc8arrh21Zj74m9ppkAhoqn0v6yJpyIxNTnNmDMOjsSClzfb7I+oUFSrsBHY15IW2yzWR66
-        XSg8y9K9nagTX9+/MW2gvdnz6aUoY0TbQxc1iUbHC92XmfQd0Tym2t+KeBL/HI4T3iAfcR6zWo6OI
-        ElGynbeA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m7BwJ-00C4tG-OZ; Sat, 24 Jul 2021 07:19:17 +0000
-Date:   Sat, 24 Jul 2021 08:19:15 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Satya Tangirala <satyat@google.com>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=gOly5RgJwQW+4ree/ujTW38W0q8unpvwRJ7LE8eZS8c=; b=c//ppHUwJp8vv/1stiSv/Ky57D
+        Y8TlFwITw0+WQVAHw56PlWEA7JyxuUT6hRNjjKPCMHnc7n011fc0wXon4sn3nGbM9+9hWuWXb6HG1
+        ztigBNV/t3Aael+cGvAMUdPfCFcReNOP6DM+9nVa5LUnY+y7eyZttHLPXffiDvrMIGaGZ/3/dq2Y4
+        Z3IL612bOPIbz30N1otDTKVn/SwKd+oIYe/ZFSYSzwZyUW3lqGoByYi+nNR9YL4hqSO/u9mr79QR1
+        od96T7cKnzYWZd9kfNK7pTCYAqee/iBwoN4oRyJ+OGRMGUZP51TfFMdaxc5/vSmN7jvKJib8PWBJH
+        cn2vgB9w==;
+Received: from [2001:4bb8:184:87c5:85d0:a26b:ef67:d32c] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m7Bxa-00C4wW-Ge; Sat, 24 Jul 2021 07:20:37 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
         Jens Axboe <axboe@kernel.dk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-Subject: Re: [PATCH v9 5/9] block: Make bio_iov_iter_get_pages() respect
- bio_required_sector_alignment()
-Message-ID: <YPu+88KReGlt94o3@infradead.org>
-References: <20210604210908.2105870-1-satyat@google.com>
- <20210604210908.2105870-6-satyat@google.com>
- <YPs1jlAsvXLomSJJ@gmail.com>
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
+Cc:     Doug Gilbert <dgilbert@interlog.com>,
+        =?UTF-8?q?Kai=20M=C3=A4kisara?= <Kai.Makisara@kolumbus.fi>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: cleanup SCSI ioctl support v2
+Date:   Sat, 24 Jul 2021 09:20:09 +0200
+Message-Id: <20210724072033.1284840-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YPs1jlAsvXLomSJJ@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 23, 2021 at 02:33:02PM -0700, Eric Biggers wrote:
-> I do still wonder if we should just not support that...  Dave is the only person
-> who has asked for it, and it's a lot of trouble to support.
-> 
-> I also noticed that f2fs has always only supported direct I/O that is *fully*
-> fs-block aligned (including the I/O segments) anyway.  So presumably that
-> limitation is not really that important after all...
-> 
-> Does anyone else have thoughts on this?
+Hi all,
 
-There are some use cases that really like sector aligned direct I/O,
-what comes to mind is some data bases, and file system repair tools
-(the latter on the raw block device).  So it is nice to support, but not
-really required.
+this series cleans up the scsi ioctl handler and merges the "block layer"
+SCSI ioctl code that is only used by the SCSI layer and its drivers now
+into the main SCSI ioctl handler.
 
-So for now I'd much prefer to initially support inline encryption for
-direct I/O without that if that simplifies the support.  We can revisit
-the additional complexity later.
+Changes since v1:
+ - replace and ifdef with an IS_ENABLED check to cater for modular bsg
+   builds
+ - rename queue_max_sectors_bytes to queue_max_bytes
+ - return an unsigned value from queue_max_bytes
+ - rename a few symbols to match their move to the SCSI code
+ - scsi_common.c needs module.h for some configs, so add іt
+ - use an u8 array instead of a char one for the CDB
+ - document scsi_cmd_allowed
 
-Also note that for cheap flash media pretending support for 512 byte
-blocks is actually a bit awwkward, so just presenting the media as
-having 4096 sectors in these setups would be the better choice anyway.
+Diffstat:
