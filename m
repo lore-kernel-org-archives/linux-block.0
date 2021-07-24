@@ -2,165 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C236AC4320A
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 12:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5255BC4338F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 15:50:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A628860F13
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 12:15:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2869A60E8E
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 15:50:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231938AbhGXLep convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jul 2021 07:34:45 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.85.151]:59176 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232079AbhGXLeo (ORCPT
+        id S229845AbhGXPK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Jul 2021 11:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33380 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229545AbhGXPKZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jul 2021 07:34:44 -0400
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-184-PbhWv6FXOqCKOHTvwAuzBw-1; Sat, 24 Jul 2021 13:15:13 +0100
-X-MC-Unique: PbhWv6FXOqCKOHTvwAuzBw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.23; Sat, 24 Jul 2021 13:15:10 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.023; Sat, 24 Jul 2021 13:15:10 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Luis Chamberlain' <mcgrof@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "ast@kernel.org" <ast@kernel.org>,
-        "andriin@fb.com" <andriin@fb.com>,
-        "daniel@iogearbox.net" <daniel@iogearbox.net>,
-        "atenart@kernel.org" <atenart@kernel.org>,
-        "alobakin@pm.me" <alobakin@pm.me>,
-        "weiwan@google.com" <weiwan@google.com>,
-        "ap420073@gmail.com" <ap420073@gmail.com>
-CC:     "jeyu@kernel.org" <jeyu@kernel.org>,
-        "ngupta@vflare.org" <ngupta@vflare.org>,
-        "sergey.senozhatsky.work@gmail.com" 
-        <sergey.senozhatsky.work@gmail.com>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "mbenes@suse.com" <mbenes@suse.com>,
-        "jpoimboe@redhat.com" <jpoimboe@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "jikos@kernel.org" <jikos@kernel.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] kernel/module: add documentation for try_module_get()
-Thread-Topic: [PATCH] kernel/module: add documentation for try_module_get()
-Thread-Index: AQHXf0eaxD6lEmY4bU6QViNa8xuU1KtSAuiA
-Date:   Sat, 24 Jul 2021 12:15:10 +0000
-Message-ID: <dbf27fa2f8864e1d91f7015249b1a5f1@AcuMS.aculab.com>
-References: <20210722221905.1718213-1-mcgrof@kernel.org>
-In-Reply-To: <20210722221905.1718213-1-mcgrof@kernel.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Sat, 24 Jul 2021 11:10:25 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90535C061575
+        for <linux-block@vger.kernel.org>; Sat, 24 Jul 2021 08:50:57 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id p5-20020a17090a8685b029015d1a9a6f1aso8881527pjn.1
+        for <linux-block@vger.kernel.org>; Sat, 24 Jul 2021 08:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=Sg3HZ2LWmsxvN1PjwE9Zhub2tv7T+zAL42fZfnh0dfc=;
+        b=Klnb+O813Iht8GL9jYb5KrCv2cEHdIH8ABCBRDQwcIkDHaWeMAR2hBeCuDfPyBT6Wo
+         iTGi186kwwchA40+sH+QRAhKe0xi9S6YQSZ9UtIBemmHmRLBLiA4xl5qHSfvSfRxXNxW
+         GU8cFirx9m/ZuCuh+A9W4T+il+OD84Gbu5KjNJ9/QLexvgJ+5+9ii8HLUFlF/cDmf7mg
+         9qV2K67MKWUuEFU8DM5XXonBwWSi20Q8LVrBx1diz5lsbCJ90cnTNOJ3KsjrNamSSUoi
+         3LahRcw/9SZ9agCEBxorv3Wa7oCT0xvLrPkNx+a7hsj8Uj9OEVaysxYyk6U9MjlLAEG8
+         s9IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=Sg3HZ2LWmsxvN1PjwE9Zhub2tv7T+zAL42fZfnh0dfc=;
+        b=f4aLVB3UeQC5LP50ZHHkHMCsmubTbsmO5w/ZqqiRqrOS1zB98cHhHIrCoJRUmpgD+j
+         T6sdWYGs2+GLHW2ZgYIAzV8VFXz6TDMBXJVdcAFdF/SBd6snijETVCbsVg8gFrJQyuKl
+         WZmSoVYodbxrGV0ElmI4ZUiDpW6gkNLWGQ1mfxwmoUc+oBzOMzdXj2Wf7nM3pR4dQ0lG
+         ML5ERcuu+wnb2O/dgkZz5jA0qBaYlsp0AMfgjmBBptNXhoVRnsQuSCcLECB2IC2afY9B
+         SDftTfHs9PBy7CMYVdnLaCpRgfe9/I7T4DV/bgN7tJ4wy7xTLn4hUfiLRfLfwYXC89e3
+         C9OQ==
+X-Gm-Message-State: AOAM531NHcOBR58hJ+3DSMRY5vltJRqYpECRDyljvUUNkXPQ0cUd3HEA
+        30s/1Z/8Rq5ACWHumlx3/ri0z9j3fcmRA+X5
+X-Google-Smtp-Source: ABdhPJwJn1lK9Mo7VFR/ShUluf9CoD9/DpY0zcXBGLsVmAQyRVsgt5GR15ITS+IllkcPIhd2QXaYiA==
+X-Received: by 2002:a17:902:a513:b029:11a:9be6:f1b9 with SMTP id s19-20020a170902a513b029011a9be6f1b9mr7732053plq.55.1627141856687;
+        Sat, 24 Jul 2021 08:50:56 -0700 (PDT)
+Received: from [192.168.1.187] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id u188sm12199092pfc.115.2021.07.24.08.50.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Jul 2021 08:50:56 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.14-rc3
+Message-ID: <b5a906fb-0e55-cfb1-ba4b-d12ecc3a42d4@kernel.dk>
+Date:   Sat, 24 Jul 2021 09:50:54 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luis Chamberlain
-> Sent: 22 July 2021 23:19
-> 
-> There is quite a bit of tribal knowledge around proper use of
-> try_module_get() and that it must be used only in a context which
-> can ensure the module won't be gone during the operation. Document
-> this little bit of tribal knowledge.
-> 
-...
+Hi Linus,
 
-Some typos.
+A few fixes for the 5.14 release:
 
-> +/**
-> + * try_module_get - yields to module removal and bumps reference count otherwise
-> + * @module: the module we should check for
-> + *
-> + * This can be used to check if userspace has requested to remove a module,
-                                                           a module be removed
-> + * and if so let the caller give up. Otherwise it takes a reference count to
-> + * ensure a request from userspace to remove the module cannot happen.
-> + *
-> + * Care must be taken to ensure the module cannot be removed during
-> + * try_module_get(). This can be done by having another entity other than the
-> + * module itself increment the module reference count, or through some other
-> + * means which gaurantees the module could not be removed during an operation.
-                  guarantees
-> + * An example of this later case is using this call in a sysfs file which the
-> + * module created. The sysfs store / read file operation is ensured to exist
-                                                            ^^^^^^^^^^^^^^^^^^^
-Not sure what that is supposed to mean.
-> + * and still be present by kernfs's active reference. If a sysfs file operation
-> + * is being run, the module which created it must still exist as the module is
-> + * in charge of removal of the sysfs file.
-> + *
-> + * The real value to try_module_get() is the module_is_live() check which
-> + * ensures this the caller of try_module_get() can yields to userspace module
-> + * removal requests and fail whatever it was about to process.
-> + */
+- NVMe pull request (Christoph)
+	- tracing fix (Keith Busch)
+	- fix multipath head refcounting (Hannes Reinecke)
+	- Write Zeroes vs PI fix (me)
+	- drop a bogus WARN_ON (Zhihao Cheng)
 
-But is the comment even right?
-I think you need to consider when try_module_get() can actually fail.
-I believe the following is right.
-The caller has to have valid module reference and module unload
-must actually be in progress - ie the ref count is zero and
-there are no active IO operations.
+- Increase max blk-cgroup policy size, now that mq-deadline uses it too
+  (Oleksandr)
 
-The module's unload function must (eventually) invalidate the
-caller's module reference to stop try_module_get() being called
-with a (very) stale pointer.
+Please pull!
 
-So there is a potentially horrid race:
-The module unload is going to do:
-	driver_data->module_ref = 0;
-and elsewhere there'll be:
-	ref = driver_data->module_ref;
-	if (!ref || !try_module_get(ref))
-		return -error;
 
-You have to have try_module_get() to allow the module unload
-function to sleep.
-But the above code still needs a driver lock to ensure the
-unload code doesn't race with the try_module_get() and the
-'ref' be invalidated before try_module_get() looks at it.
-(eg if an interrupt defers processing.)
+The following changes since commit 05d69d950d9d84218fc9beafd02dea1f6a70e09e:
 
-So there can be no 'yielding'.
+  xen-blkfront: sanitize the removal state machine (2021-07-15 09:32:34 -0600)
 
-I'm pretty much certain try_module_get(THIS_MODULE) is pretty
-much never going to fail.
-(It is mostly needed to give a worker thread a reference.)
+are available in the Git repository at:
 
-	David
+  git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-24
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+for you to fetch changes up to 7054133da39a82c1dc44ce796f13a7cb0d6a0b3c:
+
+  Merge tag 'nvme-5.14-2021-07-22' of git://git.infradead.org/nvme into block-5.14 (2021-07-22 14:23:55 -0600)
+
+----------------------------------------------------------------
+block-5.14-2021-07-24
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme: set the PRACT bit when using Write Zeroes with T10 PI
+
+Hannes Reinecke (1):
+      nvme: fix refcounting imbalance when all paths are down
+
+Jens Axboe (1):
+      Merge tag 'nvme-5.14-2021-07-22' of git://git.infradead.org/nvme into block-5.14
+
+Keith Busch (1):
+      nvme: fix nvme_setup_command metadata trace event
+
+Oleksandr Natalenko (1):
+      block: increase BLKCG_MAX_POLS
+
+Zhihao Cheng (1):
+      nvme-pci: don't WARN_ON in nvme_reset_work if ctrl.state is not RESETTING
+
+ drivers/nvme/host/core.c      | 19 +++++++++++++++----
+ drivers/nvme/host/multipath.c |  9 ++++++++-
+ drivers/nvme/host/nvme.h      | 11 ++---------
+ drivers/nvme/host/pci.c       |  4 +++-
+ drivers/nvme/host/trace.h     |  6 +++---
+ include/linux/blkdev.h        |  2 +-
+ 6 files changed, 32 insertions(+), 19 deletions(-)
+
+-- 
+Jens Axboe
 
