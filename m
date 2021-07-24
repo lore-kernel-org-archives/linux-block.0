@@ -2,45 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D54B6C432BE
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 16:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA696C4320A
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 20:16:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC14860E91
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 16:54:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF21660EAF
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 20:16:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbhGXQNv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jul 2021 12:13:51 -0400
-Received: from verein.lst.de ([213.95.11.211]:40992 "EHLO verein.lst.de"
+        id S229811AbhGXTgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Jul 2021 15:36:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52644 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229530AbhGXQNv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jul 2021 12:13:51 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7E83467373; Sat, 24 Jul 2021 18:54:20 +0200 (CEST)
-Date:   Sat, 24 Jul 2021 18:54:20 +0200
-From:   Christoph Hellwig <hch@lst.de>
+        id S229798AbhGXTgJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 24 Jul 2021 15:36:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 377E560EAF;
+        Sat, 24 Jul 2021 20:16:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627157801;
+        bh=7Hhzc41ALdyOmjP3nMbs/0Rcj8fhnGhC2XQ3VeTy7Qo=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=mLxayoVF6fHUzP0d4MycTpRK5n4Q1XRRHiv6pKrZTHC+jbd/M6KXckydgDEFX1XIG
+         lGwR5Jncdjw4Y+Y87Jv+VKhV1iGrLOC/txjUXeOE88+IPdeiovB+Q2iGRwPuJ0cnKv
+         NLDLGr3wrLkBsY35JBOSYLvnOQFQ0myTY2/nQs62aFHkMNzy4dTHlr1K2KmoXRxnXo
+         md+ZfxYwlwWAdDQd0USukPQEY6Gn6zAMrGfpj8cKi56lMOxPZ0j/aruZ2AyDuphaWA
+         BtTuicjeuHCX8LeqCZvbV+fAFW5jMOQxoM5Zmffd7QBsdc86jfQyTWu9bEISmRNeKY
+         sQCpsFm8VCPGw==
+Subject: Re: [GIT PULL] Block fixes for 5.14-rc3
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <b5a906fb-0e55-cfb1-ba4b-d12ecc3a42d4@kernel.dk>
+References: <b5a906fb-0e55-cfb1-ba4b-d12ecc3a42d4@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <b5a906fb-0e55-cfb1-ba4b-d12ecc3a42d4@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-24
+X-PR-Tracked-Commit-Id: 7054133da39a82c1dc44ce796f13a7cb0d6a0b3c
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4d4a60cede3604208c671f5a73a6edd094237b13
+Message-Id: <162715780119.1145.1933843129936356243.pr-tracker-bot@kernel.org>
+Date:   Sat, 24 Jul 2021 20:16:41 +0000
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-Subject: Re: fixes and cleanups for block_device refcounting v3
-Message-ID: <20210724165420.GA22350@lst.de>
-References: <20210724071249.1284585-1-hch@lst.de> <20210724072223.GA2930@lst.de> <718272a2-de67-c849-7c6e-2232f8762b23@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <718272a2-de67-c849-7c6e-2232f8762b23@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 24, 2021 at 10:06:31AM -0600, Jens Axboe wrote:
-> Shall we get patch 1 queued up for next week, and then look at the rest
-> for the 5.15 block tree once the btrfs fix lands in mainline?
+The pull request you sent on Sat, 24 Jul 2021 09:50:54 -0600:
 
-Sounds good.  The btrfs patch is in fact in mainline already as of today.
+> git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-24
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4d4a60cede3604208c671f5a73a6edd094237b13
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
