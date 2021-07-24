@@ -2,138 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1319EC4338F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77BDC4338F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:19:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4E0060E8F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7EE560E9C
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jul 2021 07:19:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234188AbhGXGgU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jul 2021 02:36:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33988 "EHLO
+        id S234245AbhGXGjM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Jul 2021 02:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234105AbhGXGgU (ORCPT
+        with ESMTP id S234085AbhGXGjK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jul 2021 02:36:20 -0400
+        Sat, 24 Jul 2021 02:39:10 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2256C061575;
-        Sat, 24 Jul 2021 00:16:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EB9C061575;
+        Sat, 24 Jul 2021 00:19:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=HCm9uW4E4/3DOcRfmm9HD39m8G2hjpMR0GIiHTmeNNs=; b=ABt/PzvpW/Q+hHON2g66n5CL/W
-        /rI8i6tQ/f/s6m9WhFJ5sVII0/CAbTU77H9bPgxR0kONR9g0zEnzD8ZH5M759+njc5+e9QZNpjyH8
-        vFJ3JmzhRujHzsgJwU4MDoaqecrkB60NfVAW7SNun2i2D/x7SdbNJoKVhICzDWoIJqRlg2GLqFR9b
-        kfNrDV9z4/uDTrHFeiWoguHRSVuhlKTFX6pnqbhCATQ4B1Kq01MpOAMqm1AwRvrPoy8YdwkhaX0yD
-        Ddww1ZfOMYLWc5i5PsqnAfr2fCTogEy0tQzOcXAO0zLVzxPm1piknMV5vbxVn7dQIl5U/CphYE0iI
-        PZNmCJbw==;
-Received: from [2001:4bb8:184:87c5:85d0:a26b:ef67:d32c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m7BtW-00C4k0-D2; Sat, 24 Jul 2021 07:16:25 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: [PATCH 10/10] block: remove bdput
-Date:   Sat, 24 Jul 2021 09:12:49 +0200
-Message-Id: <20210724071249.1284585-11-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210724071249.1284585-1-hch@lst.de>
-References: <20210724071249.1284585-1-hch@lst.de>
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=O/XU7BaOJ1uvC1EkMCQUlQz3U2U8xvRd2MbfcwD2IpA=; b=MDgreUOWODAfOvefRAPYEl3Oia
+        dHU4LYmu8cbdWaaqhowrU9J6cLhO6rLSUkrKQy0hsdL3ePEwcProggNMwZU75a92cRzyw6YUByyPQ
+        5Y9tgXQqRw4Dlqh6wGhbGvJGcbVMxiFloSSZdc4WjU1y9Z0a0eStaG+OMLSPdiTV1bn6NuTRM9ZDF
+        xUDXHwdc8arrh21Zj74m9ppkAhoqn0v6yJpyIxNTnNmDMOjsSClzfb7I+oUFSrsBHY15IW2yzWR66
+        XSg8y9K9nagTX9+/MW2gvdnz6aUoY0TbQxc1iUbHC92XmfQd0Tym2t+KeBL/HI4T3iAfcR6zWo6OI
+        ElGynbeA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m7BwJ-00C4tG-OZ; Sat, 24 Jul 2021 07:19:17 +0000
+Date:   Sat, 24 Jul 2021 08:19:15 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Satya Tangirala <satyat@google.com>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
+Subject: Re: [PATCH v9 5/9] block: Make bio_iov_iter_get_pages() respect
+ bio_required_sector_alignment()
+Message-ID: <YPu+88KReGlt94o3@infradead.org>
+References: <20210604210908.2105870-1-satyat@google.com>
+ <20210604210908.2105870-6-satyat@google.com>
+ <YPs1jlAsvXLomSJJ@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YPs1jlAsvXLomSJJ@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we've stopped using inode references for anything meaninful
-in the block layer get rid of the helper to put it and just open code
-the call to iput on the block_device inode.
+On Fri, Jul 23, 2021 at 02:33:02PM -0700, Eric Biggers wrote:
+> I do still wonder if we should just not support that...  Dave is the only person
+> who has asked for it, and it's a lot of trouble to support.
+> 
+> I also noticed that f2fs has always only supported direct I/O that is *fully*
+> fs-block aligned (including the I/O segments) anyway.  So presumably that
+> limitation is not really that important after all...
+> 
+> Does anyone else have thoughts on this?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Reviewed-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
----
- block/genhd.c           | 4 ++--
- block/partitions/core.c | 2 +-
- fs/block_dev.c          | 6 ------
- include/linux/blkdev.h  | 1 -
- 4 files changed, 3 insertions(+), 10 deletions(-)
+There are some use cases that really like sector aligned direct I/O,
+what comes to mind is some data bases, and file system repair tools
+(the latter on the raw block device).  So it is nice to support, but not
+really required.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 7b4beadaa694..700d9d291546 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1077,7 +1077,7 @@ static void disk_release(struct device *dev)
- 	xa_destroy(&disk->part_tbl);
- 	if (test_bit(GD_QUEUE_REF, &disk->state) && disk->queue)
- 		blk_put_queue(disk->queue);
--	bdput(disk->part0);	/* frees the disk */
-+	iput(disk->part0->bd_inode);	/* frees the disk */
- }
- struct class block_class = {
- 	.name		= "block",
-@@ -1262,7 +1262,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- 
- out_destroy_part_tbl:
- 	xa_destroy(&disk->part_tbl);
--	bdput(disk->part0);
-+	iput(disk->part0->bd_inode);
- out_free_disk:
- 	kfree(disk);
- 	return NULL;
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 1b02073a2047..8d8be1187b9e 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -262,7 +262,7 @@ static void part_release(struct device *dev)
- 	if (MAJOR(dev->devt) == BLOCK_EXT_MAJOR)
- 		blk_free_ext_minor(MINOR(dev->devt));
- 	put_disk(dev_to_bdev(dev)->bd_disk);
--	bdput(dev_to_bdev(dev));
-+	iput(dev_to_bdev(dev)->bd_inode);
- }
- 
- static int part_uevent(struct device *dev, struct kobj_uevent_env *env)
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 4f2c4e9e84f5..6658f40ae492 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -934,12 +934,6 @@ long nr_blockdev_pages(void)
- 	return ret;
- }
- 
--void bdput(struct block_device *bdev)
--{
--	iput(bdev->bd_inode);
--}
--EXPORT_SYMBOL(bdput);
-- 
- /**
-  * bd_may_claim - test whether a block device can be claimed
-  * @bdev: block device of interest
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 98772da38bb1..b94de1d194b8 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1984,7 +1984,6 @@ void blkdev_put_no_open(struct block_device *bdev);
- struct block_device *bdev_alloc(struct gendisk *disk, u8 partno);
- void bdev_add(struct block_device *bdev, dev_t dev);
- struct block_device *I_BDEV(struct inode *inode);
--void bdput(struct block_device *);
- int truncate_bdev_range(struct block_device *bdev, fmode_t mode, loff_t lstart,
- 		loff_t lend);
- 
--- 
-2.30.2
+So for now I'd much prefer to initially support inline encryption for
+direct I/O without that if that simplifies the support.  We can revisit
+the additional complexity later.
 
+Also note that for cheap flash media pretending support for 512 byte
+blocks is actually a bit awwkward, so just presenting the media as
+having 4096 sectors in these setups would be the better choice anyway.
