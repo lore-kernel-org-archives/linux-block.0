@@ -2,127 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C87C4338F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 08:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 833E1C4338F
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 10:16:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A01E2603E7
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 08:47:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63A4B60F37
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 10:16:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231800AbhGZIHL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jul 2021 04:07:11 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:58322 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231779AbhGZIHK (ORCPT
+        id S233006AbhGZJfm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jul 2021 05:35:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22993 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232902AbhGZJfl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jul 2021 04:07:10 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id DAA211FE5A;
-        Mon, 26 Jul 2021 08:47:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1627289258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Mon, 26 Jul 2021 05:35:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627294570;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=q9YB575bdMZAKMtPhVHfsf9Vuk0oGw3jIjKXXV75dY0=;
-        b=sKqEEZFP7dZvVnRrJyNe42DFKLZvzNzHcld8/R0lPis2iYpgCaRa/SVRqNEbFV7czUh1w/
-        Ed+OxyeIUXAlavu/FlAc+TiM5ff+FzHpc7UNY06qY46kKjRPKeIpxe7BYqAYPEltACiqiE
-        rAcCY+JKv/SFgZjQTv5zbyY8rA6wjx0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1627289258;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q9YB575bdMZAKMtPhVHfsf9Vuk0oGw3jIjKXXV75dY0=;
-        b=FbvIHjNjVcL7dVyI32vcDSMnd8+S3tpCOKC++jxIBTYwXbLxnWS+Pz9j031KE4ifLFID8i
-        X47L6mZtylkDzrDA==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=7iZduvyTXATyk5FvcsQduGt6p3a0FG7RvWO3vuB7s0U=;
+        b=MOs7Ev7MUKD1l+WydFwh8qM9O3qgOqPOfGmkIStdnjk+kYRjNsyo0tr2oA1/GPg4z3Uugb
+        sqfd+KFcUYkZwq4kEzFDHkpia4M00UUBY/alxAG6wCzasz9qzaHFgZx2ae7kJtLoQKXXyq
+        boAU6exFzC/6Bl+2iZb0QatDnhY1bKs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-zqkMbXsNPuiKc67TFd8yuA-1; Mon, 26 Jul 2021 06:16:08 -0400
+X-MC-Unique: zqkMbXsNPuiKc67TFd8yuA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id BC9251365C;
-        Mon, 26 Jul 2021 08:47:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id Coc5Lap2/mAGJQAAGKfGzw
-        (envelope-from <hare@suse.de>); Mon, 26 Jul 2021 08:47:38 +0000
-Subject: Re: [PATCH v3 1/4] block: Add concurrent positioning ranges support
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-References: <20210726013806.84815-1-damien.lemoal@wdc.com>
- <20210726013806.84815-2-damien.lemoal@wdc.com>
- <751621a5-a35b-c799-439c-8982433a6be5@suse.de>
- <DM6PR04MB7081141B64D9501BDA876433E7E89@DM6PR04MB7081.namprd04.prod.outlook.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <0ec2ea13-208f-1a5e-7b11-37317b5e56b8@suse.de>
-Date:   Mon, 26 Jul 2021 10:47:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F3D2760C0;
+        Mon, 26 Jul 2021 10:16:07 +0000 (UTC)
+Received: from T590 (ovpn-13-107.pek2.redhat.com [10.72.13.107])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DA1E19D9F;
+        Mon, 26 Jul 2021 10:15:57 +0000 (UTC)
+Date:   Mon, 26 Jul 2021 18:15:55 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH 03/10] block: unhash the block device inodes earlier
+Message-ID: <YP6LW7YqRGVDSCmK@T590>
+References: <20210724071249.1284585-1-hch@lst.de>
+ <20210724071249.1284585-4-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <DM6PR04MB7081141B64D9501BDA876433E7E89@DM6PR04MB7081.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210724071249.1284585-4-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/26/21 10:30 AM, Damien Le Moal wrote:
-> On 2021/07/26 16:34, Hannes Reinecke wrote:
-[ .. ]
->> In principle it looks good, but what would be the appropriate action
->> when invalid ranges are being detected during revalidation?
->> The current code will leave the original ones intact, but I guess that's
->> questionable as the current settings are most likely invalid.
+On Sat, Jul 24, 2021 at 09:12:42AM +0200, Christoph Hellwig wrote:
+> Unhash the block device inodes as early as possible.  This ensures that
+> the inode and thus block_device an't be found in the inode hash as soon
+> as we start deleting the disk, instead of finding it and rejecting it
+> later because GENHD_FL_UP is cleared.
 > 
-> Nope. In that case, the old ranges are removed. In blk_queue_set_cranges(),
-> there is:
-> 
-> +		if (!blk_check_ranges(disk, cr)) {
-> +			kfree(cr);
-> +			cr = NULL;
-> +			goto reg;
-> +		}
-> 
-> So for incorrect ranges, we will register "NULL", so no ranges. The old ranges
-> are gone.
-> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Right. So that's the first concern addressed.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
->> I would vote for de-register the old ones and implement an error state
->> (using an error pointer?); that would signal that there _are_ ranges,
->> but we couldn't parse them properly.
->> Hmm?
-> 
-> With the current code, the information "there are ranges" will be completely
-> gone if the ranges are bad... dmesg will have a message about it, but that's it.
-> 
-So there will be no additional information in sysfs in case of incorrect 
-ranges?
-
-Hmm. Not sure if I like that, but then it might be the best option after 
-all. So you can add my:
-
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Ming
+
