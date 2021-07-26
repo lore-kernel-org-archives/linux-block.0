@@ -2,92 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 760BBC4338F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 19:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C47DC4338F
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 21:46:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CD2160F11
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 19:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4926560F9E
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 21:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232055AbhGZSWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jul 2021 14:22:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37388 "EHLO
+        id S232252AbhGZVGU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jul 2021 17:06:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231548AbhGZSWA (ORCPT
+        with ESMTP id S229489AbhGZVGS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jul 2021 14:22:00 -0400
+        Mon, 26 Jul 2021 17:06:18 -0400
 Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49750C061757
-        for <linux-block@vger.kernel.org>; Mon, 26 Jul 2021 12:02:29 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id mt6so14262473pjb.1
-        for <linux-block@vger.kernel.org>; Mon, 26 Jul 2021 12:02:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BFBC061757;
+        Mon, 26 Jul 2021 14:46:45 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id q17-20020a17090a2e11b02901757deaf2c8so2051211pjd.0;
+        Mon, 26 Jul 2021 14:46:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=oIZ9pdo2+5OpdZQpx9ZlAKftbuTis/k6Y9QzdC2OCF0=;
-        b=TOqWzBMBvAvBP5ZJ/YvVVNGJ1P7PyBJvF04uepFI7c3aMLnvkJ+XaLVfcLnhRQIE1w
-         6wM93Atbrz95Xoh/wmyw5LXQCS8jCEJFwNecKgLKOmyyhUC7wEoXM49iX9cYoIYp8dDq
-         PAdFvGt2sw7+ele0JcsNpY4t6B46Ylf0BDSEf9QuinqD4aZTHtXUzq2ASdrb6XTdcF6I
-         6Qa8abvIT2My+O+Y3EkC6D7TGBiXkPxEWq+SfYaiTiYu8N33BIQMJSvdijXPXwIUcy3X
-         cTgaymZWaBK1yXJcKTL53jdZGjj+Uur9BsGJNBaJsdsghiYdAdDY4c8/WLDGEWAdM3gy
-         ojig==
+        bh=WjCY/wbfUK0zm4QOWZ0DfXs/wUDR97ZPxIRjy8ov/A8=;
+        b=cvGQNlqXc9F1r7YAKDQI6gKQ+w7Tm1Ej6DWyxSVtVV7QCgNAknurz1XyI+O85DdhQ+
+         MJ0B1NDkbdjFhHEH7zWz5hF0cwbQvSLN0/ePaEE6MW16fBOA2MzLBYxet2f3qJiE7EnW
+         m+OWDz1TI31PyE6H7nhrBrBAXCYMmjTzarqj7nhPP6xU4SdQvuOnNEfS03iSRiQFIKzR
+         mCfOnn0G5hjF3ZplGswQcxPC11oEpekR6J8FdX3b1POrATCU3vkakA4DYNdEzEU3ULiA
+         SRyYLqldmtNKEnXT4soiRYkC3NC/cHvwC326jLTI9WcKv/U+urb0F+6Z1OFVUF1Hiz2K
+         jmVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oIZ9pdo2+5OpdZQpx9ZlAKftbuTis/k6Y9QzdC2OCF0=;
-        b=EDhWWRbeVWvPlRIt3K4jHSgKcv4/qqkgebHa3Xe7TTqoLvYesi83mf7JlAPAm1WG5O
-         DTULCaQsrk6iuM+kfP4+dE34lRJpCxyKcwBvAuLUomUGTcJYAObkeRSjOElP6Du8m6A4
-         2ZUB/JQxDpaZH2uOzwyuM7G7btGccQG8uvQihcwvQtFvyA34HsOK30TNsPuK8Ex9nx6W
-         eyvPBF/IIHIwIgBCwuBcBJaEkNJQYEMocOxbHx4DVpyVNTqigaAgbmQBEfb3hUpTv2wK
-         D8GZOfHuxN9QHrEXj3TathcePgQGpsfA+zNIs7AJSyoeYnLAXfsklJSoIDTwZKtAre09
-         7+UA==
-X-Gm-Message-State: AOAM533NH4gFmiaF1catkzjFmGdwZNeVgFRFk7hGuektVZMX3hOlYtDH
-        K10X/yXUkvHGOw8/zKzkRn8yBg==
-X-Google-Smtp-Source: ABdhPJyl/PKPM61AWdtCCdVmH92Ret+f2NB7iRnPe/CZTd0nNiu96ZlhLc1Su0/mm/iAdtNVmaiO2g==
-X-Received: by 2002:a05:6a00:139e:b029:337:1895:b702 with SMTP id t30-20020a056a00139eb02903371895b702mr19046618pfg.39.1627326148693;
-        Mon, 26 Jul 2021 12:02:28 -0700 (PDT)
-Received: from relinquished.localdomain ([2620:10d:c090:400::5:3bd7])
-        by smtp.gmail.com with ESMTPSA id bg8sm413782pjb.4.2021.07.26.12.02.27
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=WjCY/wbfUK0zm4QOWZ0DfXs/wUDR97ZPxIRjy8ov/A8=;
+        b=XlNGKq/GSobmstmJbcolWbtNrdfdwNMKIX+iEUuqoxWOwvzmSqie7sY7spT0aWZp/s
+         ihTla+HpzbwiTQNL0L4YZEH00WHgtg+BXfcZB/8EE8/WcVUuJCGZS5/AisfEoVBYuIQl
+         SQ1reUPTpUZdLjaELJvRGOOXazLmZus3GaTAXd/VoBBj153unHN8fsi7gRw02aLYm7iW
+         RPF/BuJxUpy0C7T3cNyYXmnNzjpwRIfGsQrCXSzeqR93HBe/6bsTIx064jV/F4koNQRB
+         8z0dv0D/MMQKTiXLn+fERKAlO/ER8oe4mB4QakPfSAwvG4sWSAvAVApiZIt+iq1JZy/U
+         w+/Q==
+X-Gm-Message-State: AOAM5336qMbME2L2DrKnv+wjKP2h0+l9VRLjInWxfuDVS6dWh6iPd2i/
+        ugtmZLJikTd/jArIdgRditA=
+X-Google-Smtp-Source: ABdhPJw81HPawxf4d1zjmwCFjOgjrImnGU9ms6L2OKXzU4AsvSekTj80/x38kgXCjx2Ezgp8BWwY9A==
+X-Received: by 2002:aa7:8c47:0:b029:340:aa57:f65 with SMTP id e7-20020aa78c470000b0290340aa570f65mr19748761pfd.56.1627336005187;
+        Mon, 26 Jul 2021 14:46:45 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:428])
+        by smtp.gmail.com with ESMTPSA id j13sm823374pgp.29.2021.07.26.14.46.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jul 2021 12:02:28 -0700 (PDT)
-Date:   Mon, 26 Jul 2021 12:02:26 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH blktests 0/2] zbd: Support dm-crypt
-Message-ID: <YP8GwrYGzv+Q/CQR@relinquished.localdomain>
-References: <20210713101239.269789-1-shinichiro.kawasaki@wdc.com>
+        Mon, 26 Jul 2021 14:46:44 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 26 Jul 2021 11:46:39 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     brookxu <brookxu.cn@gmail.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
+Message-ID: <YP8tPwkJNMAcjDqk@mtj.duckdns.org>
+References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
+ <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+ <957ab14d-c4bc-32f0-3f7d-af98832ab955@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210713101239.269789-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <957ab14d-c4bc-32f0-3f7d-af98832ab955@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 13, 2021 at 07:12:37PM +0900, Shin'ichiro Kawasaki wrote:
-> Linux kernel 5.9 added zoned block device support to dm-crypt. With this zoned
-> dm-crypt device, zbd group test cases pass except zbd/007. This series makes
-> required changes to allow the test case zbd/007 pass with zoned dm-cyrpt
-> devices. The first patch adds dm-crypt support to the helper function
-> _get_dev_container_and_sector(). The second patch wipes out broken data on the
-> dm-crypt devices which was left after the test case run.
-> 
-> Shin'ichiro Kawasaki (2):
->   zbd/rc: Support dm-crypt
->   zbd/007: Reset test target zones at test end
-> 
->  tests/zbd/007 |  7 +++++++
->  tests/zbd/rc  | 20 ++++++++++++++------
->  2 files changed, 21 insertions(+), 6 deletions(-)
+Hello,
 
-The patches look reasonable. Could you provide instructions on how to
-run with zoned dm-crypt so I can run the tests?
+On Tue, Jul 20, 2021 at 12:35:54AM +0800, brookxu wrote:
+> In order to avoid code duplication and IOPS stability problems caused by estimating
+> the equivalent number of IOs, and to avoid potential deadlock problems caused by
+> synchronization through queue_lock. I tried to count the number of splited IOs in
+> the current window through two atomic counters. Add the value of the atomic variable
+> when calculating io_disp[rw], which can also avoid the problem of inaccurate IOPS in
+> large IO scenarios. How do you think of this approach? Thanks for your time.
+
+I guess it's okay but am still not a big fan of adding another hook. This is
+primarily because blk-throtl is sitting too early in the stack - e.g. rq_qos
+is doing the same thing but sits after the split path - and it's a bit nasty
+to add an additional hook for it.
+
+Do you think it can be an option to relocate the blk-throtl hooks to the
+same spots as rq-qos or, even better, make it use rq-qos?
+
+Thanks.
+
+-- 
+tejun
