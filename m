@@ -2,96 +2,239 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6117C4338F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 12:31:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21172C4320A
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 15:17:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8894F604AC
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 12:31:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0664E60D07
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 15:17:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234096AbhGZLvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jul 2021 07:51:24 -0400
-Received: from smtp99.ord1c.emailsrvr.com ([108.166.43.99]:46334 "EHLO
-        smtp99.ord1c.emailsrvr.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234161AbhGZLvP (ORCPT
+        id S235015AbhGZOhQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jul 2021 10:37:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32148 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234918AbhGZOhP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jul 2021 07:51:15 -0400
-X-Greylist: delayed 473 seconds by postgrey-1.27 at vger.kernel.org; Mon, 26 Jul 2021 07:51:13 EDT
-X-Auth-ID: markh@compro.net
-Received: by smtp13.relay.ord1c.emailsrvr.com (Authenticated sender: markh-AT-compro.net) with ESMTPSA id C6730A0115;
-        Mon, 26 Jul 2021 08:23:48 -0400 (EDT)
-Reply-To: markh@compro.net
-Subject: Re: [BUG] FLOPPY DRIVER since 5.10.20
-To:     Denis Efremov <efremov@linux.com>, dmarkh@cfl.rr.com,
-        linux-block@vger.kernel.org,
-        Linux-kernel <linux-kernel@vger.kernel.org>
-Cc:     Jiri Kosina <jkosina@suse.cz>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
- <e49603c2-ac36-12b0-57cf-ff5ab30115bc@linux.com>
- <f5501a7c-4387-259d-66d2-f10db0cf36ff@cfl.rr.com>
- <f1277dcb-6bf8-b149-ad4e-68a4109d4e67@linux.com>
-From:   Mark Hounschell <markh@compro.net>
-Organization: Compro Computer Svcs.
-Message-ID: <1cf8e751-db77-441e-53b4-d6e979bbe046@compro.net>
-Date:   Mon, 26 Jul 2021 08:23:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Mon, 26 Jul 2021 10:37:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627312663;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FMlQ25hJH+R6pFD/1ahHb0bRBusBkFzxUiCW7bLMoRM=;
+        b=FsXc7g6CCp7fRi/Zugz3/W+yI6mwq3ZP8nRX07GkLz3BvuXAap0UVDKisMrXbu0PnJFIv8
+        h/WHgXBifEipww0BegoLl1N9z2HA1Dr8In0EX+ywCRmuGZLnSLxBTVDkfgxEw8kQciLiLi
+        OM/QabP0QUPcaJw1EneqaETs9LON42A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-g6CjAF31OVu8ZPoQLsfTDA-1; Mon, 26 Jul 2021 11:17:42 -0400
+X-MC-Unique: g6CjAF31OVu8ZPoQLsfTDA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94014107ACF5;
+        Mon, 26 Jul 2021 15:17:40 +0000 (UTC)
+Received: from localhost (ovpn-113-151.ams2.redhat.com [10.36.113.151])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 896FC19C59;
+        Mon, 26 Jul 2021 15:17:39 +0000 (UTC)
+Date:   Mon, 26 Jul 2021 16:17:38 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        virtualization@lists.linux-foundation.org,
+        linux-pm@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [RFC 0/3] cpuidle: add poll_source API and virtio vq polling
+Message-ID: <YP7SEkDEIBOch9U8@stefanha-x1.localdomain>
+References: <20210713161906.457857-1-stefanha@redhat.com>
+ <1008dee4-fce1-2462-1520-f5432bc89a07@redhat.com>
+ <YPfryV7qZVRbjNgP@stefanha-x1.localdomain>
+ <869a993d-a1b0-1c39-d081-4cdd2b71041f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f1277dcb-6bf8-b149-ad4e-68a4109d4e67@linux.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Classification-ID: 0104ae61-b9b1-446d-a266-59dbbb31ebfc-1-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="jE35KopBNKOzFkBR"
+Content-Disposition: inline
+In-Reply-To: <869a993d-a1b0-1c39-d081-4cdd2b71041f@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/26/21 7:37 AM, Denis Efremov wrote:
-> 
-> 
-> On 7/26/21 2:17 PM, Mark Hounschell wrote:
->> On 7/26/21 3:57 AM, Denis Efremov wrote:
->>> Hi,
->>>
->>> On 7/23/21 9:47 PM, Mark Hounschell wrote:
->>>>
->>>> These 2 incremental patches, patch-5.10.19-20 and patch-5.11.2-3 have broken the user land fd = open("/dev/fd0", (O_RDWR | O_NDELAY)); functionality.
->>>
->>> Thank you for the report, I'm looking into this.
->>>
->>>> Since FOREVER before the patch, when using O_NDELAY, one could open the floppy device with no media inserted or even with write protected media without error. "Read-only file system" status is returned only when we actually tried to write to it. We have software still in use today that relies on this functionality.
->>>
->>> If it's a project with open sources could you please give a link?
->>>
->>> Regards,
->>> Denis
->>>
->> This is immaterial but fdutils and libdsk both use rely on this flag. Who can know who else does. The point is it should NOT have been changed.
-> 
-> Yes, I asked this only to add utils and this behavior to the tests.
-> And be more specific about why we should preserve this behavior in
-> next commit messages.
-> 
 
-Well, first thing is now you can't open a floppy with a write protected 
-floppy installed. I don't think that was intended but that is now how it is.
+--jE35KopBNKOzFkBR
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Next there are commands that can be sent to the floppy via "ioctl(fd, 
-FDRAWCMD,  &raw_cmd);" that do NOT require a floppy diskette to be 
-installed.
+On Thu, Jul 22, 2021 at 05:04:57PM +0800, Jason Wang wrote:
+>=20
+> =E5=9C=A8 2021/7/21 =E4=B8=8B=E5=8D=885:41, Stefan Hajnoczi =E5=86=99=E9=
+=81=93:
+> > On Wed, Jul 21, 2021 at 11:29:55AM +0800, Jason Wang wrote:
+> > > =E5=9C=A8 2021/7/14 =E4=B8=8A=E5=8D=8812:19, Stefan Hajnoczi =E5=86=
+=99=E9=81=93:
+> > > > These patches are not polished yet but I would like request feedbac=
+k on this
+> > > > approach and share performance results with you.
+> > > >=20
+> > > > Idle CPUs tentatively enter a busy wait loop before halting when th=
+e cpuidle
+> > > > haltpoll driver is enabled inside a virtual machine. This reduces w=
+akeup
+> > > > latency for events that occur soon after the vCPU becomes idle.
+> > > >=20
+> > > > This patch series extends the cpuidle busy wait loop with the new p=
+oll_source
+> > > > API so drivers can participate in polling. Such polling-aware drive=
+rs disable
+> > > > their device's irq during the busy wait loop to avoid the cost of i=
+nterrupts.
+> > > > This reduces latency further than regular cpuidle haltpoll, which s=
+till relies
+> > > > on irqs.
+> > > >=20
+> > > > Virtio drivers are modified to use the poll_source API so all virti=
+o device
+> > > > types get this feature. The following virtio-blk fio benchmark resu=
+lts show the
+> > > > improvement:
+> > > >=20
+> > > >                IOPS (numjobs=3D4, iodepth=3D1, 4 virtqueues)
+> > > >                  before   poll_source      io_poll
+> > > > 4k randread    167102  186049 (+11%)  186654 (+11%)
+> > > > 4k randwrite   162204  181214 (+11%)  181850 (+12%)
+> > > > 4k randrw      159520  177071 (+11%)  177928 (+11%)
+> > > >=20
+> > > > The comparison against io_poll shows that cpuidle poll_source achie=
+ves
+> > > > equivalent performance to the block layer's io_poll feature (which I
+> > > > implemented in a separate patch series [1]).
+> > > >=20
+> > > > The advantage of poll_source is that applications do not need to ex=
+plicitly set
+> > > > the RWF_HIPRI I/O request flag. The poll_source approach is attract=
+ive because
+> > > > few applications actually use RWF_HIPRI and it takes advantage of C=
+PU cycles we
+> > > > would have spent in cpuidle haltpoll anyway.
+> > > >=20
+> > > > The current series does not improve virtio-net. I haven't investiga=
+ted deeply,
+> > > > but it is possible that NAPI and poll_source do not combine. See th=
+e final
+> > > > patch for a starting point on making the two work together.
+> > > >=20
+> > > > I have not tried this on bare metal but it might help there too. Th=
+e cost of
+> > > > disabling a device's irq must be less than the savings from avoidin=
+g irq
+> > > > handling for this optimization to make sense.
+> > > >=20
+> > > > [1] https://lore.kernel.org/linux-block/20210520141305.355961-1-ste=
+fanha@redhat.com/
+> > >=20
+> > > Hi Stefan:
+> > >=20
+> > > Some questions:
+> > >=20
+> > > 1) What's the advantages of introducing polling at virtio level inste=
+ad of
+> > > doing it at each subsystems? Polling in virtio level may only work we=
+ll if
+> > > all (or most) of the devices are virtio
+> > I'm not sure I understand the question. cpuidle haltpoll benefits all
+> > devices today, except it incurs interrupt latency. The poll_source API
+> > eliminates the interrupt latency for drivers that can disable device
+> > interrupts cheaply.
+> >=20
+> > This patch adds poll_source to core virtio code so that all virtio
+> > drivers get this feature for free. No driver-specific changes are
+> > needed.
+> >=20
+> > If you mean networking, block layer, etc by "subsystems" then there's
+> > nothing those subsystems can do to help. Whether poll_source can be used
+> > depends on the specific driver, not the subsystem. If you consider
+> > drivers/virtio/ a subsystem, then that's exactly what the patch series
+> > is doing.
+>=20
+>=20
+> I meant, if we choose to use idle poll, we have some several choices:
+>=20
+> 1) bus level (e.g the virtio)
+> 2) subsystem level (e.g the networking and block)
+>=20
+> I'm not sure which one is better.
 
-All commands issued to the device that require a floppy diskette without 
-a diskette installed fail with the proper status letting you know the 
-device is not ready / no diskette installed. That goes for write 
-protected floppies too.
+This API is intended to be driver- or bus-level. I don't think
+subsystems can do very much since they don't know the hardware
+capabilities (cheap interrupt disabling) and in most cases there's no
+advantage of plumbing it through subsystems when drivers can call the
+API directly.
 
-There is no reason to force a user to only be able to operate on Linux 
-fdformat formatted floppies.
+> > > 2) What's the advantages of using cpuidle instead of using a thread (=
+and
+> > > leverage the scheduler)?
+> > In order to combine with the existing cpuidle infrastructure. No new
+> > polling loop is introduced and no additional CPU cycles are spent on
+> > polling.
+> >=20
+> > If cpuidle itself is converted to threads then poll_source would
+> > automatically operate in a thread too, but this patch series doesn't
+> > change how the core cpuidle code works.
+>=20
+>=20
+> So networking subsystem can use NAPI busy polling in the process context
+> which means it can be leveraged by the scheduler.
+>=20
+> I'm not sure it's a good idea to poll drivers for a specific bus in the
+> general cpu idle layer.
 
-Regards
-Mark
+Why? Maybe because the cpuidle execution environment is a little special?
+
+> Another questions, are those numbers measured by APICV capable machine?
+
+Yes.
+
+> Virtio-net turns on the tx interrupts since 2 years ago. And we don't see
+> too much difference when measured with a APICV host.
+
+My understand is NAPI always takes the first interrupt. Polling only
+happens on subsequent rounds until there's no more work to do.
+
+There seem to be multiple factors that would influence tx performance
+like how full the tx queues are, whether more packets are sent during
+NAPI polling, whether you're benchmarking a physical PCIe NIC or a
+vhost_net software device, etc.
+
+Regarding APICV and software devices, the benchmark results I posted
+show that avoiding the interrupt injection helps even with APICV.
+
+Stefan
+
+--jE35KopBNKOzFkBR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmD+0hIACgkQnKSrs4Gr
+c8hEMwf/UorkfbFzgbz8WztHfFLygTqvvZ+SQp1NtIS713IwgbLzCS1YSae8MgOx
+1DbSdXqGM/iQUzorcrJVzKyc2jNsRAYDTw8bK0sF6XIAptbrDcHRFs/o6NAZw4vB
+h4ohjd1H0UYaDgKZP0sX0ecu/V4gJ2IPteUcGS+L9ZfXw7IVSXFU/6iHAmkmSz6D
+uwwBwvYgFKgmfeg1z0MGNHB2P8akYlGjHJkDX8oXQLVULAGqpCONfu347leIMM50
+X1r9n8BUpJy9ieIKr1ED4uVmTJImbsR7ReXLFjp3U5DLErhWr8OEZL3wEA3q4J1M
+7NAjTB9t4Aecd7549QNpbF16aC+pgQ==
+=U0jQ
+-----END PGP SIGNATURE-----
+
+--jE35KopBNKOzFkBR--
 
