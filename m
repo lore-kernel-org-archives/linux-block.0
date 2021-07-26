@@ -2,91 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F344C4338F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAE8C432BE
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:38:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 561756052B
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:16:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFCB860E78
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:38:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbhGZAf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jul 2021 20:35:29 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:7058 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbhGZAf2 (ORCPT
+        id S231518AbhGZA5l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jul 2021 20:57:41 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:5174 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231419AbhGZA5k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jul 2021 20:35:28 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GY20C0K9hzYgSq;
-        Mon, 26 Jul 2021 09:10:03 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Mon, 26 Jul 2021 09:15:54 +0800
-Received: from [10.174.178.91] (10.174.178.91) by
- dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Mon, 26 Jul 2021 09:15:54 +0800
-Subject: Re: [PATCH 1/3] block, bfq: do not idle if only one cgroup is
- activated
-To:     Paolo Valente <paolo.valente@linaro.org>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20210714094529.758808-1-yukuai3@huawei.com>
- <20210714094529.758808-2-yukuai3@huawei.com>
- <7DF40BD4-8F57-4C2E-88A9-CBC3DA2A891E@linaro.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <fd21f7c8-2b13-f638-3114-9d95df9bc082@huawei.com>
-Date:   Mon, 26 Jul 2021 09:15:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sun, 25 Jul 2021 20:57:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1627263490; x=1658799490;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+4y6QnO0EX2zdAVAuJf41nc6N7i70ACwJW+ZZfsL8Pk=;
+  b=Ws3ZqJbmX238TXZ9UXqiMMFmaqJqrz0rLZIGc7xR4AYAf5/pgavstJVa
+   7YSEpMBEfZBZUHXIc3zafVNZk3XbKskXzcYKB0VA9hYbXx6trWMPYbPE3
+   od90HINJJGs/EmBCMBLtjCRbByUeT8fVKvxAaJCV0coW2Tpls8glBStsJ
+   SxkHr0rnd2lHRM5hLAfSBjuyIVAqbBuYCjrKzl4vlRdiKUdp4mtbCnZQr
+   UL65PTdsBzagR3XWQ2A6BFf6n81xdLMnDtIXKas21VNuWSPmy2isyXkCH
+   LqjHanfXG/nugxbR21lSXHMdfS67D7iQC7SE6Rm/zOIG9zq5ZCybeOmjp
+   w==;
+X-IronPort-AV: E=Sophos;i="5.84,269,1620662400"; 
+   d="scan'208";a="279290737"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jul 2021 09:38:10 +0800
+IronPort-SDR: v0JO29SNne3OFOoCca7jmgwboAnXK/k0xQd1RR3Ed3HQ/qT3p9DfBndOXoyB9HnOSzDkEFhdRY
+ D0DtjVbt9q+4eFNJW9fKS9EQxCvrSx9/PEER7TwzbRk2L8GxBEFIiMvujB7f/2PP7KNBaVVeFR
+ T0K6ohid7zxB2flf5QFdPlYirMa/6qbsLK0FNbCz2Dpan33XOT1TPSDrmak7pgX3yGnkH3iHMo
+ MMPDSw1SvcKlxZ/ntKzpWsr5i4u+btwtOFSHrOiFvecVxEkkOrsnJJZiUf+5roKnrTofsxcUyl
+ hpAPxWXVgyVEapsN/3E3pJl6
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2021 18:14:09 -0700
+IronPort-SDR: V0fHofpYZ52+ogEe8QsTWdMnQ3+IeHLoMlvKEuAEEnc/ZaXYhT1a/Yr4Rn/Gfj5zJ2s2vjzHXb
+ ND0bkfOybERihAIBlMxCgB4GrvEvlYGlV7T4TdFrxg2JuuEIb5sde2IcmVMJBPGYJ65n4BDv5K
+ Sm9MjYITO9bKaZATrOhRDyNh0QJljCLiGmdBjZ62IIduQyJfNrnWZVGd5DKjPRBy6z2yPHkHWy
+ dHnMfbj7upQqSm2I0mgy8yiPLVyd3fplRZTk1ihj/JHPr/RJHNl2NP01Ezg3pnZSwF+aPSkqz8
+ h6I=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jul 2021 18:38:09 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-ide@vger.kernel.org
+Cc:     Hannes Reinecke <hare@suse.de>
+Subject: [PATCH v3 0/4] Initial support for multi-actuator HDDs
+Date:   Mon, 26 Jul 2021 10:38:02 +0900
+Message-Id: <20210726013806.84815-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <7DF40BD4-8F57-4C2E-88A9-CBC3DA2A891E@linaro.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.91]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/07/24 15:12, Paolo Valente wrote:
-> 
-> 
->> Il giorno 14 lug 2021, alle ore 11:45, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>
->> If only one group is activated, specifically
->> 'bfqd->num_groups_with_pending_reqs == 1', there is no need to guarantee
->> the same share of the throughput of queues in the same group.
->>
->> Thus change the condition from '> 0' to '> 1' in
->> bfq_asymmetric_scenario().
-> 
-> I see your point, and I agree with your goal.  Yet, your change seems
-> not to suffer from the following problem.
-> 
-> In addition to the groups that are created explicitly, there is the
-> implicit root group.  So, when bfqd->num_groups_with_pending_reqs ==
-> 1, there may be both active processes in the root group and active
-> processes in the only group created explicitly.  In this case, idling
-> is needed to preserve service guarantees.
-> 
-> Probably your idea should be improved by making sure that there is
-> pending I/O only from either the root group or the explicit group.
-> 
-> Thanks,
-> Paolo
-> 
+Single LUN multi-actuator hard-disks are cappable to seek and execute
+multiple commands in parallel. This capability is exposed to the host
+using the Concurrent Positioning Ranges VPD page (SCSI) and Log (ATA).
+Each positioning range describes the contiguous set of LBAs that an
+actuator serves.
 
-Hi,
+This series adds support the scsi disk driver to retreive this
+information and advertize it to user space through sysfs. libata is also
+modified to handle ATA drives.
 
-Thanks for you advice, will do this in the next iteration.
+The first patch adds the block layer plumbing to expose concurrent
+sector ranges of the device through sysfs as a sub-directory of the
+device sysfs queue directory. Patch 2 and 3 add support to sd and
+libata. Finally patch 4 documents the sysfs queue attributed changes.
 
-Best regards,
-Kuai
+This series does not attempt in any way to optimize accesses to
+multi-actuator devices (e.g. block IO scheduler or filesystems). This
+initial support only exposes the actuators information to user space
+through sysfs.
+
+Changes from v2:
+* Update patch 1 to fix a compilation warning for a potential NULL
+  pointer dereference of the cr argument of blk_queue_set_cranges().
+  Warning reported by the kernel test robot <lkp@intel.com>).
+
+Changes from v1:
+* Moved libata-scsi hunk from patch 1 to patch 3 where it belongs
+* Fixed unintialized variable in patch 2
+  Reported-by: kernel test robot <lkp@intel.com>
+  Reported-by: Dan Carpenter <dan.carpenter@oracle.com
+* Changed patch 3 adding struct ata_cpr_log to contain both the number
+  of concurrent ranges and the array of concurrent ranges.
+* Added a note in the documentation (patch 4) about the unit used for
+  the concurrent ranges attributes.
+
+Damien Le Moal (4):
+  block: Add concurrent positioning ranges support
+  scsi: sd: add concurrent positioning ranges support
+  libata: support concurrent positioning ranges log
+  doc: document sysfs queue/cranges attributes
+
+ Documentation/block/queue-sysfs.rst |  30 ++-
+ block/Makefile                      |   2 +-
+ block/blk-cranges.c                 | 295 ++++++++++++++++++++++++++++
+ block/blk-sysfs.c                   |  13 ++
+ block/blk.h                         |   3 +
+ drivers/ata/libata-core.c           |  52 +++++
+ drivers/ata/libata-scsi.c           |  48 ++++-
+ drivers/scsi/sd.c                   |  81 ++++++++
+ drivers/scsi/sd.h                   |   1 +
+ include/linux/ata.h                 |   1 +
+ include/linux/blkdev.h              |  29 +++
+ include/linux/libata.h              |  15 ++
+ 12 files changed, 559 insertions(+), 11 deletions(-)
+ create mode 100644 block/blk-cranges.c
+
+-- 
+2.31.1
+
