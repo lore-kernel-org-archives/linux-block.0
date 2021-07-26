@@ -2,128 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAE8C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BDFC43214
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:38:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFCB860E78
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7053E606A5
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 01:38:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231518AbhGZA5l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jul 2021 20:57:41 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:5174 "EHLO
+        id S230272AbhGZA5t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jul 2021 20:57:49 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:5182 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231419AbhGZA5k (ORCPT
+        with ESMTP id S231419AbhGZA5n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jul 2021 20:57:40 -0400
+        Sun, 25 Jul 2021 20:57:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1627263490; x=1658799490;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+4y6QnO0EX2zdAVAuJf41nc6N7i70ACwJW+ZZfsL8Pk=;
-  b=Ws3ZqJbmX238TXZ9UXqiMMFmaqJqrz0rLZIGc7xR4AYAf5/pgavstJVa
-   7YSEpMBEfZBZUHXIc3zafVNZk3XbKskXzcYKB0VA9hYbXx6trWMPYbPE3
-   od90HINJJGs/EmBCMBLtjCRbByUeT8fVKvxAaJCV0coW2Tpls8glBStsJ
-   SxkHr0rnd2lHRM5hLAfSBjuyIVAqbBuYCjrKzl4vlRdiKUdp4mtbCnZQr
-   UL65PTdsBzagR3XWQ2A6BFf6n81xdLMnDtIXKas21VNuWSPmy2isyXkCH
-   LqjHanfXG/nugxbR21lSXHMdfS67D7iQC7SE6Rm/zOIG9zq5ZCybeOmjp
+  t=1627263492; x=1658799492;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=obRrtrdNI8ZnmW532ciGoaL+n+JdATCeY+pJxx35DX8=;
+  b=DRE29IWJphP9BCS4M9+0N8rlDAdVt9A2/KFcI7BalDlQThDHLVPMqm/A
+   OA8kiIKMs32wWUQsgmxJO3z9zXXhmDADtNHNHeniKx5Gtnxw/dNu9Hi/Y
+   4xke9eJRZL/ZhHG6XngV5izbmgkrzkrd8qZBzM0OAhphm8hIqNhL+PmId
+   DsgVlRxKnrs/WKqlbElEW3B1/JW1CT9S1jy7JX/P84Pl5sxYvalERntVG
+   MmObToHResKYcR4S5tMmcCdA+2j6JA/a35iWrkGd6AB2GI7HSfvZt7dVz
+   fz9FyyYZh1c5sp1Twa+IgWZjicaL5jorR+8fPznG9OtzIBK+mWvVmh9S5
    w==;
 X-IronPort-AV: E=Sophos;i="5.84,269,1620662400"; 
-   d="scan'208";a="279290737"
+   d="scan'208";a="279290745"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jul 2021 09:38:10 +0800
-IronPort-SDR: v0JO29SNne3OFOoCca7jmgwboAnXK/k0xQd1RR3Ed3HQ/qT3p9DfBndOXoyB9HnOSzDkEFhdRY
- D0DtjVbt9q+4eFNJW9fKS9EQxCvrSx9/PEER7TwzbRk2L8GxBEFIiMvujB7f/2PP7KNBaVVeFR
- T0K6ohid7zxB2flf5QFdPlYirMa/6qbsLK0FNbCz2Dpan33XOT1TPSDrmak7pgX3yGnkH3iHMo
- MMPDSw1SvcKlxZ/ntKzpWsr5i4u+btwtOFSHrOiFvecVxEkkOrsnJJZiUf+5roKnrTofsxcUyl
- hpAPxWXVgyVEapsN/3E3pJl6
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jul 2021 09:38:12 +0800
+IronPort-SDR: KfShcnFvXHgq4u9Epv+dL8TIszYdmiG2a0QLf1Kw87jJ2J/LCyXN8BAJEdLJVI9QFvbFB0z9OX
+ isD5nkjHLsYRZ3IgH0gyCqd/eMcbLsD3VMtjM+Q9kcKqjJztPnd3pnAZME16OyG5O3QjN9iUdI
+ JyF232yX2u+qG8n3QyhhkzVdiJrdFJ4UgXmS73HI13/jcZHq5CGl3FmsokGhh7fLPSdChsNpkD
+ 3+bv6Tqxt7+kiX0RN2hiICJQGb2TPZ3Q+H5ANFPUq+NtvOaWOLxpUDw2mSMVvfbRy/2RQDcO73
+ p1whTWPsZr+RPuzkFSYLwaQq
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2021 18:14:09 -0700
-IronPort-SDR: V0fHofpYZ52+ogEe8QsTWdMnQ3+IeHLoMlvKEuAEEnc/ZaXYhT1a/Yr4Rn/Gfj5zJ2s2vjzHXb
- ND0bkfOybERihAIBlMxCgB4GrvEvlYGlV7T4TdFrxg2JuuEIb5sde2IcmVMJBPGYJ65n4BDv5K
- Sm9MjYITO9bKaZATrOhRDyNh0QJljCLiGmdBjZ62IIduQyJfNrnWZVGd5DKjPRBy6z2yPHkHWy
- dHnMfbj7upQqSm2I0mgy8yiPLVyd3fplRZTk1ihj/JHPr/RJHNl2NP01Ezg3pnZSwF+aPSkqz8
- h6I=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2021 18:14:12 -0700
+IronPort-SDR: Z+6kpdAVd82SZ/tNsjhFpOyVK4qM9orG5daVgHZB+eghjAsp2IlKv3115BR/Vt+/5RJhRilX54
+ x7nXjW3y+jZ9+y8y0TCaUEJyIX35TOC+/HxbzTiU7amrQR3yhz4jjJDviw7usbfTlRSCjz5qZD
+ uBvBhZ4bU2lB/zYZqkR0rpi2UNe7DtYJ64XLqGRXUxIdoHD2AnINCuuoiwrDF/tyZ2aM5KzbSZ
+ c1JSlsbLKT5owJA4LbchIRT0BczHEW18v8XInw2c2d7ehM8hSNMiz9GT/2PXnGtVfXN6Cw7bu5
+ iRA=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jul 2021 18:38:09 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jul 2021 18:38:11 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         linux-ide@vger.kernel.org
 Cc:     Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v3 0/4] Initial support for multi-actuator HDDs
-Date:   Mon, 26 Jul 2021 10:38:02 +0900
-Message-Id: <20210726013806.84815-1-damien.lemoal@wdc.com>
+Subject: [PATCH v3 2/4] scsi: sd: add concurrent positioning ranges support
+Date:   Mon, 26 Jul 2021 10:38:04 +0900
+Message-Id: <20210726013806.84815-3-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210726013806.84815-1-damien.lemoal@wdc.com>
+References: <20210726013806.84815-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Single LUN multi-actuator hard-disks are cappable to seek and execute
-multiple commands in parallel. This capability is exposed to the host
-using the Concurrent Positioning Ranges VPD page (SCSI) and Log (ATA).
-Each positioning range describes the contiguous set of LBAs that an
-actuator serves.
+Add the sd_read_cpr() function to the sd scsi disk driver to discover
+if a device has multiple concurrent positioning ranges (i.e. multiple
+actuators on an HDD). This new function is called from
+sd_revalidate_disk() and uses the block layer functions
+blk_alloc_cranges() and blk_queue_set_cranges() to set a device
+cranges according to the information retrieved from log page B9h,
+if the device supports it.
 
-This series adds support the scsi disk driver to retreive this
-information and advertize it to user space through sysfs. libata is also
-modified to handle ATA drives.
+The format of the Concurrent Positioning Ranges VPD page B9h is defined
+in section 6.6.6 of SBC-5.
 
-The first patch adds the block layer plumbing to expose concurrent
-sector ranges of the device through sysfs as a sub-directory of the
-device sysfs queue directory. Patch 2 and 3 add support to sd and
-libata. Finally patch 4 documents the sysfs queue attributed changes.
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/scsi/sd.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/scsi/sd.h |  1 +
+ 2 files changed, 82 insertions(+)
 
-This series does not attempt in any way to optimize accesses to
-multi-actuator devices (e.g. block IO scheduler or filesystems). This
-initial support only exposes the actuators information to user space
-through sysfs.
-
-Changes from v2:
-* Update patch 1 to fix a compilation warning for a potential NULL
-  pointer dereference of the cr argument of blk_queue_set_cranges().
-  Warning reported by the kernel test robot <lkp@intel.com>).
-
-Changes from v1:
-* Moved libata-scsi hunk from patch 1 to patch 3 where it belongs
-* Fixed unintialized variable in patch 2
-  Reported-by: kernel test robot <lkp@intel.com>
-  Reported-by: Dan Carpenter <dan.carpenter@oracle.com
-* Changed patch 3 adding struct ata_cpr_log to contain both the number
-  of concurrent ranges and the array of concurrent ranges.
-* Added a note in the documentation (patch 4) about the unit used for
-  the concurrent ranges attributes.
-
-Damien Le Moal (4):
-  block: Add concurrent positioning ranges support
-  scsi: sd: add concurrent positioning ranges support
-  libata: support concurrent positioning ranges log
-  doc: document sysfs queue/cranges attributes
-
- Documentation/block/queue-sysfs.rst |  30 ++-
- block/Makefile                      |   2 +-
- block/blk-cranges.c                 | 295 ++++++++++++++++++++++++++++
- block/blk-sysfs.c                   |  13 ++
- block/blk.h                         |   3 +
- drivers/ata/libata-core.c           |  52 +++++
- drivers/ata/libata-scsi.c           |  48 ++++-
- drivers/scsi/sd.c                   |  81 ++++++++
- drivers/scsi/sd.h                   |   1 +
- include/linux/ata.h                 |   1 +
- include/linux/blkdev.h              |  29 +++
- include/linux/libata.h              |  15 ++
- 12 files changed, 559 insertions(+), 11 deletions(-)
- create mode 100644 block/blk-cranges.c
-
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index b8d55af763f9..8e83099b49f6 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3125,6 +3125,86 @@ static void sd_read_security(struct scsi_disk *sdkp, unsigned char *buffer)
+ 		sdkp->security = 1;
+ }
+ 
++static inline sector_t sd64_to_sectors(struct scsi_disk *sdkp, u8 *buf)
++{
++	return logical_to_sectors(sdkp->device, get_unaligned_be64(buf));
++}
++
++/**
++ * sd_read_cpr - Query concurrent positioning ranges
++ * @sdkp:	disk to query
++ */
++static void sd_read_cpr(struct scsi_disk *sdkp)
++{
++	unsigned char *buffer = NULL;
++	struct blk_cranges *cr = NULL;
++	unsigned int nr_cpr = 0;
++	int i, vpd_len, buf_len = SD_BUF_SIZE;
++	u8 *desc;
++
++	/*
++	 * We need to have the capacity set first for the block layer to be
++	 * able to check the ranges.
++	 */
++	if (sdkp->first_scan)
++		return;
++
++	if (!sdkp->capacity)
++		goto out;
++
++	/*
++	 * Concurrent Positioning Ranges VPD: there can be at most 256 ranges,
++	 * leading to a maximum page size of 64 + 256*32 bytes.
++	 */
++	buf_len = 64 + 256*32;
++	buffer = kmalloc(buf_len, GFP_KERNEL);
++	if (!buffer || scsi_get_vpd_page(sdkp->device, 0xb9, buffer, buf_len))
++		goto out;
++
++	/* We must have at least a 64B header and one 32B range descriptor */
++	vpd_len = get_unaligned_be16(&buffer[2]) + 3;
++	if (vpd_len > buf_len || vpd_len < 64 + 32 || (vpd_len & 31)) {
++		sd_printk(KERN_ERR, sdkp,
++			  "Invalid Concurrent Positioning Ranges VPD page\n");
++		goto out;
++	}
++
++	nr_cpr = (vpd_len - 64) / 32;
++	if (nr_cpr == 1) {
++		nr_cpr = 0;
++		goto out;
++	}
++
++	cr = blk_alloc_cranges(sdkp->disk, nr_cpr);
++	if (!cr) {
++		nr_cpr = 0;
++		goto out;
++	}
++
++	desc = &buffer[64];
++	for (i = 0; i < nr_cpr; i++, desc += 32) {
++		if (desc[0] != i) {
++			sd_printk(KERN_ERR, sdkp,
++				"Invalid Concurrent Positioning Range number\n");
++			nr_cpr = 0;
++			break;
++		}
++
++		cr->ranges[i].sector = sd64_to_sectors(sdkp, desc + 8);
++		cr->ranges[i].nr_sectors = sd64_to_sectors(sdkp, desc + 16);
++	}
++
++out:
++	blk_queue_set_cranges(sdkp->disk, cr);
++	if (nr_cpr && sdkp->nr_actuators != nr_cpr) {
++		sd_printk(KERN_NOTICE, sdkp,
++			  "%u concurrent positioning ranges\n", nr_cpr);
++		sdkp->nr_actuators = nr_cpr;
++	}
++
++	kfree(buffer);
++}
++
+ /*
+  * Determine the device's preferred I/O size for reads and writes
+  * unless the reported value is unreasonably small, large, not a
+@@ -3240,6 +3320,7 @@ static int sd_revalidate_disk(struct gendisk *disk)
+ 		sd_read_app_tag_own(sdkp, buffer);
+ 		sd_read_write_same(sdkp, buffer);
+ 		sd_read_security(sdkp, buffer);
++		sd_read_cpr(sdkp);
+ 	}
+ 
+ 	/*
+diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
+index b59136c4125b..2e5932bde43d 100644
+--- a/drivers/scsi/sd.h
++++ b/drivers/scsi/sd.h
+@@ -106,6 +106,7 @@ struct scsi_disk {
+ 	u8		protection_type;/* Data Integrity Field */
+ 	u8		provisioning_mode;
+ 	u8		zeroing_mode;
++	u8		nr_actuators;		/* Number of actuators */
+ 	unsigned	ATO : 1;	/* state of disk ATO bit */
+ 	unsigned	cache_override : 1; /* temp override of WCE,RCD */
+ 	unsigned	WCE : 1;	/* state of disk WCE bit */
 -- 
 2.31.1
 
