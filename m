@@ -2,188 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EBB2C4320A
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 16:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B888C4338F
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 17:09:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 537F560F11
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 16:37:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7515560F57
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 17:09:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239326AbhGZP5D convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jul 2021 11:57:03 -0400
-Received: from mail-ot1-f48.google.com ([209.85.210.48]:38868 "EHLO
-        mail-ot1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239440AbhGZP45 (ORCPT
+        id S236531AbhGZQ2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jul 2021 12:28:38 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:47852 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242403AbhGZQ0c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jul 2021 11:56:57 -0400
-Received: by mail-ot1-f48.google.com with SMTP id 19-20020a9d08930000b02904b98d90c82cso10562217otf.5;
-        Mon, 26 Jul 2021 09:37:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7eA3rP3aWeS+yKeUdalJiZZ3+MRB3dmDKKblxGisnlw=;
-        b=Qt2qqovpOvfWSk5fe3sLZjup+ZjzfZ7OKzvl4Zd2WVDdJDkD2XC8kPc00KZzr6rWrq
-         xORQYz+DqN9BznrPteIqPFmqES1fpuqtJJB9O227OIzQw6+c4amxIe1kbERpcgi/Gp3o
-         08QLr9BYO/04EjIb+uYolygELwjX1UD0G1PBxwFxZUxPAT0CvRPeAWzVRiFq6AGuwTA+
-         C3ir1ALLzjEoWr5OdicBXCm/36BiOfKmJQ/x/ORDusvFC34bZkmz7Xz+MUEV7VkI59oy
-         MrtVdT4scY9QlEMEvbEvV+08MhA26zOM9xl0n4aHvF3yo313bZqArUOlzci0HuuR/v/L
-         +nmg==
-X-Gm-Message-State: AOAM531SokQeQMtaoC+SKRiRDRmaVkgzk10zMIbvzlqqUUc1k7uNXGt/
-        zSYaK7ZMBbqFGJ17hSSyXgLaH34xwA5fssCdtkQ=
-X-Google-Smtp-Source: ABdhPJx5k6Wln1bzY8Oi4eCitpGpORwmKPZ8bqs2YffzycATwB2RqMeEuPCjlxvSObMYzzHxoeWLw1jLujkzVW/AGvY=
-X-Received: by 2002:a9d:2968:: with SMTP id d95mr12468577otb.321.1627317444886;
- Mon, 26 Jul 2021 09:37:24 -0700 (PDT)
+        Mon, 26 Jul 2021 12:26:32 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 000AC21FCA;
+        Mon, 26 Jul 2021 17:06:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1627319220; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u/6Vj7OVxSVTlBeyT4j4Pxr6K4YolKwbPh8N6Yh1Nzw=;
+        b=YIGoWUw016ZAuST4/iaJe5nf9tPg+3yPg5yp2eqZaNB/Zus7dTToJp9w4F8LlHCb0ZP2g+
+        gnqHEkMjd7lkuwJkHBUPIkiUjhGfnGxCEJxvdyfG0wpRGE8yZv4hkqpy9LxFMfp3Q7z3qJ
+        rwpQfeQzQk3qxHsFirG+ipcU36FuCZA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1627319220;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u/6Vj7OVxSVTlBeyT4j4Pxr6K4YolKwbPh8N6Yh1Nzw=;
+        b=8D3QE8aI4ZWmDuHC5VfAoJBVV7Q/6X4xqWWp0y3DrpPXMuJxJ78ufsoN5Iq3uZgz2t1gTI
+        LHvFLUUQRHUW15CA==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id DCC6E13A91;
+        Mon, 26 Jul 2021 17:06:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id Lsx5NbPr/mCqPwAAGKfGzw
+        (envelope-from <dwagner@suse.de>); Mon, 26 Jul 2021 17:06:59 +0000
+Date:   Mon, 26 Jul 2021 19:06:59 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Wen Xiong <wenxiong@us.ibm.com>
+Cc:     ming.lei@redhat.com, axboe@kernel.dk, gregkh@linuxfoundation.org,
+        hare@suse.de, hch@lst.de, john.garry@huawei.com,
+        linux-block@vger.kernel.org, sagi@grimberg.me, tglx@linutronix.de
+Subject: Re: [PATCH V6 0/3] blk-mq: fix blk_mq_alloc_request_hctx
+Message-ID: <20210726170659.hrh4evhkdqnyjz5k@beryllium.lan>
+References: <YPp63niga//Q6GLV@T590>
+ <20210722131245.u4dhcqotepxhwgbz@beryllium.lan>
+ <20210722095246.1240526-1-ming.lei@redhat.com>
+ <OFDADF39F5.DDB99A55-ON0025871A.00794382-0025871A.00797A2E@ibm.com>
+ <OF2C4681CD.AF20CBB4-ON0025871E.004D37B6-0025871E.004E3B9F@ibm.com>
 MIME-Version: 1.0
-References: <20210713161906.457857-1-stefanha@redhat.com> <1008dee4-fce1-2462-1520-f5432bc89a07@redhat.com>
- <YPfryV7qZVRbjNgP@stefanha-x1.localdomain> <869a993d-a1b0-1c39-d081-4cdd2b71041f@redhat.com>
- <YP7SEkDEIBOch9U8@stefanha-x1.localdomain> <CAJZ5v0h+RrRP-3MtV8dgxmba0rDfqoOw54DsFh0yx3YGUAVRqw@mail.gmail.com>
- <YP7cTjrfipfsJe9O@stefanha-x1.localdomain>
-In-Reply-To: <YP7cTjrfipfsJe9O@stefanha-x1.localdomain>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Mon, 26 Jul 2021 18:37:13 +0200
-Message-ID: <CAJZ5v0i4+2xda4Z6=JwRQf4ZzM2_agiyCwhMDRzAC-yz39fGzg@mail.gmail.com>
-Subject: Re: [RFC 0/3] cpuidle: add poll_source API and virtio vq polling
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        virtualization@lists.linux-foundation.org,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <OF2C4681CD.AF20CBB4-ON0025871E.004D37B6-0025871E.004E3B9F@ibm.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 26, 2021 at 6:04 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Mon, Jul 26, 2021 at 05:47:19PM +0200, Rafael J. Wysocki wrote:
-> > On Mon, Jul 26, 2021 at 5:17 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > >
-> > > On Thu, Jul 22, 2021 at 05:04:57PM +0800, Jason Wang wrote:
-> > > >
-> > > > 在 2021/7/21 下午5:41, Stefan Hajnoczi 写道:
-> > > > > On Wed, Jul 21, 2021 at 11:29:55AM +0800, Jason Wang wrote:
-> > > > > > 在 2021/7/14 上午12:19, Stefan Hajnoczi 写道:
-> > > > > > > These patches are not polished yet but I would like request feedback on this
-> > > > > > > approach and share performance results with you.
-> > > > > > >
-> > > > > > > Idle CPUs tentatively enter a busy wait loop before halting when the cpuidle
-> > > > > > > haltpoll driver is enabled inside a virtual machine. This reduces wakeup
-> > > > > > > latency for events that occur soon after the vCPU becomes idle.
-> > > > > > >
-> > > > > > > This patch series extends the cpuidle busy wait loop with the new poll_source
-> > > > > > > API so drivers can participate in polling. Such polling-aware drivers disable
-> > > > > > > their device's irq during the busy wait loop to avoid the cost of interrupts.
-> > > > > > > This reduces latency further than regular cpuidle haltpoll, which still relies
-> > > > > > > on irqs.
-> > > > > > >
-> > > > > > > Virtio drivers are modified to use the poll_source API so all virtio device
-> > > > > > > types get this feature. The following virtio-blk fio benchmark results show the
-> > > > > > > improvement:
-> > > > > > >
-> > > > > > >                IOPS (numjobs=4, iodepth=1, 4 virtqueues)
-> > > > > > >                  before   poll_source      io_poll
-> > > > > > > 4k randread    167102  186049 (+11%)  186654 (+11%)
-> > > > > > > 4k randwrite   162204  181214 (+11%)  181850 (+12%)
-> > > > > > > 4k randrw      159520  177071 (+11%)  177928 (+11%)
-> > > > > > >
-> > > > > > > The comparison against io_poll shows that cpuidle poll_source achieves
-> > > > > > > equivalent performance to the block layer's io_poll feature (which I
-> > > > > > > implemented in a separate patch series [1]).
-> > > > > > >
-> > > > > > > The advantage of poll_source is that applications do not need to explicitly set
-> > > > > > > the RWF_HIPRI I/O request flag. The poll_source approach is attractive because
-> > > > > > > few applications actually use RWF_HIPRI and it takes advantage of CPU cycles we
-> > > > > > > would have spent in cpuidle haltpoll anyway.
-> > > > > > >
-> > > > > > > The current series does not improve virtio-net. I haven't investigated deeply,
-> > > > > > > but it is possible that NAPI and poll_source do not combine. See the final
-> > > > > > > patch for a starting point on making the two work together.
-> > > > > > >
-> > > > > > > I have not tried this on bare metal but it might help there too. The cost of
-> > > > > > > disabling a device's irq must be less than the savings from avoiding irq
-> > > > > > > handling for this optimization to make sense.
-> > > > > > >
-> > > > > > > [1] https://lore.kernel.org/linux-block/20210520141305.355961-1-stefanha@redhat.com/
-> > > > > >
-> > > > > > Hi Stefan:
-> > > > > >
-> > > > > > Some questions:
-> > > > > >
-> > > > > > 1) What's the advantages of introducing polling at virtio level instead of
-> > > > > > doing it at each subsystems? Polling in virtio level may only work well if
-> > > > > > all (or most) of the devices are virtio
-> > > > > I'm not sure I understand the question. cpuidle haltpoll benefits all
-> > > > > devices today, except it incurs interrupt latency. The poll_source API
-> > > > > eliminates the interrupt latency for drivers that can disable device
-> > > > > interrupts cheaply.
-> > > > >
-> > > > > This patch adds poll_source to core virtio code so that all virtio
-> > > > > drivers get this feature for free. No driver-specific changes are
-> > > > > needed.
-> > > > >
-> > > > > If you mean networking, block layer, etc by "subsystems" then there's
-> > > > > nothing those subsystems can do to help. Whether poll_source can be used
-> > > > > depends on the specific driver, not the subsystem. If you consider
-> > > > > drivers/virtio/ a subsystem, then that's exactly what the patch series
-> > > > > is doing.
-> > > >
-> > > >
-> > > > I meant, if we choose to use idle poll, we have some several choices:
-> > > >
-> > > > 1) bus level (e.g the virtio)
-> > > > 2) subsystem level (e.g the networking and block)
-> > > >
-> > > > I'm not sure which one is better.
-> > >
-> > > This API is intended to be driver- or bus-level. I don't think
-> > > subsystems can do very much since they don't know the hardware
-> > > capabilities (cheap interrupt disabling) and in most cases there's no
-> > > advantage of plumbing it through subsystems when drivers can call the
-> > > API directly.
-> > >
-> > > > > > 2) What's the advantages of using cpuidle instead of using a thread (and
-> > > > > > leverage the scheduler)?
-> > > > > In order to combine with the existing cpuidle infrastructure. No new
-> > > > > polling loop is introduced and no additional CPU cycles are spent on
-> > > > > polling.
-> > > > >
-> > > > > If cpuidle itself is converted to threads then poll_source would
-> > > > > automatically operate in a thread too, but this patch series doesn't
-> > > > > change how the core cpuidle code works.
-> > > >
-> > > >
-> > > > So networking subsystem can use NAPI busy polling in the process context
-> > > > which means it can be leveraged by the scheduler.
-> > > >
-> > > > I'm not sure it's a good idea to poll drivers for a specific bus in the
-> > > > general cpu idle layer.
-> > >
-> > > Why? Maybe because the cpuidle execution environment is a little special?
-> >
-> > Well, this would be prone to abuse.
-> >
-> > The time spent in that driver callback counts as CPU idle time while
-> > it really is the driver running and there is not limit on how much
-> > time the callback can take, while doing costly things in the idle loop
-> > is generally avoided, because on wakeup the CPU needs to be available
-> > to the task needing it as soon as possible.  IOW, the callback
-> > potentially add unbounded latency to the CPU wakeup path.
->
-> How is this different from driver interrupt handlers running during
-> cpuidle?
+Hi,
 
-The time spent on handling interrupts does not count as CPU idle time.
+On Mon, Jul 26, 2021 at 02:14:30PM +0000, Wen Xiong wrote:
+> >>V6 is basically same with V4, can you figure out where the failure
+> >>comes?(v5.14-rc2, V6 or Daniel's V3)
+>  
+> Looks 3/3 was not patched cleanly in v5.14-rc2 last week.  I made the changes
+> in block/blk-mq.c.rej manually but still missed the last part of 3/3 patch.
+
+Sorry for the long delay on my side. It took a while to get my test
+setup running again. The qla2xxx driver really doesn't like 'fast'
+remote port toggling. But that's a different story.
+
+Anyway, it turns out that my patch series is still not working
+correctly. When I tested the series I deliberate forced to execute
+the 'revising io queue count' path in nvme_fc_recreate_io_queues by
+doing:
+
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -2954,7 +2954,7 @@ nvme_fc_recreate_io_queues(struct nvme_fc_ctrl *ctrl)
+        if (ctrl->ctrl.queue_count == 1)
+                return 0;
+ 
+-       if (prior_ioq_cnt != nr_io_queues) {
++       if (prior_ioq_cnt != nr_io_queues - 1) {
+                dev_info(ctrl->ctrl.device,
+                        "reconnect: revising io queue count from %d to %d\n",
+                        prior_ioq_cnt, nr_io_queues);
+
+
+With this change I can't observe any I/O hanging. Without the change it
+hangs in the first iteration.
+
+In Wen's setup we observed in earlier debugging sessions that the
+nr_io_queues does change. So this explains why Wen doesn't see any
+hanging I/Os.
+
+@James, I think we need to look at bit more at the freeze code. BTW,
+my initial patch which just added a nvme_start_freeze() in
+nvme_fc_delete_association() doesn't work either for the 'prior_ioq_cnt
+== nr_io_queues' case.
+
+So I think Ming series can be merged as the hanging I/Os are clearly not
+caused by the series.
+
+Feel free to add
+
+Tested-by: Daniel Wagner <dwagner@suse.de>
+
+Thanks,
+Daniel
