@@ -2,298 +2,568 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB65DC432BE
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 02:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C210C432BE
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 07:33:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7EB8601FD
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 02:20:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33C2A60F42
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jul 2021 07:33:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbhGZBkJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jul 2021 21:40:09 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:4893 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230272AbhGZBkJ (ORCPT
+        id S231778AbhGZGx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jul 2021 02:53:26 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:37988 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231728AbhGZGx0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jul 2021 21:40:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1627266037; x=1658802037;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=Llnq2cDRdn1yCnx3gzswWo88K4FVV15rPZImRdGKA1A=;
-  b=Lf6UtzDsu/n+dcdd/5iKJ7h4uZIZ/jszCeMAENz3/AQEscw0Sw5UM1jI
-   HbZFB6qfHoVKrfiZ9xJrtgTTN+SE8eyTZhGbTVTvTBDgX//ZwLGxlbDQr
-   ivcWOedahWMarJVZkwvFpEcKP2bVJo9+ouimZ+HSrT4Jp42GuflErP/iN
-   R6GYQ0954KOsCKJRrujZvmBV+nR3UjkOPHOK4VJDL1TD53oaDAo9JOj73
-   +31hfA3Rcdl7wPLhi9PF1I8zeyIsMVzT+SaQrAd74FxLsKTClXtSK8zmJ
-   hhc7hn5iKf4mNg9WLRT3z0nOik/CMWmjquU5IEgTC+u8S0+WoDb/MKXZG
-   A==;
-X-IronPort-AV: E=Sophos;i="5.84,269,1620662400"; 
-   d="scan'208";a="175463836"
-Received: from mail-bn7nam10lp2109.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.109])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jul 2021 10:20:36 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gB7cTPo3y4AgvS77iDtfPxFMQVW716Hrkuw0GzGinqwDdDdsNmVb25XMuKD15yGTHXk/C6XVAa0wFmpcnZmZSokAfemafPLoHw4eRKzFqC3UEme3aFKFyxdtlvVlcbmgudXylRpjBFg90VAJzjVY+kgx4msIURjECwgmWniUpQqTQzDCTsLlYnjxxoZozltbd0IOq9LlgBKukEU6gBmNeEmQMyD2mOohqjDetdXBcAimjYr06SybGKT7CCfaZ5pJlu4lUGZ+wp6QYNyP5c3EPKbeTI1kKzvGcj4QfYn4ZCdSuLZYSnHz05g/CYb+I1Eu/MMdnqfeURCn4l6fvTVQ2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MEagqNbu3InuqTW3SN8cfkohty69DjkSTYJcZObOnms=;
- b=newGUFnSouDsZhvgLmhUBVjiiWrlTvTwHZCE8hC8BGNGD9FBiz6r1xiZZrLqqwckImzxjYm0HQ/LsLrq/05MEP9XM3WZqbQVDHH8b66IXF4GYZpNiscJatPSAVtmQ8SgyurRUC8wWn/tww6msz0kVCXmHp+VGBMLkddizU7ELHBpeE8Qb+5FQmYs0+WinH0TAxQleMcLmdrqcP/x6xj8MKhhfw/TbBobFLFnIvrdCleKt6yGiB8pzlFISainSwILQ/D2Yy5ilAcPLKD1VEzsZhCzUyh06fLhzxBBYOvX6UKDijCr/bsFZ0bmT3b+CcDTemUP/eOeKoTE00ezOhj/Zw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MEagqNbu3InuqTW3SN8cfkohty69DjkSTYJcZObOnms=;
- b=Mr06/IsnDf8QLCwFPB8Kw0H0Wfg+eEMY4+pVMFe94pBc3mJZzWnTadhbh6kaayFHzzfgZ56/hlmL482Im72hLyV1K+xlEBlHaoLAmE/THJd30KQfduimKBkmsAjFR26vIKmImuWXghlSLfD7tCiwYxO60EuJrKuGED+xr6hLz/A=
-Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
- by DM6PR04MB5100.namprd04.prod.outlook.com (2603:10b6:5:16::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.24; Mon, 26 Jul
- 2021 02:20:36 +0000
-Received: from DM6PR04MB7081.namprd04.prod.outlook.com
- ([fe80::44e6:14cc:4aab:3028]) by DM6PR04MB7081.namprd04.prod.outlook.com
- ([fe80::44e6:14cc:4aab:3028%8]) with mapi id 15.20.4352.031; Mon, 26 Jul 2021
- 02:20:36 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
-Subject: Re: [PATCH 06/10] block: change the refcounting for partitions
-Thread-Topic: [PATCH 06/10] block: change the refcounting for partitions
-Thread-Index: AQHXgFu7zJ2Q1gh81EWRznbYLJ+kgA==
-Date:   Mon, 26 Jul 2021 02:20:35 +0000
-Message-ID: <DM6PR04MB708159627FB52CFA496666BFE7E89@DM6PR04MB7081.namprd04.prod.outlook.com>
-References: <20210724071249.1284585-1-hch@lst.de>
- <20210724071249.1284585-7-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4bb89e6a-4d5b-47c2-366a-08d94fdbf40e
-x-ms-traffictypediagnostic: DM6PR04MB5100:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR04MB5100F09EC3F93AB03A8D88F6E7E89@DM6PR04MB5100.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fcpXj+84gFsDKf02LpCwexGNS5HSuJk4zw1NDkfhtGTlVUPw05LMEXOrA0MsAQlaDbpu2hfI8L4DosiW/rZ/gWIusnDhtwiUVt1PtQcdQC8rJeWawB5/kC1vBHGrdWcLDfQvsZkN7kZ42jqEJWvGN/nyiGFfhKwUxR4bptQEll8K6BdKJiPjEVS5GjIdTAxRuou5n+DXdee6O47RXTVm+3pKM52239PAraVgnHxCFOQZKbdHYZ4jOlsAu9f/ikEAqoAQbomjJPgwiprdFB0dxMlNsfr5fR57vdBUqvO6WJI/A7+4kUHzYakoDSq00XOx5NJ/zj5JvEmxKdt/joN3gn8pNE6ezJiDcZVwpaun77E2BBcboEcpkwkCgGK2GO+sOELeafutJaItEn6jhId3f77JNTbO4ou+CR1ZZ+5i78hEzCRB1Vq5BbvvB2/KIV8vBrcYg1wuW0JWkRLMrbHMswv5QR+7yl40am8l2nA3iO7BltsMwHRe8SJmZKDnXzHHHuzFi0D/KMv9kwIguRdh7ZrXC3kc7SDJ7pD0jJrzCcDuf0yxLC4hw5knB4g3HyS3FVPWr9ZJAJozu1r/yGbRntmz3VcdcppZO4UzweroScpK+NIMraWEhdKAJE6ItDcLXMzI4UTGt+mfi/u/9PxwgV24IVNI8eG1VL6fRG++4tYaQ+kDI9L5LykCWcDlL0CY
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(136003)(396003)(366004)(376002)(55016002)(8676002)(26005)(6506007)(33656002)(66946007)(478600001)(76116006)(38100700002)(5660300002)(66446008)(66556008)(66476007)(91956017)(64756008)(8936002)(186003)(52536014)(122000001)(86362001)(71200400001)(2906002)(9686003)(316002)(83380400001)(54906003)(4326008)(110136005)(53546011)(7696005)(38070700004);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xmhS9ttonWLbCMKCMTxXwCnUj0uZwlHavIvb9rfgAyuTx6RIAvmY0wjOX6XD?=
- =?us-ascii?Q?yW6bIQ1Hg/fC+wczNy1Vr9Nyokrt5nzmA+TqbNo95hdNZP0vDZ04cpXMiJZ/?=
- =?us-ascii?Q?Hesv7ooPj5eRs4ud1mue2uEjnyF9CmfztomKvxZxVZkTxEbq0oweP/G1kB34?=
- =?us-ascii?Q?J1lXb93E6jhE46eISfqVtFbjqUh3miknrNDcNafrWu6o1+iN8NZe7/fOPRSo?=
- =?us-ascii?Q?Bk8pHwldclelI8CA4O20IHTim/LZ18KTnL78mrIm2V5jVIWFxx0i1zxRPGMa?=
- =?us-ascii?Q?TEuXYokJxJXTXIjtZaUO56XOqw55dsu+270vI9MlH9ZagcKSlPKIhcfoIxWX?=
- =?us-ascii?Q?2myukTMd0mZxtT6v4o0k5CRkxMGNWXF/Z8iv3b8UizWXhXfsgnlXmCdl4JIq?=
- =?us-ascii?Q?J0bzA/0iB1Q76SQvfEoQc7Idc5Uu/qgW7jM0hZF/Fs3hy47nva0uJCuHxoQj?=
- =?us-ascii?Q?DiQfjVrrZMz4s7cw1ju/RaPq/kpOLvBTsGpzu+Vp5i2lx7kOYPjXQR1h2GPQ?=
- =?us-ascii?Q?LoW4CPGnU7a2Ktj5O5kTsMEZA01gmqOdmKklYva52qpB+hemWy63o/Nv0VhO?=
- =?us-ascii?Q?33/N1p9dZ8KJa6iV8xEP/IS8rpjQavVq5pyYwpnsJl/QfnWWSpkFK/6sJ7Nw?=
- =?us-ascii?Q?MmGu7hCSfY9EQ0b3xZDzW49/MOUMCOTQqX0fcE82c0VP51tHW5+HKQAOupQ4?=
- =?us-ascii?Q?gulM2ueKQnrxDhS4EQrEX6wmxT8O1FFCwHp4LbtUcxHMuFVQiRe5bji86FCZ?=
- =?us-ascii?Q?DG2SEuY4p9n36sInLNZOplxoVUFn/QQ0s1MNDncKvsoYs/f45elSft5C0IMy?=
- =?us-ascii?Q?GPujQDA+y5xgzhsJ9xmPA0RreYm3Kido0AIEYY6RNFfFBC6VNj8L6KbZlvXt?=
- =?us-ascii?Q?IdPk3D74ysKPDNqU4iUw0eIsV7Qb5nQJKYmLZoy2pT+/BUy+ZZfF0eJPaoou?=
- =?us-ascii?Q?RDSuBw4V6a4t1oiy9Wdt211CNlWynn3dX64BuMITMXFfPB6StTo7hLETu+I9?=
- =?us-ascii?Q?Zrm7pZu6jI+Ub9O01M2dCDfsIBIkyunKviArlY4jwuNNLDzs4UcrBGObzuW8?=
- =?us-ascii?Q?PlYtvxj1m6Ffg3llu/Kki7sBk8n5niY7KdcM62NwSpiAOfRpHH5D4Zspz4HO?=
- =?us-ascii?Q?BRbNE9DmdBv0FtlDjTVxYigKWzl6eweNJtC2kz5YsAGEnT+Hh4gaA/2j7xef?=
- =?us-ascii?Q?ynE+QgvuIEgywhgUmnQLd9WLWRrMCgONpOf9u0z0KrOegcL3whNVPjH4GjjZ?=
- =?us-ascii?Q?iURVChF9GceYZxO63mg2bLsQaGmKR73+At0f1fiyyGKfV00v0+5xwsXfoyWx?=
- =?us-ascii?Q?HaPLMVNBbx39vTaYKg7kWRzfi0cxzNkujqri2iy7gNk/9A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 26 Jul 2021 02:53:26 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 62DC521E51;
+        Mon, 26 Jul 2021 07:33:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1627284834; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=scm7y8lSqAoU0cBEa+C46YiqXbNpSSrqrvBN13VIXTE=;
+        b=Hs/albcmCRsQmpBNxdIoQaqzW+ZJDgNe0keqx917uOuHiO+oUY2ywI1I6/OEqP8AxUpe7/
+        nPZ/WqlVwWm7erp/Ch1LDZ0zMG1KRMAoTnOtEH6xS3Z/EUAdggJp3/RCrsAeQJjQKSAppy
+        g/A+CNwjUg0Zol1eJgcW4QOK7Z7C9hQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1627284834;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=scm7y8lSqAoU0cBEa+C46YiqXbNpSSrqrvBN13VIXTE=;
+        b=Sd1YyRFyNRqa7UIz4CohxqMZMe/5GUqxYa54Jtjs2bI0DV/nsaAd1PTqlCZWqadsAGAgUp
+        YfxNATzG7zHTIEBQ==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 3D5AE13A7B;
+        Mon, 26 Jul 2021 07:33:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id F4SLDWJl/mAfEAAAGKfGzw
+        (envelope-from <hare@suse.de>); Mon, 26 Jul 2021 07:33:54 +0000
+Subject: Re: [PATCH v3 1/4] block: Add concurrent positioning ranges support
+To:     Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-ide@vger.kernel.org
+References: <20210726013806.84815-1-damien.lemoal@wdc.com>
+ <20210726013806.84815-2-damien.lemoal@wdc.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <751621a5-a35b-c799-439c-8982433a6be5@suse.de>
+Date:   Mon, 26 Jul 2021 09:33:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4bb89e6a-4d5b-47c2-366a-08d94fdbf40e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2021 02:20:36.0012
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iDuJpL2PFJVpY/+aPdTOHBYpj7Gol4LIl3vkTrvBTaXne3Ep9O2ruGconYdgSHmSyoQN2qigNZLmJ/mSNNmEhw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5100
+In-Reply-To: <20210726013806.84815-2-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/07/24 16:15, Christoph Hellwig wrote:=0A=
-> Instead of acquiring an inode reference on open make sure partitions=0A=
-> always hold device model references to the disk while alive, and switch=
-=0A=
-> open to grab only a device model reference to the opened block device.=0A=
-> If that is a partition the disk reference is transitively held by the=0A=
-> partition already.=0A=
-=0A=
-Your SoB is missing...=0A=
-=0A=
-> ---=0A=
->  block/partitions/core.c |  4 +++=0A=
->  fs/block_dev.c          | 60 ++++++++++++++++-------------------------=
-=0A=
->  2 files changed, 27 insertions(+), 37 deletions(-)=0A=
-> =0A=
-> diff --git a/block/partitions/core.c b/block/partitions/core.c=0A=
-> index ae88b5439056..1b02073a2047 100644=0A=
-> --- a/block/partitions/core.c=0A=
-> +++ b/block/partitions/core.c=0A=
-> @@ -261,6 +261,7 @@ static void part_release(struct device *dev)=0A=
->  {=0A=
->  	if (MAJOR(dev->devt) =3D=3D BLOCK_EXT_MAJOR)=0A=
->  		blk_free_ext_minor(MINOR(dev->devt));=0A=
-> +	put_disk(dev_to_bdev(dev)->bd_disk);=0A=
->  	bdput(dev_to_bdev(dev));=0A=
->  }=0A=
->  =0A=
-> @@ -364,6 +365,9 @@ static struct block_device *add_partition(struct gend=
-isk *disk, int partno,=0A=
->  	pdev->type =3D &part_type;=0A=
->  	pdev->parent =3D ddev;=0A=
->  =0A=
-> +	/* ensure we always have a reference to the whole disk */=0A=
-> +	get_device(disk_to_dev(disk));=0A=
-> +=0A=
->  	/* in consecutive minor range? */=0A=
->  	if (bdev->bd_partno < disk->minors) {=0A=
->  		devt =3D MKDEV(disk->major, disk->first_minor + bdev->bd_partno);=0A=
-> diff --git a/fs/block_dev.c b/fs/block_dev.c=0A=
-> index 932f4034ad66..4a6c8c0a3bc9 100644=0A=
-> --- a/fs/block_dev.c=0A=
-> +++ b/fs/block_dev.c=0A=
-> @@ -921,16 +921,6 @@ void bdev_add(struct block_device *bdev, dev_t dev)=
-=0A=
->  	insert_inode_hash(bdev->bd_inode);=0A=
->  }=0A=
->  =0A=
-> -static struct block_device *bdget(dev_t dev)=0A=
-> -{=0A=
-> -	struct inode *inode;=0A=
-> -=0A=
-> -	inode =3D ilookup(blockdev_superblock, dev);=0A=
-> -	if (!inode)=0A=
-> -		return NULL;=0A=
-> -	return &BDEV_I(inode)->bdev;=0A=
-> -}=0A=
-> -=0A=
->  /**=0A=
->   * bdgrab -- Grab a reference to an already referenced block device=0A=
->   * @bdev:	Block device to grab a reference to.=0A=
-> @@ -1282,16 +1272,14 @@ static void blkdev_put_whole(struct block_device =
-*bdev, fmode_t mode)=0A=
->  static int blkdev_get_part(struct block_device *part, fmode_t mode)=0A=
->  {=0A=
->  	struct gendisk *disk =3D part->bd_disk;=0A=
-> -	struct block_device *whole;=0A=
->  	int ret;=0A=
->  =0A=
->  	if (part->bd_openers)=0A=
->  		goto done;=0A=
->  =0A=
-> -	whole =3D bdgrab(disk->part0);=0A=
-> -	ret =3D blkdev_get_whole(whole, mode);=0A=
-> +	ret =3D blkdev_get_whole(bdev_whole(part), mode);=0A=
->  	if (ret)=0A=
-> -		goto out_put_whole;=0A=
-> +		return ret;=0A=
->  =0A=
->  	ret =3D -ENXIO;=0A=
->  	if (!bdev_nr_sectors(part))=0A=
-> @@ -1306,9 +1294,7 @@ static int blkdev_get_part(struct block_device *par=
-t, fmode_t mode)=0A=
->  	return 0;=0A=
->  =0A=
->  out_blkdev_put:=0A=
-> -	blkdev_put_whole(whole, mode);=0A=
-> -out_put_whole:=0A=
-> -	bdput(whole);=0A=
-> +	blkdev_put_whole(bdev_whole(part), mode);=0A=
->  	return ret;=0A=
->  }=0A=
->  =0A=
-> @@ -1321,42 +1307,42 @@ static void blkdev_put_part(struct block_device *=
-part, fmode_t mode)=0A=
->  	blkdev_flush_mapping(part);=0A=
->  	whole->bd_disk->open_partitions--;=0A=
->  	blkdev_put_whole(whole, mode);=0A=
-> -	bdput(whole);=0A=
->  }=0A=
->  =0A=
->  struct block_device *blkdev_get_no_open(dev_t dev)=0A=
->  {=0A=
->  	struct block_device *bdev;=0A=
-> -	struct gendisk *disk;=0A=
-> +	struct inode *inode;=0A=
->  =0A=
-> -	bdev =3D bdget(dev);=0A=
-> -	if (!bdev) {=0A=
-> +	inode =3D ilookup(blockdev_superblock, dev);=0A=
-> +	if (!inode) {=0A=
->  		blk_request_module(dev);=0A=
-> -		bdev =3D bdget(dev);=0A=
-> -		if (!bdev)=0A=
-> +		inode =3D ilookup(blockdev_superblock, dev);=0A=
-> +		if (!inode)=0A=
->  			return NULL;=0A=
->  	}=0A=
->  =0A=
-> -	disk =3D bdev->bd_disk;=0A=
-> -	if (!kobject_get_unless_zero(&disk_to_dev(disk)->kobj))=0A=
-> -		goto bdput;=0A=
-> -	if (disk->flags & GENHD_FL_HIDDEN)=0A=
-> -		goto put_disk;=0A=
-> -	if (!try_module_get(bdev->bd_disk->fops->owner))=0A=
-> -		goto put_disk;=0A=
-> +	/* switch from the inode reference to a device mode one: */=0A=
-> +	bdev =3D &BDEV_I(inode)->bdev;=0A=
-> +	if (!kobject_get_unless_zero(&bdev->bd_device.kobj))=0A=
-> +		bdev =3D NULL;=0A=
-> +	iput(inode);=0A=
-> +=0A=
-> +	if (!bdev)=0A=
-> +		return NULL;=0A=
-> +	if ((bdev->bd_disk->flags & GENHD_FL_HIDDEN) ||=0A=
-> +	    !try_module_get(bdev->bd_disk->fops->owner)) {=0A=
-> +		put_device(&bdev->bd_device);=0A=
-> +		return NULL;=0A=
-> +	}=0A=
-> +=0A=
->  	return bdev;=0A=
-> -put_disk:=0A=
-> -	put_disk(disk);=0A=
-> -bdput:=0A=
-> -	bdput(bdev);=0A=
-> -	return NULL;=0A=
->  }=0A=
->  =0A=
->  void blkdev_put_no_open(struct block_device *bdev)=0A=
->  {=0A=
->  	module_put(bdev->bd_disk->fops->owner);=0A=
-> -	put_disk(bdev->bd_disk);=0A=
-> -	bdput(bdev);=0A=
-> +	put_device(&bdev->bd_device);=0A=
->  }=0A=
->  =0A=
->  /**=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On 7/26/21 3:38 AM, Damien Le Moal wrote:
+> The Concurrent Positioning Ranges VPD page (for SCSI) and Log (for ATA)
+> contain parameters describing the number of sets of contiguous LBAs that
+> can be served independently by a single LUN multi-actuator disk. This
+> patch provides the blk_queue_set_cranges() function allowing a device
+> driver to signal to the block layer that a disk has multiple actuators,
+> each one serving a contiguous range of sectors. To describe the set
+> of sector ranges representing the different actuators of a device, the
+> data type struct blk_cranges is introduced.
+> 
+> For a device with multiple actuators, a struct blk_cranges is attached
+> to the device request queue by the blk_queue_set_cranges() function. The
+> function blk_alloc_cranges() is provided for drivers to allocate this
+> structure.
+> 
+> The blk_cranges structure contains kobjects (struct kobject) to register
+> with sysfs the set of sector ranges defined by a device. On initial
+> device scan, this registration is done from blk_register_queue() using
+> the block layer internal function blk_register_cranges(). If a driver
+> calls blk_queue_set_cranges() for a registered queue, e.g. when a device
+> is revalidated, blk_queue_set_cranges() will execute
+> blk_register_cranges() to update the queue sysfs attribute files.
+> 
+> The sysfs file structure created starts from the cranges sub-directory
+> and contains the start sector and number of sectors served by an
+> actuator, with the information for each actuator grouped in one
+> directory per actuator. E.g. for a dual actuator drive, we have:
+> 
+> $ tree /sys/block/sdk/queue/cranges/
+> /sys/block/sdk/queue/cranges/
+> |-- 0
+> |   |-- nr_sectors
+> |   `-- sector
+> `-- 1
+>      |-- nr_sectors
+>      `-- sector
+> 
+> For a regular single actuator device, the cranges directory does not
+> exist.
+> 
+> Device revalidation may lead to changes to this structure and to the
+> attribute values. When manipulated, the queue sysfs_lock and
+> sysfs_dir_lock are held for atomicity, similarly to how the blk-mq and
+> elevator sysfs queue sub-directories are protected.
+> 
+> The code related to the management of cranges is added in the new
+> file block/blk-cranges.c.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> ---
+>   block/Makefile         |   2 +-
+>   block/blk-cranges.c    | 295 +++++++++++++++++++++++++++++++++++++++++
+>   block/blk-sysfs.c      |  13 ++
+>   block/blk.h            |   3 +
+>   include/linux/blkdev.h |  29 ++++
+>   5 files changed, 341 insertions(+), 1 deletion(-)
+>   create mode 100644 block/blk-cranges.c
+> 
+> diff --git a/block/Makefile b/block/Makefile
+> index bfbe4e13ca1e..e477e6ca9ea6 100644
+> --- a/block/Makefile
+> +++ b/block/Makefile
+> @@ -9,7 +9,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-sysfs.o \
+>   			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
+>   			blk-mq-sysfs.o blk-mq-cpumap.o blk-mq-sched.o ioctl.o \
+>   			genhd.o ioprio.o badblocks.o partitions/ blk-rq-qos.o \
+> -			disk-events.o
+> +			disk-events.o blk-cranges.o
+>   
+>   obj-$(CONFIG_BOUNCE)		+= bounce.o
+>   obj-$(CONFIG_BLK_SCSI_REQUEST)	+= scsi_ioctl.o
+> diff --git a/block/blk-cranges.c b/block/blk-cranges.c
+> new file mode 100644
+> index 000000000000..deaa09e564f7
+> --- /dev/null
+> +++ b/block/blk-cranges.c
+> @@ -0,0 +1,295 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + *  Block device concurrent positioning ranges.
+> + *
+> + *  Copyright (C) 2021 Western Digital Corporation or its Affiliates.
+> + */
+> +#include <linux/kernel.h>
+> +#include <linux/blkdev.h>
+> +#include <linux/slab.h>
+> +#include <linux/init.h>
+> +
+> +#include "blk.h"
+> +
+> +static ssize_t blk_crange_sector_show(struct blk_crange *cr, char *page)
+> +{
+> +	return sprintf(page, "%llu\n", cr->sector);
+> +}
+> +
+> +static ssize_t blk_crange_nr_sectors_show(struct blk_crange *cr, char *page)
+> +{
+> +	return sprintf(page, "%llu\n", cr->nr_sectors);
+> +}
+> +
+> +struct blk_crange_sysfs_entry {
+> +	struct attribute attr;
+> +	ssize_t (*show)(struct blk_crange *cr, char *page);
+> +};
+> +
+> +static struct blk_crange_sysfs_entry blk_crange_sector_entry = {
+> +	.attr = { .name = "sector", .mode = 0444 },
+> +	.show = blk_crange_sector_show,
+> +};
+> +
+> +static struct blk_crange_sysfs_entry blk_crange_nr_sectors_entry = {
+> +	.attr = { .name = "nr_sectors", .mode = 0444 },
+> +	.show = blk_crange_nr_sectors_show,
+> +};
+> +
+> +static struct attribute *blk_crange_attrs[] = {
+> +	&blk_crange_sector_entry.attr,
+> +	&blk_crange_nr_sectors_entry.attr,
+> +	NULL,
+> +};
+> +ATTRIBUTE_GROUPS(blk_crange);
+> +
+> +static ssize_t blk_crange_sysfs_show(struct kobject *kobj,
+> +				     struct attribute *attr, char *page)
+> +{
+> +	struct blk_crange_sysfs_entry *entry;
+> +	struct blk_crange *cr;
+> +	struct request_queue *q;
+> +	ssize_t ret;
+> +
+> +	entry = container_of(attr, struct blk_crange_sysfs_entry, attr);
+> +	cr = container_of(kobj, struct blk_crange, kobj);
+> +	q = cr->queue;
+> +
+> +	mutex_lock(&q->sysfs_lock);
+> +	ret = entry->show(cr, page);
+> +	mutex_unlock(&q->sysfs_lock);
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct sysfs_ops blk_crange_sysfs_ops = {
+> +	.show	= blk_crange_sysfs_show,
+> +};
+> +
+> +/*
+> + * Dummy release function to make kobj happy.
+> + */
+> +static void blk_cranges_sysfs_nop_release(struct kobject *kobj)
+> +{
+> +}
+> +
+> +static struct kobj_type blk_crange_ktype = {
+> +	.sysfs_ops	= &blk_crange_sysfs_ops,
+> +	.default_groups	= blk_crange_groups,
+> +	.release	= blk_cranges_sysfs_nop_release,
+> +};
+> +
+> +static struct kobj_type blk_cranges_ktype = {
+> +	.release	= blk_cranges_sysfs_nop_release,
+> +};
+> +
+> +/**
+> + * blk_register_cranges - register with sysfs a set of concurrent ranges
+> + * @disk:		Target disk
+> + * @new_cranges:	New set of concurrent ranges
+> + *
+> + * Register with sysfs a set of concurrent ranges for @disk. If @new_cranges
+> + * is not NULL, this set of concurrent ranges is registered and the
+> + * old set specified by q->cranges is unregistered. Otherwise, q->cranges
+> + * is registered if it is not already.
+> + */
+> +int blk_register_cranges(struct gendisk *disk, struct blk_cranges *new_cranges)
+> +{
+> +	struct request_queue *q = disk->queue;
+> +	struct blk_cranges *cranges;
+> +	int i, ret;
+> +
+> +	lockdep_assert_held(&q->sysfs_dir_lock);
+> +	lockdep_assert_held(&q->sysfs_lock);
+> +
+> +	/* If a new range set is specified, unregister the old one */
+> +	if (new_cranges) {
+> +		if (q->cranges)
+> +			blk_unregister_cranges(disk);
+> +		q->cranges = new_cranges;
+> +	}
+> +
+> +	cranges = q->cranges;
+> +	if (!cranges)
+> +		return 0;
+> +
+> +	/*
+> +	 * At this point, q->cranges is the new set of sector ranges that needs
+> +	 * to be registered with sysfs.
+> +	 */
+> +	WARN_ON(cranges->sysfs_registered);
+> +	ret = kobject_init_and_add(&cranges->kobj, &blk_cranges_ktype,
+> +				   &q->kobj, "%s", "cranges");
+> +	if (ret)
+> +		goto free;
+> +
+> +	for (i = 0; i < cranges->nr_ranges; i++) {
+> +		cranges->ranges[i].queue = q;
+> +		ret = kobject_init_and_add(&cranges->ranges[i].kobj,
+> +					   &blk_crange_ktype, &cranges->kobj,
+> +					   "%d", i);
+> +		if (ret)
+> +			goto delete_obj;
+> +	}
+> +
+> +	cranges->sysfs_registered = true;
+> +
+> +	return 0;
+> +
+> +delete_obj:
+> +	while (--i >= 0)
+> +		kobject_del(&cranges->ranges[i].kobj);
+> +	kobject_del(&cranges->kobj);
+> +free:
+> +	kfree(cranges);
+> +	q->cranges = NULL;
+> +	return ret;
+> +}
+> +
+> +void blk_unregister_cranges(struct gendisk *disk)
+> +{
+> +	struct request_queue *q = disk->queue;
+> +	struct blk_cranges *cranges = q->cranges;
+> +	int i;
+> +
+> +	lockdep_assert_held(&q->sysfs_dir_lock);
+> +	lockdep_assert_held(&q->sysfs_lock);
+> +
+> +	if (!cranges)
+> +		return;
+> +
+> +	if (cranges->sysfs_registered) {
+> +		for (i = 0; i < cranges->nr_ranges; i++)
+> +			kobject_del(&cranges->ranges[i].kobj);
+> +		kobject_del(&cranges->kobj);
+> +	}
+> +
+> +	kfree(cranges);
+> +	q->cranges = NULL;
+> +}
+> +
+> +static bool blk_check_ranges(struct gendisk *disk, struct blk_cranges *cr)
+> +{
+> +	sector_t capacity = get_capacity(disk);
+> +	sector_t min_sector = (sector_t)-1;
+> +	sector_t max_sector = 0;
+> +	int i;
+> +
+> +	/*
+> +	 * Sector ranges may overlap but should overall contain all sectors
+> +	 * within the disk capacity.
+> +	 */
+> +	for (i = 0; i < cr->nr_ranges; i++) {
+> +		min_sector = min(min_sector, cr->ranges[i].sector);
+> +		max_sector = max(max_sector, cr->ranges[i].sector +
+> +					     cr->ranges[i].nr_sectors);
+> +	}
+> +
+> +	if (min_sector != 0 || max_sector < capacity) {
+> +		pr_warn("Invalid concurrent ranges: missing sectors\n");
+> +		return false;
+> +	}
+> +
+> +	if (max_sector > capacity) {
+> +		pr_warn("Invalid concurrent ranges: beyond capacity\n");
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static bool blk_cranges_changed(struct gendisk *disk, struct blk_cranges *new)
+> +{
+> +	struct blk_cranges *old = disk->queue->cranges;
+> +	int i;
+> +
+> +	if (!old)
+> +		return true;
+> +
+> +	if (old->nr_ranges != new->nr_ranges)
+> +		return true;
+> +
+> +	for (i = 0; i < old->nr_ranges; i++) {
+> +		if (new->ranges[i].sector != old->ranges[i].sector ||
+> +		    new->ranges[i].nr_sectors != old->ranges[i].nr_sectors)
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +/**
+> + * blk_alloc_cranges - Allocate a concurrent positioning range structure
+> + * @disk:	target disk
+> + * @nr_ranges:	Number of concurrent ranges
+> + *
+> + * Allocate a struct blk_cranges structure with @nr_ranges range descriptors.
+> + */
+> +struct blk_cranges *blk_alloc_cranges(struct gendisk *disk, int nr_ranges)
+> +{
+> +	struct blk_cranges *cr;
+> +
+> +	cr = kzalloc_node(struct_size(cr, ranges, nr_ranges), GFP_KERNEL,
+> +			  disk->queue->node);
+> +	if (cr)
+> +		cr->nr_ranges = nr_ranges;
+> +	return cr;
+> +}
+> +EXPORT_SYMBOL_GPL(blk_alloc_cranges);
+> +
+> +/**
+> + * blk_queue_set_cranges - Set a disk concurrent positioning ranges
+> + * @disk:	target disk
+> + * @cr:		concurrent ranges structure
+> + *
+> + * Set the concurrant positioning ranges information of the request queue
+> + * of @disk to @cr. If @cr is NULL and the concurrent ranges structure
+> + * already set, if any, is cleared. If there are no differences between
+> + * @cr and the concurrent ranges structure already set, @cr is freed.
+> + */
+> +void blk_queue_set_cranges(struct gendisk *disk, struct blk_cranges *cr)
+> +{
+> +	struct request_queue *q = disk->queue;
+> +
+> +	if (WARN_ON_ONCE(cr && !cr->nr_ranges)) {
+> +		kfree(cr);
+> +		cr = NULL;
+> +	}
+> +
+> +	mutex_lock(&q->sysfs_dir_lock);
+> +	mutex_lock(&q->sysfs_lock);
+> +
+> +	if (cr) {
+> +		if (!blk_check_ranges(disk, cr)) {
+> +			kfree(cr);
+> +			cr = NULL;
+> +			goto reg;
+> +		}
+> +
+> +		if (!blk_cranges_changed(disk, cr)) {
+> +			kfree(cr);
+> +			goto unlock;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * This may be called for a registered queue. E.g. during a device
+> +	 * revalidation. If that is the case, we need to unregister the old
+> +	 * set of concurrent ranges and register the new set. If the queue
+> +	 * is not registered, the device request queue registration will
+> +	 * register the ranges, so only swap in the new set and free the
+> +	 * old one.
+> +	 */
+> +reg:
+> +	if (blk_queue_registered(q)) {
+> +		blk_register_cranges(disk, cr);
+> +	} else {
+> +		swap(q->cranges, cr);
+> +		kfree(cr);
+> +	}
+> +
+> +unlock:
+> +	mutex_unlock(&q->sysfs_lock);
+> +	mutex_unlock(&q->sysfs_dir_lock);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_queue_set_cranges);
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 370d83c18057..aeac98ecc5a0 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -899,9 +899,21 @@ int blk_register_queue(struct gendisk *disk)
+>   	}
+>   
+>   	mutex_lock(&q->sysfs_lock);
+> +
+> +	ret = blk_register_cranges(disk, NULL);
+> +	if (ret) {
+> +		mutex_unlock(&q->sysfs_lock);
+> +		mutex_unlock(&q->sysfs_dir_lock);
+> +		kobject_del(&q->kobj);
+> +		blk_trace_remove_sysfs(dev);
+> +		kobject_put(&dev->kobj);
+> +		return ret;
+> +	}
+> +
+>   	if (q->elevator) {
+>   		ret = elv_register_queue(q, false);
+>   		if (ret) {
+> +			blk_unregister_cranges(disk);
+>   			mutex_unlock(&q->sysfs_lock);
+>   			mutex_unlock(&q->sysfs_dir_lock);
+>   			kobject_del(&q->kobj);
+> @@ -985,6 +997,7 @@ void blk_unregister_queue(struct gendisk *disk)
+>   	mutex_lock(&q->sysfs_lock);
+>   	if (q->elevator)
+>   		elv_unregister_queue(q);
+> +	blk_unregister_cranges(disk);
+>   	mutex_unlock(&q->sysfs_lock);
+>   	mutex_unlock(&q->sysfs_dir_lock);
+>   
+> diff --git a/block/blk.h b/block/blk.h
+> index 4b885c0f6708..650c0d87987c 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -368,4 +368,7 @@ extern struct device_attribute dev_attr_events;
+>   extern struct device_attribute dev_attr_events_async;
+>   extern struct device_attribute dev_attr_events_poll_msecs;
+>   
+> +int blk_register_cranges(struct gendisk *disk, struct blk_cranges *new_cranges);
+> +void blk_unregister_cranges(struct gendisk *disk);
+> +
+>   #endif /* BLK_INTERNAL_H */
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index d3afea47ade6..d10352674d20 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -378,6 +378,29 @@ static inline int blkdev_zone_mgmt_ioctl(struct block_device *bdev,
+>   
+>   #endif /* CONFIG_BLK_DEV_ZONED */
+>   
+> +/*
+> + * Concurrent sector ranges: struct blk_crange describes range of
+> + * contiguous sectors that can be served by independent resources on the
+> + * device. The set of ranges defined in struct blk_cranges must overall
+> + * include all sectors within the device capacity.
+> + * For a device with multiple ranges, e.g. a single LUN multi-actuator HDD,
+> + * requests targeting sectors in different ranges can be executed in parallel.
+> + * A request can straddle a range boundary.
+> + */
+> +struct blk_crange {
+> +	struct kobject		kobj;
+> +	struct request_queue	*queue;
+> +	sector_t		sector;
+> +	sector_t		nr_sectors;
+> +};
+> +
+> +struct blk_cranges {
+> +	struct kobject		kobj;
+> +	bool			sysfs_registered;
+> +	unsigned int		nr_ranges;
+> +	struct blk_crange	ranges[];
+> +};
+> +
+>   struct request_queue {
+>   	struct request		*last_merge;
+>   	struct elevator_queue	*elevator;
+> @@ -570,6 +593,9 @@ struct request_queue {
+>   
+>   #define BLK_MAX_WRITE_HINTS	5
+>   	u64			write_hints[BLK_MAX_WRITE_HINTS];
+> +
+> +	/* Concurrent sector ranges */
+> +	struct blk_cranges	*cranges;
+>   };
+>   
+>   /* Keep blk_queue_flag_name[] in sync with the definitions below */
+> @@ -1163,6 +1189,9 @@ extern void blk_queue_required_elevator_features(struct request_queue *q,
+>   extern bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
+>   					      struct device *dev);
+>   
+> +struct blk_cranges *blk_alloc_cranges(struct gendisk *disk, int nr_ranges);
+> +void blk_queue_set_cranges(struct gendisk *disk, struct blk_cranges *cr);
+> +
+>   /*
+>    * Number of physical segments as sent to the device.
+>    *
+> 
+In principle it looks good, but what would be the appropriate action 
+when invalid ranges are being detected during revalidation?
+The current code will leave the original ones intact, but I guess that's 
+questionable as the current settings are most likely invalid.
+I would vote for de-register the old ones and implement an error state 
+(using an error pointer?); that would signal that there _are_ ranges, 
+but we couldn't parse them properly.
+Hmm?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
