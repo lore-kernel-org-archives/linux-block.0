@@ -8,50 +8,50 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC81C4320A
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14375C43214
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 506C4603E9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 014CD60FBF
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233133AbhG0VBG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S233583AbhG0VBG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 27 Jul 2021 17:01:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54054 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231432AbhG0U7H (ORCPT
+        with ESMTP id S232506AbhG0U7H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 27 Jul 2021 16:59:07 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E59DC0613C1
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:07 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id l19so1888114pjz.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:07 -0700 (PDT)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5C0C061760
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:06 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id n10so7820plf.4
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2339k4b0c5OWODNkIvToUoNb0tla173APtop2g87yK0=;
-        b=iEi8m5VvnHSI7PFGMBkWP99DR9/hasEmGaHMmQ/hAQvXWolvYn1ZqWUISR9yx86HKe
-         271G4W/Ncz7bw1+gj01x3c+6WGGDOH9Vwl/Z+aiHCXNR+A9GI+MIw4zbZztpHvcFA5pK
-         3bJY25UolqjG5yrPadDsyTKAutRNBCjMgVGtE=
+        bh=uPW4aGYkFWagrfBZ6kQLS1fLAo/l3YI0HfE68pjP/OM=;
+        b=UXpVpHuoBEvfkIVMmS2/VMwQ3bCV5jrK0wfMve0yrY4hayGeG4jDKjgxlRt2It30Iz
+         S44+j1gZxTlkm8YvMSPchxSLtEdSeKLytFhP5KNfmjNxQ6L+nnA6VIeYdnOhHvYqTGNE
+         2lfrw5gKAB7i6UPypwEWQs0LaSLesvD8FyEig=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2339k4b0c5OWODNkIvToUoNb0tla173APtop2g87yK0=;
-        b=QLePQjx32fQiQp9kkdGYAOoAFnv3ccsriFGnqBMBx5Lz+dSq7dGw8iLCLHyNjEeeVm
-         zBY3xlyuxwLXz+iP/frN+KFI4MLQc1YQSy0ujPH8YRn7+BywmA9okKDyq1RXJ+kyiunk
-         nfBTcFFOvzzK388qojtmwFG8hmbGWVKNUfVMzAM2L/nIcBobtr2pXJguaUNFOV3iKVbG
-         jgstosfXcO+/+sgvWPMTOGIiy9VVFLQw2fBpinUtAvqWJ+dtCSu6TubBx90sphVYBPMz
-         SEeHGN43AHzs73unPOjnsqCtqQ85kZMcsttDvUKmkD83IK9CqMq/vke0iQeIIirfZuCG
-         xFQA==
-X-Gm-Message-State: AOAM5304v6OacE1Mfo6h94i2v8y0DEa30+Vt6ug3T4PsWP+WxgPdu7Cw
-        Qjntfj193lAci48gCt9c5JDdOw==
-X-Google-Smtp-Source: ABdhPJyJWxUGA3LrJs4BG51/vLWpJYAHbkWL9HNsMr9tG1fy6upd+bj3BEBNQksVHaNDSvFaiNMgng==
-X-Received: by 2002:a63:5610:: with SMTP id k16mr25193869pgb.439.1627419546981;
+        bh=uPW4aGYkFWagrfBZ6kQLS1fLAo/l3YI0HfE68pjP/OM=;
+        b=TMBrJ4nUCqrIp8UPCzAwIXLH0atReCuCYHw9X83YTJ4fVBkIEkY4b9dC+jdU9dwcqE
+         I8nGcGm3h+XGHuJwPNRR3ufxKyRZhgmGOn3rsCvi2ocYZTpINvUhYFtiXuDvNMQeQUrA
+         znyiTg9d5cu9GINxSonxRzW/o411VtIh1QVfgO79K8FHQexbGRxxvYpY2yzPkeBsRMtL
+         CdlWNMcFqrZJuwfrZZs48ZnKFXEsau08Dyy/JwvYcezQyXyz5X5RQPd9HAgfjXl877Vq
+         XYUo5HPEPuo8Iv1PSdhZyNzYot+9Wc9QD87Dml/lNDGx5w/+xxln4xRJvpPBDmTGE/au
+         Cg/w==
+X-Gm-Message-State: AOAM5327LVvciSKH3MrdN5as6qPQZ6UP7VQ8uYd5Cv2paHkohRLjdwNI
+        Uvq4LZbuoemuTqa2iqRNWoQPEQ==
+X-Google-Smtp-Source: ABdhPJxd0+AjNRPUswTM0GF/7R6M9ezJro8mUT8qaHqrKFrbmFwcqlTxjNrGQJxkBIVrT0fiUY7kSg==
+X-Received: by 2002:a17:902:7001:b029:12c:4e36:52c5 with SMTP id y1-20020a1709027001b029012c4e3652c5mr2732432plk.9.1627419546233;
         Tue, 27 Jul 2021 13:59:06 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id j20sm4672710pfc.203.2021.07.27.13.59.03
+        by smtp.gmail.com with ESMTPSA id v5sm5184284pgi.74.2021.07.27.13.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 06/64] bnxt_en: Use struct_group_attr() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:57:57 -0700
-Message-Id: <20210727205855.411487-7-keescook@chromium.org>
+Subject: [PATCH 09/64] staging: rtl8723bs: Avoid field-overflowing memcpy()
+Date:   Tue, 27 Jul 2021 13:58:00 -0700
+Message-Id: <20210727205855.411487-10-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2358; h=from:subject; bh=urnr1c0HuSr0zcemksTCEth1t70QAfbHaEcP+c1mXUA=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOBqioJQ+1gy1GQQan/jf7RJ1/WXH5A0qXVd7xV vq5+5hOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJiWREA CNm4WJeCn47J5obmfhInAVhQHs+WaRodzYXqYlwhYZwqztfgNWLmnuTFB7WixSIet+ogzFMJ1r7fzU QnWXAsLuJ3BX98gUGzvKpmV42J3D2bYmtlrZs7Eyhzqsf8YU/1DgzM/cyzoMB1MkY7QVnFyA9ECldc n4XuqAu3QiaIe+5lzEXU3cW0wy5VDaO3U89VhsX3c6FWjMhQ0FF71U5yZVlZ7s8QMcwjgGQ/rSZ5HS tHMaYMmuprGsc0WRWDxssLMce4AZIdKRwnQBGxYX56oM9u/26JaL77KjZeahVv+n4nC+KkXfWFoSls jO+qT1zevLJBtQfWAqBgbtl6mxUkW3D/0aBPlL7o63ss885dcW9pWjj8sVkqG2AOPVUcl+mMOp+VQm 5qmqUeZbnxJVtXjSRXpvzpBMjNj47QiFJaRRu++FQ9+TJ9TwFws9C31mCXsNjIBK/xzNCc0OuY/J2T Fuuz5AL5SsvRzztZGGQvpjWG2xGgfilhJucEqfeyaJrFQIvjGMIAVFYzMGX4dwwIpBMhxVU4spof3f TLNENoSRR30/sOaQWASgjwj8RqwZ3WioWr4/ALRyqYdHD8j5usq3wgrSpYlAC1AQpefx1uLVDOyes3 1j+4vL+JqxKC93LWdqu/2gVD/VBJnBjDTcrSW3GQTmYSKuzKxca2WKziYSew==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1200; h=from:subject; bh=W255D43HxOgsOipc15Ftl/Z16nQ7WLNF6zRAweGW0nw=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOC1QFEAUDqn9/LsmpdJgx+v9gsLtlsJdMUyKBG b+56mhyJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzggAKCRCJcvTf3G3AJltAEA CFqUNvIguNTsoQJJxTpZmXIFSznOd0DQbsxxZjiiSI+Uy5K/rxgo0fi7YbevEnqZLbfvmzTrflUtnP vrxikp6Nm3oUKk87MfWKm55/Rb4UNEtRFkq6lpU13Pff2ZKiGagsWulzzRcChGxOWGJLkQgutmZo19 4lL+NXsl53eQK+fKsQUzoeZnXWEXR6fi9Prc46Jpll0wb0XU9OCffbFczCNAJ2TFktSN97z0OLhGOj bKetL0pmjEsXBBLKFBsoi6qrkGdaWIt+UYNqj6GyUTxl9aSKASroGp7CnPxFzGw8860bLtdeVytJpH M6VWwhSrRFnJ9E/kNVoT3886OMGv2hE1L1SgpE4EDWKKIk8OhjNP+fc2jAdhvOv3toFl4XiMe5rVbd XdqTBfQvqWFw1vAelUGVpKbstixGrSv0cEqG97X0qoVoqij+34qbecwOpBc2j8/gQp9d6gdqWiC7QO HVaCe91yWXyU7FvAW8qYQnHiPqborIACdGPPaCnRpJozv/LSuBdXrN/zfRcuHrOFb+yI1mNplJICgl WgxTNn036UBtlbh0Wb2bxTvaLshJR8pghfrGo4l7FN0LRxsxCkn4g9ZFd/8BPya8EYm72GRg/jZPRV IgZEiVdWLN8MdZlNcQ/Udi70s66J8qKfCm/KsWRSEfFjdnJHu0Fgu1w04aGQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -83,64 +83,29 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memcpy(), memmove(), and memset(), avoid
 intentionally writing across neighboring fields.
 
-Use struct_group() around members queue_id, min_bw, max_bw, tsa, pri_lvl,
-and bw_weight so they can be referenced together. This will allow memcpy()
-and sizeof() to more easily reason about sizes, improve readability,
-and avoid future warnings about writing beyond the end of queue_id.
+Adjust memcpy() destination to be the named structure itself, rather than
+the first member, allowing memcpy() to correctly reason about the size.
 
-"pahole" shows no size nor member offset changes to struct bnxt_cos2bw_cfg.
-"objdump -d" shows no meaningful object code changes (i.e. only source
-line number induced differences and optimizations).
+"objdump -d" shows no object code changes.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h | 14 ++++++++------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ drivers/staging/rtl8723bs/core/rtw_mlme.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-index 8a68df4d9e59..95c636f89329 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-@@ -148,10 +148,10 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
+diff --git a/drivers/staging/rtl8723bs/core/rtw_mlme.c b/drivers/staging/rtl8723bs/core/rtw_mlme.c
+index a0c19253095d..fbd6e3d16323 100644
+--- a/drivers/staging/rtl8723bs/core/rtw_mlme.c
++++ b/drivers/staging/rtl8723bs/core/rtw_mlme.c
+@@ -2390,7 +2390,7 @@ unsigned int rtw_restructure_ht_ie(struct adapter *padapter, u8 *in_ie, u8 *out_
  	}
  
- 	data = &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, queue_id);
--	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw) - 4) {
-+	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw.cfg)) {
- 		int tc;
+ 	/* fill default supported_mcs_set */
+-	memcpy(ht_capie.mcs.rx_mask, pmlmeext->default_supported_mcs_set, 16);
++	memcpy(&ht_capie.mcs, pmlmeext->default_supported_mcs_set, 16);
  
--		memcpy(&cos2bw.queue_id, data, sizeof(cos2bw) - 4);
-+		memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
- 		if (i == 0)
- 			cos2bw.queue_id = resp->queue_id0;
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-index 6eed231de565..716742522161 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-@@ -23,13 +23,15 @@ struct bnxt_dcb {
- 
- struct bnxt_cos2bw_cfg {
- 	u8			pad[3];
--	u8			queue_id;
--	__le32			min_bw;
--	__le32			max_bw;
-+	struct_group_attr(cfg, __packed,
-+		u8		queue_id;
-+		__le32		min_bw;
-+		__le32		max_bw;
- #define BW_VALUE_UNIT_PERCENT1_100		(0x1UL << 29)
--	u8			tsa;
--	u8			pri_lvl;
--	u8			bw_weight;
-+		u8		tsa;
-+		u8		pri_lvl;
-+		u8		bw_weight;
-+	);
- 	u8			unused;
- };
- 
+ 	/* update default supported_mcs_set */
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
 -- 
 2.30.2
 
