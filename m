@@ -2,108 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17767C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A733C4320A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:54:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC69960F9C
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:38:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 300F460FA0
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:54:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231417AbhG0UiV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:38:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49352 "EHLO
+        id S231608AbhG0Uyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:54:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231133AbhG0UiV (ORCPT
+        with ESMTP id S231516AbhG0Uyq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:38:21 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9275C061757
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:38:19 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id z4so4784687wrv.11
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:38:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=KPMi5h0wG6VmN+T30wtj1G7lchgByCQoOqYqjiw39eI=;
-        b=Hff9T2vJsztwyRZh4fWvE06Xfgk4KUguvUar59ZlSdCyyiNBS+r63aTSY/c8z9sGZj
-         v+sRktjjPf9pTrYFjX28EEutT2bKhGdOWYzmfBaP2STq+H0wAnoZSzDab+jvKPLmbFks
-         6c7/tjy9decpJZaA2zYLKsSveYNDsdf2nnTtJBDawqiIMA2rjPhSKFYwAR8smcv2K1nG
-         sU6BNWlPSlDD1L3TiE9TK6niStqpMgylEKaY7ePRKQ5cPIwAuG9mwWSaDVMuIm6zN5a/
-         j+OKiIcq6r9il8phqIkMhdAwTAYg0GqqK5qpVg47UL9E/Ktn//M+O4OkiV7aO8HIJrbg
-         EedQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KPMi5h0wG6VmN+T30wtj1G7lchgByCQoOqYqjiw39eI=;
-        b=TeigVCb6NNcSarPSKXkCukx+vbWaPgc1NprVh2vcQ1uo1kxknVBSTc4kiOkzRLOCQu
-         3SC2LBPnb2U9Hbu6zN/IZS/PeIrfT/TLCqGr6iL4c5SL1HdG46rA3KfizA7ESiVd0/TT
-         5jgMSmvYY9HKwYX1aG16IZ4vrKqAP554pBCDvbhsFfDLkJ+lB0GfVDewfUx1GN3GVlk9
-         2drDD8dH2n5jhTygdvoEnv9jFBAyTl59VIVhixzAG6ZTFvyGfNJ5YAbZhNo6nDFNqkw7
-         ZXqJq9yyzfAsxQSymLXQuBk7d7oJRN1hdaZg41O95lGxOKqISIQB01sIoRjoMS+KIzzV
-         nfiw==
-X-Gm-Message-State: AOAM530NYQkIWGLBNUzGC1z/I6t7rOTJ1wvAi30pcAhYoutKAd0Ck+Bh
-        5GPzEluHWltipVlpNsgIqY5qJS9jm1U=
-X-Google-Smtp-Source: ABdhPJzULrhZk2lqdInoI6Mjx/u3ve6ShCM8qkTZhLAl61553LahecpEUl5/CyDMOvLjoxzh+TxJhA==
-X-Received: by 2002:a5d:64c2:: with SMTP id f2mr26218030wri.374.1627418298225;
-        Tue, 27 Jul 2021 13:38:18 -0700 (PDT)
-Received: from [192.168.2.27] (39.35.broadband4.iol.cz. [85.71.35.39])
-        by smtp.gmail.com with ESMTPSA id d67sm4223406wmd.9.2021.07.27.13.38.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jul 2021 13:38:17 -0700 (PDT)
-Subject: Re: [dm-devel] use regular gendisk registration in device mapper
-To:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-References: <20210725055458.29008-1-hch@lst.de> <YQAtNkd8T1w/cSLc@redhat.com>
- <20210727160226.GA17989@lst.de> <YQAxyjrGJpl7UkNG@redhat.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Message-ID: <9c719e1d-f8da-f1f3-57a9-3802aa1312d4@gmail.com>
-Date:   Tue, 27 Jul 2021 22:38:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Tue, 27 Jul 2021 16:54:46 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD19C061757;
+        Tue, 27 Jul 2021 13:54:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=MBrBM2hWSSFJKN0za7twq1O9odGp29rpAsJCQ0flnEg=; b=vbm6nTwMY9s5EUFtqtEUpQ/fdO
+        50MABQ301exgOgwuy15+9Q0GSyqRn0P9WyXq5dgm2UR5LQ9oawo84jeNCDARuh7gqA7/kIsfVwZ73
+        ZYkRar/zbKmHnkPbEEyxUFqcFfsDmyeBkLKnkz8ht4sVpncWYKo3NkdeUVxF0Fz2fUpoNpDnewUmt
+        ZaoB4iQDKLUkDBsTQ147poEW4F2OUO8D0QqX237/WXVQIGMPbEH1nx9r9T7x6Z7x8T65eC6kDN9a5
+        pwi+7X4ZTm0BP/7oQ4gXfpaAaQWl8gJ8z4VwJOMmcN94TpvWy6sUw/Ijrg/lf0b3lDG0ruSOvP9fY
+        BYWrgWAg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m8U5l-00GHkQ-28; Tue, 27 Jul 2021 20:54:21 +0000
+Date:   Tue, 27 Jul 2021 13:54:21 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Cc:     David Laight <David.Laight@aculab.com>,
+        "tj@kernel.org" <tj@kernel.org>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "ast@kernel.org" <ast@kernel.org>,
+        "andriin@fb.com" <andriin@fb.com>,
+        "daniel@iogearbox.net" <daniel@iogearbox.net>,
+        "atenart@kernel.org" <atenart@kernel.org>,
+        "alobakin@pm.me" <alobakin@pm.me>,
+        "weiwan@google.com" <weiwan@google.com>,
+        "ap420073@gmail.com" <ap420073@gmail.com>,
+        "jeyu@kernel.org" <jeyu@kernel.org>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
+        "sergey.senozhatsky.work@gmail.com" 
+        <sergey.senozhatsky.work@gmail.com>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "mbenes@suse.com" <mbenes@suse.com>,
+        "jpoimboe@redhat.com" <jpoimboe@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "jikos@kernel.org" <jikos@kernel.org>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] kernel/module: add documentation for try_module_get()
+Message-ID: <YQByfUaDaXCUqrlo@bombadil.infradead.org>
+References: <20210722221905.1718213-1-mcgrof@kernel.org>
+ <dbf27fa2f8864e1d91f7015249b1a5f1@AcuMS.aculab.com>
+ <YQBCvKgH481C7o1c@bombadil.infradead.org>
+ <YQBGemOIF4sp/ges@kroah.com>
+ <YQBN2/K4Ne5orgzS@bombadil.infradead.org>
+ <YQBSutZfhqfTzKQa@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <YQAxyjrGJpl7UkNG@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YQBSutZfhqfTzKQa@kroah.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/07/2021 18:18, Mike Snitzer wrote:
-> On Tue, Jul 27 2021 at 12:02P -0400,
-> Christoph Hellwig <hch@lst.de> wrote:
+On Tue, Jul 27, 2021 at 08:38:50PM +0200, gregkh@linuxfoundation.org wrote:
+> On Tue, Jul 27, 2021 at 11:18:03AM -0700, Luis Chamberlain wrote:
+> > On Tue, Jul 27, 2021 at 07:46:34PM +0200, gregkh@linuxfoundation.org wrote:
+> > > On Tue, Jul 27, 2021 at 10:30:36AM -0700, Luis Chamberlain wrote:
+> > > > On Sat, Jul 24, 2021 at 12:15:10PM +0000, David Laight wrote:
+> > > > > From: Luis Chamberlain
+> > > > > > Sent: 22 July 2021 23:19
+> > > > The sysfs store / read file operations are gauranteed to exist using
+> > > > kernfs's active reference (see kernfs_active()).
+> > > 
+> > > But that has nothing to do with module reference counts.  kernfs knows
+> > > nothing about modules.
+> > 
+> > Yes but we are talking about sysfs files which the module creates. So
+> > but inference again, an active reference protects a module.
 > 
->> On Tue, Jul 27, 2021 at 11:58:46AM -0400, Mike Snitzer wrote:
->>>> This did not make a different to my testing
->>>> using dmsetup and the lvm2 tools.
->>>
->>> I'll try these changes running through the lvm2 testsuite.
->>
->> Btw, is ther documentation on how to run it somewhere?  I noticed
->> tests, old-tests and unit-tests directories, but no obvious way
->> to run them.
-> 
-> I haven't tracked how it has changed in a while, but I always run:
-> make check_local
-> 
-> (but to do that you first need to ./configure how your distro does
-> it... so that all targets are enabled, etc. Then: make).
-> 
-> Will revisit this shortly and let you know if my process needed to
-> change at all due to lvm2 changes.
+> What active reference? 
 
-BTW it would be also nice to run cryptsetup testsuite as root - we do a lot
-of DM operations there (and we depend on sysfs on some places).
+kernfs_active()
 
-You can just run configure, make and then make check.
+> > > > In fact, this documentation patch was motivated by my own solution to a
+> > > > possible deadlock when sysfs is used. Using the same example above, if
+> > > > the same sysfs file uses *any* lock, which is *also* used on the exit
+> > > > routine, you can easily trigger a deadlock. This can happen for example
+> > > > by the lock being obtained by the removal routine, then the sysfs file
+> > > > gets called, waits for the lock to complete, then the module's exit
+> > > > routine starts cleaning up and removing sysfs files, but we won't be
+> > > > able to remove the sysfs file (due to kernefs active reference) until
+> > > > the sysfs file complets, but it cannot complete because the lock is
+> > > > already held.
+> > > > 
+> > > > Yes, this is a generic problem. Yes I have proof [0]. Yes, a generic
+> > > > solution has been proposed [1], and because Greg is not convinced and I
+> > > > need to move on with life, I am suggesting a temporary driver specific
+> > > > solution (to which Greg is still NACK'ing, without even proposing any
+> > > > alternatives) [2].
+> > > > 
+> > > > [0] https://lkml.kernel.org/r/20210703004632.621662-5-mcgrof@kernel.org
+> > > > [1] https://lkml.kernel.org/r/20210401235925.GR4332@42.do-not-panic.com 
+> > > > [2] https://lkml.kernel.org/r/20210723174919.ka3tzyre432uilf7@garbanzo
+> > > 
+> > > My problem with your proposed solution is that it is still racy, you can
+> > > not increment your own module reference count from 0 -> 1 and expect it
+> > > to work properly.  You need external code to do that somewhere.
+> > 
+> > You are not providing *any* proof for this.
+> 
+> I did provide proof of that.  Here it is again.
 
-Thanks,
-Milan
+<irrelevant example> 
+
+sysfs files are safe to use try_module_get() because once they are
+active a removal of the file cannot happen, and so removal will wait.
+
+> > And even so, I believe I have clarified as best as possible how a
+> > kernfs active reference implicitly protects the module when we are
+> > talking about sysfs files.
+> 
+> I do not see any link anywhere between kernfs and modules, what am I
+> missing?  Pointers to lines of code would be appreciated.
+
+I provided a selftests with error injections inserted all over
+kernfs_fop_write_iter(). Please study that and my error injection
+code.
+
+> > > Now trying to tie sysfs files to the modules that own them would be
+> > > nice, but as we have seen, that way lies way too many kernel changes,
+> > > right?
+> > 
+> > It's not a one-liner fix. Yes.
+> > 
+> > > Hm, maybe.  Did we think about this from the kobj_attribute level?  If
+> > > we use the "wrapper" logic there and the use of the macros we already
+> > > have for attributes, we might be able to get the module pointer directly
+> > > "for free".
+> > >
+> > > Did we try that?
+> > 
+> > That was my hope. I tried that first. Last year in November I determined
+> > kernfs is kobject stupid. But more importantly *neither* are struct device
+> > specific, so neither of them have semantics for modules or even devices.
+> 
+> But what about at the kobject level?
+
+kernfs is kobject stupid.
+
+> I will try to look at that this week, can't promise anything...
+
+  Luis
