@@ -2,62 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE9CC4338F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A333C4320E
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:20:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0EC6960F6E
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:19:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0957860F9C
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:20:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233612AbhG0VTY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:19:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233003AbhG0VQy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 17:16:54 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2600CC06179B
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:16:54 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id o44-20020a17090a0a2fb0290176ca3e5a2fso1132745pjo.1
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:16:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=HP4OyANmlGcmztFWqw/dgo2DQckUAHhybqKwZBENvis=;
-        b=LCA95eGQPuDryGp7EbL19tEBN1vZX/DV2Ru999TrrBIWyGTxCgkLiQwMnWVaK3dqpk
-         60QOsc5jmDPjJIsota7QsQXAPPxE36dJdfR+Ydl1pbfvgmM6HMxLTyilm0vGV2trPRqk
-         qPStf78RsWs4Jdx6SvJZesYZLDr/2M1lshLlo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=HP4OyANmlGcmztFWqw/dgo2DQckUAHhybqKwZBENvis=;
-        b=cFTTphE+i+syqGoeaDOHrNTsNMga3UxVJnzz7VE4x3EWRVO8AJURQ9aQ/n0LvedUEE
-         XBz1gTtGFjYbFR5Z+3F/b9hUGvQ7ce62dGq1ZhEcOVNnjkc2GJV87AP58dxSY5qt17LX
-         jINMi5HFJ9mAD0/8EG0pOnDaUj9DMqClaWA+ZlSLwi31cMr3h7aoTp63OjqvwdAS7hJt
-         GQQpJXHlYqI9mREFOVqSV8SY8tykzZ9h2HfexnzFXA6SxUCXpvVe/tfe+wcRnFPw6zmI
-         XR4RFCA1O4x7ULuui/FibtuTfL7slDdL6HNYQtHUleiLQJrzcnlSDu8It7Fu9CyChpir
-         KL5A==
-X-Gm-Message-State: AOAM531lxiHRDHHob1xy2Lt7e/lly6w5vkcWFtwHRopYgQ8ThyC8nu8h
-        KkALdUM/uWzByT27Bu8xx6u07A==
-X-Google-Smtp-Source: ABdhPJxnDJcYqdBzy28fe0pM7iN+zbksS85dJ1SqWH/meLyEzdRT3xN+44Z+ArcWYMJYdepJ2zZ1uQ==
-X-Received: by 2002:a17:90a:c902:: with SMTP id v2mr6116581pjt.136.1627420613728;
-        Tue, 27 Jul 2021 14:16:53 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id m6sm4511294pfc.151.2021.07.27.14.16.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 14:16:50 -0700 (PDT)
-From:   Kees Cook <keescook@chromium.org>
-To:     linux-hardening@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        id S234419AbhG0VUI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:20:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37744 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234113AbhG0VT3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Jul 2021 17:19:29 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9C5BA60FA0;
+        Tue, 27 Jul 2021 21:18:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627420740;
+        bh=WmBPx1Yv944WSgHzak0rUdbiFwHmXA9AEErppz095mw=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=Yhxrd8TFAkXrlR9r4ZRtp1p0sOIsB3ZuHtZ7oYU4pXZvEaqyymH79DJSjO7iRK0si
+         GSkXTTyUofgJqP034jp+1ZTvpxMOzmU1ZGhjE0qTg4I6idDUP9ThURBnvBclsuNBhC
+         u1tZ6C5YrfZBbxqk5ahpRO+VLSzVj3IEDOAgpOob/SggphKjlTaaTST/9JYGw9qJid
+         8957SpfZCeNiETD/zLB4cNWxzBDrGN9HQH+PNdMkwgJzIdpYFU/NFrV7mI6t8oFQsi
+         iwRWwF/foCBjtefKMixR8I7lM2u4IUX+zsUkg8iCrC0hdyyEJdWn/XDDKg0i/Pt6xD
+         FkiBVpBB37WQw==
+Subject: Re: [PATCH 31/64] fortify: Explicitly disable Clang support
+To:     Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org
+Cc:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Keith Packard <keithpac@amazon.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -65,62 +41,63 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 62/64] netlink: Avoid false-positive memcpy() warning
-Date:   Tue, 27 Jul 2021 13:58:53 -0700
-Message-Id: <20210727205855.411487-63-keescook@chromium.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-32-keescook@chromium.org>
+From:   Nathan Chancellor <nathan@kernel.org>
+Message-ID: <da989ffc-da64-33a2-581e-6920eb7ebd2d@kernel.org>
+Date:   Tue, 27 Jul 2021 14:18:58 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1678; h=from:subject; bh=vs/nNFIrJxwpI5nY+xgEPX6hqzmriBWLvM3b/eZbMbo=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOOsotWr+xLgDAagynSwACfihlJOnm7qN9/Mu92 bGzCtbGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzjgAKCRCJcvTf3G3AJj/ZD/ 9ntjJhpq8fBwkjGH+dUg05xTxsNzIOuiH2+WA92AhYmbos7FaDGTm1g+GjbS9tYtH4WO2HSlLQe7LQ FBHmUbu6aiUm0Adb7gUZE3muL85N91x3mnnmxIoo2J/A/2tV0zkQyLUOckCj8VK+SR9BfW61OwCULU 7dXUvxZG2bCfldSz9FFpeTg6B3n38v7ZsFzE0Z+OKqNG5B6gy6nq9hQDiK5eWY7jsHwu6TaCX2KdWP ox3h/ObmvzejD4r5bqMjjhvU16eLjApW1M3mdaJGfxBeiC7Hn4U7R0R/a57zPmDRTbz/MhdWbOOFDp ABNXWuprZfW5V1fn74AOyo4Qdi0fWAhH4ttZZuPFnGp39cUNy/oe1zMgHhD+XjhBS0RMucpc7gNElk gk4SaMhbgnC4Ou6wBhA+yQfDvMUjqtRWUuRYmsFZ5Llmrlr/jWnsbjlt39vSdTBC9vTKSqnxgt1omQ fQi/9qcta+kyf71Lx1H+c1m8ve+vz4yBPxEJ5ztsLmSYk+J3LMojiNObOTsmlTFbCj4ZoDBFSpnQga mYRnTFbLCAQHQtPXM2pa7+qmWPgSz70szWlbF1IDWFBmyv8JppWdlZQu+0ThYGXTdnhi+QLNwm/WxH Zw293JAH5hVEyNiT/+/fkkV4VjclpW+bzGJvvMPBwvfpxzJKDGLjwSx2fyMw==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210727205855.411487-32-keescook@chromium.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memcpy(), memmove(), and memset(), avoid
-intentionally writing across neighboring fields.
+On 7/27/2021 1:58 PM, Kees Cook wrote:
+> Clang has never correctly compiled the FORTIFY_SOURCE defenses due to
+> a couple bugs:
+> 
+> 	Eliding inlines with matching __builtin_* names
+> 	https://bugs.llvm.org/show_bug.cgi?id=50322
+> 
+> 	Incorrect __builtin_constant_p() of some globals
+> 	https://bugs.llvm.org/show_bug.cgi?id=41459
+> 
+> In the process of making improvements to the FORTIFY_SOURCE defenses, the
+> first (silent) bug (coincidentally) becomes worked around, but exposes
+> the latter which breaks the build. As such, Clang must not be used with
+> CONFIG_FORTIFY_SOURCE until at least latter bug is fixed (in Clang 13),
+> and the fortify routines have been rearranged.
+> 
+> Update the Kconfig to reflect the reality of the current situation.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>   security/Kconfig | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/security/Kconfig b/security/Kconfig
+> index 0ced7fd33e4d..8f0e675e70a4 100644
+> --- a/security/Kconfig
+> +++ b/security/Kconfig
+> @@ -191,6 +191,9 @@ config HARDENED_USERCOPY_PAGESPAN
+>   config FORTIFY_SOURCE
+>   	bool "Harden common str/mem functions against buffer overflows"
+>   	depends on ARCH_HAS_FORTIFY_SOURCE
+> +	# https://bugs.llvm.org/show_bug.cgi?id=50322
+> +	# https://bugs.llvm.org/show_bug.cgi?id=41459
+> +	depends on !CONFIG_CC_IS_CLANG
 
-Add a flexible array member to mark the end of struct nlmsghdr, and
-split the memcpy() to avoid false positive memcpy() warning:
+Should be !CC_IS_CLANG, Kconfig is hard :)
 
-memcpy: detected field-spanning write (size 32) of single field (size 16)
+>   	help
+>   	  Detect overflows of buffers in common string and memory functions
+>   	  where the compiler can determine and validate the buffer sizes.
+> 
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- include/uapi/linux/netlink.h | 1 +
- net/netlink/af_netlink.c     | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/include/uapi/linux/netlink.h b/include/uapi/linux/netlink.h
-index 4c0cde075c27..ddeaa748df5e 100644
---- a/include/uapi/linux/netlink.h
-+++ b/include/uapi/linux/netlink.h
-@@ -47,6 +47,7 @@ struct nlmsghdr {
- 	__u16		nlmsg_flags;	/* Additional flags */
- 	__u32		nlmsg_seq;	/* Sequence number */
- 	__u32		nlmsg_pid;	/* Sending process port ID */
-+	__u8		contents[];
- };
- 
- /* Flags values */
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 24b7cf447bc5..f2dd99e96822 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2447,7 +2447,9 @@ void netlink_ack(struct sk_buff *in_skb, struct nlmsghdr *nlh, int err,
- 			  NLMSG_ERROR, payload, flags);
- 	errmsg = nlmsg_data(rep);
- 	errmsg->error = err;
--	memcpy(&errmsg->msg, nlh, payload > sizeof(*errmsg) ? nlh->nlmsg_len : sizeof(*nlh));
-+	memcpy(&errmsg->msg, nlh, sizeof(*nlh));
-+	if (payload > sizeof(*errmsg))
-+		memcpy(errmsg->msg.contents, nlh->contents, nlh->nlmsg_len - sizeof(*nlh));
- 
- 	if (nlk_has_extack && extack) {
- 		if (extack->_msg) {
--- 
-2.30.2
-
+Cheers,
+Nathan
