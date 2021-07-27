@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 320B0C19F35
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41205C00143
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1275660FBF
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23DE76101B
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232376AbhG0U7P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
+        id S232951AbhG0U7S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232214AbhG0U7I (ORCPT
+        with ESMTP id S232643AbhG0U7J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:08 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12560C061765
+        Tue, 27 Jul 2021 16:59:09 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64D43C061796
         for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id j1so1780960pjv.3
+Received: by mail-pj1-x1029.google.com with SMTP id q17-20020a17090a2e11b02901757deaf2c8so1188866pjd.0
         for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A3PAzWLU246y1XAJJGWj+zmXxgq3vu+t3uT7F7ts2iM=;
-        b=IYhfsWGlsw3iSzV/PshzqWyl6YBx5L4bzzAy1O/DivhJOOn5XnSEfDfbmKq3pZ+0Vk
-         uh7GiUZL5niXHON0wQ0k5rOANeYvbqA7jpbTdKzVDWyXzIPUHuwdFvuQCZlNfXL/s5xy
-         EIQ0LWDe7jO3cVQe1/FSgbqBokHxmE/gnetDA=
+        bh=ce1JaJ2iLqZ1ByPIR9vq7JUGIWw9MUEqupb8ASz/48w=;
+        b=oFZ38ngC4x0EhFhmHE+6qfFOYlT/SRKUjL4MPMQTyFaF3s8fWo/JmjxWIaNX2p9bbt
+         qzdODRjS63nCZWqXoq8D46zA/h8aG7csZue0TYDQDcVJ/Tm9e8VNeG3PnQgl4tWZQ+8c
+         dISuWbNSuDBTOb5SssPxgXBD5DtFD1/ugFU8Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A3PAzWLU246y1XAJJGWj+zmXxgq3vu+t3uT7F7ts2iM=;
-        b=JNaxq9mmBV/rrQC6CSl2XS6XjjXH+EAvwVXowwyulIGavrnEGHzdQBUOyAikTfaBEL
-         irLXnUzudT86DAtYgyJHyCBzeFINZALfAgZBduSgpmj4ykZy1DnPuF8Op0eSFP3i4YDK
-         I/3OqhhVttTNdEF/OeyHRHzlivhsB/RWT1rGwBsDRkZxm9s9kHvuO/uTcIqaIhT2jNRZ
-         TtzZsWu3jCpJE9QWrvyG8hmQ8HREqGtq8nbSDLC01uW/mDmpPfhP/XLwSNYAD5fCBDia
-         5LPoUKkPGF7GqtFyQjsfbHT9XJKJbElOcEc6TFX4aK1Rq0Edap2AExGd0xMTbcwRTLro
-         51AA==
-X-Gm-Message-State: AOAM530Dt3VKw8fWmr+s77Kmw+dBVtPJT+2GO1rJ3qhH0QhUQ92pHp4/
-        ohoZ3EeMlGu0FVFpsU/UmzyAQQ==
-X-Google-Smtp-Source: ABdhPJztdkoXWjXT5QD/exKWw9kw2lZC8KEgnSRSe5hUXoJqgzkXvN7Kc2Da1tooBWFUMhMM+5Yl+Q==
-X-Received: by 2002:a63:4206:: with SMTP id p6mr25847081pga.285.1627419547538;
-        Tue, 27 Jul 2021 13:59:07 -0700 (PDT)
+        bh=ce1JaJ2iLqZ1ByPIR9vq7JUGIWw9MUEqupb8ASz/48w=;
+        b=FTl4HbZk6iPtGznJjX9EoC33yWnyV0nlsQ+U4WEoERZ21JtMXwBL7O7THtmLbQ2ghE
+         Vy8Ub1Tc5Gioc/0QjELjd/vrUhhsaXYVeEeBF7ELfSqGhYLBj25FX22VI365rAmzCfuC
+         /QZEfs6xys9iNuatU/iOiIfN+6HSijfXIpdEa41UctsDWThLgHoKkfJmNGR9VzrqxHL0
+         /A2CG3I7CXPTHToHXGm5ELkJqUCalECnuKBc8NTuCJl26QhlEYIiLThXELdoNpqr2V84
+         9u/nl4fr6aU6xtHfwTA+FbqMn2JYOFE1Q+Lp53t3AftUcyDYIf84/SOcptVdM2gU9VZR
+         Snzg==
+X-Gm-Message-State: AOAM532ZKw+RNJ7fzfe/m8Gg5MVuDIeqip0FDKEBPFFasm+ZyGuP3JW2
+        SnLDSJj3a+1dx1ges7RryBB7MQ==
+X-Google-Smtp-Source: ABdhPJxLx3UKt1g0knEKNGPxeEHzWNplXw12NU8/pyauXMt+ycvKwDQPddmlym/wJmVWHmTZkImhYQ==
+X-Received: by 2002:a65:5684:: with SMTP id v4mr25470763pgs.388.1627419548007;
+        Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id nm19sm3750853pjb.27.2021.07.27.13.59.03
+        by smtp.gmail.com with ESMTPSA id f4sm5114783pgi.68.2021.07.27.13.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -64,14 +64,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 08/64] staging: rtl8192u: Use struct_group() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:57:59 -0700
-Message-Id: <20210727205855.411487-9-keescook@chromium.org>
+Subject: [PATCH 07/64] staging: rtl8192e: Use struct_group() for memcpy() region
+Date:   Tue, 27 Jul 2021 13:57:58 -0700
+Message-Id: <20210727205855.411487-8-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4950; h=from:subject; bh=Auxw1wcSuXLG5PZpqLVm+ToYm1BZgRegEEtY4+3pHw8=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOBQir91mVsM70reKpFOtfagOnSNOBMkJbr7LeF cLNYV1eJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJo2aD/ 4h/gem/XLyVOoZV8fQb32viUj7rAyg4aQwHNkuWJUlBL82B2X54xsC7DFKlCa8N29O8H+qPnwHWT4K 6ICv9SY/cbNJmcNDaVRxa1zStMzYOl04p6xD9WCnFFjK4B+q9LeGI2YR5rnKXwMRVRN62lGGb2tbDG n+B7S4A3Lzj7gnCvw8H/Jh9jykK5MtMYCK3XaA8cM136SS6m+/Mz2jQkeWtGxivZP3JfUY99slNEkG 0LZ6JrK7U2HhCqW+GBrJFottbbgKHmwow4xCoIvuKHVrRe+pSDHtQkB9J3CO3kRk/B4+UUgR29S3N1 WGzHQkQOdCogIIKKhl+dGtRJkzv1E6H3AfsfHn9mRX+rlRVMuWdY7OOtWt09v9kOhJi9TJuYsCUhXd bb2iFWqiDbfnzl1cMyIJwIcRmKPa8iWe3+q44A9MO1491pridbSlGKpf8eOQJKQrrofq4o2cm2VKmy VObV/m/b4dpWYSDq+ecjCOAwd9Q2lNy5lWiCgPg/UTP9q/ZJuT+DhU92dfstVyX0UZsLQY2XjsDTcY +kcirjK4bujmk/nhABsxK1FigYwqICkmpUKU2Nw2NqvaMQuz7GFb/MwXE0F6PrttZzKLnIcWQt2RMg S0RnPStAbsoJy+Iytt3EPyIdRveCUUfgivtpUg6QthiMPmFTasWv4patQHMQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4368; h=from:subject; bh=whsZXL1+VyeGGVCEni/WVzZTdGJot/iTzZPaNe8UUr4=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOBTnFFuq2+zkjlQr57HB6KOpEDyaB2ijAbcALO MKTd4mmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJqgfEA CpVSQGeMGU5eUl64arg0mbKqIDJKPLDrfc3TEtQwzpULtWAtStxgtXWkqjgD3gLSOMuwG3ih74xg0+ hTraIVtKZb1lrnvbvn3GZRfBp0n2qpK2QBFNx2/+F5nXotHQOKPORNJRAJydSL2viaQ7OEoyIpM2Me D8nL5yC8ZGHK0A4lVP55GAkIj7LrR+BeEpWkybNkHdiFl+rs+n4d4Y5K5W5VNlMcjt7QuPReCHC+Qv WWBBoNfTHJEW2CoFe5zCDER42ROLFDvt+sDPfKsVQI9Z1vlUsnpX5iYDzQzaEdNq+qiG5STf7DfJpl 7boSirsHUslj5fLDMwcf6eJddWbh6fTv3G3t/wGWDeNMTPM9I87kUfIxdOVlVxwZJTtQzRkVKiO6cj QPIENJ4Jr0y7lIw5VC2PrLb1k1OrOLVMITkShgU/vOEYCHwsAbSV5+hZl++Mr/JP53hPfwiDGK6fkO h4jnthinSH7U1p3zBAyyW/U4j8y0rc+SLpCnVJzA8pK+h/cwKcNF3miP5pu2wcEnonqvq0pO27EukH en9phkwP2ZomfnVI6QII0zHonJUw0qciBinwVIIvS0xAoNPj7fCpwMkcIuj4N/wj+xN3kwpZ7ix0Dv AmxT/glSjzUIz5WJPhvBRwvRJLLJLoIbc44SjjMc/R2fFjtCYNoSHk1KJRtw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -83,49 +83,30 @@ field bounds checking for memcpy(), memmove(), and memset(), avoid
 intentionally writing across neighboring fields.
 
 Use struct_group() around members addr1, addr2, and addr3 in struct
-rtl_80211_hdr_4addr, and members qui, qui_type, qui_subtype, version,
-and ac_info in struct ieee80211_qos_information_element, so they can be
+rtllib_hdr_4addr, and members qui, qui_type, qui_subtype, version,
+and ac_info in struct rtllib_qos_information_element, so they can be
 referenced together. This will allow memcpy() and sizeof() to more easily
 reason about sizes, improve readability, and avoid future warnings about
-writing beyond the end of addr1 and qui. Additionally replace zero sized
-arrays with flexible arrays in struct ieee_param.
+writing beyond the end of addr1 and qui.
 
 "pahole" shows no size nor member offset changes to struct
-rtl_80211_hdr_4addr nor struct ieee80211_qos_information_element. "objdump
--d" shows no meaningful object code changes (i.e. only source line number
+rtllib_hdr_4addr nor struct rtllib_qos_information_element. "objdump -d"
+shows no meaningful object code changes (i.e. only source line number
 induced differences and optimizations).
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- .../staging/rtl8192u/ieee80211/ieee80211.h    | 24 +++++++++++--------
- .../rtl8192u/ieee80211/ieee80211_crypt_ccmp.c |  3 ++-
- .../staging/rtl8192u/ieee80211/ieee80211_rx.c |  8 +++----
- 3 files changed, 20 insertions(+), 15 deletions(-)
+ drivers/staging/rtl8192e/rtllib.h            | 20 ++++++++++++--------
+ drivers/staging/rtl8192e/rtllib_crypt_ccmp.c |  3 ++-
+ drivers/staging/rtl8192e/rtllib_rx.c         |  8 ++++----
+ 3 files changed, 18 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211.h b/drivers/staging/rtl8192u/ieee80211/ieee80211.h
-index 7903c777a417..6ae8d7504558 100644
---- a/drivers/staging/rtl8192u/ieee80211/ieee80211.h
-+++ b/drivers/staging/rtl8192u/ieee80211/ieee80211.h
-@@ -303,7 +303,7 @@ struct ieee_param {
- 		struct {
- 			u32 len;
- 			u8 reserved[32];
--			u8 data[0];
-+			u8 data[];
- 		} wpa_ie;
- 		struct{
- 			int command;
-@@ -316,7 +316,7 @@ struct ieee_param {
- 			u8 idx;
- 			u8 seq[8]; /* sequence counter (set: RX, get: TX) */
- 			u16 key_len;
--			u8 key[0];
-+			u8 key[];
- 		} crypt;
- 	} u;
- };
-@@ -917,9 +917,11 @@ struct rtl_80211_hdr_3addr {
- struct rtl_80211_hdr_4addr {
+diff --git a/drivers/staging/rtl8192e/rtllib.h b/drivers/staging/rtl8192e/rtllib.h
+index c6f8b772335c..547579070a82 100644
+--- a/drivers/staging/rtl8192e/rtllib.h
++++ b/drivers/staging/rtl8192e/rtllib.h
+@@ -759,9 +759,11 @@ struct rtllib_hdr_3addr {
+ struct rtllib_hdr_4addr {
  	__le16 frame_ctl;
  	__le16 duration_id;
 -	u8 addr1[ETH_ALEN];
@@ -139,8 +120,8 @@ index 7903c777a417..6ae8d7504558 100644
  	__le16 seq_ctl;
  	u8 addr4[ETH_ALEN];
  	u8 payload[];
-@@ -1100,11 +1102,13 @@ typedef union _frameqos {
- struct ieee80211_qos_information_element {
+@@ -921,11 +923,13 @@ union frameqos {
+ struct rtllib_qos_information_element {
  	u8 elementID;
  	u8 length;
 -	u8 qui[QOS_OUI_LEN];
@@ -157,33 +138,33 @@ index 7903c777a417..6ae8d7504558 100644
 +	);
  } __packed;
  
- struct ieee80211_qos_ac_parameter {
-diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
-index c241cf484023..61f9a189c90c 100644
---- a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
-+++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
-@@ -141,7 +141,8 @@ static int ccmp_init_iv_and_aad(struct rtl_80211_hdr_4addr *hdr,
- 	pos = (u8 *)hdr;
+ struct rtllib_qos_ac_parameter {
+diff --git a/drivers/staging/rtl8192e/rtllib_crypt_ccmp.c b/drivers/staging/rtl8192e/rtllib_crypt_ccmp.c
+index b60e2a109ce4..66b3a13fced7 100644
+--- a/drivers/staging/rtl8192e/rtllib_crypt_ccmp.c
++++ b/drivers/staging/rtl8192e/rtllib_crypt_ccmp.c
+@@ -133,7 +133,8 @@ static int ccmp_init_iv_and_aad(struct rtllib_hdr_4addr *hdr,
+ 	pos = (u8 *) hdr;
  	aad[0] = pos[0] & 0x8f;
  	aad[1] = pos[1] & 0xc7;
 -	memcpy(aad + 2, hdr->addr1, 3 * ETH_ALEN);
-+	BUILD_BUG_ON(sizeof(hdr->addrs) != 3 * ETH_ALEN);
++	BUILD_BUG_ON(sizeof(hdr->addrs) != (3 * ETH_ALEN));
 +	memcpy(aad + 2, &hdr->addrs, 3 * ETH_ALEN);
- 	pos = (u8 *)&hdr->seq_ctl;
+ 	pos = (u8 *) &hdr->seq_ctl;
  	aad[20] = pos[0] & 0x0f;
  	aad[21] = 0; /* all bits masked */
-diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
-index b0e01ee65f7f..d5557ee0a3b7 100644
---- a/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
-+++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
-@@ -1332,13 +1332,13 @@ static int ieee80211_read_qos_param_element(struct ieee80211_qos_parameter_info
- 					    *info_element)
+diff --git a/drivers/staging/rtl8192e/rtllib_rx.c b/drivers/staging/rtl8192e/rtllib_rx.c
+index c2209c033838..9c4b686d2756 100644
+--- a/drivers/staging/rtl8192e/rtllib_rx.c
++++ b/drivers/staging/rtl8192e/rtllib_rx.c
+@@ -1576,13 +1576,13 @@ static int rtllib_read_qos_param_element(struct rtllib_qos_parameter_info
+ 							*info_element)
  {
  	int ret = 0;
--	u16 size = sizeof(struct ieee80211_qos_parameter_info) - 2;
+-	u16 size = sizeof(struct rtllib_qos_parameter_info) - 2;
 +	u16 size = sizeof(element_param->info_element.data);
  
- 	if (!info_element || !element_param)
+ 	if ((info_element == NULL) || (element_param == NULL))
  		return -1;
  
  	if (info_element->id == QOS_ELEMENT_ID && info_element->len == size) {
@@ -192,19 +173,19 @@ index b0e01ee65f7f..d5557ee0a3b7 100644
  		       info_element->len);
  		element_param->info_element.elementID = info_element->id;
  		element_param->info_element.length = info_element->len;
-@@ -1358,7 +1358,7 @@ static int ieee80211_read_qos_info_element(
- 		struct ieee80211_info_element *info_element)
+@@ -1601,7 +1601,7 @@ static int rtllib_read_qos_info_element(struct rtllib_qos_information_element
+ 							*info_element)
  {
  	int ret = 0;
--	u16 size = sizeof(struct ieee80211_qos_information_element) - 2;
+-	u16 size = sizeof(struct rtllib_qos_information_element) - 2;
 +	u16 size = sizeof(element_info->data);
  
- 	if (!element_info)
+ 	if (element_info == NULL)
  		return -1;
-@@ -1366,7 +1366,7 @@ static int ieee80211_read_qos_info_element(
- 		return -1;
+@@ -1610,7 +1610,7 @@ static int rtllib_read_qos_info_element(struct rtllib_qos_information_element
  
- 	if ((info_element->id == QOS_ELEMENT_ID) && (info_element->len == size)) {
+ 	if ((info_element->id == QOS_ELEMENT_ID) &&
+ 	    (info_element->len == size)) {
 -		memcpy(element_info->qui, info_element->data,
 +		memcpy(&element_info->data, info_element->data,
  		       info_element->len);
