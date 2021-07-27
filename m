@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E10C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D177C4320E
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABE2B60FEE
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 256D560F94
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234491AbhG0VRK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:17:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58324 "EHLO
+        id S234006AbhG0VRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:17:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233840AbhG0VRB (ORCPT
+        with ESMTP id S233990AbhG0VRD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 17:17:01 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC04C061760
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:17:00 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id q2so20616plr.11
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:17:00 -0700 (PDT)
+        Tue, 27 Jul 2021 17:17:03 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B970AC0617A1
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:17:01 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id m2-20020a17090a71c2b0290175cf22899cso1175110pjs.2
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:17:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vRgb1VJvkR4TxUQ9j5wT6NQOJVualZe/N5ucmrpwcpM=;
-        b=Urt716jbz8XdyF5XY5KmZM6capTDsG++7NWnKWGXa8A82gOnBVfVmzBVpmjGHy1J4E
-         Ae0oY6icZsuXtD/nJ3EHWKWtJRkbNQuHNTS22y5t0/gFqDYoj2X9jMSktKlfLPXE1X8w
-         GZLII5xANVEeoTTYkjVLPXyHbZ6nhUyQoz/jc=
+        bh=pTss2I65Q2CWQl0zMLaa8H82eOPPoCY8oMnTRENSqR4=;
+        b=YAUu+p5PRv4m9It5HWgaxQc7eZqBkPBSZLDjvBQJVq7VcgxFhGvoVLyoLJ8N4i8Jfl
+         V1tiBwQXzIjaRpT/6KU3bsvSRWIl+Ed1WJZU8t8lYPaguXMnM+sHAZ9PNM1FRuzeOZ6x
+         1w/S3Lji8xVrapNny1sSSoyKLZ2A+Kc5xxrVc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vRgb1VJvkR4TxUQ9j5wT6NQOJVualZe/N5ucmrpwcpM=;
-        b=A2oISoDyCGBhoMfbhiJ2u3UQep+6mzN6wY+ZUNNqolzLaBMQhQiZmS6GWNhRi95QVL
-         DebiXCORibDFOmIangd/3PbltR4nOX6jrKPcG8K8v2SWYazegaPQwh5+IcL5uNWj1/EP
-         TA/DX/AaPEVtz80+TKNvJhsLTJb5hvnIwSwmRXhKEoUKvkrZtRDGEENjx5ELcbK46Wxz
-         1MQ8u2WGV1V9SFkMQ+3Jb1eit4XywZuXMlnB5ypuCDJ/hQR7j4755L88tazjab/jD9Uz
-         BpuKhB/eTlTxVtqgBeHzEfHRUG8LwgxqHGUfNVWj0knHFyclENG9UrezjOvjqNkLpqW1
-         EJoA==
-X-Gm-Message-State: AOAM53386coOkpO5RXTLAfrWuuIAY6IzG2uhtvcnKXj5euoj1KrWJHcd
-        rUMw9QoYrz6GsZ1AHdxkmfDrvxwiz5SPHBpm
-X-Google-Smtp-Source: ABdhPJyL6XeGJmKfKYoPIwSnVfrJu9DIh6q4pNy4qcyzmKIcgSJdIeoB0sfhxYXoqkr/188RbhWTVQ==
-X-Received: by 2002:a05:6a00:1913:b029:32b:cec0:77e5 with SMTP id y19-20020a056a001913b029032bcec077e5mr24883708pfi.76.1627420619841;
-        Tue, 27 Jul 2021 14:16:59 -0700 (PDT)
+        bh=pTss2I65Q2CWQl0zMLaa8H82eOPPoCY8oMnTRENSqR4=;
+        b=UbEfxjx4iGUwLtCdBxzUNnOZ7Qk03LnSj+8BIJTtpF12dD6jPTvz4IxkwnjAN4E0kk
+         0np7HLPPoxNt3MVlmJp8XdTCTPc/jwOXffPExSxdXM6d1By2AHWHTMZ+BAjr1AaRLwV8
+         MOuSlOuiEEoWEWmzhgWOykToHIGpDHeComzkmp29mBLKtM8s0DbzjeQdKxEqjY3ScB1N
+         vfMJU5KIW9j/iUFzE/lTNjdk4Gof+NDhneXBRu5st3pM0lw79IrGyD+Q8/JscDlVWEux
+         tHPiCOa2AT1aPZ9bPAGvbkcuULQOilqG7sQpGFYXPArmcFODMYDLb2mdpDU2JsE4ko77
+         RxNA==
+X-Gm-Message-State: AOAM530DNlBoDnXUA34tmzjhIyur4BGhzhE1fCIFDkMC56x0rYdmjGk8
+        Hu7Kzv2E2xLSI3wRYYDH3UQ75A==
+X-Google-Smtp-Source: ABdhPJzbDPYt/21lhtnaWr0tImee3BF99wlkjaOxZG/zklC2IjLrFJ3c7AoHcvzezPw5M6d3+zm/bg==
+X-Received: by 2002:a17:90a:d301:: with SMTP id p1mr5932205pju.220.1627420621296;
+        Tue, 27 Jul 2021 14:17:01 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id w15sm3794043pjc.45.2021.07.27.14.16.54
+        by smtp.gmail.com with ESMTPSA id z124sm5174413pgb.6.2021.07.27.14.16.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 14:16:57 -0700 (PDT)
+        Tue, 27 Jul 2021 14:16:58 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,85 +65,348 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 51/64] tracing: Use struct_group() to zero struct trace_iterator
-Date:   Tue, 27 Jul 2021 13:58:42 -0700
-Message-Id: <20210727205855.411487-52-keescook@chromium.org>
+Subject: [PATCH 33/64] lib: Introduce CONFIG_TEST_MEMCPY
+Date:   Tue, 27 Jul 2021 13:58:24 -0700
+Message-Id: <20210727205855.411487-34-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1917; h=from:subject; bh=x33Bs21uGrD+N+Lns8bFSqK7vUUUNaNSw4EtFfeCu58=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOLu8z/bdU1zMaKndqRyKLCCkXgpWttZKN9yc8w d3BxuKSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBziwAKCRCJcvTf3G3AJgHsD/ 98DZD+ecFAqbOjuzLoGxIi4OSnpxnTAcnT2/ZfVnIlEZyXBS+jkr8lU+k0GXpQG2scT/z3KyhdrOJp E60WG63kSFNFWzdWBZZyb0Rf9XVDGHksNfg81VOrWxyCFWrib/BFkg1uKQ3XHny7kvC0saWxsJLOvP PMmBG3p0AzH/bcHeY8JCSe1JqVGWLz4Wdiqq+a1FX3oATkVH4X6hjEPQSu7K5W5gsu8y3sWyfaJ/21 OTekfh+08tGzJUz0x5qwW+mEDgtAt0LEEHLhnIpkUCLiYWmDJzWKF5CUljC6wN4V/uNZBOMTukJCz8 F9nA0W1W0nXeWdz0Z6mMUksqNHOYIhyE52fHArE2U0l0tdWYgbUybcSQsrFUzJ1QxTx6KXNTmHAdC8 g1F37UY/3wzrelPZKNjO7Q2mpX8Q0hoRoR0IePaxvGxraMIKoteVOWP+yTjyheOHuIRmmwFS+m4zl0 xz0ti0B1g1MqQBahH7M3aZtJg/kgJEHRJTpe8g68atzyvYwY8rGNnEiemCygZ2liwL0XGVd/tcrTlJ KkliSKYsXdS6eykIau3c0P0wmRt7ydb/oQgVBcA744nu/6TZH0x0ehC/RmIZ3f0pnMMvLuX81V1dQy aaHLtNUQtk1I2pKRDzLqOWe+HldXvpA+eH/7VFXxng+zPZzpvdu07VGean9Q==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9613; h=from:subject; bh=vMvyiyYe9K9D2gND/ltuxCZWuPzQBox4RoUvXlZiiJg=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOHMVso80UVr0RhQnwYElca8D+4vYHNyJyis1bc atW3oFGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhwAKCRCJcvTf3G3AJjllD/ 9XMGR1In5NUDFOfmtBe5obH+PZnVXYS7aCsaC9BBl36zVbpB9g3hy9o9954IL44Q2M2X8l/iP0Mdt9 Fprd6vbL7wO+hDD4ywgbQtQaW4EbO1b99AS/E4opV8walRqK+MZ1ssZ9th1mYU1Yryl3nNwXH80K5z cHnVH/c6qUM1l7u4iPrktSMcqi0uxY+WT4tJT2QpEzBS2uA2Z++Pg0QAuabvzcMJLD36XlzH1dMGHF QsjWHoq3OpB7JI9BFoibODlYeQfe0vH+O4ZMR0CdC9+uqqaXOGvYga3tfXZzEFjKmWYLSbRiO/mRRb CiyxwZtmj156O9vH2uplTEipL2Mfks1IS1tv2wMc6e1Uc36ZTXbZ+ZDpYJHijeW4Kff8vdOt/zCO6H muSBMvvv8ZNOdnqmeHtRo5TJNWctfJSbnn4+sNRiDBQn7X6UuwmNmMhxRUt+l9Pjt5J1qx0T9lAmLn 0YWwa+kC7zviH7HJgzmVAbq7+flzYb9RAM0a927c5isRD+tKPj1F6yCfYw+B22p8x1p/BgLIibuR8G 83lZvdFsnQZvJgeK1txkG4sB66fQousphoaJGgD4py+IHG1KtnDuFiq/fwlscSFVTgiEGImI+xoQCE yfbM7YDkZxoxwyj7Q+KKDvxwFASZkIBYQ4AxZh75JAJqW2RHNpzsVKTFNVHw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memset(), avoid intentionally writing across
-neighboring fields.
-
-Add struct_group() to mark region of struct trace_iterator that should
-be initialized to zero.
+Before changing anything about memcpy(), memmove(), and memset(), add
+run-time tests to check basic behaviors for any regressions.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/linux/trace_events.h | 26 ++++++++++++++------------
- kernel/trace/trace.c         |  4 +---
- 2 files changed, 15 insertions(+), 15 deletions(-)
+ lib/Kconfig.debug |   3 +
+ lib/Makefile      |   1 +
+ lib/test_memcpy.c | 285 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 289 insertions(+)
+ create mode 100644 lib/test_memcpy.c
 
-diff --git a/include/linux/trace_events.h b/include/linux/trace_events.h
-index ad413b382a3c..cadad77fe524 100644
---- a/include/linux/trace_events.h
-+++ b/include/linux/trace_events.h
-@@ -101,18 +101,20 @@ struct trace_iterator {
- 	bool			snapshot;
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 4654e838d68b..d315db9702de 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -2220,6 +2220,9 @@ config TEST_XARRAY
+ config TEST_OVERFLOW
+ 	tristate "Test check_*_overflow() functions at runtime"
  
- 	/* The below is zeroed out in pipe_read */
--	struct trace_seq	seq;
--	struct trace_entry	*ent;
--	unsigned long		lost_events;
--	int			leftover;
--	int			ent_size;
--	int			cpu;
--	u64			ts;
--
--	loff_t			pos;
--	long			idx;
--
--	/* All new field here will be zeroed out in pipe_read */
-+	struct_group(init,
-+		struct trace_seq	seq;
-+		struct trace_entry	*ent;
-+		unsigned long		lost_events;
-+		int			leftover;
-+		int			ent_size;
-+		int			cpu;
-+		u64			ts;
++config TEST_MEMCPY
++	tristate "Test memcpy*(), memmove*(), and memset*() functions at runtime"
 +
-+		loff_t			pos;
-+		long			idx;
+ config TEST_RHASHTABLE
+ 	tristate "Perform selftest on resizable hash table"
+ 	help
+diff --git a/lib/Makefile b/lib/Makefile
+index 40b4bf0bc847..083a19336e20 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -77,6 +77,7 @@ obj-$(CONFIG_TEST_MIN_HEAP) += test_min_heap.o
+ obj-$(CONFIG_TEST_LKM) += test_module.o
+ obj-$(CONFIG_TEST_VMALLOC) += test_vmalloc.o
+ obj-$(CONFIG_TEST_OVERFLOW) += test_overflow.o
++obj-$(CONFIG_TEST_MEMCPY) += test_memcpy.o
+ obj-$(CONFIG_TEST_RHASHTABLE) += test_rhashtable.o
+ obj-$(CONFIG_TEST_SORT) += test_sort.o
+ obj-$(CONFIG_TEST_USER_COPY) += test_user_copy.o
+diff --git a/lib/test_memcpy.c b/lib/test_memcpy.c
+new file mode 100644
+index 000000000000..7c64120a68a9
+--- /dev/null
++++ b/lib/test_memcpy.c
+@@ -0,0 +1,285 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Test cases for memcpy(), memmove(), and memset().
++ */
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+		/* All new field here will be zeroed out in pipe_read */
-+	);
- };
- 
- enum trace_iter_flags {
-diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index c59dd35a6da5..9f83864b0be6 100644
---- a/kernel/trace/trace.c
-+++ b/kernel/trace/trace.c
-@@ -6691,9 +6691,7 @@ tracing_read_pipe(struct file *filp, char __user *ubuf,
- 		cnt = PAGE_SIZE - 1;
- 
- 	/* reset all but tr, trace, and overruns */
--	memset(&iter->seq, 0,
--	       sizeof(struct trace_iterator) -
--	       offsetof(struct trace_iterator, seq));
-+	memset(&iter->init, 0, sizeof(iter->init));
- 	cpumask_clear(iter->started);
- 	trace_seq_init(&iter->seq);
- 	iter->pos = -1;
++#include <linux/device.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/overflow.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <linux/vmalloc.h>
++
++struct some_bytes {
++	union {
++		u8 data[32];
++		struct {
++			u32 one;
++			u16 two;
++			u8  three;
++			/* 1 byte hole */
++			u32 four[4];
++		};
++	};
++};
++
++#define check(instance, v) do {	\
++	int i;	\
++	BUILD_BUG_ON(sizeof(instance.data) != 32);	\
++	for (i = 0; i < sizeof(instance.data); i++) {	\
++		if (instance.data[i] != v) {	\
++			pr_err("line %d: '%s' not initialized to 0x%02x @ %d (saw 0x%02x)\n", \
++				__LINE__, #instance, v, i, instance.data[i]);	\
++			return 1;	\
++		}	\
++	}	\
++} while (0)
++
++#define compare(name, one, two) do { \
++	int i; \
++	BUILD_BUG_ON(sizeof(one) != sizeof(two)); \
++	for (i = 0; i < sizeof(one); i++) {	\
++		if (one.data[i] != two.data[i]) {	\
++			pr_err("line %d: %s.data[%d] (0x%02x) != %s.data[%d] (0x%02x)\n", \
++				__LINE__, #one, i, one.data[i], \
++				#two, i, two.data[i]);	\
++			return 1;	\
++		}	\
++	}	\
++	pr_info("ok: " TEST_OP "() " name "\n");	\
++} while (0)
++
++static int __init test_memcpy(void)
++{
++#define TEST_OP "memcpy"
++	struct some_bytes control = {
++		.data = { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			},
++	};
++	struct some_bytes zero = { };
++	struct some_bytes middle = {
++		.data = { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00,
++			  0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			},
++	};
++	struct some_bytes three = {
++		.data = { 0x00, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
++			},
++	};
++	struct some_bytes dest = { };
++	int count;
++	u8 *ptr;
++
++	/* Verify static initializers. */
++	check(control, 0x20);
++	check(zero, 0);
++	compare("static initializers", dest, zero);
++
++	/* Verify assignment. */
++	dest = control;
++	compare("direct assignment", dest, control);
++
++	/* Verify complete overwrite. */
++	memcpy(dest.data, zero.data, sizeof(dest.data));
++	compare("complete overwrite", dest, zero);
++
++	/* Verify middle overwrite. */
++	dest = control;
++	memcpy(dest.data + 12, zero.data, 7);
++	compare("middle overwrite", dest, middle);
++
++	/* Verify argument side-effects aren't repeated. */
++	dest = control;
++	ptr = dest.data;
++	count = 1;
++	memcpy(ptr++, zero.data, count++);
++	ptr += 8;
++	memcpy(ptr++, zero.data, count++);
++	compare("argument side-effects", dest, three);
++
++	return 0;
++#undef TEST_OP
++}
++
++static int __init test_memmove(void)
++{
++#define TEST_OP "memmove"
++	struct some_bytes control = {
++		.data = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			},
++	};
++	struct some_bytes zero = { };
++	struct some_bytes middle = {
++		.data = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x00, 0x00, 0x00, 0x00,
++			  0x00, 0x00, 0x00, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			},
++	};
++	struct some_bytes five = {
++		.data = { 0x00, 0x00, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x00, 0x00, 0x00, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			},
++	};
++	struct some_bytes overlap = {
++		.data = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++			  0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			},
++	};
++	struct some_bytes overlap_expected = {
++		.data = { 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x04, 0x07,
++			  0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
++			},
++	};
++	struct some_bytes dest = { };
++	int count;
++	u8 *ptr;
++
++	/* Verify static initializers. */
++	check(control, 0x99);
++	check(zero, 0);
++	compare("static initializers", zero, dest);
++
++	/* Verify assignment. */
++	dest = control;
++	compare("direct assignment", dest, control);
++
++	/* Verify complete overwrite. */
++	memmove(dest.data, zero.data, sizeof(dest.data));
++	compare("complete overwrite", dest, zero);
++
++	/* Verify middle overwrite. */
++	dest = control;
++	memmove(dest.data + 12, zero.data, 7);
++	compare("middle overwrite", dest, middle);
++
++	/* Verify argument side-effects aren't repeated. */
++	dest = control;
++	ptr = dest.data;
++	count = 2;
++	memmove(ptr++, zero.data, count++);
++	ptr += 9;
++	memmove(ptr++, zero.data, count++);
++	compare("argument side-effects", dest, five);
++
++	/* Verify overlapping overwrite is correct. */
++	ptr = &overlap.data[2];
++	memmove(ptr, overlap.data, 5);
++	compare("overlapping write", overlap, overlap_expected);
++
++	return 0;
++#undef TEST_OP
++}
++
++static int __init test_memset(void)
++{
++#define TEST_OP "memset"
++	struct some_bytes control = {
++		.data = { 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			},
++	};
++	struct some_bytes complete = {
++		.data = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			},
++	};
++	struct some_bytes middle = {
++		.data = { 0x30, 0x30, 0x30, 0x30, 0x31, 0x31, 0x31, 0x31,
++			  0x31, 0x31, 0x31, 0x31, 0x31, 0x31, 0x31, 0x31,
++			  0x31, 0x31, 0x31, 0x31, 0x30, 0x30, 0x30, 0x30,
++			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			},
++	};
++	struct some_bytes three = {
++		.data = { 0x60, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			  0x30, 0x61, 0x61, 0x30, 0x30, 0x30, 0x30, 0x30,
++			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
++			},
++	};
++	struct some_bytes dest = { };
++	int count, value;
++	u8 *ptr;
++
++	/* Verify static initializers. */
++	check(control, 0x30);
++	check(dest, 0);
++
++	/* Verify assignment. */
++	dest = control;
++	compare("direct assignment", dest, control);
++
++	/* Verify complete overwrite. */
++	memset(dest.data, 0xff, sizeof(dest.data));
++	compare("complete overwrite", dest, complete);
++
++	/* Verify middle overwrite. */
++	dest = control;
++	memset(dest.data + 4, 0x31, 16);
++	compare("middle overwrite", dest, middle);
++
++	/* Verify argument side-effects aren't repeated. */
++	dest = control;
++	ptr = dest.data;
++	value = 0x60;
++	count = 1;
++	memset(ptr++, value++, count++);
++	ptr += 8;
++	memset(ptr++, value++, count++);
++	compare("argument side-effects", dest, three);
++
++	return 0;
++#undef TEST_OP
++}
++
++
++static int __init test_memcpy_init(void)
++{
++	int err = 0;
++
++	err |= test_memcpy();
++	err |= test_memmove();
++	err |= test_memset();
++
++	if (err) {
++		pr_warn("FAIL!\n");
++		err = -EINVAL;
++	} else {
++		pr_info("all tests passed\n");
++	}
++
++	return err;
++}
++
++static void __exit test_memcpy_exit(void)
++{ }
++
++module_init(test_memcpy_init);
++module_exit(test_memcpy_exit);
++MODULE_LICENSE("GPL");
 -- 
 2.30.2
 
