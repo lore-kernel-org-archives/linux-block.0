@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B4DC4320E
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE163C4320A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E89060FA0
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A03D760FEA
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234496AbhG0VAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54052 "EHLO
+        id S234544AbhG0VAd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:00:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232908AbhG0U7Q (ORCPT
+        with ESMTP id S232817AbhG0U7N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:16 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA105C0613D3
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id m2-20020a17090a71c2b0290175cf22899cso1094373pjs.2
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:13 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6423FC061384
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:10 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id mt6so1832825pjb.1
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A8VL5uTwi2ok0xQG2fExEpX5b43uBzp5tHuj3L/R+N0=;
-        b=MuVA98uzyFghrpeCefbkYMobO8SHDZI2jc808l40HzcktA/z0DyZWg3UUrPxY2jQTx
-         1ed5PTEGwVLj+gUQNU9VV6/Wlgw5nfs0KfrxNrYxZJIzih6b5CYNoj6jQnfqqe/aF7CG
-         Kag8EJWSgFoDxhRz+uHbAHJSq3YzIYRwaQERY=
+        bh=RCqXotzAIvnXgOqstJDis4roVpoLDPnfq3WqfZlD8nw=;
+        b=IsnPTTOIgdGKCXuW3XQ+MT6hIlhVYI7Io0wctUxwqvbJIIvtSltHPjtWeHzLWKF+kA
+         CQvAxohJQYoF71joFX6v/3Z6eoC2GSqaTNcLccBsOh5LMFueIVes2gOSJpZyft2tneFd
+         eIMQ6OLOd1lFb131IMCikGtxTAI11b8IFNErI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A8VL5uTwi2ok0xQG2fExEpX5b43uBzp5tHuj3L/R+N0=;
-        b=CDyhZ9xUSlZl7GjRgNW/9Y3G2rheC1yN+PAbucgMU5HKWBdb/zrNohz0cGIptiEhT6
-         +zsmq17jGAVYFGy+PyMurMarOaBdLt6UgLUOqA9aMAcpEatZBOKXledqe6lo5tSqn/PQ
-         XbMG5x9t0CTBsk3MBRoPte02rvVbzn3qSAMdMtj9bF/7cEJGJ+UzWZZ81+3Z0Zs3SBWM
-         KKR4txHpQ8B9fdWx8mi6UGcfDlrsMPU/CpzQcuRHvCKhuY9ukeuns5arGhRSh4ipiBa9
-         LZlb1nFxBBcWXBSSrdgmP/qFt7nHCOgXXxGCixiQngRU/RTePgE3K4KHlQXkFLrMHsHC
-         n3FQ==
-X-Gm-Message-State: AOAM532pdjQcS4hU59qjOoOHW6d6flzBkbBf6n7FHlB1NHTgr4WwAjyq
-        8TGg/cowwDTXoD3jFVNsLxI0tg==
-X-Google-Smtp-Source: ABdhPJwK/hlVX3ijEELPaVNGs5CqZ9MYVDpKWehXzD8lK279R3qnfEziD46RtfTuI5da/TZ/A7j89A==
-X-Received: by 2002:a17:90a:1196:: with SMTP id e22mr5942936pja.168.1627419551358;
-        Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
+        bh=RCqXotzAIvnXgOqstJDis4roVpoLDPnfq3WqfZlD8nw=;
+        b=kRF9unPnMHN+HvsvIeW/tW7Pwi981NwiurfzWKdx/xJCd7FIRKxYGQXHeVbB0oxqVx
+         TX196+66eCCwrQm+wOOJDUTML6LALUGgG5jNjHy8ssm97CmjNFtPiT+nWNNszlBl4n3Z
+         caJ4/+NJv4G2k+pkgHbGEe7f/KcTE/ry6wpXfGIThMkpccuEdeFK2JYdq4uDFXI8iPL9
+         TKP2EQ6TUJq1IytcIjTLITQWD+gjsMBHjDgJ3ndYLo8NNyfw/P2ivWkpkYlddkfNsTHY
+         f+jEfhqQahWWAni/ZFDPv8AP6tO5Fyirn6ZhuZ5TNLV5gwKlvrub3KBwekn6AAgb+4zT
+         oH1w==
+X-Gm-Message-State: AOAM530Pg6ZNOWA66tg2qbC/89P2nQBn3l78gJTkWmtR1PgahjIGfobB
+        7i0b0voHE3SpbB2J2SSIjY9g9K0i+wGtdiaN
+X-Google-Smtp-Source: ABdhPJzspBBQMDyvDf6TBVh0kJFHAIruWS/HtAlIq0eRpPNOGgO/FodQZJlNxuLaUl6IYFezsXLBRA==
+X-Received: by 2002:a05:6a00:1c6d:b029:338:322:137d with SMTP id s45-20020a056a001c6db02903380322137dmr25076229pfw.38.1627419549870;
+        Tue, 27 Jul 2021 13:59:09 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h18sm3550930pjv.21.2021.07.27.13.59.08
+        by smtp.gmail.com with ESMTPSA id h20sm4771196pfn.173.2021.07.27.13.59.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 27/64] HID: cp2112: Use struct_group() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:58:18 -0700
-Message-Id: <20210727205855.411487-28-keescook@chromium.org>
+Subject: [PATCH 11/64] net/mlx5e: Avoid field-overflowing memcpy()
+Date:   Tue, 27 Jul 2021 13:58:02 -0700
+Message-Id: <20210727205855.411487-12-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2121; h=from:subject; bh=K97nJ7xl1U2miGBKe3f4iGnBB6d79/ydjDfoar50c1k=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOGJiERxKe5UaB/DWAoZsHfj6ZstGRywspA5cbo qbU/Sa2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhgAKCRCJcvTf3G3AJviXD/ 0awF1xyojK4bdkGTsWWYC5EaCkxQXolbhn5I4Bt5LTgBerDVUkkQ+0hbx3KTd6J1shKe33O721L80q ZPSzA6XO1IU4jEh9ESD0vy/BbcwUB240/GjH7pokMgs1tY/ASfazVm5pEoVQ2XMbM9ttTkxD6cKwl2 wD3CaaTKSXRB54J1wY/RbfKchhBz/awcZEkaPX+V5MH128VNgQWftdwl6k4zkukMyTgQqqtcQEDxLG 2PXGR01tGWiZG4zcq6j0qKS9hF+YMV3vNRTD11FlkXkpCJa/stjQqYc3X+5SMk4CRzfl/Y8cOb2ori taM7ib/LTTXf/XdYjP8mkve4OB2F547uGMmQY02c0e401LtZTJR+BdjWQtnzweLMCU7bZWFnvUt/RI 4cqv3FXHI7G3rsq/9s9nQOPzyX1g6CKdhXSGgnS6F75W6n3LHmhYa9TRe7Q9yzYq+fQMiHisjUkftb iTEIUCDgO5rrzjGJ+PX3mtU2ZT4MbYy9wphEFnW76pP0WmYvf85gMWFUBXxjM3D3zkrPguys6E4LcZ Otlv5886DjdrIVDbh5s3k6JVcDviF5vEmyocVX7Gu/d9l7lhKm805IufyFMpTdxERMUq7Hv4ROE4Ex QkBYn0Udw21OjJBLXDJldGRan/1A1k6mjEOu8Q1mHNN3JiXDko0nT/TA1CHQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2638; h=from:subject; bh=QKALqwrqhLc+7tVP8mb7u9vJwM2ktK3XL7hcr7RjisE=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOCimDJCcehKBIQzI/fV1vkomdBEz58Sp357Acw ashx10aJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzggAKCRCJcvTf3G3AJowOD/ 0cV2/gWpM3tzSGeDnd+48FkILInBduxYU7T8eAce0pFHdDWK3Xdzt0Rz/8KSK9g9qHiPAoTtE1ZDZs IdycA5PGwVU7OoMo9y8rxip+T0x8+0FTjiK0eEeADuraWJtuRkY7rqUv3anZB+7aFcy23HLSzsokDy v3K2NShHDdMr6+BTxCwT82oNKp7sflOMI9zqU65OfotImRrxPDAWNMY94XTaiIiAAWhAiHJTCCBy8a ww4ATYSVeRhj5CuJno8eppzIfgRbYoroFPSEqjpMIcR8XWfhMi3nGrZH+yIEDKzj93dnynMtjdt29m NwgegnkyruD3AJAJMQlWpROj7wM6tRwt/RQHzXD7ude5mYXinSx6o7qjeEh5KvtVaWGZNIyNH7QX03 PtXqkYsIh8qzepHC9wr8mH6qkkUO1tkoy2yiGAA+MawqqegNs1HUQyC90hWs+rYewPsWZdHCusZQgh ZwPEDFuZ5NwYCIx582KcOGBtSe8ERTdcCF8QAsSe7eA8uVzZh7NgAKPp9Qv5ldepnhjwjiXDlXn1kl c6aG7NcBdLnGZLaWPMWbzyie+xLb3X42bGBryj5ZyD+7tJuSeBWhYRQ4Vf3KftFyOoXMrhYgc97usd VBN5UHc/ZqYheG58Rq9zQ6wjzNvKBzLmALvQsvOQLX+K6SPP+pWWlQKN4+LA==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -83,53 +83,59 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memcpy(), memmove(), and memset(), avoid
 intentionally writing across neighboring fields.
 
-Use struct_group() in struct cp2112_string_report around members report,
-length, type, and string, so they can be referenced together. This will
-allow memcpy() and sizeof() to more easily reason about sizes, improve
-readability, and avoid future warnings about writing beyond the end of
-report.
+Use flexible arrays instead of zero-element arrays (which look like they
+are always overflowing) and split the cross-field memcpy() into two halves
+that can be appropriately bounds-checked by the compiler.
 
-"pahole" shows no size nor member offset changes to struct
-cp2112_string_report.  "objdump -d" shows no meaningful object
-code changes (i.e. only source line number induced differences.)
+"pahole" shows no size nor member offset changes to struct mlx5e_tx_wqe
+nor struct mlx5e_umr_wqe. "objdump -d" shows no meaningful object
+code changes (i.e. only source line number induced differences and
+optimizations).
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/hid/hid-cp2112.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en.h     | 4 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c | 4 +++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/hid/hid-cp2112.c b/drivers/hid/hid-cp2112.c
-index 477baa30889c..e6ee453c7cfc 100644
---- a/drivers/hid/hid-cp2112.c
-+++ b/drivers/hid/hid-cp2112.c
-@@ -129,10 +129,12 @@ struct cp2112_xfer_status_report {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index b1b51bbba054..54c014d97db7 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -204,7 +204,7 @@ static inline int mlx5e_get_max_num_channels(struct mlx5_core_dev *mdev)
+ struct mlx5e_tx_wqe {
+ 	struct mlx5_wqe_ctrl_seg ctrl;
+ 	struct mlx5_wqe_eth_seg  eth;
+-	struct mlx5_wqe_data_seg data[0];
++	struct mlx5_wqe_data_seg data[];
+ };
  
- struct cp2112_string_report {
- 	u8 dummy;		/* force .string to be aligned */
--	u8 report;		/* CP2112_*_STRING */
--	u8 length;		/* length in bytes of everyting after .report */
--	u8 type;		/* USB_DT_STRING */
--	wchar_t string[30];	/* UTF16_LITTLE_ENDIAN string */
-+	struct_group_attr(contents, __packed,
-+		u8 report;		/* CP2112_*_STRING */
-+		u8 length;		/* length in bytes of everyting after .report */
-+		u8 type;		/* USB_DT_STRING */
-+		wchar_t string[30];	/* UTF16_LITTLE_ENDIAN string */
-+	);
- } __packed;
+ struct mlx5e_rx_wqe_ll {
+@@ -220,7 +220,7 @@ struct mlx5e_umr_wqe {
+ 	struct mlx5_wqe_ctrl_seg       ctrl;
+ 	struct mlx5_wqe_umr_ctrl_seg   uctrl;
+ 	struct mlx5_mkey_seg           mkc;
+-	struct mlx5_mtt                inline_mtts[0];
++	struct mlx5_mtt                inline_mtts[];
+ };
  
- /* Number of times to request transfer status before giving up waiting for a
-@@ -986,8 +988,8 @@ static ssize_t pstr_show(struct device *kdev,
- 	u8 length;
- 	int ret;
+ extern const char mlx5e_self_tests[][ETH_GSTRING_LEN];
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+index 2f0df5cc1a2d..2d2364ea13cf 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+@@ -341,8 +341,10 @@ mlx5e_xmit_xdp_frame(struct mlx5e_xdpsq *sq, struct mlx5e_xmit_data *xdptxd,
  
--	ret = cp2112_hid_get(hdev, attr->report, &report.report,
--			     sizeof(report) - 1, HID_FEATURE_REPORT);
-+	ret = cp2112_hid_get(hdev, attr->report, (u8 *)&report.contents,
-+			     sizeof(report.contents), HID_FEATURE_REPORT);
- 	if (ret < 3) {
- 		hid_err(hdev, "error reading %s string: %d\n", kattr->attr.name,
- 			ret);
+ 	/* copy the inline part if required */
+ 	if (sq->min_inline_mode != MLX5_INLINE_MODE_NONE) {
+-		memcpy(eseg->inline_hdr.start, xdptxd->data, MLX5E_XDP_MIN_INLINE);
++		memcpy(eseg->inline_hdr.start, xdptxd->data, sizeof(eseg->inline_hdr.start));
+ 		eseg->inline_hdr.sz = cpu_to_be16(MLX5E_XDP_MIN_INLINE);
++		memcpy(dseg, xdptxd->data + sizeof(eseg->inline_hdr.start),
++				MLX5E_XDP_MIN_INLINE - sizeof(eseg->inline_hdr.start));
+ 		dma_len  -= MLX5E_XDP_MIN_INLINE;
+ 		dma_addr += MLX5E_XDP_MIN_INLINE;
+ 		dseg++;
 -- 
 2.30.2
 
