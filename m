@@ -5,55 +5,54 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 999F5C3F6A3
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 320B0C19F35
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68FB36105A
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1275660FBF
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232596AbhG0U7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54040 "EHLO
+        id S232376AbhG0U7P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231339AbhG0U7F (ORCPT
+        with ESMTP id S232214AbhG0U7I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:05 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14541C061764
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id b6so1772207pji.4
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:08 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12560C061765
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id j1so1780960pjv.3
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=HpqGAKzdyVBA/Xfwi2YIWzNMC8MxbuJr9wu4OHi5PCI=;
-        b=b9n3PLWe+yZgButmI22wyxu+eeyOUhPxCDUEfynBqPyMnsrnYQiVExI+J4v3rxE5/o
-         G8J1IXNU0m0vNz/8YTkfJoaVZZj0wRBYaQuAJPoofDusamLFunZmfD45sWLn68LLU6JA
-         BeETDRJ6OBfY6C94RhaCenx0bdi00zda2HbHY=
+        bh=A3PAzWLU246y1XAJJGWj+zmXxgq3vu+t3uT7F7ts2iM=;
+        b=IYhfsWGlsw3iSzV/PshzqWyl6YBx5L4bzzAy1O/DivhJOOn5XnSEfDfbmKq3pZ+0Vk
+         uh7GiUZL5niXHON0wQ0k5rOANeYvbqA7jpbTdKzVDWyXzIPUHuwdFvuQCZlNfXL/s5xy
+         EIQ0LWDe7jO3cVQe1/FSgbqBokHxmE/gnetDA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=HpqGAKzdyVBA/Xfwi2YIWzNMC8MxbuJr9wu4OHi5PCI=;
-        b=oo7b0aIDiPcZx9UPiBI3tcLkJ+6K9zU4oTprHpl2tAfVSZU8UH3J9z41dHc0sSI61u
-         ELusJg+1SfLuJ2pWh4PNE2fVzuWwbXPfkYrpC1eHfRk9shz5t2LS5EJSc2dFi4lJiU2h
-         +Yp+A1Jgn+dkQ8/148qaSDVIiKyR2Lf06Ctq5nc/OWtIJgs+DN3TGyVprng/tbPPlprI
-         jpL3jnGndMgawudtLYGotPTYef2y2DawKcF+8UXoj07QIBY4MRH4F3kyYC7mtU+pIqyF
-         nF/rCu8YF7rXUfaahOffAqh9cRNLyA8IYXt+7/QXn7oGdMCSyLwgjdaS/0UNOD7+j1Cy
-         m+AQ==
-X-Gm-Message-State: AOAM532KhpwlWkjp+mtPdQL+FhKzCMgLTOBmYSyxgWz1r6ojxa1lqU9+
-        YLCumYSL5v1e6fTrtxis350gZQ==
-X-Google-Smtp-Source: ABdhPJwDSoBnYuvYRba1s+KLi8H28OXxuTeCqk1M8Bi6vVkOBrXn2p1i6DPX5y3V6fg7nYwJU2Ltsg==
-X-Received: by 2002:a05:6a00:1391:b029:347:168f:1be7 with SMTP id t17-20020a056a001391b0290347168f1be7mr25305700pfg.70.1627419544638;
-        Tue, 27 Jul 2021 13:59:04 -0700 (PDT)
+        bh=A3PAzWLU246y1XAJJGWj+zmXxgq3vu+t3uT7F7ts2iM=;
+        b=JNaxq9mmBV/rrQC6CSl2XS6XjjXH+EAvwVXowwyulIGavrnEGHzdQBUOyAikTfaBEL
+         irLXnUzudT86DAtYgyJHyCBzeFINZALfAgZBduSgpmj4ykZy1DnPuF8Op0eSFP3i4YDK
+         I/3OqhhVttTNdEF/OeyHRHzlivhsB/RWT1rGwBsDRkZxm9s9kHvuO/uTcIqaIhT2jNRZ
+         TtzZsWu3jCpJE9QWrvyG8hmQ8HREqGtq8nbSDLC01uW/mDmpPfhP/XLwSNYAD5fCBDia
+         5LPoUKkPGF7GqtFyQjsfbHT9XJKJbElOcEc6TFX4aK1Rq0Edap2AExGd0xMTbcwRTLro
+         51AA==
+X-Gm-Message-State: AOAM530Dt3VKw8fWmr+s77Kmw+dBVtPJT+2GO1rJ3qhH0QhUQ92pHp4/
+        ohoZ3EeMlGu0FVFpsU/UmzyAQQ==
+X-Google-Smtp-Source: ABdhPJztdkoXWjXT5QD/exKWw9kw2lZC8KEgnSRSe5hUXoJqgzkXvN7Kc2Da1tooBWFUMhMM+5Yl+Q==
+X-Received: by 2002:a63:4206:: with SMTP id p6mr25847081pga.285.1627419547538;
+        Tue, 27 Jul 2021 13:59:07 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id z11sm547955pjq.13.2021.07.27.13.59.02
+        by smtp.gmail.com with ESMTPSA id nm19sm3750853pjb.27.2021.07.27.13.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:02 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,14 +64,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 02/64] mac80211: Use flex-array for radiotap header bitmap
-Date:   Tue, 27 Jul 2021 13:57:53 -0700
-Message-Id: <20210727205855.411487-3-keescook@chromium.org>
+Subject: [PATCH 08/64] staging: rtl8192u: Use struct_group() for memcpy() region
+Date:   Tue, 27 Jul 2021 13:57:59 -0700
+Message-Id: <20210727205855.411487-9-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3134; h=from:subject; bh=5kQsK42FaWrxRPo6tG17S0vU5dwTXkF5YJ2Hl+bjQYs=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOASZA2wSHJdmV0oArAVWb1HVe/NAsbCB3ibAr6 bxRmCeCJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgAAKCRCJcvTf3G3AJucAD/ 9WI40Y8DsttY+40HaEXLlcd6Xryj8yJoVYK9d3gFpDvBSXYBI3VB3m525SOa2sCJC28jHTFRiHhMP6 huqw/nIdms4tjuS8pOZ+DGwzggPQcPgixq4hWdvWbXbeWvQ8mzb3g3NqUh7MCUUYaHd0XZHxeZEa68 KBhKJTR1IzAMdGAY+67PouIo4YzyBaBznnCQb+NLdIUlfT6t8W4CZN8+AQx4EbaO/u03il9VH+AfXK zdL7aZ+v+6RlA8EstG3CnlY/VnSeo0q9XrTH0Q56zymAeoXPIKieJGMZFa6iM2gjIrRUcDFGpVhu7C FZJrEnBqWU+ZIq8c+Zv+XxxBR1dgFsXNeW0wYvt3oXMHiOFT6xXQ9AnpctZU8KlMtct/hdjCaZw4oR 6asBqobuZZVyim88vDBe4PCm0P2lmf5t8CRqSL58iOkzZjRIH+nNwtC8icwiMHZbEOgdBWJYI4n844 m7nJHNp9t3NKdyBYEy6/4q2ExNfaSeCS36fcueGEcPaVGU6/xc4bbPtOCUCt/ocW7/1gVWfDLaGod7 erVQcNz7hMISnSKfJsI54OZh2ah7BqVzDbpCwCewNsGxodKlGatSWB6nfpU2DxvtQKgn0q2ExYIS5K sH5r2wLmmPf369ln2Cl1YKvhBYGnsOEMQkCSbYctGbRwD2e8tiHtSiSMTzJw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4950; h=from:subject; bh=Auxw1wcSuXLG5PZpqLVm+ToYm1BZgRegEEtY4+3pHw8=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOBQir91mVsM70reKpFOtfagOnSNOBMkJbr7LeF cLNYV1eJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJo2aD/ 4h/gem/XLyVOoZV8fQb32viUj7rAyg4aQwHNkuWJUlBL82B2X54xsC7DFKlCa8N29O8H+qPnwHWT4K 6ICv9SY/cbNJmcNDaVRxa1zStMzYOl04p6xD9WCnFFjK4B+q9LeGI2YR5rnKXwMRVRN62lGGb2tbDG n+B7S4A3Lzj7gnCvw8H/Jh9jykK5MtMYCK3XaA8cM136SS6m+/Mz2jQkeWtGxivZP3JfUY99slNEkG 0LZ6JrK7U2HhCqW+GBrJFottbbgKHmwow4xCoIvuKHVrRe+pSDHtQkB9J3CO3kRk/B4+UUgR29S3N1 WGzHQkQOdCogIIKKhl+dGtRJkzv1E6H3AfsfHn9mRX+rlRVMuWdY7OOtWt09v9kOhJi9TJuYsCUhXd bb2iFWqiDbfnzl1cMyIJwIcRmKPa8iWe3+q44A9MO1491pridbSlGKpf8eOQJKQrrofq4o2cm2VKmy VObV/m/b4dpWYSDq+ecjCOAwd9Q2lNy5lWiCgPg/UTP9q/ZJuT+DhU92dfstVyX0UZsLQY2XjsDTcY +kcirjK4bujmk/nhABsxK1FigYwqICkmpUKU2Nw2NqvaMQuz7GFb/MwXE0F6PrttZzKLnIcWQt2RMg S0RnPStAbsoJy+Iytt3EPyIdRveCUUfgivtpUg6QthiMPmFTasWv4patQHMQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -83,88 +82,134 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memcpy(), memmove(), and memset(), avoid
 intentionally writing across neighboring fields.
 
-The it_present member of struct ieee80211_radiotap_header is treated as a
-flexible array (multiple u32s can be conditionally present). In order for
-memcpy() to reason (or really, not reason) about the size of operations
-against this struct, use of bytes beyond it_present need to be treated
-as part of the flexible array. Add a union/struct to contain the new
-"bitmap" member, for use with trailing presence bitmaps and arguments.
+Use struct_group() around members addr1, addr2, and addr3 in struct
+rtl_80211_hdr_4addr, and members qui, qui_type, qui_subtype, version,
+and ac_info in struct ieee80211_qos_information_element, so they can be
+referenced together. This will allow memcpy() and sizeof() to more easily
+reason about sizes, improve readability, and avoid future warnings about
+writing beyond the end of addr1 and qui. Additionally replace zero sized
+arrays with flexible arrays in struct ieee_param.
 
-Additionally improve readability in the iterator code which walks
-through the bitmaps and arguments.
+"pahole" shows no size nor member offset changes to struct
+rtl_80211_hdr_4addr nor struct ieee80211_qos_information_element. "objdump
+-d" shows no meaningful object code changes (i.e. only source line number
+induced differences and optimizations).
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/net/ieee80211_radiotap.h | 24 ++++++++++++++++++++----
- net/mac80211/rx.c                |  2 +-
- net/wireless/radiotap.c          |  5 ++---
- 3 files changed, 23 insertions(+), 8 deletions(-)
+ .../staging/rtl8192u/ieee80211/ieee80211.h    | 24 +++++++++++--------
+ .../rtl8192u/ieee80211/ieee80211_crypt_ccmp.c |  3 ++-
+ .../staging/rtl8192u/ieee80211/ieee80211_rx.c |  8 +++----
+ 3 files changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/include/net/ieee80211_radiotap.h b/include/net/ieee80211_radiotap.h
-index c0854933e24f..101c1e961032 100644
---- a/include/net/ieee80211_radiotap.h
-+++ b/include/net/ieee80211_radiotap.h
-@@ -39,10 +39,26 @@ struct ieee80211_radiotap_header {
- 	 */
- 	__le16 it_len;
- 
--	/**
--	 * @it_present: (first) present word
--	 */
--	__le32 it_present;
-+	union {
-+		/**
-+		 * @it_present: (first) present word
-+		 */
-+		__le32 it_present;
-+
-+		struct {
-+			/* The compiler makes it difficult to overlap
-+			 * a flex-array with an existing singleton,
-+			 * so we're forced to add an empty named
-+			 * variable here.
-+			 */
-+			struct { } __unused;
-+
-+			/**
-+			 * @bitmap: all presence bitmaps
-+			 */
-+			__le32 bitmap[];
-+		};
-+	};
+diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211.h b/drivers/staging/rtl8192u/ieee80211/ieee80211.h
+index 7903c777a417..6ae8d7504558 100644
+--- a/drivers/staging/rtl8192u/ieee80211/ieee80211.h
++++ b/drivers/staging/rtl8192u/ieee80211/ieee80211.h
+@@ -303,7 +303,7 @@ struct ieee_param {
+ 		struct {
+ 			u32 len;
+ 			u8 reserved[32];
+-			u8 data[0];
++			u8 data[];
+ 		} wpa_ie;
+ 		struct{
+ 			int command;
+@@ -316,7 +316,7 @@ struct ieee_param {
+ 			u8 idx;
+ 			u8 seq[8]; /* sequence counter (set: RX, get: TX) */
+ 			u16 key_len;
+-			u8 key[0];
++			u8 key[];
+ 		} crypt;
+ 	} u;
+ };
+@@ -917,9 +917,11 @@ struct rtl_80211_hdr_3addr {
+ struct rtl_80211_hdr_4addr {
+ 	__le16 frame_ctl;
+ 	__le16 duration_id;
+-	u8 addr1[ETH_ALEN];
+-	u8 addr2[ETH_ALEN];
+-	u8 addr3[ETH_ALEN];
++	struct_group(addrs,
++		u8 addr1[ETH_ALEN];
++		u8 addr2[ETH_ALEN];
++		u8 addr3[ETH_ALEN];
++	);
+ 	__le16 seq_ctl;
+ 	u8 addr4[ETH_ALEN];
+ 	u8 payload[];
+@@ -1100,11 +1102,13 @@ typedef union _frameqos {
+ struct ieee80211_qos_information_element {
+ 	u8 elementID;
+ 	u8 length;
+-	u8 qui[QOS_OUI_LEN];
+-	u8 qui_type;
+-	u8 qui_subtype;
+-	u8 version;
+-	u8 ac_info;
++	struct_group(data,
++		u8 qui[QOS_OUI_LEN];
++		u8 qui_type;
++		u8 qui_subtype;
++		u8 version;
++		u8 ac_info;
++	);
  } __packed;
  
- /* version is always 0 */
-diff --git a/net/mac80211/rx.c b/net/mac80211/rx.c
-index 2563473b5cf1..0d959a98e908 100644
---- a/net/mac80211/rx.c
-+++ b/net/mac80211/rx.c
-@@ -328,7 +328,7 @@ ieee80211_add_rx_radiotap_header(struct ieee80211_local *local,
+ struct ieee80211_qos_ac_parameter {
+diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
+index c241cf484023..61f9a189c90c 100644
+--- a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
++++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
+@@ -141,7 +141,8 @@ static int ccmp_init_iv_and_aad(struct rtl_80211_hdr_4addr *hdr,
+ 	pos = (u8 *)hdr;
+ 	aad[0] = pos[0] & 0x8f;
+ 	aad[1] = pos[1] & 0xc7;
+-	memcpy(aad + 2, hdr->addr1, 3 * ETH_ALEN);
++	BUILD_BUG_ON(sizeof(hdr->addrs) != 3 * ETH_ALEN);
++	memcpy(aad + 2, &hdr->addrs, 3 * ETH_ALEN);
+ 	pos = (u8 *)&hdr->seq_ctl;
+ 	aad[20] = pos[0] & 0x0f;
+ 	aad[21] = 0; /* all bits masked */
+diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
+index b0e01ee65f7f..d5557ee0a3b7 100644
+--- a/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
++++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
+@@ -1332,13 +1332,13 @@ static int ieee80211_read_qos_param_element(struct ieee80211_qos_parameter_info
+ 					    *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct ieee80211_qos_parameter_info) - 2;
++	u16 size = sizeof(element_param->info_element.data);
  
- 	rthdr = skb_push(skb, rtap_len);
- 	memset(rthdr, 0, rtap_len - rtap.len - rtap.pad);
--	it_present = &rthdr->it_present;
-+	it_present = rthdr->bitmap;
+ 	if (!info_element || !element_param)
+ 		return -1;
  
- 	/* radiotap header, set always present flags */
- 	rthdr->it_len = cpu_to_le16(rtap_len);
-diff --git a/net/wireless/radiotap.c b/net/wireless/radiotap.c
-index 36f1b59a78bf..9f4f1a772964 100644
---- a/net/wireless/radiotap.c
-+++ b/net/wireless/radiotap.c
-@@ -115,10 +115,9 @@ int ieee80211_radiotap_iterator_init(
- 	iterator->_max_length = get_unaligned_le16(&radiotap_header->it_len);
- 	iterator->_arg_index = 0;
- 	iterator->_bitmap_shifter = get_unaligned_le32(&radiotap_header->it_present);
--	iterator->_arg = (uint8_t *)radiotap_header + sizeof(*radiotap_header);
-+	iterator->_arg = (uint8_t *)&radiotap_header->bitmap[1];
- 	iterator->_reset_on_ext = 0;
--	iterator->_next_bitmap = &radiotap_header->it_present;
--	iterator->_next_bitmap++;
-+	iterator->_next_bitmap = &radiotap_header->bitmap[1];
- 	iterator->_vns = vns;
- 	iterator->current_namespace = &radiotap_ns;
- 	iterator->is_radiotap_ns = 1;
+ 	if (info_element->id == QOS_ELEMENT_ID && info_element->len == size) {
+-		memcpy(element_param->info_element.qui, info_element->data,
++		memcpy(&element_param->info_element.data, info_element->data,
+ 		       info_element->len);
+ 		element_param->info_element.elementID = info_element->id;
+ 		element_param->info_element.length = info_element->len;
+@@ -1358,7 +1358,7 @@ static int ieee80211_read_qos_info_element(
+ 		struct ieee80211_info_element *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct ieee80211_qos_information_element) - 2;
++	u16 size = sizeof(element_info->data);
+ 
+ 	if (!element_info)
+ 		return -1;
+@@ -1366,7 +1366,7 @@ static int ieee80211_read_qos_info_element(
+ 		return -1;
+ 
+ 	if ((info_element->id == QOS_ELEMENT_ID) && (info_element->len == size)) {
+-		memcpy(element_info->qui, info_element->data,
++		memcpy(&element_info->data, info_element->data,
+ 		       info_element->len);
+ 		element_info->elementID = info_element->id;
+ 		element_info->length = info_element->len;
 -- 
 2.30.2
 
