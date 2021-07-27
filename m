@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26FBBC432BE
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24BEFC43214
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11CA260F9D
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F6C060F9D
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233841AbhG0VHO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S233871AbhG0VHO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 27 Jul 2021 17:07:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55880 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233259AbhG0VHA (ORCPT
+        with ESMTP id S232822AbhG0VHA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 27 Jul 2021 17:07:00 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DABC061796
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:06:57 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id a4-20020a17090aa504b0290176a0d2b67aso6683231pjq.2
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:06:57 -0700 (PDT)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD34C0617A3
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:06:59 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id e14so10733plh.8
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:06:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eOeu4d7QLTPBu6QYYoqWVSDz/qzrHDToqQYaK/VYhSM=;
-        b=nmClRthMB6NUA8m9k5ViyzIj9tZSLtz+W7Y/dUJqpsE4Ra7JIpNa/jk5t7+u9guaKS
-         rD4SN4syDHrUBQt/o8lo3la5Br4kga0btCULhIMfCaHEe3PG6RzT3IeGYfyUKyEfoq3Z
-         2Fz2wu2iQF1vNyl73FIcK6AVJYeThxSfaojvI=
+        bh=eHJ5K8LiDBXCeTCe7PvgaP3UqQR5uDLvklqQUiAbnC0=;
+        b=C9odf/LxM8hQlFgEX94OyyWcybtfMz5fkcvxUOiwkptiFAnxb7Vjc9j5fcILzWzUe0
+         9SXGn/8zZ/4rPOmwRPn9BGvFK32z6oyRZbo5d8AQJpThOjubhaqeuoW3W01DCWdHwowW
+         ZQKSKYcukTOUL4ao1lnoeA3vzowcOeQgLkBm8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eOeu4d7QLTPBu6QYYoqWVSDz/qzrHDToqQYaK/VYhSM=;
-        b=clcF/D2DUmtCN5SZRQWZvH5B7csMqMaqskKQgMdYvLXTbAS5cUo+hOR3MhOAlBE/pI
-         Np2YCowZCunw6pZj3iWiX7nJSw2wGp2RzwlpxGcs4erFCQn4AY7fv1o3vJDKTpMrJTwc
-         zn5pxiN6y4+RaSZ0BECRScYBGnOKWamMq4iHUuZwWbQMUqG4e1H9MeBNLEC2FoR8y0b4
-         +1+mbnhUHOsEAzNB7LJ/lhE7ju2Ny9jeAM6O2q/rqAit6DjNF9+Fuy93Gmf5ouyMOF87
-         Jz2KI4jDYHhut4FxFjm41yyfdFQGmC6mmOqyPum7UZCUnmuLmtGHMDzarqwn7z3jXVA7
-         Y34g==
-X-Gm-Message-State: AOAM531UVm03IDOCToh9y/uF3oCsqWdASawcWhu4T6cGnigvvcCpmpVm
-        eoonxx3kFdLfHn/4pM0hzU/tGA==
-X-Google-Smtp-Source: ABdhPJynj7Mxd5dzejb/chP88BPdMVTyDp7rQutQlvaypR/9xo8DyQW71dEyKFZ3FwRUaCTEut3Rdg==
-X-Received: by 2002:a17:902:7884:b029:12a:efa7:18d8 with SMTP id q4-20020a1709027884b029012aefa718d8mr20498548pll.85.1627420017391;
-        Tue, 27 Jul 2021 14:06:57 -0700 (PDT)
+        bh=eHJ5K8LiDBXCeTCe7PvgaP3UqQR5uDLvklqQUiAbnC0=;
+        b=GPH+I+fd8ZKrlvl6c4MC1ViYB5siMyekL0Qa3rbzsv4EFyjCtJjUOEsMOhrfxuxoHI
+         qR45UbCstQF/DUZkQbpZGjfHa4vzrQtqcdWtr58uzFujW8xnj8AAHpK2E7Lav+q8Z8ld
+         8a6biWz3TSkrd/7aYSlFKIBHKRMJ7PZ1P/qeEOiF8WMBvA+p/lIPJ2nXFVInneZj2xZs
+         J6vuD5YfAvUTN+aEcCVq/2YEvOhZQux5vFwCCeVuoXjqseV96W09/KfpQ8817PzLlEMF
+         QShYB5GNqswOB1KvI/gK03e6EouH06XNBOTp4rV2ygmiKrvCaw7iF834K7xSMTagnd2n
+         2e1w==
+X-Gm-Message-State: AOAM530DrUBtxivT+SFVLwq+wudbri2S6uuYUhl9bdduF86RTowS0a17
+        rj4dRU5za0ClYcf9o3u09/R7bdZXATuLncXL
+X-Google-Smtp-Source: ABdhPJyiPLiIxF0eZ6Ht4eersAStzTtAa77UuUUu3QKRioXbvWIKsuENyKgvU1Bb8BbQdCxPR7B6MQ==
+X-Received: by 2002:a05:6a00:cc1:b029:32b:8465:9b59 with SMTP id b1-20020a056a000cc1b029032b84659b59mr24967310pfv.66.1627420018950;
+        Tue, 27 Jul 2021 14:06:58 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id e12sm3784712pjh.33.2021.07.27.14.06.52
+        by smtp.gmail.com with ESMTPSA id r128sm4687668pfc.155.2021.07.27.14.06.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 14:06:54 -0700 (PDT)
+        Tue, 27 Jul 2021 14:06:55 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,87 +65,58 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 43/64] ath11k: Use memset_after() for clearing queue descriptors
-Date:   Tue, 27 Jul 2021 13:58:34 -0700
-Message-Id: <20210727205855.411487-44-keescook@chromium.org>
+Subject: [PATCH 63/64] iwlwifi: dbg_ini: Split memcpy() to avoid multi-field write
+Date:   Tue, 27 Jul 2021 13:58:54 -0700
+Message-Id: <20210727205855.411487-64-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3116; h=from:subject; bh=j3LfXLw0C1RpC2nAiDmR2FV9ppMLr+xX2/Byaw0lUBI=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOJQjRIUTQLa3kW6JEv7dcnm26TeZbOKFOYV9Uy JUsIKlSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBziQAKCRCJcvTf3G3AJv7OD/ wOv9NnzO8vnuCd1yLn28Uh20ipd4blI/H+kMp3Wx9VsXqAUniUau5o4ju7EMl4saOmJ/ltHPdb99Yn /TXqBvuvm/fcFKOY1q7nIR/AaYPJW7LhNkRTXplMqKXe+3Qnnu8FBSAw2DUq1zXDmuYemIlXptx4ne Bmu+McSU4fRhGXiPWsd07ziif5KbBqSw6Xksw8nxp+XBVcxJX8et8bdwHVvJj0saggDJ1aJ4HQ1mF9 4HllmEQZL+wN8MhR+vknVrUK52Mj7rfxI7dwb4lSH2MhOUDYqcIIacwA5QxlhlqjlKy6/FQBNGIoBY ryzx8o2IbdOCSNbzQwAASqLiVYlD6HbVddTDKOJUZ+x++HGUnv9Ns/IgQDKGBNyhoj/ri9ybH6GklO voujRz697QTfjIL/VjnyvyF+xPaJEI8Wohz7g53gpHyYojdV+zinQHZWRwFAMHSly548C+mHC2LU2f E4CcST932vQu8ftiiXm818XOydMxX00CvzoOdlcSm4NgFL87y5zloqO76ihmGAN/LUl+GulYt7gpaN 6tsAlGYd0W8yUr7UrJaRl6QTkAffrdEJCc47+DqZK4QRdgofQHTqb0FpwfJ1WH7QWGQzpFXEyUW2Se Px6rDcKN7HvstRyGsxqRWPFEVU0eQ/A1CMhA1WHwshXb3mfP/uaPnWfv3RBw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1543; h=from:subject; bh=s7Xq57zTgnpQLZW9o4dFqvke+b60yZlygvvLnoMj4dM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOO7ylJm1Pef8Nw2Y9AVMYN/aYHsm9YN/NkJMM0 14MmcVqJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzjgAKCRCJcvTf3G3AJh5wD/ 0a9KvpCqyFZ9QKAdlblaiFHTvLu6J0I4KvuS/Pu8WGvbtdHoFcEc1A0J0FqancucuNe2oN76GijGN8 ZmNxkbLuDowcPvHB1KNKV+y/VKyD/GjTqJSFGbHSgE1d3XVQUqA8M80luRN12bHJex3vWEGlQIgVUS eo5mVVxa1vQFLA/APQtdO4QC3S0Rxaeq//vH7IZ+y8uTxf7ChRZtqCWERhOu6zi0YYM7UsadKsQ1UW kuKw1BHS6rVbpMLujJWWAPEyxEe0W/MD7sUJar7lh/sg2nbnVIlvXob+LuNF5xQtZwtIVnlj1/Tx1c JeZYoyxgw4/uvoQF/VaOiL8Fb1Mky8hA3J0Q0KSrMfDlDYr2psRQCz/wYgNiK8aZmkNvU6EyldhpRR jvpt2FEuN89iS51ofpMkKT9jWkj2G2IJnYUpSSBDS7x/6U33s9hWYtpjYFkmrtQS+KN+/zM7e0Wq85 h9kdtxEMB5GcqKunvfEzrJH/6l30zcuWdtxzKr+5eUMIzfT4m7IfJftQW1OHHiIRW8y1i2y9mOZGde lSqRZZ+xSG98+pb5deEI05oPi7AOE1XKeHnMMfVyygop9nOeSAmsJJWm+ExFOnNUkiTzMkM+sJqqiU uZuZWsn+50meKz7mBFEHFWpt++2rlXLf2jFCbTMaiMMKok79IQfcYfkHRDkg==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memset(), avoid intentionally writing across
-neighboring fields.
-
-Use memset_after() so memset() doesn't get confused about writing
-beyond the destination member that is intended to be the starting point
-of zeroing through the end of the struct. Additionally split up a later
-field-spanning memset() so that memset() can reason about the size.
+To avoid a run-time false positive in the stricter FORTIFY_SOURCE
+memcpy() checks, split the memcpy() into the struct and the data.
+Additionally switch the data member to a flexible array to follow
+modern language conventions.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/wireless/ath/ath11k/hal_rx.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/net/wireless/intel/iwlwifi/fw/file.h     | 2 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/wireless/ath/ath11k/hal_rx.c b/drivers/net/wireless/ath/ath11k/hal_rx.c
-index 325055ca41ab..c72b6b45b3ba 100644
---- a/drivers/net/wireless/ath/ath11k/hal_rx.c
-+++ b/drivers/net/wireless/ath/ath11k/hal_rx.c
-@@ -29,8 +29,7 @@ static int ath11k_hal_reo_cmd_queue_stats(struct hal_tlv_hdr *tlv,
- 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
+diff --git a/drivers/net/wireless/intel/iwlwifi/fw/file.h b/drivers/net/wireless/intel/iwlwifi/fw/file.h
+index 9a8c7b7a0816..226ccd3a6612 100644
+--- a/drivers/net/wireless/intel/iwlwifi/fw/file.h
++++ b/drivers/net/wireless/intel/iwlwifi/fw/file.h
+@@ -116,7 +116,7 @@ enum iwl_ucode_tlv_type {
+ struct iwl_ucode_tlv {
+ 	__le32 type;		/* see above */
+ 	__le32 length;		/* not including type/length fields */
+-	u8 data[0];
++	u8 data[];
+ };
  
- 	desc = (struct hal_reo_get_queue_stats *)tlv->value;
--	memset(&desc->queue_addr_lo, 0,
--	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
-+	memset_after(desc, 0, cmd);
+ #define IWL_TLV_UCODE_MAGIC		0x0a4c5749
+diff --git a/drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c b/drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c
+index 0ddd255a8cc1..f4efddf3e3c3 100644
+--- a/drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c
++++ b/drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c
+@@ -71,7 +71,8 @@ static int iwl_dbg_tlv_add(const struct iwl_ucode_tlv *tlv,
+ 	if (!node)
+ 		return -ENOMEM;
  
- 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
- 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
-@@ -62,8 +61,7 @@ static int ath11k_hal_reo_cmd_flush_cache(struct ath11k_hal *hal, struct hal_tlv
- 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
+-	memcpy(&node->tlv, tlv, sizeof(node->tlv) + len);
++	memcpy(&node->tlv, tlv, sizeof(node->tlv));
++	memcpy(node->tlv.data, tlv->data, len);
+ 	list_add_tail(&node->list, list);
  
- 	desc = (struct hal_reo_flush_cache *)tlv->value;
--	memset(&desc->cache_addr_lo, 0,
--	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
-+	memset_after(desc, 0, cmd);
- 
- 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
- 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
-@@ -101,8 +99,7 @@ static int ath11k_hal_reo_cmd_update_rx_queue(struct hal_tlv_hdr *tlv,
- 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
- 
- 	desc = (struct hal_reo_update_rx_queue *)tlv->value;
--	memset(&desc->queue_addr_lo, 0,
--	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
-+	memset_after(desc, 0, cmd);
- 
- 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
- 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
-@@ -762,15 +759,17 @@ void ath11k_hal_reo_qdesc_setup(void *vaddr, int tid, u32 ba_window_size,
- 	 * size changes and also send WMI message to FW to change the REO
- 	 * queue descriptor in Rx peer entry as part of dp_rx_tid_update.
- 	 */
--	memset(ext_desc, 0, 3 * sizeof(*ext_desc));
-+	memset(ext_desc, 0, sizeof(*ext_desc));
- 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
- 				    HAL_DESC_REO_QUEUE_EXT_DESC,
- 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_1);
- 	ext_desc++;
-+	memset(ext_desc, 0, sizeof(*ext_desc));
- 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
- 				    HAL_DESC_REO_QUEUE_EXT_DESC,
- 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_2);
- 	ext_desc++;
-+	memset(ext_desc, 0, sizeof(*ext_desc));
- 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
- 				    HAL_DESC_REO_QUEUE_EXT_DESC,
- 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_3);
+ 	return 0;
 -- 
 2.30.2
 
