@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F92C19F3F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F504C19F31
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B046960FA0
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A14260F6D
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231608AbhG0U7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54064 "EHLO
+        id S233230AbhG0U70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232772AbhG0U7N (ORCPT
+        with ESMTP id S232941AbhG0U7S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:13 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2369C0617B0
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:09 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id o44-20020a17090a0a2fb0290176ca3e5a2fso1053467pjo.1
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:09 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:18 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1E9C06136E
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id pf12-20020a17090b1d8cb0290175c085e7a5so6659049pjb.0
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=bokzvyrG/U6aqJMcplPprkAXMLOtluQLvxu28yduQ3I=;
-        b=BRJ6YXZFlzjubx3iY+P/cRdBsRsX9+VYLhU8PHg2kq/i8EQRUyFiRWx/kjBN2fHZ57
-         Rbvn2BG0HVn8p+mlpPeMBNL1FomMRZkRcy6dAl/Lz52OpvlFYUdeYvXs1q7RrMdf5wMe
-         Wym2Ven54uHKxbOOcmPeVL9UTM7qkeunpAHmw=
+        bh=niMj9CXz4ejnw+kzGNZe1+bUFXSbgDhe9sFS3VQ9miI=;
+        b=a+dkLFxyeSBPiOFmgASKI3HBPzumVIOC5mH0NfPZ4G0u9HE21lIwFBBWBONzwmMQDo
+         Efqix/y2SZ0MmC2V1Ld9XBh4ywoKeS0o00fNfBm4e5u9ZpK6ODN3+AjOzFOZhZhaYDHx
+         uzL0y45E1gPOLULzFld6xboGrx4XSCubE7bFI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=bokzvyrG/U6aqJMcplPprkAXMLOtluQLvxu28yduQ3I=;
-        b=RUfQl/1f+4KnTuxJyEoZtNY9qwThHwcsBcDS8VDkQRis6YRBOWI/WsMc2i7CCEZhbL
-         zFmPXKNA4tWp+zd2ETeU8A4W2T6CT7c5HZiPArOlIl+GfS1peIWOLocc6/MgFPc3pxdR
-         bEfJNxpHnc9rQxLYOECgkJwKtXrOzNxiMcteaLRnicvLUJrgX5wCYOFrM8wlL2AeNiqD
-         Er7sif6L+mf965eM/xUu+NlqWHXCPo+BCWt6jJRNk4430ImuQYIZGRS6jtNofJuDMBtS
-         9QTX8hexx15YaEjTlQTe8l8tvATqeWGA+quJobljB3VkbGc4+poYfOz/BmoRWsNh6xIp
-         hKOw==
-X-Gm-Message-State: AOAM530vBJ1mEpsUjFKCqHiev7O1Z5ID197lTTfni/073ucLRrBsAd1h
-        jOTLyL5bf9J/ggs8q+Rlw7J7gA==
-X-Google-Smtp-Source: ABdhPJxFkKX2Cb+2kct+lBvPCB88+g8EFFUo2+jlZ/mx9XAKU9M3E91dz4xBGj+tCH29yt2HnGdwfQ==
-X-Received: by 2002:aa7:80d3:0:b029:347:820c:fbf with SMTP id a19-20020aa780d30000b0290347820c0fbfmr25091421pfn.73.1627419549404;
-        Tue, 27 Jul 2021 13:59:09 -0700 (PDT)
+        bh=niMj9CXz4ejnw+kzGNZe1+bUFXSbgDhe9sFS3VQ9miI=;
+        b=bdXCkkkxxV+s7zN1MNEnMD/RqEkLEalJHYWxnTKt4TZ0MhvBiIBfad7o/pfGHBT+2x
+         8XFTGooyvwor+cVSrt8QVQqc2ZQBVKB6GwRFrHA6+m1pBUl1y2ovh1tT6eZK3S15TjjH
+         +c0ytdvwplIylP21yY7swtGqjAmnu9S13LxgXZ1edo2CoNB17mHWdTBPWaVmr83ux+Eu
+         NrHX+e2X/9mTmP4gDweIumHBiuMpbx+PL2mwYFZ7SG5bz8PP38aCI7TgvJV/ZmNcw8A4
+         IeYqxRwVY5DRbpAPOQVfxtGVIJwXG91eEquObjezDZhzSFIP+EiUUjv8GnlaOwbvGMoS
+         ToTg==
+X-Gm-Message-State: AOAM533AyvI3HJxfnPgGcmfbWKOKDqxfAU5Q5jpQBPzGlOCLMMymCcha
+        6qIXZTN/otwSaQsYwjZkddzeng==
+X-Google-Smtp-Source: ABdhPJzH1DT4GrYsm4Wp3fQD5rhWKkENYYazYbCfE0KpJ6DHpEI/MRvOUuvJv6GD7saGx6RnZcVO6Q==
+X-Received: by 2002:a63:2586:: with SMTP id l128mr26012275pgl.68.1627419551372;
+        Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id b7sm4526752pfl.195.2021.07.27.13.59.08
+        by smtp.gmail.com with ESMTPSA id j13sm5025493pgp.29.2021.07.27.13.59.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:09 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 22/64] bnx2x: Use struct_group() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:58:13 -0700
-Message-Id: <20210727205855.411487-23-keescook@chromium.org>
+Subject: [PATCH 15/64] ipw2x00: Use struct_group() for memcpy() region
+Date:   Tue, 27 Jul 2021 13:58:06 -0700
+Message-Id: <20210727205855.411487-16-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3598; h=from:subject; bh=A1ElP4tjKK6Dp0sFHqCrYLWenZcmBSW5YxsW0evE5y8=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOFm863HXtOc8ZeFmq+4wnVfKZlM+JRATLTvRzZ tF2gptuJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhQAKCRCJcvTf3G3AJg5IEA CxuS8kVvtGTeWwaE8ktJ8PBB1PQTvGy+LqQckpDdbfcwdWpfpfUaRcWDUYeyxQViauxQkjKX+WtpGq hyus00PTGVEQ+WIyIaFXYIjua1ivJAE+8+FSub7TLXSsMnwjQ+LHHUYqIonTydXZVNbnI26vGNsNW7 ZiV9OdkeutbHuBOgoqWEev1HlbW4+SZ11/dsn9f2pkkzB8YIhMzFPMi81NohsNTWNaJi74eoKX6qCr e5hNPHv43bf04K61+a0YVVBBpstRQLsnB1CKmBSNAfoc0edgbIAlA0OMq9CdvWO82lwYn6tk73H1Th 7fuTfssESoKBnqznYLIApEuQg37xDIDAdFz4SIssl7up5lwyunQcndQRrMZj1Y0tXkcj5w6CCUCWPw lmJrQWyWwVSqc682o6B1DYKJ4oZqFDaiMvdanoCeHEjy6x8afQF7duJMQRMS14TygWN8NoWnEQuqEI a0XvMB5J/4Z8eLg8jRrtFzwMiR9aIWjrHcHSQ+Co9sVbkxRgedeTJXK3HctCj2xHW68hdTNWPREow9 XuwAmRn6yMPi0xBwSZ1DDYkz8HIa5o6cUScE4nvrwcxz17OQhpwTybWpV3OxK3O2n9Oi/oLBwMKtNZ ogeLRK3dAHlvMOQzHJDjzkWma5VuOaPCqM5XgIHjiRuhS4PU0czJaG8Sd63Q==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3321; h=from:subject; bh=0Nhl+lV3cEcT5lOU4zXDLwJTWM/l7DZ+/5ez9PThfHU=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHODmdLOpeLBo/X7lz0zzh+JJDwEkaDN00Z8kMzv sILJmNmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgwAKCRCJcvTf3G3AJqu3EA CgffJsGtT8m9lsKheu7s+yA1eAMukcAQ13t72QJcc8A2IdLK2lwV9x8QVh9uUd3041NW91qDNI+Czs 3k2PBePcLrqYo+rdGa4Fs/X3zYzBDuEQKSmIYIkoJBe2xr+niqqh7xhFf/5ghdEYzaVZ0zGolFf8it 26bmcWDMOOoHxklGwf6NXQYQfYTg0hdDkG2BM1l7UXEbXz2oREhTB+LtbTnn0Hj4OfW7ZiO0CPrkhI lKRNotmC8/XbWEzRldEuybAi7+tknghi8uuLE+9GIz7AC4Fe6UXopDTqzxyP6j+beO0cI5K8QQPYQl 42woosmLzvhziq8Gj3/SzeQTJF9WacNXul30sJfOMm0mwZMl3y9Z2UvHeW2Q1tzzCZvtSChEQJMlJv VPnGbrapT0zmmokAsquizS99ri3WqvRQ4aa/1HPQLQxPLdEV0mfXlCZyBdS9Di0az/9jo4GTt6+4dk xw6s52TxDhSNMdH0X/j3Rd4x2bK4G+3/LG6bbP73GrzRSX/7cr5SQeJiichuQ2tAPPZLG3xktu+SBj GylM+395+DNTumAg5AwAJownhHXWSpyplcyTrQ9IxdGJW3YqhHop4Auz1mygoryurP3HSPSQoF2pzP k0+9FvuNGVyc4wPzxm3gvya7bZvJas+dThlg4d+oB8lbja/QIUDEBiG3BoIw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -80,94 +80,89 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memcpy(), memmove(), and memset(), avoid
-intentionally writing across neighboring fields.
+field array bounds checking for memcpy(), memmove(), and memset(),
+avoid intentionally writing across neighboring fields.
 
-Use struct_group() in struct nig_stats around members egress_mac_pkt0_lo,
-egress_mac_pkt0_hi, egress_mac_pkt1_lo, and egress_mac_pkt1_hi (and the
-respective members in struct bnx2x_eth_stats), so they can be referenced
-together. This will allow memcpy() and sizeof() to more easily reason
-about sizes, improve readability, and avoid future warnings about writing
-beyond the end of struct bnx2x_eth_stats's rx_stat_ifhcinbadoctets_hi.
+Use struct_group() in struct libipw_qos_information_element around
+members qui, qui_type, qui_subtype, version, and ac_info, so they can be
+referenced together. This will allow memcpy() and sizeof() to more easily
+reason about sizes, improve readability, and avoid future warnings about
+writing beyond the end of qui.
 
-"pahole" shows no size nor member offset changes to either struct.
-"objdump -d" shows no meaningful object code changes (i.e. only source
-line number induced differences and optimizations).
+"pahole" shows no size nor member offset changes to struct
+libipw_qos_information_element.
 
-Additionally adds BUILD_BUG_ON() to compare the separate struct group
-sizes.
+Additionally corrects the size in libipw_read_qos_param_element() as
+it was testing the wrong structure size (it should have been struct
+libipw_qos_information_element, not struct libipw_qos_parameter_info).
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c |  7 ++++---
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h | 14 ++++++++++----
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ drivers/net/wireless/intel/ipw2x00/libipw.h    | 12 +++++++-----
+ drivers/net/wireless/intel/ipw2x00/libipw_rx.c |  8 ++++----
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
-index 0b193edb73b8..2bb133ae61c3 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
-@@ -849,7 +849,8 @@ static int bnx2x_hw_stats_update(struct bnx2x *bp)
- 
- 	memcpy(old, new, sizeof(struct nig_stats));
- 
--	memcpy(&(estats->rx_stat_ifhcinbadoctets_hi), &(pstats->mac_stx[1]),
-+	BUILD_BUG_ON(sizeof(estats->shared) != sizeof(pstats->mac_stx[1]));
-+	memcpy(&(estats->shared), &(pstats->mac_stx[1]),
- 	       sizeof(struct mac_stx));
- 	estats->brb_drop_hi = pstats->brb_drop_hi;
- 	estats->brb_drop_lo = pstats->brb_drop_lo;
-@@ -1634,9 +1635,9 @@ void bnx2x_stats_init(struct bnx2x *bp)
- 			REG_RD(bp, NIG_REG_STAT0_BRB_TRUNCATE + port*0x38);
- 	if (!CHIP_IS_E3(bp)) {
- 		REG_RD_DMAE(bp, NIG_REG_STAT0_EGRESS_MAC_PKT0 + port*0x50,
--			    &(bp->port.old_nig_stats.egress_mac_pkt0_lo), 2);
-+			    &(bp->port.old_nig_stats.egress_mac_pkt0), 2);
- 		REG_RD_DMAE(bp, NIG_REG_STAT0_EGRESS_MAC_PKT1 + port*0x50,
--			    &(bp->port.old_nig_stats.egress_mac_pkt1_lo), 2);
-+			    &(bp->port.old_nig_stats.egress_mac_pkt1), 2);
- 	}
- 
- 	/* Prepare statistics ramrod data */
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h
-index d55e63692cf3..ae93c078707b 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h
-@@ -36,10 +36,14 @@ struct nig_stats {
- 	u32 pbf_octets;
- 	u32 pbf_packet;
- 	u32 safc_inp;
--	u32 egress_mac_pkt0_lo;
--	u32 egress_mac_pkt0_hi;
--	u32 egress_mac_pkt1_lo;
--	u32 egress_mac_pkt1_hi;
-+	struct_group(egress_mac_pkt0,
-+		u32 egress_mac_pkt0_lo;
-+		u32 egress_mac_pkt0_hi;
+diff --git a/drivers/net/wireless/intel/ipw2x00/libipw.h b/drivers/net/wireless/intel/ipw2x00/libipw.h
+index 7964ef7d15f0..4006a0db2eea 100644
+--- a/drivers/net/wireless/intel/ipw2x00/libipw.h
++++ b/drivers/net/wireless/intel/ipw2x00/libipw.h
+@@ -537,11 +537,13 @@ struct libipw_txb {
+ struct libipw_qos_information_element {
+ 	u8 elementID;
+ 	u8 length;
+-	u8 qui[QOS_OUI_LEN];
+-	u8 qui_type;
+-	u8 qui_subtype;
+-	u8 version;
+-	u8 ac_info;
++	struct_group(data,
++		u8 qui[QOS_OUI_LEN];
++		u8 qui_type;
++		u8 qui_subtype;
++		u8 version;
++		u8 ac_info;
 +	);
-+	struct_group(egress_mac_pkt1,
-+		u32 egress_mac_pkt1_lo;
-+		u32 egress_mac_pkt1_hi;
-+	);
- };
+ } __packed;
  
- enum bnx2x_stats_event {
-@@ -83,6 +87,7 @@ struct bnx2x_eth_stats {
- 	u32 no_buff_discard_hi;
- 	u32 no_buff_discard_lo;
+ struct libipw_qos_ac_parameter {
+diff --git a/drivers/net/wireless/intel/ipw2x00/libipw_rx.c b/drivers/net/wireless/intel/ipw2x00/libipw_rx.c
+index 5a2a723e480b..75cc3cab4992 100644
+--- a/drivers/net/wireless/intel/ipw2x00/libipw_rx.c
++++ b/drivers/net/wireless/intel/ipw2x00/libipw_rx.c
+@@ -948,13 +948,13 @@ static int libipw_read_qos_param_element(struct libipw_qos_parameter_info
+ 					    *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct libipw_qos_parameter_info) - 2;
++	u16 size = sizeof(element_param->info_element.data);
  
-+	struct_group(shared,
- 	u32 rx_stat_ifhcinbadoctets_hi;
- 	u32 rx_stat_ifhcinbadoctets_lo;
- 	u32 tx_stat_ifhcoutbadoctets_hi;
-@@ -159,6 +164,7 @@ struct bnx2x_eth_stats {
- 	u32 tx_stat_dot3statsinternalmactransmiterrors_lo;
- 	u32 tx_stat_bmac_ufl_hi;
- 	u32 tx_stat_bmac_ufl_lo;
-+	);
+ 	if ((info_element == NULL) || (element_param == NULL))
+ 		return -1;
  
- 	u32 pause_frames_received_hi;
- 	u32 pause_frames_received_lo;
+ 	if (info_element->id == QOS_ELEMENT_ID && info_element->len == size) {
+-		memcpy(element_param->info_element.qui, info_element->data,
++		memcpy(&element_param->info_element.data, info_element->data,
+ 		       info_element->len);
+ 		element_param->info_element.elementID = info_element->id;
+ 		element_param->info_element.length = info_element->len;
+@@ -975,7 +975,7 @@ static int libipw_read_qos_info_element(struct
+ 					   *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct libipw_qos_information_element) - 2;
++	u16 size = sizeof(element_info->data);
+ 
+ 	if (element_info == NULL)
+ 		return -1;
+@@ -983,7 +983,7 @@ static int libipw_read_qos_info_element(struct
+ 		return -1;
+ 
+ 	if ((info_element->id == QOS_ELEMENT_ID) && (info_element->len == size)) {
+-		memcpy(element_info->qui, info_element->data,
++		memcpy(&element_info->data, info_element->data,
+ 		       info_element->len);
+ 		element_info->elementID = info_element->id;
+ 		element_info->length = info_element->len;
 -- 
 2.30.2
 
