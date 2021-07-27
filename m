@@ -2,105 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5298DC4320A
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 08:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE34BC4338F
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 09:37:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39E6160F94
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 08:33:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A77026138B
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 09:37:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235964AbhG0IdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 04:33:01 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:45798 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235965AbhG0IdB (ORCPT
+        id S235978AbhG0Jhi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 05:37:38 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3498 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235970AbhG0Jhi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 04:33:01 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9F63E22150;
-        Tue, 27 Jul 2021 08:33:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1627374780; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=agyJ3PxeL/rCeznuDJr7kkkcVxlpt1QJ8E6bHYzo+fY=;
-        b=ts/InoDOcAaUgvxSUUJlwHB76cP9cG0q4Ywi3sPkOmJJovpHPIdy0IHE2MFnf4VL2ZpYu6
-        4Qphe8Os1J7DhJYYSJb4lkD8iBNw2ILAm2NE0RrF9ZEONTSH2bciZdDchpVRNf3qkhZGoY
-        s0UAjgcnjqh3pby6daxRmDWFLZitedg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1627374780;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=agyJ3PxeL/rCeznuDJr7kkkcVxlpt1QJ8E6bHYzo+fY=;
-        b=1jnsJ78OcJd/+GeZBsK9fecqotocytlzMmHsg5r74xJZEzEno7g/l09A/Klbh74Ug0er4E
-        8EjAG6TLz82GCWCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8F14D1377D;
-        Tue, 27 Jul 2021 08:33:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id fVeZIrzE/2CNaAAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 27 Jul 2021 08:33:00 +0000
-Subject: Re: [PATCH 1/6] block: reduce stack usage in diskstats_show
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
-        linux-block@vger.kernel.org
-References: <20210727062518.122108-1-hch@lst.de>
- <20210727062518.122108-2-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <a41dca1b-00de-70c2-da71-780d6e08d406@suse.de>
-Date:   Tue, 27 Jul 2021 10:32:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Tue, 27 Jul 2021 05:37:38 -0400
+Received: from fraeml712-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GYrxm1wx6z6L9ks;
+        Tue, 27 Jul 2021 17:25:48 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml712-chm.china.huawei.com (10.206.15.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 27 Jul 2021 11:37:37 +0200
+Received: from localhost.localdomain (10.69.192.58) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 27 Jul 2021 10:37:35 +0100
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <osandov@fb.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <ming.lei@redhat.com>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH] blk-mq-sched: Fix blk_mq_sched_alloc_tags() error handling
+Date:   Tue, 27 Jul 2021 17:32:53 +0800
+Message-ID: <1627378373-148090-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210727062518.122108-2-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/21 8:25 AM, Christoph Hellwig wrote:
-> From: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
-> 
-> I have compiled the kernel with a cross compiler "hppa-linux-gnu-" v9.3.0
-> on x86-64 host machine. I got the following warning:
-> 
-> block/genhd.c: In function ‘diskstats_show’:
-> block/genhd.c:1227:1: warning: the frame size of 1688 bytes is larger
-> than 1280 bytes [-Wframe-larger-than=]
->  1227  |  }
-> 
-> By Reduced the stack footprint by using the %pg printk specifier instead
-> of disk_name to remove the need for the on-stack buffer.
-> 
-> Signed-off-by: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/genhd.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+If the blk_mq_sched_alloc_tags() -> blk_mq_alloc_rqs() call fails, then we
+call blk_mq_sched_free_tags() -> blk_mq_free_rqs().
 
-Cheers,
+It is incorrect to do so, as any rqs would have already been freed in the
+blk_mq_alloc_rqs() call.
 
-Hannes
+Fix by calling blk_mq_free_rq_map() only directly.
+
+Fixes: 6917ff0b5bd41 ("blk-mq-sched: refactor scheduler initialization")
+Signed-off-by: John Garry <john.garry@huawei.com>
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index c838d81ac058..0f006cabfd91 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -515,17 +515,6 @@ void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 	percpu_ref_put(&q->q_usage_counter);
+ }
+ 
+-static void blk_mq_sched_free_tags(struct blk_mq_tag_set *set,
+-				   struct blk_mq_hw_ctx *hctx,
+-				   unsigned int hctx_idx)
+-{
+-	if (hctx->sched_tags) {
+-		blk_mq_free_rqs(set, hctx->sched_tags, hctx_idx);
+-		blk_mq_free_rq_map(hctx->sched_tags, set->flags);
+-		hctx->sched_tags = NULL;
+-	}
+-}
+-
+ static int blk_mq_sched_alloc_tags(struct request_queue *q,
+ 				   struct blk_mq_hw_ctx *hctx,
+ 				   unsigned int hctx_idx)
+@@ -539,8 +528,10 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
+ 		return -ENOMEM;
+ 
+ 	ret = blk_mq_alloc_rqs(set, hctx->sched_tags, hctx_idx, q->nr_requests);
+-	if (ret)
+-		blk_mq_sched_free_tags(set, hctx, hctx_idx);
++	if (ret) {
++		blk_mq_free_rq_map(hctx->sched_tags, set->flags);
++		hctx->sched_tags = NULL;
++	}
+ 
+ 	return ret;
+ }
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+2.26.2
+
