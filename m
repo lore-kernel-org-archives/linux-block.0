@@ -8,248 +8,163 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB4FC19F33
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4101C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DCFD461006
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E804B61006
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232518AbhG0U7I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54054 "EHLO
+        id S232992AbhG0U7T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232235AbhG0U7F (ORCPT
+        with ESMTP id S232653AbhG0U7J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:05 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93C4C06179A
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id t21so17526362plr.13
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:09 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1370C061798
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id q2so1799249plr.11
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=m9/SLyzkm5b4YgLSzID8XtRK8GIPppWgZQKzDtYl0cY=;
-        b=Q6r3JVenAALSlwAfyXn9c9rdA4TUAUv+3EIc2wTPETOe8m8gbk9+wqvXOiPL1oUvnH
-         ghkLdmrKLyR4I8vbN9OzUB9eFxc3TXAFvoPqhq1nLVTJTeUO4JgZrxR7Jn6GTmnnQyus
-         6EOqFEJs4cs2fjjy5HiOhsgCbIpL8hnk9RHbk=
+        bh=hAtUXOqdIbIKgIXF67i6edRxNnI31C05ADltnD47YVA=;
+        b=KjyaAeWacqkMvH9zZm+BBzMkjACC5HUxdXv9tgcqmihQriCrMtd/DFnnW7F/YrD/ZY
+         Ukevt5iMkwkus4GIj0BPscD7xfNb9o1NPLdX8zvYUy6Vws2evRXwUJ9SqM3iq4seKTMQ
+         0scT3SXeeEgeJXutbDZfzTUKfHAc3euSilyDg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=m9/SLyzkm5b4YgLSzID8XtRK8GIPppWgZQKzDtYl0cY=;
-        b=UML1UTJoJXPQtOcUo+es9iEyGqfNh4bX+DGLUi6QqSwSiMHCukjlNnAotNmiRvbT+O
-         aTvtI9NXRmnJwPwE7vpBGBK3O5yigOKAbYd1zOcvAfv6E+o1msMMyOcPgBPmOFKmKEW9
-         kwPkJPDoQ0sI/4GzP7iuSEWnQp5HCAGALIjmIdOrAzsrOJIjkbAb9YcHjswtju2M3pD3
-         EhlY+a2xGBAEv6OT5M/EIRaj8LdItWRMONbr/vPpg+NYKgba8HnuMx/Hr5S1QgzEUgH4
-         nmnxIfFYXbyUoJEJCF/kNA4OLDmDQ3h8vpAh3DOpenToLb3oY4vyQPqOEmUNJx0jMsZY
-         DU7g==
-X-Gm-Message-State: AOAM531ZmC+oBqufMqUCCfdyd6rerSEkpnRylbc/ko/AvuMuPKZran+u
-        xqEnAAg3thAYWLI33Bpb25eYEg==
-X-Google-Smtp-Source: ABdhPJyHLrx2rOyZ+72UCSjITxuxc5Fx4+n8MmagGGchue3NLbPGkODQaUC1y1IyFCIXLG8+7pEjjg==
-X-Received: by 2002:a17:90a:aa92:: with SMTP id l18mr6315143pjq.20.1627419543327;
-        Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
+        bh=hAtUXOqdIbIKgIXF67i6edRxNnI31C05ADltnD47YVA=;
+        b=KyLs+YlT49LRrfmWwNIXDFDnh+t8xOx6+nyCSpUAxl5Ib2dpRLKVy80Usz7MsfTyAp
+         gtN5m4OKFhhwuo4l40SC5WsQZQktwJ5ctC7lB46cnLooLL1wuc+UfKCWv9/JpNQ/aspK
+         3jO/b50vkPCJ3A+AYW+h8vkvU550QFf4AyZz/1KFHMJm8C7zLCrr6C7aXqv6S/2DMNpb
+         TVUEnqkdD1YZN6fpp+0j/APKQJ1g4e7gMxJqtrjsdn0DnLUeaRqKw3CHUHUax9ehjgTi
+         DcFDSopb25sQdffx1NIG6Rgd1JzCMg4r5lP3eq1STb5Orhhvbo5gQAKb7Kt2QeVtmNWZ
+         N1BQ==
+X-Gm-Message-State: AOAM533GBF4Gkd/V8z1/jwmuztbbUwZsDsotnXOa4dxFmmVOfrJ9V/mv
+        if7z6OE/+lmw2uePPkMDo7bGmA==
+X-Google-Smtp-Source: ABdhPJwKVVacR07W565BalKjkQLpWp2QT/TsDZexTOWZktzaVimKCn1vRk5Czb/MD//fHQXIbyCEWw==
+X-Received: by 2002:a17:90b:3581:: with SMTP id mm1mr5913025pjb.98.1627419548265;
+        Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id r10sm4606873pff.7.2021.07.27.13.59.02
+        by smtp.gmail.com with ESMTPSA id a23sm4591110pff.43.2021.07.27.13.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:02 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Keith Packard <keithpac@amazon.com>,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 04/64] stddef: Introduce struct_group() helper macro
-Date:   Tue, 27 Jul 2021 13:57:55 -0700
-Message-Id: <20210727205855.411487-5-keescook@chromium.org>
+Subject: [PATCH 10/64] lib80211: Use struct_group() for memcpy() region
+Date:   Tue, 27 Jul 2021 13:58:01 -0700
+Message-Id: <20210727205855.411487-11-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6059; h=from:subject; bh=3LEAbTxg4aXTCBqMfEtpBsDoqguT4nwPgyzTbu35rzM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOB6fBnqoQEU0SOfpxJjjk2PGndGpdft7092EvT pn5C4GCJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJjaKD/ 9Hy5ufgc4XqQ2z3z9FPvEU6kxJGQmWPS7Xcj/+0+Tt0ThcqyqNxB3pfnhNZY5oFVzFQAasxaE+uUMy w8l50dffII86GVzwgMHpVSOHfyKxD0+bVjHS1hMO0YxtoyYtE05wk1gZb0O3VCFvNI8kbknhLy9Uck SYOfNHqSctMehBN0ekYquyX+Sxta/bDS1L6zhOi7GKz1zqmata8K3Ru/ejXddx/tfY4Od9cnavr31N xw2Thp2oXNUsvJOPNbEvrB9M+WNLj3Jkh79uKUxA2pScrBaJuJyDc0eb75fwJObkRIzkHNc5UF68RQ 3sm3i/QfPCS0rVeZ3hKhcTFLjC3MZufvXgQPFR7BfYuYWBJojZhnwQdeoicgqEYtr8XHy8GgHXRxFT pHAAkO2PCn68C5FfPyf8+UKcLaAMIm3YG+MYg5c8HZrCT92UTJKR8kNFF5UhnMDqJdNE0LLWwmqQjD pee4CTHVdCAU/kDqXg2TD7dmrqC2bgT4icDvzkqIMtb10+q6UqF4VahbBVQrDLI3Y8Zcj+H+cdlb2F 0D5duiiZ6PW+dqS/zKFRLxwzmSl45QsWX4lUz1Wqs23RyLSPhcYSYz1PQjMeqiAlmp/hRAs8uiSw0q nFEKGgK/WMDmBCTVW0TdgnP5Vt5h5HAjsZEr+BMIwSeSu+7fa8Z0zUCwBT+w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3842; h=from:subject; bh=LxMwWIiVXxCqRjC5BkCQhCAsNp5uK9myZ2a4Qy1ipzQ=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOCS1cmBCRtXI7M3opQcsNvUfw7QHdDVtTF33mg z+crDrWJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzggAKCRCJcvTf3G3AJn8DD/ 0T8GLHAQTW4lQjhfBYcVN4KkQX84OyCKR/kM+6CyPh6kkSz3omcb5syI1kQjZZfi9AQMmXGm27pqXs Pfzoata/9c4TApOgEv263SYMjRV3AKeFaFCN+M+Tbki7UCpUotJm9dnRg/YZOUqcEJ2jnQpyukE/h5 WjTdoxGr75vnhyjqxtCW3aafwRG0iXBck5QQofWTgn8C998AMoFRs6Tj6WLGt00Byih284TbE5zULP NoahBowuHSS4qSopyrtMF5eCvftM06BTwO2pAHfSDoGwCRneDXaPTK82hxwFjKQowdrTh4iICk8J6z Jh8Cy9g9/qrCwlclWJxjLE11hOD2f4KFeZpANKSuUdLgh2gQH0XSCj9eew20UORocfAqHkT/RzbRTF SJY0WkjJuqFW0W0eO4eaZyUsWJHuNBEL3OEenTA/cKGL5oil0bnf+evfjR6n7xJYUez++9bbUL8NyK mwpGoz6NjtaMd6T6SdpdeK3SjBHnQVR7cnuN787a4kSO0UGQ/qiXd510dvC35+ROc9KccdBJQ9O8UG j59WtvEuYIf3wGvX7Gxat7V2DjodwzEvDiy+CyhMLXhp2kdRYaftK+hlMfdh3hvdX9HK1wsHqnZZNW 2jIB6Lm8e5R4+zKVC9MC8ZxvWDlXi8uYXm03gL2lKA5E1/cQXWrwqyFnfZrw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kernel code has a regular need to describe groups of members within a
-structure usually when they need to be copied or initialized separately
-from the rest of the surrounding structure. The generally accepted design
-pattern in C is to use a named sub-struct:
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memcpy(), memmove(), and memset(), avoid
+intentionally writing across neighboring fields.
 
-	struct foo {
-		int one;
-		struct {
-			int two;
-			int three;
-		} thing;
-		int four;
-	};
+Use struct_group() around members addr1, addr2, and addr3 in struct
+ieee80211_hdr so they can be referenced together. This will allow memcpy()
+and sizeof() to more easily reason about sizes, improve readability,
+and avoid future warnings about writing beyond the end of addr1.
 
-This would allow for traditional references and sizing:
+"pahole" shows no size nor member offset changes to struct ieee80211_hdr.
+"objdump -d" shows no meaningful object code changes (i.e. only source
+line number induced differences and optimizations).
 
-	memcpy(&dst.thing, &src.thing, sizeof(dst.thing));
-
-However, doing this would mean that referencing struct members enclosed
-by such named structs would always require including the sub-struct name
-in identifiers:
-
-	do_something(dst.thing.three);
-
-This has tended to be quite inflexible, especially when such groupings
-need to be added to established code which causes huge naming churn.
-Three workarounds exist in the kernel for this problem, and each have
-other negative properties.
-
-To avoid the naming churn, there is a design pattern of adding macro
-aliases for the named struct:
-
-	#define f_three thing.three
-
-This ends up polluting the global namespace, and makes it difficult to
-search for identifiers.
-
-Another common work-around in kernel code avoids the pollution by avoiding
-the named struct entirely, instead identifying the group's boundaries using
-either a pair of empty anonymous structs of a pair of zero-element arrays:
-
-	struct foo {
-		int one;
-		struct { } start;
-		int two;
-		int three;
-		struct { } finish;
-		int four;
-	};
-
-	struct foo {
-		int one;
-		int start[0];
-		int two;
-		int three;
-		int finish[0];
-		int four;
-	};
-
-This allows code to avoid needing to use a sub-struct name for member
-references within the surrounding structure, but loses the benefits of
-being able to actually use such a struct, making it rather fragile. Using
-these requires open-coded calculation of sizes and offsets. The efforts
-made to avoid common mistakes include lots of comments, or adding various
-BUILD_BUG_ON()s. Such code is left with no way for the compiler to reason
-about the boundaries (e.g. the "start" object looks like it's 0 bytes
-in length and is not structurally associated with "finish"), making bounds
-checking depend on open-coded calculations:
-
-	if (length > offsetof(struct foo, finish) -
-		     offsetof(struct foo, start))
-		return -EINVAL;
-	memcpy(&dst.start, &src.start, length);
-
-However, the vast majority of places in the kernel that operate on
-groups of members do so without any identification of the grouping,
-relying either on comments or implicit knowledge of the struct contents,
-which is even harder for the compiler to reason about, and results in
-even more fragile manual sizing, usually depending on member locations
-outside of the region (e.g. to copy "two" and "three", use the start of
-"four" to find the size):
-
-	BUILD_BUG_ON((offsetof(struct foo, four) <
-		      offsetof(struct foo, two)) ||
-		     (offsetof(struct foo, four) <
-		      offsetof(struct foo, three));
-	if (length > offsetof(struct foo, four) -
-		     offsetof(struct foo, two))
-		return -EINVAL;
-	memcpy(&dst.two, &src.two, length);
-
-And both of the prior two idioms additionally appear to write beyond the
-end of the referenced struct member, forcing the compiler to ignore any
-attempt to perform bounds checking.
-
-In order to have a regular programmatic way to describe a struct
-region that can be used for references and sizing, can be examined for
-bounds checking, avoids forcing the use of intermediate identifiers,
-and avoids polluting the global namespace, introduce the struct_group()
-macro. This macro wraps the member declarations to create an anonymous
-union of an anonymous struct (no intermediate name) and a named struct
-(for references and sizing):
-
-	struct foo {
-		int one;
-		struct_group(thing,
-			int two,
-			int three,
-		);
-		int four;
-	};
-
-	if (length > sizeof(src.thing))
-		return -EINVAL;
-	memcpy(&dst.thing, &src.thing, length);
-	do_something(dst.three);
-
-There are some rare cases where the resulting struct_group() needs
-attributes added, so struct_group_attr() is also introduced to allow
-for specifying struct attributes (e.g. __align(x) or __packed).
-
-Co-developed-by: Keith Packard <keithpac@amazon.com>
-Signed-off-by: Keith Packard <keithpac@amazon.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/linux/stddef.h | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ drivers/staging/rtl8723bs/core/rtw_security.c | 5 +++--
+ drivers/staging/rtl8723bs/core/rtw_xmit.c     | 5 +++--
+ include/linux/ieee80211.h                     | 8 +++++---
+ net/wireless/lib80211_crypt_ccmp.c            | 3 ++-
+ 4 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/stddef.h b/include/linux/stddef.h
-index 998a4ba28eba..cf7f866944f9 100644
---- a/include/linux/stddef.h
-+++ b/include/linux/stddef.h
-@@ -36,4 +36,38 @@ enum {
- #define offsetofend(TYPE, MEMBER) \
- 	(offsetof(TYPE, MEMBER)	+ sizeof_field(TYPE, MEMBER))
+diff --git a/drivers/staging/rtl8723bs/core/rtw_security.c b/drivers/staging/rtl8723bs/core/rtw_security.c
+index a99f439328f1..be7cf42855a1 100644
+--- a/drivers/staging/rtl8723bs/core/rtw_security.c
++++ b/drivers/staging/rtl8723bs/core/rtw_security.c
+@@ -1421,8 +1421,9 @@ u32 rtw_BIP_verify(struct adapter *padapter, u8 *precvframe)
+ 		ClearRetry(BIP_AAD);
+ 		ClearPwrMgt(BIP_AAD);
+ 		ClearMData(BIP_AAD);
+-		/* conscruct AAD, copy address 1 to address 3 */
+-		memcpy(BIP_AAD+2, pwlanhdr->addr1, 18);
++		/* conscruct AAD, copy address 1 through address 3 */
++		BUILD_BUG_ON(sizeof(pwlanhdr->addrs) != 3 * ETH_ALEN);
++		memcpy(BIP_AAD + 2, &pwlanhdr->addrs, 3 * ETH_ALEN);
  
-+/**
-+ * struct_group_attr(NAME, ATTRS, MEMBERS)
-+ *
-+ * Used to create an anonymous union of two structs with identical
-+ * layout and size: one anonymous and one named. The former can be
-+ * used normally without sub-struct naming, and the latter can be
-+ * used to reason about the start, end, and size of the group of
-+ * struct members. Includes structure attributes argument.
-+ *
-+ * @NAME: The name of the mirrored sub-struct
-+ * @ATTRS: Any struct attributes (normally empty)
-+ * @MEMBERS: The member declarations for the mirrored structs
-+ */
-+#define struct_group_attr(NAME, ATTRS, MEMBERS) \
-+	union { \
-+		struct { MEMBERS } ATTRS; \
-+		struct { MEMBERS } ATTRS NAME; \
-+	}
-+
-+/**
-+ * struct_group(NAME, MEMBERS)
-+ *
-+ * Used to create an anonymous union of two structs with identical
-+ * layout and size: one anonymous and one named. The former can be
-+ * used normally without sub-struct naming, and the latter can be
-+ * used to reason about the start, end, and size of the group of
-+ * struct members.
-+ *
-+ * @NAME: The name of the mirrored sub-struct
-+ * @MEMBERS: The member declarations for the mirrored structs
-+ */
-+#define struct_group(NAME, MEMBERS)	\
-+	struct_group_attr(NAME, /* no attrs */, MEMBERS)
-+
- #endif
+ 		if (omac1_aes_128(padapter->securitypriv.dot11wBIPKey[padapter->securitypriv.dot11wBIPKeyid].skey
+ 			, BIP_AAD, ori_len, mic))
+diff --git a/drivers/staging/rtl8723bs/core/rtw_xmit.c b/drivers/staging/rtl8723bs/core/rtw_xmit.c
+index 79e4d7df1ef5..cb47db784130 100644
+--- a/drivers/staging/rtl8723bs/core/rtw_xmit.c
++++ b/drivers/staging/rtl8723bs/core/rtw_xmit.c
+@@ -1198,8 +1198,9 @@ s32 rtw_mgmt_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, s
+ 		ClearRetry(BIP_AAD);
+ 		ClearPwrMgt(BIP_AAD);
+ 		ClearMData(BIP_AAD);
+-		/* conscruct AAD, copy address 1 to address 3 */
+-		memcpy(BIP_AAD+2, pwlanhdr->addr1, 18);
++		/* conscruct AAD, copy address 1 through address 3 */
++		BUILD_BUG_ON(sizeof(pwlanhdr->addrs) != 3 * ETH_ALEN);
++		memcpy(BIP_AAD + 2, &pwlanhdr->addrs, 3 * ETH_ALEN);
+ 		/* copy management fram body */
+ 		memcpy(BIP_AAD+BIP_AAD_SIZE, MGMT_body, frame_body_len);
+ 		/* calculate mic */
+diff --git a/include/linux/ieee80211.h b/include/linux/ieee80211.h
+index a6730072d13a..d7932b520aaf 100644
+--- a/include/linux/ieee80211.h
++++ b/include/linux/ieee80211.h
+@@ -297,9 +297,11 @@ static inline u16 ieee80211_sn_sub(u16 sn1, u16 sn2)
+ struct ieee80211_hdr {
+ 	__le16 frame_control;
+ 	__le16 duration_id;
+-	u8 addr1[ETH_ALEN];
+-	u8 addr2[ETH_ALEN];
+-	u8 addr3[ETH_ALEN];
++	struct_group(addrs,
++		u8 addr1[ETH_ALEN];
++		u8 addr2[ETH_ALEN];
++		u8 addr3[ETH_ALEN];
++	);
+ 	__le16 seq_ctrl;
+ 	u8 addr4[ETH_ALEN];
+ } __packed __aligned(2);
+diff --git a/net/wireless/lib80211_crypt_ccmp.c b/net/wireless/lib80211_crypt_ccmp.c
+index 6a5f08f7491e..21d7c39bb394 100644
+--- a/net/wireless/lib80211_crypt_ccmp.c
++++ b/net/wireless/lib80211_crypt_ccmp.c
+@@ -136,7 +136,8 @@ static int ccmp_init_iv_and_aad(const struct ieee80211_hdr *hdr,
+ 	pos = (u8 *) hdr;
+ 	aad[0] = pos[0] & 0x8f;
+ 	aad[1] = pos[1] & 0xc7;
+-	memcpy(aad + 2, hdr->addr1, 3 * ETH_ALEN);
++	BUILD_BUG_ON(sizeof(hdr->addrs) != 3 * ETH_ALEN);
++	memcpy(aad + 2, &hdr->addrs, ETH_ALEN);
+ 	pos = (u8 *) & hdr->seq_ctrl;
+ 	aad[20] = pos[0] & 0x0f;
+ 	aad[21] = 0;		/* all bits masked */
 -- 
 2.30.2
 
