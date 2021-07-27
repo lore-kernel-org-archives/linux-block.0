@@ -2,115 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE99DC432BE
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 03:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79063C4320A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 06:01:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7EB460FEE
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 03:06:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AD2A60240
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 06:01:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234766AbhG0CZ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jul 2021 22:25:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33400 "EHLO
+        id S235063AbhG0GA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 02:00:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234677AbhG0CZ6 (ORCPT
+        with ESMTP id S233553AbhG0GA5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jul 2021 22:25:58 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68AA9C061757;
-        Mon, 26 Jul 2021 20:06:25 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id b6so15769049pji.4;
-        Mon, 26 Jul 2021 20:06:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ChIcbIgLJX/+eQRpKvWif40abxApwvOjyIFA0z+RMsM=;
-        b=MU3drwGpgkx0vfwBNTNFP3MytUOGuJQ3j50dvYOId0AswZfumYMStyl+z6WjZn8xss
-         wI9eMWl1JEQ+vqomHrTtUT/LVF3rDed6w82f5LQfMDYZSoekPsqtQzVGOYDovAlJE/TC
-         VmCmyIum9y/x/IVwYRAdiqmJLu3EsPtXbTxre38qt9Ba5523aYlhBBqBbuqnNS9dl9WU
-         0qAJP+FHqHlfzwOWW5nLyuWaDTso5jq165pKxv+ahBbkeq34+qjQdiCu8UtMRhU80vmt
-         IsXYvdC6U0ZF0PIu/yOZitNgkmXGyW1foxBDYZ2E01JWlM+Hf4G/MzKs0AKlOj/msRsB
-         gpEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ChIcbIgLJX/+eQRpKvWif40abxApwvOjyIFA0z+RMsM=;
-        b=Qghna7UGMn0X971c7g5ZmH6XMNw1e+V6kw9fpz9G3NwbpOx/usIHfdYSokVSMz1K+s
-         JWp/VnViXPQUNiqVGGTTsEaW7rkdoC86buFQK1PBuIOlBzj//b5VG9YNCJqmhnqdY7Cs
-         MTmMVlR28siLW5dqFiJEEAA948P7W53WL8c5g13P2nkvWdRqrMgMxfvEkHWldL6afgfP
-         tPJQEWlHPzm5/LQta2Bc3VD/ZzbwXYmcBHVY0yo9JcvDPzB8fTEyPne30/t5HNf8SsA1
-         NoE6CWpFBkbHOzrPCXpAGOaV6ciuVKAJVZRzryVU982x4yI/vxaHFdJiJnYJKRplHI2+
-         qdIQ==
-X-Gm-Message-State: AOAM5307D3tFIueSZqiPAcPpSO4Ik53tkyBQVpTDmERDckuQE9ANWQrF
-        U84obVqBDLXiz+dDAh3ziQhRBhtpY8K+iw==
-X-Google-Smtp-Source: ABdhPJwG7wwIxzZ6bDxr27zwilvp6TmOlIGZfFSYIAhf6kFR471Ry7M3LO0iXAqErBPXXMCu8Ra0Kg==
-X-Received: by 2002:a63:455e:: with SMTP id u30mr8136269pgk.401.1627355184784;
-        Mon, 26 Jul 2021 20:06:24 -0700 (PDT)
-Received: from [127.0.0.1] ([203.205.141.116])
-        by smtp.gmail.com with ESMTPSA id p3sm913781pjt.0.2021.07.26.20.06.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jul 2021 20:06:24 -0700 (PDT)
-Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
- <YPGvIzZUI+QxP1js@mtj.duckdns.org>
- <957ab14d-c4bc-32f0-3f7d-af98832ab955@gmail.com>
- <YP8tPwkJNMAcjDqk@mtj.duckdns.org>
-From:   brookxu <brookxu.cn@gmail.com>
-Message-ID: <34a6f4b5-9055-e519-5693-068f8dcb169c@gmail.com>
-Date:   Tue, 27 Jul 2021 11:06:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Tue, 27 Jul 2021 02:00:57 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD20C061757;
+        Mon, 26 Jul 2021 23:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=r1glimHAK1enYyvXjb7/p34hcH8iizqcqcTqLcbpL40=; b=T5d98nxPB2NSUwaDW1/4ThOw4h
+        mwBZPoHDeyOsBF649ZNNo33MNZQzWi0ZFuhI4eKK0LgULX0MsqgeIQOBYFcVdvKjWetSjsEtcEbgT
+        bzCKnlOCmB9pBMg+vYWLfuVKM/S+kiKgQsy9VXVewqDLm9/kntrDKGQt6AqK5rIL5UbZERIYfa9n9
+        vDtCDAa7QtxDyflxi3fLu6Wx3l7oA/wMF90H2zvKDirZpl6hxERMkCGDdYj1Wn6+0Mu1uCyFRVPZ5
+        Czm9ZKlXm044gwqHaG8d0dmum4I+zX+maX24o8ilAWbmfhZy83uCU/ZwHgs5GqXAZw0JuYosBPpI6
+        2Yvj4Lxg==;
+Received: from [2001:4bb8:184:87c5:b7fb:1299:a9e5:ff56] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m8G59-00EiCP-1F; Tue, 27 Jul 2021 05:57:15 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Ira Weiny <ira.weiny@intel.com>, dm-devel@redhat.com,
+        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        ceph-devel@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: switch the block layer to use kmap_local_page v3
+Date:   Tue, 27 Jul 2021 07:56:31 +0200
+Message-Id: <20210727055646.118787-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <YP8tPwkJNMAcjDqk@mtj.duckdns.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi all,
 
+this series switches the core block layer code and all users of the
+existing bvec kmap helpers to use kmap_local_page.  Drivers that
+currently use open coded kmap_atomic calls will converted in a follow
+on series.
 
-Tejun Heo wrote on 2021/7/27 5:46:
-> Hello,
-> 
-> On Tue, Jul 20, 2021 at 12:35:54AM +0800, brookxu wrote:
->> In order to avoid code duplication and IOPS stability problems caused by estimating
->> the equivalent number of IOs, and to avoid potential deadlock problems caused by
->> synchronization through queue_lock. I tried to count the number of splited IOs in
->> the current window through two atomic counters. Add the value of the atomic variable
->> when calculating io_disp[rw], which can also avoid the problem of inaccurate IOPS in
->> large IO scenarios. How do you think of this approach? Thanks for your time.
-> 
-> I guess it's okay but am still not a big fan of adding another hook. This is
-> primarily because blk-throtl is sitting too early in the stack - e.g. rq_qos
-> is doing the same thing but sits after the split path - and it's a bit nasty
-> to add an additional hook for it.
-> 
-> Do you think it can be an option to relocate the blk-throtl hooks to the
-> same spots as rq-qos or, even better, make it use rq-qos?
+To do so a new kunmap variant is added that calls
+flush_kernel_dcache_page.  I'm not entirely sure where to call
+flush_dcache_page vs flush_kernel_dcache_page, so I've tried to follow
+the documentation here, but additional feedback would be welcome.
 
-Make blk-throttle use rq-qos may be more elegant. But I found that there may be at least
-one problem that is difficult to solve. blk-throttle supports separate throttle for read
-and write IOs, which means that we cannot suspend tasks during throttle, but rq-qos
-throttle IOs by suspending tasks.
+Note that the ps3disk has a minir conflict with the
+flush_kernel_dcache_page removal in linux-next through the -mm tree.
+I had hoped that change would go into 5.14, but it seems like it is
+being held for 5.15.
 
-We may be able to relocate the blk-throttle hooks to the rq-qos hooks. Since we may not
-be able to replace the throttle hook, in this case, if we register a rq-qos to the system,
-part of the blk-throttle hooks is in rq-qos and part hooks not, which feels a bit confusing.
-In addition, we may need to implement more hooks, such as IO merge hook.
+Changes since v2:
+ - rely on the flush_dcache_helpers in memcpy_to_page and memzero_page
+   that now hit mainline
 
-Thanks for you time.
+Changes since v1:
+ - add more/better comments
+ - add a new kunmap_local_dirty helper to feal with
+   flush(_kernel)_dcache_page
 
-> Thanks.
-> 
+Diffstat:
+ arch/mips/include/asm/mach-rc32434/rb.h |    2 -
+ block/bio-integrity.c                   |   14 +++-----
+ block/bio.c                             |   37 ++++++----------------
+ block/blk-map.c                         |    2 -
+ block/bounce.c                          |   39 +++++-------------------
+ block/t10-pi.c                          |   16 +++------
+ drivers/block/ps3disk.c                 |   19 +----------
+ drivers/block/rbd.c                     |   15 +--------
+ drivers/md/dm-writecache.c              |    5 +--
+ include/linux/bio.h                     |   42 -------------------------
+ include/linux/bvec.h                    |   52 ++++++++++++++++++++++++++++++--
+ include/linux/highmem-internal.h        |    7 ++++
+ include/linux/highmem.h                 |   10 ++++--
+ 13 files changed, 102 insertions(+), 158 deletions(-)
