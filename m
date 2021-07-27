@@ -2,99 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1269FC4338F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 16:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 644F3C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 16:21:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAA1161B93
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 16:18:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D2CE61B73
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 16:21:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbhG0QSW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 12:18:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43844 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229441AbhG0QSW (ORCPT
+        id S229497AbhG0QVR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 12:21:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46106 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229441AbhG0QVR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 12:18:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627402701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cM9tfLQOTWB4GCopgnP+9Qx/IyO9Pq6B7ebTSKwOWBY=;
-        b=i9oO9hrR3oxlopJ44WEB7o+y7AwaGrw3WNVg0MbpRmH9RgGeqmiujdEVpyRNnh07kh5s0Q
-        rqLQhrPEOtG3NGAVqLTqX0OnhBb4YbGErf3OrRupo6eJYOX8y1YeqwvFKCyY8m42aG49JG
-        t/fnGdWzfCMqoLqwT0a120MTV2FKsKE=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-oUDOmTZ6NXeaTL2w9Br4pA-1; Tue, 27 Jul 2021 12:18:20 -0400
-X-MC-Unique: oUDOmTZ6NXeaTL2w9Br4pA-1
-Received: by mail-qt1-f199.google.com with SMTP id g10-20020ac8768a0000b029023c90fba3dcso6621885qtr.7
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 09:18:20 -0700 (PDT)
+        Tue, 27 Jul 2021 12:21:17 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2246AC061757;
+        Tue, 27 Jul 2021 09:21:16 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id k1so16233982plt.12;
+        Tue, 27 Jul 2021 09:21:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=aKSXNwDjopSziuCU/tjPk+z1jeKEq3gWP1NdV3AtHro=;
+        b=p0y3P4/22F5hQkn3WFmpiaZsoG3SjwD9e4gQmaK7VA6kHL2uLm//Kv2uEa3ojTXZNc
+         XwxeYKIpE5ECCXztRDAzRUyUY77SSexmcB38ytVKWg1dgKp45Xmej1t+YsnnliSFzJrn
+         OMWdfRoXs218uT6SCOfCikE7/9GtnIjPzbP5jfRCTY/w4wdQALgtYlxSHXUg36/a3LD6
+         UG2gADHwg1LleP2jxPRM6H5sstIO4THOD1fXqD8HDzZL5G6K4D2/cXHaRE7XxHZNtsPj
+         Y8DwM8N0T7h/cyO8ZJvBnyoSnmLpeX9JZUw0cyBA7pKQpBWkqVwoJhkAmgfrqnyXzsQn
+         S8ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cM9tfLQOTWB4GCopgnP+9Qx/IyO9Pq6B7ebTSKwOWBY=;
-        b=kS9f/OpaxhjopUB0mj2yNbjGmJ9VMF1LOZK4eUK163m/+nChJAFIkwvzMwjvk27rps
-         lj/aA6eVMqMIx1DFZGyzsHoydQst+v07HvDJKh6QA19k3eY/q8g24PJzJGNan4pwqqwg
-         SDleMfFsHNpL8UjmhQ4IeFp1zJkVglc286EWwsHA3S2v/e+Kqhzugb2N7sZqueTH7GMG
-         SlQU4wAPBvdkQYnlfP5OdfrJ4cRx9ncKdGAOSustWxvIkLxPC+6N+EBYTAt7pMJ7EnSq
-         QagSJTOO8dQ5/KFX8zHBD0MxRYOKsLiItQWMEpTjpmbYwZfCa+Q2t0xIelDdlNt8ualE
-         Dn2w==
-X-Gm-Message-State: AOAM532TRpcoQ9etsrlynRvEbg3sW9qj6S5Y/jNug7SL4Os6GlmcNQRK
-        Hn17G9W1U1JScUCkDnN9zcwAXAcRfADwHu8mLn2p2xlhzOdr77ifpk2KWxbYqEboHXMJUTyWcXH
-        VQNFv+HHL9q3EWLLRzsis4Q==
-X-Received: by 2002:ac8:65da:: with SMTP id t26mr20558902qto.145.1627402700226;
-        Tue, 27 Jul 2021 09:18:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxcE/DRxSGmin8HOdxgpUGEuj7cvwjyi0toYmkFRns5e91de0cpGjH7LdY+CMdfWbVROh+tUA==
-X-Received: by 2002:ac8:65da:: with SMTP id t26mr20558889qto.145.1627402700053;
-        Tue, 27 Jul 2021 09:18:20 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id s19sm1609729qtx.5.2021.07.27.09.18.19
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=aKSXNwDjopSziuCU/tjPk+z1jeKEq3gWP1NdV3AtHro=;
+        b=kPCqjhI2qeKN4F2w5UubIzA8/4zVJvnLs05o5yFDtcusP4S+LeUhWQsyD4aTF76tCa
+         46OAxTfGIRyzW9IWtfcPpuyVLoMJwnrULlqmdD3EpGHLeQWfdENRYv+2t796Vx9qSJ8c
+         Fxz5F9A2M0hUFk1mLWlwe0gifp8b4cRfdrQzF5+VPIgTaELOkD4y9TF6w/KbCbeBsao+
+         R5BpRjfpQVSsRVUia2Tm+jrrA9pHDtLn1uUk+6oiV4756RqMcHMfNe9m5W0MmhGGiT8k
+         8mXMDWXWFIwcxt3KJIg+NumQsyPF+j/Px4wT8ppOXyFiRafM4rkSRfhpgTU/ItNMGdhZ
+         OcdA==
+X-Gm-Message-State: AOAM530yis899O0G3Dn1jTj1rdq7rpMA/klRtY04sanvgJyiWdKRCYbc
+        DsDrqs/dc4N1KdMiDFsi6SY=
+X-Google-Smtp-Source: ABdhPJweTq3Ojivolqcy6qYNEBQsLjn3/pc/Xj+J0oNtgS/8KrT/DtNGDcD88buZ9HFONA/Y+oJFUg==
+X-Received: by 2002:a17:90a:d595:: with SMTP id v21mr23649976pju.50.1627402875481;
+        Tue, 27 Jul 2021 09:21:15 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:7502])
+        by smtp.gmail.com with ESMTPSA id 78sm4291181pfw.189.2021.07.27.09.21.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 09:18:19 -0700 (PDT)
-Date:   Tue, 27 Jul 2021 12:18:18 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: Re: use regular gendisk registration in device mapper
-Message-ID: <YQAxyjrGJpl7UkNG@redhat.com>
-References: <20210725055458.29008-1-hch@lst.de>
- <YQAtNkd8T1w/cSLc@redhat.com>
- <20210727160226.GA17989@lst.de>
+        Tue, 27 Jul 2021 09:21:15 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 27 Jul 2021 06:21:11 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     brookxu <brookxu.cn@gmail.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
+Message-ID: <YQAydzEhZfPUpzWI@mtj.duckdns.org>
+References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
+ <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+ <957ab14d-c4bc-32f0-3f7d-af98832ab955@gmail.com>
+ <YP8tPwkJNMAcjDqk@mtj.duckdns.org>
+ <34a6f4b5-9055-e519-5693-068f8dcb169c@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210727160226.GA17989@lst.de>
+In-Reply-To: <34a6f4b5-9055-e519-5693-068f8dcb169c@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 27 2021 at 12:02P -0400,
-Christoph Hellwig <hch@lst.de> wrote:
+Hello,
 
-> On Tue, Jul 27, 2021 at 11:58:46AM -0400, Mike Snitzer wrote:
-> > > This did not make a different to my testing
-> > > using dmsetup and the lvm2 tools.
-> > 
-> > I'll try these changes running through the lvm2 testsuite.
-> 
-> Btw, is ther documentation on how to run it somewhere?  I noticed
-> tests, old-tests and unit-tests directories, but no obvious way
-> to run them.
+On Tue, Jul 27, 2021 at 11:06:18AM +0800, brookxu wrote:
+> Make blk-throttle use rq-qos may be more elegant. But I found that there may be at least
+> one problem that is difficult to solve. blk-throttle supports separate throttle for read
+> and write IOs, which means that we cannot suspend tasks during throttle, but rq-qos
+> throttle IOs by suspending tasks.
 
-I haven't tracked how it has changed in a while, but I always run:
-make check_local
+Ah, right, I forgot about that.
 
-(but to do that you first need to ./configure how your distro does
-it... so that all targets are enabled, etc. Then: make).
+> We may be able to relocate the blk-throttle hooks to the rq-qos hooks. Since we may not
+> be able to replace the throttle hook, in this case, if we register a rq-qos to the system,
+> part of the blk-throttle hooks is in rq-qos and part hooks not, which feels a bit confusing.
+> In addition, we may need to implement more hooks, such as IO merge hook.
 
-Will revisit this shortly and let you know if my process needed to
-change at all due to lvm2 changes.
+Would it be possible to just move the blk-throtl throttling hook right next
+to the rq-qos hook so that it gets throttled after splitting?
 
+Thanks.
+
+-- 
+tejun
