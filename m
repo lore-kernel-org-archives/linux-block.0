@@ -2,113 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA133C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 22:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A316C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 23:03:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A520960F9B
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 22:52:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 178CB60F9B
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 23:03:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232198AbhG0Ww7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 18:52:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36094 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231730AbhG0Ww6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 18:52:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627426377;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7stv5u1stx7EtQfdU5hPoXwvmtwChIwUztGz5KP4CR0=;
-        b=Np1Wj03MofUKzPtR+J4NPmt4QrohSovDkRxMIGYYd/zNr1VMpvAAKn6/cTuafRmRfQ/kjg
-        FCNsTX3PpZG19pO1geiSCRmU7TkO3h+QkCBVNYyiDQPqfWvTKH9TYmi8kTLyBYskmI244+
-        nhMFwMQocV7nnaIy/medmY5nwvkRNpw=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-KnvixSVVMU6ebB_E9xv3WA-1; Tue, 27 Jul 2021 18:52:56 -0400
-X-MC-Unique: KnvixSVVMU6ebB_E9xv3WA-1
-Received: by mail-qk1-f198.google.com with SMTP id s186-20020a3790c30000b02903b9ade0af31so434869qkd.1
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 15:52:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7stv5u1stx7EtQfdU5hPoXwvmtwChIwUztGz5KP4CR0=;
-        b=hN6wbOP7WTOK4TSlX/fYECPAU7tboGipG4KE3CfHk/SAuZDsu+qlXCLRz0aiBv1tlG
-         8U1MLz08FDLXcTS6mzwywwWUuHqcz7CnJhzaav6KfLaLZempsVuZW3RTxnhHU25CkCUh
-         9UhAxQrs+NpNmYUWN0iN/tjeIMsQDotenwIfe4pFesbhsNGkZP47XAX8ym40R0ALePL0
-         DKOs7axfceHqCWfBwr3cne/11+8Y8Lb0PHWGdzgRWiSAGa0DuADxOWqXiTSpwbBTnOeR
-         WD4yxMAOLY/vtF7BvYUKNSEVIxVHh9pwiRImLylv6jOsF8WoSZpnfjV+MfP8QA3LbmL2
-         +FTg==
-X-Gm-Message-State: AOAM530gM0qWhNlLJ/uLi1dCOZmryj6FzKV6YnCV/bgZHF1wMOn3GIhK
-        cMwUxpxHOIEo3bz6uaTC7tsPUHpoFkRMQWeu1f2z4mjCT5xen3JRXWWM0VNH3tWQfDvykDpPeiJ
-        ++h/TiclwOsFvNG8LWrO8Eg==
-X-Received: by 2002:ac8:5508:: with SMTP id j8mr21740853qtq.56.1627426375959;
-        Tue, 27 Jul 2021 15:52:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzk+mrtnxazRJZvhMSqIaKNemzV0sRD5t5okETA1xc/6rn87do3W+YESqL8IACFSOGwAZ82Ag==
-X-Received: by 2002:ac8:5508:: with SMTP id j8mr21740847qtq.56.1627426375766;
-        Tue, 27 Jul 2021 15:52:55 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id f12sm2438087qke.37.2021.07.27.15.52.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 15:52:55 -0700 (PDT)
-Date:   Tue, 27 Jul 2021 18:52:54 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: Re: use regular gendisk registration in device mapper
-Message-ID: <YQCORvuQJ2AGR2Ks@redhat.com>
-References: <20210725055458.29008-1-hch@lst.de>
- <YQAtNkd8T1w/cSLc@redhat.com>
- <20210727160226.GA17989@lst.de>
- <YQAxyjrGJpl7UkNG@redhat.com>
+        id S232336AbhG0XDW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 19:03:22 -0400
+Received: from cmyk.emenem.pl ([217.79.154.63]:33168 "EHLO smtp.emenem.pl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232685AbhG0XDW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Jul 2021 19:03:22 -0400
+X-Greylist: delayed 377 seconds by postgrey-1.27 at vger.kernel.org; Tue, 27 Jul 2021 19:03:19 EDT
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (50-78-106-33-static.hfc.comcastbusiness.net [50.78.106.33])
+        (authenticated bits=0)
+        by cmyk.emenem.pl (8.16.1/8.16.1) with ESMTPSA id 16RMuSMS006783
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Wed, 28 Jul 2021 00:56:29 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+        t=1627426592; bh=ZBl1EkmpJRnBApNqpV+aWeMsB6XSxkyxy7jfXLK4pYc=;
+        h=Subject:From:To:Cc:References:Date:In-Reply-To;
+        b=eX0V4/RcxKtEoLy9uZ1jY/edar+UndYPkrA1KqlIbag1F2qJfpoTAiBK/0nZoI3dy
+         sRBLwXSNwSmzbbZoI2uFRskpxW/cerIwW24Qq3Tj/5IwWINWAjS4nbrR8lHj5xwEwv
+         eieXHrlz2gAqzpxAN2FCdYvkHY+u+OyhuoJOvCqI=
+Subject: Re: Commit d5fd456c88aba4fcf77d35fe38024a8d5c814686 - "loopdev: use
+ LOOP_CONFIG ioctl" broke loop on x86-64 w/ 32 bit userspace
+From:   =?UTF-8?Q?Krzysztof_Ol=c4=99dzki?= <ole@ans.pl>
+To:     Sinan Kaya <sinan.kaya@microsoft.com>, Karel Zak <kzak@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     util-linux@vger.kernel.org, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <a797f527-4599-e986-a326-4bb141487f2c@ans.pl>
+ <e7f64d43-2a26-e386-b208-5c35d6a56ed4@ans.pl>
+Message-ID: <7de1bd0b-b8ea-daf0-b677-f92db1c1cdff@ans.pl>
+Date:   Tue, 27 Jul 2021 15:56:27 -0700
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YQAxyjrGJpl7UkNG@redhat.com>
+In-Reply-To: <e7f64d43-2a26-e386-b208-5c35d6a56ed4@ans.pl>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 27 2021 at 12:18P -0400,
-Mike Snitzer <snitzer@redhat.com> wrote:
-
-> On Tue, Jul 27 2021 at 12:02P -0400,
-> Christoph Hellwig <hch@lst.de> wrote:
+On 2021-07-27 at 15:39, Krzysztof Olędzki wrote:
+> On 2021-07-27 at 14:53, Krzysztof Olędzki wrote:
+>> Hi,
+>>
+>> I have a number of (older) systems that are still based on 32 bit
+>> userspace but are running a relatively modern 64 bit kernel -
+>> 5.4-stable, where BTW - LOOP_CONFIGURE is not yet available.
+>>
+>> I noticed that starting with util-linux-2.37 it is no longer possible to
+>> mount images using loop:
+>>
+>> # mount /usr/install/iso/systemrescue-8.04-amd64.iso /mnt/cdrom
+>> mount: /mnt/cdrom: failed to setup loop device for
+>> /usr/install/iso/systemrescue-8.04-amd64.iso.
+>>
+>> Reverting d5fd456c88aba4fcf77d35fe38024a8d5c814686 fixes the problem:
+>>
+>> /tmp/util-linux-2.37# ./mount
+>> /usr/install/iso/systemrescue-8.04-amd64.iso /mnt/cdrom
+>> mount: /mnt/cdrom: WARNING: source write-protected, mounted read-only.
+>>
+>> I have not tested if 32 bit kernel + 32 bit userspace is also affected,
+>> but 64 bit kernel + 64 bit userspace works.
 > 
-> > On Tue, Jul 27, 2021 at 11:58:46AM -0400, Mike Snitzer wrote:
-> > > > This did not make a different to my testing
-> > > > using dmsetup and the lvm2 tools.
-> > > 
-> > > I'll try these changes running through the lvm2 testsuite.
-> > 
-> > Btw, is ther documentation on how to run it somewhere?  I noticed
-> > tests, old-tests and unit-tests directories, but no obvious way
-> > to run them.
+> Some debugging data:
 > 
-> I haven't tracked how it has changed in a while, but I always run:
-> make check_local
+> 30399: loopdev:      CXT: [0xff8d0f98]: using loop-control
+> 30399: loopdev:      CXT: [0xff8d0f98]: loop0 name assigned
+> 30399: loopdev:      CXT: [0xff8d0f98]: find_unused by loop-control [rc=0]
+> 30399: libmount:     LOOP: [0x57cbbcb0]: trying to use /dev/loop0
+> 30399: loopdev:      CXT: [0xff8d0f98]: set backing file=/usr/install/iso/systemrescue-8.04-amd64.iso
+> 30399: loopdev:      CXT: [0xff8d0f98]: set flags=4
+> 30399: loopdev:    SETUP: [0xff8d0f98]: device setup requested
+> 30399: loopdev:    SETUP: [0xff8d0f98]: backing file open: OK
+> 30399: loopdev:      CXT: [0xff8d0f98]: open /dev/loop0 [rw]: Success
+> 30399: loopdev:    SETUP: [0xff8d0f98]: device open: OK
+> 30399: loopdev:    SETUP: [0xff8d0f98]: LOOP_CONFIGURE failed: Inappropriate ioctl for device
+> 30399: loopdev:    SETUP: [0xff8d0f98]: failed [rc=-25]
+> 30399: libmount:     LOOP: [0x57cbbcb0]: failed to setup device
+> 30399: loopdev:      CXT: [0xff8d0f98]: de-initialize
+> 30399: loopdev:      CXT: [0xff8d0f98]: closing old open fd
+> 30399: loopdev:     ITER: [0xff8d1168]: de-initialize
+> 30399: libmount:      CXT: [0x57cbbcb0]: mount: preparing failed
+> 30399: libmount:      CXT: [0x57cbbcb0]: excode: rc=32 message="failed to setup loop device for /usr/install/iso/systemrescue-8.04-amd64.iso"
+> mount: /mnt/cdrom: failed to setup loop device for /usr/install/iso/systemrescue-8.04-amd64.iso.
+> 30399: libmount:      CXT: [0x57cbbcb0]: <---- reset [status=0] ---->
 > 
-> (but to do that you first need to ./configure how your distro does
-> it... so that all targets are enabled, etc. Then: make).
+> Seems like the code expects EINVAL (-22) but gets ENOTTY (-25), confirmed with strace:
+> ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/install/iso/systemrescue-8.04-amd64.iso", ...}}) = -1 ENOTTY (Inappropriate ioctl for device)
 > 
-> Will revisit this shortly and let you know if my process needed to
-> change at all due to lvm2 changes.
+> Indeed, changing the code from:
+>     if (errno != EINVAL)
+> to:
+>     if (errno != EINVAL && errno != ENOTTY)
+> allows it to work.
+> 
+> Not that with 64-bit userspace, kernel returns EINVAL:
+> 
+> ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/src/PACKAGES/systemrescue-8.04-amd64.iso", ...}}) = -1 EINVAL (Invalid argument)
 
-Yeap, same process as I described above.
+... which is because lo_compat_ioctl returns -ENOIOCTLCMD for 
+unsupported cmds, while lo_ioctl returns -EINVAL via lo_simple_ioctl.
 
-Same 6 tests fail in the lvm2 testsuite with or without your changes,
-so nothing to do with your changes.
+And vfs_ioctl returns -ENOTTY for -ENOIOCTLCMD.
 
-I'll review your patches closer tomorrow (first pass it all looked
-pretty good).
+Now the question is if this inconsistency is intended? :)
 
-Mike
+Krzysztof
 
