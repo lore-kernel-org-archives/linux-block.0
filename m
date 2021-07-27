@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9176DC4320A
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A670C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77F6B60F6C
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D39360FEE
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233259AbhG0VHu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:07:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55892 "EHLO
+        id S233729AbhG0VH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:07:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233775AbhG0VHN (ORCPT
+        with ESMTP id S234270AbhG0VH2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 17:07:13 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6B8C0617BC
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:07:01 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id t21so17550673plr.13
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:07:01 -0700 (PDT)
+        Tue, 27 Jul 2021 17:07:28 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2697AC06139E
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id ds11-20020a17090b08cbb0290172f971883bso6694592pjb.1
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=MXKHRxMVkVHDhZ+T8UiWjZTM6Vum4iJmblaVt4bfwFs=;
-        b=QpC9SEfvlX7NSN3JfA2BC35zgCfrRNM89W+45O2qaetJB35LhamFXcVq9sw1mHkTeW
-         /rqrtm+yHWSsc0IMWxYyPILgag6o+lXtAWSh9S38wjvoh0M06iGGbo4ZAdR2u94jE/Bx
-         ERMjdPmbTbLpNm0w77EfMtJW7fsMMDFF057oc=
+        bh=fCr6M9WVbBxoz5xSZDTLYQZUaixoNhvM1z4ft4/JiWU=;
+        b=CkfvuUYgjXUdgM1i87D/akGLRkQBlDepGvReTODAXjxv3JZLUxpr2SeqRCtggSb1NQ
+         0eO++6VjfUhMdNdLL9RotuOnb/CQ5ydWv+gSz7/hzqH6ipBx2LTuhN83Pi+6+jPneDFl
+         4XWuDGX42ek2Bg7lAzXWOFRnumRXJltjgh5Ik=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=MXKHRxMVkVHDhZ+T8UiWjZTM6Vum4iJmblaVt4bfwFs=;
-        b=dZy8BTvE2VM2zOh+zul7RfWDhU2Zh7tvzKHdzavpXSB7lBIYaJNi2BtnvlyIHnvBQu
-         rGQnQNfQQNm+IraLuJpEts+JzO2K64LE30OWLWMpakzIyTDo8XohUZUHuJmJZwWUhhL5
-         yKu4nhuUanO17knSVO7Lvo4uoKIp1ypnR8P+Djzb/F0eOywIgbw24F2zWgWxXTlIGWig
-         4+bZIejf7KLPq9vOxgZBmEsZfNgHEvQnhd8ruJ+zQVztJYZTVD8QiSf8QxKdmKXM4AWq
-         Iqenh2p/6fJQiXl8dTJ1ALNYcor9BL7BbKFdDQ8/HaO+W9OslV9/tgbGPs1sQ15zXwRx
-         OqTg==
-X-Gm-Message-State: AOAM533RpFtTdWoe16JZ7EJzjf6SZZxLRWdVh6Qc59UU/D5xUelzQGsp
-        WmAJRF26rP4vYflLonZ07tGpBw==
-X-Google-Smtp-Source: ABdhPJyuaoJo7hoFf8hTjNgbyLAts3NdgvoF/5uezLGJPhXywqIjaeGrS9UFbajj1vPPHXYDl+4KUQ==
-X-Received: by 2002:a05:6a00:1582:b029:332:67bf:c196 with SMTP id u2-20020a056a001582b029033267bfc196mr25270650pfk.52.1627420021064;
-        Tue, 27 Jul 2021 14:07:01 -0700 (PDT)
+        bh=fCr6M9WVbBxoz5xSZDTLYQZUaixoNhvM1z4ft4/JiWU=;
+        b=QLfG8z6nWm6f+GCyia+ooiALqmtI18rIFR1SBNqW1ESoKIrARGvAsmVmPdqwelQM+d
+         fU+MS6/cjpHfJJdE3TpkadVFFMl3819Eyv2UY08GL6MZV9CIraSmDuFgJMyMtZhrNp/+
+         wKnBMq/DE5mJMbW6Mtfq9cQwA2+e68F+X007b2GXtHGWgpCDw8cssn1amU+B/A7v0kA7
+         pZMD3UkTvOGIbZ8P5vpRIxFyrHGncPB2Y6z1XzXCUwZdoFTQugIOwyh5Uge+/z6jyNxj
+         c89GEzlAkhgbZqUDi8ZPT7V9CPY0oD7rRHx4/Ii0C0LRPlfAeCvA+8g65n2aTE2lrBqS
+         gDKA==
+X-Gm-Message-State: AOAM53198Xh3jDms6Uj+ShLxwcgj/tcIo7xMUwXwx8wTltK8Tf9VRfZs
+        HbwG2B2eiPxRrCsdfW1HRM+ytw==
+X-Google-Smtp-Source: ABdhPJxSxBiTE9j5dpguWlnBff2W6XOxanMIjLBz3KD/2jrAfNakkqqBYOlfrkNXGZusO3mgNbH5WQ==
+X-Received: by 2002:a17:902:b711:b029:11e:6480:258a with SMTP id d17-20020a170902b711b029011e6480258amr20741066pls.41.1627420022747;
+        Tue, 27 Jul 2021 14:07:02 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h9sm3809707pjk.56.2021.07.27.14.06.54
+        by smtp.gmail.com with ESMTPSA id i24sm3255991pfr.207.2021.07.27.14.06.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 14:06:55 -0700 (PDT)
+        Tue, 27 Jul 2021 14:07:01 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 39/64] mac80211: Use memset_after() to clear tx status
-Date:   Tue, 27 Jul 2021 13:58:30 -0700
-Message-Id: <20210727205855.411487-40-keescook@chromium.org>
+Subject: [PATCH 54/64] ipv6: Use struct_group() to zero rt6_info
+Date:   Tue, 27 Jul 2021 13:58:45 -0700
+Message-Id: <20210727205855.411487-55-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2852; h=from:subject; bh=zkH2Je2qGKqyQkSiaJEoBpiopw/INo+50iT5U6QcyXI=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOJovWFhW+3LgOdJB6YTmyNLx9mPkMh18BW/VNJ BOSsU16JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBziQAKCRCJcvTf3G3AJj8qD/ 9f25pzpuHDI7d5bSyGKts0iDOiz738IV/yhdknEcL4rC+JiQ/OTrFsGvAMK4zbyT6SQdRvwS0HsQtW FYEY3eOTO0eTLsnAGwNaxw3v5PWM7YYyFygBYMhIhpCgVOighF6YCT2xPnQ7LTyYdpD6L907wxXQ8j oXJcLb9fiEh1t6mn0/dicUHKyTwKkM3fIt2Gx4jCa1Ahv5gyWFd8/4Lv2Yd8KCGn/qxkTG1noBJf5C 2f2h93mKKljmD+CJrJzh/ZYUKpdAY63NSAR4QmZHT60LwkIYj0Fml9G4YK2meArKeNsA1MmJjOiSI6 VkDc7dPKwda9+aKjazu66ex6TqkUbOA0oaukDd2Rq6affQhlkFzRMDK6xCOTPFSye9KgRo0AGn0Klz ni+fmXKvOFIQYweU5qyOYDeL9tYUxQqUBJ6xchOdLgNXFSn5zy34UvmTQoqrVdOTKt+ImUcuGG23jI EEF20MHn/CZclwSMToQj+7lt9iWIQlJAvkfgdTS5zOajot+7oVFGJNYCGUneXC6jvsB+pZPMryc6uu HiwAJXVMsA04PW1mZDRt3xVTJJXADFBiu1CYcDhtJQH//Kmpo9Ydh7kPS4mFHHztPd+qOEZ0St7xxf dvAPnwZQNjibJgICAOUq6/ISKZEK5Qq848MAz7EEKrmQeFoCi4Q4SxSehYJw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2014; h=from:subject; bh=9FxEXENVJNuB45fHUbaxMj4hb424u+KXBOvcDXadQUU=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOMr1s7rjBnwnV0YvEmCppP2KjiI7qwbNhC0tnR LR54sH2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzjAAKCRCJcvTf3G3AJvB1D/ 9HyBVTCMQFZVnce4Q7z9RSSZaLEhmwSMwOLxk45KjDsJAOP3HcDjbkcb2t+AmQxHosaQzMYzJBsPLM fI6MGo8d7iglJul2X+wgatbPcEehYNvmi9N2hSNViixrkSMFXRYD9gNgZxmurHn3poTaQBFJeH/CMt i0K0Mf9xJLh09ZTUaBEMkeBp92msj4wB0UzT2YgQVbRBg/2h2H9tSdBS7ou3xC8W1K4gsOB+p8y9Z9 E6xK8yOM9010RaqlQJ7Xwiw/qBjEzM4v6/BvFKOfF7nbprnDsEcm1n3uqkj3PJ0XdUXpvHAc5ObsoB KO/0wpq+dvC4caLYvsafIZqOaz3hLgcDlRNbqQtK2sC08guGWc1MHoTfZoyOpPcsvKpv6Ez1ugjb2i pyJ0WkxY6xI4NtO334xyOlpSXADvHv+yqhiucaHger+9V1z3cVGZWQJMnpNFHTjqetSkyOaPhGCfT6 eygtBdkni37ipeLcPOAVtXgZH4iuKxdilblIEAG1YqFqpciOhCgtYiCt3itR4hpyhJp61nLn2XSysU lMIbYdUyBQlmwsWY79F0ezh83tePY6wggdyAujypUrGKiYTgTpH817kU7KBH2AB7YhuYQevj9FEHhD B/H1yY45d73/j38Hw4+briFVcL4khdU1nni0efnXIAMBNb0nJPEsOcf21O/g==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -83,67 +83,70 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Use memset_after() so memset() doesn't get confused about writing
-beyond the destination member that is intended to be the starting point
-of zeroing through the end of the struct.
-
-Note that the common helper, ieee80211_tx_info_clear_status(), does NOT
-clear ack_signal, but the open-coded versions do. All three perform
-checks that the ack_signal position hasn't changed, though.
+Add struct_group() to mark region of struct rt6_info that should be
+initialized to zero.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
-Should these each be clearing the same region? Because they're currently not.
----
- drivers/net/wireless/ath/carl9170/tx.c   | 4 +---
- drivers/net/wireless/intersil/p54/txrx.c | 4 +---
- include/net/mac80211.h                   | 4 +---
- 3 files changed, 3 insertions(+), 9 deletions(-)
+ include/net/ip6_fib.h | 30 ++++++++++++++++--------------
+ net/ipv6/route.c      |  4 +---
+ 2 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/wireless/ath/carl9170/tx.c b/drivers/net/wireless/ath/carl9170/tx.c
-index 88444fe6d1c6..6d2115639434 100644
---- a/drivers/net/wireless/ath/carl9170/tx.c
-+++ b/drivers/net/wireless/ath/carl9170/tx.c
-@@ -278,9 +278,7 @@ static void carl9170_tx_release(struct kref *ref)
- 	BUILD_BUG_ON(
- 	    offsetof(struct ieee80211_tx_info, status.ack_signal) != 20);
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 15b7fbe6b15c..9816e7444918 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -205,20 +205,22 @@ struct fib6_info {
  
--	memset(&txinfo->status.ack_signal, 0,
--	       sizeof(struct ieee80211_tx_info) -
--	       offsetof(struct ieee80211_tx_info, status.ack_signal));
-+	memset_after(&txinfo->status, 0, rates);
+ struct rt6_info {
+ 	struct dst_entry		dst;
+-	struct fib6_info __rcu		*from;
+-	int				sernum;
+-
+-	struct rt6key			rt6i_dst;
+-	struct rt6key			rt6i_src;
+-	struct in6_addr			rt6i_gateway;
+-	struct inet6_dev		*rt6i_idev;
+-	u32				rt6i_flags;
+-
+-	struct list_head		rt6i_uncached;
+-	struct uncached_list		*rt6i_uncached_list;
+-
+-	/* more non-fragment space at head required */
+-	unsigned short			rt6i_nfheader_len;
++	struct_group(init,
++		struct fib6_info __rcu		*from;
++		int				sernum;
++
++		struct rt6key			rt6i_dst;
++		struct rt6key			rt6i_src;
++		struct in6_addr			rt6i_gateway;
++		struct inet6_dev		*rt6i_idev;
++		u32				rt6i_flags;
++
++		struct list_head		rt6i_uncached;
++		struct uncached_list		*rt6i_uncached_list;
++
++		/* more non-fragment space at head required */
++		unsigned short			rt6i_nfheader_len;
++	);
+ };
  
- 	if (atomic_read(&ar->tx_total_queued))
- 		ar->tx_schedule = true;
-diff --git a/drivers/net/wireless/intersil/p54/txrx.c b/drivers/net/wireless/intersil/p54/txrx.c
-index 873fea59894f..f71b355f8583 100644
---- a/drivers/net/wireless/intersil/p54/txrx.c
-+++ b/drivers/net/wireless/intersil/p54/txrx.c
-@@ -431,9 +431,7 @@ static void p54_rx_frame_sent(struct p54_common *priv, struct sk_buff *skb)
- 	 * Clear manually, ieee80211_tx_info_clear_status would
- 	 * clear the counts too and we need them.
- 	 */
--	memset(&info->status.ack_signal, 0,
--	       sizeof(struct ieee80211_tx_info) -
--	       offsetof(struct ieee80211_tx_info, status.ack_signal));
-+	memset_after(&info->status, 0, rates);
- 	BUILD_BUG_ON(offsetof(struct ieee80211_tx_info,
- 			      status.ack_signal) != 20);
+ struct fib6_result {
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 6b8051106aba..bbcc605bab57 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -327,9 +327,7 @@ static const struct rt6_info ip6_blk_hole_entry_template = {
  
-diff --git a/include/net/mac80211.h b/include/net/mac80211.h
-index d8a1d09a2141..7abc1427aa8c 100644
---- a/include/net/mac80211.h
-+++ b/include/net/mac80211.h
-@@ -1200,9 +1200,7 @@ ieee80211_tx_info_clear_status(struct ieee80211_tx_info *info)
- 
- 	BUILD_BUG_ON(
- 	    offsetof(struct ieee80211_tx_info, status.ack_signal) != 20);
--	memset(&info->status.ampdu_ack_len, 0,
--	       sizeof(struct ieee80211_tx_info) -
--	       offsetof(struct ieee80211_tx_info, status.ampdu_ack_len));
-+	memset_after(&info->status, 0, ack_signal);
+ static void rt6_info_init(struct rt6_info *rt)
+ {
+-	struct dst_entry *dst = &rt->dst;
+-
+-	memset(dst + 1, 0, sizeof(*rt) - sizeof(*dst));
++	memset(&rt->init, 0, sizeof(rt->init));
+ 	INIT_LIST_HEAD(&rt->rt6i_uncached);
  }
- 
  
 -- 
 2.30.2
