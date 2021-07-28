@@ -2,239 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C12FC43214
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 02:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A57FC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 02:33:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2597560C51
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 02:29:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 242D460FBF
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 02:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233481AbhG1C3u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 22:29:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34066 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233223AbhG1C3s (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 22:29:48 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 84F0D60F9D;
-        Wed, 28 Jul 2021 02:29:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627439387;
-        bh=BVDbpAxM+frKsf51jnSBcTwiQH8xLbDYLBzUc0RtR0M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=l6M3v8Dq2RJdZLdrHlrRgTadlXo18w0hg79Ao53CwSywiG4PH3Rc4TbpW57kIzW1S
-         pm6M6TV3FKuJCCcFSdzyGO71jyln5VcPtaUD9nOLMKg6Qx6n9Kx3C8uHVNO61i3M2u
-         2SBMrLoYyWf49yVEfJt1aNS6NaEHgz5YEVHAERBnWdRvrBzlOIrmaM1ZZbV07FGLbm
-         1uBebQ83iDB2f9hacpYv/eNbd5+KlFwLEzan/vnD+OXejhk1MnQvLRBZOVtKw5ga3w
-         8WxfmT0ZIlecIgkas59dvSbF0KnQ7Su6ay6kZawGxUukuAv3MWwRrmhymS3vQE/f/P
-         G4AuC1SuQNLjg==
-Date:   Tue, 27 Jul 2021 21:32:17 -0500
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 04/64] stddef: Introduce struct_group() helper macro
-Message-ID: <20210728023217.GC35706@embeddedor>
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-5-keescook@chromium.org>
+        id S234433AbhG1Cdb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 22:33:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44884 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233223AbhG1Cdb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Jul 2021 22:33:31 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68895C061757;
+        Tue, 27 Jul 2021 19:33:29 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id ds11-20020a17090b08cbb0290172f971883bso7798262pjb.1;
+        Tue, 27 Jul 2021 19:33:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=D45lrolxqJIjPPb8I/48vYfzy0j0FugUdvX8Qruvv54=;
+        b=pQfJFQ+eTwlrNYDdbzs2U9jeZ0E/c0YUPgCYHaq+gBlpkgqxicfU9PnwGI0BrE3/lT
+         tt2V1uJZiKWoQ5kUXBGAXbePZTKTjE2YexRN9Gnmkix3BF4KxE0qYyjh69qdQS6o7EQL
+         6Ax5YEkduRwRULXud/4EmTwFUKwWcNR/GIADiNZrQely2ESBEN3UVhZKwnFKd1dji3dF
+         rDbXmtNZs3qHjiJ9GuBK7FAoljylKQlQVdzjarnbpEyV09wdSSVF+tiU9f+xKKz+IaLF
+         S9MODWQ4I2U2Q1M7emhDGag6v8H0L8j6jGp5S2APB42m9ppQ5Sw6JhXkmb1Tdaq0tVb1
+         YeLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=D45lrolxqJIjPPb8I/48vYfzy0j0FugUdvX8Qruvv54=;
+        b=eFKVMc0SMBTo/uLX/gESXPFZKkNqamX7+1R7veiljvzK/tGGvQn4RO4fPA0/Uicskc
+         BL/tg5942uIQ3IsPFVMEUsZEo37/xMSflUIRa3GOdCm4kQheE8gEfdwASUhf6ydnssoi
+         67qVRnXv5ZUNC7xM6WmSfAFljDA4Y+R6RfxqTlRSpscB8scHxvfWF8UnIxtoTCMRN7sU
+         xzHCIwjyTbDizDBEhCVpQH+MbSGQoWSQiB8H+7rzYMR9/gWI51PUcwL4GLkkOHHpRSj6
+         EoOf5H8gyegOxr7SZbnxivuxTFuYdSLQGp+hVrq2l6KrdvNsBR5oJvLcZ6ekCkQsS0cB
+         0t1w==
+X-Gm-Message-State: AOAM533iAJSD+xRA8AITGOEfdSRI9X9WXi+nlEbN6tmI4+J0BIxm8l68
+        Tj6dwUKTx7vWfYQJISYefaqrLAPPchJtMw==
+X-Google-Smtp-Source: ABdhPJxP5Se/5psX3Di0Yjyg2zr2lBpOzdzRRiH5bE1mZy3PBuFZSeeuLMOJh+nGdvPJ+ExVs2UZDw==
+X-Received: by 2002:a65:52c2:: with SMTP id z2mr1994938pgp.225.1627439608862;
+        Tue, 27 Jul 2021 19:33:28 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.110])
+        by smtp.gmail.com with ESMTPSA id j22sm5339769pgb.62.2021.07.27.19.33.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jul 2021 19:33:28 -0700 (PDT)
+Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
+ <YPGvIzZUI+QxP1js@mtj.duckdns.org>
+ <957ab14d-c4bc-32f0-3f7d-af98832ab955@gmail.com>
+ <YP8tPwkJNMAcjDqk@mtj.duckdns.org>
+ <34a6f4b5-9055-e519-5693-068f8dcb169c@gmail.com>
+ <YQAydzEhZfPUpzWI@mtj.duckdns.org>
+From:   brookxu <brookxu.cn@gmail.com>
+Message-ID: <fab343e8-5929-fb30-90e3-b5b6bd34702a@gmail.com>
+Date:   Wed, 28 Jul 2021 10:33:20 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210727205855.411487-5-keescook@chromium.org>
+In-Reply-To: <YQAydzEhZfPUpzWI@mtj.duckdns.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 01:57:55PM -0700, Kees Cook wrote:
-> Kernel code has a regular need to describe groups of members within a
-> structure usually when they need to be copied or initialized separately
-> from the rest of the surrounding structure. The generally accepted design
-> pattern in C is to use a named sub-struct:
-> 
-> 	struct foo {
-> 		int one;
-> 		struct {
-> 			int two;
-> 			int three;
-> 		} thing;
-> 		int four;
-> 	};
-> 
-> This would allow for traditional references and sizing:
-> 
-> 	memcpy(&dst.thing, &src.thing, sizeof(dst.thing));
-> 
-> However, doing this would mean that referencing struct members enclosed
-> by such named structs would always require including the sub-struct name
-> in identifiers:
-> 
-> 	do_something(dst.thing.three);
-> 
-> This has tended to be quite inflexible, especially when such groupings
-> need to be added to established code which causes huge naming churn.
-> Three workarounds exist in the kernel for this problem, and each have
-> other negative properties.
-> 
-> To avoid the naming churn, there is a design pattern of adding macro
-> aliases for the named struct:
-> 
-> 	#define f_three thing.three
-> 
-> This ends up polluting the global namespace, and makes it difficult to
-> search for identifiers.
-> 
-> Another common work-around in kernel code avoids the pollution by avoiding
-> the named struct entirely, instead identifying the group's boundaries using
-> either a pair of empty anonymous structs of a pair of zero-element arrays:
-> 
-> 	struct foo {
-> 		int one;
-> 		struct { } start;
-> 		int two;
-> 		int three;
-> 		struct { } finish;
-> 		int four;
-> 	};
-> 
-> 	struct foo {
-> 		int one;
-> 		int start[0];
-> 		int two;
-> 		int three;
-> 		int finish[0];
-> 		int four;
-> 	};
-> 
-> This allows code to avoid needing to use a sub-struct name for member
-> references within the surrounding structure, but loses the benefits of
-> being able to actually use such a struct, making it rather fragile. Using
-> these requires open-coded calculation of sizes and offsets. The efforts
-> made to avoid common mistakes include lots of comments, or adding various
-> BUILD_BUG_ON()s. Such code is left with no way for the compiler to reason
-> about the boundaries (e.g. the "start" object looks like it's 0 bytes
-> in length and is not structurally associated with "finish"), making bounds
-> checking depend on open-coded calculations:
-> 
-> 	if (length > offsetof(struct foo, finish) -
-> 		     offsetof(struct foo, start))
-> 		return -EINVAL;
-> 	memcpy(&dst.start, &src.start, length);
-> 
-> However, the vast majority of places in the kernel that operate on
-> groups of members do so without any identification of the grouping,
-> relying either on comments or implicit knowledge of the struct contents,
-> which is even harder for the compiler to reason about, and results in
-> even more fragile manual sizing, usually depending on member locations
-> outside of the region (e.g. to copy "two" and "three", use the start of
-> "four" to find the size):
-> 
-> 	BUILD_BUG_ON((offsetof(struct foo, four) <
-> 		      offsetof(struct foo, two)) ||
-> 		     (offsetof(struct foo, four) <
-> 		      offsetof(struct foo, three));
-> 	if (length > offsetof(struct foo, four) -
-> 		     offsetof(struct foo, two))
-> 		return -EINVAL;
-> 	memcpy(&dst.two, &src.two, length);
-> 
-> And both of the prior two idioms additionally appear to write beyond the
-> end of the referenced struct member, forcing the compiler to ignore any
-> attempt to perform bounds checking.
-> 
-> In order to have a regular programmatic way to describe a struct
-> region that can be used for references and sizing, can be examined for
-> bounds checking, avoids forcing the use of intermediate identifiers,
-> and avoids polluting the global namespace, introduce the struct_group()
-> macro. This macro wraps the member declarations to create an anonymous
-> union of an anonymous struct (no intermediate name) and a named struct
-> (for references and sizing):
-> 
-> 	struct foo {
-> 		int one;
-> 		struct_group(thing,
-> 			int two,
-> 			int three,
-> 		);
-> 		int four;
-> 	};
-> 
-> 	if (length > sizeof(src.thing))
-> 		return -EINVAL;
-> 	memcpy(&dst.thing, &src.thing, length);
-> 	do_something(dst.three);
-> 
-> There are some rare cases where the resulting struct_group() needs
-> attributes added, so struct_group_attr() is also introduced to allow
-> for specifying struct attributes (e.g. __align(x) or __packed).
-> 
-> Co-developed-by: Keith Packard <keithpac@amazon.com>
-> Signed-off-by: Keith Packard <keithpac@amazon.com>
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+Thanks for your time.
 
-Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-
-Love it! :)
-
-Thanks
---
-Gustavo
-
-> ---
->  include/linux/stddef.h | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
+Tejun Heo wrote on 2021/7/28 12:21 上午:
+> Hello,
 > 
-> diff --git a/include/linux/stddef.h b/include/linux/stddef.h
-> index 998a4ba28eba..cf7f866944f9 100644
-> --- a/include/linux/stddef.h
-> +++ b/include/linux/stddef.h
-> @@ -36,4 +36,38 @@ enum {
->  #define offsetofend(TYPE, MEMBER) \
->  	(offsetof(TYPE, MEMBER)	+ sizeof_field(TYPE, MEMBER))
->  
-> +/**
-> + * struct_group_attr(NAME, ATTRS, MEMBERS)
-> + *
-> + * Used to create an anonymous union of two structs with identical
-> + * layout and size: one anonymous and one named. The former can be
-> + * used normally without sub-struct naming, and the latter can be
-> + * used to reason about the start, end, and size of the group of
-> + * struct members. Includes structure attributes argument.
-> + *
-> + * @NAME: The name of the mirrored sub-struct
-> + * @ATTRS: Any struct attributes (normally empty)
-> + * @MEMBERS: The member declarations for the mirrored structs
-> + */
-> +#define struct_group_attr(NAME, ATTRS, MEMBERS) \
-> +	union { \
-> +		struct { MEMBERS } ATTRS; \
-> +		struct { MEMBERS } ATTRS NAME; \
-> +	}
-> +
-> +/**
-> + * struct_group(NAME, MEMBERS)
-> + *
-> + * Used to create an anonymous union of two structs with identical
-> + * layout and size: one anonymous and one named. The former can be
-> + * used normally without sub-struct naming, and the latter can be
-> + * used to reason about the start, end, and size of the group of
-> + * struct members.
-> + *
-> + * @NAME: The name of the mirrored sub-struct
-> + * @MEMBERS: The member declarations for the mirrored structs
-> + */
-> +#define struct_group(NAME, MEMBERS)	\
-> +	struct_group_attr(NAME, /* no attrs */, MEMBERS)
-> +
->  #endif
-> -- 
-> 2.30.2
+> On Tue, Jul 27, 2021 at 11:06:18AM +0800, brookxu wrote:
+>> Make blk-throttle use rq-qos may be more elegant. But I found that there may be at least
+>> one problem that is difficult to solve. blk-throttle supports separate throttle for read
+>> and write IOs, which means that we cannot suspend tasks during throttle, but rq-qos
+>> throttle IOs by suspending tasks.
+> 
+> Ah, right, I forgot about that.
+> 
+>> We may be able to relocate the blk-throttle hooks to the rq-qos hooks. Since we may not
+>> be able to replace the throttle hook, in this case, if we register a rq-qos to the system,
+>> part of the blk-throttle hooks is in rq-qos and part hooks not, which feels a bit confusing.
+>> In addition, we may need to implement more hooks, such as IO merge hook.
+> 
+> Would it be possible to just move the blk-throtl throttling hook right next
+> to the rq-qos hook so that it gets throttled after splitting?
+
+If we do this, I think we will encounter some problems, as follows:
+1. blk-throttle is now at the top of the IO stack. Changing the position of the throttle hook
+   will make this mechanism invalid for some devices.
+2. We may also need to add a new hook to handle back-merge, otherwise I think the isolation
+   effect will be worse in the sequential IO scene.
+3. Since bio has entered the IO stack, if it is suspended and resubmitted by blk-throttle,
+   then there is an IO stack reentry problem, which I think may cause many small problems.
+
+> Thanks.
 > 
