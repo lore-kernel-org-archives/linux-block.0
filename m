@@ -2,97 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 830C5C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 07:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F7A8C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 08:16:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A46560FC4
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 07:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E97060F9D
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 08:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233469AbhG1HsK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 03:48:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232691AbhG1HsJ (ORCPT
+        id S234556AbhG1IQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 04:16:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32258 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234311AbhG1IQx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 03:48:09 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06C1C061757;
-        Wed, 28 Jul 2021 00:48:08 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id e2-20020a17090a4a02b029016f3020d867so2983073pjh.3;
-        Wed, 28 Jul 2021 00:48:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nSOViMYPYa18THue5NB1xRZRfJm692a7CdBC4/LyTC4=;
-        b=KNM2TQ0qBbPb4XvWNcysK8INoORw2FRUtbc8UbVGuaP8PeRKXOA40SbsDF9oCehOVL
-         AnCZvTFY+1SPWB6JTBKcQKVHe3UPQGU3v1GUFjON3h/+SJzOISApHH7sj4rhrF7i2OA/
-         MoxIDhyejas59nJVOYyl3xM1pLZ6ytfPEfoAhwvPgna4fkebhtY+gUYU+jJCtA+Ctm3k
-         Ji/a68Vrx6gto6KOy8+ipXUFVimMCo4eWMWAltb/IoZ4C2U32jFknB1VnzXzmkX2ohHe
-         CJffsTry3FwO+oIN4xrkKxl/JfuJtPbRpXoMTAJLEmaV29xTQ0CpI2LIj2vNyc5xy9+V
-         XZgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=nSOViMYPYa18THue5NB1xRZRfJm692a7CdBC4/LyTC4=;
-        b=aNryeBLSB+UUUiT8cNZOdvRfD5SbdGJiFqNL8zRo+0kiiJDagddv76/uoGDKwddmGp
-         8WMQL2xAsFunVJAN7QVOZD3C1EMXJMly7by+ER+Vfd9T3JZ7aGgmOz5XF7dnjzzM1JVy
-         j7K7k9gIDSY0eHQLiSmvkH3kbl54nFwNkQovtvd6MyLfa93ozz86Q3op9cLHPkXmZqk1
-         4x911aFgGBvXTWsQmavHULYIO2B5MYDhCK1lV0BpeHEnxy+po4iBk8G13vlpXXa93zvu
-         jb75QY4VD3lRJ1VdI+jhebQ9SRByb1fSmoXCJY2PG3DoZbsvE8lyrxH1rvYe9m+75dvC
-         x56Q==
-X-Gm-Message-State: AOAM5337Qt1qmGRUDr51ZuQrCsf/nokaeEkPRiFLWGLXukFp+DgIjcwZ
-        G1su/n8JQPk2TWrzPcIUhBI=
-X-Google-Smtp-Source: ABdhPJyQ5x/nLRycZwhKR5z/hDbd5kNAj62JRoGgdGAZyAI1/V0HjUmqvoghYIyRYo7AvfzFszmIXQ==
-X-Received: by 2002:a63:a42:: with SMTP id z2mr27192335pgk.245.1627458488040;
-        Wed, 28 Jul 2021 00:48:08 -0700 (PDT)
-Received: from localhost (udp264798uds.hawaiiantel.net. [72.253.242.87])
-        by smtp.gmail.com with ESMTPSA id i8sm6639232pfk.18.2021.07.28.00.48.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 00:48:07 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 27 Jul 2021 21:48:06 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     brookxu <brookxu.cn@gmail.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-throtl: optimize IOPS throttle for large IO scenarios
-Message-ID: <YQELtmeLjlDHCk2i@mtj.duckdns.org>
-References: <1626416569-30907-1-git-send-email-brookxu.cn@gmail.com>
- <YPGvIzZUI+QxP1js@mtj.duckdns.org>
- <957ab14d-c4bc-32f0-3f7d-af98832ab955@gmail.com>
- <YP8tPwkJNMAcjDqk@mtj.duckdns.org>
- <34a6f4b5-9055-e519-5693-068f8dcb169c@gmail.com>
- <YQAydzEhZfPUpzWI@mtj.duckdns.org>
- <fab343e8-5929-fb30-90e3-b5b6bd34702a@gmail.com>
+        Wed, 28 Jul 2021 04:16:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627460212;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=11KkgfjZAJz7gnbKE1E4S6iTwopp2sMFZgLDOO2RYF0=;
+        b=OC04xr5cpSVy9wKZbeIBobCE7QdQUUJcOdILwXFXU5KuBl9TIRaCs/lOqdVN6ACoUl4yvX
+        UsP5sPF2X7M5xSm7gI7iLpvW0reGTKlGbqgtP4vjdwz9kqtm86QDU8xvF4UqRoF64HiKVa
+        GhWUHDuNeTfqO08uwljj2lf0Clxz2L0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-lsI691mRPdqlEDxrWG7Qsw-1; Wed, 28 Jul 2021 04:16:50 -0400
+X-MC-Unique: lsI691mRPdqlEDxrWG7Qsw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44B611084F40;
+        Wed, 28 Jul 2021 08:16:49 +0000 (UTC)
+Received: from localhost (ovpn-13-99.pek2.redhat.com [10.72.13.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 785AA60C05;
+        Wed, 28 Jul 2021 08:16:44 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/7] loop: cleanup charging io to mem/blkcg
+Date:   Wed, 28 Jul 2021 16:16:31 +0800
+Message-Id: <20210728081638.1500953-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fab343e8-5929-fb30-90e3-b5b6bd34702a@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hello Guys,
 
-On Wed, Jul 28, 2021 at 10:33:20AM +0800, brookxu wrote:
-> If we do this, I think we will encounter some problems, as follows:
-> 1. blk-throttle is now at the top of the IO stack. Changing the position of the throttle hook
->    will make this mechanism invalid for some devices.
-> 2. We may also need to add a new hook to handle back-merge, otherwise I think the isolation
->    effect will be worse in the sequential IO scene.
-> 3. Since bio has entered the IO stack, if it is suspended and resubmitted by blk-throttle,
->    then there is an IO stack reentry problem, which I think may cause many small problems.
+Cleanup charging io to mem/blkcg a bit:
 
-Yeah, you're right. I don't think it's worth rocking the boat with
-blk-throtl at this point. An extra callback it is then.
+- avoid to store blkcg_css/memcg_css in loop_cmd, and store blkcg_css in
+loop_worker instead
 
-Thanks.
+- avoid to acquire ->lo_work_lock in IO path
+
+- simplify blkcg_css query via xarray
+
+- other misc cleanup
+
+V2:
+	- add helper of memcg_get_e_css
+	- cleanup #ifdef
+	- improve the last patch, as discussed with Dan Schatzberg
+
+
+Ming Lei (7):
+  mm: memcontrol: add helper of memcg_get_e_css
+  loop: clean up blkcg association
+  loop: conver timer for monitoring idle worker into dwork
+  loop: add __loop_free_idle_workers() for covering freeing workers in
+    clearing FD
+  loop: improve loop_process_work
+  loop: use xarray to store workers
+  loop: don't add worker into idle list
+
+ drivers/block/loop.c       | 320 ++++++++++++++++++++-----------------
+ drivers/block/loop.h       |   7 +-
+ include/linux/memcontrol.h |   8 +
+ 3 files changed, 188 insertions(+), 147 deletions(-)
 
 -- 
-tejun
+2.31.1
+
