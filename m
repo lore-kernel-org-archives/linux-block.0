@@ -2,149 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7885FC4320E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99FCC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:14:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6561660F91
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B90A460F9E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:14:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235315AbhG1JCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 05:02:10 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:42376 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234163AbhG1JCJ (ORCPT
+        id S230520AbhG1JOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 05:14:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39740 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235558AbhG1JOO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 05:02:09 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 2DF0A22262;
-        Wed, 28 Jul 2021 09:02:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1627462927;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        Wed, 28 Jul 2021 05:14:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627463652;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sp2fXaO4+VkU0ewmSUxyDBIfoqxWZ/YmzoRuKp72TwU=;
-        b=QJtqaRDeD/r+6BS2RpMLHsBckRf2sr1w3iN33pezOooEqpnn8T7DqSapcRxyMPIZfjRSjm
-        7J+1lee9yCSAoX/yXx5qOnlJlNQlP5/7ZOeqDMcdtfzJJyxwr5G3M0hN/eM3VNhe4zl7mM
-        ShgAu0K7CLyKCgHUkgVaDq862Mit+3M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1627462927;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sp2fXaO4+VkU0ewmSUxyDBIfoqxWZ/YmzoRuKp72TwU=;
-        b=pmBfIB2QkmA3xf4kSvM/Kul+M1rkY2xpWB6cH5WhgISANis+5+m+8zDuM/QuNvL/ktFiFp
-        tiOqD9YAirWKVzAw==
-Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
-        by relay2.suse.de (Postfix) with ESMTP id 15362A3B8B;
-        Wed, 28 Jul 2021 09:02:07 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 4CA03DA8A7; Wed, 28 Jul 2021 10:59:22 +0200 (CEST)
-Date:   Wed, 28 Jul 2021 10:59:22 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        nborisov@suse.com
-Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy()
- region
-Message-ID: <20210728085921.GV5047@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Kees Cook <keescook@chromium.org>,
-        linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        nborisov@suse.com
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-2-keescook@chromium.org>
+        bh=qM2pY3QQZ75N8NGvyWod3aePv3OhL3iSnbWaTNcX1vQ=;
+        b=gx/ubLe+S5NdMkemIaKlIy47tVdmI9CfJXaFIcVjt7py3jxlEcJEJVi+tR3GGV9jLjk8Zu
+        dKDTZUKPL5RZACApYNuwf8zfHxtGfcbfurVbqYLgd4KvGC8HEC2S85zyg/t/tt34CXAedg
+        dyW6aFJ5q2RkOft8pY+AmN7tpbpfHhw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-koeJ_VBtMm6s37DXcy3xsA-1; Wed, 28 Jul 2021 05:14:10 -0400
+X-MC-Unique: koeJ_VBtMm6s37DXcy3xsA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 442978010F4;
+        Wed, 28 Jul 2021 09:14:09 +0000 (UTC)
+Received: from ws.net.home (ovpn-113-182.ams2.redhat.com [10.36.113.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EFF5C60854;
+        Wed, 28 Jul 2021 09:14:07 +0000 (UTC)
+Date:   Wed, 28 Jul 2021 11:14:05 +0200
+From:   Karel Zak <kzak@redhat.com>
+To:     Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Sinan Kaya <sinan.kaya@microsoft.com>,
+        util-linux@vger.kernel.org, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Commit d5fd456c88aba4fcf77d35fe38024a8d5c814686 - "loopdev: use
+ LOOP_CONFIG ioctl" broke loop on x86-64 w/ 32 bit userspace
+Message-ID: <20210728091405.cqvkgv6c2vvsmacb@ws.net.home>
+References: <a797f527-4599-e986-a326-4bb141487f2c@ans.pl>
+ <e7f64d43-2a26-e386-b208-5c35d6a56ed4@ans.pl>
+ <7de1bd0b-b8ea-daf0-b677-f92db1c1cdff@ans.pl>
+ <c1c9d728-c4d9-eaf4-63c3-d13b99da3a3d@kernel.dk>
+ <72947cba-6a12-d54f-c9c8-588729631306@ans.pl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210727205855.411487-2-keescook@chromium.org>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <72947cba-6a12-d54f-c9c8-588729631306@ans.pl>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 01:57:52PM -0700, Kees Cook wrote:
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memcpy(), memmove(), and memset(), avoid
-> intentionally writing across neighboring fields.  Wrap the target region
-> in a common named structure. This additionally fixes a theoretical
-> misalignment of the copy (since the size of "buf" changes between 64-bit
-> and 32-bit, but this is likely never built for 64-bit).
+On Tue, Jul 27, 2021 at 10:46:06PM -0700, Krzysztof Olędzki wrote:
+> So, to confirm - checking for both EINVAL and ENOTTY after LOOP_CONFIGURE is
+> the proper way of taking care this?
 > 
-> FWIW, I think this code is totally broken on 64-bit (which appears to
-> not be a "real" build configuration): it would either always fail (with
-> an uninitialized data->buf_size) or would cause corruption in userspace
-> due to the copy_to_user() in the call path against an uninitialized
-> data->buf value:
-> 
-> omap3isp_stat_request_statistics_time32(...)
->     struct omap3isp_stat_data data64;
->     ...
->     omap3isp_stat_request_statistics(stat, &data64);
-> 
-> int omap3isp_stat_request_statistics(struct ispstat *stat,
->                                      struct omap3isp_stat_data *data)
->     ...
->     buf = isp_stat_buf_get(stat, data);
-> 
-> static struct ispstat_buffer *isp_stat_buf_get(struct ispstat *stat,
->                                                struct omap3isp_stat_data *data)
-> ...
->     if (buf->buf_size > data->buf_size) {
->             ...
->             return ERR_PTR(-EINVAL);
->     }
->     ...
->     rval = copy_to_user(data->buf,
->                         buf->virt_addr,
->                         buf->buf_size);
-> 
-> Regardless, additionally initialize data64 to be zero-filled to avoid
-> undefined behavior.
-> 
-> Fixes: 378e3f81cb56 ("media: omap3isp: support 64-bit version of omap3isp_stat_data")
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  drivers/media/platform/omap3isp/ispstat.c |  5 +--
->  include/uapi/linux/omap3isp.h             | 44 +++++++++++++++++------
->  2 files changed, 36 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/media/platform/omap3isp/ispstat.c b/drivers/media/platform/omap3isp/ispstat.c
-> index 5b9b57f4d9bf..ea8222fed38e 100644
-> --- a/drivers/media/platform/omap3isp/ispstat.c
-> +++ b/drivers/media/platform/omap3isp/ispstat.c
-> @@ -512,7 +512,7 @@ int omap3isp_stat_request_statistics(struct ispstat *stat,
->  int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
->  					struct omap3isp_stat_data_time32 *data)
->  {
-> -	struct omap3isp_stat_data data64;
-> +	struct omap3isp_stat_data data64 = { };
+> https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/tree/lib/loopdev.c?id=d4423cce9b9001c9de7ebc6f64f6cc2bb854944c#n1362
 
-Should this be { 0 } ?
+We need both to make losetup/mount robust for already released kernels.
+Fixed: https://github.com/karelzak/util-linux/commit/583990d25b5d65a9a9771a39d112de0ee16a1f3a
 
-We've seen patches trying to switch from { 0 } to {  } but the answer
-was that { 0 } is supposed to be used,
-http://www.ex-parrot.com/~chris/random/initialise.html
+Thanks for your report!
 
-(from https://lore.kernel.org/lkml/fbddb15a-6e46-3f21-23ba-b18f66e3448a@suse.com/)
+ Karel
+
+-- 
+ Karel Zak  <kzak@redhat.com>
+ http://karelzak.blogspot.com
+
