@@ -2,78 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0C7C4320A
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19288C432BE
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:24:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EFF060FDA
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:20:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3EBF60FD8
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:24:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234344AbhG1LUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 07:20:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51550 "EHLO
+        id S234746AbhG1LYH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 07:24:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232111AbhG1LUF (ORCPT
+        with ESMTP id S234631AbhG1LYG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 07:20:05 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84075C061757
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 04:20:02 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id a26so3179875lfr.11
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 04:20:02 -0700 (PDT)
+        Wed, 28 Jul 2021 07:24:06 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45ACC061764
+        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 04:24:04 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id l17so2670022ljn.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 04:24:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=rasmusvillemoes.dk; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WRpAt4Qf30VQcI04z59j1Xhna4kVm3ZAFQjWCiFVzII=;
-        b=ZITf0JJkY6siA6zuTWx/S+3I3pJ92j2lsEWHCAUrQgybgq2nu7vMyrV5yFzPnr0ASF
-         zQnwOwgLaX1f2Ag8AdE3Zoi+yryD69qxehZj3Axp0G1SI8NHWpwdtRD/AWfB8hXTTU+w
-         7JIntZBgXB7V3Bx+KAGMmd0eo1ehu7YXfBEGo=
+        bh=Wg+3/RRWhlXAdTdGrz6ZDOoqwDjAalfDgSMGfZRFy7c=;
+        b=MqB2oQJrWErl4M3jysGVniDJ4xARTYUEk892vt+CXTsOghQBHfw+ROqpA+FWeMfNAw
+         99HiHQl9pgCodpNZVcjBeusKVj1g8kcdEIy/ZsV7LY738G0Iid6EaBW2zhaAmZdiUtKc
+         pOnrw2np1M0KCLNrhvFVpkrx8b6JNzJx5ukHc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=WRpAt4Qf30VQcI04z59j1Xhna4kVm3ZAFQjWCiFVzII=;
-        b=WUyKXjCTr/rdKF+1YrSLfQeXMRJ7leLJFwvOhU2KSvagK1qQHVTtCXz8O9sRABwUtQ
-         MSwHIhyo6IMsMP0rmYP/gLA1RQoFxBayrxUD7qJbzYoah41PzYeQv0tRueNpl5vlaN1k
-         M/j0+n9/ChGzmznWcjFHP2TxBZXlaB61SANlXQhI0XBIZeO0frrllm9z+53ynwZTQf7d
-         l7clPxMfRryvdS56v82F/JYOPuDoiumKS+f32tn6sc+jK5ry6oGZaPSIGuJz7SfqjjRK
-         Obwgrq9RN+Kyfmg8N4QRjm+dojTN7e7hRyzYxI6yaVD+HSXQY737LpwfSq7BUBhvo7hj
-         /J4A==
-X-Gm-Message-State: AOAM531pz/kh09WMPeEVmEUF8xakpCVv+/cET9vtuLNQ/8XKXv1H65f8
-        sf5o/gAifNFLhHIAT5fMHeC0xg==
-X-Google-Smtp-Source: ABdhPJwtX9cWcqS+T2RXR4asd80U6YfWCrWHQPG0xseFJRRyUcQAZvx3wnyU+2xS6u5f7adx+ZAvkA==
-X-Received: by 2002:a19:dc5e:: with SMTP id f30mr20474709lfj.318.1627471200888;
-        Wed, 28 Jul 2021 04:20:00 -0700 (PDT)
+        bh=Wg+3/RRWhlXAdTdGrz6ZDOoqwDjAalfDgSMGfZRFy7c=;
+        b=m/K0ZXrcLrVB6q4oe9+P72hEz/iX3BXseZIOimw5PSnyqGwZsMQqPggZLS6CUp/gIU
+         H9q27tYaye8by/+ePRW8w6pPfVOlzNxC3SNAkoEb6R4LEr72uj7JSmwWoxCb8V5inWSA
+         +iKiBU41wsDw25rgg5M3Ifw39PMl62kndro86OxC2tc99fYwOmrcjx67uE5As9x9j5sM
+         s1au8S9K/lfK1d1NVzOsBCGXzt+2DzVoTweYtWCWjQ4EtbybGcuNR8sICZ109ratLFaX
+         jw2FLHDVC7upnFRxUHOEm9Rw6c5P31aULwjfNSWx8/4gL5GDHdAnNwWkTdkkBW9oMtRA
+         3YMA==
+X-Gm-Message-State: AOAM530EyP22fp2DZQkDEsHNVMAlhu+6CQIFhjwX15i/41TUoZdSskdS
+        p7tgksiKNcKru/Komm27iSOK3g==
+X-Google-Smtp-Source: ABdhPJzbJpuLwTQcj/uhUJ1FDab/S8wsNFZGfZq+HhHIgh+eTtqaebX9Ee+tEB7aFHczhnUT7I/eLg==
+X-Received: by 2002:a05:651c:124f:: with SMTP id h15mr18566268ljh.4.1627471443108;
+        Wed, 28 Jul 2021 04:24:03 -0700 (PDT)
 Received: from [172.16.11.1] ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id z4sm564853lfe.274.2021.07.28.04.19.59
+        by smtp.gmail.com with ESMTPSA id f14sm494569ljj.116.2021.07.28.04.24.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 04:20:00 -0700 (PDT)
-Subject: Re: [PATCH 34/64] fortify: Detect struct member overflows in memcpy()
- at compile-time
-To:     Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org
-Cc:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Wed, 28 Jul 2021 04:24:02 -0700 (PDT)
+Subject: Re: [PATCH 62/64] netlink: Avoid false-positive memcpy() warning
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
 References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-35-keescook@chromium.org>
+ <20210727205855.411487-63-keescook@chromium.org> <YQDv+oG7ok0T1L+r@kroah.com>
 From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <d2f9f21c-4d6e-9458-5887-ca5166d07942@rasmusvillemoes.dk>
-Date:   Wed, 28 Jul 2021 13:19:59 +0200
+Message-ID: <d7251d92-150b-5346-6237-52afc154bb00@rasmusvillemoes.dk>
+Date:   Wed, 28 Jul 2021 13:24:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210727205855.411487-35-keescook@chromium.org>
+In-Reply-To: <YQDv+oG7ok0T1L+r@kroah.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,34 +82,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/07/2021 22.58, Kees Cook wrote:
-
-> At its core, FORTIFY_SOURCE uses the compiler's __builtin_object_size()
-> internal[0] to determine the available size at a target address based on
-> the compile-time known structure layout details. It operates in two
-> modes: outer bounds (0) and inner bounds (1). In mode 0, the size of the
-> enclosing structure is used. In mode 1, the size of the specific field
-> is used. For example:
+On 28/07/2021 07.49, Greg Kroah-Hartman wrote:
+> On Tue, Jul 27, 2021 at 01:58:53PM -0700, Kees Cook wrote:
+>> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+>> field bounds checking for memcpy(), memmove(), and memset(), avoid
+>> intentionally writing across neighboring fields.
+>>
+>> Add a flexible array member to mark the end of struct nlmsghdr, and
+>> split the memcpy() to avoid false positive memcpy() warning:
+>>
+>> memcpy: detected field-spanning write (size 32) of single field (size 16)
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>> ---
+>>  include/uapi/linux/netlink.h | 1 +
+>>  net/netlink/af_netlink.c     | 4 +++-
+>>  2 files changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/uapi/linux/netlink.h b/include/uapi/linux/netlink.h
+>> index 4c0cde075c27..ddeaa748df5e 100644
+>> --- a/include/uapi/linux/netlink.h
+>> +++ b/include/uapi/linux/netlink.h
+>> @@ -47,6 +47,7 @@ struct nlmsghdr {
+>>  	__u16		nlmsg_flags;	/* Additional flags */
+>>  	__u32		nlmsg_seq;	/* Sequence number */
+>>  	__u32		nlmsg_pid;	/* Sending process port ID */
+>> +	__u8		contents[];
 > 
-> 	struct object {
-> 		u16 scalar1;	/* 2 bytes */
-> 		char array[6];	/* 6 bytes */
-> 		u64 scalar2;	/* 8 bytes */
-> 		u32 scalar3;	/* 4 bytes */
-> 	} instance;
-> 
->
-> __builtin_object_size(instance.array, 0) == 18, since the remaining size
-> of the enclosing structure starting from "array" is 18 bytes (6 + 8 + 4).
+> Is this ok to change a public, userspace visable, structure?
 
-I think the compiler would usually end up making that struct size 24,
-with 4 bytes of trailing padding (at least when alignof(u64) is 8). In
-that case, does __builtin_object_size(instance.array, 0) actually
-evaluate to 18, or to 22? A quick test on x86-64 suggests the latter, so
-the memcpy(, , 20) would not be a violation.
-
-Perhaps it's better to base the example on something which doesn't have
-potential trailing padding - so either add another 4 byte member, or
-also make scalar2 u32.
+At least it should keep using a nlmsg_ prefix for consistency and reduce
+risk of collision with somebody having defined an object-like contents
+macro. But there's no guarantees in any case, of course.
 
 Rasmus
