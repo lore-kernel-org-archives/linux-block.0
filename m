@@ -2,129 +2,742 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D37D2C4320A
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 04:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70393C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 05:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA973600D4
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 04:42:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3ED4560F6D
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 05:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbhG1Emt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 00:42:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33856 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229546AbhG1Ems (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 00:42:48 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 86E2760F41;
-        Wed, 28 Jul 2021 04:42:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627447367;
-        bh=dOk+2tFiWObmw55S1h9slR4A4T3f+tlYA4VqWOD2eAE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=asPRK8N64wo9bRcUDj3+v7oCKxySBOZvt/v7+Ul8CUaSzKyZPUVlLsBPnm9NGj8aL
-         t5IuM3IQXPrHb8Yz9D1mratdKG9R7S2c6Yh0zwS5GpHg29+SDGojG4OjVqAnE7tBpM
-         jAYxTK0V3onNdQN5uaDwZHNbxeDz3CHlU72GMmyDdw3HGwL6DH9eW9xA1/Dl42zjDN
-         Mx5AQotOjd6cHYwVOYCdo1B2deACWPfuxLWKtXpFn4h3EM2Sw91Cq07kOjltlEe6ME
-         9G2X5bnCZTkzA9pUjeaTaMt7xOmJ0XcdN+dMfePsl7645X7vk6VmD2uTl+suSMo30h
-         OeKWby67B9Y7A==
-Date:   Tue, 27 Jul 2021 23:45:17 -0500
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 06/64] bnxt_en: Use struct_group_attr() for memcpy()
- region
-Message-ID: <20210728044517.GE35706@embeddedor>
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-7-keescook@chromium.org>
+        id S230118AbhG1Fit (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 01:38:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229814AbhG1Fit (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jul 2021 01:38:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB2F9C061757
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 22:38:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=3jsQ99HpN4RJuS5/TNvKGH62p8hS2SViysXZECY6cb8=; b=lakJYL+D+d6wOWPL23vcPrZODX
+        LgfwnxqR3sR8gfJ8I5D257TuW/KhpbArhsqB5SRorERYqct84Qm9vnZohq/Uuz+RmrEKTGaX4zGTW
+        GZghtgxpb8JqtFGkN0ub5XwqQlIzaH26KjMwvUIRI3tvucLyPxR27BZvawoeglFuppm9FRmgsHm+N
+        tjREt4hoc0HEIXc0qAR0Q7mp6V32eiCT7ZvTBlDyNxK1CElCr7QD8Ftliqmj23x++gT44Cdr846kZ
+        C8DFpA96RZo4SEj/DIVawhvnl/4GTYkiug5GedvycQLJjtdRSzhP3CdOOksmlBxQEhBDNlm8Q2/28
+        q2/Id71w==;
+Received: from [2001:4bb8:184:87c5:bb62:2cac:f51c:2ae7] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m8cGT-00Fjx3-JW; Wed, 28 Jul 2021 05:38:08 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     caizhiyong@huawei.com, linux-block@vger.kernel.org
+Subject: [PATCH] block: remove cmdline-parser.c
+Date:   Wed, 28 Jul 2021 07:37:56 +0200
+Message-Id: <20210728053756.409654-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210727205855.411487-7-keescook@chromium.org>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 01:57:57PM -0700, Kees Cook wrote:
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memcpy(), memmove(), and memset(), avoid
-> intentionally writing across neighboring fields.
-> 
-> Use struct_group() around members queue_id, min_bw, max_bw, tsa, pri_lvl,
-> and bw_weight so they can be referenced together. This will allow memcpy()
-> and sizeof() to more easily reason about sizes, improve readability,
-> and avoid future warnings about writing beyond the end of queue_id.
-> 
-> "pahole" shows no size nor member offset changes to struct bnxt_cos2bw_cfg.
-> "objdump -d" shows no meaningful object code changes (i.e. only source
-> line number induced differences and optimizations).
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+cmdline-parser.c is only used by the cmdline faux partition format,
+so merge the code into that and avoid an indirect call.
 
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ arch/m68k/configs/stmark2_defconfig |   1 -
+ block/Kconfig                       |  10 --
+ block/Makefile                      |   1 -
+ block/cmdline-parser.c              | 255 --------------------------
+ block/partitions/Kconfig            |   1 -
+ block/partitions/cmdline.c          | 267 +++++++++++++++++++++++++++-
+ include/linux/cmdline-parser.h      |  46 -----
+ 7 files changed, 262 insertions(+), 319 deletions(-)
+ delete mode 100644 block/cmdline-parser.c
+ delete mode 100644 include/linux/cmdline-parser.h
 
-Thanks
---
-Gustavo
+diff --git a/arch/m68k/configs/stmark2_defconfig b/arch/m68k/configs/stmark2_defconfig
+index d92306472fce..8898ae321779 100644
+--- a/arch/m68k/configs/stmark2_defconfig
++++ b/arch/m68k/configs/stmark2_defconfig
+@@ -22,7 +22,6 @@ CONFIG_RAMSIZE=0x8000000
+ CONFIG_VECTORBASE=0x40000000
+ CONFIG_KERNELBASE=0x40001000
+ # CONFIG_BLK_DEV_BSG is not set
+-CONFIG_BLK_CMDLINE_PARSER=y
+ CONFIG_BINFMT_FLAT=y
+ CONFIG_BINFMT_ZFLAT=y
+ CONFIG_BINFMT_MISC=y
+diff --git a/block/Kconfig b/block/Kconfig
+index fd732aede922..15dfb7660645 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -114,16 +114,6 @@ config BLK_DEV_THROTTLING_LOW
+ 
+ 	Note, this is an experimental interface and could be changed someday.
+ 
+-config BLK_CMDLINE_PARSER
+-	bool "Block device command line partition parser"
+-	help
+-	Enabling this option allows you to specify the partition layout from
+-	the kernel boot args.  This is typically of use for embedded devices
+-	which don't otherwise have any standardized method for listing the
+-	partitions on a block device.
+-
+-	See Documentation/block/cmdline-partition.rst for more information.
+-
+ config BLK_WBT
+ 	bool "Enable support for block device writeback throttling"
+ 	help
+diff --git a/block/Makefile b/block/Makefile
+index bfbe4e13ca1e..c72592b4cf31 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -28,7 +28,6 @@ obj-$(CONFIG_MQ_IOSCHED_KYBER)	+= kyber-iosched.o
+ bfq-y				:= bfq-iosched.o bfq-wf2q.o bfq-cgroup.o
+ obj-$(CONFIG_IOSCHED_BFQ)	+= bfq.o
+ 
+-obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
+ obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o
+ obj-$(CONFIG_BLK_DEV_INTEGRITY_T10)	+= t10-pi.o
+ obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
+diff --git a/block/cmdline-parser.c b/block/cmdline-parser.c
+deleted file mode 100644
+index f2a14571882b..000000000000
+--- a/block/cmdline-parser.c
++++ /dev/null
+@@ -1,255 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * Parse command line, get partition information
+- *
+- * Written by Cai Zhiyong <caizhiyong@huawei.com>
+- *
+- */
+-#include <linux/export.h>
+-#include <linux/cmdline-parser.h>
+-
+-static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
+-{
+-	int ret = 0;
+-	struct cmdline_subpart *new_subpart;
+-
+-	*subpart = NULL;
+-
+-	new_subpart = kzalloc(sizeof(struct cmdline_subpart), GFP_KERNEL);
+-	if (!new_subpart)
+-		return -ENOMEM;
+-
+-	if (*partdef == '-') {
+-		new_subpart->size = (sector_t)(~0ULL);
+-		partdef++;
+-	} else {
+-		new_subpart->size = (sector_t)memparse(partdef, &partdef);
+-		if (new_subpart->size < (sector_t)PAGE_SIZE) {
+-			pr_warn("cmdline partition size is invalid.");
+-			ret = -EINVAL;
+-			goto fail;
+-		}
+-	}
+-
+-	if (*partdef == '@') {
+-		partdef++;
+-		new_subpart->from = (sector_t)memparse(partdef, &partdef);
+-	} else {
+-		new_subpart->from = (sector_t)(~0ULL);
+-	}
+-
+-	if (*partdef == '(') {
+-		int length;
+-		char *next = strchr(++partdef, ')');
+-
+-		if (!next) {
+-			pr_warn("cmdline partition format is invalid.");
+-			ret = -EINVAL;
+-			goto fail;
+-		}
+-
+-		length = min_t(int, next - partdef,
+-			       sizeof(new_subpart->name) - 1);
+-		strncpy(new_subpart->name, partdef, length);
+-		new_subpart->name[length] = '\0';
+-
+-		partdef = ++next;
+-	} else
+-		new_subpart->name[0] = '\0';
+-
+-	new_subpart->flags = 0;
+-
+-	if (!strncmp(partdef, "ro", 2)) {
+-		new_subpart->flags |= PF_RDONLY;
+-		partdef += 2;
+-	}
+-
+-	if (!strncmp(partdef, "lk", 2)) {
+-		new_subpart->flags |= PF_POWERUP_LOCK;
+-		partdef += 2;
+-	}
+-
+-	*subpart = new_subpart;
+-	return 0;
+-fail:
+-	kfree(new_subpart);
+-	return ret;
+-}
+-
+-static void free_subpart(struct cmdline_parts *parts)
+-{
+-	struct cmdline_subpart *subpart;
+-
+-	while (parts->subpart) {
+-		subpart = parts->subpart;
+-		parts->subpart = subpart->next_subpart;
+-		kfree(subpart);
+-	}
+-}
+-
+-static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
+-{
+-	int ret = -EINVAL;
+-	char *next;
+-	int length;
+-	struct cmdline_subpart **next_subpart;
+-	struct cmdline_parts *newparts;
+-	char buf[BDEVNAME_SIZE + 32 + 4];
+-
+-	*parts = NULL;
+-
+-	newparts = kzalloc(sizeof(struct cmdline_parts), GFP_KERNEL);
+-	if (!newparts)
+-		return -ENOMEM;
+-
+-	next = strchr(bdevdef, ':');
+-	if (!next) {
+-		pr_warn("cmdline partition has no block device.");
+-		goto fail;
+-	}
+-
+-	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
+-	strncpy(newparts->name, bdevdef, length);
+-	newparts->name[length] = '\0';
+-	newparts->nr_subparts = 0;
+-
+-	next_subpart = &newparts->subpart;
+-
+-	while (next && *(++next)) {
+-		bdevdef = next;
+-		next = strchr(bdevdef, ',');
+-
+-		length = (!next) ? (sizeof(buf) - 1) :
+-			min_t(int, next - bdevdef, sizeof(buf) - 1);
+-
+-		strncpy(buf, bdevdef, length);
+-		buf[length] = '\0';
+-
+-		ret = parse_subpart(next_subpart, buf);
+-		if (ret)
+-			goto fail;
+-
+-		newparts->nr_subparts++;
+-		next_subpart = &(*next_subpart)->next_subpart;
+-	}
+-
+-	if (!newparts->subpart) {
+-		pr_warn("cmdline partition has no valid partition.");
+-		ret = -EINVAL;
+-		goto fail;
+-	}
+-
+-	*parts = newparts;
+-
+-	return 0;
+-fail:
+-	free_subpart(newparts);
+-	kfree(newparts);
+-	return ret;
+-}
+-
+-void cmdline_parts_free(struct cmdline_parts **parts)
+-{
+-	struct cmdline_parts *next_parts;
+-
+-	while (*parts) {
+-		next_parts = (*parts)->next_parts;
+-		free_subpart(*parts);
+-		kfree(*parts);
+-		*parts = next_parts;
+-	}
+-}
+-EXPORT_SYMBOL(cmdline_parts_free);
+-
+-int cmdline_parts_parse(struct cmdline_parts **parts, const char *cmdline)
+-{
+-	int ret;
+-	char *buf;
+-	char *pbuf;
+-	char *next;
+-	struct cmdline_parts **next_parts;
+-
+-	*parts = NULL;
+-
+-	next = pbuf = buf = kstrdup(cmdline, GFP_KERNEL);
+-	if (!buf)
+-		return -ENOMEM;
+-
+-	next_parts = parts;
+-
+-	while (next && *pbuf) {
+-		next = strchr(pbuf, ';');
+-		if (next)
+-			*next = '\0';
+-
+-		ret = parse_parts(next_parts, pbuf);
+-		if (ret)
+-			goto fail;
+-
+-		if (next)
+-			pbuf = ++next;
+-
+-		next_parts = &(*next_parts)->next_parts;
+-	}
+-
+-	if (!*parts) {
+-		pr_warn("cmdline partition has no valid partition.");
+-		ret = -EINVAL;
+-		goto fail;
+-	}
+-
+-	ret = 0;
+-done:
+-	kfree(buf);
+-	return ret;
+-
+-fail:
+-	cmdline_parts_free(parts);
+-	goto done;
+-}
+-EXPORT_SYMBOL(cmdline_parts_parse);
+-
+-struct cmdline_parts *cmdline_parts_find(struct cmdline_parts *parts,
+-					 const char *bdev)
+-{
+-	while (parts && strncmp(bdev, parts->name, sizeof(parts->name)))
+-		parts = parts->next_parts;
+-	return parts;
+-}
+-EXPORT_SYMBOL(cmdline_parts_find);
+-
+-/*
+- *  add_part()
+- *    0 success.
+- *    1 can not add so many partitions.
+- */
+-int cmdline_parts_set(struct cmdline_parts *parts, sector_t disk_size,
+-		      int slot,
+-		      int (*add_part)(int, struct cmdline_subpart *, void *),
+-		      void *param)
+-{
+-	sector_t from = 0;
+-	struct cmdline_subpart *subpart;
+-
+-	for (subpart = parts->subpart; subpart;
+-	     subpart = subpart->next_subpart, slot++) {
+-		if (subpart->from == (sector_t)(~0ULL))
+-			subpart->from = from;
+-		else
+-			from = subpart->from;
+-
+-		if (from >= disk_size)
+-			break;
+-
+-		if (subpart->size > (disk_size - from))
+-			subpart->size = disk_size - from;
+-
+-		from += subpart->size;
+-
+-		if (add_part(slot, subpart, param))
+-			break;
+-	}
+-
+-	return slot;
+-}
+-EXPORT_SYMBOL(cmdline_parts_set);
+diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
+index 6e2a649669e5..278593b8e4e9 100644
+--- a/block/partitions/Kconfig
++++ b/block/partitions/Kconfig
+@@ -264,7 +264,6 @@ config SYSV68_PARTITION
+ 
+ config CMDLINE_PARTITION
+ 	bool "Command line partition support" if PARTITION_ADVANCED
+-	select BLK_CMDLINE_PARSER
+ 	help
+ 	  Say Y here if you want to read the partition table from bootargs.
+ 	  The format for the command line is just like mtdparts.
+diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
+index 8f545c36cde4..482a29e95dbd 100644
+--- a/block/partitions/cmdline.c
++++ b/block/partitions/cmdline.c
+@@ -14,20 +14,248 @@
+  * For further information, see "Documentation/block/cmdline-partition.rst"
+  *
+  */
++#include <linux/blkdev.h>
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include "check.h"
+ 
+-#include <linux/cmdline-parser.h>
+ 
+-#include "check.h"
++/* partition flags */
++#define PF_RDONLY                   0x01 /* Device is read only */
++#define PF_POWERUP_LOCK             0x02 /* Always locked after reset */
++
++struct cmdline_subpart {
++	char name[BDEVNAME_SIZE]; /* partition name, such as 'rootfs' */
++	sector_t from;
++	sector_t size;
++	int flags;
++	struct cmdline_subpart *next_subpart;
++};
++
++struct cmdline_parts {
++	char name[BDEVNAME_SIZE]; /* block device, such as 'mmcblk0' */
++	unsigned int nr_subparts;
++	struct cmdline_subpart *subpart;
++	struct cmdline_parts *next_parts;
++};
++
++static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
++{
++	int ret = 0;
++	struct cmdline_subpart *new_subpart;
++
++	*subpart = NULL;
++
++	new_subpart = kzalloc(sizeof(struct cmdline_subpart), GFP_KERNEL);
++	if (!new_subpart)
++		return -ENOMEM;
++
++	if (*partdef == '-') {
++		new_subpart->size = (sector_t)(~0ULL);
++		partdef++;
++	} else {
++		new_subpart->size = (sector_t)memparse(partdef, &partdef);
++		if (new_subpart->size < (sector_t)PAGE_SIZE) {
++			pr_warn("cmdline partition size is invalid.");
++			ret = -EINVAL;
++			goto fail;
++		}
++	}
++
++	if (*partdef == '@') {
++		partdef++;
++		new_subpart->from = (sector_t)memparse(partdef, &partdef);
++	} else {
++		new_subpart->from = (sector_t)(~0ULL);
++	}
++
++	if (*partdef == '(') {
++		int length;
++		char *next = strchr(++partdef, ')');
++
++		if (!next) {
++			pr_warn("cmdline partition format is invalid.");
++			ret = -EINVAL;
++			goto fail;
++		}
++
++		length = min_t(int, next - partdef,
++			       sizeof(new_subpart->name) - 1);
++		strncpy(new_subpart->name, partdef, length);
++		new_subpart->name[length] = '\0';
++
++		partdef = ++next;
++	} else
++		new_subpart->name[0] = '\0';
++
++	new_subpart->flags = 0;
++
++	if (!strncmp(partdef, "ro", 2)) {
++		new_subpart->flags |= PF_RDONLY;
++		partdef += 2;
++	}
++
++	if (!strncmp(partdef, "lk", 2)) {
++		new_subpart->flags |= PF_POWERUP_LOCK;
++		partdef += 2;
++	}
++
++	*subpart = new_subpart;
++	return 0;
++fail:
++	kfree(new_subpart);
++	return ret;
++}
++
++static void free_subpart(struct cmdline_parts *parts)
++{
++	struct cmdline_subpart *subpart;
++
++	while (parts->subpart) {
++		subpart = parts->subpart;
++		parts->subpart = subpart->next_subpart;
++		kfree(subpart);
++	}
++}
++
++static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
++{
++	int ret = -EINVAL;
++	char *next;
++	int length;
++	struct cmdline_subpart **next_subpart;
++	struct cmdline_parts *newparts;
++	char buf[BDEVNAME_SIZE + 32 + 4];
++
++	*parts = NULL;
++
++	newparts = kzalloc(sizeof(struct cmdline_parts), GFP_KERNEL);
++	if (!newparts)
++		return -ENOMEM;
++
++	next = strchr(bdevdef, ':');
++	if (!next) {
++		pr_warn("cmdline partition has no block device.");
++		goto fail;
++	}
++
++	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
++	strncpy(newparts->name, bdevdef, length);
++	newparts->name[length] = '\0';
++	newparts->nr_subparts = 0;
++
++	next_subpart = &newparts->subpart;
++
++	while (next && *(++next)) {
++		bdevdef = next;
++		next = strchr(bdevdef, ',');
++
++		length = (!next) ? (sizeof(buf) - 1) :
++			min_t(int, next - bdevdef, sizeof(buf) - 1);
++
++		strncpy(buf, bdevdef, length);
++		buf[length] = '\0';
++
++		ret = parse_subpart(next_subpart, buf);
++		if (ret)
++			goto fail;
++
++		newparts->nr_subparts++;
++		next_subpart = &(*next_subpart)->next_subpart;
++	}
++
++	if (!newparts->subpart) {
++		pr_warn("cmdline partition has no valid partition.");
++		ret = -EINVAL;
++		goto fail;
++	}
++
++	*parts = newparts;
++
++	return 0;
++fail:
++	free_subpart(newparts);
++	kfree(newparts);
++	return ret;
++}
++
++static void cmdline_parts_free(struct cmdline_parts **parts)
++{
++	struct cmdline_parts *next_parts;
++
++	while (*parts) {
++		next_parts = (*parts)->next_parts;
++		free_subpart(*parts);
++		kfree(*parts);
++		*parts = next_parts;
++	}
++}
++
++static int cmdline_parts_parse(struct cmdline_parts **parts,
++		const char *cmdline)
++{
++	int ret;
++	char *buf;
++	char *pbuf;
++	char *next;
++	struct cmdline_parts **next_parts;
++
++	*parts = NULL;
++
++	next = pbuf = buf = kstrdup(cmdline, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	next_parts = parts;
++
++	while (next && *pbuf) {
++		next = strchr(pbuf, ';');
++		if (next)
++			*next = '\0';
++
++		ret = parse_parts(next_parts, pbuf);
++		if (ret)
++			goto fail;
++
++		if (next)
++			pbuf = ++next;
++
++		next_parts = &(*next_parts)->next_parts;
++	}
++
++	if (!*parts) {
++		pr_warn("cmdline partition has no valid partition.");
++		ret = -EINVAL;
++		goto fail;
++	}
++
++	ret = 0;
++done:
++	kfree(buf);
++	return ret;
++
++fail:
++	cmdline_parts_free(parts);
++	goto done;
++}
++
++static struct cmdline_parts *cmdline_parts_find(struct cmdline_parts *parts,
++					 const char *bdev)
++{
++	while (parts && strncmp(bdev, parts->name, sizeof(parts->name)))
++		parts = parts->next_parts;
++	return parts;
++}
+ 
+ static char *cmdline;
+ static struct cmdline_parts *bdev_parts;
+ 
+-static int add_part(int slot, struct cmdline_subpart *subpart, void *param)
++static int add_part(int slot, struct cmdline_subpart *subpart,
++		struct parsed_partitions *state)
+ {
+ 	int label_min;
+ 	struct partition_meta_info *info;
+ 	char tmp[sizeof(info->volname) + 4];
+-	struct parsed_partitions *state = (struct parsed_partitions *)param;
+ 
+ 	if (slot >= state->limit)
+ 		return 1;
+@@ -50,6 +278,35 @@ static int add_part(int slot, struct cmdline_subpart *subpart, void *param)
+ 	return 0;
+ }
+ 
++static int cmdline_parts_set(struct cmdline_parts *parts, sector_t disk_size,
++		struct parsed_partitions *state)
++{
++	sector_t from = 0;
++	struct cmdline_subpart *subpart;
++	int slot = 1;
++
++	for (subpart = parts->subpart; subpart;
++	     subpart = subpart->next_subpart, slot++) {
++		if (subpart->from == (sector_t)(~0ULL))
++			subpart->from = from;
++		else
++			from = subpart->from;
++
++		if (from >= disk_size)
++			break;
++
++		if (subpart->size > (disk_size - from))
++			subpart->size = disk_size - from;
++
++		from += subpart->size;
++
++		if (add_part(slot, subpart, state))
++			break;
++	}
++
++	return slot;
++}
++
+ static int __init cmdline_parts_setup(char *s)
+ {
+ 	cmdline = s;
+@@ -147,7 +404,7 @@ int cmdline_partition(struct parsed_partitions *state)
+ 
+ 	disk_size = get_capacity(state->bdev->bd_disk) << 9;
+ 
+-	cmdline_parts_set(parts, disk_size, 1, add_part, (void *)state);
++	cmdline_parts_set(parts, disk_size, state);
+ 	cmdline_parts_verifier(1, state);
+ 
+ 	strlcat(state->pp_buf, "\n", PAGE_SIZE);
+diff --git a/include/linux/cmdline-parser.h b/include/linux/cmdline-parser.h
+deleted file mode 100644
+index 68a541807bdf..000000000000
+--- a/include/linux/cmdline-parser.h
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- * Parsing command line, get the partitions information.
+- *
+- * Written by Cai Zhiyong <caizhiyong@huawei.com>
+- *
+- */
+-#ifndef CMDLINEPARSEH
+-#define CMDLINEPARSEH
+-
+-#include <linux/blkdev.h>
+-#include <linux/fs.h>
+-#include <linux/slab.h>
+-
+-/* partition flags */
+-#define PF_RDONLY                   0x01 /* Device is read only */
+-#define PF_POWERUP_LOCK             0x02 /* Always locked after reset */
+-
+-struct cmdline_subpart {
+-	char name[BDEVNAME_SIZE]; /* partition name, such as 'rootfs' */
+-	sector_t from;
+-	sector_t size;
+-	int flags;
+-	struct cmdline_subpart *next_subpart;
+-};
+-
+-struct cmdline_parts {
+-	char name[BDEVNAME_SIZE]; /* block device, such as 'mmcblk0' */
+-	unsigned int nr_subparts;
+-	struct cmdline_subpart *subpart;
+-	struct cmdline_parts *next_parts;
+-};
+-
+-void cmdline_parts_free(struct cmdline_parts **parts);
+-
+-int cmdline_parts_parse(struct cmdline_parts **parts, const char *cmdline);
+-
+-struct cmdline_parts *cmdline_parts_find(struct cmdline_parts *parts,
+-					 const char *bdev);
+-
+-int cmdline_parts_set(struct cmdline_parts *parts, sector_t disk_size,
+-		      int slot,
+-		      int (*add_part)(int, struct cmdline_subpart *, void *),
+-		      void *param);
+-
+-#endif /* CMDLINEPARSEH */
+-- 
+2.30.2
 
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  4 ++--
->  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h | 14 ++++++++------
->  2 files changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-> index 8a68df4d9e59..95c636f89329 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-> @@ -148,10 +148,10 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
->  	}
->  
->  	data = &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, queue_id);
-> -	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw) - 4) {
-> +	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw.cfg)) {
->  		int tc;
->  
-> -		memcpy(&cos2bw.queue_id, data, sizeof(cos2bw) - 4);
-> +		memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
->  		if (i == 0)
->  			cos2bw.queue_id = resp->queue_id0;
->  
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-> index 6eed231de565..716742522161 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-> @@ -23,13 +23,15 @@ struct bnxt_dcb {
->  
->  struct bnxt_cos2bw_cfg {
->  	u8			pad[3];
-> -	u8			queue_id;
-> -	__le32			min_bw;
-> -	__le32			max_bw;
-> +	struct_group_attr(cfg, __packed,
-> +		u8		queue_id;
-> +		__le32		min_bw;
-> +		__le32		max_bw;
->  #define BW_VALUE_UNIT_PERCENT1_100		(0x1UL << 29)
-> -	u8			tsa;
-> -	u8			pri_lvl;
-> -	u8			bw_weight;
-> +		u8		tsa;
-> +		u8		pri_lvl;
-> +		u8		bw_weight;
-> +	);
->  	u8			unused;
->  };
->  
-> -- 
-> 2.30.2
-> 
