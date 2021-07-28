@@ -2,117 +2,733 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19288C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 216CAC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:24:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3EBF60FD8
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:24:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0747A600D1
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 11:24:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234746AbhG1LYH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 07:24:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52496 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234631AbhG1LYG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 07:24:06 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45ACC061764
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 04:24:04 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id l17so2670022ljn.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 04:24:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Wg+3/RRWhlXAdTdGrz6ZDOoqwDjAalfDgSMGfZRFy7c=;
-        b=MqB2oQJrWErl4M3jysGVniDJ4xARTYUEk892vt+CXTsOghQBHfw+ROqpA+FWeMfNAw
-         99HiHQl9pgCodpNZVcjBeusKVj1g8kcdEIy/ZsV7LY738G0Iid6EaBW2zhaAmZdiUtKc
-         pOnrw2np1M0KCLNrhvFVpkrx8b6JNzJx5ukHc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Wg+3/RRWhlXAdTdGrz6ZDOoqwDjAalfDgSMGfZRFy7c=;
-        b=m/K0ZXrcLrVB6q4oe9+P72hEz/iX3BXseZIOimw5PSnyqGwZsMQqPggZLS6CUp/gIU
-         H9q27tYaye8by/+ePRW8w6pPfVOlzNxC3SNAkoEb6R4LEr72uj7JSmwWoxCb8V5inWSA
-         +iKiBU41wsDw25rgg5M3Ifw39PMl62kndro86OxC2tc99fYwOmrcjx67uE5As9x9j5sM
-         s1au8S9K/lfK1d1NVzOsBCGXzt+2DzVoTweYtWCWjQ4EtbybGcuNR8sICZ109ratLFaX
-         jw2FLHDVC7upnFRxUHOEm9Rw6c5P31aULwjfNSWx8/4gL5GDHdAnNwWkTdkkBW9oMtRA
-         3YMA==
-X-Gm-Message-State: AOAM530EyP22fp2DZQkDEsHNVMAlhu+6CQIFhjwX15i/41TUoZdSskdS
-        p7tgksiKNcKru/Komm27iSOK3g==
-X-Google-Smtp-Source: ABdhPJzbJpuLwTQcj/uhUJ1FDab/S8wsNFZGfZq+HhHIgh+eTtqaebX9Ee+tEB7aFHczhnUT7I/eLg==
-X-Received: by 2002:a05:651c:124f:: with SMTP id h15mr18566268ljh.4.1627471443108;
-        Wed, 28 Jul 2021 04:24:03 -0700 (PDT)
-Received: from [172.16.11.1] ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id f14sm494569ljj.116.2021.07.28.04.24.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 04:24:02 -0700 (PDT)
-Subject: Re: [PATCH 62/64] netlink: Avoid false-positive memcpy() warning
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-63-keescook@chromium.org> <YQDv+oG7ok0T1L+r@kroah.com>
-From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <d7251d92-150b-5346-6237-52afc154bb00@rasmusvillemoes.dk>
-Date:   Wed, 28 Jul 2021 13:24:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S232786AbhG1LYf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 07:24:35 -0400
+Received: from verein.lst.de ([213.95.11.211]:53317 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232111AbhG1LYf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jul 2021 07:24:35 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 29FC667373; Wed, 28 Jul 2021 13:24:31 +0200 (CEST)
+Date:   Wed, 28 Jul 2021 13:24:30 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: Re: [dm-devel] use regular gendisk registration in device mapper
+Message-ID: <20210728112430.GA22101@lst.de>
+References: <20210725055458.29008-1-hch@lst.de> <YQAtNkd8T1w/cSLc@redhat.com> <20210727160226.GA17989@lst.de> <YQAxyjrGJpl7UkNG@redhat.com> <9c719e1d-f8da-f1f3-57a9-3802aa1312d4@gmail.com> <20210728070655.GA5086@lst.de> <9e668239-78cc-55ad-8998-b7e39f573c34@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YQDv+oG7ok0T1L+r@kroah.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9e668239-78cc-55ad-8998-b7e39f573c34@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/07/2021 07.49, Greg Kroah-Hartman wrote:
-> On Tue, Jul 27, 2021 at 01:58:53PM -0700, Kees Cook wrote:
->> In preparation for FORTIFY_SOURCE performing compile-time and run-time
->> field bounds checking for memcpy(), memmove(), and memset(), avoid
->> intentionally writing across neighboring fields.
->>
->> Add a flexible array member to mark the end of struct nlmsghdr, and
->> split the memcpy() to avoid false positive memcpy() warning:
->>
->> memcpy: detected field-spanning write (size 32) of single field (size 16)
->>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>  include/uapi/linux/netlink.h | 1 +
->>  net/netlink/af_netlink.c     | 4 +++-
->>  2 files changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/uapi/linux/netlink.h b/include/uapi/linux/netlink.h
->> index 4c0cde075c27..ddeaa748df5e 100644
->> --- a/include/uapi/linux/netlink.h
->> +++ b/include/uapi/linux/netlink.h
->> @@ -47,6 +47,7 @@ struct nlmsghdr {
->>  	__u16		nlmsg_flags;	/* Additional flags */
->>  	__u32		nlmsg_seq;	/* Sequence number */
->>  	__u32		nlmsg_pid;	/* Sending process port ID */
->> +	__u8		contents[];
-> 
-> Is this ok to change a public, userspace visable, structure?
+On Wed, Jul 28, 2021 at 10:37:41AM +0200, Milan Broz wrote:
+> very specific hw attributes. So you have one emulated device compiled-in?
 
-At least it should keep using a nlmsg_ prefix for consistency and reduce
-risk of collision with somebody having defined an object-like contents
-macro. But there's no guarantees in any case, of course.
+Yes.
 
-Rasmus
+> Or there is another way how to configure scsi_debug if compiled-in? (we use module parameters, I think it is
+> the same was how util-linux testsute works with scsi_debug).
+
+Can can add hosts using the add_host sysfs file.  I thought that was the
+way to go generally, never thought of reloading the module just to
+add/delete hosts.
+
+> (BTW could you send me output of the failed test run? I run it over Linus' tree and ti works so it is perhaps another
+> assumption that should be fixed.)
+
+Output with everything from the README installed (a lot less failures now):
+
+
+Making check in po
+make[1]: Entering directory '/root/cryptsetup/po'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/root/cryptsetup/po'
+Making check in tests
+make[1]: Entering directory '/root/cryptsetup/tests'
+make  check-am
+make[2]: Entering directory '/root/cryptsetup/tests'
+make  api-test api-test-2 differ vectors-test unit-utils-io all-symbols-test
+make[3]: Entering directory '/root/cryptsetup/tests'
+make[3]: 'api-test' is up to date.
+make[3]: 'api-test-2' is up to date.
+make[3]: 'differ' is up to date.
+make[3]: 'vectors-test' is up to date.
+make[3]: 'unit-utils-io' is up to date.
+make[3]: 'all-symbols-test' is up to date.
+make[3]: Leaving directory '/root/cryptsetup/tests'
+make  check-TESTS
+make[3]: Entering directory '/root/cryptsetup/tests'
+Cryptsetup test environment (Wed Jul 28 10:59:13 UTC 2021)
+Linux testvm 5.14.0-rc2+ #53 SMP PREEMPT Wed Jul 28 12:57:30 CEST 2021 x86_64 GNU/Linux
+Debian GNU/Linux 10 (buster) (Debian GNU/Linux) 10 (buster)
+Memory
+              total        used        free      shared  buff/cache   available
+Mem:          3.8Gi       173Mi       3.5Gi       9.0Mi       157Mi       3.6Gi
+Swap:            0B          0B          0B
+../cryptsetup 2.4.0-rc0
+../veritysetup 2.4.0-rc0
+../integritysetup 2.4.0-rc0
+../cryptsetup-reencrypt 2.4.0-rc0
+Cryptsetup defaults:
+Default compiled-in metadata format is LUKS2 (for luksFormat action).
+
+LUKS2 external token plugin support is compiled-in.
+LUKS2 external token plugin path: /usr/lib/cryptsetup.
+
+Default compiled-in key and passphrase parameters:
+	Maximum keyfile size: 8192kB, Maximum interactive passphrase length 512 (characters)
+Default PBKDF for LUKS1: pbkdf2, iteration time: 2000 (ms)
+Default PBKDF for LUKS2: argon2id
+	Iteration time: 2000, Memory required: 1048576kB, Parallel threads: 4
+
+Default compiled-in device cipher parameters:
+	loop-AES: aes, Key 256 bits
+	plain: aes-cbc-essiv:sha256, Key: 256 bits, Password hashing: ripemd160
+	LUKS: aes-xts-plain64, Key: 256 bits, LUKS header hashing: sha256, RNG: /dev/urandom
+	LUKS: Default keysize with XTS mode (two internal keys) will be doubled.
+Library version:   1.02.155 (2018-12-18)
+Driver version:    4.45.0
+Device mapper targets:
+thin-pool        v1.22.0
+thin             v1.22.0
+zero             v1.1.0
+mirror           v1.14.0
+snapshot-merge   v1.5.0
+snapshot-origin  v1.9.0
+snapshot         v1.16.0
+multipath        v1.14.0
+crypt            v1.23.0
+striped          v1.6.0
+linear           v1.4.0
+error            v1.5.0
+PASS: 00modules-test
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module dm-crypt not found in directory /lib/modules/5.14.0-rc2+
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module dm-verity not found in directory /lib/modules/5.14.0-rc2+
+NonFIPSAlg: Crypto is properly initialised in format
+AddDevicePlain: A plain device API creation
+HashDevicePlain: A plain device API hash
+AddDeviceLuks: Format and use LUKS device
+LuksHeaderLoad: Header load
+LuksHeaderRestore: LUKS header restore
+LuksHeaderBackup: LUKS header backup
+ResizeDeviceLuks: LUKS device resize
+UseLuksDevice: Use pre-formated LUKS device
+SuspendDevice: Suspend/Resume
+UseTempVolumes: Format and use temporary encrypted device
+CallbacksTest: API callbacks
+VerityTest: DM verity
+WARNING: kernel dm-verity not supported, skipping test.
+TcryptTest: Tcrypt API
+WARNING: algif_skcipher interface not present, skipping test.
+IntegrityTest: Integrity API
+WARNING: cannot format integrity device, skipping test.
+PASS: api-test
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module dm-crypt not found in directory /lib/modules/5.14.0-rc2+
+Cannot set test devices.
+SKIP: api-test-2
+[1] Current state
+PASS: compat-test-args
+CASE: Image in file tests (root capabilities not required)
+[1] format
+[2] open
+[3] add key
+[4] change key
+[5] remove key
+[6] kill slot
+[7] header backup
+[8] header restore
+[9] luksDump
+[10] uuid
+CASE: [1] open - compat image - acceptance check
+CASE: [2] open - compat image - denial check
+CASE: [3] format
+CASE: [4] format using hash sha512
+CASE: [5] open
+CASE: [6] add key
+CASE: [7] unsuccessful delete
+CASE: [8] successful delete
+CASE: [9] add key test for key files
+CASE: [10] delete key test with key1 as remaining key
+CASE: [11] delete last key
+CASE: [12] parameter variation test
+CASE: [13] open/close - stacked devices
+CASE: [14] format/open - passphrase on stdin & new line
+CASE: [15] UUID - use and report provided UUID
+CASE: [16] luksFormat
+CASE: [17] AddKey volume key, passphrase and keyfile
+CASE: [18] RemoveKey passphrase and keyfile
+CASE: [19] create & status & resize
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+This kernel seems to not support proper scsi_debug module, test skipped.
+SKIP: compat-test
+CASE: [0] Detect LUKS2 environment
+CASE: [1] Data offset
+CASE: [2] Sector size and old payload alignment
+CASE: [3] format
+CASE: [4] format using hash sha512
+CASE: [5] open
+CASE: [6] add key
+CASE: [7] unsuccessful delete
+CASE: [8] successful delete
+CASE: [9] add key test for key files
+CASE: [10] delete key test with key1 as remaining key
+CASE: [11] delete last key
+CASE: [12] parameter variation test
+CASE: [13] open/close - stacked devices
+CASE: [14] format/open - passphrase on stdin & new line
+CASE: [15] UUID - use and report provided UUID
+CASE: [16] luksFormat
+CASE: [17] AddKey volume key, passphrase and keyfile
+CASE: [18] RemoveKey passphrase and keyfile
+CASE: [19] create & status & resize
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+This kernel seems to not support proper scsi_debug module, test skipped.
+SKIP: compat-test2
+Open loop-AES key_v1 / AES-128 / offset 0 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-128 / offset 8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-128 / offset @8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-128 / offset 8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-128 / offset @8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-128 / offset 0 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-128 / offset 8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-128 / offset @8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-128 / offset 8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-128 / offset @8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-128 / offset 0 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-128 / offset 8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-128 / offset @8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-128 / offset 8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-128 / offset @8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-256 / offset 0 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-256 / offset 8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-256 / offset @8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-256 / offset 8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v1 / AES-256 / offset @8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-256 / offset 0 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-256 / offset 8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-256 / offset @8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-256 / offset 8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v2 / AES-256 / offset @8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-256 / offset 0 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-256 / offset 8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-256 / offset @8192 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-256 / offset 8388608 [keyfile:OK][stdin:OK]
+Open loop-AES key_v3 / AES-256 / offset @8388608 [keyfile:OK][stdin:OK]
+PASS: loopaes-test
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+SKIP: align-test
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+SKIP: align-test2
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+SKIP: discards-test
+aes                            PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-plain                      PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+null                           PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+cipher_null                    PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+cipher_null-ecb                PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-ecb                        PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+twofish-ecb                    PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-ecb                    PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+aes-cbc-null                   PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-cbc-benbi                  PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-cbc-plain                  PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-cbc-plain64                PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-cbc-essiv:sha256           PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-lrw-null                   PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+aes-lrw-benbi                  PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+aes-lrw-plain                  PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+aes-lrw-plain64                PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+aes-lrw-essiv:sha256           PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+aes-xts-null                   PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-xts-benbi                  PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-xts-plain                  PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-xts-plain64                PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+aes-xts-essiv:sha256           PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] LUKS2:[table OK][status OK] CHECKSUM:[OK]
+twofish-cbc-null               PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-cbc-benbi              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-cbc-plain              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-cbc-plain64            PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-cbc-essiv:sha256       PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-lrw-null               PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-lrw-benbi              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-lrw-plain              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-lrw-plain64            PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-lrw-essiv:sha256       PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-xts-null               PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-xts-benbi              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-xts-plain              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-xts-plain64            PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+twofish-xts-essiv:sha256       PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-cbc-null               PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-cbc-benbi              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-cbc-plain              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-cbc-plain64            PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-cbc-essiv:sha256       PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-lrw-null               PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-lrw-benbi              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-lrw-plain              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-lrw-plain64            PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-lrw-essiv:sha256       PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-xts-null               PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-xts-benbi              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-xts-plain              PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-xts-plain64            PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+serpent-xts-essiv:sha256       PLAIN:[table OK][status OK] LUKS1:[table OK][status OK] CHECKSUM:[OK]
+xchacha12,aes-adiantum-plain64 [n/a]
+xchacha20,aes-adiantum-plain64 [n/a]
+PASS: mode-test
+HASH: ripemd160 KSIZE: 0 / pwd [OK]
+HASH: ripemd160 KSIZE: 256 / pwd [OK]
+HASH: ripemd160 KSIZE: 128 / pwd [OK]
+HASH: sha1 KSIZE: 256 / pwd [OK]
+HASH: sha1 KSIZE: 128 / pwd [OK]
+HASH: sha256 KSIZE: 256 / pwd [OK]
+HASH: sha256 KSIZE: 128 / pwd [OK]
+HASH: sha256 KSIZE: 0 / std- [OK]
+HASH: sha256 KSIZE: 256 / std- [OK]
+HASH: sha256 KSIZE: 128 / std- [OK]
+HASH: sha256 KSIZE: 256 / stdin [OK]
+HASH: sha256 KSIZE: 0 / stdin [OK]
+HASH: ripemd160 KSIZE: 256 / file [OK]
+HASH: sha256 KSIZE: 256 / file [OK]
+HASH: unknown* KSIZE: 256 / file [OK]
+HASH: sha256:20 KSIZE: 256 / pwd [OK]
+HASH: sha256:32 KSIZE: 256 / pwd [OK]
+HASH: sha256: KSIZE: 256 / failpwd [OK]
+HASH: sha256:xx KSIZE: 256 / failpwd [OK]
+HASH: ripemd160 KSIZE: 256 / file [OK]
+HASH: sha256 KSIZE: 256 / file [OK]
+HASH: sha256 KSIZE: 128 / file [OK]
+HASH: sha256 KSIZE: 512 / file [OK]
+HASH: plain KSIZE: 128 / cat [OK]
+HASH: plain KSIZE: 128 / cat [OK]
+HASH: plain KSIZE: 128 / cat [OK]
+HASH: plain KSIZE: 128 / cat- [OK]
+HASH: plain KSIZE: 128 / cat- [OK]
+HASH: sha256 KSIZE: 128 / cat- [OK]
+HASH: sha256 KSIZE: 128 / cat- [OK]
+HASH: sha256 KSIZE: 128 / cat- [OK]
+HASH: sha256 KSIZE: 128 / cat- [OK]
+HASH: sha256 KSIZE: 128 / cat- [OK]
+HASH: sha256 KSIZE: 128 / cat- [OK]
+HASH: plain KSIZE: 256 / pwd [OK]
+HASH: plain:2 KSIZE: 256 / pwd [OK]
+HASH: plain:9 KSIZE: 256 / failpwd [OK]
+HASH: sha256 KSIZE: 128 / cat [OK]
+HASH: sha256:14 KSIZE: 128 / cat [OK]
+HASH: sha256 KSIZE: 128 / pwd [OK]
+HASH: sha256 KSIZE: 128 / pwd [OK]
+HASH: sha256 KSIZE: 128 / pwd [OK]
+HASH: sha1 KSIZE: 256 / pwd [OK]
+HASH: sha224 KSIZE: 256 / pwd [OK]
+HASH: sha256 KSIZE: 256 / pwd [OK]
+HASH: sha384 KSIZE: 256 / pwd [OK]
+HASH: sha512 KSIZE: 256 / pwd [OK]
+HASH: ripemd160 KSIZE: 256 / pwd [OK]
+HASH: whirlpool KSIZE: 256 / pwd [OK]
+HASH: sha3-224 KSIZE: 256 / pwd [OK]
+HASH: sha3-256 KSIZE: 256 / pwd [OK]
+HASH: sha3-384 KSIZE: 256 / pwd [OK]
+HASH: sha3-512 KSIZE: 256 / pwd [OK]
+HASH: sm3 KSIZE: 256 / pwd [OK]
+HASH: stribog512 KSIZE: 256 / pwd [N/A] (1, SKIPPED)
+PASS: password-hash-test
+REQUIRED KDF TEST
+pbkdf2-sha256 [OK]
+pbkdf2-sha512 [OK]
+pbkdf2-ripemd160 [OK]
+pbkdf2-whirlpool [OK]
+pbkdf2-stribog512 [N/A]
+REQUIRED CIPHERS TEST
+aes-cbc [N/A]
+aes-lrw [N/A]
+aes-xts [N/A]
+twofish-ecb [N/A]
+twofish-cbc [N/A]
+twofish-lrw [N/A]
+twofish-xts [N/A]
+serpent-ecb [N/A]
+serpent-cbc [N/A]
+serpent-lrw [N/A]
+serpent-xts [N/A]
+blowfish-cbc [N/A]
+des3_ede-cbc [N/A]
+cast5-cbc [N/A]
+camellia-xts [N/A]
+kuznyechik-xts [N/A]
+No remaining images.
+Test skipped.
+SKIP: tcrypt-compat-test
+REQUIRED KDF TEST
+REQUIRED CIPHERS TEST
+#     Algorithm | Key |  Encryption |  Decryption
+Cipher aes-xts (with 256 bits key) is not available.
+Required kernel crypto interface not available.
+Ensure you have algif_skcipher kernel module loaded.
+Test skipped.
+SKIP: luks1-compat-test
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module dm-crypt not found in directory /lib/modules/5.14.0-rc2+
+FAIL dm-crypt failed to load
+FAILED backtrace:
+51 ./device-test
+122 main ./device-test
+FAIL: device-test
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module dm-crypt not found in directory /lib/modules/5.14.0-rc2+
+dm-crypt failed to load
+FAILED backtrace:
+81 ./keyring-test
+FAIL: keyring-test
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module dm-crypt not found in directory /lib/modules/5.14.0-rc2+
+dm-crypt failed to load
+FAILED backtrace:
+117 ./keyring-compat-test
+FAIL: keyring-compat-test
+[0] Generating test headers
+generate-luks2-area-in-json-hdr-space-json0.img.sh...done
+generate-luks2-argon2-leftover-params.img.sh...done
+generate-luks2-correct-full-json0.img.sh...done
+generate-luks2-corrupted-hdr0-with-correct-chks.img.sh...done
+generate-luks2-corrupted-hdr1-with-correct-chks.img.sh...done
+generate-luks2-invalid-checksum-both-hdrs.img.sh...done
+generate-luks2-invalid-checksum-hdr0.img.sh...done
+generate-luks2-invalid-checksum-hdr1.img.sh...done
+generate-luks2-invalid-json-size-c0.img.sh...done
+generate-luks2-invalid-json-size-c1.img.sh...done
+generate-luks2-invalid-json-size-c2.img.sh...done
+generate-luks2-invalid-keyslots-size-c0.img.sh...done
+generate-luks2-invalid-keyslots-size-c1.img.sh...done
+generate-luks2-invalid-keyslots-size-c2.img.sh...done
+generate-luks2-invalid-object-type-json0.img.sh...done
+generate-luks2-invalid-opening-char-json0.img.sh...done
+generate-luks2-keyslot-missing-digest.img.sh...done
+generate-luks2-keyslot-too-many-digests.img.sh...done
+generate-luks2-metadata-size-128k-secondary.img.sh...done
+generate-luks2-metadata-size-128k.img.sh...done
+generate-luks2-metadata-size-16k-secondary.img.sh...done
+generate-luks2-metadata-size-1m-secondary.img.sh...done
+generate-luks2-metadata-size-1m.img.sh...done
+generate-luks2-metadata-size-256k-secondary.img.sh...done
+generate-luks2-metadata-size-256k.img.sh...done
+generate-luks2-metadata-size-2m-secondary.img.sh...done
+generate-luks2-metadata-size-2m.img.sh...done
+generate-luks2-metadata-size-32k-secondary.img.sh...done
+generate-luks2-metadata-size-32k.img.sh...done
+generate-luks2-metadata-size-4m-secondary.img.sh...done
+generate-luks2-metadata-size-4m.img.sh...done
+generate-luks2-metadata-size-512k-secondary.img.sh...done
+generate-luks2-metadata-size-512k.img.sh...done
+generate-luks2-metadata-size-64k-inv-area-c0.img.sh...done
+generate-luks2-metadata-size-64k-inv-area-c1.img.sh...done
+generate-luks2-metadata-size-64k-inv-keyslots-size-c0.img.sh...done
+generate-luks2-metadata-size-64k-secondary.img.sh...done
+generate-luks2-metadata-size-64k.img.sh...done
+generate-luks2-missing-keyslot-referenced-in-digest.img.sh...done
+generate-luks2-missing-keyslot-referenced-in-token.img.sh...done
+generate-luks2-missing-segment-referenced-in-digest.img.sh...done
+generate-luks2-missing-trailing-null-byte-json0.img.sh...done
+generate-luks2-non-null-byte-beyond-json0.img.sh...done
+generate-luks2-non-null-bytes-beyond-json0.img.sh...done
+generate-luks2-overlapping-areas-c0-json0.img.sh...done
+generate-luks2-overlapping-areas-c1-json0.img.sh...done
+generate-luks2-overlapping-areas-c2-json0.img.sh...done
+generate-luks2-pbkdf2-leftover-params-0.img.sh...done
+generate-luks2-pbkdf2-leftover-params-1.img.sh...done
+generate-luks2-segment-crypt-missing-encryption.img.sh...done
+generate-luks2-segment-crypt-missing-ivoffset.img.sh...done
+generate-luks2-segment-crypt-missing-sectorsize.img.sh...done
+generate-luks2-segment-crypt-wrong-encryption.img.sh...done
+generate-luks2-segment-crypt-wrong-ivoffset.img.sh...done
+generate-luks2-segment-crypt-wrong-sectorsize-0.img.sh...done
+generate-luks2-segment-crypt-wrong-sectorsize-1.img.sh...done
+generate-luks2-segment-crypt-wrong-sectorsize-2.img.sh...done
+generate-luks2-segment-missing-offset.img.sh...done
+generate-luks2-segment-missing-size.img.sh...done
+generate-luks2-segment-missing-type.img.sh...done
+generate-luks2-segment-two.img.sh...done
+generate-luks2-segment-unknown-type.img.sh...done
+generate-luks2-segment-wrong-backup-key-0.img.sh...done
+generate-luks2-segment-wrong-backup-key-1.img.sh...done
+generate-luks2-segment-wrong-flags-element.img.sh...done
+generate-luks2-segment-wrong-flags.img.sh...done
+generate-luks2-segment-wrong-offset.img.sh...done
+generate-luks2-segment-wrong-size-0.img.sh...done
+generate-luks2-segment-wrong-size-1.img.sh...done
+generate-luks2-segment-wrong-size-2.img.sh...done
+generate-luks2-segment-wrong-type.img.sh...done
+generate-luks2-uint64-max-segment-size.img.sh...done
+generate-luks2-uint64-overflow-segment-size.img.sh...done
+generate-luks2-uint64-signed-segment-size.img.sh...done
+[1] Test basic auto-recovery
+Test image: luks2-invalid-checksum-hdr0.img...OK
+Test image: luks2-invalid-checksum-hdr1.img...OK
+Test image: luks2-invalid-checksum-both-hdrs.img...OK
+[2] Test ability to auto-correct mallformed json area
+Test image: luks2-corrupted-hdr0-with-correct-chks.img...OK
+Test image: luks2-corrupted-hdr1-with-correct-chks.img...OK
+Test image: luks2-correct-full-json0.img...OK
+Test image: luks2-argon2-leftover-params.img...OK
+Test image: luks2-pbkdf2-leftover-params-0.img...OK
+Test image: luks2-pbkdf2-leftover-params-1.img...OK
+[3] Test LUKS2 json area restrictions
+Test image: luks2-non-null-byte-beyond-json0.img...OK
+Test image: luks2-non-null-bytes-beyond-json0.img...OK
+Test image: luks2-missing-trailing-null-byte-json0.img...OK
+Test image: luks2-invalid-opening-char-json0.img...OK
+Test image: luks2-invalid-object-type-json0.img...OK
+Test image: luks2-overlapping-areas-c0-json0.img...OK
+Test image: luks2-overlapping-areas-c1-json0.img...OK
+Test image: luks2-overlapping-areas-c2-json0.img...OK
+Test image: luks2-area-in-json-hdr-space-json0.img...OK
+Test image: luks2-missing-keyslot-referenced-in-digest.img...OK
+Test image: luks2-missing-segment-referenced-in-digest.img...OK
+Test image: luks2-missing-keyslot-referenced-in-token.img...OK
+Test image: luks2-keyslot-missing-digest.img...OK
+Test image: luks2-keyslot-too-many-digests.img...OK
+[4] Test integers value limits
+Test image: luks2-uint64-max-segment-size.img...OK
+Test image: luks2-uint64-overflow-segment-size.img...OK
+Test image: luks2-uint64-signed-segment-size.img...OK
+[5] Test segments validation
+Test image: luks2-segment-missing-type.img...OK
+Test image: luks2-segment-wrong-type.img...OK
+Test image: luks2-segment-missing-offset.img...OK
+Test image: luks2-segment-wrong-offset.img...OK
+Test image: luks2-segment-missing-size.img...OK
+Test image: luks2-segment-wrong-size-0.img...OK
+Test image: luks2-segment-wrong-size-1.img...OK
+Test image: luks2-segment-wrong-size-2.img...OK
+Test image: luks2-segment-crypt-missing-encryption.img...OK
+Test image: luks2-segment-crypt-wrong-encryption.img...OK
+Test image: luks2-segment-crypt-missing-ivoffset.img...OK
+Test image: luks2-segment-crypt-wrong-ivoffset.img...OK
+Test image: luks2-segment-crypt-missing-sectorsize.img...OK
+Test image: luks2-segment-crypt-wrong-sectorsize-0.img...OK
+Test image: luks2-segment-crypt-wrong-sectorsize-1.img...OK
+Test image: luks2-segment-crypt-wrong-sectorsize-2.img...OK
+Test image: luks2-segment-unknown-type.img...OK
+Test image: luks2-segment-two.img...OK
+Test image: luks2-segment-wrong-flags.img...OK
+Test image: luks2-segment-wrong-flags-element.img...OK
+Test image: luks2-segment-wrong-backup-key-0.img...OK
+Test image: luks2-segment-wrong-backup-key-1.img...OK
+[6] Test metadata size and keyslots size (config section)
+Test image: luks2-invalid-keyslots-size-c0.img...OK
+Test image: luks2-invalid-keyslots-size-c1.img...OK
+Test image: luks2-invalid-keyslots-size-c2.img...OK
+Test image: luks2-invalid-json-size-c0.img...OK
+Test image: luks2-invalid-json-size-c1.img...OK
+Test image: luks2-invalid-json-size-c2.img...OK
+Test image: luks2-metadata-size-32k.img...OK
+Test image: luks2-metadata-size-64k.img...OK
+Test image: luks2-metadata-size-64k-inv-area-c0.img...OK
+Test image: luks2-metadata-size-64k-inv-area-c1.img...OK
+Test image: luks2-metadata-size-64k-inv-keyslots-size-c0.img...OK
+Test image: luks2-metadata-size-128k.img...OK
+Test image: luks2-metadata-size-256k.img...OK
+Test image: luks2-metadata-size-512k.img...OK
+Test image: luks2-metadata-size-1m.img...OK
+Test image: luks2-metadata-size-2m.img...OK
+Test image: luks2-metadata-size-4m.img...OK
+Test image: luks2-metadata-size-16k-secondary.img...OK
+Test image: luks2-metadata-size-32k-secondary.img...OK
+Test image: luks2-metadata-size-64k-secondary.img...OK
+Test image: luks2-metadata-size-128k-secondary.img...OK
+Test image: luks2-metadata-size-256k-secondary.img...OK
+Test image: luks2-metadata-size-512k-secondary.img...OK
+Test image: luks2-metadata-size-1m-secondary.img...OK
+Test image: luks2-metadata-size-2m-secondary.img...OK
+Test image: luks2-metadata-size-4m-secondary.img...OK
+PASS: luks2-validation-test
+Cannot find dm-integrity target, test skipped.
+SKIP: luks2-integrity-test
+Test vectors using OpenSSL 1.1.1d  10 Sep 2019 crypto backend.
+PBKDF vector 00 argon2i [OK]
+PBKDF vector 01 argon2id [OK]
+PBKDF vector 02 pbkdf2 [OK]
+PBKDF vector 03 pbkdf2 [OK]
+PBKDF vector 04 pbkdf2 [OK]
+PBKDF vector 05 pbkdf2 [OK]
+PBKDF vector 06 pbkdf2 [OK]
+PBKDF vector 07 pbkdf2 [OK]
+PBKDF vector 08 pbkdf2 [OK]
+PBKDF vector 09 pbkdf2 [OK]
+PBKDF vector 10 pbkdf2 [OK]
+PBKDF vector 11 pbkdf2 [OK]
+PBKDF vector 12 pbkdf2 [OK]
+PBKDF vector 13 pbkdf2 [OK]
+PBKDF vector 14 pbkdf2 [OK]
+PBKDF vector 15 pbkdf2 [OK]
+PBKDF vector 16 pbkdf2 [OK]
+PBKDF vector 17 pbkdf2 [OK]
+PBKDF vector 18 pbkdf2 [OK]
+Hash vector 00: [crc32][sha1][sha256][sha512][ripemd160][whirlpool][blake2b-512][blake2s-256]
+Hash vector 01: [crc32][sha1][sha256][sha512][ripemd160][whirlpool][blake2b-512][blake2s-256]
+Hash vector 02: [crc32][sha1][sha256][sha512][ripemd160][whirlpool][blake2b-512][blake2s-256]
+Hash vector 03: [crc32][sha1][sha256][sha512][ripemd160][whirlpool][blake2b-512][blake2s-256]
+Hash vector 04: [crc32][sha1][sha256][sha512][ripemd160][whirlpool][blake2b-512][blake2s-256]
+Hash vector 05: [crc32][sha1][sha256][sha512][ripemd160][whirlpool][blake2b-512][blake2s-256]
+Hash vector 06: [crc32][sha1][sha256][sha512][ripemd160][whirlpool][blake2b-512][blake2s-256]
+HMAC vector 00: [sha1][sha256][sha512]
+HMAC vector 01: [sha1][sha256][sha512]
+HMAC vector 02: [sha1][sha256][sha512]
+HMAC vector 03: [sha1][sha256][sha512]
+HMAC vector 04: [sha1][sha256][sha512]
+HMAC vector 05: [sha1][sha256][sha512]
+CIPHER vector 00: [aes-ecb,128bits][serpent-ecb N/A]
+CIPHER vector 01: [aes-cbc,128bits][serpent-cbc N/A]
+CIPHER vector 02: [aes-ecb,256bits][serpent-ecb N/A]
+CIPHER vector 03: [aes-cbc,256bits][serpent-cbc N/A]
+CIPHER vector 04: [aes-xts,256bits][serpent-xts N/A]
+CIPHER vector 05: [aes-xts,512bits][serpent-xts N/A]
+CIPHER vector 06: [xchacha12,aes-adiantum N/A][xchacha20,aes-adiantum N/A]
+IV vector 00: [aes-cbc-null][512][1024][1024L][2048][2048L][4096][4096L]
+IV vector 01: [aes-cbc-plain][512][1024][1024L][2048][2048L][4096][4096L]
+IV vector 02: [aes-cbc-plain64][512][1024][1024L][2048][2048L][4096][4096L]
+IV vector 03: [aes-cbc-plain64be][512][1024][1024L][2048][2048L][4096][4096L]
+IV vector 04: [aes-cbc-essiv:sha256][512][1024][1024L][2048][2048L][4096][4096L]
+IV vector 05: [aes-cbc-benbi][512][1024][1024L][2048][2048L][4096][4096L]
+IV vector 06: [aes-cbc-eboiv][512][1024][1024L][2048][2048L][4096][4096L]
+PASS: vectors-test
+System PAGE_SIZE=4096
+Run tests in local filesystem
+# Create classic 512B drive
+# (logical_block_size=512, physical_block_size=512)
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+This kernel seems to not support proper scsi_debug module, test skipped.
+SKIP: blockwise-compat
+HEADER CHECK
+ bitlk-images/bitlk-aes-cbc-128-4k.img [OK]
+ bitlk-images/bitlk-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-256.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-256.img [OK]
+ bitlk-images/bitlk-aes-xts-128-4k.img [OK]
+ bitlk-images/bitlk-aes-xts-128-eow.img [OK]
+ bitlk-images/bitlk-aes-xts-128-new-entry.img [OK]
+ bitlk-images/bitlk-aes-xts-128-smart-card.img [OK]
+ bitlk-images/bitlk-aes-xts-128-startup-key.img [OK]
+ bitlk-images/bitlk-aes-xts-128.img [OK]
+ bitlk-images/bitlk-aes-xts-256.img [OK]
+ bitlk-images/bitlk-clearkey-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-togo-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-togo-aes-xts-128.img [OK]
+ACTIVATION FS UUID CHECK
+ bitlk-images/bitlk-aes-cbc-128-4k.img [OK]
+ bitlk-images/bitlk-aes-cbc-128-4k.img [OK]
+ bitlk-images/bitlk-aes-cbc-128-4k.img [OK]
+ bitlk-images/bitlk-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-256.img [OK]
+ bitlk-images/bitlk-aes-cbc-256.img [OK]
+ bitlk-images/bitlk-aes-cbc-256.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-128.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-256.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-256.img [OK]
+ bitlk-images/bitlk-aes-cbc-elephant-256.img [OK]
+ bitlk-images/bitlk-aes-xts-128-4k.img [OK]
+ bitlk-images/bitlk-aes-xts-128-4k.img [OK]
+ bitlk-images/bitlk-aes-xts-128-4k.img [OK]
+ bitlk-images/bitlk-aes-xts-128-eow.img [N/A]
+ bitlk-images/bitlk-aes-xts-128-eow.img [N/A]
+ bitlk-images/bitlk-aes-xts-128-eow.img [N/A]
+ bitlk-images/bitlk-aes-xts-128-new-entry.img [OK]
+ bitlk-images/bitlk-aes-xts-128-new-entry.img [OK]
+ bitlk-images/bitlk-aes-xts-128-new-entry.img [OK]
+ bitlk-images/bitlk-aes-xts-128-smart-card.img [OK]
+ bitlk-images/bitlk-aes-xts-128-smart-card.img [OK]
+ bitlk-images/bitlk-aes-xts-128-startup-key.img [OK]
+ bitlk-images/bitlk-aes-xts-128-startup-key.img [OK]
+ bitlk-images/bitlk-aes-xts-128-startup-key.img [OK]
+ bitlk-images/bitlk-aes-xts-128.img [OK]
+ bitlk-images/bitlk-aes-xts-128.img [OK]
+ bitlk-images/bitlk-aes-xts-128.img [OK]
+ bitlk-images/bitlk-aes-xts-256.img [OK]
+ bitlk-images/bitlk-aes-xts-256.img [OK]
+ bitlk-images/bitlk-aes-xts-256.img [OK]
+ bitlk-images/bitlk-clearkey-aes-cbc-128.img [N/A]
+ bitlk-images/bitlk-clearkey-aes-cbc-128.img [N/A]
+ bitlk-images/bitlk-clearkey-aes-cbc-128.img [N/A]
+ bitlk-images/bitlk-togo-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-togo-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-togo-aes-cbc-128.img [OK]
+ bitlk-images/bitlk-togo-aes-xts-128.img [OK]
+ bitlk-images/bitlk-togo-aes-xts-128.img [OK]
+ bitlk-images/bitlk-togo-aes-xts-128.img [OK]
+PASS: bitlk-compat-test
+Checking dlopen(../.libs/libcryptsetup.so)...OK
+Performed 120 symbol checks in total
+.PASS: run-all-symbols
+Cannot find dm-verity target, test skipped.
+SKIP: verity-compat-test
+[1] Reencryption
+[2] Reencryption with data shift
+[3] Reencryption with keyfile
+[4] Encryption of not yet encrypted device
+[5] Reencryption using specific keyslot
+[6] Reencryption using all active keyslots
+[7] Reencryption of block devices with different block size
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+This kernel seems to not support proper scsi_debug module, test skipped.
+SKIP: reencryption-compat-test
+[1] Reencryption
+[2] Reencryption with data shift
+[3] Reencryption with keyfile
+[4] Encryption of not yet encrypted device
+[5] Reencryption using specific keyslot
+[6] Reencryption using all active keyslots
+[7] Reencryption of block devices with different block size
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+This kernel seems to not support proper scsi_debug module, test skipped.
+SKIP: reencryption-compat-test2
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/modules/5.14.0-rc2+/modules.dep.bin'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc2+
+SKIP: luks2-reencryption-test
+Cannot find dm-integrity target, test skipped.
+SKIP: integrity-compat-test
+WARNING: Variable RUN_SSH_PLUGIN_TEST must be defined, test skipped.
+SKIP: ssh-plugin-test
+=======================
+3 of 13 tests failed
+(16 tests were not run)
+=======================
+make[3]: *** [Makefile:799: check-TESTS] Error 1
+make[3]: Leaving directory '/root/cryptsetup/tests'
+make[2]: *** [Makefile:926: check-am] Error 2
+make[2]: Leaving directory '/root/cryptsetup/tests'
+make[1]: *** [Makefile:928: check] Error 2
+make[1]: Leaving directory '/root/cryptsetup/tests'
+make: *** [Makefile:2595: check-recursive] Error 1
