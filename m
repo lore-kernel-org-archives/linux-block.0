@@ -6,47 +6,54 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8858C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 07:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2ECCC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 07:06:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B343460C3F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 07:03:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 896816052B
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 07:06:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233187AbhG1HDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 03:03:18 -0400
-Received: from verein.lst.de ([213.95.11.211]:52604 "EHLO verein.lst.de"
+        id S233758AbhG1HG7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 03:06:59 -0400
+Received: from verein.lst.de ([213.95.11.211]:52613 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229939AbhG1HDP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 03:03:15 -0400
+        id S233182AbhG1HG7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jul 2021 03:06:59 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id C555868AFE; Wed, 28 Jul 2021 09:03:11 +0200 (CEST)
-Date:   Wed, 28 Jul 2021 09:03:11 +0200
+        id DABE767373; Wed, 28 Jul 2021 09:06:55 +0200 (CEST)
+Date:   Wed, 28 Jul 2021 09:06:55 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Hou Tao <houtao1@huawei.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Subject: Re: [PATCH] nbd: do del_gendisk() asynchronously
-Message-ID: <20210728070311.GB4815@lst.de>
-References: <20210728044211.115787-1-houtao1@huawei.com> <20210728053915.GA3374@lst.de> <3b55c3e6-d286-9c64-46bf-3018929c7a54@huawei.com>
+        dm-devel@redhat.com
+Subject: Re: [dm-devel] use regular gendisk registration in device mapper
+Message-ID: <20210728070655.GA5086@lst.de>
+References: <20210725055458.29008-1-hch@lst.de> <YQAtNkd8T1w/cSLc@redhat.com> <20210727160226.GA17989@lst.de> <YQAxyjrGJpl7UkNG@redhat.com> <9c719e1d-f8da-f1f3-57a9-3802aa1312d4@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3b55c3e6-d286-9c64-46bf-3018929c7a54@huawei.com>
+In-Reply-To: <9c719e1d-f8da-f1f3-57a9-3802aa1312d4@gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 02:56:48PM +0800, Hou Tao wrote:
-> Hi,
-> 
-> Thanks for your review.
-> 
-> Now I am not sure whether or not it is a better idea that doing synchronous or asynchronous del_gendisk()
-> 
-> according to NBD_CFLAG_DESTROY_ON_DISCONNECT, and will wait for some feedback from Josef.
+On Tue, Jul 27, 2021 at 10:38:16PM +0200, Milan Broz wrote:
+> BTW it would be also nice to run cryptsetup testsuite as root - we do a lot
+> of DM operations there (and we depend on sysfs on some places).
 
-The other option would be to add a variant of del_gendisk that does
-expect the open_mutex to be held over the whole operation.  But I'd be
-happy if we could avoid that.
+It already doesn't seem very happy in current mainline for me:
+
+=======================
+13 of 17 tests failed
+(12 tests were not run)
+=======================
+
+but this series doesn't seem to change anything.
+
+A lot of the not run tests seem to be due to broken assumptions
+that some code must be modular.  E.g. my kernel has scsi_debug built
+in, but it complains like this:
+
+modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/module'
+modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc3+
