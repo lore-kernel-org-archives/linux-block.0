@@ -7,153 +7,119 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8484FC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B49C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:27:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66A0C60F91
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:24:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5426360FBF
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:27:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232786AbhG1BYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 21:24:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57748 "EHLO
+        id S233865AbhG1B1V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 21:27:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232464AbhG1BYW (ORCPT
+        with ESMTP id S233179AbhG1B1V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 21:24:22 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B095C061760
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:24:22 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id n10so730024plf.4
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:24:22 -0700 (PDT)
+        Tue, 27 Jul 2021 21:27:21 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F02C061760
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:27:20 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id mz5-20020a17090b3785b0290176ecf64922so7541867pjb.3
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:27:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=fYGwSTr6ccg+6XJVgKogWtecCYirHUHK2PK/K0gKM7I=;
-        b=ipZjYKlLRwrbxtuaEbJySLZrE8u7necIFXb1T+GQ+cVmi1XjrcxKLDXZWy2ZK1ln5Z
-         iXooQt2But+7PFWRiXjtmkV++D6ajj9Fg7sbnF9wtnnvZqNwkp8Ch+lU0d5EOtnZhoUv
-         9q9MuAR3LULbOMFuOJ/pqVVegIeI/IKFMYd6eJiEyM5ByD70XbjeHc8DkB3cPTyRWx7+
-         29mCUdWCfbwwivxnASAwIRM1cQpKu0JpuLQgkX/Z00JCZ9v4ScdHktnloNe2aV/hb9ug
-         AxsULN0IFDVvZGFLoH64b72xge2eLu8gzcTKq12FzPXSgtGIB0z5pjJtWLbgtndQPObu
-         OzoQ==
+        bh=BuRrato+o09YUZsVPMy1mXs7KN2geli20wiSeJ7rF70=;
+        b=iRflQWEcz/8FkWlJ6aPgsfGG17MqqawTqklVW88bdIUxZ3917VCU9DLXGmBstsNIYO
+         fB175NSa7KQb3FOoLG6XG6p6kaVOJT0k+pIcx9XzP2/kXN6FnA8Ho5kiX+Hx3vDaCelM
+         2RxYGos9abHhaO4UAl3mV/0zm57aC+iS5nc2bwTFmZloZKsqD4uZ3LYBzWKgadmgQpSF
+         BTTgwXimJLbYaNGaEmSUIn5oirLEudJyfMt2iA4NylrhKXzmXKUMGCkWRPxCrWCNdqgP
+         ouiY20aMvQo7azBi9oKLxY8TzaxydEA2zcND+vCy0pFGg2CnIR5UikV13+H5XT1xtJ2s
+         jN7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=fYGwSTr6ccg+6XJVgKogWtecCYirHUHK2PK/K0gKM7I=;
-        b=TItNn2xFfElRUpmDcyv5HqQz/YRYpAqoxgZxuzQcn+2GqFYNZd+pK+XgKVHcX/PaeX
-         T+cURxcbUaHuHsqGv2Eitei6+ehvX54Nd5NkqfxPdxvrtK/zueBD/czQ3ak8gy2sIPhW
-         Jw/S5C14Akx4tlm1S6b8EjYDNRMkDbL7kLK7RHj8aqrLIEO7dTOwwf0P23ABmZwErIvM
-         rfxDYz7n3lXHH9ni6GuO2SJifG4ox+W2prLN7Y24jioNXfXYd+CHh5njN+bZBdb/59kU
-         M5Ra5mCpW7A+CVRIH4bF/xbUgn8VuWTjP5lWuC9caNH4yR/z7k1IANQxIAcvREhcI7K0
-         QrYA==
-X-Gm-Message-State: AOAM531Lm2GczPENiSsP6/RPIIbcTtLKrs4hBNGRVXgga3fnf/F4JeqZ
-        Of+8kjKmZwUFtl+MsMqFzwGSSg==
-X-Google-Smtp-Source: ABdhPJw7bwWKM4mz64JpYjWPqii8We0O0thyOnvf/9s8gAnsnp6bNyNqy0I2JPTbxQpaDjEkUqe4ng==
-X-Received: by 2002:aa7:8246:0:b029:39a:1e0a:cd48 with SMTP id e6-20020aa782460000b029039a1e0acd48mr12054588pfn.14.1627435461843;
-        Tue, 27 Jul 2021 18:24:21 -0700 (PDT)
+        bh=BuRrato+o09YUZsVPMy1mXs7KN2geli20wiSeJ7rF70=;
+        b=bL/7SttmO2RJLLqEWqdx72WEraz7pxn32YtTMmjBfrhYIWs4FAosg1Ck2SOAX9IkD5
+         k10msxH1oD11fnGMY1+X2sf7MKp4WdchoQ9zk2YMcViyfG76btP8qCuEJOYU5iTo2Cbd
+         E4ABD7Y1YV2txS6wVTJoxYetNDzBP4dYtPJG4i/T15tnHKpHZ9Yf9+716zTTU2oqRBY9
+         M29wW+f66o/yVY6V4P0jd5tnUcdyAYHr31KTAfY7sQcgN/7hSLIIxz4qN02tO2oYz+J0
+         Xc7xMzTMCusbi1vJ/NFvEwQut66Ke4BFek22/3BwWE+tEDGwiaopC7DfvlxIv5LOzd1V
+         NxZw==
+X-Gm-Message-State: AOAM530NQwG7+wix002edcB17iFqEp7kg+29URaDZHybnv/f5qJFYe0h
+        ua1E98k9/HerHNReZAbY2TQg8g==
+X-Google-Smtp-Source: ABdhPJzvmigvKQ70CrbNNkD9Q+t5Im9Cg09OlI4jRIBfZ9PWgFJplcENHC+hR4x4hZra1N9TQNyoKQ==
+X-Received: by 2002:a17:90a:d250:: with SMTP id o16mr16054930pjw.181.1627435639313;
+        Tue, 27 Jul 2021 18:27:19 -0700 (PDT)
 Received: from [192.168.1.116] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id l10sm4188459pjg.11.2021.07.27.18.24.20
+        by smtp.gmail.com with ESMTPSA id 201sm5599367pgd.37.2021.07.27.18.27.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jul 2021 18:24:21 -0700 (PDT)
-Subject: Re: Commit d5fd456c88aba4fcf77d35fe38024a8d5c814686 - "loopdev: use
- LOOP_CONFIG ioctl" broke loop on x86-64 w/ 32 bit userspace
-To:     =?UTF-8?Q?Krzysztof_Ol=c4=99dzki?= <ole@ans.pl>,
-        Sinan Kaya <sinan.kaya@microsoft.com>,
-        Karel Zak <kzak@redhat.com>
-Cc:     util-linux@vger.kernel.org, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <a797f527-4599-e986-a326-4bb141487f2c@ans.pl>
- <e7f64d43-2a26-e386-b208-5c35d6a56ed4@ans.pl>
- <7de1bd0b-b8ea-daf0-b677-f92db1c1cdff@ans.pl>
+        Tue, 27 Jul 2021 18:27:18 -0700 (PDT)
+Subject: Re: [PATCH block/for-5.14-fixes] blk-iocost: fix operation ordering
+ in iocg_wake_fn()
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Rik van Riel <riel@surriel.com>
+References: <YQCm8flaer2Ek0c+@slm.duckdns.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c1c9d728-c4d9-eaf4-63c3-d13b99da3a3d@kernel.dk>
-Date:   Tue, 27 Jul 2021 19:24:18 -0600
+Message-ID: <7e00b3af-1667-4e27-d4b0-1317fcee9032@kernel.dk>
+Date:   Tue, 27 Jul 2021 19:27:16 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <7de1bd0b-b8ea-daf0-b677-f92db1c1cdff@ans.pl>
+In-Reply-To: <YQCm8flaer2Ek0c+@slm.duckdns.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/21 4:56 PM, Krzysztof Olędzki wrote:
-> On 2021-07-27 at 15:39, Krzysztof Olędzki wrote:
->> On 2021-07-27 at 14:53, Krzysztof Olędzki wrote:
->>> Hi,
->>>
->>> I have a number of (older) systems that are still based on 32 bit
->>> userspace but are running a relatively modern 64 bit kernel -
->>> 5.4-stable, where BTW - LOOP_CONFIGURE is not yet available.
->>>
->>> I noticed that starting with util-linux-2.37 it is no longer possible to
->>> mount images using loop:
->>>
->>> # mount /usr/install/iso/systemrescue-8.04-amd64.iso /mnt/cdrom
->>> mount: /mnt/cdrom: failed to setup loop device for
->>> /usr/install/iso/systemrescue-8.04-amd64.iso.
->>>
->>> Reverting d5fd456c88aba4fcf77d35fe38024a8d5c814686 fixes the problem:
->>>
->>> /tmp/util-linux-2.37# ./mount
->>> /usr/install/iso/systemrescue-8.04-amd64.iso /mnt/cdrom
->>> mount: /mnt/cdrom: WARNING: source write-protected, mounted read-only.
->>>
->>> I have not tested if 32 bit kernel + 32 bit userspace is also affected,
->>> but 64 bit kernel + 64 bit userspace works.
->>
->> Some debugging data:
->>
->> 30399: loopdev:      CXT: [0xff8d0f98]: using loop-control
->> 30399: loopdev:      CXT: [0xff8d0f98]: loop0 name assigned
->> 30399: loopdev:      CXT: [0xff8d0f98]: find_unused by loop-control [rc=0]
->> 30399: libmount:     LOOP: [0x57cbbcb0]: trying to use /dev/loop0
->> 30399: loopdev:      CXT: [0xff8d0f98]: set backing file=/usr/install/iso/systemrescue-8.04-amd64.iso
->> 30399: loopdev:      CXT: [0xff8d0f98]: set flags=4
->> 30399: loopdev:    SETUP: [0xff8d0f98]: device setup requested
->> 30399: loopdev:    SETUP: [0xff8d0f98]: backing file open: OK
->> 30399: loopdev:      CXT: [0xff8d0f98]: open /dev/loop0 [rw]: Success
->> 30399: loopdev:    SETUP: [0xff8d0f98]: device open: OK
->> 30399: loopdev:    SETUP: [0xff8d0f98]: LOOP_CONFIGURE failed: Inappropriate ioctl for device
->> 30399: loopdev:    SETUP: [0xff8d0f98]: failed [rc=-25]
->> 30399: libmount:     LOOP: [0x57cbbcb0]: failed to setup device
->> 30399: loopdev:      CXT: [0xff8d0f98]: de-initialize
->> 30399: loopdev:      CXT: [0xff8d0f98]: closing old open fd
->> 30399: loopdev:     ITER: [0xff8d1168]: de-initialize
->> 30399: libmount:      CXT: [0x57cbbcb0]: mount: preparing failed
->> 30399: libmount:      CXT: [0x57cbbcb0]: excode: rc=32 message="failed to setup loop device for /usr/install/iso/systemrescue-8.04-amd64.iso"
->> mount: /mnt/cdrom: failed to setup loop device for /usr/install/iso/systemrescue-8.04-amd64.iso.
->> 30399: libmount:      CXT: [0x57cbbcb0]: <---- reset [status=0] ---->
->>
->> Seems like the code expects EINVAL (-22) but gets ENOTTY (-25), confirmed with strace:
->> ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/install/iso/systemrescue-8.04-amd64.iso", ...}}) = -1 ENOTTY (Inappropriate ioctl for device)
->>
->> Indeed, changing the code from:
->>     if (errno != EINVAL)
->> to:
->>     if (errno != EINVAL && errno != ENOTTY)
->> allows it to work.
->>
->> Not that with 64-bit userspace, kernel returns EINVAL:
->>
->> ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/src/PACKAGES/systemrescue-8.04-amd64.iso", ...}}) = -1 EINVAL (Invalid argument)
+On 7/27/21 6:38 PM, Tejun Heo wrote:
+> From aae4e1b4e26c3c671fc19aed2fb2ee19f7438707 Mon Sep 17 00:00:00 2001
+> From: Tejun Heo <tj@kernel.org>
+> Date: Tue, 27 Jul 2021 14:21:30 -1000
 > 
-> ... which is because lo_compat_ioctl returns -ENOIOCTLCMD for 
-> unsupported cmds, while lo_ioctl returns -EINVAL via lo_simple_ioctl.
+> iocg_wake_fn() open-codes wait_queue_entry removal and wakeup because it
+> wants the wq_entry to be always removed whether it ended up waking the task
+> or not. finish_wait() tests whether wq_entry needs removal without grabbing
+> the wait_queue lock and expects the waker to use list_del_init_careful()
+> after all waking operations are complete, which iocg_wake_fn() didn't do.
+> The operation order was wrong and the regular list_del_init() was used.
 > 
-> And vfs_ioctl returns -ENOTTY for -ENOIOCTLCMD.
+> The result is that if a watier wakes up racing the waker, it can free pop
+> the wq_entry off stack before the waker is still looking at it, which can
+> lead to a backtrace like the following.
 > 
-> Now the question is if this inconsistency is intended? :)
+>   [7312084.588951] general protection fault, probably for non-canonical address 0x586bf4005b2b88: 0000 [#1] SMP
+>   ...
+>   [7312084.647079] RIP: 0010:queued_spin_lock_slowpath+0x171/0x1b0
+>   ...
+>   [7312084.858314] Call Trace:
+>   [7312084.863548]  _raw_spin_lock_irqsave+0x22/0x30
+>   [7312084.872605]  try_to_wake_up+0x4c/0x4f0
+>   [7312084.880444]  iocg_wake_fn+0x71/0x80
+>   [7312084.887763]  __wake_up_common+0x71/0x140
+>   [7312084.895951]  iocg_kick_waitq+0xe8/0x2b0
+>   [7312084.903964]  ioc_rqos_throttle+0x275/0x650
+>   [7312084.922423]  __rq_qos_throttle+0x20/0x30
+>   [7312084.930608]  blk_mq_make_request+0x120/0x650
+>   [7312084.939490]  generic_make_request+0xca/0x310
+>   [7312084.957600]  submit_bio+0x173/0x200
+>   [7312084.981806]  swap_readpage+0x15c/0x240
+>   [7312084.989646]  read_swap_cache_async+0x58/0x60
+>   [7312084.998527]  swap_cluster_readahead+0x201/0x320
+>   [7312085.023432]  swapin_readahead+0x2df/0x450
+>   [7312085.040672]  do_swap_page+0x52f/0x820
+>   [7312085.058259]  handle_mm_fault+0xa16/0x1420
+>   [7312085.066620]  do_page_fault+0x2c6/0x5c0
+>   [7312085.074459]  page_fault+0x2f/0x40
+> 
+> Fix it by switching to list_del_init_careful() and putting it at the end.
 
-That's unfortunate, but probably not something that can get corrected at
-this time. The correct return value for an unknown ioctl is -ENOTTY
-(ENOIOCTLCMD isn't user visible, should get turned into that). But
-current behavior is set in stone at this point, even if it is
-technically incorrect.
+Fixed up the malformed commit message, applied, thanks!
 
 -- 
 Jens Axboe
