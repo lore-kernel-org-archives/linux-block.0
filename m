@@ -2,282 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49314C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7885FC4320E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31EB960FC4
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6561660F91
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:02:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235068AbhG1JBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 05:01:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47644 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbhG1JBr (ORCPT
+        id S235315AbhG1JCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 05:02:10 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:42376 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234163AbhG1JCJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 05:01:47 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1546AC061757;
-        Wed, 28 Jul 2021 02:01:45 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id m1so4164163pjv.2;
-        Wed, 28 Jul 2021 02:01:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=4bqdWbPwSD8rwbkHQdBKMTQMEN6QzdUaiSUT4bqLYMQ=;
-        b=mBpE+ddlhyDWoSY5jwg3MaoIXgwFrSGr6qK9qvsa3MSmUvzPv7bKBlmE08+oFkSOo8
-         dzeF2PrgktVn8D2JETDKhnhwU8+ownGLOpRBEkrS4LDj09zkoqZ7F9JAAKpGnOXvTLKO
-         yjTopeT9+TNx6tlbQGbMqUAtySHIDDF4wkI7tPc71ldSU8hL9x+srxHZTfRMjgiJBHdJ
-         wCbAq41Ud6H1dlff0n4/RvqqED1AIYHX/yf7ZLwHn4PC8ucOjT4v5wR05uT8lWbp6qed
-         E5kdJjwpI4NzKmlItbDu38n8DYxIkzFMR1IDNmqPy10kviqzn8p/Mjwz0vDQjlEcz1Ae
-         0Zcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=4bqdWbPwSD8rwbkHQdBKMTQMEN6QzdUaiSUT4bqLYMQ=;
-        b=cIWKn+p9FV7FPlrMilF/W3Hw4+Vct+fXJhRiJQu3JWy62bzLXpiSpeQ2R2bAhmQKon
-         5GQB7bPhRHpnCatAUgametqUuWRql8hbN14RqMvh2OK8ALyg1oeuM02ogCbgpeBnegAF
-         xO3tygi9C16IhV/qFAvisJwXVtrGprJHC82+sf0qDJ5IHYiafFfNSPPuKDVJh38hghI9
-         iLG3DFQomu13dRFzraKT8eWMFnzAYg3vntFadiUpt7/GGTqW8sUllHwwzTG1jT3S128+
-         3t+HriyQgyBAsyh2Xi8KuxmDB30wLIPhVIVDrCDJzLhCYBxwYhlJ25y9ulTIwE0A9ejM
-         0Rlw==
-X-Gm-Message-State: AOAM530XnBV/1PeWldJrBvkRV1Phwdj/Jw3Mmd8GVOpDQZ0aB0SNrHSP
-        sNmRFr+wC6jCtQY5Km0lA0s=
-X-Google-Smtp-Source: ABdhPJz/6eeBGcEQNkvW54JfVd0WnGBFsSa7/F4BJnb4nuwqpC85pweT1WZkIv66WUioJhi9ZYYn1w==
-X-Received: by 2002:a63:1a12:: with SMTP id a18mr27653069pga.269.1627462904637;
-        Wed, 28 Jul 2021 02:01:44 -0700 (PDT)
-Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id 85sm6553434pfz.76.2021.07.28.02.01.43
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Jul 2021 02:01:44 -0700 (PDT)
-From:   brookxu <brookxu.cn@gmail.com>
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org
-Subject: [PATCH v2] blk-throtl: optimize IOPS throttle for large IO scenarios
-Date:   Wed, 28 Jul 2021 17:01:41 +0800
-Message-Id: <40915233274d31bb0659ff9f3be8900a5a0e81ba.1627462548.git.brookxu@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
+        Wed, 28 Jul 2021 05:02:09 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 2DF0A22262;
+        Wed, 28 Jul 2021 09:02:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1627462927;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sp2fXaO4+VkU0ewmSUxyDBIfoqxWZ/YmzoRuKp72TwU=;
+        b=QJtqaRDeD/r+6BS2RpMLHsBckRf2sr1w3iN33pezOooEqpnn8T7DqSapcRxyMPIZfjRSjm
+        7J+1lee9yCSAoX/yXx5qOnlJlNQlP5/7ZOeqDMcdtfzJJyxwr5G3M0hN/eM3VNhe4zl7mM
+        ShgAu0K7CLyKCgHUkgVaDq862Mit+3M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1627462927;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sp2fXaO4+VkU0ewmSUxyDBIfoqxWZ/YmzoRuKp72TwU=;
+        b=pmBfIB2QkmA3xf4kSvM/Kul+M1rkY2xpWB6cH5WhgISANis+5+m+8zDuM/QuNvL/ktFiFp
+        tiOqD9YAirWKVzAw==
+Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
+        by relay2.suse.de (Postfix) with ESMTP id 15362A3B8B;
+        Wed, 28 Jul 2021 09:02:07 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 4CA03DA8A7; Wed, 28 Jul 2021 10:59:22 +0200 (CEST)
+Date:   Wed, 28 Jul 2021 10:59:22 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        nborisov@suse.com
+Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy()
+ region
+Message-ID: <20210728085921.GV5047@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Kees Cook <keescook@chromium.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        nborisov@suse.com
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-2-keescook@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210727205855.411487-2-keescook@chromium.org>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chunguang Xu <brookxu@tencent.com>
+On Tue, Jul 27, 2021 at 01:57:52PM -0700, Kees Cook wrote:
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memcpy(), memmove(), and memset(), avoid
+> intentionally writing across neighboring fields.  Wrap the target region
+> in a common named structure. This additionally fixes a theoretical
+> misalignment of the copy (since the size of "buf" changes between 64-bit
+> and 32-bit, but this is likely never built for 64-bit).
+> 
+> FWIW, I think this code is totally broken on 64-bit (which appears to
+> not be a "real" build configuration): it would either always fail (with
+> an uninitialized data->buf_size) or would cause corruption in userspace
+> due to the copy_to_user() in the call path against an uninitialized
+> data->buf value:
+> 
+> omap3isp_stat_request_statistics_time32(...)
+>     struct omap3isp_stat_data data64;
+>     ...
+>     omap3isp_stat_request_statistics(stat, &data64);
+> 
+> int omap3isp_stat_request_statistics(struct ispstat *stat,
+>                                      struct omap3isp_stat_data *data)
+>     ...
+>     buf = isp_stat_buf_get(stat, data);
+> 
+> static struct ispstat_buffer *isp_stat_buf_get(struct ispstat *stat,
+>                                                struct omap3isp_stat_data *data)
+> ...
+>     if (buf->buf_size > data->buf_size) {
+>             ...
+>             return ERR_PTR(-EINVAL);
+>     }
+>     ...
+>     rval = copy_to_user(data->buf,
+>                         buf->virt_addr,
+>                         buf->buf_size);
+> 
+> Regardless, additionally initialize data64 to be zero-filled to avoid
+> undefined behavior.
+> 
+> Fixes: 378e3f81cb56 ("media: omap3isp: support 64-bit version of omap3isp_stat_data")
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  drivers/media/platform/omap3isp/ispstat.c |  5 +--
+>  include/uapi/linux/omap3isp.h             | 44 +++++++++++++++++------
+>  2 files changed, 36 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/media/platform/omap3isp/ispstat.c b/drivers/media/platform/omap3isp/ispstat.c
+> index 5b9b57f4d9bf..ea8222fed38e 100644
+> --- a/drivers/media/platform/omap3isp/ispstat.c
+> +++ b/drivers/media/platform/omap3isp/ispstat.c
+> @@ -512,7 +512,7 @@ int omap3isp_stat_request_statistics(struct ispstat *stat,
+>  int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
+>  					struct omap3isp_stat_data_time32 *data)
+>  {
+> -	struct omap3isp_stat_data data64;
+> +	struct omap3isp_stat_data data64 = { };
 
-After patch 54efd50 (block: make generic_make_request handle
-arbitrarily sized bios), the IO through io-throttle may be larger,
-and these IOs may be further split into more small IOs. However,
-IOPS throttle does not seem to be aware of this change, which
-makes the calculation of IOPS of large IOs incomplete, resulting
-in disk-side IOPS that does not meet expectations. Maybe we should
-fix this problem.
+Should this be { 0 } ?
 
-We can reproduce it by set max_sectors_kb of disk to 128, set
-blkio.write_iops_throttle to 100, run a dd instance inside blkio
-and use iostat to watch IOPS:
+We've seen patches trying to switch from { 0 } to {  } but the answer
+was that { 0 } is supposed to be used,
+http://www.ex-parrot.com/~chris/random/initialise.html
 
-dd if=/dev/zero of=/dev/sdb bs=1M count=1000 oflag=direct
-
-As a result, without this change the average IOPS is 1995, with
-this change the IOPS is 98.
-
-Signed-off-by: Chunguang Xu <brookxu@tencent.com>
----
- block/blk-merge.c    |  2 ++
- block/blk-throttle.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++-----
- block/blk.h          |  2 ++
- 3 files changed, 64 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index a11b3b5..86ff943 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
- 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
- 		submit_bio_noacct(*bio);
- 		*bio = split;
-+
-+		blk_throtl_recharge_bio(*bio);
- 	}
- }
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index b1b22d8..a0daa15 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -178,6 +178,9 @@ struct throtl_grp {
- 	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
- 	unsigned long bio_cnt_reset_time;
- 
-+	atomic_t io_split_cnt[2];
-+	atomic_t last_io_split_cnt[2];
-+
- 	struct blkg_rwstat stat_bytes;
- 	struct blkg_rwstat stat_ios;
- };
-@@ -293,6 +296,16 @@ static uint64_t throtl_adjusted_limit(uint64_t low, struct throtl_data *td)
- 	return low + (low >> 1) * td->scale;
- }
- 
-+static inline unsigned int tg_io_disp(struct throtl_grp *tg, int rw)
-+{
-+	return tg->io_disp[rw] + atomic_read(&tg->io_split_cnt[rw]);
-+}
-+
-+static inline unsigned int tg_last_io_disp(struct throtl_grp *tg, int rw)
-+{
-+	return tg->last_io_disp[rw] + atomic_read(&tg->last_io_split_cnt[rw]);
-+}
-+
- static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- {
- 	struct blkcg_gq *blkg = tg_to_blkg(tg);
-@@ -524,6 +537,11 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
- 	tg->idletime_threshold = DFL_IDLE_THRESHOLD;
- 	tg->idletime_threshold_conf = DFL_IDLE_THRESHOLD;
- 
-+	atomic_set(&tg->io_split_cnt[0], 0);
-+	atomic_set(&tg->io_split_cnt[1], 0);
-+	atomic_set(&tg->last_io_split_cnt[0], 0);
-+	atomic_set(&tg->last_io_split_cnt[1], 0);
-+
- 	return &tg->pd;
- 
- err_exit_stat_bytes:
-@@ -777,6 +795,8 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
- 
-+	atomic_set(&tg->io_split_cnt[rw], 0);
-+
- 	/*
- 	 * Previous slice has expired. We must have trimmed it after last
- 	 * bio dispatch. That means since start of last slice, we never used
-@@ -799,6 +819,9 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
- 	tg->io_disp[rw] = 0;
- 	tg->slice_start[rw] = jiffies;
- 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
-+
-+	atomic_set(&tg->io_split_cnt[rw], 0);
-+
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -877,10 +900,19 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	else
- 		tg->bytes_disp[rw] = 0;
- 
--	if (tg->io_disp[rw] >= io_trim)
-+	if (tg_io_disp(tg, rw) >= io_trim) {
-+		int cnt = atomic_read(&tg->io_split_cnt[rw]);
-+
-+		if (cnt) {
-+			atomic_set(&tg->io_split_cnt[rw], 0);
-+			tg->io_disp[rw] += cnt;
-+		}
-+
- 		tg->io_disp[rw] -= io_trim;
--	else
-+	} else {
-+		atomic_set(&tg->io_split_cnt[rw], 0);
- 		tg->io_disp[rw] = 0;
-+	}
- 
- 	tg->slice_start[rw] += nr_slices * tg->td->throtl_slice;
- 
-@@ -924,7 +956,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 	else
- 		io_allowed = tmp;
- 
--	if (tg->io_disp[rw] + 1 <= io_allowed) {
-+	if (tg_io_disp(tg, rw) + 1 <= io_allowed) {
- 		if (wait)
- 			*wait = 0;
- 		return true;
-@@ -2052,13 +2084,13 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 	}
- 
- 	if (tg->iops[READ][LIMIT_LOW]) {
--		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
-+		iops = tg_last_io_disp(tg, READ) * HZ / elapsed_time;
- 		if (iops >= tg->iops[READ][LIMIT_LOW])
- 			tg->last_low_overflow_time[READ] = now;
- 	}
- 
- 	if (tg->iops[WRITE][LIMIT_LOW]) {
--		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
-+		iops = tg_last_io_disp(tg, WRITE) * HZ / elapsed_time;
- 		if (iops >= tg->iops[WRITE][LIMIT_LOW])
- 			tg->last_low_overflow_time[WRITE] = now;
- 	}
-@@ -2074,6 +2106,9 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 	tg->last_bytes_disp[WRITE] = 0;
- 	tg->last_io_disp[READ] = 0;
- 	tg->last_io_disp[WRITE] = 0;
-+
-+	atomic_set(&tg->last_io_split_cnt[READ], 0);
-+	atomic_set(&tg->last_io_split_cnt[WRITE], 0);
- }
- 
- static void blk_throtl_update_idletime(struct throtl_grp *tg)
-@@ -2176,6 +2211,25 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- }
- #endif
- 
-+void blk_throtl_recharge_bio(struct bio *bio)
-+{
-+	struct blkcg_gq *blkg = bio->bi_blkg;
-+	struct throtl_grp *parent = blkg_to_tg(blkg);
-+	struct throtl_service_queue *parent_sq;
-+	bool rw = bio_data_dir(bio);
-+
-+	if (!parent->has_rules[rw])
-+		return;
-+
-+	do {
-+		atomic_inc(&parent->io_split_cnt[rw]);
-+		atomic_inc(&parent->last_io_split_cnt[rw]);
-+
-+		parent_sq = parent->service_queue.parent_sq;
-+		parent = sq_to_tg(parent_sq);
-+	} while (parent);
-+}
-+
- bool blk_throtl_bio(struct bio *bio)
- {
- 	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-@@ -2263,7 +2317,7 @@ bool blk_throtl_bio(struct bio *bio)
- 		   rw == READ ? 'R' : 'W',
- 		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
- 		   tg_bps_limit(tg, rw),
--		   tg->io_disp[rw], tg_iops_limit(tg, rw),
-+		   tg_io_disp(tg, rw), tg_iops_limit(tg, rw),
- 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
- 
- 	tg->last_low_overflow_time[rw] = jiffies;
-diff --git a/block/blk.h b/block/blk.h
-index 4b885c0..9e925bf 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -293,11 +293,13 @@ struct io_cq *ioc_create_icq(struct io_context *ioc, struct request_queue *q,
- extern int blk_throtl_init(struct request_queue *q);
- extern void blk_throtl_exit(struct request_queue *q);
- extern void blk_throtl_register_queue(struct request_queue *q);
-+extern void blk_throtl_recharge_bio(struct bio *bio);
- bool blk_throtl_bio(struct bio *bio);
- #else /* CONFIG_BLK_DEV_THROTTLING */
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
-+static inline void blk_throtl_recharge_bio(struct bio *bio) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
- #endif /* CONFIG_BLK_DEV_THROTTLING */
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--- 
-1.8.3.1
-
+(from https://lore.kernel.org/lkml/fbddb15a-6e46-3f21-23ba-b18f66e3448a@suse.com/)
