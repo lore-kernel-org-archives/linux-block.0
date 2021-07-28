@@ -2,150 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A93B7C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 19:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF342C4320E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 21:01:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 862556103E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 19:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAE8661040
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 21:01:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231316AbhG1TWZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 15:22:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50836 "EHLO
+        id S231843AbhG1VBb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 17:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231298AbhG1TWY (ORCPT
+        with ESMTP id S231824AbhG1VB3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 15:22:24 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C053C061765
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 12:22:21 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id c7-20020a9d27870000b02904d360fbc71bso3191713otb.10
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 12:22:21 -0700 (PDT)
+        Wed, 28 Jul 2021 17:01:29 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6C6C0613CF
+        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 14:01:26 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id g23-20020a17090a5797b02901765d605e14so5933318pji.5
+        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 14:01:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xtCzcJFAu9dR3CG6ek/fh/xMW6UNckFyG7RsgVYyIWw=;
-        b=TT+fBye+Vvf5GJpNluw0WcRTC7515kpgaXVVegMP0wr4inSikyrK9QanPefFtjXmim
-         WTEQtYiCNW/5IW8h+juauUzRzHM/svXLuLrAV+fuKZ9rqkmQbDIA9OT+VvZQH2bjm2cT
-         0/p6SsgDhIIYH/h46RytjULmrLSTZRSXTrga4HzPz/3Qm0rJj1aeVtkoOK4gaNlySQvW
-         3M+BSBbmJisXYnHtIp6o6BQhrd/mwd9K2OyKVF+/qPBE4+wp0j2A3zZhqHHEgyHyZMqF
-         tmmtTCOr682Mglw8SU0cvL4tSZlC4vzW8FLEHyOkF1swMSKXTy+H6mdf1t8PCYkkfmg8
-         Lovw==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=v4TsexyUVtPmnWQp8z0vQybdqGDFJ+IKH3X3D8imsE4=;
+        b=hg+gKirQh4CStWcllp3dCMDGaMydMxkrfDz7dI28grfxRHealC37a8xJDfYI0FVrQZ
+         2tYUG05gAJbnL7ZSiMGxXN0BbgqYaSHUyURFCYtvwZV0Mx+omFId8CJj1UovnV0ee9cA
+         66wsvWC92AbI6ez9cGn13eYUvZ7XhoUJQlPzE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xtCzcJFAu9dR3CG6ek/fh/xMW6UNckFyG7RsgVYyIWw=;
-        b=TREPtL19aqM39MkNVkEwMijb5kF7KeTS3yrN8Jbtwp3duCXKt/ZbIHGHyEVT4iEE2Q
-         qvFfaTt+oyx7lTj8LJARWZC/gbreJQ3HheX/lkFVOyV2QJgNNwRMAdLwhZoOqdD2kiCw
-         K/Dcmbme4o+2oH0NbOCyPIYGxQ0rRerZetAMt+kBtTlCnUg9nqcKjyBlrsQq2p1k9R5B
-         mPKWvwECz+5+IFWbVU1E5Krovck/O9aZuU1QtmAD3EijMApdy7DEUtHDicOeox1t0vf1
-         pIUHGA88EHf/oJ/yRA6wgXoDMrqaROOhdpOwLwGMPrnqxHQ9ejvD8bNmmMo8qFfuUyxk
-         XsfQ==
-X-Gm-Message-State: AOAM5301ElUtG1ZysoYoElgqjoX2iDSmc7xPQt9vYJVP7/kwuLiQoduX
-        1Wjd54PhBZISHFemchfyWzZS+Q==
-X-Google-Smtp-Source: ABdhPJxCOixxPZx/B9u6/IckaLKvyCZhkvAoWYTyKbBLx//EwCPaLJWT+Dr+GFNlXpBF10QYtCkl5g==
-X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr1050189otr.51.1627500140530;
-        Wed, 28 Jul 2021 12:22:20 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id p4sm127444ooa.35.2021.07.28.12.22.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 12:22:20 -0700 (PDT)
-Subject: Re: [PATCH v5 0/5] block: add a sequence number to disks
-To:     Matteo Croce <mcroce@linux.microsoft.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-References: <20210712230530.29323-1-mcroce@linux.microsoft.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fa2b4c63-6262-ab0b-63c2-270e84207dc0@kernel.dk>
-Date:   Wed, 28 Jul 2021 13:22:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=v4TsexyUVtPmnWQp8z0vQybdqGDFJ+IKH3X3D8imsE4=;
+        b=IRZiLIQHRqzVEmKa+ZmwzukCaAtg0+/zM4nXgtVoyUIl9wKuBycbe/YEs2lIh43ydy
+         SaUa36P3hxHzCyce+L0UX5PjqZbk/xCTasque26ywVnJTwc5bAaRarxsQgKo3xLyF1R7
+         HJIDDcORjutOo5Ck9xdb9zD/BC+6uq5zFQBo9IQ1Oo7MJp9ho8RfnGQ/uwljsRC9qq6F
+         6Oglo6DDK4nCQesW6kJOf0/G1od9Pa9U5LwNeoE2Aj4iO6/1NfIvXgzL0DW3ExpSTzS3
+         Yhg/jBsnjka6J4PnPhb1y/7NWAoTSPEZ5iDvm2ZmfSi5E8+L7ASrt6yYKwL+MeB2RZ9R
+         gbMQ==
+X-Gm-Message-State: AOAM533noz1vZqyS7CzSCGCHiI8/WAF2y4D3QDQmCnoJEMUayU8vqEUk
+        4RIlrayNh+lC3NAQ7eYCpSj0/A==
+X-Google-Smtp-Source: ABdhPJzkF5cilzb73BCpcxICFq3XUeRAJh6fZICuqCaVMVL6bCDUAwLUBtlkfh9/lXbLB+5T11D9+w==
+X-Received: by 2002:a17:902:d717:b029:12c:1653:d611 with SMTP id w23-20020a170902d717b029012c1653d611mr1508273ply.51.1627506086388;
+        Wed, 28 Jul 2021 14:01:26 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id t3sm932392pfd.153.2021.07.28.14.01.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jul 2021 14:01:25 -0700 (PDT)
+Date:   Wed, 28 Jul 2021 14:01:24 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 19/64] ip: Use struct_group() for memcpy() regions
+Message-ID: <202107281358.8E12638@keescook>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-20-keescook@chromium.org>
+ <YQDxaYrHu0PeBIuX@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <20210712230530.29323-1-mcroce@linux.microsoft.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YQDxaYrHu0PeBIuX@kroah.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/12/21 5:05 PM, Matteo Croce wrote:
-> From: Matteo Croce <mcroce@microsoft.com>
+On Wed, Jul 28, 2021 at 07:55:53AM +0200, Greg Kroah-Hartman wrote:
+> >  struct ethhdr {
+> > -	unsigned char	h_dest[ETH_ALEN];	/* destination eth addr	*/
+> > -	unsigned char	h_source[ETH_ALEN];	/* source ether addr	*/
+> > +	union {
+> > +		struct {
+> > +			unsigned char h_dest[ETH_ALEN];	  /* destination eth addr */
+> > +			unsigned char h_source[ETH_ALEN]; /* source ether addr	  */
+> > +		};
+> > +		struct {
+> > +			unsigned char h_dest[ETH_ALEN];	  /* destination eth addr */
+> > +			unsigned char h_source[ETH_ALEN]; /* source ether addr	  */
+> > +		} addrs;
 > 
-> Associating uevents with block devices in userspace is difficult and racy:
-> the uevent netlink socket is lossy, and on slow and overloaded systems has
-> a very high latency. Block devices do not have exclusive owners in
-> userspace, any process can set one up (e.g. loop devices). Moreover, device
-> names can be reused (e.g. loop0 can be reused again and again). A userspace
-> process setting up a block device and watching for its events cannot thus
-> reliably tell whether an event relates to the device it just set up or
-> another earlier instance with the same name.
+> A union of the same fields in the same structure in the same way?
 > 
-> Being able to set a UUID on a loop device would solve the race conditions.
-> But it does not allow to derive orderings from uevents: if you see a uevent
-> with a UUID that does not match the device you are waiting for, you cannot
-> tell whether it's because the right uevent has not arrived yet, or it was
-> already sent and you missed it. So you cannot tell whether you should wait
-> for it or not.
-> 
-> Being able to set devices up in a namespace would solve the race conditions
-> too, but it can work only if being namespaced is feasible in the first
-> place. Many userspace processes need to set devices up for the root
-> namespace, so this solution cannot always work.
-> 
-> Changing the loop devices naming implementation to always use
-> monotonically increasing device numbers, instead of reusing the lowest
-> free number, would also solve the problem, but it would be very disruptive
-> to userspace and likely break many existing use cases. It would also be
-> quite awkward to use on long-running machines, as the loop device name
-> would quickly grow to many-digits length.
-> 
-> Furthermore, this problem does not affect only loop devices - partition
-> probing is asynchronous and very slow on busy systems. It is very easy to
-> enter races when using LO_FLAGS_PARTSCAN and watching for the partitions to
-> show up, as it can take a long time for the uevents to be delivered after
-> setting them up.
-> 
-> Associating a unique, monotonically increasing sequential number to the
-> lifetime of each block device, which can be retrieved with an ioctl
-> immediately upon setting it up, allows to solve the race conditions with
-> uevents, and also allows userspace processes to know whether they should
-> wait for the uevent they need or if it was dropped and thus they should
-> move on.
-> 
-> This does not benefit only loop devices and block devices with multiple
-> partitions, but for example also removable media such as USB sticks or
-> cdroms/dvdroms/etc.
-> 
-> The first patch is the core one, the 2..4 expose the information in
-> different ways, and the last one makes the loop device generate a media
-> changed event upon attach, detach or reconfigure, so the sequence number
-> is increased.
-> 
-> If merged, this feature will immediately used by the userspace:
-> https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
+> Ah, because struct_group() can not be used here?  Still feels odd to see
+> in a userspace-visible header.
 
-Applied for 5.15, with #2 done manually since it didn't apply cleanly.
+Yeah, there is some inconsistency here. I will clean this up for v2.
+
+Is there a place we can put kernel-specific macros for use in UAPI
+headers? (I need to figure out where things like __kernel_size_t get
+defined...)
 
 -- 
-Jens Axboe
-
+Kees Cook
