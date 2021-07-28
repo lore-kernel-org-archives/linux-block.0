@@ -2,78 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC67C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDE9C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:39:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B66860F91
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:32:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 784CD60F23
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:39:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232926AbhG1BcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 21:32:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59602 "EHLO
+        id S234680AbhG1Bj4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 21:39:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233153AbhG1BcS (ORCPT
+        with ESMTP id S233118AbhG1Bjz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 21:32:18 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09534C061760
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:32:18 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id pf12-20020a17090b1d8cb0290175c085e7a5so7610862pjb.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:32:18 -0700 (PDT)
+        Tue, 27 Jul 2021 21:39:55 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53906C061757
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:39:55 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id g23-20020a17090a5797b02901765d605e14so1891514pji.5
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:39:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5rj+Jk8FZe2NEOutgAZKHy8g5XY1Cgm2OZ1BjO0VAd0=;
-        b=oTfMUw2EkafM0zM+vz7MUGjWHsAMLTsK1efDco2LoDl5YGkfsXIthZivNODcSebRY9
-         6u3W5VS3Ily4bMwwrikZiTJXxDtP16BTyXHbExHnbwePelhCg5MaWUy4GKzM3SHe8p9V
-         3MF5Wri2SJBEpdKM+XpKWKCd3SAm+kBHVwunaeghnGmCmjvRdl4n8LpZiCFx5JvpCKmI
-         /unIogdFHU/VuHO2fWC4udd4cr8kFaO//dYM1PcRSsqnGBG7sduKIrP9xOSBYWJuzzii
-         E3z7qD4fxDaApSnavwNLbZKPYDhL92d2UZf/iAzq6C9nWM1hE/ER7gzt5RUgLjHv/D6E
-         iTWw==
+        bh=svIq3M8HhmjOQFHJQVWbDLjaKokejNdfgbcRMVtQl6I=;
+        b=OkeYqPnbSWWqVhkH3XroWcXMPLjvBpzL07PshovmwhHsgpcjHE/dwBaIT57dE6cguD
+         wfacScli3WcozLzcK7oOWYp1cr/cauCMt5zOXwYqVRt/eld6koC6z6wzTDj39ILXyPCS
+         u23uNSRCr3BshpsazezRbAAOpEcuTo8HlCD56SiPr0Udvm6yJpoh2jxr+RZqZ4gVGrqy
+         1vBIFStGTKz6wxYTBJ2r6H3qoqNNCw0z9s03i+NhcuItRBiexi9mFZR1JGLFD5Ja/uhq
+         2zgF/R88YiIs7q+GTZojmm1iimQe8VX81QQiSrtBWxMuc6KPQQ0HvH88ow1NF18cMW+z
+         FPRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=5rj+Jk8FZe2NEOutgAZKHy8g5XY1Cgm2OZ1BjO0VAd0=;
-        b=Xhw3ATPDMzcYN+lbqyEZ2Kcr/lznpc8646QPfmPCms9GIgNMD3NeGWUbN4hokRaJAK
-         U6mXl23SRfEP2pVDITRvuGhGAe8sFCLc+f41Fv29bVh6CZoauQ0gegYgejD6NwXPgtHP
-         sWWVZ2ufG8z3Kpa1r9FfthYYCViWPuJ448KoBa9bzdiNC4kRBBGn2WgfQXpUhWFnfx7F
-         jiCfd6p6zPmGelkNnmSoNkX1DcjtgUXUOc9x8QuC5cdgjyUfIXQPl1FZpfn/U/tdK99E
-         kaAiVUVDV1ESKYjyuTLZjUVXWQkjUe2yFDtGgWaB70GIaUN7aDHy3Q1sOuXAmFeTlAnh
-         nm+Q==
-X-Gm-Message-State: AOAM533l99a6pnUwuvfpedgkNdIVKZJnzjsqGxMBvKIVfUk1K7zIJsIS
-        B522Sj4C+RQvH55BYeI4Og4eTQ==
-X-Google-Smtp-Source: ABdhPJzArq/2MSZEt4PoQH1xCrFAgDVmP1R6cTFs/nEA3E2TCkL7htHdSRGpAC/pEHilHz8mnYqRCA==
-X-Received: by 2002:a65:5083:: with SMTP id r3mr8039958pgp.161.1627435937627;
-        Tue, 27 Jul 2021 18:32:17 -0700 (PDT)
+        bh=svIq3M8HhmjOQFHJQVWbDLjaKokejNdfgbcRMVtQl6I=;
+        b=VBy45KjvR4sasyOJ1YAJyNxDGZS8ebs4i5gg90eBxykufRg4PPWb0m8dQAeCGocM7P
+         Fshf+SJ6Z2yUZzX+Imx2VtRs6mxVDqMCfl2WWwmN9BcqpW/PC5SuxgCU7+gNFJ7/puQ6
+         r8ZMaZS2tOZUmcQXoxQ/IMu+enOkImUJilBKp8z57h6zREU3NxLP6nkFsmfX0aLT35Ib
+         i/34OWHcnlanmKwXJLqzkbfhvF5M4cre83n9+Exc/2BMbAxwG0tmHkP9UNxwLsn7y0Ko
+         4ASezOgmM/UROVPXwMjJ2hCkJhh8x6qSCPfjEixFgYh+znRdZdz2V2iTczyz7gcv9CfJ
+         Lpvg==
+X-Gm-Message-State: AOAM532wEAP4ULFw7GlFr1dOdtY8X4/wDqUnbUfzK0RBS+Hdp3DKL7kQ
+        cQx6Yr92GIFYdlz96aTYwHFyVg==
+X-Google-Smtp-Source: ABdhPJyJLwNyRctObcxyK4toXEaF7zEJrs1ztdt1iDwWMOxEFMftiOxaVnTlS6RBmwQHMU92F/6ihA==
+X-Received: by 2002:a17:902:a587:b029:12c:3265:26a with SMTP id az7-20020a170902a587b029012c3265026amr8666756plb.34.1627436394755;
+        Tue, 27 Jul 2021 18:39:54 -0700 (PDT)
 Received: from [192.168.1.116] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id w10sm5544576pgl.46.2021.07.27.18.32.16
+        by smtp.gmail.com with ESMTPSA id p11sm4131248pju.20.2021.07.27.18.39.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jul 2021 18:32:17 -0700 (PDT)
-Subject: Re: [PATCH 01/24] bsg: remove support for SCSI_IOCTL_SEND_COMMAND
-To:     Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
-Cc:     Doug Gilbert <dgilbert@interlog.com>,
-        =?UTF-8?Q?Kai_M=c3=a4kisara?= <Kai.Makisara@kolumbus.fi>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20210724072033.1284840-1-hch@lst.de>
- <20210724072033.1284840-2-hch@lst.de>
+        Tue, 27 Jul 2021 18:39:53 -0700 (PDT)
+Subject: Re: fixes and cleanups for block_device refcounting v2
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20210722075402.983367-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b3e2bea6-3ba9-11d6-f054-e1fa62be466f@kernel.dk>
-Date:   Tue, 27 Jul 2021 19:32:14 -0600
+Message-ID: <23d8cafb-413a-8feb-a2c7-601783d18706@kernel.dk>
+Date:   Tue, 27 Jul 2021 19:39:50 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210724072033.1284840-2-hch@lst.de>
+In-Reply-To: <20210722075402.983367-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,12 +78,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/24/21 1:20 AM, Christoph Hellwig wrote:
-> SCSI_IOCTL_SEND_COMMAND has been deprecated longer than bsg exists
-> and has been warning for just as long.  More importantly it harcodes
-> SCSI CDBs and thus will do the wrong thing on non-scsi bsg nodes.
+On 7/22/21 1:53 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this series fixes up a possible race with the block_device lookup
+> changes, and the finishes off the conversion to stop using the inode
+> refcount for block devices.
 
-Acked-by: Jens Axboe <axboe@kernel.dk>
+Dropped the btrfs patch since it's in -git, and applied #1 to block-5.14,
+rest for 5.15.
 
 -- 
 Jens Axboe
