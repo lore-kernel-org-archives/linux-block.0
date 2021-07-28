@@ -2,194 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EA8C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 04:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D37D2C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 04:42:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D60D60F00
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 04:28:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA973600D4
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 04:42:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbhG1E2X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 00:28:23 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:12321 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbhG1E2W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 00:28:22 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GZLBc2jWNz7ywZ;
-        Wed, 28 Jul 2021 12:23:36 +0800 (CST)
-Received: from dggpeml500025.china.huawei.com (7.185.36.35) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 28 Jul 2021 12:28:19 +0800
-Received: from huawei.com (10.90.53.225) by dggpeml500025.china.huawei.com
- (7.185.36.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Wed, 28 Jul
- 2021 12:28:19 +0800
-From:   Hou Tao <houtao1@huawei.com>
-To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        Christoph Hellwig <hch@lst.de>, <houtao1@huawei.com>
-Subject: [PATCH] nbd: do del_gendisk() asynchronously
-Date:   Wed, 28 Jul 2021 12:42:11 +0800
-Message-ID: <20210728044211.115787-1-houtao1@huawei.com>
-X-Mailer: git-send-email 2.25.0.4.g0ad7144999
+        id S229704AbhG1Emt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 00:42:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33856 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229546AbhG1Ems (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jul 2021 00:42:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 86E2760F41;
+        Wed, 28 Jul 2021 04:42:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627447367;
+        bh=dOk+2tFiWObmw55S1h9slR4A4T3f+tlYA4VqWOD2eAE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=asPRK8N64wo9bRcUDj3+v7oCKxySBOZvt/v7+Ul8CUaSzKyZPUVlLsBPnm9NGj8aL
+         t5IuM3IQXPrHb8Yz9D1mratdKG9R7S2c6Yh0zwS5GpHg29+SDGojG4OjVqAnE7tBpM
+         jAYxTK0V3onNdQN5uaDwZHNbxeDz3CHlU72GMmyDdw3HGwL6DH9eW9xA1/Dl42zjDN
+         Mx5AQotOjd6cHYwVOYCdo1B2deACWPfuxLWKtXpFn4h3EM2Sw91Cq07kOjltlEe6ME
+         9G2X5bnCZTkzA9pUjeaTaMt7xOmJ0XcdN+dMfePsl7645X7vk6VmD2uTl+suSMo30h
+         OeKWby67B9Y7A==
+Date:   Tue, 27 Jul 2021 23:45:17 -0500
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 06/64] bnxt_en: Use struct_group_attr() for memcpy()
+ region
+Message-ID: <20210728044517.GE35706@embeddedor>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-7-keescook@chromium.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.225]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500025.china.huawei.com (7.185.36.35)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210727205855.411487-7-keescook@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now open_mutex is used to synchronize partition operations (e.g,
-blk_drop_partitions() and blkdev_reread_part()), however it makes
-nbd driver broken, because nbd may call del_gendisk() in nbd_release()
-or nbd_genl_disconnect() if NBD_CFLAG_DESTROY_ON_DISCONNECT is enabled,
-and deadlock occurs, as shown below:
+On Tue, Jul 27, 2021 at 01:57:57PM -0700, Kees Cook wrote:
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memcpy(), memmove(), and memset(), avoid
+> intentionally writing across neighboring fields.
+> 
+> Use struct_group() around members queue_id, min_bw, max_bw, tsa, pri_lvl,
+> and bw_weight so they can be referenced together. This will allow memcpy()
+> and sizeof() to more easily reason about sizes, improve readability,
+> and avoid future warnings about writing beyond the end of queue_id.
+> 
+> "pahole" shows no size nor member offset changes to struct bnxt_cos2bw_cfg.
+> "objdump -d" shows no meaningful object code changes (i.e. only source
+> line number induced differences and optimizations).
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-// AB-BA dead-lock
-nbd_genl_disconnect                    blkdev_open
-nbd_disconnect_and_put
-				       lock bd_mutex
-// last ref
-nbd_put
-    lock nbd_index_mutex
-	del_gendisk                    nbd_open
-					   try lock nbd_index_mutex
-	    try lock bd_mutex
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
- or
+Thanks
+--
+Gustavo
 
-// AA dead-lock
-nbd_release
-    lock bd_mutex
-    nbd_put
-        try lock bd_mutex
-
-Instead of fixing block layer (e.g, introduce another lock), fixing
-the nbd driver to call del_gendisk() in a kworker. To ensure the
-reuse of nbd index succeeds, moving the calling idr_remove() after
-del_gendisk(), so if the reused index is not found in nbd_index_idr,
-the old disk must have been deleted. And reusing the existing
-destroy_complete to ensure nbd_genl_connect() will wait for
-the completion of del_gendisk().
-
-Also adding a new workqueue for nbd removal, so nbd_cleanup()
-can ensure all removals completes before exits.
-
-Reported-by: syzbot+0fe7752e52337864d29b@syzkaller.appspotmail.com
-Fixes: c76f48eb5c08 ("block: take bd_mutex around delete_partitions in del_gendisk")
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- drivers/block/nbd.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74e..c1cbfd944f2cd 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -49,6 +49,7 @@
- 
- static DEFINE_IDR(nbd_index_idr);
- static DEFINE_MUTEX(nbd_index_mutex);
-+static struct workqueue_struct *nbd_del_wq;
- static int nbd_total_devices = 0;
- 
- struct nbd_sock {
-@@ -113,6 +114,7 @@ struct nbd_device {
- 	struct mutex config_lock;
- 	struct gendisk *disk;
- 	struct workqueue_struct *recv_workq;
-+	struct work_struct remove_work;
- 
- 	struct list_head list;
- 	struct task_struct *task_recv;
-@@ -233,8 +235,10 @@ static const struct device_attribute backend_attr = {
- 	.show = backend_show,
- };
- 
--static void nbd_dev_remove(struct nbd_device *nbd)
-+static void nbd_dev_remove_work(struct work_struct *work)
- {
-+	struct nbd_device *nbd =
-+		container_of(work, struct nbd_device, remove_work);
- 	struct gendisk *disk = nbd->disk;
- 
- 	if (disk) {
-@@ -243,6 +247,13 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 		blk_mq_free_tag_set(&nbd->tag_set);
- 	}
- 
-+	mutex_lock(&nbd_index_mutex);
-+	/*
-+	 * Remove from idr after del_gendisk() completes,
-+	 * so if the same id is reused, add_disk() will succeed
-+	 */
-+	idr_remove(&nbd_index_idr, nbd->index);
-+
- 	/*
- 	 * Place this in the last just before the nbd is freed to
- 	 * make sure that the disk and the related kobject are also
-@@ -251,6 +262,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 	 */
- 	if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) && nbd->destroy_complete)
- 		complete(nbd->destroy_complete);
-+	mutex_unlock(&nbd_index_mutex);
- 
- 	kfree(nbd);
- }
-@@ -259,8 +271,7 @@ static void nbd_put(struct nbd_device *nbd)
- {
- 	if (refcount_dec_and_mutex_lock(&nbd->refs,
- 					&nbd_index_mutex)) {
--		idr_remove(&nbd_index_idr, nbd->index);
--		nbd_dev_remove(nbd);
-+		queue_work(nbd_del_wq, &nbd->remove_work);
- 		mutex_unlock(&nbd_index_mutex);
- 	}
- }
-@@ -1679,6 +1690,7 @@ static int nbd_dev_add(int index)
- 	nbd->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
- 		BLK_MQ_F_BLOCKING;
- 	nbd->tag_set.driver_data = nbd;
-+	INIT_WORK(&nbd->remove_work, nbd_dev_remove_work);
- 	nbd->destroy_complete = NULL;
- 	nbd->backend = NULL;
- 
-@@ -2416,7 +2428,14 @@ static int __init nbd_init(void)
- 	if (register_blkdev(NBD_MAJOR, "nbd"))
- 		return -EIO;
- 
-+	nbd_del_wq = alloc_workqueue("nbd-del", WQ_UNBOUND, 0);
-+	if (!nbd_del_wq) {
-+		unregister_blkdev(NBD_MAJOR, "nbd");
-+		return -ENOMEM;
-+	}
-+
- 	if (genl_register_family(&nbd_genl_family)) {
-+		destroy_workqueue(nbd_del_wq);
- 		unregister_blkdev(NBD_MAJOR, "nbd");
- 		return -EINVAL;
- 	}
-@@ -2457,6 +2476,9 @@ static void __exit nbd_cleanup(void)
- 		nbd_put(nbd);
- 	}
- 
-+	/* Wait for nbd_dev_remove_work() completes */
-+	destroy_workqueue(nbd_del_wq);
-+
- 	idr_destroy(&nbd_index_idr);
- 	genl_unregister_family(&nbd_genl_family);
- 	unregister_blkdev(NBD_MAJOR, "nbd");
--- 
-2.25.0.4.g0ad7144999
-
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  4 ++--
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h | 14 ++++++++------
+>  2 files changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+> index 8a68df4d9e59..95c636f89329 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+> @@ -148,10 +148,10 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
+>  	}
+>  
+>  	data = &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, queue_id);
+> -	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw) - 4) {
+> +	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw.cfg)) {
+>  		int tc;
+>  
+> -		memcpy(&cos2bw.queue_id, data, sizeof(cos2bw) - 4);
+> +		memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
+>  		if (i == 0)
+>  			cos2bw.queue_id = resp->queue_id0;
+>  
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
+> index 6eed231de565..716742522161 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
+> @@ -23,13 +23,15 @@ struct bnxt_dcb {
+>  
+>  struct bnxt_cos2bw_cfg {
+>  	u8			pad[3];
+> -	u8			queue_id;
+> -	__le32			min_bw;
+> -	__le32			max_bw;
+> +	struct_group_attr(cfg, __packed,
+> +		u8		queue_id;
+> +		__le32		min_bw;
+> +		__le32		max_bw;
+>  #define BW_VALUE_UNIT_PERCENT1_100		(0x1UL << 29)
+> -	u8			tsa;
+> -	u8			pri_lvl;
+> -	u8			bw_weight;
+> +		u8		tsa;
+> +		u8		pri_lvl;
+> +		u8		bw_weight;
+> +	);
+>  	u8			unused;
+>  };
+>  
+> -- 
+> 2.30.2
+> 
