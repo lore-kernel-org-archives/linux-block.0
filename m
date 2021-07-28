@@ -2,71 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3649C43216
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 06:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7462C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 06:54:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9260860EB2
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 06:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB89660EBB
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 06:54:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbhG1GlU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 02:41:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36646 "EHLO mail.kernel.org"
+        id S232540AbhG1GyG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 02:54:06 -0400
+Received: from verein.lst.de ([213.95.11.211]:52571 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232798AbhG1GlU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 02:41:20 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BA8B16023E;
-        Wed, 28 Jul 2021 06:41:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627454479;
-        bh=56P83WlclwichTl6Z38luZ2iMK3+gEOYgDjb65V+lIk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RyFulSv1DKr+WMQoNMSADu/bvEL2Nt9m/j8r5jvKSLh5jGBe0pgTIj4j2kHvRaqiq
-         cqa3qzmYXurTLeQgm/jDQEpxNsvH/ufI5US3zham8t8FNmVEui6kSE+H9CKeuNpq36
-         x4opoXtu0wbNZ69pe/1t1danjGs4IfYhvpwS+YHI=
-Date:   Wed, 28 Jul 2021 08:41:17 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc:     Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 19/64] ip: Use struct_group() for memcpy() regions
-Message-ID: <YQD8DcOeivPzLMkL@kroah.com>
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-20-keescook@chromium.org>
- <YQDxaYrHu0PeBIuX@kroah.com>
- <baead202-569f-775f-348c-aa64e69f03ed@embeddedor.com>
- <YQD2/CA7zJU7MW6M@kroah.com>
- <e3193698-86d5-d529-e095-e09b4d52927b@embeddedor.com>
+        id S232798AbhG1GyG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jul 2021 02:54:06 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 683BD67357; Wed, 28 Jul 2021 08:54:03 +0200 (CEST)
+Date:   Wed, 28 Jul 2021 08:54:03 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/8] block: support delayed holder registration
+Message-ID: <20210728065403.GA4815@lst.de>
+References: <20210725055458.29008-1-hch@lst.de> <20210725055458.29008-5-hch@lst.de> <YQAu7KKyKnCm+tlf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e3193698-86d5-d529-e095-e09b4d52927b@embeddedor.com>
+In-Reply-To: <YQAu7KKyKnCm+tlf@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 01:31:16AM -0500, Gustavo A. R. Silva wrote:
-> > Why not use a local version of the macro like was done in the DRM header
-> > file, to make it always work the same and more obvious what is
-> > happening?  If I were a userspace developer and saw the above, I would
-> > think that the kernel developers have lost it :)
-> 
-> Then don't take a look at this[1]. :p
-> 
-> --
-> Gustavo
-> 
-> [1] https://git.kernel.org/linus/c0a744dcaa29e9537e8607ae9c965ad936124a4d
+On Tue, Jul 27, 2021 at 12:06:04PM -0400, Mike Snitzer wrote:
+> This header starts to shine some light on what is motivating this
+> series by touching on "all kinds of bad side effects" being fixed.
+> Any chance you could elaborate what you've noticed/found/hit?
 
-That one at least looks a "little" different so maybe it could be seen
-as semi-reasonable :)
+The proble mis that it leaves the queue in a weird half state.  The
+normal states for a gendisk are:
+
+ 1) allocated		(after *alloc_disk)
+ 2) registered		(after add_disk*)
+ 3) unregistered	(after del_gendisk)
+
+the delayed queue registration adds a weird half state where it is
+sort of registered, except for in sysfs and the elevator.  I have
+some pretty big changes between how the disk and queue interact
+that tripped over it, but even right now code has to be very careful
+in the takedown path to deal with the half-initialized disks.
