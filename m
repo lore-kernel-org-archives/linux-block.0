@@ -2,45 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 860BBC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 05:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E5EC4320E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 05:45:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6173360F91
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 05:39:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1874260FE7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 05:45:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231199AbhG1FjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 01:39:19 -0400
-Received: from verein.lst.de ([213.95.11.211]:52376 "EHLO verein.lst.de"
+        id S233828AbhG1Fpl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 01:45:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47880 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229814AbhG1FjT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 01:39:19 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id B9F1067357; Wed, 28 Jul 2021 07:39:15 +0200 (CEST)
-Date:   Wed, 28 Jul 2021 07:39:15 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Hou Tao <houtao1@huawei.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] nbd: do del_gendisk() asynchronously
-Message-ID: <20210728053915.GA3374@lst.de>
-References: <20210728044211.115787-1-houtao1@huawei.com>
+        id S232891AbhG1Fpl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jul 2021 01:45:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5EAC060F93;
+        Wed, 28 Jul 2021 05:45:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1627451139;
+        bh=iRPIkA9wCneiiPcbFTtaQRP1uYFSznhLeZtrCj67jCs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=cSi5Yn73Q7vWLdkilrflKgNOm7mNY5dQqgNjN+qepVVuYUWrI0aHzBMp1F6Q0epj9
+         ZMRABIZgA+udyB+hnoMPHnAJxchAq9ks+jQbdEnkCRvARKi62oxT1yu+FxUgwo1NKi
+         BkptoOs2eYMnU4S84hmk6GAERU1CRR9+P4HQ4kPY=
+Date:   Wed, 28 Jul 2021 07:45:36 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 07/64] staging: rtl8192e: Use struct_group() for memcpy()
+ region
+Message-ID: <YQDvABSKqzGxrycR@kroah.com>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-8-keescook@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210728044211.115787-1-houtao1@huawei.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210727205855.411487-8-keescook@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks,
+On Tue, Jul 27, 2021 at 01:57:58PM -0700, Kees Cook wrote:
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memcpy(), memmove(), and memset(), avoid
+> intentionally writing across neighboring fields.
+> 
+> Use struct_group() around members addr1, addr2, and addr3 in struct
+> rtllib_hdr_4addr, and members qui, qui_type, qui_subtype, version,
+> and ac_info in struct rtllib_qos_information_element, so they can be
+> referenced together. This will allow memcpy() and sizeof() to more easily
+> reason about sizes, improve readability, and avoid future warnings about
+> writing beyond the end of addr1 and qui.
+> 
+> "pahole" shows no size nor member offset changes to struct
+> rtllib_hdr_4addr nor struct rtllib_qos_information_element. "objdump -d"
+> shows no meaningful object code changes (i.e. only source line number
+> induced differences and optimizations).
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  drivers/staging/rtl8192e/rtllib.h            | 20 ++++++++++++--------
+>  drivers/staging/rtl8192e/rtllib_crypt_ccmp.c |  3 ++-
+>  drivers/staging/rtl8192e/rtllib_rx.c         |  8 ++++----
+>  3 files changed, 18 insertions(+), 13 deletions(-)
 
-this looks good to me:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
