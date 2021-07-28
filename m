@@ -2,178 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6E3C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8484FC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:24:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87D4360F02
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:03:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66A0C60F91
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 01:24:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234568AbhG1BDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jul 2021 21:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53180 "EHLO
+        id S232786AbhG1BYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jul 2021 21:24:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234074AbhG1BDf (ORCPT
+        with ESMTP id S232464AbhG1BYW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jul 2021 21:03:35 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB53C061757
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:03:34 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id g11so204476qts.11
-        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:03:34 -0700 (PDT)
+        Tue, 27 Jul 2021 21:24:22 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B095C061760
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:24:22 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id n10so730024plf.4
+        for <linux-block@vger.kernel.org>; Tue, 27 Jul 2021 18:24:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KT3o/Erj+/ChZGrzGtFf7TbyOqNkjzbuWFwi+YRAS58=;
-        b=hRZkPga+k++EkMHqQsorpTi7alB754B3iwaBNQ41Qz8MYKBAnW9lX99VlTYIIzVA6j
-         4cwo57sOU7g+u/fGjwozktUxnT8j2tM0efgZBLnwbZ4DfHLIzImK6Ig4i/5wGTtWayUF
-         NhxDkjkotgAm+aTTAzVrKXKIlVLO2sC7Ws8QY=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=fYGwSTr6ccg+6XJVgKogWtecCYirHUHK2PK/K0gKM7I=;
+        b=ipZjYKlLRwrbxtuaEbJySLZrE8u7necIFXb1T+GQ+cVmi1XjrcxKLDXZWy2ZK1ln5Z
+         iXooQt2But+7PFWRiXjtmkV++D6ajj9Fg7sbnF9wtnnvZqNwkp8Ch+lU0d5EOtnZhoUv
+         9q9MuAR3LULbOMFuOJ/pqVVegIeI/IKFMYd6eJiEyM5ByD70XbjeHc8DkB3cPTyRWx7+
+         29mCUdWCfbwwivxnASAwIRM1cQpKu0JpuLQgkX/Z00JCZ9v4ScdHktnloNe2aV/hb9ug
+         AxsULN0IFDVvZGFLoH64b72xge2eLu8gzcTKq12FzPXSgtGIB0z5pjJtWLbgtndQPObu
+         OzoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KT3o/Erj+/ChZGrzGtFf7TbyOqNkjzbuWFwi+YRAS58=;
-        b=DiZFjsUyeC4gMJdCJUXMiVy8qSb32lWCkPc0Ej9/rbxtSgv0FzLmMzSgNHyqkcCCgs
-         3MQJGWCuDJLhdN+VG+1jLbj2hx4PCYSagys0op1usBuZEWqQq8LNOQpYzkza6/yHPH0w
-         Ps7jRrc3P3wwWlFp0EK6cB2cYbTe9/uCE8+cmkAGB7GxJ5EEus7p92VejmRFYddjDyo2
-         8na1lKNdvCekzWyj0SueXFD3C3EDRP7dONNxCZF72LaINT937TesJPMSg3LyDVtTCP96
-         gnP4syeZ3oL9O3yFoz1g5Aad17bfD4eMF0Xjra7chyb1DB2dl5t7+LdNjxE9OpQPpQ0T
-         AebQ==
-X-Gm-Message-State: AOAM531eehGU6pm8uoG2mIRjYZFBHpwZCwhNySG5PTKFUWJGbuxGeaXp
-        U7JuY5ogoj+SZDu3rVzNSiA4A94FheAX2xMeupenmA==
-X-Google-Smtp-Source: ABdhPJxjmlE5yVh8YlGpJ0U/rLjeeeLuwtccal5EeveFlAkx6Qo+3rxtJO7aKcAii92XQv8UT6eEzvGpQiQfkHuEt+A=
-X-Received: by 2002:ac8:7515:: with SMTP id u21mr3011194qtq.80.1627434213425;
- Tue, 27 Jul 2021 18:03:33 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fYGwSTr6ccg+6XJVgKogWtecCYirHUHK2PK/K0gKM7I=;
+        b=TItNn2xFfElRUpmDcyv5HqQz/YRYpAqoxgZxuzQcn+2GqFYNZd+pK+XgKVHcX/PaeX
+         T+cURxcbUaHuHsqGv2Eitei6+ehvX54Nd5NkqfxPdxvrtK/zueBD/czQ3ak8gy2sIPhW
+         Jw/S5C14Akx4tlm1S6b8EjYDNRMkDbL7kLK7RHj8aqrLIEO7dTOwwf0P23ABmZwErIvM
+         rfxDYz7n3lXHH9ni6GuO2SJifG4ox+W2prLN7Y24jioNXfXYd+CHh5njN+bZBdb/59kU
+         M5Ra5mCpW7A+CVRIH4bF/xbUgn8VuWTjP5lWuC9caNH4yR/z7k1IANQxIAcvREhcI7K0
+         QrYA==
+X-Gm-Message-State: AOAM531Lm2GczPENiSsP6/RPIIbcTtLKrs4hBNGRVXgga3fnf/F4JeqZ
+        Of+8kjKmZwUFtl+MsMqFzwGSSg==
+X-Google-Smtp-Source: ABdhPJw7bwWKM4mz64JpYjWPqii8We0O0thyOnvf/9s8gAnsnp6bNyNqy0I2JPTbxQpaDjEkUqe4ng==
+X-Received: by 2002:aa7:8246:0:b029:39a:1e0a:cd48 with SMTP id e6-20020aa782460000b029039a1e0acd48mr12054588pfn.14.1627435461843;
+        Tue, 27 Jul 2021 18:24:21 -0700 (PDT)
+Received: from [192.168.1.116] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id l10sm4188459pjg.11.2021.07.27.18.24.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jul 2021 18:24:21 -0700 (PDT)
+Subject: Re: Commit d5fd456c88aba4fcf77d35fe38024a8d5c814686 - "loopdev: use
+ LOOP_CONFIG ioctl" broke loop on x86-64 w/ 32 bit userspace
+To:     =?UTF-8?Q?Krzysztof_Ol=c4=99dzki?= <ole@ans.pl>,
+        Sinan Kaya <sinan.kaya@microsoft.com>,
+        Karel Zak <kzak@redhat.com>
+Cc:     util-linux@vger.kernel.org, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <a797f527-4599-e986-a326-4bb141487f2c@ans.pl>
+ <e7f64d43-2a26-e386-b208-5c35d6a56ed4@ans.pl>
+ <7de1bd0b-b8ea-daf0-b677-f92db1c1cdff@ans.pl>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c1c9d728-c4d9-eaf4-63c3-d13b99da3a3d@kernel.dk>
+Date:   Tue, 27 Jul 2021 19:24:18 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210727205855.411487-1-keescook@chromium.org> <20210727205855.411487-7-keescook@chromium.org>
-In-Reply-To: <20210727205855.411487-7-keescook@chromium.org>
-From:   Michael Chan <michael.chan@broadcom.com>
-Date:   Tue, 27 Jul 2021 18:03:22 -0700
-Message-ID: <CACKFLinDc6Y+P8eZ=450yA1nMC7swTURLtcdyiNR=9J6dfFyBg@mail.gmail.com>
-Subject: Re: [PATCH 06/64] bnxt_en: Use struct_group_attr() for memcpy() region
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000036081b05c8248ed0"
+In-Reply-To: <7de1bd0b-b8ea-daf0-b677-f92db1c1cdff@ans.pl>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---00000000000036081b05c8248ed0
-Content-Type: text/plain; charset="UTF-8"
+On 7/27/21 4:56 PM, Krzysztof Olędzki wrote:
+> On 2021-07-27 at 15:39, Krzysztof Olędzki wrote:
+>> On 2021-07-27 at 14:53, Krzysztof Olędzki wrote:
+>>> Hi,
+>>>
+>>> I have a number of (older) systems that are still based on 32 bit
+>>> userspace but are running a relatively modern 64 bit kernel -
+>>> 5.4-stable, where BTW - LOOP_CONFIGURE is not yet available.
+>>>
+>>> I noticed that starting with util-linux-2.37 it is no longer possible to
+>>> mount images using loop:
+>>>
+>>> # mount /usr/install/iso/systemrescue-8.04-amd64.iso /mnt/cdrom
+>>> mount: /mnt/cdrom: failed to setup loop device for
+>>> /usr/install/iso/systemrescue-8.04-amd64.iso.
+>>>
+>>> Reverting d5fd456c88aba4fcf77d35fe38024a8d5c814686 fixes the problem:
+>>>
+>>> /tmp/util-linux-2.37# ./mount
+>>> /usr/install/iso/systemrescue-8.04-amd64.iso /mnt/cdrom
+>>> mount: /mnt/cdrom: WARNING: source write-protected, mounted read-only.
+>>>
+>>> I have not tested if 32 bit kernel + 32 bit userspace is also affected,
+>>> but 64 bit kernel + 64 bit userspace works.
+>>
+>> Some debugging data:
+>>
+>> 30399: loopdev:      CXT: [0xff8d0f98]: using loop-control
+>> 30399: loopdev:      CXT: [0xff8d0f98]: loop0 name assigned
+>> 30399: loopdev:      CXT: [0xff8d0f98]: find_unused by loop-control [rc=0]
+>> 30399: libmount:     LOOP: [0x57cbbcb0]: trying to use /dev/loop0
+>> 30399: loopdev:      CXT: [0xff8d0f98]: set backing file=/usr/install/iso/systemrescue-8.04-amd64.iso
+>> 30399: loopdev:      CXT: [0xff8d0f98]: set flags=4
+>> 30399: loopdev:    SETUP: [0xff8d0f98]: device setup requested
+>> 30399: loopdev:    SETUP: [0xff8d0f98]: backing file open: OK
+>> 30399: loopdev:      CXT: [0xff8d0f98]: open /dev/loop0 [rw]: Success
+>> 30399: loopdev:    SETUP: [0xff8d0f98]: device open: OK
+>> 30399: loopdev:    SETUP: [0xff8d0f98]: LOOP_CONFIGURE failed: Inappropriate ioctl for device
+>> 30399: loopdev:    SETUP: [0xff8d0f98]: failed [rc=-25]
+>> 30399: libmount:     LOOP: [0x57cbbcb0]: failed to setup device
+>> 30399: loopdev:      CXT: [0xff8d0f98]: de-initialize
+>> 30399: loopdev:      CXT: [0xff8d0f98]: closing old open fd
+>> 30399: loopdev:     ITER: [0xff8d1168]: de-initialize
+>> 30399: libmount:      CXT: [0x57cbbcb0]: mount: preparing failed
+>> 30399: libmount:      CXT: [0x57cbbcb0]: excode: rc=32 message="failed to setup loop device for /usr/install/iso/systemrescue-8.04-amd64.iso"
+>> mount: /mnt/cdrom: failed to setup loop device for /usr/install/iso/systemrescue-8.04-amd64.iso.
+>> 30399: libmount:      CXT: [0x57cbbcb0]: <---- reset [status=0] ---->
+>>
+>> Seems like the code expects EINVAL (-22) but gets ENOTTY (-25), confirmed with strace:
+>> ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/install/iso/systemrescue-8.04-amd64.iso", ...}}) = -1 ENOTTY (Inappropriate ioctl for device)
+>>
+>> Indeed, changing the code from:
+>>     if (errno != EINVAL)
+>> to:
+>>     if (errno != EINVAL && errno != ENOTTY)
+>> allows it to work.
+>>
+>> Not that with 64-bit userspace, kernel returns EINVAL:
+>>
+>> ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/src/PACKAGES/systemrescue-8.04-amd64.iso", ...}}) = -1 EINVAL (Invalid argument)
+> 
+> ... which is because lo_compat_ioctl returns -ENOIOCTLCMD for 
+> unsupported cmds, while lo_ioctl returns -EINVAL via lo_simple_ioctl.
+> 
+> And vfs_ioctl returns -ENOTTY for -ENOIOCTLCMD.
+> 
+> Now the question is if this inconsistency is intended? :)
 
-On Tue, Jul 27, 2021 at 2:01 PM Kees Cook <keescook@chromium.org> wrote:
->
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memcpy(), memmove(), and memset(), avoid
-> intentionally writing across neighboring fields.
->
-> Use struct_group() around members queue_id, min_bw, max_bw, tsa, pri_lvl,
-> and bw_weight so they can be referenced together. This will allow memcpy()
-> and sizeof() to more easily reason about sizes, improve readability,
-> and avoid future warnings about writing beyond the end of queue_id.
->
-> "pahole" shows no size nor member offset changes to struct bnxt_cos2bw_cfg.
-> "objdump -d" shows no meaningful object code changes (i.e. only source
-> line number induced differences and optimizations).
->
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+That's unfortunate, but probably not something that can get corrected at
+this time. The correct return value for an unknown ioctl is -ENOTTY
+(ENOIOCTLCMD isn't user visible, should get turned into that). But
+current behavior is set in stone at this point, even if it is
+technically incorrect.
 
-Thanks.
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+-- 
+Jens Axboe
 
---00000000000036081b05c8248ed0
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBUwwggQ0oAMCAQICDBB5T5jqFt6c/NEwmzANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMTAyMjIxNDE0MTRaFw0yMjA5MjIxNDQzNDhaMIGO
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
-ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-ggEBANtwBQrLJBrTcbQ1kmjdo+NJT2hFaBFsw1IOi34uVzWz21AZUqQkNVktkT740rYuB1m1No7W
-EBvfLuKxbgQO2pHk9mTUiTHsrX2CHIw835Du8Co2jEuIqAsocz53NwYmk4Sj0/HqAfxgtHEleK2l
-CR56TX8FjvCKYDsIsXIjMzm3M7apx8CQWT6DxwfrDBu607V6LkfuHp2/BZM2GvIiWqy2soKnUqjx
-xV4Em+0wQoEIR2kPG6yiZNtUK0tNCaZejYU/Mf/bzdKSwud3pLgHV8ls83y2OU/ha9xgJMLpRswv
-xucFCxMsPmk0yoVmpbr92kIpLm+TomNZsL++LcDRa2ECAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUz2bMvqtXpXM0u3vAvRkalz60
-CjswDQYJKoZIhvcNAQELBQADggEBAGUgeqqI/q2pkETeLr6oS7nnm1bkeNmtnJ2bnybNO/RdrbPj
-DHVSiDCCrWr6xrc+q6OiZDKm0Ieq6BN+Wfr8h5mCkZMUdJikI85WcQTRk6EEF2lzIiaULmFD7U15
-FSWQptLx+kiu63idTII4r3k/7+dJ5AhLRr4WCoXEme2GZkfSbYC3fEL46tb1w7w+25OEFCv1MtDZ
-1CHkODrS2JGwDQxXKmyF64MhJiOutWHmqoGmLJVz1jnDvClsYtgT4zcNtoqKtjpWDYAefncWDPIQ
-DauX1eWVM+KepL7zoSNzVbTipc65WuZFLR8ngOwkpknqvS9n/nKd885m23oIocC+GA4xggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwQeU+Y6hbenPzRMJsw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAytmRVs3iqumAGYPxtXBXNDPjf2yXEt
-NItAzRh0/A93MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIxMDcy
-ODAxMDMzM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQDbA729KptGpP+Nuqj8l5Ge0wUTJoac1/fcEa24ANVLeiYZbK8O
-ZDbNWnvAZ2x+faY3zejhYQQOOa03PBWZJ6Pdzh1oBsfN82DyN0vemF51ADwVKZh416Zo3d4htVzd
-RXCkH5Y345ZCaaNnYNQ4pNNGTMtzzsZa1gmitKBccg5WH5LrruzMzv6uEJaPIGlialvNXfNUZnc6
-lrO2ZhH+E+l05NLUHipaHv2z/HFr8Z/NTTqthHP+wjmbi0TTtCpFUQc5tf5zZVc7HoITwGuj2/bD
-OJwZGNS1ArPflol7zJnVk4MqRvALwKWTHMmF8iPFuj4pI95ls14ipsVfYhgWhYY6
---00000000000036081b05c8248ed0--
