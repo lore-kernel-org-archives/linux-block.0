@@ -2,120 +2,282 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50970C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 08:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49314C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:01:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3828C60FC0
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 08:37:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31EB960FC4
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jul 2021 09:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235333AbhG1Ihq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 04:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42234 "EHLO
+        id S235068AbhG1JBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 05:01:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235296AbhG1Ihp (ORCPT
+        with ESMTP id S229574AbhG1JBr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 04:37:45 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88044C061757
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 01:37:44 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id m19so887566wms.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 01:37:44 -0700 (PDT)
+        Wed, 28 Jul 2021 05:01:47 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1546AC061757;
+        Wed, 28 Jul 2021 02:01:45 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id m1so4164163pjv.2;
+        Wed, 28 Jul 2021 02:01:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=A1L2Jchg5OdnAOILbniN0YQs16Gjlig7fJyJCi+ceF0=;
-        b=slIDqxr9tZF1ghtwdCP2dadIaZSajmfMRp32wytrsrBngMSJAekeqieJuplB844Hm0
-         zL17g6cUv/tUOUtpiUMhZjrTghxTvuqYHip1N4hbaFcaFN5VxdRG/+mmW5BCG6fkyUGU
-         FdlqwAEcidBmczln7ulpep2aEng7jZd+vpyVxrQ/mqTVk4Lyxmk0N4+GTkkUiF+TIzWY
-         u/jP585y22NmxESq+2UsJgPxjdYwGZBbrRhsug7FOm/AhSdFx4meahCD/9Tuymm1a7zx
-         Q23GtdWq3wKNU2w7JsEEHXG3YEL3aX5RaM4l4y9EweNNiK5vMjxLJ39MQEBv7/QSSy66
-         H5xA==
+        h=from:to:cc:subject:date:message-id;
+        bh=4bqdWbPwSD8rwbkHQdBKMTQMEN6QzdUaiSUT4bqLYMQ=;
+        b=mBpE+ddlhyDWoSY5jwg3MaoIXgwFrSGr6qK9qvsa3MSmUvzPv7bKBlmE08+oFkSOo8
+         dzeF2PrgktVn8D2JETDKhnhwU8+ownGLOpRBEkrS4LDj09zkoqZ7F9JAAKpGnOXvTLKO
+         yjTopeT9+TNx6tlbQGbMqUAtySHIDDF4wkI7tPc71ldSU8hL9x+srxHZTfRMjgiJBHdJ
+         wCbAq41Ud6H1dlff0n4/RvqqED1AIYHX/yf7ZLwHn4PC8ucOjT4v5wR05uT8lWbp6qed
+         E5kdJjwpI4NzKmlItbDu38n8DYxIkzFMR1IDNmqPy10kviqzn8p/Mjwz0vDQjlEcz1Ae
+         0Zcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=A1L2Jchg5OdnAOILbniN0YQs16Gjlig7fJyJCi+ceF0=;
-        b=eh/B00k0IgzSPJdD0IngI5rzSvYJe5hUlsFou75YJ1ejeOwRf9XDYwqLtm/XN3s/qK
-         vZ5oVuGIFz64FFnrnpRuxVI0e5m3cjTZFkMRRU0p/38LDqiPskX+jq/m6Rus/null8cW
-         lWweRTdi1qITOZ/orcGNQ9Puy+L1tLiWZADPOBrV2wieJYX5ec8wnkPPFP3Zc+xDOf6g
-         py2pR8CV9FotomICepI9g8XI/gtzEurIIpts4JXkP124NGK3yIIyBPnqFq82LGHRfPck
-         QqGhSD29D8egDfVdTGd1Qbjr+kJErFIpY6S3gayRN1HcNMJ/5uc5QMolZZwJSwBMmD3e
-         Iv7A==
-X-Gm-Message-State: AOAM532SH8MW1ozcSDto50DHWaSKW1I9QO6AZ5KUFSVJ+7mX9cnXh0Ac
-        Qxg1DGUaeojdtlIhEPJBOl2aNo2DLGw=
-X-Google-Smtp-Source: ABdhPJzAA5mCJ7kdYgSW/P7puft4HReSjV75uDDD8Jty59N9zXYfieg1muOkeW/1Jok3hSGNcwimwA==
-X-Received: by 2002:a1c:a510:: with SMTP id o16mr8127946wme.162.1627461463178;
-        Wed, 28 Jul 2021 01:37:43 -0700 (PDT)
-Received: from [172.22.36.87] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
-        by smtp.gmail.com with ESMTPSA id h8sm4845588wmb.35.2021.07.28.01.37.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 01:37:42 -0700 (PDT)
-Subject: Re: [dm-devel] use regular gendisk registration in device mapper
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-References: <20210725055458.29008-1-hch@lst.de> <YQAtNkd8T1w/cSLc@redhat.com>
- <20210727160226.GA17989@lst.de> <YQAxyjrGJpl7UkNG@redhat.com>
- <9c719e1d-f8da-f1f3-57a9-3802aa1312d4@gmail.com>
- <20210728070655.GA5086@lst.de>
-From:   Milan Broz <gmazyland@gmail.com>
-Message-ID: <9e668239-78cc-55ad-8998-b7e39f573c34@gmail.com>
-Date:   Wed, 28 Jul 2021 10:37:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
-MIME-Version: 1.0
-In-Reply-To: <20210728070655.GA5086@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=4bqdWbPwSD8rwbkHQdBKMTQMEN6QzdUaiSUT4bqLYMQ=;
+        b=cIWKn+p9FV7FPlrMilF/W3Hw4+Vct+fXJhRiJQu3JWy62bzLXpiSpeQ2R2bAhmQKon
+         5GQB7bPhRHpnCatAUgametqUuWRql8hbN14RqMvh2OK8ALyg1oeuM02ogCbgpeBnegAF
+         xO3tygi9C16IhV/qFAvisJwXVtrGprJHC82+sf0qDJ5IHYiafFfNSPPuKDVJh38hghI9
+         iLG3DFQomu13dRFzraKT8eWMFnzAYg3vntFadiUpt7/GGTqW8sUllHwwzTG1jT3S128+
+         3t+HriyQgyBAsyh2Xi8KuxmDB30wLIPhVIVDrCDJzLhCYBxwYhlJ25y9ulTIwE0A9ejM
+         0Rlw==
+X-Gm-Message-State: AOAM530XnBV/1PeWldJrBvkRV1Phwdj/Jw3Mmd8GVOpDQZ0aB0SNrHSP
+        sNmRFr+wC6jCtQY5Km0lA0s=
+X-Google-Smtp-Source: ABdhPJz/6eeBGcEQNkvW54JfVd0WnGBFsSa7/F4BJnb4nuwqpC85pweT1WZkIv66WUioJhi9ZYYn1w==
+X-Received: by 2002:a63:1a12:: with SMTP id a18mr27653069pga.269.1627462904637;
+        Wed, 28 Jul 2021 02:01:44 -0700 (PDT)
+Received: from VM-0-3-centos.localdomain ([101.32.213.191])
+        by smtp.gmail.com with ESMTPSA id 85sm6553434pfz.76.2021.07.28.02.01.43
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 28 Jul 2021 02:01:44 -0700 (PDT)
+From:   brookxu <brookxu.cn@gmail.com>
+To:     axboe@kernel.dk, tj@kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org
+Subject: [PATCH v2] blk-throtl: optimize IOPS throttle for large IO scenarios
+Date:   Wed, 28 Jul 2021 17:01:41 +0800
+Message-Id: <40915233274d31bb0659ff9f3be8900a5a0e81ba.1627462548.git.brookxu@tencent.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/07/2021 09:06, Christoph Hellwig wrote:
-> On Tue, Jul 27, 2021 at 10:38:16PM +0200, Milan Broz wrote:
->> BTW it would be also nice to run cryptsetup testsuite as root - we do a lot
->> of DM operations there (and we depend on sysfs on some places).
-> 
-> It already doesn't seem very happy in current mainline for me:
-> 
-> =======================
-> 13 of 17 tests failed
-> (12 tests were not run)
-> =======================
-> 
-> but this series doesn't seem to change anything.
-> 
-> A lot of the not run tests seem to be due to broken assumptions
-> that some code must be modular.  E.g. my kernel has scsi_debug built
-> in, but it complains like this:
-> 
-> modprobe: ERROR: ../libkmod/libkmod.c:586 kmod_search_moddep() could not open moddep file '/lib/module'
-> modprobe: FATAL: Module scsi_debug not found in directory /lib/modules/5.14.0-rc3+
+From: Chunguang Xu <brookxu@tencent.com>
 
-Hi,
+After patch 54efd50 (block: make generic_make_request handle
+arbitrarily sized bios), the IO through io-throttle may be larger,
+and these IOs may be further split into more small IOs. However,
+IOPS throttle does not seem to be aware of this change, which
+makes the calculation of IOPS of large IOs incomplete, resulting
+in disk-side IOPS that does not meet expectations. Maybe we should
+fix this problem.
 
-there should not be many assumptions, but yes, we depend on modular scsi_debug in some tests because we simulate
-very specific hw attributes. So you have one emulated device compiled-in?
+We can reproduce it by set max_sectors_kb of disk to 128, set
+blkio.write_iops_throttle to 100, run a dd instance inside blkio
+and use iostat to watch IOPS:
 
-Or there is another way how to configure scsi_debug if compiled-in? (we use module parameters, I think it is
-the same was how util-linux testsute works with scsi_debug).
+dd if=/dev/zero of=/dev/sdb bs=1M count=1000 oflag=direct
 
-Anyway, this is a bug, tests should be skipped (the same way if scsi_debug is not available).
+As a result, without this change the average IOPS is 1995, with
+this change the IOPS is 98.
 
-I forgot to say - there is a list of packages that should be installed for make check mentioned
-in README.md - I guess this was the reason some other tests were skipped.
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+---
+ block/blk-merge.c    |  2 ++
+ block/blk-throttle.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ block/blk.h          |  2 ++
+ 3 files changed, 64 insertions(+), 6 deletions(-)
 
-(BTW could you send me output of the failed test run? I run it over Linus' tree and ti works so it is perhaps another
-assumption that should be fixed.)
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a11b3b5..86ff943 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+ 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+ 		submit_bio_noacct(*bio);
+ 		*bio = split;
++
++		blk_throtl_recharge_bio(*bio);
+ 	}
+ }
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index b1b22d8..a0daa15 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -178,6 +178,9 @@ struct throtl_grp {
+ 	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
+ 	unsigned long bio_cnt_reset_time;
+ 
++	atomic_t io_split_cnt[2];
++	atomic_t last_io_split_cnt[2];
++
+ 	struct blkg_rwstat stat_bytes;
+ 	struct blkg_rwstat stat_ios;
+ };
+@@ -293,6 +296,16 @@ static uint64_t throtl_adjusted_limit(uint64_t low, struct throtl_data *td)
+ 	return low + (low >> 1) * td->scale;
+ }
+ 
++static inline unsigned int tg_io_disp(struct throtl_grp *tg, int rw)
++{
++	return tg->io_disp[rw] + atomic_read(&tg->io_split_cnt[rw]);
++}
++
++static inline unsigned int tg_last_io_disp(struct throtl_grp *tg, int rw)
++{
++	return tg->last_io_disp[rw] + atomic_read(&tg->last_io_split_cnt[rw]);
++}
++
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
+@@ -524,6 +537,11 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
+ 	tg->idletime_threshold = DFL_IDLE_THRESHOLD;
+ 	tg->idletime_threshold_conf = DFL_IDLE_THRESHOLD;
+ 
++	atomic_set(&tg->io_split_cnt[0], 0);
++	atomic_set(&tg->io_split_cnt[1], 0);
++	atomic_set(&tg->last_io_split_cnt[0], 0);
++	atomic_set(&tg->last_io_split_cnt[1], 0);
++
+ 	return &tg->pd;
+ 
+ err_exit_stat_bytes:
+@@ -777,6 +795,8 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
+ 	tg->bytes_disp[rw] = 0;
+ 	tg->io_disp[rw] = 0;
+ 
++	atomic_set(&tg->io_split_cnt[rw], 0);
++
+ 	/*
+ 	 * Previous slice has expired. We must have trimmed it after last
+ 	 * bio dispatch. That means since start of last slice, we never used
+@@ -799,6 +819,9 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
+ 	tg->io_disp[rw] = 0;
+ 	tg->slice_start[rw] = jiffies;
+ 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
++
++	atomic_set(&tg->io_split_cnt[rw], 0);
++
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
+ 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
+@@ -877,10 +900,19 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 	else
+ 		tg->bytes_disp[rw] = 0;
+ 
+-	if (tg->io_disp[rw] >= io_trim)
++	if (tg_io_disp(tg, rw) >= io_trim) {
++		int cnt = atomic_read(&tg->io_split_cnt[rw]);
++
++		if (cnt) {
++			atomic_set(&tg->io_split_cnt[rw], 0);
++			tg->io_disp[rw] += cnt;
++		}
++
+ 		tg->io_disp[rw] -= io_trim;
+-	else
++	} else {
++		atomic_set(&tg->io_split_cnt[rw], 0);
+ 		tg->io_disp[rw] = 0;
++	}
+ 
+ 	tg->slice_start[rw] += nr_slices * tg->td->throtl_slice;
+ 
+@@ -924,7 +956,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 	else
+ 		io_allowed = tmp;
+ 
+-	if (tg->io_disp[rw] + 1 <= io_allowed) {
++	if (tg_io_disp(tg, rw) + 1 <= io_allowed) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -2052,13 +2084,13 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
+ 	}
+ 
+ 	if (tg->iops[READ][LIMIT_LOW]) {
+-		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
++		iops = tg_last_io_disp(tg, READ) * HZ / elapsed_time;
+ 		if (iops >= tg->iops[READ][LIMIT_LOW])
+ 			tg->last_low_overflow_time[READ] = now;
+ 	}
+ 
+ 	if (tg->iops[WRITE][LIMIT_LOW]) {
+-		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
++		iops = tg_last_io_disp(tg, WRITE) * HZ / elapsed_time;
+ 		if (iops >= tg->iops[WRITE][LIMIT_LOW])
+ 			tg->last_low_overflow_time[WRITE] = now;
+ 	}
+@@ -2074,6 +2106,9 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
+ 	tg->last_bytes_disp[WRITE] = 0;
+ 	tg->last_io_disp[READ] = 0;
+ 	tg->last_io_disp[WRITE] = 0;
++
++	atomic_set(&tg->last_io_split_cnt[READ], 0);
++	atomic_set(&tg->last_io_split_cnt[WRITE], 0);
+ }
+ 
+ static void blk_throtl_update_idletime(struct throtl_grp *tg)
+@@ -2176,6 +2211,25 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ }
+ #endif
+ 
++void blk_throtl_recharge_bio(struct bio *bio)
++{
++	struct blkcg_gq *blkg = bio->bi_blkg;
++	struct throtl_grp *parent = blkg_to_tg(blkg);
++	struct throtl_service_queue *parent_sq;
++	bool rw = bio_data_dir(bio);
++
++	if (!parent->has_rules[rw])
++		return;
++
++	do {
++		atomic_inc(&parent->io_split_cnt[rw]);
++		atomic_inc(&parent->last_io_split_cnt[rw]);
++
++		parent_sq = parent->service_queue.parent_sq;
++		parent = sq_to_tg(parent_sq);
++	} while (parent);
++}
++
+ bool blk_throtl_bio(struct bio *bio)
+ {
+ 	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+@@ -2263,7 +2317,7 @@ bool blk_throtl_bio(struct bio *bio)
+ 		   rw == READ ? 'R' : 'W',
+ 		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
+ 		   tg_bps_limit(tg, rw),
+-		   tg->io_disp[rw], tg_iops_limit(tg, rw),
++		   tg_io_disp(tg, rw), tg_iops_limit(tg, rw),
+ 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
+ 
+ 	tg->last_low_overflow_time[rw] = jiffies;
+diff --git a/block/blk.h b/block/blk.h
+index 4b885c0..9e925bf 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -293,11 +293,13 @@ struct io_cq *ioc_create_icq(struct io_context *ioc, struct request_queue *q,
+ extern int blk_throtl_init(struct request_queue *q);
+ extern void blk_throtl_exit(struct request_queue *q);
+ extern void blk_throtl_register_queue(struct request_queue *q);
++extern void blk_throtl_recharge_bio(struct bio *bio);
+ bool blk_throtl_bio(struct bio *bio);
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
+ static inline void blk_throtl_exit(struct request_queue *q) { }
+ static inline void blk_throtl_register_queue(struct request_queue *q) { }
++static inline void blk_throtl_recharge_bio(struct bio *bio) { }
+ static inline bool blk_throtl_bio(struct bio *bio) { return false; }
+ #endif /* CONFIG_BLK_DEV_THROTTLING */
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-- 
+1.8.3.1
 
-Thanks,
-Milan
