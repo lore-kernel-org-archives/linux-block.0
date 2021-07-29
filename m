@@ -2,63 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB7DC4320A
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 05:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14696C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 05:56:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3617461055
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 05:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1A6F60E09
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 05:56:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233739AbhG2Fyb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 01:54:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59376 "EHLO mail.kernel.org"
+        id S233899AbhG2F4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 01:56:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60002 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230223AbhG2Fyb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 01:54:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3D67A61053;
-        Thu, 29 Jul 2021 05:54:28 +0000 (UTC)
+        id S230223AbhG2F4f (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jul 2021 01:56:35 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 854FE61042;
+        Thu, 29 Jul 2021 05:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627538068;
-        bh=rAXscKZrW+2+4LGOnZPqFBsItZBqoTEh6dVWtmRtH2s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ppnf4cw4XG1iifQPDU9vTPsziBWEDfVakd1QzjJc7424WDvwxsarkQXBOSne6lZRX
-         2LQTRfGte1ePbPnsuRNFBOPAGjCLDiW4aH1lspDeN3kcY1w1XQsvo64fyIaE7AJJzN
-         hwQs8Gu2qqMdH6i2S4aDJtFdcovWFMFhZeSx/Iw0=
-Date:   Thu, 29 Jul 2021 07:54:23 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org, pavel@ucw.cz,
-        kernelnewbies@kernelnewbies.org
-Subject: Re: [RFC PATCH 4/8] block: Add block class attributes to manage LED
- trigger list
-Message-ID: <YQJCj/LjjCqb93AS@kroah.com>
-References: <20210729015344.3366750-1-arequipeno@gmail.com>
- <20210729015344.3366750-5-arequipeno@gmail.com>
+        s=korg; t=1627538193;
+        bh=+SNXxGgtyfvtJSvpFlcjUjBSnYextIMvu3GnqLmisRg=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=WQfdXRaghOLXCT8ymhifuJr8DNZEffe/G+jLc+ym/fXkJttIe2razGZt7Ai/Dskty
+         mp3udIEdjRafAUq7M7ZSvFzqobaUKbRu4cTixJR2sqnNvPfj21h714N12Mk/LFXudD
+         9+NsLn4X8zeIrXPdueqCEyuN7a+iOiimS257+kK8=
+Date:   Thu, 29 Jul 2021 07:56:27 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     dsterba@suse.cz, Bart Van Assche <bvanassche@acm.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Kees Cook <keescook@chromium.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        nborisov@suse.com
+Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy()
+ region
+Message-ID: <YQJDCw01gSp1d1/M@kroah.com>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-2-keescook@chromium.org>
+ <20210728085921.GV5047@twin.jikos.cz>
+ <20210728091434.GQ1931@kadam>
+ <c52a52d9-a9e0-5020-80fe-4aada39035d3@acm.org>
+ <20210728213730.GR5047@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210729015344.3366750-5-arequipeno@gmail.com>
+In-Reply-To: <20210728213730.GR5047@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 08:53:40PM -0500, Ian Pilcher wrote:
-> * New class attributes - /sys/class/block/led_trigger_{new,list,del}
+On Wed, Jul 28, 2021 at 11:37:30PM +0200, David Sterba wrote:
+> On Wed, Jul 28, 2021 at 02:37:20PM -0700, Bart Van Assche wrote:
+> > On 7/28/21 2:14 AM, Dan Carpenter wrote:
+> > > On Wed, Jul 28, 2021 at 10:59:22AM +0200, David Sterba wrote:
+> > >>>   drivers/media/platform/omap3isp/ispstat.c |  5 +--
+> > >>>   include/uapi/linux/omap3isp.h             | 44 +++++++++++++++++------
+> > >>>   2 files changed, 36 insertions(+), 13 deletions(-)
+> > >>>
+> > >>> diff --git a/drivers/media/platform/omap3isp/ispstat.c b/drivers/media/platform/omap3isp/ispstat.c
+> > >>> index 5b9b57f4d9bf..ea8222fed38e 100644
+> > >>> --- a/drivers/media/platform/omap3isp/ispstat.c
+> > >>> +++ b/drivers/media/platform/omap3isp/ispstat.c
+> > >>> @@ -512,7 +512,7 @@ int omap3isp_stat_request_statistics(struct ispstat *stat,
+> > >>>   int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
+> > >>>   					struct omap3isp_stat_data_time32 *data)
+> > >>>   {
+> > >>> -	struct omap3isp_stat_data data64;
+> > >>> +	struct omap3isp_stat_data data64 = { };
+> > >>
+> > >> Should this be { 0 } ?
+> > >>
+> > >> We've seen patches trying to switch from { 0 } to {  } but the answer
+> > >> was that { 0 } is supposed to be used,
+> > >> http://www.ex-parrot.com/~chris/random/initialise.html
+> > >>
+> > >> (from https://lore.kernel.org/lkml/fbddb15a-6e46-3f21-23ba-b18f66e3448a@suse.com/)
+> > > 
+> > > In the kernel we don't care about portability so much.  Use the = { }
+> > > GCC extension.  If the first member of the struct is a pointer then
+> > > Sparse will complain about = { 0 }.
+> > 
+> > +1 for { }.
 > 
-> * Add init function - blk_ledtrig_init() - to create the attributes
->   in sysfs.  Call blk_ledtrig_init() from genhd_device_init() (in
->   block/genhd.c).
+> Oh, I thought the tendency is is to use { 0 } because that can also
+> intialize the compound members, by a "scalar 0" as it appears in the
+> code.
 > 
-> * New file - block/blk-ledtrig.h
 
-That is an odd way to write a changelog, please read the documentation
-file about how to write a good changelog.
+Holes in the structure might not be initialized to anything if you do
+either one of these as well.
 
-thanks,
+Or did we finally prove that is not the case?  I can not remember
+anymore...
 
 greg k-h
