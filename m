@@ -2,122 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D4FC432BE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA7BC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 19:14:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 837D360F5C
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:58:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59EE060F5C
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 19:14:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbhG2S67 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 14:58:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54186 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229713AbhG2S66 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 14:58:58 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7D1F9600D4;
-        Thu, 29 Jul 2021 18:58:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627585135;
-        bh=NY+6KsF6TgwvjW8V2qdlD2zqaxdlHCFW8WbLHI1uw44=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=QwbKTXNKGQlFHhv+nWwVAGS0y7dhrRo4QVZVXmOtNRN5nEqtsizCnwgYVL71jdemC
-         NN4LRUz2GWMm7y5nxjYEDLhzAkGKRRgwxxSk0RtIMXokH62NJ6mpGF6A4PMG9LR/dk
-         TFkkqH24xr7RZti78Lg43eSuDbQW/o4UTfuxqASt48qIZ7hGRVSrrGAHfGoGqApQr4
-         fe/qqMg9s0eu93lcxSA+fP7WwiK2Zm7316Nw0lTenmESdj7Qq2k4auX+VlqVjOzIyH
-         tJgu8hsfbG/DoN1PkOib/PnMN36fOPMKqtasZoBoWlwaNtiGVNPNof0RnW7kK1gS1x
-         /NEEryLj0coQw==
-Date:   Thu, 29 Jul 2021 11:58:50 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 54/64] ipv6: Use struct_group() to zero rt6_info
-Message-ID: <20210729115850.7f913c73@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20210727205855.411487-55-keescook@chromium.org>
-References: <20210727205855.411487-1-keescook@chromium.org>
-        <20210727205855.411487-55-keescook@chromium.org>
+        id S230056AbhG2TOa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 15:14:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47258 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229713AbhG2TOa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jul 2021 15:14:30 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B17C061765;
+        Thu, 29 Jul 2021 12:14:26 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id a19so9825170oiw.6;
+        Thu, 29 Jul 2021 12:14:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=dq8X3bwjz9sqqkCm4+HA7qd+/0ngQHwPeVfx2qkB81Y=;
+        b=u7xirmmJ5Hy56G/uAPI+A466Nr7diM5GyE+1ndVRveWCT+/AqYEJkZElxwouvwZghk
+         5bRcYRaZU45Ju6dULijh7wlAuCJ5cMxvBCH3+yY6Dqj5XqMRNXGzmjMio6VPJyWQ3DtZ
+         vg2ZBLJaAj6eSKqNpbzQCX9zYIqAY3UgvHnI3e/BTyz7+t5futV9yKOfpqHK5FUOhzuD
+         vTr2QNFcrRxd+sJojLuUqu2X1m4ulqJOIrAMLZQJGUgScsZd/Ko+UpGjPh7eIVte4EQC
+         73ocH3w+50kPf8eUfuDyCt/V1forChgqL7goG3MVX9032oC5Wsr7IDsNaoLBHP+GXTwD
+         jUVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dq8X3bwjz9sqqkCm4+HA7qd+/0ngQHwPeVfx2qkB81Y=;
+        b=puujQ/UMp+jbBclZbW1qUrcoSuJ1e6DVPz7xvg+X4jcSMKQc3cDYWKeQoBvLaH3qGE
+         BEU1ebwOnaER6r6Joe/3nlfqCRVb5PY0z/CJpS8C5aXogIJspC047tzL8zoaew2NWmgg
+         +qH/VzVTlv6GHPy+wNPQ8LyrIioaLx873wamCrdFahh6a5RA1KdJTwmHquk0WfRtyOt+
+         zLyCJBs6Pp5rMoaviFIq/Tg9DqGAenu3XxVcx7QhIu8LcOE0GD4Bj4Ily0Pgy/d/hVD2
+         tV1uQx+XzL1SaouV141g6hoeOeoKuK+yQst1RJRrRcUNiVkYs7MWxqO4/f3k9kV7L3eh
+         Hv2w==
+X-Gm-Message-State: AOAM533iM9gxQGVt/oRXPwS0EiqBn/fILW6K5HVyTe9E+B/XMaeuHlV2
+        jQNwPy8eq9WtGHmtq9a18Ia6tRLPiIfWS2zn
+X-Google-Smtp-Source: ABdhPJyLfO/2HRJ0hVZIubo0kNuxVp9XStJqQnD4Zcl+AKZnqEkafj1F3lsi2V1UPF1a/smFr39hPA==
+X-Received: by 2002:a54:468d:: with SMTP id k13mr11095578oic.125.1627586066226;
+        Thu, 29 Jul 2021 12:14:26 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id z6sm761213oiz.39.2021.07.29.12.14.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jul 2021 12:14:25 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/8] Add configurable block device LED triggers
+To:     Pavel Machek <pavel@ucw.cz>
+Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org,
+        =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>
+References: <20210729015344.3366750-1-arequipeno@gmail.com>
+ <20210729085413.GA16945@amd> <b108799e-24a2-d5ec-e18e-b7ae8bded085@gmail.com>
+ <20210729183541.GA6772@duo.ucw.cz>
+From:   Ian Pilcher <arequipeno@gmail.com>
+Message-ID: <7a353c64-a81f-a149-9541-ef328a197761@gmail.com>
+Date:   Thu, 29 Jul 2021 14:14:24 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210729183541.GA6772@duo.ucw.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 27 Jul 2021 13:58:45 -0700 Kees Cook wrote:
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memset(), avoid intentionally writing across
-> neighboring fields.
-> 
-> Add struct_group() to mark region of struct rt6_info that should be
-> initialized to zero.
+On 7/29/21 1:35 PM, Pavel Machek wrote:
+> Yes, and I'd like to have that functionality, but I believe userland
+> API should be similar to what we do elsewhere. Marek described it in
+> more details.
 
-memset_after() ?
+On 7/29/21 6:59 AM, Marek Behún wrote:
+...
+ > - only one trigger, with name "blkdev"
 
-> diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-> index 15b7fbe6b15c..9816e7444918 100644
-> --- a/include/net/ip6_fib.h
-> +++ b/include/net/ip6_fib.h
-> @@ -205,20 +205,22 @@ struct fib6_info {
->  
->  struct rt6_info {
->  	struct dst_entry		dst;
-> -	struct fib6_info __rcu		*from;
-> -	int				sernum;
-> -
-> -	struct rt6key			rt6i_dst;
-> -	struct rt6key			rt6i_src;
-> -	struct in6_addr			rt6i_gateway;
-> -	struct inet6_dev		*rt6i_idev;
-> -	u32				rt6i_flags;
-> -
-> -	struct list_head		rt6i_uncached;
-> -	struct uncached_list		*rt6i_uncached_list;
-> -
-> -	/* more non-fragment space at head required */
-> -	unsigned short			rt6i_nfheader_len;
-> +	struct_group(init,
-> +		struct fib6_info __rcu		*from;
-> +		int				sernum;
-> +
-> +		struct rt6key			rt6i_dst;
-> +		struct rt6key			rt6i_src;
-> +		struct in6_addr			rt6i_gateway;
-> +		struct inet6_dev		*rt6i_idev;
-> +		u32				rt6i_flags;
-> +
-> +		struct list_head		rt6i_uncached;
-> +		struct uncached_list		*rt6i_uncached_list;
-> +
-> +		/* more non-fragment space at head required */
-> +		unsigned short			rt6i_nfheader_len;
-> +	);
->  };
->  
->  struct fib6_result {
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 6b8051106aba..bbcc605bab57 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -327,9 +327,7 @@ static const struct rt6_info ip6_blk_hole_entry_template = {
->  
->  static void rt6_info_init(struct rt6_info *rt)
->  {
-> -	struct dst_entry *dst = &rt->dst;
-> -
-> -	memset(dst + 1, 0, sizeof(*rt) - sizeof(*dst));
-> +	memset(&rt->init, 0, sizeof(rt->init));
->  	INIT_LIST_HEAD(&rt->rt6i_uncached);
->  }
->  
+I guess I'm missing something, because I just don't understand how this
+can work for multiple, per-device LEDs.
 
+-- 
+========================================================================
+                  In Soviet Russia, Google searches you!
+========================================================================
