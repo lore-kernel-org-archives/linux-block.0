@@ -2,82 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 483C9C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D4FC432BE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:58:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E1C560F01
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:35:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 837D360F5C
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:58:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230503AbhG2Sfr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 14:35:47 -0400
-Received: from jabberwock.ucw.cz ([46.255.230.98]:36352 "EHLO
-        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229906AbhG2Sfq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 14:35:46 -0400
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id F14121C0B79; Thu, 29 Jul 2021 20:35:41 +0200 (CEST)
-Date:   Thu, 29 Jul 2021 20:35:41 +0200
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        kernelnewbies@kernelnewbies.org
-Subject: Re: [RFC PATCH 0/8] Add configurable block device LED triggers
-Message-ID: <20210729183541.GA6772@duo.ucw.cz>
-References: <20210729015344.3366750-1-arequipeno@gmail.com>
- <20210729085413.GA16945@amd>
- <b108799e-24a2-d5ec-e18e-b7ae8bded085@gmail.com>
+        id S229925AbhG2S67 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 14:58:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54186 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229713AbhG2S66 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jul 2021 14:58:58 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7D1F9600D4;
+        Thu, 29 Jul 2021 18:58:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627585135;
+        bh=NY+6KsF6TgwvjW8V2qdlD2zqaxdlHCFW8WbLHI1uw44=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=QwbKTXNKGQlFHhv+nWwVAGS0y7dhrRo4QVZVXmOtNRN5nEqtsizCnwgYVL71jdemC
+         NN4LRUz2GWMm7y5nxjYEDLhzAkGKRRgwxxSk0RtIMXokH62NJ6mpGF6A4PMG9LR/dk
+         TFkkqH24xr7RZti78Lg43eSuDbQW/o4UTfuxqASt48qIZ7hGRVSrrGAHfGoGqApQr4
+         fe/qqMg9s0eu93lcxSA+fP7WwiK2Zm7316Nw0lTenmESdj7Qq2k4auX+VlqVjOzIyH
+         tJgu8hsfbG/DoN1PkOib/PnMN36fOPMKqtasZoBoWlwaNtiGVNPNof0RnW7kK1gS1x
+         /NEEryLj0coQw==
+Date:   Thu, 29 Jul 2021 11:58:50 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 54/64] ipv6: Use struct_group() to zero rt6_info
+Message-ID: <20210729115850.7f913c73@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20210727205855.411487-55-keescook@chromium.org>
+References: <20210727205855.411487-1-keescook@chromium.org>
+        <20210727205855.411487-55-keescook@chromium.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="tThc/1wpZn/ma/RB"
-Content-Disposition: inline
-In-Reply-To: <b108799e-24a2-d5ec-e18e-b7ae8bded085@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, 27 Jul 2021 13:58:45 -0700 Kees Cook wrote:
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memset(), avoid intentionally writing across
+> neighboring fields.
+> 
+> Add struct_group() to mark region of struct rt6_info that should be
+> initialized to zero.
 
---tThc/1wpZn/ma/RB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+memset_after() ?
 
-On Thu 2021-07-29 12:03:04, Ian Pilcher wrote:
-> On 7/29/21 3:54 AM, Pavel Machek wrote:
-> > We normally have a trigger ("block device activity") which can then
-> > expose parameters ("I watch for read" and "I monitor sda1").
-> >=20
-> > Is there a reason normal solution can not be used?
->=20
-> This big difference is that this allows different devices to drive
-> different LEDs.  For example, my NAS has 5 drive bays, each of which
-> has its own activity LED.  With these patches, I can create a
-> separate trigger for each of those LEDs and associate the drive in each
-> bay with the correct LED:
+> diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+> index 15b7fbe6b15c..9816e7444918 100644
+> --- a/include/net/ip6_fib.h
+> +++ b/include/net/ip6_fib.h
+> @@ -205,20 +205,22 @@ struct fib6_info {
+>  
+>  struct rt6_info {
+>  	struct dst_entry		dst;
+> -	struct fib6_info __rcu		*from;
+> -	int				sernum;
+> -
+> -	struct rt6key			rt6i_dst;
+> -	struct rt6key			rt6i_src;
+> -	struct in6_addr			rt6i_gateway;
+> -	struct inet6_dev		*rt6i_idev;
+> -	u32				rt6i_flags;
+> -
+> -	struct list_head		rt6i_uncached;
+> -	struct uncached_list		*rt6i_uncached_list;
+> -
+> -	/* more non-fragment space at head required */
+> -	unsigned short			rt6i_nfheader_len;
+> +	struct_group(init,
+> +		struct fib6_info __rcu		*from;
+> +		int				sernum;
+> +
+> +		struct rt6key			rt6i_dst;
+> +		struct rt6key			rt6i_src;
+> +		struct in6_addr			rt6i_gateway;
+> +		struct inet6_dev		*rt6i_idev;
+> +		u32				rt6i_flags;
+> +
+> +		struct list_head		rt6i_uncached;
+> +		struct uncached_list		*rt6i_uncached_list;
+> +
+> +		/* more non-fragment space at head required */
+> +		unsigned short			rt6i_nfheader_len;
+> +	);
+>  };
+>  
+>  struct fib6_result {
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index 6b8051106aba..bbcc605bab57 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -327,9 +327,7 @@ static const struct rt6_info ip6_blk_hole_entry_template = {
+>  
+>  static void rt6_info_init(struct rt6_info *rt)
+>  {
+> -	struct dst_entry *dst = &rt->dst;
+> -
+> -	memset(dst + 1, 0, sizeof(*rt) - sizeof(*dst));
+> +	memset(&rt->init, 0, sizeof(rt->init));
+>  	INIT_LIST_HEAD(&rt->rt6i_uncached);
+>  }
+>  
 
-Yes, and I'd like to have that functionality, but I believe userland
-API should be similar to what we do elsewhere. Marek described it in
-more details.
-
-Best regards,
-								Pavel
---=20
-http://www.livejournal.com/~pavelmachek
-
---tThc/1wpZn/ma/RB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCYQL0/QAKCRAw5/Bqldv6
-8mF+AJ0WfDSWeTOfpy+dRFuYGXEO4Bl98gCfWa1EIMy+vpCphwJ2PRXsqEqniOc=
-=foRg
------END PGP SIGNATURE-----
-
---tThc/1wpZn/ma/RB--
