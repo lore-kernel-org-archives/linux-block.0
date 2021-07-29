@@ -2,105 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14696C432BE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 05:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A83C9C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 06:49:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1A6F60E09
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 05:56:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 829AC61053
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 06:49:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233899AbhG2F4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 01:56:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60002 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230223AbhG2F4f (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 01:56:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 854FE61042;
-        Thu, 29 Jul 2021 05:56:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627538193;
-        bh=+SNXxGgtyfvtJSvpFlcjUjBSnYextIMvu3GnqLmisRg=;
-        h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=WQfdXRaghOLXCT8ymhifuJr8DNZEffe/G+jLc+ym/fXkJttIe2razGZt7Ai/Dskty
-         mp3udIEdjRafAUq7M7ZSvFzqobaUKbRu4cTixJR2sqnNvPfj21h714N12Mk/LFXudD
-         9+NsLn4X8zeIrXPdueqCEyuN7a+iOiimS257+kK8=
-Date:   Thu, 29 Jul 2021 07:56:27 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     dsterba@suse.cz, Bart Van Assche <bvanassche@acm.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Kees Cook <keescook@chromium.org>,
-        linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        nborisov@suse.com
-Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy()
- region
-Message-ID: <YQJDCw01gSp1d1/M@kroah.com>
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-2-keescook@chromium.org>
- <20210728085921.GV5047@twin.jikos.cz>
- <20210728091434.GQ1931@kadam>
- <c52a52d9-a9e0-5020-80fe-4aada39035d3@acm.org>
- <20210728213730.GR5047@suse.cz>
+        id S234326AbhG2Gtu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 02:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35806 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234283AbhG2Gtt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jul 2021 02:49:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79365C061757;
+        Wed, 28 Jul 2021 23:49:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=oLa/CMP0SEWh2QjRjiVed2yCZcGeC41TRLsTyHujkxY=; b=lXpK/Lb3tuBCgRBX2qGXZjPy5b
+        ZPS3Sm0Le2+0v+ktx8d2nPis5lqhL5nQUyAkMUrW7ExlsoS0OcU88prGJ0tClaQraj+R0wRHsE1MG
+        E8SK3/eAvNCgt09n+wN5jSBffGa62jqAqwbRhoPs4AeXiJWzSucuhpDlCkqUDw5e3e3ZZbuqJ1ak/
+        rid7Vzd2j2CIz7CzXKS4QBYfO92HzQYGVJbNM6uFtzIGIe5grfU8CQtdk/l7ZkKq1K8VQLqfDNpck
+        LV0uPeGrDECisLpc9c+YFAqO9yuGdHO1qxPxlhW2UQpCT6t+l/0naHCe0ANd3ISeXKMWmVIeOwAKE
+        HuH1j65w==;
+Received: from [2001:4bb8:184:87c5:8c88:c313:79e2:b780] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m8zqb-00Gndz-Ka; Thu, 29 Jul 2021 06:49:04 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: bsg cleanup, part 2
+Date:   Thu, 29 Jul 2021 08:48:41 +0200
+Message-Id: <20210729064845.1044147-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210728213730.GR5047@suse.cz>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 11:37:30PM +0200, David Sterba wrote:
-> On Wed, Jul 28, 2021 at 02:37:20PM -0700, Bart Van Assche wrote:
-> > On 7/28/21 2:14 AM, Dan Carpenter wrote:
-> > > On Wed, Jul 28, 2021 at 10:59:22AM +0200, David Sterba wrote:
-> > >>>   drivers/media/platform/omap3isp/ispstat.c |  5 +--
-> > >>>   include/uapi/linux/omap3isp.h             | 44 +++++++++++++++++------
-> > >>>   2 files changed, 36 insertions(+), 13 deletions(-)
-> > >>>
-> > >>> diff --git a/drivers/media/platform/omap3isp/ispstat.c b/drivers/media/platform/omap3isp/ispstat.c
-> > >>> index 5b9b57f4d9bf..ea8222fed38e 100644
-> > >>> --- a/drivers/media/platform/omap3isp/ispstat.c
-> > >>> +++ b/drivers/media/platform/omap3isp/ispstat.c
-> > >>> @@ -512,7 +512,7 @@ int omap3isp_stat_request_statistics(struct ispstat *stat,
-> > >>>   int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
-> > >>>   					struct omap3isp_stat_data_time32 *data)
-> > >>>   {
-> > >>> -	struct omap3isp_stat_data data64;
-> > >>> +	struct omap3isp_stat_data data64 = { };
-> > >>
-> > >> Should this be { 0 } ?
-> > >>
-> > >> We've seen patches trying to switch from { 0 } to {  } but the answer
-> > >> was that { 0 } is supposed to be used,
-> > >> http://www.ex-parrot.com/~chris/random/initialise.html
-> > >>
-> > >> (from https://lore.kernel.org/lkml/fbddb15a-6e46-3f21-23ba-b18f66e3448a@suse.com/)
-> > > 
-> > > In the kernel we don't care about portability so much.  Use the = { }
-> > > GCC extension.  If the first member of the struct is a pointer then
-> > > Sparse will complain about = { 0 }.
-> > 
-> > +1 for { }.
-> 
-> Oh, I thought the tendency is is to use { 0 } because that can also
-> intialize the compound members, by a "scalar 0" as it appears in the
-> code.
-> 
+Hi Martin,
 
-Holes in the structure might not be initialized to anything if you do
-either one of these as well.
+this is the next round of bsg cleanups based on the previous scsi ioctl
+changes.  The biggest changes are major simplification of how the bsg
+nodes are created and found, and a simplification of the interface
+between the frontend in bsg.c and the two backends.
 
-Or did we finally prove that is not the case?  I can not remember
-anymore...
-
-greg k-h
+Diffstat:
+ block/blk-mq.c             |    2 
+ block/bsg-lib.c            |   89 +++++------
+ block/bsg.c                |  353 ++++++++++-----------------------------------
+ drivers/scsi/scsi_bsg.c    |   72 +++++----
+ drivers/scsi/scsi_ioctl.c  |   63 +++-----
+ drivers/scsi/scsi_priv.h   |   11 -
+ drivers/scsi/scsi_scan.c   |    2 
+ drivers/scsi/scsi_sysfs.c  |   24 ++-
+ include/linux/blkdev.h     |   14 -
+ include/linux/bsg-lib.h    |    1 
+ include/linux/bsg.h        |   31 +--
+ include/scsi/scsi_device.h |    5 
+ 12 files changed, 229 insertions(+), 438 deletions(-)
