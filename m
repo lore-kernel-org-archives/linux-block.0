@@ -2,139 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF54C432BE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 10:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7204BC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 12:00:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DFC860E94
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 10:48:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5538A60720
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 12:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235722AbhG2Ksi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 06:48:38 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:35438 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232135AbhG2Ksi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 06:48:38 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 6BCE0201ED;
-        Thu, 29 Jul 2021 10:48:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1627555713;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ao638iMTTjsA+VNcKLaQE/T5PYOWw6rLSmI4SdHNaOg=;
-        b=abeCZgaOXkwOt0BkzLlF/+2YTZf7UkZxXuKxwx+rarlLl6+++jGA/oSR1zP1tBBkMVXgvm
-        GT4hGzwrHWO646FIwY3QI2qOTTdotUXq3PJvQire1Y3xdHm1pRg9mNfEdMqC4y4P0XvCJK
-        f4ThlbSAIc4M6bC7S1y1F/1mrMoaviA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1627555713;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ao638iMTTjsA+VNcKLaQE/T5PYOWw6rLSmI4SdHNaOg=;
-        b=3jaJHiWtLRI5qqhbTkmtMyPrqt0TMeDMpnw71ZVL0gyLLlXhjwjFNZFKJAOOOEzthRehoc
-        I6ScSOeN75vLU8Cg==
-Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
-        by relay2.suse.de (Postfix) with ESMTP id 53E3BA3B81;
-        Thu, 29 Jul 2021 10:48:33 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id E0A69DA7AF; Thu, 29 Jul 2021 12:45:47 +0200 (CEST)
-Date:   Thu, 29 Jul 2021 12:45:47 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 02/64] mac80211: Use flex-array for radiotap header bitmap
-Message-ID: <20210729104547.GT5047@suse.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Kees Cook <keescook@chromium.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-3-keescook@chromium.org>
- <20210728073556.GP1931@kadam>
- <20210728092323.GW5047@twin.jikos.cz>
- <202107281454.F96505E15@keescook>
+        id S234790AbhG2MAD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 08:00:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49880 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234610AbhG2MAD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jul 2021 08:00:03 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BCA4760F21;
+        Thu, 29 Jul 2021 11:59:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627560000;
+        bh=dVlivW1G35KXO37f2DhxEdxNU8sqEfSwmTd1QUrB7vE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=JxwqEzyYPYymuA8cRC/Zbn9293xfgv72Y/v8+W5+YllJsHUaHm+agVxifF87zv4PA
+         Sy53L3qxsQQhlRuVFG+E6BpwdOW/ruhUAQ4RKG1eEsz8adfjh9Rzai6OsfgfWzs7Sh
+         OW0jxVXq/dbHGVrSPIwx+Ia1cn/Ygc4XY7Spvpte0kqmcbw59/L/V85UT0lpJBu4An
+         cNvD7MmOHns+xNk2fEIj/1fQEoKZESe0Ek67qwX3djur/c2QLaomNQqh/4JgIKII9/
+         fSjDPjBPMBT7ftwBi4RUhafe/er+7s4Qmfak9qrX65wpMd+aJ/TiEOP54iQahf+afx
+         ufUOA8wUpCEnA==
+Date:   Thu, 29 Jul 2021 13:59:55 +0200
+From:   Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To:     Ian Pilcher <arequipeno@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org
+Subject: Re: [RFC PATCH 1/8] docs: Add block device LED trigger
+ documentation
+Message-ID: <20210729135955.3e3f591c@thinkpad>
+In-Reply-To: <20210729015344.3366750-2-arequipeno@gmail.com>
+References: <20210729015344.3366750-1-arequipeno@gmail.com>
+        <20210729015344.3366750-2-arequipeno@gmail.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202107281454.F96505E15@keescook>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 02:54:52PM -0700, Kees Cook wrote:
-> On Wed, Jul 28, 2021 at 11:23:23AM +0200, David Sterba wrote:
-> > On Wed, Jul 28, 2021 at 10:35:56AM +0300, Dan Carpenter wrote:
-> > > @@ -372,7 +372,7 @@ ieee80211_add_rx_radiotap_header(struct ieee80211_local *local,
-> > >  			ieee80211_calculate_rx_timestamp(local, status,
-> > >  							 mpdulen, 0),
-> > >  			pos);
-> > > -		rthdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_TSFT);
-> > > +		rthdr->data.it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_TSFT);
-> > 
-> > A drive-by comment, not related to the patchset, but rather the
-> > ieee80211 driver itself.
-> > 
-> > Shift expressions with (1 << NUMBER) can be subtly broken once the
-> > NUMBER is 31 and the value gets silently cast to a 64bit type. It will
-> > become 0xfffffffff80000000.
-> > 
-> > I've checked the IEEE80211_RADIOTAP_* defintions if this is even remotely
-> > possible and yes, IEEE80211_RADIOTAP_EXT == 31. Fortunatelly it seems to
-> > be used with used with a 32bit types (eg. _bitmap_shifter) so there are
-> > no surprises.
-> > 
-> > The recommended practice is to always use unsigned types for shifts, so
-> > "1U << ..." at least.
+Dear Ian,
+
+On Wed, 28 Jul 2021 20:53:37 -0500
+Ian Pilcher <arequipeno@gmail.com> wrote:
+
+> * Document the sysfs attributes (/sys/class/block/led_trigger_*
+>   and /sys/class/block/${DEV}/led_trigger) that can be used to
+>   create, list, and delete block device LED triggers and to
+>   set and clear device/trigger associations.
 > 
-> Ah, good catch! I think just using BIT() is the right replacement here,
-> yes? I suppose that should be a separate patch.
+> * Pull API documentation from block/blk-ledtrig.c (once it
+>   exists).
+> 
+> Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 
-I found definition of BIT in vdso/bits.h, that does not sound like a
-standard header, besides that it shifts 1UL, that may not be necessary
-everywhere. IIRC there were objections against using the macro at all.
+thank you for this proposal.
 
-Looking for all the definitions, there are a few that are wrong in the
-sense they're using the singed type, eg.
+I don't really see the purpose for having multiple different block
+device LED triggers. Moreover we really do not want userspace to be
+able to add LED triggers with arbitrary names, and as many as the
+userspace wants. There is no sense in making userspace be able to
+create 10000 triggers. Also if userspace can create triggers with
+arbitrary names, it could "steal" a name for a real trigger. For
+example if netdev trigger is compiled as a module, and before loading
+someone creates blockdev trigger with name "netdev", the loading of
+netdev trigger will fail.
 
-https://elixir.bootlin.com/linux/v5.14-rc3/source/arch/arm/mach-davinci/sleep.S#L7
+I would like the blkdev trigger to work in a similar way the netdev
+trigger works:
+- only one trigger, with name "blkdev"
+- when activated on a LED, new sysfs files will be created:
+  * device_name, where user can write sda1, vdb, ...
+  * read (binary value, 1 means blink on read)
+  * write (binary value, 1 means blink on write)
+  * interval (blink interval)
+  Note that device_name could allow multiple names, in theory...
+  Also some other disk states may be included, like error, or something
+- also the blinking itself can be done as is done netdev trigger: every
+  50ms the work function would look at blkdev stats, and if current
+  stat (number of bytes read/written) is different from previous, then
+  blink the LED
 
-#define BIT(nr)			(1 << (nr))
-...
-#define DEEPSLEEP_SLEEPENABLE_BIT	BIT(31)
-
-but that's an assembly file so the C integer promotions don't apply.
-
-https://elixir.bootlin.com/linux/v5.14-rc3/source/drivers/staging/rtl8723bs/include/osdep_service.h#L18
-https://elixir.bootlin.com/linux/v5.14-rc3/source/drivers/staging/rtl8723bs/include/wifi.h#L15
-https://elixir.bootlin.com/linux/v5.14-rc3/source/tools/perf/util/intel-pt-decoder/intel-pt-pkt-decoder.c#L15
-
-#define BIT(x)	(1 << (x))
-
-Auditing and cleaning that up is for another series, yeah, I'm just
-pointing it here if somebody feels like doing the work. It's IMO low
-hanging fruit but can reveal real bugs.
+Marek
+  
