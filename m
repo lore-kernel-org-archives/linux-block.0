@@ -2,96 +2,254 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7204BC4320A
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 12:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19849C4338F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 12:11:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5538A60720
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 12:00:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1E65603E7
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 12:11:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234790AbhG2MAD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 08:00:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49880 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234610AbhG2MAD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 08:00:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BCA4760F21;
-        Thu, 29 Jul 2021 11:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627560000;
-        bh=dVlivW1G35KXO37f2DhxEdxNU8sqEfSwmTd1QUrB7vE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JxwqEzyYPYymuA8cRC/Zbn9293xfgv72Y/v8+W5+YllJsHUaHm+agVxifF87zv4PA
-         Sy53L3qxsQQhlRuVFG+E6BpwdOW/ruhUAQ4RKG1eEsz8adfjh9Rzai6OsfgfWzs7Sh
-         OW0jxVXq/dbHGVrSPIwx+Ia1cn/Ygc4XY7Spvpte0kqmcbw59/L/V85UT0lpJBu4An
-         cNvD7MmOHns+xNk2fEIj/1fQEoKZESe0Ek67qwX3djur/c2QLaomNQqh/4JgIKII9/
-         fSjDPjBPMBT7ftwBi4RUhafe/er+7s4Qmfak9qrX65wpMd+aJ/TiEOP54iQahf+afx
-         ufUOA8wUpCEnA==
-Date:   Thu, 29 Jul 2021 13:59:55 +0200
-From:   Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
-        kernelnewbies@kernelnewbies.org
-Subject: Re: [RFC PATCH 1/8] docs: Add block device LED trigger
- documentation
-Message-ID: <20210729135955.3e3f591c@thinkpad>
-In-Reply-To: <20210729015344.3366750-2-arequipeno@gmail.com>
-References: <20210729015344.3366750-1-arequipeno@gmail.com>
-        <20210729015344.3366750-2-arequipeno@gmail.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        id S236611AbhG2MLg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 08:11:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55824 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234949AbhG2MLf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jul 2021 08:11:35 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E707C061765
+        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 05:11:31 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id l18so6663311wrv.5
+        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 05:11:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8Nz6vB9p8A0wBJs6kkDYFIrrTzDZDT+uS9XB0IAUyko=;
+        b=IX9QYptYV6st0L1XmOo2+ZVTD1czWMC0yv2A0wEKs5uhoKxyG1M8hYGFid/Rc9caoJ
+         g3s8uihSolFDNGNVDmh/KcSkUnjuvxHUSlZem764aZk2d9p45qyVKzkwnR65zmpbIjwe
+         oixk5YiEQMSk6egRcnGh8U5DvdkvMLdRPa8MA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to;
+        bh=8Nz6vB9p8A0wBJs6kkDYFIrrTzDZDT+uS9XB0IAUyko=;
+        b=N+ll7s+0NqZfUWIEZXXT1tA0wbixc+HL+ADac0SN6JL3B4eKBgPyP3Ljo42xEeCkJY
+         dyJ7X4Juvb+k4rERybjafTyCep3RV8hobhFj3bNUIib4LnHTpOHWhm990szEHvrxPHQg
+         WQTdoGZqRfYmWgzogJ22RmTqJAi6mIBKpfyrfYO8mLpvb0+BNrliRCStZEJhMn1ahJqN
+         FE9fpq3jTETbOy+7n9vK6ZaZQc0E3i8SdBKZaAXr+hMXnhuQKn/+G/a4abQY7rB/ZH6c
+         JemM4mIculNgJDtN1Zb4c49YG69ykdXN1TMZ2pupeV6AbkZHPhUtas+412g97rWpj4ec
+         gj1w==
+X-Gm-Message-State: AOAM533L0cEUswtAaPqn7yg2lkDQO5PpxUL9L/sKvSaImbMglM/5kXz9
+        vUM6fPABdO9W1MOgtGAzghyBXQ==
+X-Google-Smtp-Source: ABdhPJyxNFOOp917FBlh8xg1Ee/DiYPVZ7Er8zzOKotZZKyVJ/yUFb4NW2JEu0Us3Suihgl1chkn3Q==
+X-Received: by 2002:a5d:4e91:: with SMTP id e17mr4462754wru.7.1627560689971;
+        Thu, 29 Jul 2021 05:11:29 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id a14sm3323850wrf.97.2021.07.29.05.11.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 05:11:29 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 14:11:27 +0200
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org,
+        netdev@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-block@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Keith Packard <keithpac@amazon.com>,
+        linux-hardening@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH 25/64] drm/mga/mga_ioc32: Use struct_group() for memcpy()
+ region
+Message-ID: <YQKa76A6XuFqgM03@phenom.ffwll.local>
+Mail-Followup-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org,
+        netdev@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-block@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Keith Packard <keithpac@amazon.com>,
+        linux-hardening@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-26-keescook@chromium.org>
+ <YQDxmEYfppJ4wAmD@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YQDxmEYfppJ4wAmD@kroah.com>
+X-Operating-System: Linux phenom 5.10.0-7-amd64 
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dear Ian,
-
-On Wed, 28 Jul 2021 20:53:37 -0500
-Ian Pilcher <arequipeno@gmail.com> wrote:
-
-> * Document the sysfs attributes (/sys/class/block/led_trigger_*
->   and /sys/class/block/${DEV}/led_trigger) that can be used to
->   create, list, and delete block device LED triggers and to
->   set and clear device/trigger associations.
+On Wed, Jul 28, 2021 at 07:56:40AM +0200, Greg Kroah-Hartman wrote:
+> On Tue, Jul 27, 2021 at 01:58:16PM -0700, Kees Cook wrote:
+> > In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> > field bounds checking for memcpy(), memmove(), and memset(), avoid
+> > intentionally writing across neighboring fields.
+> > 
+> > Use struct_group() in struct drm32_mga_init around members chipset, sgram,
+> > maccess, fb_cpp, front_offset, front_pitch, back_offset, back_pitch,
+> > depth_cpp, depth_offset, depth_pitch, texture_offset, and texture_size,
+> > so they can be referenced together. This will allow memcpy() and sizeof()
+> > to more easily reason about sizes, improve readability, and avoid future
+> > warnings about writing beyond the end of chipset.
+> > 
+> > "pahole" shows no size nor member offset changes to struct drm32_mga_init.
+> > "objdump -d" shows no meaningful object code changes (i.e. only source
+> > line number induced differences and optimizations).
+> > 
+> > Note that since this includes a UAPI header, struct_group() has been
+> > explicitly redefined local to the header.
+> > 
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > ---
+> >  drivers/gpu/drm/mga/mga_ioc32.c | 30 ++++++++++++++------------
+> >  include/uapi/drm/mga_drm.h      | 37 ++++++++++++++++++++++++---------
+> >  2 files changed, 44 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/drivers/gpu/drm/mga/mga_ioc32.c b/drivers/gpu/drm/mga/mga_ioc32.c
+> > index 4fd4de16cd32..fbd0329dbd4f 100644
+> > --- a/drivers/gpu/drm/mga/mga_ioc32.c
+> > +++ b/drivers/gpu/drm/mga/mga_ioc32.c
+> > @@ -38,16 +38,21 @@
+> >  typedef struct drm32_mga_init {
+> >  	int func;
+> >  	u32 sarea_priv_offset;
+> > -	int chipset;
+> > -	int sgram;
+> > -	unsigned int maccess;
+> > -	unsigned int fb_cpp;
+> > -	unsigned int front_offset, front_pitch;
+> > -	unsigned int back_offset, back_pitch;
+> > -	unsigned int depth_cpp;
+> > -	unsigned int depth_offset, depth_pitch;
+> > -	unsigned int texture_offset[MGA_NR_TEX_HEAPS];
+> > -	unsigned int texture_size[MGA_NR_TEX_HEAPS];
+> > +	struct_group(always32bit,
+> > +		int chipset;
+> > +		int sgram;
+> > +		unsigned int maccess;
+> > +		unsigned int fb_cpp;
+> > +		unsigned int front_offset;
+> > +		unsigned int front_pitch;
+> > +		unsigned int back_offset;
+> > +		unsigned int back_pitch;
+> > +		unsigned int depth_cpp;
+> > +		unsigned int depth_offset;
+> > +		unsigned int depth_pitch;
+> > +		unsigned int texture_offset[MGA_NR_TEX_HEAPS];
+> > +		unsigned int texture_size[MGA_NR_TEX_HEAPS];
+> > +	);
+> >  	u32 fb_offset;
+> >  	u32 mmio_offset;
+> >  	u32 status_offset;
+> > @@ -67,9 +72,8 @@ static int compat_mga_init(struct file *file, unsigned int cmd,
+> >  
+> >  	init.func = init32.func;
+> >  	init.sarea_priv_offset = init32.sarea_priv_offset;
+> > -	memcpy(&init.chipset, &init32.chipset,
+> > -		offsetof(drm_mga_init_t, fb_offset) -
+> > -		offsetof(drm_mga_init_t, chipset));
+> > +	memcpy(&init.always32bit, &init32.always32bit,
+> > +	       sizeof(init32.always32bit));
+> >  	init.fb_offset = init32.fb_offset;
+> >  	init.mmio_offset = init32.mmio_offset;
+> >  	init.status_offset = init32.status_offset;
+> > diff --git a/include/uapi/drm/mga_drm.h b/include/uapi/drm/mga_drm.h
+> > index 8c4337548ab5..61612e5ecab2 100644
+> > --- a/include/uapi/drm/mga_drm.h
+> > +++ b/include/uapi/drm/mga_drm.h
+> > @@ -265,6 +265,16 @@ typedef struct _drm_mga_sarea {
+> >  #define DRM_IOCTL_MGA_WAIT_FENCE    DRM_IOWR(DRM_COMMAND_BASE + DRM_MGA_WAIT_FENCE, __u32)
+> >  #define DRM_IOCTL_MGA_DMA_BOOTSTRAP DRM_IOWR(DRM_COMMAND_BASE + DRM_MGA_DMA_BOOTSTRAP, drm_mga_dma_bootstrap_t)
+> >  
+> > +#define __struct_group(name, fields) \
+> > +	union { \
+> > +		struct { \
+> > +			fields \
+> > +		}; \
+> > +		struct { \
+> > +			fields \
+> > +		} name; \
+> > +	}
+> > +
+> >  typedef struct _drm_mga_warp_index {
+> >  	int installed;
+> >  	unsigned long phys_addr;
+> > @@ -279,20 +289,25 @@ typedef struct drm_mga_init {
+> >  
+> >  	unsigned long sarea_priv_offset;
+> >  
+> > -	int chipset;
+> > -	int sgram;
+> > +	__struct_group(always32bit,
+> > +		int chipset;
+> > +		int sgram;
+> >  
+> > -	unsigned int maccess;
+> > +		unsigned int maccess;
+> >  
+> > -	unsigned int fb_cpp;
+> > -	unsigned int front_offset, front_pitch;
+> > -	unsigned int back_offset, back_pitch;
+> > +		unsigned int fb_cpp;
+> > +		unsigned int front_offset;
+> > +		unsigned int front_pitch;
+> > +		unsigned int back_offset;
+> > +		unsigned int back_pitch;
+> >  
+> > -	unsigned int depth_cpp;
+> > -	unsigned int depth_offset, depth_pitch;
+> > +		unsigned int depth_cpp;
+> > +		unsigned int depth_offset;
+> > +		unsigned int depth_pitch;
+> >  
+> > -	unsigned int texture_offset[MGA_NR_TEX_HEAPS];
+> > -	unsigned int texture_size[MGA_NR_TEX_HEAPS];
+> > +		unsigned int texture_offset[MGA_NR_TEX_HEAPS];
+> > +		unsigned int texture_size[MGA_NR_TEX_HEAPS];
+> > +	);
+> >  
+> >  	unsigned long fb_offset;
+> >  	unsigned long mmio_offset;
+> > @@ -302,6 +317,8 @@ typedef struct drm_mga_init {
+> >  	unsigned long buffers_offset;
+> >  } drm_mga_init_t;
+> >  
+> > +#undef __struct_group
+> > +
 > 
-> * Pull API documentation from block/blk-ledtrig.c (once it
->   exists).
+> Why can you use __struct_group in this uapi header, but not the
+> networking one?
+
+If there's others, maybe we can stuff the uapi __struct_group into
+linux/types.h where all the other __ uapi types hang out?
+
+Anyway mga is very dead, I don't anyone cares.
+
+Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+
+I'm assuming this goes in through a topic pull from you?
+
+I'll leave the drm/amd one to figure out between you and Alex.
+-Daniel
+
 > 
-> Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
+> thanks,
+> 
+> greg k-h
 
-thank you for this proposal.
-
-I don't really see the purpose for having multiple different block
-device LED triggers. Moreover we really do not want userspace to be
-able to add LED triggers with arbitrary names, and as many as the
-userspace wants. There is no sense in making userspace be able to
-create 10000 triggers. Also if userspace can create triggers with
-arbitrary names, it could "steal" a name for a real trigger. For
-example if netdev trigger is compiled as a module, and before loading
-someone creates blockdev trigger with name "netdev", the loading of
-netdev trigger will fail.
-
-I would like the blkdev trigger to work in a similar way the netdev
-trigger works:
-- only one trigger, with name "blkdev"
-- when activated on a LED, new sysfs files will be created:
-  * device_name, where user can write sda1, vdb, ...
-  * read (binary value, 1 means blink on read)
-  * write (binary value, 1 means blink on write)
-  * interval (blink interval)
-  Note that device_name could allow multiple names, in theory...
-  Also some other disk states may be included, like error, or something
-- also the blinking itself can be done as is done netdev trigger: every
-  50ms the work function would look at blkdev stats, and if current
-  stat (number of bytes read/written) is different from previous, then
-  blink the LED
-
-Marek
-  
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
