@@ -2,116 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AEEC4338F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AADFC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:03:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A19C60F21
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:11:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 371F960F4A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 18:03:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbhG2RLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 13:11:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45394 "EHLO
+        id S229731AbhG2SDm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 14:03:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbhG2RLo (ORCPT
+        with ESMTP id S229556AbhG2SDm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 13:11:44 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F05BC061765;
-        Thu, 29 Jul 2021 10:11:40 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id b6so11213627pji.4;
-        Thu, 29 Jul 2021 10:11:40 -0700 (PDT)
+        Thu, 29 Jul 2021 14:03:42 -0400
+Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4FDAC061765;
+        Thu, 29 Jul 2021 11:03:38 -0700 (PDT)
+Received: by mail-oi1-x234.google.com with SMTP id q6so9533600oiw.7;
+        Thu, 29 Jul 2021 11:03:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vwili5Ap3pl5QTQqz8bc1S7CjPVAgBWQMamZ9XQVdO4=;
-        b=iT/gDga4Q09cV3tRMXD5HCdMqu54krFqAdGOn3IVbHrIUuIJKufh/9zsc2S76ZQQXR
-         HFcSP8MMW8c2pLGKGrkHNFGTjmT6XcvFk7Ydam8QwwSxmGc2uUAUOBc7vgV94yksLCbm
-         5g6jBi3tmExqgi5PtPz1If7SVyGOKnDFb7ShBegl1TRFWjUyJiz187mcVe9FGcEthtWE
-         fio7y7AZ+6HJ4Xge03I++TWhDsyCynxfLIvLFd2Mw3Vyq2nR7/NdjdsOFtol/k9QcFP6
-         WVWF8GQjsJtJB5gVq+KytIjw5niqWi7/Eh8F6QlDnTawp+qhc9z1hd6TqBvGzKCtUAAr
-         1cVw==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=fuxy55vow1KuFQW+e5yb6EGMBOauB93N2LgKK+CL0WI=;
+        b=lqemvRFpqTzI7XRonm35qDC/47Br7jRmw5ZIeL7tPnv93kH67cCBJr/fPOx0tOyAzQ
+         6IfcJvP+MHZTUFYB4KH6Jk64YnqTyAjUwN31KI2nZxPUe82DeTL4/gnq56XlmATMB6VI
+         mLtoV7wS796JFGhZNZ61OJbinHuIuU7SKgYeYlSbLYlo5NTTtwV4D+LolFH7ymXpGuk1
+         qU+5JjACZqTol+3S8iQRAxZe0XK231tx62Yk25uiOmFUuf0p1+dAkix2N2gqFfQzUChP
+         +PWEwDahEdlToZaRN7o8QQ+6XjY4kYZunY5Oi67FJOqxc6f4FGqi0I6soKpdNh7+dnlR
+         BlaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=vwili5Ap3pl5QTQqz8bc1S7CjPVAgBWQMamZ9XQVdO4=;
-        b=oPU3XYkXRSm4EIy8XUfBnOR8QyRJYSpgiLHD5fZwMuvPBDi1QwYmLxzyBzXUAZDMBw
-         N+591Z9u/gkih/DQ+ylD017FnHEhRDG+Zf9kd/lN+0w7T7RzKVg07lxgKJsBTHR75b8e
-         yFlSj3S+L8gjL53fUfIcOjidPsBvFF9KbOiYIqwz/nKKuixKkRfHqU3Q25ZEN5ocu07q
-         9ZbWWTmzQkCdAvjxFCccWlHxrAGycC9SGqPkp9lXcK5Iu4OcQCZj8r3zsfJNNkICqewp
-         t+CsBI1XMSjboN+65qsFMQKywlmXdW+A2iAcRi2IYCMvtlrWMG5Yodu5JcU8zMjgXSEm
-         lvKg==
-X-Gm-Message-State: AOAM533H0kAgRBDVIQWoyyspzfVt1U1JAPYfMmzhLMVVpeSgAEShlB8F
-        v3naqlsDp39wVOgugQWh4Kw=
-X-Google-Smtp-Source: ABdhPJyLj0LNatiDfmCRGU+euAPbCw3/KzESbb7ezYVlpBaMpmeSg59g33hAw1YtZBWYGNl1bnwQjg==
-X-Received: by 2002:a63:7f48:: with SMTP id p8mr1758975pgn.184.1627578699815;
-        Thu, 29 Jul 2021 10:11:39 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:9699])
-        by smtp.gmail.com with ESMTPSA id s50sm4205467pfw.212.2021.07.29.10.11.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 10:11:39 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 29 Jul 2021 07:11:34 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     brookxu <brookxu.cn@gmail.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
-Subject: Re: [PATCH v2] blk-throtl: optimize IOPS throttle for large IO
- scenarios
-Message-ID: <YQLhRrkZrmKTzfbP@mtj.duckdns.org>
-References: <40915233274d31bb0659ff9f3be8900a5a0e81ba.1627462548.git.brookxu@tencent.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fuxy55vow1KuFQW+e5yb6EGMBOauB93N2LgKK+CL0WI=;
+        b=a5fHhOqw/jI3BrLorjX2uPGO85eDPXTBDRSsGz1cGirguD63dCp882U7rSIpJuQn2O
+         acEmg+ThSm83699EGw+PPkUVBu1Ft6D2gMAOxIgKF1VLobdAMQQ6fBdNTgcIl6SNKnj6
+         VPKsAzf9UMhIATbfsARTwBWqeinWpzS8IFZNtrglWs1AjnwPRg8r/LkZHb7dKJos9Ylp
+         ydx+nEnUsEUm+9gCF4xpSEefnR4zGyXH7z5N+MewIlWPsOMn9tJtVkbyTDfZi/3pnGbL
+         G+/DjrTijtBV6lTHJu1bkW8rSpYawiIwnHq6gT2Xs3H9tKsa7vqu/11yegqNlcycXeIV
+         3iOg==
+X-Gm-Message-State: AOAM533YOhbqaJBh4sAUHTT5x3/iE/KluNratGTAKg+AlClvBiOu6yZT
+        uIfSJOpJYUV+cxhpI29CrLQm+G1yl59ufvEf
+X-Google-Smtp-Source: ABdhPJyXmsbTqz9YWsoEDwcIymc9NYbh3+0BQLzPGgII3gFC3V5UIKDJp3lClz/q8gWq/3T9+FnrkA==
+X-Received: by 2002:aca:7589:: with SMTP id q131mr10222440oic.76.1627581818302;
+        Thu, 29 Jul 2021 11:03:38 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id n202sm732402oig.10.2021.07.29.11.03.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jul 2021 11:03:37 -0700 (PDT)
+Subject: Re: [RFC PATCH 1/8] docs: Add block device LED trigger documentation
+To:     =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org
+References: <20210729015344.3366750-1-arequipeno@gmail.com>
+ <20210729015344.3366750-2-arequipeno@gmail.com>
+ <20210729135955.3e3f591c@thinkpad>
+From:   Ian Pilcher <arequipeno@gmail.com>
+Message-ID: <9e75ce6e-0823-6701-4f1d-7e06fc4cddc1@gmail.com>
+Date:   Thu, 29 Jul 2021 13:03:36 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <40915233274d31bb0659ff9f3be8900a5a0e81ba.1627462548.git.brookxu@tencent.com>
+In-Reply-To: <20210729135955.3e3f591c@thinkpad>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 7/29/21 6:59 AM, Marek Behún wrote:
+> I don't really see the purpose for having multiple different block
+> device LED triggers. 
 
-On Wed, Jul 28, 2021 at 05:01:41PM +0800, brookxu wrote:
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index a11b3b5..86ff943 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
->  		trace_block_split(split, (*bio)->bi_iter.bi_sector);
->  		submit_bio_noacct(*bio);
->  		*bio = split;
-> +
-> +		blk_throtl_recharge_bio(*bio);
+Is there a different/better way to control per-device LEDs?  (I'm
+thinking of something like my NAS, which has 5 drive bays, each with
+its own activity LED.)
 
-Can you rename this blk_throtl_charge_bio_split()?
+> Moreover we really do not want userspace to be
+> able to add LED triggers with arbitrary names, and as many as the
+> userspace wants.
 
-> @@ -524,6 +537,11 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
->  	tg->idletime_threshold = DFL_IDLE_THRESHOLD;
->  	tg->idletime_threshold_conf = DFL_IDLE_THRESHOLD;
->  
-> +	atomic_set(&tg->io_split_cnt[0], 0);
-> +	atomic_set(&tg->io_split_cnt[1], 0);
-> +	atomic_set(&tg->last_io_split_cnt[0], 0);
-> +	atomic_set(&tg->last_io_split_cnt[1], 0);
+To be slightly flippant, why not?  "Userspace" in this case is the
+system/device administrator.  They presumably know what LEDs they have
+and what they want to use them for, something which the kernel cannot
+know (assuming a "generic" disto kernel).
 
-We likely don't need these. pd's zeroed on allocation.
+> There is no sense in making userspace be able to
+> create 10000 triggers.
 
-> @@ -877,10 +900,19 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
->  	else
->  		tg->bytes_disp[rw] = 0;
->  
-> -	if (tg->io_disp[rw] >= io_trim)
-> +	if (tg_io_disp(tg, rw) >= io_trim) {
+It would certainly be possible to impose a limit on the number of
+triggers that could be created.  But then someone has to decide what
+that limit should be.  Personally, I lean very much toward giving the
+system administrator the freedom to configure their system as they see
+fit, even if that means that they can break it.  (Where "break"
+basically means that they need to reboot.)
 
-Instead of checking this in multiple places, would it be simpler to transfer
-the atomic counters to the existing counters whenever we enter blk-throtl
-and leave the rest of the code as-is?
+> Also if userspace can create triggers with
+> arbitrary names, it could "steal" a name for a real trigger. For
+> example if netdev trigger is compiled as a module, and before loading
+> someone creates blockdev trigger with name "netdev", the loading of
+> netdev trigger will fail.
 
-Thanks.
+Would adding a prefix to the LED trigger name address your concern
+about arbitrary names and potential conflicts?  I.e. the system
+administrator creates a block device LED trigger named "foo", and it
+shows up as an LED trigger named "blkdev:foo" (or something like that).
+
+> I would like the blkdev trigger to work in a similar way the netdev
+> trigger works:
+> - only one trigger, with name "blkdev"
+> - when activated on a LED, new sysfs files will be created:
+>    * device_name, where user can write sda1, vdb, ...
+>    * read (binary value, 1 means blink on read)
+>    * write (binary value, 1 means blink on write)
+>    * interval (blink interval)
+>    Note that device_name could allow multiple names, in theory...
+>    Also some other disk states may be included, like error, or something
+
+How would you support multiple, per-device LEDs (the NAS use case above)
+in this scheme?
+
+> - also the blinking itself can be done as is done netdev trigger: every
+>    50ms the work function would look at blkdev stats, and if current
+>    stat (number of bytes read/written) is different from previous, then
+>    blink the LED
+
+Is there a reason that you prefer this approach to simply having the
+block layer "fire" the trigger?
+
+Thanks for the feedback!
 
 -- 
-tejun
+========================================================================
+                  In Soviet Russia, Google searches you!
+========================================================================
