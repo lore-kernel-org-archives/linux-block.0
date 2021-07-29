@@ -2,105 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF89AC432BE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 01:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DF1C4338F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 03:09:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC2D16103B
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 01:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B322D60F23
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 03:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233310AbhG2B7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jul 2021 21:59:14 -0400
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:42797 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233241AbhG2B7O (ORCPT
+        id S233555AbhG2DJV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jul 2021 23:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233542AbhG2DJV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jul 2021 21:59:14 -0400
-Received: by mail-pl1-f181.google.com with SMTP id t3so2929816plg.9;
-        Wed, 28 Jul 2021 18:59:11 -0700 (PDT)
+        Wed, 28 Jul 2021 23:09:21 -0400
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EDE6C0613C1
+        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 20:09:18 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id o13so4511023qkk.9
+        for <linux-block@vger.kernel.org>; Wed, 28 Jul 2021 20:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vt-edu.20150623.gappssmtp.com; s=20150623;
+        h=sender:from:to:cc:subject:in-reply-to:references:mime-version
+         :content-transfer-encoding:date:message-id;
+        bh=SdHnd3UxhQxILD5sIY68I8w2CS+2K2nQR0hdwBItcSQ=;
+        b=1fuWuTp0S9vFfzdBLCV3w1xBUH4RYC//+UhbZLlGYzInl7HpKECRExfamgdx9eRolN
+         pXxGhX4yl1vQgiqq79cpBOenFVyx6uEYvqYz2oqAhPuX1kIcBreKvpIlI0irOSjtsjXU
+         0W6X8Mas7FaprAPVqoVjugg9OX0tHpHbPSRCqMOTMc7NwRWFNP6Po371r05TndavoxN3
+         7ZOQNrGPvcO+rXPj+GuqhhCfqOQOOxOFjXEvQpB9G5bbJRXCq/6PQEAN5AnFSjrLQ+9e
+         d6lJcFOP0YVNlrp6ii47qjLM0W97tovZ/w2mTmrNJxiMCrEjlo6pv5Usv83bGYFxyMCa
+         1p7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/EMnvbg1lkcKUNHoTGAUlLRl80RwVqD1WDQs78+Ryng=;
-        b=T9QUZci9xRPUsyFylgg8iNO/vYQvXXH1GjnR9a+ORlVU3giTSq46ZzzVStYhQzQyVX
-         mOLRviPqB0U0VzfefMBPrH2zxRJ8GXRxTSnReCaP7uZGRjeqYbmTj93lORJJYJYJ+UWt
-         spwGognRDV14UtNOyYroC6Y6TKIm0ruPupWUwVNOCUMrsBxsb31ONXNerdH/j3a918F6
-         b1iQAdIoESQs2Q/T/v45hA59MGszluDk35P6uZRV+9iIQLaLnO8CBrwXv8iBRKbboxGV
-         uMTQpXMyK7EDxu9YSaNqUtqbtZszoI002WWUymzMfCKU66bgkqv4ECGRQIqAtlfHSLyw
-         K/9A==
-X-Gm-Message-State: AOAM532Ht9g9o9CnvXn1jL8DQg1Vp5ec/nrS1+YgPRE2L2uysG8WfphN
-        eGEAyBFxq8vZAXzvyRBjlEk=
-X-Google-Smtp-Source: ABdhPJwy46rGfGzBPHT0dDc2OF3JHAeIdHBXsVA3/Hjfoi4OURPDSpbVi+xEgy37JuU2Z3C+YFQFpw==
-X-Received: by 2002:aa7:93dc:0:b029:328:d6c9:cae7 with SMTP id y28-20020aa793dc0000b0290328d6c9cae7mr2579458pff.53.1627523950822;
-        Wed, 28 Jul 2021 18:59:10 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:9eeb:60dc:7a3c:6558? ([2601:647:4000:d7:9eeb:60dc:7a3c:6558])
-        by smtp.gmail.com with ESMTPSA id z16sm1344383pgu.21.2021.07.28.18.59.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 18:59:10 -0700 (PDT)
-Subject: Re: [PATCH 19/64] ip: Use struct_group() for memcpy() regions
-To:     Kees Cook <keescook@chromium.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-20-keescook@chromium.org> <YQDxaYrHu0PeBIuX@kroah.com>
- <202107281358.8E12638@keescook>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <45855f4f-f7cf-b7b3-bcd6-c9ebc3a55c64@acm.org>
-Date:   Wed, 28 Jul 2021 18:59:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
-MIME-Version: 1.0
-In-Reply-To: <202107281358.8E12638@keescook>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        h=x-gm-message-state:sender:from:to:cc:subject:in-reply-to:references
+         :mime-version:content-transfer-encoding:date:message-id;
+        bh=SdHnd3UxhQxILD5sIY68I8w2CS+2K2nQR0hdwBItcSQ=;
+        b=ezigpwXARcIt2kXXMgJ0SDh/fN+RoDsDn20VM4yZNVrYkN1WS1gVdZ1zh32GnVETSE
+         E/umffAHV7/GAbbTMmfFTF32+/pB/GVo4jDzZPyNhnBG6ajNfV72kXE7DV7mFjtjhDUc
+         mh6YVdONJMe0HlqwqdlYhPPWdoit4ITVqaB4/IrN318ucKi5fwN3T50IolfaIIqYl6mi
+         MSkewPXVgksuWy0Vh5K/yqA02yoyhKD/rhD0eJAQ9iIfiekrDsxYZQyX3pqGwp1wCbCJ
+         txBMH5dWGsa8ysXASg9LrL0jQbFkPYoxhyzaZl57sK3OGgsRxRM8Ckys1++ShLBvgSq/
+         J88Q==
+X-Gm-Message-State: AOAM533Ekqs+E8p32WrEIMqJ93Y7EMcMb2a2gvbEKJafbCohjLtAl2St
+        fYSacFW2Vnvdf6Z4vVS1JXtybQ==
+X-Google-Smtp-Source: ABdhPJwDK0qVuMlp6WgaA3Az4Au4QJilqAUMO8ICEJgVOV83q4gFst/vTmoNWJBscKKsVOjnSF/VOA==
+X-Received: by 2002:a37:6151:: with SMTP id v78mr3152537qkb.9.1627528157390;
+        Wed, 28 Jul 2021 20:09:17 -0700 (PDT)
+Received: from turing-police ([2601:5c0:c380:d61::359])
+        by smtp.gmail.com with ESMTPSA id q11sm1011870qkm.56.2021.07.28.20.09.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jul 2021 20:09:16 -0700 (PDT)
+Sender: Valdis Kletnieks <valdis@vt.edu>
+From:   "Valdis Kl=?utf-8?Q?=c4=93?=tnieks" <valdis.kletnieks@vt.edu>
+X-Google-Original-From: "Valdis Kl=?utf-8?Q?=c4=93?=tnieks" <Valdis.Kletnieks@vt.edu>
+X-Mailer: exmh version 2.10.0-pre 07/05/2021 with nmh-1.7+dev
+To:     Ian Pilcher <arequipeno@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org
+Subject: Re: [RFC PATCH 1/8] docs: Add block device LED trigger documentation
+In-Reply-To: <20210729015344.3366750-2-arequipeno@gmail.com>
+References: <20210729015344.3366750-1-arequipeno@gmail.com>
+ <20210729015344.3366750-2-arequipeno@gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1627528155_13589P";
+         micalg=pgp-sha256; protocol="application/pgp-signature"
 Content-Transfer-Encoding: 7bit
+Date:   Wed, 28 Jul 2021 23:09:15 -0400
+Message-ID: <108629.1627528155@turing-police>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/28/21 2:01 PM, Kees Cook wrote:
-> On Wed, Jul 28, 2021 at 07:55:53AM +0200, Greg Kroah-Hartman wrote:
->>>  struct ethhdr {
->>> -	unsigned char	h_dest[ETH_ALEN];	/* destination eth addr	*/
->>> -	unsigned char	h_source[ETH_ALEN];	/* source ether addr	*/
->>> +	union {
->>> +		struct {
->>> +			unsigned char h_dest[ETH_ALEN];	  /* destination eth addr */
->>> +			unsigned char h_source[ETH_ALEN]; /* source ether addr	  */
->>> +		};
->>> +		struct {
->>> +			unsigned char h_dest[ETH_ALEN];	  /* destination eth addr */
->>> +			unsigned char h_source[ETH_ALEN]; /* source ether addr	  */
->>> +		} addrs;
->>
->> A union of the same fields in the same structure in the same way?
->>
->> Ah, because struct_group() can not be used here?  Still feels odd to see
->> in a userspace-visible header.
-> 
-> Yeah, there is some inconsistency here. I will clean this up for v2.
-> 
-> Is there a place we can put kernel-specific macros for use in UAPI
-> headers? (I need to figure out where things like __kernel_size_t get
-> defined...)
+--==_Exmh_1627528155_13589P
+Content-Type: text/plain; charset=us-ascii
 
-How about using two memset() calls to clear h_dest[] and h_source[]
-instead of modifying the uapi header?
+On Wed, 28 Jul 2021 20:53:37 -0500, Ian Pilcher said:
 
-Thanks,
+> +Create a new block device LED trigger::
+> +
+> +	# echo foo > /sys/class/block/led_trigger_new
+> +
+> +The name must be unique among all LED triggers (not just block device LED
+> +triggers).
+> +
+> +Create two more::
+> +
+> +	# echo bar baz > /sys/class/block/led_trigger_new
 
-Bart.
+> +	# cat /sys/class/block/led_trigger_list
+> +	baz: 0
+> +	bar: 0
+> +	foo: 0
 
+This looks like an abuse of the "one entry one value" rule for sysfs.
+Perhaps this should be a directory /sys/class/block/defined_triggers/
+and separate files under that for foo, bar, and baz?  That would probably
+make reference counting a lot easier as well....
 
+--==_Exmh_1627528155_13589P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Exmh version 2.9.0 11/07/2018
+
+iQEcBAEBCAAGBQJhAhvbAAoJEI0DS38y7CIctZEH/3Pdfz1JB35y9wFELHDki00R
+/UC64FJqOqMfASDl0QtxgVV1S3MfGAAqXFlUw1Djb/0/ZcytyZ22f2S0u8JaP9Qx
+M4Wr0eo5A/BLR7csFwxoxN7lfxDFyEcsKKx+kkZZgfmoqbTLzt46NXTRWrcxJ5p4
+rc9KA6hWGz3GYFUj48Maz9VA3hNz3RLcmOy/F1DKHk7nwBrXZ775iKToao4uNNrw
+Y0NNAAFQYQ8LBZkf5G2hxBakpIA5jY+7arv2dIDO6f+MyDQYKH8gvJEO1vFmiyMM
+OAufuI4mM8ouhA11rIRqtZZ9acl12CJt/OK8FPifF+ypiFVqbqZHteNbzIvbmY4=
+=IjcV
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1627528155_13589P--
