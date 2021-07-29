@@ -2,198 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6182C4338F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 16:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E56C4320A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:03:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8410960F0F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 16:37:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C09060F22
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:03:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbhG2QhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 12:37:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24191 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229614AbhG2QhT (ORCPT
+        id S229657AbhG2RDK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 13:03:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43242 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229565AbhG2RDK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 12:37:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627576636;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1RSuBssQi+q7cm+z6CE0tczu7IpqjYbm4lf0fu8TZ1I=;
-        b=P4qBYbKDBraiuicjrA7eWiCzUqSjJ7USQCprW2mA1emdKxTPbcP/ped4DDBm6M2VLCQft4
-        GRYidKQXxdImFTEe/NqxHIHYdxZFepixt5nrqY/q9TgV9tBOQDPgcvsNHYCTmzlrUqcUDt
-        eB3H55wChOCaXUDMH6Ar+Rs//mbPOvM=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-RAGLCOwNOvWBH8eK7KQxgg-1; Thu, 29 Jul 2021 12:37:14 -0400
-X-MC-Unique: RAGLCOwNOvWBH8eK7KQxgg-1
-Received: by mail-qv1-f71.google.com with SMTP id v16-20020a0562140510b029032511e85975so4170144qvw.23
-        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 09:37:14 -0700 (PDT)
+        Thu, 29 Jul 2021 13:03:10 -0400
+Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4CD2C061765;
+        Thu, 29 Jul 2021 10:03:05 -0700 (PDT)
+Received: by mail-oi1-x234.google.com with SMTP id w6so9283763oiv.11;
+        Thu, 29 Jul 2021 10:03:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=48GpcyRTXY0iV0Yn24BwGNhhL7mTyBkdtTI5JRfp5Nc=;
+        b=c+Mm2sSrlJalV4WONcqQ73ypeaI1CHM4QAYBR98KYgFRIHa5/FzhOfhaaCI5TR7zrp
+         3+Q7k/9LlKQqKt8xV+XT8S2Yi0vA+B1JqFlkSZAyInycsp5w+YXnUSvcqbRYag69vGXo
+         8ZRjqzBgxmq1OidIiOd5BXV9vS8qBH79LW2jCdJfKZIbZuEBz7oEOJ55TwO4DgQkNv6N
+         o6cI/jUXdhUufV95+07SsoJfUs1NpiZl/DO9O2uLFJU+8nuFes+iOLUA5VdqOC17sbBx
+         p/5dT/eg+S2d2RYCG6CPPpXEW2ksJpMDyV+gdr7O69Qb8W9ODsPxTzXhyiRx71+rrm9Y
+         ZbhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1RSuBssQi+q7cm+z6CE0tczu7IpqjYbm4lf0fu8TZ1I=;
-        b=DZRFaMV2EhL75MRpR0rI+B14AbnpbsnIrsiM2RAXlD3MpIEZRUz3QWCsR2ogNACQJW
-         h4Kse/Lqg3Ek7scJSxrLKXTTRxzaxmdyiw4p7zENmmn+A8+NloNtY/MM/uPP8PqjI0XR
-         om3p85NEkDhm1iPB7cpnWll57lR4ixaQzBxA5SPvIqMLVCsA+0vbMEizMMzgxFPOJcmZ
-         DoFYqN8v4N223njpRAPLkeVgoocT8c2q1zdA46XK9Vd6SxwOB6FESCnj74hao3+JWx4i
-         llOIjLFfcB1qUGQD8izA+OAkp2MxVIy7wdHCk8P8geMAaqsbOsBOfY0AHRzVIPj7przG
-         ioEA==
-X-Gm-Message-State: AOAM531rV2wx61mlIzQ0gOvOEr+MyEYJvwnUxye/RL8grvFM8FzUMl3A
-        cSablygqM35feaUEDf3mP9wZ4P/ekdS1Q8oCEC+Z3O/rlUWxYhP2OJ+pQlwm6CLwhbV1hPk5wNO
-        UPPXN2ohzTgmHrRcleLG4eA==
-X-Received: by 2002:a05:620a:140a:: with SMTP id d10mr6139104qkj.171.1627576633983;
-        Thu, 29 Jul 2021 09:37:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzc0wxWpfaIl7vXBoFkjNjlCwXG9APADqkFM5GGd2jrBukPuBRpblzl0nmz+pSqYXMAlreiLg==
-X-Received: by 2002:a05:620a:140a:: with SMTP id d10mr6139092qkj.171.1627576633830;
-        Thu, 29 Jul 2021 09:37:13 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id m3sm2010655qkk.0.2021.07.29.09.37.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 09:37:13 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 12:37:12 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 8/8] block: remove support for delayed queue registrations
-Message-ID: <YQLZOMfbV0BCkMsJ@redhat.com>
-References: <20210725055458.29008-1-hch@lst.de>
- <20210725055458.29008-9-hch@lst.de>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=48GpcyRTXY0iV0Yn24BwGNhhL7mTyBkdtTI5JRfp5Nc=;
+        b=BkCggNo+aNGX9zuYeJHLIX+ojSAuFhuDhEMMlAAqZP4RlCGZwisUviTSqcqxyqHt7Q
+         KsOoqEpvqWpouOFPlGO1/Cf7JigU6NLko9nJ8E7WBvJXlWQtPd1pW4rG1g2x8Etrwmhr
+         E5CUo13w879cFLCLIIhr35eGGt5Qtm1weBKaGmvY4S89BfL8r3IEG9xj8KxSnjY+IRZC
+         v2Bkjw3jKlo4vt9JSCtTsOnxHPGQ77+xxzzFdFBQUCHqT48Zh16vqH9lyRuZs/QnxkyR
+         ULTqfg6HccL6DIFJRZyL5IUFlDoNQEk2oZoKi3B6YvLXxrY/uC4fTx/HaKthnULZeo0M
+         GWWQ==
+X-Gm-Message-State: AOAM532tXPIG0cXNe+9CqpkHnPl/i6UxZ4EaMEHprJqa2hEaSilV3rHP
+        ohwMTa78YJpRHdAjUhRQ5YGhoWjS8phYP5Pv
+X-Google-Smtp-Source: ABdhPJw7ocOYLDfL5dZaVR4MDFI8xCYr21lpH9j8rvUQmHcPSf4Avd82c6eds3Y6dtRmTNm44FvHWQ==
+X-Received: by 2002:aca:da02:: with SMTP id r2mr3612195oig.141.1627578185251;
+        Thu, 29 Jul 2021 10:03:05 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id be15sm679082oib.18.2021.07.29.10.03.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jul 2021 10:03:04 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/8] Add configurable block device LED triggers
+To:     Pavel Machek <pavel@ucw.cz>
+Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org
+References: <20210729015344.3366750-1-arequipeno@gmail.com>
+ <20210729085413.GA16945@amd>
+From:   Ian Pilcher <arequipeno@gmail.com>
+Message-ID: <b108799e-24a2-d5ec-e18e-b7ae8bded085@gmail.com>
+Date:   Thu, 29 Jul 2021 12:03:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210725055458.29008-9-hch@lst.de>
+In-Reply-To: <20210729085413.GA16945@amd>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 25 2021 at  1:54P -0400,
-Christoph Hellwig <hch@lst.de> wrote:
-
-> Now that device mapper has been changed to register the disk once
-> it is fully ready all this code is unused.
+On 7/29/21 3:54 AM, Pavel Machek wrote:
+> We normally have a trigger ("block device activity") which can then
+> expose parameters ("I watch for read" and "I monitor sda1").
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Is there a reason normal solution can not be used?
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+This big difference is that this allows different devices to drive
+different LEDs.  For example, my NAS has 5 drive bays, each of which
+has its own activity LED.  With these patches, I can create a
+separate trigger for each of those LEDs and associate the drive in each
+bay with the correct LED:
 
+   sdb --> trigger1 --> LED1
+    ⋮         ⋮         ⋮
+   sdf --> trigger5 --> LED5
 
-> ---
->  block/elevator.c      |  1 -
->  block/genhd.c         | 29 +++++++----------------------
->  include/linux/genhd.h |  6 ------
->  3 files changed, 7 insertions(+), 29 deletions(-)
-> 
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 52ada14cfe45..706d5a64508d 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -702,7 +702,6 @@ void elevator_init_mq(struct request_queue *q)
->  		elevator_put(e);
->  	}
->  }
-> -EXPORT_SYMBOL_GPL(elevator_init_mq); /* only for dm-rq */
->  
->  /*
->   * switch to new_e io scheduler. be careful not to introduce deadlocks -
-> diff --git a/block/genhd.c b/block/genhd.c
-> index e3d93b868ec5..3cd9f165a5a7 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -457,20 +457,20 @@ static void register_disk(struct device *parent, struct gendisk *disk,
->  }
->  
->  /**
-> - * __device_add_disk - add disk information to kernel list
-> + * device_add_disk - add disk information to kernel list
->   * @parent: parent device for the disk
->   * @disk: per-device partitioning information
->   * @groups: Additional per-device sysfs groups
-> - * @register_queue: register the queue if set to true
->   *
->   * This function registers the partitioning information in @disk
->   * with the kernel.
->   *
->   * FIXME: error handling
->   */
-> -static void __device_add_disk(struct device *parent, struct gendisk *disk,
-> -			      const struct attribute_group **groups,
-> -			      bool register_queue)
-> +
-> +void device_add_disk(struct device *parent, struct gendisk *disk,
-> +		     const struct attribute_group **groups)
-> +
->  {
->  	int ret;
->  
-> @@ -480,8 +480,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
->  	 * elevator if one is needed, that is, for devices requesting queue
->  	 * registration.
->  	 */
-> -	if (register_queue)
-> -		elevator_init_mq(disk->queue);
-> +	elevator_init_mq(disk->queue);
->  
->  	/*
->  	 * If the driver provides an explicit major number it also must provide
-> @@ -535,8 +534,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
->  		bdev_add(disk->part0, dev->devt);
->  	}
->  	register_disk(parent, disk, groups);
-> -	if (register_queue)
-> -		blk_register_queue(disk);
-> +	blk_register_queue(disk);
->  
->  	/*
->  	 * Take an extra ref on queue which will be put on disk_release()
-> @@ -550,21 +548,8 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
->  	disk_add_events(disk);
->  	blk_integrity_add(disk);
->  }
-> -
-> -void device_add_disk(struct device *parent, struct gendisk *disk,
-> -		     const struct attribute_group **groups)
-> -
-> -{
-> -	__device_add_disk(parent, disk, groups, true);
-> -}
->  EXPORT_SYMBOL(device_add_disk);
->  
-> -void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk)
-> -{
-> -	__device_add_disk(parent, disk, NULL, false);
-> -}
-> -EXPORT_SYMBOL(device_add_disk_no_queue_reg);
-> -
->  /**
->   * del_gendisk - remove the gendisk
->   * @disk: the struct gendisk to remove
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index dd95d53c75fa..fbc4bf269f63 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -218,12 +218,6 @@ static inline void add_disk(struct gendisk *disk)
->  {
->  	device_add_disk(NULL, disk, NULL);
->  }
-> -extern void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk);
-> -static inline void add_disk_no_queue_reg(struct gendisk *disk)
-> -{
-> -	device_add_disk_no_queue_reg(NULL, disk);
-> -}
-> -
->  extern void del_gendisk(struct gendisk *gp);
->  
->  void set_disk_ro(struct gendisk *disk, bool read_only);
-> -- 
-> 2.30.2
-> 
+(sda is the SATA DOM boot drive.)
 
+Note that this also supports associating multiple devices with a single
+trigger, so it can be used for more complicated schemes.  For example,
+if my NAS had an additional LED and an optical drive, I could do this:
+
+   sr0 --+
+         |
+         +--> trigger0 --> LED0
+         |
+   sda --+
+
+   sdb -----> trigger1 --> LED1
+    ⋮         ⋮         ⋮
+   sdf -----> trigger5 --> LED5
+
+As far as I know, the current triggers (disk-activity, disk-read,
+disk-write, and ide-disk) don't support this sort of arbitrary
+device-trigger association.
+
+This patch set also support triggering LEDs from pretty much any block
+device (virtual as well as physical), not just ATA devices, although
+that's just a matter of the place from which the trigger is "fired".
+
+I hope this explains things.
+
+Thanks!
+
+-- 
+========================================================================
+                  In Soviet Russia, Google searches you!
+========================================================================
