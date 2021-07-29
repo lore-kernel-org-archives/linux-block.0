@@ -7,108 +7,103 @@ X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444CAC4338F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 15:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0827CC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 15:52:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 205A060720
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 15:01:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC5BF60F46
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 15:52:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229934AbhG2PBp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 11:01:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41232 "EHLO
+        id S237579AbhG2PwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 11:52:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237669AbhG2PBp (ORCPT
+        with ESMTP id S229739AbhG2PwM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 11:01:45 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC962C061765
-        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 08:01:40 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id q3so7393810wrx.0
-        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 08:01:40 -0700 (PDT)
+        Thu, 29 Jul 2021 11:52:12 -0400
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36BE7C061765;
+        Thu, 29 Jul 2021 08:52:08 -0700 (PDT)
+Received: by mail-ot1-x32a.google.com with SMTP id v8-20020a0568301bc8b02904d5b4e5ca3aso6277573ota.13;
+        Thu, 29 Jul 2021 08:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=V4O1I87U2stEkz/YUjYSiQ1/9SiHiehqPp46NQ2rxgg=;
-        b=LecaHDd9irY5hHx18BSCSN/6hB08ltRDILoxBgcTJgeG7f+CIMqUlZlwxwkgJO+bLn
-         B1IeyFDwnLn4eCmMF2O22YRRqgB+9jlRVjJVxdlTCFz+kMt5b9ztuOL6ob73CuUQu1/h
-         srXJI90rWpxmnF1eZfJ4ZdPxkicjbwzZKOGJm75z/sAtqZ1ooh8IQWE0Q/mgCFSQ0izA
-         TJALoM1lGfBHAqrbvMlJasCqURVf0PdeTUwkkpUt/zNwjcq4LsjEwfoIcSXeAFW+C3SN
-         JSZFWrSUMv2usyIKPktUJ0OSBEpeDCaFIeCCR741A2uTnABUbq3UqN6jjRWjLqv6YSLp
-         sg/g==
+        bh=5ggudXBKBG+mZkoKUCRIvn4jywWI6nv9ReIVf6rwOFM=;
+        b=tv39JsgncGFBeHS30VsHiX/zWucJ6YM9HZuj/+LXC6ReWc5/57+JQvOiaC/WRWwcCY
+         OdBQ6hRg7LJUmCj+MLPZrcpL1laZ0MTDDtxXVt8RAr+y8iYAqzxh5rLELQqgswJroPLe
+         Efxzr/RxUHnnG5SHgMZ0IfxCSr22FPuiFP9yP3XZS0VmG1L75qrgvvDkOR4ykxamjvSc
+         lkAYl6PIhpb6iH/ZtH48IEl2Td6nGljG1VlD2cjHGUDSiWhBtM+rKyXJ4jQhq93XeA6t
+         Tb5T8EFt5FZes55EgWaKSKLFGesHiQxabS2fKwsD7UWNhJWGXyo4qjB9lUb8KsrDPJVq
+         L5MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=V4O1I87U2stEkz/YUjYSiQ1/9SiHiehqPp46NQ2rxgg=;
-        b=BqatE2xFnPy4CvyUetm0oA+xFLEWQ4pdfV5aLsxHqMigwRZ2P5Jvpajc5MkJSCmNW5
-         +XB4ojM8/jmT1AX7pDhNl/seoxhKJ2qsnSUrjXLWlbUJd1Sx715rS64Pisl1iB6PQoqn
-         oMfJLSFL8qquunU152fhqchx8ledPX7SQ7YNxhaVW718Bt7zh6Vpp0q96QpryzhheVcs
-         10uguZTbat0WYi7lyl56kYFQHcqyIX2yHG/h4ib/Jm5S2CdYRVy85iY0uAffDSnSn2mW
-         kX/t5eADqlb3MUOW/PfD5FDTsUUBKq09wkP9Gce3CwTCTcvW0m2ZqQ1Mgv6JysHQwdut
-         wdyQ==
-X-Gm-Message-State: AOAM530PbsijQEx7A9F+LHEX8ZMkIVusFBMiyfrOeBuKCHA760qlo+1/
-        /fSZGKGixMQr5u1LhZccRXUMhzund7Y=
-X-Google-Smtp-Source: ABdhPJxE8iS/k3YsL8C6WjITTXbMpLzLrNKRoRz3wfn+er3aI1WsiwbtBXf8HXoDfLKku0i+q22GHQ==
-X-Received: by 2002:adf:ed45:: with SMTP id u5mr5369561wro.203.1627570899385;
-        Thu, 29 Jul 2021 08:01:39 -0700 (PDT)
-Received: from [192.168.2.27] (39.35.broadband4.iol.cz. [85.71.35.39])
-        by smtp.gmail.com with ESMTPSA id t1sm3567140wma.28.2021.07.29.08.01.38
+        bh=5ggudXBKBG+mZkoKUCRIvn4jywWI6nv9ReIVf6rwOFM=;
+        b=QH0XesM+V6hCKlu7XD8514PaUA/ThZnE4T5G+HLV/ppRlVgfmELU2XRXefkmcK7oh5
+         7me30m3Po9ih1VRyBzYK4VFykgRW5e5Wv1+s2kgKLDte4JmDrENnz9zrLNPuaiDRAwRT
+         gZ1BYKpgSw7TofczJ6bvr2yGJzdJdW0UR/H0mug8lSVtLE0GSgLtj3Km655cpsgMg/lE
+         yUuXig3PLdgZ8+nagThOSYJzSf4Uzid8VqMDFTNfDaX2o1eV5ZoN7KstcMP/qJUe6c68
+         n+d4hyjcSMXfZJFxqh/wZhnKQIu5TxZKAdmeG7TpG4gYTJGdo3YPO9EiEmI5+6TZWEdC
+         VPwA==
+X-Gm-Message-State: AOAM5307B0OIudvzdQ/9Lh41oyoVVXnDvqsje6OfoH7sw/GmzuLVe+rF
+        FAYbFddyqD/XqKwVyEWt8TtImJfjGvgfdVxz
+X-Google-Smtp-Source: ABdhPJxYivceaUUzZVLbIYBm71r6OlTgt6MvSU6cllWXNnCb/c8aN7E9Yl4KuRtrjmivqmJz0N/VMA==
+X-Received: by 2002:a05:6830:1f3b:: with SMTP id e27mr3873661oth.311.1627573927585;
+        Thu, 29 Jul 2021 08:52:07 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id b14sm645195oic.58.2021.07.29.08.52.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jul 2021 08:01:38 -0700 (PDT)
-Subject: Re: [dm-devel] use regular gendisk registration in device mapper
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-References: <20210725055458.29008-1-hch@lst.de> <YQAtNkd8T1w/cSLc@redhat.com>
- <20210727160226.GA17989@lst.de> <YQAxyjrGJpl7UkNG@redhat.com>
- <9c719e1d-f8da-f1f3-57a9-3802aa1312d4@gmail.com>
- <20210728070655.GA5086@lst.de>
- <9e668239-78cc-55ad-8998-b7e39f573c34@gmail.com>
- <20210728112430.GA22101@lst.de>
-From:   Milan Broz <gmazyland@gmail.com>
-Message-ID: <b51ac16f-bede-15df-ac8c-b219e06f9060@gmail.com>
-Date:   Thu, 29 Jul 2021 17:01:37 +0200
+        Thu, 29 Jul 2021 08:52:06 -0700 (PDT)
+Subject: Re: [RFC PATCH 1/8] docs: Add block device LED trigger documentation
+To:     =?UTF-8?Q?Valdis_Kl=c4=93tnieks?= <valdis.kletnieks@vt.edu>
+Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
+        axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org
+References: <20210729015344.3366750-1-arequipeno@gmail.com>
+ <20210729015344.3366750-2-arequipeno@gmail.com>
+ <108629.1627528155@turing-police>
+From:   Ian Pilcher <arequipeno@gmail.com>
+Message-ID: <ee56510e-e8ef-5e92-3e29-4e290bfad9b2@gmail.com>
+Date:   Thu, 29 Jul 2021 10:52:06 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210728112430.GA22101@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <108629.1627528155@turing-police>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/07/2021 13:24, Christoph Hellwig wrote:
-> On Wed, Jul 28, 2021 at 10:37:41AM +0200, Milan Broz wrote:
->> very specific hw attributes. So you have one emulated device compiled-in?
+On 7/28/21 10:09 PM, Valdis Klētnieks wrote:
+>> +	# cat /sys/class/block/led_trigger_list
+>> +	baz: 0
+>> +	bar: 0
+>> +	foo: 0
 > 
-> Yes.
-> 
->> Or there is another way how to configure scsi_debug if compiled-in? (we use module parameters, I think it is
->> the same was how util-linux testsute works with scsi_debug).
-> 
-> Can can add hosts using the add_host sysfs file.  I thought that was the
-> way to go generally, never thought of reloading the module just to
-> add/delete hosts.
+> This looks like an abuse of the "one entry one value" rule for sysfs.
+> Perhaps this should be a directory /sys/class/block/defined_triggers/
+> and separate files under that for foo, bar, and baz?  That would probably
+> make reference counting a lot easier as well....
 
-Heh, I just thought the opposite -that using kernel parameters is the way how to use it :-)
+Indeed it is.
 
-> 
->> (BTW could you send me output of the failed test run? I run it over Linus' tree and ti works so it is perhaps another
->> assumption that should be fixed.)
-> 
-> Output with everything from the README installed (a lot less failures now):
+Funny that you should mention using a subdirectory.  I originally wanted
+to put all of the trigger-related stuff into
+/sys/class/block/led_triggers/, but I couldn't find any API to create a
+subdirectory for *class* attributes (only for device attributes), nor do
+I see any such subdirectories on my system.
 
-We cannot run some tests without scsi_debug as module, so I at least added detection for compiled-in scsi_debug
-and some module error noise removal. (There is still a lot of operations tested without this.)
+   # find /sys/class -type d | egrep '^/sys/class/[^/]+/'
+   (no output)
 
-For the kernel dependencies:
-For cryptsetup project and testsuite is good to have also enabled userspace crypto API interface (CONFIG_CRYPTO_USER)
-and keyring (CONFIG_KEYS) but we should be able to run without it.
-(The rest is specific crypto algs used in test images, but these are skipped if not available.)
+Is is possible to create subdirectories for class attributes?
 
-Thanks,
-Milan
+-- 
+========================================================================
+                  In Soviet Russia, Google searches you!
+========================================================================
