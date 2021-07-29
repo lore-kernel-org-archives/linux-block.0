@@ -2,127 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E56C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AEEC4338F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:11:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C09060F22
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A19C60F21
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 17:11:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbhG2RDK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 13:03:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43242 "EHLO
+        id S229812AbhG2RLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 13:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbhG2RDK (ORCPT
+        with ESMTP id S229598AbhG2RLo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 13:03:10 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4CD2C061765;
-        Thu, 29 Jul 2021 10:03:05 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id w6so9283763oiv.11;
-        Thu, 29 Jul 2021 10:03:05 -0700 (PDT)
+        Thu, 29 Jul 2021 13:11:44 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F05BC061765;
+        Thu, 29 Jul 2021 10:11:40 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id b6so11213627pji.4;
+        Thu, 29 Jul 2021 10:11:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=48GpcyRTXY0iV0Yn24BwGNhhL7mTyBkdtTI5JRfp5Nc=;
-        b=c+Mm2sSrlJalV4WONcqQ73ypeaI1CHM4QAYBR98KYgFRIHa5/FzhOfhaaCI5TR7zrp
-         3+Q7k/9LlKQqKt8xV+XT8S2Yi0vA+B1JqFlkSZAyInycsp5w+YXnUSvcqbRYag69vGXo
-         8ZRjqzBgxmq1OidIiOd5BXV9vS8qBH79LW2jCdJfKZIbZuEBz7oEOJ55TwO4DgQkNv6N
-         o6cI/jUXdhUufV95+07SsoJfUs1NpiZl/DO9O2uLFJU+8nuFes+iOLUA5VdqOC17sbBx
-         p/5dT/eg+S2d2RYCG6CPPpXEW2ksJpMDyV+gdr7O69Qb8W9ODsPxTzXhyiRx71+rrm9Y
-         ZbhA==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vwili5Ap3pl5QTQqz8bc1S7CjPVAgBWQMamZ9XQVdO4=;
+        b=iT/gDga4Q09cV3tRMXD5HCdMqu54krFqAdGOn3IVbHrIUuIJKufh/9zsc2S76ZQQXR
+         HFcSP8MMW8c2pLGKGrkHNFGTjmT6XcvFk7Ydam8QwwSxmGc2uUAUOBc7vgV94yksLCbm
+         5g6jBi3tmExqgi5PtPz1If7SVyGOKnDFb7ShBegl1TRFWjUyJiz187mcVe9FGcEthtWE
+         fio7y7AZ+6HJ4Xge03I++TWhDsyCynxfLIvLFd2Mw3Vyq2nR7/NdjdsOFtol/k9QcFP6
+         WVWF8GQjsJtJB5gVq+KytIjw5niqWi7/Eh8F6QlDnTawp+qhc9z1hd6TqBvGzKCtUAAr
+         1cVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=48GpcyRTXY0iV0Yn24BwGNhhL7mTyBkdtTI5JRfp5Nc=;
-        b=BkCggNo+aNGX9zuYeJHLIX+ojSAuFhuDhEMMlAAqZP4RlCGZwisUviTSqcqxyqHt7Q
-         KsOoqEpvqWpouOFPlGO1/Cf7JigU6NLko9nJ8E7WBvJXlWQtPd1pW4rG1g2x8Etrwmhr
-         E5CUo13w879cFLCLIIhr35eGGt5Qtm1weBKaGmvY4S89BfL8r3IEG9xj8KxSnjY+IRZC
-         v2Bkjw3jKlo4vt9JSCtTsOnxHPGQ77+xxzzFdFBQUCHqT48Zh16vqH9lyRuZs/QnxkyR
-         ULTqfg6HccL6DIFJRZyL5IUFlDoNQEk2oZoKi3B6YvLXxrY/uC4fTx/HaKthnULZeo0M
-         GWWQ==
-X-Gm-Message-State: AOAM532tXPIG0cXNe+9CqpkHnPl/i6UxZ4EaMEHprJqa2hEaSilV3rHP
-        ohwMTa78YJpRHdAjUhRQ5YGhoWjS8phYP5Pv
-X-Google-Smtp-Source: ABdhPJw7ocOYLDfL5dZaVR4MDFI8xCYr21lpH9j8rvUQmHcPSf4Avd82c6eds3Y6dtRmTNm44FvHWQ==
-X-Received: by 2002:aca:da02:: with SMTP id r2mr3612195oig.141.1627578185251;
-        Thu, 29 Jul 2021 10:03:05 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id be15sm679082oib.18.2021.07.29.10.03.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jul 2021 10:03:04 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/8] Add configurable block device LED triggers
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        kernelnewbies@kernelnewbies.org
-References: <20210729015344.3366750-1-arequipeno@gmail.com>
- <20210729085413.GA16945@amd>
-From:   Ian Pilcher <arequipeno@gmail.com>
-Message-ID: <b108799e-24a2-d5ec-e18e-b7ae8bded085@gmail.com>
-Date:   Thu, 29 Jul 2021 12:03:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=vwili5Ap3pl5QTQqz8bc1S7CjPVAgBWQMamZ9XQVdO4=;
+        b=oPU3XYkXRSm4EIy8XUfBnOR8QyRJYSpgiLHD5fZwMuvPBDi1QwYmLxzyBzXUAZDMBw
+         N+591Z9u/gkih/DQ+ylD017FnHEhRDG+Zf9kd/lN+0w7T7RzKVg07lxgKJsBTHR75b8e
+         yFlSj3S+L8gjL53fUfIcOjidPsBvFF9KbOiYIqwz/nKKuixKkRfHqU3Q25ZEN5ocu07q
+         9ZbWWTmzQkCdAvjxFCccWlHxrAGycC9SGqPkp9lXcK5Iu4OcQCZj8r3zsfJNNkICqewp
+         t+CsBI1XMSjboN+65qsFMQKywlmXdW+A2iAcRi2IYCMvtlrWMG5Yodu5JcU8zMjgXSEm
+         lvKg==
+X-Gm-Message-State: AOAM533H0kAgRBDVIQWoyyspzfVt1U1JAPYfMmzhLMVVpeSgAEShlB8F
+        v3naqlsDp39wVOgugQWh4Kw=
+X-Google-Smtp-Source: ABdhPJyLj0LNatiDfmCRGU+euAPbCw3/KzESbb7ezYVlpBaMpmeSg59g33hAw1YtZBWYGNl1bnwQjg==
+X-Received: by 2002:a63:7f48:: with SMTP id p8mr1758975pgn.184.1627578699815;
+        Thu, 29 Jul 2021 10:11:39 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:9699])
+        by smtp.gmail.com with ESMTPSA id s50sm4205467pfw.212.2021.07.29.10.11.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 10:11:39 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 29 Jul 2021 07:11:34 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     brookxu <brookxu.cn@gmail.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
+Subject: Re: [PATCH v2] blk-throtl: optimize IOPS throttle for large IO
+ scenarios
+Message-ID: <YQLhRrkZrmKTzfbP@mtj.duckdns.org>
+References: <40915233274d31bb0659ff9f3be8900a5a0e81ba.1627462548.git.brookxu@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20210729085413.GA16945@amd>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <40915233274d31bb0659ff9f3be8900a5a0e81ba.1627462548.git.brookxu@tencent.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/29/21 3:54 AM, Pavel Machek wrote:
-> We normally have a trigger ("block device activity") which can then
-> expose parameters ("I watch for read" and "I monitor sda1").
-> 
-> Is there a reason normal solution can not be used?
+Hello,
 
-This big difference is that this allows different devices to drive
-different LEDs.  For example, my NAS has 5 drive bays, each of which
-has its own activity LED.  With these patches, I can create a
-separate trigger for each of those LEDs and associate the drive in each
-bay with the correct LED:
+On Wed, Jul 28, 2021 at 05:01:41PM +0800, brookxu wrote:
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index a11b3b5..86ff943 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+>  		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+>  		submit_bio_noacct(*bio);
+>  		*bio = split;
+> +
+> +		blk_throtl_recharge_bio(*bio);
 
-   sdb --> trigger1 --> LED1
-    ⋮         ⋮         ⋮
-   sdf --> trigger5 --> LED5
+Can you rename this blk_throtl_charge_bio_split()?
 
-(sda is the SATA DOM boot drive.)
+> @@ -524,6 +537,11 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
+>  	tg->idletime_threshold = DFL_IDLE_THRESHOLD;
+>  	tg->idletime_threshold_conf = DFL_IDLE_THRESHOLD;
+>  
+> +	atomic_set(&tg->io_split_cnt[0], 0);
+> +	atomic_set(&tg->io_split_cnt[1], 0);
+> +	atomic_set(&tg->last_io_split_cnt[0], 0);
+> +	atomic_set(&tg->last_io_split_cnt[1], 0);
 
-Note that this also supports associating multiple devices with a single
-trigger, so it can be used for more complicated schemes.  For example,
-if my NAS had an additional LED and an optical drive, I could do this:
+We likely don't need these. pd's zeroed on allocation.
 
-   sr0 --+
-         |
-         +--> trigger0 --> LED0
-         |
-   sda --+
+> @@ -877,10 +900,19 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+>  	else
+>  		tg->bytes_disp[rw] = 0;
+>  
+> -	if (tg->io_disp[rw] >= io_trim)
+> +	if (tg_io_disp(tg, rw) >= io_trim) {
 
-   sdb -----> trigger1 --> LED1
-    ⋮         ⋮         ⋮
-   sdf -----> trigger5 --> LED5
+Instead of checking this in multiple places, would it be simpler to transfer
+the atomic counters to the existing counters whenever we enter blk-throtl
+and leave the rest of the code as-is?
 
-As far as I know, the current triggers (disk-activity, disk-read,
-disk-write, and ide-disk) don't support this sort of arbitrary
-device-trigger association.
-
-This patch set also support triggering LEDs from pretty much any block
-device (virtual as well as physical), not just ATA devices, although
-that's just a matter of the place from which the trigger is "fired".
-
-I hope this explains things.
-
-Thanks!
+Thanks.
 
 -- 
-========================================================================
-                  In Soviet Russia, Google searches you!
-========================================================================
+tejun
