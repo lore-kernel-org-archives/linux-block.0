@@ -2,254 +2,245 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F58C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 08:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8BC3C43214
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 08:41:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B9B760524
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 08:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95B8260F9B
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 08:41:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238009AbhG3I21 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 04:28:27 -0400
-Received: from mail-il1-f199.google.com ([209.85.166.199]:33763 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbhG3I2V (ORCPT
+        id S238047AbhG3Ili (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 04:41:38 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:58882 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237992AbhG3Ilh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 04:28:21 -0400
-Received: by mail-il1-f199.google.com with SMTP id d6-20020a056e020506b0290208fe58bd16so4681516ils.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 01:28:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=GISeRZqB/e3Oljoo9ObPCdPOxhxBhMkqAwYWd8XUGME=;
-        b=uaT/2FE7jiRMl4PH4k3WseAd4pY/8odJNOuRsJMZV4VEmB6hgM08wB4E4AMjd6BDEY
-         R35BCwAuy8l+qX+b6lg4K3Ic709/+zPcs0+qN2ZNdFPZ+iPGMFHYEA+Tbjcyfw+ShxP1
-         O5LktamUYYlb/PZwHsnN1HQladQ2Q37LkPuqPleIfV59S94rTXE5IOhpRRBxQ0iJ+6ok
-         5V82W1kUHP/GeRMv1+jzy8ml7Zr3u2/gdLWlJZS8St6UEuxGmc4CsngEDcSFbwImTf93
-         +aVmoUiqpWQemPoKMqoWqdWvgfpdyvwvfDZRXj/wYFXFnD9WOB4lo6elvLbjg1CbwZJy
-         UV7w==
-X-Gm-Message-State: AOAM531yjEAdFmsV8GxF7ZGSbowrRItf+7RtIv+hq+WeWyJKis6vrr1A
-        A4354hqB7ubXjlqM7qNt/hda8LeFBJC6j+DRk74NNjVlca9m
-X-Google-Smtp-Source: ABdhPJzzjWCRaOM7xD8AfBtQ/XRWqmHCiFjnQk+DT8rgvtzJ38XwWm2r0bULYRZWLY5piamtdzOnQAW+3fef5RiKOzQXmIOvrq59
+        Fri, 30 Jul 2021 04:41:37 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 3A8E01FDBC;
+        Fri, 30 Jul 2021 08:41:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1627634491;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q5VtXhh5iSmysRELgw6/DxJ+Gj7wHi4sWZNfLM3x5SI=;
+        b=nZijUChYyt3l8+IQmonxJMZHIuUEfIAQzB7oBbZigVnXkYK/NyBO9B+g7LbWqN3d2/Rrtt
+        eHOGGQdCN5LkTDW9uXhGQmoCSEgl91rCcCmb5glsxNRumKrdaFywzGDGURVSolnbsgTNb6
+        1cJiB/CIOwgEuPy2iCQd4GlQfbV4h1c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1627634491;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q5VtXhh5iSmysRELgw6/DxJ+Gj7wHi4sWZNfLM3x5SI=;
+        b=Z4MYoBJrjJWY+SVTj+NlOvwKoN39lEA6H+7Iq2rGEVfpGtoH548rv56fLf4/8on5mD1JsN
+        6QWTZU5U8pK6udAg==
+Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
+        by relay2.suse.de (Postfix) with ESMTP id 212AFA3B8A;
+        Fri, 30 Jul 2021 08:41:31 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 3D3B6DB284; Fri, 30 Jul 2021 10:38:45 +0200 (CEST)
+Date:   Fri, 30 Jul 2021 10:38:45 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        nborisov@suse.com
+Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy()
+ region
+Message-ID: <20210730083845.GD5047@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Kees Cook <keescook@chromium.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        nborisov@suse.com
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-2-keescook@chromium.org>
+ <20210728085921.GV5047@twin.jikos.cz>
+ <20210728091434.GQ1931@kadam>
+ <c52a52d9-a9e0-5020-80fe-4aada39035d3@acm.org>
+ <20210728213730.GR5047@suse.cz>
+ <YQJDCw01gSp1d1/M@kroah.com>
+ <20210729082039.GX25548@kadam>
+ <202107291952.C08EAE039B@keescook>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2424:: with SMTP id g4mr722705iob.189.1627633697367;
- Fri, 30 Jul 2021 01:28:17 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 01:28:17 -0700
-In-Reply-To: <000000000000458e0c05c6928ee2@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005b27b805c853007b@google.com>
-Subject: Re: [syzbot] possible deadlock in __loop_clr_fd (2)
-From:   syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, hdanton@sina.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202107291952.C08EAE039B@keescook>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+On Thu, Jul 29, 2021 at 11:00:48PM -0700, Kees Cook wrote:
+> On Thu, Jul 29, 2021 at 11:20:39AM +0300, Dan Carpenter wrote:
+> > On Thu, Jul 29, 2021 at 07:56:27AM +0200, Greg Kroah-Hartman wrote:
+> > > On Wed, Jul 28, 2021 at 11:37:30PM +0200, David Sterba wrote:
+> > > > On Wed, Jul 28, 2021 at 02:37:20PM -0700, Bart Van Assche wrote:
+> > > > > On 7/28/21 2:14 AM, Dan Carpenter wrote:
+> > > > > > On Wed, Jul 28, 2021 at 10:59:22AM +0200, David Sterba wrote:
+> > > > > >>>   drivers/media/platform/omap3isp/ispstat.c |  5 +--
+> > > > > >>>   include/uapi/linux/omap3isp.h             | 44 +++++++++++++++++------
+> > > > > >>>   2 files changed, 36 insertions(+), 13 deletions(-)
+> > > > > >>>
+> > > > > >>> diff --git a/drivers/media/platform/omap3isp/ispstat.c b/drivers/media/platform/omap3isp/ispstat.c
+> > > > > >>> index 5b9b57f4d9bf..ea8222fed38e 100644
+> > > > > >>> --- a/drivers/media/platform/omap3isp/ispstat.c
+> > > > > >>> +++ b/drivers/media/platform/omap3isp/ispstat.c
+> > > > > >>> @@ -512,7 +512,7 @@ int omap3isp_stat_request_statistics(struct ispstat *stat,
+> > > > > >>>   int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
+> > > > > >>>   					struct omap3isp_stat_data_time32 *data)
+> > > > > >>>   {
+> > > > > >>> -	struct omap3isp_stat_data data64;
+> > > > > >>> +	struct omap3isp_stat_data data64 = { };
+> > > > > >>
+> > > > > >> Should this be { 0 } ?
+> > > > > >>
+> > > > > >> We've seen patches trying to switch from { 0 } to {  } but the answer
+> > > > > >> was that { 0 } is supposed to be used,
+> > > > > >> http://www.ex-parrot.com/~chris/random/initialise.html 
+> > > > > >>
+> > > > > >> (from https://lore.kernel.org/lkml/fbddb15a-6e46-3f21-23ba-b18f66e3448a@suse.com/ )
+> > > > > > 
+> > > > > > In the kernel we don't care about portability so much.  Use the = { }
+> > > > > > GCC extension.  If the first member of the struct is a pointer then
+> > > > > > Sparse will complain about = { 0 }.
+> > > > > 
+> > > > > +1 for { }.
+> > > > 
+> > > > Oh, I thought the tendency is is to use { 0 } because that can also
+> > > > intialize the compound members, by a "scalar 0" as it appears in the
+> > > > code.
+> > > > 
+> > > 
+> > > Holes in the structure might not be initialized to anything if you do
+> > > either one of these as well.
+> > > 
+> > > Or did we finally prove that is not the case?  I can not remember
+> > > anymore...
+> > 
+> > Yep.  The C11 spec says that struct holes are initialized.
+> > 
+> > https://lore.kernel.org/netdev/20200731140452.GE24045@ziepe.ca/
+> 
+> This is, unfortunately, misleading. The frustrating key word is
+> "partial" in "updated in C11 to require zero'ing padding when doing
+> partial initialization of aggregates". If one initializes _all_ the
+> struct members ... the padding doesn't get initialized. :( (And until
+> recently, _trailing_ padding wasn't getting initialized even when other
+> paddings were.)
+> 
+> I've tried to collect all the different ways the compiler might initialize
+> a variable in this test:
+> https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/tree/lib/test_stackinit.c?h=for-next/kspp
+> 
+> FWIW, there's no difference between -std=gnu99 and -std=c11, and the
+> test shows that padding is _not_ universally initialized (unless your
+> compiler supports -ftrivial-auto-var-init=zero, which Clang does, and
+> GCC will shortly[1]). Running this with GCC 10.3.0, I see this...
+> 
+> As expected, having no initializer leaves padding (as well as members)
+> uninitialized:
+> 
+> stackinit: small_hole_none FAIL (uninit bytes: 24)
+> stackinit: big_hole_none FAIL (uninit bytes: 128)
+> stackinit: trailing_hole_none FAIL (uninit bytes: 32)
+> 
+> Here, "zero" means  "= { };" and they get padding initialized:
+> 
+> stackinit: small_hole_zero ok
+> stackinit: big_hole_zero ok
+> stackinit: trailing_hole_zero ok
+> 
+> Here, "static_partial" means "= { .one_member = 0 };", and
+> "dynamic_partial" means "= { .one_member = some_variable };". These are
+> similarly initialized:
+> 
+> stackinit: small_hole_static_partial ok
+> stackinit: big_hole_static_partial ok
+> stackinit: trailing_hole_static_partial ok
+> 
+> stackinit: small_hole_dynamic_partial ok
+> stackinit: big_hole_dynamic_partial ok
+> stackinit: trailing_hole_dynamic_partial ok
+> 
+> But when _all_ members are initialized, the padding is _not_:
+> 
+> stackinit: small_hole_static_all FAIL (uninit bytes: 3)
+> stackinit: big_hole_static_all FAIL (uninit bytes: 124)
+> stackinit: trailing_hole_static_all FAIL (uninit bytes: 7)
+> 
+> stackinit: small_hole_dynamic_all FAIL (uninit bytes: 3)
+> stackinit: big_hole_dynamic_all FAIL (uninit bytes: 124)
+> stackinit: trailing_hole_dynamic_all FAIL (uninit bytes: 7)
+> 
+> As expected, assigning to members outside of initialization leaves
+> padding uninitialized:
+> 
+> stackinit: small_hole_runtime_partial FAIL (uninit bytes: 23)
+> stackinit: big_hole_runtime_partial FAIL (uninit bytes: 127)
+> stackinit: trailing_hole_runtime_partial FAIL (uninit bytes: 24)
+> 
+> stackinit: small_hole_runtime_all FAIL (uninit bytes: 3)
+> stackinit: big_hole_runtime_all FAIL (uninit bytes: 124)
+> stackinit: trailing_hole_runtime_all FAIL (uninit bytes: 7)
+> 
+> > What doesn't initialize struct holes is assignments:
+> > 
+> > 	struct foo foo = *bar;
+> 
+> Right. Object to object assignments do not clear padding:
+> 
+> stackinit: small_hole_assigned_copy XFAIL (uninit bytes: 3)
+> stackinit: big_hole_assigned_copy XFAIL (uninit bytes: 124)
+> stackinit: trailing_hole_assigned_copy XFAIL (uninit bytes: 7)
+> 
+> And whole-object assignments of cast initializers follow the pattern of
+> basic initializers, which makes sense given the behavior of initializers
+> and direct assignment tests above. e.g.:
+> 	obj = (type){ .member = ... };
+> 
+> stackinit: small_hole_assigned_static_partial ok
+> stackinit: small_hole_assigned_dynamic_partial ok
+> stackinit: big_hole_assigned_dynamic_partial ok
+> stackinit: big_hole_assigned_static_partial ok
+> stackinit: trailing_hole_assigned_dynamic_partial ok
+> stackinit: trailing_hole_assigned_static_partial ok
+> 
+> stackinit: small_hole_assigned_static_all FAIL (uninit bytes: 3)
+> stackinit: small_hole_assigned_dynamic_all FAIL (uninit bytes: 3)
+> stackinit: big_hole_assigned_static_all FAIL (uninit bytes: 124)
+> stackinit: big_hole_assigned_dynamic_all FAIL (uninit bytes: 124)
+> stackinit: trailing_hole_assigned_dynamic_all FAIL (uninit bytes: 7)
+> stackinit: trailing_hole_assigned_static_all FAIL (uninit bytes: 7)
+> 
+> So, yeah, it's not very stable.
 
-HEAD commit:    4ccc9e2db7ac Add linux-next specific files for 20210729
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=169b8d7a300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=75a5bed89b5c0fd2
-dashboard link: https://syzkaller.appspot.com/bug?extid=f61766d5763f9e7a118f
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b87a8e300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d20adc300000
+Then is explicit memset the only reliable way accross all compiler
+flavors and supported versions?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com
-
-loop0: detected capacity change from 0 to 4096
-EXT4-fs error (device loop0): ext4_fill_super:4953: inode #2: comm syz-executor258: iget: root inode unallocated
-EXT4-fs (loop0): get root inode failed
-EXT4-fs (loop0): mount failed
-======================================================
-WARNING: possible circular locking dependency detected
-5.14.0-rc3-next-20210729-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor258/6697 is trying to acquire lock:
-ffff88807dbec138 ((wq_completion)loop0){+.+.}-{0:0}, at: flush_workqueue+0xe1/0x1600 kernel/workqueue.c:2784
-
-but task is already holding lock:
-ffff88801d535468 (&lo->lo_mutex){+.+.}-{3:3}, at: __loop_clr_fd+0xaf/0x15e0 drivers/block/loop.c:1350
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #6 (&lo->lo_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:957 [inline]
-       __mutex_lock+0x131/0x1300 kernel/locking/mutex.c:1096
-       loop_control_remove drivers/block/loop.c:2449 [inline]
-       loop_control_ioctl+0x22f/0x450 drivers/block/loop.c:2494
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:866 [inline]
-       __se_sys_ioctl fs/ioctl.c:852 [inline]
-       __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:852
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #5 (loop_ctl_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:957 [inline]
-       __mutex_lock+0x131/0x1300 kernel/locking/mutex.c:1096
-       loop_add+0x9c/0x940 drivers/block/loop.c:2314
-       loop_probe+0x6a/0x80 drivers/block/loop.c:2426
-       blk_request_module+0x111/0x1d0 block/genhd.c:673
-       blkdev_get_no_open+0x178/0x1e0 fs/block_dev.c:1298
-       blkdev_get_by_dev.part.0+0x23/0xd40 fs/block_dev.c:1362
-       blkdev_get_by_dev fs/block_dev.c:1471 [inline]
-       blkdev_open+0x295/0x300 fs/block_dev.c:1477
-       do_dentry_open+0x4c8/0x11d0 fs/open.c:826
-       do_open fs/namei.c:3374 [inline]
-       path_openat+0x1c23/0x27f0 fs/namei.c:3507
-       do_filp_open+0x1aa/0x400 fs/namei.c:3534
-       do_sys_openat2+0x16d/0x420 fs/open.c:1204
-       do_sys_open fs/open.c:1220 [inline]
-       __do_sys_open fs/open.c:1228 [inline]
-       __se_sys_open fs/open.c:1224 [inline]
-       __x64_sys_open+0x119/0x1c0 fs/open.c:1224
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #4 (major_names_lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:957 [inline]
-       __mutex_lock+0x131/0x1300 kernel/locking/mutex.c:1096
-       blkdev_show+0x27/0x160 block/genhd.c:197
-       devinfo_show+0xc1/0xf0 fs/proc/devices.c:22
-       seq_read_iter+0xbb0/0x1240 fs/seq_file.c:272
-       proc_reg_read_iter+0x1fb/0x2d0 fs/proc/inode.c:300
-       call_read_iter include/linux/fs.h:2146 [inline]
-       new_sync_read+0x41e/0x6e0 fs/read_write.c:415
-       vfs_read+0x35c/0x570 fs/read_write.c:496
-       ksys_read+0x12d/0x250 fs/read_write.c:634
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #3 (&p->lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:957 [inline]
-       __mutex_lock+0x131/0x1300 kernel/locking/mutex.c:1096
-       seq_read_iter+0xdf/0x1240 fs/seq_file.c:182
-       call_read_iter include/linux/fs.h:2146 [inline]
-       generic_file_splice_read+0x450/0x6c0 fs/splice.c:311
-       do_splice_to+0x1bf/0x250 fs/splice.c:796
-       splice_direct_to_actor+0x2c2/0x8c0 fs/splice.c:870
-       do_splice_direct+0x1b3/0x280 fs/splice.c:979
-       do_sendfile+0x9f0/0x1120 fs/read_write.c:1260
-       __do_sys_sendfile64 fs/read_write.c:1325 [inline]
-       __se_sys_sendfile64 fs/read_write.c:1311 [inline]
-       __x64_sys_sendfile64+0x1cc/0x210 fs/read_write.c:1311
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #2 (sb_writers#3){.+.+}-{0:0}:
-       percpu_down_read include/linux/percpu-rwsem.h:51 [inline]
-       __sb_start_write include/linux/fs.h:1801 [inline]
-       sb_start_write include/linux/fs.h:1871 [inline]
-       file_start_write include/linux/fs.h:3080 [inline]
-       lo_write_bvec+0x3b6/0x6d0 drivers/block/loop.c:327
-       lo_write_simple drivers/block/loop.c:350 [inline]
-       do_req_filebacked drivers/block/loop.c:668 [inline]
-       loop_handle_cmd drivers/block/loop.c:2202 [inline]
-       loop_process_work+0xc60/0x24e0 drivers/block/loop.c:2242
-       process_one_work+0x98d/0x1630 kernel/workqueue.c:2276
-       worker_thread+0x658/0x11f0 kernel/workqueue.c:2422
-       kthread+0x3e5/0x4d0 kernel/kthread.c:319
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
--> #1 ((work_completion)(&lo->rootcg_work)){+.+.}-{0:0}:
-       process_one_work+0x8fc/0x1630 kernel/workqueue.c:2252
-       worker_thread+0x658/0x11f0 kernel/workqueue.c:2422
-       kthread+0x3e5/0x4d0 kernel/kthread.c:319
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
--> #0 ((wq_completion)loop0){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3051 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3174 [inline]
-       validate_chain kernel/locking/lockdep.c:3789 [inline]
-       __lock_acquire+0x2a07/0x54a0 kernel/locking/lockdep.c:5015
-       lock_acquire kernel/locking/lockdep.c:5625 [inline]
-       lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
-       flush_workqueue+0x110/0x1600 kernel/workqueue.c:2787
-       drain_workqueue+0x1a5/0x3c0 kernel/workqueue.c:2952
-       destroy_workqueue+0x71/0x800 kernel/workqueue.c:4389
-       __loop_clr_fd+0x212/0x15e0 drivers/block/loop.c:1368
-       loop_clr_fd drivers/block/loop.c:1494 [inline]
-       lo_ioctl+0x3c3/0x1880 drivers/block/loop.c:1850
-       blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:587
-       block_ioctl+0xf9/0x140 fs/block_dev.c:1569
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:866 [inline]
-       __se_sys_ioctl fs/ioctl.c:852 [inline]
-       __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:852
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-other info that might help us debug this:
-
-Chain exists of:
-  (wq_completion)loop0 --> loop_ctl_mutex --> &lo->lo_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&lo->lo_mutex);
-                               lock(loop_ctl_mutex);
-                               lock(&lo->lo_mutex);
-  lock((wq_completion)loop0);
-
- *** DEADLOCK ***
-
-1 lock held by syz-executor258/6697:
- #0: ffff88801d535468 (&lo->lo_mutex){+.+.}-{3:3}, at: __loop_clr_fd+0xaf/0x15e0 drivers/block/loop.c:1350
-
-stack backtrace:
-CPU: 1 PID: 6697 Comm: syz-executor258 Not tainted 5.14.0-rc3-next-20210729-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:105
- check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2131
- check_prev_add kernel/locking/lockdep.c:3051 [inline]
- check_prevs_add kernel/locking/lockdep.c:3174 [inline]
- validate_chain kernel/locking/lockdep.c:3789 [inline]
- __lock_acquire+0x2a07/0x54a0 kernel/locking/lockdep.c:5015
- lock_acquire kernel/locking/lockdep.c:5625 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
- flush_workqueue+0x110/0x1600 kernel/workqueue.c:2787
- drain_workqueue+0x1a5/0x3c0 kernel/workqueue.c:2952
- destroy_workqueue+0x71/0x800 kernel/workqueue.c:4389
- __loop_clr_fd+0x212/0x15e0 drivers/block/loop.c:1368
- loop_clr_fd drivers/block/loop.c:1494 [inline]
- lo_ioctl+0x3c3/0x1880 drivers/block/loop.c:1850
- blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:587
- block_ioctl+0xf9/0x140 fs/block_dev.c:1569
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:866 [inline]
- __se_sys_ioctl fs/ioctl.c:852 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:852
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x444717
-Code: 3c 1c 48 f7 d8 49 39 c4 72 b8 e8 44 3a 02 00 85 c0 78 bd 48 83 c4 08 4c 89 e0 5b 41 5c c3 0f 1f 44 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffab8ca568 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000016232c0 RCX: 0000000000444717
-RDX: 0000000000000000 RSI: 0000000000004c01 RDI: 0000000000000007
-RBP: 0000000000000075 R08: 00007fffab8ca5c0 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000200002a8
-R13: 0000000000000006 R14: 0000000000000007 R15: 0000000000000007
-
+E.g. for ioctls that get kernel memory (stack, kmalloc), partially
+initialize it and then call copy_to_user.
