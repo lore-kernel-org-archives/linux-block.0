@@ -2,114 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B1A5C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 19:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B09C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 20:33:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 741FA60F46
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 19:18:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE63560E09
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 20:33:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231134AbhG3TSe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 15:18:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60400 "EHLO
+        id S230239AbhG3UeC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 16:34:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230402AbhG3TSd (ORCPT
+        with ESMTP id S230217AbhG3UeB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 15:18:33 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1AF0C061765
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 12:18:28 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id j1so16640242pjv.3
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 12:18:28 -0700 (PDT)
+        Fri, 30 Jul 2021 16:34:01 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93900C06175F;
+        Fri, 30 Jul 2021 13:33:55 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id b13so1949258wrs.3;
+        Fri, 30 Jul 2021 13:33:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GxQ+HQk3cdftqAN6ekEINRB7/ckK/Y3btr+5Ktub3O8=;
-        b=WS5dYESChuBnCxT0C846oXNdS39ELe0+GVYff+8CDiB/+f/gvQwIUAsaHdpyWtgQI9
-         Ksdmzxs2AfVddKWJDuxET2t1XvdH74XtC3HtYpRTl4M2aix9P85mPUTWk0m4skcu2rUY
-         hkzUA5m/uNIuqcBh7EgcpFhsleAuHbj8eKL2s=
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Qkobvq7Hd4pPLqJEaL5Fbrn7pZXWscENjpBzNmq2/mY=;
+        b=jmVDSA9r24qbJ1fGGbG42y/SbrixWvSS96TgLpZRMNqB/zKs0WW1eD2sJZvcPdxKr9
+         DswXy3NGiw0NVlGOPMonarwsE/rVoGfKIJp84GB9q7WWQmIr+YIsmMtxnYltk9iehZDO
+         lPJsWP5eGolJ1H9fkCheFqW6EOAA0HEH5caa/dYc9ssbJZ8XvZCIhtkZFXsRJ0Tcm17R
+         TqqxUoDUjh0jV5JMVRb/ZwfRH0IJ+nYr6bikKvR9L5iyBrv1BodIJmcttLX76XFCNSiS
+         6qdaKyzMSp/8dTndu9y3Gu2PZBXKHx5WoL8wPJZbO04CkSIK9vo5kqq6JVVf4auQ3Rk7
+         Yh7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GxQ+HQk3cdftqAN6ekEINRB7/ckK/Y3btr+5Ktub3O8=;
-        b=szL6lgPVZxdonZ8zQP85gtg466tc9SLEMjdVzLalA1sNC5FxCyCmXcFbBAzKcGDwft
-         hRa+cUJd3JhRX6X+J2pJlL+CHxeBzCnYxPIUiJi0fDMKPeTMvmKKkzU8lXItXmufQRH9
-         CfHUx726iq1ZV3UjOJjAWhvbkIbzPpgTTzl7CAjRB8vs8Gxn2WfJJn9tuhxgsgem+4gd
-         nRaOsA0CLG2rmoue1Xim7tJkXe2B7vyKElDp/0baXM4Gdjka2ctsLvrrcjAwHJBTKFFo
-         peJRvjQd4iWrYMyF9BOdnqyUMZGPLoUa7BteXr1xpxwf/T340J+iDkoiYCNJnDVGSo06
-         2Zgw==
-X-Gm-Message-State: AOAM533FPs23/7DL2Hua11nhF4DGyQ9lN6Z1OltIQxSw6YYQ+sZ0goO+
-        gvzur9AXwzereC0OosFM5ekDlA==
-X-Google-Smtp-Source: ABdhPJyCK3+AR/s/Pq/itPZjFA3DL77BZcO4l8s7xQqT+jnGem6TdAj1wqpo6cwifM6sSr5c8f1XQQ==
-X-Received: by 2002:a65:498a:: with SMTP id r10mr500564pgs.7.1627672708339;
-        Fri, 30 Jul 2021 12:18:28 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 26sm3040727pjj.27.2021.07.30.12.18.27
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Qkobvq7Hd4pPLqJEaL5Fbrn7pZXWscENjpBzNmq2/mY=;
+        b=LPDgqXJWh86Ko4filsCE1og35Sp92N7svyaPAoL4U9cLGpO9C9kFffmBdumzo47c9G
+         O4det2FjWhuXg8zLIQpJjb5Gx2MzSCCkRCmzq906aNK1jLLxnKhYezW/t1htynS7jkHb
+         sVVcKphgrsbmi8UQLN7+uNe7fYRCQlc9rdVkUilfhAiaOXW3QhrselapMQFhG8SNNtSu
+         TAk2tRSvjSp8x9sU0OhZ7FRDYrDsIrvsL2Dg7wtIlV80Fl69kHT9/9I3/vlQa/nKnpkK
+         k7w03svVoB5H/Cvvp4nmSNfBjjyxsz2HdnTHJ1UQGjyYU9ndg3n5NwO5TFsvxTqmehkb
+         hxzQ==
+X-Gm-Message-State: AOAM530CRhYHLqMWwmPIUpw/gLlPX2vIJrT/TFfsyoeHcxV2H/CXA5NL
+        9G4pVYiCBTa27IR9uq3Tell4MOqcjBI=
+X-Google-Smtp-Source: ABdhPJw8HF/cjS5VndssudRxX31dvWq9yzgzLYEppF9rZCk2YI6wkjvUk29q5DGlqD90A30NO1Qe4Q==
+X-Received: by 2002:adf:e507:: with SMTP id j7mr5194675wrm.113.1627677234231;
+        Fri, 30 Jul 2021 13:33:54 -0700 (PDT)
+Received: from masalkhi.fritz.box (dslb-178-005-073-162.178.005.pools.vodafone-ip.de. [178.5.73.162])
+        by smtp.gmail.com with ESMTPSA id b20sm114161wmj.48.2021.07.30.13.33.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 12:18:27 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 12:18:26 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>, dsterba@suse.cz,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        nborisov@suse.com
-Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy()
- region
-Message-ID: <202107301217.46EA9DA@keescook>
-References: <20210728091434.GQ1931@kadam>
- <c52a52d9-a9e0-5020-80fe-4aada39035d3@acm.org>
- <20210728213730.GR5047@suse.cz>
- <YQJDCw01gSp1d1/M@kroah.com>
- <20210729082039.GX25548@kadam>
- <202107291952.C08EAE039B@keescook>
- <20210730083845.GD5047@suse.cz>
- <20210730090054.GX1931@kadam>
- <202107300937.C7016A82@keescook>
- <CAKwvOdmtKszUS0-OyGMHuhqjyXQC_283KOQOouWWtimYCvsAoA@mail.gmail.com>
+        Fri, 30 Jul 2021 13:33:53 -0700 (PDT)
+From:   Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+To:     viro@zeniv.linux.org.uk
+Cc:     arnd@arndb.de, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+Subject: [PATCH] fs: block: reduce the stack footprint by using the %pg printk specifier
+Date:   Fri, 30 Jul 2021 22:32:05 +0200
+Message-Id: <20210730203205.23875-1-abd.masalkhi@gmail.com>
+X-Mailer: git-send-email 2.29.0.rc1.dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdmtKszUS0-OyGMHuhqjyXQC_283KOQOouWWtimYCvsAoA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 30, 2021 at 10:08:03AM -0700, Nick Desaulniers wrote:
-> On Fri, Jul 30, 2021 at 9:44 AM Kees Cook <keescook@chromium.org> wrote:
-> >
-> > On Fri, Jul 30, 2021 at 12:00:54PM +0300, Dan Carpenter wrote:
-> > > On Fri, Jul 30, 2021 at 10:38:45AM +0200, David Sterba wrote:
-> > > > Then is explicit memset the only reliable way accross all compiler
-> > > > flavors and supported versions?
-> > > >
-> > >
-> > > The = { } initializer works.  It's only when you start partially
-> > > initializing the struct that it doesn't initialize holes.
-> >
-> > No, partial works. It's when you _fully_ initialize the struct where the
-> > padding doesn't get initialized. *sob*
-> 
-> I'm pretty sure that this has more to do with whether or not the
-> compiler applies SROA then observes uses of the individual members or
-> not.
+Reduced the stack footprint by using the %pg printk specifier.
 
-Ultimately, it's just not consistent, so thank goodness for
--ftrivial-auto-var-init=zero. :)
+Signed-off-by: Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>
+---
+ fs/block_dev.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 6658f40ae492..765b3a9b328c 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -64,10 +64,9 @@ static void bdev_write_inode(struct block_device *bdev)
+ 		spin_unlock(&inode->i_lock);
+ 		ret = write_inode_now(inode, true);
+ 		if (ret) {
+-			char name[BDEVNAME_SIZE];
+ 			pr_warn_ratelimited("VFS: Dirty inode writeback failed "
+-					    "for block device %s (err=%d).\n",
+-					    bdevname(bdev, name), ret);
++					    "for block device %pg (err=%d).\n",
++					    bdev, ret);
+ 		}
+ 		spin_lock(&inode->i_lock);
+ 	}
 -- 
-Kees Cook
+2.29.0.rc1.dirty
+
