@@ -2,64 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17887C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 18:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F64C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 18:16:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0034A60560
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 18:11:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25E5560F4A
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 18:16:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230093AbhG3SL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 14:11:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37052 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230335AbhG3SL2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 14:11:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 86DF460560;
-        Fri, 30 Jul 2021 18:11:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627668683;
-        bh=1tXfr+9tuYnTxqd1EU/W5Gv6g1H4664MMXoCCbdd8DQ=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=RcXdcbBw6aJ7hjwfZuwLfhvUlqgfcnhA9QO5U32WYtHWSs08zCjNXQJwR943/h3Bz
-         bN0nBSgnDD2AzRD6EZkmSuq3dWukyOk9/Fe66rUaGFHM+h9hx82mgI4OA9oZctbKbp
-         TeJ55mNNTXJiTTUW+uZsCZg7o9QyZXxKhtU1RjEpSdT4RGpubxL558rCWwovD+tCE4
-         OxYJGnHSBYmx0csX4pFzQpQGvyyiPrnR91l4liJ9zqGBa6LnZ7hCX7gRgO/0xWh0Ry
-         0Lm7cOUVxsjT+DglvRvmsLbGZFgTOnplFc+9SBAjYoSxnUCd5YGuSmPbmuqZVR8TWx
-         W/YqIwK+ejsLA==
-Subject: Re: [GIT PULL] Block fixes for 5.14-rc
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <c230e91a-74a0-5a78-a538-826ed0c40b94@kernel.dk>
-References: <c230e91a-74a0-5a78-a538-826ed0c40b94@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <c230e91a-74a0-5a78-a538-826ed0c40b94@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-30
-X-PR-Tracked-Commit-Id: 340e84573878b2b9d63210482af46883366361b9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 4669e13cd67f8532be12815ed3d37e775a9bdc16
-Message-Id: <162766868352.11392.18401440262035449198.pr-tracker-bot@kernel.org>
-Date:   Fri, 30 Jul 2021 18:11:23 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S230127AbhG3SQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 14:16:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34586 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229921AbhG3SQ4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jul 2021 14:16:56 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16UI3vac158050;
+        Fri, 30 Jul 2021 14:16:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=47G+jOd9ft2urcdZVKEMDZ0W/umlhqgBNQoiaG8/OGA=;
+ b=MmozcAgtOxadFvhaSECQH4KmhgbRBg6VyWpLGX3FBtuagYmylENTaCuWR82/lNNfbPpb
+ QJfiSQgTNSifUbi1oVVndx/rCdy1H/7S36oM4XhiUuN6IJWZ4ET3XDtCHkLDrST4RH2Q
+ tfqKq/UxjHBu283tFp8IYQLePZmishK2Pp7/eqmxo/jF+F6+zIgYh5gToNqnRQvrrJqB
+ NdbqtuiUus2teB5vKekm+w2HUPdFxhIKsaFDV0GC/ahvpW0zOlV8wJK3W/evsEIJdfgA
+ qNLn333UfVsJWG6qEWqW49xmDlQ0rue3LB9jgqXzYZOC9Y7WOKP6EQ15gy09U5EidObu ag== 
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a4p568pj3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jul 2021 14:16:34 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16UI75qd019316;
+        Fri, 30 Jul 2021 18:16:33 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03dal.us.ibm.com with ESMTP id 3a235u95p7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jul 2021 18:16:33 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16UIGWiZ34472428
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Jul 2021 18:16:32 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 75B7D28060;
+        Fri, 30 Jul 2021 18:16:32 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A40028059;
+        Fri, 30 Jul 2021 18:16:29 +0000 (GMT)
+Received: from oc6857751186.ibm.com (unknown [9.160.21.31])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 30 Jul 2021 18:16:29 +0000 (GMT)
+Subject: Re: [PATCH 36/64] scsi: ibmvscsi: Avoid multi-field memset() overflow
+ by aiming at srp
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Brian King <brking@linux.vnet.ibm.com>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-37-keescook@chromium.org>
+ <yq135rzp79c.fsf@ca-mkp.ca.oracle.com>
+From:   Tyrel Datwyler <tyreld@linux.ibm.com>
+Message-ID: <6eae8434-e9a7-aa74-628b-b515b3695359@linux.ibm.com>
+Date:   Fri, 30 Jul 2021 11:16:28 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <yq135rzp79c.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: gc5JE-Gvwp4LjpvIX5-GdEcqjSPid7w2
+X-Proofpoint-GUID: gc5JE-Gvwp4LjpvIX5-GdEcqjSPid7w2
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-30_11:2021-07-30,2021-07-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 clxscore=1011 adultscore=0 bulkscore=0
+ phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2107140000 definitions=main-2107300121
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 30 Jul 2021 09:16:39 -0600:
+On 7/27/21 6:39 PM, Martin K. Petersen wrote:
+> 
+> Kees,
+> 
+>> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+>> field bounds checking for memset(), avoid intentionally writing across
+>> neighboring fields.
+>>
+>> Instead of writing beyond the end of evt_struct->iu.srp.cmd, target the
+>> upper union (evt_struct->iu.srp) instead, as that's what is being wiped.
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+> 
+> Orthogonal to your change, it wasn't immediately obvious to me that
+> SRP_MAX_IU_LEN was the correct length to use for an srp_cmd. However, I
+> traversed the nested unions and it does look OK.
+> 
+> For good measure I copied Tyrel and Brian.
 
-> git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-30
+LGTM
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/4669e13cd67f8532be12815ed3d37e775a9bdc16
+Acked-by: Tyrel Datwyler <tyreld@linux.ibm.com>
 
-Thank you!
+> 
+> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+> 
+>> ---
+>>  drivers/scsi/ibmvscsi/ibmvscsi.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/scsi/ibmvscsi/ibmvscsi.c b/drivers/scsi/ibmvscsi/ibmvscsi.c
+>> index e6a3eaaa57d9..7e8beb42d2d3 100644
+>> --- a/drivers/scsi/ibmvscsi/ibmvscsi.c
+>> +++ b/drivers/scsi/ibmvscsi/ibmvscsi.c
+>> @@ -1055,8 +1055,8 @@ static int ibmvscsi_queuecommand_lck(struct scsi_cmnd *cmnd,
+>>  		return SCSI_MLQUEUE_HOST_BUSY;
+>>  
+>>  	/* Set up the actual SRP IU */
+>> +	memset(&evt_struct->iu.srp, 0x00, SRP_MAX_IU_LEN);
+>>  	srp_cmd = &evt_struct->iu.srp.cmd;
+>> -	memset(srp_cmd, 0x00, SRP_MAX_IU_LEN);
+>>  	srp_cmd->opcode = SRP_CMD;
+>>  	memcpy(srp_cmd->cdb, cmnd->cmnd, sizeof(srp_cmd->cdb));
+>>  	int_to_scsilun(lun, &srp_cmd->lun);
+> 
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
