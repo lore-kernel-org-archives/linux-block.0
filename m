@@ -2,126 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F85C4320E
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 17:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17887C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 18:11:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEB3A60F3A
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 17:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0034A60560
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 18:11:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230062AbhG3RIW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 13:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55148 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229999AbhG3RIV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 13:08:21 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8330C0613D3
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 10:08:16 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id a26so19143119lfr.11
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 10:08:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IV0tGa4+rpa0rWOKVy/RYqy1amnye8o4Jt6/b1EaRas=;
-        b=C6FDsp9eo10MPB7h8sanJV5aN6A87Y6zvnhf4hLt8eXrk78vLYzMazC5TtOgLlOPY3
-         q6Wjzc5G5DyLh+vBan4K/J3UkTpZk9Zz/tHyBwnmFN/5EodvKdl6FgMiGT62DUfWqlrJ
-         CFHjvaoGeKrAtFractG9IPE4H024PaEN1hckYzkwZnlXcachhpXtQresnwHmLQ0ksg0x
-         p4P3NNHOEMKY3qWIjd6qDKsCUDG0PnpKpr+TSZhFKtwgJbg2c8ef3I8Cpfsg3xrToL0H
-         UgZn5Pr4DGCnZ1C0lX3+OMlNp5SKFXq2/hs7zv3T1TgDMiYGIhUNHql1vz9SGCm5BHse
-         xWjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IV0tGa4+rpa0rWOKVy/RYqy1amnye8o4Jt6/b1EaRas=;
-        b=HHr/st+n50nHyv/OHNiB7WR7mlxoOY9ypmHY4vLlCXNTOH9eMHNStpTSEj5+ku5gVU
-         tlcg/T9GVAt0EAr4/uGt5Wf8fQ5OFrkU7+3UyqfBQlx5yix7P+sVifyij/fzj2murtBB
-         Jpiwc/Lr4A7eHCbjX8hU2YIxcq+GFISZOar9CUUrGTZnYX/FjQRVjdBfJ63qpG3hu6Ac
-         /30qGLdRJAx+mW5N2slnjRuNH3G4lkolv3YwVGsBbb90h2d+PbAh1698MpsU372fn/Hj
-         kDQCPULmgHJxRt3WzEDUkgtET3ptgzosH0541gPjilaeoo1/ORKjAz9LR93WLJJPI30l
-         m8fw==
-X-Gm-Message-State: AOAM531HS8fVOeSSuw0oiH/yXBFukspZYgQ2JJGl6XM73F+VUeDg3WP1
-        9BK95FPNh1Fp+S0SQv6N5Sfl8ehDUuapVGTJ3jOz8Q==
-X-Google-Smtp-Source: ABdhPJzj9IdxPOohHA8FDaGlITftqmCvtv1eT7HQAjqzz+pi/C9CDaOH613bJIBrdNXKsY/3pslb8syNjswLKo9CXgk=
-X-Received: by 2002:a05:6512:32aa:: with SMTP id q10mr2512533lfe.368.1627664894662;
- Fri, 30 Jul 2021 10:08:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210727205855.411487-2-keescook@chromium.org>
- <20210728085921.GV5047@twin.jikos.cz> <20210728091434.GQ1931@kadam>
- <c52a52d9-a9e0-5020-80fe-4aada39035d3@acm.org> <20210728213730.GR5047@suse.cz>
- <YQJDCw01gSp1d1/M@kroah.com> <20210729082039.GX25548@kadam>
- <202107291952.C08EAE039B@keescook> <20210730083845.GD5047@suse.cz>
- <20210730090054.GX1931@kadam> <202107300937.C7016A82@keescook>
-In-Reply-To: <202107300937.C7016A82@keescook>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Fri, 30 Jul 2021 10:08:03 -0700
-Message-ID: <CAKwvOdmtKszUS0-OyGMHuhqjyXQC_283KOQOouWWtimYCvsAoA@mail.gmail.com>
-Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy() region
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>, dsterba@suse.cz,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        nborisov@suse.com
-Content-Type: text/plain; charset="UTF-8"
+        id S230093AbhG3SL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 14:11:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37052 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230335AbhG3SL2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jul 2021 14:11:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 86DF460560;
+        Fri, 30 Jul 2021 18:11:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627668683;
+        bh=1tXfr+9tuYnTxqd1EU/W5Gv6g1H4664MMXoCCbdd8DQ=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=RcXdcbBw6aJ7hjwfZuwLfhvUlqgfcnhA9QO5U32WYtHWSs08zCjNXQJwR943/h3Bz
+         bN0nBSgnDD2AzRD6EZkmSuq3dWukyOk9/Fe66rUaGFHM+h9hx82mgI4OA9oZctbKbp
+         TeJ55mNNTXJiTTUW+uZsCZg7o9QyZXxKhtU1RjEpSdT4RGpubxL558rCWwovD+tCE4
+         OxYJGnHSBYmx0csX4pFzQpQGvyyiPrnR91l4liJ9zqGBa6LnZ7hCX7gRgO/0xWh0Ry
+         0Lm7cOUVxsjT+DglvRvmsLbGZFgTOnplFc+9SBAjYoSxnUCd5YGuSmPbmuqZVR8TWx
+         W/YqIwK+ejsLA==
+Subject: Re: [GIT PULL] Block fixes for 5.14-rc
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <c230e91a-74a0-5a78-a538-826ed0c40b94@kernel.dk>
+References: <c230e91a-74a0-5a78-a538-826ed0c40b94@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <c230e91a-74a0-5a78-a538-826ed0c40b94@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-30
+X-PR-Tracked-Commit-Id: 340e84573878b2b9d63210482af46883366361b9
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4669e13cd67f8532be12815ed3d37e775a9bdc16
+Message-Id: <162766868352.11392.18401440262035449198.pr-tracker-bot@kernel.org>
+Date:   Fri, 30 Jul 2021 18:11:23 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 30, 2021 at 9:44 AM Kees Cook <keescook@chromium.org> wrote:
->
-> On Fri, Jul 30, 2021 at 12:00:54PM +0300, Dan Carpenter wrote:
-> > On Fri, Jul 30, 2021 at 10:38:45AM +0200, David Sterba wrote:
-> > > Then is explicit memset the only reliable way accross all compiler
-> > > flavors and supported versions?
-> > >
-> >
-> > The = { } initializer works.  It's only when you start partially
-> > initializing the struct that it doesn't initialize holes.
->
-> No, partial works. It's when you _fully_ initialize the struct where the
-> padding doesn't get initialized. *sob*
+The pull request you sent on Fri, 30 Jul 2021 09:16:39 -0600:
 
-I'm pretty sure that this has more to do with whether or not the
-compiler applies SROA then observes uses of the individual members or
-not.
+> git://git.kernel.dk/linux-block.git tags/block-5.14-2021-07-30
 
->
-> struct foo {
->         u8 flag;
->         /* padding */
->         void *ptr;
-> };
->
-> These are fine:
->
-> struct foo ok1 = { };
-> struct foo ok2 = { .flag = 7 };
-> struct foo ok3 = { .ptr = NULL };
->
-> This is not:
->
-> struct foo bad = { .flag = 7, .ptr = NULL };
->
-> (But, of course, it depends on padding size, compiler version, and
-> architecture. i.e. things remain unreliable.)
->
-> --
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4669e13cd67f8532be12815ed3d37e775a9bdc16
+
+Thank you!
 
 -- 
-Thanks,
-~Nick Desaulniers
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
