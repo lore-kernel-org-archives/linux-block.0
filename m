@@ -2,97 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA7BC4320A
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 19:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79778C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 01:39:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59EE060F5C
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jul 2021 19:14:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57BE96103B
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 01:39:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230056AbhG2TOa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jul 2021 15:14:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47258 "EHLO
+        id S234733AbhG3Bj3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jul 2021 21:39:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229713AbhG2TOa (ORCPT
+        with ESMTP id S234576AbhG3Bj3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jul 2021 15:14:30 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B17C061765;
-        Thu, 29 Jul 2021 12:14:26 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id a19so9825170oiw.6;
-        Thu, 29 Jul 2021 12:14:26 -0700 (PDT)
+        Thu, 29 Jul 2021 21:39:29 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3FC4C0613D3
+        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 18:39:24 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id b6so12830481pji.4
+        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 18:39:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dq8X3bwjz9sqqkCm4+HA7qd+/0ngQHwPeVfx2qkB81Y=;
-        b=u7xirmmJ5Hy56G/uAPI+A466Nr7diM5GyE+1ndVRveWCT+/AqYEJkZElxwouvwZghk
-         5bRcYRaZU45Ju6dULijh7wlAuCJ5cMxvBCH3+yY6Dqj5XqMRNXGzmjMio6VPJyWQ3DtZ
-         vg2ZBLJaAj6eSKqNpbzQCX9zYIqAY3UgvHnI3e/BTyz7+t5futV9yKOfpqHK5FUOhzuD
-         vTr2QNFcrRxd+sJojLuUqu2X1m4ulqJOIrAMLZQJGUgScsZd/Ko+UpGjPh7eIVte4EQC
-         73ocH3w+50kPf8eUfuDyCt/V1forChgqL7goG3MVX9032oC5Wsr7IDsNaoLBHP+GXTwD
-         jUVg==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vPAHzrcSpfKuQzB1lrV/ttkpcnRRhB/aWzazYKPR4LA=;
+        b=Nkis4e8105uAbCge9aO+StXNkXelrJqOpF7xNsIBtcoe+D0iGfGrhXWOijeKDfFQS8
+         tcGIefv5L6ODB7FGlHuoK3nhQNiRzvNAcTkGvlhjpZKPls5MD5zfBf1pJ7Ll8rA8iZ5f
+         LTaEoFLk38qAHkDnPefiooUaNHcHv32+03LBo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dq8X3bwjz9sqqkCm4+HA7qd+/0ngQHwPeVfx2qkB81Y=;
-        b=puujQ/UMp+jbBclZbW1qUrcoSuJ1e6DVPz7xvg+X4jcSMKQc3cDYWKeQoBvLaH3qGE
-         BEU1ebwOnaER6r6Joe/3nlfqCRVb5PY0z/CJpS8C5aXogIJspC047tzL8zoaew2NWmgg
-         +qH/VzVTlv6GHPy+wNPQ8LyrIioaLx873wamCrdFahh6a5RA1KdJTwmHquk0WfRtyOt+
-         zLyCJBs6Pp5rMoaviFIq/Tg9DqGAenu3XxVcx7QhIu8LcOE0GD4Bj4Ily0Pgy/d/hVD2
-         tV1uQx+XzL1SaouV141g6hoeOeoKuK+yQst1RJRrRcUNiVkYs7MWxqO4/f3k9kV7L3eh
-         Hv2w==
-X-Gm-Message-State: AOAM533iM9gxQGVt/oRXPwS0EiqBn/fILW6K5HVyTe9E+B/XMaeuHlV2
-        jQNwPy8eq9WtGHmtq9a18Ia6tRLPiIfWS2zn
-X-Google-Smtp-Source: ABdhPJyLfO/2HRJ0hVZIubo0kNuxVp9XStJqQnD4Zcl+AKZnqEkafj1F3lsi2V1UPF1a/smFr39hPA==
-X-Received: by 2002:a54:468d:: with SMTP id k13mr11095578oic.125.1627586066226;
-        Thu, 29 Jul 2021 12:14:26 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id z6sm761213oiz.39.2021.07.29.12.14.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jul 2021 12:14:25 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/8] Add configurable block device LED triggers
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        kernelnewbies@kernelnewbies.org,
-        =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>
-References: <20210729015344.3366750-1-arequipeno@gmail.com>
- <20210729085413.GA16945@amd> <b108799e-24a2-d5ec-e18e-b7ae8bded085@gmail.com>
- <20210729183541.GA6772@duo.ucw.cz>
-From:   Ian Pilcher <arequipeno@gmail.com>
-Message-ID: <7a353c64-a81f-a149-9541-ef328a197761@gmail.com>
-Date:   Thu, 29 Jul 2021 14:14:24 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vPAHzrcSpfKuQzB1lrV/ttkpcnRRhB/aWzazYKPR4LA=;
+        b=ntJ2h9ntkBezbBG5Ggzh+B+dbmDNl7R3YnuQG5M0xarG+6LV1GB2bWep44/S64OKaf
+         gq6HT4O/K8bH8mneqzuFei98HdkI/ScvcQg/KBQMRnq8+eLvQRvE35mWML5PvAadoe92
+         rAjcHdAIr6FLmcOF3sN015JKuzxyhCmVwJAceRTOE0FH6ylH6mlQzeUxN+EXnO0spE/E
+         /jSyWok2GqKAioE/iqhBTXz6tEh3Fhd207mjHp8i5FtqguYMJenQlsOZydCnCPPLEvYk
+         NSODhnxwNuMtHZnnvg1FsyWXc3C/AJbiog3k55aflCbhhTwK10eCmQo2KrLAsDCxqPGc
+         Q+vg==
+X-Gm-Message-State: AOAM533wCs/LM7MhTQj8by7izphogidaV7PC8LNYYS5OpIo11QtKNoUP
+        jgvT9+56hsNJ6wryzLYmF/nuHQ==
+X-Google-Smtp-Source: ABdhPJzbwo1FmDrFDbiWZ8BWT3TYMS+pXDsYeTk5gfATiaIbAKAeZ3H6gw+DeJERV+7PZzePv9GaaQ==
+X-Received: by 2002:a63:1053:: with SMTP id 19mr5768pgq.395.1627609164105;
+        Thu, 29 Jul 2021 18:39:24 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id z5sm97349pgz.77.2021.07.29.18.39.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 18:39:23 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 18:39:22 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 62/64] netlink: Avoid false-positive memcpy() warning
+Message-ID: <202107291838.25D1F118C@keescook>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-63-keescook@chromium.org>
+ <YQDv+oG7ok0T1L+r@kroah.com>
+ <d7251d92-150b-5346-6237-52afc154bb00@rasmusvillemoes.dk>
 MIME-Version: 1.0
-In-Reply-To: <20210729183541.GA6772@duo.ucw.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d7251d92-150b-5346-6237-52afc154bb00@rasmusvillemoes.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/29/21 1:35 PM, Pavel Machek wrote:
-> Yes, and I'd like to have that functionality, but I believe userland
-> API should be similar to what we do elsewhere. Marek described it in
-> more details.
+On Wed, Jul 28, 2021 at 01:24:01PM +0200, Rasmus Villemoes wrote:
+> On 28/07/2021 07.49, Greg Kroah-Hartman wrote:
+> > On Tue, Jul 27, 2021 at 01:58:53PM -0700, Kees Cook wrote:
+> >> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> >> field bounds checking for memcpy(), memmove(), and memset(), avoid
+> >> intentionally writing across neighboring fields.
+> >>
+> >> Add a flexible array member to mark the end of struct nlmsghdr, and
+> >> split the memcpy() to avoid false positive memcpy() warning:
+> >>
+> >> memcpy: detected field-spanning write (size 32) of single field (size 16)
+> >>
+> >> Signed-off-by: Kees Cook <keescook@chromium.org>
+> >> ---
+> >>  include/uapi/linux/netlink.h | 1 +
+> >>  net/netlink/af_netlink.c     | 4 +++-
+> >>  2 files changed, 4 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/include/uapi/linux/netlink.h b/include/uapi/linux/netlink.h
+> >> index 4c0cde075c27..ddeaa748df5e 100644
+> >> --- a/include/uapi/linux/netlink.h
+> >> +++ b/include/uapi/linux/netlink.h
+> >> @@ -47,6 +47,7 @@ struct nlmsghdr {
+> >>  	__u16		nlmsg_flags;	/* Additional flags */
+> >>  	__u32		nlmsg_seq;	/* Sequence number */
+> >>  	__u32		nlmsg_pid;	/* Sending process port ID */
+> >> +	__u8		contents[];
+> > 
+> > Is this ok to change a public, userspace visable, structure?
+> 
+> At least it should keep using a nlmsg_ prefix for consistency and reduce
+> risk of collision with somebody having defined an object-like contents
+> macro. But there's no guarantees in any case, of course.
 
-On 7/29/21 6:59 AM, Marek Behún wrote:
-...
- > - only one trigger, with name "blkdev"
+Ah, good call. I've adjusted this and added a comment.
 
-I guess I'm missing something, because I just don't understand how this
-can work for multiple, per-device LEDs.
+Thanks!
+
+-Kees
 
 -- 
-========================================================================
-                  In Soviet Russia, Google searches you!
-========================================================================
+Kees Cook
