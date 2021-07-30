@@ -2,112 +2,236 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C982BC4320A
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 05:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC543C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 06:00:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3D1960E76
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 05:22:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9484C61040
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 06:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233424AbhG3FWY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 01:22:24 -0400
-Received: from new4-smtp.messagingengine.com ([66.111.4.230]:50165 "EHLO
-        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229696AbhG3FWY (ORCPT
+        id S237185AbhG3GA5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 02:00:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55312 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236976AbhG3GAz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 01:22:24 -0400
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id B013F580D65;
-        Fri, 30 Jul 2021 01:22:19 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Fri, 30 Jul 2021 01:22:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:content-transfer-encoding:in-reply-to; s=fm1; bh=w
-        Z3kutLqmcKQSNip3ycj7XGCG1ZWDjerJRvqk0QSHZU=; b=BuomH8qzwT4tALiDl
-        1vvTx8AQRdRK03K/c44WkmzqAzSSvSd2BKdtL6br6Uxgsce9a3efQVVa7Bik4ioc
-        oooOTbE7QoDEwwxuXrIiHWwjjWzvhiAKmmxBNusBDpkl0JYoWhF6XCmVPAfXeJy/
-        Y/H1Qa9Qot+qKa8nJmlGd0O7QTGH0hEqI+Bd+IN6Ysu42Na/oXfUvEtzwtpQzCuZ
-        ltfhuqSMhYnFUsdPC/aHelqqlkS18ZvGUTZEHBUu8T4tqdz4ZzwgxZKqL4ag0PsP
-        lH4q7TNa/r/TyzM6R5Tvj5p5NTIylU2wil7BHXfiRPQ5jcXnUQEEvYS314rEQdOz
-        qZtBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:from:in-reply-to:message-id:mime-version:references
-        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; bh=wZ3kutLqmcKQSNip3ycj7XGCG1ZWDjerJRvqk0QSH
-        ZU=; b=W/RL+RnDcbQqBAdaQn7yFZp1OdzFohjyvjMHp7rfQaNi4mJEUZkbMdwq3
-        VCn/rfRv6KUyBeRjfPiR5/bAF6IdWpKtIIqtJLV+o0+C7F5LLNFlxppXAMXSf5eh
-        rhpHfRVxGhfgifxyR449pC+7dUg5GuB+xzahqrqlEIEE2HoHPhsext5B7THDA/6/
-        QWyOuJypQTeCd3YoHB5A3TFyreECeP8qJPpNvtRXwhmCPDSoEKkHMwE9tvivBtz1
-        PXYx5X490xQz/mYQotbDqeJihUxRQw4RUBPaXYbUxdQWexi2O6FZRM5qVXYp/BKa
-        xV599mJPVnGkFI1Oh+HZw33hQsVAQ==
-X-ME-Sender: <xms:iowDYTizcg78LosaRTdbPH_r_nimNDxKdJvMXea-pJVfsHM9b73y2Q>
-    <xme:iowDYQC7cENA8p7TmbRzq3QV82nAhAWcBQ6M4Gg2K7G34VFIFTqLI3y7daroud-Sa
-    dvjFzLqARuPtw>
-X-ME-Received: <xmr:iowDYTH3YVqjyJkDgQHw6j7AcgjnWwS8X1tZd1DSTiBs_luJmG_ghVMSp2V4Z5ZjCvCSvPv-qUNiNs-U2cGH_eNG38SEOLyQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrheeggdejhecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeeuheekhe
-    elffefieduteefkeejffdvueehjeejffehledugfetkedvleekudduvdenucevlhhushht
-    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhh
-    drtghomh
-X-ME-Proxy: <xmx:iowDYQSy2yNQuwG09wEV9uTJzXcaOjCkWWBr7gHA_p8zkO8B1p5Gvg>
-    <xmx:iowDYQwobnYPKK7xHHGvU4BYN3WeT6hgKVCgQPW6wxLuYN6-7uGraQ>
-    <xmx:iowDYW5x2Dj1PryFqgcicVL68rc2Ubl1ShWBX6r5bnAQZyYqL-kgdg>
-    <xmx:i4wDYVI04zKJLztJry6rR3d5MF_sa7wiQksfJENiH2Wh2yCOAfHaDg>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 30 Jul 2021 01:22:18 -0400 (EDT)
-Date:   Fri, 30 Jul 2021 07:22:16 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     Valdis =?utf-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
-        axboe@kernel.dk, kernelnewbies@kernelnewbies.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        pavel@ucw.cz, linux-leds@vger.kernel.org
-Subject: Re: [RFC PATCH 1/8] docs: Add block device LED trigger documentation
-Message-ID: <YQOMiO1HAf60Odqa@kroah.com>
-References: <20210729015344.3366750-1-arequipeno@gmail.com>
- <20210729015344.3366750-2-arequipeno@gmail.com>
- <108629.1627528155@turing-police>
- <ee56510e-e8ef-5e92-3e29-4e290bfad9b2@gmail.com>
+        Fri, 30 Jul 2021 02:00:55 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCDBDC0613D5
+        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 23:00:50 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id u16so1283663ple.2
+        for <linux-block@vger.kernel.org>; Thu, 29 Jul 2021 23:00:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=AkhIE+Z/B9o86qJ2h9HZNEp9cxXi2bxRLjCixTXYrfc=;
+        b=Fh6OENhJi1c3RrFskVWW6a9K2LSOKkwhkO0I0QoeZawnKqIN6ZuzUUVNxbwiTtvNFz
+         bMVWqh2xIMpsrdYmeJhT9uFMA1by20wu3sM3OAADk1KBtfN4Uu2cssSA0TWKloIc9Vey
+         zfRQUlNDvpayDj2QUZLI50jUvarPm8pJnxzm8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AkhIE+Z/B9o86qJ2h9HZNEp9cxXi2bxRLjCixTXYrfc=;
+        b=H1zRPzvIjmTbTnZXQKlTtBltpRhsWcSfCsrfVMCd1fvICstm2qXhC0KA96pvvFVX6Q
+         fkYvZyF7bsdzI0FPOmTmK6YQTyisgv6e023k8AeTWAfN0SXwJ01s7YUxOgF65QxxjyGJ
+         jhjheVsmEAeu30ucTkHfv6ywiWvgPYSCPdEILPEuQufLpDTK3Ku1KaRA0gSAsEHDHC5L
+         5gSZlnYq6tJFCux1TAofcFxyOt1leIxwycj3YIhhbav1aOc5FL8UnjrPlneER3swNi2J
+         GE8Tkq5NOS8TUApU3d8Bhi5d2ml9vPIttdUvdVo52TQ1fD6SGoNGEa0/Tc3CkaU+Xrgl
+         hpgQ==
+X-Gm-Message-State: AOAM531N2HYsptKuTUCFy8mQ2Ux0cV0CCLzhS2BWZWHZq7HFVps1u432
+        OaKOeIe7dikLAp4UGJ1UA4ruoA==
+X-Google-Smtp-Source: ABdhPJyWC1FrO1Uo8OEqczQz/zwyPTutgGoQvmX1ca/HLGVAQy1qzKK0RhNumzH/6yied/9WmGxhOQ==
+X-Received: by 2002:a17:902:a411:b029:12b:a4eb:5fcc with SMTP id p17-20020a170902a411b029012ba4eb5fccmr1190139plq.22.1627624850214;
+        Thu, 29 Jul 2021 23:00:50 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id a22sm723870pfv.113.2021.07.29.23.00.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 23:00:49 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 23:00:48 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>, dsterba@suse.cz,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        nborisov@suse.com
+Subject: Re: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy()
+ region
+Message-ID: <202107291952.C08EAE039B@keescook>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-2-keescook@chromium.org>
+ <20210728085921.GV5047@twin.jikos.cz>
+ <20210728091434.GQ1931@kadam>
+ <c52a52d9-a9e0-5020-80fe-4aada39035d3@acm.org>
+ <20210728213730.GR5047@suse.cz>
+ <YQJDCw01gSp1d1/M@kroah.com>
+ <20210729082039.GX25548@kadam>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ee56510e-e8ef-5e92-3e29-4e290bfad9b2@gmail.com>
+In-Reply-To: <20210729082039.GX25548@kadam>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 10:52:06AM -0500, Ian Pilcher wrote:
-> On 7/28/21 10:09 PM, Valdis Klētnieks wrote:
-> > > +	# cat /sys/class/block/led_trigger_list
-> > > +	baz: 0
-> > > +	bar: 0
-> > > +	foo: 0
+On Thu, Jul 29, 2021 at 11:20:39AM +0300, Dan Carpenter wrote:
+> On Thu, Jul 29, 2021 at 07:56:27AM +0200, Greg Kroah-Hartman wrote:
+> > On Wed, Jul 28, 2021 at 11:37:30PM +0200, David Sterba wrote:
+> > > On Wed, Jul 28, 2021 at 02:37:20PM -0700, Bart Van Assche wrote:
+> > > > On 7/28/21 2:14 AM, Dan Carpenter wrote:
+> > > > > On Wed, Jul 28, 2021 at 10:59:22AM +0200, David Sterba wrote:
+> > > > >>>   drivers/media/platform/omap3isp/ispstat.c |  5 +--
+> > > > >>>   include/uapi/linux/omap3isp.h             | 44 +++++++++++++++++------
+> > > > >>>   2 files changed, 36 insertions(+), 13 deletions(-)
+> > > > >>>
+> > > > >>> diff --git a/drivers/media/platform/omap3isp/ispstat.c b/drivers/media/platform/omap3isp/ispstat.c
+> > > > >>> index 5b9b57f4d9bf..ea8222fed38e 100644
+> > > > >>> --- a/drivers/media/platform/omap3isp/ispstat.c
+> > > > >>> +++ b/drivers/media/platform/omap3isp/ispstat.c
+> > > > >>> @@ -512,7 +512,7 @@ int omap3isp_stat_request_statistics(struct ispstat *stat,
+> > > > >>>   int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
+> > > > >>>   					struct omap3isp_stat_data_time32 *data)
+> > > > >>>   {
+> > > > >>> -	struct omap3isp_stat_data data64;
+> > > > >>> +	struct omap3isp_stat_data data64 = { };
+> > > > >>
+> > > > >> Should this be { 0 } ?
+> > > > >>
+> > > > >> We've seen patches trying to switch from { 0 } to {  } but the answer
+> > > > >> was that { 0 } is supposed to be used,
+> > > > >> http://www.ex-parrot.com/~chris/random/initialise.html 
+> > > > >>
+> > > > >> (from https://lore.kernel.org/lkml/fbddb15a-6e46-3f21-23ba-b18f66e3448a@suse.com/ )
+> > > > > 
+> > > > > In the kernel we don't care about portability so much.  Use the = { }
+> > > > > GCC extension.  If the first member of the struct is a pointer then
+> > > > > Sparse will complain about = { 0 }.
+> > > > 
+> > > > +1 for { }.
+> > > 
+> > > Oh, I thought the tendency is is to use { 0 } because that can also
+> > > intialize the compound members, by a "scalar 0" as it appears in the
+> > > code.
+> > > 
 > > 
-> > This looks like an abuse of the "one entry one value" rule for sysfs.
-> > Perhaps this should be a directory /sys/class/block/defined_triggers/
-> > and separate files under that for foo, bar, and baz?  That would probably
-> > make reference counting a lot easier as well....
+> > Holes in the structure might not be initialized to anything if you do
+> > either one of these as well.
+> > 
+> > Or did we finally prove that is not the case?  I can not remember
+> > anymore...
 > 
-> Indeed it is.
+> Yep.  The C11 spec says that struct holes are initialized.
 > 
-> Funny that you should mention using a subdirectory.  I originally wanted
-> to put all of the trigger-related stuff into
-> /sys/class/block/led_triggers/, but I couldn't find any API to create a
-> subdirectory for *class* attributes (only for device attributes), nor do
-> I see any such subdirectories on my system.
+> https://lore.kernel.org/netdev/20200731140452.GE24045@ziepe.ca/
 
-Add a name to your attribute group and sysfs creates the subdirectory
-automagically for you.
+This is, unfortunately, misleading. The frustrating key word is
+"partial" in "updated in C11 to require zero'ing padding when doing
+partial initialization of aggregates". If one initializes _all_ the
+struct members ... the padding doesn't get initialized. :( (And until
+recently, _trailing_ padding wasn't getting initialized even when other
+paddings were.)
 
-thanks,
+I've tried to collect all the different ways the compiler might initialize
+a variable in this test:
+https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/tree/lib/test_stackinit.c?h=for-next/kspp
 
-greg k-h
+FWIW, there's no difference between -std=gnu99 and -std=c11, and the
+test shows that padding is _not_ universally initialized (unless your
+compiler supports -ftrivial-auto-var-init=zero, which Clang does, and
+GCC will shortly[1]). Running this with GCC 10.3.0, I see this...
+
+As expected, having no initializer leaves padding (as well as members)
+uninitialized:
+
+stackinit: small_hole_none FAIL (uninit bytes: 24)
+stackinit: big_hole_none FAIL (uninit bytes: 128)
+stackinit: trailing_hole_none FAIL (uninit bytes: 32)
+
+Here, "zero" means  "= { };" and they get padding initialized:
+
+stackinit: small_hole_zero ok
+stackinit: big_hole_zero ok
+stackinit: trailing_hole_zero ok
+
+Here, "static_partial" means "= { .one_member = 0 };", and
+"dynamic_partial" means "= { .one_member = some_variable };". These are
+similarly initialized:
+
+stackinit: small_hole_static_partial ok
+stackinit: big_hole_static_partial ok
+stackinit: trailing_hole_static_partial ok
+
+stackinit: small_hole_dynamic_partial ok
+stackinit: big_hole_dynamic_partial ok
+stackinit: trailing_hole_dynamic_partial ok
+
+But when _all_ members are initialized, the padding is _not_:
+
+stackinit: small_hole_static_all FAIL (uninit bytes: 3)
+stackinit: big_hole_static_all FAIL (uninit bytes: 124)
+stackinit: trailing_hole_static_all FAIL (uninit bytes: 7)
+
+stackinit: small_hole_dynamic_all FAIL (uninit bytes: 3)
+stackinit: big_hole_dynamic_all FAIL (uninit bytes: 124)
+stackinit: trailing_hole_dynamic_all FAIL (uninit bytes: 7)
+
+As expected, assigning to members outside of initialization leaves
+padding uninitialized:
+
+stackinit: small_hole_runtime_partial FAIL (uninit bytes: 23)
+stackinit: big_hole_runtime_partial FAIL (uninit bytes: 127)
+stackinit: trailing_hole_runtime_partial FAIL (uninit bytes: 24)
+
+stackinit: small_hole_runtime_all FAIL (uninit bytes: 3)
+stackinit: big_hole_runtime_all FAIL (uninit bytes: 124)
+stackinit: trailing_hole_runtime_all FAIL (uninit bytes: 7)
+
+> What doesn't initialize struct holes is assignments:
+> 
+> 	struct foo foo = *bar;
+
+Right. Object to object assignments do not clear padding:
+
+stackinit: small_hole_assigned_copy XFAIL (uninit bytes: 3)
+stackinit: big_hole_assigned_copy XFAIL (uninit bytes: 124)
+stackinit: trailing_hole_assigned_copy XFAIL (uninit bytes: 7)
+
+And whole-object assignments of cast initializers follow the pattern of
+basic initializers, which makes sense given the behavior of initializers
+and direct assignment tests above. e.g.:
+	obj = (type){ .member = ... };
+
+stackinit: small_hole_assigned_static_partial ok
+stackinit: small_hole_assigned_dynamic_partial ok
+stackinit: big_hole_assigned_dynamic_partial ok
+stackinit: big_hole_assigned_static_partial ok
+stackinit: trailing_hole_assigned_dynamic_partial ok
+stackinit: trailing_hole_assigned_static_partial ok
+
+stackinit: small_hole_assigned_static_all FAIL (uninit bytes: 3)
+stackinit: small_hole_assigned_dynamic_all FAIL (uninit bytes: 3)
+stackinit: big_hole_assigned_static_all FAIL (uninit bytes: 124)
+stackinit: big_hole_assigned_dynamic_all FAIL (uninit bytes: 124)
+stackinit: trailing_hole_assigned_dynamic_all FAIL (uninit bytes: 7)
+stackinit: trailing_hole_assigned_static_all FAIL (uninit bytes: 7)
+
+So, yeah, it's not very stable.
+
+-Kees
+
+[1] https://gcc.gnu.org/pipermail/gcc-patches/2021-July/576341.html
+
+-- 
+Kees Cook
