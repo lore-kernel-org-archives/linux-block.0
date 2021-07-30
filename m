@@ -2,172 +2,430 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C87D7C4320E
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 09:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8127C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 10:08:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A93566052B
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 09:26:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A039961019
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jul 2021 10:08:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238167AbhG3J0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 05:26:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48536 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238105AbhG3J0G (ORCPT
+        id S238358AbhG3KIu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 06:08:50 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:39288 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238274AbhG3KIu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 05:26:06 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BF00C061796
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 02:26:01 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id m12so5646247wru.12
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 02:26:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AkuGs7W3jKofUPHLtLFgYg9f4YA+eRGF5if/gTr/VXg=;
-        b=lylUtumRYNonwKmsPvuJom3wxBHkLf4anhWQaqkh04Z4ai4zZJd08vdZ7peV9SRpsh
-         8kDAxoMFjhA4/LA7o2la5MrwwsntBQgGjb0I1dUZFTJHnBuxsue7dB41Zed6v8YvFnQx
-         EtWmNPzKWs0OwoVonXjeCSLzamGDsOrch7MlE+WtH/ppN38tQ4p8HLRgifhRRjoPlQkI
-         e7dhso1fixnA6ExwMDoIvam1wge26Ggl97vNBtGlzBzaYUrpPxGPV5UmfIV5g4S/Vge/
-         4ukVRSa4etHYaDGK4EAFlKuotQCFXCnz8HEMRP8pLWuHCS1V7/wsG8+TQIpv8pIama72
-         IoVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to;
-        bh=AkuGs7W3jKofUPHLtLFgYg9f4YA+eRGF5if/gTr/VXg=;
-        b=mkCUI70r8KbK1F9U1uxs+qLsky1d0+DYKqBzggfmYGDY4IWuf/qCq8yd4T9Fox7/hh
-         zwialcq0q7MJcOEFO8frqVwENXb/bFMH3pkgB2MCLhPOIZkIo2KXW/exEYoCwWqPIFeu
-         3aPOTZaUPcIm3uxz1D7YWkBDpylEh+Ppx61v93Nm4alUjyM8zMbk98zF3KdhvEaN70R7
-         BZ1efPKNpkuOvIXswGU3iCvIlhW9jp8g1cjeeCpqy3/H1zitynovaaCP9iC27scPqbzb
-         pLGIkJ4RM81guKRHJCHawY4k9fxTxh9Ncujo6hGQd9dLi3LugoeGA8WSFlnkNjC26Dx0
-         BpRA==
-X-Gm-Message-State: AOAM532tjr9btpeIBnsPp8WMAfytoWIa22kLuuR7KSdzJ3vls50KGBHo
-        lCXsZLM4MYj+qG2K1XR7rz2pJQ==
-X-Google-Smtp-Source: ABdhPJzeDirH6vZRgzsjdA+6SGrdUfGDvYu5Q0o7XkuF8nVr9uoOebNL2C+zT2PnMdIeL/CWiOquwA==
-X-Received: by 2002:a5d:6448:: with SMTP id d8mr1920645wrw.295.1627637160119;
-        Fri, 30 Jul 2021 02:26:00 -0700 (PDT)
-Received: from grappa.linbit (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
-        by smtp.gmail.com with ESMTPSA id v15sm1259298wmj.39.2021.07.30.02.25.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 02:25:59 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 11:25:57 +0200
-From:   Lars Ellenberg <lars.ellenberg@linbit.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 48/64] drbd: Use struct_group() to zero algs
-Message-ID: <20210730092557.GC909654@grappa.linbit>
-Mail-Followup-To: Bart Van Assche <bvanassche@acm.org>,
-        Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-49-keescook@chromium.org>
- <1cc74e5e-8d28-6da4-244e-861eac075ca2@acm.org>
- <202107291845.1E1528D@keescook>
- <0d71917d-967f-beaa-d83e-a60fa254627c@acm.org>
+        Fri, 30 Jul 2021 06:08:50 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id C4CAA2232B;
+        Fri, 30 Jul 2021 10:08:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1627639724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=y9eoYKwUaNwyJ1kH2wmng6DVC36hmogi2+P+PPhIWXo=;
+        b=G1t1qvYRJSqfzxBam0/V7gTVLiXchUexMhlrkC0wiSurNLNhwTcjTB61Ia46xsJ62Pq9GX
+        z6gwz2Hbal+e+bp8jjlVWwhAnniR6ZSmP/KtYebtnmRJam/4fc1dNdRYj/iyTKt3mjLkwY
+        BFXv51+ADhIodw2JDa5DrkzbDc4xViY=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 87A91137C2;
+        Fri, 30 Jul 2021 10:08:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id ffXGH6zPA2H2LwAAGKfGzw
+        (envelope-from <jgross@suse.com>); Fri, 30 Jul 2021 10:08:44 +0000
+Subject: Re: [PATCH v2 3/3] xen/blkfront: don't trust the backend response
+ data blindly
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20210708124345.10173-1-jgross@suse.com>
+ <20210708124345.10173-4-jgross@suse.com>
+From:   Juergen Gross <jgross@suse.com>
+Message-ID: <9ef58781-bd7d-48bc-2b59-bb71d2ba83b8@suse.com>
+Date:   Fri, 30 Jul 2021 12:08:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0d71917d-967f-beaa-d83e-a60fa254627c@acm.org>
+In-Reply-To: <20210708124345.10173-4-jgross@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="fwf22lPzo4Qvu6QvspcrGFkuoLTLZpHAg"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 07:57:47PM -0700, Bart Van Assche wrote:
-> On 7/29/21 7:31 PM, Kees Cook wrote:
-> > On Wed, Jul 28, 2021 at 02:45:55PM -0700, Bart Van Assche wrote:
-> >> On 7/27/21 1:58 PM, Kees Cook wrote:
-> >>> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> >>> field bounds checking for memset(), avoid intentionally writing across
-> >>> neighboring fields.
-> >>>
-> >>> Add a struct_group() for the algs so that memset() can correctly reason
-> >>> about the size.
-> >>>
-> >>> Signed-off-by: Kees Cook <keescook@chromium.org>
-> >>> ---
-> >>>   drivers/block/drbd/drbd_main.c     | 3 ++-
-> >>>   drivers/block/drbd/drbd_protocol.h | 6 ++++--
-> >>>   drivers/block/drbd/drbd_receiver.c | 3 ++-
-> >>>   3 files changed, 8 insertions(+), 4 deletions(-)
-> >>>
-> >>> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-> >>> index 55234a558e98..b824679cfcb2 100644
-> >>> --- a/drivers/block/drbd/drbd_main.c
-> >>> +++ b/drivers/block/drbd/drbd_main.c
-> >>> @@ -729,7 +729,8 @@ int drbd_send_sync_param(struct drbd_peer_device *peer_device)
-> >>>   	cmd = apv >= 89 ? P_SYNC_PARAM89 : P_SYNC_PARAM;
-> >>>   	/* initialize verify_alg and csums_alg */
-> >>> -	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
-> >>> +	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
-> >>> +	memset(&p->algs, 0, sizeof(p->algs));
-> >>>   	if (get_ldev(peer_device->device)) {
-> >>>   		dc = rcu_dereference(peer_device->device->ldev->disk_conf);
-> >>> diff --git a/drivers/block/drbd/drbd_protocol.h b/drivers/block/drbd/drbd_protocol.h
-> >>> index dea59c92ecc1..a882b65ab5d2 100644
-> >>> --- a/drivers/block/drbd/drbd_protocol.h
-> >>> +++ b/drivers/block/drbd/drbd_protocol.h
-> >>> @@ -283,8 +283,10 @@ struct p_rs_param_89 {
-> >>>   struct p_rs_param_95 {
-> >>>   	u32 resync_rate;
-> >>> -	char verify_alg[SHARED_SECRET_MAX];
-> >>> -	char csums_alg[SHARED_SECRET_MAX];
-> >>> +	struct_group(algs,
-> >>> +		char verify_alg[SHARED_SECRET_MAX];
-> >>> +		char csums_alg[SHARED_SECRET_MAX];
-> >>> +	);
-> >>>   	u32 c_plan_ahead;
-> >>>   	u32 c_delay_target;
-> >>>   	u32 c_fill_target;
-> >>> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-> >>> index 1f740e42e457..6df2539e215b 100644
-> >>> --- a/drivers/block/drbd/drbd_receiver.c
-> >>> +++ b/drivers/block/drbd/drbd_receiver.c
-> >>> @@ -3921,7 +3921,8 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
-> >>>   	/* initialize verify_alg and csums_alg */
-> >>>   	p = pi->data;
-> >>> -	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
-> >>> +	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
-> >>> +	memset(&p->algs, 0, sizeof(p->algs));
-> >>
-> >> Using struct_group() introduces complexity. Has it been considered not to
-> >> modify struct p_rs_param_95 and instead to use two memset() calls instead of
-> >> one (one memset() call per member)?
-> > 
-> > I went this direction because using two memset()s (or memcpy()s in other
-> > patches) changes the machine code. It's not much of a change, but it
-> > seems easier to justify "no binary changes" via the use of struct_group().
-> > 
-> > If splitting the memset() is preferred, I can totally do that instead.
-> > :)
-> 
-> I don't have a strong opinion about this. Lars, do you want to comment
-> on this patch?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fwf22lPzo4Qvu6QvspcrGFkuoLTLZpHAg
+Content-Type: multipart/mixed; boundary="R9dG4AJRst60ODdYDy8EfrA61v1dVekG9";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>
+Message-ID: <9ef58781-bd7d-48bc-2b59-bb71d2ba83b8@suse.com>
+Subject: Re: [PATCH v2 3/3] xen/blkfront: don't trust the backend response
+ data blindly
+References: <20210708124345.10173-1-jgross@suse.com>
+ <20210708124345.10173-4-jgross@suse.com>
+In-Reply-To: <20210708124345.10173-4-jgross@suse.com>
+
+--R9dG4AJRst60ODdYDy8EfrA61v1dVekG9
+Content-Type: multipart/mixed;
+ boundary="------------C23AF8705A3C312E05994730"
+Content-Language: en-US
+
+This is a multi-part message in MIME format.
+--------------C23AF8705A3C312E05994730
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+
+On 08.07.21 14:43, Juergen Gross wrote:
+> Today blkfront will trust the backend to send only sane response data.
+> In order to avoid privilege escalations or crashes in case of malicious=
+
+> backends verify the data to be within expected limits. Especially make
+> sure that the response always references an outstanding request.
+>=20
+> Introduce a new state of the ring BLKIF_STATE_ERROR which will be
+> switched to in case an inconsistency is being detected. Recovering from=
+
+> this state is possible only via removing and adding the virtual device
+> again (e.g. via a suspend/resume cycle).
+>=20
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+
+Any comments for this patch?
 
 
-Fine either way. "no binary changes" sounds good ;-)
+Juergen
 
-Thanks,
-    Lars
+> ---
+> V2:
+> - use READ_ONCE() for reading the producer index
+> - check validity of producer index only after memory barrier (Jan Beuli=
+ch)
+> - use virt_rmb() as barrier (Jan Beulich)
+> ---
+>   drivers/block/xen-blkfront.c | 66 ++++++++++++++++++++++++++---------=
+-
+>   1 file changed, 49 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.=
+c
+> index 80701860870a..ecdbb0381b4c 100644
+> --- a/drivers/block/xen-blkfront.c
+> +++ b/drivers/block/xen-blkfront.c
+> @@ -80,6 +80,7 @@ enum blkif_state {
+>   	BLKIF_STATE_DISCONNECTED,
+>   	BLKIF_STATE_CONNECTED,
+>   	BLKIF_STATE_SUSPENDED,
+> +	BLKIF_STATE_ERROR,
+>   };
+>  =20
+>   struct grant {
+> @@ -89,6 +90,7 @@ struct grant {
+>   };
+>  =20
+>   enum blk_req_status {
+> +	REQ_PROCESSING,
+>   	REQ_WAITING,
+>   	REQ_DONE,
+>   	REQ_ERROR,
+> @@ -543,7 +545,7 @@ static unsigned long blkif_ring_get_request(struct =
+blkfront_ring_info *rinfo,
+>  =20
+>   	id =3D get_id_from_freelist(rinfo);
+>   	rinfo->shadow[id].request =3D req;
+> -	rinfo->shadow[id].status =3D REQ_WAITING;
+> +	rinfo->shadow[id].status =3D REQ_PROCESSING;
+>   	rinfo->shadow[id].associated_id =3D NO_ASSOCIATED_ID;
+>  =20
+>   	rinfo->shadow[id].req.u.rw.id =3D id;
+> @@ -572,6 +574,7 @@ static int blkif_queue_discard_req(struct request *=
+req, struct blkfront_ring_inf
+>  =20
+>   	/* Copy the request to the ring page. */
+>   	*final_ring_req =3D *ring_req;
+> +	rinfo->shadow[id].status =3D REQ_WAITING;
+>  =20
+>   	return 0;
+>   }
+> @@ -847,8 +850,11 @@ static int blkif_queue_rw_req(struct request *req,=
+ struct blkfront_ring_info *ri
+>  =20
+>   	/* Copy request(s) to the ring page. */
+>   	*final_ring_req =3D *ring_req;
+> -	if (unlikely(require_extra_req))
+> +	rinfo->shadow[id].status =3D REQ_WAITING;
+> +	if (unlikely(require_extra_req)) {
+>   		*final_extra_ring_req =3D *extra_ring_req;
+> +		rinfo->shadow[extra_id].status =3D REQ_WAITING;
+> +	}
+>  =20
+>   	if (new_persistent_gnts)
+>   		gnttab_free_grant_references(setup.gref_head);
+> @@ -1402,8 +1408,8 @@ static enum blk_req_status blkif_rsp_to_req_statu=
+s(int rsp)
+>   static int blkif_get_final_status(enum blk_req_status s1,
+>   				  enum blk_req_status s2)
+>   {
+> -	BUG_ON(s1 =3D=3D REQ_WAITING);
+> -	BUG_ON(s2 =3D=3D REQ_WAITING);
+> +	BUG_ON(s1 < REQ_DONE);
+> +	BUG_ON(s2 < REQ_DONE);
+>  =20
+>   	if (s1 =3D=3D REQ_ERROR || s2 =3D=3D REQ_ERROR)
+>   		return BLKIF_RSP_ERROR;
+> @@ -1436,7 +1442,7 @@ static bool blkif_completion(unsigned long *id,
+>   		s->status =3D blkif_rsp_to_req_status(bret->status);
+>  =20
+>   		/* Wait the second response if not yet here. */
+> -		if (s2->status =3D=3D REQ_WAITING)
+> +		if (s2->status < REQ_DONE)
+>   			return false;
+>  =20
+>   		bret->status =3D blkif_get_final_status(s->status,
+> @@ -1555,11 +1561,17 @@ static irqreturn_t blkif_interrupt(int irq, voi=
+d *dev_id)
+>  =20
+>   	spin_lock_irqsave(&rinfo->ring_lock, flags);
+>    again:
+> -	rp =3D rinfo->ring.sring->rsp_prod;
+> -	rmb(); /* Ensure we see queued responses up to 'rp'. */
+> +	rp =3D READ_ONCE(rinfo->ring.sring->rsp_prod);
+> +	virt_rmb(); /* Ensure we see queued responses up to 'rp'. */
+> +	if (RING_RESPONSE_PROD_OVERFLOW(&rinfo->ring, rp)) {
+> +		pr_alert("%s: illegal number of responses %u\n",
+> +			 info->gd->disk_name, rp - rinfo->ring.rsp_cons);
+> +		goto err;
+> +	}
+>  =20
+>   	for (i =3D rinfo->ring.rsp_cons; i !=3D rp; i++) {
+>   		unsigned long id;
+> +		unsigned int op;
+>  =20
+>   		RING_COPY_RESPONSE(&rinfo->ring, i, &bret);
+>   		id =3D bret.id;
+> @@ -1570,14 +1582,28 @@ static irqreturn_t blkif_interrupt(int irq, voi=
+d *dev_id)
+>   		 * look in get_id_from_freelist.
+>   		 */
+>   		if (id >=3D BLK_RING_SIZE(info)) {
+> -			WARN(1, "%s: response to %s has incorrect id (%ld)\n",
+> -			     info->gd->disk_name, op_name(bret.operation), id);
+> -			/* We can't safely get the 'struct request' as
+> -			 * the id is busted. */
+> -			continue;
+> +			pr_alert("%s: response has incorrect id (%ld)\n",
+> +				 info->gd->disk_name, id);
+> +			goto err;
+>   		}
+> +		if (rinfo->shadow[id].status !=3D REQ_WAITING) {
+> +			pr_alert("%s: response references no pending request\n",
+> +				 info->gd->disk_name);
+> +			goto err;
+> +		}
+> +
+> +		rinfo->shadow[id].status =3D REQ_PROCESSING;
+>   		req  =3D rinfo->shadow[id].request;
+>  =20
+> +		op =3D rinfo->shadow[id].req.operation;
+> +		if (op =3D=3D BLKIF_OP_INDIRECT)
+> +			op =3D rinfo->shadow[id].req.u.indirect.indirect_op;
+> +		if (bret.operation !=3D op) {
+> +			pr_alert("%s: response has wrong operation (%u instead of %u)\n",
+> +				 info->gd->disk_name, bret.operation, op);
+> +			goto err;
+> +		}
+> +
+>   		if (bret.operation !=3D BLKIF_OP_DISCARD) {
+>   			/*
+>   			 * We may need to wait for an extra response if the
+> @@ -1602,7 +1628,8 @@ static irqreturn_t blkif_interrupt(int irq, void =
+*dev_id)
+>   		case BLKIF_OP_DISCARD:
+>   			if (unlikely(bret.status =3D=3D BLKIF_RSP_EOPNOTSUPP)) {
+>   				struct request_queue *rq =3D info->rq;
+> -				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+> +
+> +				pr_warn_ratelimited("blkfront: %s: %s op failed\n",
+>   					   info->gd->disk_name, op_name(bret.operation));
+>   				blkif_req(req)->error =3D BLK_STS_NOTSUPP;
+>   				info->feature_discard =3D 0;
+> @@ -1614,13 +1641,13 @@ static irqreturn_t blkif_interrupt(int irq, voi=
+d *dev_id)
+>   		case BLKIF_OP_FLUSH_DISKCACHE:
+>   		case BLKIF_OP_WRITE_BARRIER:
+>   			if (unlikely(bret.status =3D=3D BLKIF_RSP_EOPNOTSUPP)) {
+> -				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+> +				pr_warn_ratelimited("blkfront: %s: %s op failed\n",
+>   				       info->gd->disk_name, op_name(bret.operation));
+>   				blkif_req(req)->error =3D BLK_STS_NOTSUPP;
+>   			}
+>   			if (unlikely(bret.status =3D=3D BLKIF_RSP_ERROR &&
+>   				     rinfo->shadow[id].req.u.rw.nr_segments =3D=3D 0)) {
+> -				printk(KERN_WARNING "blkfront: %s: empty %s op failed\n",
+> +				pr_warn_ratelimited("blkfront: %s: empty %s op failed\n",
+>   				       info->gd->disk_name, op_name(bret.operation));
+>   				blkif_req(req)->error =3D BLK_STS_NOTSUPP;
+>   			}
+> @@ -1635,8 +1662,8 @@ static irqreturn_t blkif_interrupt(int irq, void =
+*dev_id)
+>   		case BLKIF_OP_READ:
+>   		case BLKIF_OP_WRITE:
+>   			if (unlikely(bret.status !=3D BLKIF_RSP_OKAY))
+> -				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
+> -					"request: %x\n", bret.status);
+> +				dev_dbg_ratelimited(&info->xbdev->dev,
+> +					"Bad return from blkdev data request: %x\n", bret.status);
+>  =20
+>   			break;
+>   		default:
+> @@ -1662,6 +1689,11 @@ static irqreturn_t blkif_interrupt(int irq, void=
+ *dev_id)
+>   	spin_unlock_irqrestore(&rinfo->ring_lock, flags);
+>  =20
+>   	return IRQ_HANDLED;
+> +
+> + err:
+> +	info->connected =3D BLKIF_STATE_ERROR;
+> +	pr_alert("%s disabled for further use\n", info->gd->disk_name);
+> +	return IRQ_HANDLED;
+>   }
+>  =20
+>  =20
+>=20
 
+
+--------------C23AF8705A3C312E05994730
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: OpenPGP public key
+Content-Disposition: attachment;
+ filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
+cWx
+w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
+f8Z
+d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
+9bf
+IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
+G7/
+377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
+3Jv
+c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
+QIe
+AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
+hpw
+dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
+MbD
+1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
+oPH
+Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
+5QL
++qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
+2Vu
+IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
+QoL
+BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
+Wf0
+teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
+/nu
+AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
+ITT
+d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
+XBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
+80h
+SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
+AcD
+AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
+FOX
+gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
+jnD
+kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
+N51
+N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
+otu
+fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
+tqS
+EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
+hsD
+BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
+g3O
+ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
+dM7
+wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
+D+j
+LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
+V2x
+AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
+Eaw
+QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
+nHI
+s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
+wgn
+BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
+bVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
+pEd
+IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
+QAB
+wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
+Tbe
+8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
+vJz
+Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
+VGi
+wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
+svi
+uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
+zXs
+ZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------C23AF8705A3C312E05994730--
+
+--R9dG4AJRst60ODdYDy8EfrA61v1dVekG9--
+
+--fwf22lPzo4Qvu6QvspcrGFkuoLTLZpHAg
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmEDz6sFAwAAAAAACgkQsN6d1ii/Ey+v
+nwf8DSy7o0QgcyQEDIb8rZ4dRodp/bKyqqtC+iLsog5Ep9v+blpOTGXyeN+FnkYsWbugSbqorg87
+kAl/Y3LMte7ui2P7F2Nwj6ACy1hLYBMujx0v/JRxjjxjiU7wx2Se1UExoOx0X2mLhp2V6ZVtjnnb
+JGd1csOsimBZacftbYzRKlDNS3veBki82V50ucH3WRmg6y61tPx7i0GcqW687tNaSKlNFSOCYcKQ
+rJdsRS5hjsbgsjz5M9Sc25fHVDhVC20Xkf8xbe3BKHN0L+j5ns7a5FqVx2nlT2wx4kCEm912oyeo
+yxPZFGRHptOn9OQst/tus8G50WYVrayZvMvXwedn0Q==
+=T4Y/
+-----END PGP SIGNATURE-----
+
+--fwf22lPzo4Qvu6QvspcrGFkuoLTLZpHAg--
