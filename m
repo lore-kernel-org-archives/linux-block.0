@@ -2,252 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C37C4338F
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 02:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F17BC4338F
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 03:43:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6592660F3A
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 02:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32DA960F94
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 03:43:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231336AbhGaC7M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 22:59:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57674 "EHLO
+        id S231489AbhGaDn1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 23:43:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231285AbhGaC7M (ORCPT
+        with ESMTP id S231491AbhGaDn1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 22:59:12 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9899C0613D5
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 19:59:06 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id q17-20020a17090a2e11b02901757deaf2c8so17226689pjd.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 19:59:06 -0700 (PDT)
+        Fri, 30 Jul 2021 23:43:27 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA48C0613CF;
+        Fri, 30 Jul 2021 20:43:21 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id j1so17945204pjv.3;
+        Fri, 30 Jul 2021 20:43:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=9Aa9q+ZgPH94d4mui+MhDlRe9awiZiZZrbzXI3QwflQ=;
-        b=K/AnMh6xbreh13akr8KlRWX933KG/LVSiOukQOOU02w9zDvPcZa/3brhzVIyI/b/3I
-         8MwYX4XWyDe4L8DaHTAAOwEDtNaP6NmQ6MxmN2PhdWVt37y0G/ZLykupXyKWHjpiieLb
-         dX8vGbaeXhGoISkRuWXLfYmOV+Mfm2EZz2F7A=
+        d=gmail.com; s=20161025;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-transfer-encoding:content-language;
+        bh=oE01F0SF2I0CJYZNXztVGMTSrHuG1clp4AQ85RY2cJ8=;
+        b=Bhoy9hgpDE7rm1g+FNTQi4ueRhpgTPD+nvjWT1fGTqHbqmegbgLgDHcTy2MpYvFajB
+         UQTcuheBvkltwY2R3TW84GFKd9fP9gDSQ4W/w3oeLl+nPLKdGHlM3NoULNPODRonTfxR
+         0iRJR5xwkj7xt2mdTXGBY14QsF542GwX8aLCieQNEgsxHybAEKgc5zaG9ok0Nnt+l4Iz
+         DotKwKU2fYKmDQsxpPMJgBAkpHN4sQEncSzlj3GreDt8HRJgM6dAfhmLDavG+vnTeNBN
+         GI/dOHjGAg9rj2pWtHPKsHeBopB2V54WCQ0wL+ihyYReXUTd9rx0/B/auPEFvAzd0ejk
+         pInw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=9Aa9q+ZgPH94d4mui+MhDlRe9awiZiZZrbzXI3QwflQ=;
-        b=pVYYAgpUiVeRgpbD9gTjId2LGxSLZCvOLP8jA6l5q8K0c5Fo5UkJkDqzv6BIy6Q+nU
-         ev60+bD7wGT0bdjEoOl6Z7Y1yfHexTdP/fdyLUI24tMH4cFzPzGOQjXrGu+LFi0ZuayU
-         K87SkxEAuZQRocJeuvBB8QeaybtHUGA2bdug6xnl64BIwh8GydlNzgeXMh/RsmAsAii0
-         6rq/aTEX+GsgtFa88qCnwl+6lf2nV1PJVDqnRODK5ekPccci1iHADcxq1Oud6s8pyPv5
-         HX0Zt7yMYFIWWpV1iZ32ZuVnhH6xNkakLmtanKirIf/a34XV4J+kvDaJXKOmtWBugsDW
-         +Z9w==
-X-Gm-Message-State: AOAM530QVdtGBt/pgyLRmDmgAZEOFRVfbHei0kANf7TqnZ5mmFw9L+EX
-        j9xKTlm65VFwR8kdgdtPmh5ztA==
-X-Google-Smtp-Source: ABdhPJxTfKt3gvdchGd16NukW5boDEwoaheumkJt6I1FzMy8GwJfQpRQICiNX//vocu1zdwGzNo0jA==
-X-Received: by 2002:a63:5505:: with SMTP id j5mr1362082pgb.250.1627700346188;
-        Fri, 30 Jul 2021 19:59:06 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id c7sm4280329pgq.22.2021.07.30.19.59.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 19:59:05 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 19:59:04 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     "Williams, Dan J" <dan.j.williams@intel.com>
-Cc:     "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
-        "keithpac@amazon.com" <keithpac@amazon.com>,
-        "clang-built-linux@googlegroups.com" 
-        <clang-built-linux@googlegroups.com>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-        "gustavoars@kernel.org" <gustavoars@kernel.org>,
-        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 04/64] stddef: Introduce struct_group() helper macro
-Message-ID: <202107301952.B484563@keescook>
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-5-keescook@chromium.org>
- <41183a98-bdb9-4ad6-7eab-5a7292a6df84@rasmusvillemoes.dk>
- <202107281456.1A3A5C18@keescook>
- <1d9a2e6df2a9a35b2cdd50a9a68cac5991e7e5f0.camel@intel.com>
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=oE01F0SF2I0CJYZNXztVGMTSrHuG1clp4AQ85RY2cJ8=;
+        b=VxhSKibuztL714DbRHZ3+zWTfPDEDgxz0gj/VRqoYrUZGTCypi/PHo7hHI3gbgqOpS
+         aqh1+1YwxC+kmsETB9jJ9hHu1fzb8C6LmPc8WtFUgjdc5tOoW0qfaS3VaihVGrzAMF93
+         kSKMhG22/87fPQg4obEQPWfWG7Zuk0r/mwOpt6lr6jA1Umh50AfF9GyQ5DHncuRTjNfy
+         v2X7YCW+nqx/ekOblbvdxkR1Cb7i6jrg6TbBbCpNbAl0nIEnyTjBvsrqlzU+RO+oslin
+         /LP/voP5MSw57l4J9V/0C9/7to6vru8nMC0G7BTAMimTi1ONhY5k3RTx99c0J7kJYwEx
+         h8Ow==
+X-Gm-Message-State: AOAM531ryYfO83JR120ZPbzy8ztAWvjk7rb4nFIrma5B3/XskiDSuCL2
+        vC02wsoypa7G4c8NjHWjT7k=
+X-Google-Smtp-Source: ABdhPJwoVxUjY2KahpW1sf3KQyY/0z8SltB8hE4mRZgWh2ZQksT9iQFLrnd34iSIV8zbzNtAhQWs2Q==
+X-Received: by 2002:a17:90a:e7c7:: with SMTP id kb7mr6282781pjb.43.1627703001289;
+        Fri, 30 Jul 2021 20:43:21 -0700 (PDT)
+Received: from [10.106.0.42] ([45.135.186.29])
+        by smtp.gmail.com with ESMTPSA id b7sm3855288pfl.195.2021.07.30.20.43.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jul 2021 20:43:20 -0700 (PDT)
+To:     paolo.valente@linaro.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        baijiaju1990@gmail.com
+From:   Li Tuo <islituo@gmail.com>
+Subject: [BUG] bfq-iosched: possible null-pointer dereference in
+ __bfq_insert_request()
+Message-ID: <37e54bb8-25db-6f93-4b54-7a10f1eb49c4@gmail.com>
+Date:   Sat, 31 Jul 2021 11:43:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1d9a2e6df2a9a35b2cdd50a9a68cac5991e7e5f0.camel@intel.com>
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 30, 2021 at 10:19:20PM +0000, Williams, Dan J wrote:
-> On Wed, 2021-07-28 at 14:59 -0700, Kees Cook wrote:
-> > On Wed, Jul 28, 2021 at 12:54:18PM +0200, Rasmus Villemoes wrote:
-> > > On 27/07/2021 22.57, Kees Cook wrote:
-> > > 
-> > > > In order to have a regular programmatic way to describe a struct
-> > > > region that can be used for references and sizing, can be examined for
-> > > > bounds checking, avoids forcing the use of intermediate identifiers,
-> > > > and avoids polluting the global namespace, introduce the struct_group()
-> > > > macro. This macro wraps the member declarations to create an anonymous
-> > > > union of an anonymous struct (no intermediate name) and a named struct
-> > > > (for references and sizing):
-> > > > 
-> > > >         struct foo {
-> > > >                 int one;
-> > > >                 struct_group(thing,
-> > > >                         int two,
-> > > >                         int three,
-> > > >                 );
-> > > >                 int four;
-> > > >         };
-> > > 
-> > > That example won't compile, the commas after two and three should be
-> > > semicolons.
-> > 
-> > Oops, yes, thanks. This is why I shouldn't write code that doesn't first
-> > go through a compiler. ;)
-> > 
-> > > And your implementation relies on MEMBERS not containing any comma
-> > > tokens, but as
-> > > 
-> > >   int a, b, c, d;
-> > > 
-> > > is a valid way to declare multiple members, consider making MEMBERS
-> > > variadic
-> > > 
-> > > #define struct_group(NAME, MEMBERS...)
-> > > 
-> > > to have it slurp up every subsequent argument and make that work.
-> > 
-> > Ah! Perfect, thank you. I totally forgot I could do it that way.
-> 
-> This is great Kees. It just so happens it would clean-up what we are
-> already doing in drivers/cxl/cxl.h for anonymous + named register block
-> pointers. However in the cxl case it also needs the named structure to
-> be typed. Any appetite for a typed version of this?
+Hello,
 
-Oh cool! Yeah, totally I can expand it. Thanks for the suggestion!
+Our static analysis tool finds a possible null-pointer dereference in 
+bfq-iosched.c in Linux 5.14.0-rc3:
 
-> 
-> Here is a rough idea of the cleanup it would induce in drivers/cxl/:
-> 
-> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-> index 53927f9fa77e..a2308c995654 100644
-> --- a/drivers/cxl/cxl.h
-> +++ b/drivers/cxl/cxl.h
-> @@ -75,52 +75,19 @@ static inline int cxl_hdm_decoder_count(u32 cap_hdr)
->  #define CXLDEV_MBOX_BG_CMD_STATUS_OFFSET 0x18
->  #define CXLDEV_MBOX_PAYLOAD_OFFSET 0x20
->  
-> -#define CXL_COMPONENT_REGS() \
-> -       void __iomem *hdm_decoder
-> -
-> -#define CXL_DEVICE_REGS() \
-> -       void __iomem *status; \
-> -       void __iomem *mbox; \
-> -       void __iomem *memdev
-> -
-> -/* See note for 'struct cxl_regs' for the rationale of this organization */
->  /*
-> - * CXL_COMPONENT_REGS - Common set of CXL Component register block base pointers
->   * @hdm_decoder: CXL 2.0 8.2.5.12 CXL HDM Decoder Capability Structure
-> - */
-> -struct cxl_component_regs {
-> -       CXL_COMPONENT_REGS();
-> -};
-> -
-> -/* See note for 'struct cxl_regs' for the rationale of this organization */
-> -/*
-> - * CXL_DEVICE_REGS - Common set of CXL Device register block base pointers
->   * @status: CXL 2.0 8.2.8.3 Device Status Registers
->   * @mbox: CXL 2.0 8.2.8.4 Mailbox Registers
->   * @memdev: CXL 2.0 8.2.8.5 Memory Device Registers
->   */
-> -struct cxl_device_regs {
-> -       CXL_DEVICE_REGS();
-> -};
-> -
-> -/*
-> - * Note, the anonymous union organization allows for per
-> - * register-block-type helper routines, without requiring block-type
-> - * agnostic code to include the prefix.
-> - */
->  struct cxl_regs {
-> -       union {
-> -               struct {
-> -                       CXL_COMPONENT_REGS();
-> -               };
-> -               struct cxl_component_regs component;
-> -       };
-> -       union {
-> -               struct {
-> -                       CXL_DEVICE_REGS();
-> -               };
-> -               struct cxl_device_regs device_regs;
-> -       };
-> +       struct_group_typed(cxl_component_regs, component,
-> +               void __iomem *hdm_decoder;
-> +       );
-> +       struct_group_typed(cxl_device_regs, device_regs,
-> +               void __iomem *status, *mbox, *memdev;
-> +       );
->  };
->  
->  struct cxl_reg_map {
-> diff --git a/include/linux/stddef.h b/include/linux/stddef.h
-> index cf7f866944f9..84b7de24ffb5 100644
-> --- a/include/linux/stddef.h
-> +++ b/include/linux/stddef.h
-> @@ -49,12 +49,18 @@ enum {
->   * @ATTRS: Any struct attributes (normally empty)
->   * @MEMBERS: The member declarations for the mirrored structs
->   */
-> -#define struct_group_attr(NAME, ATTRS, MEMBERS) \
-> +#define struct_group_attr(NAME, ATTRS, MEMBERS...) \
->         union { \
->                 struct { MEMBERS } ATTRS; \
->                 struct { MEMBERS } ATTRS NAME; \
->         }
->  
-> +#define struct_group_attr_typed(TYPE, NAME, ATTRS, MEMBERS...) \
-> +       union { \
-> +               struct { MEMBERS } ATTRS; \
-> +               struct TYPE { MEMBERS } ATTRS NAME; \
-> +       }
-> +
->  /**
->   * struct_group(NAME, MEMBERS)
->   *
-> @@ -67,7 +73,10 @@ enum {
->   * @NAME: The name of the mirrored sub-struct
->   * @MEMBERS: The member declarations for the mirrored structs
->   */
-> -#define struct_group(NAME, MEMBERS)    \
-> +#define struct_group(NAME, MEMBERS...) \
->         struct_group_attr(NAME, /* no attrs */, MEMBERS)
->  
-> +#define struct_group_typed(TYPE, NAME, MEMBERS...) \
-> +       struct_group_attr_typed(TYPE, NAME, /* no attrs */, MEMBERS)
-> +
->  #endif
+The variable bfqq is checked in:
+5920:Â Â Â  waiting = bfqq && bfq_bfqq_wait_request(bfqq);
 
-Awesome! My instinct is to expose the resulting API as:
+This indicates that bfqq can be NULL.
+But the address of its field fifo, which is an illegal pointer, is 
+dereferenced in the function list_add_tail():
+5925:Â Â Â  list_add_tail(&rq->queuelist, &bfqq->fifo);
 
-__struct_group(type, name, attrs, members...)
+The pointer bfqq is also dereferenced in the function bfq_rq_enqueued() 
+which is called at line 5927.
+Some dereference operations are:
+5826:Â Â Â  bfqq->meta_pending++;
+5828:Â Â Â  bfqq->last_request_pos = blk_rq_pos(rq) + blk_rq_sectors(rq);
 
-struct_group(name, members...)
-struct_group_attr(name, attrs, members...)
-struct_group_typed(type, name, members...)
+I am not quite sure whether this possible null-pointer dereference is 
+real and how to fix it if it is real.
+Any feedback would be appreciated, thanks!
 
--- 
-Kees Cook
+Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+
+Best wishes,
+Tuo Li
