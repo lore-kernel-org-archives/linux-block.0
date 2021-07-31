@@ -2,168 +2,252 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42836C4338F
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 02:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C37C4338F
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 02:59:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2718C60BD3
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 02:29:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6592660F3A
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 02:59:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236610AbhGaC3g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jul 2021 22:29:36 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:59598 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231682AbhGaC3f (ORCPT
+        id S231336AbhGaC7M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jul 2021 22:59:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57674 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231285AbhGaC7M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jul 2021 22:29:35 -0400
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16V2CuSk032372;
-        Sat, 31 Jul 2021 02:29:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2021-07-09;
- bh=YSul0KHuGGe/+kLtfYWOpKNe/doHF+putzp2G9X2p1Y=;
- b=EBKIvdvmfHLhUshAIieyeNd8UF9B632yw4cZvC5T/P2j8roxEufUPvD2LEq8YnPz32A/
- OYlGF82eDn52jZ61Ftw9zWql8QB0DBTntzvYmQ/mTV3XEj94XZgbXj8SJh0ygOgJpW6K
- ECETmhW/10iEyNHB8Eq+mA8kcrTkqhBqVuyhMnNOj05Glmaw0ozSh18SP0kTDLFjHvrL
- agxKA965r3TA3IxIo1Z7GVVCOvBulFFWF+iDwEDDZv5aeItUQQ3Chb1ajc5eTEcrRlG6
- bv2YN/+l2Gngmc3wDrC+19dqO8ZXa+NUXpQRnbnfOffgiDrs0o4j87972Aw6Sf1QKmq+ sw== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2020-01-29;
- bh=YSul0KHuGGe/+kLtfYWOpKNe/doHF+putzp2G9X2p1Y=;
- b=M+vRCynKiArMEZKuE55XZAS+b7NhhjAQakVpEt44ijpZG0ug2A03NOEH27hJ/VpX9jaX
- /ImteC073VDp939//KoymcVUN2mASvXZ5c3ZgtSfasJRBZR+CV6dAUFVYMmgYTKuEEsN
- gGTNTqK/mAb74Duo+EN0EkRqNE1j+2iTHYiC+1Dm01QKl2hUQcHpGqlE1Vw2PNLtMhLm
- bUFTm5Rv2Vgxy/d/259kUKNka/OW3UkNYy/ALd2qac6mUM8oyAKxFsE/rtxIJ2y4kwIo
- cdzfGJ8QjH9mbO30LV6Da/DnuRSmDC6r6LZ7UqhKC6ONxj4NnuZ+3b8L0ATKm9vQ22fl iQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3a4w4180qg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 31 Jul 2021 02:29:22 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16V29rB8044982;
-        Sat, 31 Jul 2021 02:29:21 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2042.outbound.protection.outlook.com [104.47.57.42])
-        by aserp3030.oracle.com with ESMTP id 3a4vj8tck4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 31 Jul 2021 02:29:21 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SmV8/goZs9BNMr/Az7DF23+oJpg3nul/ZPlQ1ncw9ABsCmuJ2GRv8etoOVZ1ijM9ayldTonuxjIr2w5PM1H7OeAPjcyokJE3F0g+4ya4j/nxNwkhYA6yKCLDqGl8db81ZbJ9saEu2FKeNZaJFzI7NHWRLLUTX4Ma/FaLV1nkRbl4Q03dN9KHiYwNAFPWS9orPUhCRLJFXJyVIjXOv6GZbHDw9CJje5U7a3j/3nkO0GevX34Ga3gJUrzRuPL3O2Rre7xL4IXEdEwWe90HXLg7BzmPXQIhl2eiyVvcjnljeVZEzNL29eavzEPbb0bBTZ2IZwPAufy0lypaMNGL2zwIiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YSul0KHuGGe/+kLtfYWOpKNe/doHF+putzp2G9X2p1Y=;
- b=NPUrPNCQtW8x/B/eJqVvlDcWX6iKnfFzFNFwjPJAXBLRaWWcRDVLOESMDd/pV2s7wArRS/OJihNarNcsVkXuFqPK+KUDzwV5LFTlpLkuqXHXw6FVRnManSLQcpPOuzXDBoQHojimhlQQFUts10uprkQHl6Cs7RP1hQo9hhyZeXGjRfNoNE5ulyXGcFefZ9OaPjoZ3HjMz+hqRs9dRyEMBaED0L5Pgn9cYmWcaVeJuUIBUe2JaYME9VkcYKZzFaURrNedT+w3VZYtouL6QUVTDKuaY0TkvokIPygVMi8S8Tqf4j2EyVrSYusD8Fz/mlZz1NW7B23S8vn62HRu4rPE8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Fri, 30 Jul 2021 22:59:12 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9899C0613D5
+        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 19:59:06 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id q17-20020a17090a2e11b02901757deaf2c8so17226689pjd.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Jul 2021 19:59:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YSul0KHuGGe/+kLtfYWOpKNe/doHF+putzp2G9X2p1Y=;
- b=sfzQIK99efefr1UOZ9wC1yIbW5Fp9d9Ch1GCr0LJs4riyNo5ptNe//BFAjNKcUotEYNq/6ixbFggH5anhu7ZLo5u2av7jP23JXW9wtZCA3DpNwt7m2u3jl1SSyzpUZb3eI4h1DmirgEbJPJ3g+7DfVIYhorvfTg+3L7zKegLbKc=
-Authentication-Results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=oracle.com;
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by PH0PR10MB5482.namprd10.prod.outlook.com (2603:10b6:510:e4::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4373.18; Sat, 31 Jul
- 2021 02:29:20 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::153e:22d1:d177:d4f1]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::153e:22d1:d177:d4f1%8]) with mapi id 15.20.4373.025; Sat, 31 Jul 2021
- 02:29:20 +0000
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: bsg cleanup, part 2
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1tukbmd44.fsf@ca-mkp.ca.oracle.com>
-References: <20210729064845.1044147-1-hch@lst.de>
-Date:   Fri, 30 Jul 2021 22:29:16 -0400
-In-Reply-To: <20210729064845.1044147-1-hch@lst.de> (Christoph Hellwig's
-        message of "Thu, 29 Jul 2021 08:48:41 +0200")
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR05CA0074.namprd05.prod.outlook.com
- (2603:10b6:a03:e0::15) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=9Aa9q+ZgPH94d4mui+MhDlRe9awiZiZZrbzXI3QwflQ=;
+        b=K/AnMh6xbreh13akr8KlRWX933KG/LVSiOukQOOU02w9zDvPcZa/3brhzVIyI/b/3I
+         8MwYX4XWyDe4L8DaHTAAOwEDtNaP6NmQ6MxmN2PhdWVt37y0G/ZLykupXyKWHjpiieLb
+         dX8vGbaeXhGoISkRuWXLfYmOV+Mfm2EZz2F7A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=9Aa9q+ZgPH94d4mui+MhDlRe9awiZiZZrbzXI3QwflQ=;
+        b=pVYYAgpUiVeRgpbD9gTjId2LGxSLZCvOLP8jA6l5q8K0c5Fo5UkJkDqzv6BIy6Q+nU
+         ev60+bD7wGT0bdjEoOl6Z7Y1yfHexTdP/fdyLUI24tMH4cFzPzGOQjXrGu+LFi0ZuayU
+         K87SkxEAuZQRocJeuvBB8QeaybtHUGA2bdug6xnl64BIwh8GydlNzgeXMh/RsmAsAii0
+         6rq/aTEX+GsgtFa88qCnwl+6lf2nV1PJVDqnRODK5ekPccci1iHADcxq1Oud6s8pyPv5
+         HX0Zt7yMYFIWWpV1iZ32ZuVnhH6xNkakLmtanKirIf/a34XV4J+kvDaJXKOmtWBugsDW
+         +Z9w==
+X-Gm-Message-State: AOAM530QVdtGBt/pgyLRmDmgAZEOFRVfbHei0kANf7TqnZ5mmFw9L+EX
+        j9xKTlm65VFwR8kdgdtPmh5ztA==
+X-Google-Smtp-Source: ABdhPJxTfKt3gvdchGd16NukW5boDEwoaheumkJt6I1FzMy8GwJfQpRQICiNX//vocu1zdwGzNo0jA==
+X-Received: by 2002:a63:5505:: with SMTP id j5mr1362082pgb.250.1627700346188;
+        Fri, 30 Jul 2021 19:59:06 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id c7sm4280329pgq.22.2021.07.30.19.59.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jul 2021 19:59:05 -0700 (PDT)
+Date:   Fri, 30 Jul 2021 19:59:04 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     "Williams, Dan J" <dan.j.williams@intel.com>
+Cc:     "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
+        "keithpac@amazon.com" <keithpac@amazon.com>,
+        "clang-built-linux@googlegroups.com" 
+        <clang-built-linux@googlegroups.com>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
+        "gustavoars@kernel.org" <gustavoars@kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 04/64] stddef: Introduce struct_group() helper macro
+Message-ID: <202107301952.B484563@keescook>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-5-keescook@chromium.org>
+ <41183a98-bdb9-4ad6-7eab-5a7292a6df84@rasmusvillemoes.dk>
+ <202107281456.1A3A5C18@keescook>
+ <1d9a2e6df2a9a35b2cdd50a9a68cac5991e7e5f0.camel@intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ca-mkp.ca.oracle.com (138.3.200.58) by BYAPR05CA0074.namprd05.prod.outlook.com (2603:10b6:a03:e0::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.10 via Frontend Transport; Sat, 31 Jul 2021 02:29:19 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f234af10-211b-491b-0bbc-08d953cb003f
-X-MS-TrafficTypeDiagnostic: PH0PR10MB5482:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <PH0PR10MB5482890FB2AD13D4B70900EC8EED9@PH0PR10MB5482.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: u74F0shGG9n647maN5xrBrlz0XO+orOVh5l0/Y11S3N0rPusLo7c7YW06VtdiKHIOTpwSHbmXt0PxTf/ADYj1xU5MTPJj+QFMHrwfQMcuFpTFwGTrbMhKElRJcYh/FiR6lfmwadhVsLG5uFFIHeDQJxamJpSy+OO7LwgIcON3fkbDvH7kCx2qaMpRNPc1tM8qp3Pjwoj4UU2VSBqlNWXS7eFJcKkzz/sq6R+ZK1cSsQHpGMtLzkJ3DTnTzRYEwydbHMsACeJSR5nLVqFf1Q87NybeA3l78reKbMWqEqcYoQJolsIvKn/gmAXbMM+LGz2mcajFDaI2SrXC5ztOBxdL6v7lXEz+ge59GT0R4ilEOtvrX239RHD7wF69WH70LRvIGRn1vd6/aTMladCpMfOR3xdhX5uIXGYe/WyTgWBhN3mPcI+oKVb4TMvm9L3pXVIKlRThNl6Al96yUNJrrTe2XRZ1sfXPNVeh/J3MG6ldRLtWjZ2tLxrpbifySjBA4dEfFqYzJMS48AEgPo/zmCjw8gGKRkUWmiXhBZ0OBK081OWC8XDZLlX7l8+pKpHzb9RwTAb7yKNfh9ebDnHhXSK/8Oj3AjtDqjSbCL/R1mMcMGEk3FSQ3M/FwEF3l4fE+iXfqId/dmcBeIP2A56WukDF/PyhGS2o4Ltd/Ll6hOMSf+SFQrxVT/j7bKljIF+tSovNJhiP5eO1E1hz598mG6RtQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(66556008)(66476007)(38350700002)(38100700002)(66946007)(6916009)(4744005)(6666004)(26005)(52116002)(316002)(956004)(8936002)(86362001)(7696005)(186003)(36916002)(508600001)(8676002)(5660300002)(55016002)(54906003)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ITclqtE1NxZjRyMazNyVjZdD3wtn69u8T3HWr+IbKJpQHRvzuq+CWhsI6Gm9?=
- =?us-ascii?Q?v7MRw+YiDv3je/RU4fv4gVR4CJawrz1CzEOKG2AfP8qp10+Dg1hTZs7sSvhU?=
- =?us-ascii?Q?ss42e46/wHd7hsKwWzcJw0nLd8BuDI9QYffzVDCEByd/tpGcGIZZTqxW/DCY?=
- =?us-ascii?Q?iIn2rn7FpYmolQw7mGEHEMkr1kCrin287Z8Uhbxw+THQTzTjnjnEb/LKYjOw?=
- =?us-ascii?Q?qfpl4955uWsvtrw3zEvZu71nL89xvS+ZDYaNMegxWQhd2bY++dVZBHWmxcSw?=
- =?us-ascii?Q?Yw6GHmONApEhboeCGw1F2X67uO7XvRgcxdxn5IkyQHFxtTvgKvMuShv88PxY?=
- =?us-ascii?Q?qawJYMF0naaQj804pXLIwjEb2XxU7HtKc5CIPG+VfmO8NoERDrCNvMAfvre3?=
- =?us-ascii?Q?qzJjwmcjJV1aYEhueL0m5oeh6z9DT/4/DY8GypSrRv0E+noWNeu0dQcT/dof?=
- =?us-ascii?Q?LH+xLjQ8paVjUhwvLsG3yM9AIFNXFknKTX3JjwWyMN4X/rBCBqLgJFBjwgiU?=
- =?us-ascii?Q?JvvEzBmEpiU//d96bjroR88QiWvmU/okGEvWROOdTZb/uaByAnSadiqM2RT9?=
- =?us-ascii?Q?iB0p4av6O3gfUQC/DbCUXi0BZrQLIPvJdDUqp+3BlanbGAnKBEDUd3Vp0jHa?=
- =?us-ascii?Q?/jqs2uxNVCgNNH/W5eL2LyUu7O4olbrvE2Tyl02zKMh+SlLUBV7MKiA2auf8?=
- =?us-ascii?Q?IW2oQHND+NILzR7daluylzLUXDj2jJP0yi8xrjY4Wfr+17GwnzIaUtjwqCDi?=
- =?us-ascii?Q?KsmrDix88NEpmgRBL/eSXHTcmnL8MQi3x4giMnhj+NhkPPAFemUFsR95oHTs?=
- =?us-ascii?Q?4xUx3pezVXvhpBZJWX+UAErfvoUV8RA5lLXkZGmNgYGbWBz69pXJubFmUXsd?=
- =?us-ascii?Q?zTl40sdBCf6kbGGpJ6l8seJOF4vXa1NZ7NxrNIx/9imSp1bpUfWSeQTzEby4?=
- =?us-ascii?Q?M2S32QENMqOBtTYGVc4W7RRHydkNztcGPlteqcx8Kv5bJ3jOAvsgU+m6ZO3v?=
- =?us-ascii?Q?VhLMGxyRZkmhRiCdBQiWDkd4HMXRdRmZAeVvaq39G7o0uEc4h+DP/gXf2Xd6?=
- =?us-ascii?Q?PsZ3vcZgsRrHb9SAYaeSqAAzYVBIqgROn6SdmdkrDPTuTTiJgdGTNhQAqd3Z?=
- =?us-ascii?Q?TKs3hZItW0Vf6NwsC6kOtLvOOWGGa1oAWbVSuB3BxKebKuw1REJfEVUgmOQC?=
- =?us-ascii?Q?e+IZ/cr5iCcIB+xzZjlYEFG3aWS7qKj5ay+mEEsH/D3J8XINZ1k4tnhFRpPZ?=
- =?us-ascii?Q?gmMfFwrBsg6e5RKt8jUC1qRWYb0fDY75zjIVjPdZQobKjAYfF/7v/rSG+VJW?=
- =?us-ascii?Q?mf41DBMbl+CWsVUeVFiT6RO6?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f234af10-211b-491b-0bbc-08d953cb003f
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2021 02:29:19.9125
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5gv733vyaE6dBohavWVimVYh1qYWgf+sZ6XzYLMfmTHxbEdQ628iOhcnSLp7/a8u4J4D/JDEloDnyqmceQT87Xq9AHipl04JpuV2yRFEEMs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5482
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10061 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=768 adultscore=0
- suspectscore=0 malwarescore=0 phishscore=0 mlxscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2107310009
-X-Proofpoint-ORIG-GUID: I_OPpL4sGX4u3PAQSPVqYVzzHihe5MQL
-X-Proofpoint-GUID: I_OPpL4sGX4u3PAQSPVqYVzzHihe5MQL
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1d9a2e6df2a9a35b2cdd50a9a68cac5991e7e5f0.camel@intel.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Jul 30, 2021 at 10:19:20PM +0000, Williams, Dan J wrote:
+> On Wed, 2021-07-28 at 14:59 -0700, Kees Cook wrote:
+> > On Wed, Jul 28, 2021 at 12:54:18PM +0200, Rasmus Villemoes wrote:
+> > > On 27/07/2021 22.57, Kees Cook wrote:
+> > > 
+> > > > In order to have a regular programmatic way to describe a struct
+> > > > region that can be used for references and sizing, can be examined for
+> > > > bounds checking, avoids forcing the use of intermediate identifiers,
+> > > > and avoids polluting the global namespace, introduce the struct_group()
+> > > > macro. This macro wraps the member declarations to create an anonymous
+> > > > union of an anonymous struct (no intermediate name) and a named struct
+> > > > (for references and sizing):
+> > > > 
+> > > >         struct foo {
+> > > >                 int one;
+> > > >                 struct_group(thing,
+> > > >                         int two,
+> > > >                         int three,
+> > > >                 );
+> > > >                 int four;
+> > > >         };
+> > > 
+> > > That example won't compile, the commas after two and three should be
+> > > semicolons.
+> > 
+> > Oops, yes, thanks. This is why I shouldn't write code that doesn't first
+> > go through a compiler. ;)
+> > 
+> > > And your implementation relies on MEMBERS not containing any comma
+> > > tokens, but as
+> > > 
+> > >   int a, b, c, d;
+> > > 
+> > > is a valid way to declare multiple members, consider making MEMBERS
+> > > variadic
+> > > 
+> > > #define struct_group(NAME, MEMBERS...)
+> > > 
+> > > to have it slurp up every subsequent argument and make that work.
+> > 
+> > Ah! Perfect, thank you. I totally forgot I could do it that way.
+> 
+> This is great Kees. It just so happens it would clean-up what we are
+> already doing in drivers/cxl/cxl.h for anonymous + named register block
+> pointers. However in the cxl case it also needs the named structure to
+> be typed. Any appetite for a typed version of this?
 
-Christoph,
+Oh cool! Yeah, totally I can expand it. Thanks for the suggestion!
 
-> this is the next round of bsg cleanups based on the previous scsi
-> ioctl changes.  The biggest changes are major simplification of how
-> the bsg nodes are created and found, and a simplification of the
-> interface between the frontend in bsg.c and the two backends.
+> 
+> Here is a rough idea of the cleanup it would induce in drivers/cxl/:
+> 
+> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+> index 53927f9fa77e..a2308c995654 100644
+> --- a/drivers/cxl/cxl.h
+> +++ b/drivers/cxl/cxl.h
+> @@ -75,52 +75,19 @@ static inline int cxl_hdm_decoder_count(u32 cap_hdr)
+>  #define CXLDEV_MBOX_BG_CMD_STATUS_OFFSET 0x18
+>  #define CXLDEV_MBOX_PAYLOAD_OFFSET 0x20
+>  
+> -#define CXL_COMPONENT_REGS() \
+> -       void __iomem *hdm_decoder
+> -
+> -#define CXL_DEVICE_REGS() \
+> -       void __iomem *status; \
+> -       void __iomem *mbox; \
+> -       void __iomem *memdev
+> -
+> -/* See note for 'struct cxl_regs' for the rationale of this organization */
+>  /*
+> - * CXL_COMPONENT_REGS - Common set of CXL Component register block base pointers
+>   * @hdm_decoder: CXL 2.0 8.2.5.12 CXL HDM Decoder Capability Structure
+> - */
+> -struct cxl_component_regs {
+> -       CXL_COMPONENT_REGS();
+> -};
+> -
+> -/* See note for 'struct cxl_regs' for the rationale of this organization */
+> -/*
+> - * CXL_DEVICE_REGS - Common set of CXL Device register block base pointers
+>   * @status: CXL 2.0 8.2.8.3 Device Status Registers
+>   * @mbox: CXL 2.0 8.2.8.4 Mailbox Registers
+>   * @memdev: CXL 2.0 8.2.8.5 Memory Device Registers
+>   */
+> -struct cxl_device_regs {
+> -       CXL_DEVICE_REGS();
+> -};
+> -
+> -/*
+> - * Note, the anonymous union organization allows for per
+> - * register-block-type helper routines, without requiring block-type
+> - * agnostic code to include the prefix.
+> - */
+>  struct cxl_regs {
+> -       union {
+> -               struct {
+> -                       CXL_COMPONENT_REGS();
+> -               };
+> -               struct cxl_component_regs component;
+> -       };
+> -       union {
+> -               struct {
+> -                       CXL_DEVICE_REGS();
+> -               };
+> -               struct cxl_device_regs device_regs;
+> -       };
+> +       struct_group_typed(cxl_component_regs, component,
+> +               void __iomem *hdm_decoder;
+> +       );
+> +       struct_group_typed(cxl_device_regs, device_regs,
+> +               void __iomem *status, *mbox, *memdev;
+> +       );
+>  };
+>  
+>  struct cxl_reg_map {
+> diff --git a/include/linux/stddef.h b/include/linux/stddef.h
+> index cf7f866944f9..84b7de24ffb5 100644
+> --- a/include/linux/stddef.h
+> +++ b/include/linux/stddef.h
+> @@ -49,12 +49,18 @@ enum {
+>   * @ATTRS: Any struct attributes (normally empty)
+>   * @MEMBERS: The member declarations for the mirrored structs
+>   */
+> -#define struct_group_attr(NAME, ATTRS, MEMBERS) \
+> +#define struct_group_attr(NAME, ATTRS, MEMBERS...) \
+>         union { \
+>                 struct { MEMBERS } ATTRS; \
+>                 struct { MEMBERS } ATTRS NAME; \
+>         }
+>  
+> +#define struct_group_attr_typed(TYPE, NAME, ATTRS, MEMBERS...) \
+> +       union { \
+> +               struct { MEMBERS } ATTRS; \
+> +               struct TYPE { MEMBERS } ATTRS NAME; \
+> +       }
+> +
+>  /**
+>   * struct_group(NAME, MEMBERS)
+>   *
+> @@ -67,7 +73,10 @@ enum {
+>   * @NAME: The name of the mirrored sub-struct
+>   * @MEMBERS: The member declarations for the mirrored structs
+>   */
+> -#define struct_group(NAME, MEMBERS)    \
+> +#define struct_group(NAME, MEMBERS...) \
+>         struct_group_attr(NAME, /* no attrs */, MEMBERS)
+>  
+> +#define struct_group_typed(TYPE, NAME, MEMBERS...) \
+> +       struct_group_attr_typed(TYPE, NAME, /* no attrs */, MEMBERS)
+> +
+>  #endif
 
-Applied to 5.15/scsi-staging, thanks!
+Awesome! My instinct is to expose the resulting API as:
+
+__struct_group(type, name, attrs, members...)
+
+struct_group(name, members...)
+struct_group_attr(name, attrs, members...)
+struct_group_typed(type, name, members...)
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Kees Cook
