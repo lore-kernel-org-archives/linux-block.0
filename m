@@ -2,79 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7708EC432BE
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 17:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 840FFC432BE
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 18:38:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 205C761077
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 17:15:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66C9C6052B
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 18:38:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229449AbhGaRPY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 31 Jul 2021 13:15:24 -0400
-Received: from mail-pj1-f47.google.com ([209.85.216.47]:55137 "EHLO
-        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229840AbhGaRPY (ORCPT
+        id S229606AbhGaSiF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 31 Jul 2021 14:38:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229475AbhGaSiF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Jul 2021 13:15:24 -0400
-Received: by mail-pj1-f47.google.com with SMTP id b6so19658292pji.4;
-        Sat, 31 Jul 2021 10:15:17 -0700 (PDT)
+        Sat, 31 Jul 2021 14:38:05 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAABC0613CF;
+        Sat, 31 Jul 2021 11:37:57 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id l17so17841626ljn.2;
+        Sat, 31 Jul 2021 11:37:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KxFpJWQtK9xa0w5gLWUipHSVysNghEYt1w+9Q+Sruzk=;
+        b=U0XbTqkiexQT8dIpEgS5EPcVLq4FcRc4Pe3geUoKP77s03RswnDuv7Ug0KTudzcBrj
+         Z9XnmrejpP2GwC1m13qZD16Ko5n8yVqhk+vqMUJ6FBKtbFvx96qOOWfz5bhNk89Ozx1c
+         aDCJzwP9HeK6ORID97iIawwu3zfw10GKo6p+E4XKEMhya4Cyg2mmnUIXGFjRTbR0y3lj
+         e4QlTNhOnxuk1uQTku76KVSCj09hNpf4plVP9kiNrPq5Xl0Hqr64gB8aAyQ2raCbw97i
+         fK9VEnSxSvnrmzWqEqn/uFfi9+LKSLs316cv8T4pTiZ2bM/mEYWyUQUxmrcGdC38UPOR
+         8eRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=DlaoNmwnEWDtxTjH4uaBlzq3ZGun3yheeOVe4kPMWlc=;
-        b=nRiNHjZ3ak47qCrpNaQC0KlEFsD2IJqBqsI1jy+9CnSM9OelaAgyA+Mu1MpcgIs33K
-         MjTuU01NGmSM3JZkodBKzlqvY7euttqBs+vUI/X4Wky9Z4F5YoY/FY9v+1T4wJk1wMqp
-         uyuR9peYgOq5CdJwj6JuMSN2wtPUeborC3fpNiF+BO/p+RdsZo4jqLIkjf2H9wv2yWcd
-         0aPU4N2NJQndTWUwMJdKLmtguitLd5aDvvCQLx+gJlN1PRM1mgCF+AT64aqjPlPBFy7l
-         30fA1O9pqE8ytkwTagftLoWxnF4Nk5dfidjo4DqJUZjkvfDminEzRO9X7AhsKeS2wCQ8
-         oB8g==
-X-Gm-Message-State: AOAM530AyiOT1ba5ld2GHS9chB2nRk5whiy6MnnsWZBk98rF/EJPNoi9
-        UbnSAvSw+/rL2sLUcI8XPBI=
-X-Google-Smtp-Source: ABdhPJxagnFWjqey40tjfYyQ5SyxoZzmV1olLTHdeYhT7HZM2cviRdp277uKthSeil31eA/NJXkRIQ==
-X-Received: by 2002:a17:90a:d90f:: with SMTP id c15mr9207955pjv.178.1627751717376;
-        Sat, 31 Jul 2021 10:15:17 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:13bf:959e:93b8:7d56? ([2601:647:4000:d7:13bf:959e:93b8:7d56])
-        by smtp.gmail.com with ESMTPSA id z5sm2501918pff.97.2021.07.31.10.15.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 31 Jul 2021 10:15:16 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: allow hardware queue to get more tag while
- sharing a tag set
-To:     Yu Kuai <yukuai3@huawei.com>, axboe@kernel.dk, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-References: <20210712031818.31918-1-yukuai3@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <ade72519-5e16-1cc5-9a77-cb9ead42035e@acm.org>
-Date:   Sat, 31 Jul 2021 10:15:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        bh=KxFpJWQtK9xa0w5gLWUipHSVysNghEYt1w+9Q+Sruzk=;
+        b=docUTVUFI9JVNxOoqcWbVEZYaPHMtoEbyX08IQ0FMmdfO6yVvyWtLjV27cUFA+3HaF
+         jrM2nPxlrA6Tipcr8sS5RE0rA9txbk4lhlaVObsH0NpXK3laBb/jh8UmyflfHjmJ6Gqz
+         6b5SJm+lVnxqc0DryvGy4sgFptxl9CWftiwXfzI4dxkdVdYyCMGypFlGNXvdzSuSE9K8
+         jQJChcZ2EI9ll6y2CXJldsjaXlhBhbU0xPIZRd8aW8zshO5eTgDlTf9LUspIjXiD7dR5
+         s/1fDsCyIddqm54Ot2SDdPtrx+5WkvL4SA50+wlN0A/RJT3nB1EjE+V6ztz2e0KVlFvx
+         UkiQ==
+X-Gm-Message-State: AOAM531qSY3mvxyaNGD9loqoxuUzgMW5rcvjf/Sxsfe5mzNHRVOYl4we
+        R0RHGKMtELgrBexHei64gvo=
+X-Google-Smtp-Source: ABdhPJzbs1TlgquigMiOkPiIVqMR8Kjdsh66zmbC/Zx6ZBeNqvgGg6+gKf9gk751vNjN1/EvzI3rZQ==
+X-Received: by 2002:a2e:9ecd:: with SMTP id h13mr6060906ljk.162.1627756676219;
+        Sat, 31 Jul 2021 11:37:56 -0700 (PDT)
+Received: from localhost.localdomain (94-29-22-96.dynamic.spd-mgts.ru. [94.29.22.96])
+        by smtp.gmail.com with ESMTPSA id s7sm456396lfg.297.2021.07.31.11.37.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 Jul 2021 11:37:55 -0700 (PDT)
+From:   Dmitry Osipenko <digetx@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>
+Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+Subject: [PATCH v2 0/3] Support EFI partition on NVIDIA Tegra devices
+Date:   Sat, 31 Jul 2021 21:36:23 +0300
+Message-Id: <20210731183626.18568-1-digetx@gmail.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <20210712031818.31918-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/11/21 8:18 PM, Yu Kuai wrote:
-> If there are multiple active queues while sharing a tag set, it's not
-> necessary to limit the available tags as same share for each active queue
-> if no one ever failed to get driver tag. And fall back to same share if
-> someone do failed to get driver tag.
-> 
-> This modification will be beneficial if total queue_depth of disks
-> on the same host is less than total tags.
+This series adds the most minimal EFI partition support for NVIDIA Tegra
+consumer devices, like Android tablets and game consoles, making theirs
+EMMC accessible out-of-the-box using downstream bootloader and mainline
+Linux kernel.  EMMC now works on Acer A500 tablet and Ouya game console
+that are already well supported in mainline and internal storage is the
+only biggest thing left to support.
 
-This patch adds new atomic operations in the hot path and hence probably
-has a negative performance impact. What is the performance impact of
-this patch for e.g. null_blk when submitting I/O from all CPU cores?
+Changelog:
 
-Thanks,
+v2: - This is continuation of [1] where Davidlohr Bueso suggested that it
+      should be better to avoid supporting in mainline the custom gpt_sector
+      kernel cmdline parameter that downstream Android kernels use.  We can
+      do this for the devices that are already mainlined, so I dropped the
+      cmdline from the v2 and left only the variant with a fixed GPT address.
 
-Bart.
+[1] https://lore.kernel.org/linux-efi/20210327212100.3834-3-digetx@gmail.com/T/
+
+Dmitry Osipenko (3):
+  mmc: core: Add raw_boot_mult field to mmc_ext_csd
+  mmc: block: Add mmc_bdev_to_card() helper
+  partitions/efi: Support NVIDIA Tegra devices
+
+ block/partitions/Kconfig   |  8 ++++
+ block/partitions/Makefile  |  1 +
+ block/partitions/check.h   |  2 +
+ block/partitions/core.c    |  3 ++
+ block/partitions/efi.c     | 18 ++++++++
+ block/partitions/tegra.c   | 86 ++++++++++++++++++++++++++++++++++++++
+ drivers/mmc/core/block.c   | 15 +++++++
+ drivers/mmc/core/mmc.c     |  2 +
+ include/linux/mmc/blkdev.h | 13 ++++++
+ include/linux/mmc/card.h   |  1 +
+ 10 files changed, 149 insertions(+)
+ create mode 100644 block/partitions/tegra.c
+ create mode 100644 include/linux/mmc/blkdev.h
+
+-- 
+2.32.0
+
