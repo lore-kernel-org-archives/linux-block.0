@@ -2,101 +2,315 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 915FCC4338F
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 07:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C83C4338F
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 07:13:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 761CD6103B
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 07:10:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B228260524
+	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 07:13:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229875AbhGaHKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 31 Jul 2021 03:10:18 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:7770 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231429AbhGaHKR (ORCPT
+        id S229981AbhGaHNd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 31 Jul 2021 03:13:33 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:12434 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229811AbhGaHNc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Jul 2021 03:10:17 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GcFcR4tVPzYjf6;
-        Sat, 31 Jul 2021 15:04:07 +0800 (CST)
+        Sat, 31 Jul 2021 03:13:32 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GcFl50xGWzcfZv;
+        Sat, 31 Jul 2021 15:09:53 +0800 (CST)
 Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Sat, 31 Jul 2021 15:10:02 +0800
+ 15.1.2176.2; Sat, 31 Jul 2021 15:13:23 +0800
 Received: from [10.174.178.91] (10.174.178.91) by
  dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Sat, 31 Jul 2021 15:10:01 +0800
-Subject: Re: [PATCH 1/3] block, bfq: do not idle if only one cgroup is
- activated
-To:     Paolo Valente <paolo.valente@linaro.org>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20210714094529.758808-1-yukuai3@huawei.com>
- <20210714094529.758808-2-yukuai3@huawei.com>
- <7DF40BD4-8F57-4C2E-88A9-CBC3DA2A891E@linaro.org>
+ 15.1.2176.2; Sat, 31 Jul 2021 15:13:23 +0800
+Subject: Re: [PATCH] blk-mq: allow hardware queue to get more tag while
+ sharing a tag set
 From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <c0b97b5b-c961-6d9f-7033-6da194c6b220@huawei.com>
-Date:   Sat, 31 Jul 2021 15:10:01 +0800
+To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20210712031818.31918-1-yukuai3@huawei.com>
+ <ce3aa33f-3b13-5047-60ac-dee910ae6184@huawei.com>
+Message-ID: <81352885-9af4-0dcf-c009-59d1d6da8495@huawei.com>
+Date:   Sat, 31 Jul 2021 15:13:22 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <7DF40BD4-8F57-4C2E-88A9-CBC3DA2A891E@linaro.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ce3aa33f-3b13-5047-60ac-dee910ae6184@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.178.91]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  dggema762-chm.china.huawei.com (10.1.198.204)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/07/24 15:12, Paolo Valente wrote:
-> 
-> 
->> Il giorno 14 lug 2021, alle ore 11:45, Yu Kuai <yukuai3@huawei.com> ha scritto:
+On 2021/07/20 20:33, yukuai (C) wrote:
+> On 2021/07/12 11:18, Yu Kuai wrote:
+>> If there are multiple active queues while sharing a tag set, it's not
+>> necessary to limit the available tags as same share for each active queue
+>> if no one ever failed to get driver tag. And fall back to same share if
+>> someone do failed to get driver tag.
 >>
->> If only one group is activated, specifically
->> 'bfqd->num_groups_with_pending_reqs == 1', there is no need to guarantee
->> the same share of the throughput of queues in the same group.
+>> This modification will be beneficial if total queue_depth of disks
+>> on the same host is less than total tags.
 >>
->> Thus change the condition from '> 0' to '> 1' in
->> bfq_asymmetric_scenario().
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/blk-mq-debugfs.c |  2 ++
+>>   block/blk-mq-tag.c     | 43 +++++++++++++++++++++++++++++++++++++++++-
+>>   block/blk-mq-tag.h     | 27 ++++++++++++++++++++++++--
+>>   block/blk-mq.c         | 13 ++++++++++---
+>>   block/blk-mq.h         |  8 ++++++++
+>>   include/linux/blk-mq.h |  4 ++++
+>>   include/linux/blkdev.h |  1 +
+>>   7 files changed, 92 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>> index 4b66d2776eda..35f1f01d93ae 100644
+>> --- a/block/blk-mq-debugfs.c
+>> +++ b/block/blk-mq-debugfs.c
+>> @@ -450,6 +450,8 @@ static void blk_mq_debugfs_tags_show(struct 
+>> seq_file *m,
+>>       seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
+>>       seq_printf(m, "active_queues=%d\n",
+>>              atomic_read(&tags->active_queues));
+>> +    seq_printf(m, "pending_queues=%d\n",
+>> +           atomic_read(&tags->pending_queues));
+>>       seq_puts(m, "\nbitmap_tags:\n");
+>>       sbitmap_queue_show(tags->bitmap_tags, m);
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 86f87346232a..618624b359d6 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -40,6 +40,22 @@ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>>       return true;
+>>   }
+>> +void __blk_mq_dtag_busy(struct blk_mq_hw_ctx *hctx)
+>> +{
+>> +    if (blk_mq_is_sbitmap_shared(hctx->flags)) {
+>> +        struct request_queue *q = hctx->queue;
+>> +        struct blk_mq_tag_set *set = q->tag_set;
+>> +
+>> +        if (!test_bit(QUEUE_FLAG_HCTX_WAIT, &q->queue_flags) &&
+>> +            !test_and_set_bit(QUEUE_FLAG_HCTX_WAIT, &q->queue_flags))
+>> +            atomic_inc(&set->pending_queues_shared_sbitmap);
+>> +    } else {
+>> +        if (!test_bit(BLK_MQ_S_DTAG_WAIT, &hctx->state) &&
+>> +            !test_and_set_bit(BLK_MQ_S_DTAG_WAIT, &hctx->state))
+>> +            atomic_inc(&hctx->tags->pending_queues);
+>> +    }
+>> +}
+>> +
+>>   /*
+>>    * Wakeup all potentially sleeping on tags
+>>    */
+>> @@ -74,6 +90,24 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>>       blk_mq_tag_wakeup_all(tags, false);
+>>   }
+>> +void __blk_mq_dtag_idle(struct blk_mq_hw_ctx *hctx)
+>> +{
+>> +    struct blk_mq_tags *tags = hctx->tags;
+>> +    struct request_queue *q = hctx->queue;
+>> +    struct blk_mq_tag_set *set = q->tag_set;
+>> +
+>> +    if (blk_mq_is_sbitmap_shared(hctx->flags)) {
+>> +        if (!test_and_clear_bit(QUEUE_FLAG_HCTX_WAIT,
+>> +                    &q->queue_flags))
+>> +            return;
+>> +        atomic_dec(&set->pending_queues_shared_sbitmap);
+>> +    } else {
+>> +        if (!test_and_clear_bit(BLK_MQ_S_DTAG_WAIT, &hctx->state))
+>> +            return;
+>> +        atomic_dec(&tags->pending_queues);
+>> +    }
+>> +}
+>> +
+>>   static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+>>                   struct sbitmap_queue *bt)
+>>   {
+>> @@ -112,8 +146,12 @@ unsigned int blk_mq_get_tag(struct 
+>> blk_mq_alloc_data *data)
+>>       if (tag != BLK_MQ_NO_TAG)
+>>           goto found_tag;
+>> -    if (data->flags & BLK_MQ_REQ_NOWAIT)
+>> +    if (data->flags & BLK_MQ_REQ_NOWAIT) {
+>> +        if (!data->q->elevator)
+>> +            blk_mq_dtag_busy(data->hctx);
+>> +
+>>           return BLK_MQ_NO_TAG;
+>> +    }
+>>       ws = bt_wait_ptr(bt, data->hctx);
+>>       do {
+>> @@ -140,6 +178,9 @@ unsigned int blk_mq_get_tag(struct 
+>> blk_mq_alloc_data *data)
+>>           if (tag != BLK_MQ_NO_TAG)
+>>               break;
+>> +        if (!data->q->elevator)
+>> +            blk_mq_dtag_busy(data->hctx);
+>> +
+>>           bt_prev = bt;
+>>           io_schedule();
+>> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+>> index 8ed55af08427..badcf3693749 100644
+>> --- a/block/blk-mq-tag.h
+>> +++ b/block/blk-mq-tag.h
+>> @@ -10,6 +10,11 @@ struct blk_mq_tags {
+>>       unsigned int nr_reserved_tags;
+>>       atomic_t active_queues;
+>> +    /*
+>> +     * if multiple queues share a tag set, pending_queues record the
+>> +     * number of queues that can't get driver tag.
+>> +     */
+>> +    atomic_t pending_queues;
+>>       struct sbitmap_queue *bitmap_tags;
+>>       struct sbitmap_queue *breserved_tags;
+>> @@ -69,8 +74,10 @@ enum {
+>>       BLK_MQ_TAG_MAX        = BLK_MQ_NO_TAG - 1,
+>>   };
+>> -extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
+>> -extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *);
+>> +extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx);
+>> +extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx);
+>> +extern void __blk_mq_dtag_busy(struct blk_mq_hw_ctx *hctx);
+>> +extern void __blk_mq_dtag_idle(struct blk_mq_hw_ctx *hctx);
+>>   static inline bool blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>>   {
+>> @@ -88,6 +95,22 @@ static inline void blk_mq_tag_idle(struct 
+>> blk_mq_hw_ctx *hctx)
+>>       __blk_mq_tag_idle(hctx);
+>>   }
+>> +static inline void blk_mq_dtag_busy(struct blk_mq_hw_ctx *hctx)
+>> +{
+>> +    if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+>> +        return;
+>> +
+>> +    __blk_mq_dtag_busy(hctx);
+>> +}
+>> +
+>> +static inline void blk_mq_dtag_idle(struct blk_mq_hw_ctx *hctx)
+>> +{
+>> +    if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+>> +        return;
+>> +
+>> +    __blk_mq_dtag_idle(hctx);
+>> +}
+>> +
+>>   static inline bool blk_mq_tag_is_reserved(struct blk_mq_tags *tags,
+>>                         unsigned int tag)
+>>   {
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 2c4ac51e54eb..1bb52bd71da8 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -991,8 +991,10 @@ static void blk_mq_timeout_work(struct 
+>> work_struct *work)
+>>            */
+>>           queue_for_each_hw_ctx(q, hctx, i) {
+>>               /* the hctx may be unmapped, so check it here */
+>> -            if (blk_mq_hw_queue_mapped(hctx))
+>> +            if (blk_mq_hw_queue_mapped(hctx)) {
+>>                   blk_mq_tag_idle(hctx);
+>> +                blk_mq_dtag_idle(hctx);
+>> +            }
+>>           }
+>>       }
+>>       blk_queue_exit(q);
+>> @@ -1097,8 +1099,10 @@ static bool __blk_mq_get_driver_tag(struct 
+>> request *rq)
+>>       }
+>>       tag = __sbitmap_queue_get(bt);
+>> -    if (tag == BLK_MQ_NO_TAG)
+>> +    if (tag == BLK_MQ_NO_TAG) {
+>> +        blk_mq_dtag_busy(rq->mq_hctx);
+>>           return false;
+>> +    }
+>>       rq->tag = tag + tag_offset;
+>>       return true;
+>> @@ -2676,8 +2680,10 @@ static void blk_mq_exit_hctx(struct 
+>> request_queue *q,
+>>   {
+>>       struct request *flush_rq = hctx->fq->flush_rq;
+>> -    if (blk_mq_hw_queue_mapped(hctx))
+>> +    if (blk_mq_hw_queue_mapped(hctx)) {
+>>           blk_mq_tag_idle(hctx);
+>> +        blk_mq_dtag_idle(hctx);
+>> +    }
+>>       blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
+>>               set->queue_depth, flush_rq);
+>> @@ -3536,6 +3542,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set 
+>> *set)
+>>       if (blk_mq_is_sbitmap_shared(set->flags)) {
+>>           atomic_set(&set->active_queues_shared_sbitmap, 0);
+>> +        atomic_set(&set->pending_queues_shared_sbitmap, 0);
+>>           if (blk_mq_init_shared_sbitmap(set)) {
+>>               ret = -ENOMEM;
+>> diff --git a/block/blk-mq.h b/block/blk-mq.h
+>> index d08779f77a26..9e646ade81a8 100644
+>> --- a/block/blk-mq.h
+>> +++ b/block/blk-mq.h
+>> @@ -337,10 +337,18 @@ static inline bool hctx_may_queue(struct 
+>> blk_mq_hw_ctx *hctx,
+>>           if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+>>               return true;
+>> +
+>> +        if (!atomic_read(&set->pending_queues_shared_sbitmap))
+>> +            return true;
+>> +
+>>           users = atomic_read(&set->active_queues_shared_sbitmap);
+>>       } else {
+>>           if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>>               return true;
+>> +
+>> +        if (!atomic_read(&hctx->tags->pending_queues))
+>> +            return true;
+>> +
+>>           users = atomic_read(&hctx->tags->active_queues);
+>>       }
+>> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+>> index 1d18447ebebc..3bc0faf0e2cf 100644
+>> --- a/include/linux/blk-mq.h
+>> +++ b/include/linux/blk-mq.h
+>> @@ -256,6 +256,7 @@ struct blk_mq_tag_set {
+>>       unsigned int        flags;
+>>       void            *driver_data;
+>>       atomic_t        active_queues_shared_sbitmap;
+>> +    atomic_t        pending_queues_shared_sbitmap;
+>>       struct sbitmap_queue    __bitmap_tags;
+>>       struct sbitmap_queue    __breserved_tags;
+>> @@ -415,6 +416,9 @@ enum {
+>>       /* hw queue is inactive after all its CPUs become offline */
+>>       BLK_MQ_S_INACTIVE    = 3,
+>> +    /* hw queue is waiting for driver tag */
+>> +    BLK_MQ_S_DTAG_WAIT    = 1,
+>> +
+>>       BLK_MQ_MAX_DEPTH    = 10240,
+>>       BLK_MQ_CPU_WORK_BATCH    = 8,
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 3177181c4326..55e0965c9c3c 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -603,6 +603,7 @@ struct request_queue {
+>>   #define QUEUE_FLAG_RQ_ALLOC_TIME 27    /* record rq->alloc_time_ns */
+>>   #define QUEUE_FLAG_HCTX_ACTIVE    28    /* at least one blk-mq hctx 
+>> is active */
+>>   #define QUEUE_FLAG_NOWAIT       29    /* device supports NOWAIT */
+>> +#define QUEUE_FLAG_HCTX_WAIT    30    /* at least one blk-mq hctx 
+>> can't get driver tag */
+>>   #define QUEUE_FLAG_MQ_DEFAULT    ((1 << QUEUE_FLAG_IO_STAT) |        \
+>>                    (1 << QUEUE_FLAG_SAME_COMP) |        \
+>>
 > 
-> I see your point, and I agree with your goal.  Yet, your change seems
-> not to suffer from the following problem.
-> 
-> In addition to the groups that are created explicitly, there is the
-> implicit root group.  So, when bfqd->num_groups_with_pending_reqs ==
-> 1, there may be both active processes in the root group and active
-> processes in the only group created explicitly.  In this case, idling
-> is needed to preserve service guarantees.
-> 
-> Probably your idea should be improved by making sure that there is
-> pending I/O only from either the root group or the explicit group.
-> 
-> Thanks,
-> Paolo
+> ping ...
 
-
-Hi, Paolo
-
-I'm trying to add support to judge if root group have pending rqs, the
-implementation involve setting and clearing the busy state.
-
-I'm thinking about setting busy in __bfq_activate_entity() if
-bfq_entity_to_bfqq() return valid bfqq, however I'm not sure where to
-clear the busy state.
-
-On the other hand, do you think the way I record rq size info in patch 2
-is OK? If so, I can do this the similar way: say that root group doesn't
-have any pending requests if bfq haven't dispatch rq from root group for
-a period of time.
-
-Thanks
-Kuai
+ping ...
