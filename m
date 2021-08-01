@@ -2,272 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53392C19F39
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 18:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D9FC4338F
+	for <linux-block@archiver.kernel.org>; Sun,  1 Aug 2021 11:24:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D3B461058
-	for <linux-block@archiver.kernel.org>; Sat, 31 Jul 2021 18:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D12A61057
+	for <linux-block@archiver.kernel.org>; Sun,  1 Aug 2021 11:24:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230408AbhGaS5R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 31 Jul 2021 14:57:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44734 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230398AbhGaS5R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Jul 2021 14:57:17 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F9FC06175F;
-        Sat, 31 Jul 2021 11:57:10 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id u20so17920269ljo.0;
-        Sat, 31 Jul 2021 11:57:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=+/WYo8QV+iZpYeEZvpXl5J2olgvwzkYcuOSEqBeA8sI=;
-        b=e3qLhBXhJis92SjGbiSmhxP6wPsHmOMb+IFZwpENnh7tGOQyv2K6ZOTk92C1k22zez
-         /er+WbZXYkG2IOoXbpmHlYJVfHF4f+qZl4c0Wj4mW6F8B8NiXDKtjQywYJdmwhMMdvBV
-         UA5pb9Ho8F604LrEdGaKC08ZV3bvskPx6OU+3kY0bfD7g7Bg6ro/4+MxvGMRNldHy8ee
-         arBesUciw9twEBuZsuwNPLAI2lXZxAFQ02KpdhLz0xE7oW28mHahJGwvjNQnEy33qGKi
-         Psg8rXPrKyMpe4iu62xOxj8YK7mLbRNmnRTkp4DtjM4EgPS7K7vBjmB8JPJ2HFV2Avj3
-         2OEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+/WYo8QV+iZpYeEZvpXl5J2olgvwzkYcuOSEqBeA8sI=;
-        b=WPHzDQ/yc5x8GVB6/Ki27T/vzo7og4kC4+LHZLE9Tk3CSKhcnKC3PYmT+S1E76cvjZ
-         xuO2qd79tJ+AZtWpFmNdeJ4CwU3W4EcAE4fFT/uBcAvYhE1WV+8epBVA//DRRg2fdhpB
-         zbrpVQ91HkvXKoENth1z3bo9mRLoV4c0zWraq8Gmwju0UdEwq3YQXNghdMOllOoH3x2p
-         4PR6n2hwTOakW+gIw+FP8ZynZIgmB3LfXX7/yW75uV5gDZR+NcIoSN2dP3NsR9mqZVTN
-         xyldDQzJP9vLxSUr+Yo0sAhm8cYWcVMpDZZEdcYFHs5roLw0Ua4YrrVVqyLAY/wMFZgj
-         dpDg==
-X-Gm-Message-State: AOAM532d+j2yB6DVMsE1U0zk9vxOmt0iQyOEkxQkS5zwbnWakO3bazIO
-        iqkqSlXQBY2qqSmfMcbE1GM=
-X-Google-Smtp-Source: ABdhPJwUVQ/+Kcer+GEI9EQ5RHOkSGNApeuahYKxUIkTU7VJsLbr6lnS/z5ajIp/wbDRsmLKc/jl/w==
-X-Received: by 2002:a2e:581a:: with SMTP id m26mr5749716ljb.401.1627757828788;
-        Sat, 31 Jul 2021 11:57:08 -0700 (PDT)
-Received: from localhost.localdomain (94-29-22-96.dynamic.spd-mgts.ru. [94.29.22.96])
-        by smtp.gmail.com with ESMTPSA id c10sm507653lfv.10.2021.07.31.11.57.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Jul 2021 11:57:08 -0700 (PDT)
-From:   Dmitry Osipenko <digetx@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>
-Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: [PATCH v3 3/3] partitions/efi: Support NVIDIA Tegra devices
-Date:   Sat, 31 Jul 2021 21:56:52 +0300
-Message-Id: <20210731185652.6421-4-digetx@gmail.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210731185652.6421-1-digetx@gmail.com>
-References: <20210731185652.6421-1-digetx@gmail.com>
+        id S231645AbhHALYV convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 Aug 2021 07:24:21 -0400
+Received: from cc-smtpout1.netcologne.de ([89.1.8.211]:44656 "EHLO
+        cc-smtpout1.netcologne.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231527AbhHALYV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Aug 2021 07:24:21 -0400
+X-Greylist: delayed 555 seconds by postgrey-1.27 at vger.kernel.org; Sun, 01 Aug 2021 07:24:20 EDT
+Received: from cc-smtpin2.netcologne.de (cc-smtpin2.netcologne.de [89.1.8.202])
+        by cc-smtpout1.netcologne.de (Postfix) with ESMTP id A7EA61257B;
+        Sun,  1 Aug 2021 13:14:56 +0200 (CEST)
+Received: from nas2.garloff.de (xdsl-89-0-233-245.nc.de [89.0.233.245])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by cc-smtpin2.netcologne.de (Postfix) with ESMTPSA id 2377A11E24;
+        Sun,  1 Aug 2021 13:14:47 +0200 (CEST)
+Received: from [10.5.8.22] (unknown [185.58.53.67])
+        by nas2.garloff.de (Postfix) with ESMTPSA id B933CB3B1319;
+        Sun,  1 Aug 2021 13:14:45 +0200 (CEST)
+To:     Denis Efremov <efremov@linux.com>, linux-block@vger.kernel.org,
+        Linux-kernel <linux-kernel@vger.kernel.org>,
+        Jiri Kosina <jkosina@suse.cz>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wim Osterholt <wim@djo.tudelft.nl>, dmarkh@cfl.rr.com,
+        markh@compro.net
+References: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
+ <e49603c2-ac36-12b0-57cf-ff5ab30115bc@linux.com>
+ <f5501a7c-4387-259d-66d2-f10db0cf36ff@cfl.rr.com>
+ <f1277dcb-6bf8-b149-ad4e-68a4109d4e67@linux.com>
+ <1cf8e751-db77-441e-53b4-d6e979bbe046@compro.net>
+ <751150dd-251f-bc68-0cd0-4a10b70ab79a@linux.com>
+ <ffb8ca1c-ac8c-95c4-c05a-1269c4831b0a@linux.com>
+From:   Kurt Garloff <kurt@garloff.de>
+Subject: Re: [BUG] FLOPPY DRIVER since 5.10.20
+Message-ID: <9d46f063-8d8d-95ee-e262-9300f54d527c@garloff.de>
+Date:   Sun, 1 Aug 2021 13:14:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <ffb8ca1c-ac8c-95c4-c05a-1269c4831b0a@linux.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+X-NetCologne-Spam: L
+X-Rspamd-Queue-Id: 2377A11E24
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-NVIDIA Tegra consumer devices have EMMC storage that has GPT entry at a
-non-standard location. Support looking up GPT entry at a special sector
-to enable such devices.
+Hi Denis,
 
-Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
----
- block/partitions/Kconfig  |  8 ++++
- block/partitions/Makefile |  1 +
- block/partitions/check.h  |  2 +
- block/partitions/core.c   |  3 ++
- block/partitions/efi.c    |  9 ++++
- block/partitions/tegra.c  | 86 +++++++++++++++++++++++++++++++++++++++
- 6 files changed, 109 insertions(+)
- create mode 100644 block/partitions/tegra.c
+Here's what I did to uncover and reproduce the bug:
+* Building a VM image with openSUSE-15.2
+* VM image includes cloud-init which reads from a config-drive (with fallback to network) to customize the generic image on (first) boot
+* Started the image with an attached floppy disk in KVM (qemu-5.x) that contained valid cloud-config (cidata) information
+(-drive file=/tmp/ci-disk.17138.3Jf2/seed-17138.img,format=raw,if=floppy,id=cidata)
 
-diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
-index 278593b8e4e9..5db25e7efbb7 100644
---- a/block/partitions/Kconfig
-+++ b/block/partitions/Kconfig
-@@ -267,3 +267,11 @@ config CMDLINE_PARTITION
- 	help
- 	  Say Y here if you want to read the partition table from bootargs.
- 	  The format for the command line is just like mtdparts.
-+
-+config TEGRA_PARTITION
-+	bool "NVIDIA Tegra Partition support" if PARTITION_ADVANCED
-+	default y if ARCH_TEGRA
-+	depends on EFI_PARTITION && MMC_BLOCK && (ARCH_TEGRA || COMPILE_TEST)
-+	help
-+	  Say Y here if you would like to be able to read the hard disk
-+	  partition table format used by NVIDIA Tegra machines.
-diff --git a/block/partitions/Makefile b/block/partitions/Makefile
-index a7f05cdb02a8..83cb70c6d08d 100644
---- a/block/partitions/Makefile
-+++ b/block/partitions/Makefile
-@@ -20,3 +20,4 @@ obj-$(CONFIG_IBM_PARTITION) += ibm.o
- obj-$(CONFIG_EFI_PARTITION) += efi.o
- obj-$(CONFIG_KARMA_PARTITION) += karma.o
- obj-$(CONFIG_SYSV68_PARTITION) += sysv68.o
-+obj-$(CONFIG_TEGRA_PARTITION) += tegra.o
-diff --git a/block/partitions/check.h b/block/partitions/check.h
-index c577e9ee67f0..5fcc85087465 100644
---- a/block/partitions/check.h
-+++ b/block/partitions/check.h
-@@ -22,6 +22,7 @@ struct parsed_partitions {
- 	int limit;
- 	bool access_beyond_eod;
- 	char *pp_buf;
-+	sector_t force_gpt_sector;
- };
- 
- typedef struct {
-@@ -67,4 +68,5 @@ int osf_partition(struct parsed_partitions *state);
- int sgi_partition(struct parsed_partitions *state);
- int sun_partition(struct parsed_partitions *state);
- int sysv68_partition(struct parsed_partitions *state);
-+int tegra_partition_forced_gpt(struct parsed_partitions *state);
- int ultrix_partition(struct parsed_partitions *state);
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index fb3a556cacce..2fb6db3134ee 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -82,6 +82,9 @@ static int (*check_part[])(struct parsed_partitions *) = {
- #endif
- #ifdef CONFIG_SYSV68_PARTITION
- 	sysv68_partition,
-+#endif
-+#ifdef CONFIG_TEGRA_PARTITION
-+	tegra_partition_forced_gpt,
- #endif
- 	NULL
- };
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index e2716792ecc1..093b084d002f 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -621,6 +621,15 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
-         if (!good_agpt && force_gpt)
-                 good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
- 
-+	/*
-+	 * The force_gpt_sector is used by NVIDIA Tegra partition parser in
-+	 * order to convey a non-standard location of the GPT entry for lookup.
-+	 * By default force_gpt_sector is set to 0 and has no effect.
-+	 */
-+	if (!good_agpt && force_gpt && state->force_gpt_sector)
-+		good_agpt = is_gpt_valid(state, state->force_gpt_sector,
-+					 &agpt, &aptes);
-+
-         /* The obviously unsuccessful case */
-         if (!good_pgpt && !good_agpt)
-                 goto fail;
-diff --git a/block/partitions/tegra.c b/block/partitions/tegra.c
-new file mode 100644
-index 000000000000..d8801a885a62
---- /dev/null
-+++ b/block/partitions/tegra.c
-@@ -0,0 +1,86 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#define pr_fmt(fmt) "tegra-partition: " fmt
-+
-+#include <linux/blkdev.h>
-+#include <linux/kernel.h>
-+#include <linux/of.h>
-+#include <linux/sizes.h>
-+
-+#include <linux/mmc/blkdev.h>
-+#include <linux/mmc/card.h>
-+#include <linux/mmc/host.h>
-+
-+#include <soc/tegra/common.h>
-+
-+#include "check.h"
-+
-+#define TEGRA_PT_ERR(_state, fmt, ...)					\
-+	pr_debug("%s: " fmt,						\
-+		 (_state)->bdev->bd_disk->disk_name, ##__VA_ARGS__)
-+
-+static const struct of_device_id tegra_sdhci_match[] = {
-+	{ .compatible = "nvidia,tegra20-sdhci", },
-+	{ .compatible = "nvidia,tegra30-sdhci", },
-+	{ .compatible = "nvidia,tegra114-sdhci", },
-+	{ .compatible = "nvidia,tegra124-sdhci", },
-+	{}
-+};
-+
-+static int
-+tegra_partition_table_emmc_boot_offset(struct parsed_partitions *state)
-+{
-+	struct mmc_card *card = mmc_bdev_to_card(state->bdev);
-+
-+	/* filter out unrelated and untested boot sources */
-+	if (!card || card->ext_csd.rev < 3 ||
-+	    !mmc_card_is_blockaddr(card) ||
-+	     mmc_card_is_removable(card->host) ||
-+	     bdev_logical_block_size(state->bdev) != SZ_512 ||
-+	    !of_match_node(tegra_sdhci_match, card->host->parent->of_node)) {
-+		TEGRA_PT_ERR(state, "unexpected boot source\n");
-+		return -1;
-+	}
-+
-+	/*
-+	 * eMMC storage has two special boot partitions in addition to the
-+	 * main one.  NVIDIA's bootloader linearizes eMMC boot0->boot1->main
-+	 * accesses, this means that the partition table addresses are shifted
-+	 * by the size of boot partitions.  In accordance with the eMMC
-+	 * specification, the boot partition size is calculated as follows:
-+	 *
-+	 *	boot partition size = 128K byte x BOOT_SIZE_MULT
-+	 *
-+	 * This function returns number of sectors occupied by the both boot
-+	 * partitions.
-+	 */
-+	return card->ext_csd.raw_boot_mult * SZ_128K /
-+	       SZ_512 * MMC_NUM_BOOT_PARTITION;
-+}
-+
-+int tegra_partition_forced_gpt(struct parsed_partitions *state)
-+{
-+	int ret, boot_offset;
-+
-+	if (!soc_is_tegra())
-+		return 0;
-+
-+	boot_offset = tegra_partition_table_emmc_boot_offset(state);
-+	if (boot_offset < 0)
-+		return 0;
-+
-+	/*
-+	 * The fixed GPT entry address is calculated like this:
-+	 *
-+	 * gpt_sector = ext_csd.sectors_num - ext_csd.boot_sectors_num - 1
-+	 *
-+	 * This algorithm is defined by NVIDIA and used by Android devices.
-+	 */
-+	state->force_gpt_sector  = get_capacity(state->bdev->bd_disk);
-+	state->force_gpt_sector -= boot_offset + 1;
-+
-+	ret = efi_partition(state);
-+	state->force_gpt_sector = 0;
-+
-+	return ret;
-+}
+This worked fine until openSUSE updated libblkid to include a backport that opens cdroms and floppies with O_NONBLOCK (to avoid spurious CD tray closes on CDRoms).
+
+History is at
+https://bugzilla.suse.com/show_bug.cgi?id=1181018 <https://bugzilla.suse.com/show_bug.cgi?id=1181018>
+
+My understanding is that
+* qemu reports media changed once on the attached floppy (it's a removable device after all) -- I have no idea whether or not that behavior from qemu is reasonable or not.
+* old libblkid used to probe it without O_NONBLOCK, finding out that there is a medium inserted and clearing the media change flag
+* a subsequent mount attempt (by cloud-init) would succeed
+
+With new libblkid, using O_NONBLOCK, the media change was not cleared, and the mount would not succeed, DESPITE a valid floppy being attached before booting.
+
+With the kernel update, the access would work again, despite blkkid using O_NONBLOCK.
+
+Jiri should be able to understand this in more detail than I am -- I am no expert in handling of removable block devices ...
+
+Let me know if you need a VM image to reproduce this issue -- I can find it in my archives and push it to some place for downloading.
+
 -- 
-2.32.0
+Kurt Garloff <kurt@garloff.de>
+Cologne, Germany
+
+On 30/07/2021 07:15, Denis Efremov wrote:
+> Hi,
+>
+> On 7/26/21 7:34 PM, Denis Efremov wrote:
+>>
+>> On 7/26/21 3:23 PM, Mark Hounschell wrote:
+>>> On 7/26/21 7:37 AM, Denis Efremov wrote:
+>>>>
+>>>> On 7/26/21 2:17 PM, Mark Hounschell wrote:
+>>>>> On 7/26/21 3:57 AM, Denis Efremov wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> On 7/23/21 9:47 PM, Mark Hounschell wrote:
+>>>>>>> These 2 incremental patches, patch-5.10.19-20 and patch-5.11.2-3 have broken the user land fd = open("/dev/fd0", (O_RDWR | O_NDELAY)); functionality.
+>>>>>> Thank you for the report, I'm looking into this.
+>>>>>>
+>>>>>>> Since FOREVER before the patch, when using O_NDELAY, one could open the floppy device with no media inserted or even with write protected media without error. "Read-only file system" status is returned only when we actually tried to write to it. We have software still in use today that relies on this functionality.
+>>>>>> If it's a project with open sources could you please give a link?
+>>>>>>
+>>>>>> Regards,
+>>>>>> Denis
+>>>>>>
+>>>>> This is immaterial but fdutils and libdsk both use rely on this flag. Who can know who else does. The point is it should NOT have been changed.
+>>>> Yes, I asked this only to add utils and this behavior to the tests.
+>>>> And be more specific about why we should preserve this behavior in
+>>>> next commit messages.
+>>>>
+>>> Well, first thing is now you can't open a floppy with a write protected floppy installed. I don't think that was intended but that is now how it is.
+>>>
+>>> Next there are commands that can be sent to the floppy via "ioctl(fd, FDRAWCMD,  &raw_cmd);" that do NOT require a floppy diskette to be installed.
+>>>
+>>> All commands issued to the device that require a floppy diskette without a diskette installed fail with the proper status letting you know the device is not ready / no diskette installed. That goes for write protected floppies too.
+>>>
+>>> There is no reason to force a user to only be able to operate on Linux fdformat formatted floppies.
+>>>
+>> It appears that the story behind the issue is long enough.
+>> I'll try to sum up the things:
+>> [1] 09954bad4487 floppy: refactor open() flags handling
+>> [2] ff06db1efb2a floppy: fix open(O_ACCMODE) for ioctl-only open
+>> [3] 468c298ad3ed Revert "floppy: fix open(O_ACCMODE) for ioctl-only open"
+>> [4] f2791e7eadf4 Revert "floppy: refactor open() flags handling"
+>> [5] 8a0c014cd205 floppy: reintroduce O_NDELAY fix
+>>
+>> In [1] we tried to fix O_NDELAY behavior because it's hard to define
+>> proper non-blocking behavior for floppies. We also added
+>> "!(mode & (FMODE_READ|FMODE_WRITE))" sanity check for open in that patch.
+>> Motivation for the changes was that it's easy to livelock the system with
+>> floppy's O_NDELAY and syzkaller spotted it. Just for the record, /dev/fd0
+>> is only accessible by the root user in recent distros. 
+>>
+>> Patch [1] broke ioctl-only opens in fdutils because:
+>> $ grep -nre open ./setfdprm.c 
+>> 60:     if ((fd = open(argv[0],3)) < 0) { /* 3 == no access at all */
+>> Patch [2] reverted "!(mode & (FMODE_READ|FMODE_WRITE))" to fix ioctls.
+>> I guess [2] was not enough and Jens completely reverted [1] with [3] [4].
+>>
+>> The last [5] patch restores the open function to the [2] state (it's possible
+>> to use ioctl with open O_ACCMODE). [5] was added because libblkid use O_NONBLOCK
+>> for probing devices, and floppy driver prints many I/O errors to the kernel log.
+>> There are also problems with mounts after. I'm afraid simple revert for [5] is
+>> not enough, otherwise we will face libblkid issues once again.I'll try to test the things and find a more elegant solution.
+>>
+> I performed some tests and here is a small example that can be reproduced
+> even with qemu.
+> With O_NDELAY fix:
+> $ fdlist # no floppy inserted
+> fdlist (): drive fd0 does not exist
+>
+> Without O_NDELAY fix:
+> $ fdlist # no floppy inserted
+> NAME   TYPE  STATUS
+>  fd0  2880K  not mounted
+>
+> That's because of O_RDONLY|O_NDELAY open in probe_drive:
+> https://sources.debian.org/src/fdutils/5.6-2/src/fdmount.c/#L390
+>
+> I guess that's why the original patch was reverted
+> f2791e7eadf4 Revert "floppy: refactor open() flags handling"
+> We still have software that depends on O_NDELAY in floppies
+> and this patch will be reverted again.
+>
+> Meanwhile I can't fully reproduce the issues with libblkid.
+> I know that systemd-udevd tries to open /dev/fd0 during boot
+> with O_RDONLY|O_NDELAY. With O_NDELAY implemented we don't call
+> floppy_revalidate() which result in an attempt to read block 0
+> https://elixir.bootlin.com/linux/v5.10.20/source/drivers/block/floppy.c#L4127
+> However, *with* O_NDELAY fix we try to read block 0 and get kernel
+> log errors if no floppy inserted:
+> [    1.732360] blk_update_request: I/O error, dev fd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+> [    1.732822] floppy: error 10 while reading block 0
+> If floppy inserted this results in a boot delay on a
+> real system.
+>
+> Jiri, Kurt, can you give more details about test conditions
+> for O_NDELAY problem or maybe even provide some examples?
+>
+> Maybe it will cheaper to implement a special probing for
+> floppies in new software than drop O_NDELAY for all already
+> written software. Of course, if there is no cheap and obvious
+> in-kernel fix.
+>
+> Denis
+>
 
