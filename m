@@ -2,145 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 713C9C4338F
-	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 14:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9BCC4338F
+	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 14:24:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5969060F36
-	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 14:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9341F60EC0
+	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 14:24:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235783AbhHBOXc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Aug 2021 10:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45738 "EHLO
+        id S234563AbhHBOYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Aug 2021 10:24:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235537AbhHBOX3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Aug 2021 10:23:29 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27010C077214
-        for <linux-block@vger.kernel.org>; Mon,  2 Aug 2021 07:14:14 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id o5so31162862ejy.2
-        for <linux-block@vger.kernel.org>; Mon, 02 Aug 2021 07:14:14 -0700 (PDT)
+        with ESMTP id S234114AbhHBOYo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Aug 2021 10:24:44 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF56FC04F9C8
+        for <linux-block@vger.kernel.org>; Mon,  2 Aug 2021 07:21:23 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id n2so24667536eda.10
+        for <linux-block@vger.kernel.org>; Mon, 02 Aug 2021 07:21:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=/DfJGvKPYs2b4GFALQdTSuGeCIFT4Xl1aMZnLTgiRN4=;
-        b=qlX4S5b+mRMzYVQec489RdIHfebNI0B/eaB18FCdvGZtAYdvGFmRuCAhY/JOCnA79p
-         P6IV6L0Sks49L1XjLwokhjwgtg394puloBpe4HHpsaMa7pIsi1HWbx9RuPU5WyyqIAmM
-         2nY9yOja6nvYZp1QnxF+du574QlTJU3GqSvXM2jIrRdI+4w46fKfxbkkpxdQf/E5DyuB
-         SP6YO9D66AXd5VJWIBGE/kY9Yf2OiXzyYO+wKf+r/FpGAjr0vkaFHsGxg7PeWNBg6Nnk
-         kuaHx7TRzx4BKj5I5cqfob6FYfQzmYRe9PDVYbd56ZHo37X4MBOe5ohlTNWkBWhoPAJm
-         0Qrg==
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=B04BQlaidpyijFU7BfQqGywEVs1HZBYHBKlltsjDI90=;
+        b=YVU0Bpk96bXf7jtBLka7c+7Ieyp2hOvD/9a4h+Ew6gDmJfIymH08r5vepGlrNkKGr5
+         dvLp3gryXO5s2oPaBynZiWY6IoU48sCOYCYFxk23VRnqMx/ffniFp+nvY/gAfZgmcikl
+         hHaupRCoElpbiB4l4yBZ76eFtpW5RK2dk5THxytHa+YPDhWozkraWqQ1X7hygn2LtgQl
+         ljc5jF9zcIdRY0jen+32nDAmbHoiFDz1z0DXYl40D9kq+DwgI9WW+zfuM7EU0ZdmPyx4
+         rHQr8spoV5ZgHRZvMG3Nite0vkD890j6qUvxcUTYCuKv+zmMJG7UaoFBq3e3FIM6L/Bg
+         PP7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/DfJGvKPYs2b4GFALQdTSuGeCIFT4Xl1aMZnLTgiRN4=;
-        b=Zle5KnxiOo8WmeMnuccmJrd/DnDpbeIzgAPWGqIZoRjGgX6JBlgFrjQpC+XOv17EB/
-         7cFYhfXf440XBpfayFC/9S3FPxla1ldOeMSrEZo1pEQ4mgMjzil7Q90VfHpOxGRm5L7m
-         KMGqPibTf9rhBfY+sVJTYWPAzzbB/1W5qDe456pxjXkUmUgsYGAO78QX8cFFi5iaM6gN
-         bIra8QV2QgizyFvhjA2aos78ACTTA3quNoT8Okk0lOV1e0l57yyW91i841q/L/zI3ft6
-         TjMixg+56R4ZHlnkd+6zdmQ2tizBNdOMQXqk4KT8Ii2j4J1CP7l7SBKuQ0uS0DH2PBot
-         GLmg==
-X-Gm-Message-State: AOAM532/se8CgjTIo78FaQEWfvoDWx8B+xDwfPKN5BgSLoC2S33mP2at
-        pmLcqQ5ND4CF3St6wT0lURVyX8GV2A7gUSvd
-X-Google-Smtp-Source: ABdhPJxhG992fKUAdukWXFACHaZ29/sa9RaqRE26tbJ6qTIHGc+2iQOaLfhKSAbY8359zAx+6Pa67g==
-X-Received: by 2002:a17:906:c20d:: with SMTP id d13mr15236738ejz.259.1627913652690;
-        Mon, 02 Aug 2021 07:14:12 -0700 (PDT)
-Received: from localhost.localdomain ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id o3sm6084403edt.61.2021.08.02.07.14.11
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=B04BQlaidpyijFU7BfQqGywEVs1HZBYHBKlltsjDI90=;
+        b=gY9oVKUHdPWas9tEdI1YdElCsKcGxBRqAohV4GU2SpvBTeiehOskc8h5A4qdzkatUk
+         04BmNtC9RMuWi0ZYattI8qt50K27zw7BzFwZUdA0A/IuGaPXW3xwjwDjfGlrp2pOheuI
+         XYd7HBRsYo885r8Hl2Kck8cGxsC+K7/6qpzL3c+ELUQQRbLs8kA9+8XzcsMyv4YfVSbD
+         1NxWwXHWVrWDUxASq4yiX5UErGdxt100K3vkytxCO/ZJ7PwnzcCUmQ7Is855Y0gmnH9m
+         jGnnKXv3SARCy2vaH5CY6I7+cHpvpZ464yzTWtGUnacelZmYjc/Zexp7XdJmefoYiAqv
+         yMIw==
+X-Gm-Message-State: AOAM533xHLdATEf8T65hkyDRlz0M9K3qu9WtPjvTASOtg0MNX8iBV14w
+        s0mf8lokd45W6O2TDWDdTUGBhA==
+X-Google-Smtp-Source: ABdhPJznZzNC0wMuspVUsQeIYsfM4FxhXltAmdVnA7v7Nh/p4VfUQklWQod0HSywbyqw5f38HwyWJA==
+X-Received: by 2002:a05:6402:1778:: with SMTP id da24mr19784630edb.385.1627914082435;
+        Mon, 02 Aug 2021 07:21:22 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id r27sm6264721edb.66.2021.08.02.07.21.21
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 02 Aug 2021 07:14:12 -0700 (PDT)
+        Mon, 02 Aug 2021 07:21:21 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: 5.14.0-rc1 KASAN use after free
 From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        davidezini2@gmail.com, Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 1/1] block, bfq: honor already-setup queue merges
-Date:   Mon,  2 Aug 2021 16:13:52 +0200
-Message-Id: <20210802141352.74353-2-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210802141352.74353-1-paolo.valente@linaro.org>
-References: <20210802141352.74353-1-paolo.valente@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJfuBxwJam5=s3Rr06RyLoO19s3HTBomnNi6P3dw59s_b7we+Q@mail.gmail.com>
+Date:   Mon, 2 Aug 2021 16:21:20 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FE6B2429-5846-4EE8-896A-691BD11C76D0@linaro.org>
+References: <CAJfuBxxVEVwj=hGa+FoQUV6i7BtoUbiJwGunnRq26Fp=Ax2ziQ@mail.gmail.com>
+ <8057650.rSI8SBESIY@natalenko.name>
+ <98103103-c517-59d2-a4d6-9b0758cbdfc1@kernel.dk>
+ <CAJfuBxwJam5=s3Rr06RyLoO19s3HTBomnNi6P3dw59s_b7we+Q@mail.gmail.com>
+To:     jim.cromie@gmail.com
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The function bfq_setup_merge prepares the merging between two
-bfq_queues, say bfqq and new_bfqq. To this goal, it assigns
-bfqq->new_bfqq = new_bfqq. Then, each time some I/O for bfqq arrives,
-the process that generated that I/O is disassociated from bfqq and
-associated with new_bfqq (merging is actually a redirection). In this
-respect, bfq_setup_merge increases new_bfqq->ref in advance, adding
-the number of processes that are expected to be associated with
-new_bfqq.
 
-Unfortunately, the stable-merging mechanism interferes with this
-setup. After bfqq->new_bfqq has been set by bfq_setup_merge, and
-before all the expected processes have been associated with
-bfqq->new_bfqq, bfqq may happen to be stably merged with a different
-queue than the current bfqq->new_bfqq. In this case, bfqq->new_bfqq
-gets changed. So, some of the processes that have been already
-accounted for in the ref counter of the previous new_bfqq will not be
-associated with that queue.  This creates an unbalance, because those
-references will never be decremented.
 
-This commit fixes this issue by reestablishing the previous, natural
-behaviour: once bfqq->new_bfqq has been set, it will not be changed
-until all expected redirections have occurred.
+> Il giorno 23 lug 2021, alle ore 15:08, jim.cromie@gmail.com ha =
+scritto:
+>=20
+> On Sun, Jul 18, 2021 at 5:58 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>=20
+>> On 7/18/21 3:08 PM, Oleksandr Natalenko wrote:
+>>> + Paolo, Jens et al.
+>>>=20
+>>> On =C4=8Dtvrtek 15. =C4=8Dervence 2021 16:32:29 CEST =
+jim.cromie@gmail.com wrote:
+>>>> hi all,
+>>>>=20
+>>>> I noticed this report this morning, from 3 days ago,
+>>>> about 10 minutes after boot.
+>>>> Its easiest to ignore it, and I dont want to make a fuss,
+>>>> but it looks useful to someone
+>>>>=20
+>>>>=20
+>>>> [   33.663464] Bluetooth: RFCOMM ver 1.11
+>>>> [  646.343628]
+>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D [
+>>>> 646.343649] BUG: KASAN: use-after-free in bfq_get_queue+0x47d/0x900 =
+[
+>>>> 646.343680] Read of size 8 at addr ffff88810d864a00 by task
+>>>> journal-offline/1639
+>>=20
+>> There are only a few commits between 5.13 and master in this area, =
+see
+>> attached. I'd just start reverting from the top, one by one, and see
+>> which one is causing the issue. Jim, would that be feasible?
+>>=20
+>=20
+> oops, didn't see this earlier.
+> It hasnt happened since, I can try to recreate mid-next-week
+>=20
 
-Signed-off-by: Davide Zini <davidezini2@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+Still nothing?
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 727955918563..08d9122dd4c0 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2659,6 +2659,15 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- 	 * are likely to increase the throughput.
- 	 */
- 	bfqq->new_bfqq = new_bfqq;
-+	/*
-+	 * The above assignment schedules the following redirections:
-+	 * each time some I/O for bfqq arrives, the process that
-+	 * generated that I/O is disassociated from bfqq and
-+	 * associated with new_bfqq. Here we increases new_bfqq->ref
-+	 * in advance, adding the number of processes that are
-+	 * expected to be associated with new_bfqq as they happen to
-+	 * issue I/O.
-+	 */
- 	new_bfqq->ref += process_refs;
- 	return new_bfqq;
- }
-@@ -2721,6 +2730,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- {
- 	struct bfq_queue *in_service_bfqq, *new_bfqq;
- 
-+	/* if a merge has already been setup, then proceed with that first */
-+	if (bfqq->new_bfqq)
-+		return bfqq->new_bfqq;
-+
- 	/*
- 	 * Check delayed stable merge for rotational or non-queueing
- 	 * devs. For this branch to be executed, bfqq must not be
-@@ -2822,9 +2835,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	if (bfq_too_late_for_merging(bfqq))
- 		return NULL;
- 
--	if (bfqq->new_bfqq)
--		return bfqq->new_bfqq;
--
- 	if (!io_struct || unlikely(bfqq == &bfqd->oom_bfqq))
- 		return NULL;
- 
--- 
-2.20.1
+Thanks,
+Paolo
+
+>=20
+>> --
+>> Jens Axboe
 
