@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D68C4338F
-	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 09:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C866C4320A
+	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 09:22:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D938761050
-	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 09:22:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A7FF61050
+	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 09:22:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232699AbhHBJWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Aug 2021 05:22:11 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:2573 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232987AbhHBJWK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Aug 2021 05:22:10 -0400
+        id S232981AbhHBJWM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Aug 2021 05:22:12 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:7966 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232966AbhHBJWL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Aug 2021 05:22:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1627896121; x=1659432121;
+  t=1627896122; x=1659432122;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=eaHgdGMoAMKvAu0DYAhOf7vCPoF7H0Ce7MiwFwY91mU=;
-  b=B9sK05/AtBo1QMfkzVNnEtbgRs39pGKOdr9yWOHblj8HcDu52ixG2Ffe
-   0pxDOpkOazkBEO89FtWCNyvVG+yvl1GZHDyMDGSXpvuYGljj7wsYulrFu
-   /YiqSv3XI+gDPGd9cnDiYFUfbUqn3LWI0vMpTRHGra1KKT/ZgyajCu3Nm
-   thkUWmpS4RtW6jTsrh0oa1Li3UK0JHZGfXSyCRenJi/w3DkVKOLV//dQN
-   DkUrrV4w2wFZ2aFqQQoYRq/m23eY/34ty3EqArxGOOJrzuAwNTESAlRDn
-   QGeIxkpZSJOr4i0sBpG81em0oIUiGDN8vtQQG6r/RxcivPWnw4JsyNDo/
-   A==;
+  bh=+Bv5i6pnPJv25BpMkzWfJ12S73tfSuHprq5TDSMC/cY=;
+  b=kKQiJATB3pr/gEcYoyCpVX+1Xfh/X4CUlG84GBkBcaRMHt5G6cx5KjCJ
+   y1+ODacD8uvvad6pMQGyOkBGba8hn5JV0frPrDobuSzeqLuj3Juex8pXU
+   o/XlfVwhZoOd6HhMlGubGeNP8u5KOvNzUgO8PNltFKsEaV5yqCUSFv82U
+   EFvq6lmkdKDlkmMKbOKq7KD/CxuP29HgpUvMieEpBCAWkwDYwuFuigV4a
+   jD8gXxtjCYSLQRZhzNtQvjvhH126yQYRLDkqcWQd5jftBST/eRONAKNhv
+   carDlxcoF3f3785WuvpiArvG5Yrpki9SRjjywdGjN06j+nH/Bb87/ICl0
+   g==;
 X-IronPort-AV: E=Sophos;i="5.84,288,1620662400"; 
-   d="scan'208";a="175287155"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+   d="scan'208";a="180888881"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
   by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2021 17:22:01 +0800
-IronPort-SDR: /HqXZwhpVRUnfXStoforlY67qVUSwE08yT8BS6pBTHkQ9Vi7FDrmOnHSXD81Vd09EmrKRPElSp
- tNnv2tZ01WM9kPvMatRiBIYMhNM98sn6xoe1eEcFHpDe+bpPvL+aGDntCFlXvZU7SOV64Hto7Y
- As/QWH8Iw4HnPabeT57W1JdsRcSefX38DEXR2JkKkEe//+RtWt9cru+6+FTW50RO8QKpzCeeZU
- HmgFm9tsvECq8xmtWbwysGvqjEnlK1sRPAipvmvayR0Zf8tHaErxSBTY8kRxUAbNKDYctvmgy9
- 4uSI0QVOWgAknNdtzlnYy7we
+IronPort-SDR: A4mlE7mbGg6qTzPwv7da4TDHxYtolZWBlVGG9n6oXus+wPOguHkIUqwrWFYRnRbcp+o6gNXUeR
+ EPIJ3OI0xUCyGP1CnBj1yrZfu8CQz+q506b/20DKKJil0gTnusgQzDZK3V56MCM5z78uqr9mhd
+ VdeAkew3GxjP1KK+1fZgLl5OtgvGRRyN2rvcKc8Ype/F376stMv4mUPGevU4KvYk8bvhTmp/EI
+ 2/GjbLxNgCTjGr8TcGHWOYgIcK+/pscmLPD+gVbrSjg/PsTEa4ZCrBhYuxP37Jtkx15IuVbUWj
+ E4IvOq/Y6YoKqohpskfzCkH4
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 01:57:42 -0700
-IronPort-SDR: ZwQ0axXi6WMK/JBPqhkY6A8+RqjFJUJwlH5vurWcUIgRGq2ZKNyb5D5Z1WPn5hP3H5q3IhqpvD
- DYaKX5F3/Zage9y247jpxk7lQn2KKRVv7VvbxtlPcYM9KnwYTFWpemgO/X2iJouiwVV8wVdJuL
- V0o66/YyFVLI+6df7RGGHneBIBChrZp6DMGUQ6hm3asmkBZeAJlr5pi4g748mOtL5/5/UhO6BX
- 3vNDrJTdQpYKzpmi6M6vtvYVFmFZlf3ntoQ0p9Xsx1Vo6snQy6YFr5jldppq1VyV70rWOzCYPx
- rXw=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 01:57:41 -0700
+IronPort-SDR: LvbojvhY1YLYsAAJDZVdRjLWO8QaprUzs3CPDIzSOv7WxV4qS5a/7Uyy+aNdLcQ3q/Rw91GI3B
+ 8kMqfMY9fWL5mp6VIIQgb1jM+6Y3IBpGrWeUbzYuZqiXhErepJ365TuuQI1OYnb40Hk9ufhAJu
+ duyQbQpmMRtlyD1V5gLNB/xk9bDADHZZlTF6/LRgiauz4783Ho7VuhD84wjzEJ0dBZG84Gubun
+ FLZfr2QdZDVyMgOVOiARUl6IeY1CtzxUTuzlcNHZVoXri3XYdtMf2sxp8y1ylWsvkNRy21Toa2
+ JXA=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 02 Aug 2021 02:22:00 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 02 Aug 2021 02:21:59 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 3/3] block: rename IOPRIO_BE_NR
-Date:   Mon,  2 Aug 2021 18:21:57 +0900
-Message-Id: <20210802092157.1260445-4-damien.lemoal@wdc.com>
+Subject: [PATCH 2/3] block: fix ioprio interface
+Date:   Mon,  2 Aug 2021 18:21:56 +0900
+Message-Id: <20210802092157.1260445-3-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210802092157.1260445-1-damien.lemoal@wdc.com>
 References: <20210802092157.1260445-1-damien.lemoal@wdc.com>
@@ -66,152 +66,89 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The BFQ scheduler and ioprio_check_cap() both assume that the RT
-priority class (IOPRIO_CLASS_RT) can have up to 8 different priority
-levels. This is controlled using the macro IOPRIO_BE_NR, which is badly
-named as the number of levels applies to the RT class too.
+An iocb aio_reqprio field is 16 bits only, but often handled as an int
+in the block layer. E.g. ioprio_check_cap() takes an int as argument.
+However, with such int casting function calls, the upper 16 bits of the
+argument may be left uninitialized by the compiler, resulting in
+invalid values for the IOPRIO_PRIO_CLASS() macro (garbage upper bits)
+and in an error return for functions such as ioprio_check_cap().
 
-Rename IOPRIO_BE_NR to IOPRIO_NR_LEVELS to make things clear.
+Fix this by masking the result of the shift by IOPRIO_CLASS_SHIFT bits
+in the IOPRIO_PRIO_CLASS() macro. The new macro IOPRIO_CLASS_MASK
+defines the 3-bits mask for the priority class.
+
+While at it, cleanup the following:
+* Update the mention of CFQ in the comment describing priority classes
+  and mention BFQ and mq-deadline.
+* Change the argument name of the IOPRIO_PRIO_CLASS() and
+  IOPRIO_PRIO_DATA() macros from "mask" to "val" to reflect the fact
+  that an IO priority value should be passed rather than a mask.
+* Change the ioprio_valid() macro into an inline function, adding a
+  check on the maximum value of the class of a priority as defined by
+  the IOPRIO_CLASS_MAX enum value.
+* Remove the unnecessary "else" after the return statements in
+  task_nice_ioclass().
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- block/bfq-iosched.c         | 8 ++++----
- block/bfq-iosched.h         | 4 ++--
- block/bfq-wf2q.c            | 6 +++---
- block/ioprio.c              | 3 +--
- fs/f2fs/sysfs.c             | 2 +-
- include/uapi/linux/ioprio.h | 4 ++--
- 6 files changed, 13 insertions(+), 14 deletions(-)
+ include/linux/ioprio.h      |  5 ++---
+ include/uapi/linux/ioprio.h | 15 ++++++++++++---
+ 2 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 1f38d75524ae..d5824cab34d7 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2505,7 +2505,7 @@ void bfq_end_wr_async_queues(struct bfq_data *bfqd,
- 	int i, j;
- 
- 	for (i = 0; i < 2; i++)
--		for (j = 0; j < IOPRIO_BE_NR; j++)
-+		for (j = 0; j < IOPRIO_NR_LEVELS; j++)
- 			if (bfqg->async_bfqq[i][j])
- 				bfq_bfqq_end_wr(bfqg->async_bfqq[i][j]);
- 	if (bfqg->async_idle_bfqq)
-@@ -5290,10 +5290,10 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 		break;
- 	}
- 
--	if (bfqq->new_ioprio >= IOPRIO_BE_NR) {
-+	if (bfqq->new_ioprio >= IOPRIO_NR_LEVELS) {
- 		pr_crit("bfq_set_next_ioprio_data: new_ioprio %d\n",
- 			bfqq->new_ioprio);
--		bfqq->new_ioprio = IOPRIO_BE_NR - 1;
-+		bfqq->new_ioprio = IOPRIO_NR_LEVELS - 1;
- 	}
- 
- 	bfqq->entity.new_weight = bfq_ioprio_to_weight(bfqq->new_ioprio);
-@@ -6822,7 +6822,7 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
- 	int i, j;
- 
- 	for (i = 0; i < 2; i++)
--		for (j = 0; j < IOPRIO_BE_NR; j++)
-+		for (j = 0; j < IOPRIO_NR_LEVELS; j++)
- 			__bfq_put_async_bfqq(bfqd, &bfqg->async_bfqq[i][j]);
- 
- 	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq);
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 99c2a3cb081e..385e28a843d1 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -931,7 +931,7 @@ struct bfq_group {
- 
- 	void *bfqd;
- 
--	struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
-+	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
- 	struct bfq_queue *async_idle_bfqq;
- 
- 	struct bfq_entity *my_entity;
-@@ -948,7 +948,7 @@ struct bfq_group {
- 	struct bfq_entity entity;
- 	struct bfq_sched_data sched_data;
- 
--	struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
-+	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
- 	struct bfq_queue *async_idle_bfqq;
- 
- 	struct rb_root rq_pos_tree;
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 7a462df71f68..b74cc0da118e 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -505,7 +505,7 @@ static void bfq_active_insert(struct bfq_service_tree *st,
-  */
- unsigned short bfq_ioprio_to_weight(int ioprio)
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index ef9ad4fb245f..997641211cca 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -25,10 +25,9 @@ static inline int task_nice_ioclass(struct task_struct *task)
  {
--	return (IOPRIO_BE_NR - ioprio) * BFQ_WEIGHT_CONVERSION_COEFF;
-+	return (IOPRIO_NR_LEVELS - ioprio) * BFQ_WEIGHT_CONVERSION_COEFF;
- }
- 
- /**
-@@ -514,12 +514,12 @@ unsigned short bfq_ioprio_to_weight(int ioprio)
-  *
-  * To preserve as much as possible the old only-ioprio user interface,
-  * 0 is used as an escape ioprio value for weights (numerically) equal or
-- * larger than IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF.
-+ * larger than IOPRIO_NR_LEVELS * BFQ_WEIGHT_CONVERSION_COEFF.
-  */
- static unsigned short bfq_weight_to_ioprio(int weight)
- {
- 	return max_t(int, 0,
--		     IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF - weight);
-+		     IOPRIO_NR_LEVELS * BFQ_WEIGHT_CONVERSION_COEFF - weight);
- }
- 
- static void bfq_get_entity(struct bfq_entity *entity)
-diff --git a/block/ioprio.c b/block/ioprio.c
-index bee628f9f1b2..ca6b136c5586 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -74,9 +74,8 @@ int ioprio_check_cap(int ioprio)
- 			fallthrough;
- 			/* rt has prio field too */
- 		case IOPRIO_CLASS_BE:
--			if (data >= IOPRIO_BE_NR || data < 0)
-+			if (data >= IOPRIO_NR_LEVELS || data < 0)
- 				return -EINVAL;
--
- 			break;
- 		case IOPRIO_CLASS_IDLE:
- 			break;
-diff --git a/fs/f2fs/sysfs.c b/fs/f2fs/sysfs.c
-index 6642246206bd..daad532a4e2b 100644
---- a/fs/f2fs/sysfs.c
-+++ b/fs/f2fs/sysfs.c
-@@ -378,7 +378,7 @@ static ssize_t __sbi_store(struct f2fs_attr *a,
- 		ret = kstrtol(name, 10, &data);
- 		if (ret)
- 			return ret;
--		if (data >= IOPRIO_BE_NR || data < 0)
-+		if (data >= IOPRIO_NR_LEVELS || data < 0)
- 			return -EINVAL;
- 
- 		cprc->ckpt_thread_ioprio = IOPRIO_PRIO_VALUE(class, data);
-diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-index 27dc7fb0ba12..fe47b58c4274 100644
---- a/include/uapi/linux/ioprio.h
-+++ b/include/uapi/linux/ioprio.h
-@@ -37,9 +37,9 @@ static inline bool ioprio_valid(unsigned short ioprio)
+ 	if (task->policy == SCHED_IDLE)
+ 		return IOPRIO_CLASS_IDLE;
+-	else if (task_is_realtime(task))
++	if (task_is_realtime(task))
+ 		return IOPRIO_CLASS_RT;
+-	else
+-		return IOPRIO_CLASS_BE;
++	return IOPRIO_CLASS_BE;
  }
  
  /*
-- * 8 best effort priority levels are supported
-+ * The RT an BE priority classes support up to 8 priority levels.
+diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
+index 77b17e08b0da..27dc7fb0ba12 100644
+--- a/include/uapi/linux/ioprio.h
++++ b/include/uapi/linux/ioprio.h
+@@ -6,10 +6,12 @@
+  * Gives us 8 prio classes with 13-bits of data for each class
   */
--#define IOPRIO_BE_NR	(8)
-+#define IOPRIO_NR_LEVELS	(8)
+ #define IOPRIO_CLASS_SHIFT	(13)
++#define IOPRIO_CLASS_MASK	(0x07)
+ #define IOPRIO_PRIO_MASK	((1UL << IOPRIO_CLASS_SHIFT) - 1)
  
- enum {
- 	IOPRIO_WHO_PROCESS = 1,
+-#define IOPRIO_PRIO_CLASS(mask)	((mask) >> IOPRIO_CLASS_SHIFT)
+-#define IOPRIO_PRIO_DATA(mask)	((mask) & IOPRIO_PRIO_MASK)
++#define IOPRIO_PRIO_CLASS(val)	\
++	(((val) >> IOPRIO_CLASS_SHIFT) & IOPRIO_CLASS_MASK)
++#define IOPRIO_PRIO_DATA(val)	((val) & IOPRIO_PRIO_MASK)
+ #define IOPRIO_PRIO_VALUE(class, data)	(((class) << IOPRIO_CLASS_SHIFT) | data)
+ 
+ /*
+@@ -23,9 +25,16 @@ enum {
+ 	IOPRIO_CLASS_RT,
+ 	IOPRIO_CLASS_BE,
+ 	IOPRIO_CLASS_IDLE,
++
++	IOPRIO_CLASS_MAX,
+ };
+ 
+-#define ioprio_valid(mask)	(IOPRIO_PRIO_CLASS((mask)) != IOPRIO_CLASS_NONE)
++static inline bool ioprio_valid(unsigned short ioprio)
++{
++	unsigned short class = IOPRIO_PRIO_CLASS(ioprio);
++
++	return class > IOPRIO_CLASS_NONE && class < IOPRIO_CLASS_MAX;
++}
+ 
+ /*
+  * 8 best effort priority levels are supported
 -- 
 2.31.1
 
