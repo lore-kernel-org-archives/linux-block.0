@@ -2,110 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE2EC4338F
-	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 07:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 449BEC432BE
+	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 09:02:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A828D60F4B
-	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 07:45:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DE9F61057
+	for <linux-block@archiver.kernel.org>; Mon,  2 Aug 2021 09:02:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232500AbhHBHpo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Aug 2021 03:45:44 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:13222 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232482AbhHBHpn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Aug 2021 03:45:43 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4GdVRF2dBhz1CRWS;
-        Mon,  2 Aug 2021 15:45:29 +0800 (CST)
-Received: from dggpeml500020.china.huawei.com (7.185.36.88) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 2 Aug 2021 15:45:21 +0800
-Received: from huawei.com (10.175.127.227) by dggpeml500020.china.huawei.com
- (7.185.36.88) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Mon, 2 Aug 2021
- 15:45:21 +0800
-From:   Baokun Li <libaokun1@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <patchwork@huawei.com>, <libaokun1@huawei.com>,
-        Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH -next v2] nbd: add the check to prevent overflow in __nbd_ioctl()
-Date:   Mon, 2 Aug 2021 15:56:15 +0800
-Message-ID: <20210802075615.4037698-1-libaokun1@huawei.com>
+        id S232882AbhHBJCz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Aug 2021 05:02:55 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:6555 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232711AbhHBJCs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Aug 2021 05:02:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1627894957; x=1659430957;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Q0qi0MmsrsEfp9dtr19KJjoVUyafiktr3GhxDwTWet4=;
+  b=TfEZ+2/YRmY9ay08BK4xGHYPGDNbXzCFvRKC8hinZqwGiQA8xkq50wMN
+   pLtaNF6Ai9V+8hRNH+gMcTPoeWbTKX0LwkWonWW/k93qwT9vmkSSKJ0mv
+   7EVtLJplZaY4QMyRA4rbEWV8t4ojqVnSaaf6krK/oMSlkloELBN8djrsi
+   PSdSWO/nPiXaYksLPtcS3zNYW7rGUyeGF1XqPH/cz6pBD9EPnRrOoPHDp
+   lQZeS+CmvyK9AtTR7O8od4/N+qsp+BxD/pcm3WFxLmiuG4rBuXt2hOi17
+   OHhhhotUluZkXBzBh338WvLWMNKunVk1XXaKWc5BvkocqtvDiWIl3YYC6
+   g==;
+X-IronPort-AV: E=Sophos;i="5.84,288,1620662400"; 
+   d="scan'208";a="180887615"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2021 17:02:33 +0800
+IronPort-SDR: /7eJNYOEH7Dybwfr9k8mF9Vr6IC19A+HORD3feFg1oObAA437AyKYmyjONyb2YVrNNkEj49Y4n
+ u/xj5ieaCPVldQCoxroinVrH4IBTe674E866IjTrx7DrSHX89JibD5Z7UecWr1iMmafdW8q08F
+ KGqqQS3YtwoHr3UzldsrVla4+E/LuV5Z2V2ZOmGj0ITkytPFglr+zCb1fY2/Ya3Xwi158iw4tG
+ HhEg7nIC/DdypovO7cPOQ5q3CLxI8kaND9wDqp+iU8cOD2RVbtDxnrus9+b9fEcvT68xjLWL/4
+ WLsVefdGZtEaYOrR+OxGOh8s
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 01:40:08 -0700
+IronPort-SDR: YJ1UWZNsR3Ufmh6thlc5JH78U2AyUnIaRmvgU9EsZWEMadN03/APgJ6mNSycLiOS0fo2SQMngD
+ gZEPNLa+Bj98fVv1Ure0s+gE8CC8oN18wItY/QkpT6PRV8hFiI1EHmUWpZqPrLK/9CR/CVmU7v
+ fxgB5LId0JLJL9NwUFrpUlJk5GxIUwQ6sKMlY34xLjAO8+tvpoK6hcrpYoURcxBHQi5goHv4Qb
+ zYS9t+B9gkbRo+Ly4Vr3g1TqHkNNlSE6j/baQLIIfOYFk1htDIXQJcSLM/Q7+t1MPxgjhzM5mk
+ jvg=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 02 Aug 2021 02:02:33 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     Sathya Prakash <sathya.prakash@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>
+Subject: [PATCH 0/7] libata cleanups and improvements
+Date:   Mon,  2 Aug 2021 18:02:25 +0900
+Message-Id: <20210802090232.1166195-1-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500020.china.huawei.com (7.185.36.88)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If user specify a large enough value of NBD blocks option, it may trigger
-signed integer overflow which may lead to nbd->config->bytesize becomes a
-large or small value, zero in particular.
+The first three patches of this series cleanup libata-core code in the
+area of device configuration (ata_dev_configure() function).
+Patch 4 improves ata_read_log_page() handling to avoid unnecessary
+warning messages and patch 5 adds an informational message on device
+scan to advertize the features supported by a device.
 
-UBSAN: Undefined behaviour in drivers/block/nbd.c:325:31
-signed integer overflow:
-1024 * 4611686155866341414 cannot be represented in type 'long long int'
-[...]
-Call trace:
-[...]
- handle_overflow+0x188/0x1dc lib/ubsan.c:192
- __ubsan_handle_mul_overflow+0x34/0x44 lib/ubsan.c:213
- nbd_size_set drivers/block/nbd.c:325 [inline]
- __nbd_ioctl drivers/block/nbd.c:1342 [inline]
- nbd_ioctl+0x998/0xa10 drivers/block/nbd.c:1395
- __blkdev_driver_ioctl block/ioctl.c:311 [inline]
-[...]
+Path 6 adds the new sysfs ahci device attribute ncq_prio_supported to
+indicate that a disk supports NCQ priority. Patch 7 does the same for
+the mpt3sas driver, adding the sas_ncq_prio_supported device attribute.
 
-Although it is not a big deal, still silence the UBSAN by limit
-the input value.
+Damien Le Moal (7):
+  libata: cleanup device sleep capability detection
+  libata: cleanup ata_dev_configure()
+  libata: cleanup NCQ priority handling
+  libata: fix ata_read_log_page() warning
+  libata: print feature list on device scan
+  libahci: Introduce ncq_prio_supported sysfs sttribute
+  scsi: mpt3sas: Introduce sas_ncq_prio_supported sysfs sttribute
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Baokun Li <libaokun1@huawei.com>
----
-V1->V2:
-	Use check_mul_overflow().
+ drivers/ata/libahci.c              |   1 +
+ drivers/ata/libata-core.c          | 249 +++++++++++++++--------------
+ drivers/ata/libata-sata.c          |  61 ++++---
+ drivers/scsi/mpt3sas/mpt3sas_ctl.c |  20 +++
+ include/linux/libata.h             |   5 +
+ 5 files changed, 191 insertions(+), 145 deletions(-)
 
- drivers/block/nbd.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..9f3e25f74e9b 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1384,6 +1384,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 		       unsigned int cmd, unsigned long arg)
- {
- 	struct nbd_config *config = nbd->config;
-+	loff_t bytesize;
- 
- 	switch (cmd) {
- 	case NBD_DISCONNECT:
-@@ -1398,8 +1399,10 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 	case NBD_SET_SIZE:
- 		return nbd_set_size(nbd, arg, config->blksize);
- 	case NBD_SET_SIZE_BLOCKS:
--		return nbd_set_size(nbd, arg * config->blksize,
--				    config->blksize);
-+		if (unlikely(check_mul_overflow(arg, config->blksize,
-+						&bytesize)))
-+			return -EINVAL;
-+		return nbd_set_size(nbd, bytesize, config->blksize);
- 	case NBD_SET_TIMEOUT:
- 		nbd_set_cmd_timeout(nbd, arg);
- 		return 0;
 -- 
 2.31.1
 
