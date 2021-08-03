@@ -2,104 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1046FC4338F
-	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 975ECC432BE
+	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:38:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7EE860EE8
-	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:23:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7664360725
+	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:38:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238501AbhHCSX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Aug 2021 14:23:29 -0400
-Received: from mail-pj1-f47.google.com ([209.85.216.47]:37699 "EHLO
-        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238486AbhHCSX2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Aug 2021 14:23:28 -0400
-Received: by mail-pj1-f47.google.com with SMTP id dw2-20020a17090b0942b0290177cb475142so5114901pjb.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Aug 2021 11:23:17 -0700 (PDT)
+        id S234323AbhHCSi6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Aug 2021 14:38:58 -0400
+Received: from mail-pj1-f48.google.com ([209.85.216.48]:42578 "EHLO
+        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234248AbhHCSi6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Aug 2021 14:38:58 -0400
+Received: by mail-pj1-f48.google.com with SMTP id o44-20020a17090a0a2fb0290176ca3e5a2fso11pjo.1;
+        Tue, 03 Aug 2021 11:38:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nL6bvEt5vlGnQxMjKGf+lIWLnGMZ6Pd7pjQssOksqoA=;
-        b=GQJAeaUOvUmgjkPnqKWYGEQ4vjvMswOz2iyX13JQdf175tK8W8R+Llk/ryi0QJglhf
-         o+upxcci8T9pnTbf5IvSIMzqJBGp9Y3L8ZTMfNpPjzYlF/TnPk//R6lbEsJSSoMgOkFD
-         Wr5nmXKWCJdlyJcyijqg0zUo/MkjPEuj/oQURgSpG5IBy5IuGjaNN9QbhVdmuWbgsleP
-         sS0woQ0DPralz/dmyckdC8xXfTEgLFD7Ojhpf2pCnskDN/gkSofEt0SMswgNwXs1962n
-         0U3MJ2pnM6GULSVc35JLAOVMUSXrJQKLKrk30dWFrPjFr0ACKou5rfCVwlMM+8+Y3jhv
-         QmBA==
-X-Gm-Message-State: AOAM531U4xlK5AFQu7xBUdLxw2iHjJoRp/2PbN3jDou7ig6OJnOdPV6w
-        1+3gM/uunVGOFAL7gZ+nuFzJxySJb4iivLQf
-X-Google-Smtp-Source: ABdhPJy8ZeGKG57yL9KAa6H/Iiu8VV7M6xOOmU0QN39tnGn3yxM5KM3FVGICbiIyE1EPSkfkn8U1lg==
-X-Received: by 2002:a17:902:a9c6:b029:129:8fdb:698f with SMTP id b6-20020a170902a9c6b02901298fdb698fmr19476017plr.15.1628014996678;
-        Tue, 03 Aug 2021 11:23:16 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WJYQcXM/ofUPMB+RBQxPq0m9h51ViO2SpCc1//JSrXM=;
+        b=qsLs31PaQBYjTG5CSQ2Qmbj+AEO3fDTJg88QCQut9RBgVJZhVK+6wC1evDA6DE3K4Y
+         guwgBHhyga6aCOZ7az5vxzXDQU3h9AF2oQarmBqgNjAASW9FBKox7dRMdfmg9oYQuKqf
+         ziDz3f7iacBVYAmrkGjDW/aeN3A1nyCBqYCi+kIzsaCfGd/8zmElK7/7oAUtuvTBJJ/3
+         D8SSkcpVvydNp5g8B3+NbHpfbbknZAFcdfELv90gI/uQd6GP8+0U00p3SO4Z5GxdWBRi
+         Gb6MI5g7Vr/+mCQ/68n79U/nnMxKKxOB81C39uhN4rJAZ32lRXYfPyCdA6EemUZj1dUz
+         9K8w==
+X-Gm-Message-State: AOAM533X/gW+VxIi55Kw15wvDW30xrl2bfdpW8V2KBJXQ4IWHH169JfY
+        rO7GO5gggJFl9o01OAO2PvA=
+X-Google-Smtp-Source: ABdhPJzgA/1jktfXbQQDFhXI8WXt99jGtglEOXQTTsjlLfwHbW6JCUWzv/sikq7++DN7OcCQGCUDkg==
+X-Received: by 2002:a65:6248:: with SMTP id q8mr267440pgv.279.1628015926799;
+        Tue, 03 Aug 2021 11:38:46 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:f630:1578:90bf:ff92])
-        by smtp.gmail.com with ESMTPSA id ms8sm3476279pjb.36.2021.08.03.11.23.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 11:23:16 -0700 (PDT)
+        by smtp.gmail.com with ESMTPSA id a8sm4388072pfk.219.2021.08.03.11.38.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Aug 2021 11:38:45 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: allow hardware queue to get more tag while
+ sharing a tag set
+To:     "yukuai (C)" <yukuai3@huawei.com>, axboe@kernel.dk,
+        ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20210712031818.31918-1-yukuai3@huawei.com>
+ <ade72519-5e16-1cc5-9a77-cb9ead42035e@acm.org>
+ <5ab07cf8-a2a5-a60e-c86a-ab6ea53990bb@huawei.com>
+ <e587c572-bcd7-87c4-5eea-30ccdc7455db@acm.org>
+ <b124b91b-7474-fa27-b78c-01b7e7396a17@huawei.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Martijn Coenen <maco@android.com>
-Subject: [PATCH v2 3/3] loop: Add the default_queue_depth kernel module parameter
-Date:   Tue,  3 Aug 2021 11:23:04 -0700
-Message-Id: <20210803182304.365053-4-bvanassche@acm.org>
-X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-In-Reply-To: <20210803182304.365053-1-bvanassche@acm.org>
-References: <20210803182304.365053-1-bvanassche@acm.org>
+Message-ID: <07d2e6ba-d016-458a-a2ce-877fd7b72ed0@acm.org>
+Date:   Tue, 3 Aug 2021 11:38:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <b124b91b-7474-fa27-b78c-01b7e7396a17@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Recent versions of Android use the zram driver on top of the loop driver.
-There is a mismatch between the default loop driver queue depth (128) and
-the queue depth of the storage device in my test setup (32). That mismatch
-results in write latencies that are higher than necessary. Address this
-issue by making the default loop driver queue depth configurable. Compared
-to configuring the queue depth by writing into the nr_requests sysfs
-attribute, this approach does not involve calling synchronize_rcu() to
-modify the queue depth.
+On 8/2/21 7:57 PM, yukuai (C) wrote:
+> The cpu I'm testing is Intel(R) Xeon(R) Gold 6140 CPU @ 2.30GHz, and
+> after switching to io_uring with "--thread --gtod_reduce=1
+> --ioscheduler=none", the numbers can increase to 330k, yet still
+> far behind 6000k.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Martijn Coenen <maco@android.com>
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/loop.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On 
+https://ark.intel.com/content/www/us/en/ark/products/120485/intel-xeon-gold-6140-processor-24-75m-cache-2-30-ghz.html 
+I found the following information about that CPU:
+18 CPU cores
+36 hyperthreads
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index fa1c298a8cfb..b5dbf2d7447e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2098,6 +2098,9 @@ module_param(max_loop, int, 0444);
- MODULE_PARM_DESC(max_loop, "Maximum number of loop devices");
- module_param(max_part, int, 0444);
- MODULE_PARM_DESC(max_part, "Maximum number of partitions per loop device");
-+static uint32_t default_queue_depth = 128;
-+module_param(default_queue_depth, uint, 0644);
-+MODULE_PARM_DESC(default_queue_depth, "Default loop device queue depth");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_BLOCKDEV_MAJOR(LOOP_MAJOR);
- 
-@@ -2330,7 +2333,7 @@ static int loop_add(int i)
- 	err = -ENOMEM;
- 	lo->tag_set.ops = &loop_mq_ops;
- 	lo->tag_set.nr_hw_queues = 1;
--	lo->tag_set.queue_depth = 128;
-+	lo->tag_set.queue_depth = max(default_queue_depth, 2U);
- 	lo->tag_set.numa_node = NUMA_NO_NODE;
- 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
- 	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING |
+so 36 fio jobs should be sufficient. Maybe IOPS are lower than expected 
+because of how null_blk has been configured? This is the configuration 
+that I used in my test:
+
+modprobe null_blk nr_devices=0 &&
+     udevadm settle &&
+     cd /sys/kernel/config/nullb &&
+     mkdir nullb0 &&
+     cd nullb0 &&
+     echo 0 > completion_nsec &&
+     echo 512 > blocksize &&
+     echo 0 > home_node &&
+     echo 0 > irqmode &&
+     echo 1024 > size &&
+     echo 0 > memory_backed &&
+     echo 2 > queue_mode &&
+     echo 1 > power ||
+     exit $?
+
+> The new atomic operations in the hot path is atomic_read() from
+> hctx_may_queue(), and the atomic variable will change in two
+> situations:
+> 
+> a. fail to get driver tag with dbusy not set, increase and set dbusy.
+> b. if dbusy is set when queue switch from busy to dile, decrease and
+> clear dbusy.
+> 
+> During the period a device "idle -> busy -> idle", the new atomic
+> variable can be writen twice at most, which means this is almost
+> readonly in the above test situation. So I guess the impact on
+> performance is minimal ?
+
+Please measure the performance impact of your patch.
+
+Thanks,
+
+Bart.
+
