@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF19EC4338F
-	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1046FC4338F
+	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:23:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A769560F38
-	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:23:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7EE860EE8
+	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 18:23:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238471AbhHCSX1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Aug 2021 14:23:27 -0400
-Received: from mail-pj1-f48.google.com ([209.85.216.48]:45886 "EHLO
-        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238285AbhHCSX0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Aug 2021 14:23:26 -0400
-Received: by mail-pj1-f48.google.com with SMTP id m10-20020a17090a34cab0290176b52c60ddso5933114pjf.4
-        for <linux-block@vger.kernel.org>; Tue, 03 Aug 2021 11:23:15 -0700 (PDT)
+        id S238501AbhHCSX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Aug 2021 14:23:29 -0400
+Received: from mail-pj1-f47.google.com ([209.85.216.47]:37699 "EHLO
+        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238486AbhHCSX2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Aug 2021 14:23:28 -0400
+Received: by mail-pj1-f47.google.com with SMTP id dw2-20020a17090b0942b0290177cb475142so5114901pjb.2
+        for <linux-block@vger.kernel.org>; Tue, 03 Aug 2021 11:23:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=MedzByid45hPWlsWBY8HcRkcdGBJfhY+gJCqR53I97k=;
-        b=XsYLxPXWErJ38Yhrnxv0vzdWhON/VMNQs90teW1AhTq+UDS7cwTq7FgwZqilueQ33X
-         yDNLIk/6auYhDlHdc9QyzAlKgWbvsmpiXOqoMESvO+J3hhvZLggDvSMsVMcU5fJByo5i
-         WDQhpB1hny+DwNTe9oD0ZZMFya6UJJfy4xC8gfEUQfm9Z07oZxF9WjvZvUsUnCzZvL7a
-         APLKP9PtEEnhhuLSVYqvVKzFUSdXQ+bw0hFQsb6Z3OZ34BAorjKQc1QFxvXOb5HZu1ix
-         94q0VQGsXGdLS6GAigWNRu+9YNoelzlw178+91RiwW5lHQICadVeUHic/tkyqEDkZk6Z
-         wqvQ==
-X-Gm-Message-State: AOAM5313xjFfZwy63126WrbEdSrJ1YN+mw+tLly8hUkWpe+6Ehup1qjx
-        QAcPkguZEguFNRrsjegMAYs=
-X-Google-Smtp-Source: ABdhPJybELZLOhdlydJHksJFcZ9hR80GQEi2rPrCRhSwL9ghhsRatHcAgNofLzh0bi3X9XV3kmGfKA==
-X-Received: by 2002:a63:e0c:: with SMTP id d12mr1131046pgl.386.1628014995299;
-        Tue, 03 Aug 2021 11:23:15 -0700 (PDT)
+        bh=nL6bvEt5vlGnQxMjKGf+lIWLnGMZ6Pd7pjQssOksqoA=;
+        b=GQJAeaUOvUmgjkPnqKWYGEQ4vjvMswOz2iyX13JQdf175tK8W8R+Llk/ryi0QJglhf
+         o+upxcci8T9pnTbf5IvSIMzqJBGp9Y3L8ZTMfNpPjzYlF/TnPk//R6lbEsJSSoMgOkFD
+         Wr5nmXKWCJdlyJcyijqg0zUo/MkjPEuj/oQURgSpG5IBy5IuGjaNN9QbhVdmuWbgsleP
+         sS0woQ0DPralz/dmyckdC8xXfTEgLFD7Ojhpf2pCnskDN/gkSofEt0SMswgNwXs1962n
+         0U3MJ2pnM6GULSVc35JLAOVMUSXrJQKLKrk30dWFrPjFr0ACKou5rfCVwlMM+8+Y3jhv
+         QmBA==
+X-Gm-Message-State: AOAM531U4xlK5AFQu7xBUdLxw2iHjJoRp/2PbN3jDou7ig6OJnOdPV6w
+        1+3gM/uunVGOFAL7gZ+nuFzJxySJb4iivLQf
+X-Google-Smtp-Source: ABdhPJy8ZeGKG57yL9KAa6H/Iiu8VV7M6xOOmU0QN39tnGn3yxM5KM3FVGICbiIyE1EPSkfkn8U1lg==
+X-Received: by 2002:a17:902:a9c6:b029:129:8fdb:698f with SMTP id b6-20020a170902a9c6b02901298fdb698fmr19476017plr.15.1628014996678;
+        Tue, 03 Aug 2021 11:23:16 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:f630:1578:90bf:ff92])
-        by smtp.gmail.com with ESMTPSA id ms8sm3476279pjb.36.2021.08.03.11.23.14
+        by smtp.gmail.com with ESMTPSA id ms8sm3476279pjb.36.2021.08.03.11.23.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 11:23:14 -0700 (PDT)
+        Tue, 03 Aug 2021 11:23:16 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -49,9 +49,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>,
         Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
         Martijn Coenen <maco@android.com>
-Subject: [PATCH v2 2/3] loop: Select I/O scheduler 'none' from inside add_disk()
-Date:   Tue,  3 Aug 2021 11:23:03 -0700
-Message-Id: <20210803182304.365053-3-bvanassche@acm.org>
+Subject: [PATCH v2 3/3] loop: Add the default_queue_depth kernel module parameter
+Date:   Tue,  3 Aug 2021 11:23:04 -0700
+Message-Id: <20210803182304.365053-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
 In-Reply-To: <20210803182304.365053-1-bvanassche@acm.org>
 References: <20210803182304.365053-1-bvanassche@acm.org>
@@ -61,42 +61,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We noticed that the user interface of Android devices becomes very slow
-under memory pressure. This is because Android uses the zram driver on top
-of the loop driver for swapping, because under memory pressure the swap
-code alternates reads and writes quickly, because mq-deadline is the
-default scheduler for loop devices and because mq-deadline delays writes by
-five seconds for such a workload with default settings. Fix this by making
-the kernel select I/O scheduler 'none' from inside add_disk() for loop
-devices. This default can be overridden at any time from user space,
-e.g. via a udev rule. This approach has an advantage compared to changing
-the I/O scheduler from userspace from 'mq-deadline' into 'none', namely
-that synchronize_rcu() does not get called.
+Recent versions of Android use the zram driver on top of the loop driver.
+There is a mismatch between the default loop driver queue depth (128) and
+the queue depth of the storage device in my test setup (32). That mismatch
+results in write latencies that are higher than necessary. Address this
+issue by making the default loop driver queue depth configurable. Compared
+to configuring the queue depth by writing into the nr_requests sysfs
+attribute, this approach does not involve calling synchronize_rcu() to
+modify the queue depth.
 
-This patch reduces the Android boot time on my test setup with 0.5 seconds
-compared to configuring the loop I/O scheduler from user space.
-
-Cc: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martijn Coenen <maco@android.com>
 Cc: Jaegeuk Kim <jaegeuk@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/loop.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/block/loop.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f8486d9b75a4..fa1c298a8cfb 100644
+index fa1c298a8cfb..b5dbf2d7447e 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -2333,7 +2333,8 @@ static int loop_add(int i)
- 	lo->tag_set.queue_depth = 128;
+@@ -2098,6 +2098,9 @@ module_param(max_loop, int, 0444);
+ MODULE_PARM_DESC(max_loop, "Maximum number of loop devices");
+ module_param(max_part, int, 0444);
+ MODULE_PARM_DESC(max_part, "Maximum number of partitions per loop device");
++static uint32_t default_queue_depth = 128;
++module_param(default_queue_depth, uint, 0644);
++MODULE_PARM_DESC(default_queue_depth, "Default loop device queue depth");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_BLOCKDEV_MAJOR(LOOP_MAJOR);
+ 
+@@ -2330,7 +2333,7 @@ static int loop_add(int i)
+ 	err = -ENOMEM;
+ 	lo->tag_set.ops = &loop_mq_ops;
+ 	lo->tag_set.nr_hw_queues = 1;
+-	lo->tag_set.queue_depth = 128;
++	lo->tag_set.queue_depth = max(default_queue_depth, 2U);
  	lo->tag_set.numa_node = NUMA_NO_NODE;
  	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
--	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING;
-+	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING |
-+		BLK_MQ_F_NO_SCHED_BY_DEFAULT;
- 	lo->tag_set.driver_data = lo;
- 
- 	err = blk_mq_alloc_tag_set(&lo->tag_set);
+ 	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING |
