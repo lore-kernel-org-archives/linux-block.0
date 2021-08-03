@@ -2,116 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A8CC4338F
-	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 01:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23203C4320A
+	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 02:57:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4293D61019
-	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 01:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0C7260F94
+	for <linux-block@archiver.kernel.org>; Tue,  3 Aug 2021 02:57:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233200AbhHCB5f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Aug 2021 21:57:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28849 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233178AbhHCB5f (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Aug 2021 21:57:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627955844;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wbOF+mNZOqgnrXh/vdXFZt/qzGL3DM+vGqqV5hBIlqo=;
-        b=XiHSo5NeWRnQgtxUsGYrhjPWu1S+E3YyS6h0+IJPK3ygSmy6zy/eUc5ARciXrtTkEMggvA
-        VHwlvuu6V7vDVK/O07KkJ30nS8M7f/h0/mRg6B3FOWxEFVDKWpomJpcRDURggefOJAi1by
-        UoJ8vyAgUNpZOgkMwaDQpAWodv2BKcg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-9mzpqw7zPQCmj-eSiYGPRA-1; Mon, 02 Aug 2021 21:57:21 -0400
-X-MC-Unique: 9mzpqw7zPQCmj-eSiYGPRA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A964E1006C80;
-        Tue,  3 Aug 2021 01:57:19 +0000 (UTC)
-Received: from T590 (ovpn-13-136.pek2.redhat.com [10.72.13.136])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3496B60CC4;
-        Tue,  3 Aug 2021 01:57:11 +0000 (UTC)
-Date:   Tue, 3 Aug 2021 09:57:19 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Martijn Coenen <maco@android.com>
-Subject: Re: [PATCH 2/2] loop: Add the default_queue_depth kernel module
- parameter
-Message-ID: <YQiif6/X28R7jC0V@T590>
-References: <20210803000200.4125318-1-bvanassche@acm.org>
- <20210803000200.4125318-3-bvanassche@acm.org>
+        id S233506AbhHCC5S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Aug 2021 22:57:18 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:13226 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233436AbhHCC5S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Aug 2021 22:57:18 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Gdzzy1Hg2z1CR2F;
+        Tue,  3 Aug 2021 10:57:02 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Tue, 3 Aug 2021 10:57:06 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Tue, 3 Aug 2021 10:57:05 +0800
+Subject: Re: [PATCH] blk-mq: allow hardware queue to get more tag while
+ sharing a tag set
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20210712031818.31918-1-yukuai3@huawei.com>
+ <ade72519-5e16-1cc5-9a77-cb9ead42035e@acm.org>
+ <5ab07cf8-a2a5-a60e-c86a-ab6ea53990bb@huawei.com>
+ <e587c572-bcd7-87c4-5eea-30ccdc7455db@acm.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <b124b91b-7474-fa27-b78c-01b7e7396a17@huawei.com>
+Date:   Tue, 3 Aug 2021 10:57:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210803000200.4125318-3-bvanassche@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <e587c572-bcd7-87c4-5eea-30ccdc7455db@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 02, 2021 at 05:02:00PM -0700, Bart Van Assche wrote:
-> Recent versions of Android use the zram driver on top of the loop driver.
-> There is a mismatch between the default loop driver queue depth (128) and
-> the queue depth of the storage device in my test setup (32). That mismatch
-> results in write latencies that are higher than necessary. Address this
-> issue by making the default loop driver queue depth configurable. Compared
-> to configuring the queue depth by writing into the nr_requests sysfs
-> attribute, this approach does not involve calling synchronize_rcu() to
-> modify the queue depth.
+On 2021/08/03 0:17, Bart Van Assche wrote:
+> On 8/2/21 6:34 AM, yukuai (C) wrote:
+>> I run a test on both null_blk and nvme, results show that there are no
+>> performance degradation:
+>>
+>> test platform: x86
+>> test cpu: 2 nodes, total 72
+>> test scheduler: none
+>> test device: null_blk / nvme
+>>
+>> test cmd: fio -filename=/dev/xxx -name=test -ioengine=libaio -direct=1
+>> -numjobs=72 -iodepth=16 -bs=4k -rw=write -offset_increment=1G
+>> -cpus_allowed=0:71 -cpus_allowed_policy=split -group_reporting
+>> -runtime=120
+>>
+>> test results: iops
+>> 1) null_blk before this patch: 280k
+>> 2) null_blk after this patch: 282k
+>> 3) nvme before this patch: 378k
+>> 4) nvme after this patch: 384k
 > 
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Martijn Coenen <maco@android.com>
-> Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  drivers/block/loop.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+> Please use io_uring for performance tests.
 > 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 9fca3ab3988d..0f1f1ecd941a 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2098,6 +2098,9 @@ module_param(max_loop, int, 0444);
->  MODULE_PARM_DESC(max_loop, "Maximum number of loop devices");
->  module_param(max_part, int, 0444);
->  MODULE_PARM_DESC(max_part, "Maximum number of partitions per loop device");
-> +static uint32_t default_queue_depth = 128;
-> +module_param(default_queue_depth, uint, 0644);
-> +MODULE_PARM_DESC(default_queue_depth, "Default loop device queue depth");
->  MODULE_LICENSE("GPL");
->  MODULE_ALIAS_BLOCKDEV_MAJOR(LOOP_MAJOR);
->  
-> @@ -2330,7 +2333,7 @@ static int loop_add(int i)
->  	err = -ENOMEM;
->  	lo->tag_set.ops = &loop_mq_ops;
->  	lo->tag_set.nr_hw_queues = 1;
-> -	lo->tag_set.queue_depth = 128;
-> +	lo->tag_set.queue_depth = max(default_queue_depth, 2U);
->  	lo->tag_set.numa_node = NUMA_NO_NODE;
->  	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
->  	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING |
+> The null_blk numbers seem way too low to me. If I run a null_blk 
+> performance test inside a VM with 6 CPU cores (Xeon W-2135 CPU) I see 
+> about 6 million IOPS for synchronous I/O and about 4.4 million IOPS when 
+> using libaio. The options I used and that are not in the above command 
+> line are: --thread --gtod_reduce=1 --ioscheduler=none.
 > 
 
-Looks fine:
+Hi, Bart
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+The cpu I'm testing is Intel(R) Xeon(R) Gold 6140 CPU @ 2.30GHz, and
+after switching to io_uring with "--thread --gtod_reduce=1
+--ioscheduler=none", the numbers can increase to 330k, yet still
+far behind 6000k.
 
--- 
-Ming
+The new atomic operations in the hot path is atomic_read() from
+hctx_may_queue(), and the atomic variable will change in two
+situations:
 
+a. fail to get driver tag with dbusy not set, increase and set dbusy.
+b. if dbusy is set when queue switch from busy to dile, decrease and
+clear dbusy.
+
+During the period a device "idle -> busy -> idle", the new atomic
+variable can be writen twice at most, which means this is almost
+readonly in the above test situation. So I guess the impact on
+performance is minimal ?
+
+Thanks!
+Kuai
