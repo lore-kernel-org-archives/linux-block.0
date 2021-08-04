@@ -2,127 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 463FCC432BE
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 08:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 618E7C4338F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 09:42:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E1DC60EFF
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 08:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42DE560F58
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 09:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236358AbhHDI0c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Aug 2021 04:26:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55860 "EHLO
+        id S236409AbhHDJm4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Aug 2021 05:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236261AbhHDI0b (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 04:26:31 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B913C061798
-        for <linux-block@vger.kernel.org>; Wed,  4 Aug 2021 01:26:19 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id b128so684847wmb.4
-        for <linux-block@vger.kernel.org>; Wed, 04 Aug 2021 01:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=wshwpEouxlj43w/LQBqY2ZUR+r5ng5wTSfjhEdV7ZQ8=;
-        b=REbwzykdm7OHhYkHKTa4GjtmoAm/i/ozHj6HEKSDN2l8DI9yMhJjoD3frpiGcgtfuf
-         B6k4/3bLIv/vNdP6tho5LYyF0rZUupRmPJCOued8whJH/JUG2rWSdfbelUmXEH/ZI/v+
-         2SflUax0cVIuf5qFUmtGeSjNmD177hOaOC1u31X3/1MZEBQLCJRSwk6AwezncWp08aGl
-         Rz6HuxNepkU8dv72WwgMjJnDtKHfA1zczbGIhz4JCvDjHDc/zxSFeRsjxGheGvW8bTGG
-         jsYxYwMJy8H34keULSi4tRMVafjaS+eTGn93fl/EP8YVVkhsVZxL9hp4Hl8UgT+5kuWC
-         DtRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=wshwpEouxlj43w/LQBqY2ZUR+r5ng5wTSfjhEdV7ZQ8=;
-        b=uX3wfL2MBBDdsEWwFN3dsGK6D4oeA9soLS4MCKItCrAar+mYqVKvKyzC26fCDQK/u6
-         CRDhir2AHyklWxxet8sqm0N2fX2SlSGYcwp7VJ9W8wEG04oiE1xYtSC+gbpPeDmvJPUo
-         rO104MowpDtdt7CEjA/5crCfpeb9kA/1Y26B2izHIZy0k+c9jhfOTef8JFB0AyaFmW6b
-         Z/pW4bwMFG+HM9mK3vlAw3zMquh4scrgI7y5DUImqgPgvCUkoDeqd49WWWcHZ+W40Z/q
-         NhzJtUsdGBb2f7pacI9WEndEbIpZEOiJwW8vmXewPLjXtGqo2jho5bpnfl4R2YcpM1oV
-         Btvw==
-X-Gm-Message-State: AOAM531fqmrlmurOzsU47SEBoUQDW/1AuorQqQLFo0SISHX1ppd7oH26
-        PElfIpFhRjo3eYKM+2neJ603VQ==
-X-Google-Smtp-Source: ABdhPJxSza4YTAHvrQmEe3o94FSosfOKLqFVTx3EseeNpvxzLFtyvsyQMNLyS8I4Tj4Yqe7BtrbYsA==
-X-Received: by 2002:a7b:cb44:: with SMTP id v4mr26665661wmj.169.1628065578184;
-        Wed, 04 Aug 2021 01:26:18 -0700 (PDT)
-Received: from google.com ([109.180.115.228])
-        by smtp.gmail.com with ESMTPSA id j6sm5060494wmq.29.2021.08.04.01.26.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Aug 2021 01:26:17 -0700 (PDT)
-Date:   Wed, 4 Aug 2021 09:26:15 +0100
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Satya Tangirala <satyat@google.com>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-Subject: Re: [PATCH v9 0/9] add support for direct I/O with fscrypt using
- blk-crypto
-Message-ID: <YQpPJ8To7NN2AIuq@google.com>
-References: <20210604210908.2105870-1-satyat@google.com>
- <CAF2Aj3h-Gt3bOxH4wXB7aeQ3jVzR3TEqd3uLsh4T9Q=e6W6iqQ@mail.gmail.com>
- <YPmFSw4JbWnIozSZ@gmail.com>
+        with ESMTP id S236397AbhHDJmz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 05:42:55 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29AD0C0613D5
+        for <linux-block@vger.kernel.org>; Wed,  4 Aug 2021 02:42:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=1qVaQySvDOJeK5ZL0MyITtotrwjkuDRpzKgiar8AD/I=; b=KYOpCffu8+dNy8o/q1HNbCsGzt
+        3Zj63wq8HSPiW6vI158vgUPeOh/69KIJpqQR2YGoue3ByjXC9d1VQlAGPaA2f+fyaWu5HUxRn7OJE
+        P7gM/mcHQz1faTEznnrIyaxOc2tV6UjT7bm1oawl9v97xU6A2tQ8OmM3q2LnaNCqXY+CfHSJpOQCs
+        EiJavyNcbu5JCq1m5q7PI0CDGXBwAG8E2YX8SUUSCftKq4QKonLb8DdjQVNStV5NCHwRgaZbn79AH
+        A81ZwWiIFubalasqL5BXRCE9v5CAx4cWLhZGR5VyKSkBTQgyx+uYo7+gZ9VLkHVRLFi1Ssgi/+zhx
+        9x98cJJw==;
+Received: from [2a02:1205:5023:1f80:c068:bd3d:78b3:7d37] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mBDPI-005dwa-Kn; Wed, 04 Aug 2021 09:41:54 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: use regular gendisk registration in device mapper v2
+Date:   Wed,  4 Aug 2021 11:41:39 +0200
+Message-Id: <20210804094147.459763-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YPmFSw4JbWnIozSZ@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 22 Jul 2021, Eric Biggers wrote:
+Hi all,
 
-> Hi Lee,
-> 
-> On Thu, Jul 22, 2021 at 12:23:47PM +0100, Lee Jones wrote:
-> > 
-> > No review after 7 weeks on the list.
-> > 
-> > Is there anything Satya can do to help expedite this please?
-> > 
-> 
-> This series is basically ready, but I can't apply it because it depends on the
-> other patch series
-> "[PATCH v4 0/9] ensure bios aren't split in middle of crypto data unit"
-> (https://lkml.kernel.org/linux-block/20210707052943.3960-1-satyaprateek2357@gmail.com/T/#u).
-> I will be re-reviewing that other patch series soon, but it primary needs review
-> by the people who work more regularly with the block layer, and it will have to
-> go in through the block tree (I can't apply it to the fscrypt tree).
-> 
-> The original version of this series didn't require so many block layer changes,
-> but it would have only allowed direct I/O with user buffer pointers aligned to
-> the filesystem block size, which was too controversial with other filesystem
-> developers; see the long discussion at
-> https://lkml.kernel.org/linux-fscrypt/20200720233739.824943-1-satyat@google.com/T/#u.
-> 
-> In addition, it was requested that we not add features to the "legacy" direct
-> I/O implementation (fs/direct-io.c), so I have a patch series in progress
-> "[PATCH 0/9] f2fs: use iomap for direct I/O"
-> (https://lkml.kernel.org/linux-f2fs-devel/20210716143919.44373-1-ebiggers@kernel.org/T/#u)
-> which will change f2fs to use iomap.
-> 
-> Also please understand that Satya has left Google, so any further work from him
-> on this is happening on a personal capacity in his free time.
+The device mapper code currently has a somewhat odd gendisk registration
+scheme where it calls add_disk early, but uses a special flag to skip the
+"queue registration", which is a major part of add_disk.  This series
+improves the block layer holder tracking to work on an entirely
+unregistered disk and thus allows device mapper to use the normal scheme
+of calling add_disk when it is ready to accept I/O.
 
-Thanks for the update Eric.  I'll push this to the back of my queue
-and check back with you at a later date.  Hopefully we see some
-interest from the other maintainers sooner, rather than later.
+Note that this leads to a user visible change - the sysfs attributes on
+the disk and the dm directory hanging off it are not only visible once
+the initial table is loaded.  This did not make a different to my testing
+using dmsetup and the lvm2 tools.
 
--- 
-Lee Jones [李琼斯]
-Senior Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+Changes since v1:
+ - rebased on the lastes for-5.15/block tree
+ - improve various commit messages, including commit references
+
+Diffstat:
+ block/Kconfig             |    4 +
+ block/Makefile            |    1 
+ block/elevator.c          |    1 
+ block/genhd.c             |   42 +++++------
+ block/holder.c            |  167 ++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/md/Kconfig        |    2 
+ drivers/md/bcache/Kconfig |    1 
+ drivers/md/dm-ioctl.c     |    4 -
+ drivers/md/dm-rq.c        |    1 
+ drivers/md/dm.c           |   32 +++-----
+ fs/block_dev.c            |  145 ---------------------------------------
+ include/linux/blk_types.h |    3 
+ include/linux/genhd.h     |   19 ++---
+ 13 files changed, 219 insertions(+), 203 deletions(-)
