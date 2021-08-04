@@ -2,113 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E292C4320A
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 02:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6AEC4338F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 02:44:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E57AC60E78
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 02:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A93B661029
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 02:44:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233666AbhHDCBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Aug 2021 22:01:38 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:13273 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229869AbhHDCBi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Aug 2021 22:01:38 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GfZbk0H72z82X0;
-        Wed,  4 Aug 2021 09:56:34 +0800 (CST)
-Received: from dggpeml500020.china.huawei.com (7.185.36.88) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 4 Aug 2021 10:01:20 +0800
-Received: from huawei.com (10.175.127.227) by dggpeml500020.china.huawei.com
- (7.185.36.88) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Wed, 4 Aug 2021
- 10:01:19 +0800
-From:   Baokun Li <libaokun1@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <patchwork@huawei.com>, <libaokun1@huawei.com>,
-        <yukuai3@huawei.com>, "Hulk Robot" <hulkci@huawei.com>
-Subject: [PATCH -next v3] nbd: add the check to prevent overflow in __nbd_ioctl()
-Date:   Wed, 4 Aug 2021 10:12:12 +0800
-Message-ID: <20210804021212.990223-1-libaokun1@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        id S233362AbhHDCoT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Aug 2021 22:44:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38840 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230060AbhHDCoT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Aug 2021 22:44:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628045046;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bgYEfKHml5l3JmIqsBfQ2Zvdb8bUlQBtsbXqWhAYYsk=;
+        b=hVyNvxkNnd06ZUY9oK9ERL4jj1indLEbmFogXaw2X9OoZJfeB/euGtFwtrXRoHustL6tj5
+        Cbp+38MhPFH8MSqW1GmPNGiM7h3rbZm8IAo8fn7vrefc1W9hBCuU/CoMBtzd2uRXucB1Ad
+        P1lG/NjBvOxHcn3J08NXy8PyvaYlgko=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-586-J14zPQyKPfiN8hZASCv-3A-1; Tue, 03 Aug 2021 22:39:27 -0400
+X-MC-Unique: J14zPQyKPfiN8hZASCv-3A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F375A1074661;
+        Wed,  4 Aug 2021 02:39:25 +0000 (UTC)
+Received: from T590 (ovpn-13-3.pek2.redhat.com [10.72.13.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2209660C05;
+        Wed,  4 Aug 2021 02:39:16 +0000 (UTC)
+Date:   Wed, 4 Aug 2021 10:39:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Martijn Coenen <maco@android.com>
+Subject: Re: [PATCH v2 2/3] loop: Select I/O scheduler 'none' from inside
+ add_disk()
+Message-ID: <YQn924DHk4axOUso@T590>
+References: <20210803182304.365053-1-bvanassche@acm.org>
+ <20210803182304.365053-3-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500020.china.huawei.com (7.185.36.88)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210803182304.365053-3-bvanassche@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If user specify a large enough value of NBD blocks option, it may trigger
-signed integer overflow which may lead to nbd->config->bytesize becomes a
-large or small value, zero in particular.
+On Tue, Aug 03, 2021 at 11:23:03AM -0700, Bart Van Assche wrote:
+> We noticed that the user interface of Android devices becomes very slow
+> under memory pressure. This is because Android uses the zram driver on top
+> of the loop driver for swapping, because under memory pressure the swap
+> code alternates reads and writes quickly, because mq-deadline is the
+> default scheduler for loop devices and because mq-deadline delays writes by
 
-UBSAN: Undefined behaviour in drivers/block/nbd.c:325:31
-signed integer overflow:
-1024 * 4611686155866341414 cannot be represented in type 'long long int'
-[...]
-Call trace:
-[...]
- handle_overflow+0x188/0x1dc lib/ubsan.c:192
- __ubsan_handle_mul_overflow+0x34/0x44 lib/ubsan.c:213
- nbd_size_set drivers/block/nbd.c:325 [inline]
- __nbd_ioctl drivers/block/nbd.c:1342 [inline]
- nbd_ioctl+0x998/0xa10 drivers/block/nbd.c:1395
- __blkdev_driver_ioctl block/ioctl.c:311 [inline]
-[...]
+Maybe we can bypass io scheduler always for request with REQ_SWAP, such as:
 
-Although it is not a big deal, still silence the UBSAN by limit
-the input value.
-
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Baokun Li <libaokun1@huawei.com>
----
-V1->V2:
-	Use check_mul_overflow().
-V2->V3:
-	The check_mul_overflow function requires the same input parameter type.
-
- drivers/block/nbd.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..5a42b838d26c 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1384,6 +1384,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 		       unsigned int cmd, unsigned long arg)
- {
- 	struct nbd_config *config = nbd->config;
-+	loff_t bytesize;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 0f006cabfd91..d86709ac9d1f 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -420,7 +420,8 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+ 	 * passthrough request is added to scheduler queue, there isn't any
+ 	 * chance to dispatch it given we prioritize requests in hctx->dispatch.
+ 	 */
+-	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
++	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq) ||
++			blk_rq_is_swap(rq))
+ 		return true;
  
- 	switch (cmd) {
- 	case NBD_DISCONNECT:
-@@ -1398,8 +1399,11 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 	case NBD_SET_SIZE:
- 		return nbd_set_size(nbd, arg, config->blksize);
- 	case NBD_SET_SIZE_BLOCKS:
--		return nbd_set_size(nbd, arg * config->blksize,
--				    config->blksize);
-+		if (unlikely(check_mul_overflow((loff_t)arg,
-+						config->blksize,
-+						&bytesize)))
-+			return -EINVAL;
-+		return nbd_set_size(nbd, bytesize, config->blksize);
- 	case NBD_SET_TIMEOUT:
- 		nbd_set_cmd_timeout(nbd, arg);
- 		return 0;
--- 
-2.31.1
+ 	return false;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d3afea47ade6..71aaa99614ab 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -251,6 +251,11 @@ static inline bool blk_rq_is_passthrough(struct request *rq)
+ 	return blk_op_is_passthrough(req_op(rq));
+ }
+ 
++static inline bool blk_rq_is_swap(struct request *rq)
++{
++	return rq->cmd_flags & REQ_SWAP;
++}
++
+ static inline unsigned short req_get_ioprio(struct request *req)
+ {
+ 	return req->ioprio;
+
+
+Thanks, 
+Ming
 
