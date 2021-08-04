@@ -2,91 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3132AC432BE
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 10:01:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F394C4338F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 10:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10F7B601FC
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 10:01:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC67F61029
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 10:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236913AbhHDKCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Aug 2021 06:02:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49926 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237234AbhHDKCI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 06:02:08 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43347C0613D5;
-        Wed,  4 Aug 2021 03:01:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=tt1taHmY3o8vbuA2AsPbb7cVrfeK82HOf8oIyKb3FTc=; b=hQD8KAYgeD+mcu3L+5xHSLBo6v
-        KqojgNbYvl2wtrtH74G2n7RfNh4yKrQ6VFFH0zqcE312iaQ3rdaOtuiLLhlgi6inMl2tvjqN44r72
-        8uFEgjIi2C8hWo+D6boAKH/PyxlyQ5HOTIkyPuBK6Mf0/D9MQC28Vfvk98Wd/tCkX5OPbz8e9hns7
-        iFrSC8YNN3h2HIBA7MnCkr1wp7PIx30YO2pOm1Jvv0UyrDjAotS7zcZNT86qxhTcottNy1CIKwe7E
-        eBqYoK9R7/9DBi0elNYmpi9Zu1wOHzahpeNqX2Mbv82BVMilP4Ziw9RJf0cJQZV2KmrCwCOqyBakx
-        asS/u03g==;
-Received: from [2a02:1205:5023:1f80:c068:bd3d:78b3:7d37] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mBDga-005f7A-CF; Wed, 04 Aug 2021 09:59:54 +0000
+        id S237286AbhHDKCS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Aug 2021 06:02:18 -0400
+Received: from verein.lst.de ([213.95.11.211]:46473 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237234AbhHDKCR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Aug 2021 06:02:17 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 766E967373; Wed,  4 Aug 2021 12:02:03 +0200 (CEST)
+Date:   Wed, 4 Aug 2021 12:02:03 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Song Liu <song@kernel.org>, Mike Snitzer <snitzer@redhat.com>,
-        Coly Li <colyli@suse.de>, Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-um@lists.infradead.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: [PATCH 04/15] dm-ebs: use bvec_virt
-Date:   Wed,  4 Aug 2021 11:56:23 +0200
-Message-Id: <20210804095634.460779-5-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210804095634.460779-1-hch@lst.de>
-References: <20210804095634.460779-1-hch@lst.de>
+To:     Lauri Kasanen <cand@gmx.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] n64cart: fix the dma address in n64cart_do_bvec
+Message-ID: <20210804100203.GA20072@lst.de>
+References: <20210804094958.460298-1-hch@lst.de> <20210804130136.55f633eeb4522f844463159a@gmx.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210804130136.55f633eeb4522f844463159a@gmx.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use bvec_virt instead of open coding it.
+On Wed, Aug 04, 2021 at 01:01:36PM +0300, Lauri Kasanen wrote:
+> > diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
+> > index 7b4dd10af9ec..c84be0028f63 100644
+> > --- a/drivers/block/n64cart.c
+> > +++ b/drivers/block/n64cart.c
+> > @@ -74,7 +74,7 @@ static bool n64cart_do_bvec(struct device *dev, struct bio_vec *bv, u32 pos)
+> >
+> >  	n64cart_wait_dma();
+> >
+> > -	n64cart_write_reg(PI_DRAM_REG, dma_addr + bv->bv_offset);
+> > +	n64cart_write_reg(PI_DRAM_REG, dma_addr);
+> >  	n64cart_write_reg(PI_CART_REG, (bstart | CART_DOMAIN) & CART_MAX);
+> >  	n64cart_write_reg(PI_WRITE_REG, bv->bv_len - 1);
+> 
+> Hm, then how did it work? Does it always happen to be zero?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-ebs-target.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It isn't always zero, but for your use cases it might.  That is if
+you have a page aligned buffer (e.g. the page cache) it tends to be
+zero.
 
-diff --git a/drivers/md/dm-ebs-target.c b/drivers/md/dm-ebs-target.c
-index 71475a2410be..0c509dae0ff8 100644
---- a/drivers/md/dm-ebs-target.c
-+++ b/drivers/md/dm-ebs-target.c
-@@ -74,7 +74,7 @@ static int __ebs_rw_bvec(struct ebs_c *ec, int rw, struct bio_vec *bv, struct bv
- 	if (unlikely(!bv->bv_page || !bv_len))
- 		return -EIO;
- 
--	pa = page_address(bv->bv_page) + bv->bv_offset;
-+	pa = bvec_virt(bv);
- 
- 	/* Handle overlapping page <-> blocks */
- 	while (bv_len) {
--- 
-2.30.2
+> Have you tested this? I don't have the equipment currently.
 
+No, I don't.  I'm just auditing uses of bv_offset and this one is
+clearly bogus.
