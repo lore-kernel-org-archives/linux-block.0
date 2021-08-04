@@ -2,168 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B209C4338F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 16:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7723C432BE
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 17:05:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63E126044F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 16:31:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C19A260F94
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 17:05:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237899AbhHDQbm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Aug 2021 12:31:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55492 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237794AbhHDQbl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 12:31:41 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DABD4C0613D5
-        for <linux-block@vger.kernel.org>; Wed,  4 Aug 2021 09:31:25 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id b21so3213383ljo.13
-        for <linux-block@vger.kernel.org>; Wed, 04 Aug 2021 09:31:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Mbke9nvjw7+ZeekiQRXLpz0LVFhUcu96Nb3OTfXE7BU=;
-        b=PZ1SUNe5srVpzwzOaifNxeDnFelZQ09VVBF0S+czoEleI8H7NaXtf6BgmLYsKuLNiC
-         LTcU8OYPWLuF/4NphS6i+l1ci/XnoMb+i+upOTt69bQAT3JgDhcod/J5a5/zqAWUQ5CE
-         n8TsxAIOFru99StbsoS1slJejG91rgTWWoOlM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Mbke9nvjw7+ZeekiQRXLpz0LVFhUcu96Nb3OTfXE7BU=;
-        b=NpnXGXmsegLg13cysyAc0CFkURZ5cYX2tRuS9KwoagmyDbQeX8o+OZIPrRqu2RNmhd
-         r5tnbuRtnuziWDCcMjJReJcEUUaYDGmKmTXHKTpnnud7T+Nowt+Mp5LGZ7mFEGn5s93X
-         PwXM3oXDYRDstEjZXh8VinRqOYyetwbl8Zrn/clXlDUuL3cixOQmHXs2kKgnOlLP6FoJ
-         3RkzHiU+48caZPvuxOTLH0WkNZAR+nYt53QZLySMckHVL2ehwPNTRGFXPJNgUGcOnrkv
-         ollxU6IpoRlbcGSPhzp5uZUZdr98ug6hrHLF81JkelnA9fD4R8eL8jAFlTcW6W216mja
-         hQjg==
-X-Gm-Message-State: AOAM531DzgOduZpoIBNN2pnmY2/grS2J/rmKSc5GbEpNgLdtrlya95A/
-        wnCwSfcqiWKBduagYLg865UJDc0zjFrsP/Lr
-X-Google-Smtp-Source: ABdhPJxHcbUszbwKCCpktxXZerEWv1ffOncCBhHjrHe4ThndZLoCWhCZupli5chlbaOWUdHixcxKMA==
-X-Received: by 2002:a2e:99d6:: with SMTP id l22mr174752ljj.465.1628094683676;
-        Wed, 04 Aug 2021 09:31:23 -0700 (PDT)
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com. [209.85.167.42])
-        by smtp.gmail.com with ESMTPSA id b41sm188529ljr.67.2021.08.04.09.31.18
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Aug 2021 09:31:18 -0700 (PDT)
-Received: by mail-lf1-f42.google.com with SMTP id c24so2165299lfi.11
-        for <linux-block@vger.kernel.org>; Wed, 04 Aug 2021 09:31:18 -0700 (PDT)
-X-Received: by 2002:a19:fc06:: with SMTP id a6mr62531lfi.377.1628094677755;
- Wed, 04 Aug 2021 09:31:17 -0700 (PDT)
+        id S239746AbhHDRFd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Aug 2021 13:05:33 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:56770 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239695AbhHDRFc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 13:05:32 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 87CC22226C;
+        Wed,  4 Aug 2021 17:05:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1628096717; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LZP5mbUaD4tLAM/AkhQwADJlhMUwxJoQ/fOe4VFqGiM=;
+        b=T28M0ZzaVol9YE3Im9Ef1mW1D7DzmcvFlTfm+U3I6h9FX8vh3AkbVlkZFRYSdqJtek/+0x
+        dI3DWubXqGVFB7wCjGMMp3YpUY0PLxtnKXLrO4UFOKWVXWoEisnr9ymd2Q+ibiGfXn7xYW
+        yN1YDv9rZpfydqtAGq/FdJrpbfRlczY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1628096717;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LZP5mbUaD4tLAM/AkhQwADJlhMUwxJoQ/fOe4VFqGiM=;
+        b=t/keDuDOz4izQ9+Pevp8W+FaYqjWV9O9Grio2dEGxQV6iGJHmdZQ208YpuRM80KcNSr8MP
+        me7eM4q47pic8fDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6E66913D1F;
+        Wed,  4 Aug 2021 17:05:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id +P54DsjICmHSHgAAMHmgww
+        (envelope-from <colyli@suse.de>); Wed, 04 Aug 2021 17:05:12 +0000
+Subject: Re: [PATCH 09/15] bcache: use bvec_virt
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Song Liu <song@kernel.org>, Mike Snitzer <snitzer@redhat.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-um@lists.infradead.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <20210804095634.460779-1-hch@lst.de>
+ <20210804095634.460779-10-hch@lst.de>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <13eb9def-5db4-d776-2b5a-0096a0a2a681@suse.de>
+Date:   Thu, 5 Aug 2021 01:05:10 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-References: <1628086770.5rn8p04n6j.none.ref@localhost> <1628086770.5rn8p04n6j.none@localhost>
-In-Reply-To: <1628086770.5rn8p04n6j.none@localhost>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 4 Aug 2021 09:31:01 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiLr55zHUWNzmp3DeoO0DUaYp7vAzQB5KUCni5FpwC7Uw@mail.gmail.com>
-Message-ID: <CAHk-=wiLr55zHUWNzmp3DeoO0DUaYp7vAzQB5KUCni5FpwC7Uw@mail.gmail.com>
-Subject: Re: [REGRESSION?] Simultaneous writes to a reader-less, non-full pipe
- can hang
-To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>, acrichton@mozilla.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-        Ian Kent <raven@themaw.net>,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210804095634.460779-10-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Your program is buggy.
-
-On Wed, Aug 4, 2021 at 8:37 AM Alex Xu (Hello71) <alex_y_xu@yahoo.ca> wrote:
+On 8/4/21 5:56 PM, Christoph Hellwig wrote:
+> Use bvec_virt instead of open coding it.  Note that the existing code is
+> fine despite ignoring bv_offset as the bio is known to contain exactly
+> one page from the page allocator per bio_vec.
 >
->     pipe(pipefd);
->     printf("init buffer: %d\n", fcntl(pipefd[1], F_GETPIPE_SZ));
->     printf("new buffer:  %d\n", fcntl(pipefd[1], F_SETPIPE_SZ, 0));
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Yeah, what did you expect this to do? You said you want a minimal
-buffer, you get a really small buffer.
+Looks good to me.
 
-Then you try to write multiple messages to the pipe that you just said
-should have a minimum size.
+Reviewed-by: Coly Li <colyli@suse.de>
 
-Don't do that then.
+Thanks.
 
-> /proc/x/stack shows that the remaining thread is hanging at pipe.c:560.
-> It looks like not only there needs to be space in the pipe, but also
-> slots.
+Coly Li
 
-Correct. The fullness of a pipe is not about whether it has the
-possibility of merging more bytes into an existing not-full slot, but
-about whether it has empty slots left.
+> ---
+>  drivers/md/bcache/btree.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 183a58c89377..0595559de174 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -378,7 +378,7 @@ static void do_btree_node_write(struct btree *b)
+>  		struct bvec_iter_all iter_all;
+>  
+>  		bio_for_each_segment_all(bv, b->bio, iter_all) {
+> -			memcpy(page_address(bv->bv_page), addr, PAGE_SIZE);
+> +			memcpy(bvec_virt(bv), addr, PAGE_SIZE);
+>  			addr += PAGE_SIZE;
+>  		}
+>  
 
-Part of that is simply the POSIX pipe guarantees - a write of size
-PIPE_BUF or less is guaranteed to be atomic, so it mustn't be split
-among buffers.
-
-So a pipe must not be "writable" unless it has space for at least that
-much (think select/poll, which don't know the size of the write).
-
-The fact that we might be able to reuse a partially filled buffer for
-smaller writes is simply not relevant to that issue.
-
-And yes, we could have different measures of "could write" for
-different writes, but we just don't have or want that complexity.
-
-Please don't mess with F_SETPIPE_SZ unless you have a really good
-reason to do so, and actually understand what you are doing.
-
-Doing a F_SETPIPE_SZ, 0 basically means "I want the mimimum pipe size
-possible". And that one accepts exactly one write at a time.
-
-Of course, the exact semantics are much more complicated than that
-"exactly one write". The pipe write code will optimistically merge
-writes into a previous buffer, which means that depending on the
-pattern of your writes, the exact number of bytes you can write will
-be very different.
-
-But that "merge writes into a previous buffer" only appends to the
-buffer - not _reuse_ it - so when each buffer is one page in size,
-what happens is that you can merge up to 4096 bytes worth of writes,
-but then after that the pipe write will want a new buffer - even if
-the old buffer is now empty because of old reads.
-
-That's why your test program won't block immediately: both writers
-will actually start out happily doing writes into that one buffer that
-is allocated, but at some point that buffer ends, and it wants to
-allocate a new buffer.
-
-But you told it not to allocate more buffers, and the old buffer is
-never completely empty because your readers never read _everythign_,
-so it will hang, waiting for you to empty the one minimal buffer it
-allocated. And that will never happen.
-
-There's a very real reason why we do *not* by default say "pipes can
-only ever use only one buffer".
-
-I don't think this is a regression, but if you have an actual
-application - not a test program - that does crazy things like this
-and used to work (I'm not sure it has ever worked, though), we can
-look into making it work again.
-
-That said, I suspect the way to make it work is to just say "the
-minimum pipe size is two slots" rather than change the "we want at
-least one empty slot". Exactly because of that whole "look, we must
-not consider a pipe that doesn't have a slot writable".
-
-Because clearly people don't understand how subtle F_SETPIPE_SZ is.
-It's not really a "byte count", even though that is how it's
-expressed.
-
-                   Linus
