@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF817C4338F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 09:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7FF4C4338F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 09:48:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1BBB60F58
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 09:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98DA760725
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 09:48:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237159AbhHDJrs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Aug 2021 05:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46592 "EHLO
+        id S237120AbhHDJsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Aug 2021 05:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237120AbhHDJrr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 05:47:47 -0400
+        with ESMTP id S235545AbhHDJsN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 05:48:13 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904ABC0613D5
-        for <linux-block@vger.kernel.org>; Wed,  4 Aug 2021 02:47:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D837CC0613D5
+        for <linux-block@vger.kernel.org>; Wed,  4 Aug 2021 02:48:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=k2yYZNaBLMa7NYf7BbrOINdcLCZcM1gv20SvVEuyeyg=; b=XC5VoeKS9a7YpxWWpjrGi0Lj/8
-        gN/t85/DPQ4HgtrfNZMiVRUcvwO6GHDA70iLvVO8eYEIh4bnrA2Anpt9Tn/o0Y2kfW9BdLLhepIM0
-        ZnpBYtmA5hyyQjxJsyl6TMQC/OITDMd3CATjiUrBJyUPR4u6zccSYk70ph/lmAX69LxFKV7SGBdTq
-        6fiQ/eijcIPO++Z0/RaN5WRYMYH/bBOIyTg3YTK9ThUDSVNPpXQ0Mm106VZAuWqKJoug6m8z+8imc
-        h/BYsH4iaOxjiwzCfc7pa09k2smcirV9zbqx3QONa891rTtH7jZl9gp4y+VqxDtN/QyB0y9K38X3K
-        R6JLRPlg==;
+        bh=XW8zcUpkcrvV2wsnrsFTaJ5SqIRMhKaQLBesj9oC03s=; b=sSiuijGgqiKMtCTawH/HT6JUcS
+        j3o4MbvL/g5CQ5f6ZyH+wVSzNtohvksL+rDJbvv83xyDW5KXDyiaYfMHoTJblqY1h0x6zxoegk6SY
+        p7g6AezxKEsKEHW2kgSW491CbY66kbs3auUf3cUyYhLVIO12ZnQgDuTh/KlimVlfM1n68iiDOnehR
+        ytrVRzyh56QFX4+MYMXLBpiMwBUFnHJkchVR2IrCQWNEZXoKd8ibIGoZQtu9q6PCmo7L1lAupTAjH
+        eO6U5raHWsPffylrVaQp592igXa2F5P12sTtcgerCXris4Zb05BUrh8Xz0g1l7PSYE9AURSiLIEh9
+        vWhg9urQ==;
 Received: from [2a02:1205:5023:1f80:c068:bd3d:78b3:7d37] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mBDTo-005eDo-OZ; Wed, 04 Aug 2021 09:46:49 +0000
+        id 1mBDUi-005eJm-Mb; Wed, 04 Aug 2021 09:47:34 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 7/8] dm: delay registering the gendisk
-Date:   Wed,  4 Aug 2021 11:41:46 +0200
-Message-Id: <20210804094147.459763-8-hch@lst.de>
+Subject: [PATCH 8/8] block: remove support for delayed queue registrations
+Date:   Wed,  4 Aug 2021 11:41:47 +0200
+Message-Id: <20210804094147.459763-9-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210804094147.459763-1-hch@lst.de>
 References: <20210804094147.459763-1-hch@lst.de>
@@ -51,104 +51,118 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-device mapper is currently the only outlier that tries to call
-register_disk after add_disk, leading to fairly inconsistent state
-of these block layer data structures.  Instead change device-mapper
-to just register the gendisk later now that the holder mechanism
-can cope with that.
-
-Note that this introduces a user visible change: the dm kobject is
-now only visible after the initial table has been loaded.
+Now that device mapper has been changed to register the disk once
+it is fully ready all this code is unused.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/md/dm-rq.c |  1 -
- drivers/md/dm.c    | 23 +++++++++++------------
- 2 files changed, 11 insertions(+), 13 deletions(-)
+ block/elevator.c      |  1 -
+ block/genhd.c         | 29 +++++++----------------------
+ include/linux/genhd.h |  6 ------
+ 3 files changed, 7 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 0dbd48cbdff9..5b95eea517d1 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -559,7 +559,6 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
- 	err = blk_mq_init_allocated_queue(md->tag_set, md->queue);
- 	if (err)
- 		goto out_tag_set;
--	elevator_init_mq(md->queue);
- 	return 0;
- 
- out_tag_set:
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index f003bd5b93ce..7981b7287628 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1693,7 +1693,10 @@ static void cleanup_mapped_device(struct mapped_device *md)
- 		spin_lock(&_minor_lock);
- 		md->disk->private_data = NULL;
- 		spin_unlock(&_minor_lock);
--		del_gendisk(md->disk);
-+		if (dm_get_md_type(md) != DM_TYPE_NONE) {
-+			dm_sysfs_exit(md);
-+			del_gendisk(md->disk);
-+		}
- 		dm_queue_destroy_keyslot_manager(md->queue);
- 		blk_cleanup_disk(md->disk);
+diff --git a/block/elevator.c b/block/elevator.c
+index 52ada14cfe45..706d5a64508d 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -702,7 +702,6 @@ void elevator_init_mq(struct request_queue *q)
+ 		elevator_put(e);
  	}
-@@ -1788,7 +1791,6 @@ static struct mapped_device *alloc_dev(int minor)
- 			goto bad;
- 	}
+ }
+-EXPORT_SYMBOL_GPL(elevator_init_mq); /* only for dm-rq */
  
--	add_disk_no_queue_reg(md->disk);
- 	format_dev_t(md->name, MKDEV(_major, minor));
+ /*
+  * switch to new_e io scheduler. be careful not to introduce deadlocks -
+diff --git a/block/genhd.c b/block/genhd.c
+index db916f779077..b0b6e0caa389 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -475,20 +475,20 @@ static void register_disk(struct device *parent, struct gendisk *disk,
+ }
  
- 	md->wq = alloc_workqueue("kdmflush", WQ_MEM_RECLAIM, 0);
-@@ -1989,19 +1991,12 @@ static struct dm_table *__unbind(struct mapped_device *md)
+ /**
+- * __device_add_disk - add disk information to kernel list
++ * device_add_disk - add disk information to kernel list
+  * @parent: parent device for the disk
+  * @disk: per-device partitioning information
+  * @groups: Additional per-device sysfs groups
+- * @register_queue: register the queue if set to true
+  *
+  * This function registers the partitioning information in @disk
+  * with the kernel.
+  *
+  * FIXME: error handling
   */
- int dm_create(int minor, struct mapped_device **result)
+-static void __device_add_disk(struct device *parent, struct gendisk *disk,
+-			      const struct attribute_group **groups,
+-			      bool register_queue)
++
++void device_add_disk(struct device *parent, struct gendisk *disk,
++		     const struct attribute_group **groups)
++
  {
--	int r;
- 	struct mapped_device *md;
+ 	int ret;
  
- 	md = alloc_dev(minor);
- 	if (!md)
- 		return -ENXIO;
+@@ -498,8 +498,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	 * elevator if one is needed, that is, for devices requesting queue
+ 	 * registration.
+ 	 */
+-	if (register_queue)
+-		elevator_init_mq(disk->queue);
++	elevator_init_mq(disk->queue);
  
--	r = dm_sysfs_init(md);
--	if (r) {
--		free_dev(md);
--		return r;
--	}
+ 	/*
+ 	 * If the driver provides an explicit major number it also must provide
+@@ -553,8 +552,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 		bdev_add(disk->part0, dev->devt);
+ 	}
+ 	register_disk(parent, disk, groups);
+-	if (register_queue)
+-		blk_register_queue(disk);
++	blk_register_queue(disk);
+ 
+ 	/*
+ 	 * Take an extra ref on queue which will be put on disk_release()
+@@ -568,21 +566,8 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
+ }
 -
- 	*result = md;
- 	return 0;
+-void device_add_disk(struct device *parent, struct gendisk *disk,
+-		     const struct attribute_group **groups)
+-
+-{
+-	__device_add_disk(parent, disk, groups, true);
+-}
+ EXPORT_SYMBOL(device_add_disk);
+ 
+-void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk)
+-{
+-	__device_add_disk(parent, disk, NULL, false);
+-}
+-EXPORT_SYMBOL(device_add_disk_no_queue_reg);
+-
+ /**
+  * del_gendisk - remove the gendisk
+  * @disk: the struct gendisk to remove
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 80952f038d79..473d93c6ebda 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -219,12 +219,6 @@ static inline void add_disk(struct gendisk *disk)
+ {
+ 	device_add_disk(NULL, disk, NULL);
  }
-@@ -2081,10 +2076,15 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
- 	r = dm_table_set_restrictions(t, md->queue, &limits);
- 	if (r)
- 		return r;
--	md->type = type;
+-extern void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk);
+-static inline void add_disk_no_queue_reg(struct gendisk *disk)
+-{
+-	device_add_disk_no_queue_reg(NULL, disk);
+-}
+-
+ extern void del_gendisk(struct gendisk *gp);
  
--	blk_register_queue(md->disk);
-+	add_disk(md->disk);
- 
-+	r = dm_sysfs_init(md);
-+	if (r) {
-+		del_gendisk(md->disk);
-+		return r;
-+	}
-+	md->type = type;
- 	return 0;
- }
- 
-@@ -2190,7 +2190,6 @@ static void __dm_destroy(struct mapped_device *md, bool wait)
- 		DMWARN("%s: Forcibly removing mapped_device still in use! (%d users)",
- 		       dm_device_name(md), atomic_read(&md->holders));
- 
--	dm_sysfs_exit(md);
- 	dm_table_destroy(__unbind(md));
- 	free_dev(md);
- }
+ void set_disk_ro(struct gendisk *disk, bool read_only);
 -- 
 2.30.2
 
