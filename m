@@ -2,64 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22081C4338F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 17:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB162C4338F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 17:43:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F182A60E78
-	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 17:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B23561040
+	for <linux-block@archiver.kernel.org>; Wed,  4 Aug 2021 17:43:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234283AbhHDRjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Aug 2021 13:39:13 -0400
-Received: from mail-pl1-f170.google.com ([209.85.214.170]:34444 "EHLO
-        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231410AbhHDRjM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 13:39:12 -0400
-Received: by mail-pl1-f170.google.com with SMTP id d1so3817751pll.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Aug 2021 10:38:59 -0700 (PDT)
+        id S237503AbhHDRn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Aug 2021 13:43:26 -0400
+Received: from mail-pj1-f51.google.com ([209.85.216.51]:44918 "EHLO
+        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237454AbhHDRnZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Aug 2021 13:43:25 -0400
+Received: by mail-pj1-f51.google.com with SMTP id e2-20020a17090a4a02b029016f3020d867so4609061pjh.3
+        for <linux-block@vger.kernel.org>; Wed, 04 Aug 2021 10:43:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=35tmvDoxIDdxsV5RuU9E3kNQIB8zkS61UYEvB+q7zF8=;
-        b=LzH6/m9LzO83UanVdgThtpS65+EbivlzpPtGz0s3XZjY9VThYrxqJaToXtU+tzITtL
-         ZnJsjhM+F3NHtg2KCPsVEzIIEvkou2Kifz2FNdoRUdFNU8f0U7iAy0qgEHKXhPu6oL+k
-         wozMAlw9zoTA/0Am8TaNqm+RE5cjCcIeutd6HFkzXhudqyHDwFqcD0YJriRysZ0yHgbB
-         wCzlPhEoinkP5UQzmNbfN/Nki3ugPGPwf0L0OPLhpv8aXMmtQkRwl85nVhJO7ofJclnO
-         JCQdz5Dv3J5u9QI+94NVmX34+Itjz8fZECU8mZI7SMyTV1pmYT/HsxvI10gaUnERfFSQ
-         m2Rg==
-X-Gm-Message-State: AOAM532GtRNYcRK7RQlYdsQ5SS/CKZYX4lGr6JxOHhpWWsZKsa6sik6W
-        VhU/qw5gdKDY5FiaGtsCQHc=
-X-Google-Smtp-Source: ABdhPJyFD6cA/w37MYtAN21hilsP7eyi/Xzs0/p/GXsoL8VheWcHv8ziynynlth7pHi7dc4UmlzbiA==
-X-Received: by 2002:a17:90a:1f49:: with SMTP id y9mr10813040pjy.225.1628098738759;
-        Wed, 04 Aug 2021 10:38:58 -0700 (PDT)
+        bh=pXItJuhcXznkQN2dHpC7pclMz+MY9DZLeArM3n5ZRoo=;
+        b=E4qLlCdEiSvQsItKU6nGTsKh9Qd+q0qTyF1eRIeIFxPx+mltl1iXrHSV1tQftq9Q8+
+         cEqxXxocCTkaWw9NoDjUESI4/fll++MmOwFttl8IulhtiApsvmSsKtnIW4z3juu95zcr
+         3U5FZRG1oi3KgpR9/OT4AWXCiK1cFw1MDjMK5NiCV62xRgag4DZamaOaBK/1I59mwqa4
+         BMXeL3cuFbop0uXs5MMMKsvj/zFwFI+YuMWy3itpAmddmOJVOA1lbcpFxNtbqc03AGQ8
+         00blVCE81rGMVmMiKi2FMz6oyMobjRQ+UBdviUm6kBATZetKRIPW9Afh6e7sShqKabiB
+         S7tQ==
+X-Gm-Message-State: AOAM532a/0DNWt3w7IXo7Ezn47t7L4i9/Afe0FbehHDiMLzj+2v8+SCA
+        REGzfyJcW8sEa+lB2ZDPsao=
+X-Google-Smtp-Source: ABdhPJzwKmu/AkSn1J7QFC/7G4mn1dCXhnQnKFgnjjqO13JRlLlysiGqwGH3cn2SS7cupWeDoZO5tA==
+X-Received: by 2002:a63:550c:: with SMTP id j12mr280040pgb.31.1628098990997;
+        Wed, 04 Aug 2021 10:43:10 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:8587:b3fe:5419:1ed7])
-        by smtp.gmail.com with ESMTPSA id s3sm3487152pfk.61.2021.08.04.10.38.56
+        by smtp.gmail.com with ESMTPSA id b5sm3141575pjq.2.2021.08.04.10.43.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Aug 2021 10:38:57 -0700 (PDT)
-Subject: Re: [PATCH v2 3/3] loop: Add the default_queue_depth kernel module
- parameter
-To:     Greg KH <gregkh@linuxfoundation.org>
+        Wed, 04 Aug 2021 10:43:09 -0700 (PDT)
+Subject: Re: [PATCH v2 2/3] loop: Select I/O scheduler 'none' from inside
+ add_disk()
+To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
         Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         Martijn Coenen <maco@android.com>
 References: <20210803182304.365053-1-bvanassche@acm.org>
- <20210803182304.365053-4-bvanassche@acm.org> <YQouvmh3rTDz2WIE@kroah.com>
+ <20210803182304.365053-3-bvanassche@acm.org> <YQn924DHk4axOUso@T590>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <a7a8da9f-a413-8b43-0025-34a9d7dcd3c9@acm.org>
-Date:   Wed, 4 Aug 2021 10:38:55 -0700
+Message-ID: <bbecb701-48d6-bdfa-2d41-afb6c48a8254@acm.org>
+Date:   Wed, 4 Aug 2021 10:43:05 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <YQouvmh3rTDz2WIE@kroah.com>
+In-Reply-To: <YQn924DHk4axOUso@T590>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -67,21 +66,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/3/21 11:07 PM, Greg KH wrote:
-> Should we just bump it up anyway given that modern memory limits are
-> probably more now?
+On 8/3/21 7:39 PM, Ming Lei wrote:
+> On Tue, Aug 03, 2021 at 11:23:03AM -0700, Bart Van Assche wrote:
+>> We noticed that the user interface of Android devices becomes very slow
+>> under memory pressure. This is because Android uses the zram driver on top
+>> of the loop driver for swapping, because under memory pressure the swap
+>> code alternates reads and writes quickly, because mq-deadline is the
+>> default scheduler for loop devices and because mq-deadline delays writes by
+> 
+> Maybe we can bypass io scheduler always for request with REQ_SWAP, such as:
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 0f006cabfd91..d86709ac9d1f 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -420,7 +420,8 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+>   	 * passthrough request is added to scheduler queue, there isn't any
+>   	 * chance to dispatch it given we prioritize requests in hctx->dispatch.
+>   	 */
+> -	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
+> +	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq) ||
+> +			blk_rq_is_swap(rq))
+>   		return true;
+>   
+>   	return false;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index d3afea47ade6..71aaa99614ab 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -251,6 +251,11 @@ static inline bool blk_rq_is_passthrough(struct request *rq)
+>   	return blk_op_is_passthrough(req_op(rq));
+>   }
+>   
+> +static inline bool blk_rq_is_swap(struct request *rq)
+> +{
+> +	return rq->cmd_flags & REQ_SWAP;
+> +}
+> +
+>   static inline unsigned short req_get_ioprio(struct request *req)
+>   {
+>   	return req->ioprio;
 
-As mentioned in the patch description, this patch is not about saving 
-memory but about reducing latency. Reducing the queue depth to control 
-latency is a common approach for block storage. See e.g. the description 
-of CONFIG_BLK_WBT in block/Kconfig.
+Hi Ming,
 
-You may want to know that I looked into reducing the queue depth from 
-user space before I came up with this kernel patch 
-(https://android-review.googlesource.com/c/platform/system/core/+/1783847/6). 
-However, making that approach work requires significant changes in the 
-Android SELinux sysfs labeling policy. From my point of view, modifying 
-the kernel is much less painful than reworking the Android SELinux 
-labeling policy.
+Thanks for having suggested an alternative. However, isn't the above a 
+policy? Shouldn't a kernel provide mechanisms instead of policies?
+
+Additionally, the above patch does not address all Android loop driver 
+use cases. Reading APEX files is regular I/O and hence REQ_SWAP is not 
+set while reading from APEX files.
+
+Thanks,
 
 Bart.
