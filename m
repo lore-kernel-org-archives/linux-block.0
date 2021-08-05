@@ -2,84 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB089C4338F
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 12:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 007DBC4338F
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 12:38:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EB7261131
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 12:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4A4D61131
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 12:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240270AbhHEMg6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Aug 2021 08:36:58 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:16051 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240188AbhHEMg5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Aug 2021 08:36:57 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GgSgl1dh3zZxt4;
-        Thu,  5 Aug 2021 20:33:07 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Thu, 5 Aug 2021 20:36:41 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 5 Aug
- 2021 20:36:41 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>, <bo.liu@linux.alibaba.com>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH] blk-iolatency: error out if blk_get_queue() failed in iolatency_set_limit()
-Date:   Thu, 5 Aug 2021 20:46:45 +0800
-Message-ID: <20210805124645.543797-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        id S240417AbhHEMiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Aug 2021 08:38:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44826 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240412AbhHEMiX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Aug 2021 08:38:23 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BAD2C061765;
+        Thu,  5 Aug 2021 05:38:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=e5vYlUPIOBxPGz/O2JkivhT5pBDV17FiEahr25m94xo=; b=VDNG8Tb6wClCKpztYtmaSD7NEq
+        SGQD7UcMobrslkmhg185QFnKUTpwyGPNwuGRrN9NXSDaOIycvUVH4S1GdYyGXDUQPFct5VRUnkOMY
+        WDClNDfDjIUSzKGZ46rT1uMOx2aGIjFHxepx+psS9IGpDuWXrCrAmKbLBvH/SeheEF6i2FSP5DXbd
+        XKSPmmIEZS4rukLqA6nkiMj28GoQ289Yemf7px5Qlp7JY5gVzI2U7rtl2dpLf/Jk15fkeZi8m52EX
+        RWshljiw5A2IVuCYg8uKdn4EvvoVAwDTWUlu3aIW/rroiwN2prJL3LZiqk6HywaVRmpu2BcMV3RoB
+        A7cNk2dA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mBccq-0070Ga-9X; Thu, 05 Aug 2021 12:37:36 +0000
+Date:   Thu, 5 Aug 2021 13:37:28 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     linux-fsdevel@vger.kernel.org, jlayton@kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        dchinner@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: Could it be made possible to offer "supplementary" data to a DIO
+ write ?
+Message-ID: <YQvbiCubotHz6cN7@casper.infradead.org>
+References: <1017390.1628158757@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1017390.1628158757@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If queue is dying while iolatency_set_limit() is in progress,
-blk_get_queue() won't increment the refcount of the queue. However,
-blk_put_queue() will still decrement the refcount later, which will
-cause the refcout to be unbalanced.
+On Thu, Aug 05, 2021 at 11:19:17AM +0100, David Howells wrote:
+> I'm working on network filesystem write helpers to go with the read helpers,
+> and I see situations where I want to write a few bytes to the cache, but have
+> more available that could be written also if it would allow the
+> filesystem/blockdev to optimise its layout.
+> 
+> Say, for example, I need to write a 3-byte change from a page, where that page
+> is part of a 256K sequence in the pagecache.  Currently, I have to round the
+> 3-bytes out to DIO size/alignment, but I could say to the API, for example,
+> "here's a 256K iterator - I need bytes 225-227 written, but you can write more
+> if you want to"?
 
-Thus error out in such case to fix the problem.
+I think you're optimising the wrong thing.  No actual storage lets you
+write three bytes.  You're just pushing the read/modify/write cycle to
+the remote end.  So you shouldn't even be tracking that three bytes have
+been dirtied; you should be working in multiples of i_blocksize().
 
-Fixes: 8c772a9bfc7c ("blk-iolatency: fix IO hang due to negative inflight counter")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-iolatency.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+I don't know of any storage which lets you ask "can I optimise this
+further for you by using a larger size".  Maybe we have some (software)
+compressed storage which could do a better job if given a whole 256kB
+block to recompress.
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 81be0096411d..d8b0d8bd132b 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -833,7 +833,11 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 
- 	enable = iolatency_set_min_lat_nsec(blkg, lat_val);
- 	if (enable) {
--		WARN_ON_ONCE(!blk_get_queue(blkg->q));
-+		if (!blk_get_queue(blkg->q)) {
-+			ret = -ENODEV;
-+			goto out;
-+		}
-+
- 		blkg_get(blkg);
- 	}
- 
--- 
-2.31.1
-
+So it feels like you're both tracking dirty data at too fine a
+granularity, and getting ahead of actual hardware capabilities by trying
+to introduce a too-flexible API.
