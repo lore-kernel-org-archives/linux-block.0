@@ -2,103 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97D5C4338F
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 15:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7B2C4338F
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 15:50:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCB4D61151
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 15:39:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41F9C60E78
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 15:50:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242203AbhHEPjU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Aug 2021 11:39:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27935 "EHLO
+        id S242400AbhHEPuY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Aug 2021 11:50:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36441 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242315AbhHEPjM (ORCPT
+        by vger.kernel.org with ESMTP id S242394AbhHEPuY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Aug 2021 11:39:12 -0400
+        Thu, 5 Aug 2021 11:50:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628177937;
+        s=mimecast20190719; t=1628178609;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=k3S29HjL3Vb9q9YH8bmWKld33b/KN/RqQKdhy40cdvM=;
-        b=AlcyC1+zNr3FjMU74IPVPVDeSGiTQijnPJ6x4SwwXF4XjD6p7d9rM5S3LMdKivC3G5/48z
-        6bfh+41Apnx4Z4JvNEs4yhH/D/QjIARvOuOTPaCO9nxUgt7KpbDPLGCRurSacQP0/heyTL
-        wf3lfHwnkfEBolGK8OshRl1rEbfSfOY=
+        bh=cBq22qCt0vTioV8uoJVFfE3aNxsV4C6kvXFGv17EYKo=;
+        b=DrBPEMUqNE7GNbOvI3wRYD/BRfn7+yBe0CUYVDOumUok1TfxaR1GjYVhxEMgqLF8XSOCVV
+        ViFJ5WcZjoOA7HibUrFVRHcmepDY3vuTSmPT7zf0h6C10KwblE8GWmW1p/TtmQJtR+REzs
+        KjobqhKJgOK8Ft8G0oDv9mvQoGb0fOo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-NJ6bkOBkNAebOHEifdG9_A-1; Thu, 05 Aug 2021 11:38:56 -0400
-X-MC-Unique: NJ6bkOBkNAebOHEifdG9_A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-371-FtQ83V1CPNGdAYXpQsBiyQ-1; Thu, 05 Aug 2021 11:50:08 -0400
+X-MC-Unique: FtQ83V1CPNGdAYXpQsBiyQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7ED0100CA8C;
-        Thu,  5 Aug 2021 15:38:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.22.32.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32A0460CA1;
-        Thu,  5 Aug 2021 15:38:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <YQv+iwmhhZJ+/ndc@casper.infradead.org>
-References: <YQv+iwmhhZJ+/ndc@casper.infradead.org> <YQvpDP/tdkG4MMGs@casper.infradead.org> <YQvbiCubotHz6cN7@casper.infradead.org> <1017390.1628158757@warthog.procyon.org.uk> <1170464.1628168823@warthog.procyon.org.uk> <1186271.1628174281@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-        jlayton@kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        dchinner@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Could it be made possible to offer "supplementary" data to a DIO write ?
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B35FD107BEF6;
+        Thu,  5 Aug 2021 15:50:06 +0000 (UTC)
+Received: from redhat.com (ovpn-112-138.phx2.redhat.com [10.3.112.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 01F755D9DE;
+        Thu,  5 Aug 2021 15:50:05 +0000 (UTC)
+Date:   Thu, 5 Aug 2021 10:50:04 -0500
+From:   Eric Blake <eblake@redhat.com>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: Re: [PATCH] nbd: call genl_unregister_family() first in nbd_cleanup()
+Message-ID: <20210805155004.6l4gxrniih6vxisr@redhat.com>
+References: <20210805021946.978686-1-houtao1@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1216853.1628177932.1@warthog.procyon.org.uk>
-Date:   Thu, 05 Aug 2021 16:38:52 +0100
-Message-ID: <1216854.1628177932@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210805021946.978686-1-houtao1@huawei.com>
+User-Agent: NeoMutt/20210205-687-0ed190
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+On Thu, Aug 05, 2021 at 10:19:46AM +0800, Hou Tao wrote:
+> Else there may be race between module removal and handling of
+> netlink command and will lead to oops as shown below:
 
-> > Note that PAGE_SIZE varies across arches and folios are going to
-> > exacerbate this.  What I don't want to happen is that you read from a
-> > file, it creates, say, a 4M (or larger) folio; you change three bytes and
-> > then you're forced to write back the entire 4M folio.
+Grammar suggestion:
+
+Otherwise, there is a race between module removal and the handling of
+a netlink command, which can lead to the oops shown below:
+
 > 
-> Actually, you do.  Two situations:
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> ---
+>  drivers/block/nbd.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> 1. Application uses MADVISE_HUGEPAGE.  In response, we create a 2MB
-> page and mmap it aligned.  We use a PMD sized TLB entry and then the
-> CPU dirties a few bytes with a store.  There's no sub-TLB-entry tracking
-> of dirtiness.  It's just the whole 2MB.
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 9a7c9a425ab0..0993d108d868 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -2492,6 +2492,12 @@ static void __exit nbd_cleanup(void)
+>  	struct nbd_device *nbd;
+>  	LIST_HEAD(del_list);
+>  
+> +	/*
+> +	 * Unregister netlink interface first to waiting
+> +	 * for the completion of netlink commands.
 
-That's a special case.  The app specifically asked for it.  I'll grant with
-mmap you have to mark a whole page as being dirty - but if you mmapped it, you
-need to understand that's what will happen.
+Grammar suggestion: s/first/prior/
 
-> 2. The bigger the folio, the more writes it will absorb before being
-> written back.  So when you're writing back that 4MB folio, you're not
-> just servicing this 3 byte write, you're servicing every other write
-> which hit this 4MB chunk of the file.
-
-You can argue it that way - but we already do it bytewise in some filesystems,
-so what you want would necessitate a change of behaviour.
-
-Note also that if the page size > max RPC payload size (1MB in NFS, I think),
-you have to make multiple write operations to fulfil that writeback; further,
-if you have an object-based system you might be making writes to multiple
-servers, some of which will not actually make a change, to make that
-writeback.
-
-I wonder if this needs pushing onto the various network filesystem mailing
-lists to find out what they want and why.
-
-David
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
