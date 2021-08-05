@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45025C4338F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 744FEC4320A
 	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 17:42:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2595A61104
+	by mail.kernel.org (Postfix) with ESMTP id 5D4116112F
 	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 17:42:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232460AbhHERmZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S231225AbhHERmZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 5 Aug 2021 13:42:25 -0400
-Received: from mail-pj1-f48.google.com ([209.85.216.48]:43612 "EHLO
-        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231225AbhHERmZ (ORCPT
+Received: from mail-pj1-f50.google.com ([209.85.216.50]:35835 "EHLO
+        mail-pj1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232441AbhHERmZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 5 Aug 2021 13:42:25 -0400
-Received: by mail-pj1-f48.google.com with SMTP id pj14-20020a17090b4f4eb029017786cf98f9so11348413pjb.2
-        for <linux-block@vger.kernel.org>; Thu, 05 Aug 2021 10:42:09 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id s22-20020a17090a1c16b0290177caeba067so16695405pjs.0
+        for <linux-block@vger.kernel.org>; Thu, 05 Aug 2021 10:42:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=CB7SvHbKMaUaPt3Ci5PlkFunOEsthh1lpDInkmwyLlA=;
-        b=sEg0uIxDULZXjZu9kjQ+yibJ/NkmWN+ax5Zw0E5pzdq8W4snD7QWwk4tEjllsVdTCa
-         OOt9p3q6F3UMLjG0HSy0aMy7CCYaonOLW33LUPPExODqmwWaZSFdmI4wn7OQptU0m/4D
-         +paUvgNkcfIKaH4HSqI2e0KwlHq2QakNtstJFpk/0QaKn4OmdvlX+8lGfjAMydZl9OZz
-         /kpYNWA+6MZWwThu4FPmINPj9t9Uxq8UoOfp7hADGmG5NJlrTIkwsp6o3gfWISLZkDZn
-         I0pDYFfhiw8MGrb9j7bCDQh9KZ1lzx0LLL3vQsCIoxjkzsFZPbVAQu9Lll8mp6wDOweE
-         bDUw==
-X-Gm-Message-State: AOAM532FoSgn8Kf6n5ABB7Lvx/cb8vIByWKrBmugwe+5rlgRxgQKrI5x
-        hscyEGSH8sRz47XkiNpd+aE=
-X-Google-Smtp-Source: ABdhPJy99OTKESnYKVhs1h8DOe/uEkPyfcmx7Y3DHSbJQfxPJ7mwv+3LOR9vkl84bkbq+50UgNtyvA==
-X-Received: by 2002:a17:902:7481:b029:12c:9cf8:bc5f with SMTP id h1-20020a1709027481b029012c9cf8bc5fmr4974202pll.52.1628185329499;
-        Thu, 05 Aug 2021 10:42:09 -0700 (PDT)
+        bh=lLWNU9TyS6kZiUYgcinRCx8/FTMFK+wMonF0fm+iApE=;
+        b=IsblKbWz/oZHIEX/84BbOcLrLJ4otC928Qq5RnltYv47cX4n4U4xq39Sf/YAeFL7i/
+         dT1cH4U26HWVYdCI4xiWQm4Tqrb/i2FCBs0wj9aWSB2rw7y2DbjhV5RbeMi9C4CnMS3O
+         cZEcPzW4imzAr1xR5F+aL5Pu0XdJ9+Oxkpcg8t+0zhUL3xndMwT7mjJo7Qjh/Ls/1vPv
+         N9tvgczBtJDpcfmQidqaQ5ooD90ltd9icIX/YEjchbxbzts+ymIxg8P+5MR7i2yOUS54
+         tWNOpEdmINDeIZdV1Ui7rKsy3KhrJSmC18xlSZaNnrwSdx/nD0yIYAufD0HeO/QvXYsp
+         2UpA==
+X-Gm-Message-State: AOAM533ewNElAykP9o8oJUQUgGYIzwJBYp8qR9DXVUq5Ddhbrw1ThMNN
+        JuMveUEBqEEhF9EyfUifCZw=
+X-Google-Smtp-Source: ABdhPJzZueCBzQ/9LX9afv7Ll0BXDmUDq+nUQyPBSGS8pq7fDml8RKfKxIHfUgs0cii14YxiCkByQQ==
+X-Received: by 2002:a63:5619:: with SMTP id k25mr288555pgb.92.1628185330880;
+        Thu, 05 Aug 2021 10:42:10 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:93c2:eaf5:530d:627d])
-        by smtp.gmail.com with ESMTPSA id m11sm10381834pjn.2.2021.08.05.10.42.08
+        by smtp.gmail.com with ESMTPSA id m11sm10381834pjn.2.2021.08.05.10.42.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Aug 2021 10:42:08 -0700 (PDT)
+        Thu, 05 Aug 2021 10:42:10 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -49,9 +49,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>,
         Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
         Martijn Coenen <maco@android.com>
-Subject: [PATCH v3 1/2] blk-mq: Introduce the BLK_MQ_F_NO_SCHED_BY_DEFAULT flag
-Date:   Thu,  5 Aug 2021 10:41:59 -0700
-Message-Id: <20210805174200.3250718-2-bvanassche@acm.org>
+Subject: [PATCH v3 2/2] loop: Select I/O scheduler 'none' from inside add_disk()
+Date:   Thu,  5 Aug 2021 10:42:00 -0700
+Message-Id: <20210805174200.3250718-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
 In-Reply-To: <20210805174200.3250718-1-bvanassche@acm.org>
 References: <20210805174200.3250718-1-bvanassche@acm.org>
@@ -61,15 +61,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-elevator_get_default() uses the following algorithm to select an I/O
-scheduler from inside add_disk():
-- In case of a single hardware queue or if sharing hardware queues across
-  multiple request queues (BLK_MQ_F_TAG_HCTX_SHARED), use mq-deadline.
-- Otherwise, use 'none'.
+We noticed that the user interface of Android devices becomes very slow
+under memory pressure. This is because Android uses the zram driver on top
+of the loop driver for swapping, because under memory pressure the swap
+code alternates reads and writes quickly, because mq-deadline is the
+default scheduler for loop devices and because mq-deadline delays writes by
+five seconds for such a workload with default settings. Fix this by making
+the kernel select I/O scheduler 'none' from inside add_disk() for loop
+devices. This default can be overridden at any time from user space,
+e.g. via a udev rule. This approach has an advantage compared to changing
+the I/O scheduler from userspace from 'mq-deadline' into 'none', namely
+that synchronize_rcu() does not get called.
 
-This is a good choice for most but not for all block drivers. Make it
-possible to override the selection of mq-deadline with a new flag,
-namely BLK_MQ_F_NO_SCHED_BY_DEFAULT.
+This patch changes the default I/O scheduler for loop devices from
+'mq-deadline' into 'none'.
+
+Additionally, this patch reduces the Android boot time on my test setup
+with 0.5 seconds compared to configuring the loop I/O scheduler from user
+space.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
@@ -78,39 +87,20 @@ Cc: Martijn Coenen <maco@android.com>
 Cc: Jaegeuk Kim <jaegeuk@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/elevator.c       | 3 +++
- include/linux/blk-mq.h | 6 ++++++
- 2 files changed, 9 insertions(+)
+ drivers/block/loop.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 52ada14cfe45..d0295e68f481 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -630,6 +630,9 @@ static inline bool elv_support_iosched(struct request_queue *q)
-  */
- static struct elevator_type *elevator_get_default(struct request_queue *q)
- {
-+	if (q->tag_set && q->tag_set->flags & BLK_MQ_F_NO_SCHED_BY_DEFAULT)
-+		return NULL;
-+
- 	if (q->nr_hw_queues != 1 &&
- 			!blk_mq_is_sbitmap_shared(q->tag_set->flags))
- 		return NULL;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 1d18447ebebc..22215db36122 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -404,7 +404,13 @@ enum {
- 	BLK_MQ_F_STACKING	= 1 << 2,
- 	BLK_MQ_F_TAG_HCTX_SHARED = 1 << 3,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
-+	/* Do not allow an I/O scheduler to be configured. */
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
-+	/*
-+	 * Select 'none' during queue registration in case of a single hwq
-+	 * or shared hwqs instead of 'mq-deadline'.
-+	 */
-+	BLK_MQ_F_NO_SCHED_BY_DEFAULT	= 1 << 7,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
- 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f8486d9b75a4..fa1c298a8cfb 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2333,7 +2333,8 @@ static int loop_add(int i)
+ 	lo->tag_set.queue_depth = 128;
+ 	lo->tag_set.numa_node = NUMA_NO_NODE;
+ 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
+-	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING;
++	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING |
++		BLK_MQ_F_NO_SCHED_BY_DEFAULT;
+ 	lo->tag_set.driver_data = lo;
  
+ 	err = blk_mq_alloc_tag_set(&lo->tag_set);
