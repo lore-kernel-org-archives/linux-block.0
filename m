@@ -2,94 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7B2C4338F
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 15:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 917A0C4320E
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 16:31:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41F9C60E78
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 15:50:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79B8860243
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 16:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242400AbhHEPuY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Aug 2021 11:50:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36441 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242394AbhHEPuY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Aug 2021 11:50:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628178609;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cBq22qCt0vTioV8uoJVFfE3aNxsV4C6kvXFGv17EYKo=;
-        b=DrBPEMUqNE7GNbOvI3wRYD/BRfn7+yBe0CUYVDOumUok1TfxaR1GjYVhxEMgqLF8XSOCVV
-        ViFJ5WcZjoOA7HibUrFVRHcmepDY3vuTSmPT7zf0h6C10KwblE8GWmW1p/TtmQJtR+REzs
-        KjobqhKJgOK8Ft8G0oDv9mvQoGb0fOo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-FtQ83V1CPNGdAYXpQsBiyQ-1; Thu, 05 Aug 2021 11:50:08 -0400
-X-MC-Unique: FtQ83V1CPNGdAYXpQsBiyQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B35FD107BEF6;
-        Thu,  5 Aug 2021 15:50:06 +0000 (UTC)
-Received: from redhat.com (ovpn-112-138.phx2.redhat.com [10.3.112.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 01F755D9DE;
-        Thu,  5 Aug 2021 15:50:05 +0000 (UTC)
-Date:   Thu, 5 Aug 2021 10:50:04 -0500
-From:   Eric Blake <eblake@redhat.com>
-To:     Hou Tao <houtao1@huawei.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: Re: [PATCH] nbd: call genl_unregister_family() first in nbd_cleanup()
-Message-ID: <20210805155004.6l4gxrniih6vxisr@redhat.com>
-References: <20210805021946.978686-1-houtao1@huawei.com>
+        id S235482AbhHEQb5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Aug 2021 12:31:57 -0400
+Received: from mail-pj1-f44.google.com ([209.85.216.44]:56138 "EHLO
+        mail-pj1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235024AbhHEQb0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Aug 2021 12:31:26 -0400
+Received: by mail-pj1-f44.google.com with SMTP id ca5so10130954pjb.5;
+        Thu, 05 Aug 2021 09:31:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hHUTsKDnxap0EiJI1vbHiNIpoH+R0H2TboThtqpCWSc=;
+        b=lhkCxai7p7X3kxlL+3aFu4AkkT/AuEAkn4qjbZ5qp7nA2Ve4sA9kaHiXjwKbegxXxl
+         bdDFiS35OADff4FyLBYrr+MIJOFxvC/z7uIma/WqUWN1gR75oE51jG8z+0DV9FY9iVtA
+         AhaUsltZUkl0UcQPG3YZUVQf2mtUqZ1BQQZOQ7AgxpNXQ2dIFZA+stbDCUHxi0jyB8r1
+         YtF5f/F0OSHgERAttAZpWuSdVMauY8O/qRqs0YXTBkaF6kSCTIebS9eQC6VAu2cNynsK
+         r1vGbFMBECcXVlYtH9t72lBoIqfxq2qqw/4YyJZMQR5E2j5SaGAHtoDExfDtYwSi/Pn/
+         7NIw==
+X-Gm-Message-State: AOAM532NVQvi01jv+RTHcRVQQEM2540eDDCJlxLSDDFCCq3csShDM8I/
+        3CXxi/n2nx1Fkt/eca0RHO8=
+X-Google-Smtp-Source: ABdhPJyCuisk5RzZy6da7AsZoR/DaZLZHn4oZn9ITXuwK2Rjv1pBKXahTV8aXSruiOZbF6hVQSA8vQ==
+X-Received: by 2002:a17:90a:9f91:: with SMTP id o17mr15924247pjp.29.1628181071870;
+        Thu, 05 Aug 2021 09:31:11 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:93c2:eaf5:530d:627d])
+        by smtp.gmail.com with ESMTPSA id r4sm6334361pjo.46.2021.08.05.09.31.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Aug 2021 09:31:10 -0700 (PDT)
+Subject: Re: [dm-devel] [PATCH 10/15] sd: use bvec_virt
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-nvme@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        Song Liu <song@kernel.org>, dm-devel@redhat.com,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Richard Weinberger <richard@nod.at>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        linux-um@lists.infradead.org, Coly Li <colyli@suse.de>,
+        linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Geoff Levand <geoff@infradead.org>,
+        Phillip Lougher <phillip@squashfs.org.uk>
+References: <20210804095634.460779-1-hch@lst.de>
+ <20210804095634.460779-11-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <8b487c0f-71be-19d6-249c-9cd1ba228548@acm.org>
+Date:   Thu, 5 Aug 2021 09:31:08 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210805021946.978686-1-houtao1@huawei.com>
-User-Agent: NeoMutt/20210205-687-0ed190
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20210804095634.460779-11-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 05, 2021 at 10:19:46AM +0800, Hou Tao wrote:
-> Else there may be race between module removal and handling of
-> netlink command and will lead to oops as shown below:
-
-Grammar suggestion:
-
-Otherwise, there is a race between module removal and the handling of
-a netlink command, which can lead to the oops shown below:
-
+On 8/4/21 2:56 AM, Christoph Hellwig wrote:
+> Use bvec_virt instead of open coding it.
 > 
-> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  drivers/block/nbd.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>   drivers/scsi/sd.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 9a7c9a425ab0..0993d108d868 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -2492,6 +2492,12 @@ static void __exit nbd_cleanup(void)
->  	struct nbd_device *nbd;
->  	LIST_HEAD(del_list);
->  
-> +	/*
-> +	 * Unregister netlink interface first to waiting
-> +	 * for the completion of netlink commands.
+> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> index b8d55af763f9..5b5b8266e142 100644
+> --- a/drivers/scsi/sd.c
+> +++ b/drivers/scsi/sd.c
+> @@ -886,7 +886,7 @@ static blk_status_t sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
+>   	cmd->cmnd[0] = UNMAP;
+>   	cmd->cmnd[8] = 24;
+>   
+> -	buf = page_address(rq->special_vec.bv_page);
+> +	buf = bvec_virt(&rq->special_vec);
+>   	put_unaligned_be16(6 + 16, &buf[0]);
+>   	put_unaligned_be16(16, &buf[2]);
+>   	put_unaligned_be64(lba, &buf[8]);
 
-Grammar suggestion: s/first/prior/
+The patch description is not correct. The above patch involves a 
+functional change while the patch description suggests that no 
+functionality has been changed.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Although the above patch looks fine to me, why has page_address() been 
+changed into bvec_virt() in the sd driver? My understanding is that the 
+sd driver always sets bv_offset to zero.
+
+Thanks,
+
+Bart.
+
 
