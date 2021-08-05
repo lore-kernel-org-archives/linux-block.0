@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-23.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A77C4320A
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 07:00:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E65C43216
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 07:00:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 168236056B
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 07:00:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8B5B60EC0
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 07:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236336AbhHEHAr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Aug 2021 03:00:47 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:48604 "EHLO
+        id S229869AbhHEHA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Aug 2021 03:00:59 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:48672 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229869AbhHEHAq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Aug 2021 03:00:46 -0400
+        with ESMTP id S237114AbhHEHA5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Aug 2021 03:00:57 -0400
 Received: by linux.microsoft.com (Postfix, from userid 1004)
-        id 1B3C320B36E8; Thu,  5 Aug 2021 00:00:33 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1B3C320B36E8
+        id 6F91220B36EA; Thu,  5 Aug 2021 00:00:43 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6F91220B36EA
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-        s=default; t=1628146833;
-        bh=8ZS3qjGMVs6QTqYWCjbIVHJG68fUEK73WxNFX/N/e88=;
+        s=default; t=1628146843;
+        bh=pVDKNE7XALWLMR+Ke+o37vD05yBTcZzAJDeQMeIV4wk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IL/3MfEA1NOR257CrrfTVGRpSUkPAFZRMwd3FYMIGU5S7MvIqSq9To7SsTALVeG31
-         uh4Vo/8UHV799RbMLhhw9j6SaHUnzazxG62fORkNyKIP7J6qLdWl3FdXQtk9rlDtnN
-         GontWuq906VewSAtOv7zQ84jT9BBYmMHgorLLHMc=
+        b=mKfn1L37/ll4HKUq1Ivk43olUAQ6fFVp0fybEWfcJNZv+6H7gxqMGlqdAcb3O4VfF
+         NBF8LgyVFhn5bpN7YPSI0bDZUTReaojO9jyG9qc2+A6S+LykpXG1TVs7IHvBbvDC66
+         VWUcVl1ZnLla+WK/oKQEb363oSnhtsokaBqGnLT8=
 From:   longli@linuxonhyperv.com
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-hyperv@vger.kernel.org
@@ -37,9 +37,9 @@ Cc:     Long Li <longli@microsoft.com>,
         Haiyang Zhang <haiyangz@microsoft.com>,
         Stephen Hemminger <sthemmin@microsoft.com>,
         Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>
-Subject: [Patch v5 1/3] Drivers: hv: vmbus: add support to ignore certain PCIE devices
-Date:   Thu,  5 Aug 2021 00:00:10 -0700
-Message-Id: <1628146812-29798-2-git-send-email-longli@linuxonhyperv.com>
+Subject: [Patch v5 3/3] Drivers: hv: Add to maintainer for Hyper-V/Azure drivers
+Date:   Thu,  5 Aug 2021 00:00:12 -0700
+Message-Id: <1628146812-29798-4-git-send-email-longli@linuxonhyperv.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1628146812-29798-1-git-send-email-longli@linuxonhyperv.com>
 References: <1628146812-29798-1-git-send-email-longli@linuxonhyperv.com>
@@ -49,11 +49,7 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Under certain configurations when Hyper-v presents a device to VMBUS, it
-may have a VMBUS channel and a PCIe channel. The PCIe channel is not used
-in Linux and does not have a backing PCIE device on Hyper-v. For such
-devices, ignore those PCIe channels so they are not getting probed by the
-PCI subsystem.
+Add longli@microsoft.com to maintainer list.
 
 Cc: K. Y. Srinivasan <kys@microsoft.com>
 Cc: Haiyang Zhang <haiyangz@microsoft.com>
@@ -62,105 +58,29 @@ Cc: Wei Liu <wei.liu@kernel.org>
 Cc: Dexuan Cui <decui@microsoft.com>
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- drivers/hv/channel_mgmt.c | 48 +++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 6 deletions(-)
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/hv/channel_mgmt.c b/drivers/hv/channel_mgmt.c
-index caf6d0c..705e95d 100644
---- a/drivers/hv/channel_mgmt.c
-+++ b/drivers/hv/channel_mgmt.c
-@@ -26,6 +26,21 @@
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9487061..bbf0629 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8440,6 +8440,7 @@ M:	Haiyang Zhang <haiyangz@microsoft.com>
+ M:	Stephen Hemminger <sthemmin@microsoft.com>
+ M:	Wei Liu <wei.liu@kernel.org>
+ M:	Dexuan Cui <decui@microsoft.com>
++M:	Long Li <longli@microsoft.com>
+ L:	linux-hyperv@vger.kernel.org
+ S:	Supported
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git
+@@ -8468,6 +8469,7 @@ F:	include/asm-generic/mshyperv.h
+ F:	include/clocksource/hyperv_timer.h
+ F:	include/linux/hyperv.h
+ F:	include/uapi/linux/hyperv.h
++F:	include/uapi/misc/hv_azure_blob.h
+ F:	net/vmw_vsock/hyperv_transport.c
+ F:	tools/hv/
  
- static void init_vp_index(struct vmbus_channel *channel);
- 
-+/*
-+ * For some VMBUS devices, Hyper-v also presents certain PCIE devices as
-+ * part of the host device implementation. Those devices have no real
-+ * PCI implementation in Hyper-V, and should be ignored and not presented
-+ * to the PCI layer.
-+ */
-+static const guid_t vpci_ignore_instances[] = {
-+	/*
-+	 * Azure Blob instance ID in VPCI
-+	 * {d4573da2-2caa-4711-a8f9-bbabf4ee9685}
-+	 */
-+	GUID_INIT(0xd4573da2, 0x2caa, 0x4711, 0xa8, 0xf9,
-+		  0xbb, 0xab, 0xf4, 0xee, 0x96, 0x85),
-+};
-+
- const struct vmbus_device vmbus_devs[] = {
- 	/* IDE */
- 	{ .dev_type = HV_IDE,
-@@ -187,20 +202,19 @@ static bool is_unsupported_vmbus_devs(const guid_t *guid)
- 	return false;
- }
- 
--static u16 hv_get_dev_type(const struct vmbus_channel *channel)
-+static u16 hv_get_dev_type(const guid_t *guid)
- {
--	const guid_t *guid = &channel->offermsg.offer.if_type;
- 	u16 i;
- 
--	if (is_hvsock_channel(channel) || is_unsupported_vmbus_devs(guid))
-+	if (is_unsupported_vmbus_devs(guid))
- 		return HV_UNKNOWN;
- 
- 	for (i = HV_IDE; i < HV_UNKNOWN; i++) {
- 		if (guid_equal(guid, &vmbus_devs[i].guid))
--			return i;
-+			return vmbus_devs[i].dev_type;
- 	}
- 	pr_info("Unknown GUID: %pUl\n", guid);
--	return i;
-+	return HV_UNKNOWN;
- }
- 
- /**
-@@ -487,6 +501,16 @@ void vmbus_free_channels(void)
- 	}
- }
- 
-+static bool ignore_pcie_device(guid_t *if_instance)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(vpci_ignore_instances); i++)
-+		if (guid_equal(&vpci_ignore_instances[i], if_instance))
-+			return true;
-+	return false;
-+}
-+
- /* Note: the function can run concurrently for primary/sub channels. */
- static void vmbus_add_channel_work(struct work_struct *work)
- {
-@@ -910,7 +934,11 @@ static void vmbus_setup_channel_state(struct vmbus_channel *channel,
- 	       sizeof(struct vmbus_channel_offer_channel));
- 	channel->monitor_grp = (u8)offer->monitorid / 32;
- 	channel->monitor_bit = (u8)offer->monitorid % 32;
--	channel->device_id = hv_get_dev_type(channel);
-+	if (is_hvsock_channel(channel))
-+		channel->device_id = HV_UNKNOWN;
-+	else
-+		channel->device_id =
-+			hv_get_dev_type(&channel->offermsg.offer.if_type);
- }
- 
- /*
-@@ -972,6 +1000,14 @@ static void vmbus_onoffer(struct vmbus_channel_message_header *hdr)
- 
- 	trace_vmbus_onoffer(offer);
- 
-+	/* Check to see if we should ignore this PCIe channel */
-+	if (hv_get_dev_type(&offer->offer.if_type) == HV_PCIE &&
-+	    ignore_pcie_device(&offer->offer.if_instance)) {
-+		pr_debug("Ignore instance %pUl over VPCI\n",
-+			 &offer->offer.if_instance);
-+		return;
-+	}
-+
- 	if (!vmbus_is_valid_device(&offer->offer.if_type)) {
- 		pr_err_ratelimited("Invalid offer %d from the host supporting isolation\n",
- 				   offer->child_relid);
 -- 
 1.8.3.1
 
