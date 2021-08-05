@@ -7,81 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15361C432BE
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 07:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8A3C4320A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 10:19:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE65060ED6
-	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 07:11:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8A1D61108
+	for <linux-block@archiver.kernel.org>; Thu,  5 Aug 2021 10:19:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235754AbhHEHLu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Aug 2021 03:11:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51436 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230037AbhHEHLu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Aug 2021 03:11:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1573C60F41;
-        Thu,  5 Aug 2021 07:11:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1628147495;
-        bh=O9a3HRs73pQwCyxWN42LGJZX4aJ9FyFEg8Z3U4/fTgA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZfpnjYf8skjAt9pwnu7FHoGa5dMwu/nYzyOjxpzFInxHKUbssI/eXFFe6e6oaYWgH
-         pLlf+qR5fT8ASoRhTjeohzR6aZjPHprE86aqSmmGG5NQpUfhKAEMYvz7CQHwguiaKQ
-         n+yhFChuHRf5QMQfpe7eyHLuK/hbgNTjjiGa5Q2o=
-Date:   Thu, 5 Aug 2021 09:11:33 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     longli@linuxonhyperv.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, Long Li <longli@microsoft.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Siddharth Gupta <sidgup@codeaurora.org>,
-        Hannes Reinecke <hare@suse.de>, linux-doc@vger.kernel.org
-Subject: Re: [Patch v5 2/3] Drivers: hv: add Azure Blob driver
-Message-ID: <YQuPJUX4+HZ3FeKC@kroah.com>
-References: <1628146812-29798-1-git-send-email-longli@linuxonhyperv.com>
- <1628146812-29798-3-git-send-email-longli@linuxonhyperv.com>
+        id S240034AbhHEKTh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Aug 2021 06:19:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32695 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240022AbhHEKTg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Aug 2021 06:19:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628158762;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=tPLv8/FqEnF6zrBT0uL4PeS5Q8+ujikNSGDD6GSwxto=;
+        b=R8MWfSf1FA2LrMvy2UElSusUxr+qyYtnKA/3VktqMVLESsHvXZ73GGkKEXGQvkIpCy4YkQ
+        ygTmvePsENrE1BqGOjuGXQZPoaeLJkwD5NyIrVmZXB4bYvbv7nhTSvQ+YG9KQf2ZG3YTyS
+        WnQfK7G1xlKSwly31y7necQDnZTId48=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-139-9SCv9aALMnql9atHZRlg2g-1; Thu, 05 Aug 2021 06:19:21 -0400
+X-MC-Unique: 9SCv9aALMnql9atHZRlg2g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 852AC87D541;
+        Thu,  5 Aug 2021 10:19:19 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.22.32.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E55B0100238C;
+        Thu,  5 Aug 2021 10:19:17 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     linux-fsdevel@vger.kernel.org
+cc:     dhowells@redhat.com, jlayton@kernel.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        dchinner@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Could it be made possible to offer "supplementary" data to a DIO write ?
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1628146812-29798-3-git-send-email-longli@linuxonhyperv.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1017389.1628158757.1@warthog.procyon.org.uk>
+Date:   Thu, 05 Aug 2021 11:19:17 +0100
+Message-ID: <1017390.1628158757@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 05, 2021 at 12:00:11AM -0700, longli@linuxonhyperv.com wrote:
-> +static int az_blob_create_device(struct az_blob_device *dev)
-> +{
-> +	int ret;
-> +	struct dentry *debugfs_root;
-> +
-> +	dev->misc.minor	= MISC_DYNAMIC_MINOR,
-> +	dev->misc.name	= "azure_blob",
-> +	dev->misc.fops	= &az_blob_client_fops,
-> +
-> +	ret = misc_register(&dev->misc);
-> +	if (ret)
-> +		return ret;
-> +
-> +	debugfs_root = debugfs_create_dir("az_blob", NULL);
+Hi,
 
-So you try to create a directory in the root of debugfs called "az_blob"
-for every device in the system of this one type?
+I'm working on network filesystem write helpers to go with the read helpers,
+and I see situations where I want to write a few bytes to the cache, but have
+more available that could be written also if it would allow the
+filesystem/blockdev to optimise its layout.
 
-That will blow up when you have multiple devices of the same type,
-please fix.
+Say, for example, I need to write a 3-byte change from a page, where that page
+is part of a 256K sequence in the pagecache.  Currently, I have to round the
+3-bytes out to DIO size/alignment, but I could say to the API, for example,
+"here's a 256K iterator - I need bytes 225-227 written, but you can write more
+if you want to"?
 
-thanks,
+Would it be useful/feasible to have some sort of interface that allows the
+offer to be made?
 
-greg k-h
+David
+
