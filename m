@@ -2,352 +2,180 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 719D2C4338F
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 02:35:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5EEC4320A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 02:38:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5478D61186
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 02:35:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3454611BF
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 02:38:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242611AbhHFCfk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Aug 2021 22:35:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37308 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242500AbhHFCfi (ORCPT
+        id S232513AbhHFCjL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Aug 2021 22:39:11 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:32792 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229938AbhHFCjK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Aug 2021 22:35:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628217322;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5WME09711Dv5+upqol+WO8Dd3fTJ9djKLCDjpxZslkw=;
-        b=ETBGEUe1TIvyn6zjZORT+ym0WMyam7p2eK59wFfXkBvPsTmz/7Jdo5ZcXOJGVIb8ZtnHLY
-        l3XrUuoIfvzcWel8iqaByHVO/Ud9LomPzY/GINOFqzhf2N+D1Ii93nNLoz5gDXM7jj9K5x
-        3LPm3dv0DNMzt9Afpi4fB/TUePRrI2o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-oJ5WXDR6NKmJxdXgLcNW9w-1; Thu, 05 Aug 2021 22:35:21 -0400
-X-MC-Unique: oJ5WXDR6NKmJxdXgLcNW9w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88F5C192CC49;
-        Fri,  6 Aug 2021 02:35:20 +0000 (UTC)
-Received: from localhost (ovpn-12-45.pek2.redhat.com [10.72.12.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3707B19811;
-        Fri,  6 Aug 2021 02:35:15 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 7/7] loop: don't add worker into idle list
-Date:   Fri,  6 Aug 2021 10:34:23 +0800
-Message-Id: <20210806023423.131060-8-ming.lei@redhat.com>
-In-Reply-To: <20210806023423.131060-1-ming.lei@redhat.com>
-References: <20210806023423.131060-1-ming.lei@redhat.com>
+        Thu, 5 Aug 2021 22:39:10 -0400
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1762bApn026555;
+        Fri, 6 Aug 2021 02:38:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2021-07-09;
+ bh=lxe5Cm1S+VrVoP/j7wgprFlGF9L+RuNFvgHNCf2F8ak=;
+ b=wpwO0+WEvpTCBoixBRc+LQmJ1oLquhwSkNIP2tV9qsY+LY8VD42JLmwFq8+jmSTQPqfa
+ lwyLRw5UqyaIuC8Hk0grvtUtgXsiBzLJCcZ6TkSwAMaaF1pbxFdv+Bh4gR27jCbB3nuO
+ OXXn6+GZrlj/kMgQInFmmgNWzNhc6mb7B+Ucyd7nGfAa6B2oyMSTcnsaFiW+43rhYOJC
+ 6ua12Xx4fu2f6mFyE3oDfBXjfa1bGYS/l6OKXmTH08dSZoNK9BEY64DsSxCjbqNPQQDE
+ 7F+RNFszXa3hvugMt3luN/GpqYJhcE+fQ0aBVTfMmM2mzlY8RbWIZI5h41/CDkeN7hTA TQ== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2020-01-29;
+ bh=lxe5Cm1S+VrVoP/j7wgprFlGF9L+RuNFvgHNCf2F8ak=;
+ b=P6PdS3dSXhNmUDYbi06NJtU1h8uYfq9/zuEt2in+Ppx5YKhkplt/kzsqvmDbNGxyKnUu
+ tr3qtMKUIm7+Cg1te8Ho7y/gGfpKnWnX9jD0OJqMxKX51oeof0vuwvc7CPzoAqfj9/Xw
+ nObE2PxzTCswyf5Qq22i55yX3lMMZEFNseI/idnXNFW4rUWjWB4vW+iwng/etV9YNJul
+ H0iSp0R44hG+u0cNtRgu5y+a3T/XS68Zkled4xAdU8nNqCSjDpndGdctE3p+1/nm9y1P
+ 6zCN6gJnZZOXPJVDekHIVSy7Oc0YCeCVQFCBB3OWzaPM6hbr9eTibvIJhG7d43AXvHku Qg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3a7hxpnj7e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Aug 2021 02:38:18 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1762ZfOX163593;
+        Fri, 6 Aug 2021 02:38:17 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2108.outbound.protection.outlook.com [104.47.58.108])
+        by userp3030.oracle.com with ESMTP id 3a4un4x32e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Aug 2021 02:38:17 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d45Wsz6J2Qp9srdC51J2vmTF5rw610I1vP/UJp5hPeWgUoCDX6pOFJnWsLhszXFWyIkXtOjfskPcOvtTzgU7qiGo9Di2tHimI22fH87ScRsSn358PRH9mo0wM5Lyo7lZf10PMwKtVR04ypyGmTMZu4cdwTtgFjGYRZJaWk4THR9c5iSLm5Thfd4/PghKpNT0GVl5SEHjZ0xM8cu3o9F1eznRsyg3y0zWsxRGBHZnEx0wu/tIYqfJefQCsJitigjm6bJI+eVVrpvJUhUba+k9yprm+mcJHznAvICi5RJsNBRrJZbRxqzDeHF86nmbbuXG7wVwI2wLpYFHIr8uVU0w1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lxe5Cm1S+VrVoP/j7wgprFlGF9L+RuNFvgHNCf2F8ak=;
+ b=PL2bFGSwnD9QXLRgCF1HdNhdQVjJE6DUBN0HsYt81jgVYCO1EHqdS8S32hSsiRxkxTw7vpRA4oYmBUqYNk+aN2xLAprJWlF1zeD7z5vRwo0UIxPTj1aBYH3Cu0wU6e5TeugEwH3woa1YWjnyxOCb3NF9CZQnV78Rb4sZUF0h6HABIlvQsx257oFjCzqEze3XQajrFGm4dsf069isuTbsPEcLSW6mh6vFBnsEbZYWHOPOL/9qUP9/jA0vlCMmVhF+yZHnB1KvdR5yYRaA2r97Oa6fu5zXJlcK9FKhrTnLQbWN2qPaBcLG8VNGNk/zO3wiz1lPKLhnt31x7PjrmAi6hA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lxe5Cm1S+VrVoP/j7wgprFlGF9L+RuNFvgHNCf2F8ak=;
+ b=lm9GlDjuuZd8Pa0Zvqnjlcw+EeFydkj1l7wt65kpVbUkqbw9yJeo98EnXPbjAacnONFmwnzZ+CDWpiH/DP13DBJDDgmIdxt3pAQKj/SHGPcuUOr6xKSeQX+7ZGmS97KI6Wnx2RpdizO4hK+zQVTzD+FlUGOVHi7niXnKfpPg93M=
+Authentication-Results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=oracle.com;
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by PH0PR10MB5547.namprd10.prod.outlook.com (2603:10b6:510:da::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.16; Fri, 6 Aug
+ 2021 02:38:15 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::153e:22d1:d177:d4f1]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::153e:22d1:d177:d4f1%8]) with mapi id 15.20.4373.026; Fri, 6 Aug 2021
+ 02:38:15 +0000
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Geoff Levand <geoff@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Song Liu <song@kernel.org>, Mike Snitzer <snitzer@redhat.com>,
+        Coly Li <colyli@suse.de>, Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-um@lists.infradead.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 01/15] bvec: add a bvec_virt helper
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1tuk3guwk.fsf@ca-mkp.ca.oracle.com>
+References: <20210804095634.460779-1-hch@lst.de>
+        <20210804095634.460779-2-hch@lst.de>
+Date:   Thu, 05 Aug 2021 22:38:11 -0400
+In-Reply-To: <20210804095634.460779-2-hch@lst.de> (Christoph Hellwig's message
+        of "Wed, 4 Aug 2021 11:56:20 +0200")
+Content-Type: text/plain
+X-ClientProxiedBy: SA9P223CA0025.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:806:26::30) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ca-mkp.ca.oracle.com (138.3.200.58) by SA9P223CA0025.NAMP223.PROD.OUTLOOK.COM (2603:10b6:806:26::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.16 via Frontend Transport; Fri, 6 Aug 2021 02:38:14 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 37bc1a19-ab81-480a-98f8-08d958833dd1
+X-MS-TrafficTypeDiagnostic: PH0PR10MB5547:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <PH0PR10MB554779D0BA37A158A6A51D278EF39@PH0PR10MB5547.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vEip2dgbKdqZ4Asg58kgknokPP0VL7s2MhAl/RcCcR3taRwndoxL7E712HIVgx9LdTrlNqQ0diDJszAe4rBXJk0aVwB4arw0ONCn5cC8IUL9sSK3UMCgZLnKV7lpO89eSju6eWWfvlJQEqK1lub3+ocK+KhN7n1FeZLZEUr/Jcml06d2lfKNyRuYie2qXchAtGxkZhaM3Oi14SiJEFPvo4x7wzO9tSPy2JWJ4buZKJzVDWs6k/UtiK4ZbNorEjE4noZAOk1OMRLJ+zfjo5YDXN3poq5pvQxuatHatDIDUCjIuU/B8F8712qa5z4b/W1TCyX8HP6DitEZqK4xOVUJPlbPduP4hcCTaQLOYSrt1f896Rj5NeitTldF/8Vf0KpemAdcgbbJc+zuiUHMkDpuVNPH0p1jqnVCy700lBRvG/zenHMOo8Y/ib7OAH18tWE+uzrMnDed1DQBDeOGAzCG6YtX5QQnCW6W2OLjQUjC+hagRWtuXZRIP2MCQf4IVU/O3a8AL6Eir5IPQ2n6tFbukGHagq3zIcXBS6AB9VAqCR3I9QG9gPILlANRxk6n72qdZlWr9fSHZ4u1CzIRT8N/5MfBcmQLhLXu9PfqFcxjgd4zqPPCkm9/ksZ9hBvEBaL4Fi9mamrnqQMjFrgduQP02LqQp0myyr5mWsUAHmHnJAk0ta8XMlLNoatxGvdoGcFhCZ1Zj3PBZrCUAwyyfV3Eeg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(376002)(39860400002)(396003)(136003)(346002)(186003)(55016002)(8936002)(2906002)(8676002)(7696005)(52116002)(36916002)(38350700002)(38100700002)(6916009)(478600001)(956004)(54906003)(66946007)(66556008)(5660300002)(6666004)(558084003)(316002)(26005)(7416002)(4326008)(66476007)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?HwqZ6hDDLzRzX+a0nli8YIlaVQoXWqp5xHzf2aqWrJ3KUDo/c3Z+0fVLgg7q?=
+ =?us-ascii?Q?7vHOTmdJPFqcfAu2fpD5jg51HVvw9a2CQOE4HPRPrzJqt9wFVr2Q7AfOON03?=
+ =?us-ascii?Q?YjK8VkpbCU3nrWFAxYqJMeeczHdsl95+tbc6lUjSfzJLsrRgqJ6S79QciLgN?=
+ =?us-ascii?Q?OKmg6/3qGpwmh3po3B3GPmKHSZkdTri7jadDwiOIZW8W2AKxx5bT1PbVJg9T?=
+ =?us-ascii?Q?CRXExyff6w4rG4/Q8s3aDOCD3yPqZZ/pHPwSA5BENGHOcAPCR8AaLtwVKZOM?=
+ =?us-ascii?Q?0HieGiehG3YEC8QboF86m+C6W3zMCK4zw7tUnsWAZVD6COzDyDQ8GPMU2rmu?=
+ =?us-ascii?Q?+4dCsq6TY85PRALRHUy0G4pq3f0+6+KK+Gf8AgbYBLGj2jedtz3yTrJ17V4K?=
+ =?us-ascii?Q?+xIyoun+VMyc8DU2RN7AE68VhGJIXo6a1Mc/qCCrKBYKNX37EO4kIziP11TJ?=
+ =?us-ascii?Q?K7YosFfZMrIrMeEgRsW6AH1+vVoAd71uZ4GLxjT15quVWtU+Dy8zXjlmlf5E?=
+ =?us-ascii?Q?+UUs6BwDodJIUdHzgLnxhwZAzfuQLc7VlmxVHz560DEgHMMsl18ES9YbmEHm?=
+ =?us-ascii?Q?uMBPFez7qUHTpb8vVktdVE8eIEMDD7fJoVamg6W7nZYu2WnD0nTKEgskawiP?=
+ =?us-ascii?Q?44VtjlUdvSRJxI0xkALX3mcwT7VNqoU9jH+sVI53gCNABV9G35ncG5JRGHYk?=
+ =?us-ascii?Q?LePs+GQjGe3Y0EgbXR74UEP+YbwvRr8qDg6luS7kmAhCWX9wTK+q0O9JFl8P?=
+ =?us-ascii?Q?g/bG5T6HvWy3Aw5YfS7R5bv2SgZkH75vYPxPJGEDxE/7QQeL9RkLuU+IZZKu?=
+ =?us-ascii?Q?Z3eGJcTwzmcg/ESN7zKy92HK7TMl2ywgAHPgo5QPEz0Xo9LAAxqlr8I8Kj/O?=
+ =?us-ascii?Q?EAZ1Y75kVbZKBSzurNCd1+dAsguu3XljvDtv5fsX0pEIMG0TRidcagMxozhr?=
+ =?us-ascii?Q?3LunAsi5D8FM90Zmi/v/WG0sY+vtR1d0ytcFSRUXW2JzgWjhdoFlMVi7Njak?=
+ =?us-ascii?Q?jEt5/8Dh1kcTdKsnklc5hjUx+kVQVLPNw7DayUcGCrHsH9CGGiCYBrZcAJeS?=
+ =?us-ascii?Q?3yMTOPfEI4+yStNsR0FzMDKggjC9DbLWxPpF8JF4kk25L6J9c/g5Hnu3PPCh?=
+ =?us-ascii?Q?P66okeQP5QxJJAam1nuti5Gi8YgGf/w+uj9BU2/2tLhzpAdTwe76fr/Bav5T?=
+ =?us-ascii?Q?OLRaUkPqAigRs0g93Hyc1laafVT+gxEOTSamnJIYBBe7Uqs8sO0ImoK9GqYA?=
+ =?us-ascii?Q?2UWltULOiOy71dumNVEd29A/nPXVs55U7EVadKMVwxx0V70I8iV2AK5cVE5r?=
+ =?us-ascii?Q?8mcQOfVqXytTFulDz3EDUjnj?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37bc1a19-ab81-480a-98f8-08d958833dd1
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2021 02:38:15.1817
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iOpJtuq92ls4/s19y3U0YyIwZnm7Sz8XctOTqylByalLubpc2b21MWjny/0ph5WA1NsDPw4JOHzXCamm5VUf2qTmj7M7hjw9NY8Excl2LRs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5547
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10067 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 malwarescore=0
+ suspectscore=0 mlxscore=0 adultscore=0 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108060013
+X-Proofpoint-GUID: wK_tIywM9icsTQkrrZ80TX8d8LC0f_PT
+X-Proofpoint-ORIG-GUID: wK_tIywM9icsTQkrrZ80TX8d8LC0f_PT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We can retrieve any workers via xarray, so not add it into idle list.
-Meantime reduce .lo_work_lock coverage, especially we don't need that
-in IO path except for adding/deleting worker into xarray.
 
-Also replace .last_ran_at with .reclaim_time, which is set when adding
-loop command into worker->cmd_list. Meantime reclaim the worker when
-the worker is expired and no any pending commands.
+Christoph,
 
-Acked-by: Dan Schatzberg <schatzberg.dan@gmail.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 172 ++++++++++++++++++++++++++-----------------
- 1 file changed, 104 insertions(+), 68 deletions(-)
+> Add a helper to get the virtual address for a bvec.  This avoids that
+> all callers need to know about the page + offset representation.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index fd07481058e5..ca91d143f1d9 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -973,10 +973,11 @@ static void loop_config_discard(struct loop_device *lo)
- struct loop_worker {
- 	struct work_struct work;
- 	struct list_head cmd_list;
--	struct list_head idle_list;
- 	struct loop_device *lo;
- 	struct cgroup_subsys_state *blkcg_css;
--	unsigned long last_ran_at;
-+	unsigned long reclaim_time;
-+	spinlock_t lock;
-+	refcount_t refcnt;
- };
- 
- static void loop_workfn(struct work_struct *work);
-@@ -1016,62 +1017,93 @@ static struct cgroup_subsys_state *loop_rq_get_memcg_css(
- 	return NULL;
- }
- 
--static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
-+static struct loop_worker *loop_alloc_or_get_worker(struct loop_device *lo,
-+		struct cgroup_subsys_state *blkcg_css)
- {
--	struct loop_worker *worker = NULL;
--	struct work_struct *work;
--	struct list_head *cmd_list;
--	struct cgroup_subsys_state *blkcg_css = loop_rq_blkcg_css(cmd);
- 	gfp_t gfp = GFP_NOWAIT | __GFP_NOWARN;
-+	struct loop_worker *worker = kzalloc(sizeof(*worker), gfp);
-+	struct loop_worker *worker_old;
- 
--	spin_lock(&lo->lo_work_lock);
--
--	if (queue_on_root_worker(blkcg_css))
--		goto queue_work;
--
--	/* css->id is unique in each cgroup subsystem */
--	worker = xa_load(&lo->workers, blkcg_css->id);
--	if (worker)
--		goto queue_work;
--
--	worker = kzalloc(sizeof(*worker), gfp);
--	/*
--	 * In the event we cannot allocate a worker, just queue on the
--	 * rootcg worker and issue the I/O as the rootcg
--	 */
- 	if (!worker)
--		goto queue_work;
-+		return NULL;
- 
- 	worker->blkcg_css = blkcg_css;
--	css_get(worker->blkcg_css);
- 	INIT_WORK(&worker->work, loop_workfn);
- 	INIT_LIST_HEAD(&worker->cmd_list);
--	INIT_LIST_HEAD(&worker->idle_list);
- 	worker->lo = lo;
-+	spin_lock_init(&worker->lock);
-+	refcount_set(&worker->refcnt, 2);	/* INIT + INC */
- 
--	if (xa_err(xa_store(&lo->workers, blkcg_css->id, worker, gfp))) {
-+	spin_lock(&lo->lo_work_lock);
-+	/* maybe someone is storing a new worker */
-+	worker_old = xa_load(&lo->workers, blkcg_css->id);
-+	if (!worker_old || !refcount_inc_not_zero(&worker_old->refcnt)) {
-+		if (xa_err(xa_store(&lo->workers, blkcg_css->id, worker, gfp))) {
-+			kfree(worker);
-+			worker = NULL;
-+		} else {
-+			if (!work_pending(&lo->idle_work.work))
-+				schedule_delayed_work(&lo->idle_work,
-+						LOOP_IDLE_WORKER_TIMEOUT);
-+			css_get(worker->blkcg_css);
-+		}
-+	} else {
- 		kfree(worker);
--		worker = NULL;
-+		worker = worker_old;
- 	}
-+	spin_unlock(&lo->lo_work_lock);
- 
--queue_work:
--	if (worker) {
-+	return worker;
-+}
-+
-+static void loop_release_worker(struct loop_worker *worker)
-+{
-+	css_put(worker->blkcg_css);
-+	kfree_rcu(worker);
-+}
-+
-+static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
-+{
-+	struct loop_worker *worker = NULL;
-+	struct work_struct *work;
-+	struct list_head *cmd_list;
-+	struct cgroup_subsys_state *blkcg_css = loop_rq_blkcg_css(cmd);
-+	spinlock_t	*lock;
-+
-+	if (!queue_on_root_worker(blkcg_css)) {
-+		int ret = 0;
-+
-+		rcu_read_lock();
-+		/* css->id is unique in each cgroup subsystem */
-+		worker = xa_load(&lo->workers, blkcg_css->id);
-+		if (worker)
-+			ret = refcount_inc_not_zero(&worker->refcnt);
-+		rcu_read_unlock();
-+
-+		if (!worker || !ret)
-+			worker = loop_alloc_or_get_worker(lo, blkcg_css);
- 		/*
--		 * We need to remove from the idle list here while
--		 * holding the lock so that the idle timer doesn't
--		 * free the worker
-+		 * In the event we cannot allocate a worker, just queue on the
-+		 * rootcg worker and issue the I/O as the rootcg
- 		 */
--		if (!list_empty(&worker->idle_list))
--			list_del_init(&worker->idle_list);
-+	}
-+
-+	if (worker) {
- 		work = &worker->work;
- 		cmd_list = &worker->cmd_list;
-+		lock = &worker->lock;
- 	} else {
- 		work = &lo->rootcg_work;
- 		cmd_list = &lo->rootcg_cmd_list;
-+		lock = &lo->lo_work_lock;
- 	}
-+
-+	spin_lock(lock);
- 	list_add_tail(&cmd->list_entry, cmd_list);
-+	if (worker)
-+		worker->reclaim_time = jiffies + LOOP_IDLE_WORKER_TIMEOUT;
-+	spin_unlock(lock);
- 	queue_work(lo->workqueue, work);
--	spin_unlock(&lo->lo_work_lock);
- }
- 
- static void loop_update_rotational(struct loop_device *lo)
-@@ -1193,28 +1225,38 @@ loop_set_status_from_info(struct loop_device *lo,
- 	return 0;
- }
- 
--static void loop_set_timer(struct loop_device *lo)
-+static bool loop_need_reclaim_worker(struct loop_worker *worker)
- {
--	schedule_delayed_work(&lo->idle_work, LOOP_IDLE_WORKER_TIMEOUT);
-+	bool reclaim;
-+
-+	spin_lock(&worker->lock);
-+	if (list_empty(&worker->cmd_list) &&
-+			time_is_before_jiffies(worker->reclaim_time))
-+		reclaim = true;
-+	else
-+		reclaim = false;
-+	spin_unlock(&worker->lock);
-+
-+	return reclaim;
- }
- 
- static void __loop_free_idle_workers(struct loop_device *lo, bool force)
- {
--	struct loop_worker *pos, *worker;
-+	struct loop_worker *worker;
-+	unsigned long id;
- 
- 	spin_lock(&lo->lo_work_lock);
--	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
--				idle_list) {
--		if (!force && time_is_after_jiffies(worker->last_ran_at +
--						LOOP_IDLE_WORKER_TIMEOUT))
--			break;
--		list_del(&worker->idle_list);
--		xa_erase(&lo->workers, worker->blkcg_css->id);
--		css_put(worker->blkcg_css);
--		kfree(worker);
-+	xa_for_each(&lo->workers, id, worker) {
-+		if (!force && !loop_need_reclaim_worker(worker))
-+			continue;
-+
-+		xa_erase(&worker->lo->workers, worker->blkcg_css->id);
-+		if (refcount_dec_and_test(&worker->refcnt))
-+			loop_release_worker(worker);
- 	}
--	if (!list_empty(&lo->idle_worker_list))
--		loop_set_timer(lo);
-+	if (!xa_empty(&lo->workers))
-+		schedule_delayed_work(&lo->idle_work,
-+				LOOP_IDLE_WORKER_TIMEOUT);
- 	spin_unlock(&lo->lo_work_lock);
- }
- 
-@@ -2226,42 +2268,36 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- }
- 
- static void loop_process_work(struct loop_worker *worker,
--			struct list_head *cmd_list, struct loop_device *lo)
-+			struct list_head *cmd_list, spinlock_t *lock)
- {
- 	int orig_flags = current->flags;
- 	struct loop_cmd *cmd;
- 	LIST_HEAD(list);
-+	int cnt = 0;
- 
- 	current->flags |= PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
- 
--	spin_lock(&lo->lo_work_lock);
-+	spin_lock(lock);
-  again:
- 	list_splice_init(cmd_list, &list);
--	spin_unlock(&lo->lo_work_lock);
-+	spin_unlock(lock);
- 
- 	while (!list_empty(&list)) {
- 		cmd = list_first_entry(&list, struct loop_cmd, list_entry);
- 		list_del_init(&cmd->list_entry);
- 
- 		loop_handle_cmd(cmd);
-+		cnt++;
- 	}
- 
--	spin_lock(&lo->lo_work_lock);
-+	spin_lock(lock);
- 	if (!list_empty(cmd_list))
- 		goto again;
--
--	/*
--	 * We only add to the idle list if there are no pending cmds
--	 * *and* the worker will not run again which ensures that it
--	 * is safe to free any worker on the idle list
--	 */
--	if (worker && !work_pending(&worker->work)) {
--		worker->last_ran_at = jiffies;
--		list_add_tail(&worker->idle_list, &lo->idle_worker_list);
--		loop_set_timer(lo);
--	}
--	spin_unlock(&lo->lo_work_lock);
-+	spin_unlock(lock);
- 	current->flags = orig_flags;
-+
-+	if (worker && refcount_sub_and_test(cnt, &worker->refcnt))
-+		loop_release_worker(worker);
- }
- 
- static void loop_workfn(struct work_struct *work)
-@@ -2276,11 +2312,11 @@ static void loop_workfn(struct work_struct *work)
- 	if (memcg_css) {
- 		old_memcg = set_active_memcg(
- 				mem_cgroup_from_css(memcg_css));
--		loop_process_work(worker, &worker->cmd_list, worker->lo);
-+		loop_process_work(worker, &worker->cmd_list, &worker->lock);
- 		set_active_memcg(old_memcg);
- 		css_put(memcg_css);
- 	} else {
--		loop_process_work(worker, &worker->cmd_list, worker->lo);
-+		loop_process_work(worker, &worker->cmd_list, &worker->lock);
- 	}
- 	kthread_associate_blkcg(NULL);
- }
-@@ -2289,7 +2325,7 @@ static void loop_rootcg_workfn(struct work_struct *work)
- {
- 	struct loop_device *lo =
- 		container_of(work, struct loop_device, rootcg_work);
--	loop_process_work(NULL, &lo->rootcg_cmd_list, lo);
-+	loop_process_work(NULL, &lo->rootcg_cmd_list, &lo->lo_work_lock);
- }
- 
- static const struct blk_mq_ops loop_mq_ops = {
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.31.1
-
+Martin K. Petersen	Oracle Linux Engineering
