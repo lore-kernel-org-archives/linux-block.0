@@ -2,124 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FC0C4338F
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 09:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F82DC4320A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 11:06:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 691DE61181
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 09:34:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2146A61184
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 11:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244520AbhHFJek (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 05:34:40 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:7798 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244184AbhHFJek (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 05:34:40 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Gh0ft1PWwzYlQk;
-        Fri,  6 Aug 2021 17:34:14 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 6 Aug 2021 17:34:22 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Fri, 6 Aug
- 2021 17:34:22 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH] nbd: hold tags->lock to prevent access freed request through blk_mq_tag_to_rq()
-Date:   Fri, 6 Aug 2021 17:44:58 +0800
-Message-ID: <20210806094458.2330093-1-yukuai3@huawei.com>
+        id S245241AbhHFLGT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 07:06:19 -0400
+Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:47986
+        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S245299AbhHFLGS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Aug 2021 07:06:18 -0400
+Received: from localhost (1.general.cking.uk.vpn [10.172.193.212])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 9FA603F109;
+        Fri,  6 Aug 2021 11:06:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1628247961;
+        bh=l6Crxr7OCP95ZsjBftxKKMqfoQ4lcuoG+yhpbemOXu0=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type;
+        b=oN0z2sFHSpBGlOta2FnY8Ao9EE9iL/YOWKCyNDeGYYEUhJ6mboXufR37rKoXie46e
+         bGlptR5u6SFgWmFqQ0OjHPdFD+RE6sH8BxMaeA76g+DaTsgnqkk5cEZkctoGneNWAw
+         jdLWxU2utggd6w3m2hIzw5Tsk5YAj5Z1QoVXDv2M0MfJfC+I5rr8NdiV0KUo0ZQzBS
+         exD5JhZQgi/Wsfp9beW6PUXQFR4n/fUFMpMa77pjV51FJpK2w6I26QZsIlbVHlDydk
+         /p7vDntJKfJ7qe4TOg9Q6MsLodm6QE1FXFvD46CzhElz3hfgEJCB6KrqkKs0IkCZDd
+         XxULMTABC5Cnw==
+From:   Colin King <colin.king@canonical.com>
+To:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] xen-blkfront: Remove redundant assignment to variable err
+Date:   Fri,  6 Aug 2021 12:06:01 +0100
+Message-Id: <20210806110601.11386-1-colin.king@canonical.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Our test reported a uaf problem:
+From: Colin Ian King <colin.king@canonical.com>
 
-Read of size 4 at addr ffff80036b790b54 by task kworker/u9:1/31105
+The variable err is being assigned a value that is never read, the
+assignment is redundant and can be removed.
 
-Workqueue: knbd0-recv recv_work
-Call trace:
- dump_backtrace+0x0/0x310 arch/arm64/kernel/time.c:78
- show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x144/0x1b4 lib/dump_stack.c:118
- print_address_description+0x68/0x2d0 mm/kasan/report.c:253
- kasan_report_error mm/kasan/report.c:351 [inline]
- kasan_report+0x134/0x2f0 mm/kasan/report.c:409
- check_memory_region_inline mm/kasan/kasan.c:260 [inline]
- __asan_load4+0x88/0xb0 mm/kasan/kasan.c:699
- __read_once_size include/linux/compiler.h:193 [inline]
- blk_mq_rq_state block/blk-mq.h:106 [inline]
- blk_mq_request_started+0x24/0x40 block/blk-mq.c:644
- nbd_read_stat drivers/block/nbd.c:670 [inline]
- recv_work+0x1bc/0x890 drivers/block/nbd.c:749
- process_one_work+0x3ec/0x9e0 kernel/workqueue.c:2147
- worker_thread+0x80/0x9d0 kernel/workqueue.c:2302
- kthread+0x1d8/0x1e0 kernel/kthread.c:255
- ret_from_fork+0x10/0x18 arch/arm64/kernel/entry.S:1174
-
-This is because tags->static_rq can be freed without clearing tags->rq,
-Ming Lei had fixed the problem while itering tags, howerver, the problem
-still exist in blk_mq_tag_to_rq().
-
-Thus fix the problem by holding tags->lock, so that tags->rq can be
-cleared before tags->static_rq is freed.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Addresses-Coverity: ("Unused value")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- drivers/block/nbd.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ drivers/block/xen-blkfront.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..a0784d0b89ac 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -712,12 +712,22 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	memcpy(&handle, reply.handle, sizeof(handle));
- 	tag = nbd_handle_to_tag(handle);
- 	hwq = blk_mq_unique_tag_to_hwq(tag);
--	if (hwq < nbd->tag_set.nr_hw_queues)
--		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
--				       blk_mq_unique_tag_to_tag(tag));
--	if (!req || !blk_mq_request_started(req)) {
--		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
--			tag, req);
-+	if (hwq < nbd->tag_set.nr_hw_queues) {
-+		unsigned long flags;
-+		struct blk_mq_tags *tags = nbd->tag_set.tags[hwq];
-+
-+		spin_lock_irqsave(&tags->lock, flags);
-+		req = blk_mq_tag_to_rq(tags, blk_mq_unique_tag_to_tag(tag));
-+		if (!blk_mq_request_started(req)) {
-+			dev_err(disk_to_dev(nbd->disk), "Request not started (%d) %p\n",
-+				tag, req);
-+			req = NULL;
-+		}
-+		spin_unlock_irqrestore(&tags->lock, flags);
-+	}
-+
-+	if (!req) {
-+		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d)\n", tag);
- 		return ERR_PTR(-ENOENT);
- 	}
- 	trace_nbd_header_received(req, handle);
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index d83fee21f6c5..715bfa8aca7f 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -1092,7 +1092,6 @@ static int xlvbd_alloc_gendisk(blkif_sector_t capacity,
+ 	err = xlbd_reserve_minors(minor, nr_minors);
+ 	if (err)
+ 		return err;
+-	err = -ENODEV;
+ 
+ 	memset(&info->tag_set, 0, sizeof(info->tag_set));
+ 	info->tag_set.ops = &blkfront_mq_ops;
 -- 
 2.31.1
 
