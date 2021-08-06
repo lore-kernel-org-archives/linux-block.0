@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E3BC4338F
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 06:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20D33C4338F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 06:39:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B58B0611C6
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 06:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02B6D611CA
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 06:39:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243376AbhHFGiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 02:38:19 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:52300 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbhHFGiO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 02:38:14 -0400
+        id S229756AbhHFGjp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 02:39:45 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:55232 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229625AbhHFGjo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 02:39:44 -0400
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 6B7F71FE9C;
-        Fri,  6 Aug 2021 06:37:58 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D7154220DC;
+        Fri,  6 Aug 2021 06:39:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1628231878; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+        t=1628231968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=11F7vf2VJ6T0TivdTVIFesJ86SixA4ATGqbIwq4iPoQ=;
-        b=eRW7dggE8AwdKRv1CuCXWzifyRM9OFr/UkLBW6lsOZ7T/xWkU9CSD6erVDLKOIFScOWyMd
-        QuVWjUUA7jG1NuI7XjIghexwEEVGfPrsylZqzC9HGp4KqXY0ddD+iwcrbdu1ttzaxSEdkZ
-        nXbPdab/f155C9hq28E5a4uEboQHbZA=
+        bh=cV0RA/Arj9e5UZlBlatsxjaXnCgVHR/k0A0IbcKoE5s=;
+        b=vQulwVbMfvbzZndkQLuSEyPzMd0nJJZxpwQsVnUE+RlZbTGhHPQZUu4RlSjtQfxIRTX87s
+        QOJG1ZahM9FxFjE9bksgm5zeXG4yIiN99epOxMPVjXlobcJogh4bD9tFeKx1CPPZcUx5EW
+        NAcSlzdC1LnkEtfaU6dj6Qi2AAGOXIE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1628231878;
+        s=susede2_ed25519; t=1628231968;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=11F7vf2VJ6T0TivdTVIFesJ86SixA4ATGqbIwq4iPoQ=;
-        b=YSX5NX/l5Tmh+4NUXGP6EZXvs4w+Nsq274PA+1KvG5F50BcXieP02pbk2tcE/uyNW6VKA3
-        ina7I8ILN5AD1JBg==
+        bh=cV0RA/Arj9e5UZlBlatsxjaXnCgVHR/k0A0IbcKoE5s=;
+        b=iqaMnbGiXV+xcE3ghgfFmGGZirrBiKqfN+VYhLeMN0spHkOQzmqSFyoZK+7JxqWx80CvfB
+        Gaw3lLi1NleSWaDg==
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 1F13D136D9;
-        Fri,  6 Aug 2021 06:37:58 +0000 (UTC)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 8B8DA136D9;
+        Fri,  6 Aug 2021 06:39:28 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap1.suse-dmz.suse.de with ESMTPSA
-        id YWiEBsbYDGGQBgAAGKfGzw
-        (envelope-from <hare@suse.de>); Fri, 06 Aug 2021 06:37:58 +0000
-Subject: Re: [PATCH v2 3/4] block: rename IOPRIO_BE_NR
+        id UKj+ICDZDGHTBgAAGKfGzw
+        (envelope-from <hare@suse.de>); Fri, 06 Aug 2021 06:39:28 +0000
+Subject: Re: [PATCH v2 4/4] block: fix default IO priority handling
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Paolo Valente <paolo.valente@linaro.org>,
         linux-f2fs-devel@lists.sourceforge.net,
         Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
 References: <20210806051140.301127-1-damien.lemoal@wdc.com>
- <20210806051140.301127-4-damien.lemoal@wdc.com>
+ <20210806051140.301127-5-damien.lemoal@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <d0bc418e-ddf7-6038-427a-2e9ad2f4ab87@suse.de>
-Date:   Fri, 6 Aug 2021 08:37:56 +0200
+Message-ID: <8304adbf-f7de-b8ae-3230-f19c8e51cace@suse.de>
+Date:   Fri, 6 Aug 2021 08:39:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210806051140.301127-4-damien.lemoal@wdc.com>
+In-Reply-To: <20210806051140.301127-5-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -76,150 +76,30 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/6/21 7:11 AM, Damien Le Moal wrote:
-> The BFQ scheduler and ioprio_check_cap() both assume that the RT
-> priority class (IOPRIO_CLASS_RT) can have up to 8 different priority
-> levels. This is controlled using the macro IOPRIO_BE_NR, which is badly
-> named as the number of levels applies to the RT class.
+> The default IO priority is the best effort (BE) class with the
+> normal priority level IOPRIO_NORM (4). However, get_task_ioprio()
+> returns IOPRIO_CLASS_NONE/IOPRIO_NORM as the default priority and
+> get_current_ioprio() returns IOPRIO_CLASS_NONE/0. Let's be consistent
+> with the defined default and have both of these functions return the
+> default priority IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_NORM) when
+> the user did not define another default IO priority for the task.
 > 
-> Rename IOPRIO_BE_NR to the class independent IOPRIO_NR_LEVELS to make
-> things clear.
+> In include/linux/ioprio.h, rename the IOPRIO_NORM macro to
+> IOPRIO_BE_NORM to clarify that this default level applies to the BE
+> priotity class. Also, define the macro IOPRIO_DEFAULT as
+> IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM) and use this new
+> macro when setting a priority to the default.
 > 
 > Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 > ---
->   block/bfq-iosched.c         | 8 ++++----
->   block/bfq-iosched.h         | 4 ++--
->   block/bfq-wf2q.c            | 6 +++---
->   block/ioprio.c              | 3 +--
->   fs/f2fs/sysfs.c             | 2 +-
->   include/uapi/linux/ioprio.h | 4 ++--
->   6 files changed, 13 insertions(+), 14 deletions(-)
+>   block/bfq-iosched.c          | 2 +-
+>   block/ioprio.c               | 6 +++---
+>   drivers/nvme/host/lightnvm.c | 2 +-
+>   include/linux/ioprio.h       | 7 ++++++-
+>   include/uapi/linux/ioprio.h  | 4 ++--
+>   5 files changed, 13 insertions(+), 8 deletions(-)
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 1f38d75524ae..d5824cab34d7 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -2505,7 +2505,7 @@ void bfq_end_wr_async_queues(struct bfq_data *bfqd,
->   	int i, j;
->   
->   	for (i = 0; i < 2; i++)
-> -		for (j = 0; j < IOPRIO_BE_NR; j++)
-> +		for (j = 0; j < IOPRIO_NR_LEVELS; j++)
->   			if (bfqg->async_bfqq[i][j])
->   				bfq_bfqq_end_wr(bfqg->async_bfqq[i][j]);
->   	if (bfqg->async_idle_bfqq)
-> @@ -5290,10 +5290,10 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
->   		break;
->   	}
->   
-> -	if (bfqq->new_ioprio >= IOPRIO_BE_NR) {
-> +	if (bfqq->new_ioprio >= IOPRIO_NR_LEVELS) {
->   		pr_crit("bfq_set_next_ioprio_data: new_ioprio %d\n",
->   			bfqq->new_ioprio);
-> -		bfqq->new_ioprio = IOPRIO_BE_NR - 1;
-> +		bfqq->new_ioprio = IOPRIO_NR_LEVELS - 1;
->   	}
->   
->   	bfqq->entity.new_weight = bfq_ioprio_to_weight(bfqq->new_ioprio);
-> @@ -6822,7 +6822,7 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
->   	int i, j;
->   
->   	for (i = 0; i < 2; i++)
-> -		for (j = 0; j < IOPRIO_BE_NR; j++)
-> +		for (j = 0; j < IOPRIO_NR_LEVELS; j++)
->   			__bfq_put_async_bfqq(bfqd, &bfqg->async_bfqq[i][j]);
->   
->   	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq);
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 99c2a3cb081e..385e28a843d1 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -931,7 +931,7 @@ struct bfq_group {
->   
->   	void *bfqd;
->   
-> -	struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
-> +	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
->   	struct bfq_queue *async_idle_bfqq;
->   
->   	struct bfq_entity *my_entity;
-> @@ -948,7 +948,7 @@ struct bfq_group {
->   	struct bfq_entity entity;
->   	struct bfq_sched_data sched_data;
->   
-> -	struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
-> +	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
->   	struct bfq_queue *async_idle_bfqq;
->   
->   	struct rb_root rq_pos_tree;
-> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> index 7a462df71f68..b74cc0da118e 100644
-> --- a/block/bfq-wf2q.c
-> +++ b/block/bfq-wf2q.c
-> @@ -505,7 +505,7 @@ static void bfq_active_insert(struct bfq_service_tree *st,
->    */
->   unsigned short bfq_ioprio_to_weight(int ioprio)
->   {
-> -	return (IOPRIO_BE_NR - ioprio) * BFQ_WEIGHT_CONVERSION_COEFF;
-> +	return (IOPRIO_NR_LEVELS - ioprio) * BFQ_WEIGHT_CONVERSION_COEFF;
->   }
->   
->   /**
-> @@ -514,12 +514,12 @@ unsigned short bfq_ioprio_to_weight(int ioprio)
->    *
->    * To preserve as much as possible the old only-ioprio user interface,
->    * 0 is used as an escape ioprio value for weights (numerically) equal or
-> - * larger than IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF.
-> + * larger than IOPRIO_NR_LEVELS * BFQ_WEIGHT_CONVERSION_COEFF.
->    */
->   static unsigned short bfq_weight_to_ioprio(int weight)
->   {
->   	return max_t(int, 0,
-> -		     IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF - weight);
-> +		     IOPRIO_NR_LEVELS * BFQ_WEIGHT_CONVERSION_COEFF - weight);
->   }
->   
->   static void bfq_get_entity(struct bfq_entity *entity)
-> diff --git a/block/ioprio.c b/block/ioprio.c
-> index bee628f9f1b2..ca6b136c5586 100644
-> --- a/block/ioprio.c
-> +++ b/block/ioprio.c
-> @@ -74,9 +74,8 @@ int ioprio_check_cap(int ioprio)
->   			fallthrough;
->   			/* rt has prio field too */
->   		case IOPRIO_CLASS_BE:
-> -			if (data >= IOPRIO_BE_NR || data < 0)
-> +			if (data >= IOPRIO_NR_LEVELS || data < 0)
->   				return -EINVAL;
-> -
->   			break;
->   		case IOPRIO_CLASS_IDLE:
->   			break;
-> diff --git a/fs/f2fs/sysfs.c b/fs/f2fs/sysfs.c
-> index 6642246206bd..daad532a4e2b 100644
-> --- a/fs/f2fs/sysfs.c
-> +++ b/fs/f2fs/sysfs.c
-> @@ -378,7 +378,7 @@ static ssize_t __sbi_store(struct f2fs_attr *a,
->   		ret = kstrtol(name, 10, &data);
->   		if (ret)
->   			return ret;
-> -		if (data >= IOPRIO_BE_NR || data < 0)
-> +		if (data >= IOPRIO_NR_LEVELS || data < 0)
->   			return -EINVAL;
->   
->   		cprc->ckpt_thread_ioprio = IOPRIO_PRIO_VALUE(class, data);
-> diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-> index abc40965aa96..b9d48744dacb 100644
-> --- a/include/uapi/linux/ioprio.h
-> +++ b/include/uapi/linux/ioprio.h
-> @@ -31,9 +31,9 @@ enum {
->   };
->   
->   /*
-> - * 8 best effort priority levels are supported
-> + * The RT an BE priority classes support up to 8 priority levels.
-
-This sentence no verb :-)
-(maybe 'The RT class is an BE priority ...'?)
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
 
