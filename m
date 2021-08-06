@@ -2,132 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF4AC4338F
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56FA3C4320A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:31:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C15D1611C3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:30:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32E46611C3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:31:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239292AbhHFOaU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 10:30:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58837 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239483AbhHFOaT (ORCPT
+        id S239770AbhHFOb7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 10:31:59 -0400
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:59312 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232085AbhHFOb6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Aug 2021 10:30:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628260202;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g02NNSi8BKXFu9HdVxcvonhWT7pRtGQw5k4dnx6xGH8=;
-        b=FGapoo/Ohv7RdQacsThHPyAfct4uzNiqBIUhBjvv+BTdFsxF5gmT8D8LX42E+79e7xNWLs
-        MTpJWFgP2inLxW0SQ5aIys61v4Y4Jd/etSv0SgCYX13dZ5lrNdINh4ho3RWSKCY0FC+FPu
-        XrXdvK5snQ0Bzz5qIybpCYu7srFkl4M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-r9AMVNqAPeescJAOslgJSA-1; Fri, 06 Aug 2021 10:30:01 -0400
-X-MC-Unique: r9AMVNqAPeescJAOslgJSA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 6 Aug 2021 10:31:58 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id D2F4F1281006;
+        Fri,  6 Aug 2021 07:31:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1628260302;
+        bh=fgmN48V906EE49Jbtzro8T5ElSxfgoQuL3j6K6G3/2w=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=MuZ8ld8RDF4lb4kCN5RuvmW+BunUfwTrYzPcoi91xTjk5ZPE/NDBWvoHu4llQzuU/
+         1c2ggOHWK1/JJJlxQdntOKobc+UJChKZ+QQ+ikHd1os2OsFDMSPdBSmtXnQT7qX16n
+         18799WjMWmfKI762vLMYCzHhs80x/13kCDkaa1Y0=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id SDwkYHd5iatn; Fri,  6 Aug 2021 07:31:42 -0700 (PDT)
+Received: from [IPv6:2601:600:8280:66d1::c447] (unknown [IPv6:2601:600:8280:66d1::c447])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B972FDF8A0;
-        Fri,  6 Aug 2021 14:29:59 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.40.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A72415D9D5;
-        Fri,  6 Aug 2021 14:29:48 +0000 (UTC)
-From:   pkalever@redhat.com
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        josef@toxicpanda.com, axboe@kernel.dk, idryomov@redhat.com,
-        xiubli@redhat.com,
-        Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-Subject: [PATCH v1 2/2] nbd: reset the queue/io_timeout to default on disconnect
-Date:   Fri,  6 Aug 2021 19:59:14 +0530
-Message-Id: <20210806142914.70556-3-pkalever@redhat.com>
-In-Reply-To: <20210806142914.70556-1-pkalever@redhat.com>
-References: <20210806142914.70556-1-pkalever@redhat.com>
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 530031281004;
+        Fri,  6 Aug 2021 07:31:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1628260302;
+        bh=fgmN48V906EE49Jbtzro8T5ElSxfgoQuL3j6K6G3/2w=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=MuZ8ld8RDF4lb4kCN5RuvmW+BunUfwTrYzPcoi91xTjk5ZPE/NDBWvoHu4llQzuU/
+         1c2ggOHWK1/JJJlxQdntOKobc+UJChKZ+QQ+ikHd1os2OsFDMSPdBSmtXnQT7qX16n
+         18799WjMWmfKI762vLMYCzHhs80x/13kCDkaa1Y0=
+Message-ID: <1dca71ad49be897f9544d0de59204e42a5b56a50.camel@HansenPartnership.com>
+Subject: Re: [PATCH v2 2/9] libata: fix ata_host_start()
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     Sathya Prakash <sathya.prakash@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>
+Date:   Fri, 06 Aug 2021 07:31:41 -0700
+In-Reply-To: <20210806074252.398482-3-damien.lemoal@wdc.com>
+References: <20210806074252.398482-1-damien.lemoal@wdc.com>
+         <20210806074252.398482-3-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+On Fri, 2021-08-06 at 16:42 +0900, Damien Le Moal wrote:
+> The loop on entry of ata_host_start() may not initialize host->ops to
+> a non NULL value. The test on the host_stop field of host->ops must
+> then be preceded by a check that host->ops is not NULL.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> ---
+>  drivers/ata/libata-core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+> index ea8b91297f12..fe49197caf99 100644
+> --- a/drivers/ata/libata-core.c
+> +++ b/drivers/ata/libata-core.c
+> @@ -5573,7 +5573,7 @@ int ata_host_start(struct ata_host *host)
+>  			have_stop = 1;
+>  	}
+>  
+> -	if (host->ops->host_stop)
+> +	if (host->ops && host->ops->host_stop)
 
-Without any changes to NBD_ATTR_TIMEOUT (default is 30 secs),
-$ rbd-nbd map rbd-pool/image0 --try-netlink
-/dev/nbd0
-$ cat /sys/block/nbd0/queue/io_timeout
-30000
-$ rbd-nbd unmap /dev/nbd0
-$ cat /sys/block/nbd0/queue/io_timeout
-30000
+since have_stop was already set by the port ops, surely this entire if
+is redundant?
 
-Now user sets NBD_ATTR_TIMEOUT to 60,
-$ rbd-nbd map rbd-pool/image0 --try-netlink --io-timeout 60
-/dev/nbd0
-$ cat /sys/block/nbd0/queue/io_timeout
-60000
-$ rbd-nbd unmap /dev/nbd0
-$ cat /sys/block/nbd0/queue/io_timeout
-60000
+James
 
-Now user doesn't alter NBD_ATTR_TIMEOUT, but sysfs still shows it as 60,
-$ rbd-nbd map rbd-pool/image0 --try-netlink
-/dev/nbd0
-$ cat /sys/block/nbd0/queue/io_timeout
-60000
-$ rbd-nbd unmap /dev/nbd0
-$ cat /sys/block/nbd0/queue/io_timeout
-60000
-
-The problem exists with ioctl interface too.
-
-Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
----
- drivers/block/nbd.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 16a1a14b1fd1..a45aabc4914b 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -158,6 +158,7 @@ static void nbd_connect_reply(struct genl_info *info, int index);
- static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info);
- static void nbd_dead_link_work(struct work_struct *work);
- static void nbd_disconnect_and_put(struct nbd_device *nbd);
-+static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout);
- 
- static inline struct device *nbd_to_dev(struct nbd_device *nbd)
- {
-@@ -1250,7 +1251,7 @@ static void nbd_config_put(struct nbd_device *nbd)
- 			destroy_workqueue(nbd->recv_workq);
- 		nbd->recv_workq = NULL;
- 
--		nbd->tag_set.timeout = 0;
-+		nbd_set_cmd_timeout(nbd, 0);
- 		nbd->disk->queue->limits.discard_granularity = 0;
- 		nbd->disk->queue->limits.discard_alignment = 0;
- 		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
-@@ -2124,6 +2125,10 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 	if (ret)
- 		goto out;
- 
-+	/*
-+	 * On reconfigure, if NBD_ATTR_TIMEOUT is not provided, we will
-+	 * continue to use the cmd timeout provided with connect initially.
-+	 */
- 	if (info->attrs[NBD_ATTR_TIMEOUT])
- 		nbd_set_cmd_timeout(nbd,
- 				    nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]));
--- 
-2.31.1
 
