@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7660EC4338F
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF4AC4338F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:30:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5641E611C9
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C15D1611C3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 14:30:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239309AbhHFOaG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 10:30:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43114 "EHLO
+        id S239292AbhHFOaU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 10:30:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58837 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231979AbhHFOaF (ORCPT
+        by vger.kernel.org with ESMTP id S239483AbhHFOaT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Aug 2021 10:30:05 -0400
+        Fri, 6 Aug 2021 10:30:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628260189;
+        s=mimecast20190719; t=1628260202;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gSnu/aP1K8BTE584PRmDJjSK8aJMHAFLzkH76oZhIvE=;
-        b=E3J4D6B6rMlVSj1cxAT+PTYQsIrEn4UujW9jXNbUh7ekQe0K/GZCQdvx5kiXpayBvzzq81
-        05c5InXgiKN3Zyua5UYWf8aOJLWvq6HBiri7sBsUMY8Yl5XmA3zSiI4cUOhNCKpEwYUpNi
-        cccfWUjoahEntO6Hlh1Vv5Sx2X4ieO4=
+        bh=g02NNSi8BKXFu9HdVxcvonhWT7pRtGQw5k4dnx6xGH8=;
+        b=FGapoo/Ohv7RdQacsThHPyAfct4uzNiqBIUhBjvv+BTdFsxF5gmT8D8LX42E+79e7xNWLs
+        MTpJWFgP2inLxW0SQ5aIys61v4Y4Jd/etSv0SgCYX13dZ5lrNdINh4ho3RWSKCY0FC+FPu
+        XrXdvK5snQ0Bzz5qIybpCYu7srFkl4M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-nqPHld96Ndqnq_rJmeQIow-1; Fri, 06 Aug 2021 10:29:48 -0400
-X-MC-Unique: nqPHld96Ndqnq_rJmeQIow-1
+ us-mta-135-r9AMVNqAPeescJAOslgJSA-1; Fri, 06 Aug 2021 10:30:01 -0400
+X-MC-Unique: r9AMVNqAPeescJAOslgJSA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8950A87D543;
-        Fri,  6 Aug 2021 14:29:46 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B972FDF8A0;
+        Fri,  6 Aug 2021 14:29:59 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.40.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 899DB5D9D5;
-        Fri,  6 Aug 2021 14:29:42 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A72415D9D5;
+        Fri,  6 Aug 2021 14:29:48 +0000 (UTC)
 From:   pkalever@redhat.com
 To:     linux-kernel@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         josef@toxicpanda.com, axboe@kernel.dk, idryomov@redhat.com,
         xiubli@redhat.com,
         Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-Subject: [PATCH v1 1/2] block: cleanup: define default command timeout and use it
-Date:   Fri,  6 Aug 2021 19:59:13 +0530
-Message-Id: <20210806142914.70556-2-pkalever@redhat.com>
+Subject: [PATCH v1 2/2] nbd: reset the queue/io_timeout to default on disconnect
+Date:   Fri,  6 Aug 2021 19:59:14 +0530
+Message-Id: <20210806142914.70556-3-pkalever@redhat.com>
 In-Reply-To: <20210806142914.70556-1-pkalever@redhat.com>
 References: <20210806142914.70556-1-pkalever@redhat.com>
 MIME-Version: 1.0
@@ -62,54 +62,72 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 
-defined BLK_DEFAULT_CMD_TIMEOUT and reuse it everywhere else.
+Without any changes to NBD_ATTR_TIMEOUT (default is 30 secs),
+$ rbd-nbd map rbd-pool/image0 --try-netlink
+/dev/nbd0
+$ cat /sys/block/nbd0/queue/io_timeout
+30000
+$ rbd-nbd unmap /dev/nbd0
+$ cat /sys/block/nbd0/queue/io_timeout
+30000
+
+Now user sets NBD_ATTR_TIMEOUT to 60,
+$ rbd-nbd map rbd-pool/image0 --try-netlink --io-timeout 60
+/dev/nbd0
+$ cat /sys/block/nbd0/queue/io_timeout
+60000
+$ rbd-nbd unmap /dev/nbd0
+$ cat /sys/block/nbd0/queue/io_timeout
+60000
+
+Now user doesn't alter NBD_ATTR_TIMEOUT, but sysfs still shows it as 60,
+$ rbd-nbd map rbd-pool/image0 --try-netlink
+/dev/nbd0
+$ cat /sys/block/nbd0/queue/io_timeout
+60000
+$ rbd-nbd unmap /dev/nbd0
+$ cat /sys/block/nbd0/queue/io_timeout
+60000
+
+The problem exists with ioctl interface too.
 
 Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 ---
- block/blk-mq.c         | 2 +-
- drivers/block/nbd.c    | 2 +-
- include/linux/blkdev.h | 2 ++
- 3 files changed, 4 insertions(+), 2 deletions(-)
+ drivers/block/nbd.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2c4ac51e54eb..1cba91eca6ee 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3289,7 +3289,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		goto err_hctxs;
- 
- 	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
--	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
-+	blk_queue_rq_timeout(q, set->timeout ? set->timeout : BLK_DEFAULT_CMD_TIMEOUT);
- 
- 	q->tag_set = set;
- 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..16a1a14b1fd1 100644
+index 16a1a14b1fd1..a45aabc4914b 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1376,7 +1376,7 @@ static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
- 	if (timeout)
- 		blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
- 	else
--		blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
-+		blk_queue_rq_timeout(nbd->disk->queue, BLK_DEFAULT_CMD_TIMEOUT);
- }
+@@ -158,6 +158,7 @@ static void nbd_connect_reply(struct genl_info *info, int index);
+ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info);
+ static void nbd_dead_link_work(struct work_struct *work);
+ static void nbd_disconnect_and_put(struct nbd_device *nbd);
++static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout);
  
- /* Must be called with config_lock held */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d3afea47ade6..e50a9a5356d3 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -378,6 +378,8 @@ static inline int blkdev_zone_mgmt_ioctl(struct block_device *bdev,
+ static inline struct device *nbd_to_dev(struct nbd_device *nbd)
+ {
+@@ -1250,7 +1251,7 @@ static void nbd_config_put(struct nbd_device *nbd)
+ 			destroy_workqueue(nbd->recv_workq);
+ 		nbd->recv_workq = NULL;
  
- #endif /* CONFIG_BLK_DEV_ZONED */
+-		nbd->tag_set.timeout = 0;
++		nbd_set_cmd_timeout(nbd, 0);
+ 		nbd->disk->queue->limits.discard_granularity = 0;
+ 		nbd->disk->queue->limits.discard_alignment = 0;
+ 		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
+@@ -2124,6 +2125,10 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
+ 	if (ret)
+ 		goto out;
  
-+#define BLK_DEFAULT_CMD_TIMEOUT	(30*HZ) /* 30 seconds */
-+
- struct request_queue {
- 	struct request		*last_merge;
- 	struct elevator_queue	*elevator;
++	/*
++	 * On reconfigure, if NBD_ATTR_TIMEOUT is not provided, we will
++	 * continue to use the cmd timeout provided with connect initially.
++	 */
+ 	if (info->attrs[NBD_ATTR_TIMEOUT])
+ 		nbd_set_cmd_timeout(nbd,
+ 				    nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]));
 -- 
 2.31.1
 
