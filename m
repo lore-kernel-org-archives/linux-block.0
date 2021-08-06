@@ -2,125 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 643D6C4320A
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 21:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F79C4338F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 22:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EF74610E7
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 21:45:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A72E761184
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 22:40:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244496AbhHFVpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 17:45:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43672 "EHLO
+        id S242906AbhHFWkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 18:40:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241587AbhHFVpn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 17:45:43 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC1CC0613CF;
-        Fri,  6 Aug 2021 14:45:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=3yo0Z1DqiPntRlxzgzVM4K1c9ilgCH5IdUhCZZNDe9s=; b=YEcpgCfI59SF9Tug3dbXK91OXX
-        sq9bPtmNl5qPktHwmAAihU+NGy4EI2Wu4qsPOh1YYDsBUr8cB8XertXL4GuKVn5dzjT+2S1FZ3ks2
-        ORtg4pVQ21049fLZZaN+E4/dG2qP3gkRUSMu6HVBgJTI1Z0dMoLe0I09+mcsDE/PnKAall2S/lIq0
-        4OTwMTLqvzUBf40IsuaIbSHTe4FUiD3OaquwRjBJ3LNndLJX1vzhAu32F2tb4kqIa7o0oif1GzujM
-        u/UJbjCcJ96IbwBmsdqgzM0qVc+m5TsYwt9kBS3BqP+RYOiQHBu6DkLVigbaVerIeFBT58rWnyT3O
-        csmQP7Bg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mC7ee-00DgiI-Nc; Fri, 06 Aug 2021 21:45:24 +0000
-Date:   Fri, 6 Aug 2021 14:45:24 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Lucas De Marchi <lucas.demarchi@intel.com>
-Cc:     linux-modules@vger.kernel.org, live-patching@vger.kernel.org,
-        fstests@vger.kernel.org, linux-block@vger.kernel.org, hare@suse.de,
-        dgilbert@interlog.com, jeyu@kernel.org, osandov@fb.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] libkmod-module: add support for a patient module removal
- option
-Message-ID: <YQ2tdCZ5YynHtuHB@bombadil.infradead.org>
-References: <20210803202417.462197-1-mcgrof@kernel.org>
- <YQrVY8Wxb026TDWN@bombadil.infradead.org>
- <20210804184720.z27u5aymcl5hzqgh@ldmartin-desk2>
+        with ESMTP id S231281AbhHFWky (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 18:40:54 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD40CC0613CF
+        for <linux-block@vger.kernel.org>; Fri,  6 Aug 2021 15:40:37 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id pj14-20020a17090b4f4eb029017786cf98f9so20103413pjb.2
+        for <linux-block@vger.kernel.org>; Fri, 06 Aug 2021 15:40:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=s+sQ4/NvUdoStCMijOHcxkxMFWFwwxM5neHhTqzEGfU=;
+        b=dlRajXvOMukeGX57J1cmiBjubcnvunM/PzUyO0exarysAoTRKy2bPquL1iTG9hMCnT
+         2m3WAD+nEJYBDcsnatIyzh+4KvjgMEKzhm+TpBBZ5K4M2W5RxDxoOo9lXwBby9L7zgD1
+         4lSn3ffrL2pOY+Ewq7Kwq7bsSP0/VYT6zR/pw9BmOKDsVDN6lNieLQc8Lo+MQalziy/A
+         65J5+JMIEk1x9yZRYagQsjfll0TjZqnT4S/BKAAaULNjbeRfHIt+plyHyEqi7Wkc0/Ve
+         94QzWONPrciQY8aIPqJGZfijxLpArt18/6RrvXwsTFF6E92LBywPAUMbc3BJShdqgvir
+         H8BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=s+sQ4/NvUdoStCMijOHcxkxMFWFwwxM5neHhTqzEGfU=;
+        b=oOSRhgYHJNaHkfleRZjo+L5B0kkgK0sZZkycqbO4U5g667YEuJ2jN1HAaKFDo4jvbs
+         cGUd2QgF4ZSH6z8oRKcDkfJlGhedGMjlVxKywFq75IZ1jIAtkW9lJgqefyVTB1fUaZMB
+         1KCsZCIjs3EK9B+ddYvlxV9VndYb6NgZUi6h6oBGqNoyownhPV870ymsug5i8gBrYiOr
+         +xkWRFlLcfRJUhGrPn98cXiHbcyE2AdmM10KE9T6Xj9vNdKSbcy/N1uhhUgkTQlqDwdq
+         Y+kUFv4Viw/4N2bS/gzT5E4Y9xznUMP1lBgC2BYGFY2g42bjVdsECaLrwqBwbCwoTqbd
+         xFuA==
+X-Gm-Message-State: AOAM533/q60pHk5sF0CPN3Y4HW3D5UHowJtJ3HHjYg+JSTR1ZwwNu/Ro
+        kR2slOI7LlH96wMuQPopldME4Gv6DyanvsU+
+X-Google-Smtp-Source: ABdhPJyXKmQgT9nnIo/hAYJidjITJP5fMi/AQ7X3XMaBOv7MgkI6J0Rlu95Irh4yhWSCTmLDEjsEag==
+X-Received: by 2002:a17:90a:9511:: with SMTP id t17mr23405021pjo.194.1628289637049;
+        Fri, 06 Aug 2021 15:40:37 -0700 (PDT)
+Received: from [192.168.1.116] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id p8sm11398551pfw.35.2021.08.06.15.40.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Aug 2021 15:40:36 -0700 (PDT)
+Subject: Re: [PATCH] kyber: make trace_block_rq call consistent with
+ documentation
+To:     Vincent Fu <vincent.fu@samsung.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <CGME20210804194924uscas1p2922dc9e7bb44fbfa10abe8157fdd43e1@uscas1p2.samsung.com>
+ <20210804194913.10497-1-vincent.fu@samsung.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d9229ef3-6751-407f-a013-c4a1671996f9@kernel.dk>
+Date:   Fri, 6 Aug 2021 16:40:35 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210804184720.z27u5aymcl5hzqgh@ldmartin-desk2>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20210804194913.10497-1-vincent.fu@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 04, 2021 at 11:47:20AM -0700, Lucas De Marchi wrote:
-> On Wed, Aug 04, 2021 at 10:58:59AM -0700, Luis Chamberlain wrote:
-> > On Tue, Aug 03, 2021 at 01:24:17PM -0700, Luis Chamberlain wrote:
-> > > + diff --git a/libkmod/libkmod-module.c b/libkmod/libkmod-module.c
-> > <-- snip -->
-> > > +		ERR(mod->ctx, "%s refcnt is %ld waiting for it to become 0\n", mod->name, refcnt);
-> > 
-> > OK after running many tests with this I think we need to just expand
-> > this so that the error message only applies when -v is passed to
-> > modprobe, otherwise we get the print message every time, and using
-> > INFO() doesn't cut it, given the next priority level available to
-> > the library is LOG_INFO (6) and when modprobe -v is passed we set the
-> > log level to LOG_NOTICE (5), so we need a new NOTICE(). I'll send a v2
-> > with that included as a separate patch.
-> 
-> Or maybe move the sleep to modprobe instead of doing it in the
-> library? 
+On 8/4/21 1:49 PM, Vincent Fu wrote:
+> The kyber ioscheduler calls trace_block_rq_insert() *after* the request
+> is added to the queue but the documentation for trace_block_rq_insert()
+> says that the call should be made *before* the request is added to the
+> queue.  Move the tracepoint for the kyber ioscheduler so that it is
+> consistent with the documentation.
 
-We have a few callers which need to impement the wait, and so having
-a library call is one way to share code. I realized this while first
-open coding this in each call site and realizing I was just
-re-inventing the wheel.
+Applied, thanks.
 
-> The sleep(1) seems like an arbitrary number to be introduced
-> in the lib.
+-- 
+Jens Axboe
 
-Indeed, the ideal thing here is to introduce then a timeout, and have
-a default setting, which code can override.
-
-> Since kernfs is pollable,
-> maybe we could rather introduce an API to
-> return the pid in which the application has to wait for
-
-The kernel does not have information to provide userspace any
-information for how long it should wait. I mean, in a test case I am
-using its an lvm pvremove and for some reason it seems the removal
-is asynchronously putting the module refcnt (even though I do not believe
-DM_DEFERRED_REMOVE is ever set by default), and I had fixed the kernel's
-own asynchronous removal of the request_queue a little while back so
-I don't think that's the issue either.
-
-If you mean to consider adding *more* information to the kernel, as
-a new feature, I'm afraid any PID triggering a bump in the refcnt is
-ephemeral, and so I don't think it would help. It would only be useful
-if userspace *knew* it would trigger a recnt bump, and that seems
-likely a promise we would probaby want to break any time. Unless we
-want to get into the business of granting userspace the ability to
-bump refcnt's with new structural information it promises is legit.
-Then userspace can query for this. However that still seems overkill,
-I can't see a need for it yet.
-
-> and then the
-> application can use whatever it wants to poll, including controlling a
-> timeout.
-
-A dynamic timeout seems sensible indeed.
-
-> I'm saying this because sleep(1) may be all fine for modprobe, but for
-> other applications using libkmod it may not play well with their mainloops
-> (and they may want to control both granularity of the sleep and a max
-> timeout).
-
-Indeed. A default timeout set into the context seem to be the way to go,
-which callers can override. Then modprobe -t <ms_wait> can use this caller to
-update the ctx timeout to a setting.
-
-I'll post a v2 with these changes.
-
-  Luis
