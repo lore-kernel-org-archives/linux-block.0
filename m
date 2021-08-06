@@ -2,125 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 863CCC43214
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 07:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C5BC4338F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 07:50:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68C9761050
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 07:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28F0E60F25
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 07:50:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241230AbhHFHn2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 03:43:28 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:24098 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237731AbhHFHnX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 03:43:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1628235788; x=1659771788;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ULrEcE5t9wkFqxwczLZAuZuz5T9Sl9Ovubu3sAYR6Qo=;
-  b=AStdzQb77kd6DzzqX1fmJas3iXXTl9vxD5IzcJGKJ4MW6Sp2ZoPLJf7/
-   aPzrxEgxhR7aPcEbRpUwMjglLQjcYMuYwncnzdwOedjval+Lrog5EG7OR
-   Thvdygtbg5vu69UysagBTInQPCQks0j0yYqyfvlLyGNHGsbfoqYYVQ0Y4
-   Cs2uM7iHC1Fdotug/dH2khY7JFjYCy4I6es7XFD8gzneN0iqBUqwSv3rc
-   IqKjfnU3M6zJzdL78unXZjUc3n5KP82KrdwfjZYyouIPJrESsUlw5IVJe
-   ZK3EEMm4X8LNZp3qsDjdWbqrkXe+PNbGM+UeSrJR2nExpVr7DFIoU87ry
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.84,300,1620662400"; 
-   d="scan'208";a="181296867"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Aug 2021 15:43:08 +0800
-IronPort-SDR: iDg/ZjlVTAlTXFbgu5gH5ojiZgDdKUx1cROTJLScU+x1YrzqAwrHrJU4KTgjBy4qrGJK82leQT
- 7SAEjjwJL6olJysnmGYFVfRohQpzFVgwe5fS8/vTOR1YNOUZlYTB0IDEh1fJz4sj9zfr1kTtUS
- vd6UIm/fpXJDg91iD3GZtF1031EwDFXXjlgqs5Wi8gc6FPyJxjFpFasPV/n6EUsiJ/JQEQuGvz
- ka50inCdw6ePMQNsJqRW2H3V6gTOitXVJPm44RQ2SV4wXjYmReNXx4DRrtOxOlBGr+WlCTikE9
- Jt3nz/LH/FN1guCdlA3mtYYI
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 00:20:36 -0700
-IronPort-SDR: 3xFDLSmLyEbguGAbwxLdRsxHRd+vIRs87r4PX86DjK8YEdyUtulZPc446c6tpts1UMeGDaBi4Z
- hJa8+Vi/5e2pWQmbVSB8lkPvcZI2ZxgEBg4RBdphGJGRPoya5DM2g7FlcnY80B66My+QxcnjDA
- Dg4AIKDcYpRCd4FcG/trQWb+5xJhhTPpXP83fZNj6px4L4bmNObRlyhWqdGHEfMtNrrx5x5RCw
- 7I7m9uMXaf7obqrbPgl4NWAUQpmyzxdiX/FVecb+wrgtxzBD/lVt5u5z2PMEShPjM0BRKcRwfH
- jqc=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 06 Aug 2021 00:43:07 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Sathya Prakash <sathya.prakash@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>
-Subject: [PATCH v2 9/9] scsi: mpt3sas: Introduce sas_ncq_prio_supported sysfs sttribute
-Date:   Fri,  6 Aug 2021 16:42:52 +0900
-Message-Id: <20210806074252.398482-10-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210806074252.398482-1-damien.lemoal@wdc.com>
-References: <20210806074252.398482-1-damien.lemoal@wdc.com>
+        id S243255AbhHFHu4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 03:50:56 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:8372 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243643AbhHFHuv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 03:50:51 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GgyGm6y92z84DY;
+        Fri,  6 Aug 2021 15:46:40 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 6 Aug 2021 15:50:32 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Fri, 6 Aug 2021 15:50:32 +0800
+Subject: Re: [PATCH V7 0/4] blk-mq: fix request UAF related with iterating
+ over tagset requests
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        "Bart Van Assche" <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>,
+        John Garry <john.garry@huawei.com>,
+        Christoph Hellwig <hch@lst.de>,
+        David Jeffery <djeffery@redhat.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20210511152236.763464-1-ming.lei@redhat.com>
+ <678fd2c5-587d-6abe-4348-067210d4adae@huawei.com> <YQy2x5RzwveW0ROR@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <3809c299-4f40-3614-c233-184d8a39e286@huawei.com>
+Date:   Fri, 6 Aug 2021 15:50:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YQy2x5RzwveW0ROR@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Similarly to AHCI, introduce the device sysfs attribute
-sas_ncq_prio_supported to advertize if a SATA device supports the NCQ
-priority feature. Without this new attribute, the user can only
-discover if a SATA device supports NCQ priority by trying to enable
-the feature use with the sas_ncq_prio_enable sysfs device attribute,
-which fails when the device does not support high priroity commands.
+On 2021/08/06 12:12, Ming Lei wrote:
+> On Fri, Aug 06, 2021 at 11:40:25AM +0800, yukuai (C) wrote:
+>> On 2021/05/11 23:22, Ming Lei wrote:
+>>> Hi Jens,
+>>>
+>>> This patchset fixes the request UAF issue by one simple approach,
+>>> without clearing ->rqs[] in fast path, please consider it for 5.13.
+>>>
+>>> 1) grab request's ref before calling ->fn in blk_mq_tagset_busy_iter,
+>>> and release it after calling ->fn, so ->fn won't be called for one
+>>> request if its queue is frozen, done in 2st patch
+>>>
+>>> 2) clearing any stale request referred in ->rqs[] before freeing the
+>>> request pool, one per-tags spinlock is added for protecting
+>>> grabbing request ref vs. clearing ->rqs[tag], so UAF by refcount_inc_not_zero
+>>> in bt_tags_iter() is avoided, done in 3rd patch.
+>>>
+>>> V7:
+>>> 	- fix one null-ptr-deref during updating nr_hw_queues, because
+>>> 	blk_mq_clear_flush_rq_mapping() may touch non-mapped hw queue's
+>>> 	tags, only patch 4/4 is modified, reported and verified by
+>>> 	Shinichiro Kawasaki
+>>> 	- run blktests and not see regression
+>>>
+>>> V6:
+>>> 	- hold spin lock when reading rq via ->rq[tag_bit], the issue is
+>>> 	  added in V5
+>>> 	- make blk_mq_find_and_get_req() more clean, as suggested by Bart
+>>> 	- not hold tags->lock when clearing ->rqs[] for avoiding to disable
+>>> 	interrupt a bit long, as suggested by Bart
+>>> 	- code style change, as suggested by Christoph
+>>>
+>>> V5:
+>>> 	- cover bt_iter() by same approach taken in bt_tags_iter(), and pass
+>>> 	John's invasive test
+>>> 	- add tested-by/reviewed-by tag
+>>>
+>>> V4:
+>>> 	- remove hctx->fq-flush_rq from tags->rqs[] before freeing hw queue,
+>>> 	patch 4/4 is added, which is based on David's patch.
+>>>
+>>> V3:
+>>> 	- drop patches for completing requests started in iterator ->fn,
+>>> 	  because blk-mq guarantees that valid request is passed to ->fn,
+>>> 	  and it is driver's responsibility for avoiding double completion.
+>>> 	  And drivers works well for not completing rq twice.
+>>> 	- add one patch for avoiding double accounting of flush rq
+>>>
+>>> V2:
+>>> 	- take Bart's suggestion to not add blk-mq helper for completing
+>>> 	  requests when it is being iterated
+>>> 	- don't grab rq->ref if the iterator is over static rqs because
+>>> 	the use case do require to iterate over all requests no matter if
+>>> 	the request is initialized or not
+>>>
+>>>
+>>> Ming Lei (4):
+>>>     block: avoid double io accounting for flush request
+>>>     blk-mq: grab rq->refcount before calling ->fn in
+>>>       blk_mq_tagset_busy_iter
+>>>     blk-mq: clear stale request in tags->rq[] before freeing one request
+>>>       pool
+>>>     blk-mq: clearing flush request reference in tags->rqs[]
+>>>
+>>>    block/blk-flush.c  |  3 +-
+>>>    block/blk-mq-tag.c | 49 ++++++++++++++++++------
+>>>    block/blk-mq-tag.h |  6 +++
+>>>    block/blk-mq.c     | 95 ++++++++++++++++++++++++++++++++++++++++------
+>>>    block/blk-mq.h     |  1 +
+>>>    5 files changed, 130 insertions(+), 24 deletions(-)
+>>>
+>>
+>> Hi, ming
+>>
+>> I see this patchset was applied to fix the problem while iterating over
+>> tagset, however blk_mq_tag_to_rq() is still untouched, and this
+>> interface might still return freed request.
+>>
+>> Any reason why this interface didn't use the same solution ?
+>> (hold tags->lock and return null if ref is 0)
+> 
+> It is driver's responsibility to cover race between normal completion
+> and timeout/error handing, so driver has the knowledge if one tag is valid
+> or not. In short, it is driver's responsibility to guarantee that valid 'tag'
+> is passed to blk_mq_tag_to_rq().
+> 
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/scsi/mpt3sas/mpt3sas_ctl.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Thanks for the explanation.
 
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_ctl.c b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-index b66140e4c370..f83d4d32d459 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_ctl.c
-@@ -3918,6 +3918,24 @@ sas_device_handle_show(struct device *dev, struct device_attribute *attr,
- }
- static DEVICE_ATTR_RO(sas_device_handle);
- 
-+/**
-+ * sas_ncq_prio_supported_show - Indicate if device supports NCQ priority
-+ * @dev: pointer to embedded device
-+ * @attr: sas_ncq_prio_supported attribute descriptor
-+ * @buf: the buffer returned
-+ *
-+ * A sysfs 'read-only' sdev attribute, only works with SATA
-+ */
-+static ssize_t
-+sas_ncq_prio_supported_show(struct device *dev,
-+			    struct device_attribute *attr, char *buf)
-+{
-+	struct scsi_device *sdev = to_scsi_device(dev);
-+
-+	return sysfs_emit(buf, "%d\n", scsih_ncq_prio_supp(sdev));
-+}
-+static DEVICE_ATTR_RO(sas_ncq_prio_supported);
-+
- /**
-  * sas_ncq_prio_enable_show - send prioritized io commands to device
-  * @dev: pointer to embedded device
-@@ -3960,6 +3978,7 @@ static DEVICE_ATTR_RW(sas_ncq_prio_enable);
- struct device_attribute *mpt3sas_dev_attrs[] = {
- 	&dev_attr_sas_address,
- 	&dev_attr_sas_device_handle,
-+	&dev_attr_sas_ncq_prio_supported,
- 	&dev_attr_sas_ncq_prio_enable,
- 	NULL,
- };
--- 
-2.31.1
-
+Best regards,
+Kuai
