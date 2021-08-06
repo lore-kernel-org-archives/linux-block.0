@@ -2,272 +2,209 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A14E4C4338F
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 11:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B14C4338F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 12:17:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B06360EBC
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 11:45:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDF8761131
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 12:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245674AbhHFLpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 07:45:38 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:34585 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240091AbhHFLpg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 07:45:36 -0400
-Received: by mail-io1-f71.google.com with SMTP id o8-20020a0566021248b029058d0f91164eso235919iou.1
-        for <linux-block@vger.kernel.org>; Fri, 06 Aug 2021 04:45:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=lrc6qWgXYunik/TwaWIoQx2OmfSbqXAPxMjan+uV4Iw=;
-        b=ZoZirgq1dCnZ8VXaH5vAV63r5Xv8PsjvWaBQ5jaXeMsSfBz529mlCyoGpUCG1zAMSo
-         GO70dw+mzPMc1dbzpCqEley51heHAuQf4GusDpaP3plcERgl2CvfVJL8euklQK5TmspU
-         uPsfgwJnHcUK81JgeHi6+7Iv1aKrWDMm+KTcKMStPlWUN/L3KXECElJ48Aj4HYz1koaR
-         1UvPDYpr7ixiAnKov1Lp6VT3VsbcH3tsje4Evz/7PZ6uCKwFIV9EKQDs5pauZwfl4mpS
-         xHHRw34mjgBprLkqCtZHN25gUEYq32Jb765BxYw+24Oqq0jI/U3UQW1VPv+BVxsxk6Ce
-         PgjQ==
-X-Gm-Message-State: AOAM531qDcbQZOZS4EJNgSTLZYkUHNvyMwwQRfnIshnV9/xQd5ne6MqQ
-        DYmHC0wJsD9xljt3TiXwr+Q/o0qegxprhj3Xpp4WaiBlIWdS
-X-Google-Smtp-Source: ABdhPJyuOe0RgoxnNedM+pKHLphrhtZ16KovLW8KEYPAKJLopDoWWFaOL5hNA2UoA3r6uMgwvpDAOL1F7K/6mTuAHV2jjwN0ovmF
+        id S243549AbhHFMSL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 08:18:11 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:20459 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243064AbhHFMSL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 08:18:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1628252275; x=1659788275;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=SJfdML0BSAQ0tVRPaucFqAXczI6I+ZlB7NK8GnOvlig=;
+  b=WL9U4uxc34rk4SI3foD3MBwFPzjurNTHtZn3/3ykBcbzlkDarWwwk5xA
+   87dLsh52cOLq276FOXww4LxlJFxvGNO/iK29xuk3uXA2+WsqQcd3bvwrl
+   VGhSp0eJP7Ig8ORMZiTTpwYnPeVuYKJqRjCsMgEvRvbtbdHrtZdAvZrYv
+   3oFYcHcz54cnjS6nFDUONOA85D2FXJ4+yZXkP7iHFBxF3yAoVfHI/l3u2
+   KupePOEKNag3x1ZLSjmLsHdeJU7Dsj+9XFY6turvvo72aQ7Cg29QaKdxV
+   TFQHd52KY9q0uqAIF3zUoKPa1Qpl8izWWH5TFCw6YOOGmJG9gWWJ6OnsJ
+   g==;
+X-IronPort-AV: E=Sophos;i="5.84,300,1620662400"; 
+   d="scan'208";a="288062035"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Aug 2021 20:17:55 +0800
+IronPort-SDR: vJqcGgolsUDVF/BX+6YkkUadAvyRhLoYfuwL9q1AvRkAB3+MuveBQrm+pcQnbUZK6kGy+uWqB9
+ Cu2fDBj0cpu7D4qJOI4L0bb5BCjJuWlQ4ta9zo+KXnt/I93te9wJWEfdumVWTiFFVWDZZXnSYc
+ D6wzma6/bqdUo4eceFqBRxJ1U26oowpwzGmHhiT4jJcFF91+CajSPdkFJGhBEcp3xhuZYTfujw
+ 6e1USkokZbpUTsvm2IKxayADo3RNz4Ju2n2+EjNBbHGy5NAoTYZOuYeIaBr0kQrkrvfDLHhKjN
+ kyjguZ2xb6XisNilLLqAUTzk
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 04:53:31 -0700
+IronPort-SDR: 0cretE/PJmR4cQbT2tLe2olMoSDvv+uYKUP/y+yZhSWbYmxs0sBVKkSMHfdPklYTtgOobHdQDB
+ PWyfnVjf95gne9Jj+6nwkDZ02SR/Jakz0SxuZt9kQimrCeZudKMluYdS4u2jg9vSphzwdnc1U5
+ 9fq5Egd51QGrsbK7CVDnI2VAqKsb6v+v8Q5Bsne+FJDRBB55Ht59aFhl3D3bhgTM+10rvq2GFv
+ WU60ftIMb6newb51PpUG7EGflmbqSC+VYwt3Yxqa7/0Z6XtdaqMOfFB4ixukbmpvayGMkMCXMU
+ PO8=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 05:17:56 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Gh4Hk6q2Tz1RvlM
+        for <linux-block@vger.kernel.org>; Fri,  6 Aug 2021 05:17:54 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-language
+        :content-type:in-reply-to:mime-version:user-agent:date
+        :message-id:organization:from:references:to:subject; s=dkim; t=
+        1628252274; x=1630844275; bh=SJfdML0BSAQ0tVRPaucFqAXczI6I+ZlB7NK
+        8GnOvlig=; b=jlPhfYWBudjLi6/l7MPWFTMsZvqJ8IbMfrpzuUgW9QyzB+50nGK
+        8s/RxCZ6jJyd23W+QsM4CDHUxCtytNM88S9KHfiFEO7clrHV4xt5rV3iSH5QIonE
+        hQntIUzeUoKgGZU4ELpBa4YrDMT+pP7124m6Md4IMeauH1h8Up7g7UFZfe5fv5kB
+        Zudouhw0f4Cbr5Z/jdgmsfXkmqZ3mG0by5Q5G44+h38b82kFWJTKXNxxJdcCAXrq
+        hKrT6vbqw1OdxboH+r+8kvklyhli3QLNgMrja02nHSmJ0vIkxjyr0kkeH+qNkWN/
+        1k5x8bvnunMXA51KCsbXM72Rd+nFYhtTJ+g==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 9F6PntQRZtCs for <linux-block@vger.kernel.org>;
+        Fri,  6 Aug 2021 05:17:54 -0700 (PDT)
+Received: from [10.225.48.54] (unknown [10.225.48.54])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Gh4Hh4l9Yz1RvlC;
+        Fri,  6 Aug 2021 05:17:52 -0700 (PDT)
+Subject: Re: [PATCH v3 8/9] libahci: Introduce ncq_prio_supported sysfs
+ sttribute
+To:     Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     Sathya Prakash <sathya.prakash@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>
+References: <20210806111145.445697-1-damien.lemoal@wdc.com>
+ <20210806111145.445697-9-damien.lemoal@wdc.com>
+ <9ba3574f-3b46-d80e-1ff9-29a7af27cc22@suse.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital
+Message-ID: <d25a6af0-abfd-afc3-7ae6-63349b964656@opensource.wdc.com>
+Date:   Fri, 6 Aug 2021 21:17:50 +0900
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-X-Received: by 2002:a5e:c006:: with SMTP id u6mr185293iol.66.1628250321206;
- Fri, 06 Aug 2021 04:45:21 -0700 (PDT)
-Date:   Fri, 06 Aug 2021 04:45:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000000410c05c8e29289@google.com>
-Subject: [syzbot] KASAN: invalid-free in bdev_free_inode (2)
-From:   syzbot <syzbot+5fa698422954b6b9307b@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <9ba3574f-3b46-d80e-1ff9-29a7af27cc22@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 2021/08/06 20:37, Hannes Reinecke wrote:
+> On 8/6/21 1:11 PM, Damien Le Moal wrote:
+>> Currently, the only way a user can determine if a SATA device supports
+>> NCQ priority is to try to enable the use of this feature using the
+>> ncq_prio_enable sysfs device attribute. If enabling the feature fails,
+>> it is because the device does not support NCQ priority. Otherwise, the
+>> feature is enabled and indicates that the device supports NCQ priority.
+>>
+>> Improve this odd interface by introducing the read-only
+>> ncq_prio_supported sysfs device attribute to indicate if a SATA device
+>> supports NCQ priority. The value of this attribute reflects if the
+>> device flag ATA_DFLAG_NCQ_PRIO is set or cleared.
+>>
+>> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+>> ---
+>>  drivers/ata/libahci.c     |  1 +
+>>  drivers/ata/libata-sata.c | 24 ++++++++++++++++++++++++
+>>  include/linux/libata.h    |  1 +
+>>  3 files changed, 26 insertions(+)
+>>
+>> diff --git a/drivers/ata/libahci.c b/drivers/ata/libahci.c
+>> index fec2e9754aed..5b3fa2cbe722 100644
+>> --- a/drivers/ata/libahci.c
+>> +++ b/drivers/ata/libahci.c
+>> @@ -125,6 +125,7 @@ EXPORT_SYMBOL_GPL(ahci_shost_attrs);
+>>  struct device_attribute *ahci_sdev_attrs[] = {
+>>  	&dev_attr_sw_activity,
+>>  	&dev_attr_unload_heads,
+>> +	&dev_attr_ncq_prio_supported,
+>>  	&dev_attr_ncq_prio_enable,
+>>  	NULL
+>>  };
+>> diff --git a/drivers/ata/libata-sata.c b/drivers/ata/libata-sata.c
+>> index dc397ebda089..5566fd4bb38f 100644
+>> --- a/drivers/ata/libata-sata.c
+>> +++ b/drivers/ata/libata-sata.c
+>> @@ -834,6 +834,30 @@ DEVICE_ATTR(link_power_management_policy, S_IRUGO | S_IWUSR,
+>>  	    ata_scsi_lpm_show, ata_scsi_lpm_store);
+>>  EXPORT_SYMBOL_GPL(dev_attr_link_power_management_policy);
+>>  
+>> +static ssize_t ata_ncq_prio_supported_show(struct device *device,
+>> +					   struct device_attribute *attr,
+>> +					   char *buf)
+>> +{
+>> +	struct scsi_device *sdev = to_scsi_device(device);
+>> +	struct ata_port *ap = ata_shost_to_port(sdev->host);
+>> +	struct ata_device *dev;
+>> +	bool ncq_prio_supported;
+>> +	int rc = 0;
+>> +
+>> +	spin_lock_irq(ap->lock);
+>> +	dev = ata_scsi_find_dev(ap, sdev);
+>> +	if (!dev)
+>> +		rc = -ENODEV;
+>> +	else
+>> +		ncq_prio_supported = dev->flags & ATA_DFLAG_NCQ_PRIO;
+>> +	spin_unlock_irq(ap->lock);
+>> +
+>> +	return rc ? rc : sysfs_emit(buf, "%u\n", ncq_prio_supported);
+>> +}
+>> +
+>> +DEVICE_ATTR(ncq_prio_supported, S_IRUGO, ata_ncq_prio_supported_show, NULL);
+>> +EXPORT_SYMBOL_GPL(dev_attr_ncq_prio_supported);
+>> +
+>>  static ssize_t ata_ncq_prio_enable_show(struct device *device,
+>>  					struct device_attribute *attr,
+>>  					char *buf)
+>> diff --git a/include/linux/libata.h b/include/linux/libata.h
+>> index b23f28cfc8e0..a2d1bae7900b 100644
+>> --- a/include/linux/libata.h
+>> +++ b/include/linux/libata.h
+>> @@ -539,6 +539,7 @@ typedef void (*ata_postreset_fn_t)(struct ata_link *link, unsigned int *classes)
+>>  extern struct device_attribute dev_attr_unload_heads;
+>>  #ifdef CONFIG_SATA_HOST
+>>  extern struct device_attribute dev_attr_link_power_management_policy;
+>> +extern struct device_attribute dev_attr_ncq_prio_supported;
+>>  extern struct device_attribute dev_attr_ncq_prio_enable;
+>>  extern struct device_attribute dev_attr_em_message_type;
+>>  extern struct device_attribute dev_attr_em_message;
+>>
+> Alternative would have been to make the 'ncq_prio_enable' attribute
+> visible only when NCQ prio is supported, but not sure if that works out.
 
-syzbot found the following issue on:
+Indeed. But from the start (4.10) ncq_prio_enable is always shown, even for
+devices that do not support NCQ prio. I am not sure if changing that is
+acceptable as this is a user IF.
 
-HEAD commit:    c500bee1c5b2 Linux 5.14-rc4
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1415477a300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=343fd21f6f4da2d6
-dashboard link: https://syzkaller.appspot.com/bug?extid=5fa698422954b6b9307b
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5fa698422954b6b9307b@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: double-free or invalid-free in slab_free mm/slub.c:3210 [inline]
-BUG: KASAN: double-free or invalid-free in kfree+0xe4/0x530 mm/slub.c:4264
-
-CPU: 1 PID: 813 Comm: syz-executor.2 Not tainted 5.14.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:105
- print_address_description.constprop.0.cold+0x6c/0x309 mm/kasan/report.c:233
- kasan_report_invalid_free+0x51/0x80 mm/kasan/report.c:358
- ____kasan_slab_free mm/kasan/common.c:346 [inline]
- __kasan_slab_free+0x120/0x130 mm/kasan/common.c:374
- kasan_slab_free include/linux/kasan.h:230 [inline]
- slab_free_hook mm/slub.c:1625 [inline]
- slab_free_freelist_hook+0xdf/0x240 mm/slub.c:1650
- slab_free mm/slub.c:3210 [inline]
- kfree+0xe4/0x530 mm/slub.c:4264
- bdev_free_inode+0xe0/0x110 fs/block_dev.c:816
- i_callback+0x3f/0x70 fs/inode.c:222
- rcu_do_batch kernel/rcu/tree.c:2550 [inline]
- rcu_core+0x7ab/0x1380 kernel/rcu/tree.c:2785
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
- invoke_softirq kernel/softirq.c:432 [inline]
- __irq_exit_rcu+0x16e/0x1c0 kernel/softirq.c:636
- irq_exit_rcu+0x5/0x20 kernel/softirq.c:648
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
- </IRQ>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:638
-RIP: 0010:check_kcov_mode+0x2c/0x40 kernel/kcov.c:174
-Code: 05 a9 5c 8c 7e 89 c2 81 e2 00 01 00 00 a9 00 01 ff 00 74 10 31 c0 85 d2 74 15 8b 96 34 15 00 00 85 d2 74 0b 8b 86 10 15 00 00 <39> f8 0f 94 c0 c3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 31 c0
-RSP: 0018:ffffc9000941f590 EFLAGS: 00000246
-RAX: 0000000000000002 RBX: 0000000000000009 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffff88801b691c40 RDI: 0000000000000003
-RBP: ffff888036020580 R08: 0000000000000000 R09: 0000000000000009
-R10: ffffffff839f2957 R11: 0000000000000010 R12: 0000000000000010
-R13: 00000000000003af R14: dffffc0000000000 R15: 0000000000000000
- write_comp_data kernel/kcov.c:218 [inline]
- __sanitizer_cov_trace_const_cmp4+0x1c/0x70 kernel/kcov.c:284
- tomoyo_domain_quota_is_ok+0x307/0x550 security/tomoyo/util.c:1093
- tomoyo_supervisor+0x2f2/0xf00 security/tomoyo/common.c:2089
- tomoyo_audit_path_log security/tomoyo/file.c:168 [inline]
- tomoyo_path_permission security/tomoyo/file.c:587 [inline]
- tomoyo_path_permission+0x270/0x3a0 security/tomoyo/file.c:573
- tomoyo_check_open_permission+0x33e/0x380 security/tomoyo/file.c:777
- tomoyo_file_open security/tomoyo/tomoyo.c:311 [inline]
- tomoyo_file_open+0xa3/0xd0 security/tomoyo/tomoyo.c:306
- security_file_open+0x52/0x4f0 security/security.c:1633
- do_dentry_open+0x353/0x11d0 fs/open.c:813
- do_open fs/namei.c:3374 [inline]
- path_openat+0x1c23/0x27f0 fs/namei.c:3507
- do_filp_open+0x1aa/0x400 fs/namei.c:3534
- do_sys_openat2+0x16d/0x420 fs/open.c:1204
- do_sys_open fs/open.c:1220 [inline]
- __do_sys_openat fs/open.c:1236 [inline]
- __se_sys_openat fs/open.c:1231 [inline]
- __x64_sys_openat+0x13f/0x1f0 fs/open.c:1231
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x4196d4
-Code: 84 00 00 00 00 00 44 89 54 24 0c e8 96 f9 ff ff 44 8b 54 24 0c 44 89 e2 48 89 ee 41 89 c0 bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 34 44 89 c7 89 44 24 0c e8 c8 f9 ff ff 8b 44
-RSP: 002b:00007f69595e9060 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 000000000056bf80 RCX: 00000000004196d4
-RDX: 0000000000000002 RSI: 00007f69595e90f0 RDI: 00000000ffffff9c
-RBP: 00007f69595e90f0 R08: 0000000000000000 R09: 00007f69595e8f70
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000002
-R13: 0000000000a9fb1f R14: 00007f69595e9300 R15: 0000000000022000
-
-Allocated by task 802:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:46 [inline]
- set_alloc_info mm/kasan/common.c:434 [inline]
- ____kasan_kmalloc mm/kasan/common.c:513 [inline]
- ____kasan_kmalloc mm/kasan/common.c:472 [inline]
- __kasan_kmalloc+0x9b/0xd0 mm/kasan/common.c:522
- kmalloc_node include/linux/slab.h:609 [inline]
- kzalloc_node include/linux/slab.h:732 [inline]
- __alloc_disk_node+0x4e/0x380 block/genhd.c:1246
- __blk_mq_alloc_disk+0xec/0x190 block/blk-mq.c:3145
- loop_add+0x324/0x8c0 drivers/block/loop.c:2345
- loop_control_ioctl+0x130/0x450 drivers/block/loop.c:2492
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:1069 [inline]
- __se_sys_ioctl fs/ioctl.c:1055 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Freed by task 802:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:360
- ____kasan_slab_free mm/kasan/common.c:366 [inline]
- ____kasan_slab_free mm/kasan/common.c:328 [inline]
- __kasan_slab_free+0xfb/0x130 mm/kasan/common.c:374
- kasan_slab_free include/linux/kasan.h:230 [inline]
- slab_free_hook mm/slub.c:1625 [inline]
- slab_free_freelist_hook+0xdf/0x240 mm/slub.c:1650
- slab_free mm/slub.c:3210 [inline]
- kfree+0xe4/0x530 mm/slub.c:4264
- __alloc_disk_node+0x2e8/0x380 block/genhd.c:1271
- __blk_mq_alloc_disk+0xec/0x190 block/blk-mq.c:3145
- loop_add+0x324/0x8c0 drivers/block/loop.c:2345
- loop_control_ioctl+0x130/0x450 drivers/block/loop.c:2492
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:1069 [inline]
- __se_sys_ioctl fs/ioctl.c:1055 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:348
- __call_rcu kernel/rcu/tree.c:3029 [inline]
- call_rcu+0xb1/0x750 kernel/rcu/tree.c:3109
- put_ctx kernel/events/core.c:1273 [inline]
- put_ctx+0x116/0x1e0 kernel/events/core.c:1266
- perf_event_exit_task_context kernel/events/core.c:12664 [inline]
- perf_event_exit_task+0x528/0x740 kernel/events/core.c:12693
- do_exit+0xbe4/0x2a60 kernel/exit.c:834
- do_group_exit+0x125/0x310 kernel/exit.c:922
- get_signal+0x47f/0x2160 kernel/signal.c:2808
- arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:865
- handle_signal_work kernel/entry/common.c:148 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
- exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:209
- __syscall_exit_to_user_mode_work kernel/entry/common.c:291 [inline]
- syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:302
- do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Second to last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:348
- insert_work+0x48/0x370 kernel/workqueue.c:1332
- __queue_work+0x5c1/0xed0 kernel/workqueue.c:1498
- call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1419
- expire_timers kernel/time/timer.c:1459 [inline]
- __run_timers.part.0+0x49f/0xa50 kernel/time/timer.c:1732
- __run_timers kernel/time/timer.c:1713 [inline]
- run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1745
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
-
-The buggy address belongs to the object at ffff88802ac59400
- which belongs to the cache kmalloc-512 of size 512
-The buggy address is located 0 bytes inside of
- 512-byte region [ffff88802ac59400, ffff88802ac59600)
-The buggy address belongs to the page:
-page:ffffea0000ab1600 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x2ac58
-head:ffffea0000ab1600 order:2 compound_mapcount:0 compound_pincount:0
-flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-raw: 00fff00000010200 dead000000000100 dead000000000122 ffff888010841c80
-raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, ts 18483051698, free_ts 0
- prep_new_page mm/page_alloc.c:2436 [inline]
- get_page_from_freelist+0xa72/0x2f80 mm/page_alloc.c:4169
- __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5391
- alloc_pages+0x18c/0x2a0 mm/mempolicy.c:2244
- alloc_slab_page mm/slub.c:1688 [inline]
- allocate_slab+0x32e/0x4b0 mm/slub.c:1828
- new_slab mm/slub.c:1891 [inline]
- new_slab_objects mm/slub.c:2637 [inline]
- ___slab_alloc+0x4ba/0x820 mm/slub.c:2800
- __slab_alloc.constprop.0+0xa7/0xf0 mm/slub.c:2840
- slab_alloc_node mm/slub.c:2922 [inline]
- slab_alloc mm/slub.c:2964 [inline]
- kmem_cache_alloc_trace+0x30f/0x3c0 mm/slub.c:2981
- kmalloc include/linux/slab.h:591 [inline]
- kzalloc include/linux/slab.h:721 [inline]
- devcgroup_css_alloc+0x3d/0x120 security/device_cgroup.c:214
- css_create kernel/cgroup/cgroup.c:5229 [inline]
- cgroup_apply_control_enable+0x4b8/0xc00 kernel/cgroup/cgroup.c:3085
- cgroup_mkdir+0x5ac/0x10f0 kernel/cgroup/cgroup.c:5447
- kernfs_iop_mkdir+0x146/0x1d0 fs/kernfs/dir.c:1127
- vfs_mkdir+0x52e/0x760 fs/namei.c:3823
- do_mkdirat+0x284/0x310 fs/namei.c:3848
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff88802ac59300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88802ac59380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88802ac59400: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff88802ac59480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88802ac59500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+> 
+> So:
+> 
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> 
+> Cheers,
+> 
+> Hannes
+> 
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+-- 
+Damien Le Moal
+Western Digital Research
