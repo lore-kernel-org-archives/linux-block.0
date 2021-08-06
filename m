@@ -2,74 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDA4C432BE
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 08:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 996D1C4338F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 08:38:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B0F16103B
-	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 08:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7383161159
+	for <linux-block@archiver.kernel.org>; Fri,  6 Aug 2021 08:38:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230467AbhHFIgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Aug 2021 04:36:13 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:44414 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230402AbhHFIgM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 04:36:12 -0400
+        id S235706AbhHFIiV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Aug 2021 04:38:21 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:54278 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230402AbhHFIiV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Aug 2021 04:38:21 -0400
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 6CFCB1FEB5;
-        Fri,  6 Aug 2021 08:35:56 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1C7CD21BD4;
+        Fri,  6 Aug 2021 08:38:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1628238956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1628239085; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p1CWzLZt/NtYjFo2iHfGLdoJ9qlVnFGVOJD1asTKnq0=;
-        b=Yu7SCPunAYBQ5d43ZsS00RiquxT58S0Dmyk9HIdcTV+n3XNP2u15b/Bk45ML2wFZOqIEk/
-        KGrsXsk2oj5KxCzcVb4Xgk1aEZbkqLh5EVKyauIDEM+VxfrCGweVNaPo2YNHt8dh8VCCd4
-        aij2ZJxOxK30ajvFV2F96FN981vH39Y=
+        bh=MZBqNnNscfHiOGe+k+ov3sat4e7XsHhtjE9C+58y2uc=;
+        b=A3hycox/Fm/0aNPL6yk1NYiLoqZxIjc9SkSOOSbAy9TCdCh6Ns4lUMN3IqknGBxy0cnAR3
+        ueBCYYiHx1j4Xr6sxJns1hUEkFL8d4JuVejFWbIJZ952doVHW6WoMb4VX+ojNf0M8/jbA/
+        Zy2BgBlT6YmnyX+kw/7/NpZR9OLs7zw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1628238956;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        s=susede2_ed25519; t=1628239085;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p1CWzLZt/NtYjFo2iHfGLdoJ9qlVnFGVOJD1asTKnq0=;
-        b=4ghKdO5GtZ1ybrj9kGkL8tCpMEDjDVtOqqECyCP61n4W1uXcGjjUahdLI3YG9EVfOQLoFl
-        xqgDvABozA2ftuBA==
+        bh=MZBqNnNscfHiOGe+k+ov3sat4e7XsHhtjE9C+58y2uc=;
+        b=aNOCG0J7PpmgPwbQc/65LlLCJj2f93M6tu/nosPkuvOzylpDGIGLjNbX4E2bfIgNcv36ME
+        9mupo7VMREFy4xAA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 54D1C13A6A;
-        Fri,  6 Aug 2021 08:35:56 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 01AE313A6A;
+        Fri,  6 Aug 2021 08:38:04 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 1wr6E2z0DGG6YgAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 06 Aug 2021 08:35:56 +0000
+        id d0UqOuz0DGEkYwAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 06 Aug 2021 08:38:04 +0000
+Subject: Re: [PATCH v2 2/4] block: fix ioprio interface
 To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-References: <20210726013806.84815-1-damien.lemoal@wdc.com>
- <yq18s1ffdz7.fsf@ca-mkp.ca.oracle.com>
- <DM6PR04MB7081398426CA28606DC39491E7F39@DM6PR04MB7081.namprd04.prod.outlook.com>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
+References: <20210806051140.301127-1-damien.lemoal@wdc.com>
+ <20210806051140.301127-3-damien.lemoal@wdc.com>
+ <6fdc9b02-d03f-a63f-cefb-1d00ac42b885@suse.de>
+ <DM6PR04MB70818B00518B40E671481E76E7F39@DM6PR04MB7081.namprd04.prod.outlook.com>
 From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v3 0/4] Initial support for multi-actuator HDDs
-Message-ID: <c3a28f3f-52c4-e7bc-8bd7-bec2feae25fa@suse.de>
-Date:   Fri, 6 Aug 2021 10:35:55 +0200
+Message-ID: <5b2642eb-2817-3814-3469-71027d6b629d@suse.de>
+Date:   Fri, 6 Aug 2021 10:38:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <DM6PR04MB7081398426CA28606DC39491E7F39@DM6PR04MB7081.namprd04.prod.outlook.com>
+In-Reply-To: <DM6PR04MB70818B00518B40E671481E76E7F39@DM6PR04MB7081.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -77,92 +79,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/6/21 6:05 AM, Damien Le Moal wrote:
-> On 2021/08/06 12:42, Martin K. Petersen wrote:
+On 8/6/21 8:57 AM, Damien Le Moal wrote:
+> On 2021/08/06 15:35, Hannes Reinecke wrote:
+>> On 8/6/21 7:11 AM, Damien Le Moal wrote:
+>>> An iocb aio_reqprio field is 16-bits (u16) but often handled as an int
+>>> in the block layer. E.g. ioprio_check_cap() takes an int as argument.
+>>> With such implicit int casting function calls, the upper 16-bits of the
+>>> int argument may be left uninitialized by the compiler, resulting in
+>>> invalid values for the IOPRIO_PRIO_CLASS() macro (garbage upper bits)
+>>> and in an error return for functions such as ioprio_check_cap().
+>>>
+>>> Fix this by masking the result of the shift by IOPRIO_CLASS_SHIFT bits
+>>> in the IOPRIO_PRIO_CLASS() macro. The new macro IOPRIO_CLASS_MASK
+>>> defines the 3-bits mask for the priority class.
+>>>
+>>> While at it, cleanup the following:
+>>> * Apply the mask IOPRIO_PRIO_MASK to the data argument of the
+>>>    IOPRIO_PRIO_VALUE() macro to ignore upper bits of the data value.
+>>> * Remove unnecessary parenthesis around fixed values in the macro
+>>>    definitions in include/uapi/linux/ioprio.h.
+>>> * Update the outdated mention of CFQ in the comment describing priority
+>>>    classes and instead mention BFQ and mq-deadline.
+>>> * Change the argument name of the IOPRIO_PRIO_CLASS() and
+>>>    IOPRIO_PRIO_DATA() macros from "mask" to "ioprio" to reflect the fact
+>>>    that an IO priority value should be passed rather than a mask.
+>>> * Change the ioprio_valid() macro into an inline function, adding a
+>>>    check on the maximum value of the class of a priority value as
+>>>    defined by the IOPRIO_CLASS_MAX enum value. Move this function to
+>>>    the kernel side in include/linux/ioprio.h.
+>>> * Remove the unnecessary "else" after the return statements in
+>>>    task_nice_ioclass().
+>>>
+>>> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+>>> ---
+>>>   include/linux/ioprio.h      | 15 ++++++++++++---
+>>>   include/uapi/linux/ioprio.h | 19 +++++++++++--------
+>>>   2 files changed, 23 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+>>> index ef9ad4fb245f..9b3a6d8172b4 100644
+>>> --- a/include/linux/ioprio.h
+>>> +++ b/include/linux/ioprio.h
+>>> @@ -8,6 +8,16 @@
+>>>   
+>>>   #include <uapi/linux/ioprio.h>
+>>>   
+>>> +/*
+>>> + * Check that a priority value has a valid class.
+>>> + */
+>>> +static inline bool ioprio_valid(unsigned short ioprio)
 >>
->> Damien,
->>
->>> Single LUN multi-actuator hard-disks are cappable to seek and execute
->>> multiple commands in parallel. This capability is exposed to the host
->>> using the Concurrent Positioning Ranges VPD page (SCSI) and Log (ATA).
->>> Each positioning range describes the contiguous set of LBAs that an
->>> actuator serves.
->>
->> I have to say that I prefer the multi-LUN model.
+>> Wouldn't it be better to use 'u16' here as type, as we're relying on the 
+>> number of bits?
 > 
-> It is certainly easier: nothing to do :)
-> SATA, as usual, makes things harder...
+> Other functions in block/ioprio.c and in include/linux/ioprio.h use "unsigned
+> short", so I followed. But many functions, if not most, use "int". This is all a
+> bit of a mess. I think we need a "typedef ioprio_t u16;" to clean things up. But
+> there are a lot of places to fix. I can add such patch... Worth it ?
 > 
->>
->>> The first patch adds the block layer plumbing to expose concurrent
->>> sector ranges of the device through sysfs as a sub-directory of the
->>> device sysfs queue directory.
->>
->> So how do you envision this range reporting should work when putting
->> DM/MD on top of a multi-actuator disk?
-> 
-> The ranges are attached to the device request queue. So the DM/MD target driver
-> can use that information from the underlying devices for whatever possible
-> optimization. For the logical device exposed by the target driver, the ranges
-> are not limits so they are not inherited. As is, right now, DM target devices
-> will not show any range information for the logical devices they create, even if
-> the underlying devices have multiple ranges.
-> 
-> The DM/MD target driver is free to set any range information pertinent to the
-> target. E.g. dm-liear could set the range information corresponding to sector
-> chunks from different devices used to build the dm-linear device.
-> 
-And indeed, that would be the easiest consumer.
-One 'just' needs to have a simple script converting the sysfs ranges
-into the corresponding dm-linear table definitions, and create one DM
-device for each range.
-That would simulate the multi-LUN approach.
-Not sure if that would warrant a 'real' DM target, seeing that it's
-fully scriptable.
-
->> And even without multi-actuator drives, how would you express concurrent
->> ranges on a DM/MD device sitting on top of a several single-actuator
->> devices?
-> 
-> Similar comment as above: it is up to the DM/MD target driver to decide if range
-> information can be useful. For dm-linear, there are obvious cases where it is.
-> Ex: 2 single actuator drives concatenated together can generate 2 ranges
-> similarly to a real split-actuator disk. Expressing the chunks of a dm-linear
-> setup as ranges may not always be possible though, that is, if we keep the
-> assumption that a range is independent from others in terms of command
-> execution. Ex: a dm-linear setup that shuffles a drive LBA mapping (high to low
-> and low to high) has no business showing sector ranges.
-> 
->> While I appreciate that it is easy to just export what the hardware
->> reports in sysfs, I also think we should consider how filesystems would
->> use that information. And how things would work outside of the simple
->> fs-on-top-of-multi-actuator-drive case.
-> 
-> Without any change anywhere in existing code (kernel and applications using raw
-> disk accesses), things will just work as is. The multi/split actuator drive will
-> behave as a single actuator drive, even for commands spanning range boundaries.
-> Your guess on potential IOPS gains is as good as mine in this case. Performance
-> will totally depend on the workload but will not be worse than an equivalent
-> single actuator disk.
-> 
-> FS block allocators can definitely use the range information to distribute
-> writes among actuators. For reads, well, gains will depend on the workload,
-> obviously, but optimizations at the block IO scheduler level can improve things
-> too, especially if the drive is being used at a QD beyond its capability (that
-> is, requests are accumulated in the IO scheduler).
-> 
-> Similar write optimization can be achieved by applications using block device
-> files directly. This series is intended for this case for now. FS and bloc IO
-> scheduler optimization can be added later.
-> 
-> 
-Rumours have it that Paolo Valente is working on adapting BFQ to utilize
-the range information for better actuator utilisation.
-And eventually one should modify filesystem utilities like xfs to adapt
-the metadata layout to multi-actuator drives.
-
-The _real_ fun starts once the HDD manufactures starts putting out
-multi-actuator SMR drives :-)
+Possibly not.
+Consider my comment retracted :-)
 
 Cheers,
 
