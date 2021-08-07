@@ -2,75 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11871C4338F
-	for <linux-block@archiver.kernel.org>; Sat,  7 Aug 2021 16:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 293F7C4338F
+	for <linux-block@archiver.kernel.org>; Sat,  7 Aug 2021 16:50:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4DEC6101D
-	for <linux-block@archiver.kernel.org>; Sat,  7 Aug 2021 16:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0043A61058
+	for <linux-block@archiver.kernel.org>; Sat,  7 Aug 2021 16:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbhHGQU7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Aug 2021 12:20:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60432 "EHLO
+        id S229458AbhHGQus (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Aug 2021 12:50:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbhHGQUh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Aug 2021 12:20:37 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78375C0613CF
-        for <linux-block@vger.kernel.org>; Sat,  7 Aug 2021 09:19:52 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id b1-20020a17090a8001b029017700de3903so15106912pjn.1
-        for <linux-block@vger.kernel.org>; Sat, 07 Aug 2021 09:19:52 -0700 (PDT)
+        with ESMTP id S229437AbhHGQur (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Aug 2021 12:50:47 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E69A6C0613CF
+        for <linux-block@vger.kernel.org>; Sat,  7 Aug 2021 09:50:28 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id k11-20020a17090a62cbb02901786a5edc9aso3718018pjs.5
+        for <linux-block@vger.kernel.org>; Sat, 07 Aug 2021 09:50:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=sE4J/KNRIhq4Qq1TJTV7nxoeSBjq593vfcTRyIoqZB8=;
-        b=F8bJc5ayOa1NQ/0OLvIq7fauc1tSb4zx9pEU23QZ03TiiHbDjRvGxkf4tZiV/xmwuw
-         qXJBY04ip1ae+q8XRoAgpltiT/vwxOfzHD1FSKvNBAAOdC0MgORNTxsnWjF/H1Oo90Ys
-         6E0jDg5fXZm/Tyhqi5xSbdJJefUZme4h1sR2G8NoGw5zfX2rEWHwu4moCjzi22X1sGt0
-         Qt7/cxoAwgTwUaxfr1M8NIcx1iCOsCaMSUG239oKtOTnqvhJBUzmo7nfgYynFwFe/OqQ
-         eV2pkrza5d5MrVkNZ/JJrxRer+hTlanySw3H7TR9VqkpgIRbAYnHI61HYrA+x9AT+NFm
-         2NcA==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=KEIPf8fDSuRzBO9mTHacLd2J105i7r0UjYGiZOvSaHg=;
+        b=x4rpFuy2+M71OlDw81d0Jz86ODfw/SJA7eIpGCLl0hztTba6gH+jOA9U2lW4x1wQAB
+         jGR1dzOnLieftV2AABD+HVz6JMlI5c0Thqj/NVnkiYaRxLPN26no43qjkDHoeS6WnWSA
+         zb+UN50YcCsruTOMrpUn2nwbdaugSoN1kzKv8Y3o5FB9j3RlyBwUUhkBYeEiUn2SBxPN
+         krmZoeoumrdiaK/ex+iRWp40lJvhKOTqX9+5i2qONnh9e07nDL1Q6Cs+ALIqlZ5oNV5l
+         lro/d0n9xcdkKiqzzkDZmIoSrkpH+Nm9eZHIWafT88YC0nhmt9hVwMbxOjoVXpfAvTEy
+         ykkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sE4J/KNRIhq4Qq1TJTV7nxoeSBjq593vfcTRyIoqZB8=;
-        b=f+fwMQ7bjRd0DUN+abi8VfEyLD1QPMdKOz3m5VDDwllhaY2sdUsUEaFU1FDe4EcH4Y
-         jCKgqNVs2q3HG+6p3wMgkV04gL2FRpX5aLasJd8HEbiya8JXlpTcd+YArCNq6oLaywAf
-         Ob9WWONOGECJG20mJD/qLHeigfMofd39QNhG8gC1hYF5gz2cIh8Jr6VBxid7SMdQlNSQ
-         2PDLXPCvNwCRnrmWRzEBZ8Xx72Gpato7CAvRuiXcOFmIWK5Lgh/NtjpPxWT5oaYgauxT
-         2ADhjYXnPDw8Jo509iyeX4+Nh3lYzW6CGrMy/bp3Q3cw0Wcrn52tz9EvjOR1D4ekkPx6
-         QjlA==
-X-Gm-Message-State: AOAM5312yA6sGp9vTPLLV4DzdXHn95GqqiwN6w3OwACXfZjaRnjBKbH+
-        rxyjbO2TiRuJIhOD/DihilX81g==
-X-Google-Smtp-Source: ABdhPJzk4/8bmVQ2Nl31owua5k69ZyxSZipU5YOIY/m7LVvU8DIehftrExiEXUCenqHaKirRIpmZYQ==
-X-Received: by 2002:a63:cc0e:: with SMTP id x14mr1332919pgf.352.1628353192079;
-        Sat, 07 Aug 2021 09:19:52 -0700 (PDT)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=KEIPf8fDSuRzBO9mTHacLd2J105i7r0UjYGiZOvSaHg=;
+        b=YdP2zjmrIjn1UZxpMRLiwiF4Rr6rqA0jBXZ8t9mLTD84fEvOmlwk6rKb768ajyAP3L
+         2P5p1llUGAZgEYorlX8znv+IP1vufJZ4Cf0Q+GoO8x7rcMwqlcCK1hsR/Ysr2eOMqfi8
+         Uv63TNPAEwj1ok6eWapymzM+/RZvSKKcoJCST6j4jkbEQykmjbCV0o8uH9IX7eWIJeXI
+         v+sHoqPHtZdcI6sPpX1c9tNLdlXmkV/YPCuJ2pOK35bpDkXt0cfqPyCs43/MLLX6Z3kr
+         S4KoEr+BckleJfyYRA5qXgU8+HHIk6/T/97J18epTSYZtKYcCGCjb0jv4NpRZ3J9DIHl
+         TsUQ==
+X-Gm-Message-State: AOAM532G97+UPXoEuDzZdDoHzqwvRI5fJXIZiVB+ty3ZbJug27b/EKdz
+        PaA0LjUCG4CKtZANSEQxLsIpMLHNcOFfX6Hk
+X-Google-Smtp-Source: ABdhPJxOu785QpUCLdpeTJ2flEfk5O/uaQsQHrdxaAY+L6CFuZqAcww4ev5lGs141w4P7xbZE30f0g==
+X-Received: by 2002:a05:6a00:2142:b029:3b9:e5df:77ab with SMTP id o2-20020a056a002142b02903b9e5df77abmr10536625pfk.52.1628355028089;
+        Sat, 07 Aug 2021 09:50:28 -0700 (PDT)
 Received: from [192.168.1.116] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id jz24sm12842797pjb.9.2021.08.07.09.19.50
+        by smtp.gmail.com with ESMTPSA id b15sm16522722pgm.15.2021.08.07.09.50.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Aug 2021 09:19:51 -0700 (PDT)
-Subject: Re: [PATCH v3 4/4] block: fix default IO priority handling
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
-References: <20210806111857.488705-1-damien.lemoal@wdc.com>
- <20210806111857.488705-5-damien.lemoal@wdc.com>
+        Sat, 07 Aug 2021 09:50:27 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4bfdceb3-36a7-c224-c1cc-ab273ab15589@kernel.dk>
-Date:   Sat, 7 Aug 2021 10:19:50 -0600
+Subject: [GIT PULL] Block fixes for 5.14-rc5
+Message-ID: <9c6e6b8b-ef8e-6c14-1afd-e18569c3df45@kernel.dk>
+Date:   Sat, 7 Aug 2021 10:50:26 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210806111857.488705-5-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,22 +71,70 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/6/21 5:18 AM, Damien Le Moal wrote:
-> diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-> index 99d37d4807b8..5b4a39c2f623 100644
-> --- a/include/uapi/linux/ioprio.h
-> +++ b/include/uapi/linux/ioprio.h
-> @@ -42,8 +42,8 @@ enum {
->  };
->  
->  /*
-> - * Fallback BE priority
-> + * Fallback BE priority level.
->   */
-> -#define IOPRIO_NORM	4
-> +#define IOPRIO_BE_NORM	4
+Hi Linus,
 
-This again seems like a very poor idea.
+A few minor fixes:
+
+- Fix ldm kernel-doc warning (Bart)
+
+- Fix adding offset twice for DMA address in n64cart (Christoph)
+
+- Fix use-after-free in dasd path handling (Stefan)
+
+- Order kyber insert trace correctly (Vincent)
+
+- raid1 errored write handling fix (Wei)
+
+- Fix blk-iolatency queue get failure handling (Yu)
+
+Please pull!
+
+
+The following changes since commit 340e84573878b2b9d63210482af46883366361b9:
+
+  block: delay freeing the gendisk (2021-07-27 19:35:47 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.14-2021-08-07
+
+for you to fetch changes up to fb7b9b0231ba8f77587c23f5257a4fdb6df1219e:
+
+  kyber: make trace_block_rq call consistent with documentation (2021-08-06 16:40:47 -0600)
+
+----------------------------------------------------------------
+block-5.14-2021-08-07
+
+----------------------------------------------------------------
+Bart Van Assche (1):
+      block/partitions/ldm.c: Fix a kernel-doc warning
+
+Christoph Hellwig (1):
+      n64cart: fix the dma address in n64cart_do_bvec
+
+Jens Axboe (1):
+      Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.14
+
+Stefan Haberland (1):
+      s390/dasd: fix use after free in dasd path handling
+
+Vincent Fu (1):
+      kyber: make trace_block_rq call consistent with documentation
+
+Wei Shuyu (1):
+      md/raid10: properly indicate failure when ending a failed write request
+
+Yu Kuai (1):
+      blk-iolatency: error out if blk_get_queue() failed in iolatency_set_limit()
+
+ block/blk-iolatency.c          |  6 +++++-
+ block/kyber-iosched.c          |  2 +-
+ block/partitions/ldm.c         |  2 +-
+ drivers/block/n64cart.c        |  2 +-
+ drivers/md/raid1.c             |  2 --
+ drivers/md/raid10.c            |  4 ++--
+ drivers/s390/block/dasd_eckd.c | 13 +++++++++++--
+ 7 files changed, 21 insertions(+), 10 deletions(-)
 
 -- 
 Jens Axboe
