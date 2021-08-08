@@ -7,77 +7,124 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC776C4338F
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 06:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A740EC4320A
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 07:43:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98DFC60FF2
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 06:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84C1B61052
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 07:43:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230262AbhHHGxH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Aug 2021 02:53:07 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:16994 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbhHHGxG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 02:53:06 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Gj8vT0z80zZydk;
-        Sun,  8 Aug 2021 14:49:09 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Sun, 8 Aug 2021 14:52:45 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Sun, 8 Aug
- 2021 14:52:45 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH] block: don't decrement flush request refcount if it's state is idle in flush_end_io()
-Date:   Sun, 8 Aug 2021 15:03:30 +0800
-Message-ID: <20210808070330.763177-1-yukuai3@huawei.com>
+        id S231130AbhHHHnZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Aug 2021 03:43:25 -0400
+Received: from mail-lf1-f43.google.com ([209.85.167.43]:38661 "EHLO
+        mail-lf1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230237AbhHHHnZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 03:43:25 -0400
+Received: by mail-lf1-f43.google.com with SMTP id x27so4660015lfu.5;
+        Sun, 08 Aug 2021 00:43:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=xaUXR1M3JrHIdKjUj68yVCDcrvnHzz2hp1oLUNxXisE=;
+        b=hU3nzM/HnbR0jjsVtFxY2pNwVpSMCAAjASJQzvvJZ8VQQeQZMUGt8VuKLRPfswTFHN
+         jy7HbAMbyjUuibYMJVL/cKxLkWYKV1EDy6/KRyNFT41jtSMSjpVxDqDf47MdeWGklLKL
+         JssoKU4Viql7Ar7NaB09qGY6bliC4Q7Oj2Fde+yYN453A/ErU6wnLNQEQ3i4XdpPdjzM
+         PCFndtvkL+CP7dsKEakLT4d88bu92RptF9XiwVQEMlTnMHaFq4l2svPIvVR0MRydCnSV
+         5rxL/4wuNQ9nmw6Nkr75vuN8stofJNSG8JfzWaEBXvlk4Qz5fDdYAgNexcILNA1XMC7D
+         E77A==
+X-Gm-Message-State: AOAM532DIC0odMRUXdvrzcPuV1LuhSHUcTo1eCSUhpKoY/LsJdmsAoBU
+        Dc1YLLHUsfRxPc9qEsW1VD8NtbFOKUY/APAM
+X-Google-Smtp-Source: ABdhPJyeTvDkHfiGdvbVtaYGP13f9+eXjPw0AdUagtYcpdUXM+or0c1ZyInJHTL3QHsZ0YJkGzemAw==
+X-Received: by 2002:a05:6512:22c4:: with SMTP id g4mr13342499lfu.287.1628408584560;
+        Sun, 08 Aug 2021 00:43:04 -0700 (PDT)
+Received: from localhost.localdomain (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.googlemail.com with ESMTPSA id c19sm406282lfc.70.2021.08.08.00.43.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Aug 2021 00:43:04 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
+        Denis Efremov <efremov@linux.com>,
+        Mark Hounschell <markh@compro.net>,
+        Jiri Kosina <jkosina@suse.cz>,
+        Wim Osterholt <wim@djo.tudelft.nl>,
+        Kurt Garloff <kurt@garloff.de>, stable@vger.kernel.org
+Subject: [PATCH] Revert "floppy: reintroduce O_NDELAY fix"
+Date:   Sun,  8 Aug 2021 10:42:46 +0300
+Message-Id: <20210808074246.33449-1-efremov@linux.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
+References: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-flush_end_io() currently decrement request refcount unconditionally.
-However, it's possible that the request is already idle and it's
-refcount is zero since that flush_end_io() can be called concurrently.
+The patch breaks userspace implementations (e.g. fdutils) and introduces
+regressions in behaviour. Previously, it was possible to O_NDELAY open a
+floppy device with no media inserted or with write protected media without
+an error. Some userspace tools use this particular behavior for probing.
 
-For example, nbd_clear_que() can be called concurrently with normal
-io completion or io timeout.
+It's not the first time when we revert this patch. Previous revert is in
+commit f2791e7eadf4 (Revert "floppy: refactor open() flags handling").
 
-Thus check idle before decrement to avoid refcount_t underflow
-warning.
+This reverts commit 8a0c014cd20516ade9654fc13b51345ec58e7be8.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Link: https://lore.kernel.org/linux-block/de10cb47-34d1-5a88-7751-225ca380f735@compro.net/
+Reported-by: Mark Hounschell <markh@compro.net>
+Cc: Jiri Kosina <jkosina@suse.cz>
+Cc: Wim Osterholt <wim@djo.tudelft.nl>
+Cc: Kurt Garloff <kurt@garloff.de>
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Denis Efremov <efremov@linux.com>
 ---
- block/blk-flush.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/block/floppy.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 1002f6c58181..9b65dc43702c 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -222,7 +222,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	/* release the tag's ownership to the req cloned from */
- 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 87460e0e5c72..fef79ea52e3e 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4029,23 +4029,23 @@ static int floppy_open(struct block_device *bdev, fmode_t mode)
+ 	if (fdc_state[FDC(drive)].rawcmd == 1)
+ 		fdc_state[FDC(drive)].rawcmd = 2;
  
--	if (!refcount_dec_and_test(&flush_rq->ref)) {
-+	if (blk_mq_rq_state(flush_rq) == MQ_RQ_IDLE ||
-+	    !refcount_dec_and_test(&flush_rq->ref)) {
- 		fq->rq_status = error;
- 		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- 		return;
+-	if (mode & (FMODE_READ|FMODE_WRITE)) {
+-		drive_state[drive].last_checked = 0;
+-		clear_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags);
+-		if (bdev_check_media_change(bdev))
+-			floppy_revalidate(bdev->bd_disk);
+-		if (test_bit(FD_DISK_CHANGED_BIT, &drive_state[drive].flags))
+-			goto out;
+-		if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags))
++	if (!(mode & FMODE_NDELAY)) {
++		if (mode & (FMODE_READ|FMODE_WRITE)) {
++			drive_state[drive].last_checked = 0;
++			clear_bit(FD_OPEN_SHOULD_FAIL_BIT,
++				  &drive_state[drive].flags);
++			if (bdev_check_media_change(bdev))
++				floppy_revalidate(bdev->bd_disk);
++			if (test_bit(FD_DISK_CHANGED_BIT, &drive_state[drive].flags))
++				goto out;
++			if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags))
++				goto out;
++		}
++		res = -EROFS;
++		if ((mode & FMODE_WRITE) &&
++		    !test_bit(FD_DISK_WRITABLE_BIT, &drive_state[drive].flags))
+ 			goto out;
+ 	}
+-
+-	res = -EROFS;
+-
+-	if ((mode & FMODE_WRITE) &&
+-			!test_bit(FD_DISK_WRITABLE_BIT, &drive_state[drive].flags))
+-		goto out;
+-
+ 	mutex_unlock(&open_lock);
+ 	mutex_unlock(&floppy_mutex);
+ 	return 0;
 -- 
 2.31.1
 
