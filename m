@@ -2,125 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9E8C432BE
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 03:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18189C4338F
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 05:15:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BE9160EE8
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 03:07:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6ABB60FD8
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 05:15:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230169AbhHHDHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Aug 2021 23:07:33 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:8376 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229977AbhHHDHc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Aug 2021 23:07:32 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Gj3tq4MLNz8477;
-        Sun,  8 Aug 2021 11:03:15 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Sun, 8 Aug 2021 11:07:09 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Sun, 8 Aug
- 2021 11:07:09 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH 2/2] nbd: hold tags->lock to prevent access freed request through blk_mq_tag_to_rq()
-Date:   Sun, 8 Aug 2021 11:17:52 +0800
-Message-ID: <20210808031752.579882-3-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210808031752.579882-1-yukuai3@huawei.com>
-References: <20210808031752.579882-1-yukuai3@huawei.com>
+        id S229526AbhHHFPW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Aug 2021 01:15:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36878 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229473AbhHHFPV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 8 Aug 2021 01:15:21 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BD2ED60F38;
+        Sun,  8 Aug 2021 05:15:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1628399703;
+        bh=r409KvyNgLbyfYI1tePdR3Fn6jngjHs4GuZ52QDGYW0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BXaZWx+jEEFDknjNvDH/ZpiTRbEA+YwNxqFY6NSHsrrXBX26RK2hiL6lej1aHNrBm
+         U/tyz+1uA3ldYaa5lHZ945pr1Anh+tqG/mGG0hdP156kvDb0CQjPjQlxOcOB6LD6Sv
+         Ogm4uQtfoY8H9qTf40aoJS4CD0PpeCVeZdzY8Kls=
+Date:   Sun, 8 Aug 2021 07:14:52 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Long Li <longli@microsoft.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        Ben Widawsky <ben.widawsky@intel.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Siddharth Gupta <sidgup@codeaurora.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [Patch v5 0/3] Introduce a driver to support host accelerated
+ access to Microsoft Azure Blob for Azure VM
+Message-ID: <YQ9oTBSRyHCffC2k@kroah.com>
+References: <1628146812-29798-1-git-send-email-longli@linuxonhyperv.com>
+ <e249d88b-6ca2-623f-6f6e-9547e2b36f1f@acm.org>
+ <BY5PR21MB15060F1B9CDB078189B76404CEF29@BY5PR21MB1506.namprd21.prod.outlook.com>
+ <YQwvL2N6JpzI+hc8@kroah.com>
+ <BY5PR21MB1506A93E865A8D6972DD0AAECEF49@BY5PR21MB1506.namprd21.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BY5PR21MB1506A93E865A8D6972DD0AAECEF49@BY5PR21MB1506.namprd21.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Our test reported a uaf problem:
+On Sat, Aug 07, 2021 at 06:29:06PM +0000, Long Li wrote:
+> > I still think this "model" is totally broken and wrong overall.  Again, you are
+> > creating a custom "block" layer with a character device, forcing all userspace
+> > programs to use a custom library (where is it at?) just to get their data.
+> 
+> The Azure Blob library (with source code) is available in the following languages:
+> Java: https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/storage/azure-storage-blob
+> JavaScript: https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/storage/storage-blob
+> Python: https://github.com/Azure/azure-sdk-for-python/tree/main/sdk/storage/azure-storage-blob
+> Go: https://github.com/Azure/azure-storage-blob-go
+> .NET: https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/storage/Azure.Storage.Blobs
+> PHP: https://github.com/Azure/azure-storage-php/tree/master/azure-storage-blob
+> Ruby: https://github.com/azure/azure-storage-ruby/tree/master/blob
+> C++: https://github.com/Azure/azure-sdk-for-cpp/tree/main/sdk/storage#azure-storage-client-library-for-c
 
-Read of size 4 at addr ffff80036b790b54 by task kworker/u9:1/31105
+And why wasn't this linked to in the changelog here?
 
-Workqueue: knbd0-recv recv_work
-Call trace:
- dump_backtrace+0x0/0x310 arch/arm64/kernel/time.c:78
- show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x144/0x1b4 lib/dump_stack.c:118
- print_address_description+0x68/0x2d0 mm/kasan/report.c:253
- kasan_report_error mm/kasan/report.c:351 [inline]
- kasan_report+0x134/0x2f0 mm/kasan/report.c:409
- check_memory_region_inline mm/kasan/kasan.c:260 [inline]
- __asan_load4+0x88/0xb0 mm/kasan/kasan.c:699
- __read_once_size include/linux/compiler.h:193 [inline]
- blk_mq_rq_state block/blk-mq.h:106 [inline]
- blk_mq_request_started+0x24/0x40 block/blk-mq.c:644
- nbd_read_stat drivers/block/nbd.c:670 [inline]
- recv_work+0x1bc/0x890 drivers/block/nbd.c:749
- process_one_work+0x3ec/0x9e0 kernel/workqueue.c:2147
- worker_thread+0x80/0x9d0 kernel/workqueue.c:2302
- kthread+0x1d8/0x1e0 kernel/kthread.c:255
- ret_from_fork+0x10/0x18 arch/arm64/kernel/entry.S:1174
+In looking at the C code above, where is the interaction with this Linux
+driver?  I can't seem to find it...
 
-This is because tags->static_rq can be freed without clearing tags->rq,
-Ming Lei had fixed the problem while itering tags, howerver, the problem
-still exist in blk_mq_tag_to_rq().
+> > There's a reason the POSIX model is there, why are you all ignoring it?
+> 
+> The Azure Blob APIs are not designed to be POSIX compatible. This driver is used
+> to accelerate Blob access for a Blob client running in an Azure VM. It doesn't attempt
+> to modify the Blob APIs. Changing the Blob APIs will break the existing Blob clients.
 
-Thus fix the problem by holding tags->lock, so that tags->rq can be
-cleared before tags->static_rq is freed.
+There are no Blob clients today on Linux given that this code is not
+merged into the kernel yet, so there is nothing to "break".
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/block/nbd.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+I still don't see a good reason why this can't just be a block device,
+or a filesystem interface and why you need to make this a custom
+character device ioctl.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..c7ca16f0adbd 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -712,12 +712,22 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	memcpy(&handle, reply.handle, sizeof(handle));
- 	tag = nbd_handle_to_tag(handle);
- 	hwq = blk_mq_unique_tag_to_hwq(tag);
--	if (hwq < nbd->tag_set.nr_hw_queues)
--		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
--				       blk_mq_unique_tag_to_tag(tag));
--	if (!req || !blk_mq_request_started(req)) {
--		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
--			tag, req);
-+	if (hwq < nbd->tag_set.nr_hw_queues) {
-+		unsigned long flags;
-+		struct blk_mq_tags *tags = nbd->tag_set.tags[hwq];
-+
-+		blk_mq_tags_lock(tags, &flags);
-+		req = blk_mq_tag_to_rq(tags, blk_mq_unique_tag_to_tag(tag));
-+		if (!blk_mq_request_started(req)) {
-+			dev_err(disk_to_dev(nbd->disk), "Request not started (%d) %p\n",
-+				tag, req);
-+			req = NULL;
-+		}
-+		blk_mq_tags_unlock(tags, &flags);
-+	}
-+
-+	if (!req) {
-+		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d)\n", tag);
- 		return ERR_PTR(-ENOENT);
- 	}
- 	trace_nbd_header_received(req, handle);
--- 
-2.31.1
+thanks,
 
+greg k-h
