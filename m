@@ -2,104 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18189C4338F
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 05:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D01DC4338F
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 06:29:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6ABB60FD8
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 05:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75B636023E
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 06:29:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229526AbhHHFPW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Aug 2021 01:15:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36878 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229473AbhHHFPV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 8 Aug 2021 01:15:21 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BD2ED60F38;
-        Sun,  8 Aug 2021 05:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1628399703;
-        bh=r409KvyNgLbyfYI1tePdR3Fn6jngjHs4GuZ52QDGYW0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BXaZWx+jEEFDknjNvDH/ZpiTRbEA+YwNxqFY6NSHsrrXBX26RK2hiL6lej1aHNrBm
-         U/tyz+1uA3ldYaa5lHZ945pr1Anh+tqG/mGG0hdP156kvDb0CQjPjQlxOcOB6LD6Sv
-         Ogm4uQtfoY8H9qTf40aoJS4CD0PpeCVeZdzY8Kls=
-Date:   Sun, 8 Aug 2021 07:14:52 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Long Li <longli@microsoft.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Siddharth Gupta <sidgup@codeaurora.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [Patch v5 0/3] Introduce a driver to support host accelerated
- access to Microsoft Azure Blob for Azure VM
-Message-ID: <YQ9oTBSRyHCffC2k@kroah.com>
-References: <1628146812-29798-1-git-send-email-longli@linuxonhyperv.com>
- <e249d88b-6ca2-623f-6f6e-9547e2b36f1f@acm.org>
- <BY5PR21MB15060F1B9CDB078189B76404CEF29@BY5PR21MB1506.namprd21.prod.outlook.com>
- <YQwvL2N6JpzI+hc8@kroah.com>
- <BY5PR21MB1506A93E865A8D6972DD0AAECEF49@BY5PR21MB1506.namprd21.prod.outlook.com>
+        id S229526AbhHHG3a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Aug 2021 02:29:30 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:5909 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229473AbhHHG3a (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 02:29:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1628404151; x=1659940151;
+  h=subject:to:references:from:message-id:date:mime-version:
+   in-reply-to:content-transfer-encoding;
+  bh=3GAC1Q1eyioWTbceJCqnnOuPi53DrTVF6wRNqBUDPwU=;
+  b=B2NrBKY3RkJAWsW19rqvuRWM+bMI6iiYy9T3b9d4vTRqedULxMxM9JU0
+   Le7E/u2WPk/a/sKGrjPhCfJRIJ9uzAHVSvC+HT5RyHxnPcI+h1EOQ3HMl
+   zMoCKHRGKV82ol8IVX9pJItuI++kMO6aA5JF5nHj/a+/e3+MjeMwOPaEG
+   Uiyt5j0/VwDEC8qAEcRFXgg7Q+YoVP1yq8iBV93UF3Dh0HeXwwrN+fcMN
+   AE0kjPEHmcwY6op4C4qtVSKnxeXHXgUCLYWpfDuZAJxlWaJu5uyt3V84r
+   +008azbj8iYLhwFaWG4j9t915jWHP0khIuPAxKcVyh9WLYU6tw7HNoIhm
+   w==;
+X-IronPort-AV: E=Sophos;i="5.84,304,1620662400"; 
+   d="scan'208";a="288162594"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Aug 2021 14:29:11 +0800
+IronPort-SDR: QYnw3fNfGh94rH0tD8lDW+qtgOhaOTQNJZTqATAJZNHIaNjvQ5vPdMdEO5gMkoLksEr0QcBAPP
+ 4siPL6/zHNXp8zRb+VDX0CbSlJlEFyqR9noce9xlQXvUxskm81mjVuoFz+KtegBL5C57u3H8Pv
+ LZKkaM9vO+QuLGug41A1Ks7MN04TP4nPMk04MQK+hQ1sipIcSHglEZ+yAII3zVuF6xaJtKipBc
+ +agkvFvMJVZxtHGakT9z7LTrbnWHniuO3pgdC+yliETM5odwlPcF7AvhsEw3SqFrbmr9R7HBnG
+ vsHaw+nlrN2vh0KcFOo2knEA
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2021 23:06:36 -0700
+IronPort-SDR: 2AlAspc+VF+VXfSmvl7XIq5Jnk50wEDJQI09H6+gIzI039pBs5JJiVwV++UC6G9w4d+tglpI/t
+ tg+5UWUnXEE+pRZ+vYGzqBCRshbKxXyxW3EHUB2r8mMnJaGu+oid5lCSYxsTp5GNFFwKFzbu8H
+ 0yIk8TuOUTfrbhqklCCJUjvA74eFbWroWRz8NjrNlPamoDk/PhS+D2dTBuja7Ek/T2/dP+/L0v
+ q0iIG6uZCf8suHrDxdlB6Jm+6INvKSgc5bYIXkWAzQ1efjr6tk/Kye7bOfvOuq/5o9w87D6SDD
+ yZ4=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2021 23:29:12 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Gj8SR22V5z1RvlK
+        for <linux-block@vger.kernel.org>; Sat,  7 Aug 2021 23:29:11 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-language
+        :content-type:in-reply-to:mime-version:user-agent:date
+        :message-id:organization:from:references:to:subject; s=dkim; t=
+        1628404150; x=1630996151; bh=3GAC1Q1eyioWTbceJCqnnOuPi53DrTVF6wR
+        NqBUDPwU=; b=iSMFNrC0RjlpU7HT24FoAgDrjFQm+Qs/a7M1tOiYpyGWMoZYMvc
+        qEZCjnEN2NLLPdANrPJ5diihsqPcGmCEE85GJSvg6KQG3knJxzSSmYlAP3eHEF+t
+        I/tWDkH/fpctQnOluM7rhPQPd75neJ5vm0R50nmLQMBSICU0UYYa5yVp66zHdDAB
+        iU85BPPqc6Elac44IObBuXmUD8uw8UpnXxU+NZM3zeSqFfAto5GXYTzM3QxRjO7A
+        w9mFvws0U0PmNnIybErLXIK5colf7YnGSRy4jkD+mjcE0l9JfyfrAowBVb6Wu7vN
+        qQ3CGeqbm0DyST/Gm7O1mqNICWVGiO4u6GQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id ZDJM0XN7kyrF for <linux-block@vger.kernel.org>;
+        Sat,  7 Aug 2021 23:29:10 -0700 (PDT)
+Received: from [10.225.48.54] (unknown [10.225.48.54])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Gj8SP5KDrz1RvlC;
+        Sat,  7 Aug 2021 23:29:09 -0700 (PDT)
+Subject: Re: [PATCH v3 3/4] block: rename IOPRIO_BE_NR
+To:     Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
+References: <20210806111857.488705-1-damien.lemoal@wdc.com>
+ <20210806111857.488705-4-damien.lemoal@wdc.com>
+ <5f2640c5-0712-b822-9ac7-3daa974c0c30@kernel.dk>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital
+Message-ID: <e98cdc46-a58e-2c20-b0ab-5a93c4bf66c0@opensource.wdc.com>
+Date:   Sun, 8 Aug 2021 15:29:08 +0900
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY5PR21MB1506A93E865A8D6972DD0AAECEF49@BY5PR21MB1506.namprd21.prod.outlook.com>
+In-Reply-To: <5f2640c5-0712-b822-9ac7-3daa974c0c30@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 07, 2021 at 06:29:06PM +0000, Long Li wrote:
-> > I still think this "model" is totally broken and wrong overall.  Again, you are
-> > creating a custom "block" layer with a character device, forcing all userspace
-> > programs to use a custom library (where is it at?) just to get their data.
+On 2021/08/08 1:16, Jens Axboe wrote:
+> On 8/6/21 5:18 AM, Damien Le Moal wrote:
+>> diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
+>> index abc40965aa96..99d37d4807b8 100644
+>> --- a/include/uapi/linux/ioprio.h
+>> +++ b/include/uapi/linux/ioprio.h
+>> @@ -31,9 +31,9 @@ enum {
+>>  };
+>>  
+>>  /*
+>> - * 8 best effort priority levels are supported
+>> + * The RT and BE priority classes both support up to 8 priority levels.
+>>   */
+>> -#define IOPRIO_BE_NR	8
+>> +#define IOPRIO_NR_LEVELS	8
 > 
-> The Azure Blob library (with source code) is available in the following languages:
-> Java: https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/storage/azure-storage-blob
-> JavaScript: https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/storage/storage-blob
-> Python: https://github.com/Azure/azure-sdk-for-python/tree/main/sdk/storage/azure-storage-blob
-> Go: https://github.com/Azure/azure-storage-blob-go
-> .NET: https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/storage/Azure.Storage.Blobs
-> PHP: https://github.com/Azure/azure-storage-php/tree/master/azure-storage-blob
-> Ruby: https://github.com/azure/azure-storage-ruby/tree/master/blob
-> C++: https://github.com/Azure/azure-sdk-for-cpp/tree/main/sdk/storage#azure-storage-client-library-for-c
+> That might not be a good idea, if an application already uses
+> IOPRIO_BE_NR...
 
-And why wasn't this linked to in the changelog here?
+Hmmm. include/uapi/linux/ioprio.h is being introduced with kernel 5.15. These
+definition are not UAPI level right now.
 
-In looking at the C code above, where is the interaction with this Linux
-driver?  I can't seem to find it...
+What about something like this:
 
-> > There's a reason the POSIX model is there, why are you all ignoring it?
-> 
-> The Azure Blob APIs are not designed to be POSIX compatible. This driver is used
-> to accelerate Blob access for a Blob client running in an Azure VM. It doesn't attempt
-> to modify the Blob APIs. Changing the Blob APIs will break the existing Blob clients.
+#define IOPRIO_NR_LEVELS	8
+#define IOPRIO_BE_NR		IOPRIO_NR_LEVELS
 
-There are no Blob clients today on Linux given that this code is not
-merged into the kernel yet, so there is nothing to "break".
+To keep IOPRIO_BE_NR ?
 
-I still don't see a good reason why this can't just be a block device,
-or a filesystem interface and why you need to make this a custom
-character device ioctl.
+OR,
 
-thanks,
+Keep IOPRIO_BE_NR as is in include/uapi/linux/ioprio.h and add
 
-greg k-h
+#define IOPRIO_NR_LEVELS	IOPRIO_BE_NR
+
+in include/linux/ioprio.h ?
+
+Both would still allow doing some cleanup kernel side.
+
+Or I can just drop this patch too.
+
+-- 
+Damien Le Moal
+Western Digital Research
