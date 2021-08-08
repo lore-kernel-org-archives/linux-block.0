@@ -2,129 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A740EC4320A
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 07:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 895F0C4338F
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 08:45:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84C1B61052
-	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 07:43:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F0A46101C
+	for <linux-block@archiver.kernel.org>; Sun,  8 Aug 2021 08:45:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231130AbhHHHnZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Aug 2021 03:43:25 -0400
-Received: from mail-lf1-f43.google.com ([209.85.167.43]:38661 "EHLO
-        mail-lf1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230237AbhHHHnZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 03:43:25 -0400
-Received: by mail-lf1-f43.google.com with SMTP id x27so4660015lfu.5;
-        Sun, 08 Aug 2021 00:43:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=xaUXR1M3JrHIdKjUj68yVCDcrvnHzz2hp1oLUNxXisE=;
-        b=hU3nzM/HnbR0jjsVtFxY2pNwVpSMCAAjASJQzvvJZ8VQQeQZMUGt8VuKLRPfswTFHN
-         jy7HbAMbyjUuibYMJVL/cKxLkWYKV1EDy6/KRyNFT41jtSMSjpVxDqDf47MdeWGklLKL
-         JssoKU4Viql7Ar7NaB09qGY6bliC4Q7Oj2Fde+yYN453A/ErU6wnLNQEQ3i4XdpPdjzM
-         PCFndtvkL+CP7dsKEakLT4d88bu92RptF9XiwVQEMlTnMHaFq4l2svPIvVR0MRydCnSV
-         5rxL/4wuNQ9nmw6Nkr75vuN8stofJNSG8JfzWaEBXvlk4Qz5fDdYAgNexcILNA1XMC7D
-         E77A==
-X-Gm-Message-State: AOAM532DIC0odMRUXdvrzcPuV1LuhSHUcTo1eCSUhpKoY/LsJdmsAoBU
-        Dc1YLLHUsfRxPc9qEsW1VD8NtbFOKUY/APAM
-X-Google-Smtp-Source: ABdhPJyeTvDkHfiGdvbVtaYGP13f9+eXjPw0AdUagtYcpdUXM+or0c1ZyInJHTL3QHsZ0YJkGzemAw==
-X-Received: by 2002:a05:6512:22c4:: with SMTP id g4mr13342499lfu.287.1628408584560;
-        Sun, 08 Aug 2021 00:43:04 -0700 (PDT)
-Received: from localhost.localdomain (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
-        by smtp.googlemail.com with ESMTPSA id c19sm406282lfc.70.2021.08.08.00.43.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Aug 2021 00:43:04 -0700 (PDT)
-From:   Denis Efremov <efremov@linux.com>
-To:     linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
-        Denis Efremov <efremov@linux.com>,
-        Mark Hounschell <markh@compro.net>,
-        Jiri Kosina <jkosina@suse.cz>,
-        Wim Osterholt <wim@djo.tudelft.nl>,
-        Kurt Garloff <kurt@garloff.de>, stable@vger.kernel.org
-Subject: [PATCH] Revert "floppy: reintroduce O_NDELAY fix"
-Date:   Sun,  8 Aug 2021 10:42:46 +0300
-Message-Id: <20210808074246.33449-1-efremov@linux.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
-References: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
+        id S231176AbhHHIpX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Aug 2021 04:45:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25235 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230301AbhHHIpW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 8 Aug 2021 04:45:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628412303;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kFwi0Z6oGORAHQ+dxi0xTcqJOzaM4j07+7O6RC89Pmo=;
+        b=DXeqOvs1EygOhSvlYa2P9z87us8Htsm+WEsqO0ioepftsyxryAOhiQTIPLJHGCqkyizvNc
+        fLlPLqRDupvXs0f5F8ocqItJ8zA+eRS3suAUp4SEwvb1HvC9wKHPZ0ANaDPAnLGA82Ia4j
+        UkPMNBSr11rMJP9Q4hvYHEwZ5WZok1Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-498-KnHj6BWkMziveqpLqC8vLA-1; Sun, 08 Aug 2021 04:44:59 -0400
+X-MC-Unique: KnHj6BWkMziveqpLqC8vLA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7EA8180FCCF;
+        Sun,  8 Aug 2021 08:44:58 +0000 (UTC)
+Received: from T590 (ovpn-12-50.pek2.redhat.com [10.72.12.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EBDCE5D9D3;
+        Sun,  8 Aug 2021 08:44:51 +0000 (UTC)
+Date:   Sun, 8 Aug 2021 16:44:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH] block: don't decrement flush request refcount if it's
+ state is idle in flush_end_io()
+Message-ID: <YQ+Zfkl7Nsl2aSdw@T590>
+References: <20210808070330.763177-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210808070330.763177-1-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The patch breaks userspace implementations (e.g. fdutils) and introduces
-regressions in behaviour. Previously, it was possible to O_NDELAY open a
-floppy device with no media inserted or with write protected media without
-an error. Some userspace tools use this particular behavior for probing.
+On Sun, Aug 08, 2021 at 03:03:30PM +0800, Yu Kuai wrote:
+> flush_end_io() currently decrement request refcount unconditionally.
+> However, it's possible that the request is already idle and it's
+> refcount is zero since that flush_end_io() can be called concurrently.
+> 
+> For example, nbd_clear_que() can be called concurrently with normal
+> io completion or io timeout.
+> 
+> Thus check idle before decrement to avoid refcount_t underflow
+> warning.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/blk-flush.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 1002f6c58181..9b65dc43702c 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -222,7 +222,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+>  	/* release the tag's ownership to the req cloned from */
+>  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+>  
+> -	if (!refcount_dec_and_test(&flush_rq->ref)) {
+> +	if (blk_mq_rq_state(flush_rq) == MQ_RQ_IDLE ||
+> +	    !refcount_dec_and_test(&flush_rq->ref)) {
 
-It's not the first time when we revert this patch. Previous revert is in
-commit f2791e7eadf4 (Revert "floppy: refactor open() flags handling").
+It is driver's bug to finish one already ended request, so please
+fix the driver instead.
 
-This reverts commit 8a0c014cd20516ade9654fc13b51345ec58e7be8.
-
-Link: https://lore.kernel.org/linux-block/de10cb47-34d1-5a88-7751-225ca380f735@compro.net/
-Reported-by: Mark Hounschell <markh@compro.net>
-Cc: Jiri Kosina <jkosina@suse.cz>
-Cc: Wim Osterholt <wim@djo.tudelft.nl>
-Cc: Kurt Garloff <kurt@garloff.de>
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
- drivers/block/floppy.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 87460e0e5c72..fef79ea52e3e 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -4029,23 +4029,23 @@ static int floppy_open(struct block_device *bdev, fmode_t mode)
- 	if (fdc_state[FDC(drive)].rawcmd == 1)
- 		fdc_state[FDC(drive)].rawcmd = 2;
- 
--	if (mode & (FMODE_READ|FMODE_WRITE)) {
--		drive_state[drive].last_checked = 0;
--		clear_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags);
--		if (bdev_check_media_change(bdev))
--			floppy_revalidate(bdev->bd_disk);
--		if (test_bit(FD_DISK_CHANGED_BIT, &drive_state[drive].flags))
--			goto out;
--		if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags))
-+	if (!(mode & FMODE_NDELAY)) {
-+		if (mode & (FMODE_READ|FMODE_WRITE)) {
-+			drive_state[drive].last_checked = 0;
-+			clear_bit(FD_OPEN_SHOULD_FAIL_BIT,
-+				  &drive_state[drive].flags);
-+			if (bdev_check_media_change(bdev))
-+				floppy_revalidate(bdev->bd_disk);
-+			if (test_bit(FD_DISK_CHANGED_BIT, &drive_state[drive].flags))
-+				goto out;
-+			if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags))
-+				goto out;
-+		}
-+		res = -EROFS;
-+		if ((mode & FMODE_WRITE) &&
-+		    !test_bit(FD_DISK_WRITABLE_BIT, &drive_state[drive].flags))
- 			goto out;
- 	}
--
--	res = -EROFS;
--
--	if ((mode & FMODE_WRITE) &&
--			!test_bit(FD_DISK_WRITABLE_BIT, &drive_state[drive].flags))
--		goto out;
--
- 	mutex_unlock(&open_lock);
- 	mutex_unlock(&floppy_mutex);
- 	return 0;
--- 
-2.31.1
+Thanks,
+Ming
 
