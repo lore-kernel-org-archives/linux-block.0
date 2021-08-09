@@ -2,116 +2,250 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7539DC432BE
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04DF8C4320A
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:31:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5798460F11
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:23:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF9C26054F
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:30:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235081AbhHILXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 07:23:44 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:34390 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235007AbhHILXo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 07:23:44 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 6D8F421ED4;
-        Mon,  9 Aug 2021 11:23:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1628508202;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XEHaigBd+p4Kdq3FOyfyiQahnEWWgwrbyI9p3sYy9Jg=;
-        b=FUJg+QaU7zw3qTf6t8q9Qr96X0Utqfsl+nS4wyhc9/5vWZMS539Of9T5SM02pWzim1Cnda
-        RMrFBB4C9IiCbCzLy7hKe0Nw5kCTqLiYUG2RwoYyBydeMv59tIlgL5Vpa/xsWEDauKkWvj
-        09N1MMAWFSlJkFOi7ijKkWYVWovvXhs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1628508202;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XEHaigBd+p4Kdq3FOyfyiQahnEWWgwrbyI9p3sYy9Jg=;
-        b=4VeRarVySJZv/AlngzeBW/O6mbVTRAHHGwmwBsPvaCbeLhv85RY/VfIGPtUkorqnnpUTKq
-        o+aHpptVRlTrrwAw==
-Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
-        by relay2.suse.de (Postfix) with ESMTP id 53C44A3B8E;
-        Mon,  9 Aug 2021 11:23:22 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id BAE5EDA880; Mon,  9 Aug 2021 13:20:30 +0200 (CEST)
-Date:   Mon, 9 Aug 2021 13:20:30 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 47/64] btrfs: Use memset_after() to clear end of struct
-Message-ID: <20210809112030.GM5047@suse.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Kees Cook <keescook@chromium.org>,
-        linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-48-keescook@chromium.org>
- <20210728094215.GX5047@twin.jikos.cz>
- <202107281455.2A0753F5@keescook>
- <20210729103337.GS5047@suse.cz>
- <202107310822.31BEB6E543@keescook>
+        id S235233AbhHILbQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 07:31:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60982 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235196AbhHILbP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 07:31:15 -0400
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8692C061798
+        for <linux-block@vger.kernel.org>; Mon,  9 Aug 2021 04:30:55 -0700 (PDT)
+Received: by mail-vs1-xe32.google.com with SMTP id a8so9804547vsl.4
+        for <linux-block@vger.kernel.org>; Mon, 09 Aug 2021 04:30:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fOiX5Fq3KXnBSLuawZfkvyDmjzsFYZZ+98EOQpFNGTM=;
+        b=Uqs8Zs2QVxW19OPp6ZaYropMD8wq8XzkZj7QkVLqpPM9d4D1VE73zWGn2Wd4wVWWKo
+         dCiEE20W3t4lEemNh9QhNYlHhoPpHwiij4/ziwEVih9Dv2II0zRp36htHJQnUV2V3WAN
+         O3jpAmIUQ6x2uVTrMnu5r3hD17yyOicUYsFwihDXtVyLWJBVa8NqrtYlkcV1Lf7YLJMn
+         9ILGVliAuaAmSDBjeEjxnw2gB0BnYc2oZAxv7NlNmtNgoZDf251iTf/dNeOLBlVK2opR
+         GfIiXhpUH1vkvSo3w0n/gNe2zE30sKnNIiqxyZ0E3/cg3vcOLsR06s9dCjztnYA6RJQZ
+         CeKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fOiX5Fq3KXnBSLuawZfkvyDmjzsFYZZ+98EOQpFNGTM=;
+        b=nrXYaSdMePdBPXc0G9hMSG+yYwZjAH596dD5WIWr93kPaA0vY41lcGd505R4sWJEIu
+         Dvm3QY0dqllmuy3NpDS0l5ADiBWWlJzmKJuFx4flJY0PlJNkULn2vHefh8TGR7qALL9Y
+         rQmYa+kyTw4Zi9YPK+VkKRZGbPpQlqLK1dXPqGfZiBDnZSk3Z+03n6REwWNNugExbiiP
+         6OhD5ed6OQ8FtSBpyf0geALgERIuCzngStvJtIcGI3F+4VqU1hzIqGAIeWO/jGJjcfA4
+         oJz91lSB3oRlqog5aDUee20qDph17oWmiwSHAS9IbfX8Tc4vAU9MDIGimncpLqkjZp/N
+         W29g==
+X-Gm-Message-State: AOAM532JL95EW6uY8ghtXo3VHpXFvTUAL/TuP0GX3SSaBcqdP6ga2lvE
+        yDmW7d+j45iJnJ/+YrIxitHfmZ315KI7xKZL8mtPLw==
+X-Google-Smtp-Source: ABdhPJzFsvgytRJWqLZxvtQilzSUmLu3e4lpYoG45hUphYdCxvnwzfo5c76bu9iRy/GrvrZdQeDel/HkqPDrIvVs0T8=
+X-Received: by 2002:a67:7c11:: with SMTP id x17mr15676775vsc.55.1628508654832;
+ Mon, 09 Aug 2021 04:30:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202107310822.31BEB6E543@keescook>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+References: <20210809064028.1198327-1-hch@lst.de> <20210809064028.1198327-2-hch@lst.de>
+In-Reply-To: <20210809064028.1198327-2-hch@lst.de>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Mon, 9 Aug 2021 13:30:18 +0200
+Message-ID: <CAPDyKFrpKqadCXZNypdk2rp8n1T1Xk-BO2B0FQ=rzbKyz_k8wg@mail.gmail.com>
+Subject: Re: [PATCH 1/8] mmc: block: let device_add_disk create disk attributes
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Song Liu <song@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 31, 2021 at 08:25:51AM -0700, Kees Cook wrote:
-> On Thu, Jul 29, 2021 at 12:33:37PM +0200, David Sterba wrote:
-> > On Wed, Jul 28, 2021 at 02:56:31PM -0700, Kees Cook wrote:
-> > > On Wed, Jul 28, 2021 at 11:42:15AM +0200, David Sterba wrote:
-> > > > On Tue, Jul 27, 2021 at 01:58:38PM -0700, Kees Cook wrote:
-> > > > >  	}
-> > > > >  	if (need_reset) {
-> > > > > -		memset(&item->generation_v2, 0,
-> > > > > -			sizeof(*item) - offsetof(struct btrfs_root_item,
-> > > > > -					generation_v2));
-> > > > > -
-> > > > 
-> > > > Please add
-> > > > 		/* Clear all members from generation_v2 onwards */
-> > > > 
-> > > > > +		memset_after(item, 0, level);
-> > > 
-> > > Perhaps there should be another helper memset_starting()? That would
-> > > make these cases a bit more self-documenting.
-> > 
-> > That would be better, yes.
-> > 
-> > > +		memset_starting(item, 0, generation_v2);
-> > 
-> > memset_from?
-> 
-> For v2, I bikeshed this to "memset_startat" since "from" is semantically
-> close to "source" which I thought might be confusing. (I, too, did not
-> like "starting".) :)
+On Mon, 9 Aug 2021 at 08:43, Christoph Hellwig <hch@lst.de> wrote:
+>
+> Pass the attribute group for the attributes on the gendisk to
+> device_add_disk so that they are created atomically with the
+> disk creation.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-memset_startat works for me, thanks.
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+
+Let's try to funnel this via Jens' tree. As long as his tree is based
+upon v5.14-rc3 or later I don't think we should have any problem with
+conflicts.
+
+Kind regards
+Uffe
+
+
+> ---
+>  drivers/mmc/core/block.c | 102 +++++++++++++++++----------------------
+>  1 file changed, 45 insertions(+), 57 deletions(-)
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index ce8aed562929..4ac3e1b93e7e 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -128,8 +128,6 @@ struct mmc_blk_data {
+>          * track of the current selected device partition.
+>          */
+>         unsigned int    part_curr;
+> -       struct device_attribute force_ro;
+> -       struct device_attribute power_ro_lock;
+>         int     area_type;
+>
+>         /* debugfs files (only in main mmc_blk_data) */
+> @@ -281,6 +279,9 @@ static ssize_t power_ro_lock_store(struct device *dev,
+>         return count;
+>  }
+>
+> +static DEVICE_ATTR(ro_lock_until_next_power_on, 0,
+> +               power_ro_lock_show, power_ro_lock_store);
+> +
+>  static ssize_t force_ro_show(struct device *dev, struct device_attribute *attr,
+>                              char *buf)
+>  {
+> @@ -313,6 +314,44 @@ static ssize_t force_ro_store(struct device *dev, struct device_attribute *attr,
+>         return ret;
+>  }
+>
+> +static DEVICE_ATTR(force_ro, 0644, force_ro_show, force_ro_store);
+> +
+> +static struct attribute *mmc_disk_attrs[] = {
+> +       &dev_attr_force_ro.attr,
+> +       &dev_attr_ro_lock_until_next_power_on.attr,
+> +       NULL,
+> +};
+> +
+> +static umode_t mmc_disk_attrs_is_visible(struct kobject *kobj,
+> +               struct attribute *a, int n)
+> +{
+> +       struct device *dev = container_of(kobj, struct device, kobj);
+> +       struct mmc_blk_data *md = mmc_blk_get(dev_to_disk(dev));
+> +       umode_t mode = a->mode;
+> +
+> +       if (a == &dev_attr_ro_lock_until_next_power_on.attr &&
+> +           (md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
+> +           md->queue.card->ext_csd.boot_ro_lockable) {
+> +               mode = S_IRUGO;
+> +               if (!(md->queue.card->ext_csd.boot_ro_lock &
+> +                               EXT_CSD_BOOT_WP_B_PWR_WP_DIS))
+> +                       mode |= S_IWUSR;
+> +       }
+> +
+> +       mmc_blk_put(md);
+> +       return mode;
+> +}
+> +
+> +static const struct attribute_group mmc_disk_attr_group = {
+> +       .is_visible     = mmc_disk_attrs_is_visible,
+> +       .attrs          = mmc_disk_attrs,
+> +};
+> +
+> +static const struct attribute_group *mmc_disk_attr_groups[] = {
+> +       &mmc_disk_attr_group,
+> +       NULL,
+> +};
+> +
+>  static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
+>  {
+>         struct mmc_blk_data *md = mmc_blk_get(bdev->bd_disk);
+> @@ -2644,15 +2683,8 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
+>                  * from being accepted.
+>                  */
+>                 card = md->queue.card;
+> -               if (md->disk->flags & GENHD_FL_UP) {
+> -                       device_remove_file(disk_to_dev(md->disk), &md->force_ro);
+> -                       if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
+> -                                       card->ext_csd.boot_ro_lockable)
+> -                               device_remove_file(disk_to_dev(md->disk),
+> -                                       &md->power_ro_lock);
+> -
+> +               if (md->disk->flags & GENHD_FL_UP)
+>                         del_gendisk(md->disk);
+> -               }
+>                 mmc_cleanup_queue(&md->queue);
+>                 mmc_blk_put(md);
+>         }
+> @@ -2679,51 +2711,6 @@ static void mmc_blk_remove_parts(struct mmc_card *card,
+>         }
+>  }
+>
+> -static int mmc_add_disk(struct mmc_blk_data *md)
+> -{
+> -       int ret;
+> -       struct mmc_card *card = md->queue.card;
+> -
+> -       device_add_disk(md->parent, md->disk, NULL);
+> -       md->force_ro.show = force_ro_show;
+> -       md->force_ro.store = force_ro_store;
+> -       sysfs_attr_init(&md->force_ro.attr);
+> -       md->force_ro.attr.name = "force_ro";
+> -       md->force_ro.attr.mode = S_IRUGO | S_IWUSR;
+> -       ret = device_create_file(disk_to_dev(md->disk), &md->force_ro);
+> -       if (ret)
+> -               goto force_ro_fail;
+> -
+> -       if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
+> -            card->ext_csd.boot_ro_lockable) {
+> -               umode_t mode;
+> -
+> -               if (card->ext_csd.boot_ro_lock & EXT_CSD_BOOT_WP_B_PWR_WP_DIS)
+> -                       mode = S_IRUGO;
+> -               else
+> -                       mode = S_IRUGO | S_IWUSR;
+> -
+> -               md->power_ro_lock.show = power_ro_lock_show;
+> -               md->power_ro_lock.store = power_ro_lock_store;
+> -               sysfs_attr_init(&md->power_ro_lock.attr);
+> -               md->power_ro_lock.attr.mode = mode;
+> -               md->power_ro_lock.attr.name =
+> -                                       "ro_lock_until_next_power_on";
+> -               ret = device_create_file(disk_to_dev(md->disk),
+> -                               &md->power_ro_lock);
+> -               if (ret)
+> -                       goto power_ro_lock_fail;
+> -       }
+> -       return ret;
+> -
+> -power_ro_lock_fail:
+> -       device_remove_file(disk_to_dev(md->disk), &md->force_ro);
+> -force_ro_fail:
+> -       del_gendisk(md->disk);
+> -
+> -       return ret;
+> -}
+> -
+>  #ifdef CONFIG_DEBUG_FS
+>
+>  static int mmc_dbg_card_status_get(void *data, u64 *val)
+> @@ -2919,12 +2906,13 @@ static int mmc_blk_probe(struct mmc_card *card)
+>
+>         dev_set_drvdata(&card->dev, md);
+>
+> -       ret = mmc_add_disk(md);
+> +       device_add_disk(md->parent, md->disk, mmc_disk_attr_groups);
+>         if (ret)
+>                 goto out;
+>
+>         list_for_each_entry(part_md, &md->part, part) {
+> -               ret = mmc_add_disk(part_md);
+> +               device_add_disk(part_md->parent, part_md->disk,
+> +                               mmc_disk_attr_groups);
+>                 if (ret)
+>                         goto out;
+>         }
+> --
+> 2.30.2
+>
