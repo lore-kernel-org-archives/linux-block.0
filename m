@@ -2,93 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA910C432BE
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 02:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F12C43214
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 03:32:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 945FB60FD8
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 02:58:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBF6A6101E
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 03:32:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232742AbhHIC7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Aug 2021 22:59:09 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:8381 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231675AbhHIC7H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 22:59:07 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Gjgff5pbQz84Xj;
-        Mon,  9 Aug 2021 10:54:50 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Mon, 9 Aug 2021 10:58:45 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Mon, 9 Aug
- 2021 10:58:45 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <bvanassche@acm.org>,
-        <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH v2 2/2] nbd: convert to use blk_mq_get_rq_by_tag()
-Date:   Mon, 9 Aug 2021 11:09:27 +0800
-Message-ID: <20210809030927.1946162-3-yukuai3@huawei.com>
+        id S232836AbhHIDdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Aug 2021 23:33:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37080 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232763AbhHIDdJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 23:33:09 -0400
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB3C0C061757;
+        Sun,  8 Aug 2021 20:32:48 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id u25so21732132oiv.5;
+        Sun, 08 Aug 2021 20:32:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dQUClTMviLXFilKUZkYDlG4dFYcNKwc8DGMBuYM6LPM=;
+        b=gkx/+qhr03Rrp3H/arWri6RY7olzdo2fg1nqA8vP7jQupA62YXZoHex10txZliDqff
+         X8Wq663hYioQqu0bGiAUe4VENr6nr9Qw+uaL5VMqu9Dew6TRag54D0fj4Ak5W0fXZq/y
+         sYqsRembZ8+lnvortVg7NdioQP0RPzXEkYgaYoJ0uvFGqlKxyVe/8mgGyuSEvrFO9r21
+         /Fkjp7kOouFbH45jLDzvOolT/ie5BvLKi41yiMI+bJ+VTTCWOu3zceV265a9CXB4LFOt
+         Zb/650oacRMnKPcvmKw9Sh7G+c+ZXEaWz87dm5aFOaXoIe8kY+tpvFO7vbkR2A9MiQ4F
+         Soug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dQUClTMviLXFilKUZkYDlG4dFYcNKwc8DGMBuYM6LPM=;
+        b=bLcvJM7uKqufsb4YIv4BlMzH9kGwn85x/mU8QdNjDKSJURPvatrxSsCWGdddiOmgGH
+         ko7PVr2wZ1fHJRj7ty7JXDpgHzUglTdS71U1vTEL/TI0Rd2WRu0ioY08V8bbaC0wSERT
+         ovd8SgVXRA2qu5llo6jzu8AhTiCpJhNyKG2+2D5Icb8Ov60tflKoQwEKpHlBLHCgrce4
+         SuFydE0sSJ4xbtJO2nauqasSSWa6PdBglvsRwRALZnsDtm95KUG0ZnzJKNA6BvPCp0cm
+         fDbbAHMV0+4qItbMdJyEPIP8TqvzqdS965tINF2dZsH924VvavFk0bMc+RG/4RTawYWa
+         7wmQ==
+X-Gm-Message-State: AOAM532wA5h2XutcmUrLbW4esjJ4G3/vy1ubkTsJk1FZKT2EsFrgWH/1
+        CT1IhGgLCggkm0hX3YbpU1GQx+sHn1kBTVyj
+X-Google-Smtp-Source: ABdhPJzlOquy6MqH9DYdpYZjFIND1GvsCfWmiraLPoEvM6vh0h5qVKZpQGGjxN4tscyUJQn5XZAFJA==
+X-Received: by 2002:a05:6808:9aa:: with SMTP id e10mr5261792oig.31.1628479968085;
+        Sun, 08 Aug 2021 20:32:48 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id r7sm1463646oij.14.2021.08.08.20.32.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Aug 2021 20:32:47 -0700 (PDT)
+From:   Ian Pilcher <arequipeno@gmail.com>
+To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org
+Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org
+Subject: [RFC PATCH v2 00/10] Add configurable block device LED triggers
+Date:   Sun,  8 Aug 2021 22:32:07 -0500
+Message-Id: <20210809033217.1113444-1-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210809030927.1946162-1-yukuai3@huawei.com>
-References: <20210809030927.1946162-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_tag_to_rq() might return freed request, use
-blk_mq_get_rq_by_tag() instead.
+This is a significant rewrite of the patchset that I originally posted
+back on 28 July.  It incorporates almost all of the suggestions that I
+received as feedback to my original patchset (largely because I was
+finally able to wrap my head around how complex LED triggers work).
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/block/nbd.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+One thing that has not changed is that associations between block
+devices and LEDs are still set via an attribute on the device, rather
+than the LED.  This is much simpler, as the device attribute only has
+to handle a single value (the name of the associated LED), rather than
+potentially handling multiple device names.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..9e56975a8eee 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -713,11 +713,10 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	tag = nbd_handle_to_tag(handle);
- 	hwq = blk_mq_unique_tag_to_hwq(tag);
- 	if (hwq < nbd->tag_set.nr_hw_queues)
--		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
--				       blk_mq_unique_tag_to_tag(tag));
--	if (!req || !blk_mq_request_started(req)) {
--		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
--			tag, req);
-+		req = blk_mq_get_rq_by_tag(nbd->tag_set.tags[hwq],
-+					   blk_mq_unique_tag_to_tag(tag));
-+	if (!req) {
-+		dev_err(disk_to_dev(nbd->disk), "Unexpected reply %d\n", tag);
- 		return ERR_PTR(-ENOENT);
- 	}
- 	trace_nbd_header_received(req, handle);
-@@ -779,6 +778,8 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	}
- out:
- 	trace_nbd_payload_received(req, handle);
-+	if (req)
-+		blk_mq_put_rq_ref(req);
- 	mutex_unlock(&cmd->lock);
- 	return ret ? ERR_PTR(ret) : cmd;
- }
+More importantly, it avoids the need to iterate through all of the
+block devices on the system, searching by name.  This was proposed
+fairly recently, and the reaction was not positive.[1][2]
+
+I have modeled the interface for the /sys/block/<DEVICE>/led
+attribute on the sysfs interface used for selecting a trigger.  All
+available LEDs (all LEDs associated with the blkdev trigger) are
+shown when the attribute is read, with the currently selected LED
+enclosed in square brackets ([]).
+
+As before, this is all very new to me (particularly the RCU stuff), so
+I welcome feedback.
+
+Thanks!
+
+Changes from the original patchset:
+
+* Use a single complex LED trigger ("blkdev"), rather than multiple
+  user-defined triggers.
+
+* Configurable blink time and interval for each LED:
+
+    /sys/class/leds/<LED>/blink_{on,off}
+
+* Associated block devices linked from LED subdirectory:
+
+    /sys/class/leds/<LED>/block_devices
+
+  (Avoids violating the "one value per entry" sysfs rule.)
+
+* Device-LED associations set via /sys/block/<DEVICE>/led
+
+* Document all sysfs attributes in Documentation/ABI/testing (but also kept
+  the overview doc)
+
+* Removed unnecessary [un]likely macros
+
+* Reduced number of "user error" log messages and changed level to INFO
+
+* More detailed commit messages
+
+* Add Kconfig option in final commit
+
+* Use RCU-protected pointer (rather than mutex)
+
+* No in-kernel APIs for now
+
+[1] https://www.spinics.net/lists/linux-leds/msg18256.html
+[2] https://www.spinics.net/lists/linux-leds/msg18261.html
+
+Ian Pilcher (10):
+  docs: Add block device LED trigger documentation
+  block: Add file (blk-ledtrig.c) for block device LED trigger
+    implementation
+  block: Add block device LED trigger fields to gendisk structure
+  block: Add functions to set & clear block device LEDs
+  block: Add block device sysfs attribute to set/clear/show LED
+  block: Add activate and deactivate functions for block device LED
+    trigger
+  block: Add sysfs attributes to LEDs associated with blkdev trigger
+  block: Add init function for block device LED trigger
+  block: Blink device LED (if any) when request is sent to its driver
+  block: Add config option to enable block device LED triggers
+
+ Documentation/ABI/testing/sysfs-block         |  16 +
+ .../testing/sysfs-class-led-trigger-blkdev    |  28 ++
+ Documentation/block/blk-ledtrig.rst           |  79 +++
+ Documentation/block/index.rst                 |   1 +
+ block/Kconfig                                 |   8 +
+ block/Makefile                                |   1 +
+ block/blk-ledtrig.c                           | 469 ++++++++++++++++++
+ block/blk-ledtrig.h                           |  45 ++
+ block/blk-mq.c                                |   2 +
+ block/genhd.c                                 |  11 +
+ include/linux/genhd.h                         |   4 +
+ 11 files changed, 664 insertions(+)
+ create mode 100644 Documentation/ABI/testing/sysfs-class-led-trigger-blkdev
+ create mode 100644 Documentation/block/blk-ledtrig.rst
+ create mode 100644 block/blk-ledtrig.c
+ create mode 100644 block/blk-ledtrig.h
+
 -- 
 2.31.1
 
