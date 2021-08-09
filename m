@@ -2,98 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BFAC4338F
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 15:18:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 783ACC4320E
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 15:44:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61EDE60F35
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 15:18:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56F5860F93
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 15:44:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232816AbhHIPSm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 11:18:42 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:51678 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232717AbhHIPSm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 11:18:42 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 059912000C;
-        Mon,  9 Aug 2021 15:18:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1628522301; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+7LQfr+QS70hPlEzdXU5UNfASl0hm6MYjCpn/TJE3Bc=;
-        b=R4vTQk1xooDBp9mWzIXzqhwLD4CIHqYAxE00uuxm9oLbJhzDcwNh6qmud4FPuBHxoWpTKs
-        /uupXehqAF9P9KZgz9j+mFeb0T4LfBlR3IfbjX03lQLinlhL1epZQVP3/ha2pv01dqhbhx
-        Q4tSeteWdiPwWSpi+KBAapfqQhD7tok=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1628522301;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+7LQfr+QS70hPlEzdXU5UNfASl0hm6MYjCpn/TJE3Bc=;
-        b=dm/cqvOl95qsMUroycYmEaR6xavGIMxMc49ZUMkfh0XYG2GNLNuYmbuk7HNcvA2Psn69/P
-        q05ZLbbK32ovACDg==
-Received: from quack2.suse.cz (unknown [10.100.224.230])
-        by relay2.suse.de (Postfix) with ESMTP id EAE89A3B81;
-        Mon,  9 Aug 2021 15:18:20 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id D3AB21E3BFC; Mon,  9 Aug 2021 17:18:20 +0200 (CEST)
-Date:   Mon, 9 Aug 2021 17:18:20 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 3/5] block: add a queue_has_disk helper
-Message-ID: <20210809151820.GG30319@quack2.suse.cz>
-References: <20210809141744.1203023-1-hch@lst.de>
- <20210809141744.1203023-4-hch@lst.de>
+        id S235541AbhHIPoc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 11:44:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34040 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230095AbhHIPoa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 11:44:30 -0400
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D51CCC0613D3;
+        Mon,  9 Aug 2021 08:44:09 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id s13so14833446oie.10;
+        Mon, 09 Aug 2021 08:44:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=xfIEzWUDBcftZDUDyQ73IjKOk2KGqvXNnD8dGpW+rlo=;
+        b=fGM1iJJHVlpNxWI4E4jrECgCUC9fj1LJN4tQd5aMWM8drsHKYuobXpvs7PM+20/uLW
+         htmXBNzpuOX22Oka1iMVxhSLqs8kjJatkceELw9IA6JU4BNTzzMbzGY8vxiQhk3ZABZD
+         w7Mo0juFgCqnLeNpLTLHxqDQjfTomEt19BrxQwYAdkBjrlungN6WAL2yngyna25ZIolj
+         TZBMaACd8pNArZQ69dTDvNk5YY0UMTCtwwJlAb8zb3sJqdKs7AtDexgejWJapk9rVl6G
+         bMHitrVWa5eWDuMGLg6R3x3SCdaBUCcH12Cq4P47tmiJ6u77rRcxkIeso1PIUnbkplmJ
+         Z9jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xfIEzWUDBcftZDUDyQ73IjKOk2KGqvXNnD8dGpW+rlo=;
+        b=fGMj4f17m/wDLvwU2pB4ZukkDi0cC0Zmjd/KNjBqUA+cdwO6mM3yfTYEn52g+g3T0J
+         aoa/60speo3yPhtj3sMizrBCOqox263EJVUO7MbASdk1Fntsmef/eBKZp67tZIJHPt13
+         yRqEiP5V/7Y5nrCUb3XF3KroHwmN2k05W6+7uyVFhscerQN+v3XZ6zZvEcHofBtS7Q9l
+         yGLbHqsbMI6PesXXUVNDeLohlfJszxhNE/avGpMzNT2IugyiekYolv/2p6tDbWBd6O4V
+         Lny5BkNzKgHNH6pj+6Bg8g5kIMfWxT3GkHtVQ9gZ+gVNRXtNHtTfCKVbDKBK25cT3XFZ
+         Ku2Q==
+X-Gm-Message-State: AOAM530tHyNyOYZKsEMTUQj0KzpB6GHPdL0xgeWyxu86F+lL5eh7MuWx
+        G9K+FOfSlJjSYPutpPlvN259nm8wk+tSOBZr
+X-Google-Smtp-Source: ABdhPJxgLkeRKmS9D3bTDsoGfiCtg7u1A9LPfKTKFBxGvYxn21y3lO+KcKfy3DFFHST+BwHQFjM89A==
+X-Received: by 2002:aca:59c6:: with SMTP id n189mr11814143oib.44.1628523849234;
+        Mon, 09 Aug 2021 08:44:09 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id o11sm1342681otp.8.2021.08.09.08.44.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Aug 2021 08:44:08 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 05/10] block: Add block device sysfs attribute to
+ set/clear/show LED
+To:     Jackie Liu <liuyun01@kylinos.cn>, linux-block@vger.kernel.org,
+        linux-leds@vger.kernel.org
+Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
+        kernelnewbies@kernelnewbies.org
+References: <20210809033217.1113444-1-arequipeno@gmail.com>
+ <20210809033217.1113444-6-arequipeno@gmail.com>
+ <d2322db3-992a-f9c1-53c4-39efc9d957a4@kylinos.cn>
+From:   Ian Pilcher <arequipeno@gmail.com>
+Message-ID: <94f034a0-4c65-48d3-3eaa-a57ceb6a8ce3@gmail.com>
+Date:   Mon, 9 Aug 2021 10:44:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210809141744.1203023-4-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <d2322db3-992a-f9c1-53c4-39efc9d957a4@kylinos.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 09-08-21 16:17:42, Christoph Hellwig wrote:
-> Add a helper to check if a gendisk is associated with a request_queue.
+On 8/8/21 11:21 PM, Jackie Liu wrote:
+>> +// Returns a pointer to the first whitespace character in s (or a pointer to
+>> +// the terminating null), which is effectively a pointer to the position *after*
+>> +// the last character in the non-whitespace token at the beginning of s.  (s is
+>> +// expected to be the result of a previous call to blk_ledtrig_skip_whitespace.)
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> These are not linux kernel style comments.
 
-Looks fine. Feel free to add:
+Do you mean kernel-doc comments?  If so, they're not supposed to be, as
+the functions are not exported.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+>> +static const char *blk_ledtrig_find_whitespace(const char *s)     ^^^^^^
 
-								Honza
-
-> ---
->  include/linux/blkdev.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index ac3642c88a4d..96f3d9617cd8 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -664,6 +664,7 @@ extern void blk_clear_pm_only(struct request_queue *q);
->  	dma_map_page_attrs(dev, (bv)->bv_page, (bv)->bv_offset, (bv)->bv_len, \
->  	(dir), (attrs))
->  
-> +#define queue_has_disk(q)	((q)->kobj.parent != NULL)
->  #define queue_to_disk(q)	(dev_to_disk(kobj_to_dev((q)->kobj.parent)))
->  
->  static inline bool queue_is_mq(struct request_queue *q)
-> -- 
-> 2.30.2
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+========================================================================
+                  In Soviet Russia, Google searches you!
+========================================================================
