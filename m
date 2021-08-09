@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 011A7C432BE
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 14:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B13CC4338F
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 14:38:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D391F60234
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 14:36:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BC0960234
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 14:38:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232944AbhHIOgH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 10:36:07 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3609 "EHLO
+        id S233959AbhHIOgt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 10:36:49 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3611 "EHLO
         frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235256AbhHIOfA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 10:35:00 -0400
-Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Gjz9V4HLYz6D9Hg;
-        Mon,  9 Aug 2021 22:34:06 +0800 (CST)
+        with ESMTP id S233984AbhHIOfB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 10:35:01 -0400
+Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Gjz9Y1Jzyz6C990;
+        Mon,  9 Aug 2021 22:34:09 +0800 (CST)
 Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
+ fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 9 Aug 2021 16:34:33 +0200
+ 15.1.2308.8; Mon, 9 Aug 2021 16:34:39 +0200
 Received: from localhost.localdomain (10.69.192.58) by
  lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 9 Aug 2021 15:34:30 +0100
+ 15.1.2176.2; Mon, 9 Aug 2021 15:34:36 +0100
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>
@@ -37,9 +37,9 @@ CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-scsi@vger.kernel.org>, <kashyap.desai@broadcom.com>,
         <hare@suse.de>, <ming.lei@redhat.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH v2 03/11] blk-mq: Relocate shared sbitmap resize in blk_mq_update_nr_requests()
-Date:   Mon, 9 Aug 2021 22:29:30 +0800
-Message-ID: <1628519378-211232-4-git-send-email-john.garry@huawei.com>
+Subject: [PATCH v2 05/11] blk-mq-sched: Rename blk_mq_sched_alloc_{tags -> map_and_request}()
+Date:   Mon, 9 Aug 2021 22:29:32 +0800
+Message-ID: <1628519378-211232-6-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
 References: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
@@ -53,50 +53,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For shared sbitmap, if the call to blk_mq_tag_update_depth() was
-successful for any hctx when hctx->sched_tags is not set, then it would be
-successful for all (due to nature in which blk_mq_tag_update_depth()
-fails).
+Function blk_mq_sched_alloc_tags() does same as
+__blk_mq_alloc_map_and_request(), so give a similar name to be consistent.
 
-As such, there is no need to call blk_mq_tag_resize_shared_sbitmap() for
-each hctx. So relocate the call until after the hctx iteration under the
-!q->elevator check, which is equivalent (to !hctx->sched_tags).
+Similarly rename label err_free_tags -> err_free_map_and_request.
 
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- block/blk-mq.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ block/blk-mq-sched.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ae28f470893c..0e4825ca9869 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3624,8 +3624,6 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		if (!hctx->sched_tags) {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
- 							false);
--			if (!ret && blk_mq_is_sbitmap_shared(set->flags))
--				blk_mq_tag_resize_shared_sbitmap(set, nr);
- 		} else {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
- 							nr, true);
-@@ -3643,9 +3641,13 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 	}
- 	if (!ret) {
- 		q->nr_requests = nr;
--		if (q->elevator && blk_mq_is_sbitmap_shared(set->flags))
--			sbitmap_queue_resize(&q->sched_bitmap_tags,
--					     nr - set->reserved_tags);
-+		if (blk_mq_is_sbitmap_shared(set->flags)) {
-+			if (q->elevator)
-+				sbitmap_queue_resize(&q->sched_bitmap_tags,
-+						     nr - set->reserved_tags);
-+			else
-+				blk_mq_tag_resize_shared_sbitmap(set, nr);
-+		}
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 2231fb0d4c35..b4d7ad9a7a60 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -515,9 +515,9 @@ void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 	percpu_ref_put(&q->q_usage_counter);
+ }
+ 
+-static int blk_mq_sched_alloc_tags(struct request_queue *q,
+-				   struct blk_mq_hw_ctx *hctx,
+-				   unsigned int hctx_idx)
++static int blk_mq_sched_alloc_map_and_request(struct request_queue *q,
++					      struct blk_mq_hw_ctx *hctx,
++					      unsigned int hctx_idx)
+ {
+ 	struct blk_mq_tag_set *set = q->tag_set;
+ 	int ret;
+@@ -609,15 +609,15 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 				   BLKDEV_DEFAULT_RQ);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+-		ret = blk_mq_sched_alloc_tags(q, hctx, i);
++		ret = blk_mq_sched_alloc_map_and_request(q, hctx, i);
+ 		if (ret)
+-			goto err_free_tags;
++			goto err_free_map_and_request;
  	}
  
- 	blk_mq_unquiesce_queue(q);
+ 	if (blk_mq_is_sbitmap_shared(q->tag_set->flags)) {
+ 		ret = blk_mq_init_sched_shared_sbitmap(q);
+ 		if (ret)
+-			goto err_free_tags;
++			goto err_free_map_and_request;
+ 	}
+ 
+ 	ret = e->ops.init_sched(q, e);
+@@ -645,7 +645,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ err_free_sbitmap:
+ 	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+ 		blk_mq_exit_sched_shared_sbitmap(q);
+-err_free_tags:
++err_free_map_and_request:
+ 	blk_mq_sched_free_requests(q);
+ 	blk_mq_sched_tags_teardown(q);
+ 	q->elevator = NULL;
 -- 
 2.26.2
 
