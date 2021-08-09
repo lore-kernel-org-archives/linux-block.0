@@ -2,151 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 304F2C43214
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 21:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E1EC432BE
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 21:29:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1589160EB9
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 21:24:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CB3F6105A
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 21:29:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234687AbhHIVYf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 17:24:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55922 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236419AbhHIVYf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 17:24:35 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58DFEC0613D3
-        for <linux-block@vger.kernel.org>; Mon,  9 Aug 2021 14:24:12 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id a20so18107539plm.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Aug 2021 14:24:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=dyOLwIAyn5igot9fdJEMYSDMYL7Dq8yEvViQYaBuv5Q=;
-        b=IgN38Ju83GTulvCvZYlk1tCmOLuq05ZnrXLyiM9cJpOx72VXo8vLggCiEjPzdjwgyD
-         mMK7Lct7hKsJ/9DeBUZkREk9FHfFpCUr77ggNxRruqvvZ4qbGG6Bt5NbSI/8AvjN+lsD
-         7DlNNRZMiSIZboSKJdB46Lk6VuIvJ8D/yY1x6ajWlTDv1lyKY0e52sAZDh9GjmZn5d9X
-         S2zhHWdkcPKHSIdk8OT/QtCUFD4xvU3VyyZhgnonWJv2jzZEX6KXZYTft+GnfFxn4mCi
-         2hIadd1fFXCXYRljE3GILzNYvjMtdV6g6PhSoJG9kDpUkJFogd08mLnucB5oubB0dmNE
-         nG+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=dyOLwIAyn5igot9fdJEMYSDMYL7Dq8yEvViQYaBuv5Q=;
-        b=cuujV7fHHWYPf7Y5PZguUoBiIKdOromIpZhj3+fs3NNpTnVOtf4rgdfqyIyRMsLewR
-         cbL75NkjhALeXweREfX9Ui9F2eQWL4571dJprofAT2GOvVOZGpKB5j03cwo6sgoNQ7fE
-         lCRK8NC9nQuuA0KR0jdQXCxMO6zNARLd49CWJE15JOL2Pu7qF17zFSxKV7nx3OsbAVlJ
-         E3vKqWct/cTInBD8yVJy0AIRosag32VihFV2QE/l+8w7gpwhz1Tw2c/6ILCuoRb7BDsL
-         ssOIfh6t9ybUYu23vl5883MentkwkKY5NhqHzTWTudPSl5NAUw3KhsMl7S5NXDAGoXND
-         uAbw==
-X-Gm-Message-State: AOAM531tXSKj7Zm+vjF0xnK2xAgPStnC5F1O111q3dyHAaFfEeGkFZj0
-        +TFUT1TcCRJQDFyoOj145jf+pzqDIuCsJ4dp
-X-Google-Smtp-Source: ABdhPJwsQKrvh7BBLMHgl6EZA+imD4LOvABq2HSlJV/q66inXi4kN9VHm6P7KHtJsfNePIQmLfyH3A==
-X-Received: by 2002:a17:90a:6541:: with SMTP id f1mr1114982pjs.184.1628544251710;
-        Mon, 09 Aug 2021 14:24:11 -0700 (PDT)
-Received: from localhost.localdomain ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id m16sm439885pjz.30.2021.08.09.14.24.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 14:24:11 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     io-uring@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/4] block: enable use of bio allocation cache
-Date:   Mon,  9 Aug 2021 15:24:01 -0600
-Message-Id: <20210809212401.19807-5-axboe@kernel.dk>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210809212401.19807-1-axboe@kernel.dk>
-References: <20210809212401.19807-1-axboe@kernel.dk>
+        id S232897AbhHIVaA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 17:30:00 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:57106 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232334AbhHIV37 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 17:29:59 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 7C2FB21F6C;
+        Mon,  9 Aug 2021 21:29:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1628544577; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HMQNCsfM55EcDNGyuVeZ/Y95f0u1E88irWEda0U0VhM=;
+        b=Qyhsi29JZSoTngsj/2wl6iGcB+tfYHcXf9Ibdj+Ogl0+YMIdj/OQQtMaOPJKbd5P2fcrsk
+        x34It64TOdssJNHD7D20il83KqmH2nMT5KrNzMP1XnqA86V3DOyWeqGIR1LE/BRoGCkKJj
+        UGhvprc0zfFwj2dypqr5JDNQFfLgeTY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1628544577;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HMQNCsfM55EcDNGyuVeZ/Y95f0u1E88irWEda0U0VhM=;
+        b=j/p5lE3P0VRMmomkyOqEGMqgyc6eC5IkwVwcnBe9Wd0S4rFC5df1no8lez/Y4/5kbgyQR9
+        BZLBIkZcvF54ELCA==
+Received: from quack2.suse.cz (unknown [10.100.224.230])
+        by relay2.suse.de (Postfix) with ESMTP id 692E8A3B81;
+        Mon,  9 Aug 2021 21:29:37 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 16E9C1E3BFC; Mon,  9 Aug 2021 23:29:34 +0200 (CEST)
+Date:   Mon, 9 Aug 2021 23:29:34 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+        Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 4/5] block: move the bdi from the request_queue to the
+ gendisk
+Message-ID: <20210809212934.GK30319@quack2.suse.cz>
+References: <20210809141744.1203023-1-hch@lst.de>
+ <20210809141744.1203023-5-hch@lst.de>
+ <20210809154728.GH30319@quack2.suse.cz>
+ <2c007f99-b8f1-3f84-7575-cb6934704388@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2c007f99-b8f1-3f84-7575-cb6934704388@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If a kiocb is marked as being valid for bio caching, then use that to
-allocate a (and free) new bio if possible.
+On Mon 09-08-21 11:57:42, Jens Axboe wrote:
+> On 8/9/21 9:47 AM, Jan Kara wrote:
+> > On Mon 09-08-21 16:17:43, Christoph Hellwig wrote:
+> >> The backing device information only makes sense for file system I/O,
+> >> and thus belongs into the gendisk and not the lower level request_queue
+> >> structure.  Move it there.
+> >>
+> >> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > 
+> > Looks mostly good. I'm just unsure whether some queue_to_disk() calls are
+> > safe.
+> > 
+> >> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> >> index 2c4ac51e54eb..d2725f94491d 100644
+> >> --- a/block/blk-mq.c
+> >> +++ b/block/blk-mq.c
+> >> @@ -525,7 +525,7 @@ void blk_mq_free_request(struct request *rq)
+> >>  		__blk_mq_dec_active_requests(hctx);
+> >>  
+> >>  	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+> >> -		laptop_io_completion(q->backing_dev_info);
+> >> +		laptop_io_completion(queue_to_disk(q)->bdi);
+> >>
+> > 
+> > E.g. cannot this get called for a queue that is without a disk?
+> 
+> Should be fine, as it's checking for passthrough. Maybe famous last
+> words, but we should not be seeing regular IO before disk is setup.
+> 
+> >> @@ -359,8 +359,8 @@ static void wb_timer_fn(struct blk_stat_callback *cb)
+> >>  
+> >>  	status = latency_exceeded(rwb, cb->stat);
+> >>  
+> >> -	trace_wbt_timer(rwb->rqos.q->backing_dev_info, status, rqd->scale_step,
+> >> -			inflight);
+> >> +	trace_wbt_timer(queue_to_disk(rwb->rqos.q)->bdi, status,
+> >> +			rqd->scale_step, inflight);
+> >>  
+> >>  	/*
+> >>  	 * If we exceeded the latency target, step down. If we did not,
+> > 
+> > Or all these calls - is wbt guaranteed to only be setup for a queue with
+> > disk?
+> 
+> Same for this one.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/block_dev.c | 30 ++++++++++++++++++++++++++----
- 1 file changed, 26 insertions(+), 4 deletions(-)
+OK, fair enough then. Feel free to add:
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9ef4f1fc2cb0..36a3d53326c0 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -327,6 +327,14 @@ static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
- 	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
- }
- 
-+static void dio_bio_put(struct blkdev_dio *dio)
-+{
-+	if (!dio->is_sync && (dio->iocb->ki_flags & IOCB_ALLOC_CACHE))
-+		bio_cache_put(&dio->bio);
-+	else
-+		bio_put(&dio->bio);
-+}
-+
- static void blkdev_bio_end_io(struct bio *bio)
- {
- 	struct blkdev_dio *dio = bio->bi_private;
-@@ -362,7 +370,7 @@ static void blkdev_bio_end_io(struct bio *bio)
- 		bio_check_pages_dirty(bio);
- 	} else {
- 		bio_release_pages(bio, false);
--		bio_put(bio);
-+		dio_bio_put(dio);
- 	}
- }
- 
-@@ -385,7 +393,14 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 	    (bdev_logical_block_size(bdev) - 1))
- 		return -EINVAL;
- 
--	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
-+	bio = NULL;
-+	if (iocb->ki_flags & IOCB_ALLOC_CACHE) {
-+		bio = bio_cache_get(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
-+		if (!bio)
-+			iocb->ki_flags &= ~IOCB_ALLOC_CACHE;
-+	}
-+	if (!bio)
-+		bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
- 
- 	dio = container_of(bio, struct blkdev_dio, bio);
- 	dio->is_sync = is_sync = is_sync_kiocb(iocb);
-@@ -467,7 +482,14 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 		}
- 
- 		submit_bio(bio);
--		bio = bio_alloc(GFP_KERNEL, nr_pages);
-+		bio = NULL;
-+		if (iocb->ki_flags & IOCB_ALLOC_CACHE) {
-+			bio = bio_cache_get(GFP_KERNEL, nr_pages, &fs_bio_set);
-+			if (!bio)
-+				iocb->ki_flags &= ~IOCB_ALLOC_CACHE;
-+		}
-+		if (!bio)
-+			bio = bio_alloc(GFP_KERNEL, nr_pages);
- 	}
- 
- 	if (!is_poll)
-@@ -492,7 +514,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 	if (likely(!ret))
- 		ret = dio->size;
- 
--	bio_put(&dio->bio);
-+	dio_bio_put(dio);
- 	return ret;
- }
- 
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
 -- 
-2.32.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
