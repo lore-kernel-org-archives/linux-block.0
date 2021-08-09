@@ -5,64 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28DCFC43214
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 03:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B169AC43216
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 03:32:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06B0A61019
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 03:32:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F4476103B
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 03:32:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232877AbhHIDdN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Aug 2021 23:33:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37104 "EHLO
+        id S232898AbhHIDdP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Aug 2021 23:33:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232763AbhHIDdM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 23:33:12 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF6DEC061757;
-        Sun,  8 Aug 2021 20:32:52 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id be20so2853251oib.8;
-        Sun, 08 Aug 2021 20:32:52 -0700 (PDT)
+        with ESMTP id S232861AbhHIDdL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Aug 2021 23:33:11 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6890FC061757;
+        Sun,  8 Aug 2021 20:32:51 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id w6so21734420oiv.11;
+        Sun, 08 Aug 2021 20:32:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=kRrIoSKg1v4/TjhUcT0NK/1ehkQeeVfSwbumR9nUTwI=;
-        b=rn0342fWakTOfnwZyR38Tk1r4457maQ+jFYOSAyl4x0tRYTdpBUqCMwdK9KqnUNHTY
-         bnmYFStkH9MYPBH2rlut2KfG2yS8bN05EbM94cb0Y9oZdUoDQ0T5NqZC/MqagyLxKxDW
-         mwXEcXWvCWkYEAPTfoJtFUwKauyIV2JiQMaH8ymqSgx2AYByFBE8JgTJNqeRwIflo2G0
-         sYgjHdY8ffdpCXbLYVSrnTYslQxiQ1mLrxHHtmmFIbIPanWYZxRQNF2GpAxVeBfTkn0G
-         x0H5AQSDdhQ4ZO0QO7PZrElvYdKx1WyjZQqzAeoL2haikbCg4fZWvnFRRFnckA767QAS
-         ZVwg==
+        bh=OX+fGhBFKu5FC8W1LaNx83ZClAd+GqNacmx+NCQZpPI=;
+        b=WCC40AOnAGPJCaly+0XFVIQEEX64WmZgZhhQF5zRUV4r4HOd8anG3DBtybTrc7soJe
+         tGoCQUJTuST/3+LB8ERWMX41+GufyjY5NIgQAhP/BZqvyzELNQ098BPqituW4QSQq/FH
+         ba+s+ygjJ/OfjWLGzE86crAdG56hD6CDqqFMRYOLLnVKmQWSTJbRJx9OWaZFv0QYNTQd
+         qTssijziug4kor5ryPvtorh5aLHZnjZCON27lHp7zHcHhxsyDYsOPjsXoMD8eDQGoWmU
+         GhmFz3/wN1XECvJTvjkp+D7xG0614KsXnhfui935r7yY3ksjGn2+I98ZG+Pf11Dg9qLu
+         n1jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kRrIoSKg1v4/TjhUcT0NK/1ehkQeeVfSwbumR9nUTwI=;
-        b=lAk9k1Z051zbVu5nvLbSUduQDif9RWXyl0exsiOKdbBvTKA+fu6gUl5Sv4r2x6x0g6
-         T6fITdA11DduntmmIx2L176bBoRb9juRfH38knzGxxUkUpfvkNCmXSDNFAAIyM1M6CHb
-         QtJGEp6zcG1pSV7p8sfTOLNgPGPiCNM2nrNvexTE6aEJ9B5vZVBlMdp+C8QKaYWe9ChW
-         tQNqA+je9e5jtS5LjZRLJ691uXkP0myfnTe8nqm/8+vEtfZqTzoeoOT1IH3Z2akZSc8k
-         LszbvPCWEyrw3dPtNMBE1Mefy+OSepX2Ijx7WNjNMM2u02aBXbAFxtus8JHjGBW3UZhV
-         7sqw==
-X-Gm-Message-State: AOAM531pUwPyOWVksmelUS88nIT43iMTZqQ7FZh2YAg1odXEbuV1kYwv
-        TGBMJT4/9COoxO1cOxakorKz5sloqQnJqCze
-X-Google-Smtp-Source: ABdhPJwZ2nCdKz7ZHdKJ2lNlsJ+uCw9Aw35CFGNScZU6OYTKlyWRPBg+/wMC34wH3kMIblU9RFzmtQ==
-X-Received: by 2002:aca:de54:: with SMTP id v81mr2142698oig.40.1628479972174;
-        Sun, 08 Aug 2021 20:32:52 -0700 (PDT)
+        bh=OX+fGhBFKu5FC8W1LaNx83ZClAd+GqNacmx+NCQZpPI=;
+        b=LrW+cH5Eeopi0Cx75GDz7JRyWltCGl2F263kA/CmmF0CdQg3Z/rYXXycXSiooiRcJl
+         2SgAJTH2C8mT6HZhr/jeQ/+kCQ6FerFFqq4/MhPCSVymf2OcY48TnidNzMTZaKF/uqob
+         5NfxlE12BMTIK3kE75ukqgs6f8EOE2FpOq+VSYfUWIQPfAqvu2zFjxboYkZGKILeKqSc
+         G3Zg6NtMsXY38mqizOvEp4CbLEe7hCEvDMT5+prtsV5cglomcY7QdHswrXAKTCiqP89f
+         QiRQek+Y61kYGJG2jvP5n4tcENJAhrNWwCCvtIzVS9DRYC1H39MgHhjTQyi5zM8HZbXo
+         RyGQ==
+X-Gm-Message-State: AOAM530fW/AlCX3nKVy2S6NjL1gLulgRRN6PirlT1Wu6eacX+Xw79lIR
+        NcbYrEc08yp9Qc+jLube5lCPyiosDjL6SPew
+X-Google-Smtp-Source: ABdhPJxsUg7gwG7M3FvrqmDHa42XuVGQE62q8ZQUKn9I3VhNuZ7da2cDoNa5fykXMIwI1js9pyQSsQ==
+X-Received: by 2002:aca:b757:: with SMTP id h84mr4870760oif.77.1628479970869;
+        Sun, 08 Aug 2021 20:32:50 -0700 (PDT)
 Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id r7sm1463646oij.14.2021.08.08.20.32.51
+        by smtp.gmail.com with ESMTPSA id r7sm1463646oij.14.2021.08.08.20.32.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Aug 2021 20:32:51 -0700 (PDT)
+        Sun, 08 Aug 2021 20:32:50 -0700 (PDT)
 From:   Ian Pilcher <arequipeno@gmail.com>
 To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org
 Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-kernel@vger.kernel.org,
         kernelnewbies@kernelnewbies.org
-Subject: [RFC PATCH v2 06/10] block: Add activate and deactivate functions for block device LED trigger
-Date:   Sun,  8 Aug 2021 22:32:13 -0500
-Message-Id: <20210809033217.1113444-7-arequipeno@gmail.com>
+Subject: [RFC PATCH v2 04/10] block: Add functions to set & clear block device LEDs
+Date:   Sun,  8 Aug 2021 22:32:11 -0500
+Message-Id: <20210809033217.1113444-5-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210809033217.1113444-1-arequipeno@gmail.com>
 References: <20210809033217.1113444-1-arequipeno@gmail.com>
@@ -72,135 +72,158 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set up activated LED:
+Create a symlink from /sys/class/leds/<LED>/block_devices to each block
+device that is associated with that LED
 
-  * Allocate per-LED data structure
-  * Add LED to list of LEDs associated with blkdev trigger
-  * Create block_devices subdirectory for links to associated devices
-
-Clean up deactivated LED:
-
-  * Clear LED of any associated devices
-  * Remove from LED from blkdev trigger list
-  * Remove block_devices subdirectory
-  * Wait for any blinks using LED to complete (synchronize_rcu())
-  * Free per-LED structure
+Ensure device LED is cleared when device is removed
 
 Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 ---
- block/blk-ledtrig.c | 95 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+ block/blk-ledtrig.c | 93 +++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-ledtrig.h |  3 ++
+ block/genhd.c       |  1 +
+ 3 files changed, 97 insertions(+)
 
 diff --git a/block/blk-ledtrig.c b/block/blk-ledtrig.c
-index 1af94dc7ea51..f8cb6de203f8 100644
+index c5ad57ed9c3b..280fa9edc2dd 100644
 --- a/block/blk-ledtrig.c
 +++ b/block/blk-ledtrig.c
-@@ -13,6 +13,11 @@
+@@ -6,9 +6,13 @@
+  *	Copyright 2021 Ian Pilcher <arequipeno@gmail.com>
+  */
  
- #include "blk-ledtrig.h"
++#include <linux/genhd.h>
+ #include <linux/leds.h>
+ #include <linux/mutex.h>
  
-+// Default blink_on & blink_off values
-+#define BLK_LEDTRIG_BLINK_ON	75
-+#define BLK_LEDTRIG_BLINK_OFF	25
-+#define BLK_LEDTRIG_BLINK_MAX	10000		// 10 seconds
++#include "blk-ledtrig.h"
 +
- 
++
  /*
   *
-@@ -248,3 +253,93 @@ ssize_t blk_ledtrig_dev_led_show(struct device *const dev,
- led_show_exit_return:
- 	return ret;
+  *	Trigger mutex and LED list
+@@ -46,3 +50,92 @@ static struct blk_ledtrig_led *blk_ledtrig_find(const char *const led_name,
+ 
+ 	return NULL;
  }
 +
 +
 +/*
 + *
-+ *	Associate an LED with the blkdev trigger
++ *	Clear a block device's LED
 + *
 + */
 +
-+// Helper function to create <LED>/blkdevs subdirectory - doesn't
-+// swallow error code like kobject_create_and_add()
-+static int blk_ledtrig_subdir_create(struct blk_ledtrig_led *const bd_led,
-+				     struct led_classdev *const led)
++// Also called from blk_ledtrig_dev_set()
++static void blk_ledtrig_dev_cleanup(struct gendisk *const disk,
++				    struct blk_ledtrig_led *const old_led)
 +{
-+	int ret;
-+
-+	bd_led->dir = kobject_create();
-+	if (bd_led->dir == NULL)
-+		return -ENOMEM;
-+
-+	ret = kobject_add(bd_led->dir, &led->dev->kobj, "block_devices");
-+	if (ret != 0)
-+		kobject_put(bd_led->dir);
-+
-+	return ret;
++	sysfs_remove_link(old_led->dir, disk->disk_name);
++	list_del(&disk->led_dev_list_node);
 +}
 +
-+static int blk_ledtrig_activate(struct led_classdev *const led)
++// Also called from blk_ledtrig_deactivate()
++static void blk_ledtrig_dev_clear_locked(struct gendisk *const disk,
++					 struct blk_ledtrig_led *const old_led)
 +{
-+	struct blk_ledtrig_led *bd_led;
-+	int ret;
++	RCU_INIT_POINTER(disk->led, NULL);
++	if (old_led != NULL)
++		blk_ledtrig_dev_cleanup(disk, old_led);
++}
 +
-+	bd_led = kmalloc(sizeof(*bd_led), GFP_KERNEL);
-+	if (bd_led == NULL) {
-+		ret = -ENOMEM;
-+		goto activate_exit_return;
-+	}
++// Also called from genhd.c:del_gendisk()
++void blk_ledtrig_dev_clear(struct gendisk *const disk)
++{
++	struct blk_ledtrig_led *old_led;
 +
-+	bd_led->led = led;
-+	bd_led->blink_on = BLK_LEDTRIG_BLINK_ON;
-+	bd_led->blink_off = BLK_LEDTRIG_BLINK_OFF;
-+	INIT_LIST_HEAD(&bd_led->dev_list);
-+
-+	ret = mutex_lock_interruptible(&blk_ledtrig_mutex);
-+	if (ret != 0)
-+		goto activate_exit_free;
-+
-+	ret = blk_ledtrig_subdir_create(bd_led, led);
-+	if (ret != 0)
-+		goto activate_exit_unlock;
-+
-+	list_add(&bd_led->leds_list_node, &blk_ledtrig_leds);
-+	led_set_trigger_data(led, bd_led);
-+	ret = 0;
-+
-+activate_exit_unlock:
++	mutex_lock(&blk_ledtrig_mutex);
++	old_led = rcu_dereference_protected(disk->led,
++					lockdep_is_held(&blk_ledtrig_mutex));
++	blk_ledtrig_dev_clear_locked(disk, old_led);
 +	mutex_unlock(&blk_ledtrig_mutex);
-+activate_exit_free:
-+	if (ret != 0)
-+		kfree(bd_led);
-+activate_exit_return:
-+	return ret;
 +}
 +
 +
 +/*
 + *
-+ *	Disassociate an LED from the blkdev trigger
++ *	Set a block device's LED
 + *
 + */
 +
-+static void blk_ledtrig_deactivate(struct led_classdev *const led)
++static int blk_ledtrig_dev_set(struct gendisk *const disk,
++			       const char *const led_name,
++			       const size_t name_len)
 +{
-+	struct blk_ledtrig_led *const bd_led = led_get_trigger_data(led);
-+	struct gendisk *disk, *next;
++	struct blk_ledtrig_led *new_led, *old_led;
++	int ret;
 +
-+	mutex_lock(&blk_ledtrig_mutex);
++	ret = mutex_lock_interruptible(&blk_ledtrig_mutex);
++	if (ret != 0)
++		goto led_set_exit_return;
 +
-+	list_for_each_entry_safe(disk, next,
-+				 &bd_led->dev_list, led_dev_list_node) {
-+
-+		blk_ledtrig_dev_clear_locked(disk, bd_led);
++	new_led = blk_ledtrig_find(led_name, name_len);
++	if (new_led == NULL) {
++		pr_info("no LED named %.*s associated with blkdev trigger\n",
++			(int)name_len, led_name);
++		ret = -ENODEV;
++		goto led_set_exit_unlock;
 +	}
 +
-+	list_del(&bd_led->leds_list_node);
-+	kobject_put(bd_led->dir);
++	old_led = rcu_dereference_protected(disk->led,
++					lockdep_is_held(&blk_ledtrig_mutex));
 +
++	if (old_led == new_led) {
++		ret = 0;
++		goto led_set_exit_unlock;
++	}
++
++	ret = sysfs_create_link(new_led->dir, &disk_to_dev(disk)->kobj,
++				disk->disk_name);
++	if (ret != 0)
++		goto led_set_exit_unlock;
++
++	if (old_led != NULL)
++		blk_ledtrig_dev_cleanup(disk, old_led);
++
++	rcu_assign_pointer(disk->led, new_led);
++	list_add(&disk->led_dev_list_node, &new_led->dev_list);
++
++	ret = 0;
++
++led_set_exit_unlock:
 +	mutex_unlock(&blk_ledtrig_mutex);
-+	synchronize_rcu();
-+	kfree(bd_led);
++led_set_exit_return:
++	return ret;
 +}
+diff --git a/block/blk-ledtrig.h b/block/blk-ledtrig.h
+index 95a79d2fe447..66a1302a4174 100644
+--- a/block/blk-ledtrig.h
++++ b/block/blk-ledtrig.h
+@@ -16,9 +16,12 @@ static inline void blk_ledtrig_disk_init(struct gendisk *const disk)
+ 	RCU_INIT_POINTER(disk->led, NULL);
+ }
+ 
++void blk_ledtrig_dev_clear(struct gendisk *const disk);
++
+ #else	// CONFIG_BLK_LED_TRIGGERS
+ 
+ static inline void blk_ledtrig_disk_init(const struct gendisk *disk) {}
++static inline void blk_ledtrig_dev_clear(const struct gendisk *disk) {}
+ 
+ #endif	// CONFIG_BLK_LED_TRIGGERS
+ 
+diff --git a/block/genhd.c b/block/genhd.c
+index b168172e664b..9fa734aeab0f 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -583,6 +583,7 @@ void del_gendisk(struct gendisk *disk)
+ 	if (WARN_ON_ONCE(!disk->queue))
+ 		return;
+ 
++	blk_ledtrig_dev_clear(disk);
+ 	blk_integrity_del(disk);
+ 	disk_del_events(disk);
+ 
 -- 
 2.31.1
 
