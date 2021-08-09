@@ -2,207 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473C8C4320A
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F302C4338F
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 14:04:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E2196054F
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:31:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E50F460F35
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 14:04:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235241AbhHILbX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 07:31:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32776 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234982AbhHILbV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 07:31:21 -0400
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79592C0613D3
-        for <linux-block@vger.kernel.org>; Mon,  9 Aug 2021 04:31:01 -0700 (PDT)
-Received: by mail-ua1-x92e.google.com with SMTP id f25so547879uam.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Aug 2021 04:31:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IV6BRlu5nqWBo0sf/tGMiDpNp/29jpZe7hZGlMgK9TE=;
-        b=pd99atNghWR2EXFgv8XZJakjfWaxf7WhyknLM8kIoOHa4YgdfnoTPB5B5yZKzpLLeL
-         8Obky1Touzww7JJ1LPkDR5ussYz78TDCT/aOUVtyInKRanV+yhskxWy13r4ELz5Zt3+W
-         j9ZgRTqbG9Kk64HZ1JdseYys90ZGg5RbdLCoMBVBvfCnnouHZHy1qNjIffFsLIDWhKR3
-         uEtKIcbj7BvqzUXb9yfl6fU6G44H8iNCHs0xPANj5Q3vS42f1YwZgr2i8eKmWNKpr9uz
-         y4W3Mq4knk8u4HtsRKPZJo69FOfCe9ybgJAnEPiZm5i2N8d8t0qXR+Sy+nPjW/M5xCMV
-         9Ssw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IV6BRlu5nqWBo0sf/tGMiDpNp/29jpZe7hZGlMgK9TE=;
-        b=F0Rtim90YbEmAHvC9yXKJgV5Uls/83/UN8vYzKZiMs6K5u5Z7MpGODh0ViEkNEWAOJ
-         eQ0Fu2XHxvBTcN528gx+NUM+ITpjgZrOC94lHnLJ8PQ0RrH6zbwoRWFtJHgLO+cZp6F6
-         +YBG0RHwmbzXeD4fdGGWoXw7qTctza3N5bF+cNlDw6rQ07lFa4bk/jk3mbXCxAsDswlj
-         SFLoHrG1Tzfr0NHb2iuzWjqpDj2n4v4Xkz2JHRUZxk47nIKTTfYMu/zSpGg+PRW6D+OC
-         eIqpcu6PTJdikg68RNXMllUsnQ0qopgNxhdhgWnIPVB+FdhObWJTDlRRmLz+fLfM2583
-         +GeQ==
-X-Gm-Message-State: AOAM531jImIX+WX0jvy1/BybauT8yNSr5lFw4Ruhshu0y94WrKU2kWaB
-        FWUhMicqiizPVnR9W6lDjPfJKwBGcW/A7VlN5HU5oQ==
-X-Google-Smtp-Source: ABdhPJy6uKMGreNLvF0Ki8YaGC8NZzCCp3R6j9fbKII+5cbhRx2RkmK8Ng+IHjA2Ta3Qj2A+jSG6gNmoplJ+Wp8abWQ=
-X-Received: by 2002:ab0:6f4b:: with SMTP id r11mr15007620uat.104.1628508660724;
- Mon, 09 Aug 2021 04:31:00 -0700 (PDT)
+        id S231793AbhHIOE5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 10:04:57 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:13406 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231478AbhHIOE5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 10:04:57 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GjyRC3s7NzclyL;
+        Mon,  9 Aug 2021 22:00:55 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Mon, 9 Aug 2021 22:04:33 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Mon, 9 Aug 2021 22:04:32 +0800
+Subject: Re: [PATCH v2 2/2] nbd: convert to use blk_mq_get_rq_by_tag()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <bvanassche@acm.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <nbd@other.debian.org>, <yi.zhang@huawei.com>
+References: <20210809030927.1946162-1-yukuai3@huawei.com>
+ <20210809030927.1946162-3-yukuai3@huawei.com> <YRDK9tBFscK5ScK8@T590>
+ <47e5faa8-f8e5-86db-05a1-559e3b3c04b5@huawei.com> <YRD5krmF/C7JxchE@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <3adf6183-bf40-10cd-b8ed-552120028ca3@huawei.com>
+Date:   Mon, 9 Aug 2021 22:04:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20210809064028.1198327-1-hch@lst.de> <20210809064028.1198327-3-hch@lst.de>
-In-Reply-To: <20210809064028.1198327-3-hch@lst.de>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Mon, 9 Aug 2021 13:30:24 +0200
-Message-ID: <CAPDyKFoSKwamqRdQNkgwKTixSwXPEf9dB4jSiOh73DqXOZ1yGg@mail.gmail.com>
-Subject: Re: [PATCH 2/8] mmc: block: cleanup gendisk creation
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-        Song Liu <song@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YRD5krmF/C7JxchE@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 9 Aug 2021 at 08:44, Christoph Hellwig <hch@lst.de> wrote:
->
-> Restructure mmc_blk_probe to avoid a failure path with a half created
-> disk.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On 2021/08/09 17:46, Ming Lei wrote:
+> On Mon, Aug 09, 2021 at 03:08:26PM +0800, yukuai (C) wrote:
+>> On 2021/08/09 14:28, Ming Lei wrote:
+>>> On Mon, Aug 09, 2021 at 11:09:27AM +0800, Yu Kuai wrote:
+>>>> blk_mq_tag_to_rq() might return freed request, use
+>>>> blk_mq_get_rq_by_tag() instead.
+>>>>
+>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>>> ---
+>>>>    drivers/block/nbd.c | 11 ++++++-----
+>>>>    1 file changed, 6 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>>> index c38317979f74..9e56975a8eee 100644
+>>>> --- a/drivers/block/nbd.c
+>>>> +++ b/drivers/block/nbd.c
+>>>> @@ -713,11 +713,10 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+>>>>    	tag = nbd_handle_to_tag(handle);
+>>>>    	hwq = blk_mq_unique_tag_to_hwq(tag);
+>>>>    	if (hwq < nbd->tag_set.nr_hw_queues)
+>>>> -		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
+>>>> -				       blk_mq_unique_tag_to_tag(tag));
+>>>> -	if (!req || !blk_mq_request_started(req)) {
+>>>> -		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
+>>>> -			tag, req);
+>>>> +		req = blk_mq_get_rq_by_tag(nbd->tag_set.tags[hwq],
+>>>> +					   blk_mq_unique_tag_to_tag(tag));
+>>>> +	if (!req) {
+>>>> +		dev_err(disk_to_dev(nbd->disk), "Unexpected reply %d\n", tag);
+>>>>    		return ERR_PTR(-ENOENT);
+>>>>    	}
+>>>>    	trace_nbd_header_received(req, handle);
+>>>> @@ -779,6 +778,8 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+>>>>    	}
+>>>>    out:
+>>>>    	trace_nbd_payload_received(req, handle);
+>>>> +	if (req)
+>>>> +		blk_mq_put_rq_ref(req);
+>>>>    	mutex_unlock(&cmd->lock);
+>>>>    	return ret ? ERR_PTR(ret) : cmd;
+>>>
+>>> After blk_mq_put_rq_ref() returns, this request may have been freed,
+>>> so the returned 'cmd' may have been freed too.
+>>>
+>>> As I replied in your another thread, it is driver's responsibility to
+>>> cover race between normal completion and timeout/error handling, that
+>>> means the caller of blk_mq_tag_to_rq need to make sure that the request
+>>> represented by the passed 'tag' can't be freed.
+>>
+>> Hi, Ming
+>>
+>> There are two problems here in nbd, both reported by our syzkaller.
+>>
+>> The first is that blk_mq_tag_to_rq() returned a freed request, which is
+>> because tags->static_rq[] is freed without clearing tags->rq[].
+>> Syzkaller log shows that a reply package is sent to client without
+>> the client's request package. And this patch is trying to solve this
+>> problem.
+> 
+> It is still driver's problem:
+> 
+> ->static_rq is freed in blk_mq_free_tag_set() which is called after
+> blk_cleanup_disk() returns. Once blk_cleanup_disk() returns, there
+> shouldn't be any driver activity, including calling blk_mq_tag_to_rq()
+> by passing one invalid tag.
+> 
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+Hi, Ming
 
-Let's try to funnel this via Jens' tree. As long as his tree is based
-upon v5.14-rc3 or later I don't think we should have any problem with
-conflicts.
+I understand if static_rq is freed through blk_mq_free_tag_set(),
+drivers should not use static_rq anymore.
 
-Kind regards
-Uffe
+By the way, I was thinking about another path:
 
+blk_mq_update_nr_requests
+  if (!hctx->sched_tags) -> if this is true
+   ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr, false)
+    blk_mq_free_rqs -> static_rq is freed here
 
-> ---
->  drivers/mmc/core/block.c | 49 ++++++++++++++--------------------------
->  1 file changed, 17 insertions(+), 32 deletions(-)
->
-> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-> index 4ac3e1b93e7e..4c11f171e56d 100644
-> --- a/drivers/mmc/core/block.c
-> +++ b/drivers/mmc/core/block.c
-> @@ -2328,7 +2328,8 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
->                                               sector_t size,
->                                               bool default_ro,
->                                               const char *subname,
-> -                                             int area_type)
-> +                                             int area_type,
-> +                                             unsigned int part_type)
->  {
->         struct mmc_blk_data *md;
->         int devidx, ret;
-> @@ -2375,6 +2376,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
->         kref_init(&md->kref);
->
->         md->queue.blkdata = md;
-> +       md->part_type = part_type;
->
->         md->disk->major = MMC_BLOCK_MAJOR;
->         md->disk->minors = perdev_minors;
-> @@ -2427,6 +2429,10 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
->                 md->disk->disk_name, mmc_card_id(card), mmc_card_name(card),
->                 cap_str, md->read_only ? "(ro)" : "");
->
-> +       /* used in ->open, must be set before add_disk: */
-> +       if (area_type == MMC_BLK_DATA_AREA_MAIN)
-> +               dev_set_drvdata(&card->dev, md);
-> +       device_add_disk(md->parent, md->disk, mmc_disk_attr_groups);
->         return md;
->
->   err_kfree:
-> @@ -2456,7 +2462,7 @@ static struct mmc_blk_data *mmc_blk_alloc(struct mmc_card *card)
->         }
->
->         return mmc_blk_alloc_req(card, &card->dev, size, false, NULL,
-> -                                       MMC_BLK_DATA_AREA_MAIN);
-> +                                       MMC_BLK_DATA_AREA_MAIN, 0);
->  }
->
->  static int mmc_blk_alloc_part(struct mmc_card *card,
-> @@ -2470,10 +2476,9 @@ static int mmc_blk_alloc_part(struct mmc_card *card,
->         struct mmc_blk_data *part_md;
->
->         part_md = mmc_blk_alloc_req(card, disk_to_dev(md->disk), size, default_ro,
-> -                                   subname, area_type);
-> +                                   subname, area_type, part_type);
->         if (IS_ERR(part_md))
->                 return PTR_ERR(part_md);
-> -       part_md->part_type = part_type;
->         list_add(&part_md->part, &md->part);
->
->         return 0;
-> @@ -2674,20 +2679,13 @@ static int mmc_blk_alloc_parts(struct mmc_card *card, struct mmc_blk_data *md)
->
->  static void mmc_blk_remove_req(struct mmc_blk_data *md)
->  {
-> -       struct mmc_card *card;
-> -
-> -       if (md) {
-> -               /*
-> -                * Flush remaining requests and free queues. It
-> -                * is freeing the queue that stops new requests
-> -                * from being accepted.
-> -                */
-> -               card = md->queue.card;
-> -               if (md->disk->flags & GENHD_FL_UP)
-> -                       del_gendisk(md->disk);
-> -               mmc_cleanup_queue(&md->queue);
-> -               mmc_blk_put(md);
-> -       }
-> +       /*
-> +        * Flush remaining requests and free queues. It is freeing the queue
-> +        * that stops new requests from being accepted.
-> +        */
-> +       del_gendisk(md->disk);
-> +       mmc_cleanup_queue(&md->queue);
-> +       mmc_blk_put(md);
->  }
->
->  static void mmc_blk_remove_parts(struct mmc_card *card,
-> @@ -2876,7 +2874,7 @@ static void mmc_blk_remove_debugfs(struct mmc_card *card,
->
->  static int mmc_blk_probe(struct mmc_card *card)
->  {
-> -       struct mmc_blk_data *md, *part_md;
-> +       struct mmc_blk_data *md;
->         int ret = 0;
->
->         /*
-> @@ -2904,19 +2902,6 @@ static int mmc_blk_probe(struct mmc_card *card)
->         if (ret)
->                 goto out;
->
-> -       dev_set_drvdata(&card->dev, md);
-> -
-> -       device_add_disk(md->parent, md->disk, mmc_disk_attr_groups);
-> -       if (ret)
-> -               goto out;
-> -
-> -       list_for_each_entry(part_md, &md->part, part) {
-> -               device_add_disk(part_md->parent, part_md->disk,
-> -                               mmc_disk_attr_groups);
-> -               if (ret)
-> -                       goto out;
-> -       }
-> -
->         /* Add two debugfs entries */
->         mmc_blk_add_debugfs(card, md);
->
-> --
-> 2.30.2
->
+If this path concurrent with nbd_read_stat(), nbd_read_stat() can
+get a freed request by blk_mq_tag_to_rq(), since tags->lock is not
+held.
+
+t1: nbd_read_stat	  t2: blk_mq_update_nr_requests
+rq = blk_mq_tag_to_rq()
+			  blk_mq_free_rqs
+
+By holding tags->lock, we can check that rq state is idle, and it's
+ref is 0.
+
+Thanks
+Kuai
