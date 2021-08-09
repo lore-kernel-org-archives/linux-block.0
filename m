@@ -2,164 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82284C4338F
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 10:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7539DC432BE
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:23:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C94B61076
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 10:18:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5798460F11
+	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 11:23:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233508AbhHIKSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 06:18:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44136 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233445AbhHIKSt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 06:18:49 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CCBC061796
-        for <linux-block@vger.kernel.org>; Mon,  9 Aug 2021 03:18:29 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id m24-20020a17090a7f98b0290178b1a81700so3225788pjl.4
-        for <linux-block@vger.kernel.org>; Mon, 09 Aug 2021 03:18:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jkLLkAaCMrvGSGnk9HYHVtNB7W5aNoh0CfrV/y19IQw=;
-        b=R6IYedkFb9YhTOOqxkyzltIgx8LAstXCcDLzOCVIIwwnr/cO9OhWeGxOgspAQY+p+t
-         dQ4mvdAbqc+HKIDbpHvex3AWtIyFzqsnzHtlgamPpGPdZnKWLjc8qITx54zqtpNbCAaf
-         pvE5irUlEtVrHrwDmXmPr3MEc05n3b9W7bY0tUFnjWWDvEjtNGEls+bhEs+ilsjeV9Vh
-         Pr6guNaa60J+evo7bMqJIQEA+SykeJQu9QOuXLSLmm6czRi2SgbegMJTvHg629agnrMN
-         bPWVpm2W4pgfZdIb4NCQD4CTFI+UY8NiuJxRUAO+pRaHFF/9IzzOGFnTP4E87CTldqNA
-         57kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jkLLkAaCMrvGSGnk9HYHVtNB7W5aNoh0CfrV/y19IQw=;
-        b=ge8R+neMwFPSRgWdq9lfBaqhdTAjuG3wP5e+SuBo10NUWHE2uwP8IbE6K4TW1zDxZg
-         OlRvYAm2poBmaX7zgCCUfsazujPyJOX3A54AanH3uMoFbXAM4LZ7sNaxs3f2Au8Z7moD
-         qmQ/+HcQeopZUQ8sL1Z/9gkNYtLoZSF6RyTAtHyegmZqdT0XB7id0FS+YSuTKMTByGVy
-         uJp8PDm/LSifc3eeXLULY9aD0wZ61/lI2hxUrZGsGUPvazMX1+YEa4OM+KmY+Ws5PWAN
-         SSs/4ykYKmiiG5AW5HcF0ym9fkbE8pZmA5ajCPcBjNEx3Mubf+YX2li/uefsIrR4z0nG
-         iK3Q==
-X-Gm-Message-State: AOAM533od71NfOS8XP23E5Ipf0N78MxjuyhCX44NshGpePM+8hrAnsYJ
-        UQMuCkyXXMAZWa91E05dvHdn
-X-Google-Smtp-Source: ABdhPJw53UyF6YJcipsF/HNnSD+fg9LmBDc9iBipK+yx3VckpcCmFaTDCcoWLKVhhuW+kg6cYe+mLg==
-X-Received: by 2002:a63:5815:: with SMTP id m21mr32030pgb.363.1628504308562;
-        Mon, 09 Aug 2021 03:18:28 -0700 (PDT)
-Received: from localhost ([139.177.225.237])
-        by smtp.gmail.com with ESMTPSA id e7sm7039789pfc.145.2021.08.09.03.18.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 03:18:28 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v5] virtio-blk: Add validation for block size in config space
-Date:   Mon,  9 Aug 2021 18:16:09 +0800
-Message-Id: <20210809101609.148-1-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
+        id S235081AbhHILXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 07:23:44 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:34390 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235007AbhHILXo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 07:23:44 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 6D8F421ED4;
+        Mon,  9 Aug 2021 11:23:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1628508202;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XEHaigBd+p4Kdq3FOyfyiQahnEWWgwrbyI9p3sYy9Jg=;
+        b=FUJg+QaU7zw3qTf6t8q9Qr96X0Utqfsl+nS4wyhc9/5vWZMS539Of9T5SM02pWzim1Cnda
+        RMrFBB4C9IiCbCzLy7hKe0Nw5kCTqLiYUG2RwoYyBydeMv59tIlgL5Vpa/xsWEDauKkWvj
+        09N1MMAWFSlJkFOi7ijKkWYVWovvXhs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1628508202;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XEHaigBd+p4Kdq3FOyfyiQahnEWWgwrbyI9p3sYy9Jg=;
+        b=4VeRarVySJZv/AlngzeBW/O6mbVTRAHHGwmwBsPvaCbeLhv85RY/VfIGPtUkorqnnpUTKq
+        o+aHpptVRlTrrwAw==
+Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
+        by relay2.suse.de (Postfix) with ESMTP id 53C44A3B8E;
+        Mon,  9 Aug 2021 11:23:22 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id BAE5EDA880; Mon,  9 Aug 2021 13:20:30 +0200 (CEST)
+Date:   Mon, 9 Aug 2021 13:20:30 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 47/64] btrfs: Use memset_after() to clear end of struct
+Message-ID: <20210809112030.GM5047@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Kees Cook <keescook@chromium.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-48-keescook@chromium.org>
+ <20210728094215.GX5047@twin.jikos.cz>
+ <202107281455.2A0753F5@keescook>
+ <20210729103337.GS5047@suse.cz>
+ <202107310822.31BEB6E543@keescook>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202107310822.31BEB6E543@keescook>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-An untrusted device might presents an invalid block size
-in configuration space. This tries to add validation for it
-in the validate callback and clear the VIRTIO_BLK_F_BLK_SIZE
-feature bit if the value is out of the supported range.
+On Sat, Jul 31, 2021 at 08:25:51AM -0700, Kees Cook wrote:
+> On Thu, Jul 29, 2021 at 12:33:37PM +0200, David Sterba wrote:
+> > On Wed, Jul 28, 2021 at 02:56:31PM -0700, Kees Cook wrote:
+> > > On Wed, Jul 28, 2021 at 11:42:15AM +0200, David Sterba wrote:
+> > > > On Tue, Jul 27, 2021 at 01:58:38PM -0700, Kees Cook wrote:
+> > > > >  	}
+> > > > >  	if (need_reset) {
+> > > > > -		memset(&item->generation_v2, 0,
+> > > > > -			sizeof(*item) - offsetof(struct btrfs_root_item,
+> > > > > -					generation_v2));
+> > > > > -
+> > > > 
+> > > > Please add
+> > > > 		/* Clear all members from generation_v2 onwards */
+> > > > 
+> > > > > +		memset_after(item, 0, level);
+> > > 
+> > > Perhaps there should be another helper memset_starting()? That would
+> > > make these cases a bit more self-documenting.
+> > 
+> > That would be better, yes.
+> > 
+> > > +		memset_starting(item, 0, generation_v2);
+> > 
+> > memset_from?
+> 
+> For v2, I bikeshed this to "memset_startat" since "from" is semantically
+> close to "source" which I thought might be confusing. (I, too, did not
+> like "starting".) :)
 
-And we also double check the value in virtblk_probe() in
-case that it's changed after the validation.
-
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- drivers/block/virtio_blk.c | 39 +++++++++++++++++++++++++++++++++------
- 1 file changed, 33 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 4b49df2dfd23..afb37aac09e8 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -692,6 +692,28 @@ static const struct blk_mq_ops virtio_mq_ops = {
- static unsigned int virtblk_queue_depth;
- module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
- 
-+static int virtblk_validate(struct virtio_device *vdev)
-+{
-+	u32 blk_size;
-+
-+	if (!vdev->config->get) {
-+		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-+			__func__);
-+		return -EINVAL;
-+	}
-+
-+	if (!virtio_has_feature(vdev, VIRTIO_BLK_F_BLK_SIZE))
-+		return 0;
-+
-+	blk_size = virtio_cread32(vdev,
-+			offsetof(struct virtio_blk_config, blk_size));
-+
-+	if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)
-+		__virtio_clear_bit(vdev, VIRTIO_BLK_F_BLK_SIZE);
-+
-+	return 0;
-+}
-+
- static int virtblk_probe(struct virtio_device *vdev)
- {
- 	struct virtio_blk *vblk;
-@@ -703,12 +725,6 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	u8 physical_block_exp, alignment_offset;
- 	unsigned int queue_depth;
- 
--	if (!vdev->config->get) {
--		dev_err(&vdev->dev, "%s failure: config access disabled\n",
--			__func__);
--		return -EINVAL;
--	}
--
- 	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
- 			     GFP_KERNEL);
- 	if (err < 0)
-@@ -823,6 +839,14 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	else
- 		blk_size = queue_logical_block_size(q);
- 
-+	if (unlikely(blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)) {
-+		dev_err(&vdev->dev,
-+			"block size is changed unexpectedly, now is %u\n",
-+			blk_size);
-+		err = -EINVAL;
-+		goto err_cleanup_disk;
-+	}
-+
- 	/* Use topology information if available */
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
- 				   struct virtio_blk_config, physical_block_exp,
-@@ -881,6 +905,8 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
- 	return 0;
- 
-+err_cleanup_disk:
-+	blk_cleanup_disk(vblk->disk);
- out_free_tags:
- 	blk_mq_free_tag_set(&vblk->tag_set);
- out_free_vq:
-@@ -983,6 +1009,7 @@ static struct virtio_driver virtio_blk = {
- 	.driver.name			= KBUILD_MODNAME,
- 	.driver.owner			= THIS_MODULE,
- 	.id_table			= id_table,
-+	.validate			= virtblk_validate,
- 	.probe				= virtblk_probe,
- 	.remove				= virtblk_remove,
- 	.config_changed			= virtblk_config_changed,
--- 
-2.11.0
-
+memset_startat works for me, thanks.
