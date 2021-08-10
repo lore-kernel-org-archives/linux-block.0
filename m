@@ -2,124 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CF9C4320A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68669C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:42:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E32C60E09
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:28:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D0E960F38
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239014AbhHJO2a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 10:28:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35412 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240285AbhHJO22 (ORCPT
+        id S240965AbhHJOmn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 10:42:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21054 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241332AbhHJOmi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 10:28:28 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5ABBC0619E5
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 07:24:51 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id w13-20020a17090aea0db029017897a5f7bcso5626537pjy.5
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 07:24:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=cE5Duj56ugJml1WWttHkSOG5BdjvCKPDcIyyykdg/Uk=;
-        b=UtWsltE3Ww3Dl4t8IggrMi5tNjWx9aMvEL3dOAOmeYbQr/QKf7uny/HEWMbHgruGAH
-         Q9Q52KdH/NL3CoX0LeZY54REq7WQsTi5wNgz8LVWlIS2l6bXXj3nJQJuKAkuZYM8JX+e
-         oMUrQXRZvf3ej2FOKTfLMBPNaKWMRAfe3ebHqoLqeEe4jku9ialfYhRRV0z3XN6pdaep
-         FBdxoGRm2fwlsTbWxHsJuxSc5Vm8ucsOMij+kvZxsfVu/9RRszoZJx57ydCzS5Bo19NG
-         tGN8Qq3+J8g+t/S+dZGgwGOJLUSh7/Kl0QlR3YhDqUD306z1v0CWvHUq2PlIop3/SqKp
-         s64g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cE5Duj56ugJml1WWttHkSOG5BdjvCKPDcIyyykdg/Uk=;
-        b=aRZWwSaf3sdq3qYNUzYukEN87C6LodGV3oQl5SwL63xMhEHUG80P+1XXXh6NRcE+ai
-         NsS6ZuYnSHS5RgewYNSeFSbn5R+wvj7i+Dd3zZkWApaf/afE77s5b95AWMkeoNSgXtv3
-         Tn3IF7W0/tmx93hIG5kC3kBcvU61rTH5ZEWSSKoJpyHY03hzPZuI057p8MKXZQREpsNf
-         1uYX3Try0H/yUkMJzHr7cCf0DT6e02yoK6sC1OfYSRgq6Aid5vqiMphFMtRw0wQt/+AN
-         heiR8DUlzK3DSgzMe8dXpFbeD03mxFwXBLb3h0baOWcfvTresM/isnV7ehDiTLYHkVGo
-         H1HA==
-X-Gm-Message-State: AOAM532PtVTXkGf+hS+LT/RAHt45LTiPpVi7Batl+uPUwr6ODoxh8tDz
-        Bt/4k/aUpm11t04lDp691cfqOmmZ8Yn7cMk+
-X-Google-Smtp-Source: ABdhPJwyGRgI9Ylh1m8IrL+RZNlOECQqTH+eOr4xDshvNGR3gcKNCAT7d/biX9nQuHyjwX8G6L4K9g==
-X-Received: by 2002:a17:90b:3ec5:: with SMTP id rm5mr5141814pjb.132.1628605490727;
-        Tue, 10 Aug 2021 07:24:50 -0700 (PDT)
-Received: from [192.168.1.116] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id x69sm1428731pfc.59.2021.08.10.07.24.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Aug 2021 07:24:50 -0700 (PDT)
-Subject: Re: [PATCH 1/4] bio: add allocation cache abstraction
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20210809212401.19807-1-axboe@kernel.dk>
- <20210809212401.19807-2-axboe@kernel.dk> <YRJ74uUkGfXjR52l@T590>
- <79511eac-d5f2-2be3-f12c-7e296d9f1a76@kernel.dk>
-Message-ID: <6c06ac42-bda4-cef6-6b8e-7c96eeeeec47@kernel.dk>
-Date:   Tue, 10 Aug 2021 08:24:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 10 Aug 2021 10:42:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628606536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BIxEPmDkI16q3+xhgpv405YJ/cMKZZG/VvunOzqLvpU=;
+        b=WkD4YkNTw4UMaYtlUdVPB0At/sU8svuY6w9C+lzk+oWKJT6P2sBXw9Yi9z7+QJcoyEB5pv
+        WUELHCxaHOqOckdkUcq5nGMfAOJo0SunUzvDCJUihMMqn8jMwECV0fK6cRtPhWDN+6b4+X
+        1l1TDlT9apL6TP5jtFrzNV4m3kqrIDM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-zz7xgIKcMwOSjvsnQHZ1bg-1; Tue, 10 Aug 2021 10:42:12 -0400
+X-MC-Unique: zz7xgIKcMwOSjvsnQHZ1bg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F6201008060;
+        Tue, 10 Aug 2021 14:42:11 +0000 (UTC)
+Received: from agk-cloud1.hosts.prod.upshift.rdu2.redhat.com (agk-cloud1.hosts.prod.upshift.rdu2.redhat.com [10.0.13.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CA7C5D9C6;
+        Tue, 10 Aug 2021 14:41:54 +0000 (UTC)
+Received: by agk-cloud1.hosts.prod.upshift.rdu2.redhat.com (Postfix, from userid 3883)
+        id 38A2141FBD38; Tue, 10 Aug 2021 15:41:55 +0100 (BST)
+Date:   Tue, 10 Aug 2021 15:41:55 +0100
+From:   Alasdair G Kergon <agk@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: Re: [dm-devel] use regular gendisk registration in device mapper v2
+Message-ID: <20210810144155.GA101710@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+Mail-Followup-To: Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+References: <20210804094147.459763-1-hch@lst.de>
+ <20210810003608.GB101579@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <79511eac-d5f2-2be3-f12c-7e296d9f1a76@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210810003608.GB101579@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+Organization: Red Hat UK Ltd. Registered in England and Wales, number
+ 03798903. Registered Office: Amberley Place, 107-111 Peascod Street,
+ Windsor, Berkshire, SL4 1TE.
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/21 7:53 AM, Jens Axboe wrote:
-> On 8/10/21 7:15 AM, Ming Lei wrote:
->> Hi Jens,
->>
->> On Mon, Aug 09, 2021 at 03:23:58PM -0600, Jens Axboe wrote:
->>> Add a set of helpers that can encapsulate bio allocations, reusing them
->>> as needed. Caller must provide the necessary locking, if any is needed.
->>> The primary intended use case is polled IO from io_uring, which will not
->>> need any external locking.
->>>
->>> Very simple - keeps a count of bio's in the cache, and maintains a max
->>> of 512 with a slack of 64. If we get above max + slack, we drop slack
->>> number of bio's.
->>>
->>> The cache is intended to be per-task, and the user will need to supply
->>> the storage for it. As io_uring will be the only user right now, provide
->>> a hook that returns the cache there. Stub it out as NULL initially.
->>
->> Is it possible for user space to submit & poll IO from different io_uring
->> tasks?
->>
->> Then one bio may be allocated from bio cache of the submission task, and
->> freed to cache of the poll task?
-> 
-> Yes that is possible, and yes that would not benefit from this cache
-> at all. The previous version would work just fine with that, as the
-> cache is just under the ring lock and hence you can share it between
-> tasks.
-> 
-> I wonder if the niftier solution here is to retain the cache in the
-> ring still, yet have the pointer be per-task. So basically the setup
-> that this version does, except we store the cache itself in the ring.
-> I'll give that a whirl, should be a minor change, and it'll work per
-> ring instead then like before.
+On Tue, Aug 10, 2021 at 01:36:08AM +0100, Alasdair G Kergon wrote:
+> On Wed, Aug 04, 2021 at 11:41:39AM +0200, Christoph Hellwig wrote:
+> > allows device mapper to use the normal scheme
+> > of calling add_disk when it is ready to accept I/O.
+> For clarity, even after this patchset, the device is not ready to accept
+> I/O when add_disk is called.  
 
-That won't work, as we'd have to do a ctx lookup (which would defeat the
-purpose), and we don't even have anything to key off of at that point...
+The question then arises: could we go beyond this patchset and move the
+add_disk further to the first resume to make the statement true?  (From
+step 2 to 3 in my earlier response. DM_TABLE_CLEAR then also enters the
+mix for testing.)
 
-The current approach seems like the only viable one, or adding a member
-to kiocb so we can pass in the cache in question. The latter did work
-just fine, but I really dislike the fact that it's growing the kiocb to
-more than a cacheline.
+In the early days, in practice userspace did have to resume a device
+before it could be referenced in a table and lvm2 and other tools were
+designed with that in mind - they should always resume a device before
+loading a table that references it.  This was because the device
+reference performed a size check - to make sure the access was within
+the device, and the device size isn't defined until a table becomes live
+when the device is resumed.  But some multipath tables had to be set up
+referencing devices with not-yet-defined sizes, so the code got relaxed
+to accept references to zero-sized devices.  (At the back of my mind I
+think there was some non-multipath code that found this a convenient
+short-cut too.)
 
--- 
-Jens Axboe
+So since this "must resume before referencing in a table" hasn't been
+enforced for so long, I can't really say how much userspace code, if
+any, might now not be doing it.  We and others would need to do some
+testing to see if we could get away with making such a change.
+
+Alasdair
 
