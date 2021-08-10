@@ -7,144 +7,80 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90215C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E48E0C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:15:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FB4360F38
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF07961052
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:15:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238396AbhHJNM4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 09:12:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43697 "EHLO
+        id S241119AbhHJNPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 09:15:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53608 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236764AbhHJNMz (ORCPT
+        by vger.kernel.org with ESMTP id S241134AbhHJNPu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 09:12:55 -0400
+        Tue, 10 Aug 2021 09:15:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628601153;
+        s=mimecast20190719; t=1628601327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=R4vBz2mMGvhkdtkFiw2NditsBGmKPW13//Cafaw3E4Y=;
-        b=epmY/3HmsPWoyIHAzJPR+mu1pis0KiOiBuUHsyGrMcCq45isweK3o1w1/vNbW2jCMTH4Bn
-        6ImHS9N9JyQil796RIlC3YezL0tYpDlzjTyI4bvPfkCS6sbqLwG8wLS3xfI5rBnHSTNWCH
-        TGOB/j1QX4jPiB6eO4swq+WciD9CYa8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-595-SYWWofVrPjSKL4M1_CH16A-1; Tue, 10 Aug 2021 09:12:32 -0400
-X-MC-Unique: SYWWofVrPjSKL4M1_CH16A-1
-Received: by mail-wm1-f72.google.com with SMTP id u14-20020a7bcb0e0000b0290248831d46e4so996729wmj.6
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 06:12:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=R4vBz2mMGvhkdtkFiw2NditsBGmKPW13//Cafaw3E4Y=;
-        b=VcoklYV+x9DGoQqvDfFT8ng6XpahjaKPwaoaEyPumfr1eKSfRhXJT9tMLtQzbVCBb0
-         xjXEDPsJb2zP8IJXKcd6kbAIs2BxtdbiDEiY5rwwMi7BdqkQoBjD2btj8AefLytQ+57H
-         vRDA8ZWdiZu9kKQUeV0gd0mKoYtVe+ZvH2ZO+IEhNT8CuBVsjzqM7M32FCjqcLDbEZA2
-         4/f0IaloLxUglTyfWlCfyz68q6qXxV3JopM3Eu0e7XP2Htv4rePP04u0p0tc4F8RIesb
-         rvnG+wBz1UG6ez7QkEjdC1Wr39fn3ORM8Q8mwBhiGacqRjGpftJ03P924LgiFzB7fzQG
-         wzlQ==
-X-Gm-Message-State: AOAM533gem4rbNn5O3dYLbD1b1rDdrP9oD6L3gowOPcQxIKKa5BjsPeo
-        tg/jlfjXKlK1DkFoHwB033zQL9aBYtqxyPOXIohBiBHa46072HiHx4xi8FIEYP7cPI7ULt1bG6v
-        XzE+BmxUNTxkxmNjhwPua7YQ=
-X-Received: by 2002:a05:600c:19cd:: with SMTP id u13mr716222wmq.143.1628601150974;
-        Tue, 10 Aug 2021 06:12:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw8QSATE7swL8AuNZTG+EQ7iM068PEVg5iYNL8Kim1eedQZqEzh50p3XA1cUFN9ZRJ6UananQ==
-X-Received: by 2002:a05:600c:19cd:: with SMTP id u13mr716192wmq.143.1628601150735;
-        Tue, 10 Aug 2021 06:12:30 -0700 (PDT)
-Received: from alatyr-rpi.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id d4sm8830733wrc.34.2021.08.10.06.12.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 06:12:30 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 15:12:27 +0200
-From:   Peter Rajnoha <prajnoha@redhat.com>
-To:     Alasdair G Kergon <agk@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [dm-devel] [PATCH 7/8] dm: delay registering the gendisk
-Message-ID: <20210810131227.ofgfi62agal64nqd@alatyr-rpi.brq.redhat.com>
-References: <20210804094147.459763-8-hch@lst.de>
- <20210809233143.GA101480@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+        bh=fJ3pNvm7jE2sg7bk2uct+zwhcMqnSG42g9P7ervPcF8=;
+        b=azzD7N77xxmRwz831gomcCPZ40f/NU+En3e3Yl18/gG/RzalC61lz9J0N8p7ddlQEYuKSx
+        /npZ8aSDjRqaGCE/VsIMTjOxVzj4rVSvv+e3CAl5Bz4nud5JAZvMZwHG62ZbZTg61hgJB/
+        4A+hQaPepbxU7GMD5UK4KF/jcB/OXWA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-tLnaUJNyOZ6VcUSwHUGm4A-1; Tue, 10 Aug 2021 09:15:26 -0400
+X-MC-Unique: tLnaUJNyOZ6VcUSwHUGm4A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DA38801AE7;
+        Tue, 10 Aug 2021 13:15:25 +0000 (UTC)
+Received: from T590 (ovpn-13-190.pek2.redhat.com [10.72.13.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 441F12854F;
+        Tue, 10 Aug 2021 13:15:18 +0000 (UTC)
+Date:   Tue, 10 Aug 2021 21:15:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] bio: add allocation cache abstraction
+Message-ID: <YRJ74uUkGfXjR52l@T590>
+References: <20210809212401.19807-1-axboe@kernel.dk>
+ <20210809212401.19807-2-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210809233143.GA101480@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+In-Reply-To: <20210809212401.19807-2-axboe@kernel.dk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 10 Aug 2021 00:31, Alasdair G Kergon wrote:
-> On Wed, Aug 04, 2021 at 11:41:46AM +0200, Christoph Hellwig wrote:
-> > device mapper is currently the only outlier that tries to call
-> > register_disk after add_disk, leading to fairly inconsistent state
-> > of these block layer data structures.  
-> 
-> > Note that this introduces a user visible change: the dm kobject is
-> > now only visible after the initial table has been loaded.
-> 
-> Indeed.  We should try to document the userspace implications of this
-> change in a bit more detail.  While lvm2 and any other tools that
-> followed our recommendations about how to use dm should be OK, there's
-> always the chance that some other less robustly-written code will need
-> to make adjustments.
-> 
-> Currently to make a dm device, 3 ioctls are called in sequence:
-> 
-> 1. DM_DEV_CREATE  - triggers 'add' uevents
-> 2. DM_TABLE_LOAD
-> 3. DM_SUSPEND     - triggers 'change' uevent
-> 
-> After this patch we have:
-> 
-> 1. DM_DEV_CREATE  
-> 2. DM_TABLE_LOAD  - triggers 'add' uevents
-> 3. DM_SUSPEND     - triggers 'change' uevent
-> 
-> The equivalent dmsetup commands for a simple test device are
-> 0. udevadm monitor --kernel --env &   # View the uevents as they happen
-> 1. dmsetup create dev1 --notable
-> 2. dmsetup load --table "0 1 error" dev1
-> 3. dmsetup resume dev1
-> 
->   => Anyone with a udev rule that relies on 'add' needs to check if they
->      need to change their code.
-> 
-> The udev rules that lvm2 uses to synchronise what it is doing rely
-> only on the 'change' event - which is not moving.  The 'add' event
-> gets ignored.  
-> 
-> When loading tables, our tools also always refer to devices using
-> the 'major:minor' format, which isn't affected, rather than using
-> pathnames in /dev which might not exist now after this change if a table
-> hasn't been loaded into a referenced device yet.  Previously this was
-> permissible but we always recommended against it to avoid a pointless
-> pathname lookup that's subject to races and delays.
-> 
-> So again, any tools that followed our recommendations ought to be
-> unaffected.
-> 
-> Here's an example of poor code that previously worked but will fail now:
->   dmsetup create dev1 --notable
->   dmsetup create dev2 --notable
->   dmsetup ls  <-- get the minor number of dev1 (say it's 1 corresponding
-> to dm-1)
->   dmsetup load dev2 --table '0 1 linear /dev/dm-1 0'
->   ...
-> 
-> Peter - have I missed anything?
+Hi Jens,
 
-It looks this is the only area affected, but as you say, this should be
-well documented (including comments in our own udev rules) so there are
-no false assumptions made by other non-lvm/non-libdm users.
+On Mon, Aug 09, 2021 at 03:23:58PM -0600, Jens Axboe wrote:
+> Add a set of helpers that can encapsulate bio allocations, reusing them
+> as needed. Caller must provide the necessary locking, if any is needed.
+> The primary intended use case is polled IO from io_uring, which will not
+> need any external locking.
+> 
+> Very simple - keeps a count of bio's in the cache, and maintains a max
+> of 512 with a slack of 64. If we get above max + slack, we drop slack
+> number of bio's.
+> 
+> The cache is intended to be per-task, and the user will need to supply
+> the storage for it. As io_uring will be the only user right now, provide
+> a hook that returns the cache there. Stub it out as NULL initially.
 
-(I'm not counting the very corner use case of
-'dmsetup --addnodeoncreate --verifyudev' which now ends up with a dev node
-in /dev that logically returns -ENODEV when accessed instead of zero-sized
-device as it was before.)
+Is it possible for user space to submit & poll IO from different io_uring
+tasks?
 
--- 
-Peter
+Then one bio may be allocated from bio cache of the submission task, and
+freed to cache of the poll task?
+
+
+Thanks, 
+Ming
 
