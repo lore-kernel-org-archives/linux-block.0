@@ -2,89 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B15FC432BE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 12:25:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A39C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 12:35:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71AFE61019
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 12:25:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 350F960F55
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 12:35:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240262AbhHJMZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 08:25:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34520 "EHLO
+        id S238617AbhHJMfz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 08:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240254AbhHJMZv (ORCPT
+        with ESMTP id S237391AbhHJMfy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 08:25:51 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 358ABC0613D3;
-        Tue, 10 Aug 2021 05:25:29 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id b11so9866615wrx.6;
-        Tue, 10 Aug 2021 05:25:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=46uttd57qDgJ8zS4aFhGTeFL+aWcacM4jv424clAPHA=;
-        b=OgFyryNO3QGEPzpa+iD6qV5DO+TCrT8yCea7HMnzfxLzMHyfEPvbhQm7B7j8KfvxQk
-         rb7XwVsmEYcUmPEzB7XJ+wypcDqjOn3IuOxrHGwAWiT5Uv7VfMQDCUIxjjSTyMIaMj++
-         EY3TvwSyP8Fs5ndErkSJeEMa2rN1fDTeJ9AO8ltol5DjCzUnzaFbqZRm822siXN8U4Jg
-         VQcE1EcZZ2IKrxbD6BUqfpn4AEDAHMvQ0dPkwN6loPUtdbfAoSwJv4glIiFb5uIyVpcu
-         oJGYGgTxgPo6s38c43BaMFAVh37TAogIt11hnYdIMlgb1zLsagf0Wkq+p1a/HbAWCztb
-         5FPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=46uttd57qDgJ8zS4aFhGTeFL+aWcacM4jv424clAPHA=;
-        b=DqGnAlZKrxYfCLh2rtehoQlYxZwHyAjq94jdMoE0qVjdjIcwZtl2Pg1By3KTfZae4F
-         TTnxoYoRjjBdsrDMHIWIzuxlInFeyfelrxCM7udP6sv9WJ5/osQ7fyLOZOJMc5vGvXrS
-         eyaWf3IFYJDuZcfSPYoJI+/R8jJpTi1ERFgGG3WAP+XOtYHNITFEQmL+6jcJsimQWxa4
-         bvOVGm31uZWeFWbLEQ+mTrutIjB2gcedTIIUxGR4lTsW2ONDE27CuLAaa23n80NYvy8f
-         wtRhejoMphuVQPIhWTOO+mbFW4rkYFddJLg3G9v2NNDU6a8B6Ubd2RhksIRzrlfKYiEo
-         G0Lg==
-X-Gm-Message-State: AOAM532G2bb1w0qQE2V0c5lc5J8t51Aqx2ljAToZUXyqlPsaDzHGwd+8
-        DzR6zr5dR1jQBJkoaVlheLZGxhKnUG3Yn+fY9hw=
-X-Google-Smtp-Source: ABdhPJzHIVBAAYsAzYMLpcSehzRUY+Ijs//WgCHhaZrG++zqurT7m/dNAxqR3IwqZkvVsFJbKCsIceEOoa1wL3MmUsw=
-X-Received: by 2002:a5d:6146:: with SMTP id y6mr30068657wrt.278.1628598327648;
- Tue, 10 Aug 2021 05:25:27 -0700 (PDT)
+        Tue, 10 Aug 2021 08:35:54 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66288C0613D3;
+        Tue, 10 Aug 2021 05:35:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=1Eibxde9ggx54b5TBpNP+oBpZ0ThMzYJ1OQ+F+Hf7IU=; b=r1eXHXnv/xi2nTA4IlUEdZL/gl
+        aiAmEz31byi7ERD4xN/iaW8IozUq8x8hAecNx1Rc73WW430UhZWuAkryy1uMmmqTbW1TnHZuvXrqK
+        FsjVrILygugSexALlOacSKdxYERbCfNYhOM3P5mt8bhYxoZK1aiPM0wDWTIvJ1X9LxQb23wKxYT3v
+        1f5K/5a+LiW0cMjtZrxKrwjFb4TqsLxNVld7nMi4oY06na7TTAATHxj8YgLPexLuF9RvQlYJmdpbJ
+        ay0NuZjJDP/0RIlwLpJiDJFAULErz5D1AKSPwQNyDnaQ+HWVKn5xtvD5h4T+hyhvqM/jTw+5f+KjW
+        lWhn0SGQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mDQwi-00C6cz-GN; Tue, 10 Aug 2021 12:33:52 +0000
+Date:   Tue, 10 Aug 2021 13:33:28 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Vishal Moola <vishal.moola@gmail.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] Page Cache Allowing Hard Interrupts
+Message-ID: <YRJyGMLAFKoB1qUQ@infradead.org>
+References: <20210730213630.44891-1-vishal.moola@gmail.com>
+ <YRI1oLdiueUbBVwb@infradead.org>
+ <YRJsiapS/M3BOH9D@casper.infradead.org>
 MIME-Version: 1.0
-References: <20210809212401.19807-1-axboe@kernel.dk> <20210809212401.19807-4-axboe@kernel.dk>
-In-Reply-To: <20210809212401.19807-4-axboe@kernel.dk>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Tue, 10 Aug 2021 17:55:02 +0530
-Message-ID: <CA+1E3rKB7m54VxD+RrdS06ZSSJ_gJtO_ZVVQvespo+Y+jOBiKg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] io_uring: wire up bio allocation cache
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YRJsiapS/M3BOH9D@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 6:40 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> Initialize a bio allocation cache, and mark it as being used for
-> IOPOLL. We could use it for non-polled IO as well, but it'd need some
-> locking and probably would negate much of the win in that case.
+On Tue, Aug 10, 2021 at 01:09:45PM +0100, Matthew Wilcox wrote:
+> On Tue, Aug 10, 2021 at 09:15:28AM +0100, Christoph Hellwig wrote:
+> > Stupid question, but where do we ever do page cache interaction from
+> > soft irq context?
+> 
+> test_clear_page_writeback() happens in _some_ interrupt context (ie
+> the io completion path).  We had been under the impression that it was
+> always actually softirq context, and so this patch was safe.  However,
+> it's now clear that some drivers are calling it from hardirq context.
+> Writeback completions are clearly not latency sensitive and so can
+> be delayed from hardirq to softirq context without any problem, so I
+> think fixing this is just going to be a matter of tagging requests as
+> "complete in softirq context" and ensuring that blk_mq_raise_softirq()
+> is called for them.
+> 
+> Assuming that DIO write completions _are_ latency-sensitive, of course.
+> Maybe all write completions could be run in softirqs.
 
-For regular (non-polled) IO, will it make sense to tie a bio-cache to
-each fixed-buffer slot (ctx->user_bufs array).
-One bio cache (along with the lock) per slot. That may localize the
-lock contention. And it will happen only when multiple IOs are spawned
-from the same fixed-buffer concurrently?
-
-> We start with IOPOLL, as completions are locked by the ctx lock anyway.
-> So no further locking is needed there.
->
-> This brings an IOPOLL gen2 Optane QD=128 workload from ~3.0M IOPS to
-> ~3.25M IOPS.
-
-
-
--- 
-Kanchan
+I really don't really see any benefit in introducing softirqs into
+the game.  If we want to simplify the locking and do not care too much
+about latency, we should just defer to workqueue/thread context.
+For example XFS already does that for all writeback except for pure
+overwrites.  Those OTOH can be latency critical for O_SYNC writes, but
+you're apparently looking into that already.
