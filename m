@@ -2,100 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68669C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B550C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:48:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D0E960F38
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:42:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7136660FDA
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:48:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240965AbhHJOmn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 10:42:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21054 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241332AbhHJOmi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 10:42:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628606536;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BIxEPmDkI16q3+xhgpv405YJ/cMKZZG/VvunOzqLvpU=;
-        b=WkD4YkNTw4UMaYtlUdVPB0At/sU8svuY6w9C+lzk+oWKJT6P2sBXw9Yi9z7+QJcoyEB5pv
-        WUELHCxaHOqOckdkUcq5nGMfAOJo0SunUzvDCJUihMMqn8jMwECV0fK6cRtPhWDN+6b4+X
-        1l1TDlT9apL6TP5jtFrzNV4m3kqrIDM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-zz7xgIKcMwOSjvsnQHZ1bg-1; Tue, 10 Aug 2021 10:42:12 -0400
-X-MC-Unique: zz7xgIKcMwOSjvsnQHZ1bg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F6201008060;
-        Tue, 10 Aug 2021 14:42:11 +0000 (UTC)
-Received: from agk-cloud1.hosts.prod.upshift.rdu2.redhat.com (agk-cloud1.hosts.prod.upshift.rdu2.redhat.com [10.0.13.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CA7C5D9C6;
-        Tue, 10 Aug 2021 14:41:54 +0000 (UTC)
-Received: by agk-cloud1.hosts.prod.upshift.rdu2.redhat.com (Postfix, from userid 3883)
-        id 38A2141FBD38; Tue, 10 Aug 2021 15:41:55 +0100 (BST)
-Date:   Tue, 10 Aug 2021 15:41:55 +0100
-From:   Alasdair G Kergon <agk@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [dm-devel] use regular gendisk registration in device mapper v2
-Message-ID: <20210810144155.GA101710@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
-Mail-Followup-To: Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-References: <20210804094147.459763-1-hch@lst.de>
- <20210810003608.GB101579@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+        id S240734AbhHJOse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 10:48:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42436 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241888AbhHJOsb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Aug 2021 10:48:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4835560F25;
+        Tue, 10 Aug 2021 14:48:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1628606889;
+        bh=BCaw6jsYR+1+ch9MuRv11DN73c0NzIIA0uUPkD5qS+Q=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aejb1GlEF8xfjZg3Dr67Ia/+4GKCFO8u3xGOqykZ1QOXFXvGioKaoWlknitlue5jy
+         qP6VTMWyAJbbfpGq7Os9IMYLQhtpH92htrvSy6mCEvGJMjWoGnbD2YsYH5f7kgir9r
+         XT4G8X93IOY/K4TixaZ117wv82K9ARjVLNNzBJ1g=
+Date:   Tue, 10 Aug 2021 16:48:05 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc:     axboe@kernel.dk, kernelnewbies@kernelnewbies.org,
+        Ian Pilcher <arequipeno@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        pavel@ucw.cz, pali@kernel.org, hch@lst.de,
+        linux-leds@vger.kernel.org
+Subject: Re: [RFC PATCH v2 00/10] Add configurable block device LED triggers
+Message-ID: <YRKRpQdLRJmAb5kZ@kroah.com>
+References: <20210809033217.1113444-1-arequipeno@gmail.com>
+ <20210809205633.4300bbea@thinkpad>
+ <81c128a1-c1b8-0f1e-a77b-6704bade26c0@gmail.com>
+ <20210810004331.0f0094a5@thinkpad>
+ <7b5f3509-5bcd-388b-8d3b-4ea95a9483ad@gmail.com>
+ <YRIeHH1SLl6tYCeY@kroah.com>
+ <20210810153840.42419d06@thinkpad>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210810003608.GB101579@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
-Organization: Red Hat UK Ltd. Registered in England and Wales, number
- 03798903. Registered Office: Amberley Place, 107-111 Peascod Street,
- Windsor, Berkshire, SL4 1TE.
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210810153840.42419d06@thinkpad>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 01:36:08AM +0100, Alasdair G Kergon wrote:
-> On Wed, Aug 04, 2021 at 11:41:39AM +0200, Christoph Hellwig wrote:
-> > allows device mapper to use the normal scheme
-> > of calling add_disk when it is ready to accept I/O.
-> For clarity, even after this patchset, the device is not ready to accept
-> I/O when add_disk is called.  
+On Tue, Aug 10, 2021 at 03:38:40PM +0200, Marek Behún wrote:
+> On Tue, 10 Aug 2021 08:35:08 +0200
+> Greg KH <gregkh@linuxfoundation.org> wrote:
+> 
+> > On Mon, Aug 09, 2021 at 06:50:44PM -0500, Ian Pilcher wrote:
+> > > On 8/9/21 5:43 PM, Marek Behún wrote:  
+> > > > I confess that I am not very familiar with internal blkdev API.  
+> > > 
+> > > It's mainly a matter of symbol visibility.  See this thread from a few
+> > > months ago:
+> > > 
+> > >   https://www.spinics.net/lists/linux-leds/msg18244.html
+> > > 
+> > > Now ... my code currently lives in block/, so there isn't actually
+> > > anything technically preventing it from iterating through the block
+> > > devices.
+> > > 
+> > > The reactions to Enzo's patch (which you can see in that thread) make me
+> > > think that anything that iterates through all block devices is likely to
+> > > be rejected, but maybe I'm reading too much into it.
+> > > 
+> > > 
+> > > Greg / Christoph -
+> > > 
+> > > (As you were the people who expressed disapproval of Enzo's patch to
+> > > export block_class and disk_type ...)
+> > > 
+> > > Can you weigh in on the acceptability of iterating through the block
+> > > devices (searching by name) from LED trigger code within the block
+> > > subsystem (i.e. no new symbols would need to be exported)?
+> > > 
+> > > This would allow the trigger to implement the sysfs API that Marek and
+> > > Pavel want.  
+> > 
+> > No idea, let's see the change first, we can never promise anything :)
+> 
+> Hi Greg,
+> 
+> Can't we use blkdev_get_by_path() (or blk_lookup_devt() with
+> blkdev_get_by_dev())?
+> This would open the block device and return a struct block_device *.
+> When the LED trigger is disabled, it would also have to release the
+> device.
 
-The question then arises: could we go beyond this patchset and move the
-add_disk further to the first resume to make the statement true?  (From
-step 2 to 3 in my earlier response. DM_TABLE_CLEAR then also enters the
-mix for testing.)
+But what about when the device is removed from the system first?  Be
+careful about that...
 
-In the early days, in practice userspace did have to resume a device
-before it could be referenced in a table and lvm2 and other tools were
-designed with that in mind - they should always resume a device before
-loading a table that references it.  This was because the device
-reference performed a size check - to make sure the access was within
-the device, and the device size isn't defined until a table becomes live
-when the device is resumed.  But some multipath tables had to be set up
-referencing devices with not-yet-defined sizes, so the code got relaxed
-to accept references to zero-sized devices.  (At the back of my mind I
-think there was some non-multipath code that found this a convenient
-short-cut too.)
+Anyway, sure, try those functions, I really do not know, all I
+originally complained about was those exports which did not need to be
+exported.
 
-So since this "must resume before referencing in a table" hasn't been
-enforced for so long, I can't really say how much userspace code, if
-any, might now not be doing it.  We and others would need to do some
-testing to see if we could get away with making such a change.
+thanks,
 
-Alasdair
-
+greg k-h
