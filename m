@@ -2,104 +2,306 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B1AC4320A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814E1C43214
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC74D60041
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A16D61073
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236022AbhHJQh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S236082AbhHJQh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 10 Aug 2021 12:37:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37962 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235994AbhHJQh4 (ORCPT
+        with ESMTP id S236059AbhHJQh5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 12:37:56 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB7EC0613C1
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:34 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id b7so2087800plh.7
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:34 -0700 (PDT)
+        Tue, 10 Aug 2021 12:37:57 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98069C0613C1
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:35 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id oa17so9085233pjb.1
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q+7fpP+Ie92YhSLrs9IH27Kmx9JflNEk3yN3M1jDzas=;
-        b=K2aoNwcBhLTqZl2tN5is9O4IGvx2f/vGEsoD+NeN+xEQbLFwI9BZs/MXM8CoqhKV70
-         kMOVGc2b4T/5M9yvzlR0T2e+c5TNM6MC3Gfr7SvkwNAOP/PTxQtq6jdLyROFFqFjUScM
-         jQkZdQ8+fzrQheLYersXNl6+7xwhj5cwqLvc0TcEF5ldF08yFN8tTMqs5VruR9Yl9V3w
-         WiLEY7Z8ZzxeHWE5NA9MH4cewyAOVCdp4OzWGPRMxQHuD91podbTq2wgZjkTjPdWb9rO
-         5VkTJdUEzYqGeri0UERQt+ciC80Ov4n27vYFQqHyN/AbkdqOUoc3uV0e4dA6hnBHs8f6
-         Ux7Q==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=1RA9V7Otxh4nwqoHM1FxmgmC9MK5/ORNFdKMxH+oR/U=;
+        b=OO5wlqX82B3SOe9CMR+tYp4e0+G/qDK/NoOH3oDvA+t2PXPPZQaldwxSIWkL7M/4PG
+         SWIdNH1YWdOitqF5+fn4eX0kUg5EXx4fdN5kGkmE+hHMuJ6BYzQy86GiqszHsKqcbOjW
+         d/NtlveyUfA6aTtfFKlmlPfxpM4tAN9TkKyBlTIyD4ZRdOY81e0xZs8J4dM+dlH/C6EQ
+         u1ugW3iB6LLu70IvD/pJtYk07/5OkNyCQh/lBNIjF/lgAETt/+Bl0/ZOqbIuV/3m3Un4
+         8wcHsD6aSKQnNC51fuvSJGWqPNHfho5NH/Wn2bp0KibmFQSlOfuZlJdFHIRbSpot3JaE
+         QhpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q+7fpP+Ie92YhSLrs9IH27Kmx9JflNEk3yN3M1jDzas=;
-        b=cnS8vcaaY+c2JSfVYiM2WDCuziTlWNiYQVeSHv2fnJ5uR8vshEAHYPycQWQ/lfYUwt
-         aoWL2D1hdh1FBtA4A4ivF2GgpplO/cOLxml4hgMmLvQ4EU36remk5V+jHGpQYyMRK8KR
-         AbRqyWfI3h9S/KvrdYXkthBaoLn0WETiz/B5e0Njdl3we4McDVnwCsa5mVW77QEgjBzB
-         T38o0Ln3Gz9Q7jihTkHRmfXrkNUKN08Q0AUkLGeizMkuB/MbT5n3Z637RvNvBPbXegSL
-         5TFmf7gphFLwK4YBUru90HFFktliMd/NGPtzoXlPJNJgI9w7welZTabQkPfFQ3vMZ7Rv
-         AFXA==
-X-Gm-Message-State: AOAM531YZpEvJcXk6pap4n9U7w/3XGb0PxK7/xOceJittIlOJjDPtif6
-        fN8gtQUI+xrRiP/6ak8/BnAs3g==
-X-Google-Smtp-Source: ABdhPJz5gKGhjJ1dakFY8qZU8Z2qVodgv5Fc1rK7xkQdKmXOEOMmouzxYOs5rAJRCu6QjYsmy3un+w==
-X-Received: by 2002:a17:902:e843:b029:12c:d520:453e with SMTP id t3-20020a170902e843b029012cd520453emr466336plg.50.1628613453981;
-        Tue, 10 Aug 2021 09:37:33 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=1RA9V7Otxh4nwqoHM1FxmgmC9MK5/ORNFdKMxH+oR/U=;
+        b=aN+PcaHdH3y+VtZ2e5cpQ1FRUiQzosNduNcqWsln2EGGb9LrnuGmd1EUoi4tGwrEQf
+         9HYz6uvmbuSXuwWvJk1faD6XSvV8ApAymPuZyzC0fmuDrFfKIqPSUxnhQG84ho11x8by
+         AJcrZaKqH3xZxaDRBz32diupl5Qgrs+xmxEIt3xE9+XQP9pC4pLyd7QqIqrqdxmvahhS
+         LTv0w7IaCOgbkCrEkg2WLgItHAKu+AJobOGC1z1x4iIlEiB7peJwo1/EifT4PY45wiRx
+         bQozajZxwFDAvBcpuO96zXG58XmJDmQ7phfNQPXkFqleU2dcEdiFanYDgmwBvq8sQwjY
+         MVkg==
+X-Gm-Message-State: AOAM530nmkphOBsmyh9at40SD6Su0pQYvbE9mwB8zDu7ZEydWTMzG2aw
+        aBG98X/eE1di+0jMhlrfENwRdTvUOYYuO26I
+X-Google-Smtp-Source: ABdhPJxHEGFaMaF22Z5HCW2H2t3D7mp6MSlHF9fy86Ov0iLlq6iEGORrlkti+etsVz0JrSf5pn8RxA==
+X-Received: by 2002:a17:902:ab91:b029:12b:8dae:b1ff with SMTP id f17-20020a170902ab91b029012b8daeb1ffmr464808plr.52.1628613455084;
+        Tue, 10 Aug 2021 09:37:35 -0700 (PDT)
 Received: from localhost.localdomain ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id pi14sm3517744pjb.38.2021.08.10.09.37.33
+        by smtp.gmail.com with ESMTPSA id pi14sm3517744pjb.38.2021.08.10.09.37.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 09:37:33 -0700 (PDT)
+        Tue, 10 Aug 2021 09:37:34 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     io-uring@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCHSET v3 0/5] Enable bio recycling for polled IO
-Date:   Tue, 10 Aug 2021 10:37:23 -0600
-Message-Id: <20210810163728.265939-1-axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/5] bio: add allocation cache abstraction
+Date:   Tue, 10 Aug 2021 10:37:24 -0600
+Message-Id: <20210810163728.265939-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210810163728.265939-1-axboe@kernel.dk>
+References: <20210810163728.265939-1-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Add a set of helpers that can encapsulate bio allocations, reusing them
+as needed. Caller must provide the necessary locking, if any is needed.
+The primary intended use case is polled IO from io_uring, which will not
+need any external locking.
 
-This is v3 of this patchset. We're back to passing the cache pointer
-in the kiocb, I do think that's the cleanest and it's also the most
-efficient approach. A patch has been added to remove a member from
-the io_uring req_rw structure, so that the kiocb size bump doesn't
-result in the per-command part of io_kiocb to bump into the next
-cacheline.
+Very simple - keeps a count of bio's in the cache, and maintains a max
+of 512 with a slack of 64. If we get above max + slack, we drop slack
+number of bio's.
 
-Another benefit of this approach is that we get per-ring caching.
-That means if an application splits polled IO into two threads, one
-doing submit and one doing reaps, then we still get the full benefit
-of the bio caching.
+The cache is intended to be per-task, and the user will need to supply
+the storage for it. As io_uring will be the only user right now, provide
+a hook that returns the cache there. Stub it out as NULL initially.
 
-The tldr; here is that we get about a 10% bump in polled performance with
-this patchset, as we can recycle bio structures essentially for free.
-Outside of that, explanations in each patch. I've also got an iomap patch,
-but trying to keep this single user until there's agreement on the
-direction.
-
-Against for-5.15/io_uring, and can also be found in my
-io_uring-bio-cache.3 branch.
-
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
  block/bio.c         | 123 ++++++++++++++++++++++++++++++++++++++++----
- fs/block_dev.c      |  32 ++++++++++--
- fs/io_uring.c       |  67 +++++++++++++++++++++---
  include/linux/bio.h |  24 +++++++--
- include/linux/fs.h  |  11 ++++
- 5 files changed, 229 insertions(+), 28 deletions(-)
+ 2 files changed, 131 insertions(+), 16 deletions(-)
 
+diff --git a/block/bio.c b/block/bio.c
+index 1fab762e079b..e3680702aeae 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -238,6 +238,35 @@ static void bio_free(struct bio *bio)
+ 	}
+ }
+ 
++static inline void __bio_init(struct bio *bio)
++{
++	bio->bi_next = NULL;
++	bio->bi_bdev = NULL;
++	bio->bi_opf = 0;
++	bio->bi_flags = bio->bi_ioprio = bio->bi_write_hint = 0;
++	bio->bi_status = 0;
++	bio->bi_iter.bi_sector = 0;
++	bio->bi_iter.bi_size = 0;
++	bio->bi_iter.bi_idx = 0;
++	bio->bi_iter.bi_bvec_done = 0;
++	bio->bi_end_io = NULL;
++	bio->bi_private = NULL;
++#ifdef CONFIG_BLK_CGROUP
++	bio->bi_blkg = NULL;
++	bio->bi_issue.value = 0;
++#ifdef CONFIG_BLK_CGROUP_IOCOST
++	bio->bi_iocost_cost = 0;
++#endif
++#endif
++#ifdef CONFIG_BLK_INLINE_ENCRYPTION
++	bio->bi_crypt_context = NULL;
++#endif
++#ifdef CONFIG_BLK_DEV_INTEGRITY
++	bio->bi_integrity = NULL;
++#endif
++	bio->bi_vcnt = 0;
++}
++
+ /*
+  * Users of this function have their own bio allocation. Subsequently,
+  * they must remember to pair any call to bio_init() with bio_uninit()
+@@ -246,7 +275,7 @@ static void bio_free(struct bio *bio)
+ void bio_init(struct bio *bio, struct bio_vec *table,
+ 	      unsigned short max_vecs)
+ {
+-	memset(bio, 0, sizeof(*bio));
++	__bio_init(bio);
+ 	atomic_set(&bio->__bi_remaining, 1);
+ 	atomic_set(&bio->__bi_cnt, 1);
+ 
+@@ -591,6 +620,19 @@ void guard_bio_eod(struct bio *bio)
+ 	bio_truncate(bio, maxsector << 9);
+ }
+ 
++static bool __bio_put(struct bio *bio)
++{
++	if (!bio_flagged(bio, BIO_REFFED))
++		return true;
++
++	BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
++
++	/*
++	 * last put frees it
++	 */
++	return atomic_dec_and_test(&bio->__bi_cnt);
++}
++
+ /**
+  * bio_put - release a reference to a bio
+  * @bio:   bio to release reference to
+@@ -601,17 +643,8 @@ void guard_bio_eod(struct bio *bio)
+  **/
+ void bio_put(struct bio *bio)
+ {
+-	if (!bio_flagged(bio, BIO_REFFED))
++	if (__bio_put(bio))
+ 		bio_free(bio);
+-	else {
+-		BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
+-
+-		/*
+-		 * last put frees it
+-		 */
+-		if (atomic_dec_and_test(&bio->__bi_cnt))
+-			bio_free(bio);
+-	}
+ }
+ EXPORT_SYMBOL(bio_put);
+ 
+@@ -1595,6 +1628,74 @@ int bioset_init_from_src(struct bio_set *bs, struct bio_set *src)
+ }
+ EXPORT_SYMBOL(bioset_init_from_src);
+ 
++void bio_alloc_cache_init(struct bio_alloc_cache *cache)
++{
++	bio_list_init(&cache->free_list);
++	cache->nr = 0;
++}
++
++static void bio_alloc_cache_prune(struct bio_alloc_cache *cache,
++				  unsigned int nr)
++{
++	struct bio *bio;
++	unsigned int i;
++
++	i = 0;
++	while ((bio = bio_list_pop(&cache->free_list)) != NULL) {
++		cache->nr--;
++		bio_free(bio);
++		if (++i == nr)
++			break;
++	}
++}
++
++void bio_alloc_cache_destroy(struct bio_alloc_cache *cache)
++{
++	bio_alloc_cache_prune(cache, -1U);
++}
++
++struct bio *bio_cache_get(struct bio_alloc_cache *cache, gfp_t gfp,
++			  unsigned short nr_vecs, struct bio_set *bs)
++{
++	struct bio *bio;
++
++	if (nr_vecs > BIO_INLINE_VECS)
++		return NULL;
++	if (bio_list_empty(&cache->free_list)) {
++alloc:
++		if (bs)
++			return bio_alloc_bioset(gfp, nr_vecs, bs);
++		else
++			return bio_alloc(gfp, nr_vecs);
++	}
++
++	bio = bio_list_peek(&cache->free_list);
++	if (bs && bio->bi_pool != bs)
++		goto alloc;
++	bio_list_del_head(&cache->free_list, bio);
++	cache->nr--;
++	bio_init(bio, nr_vecs ? bio->bi_inline_vecs : NULL, nr_vecs);
++	return bio;
++}
++
++#define ALLOC_CACHE_MAX		512
++#define ALLOC_CACHE_SLACK	 64
++
++void bio_cache_put(struct bio_alloc_cache *cache, struct bio *bio)
++{
++	if (unlikely(!__bio_put(bio)))
++		return;
++	if (cache) {
++		bio_uninit(bio);
++		bio_list_add_head(&cache->free_list, bio);
++		cache->nr++;
++		if (cache->nr > ALLOC_CACHE_MAX + ALLOC_CACHE_SLACK)
++			bio_alloc_cache_prune(cache, ALLOC_CACHE_SLACK);
++	} else {
++		bio_free(bio);
++	}
++}
++
+ static int __init init_bio(void)
+ {
+ 	int i;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 2203b686e1f0..c351aa88d137 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -652,18 +652,22 @@ static inline struct bio *bio_list_peek(struct bio_list *bl)
+ 	return bl->head;
+ }
+ 
+-static inline struct bio *bio_list_pop(struct bio_list *bl)
++static inline void bio_list_del_head(struct bio_list *bl, struct bio *head)
+ {
+-	struct bio *bio = bl->head;
+-
+-	if (bio) {
++	if (head) {
+ 		bl->head = bl->head->bi_next;
+ 		if (!bl->head)
+ 			bl->tail = NULL;
+ 
+-		bio->bi_next = NULL;
++		head->bi_next = NULL;
+ 	}
++}
+ 
++static inline struct bio *bio_list_pop(struct bio_list *bl)
++{
++	struct bio *bio = bl->head;
++
++	bio_list_del_head(bl, bio);
+ 	return bio;
+ }
+ 
+@@ -676,6 +680,16 @@ static inline struct bio *bio_list_get(struct bio_list *bl)
+ 	return bio;
+ }
+ 
++struct bio_alloc_cache {
++	struct bio_list		free_list;
++	unsigned int		nr;
++};
++
++void bio_alloc_cache_init(struct bio_alloc_cache *);
++void bio_alloc_cache_destroy(struct bio_alloc_cache *);
++struct bio *bio_cache_get(struct bio_alloc_cache *, gfp_t, unsigned short, struct bio_set *bs);
++void bio_cache_put(struct bio_alloc_cache *, struct bio *);
++
+ /*
+  * Increment chain count for the bio. Make sure the CHAIN flag update
+  * is visible before the raised count.
 -- 
-Jens Axboe
-
+2.32.0
 
