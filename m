@@ -2,117 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E985C4320A
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 23:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8A7C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 00:17:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20A6F60E78
-	for <linux-block@archiver.kernel.org>; Mon,  9 Aug 2021 23:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52E0860F38
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 00:17:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232884AbhHIXvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 19:51:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231127AbhHIXvH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 19:51:07 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE66CC0613D3;
-        Mon,  9 Aug 2021 16:50:45 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id bi32so2328936oib.2;
-        Mon, 09 Aug 2021 16:50:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CwKNOnnzAd5qosOD7HgKOb5hYzfIZY7Sz4p7lyYQkDQ=;
-        b=Aw1PwLw9e6HEVLxXhk3SYCBTevOdoaIoFpu5z454kaPWRiGrPfArMajweYsgcLKbzk
-         Imp4itmpEiA+3FGketSR7PifxV6klN1X7wdOV8tp5BICwZtSPUnkFUYUnhH/puiFckkW
-         1owHYvHPyAoPARvslIafJjcn/4RIdhVJ0Bc32zc71tDqTV5oykqqsJOgtUfcqJitBWVL
-         RghRsH8xnfUNvK2oQlex1pdgJooRD0CQeGSABCvcUkkILPupJIlrkitKO/7TGNzA/ZGH
-         I6qV0Qvj260FojJGnK5wmkBtJSht0PHFoI81D06mAQCrIiQVUGxwBN0BD7p3xBiDmVeK
-         z5Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CwKNOnnzAd5qosOD7HgKOb5hYzfIZY7Sz4p7lyYQkDQ=;
-        b=SY0FCAMT5ZBUDy+qJVPEXfoUlk91UISAgZ/A6gjFLXlAO5jCzJzQK+BuQ1H19Q/+wz
-         7nuY0EEI02k87pBiKU3+WK+rdw6jbumbTo4GscoWzIodmOgUsY6YIDNngo5iIzO5ApG9
-         HQWAIGf8HqbolfjFmIluKOVD8i1/EtKjvhzRNxzSYKI4wbd0oqMP9P6skI0yhlvUg67C
-         JVwXO0LyH/VyIHNlbLvhdrIfR9BN/Drhp5geXSjkGina8EpwhTytcz2N6QdtBezKeRDn
-         V6X3WrLg8n2m+s+JjSyrfWIcJZ50XtypAPIKa1MfvgciPshAmwbInVW43eudCXDHc3kn
-         Xl4g==
-X-Gm-Message-State: AOAM5320w90JMwN74L4oCO5Hlv3gG4ZVOB4qjMKUXHY0U6dix8yqs6PT
-        DKDm7GzEPXRpkYbGekPzfbY=
-X-Google-Smtp-Source: ABdhPJwKE8xFAwn77y6/BcbWHJp78SYbrn5U/bAujlBDwg0xzY5VcU7KrFg7wdPYJagRGaxULtF8Kw==
-X-Received: by 2002:a05:6808:601:: with SMTP id y1mr16033359oih.27.1628553045406;
-        Mon, 09 Aug 2021 16:50:45 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id u8sm496600oiw.52.2021.08.09.16.50.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Aug 2021 16:50:44 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 00/10] Add configurable block device LED triggers
-To:     =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>, hch@lst.de
-Cc:     pali@kernel.org, linux-block@vger.kernel.org,
-        linux-leds@vger.kernel.org, axboe@kernel.dk, pavel@ucw.cz,
-        linux-kernel@vger.kernel.org, kernelnewbies@kernelnewbies.org
-References: <20210809033217.1113444-1-arequipeno@gmail.com>
- <20210809205633.4300bbea@thinkpad>
- <81c128a1-c1b8-0f1e-a77b-6704bade26c0@gmail.com>
- <20210810004331.0f0094a5@thinkpad>
-From:   Ian Pilcher <arequipeno@gmail.com>
-Message-ID: <7b5f3509-5bcd-388b-8d3b-4ea95a9483ad@gmail.com>
-Date:   Mon, 9 Aug 2021 18:50:44 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S236004AbhHJARr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 20:17:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30510 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231439AbhHJARn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Aug 2021 20:17:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628554642;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6pJ9mtGT8YizJJRqVC041LrTmK6DM9Sov7/CV20wokc=;
+        b=hBgsdi+lXj0SKZaQDOmqvZfnLEVSgu7eZ/vgirTBCoY4i9m4s5eQt0guaWlkd61VGLKdEZ
+        Xecr6m1mHT87aNbxUAlXh9g9IychNS/oldAS/fUKdnQpbB/GxD/SQKxvaDZc1YsdB/pDdb
+        lQcMyMNTWdO6/BnYmD0/VBES8xPX3E4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-SGbWsb1NPz-xDhzMXnwxcg-1; Mon, 09 Aug 2021 20:17:20 -0400
+X-MC-Unique: SGbWsb1NPz-xDhzMXnwxcg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C51187504B;
+        Tue, 10 Aug 2021 00:17:19 +0000 (UTC)
+Received: from agk-cloud1.hosts.prod.upshift.rdu2.redhat.com (agk-cloud1.hosts.prod.upshift.rdu2.redhat.com [10.0.13.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C307366FFF;
+        Tue, 10 Aug 2021 00:17:08 +0000 (UTC)
+Received: by agk-cloud1.hosts.prod.upshift.rdu2.redhat.com (Postfix, from userid 3883)
+        id C86B642C4190; Tue, 10 Aug 2021 01:17:09 +0100 (BST)
+Date:   Tue, 10 Aug 2021 01:17:09 +0100
+From:   Alasdair G Kergon <agk@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        prajnoha@redhat.com
+Subject: Re: [dm-devel] [PATCH 7/8] dm: delay registering the gendisk
+Message-ID: <20210810001709.GA101579@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+Mail-Followup-To: Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        prajnoha@redhat.com
+References: <20210804094147.459763-8-hch@lst.de>
+ <20210809233143.GA101480@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210810004331.0f0094a5@thinkpad>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210809233143.GA101480@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+Organization: Red Hat UK Ltd. Registered in England and Wales, number
+ 03798903. Registered Office: Amberley Place, 107-111 Peascod Street,
+ Windsor, Berkshire, SL4 1TE.
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/9/21 5:43 PM, Marek Behún wrote:
-> I confess that I am not very familiar with internal blkdev API.
+On Tue, Aug 10, 2021 at 12:31:43AM +0100, Alasdair G Kergon wrote:
+> When loading tables, our tools also always refer to devices using
+> the 'major:minor' format, which isn't affected, rather than using
+                            ^^^^^^^^^^^^^^^^^^^^
+Wrong - that is also affected.
 
-It's mainly a matter of symbol visibility.  See this thread from a few
-months ago:
+So there is a new general constraint that a table must be loaded into a
+device before another device's table can reference that device.  (The
+stacked device handling in lvm2 as supported by libdevmapper should
+always be doing this.)
 
-   https://www.spinics.net/lists/linux-leds/msg18244.html
+(The original implementation had to be a bit loose to accommodate
+multipath device paths that were essentially placeholders at the point
+they got set up.)
 
-Now ... my code currently lives in block/, so there isn't actually
-anything technically preventing it from iterating through the block
-devices.
+Alasdair
 
-The reactions to Enzo's patch (which you can see in that thread) make me
-think that anything that iterates through all block devices is likely to
-be rejected, but maybe I'm reading too much into it.
-
-
-Greg / Christoph -
-
-(As you were the people who expressed disapproval of Enzo's patch to
-export block_class and disk_type ...)
-
-Can you weigh in on the acceptability of iterating through the block
-devices (searching by name) from LED trigger code within the block
-subsystem (i.e. no new symbols would need to be exported)?
-
-This would allow the trigger to implement the sysfs API that Marek and
-Pavel want.
-
-Thanks!
-
--- 
-========================================================================
-                  In Soviet Russia, Google searches you!
-========================================================================
