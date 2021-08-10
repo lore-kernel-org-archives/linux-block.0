@@ -4,72 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A49C4320A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFCE0C4320A
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:53:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5129D60295
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:51:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A025E60C51
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:53:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241951AbhHJNvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 09:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55278 "EHLO
+        id S241985AbhHJNx3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 09:53:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241853AbhHJNvV (ORCPT
+        with ESMTP id S240442AbhHJNx3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 09:51:21 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A7FC0613D3
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 06:50:59 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id cp15-20020a17090afb8fb029017891959dcbso4465233pjb.2
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 06:50:59 -0700 (PDT)
+        Tue, 10 Aug 2021 09:53:29 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8E9C0613D3
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 06:53:07 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id b7so1264959plh.7
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 06:53:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XoWeVxyak4DWU94pEzM6MUAbK2lfkSPHc8kV9GBn1Xw=;
-        b=uF3F0hZgVxYl3RCrx+c1fva6X9MmI7dgyLS/Ut16oNRj/N933RDSMJURC66trAX5Yi
-         5ot9QB52YSNM9rkHPLn+8Pz1B06Wrk8/y6qvpw4irlfV/HqCOOE1L9JmMUUtgA2gP6Te
-         ONNdEkr+qWr7AB5DkN2qAFlGYpaHOTLI+u1GnsGZ1+JY6/xoBLxIK8nL8zps3Go8aiT2
-         Xbv3CFELefETqtotvuY/D8PnRAApPGdamf9gbpbY/aN2PeWyR4tSlCL6vhFWaq12arRM
-         pdgMIityTmOcAZ/biSHiHIGmDBZS8yQFN6AIxa0dv9txW9izXveF+KlGOVPVrBdSF4HQ
-         I4DQ==
+        bh=3BaQG7uNacgdVp+drfazKFG6Tgy96a7rOj8pZqTgzhc=;
+        b=1Mo+/RZNvWDNjdmXd/QIeKdpWn2FxSb6ryjjbIgaCAWijH40jFBZFekGmZR5+o21M+
+         qWvwrD/880UDQMbVaRs0RPvBwoH30kOJNLxqepJ+lUgMPrvew2CwoLtZyl1fLnz+S3po
+         0dAw9d3Ec+voR0Z/iRPbXgzcqVSbz8cL4g5g++XJT8vfI0WLB8unYSNilVbKJ7vrATWC
+         K/UX22DEJGLT3qGdkp9U5UGMNFnMSMBzIeUFNm2pX5rI+c8WU/r6vuerGI8FlGfAkbGz
+         yZc0tUKv4sGpNusWP1tjflcoxmcPxydV4avKEHYBoP0uhZsapSXkP0n6gGPDSUy4Tx3R
+         povQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XoWeVxyak4DWU94pEzM6MUAbK2lfkSPHc8kV9GBn1Xw=;
-        b=WnhhyBczXa6PsoTdCthS88uzLuUOO/7RdFHEs18YHP8Enn7UjgKb0Okkh7BQKKEIxw
-         ytJZjUZ0mk8ya6oHN7WpvgFVYRQNWp0M4SjShVhABlBNXwHcm5Q1G17/OlQyVVbe741l
-         D4VulTUOON7pkIVU0abvNLsZNCbJFTfDKdSEAUELEedYHsTmValsrQuABidTMahMl6Sj
-         mJj7RmR3o4d4YSHozvaNfpO5H/f0/Wh7SWEW9aotG8V/RaLXd/zvoyxSR1XsDrMfSAij
-         S0gXAwjvhdfWK6ED1Xa6yAuVHjZW4J4cjdhOJXEFOOb8xbPUhZavQdYXLgSc3f94xahH
-         N84Q==
-X-Gm-Message-State: AOAM533QmIaoK1ZpaYWCdhuE1frA9AXR1+tCXKeyC4Dw1VYpRUO+Dl41
-        agCZj29VhrFdx5y1Em8Y8dQAzo1+Dwiis1y2
-X-Google-Smtp-Source: ABdhPJy4mP2As13SmqECTfCVTuLG7/rR2QGtE0EFlR44tPcdU6oMjHtsu0AmIvsUQxpwgCjS4b+sPw==
-X-Received: by 2002:a17:902:da8a:b029:12c:6f0:fe3c with SMTP id j10-20020a170902da8ab029012c06f0fe3cmr25854832plx.41.1628603458328;
-        Tue, 10 Aug 2021 06:50:58 -0700 (PDT)
+        bh=3BaQG7uNacgdVp+drfazKFG6Tgy96a7rOj8pZqTgzhc=;
+        b=nYz2VpSZL9szJyzcjB4Qw8U7c9NPLxMGNqLrRACGDohGXYxqbUDyT3vcx2BvelefRq
+         CkoQ5oJD+vn4xMggMCzCfDTZqs90GD3P77bg8b0mPAOX3pTUJvBKk1VoC+RDA/Q/KITL
+         Q2X3xxRNrlK775mkD8whVoWifWvB5NKQ1ENIINcbPF3dVTnQvETB9Is16Ttd2I7MT/V2
+         eFLa1TtEeECF0/tqx1aGejmhI/vVs50Jg4y80zvtVTYWbfm8yroYA0Y1e3MstwPRx6IT
+         ZhXADx1g+oYSCyL1nErAp4u7bsU4BLuV801hugPE6xGOHbG/nRw5TP+MOIJG7l49GUWK
+         b5Wg==
+X-Gm-Message-State: AOAM530IchpTqIbvg61muqr9dwGttpIsstYGhJzPv7p3Yof5JJi7QdGb
+        6nbHkFIDCEkMiHBgC41R235UpRz3aKTqXjLu
+X-Google-Smtp-Source: ABdhPJz+dgHKaPdfvp762hdQb6DzhTCzglW6Zw6wa8i3RPOE2gY86BPWyxP7sR1SB7oWb+b/FxRkAg==
+X-Received: by 2002:a17:902:7786:b029:12c:dac0:15ba with SMTP id o6-20020a1709027786b029012cdac015bamr25309235pll.27.1628603586628;
+        Tue, 10 Aug 2021 06:53:06 -0700 (PDT)
 Received: from [192.168.1.116] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id n35sm28341569pgb.90.2021.08.10.06.50.57
+        by smtp.gmail.com with ESMTPSA id y20sm10985632pfb.54.2021.08.10.06.53.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Aug 2021 06:50:57 -0700 (PDT)
-Subject: Re: [PATCH 3/4] io_uring: wire up bio allocation cache
-To:     Kanchan Joshi <joshiiitr@gmail.com>
+        Tue, 10 Aug 2021 06:53:06 -0700 (PDT)
+Subject: Re: [PATCH 1/4] bio: add allocation cache abstraction
+To:     Ming Lei <ming.lei@redhat.com>
 Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
 References: <20210809212401.19807-1-axboe@kernel.dk>
- <20210809212401.19807-4-axboe@kernel.dk>
- <CA+1E3rKB7m54VxD+RrdS06ZSSJ_gJtO_ZVVQvespo+Y+jOBiKg@mail.gmail.com>
+ <20210809212401.19807-2-axboe@kernel.dk> <YRJ74uUkGfXjR52l@T590>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <60fc0384-028e-3878-dd1a-7601bff44d1e@kernel.dk>
-Date:   Tue, 10 Aug 2021 07:50:56 -0600
+Message-ID: <79511eac-d5f2-2be3-f12c-7e296d9f1a76@kernel.dk>
+Date:   Tue, 10 Aug 2021 07:53:04 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CA+1E3rKB7m54VxD+RrdS06ZSSJ_gJtO_ZVVQvespo+Y+jOBiKg@mail.gmail.com>
+In-Reply-To: <YRJ74uUkGfXjR52l@T590>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,33 +76,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/21 6:25 AM, Kanchan Joshi wrote:
-> On Tue, Aug 10, 2021 at 6:40 AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> Initialize a bio allocation cache, and mark it as being used for
->> IOPOLL. We could use it for non-polled IO as well, but it'd need some
->> locking and probably would negate much of the win in that case.
+On 8/10/21 7:15 AM, Ming Lei wrote:
+> Hi Jens,
 > 
-> For regular (non-polled) IO, will it make sense to tie a bio-cache to
-> each fixed-buffer slot (ctx->user_bufs array).
-> One bio cache (along with the lock) per slot. That may localize the
-> lock contention. And it will happen only when multiple IOs are spawned
-> from the same fixed-buffer concurrently?
+> On Mon, Aug 09, 2021 at 03:23:58PM -0600, Jens Axboe wrote:
+>> Add a set of helpers that can encapsulate bio allocations, reusing them
+>> as needed. Caller must provide the necessary locking, if any is needed.
+>> The primary intended use case is polled IO from io_uring, which will not
+>> need any external locking.
+>>
+>> Very simple - keeps a count of bio's in the cache, and maintains a max
+>> of 512 with a slack of 64. If we get above max + slack, we drop slack
+>> number of bio's.
+>>
+>> The cache is intended to be per-task, and the user will need to supply
+>> the storage for it. As io_uring will be the only user right now, provide
+>> a hook that returns the cache there. Stub it out as NULL initially.
+> 
+> Is it possible for user space to submit & poll IO from different io_uring
+> tasks?
+> 
+> Then one bio may be allocated from bio cache of the submission task, and
+> freed to cache of the poll task?
 
-I don't think it's worth it - the slub overhead is already pretty low,
-basically turning into a cmpxchg16 for the fast path. But that's a big
-enough hit for polled IO of this magnitude that it's worth getting rid
-of.
+Yes that is possible, and yes that would not benefit from this cache
+at all. The previous version would work just fine with that, as the
+cache is just under the ring lock and hence you can share it between
+tasks.
 
-I've attempted bio caches before for non-polled, but the lock + irq
-dance required for them just means it ends up being moot. Or even if
-you have per-cpu caches, just doing irq enable/disable means you're
-back at the same perf where you started, except now you've got extra
-code...
-
-Here's an example from a few years ago:
-
-https://git.kernel.dk/cgit/linux-block/log/?h=cpu-alloc-cache
+I wonder if the niftier solution here is to retain the cache in the
+ring still, yet have the pointer be per-task. So basically the setup
+that this version does, except we store the cache itself in the ring.
+I'll give that a whirl, should be a minor change, and it'll work per
+ring instead then like before.
 
 -- 
 Jens Axboe
