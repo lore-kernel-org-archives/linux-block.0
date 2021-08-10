@@ -2,139 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D802C432BE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 15:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CB9C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:06:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 202D660EDF
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 15:58:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65DA3610E9
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:06:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237009AbhHJP6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 11:58:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57056 "EHLO
+        id S232630AbhHJQGk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 12:06:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238831AbhHJP6d (ORCPT
+        with ESMTP id S229474AbhHJQGk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 11:58:33 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8CCC0613D3
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 08:58:11 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id w13-20020a17090aea0db029017897a5f7bcso6008742pjy.5
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 08:58:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=M+5EflNi15FD/Kvdqur66KYZd4k9wCMPUYuJ6mvPI6c=;
-        b=yx7fuInePn6q+hS56FK+SUzk3ugRiE2IQ2+hEwWLr3J64PEG5vkWPV5eTzErQK7jKZ
-         NAEPQKDcql2t7U0zhy+KeLb7rLsQg0J+2w7mQTy/ejZ5LGuRB5frsAB0esNqZlhcwyj3
-         BTFXXOl5F1p24Qx3+326hzTLYzRkTk0hf6G6KT5do3vQOaJqY43J1IivT/D2pMX5Gzk8
-         MSUiSfn98cC2IcTsCPCRXDiD58v3QwnE+IHFmLLlrouPRSHuz9YG9g2LB+7DJozr0iA5
-         1i+erRkaXsFXYko4/+Lc1XGTE7tPgxnLbVPBFkO0g1cFwIbq0Ype8xmZkp0AjKkjT/oX
-         8MHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=M+5EflNi15FD/Kvdqur66KYZd4k9wCMPUYuJ6mvPI6c=;
-        b=MXs9kbrT8RCQJG6UOFCy6h5N5x/OQsPI44HuLbo7VL+FT15AyNo+alONt1aP0/E4Kh
-         pVZRqH7Iv5WPo73XvuSX6h9Vam3vuO54R+2EN6tl7qeUOVCOqhVINhDXiH3yu0JSdVvN
-         juBG+XXSJtIJi0Et3j4Rzw8y3IPbTxyLReuq1ZGE0LBnRCQQQ3v6fDdXCI5CEob5uwsb
-         pp8wgZvEZz3wlsE0Lxbl2a6wnRo+DFLCGBjFjR+ej3G5FLAqUcR5vDEljbbS2c0WN6QF
-         iMPpk44L5GrCv5A2il1BKP5BMFJFSALFelGQU29m1o5XVlVUwoZxhQf5T01Vt+e2CwWJ
-         saJA==
-X-Gm-Message-State: AOAM5330uqqfrXMvdczGIe38OwBnkWxg8PBHkP0uNdrxendVGjd9D1SE
-        Zhhy1QuhVzQeq7ipuFXrBGZ10CLiZCV9mjbB
-X-Google-Smtp-Source: ABdhPJxLO/IDbZd7fXXRWdhdpVP3d7Hf7z+N4m80CJA/NKPj5eOhsrSZjkCcV35t+0BCAMQK5Yo8ZQ==
-X-Received: by 2002:a63:1709:: with SMTP id x9mr88177pgl.28.1628611090521;
-        Tue, 10 Aug 2021 08:58:10 -0700 (PDT)
-Received: from [192.168.1.116] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id fa21sm3529815pjb.20.2021.08.10.08.58.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Aug 2021 08:58:10 -0700 (PDT)
-Subject: Re: [PATCH 1/4] bio: add allocation cache abstraction
-To:     Kanchan Joshi <joshiiitr@gmail.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20210809212401.19807-1-axboe@kernel.dk>
- <20210809212401.19807-2-axboe@kernel.dk> <YRJ74uUkGfXjR52l@T590>
- <79511eac-d5f2-2be3-f12c-7e296d9f1a76@kernel.dk>
- <6c06ac42-bda4-cef6-6b8e-7c96eeeeec47@kernel.dk>
- <CA+1E3r+otujBbY8E49QL_MmxA_bGRTaivFbOkCvNvZEr93q=7g@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0d437134-ce97-747a-4b49-36801dbf4824@kernel.dk>
-Date:   Tue, 10 Aug 2021 09:58:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 10 Aug 2021 12:06:40 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007B0C0613C1;
+        Tue, 10 Aug 2021 09:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+Jv2/jgZobz77fOiD8+fY2ru4eleuTODaKvjUo/2u+I=; b=HRdFuY4DcvoUGHl6bV0gtVyH+9
+        L5swwp66b//JG9wsDDrcQ2fc9jVXM38wBl0q9QAl7O3qDn2CMlKJcsC+S7XESBvy96aQ/GgQUd+I9
+        xe2Mq920y5dmnLgq7LiWjs9nanmmyF3OFWhhA4MFdgsWYWwBBMrcHMUG+VKGKqrdu46bmzp2fNf1c
+        jNWTu2xge0TIdv8/u74jDAwuAxUthYJqWyVZcTfQDwmKQzk2BVbw9TmQxnNO+vkRliYVipul6H7Nj
+        th26o5TwUYwz3D18l6mDH5bwKW4xd9/NaVnRZmx+kSYowCZniqTgA3ihmhXwJ9FD5yUqZLBhRkPf6
+        kpzI1yqg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mDUD3-00CJUH-Hb; Tue, 10 Aug 2021 16:03:46 +0000
+Date:   Tue, 10 Aug 2021 17:02:33 +0100
+From:   "hch@infradead.org" <hch@infradead.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v3 1/4] block: Add concurrent positioning ranges support
+Message-ID: <YRKjGeOZLVnTjQNv@infradead.org>
+References: <20210726013806.84815-1-damien.lemoal@wdc.com>
+ <20210726013806.84815-2-damien.lemoal@wdc.com>
+ <YRI3kMc39XPRLe/u@infradead.org>
+ <DM6PR04MB7081844211DF94238A3FC6B4E7F79@DM6PR04MB7081.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+1E3r+otujBbY8E49QL_MmxA_bGRTaivFbOkCvNvZEr93q=7g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR04MB7081844211DF94238A3FC6B4E7F79@DM6PR04MB7081.namprd04.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/21 9:54 AM, Kanchan Joshi wrote:
-> On Tue, Aug 10, 2021 at 8:18 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 8/10/21 7:53 AM, Jens Axboe wrote:
->>> On 8/10/21 7:15 AM, Ming Lei wrote:
->>>> Hi Jens,
->>>>
->>>> On Mon, Aug 09, 2021 at 03:23:58PM -0600, Jens Axboe wrote:
->>>>> Add a set of helpers that can encapsulate bio allocations, reusing them
->>>>> as needed. Caller must provide the necessary locking, if any is needed.
->>>>> The primary intended use case is polled IO from io_uring, which will not
->>>>> need any external locking.
->>>>>
->>>>> Very simple - keeps a count of bio's in the cache, and maintains a max
->>>>> of 512 with a slack of 64. If we get above max + slack, we drop slack
->>>>> number of bio's.
->>>>>
->>>>> The cache is intended to be per-task, and the user will need to supply
->>>>> the storage for it. As io_uring will be the only user right now, provide
->>>>> a hook that returns the cache there. Stub it out as NULL initially.
->>>>
->>>> Is it possible for user space to submit & poll IO from different io_uring
->>>> tasks?
->>>>
->>>> Then one bio may be allocated from bio cache of the submission task, and
->>>> freed to cache of the poll task?
->>>
->>> Yes that is possible, and yes that would not benefit from this cache
->>> at all. The previous version would work just fine with that, as the
->>> cache is just under the ring lock and hence you can share it between
->>> tasks.
->>>
->>> I wonder if the niftier solution here is to retain the cache in the
->>> ring still, yet have the pointer be per-task. So basically the setup
->>> that this version does, except we store the cache itself in the ring.
->>> I'll give that a whirl, should be a minor change, and it'll work per
->>> ring instead then like before.
->>
->> That won't work, as we'd have to do a ctx lookup (which would defeat the
->> purpose), and we don't even have anything to key off of at that point...
->>
->> The current approach seems like the only viable one, or adding a member
->> to kiocb so we can pass in the cache in question. The latter did work
->> just fine, but I really dislike the fact that it's growing the kiocb to
->> more than a cacheline.
->>
-> Still under a cacheline seems. kiocb took 48 bytes, and adding a
-> bio-cache pointer made it 56.
+On Tue, Aug 10, 2021 at 11:03:41AM +0000, Damien Le Moal wrote:
+> >> + * Dummy release function to make kobj happy.
+> >> + */
+> >> +static void blk_cranges_sysfs_nop_release(struct kobject *kobj)
+> >> +{
+> >> +}
+> > 
+> > How do we ensure the kobj is still alive while it is accessed?
+> 
+> q->sysfs_lock ensures that. This mutex is taken whenever revalidate registers
+> new ranges (see blk_queue_set_cranges below), and is taken also when the ranges
+> are unregistered (on revalidate if the ranges changed and when the request queue
+> is unregistered). And blk_crange_sysfs_show() takes that lock too. So the kobj
+> cannot be freed while it is being accessed (the sysfs inode lock also prevents
+> it since kobj_del() will take the inode lock).
 
-Huh yes, I think I'm mixing up the fact that we embed kiocb and it takes
-req->rw over a cacheline, but I did put a fix on top for that one.
+Does it?  It only protects the access inside of it, but not the object
+lifetime.
 
-I guess we can ignore that then and just shove it in the kiocb, at the
-end.
+> 
+> > 
+> >> +void blk_queue_set_cranges(struct gendisk *disk, struct blk_cranges *cr)
+> > 
+> > s/blk_queue/disk/
+> 
+> Hmmm... The argument is a gendisk, but it is the request queue that is modified.
+> So following other functions like this, isn't blk_queue_ prefix better ?
 
--- 
-Jens Axboe
-
+Do we have blk_queue_ functions that take a gendisk anywhere?  The
+ones I noticed (and the ones I've recently added) all use disk_.
