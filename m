@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F64C04FE3
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E5FC432BE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6296C60724
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3B4D60724
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 16:37:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236138AbhHJQiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 12:38:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37978 "EHLO
+        id S236202AbhHJQiE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 12:38:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235994AbhHJQh6 (ORCPT
+        with ESMTP id S236100AbhHJQiA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 12:37:58 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7AB5C0613C1
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:36 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id u16so21901047ple.2
-        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:36 -0700 (PDT)
+        Tue, 10 Aug 2021 12:38:00 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3385C061798
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:37 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id cp15-20020a17090afb8fb029017891959dcbso5124005pjb.2
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 09:37:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=WC4ejIUmrNi+MIoz5Vp544UpW+vl/SQ46veVxKdleWg=;
-        b=GMsnua/vFwRz60BeydnigsA4jcIWrr8FxK1Im4OgUtG5IXYvqCO6MYvEMtZ1f1MfID
-         8VxLc67WcHLO0RGiJpFcSjHJaCzIfPYCKkBS9rIjgA/zxjgLKb/opTzJVf9W9ynE727y
-         biFhDxLYxZbIjcUiwkilKwCiXrfcPskJ/l5mNBgmjkPoBmg/DEXcKM8PEcoSv9tfcUjX
-         vQnk/zxdfAog53x9c7o85MuCDaDyX8lMQYQywy+9VBHHiyLdnrDgq7czCwkZNE4Xtowf
-         +FMNHuG/22wruIcqwViZcIx91ZLjCCWBgLayeZDpUUQgcyxDSM8Rxi8be1O55CuE9AJh
-         RekA==
+        bh=EOUkUjkApB+u9s/YlxR3KEiPACxa20TSw4f2NjsBDFs=;
+        b=Ot4LUM9vennjOsDScG+3pnXhAVWQ+7ozD6mExFiU/aVRNFuzm8PMzBcMa4XZsEwso3
+         i9z5RAna0gYQtTFNd61o9jeiOH6tWKu5LajdsFaXhMLrd25cJuPf1ojBIyeL1Yv4ZoPD
+         7MOdpeqh+HQ2uXmWsVIyXBZARr/xXmTikyFle987FhGhVW+m35RITgGN7HQ6DXm1p3eK
+         zUlgyuHNjDHxjLaMGmmvhd+EivglTjKNTR9hkOcueDk1lZvwuW5+Y8//8B7YgQFqIxWm
+         T5LzRUZ+P0bsZA0elYv2i3Xz0aZ+92cIbrFLg1iqcEcrT2GOxRD3g3RJ9ktYVZLwtfqF
+         CQ8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=WC4ejIUmrNi+MIoz5Vp544UpW+vl/SQ46veVxKdleWg=;
-        b=RZiq4HIBOMfOiT3svBl7RRreafVFOXLMoDdnfhPhoSKS1RChP11DvsPSfj8P4t4jNM
-         vpTqmEdi7Jz2dDBJY7Yr2fmL0UMHbV6O2ChKZpUrlZXPeaqkMDO9IE1vuPEDUd+8x3Xf
-         71zOsBo2CUBQC6jOZ8tNhHPLt2ObWs4daXAFVWUsvmr870DCT3zoDaYaDCcxBA2jOBvc
-         NjVxGvX+HvToWE9wUGJKgF99N74QlwnOjDaok/AfAzpBpX+aS7za2qdXwDHExvG71qAe
-         78IfDeN/IVqkHWLTFhE2GL1ax7tmWTkIjUNPcn4c0ZTwTLYghG3wM9UcumovlOhcgEFe
-         I5Aw==
-X-Gm-Message-State: AOAM531By5eeYPAditYOvkGDH1ylJr1NMY/Sbt8rxvK7zGsqFobnRBrA
-        sMub7a8dp0rMULIZr9xO7AqD/A==
-X-Google-Smtp-Source: ABdhPJz7dVXHqThkKzn8IurG1da0CB8RjNEa6kAteOMr84OllC+qHW6Krjbg+fDI/TnpgZ/r+hrCLQ==
-X-Received: by 2002:a17:90b:102:: with SMTP id p2mr5927180pjz.126.1628613456131;
-        Tue, 10 Aug 2021 09:37:36 -0700 (PDT)
+        bh=EOUkUjkApB+u9s/YlxR3KEiPACxa20TSw4f2NjsBDFs=;
+        b=Krbg1IXg1hceNn9wWthF0qtojmrXteaC0OHC8r0Z3u24D7hY+x8w9Bx1ugTfj2wlsC
+         SMdktg0boJCb2bZpJ5Frp7AqBYL7q6Qs7gQe+tNpDTxyE4YLAnYtTE0T/F5vL4s3JFdG
+         msQZs+hNuMsKZzIOSY9yLOJF2aFGNAXS0wS1cHNbByJ8yKYLeBmQyQRGvECpW4uWmNJc
+         bNLSWbFuFKtLomDhURD5imCDFgvPYT2kp2drI/k+MXP6h1kgUGv7YdR2ITZRsIGduHKA
+         OY3b9BpeKPayCvq0la3P0CqGAIOz746xkQ8sSnC+QAWHnDPhZ+5SvmO8wFFaL7N0jmV8
+         svBg==
+X-Gm-Message-State: AOAM532LZB3B5k6BdfcSU2Cg3e/F43v47gFjIpa/+dQ5CVqTiqXeUF4B
+        zehwRNWBYM0wAlO+BCeKaK/r3Q==
+X-Google-Smtp-Source: ABdhPJwbB4i6KbTtSHoL8+GibG3II0wrltUkyNqSuMSNeJPHqSJinHnylmT6nDOpvLO+YEKUOjamcQ==
+X-Received: by 2002:a63:f011:: with SMTP id k17mr193635pgh.391.1628613457217;
+        Tue, 10 Aug 2021 09:37:37 -0700 (PDT)
 Received: from localhost.localdomain ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id pi14sm3517744pjb.38.2021.08.10.09.37.35
+        by smtp.gmail.com with ESMTPSA id pi14sm3517744pjb.38.2021.08.10.09.37.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 09:37:35 -0700 (PDT)
+        Tue, 10 Aug 2021 09:37:36 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     io-uring@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/5] io_uring: use kiocb->private to hold rw_len
-Date:   Tue, 10 Aug 2021 10:37:25 -0600
-Message-Id: <20210810163728.265939-3-axboe@kernel.dk>
+Subject: [PATCH 3/5] fs: add ki_bio_cache pointer to struct kiocb
+Date:   Tue, 10 Aug 2021 10:37:26 -0600
+Message-Id: <20210810163728.265939-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210810163728.265939-1-axboe@kernel.dk>
 References: <20210810163728.265939-1-axboe@kernel.dk>
@@ -71,124 +71,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We don't need a separate member in io_rw for this, we can just use the
-kiocb->private field as we're not using it for anything else anyway.
-This saves 8 bytes in io_rw, which we'll be needing once kiocb grows
-a new member.
+This allows an issuer (and owner of a kiocb) to pass in a bio allocation
+cache that can be used to improve the efficiency of the churn of repeated
+bio allocations and frees.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ include/linux/fs.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 91a301bb1644..f35b54f016f3 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -557,7 +557,6 @@ struct io_rw {
- 	/* NOTE: kiocb has the file as the first member, so don't do it here */
- 	struct kiocb			kiocb;
- 	u64				addr;
--	u64				len;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 640574294216..5f17d10ddc2d 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -291,6 +291,7 @@ struct page;
+ struct address_space;
+ struct writeback_control;
+ struct readahead_control;
++struct bio_alloc_cache;
+ 
+ /*
+  * Write life time hint values.
+@@ -319,6 +320,8 @@ enum rw_hint {
+ /* iocb->ki_waitq is valid */
+ #define IOCB_WAITQ		(1 << 19)
+ #define IOCB_NOIO		(1 << 20)
++/* iocb->ki_bio_cache is valid */
++#define IOCB_ALLOC_CACHE	(1 << 21)
+ 
+ struct kiocb {
+ 	struct file		*ki_filp;
+@@ -337,6 +340,14 @@ struct kiocb {
+ 		struct wait_page_queue	*ki_waitq; /* for async buffered IO */
+ 	};
+ 
++	/*
++	 * If set, owner of iov_iter can pass in a fast-cache for bio
++	 * allocations.
++	 */
++#ifdef CONFIG_BLOCK
++	struct bio_alloc_cache	*ki_bio_cache;
++#endif
++
+ 	randomized_struct_fields_end
  };
  
- struct io_connect {
-@@ -2675,6 +2674,16 @@ static bool io_file_supports_nowait(struct io_kiocb *req, int rw)
- 	return __io_file_supports_nowait(req->file, rw);
- }
- 
-+static inline void *u64_to_ptr(__u64 ptr)
-+{
-+	return (void *)(unsigned long) ptr;
-+}
-+
-+static inline __u64 ptr_to_u64(void *ptr)
-+{
-+	return (__u64)(unsigned long)ptr;
-+}
-+
- static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- {
- 	struct io_ring_ctx *ctx = req->ctx;
-@@ -2732,7 +2741,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	}
- 
- 	req->rw.addr = READ_ONCE(sqe->addr);
--	req->rw.len = READ_ONCE(sqe->len);
-+	req->rw.kiocb.private = u64_to_ptr(READ_ONCE(sqe->len));
- 	req->buf_index = READ_ONCE(sqe->buf_index);
- 	return 0;
- }
-@@ -2799,7 +2808,7 @@ static void kiocb_done(struct kiocb *kiocb, ssize_t ret,
- static int __io_import_fixed(struct io_kiocb *req, int rw, struct iov_iter *iter,
- 			     struct io_mapped_ubuf *imu)
- {
--	size_t len = req->rw.len;
-+	size_t len = ptr_to_u64(req->rw.kiocb.private);
- 	u64 buf_end, buf_addr = req->rw.addr;
- 	size_t offset;
- 
-@@ -2997,7 +3006,7 @@ static ssize_t io_iov_buffer_select(struct io_kiocb *req, struct iovec *iov,
- 		iov[0].iov_len = kbuf->len;
- 		return 0;
- 	}
--	if (req->rw.len != 1)
-+	if (ptr_to_u64(req->rw.kiocb.private) != 1)
- 		return -EINVAL;
- 
- #ifdef CONFIG_COMPAT
-@@ -3012,7 +3021,7 @@ static int io_import_iovec(int rw, struct io_kiocb *req, struct iovec **iovec,
- 			   struct iov_iter *iter, bool needs_lock)
- {
- 	void __user *buf = u64_to_user_ptr(req->rw.addr);
--	size_t sqe_len = req->rw.len;
-+	size_t sqe_len = ptr_to_u64(req->rw.kiocb.private);
- 	u8 opcode = req->opcode;
- 	ssize_t ret;
- 
-@@ -3030,7 +3039,7 @@ static int io_import_iovec(int rw, struct io_kiocb *req, struct iovec **iovec,
- 			buf = io_rw_buffer_select(req, &sqe_len, needs_lock);
- 			if (IS_ERR(buf))
- 				return PTR_ERR(buf);
--			req->rw.len = sqe_len;
-+			req->rw.kiocb.private = u64_to_ptr(sqe_len);
- 		}
- 
- 		ret = import_single_range(rw, buf, sqe_len, *iovec, iter);
-@@ -3063,6 +3072,7 @@ static ssize_t loop_rw_iter(int rw, struct io_kiocb *req, struct iov_iter *iter)
- {
- 	struct kiocb *kiocb = &req->rw.kiocb;
- 	struct file *file = req->file;
-+	unsigned long rw_len;
- 	ssize_t ret = 0;
- 
- 	/*
-@@ -3075,6 +3085,7 @@ static ssize_t loop_rw_iter(int rw, struct io_kiocb *req, struct iov_iter *iter)
- 	if (kiocb->ki_flags & IOCB_NOWAIT)
- 		return -EAGAIN;
- 
-+	rw_len = ptr_to_u64(req->rw.kiocb.private);
- 	while (iov_iter_count(iter)) {
- 		struct iovec iovec;
- 		ssize_t nr;
-@@ -3083,7 +3094,7 @@ static ssize_t loop_rw_iter(int rw, struct io_kiocb *req, struct iov_iter *iter)
- 			iovec = iov_iter_iovec(iter);
- 		} else {
- 			iovec.iov_base = u64_to_user_ptr(req->rw.addr);
--			iovec.iov_len = req->rw.len;
-+			iovec.iov_len = rw_len;
- 		}
- 
- 		if (rw == READ) {
-@@ -3102,7 +3113,7 @@ static ssize_t loop_rw_iter(int rw, struct io_kiocb *req, struct iov_iter *iter)
- 		ret += nr;
- 		if (nr != iovec.iov_len)
- 			break;
--		req->rw.len -= nr;
-+		rw_len -= nr;
- 		req->rw.addr += nr;
- 		iov_iter_advance(iter, nr);
- 	}
 -- 
 2.32.0
 
