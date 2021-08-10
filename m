@@ -2,85 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E48E0C432BE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA05BC4320A
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:39:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF07961052
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:15:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D33A160FDA
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:39:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241119AbhHJNPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 09:15:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53608 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241134AbhHJNPu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 09:15:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628601327;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fJ3pNvm7jE2sg7bk2uct+zwhcMqnSG42g9P7ervPcF8=;
-        b=azzD7N77xxmRwz831gomcCPZ40f/NU+En3e3Yl18/gG/RzalC61lz9J0N8p7ddlQEYuKSx
-        /npZ8aSDjRqaGCE/VsIMTjOxVzj4rVSvv+e3CAl5Bz4nud5JAZvMZwHG62ZbZTg61hgJB/
-        4A+hQaPepbxU7GMD5UK4KF/jcB/OXWA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-tLnaUJNyOZ6VcUSwHUGm4A-1; Tue, 10 Aug 2021 09:15:26 -0400
-X-MC-Unique: tLnaUJNyOZ6VcUSwHUGm4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DA38801AE7;
-        Tue, 10 Aug 2021 13:15:25 +0000 (UTC)
-Received: from T590 (ovpn-13-190.pek2.redhat.com [10.72.13.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 441F12854F;
-        Tue, 10 Aug 2021 13:15:18 +0000 (UTC)
-Date:   Tue, 10 Aug 2021 21:15:14 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/4] bio: add allocation cache abstraction
-Message-ID: <YRJ74uUkGfXjR52l@T590>
-References: <20210809212401.19807-1-axboe@kernel.dk>
- <20210809212401.19807-2-axboe@kernel.dk>
+        id S241172AbhHJNkN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 09:40:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49392 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241877AbhHJNji (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Aug 2021 09:39:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DD75E60EE7;
+        Tue, 10 Aug 2021 13:38:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628602749;
+        bh=fObxAgs+ulfRDwt7g5xTa8zsugCY1+6fJfkNM/IsNlA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=rL/ZttqfxsO2dZRUHtzy9nzwGGoLFagpqaqSVFKyYkmwEk8jLLj+VGms3FbxODWOE
+         /axtGd5S9x+7lkyR5olgKW/uQ6xIG4FAyY22EBUvi0ygIQI/V8oqo0AztKG0xH8P+D
+         i2BUBtwAKuoo5FiwRcNTvRRH5OPAvTRFsERhYmH3cPbkdyodLTyF6MqRFOB3VOotNS
+         EgJsbqMLwqFLTVqbYkoNJRWhI2ATN7S7OajsyTWegqHLoNNk3q1brbNti/WGlP5hLq
+         Dtva7zVz02U1F7tX/hFspZj7RsQEplXREoFsMoN28qsjq+2ZvBsJ6Dl4XjCpPfWmew
+         qK1BAfDETIcpw==
+Date:   Tue, 10 Aug 2021 15:38:40 +0200
+From:   Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Ian Pilcher <arequipeno@gmail.com>, hch@lst.de, axboe@kernel.dk,
+        kernelnewbies@kernelnewbies.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, pavel@ucw.cz, pali@kernel.org,
+        linux-leds@vger.kernel.org
+Subject: Re: [RFC PATCH v2 00/10] Add configurable block device LED triggers
+Message-ID: <20210810153840.42419d06@thinkpad>
+In-Reply-To: <YRIeHH1SLl6tYCeY@kroah.com>
+References: <20210809033217.1113444-1-arequipeno@gmail.com>
+        <20210809205633.4300bbea@thinkpad>
+        <81c128a1-c1b8-0f1e-a77b-6704bade26c0@gmail.com>
+        <20210810004331.0f0094a5@thinkpad>
+        <7b5f3509-5bcd-388b-8d3b-4ea95a9483ad@gmail.com>
+        <YRIeHH1SLl6tYCeY@kroah.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210809212401.19807-2-axboe@kernel.dk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Tue, 10 Aug 2021 08:35:08 +0200
+Greg KH <gregkh@linuxfoundation.org> wrote:
 
-On Mon, Aug 09, 2021 at 03:23:58PM -0600, Jens Axboe wrote:
-> Add a set of helpers that can encapsulate bio allocations, reusing them
-> as needed. Caller must provide the necessary locking, if any is needed.
-> The primary intended use case is polled IO from io_uring, which will not
-> need any external locking.
-> 
-> Very simple - keeps a count of bio's in the cache, and maintains a max
-> of 512 with a slack of 64. If we get above max + slack, we drop slack
-> number of bio's.
-> 
-> The cache is intended to be per-task, and the user will need to supply
-> the storage for it. As io_uring will be the only user right now, provide
-> a hook that returns the cache there. Stub it out as NULL initially.
+> On Mon, Aug 09, 2021 at 06:50:44PM -0500, Ian Pilcher wrote:
+> > On 8/9/21 5:43 PM, Marek Beh=C3=BAn wrote: =20
+> > > I confess that I am not very familiar with internal blkdev API. =20
+> >=20
+> > It's mainly a matter of symbol visibility.  See this thread from a few
+> > months ago:
+> >=20
+> >   https://www.spinics.net/lists/linux-leds/msg18244.html
+> >=20
+> > Now ... my code currently lives in block/, so there isn't actually
+> > anything technically preventing it from iterating through the block
+> > devices.
+> >=20
+> > The reactions to Enzo's patch (which you can see in that thread) make me
+> > think that anything that iterates through all block devices is likely to
+> > be rejected, but maybe I'm reading too much into it.
+> >=20
+> >=20
+> > Greg / Christoph -
+> >=20
+> > (As you were the people who expressed disapproval of Enzo's patch to
+> > export block_class and disk_type ...)
+> >=20
+> > Can you weigh in on the acceptability of iterating through the block
+> > devices (searching by name) from LED trigger code within the block
+> > subsystem (i.e. no new symbols would need to be exported)?
+> >=20
+> > This would allow the trigger to implement the sysfs API that Marek and
+> > Pavel want. =20
+>=20
+> No idea, let's see the change first, we can never promise anything :)
 
-Is it possible for user space to submit & poll IO from different io_uring
-tasks?
+Hi Greg,
 
-Then one bio may be allocated from bio cache of the submission task, and
-freed to cache of the poll task?
+Can't we use blkdev_get_by_path() (or blk_lookup_devt() with
+blkdev_get_by_dev())?
+This would open the block device and return a struct block_device *.
+When the LED trigger is disabled, it would also have to release the
+device.
 
-
-Thanks, 
-Ming
-
+Marek
