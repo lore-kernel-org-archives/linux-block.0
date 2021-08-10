@@ -4,70 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DE4C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 02:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC252C4320A
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 02:05:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83DAA61075
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 02:00:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B9A761056
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 02:05:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236682AbhHJCBD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 22:01:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32812 "EHLO
+        id S237316AbhHJCFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 22:05:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236645AbhHJCBD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 22:01:03 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C680C0613D3
-        for <linux-block@vger.kernel.org>; Mon,  9 Aug 2021 19:00:42 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id nt11so7680504pjb.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Aug 2021 19:00:42 -0700 (PDT)
+        with ESMTP id S230424AbhHJCFy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Aug 2021 22:05:54 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23EAEC061796
+        for <linux-block@vger.kernel.org>; Mon,  9 Aug 2021 19:05:33 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id cp15-20020a17090afb8fb029017891959dcbso2060106pjb.2
+        for <linux-block@vger.kernel.org>; Mon, 09 Aug 2021 19:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Jyg3h9YD/l7v++rwDIcj7NKt8ibdDEOy85xZxBpzgVo=;
-        b=dmA6lFK4CAg+wvPQTU0zUVA7r2m/6OjkkHyj7hFfeyTgwd6zpvVJs+/jLkEkbWnhUk
-         oSlsgnAq4d4IIm+YURwiFJQCUh5/lBduDfdqr/00zqX5+iReaDqNjhkIMAa2FJdRh96+
-         HFIvsv1iswL3uSaVs/pAu/yA6Dp2j6Zkp07D0rqg61kaueOj8vgVMA4YIjGJtnHooyEo
-         S+grwwObkj3hSpovEEWeW0uU7mOiXeW7E7XmSo5QpGmuk/KFnGsGhCQxgp3Ozn9qD3ay
-         FcpHFw7G0vn2VYA5LnFPDsp5ls4Kva+Qw99DcbTeqmTatpey1PbWp/DsnuoX/KmoYnrB
-         IhzA==
+        bh=4obz9WkqAEaS3SU/Ft8ZVbZx29A5UvHIZHpNuPkmvSk=;
+        b=kZGou/+ar6VkGad2l0SxaqeFt1SKZRIzP9scQKzNs4UWQkTcp9RFq2j7DzVxV5KgyK
+         5TlRRQZiF84syxutswoRu9al2wgA6RIdYNPOBxcnTDzmobwr5KimozZFSDPrq4diHXeX
+         ipKAui0LFbQLJxIpk5KS/wFGdunbQWFii1rXT4wS1I8XQZsesNjv4HPv3iAD3ea+upBS
+         JSg6AlDBdu61OSsdQuXUhveKPb1AmEK5XcKA36O+/DwyPCvucbwUCa4b3wIe+ypj3GQo
+         a62adTZ9xmyyPOvuM6rVkvObTb2FdTjAK6ijP2kom0N55yhlEBTjNlqSbSS+QSc+1saE
+         805Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Jyg3h9YD/l7v++rwDIcj7NKt8ibdDEOy85xZxBpzgVo=;
-        b=SyRbd4A1Y2qOYg5W9jpM5mys3un3gdMIS1qaBht5e6lFK0pn6VVcfzDMZ1RPr2P1Vm
-         SnsKdUcHPH0ovf/Jmi0AvhmMiUWuO8k/ykXDgVGbs4lsboHxduHhgkDzTlNlSEgmHQiG
-         PQ3w/29yfXwdal0WZf9zRw+iIh4wQbNvXnQO8BtCz5UW36kjfbEwORG5NS56dAxmBv7s
-         8octCcT4HVX1Q1QA7w8ZEELLi2kENl6Ada7UrnCMuvSOoTDbcBi2aWHJa3lCVrbtV3uQ
-         UuO8KPmqHBwj/HAFsRMBvfNUoACwZMRHUNFpVfYwxt4YbRPhJt1SuE4NdP/28XCVI2ES
-         hsKQ==
-X-Gm-Message-State: AOAM532Ua/L+VSqT/M0bbPiwqZOzTFaWB1Ua9JIsnCKTyNtd5JK65O8i
-        LgJeAexCpJMtkZrfPxkSaujN1g==
-X-Google-Smtp-Source: ABdhPJzEGF1e8a24PbEwPGl0hpmUD+HP9Gw6rGODPcCRTjWUl66UmylWvDoEZtSlgGUDeLyffEXEdw==
-X-Received: by 2002:a17:90a:bd18:: with SMTP id y24mr2193848pjr.83.1628560841876;
-        Mon, 09 Aug 2021 19:00:41 -0700 (PDT)
+        bh=4obz9WkqAEaS3SU/Ft8ZVbZx29A5UvHIZHpNuPkmvSk=;
+        b=rgzjbD8USAzoHS4sxSKeDhH/EFbtGqSRekAp91OsmTpjUEF8NlOk7X6ZM9ywIdDP22
+         Kuo/5Ji1vC+LUXL/yhjjWXnuKIGQaDrbPYf7Kak3SaTnnb76paKdNT7K4KH2eUVp8+pO
+         V5HrDfYhIaLyLO9JPD32xk19L5EGED/jkPo0DEfokaFx8zmIt3FJhVioj4GDupAh4syr
+         VSTMfWr+VtQSyTBCDJ05QSHspjPnBEoAkfPXOUOBXAsD5njf2zttEeMqaHb3kaq1qYdC
+         mJeGG1i2lohD4xmXaz2aWWg54F0C7oGQk4hJRuDIvboB87/A4/kPXqqInyMSKywH2sR/
+         s7ug==
+X-Gm-Message-State: AOAM53122K70ZT8+MAHReDmy6WXLfxDlRrz6Ffltu7NGLUzrFqIceQ6s
+        aV22ktFDOxB/G/m7hiTuMnNqdw==
+X-Google-Smtp-Source: ABdhPJwMjMG5NuvlBdsJwiOAWKSMNKV4GrcOGftPPG58i6c5kNWYn1StXNhVEiq6b+QLIyTgFs/jww==
+X-Received: by 2002:a17:90b:17c3:: with SMTP id me3mr2143130pjb.203.1628561132632;
+        Mon, 09 Aug 2021 19:05:32 -0700 (PDT)
 Received: from [192.168.1.116] ([198.8.77.61])
-        by smtp.gmail.com with ESMTPSA id r4sm34361pfc.167.2021.08.09.19.00.40
+        by smtp.gmail.com with ESMTPSA id u3sm18289827pfn.76.2021.08.09.19.05.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Aug 2021 19:00:40 -0700 (PDT)
-Subject: Re: [PATCH] blk-iocost: fix lockdep warning on blkcg->lock
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        Bruno Goncalves <bgoncalv@redhat.com>
-References: <20210803070608.1766400-1-ming.lei@redhat.com>
+        Mon, 09 Aug 2021 19:05:32 -0700 (PDT)
+Subject: Re: [PATCH] xen-blkfront: Remove redundant assignment to variable err
+To:     Colin King <colin.king@canonical.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210806110601.11386-1-colin.king@canonical.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7f048cec-69b4-cb87-5e41-68714a36d10f@kernel.dk>
-Date:   Mon, 9 Aug 2021 20:00:38 -0600
+Message-ID: <f87ecb57-12f7-71cd-29a7-9cecd6605c88@kernel.dk>
+Date:   Mon, 9 Aug 2021 20:05:30 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210803070608.1766400-1-ming.lei@redhat.com>
+In-Reply-To: <20210806110601.11386-1-colin.king@canonical.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,27 +79,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/3/21 1:06 AM, Ming Lei wrote:
-> blkcg->lock depends on q->queue_lock which may depend on another driver
-> lock required in irq context, one example is dm-thin:
+On 8/6/21 5:06 AM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> 	Chain exists of:
-> 	  &pool->lock#3 --> &q->queue_lock --> &blkcg->lock
-> 
-> 	 Possible interrupt unsafe locking scenario:
-> 
-> 	       CPU0                    CPU1
-> 	       ----                    ----
-> 	  lock(&blkcg->lock);
-> 	                               local_irq_disable();
-> 	                               lock(&pool->lock#3);
-> 	                               lock(&q->queue_lock);
-> 	  <Interrupt>
-> 	    lock(&pool->lock#3);
-> 
-> Fix the issue by using spin_lock_irq(&blkcg->lock) in ioc_weight_write().
+> The variable err is being assigned a value that is never read, the
+> assignment is redundant and can be removed.
 
-Applied, thanks.
+Added for 5.15, thanks.
 
 -- 
 Jens Axboe
