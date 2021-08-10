@@ -2,98 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C63C432BE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DAEC19F3C
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:16:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 913F760F56
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:09:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18390610E9
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 14:16:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241986AbhHJOJk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 10:09:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59576 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241805AbhHJOJb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 10:09:31 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174E2C0613D3;
-        Tue, 10 Aug 2021 07:09:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=5o2X/hCLV7cpukH2oc7YrdoxcLinZ80KA7F0XExRIIQ=; b=G7JNfDn2E3Yqko3QMw5vmP2NW2
-        ioSwGdje9u+wA6M5Y0AlzbnP1x+YGPiFcjLq8UK0nhfFiuM9R3jdBoVvhn4td7tEUywlRmqE0QwUf
-        5OY2S869MiBiQMcecsZVtd9qtk4sotUTXTbKqw+1xVDaKrrsSOFhLboCKmfaJR8cMyf4/e1JtpkhM
-        by1+c+X6twREHyKgD2J1Lnul+zwZJDAUu1jgiyJhLBh4QyA0Y4SNJ0+G2J3sCjwRyRCnihFH0fq/v
-        KSrWIiphg7cUXidSSULbagNVzERZ9yvY4Kf44hNXeBZkPnadyyFp+LFYTbL99Ncw0QB3eBCC+wXqC
-        VSIWKBDw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mDSQX-00CC2G-5a; Tue, 10 Aug 2021 14:08:27 +0000
-Date:   Tue, 10 Aug 2021 15:08:21 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Vishal Moola <vishal.moola@gmail.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] Page Cache Allowing Hard Interrupts
-Message-ID: <YRKIVZIxdirjg7Ih@casper.infradead.org>
-References: <20210730213630.44891-1-vishal.moola@gmail.com>
- <YRI1oLdiueUbBVwb@infradead.org>
- <YRJsiapS/M3BOH9D@casper.infradead.org>
- <YRJyGMLAFKoB1qUQ@infradead.org>
+        id S242478AbhHJOQW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 10:16:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53076 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242450AbhHJOP7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Aug 2021 10:15:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F040F60F41;
+        Tue, 10 Aug 2021 14:15:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628604937;
+        bh=B7Mc6+bu3nOA9xNACCyDGH25quCXPgXomeh32na7dbY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iExtOShjto0dM1rWNczTFtib+JEejASTOY5JY+TQRg4nZd1pooQHY8phxPCFJq/zz
+         3OMrWRfEpXBbhy0yP7xtkXpPBWde4HlOODPJTpZ33wK3Er/7lxmGucMimAQfuTPoVk
+         cQg4daV7ITlJtwz/cOEBj+/okgQ9+E7CKVpkqakJf5mM9L1Oh2QKAhMkNAU4fWVuQV
+         TxIrUulTIONMHA3b2vMMtj/r3XMZNeWkv4kALfdtpofBEZAgLHMR/0xs91UO1DJlZN
+         SpRPEiIxhjC+ia2tIEawT6qJGfYgUm45iSB1F5Wjtx7g1RDNrpaFXjddL8oQFIXgDK
+         lpfi3/++bU1jg==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Vincent Fu <vincent.fu@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 24/24] kyber: make trace_block_rq call consistent with documentation
+Date:   Tue, 10 Aug 2021 10:15:05 -0400
+Message-Id: <20210810141505.3117318-24-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210810141505.3117318-1-sashal@kernel.org>
+References: <20210810141505.3117318-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YRJyGMLAFKoB1qUQ@infradead.org>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 01:33:28PM +0100, Christoph Hellwig wrote:
-> On Tue, Aug 10, 2021 at 01:09:45PM +0100, Matthew Wilcox wrote:
-> > On Tue, Aug 10, 2021 at 09:15:28AM +0100, Christoph Hellwig wrote:
-> > > Stupid question, but where do we ever do page cache interaction from
-> > > soft irq context?
-> > 
-> > test_clear_page_writeback() happens in _some_ interrupt context (ie
-> > the io completion path).  We had been under the impression that it was
-> > always actually softirq context, and so this patch was safe.  However,
-> > it's now clear that some drivers are calling it from hardirq context.
-> > Writeback completions are clearly not latency sensitive and so can
-> > be delayed from hardirq to softirq context without any problem, so I
-> > think fixing this is just going to be a matter of tagging requests as
-> > "complete in softirq context" and ensuring that blk_mq_raise_softirq()
-> > is called for them.
-> > 
-> > Assuming that DIO write completions _are_ latency-sensitive, of course.
-> > Maybe all write completions could be run in softirqs.
-> 
-> I really don't really see any benefit in introducing softirqs into
-> the game.
+From: Vincent Fu <vincent.fu@samsung.com>
 
-The benefit is not having to disable interrupts while manipulating
-the page cache, eg delete_from_page_cache_batch().
+[ Upstream commit fb7b9b0231ba8f77587c23f5257a4fdb6df1219e ]
 
-> If we want to simplify the locking and do not care too much
-> about latency, we should just defer to workqueue/thread context.
+The kyber ioscheduler calls trace_block_rq_insert() *after* the request
+is added to the queue but the documentation for trace_block_rq_insert()
+says that the call should be made *before* the request is added to the
+queue.  Move the tracepoint for the kyber ioscheduler so that it is
+consistent with the documentation.
 
-It's not a bad idea.  I thought BH would be the better place for it
-because it wouldn't require scheduling in a task.  If we are going to
-schedule in a task though, can we make it the task which submitted the I/O
-(assuming it still exists), or do we not have the infrastructure for that?
+Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
+Link: https://lore.kernel.org/r/20210804194913.10497-1-vincent.fu@samsung.com
+Reviewed by: Adam Manzanares <a.manzanares@samsung.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/kyber-iosched.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> For example XFS already does that for all writeback except for pure
-> overwrites.  Those OTOH can be latency critical for O_SYNC writes, but
-> you're apparently looking into that already.
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 81e3279ecd57..15a8be57203d 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -596,13 +596,13 @@ static void kyber_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *head = &kcq->rq_list[sched_domain];
+ 
+ 		spin_lock(&kcq->lock);
++		trace_block_rq_insert(rq);
+ 		if (at_head)
+ 			list_move(&rq->queuelist, head);
+ 		else
+ 			list_move_tail(&rq->queuelist, head);
+ 		sbitmap_set_bit(&khd->kcq_map[sched_domain],
+ 				rq->mq_ctx->index_hw[hctx->type]);
+-		trace_block_rq_insert(rq);
+ 		spin_unlock(&kcq->lock);
+ 	}
+ }
+-- 
+2.30.2
 
-To my mind if you've asked for O_SYNC, you've asked for bad performance.
-
-The writethrough improvement that I'm working on skips dirtying the page,
-but still marks the page as writeback so that we don't submit overlapping
-writes to the device.  The O_SYNC write will wait for the writeback to
-finish, so it'll still be delayed by one additional scheduling event
-... unless we run the write completion in the context of this task.
