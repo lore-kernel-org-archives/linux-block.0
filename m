@@ -2,100 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7674C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 03:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0758EC4338F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 04:59:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 893BC61051
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 03:28:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D778F6101E
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 04:59:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236572AbhHJD3R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 23:29:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45470 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236799AbhHJD3N (ORCPT
+        id S237067AbhHJE7p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 00:59:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44338 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235564AbhHJE7p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Aug 2021 23:29:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628566131;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zU+tbeF5cdcnLxTRgRGaA9ZLrJOz63y76gvrboLDlDI=;
-        b=W/g15d9sXk3ZYRbvb7X4GtGrwy1+zgdyjy/XtEYwYwgj6Ix7t8FkmF0a8Lq4/6M+6MvXoK
-        VLnEeC1XFuvkmPSzrh+y7xFmRFP7LXGDP2OsLEFlPfXKoUrnV0t1TUm+aLk/OJ41V7VrG1
-        aFTyPO6mbLbHx0TNyt6PX+s990/L4GE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-qDEt7pi5NryyMkDZYSr9og-1; Mon, 09 Aug 2021 23:28:47 -0400
-X-MC-Unique: qDEt7pi5NryyMkDZYSr9og-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52EF5801B3C;
-        Tue, 10 Aug 2021 03:28:46 +0000 (UTC)
-Received: from T590 (ovpn-13-190.pek2.redhat.com [10.72.13.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 671A419D9B;
-        Tue, 10 Aug 2021 03:28:39 +0000 (UTC)
-Date:   Tue, 10 Aug 2021 11:28:34 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>
-Subject: Re: [PATCH] block: return ELEVATOR_DISCARD_MERGE if possible
-Message-ID: <YRHyYmqxNSMMdyXo@T590>
-References: <20210729034226.1591070-1-ming.lei@redhat.com>
- <YQtcZHgE1cTl+KVz@T590>
- <a60094bf-c5b7-9b26-43b6-11188409edf1@kernel.dk>
- <YRHoxGKjD9JHjiXh@T590>
- <eabcef59-64a1-6e6e-adbd-5924fabf9810@kernel.dk>
+        Tue, 10 Aug 2021 00:59:45 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7865EC0613D3
+        for <linux-block@vger.kernel.org>; Mon,  9 Aug 2021 21:59:23 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id e19so33097527ejs.9
+        for <linux-block@vger.kernel.org>; Mon, 09 Aug 2021 21:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=hZO0FWGJSI/OPAyxmSYKNVRiGL538jyzDi1o3M9h0YY=;
+        b=az9IIuf4LvV5E1gUiDJAMnHmhCGl441kTFEuArgXi1dxCGgvCeD3ncukC6cO6IReW8
+         CMKEbkH+vQbKYPCdSkXRrGFs7gwC9iwEr+thhh5P1zJQpCwhZUmRKOgBXFT6iuUtb3SL
+         Sa/ERYw45Ey1tn7fAQ1OlnGrErYioC8bDdavLtoSZ6IPKYSoMNpQOLtuET13csRer5aE
+         zqz74C8Cbm56Jy+h2RBa7JlWO/ki6dcU749unluyLGli8Z040kDxr89W8/UNhGFwHUyY
+         mQBnQ7ylJ1iT0GXbI02m7aYuWAeD8O9yu31WYfp1lUE2+0IDJNbLF48NU5POnZ58CPty
+         HKxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hZO0FWGJSI/OPAyxmSYKNVRiGL538jyzDi1o3M9h0YY=;
+        b=J6K3oxDZ5HdXEMr67RH27PGxDtVqmSzRi7FABLxsOYCKkNyYEjZnWXn1lDzULn+BTc
+         3mL9eab+4b4DUe0EdH+ZPc+/m18mqPMFEPs29acucVfI0ojtPaJ5dUZpMNXN95qhazxt
+         z0FdpMqhGpmL6n59jNDXdUt9WEblBa8ze2BDK0ZKOzvFLDzm7iWs0T28tpx95zhwDaBp
+         ubMfT2zkBzaJRTXH3Hmw9EgJbrmLpkcOpm1CIcza6cHOySt8SK0Ar+RWOFU9AFCoxJVx
+         sxUTwOMSTfnl5LsQ0HdYl2DUlS7OwuBlJmWBNWHkf/wqNXTBcfoIpDVj91Qmb7Ki66Y0
+         Jp1A==
+X-Gm-Message-State: AOAM530950zJUKzMX8ii55MrdeDw+LkFHVUow+Kh19d6/nmhxZyqo/zG
+        vPAkQOAnbA8IOhEBKnbD/TG0hiBrx/MVxT1CNEKl
+X-Google-Smtp-Source: ABdhPJzvFRX9YucIuizA9bbIwHFfVwAxS5dUu+C02IZQr62VEgmlzgEaZ1KwWj20s6AZdy8k+SdUk7MCY44RrSczTkw=
+X-Received: by 2002:a17:906:58c7:: with SMTP id e7mr25285736ejs.197.1628571562110;
+ Mon, 09 Aug 2021 21:59:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eabcef59-64a1-6e6e-adbd-5924fabf9810@kernel.dk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20210809101609.148-1-xieyongji@bytedance.com> <08366773-76b5-be73-7e32-d9ce6f6799bf@redhat.com>
+In-Reply-To: <08366773-76b5-be73-7e32-d9ce6f6799bf@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 10 Aug 2021 12:59:11 +0800
+Message-ID: <CACycT3tPR30RU8XmWbDA=Hp-A6BBifd-q_aqrmU-9VK=OaRJRg@mail.gmail.com>
+Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config space
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 09, 2021 at 08:55:16PM -0600, Jens Axboe wrote:
-> On 8/9/21 8:47 PM, Ming Lei wrote:
-> > On Mon, Aug 09, 2021 at 02:36:25PM -0600, Jens Axboe wrote:
-> >> On 8/4/21 9:35 PM, Ming Lei wrote:
-> >>> On Thu, Jul 29, 2021 at 11:42:26AM +0800, Ming Lei wrote:
-> >>>> When merging one bio to request, if they are discard IO and the queue
-> >>>> supports multi-range discard, we need to return ELEVATOR_DISCARD_MERGE
-> >>>> because both block core and related drivers(nvme, virtio-blk) doesn't
-> >>>> handle mixed discard io merge(traditional IO merge together with
-> >>>> discard merge) well.
-> >>>>
-> >>>> Fix the issue by returning ELEVATOR_DISCARD_MERGE in this situation,
-> >>>> so both blk-mq and drivers just need to handle multi-range discard.
-> >>>>
-> >>>> Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-> >>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> >>>
-> >>> Hello Jens and Guys,
-> >>>
-> >>> Ping...
-> >>
-> >> Since this isn't a new regression this release and since this kind
-> >> of change always makes me a bit nervous, any objections to queueing
-> >> it up for 5.15 with the stable/fixes tags?
-> > 
-> > Fine, will post a new version with fixes tag.
-> 
-> Sorry if I wasn't clear, I mean are you fine with queueing this for
-> 5.15? I already did add the fixes tag.
+On Tue, Aug 10, 2021 at 11:05 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/8/9 =E4=B8=8B=E5=8D=886:16, Xie Yongji =E5=86=99=E9=81=93:
+> > An untrusted device might presents an invalid block size
+> > in configuration space. This tries to add validation for it
+> > in the validate callback and clear the VIRTIO_BLK_F_BLK_SIZE
+> > feature bit if the value is out of the supported range.
+> >
+> > And we also double check the value in virtblk_probe() in
+> > case that it's changed after the validation.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
+> >   drivers/block/virtio_blk.c | 39 +++++++++++++++++++++++++++++++++----=
+--
+> >   1 file changed, 33 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index 4b49df2dfd23..afb37aac09e8 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -692,6 +692,28 @@ static const struct blk_mq_ops virtio_mq_ops =3D {
+> >   static unsigned int virtblk_queue_depth;
+> >   module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
+> >
+> > +static int virtblk_validate(struct virtio_device *vdev)
+> > +{
+> > +     u32 blk_size;
+> > +
+> > +     if (!vdev->config->get) {
+> > +             dev_err(&vdev->dev, "%s failure: config access disabled\n=
+",
+> > +                     __func__);
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     if (!virtio_has_feature(vdev, VIRTIO_BLK_F_BLK_SIZE))
+> > +             return 0;
+> > +
+> > +     blk_size =3D virtio_cread32(vdev,
+> > +                     offsetof(struct virtio_blk_config, blk_size));
+> > +
+> > +     if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)
+> > +             __virtio_clear_bit(vdev, VIRTIO_BLK_F_BLK_SIZE);
+>
+>
+> I wonder if it's better to just fail here as what we did for probe().
+>
 
-Sorry for misunderstanding your point, yeah, I am fine with queuing in
-5.15.
-
+Looks like we don't need to do that since we already clear the
+VIRTIO_BLK_F_BLK_SIZE to tell the device that we don't use the block
+size in configuration space. Just like what we did in
+virtnet_validate().
 
 Thanks,
-Ming
-
+Yongji
