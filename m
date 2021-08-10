@@ -2,94 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF28DC4320A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A49C4320A
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:51:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1B3B61058
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:49:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5129D60295
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 13:51:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241904AbhHJNtb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 09:49:31 -0400
-Received: from jabberwock.ucw.cz ([46.255.230.98]:59218 "EHLO
-        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240232AbhHJNtb (ORCPT
+        id S241951AbhHJNvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 09:51:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55278 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241853AbhHJNvV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 09:49:31 -0400
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id D67F31C0B77; Tue, 10 Aug 2021 15:49:04 +0200 (CEST)
-Date:   Tue, 10 Aug 2021 15:49:04 +0200
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        kernelnewbies@kernelnewbies.org
-Subject: Re: [RFC PATCH v2 01/10] docs: Add block device LED trigger
- documentation
-Message-ID: <20210810134904.GA28089@amd>
-References: <20210809033217.1113444-1-arequipeno@gmail.com>
- <20210809033217.1113444-2-arequipeno@gmail.com>
+        Tue, 10 Aug 2021 09:51:21 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A7FC0613D3
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 06:50:59 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id cp15-20020a17090afb8fb029017891959dcbso4465233pjb.2
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 06:50:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=XoWeVxyak4DWU94pEzM6MUAbK2lfkSPHc8kV9GBn1Xw=;
+        b=uF3F0hZgVxYl3RCrx+c1fva6X9MmI7dgyLS/Ut16oNRj/N933RDSMJURC66trAX5Yi
+         5ot9QB52YSNM9rkHPLn+8Pz1B06Wrk8/y6qvpw4irlfV/HqCOOE1L9JmMUUtgA2gP6Te
+         ONNdEkr+qWr7AB5DkN2qAFlGYpaHOTLI+u1GnsGZ1+JY6/xoBLxIK8nL8zps3Go8aiT2
+         Xbv3CFELefETqtotvuY/D8PnRAApPGdamf9gbpbY/aN2PeWyR4tSlCL6vhFWaq12arRM
+         pdgMIityTmOcAZ/biSHiHIGmDBZS8yQFN6AIxa0dv9txW9izXveF+KlGOVPVrBdSF4HQ
+         I4DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XoWeVxyak4DWU94pEzM6MUAbK2lfkSPHc8kV9GBn1Xw=;
+        b=WnhhyBczXa6PsoTdCthS88uzLuUOO/7RdFHEs18YHP8Enn7UjgKb0Okkh7BQKKEIxw
+         ytJZjUZ0mk8ya6oHN7WpvgFVYRQNWp0M4SjShVhABlBNXwHcm5Q1G17/OlQyVVbe741l
+         D4VulTUOON7pkIVU0abvNLsZNCbJFTfDKdSEAUELEedYHsTmValsrQuABidTMahMl6Sj
+         mJj7RmR3o4d4YSHozvaNfpO5H/f0/Wh7SWEW9aotG8V/RaLXd/zvoyxSR1XsDrMfSAij
+         S0gXAwjvhdfWK6ED1Xa6yAuVHjZW4J4cjdhOJXEFOOb8xbPUhZavQdYXLgSc3f94xahH
+         N84Q==
+X-Gm-Message-State: AOAM533QmIaoK1ZpaYWCdhuE1frA9AXR1+tCXKeyC4Dw1VYpRUO+Dl41
+        agCZj29VhrFdx5y1Em8Y8dQAzo1+Dwiis1y2
+X-Google-Smtp-Source: ABdhPJy4mP2As13SmqECTfCVTuLG7/rR2QGtE0EFlR44tPcdU6oMjHtsu0AmIvsUQxpwgCjS4b+sPw==
+X-Received: by 2002:a17:902:da8a:b029:12c:6f0:fe3c with SMTP id j10-20020a170902da8ab029012c06f0fe3cmr25854832plx.41.1628603458328;
+        Tue, 10 Aug 2021 06:50:58 -0700 (PDT)
+Received: from [192.168.1.116] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id n35sm28341569pgb.90.2021.08.10.06.50.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Aug 2021 06:50:57 -0700 (PDT)
+Subject: Re: [PATCH 3/4] io_uring: wire up bio allocation cache
+To:     Kanchan Joshi <joshiiitr@gmail.com>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+References: <20210809212401.19807-1-axboe@kernel.dk>
+ <20210809212401.19807-4-axboe@kernel.dk>
+ <CA+1E3rKB7m54VxD+RrdS06ZSSJ_gJtO_ZVVQvespo+Y+jOBiKg@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <60fc0384-028e-3878-dd1a-7601bff44d1e@kernel.dk>
+Date:   Tue, 10 Aug 2021 07:50:56 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="k+w/mQv8wyuph6w0"
-Content-Disposition: inline
-In-Reply-To: <20210809033217.1113444-2-arequipeno@gmail.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <CA+1E3rKB7m54VxD+RrdS06ZSSJ_gJtO_ZVVQvespo+Y+jOBiKg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 8/10/21 6:25 AM, Kanchan Joshi wrote:
+> On Tue, Aug 10, 2021 at 6:40 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> Initialize a bio allocation cache, and mark it as being used for
+>> IOPOLL. We could use it for non-polled IO as well, but it'd need some
+>> locking and probably would negate much of the win in that case.
+> 
+> For regular (non-polled) IO, will it make sense to tie a bio-cache to
+> each fixed-buffer slot (ctx->user_bufs array).
+> One bio cache (along with the lock) per slot. That may localize the
+> lock contention. And it will happen only when multiple IOs are spawned
+> from the same fixed-buffer concurrently?
 
---k+w/mQv8wyuph6w0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I don't think it's worth it - the slub overhead is already pretty low,
+basically turning into a cmpxchg16 for the fast path. But that's a big
+enough hit for polled IO of this magnitude that it's worth getting rid
+of.
 
-Hi!
+I've attempted bio caches before for non-polled, but the lock + irq
+dance required for them just means it ends up being moot. Or even if
+you have per-cpu caches, just doing irq enable/disable means you're
+back at the same perf where you started, except now you've got extra
+code...
 
-> +++ b/Documentation/ABI/testing/sysfs-block
-> @@ -316,3 +316,19 @@ Description:
->  		does not complete in this time then the block driver timeout
->  		handler is invoked. That timeout handler can decide to retry
->  		the request, to fail it or to start a device recovery strategy.
-> +
-> +What:		/sys/block/<disk>/led
-> +Date:		August 2021
-> +Contact:	Ian Pilcher <arequipeno@gmail.com>
-> +Description:
-> +		Set the LED associated with this block device (or show available
-> +		LEDs and the currently selected LED, if any).
-> +
-> +		Reading the attribute will display the available LEDs (LEDs that
-> +		are associated with the blkdev LED trigger).  The currently
-> +		selected LED is enclosed in square brackets.  To clear the
-> +		device's LED association write 'none' (without the quotes) or
-> +		an empty string/line to the attribute.
-> +
-> +		See Documentation/ABI/testing/sysfs-class-led-trigger-blkdev and
-> +		Documentation/block/blk-ledtrig.rst.)
+Here's an example from a few years ago:
 
-I have to agree with Marek / Pali -- this is very strange interface.
+https://git.kernel.dk/cgit/linux-block/log/?h=cpu-alloc-cache
 
-Best regards,
-								Pavel
---=20
-http://www.livejournal.com/~pavelmachek
+-- 
+Jens Axboe
 
---k+w/mQv8wyuph6w0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAmESg88ACgkQMOfwapXb+vJV0gCdGqeHkXkz9qAl+6lcbIQnxYAJ
-liUAoIIpKKVWZ9SEjYxGWwA0VjQRZqWk
-=I/wx
------END PGP SIGNATURE-----
-
---k+w/mQv8wyuph6w0--
