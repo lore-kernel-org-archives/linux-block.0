@@ -2,180 +2,180 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECE9C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 01:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38114C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 01:49:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 114946101E
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 01:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1246061052
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 01:49:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237196AbhHJB2k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Aug 2021 21:28:40 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:45930 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237117AbhHJB2j (ORCPT
+        id S237266AbhHJBt0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Aug 2021 21:49:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25654 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237262AbhHJBtZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Aug 2021 21:28:39 -0400
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17A1B4ii012493;
-        Tue, 10 Aug 2021 01:28:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=msdWJQy84fO/fVz0Rj6Q/Ua7qi0sN5TdRrBYd/lzob0=;
- b=TeWcVmXyWxPkxWe+5GaNP1p/QYlOvlPt1D0SfWzFuM8rhQxXt+111he625Qouwj1wJUk
- gEKMRqHPwzIJvsND4k13cA0TJOtSuLiy8r5mgqhju9QtET9jsCeNavwd4OqeJ9sMn1f+
- G+e5bKA7I8zK6yAuvx3U4/8ZNV1RdRvdVsP24up7bAki1CpLDuhvq9zZFvcX/RV4mAtq
- xsSsbzdPRjBZb1AYmkwg2RwKL83vRXBxXpJPtpdG1hLHO08wXUfoLFi1jKTWtyECMWn1
- B/j7lWI+9mcIJMgU5d+4Eqav4a51zseSef2tvuUER8A2eXLounEknTBA8zQQbpw4KrJI Ng== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=msdWJQy84fO/fVz0Rj6Q/Ua7qi0sN5TdRrBYd/lzob0=;
- b=SRKk+DMiw5stXZaoKwPokj/Va2YiCpYhXH10EaaDlUBaKBPcRNAu7Td7CqQ7s9EIYyFL
- gPanNphJYs5adBFot1Bu76UzDONanHHhrsw04Z31Q12u4qvO9p7Dv8SwrF5oJRkO8YMp
- sqV0VGL3kwAwJMs+dFVG2iQ3MIfz3d7xGH7HrUO6396RgnHOQD5+BmcxhVtNPVNRkEGx
- JthyXv6FMoAOcSDAg/YusLpVKmxwG90SV6+fDMStKoU6f7WLtsK9DPN0+EAa3pIdmxNA
- iBxYiKyTQZ878v4tKJOpNNj/VNaFgU0d0FxGzNifCzrqPmpNqLYElD8pn5uiQLnLfrD2 sA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3aaqmutr10-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Aug 2021 01:28:09 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17A1A6JZ009758;
-        Tue, 10 Aug 2021 01:28:08 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2103.outbound.protection.outlook.com [104.47.70.103])
-        by userp3030.oracle.com with ESMTP id 3a9f9vygxd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Aug 2021 01:28:08 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OJrPAKLI0WDW+GA4kOH6fLsqqGYtvGJpwc1YFu7+YmANiK36p2Sj8CJp/swgjOZEA626azierLAKoagsDNPYsTmITNGfPxoBymaAdI2Jl449b9ZJ+dKe9PVtPyMr9u2fp8d/7aua1Sch5gdbzLPqft5hUNI9oJhcBxTIuCFj/29IKtIBC17+m68se0dcA5xAZAJc8hoMTsAlY1mwG24I36FldnCCF485szM1PYyQg3TbPqmH8ER//pIqrVZRDaj7ru23q2UVp5gEey8mCLAvnOoTRFof1zdo7A/gkFpWehK0vBQXJGtnrKkMKV1FsdDxYZJLW+5qJxQO3yH81PDuJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=msdWJQy84fO/fVz0Rj6Q/Ua7qi0sN5TdRrBYd/lzob0=;
- b=b6Gr9RhZ4vDyZF0Eg8n6AwHaJKDiPxrBovdqoWac2KlZxWg6x3ba8XnJxlTMvErTrZnzf/tKqqm8W/pcqoIur1bjQcvE4QRnuDnBsT5ZoTA12C98G4R7woqnRTIYBw4UzIkKUuuCM8crGWQfD69D8pNzDDWr7nv0670MimD1IR0s8nUoLDLh8vVQERNoujblgt9UnMUCXPTRKIo3Dd4/O5CizC3zq/7zdSjs0jdwnzFBbGL787TLz1hZKkpQz8IlEsMMO5sQE52QZxGlyl7CdvHA9tyuHHxn3Iwtiqb3L3aNbY6G200jrzZAeCq8IMRziej7HGqt1hvAk0GBVFtXeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=msdWJQy84fO/fVz0Rj6Q/Ua7qi0sN5TdRrBYd/lzob0=;
- b=0CiM45ZremUGJzGT0kvVSA/SmHC7OBfCVNx9qsw1JgmTYJIxPstYiRx+m/tgB8WAGH9327/E1WGEitzV7gsPevWiYImGHXAujFKSn4aR0AGp+MI0dDi4Fh/EzZu4ya23PsE3x5/mXHPtxhs1pU9qHChTcAHOpFtA1fSUBJDA4yQ=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
-Received: from BLAPR10MB5009.namprd10.prod.outlook.com (2603:10b6:208:321::10)
- by MN2PR10MB4063.namprd10.prod.outlook.com (2603:10b6:208:185::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.16; Tue, 10 Aug
- 2021 01:28:06 +0000
-Received: from BLAPR10MB5009.namprd10.prod.outlook.com
- ([fe80::7cd0:8600:6e6e:aa8c]) by BLAPR10MB5009.namprd10.prod.outlook.com
- ([fe80::7cd0:8600:6e6e:aa8c%6]) with mapi id 15.20.4394.023; Tue, 10 Aug 2021
- 01:28:06 +0000
-Subject: Re: [PATCH] xen-blkfront: Remove redundant assignment to variable err
-To:     Colin King <colin.king@canonical.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210806110601.11386-1-colin.king@canonical.com>
-From:   Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Message-ID: <539ef292-ccad-dcfe-e2f8-6116e8d94b48@oracle.com>
-Date:   Mon, 9 Aug 2021 21:28:02 -0400
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
-In-Reply-To: <20210806110601.11386-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: SA9PR10CA0003.namprd10.prod.outlook.com
- (2603:10b6:806:a7::8) To BLAPR10MB5009.namprd10.prod.outlook.com
- (2603:10b6:208:321::10)
+        Mon, 9 Aug 2021 21:49:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628560144;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=G/dSgq/cGf57vOSvcWuPjjmCIcASPDhZxQFXSenWC5Q=;
+        b=M5LuSdqsoErJI2to74Qs5HCx60v9ux0TeahLnL4w+3ZTqHgpLrYhhxl/GIhDaWxND44XJr
+        5BHZAy9u7KwDCPth6VaJgew+HjBsN2z0UwO7vQ3Gc6GSnpX6gWYOfEQLpXgi8V5LGmR8CI
+        T8myyXRub3CEZ07hCLsMs2RIVIigQlI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-y01V_X30N12RlviB-2aszw-1; Mon, 09 Aug 2021 21:49:01 -0400
+X-MC-Unique: y01V_X30N12RlviB-2aszw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFB5787146F;
+        Tue, 10 Aug 2021 01:48:59 +0000 (UTC)
+Received: from T590 (ovpn-13-190.pek2.redhat.com [10.72.13.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B73C210016FB;
+        Tue, 10 Aug 2021 01:48:51 +0000 (UTC)
+Date:   Tue, 10 Aug 2021 09:48:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, josef@toxicpanda.com, bvanassche@acm.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        nbd@other.debian.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v2 2/2] nbd: convert to use blk_mq_get_rq_by_tag()
+Message-ID: <YRHa/keJ4pHP3hnL@T590>
+References: <20210809030927.1946162-1-yukuai3@huawei.com>
+ <20210809030927.1946162-3-yukuai3@huawei.com>
+ <YRDK9tBFscK5ScK8@T590>
+ <47e5faa8-f8e5-86db-05a1-559e3b3c04b5@huawei.com>
+ <YRD5krmF/C7JxchE@T590>
+ <3adf6183-bf40-10cd-b8ed-552120028ca3@huawei.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.74.102.132] (160.34.88.132) by SA9PR10CA0003.namprd10.prod.outlook.com (2603:10b6:806:a7::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Tue, 10 Aug 2021 01:28:04 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c8db24a4-b0a2-4756-68ec-08d95b9e1a93
-X-MS-TrafficTypeDiagnostic: MN2PR10MB4063:
-X-Microsoft-Antispam-PRVS: <MN2PR10MB40637C9730B1B72232BBC3A88AF79@MN2PR10MB4063.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:369;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JLpsINUUZurS/ybSu1ZJwcSeAnOoF2zSyaB087Jaz4xNM9XA1J9TQ3EowePwiMkr2MnNpaR7Lk07L39rwIPO14xZAtFfSd4NPk9cV0TWgKwD1x5lbL/bIGCsY9IgO/JVuQyklQleEsy3IaEfOR1wMSsGbMgMfld02kFGiVaYhGmdylqJn9kpgz7dtSUx9W5T3QHFYtfx1uwn2GUDDqDQki2p+8jgpJhgRymPCr+oPEPtnF5wvN6g3qiO27xxG/hdykeaB8duidJHKxfnkb+Ch6y5Kd+Wzo3dZJKRk2tpLBU3TnUBDkiJkTOxnSjebYWc6n+uu46Tv4diT9BTbbE877M3+Rw8nltPPQWXB9jatGrCzdoktsxAKTc1j9hrpfglEu14Fu2gV24nKhFGxAYQdpmWO8ZwTRlmh5bq+yVcHrRodlJE8/VpkHXu8eC/zvZihrRVjjwT0zcdI571tXLsJ6PsI9O2WGcTrYfd2/LMom8Bv2wVC+AJvK3I4D6YQT4u/mWXXRgMA2G5GKIwMEcmL+YM3YA+DiRXpeSMUm8g98Xosobc4CLPymqEI/ZFAgcLOfolYzGokWgzeX287189uGEI9KUnOatrymTR9hjQ0lcy4qVCaVVR846spnqQ/KuGAZogIhJKbJYh1dtz979nlVTTbfL9yH8cerco61t+jNW0JIb5X5VSpA9iRVaBOOhDs87HvNs91pl7pQSoJ3tV4M5GgoH/0/2vkD6pcOWIPLU9OKeaCUF6BVM9Lqnda6Jc
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB5009.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(346002)(39860400002)(376002)(396003)(366004)(5660300002)(66556008)(66946007)(31686004)(66476007)(44832011)(53546011)(956004)(4744005)(4326008)(6486002)(38100700002)(2616005)(110136005)(86362001)(26005)(31696002)(8936002)(36756003)(8676002)(186003)(16576012)(2906002)(316002)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?My9FbStGMjNram1vVEpVZmV0S3ZHeXJHNG9pWERrVHV5UVdFd2lTYmI5TTU1?=
- =?utf-8?B?ckw2S1RPYU1USnlOUlJVaWhwUjlyQUhydDBqZU5JRGVSQURhMlNHSkg5Ujlq?=
- =?utf-8?B?QVhsNDd5RFkxYVhwQUViNFhJd3MyMEk4ckN4QUlUZUtzaHo2SFZWc05aT1dl?=
- =?utf-8?B?a1RlR3R3Rm9PUFdwL00xYVJJTnJuTU9oRmgrck9acFlXZ0VJaHlCYmthTjgw?=
- =?utf-8?B?T0ZKMlhyU1lnd2ZHQWtzR0NXZzZzTmFMZndhUTljY25FWnNob1hmOHZSMmNO?=
- =?utf-8?B?djNZL3REZ2o2eG5RSk1EYzBqZEREeEZORkJEZW5CcDRaeXJyUHRoRFJ1cnlt?=
- =?utf-8?B?OU9aOUUyVHExUm9DVWZZL2NUcHRZb3pPMEkrdG5xRUxubm9mbElUVks4THFh?=
- =?utf-8?B?N090d0JwRkdPTlFyWmxaQlk2QVF4QmhlMDM0THhndG1OOFlUMHhVTS9ZRHY3?=
- =?utf-8?B?U2dxeFU1MzNVd2lyT1c0dmZ5czc3YmFDTmZiM3FiWW9yMHY3RjBQTUY0cGlL?=
- =?utf-8?B?bnNkY2tSOTVKMjhMRDdmT0E4UDkvZHc0RWlmOXM4TWVwL3AyNWxvNm9VZzVG?=
- =?utf-8?B?WHk5M3J1THBjeHh0NGV4TitnZkcxdmNIZ0R5T3F1alV5SDB1Zk1qOU9XV1RI?=
- =?utf-8?B?WkVIUFE5aEIzcnV6YmNuM0FqS3RSUzBxSnNEeURVdDNGTWdBNGI3S3FkeTVS?=
- =?utf-8?B?TUovaUVWSEZrcUhQZnZBVkYrT3NDWXJqdUkrM1hoSDVTUGZycTd2SWtsdUZH?=
- =?utf-8?B?Q2dQTE1lWHFVckhVVE9pREN0QUI0ZzJITm5YMGVXWEhvYWk0WnZtaTRURk95?=
- =?utf-8?B?azFqY1dkcTU2LzcvaGFCcmFyR2hxM21zekp6dm1GaUo4eDZzUnJOd1RiZG1J?=
- =?utf-8?B?L0hPN0JCMDhYc1V4MDJHV05zT1IvR2RIVHMvcWlyV1pSZWtBbUluM2FQN3RF?=
- =?utf-8?B?S1FwLzdtOFJLT05FMyszNmNGY0ZnR0Zxby83WXBza284ZVpLV2NHV1Bwd3JE?=
- =?utf-8?B?Vk1abjBpQ1UzNzQwc3dRZENHUXoxV1ZhQ2lyQkJvKzNNc1FCb2dhT3R5clJx?=
- =?utf-8?B?K3pCVDJsWDZoazlORm0rdG1vazFxVG9HdnFVME5Ya2hFS1hIUXJ6MUJVMUZD?=
- =?utf-8?B?K3dzL2xHaTVJWCtTTVV0TmlFQTh6akxUc1VtMEh0NjlOMlpET29kbmRXWGtB?=
- =?utf-8?B?alFkMHQ0bFZ4YUZKMVRtTitCeE5vQmc1QmhnYmpvcTNqakY3TWpiY1h2N3h3?=
- =?utf-8?B?azRVREJMN2dST0V3SHYwb1FDQjNrU1d1aEMwTVVsRmxVZjgzNytxZHR4dC9C?=
- =?utf-8?B?VFF6RDRITGZpWlVheVM1NDVhcXZ0TkpvaGF0Nk5wRzNZRnJzSnQrcWZJZ2Zm?=
- =?utf-8?B?U2VIRGN3TFE1dFE4eFloOEM5dzdpakZYbitMRGRLR2lPY0VpWkZDNytTWDdy?=
- =?utf-8?B?ZWEwSTBhanB6RkNUa2xhUDV2NzZmYVMzZFhwT1RVOHVRa2hycURWaGZlTzFl?=
- =?utf-8?B?UEFxTXhsajM1NHFEeGN2Vk9MeU4rQSt0K3RWYkV3TW9pUGJwMlJFbkV0dVNM?=
- =?utf-8?B?b09TQU5PYmF5ejNySnlkeWYyWVFscTEycndmeHI3VG1aQmIycWFOQk05U3hT?=
- =?utf-8?B?NW85cm56TVI2YXdPb28wR0VNenlsYUpvUjdjTy9tcWVUMVphblQwTTNPcDYy?=
- =?utf-8?B?VDFaYzlpVSs4bEJTY2RuL3VEb2tmYWVPOWVXQjFzUElBQjJTMStZWkFOczV1?=
- =?utf-8?Q?9MqkI9/sBG8Au4HS1vnpiXHp5AIuxeZQnoExJ1b?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8db24a4-b0a2-4756-68ec-08d95b9e1a93
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB5009.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2021 01:28:05.9758
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BGFTDWwNf1G9HRxztSFBsp4Z92JBS+1Z1y42HHXMBqEgXMtcww6Mp/YZHKZpCcIPRwYM88MKQZ2vXhzTJfn6zUx0A4qM0lSxNq7+ZIWW8ok=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4063
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10071 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0
- adultscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108100006
-X-Proofpoint-GUID: 0aVv8rDdHhR0LXZcW5AdLT7mNCXp-pp6
-X-Proofpoint-ORIG-GUID: 0aVv8rDdHhR0LXZcW5AdLT7mNCXp-pp6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3adf6183-bf40-10cd-b8ed-552120028ca3@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Aug 09, 2021 at 10:04:32PM +0800, yukuai (C) wrote:
+> On 2021/08/09 17:46, Ming Lei wrote:
+> > On Mon, Aug 09, 2021 at 03:08:26PM +0800, yukuai (C) wrote:
+> > > On 2021/08/09 14:28, Ming Lei wrote:
+> > > > On Mon, Aug 09, 2021 at 11:09:27AM +0800, Yu Kuai wrote:
+> > > > > blk_mq_tag_to_rq() might return freed request, use
+> > > > > blk_mq_get_rq_by_tag() instead.
+> > > > > 
+> > > > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > > > > ---
+> > > > >    drivers/block/nbd.c | 11 ++++++-----
+> > > > >    1 file changed, 6 insertions(+), 5 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > > > > index c38317979f74..9e56975a8eee 100644
+> > > > > --- a/drivers/block/nbd.c
+> > > > > +++ b/drivers/block/nbd.c
+> > > > > @@ -713,11 +713,10 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+> > > > >    	tag = nbd_handle_to_tag(handle);
+> > > > >    	hwq = blk_mq_unique_tag_to_hwq(tag);
+> > > > >    	if (hwq < nbd->tag_set.nr_hw_queues)
+> > > > > -		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
+> > > > > -				       blk_mq_unique_tag_to_tag(tag));
+> > > > > -	if (!req || !blk_mq_request_started(req)) {
+> > > > > -		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
+> > > > > -			tag, req);
+> > > > > +		req = blk_mq_get_rq_by_tag(nbd->tag_set.tags[hwq],
+> > > > > +					   blk_mq_unique_tag_to_tag(tag));
+> > > > > +	if (!req) {
+> > > > > +		dev_err(disk_to_dev(nbd->disk), "Unexpected reply %d\n", tag);
+> > > > >    		return ERR_PTR(-ENOENT);
+> > > > >    	}
+> > > > >    	trace_nbd_header_received(req, handle);
+> > > > > @@ -779,6 +778,8 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+> > > > >    	}
+> > > > >    out:
+> > > > >    	trace_nbd_payload_received(req, handle);
+> > > > > +	if (req)
+> > > > > +		blk_mq_put_rq_ref(req);
+> > > > >    	mutex_unlock(&cmd->lock);
+> > > > >    	return ret ? ERR_PTR(ret) : cmd;
+> > > > 
+> > > > After blk_mq_put_rq_ref() returns, this request may have been freed,
+> > > > so the returned 'cmd' may have been freed too.
+> > > > 
+> > > > As I replied in your another thread, it is driver's responsibility to
+> > > > cover race between normal completion and timeout/error handling, that
+> > > > means the caller of blk_mq_tag_to_rq need to make sure that the request
+> > > > represented by the passed 'tag' can't be freed.
+> > > 
+> > > Hi, Ming
+> > > 
+> > > There are two problems here in nbd, both reported by our syzkaller.
+> > > 
+> > > The first is that blk_mq_tag_to_rq() returned a freed request, which is
+> > > because tags->static_rq[] is freed without clearing tags->rq[].
+> > > Syzkaller log shows that a reply package is sent to client without
+> > > the client's request package. And this patch is trying to solve this
+> > > problem.
+> > 
+> > It is still driver's problem:
+> > 
+> > ->static_rq is freed in blk_mq_free_tag_set() which is called after
+> > blk_cleanup_disk() returns. Once blk_cleanup_disk() returns, there
+> > shouldn't be any driver activity, including calling blk_mq_tag_to_rq()
+> > by passing one invalid tag.
+> > 
+> 
+> Hi, Ming
+> 
+> I understand if static_rq is freed through blk_mq_free_tag_set(),
+> drivers should not use static_rq anymore.
+> 
+> By the way, I was thinking about another path:
+> 
+> blk_mq_update_nr_requests
+>  if (!hctx->sched_tags) -> if this is true
+>   ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr, false)
+>    blk_mq_free_rqs -> static_rq is freed here
+> 
+> If this path concurrent with nbd_read_stat(), nbd_read_stat() can
+> get a freed request by blk_mq_tag_to_rq(), since tags->lock is not
+> held.
+> 
+> t1: nbd_read_stat	  t2: blk_mq_update_nr_requests
+> rq = blk_mq_tag_to_rq()
+> 			  blk_mq_free_rqs
 
-On 8/6/21 7:06 AM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
->
-> The variable err is being assigned a value that is never read, the
-> assignment is redundant and can be removed.
->
-> Addresses-Coverity: ("Unused value")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+t1 isn't supposed to happen when t2 is running.
+
+blk_mq_update_nr_requests() is only called by nbd_start_device().
+
+nbd_start_device():
+	        if (nbd->task_recv)
+                return -EBUSY;
+			...
+			nbd->recv_workq = alloc_workqueue()
+
+That means nbd_config_put() has been called and ->config_refs has
+dropped to zero, so socket has been shutdown, and ->recv_workq has
+been destroyed, so t1 isn't supposed to happen when t2 is running.
+
+> 
+> By holding tags->lock, we can check that rq state is idle, and it's
+> ref is 0.
+
+Firstly tags->lock can't fix the race[1], secondly it should be addressed
+in driver.
+
+[1] https://lore.kernel.org/linux-block/20210809030927.1946162-2-yukuai3@huawei.com/T/#m6651289c5718b45a8ae8a7efc889248f8cb904a3
 
 
-Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Thanks,
+Ming
 
