@@ -2,101 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06087C432BE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 15:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D802C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 15:58:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA65C60F35
-	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 15:55:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 202D660EDF
+	for <linux-block@archiver.kernel.org>; Tue, 10 Aug 2021 15:58:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243144AbhHJPz6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 11:55:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56482 "EHLO
+        id S237009AbhHJP6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 11:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243081AbhHJPz6 (ORCPT
+        with ESMTP id S238831AbhHJP6d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 11:55:58 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1310C0613C1;
-        Tue, 10 Aug 2021 08:55:35 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id t128so29476603oig.1;
-        Tue, 10 Aug 2021 08:55:35 -0700 (PDT)
+        Tue, 10 Aug 2021 11:58:33 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8CCC0613D3
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 08:58:11 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id w13-20020a17090aea0db029017897a5f7bcso6008742pjy.5
+        for <linux-block@vger.kernel.org>; Tue, 10 Aug 2021 08:58:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QFMIGRol7sV7/3Q+36hwNIwNbBlX+rl3ShevG/F9H84=;
-        b=rp8AUGfNdqWi0MkQHN2MpjPflMt1qnkgOles5T9lsTu7PsejD7ghbNg/xG2w7Um8ic
-         HqDOUHBqhfjr05ZiDYbFo69NLpW2ip3OIty+nU6mQeBeflrtuXZ4nuZyXolyVo8hf8tQ
-         VYuw5Cnok2i7GNLSj9IOLFeVnn2n8L2s8pwEdgTlLg9e/S5Eox4i2jkO0JHujtYqe2ac
-         powEHKt9TuT/OGAhuE+2qNylfFfU6KvjEAs5yESnh4dMZy7RI3Cdsz0IpiE8DQShnkpG
-         ZghZw4AotRKgfAlTG3HnFWnDhjmJN1WrV25sr6HQSevI0xfTTsdLZV0iF8k5zy+MEMJ2
-         XAVQ==
+        bh=M+5EflNi15FD/Kvdqur66KYZd4k9wCMPUYuJ6mvPI6c=;
+        b=yx7fuInePn6q+hS56FK+SUzk3ugRiE2IQ2+hEwWLr3J64PEG5vkWPV5eTzErQK7jKZ
+         NAEPQKDcql2t7U0zhy+KeLb7rLsQg0J+2w7mQTy/ejZ5LGuRB5frsAB0esNqZlhcwyj3
+         BTFXXOl5F1p24Qx3+326hzTLYzRkTk0hf6G6KT5do3vQOaJqY43J1IivT/D2pMX5Gzk8
+         MSUiSfn98cC2IcTsCPCRXDiD58v3QwnE+IHFmLLlrouPRSHuz9YG9g2LB+7DJozr0iA5
+         1i+erRkaXsFXYko4/+Lc1XGTE7tPgxnLbVPBFkO0g1cFwIbq0Ype8xmZkp0AjKkjT/oX
+         8MHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QFMIGRol7sV7/3Q+36hwNIwNbBlX+rl3ShevG/F9H84=;
-        b=EKVP5ZHLbiylelQNoMz0oDsqzGrp44b3w6sJDM4exFjwouEOjsKScSzhBO2hJGgTsy
-         ZLId5jwYOEpzRqkYB0lusxwkYVhwTGhwOegE4qckJHDDIWCCr//2Y0pJiwxu+pfPHoi4
-         ybtjGZHyxu82ku9fVxuifqOukjorDjDXD9Yt8KHRqadrBmc+viAjbW5hSt8d3qcC5s83
-         cEnAGoLRfCkbITZ95FbrN5GUHUDggpV08dKmxyB9udi7kGbkGkKX+87CNXa2/wIwpPrU
-         lI0kGfKG6df2TNKArjBBgXs+BoAUe8sO+gt5rrPg0tGZZa3Yi3ZclFvSoPS3dsBhEqHv
-         GWXA==
-X-Gm-Message-State: AOAM530mWpk3CLr78qw5C6B2BDQdWs9Wl88RdTiPVrR4pDHsMvyAH+VQ
-        3tsPRiVfc322aWMYCnQqmLfpp+ZEA97dyx4q
-X-Google-Smtp-Source: ABdhPJx6smfXN4O6AiJlejH1VKquAjyv2G6aPsIEbcXSsBtTEV0j7ICxNxqDh5mOE6ao2lMrfIN9DA==
-X-Received: by 2002:aca:f089:: with SMTP id o131mr20450847oih.37.1628610935163;
-        Tue, 10 Aug 2021 08:55:35 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id r5sm3214794otk.71.2021.08.10.08.55.34
+        bh=M+5EflNi15FD/Kvdqur66KYZd4k9wCMPUYuJ6mvPI6c=;
+        b=MXs9kbrT8RCQJG6UOFCy6h5N5x/OQsPI44HuLbo7VL+FT15AyNo+alONt1aP0/E4Kh
+         pVZRqH7Iv5WPo73XvuSX6h9Vam3vuO54R+2EN6tl7qeUOVCOqhVINhDXiH3yu0JSdVvN
+         juBG+XXSJtIJi0Et3j4Rzw8y3IPbTxyLReuq1ZGE0LBnRCQQQ3v6fDdXCI5CEob5uwsb
+         pp8wgZvEZz3wlsE0Lxbl2a6wnRo+DFLCGBjFjR+ej3G5FLAqUcR5vDEljbbS2c0WN6QF
+         iMPpk44L5GrCv5A2il1BKP5BMFJFSALFelGQU29m1o5XVlVUwoZxhQf5T01Vt+e2CwWJ
+         saJA==
+X-Gm-Message-State: AOAM5330uqqfrXMvdczGIe38OwBnkWxg8PBHkP0uNdrxendVGjd9D1SE
+        Zhhy1QuhVzQeq7ipuFXrBGZ10CLiZCV9mjbB
+X-Google-Smtp-Source: ABdhPJxLO/IDbZd7fXXRWdhdpVP3d7Hf7z+N4m80CJA/NKPj5eOhsrSZjkCcV35t+0BCAMQK5Yo8ZQ==
+X-Received: by 2002:a63:1709:: with SMTP id x9mr88177pgl.28.1628611090521;
+        Tue, 10 Aug 2021 08:58:10 -0700 (PDT)
+Received: from [192.168.1.116] ([198.8.77.61])
+        by smtp.gmail.com with ESMTPSA id fa21sm3529815pjb.20.2021.08.10.08.58.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Aug 2021 08:55:34 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 00/10] Add configurable block device LED triggers
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>
-Cc:     axboe@kernel.dk, kernelnewbies@kernelnewbies.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        pavel@ucw.cz, pali@kernel.org, hch@lst.de,
-        linux-leds@vger.kernel.org
-References: <20210809033217.1113444-1-arequipeno@gmail.com>
- <20210809205633.4300bbea@thinkpad>
- <81c128a1-c1b8-0f1e-a77b-6704bade26c0@gmail.com>
- <20210810004331.0f0094a5@thinkpad>
- <7b5f3509-5bcd-388b-8d3b-4ea95a9483ad@gmail.com> <YRIeHH1SLl6tYCeY@kroah.com>
- <20210810153840.42419d06@thinkpad> <YRKRpQdLRJmAb5kZ@kroah.com>
-From:   Ian Pilcher <arequipeno@gmail.com>
-Message-ID: <b8e99efb-7385-0ca2-641c-f93006b20527@gmail.com>
-Date:   Tue, 10 Aug 2021 10:55:33 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Tue, 10 Aug 2021 08:58:10 -0700 (PDT)
+Subject: Re: [PATCH 1/4] bio: add allocation cache abstraction
+To:     Kanchan Joshi <joshiiitr@gmail.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20210809212401.19807-1-axboe@kernel.dk>
+ <20210809212401.19807-2-axboe@kernel.dk> <YRJ74uUkGfXjR52l@T590>
+ <79511eac-d5f2-2be3-f12c-7e296d9f1a76@kernel.dk>
+ <6c06ac42-bda4-cef6-6b8e-7c96eeeeec47@kernel.dk>
+ <CA+1E3r+otujBbY8E49QL_MmxA_bGRTaivFbOkCvNvZEr93q=7g@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0d437134-ce97-747a-4b49-36801dbf4824@kernel.dk>
+Date:   Tue, 10 Aug 2021 09:58:08 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YRKRpQdLRJmAb5kZ@kroah.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CA+1E3r+otujBbY8E49QL_MmxA_bGRTaivFbOkCvNvZEr93q=7g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/21 9:48 AM, Greg KH wrote:
-> But what about when the device is removed from the system first?  Be
-> careful about that...
-> 
-> Anyway, sure, try those functions, I really do not know, all I
-> originally complained about was those exports which did not need to be
-> exported.
+On 8/10/21 9:54 AM, Kanchan Joshi wrote:
+> On Tue, Aug 10, 2021 at 8:18 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 8/10/21 7:53 AM, Jens Axboe wrote:
+>>> On 8/10/21 7:15 AM, Ming Lei wrote:
+>>>> Hi Jens,
+>>>>
+>>>> On Mon, Aug 09, 2021 at 03:23:58PM -0600, Jens Axboe wrote:
+>>>>> Add a set of helpers that can encapsulate bio allocations, reusing them
+>>>>> as needed. Caller must provide the necessary locking, if any is needed.
+>>>>> The primary intended use case is polled IO from io_uring, which will not
+>>>>> need any external locking.
+>>>>>
+>>>>> Very simple - keeps a count of bio's in the cache, and maintains a max
+>>>>> of 512 with a slack of 64. If we get above max + slack, we drop slack
+>>>>> number of bio's.
+>>>>>
+>>>>> The cache is intended to be per-task, and the user will need to supply
+>>>>> the storage for it. As io_uring will be the only user right now, provide
+>>>>> a hook that returns the cache there. Stub it out as NULL initially.
+>>>>
+>>>> Is it possible for user space to submit & poll IO from different io_uring
+>>>> tasks?
+>>>>
+>>>> Then one bio may be allocated from bio cache of the submission task, and
+>>>> freed to cache of the poll task?
+>>>
+>>> Yes that is possible, and yes that would not benefit from this cache
+>>> at all. The previous version would work just fine with that, as the
+>>> cache is just under the ring lock and hence you can share it between
+>>> tasks.
+>>>
+>>> I wonder if the niftier solution here is to retain the cache in the
+>>> ring still, yet have the pointer be per-task. So basically the setup
+>>> that this version does, except we store the cache itself in the ring.
+>>> I'll give that a whirl, should be a minor change, and it'll work per
+>>> ring instead then like before.
+>>
+>> That won't work, as we'd have to do a ctx lookup (which would defeat the
+>> purpose), and we don't even have anything to key off of at that point...
+>>
+>> The current approach seems like the only viable one, or adding a member
+>> to kiocb so we can pass in the cache in question. The latter did work
+>> just fine, but I really dislike the fact that it's growing the kiocb to
+>> more than a cacheline.
+>>
+> Still under a cacheline seems. kiocb took 48 bytes, and adding a
+> bio-cache pointer made it 56.
 
-Sounds good.  I'll work something up.  (I'm actually thinking that
-class_find_device() may be the best way to go, as it grabs a reference
-to the device.)
+Huh yes, I think I'm mixing up the fact that we embed kiocb and it takes
+req->rw over a cacheline, but I did put a fix on top for that one.
+
+I guess we can ignore that then and just shove it in the kiocb, at the
+end.
 
 -- 
-========================================================================
-                  In Soviet Russia, Google searches you!
-========================================================================
+Jens Axboe
+
