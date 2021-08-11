@@ -2,108 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A35DC19F35
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D07C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:48:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BAF0610A4
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:35:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA6C261058
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:48:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231747AbhHKTgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 15:36:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44698 "EHLO
+        id S231377AbhHKTsq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 15:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231702AbhHKTgJ (ORCPT
+        with ESMTP id S230487AbhHKTsp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 15:36:09 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285C3C061765
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:45 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id e19so4019696pla.10
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:45 -0700 (PDT)
+        Wed, 11 Aug 2021 15:48:45 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D3EDC061765
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:48:21 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id s22-20020a17090a1c16b0290177caeba067so11446713pjs.0
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:48:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=CPHR9+/srqubnx1IylV7gQnOmmOqOlKCpGfW9/b0t68=;
-        b=Gn68Gv0X+76XfYrCArMrLcLPqzknELSJKAuyrHdrGzix21DE/eqSRfrWSFN4SWJaCg
-         +JMXaKuFKpMGx0jUV7s64y8UY/0n+9/3xaN2ZQpxjcDgj7wm/KsXdfFfAZO+F0bfMRKy
-         YDZQcSKvqvXYeTmYdAl9KshM1rtEGzvRC4Ad9QY6QlH9tZCW6qUP/Y0gVNCDlrNOX63g
-         2Q1sUqPz1wd0krTQK5B4gR21aJRh6IFREdrxprE1LuFXzLUVwHpLwymHVOgNn26huGy3
-         M1iqqJ+JlVpZmsyRCYGmV2xRtaG4AyZiElS1T3Ld4n+Q0OBx2nb9arZGaOyAmOwwDYvj
-         exXQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=dQv2M4JkmrbMym4n5tMzV5mKtrOtzsiL6FmRrS6DLLE=;
+        b=UOFafFCQp1/XqrRCTLqKJX6Vf7qd4Pu0y3NH9d1J1o7OtdcvCn7cO26pP2jUmxne3l
+         QB9SKp+y0Tti2P/E0neBAIx0Hf1biygE0afwTibMyogl/T4iztJR7zr3OTeY4+c08/d2
+         qRmyr9PJWDlMZmS8uOxp+c+KQ3serK+oGZyo+/0GOBhgDWh7y2E2S2085NuI0KCe1stv
+         zL3b0tMSClUaBC876TTXwaA6W60gKGAcjQ+fwBnsU2z/rSEvECdxUHn7LH/aKphLYET3
+         4pmvlQJUYxa+BXKj3faDnRrO7yFB7DnyUmUvYDAjojRVhiA6AanHipJf+wSRIHoEo35n
+         nS9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=CPHR9+/srqubnx1IylV7gQnOmmOqOlKCpGfW9/b0t68=;
-        b=B1TALRZj4ObZ5d4cHxwHIf3eHrHJqg/S8Igwf6/P9Y/phHlFDMUaYItrl2B/rXM2LP
-         n1jXnMQnxleIpHa/3F2KU0rfcU9m251UpDxUzMrK46/R6VnMjjY92kGgl0jqE52eLtdX
-         ucRREz/F0EbckT193OJ269TylDPu710yGMGOlEmjSuAdSqNvGHjU/Pu0ZdyaVCHpX/8x
-         TgJ4FS2HrpX0icWmk5Ds3AoaBGRKEb8RXbaIx8fduuPhSexZYr8mPKIUw3e8YDJ8GkHz
-         YWA5h0S0kn4meaKJ2ctw0JZqzvYhusbmTL2psqVP8so41VVF7C/IZ81cD5AyAJMUUw32
-         H/MA==
-X-Gm-Message-State: AOAM5312JYw4h8yUlR91um1QTMsCnrmW8zDim6V0KqkUUZoC5UznIJax
-        bQHiLqkpGnQg+50FPb/caOXaVw==
-X-Google-Smtp-Source: ABdhPJwtoG2aWyj8p2ouXV0qKbPEkI2k8GUibvKupEVpZmlq5szola+EWrLsdd7T7R6joLqN3r5/lg==
-X-Received: by 2002:a05:6a00:888:b029:3c3:ff1:38e with SMTP id q8-20020a056a000888b02903c30ff1038emr317565pfj.17.1628710544550;
-        Wed, 11 Aug 2021 12:35:44 -0700 (PDT)
-Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id u20sm286487pgm.4.2021.08.11.12.35.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 12:35:44 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dQv2M4JkmrbMym4n5tMzV5mKtrOtzsiL6FmRrS6DLLE=;
+        b=H/SHBSIevy+lkFwzsRfx6Zy0IajwyStoCBHx61jzD3/FFrQR0wmeJgCbS0HLM1nNRv
+         WmEsr8XH4Q6ior9pfPq9y6QIZx/1h0lDRDKxXFRrNouN0QdJeSelMlnpxCjmfeTU45VN
+         R7QsJ/lnFg4ORk2aZVRbdCoUP5eJr0kWTD2AVAI2EimC9q69TadwHC/e/pzryaNoO4rI
+         WTrH2ooXW1hlifm54066u497oN0azm2mXp0ci1K0IcEwwBPv+94cKS/MdkFTUCy3gbIr
+         BqoZzOC5yrh3APM8+k3sVk8ZXb2shDAQHasv+3xPtzZvlAP5OY+8hgkS/7HRnaChwoK8
+         uzxg==
+X-Gm-Message-State: AOAM531y14mA2m4rtJe2UWi3o9HHxmxwHpYHGX2EqlflEo6o7J8L+gDN
+        Kb823F/EWtgQZbjWynFR3Gm5vw==
+X-Google-Smtp-Source: ABdhPJwgwWs3ghDAShWReTmQtgNEOAyAvYDJhT3YXu4DEuMAsRYktQFUVk8N4FmAMYd9qjFVhk7tLw==
+X-Received: by 2002:a63:134e:: with SMTP id 14mr348402pgt.312.1628711300904;
+        Wed, 11 Aug 2021 12:48:20 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id 143sm388369pfz.13.2021.08.11.12.48.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Aug 2021 12:48:20 -0700 (PDT)
+Subject: Re: [PATCH block-5.14] Revert "block/mq-deadline: Add cgroup support"
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
+References: <YRQL2dlLsQ6mGNtz@slm.duckdns.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     io-uring@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, hch@infradead.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6/6] block: enable use of bio allocation cache
-Date:   Wed, 11 Aug 2021 13:35:33 -0600
-Message-Id: <20210811193533.766613-7-axboe@kernel.dk>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210811193533.766613-1-axboe@kernel.dk>
-References: <20210811193533.766613-1-axboe@kernel.dk>
+Message-ID: <9683ccee-776f-70d6-39a5-2f9b7552b189@kernel.dk>
+Date:   Wed, 11 Aug 2021 13:48:19 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YRQL2dlLsQ6mGNtz@slm.duckdns.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Initialize the bio_set used for IO with per-cpu bio caching enabled,
-and use the new bio_alloc_kiocb() helper to dip into that cache.
+On 8/11/21 11:41 AM, Tejun Heo wrote:
+> From e150c6478e453fe27b5cf83ed5d03b7582b6d35e Mon Sep 17 00:00:00 2001
+> From: Tejun Heo <tj@kernel.org>
+> Date: Wed, 11 Aug 2021 07:29:20 -1000
+> 
+> This reverts commit 08a9ad8bf607 ("block/mq-deadline: Add cgroup support")
+> and a follow-up commit c06bc5a3fb42 ("block/mq-deadline: Remove a
+> WARN_ON_ONCE() call"). The added cgroup support has the following issues:
+> 
+> * It breaks cgroup interface file format rule by adding custom elements to a
+>   nested key-value file.
+> 
+> * It registers mq-deadline as a cgroup-aware policy even though all it's
+>   doing is collecting per-cgroup stats. Even if we need these stats, this
+>   isn't the right way to add them.
+> 
+> * It hasn't been reviewed from cgroup side.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/block_dev.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+I missed that the cgroup side hadn't seen or signed off on this one. I
+have applied this revert for 5.14.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9ef4f1fc2cb0..798bb9d8f533 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -385,7 +385,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 	    (bdev_logical_block_size(bdev) - 1))
- 		return -EINVAL;
- 
--	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
-+	bio = bio_alloc_kiocb(iocb, GFP_KERNEL, nr_pages, &blkdev_dio_pool);
- 
- 	dio = container_of(bio, struct blkdev_dio, bio);
- 	dio->is_sync = is_sync = is_sync_kiocb(iocb);
-@@ -513,7 +513,9 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 
- static __init int blkdev_init(void)
- {
--	return bioset_init(&blkdev_dio_pool, 4, offsetof(struct blkdev_dio, bio), BIOSET_NEED_BVECS);
-+	return bioset_init(&blkdev_dio_pool, 4,
-+				offsetof(struct blkdev_dio, bio),
-+				BIOSET_NEED_BVECS|BIOSET_PERCPU_CACHE);
- }
- module_init(blkdev_init);
- 
 -- 
-2.32.0
+Jens Axboe
 
