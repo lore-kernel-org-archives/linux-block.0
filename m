@@ -2,72 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F42C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 05:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F947C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 05:22:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6B6560F55
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 05:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F9C760FD9
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 05:22:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234293AbhHKFWt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 01:22:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233813AbhHKFWt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 01:22:49 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9440BC061765;
-        Tue, 10 Aug 2021 22:22:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=vpzaQyEKrZmYpNp17799MlfevE7lZ5qGY4jkrsTFkd4=; b=mFTzQwKJPyhWj8LabAH5uU9j4b
-        F3jWWlaCoCd0sPss8/w0SnqlNPJI8wu1qb8etX+TDJx06ZQIEe95hK5uiNHr+ZhTnAXAvc36eutjr
-        UbVeSuHd0j043Sep41pznPLKjeFojPT1aLYAbLFWCP+N14Ye3aSlhLChPTP823Be/frDLeYT8osNN
-        AXrRDcOs6rWJ06OHJ20PnCwFzsw5lZm+so3IHpxM0B7j6jHPlI97t7l6M7/ssihiqhFgvIaLJgAfH
-        6Z8R5icMjMtTLp4lRWUjNHk1TuSEbKpI7t2bdvPQj6geefGpzjrSJ+5NvezQLcXFn8cvsOISbXLSq
-        PJE9ZZJw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mDgeG-00CzyX-HN; Wed, 11 Aug 2021 05:19:44 +0000
-Date:   Wed, 11 Aug 2021 06:19:28 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     luomeng <luomeng12@huawei.com>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        hare@suse.de, bvanassche@acm.org, ming.lei@redhat.com,
-        hch@infradead.org, jack@suse.cz, osandov@fb.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/5] block: replace incorrect uses of GENHD_FL_UP
-Message-ID: <YRNd4O1uV1auj/pK@infradead.org>
-References: <20210720182048.1906526-1-mcgrof@kernel.org>
- <051ab019-5163-e691-43ed-052401b6b95a@huawei.com>
+        id S233813AbhHKFW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 01:22:56 -0400
+Received: from verein.lst.de ([213.95.11.211]:39129 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234325AbhHKFW4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Aug 2021 01:22:56 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C851668AFE; Wed, 11 Aug 2021 07:22:29 +0200 (CEST)
+Date:   Wed, 11 Aug 2021 07:22:29 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 1/5] mm: hide laptop_mode_wb_timer entirely behind the
+ BDI API
+Message-ID: <20210811052229.GA1696@lst.de>
+References: <20210809141744.1203023-1-hch@lst.de> <20210809141744.1203023-2-hch@lst.de> <20210810215622.GA874076@roeck-us.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <051ab019-5163-e691-43ed-052401b6b95a@huawei.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210810215622.GA874076@roeck-us.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 10:42:20AM +0800, luomeng wrote:
-> Hi:
->    When the fuzz test injected memory allocation failed, I had this BUG_ON:
-> kernel BUG at fs/sysfs/group.c:116.
->   The cause of the bug_ON is that the add_disk memory fails to be allocated
-> but no error processing is performed.
->   I find your patches add error processing. So what is your next step with
-> these patches.
+On Tue, Aug 10, 2021 at 02:56:22PM -0700, Guenter Roeck wrote:
+> On Mon, Aug 09, 2021 at 04:17:40PM +0200, Christoph Hellwig wrote:
+> > Don't leak the detaіls of the timer into the block layer, instead
+> > initialize the timer in bdi_alloc and delete it in bdi_unregister.
+> > Note that this means the timer is initialized (but not armed) for
+> > non-block queues as well now.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> 
+> Just in case this hasn't been reported yet.
+> This patch results in a widespread build failure. Example:
 
-I have one more pending series on top of this one I need to submit here:
+Sorry.  This was reported before and a fix is already queued up here:
 
-http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/alloc_disk
-
-to make sure the disk always has a valid queue reference.  After that
-Luis work to return an error from add_disk should be much easier bause
-we not have defined state.
+https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.15/block&id=99d26de2f6d79badc80f55b54bd90d4cb9d1ad90
