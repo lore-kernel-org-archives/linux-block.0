@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B81DC432BE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDAEC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:50:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7EABF6056C
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:48:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C787860FC3
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229819AbhHKMtJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 08:49:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32960 "EHLO
+        id S230105AbhHKMui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 08:50:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbhHKMtI (ORCPT
+        with ESMTP id S230148AbhHKMug (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 08:49:08 -0400
+        Wed, 11 Aug 2021 08:50:36 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E72C061765
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 05:48:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E5BC06179B
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 05:50:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=q/VvVJUMkdBIfrc0PPP11iXE8LXtzuS50Q4GKM+wD9c=; b=itbuFHCdi3odw54JKxJKEMfdu6
-        8sl5XDmB34Tj82npYwE6YJwOlhIKDDMMP7k5qXOGnNRqhAgWGlFHq0r61Ez4CXC5yw6avg83AeYnU
-        OZUK7rgQ9hfqGe6v+mDBL6ha8PkxyfMgy1BoudsR6XNFVCGHjbL1Qb5sRwdR7JQFd1iM8Nn2L/eV3
-        9UgBc6FbdefRfAdKKyOl5YtNkkPJGuAhVzBC8DyR9W3s3/YUz6sBKB3hClJMRPk6mx18uS8JVIgB3
-        fKo5pmEDK6wPmTeCDNtDxoKgbjXcqGqoZMG1nJU7OHjaxCHKojPsLhnn5Ib4VUiEEA8k1QDWfczrj
-        A/bT2T6g==;
+        bh=3mjdZMlNYqnRKE0+IaFRdNsseXkfPbPjC5ghDv9vByM=; b=WiFSG1BYq4TIKneYknmEF9YLLu
+        zqFg5SdkKfxOZMNr6bgpWL9Jhsvtbysz6gbxuBBalCujhf/SN5aFT9XVH26K1IzOY5KlHwfYwM8pb
+        b0mPFyTaVID3DfzN7Nf2tXXfBXi6k1+Lb+7LBFooK22IoinaYdJHd7BaadwqRKkHfolQ/+jDWK6Bh
+        Jo1HgCN4/j0ob2Eu9hzOzu3ErFR9vumxfUVmSVnUMCQjFX7Kth5Rt8EG6OxnrHMjLyWGJ0uTOPsGc
+        nMLRSK1zOgcgCYLo2CnZT7A2KLeiOpHZqdb8OCrQsVweVLvj8echmDpwbtIIgyScahZy5XbKGfWy7
+        i3eOmnrw==;
 Received: from [2001:4bb8:184:6215:7ee3:d0e9:131a:82ff] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mDndQ-00DPwU-H3; Wed, 11 Aug 2021 12:47:31 +0000
+        id 1mDneb-00DQ2A-4D; Wed, 11 Aug 2021 12:48:43 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         Hou Tao <houtao1@huawei.com>
-Subject: [PATCH 3/6] nbd: remove nbd_del_disk
-Date:   Wed, 11 Aug 2021 14:44:25 +0200
-Message-Id: <20210811124428.2368491-4-hch@lst.de>
+Subject: [PATCH 4/6] nbd: return the allocated nbd_device from nbd_dev_add
+Date:   Wed, 11 Aug 2021 14:44:26 +0200
+Message-Id: <20210811124428.2368491-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210811124428.2368491-1-hch@lst.de>
 References: <20210811124428.2368491-1-hch@lst.de>
@@ -53,49 +53,77 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fold nbd_del_disk and remove the pointless NULL check on ->disk given
-that it is always set for a successfully allocated nbd_device structure.
+Return the device we just allocated instead of doing an extra search for
+it in the caller.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/nbd.c | 17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
+ drivers/block/nbd.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 6caf26b84a5b..de8b23af2486 100644
+index de8b23af2486..08161c73c9ed 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -235,17 +235,6 @@ static const struct device_attribute backend_attr = {
- 	.show = backend_show,
+@@ -1681,7 +1681,7 @@ static const struct blk_mq_ops nbd_mq_ops = {
+ 	.timeout	= nbd_xmit_timeout,
  };
  
--static void nbd_del_disk(struct nbd_device *nbd)
--{
--	struct gendisk *disk = nbd->disk;
--
--	if (disk) {
--		del_gendisk(disk);
--		blk_cleanup_disk(disk);
--		blk_mq_free_tag_set(&nbd->tag_set);
--	}
--}
--
- /*
-  * Place this in the last just before the nbd is freed to
-  * make sure that the disk and the related kobject are also
-@@ -261,7 +250,11 @@ static void nbd_notify_destroy_completion(struct nbd_device *nbd)
- 
- static void nbd_dev_remove(struct nbd_device *nbd)
+-static int nbd_dev_add(int index)
++static struct nbd_device *nbd_dev_add(int index)
  {
--	nbd_del_disk(nbd);
-+	struct gendisk *disk = nbd->disk;
-+
-+	del_gendisk(disk);
-+	blk_cleanup_disk(disk);
-+	blk_mq_free_tag_set(&nbd->tag_set);
+ 	struct nbd_device *nbd;
+ 	struct gendisk *disk;
+@@ -1753,7 +1753,7 @@ static int nbd_dev_add(int index)
+ 	sprintf(disk->disk_name, "nbd%d", index);
+ 	add_disk(disk);
+ 	nbd_total_devices++;
+-	return index;
++	return nbd;
  
- 	/*
- 	 * Remove from idr after del_gendisk() completes, so if the same ID is
+ out_free_idr:
+ 	idr_remove(&nbd_index_idr, index);
+@@ -1762,7 +1762,7 @@ static int nbd_dev_add(int index)
+ out_free_nbd:
+ 	kfree(nbd);
+ out:
+-	return err;
++	return ERR_PTR(err);
+ }
+ 
+ static int find_free_cb(int id, void *ptr, void *data)
+@@ -1848,25 +1848,22 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 	if (index == -1) {
+ 		ret = idr_for_each(&nbd_index_idr, &find_free_cb, &nbd);
+ 		if (ret == 0) {
+-			int new_index;
+-			new_index = nbd_dev_add(-1);
+-			if (new_index < 0) {
++			nbd = nbd_dev_add(-1);
++			if (IS_ERR(nbd)) {
+ 				mutex_unlock(&nbd_index_mutex);
+ 				printk(KERN_ERR "nbd: failed to add new device\n");
+-				return new_index;
++				return PTR_ERR(nbd);
+ 			}
+-			nbd = idr_find(&nbd_index_idr, new_index);
+ 		}
+ 	} else {
+ 		nbd = idr_find(&nbd_index_idr, index);
+ 		if (!nbd) {
+-			ret = nbd_dev_add(index);
+-			if (ret < 0) {
++			nbd = nbd_dev_add(index);
++			if (IS_ERR(nbd)) {
+ 				mutex_unlock(&nbd_index_mutex);
+ 				printk(KERN_ERR "nbd: failed to add new device\n");
+-				return ret;
++				return PTR_ERR(nbd);
+ 			}
+-			nbd = idr_find(&nbd_index_idr, index);
+ 		}
+ 	}
+ 	if (!nbd) {
 -- 
 2.30.2
 
