@@ -2,150 +2,332 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEAAC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 07:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE630C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 08:27:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3D5960F38
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 07:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 924C260FD9
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 08:27:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235491AbhHKH4h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 03:56:37 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:18626 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233850AbhHKH4h (ORCPT
+        id S235670AbhHKI1t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 04:27:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56024 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229679AbhHKI1t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 03:56:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1628668573; x=1660204573;
-  h=from:to:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=hA10R5CcpyEm33MF8KB4NF0wpd04z/2L21vXTXTY6nA=;
-  b=riEiJGYoyr99tSqKei1IQPzI0iUPZWebKYgoE0cIgODO+EenPEBdBq0S
-   nJAc6nC5eQX8a/6hNcohhQ35I1Lqa1kbBUw4ewz+ETp5aSEn9zX4Kdjug
-   67P0F8Avw1R2Fwnddp9+Qt31cWkyeUBRTpLS1OhdpcRlhq3vGZEaWfAp0
-   f6JcUj7da0oFx7Qsh73jye/vZYl1WedZ2gWfuNpmzU8YqQl8aWyq97nUE
-   U/MqWcj5v5QG7Rt1qsmavDFvzyLd5UM1nso80kr93cnUCDwedGt47gaFp
-   BsZeM4W83ppR0VcLHgHhCcus3JHFYXKwDagIF6vJk5kPWKjBoDztp138U
-   A==;
-X-IronPort-AV: E=Sophos;i="5.84,311,1620662400"; 
-   d="scan'208";a="176911734"
-Received: from mail-mw2nam12lp2045.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.45])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Aug 2021 15:56:12 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QvggHs7FD8wDMagImQsAOlS2x8elrFfcl9eHzGeD1n+Y82gICOaLUeIf5TuS28eZIa2WA78Wd//YBagDjrCckOL6JC+/sOmNTEss4TMqxc96vuY89vygKBXILVAEGS2hWJ1k8cIBui2GDtiTgGunG3HZvI3CMPoqjUCuDOh7ZpmDCm4TK0F5UAD5ZXHScxLDXkexPodXuj+WV6XLJ+Lcg+aEEEE6pXcvQYf762myO/BlCwF4hUgUkgeDbrqOwVADSdAwR4vwB1mHxo6/bfdU1wNIQGDZ0/Tk7/qp2erSAzySAsJqu+a6PT+siBm37GtwRu3kCp0ZAL9ZB5IQO5rFYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=syHO2mH7yYcqd6PH9/VhGXGYb2rAX8BorJKfQ1tY4dM=;
- b=EEOBOrAr/DQTHogBN6JBK3PbvKpbppd9yHTLq1oKKbsaAQDsaMCHyRzU5IoouUaZUsN0rQT/7HjH9TLSPerxWuRy2h+tmj1lTMqqOH1kOtbxKP+NWnne54tU6sS+e0AgmsAe3Sg7mwLuxjU7UA5LYNS1lISlb2jRISXwWMr4kyPd6lTFEXHLjpwHh/vsErN+JfHFKbVBXogDpikcAgqdHcGfiCN2oxxLZuuIc4c2QjAgnbd7IJ+DSffCf8zrAGq50dujRTgKin+3GmbAH5zeEJx3O/ltR5zRqF5EWF/OYllWsfFF/bQ6RAc+QPbUNJB4hvpYWbtGuNAVJ1cMmQpLFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=syHO2mH7yYcqd6PH9/VhGXGYb2rAX8BorJKfQ1tY4dM=;
- b=K61dcD+2URzhgh9hTNCnR0/Cjm6UFuP6ApJ8M6wrsgal3C5OVeor1qWSBVeQ9s2I36B21YLYnROGpHpnc41Cyn1tJrUjzM9VIVRJ4H856sWRpmNDdmX2jnmEtT5gTkvfLLatUS6z3fGLr1W1T2quIHqfHlZx4BRp4f/NxOixq3Y=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by PH0PR04MB7176.namprd04.prod.outlook.com (2603:10b6:510:c::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14; Wed, 11 Aug
- 2021 07:56:11 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::f1f1:286c:f903:3351]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::f1f1:286c:f903:3351%5]) with mapi id 15.20.4415.016; Wed, 11 Aug 2021
- 07:56:11 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
-Subject: Re: [PATCH v4 3/6] block: change ioprio_valid() to an inline function
-Thread-Topic: [PATCH v4 3/6] block: change ioprio_valid() to an inline
- function
-Thread-Index: AQHXjmI7JqGKWhtbGE+vjERXXKWQJw==
-Date:   Wed, 11 Aug 2021 07:56:10 +0000
-Message-ID: <PH0PR04MB7416DCAE9D84B4ED25E4C2ED9BF89@PH0PR04MB7416.namprd04.prod.outlook.com>
-References: <20210811033702.368488-1-damien.lemoal@wdc.com>
- <20210811033702.368488-4-damien.lemoal@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 43a144eb-ccde-4e03-aa3f-08d95c9d7c19
-x-ms-traffictypediagnostic: PH0PR04MB7176:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR04MB7176C8D60DC4EE7E82F174639BF89@PH0PR04MB7176.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xQJCjGYoxQXhdfqcTz83WR295qXlO7kbBm3TmHuS7t9EHR+RthmeGJkWkH8MNqEmVH3sJlPVmq6XmyBtAsyO78l8nMAgG41hnMieKR6nbVSuwctYoRXVyPk1I4N5uaFUHt7otY8jdcHCcfoUPSwbIXoTfwS5PsefX4I350Iye1BHUPPKUsPSOuWs2h7FHj9SGNV46ReBKskfmQ7cpNahgC64E0nND9pMTda+GA4344r7Mv3Qk6sfNEbcnZykKTcRuaWXQItQaH+Ye5FimoJHjNzC68hDBKtGCHf5oxYRhIkk/b/24/x/0pLC5n4LVk+LXJk3E2JdoWkqG3VUyRF2VfEnG9qGVXAWJlrmdSjAHsKVipvzj+bjemd4DSeJ6smo0YjJqPzT5AY9teYKfrRKu+2KAYZ1Jp8da5XssPc7/qlNrFcHosiAEGGcEy7RA6BRe4uuB9eFNgi49545/FKdHNsSh8J9rZknCsTUO1PwVzmyn/efAcS7rFnMx6eFdphyHUoYFvUDIFGRMzeJKiXzd0I2l24P5JguqiUED/Q8zg93482QYrfe1FjQG09kYvu6qWwQqld2f3zfW0pJexpRsjMgtrrLj+SYSiXjMByIExhaF8+lDfZEYwZkqaS5fB+pevXq+bDmJ6uhjdu4Im7O1y3J+deMpinb+iV6RNfniDZGbUWEFgqI6ko+3scwJS43qoE+tRNMGEa9sqVwEge5QA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(76116006)(7696005)(8936002)(64756008)(91956017)(9686003)(38100700002)(52536014)(8676002)(55016002)(66946007)(66446008)(66476007)(66556008)(33656002)(71200400001)(110136005)(86362001)(53546011)(6506007)(316002)(508600001)(38070700005)(186003)(2906002)(122000001)(5660300002)(4744005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?slZqJ4hyTMFIY4WM2Rc3SRoVZUXEnCaQj5RFkU62qfeIcW5IgeBo0qHXCWZV?=
- =?us-ascii?Q?jAEIHgvXeyHpMt7wpZRIjpgf797hBrbj1ylVL41GApFxWbt0rKtKwLlck7sY?=
- =?us-ascii?Q?u+26wAzLJBpeAu6JjvtziX3+W4O/O9MLiartfXcRuqtnt7KmnVfmu5KhYiH4?=
- =?us-ascii?Q?aHdd8UA49bP7V47BeGVIEpf6Qpu1SlMHET58BS0uBefoXKiwigbiofv9DYDG?=
- =?us-ascii?Q?n1VJLVp4tXroFcsGoNz6JZJuO6BhFx7O3SV3oTT0CBUzJA7+x/HZ/3XzR33t?=
- =?us-ascii?Q?4ypg4T923py0U/8+ZVV2572sGNwfY5aEhBmOcJ+d8wnH5d/jFNuqqMXfXa4s?=
- =?us-ascii?Q?GCUAYYOKpf1vr3nrnxqzKZ4jfTRDao3Zp6tFH1P99n+qtG1GqV/TG+TriVOP?=
- =?us-ascii?Q?Ho7+OZ5JvPDpVg5xY6jxXcPjyMNBfxmtHjqOx9w52WGIAe9YmIlHPEwJ5f2e?=
- =?us-ascii?Q?9yC7KhQ7PMUCyyzDw3HUsk/uDKCSHmGm7ElKzWnbHxiNpbqHe/h2r/cZmbTk?=
- =?us-ascii?Q?PwHs2S/uk4h3tadso52+qr5rCVh15f7MESu0zCZNW/hbv5cbRkK2/edYgXoz?=
- =?us-ascii?Q?6yCTyI5qXrQCsHdQLuahudIV+m5XTYKYvbm3iof+q9oSaWn3D+Bywl59/tQn?=
- =?us-ascii?Q?CKuBEO0jfsbH4b+OleA1H+7UOCJYN81bO9BXxMAn0ogfmtjX0mI1rWP20qZ6?=
- =?us-ascii?Q?SjSKHmmbj2NuBr4qTK5XL7OK4W9MpGw6/VaryM30LdLMtT814dWnUE6Unurz?=
- =?us-ascii?Q?N7IQcBr8p3ptHc56AwNUB070Mep4MUo4rVaCplbCtne6QA0L6sNQfzrVjFjv?=
- =?us-ascii?Q?iW4gPIN1wv9Z7D7IveV/DO5tWB+8Rb/IZ/IuumZgx3piaVn/lrD00H0rPkfH?=
- =?us-ascii?Q?ZZ6D/lGcCwmt25w+Wezt0o06KAzEdxPP7RTrtmliktM9yISgOB+yhedeRC9G?=
- =?us-ascii?Q?bV1t3fklAb7HdtC2/hGnNTAaH/SXs8LN9hmdJlETaLO4hKuAxMsbbQxKUQP8?=
- =?us-ascii?Q?gxn2x43/gOHKR1qKMm3fdP9cEJoiMXbYc0tysZfwJ8EgbcA5mBEWx5h7lC+2?=
- =?us-ascii?Q?DreuPi/QG9CrH1FI1JQECzer+3pffQRWfJyKnfhr2NUi6ePdnIZLNXQkQ2dr?=
- =?us-ascii?Q?QCYOEjMUpST986s8USnic9lCeyBSWlXLBsPRF9Yik4ggRS5YCoowqsExApm8?=
- =?us-ascii?Q?clrk1LFwfOjpwfDIku4kvAnq7CdG0UB/nhVCsnl+uVdgwF+PZCVCMe/AguHD?=
- =?us-ascii?Q?s9YY0Vblw2Y/qon4vO5LEFslDZjIZW2m2aSIVdkBBIArSbN8yJkFCGrDOS9x?=
- =?us-ascii?Q?xAb3lhzaNUoWXO+FEdAKDfoLJCazB6bea61YiKwdzVcgRfg2fILKjBow12wc?=
- =?us-ascii?Q?Mh9SGV7PtKVi2h4UA3I+lXGEKFI/?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 11 Aug 2021 04:27:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE107C061765;
+        Wed, 11 Aug 2021 01:27:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=wubnmL+nApnyzJ217TdFPpi4zHxmgJ+FqhTaq34wnf4=; b=nzLhiP64XdYzHmD2W1WRi47jvU
+        1I7Zcf92+r1Zg4p/v09md5CxA2Aupq7I5bz0qGcX8Uq/IOMQiJpMf9UmQZLW3qrnfx5V8ykwLdgmI
+        v+LDQa6C1+nLA0Ucibgu2LHxeF9uRf81vOYgcTxS0mFBATY9XlemeVBH0yeIRBVq25rzDkqLg73J1
+        Aqf2JfO3Luho7h9JBy7gxcC7RZJ14JBMcWEjEResmZdqr89PPEvIYpVAZ5oXTH/ylX0p718R5BjAP
+        Vlj6pRrdoxlUrAU4byw0TPRxznTNTpfw/yDaYbM+1/2s2TJFo37QjYkmkX8bAPSNvlpXRMJJze/0h
+        QxIG/eRw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mDjZJ-00DA25-Mj; Wed, 11 Aug 2021 08:26:52 +0000
+Date:   Wed, 11 Aug 2021 09:26:33 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCHSET v3 0/5] Enable bio recycling for polled IO
+Message-ID: <YROJuSsUX7y236BW@infradead.org>
+References: <20210810163728.265939-1-axboe@kernel.dk>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43a144eb-ccde-4e03-aa3f-08d95c9d7c19
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Aug 2021 07:56:10.9123
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0YuYzrnCjTGX2JNtngFaCCb/76Z/Ge/dumghJiZrW2bSJ90w/xoVTdPzVIqowm1n5MCu3k6jDUIhbnLHEppEL/6+gFCMulnt9BDyXzdUgL0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7176
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210810163728.265939-1-axboe@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/08/2021 05:37, Damien Le Moal wrote:=0A=
-> Change the ioprio_valid() macro in include/usapi/linux/ioprio.h to an    =
-                                    uapi ~^=0A=
-=0A=
-> inline function declared on the kernel side in include/linux/ioprio.h.=0A=
-> Also improve checks on the class value by checking the upper bound=0A=
-> value.=0A=
-=0A=
-But I think it needs to stay in include/uapi/linux/ioprio.h as it's there=
-=0A=
-since the 2.6.x days (I've checked back to v2.6.39.4) so the chance of=0A=
-user-space using it is quite high.=0A=
+I really don't like all the layering violations in here.  What is the
+problem with a simple (optional) percpu cache in the bio_set?  Something
+like the completely untested patch below:
+
+diff --git a/block/bio.c b/block/bio.c
+index 33160007f4e0..edd4a83b96fa 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -25,6 +25,11 @@
+ #include "blk.h"
+ #include "blk-rq-qos.h"
+ 
++struct bio_alloc_cache {
++	struct bio_list		free_list;
++	unsigned int		nr;
++};
++
+ static struct biovec_slab {
+ 	int nr_vecs;
+ 	char *name;
+@@ -239,6 +244,35 @@ static void bio_free(struct bio *bio)
+ 	}
+ }
+ 
++static inline void __bio_init(struct bio *bio)
++{
++	bio->bi_next = NULL;
++	bio->bi_bdev = NULL;
++	bio->bi_opf = 0;
++	bio->bi_flags = bio->bi_ioprio = bio->bi_write_hint = 0;
++	bio->bi_status = 0;
++	bio->bi_iter.bi_sector = 0;
++	bio->bi_iter.bi_size = 0;
++	bio->bi_iter.bi_idx = 0;
++	bio->bi_iter.bi_bvec_done = 0;
++	bio->bi_end_io = NULL;
++	bio->bi_private = NULL;
++#ifdef CONFIG_BLK_CGROUP
++	bio->bi_blkg = NULL;
++	bio->bi_issue.value = 0;
++#ifdef CONFIG_BLK_CGROUP_IOCOST
++	bio->bi_iocost_cost = 0;
++#endif
++#endif
++#ifdef CONFIG_BLK_INLINE_ENCRYPTION
++	bio->bi_crypt_context = NULL;
++#endif
++#ifdef CONFIG_BLK_DEV_INTEGRITY
++	bio->bi_integrity = NULL;
++#endif
++	bio->bi_vcnt = 0;
++}
++
+ /*
+  * Users of this function have their own bio allocation. Subsequently,
+  * they must remember to pair any call to bio_init() with bio_uninit()
+@@ -247,7 +281,7 @@ static void bio_free(struct bio *bio)
+ void bio_init(struct bio *bio, struct bio_vec *table,
+ 	      unsigned short max_vecs)
+ {
+-	memset(bio, 0, sizeof(*bio));
++	__bio_init(bio);
+ 	atomic_set(&bio->__bi_remaining, 1);
+ 	atomic_set(&bio->__bi_cnt, 1);
+ 	bio->bi_cookie = BLK_QC_T_NONE;
+@@ -470,6 +504,31 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned short nr_iovecs,
+ }
+ EXPORT_SYMBOL(bio_alloc_bioset);
+ 
++struct bio *bio_alloc_iocb(struct kiocb *iocb, unsigned short nr_vecs,
++			     struct bio_set *bs)
++{
++	struct bio_alloc_cache *cache = NULL;
++	struct bio *bio;
++
++	if (!(iocb->ki_flags & IOCB_HIPRI) ||
++	    !(iocb->ki_flags & IOCB_NOWAIT) ||
++	    nr_vecs > BIO_INLINE_VECS)
++		return bio_alloc_bioset(GFP_KERNEL, nr_vecs, bs);
++
++	cache = per_cpu_ptr(bs->cache, get_cpu());
++	bio = bio_list_pop(&cache->free_list);
++	if (bio) {
++		bio_init(bio, nr_vecs ? bio->bi_inline_vecs : NULL, nr_vecs);
++		cache->nr--;
++	}
++	put_cpu();
++
++	if (!bio)
++		bio = bio_alloc_bioset(GFP_KERNEL, nr_vecs, bs);
++	bio_set_flag(bio, BIO_CACHEABLE);
++	return bio;
++}
++
+ /**
+  * bio_kmalloc - kmalloc a bio for I/O
+  * @gfp_mask:   the GFP_* mask given to the slab allocator
+@@ -588,6 +647,46 @@ void guard_bio_eod(struct bio *bio)
+ 	bio_truncate(bio, maxsector << 9);
+ }
+ 
++#define ALLOC_CACHE_MAX		512
++#define ALLOC_CACHE_SLACK	 64
++
++static void bio_alloc_cache_prune(struct bio_alloc_cache *cache,
++				  unsigned int nr)
++{
++	struct bio *bio;
++	unsigned int i;
++
++	i = 0;
++	while ((bio = bio_list_pop(&cache->free_list)) != NULL) {
++		cache->nr--;
++		bio_free(bio);
++		if (++i == nr)
++			break;
++	}
++}
++
++#if 0
++// XXX: add a cpu down notifier to call this
++void bio_alloc_cache_destroy(struct bio_alloc_cache *cache)
++{
++	bio_alloc_cache_prune(cache, -1U);
++}
++#endif
++
++static void bio_add_to_cache(struct bio *bio)
++{
++	struct bio_alloc_cache *cache;
++
++	bio_uninit(bio);
++
++	cache = per_cpu_ptr(bio->bi_pool->cache, get_cpu());
++	bio_list_add_head(&cache->free_list, bio);
++	cache->nr++;
++	if (cache->nr > ALLOC_CACHE_MAX + ALLOC_CACHE_SLACK)
++		bio_alloc_cache_prune(cache, ALLOC_CACHE_SLACK);
++	put_cpu();
++}
++
+ /**
+  * bio_put - release a reference to a bio
+  * @bio:   bio to release reference to
+@@ -598,17 +697,16 @@ void guard_bio_eod(struct bio *bio)
+  **/
+ void bio_put(struct bio *bio)
+ {
+-	if (!bio_flagged(bio, BIO_REFFED))
+-		bio_free(bio);
+-	else {
++	if (bio_flagged(bio, BIO_REFFED)) {
+ 		BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
+-
+-		/*
+-		 * last put frees it
+-		 */
+-		if (atomic_dec_and_test(&bio->__bi_cnt))
+-			bio_free(bio);
++		if (!atomic_dec_and_test(&bio->__bi_cnt))
++			return;
+ 	}
++
++	if (bio_flagged(bio, BIO_CACHEABLE))
++		bio_add_to_cache(bio);
++	else
++		bio_free(bio);
+ }
+ EXPORT_SYMBOL(bio_put);
+ 
+@@ -1487,6 +1585,7 @@ int biovec_init_pool(mempool_t *pool, int pool_entries)
+  */
+ void bioset_exit(struct bio_set *bs)
+ {
++	free_percpu(bs->cache);
+ 	if (bs->rescue_workqueue)
+ 		destroy_workqueue(bs->rescue_workqueue);
+ 	bs->rescue_workqueue = NULL;
+@@ -1548,12 +1647,18 @@ int bioset_init(struct bio_set *bs,
+ 	    biovec_init_pool(&bs->bvec_pool, pool_size))
+ 		goto bad;
+ 
+-	if (!(flags & BIOSET_NEED_RESCUER))
+-		return 0;
+-
+-	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
+-	if (!bs->rescue_workqueue)
+-		goto bad;
++	if (flags & BIOSET_NEED_RESCUER) {
++		bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM,
++						       0);
++		if (!bs->rescue_workqueue)
++			goto bad;
++	}
++	
++	if (flags & BIOSET_PERCPU_CACHE) {
++		bs->cache = alloc_percpu(struct bio_alloc_cache);
++		if (!bs->cache)
++			goto bad;
++	}
+ 
+ 	return 0;
+ bad:
+@@ -1594,7 +1699,8 @@ static int __init init_bio(void)
+ 				SLAB_HWCACHE_ALIGN | SLAB_PANIC, NULL);
+ 	}
+ 
+-	if (bioset_init(&fs_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS))
++	if (bioset_init(&fs_bio_set, BIO_POOL_SIZE, 0,
++			BIOSET_NEED_BVECS | BIOSET_PERCPU_CACHE))
+ 		panic("bio: can't allocate bios\n");
+ 
+ 	if (bioset_integrity_create(&fs_bio_set, BIO_POOL_SIZE))
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index e95889ff4fba..c67043bfb788 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -376,8 +376,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 	    (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
+ 
+-	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
+-
++	bio = bio_alloc_iocb(iocb, nr_pages, &blkdev_dio_pool);
+ 	dio = container_of(bio, struct blkdev_dio, bio);
+ 	dio->is_sync = is_sync = is_sync_kiocb(iocb);
+ 	if (dio->is_sync) {
+@@ -452,7 +451,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 		}
+ 
+ 		submit_bio(bio);
+-		bio = bio_alloc(GFP_KERNEL, nr_pages);
++		bio = bio_alloc_iocb(iocb, nr_pages, &fs_bio_set);
+ 	}
+ 
+ 	if (!(iocb->ki_flags & IOCB_HIPRI))
+@@ -497,7 +496,9 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 
+ static __init int blkdev_init(void)
+ {
+-	return bioset_init(&blkdev_dio_pool, 4, offsetof(struct blkdev_dio, bio), BIOSET_NEED_BVECS);
++	return bioset_init(&blkdev_dio_pool, 4,
++			   offsetof(struct blkdev_dio, bio),
++			   BIOSET_NEED_BVECS | BIOSET_PERCPU_CACHE);
+ }
+ module_init(blkdev_init);
+ 
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 35de19f2ae88..69850bfddf18 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -400,6 +400,7 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
+ enum {
+ 	BIOSET_NEED_BVECS = BIT(0),
+ 	BIOSET_NEED_RESCUER = BIT(1),
++	BIOSET_PERCPU_CACHE = BIT(2),
+ };
+ extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
+ extern void bioset_exit(struct bio_set *);
+@@ -656,7 +657,7 @@ static inline void bio_inc_remaining(struct bio *bio)
+ struct bio_set {
+ 	struct kmem_cache *bio_slab;
+ 	unsigned int front_pad;
+-
++	struct bio_alloc_cache __percpu *cache;
+ 	mempool_t bio_pool;
+ 	mempool_t bvec_pool;
+ #if defined(CONFIG_BLK_DEV_INTEGRITY)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index e3a70dd0470b..7a7d9c6b33ee 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -300,6 +300,7 @@ enum {
+ 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
+ 	BIO_REMAPPED,
+ 	BIO_ZONE_WRITE_LOCKED,	/* Owns a zoned device zone write lock */
++	BIO_CACHEABLE,		/* can be added to the percpu cache */
+ 	BIO_FLAG_LAST
+ };
+ 
