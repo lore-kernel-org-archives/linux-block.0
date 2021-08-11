@@ -2,78 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F8CC432BE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 11:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE54C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:45:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5198460F56
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 11:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79C476101D
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:45:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231893AbhHKLwO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 07:52:14 -0400
-Received: from verein.lst.de ([213.95.11.211]:40261 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229836AbhHKLwO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 07:52:14 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id C07CA67373; Wed, 11 Aug 2021 13:51:47 +0200 (CEST)
-Date:   Wed, 11 Aug 2021 13:51:47 +0200
+        id S229621AbhHKMp6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 08:45:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60380 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229617AbhHKMp5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Aug 2021 08:45:57 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6218CC061765
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 05:45:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=7exWYwWdX/mv9kmXqGggLCNL3l1kVcMUuVRwKGhNT5E=; b=CnY08ocpUvwr/BCpB5fZPnaLiD
+        +GLqcWfqC5YcqvvVjdGi1BXD92OQT4Epi8udeWTOlITReYGt3pmPSfkNJikW/OavRgqKRO8deBGp7
+        +ilzX3RLxW/M1un6O1F0p/4vzPw0iZji4Desakjox32ZOnfWYCmtDKWeRQ31hI5Gjmdsi16Sn/L4+
+        edugwLDW5SHvw176fG86O/PLFYKYg5OJ7AkoJx/lxJmXN4yNUQk6fJyQtdMr6YpVHL2W2qNBCd37A
+        QH5b55oaLaAUQ+x5rJNd2BGDnftcpxwn6VL83H28YEdyOf9C6AClt00ERKLhixq8X/NJerzuojNRM
+        XugHuVlA==;
+Received: from [2001:4bb8:184:6215:7ee3:d0e9:131a:82ff] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mDnav-00DPV8-Jt; Wed, 11 Aug 2021 12:44:41 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Qian Cai <quic_qiancai@quicinc.com>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: move the bdi from the request_queue to the gendisk
-Message-ID: <20210811115147.GA27860@lst.de>
-References: <20210809141744.1203023-1-hch@lst.de> <e5e19d15-7efd-31f4-941a-a5eb2f94b898@quicinc.com> <20210810200256.GA30809@lst.de> <20210811112514.GC14725@quack2.suse.cz>
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        Hou Tao <houtao1@huawei.com>
+Subject: nbd locking fixups
+Date:   Wed, 11 Aug 2021 14:44:22 +0200
+Message-Id: <20210811124428.2368491-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210811112514.GC14725@quack2.suse.cz>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 01:25:14PM +0200, Jan Kara wrote:
-> Well, non-default bdi_writeback structures do hold bdi reference - see
-> wb_exit() which drops the reference. I think the problem rather was that a
-> block device's inode->i_wb was pointing to the default bdi_writeback
-> structure and that got freed after bdi_put() before block device inode was
-> shutdown through bdput()... So what I think we need is that if the inode
-> references the default writeback structure, it actually holds a reference
-> to the bdi.
+Hi Josef and Jens,
 
-Qian, can you test the patch below instead of the one I sent yesterday?
-
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index cd06dca232c3..edfb7ce2cc93 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -283,8 +283,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
- 
- 	memset(wb, 0, sizeof(*wb));
- 
--	if (wb != &bdi->wb)
--		bdi_get(bdi);
-+	bdi_get(bdi);
- 	wb->bdi = bdi;
- 	wb->last_old_flush = jiffies;
- 	INIT_LIST_HEAD(&wb->b_dirty);
-@@ -362,8 +361,7 @@ static void wb_exit(struct bdi_writeback *wb)
- 		percpu_counter_destroy(&wb->stat[i]);
- 
- 	fprop_local_destroy_percpu(&wb->completions);
--	if (wb != &wb->bdi->wb)
--		bdi_put(wb->bdi);
-+	bdi_put(wb->bdi);
- }
- 
- #ifdef CONFIG_CGROUP_WRITEBACK
+this series fixed the lock order reversal that is showing up with
+nbd lately.  The first patch contains the asynchronous deletion
+from Hou which is needed as a baseline.
