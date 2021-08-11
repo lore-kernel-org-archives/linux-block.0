@@ -2,127 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF467C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B09BC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:47:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2BDF6056C
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:47:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3763760FA0
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbhHKMrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 08:47:39 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:52654 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbhHKMri (ORCPT
+        id S230041AbhHKMr4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 08:47:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230102AbhHKMrz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 08:47:38 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id ACA1A20170;
-        Wed, 11 Aug 2021 12:47:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1628686033; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nwQ4TvjjMcZX7eWrYwBnPN10bqbjG9P7T2eCYAyJQXk=;
-        b=vRr9euvpwMXH0RWDfUD0ywdhH4vM2NdmgSzf1xS2x1Ed90rCAO5rygcPXkH0xi9auM1aWN
-        5CaPl0CL/LM23oND21hPH1suDmy0Qplk2ZFKkV4XOw3A4+GFei+wWFEYqgwWNJukodF7Ke
-        IDjzdq6WV6fUBS0BE8mFP0B+h9T/hJ0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1628686033;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nwQ4TvjjMcZX7eWrYwBnPN10bqbjG9P7T2eCYAyJQXk=;
-        b=pgVKegl+OIMR6AYcPyFrMsuOvSOI1CrVWEt2HwgM9Qn+HEPXhkidnjAdoKFQ64w2yOrr0q
-        cHhEhY1mmpn2KoDw==
-Received: from quack2.suse.cz (unknown [10.100.224.230])
-        by relay2.suse.de (Postfix) with ESMTP id 98216A3C59;
-        Wed, 11 Aug 2021 12:47:13 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 680061E6204; Wed, 11 Aug 2021 14:47:13 +0200 (CEST)
-Date:   Wed, 11 Aug 2021 14:47:13 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>, Qian Cai <quic_qiancai@quicinc.com>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: move the bdi from the request_queue to the gendisk
-Message-ID: <20210811124713.GF14725@quack2.suse.cz>
-References: <20210809141744.1203023-1-hch@lst.de>
- <e5e19d15-7efd-31f4-941a-a5eb2f94b898@quicinc.com>
- <20210810200256.GA30809@lst.de>
- <20210811112514.GC14725@quack2.suse.cz>
- <20210811115147.GA27860@lst.de>
+        Wed, 11 Aug 2021 08:47:55 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 800DEC061765
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 05:47:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=vQt95oM61eET5+kiBSYsNWnQOETYhTTnfEu/uTorkMY=; b=OvHqIM0gRAzf74CsVeifrGLaHS
+        +JvjgT3giFqrlh2AP24d5zhFC53a3r5RqOQkGQAaJMFxwsDB8+y+YzorbtGAa0BkPWPrThfaJWdBg
+        Zw0wvh5fP9/0F726kuQMgYhzdI9LtF6MhI6AK/19eFvu2wYa+enlKiHBpfuSlNhL72JpIeiHCfAxk
+        bV53up7LDi+cMqe4StCq3YTpa7VbaXDtzeD9FFTw/6zeNeGNJiqNiH2QQjMtNF8RzIX7fVgCcR+tj
+        5YSSQJOhupBIVU8O3s86gx1V8KPro/6Cc7PC4wOjlqkofs4n0ZfPXhduiucCjQEA0NB7mcSOXwzBL
+        rdm/OgZw==;
+Received: from [2001:4bb8:184:6215:7ee3:d0e9:131a:82ff] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mDncc-00DPlf-7z; Wed, 11 Aug 2021 12:46:28 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        Hou Tao <houtao1@huawei.com>
+Subject: [PATCH 2/6] nbd: refactor device removal
+Date:   Wed, 11 Aug 2021 14:44:24 +0200
+Message-Id: <20210811124428.2368491-3-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210811124428.2368491-1-hch@lst.de>
+References: <20210811124428.2368491-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210811115147.GA27860@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 11-08-21 13:51:47, Christoph Hellwig wrote:
-> On Wed, Aug 11, 2021 at 01:25:14PM +0200, Jan Kara wrote:
-> > Well, non-default bdi_writeback structures do hold bdi reference - see
-> > wb_exit() which drops the reference. I think the problem rather was that a
-> > block device's inode->i_wb was pointing to the default bdi_writeback
-> > structure and that got freed after bdi_put() before block device inode was
-> > shutdown through bdput()... So what I think we need is that if the inode
-> > references the default writeback structure, it actually holds a reference
-> > to the bdi.
-> 
-> Qian, can you test the patch below instead of the one I sent yesterday?
+Share common code for the synchronous and workqueue based device removal,
+and remove the pointless use of refcount_dec_and_mutex_lock.
 
-Sadly the patch below will not work because the bdi refcount will never
-drop to 0. wb_exit() for the default writeback structure is called only
-from release_bdi() (i.e., after the bdi refcount is 0). That is why I wrote
-above that references to default wb from inodes would hold the ref, not the
-default wb structure itself. So we would need to explicitely hack this into
-__inode_attach_wb() and inode_detach_wb().
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/nbd.c | 37 +++++++++++++------------------------
+ 1 file changed, 13 insertions(+), 24 deletions(-)
 
-Somewhat cleaner approach might be to modify wb_get(), wb_tryget(),
-wb_put() to get reference to bdi instead of doing nothing for the default
-wb. And drop a lot of special-casing of the default wb from various
-functions. But I guess the special cases are there to avoid the performance
-overhead for the common case because getting wb ref is common. Also that's
-why wbs use percpu refcount and we would need something similar for bdis.
-I guess this needs more thinking and your quick workaround is OK for now.
-
-								Honza
-
-> 
-> diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-> index cd06dca232c3..edfb7ce2cc93 100644
-> --- a/mm/backing-dev.c
-> +++ b/mm/backing-dev.c
-> @@ -283,8 +283,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
->  
->  	memset(wb, 0, sizeof(*wb));
->  
-> -	if (wb != &bdi->wb)
-> -		bdi_get(bdi);
-> +	bdi_get(bdi);
->  	wb->bdi = bdi;
->  	wb->last_old_flush = jiffies;
->  	INIT_LIST_HEAD(&wb->b_dirty);
-> @@ -362,8 +361,7 @@ static void wb_exit(struct bdi_writeback *wb)
->  		percpu_counter_destroy(&wb->stat[i]);
->  
->  	fprop_local_destroy_percpu(&wb->completions);
-> -	if (wb != &wb->bdi->wb)
-> -		bdi_put(wb->bdi);
-> +	bdi_put(wb->bdi);
->  }
->  
->  #ifdef CONFIG_CGROUP_WRITEBACK
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 9a7c9a425ab0..6caf26b84a5b 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -259,48 +259,37 @@ static void nbd_notify_destroy_completion(struct nbd_device *nbd)
+ 		complete(nbd->destroy_complete);
+ }
+ 
+-static void nbd_dev_remove_work(struct work_struct *work)
++static void nbd_dev_remove(struct nbd_device *nbd)
+ {
+-	struct nbd_device *nbd =
+-		container_of(work, struct nbd_device, remove_work);
+-
+ 	nbd_del_disk(nbd);
+ 
+-	mutex_lock(&nbd_index_mutex);
+ 	/*
+-	 * Remove from idr after del_gendisk() completes,
+-	 * so if the same id is reused, the following
+-	 * add_disk() will succeed.
++	 * Remove from idr after del_gendisk() completes, so if the same ID is
++	 * reused, the following add_disk() will succeed.
+ 	 */
++	mutex_lock(&nbd_index_mutex);
+ 	idr_remove(&nbd_index_idr, nbd->index);
+-
+ 	nbd_notify_destroy_completion(nbd);
+ 	mutex_unlock(&nbd_index_mutex);
+ 
+ 	kfree(nbd);
+ }
+ 
+-static void nbd_dev_remove(struct nbd_device *nbd)
++static void nbd_dev_remove_work(struct work_struct *work)
+ {
+-	/* Call del_gendisk() asynchrounously to prevent deadlock */
+-	if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags)) {
+-		queue_work(nbd_del_wq, &nbd->remove_work);
+-		return;
+-	}
+-
+-	nbd_del_disk(nbd);
+-	idr_remove(&nbd_index_idr, nbd->index);
+-	nbd_notify_destroy_completion(nbd);
+-	kfree(nbd);
++	nbd_dev_remove(container_of(work, struct nbd_device, remove_work));
+ }
+ 
+ static void nbd_put(struct nbd_device *nbd)
+ {
+-	if (refcount_dec_and_mutex_lock(&nbd->refs,
+-					&nbd_index_mutex)) {
++	if (!refcount_dec_and_test(&nbd->refs))
++		return;
++
++	/* Call del_gendisk() asynchrounously to prevent deadlock */
++	if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags))
++		queue_work(nbd_del_wq, &nbd->remove_work);
++	else
+ 		nbd_dev_remove(nbd);
+-		mutex_unlock(&nbd_index_mutex);
+-	}
+ }
+ 
+ static int nbd_disconnected(struct nbd_config *config)
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.30.2
+
