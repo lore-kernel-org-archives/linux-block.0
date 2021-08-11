@@ -2,112 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C67EC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 14:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1662BC432BE
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 15:05:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 487B160FC3
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 14:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2ED36101D
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 15:05:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232698AbhHKOzw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 10:55:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41878 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232440AbhHKOzv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 10:55:51 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7B74460FC0;
-        Wed, 11 Aug 2021 14:55:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628693727;
-        bh=wUEr1k+9OTqOwEMyx4ah8qiGrmA/MoBkHPWnCf2IEXo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OyloWZo6U/tjVyajjJv52aqrsPfNmDPRLedYKHCv4ooeSc493SOSpb6nvEU4Sf6l2
-         lzwp0urFjSevg3b3aYc1ZYlQe80kV2ZIqwqF+y5vWnYCBF4HpIy/lACkZmf/YN/rsC
-         m/cMjgtTR+yt0D45/reEpvNxJVYWS46BTHpOTBoLbWZyGxt/SR+ZikQiK97rLWJqze
-         kRiI/v+Gb+1/tC1uNV6YiIK23Kqt1WE3pxfZWKnRwxojaNjOaE1Qrpj0C8Da0kN8ao
-         Dy/grT0biZ1TgX9VHXn6WY4vo1Lp4tIVRWSSksDIhbkg50Oe6G0pfbNAeyQ61CosJs
-         FKD4AnZ1wWF0A==
-Date:   Wed, 11 Aug 2021 08:55:25 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH] blk-mq: don't grab rq's refcount in
- blk_mq_check_expired()
-Message-ID: <20210811145525.GA61802@C02WT3WMHTD6>
-References: <20210811143838.622001-1-ming.lei@redhat.com>
+        id S232753AbhHKPGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 11:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38688 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232748AbhHKPGO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Aug 2021 11:06:14 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FFA7C0613D3
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 08:05:50 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id u25so5013914oiv.5
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 08:05:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/UzD3VOUXNF9AIw3wsM9S8KXv2PiB7+V+48ULqwic2c=;
+        b=Y5Z8rYJIyMV60XOAK995PQFJHYShVaHDOUcYuhW+CWxQLqqYskgx1bmf3PlFj1X/fJ
+         Ffsjom75Onaie2GPcUirYkgrCZ2l7sIDAmtb64q/54ys7vjPxHkRDDqLOfzAXzWMQ+x3
+         srmamzjEx/0yieq9Kwmhe/722WSUPo0XPlF3jmtwGXjOMV8B4vp4Cx5PhWanjNWYUSoH
+         HEIhOX+c3p3X47A64IjcQa7XDR67TYhXOpdCuB1NVDG5WY2bi6Zp30uHWKOpeysosHyv
+         Rr84UteZhzMgi59ax6kI69puVcT+mT5A8c0H/QknJw3uOLlbXBD5tF+cLr38CyXg0FG9
+         zK0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/UzD3VOUXNF9AIw3wsM9S8KXv2PiB7+V+48ULqwic2c=;
+        b=A8PgsDQbL5GJrdN7QpE+ZhFXwN+etzX7JqLPo9d5lMMdIDbsEWRZyX+G6agQFbT0Xf
+         rPcPBPkq/ftcT02UojWTPjiU5uEZtvs+4mbvI2vDz3mE1R49TS9kym9KmyRChfuVBYum
+         59Q5ryzunvtcdqMJ2q5fBQV68DWlSgY6U4iq4+DwFoD/ZeN+lnIAD1THhfcFA4mRdWRP
+         9fo4AeO0EsqW0dQyurSxOV1iUDuBn1UnSLiaDagPOowEzN0r/W9naLZuafjHtiyfdmni
+         CEgQTCW8EKLro0kV/W0ZekZzYEIzJXTxJbwvVNEdf+7KpI0pOxQJev8sT/eHRKaM9Ap/
+         qT6g==
+X-Gm-Message-State: AOAM5334lw9qWD2+l+ES8nODMKLDOyI1zVk49hZZEfjmRjBZoTc9AZcM
+        uO9amEfBzmswakqGJ4kcfX3WTD1MrCCXAcmS
+X-Google-Smtp-Source: ABdhPJwBwwX777AS4mF69j1YnvRdmVtLeVSwIIwwmFvPgM4mokoNzF3Tod3wS2z6wuNSyroo8JTIPg==
+X-Received: by 2002:aca:3c07:: with SMTP id j7mr1123622oia.8.1628694349326;
+        Wed, 11 Aug 2021 08:05:49 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id z23sm3438231oib.36.2021.08.11.08.05.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Aug 2021 08:05:48 -0700 (PDT)
+Subject: Re: [PATCHSET v3 0/5] Enable bio recycling for polled IO
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+References: <20210810163728.265939-1-axboe@kernel.dk>
+ <YROJuSsUX7y236BW@infradead.org> <YROw06H0z0Js8yg3@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c244becd-2d94-5b49-ed33-58e6456d91d9@kernel.dk>
+Date:   Wed, 11 Aug 2021 09:05:47 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210811143838.622001-1-ming.lei@redhat.com>
+In-Reply-To: <YROw06H0z0Js8yg3@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 10:38:38PM +0800, Ming Lei wrote:
-> Inside blk_mq_queue_tag_busy_iter() we already grabbed request's
-> refcount before calling ->fn(), so needn't to grab it one more time
-> in blk_mq_check_expired().
+On 8/11/21 5:13 AM, Christoph Hellwig wrote:
+> On Wed, Aug 11, 2021 at 09:26:33AM +0100, Christoph Hellwig wrote:
+>> I really don't like all the layering violations in here.  What is the
+>> problem with a simple (optional) percpu cache in the bio_set?  Something
+>> like the completely untested patch below:
 > 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq.c | 25 +++++++------------------
->  1 file changed, 7 insertions(+), 18 deletions(-)
+> A slightly updated version that actually compiles and survives minimal
+> testing is here:
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d2725f94491d..4d3457d2957f 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -917,6 +917,10 @@ void blk_mq_put_rq_ref(struct request *rq)
->  		__blk_mq_free_request(rq);
->  }
->  
-> +/*
-> + * This request won't be re-allocated because its refcount is held when
-> + * calling this callback.
-> + */
->  static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
->  		struct request *rq, void *priv, bool reserved)
->  {
-> @@ -930,27 +934,12 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
->  		return true;
->  
->  	/*
-> -	 * We have reason to believe the request may be expired. Take a
-> -	 * reference on the request to lock this request lifetime into its
-> -	 * currently allocated context to prevent it from being reallocated in
-> -	 * the event the completion by-passes this timeout handler.
-> -	 *
-> -	 * If the reference was already released, then the driver beat the
-> -	 * timeout handler to posting a natural completion.
-> -	 */
-> -	if (!refcount_inc_not_zero(&rq->ref))
-> -		return true;
-> -
-> -	/*
-> -	 * The request is now locked and cannot be reallocated underneath the
-> -	 * timeout handler's processing. Re-verify this exact request is truly
-> -	 * expired; if it is not expired, then the request was completed and
-> -	 * reallocated as a new request.
-> +	 * Re-verify this exact request is truly expired; if it is not expired,
-> +	 * then the request was completed and reallocated as a new request
-> +	 * after returning from blk_mq_check_expired().
->  	 */
->  	if (blk_mq_req_expired(rq, next))
->  		blk_mq_rq_timed_out(rq, reserved);
+> http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bio-cache
 
-There's no need to check expired twice if the iterator is already taking a
-reference. I had this double check because I didn't want to penalize normal IO
-by preventing it from completing while the timeout handler is running, but it
-looks like the current timeout iterator is going to do that anyway.
+I like this approach, I've done something very similar in the past. But
+the key here is the opt-in, to avoid needing IRQ/locking for the cache
+which defeats the purpose. That's why it was done just for polling,
+obviously.
 
-> -
-> -	blk_mq_put_rq_ref(rq);
->  	return true;
->  }
+I'll test a bit and re-spin the series.
+
+-- 
+Jens Axboe
+
