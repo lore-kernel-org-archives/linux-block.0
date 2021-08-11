@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF15C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EAA7C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:52:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A9E9601FD
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27D8C60F38
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 12:52:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbhHKMwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 08:52:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33758 "EHLO
+        id S229721AbhHKMxH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 08:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbhHKMwM (ORCPT
+        with ESMTP id S229697AbhHKMxG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 08:52:12 -0400
+        Wed, 11 Aug 2021 08:53:06 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D2AC061765
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 05:51:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47FE0C061765
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 05:52:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=gx6W6wlVWZJkJhCx8D92XleAgs9HpKjOXDw5OWXK6YQ=; b=ZxCQInjbAKr9x0+p+HJ4YIf6Tz
-        30mHrkdvaQ4WlUVubHxw3nONpnoGnp6Go3wIwGXyZKVEdJbGVYTMyzh5IHjjpCn9/VBPYanQEAXqL
-        wyIbRLJfX/LFDljQOHfLFsCnAbC11RqMbxq/tL6QrAS6CDsxLVKeHBIESnWeOp/kZjDnMIXWGsCtS
-        3e57t/g4p9/mrvB6dNntjZYqzRbV3gtTSWq4CM6+mVA+aKdql55/cR5G01kFzYaViRWmGxs4De7PS
-        4toyL98clKFutIjsQ+MkdxCXLkUVd0s7MHic7Ohf5uaMbnWmpGBq4/80BB740aladpghN9ALQjiXV
-        Mq7JSUJQ==;
+        bh=n0dB52Aydkl+RoqMFSS9U7kndtUkJfdL8iYMrIjWdtI=; b=N05l9onf+bOe7sJhBVqbZM0Jrz
+        RQoy13CasuMiH1Reg/xqTfIFz45BVPX2dQhLRIMpaglglght6CV1PdPE+dY9iNO59uYH0IVghkyIc
+        K+SASb6ULSE6TmNiVcPNjMW789xZ35qbcmw5nXD+oedYx4jrPWOOdAjeDGZxVAzEwenc9OKZziHvD
+        mUddRdW6mIDepp1elyA/nlZ+oxbsfqNwzsxrgJZcWPLVIo0MFxMASFWhPudsTRt00X2k3c2HEOJYm
+        G6YK5NERtthDhvPOAfBfuqxsKbbpF9r+xuwJRIPhPENY3uvaL8S+sRdWnw/A9SrKmKZBlz1Ufbsz8
+        wzNzVRzw==;
 Received: from [2001:4bb8:184:6215:7ee3:d0e9:131a:82ff] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mDng3-00DQBi-5d; Wed, 11 Aug 2021 12:50:11 +0000
+        id 1mDnhZ-00DQLa-OL; Wed, 11 Aug 2021 12:51:47 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         Hou Tao <houtao1@huawei.com>
-Subject: [PATCH 5/6] nbd: refactor device search and allocation in nbd_genl_connect
-Date:   Wed, 11 Aug 2021 14:44:27 +0200
-Message-Id: <20210811124428.2368491-6-hch@lst.de>
+Subject: [PATCH 6/6] nbd: reduce the nbd_index_mutex scope
+Date:   Wed, 11 Aug 2021 14:44:28 +0200
+Message-Id: <20210811124428.2368491-7-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210811124428.2368491-1-hch@lst.de>
 References: <20210811124428.2368491-1-hch@lst.de>
@@ -53,84 +53,124 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use idr_for_each_entry instead of the awkward callback to find an
-existing device for the index == -1 case, and de-duplicate the device
-allocation if no existing device was found.
+nbd_index_mutex is currently held over add_disk and inside ->open, which
+leads to lock order reversals.  Refactor the device creation code path
+so that nbd_dev_add is called without nbd_index_mutex lock held and
+only takes it for the IDR insertation.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/nbd.c | 45 ++++++++++++++-------------------------------
- 1 file changed, 14 insertions(+), 31 deletions(-)
+ drivers/block/nbd.c | 55 +++++++++++++++++++++++----------------------
+ 1 file changed, 28 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 08161c73c9ed..0b46a608f879 100644
+index 0b46a608f879..4054cc33fc1e 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1765,18 +1765,6 @@ static struct nbd_device *nbd_dev_add(int index)
- 	return ERR_PTR(err);
- }
+@@ -1681,7 +1681,7 @@ static const struct blk_mq_ops nbd_mq_ops = {
+ 	.timeout	= nbd_xmit_timeout,
+ };
  
--static int find_free_cb(int id, void *ptr, void *data)
--{
--	struct nbd_device *nbd = ptr;
--	struct nbd_device **found = data;
--
--	if (!refcount_read(&nbd->config_refs)) {
--		*found = nbd;
--		return 1;
--	}
--	return 0;
--}
--
- /* Netlink interface. */
- static const struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
- 	[NBD_ATTR_INDEX]		=	{ .type = NLA_U32 },
-@@ -1846,31 +1834,26 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- again:
- 	mutex_lock(&nbd_index_mutex);
- 	if (index == -1) {
--		ret = idr_for_each(&nbd_index_idr, &find_free_cb, &nbd);
--		if (ret == 0) {
--			nbd = nbd_dev_add(-1);
--			if (IS_ERR(nbd)) {
--				mutex_unlock(&nbd_index_mutex);
--				printk(KERN_ERR "nbd: failed to add new device\n");
--				return PTR_ERR(nbd);
-+		struct nbd_device *tmp;
-+		int id;
-+
-+		idr_for_each_entry(&nbd_index_idr, tmp, id) {
-+			if (!refcount_read(&tmp->config_refs)) {
-+				nbd = tmp;
-+				break;
- 			}
- 		}
- 	} else {
- 		nbd = idr_find(&nbd_index_idr, index);
--		if (!nbd) {
--			nbd = nbd_dev_add(index);
--			if (IS_ERR(nbd)) {
--				mutex_unlock(&nbd_index_mutex);
--				printk(KERN_ERR "nbd: failed to add new device\n");
--				return PTR_ERR(nbd);
--			}
--		}
+-static struct nbd_device *nbd_dev_add(int index)
++static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ {
+ 	struct nbd_device *nbd;
+ 	struct gendisk *disk;
+@@ -1707,6 +1707,7 @@ static struct nbd_device *nbd_dev_add(int index)
+ 	if (err)
+ 		goto out_free_nbd;
+ 
++	mutex_lock(&nbd_index_mutex);
+ 	if (index >= 0) {
+ 		err = idr_alloc(&nbd_index_idr, nbd, index, index + 1,
+ 				GFP_KERNEL);
+@@ -1717,6 +1718,7 @@ static struct nbd_device *nbd_dev_add(int index)
+ 		if (err >= 0)
+ 			index = err;
  	}
++	mutex_unlock(&nbd_index_mutex);
+ 	if (err < 0)
+ 		goto out_free_tags;
+ 	nbd->index = index;
+@@ -1743,7 +1745,7 @@ static struct nbd_device *nbd_dev_add(int index)
+ 
+ 	mutex_init(&nbd->config_lock);
+ 	refcount_set(&nbd->config_refs, 0);
+-	refcount_set(&nbd->refs, 1);
++	refcount_set(&nbd->refs, refs);
+ 	INIT_LIST_HEAD(&nbd->list);
+ 	disk->major = NBD_MAJOR;
+ 	disk->first_minor = index << part_shift;
+@@ -1847,34 +1849,35 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 		nbd = idr_find(&nbd_index_idr, index);
+ 	}
+ 
+-	if (!nbd) {
+-		nbd = nbd_dev_add(index);
+-		if (IS_ERR(nbd)) {
++	if (nbd) {
++		if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) &&
++		    test_bit(NBD_DISCONNECT_REQUESTED, &nbd->flags)) {
++			nbd->destroy_complete = &destroy_complete;
+ 			mutex_unlock(&nbd_index_mutex);
+-			pr_err("nbd: failed to add new device\n");
+-			return PTR_ERR(nbd);
 +
- 	if (!nbd) {
--		printk(KERN_ERR "nbd: couldn't find device at index %d\n",
--		       index);
--		mutex_unlock(&nbd_index_mutex);
--		return -EINVAL;
-+		nbd = nbd_dev_add(index);
-+		if (IS_ERR(nbd)) {
++			/* wait until the nbd device is completely destroyed */
++			wait_for_completion(&destroy_complete);
++			goto again;
+ 		}
+-	}
+ 
+-	if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) &&
+-	    test_bit(NBD_DISCONNECT_REQUESTED, &nbd->flags)) {
+-		nbd->destroy_complete = &destroy_complete;
++		if (!refcount_inc_not_zero(&nbd->refs)) {
 +			mutex_unlock(&nbd_index_mutex);
++			if (index == -1)
++				goto again;
++			pr_err("nbd: device at index %d is going down\n",
++		       		index);
++			return -EINVAL;
++		}
+ 		mutex_unlock(&nbd_index_mutex);
+-
+-		/* Wait untill the the nbd stuff is totally destroyed */
+-		wait_for_completion(&destroy_complete);
+-		goto again;
+-	}
+-
+-	if (!refcount_inc_not_zero(&nbd->refs)) {
++	} else {
+ 		mutex_unlock(&nbd_index_mutex);
+-		if (index == -1)
+-			goto again;
+-		printk(KERN_ERR "nbd: device at index %d is going down\n",
+-		       index);
+-		return -EINVAL;
++
++		nbd = nbd_dev_add(index, 2);
++		if (IS_ERR(nbd)) {
 +			pr_err("nbd: failed to add new device\n");
 +			return PTR_ERR(nbd);
 +		}
  	}
+-	mutex_unlock(&nbd_index_mutex);
  
- 	if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) &&
+ 	mutex_lock(&nbd->config_lock);
+ 	if (refcount_read(&nbd->config_refs)) {
+@@ -2430,10 +2433,8 @@ static int __init nbd_init(void)
+ 	}
+ 	nbd_dbg_init();
+ 
+-	mutex_lock(&nbd_index_mutex);
+ 	for (i = 0; i < nbds_max; i++)
+-		nbd_dev_add(i);
+-	mutex_unlock(&nbd_index_mutex);
++		nbd_dev_add(i, 1);
+ 	return 0;
+ }
+ 
 -- 
 2.30.2
 
