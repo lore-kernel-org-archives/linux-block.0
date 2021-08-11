@@ -2,87 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D18C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 02:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B400C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 02:42:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C81460EBD
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 02:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10D5360EDF
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 02:42:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231633AbhHKC2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Aug 2021 22:28:38 -0400
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:57595 "EHLO
-        alexa-out-sd-01.qualcomm.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231233AbhHKC2i (ORCPT
+        id S231786AbhHKCm6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Aug 2021 22:42:58 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:8396 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231634AbhHKCm5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Aug 2021 22:28:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1628648895; x=1660184895;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=mqrHT7lSpTYubUb4Uun7g5pFgQ69qr5SKKRD11vsmq0=;
-  b=cdpMn0NbdlMX8mp1KU9fWzZ5lmzHKsv6m0vp7L4C5DvWtjqynyG0V/sG
-   6qauRtKuziRD9TssNytxIXmZQWl+1hmYK5brB12d7T0bU/78u/RauZHLY
-   wkBq5PPqpdwzgoycHsnVLpLHYBozSu7WN3saxAeRSPDqe6fkuP/+Uns3Q
-   Q=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
-  by alexa-out-sd-01.qualcomm.com with ESMTP; 10 Aug 2021 19:28:15 -0700
-X-QCInternal: smtphost
-Received: from nasanexm03e.na.qualcomm.com ([10.85.0.48])
-  by ironmsg02-sd.qualcomm.com with ESMTP/TLS/AES256-SHA; 10 Aug 2021 19:28:15 -0700
-Received: from [10.111.168.10] (10.80.80.8) by nasanexm03e.na.qualcomm.com
- (10.85.0.48) with Microsoft SMTP Server (TLS) id 15.0.1497.23; Tue, 10 Aug
- 2021 19:28:13 -0700
-Subject: Re: move the bdi from the request_queue to the gendisk
-To:     Christoph Hellwig <hch@lst.de>
-CC:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Jan Kara <jack@suse.cz>, <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        <cgroups@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-mm@kvack.org>
-References: <20210809141744.1203023-1-hch@lst.de>
- <e5e19d15-7efd-31f4-941a-a5eb2f94b898@quicinc.com>
- <20210810200256.GA30809@lst.de>
-From:   Qian Cai <quic_qiancai@quicinc.com>
-Message-ID: <4e108ea6-b1dd-510e-afc4-757eae697dab@quicinc.com>
-Date:   Tue, 10 Aug 2021 22:28:12 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Tue, 10 Aug 2021 22:42:57 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GkvC03dnTz85nV;
+        Wed, 11 Aug 2021 10:38:36 +0800 (CST)
+Received: from dggpeml500006.china.huawei.com (7.185.36.76) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 11 Aug 2021 10:42:21 +0800
+Received: from [10.174.176.127] (10.174.176.127) by
+ dggpeml500006.china.huawei.com (7.185.36.76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 11 Aug 2021 10:42:21 +0800
+Subject: Re: [PATCH 0/5] block: replace incorrect uses of GENHD_FL_UP
+To:     Luis Chamberlain <mcgrof@kernel.org>, <axboe@kernel.dk>
+CC:     <hare@suse.de>, <bvanassche@acm.org>, <ming.lei@redhat.com>,
+        <hch@infradead.org>, <jack@suse.cz>, <osandov@fb.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20210720182048.1906526-1-mcgrof@kernel.org>
+From:   luomeng <luomeng12@huawei.com>
+Message-ID: <051ab019-5163-e691-43ed-052401b6b95a@huawei.com>
+Date:   Wed, 11 Aug 2021 10:42:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210810200256.GA30809@lst.de>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanexm03c.na.qualcomm.com (10.85.0.106) To
- nasanexm03e.na.qualcomm.com (10.85.0.48)
+In-Reply-To: <20210720182048.1906526-1-mcgrof@kernel.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.127]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500006.china.huawei.com (7.185.36.76)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi:
+    When the fuzz test injected memory allocation failed, I had this 
+BUG_ON: kernel BUG at fs/sysfs/group.c:116.
+   The cause of the bug_ON is that the add_disk memory fails to be 
+allocated but no error processing is performed.
+   I find your patches add error processing. So what is your next step 
+with these patches.
+Thanks.
 
+Luo Meng
 
-On 8/10/2021 4:02 PM, Christoph Hellwig wrote:
-> On Tue, Aug 10, 2021 at 03:36:39PM -0400, Qian Cai wrote:
->>
->>
->> On 8/9/2021 10:17 AM, Christoph Hellwig wrote:
->>> Hi Jens,
->>>
->>> this series moves the pointer to the bdi from the request_queue
->>> to the bdi, better matching the life time rules of the different
->>> objects.
->>
->> Reverting this series fixed an use-after-free in bdev_evict_inode().
+ÔÚ 2021/7/21 2:20, Luis Chamberlain Ð´µÀ:
+> I've bumped this from RFC to PATCH form as request by Christoph,
+> as it seems to line up with what he wants to do. As per Hannes
+> I also stuck to one form of naming, so went with blk_disk_added()
+> instead of blk_disk_registered() and used that instead of open
+> coding the flag check.
 > 
-> Please try the patch below as a band-aid.  Although the proper fix is
-> that non-default bdi_writeback structures grab a reference to the bdi,
-> as this was a landmine that might have already caused spurious issues
-> before.
-
-This works fine with a quick test.
+> This is rebased onto next-20210720 and I've made the patch series
+> independent of my *add_disk*() error handling series. This goes
+> compile and boot tested.
+> 
+> Luis Chamberlain (5):
+>    block: add flag for add_disk() completion notation
+>    md: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED on is_mddev_broken()
+>    mmc/core/block: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED
+>    nvme: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED
+>    fs/block_dev: replace GENHD_FL_UP with GENHD_FL_DISK_ADDED
+> 
+>   block/genhd.c                 |  8 ++++++++
+>   drivers/md/md.h               |  4 +---
+>   drivers/mmc/core/block.c      |  2 +-
+>   drivers/nvme/host/core.c      |  4 ++--
+>   drivers/nvme/host/multipath.c |  2 +-
+>   fs/block_dev.c                |  5 +++--
+>   include/linux/genhd.h         | 11 ++++++++++-
+>   7 files changed, 26 insertions(+), 10 deletions(-)
+> 
