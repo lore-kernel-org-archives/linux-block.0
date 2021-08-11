@@ -2,61 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F947C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 05:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98ACAC4320A
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 06:26:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F9C760FD9
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 05:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C8DC60EB2
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 06:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233813AbhHKFW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 01:22:56 -0400
-Received: from verein.lst.de ([213.95.11.211]:39129 "EHLO verein.lst.de"
+        id S234609AbhHKG1J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 02:27:09 -0400
+Received: from verein.lst.de ([213.95.11.211]:39257 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234325AbhHKFW4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 01:22:56 -0400
+        id S234575AbhHKG1J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Aug 2021 02:27:09 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id C851668AFE; Wed, 11 Aug 2021 07:22:29 +0200 (CEST)
-Date:   Wed, 11 Aug 2021 07:22:29 +0200
+        id AE39F6736F; Wed, 11 Aug 2021 08:26:42 +0200 (CEST)
+Date:   Wed, 11 Aug 2021 08:26:42 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 1/5] mm: hide laptop_mode_wb_timer entirely behind the
- BDI API
-Message-ID: <20210811052229.GA1696@lst.de>
-References: <20210809141744.1203023-1-hch@lst.de> <20210809141744.1203023-2-hch@lst.de> <20210810215622.GA874076@roeck-us.net>
+To:     Ian Pilcher <arequipeno@gmail.com>
+Cc:     Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>, hch@lst.de,
+        pali@kernel.org, linux-block@vger.kernel.org,
+        linux-leds@vger.kernel.org, axboe@kernel.dk, pavel@ucw.cz,
+        linux-kernel@vger.kernel.org, kernelnewbies@kernelnewbies.org
+Subject: Re: [RFC PATCH v2 00/10] Add configurable block device LED triggers
+Message-ID: <20210811062642.GA3119@lst.de>
+References: <20210809033217.1113444-1-arequipeno@gmail.com> <20210809205633.4300bbea@thinkpad> <81c128a1-c1b8-0f1e-a77b-6704bade26c0@gmail.com> <20210810004331.0f0094a5@thinkpad> <7b5f3509-5bcd-388b-8d3b-4ea95a9483ad@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210810215622.GA874076@roeck-us.net>
+In-Reply-To: <7b5f3509-5bcd-388b-8d3b-4ea95a9483ad@gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 02:56:22PM -0700, Guenter Roeck wrote:
-> On Mon, Aug 09, 2021 at 04:17:40PM +0200, Christoph Hellwig wrote:
-> > Don't leak the detaÑ–ls of the timer into the block layer, instead
-> > initialize the timer in bdi_alloc and delete it in bdi_unregister.
-> > Note that this means the timer is initialized (but not armed) for
-> > non-block queues as well now.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> 
-> Just in case this hasn't been reported yet.
-> This patch results in a widespread build failure. Example:
+On Mon, Aug 09, 2021 at 06:50:44PM -0500, Ian Pilcher wrote:
+> On 8/9/21 5:43 PM, Marek Behún wrote:
+>> I confess that I am not very familiar with internal blkdev API.
+>
+> It's mainly a matter of symbol visibility.  See this thread from a few
+> months ago:
+>
+>   https://www.spinics.net/lists/linux-leds/msg18244.html
+>
+> Now ... my code currently lives in block/, so there isn't actually
+> anything technically preventing it from iterating through the block
+> devices.
+>
+> The reactions to Enzo's patch (which you can see in that thread) make me
+> think that anything that iterates through all block devices is likely to
+> be rejected, but maybe I'm reading too much into it.
 
-Sorry.  This was reported before and a fix is already queued up here:
-
-https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.15/block&id=99d26de2f6d79badc80f55b54bd90d4cb9d1ad90
+I think the main issue with this series is that it adds a shitload of
+code and a hook in the absolute I/O fastpath for fricking blinkenlights.
+I don't think it is even worth wasting time on something this ridiculous.
