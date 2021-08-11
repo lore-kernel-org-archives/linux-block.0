@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AB1C00144
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84894C432BE
 	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:35:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3BB4C61102
+	by mail.kernel.org (Postfix) with ESMTP id 58F11610FC
 	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:35:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231565AbhHKTgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S231741AbhHKTgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 11 Aug 2021 15:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44674 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231636AbhHKTgH (ORCPT
+        with ESMTP id S229802AbhHKTgH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 11 Aug 2021 15:36:07 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08265C061765
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:44 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id nt11so5223230pjb.2
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:44 -0700 (PDT)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D10C06179E
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:43 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id lw7-20020a17090b1807b029017881cc80b7so11299291pjb.3
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=oEanWYqex9JuH3iGdmfjQ00rfPxW60wGQ1NzD9wjGSo=;
-        b=o2n0uXw2A1dkovhZfrRJwk7J04SXPUMV78vc0FOMnSsnuVtqCj2WcPC/Iqmc7x5FwX
-         oann7w01bIooqFyKR1mliZ2wecJ5eTq9TTgSZtiz9Q7oiyIqPG99Hwfl96nNiaONwI4G
-         A+7KOq2RIGqH3RNu30ppI/lDnVw/TQW6olt0IclIfRXmgnVa1xiESGUfpjTBIhjasuLi
-         wS9nLuibcY/fgmtX3wTgsJ0pwhgHwHqU12cySJgucpQkYJzCIsGyCvwbUtr+ipid3t2t
-         DI0GoM/p4Xh9FibPXdpBn0UIYejaoBS+SFQ7OF2Yzdf01y1fGKM/tlkaQXCB/i2bLI5U
-         XxiQ==
+        bh=gzAcF0zizY0wVeW39ScMbIL+yu4HjhIlQYH8a7v47yo=;
+        b=UP4vySG67B3mWmew1yhsxprWgt1py2v7fnkkpmlxAWoNyfd6VwiwQHfDuPyJBCAT9y
+         CpW0eU4AV0iEKcg7DA7lLDWAlVS3hCZPLjRJx/hdBaiGn2KKYJ3jMGu5fBeSlT73oeDI
+         4Uro6cMsRsvkQZeamniiMreRLD7wwy1ru1ytSfqrZOnxKmlFsrq+O+0TyHopycKoZOaL
+         JCSihSz+y22bXA/DJ/kRXPF7qkAWYUHfwv9HY4gjILL+NY1Qy7FpKL9Uaa7GShm6n8+R
+         ZzdAY3AMgCLXa3GT/y5g87RcUXs+Onz6aOnsLzBQqwuU/ld5FBkzvCd+V8aGkZGi/XJd
+         1Feg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=oEanWYqex9JuH3iGdmfjQ00rfPxW60wGQ1NzD9wjGSo=;
-        b=HbUgbfOoaGSwn+R7CUKHcVWJ8edMNf05RI8tkoIKA+O4J5IZm2wSgARuGPIDca1aKJ
-         aOeVIIuleNFZIkTFbfSIFbalb7xs+LzG+tO+P/DeYjBeLurvEIJeGe6luYYghRYHsNPW
-         IcBX9oaYdP78kv7nBhnyg11a50hJVoaOmFkgbqv9NQjesW5kvR3VqRR60LQx8hknn3YS
-         evRZ210xPe4sIDVpfEWcJ7oR8A0J8zdW7O68QDVuW13rcugNm79CcTzV1haojiayy2jc
-         Y+8R7xX749clvNOE0bf2E55g/esDJLTrUvqACuiLZ9G6kVJkZXuzubGz8FDIWfTm9x8F
-         ajKA==
-X-Gm-Message-State: AOAM5306yfYfSlxgundEHXEK3Lgplcyog6t6jBPtC7sjfOK7ZM39n0hK
-        DkS6b8B1eKyCUR9O70c8r4ZGBQ==
-X-Google-Smtp-Source: ABdhPJwNzpEpb02gfUBt/Jh6uj4oiG5Hz4tPIqqmCtxgyRm82dQwWXlf5CU0LGyPf3PYJFQf4b8e8w==
-X-Received: by 2002:a05:6a00:1596:b029:3c7:998a:709 with SMTP id u22-20020a056a001596b02903c7998a0709mr399865pfk.68.1628710543569;
-        Wed, 11 Aug 2021 12:35:43 -0700 (PDT)
+        bh=gzAcF0zizY0wVeW39ScMbIL+yu4HjhIlQYH8a7v47yo=;
+        b=osiTfpczs0WgLDh9JjhyGS/6uddArYigmJvrIvL68TT3JHRSjIYfT1gOE4Emm/paqL
+         lHwm25dRIXsv4p61H7g/GQtsUV0GYBQAIIIX5W7QtkMf+hCTGtmWzv8i8EfO4ubn5F34
+         PMxnTe3O1seznC6Wp+Pmbt1cASDkTms7vNoViUapWfC2CI+ilj04lM9m2I1D9Jac1myZ
+         HydXyAUe2qHr+q10UCLes92iUVNlNORh+cS/8Shhf9bvA+6ByVxMZQr5YeFSqpGSBWqw
+         0QI+rv04ZEFYjvsK+d/wsZn6WP61pmdakhoXqM6L6lMe7XVvc2kzga8IHDKTTZmqjskV
+         XBUg==
+X-Gm-Message-State: AOAM533e17D9kFR7t6dhwElIv5WIYeip2nMf0HLltTLk5SNN/IkM/+TJ
+        YnPNii/onorb4eArCw8SkrHHDg==
+X-Google-Smtp-Source: ABdhPJyLozS2daFM9HNJ9WFZc7F7zdNlB81nDYSLw4lvsHkDusDtRKe6nUWUP09eLh+8xl4WDH8wZg==
+X-Received: by 2002:a05:6a00:18a3:b029:3dd:8ade:9b8c with SMTP id x35-20020a056a0018a3b02903dd8ade9b8cmr309666pfh.63.1628710542623;
+        Wed, 11 Aug 2021 12:35:42 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id u20sm286487pgm.4.2021.08.11.12.35.42
+        by smtp.gmail.com with ESMTPSA id u20sm286487pgm.4.2021.08.11.12.35.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 12:35:43 -0700 (PDT)
+        Wed, 11 Aug 2021 12:35:42 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     io-uring@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, hch@infradead.org,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/6] io_uring: enable use of bio alloc cache
-Date:   Wed, 11 Aug 2021 13:35:32 -0600
-Message-Id: <20210811193533.766613-6-axboe@kernel.dk>
+Subject: [PATCH 4/6] block: clear BIO_PERCPU_CACHE flag if polling isn't supported
+Date:   Wed, 11 Aug 2021 13:35:31 -0600
+Message-Id: <20210811193533.766613-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210811193533.766613-1-axboe@kernel.dk>
 References: <20210811193533.766613-1-axboe@kernel.dk>
@@ -72,30 +72,32 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Mark polled IO as being safe for dipping into the bio allocation
-cache, in case the targeted bio_set has it enabled.
-
-This brings an IOPOLL gen2 Optane QD=128 workload from ~3.0M IOPS to
-~3.3M IOPS.
+The bio alloc cache relies on the fact that a polled bio will complete
+in process context, clear the cacheable flag if we disable polling
+for a given bio.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index bd3f8529fe6f..00da7bdd2b53 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2667,7 +2667,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 		    !kiocb->ki_filp->f_op->iopoll)
- 			return -EOPNOTSUPP;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 04477697ee4b..c130206e9961 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -833,8 +833,11 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+ 		}
+ 	}
  
--		kiocb->ki_flags |= IOCB_HIPRI;
-+		kiocb->ki_flags |= IOCB_HIPRI | IOCB_ALLOC_CACHE;
- 		kiocb->ki_complete = io_complete_rw_iopoll;
- 		req->iopoll_completed = 0;
- 	} else {
+-	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
++	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags)) {
++		/* can't support alloc cache if we turn off polling */
++		bio_clear_flag(bio, BIO_PERCPU_CACHE);
+ 		bio->bi_opf &= ~REQ_HIPRI;
++	}
+ 
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_DISCARD:
 -- 
 2.32.0
 
