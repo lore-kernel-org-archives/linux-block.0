@@ -2,60 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E82C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 11:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F8CC432BE
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 11:51:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5208B60EB2
-	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 11:46:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5198460F56
+	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 11:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237403AbhHKLqe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 07:46:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46032 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237395AbhHKLqe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 07:46:34 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E95B2C061765
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 04:46:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=RDUf5yG/NXG5w620XtxrB+I5QSjMPfnNF1EktmZTTFw=; b=TaggWTOrLSCRtlmtnFXjzqmfl5
-        HHRr6xAqs+WpQ9qykgehMYt8hLE457Rhi2IviX84yvnNaQNZHt9gUUbwpEFbbt2mbhb98XF+1WvKO
-        SxA0gTLCtYFw8sCMZiWy5cThueLlTFezFXQNGRe/E8EFtxzYBZXJfn+SazVxO8BR6baOD6T3z0fAk
-        1jbJMxdm7FwrNCkdtYjzSctpnxdu2z7O/z9aeWH8CEYFlAxbCW3Sfls1KXipG3an2mcbolESuR3Iq
-        QQ7T/VU3NbzVX4G8JGOjP8n6sIKbtePfhg06EZayaVpNVsU75XzoZXvKAQJXRehDPpptW/NBFVMG5
-        G0aBt+xg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mDmfS-00DKZE-7K; Wed, 11 Aug 2021 11:45:25 +0000
-Date:   Wed, 11 Aug 2021 12:45:06 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     CKI Project <cki-project@redhat.com>
-Cc:     skt-results-master@redhat.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk, Memory Management <mm-qe@redhat.com>,
-        Jan Stancek <jstancek@redhat.com>, Li Wang <liwang@redhat.com>,
-        Zorro Lang <zlang@redhat.com>, Xiong Zhou <xzhou@redhat.com>,
-        Yi Zhang <yizhan@redhat.com>
-Subject: Re: ???? PANICKED: Test report for kernel 5.14.0-rc5 (block,
- 4e9e1af5)
-Message-ID: <YRO4QsuvB5jgNddW@infradead.org>
-References: <cki.D0FC7AC895.R5GM6IYQCK@redhat.com>
+        id S231893AbhHKLwO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 07:52:14 -0400
+Received: from verein.lst.de ([213.95.11.211]:40261 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229836AbhHKLwO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Aug 2021 07:52:14 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C07CA67373; Wed, 11 Aug 2021 13:51:47 +0200 (CEST)
+Date:   Wed, 11 Aug 2021 13:51:47 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Qian Cai <quic_qiancai@quicinc.com>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: move the bdi from the request_queue to the gendisk
+Message-ID: <20210811115147.GA27860@lst.de>
+References: <20210809141744.1203023-1-hch@lst.de> <e5e19d15-7efd-31f4-941a-a5eb2f94b898@quicinc.com> <20210810200256.GA30809@lst.de> <20210811112514.GC14725@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cki.D0FC7AC895.R5GM6IYQCK@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210811112514.GC14725@quack2.suse.cz>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I'm really not sure what this mail is trying to say. If you have a
-PANICKED subject please at least include the actual kernel message
-leading to it in the mail, as well as other useful information.  Take
-a look at the build-bot mails for useful examples.
+On Wed, Aug 11, 2021 at 01:25:14PM +0200, Jan Kara wrote:
+> Well, non-default bdi_writeback structures do hold bdi reference - see
+> wb_exit() which drops the reference. I think the problem rather was that a
+> block device's inode->i_wb was pointing to the default bdi_writeback
+> structure and that got freed after bdi_put() before block device inode was
+> shutdown through bdput()... So what I think we need is that if the inode
+> references the default writeback structure, it actually holds a reference
+> to the bdi.
+
+Qian, can you test the patch below instead of the one I sent yesterday?
+
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index cd06dca232c3..edfb7ce2cc93 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -283,8 +283,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
+ 
+ 	memset(wb, 0, sizeof(*wb));
+ 
+-	if (wb != &bdi->wb)
+-		bdi_get(bdi);
++	bdi_get(bdi);
+ 	wb->bdi = bdi;
+ 	wb->last_old_flush = jiffies;
+ 	INIT_LIST_HEAD(&wb->b_dirty);
+@@ -362,8 +361,7 @@ static void wb_exit(struct bdi_writeback *wb)
+ 		percpu_counter_destroy(&wb->stat[i]);
+ 
+ 	fprop_local_destroy_percpu(&wb->completions);
+-	if (wb != &wb->bdi->wb)
+-		bdi_put(wb->bdi);
++	bdi_put(wb->bdi);
+ }
+ 
+ #ifdef CONFIG_CGROUP_WRITEBACK
