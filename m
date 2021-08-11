@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84894C432BE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A35DC19F35
 	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:35:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58F11610FC
+	by mail.kernel.org (Postfix) with ESMTP id 6BAF0610A4
 	for <linux-block@archiver.kernel.org>; Wed, 11 Aug 2021 19:35:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231741AbhHKTgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 15:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44692 "EHLO
+        id S231747AbhHKTgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 15:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229802AbhHKTgH (ORCPT
+        with ESMTP id S231702AbhHKTgJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 15:36:07 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D10C06179E
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:43 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id lw7-20020a17090b1807b029017881cc80b7so11299291pjb.3
-        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:43 -0700 (PDT)
+        Wed, 11 Aug 2021 15:36:09 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285C3C061765
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:45 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id e19so4019696pla.10
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 12:35:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=gzAcF0zizY0wVeW39ScMbIL+yu4HjhIlQYH8a7v47yo=;
-        b=UP4vySG67B3mWmew1yhsxprWgt1py2v7fnkkpmlxAWoNyfd6VwiwQHfDuPyJBCAT9y
-         CpW0eU4AV0iEKcg7DA7lLDWAlVS3hCZPLjRJx/hdBaiGn2KKYJ3jMGu5fBeSlT73oeDI
-         4Uro6cMsRsvkQZeamniiMreRLD7wwy1ru1ytSfqrZOnxKmlFsrq+O+0TyHopycKoZOaL
-         JCSihSz+y22bXA/DJ/kRXPF7qkAWYUHfwv9HY4gjILL+NY1Qy7FpKL9Uaa7GShm6n8+R
-         ZzdAY3AMgCLXa3GT/y5g87RcUXs+Onz6aOnsLzBQqwuU/ld5FBkzvCd+V8aGkZGi/XJd
-         1Feg==
+        bh=CPHR9+/srqubnx1IylV7gQnOmmOqOlKCpGfW9/b0t68=;
+        b=Gn68Gv0X+76XfYrCArMrLcLPqzknELSJKAuyrHdrGzix21DE/eqSRfrWSFN4SWJaCg
+         +JMXaKuFKpMGx0jUV7s64y8UY/0n+9/3xaN2ZQpxjcDgj7wm/KsXdfFfAZO+F0bfMRKy
+         YDZQcSKvqvXYeTmYdAl9KshM1rtEGzvRC4Ad9QY6QlH9tZCW6qUP/Y0gVNCDlrNOX63g
+         2Q1sUqPz1wd0krTQK5B4gR21aJRh6IFREdrxprE1LuFXzLUVwHpLwymHVOgNn26huGy3
+         M1iqqJ+JlVpZmsyRCYGmV2xRtaG4AyZiElS1T3Ld4n+Q0OBx2nb9arZGaOyAmOwwDYvj
+         exXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=gzAcF0zizY0wVeW39ScMbIL+yu4HjhIlQYH8a7v47yo=;
-        b=osiTfpczs0WgLDh9JjhyGS/6uddArYigmJvrIvL68TT3JHRSjIYfT1gOE4Emm/paqL
-         lHwm25dRIXsv4p61H7g/GQtsUV0GYBQAIIIX5W7QtkMf+hCTGtmWzv8i8EfO4ubn5F34
-         PMxnTe3O1seznC6Wp+Pmbt1cASDkTms7vNoViUapWfC2CI+ilj04lM9m2I1D9Jac1myZ
-         HydXyAUe2qHr+q10UCLes92iUVNlNORh+cS/8Shhf9bvA+6ByVxMZQr5YeFSqpGSBWqw
-         0QI+rv04ZEFYjvsK+d/wsZn6WP61pmdakhoXqM6L6lMe7XVvc2kzga8IHDKTTZmqjskV
-         XBUg==
-X-Gm-Message-State: AOAM533e17D9kFR7t6dhwElIv5WIYeip2nMf0HLltTLk5SNN/IkM/+TJ
-        YnPNii/onorb4eArCw8SkrHHDg==
-X-Google-Smtp-Source: ABdhPJyLozS2daFM9HNJ9WFZc7F7zdNlB81nDYSLw4lvsHkDusDtRKe6nUWUP09eLh+8xl4WDH8wZg==
-X-Received: by 2002:a05:6a00:18a3:b029:3dd:8ade:9b8c with SMTP id x35-20020a056a0018a3b02903dd8ade9b8cmr309666pfh.63.1628710542623;
-        Wed, 11 Aug 2021 12:35:42 -0700 (PDT)
+        bh=CPHR9+/srqubnx1IylV7gQnOmmOqOlKCpGfW9/b0t68=;
+        b=B1TALRZj4ObZ5d4cHxwHIf3eHrHJqg/S8Igwf6/P9Y/phHlFDMUaYItrl2B/rXM2LP
+         n1jXnMQnxleIpHa/3F2KU0rfcU9m251UpDxUzMrK46/R6VnMjjY92kGgl0jqE52eLtdX
+         ucRREz/F0EbckT193OJ269TylDPu710yGMGOlEmjSuAdSqNvGHjU/Pu0ZdyaVCHpX/8x
+         TgJ4FS2HrpX0icWmk5Ds3AoaBGRKEb8RXbaIx8fduuPhSexZYr8mPKIUw3e8YDJ8GkHz
+         YWA5h0S0kn4meaKJ2ctw0JZqzvYhusbmTL2psqVP8so41VVF7C/IZ81cD5AyAJMUUw32
+         H/MA==
+X-Gm-Message-State: AOAM5312JYw4h8yUlR91um1QTMsCnrmW8zDim6V0KqkUUZoC5UznIJax
+        bQHiLqkpGnQg+50FPb/caOXaVw==
+X-Google-Smtp-Source: ABdhPJwtoG2aWyj8p2ouXV0qKbPEkI2k8GUibvKupEVpZmlq5szola+EWrLsdd7T7R6joLqN3r5/lg==
+X-Received: by 2002:a05:6a00:888:b029:3c3:ff1:38e with SMTP id q8-20020a056a000888b02903c30ff1038emr317565pfj.17.1628710544550;
+        Wed, 11 Aug 2021 12:35:44 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id u20sm286487pgm.4.2021.08.11.12.35.41
+        by smtp.gmail.com with ESMTPSA id u20sm286487pgm.4.2021.08.11.12.35.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 12:35:42 -0700 (PDT)
+        Wed, 11 Aug 2021 12:35:44 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     io-uring@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, hch@infradead.org,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/6] block: clear BIO_PERCPU_CACHE flag if polling isn't supported
-Date:   Wed, 11 Aug 2021 13:35:31 -0600
-Message-Id: <20210811193533.766613-5-axboe@kernel.dk>
+Subject: [PATCH 6/6] block: enable use of bio allocation cache
+Date:   Wed, 11 Aug 2021 13:35:33 -0600
+Message-Id: <20210811193533.766613-7-axboe@kernel.dk>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210811193533.766613-1-axboe@kernel.dk>
 References: <20210811193533.766613-1-axboe@kernel.dk>
@@ -72,32 +72,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bio alloc cache relies on the fact that a polled bio will complete
-in process context, clear the cacheable flag if we disable polling
-for a given bio.
+Initialize the bio_set used for IO with per-cpu bio caching enabled,
+and use the new bio_alloc_kiocb() helper to dip into that cache.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ fs/block_dev.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 04477697ee4b..c130206e9961 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -833,8 +833,11 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
- 		}
- 	}
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 9ef4f1fc2cb0..798bb9d8f533 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -385,7 +385,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 	    (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
  
--	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-+	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags)) {
-+		/* can't support alloc cache if we turn off polling */
-+		bio_clear_flag(bio, BIO_PERCPU_CACHE);
- 		bio->bi_opf &= ~REQ_HIPRI;
-+	}
+-	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
++	bio = bio_alloc_kiocb(iocb, GFP_KERNEL, nr_pages, &blkdev_dio_pool);
  
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
+ 	dio = container_of(bio, struct blkdev_dio, bio);
+ 	dio->is_sync = is_sync = is_sync_kiocb(iocb);
+@@ -513,7 +513,9 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 
+ static __init int blkdev_init(void)
+ {
+-	return bioset_init(&blkdev_dio_pool, 4, offsetof(struct blkdev_dio, bio), BIOSET_NEED_BVECS);
++	return bioset_init(&blkdev_dio_pool, 4,
++				offsetof(struct blkdev_dio, bio),
++				BIOSET_NEED_BVECS|BIOSET_PERCPU_CACHE);
+ }
+ module_init(blkdev_init);
+ 
 -- 
 2.32.0
 
