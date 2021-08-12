@@ -2,95 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A732CC4320A
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6DBC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:31:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84A9260FD7
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:25:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD20A610A5
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:31:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235673AbhHLRZ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 13:25:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33054 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234975AbhHLRZ5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 13:25:57 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8ABC061756
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 10:25:31 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id t35so11459430oiw.9
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 10:25:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/t0crY99bVsBHmsGtf3nFKRr2bDvUGoWJNKWSR8x7Oc=;
-        b=dRToqYfHRZlpx8HPyIvjpb8pMukJPa3W3JVGnhXop8tZRFVEu5wOeDIGyiumJHWwbn
-         pgZZZahvBayAaO2OcETJVm8rfZDrx2UEX/qF85w5/N/AL9dEzwcvkXsDszPtSfggnOBw
-         WRnLG6Z2AnGtrIkSuEB0pJTVgI7VD0Lfu+XVqeU50uOnTfPmvMYbFUMqZ/8NeuSQ9jLd
-         Ux/oxcMi3D0ZZs0T8E6TBhDY1dJl9egtumD6A67Hu8AqekrbaGgN6RMj3OQBV02Tm/7P
-         8D8GHnZSCtYmfnsn+DartzUv87VMXtbgstK4Rmjf+1yau6Q/Zn0VJ7qcahBWsv3VLkl7
-         hHew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/t0crY99bVsBHmsGtf3nFKRr2bDvUGoWJNKWSR8x7Oc=;
-        b=Bj50DbGG579KB95+VzxGbVCVr9FJzbK5cAAQL6sktKuu3Xx1WwK7As0fvQ2P17y1P5
-         h0A+V1k2rRl3k8Ag7ifG1DGs+BUtXvQJQzC7tf9Oc+ZsUPVjM74c7K7KXzzREGOarE2p
-         84IgCFdULFUaub6ok2E6bcwFLVskNv+hrzmqrtENIawJRPL0MURTN7caD/kMIQtZjEAv
-         Z4jT4ZuoYqr/a/sbiR/cfNDglJI2F1qwqc4MArVC1y0krXVKL/PL4Huk90qagTrqY202
-         EoOR9CGUiQs66XtvpbYoWvenqQbWF9nawjvY5zt2UT7PNgHPEJnNDFf18jSxgYelBOnD
-         F8yw==
-X-Gm-Message-State: AOAM531LYZklvKsOnuph7p/U0O3btlRaYXUAsQwzhmHsKI7Wx7QIYEEY
-        gvyXPLsSGp+rjXE/svEr9Xkv6w==
-X-Google-Smtp-Source: ABdhPJw0Loyg5ImjbeFcFxIdHxZG3HBvV9n0kee1hpQKmPK+psbv78uiqj9qyFL/Rx7vi6R2FMlWmQ==
-X-Received: by 2002:aca:f089:: with SMTP id o131mr4118849oih.37.1628789131106;
-        Thu, 12 Aug 2021 10:25:31 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id r137sm757387oie.17.2021.08.12.10.25.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Aug 2021 10:25:30 -0700 (PDT)
-Subject: Re: [PATCH v5 0/5] Initial support for multi-actuator HDDs
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20210812075015.1090959-1-damien.lemoal@wdc.com>
- <a968069d-07df-396e-8ac6-04dfe3ee3040@kernel.dk>
- <yq1r1eyshs3.fsf@ca-mkp.ca.oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <743ace9d-2d10-f903-aa7f-cae3fbd1872f@kernel.dk>
-Date:   Thu, 12 Aug 2021 11:25:30 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S236018AbhHLRcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 13:32:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45124 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235992AbhHLRcM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Aug 2021 13:32:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5099061019;
+        Thu, 12 Aug 2021 17:31:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628789506;
+        bh=zLJtf8RndgZCwd1MqcQhVgLu9czEEZTCIBM263Gh9Y8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rfz9vCXOQXS1zqid1XHR0gfD8etoGGu+p63GyfOzEQaFyZhKzC504cKr93GK7JdUq
+         ZzGQ3FkGkMEylRORh5K6s0W/QWuQqVlISqqHqy41JSfMX9sgWQwldBLPz5AYrNv/uP
+         rtvH0qbD1s84icS9bo2D+iyl2f5rw5ASHqdOYmZSHOkniW0t9awJFUSj4R9KE5BE+y
+         WiSlZsaQQxPd1R1b3aOPwom5V+vtorUnc2acdg8IgAJ4yO6jN/eCaKuHeafVNu+ZaT
+         oSHcxgdkFntIHboPuGARJqgDM+16DKwfTcY+8+a7ZsGjbqrPjkc0d74Q6tRkUzwaIa
+         +nh5Z9oh050Dw==
+Date:   Thu, 12 Aug 2021 10:31:43 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@infradead.org
+Subject: Re: [PATCH 4/6] block: clear BIO_PERCPU_CACHE flag if polling isn't
+ supported
+Message-ID: <20210812173143.GA3138953@dhcp-10-100-145-180.wdc.com>
+References: <20210812154149.1061502-1-axboe@kernel.dk>
+ <20210812154149.1061502-5-axboe@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <yq1r1eyshs3.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210812154149.1061502-5-axboe@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/12/21 11:21 AM, Martin K. Petersen wrote:
-> 
-> Jens,
-> 
->> This looks good to me now - are we taking this through the block tree?
->> If so, would be nice to get a SCSI signoff on patch 2.
-> 
-> I'd like to do one more review pass. Also, it may be best to take patch
-> 2 through my tree since I suspect it will interfere with my VPD shuffle.
+On Thu, Aug 12, 2021 at 09:41:47AM -0600, Jens Axboe wrote:
+> -	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+> +	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags)) {
+> +		/* can't support alloc cache if we turn off polling */
+> +		bio_clear_flag(bio, BIO_PERCPU_CACHE);
+>  		bio->bi_opf &= ~REQ_HIPRI;
+> +	}
 
-That's fine, we can do it like that. I'll wait a day or two and pending
-any last minute changes, take 1,3-5 through block.
-
--- 
-Jens Axboe
-
+It looks like you should also clear BIO_PERCPU_CACHE if this bio gets
+split in blk_bio_segment_split().
