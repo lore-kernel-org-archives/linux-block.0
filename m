@@ -5,59 +5,59 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78326C43214
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6CE5C4338F
 	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 02:44:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E63F6101E
+	by mail.kernel.org (Postfix) with ESMTP id AC52B6105A
 	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 02:44:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233700AbhHLCob (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 22:44:31 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:60779 "EHLO
+        id S233719AbhHLCoc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Aug 2021 22:44:32 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:60783 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbhHLCoa (ORCPT
+        with ESMTP id S233659AbhHLCob (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 22:44:30 -0400
+        Wed, 11 Aug 2021 22:44:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1628736245; x=1660272245;
+  t=1628736246; x=1660272246;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=N9HTUe3fPenLFb7TILYqOuQ90dOIPTNwU0OUTxnf8fo=;
-  b=Ge0cg1uOTP2VCjPW6Z8DXp0NV1RkhZpYhgOqSoYHYEQvRFXyxgbf7iUj
-   RNgRsUOewPxgmi4GoxqyHqbmA6DbwDNgTLy0hxc4jMiecGIa47ighWCHO
-   rbWX0LQgCY3NaEclOwV8CR8E2GStDwbCwVU62YRfgfLTBbGNZWM+fAu1s
-   nTL+K9r1wBfRPL3YyNwFuWoi9EKTnrk3rGdWMsHyQhtclmEHy9McPa3Ph
-   TlIiUq8Bw4m5FAkQgCSg9TD9A9amWD/PkCO1EmRmpw9M1gqD7dbSG5bsG
-   AOUCN4c1eTfAa4zwZAnrhGAyBTgLPyWK7+kkcxOFksKji7JFQhjKDoUyr
-   Q==;
+  bh=EIH026mlpK847URWOEkIJeSWTxgkrb13VQ8oOv5tb/A=;
+  b=Vj11t3r3g2tHt9sgyIQ5pf8963uNdyoOxF5DvTun8Qp0K0ASUPtD8Gi9
+   6XcVpIip94NoqB5qDEMuq0nS1U7HhifhL1NweD8Q/8NmA6Y1rKrX1tgUW
+   Ab/E39won4aKbddw8lLyZKJXE6e4FoxwSIQ6asSvWeuWzDCGsYeCX9nHF
+   PygU6wvE0RMHB/f+wqmhU7jfQAM6kSyZCmValebf7valRiQp2tK7b8TX2
+   mpdivSxvjdZLF6cte70mTn5SJbgZTbcLb4QKb4TcycdBYdFKN4T85Q1dL
+   npWFtdeubem/NaWQd/4X+g7Pu9ul9P94mZpJiK0gavlbG/5hAHggU9Eub
+   A==;
 X-IronPort-AV: E=Sophos;i="5.84,314,1620662400"; 
-   d="scan'208";a="176999856"
+   d="scan'208";a="176999859"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Aug 2021 10:44:05 +0800
-IronPort-SDR: Lq4VrNoeBoXhnGlSjftFi0Tmg9MK2WTGuTo/2qTeaRacYBMdtFiudl5feYd17qbsO0BPLVkEGs
- zk6LZE4kX4WTeV1Kgh8BM5rIQDIr+6mvQFvE6MsY2gUgJ1WXMpVffmAaXCIA0VxWN7C1lde08m
- p7y117LcMFkM/nyI9DfWIE4s86bncw97tzZYrx3LrPxI8zKjQFqRi51H6XKzSNnbwtTKQ8DB1b
- EZhghUpVFKON6HuVvQ2s9PHYY9QpBsxsvmLRedgUEHG69WFb1STi43flztguTBRLxWSfNxp05j
- BstFBBoClTSkLvZ7NO+Mfk/I
+  by ob1.hgst.iphmx.com with ESMTP; 12 Aug 2021 10:44:06 +0800
+IronPort-SDR: WhqVUhbcYnFxY+5i9pJf0DrlqT1nPcdtjMG412rmcog+YtPzqFjA4QMQXmA+28RsYIldSMQCs+
+ loNqvj/t5mCKG5io1sTgxmvG0w3PHvoOcbQqUtwhW7Vs4LYOa+Ew1SeS17ceKeQN31mlWLa7Cf
+ +TTnDH7IpPfSGht1ap6koxYiT9jpLgw7N9CxJH37722KlmUihM2NHpMykjDaog+LlJkZsGVbqv
+ VuBdzOMfF9pXnnytiz87qOqDKxqmDl4IyzPs0AbLhruhOU5ByNkivEHe5ZA15EUyhQmRCmrXOA
+ GLGYjSyERAPTkgQWoMSpjbzn
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2021 19:19:35 -0700
-IronPort-SDR: 8SseMKCTyzRJjk+0sDVc/tZ+R+fllLBeOROh7bGCJqBrL3bAsum6xcG8ZjvLkGJ11nIlGrS6u1
- u93kMcliPJ8Ogd5YBi9lCchTJE3G32HLLMOjZJh0wftFRq5Apbj5P0OGSlRCPZN7+Xj3kFazpX
- idJFZ9Pw2Z2igaPZswQOy1pijS5syETEs4BozmcrJn0UPjKXNhGKSYbndZyE0R/L7VS/ygsB4Z
- Q8k+8hqDUiEe5LwV1s6TLmqL/KF9C+TzpM+M6GqdBe09Q39kxPl9OkWTiIjTAlrX0N+aPvssU9
- L1c=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2021 19:19:36 -0700
+IronPort-SDR: 4YARjhaKZdjltWHRHtZQGGMjuzxr96RHSMRCJNmLKXllbhnlL8uJUSiRD2BLmqRbCsfN5JslSz
+ IvCZUzGbkHYqzIgR5s/FskUnowxHqxebOAwIFXwDv+08OyQipBqfZnl0Cr2hITD5fwMlp0kwUp
+ 0jbir9srf0wuf2MnYtg0oOdRtGedDoE1bBE+yVrcVO3IAttaWbyJFqBJLYnun7M7JNxvk/7smL
+ VOgu0BWTtrR7kyY+q2wVqD0sJ6vzTfM7USpe1PRZnA7llOMWRb21tcg2Ve+OIj4hlRM1xZIswa
+ e5o=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Aug 2021 19:44:05 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 11 Aug 2021 19:44:06 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-ide@vger.kernel.org
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH v6 1/9] libata: fix ata_host_alloc_pinfo()
-Date:   Thu, 12 Aug 2021 11:43:55 +0900
-Message-Id: <20210812024403.765819-2-damien.lemoal@wdc.com>
+Subject: [PATCH v6 2/9] libata: fix ata_host_start()
+Date:   Thu, 12 Aug 2021 11:43:56 +0900
+Message-Id: <20210812024403.765819-3-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210812024403.765819-1-damien.lemoal@wdc.com>
 References: <20210812024403.765819-1-damien.lemoal@wdc.com>
@@ -67,62 +67,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid static checkers warnings about a potential NULL pointer
-dereference for the port info variable pi. To do so, test that at least
-one port info is available on entry to ata_host_alloc_pinfo() and start
-the ata port initialization for() loop with pi initialized to the first
-port info passed as argument (which is already checked to be non NULL).
-Within the for() loop, get the next port info, if it is not NULL,
-after initializing the ata port using the previous port info.
+The loop on entry of ata_host_start() may not initialize host->ops to a
+non NULL value. The test on the host_stop field of host->ops must then
+be preceded by a check that host->ops is not NULL.
 
 Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/ata/libata-core.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ drivers/ata/libata-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 61c762961ca8..b237a718ea0f 100644
+index b237a718ea0f..d3f7830bda2e 100644
 --- a/drivers/ata/libata-core.c
 +++ b/drivers/ata/libata-core.c
-@@ -5441,16 +5441,17 @@ struct ata_host *ata_host_alloc_pinfo(struct device *dev,
- 	struct ata_host *host;
- 	int i, j;
- 
-+	/* We must have at least one port info */
-+	if (!ppi[0])
-+		return NULL;
-+
- 	host = ata_host_alloc(dev, n_ports);
- 	if (!host)
- 		return NULL;
- 
--	for (i = 0, j = 0, pi = NULL; i < host->n_ports; i++) {
-+	for (i = 0, j = 0, pi = ppi[0]; i < host->n_ports; i++) {
- 		struct ata_port *ap = host->ports[i];
- 
--		if (ppi[j])
--			pi = ppi[j++];
--
- 		ap->pio_mask = pi->pio_mask;
- 		ap->mwdma_mask = pi->mwdma_mask;
- 		ap->udma_mask = pi->udma_mask;
-@@ -5460,6 +5461,15 @@ struct ata_host *ata_host_alloc_pinfo(struct device *dev,
- 
- 		if (!host->ops && (pi->port_ops != &ata_dummy_port_ops))
- 			host->ops = pi->port_ops;
-+
-+		/*
-+		 * Check that the next port info is not NULL.
-+		 * If it is, keep using the current one.
-+		 */
-+		if (j < n_ports - 1 && ppi[j + 1]) {
-+			j++;
-+			pi = ppi[j];
-+		}
+@@ -5583,7 +5583,7 @@ int ata_host_start(struct ata_host *host)
+ 			have_stop = 1;
  	}
  
- 	return host;
+-	if (host->ops->host_stop)
++	if (host->ops && host->ops->host_stop)
+ 		have_stop = 1;
+ 
+ 	if (have_stop) {
 -- 
 2.31.1
 
