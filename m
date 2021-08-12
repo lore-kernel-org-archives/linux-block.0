@@ -2,213 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA20C4338F
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE99C4320A
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:19:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 410DB610A8
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:08:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DA1C6109F
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:19:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238384AbhHLPJA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 11:09:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57580 "EHLO
+        id S237489AbhHLPUS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 11:20:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238382AbhHLPI6 (ORCPT
+        with ESMTP id S235696AbhHLPUS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 11:08:58 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA896C0613D9
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:08:32 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id v10-20020a9d604a0000b02904fa9613b53dso8102791otj.6
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:08:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DgRvpKzMqUwNe01AoX0wUWkAhZnVkoKdGV1S13pUHXc=;
-        b=jLs3yIwVePiXQdFbHgTTwka5lLGzLnTlIqzGU4wU2t7tJ+JFYNdPq0uQh7hLGe0mXY
-         ZZ8cCTqGLxkLG6U9baB6D/q2lSiLvR+KMrXYJcSfB2gDO7ydTxIQ4n/hSh5wIfrHmXuT
-         K3L1es1eKh33BteNPkRVr0OOGqQo4f88XLhCe3BFFJYC/MEtG05FgJSmkCzQI0NF5rfR
-         AyWTHQR3cVEQHfnPBRGx8yFXH3AnASXyFBdf6Gax0B3PUicRNWhp+jeDfxpqHq41uDY5
-         /ITIY/aB7gr5ssWJhCRFuTExTs2pQSg+DN30lpHZXYq6Lu7aMk6XwMYpEyuBSx+fsCuy
-         MrLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DgRvpKzMqUwNe01AoX0wUWkAhZnVkoKdGV1S13pUHXc=;
-        b=pOLCO7707juehzyWuIH8EsQqCw8mmDpXZ5F8hqG8k39DO6FC/NvtPEVNHfSmqtq6iO
-         AzLyzhDu8CyNGeKxvjTUUPGREw9pN4KJJ2nfT1ljAreXXk91pfHW4h/+ei6t7yVX9cb3
-         5H1zhlU6BDqPpxanQyJZ8ijOYLZsyohkM27rRjsaGBDWPsEEDSJVDduFQOMVkO744mKM
-         oAllxOtnBkthzYs0VnJpFd5DVNdqdokFd4s/hqgPqrHg7m7RbGMzHaUg5fLI+C782+15
-         rXIky4LM72rvgs/hElznZyTZHq0K7WrvHvjEOUpmHAgQggtUp9mbcHl4YAXiLNewJXKC
-         jjuQ==
-X-Gm-Message-State: AOAM530z6TAgWjjcx+MQMlsoTVfx9TlTaEyhLtL7xFnUCpCYD0hNuxRP
-        P9RxTIdZPZkuJMd4P8/cJU3Nn0kg2aUyGuF0
-X-Google-Smtp-Source: ABdhPJzy1wEym/EySsm9b4JEdcpdGbSFD6+RfhcmdA28/1FpL9zs/gzMfRVrQrqm7pDnhcvwW/JM/A==
-X-Received: by 2002:a9d:6103:: with SMTP id i3mr3852508otj.277.1628780910647;
-        Thu, 12 Aug 2021 08:08:30 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id 65sm579662ooc.2.2021.08.12.08.08.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Aug 2021 08:08:30 -0700 (PDT)
+        Thu, 12 Aug 2021 11:20:18 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D63E4C061756;
+        Thu, 12 Aug 2021 08:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=r8cNJddWBoOtWaMWuMqZPq0UVdu3LyAnnoqeAE14WZc=; b=L79MeH8ZG+pOG5Dc7Fj9KUfud+
+        al3ivecEC0IJBRLEObATA4XaWQB9b1VetWi6/DzluRkz9daeKlZbQzOpto1QjEF25QJlctQ37/h4K
+        DpWURem/5Bd76NB4lIfI1jFHCfG44wb6JBuiEN0kn0NLKsCUQr7Tzsw7satwD8fkV1NqcilnkA1E2
+        YK8VRLZDz/OfUnyFFMYkguSqH2Npj2lbC3v//Xud5gwF+z27LcMaYc2jkSG9IlVWXyo/AISdtEeI0
+        X0azsGMCcNoE9Etks31F1pmeU6zUsHXz5GK02JdfOgMHkgCIsvbFfN0pBd/s8QA+ljlf9xKxrsTfj
+        Sp+9a5Qg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mECTn-00EhsB-9O; Thu, 12 Aug 2021 15:19:02 +0000
+Date:   Thu, 12 Aug 2021 16:18:47 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
 Subject: Re: [PATCH 3/6] bio: add allocation cache abstraction
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+Message-ID: <YRU713wjR0UBQ1uc@infradead.org>
 References: <20210811193533.766613-1-axboe@kernel.dk>
- <20210811193533.766613-4-axboe@kernel.dk> <YRTHTyz+tlRuGv2i@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <845afc13-448d-0cb1-f9f7-86ac91d27c0f@kernel.dk>
-Date:   Thu, 12 Aug 2021 09:08:29 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <20210811193533.766613-4-axboe@kernel.dk>
+ <YRTHTyz+tlRuGv2i@infradead.org>
+ <845afc13-448d-0cb1-f9f7-86ac91d27c0f@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <YRTHTyz+tlRuGv2i@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <845afc13-448d-0cb1-f9f7-86ac91d27c0f@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/12/21 1:01 AM, Christoph Hellwig wrote:
-> On Wed, Aug 11, 2021 at 01:35:30PM -0600, Jens Axboe wrote:
->> +	struct bio *bio;
->> +	unsigned int i;
->> +
->> +	i = 0;
+On Thu, Aug 12, 2021 at 09:08:29AM -0600, Jens Axboe wrote:
+> >> +	cache = per_cpu_ptr(bs->cache, get_cpu());
+> >> +	bio = bio_list_pop(&cache->free_list);
+> >> +	if (bio) {
+> >> +		cache->nr--;
+> >> +		put_cpu();
+> >> +		bio_init(bio, nr_vecs ? bio->bi_inline_vecs : NULL, nr_vecs);
+> >> +		bio_set_flag(bio, BIO_PERCPU_CACHE);
+> >> +		return bio;
+> >> +	}
+> >> +	put_cpu();
+> >> +normal_alloc:
+> >> +	bio = bio_alloc_bioset(gfp, nr_vecs, bs);
+> >> +	if (cache)
+> >> +		bio_set_flag(bio, BIO_PERCPU_CACHE);
+> >> +	return bio;
+> > 
+> > The goto here is pretty obsfucating and adds an extra patch to the fast
+> > path.
 > 
-> Initialize at declaration time?
+> I don't agree, and it's not the fast path - the fast path is popping off
+> a bio off the list, not hitting the allocator.
 
-Sure, done.
+Oh, I see you special case the list pop return now.  Still seems much
+easier to follow to avoid the goto, the cache initialization and the
+conditional in the no bio found in the list case (see patch below).
 
->> +static inline bool __bio_put(struct bio *bio)
->> +{
->> +	if (!bio_flagged(bio, BIO_REFFED))
->> +		return true;
->> +
->> +	BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
->> +
->> +	/*
->> +	 * last put frees it
->> +	 */
->> +	return atomic_dec_and_test(&bio->__bi_cnt);
->> +}
-> 
-> Please avoid this helper, we can trivially do the check inside of bio_put:
-> 
-> 	if (bio_flagged(bio, BIO_REFFED)) {
-> 		BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
-> 		if (!atomic_dec_and_test(&bio->__bi_cnt))
-> 			return;
-> 	}
-
-Done
-
->> -			bio_free(bio);
->> +	if (bio_flagged(bio, BIO_PERCPU_CACHE)) {
->> +		struct bio_alloc_cache *cache;
->> +
->> +		bio_uninit(bio);
->> +		cache = per_cpu_ptr(bio->bi_pool->cache, get_cpu());
->> +		bio_list_add_head(&cache->free_list, bio);
->> +		cache->nr++;
->> +		if (cache->nr > ALLOC_CACHE_MAX + ALLOC_CACHE_SLACK)
-> 
-> Folding the increment as a prefix here would make the increment and test
-> semantics a little more obvious.
-
-I don't really care that deeply about it, but I generally prefer keeping
-them separate as it makes it easier to read (for me). But I'll change it.
-
->> +struct bio *bio_alloc_kiocb(struct kiocb *kiocb, gfp_t gfp,
->> +			    unsigned short nr_vecs, struct bio_set *bs)
->> +{
->> +	struct bio_alloc_cache *cache = NULL;
->> +	struct bio *bio;
->> +
->> +	if (!(kiocb->ki_flags & IOCB_ALLOC_CACHE) || nr_vecs > BIO_INLINE_VECS)
->> +		goto normal_alloc;
->> +
->> +	cache = per_cpu_ptr(bs->cache, get_cpu());
->> +	bio = bio_list_pop(&cache->free_list);
->> +	if (bio) {
->> +		cache->nr--;
->> +		put_cpu();
->> +		bio_init(bio, nr_vecs ? bio->bi_inline_vecs : NULL, nr_vecs);
->> +		bio_set_flag(bio, BIO_PERCPU_CACHE);
->> +		return bio;
->> +	}
->> +	put_cpu();
->> +normal_alloc:
->> +	bio = bio_alloc_bioset(gfp, nr_vecs, bs);
->> +	if (cache)
->> +		bio_set_flag(bio, BIO_PERCPU_CACHE);
->> +	return bio;
-> 
-> The goto here is pretty obsfucating and adds an extra patch to the fast
-> path.
-
-I don't agree, and it's not the fast path - the fast path is popping off
-a bio off the list, not hitting the allocator.
-
-> Also I don't think we need the gfp argument here at all - it should
-> always be GFP_KERNEL.  In fact I plan to kill these arguments from much
-> of the block layer as the places that need NOIO of NOFS semantics can
-> and should move to set that in the per-thread context.
-
-Yeah, I actually kept it on purpose for future users, but let's just
-kill it as both potential use cases I have use GFP_KERNEL anyway.
-
->> -static inline struct bio *bio_list_pop(struct bio_list *bl)
->> +static inline void bio_list_del_head(struct bio_list *bl, struct bio *head)
->>  {
->> -	struct bio *bio = bl->head;
->> -
->> -	if (bio) {
->> +	if (head) {
->>  		bl->head = bl->head->bi_next;
->>  		if (!bl->head)
->>  			bl->tail = NULL;
->>  
->> -		bio->bi_next = NULL;
->> +		head->bi_next = NULL;
->>  	}
->> +}
->> +
->> +static inline struct bio *bio_list_pop(struct bio_list *bl)
->> +{
->> +	struct bio *bio = bl->head;
->>  
->> +	bio_list_del_head(bl, bio);
->>  	return bio;
->>  }
-> 
-> No need for this change.
-
-Leftover from earlier series, killed it now.
-
->> @@ -699,6 +706,12 @@ struct bio_set {
->>  	struct kmem_cache *bio_slab;
->>  	unsigned int front_pad;
->>  
->> +	/*
->> +	 * per-cpu bio alloc cache and notifier
->> +	 */
->> +	struct bio_alloc_cache __percpu *cache;
->> +	struct hlist_node cpuhp_dead;
->> +
-> 
-> I'd keep the hotplug list entry at the end instead of bloating the
-> cache line used in the fast path.
-
-Good point, moved to the end.
-
--- 
-Jens Axboe
-
+diff --git a/block/bio.c b/block/bio.c
+index 689335c00937..b42621cecbef 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1707,11 +1707,11 @@ EXPORT_SYMBOL(bioset_init_from_src);
+ struct bio *bio_alloc_kiocb(struct kiocb *kiocb, gfp_t gfp,
+ 			    unsigned short nr_vecs, struct bio_set *bs)
+ {
+-	struct bio_alloc_cache *cache = NULL;
++	struct bio_alloc_cache *cache;
+ 	struct bio *bio;
+ 
+ 	if (!(kiocb->ki_flags & IOCB_ALLOC_CACHE) || nr_vecs > BIO_INLINE_VECS)
+-		goto normal_alloc;
++		return bio_alloc_bioset(gfp, nr_vecs, bs);
+ 
+ 	cache = per_cpu_ptr(bs->cache, get_cpu());
+ 	bio = bio_list_pop(&cache->free_list);
+@@ -1723,10 +1723,8 @@ struct bio *bio_alloc_kiocb(struct kiocb *kiocb, gfp_t gfp,
+ 		return bio;
+ 	}
+ 	put_cpu();
+-normal_alloc:
+ 	bio = bio_alloc_bioset(gfp, nr_vecs, bs);
+-	if (cache)
+-		bio_set_flag(bio, BIO_PERCPU_CACHE);
++	bio_set_flag(bio, BIO_PERCPU_CACHE);
+ 	return bio;
+ }
+ 
