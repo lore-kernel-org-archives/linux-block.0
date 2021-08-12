@@ -2,143 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2C3C43214
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 13:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 258B3C4338F
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 14:14:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 874D66109D
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 13:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0372D6109D
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 14:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237782AbhHLNWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 09:22:44 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:51464 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237552AbhHLNTd (ORCPT
+        id S237901AbhHLOOw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 10:14:52 -0400
+Received: from vulcan.natalenko.name ([104.207.131.136]:47002 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231392AbhHLOOw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 09:19:33 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UinuYXj_1628774345;
-Received: from legedeMacBook-Pro.local(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0UinuYXj_1628774345)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 12 Aug 2021 21:19:06 +0800
-Subject: Re: [PATCH] blk-mq: fix kernel panic during iterating over flush
- request
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        John Garry <john.garry@huawei.com>,
-        "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>
-References: <20210811142624.618598-1-ming.lei@redhat.com>
- <fbb2f753-d28c-3400-3ad5-5ec863375428@linux.alibaba.com>
- <YRUcenpHYm6g+iBt@T590>
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Message-ID: <87735642-b7b9-f43a-8417-fbbe8fc096ed@linux.alibaba.com>
-Date:   Thu, 12 Aug 2021 21:19:05 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
+        Thu, 12 Aug 2021 10:14:52 -0400
+Received: from spock.localnet (unknown [151.237.229.131])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id 207B2B8CF08;
+        Thu, 12 Aug 2021 16:14:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1628777665;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2zZl6XlT1y6Vd7b8+nZZ1Gb1yoaa9GSekZcm7zSfwAg=;
+        b=dUxHh9TWsdFhJNB8f1oXzq9WAldcJScect52jKcM800buInFPlD5BzVuiaix7ZWA2RHB8J
+        3hmK5I9dQZmFpaItDQ1Mq5U/JfNUZQu1/+PgZfqZn7VYqCeJVW2ce2d8/zL1ZCKRoRTYhg
+        CYKAX/U+O8qtOyLwr8BGDgXCoybO4rU=
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH block-5.14] Revert "block/mq-deadline: Add cgroup support"
+Date:   Thu, 12 Aug 2021 16:14:23 +0200
+Message-ID: <1700769.Imp7hYaAdB@natalenko.name>
+In-Reply-To: <9683ccee-776f-70d6-39a5-2f9b7552b189@kernel.dk>
+References: <YRQL2dlLsQ6mGNtz@slm.duckdns.org> <9683ccee-776f-70d6-39a5-2f9b7552b189@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <YRUcenpHYm6g+iBt@T590>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hi,
+Hi.
+
+On st=C5=99eda 11. srpna 2021 21:48:19 CEST Jens Axboe wrote:
+> On 8/11/21 11:41 AM, Tejun Heo wrote:
+> > From e150c6478e453fe27b5cf83ed5d03b7582b6d35e Mon Sep 17 00:00:00 2001
+> > From: Tejun Heo <tj@kernel.org>
+> > Date: Wed, 11 Aug 2021 07:29:20 -1000
+> >=20
+> > This reverts commit 08a9ad8bf607 ("block/mq-deadline: Add cgroup suppor=
+t")
+> > and a follow-up commit c06bc5a3fb42 ("block/mq-deadline: Remove a
+> > WARN_ON_ONCE() call"). The added cgroup support has the following issue=
+s:
+> >=20
+> > * It breaks cgroup interface file format rule by adding custom elements=
+ to
+> > a>=20
+> >   nested key-value file.
+> >=20
+> > * It registers mq-deadline as a cgroup-aware policy even though all it's
+> >=20
+> >   doing is collecting per-cgroup stats. Even if we need these stats, th=
+is
+> >   isn't the right way to add them.
+> >=20
+> > * It hasn't been reviewed from cgroup side.
+>=20
+> I missed that the cgroup side hadn't seen or signed off on this one. I
+> have applied this revert for 5.14.
+
+Should my commit [1] be reverted too?
+
+Thanks.
+
+[1] https://git.kernel.dk/cgit/linux-block/commit/?h=3Dblock-5.14&id=3Dec64=
+5dc96699ea6c37b6de86c84d7288ea9a4ddf
+
+=2D-=20
+Oleksandr Natalenko (post-factum)
 
 
-> On Thu, Aug 12, 2021 at 07:47:55PM +0800, Xiaoguang Wang wrote:
->> hi,
->>
->>
->>> For fixing use-after-free during iterating over requests, we grabbed
->>> request's refcount before calling ->fn in commit 2e315dc07df0 ("blk-mq:
->>> grab rq->refcount before calling ->fn in blk_mq_tagset_busy_iter").
->>> Turns out this way may cause kernel panic when iterating over one flush
->>> request:
->>>
->>> 1) old flush request's tag is just released, and this tag is reused by
->>> one new request, but ->rqs[] isn't updated yet
->>>
->>> 2) the flush request can be re-used for submitting one new flush command,
->>> so blk_rq_init() is called at the same time
->>>
->>> 3) meantime blk_mq_queue_tag_busy_iter() is called, and old flush request
->>> is retrieved from ->rqs[tag]; when blk_mq_put_rq_ref() is called,
->>> flush_rq->end_io may not be updated yet, so NULL pointer dereference
->>> is triggered in blk_mq_put_rq_ref().
->>>
->>> Fix the issue by calling refcount_set(&flush_rq->ref, 1) after
->>> flush_rq->end_io is set. So far the only other caller of blk_rq_init() is
->>> scsi_ioctl_reset() in which the request doesn't enter block IO stack and
->>> the request reference count isn't used, so the change is safe.
->>>
->>> Fixes: 2e315dc07df0 ("blk-mq: grab rq->refcount before calling ->fn in
->>> blk_mq_tagset_busy_iter")
->>> Reported-by: "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>
->>> Tested-by: "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>    block/blk-core.c  | 1 -
->>>    block/blk-flush.c | 8 ++++++++
->>>    2 files changed, 8 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/block/blk-core.c b/block/blk-core.c
->>> index 0874bc2fcdb4..b5098739f72a 100644
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -121,7 +121,6 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
->>>    	rq->internal_tag = BLK_MQ_NO_TAG;
->>>    	rq->start_time_ns = ktime_get_ns();
->>>    	rq->part = NULL;
->>> -	refcount_set(&rq->ref, 1);
->>>    	blk_crypto_rq_set_defaults(rq);
->>>    }
->>>    EXPORT_SYMBOL(blk_rq_init);
->>> diff --git a/block/blk-flush.c b/block/blk-flush.c
->>> index 1002f6c58181..4912c8dbb1d8 100644
->>> --- a/block/blk-flush.c
->>> +++ b/block/blk-flush.c
->>> @@ -329,6 +329,14 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
->>>    	flush_rq->rq_flags |= RQF_FLUSH_SEQ;
->>>    	flush_rq->rq_disk = first_rq->rq_disk;
->>>    	flush_rq->end_io = flush_end_io;
->>> +	/*
->>> +	 * Order WRITE ->end_io and WRITE rq->ref, and its pair is the one
->>> +	 * implied in refcount_inc_not_zero() called from
->>> +	 * blk_mq_find_and_get_req(), which orders WRITE/READ flush_rq->ref
->>> +	 * and READ flush_rq->end_io
->> Recently we run into similar panic which is a NULL dereference on
->> rq->mq_hctx in is_flush_rq(), we also
->>
->> guess there is race bug just what you have fixed.
->>
->> But I have one question here, for a blk-mq device, before issuing the first
->> flush req, flush_rq->end_io
->>
->> is NULL, and for following flush reqs on this blk-mq device,
->> flush_rq->end_io won't be NULL. I searched
->>
->> the codes and don't find any place that sets flush_rq->end_io to be NULL
->> once flush_rq has been completed.
-> blk_kick_flush():
-> 	blk_rq_init
-> 		memset(rq, 0, sizeof(*rq));
-
-Oh, thanks.
-
-I searched codes for quite a while...
-
-
-Regards,
-
-Xiaoguang Wang
-
->
->
-> Thanks,
-> Ming
