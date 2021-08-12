@@ -2,147 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E666C4320E
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B2DC4338F
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:51:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 798BB610A5
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C41AC6023D
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 17:51:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbhHLRm1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 13:42:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36884 "EHLO
+        id S231898AbhHLRvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 13:51:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236425AbhHLRm0 (ORCPT
+        with ESMTP id S229851AbhHLRvx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 13:42:26 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD242C061756
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 10:42:00 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id n1-20020a9d1e810000b0290514da4485e4so5944409otn.4
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 10:42:00 -0700 (PDT)
+        Thu, 12 Aug 2021 13:51:53 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99281C061756
+        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 10:51:27 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id w6so1255705plg.9
+        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 10:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=60yfRd4sojuQKE6S/RBrSfNvNV6kIhsQPId8pEeVRSI=;
-        b=P+ernqdhz2CakabaEpmgSKCUwXxfkA6+QDN8eNfNzfO2qClNod32xfqM5wPpNKlMgQ
-         RzTu2NNN1Jhx8sZxn0F+kHgQ6V+uzCkN8IUMCTDw6HzESKNsRrRT7Wc2LBZ+sXLTf9qO
-         xtPIVyjOisx1w8J7QJnZczR6RHbZaRYm4Y2ELdgVjITeZjlLWfLuyMSIyXMa1+f5dSrF
-         nv90WAcYf6264xsuPhYrxAMaOAs9T7meIpKlFLtCjQFyPfLyvmNSU8w4YXazwK54j71I
-         WtiSU6XfwmBmzTK6KjNUwP5gWWcByXkCaRM4S/svkUCtq8J5TIJ0Nz6jk8DoLlrBg7xB
-         a5SQ==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wGEAHEKYrtOJrXzeFGGKYZztKgQYv9DCEEL/obPElAA=;
+        b=gB0g6EvNQwFjmW4sUTQifzSjGB0jQJkIa6wd/d0ia6dxDG/V8Lvii+r8RkYihDkzJj
+         SXt17ULMSFtTLn1S9b26soljV+AstuwBda+2MCUICy6M47DZTODzHyoVxSuDewYUr4OK
+         2/rGtOmK6wmTEOHmvae/sQieRdtHrCaHlCkPLy3s6HWp+/CLV5/zmS6I1ER1eWvULmDN
+         mraojDlehK3N2KHiicGfvGliSd6lCsfC0ev5S+a7zOJlHKoqvm869vkqOeQSBhsopB7h
+         zEESR3NCKTks1ABD5Afd4xGmm4s/TgooQcmbJKZTMIFkQD2mXoLljog024zvEOcYBmZE
+         RjcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=60yfRd4sojuQKE6S/RBrSfNvNV6kIhsQPId8pEeVRSI=;
-        b=iH7eIRi8/Yc5fDrnHBKt5n+euL83KTA2GMCumvEh5PVZKyR3UOxDBSgQ1YOjVyc0pE
-         ZpI+0wXr7LEFRgqjdLLgYeTP5rQoj5QyK6RwUPYPwPj+ptNqlaM5hHCdP1NSErOfyCEo
-         L+niY7jVGJO115yspTbQuW9DzcAm2C9rzhnQ+LIc4jyN5WldRAl7kX44GsLCpudAtWoy
-         u94VjoTNvQTG1VcczRK7xkEj4k4nk38jT1GfBYWKa1k7ufjNeKocyysxjw14U+3SwJ+/
-         M1KddKtxroxcn9IFcfXg9Cg+cKVIabBveGMA4WyuVdRkIZL5H+2yDTdYfXyxt0JSGFhG
-         MvUw==
-X-Gm-Message-State: AOAM532AwkXuL90IjwuwXXwlUIcKcz2uAYYZsoD8mcLIVcN4wBGxBbOf
-        s1pxpqcNosWu6Xn1Sj/jGMd/1A==
-X-Google-Smtp-Source: ABdhPJyhCw+WpGEcKPi/OlyJ998SVh3UuqAGLj+cV5FGggfsb+fsvyMAatfgkc4AzYFCxAkckt651A==
-X-Received: by 2002:a05:6830:4429:: with SMTP id q41mr4451581otv.284.1628790120124;
-        Thu, 12 Aug 2021 10:42:00 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id p8sm778918otk.22.2021.08.12.10.41.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Aug 2021 10:41:59 -0700 (PDT)
-Subject: Re: [PATCH 4/6] block: clear BIO_PERCPU_CACHE flag if polling isn't
- supported
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@infradead.org
-References: <20210812154149.1061502-1-axboe@kernel.dk>
- <20210812154149.1061502-5-axboe@kernel.dk>
- <20210812173143.GA3138953@dhcp-10-100-145-180.wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b60e0031-77b0-fe27-2b52-437ba21babcb@kernel.dk>
-Date:   Thu, 12 Aug 2021 11:41:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=wGEAHEKYrtOJrXzeFGGKYZztKgQYv9DCEEL/obPElAA=;
+        b=c8bqzMYt+SEyKcqpE/GMGqJfye5ys0h8+YSetn0fKR2GS03N1crYtjqnRmD+9IsAGC
+         mCleiGTxdGO2BJet+4sILK58yT92KSNZWsrY4TOgQAfkfJYJf5z9TjzfBX1b9sl9vVwG
+         F6+vkDdTyENrutHeEocqMXwbUFfch9++CBAbINxG02lziV/DZ//vU0dqzXBoYD1Em/Go
+         zaa85ykOPfAWglHUQtFqeMhsglnOf8J5cXGS4xz9SlnvTybyYr8faDFqltxq8G9YAtvz
+         rQ3H6ky5UuzaG0UvnM4NnNLEe99aNVM3NL2XvHAOtiLHcdGM9SXvLcuraeJX10cjQmCl
+         EhbA==
+X-Gm-Message-State: AOAM533yuMN5NYxaCttmhtjHhJErXpMTUEUJEZXezZaHtPW634EYxppu
+        Q0eE6DQkgGNP9SlL4R//hvI=
+X-Google-Smtp-Source: ABdhPJxPaaAQYpEc5ygF97L3OTaz4pdkao2MeTKzDTDsRanNlKpSZDo2PXQ6qtYBL/VHoG08JxLHIg==
+X-Received: by 2002:a17:90b:1950:: with SMTP id nk16mr5432835pjb.11.1628790686980;
+        Thu, 12 Aug 2021 10:51:26 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:90ad])
+        by smtp.gmail.com with ESMTPSA id 143sm4199446pfx.1.2021.08.12.10.51.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Aug 2021 10:51:26 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 12 Aug 2021 07:51:21 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH block-5.14] Revert "block/mq-deadline: Add cgroup support"
+Message-ID: <YRVfmWnOyPYl/okx@mtj.duckdns.org>
+References: <YRQL2dlLsQ6mGNtz@slm.duckdns.org>
+ <035f8334-3b69-667d-be91-92dcab9dc887@acm.org>
+ <YRQhlPBqAlkJdowG@mtj.duckdns.org>
+ <00e13a7b-6009-a9d7-41ba-aae82f5813de@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20210812173143.GA3138953@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00e13a7b-6009-a9d7-41ba-aae82f5813de@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/12/21 11:31 AM, Keith Busch wrote:
-> On Thu, Aug 12, 2021 at 09:41:47AM -0600, Jens Axboe wrote:
->> -	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
->> +	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags)) {
->> +		/* can't support alloc cache if we turn off polling */
->> +		bio_clear_flag(bio, BIO_PERCPU_CACHE);
->>  		bio->bi_opf &= ~REQ_HIPRI;
->> +	}
+On Wed, Aug 11, 2021 at 01:22:20PM -0700, Bart Van Assche wrote:
+> On 8/11/21 12:14 PM, Tejun Heo wrote:
+> > On Wed, Aug 11, 2021 at 11:49:10AM -0700, Bart Van Assche wrote:
+> > > You write that this isn't the right way to collect per cgroup stats. What is
+> > > the "right way"? Has this been documented somewhere?
+> > 
+> > Well, there's nothing specific to mq-deadline or any other elevator or
+> > controller about the stats that your patch collected and showed. That
+> > seems like a pretty straight forward sign that it likely doens't
+> > belong there.
 > 
-> It looks like you should also clear BIO_PERCPU_CACHE if this bio gets
-> split in blk_bio_segment_split().
+> Do you perhaps want these statistics to be reported via read-only cgroup
+> attributes of a new cgroup policy that is independent of any particular I/O
+> scheduler?
 
-Indeed. Wonder if we should make that a small helper, as any clear of
-REQ_HIPRI should clear BIO_PERCPU_CACHE as well.
+There's an almost fundamental conflict between ioprio and cgroup IO
+control. bfq layers it so that ioprio classes define the global
+priority above weights and then ioprio modifies the weights within
+each class. mq-deadline isn't cgroup aware and who knows what kind of
+priority inversions it's creating when its ioprio enforcement is
+interacting with other cgroup controllers.
 
+The problem is that as currently used, they're specifying the same
+things - how IO should be distributed globally in the system, and
+there's no right way to make the two configuration configuration
+regimes agree on what should happen on the system.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 7e852242f4cc..d2722ecd4d9b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -821,11 +821,8 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
- 		}
- 	}
- 
--	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags)) {
--		/* can't support alloc cache if we turn off polling */
--		bio_clear_flag(bio, BIO_PERCPU_CACHE);
--		bio->bi_opf &= ~REQ_HIPRI;
--	}
-+	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-+		bio_clear_hipri(bio);
- 
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index f8707ff7e2fc..985ca1116c32 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -285,7 +285,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	 * iopoll in direct IO routine. Given performance gain of iopoll for
- 	 * big IO can be trival, disable iopoll when split needed.
- 	 */
--	bio->bi_opf &= ~REQ_HIPRI;
-+	bio_clear_hipri(bio);
- 
- 	return bio_split(bio, sectors, GFP_NOIO, bs);
- }
-diff --git a/block/blk.h b/block/blk.h
-index db6f82bbb683..7dba254b45f2 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -367,4 +367,11 @@ extern struct device_attribute dev_attr_events;
- extern struct device_attribute dev_attr_events_async;
- extern struct device_attribute dev_attr_events_poll_msecs;
- 
-+static inline void bio_clear_hipri(struct bio *bio)
-+{
-+	/* can't support alloc cache if we turn off polling */
-+	bio_clear_flag(bio, BIO_PERCPU_CACHE);
-+	bio->bi_opf &= ~REQ_HIPRI;
-+}
-+
- #endif /* BLK_INTERNAL_H */
+I can see two paths forward:
+
+1. Accept that ioprio isn't something which makes senes with cgroup IO
+   control in a generic manner and approach it in per-configuration
+   manner, either by doing whatever the specific combination decided
+   to do with ioprio or ignoring it.
+
+2. The only generic way to integrate ioprio and cgroup IO control
+   would be nesting ioprio inside cgroup IO control, so that ioprio
+   can express per-process priority within each cgroup. While this
+   makes semantic sense and can be useful in certain scenarios, this
+   is also a departure from how people have been using ioprio and it'd
+   be involve quite a bit of effort and complexity, likely too much to
+   be justified by its inherent usefulness.
+
+Jens, what do you think?
+
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
