@@ -2,121 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98277C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7EBC432BE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:35:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7837D610A3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:29:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0D3F60FC0
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:35:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237778AbhHLP3f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 11:29:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34192 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236942AbhHLP3e (ORCPT
+        id S236596AbhHLPgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 11:36:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40109 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236638AbhHLPgL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 11:29:34 -0400
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C6F8C0613D9
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:29:09 -0700 (PDT)
-Received: by mail-oo1-xc32.google.com with SMTP id o17-20020a4a64110000b0290263e1ba7ff9so1912340ooc.2
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:29:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5K81qzSnbslnyNoHQzQWlG0SOo00nOS1V/Q3Cobq2Iw=;
-        b=wjp+pOCEs9a7GU2ohjtageszgk+f4eBfvh8hpYOR8WM1tQd0fcSBSNwi7oyOimufAv
-         spiRSuNVirQI6vNYU0Ultlj42VrtUpfvp55JrpIDICeMwMgPpQa7YFJcchOcnTtrBAkf
-         Rv1o4qYkVy0MlnzdQoPvuhZqOcJsMJK6N6fzSAUdtl4YsphDePc26GEZtTbRmDMbJIJH
-         stamWPlIdZTALKbs/O3ZqJYOnFVjwQuhbwlRcCpvyvaiUExzCO9LChOGXn/50Pfsk++q
-         bkMo84kue/tlkmNpsGu8bX9M23uwlaWPPs4zxUKyYBXdQO/gXIdhaRARUbD2nhy4kboN
-         bfAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5K81qzSnbslnyNoHQzQWlG0SOo00nOS1V/Q3Cobq2Iw=;
-        b=sne/1oMiKw3FycO4llW0t685H9PXKaaskSJAQp5V+n2jDmxHFGG0suzmeQSl7GyQpp
-         aR+X4z6PezeGA1HX8nosbiaSa4V2saKLRQbFiUfrGL/Ol9iiX5OIxlgWPwFicc2njoy9
-         mLSFG3YQ8mKcWRw1bqjNo6CAMCqpWKSsDchqKH9U4n/cDAsBmJHhpcGfaunBDlvWMlWL
-         YO0/muhQ7xc2qgCPk9j8VCQJVHiA3QzcJaHDV7CaGkOnBg0rC+kKgvMjN9bw/JPiDP1U
-         VB5MLfW3Bm7ZsCZuNzhaa+7nvm/UzH7dvUJCwp58vWWUayH5jmz19lBzUKtkxqggB/97
-         tdSw==
-X-Gm-Message-State: AOAM530oC0ENEgshOZ2uz39HNlObc4NPGH5g54MzKei/iIVIZX5tD8iJ
-        c6m5sqrO/X7wb+B0TxK3no5P4tm+lT5KsCjL
-X-Google-Smtp-Source: ABdhPJz1WZccMGdrXd5ys6QCNcjUVuBa3wkrMoXH4xi9cNJnuR/yMuoDMqmCTInP83j9I6Cdfn7npg==
-X-Received: by 2002:a4a:b04c:: with SMTP id g12mr3497225oon.3.1628782148652;
-        Thu, 12 Aug 2021 08:29:08 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q13sm577115oov.6.2021.08.12.08.29.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Aug 2021 08:29:08 -0700 (PDT)
-Subject: Re: [PATCH 1/6] bio: optimize initialization of a bio
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20210811193533.766613-1-axboe@kernel.dk>
- <20210811193533.766613-2-axboe@kernel.dk> <YRTFDLv7R4ltlvpa@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <46c21d40-2b31-d3e1-f32f-98865c969040@kernel.dk>
-Date:   Thu, 12 Aug 2021 09:29:07 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 12 Aug 2021 11:36:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628782541;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NHxcJB6Dx8/bsst5x+A7CZjcxgMXd7//qJ3xADNRAT8=;
+        b=iFbR0uGGSMFaolOPiftR0209zIzjSrJtXusWWq9vCSOS9fp65AdVT+wwIIje+HpzZBFgBj
+        um0SfuKXwhd5kZjEjqvFLG+yvIKSoSljgI28VpWT5GE6Yr2wd8pePC9dfWB6ADU4a2VXf+
+        zKDTnwv8OfJxlCqR/MeKjpqz57oZQAE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-588-oLMqJgz-PaSewlFGmDQ1nA-1; Thu, 12 Aug 2021 11:35:37 -0400
+X-MC-Unique: oLMqJgz-PaSewlFGmDQ1nA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A077E100A972;
+        Thu, 12 Aug 2021 15:35:28 +0000 (UTC)
+Received: from redhat.com (ovpn-112-138.phx2.redhat.com [10.3.112.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BFD9783BF8;
+        Thu, 12 Aug 2021 15:35:27 +0000 (UTC)
+Date:   Thu, 12 Aug 2021 10:35:25 -0500
+From:   Eric Blake <eblake@redhat.com>
+To:     Pavel Skripkin <paskripkin@gmail.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, hch@lst.de,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+9937dc42271cd87d4b98@syzkaller.appspotmail.com
+Subject: Re: [PATCH] block: nbd: add sanity check for first_minor
+Message-ID: <20210812153525.hlged76ivhqtffyg@redhat.com>
+References: <20210812091501.22648-1-paskripkin@gmail.com>
+ <7f9a6877-12d9-0177-d09a-6522e5a557ec@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YRTFDLv7R4ltlvpa@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f9a6877-12d9-0177-d09a-6522e5a557ec@gmail.com>
+User-Agent: NeoMutt/20210205-687-0ed190
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/12/21 12:51 AM, Christoph Hellwig wrote:
-> On Wed, Aug 11, 2021 at 01:35:28PM -0600, Jens Axboe wrote:
->> The memset() used is measurably slower in targeted benchmarks. Get rid
->> of it and fill in the bio manually, in a separate helper.
+On Thu, Aug 12, 2021 at 12:42:38PM +0300, Pavel Skripkin wrote:
 > 
-> If you have some numbers if would be great to throw them in here.
+> Fun thing: I got a reply to this email from
+> nsd-public@police.gov.hk, which is Hong Kong Police office email. Does
+> anyone know what is going on? :) It's a bit scary...
 
-It's about 1% of the overhead of the alloc after the cache, which
-comes later in the series.
-
-Percent│    return __underlying_memset(p, c, size);
-       │      lea    0x8(%r8),%rdi
-       │    bio_alloc_kiocb():
-  2.18 │      cmove  %rax,%r9
-       │    memset():
-       │      mov    %r8,%rcx
-       │      and    $0xfffffffffffffff8,%rdi
-       │      movq   $0x0,(%r8)
-       │      sub    %rdi,%rcx
-       │      add    $0x60,%ecx
-       │      shr    $0x3,%ecx
- 55.02 │      rep    stos %rax,%es:(%rdi)
-
-This is on AMD, might look different on Intel, the manual clear seems
-like a nice win on both. As a minor detail, avoids things like
-re-setting bio->bi_pool for cached entries, as it never changes.
-
-
->> +static inline void __bio_init(struct bio *bio)
-> 
-> Why is this split from bio_init and what are the criteria where an
-> initialization goes?
-
-Got rid of the helper.
-
->> +	bio->bi_flags = bio->bi_ioprio = bio->bi_write_hint = 0;
-> 
-> Please keep each initialization on a separate line.
-
-Done
+You are not alone.  Apparently, someone subscribed that address to the
+nbd@other.debian.org list and it is auto-responding to every message
+it receives; hopefully, a list administrator (I am not one) will be
+willing to forcefully unsubscribe that address.
 
 -- 
-Jens Axboe
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
