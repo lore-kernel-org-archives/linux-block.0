@@ -2,79 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7EBC432BE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D20A5C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:41:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0D3F60FC0
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:35:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B903160F91
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:41:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236596AbhHLPgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 11:36:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40109 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236638AbhHLPgL (ORCPT
+        id S238172AbhHLPmS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 11:42:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237375AbhHLPmR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 11:36:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628782541;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NHxcJB6Dx8/bsst5x+A7CZjcxgMXd7//qJ3xADNRAT8=;
-        b=iFbR0uGGSMFaolOPiftR0209zIzjSrJtXusWWq9vCSOS9fp65AdVT+wwIIje+HpzZBFgBj
-        um0SfuKXwhd5kZjEjqvFLG+yvIKSoSljgI28VpWT5GE6Yr2wd8pePC9dfWB6ADU4a2VXf+
-        zKDTnwv8OfJxlCqR/MeKjpqz57oZQAE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-oLMqJgz-PaSewlFGmDQ1nA-1; Thu, 12 Aug 2021 11:35:37 -0400
-X-MC-Unique: oLMqJgz-PaSewlFGmDQ1nA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A077E100A972;
-        Thu, 12 Aug 2021 15:35:28 +0000 (UTC)
-Received: from redhat.com (ovpn-112-138.phx2.redhat.com [10.3.112.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BFD9783BF8;
-        Thu, 12 Aug 2021 15:35:27 +0000 (UTC)
-Date:   Thu, 12 Aug 2021 10:35:25 -0500
-From:   Eric Blake <eblake@redhat.com>
-To:     Pavel Skripkin <paskripkin@gmail.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, hch@lst.de,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+9937dc42271cd87d4b98@syzkaller.appspotmail.com
-Subject: Re: [PATCH] block: nbd: add sanity check for first_minor
-Message-ID: <20210812153525.hlged76ivhqtffyg@redhat.com>
-References: <20210812091501.22648-1-paskripkin@gmail.com>
- <7f9a6877-12d9-0177-d09a-6522e5a557ec@gmail.com>
+        Thu, 12 Aug 2021 11:42:17 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96CC7C061756
+        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:41:52 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id l36-20020a0568302b24b0290517526ce5e3so793297otv.11
+        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:41:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2s82tmKVU8sl/Qe4wFsHJc+u0KltczDQHVAOHyV1KHA=;
+        b=EvyI0QYzqqVtHvfPjJjjAyUArww/yQnXGepKYknu5bFEGDs/mLvyC6lJBbE7xZY7h+
+         Kd8fziecTlJPRNnCBTzTWBPqXMjX82x/wnQof2ULuOipy3Q8b6AxjqxdGnZQXbZtfSWr
+         EHRgubfFXQrG8Bb4tx49Kh8/CxvcWeuhcTDS/nfuc6NXs41xWev2NTZGOcjh8MJA6u5V
+         0XipNRRAhtBmRDZAcTF+jT83rrCtybFhsmEipPdPZdttb7oNwoggiKIW8jCAcDt+SPrH
+         9pr5GSiN4Cak0cmopjkmB37rkvZ8PIMme0tQyPdjC67RhdBEO7HGM1Ui3vi0CRQnlfYB
+         /3cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2s82tmKVU8sl/Qe4wFsHJc+u0KltczDQHVAOHyV1KHA=;
+        b=OZ5iCQkPNJukBL1IqnxQLQynL0rDspuubSuHVnIqv3/4rtsAoJxXIP1CMZpTGxeb2Z
+         WtUH2yrWeVRVvnN7A9wFTtONj91dNxhwvQBhmr7uHBpctLdoZkObXlZ4c1zRpfqrcasV
+         BULvig1+eLkzXGJGUBUBaGRFLO2nlszlG2CYDHyJ/qiRMNVNEitAmoDVk44QmbxEoiRc
+         MiLTkLGPgutmk4N+j8xx/IR+viTxkYP1vAWM2O6xxLVxWTsNb6wfiDOWcgVOEJ1UP8oG
+         JpBXB6lsS36in/S3lQLez7J+tuLo9bdGnsHWjcnyqWTPbc7Kxu11nD+qK57x1NMhV5Xb
+         fc+g==
+X-Gm-Message-State: AOAM531AcyhDUOTTo6Yb75QPiAcqCL0xMgIzHq3VohM22xSd0c64Oi81
+        e9Q+fTt9UTZHf034gwl1Ps9TTg==
+X-Google-Smtp-Source: ABdhPJw5qfTKvc2KfY7vLODdNAZyhiCxNItt1a+NNJaTy//R4Rx9EadYZ7b5ICf2anLEYGTENpdtYQ==
+X-Received: by 2002:a9d:560a:: with SMTP id e10mr3935453oti.219.1628782911898;
+        Thu, 12 Aug 2021 08:41:51 -0700 (PDT)
+Received: from p1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id w16sm690973oih.19.2021.08.12.08.41.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Aug 2021 08:41:51 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     io-uring@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, hch@infradead.org
+Subject: [PATCHSET v5 0/6] Enable bio recycling for polled IO
+Date:   Thu, 12 Aug 2021 09:41:43 -0600
+Message-Id: <20210812154149.1061502-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7f9a6877-12d9-0177-d09a-6522e5a557ec@gmail.com>
-User-Agent: NeoMutt/20210205-687-0ed190
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 12, 2021 at 12:42:38PM +0300, Pavel Skripkin wrote:
-> 
-> Fun thing: I got a reply to this email from
-> nsd-public@police.gov.hk, which is Hong Kong Police office email. Does
-> anyone know what is going on? :) It's a bit scary...
+Hi,
 
-You are not alone.  Apparently, someone subscribed that address to the
-nbd@other.debian.org list and it is auto-responding to every message
-it receives; hopefully, a list administrator (I am not one) will be
-willing to forcefully unsubscribe that address.
+For v4, see posting here:
+
+https://lore.kernel.org/io-uring/20210811193533.766613-1-axboe@kernel.dk/
+
+3.5M+ IOPS per core:
+
+axboe@amd ~/g/fio (master)> sudo taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 /dev/nvme3n1
+i 8, argc 9
+Added file /dev/nvme3n1 (submitter 0)
+sq_ring ptr = 0x0x7fdab1a8d000
+sqes ptr    = 0x0x7fdab1a8b000
+cq_ring ptr = 0x0x7fdab1a89000
+polled=1, fixedbufs=1, register_files=1, buffered=0 QD=128, sq_ring=128, cq_ring=256
+submitter=1757
+IOPS=3520608, IOS/call=32/31, inflight=47 (47)
+IOPS=3514432, IOS/call=32/32, inflight=32 (32)
+IOPS=3513440, IOS/call=32/31, inflight=128 (128)
+IOPS=3507616, IOS/call=32/32, inflight=32 (32)
+IOPS=3505984, IOS/call=32/32, inflight=32 (32)
+IOPS=3511328, IOS/call=32/31, inflight=64 (64)
+[snip]
+
+Changes can also be bound in my io_uring-bio-cache.5 branch, and sit
+on top of for-5.15/io_uring.
+
+ block/bio.c                | 164 +++++++++++++++++++++++++++++++++----
+ block/blk-core.c           |   5 +-
+ fs/block_dev.c             |   6 +-
+ fs/io_uring.c              |   2 +-
+ include/linux/bio.h        |  13 +++
+ include/linux/blk_types.h  |   1 +
+ include/linux/cpuhotplug.h |   1 +
+ include/linux/fs.h         |   2 +
+ 8 files changed, 175 insertions(+), 19 deletions(-)
+
+Changes since v4:
+
+- Kill __bio_init() helper
+- Kill __bio_put() helper
+- Cleanup bio_alloc_kiocb()
+- Expand commit messages
+- Various little tweaks
+- Add kerneldoc for bio_alloc_kiocb()
+- Fix attribution on last patch
+- Remove bio.h list manipulation leftovers
+- Move cpuhp_dead notifier to end of bio_set
+- Rebase on for-5.15/io_uring
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Jens Axboe
+
 
