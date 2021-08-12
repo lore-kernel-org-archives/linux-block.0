@@ -2,161 +2,415 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6C6C432BE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 02:44:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB6DC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 05:43:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C30546105A
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 02:44:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5A156103E
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 05:43:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233763AbhHLCoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Aug 2021 22:44:39 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:60797 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233741AbhHLCoi (ORCPT
+        id S234444AbhHLFoT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 01:44:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40182 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234367AbhHLFoT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Aug 2021 22:44:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1628736253; x=1660272253;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vN2oiBTls/J4Y9W2lVbQUymPeVbZdsgb/efvUuqJGVQ=;
-  b=n1csh0TcaAiFZyiTJmdRZIKCAAEFzYE8WIWO2LQYZoR/dskA+12tRka4
-   LzpIcxN856v+2AE68sntAbFid2IU4vcZMux6msOmWrC7utUVI+HWcXvrk
-   P+hhMUeylu0O4bieTdcSNsq/V7Za4ogxStjEBhmNtSvOLW+yv/6W/hHqQ
-   bHQvQ2XPynnUwVUer5jRQ5sBxNXZpiTR+RmUJ+8fn2niYaFd4ci19Qh/R
-   MRu6V8XTxp54NNH49bjlOhJQoV0sm25KIFQtciMCxb5nALyY3OIWI4T6t
-   poz/y79R7NJ4n1btms+AdUvfY9u3s6bK9TpqXzmjfgg8GRz108vYOxA4U
-   w==;
-X-IronPort-AV: E=Sophos;i="5.84,314,1620662400"; 
-   d="scan'208";a="176999907"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Aug 2021 10:44:13 +0800
-IronPort-SDR: 4+iGKYXZy103vRapqDYWY8dtCgnci9E7nVwqTdWajA/N3vHHafvakjIG1WseL04tcXeEnzLxcb
- lbDi7E8rc6KPAWqFPbqr6uY17EVopiiF7WDn11tx4DFOcNUY5l9Nz3lLwd1HQn77Wh92WfluEd
- 2s9XM844iY2iSKn5Jk5UWBOL9oaucLJlHJkxvkRGqVsmJfkZXwOvQqBbT16Cywr0KnYGKsc+A6
- 11MiwgSknXA6WFkA6lAzFCKojxWifqqb90RvFg9hUijSd4U+DfNub+CQQa+UcjLm5qqKFBnHGe
- Zxo8YC5EBJ40BqaqQj3dm6AT
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2021 19:19:43 -0700
-IronPort-SDR: q6dw9ImJYlSjHIIJCMz2J9XI1elAbfyeakh7P6huB+O9Nv9mJBLVe0M1c9oa+TYMOuSqCpRZFS
- 0WKfGDeT64fFLCxE1mGWje9x35cyNjWlrjfFVAkKBDa1ei8TglU76zc6EX6qbU61GMC4E9F6ZL
- GUdOjsq7FAhsfCLns5TstVr3EjP7lUpHBF63x8D8zt+XWel3XcDnYBaclSvqrh2FILeOhuT27w
- I3Gy+W7xJ6yRc628DJgvbepdXFrYm60nGsNrRzNt7Bwvc+nGBWqk7KHWs5kYyjHPc3e+h8OHCV
- vAI=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Aug 2021 19:44:13 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-ide@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH v6 9/9] libata: Introduce ncq_prio_supported sysfs sttribute
-Date:   Thu, 12 Aug 2021 11:44:03 +0900
-Message-Id: <20210812024403.765819-10-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210812024403.765819-1-damien.lemoal@wdc.com>
-References: <20210812024403.765819-1-damien.lemoal@wdc.com>
+        Thu, 12 Aug 2021 01:44:19 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B0DC0613D3
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 22:43:52 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id m24-20020a17090a7f98b0290178b1a81700so8929021pjl.4
+        for <linux-block@vger.kernel.org>; Wed, 11 Aug 2021 22:43:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Q0ci9iW+Tg6tr+Ee/1JnksS/vvDhs9ZzG86BxyzGZ+Q=;
+        b=gmAHRh2OTjhp4JYpqE1sr7mYH6B7e2gl5y9BVXVgoAaJsYaljgblHJTpzYmn7vUwfD
+         D2jxCF/oOLP61MfDS//u+rzitn3lcUb/4BsPynYMoQAHwrm3dNABDmWRLVnc6nN4ul/c
+         fusvHjPhzq2USEqkL5Jj18QPK8tpOc1yDF9myR6H3SCqJ1soP2gJdoKYsZsGhL2Mc2o/
+         VKPMX/4o074Z1Njxz8BXcanzpm++rM/y3ZufJ5Z5xKU3xx3gdy1L7TJTeNePcEmFjNN9
+         4+PCCd+X8JLGvx8AANHeLTChuIPDli6wsA1V9vIyM4Xb3whm4jGjPmMzPY1waju/smnm
+         j4Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Q0ci9iW+Tg6tr+Ee/1JnksS/vvDhs9ZzG86BxyzGZ+Q=;
+        b=ldOr7XygR5s41TEZiZ31GIvy///DYw3ctydPhmpMFckXAxT0rpb3Ky3ITPmP31w/Ky
+         jTLERr+sO/w8fbnebcqFSXMNDqgkujq7PyLmnN7lxKRP71Py2d+SitmJ/2lOkwXhukqF
+         uLtWbq5IUD0mOBigaKwTZelYJxjyHJxiHtMn7z3paB3WbUdgSmycToAk2/89lg0u5Yve
+         4dOrRg++Ulz2jKKw9py603BMcLRCG9X9HxTPx3Z4ia2kTnqdhGohae0mLAAdB9UjDs3v
+         AWEO6YL751bVQuz8qibjM3HJfFeiNf2dUJHIMJ61EwIBcH4WQwhftZ7Jt1Oc3EZJrajF
+         LQXg==
+X-Gm-Message-State: AOAM531KVDWxbO+vMdfRiYMynd46QhywvjYZ87D2RpFVTWQZP+9dM2Xj
+        QN5JPQSA525FckOLxdZL2x+WL6vrpuBBcXCAQ3Tqiw==
+X-Google-Smtp-Source: ABdhPJyM2QDu351u6N5OdTLQwbkTWYZoxMNi2OuW1tbn5SQrybpoHUcPPyyekjChcCWkCKLja/XKw5yj1VS21KVUjPQ=
+X-Received: by 2002:a17:902:ab91:b029:12b:8dae:b1ff with SMTP id
+ f17-20020a170902ab91b029012b8daeb1ffmr2205012plr.52.1628747031799; Wed, 11
+ Aug 2021 22:43:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210811170224.42837-1-colyli@suse.de> <20210811170224.42837-3-colyli@suse.de>
+In-Reply-To: <20210811170224.42837-3-colyli@suse.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 11 Aug 2021 22:43:40 -0700
+Message-ID: <CAPcyv4hhfg=mgN4AW8T2VWGVbKsQZkpPwpU5yVAVh2nFOxCBcg@mail.gmail.com>
+Subject: Re: [PATCH v12 02/12] bcache: initialize the nvm pages allocator
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvdimm@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Hannes Reinecke <hare@suse.com>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@lst.de>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Qiaowei Ren <qiaowei.ren@intel.com>,
+        Hannes Reinecke <hare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, the only way a user can determine if a SATA device supports
-NCQ priority is to try to enable the use of this feature using the
-ncq_prio_enable sysfs device attribute. If enabling the feature fails,
-it is because the device does not support NCQ priority. Otherwise, the
-feature is enabled and success indicates that the device supports NCQ
-priority.
+On Wed, Aug 11, 2021 at 10:04 AM Coly Li <colyli@suse.de> wrote:
+>
+> From: Jianpeng Ma <jianpeng.ma@intel.com>
+>
+> This patch define the prototype data structures in memory and
+> initializes the nvm pages allocator.
+>
+> The nvm address space which is managed by this allocator can consist of
+> many nvm namespaces, and some namespaces can compose into one nvm set,
+> like cache set. For this initial implementation, only one set can be
+> supported.
+>
+> The users of this nvm pages allocator need to call register_namespace()
+> to register the nvdimm device (like /dev/pmemX) into this allocator as
+> the instance of struct nvm_namespace.
+>
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Jianpeng Ma <jianpeng.ma@intel.com>
+> Co-developed-by: Qiaowei Ren <qiaowei.ren@intel.com>
+> Signed-off-by: Qiaowei Ren <qiaowei.ren@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/md/bcache/Kconfig     |  10 +
+>  drivers/md/bcache/Makefile    |   1 +
+>  drivers/md/bcache/nvm-pages.c | 339 ++++++++++++++++++++++++++++++++++
+>  drivers/md/bcache/nvm-pages.h |  96 ++++++++++
+>  drivers/md/bcache/super.c     |   3 +
+>  5 files changed, 449 insertions(+)
+>  create mode 100644 drivers/md/bcache/nvm-pages.c
+>  create mode 100644 drivers/md/bcache/nvm-pages.h
+>
+> diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
+> index d1ca4d059c20..a69f6c0e0507 100644
+> --- a/drivers/md/bcache/Kconfig
+> +++ b/drivers/md/bcache/Kconfig
+> @@ -35,3 +35,13 @@ config BCACHE_ASYNC_REGISTRATION
+>         device path into this file will returns immediately and the real
+>         registration work is handled in kernel work queue in asynchronous
+>         way.
+> +
+> +config BCACHE_NVM_PAGES
+> +       bool "NVDIMM support for bcache (EXPERIMENTAL)"
+> +       depends on BCACHE
+> +       depends on 64BIT
+> +       depends on LIBNVDIMM
+> +       depends on DAX
+> +       help
+> +         Allocate/release NV-memory pages for bcache and provide allocated pages
+> +         for each requestor after system reboot.
+> diff --git a/drivers/md/bcache/Makefile b/drivers/md/bcache/Makefile
+> index 5b87e59676b8..2397bb7c7ffd 100644
+> --- a/drivers/md/bcache/Makefile
+> +++ b/drivers/md/bcache/Makefile
+> @@ -5,3 +5,4 @@ obj-$(CONFIG_BCACHE)    += bcache.o
+>  bcache-y               := alloc.o bset.o btree.o closure.o debug.o extents.o\
+>         io.o journal.o movinggc.o request.o stats.o super.o sysfs.o trace.o\
+>         util.o writeback.o features.o
+> +bcache-$(CONFIG_BCACHE_NVM_PAGES) += nvm-pages.o
+> diff --git a/drivers/md/bcache/nvm-pages.c b/drivers/md/bcache/nvm-pages.c
+> new file mode 100644
+> index 000000000000..6184c628d9cc
+> --- /dev/null
+> +++ b/drivers/md/bcache/nvm-pages.c
+> @@ -0,0 +1,339 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Nvdimm page-buddy allocator
+> + *
+> + * Copyright (c) 2021, Intel Corporation.
+> + * Copyright (c) 2021, Qiaowei Ren <qiaowei.ren@intel.com>.
+> + * Copyright (c) 2021, Jianpeng Ma <jianpeng.ma@intel.com>.
+> + */
+> +
+> +#include "bcache.h"
+> +#include "nvm-pages.h"
+> +
+> +#include <linux/slab.h>
+> +#include <linux/list.h>
+> +#include <linux/mutex.h>
+> +#include <linux/dax.h>
+> +#include <linux/pfn_t.h>
+> +#include <linux/libnvdimm.h>
+> +#include <linux/mm_types.h>
+> +#include <linux/err.h>
+> +#include <linux/pagemap.h>
+> +#include <linux/bitmap.h>
+> +#include <linux/blkdev.h>
+> +
+> +struct bch_nvmpg_set *global_nvmpg_set;
+> +
+> +void *bch_nvmpg_offset_to_ptr(unsigned long offset)
+> +{
+> +       int ns_id = BCH_NVMPG_GET_NS_ID(offset);
+> +       struct bch_nvmpg_ns *ns = global_nvmpg_set->ns_tbl[ns_id];
+> +
+> +       if (offset == 0)
+> +               return NULL;
+> +
+> +       ns_id = BCH_NVMPG_GET_NS_ID(offset);
+> +       ns = global_nvmpg_set->ns_tbl[ns_id];
+> +
+> +       if (ns)
+> +               return (void *)(ns->base_addr + BCH_NVMPG_GET_OFFSET(offset));
+> +
+> +       pr_err("Invalid ns_id %u\n", ns_id);
+> +       return NULL;
+> +}
+> +
+> +unsigned long bch_nvmpg_ptr_to_offset(struct bch_nvmpg_ns *ns, void *ptr)
+> +{
+> +       int ns_id = ns->ns_id;
+> +       unsigned long offset = (unsigned long)(ptr - ns->base_addr);
+> +
+> +       return BCH_NVMPG_OFFSET(ns_id, offset);
+> +}
+> +
+> +static void release_ns_tbl(struct bch_nvmpg_set *set)
+> +{
+> +       int i;
+> +       struct bch_nvmpg_ns *ns;
+> +
+> +       for (i = 0; i < BCH_NVMPG_NS_MAX; i++) {
+> +               ns = set->ns_tbl[i];
+> +               if (ns) {
+> +                       blkdev_put(ns->bdev, FMODE_READ|FMODE_WRITE|FMODE_EXEC);
+> +                       set->ns_tbl[i] = NULL;
+> +                       set->attached_ns--;
+> +                       kfree(ns);
+> +               }
+> +       }
+> +
+> +       if (set->attached_ns)
+> +               pr_err("unexpected attached_ns: %u\n", set->attached_ns);
+> +}
+> +
+> +static void release_nvmpg_set(struct bch_nvmpg_set *set)
+> +{
+> +       release_ns_tbl(set);
+> +       kfree(set);
+> +}
+> +
+> +/* Namespace 0 contains all meta data of the nvmpg allocation set */
+> +static int init_nvmpg_set_header(struct bch_nvmpg_ns *ns)
+> +{
+> +       struct bch_nvmpg_set_header *set_header;
+> +
+> +       if (ns->ns_id != 0) {
+> +               pr_err("unexpected ns_id %u for first nvmpg namespace.\n",
+> +                      ns->ns_id);
+> +               return -EINVAL;
+> +       }
+> +
+> +       set_header = bch_nvmpg_offset_to_ptr(ns->sb->set_header_offset);
+> +
+> +       mutex_lock(&global_nvmpg_set->lock);
+> +       global_nvmpg_set->set_header = set_header;
+> +       global_nvmpg_set->heads_size = set_header->size;
+> +       global_nvmpg_set->heads_used = set_header->used;
+> +       mutex_unlock(&global_nvmpg_set->lock);
+> +
+> +       return 0;
+> +}
+> +
+> +static int attach_nvmpg_set(struct bch_nvmpg_ns *ns)
+> +{
+> +       struct bch_nvmpg_sb *sb = ns->sb;
+> +       int rc = 0;
+> +
+> +       mutex_lock(&global_nvmpg_set->lock);
+> +
+> +       if (global_nvmpg_set->ns_tbl[sb->this_ns]) {
+> +               pr_err("ns_id %u already attached.\n", ns->ns_id);
+> +               rc = -EEXIST;
+> +               goto unlock;
+> +       }
+> +
+> +       if (ns->ns_id != 0) {
+> +               pr_err("unexpected ns_id %u for first namespace.\n", ns->ns_id);
+> +               rc = -EINVAL;
+> +               goto unlock;
+> +       }
+> +
+> +       if (global_nvmpg_set->attached_ns > 0) {
+> +               pr_err("multiple namespace attaching not supported yet\n");
+> +               rc = -EOPNOTSUPP;
+> +               goto unlock;
+> +       }
+> +
+> +       if ((global_nvmpg_set->attached_ns + 1) > sb->total_ns) {
+> +               pr_err("namespace counters error: attached %u > total %u\n",
+> +                      global_nvmpg_set->attached_ns,
+> +                      global_nvmpg_set->total_ns);
+> +               rc = -EINVAL;
+> +               goto unlock;
+> +       }
+> +
+> +       memcpy(global_nvmpg_set->set_uuid, sb->set_uuid, 16);
+> +       global_nvmpg_set->ns_tbl[sb->this_ns] = ns;
+> +       global_nvmpg_set->attached_ns++;
+> +       global_nvmpg_set->total_ns = sb->total_ns;
+> +
+> +unlock:
+> +       mutex_unlock(&global_nvmpg_set->lock);
+> +       return rc;
+> +}
+> +
+> +static int read_nvdimm_meta_super(struct block_device *bdev,
+> +                                 struct bch_nvmpg_ns *ns)
+> +{
+> +       struct page *page;
+> +       struct bch_nvmpg_sb *sb;
+> +       uint64_t expected_csum = 0;
+> +       int r;
+> +
+> +       page = read_cache_page_gfp(bdev->bd_inode->i_mapping,
+> +                               BCH_NVMPG_SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
+> +
+> +       if (IS_ERR(page))
+> +               return -EIO;
+> +
+> +       sb = (struct bch_nvmpg_sb *)
+> +            (page_address(page) + offset_in_page(BCH_NVMPG_SB_OFFSET));
+> +
+> +       r = -EINVAL;
+> +       expected_csum = csum_set(sb);
+> +       if (expected_csum != sb->csum) {
+> +               pr_info("csum is not match with expected one\n");
+> +               goto put_page;
+> +       }
+> +
+> +       if (memcmp(sb->magic, bch_nvmpg_magic, 16)) {
+> +               pr_info("invalid bch_nvmpg_magic\n");
+> +               goto put_page;
+> +       }
+> +
+> +       if (sb->sb_offset !=
+> +           BCH_NVMPG_OFFSET(sb->this_ns, BCH_NVMPG_SB_OFFSET)) {
+> +               pr_info("invalid superblock offset 0x%llx\n", sb->sb_offset);
+> +               goto put_page;
+> +       }
+> +
+> +       r = -EOPNOTSUPP;
+> +       if (sb->total_ns != 1) {
+> +               pr_info("multiple name space not supported yet.\n");
+> +               goto put_page;
+> +       }
+> +
+> +
+> +       r = 0;
+> +       /* Necessary for DAX mapping */
+> +       ns->page_size = sb->page_size;
+> +       ns->pages_total = sb->pages_total;
+> +
+> +put_page:
+> +       put_page(page);
+> +       return r;
+> +}
+> +
+> +struct bch_nvmpg_ns *bch_register_namespace(const char *dev_path)
+> +{
+> +       struct bch_nvmpg_ns *ns = NULL;
+> +       struct bch_nvmpg_sb *sb = NULL;
+> +       char buf[BDEVNAME_SIZE];
+> +       struct block_device *bdev;
+> +       pgoff_t pgoff;
+> +       int id, err;
+> +       char *path;
+> +       long dax_ret = 0;
+> +
+> +       path = kstrndup(dev_path, 512, GFP_KERNEL);
+> +       if (!path) {
+> +               pr_err("kstrndup failed\n");
+> +               return ERR_PTR(-ENOMEM);
+> +       }
+> +
+> +       bdev = blkdev_get_by_path(strim(path),
+> +                                 FMODE_READ|FMODE_WRITE|FMODE_EXEC,
+> +                                 global_nvmpg_set);
+> +       if (IS_ERR(bdev)) {
+> +               pr_err("get %s error: %ld\n", dev_path, PTR_ERR(bdev));
+> +               kfree(path);
+> +               return ERR_PTR(PTR_ERR(bdev));
+> +       }
+> +
+> +       err = -ENOMEM;
+> +       ns = kzalloc(sizeof(struct bch_nvmpg_ns), GFP_KERNEL);
+> +       if (!ns)
+> +               goto bdput;
+> +
+> +       err = -EIO;
+> +       if (read_nvdimm_meta_super(bdev, ns)) {
+> +               pr_err("%s read nvdimm meta super block failed.\n",
+> +                      bdevname(bdev, buf));
+> +               goto free_ns;
+> +       }
+> +
+> +       err = -EOPNOTSUPP;
+> +       if (!bdev_dax_supported(bdev, ns->page_size)) {
+> +               pr_err("%s don't support DAX\n", bdevname(bdev, buf));
+> +               goto free_ns;
+> +       }
+> +
+> +       err = -EINVAL;
+> +       if (bdev_dax_pgoff(bdev, 0, ns->page_size, &pgoff)) {
+> +               pr_err("invalid offset of %s\n", bdevname(bdev, buf));
+> +               goto free_ns;
+> +       }
+> +
+> +       err = -ENOMEM;
+> +       ns->dax_dev = fs_dax_get_by_bdev(bdev);
+> +       if (!ns->dax_dev) {
+> +               pr_err("can't by dax device by %s\n", bdevname(bdev, buf));
+> +               goto free_ns;
+> +       }
+> +
+> +       err = -EINVAL;
+> +       id = dax_read_lock();
+> +       dax_ret = dax_direct_access(ns->dax_dev, pgoff, ns->pages_total,
+> +                                   &ns->base_addr, &ns->start_pfn);
+> +       if (dax_ret <= 0) {
+> +               pr_err("dax_direct_access error\n");
+> +               dax_read_unlock(id);
+> +               goto free_ns;
+> +       }
+> +
+> +       if (dax_ret < ns->pages_total) {
+> +               pr_warn("mapped range %ld is less than ns->pages_total %lu\n",
+> +                       dax_ret, ns->pages_total);
 
-Improve this odd interface by introducing the read-only
-ncq_prio_supported sysfs device attribute to indicate if a SATA device
-supports NCQ priority. The value of this attribute reflects the status
-of device flag ATA_DFLAG_NCQ_PRIO, which is set only for devices
-supporting NCQ priority.
+This failure will become a common occurrence with CXL namespaces that
+will have discontiguous range support. It's already the case for
+dax-devices for soft-reserved memory [1]. In the CXL case the
+discontinuity will be 256MB aligned, for the soft-reserved dax-devices
+the discontinuity granularity can be as small as 4K.
 
-Add this new sysfs attribute to the device attributes group of libahci
-and libata-sata.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/ata/libahci.c     |  1 +
- drivers/ata/libata-sata.c | 25 +++++++++++++++++++++++++
- include/linux/libata.h    |  1 +
- 3 files changed, 27 insertions(+)
-
-diff --git a/drivers/ata/libahci.c b/drivers/ata/libahci.c
-index fec2e9754aed..5b3fa2cbe722 100644
---- a/drivers/ata/libahci.c
-+++ b/drivers/ata/libahci.c
-@@ -125,6 +125,7 @@ EXPORT_SYMBOL_GPL(ahci_shost_attrs);
- struct device_attribute *ahci_sdev_attrs[] = {
- 	&dev_attr_sw_activity,
- 	&dev_attr_unload_heads,
-+	&dev_attr_ncq_prio_supported,
- 	&dev_attr_ncq_prio_enable,
- 	NULL
- };
-diff --git a/drivers/ata/libata-sata.c b/drivers/ata/libata-sata.c
-index dc397ebda089..8f3ff830ab0c 100644
---- a/drivers/ata/libata-sata.c
-+++ b/drivers/ata/libata-sata.c
-@@ -834,6 +834,30 @@ DEVICE_ATTR(link_power_management_policy, S_IRUGO | S_IWUSR,
- 	    ata_scsi_lpm_show, ata_scsi_lpm_store);
- EXPORT_SYMBOL_GPL(dev_attr_link_power_management_policy);
- 
-+static ssize_t ata_ncq_prio_supported_show(struct device *device,
-+					   struct device_attribute *attr,
-+					   char *buf)
-+{
-+	struct scsi_device *sdev = to_scsi_device(device);
-+	struct ata_port *ap = ata_shost_to_port(sdev->host);
-+	struct ata_device *dev;
-+	bool ncq_prio_supported;
-+	int rc = 0;
-+
-+	spin_lock_irq(ap->lock);
-+	dev = ata_scsi_find_dev(ap, sdev);
-+	if (!dev)
-+		rc = -ENODEV;
-+	else
-+		ncq_prio_supported = dev->flags & ATA_DFLAG_NCQ_PRIO;
-+	spin_unlock_irq(ap->lock);
-+
-+	return rc ? rc : sysfs_emit(buf, "%u\n", ncq_prio_supported);
-+}
-+
-+DEVICE_ATTR(ncq_prio_supported, S_IRUGO, ata_ncq_prio_supported_show, NULL);
-+EXPORT_SYMBOL_GPL(dev_attr_ncq_prio_supported);
-+
- static ssize_t ata_ncq_prio_enable_show(struct device *device,
- 					struct device_attribute *attr,
- 					char *buf)
-@@ -901,6 +925,7 @@ EXPORT_SYMBOL_GPL(dev_attr_ncq_prio_enable);
- struct device_attribute *ata_ncq_sdev_attrs[] = {
- 	&dev_attr_unload_heads,
- 	&dev_attr_ncq_prio_enable,
-+	&dev_attr_ncq_prio_supported,
- 	NULL
- };
- EXPORT_SYMBOL_GPL(ata_ncq_sdev_attrs);
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index b23f28cfc8e0..a2d1bae7900b 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -539,6 +539,7 @@ typedef void (*ata_postreset_fn_t)(struct ata_link *link, unsigned int *classes)
- extern struct device_attribute dev_attr_unload_heads;
- #ifdef CONFIG_SATA_HOST
- extern struct device_attribute dev_attr_link_power_management_policy;
-+extern struct device_attribute dev_attr_ncq_prio_supported;
- extern struct device_attribute dev_attr_ncq_prio_enable;
- extern struct device_attribute dev_attr_em_message_type;
- extern struct device_attribute dev_attr_em_message;
--- 
-2.31.1
-
+[1]: https://elixir.bootlin.com/linux/v5.14-rc5/source/drivers/dax/device.c#L414
