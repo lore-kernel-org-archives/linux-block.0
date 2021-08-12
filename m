@@ -2,155 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D667C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 07:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F072DC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 07:50:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61D326101E
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 07:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D279061038
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 07:50:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234788AbhHLHtk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 03:49:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234795AbhHLHtk (ORCPT
+        id S234784AbhHLHum (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 03:50:42 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:51846 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232348AbhHLHum (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 03:49:40 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFAFFC061765;
-        Thu, 12 Aug 2021 00:49:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=qrqINKx/pIKIjST1oisE3ozmHc4lciwrBwhfjJb45VA=; b=R1IGYmi8e5eCfOeb8AN5WSab6n
-        nqmIzXkv8UqB/uVv1swxzSdKV4Q5M6g6OhJ92ZtqbNGNd5LhKZQviWOyNtmiTEJr3sgvs16tBVblS
-        zoIomFfBWgEp4R2YV8/HBnYuHKRB//87kCvegZNLGBozB8d78T3LxJLKwhXULA0hz6DlIc/nxM4F8
-        aBIcsF8cKaXMBRL7L7zSkb9uqiydH0twieuZAPvdgDK7bJYVDygVzoP9v7JvGiN/49GwzyMSvQ0dQ
-        D59LNRpQQPrC+Klkwq+qAT++airvREu+BVz1KjKdQZe7C/5CwrSbMHu7dBPX9evIdL9LVhNss8PNc
-        LkgtUZLQ==;
-Received: from [2001:4bb8:184:6215:d7d:1904:40de:694d] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mE5R5-00EIoG-K9; Thu, 12 Aug 2021 07:47:47 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        =?UTF-8?q?Kai=20M=C3=A4kisara?= <Kai.Makisara@kolumbus.fi>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 1/8] nvme: use blk_mq_alloc_disk
-Date:   Thu, 12 Aug 2021 09:46:35 +0200
-Message-Id: <20210812074642.18592-2-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210812074642.18592-1-hch@lst.de>
-References: <20210812074642.18592-1-hch@lst.de>
+        Thu, 12 Aug 2021 03:50:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1628754618; x=1660290618;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4u8e9rFyNPDmv1NIZxmllueH6Qf71aOKm4JtYfad7S4=;
+  b=O2YiMC/gmNcRBmXV5fcRz4fkPAqpfbbQM1cdyb5t1+Ql43QAsVjs8iLY
+   lKlGXLg9lEuWAA/LJiCR7ua+EvEeftL4JDjgPr1s5N4cCJQ+bJ5MOLAUB
+   FQ8CU2EcaQKJg/7zKWsR59g6TvV7YRaKyXmkLBQgF8i+KVwW8czajPdWa
+   dApbO015ItBTtcDOsf32KVXSkEUB9xVS/KN2sNBSyeD4su7MAKtsTxu5R
+   EckDA86waDQnch3BGx8NBLIclV5ROj35h378Pgzamdus8Gerlx56mBM0I
+   LvBXb1Px2FNY8U/YIzBN90iDVUfaJey/2Q4qYc1xidh6izgMdvxBz/Bvy
+   A==;
+X-IronPort-AV: E=Sophos;i="5.84,315,1620662400"; 
+   d="scan'208";a="177596931"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Aug 2021 15:50:17 +0800
+IronPort-SDR: +tNerFHQTUi0RC1CH+kq2x1BZFyTsav8fNaXr2hA2/0l+f8PJacb94iSqJv44EZNS47Fy/unDf
+ maQ4y631dp5at/aJqvyVt8NFmOk8LWP/GNelaNN0Ij6P5UZ7Sw25yFC4idXYx49DKGqMnyjCJ2
+ kIZSMw78eD8s4B4LBroFS5ozA3jLwxiSbqTmx6xCAoUUAdKJgxYzxH59kTELH1t87WgTmml+s2
+ xf2saIkFi5jLEdsFGDa4DBVIgb6HagSzUKmV5GzZzrM7URQIraqRiUFNXwe8GWQ/dHBwIn/N2u
+ 7KoEgQrrsLr6JkPFCt64hCuk
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2021 00:25:46 -0700
+IronPort-SDR: +Bh2yLsoIrS4Vo5rs2t1Ncasyk/+FAgq9Rd/MOpoIyaztNsjj4pPwEybVx1gsD9EbPL9hIG6/S
+ KPyd1whWQOHPQu7NXbYA8fkacAwelOYyQeDltxpuMA9EzLvt+TU2wBR3y1+3ikozan9rYDRYNE
+ 0H4skHVgS+iKBv1OBb6/bNYlHWQSWGhNmGujpTzfgIS3XrEAB7akPQIAZ9nx8+LM64Nv/TCOgQ
+ kffKW34ututYaNPTowaXQJ3ajrB7BIACibD94egjjTNQlQ6SelJ8TSancjWfemGfGoNiD79tfo
+ 0Aw=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 12 Aug 2021 00:50:16 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Subject: [PATCH v5 0/5] Initial support for multi-actuator HDDs
+Date:   Thu, 12 Aug 2021 16:50:10 +0900
+Message-Id: <20210812075015.1090959-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Switch to use the blk_mq_alloc_disk helper for allocating the
-request_queue and gendisk.
+Single LUN multi-actuator hard-disks are cappable to seek and execute
+multiple commands in parallel. This capability is exposed to the host
+using the Concurrent Positioning Ranges VPD page (SCSI) and Log (ATA).
+Each positioning range describes the contiguous set of LBAs that an
+actuator serves.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 33 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+This series adds support the scsi disk driver to retreive this
+information and advertize it to user space through sysfs. libata is also
+modified to handle ATA drives.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index cb12d8b94e82..1fd199a8168f 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3729,9 +3729,14 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 	if (!ns)
- 		goto out_free_id;
- 
--	ns->queue = blk_mq_init_queue(ctrl->tagset);
--	if (IS_ERR(ns->queue))
-+	disk = blk_mq_alloc_disk(ctrl->tagset, ns);
-+	if (IS_ERR(disk))
- 		goto out_free_ns;
-+	disk->fops = &nvme_bdev_ops;
-+	disk->private_data = ns;
-+
-+	ns->disk = disk;
-+	ns->queue = disk->queue;
- 
- 	if (ctrl->opts && ctrl->opts->data_digest)
- 		blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, ns->queue);
-@@ -3740,20 +3745,12 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
- 		blk_queue_flag_set(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
- 
--	ns->queue->queuedata = ns;
- 	ns->ctrl = ctrl;
- 	kref_init(&ns->kref);
- 
- 	if (nvme_init_ns_head(ns, nsid, ids, id->nmic & NVME_NS_NMIC_SHARED))
--		goto out_free_queue;
-+		goto out_cleanup_disk;
- 
--	disk = alloc_disk_node(0, node);
--	if (!disk)
--		goto out_unlink_ns;
--
--	disk->fops = &nvme_bdev_ops;
--	disk->private_data = ns;
--	disk->queue = ns->queue;
- 	/*
- 	 * Without the multipath code enabled, multiple controller per
- 	 * subsystems are visible as devices and thus we cannot use the
-@@ -3762,15 +3759,14 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 	if (!nvme_mpath_set_disk_name(ns, disk->disk_name, &disk->flags))
- 		sprintf(disk->disk_name, "nvme%dn%d", ctrl->instance,
- 			ns->head->instance);
--	ns->disk = disk;
- 
- 	if (nvme_update_ns_info(ns, id))
--		goto out_put_disk;
-+		goto out_unlink_ns;
- 
- 	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] == 0x1) {
- 		if (nvme_nvm_register(ns, disk->disk_name, node)) {
- 			dev_warn(ctrl->device, "LightNVM init failure\n");
--			goto out_put_disk;
-+			goto out_unlink_ns;
- 		}
- 	}
- 
-@@ -3789,10 +3785,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 	kfree(id);
- 
- 	return;
-- out_put_disk:
--	/* prevent double queue cleanup */
--	ns->disk->queue = NULL;
--	put_disk(ns->disk);
-+
-  out_unlink_ns:
- 	mutex_lock(&ctrl->subsys->lock);
- 	list_del_rcu(&ns->siblings);
-@@ -3800,8 +3793,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 		list_del_init(&ns->head->entry);
- 	mutex_unlock(&ctrl->subsys->lock);
- 	nvme_put_ns_head(ns->head);
-- out_free_queue:
--	blk_cleanup_queue(ns->queue);
-+ out_cleanup_disk:
-+	blk_cleanup_disk(disk);
-  out_free_ns:
- 	kfree(ns);
-  out_free_id:
+The first patch adds the block layer plumbing to expose concurrent
+sector ranges of the device through sysfs as a sub-directory of the
+device sysfs queue directory. Patch 2 and 3 add support to sd and
+libata. Finally patch 4 documents the sysfs queue attributed changes.
+Patch 5 fixes a typo in the document file (strictly speaking, not
+related to this series).
+
+This series does not attempt in any way to optimize accesses to
+multi-actuator devices (e.g. block IO scheduler or filesystems). This
+initial support only exposes the actuators information to user space
+through sysfs.
+
+Changes from v4:
+* Fixed kdoc comment function name mismatch for disk_register_cranges()
+  in patch 1
+
+Changes from v3:
+* Modified patch 1:
+  - Prefix functions that take a struct gendisk as argument with
+    "disk_". Modified patch 2 accordingly.
+  - Added a functional release operation for struct blk_cranges kobj to
+    ensure that this structure is freed only after all references to it
+    are released, including kobject_del() execution for all crange sysfs
+    entries.
+* Added patch 5 to separate the typo fix from the crange documentation
+  addition.
+* Added reviewed-by tags
+
+Changes from v2:
+* Update patch 1 to fix a compilation warning for a potential NULL
+  pointer dereference of the cr argument of blk_queue_set_cranges().
+  Warning reported by the kernel test robot <lkp@intel.com>).
+
+Changes from v1:
+* Moved libata-scsi hunk from patch 1 to patch 3 where it belongs
+* Fixed unintialized variable in patch 2
+  Reported-by: kernel test robot <lkp@intel.com>
+  Reported-by: Dan Carpenter <dan.carpenter@oracle.com
+* Changed patch 3 adding struct ata_cpr_log to contain both the number
+  of concurrent ranges and the array of concurrent ranges.
+* Added a note in the documentation (patch 4) about the unit used for
+  the concurrent ranges attributes.
+
+Damien Le Moal (5):
+  block: Add concurrent positioning ranges support
+  scsi: sd: add concurrent positioning ranges support
+  libata: support concurrent positioning ranges log
+  doc: document sysfs queue/cranges attributes
+  doc: Fix typo in request queue sysfs documentation
+
+ Documentation/block/queue-sysfs.rst |  30 ++-
+ block/Makefile                      |   2 +-
+ block/blk-cranges.c                 | 310 ++++++++++++++++++++++++++++
+ block/blk-sysfs.c                   |  26 ++-
+ block/blk.h                         |   4 +
+ drivers/ata/libata-core.c           |  52 +++++
+ drivers/ata/libata-scsi.c           |  48 ++++-
+ drivers/scsi/sd.c                   |  81 ++++++++
+ drivers/scsi/sd.h                   |   1 +
+ include/linux/ata.h                 |   1 +
+ include/linux/blkdev.h              |  29 +++
+ include/linux/libata.h              |  15 ++
+ 12 files changed, 580 insertions(+), 19 deletions(-)
+ create mode 100644 block/blk-cranges.c
+
 -- 
-2.30.2
+2.31.1
 
