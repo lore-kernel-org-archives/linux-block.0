@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66522C43214
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4D9C4320A
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:41:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D44060F91
-	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:41:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93C4260D07
+	for <linux-block@archiver.kernel.org>; Thu, 12 Aug 2021 15:41:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238168AbhHLPmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S238195AbhHLPmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 12 Aug 2021 11:42:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37114 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238199AbhHLPmT (ORCPT
+        with ESMTP id S237375AbhHLPmS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 11:42:19 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 221C3C0613D9
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:41:54 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id bi32so11031306oib.2
-        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:41:54 -0700 (PDT)
+        Thu, 12 Aug 2021 11:42:18 -0400
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 656CCC061756
+        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:41:53 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id c2-20020a0568303482b029048bcf4c6bd9so8242242otu.8
+        for <linux-block@vger.kernel.org>; Thu, 12 Aug 2021 08:41:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LEnopQL4PHusgBDS3f+zKlQOKB9hsKjgx1LSo73cC14=;
-        b=jPHTzAiTHc6FoNV++PtWwTTZ7W0ltfV924DY4oBUi4/BbGIr159yPRx/mDJpIKoA8+
-         nsZjIHxaD0PBYr11WBs92pL3U8hSE7WeNOnCT97KpAZRVQD3eG8Fd6+DZOebn5Rv74jj
-         f0BfuuGsugOprSHQxTWmfoS8tJ4a3apiLlIPiBOlnpZ8nOWIJ9JPqBrQDFuEfTuJCi+f
-         rpbWbHxrJQBnCuqkUqQYWhIkh5lmLyYEqvRDX1MLAjASwM6yP3YKUzXAPW7ztEPK/UpL
-         PfUaaudJspIaDMWOK3bKtN5pnTa0YBer89Z9UZFhVCxek5baCpCY69/eGKq1qcmxnMfL
-         0Zzg==
+        bh=mwde66FBJEayMjWLFoOXKXeLTWGiokZGl4UEeh431cU=;
+        b=X+OAoTNalGpdjv+G+zkze8hvEjnVKfAX2xQiw6waJIXyUSRk333/Pz8Sl37J0t+2Hk
+         a6obqFMEOhEhjPzvFgVKWnqd3DeCm4xQdgRJz8b27KbtbEYi9v2jWUqQKR2HMccD/MVP
+         xKMz1EqyaHCnoih7URWAdTrH8cSmaF4uMwh/kGqhybTAa8CURx3NuFbYLcO/FZh2y+4i
+         daIB9Ks2N7cVuuh26dPDjROvoexIyAjQw7DUzQLEDFmvNUsjgJzXNIaH3IDjPfYE8ywb
+         EniSPSCbS5Vyv2tsi6D/ahIPtRgaOjT0AcmDC/0zGuPOSMWRP7k8bKmF2oLQWqWqrSPV
+         lc+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LEnopQL4PHusgBDS3f+zKlQOKB9hsKjgx1LSo73cC14=;
-        b=PKsKDLEQ//zJ9RlXwToYALx72kdgG4eJXoD96+BZXwikIQ4KSdYa/jj8V+zVV+OUNl
-         5QzkDSZ4QHozwzGGB6YMcVEnUYTSTrrwe8Qb/s62Xq1KppI99qiPx+GDHviPL5QDMORj
-         OYeGe1JkQnFNr1xPPUaqxI1BzJvLML3qckpZl9jjT2sUYZYiqpOb064i2a47hUV3Rk3e
-         F1URx51pGEs4OlO0Tc4EqA4KRJ5DVntKs7MhemAXIpCfKrjS6NEznMAQF/m5Cwsz7PLc
-         tj/Nrc7O2pAa1LxbChkTt/C6mgvEQG4lAiv3AH3UjIZJGGEID/2T+OWQYdrmp/EZiv7u
-         JT3A==
-X-Gm-Message-State: AOAM532CGmhY8FKomElOhd7sS7Qn8gYUYRJYlm0qvXLKonDSMQN+Wp1y
-        vPAypwVQWbiWJIpAFs1jBlXL1w==
-X-Google-Smtp-Source: ABdhPJy6tTDQsmMyTtSwAxGdAXZ4oMRMLnqItaww2JbeqGfzhj0BjF5Z3TZJVYZhpmbVBeBlhvnXww==
-X-Received: by 2002:a05:6808:2084:: with SMTP id s4mr3827632oiw.167.1628782913507;
-        Thu, 12 Aug 2021 08:41:53 -0700 (PDT)
+        bh=mwde66FBJEayMjWLFoOXKXeLTWGiokZGl4UEeh431cU=;
+        b=elHa5u3uj4m3XFQVgpZ/ki7Hzg6lFFXSx29Wwgsk741oEjORo5HUS9jgVyzId3GKKl
+         WI1E0s5QciMKDFSv9o0pfL+wGmZvuqdd3SuKWeMzgHDmKN/PlQjK4vT9VfXxd1oMHImI
+         F71I2cdeMY+imbU5VjEj3NMYK6+CPUmrLPFqezZxGFbsUFzI5pFMcDXRykbeltmd1GzB
+         eOCTEzgY7p2/OZZ0N6f/+EGGovTgEFqQXLhB72K2J6nGmv1RDECE7GxfcDddXDw1z5Hg
+         Zs3RLbD4Hov8dNBNQ6DTktSsnIckkkmjZZ6mG0dJaEuVZ2MKH017UKsuu1/w8sq4GWiT
+         6HQQ==
+X-Gm-Message-State: AOAM53057pcmxbikbozvEJmOyS0jHeW819nOCo5FYxYTIhcubVDJxiRG
+        T/lcSjcBT3kqeY8nr17VKpTDNiRKZ77ck308
+X-Google-Smtp-Source: ABdhPJxIWJhHum+jAgMMJAb5jKpUBzhFTmpVFoJzX3tyoiY7z63wOlsHDp9NX8kLw/HQvJ3ouWQVPw==
+X-Received: by 2002:a9d:2de1:: with SMTP id g88mr4022908otb.84.1628782912735;
+        Thu, 12 Aug 2021 08:41:52 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id w16sm690973oih.19.2021.08.12.08.41.52
+        by smtp.gmail.com with ESMTPSA id w16sm690973oih.19.2021.08.12.08.41.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Aug 2021 08:41:53 -0700 (PDT)
+        Thu, 12 Aug 2021 08:41:52 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     io-uring@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, hch@infradead.org,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/6] fs: add kiocb alloc cache flag
-Date:   Thu, 12 Aug 2021 09:41:45 -0600
-Message-Id: <20210812154149.1061502-3-axboe@kernel.dk>
+Subject: [PATCH 1/6] bio: optimize initialization of a bio
+Date:   Thu, 12 Aug 2021 09:41:44 -0600
+Message-Id: <20210812154149.1061502-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210812154149.1061502-1-axboe@kernel.dk>
 References: <20210812154149.1061502-1-axboe@kernel.dk>
@@ -72,28 +72,55 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If this kiocb can safely use the polled bio allocation cache, then this
-flag must be set. Generally this can be set for polled IO, where we will
-not see IRQ completions of the request.
+The memset() used is measurably slower in targeted benchmarks, wasting
+about 1% of the total runtime, or 50% of the (later) hot path cached
+bio alloc. Get rid of it and fill in the bio manually.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/fs.h | 2 ++
- 1 file changed, 2 insertions(+)
+ block/bio.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 640574294216..0dcc5de779c9 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -319,6 +319,8 @@ enum rw_hint {
- /* iocb->ki_waitq is valid */
- #define IOCB_WAITQ		(1 << 19)
- #define IOCB_NOIO		(1 << 20)
-+/* can use bio alloc cache */
-+#define IOCB_ALLOC_CACHE	(1 << 21)
+diff --git a/block/bio.c b/block/bio.c
+index 1fab762e079b..9bf98b877aba 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -246,7 +246,34 @@ static void bio_free(struct bio *bio)
+ void bio_init(struct bio *bio, struct bio_vec *table,
+ 	      unsigned short max_vecs)
+ {
+-	memset(bio, 0, sizeof(*bio));
++	bio->bi_next = NULL;
++	bio->bi_bdev = NULL;
++	bio->bi_opf = 0;
++	bio->bi_flags = 0;
++	bio->bi_ioprio = 0;
++	bio->bi_write_hint = 0;
++	bio->bi_status = 0;
++	bio->bi_iter.bi_sector = 0;
++	bio->bi_iter.bi_size = 0;
++	bio->bi_iter.bi_idx = 0;
++	bio->bi_iter.bi_bvec_done = 0;
++	bio->bi_end_io = NULL;
++	bio->bi_private = NULL;
++#ifdef CONFIG_BLK_CGROUP
++	bio->bi_blkg = NULL;
++	bio->bi_issue.value = 0;
++#ifdef CONFIG_BLK_CGROUP_IOCOST
++	bio->bi_iocost_cost = 0;
++#endif
++#endif
++#ifdef CONFIG_BLK_INLINE_ENCRYPTION
++	bio->bi_crypt_context = NULL;
++#endif
++#ifdef CONFIG_BLK_DEV_INTEGRITY
++	bio->bi_integrity = NULL;
++#endif
++	bio->bi_vcnt = 0;
++
+ 	atomic_set(&bio->__bi_remaining, 1);
+ 	atomic_set(&bio->__bi_cnt, 1);
  
- struct kiocb {
- 	struct file		*ki_filp;
 -- 
 2.32.0
 
