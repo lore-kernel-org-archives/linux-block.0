@@ -2,84 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE511C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 17:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92598C43214
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 18:19:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5B5F60F51
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 17:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 762EA6109D
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 18:19:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232179AbhHMRSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Aug 2021 13:18:13 -0400
-Received: from mail-pl1-f178.google.com ([209.85.214.178]:34329 "EHLO
-        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230316AbhHMRSM (ORCPT
+        id S232860AbhHMSUU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Aug 2021 14:20:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34268 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232796AbhHMSUU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Aug 2021 13:18:12 -0400
-Received: by mail-pl1-f178.google.com with SMTP id d1so12889158pll.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 10:17:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6ienZbwguL6JxIZLyDC7vEnqfM94gw/FEoQHX2SJ1HE=;
-        b=YuBB5fCM5pHZww+UEiPRUZ887IXmYpI0tKsEfbJvKc4B6YxX/APymeMBCEicNRErzT
-         oco0+s8NTRyiJG+Z/UvsUiCuucKaKRBC8vLCGu1rWzJ9jQ2bpb6dCvDrHdBcUxtGRz1G
-         DUB5ZLpqF7PDlfXGWA0GnCRI7PNe+gFauNr3K5g/wazJtWXcxwFvmobLoM9E89+Uc7ZY
-         IbBrpTK16NP502RwiPXpGO8NAR1q92XyJNCIdS0ddDDjyYeeSO20wb9RiqbxCb++eukW
-         PF6Rna2YK6mmgmvWiJqP393ro2NppkAhEXbCDxdfKgnsi3w3D0y+4//fDQ3Q1gWPerhC
-         8aww==
-X-Gm-Message-State: AOAM530ICa4IOwjXmSLHLw5S7wNJPN3OOLPGaGcoH5MGoParnGhl7sdL
-        00tpsgynh48WXvQ2MCziZZIW5wWsUSaqhgfq
-X-Google-Smtp-Source: ABdhPJwm3IIQ3W31mWTa9g2O+2CTZyp/xzI1hC3pUVTsgG5I8g0vUvTfAj1kh/6t+F5CYBA9GbZJWg==
-X-Received: by 2002:a17:90a:d509:: with SMTP id t9mr3508010pju.225.1628875064503;
-        Fri, 13 Aug 2021 10:17:44 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:1:b745:b195:ae3f:f02d])
-        by smtp.gmail.com with ESMTPSA id j2sm2948519pfe.201.2021.08.13.10.17.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 10:17:43 -0700 (PDT)
-Subject: Re: [PATCH block-5.14] Revert "block/mq-deadline: Add cgroup support"
-To:     Tejun Heo <tj@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <YRQL2dlLsQ6mGNtz@slm.duckdns.org>
- <035f8334-3b69-667d-be91-92dcab9dc887@acm.org>
- <YRQhlPBqAlkJdowG@mtj.duckdns.org>
- <00e13a7b-6009-a9d7-41ba-aae82f5813de@acm.org>
- <YRVfmWnOyPYl/okx@mtj.duckdns.org>
- <631e7e18-52ca-9bec-0150-bac755e0ff24@acm.org>
- <YRV1JkkxozEb4YO6@mtj.duckdns.org>
- <DM6PR04MB7081F2D0E8579489175DF363E7FA9@DM6PR04MB7081.namprd04.prod.outlook.com>
- <YRad3tQaZfR8v7lb@mtj.duckdns.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <5527319b-ba0c-00a3-19cf-612f2e2b073d@acm.org>
-Date:   Fri, 13 Aug 2021 10:17:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Fri, 13 Aug 2021 14:20:20 -0400
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E470EC061756;
+        Fri, 13 Aug 2021 11:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+        Resent-Cc:Resent-Message-ID; bh=rq6VfTjLJfvWeGU0hw3GUv7MRF3dGVPTx8dKGrBFFlo=;
+        t=1628878793; x=1630088393; b=I5S0gRU1+S7GtJy5aucqUbOjnJXdvDVKjcmWggxsgLj+Opo
+        fyzGd1Bxvte1qlq90HpPXLYOG5gI5qMJ7VnNQl1B4jan0JC4gHk2zw75449DN/FGvBQKNyN+RVPPQ
+        Yv0F94jwEyHXmz9q7GfJpw7qFXxpYv1ji2N+o4yfZwwFYekhLwwD6pno1DHlKCG4v8p6HAB8055oi
+        cGfDJwwYyYvzjoEsDzLEkxB5wgw5S08ft+zSZYxxSmDLzTiwJBJ/FDpq6hWKKzZhz6typDdPRVMvM
+        bIqKAX1GvQmBOLCjqk//FqnBP0mvuceUUgRl16qmg0f0wnFBITH4K6XjE7wWI/mg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.94.2)
+        (envelope-from <johannes@sipsolutions.net>)
+        id 1mEbmM-00ALlG-5g; Fri, 13 Aug 2021 20:19:38 +0200
+Message-ID: <465daabf002e098f0a24cf07f72a69d7e20c7440.camel@sipsolutions.net>
+Subject: Re: [PATCH 39/64] mac80211: Use memset_after() to clear tx status
+From:   Johannes Berg <johannes@sipsolutions.net>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-hardening@vger.kernel.org
+Date:   Fri, 13 Aug 2021 20:19:36 +0200
+In-Reply-To: <202108130907.FD09C6B@keescook>
+References: <20210727205855.411487-1-keescook@chromium.org>
+         <20210727205855.411487-40-keescook@chromium.org>
+         <202107310852.551B66EE32@keescook>
+         <bb01e784dddf6a297025981a2a000a4d3fdaf2ba.camel@sipsolutions.net>
+         <202108130907.FD09C6B@keescook>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-In-Reply-To: <YRad3tQaZfR8v7lb@mtj.duckdns.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/13/21 9:29 AM, Tejun Heo wrote:
-> The problem with complex optional hardware features is often the
-> accompanying variability in terms of availability, reliability and
-> behavior. The track record has been pretty sad. That isn't to say this
-> won't be useful for anybody but it'd need careful coordination in
-> terms of picking hardware vendor and model and ensuring vendor
-> support, which kinda severely limits the usefulness.
+On Fri, 2021-08-13 at 09:08 -0700, Kees Cook wrote:
+> > 
+> > The common helper should also clear ack_signal, but that was broken by
+> > commit e3e1a0bcb3f1 ("mac80211: reduce IEEE80211_TX_MAX_RATES"), because
+> > that commit changed the order of the fields and updated carl9170 and p54
+> > properly but not the common helper...
+> 
+> It looks like p54 actually uses the rates, which is why it does this
+> manually. I can't see why carl9170 does this manually, though.
 
-I think the above view is too negative. Companies that store large 
-amounts of data have the power to make this happen by only buying 
-storage devices that support I/O prioritization well enough.
+mac80211 also uses the rates later again on status reporting, it just
+expects the # of attempts to be filled etc. I haven't looked at
+carl9170, but I would expect it to do something there and do it
+correctly, even though old it's a well-written driver and uses mac80211
+rate control, so this would need to be correct for decent performance.
 
-Bart.
+But I guess it could be that the helper could be used because the rates
+were already handed to the firmware, and the code was just copy/pasted
+from p54 (the drivers were, IIRC, developed by the same folks)
+
+johannes
 
