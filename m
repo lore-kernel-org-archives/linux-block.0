@@ -2,127 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87009C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 08:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A10C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 08:39:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B6F46109E
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 08:10:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2535660F51
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 08:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239576AbhHMILQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Aug 2021 04:11:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34802 "EHLO
+        id S239035AbhHMIjg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Aug 2021 04:39:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239501AbhHMILQ (ORCPT
+        with ESMTP id S238688AbhHMIjg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Aug 2021 04:11:16 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FB91C061756
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 01:10:50 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id a20so10942751plm.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 01:10:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=JqAwpQO8X7n0Y17FIjHDN+UGwZ5lc+0aIYD45P4Rl4g=;
-        b=l8/qcIze3UJ/k/jiJb2vHoa8CtAObJsq3orL2ts+8ZZH11WygZ3VKtV4S3zXMVAQtg
-         EUNX5F6AtaSlV0F2zXUnl64GzbdG+LG+MBHD6Ly7OkTO61r6ArgZZkZIpreVscpSFbRZ
-         ZYYGDxJFTS7yyb3dCBmJJR3z/Z3uBSwA7NsFwiyLM9SdPsK2BZhDJ9a6Mj99acrsZmdj
-         gbO6GxF/mixJbOzwMs6j6Utf+CsoHCnaWqEAXzzbPAHptvDqYTU+v4SFX7hwQx3dAxDo
-         48fH23LDthKUFdoDgc3dIlvggqFkMTf6rKFZ1Lbbu5wI85XZY9TnWVbhPMEg/+JwQW6d
-         L1Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=JqAwpQO8X7n0Y17FIjHDN+UGwZ5lc+0aIYD45P4Rl4g=;
-        b=BMVCo/ZktSIfn5mmrR0DWNLtIMdQ0CQV+/YBVSn7z22SHzNQS2JS1k0pYpYQxXTR6w
-         yP5hGv8fCNhO+LQtu1mdR84OhULV7+YYfhb8CqBw1stFHf4v6pnIv4ZmsV4LKscR2IGn
-         cn5udrB/ILprmF6YS/oV8tOjG/a6iYAF/fLHAmXwJ2afRbjo521imdnpYpuvFjfUNAwg
-         fHvdv2zC9OaSWaGGRBLZlPXT3hzg8lCHDspXiID9JdV4/VjJpd1zNfafF8CFSTaMKiJv
-         m1g8Ak1jxR7/ObJPRP20h6cKiwhzHu6+NnRFeF4kRT9Wx55v36zBRRlWo65SJM56s3k/
-         e8Lw==
-X-Gm-Message-State: AOAM532UTJzKi0Lr8nD/0H1YdDTV4P0oeasD2AN/J1whR+NmNr75JaPn
-        gMuq054OAmXp7/lpdTCsnMoF
-X-Google-Smtp-Source: ABdhPJwI8wUVL//spsdg0J/QOM84H++McIr0oJRvfmnTg8JmS3gHPpnvCN+5uY3Ok8roqBq0Y7JaFA==
-X-Received: by 2002:a17:90a:f696:: with SMTP id cl22mr1501205pjb.124.1628842249694;
-        Fri, 13 Aug 2021 01:10:49 -0700 (PDT)
-Received: from localhost ([139.177.225.237])
-        by smtp.gmail.com with ESMTPSA id x13sm1127205pjh.30.2021.08.13.01.10.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Aug 2021 01:10:49 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     jiangyadong@bytedance.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Subject: [PATCH] nbd: Aovid double completion of a request
-Date:   Fri, 13 Aug 2021 16:10:33 +0800
-Message-Id: <20210813081033.142-1-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 13 Aug 2021 04:39:36 -0400
+Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E4EC061756
+        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 01:39:10 -0700 (PDT)
+Subject: Re: [PATCH] raid1: ensure bio doesn't have more than BIO_MAX_VECS
+ sectors
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1628843946;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5CR/iaWbntZIadIIcaBov0HvNtx+4piia/RWoFZtzAY=;
+        b=GTIa02NzzP4Xd5aAlqsfS5zoTa99mCyzOdBY8BEd/M61Q3uNhzpOU7SnnZ4juQGrUi4ORm
+        fKTwep+05qTK3xirZp935cmRpuBPLKMa/NNQ05/LdTE7+1YM100dcsuIyiUqnCUuD2VWXC
+        Evp+/4gsVWxC4c9rXzt6l0ME72R2rSg=
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     song@kernel.org, linux-raid@vger.kernel.org,
+        jens@chianterastutte.eu, linux-block@vger.kernel.org
+References: <20210813060510.3545109-1-guoqing.jiang@linux.dev>
+ <YRYj8A+mDfAQBo/E@infradead.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+Message-ID: <0eac4589-ffd2-fb1a-43cc-87722731438a@linux.dev>
+Date:   Fri, 13 Aug 2021 16:38:59 +0800
 MIME-Version: 1.0
+In-Reply-To: <YRYj8A+mDfAQBo/E@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: guoqing.jiang@linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is a race between iterating over requests in
-nbd_clear_que() and completing requests in recv_work(),
-which can lead to double completion of a request.
 
-To fix it, flush the recv worker before iterating over
-the requests and don't abort the completed request
-while iterating.
 
-Fixes: 96d97e17828f ("nbd: clear_sock on netlink disconnect")
-Reported-by: Jiang Yadong <jiangyadong@bytedance.com>
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- drivers/block/nbd.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+On 8/13/21 3:49 PM, Christoph Hellwig wrote:
+> On Fri, Aug 13, 2021 at 02:05:10PM +0800, Guoqing Jiang wrote:
+>> From: Guoqing Jiang <jiangguoqing@kylinos.cn>
+>>
+>> We can't split bio with more than BIO_MAX_VECS sectors, otherwise the
+>> below call trace was triggered because we could allocate oversized
+>> write behind bio later.
+>>
+>> [ 8.097936] bvec_alloc+0x90/0xc0
+>> [ 8.098934] bio_alloc_bioset+0x1b3/0x260
+>> [ 8.099959] raid1_make_request+0x9ce/0xc50 [raid1]
+> Which bio_alloc_bioset is this?  The one in alloc_behind_master_bio?
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..19f5d5a8b16a 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -818,6 +818,10 @@ static bool nbd_clear_req(struct request *req, void *data, bool reserved)
- {
- 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
- 
-+	/* don't abort one completed request */
-+	if (blk_mq_request_completed(req))
-+		return true;
-+
- 	mutex_lock(&cmd->lock);
- 	cmd->status = BLK_STS_IOERR;
- 	mutex_unlock(&cmd->lock);
-@@ -2004,15 +2008,19 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
- {
- 	mutex_lock(&nbd->config_lock);
- 	nbd_disconnect(nbd);
--	nbd_clear_sock(nbd);
--	mutex_unlock(&nbd->config_lock);
-+	sock_shutdown(nbd);
- 	/*
- 	 * Make sure recv thread has finished, so it does not drop the last
- 	 * config ref and try to destroy the workqueue from inside the work
--	 * queue.
-+	 * queue. And this also ensure that we can safely call nbd_clear_que()
-+	 * to cancel the inflight I/Os.
- 	 */
- 	if (nbd->recv_workq)
- 		flush_workqueue(nbd->recv_workq);
-+	nbd_clear_que(nbd);
-+	nbd->task_setup = NULL;
-+	mutex_unlock(&nbd->config_lock);
-+
- 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
- 		nbd_config_put(nbd);
--- 
-2.11.0
+Yes, it should be the one since bio_clone_fast calls bio_alloc_bioset 
+with 0 iovecs.
 
+> In which case I think you want to limit the reduction of max_sectors
+> to just the write behind case, and clearly document what is going on.
+
+Ok, thanks.
+
+> In general the size of a bio only depends on the number of vectors, not
+> the total I/O size.  But alloc_behind_master_bio allocates new backing
+> pages using order 0 allocations, so in this exceptional case the total
+> size oes actually matter.
+>
+> While we're at it: this huge memory allocation looks really deadlock
+> prone.
+
+Hmm, let me think more about it, or could you share your thought? 😉
+
+Thanks,
+Guoqing
