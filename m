@@ -2,81 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D7DC4320E
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 19:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA96C43214
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 20:17:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 800AF610F7
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 19:45:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 662C2610FF
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 20:17:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233862AbhHMTpd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Aug 2021 15:45:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230440AbhHMTpc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Aug 2021 15:45:32 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F27FC061756;
-        Fri, 13 Aug 2021 12:45:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-        Resent-Cc:Resent-Message-ID; bh=vGxwLQwFO2S7TTjs1yBKTvR75GNMnpeXiG3mZABQ1io=;
-        t=1628883905; x=1630093505; b=pk97yo0ziCaTXhJO1U8NwHm2jV76Y1SaMwLWw+oePwsCEI4
-        /k80LWcPeO/cALwT9OL5KTQkkm9mEHdtcnFhrJaaBlfgHE8aOrb4x/ZeSluTZXL/didolW5u8Zs9Z
-        bdwbalR72Mqq8K97CK7TiMbG1iz2x6MbEZ8YUiMw31HJNn7vBfxDWUXmczj94VPwWq05wTWxE6U0C
-        H2v26+p/PcH1k3fe7Dev7l/mECrDmmJWH1PKMDIwkJjmVtFfs492L6GS8qdPDJFCGZA1bsGdxbnTr
-        izLUxRkmVFYineHvfmu+L5HCo0cyFqAtG1sXP/U4S/EnF1TotvO9/LYFmwC/zVzw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.94.2)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1mEd6u-00ANL4-Up; Fri, 13 Aug 2021 21:44:57 +0200
-Message-ID: <6488ed24d2ce0ccb1987c271064e25bc72c30863.camel@sipsolutions.net>
-Subject: Re: [PATCH 10/64] lib80211: Use struct_group() for memcpy() region
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Date:   Fri, 13 Aug 2021 21:44:55 +0200
-In-Reply-To: <202108130846.EC339BCA@keescook>
-References: <20210727205855.411487-1-keescook@chromium.org>
-         <20210727205855.411487-11-keescook@chromium.org>
-         <a9c8ae9e05cfe2679cd8a7ef0ab20b66cf38b930.camel@sipsolutions.net>
-         <202108130846.EC339BCA@keescook>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+        id S234510AbhHMURw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Aug 2021 16:17:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42158 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234198AbhHMURv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Aug 2021 16:17:51 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5B5F4610CC;
+        Fri, 13 Aug 2021 20:17:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628885844;
+        bh=BSAHNaF2hq41VI5supF0uF+3EBwFFPHhfcd9ufAOMmM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MAwG61mOYN7IhRo4JZHLdA0ZCaTjY7dxtcDwP4gVtPQ2m4eO3ZeJF1xPFzBJBacIA
+         /8sRDlI5ULE+UyJGNPtkT+wBX6J1uadgg9dVzNAJB+k4cjrNzFI/xnRO4Kz5vdQxR5
+         cUMGI9U+IbZNcGifM12lQMuirGg+TkM0jH07xUTFh3GzpUhSdqsrTZmt5yQG76ydGr
+         FTTmXs6+TufDl7NxLyzIoAqwmkfYRqfwcuXheWiskKLDao/Rlj9XAJrDDvsL3LWgnQ
+         +gELDoXB+RhTBZLYLaBzEZsiJi8tg4tVh5IOEiFBiCUKkNwhkbpBQCj/+HCX3njaGS
+         71fH6tWIgxZug==
+Date:   Fri, 13 Aug 2021 13:17:22 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@infradead.org
+Subject: Re: [PATCH 4/6] block: clear BIO_PERCPU_CACHE flag if polling isn't
+ supported
+Message-ID: <20210813201722.GB2661@dhcp-10-100-145-180.wdc.com>
+References: <20210812154149.1061502-1-axboe@kernel.dk>
+ <20210812154149.1061502-5-axboe@kernel.dk>
+ <20210812173143.GA3138953@dhcp-10-100-145-180.wdc.com>
+ <b60e0031-77b0-fe27-2b52-437ba21babcb@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b60e0031-77b0-fe27-2b52-437ba21babcb@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2021-08-13 at 08:49 -0700, Kees Cook wrote:
+On Thu, Aug 12, 2021 at 11:41:58AM -0600, Jens Axboe wrote:
+> Indeed. Wonder if we should make that a small helper, as any clear of
+> REQ_HIPRI should clear BIO_PERCPU_CACHE as well.
 > 
-> Ah! Yes, thanks for pointing this out. During earlier development I split
-> the "cross-field write" changes from the "cross-field read" changes, and
-> it looks like I missed moving lib80211_crypt_ccmp.c into that portion of
-> the series (which I haven't posted nor finished -- it's lower priority
-> than fixing the cross-field writes).
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 7e852242f4cc..d2722ecd4d9b 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -821,11 +821,8 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+>  		}
+>  	}
+>  
+> -	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags)) {
+> -		/* can't support alloc cache if we turn off polling */
+> -		bio_clear_flag(bio, BIO_PERCPU_CACHE);
+> -		bio->bi_opf &= ~REQ_HIPRI;
+> -	}
+> +	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+> +		bio_clear_hipri(bio);
 
-Oh, OK. I think all of this patch was cross-field read though.
+Since BIO_PERCPU_CACHE doesn't work without REQ_HIRPI, should this check
+look more like this?
 
-Anyway, the patch itself is fine, just seems incomplete and somewhat
-badly organised :)
+	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+		bio->bi_opf &= ~REQ_HIPRI;
+	if (!(bio->bi_opf & REQ_HIPRI))
+		bio_clear_flag(bio, BIO_PERCPU_CACHE);
 
-johannes
-
-
+I realise the only BIO_PERCPU_CACHE user in this series never sets it
+without REQ_HIPRI, but it looks like a problem waiting to happen if
+nothing enforces this pairing: someone could set the CACHE flag on a
+QUEUE_FLAG_POLL enabled queue without setting HIPRI and get the wrong
+bio_put() action.
