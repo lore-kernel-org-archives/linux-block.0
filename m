@@ -2,127 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9851C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 15:21:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 386D3C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 15:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B13D060F57
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 15:21:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B9E46054F
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 15:45:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242878AbhHMPVx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Aug 2021 11:21:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47352 "EHLO
+        id S241148AbhHMPpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Aug 2021 11:45:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244060AbhHMPUo (ORCPT
+        with ESMTP id S236895AbhHMPpe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Aug 2021 11:20:44 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78711C034006
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 08:13:42 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id c17so7060336plz.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 08:13:42 -0700 (PDT)
+        Fri, 13 Aug 2021 11:45:34 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBA0C061756
+        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 08:45:07 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id dt3so3571830qvb.6
+        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 08:45:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=JqAwpQO8X7n0Y17FIjHDN+UGwZ5lc+0aIYD45P4Rl4g=;
-        b=RW/1s1tEObM+aMj+uE+Htb/efFrSyNxAfeOBq1Vz2YvsOEIuCSgCTIeHifrQ0TFo7I
-         jp8U/OyohQYoOF0HPKXQFLCk8DmhQEW5zPjSUTgXU9Wxqrx6p/Sv0nXj2hO0AqTt+bG4
-         v3ubYArUpAXueL1tFkjJ/gSKDXlbyROw7FyoGSdYr0skyehKyV5XfFoc1No91evpRKVa
-         RzlJsNAlqyzrmH8sLBlMQluE5MpFZeg+Z3PFcANII9aXia4za05B+G2fxWXF/xB2r8J+
-         TT1RVgGLyly6PlM+e2EqRMgICIdE342LsMa3GZz1I6YRMn8mJvgqN8T0Mw2bUWZb9fTy
-         hQGQ==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=B9++UQjluYFHNVHpmQPx1jgqFcnRfQdNLC3YQP9GS7Q=;
+        b=pKtoEC6bxELQk/aJyT64Up3tnNBPYcWkLLIvJ7A1sujHclj2FFZpimAIv/QzdlAR+l
+         g21eYJ8Bg+7IflnlejX8/YVlYXsJil24EiN4v+5WCVxuUhogCZkdpw4At4zMS+3aKxBn
+         uzffAW+HYXtCKI0KIwbDJDK89xd3yQqSttYtWGSVTrPBo1iaAguLhnv0wlmM7aYJlQkq
+         FI/l6dFCKPyThFrGTstVPDPTl8TJ8TK/e0JrxqEdrcZ+4u2tvl7BQQ/PI4mD7wkbKFOq
+         dmE8D2shm2kcuiDvD7LgHdmKBq/6Z5rPd6RFPEp0wscI/7cgCItEZSDraOfJbzyilIYg
+         e//Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=JqAwpQO8X7n0Y17FIjHDN+UGwZ5lc+0aIYD45P4Rl4g=;
-        b=Z2lJuoDTFlxEiHZdLfGK1ZbyoxSzy0hbv7qD6VgZhGoIltJIKCz4wU+10w8mlpNdM1
-         d+r0RXj/Bn9XjDjjV4NvGUmaTbEaLCRTG0kfPsnsVaqPN6GNojZblueNj5YBM1M99pGp
-         7OCxcoJd1pzUpLdrcQMjZd3xu4BDAgHlip8TG3vxhgIH6FcDmY/agPCuJkp3nuM5H1cL
-         FmjROn2WpVWa0FfJ1uDgqEyaMTSBJrkw5OIUqytJx4jaX+QzcxQaj11JdHzQZbnmaP0I
-         ilDbIQNAZyP5VUxopMi6emvCIoftgHog6Gtg9CpbgVOzgcFb/MGX0nL2yi71wdnSfZ7a
-         Pn5g==
-X-Gm-Message-State: AOAM5337N1s0enNFLDyh9Zj5wSfAtCdH+msHD/YeXJyxDRPr1yjUfCKt
-        XAXaj5cvqsdTpebYNY/FKa3a
-X-Google-Smtp-Source: ABdhPJwGooV4r6z+dWtH6qviTbcKfA1byzCmqr/9V/NKLRQP0hZs1bL1Nd0Cd71kAtKUqRsPBAFa2Q==
-X-Received: by 2002:a05:6a00:1481:b029:3e0:4537:a1d9 with SMTP id v1-20020a056a001481b02903e04537a1d9mr2870848pfu.36.1628867621984;
-        Fri, 13 Aug 2021 08:13:41 -0700 (PDT)
-Received: from localhost ([139.177.225.245])
-        by smtp.gmail.com with ESMTPSA id y23sm2892615pfb.130.2021.08.13.08.13.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Aug 2021 08:13:41 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     josef@toxicpanda.com, axboe@kernel.dk
+        bh=B9++UQjluYFHNVHpmQPx1jgqFcnRfQdNLC3YQP9GS7Q=;
+        b=bfS2j1Hu+P0yMvfpkAmwZpoaIhVFdvTKpnMd38fG6GgOYqu0ZkrJMiVEPbWUYOK/9R
+         SWReGwt1qqJA+8AVNECzW6cChaaqQ9bmfP3LHJ930yiPfvgZnSuDaLk/plSQ5X6p3lQr
+         BEf9D/a5twhJdyCARyRDxXUbqN39zuAZf31sBW57VG8phx59ddNfFiJJTrAcKy/T3OHj
+         bpWP60lM/TzeogLijCpIZ5JqvfPqFgPzsEN5BBWRDwi646XKxZKtcsv5VtgM0QPRDlTF
+         KCh5tJ/JWaz7vf1zPTtJGwMRLvcbUNzmnGonqT9/DpqeaWDVOSd+szqPe2JVGAcXx3rs
+         AExQ==
+X-Gm-Message-State: AOAM532hFFOJ/sKL39SKzKS+SSue7ZSqcZQ2C62w0vHJYAkQo0o5hYEN
+        nzxLeu+yPlzNz9LuFSu0h4T0Jw==
+X-Google-Smtp-Source: ABdhPJx9RQY6Th0CkE5I3ByN04Wqooir3FdeHuj6MJzRj/u0jEm2CJDN2VDhOSanExV4MT47kFMfBQ==
+X-Received: by 2002:a05:6214:e62:: with SMTP id jz2mr3280396qvb.21.1628869506897;
+        Fri, 13 Aug 2021 08:45:06 -0700 (PDT)
+Received: from [192.168.1.45] (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id f17sm1065682qkm.107.2021.08.13.08.45.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Aug 2021 08:45:06 -0700 (PDT)
+Subject: Re: [PATCH RESEND] nbd: Aovid double completion of a request
+To:     Xie Yongji <xieyongji@bytedance.com>, axboe@kernel.dk
 Cc:     jiangyadong@bytedance.com, linux-block@vger.kernel.org,
         nbd@other.debian.org
-Subject: [PATCH RESEND] nbd: Aovid double completion of a request
-Date:   Fri, 13 Aug 2021 23:13:30 +0800
-Message-Id: <20210813151330.96-1-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
+References: <20210813151330.96-1-xieyongji@bytedance.com>
+From:   Josef Bacik <josef@toxicpanda.com>
+Message-ID: <10f5ac3e-4420-2635-1edc-7beca28e9619@toxicpanda.com>
+Date:   Fri, 13 Aug 2021 11:45:04 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210813151330.96-1-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is a race between iterating over requests in
-nbd_clear_que() and completing requests in recv_work(),
-which can lead to double completion of a request.
+On 8/13/21 11:13 AM, Xie Yongji wrote:
+> There is a race between iterating over requests in
+> nbd_clear_que() and completing requests in recv_work(),
+> which can lead to double completion of a request.
+> 
+> To fix it, flush the recv worker before iterating over
+> the requests and don't abort the completed request
+> while iterating.
+> 
+> Fixes: 96d97e17828f ("nbd: clear_sock on netlink disconnect")
+> Reported-by: Jiang Yadong <jiangyadong@bytedance.com>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 
-To fix it, flush the recv worker before iterating over
-the requests and don't abort the completed request
-while iterating.
+Thanks for resending this, my email client messed up.
 
-Fixes: 96d97e17828f ("nbd: clear_sock on netlink disconnect")
-Reported-by: Jiang Yadong <jiangyadong@bytedance.com>
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- drivers/block/nbd.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index c38317979f74..19f5d5a8b16a 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -818,6 +818,10 @@ static bool nbd_clear_req(struct request *req, void *data, bool reserved)
- {
- 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
- 
-+	/* don't abort one completed request */
-+	if (blk_mq_request_completed(req))
-+		return true;
-+
- 	mutex_lock(&cmd->lock);
- 	cmd->status = BLK_STS_IOERR;
- 	mutex_unlock(&cmd->lock);
-@@ -2004,15 +2008,19 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
- {
- 	mutex_lock(&nbd->config_lock);
- 	nbd_disconnect(nbd);
--	nbd_clear_sock(nbd);
--	mutex_unlock(&nbd->config_lock);
-+	sock_shutdown(nbd);
- 	/*
- 	 * Make sure recv thread has finished, so it does not drop the last
- 	 * config ref and try to destroy the workqueue from inside the work
--	 * queue.
-+	 * queue. And this also ensure that we can safely call nbd_clear_que()
-+	 * to cancel the inflight I/Os.
- 	 */
- 	if (nbd->recv_workq)
- 		flush_workqueue(nbd->recv_workq);
-+	nbd_clear_que(nbd);
-+	nbd->task_setup = NULL;
-+	mutex_unlock(&nbd->config_lock);
-+
- 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
- 		nbd_config_put(nbd);
--- 
-2.11.0
-
+Josef
