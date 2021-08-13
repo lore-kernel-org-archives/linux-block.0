@@ -2,91 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A10C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 08:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C4EC4338F
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 09:25:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2535660F51
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 08:39:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACDBA610CC
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 09:25:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239035AbhHMIjg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Aug 2021 04:39:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41398 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238688AbhHMIjg (ORCPT
+        id S239092AbhHMJZm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Aug 2021 05:25:42 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:8410 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238949AbhHMJZl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Aug 2021 04:39:36 -0400
-Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E4EC061756
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 01:39:10 -0700 (PDT)
-Subject: Re: [PATCH] raid1: ensure bio doesn't have more than BIO_MAX_VECS
- sectors
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1628843946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5CR/iaWbntZIadIIcaBov0HvNtx+4piia/RWoFZtzAY=;
-        b=GTIa02NzzP4Xd5aAlqsfS5zoTa99mCyzOdBY8BEd/M61Q3uNhzpOU7SnnZ4juQGrUi4ORm
-        fKTwep+05qTK3xirZp935cmRpuBPLKMa/NNQ05/LdTE7+1YM100dcsuIyiUqnCUuD2VWXC
-        Evp+/4gsVWxC4c9rXzt6l0ME72R2rSg=
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     song@kernel.org, linux-raid@vger.kernel.org,
-        jens@chianterastutte.eu, linux-block@vger.kernel.org
-References: <20210813060510.3545109-1-guoqing.jiang@linux.dev>
- <YRYj8A+mDfAQBo/E@infradead.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Guoqing Jiang <guoqing.jiang@linux.dev>
-Message-ID: <0eac4589-ffd2-fb1a-43cc-87722731438a@linux.dev>
-Date:   Fri, 13 Aug 2021 16:38:59 +0800
+        Fri, 13 Aug 2021 05:25:41 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GmJ2f6zrbz86NJ;
+        Fri, 13 Aug 2021 17:21:14 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 13 Aug 2021 17:25:13 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Fri, 13 Aug 2021 17:25:13 +0800
+To:     <tj@kernel.org>, linux-block <linux-block@vger.kernel.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Subject: questions about sane_behavior in cgroup v1
+Message-ID: <7ecceefb-ba98-399f-38b0-5a7717a51649@huawei.com>
+Date:   Fri, 13 Aug 2021 17:25:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <YRYj8A+mDfAQBo/E@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: guoqing.jiang@linux.dev
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
+We want to support that configuration in parent cgroup will work on
+child cgroup in cgroup v1. The feature was once supported and was
+reverted in commit 67e9c74b8a87 ("cgroup: replace __DEVEL__sane_behavior
+with cgroup2 fs type").
 
-On 8/13/21 3:49 PM, Christoph Hellwig wrote:
-> On Fri, Aug 13, 2021 at 02:05:10PM +0800, Guoqing Jiang wrote:
->> From: Guoqing Jiang <jiangguoqing@kylinos.cn>
->>
->> We can't split bio with more than BIO_MAX_VECS sectors, otherwise the
->> below call trace was triggered because we could allocate oversized
->> write behind bio later.
->>
->> [ 8.097936] bvec_alloc+0x90/0xc0
->> [ 8.098934] bio_alloc_bioset+0x1b3/0x260
->> [ 8.099959] raid1_make_request+0x9ce/0xc50 [raid1]
-> Which bio_alloc_bioset is this?  The one in alloc_behind_master_bio?
+Switching to cgroup v2 can support that, however, the cost is too high
+because all of our products are using v1, and there's a big difference
+in usage between v1 and v2.
 
-Yes, it should be the one since bio_clone_fast calls bio_alloc_bioset 
-with 0 iovecs.
-
-> In which case I think you want to limit the reduction of max_sectors
-> to just the write behind case, and clearly document what is going on.
-
-Ok, thanks.
-
-> In general the size of a bio only depends on the number of vectors, not
-> the total I/O size.  But alloc_behind_master_bio allocates new backing
-> pages using order 0 allocations, so in this exceptional case the total
-> size oes actually matter.
->
-> While we're at it: this huge memory allocation looks really deadlock
-> prone.
-
-Hmm, let me think more about it, or could you share your thought? 😉
+My question is that why is the feature reverted in cgroup v1? Is it
+because there are some severe problems? If not, we'll try to backport
+the feature to cgroup v1 again.
 
 Thanks,
-Guoqing
+Kuai
