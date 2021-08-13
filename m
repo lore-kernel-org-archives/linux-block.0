@@ -6,116 +6,119 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FF4C4320A
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 00:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B11C4320E
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 02:18:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E285F61038
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 00:30:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B19161102
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 02:18:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237670AbhHMAai (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Aug 2021 20:30:38 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:17429 "EHLO
+        id S238563AbhHMCSi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Aug 2021 22:18:38 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:25158 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236984AbhHMAai (ORCPT
+        with ESMTP id S238498AbhHMCSg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Aug 2021 20:30:38 -0400
+        Thu, 12 Aug 2021 22:18:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1628814611; x=1660350611;
+  t=1628821089; x=1660357089;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=i9Xyu7P4fBngX2nd8m5ctW2cE3xN27Ca7GVNSQDO3DM=;
-  b=h8oqOQMTvVCWn7nH5pKkKgf7XiWA3grWQ02lFVbuaXfqcxvIYoaVTnXF
-   xBlswlndXzp01Ff4gig15ZkNJuwVvUiMI1LHwBD/WgeAPtBI19dUPtrfb
-   8DgP8Hwy/jnpvIwCO6JRvge6WtKXOXoecdDn0cfTW+Xz0N1g6+niRgS8v
-   y7/70F62PIqPxRqsXRtvDeBixKRmCvYYLRGfuD8AewZcP7QhD8YpLUOKp
-   jBKGYY49vdUhT3Z9lh9wlARaaINYE2GzXuWR6bmj5VQJWprHPh8cfQgOM
-   V1N1oyM+6FL3OZ0PXMkV89ewFF9mr73mm6oWbFNqVtRhobp+OMyYU7WHT
-   g==;
+  bh=xmJ9NKKU/6L15G9dGMtx28KeDDV9aninMB0uio2PkHk=;
+  b=nR1kohDhmQUAehfEXVpvwpgZ3A4v5vLdnaO7l93MSHAnt0Zr+Pa9aGNv
+   ZHa0h0vi2VZLH8iY93jgk1BJroX95eU1qeujCRN/VGnYODfVbvr0cgQVw
+   NCupB2ErOsCSWVvSBLAp+/pZiwi1YuTUB3ZYn4anFX/OMDEX3t8Dkic7o
+   6b63wbQJRudkPG6VUT8cZ2IT9k6h5y/BKY3Uy7oVyFNzEjdn3nUBalilz
+   ushW2zPMgC1nQqbHEvtxMfIBy4ZszuQ0VZjWDT2hswRYULBcvLmbEwUdt
+   I2TvV4tLniKv1CT9FBlt10ufMgM0DHnC5d6micL/ZJFEltqH3B2Oeq9Rs
+   A==;
 X-IronPort-AV: E=Sophos;i="5.84,317,1620662400"; 
-   d="scan'208";a="181902410"
-Received: from mail-dm6nam11lp2169.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.169])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Aug 2021 08:30:11 +0800
+   d="scan'208";a="181911884"
+Received: from mail-bn7nam10lp2103.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.103])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Aug 2021 10:18:06 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WW/jSDslZIjHNvHiHFIkmBUs6f97sSW1lkTzICGcFkAx2XUyrF3n8TMvB8aE1wik6G0cj8S5/IL18PqpGW0iwNy4wAk2zhpLzW0OIiqYv54l5pzqPzz1Ky0FrswDxT+v3O3l7ET1qVVi2gVfR/v2dvAKc4qO3zD2+5e6mm7emeNBmo82nngvLodabXIwisZ3rxEBqwTPnuryqziuWipXaTGDEiX2Ygb+rjvBeY/CGisnzQs1qH/HH48c1l5lHlvE4kD6WA4WGyWB0qVvlGDYBtR4wa8nSj/16g9zH7Us/sFL8U+kcgI3C6oN0webiVYZAHtHPS+jmlMF9qPAebc8RQ==
+ b=WwgZE+JRrZi+bVxF92qFiMBqkkB9BwxTc+Ywf40ajXWEdpuQ7a7EmY8j0zp4ByvzU7ByyCZ0kQvu7c+LOQLQ/VfmaDVbapUzt9oHbOSgKolwFn7KgwYbaKYi/60/YEfB+xV5LcpgfLYyqkTZr+CQlrM0C8pyxQtApalrJfH7Kc4Y35Lp+RJbnWEhytMPxCGeJAxxcRY05AvWUUO2P9c8OZkSOJZ/JIFg/JzoU+geSuJGi4ttdReXQoWCkq/DH5Zwcrl/WdiHw8DTkKVf+WoG9RUXWbPnmZ405N//HuMwHuBl2VMskFK6x/i8YP3ewkqrb4TwM4N5ks3UmrqsnDa9zQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i9Xyu7P4fBngX2nd8m5ctW2cE3xN27Ca7GVNSQDO3DM=;
- b=Swqi1uQVANMLTYkSjVXm33Rt45PqyYfR7ZtQ+XvYuKx0xrV0BTmreiqf+mXTONGhYIK/gKy1TMIDeSpolqC72Iw0Uv9L8aySg7akQ+xzIzPpGAUR28HOdD0JvMLYxUwEGaWwgiooIpJY0fEsEBXbaeQYHiWKIn64tpbRFwatYrArzK6gtY8G8nzpMvh9custetiGdkfc7jfE3+FOA1AUXdYA66E6gSmDKFaCNpbV+N8+moNCim6odPsTdTrRuxIUYC0mVVy8mg0i9NH3orvKv83ofDWvEiZQvCJm/5wNU/u1KiS0E+YiEsxBf+p3uWl5UAh+G7rCF35YRhVWoGR7QA==
+ bh=xmJ9NKKU/6L15G9dGMtx28KeDDV9aninMB0uio2PkHk=;
+ b=Oo5mGqVKhhEbAO4gd3v/pMS1tJ4o6lG8jsBtp2eeMpU7OsBq0CHp27LC7L/4dybxstFSUxSPZMLgD17hmRP9Ahd2+KjhdlLNL1vdw3vhxWy+rNVtXJyzR6th8HwkNkZb43ph5stvWee3YDqjYamD64PiVdUxF1R3NKCYQffGNg34eQNPAxkgiBloJje4AV/5eT6we3x6ZjSk6q5BVVb3XgJkwOcLsO4m0pqVi0HmMPdoHvyzN4HrChW862lUV1EEmwHDo3tCovUInx1USwQMd0ZZkcNnNjR1sGDO0HHvRB84SeE/FS6Qi3WBdfztwrGtektKLwBJIC8/iFCzCtzcfg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i9Xyu7P4fBngX2nd8m5ctW2cE3xN27Ca7GVNSQDO3DM=;
- b=bS9XWnD2E8FotrPB3JP5p88+ySO7BLLLmguA4HurOGR9VZPPZ+FpQ5B0v8q4UKlYuEvAzSZNlvhyJKHui13RHz6u86lG4VI2sOwbs0InZs4M9IILldxnc8ZeijYzECHRNEIr7VbCyvGbwKf3modBZO+ogpS1XgqaJ5BG8tpYZo8=
+ bh=xmJ9NKKU/6L15G9dGMtx28KeDDV9aninMB0uio2PkHk=;
+ b=s2eK3z+5CXQPI4xC7IglGe4XgFoSsQz9Rksrkq+iorjITbyJLb1bdvGN2s2HrcKjpf44te5gk7EGPhMWucIO1j0rBp1UwPpuHVIk474KqU0WOvg8h50X59XStVIS43zWaYzuSMTi0TVl96KR+BOE/r024hdUC/1agpZaZqrAoi8=
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
- by DM6PR04MB4346.namprd04.prod.outlook.com (2603:10b6:5:a3::16) with
+ by DM6PR04MB6922.namprd04.prod.outlook.com (2603:10b6:5:246::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Fri, 13 Aug
- 2021 00:30:11 +0000
+ 2021 02:18:04 +0000
 Received: from DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::e521:352:1d70:31c]) by DM6PR04MB7081.namprd04.prod.outlook.com
  ([fe80::e521:352:1d70:31c%9]) with mapi id 15.20.4415.016; Fri, 13 Aug 2021
- 00:30:11 +0000
+ 02:18:04 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH v5 0/5] Initial support for multi-actuator HDDs
-Thread-Topic: [PATCH v5 0/5] Initial support for multi-actuator HDDs
-Thread-Index: AQHXj060+x8p8fG9EkmgObG6vBUOOw==
-Date:   Fri, 13 Aug 2021 00:30:11 +0000
-Message-ID: <DM6PR04MB708184CD5F221364BFCFDF47E7FA9@DM6PR04MB7081.namprd04.prod.outlook.com>
-References: <20210812075015.1090959-1-damien.lemoal@wdc.com>
- <a968069d-07df-396e-8ac6-04dfe3ee3040@kernel.dk>
- <yq1r1eyshs3.fsf@ca-mkp.ca.oracle.com>
- <743ace9d-2d10-f903-aa7f-cae3fbd1872f@kernel.dk>
+To:     Tejun Heo <tj@kernel.org>, Bart Van Assche <bvanassche@acm.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH block-5.14] Revert "block/mq-deadline: Add cgroup support"
+Thread-Topic: [PATCH block-5.14] Revert "block/mq-deadline: Add cgroup
+ support"
+Thread-Index: AQHXjtgt0+uKAnJBRE21gFzIPxLXEw==
+Date:   Fri, 13 Aug 2021 02:18:04 +0000
+Message-ID: <DM6PR04MB7081F2D0E8579489175DF363E7FA9@DM6PR04MB7081.namprd04.prod.outlook.com>
+References: <YRQL2dlLsQ6mGNtz@slm.duckdns.org>
+ <035f8334-3b69-667d-be91-92dcab9dc887@acm.org>
+ <YRQhlPBqAlkJdowG@mtj.duckdns.org>
+ <00e13a7b-6009-a9d7-41ba-aae82f5813de@acm.org>
+ <YRVfmWnOyPYl/okx@mtj.duckdns.org>
+ <631e7e18-52ca-9bec-0150-bac755e0ff24@acm.org>
+ <YRV1JkkxozEb4YO6@mtj.duckdns.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: kernel.dk; dkim=none (message not signed)
- header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
+authentication-results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 11206db3-8a43-47ed-638f-08d95df182cb
-x-ms-traffictypediagnostic: DM6PR04MB4346:
-x-microsoft-antispam-prvs: <DM6PR04MB4346538CA1D14E1FB577A61EE7FA9@DM6PR04MB4346.namprd04.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: 65c52124-f2cf-42f8-629d-08d95e009555
+x-ms-traffictypediagnostic: DM6PR04MB6922:
+x-microsoft-antispam-prvs: <DM6PR04MB6922AD5D3B89E50855EC5A14E7FA9@DM6PR04MB6922.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8/1SNrfcq9j3cFGDNGOHT0+TN0lRV7F1e6B++Vk9zE7G6i01+wUETVOT9l/dqb6omkIg8iP02LlZFACpBTk6OPOjyv1sSFHIVSm1DumRdHyiSR8CDGFML0cK+RXCzGDl6z5icm5A+MCmxch6mdAxMXqNomBiv1nydq/G2J2m57SdPR2Zc5jCs3Qx2w4PtlovgZWNr1zqAm7LgGZd5qEQ681uI2DhnwSkEq3lR99OG260cpfRIhtKL2KVNENEDRJlGIAiySAAa5Njcsu5RimqJLr4hNxHgaEIZOjldES8Y+9a0w3NlbPhjj7vmt2735vFqm54otebF7WC/g+fmkUM5jRQ94D1kwLrKtowgCtwebpJc9F6cSkftsoINj94n9l78VnQ5GPBJiB5iU5Dkuu2PVJXzpBqrcfAW2QmBJ7fvu2JidDpHTUHrU9ZwYZXBSosRUElbOV+PJ7mFzIGpQLQSaFH/7RhF6qsqtNngHrcHW/qNeHwXei6uaPSenbHp1c15P20DKQllwayvNKfiYsvDBOWEi9m/bSN10VziC/r6WZI/X/PlKKWZx1n8OHjLhI0UR8h5tx2X/y1nvtSlM6XTm6mqjoLw/Ldgsxfp2gaSbvq23Z/g1BpzWD1l0vmrXuqJ+prulPsj3Zx0sNZy0/Hwhdfq7gP+i2Dho0+kEQ5i16aZ+lpDOyBhJ4cRfnsmAmje4FJ0y7q407fxhu+vQNW9A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(136003)(346002)(39860400002)(366004)(55016002)(4744005)(83380400001)(7696005)(53546011)(8936002)(2906002)(33656002)(5660300002)(6506007)(86362001)(316002)(9686003)(38070700005)(54906003)(66446008)(66476007)(66556008)(66946007)(64756008)(4326008)(186003)(122000001)(38100700002)(76116006)(91956017)(8676002)(478600001)(71200400001)(110136005)(52536014);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: ljNTC9jgNMB9ExvNGbYsoEcriY+U6y/G9utQ8eFtbnWdHD1djlobUTa+zwBvFq5IF2wpZC5e9xf8v31xft5jPA7hkBbw+G/vefnE0PZwlpHuwV1fmBvWDu5V4LS7A7J6dZu9qR2p0W2CzBZfQMhZsfCfqVyA6RSlj8R4AmXf9nGBa4huLWnDYf9WBlydbqTEgtEjqWR0YqnJO+yjxACr70upqsr6nUTHJ0kCcHnPbhwIiGX6KZLGxHhZR70eu2Ad9xc2K+WIXYX0RcIfavVMZ+OuijwrWh6eXsKya22IFjS1PNXVIxnrtqwB3///frMKxZvmOrycplnB44gCJNq/TZzrbJMbuQFH/T9ORHyOuSlHoBOsjqsbpJl9LBU0eMMhE5mRD4YPWBDafMRKVAsJQL9SwCkpQIpQo99LR91hpzF6j5U2G88YK5jA5vyJ1Y0AX8PIx+39MHOhbx8AXTisfr0WBTQwptUfeHu1N15F0WRINO+wPk3Oo1kr62LcWmXOdT/VGEgLofH85+sPaPu751ATM4QQxlcCBCNixtmAdSchvr63nOTLQiZnQlhhQ+klg6SvfxR3Ojn8rbwcgNhNikkchwZsXwPRWEd831j2tjZNWYhhaqycnzStPn3rcuJxAsm8E0FNDua1ILmUGpSva2XNUWoIJ//O+MtiXCzlomziKBecB+sCuR0xI6Q/3tluHSTzh6pPPmH/w1YzBt+Jrg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66946007)(2906002)(6506007)(186003)(8676002)(53546011)(91956017)(4326008)(83380400001)(38100700002)(54906003)(52536014)(76116006)(110136005)(508600001)(38070700005)(66556008)(66476007)(86362001)(316002)(9686003)(55016002)(66446008)(7696005)(122000001)(64756008)(71200400001)(8936002)(33656002)(5660300002);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?K7xGUug0Yj2oV6mma+vW4tSnIwoPqHrFn9EfkgTg3nzlAhKdDwVRGlaiVs65?=
- =?us-ascii?Q?h8XjzPxJezmusgA9ZfWlrYlhA2z6fUufYRw438Zza5XFEabDe7lgsHpilSXC?=
- =?us-ascii?Q?C4oCiRZTdOLq7RALixthqWaIJak7qVwsjz0PL9z1A+oHKm5JteWb10xGQdei?=
- =?us-ascii?Q?8dNUIbGvOZK0wjEuefc62S4XVlk/Wk/VxmsE4TS1cFpQiWZ8QY+BepIk6hTG?=
- =?us-ascii?Q?SWZwvpMDb5mx4tg2su3nxgtEayjt8KHD7aM+CJe5wKdS+9qbrU4Zy/BpZe71?=
- =?us-ascii?Q?SGT5e8yF9bl694+nfT98Oz0Of/aRVY1wabvz3lWdquhJjcrXPM+dePxW83eA?=
- =?us-ascii?Q?2R5ouHaMN+MKUJZOn+W0wiLWX7JpWMwBTVuvrIt8+6CduCvN6WLDrUd7ij3M?=
- =?us-ascii?Q?8TPVL0FMxG1By3+N/0APkZRoUBLYltiY3GmZDTgimo/gOy85sAiiZnXEMg7B?=
- =?us-ascii?Q?9yTNGrXpIc9f8EkwqCEiqGIWxZMQX1d84UZ7/TpdsfZeKUT2BTEsLc7QPJuN?=
- =?us-ascii?Q?gVhox8G3P960ys1rdF/OwBlgmEjD07AfWVMLhXbkFpLXUi8TNklClm4PPsxS?=
- =?us-ascii?Q?G0InejyfBUcJt2Ols0zK64oo/7ROA/dWPIN8OXG5LTrNxWLIKzszPQhOyDU4?=
- =?us-ascii?Q?ax6XMi2x2JWxrKXCWI08FxkxoqTzWFn95+m/wQiuvBo1PmLjHYrrHZHURZuR?=
- =?us-ascii?Q?rwDTbjpw/CL2pftItOoiVN81jOXCFk4IGGeltON7UtZ+yMf+TJfcE4sp/xkJ?=
- =?us-ascii?Q?kvTfxUdHxi5BxjNuwlJ9LoJD0NJA6ecuMwF2h430+IMY4i4OBB+8sA16FHNN?=
- =?us-ascii?Q?l/EEkAvEsYkSlhJOKv3gEdqSvZgSvUWc+gKBMiJxULq/qaryDHZjjDup6zKo?=
- =?us-ascii?Q?LcFjynKyJKwmpYn+k2d0v5NA+Gr8pjDwutDaInLIKGDNN8DAcZcPrax3y7p2?=
- =?us-ascii?Q?b8Yqyrok0ulTJ4Vt+CGrt9D5VNrgH20wAXczG8rMi9SStMAjNCre6B8XyNTP?=
- =?us-ascii?Q?HIqseiCJx/IkXn5ucwYjWh5ktmjXW3C+DujfEC/CiULfjdkt2UCH1cNR5rRr?=
- =?us-ascii?Q?vN14Dl1/oTLbAxnbZvoyrzmQ8NXn9XqU2V0L8R2VoKcmr/VuFKo8kmx9GXfI?=
- =?us-ascii?Q?arTvV9hqpgCyzK/ZMSYZtmSfK3XBcSVdegVMN2MRWU6yfoIfDyrqhQByo/WF?=
- =?us-ascii?Q?9itM7nt1RGH8dOVfbrhIbIUzx18xSf4V0LWMnA8kOqxpi53Cu1slpkYnzySn?=
- =?us-ascii?Q?NKT7bz7ST+Wp+CspBPYkcHoVHnCuWQY16CrvC91o+1RXlsMVrC/4w7LGSw2y?=
- =?us-ascii?Q?i8KHBtaGi/TE/BCyrJvg5yoK9Nu+7xrQEPXCdaZMqyz97PjU5P42Pis8EGGk?=
- =?us-ascii?Q?LzC1+TaDX6D++s1cnW1z+gEGUOjZFxtf4Lwe0dzQ3rOlhRxUQw=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TRw4ltNJV4KqBqJEQAQrau1F1Ab5NS/Ux4ORIUE7LHynhSh6tyISVRRX14iT?=
+ =?us-ascii?Q?wr6pttQFO1vN/Z9scEsUxx4V2E47VaGTgmD8sFrl/T1tEd6PVpHMsuSMyR72?=
+ =?us-ascii?Q?wod+Pr+TaJ0KC/Ou7uv60XTmO87z716x2Jf6CZLeWRjNcmgUYV6cmw2XA4yw?=
+ =?us-ascii?Q?kru5CIri7taBVL2E/VYI0xTY2bxrK8qXznmbcFz8nehHr/kqLwk+yuLHFlyf?=
+ =?us-ascii?Q?hOfDToOHPGS1veJ+XEnwICKKiaQVTA5gFyhkavWy0uSP2Q+yX8kNYGui8Wln?=
+ =?us-ascii?Q?IanRbZe0MtFfKfd2qN9CMxLQ8Ynv4aHWzbKdTsOr+qjeAOBFtxFBg4bbPuRU?=
+ =?us-ascii?Q?IroiQ82C77ZEk2rzRwGdN+ruqLuaDdUqWueq3lk+5kbNGxcqBjGhZnNo7swT?=
+ =?us-ascii?Q?k4AdtxuJ2kD99jZiNFxcghf+IxH/dfpQUowXE/cG8sa+nqnhAvcVZhHl7//T?=
+ =?us-ascii?Q?YXJ6fSnjEuAbqxbjiz/bvX/YDhfAjMuptl3F5ihf635puRipmArPJKsljNC/?=
+ =?us-ascii?Q?RweJb6FXpUeShkrzpz2bl/k50HE0DOFcIhdiWGa47lRqkrAhmoaskfyPN1fc?=
+ =?us-ascii?Q?XjX2vlbqYre+UUHdw8gI3uhpEwoCx4tpfySl0ylJDHQIjhtxuEUEuWGtKujM?=
+ =?us-ascii?Q?jTeRraQD0cu9AQ8ba6yFsDMV1jWu3HgjfBUW9rigprPrNBdWvjh6lP5Ft4Ot?=
+ =?us-ascii?Q?zoROUbN/NX2aPGcXBGlBebwyCRQWgaXJuQFcBTp1j/nzNed1rWHvRd87qdDh?=
+ =?us-ascii?Q?hDkq95QQ7noHIxsWmMHDaK5kc+Feg6jMVsNeeQf2R0zhmdTOkCZiSrpXHjoT?=
+ =?us-ascii?Q?vRr1lcChmCaBwFrdo2b7Xje8bzf719eAjIvPlFMmipjXyVRWIpsE5vfAOZMm?=
+ =?us-ascii?Q?JsN4jF75u3bJTjHm4b7oNTyA0gx/Lo0mrKichVjt9DfvCWWqMDXG+eGwVVxv?=
+ =?us-ascii?Q?L+nr0Rj4AZCS12t/0BXviLU4R1RakhwXXfIgl3ND6dy4hkUa7gNCK9lYbYbc?=
+ =?us-ascii?Q?sZyX3LELAfa3vBplr2nOw9u4SqoBTL1Hyw4Z17JHkk2MgGA6C3mlur9vgHwS?=
+ =?us-ascii?Q?M2a+/6je0S1wM7upYft/FHTjAia4CYkYEshws5lsRAQnijntENTvs5BP50Oj?=
+ =?us-ascii?Q?wJN1F18Xnx/QG3z7ehvJXqHYqBPmSOxnkXWqgvuVcTrwYaH73VKPpcvziwKD?=
+ =?us-ascii?Q?kcxarvBvdaZQWvk7Jffkiz3PAaWSosFCkfyp1IHhdCuzavyw/Qx+WBbRIEC6?=
+ =?us-ascii?Q?Y75EHfPlY87EBtcNKzP+DrudRSs8+tO4mkwQymWzRLayq3GO0gY2WWyXUAJU?=
+ =?us-ascii?Q?PHT14tGZ7IHcCS3CFt3Npb8k4OkkBXWSPyBGjAvXUqyXk6Gl7sd/Sl0/n3Ce?=
+ =?us-ascii?Q?JKC28xHfEThcJ41fMgrxYWoQ7NmLXwc7rdVCUNcajqXuQzCj+g=3D=3D?=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -123,45 +126,136 @@ MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11206db3-8a43-47ed-638f-08d95df182cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2021 00:30:11.0931
+X-MS-Exchange-CrossTenant-Network-Message-Id: 65c52124-f2cf-42f8-629d-08d95e009555
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2021 02:18:04.7042
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: G/yFj0vZKD/78vPh+V0lFiMLjpAKSWAG/pr9o1g3h9iUDFfMIfNQzQg8Wfi0op2UptfkzgNGlIod9fXjPWoP2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4346
+X-MS-Exchange-CrossTenant-userprincipalname: tDOmxzisEJSMUf3qT+6ZsWwBOEtfWhYLgyKzaGDzgIm28xMKi6nIbZcxkX44AAk0hy5j2gsFXWNFfTd7ePeB8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6922
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/08/13 2:25, Jens Axboe wrote:=0A=
-> On 8/12/21 11:21 AM, Martin K. Petersen wrote:=0A=
->>=0A=
->> Jens,=0A=
->>=0A=
->>> This looks good to me now - are we taking this through the block tree?=
+On 2021/08/13 4:23, Tejun Heo wrote:=0A=
+> Hello,=0A=
+> =0A=
+> On Thu, Aug 12, 2021 at 11:16:37AM -0700, Bart Van Assche wrote:=0A=
+>> Are you perhaps referring to the iocost and iolatency cgroup controllers=
+? Is=0A=
+> =0A=
+> and blk-throtl=0A=
+> =0A=
+>> it ever useful to combine these controllers with the ioprio controller? =
+The=0A=
+> =0A=
+> So, I used controller as in cgroup IO controller, something which can=0A=
+> distribute IO resources hierarchically according to either weights or=0A=
+> limits. In that sense, there is no such thing as an ioprio controller.=0A=
+> =0A=
+>> ioprio controller was introduced with the goal to provide the informatio=
+n to=0A=
+>> the storage controller about which I/O request to handle first. My=0A=
+> =0A=
+> My experience has been that this isn't all that useful for generic IO=0A=
+> control scenarios involving cgroups. The configuration is too flexible=0A=
+> and granular to map to hardware priorities and there are way more=0A=
+> significant factors than how a controller manages its iternal ordering=0A=
+> on most commodity SSDs. For situations where such feature is useful,=0A=
+> cgroup might be able to help with tagging the associated priorities=0A=
+> but I don't think there's much beyond that and I have a hard time=0A=
+> seeing why the existing ioprio interface wouldn't be enough.=0A=
+> =0A=
+>> understanding of the iocost and iolatency controllers is that these cgro=
+up=0A=
+>> controllers decide in which order to process I/O requests. Neither=0A=
+>> controller has the last word over I/O order if the queue depth is larger=
 =0A=
->>> If so, would be nice to get a SCSI signoff on patch 2.=0A=
->>=0A=
->> I'd like to do one more review pass. Also, it may be best to take patch=
-=0A=
->> 2 through my tree since I suspect it will interfere with my VPD shuffle.=
+>> than one, something that is essential to achieve reasonable performance.=
 =0A=
 > =0A=
-> That's fine, we can do it like that. I'll wait a day or two and pending=
+> Well, whoever owns the queue can control the latencies and it isn't=0A=
+> difficult to mess up while issuing one command at a time, so if the=0A=
+> strategy is stuffing device queue as much as possible and telling the=0A=
+> device what to do, the end result is gonna be pretty sad.=0A=
 =0A=
-> any last minute changes, take 1,3-5 through block.=0A=
+Let me throw in more information related to this.=0A=
 =0A=
-Jens, Martin,=0A=
+Command duration limits (CDL) and Sequestered commands features are being=
 =0A=
-Thanks.=0A=
+drafted in SPC/SBC and ACS to give the device better hints than just a on/o=
+ff=0A=
+high priority bit. I am currently prototyping these features and I am reusi=
+ng=0A=
+the ioprio interface for that. Here is how this works:=0A=
+1) The drives exposes a set of command duration limits descriptors (up to 7=
+ for=0A=
+reads and 7 for writes) that define duration limits for a command execution=
+:=0A=
+overall processing time, queuing time and execution time. Each duration tim=
+e has=0A=
+a policy associated with it that is applied if a command processing exceeds=
+ one=0A=
+of the defined time limit: continue, continue but signal limit exceeded, ab=
+ort.=0A=
+2) Users can change the drive command duration limits to whatever they need=
 =0A=
-Without patch 1, patch 2 will cause compilation errors (disk_alloc_cranges(=
-) and=0A=
-disk_register_cranges() will be undefined). So may be both patch 1 & 2 shou=
-ld=0A=
-got through the scsi tree ?=0A=
+(e.g. change the policies for the limits to get a fast-fail behavior for=0A=
+commands instead of having the drive retry for a long time)=0A=
+3) When issuing IOs, users (or FSes) can apply a command duration limit=0A=
+descriptor by specifying the IOPRIO_CLASS_DL priority class. The priority l=
+evel=0A=
+for that class indicates the descriptor to apply to the command.=0A=
+4) At SCSI/ATA level, read and write commands have 3 bits defined to specif=
+y the=0A=
+command descriptor to apply to the command (1 to 7 or 0 for no limit)=0A=
+=0A=
+With that in place, the disk firmware can now make more intelligent decisio=
+ns on=0A=
+command scheduling to keep performance high at high queue depth without=0A=
+increasing latency for commands that have low duration limits. And based on=
+ the=0A=
+policy defined for a limit, this can be a "soft" best-effort optimization b=
+y the=0A=
+disk, or a hard one with aborts if the drive decides that what the user is=
+=0A=
+asking for is not possible.=0A=
+=0A=
+CDL can completely replace the existing binary on/off NCQ priority in a mor=
+e=0A=
+flexible manner as the user can set different duration limits for high vs l=
+ow=0A=
+priority. E.g. high priority is equivalent to a very short limit while low=
+=0A=
+priority is equivalent to longer or no limits.=0A=
+=0A=
+I think that CDL has the potential for better interactions with cgroups as=
+=0A=
+cgroup controllers can install a set of limits on the drive that fits the=
+=0A=
+controller target policy. E.g., the latency controller can set duration lim=
+its=0A=
+and use the IOPRIO_CLASS_DL class to tell the drive the exact latency targe=
+t to use.=0A=
+=0A=
+In my implementation, I have not yet looked into cgroups integration for CD=
+L=0A=
+though. I am still wondering what the best approach is: defining a new=0A=
+controller or integrating into existing controllers. The former is likely e=
+asier=0A=
+than the latter, but having hardware support for existing controllers has t=
+he=0A=
+potential to improve them seamlessly without forcing the user to change any=
+thing=0A=
+to there application setup.=0A=
+=0A=
+CDL is still in draft state in the specs though. So I will not be sending t=
+his yet.=0A=
+=0A=
+> =0A=
+> Thanks.=0A=
+> =0A=
 =0A=
 =0A=
 -- =0A=
