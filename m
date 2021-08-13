@@ -2,136 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05516C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 20:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8231C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 21:43:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D65646103A
-	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 20:33:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D92E60F14
+	for <linux-block@archiver.kernel.org>; Fri, 13 Aug 2021 21:43:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233915AbhHMUeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Aug 2021 16:34:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36766 "EHLO
+        id S234824AbhHMVoE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Aug 2021 17:44:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233905AbhHMUeR (ORCPT
+        with ESMTP id S234934AbhHMVoD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Aug 2021 16:34:17 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1D5CC061756
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 13:33:50 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id k2so13497797plk.13
-        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 13:33:50 -0700 (PDT)
+        Fri, 13 Aug 2021 17:44:03 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2FFC061756
+        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 14:43:36 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id u21-20020a17090a8915b02901782c36f543so22645889pjn.4
+        for <linux-block@vger.kernel.org>; Fri, 13 Aug 2021 14:43:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ABWosmjAaFo3NK/8PQj1Ap5zVyQ9s7Ah5OZmjqVTvdk=;
-        b=lL3C0yRT2oUzwav5KLs6yrUqX0MI35Na+qPc6LIwuv39c0zoUeURjYVj6+Qu86Ccuo
-         rYM/n7teOzKMnAeSl5TcG0oG6zQvBgdpUVerEERlqALZfGBvxArJj7YCnnFqzLCj7yKp
-         /ht8pi1qQ0d/5XNkNaTwoIDhiBLsa+pxlO9H9BYz3tpqRPGFIB5ld7qTXUxhlMmuYRlm
-         gXcOlp5H4EatcVE+1mFFJUhSHthjjmvRZ5sGZZWvXht4yeHaRrjlnPNUIu3bDtgZJNkt
-         W+VkfgRlUPbWhc2CPFOZgBV4Wy4lgwLkM8zFOawcCc4Llh4ZQlhv9CqA2yQg65ri3uLD
-         n+tQ==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=HuUumrZYiKAzBzF0sW+u1OW6Lfy1mA15+NB+MoHyf+s=;
+        b=CjsVk80qM1XlZveL/Mlj8VxPIm4ZUyf7jHYDMeExwhdsMlUVRA4fBYlTm2bvrA2Fej
+         9B0teYw36ZWPJM/RZ43xC63wT1OEANtfl5YhgBMIX/DwsNfZ8woXWEqW1CwR3kqK7WeJ
+         sk30VAgOSJg6vAlzuZn/+3fhplAEupfwDG2sIFFxz1ThhqMNwxcAlYjaTjnrCjuUmCr4
+         h9+2h443Guf0EwsZFUe74Vo2f21uDyTWuhdgHTTRlHpnQe3/ZCk0EtwcHKm0AL+JVV0c
+         KBT/0KWIsLEM7JqKUs0UGNNjp/TpqiTt7OoKVJb1zSGPB1EgGDFQaEV/ik4HlRPWK86n
+         xF8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ABWosmjAaFo3NK/8PQj1Ap5zVyQ9s7Ah5OZmjqVTvdk=;
-        b=Yr64Xa7DgEwCdbiYl4s0JMoQfQc1FB6LM50sanUPxXGAOchRvZq39rOagVi3EFol0h
-         c9Csb+BYPEwYpkY2JkGph7dw/1ip/X3iZJ2j43XzXoVsARz0Uqrah7ja5R449LjYERN/
-         ma4BwRMxh2XmnTrL+nyESKpy2GOUzJSNqQWPKAWVChJX6TmduErjRSL3fcY9/Y87Fg9X
-         Nd1XLC2dxwyfcoX4ZkxgxISz/eLP9hc9F2xIyFtYfoTtt59rC7WX/fiJskeSbfGQIqQI
-         Q4JaxzBLvGawgNh16g2JZ9akQg49XiUOhY/SmP3bsD0ZDQ4IEEyJD0bRG+hMEYaM9bg4
-         GT9Q==
-X-Gm-Message-State: AOAM531k/azMEShiJohh/nVg8jVeX65eXKgz4rxVDrHXP9WFJ57Fpi9m
-        yrmJvWzb0UUjY6afDJXaKm/XFA==
-X-Google-Smtp-Source: ABdhPJxRXlziHeLEdRZ78OBP2O1Yt1YK3jHIBrHNoOKAKFI3ic1PxitCyp6hgizB6kyc3aU19RSRPA==
-X-Received: by 2002:a17:90a:2f44:: with SMTP id s62mr4219435pjd.222.1628886829966;
-        Fri, 13 Aug 2021 13:33:49 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id n15sm3376164pff.149.2021.08.13.13.33.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 13:33:49 -0700 (PDT)
-Subject: Re: [PATCH 4/6] block: clear BIO_PERCPU_CACHE flag if polling isn't
- supported
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@infradead.org
-References: <20210812154149.1061502-1-axboe@kernel.dk>
- <20210812154149.1061502-5-axboe@kernel.dk>
- <20210812173143.GA3138953@dhcp-10-100-145-180.wdc.com>
- <b60e0031-77b0-fe27-2b52-437ba21babcb@kernel.dk>
- <20210813201722.GB2661@dhcp-10-100-145-180.wdc.com>
- <33d05811-a9c6-c1d3-8b9c-7b95bdadd457@kernel.dk>
- <20210813203138.GA2761@dhcp-10-100-145-180.wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f75f3fdc-d696-f417-fae1-087ad5d0eb44@kernel.dk>
-Date:   Fri, 13 Aug 2021 14:33:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=HuUumrZYiKAzBzF0sW+u1OW6Lfy1mA15+NB+MoHyf+s=;
+        b=OuO/3YKoSmFbSKO15giYlxwCaySK3gDTXG9Qe9RFaByMWUUhH3cIUcd0sWat173pQT
+         DmELKda1XbiHJ9yKITyHPhbFnokB2GSLitNAN+rAauIQu1D5RMyofS22ChAYrI4PQfHn
+         2o/UmDZ7bPkPdbTW9g+/c5dsz3ULT8RhPH1MkyHoI8zDmDAmorxYmstSzXqir86SkiHS
+         Sf1IzlWpnr2RnhJWwf9wP3B5RBKfIsp4Ft0igxlZ8neGDCedv/UkpJpwoCLEafMLkHpa
+         LpXa/yuKxtETWWD3yKowfM4UCL0mKXpwwhcZ4fRD3zD55/OY25szTNOq+oC9+Vv33las
+         ZDNg==
+X-Gm-Message-State: AOAM532pIM+Qasfui+VmUWafR6YCC9S7i+J7XQmXN+GCsp2OrIDfgvRX
+        ordNCsQIllu3HO2d+cpyjdM=
+X-Google-Smtp-Source: ABdhPJziVlUZ2Qgb79ttoQIrY+CbNOID2gkdFhRSY8uI7ejKnPr9QyThfLbTwUdlFDt10sWk0shSMw==
+X-Received: by 2002:a17:90a:2c05:: with SMTP id m5mr4642506pjd.32.1628891016132;
+        Fri, 13 Aug 2021 14:43:36 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:e44d])
+        by smtp.gmail.com with ESMTPSA id x16sm1235681pgc.49.2021.08.13.14.43.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Aug 2021 14:43:35 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 13 Aug 2021 11:43:30 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH block-5.14] Revert "block/mq-deadline: Add cgroup support"
+Message-ID: <YRbngn3f0eXtNi27@mtj.duckdns.org>
+References: <YRQL2dlLsQ6mGNtz@slm.duckdns.org>
+ <035f8334-3b69-667d-be91-92dcab9dc887@acm.org>
+ <YRQhlPBqAlkJdowG@mtj.duckdns.org>
+ <00e13a7b-6009-a9d7-41ba-aae82f5813de@acm.org>
+ <YRVfmWnOyPYl/okx@mtj.duckdns.org>
+ <631e7e18-52ca-9bec-0150-bac755e0ff24@acm.org>
+ <YRV1JkkxozEb4YO6@mtj.duckdns.org>
+ <DM6PR04MB7081F2D0E8579489175DF363E7FA9@DM6PR04MB7081.namprd04.prod.outlook.com>
+ <YRad3tQaZfR8v7lb@mtj.duckdns.org>
+ <5527319b-ba0c-00a3-19cf-612f2e2b073d@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20210813203138.GA2761@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5527319b-ba0c-00a3-19cf-612f2e2b073d@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/13/21 2:31 PM, Keith Busch wrote:
-> On Fri, Aug 13, 2021 at 02:19:11PM -0600, Jens Axboe wrote:
->> On 8/13/21 2:17 PM, Keith Busch wrote:
->>> On Thu, Aug 12, 2021 at 11:41:58AM -0600, Jens Axboe wrote:
->>>> Indeed. Wonder if we should make that a small helper, as any clear of
->>>> REQ_HIPRI should clear BIO_PERCPU_CACHE as well.
->>>>
->>>>
->>>> diff --git a/block/blk-core.c b/block/blk-core.c
->>>> index 7e852242f4cc..d2722ecd4d9b 100644
->>>> --- a/block/blk-core.c
->>>> +++ b/block/blk-core.c
->>>> @@ -821,11 +821,8 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
->>>>  		}
->>>>  	}
->>>>  
->>>> -	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags)) {
->>>> -		/* can't support alloc cache if we turn off polling */
->>>> -		bio_clear_flag(bio, BIO_PERCPU_CACHE);
->>>> -		bio->bi_opf &= ~REQ_HIPRI;
->>>> -	}
->>>> +	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
->>>> +		bio_clear_hipri(bio);
->>>
->>> Since BIO_PERCPU_CACHE doesn't work without REQ_HIRPI, should this check
->>> look more like this?
->>>
->>> 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
->>> 		bio->bi_opf &= ~REQ_HIPRI;
->>> 	if (!(bio->bi_opf & REQ_HIPRI))
->>> 		bio_clear_flag(bio, BIO_PERCPU_CACHE);
->>>
->>> I realise the only BIO_PERCPU_CACHE user in this series never sets it
->>> without REQ_HIPRI, but it looks like a problem waiting to happen if
->>> nothing enforces this pairing: someone could set the CACHE flag on a
->>> QUEUE_FLAG_POLL enabled queue without setting HIPRI and get the wrong
->>> bio_put() action.
->>
->> I'd rather turn that into a WARN_ON or similar. But probably better to
->> do that on the freeing side, honestly. That'll be the most reliable way,
->> but a shame to add cycles to the hot path...
+On Fri, Aug 13, 2021 at 10:17:42AM -0700, Bart Van Assche wrote:
+> On 8/13/21 9:29 AM, Tejun Heo wrote:
+> > The problem with complex optional hardware features is often the
+> > accompanying variability in terms of availability, reliability and
+> > behavior. The track record has been pretty sad. That isn't to say this
+> > won't be useful for anybody but it'd need careful coordination in
+> > terms of picking hardware vendor and model and ensuring vendor
+> > support, which kinda severely limits the usefulness.
 > 
-> Yeah, it is a coding error if that happened, so a WARN sounds okay. I
-> also don't like adding these kinds of checks, so please feel free to not
-> include it if you think the usage is clear enough.
+> I think the above view is too negative. Companies that store large amounts
+> of data have the power to make this happen by only buying storage devices
+> that support I/O prioritization well enough.
 
-Just have to watch for new additions of IOCB_ALLOC_CACHE, which
-thankfully shouldn't be too bad.
+The problem usually is that there always are other ways to skin that
+cat which don't depend on having complex optional features. So, the
+comparison isn't just about or among devices that support such extra
+feature but with other solutions which don't need them in the first
+place. Throw in the many inherent problems in expanding hardware
+interface such as variability and timescale mismatch (hardware changes
+a lot faster than software stack), the long term result tends to skew
+pretty clearly.
+
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
