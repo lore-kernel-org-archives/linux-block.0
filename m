@@ -2,114 +2,275 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10215C4338F
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 09:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 610F9C4320A
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 11:07:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E800660F00
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 09:43:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A46960E97
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 11:07:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236824AbhHNJoG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 14 Aug 2021 05:44:06 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:8412 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235202AbhHNJoF (ORCPT
+        id S238105AbhHNLHw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 14 Aug 2021 07:07:52 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:49125 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237914AbhHNLHv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Aug 2021 05:44:05 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GmwPN2P0hz865v;
-        Sat, 14 Aug 2021 17:39:36 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Sat, 14 Aug 2021 17:43:35 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Sat, 14 Aug 2021 17:43:35 +0800
-Subject: Re: [PATCH] blk-mq: allow hardware queue to get more tag while
- sharing a tag set
-To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
-        <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20210712031818.31918-1-yukuai3@huawei.com>
- <ade72519-5e16-1cc5-9a77-cb9ead42035e@acm.org>
- <5ab07cf8-a2a5-a60e-c86a-ab6ea53990bb@huawei.com>
- <e587c572-bcd7-87c4-5eea-30ccdc7455db@acm.org>
- <b124b91b-7474-fa27-b78c-01b7e7396a17@huawei.com>
- <07d2e6ba-d016-458a-a2ce-877fd7b72ed0@acm.org>
- <a63fbd36-5a43-e412-c0a2-a06730945a13@huawei.com>
- <b4603b71-4306-4542-e4fb-bf30133f89a8@acm.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <010fcd39-c819-8e0e-c188-62b1947603bf@huawei.com>
-Date:   Sat, 14 Aug 2021 17:43:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sat, 14 Aug 2021 07:07:51 -0400
+Received: by mail-io1-f71.google.com with SMTP id q2-20020a5edb020000b029059736c69d7dso6668898iop.15
+        for <linux-block@vger.kernel.org>; Sat, 14 Aug 2021 04:07:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=wsW3REPCg0yO0FBNGfNYXSFDoQbZPXDfAhUBMiCqMMg=;
+        b=bHL2qXHcP3hHdeSlF7SYFXkgRTTx7AtJRWrRjHuEcJylOOCCUWWAKuLXkSAEvXISGY
+         2vvpDhK1up/oJm6wHCGDldUSiXE1k5PZp1mdnnrRvU5TxaS3ZkxqSa1RY5NBp6CbVfff
+         bDIN2IR7suG7mnvtlg06F9kBdX/1ynJGiumvQcL+3JUnPkQsRKvZ9pEK5ypEyCi5ZALt
+         BjZ0TC8Ke2bX7C5SuUKciO9hLNw4oF97KdiWI0kond52fZYVAITgyzH191pN7AGROsmD
+         WBo2YE1t2zIwWRViFginOnz+IorV4+noIAm6owafmCJPaPgWJIW6Hh+8p+evBQDLNB8W
+         pwig==
+X-Gm-Message-State: AOAM533Z6APmU+85lp4oDKYgVYBxjwvTfJCU/Yq3L7GBwuh6DRhgslKM
+        7ZQoF+fNUYafknUPtpyhC/pnY8Q2c7sg3IvnnRmhqXEq8yrQ
+X-Google-Smtp-Source: ABdhPJy3i2Rih7zyXOdcEtyIAqKIPAXgPY3nXc7/tFap5i8zaBQdjCqekQN60qgT06qxOig675pVNdve1PjY/G1PYHJo7rpca924
 MIME-Version: 1.0
-In-Reply-To: <b4603b71-4306-4542-e4fb-bf30133f89a8@acm.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a5e:c808:: with SMTP id y8mr5480411iol.108.1628939243525;
+ Sat, 14 Aug 2021 04:07:23 -0700 (PDT)
+Date:   Sat, 14 Aug 2021 04:07:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f899f205c982f8b0@google.com>
+Subject: [syzbot] KASAN: use-after-free Read in bdev_evict_inode
+From:   syzbot <syzbot+1fb38bb7d3ce0fa3e1c4@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/08/06 10:43, Bart Van Assche wrote:
-> On 8/5/21 6:50 PM, yukuai (C) wrote:
->> After applying this configuration, the number of null_blk in my
->> machine is about 650k(330k before). Is this still too low?
-> 
-> That seems low to me. If I run the attached script on a six year old
-> desktop with an eight core i7-4790 CPU it reports a little more than 5
-> million IOPS. Has kernel debugging perhaps been enabled in the kernel on
-> the test setup? Or is the system perhaps slowed down by security
-> mitigations?
-> 
+Hello,
 
-Hi, Bart
+syzbot found the following issue on:
 
-Sorry for the delay. I was too busy with other things recently.
+HEAD commit:    92d00774360d Add linux-next specific files for 20210810
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10922209300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a6933fa6f9a86ca9
+dashboard link: https://syzkaller.appspot.com/bug?extid=1fb38bb7d3ce0fa3e1c4
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=115c5381300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c7d036300000
 
-After disable all the kernel debuging config I can think of, the
-numbers can increase to millions.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1fb38bb7d3ce0fa3e1c4@syzkaller.appspotmail.com
 
-setup cmd:
-modprobe null_blk nr_devices=0 &&
-     udevadm settle &&
-     cd /sys/kernel/config/nullb &&
-     mkdir nullb0 &&
-     cd nullb0 &&
-     echo 0 > completion_nsec &&
-     echo 512 > blocksize &&
-     echo 0 > home_node &&
-     echo 0 > irqmode &&
-     echo 1024 > size &&
-     echo 0 > memory_backed &&
-     echo 2 > queue_mode &&
-     echo 1 > power ||
-     exit $?
+==================================================================
+BUG: KASAN: use-after-free in wb_put_many include/linux/backing-dev-defs.h:250 [inline]
+BUG: KASAN: use-after-free in wb_put include/linux/backing-dev-defs.h:268 [inline]
+BUG: KASAN: use-after-free in inode_detach_wb include/linux/writeback.h:251 [inline]
+BUG: KASAN: use-after-free in bdev_evict_inode+0x3c3/0x410 fs/block_dev.c:832
+Read of size 8 at addr ffff888146568060 by task syz-executor103/6845
 
-test cmd:
-fio -filename=/dev/nullb0 -name=test -ioengine=io_uring -direct=1
--numjobs=32 -iodepth=32 -bs=4k -rw=write -group_reporting -runtime=30
---thread --gtod_reduce=1 --ioscheduler=none -time_based
+CPU: 1 PID: 6845 Comm: syz-executor103 Not tainted 5.14.0-rc5-next-20210810-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ print_address_description.constprop.0.cold+0x6c/0x309 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x83/0xdf mm/kasan/report.c:459
+ wb_put_many include/linux/backing-dev-defs.h:250 [inline]
+ wb_put include/linux/backing-dev-defs.h:268 [inline]
+ inode_detach_wb include/linux/writeback.h:251 [inline]
+ bdev_evict_inode+0x3c3/0x410 fs/block_dev.c:832
+ evict+0x2ed/0x6b0 fs/inode.c:590
+ iput_final fs/inode.c:1670 [inline]
+ iput.part.0+0x539/0x850 fs/inode.c:1696
+ iput+0x58/0x70 fs/inode.c:1686
+ device_release+0x9f/0x240 drivers/base/core.c:2193
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3463
+ put_disk block/genhd.c:1338 [inline]
+ blk_cleanup_disk+0x6b/0x80 block/genhd.c:1354
+ loop_remove drivers/block/loop.c:2415 [inline]
+ loop_control_remove drivers/block/loop.c:2463 [inline]
+ loop_control_ioctl+0x3db/0x450 drivers/block/loop.c:2495
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x444dc9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffbac3e7b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000002bef4 RCX: 0000000000444dc9
+RDX: 0000000000000000 RSI: 0000000000004c81 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007fffbac3e7e0 R09: 00007fffbac3e7e0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fffbac3e7dc
+R13: 00007fffbac3e810 R14: 00007fffbac3e7f0 R15: 000000000000003c
 
-test result:
-| test round | with this patch | without this patch |
-| ---------- | --------------- | ------------------ |
-| 1          | 4310k           | 4265k              |
-| 2          | 4295k           | 4327k              |
-| 3          | 4217k           | 4213k              |
-| 4          | 4355k           | 4236k              |
-| 5          | 4315k           | 4337k              |
-| average    | 4294k           | 4275k              |
+Allocated by task 1:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:434 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:513 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:472 [inline]
+ __kasan_kmalloc+0x9b/0xd0 mm/kasan/common.c:522
+ kmalloc_node include/linux/slab.h:609 [inline]
+ kzalloc_node include/linux/slab.h:732 [inline]
+ bdi_alloc+0x43/0x180 mm/backing-dev.c:810
+ __alloc_disk_node+0x6e/0x500 block/genhd.c:1270
+ __blk_mq_alloc_disk+0xec/0x190 block/blk-mq.c:3145
+ loop_add+0x324/0x940 drivers/block/loop.c:2344
+ loop_init+0x1f4/0x216 drivers/block/loop.c:2575
+ do_one_initcall+0x103/0x650 init/main.c:1285
+ do_initcall_level init/main.c:1360 [inline]
+ do_initcalls init/main.c:1376 [inline]
+ do_basic_setup init/main.c:1395 [inline]
+ kernel_init_freeable+0x6b1/0x73a init/main.c:1597
+ kernel_init+0x1a/0x1d0 init/main.c:1489
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-Thanks
-Kuai
+Freed by task 6845:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:360
+ ____kasan_slab_free mm/kasan/common.c:366 [inline]
+ ____kasan_slab_free mm/kasan/common.c:328 [inline]
+ __kasan_slab_free+0xfb/0x130 mm/kasan/common.c:374
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:1681 [inline]
+ slab_free_freelist_hook+0x7e/0x190 mm/slub.c:1706
+ slab_free mm/slub.c:3444 [inline]
+ kfree+0xe4/0x530 mm/slub.c:4504
+ kref_put include/linux/kref.h:65 [inline]
+ bdi_put+0x72/0xa0 mm/backing-dev.c:976
+ disk_release+0x7b/0x270 block/genhd.c:1089
+ device_release+0x9f/0x240 drivers/base/core.c:2193
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3463
+ put_disk block/genhd.c:1338 [inline]
+ blk_cleanup_disk+0x6b/0x80 block/genhd.c:1354
+ loop_remove drivers/block/loop.c:2415 [inline]
+ loop_control_remove drivers/block/loop.c:2463 [inline]
+ loop_control_ioctl+0x3db/0x450 drivers/block/loop.c:2495
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:348
+ insert_work+0x48/0x370 kernel/workqueue.c:1332
+ __queue_work+0x5c1/0xed0 kernel/workqueue.c:1498
+ flush_delayed_work+0xc6/0xf0 kernel/workqueue.c:3195
+ wb_shutdown+0x1bb/0x230 mm/backing-dev.c:363
+ bdi_unregister+0x180/0x5a0 mm/backing-dev.c:947
+ del_gendisk+0x5a6/0x730 block/genhd.c:616
+ loop_remove drivers/block/loop.c:2414 [inline]
+ loop_control_remove drivers/block/loop.c:2463 [inline]
+ loop_control_ioctl+0x3b5/0x450 drivers/block/loop.c:2495
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:348
+ insert_work+0x48/0x370 kernel/workqueue.c:1332
+ __queue_work+0x5c1/0xed0 kernel/workqueue.c:1498
+ __queue_delayed_work+0x1c8/0x270 kernel/workqueue.c:1645
+ mod_delayed_work_on+0xdd/0x220 kernel/workqueue.c:1719
+ mod_delayed_work include/linux/workqueue.h:537 [inline]
+ wb_shutdown+0x178/0x230 mm/backing-dev.c:360
+ bdi_unregister+0x180/0x5a0 mm/backing-dev.c:947
+ del_gendisk+0x5a6/0x730 block/genhd.c:616
+ loop_remove drivers/block/loop.c:2414 [inline]
+ loop_control_remove drivers/block/loop.c:2463 [inline]
+ loop_control_ioctl+0x3b5/0x450 drivers/block/loop.c:2495
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+The buggy address belongs to the object at ffff888146568000
+ which belongs to the cache kmalloc-4k of size 4096
+The buggy address is located 96 bytes inside of
+ 4096-byte region [ffff888146568000, ffff888146569000)
+The buggy address belongs to the page:
+page:ffffea0005195a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x146568
+head:ffffea0005195a00 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0x57ff00000010200(slab|head|node=1|zone=2|lastcpupid=0x7ff)
+raw: 057ff00000010200 dead000000000100 dead000000000122 ffff888010842140
+raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, ts 8085403015, free_ts 0
+ prep_new_page mm/page_alloc.c:2424 [inline]
+ get_page_from_freelist+0xa72/0x2f80 mm/page_alloc.c:4152
+ __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5374
+ alloc_page_interleave+0x1e/0x200 mm/mempolicy.c:2033
+ alloc_pages+0x29f/0x300 mm/mempolicy.c:2183
+ alloc_slab_page mm/slub.c:1744 [inline]
+ allocate_slab mm/slub.c:1881 [inline]
+ new_slab+0x319/0x490 mm/slub.c:1944
+ ___slab_alloc+0x8b9/0xf50 mm/slub.c:2955
+ __slab_alloc.constprop.0+0x4d/0xa0 mm/slub.c:3042
+ slab_alloc_node mm/slub.c:3133 [inline]
+ kmem_cache_alloc_node_trace+0x183/0x400 mm/slub.c:3217
+ kmalloc_node include/linux/slab.h:609 [inline]
+ kzalloc_node include/linux/slab.h:732 [inline]
+ bdi_alloc+0x43/0x180 mm/backing-dev.c:810
+ __alloc_disk_node+0x6e/0x500 block/genhd.c:1270
+ __blk_mq_alloc_disk+0xec/0x190 block/blk-mq.c:3145
+ loop_add+0x324/0x940 drivers/block/loop.c:2344
+ loop_init+0x1f4/0x216 drivers/block/loop.c:2575
+ do_one_initcall+0x103/0x650 init/main.c:1285
+ do_initcall_level init/main.c:1360 [inline]
+ do_initcalls init/main.c:1376 [inline]
+ do_basic_setup init/main.c:1395 [inline]
+ kernel_init_freeable+0x6b1/0x73a init/main.c:1597
+ kernel_init+0x1a/0x1d0 init/main.c:1489
+page_owner free stack trace missing
+
+Memory state around the buggy address:
+ ffff888146567f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888146567f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff888146568000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                       ^
+ ffff888146568080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888146568100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
