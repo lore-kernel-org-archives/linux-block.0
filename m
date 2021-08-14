@@ -2,64 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3C4C4320A
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 01:12:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08342C4338F
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 02:13:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66457610F7
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 01:12:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4ADD610CC
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 02:13:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236119AbhHNBMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Aug 2021 21:12:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59298 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236200AbhHNBMv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Aug 2021 21:12:51 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 1D6EB610F7;
-        Sat, 14 Aug 2021 01:12:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628903544;
-        bh=hleaGF9Z4fxjHRuUvBKMrKiLwbHJkc8mwwVap196o/8=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=NVFpnRIJCat3FdcWtnDH6l3cyraFnI7UaqZjh72wYXeesdj+sPqyLzKLd5LE/YMaK
-         8Z4y3xxWpow6CJbA+zAHFNFIVqno4em3XqEKBoRa0TGn8W6jySC0I/j1bYky3deh7b
-         J3SheOVOGROverIpxqf0EM2P2YTOa5LCVMXsawRRdLkd6XrOUEBKX6PORkuMxNXElC
-         a+w2oWZxGiF6DICZar+4iDU0yAroE4XaGXTNTqbIKCSgEXmWZMX4UIekelmleuAOp4
-         W5zE7m5RLYTA5u/1CmW4lU4CtRFGTXsZ75UNecJUA8qAra84hbmuf3eDy241AkPJjB
-         TwJulB9IBRIjQ==
-Subject: Re: [GIT PULL] Block fixes for 5.14-rc6
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <07a53f5d-0b2d-0fd3-8d50-098726bb7650@kernel.dk>
-References: <07a53f5d-0b2d-0fd3-8d50-098726bb7650@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <07a53f5d-0b2d-0fd3-8d50-098726bb7650@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.14-2021-08-13
-X-PR-Tracked-Commit-Id: cddce01160582a5f52ada3da9626c052d852ec42
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 020efdadd84958debc36e74fb5cc52b30697a611
-Message-Id: <162890354408.25277.14910399792937250254.pr-tracker-bot@kernel.org>
-Date:   Sat, 14 Aug 2021 01:12:24 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S236402AbhHNCNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Aug 2021 22:13:50 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:8411 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236327AbhHNCNu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Aug 2021 22:13:50 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GmkPs28pwz87Gg;
+        Sat, 14 Aug 2021 10:09:21 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Sat, 14 Aug 2021 10:13:20 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Sat, 14 Aug 2021 10:13:20 +0800
+Subject: Re: questions about sane_behavior in cgroup v1
+To:     Tejun Heo <tj@kernel.org>
+CC:     linux-block <linux-block@vger.kernel.org>
+References: <7ecceefb-ba98-399f-38b0-5a7717a51649@huawei.com>
+ <YRacB4mYCIw+CQTl@mtj.duckdns.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <83635fef-7409-693f-09a7-86705a52a0b0@huawei.com>
+Date:   Sat, 14 Aug 2021 10:13:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <YRacB4mYCIw+CQTl@mtj.duckdns.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 13 Aug 2021 13:12:48 -0600:
+On 2021/08/14 0:21, Tejun Heo wrote:
+> On Fri, Aug 13, 2021 at 05:25:12PM +0800, yukuai (C) wrote:
+>> We want to support that configuration in parent cgroup will work on
+>> child cgroup in cgroup v1. The feature was once supported and was
+>> reverted in commit 67e9c74b8a87 ("cgroup: replace __DEVEL__sane_behavior
+>> with cgroup2 fs type").
+>>
+>> Switching to cgroup v2 can support that, however, the cost is too high
+>> because all of our products are using v1, and there's a big difference
+>> in usage between v1 and v2.
+>>
+>> My question is that why is the feature reverted in cgroup v1? Is it
+>> because there are some severe problems? If not, we'll try to backport
+>> the feature to cgroup v1 again.
+> 
+> Because __DEVEL__sane_behavior, as the name clearly indicates, was a
+> temporary development vehicle to gradually implement cgroup2 and not
+> an official user-facing feature.
+> 
+> I have a hard time imagining backporting and maintaining that being
+> less painful than moving the users to cgroup2 but that's for you guys
+> to decide.
 
-> git://git.kernel.dk/linux-block.git tags/block-5.14-2021-08-13
+Hi, Tejun
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/020efdadd84958debc36e74fb5cc52b30697a611
+Thanks for your response.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Best regards
+Kuai
