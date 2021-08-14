@@ -2,174 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD43C4320A
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 11:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3981EC4338F
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 12:35:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EC5960234
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 11:57:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1185060EFE
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 12:35:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238254AbhHNL5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 14 Aug 2021 07:57:46 -0400
-Received: from mail-il1-f199.google.com ([209.85.166.199]:51770 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238215AbhHNL5q (ORCPT
+        id S234370AbhHNMgV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 14 Aug 2021 08:36:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35881 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229549AbhHNMgV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Aug 2021 07:57:46 -0400
-Received: by mail-il1-f199.google.com with SMTP id g9-20020a92cda90000b029020cc3319a86so6683309ild.18
-        for <linux-block@vger.kernel.org>; Sat, 14 Aug 2021 04:57:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=tFwx9H+sTjbqXalUaqlUwVvV3lDLGUXGvavN83jop28=;
-        b=VD9vHIdX2ngtExdqZSCnqVjWTnVA8fmwqWePB8uh9DWojpip1pXxGrhxCkgcFFjmlV
-         7BMGrbuKREbGiFCedgDQrFUATheondKCtuI3nDbTkQZe3Emw+Aq+O9ZsKZSgaed1Y/7f
-         17yB6pK6cizzHBzPMcJduQPHCH6csR0s9ZK00jPBFoiQh9fWheHdJ+X+a4tUZ3GnGg6V
-         5BWXp10+TQimYDqmJLPF+Bt5u2mVJVbA9ElO6s00z5F3YrtHbE7EPGOkGW4xGrg9phLq
-         Bz0TalBva7UsXzHr9zdmNpH6ue0b11BU0Q/331pMKLnXXtOk8b7tg8YFfCMtjUGuCpee
-         a+JA==
-X-Gm-Message-State: AOAM531OjI22Pf7ybh2yfxd4jveiUhfKguwRNk4GamWkn9dTnWrnMgm6
-        YuYrL8zMDxe8QrdTDKLAP9HqyVYJVTFOt9b+huEhOh/AnfUt
-X-Google-Smtp-Source: ABdhPJx2KYasBtFCquvNNnoSEfrJhdXzPJS2wgtVNcnJ0uRu/Bx/fyxDCdatYD6EOfAXSKMOiuIt7tEd4KPWzqTWYWyfaKGHjcId
+        Sat, 14 Aug 2021 08:36:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628944550;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Zi9rp4A/ofXDkM+2FBhAwSRraea93QLDveGmuBcx8js=;
+        b=R9JuWxmGhRqMwEn8i3vQgsGVObuc+q58M/CKhzeF0irdFnhO/HQRlV0gCn6dK6Dswaa6za
+        72r/46I4fdT4pYg4HoUXN9xvNwQGQWNvQCeWXrO9JuSScKkH48nqx8x6CXJzhzOyz9i0Ag
+        h6GR9dx4e0n3GDhYulAqO9BQN2scPtU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-a7BetHQTNHW64izu1qUtqg-1; Sat, 14 Aug 2021 08:35:46 -0400
+X-MC-Unique: a7BetHQTNHW64izu1qUtqg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 916B894DE1;
+        Sat, 14 Aug 2021 12:35:44 +0000 (UTC)
+Received: from localhost (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CC6B960C9F;
+        Sat, 14 Aug 2021 12:35:38 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/7] genirq/affinity: abstract new API from managed irq affinity spread
+Date:   Sat, 14 Aug 2021 20:35:25 +0800
+Message-Id: <20210814123532.229494-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a92:b312:: with SMTP id p18mr4924224ilh.233.1628942237883;
- Sat, 14 Aug 2021 04:57:17 -0700 (PDT)
-Date:   Sat, 14 Aug 2021 04:57:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000072e53a05c983ab22@google.com>
-Subject: [syzbot] general protection fault in wb_timer_fn
-From:   syzbot <syzbot+aa0801b6b32dca9dda82@syzkaller.appspotmail.com>
-To:     acme@kernel.org, alexander.shishkin@linux.intel.com,
-        axboe@kernel.dk, bp@alien8.de, hpa@zytor.com, jmattson@google.com,
-        jolsa@redhat.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org,
-        pbonzini@redhat.com, peterz@infradead.org, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hello,
 
-syzbot found the following issue on:
+irq_build_affinity_masks() actually grouping CPUs evenly into each managed
+irq vector according to NUMA and CPU locality, and it is reasonable to abstract
+one generic API for grouping CPUs evenly, the idea is suggested by Thomas
+Gleixner.
 
-HEAD commit:    92d00774360d Add linux-next specific files for 20210810
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=127f1f79300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a6933fa6f9a86ca9
-dashboard link: https://syzkaller.appspot.com/bug?extid=aa0801b6b32dca9dda82
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=145a8ff1300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1496e9fa300000
+group_cpus_evenly() is abstracted and put into lib/, so blk-mq can re-use
+it to build default queue mapping.
 
-The issue was bisected to:
+Please comments!
 
-commit 9483409ab5067941860754e78a4a44a60311d276
-Author: Namhyung Kim <namhyung@kernel.org>
-Date:   Mon Mar 15 03:34:36 2021 +0000
-
-    perf core: Allocate perf_buffer in the target node memory
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16fd40f9300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=15fd40f9300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=11fd40f9300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+aa0801b6b32dca9dda82@syzkaller.appspotmail.com
-Fixes: 9483409ab506 ("perf core: Allocate perf_buffer in the target node memory")
-
-general protection fault, probably for non-canonical address 0xdffffc00000000aa: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000550-0x0000000000000557]
-CPU: 0 PID: 6563 Comm: systemd-udevd Not tainted 5.14.0-rc5-next-20210810-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:latency_exceeded block/blk-wbt.c:237 [inline]
-RIP: 0010:wb_timer_fn+0x149/0x1740 block/blk-wbt.c:360
-Code: 03 80 3c 02 00 0f 85 68 13 00 00 48 8b 9b c8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d bb 50 05 00 00 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 35 13 00 00 48 8b 9b 50 05 00 00 48 b8 00 00 00
-RSP: 0018:ffffc90000007cd8 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000100
-RDX: 00000000000000aa RSI: ffffffff83d107dd RDI: 0000000000000550
-RBP: ffff88801ab3cc00 R08: 0000000000000003 R09: ffff88801ab3cd83
-R10: ffffffff83d107d2 R11: 0000000000027e24 R12: 0000000000000003
-R13: 0000000000000000 R14: ffff888146318000 R15: ffff88801ab3ccd0
-FS:  00007fc1898e38c0(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055aed4a39410 CR3: 0000000025577000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1421
- expire_timers kernel/time/timer.c:1466 [inline]
- __run_timers.part.0+0x675/0xa20 kernel/time/timer.c:1734
- __run_timers kernel/time/timer.c:1715 [inline]
- run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1747
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
- invoke_softirq kernel/softirq.c:432 [inline]
- __irq_exit_rcu+0x16e/0x1c0 kernel/softirq.c:636
- irq_exit_rcu+0x5/0x20 kernel/softirq.c:648
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
- </IRQ>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:638
-RIP: 0010:tomoyo_domain_quota_is_ok+0x105/0x550 security/tomoyo/util.c:1054
-Code: 68 10 48 3b 2c 24 0f 84 f4 00 00 00 49 be 00 00 00 00 00 fc ff df eb 5f e8 f8 8b d7 fd 48 89 e8 48 89 ee 48 c1 e8 03 83 e6 07 <42> 0f b6 0c 30 48 8d 45 07 48 89 c2 48 c1 ea 03 42 0f b6 14 32 40
-RSP: 0018:ffffc900011df908 EFLAGS: 00000246
-RAX: 1ffff1100f264000 RBX: 0000000000000010 RCX: 0000000000000000
-RDX: ffff888019120000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: ffff888079320000 R08: 0000000000000000 R09: 0000000000000010
-R10: ffffffff839e1c9a R11: 0000000000000010 R12: 0000000000000002
-R13: 00000000000000e1 R14: dffffc0000000000 R15: 0000000000000000
- tomoyo_supervisor+0x2f2/0xf00 security/tomoyo/common.c:2089
- tomoyo_audit_path_log security/tomoyo/file.c:168 [inline]
- tomoyo_path_permission security/tomoyo/file.c:587 [inline]
- tomoyo_path_permission+0x270/0x3a0 security/tomoyo/file.c:573
- tomoyo_path_perm+0x2f0/0x400 security/tomoyo/file.c:838
- security_inode_getattr+0xcf/0x140 security/security.c:1332
- vfs_getattr fs/stat.c:157 [inline]
- vfs_fstat+0x43/0xb0 fs/stat.c:182
- __do_sys_newfstat+0x81/0x100 fs/stat.c:422
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fc1887552e2
-Code: 48 8b 05 b9 db 2b 00 64 c7 00 16 00 00 00 b8 ff ff ff ff c3 0f 1f 40 00 83 ff 01 77 33 48 63 fe b8 05 00 00 00 48 89 d6 0f 05 <48> 3d 00 f0 ff ff 77 06 f3 c3 0f 1f 40 00 48 8b 15 81 db 2b 00 f7
-RSP: 002b:00007ffed32f4de8 EFLAGS: 00000246 ORIG_RAX: 0000000000000005
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fc1887552e2
-RDX: 00007ffed32f4e00 RSI: 00007ffed32f4e00 RDI: 0000000000000007
-RBP: 00007ffed32f4f80 R08: 0000000000000000 R09: 0000000000000001
-R10: 0000000000080000 R11: 0000000000000246 R12: 000055aed49f40e0
-R13: 000055aed4a06f10 R14: 00007ffed32f4ee0 R15: 00007ffed32f4f40
-Modules linked in:
----[ end trace 85971c24ea99db54 ]---
-RIP: 0010:latency_exceeded block/blk-wbt.c:237 [inline]
-RIP: 0010:wb_timer_fn+0x149/0x1740 block/blk-wbt.c:360
-Code: 03 80 3c 02 00 0f 85 68 13 00 00 48 8b 9b c8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d bb 50 05 00 00 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 35 13 00 00 48 8b 9b 50 05 00 00 48 b8 00 00 00
-RSP: 0018:ffffc90000007cd8 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000100
-RDX: 00000000000000aa RSI: ffffffff83d107dd RDI: 0000000000000550
-RBP: ffff88801ab3cc00 R08: 0000000000000003 R09: ffff88801ab3cd83
-R10: ffffffff83d107d2 R11: 0000000000027e24 R12: 0000000000000003
-R13: 0000000000000000 R14: ffff888146318000 R15: ffff88801ab3ccd0
-FS:  00007fc1898e38c0(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055aed4a39410 CR3: 0000000025577000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Since RFC:
+	- remove RFC
+	- rebase on -next tree
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Ming Lei (7):
+  genirq/affinity: remove the 'firstvec' parameter from
+    irq_build_affinity_masks
+  genirq/affinity: pass affinity managed mask array to
+    irq_build_affinity_masks
+  genirq/affinity: don't pass irq_affinity_desc array to
+    irq_build_affinity_masks
+  genirq/affinity: rename irq_build_affinity_masks as group_cpus_evenly
+  genirq/affinity: move group_cpus_evenly() into lib/
+  lib/group_cpus: allow to group cpus in case of !CONFIG_SMP
+  blk-mq: build default queue map via group_cpus_evenly()
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+ block/blk-mq-cpumap.c      |  64 ++----
+ include/linux/group_cpus.h |  28 +++
+ kernel/irq/affinity.c      | 404 +-----------------------------------
+ lib/Makefile               |   2 +
+ lib/group_cpus.c           | 413 +++++++++++++++++++++++++++++++++++++
+ 5 files changed, 465 insertions(+), 446 deletions(-)
+ create mode 100644 include/linux/group_cpus.h
+ create mode 100644 lib/group_cpus.c
+
+-- 
+2.31.1
+
