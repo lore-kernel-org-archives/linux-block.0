@@ -2,57 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E3DC4338F
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 07:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D208BC432BE
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 07:56:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B6556101E
-	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 07:42:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7C9260F42
+	for <linux-block@archiver.kernel.org>; Sat, 14 Aug 2021 07:56:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237003AbhHNHmb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 14 Aug 2021 03:42:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43352 "EHLO
+        id S237447AbhHNH4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 14 Aug 2021 03:56:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236519AbhHNHma (ORCPT
+        with ESMTP id S236519AbhHNH4r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Aug 2021 03:42:30 -0400
+        Sat, 14 Aug 2021 03:56:47 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FD12C06175F;
-        Sat, 14 Aug 2021 00:42:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596ADC06175F;
+        Sat, 14 Aug 2021 00:56:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=K13tg5TodNeBZEaQs93qd2dLJt
-        yJ7PjTsfGNesTofM6Aaks/5zmRuOD6XL04FlT5Ntvv3f3ET2Gb/F24YRmibcU7et52ZVoOJ85jWje
-        R2cfnLwWPFs46A+jcu+WAj+xo+Ms4NcUKmJ5MbUup8+7XH7v/9gFKciyYVrmTsSTgLg8DTMeNg5Re
-        thQo6TMQXWKUeiC1wGcFhZNCINqXYs5OatCA433+MSKG+iQE3JjLuolHDW8k5tyZBB6N6vuSuxasF
-        ukq7vcuWMiDbrws/9l/L2CC/BRdkEu6yrKm18j7GlXLNJ0wrkA2LElSqs3EXvCFHXi5iAM1j3QAFu
-        dM6tsC0Q==;
+        bh=V+NiOH/AY6x7CLqKzKV0ZvvLM9zHkh8SBM2Is+GQlVo=; b=c823Dyla4Jm6vGUypq83XMhCBm
+        KhNDuxbG9jtVxBVCmrfAQLdVhYkd5TYFt7PgHj9QDtMxS3HbnOi0jRCM/cx2//Tu4K+GnAVUIJ7LH
+        dSjLAjfjzKEZq9E6vPpGVlW6dKjLSczDVbzfgMGn/tQr5jwFcILKc0m15jbKUvEeYfHEXa5yEMgQM
+        oEVnHYu2J2En78QFAwmdgmogdVXonSBmJsU6xIyHJbVzQSGd0IGs5hEnNymY7/wROIExUwJpKu4Ke
+        MJ3JeK43p0BM+MHVaUoTXhaOomaQs/7MexRxKnPfJa4MINw81IhKkICM3G85Wk4KP5N5YDOHlaK+3
+        3lLWDRgA==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mEoHx-00GUoZ-UF; Sat, 14 Aug 2021 07:41:15 +0000
-Date:   Sat, 14 Aug 2021 08:41:05 +0100
+        id 1mEoVl-00GVYM-0y; Sat, 14 Aug 2021 07:55:29 +0000
+Date:   Sat, 14 Aug 2021 08:55:21 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-Cc:     axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+cf89d662483d6a1a0790@syzkaller.appspotmail.com
-Subject: Re: [RESEND PATCH v2] loop: fix setting arbitrarily large block size
-Message-ID: <YRdzkc6WoJOkP7yd@infradead.org>
-References: <20210814024717.1839753-1-chouhan.shreyansh630@gmail.com>
+To:     Guoqing Jiang <guoqing.jiang@linux.dev>
+Cc:     Christoph Hellwig <hch@infradead.org>, song@kernel.org,
+        linux-raid@vger.kernel.org, jens@chianterastutte.eu,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] raid1: ensure bio doesn't have more than BIO_MAX_VECS
+ sectors
+Message-ID: <YRd26VGAnBiYeHrH@infradead.org>
+References: <20210813060510.3545109-1-guoqing.jiang@linux.dev>
+ <YRYj8A+mDfAQBo/E@infradead.org>
+ <0eac4589-ffd2-fb1a-43cc-87722731438a@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210814024717.1839753-1-chouhan.shreyansh630@gmail.com>
+In-Reply-To: <0eac4589-ffd2-fb1a-43cc-87722731438a@linux.dev>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+On Fri, Aug 13, 2021 at 04:38:59PM +0800, Guoqing Jiang wrote:
+> 
+> Ok, thanks.
+> 
+> > In general the size of a bio only depends on the number of vectors, not
+> > the total I/O size.  But alloc_behind_master_bio allocates new backing
+> > pages using order 0 allocations, so in this exceptional case the total
+> > size oes actually matter.
+> > 
+> > While we're at it: this huge memory allocation looks really deadlock
+> > prone.
+> 
+> Hmm, let me think more about it, or could you share your thought? ????
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Well, you'd need a mempool which can fit the max payload of a bio,
+that is BIO_MAX_VECS pages.
+
+FYI, this is what I'd do instead of this patch for now.  We don't really
+need a vetor per sector, just per page.  So this limits the I/O
+size a little less.
+
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 3c44c4bb40fc..5b27d995302e 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1454,6 +1454,15 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 		goto retry_write;
+ 	}
+ 
++	/*
++	 * When using a bitmap, we may call alloc_behind_master_bio below.
++	 * alloc_behind_master_bio allocates a copy of the data payload a page
++	 * at a time and thus needs a new bio that can fit the whole payload
++	 * this bio in page sized chunks.
++	 */
++	if (bitmap)
++		max_sectors = min_t(int, max_sectors, BIO_MAX_VECS * PAGE_SIZE);
++
+ 	if (max_sectors < bio_sectors(bio)) {
+ 		struct bio *split = bio_split(bio, max_sectors,
+ 					      GFP_NOIO, &conf->bio_split);
