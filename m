@@ -2,154 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EF4C43214
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4304C4320A
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:17:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40F1B61A8C
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E55A61AA3
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234177AbhHPHNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 03:13:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24773 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234249AbhHPHNw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 03:13:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629098001;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KN0aTxLzmAWtRL2/TRaeBPXJ//S3RA2yfVjwHBnBNpk=;
-        b=XlHQZ2M0gwTZjdykqiPNja8ORjwf9ClolmGeDhIGTGYi6tObUY4BPa21sitWkSGTJUGqxd
-        gLeZzsbMdjyf7mK08tPmRzy7JymJ8Q3+CJBYdRKVoEvCR1roGiDzHNBxEcPWInAKYLjNLB
-        Rtoh7Et+aDSnUDKCI2UqT4+4/i+CNF4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-_K7AeRc1PoOjf81aqk5SBQ-1; Mon, 16 Aug 2021 03:13:17 -0400
-X-MC-Unique: _K7AeRc1PoOjf81aqk5SBQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21AAD1008064;
-        Mon, 16 Aug 2021 07:13:16 +0000 (UTC)
-Received: from T590 (ovpn-8-40.pek2.redhat.com [10.72.8.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E205C60CCC;
-        Mon, 16 Aug 2021 07:13:07 +0000 (UTC)
-Date:   Mon, 16 Aug 2021 15:13:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc:     Christoph Hellwig <hch@infradead.org>, song@kernel.org,
-        linux-raid@vger.kernel.org, jens@chianterastutte.eu,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] raid1: ensure bio doesn't have more than BIO_MAX_VECS
- sectors
-Message-ID: <YRoP/XU6XnPna4jU@T590>
-References: <20210813060510.3545109-1-guoqing.jiang@linux.dev>
- <YRYj8A+mDfAQBo/E@infradead.org>
- <0eac4589-ffd2-fb1a-43cc-87722731438a@linux.dev>
- <YRd26VGAnBiYeHrH@infradead.org>
- <YReFYrjtWr9MvfBr@T590>
- <05bdd906-2e78-bc85-c186-7bffac9076e0@linux.dev>
+        id S233723AbhHPHSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 03:18:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45110 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233906AbhHPHSH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Aug 2021 03:18:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 71D1161A86;
+        Mon, 16 Aug 2021 07:17:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629098256;
+        bh=V3I7Bd7jxAfVHg8y2QMOjUbjW5mcFbPEbMgjJfYkyiA=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+        b=hQ2iOmkT6EgOJa7XEQDWU1z3CDkY1B9U8B0uXz8tujK1SVEIJFbXqZ9NM3JYBR9aZ
+         nFVo4bHuMSuJE2I7ipU2GZnMheGRMmD6bI7hIg9AY4vgPxlmaAs1skjbBWjG4nKST5
+         kfA1DejFZGFn4TbntzkkxdMdtBCMBD4q6x/bB/FYtZS7CT2sCqbiH3UXvNTq3VTSDT
+         YikHySeMMxJt7lUUG/+AvxKAJQrrwyndEpF4P8YAtSvIFC9mAz+GLYBXArF30STrA6
+         NL2Qv/BvveL/9shn2FTTc7q7aY7drkOhcHXKSLaRSl1FjothGoVrz5P2xWoUh0qRnh
+         +smZIO+VNYMXg==
+Date:   Mon, 16 Aug 2021 09:17:30 +0200 (CEST)
+From:   Jiri Kosina <jikos@kernel.org>
+To:     Denis Efremov <efremov@linux.com>
+cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        regressions@lists.linux.dev, Mark Hounschell <markh@compro.net>,
+        Wim Osterholt <wim@djo.tudelft.nl>,
+        Kurt Garloff <kurt@garloff.de>, stable@vger.kernel.org
+Subject: Re: [PATCH] Revert "floppy: reintroduce O_NDELAY fix"
+In-Reply-To: <20210808074246.33449-1-efremov@linux.com>
+Message-ID: <nycvar.YFH.7.76.2108160914070.8253@cbobk.fhfr.pm>
+References: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net> <20210808074246.33449-1-efremov@linux.com>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <05bdd906-2e78-bc85-c186-7bffac9076e0@linux.dev>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 16, 2021 at 02:27:48PM +0800, Guoqing Jiang wrote:
-> Hi Ming and Christoph,
-> 
-> On 8/14/21 4:57 PM, Ming Lei wrote:
-> > On Sat, Aug 14, 2021 at 08:55:21AM +0100, Christoph Hellwig wrote:
-> > > On Fri, Aug 13, 2021 at 04:38:59PM +0800, Guoqing Jiang wrote:
-> > > > Ok, thanks.
-> > > > 
-> > > > > In general the size of a bio only depends on the number of vectors, not
-> > > > > the total I/O size.  But alloc_behind_master_bio allocates new backing
-> > > > > pages using order 0 allocations, so in this exceptional case the total
-> > > > > size oes actually matter.
-> > > > > 
-> > > > > While we're at it: this huge memory allocation looks really deadlock
-> > > > > prone.
-> > > > Hmm, let me think more about it, or could you share your thought? ????
-> > > Well, you'd need a mempool which can fit the max payload of a bio,
-> > > that is BIO_MAX_VECS pages.
-> 
-> IIUC, the behind bio is allocated from bio_set (mddev->bio_set) which is
-> allocated in md_run by
-> call bioset_init, so the mempool (bvec_pool) of  this bio_set is created by
-> biovec_init_pool which
-> uses global biovec slabs. Do we really need another mempool? Or, there is no
-> potential deadlock
->  for this case.
-> 
-> > > FYI, this is what I'd do instead of this patch for now.  We don't really
-> > > need a vetor per sector, just per page.  So this limits the I/O
-> > > size a little less.
-> > > 
-> > > diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-> > > index 3c44c4bb40fc..5b27d995302e 100644
-> > > --- a/drivers/md/raid1.c
-> > > +++ b/drivers/md/raid1.c
-> > > @@ -1454,6 +1454,15 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
-> > >   		goto retry_write;
-> > >   	}
-> > > +	/*
-> > > +	 * When using a bitmap, we may call alloc_behind_master_bio below.
-> > > +	 * alloc_behind_master_bio allocates a copy of the data payload a page
-> > > +	 * at a time and thus needs a new bio that can fit the whole payload
-> > > +	 * this bio in page sized chunks.
-> > > +	 */
-> 
-> Thanks for the above, will copy it accordingly. I will check if WriteMostly
-> is set before, then check both
-> the flag and bitmap.
-> 
-> > > +	if (bitmap)
-> > > +		max_sectors = min_t(int, max_sectors, BIO_MAX_VECS * PAGE_SIZE);
-> > s/PAGE_SIZE/PAGE_SECTORS
-> 
-> Agree.
-> 
-> > > +
-> > >   	if (max_sectors < bio_sectors(bio)) {
-> > >   		struct bio *split = bio_split(bio, max_sectors,
-> > >   					      GFP_NOIO, &conf->bio_split);
-> > Here the limit is max single-page vectors, and the above way may not work,
-> > such as:ust splitted and not
-> > 
-> > 0 ~ 254: each bvec's length is 512
-> > 255: bvec's length is 8192
-> > 
-> > the total length is just 512*255 + 8192 = 138752 bytes = 271 sectors, but it
-> > still may need 257 bvecs, which can't be allocated via bio_alloc_bioset().
-> 
-> Thanks for deeper looking! I guess it is because how vcnt is calculated.
-> 
-> > One solution is to add queue limit of max_single_page_bvec, and let
-> > blk_queue_split() handle it.
-> 
-> The path (blk_queue_split -> blk_bio_segment_split -> bvec_split_segs) which
-> respects max_segments
-> of limit. Do you mean introduce max_single_page_bvec to limit? Then perform
-> similar checking as for
->  max_segment.
+On Sun, 8 Aug 2021, Denis Efremov wrote:
 
-Yes, then the bio is guaranteed to not reach max single-page bvec limit,
-just like what __blk_queue_bounce() does.
+> The patch breaks userspace implementations (e.g. fdutils) and introduces
+> regressions in behaviour. Previously, it was possible to O_NDELAY open a
+> floppy device with no media inserted or with write protected media without
+> an error. Some userspace tools use this particular behavior for probing.
+> 
+> It's not the first time when we revert this patch. Previous revert is in
+> commit f2791e7eadf4 (Revert "floppy: refactor open() flags handling").
+> 
+> This reverts commit 8a0c014cd20516ade9654fc13b51345ec58e7be8.
 
+By reverting it you bring back the bugs that were fixed by it -- e.g. the 
+possibility to livelock mmap() on the returned fd to keep waiting on the 
+page unlock bit forever, or the functionality bug reported at [1], and 
+likely others.
 
-thanks,
-Ming
+[1] https://bugzilla.suse.com/show_bug.cgi?id=1181018
+
+-- 
+Jiri Kosina
+SUSE Labs
 
