@@ -8,66 +8,67 @@ X-Spam-Status: No, score=-21.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C95BC432BE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66185C4320A
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:54:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A341617E3
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B101617E3
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232905AbhHPFyF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 01:54:05 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:33136 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbhHPFyF (ORCPT
+        id S233156AbhHPFyu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 01:54:50 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:58796 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229623AbhHPFyt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 01:54:05 -0400
+        Mon, 16 Aug 2021 01:54:49 -0400
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 8B26D21E35;
-        Mon, 16 Aug 2021 05:53:33 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 069881FE68;
+        Mon, 16 Aug 2021 05:54:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629093213; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1629093258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aJD66JK/QbqMVGhZFAE1lmS4E54mftfsrYa+7+AS7hw=;
-        b=pOpgohigd9Q3X7eSaeGihJDC2v3ZEerTEKJnTHNcBnoJuP2cKvLfa27ToDCzvoLPyjrqrJ
-        TzrgLAA8lt+liJfk2aoVq8xdaPDt8WFLoHP0ye7yB1155bnUvM0Ii0IVu1vdB0gsTefMbX
-        Mwb1nyUfWb5Mru0cRIj/7mZaCKjdbuo=
+        bh=CzA1ReIqnrXwBZbmqYUaT6Z5TBHPWAZsWC2ezyz0xmE=;
+        b=X2iMdkDS4fgV5pJtrq+aJKoZkO2HOYr7Y6qM2ZYZ7TB+Fvm90r4Neh/achmcgCdcXiPXis
+        /xmlT8KYMxmpJv/MKp7SN0vJbEcNkvC4k+BuHDWjjvfE6rAVRla/Yx8t4tg5XgsLCOnu6R
+        wzfMFJ4OeCI7Rgm0vciluaUNU+XNo18=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629093213;
+        s=susede2_ed25519; t=1629093258;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aJD66JK/QbqMVGhZFAE1lmS4E54mftfsrYa+7+AS7hw=;
-        b=BSYP9A05Juebm+PPzPr56MFO/Es0+a935LwP616P9cHTaElROt/uU5kMP2XJo1Cr6QlC0q
-        zbRUmqtToMWYNUBg==
+        bh=CzA1ReIqnrXwBZbmqYUaT6Z5TBHPWAZsWC2ezyz0xmE=;
+        b=RCoAJ8TqJp4hTKxVKJGBOwpVKhjjwfUVnt2dKJr0wvcuPv5wz6/IzGQ5e4wkz7oVZK/bLp
+        lcz82JuvwOVvQhBA==
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 71A5C136A6;
-        Mon, 16 Aug 2021 05:53:33 +0000 (UTC)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id D949A136A6;
+        Mon, 16 Aug 2021 05:54:17 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap1.suse-dmz.suse.de with ESMTPSA
-        id i4ACG139GWH1TwAAGKfGzw
-        (envelope-from <hare@suse.de>); Mon, 16 Aug 2021 05:53:33 +0000
-Subject: Re: [PATCH v7 01/11] libata: fix ata_host_alloc_pinfo()
+        id 6N5JNIn9GWEHUAAAGKfGzw
+        (envelope-from <hare@suse.de>); Mon, 16 Aug 2021 05:54:17 +0000
+Subject: Re: [PATCH v7 09/11] libata: Introduce ncq_prio_supported sysfs
+ sttribute
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         Jens Axboe <axboe@kernel.dk>, linux-ide@vger.kernel.org
 Cc:     linux-block@vger.kernel.org
 References: <20210816014456.2191776-1-damien.lemoal@wdc.com>
- <20210816014456.2191776-2-damien.lemoal@wdc.com>
+ <20210816014456.2191776-10-damien.lemoal@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <a849c068-5538-30bc-9f0d-8dd2985e1375@suse.de>
-Date:   Mon, 16 Aug 2021 07:53:32 +0200
+Message-ID: <45f8523c-2342-7748-0190-44a4d9276a7c@suse.de>
+Date:   Mon, 16 Aug 2021 07:54:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210816014456.2191776-2-damien.lemoal@wdc.com>
+In-Reply-To: <20210816014456.2191776-10-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -76,21 +77,29 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/16/21 3:44 AM, Damien Le Moal wrote:
-> Avoid static checkers warnings about a potential NULL pointer
-> dereference for the port info variable pi. To do so, test that at least
-> one port info is available on entry to ata_host_alloc_pinfo() and start
-> the ata port initialization for() loop with pi initialized to the first
-> port info passed as argument (which is already checked to be non NULL).
-> Within the for() loop, get the next port info, if it is not NULL,
-> after initializing the ata port using the previous port info.
+> Currently, the only way a user can determine if a SATA device supports
+> NCQ priority is to try to enable the use of this feature using the
+> ncq_prio_enable sysfs device attribute. If enabling the feature fails,
+> it is because the device does not support NCQ priority. Otherwise, the
+> feature is enabled and success indicates that the device supports NCQ
+> priority.
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
+> Improve this odd interface by introducing the read-only
+> ncq_prio_supported sysfs device attribute to indicate if a SATA device
+> supports NCQ priority. The value of this attribute reflects the status
+> of device flag ATA_DFLAG_NCQ_PRIO, which is set only for devices
+> supporting NCQ priority.
+> 
+> Add this new sysfs attribute to the device attributes group of libahci
+> and libata-sata.
+> 
 > Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 > ---
->   drivers/ata/libata-core.c | 18 ++++++++++++++----
->   1 file changed, 14 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+>   drivers/ata/libahci.c     |  1 +
+>   drivers/ata/libata-sata.c | 25 +++++++++++++++++++++++++
+>   include/linux/libata.h    |  1 +
+>   3 files changed, 27 insertions(+)
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
 
