@@ -8,67 +8,67 @@ X-Spam-Status: No, score=-21.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01574C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 658D5C432BE
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:55:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6D54617E3
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:54:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AD09617E3
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 05:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233028AbhHPFzX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 01:55:23 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:59062 "EHLO
+        id S233086AbhHPFzs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 01:55:48 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:59858 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbhHPFzX (ORCPT
+        with ESMTP id S229623AbhHPFzr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 01:55:23 -0400
+        Mon, 16 Aug 2021 01:55:47 -0400
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8E7F31FE68;
-        Mon, 16 Aug 2021 05:54:51 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 0DDAD1FE66;
+        Mon, 16 Aug 2021 05:55:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629093291; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1629093316; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p14GSSLNAiRfwnN7o5zkhNvswR7f9BwazO81d15BYos=;
-        b=xkxZ1Fd74mU2RudLwFfTWEF82UGonU2bPhUWkaIQ3pFBdKdbrwNupGrZQJMhNpaREKP52Q
-        bwi5xvjrkHb4cWuWKBvQ0CdmH6RQYPbXO+kRGZlqqsf5mrBUFBGhavFL/KNPicozvtp7K6
-        vO88iFobZWpahTaZeXR/trPjtGt7HgA=
+        bh=AiS4MO5iMMblnd34sdsJIsBaxp2YN67JanmuIjicNQQ=;
+        b=SvyuC2QNRPwWYpdrQ00WG/bA+j/uMDXJM14Gw/NWMw6vjlWjGZ98TFJNdwBLIACIzJ+0+f
+        HS5xJ1XwnviGKs+3JvpekJZMqnOR6HopA0xe29Is5ikBmmwMOuhcvCIZCOsri39aTCSey5
+        npBm5Z17U0koOtS8DP+x783MFzhvTwE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629093291;
+        s=susede2_ed25519; t=1629093316;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p14GSSLNAiRfwnN7o5zkhNvswR7f9BwazO81d15BYos=;
-        b=HjXd8Jh8Tm/HRJq0ztHJuYdEdtdnCh2XUViQvKaPtgDc13zewCT5mepv9yuDK/DwxhoBT+
-        ljTc+IaUjs5OxPCA==
+        bh=AiS4MO5iMMblnd34sdsJIsBaxp2YN67JanmuIjicNQQ=;
+        b=UAdOstZA3vhDnwxDaS7A2A2r5B+9dMh0FxnRkiVUN3al5QfhDgXuJv5SIgMbQS/GidXviL
+        C1UrnAerS7jn7VBw==
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 78B13136A6;
-        Mon, 16 Aug 2021 05:54:51 +0000 (UTC)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id DE05D136A6;
+        Mon, 16 Aug 2021 05:55:15 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap1.suse-dmz.suse.de with ESMTPSA
-        id Tn+iG6v9GWEUUAAAGKfGzw
-        (envelope-from <hare@suse.de>); Mon, 16 Aug 2021 05:54:51 +0000
-Subject: Re: [PATCH v7 10/11] docs: sysfs-block-device: improve
- ncq_prio_enable documentation
+        id bH7oNMP9GWE+UAAAGKfGzw
+        (envelope-from <hare@suse.de>); Mon, 16 Aug 2021 05:55:15 +0000
+Subject: Re: [PATCH v7 11/11] docs: sysfs-block-device: document
+ ncq_prio_supported
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         Jens Axboe <axboe@kernel.dk>, linux-ide@vger.kernel.org
 Cc:     linux-block@vger.kernel.org
 References: <20210816014456.2191776-1-damien.lemoal@wdc.com>
- <20210816014456.2191776-11-damien.lemoal@wdc.com>
+ <20210816014456.2191776-12-damien.lemoal@wdc.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <d7fd2159-1034-9e64-8e14-d4edfbd94b7f@suse.de>
-Date:   Mon, 16 Aug 2021 07:54:50 +0200
+Message-ID: <127a963c-71e3-1c54-b453-39c479c72d8e@suse.de>
+Date:   Mon, 16 Aug 2021 07:55:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210816014456.2191776-11-damien.lemoal@wdc.com>
+In-Reply-To: <20210816014456.2191776-12-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -77,20 +77,13 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/16/21 3:44 AM, Damien Le Moal wrote:
-> From: Niklas Cassel <niklas.cassel@wdc.com>
+> Add documentation for the new device attribute file ncq_prio_supported,
+> and its SAS HBA equivalent sas_ncq_prio_supported.
 > 
-> NCQ priority is an optional feature of the NCQ feature set and should
-> not be confused with the NCQ feature set itself. Clarify the
-> description of the ncq_prio_enable attribute to avoid this confusion.
-> 
-> Also add the missing documentation for the equivalent
-> sas_ncq_prio_enable attribute.
-> 
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
 > Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 > ---
->   Documentation/ABI/testing/sysfs-block-device | 20 +++++++++++++++++---
->   1 file changed, 17 insertions(+), 3 deletions(-)
+>   Documentation/ABI/testing/sysfs-block-device | 25 +++++++++++++++++++-
+>   1 file changed, 24 insertions(+), 1 deletion(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
