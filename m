@@ -2,196 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E9CC4320A
-	for <linux-block@archiver.kernel.org>; Sun, 15 Aug 2021 16:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ED7C4320A
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 01:04:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA1FE60E52
-	for <linux-block@archiver.kernel.org>; Sun, 15 Aug 2021 16:22:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7C55613A4
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 01:04:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbhHOQWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Aug 2021 12:22:30 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:52146 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbhHOQW3 (ORCPT
+        id S232109AbhHPBFL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Aug 2021 21:05:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42491 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232077AbhHPBFL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Aug 2021 12:22:29 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id CDF8D1FE3F;
-        Sun, 15 Aug 2021 16:21:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629044517; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Sun, 15 Aug 2021 21:05:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629075880;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=hl/3xsL3EoM48kHqH0YKlrxAEsZuyhj8gEIz+8wIG08=;
-        b=CpEWxEt5fLCxd1JY4r52Kz8BRGlsNaSzocQH7dKkxbEysObe2fJBWWoIS/TpWR0+fiXPUZ
-        AHhaaqq7diIjZUjbOgO1PiQgmWfpuXtAhAR+fmewpmwkUnp/DWawKCKas/hL2liEcAlspp
-        5+i0dpdJ8oa4cg9ZD/LqQwoWAZMH2UI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629044517;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hl/3xsL3EoM48kHqH0YKlrxAEsZuyhj8gEIz+8wIG08=;
-        b=OSSJ47b0L+pmOTjANiS6EjHsgZrjnMFyLDUoXYrBp+trr7ohBffb/8POJcVgR64FEh/FG7
-        4WVuJd4YYtzvmdCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=HbfvwkokljU3OH/PzyLtJVDerFx7CfrHkMttzBcnp30=;
+        b=LJgPK+V4UlLe9K+z0E2k7HNPP3XQM86vu+QLx85WnsO344ZGrM9AL8oEOUQnli1hfNV7Ic
+        UM1TAWqRyZB5F+DBtBEJPzLEyA7eIFSYnnc9+6ES/PFGbq3w4UQ/4qtP5gEHM0BT7ht0g1
+        iqPAkDmq+y3bY1lHRrd7DUtIBNgONvI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-T7wyzkvIN2yAlijX0tPMew-1; Sun, 15 Aug 2021 21:04:36 -0400
+X-MC-Unique: T7wyzkvIN2yAlijX0tPMew-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0628F13D22;
-        Sun, 15 Aug 2021 16:21:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id UWOHMCM/GWHMOwAAMHmgww
-        (envelope-from <colyli@suse.de>); Sun, 15 Aug 2021 16:21:55 +0000
-Subject: Re: [PATCH v12 00/12] bcache: support NVDIMM for journaling
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-nvdimm@lists.linux.dev,
-        hare@suse.com, jack@suse.cz, dan.j.williams@intel.com, hch@lst.de,
-        ying.huang@intel.com, linux-bcache@vger.kernel.org
-References: <20210811170224.42837-1-colyli@suse.de>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <ba63e57f-ccf0-dbb2-6133-388738b6c28a@suse.de>
-Date:   Mon, 16 Aug 2021 00:21:53 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F56F108292D;
+        Mon, 16 Aug 2021 01:04:35 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F184B5D9D3;
+        Mon, 16 Aug 2021 01:04:26 +0000 (UTC)
+Date:   Mon, 16 Aug 2021 09:04:21 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        clang-built-linux@googlegroups.com, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 5/7] genirq/affinity: move group_cpus_evenly() into lib/
+Message-ID: <YRm5lXfnukXU8Ebh@T590>
+References: <20210814123532.229494-6-ming.lei@redhat.com>
+ <202108150001.EBuNGcQ8-lkp@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210811170224.42837-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202108150001.EBuNGcQ8-lkp@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Hello,
 
-Could you please consider take the v12 series for Linux v5.15 merge window?
+On Sun, Aug 15, 2021 at 01:01:07AM +0800, kernel test robot wrote:
+> Hi Ming,
+> 
+> Thank you for the patch! Perhaps something to improve:
+> 
+> [auto build test WARNING on tip/irq/core]
+> [also build test WARNING on next-20210813]
+> [cannot apply to block/for-next linux/master linus/master v5.14-rc5]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Ming-Lei/genirq-affinity-abstract-new-API-from-managed-irq-affinity-spread/20210814-203741
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git 04c2721d3530f0723b4c922a8fa9f26b202a20de
+> config: hexagon-randconfig-r041-20210814 (attached as .config)
+> compiler: clang version 12.0.0
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # https://github.com/0day-ci/linux/commit/759f72186bfdd5c3ba8b53ac0749cf7ba930012c
+>         git remote add linux-review https://github.com/0day-ci/linux
+>         git fetch --no-tags linux-review Ming-Lei/genirq-affinity-abstract-new-API-from-managed-irq-affinity-spread/20210814-203741
+>         git checkout 759f72186bfdd5c3ba8b53ac0749cf7ba930012c
+>         # save the attached .config to linux build tree
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=hexagon 
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+> >> lib/group_cpus.c:344:17: warning: no previous prototype for function 'group_cpus_evenly' [-Wmissing-prototypes]
+>    struct cpumask *group_cpus_evenly(unsigned int numgrps)
+>                    ^
+>    lib/group_cpus.c:344:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+>    struct cpumask *group_cpus_evenly(unsigned int numgrps)
+>    ^
+>    static 
+>    1 warning generated.
+> 
+> 
+> vim +/group_cpus_evenly +344 lib/group_cpus.c
+> 
+>    328	
+>    329	/**
+>    330	 * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
+>    331	 * @numgrps: number of groups
+>    332	 *
+>    333	 * Return: cpumask array if successful, NULL otherwise. And each element
+>    334	 * includes CPUs assigned to this group
+>    335	 *
+>    336	 * Try to put close CPUs from viewpoint of CPU and NUMA locality into
+>    337	 * same group, and run two-stage grouping:
+>    338	 *	1) allocate present CPUs on these groups evenly first
+>    339	 *	2) allocate other possible CPUs on these groups evenly
+>    340	 *
+>    341	 * We guarantee in the resulted grouping that all CPUs are covered, and
+>    342	 * no same CPU is assigned to different groups
+>    343	 */
+>  > 344	struct cpumask *group_cpus_evenly(unsigned int numgrps)
 
-In this version the full pointer in the on-media data structures are
-modified to per-namespace offset, and all previous review comments are
-fixed.
-There is no more comments for 4 hours, and this series survives in my
-smoking test for 24+ hours, as an EXPERIMENTAL code the current status
-is fine IMHO.
-
-Thanks in advance.
-
-Coly Li
+But the above symbol is exported via EXPORT_SYMBOL_GPL(), in current
+kernel tree, we usually keep such exported symbol as global, or is there
+some change in kernel coding style recently?
 
 
-On 8/12/21 1:02 AM, Coly Li wrote:
-> This is the v12 effort for supporting NVDIMM for bcache journal (some
-> versions may not posted with version numbers).
->
-> The major change of this version is the full pointer of on-media data
-> structure is replaced by per-namespace offset. Now a pointer address is
-> calculated by namespace base mapping address + per-namespace offset.
-> The code logic is same as previous version, all changes are only related
-> to the base+offset style pointer replacement.
->
-> The nvm-pages allocator is a buddy-like allocator, which allocates size
-> in power-of-2 pages from the NVDIMM namespace. User space tool 'bcache'
-> has a new added '-M' option to format a NVDIMM namespace and register it
-> via sysfs interface as a bcache meta device. The nvm-pages kernel code
-> does a DAX mapping to map the whole namespace into system's memory
-> address range, and allocating the pages to requestion like typical buddy
-> allocator does. The major difference is nvm-pages allocator maintains
-> the pages allocated to each requester by an allocation list which stored
-> on NVDIMM too. Allocation list of different requester is tracked by a
-> pre-defined UUID, all the pages tracked in all allocation lists are
-> treated as allocated busy pages and won't be initialized into buddy
-> system after the system reboot.
->
-> The bcache journal code may request a block of power-of-2 size pages
-> from the nvm-pages allocator, normally it is a range of 256MB or 512MB
-> continuous pages range. During meta data journaling, the in-memory jsets
-> go into the calculated nvdimm pages location by kernel memcpy routine.
-> So the journaling I/Os won't go into block device (e.g. SSD) anymore, 
-> the write and read for journal jsets happen on NVDIMM.
->
-> Intel developers Jianpeng Ma and Qiaowei Ren compose the initial code of
-> nvm-pages, the related patches are,
-> - bcache: initialize the nvm pages allocator
-> - bcache: initialization of the buddy
-> - bcache: bch_nvm_alloc_pages() of the buddy
-> - bcache: bch_nvm_free_pages() of the buddy
-> - bcache: get recs list head for allocated pages by specific uuid
-> All the code depends on Linux libnvdimm and dax drivers, the bcache nvm-
-> pages allocator can be treated as user of these two drivers.
->
-> I modify the bcache code to recognize the nvm meta device feature,
-> initialize journal on NVDIMM, and do journal I/Os on NVDIMM in the
-> following patches,
-> - bcache: add initial data structures for nvm pages
-> - bcache: use bucket index to set GC_MARK_METADATA for journal buckets
->   in bch_btree_gc_finish()
-> - bcache: add BCH_FEATURE_INCOMPAT_NVDIMM_META into incompat feature set
-> - bcache: initialize bcache journal for NVDIMM meta device
-> - bcache: support storing bcache journal into NVDIMM meta device
-> - bcache: read jset from NVDIMM pages for journal replay
-> - bcache: add sysfs interface register_nvdimm_meta to register NVDIMM
->   meta device
->
-> In this series, all previously addressed issue via code reviews are all
-> fixed. And all known issue during testing are fixed. The code survives
-> from 24+ hours smoking and I/O pressure testing among many reboots, it
-> works well as expected.
->
-> All the code is EXPERIMENTAL, they won't be enabled by default until we
-> feel the NVDIMM support is completed and stable.
->
-> Although there are some experts helped to review the code logic, but we
-> do appreciate if more people may help to review the code. It is quite
-> common that bcache patches don't have enough code reviewer, but this
-> time I do need help for more review or comments on this series.
->
-> Thanks in advance.
->
-> Coly Li
-> ---
->
-> Coly Li (7):
->   bcache: add initial data structures for nvm pages
->   bcache: use bucket index to set GC_MARK_METADATA for journal buckets
->     in bch_btree_gc_finish()
->   bcache: add BCH_FEATURE_INCOMPAT_NVDIMM_META into incompat feature set
->   bcache: initialize bcache journal for NVDIMM meta device
->   bcache: support storing bcache journal into NVDIMM meta device
->   bcache: read jset from NVDIMM pages for journal replay
->   bcache: add sysfs interface register_nvdimm_meta to register NVDIMM
->     meta device
->
-> Jianpeng Ma (5):
->   bcache: initialize the nvm pages allocator
->   bcache: initialization of the buddy
->   bcache: bch_nvmpg_alloc_pages() of the buddy
->   bcache: bch_nvmpg_free_pages() of the buddy allocator
->   bcache: get recs list head for allocated pages by specific uuid
->
->  drivers/md/bcache/Kconfig       |  10 +
->  drivers/md/bcache/Makefile      |   1 +
->  drivers/md/bcache/btree.c       |   6 +-
->  drivers/md/bcache/features.h    |   9 +
->  drivers/md/bcache/journal.c     | 325 +++++++++--
->  drivers/md/bcache/journal.h     |   2 +-
->  drivers/md/bcache/nvm-pages.c   | 931 ++++++++++++++++++++++++++++++++
->  drivers/md/bcache/nvm-pages.h   | 127 +++++
->  drivers/md/bcache/super.c       |  53 +-
->  include/uapi/linux/bcache-nvm.h | 253 +++++++++
->  10 files changed, 1649 insertions(+), 68 deletions(-)
->  create mode 100644 drivers/md/bcache/nvm-pages.c
->  create mode 100644 drivers/md/bcache/nvm-pages.h
->  create mode 100644 include/uapi/linux/bcache-nvm.h
->
+
+Thanks,
+Ming
 
