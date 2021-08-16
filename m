@@ -2,298 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9EDAC4320E
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 13:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A5D4C4338F
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 14:17:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94198632CD
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 13:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD83660F5C
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 14:17:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbhHPNrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 09:47:00 -0400
-Received: from verein.lst.de ([213.95.11.211]:54770 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229617AbhHPNq7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 09:46:59 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6C22E6736F; Mon, 16 Aug 2021 15:46:24 +0200 (CEST)
-Date:   Mon, 16 Aug 2021 15:46:24 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 9/9] block: add an explicit ->disk backpointer to the
- request_queue
-Message-ID: <20210816134624.GA24234@lst.de>
-References: <20210816131910.615153-1-hch@lst.de>
+        id S230107AbhHPORg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 10:17:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33552 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229902AbhHPORf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Aug 2021 10:17:35 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 885D6C061764
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 07:17:04 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id c2-20020a0568303482b029048bcf4c6bd9so21064748otu.8
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 07:17:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xqBgEkGNywTvhBrskowD08mnqrtLbd1U3IqXducmNiM=;
+        b=hi9oKWJP7v7pHxG3rppmcvZBqhh3QpTGh0B69Ipa7d1CP77jb1Z7F8xfBkHCNYWqO2
+         ixy9IhmRobpxHXCUhyGF/wvH8rw2frBoQtKjjjWrbCz2YYYclUQyJxwEZBFcFSpYo+Jw
+         gP99djVzYyAM97wm6HAG4x0uRgDErxBbrzDJVqP4mfwfVxp/BBESRsNIbbLNXRp2R7rL
+         3lhcTuYGvNnLTGwHwmzFs+JQBTnz/cJpZGTzKODU4WlknajAuTgZ5IcLbcUNZ1APRgZP
+         l2F8oJ8VjjTdTO8TO+5EXqQGYyBKAyTgGzygGJBI9t7kyIjVjFqS8CABNAlICymoNmsg
+         V5ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=xqBgEkGNywTvhBrskowD08mnqrtLbd1U3IqXducmNiM=;
+        b=M1ntbEJ060yHqSVDdReJy+Rq9vomXFZM71KsW9i1VRlIQSac5TRUKxXat3my9cf429
+         YCZLIqGLnf2rfnXP5qGdUZcGW1oBDnEuEx2+L3CsTWaL1uCAPIV+M2yv/PlUBnEs6lN4
+         hXm/tFIR4DtIAsoqGinIvXV5GUqbBMqPEIv6GHTNkyNnvMc5IXubvgSFqkjCJTPyA1+7
+         ArsK+9scuuNA241y3jnLQ8YR6swCC4v7Mxt+O8ZfoGdV5t9zo3AHelDTcmqUoVxcvQeg
+         e2FxY9VwtRTwN1F1RQhsWmHTAWxi8/ubLLXIz5lRS0EmirsiUcG+nolGpbBr6nLLlFkS
+         8jfQ==
+X-Gm-Message-State: AOAM53216KvvIXmzuz19YGiKHg6Pk8pkSYkUZd4xyqQPuA0rnGU+7lML
+        NX+osHNxh5ADYw691zXRs3I=
+X-Google-Smtp-Source: ABdhPJwk9RHSoGUJTOU9tmS9JZvmAHg37gvCbM3/T8FG2iyjhZiOE2JVE2I1qIxtU73Rp6CqWPD8tw==
+X-Received: by 2002:a05:6830:2695:: with SMTP id l21mr13300180otu.138.1629123424016;
+        Mon, 16 Aug 2021 07:17:04 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id h6sm2219953otu.16.2021.08.16.07.17.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Aug 2021 07:17:03 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date:   Mon, 16 Aug 2021 07:17:02 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [dm-devel] [PATCH 4/8] block: support delayed holder registration
+Message-ID: <20210816141702.GA3449320@roeck-us.net>
+References: <20210804094147.459763-1-hch@lst.de>
+ <20210804094147.459763-5-hch@lst.de>
+ <20210814211309.GA616511@roeck-us.net>
+ <20210815070724.GA23276@lst.de>
+ <a8d66952-ee44-d3fa-d699-439415b9abfe@roeck-us.net>
+ <20210816072158.GA27147@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210816131910.615153-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210816072158.GA27147@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace the magic lookup through the kobject tree with an explicit
-backpointer, given that the device model links are set up and torn
-down at times when I/O is still possible, leading to potential
-NULL or invalid pointer dereferences.
+On Mon, Aug 16, 2021 at 09:21:58AM +0200, Christoph Hellwig wrote:
+> On Sun, Aug 15, 2021 at 07:27:37AM -0700, Guenter Roeck wrote:
+> > [   14.467748][    T1]  Possible unsafe locking scenario:
+> > [   14.467748][    T1]
+> > [   14.467928][    T1]        CPU0                    CPU1
+> > [   14.468058][    T1]        ----                    ----
+> > [   14.468187][    T1]   lock(&disk->open_mutex);
+> > [   14.468317][    T1]                                lock(mtd_table_mutex);
+> > [   14.468493][    T1]                                lock(&disk->open_mutex);
+> > [   14.468671][    T1]   lock(mtd_table_mutex);
+> 
+> Oh, that ooks like a really old one, fixed by
+> b7abb0516822 ("mtd: fix lock hierarchy in deregister_mtd_blktrans")
+> in linux-next.
 
-Fixes: edb0872f44ec ("block: move the bdi from the request_queue to the gendisk")
-Reported-by: syzbot <syzbot+aa0801b6b32dca9dda82@syzkaller.appspotmail.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bfq-iosched.c          |  2 +-
- block/blk-cgroup.c           |  4 ++--
- block/blk-mq.c               |  2 +-
- block/blk-settings.c         |  8 ++++----
- block/blk-sysfs.c            | 13 ++++++-------
- block/blk-wbt.c              | 10 +++++-----
- block/genhd.c                |  2 ++
- include/linux/blkdev.h       |  5 ++---
- include/trace/events/kyber.h |  6 +++---
- 9 files changed, 26 insertions(+), 26 deletions(-)
+I have seen the problem in next-20210813 and that patch is there,
+so that is somewhat unlikely.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index e4a61eda2d0f..6ccab91a6336 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5269,7 +5269,7 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 	switch (ioprio_class) {
- 	default:
- 		pr_err("bdi %s: bfq: bad prio class %d\n",
--			bdi_dev_name(queue_to_disk(bfqq->bfqd->queue)->bdi),
-+			bdi_dev_name(bfqq->bfqd->queue->disk->bdi),
- 			ioprio_class);
- 		fallthrough;
- 	case IOPRIO_CLASS_NONE:
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index db034e35ae20..a032536a298d 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -489,9 +489,9 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
- 
- const char *blkg_dev_name(struct blkcg_gq *blkg)
- {
--	if (!queue_has_disk(blkg->q) || !queue_to_disk(blkg->q)->bdi->dev)
-+	if (!blkg->q->disk || !blkg->q->disk->bdi->dev)
- 		return NULL;
--	return bdi_dev_name(queue_to_disk(blkg->q)->bdi);
-+	return bdi_dev_name(blkg->q->disk->bdi);
- }
- 
- /**
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2ca7e7c94b18..0a33d16a7298 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -525,7 +525,7 @@ void blk_mq_free_request(struct request *rq)
- 		__blk_mq_dec_active_requests(hctx);
- 
- 	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
--		laptop_io_completion(queue_to_disk(q)->bdi);
-+		laptop_io_completion(q->disk->bdi);
- 
- 	rq_qos_done(q, rq);
- 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 3613d2cc0688..a7c857ad7d10 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -141,9 +141,9 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
- 				 limits->logical_block_size >> SECTOR_SHIFT);
- 	limits->max_sectors = max_sectors;
- 
--	if (!queue_has_disk(q))
-+	if (!q->disk)
- 		return;
--	queue_to_disk(q)->bdi->io_pages = max_sectors >> (PAGE_SHIFT - 9);
-+	q->disk->bdi->io_pages = max_sectors >> (PAGE_SHIFT - 9);
- }
- EXPORT_SYMBOL(blk_queue_max_hw_sectors);
- 
-@@ -475,9 +475,9 @@ EXPORT_SYMBOL(blk_limits_io_opt);
- void blk_queue_io_opt(struct request_queue *q, unsigned int opt)
- {
- 	blk_limits_io_opt(&q->limits, opt);
--	if (!queue_has_disk(q))
-+	if (!q->disk)
- 		return;
--	queue_to_disk(q)->bdi->ra_pages =
-+	q->disk->bdi->ra_pages =
- 		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
- }
- EXPORT_SYMBOL(blk_queue_io_opt);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 586507a5b8c2..7fd99487300c 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -90,9 +90,9 @@ static ssize_t queue_ra_show(struct request_queue *q, char *page)
- {
- 	unsigned long ra_kb;
- 
--	if (!queue_has_disk(q))
-+	if (!q->disk)
- 		return -EINVAL;
--	ra_kb = queue_to_disk(q)->bdi->ra_pages << (PAGE_SHIFT - 10);
-+	ra_kb = q->disk->bdi->ra_pages << (PAGE_SHIFT - 10);
- 	return queue_var_show(ra_kb, page);
- }
- 
-@@ -102,12 +102,12 @@ queue_ra_store(struct request_queue *q, const char *page, size_t count)
- 	unsigned long ra_kb;
- 	ssize_t ret;
- 
--	if (!queue_has_disk(q))
-+	if (!q->disk)
- 		return -EINVAL;
- 	ret = queue_var_store(&ra_kb, page, count);
- 	if (ret < 0)
- 		return ret;
--	queue_to_disk(q)->bdi->ra_pages = ra_kb >> (PAGE_SHIFT - 10);
-+	q->disk->bdi->ra_pages = ra_kb >> (PAGE_SHIFT - 10);
- 	return ret;
- }
- 
-@@ -254,9 +254,8 @@ queue_max_sectors_store(struct request_queue *q, const char *page, size_t count)
- 
- 	spin_lock_irq(&q->queue_lock);
- 	q->limits.max_sectors = max_sectors_kb << 1;
--	if (queue_has_disk(q))
--		queue_to_disk(q)->bdi->io_pages =
--			max_sectors_kb >> (PAGE_SHIFT - 10);
-+	if (q->disk)
-+		q->disk->bdi->io_pages = max_sectors_kb >> (PAGE_SHIFT - 10);
- 	spin_unlock_irq(&q->queue_lock);
- 
- 	return ret;
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 31086afaad9c..874c1c37bf0c 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -97,7 +97,7 @@ static void wb_timestamp(struct rq_wb *rwb, unsigned long *var)
-  */
- static bool wb_recent_wait(struct rq_wb *rwb)
- {
--	struct bdi_writeback *wb = &queue_to_disk(rwb->rqos.q)->bdi->wb;
-+	struct bdi_writeback *wb = &rwb->rqos.q->disk->bdi->wb;
- 
- 	return time_before(jiffies, wb->dirty_sleep + HZ);
- }
-@@ -234,7 +234,7 @@ enum {
- 
- static int latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- {
--	struct backing_dev_info *bdi = queue_to_disk(rwb->rqos.q)->bdi;
-+	struct backing_dev_info *bdi = rwb->rqos.q->disk->bdi;
- 	struct rq_depth *rqd = &rwb->rq_depth;
- 	u64 thislat;
- 
-@@ -287,7 +287,7 @@ static int latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- 
- static void rwb_trace_step(struct rq_wb *rwb, const char *msg)
- {
--	struct backing_dev_info *bdi = queue_to_disk(rwb->rqos.q)->bdi;
-+	struct backing_dev_info *bdi = rwb->rqos.q->disk->bdi;
- 	struct rq_depth *rqd = &rwb->rq_depth;
- 
- 	trace_wbt_step(bdi, msg, rqd->scale_step, rwb->cur_win_nsec,
-@@ -359,8 +359,8 @@ static void wb_timer_fn(struct blk_stat_callback *cb)
- 
- 	status = latency_exceeded(rwb, cb->stat);
- 
--	trace_wbt_timer(queue_to_disk(rwb->rqos.q)->bdi, status,
--			rqd->scale_step, inflight);
-+	trace_wbt_timer(rwb->rqos.q->disk->bdi, status, rqd->scale_step,
-+			inflight);
- 
- 	/*
- 	 * If we exceeded the latency target, step down. If we did not,
-diff --git a/block/genhd.c b/block/genhd.c
-index 6294517cebe6..02cd9ec93e52 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1078,6 +1078,7 @@ static void disk_release(struct device *dev)
- 	disk_release_events(disk);
- 	kfree(disk->random);
- 	xa_destroy(&disk->part_tbl);
-+	disk->queue->disk = NULL;
- 	blk_put_queue(disk->queue);
- 	iput(disk->part0->bd_inode);	/* frees the disk */
- }
-@@ -1276,6 +1277,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- 	device_initialize(disk_to_dev(disk));
- 	inc_diskseq(disk);
- 	disk->queue = q;
-+	q->disk = disk;
- 	lockdep_init_map(&disk->lockdep_map, "(bio completion)", lkclass, 0);
- #ifdef CONFIG_BLOCK_HOLDER_DEPRECATED
- 	INIT_LIST_HEAD(&disk->slave_bdevs);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index df404c1fb087..22b5b8502d2a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -421,6 +421,8 @@ struct request_queue {
- 
- 	spinlock_t		queue_lock;
- 
-+	struct gendisk		*disk;
-+
- 	/*
- 	 * queue kobject
- 	 */
-@@ -661,9 +663,6 @@ extern void blk_clear_pm_only(struct request_queue *q);
- 	dma_map_page_attrs(dev, (bv)->bv_page, (bv)->bv_offset, (bv)->bv_len, \
- 	(dir), (attrs))
- 
--#define queue_has_disk(q)	((q)->kobj.parent != NULL)
--#define queue_to_disk(q)	(dev_to_disk(kobj_to_dev((q)->kobj.parent)))
--
- static inline bool queue_is_mq(struct request_queue *q)
- {
- 	return q->mq_ops;
-diff --git a/include/trace/events/kyber.h b/include/trace/events/kyber.h
-index f9802562edf6..491098a0d8ed 100644
---- a/include/trace/events/kyber.h
-+++ b/include/trace/events/kyber.h
-@@ -30,7 +30,7 @@ TRACE_EVENT(kyber_latency,
- 	),
- 
- 	TP_fast_assign(
--		__entry->dev		= disk_devt(queue_to_disk(q));
-+		__entry->dev		= disk_devt(q->disk);
- 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
- 		strlcpy(__entry->type, type, sizeof(__entry->type));
- 		__entry->percentile	= percentile;
-@@ -59,7 +59,7 @@ TRACE_EVENT(kyber_adjust,
- 	),
- 
- 	TP_fast_assign(
--		__entry->dev		= disk_devt(queue_to_disk(q));
-+		__entry->dev		= disk_devt(q->disk);
- 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
- 		__entry->depth		= depth;
- 	),
-@@ -81,7 +81,7 @@ TRACE_EVENT(kyber_throttled,
- 	),
- 
- 	TP_fast_assign(
--		__entry->dev		= disk_devt(queue_to_disk(q));
-+		__entry->dev		= disk_devt(q->disk);
- 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
- 	),
- 
--- 
-2.30.2
-
+Guenter
