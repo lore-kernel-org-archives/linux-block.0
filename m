@@ -2,116 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22AAFC4338F
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B8BC4338F
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:33:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F349E61A8E
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35EE961AAD
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 07:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234096AbhHPHYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 03:24:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28951 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234090AbhHPHYm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 03:24:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629098650;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=raXZ9wS6uRXZ08WEw0+7FaHAEkjqyrsEFRdbyxNvvYc=;
-        b=L3IWRFzdJrBh3DGzVMXszGhyX14Qjmoz4v49NwkMCyH084MMr+UL/wgeSSYRAtAIvr+IhZ
-        7vYBtYfkRbHJQfK+hh5DlgDiwlbp2VmlPYsrA5c+6FdLVKJSpO0i8if5J37eBbkgJq5hE+
-        Y45DRJQvojnQctlOkmUvU1iNH9ko0qY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-_xQKX4D_OlmmXZEwXg89XQ-1; Mon, 16 Aug 2021 03:24:09 -0400
-X-MC-Unique: _xQKX4D_OlmmXZEwXg89XQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C363E8799E0;
-        Mon, 16 Aug 2021 07:24:07 +0000 (UTC)
-Received: from T590 (ovpn-8-40.pek2.redhat.com [10.72.8.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E48C5D6D5;
-        Mon, 16 Aug 2021 07:23:59 +0000 (UTC)
-Date:   Mon, 16 Aug 2021 15:23:53 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        clang-built-linux@googlegroups.com, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 7/7] blk-mq: build default queue map via
- group_cpus_evenly()
-Message-ID: <YRoSiXYhcIsvPNX6@T590>
-References: <20210814123532.229494-8-ming.lei@redhat.com>
- <202108150441.EPrLDMTH-lkp@intel.com>
+        id S234035AbhHPHds (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 03:33:48 -0400
+Received: from verein.lst.de ([213.95.11.211]:53322 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233725AbhHPHdr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Aug 2021 03:33:47 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1F10167373; Mon, 16 Aug 2021 09:33:14 +0200 (CEST)
+Date:   Mon, 16 Aug 2021 09:33:13 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v3] block: genhd: don't call probe function with
+ major_names_lock held
+Message-ID: <20210816073313.GA27275@lst.de>
+References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp> <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202108150441.EPrLDMTH-lkp@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+This is the wrong way to approach it.  Instead of making things ever
+more complex try to make it simpler.  In this case, ensure that the
+destroy_workqueue is not held with pointless locks.  Given that the
+loop device already is known to not have a reference and marked as in
+the rundown state there shouldn't be anything that is required to
+be protected by lo_mutex.  So something like this untested patch
+should probably do the work:
 
-On Sun, Aug 15, 2021 at 04:49:25AM +0800, kernel test robot wrote:
-> Hi Ming,
-> 
-> Thank you for the patch! Yet something to improve:
-> 
-> [auto build test ERROR on tip/irq/core]
-> [also build test ERROR on next-20210813]
-> [cannot apply to block/for-next linux/master linus/master v5.14-rc5]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Ming-Lei/genirq-affinity-abstract-new-API-from-managed-irq-affinity-spread/20210814-203741
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git 04c2721d3530f0723b4c922a8fa9f26b202a20de
-> config: riscv-buildonly-randconfig-r005-20210814 (attached as .config)
-> compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 1f7b25ea76a925aca690da28de9d78db7ca99d0c)
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # https://github.com/0day-ci/linux/commit/46b1d0ed609db266f6f18e7156c4f294bf6c4502
->         git remote add linux-review https://github.com/0day-ci/linux
->         git fetch --no-tags linux-review Ming-Lei/genirq-affinity-abstract-new-API-from-managed-irq-affinity-spread/20210814-203741
->         git checkout 46b1d0ed609db266f6f18e7156c4f294bf6c4502
->         # save the attached .config to linux build tree
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=riscv 
-> 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> All error/warnings (new ones prefixed by >>):
-> 
->    In file included from block/blk-mq-cpumap.c:13:
-> >> include/linux/group_cpus.h:17:26: error: implicit declaration of function 'kcalloc' [-Werror,-Wimplicit-function-declaration]
->            struct cpumask *masks = kcalloc(numgrps, sizeof(*masks), GFP_KERNEL);
->                                    ^
->    include/linux/group_cpus.h:17:26: note: did you mean 'kvcalloc'?
->    include/linux/mm.h:827:21: note: 'kvcalloc' declared here
->    static inline void *kvcalloc(size_t n, size_t size, gfp_t flags)
->                        ^
->    In file included from block/blk-mq-cpumap.c:13:
-> >> include/linux/group_cpus.h:17:18: warning: incompatible integer to pointer conversion initializing 'struct cpumask *' with an expression of type 'int' [-Wint-conversion]
->            struct cpumask *masks = kcalloc(numgrps, sizeof(*masks), GFP_KERNEL);
->                            ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Will fix it in next version, and it can be done by include <linux/slab.h> into
-include/linux/group_cpus.h.
-
-
-Thanks,
-Ming
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index fa1c298a8cfb..c734dc768316 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1347,16 +1347,15 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	 * became visible.
+ 	 */
+ 
+-	mutex_lock(&lo->lo_mutex);
+ 	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
+ 		err = -ENXIO;
+-		goto out_unlock;
++		goto out;
+ 	}
+ 
+ 	filp = lo->lo_backing_file;
+ 	if (filp == NULL) {
+ 		err = -EINVAL;
+-		goto out_unlock;
++		goto out;
+ 	}
+ 
+ 	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
+@@ -1366,6 +1365,8 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
+ 	destroy_workqueue(lo->workqueue);
++
++	mutex_lock(&lo->lo_mutex);
+ 	spin_lock_irq(&lo->lo_work_lock);
+ 	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
+ 				idle_list) {
+@@ -1413,8 +1414,8 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN && bdev;
+ 	lo_number = lo->lo_number;
+ 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+-out_unlock:
+ 	mutex_unlock(&lo->lo_mutex);
++
+ 	if (partscan) {
+ 		/*
+ 		 * open_mutex has been held already in release path, so don't
+@@ -1435,7 +1436,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 		/* Device is gone, no point in returning error */
+ 		err = 0;
+ 	}
+-
++out:
+ 	/*
+ 	 * lo->lo_state is set to Lo_unbound here after above partscan has
+ 	 * finished.
