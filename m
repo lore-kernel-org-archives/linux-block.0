@@ -4,86 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EC2C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE62C4320A
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:52:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A07F60EFF
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94B35604DC
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230148AbhHPQvu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 12:51:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41708 "EHLO
+        id S232276AbhHPQwv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 12:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbhHPQvt (ORCPT
+        with ESMTP id S232266AbhHPQwt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 12:51:49 -0400
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47116C061292
-        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:51:16 -0700 (PDT)
-Received: by mail-oi1-x22e.google.com with SMTP id t35so27586389oiw.9
-        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:51:16 -0700 (PDT)
+        Mon, 16 Aug 2021 12:52:49 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C677C061764
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:52:17 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id u10so27621241oiw.4
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:52:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lkHKKxx6E91blWpox1bXj/LIePIAFS6deUe/aal8ts0=;
-        b=2M7PsQmoW0m68H0tIVJvrAROv1UoWp/uy48nnzobRrc03mo4J/lqcPLEQEF1kpJUHw
-         HQBa4gX5fuTsQap76AZD/5O7VV8iT7vusfHhUAUKN78fP0BZSnTbz5bFFrpuEHica0IG
-         vNOnPFWucI7QTNpQA0kxldWWTEaok+vCXtpMF9OBhganoAYTPaU0jWc3pk2ipYfiP3qw
-         KJv7dYM9ZKsD48MEvHmMnjHIhntqyqYB/aLy5wa1Nk3VqVwfnK6sD7DQ+glML2iy7RW5
-         8bKOFtNVZE+7XBNUsAmXKRXSN7yXiZDUd4eqzd5A6g+KiYc52tKP/BJj3qVXfxUmmZ/Y
-         b/Lg==
+        bh=xO5EMmY8sQ8S/tQm52A7GQ7bDU6ioSSVSLGS4hhhAGw=;
+        b=hND9YVgRVkyT+6hFdajzVlyemD74d0Dj7GSNO/jU0Mv0S0HIRbE7N4Gw3lFjIRyaEp
+         PLQJUADLOpuCj0SquKpzAaEuHJV/Iy+mnR3zbuoG5tihaV9mrV/h2US1MrmzNT0vJbCo
+         7GKVEGxIutQfPYS/Br+RPQSCTcpaTtwzpDsaaf9J/lXuuEcTLosySspYeNzeiMdEMZjV
+         BQSrN28ubk/LRZMC7ehadkTexB+KKj1N6v6xZwqp5SHDjpZp3dC6RlRvvADomSs3xcVs
+         5fo3Z2H9mDhGB7rml9EAp2PLUFBdJSie+LdZrgE+wSZRBAPFhfj8U4zmEuxguAN7j87a
+         /6kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=lkHKKxx6E91blWpox1bXj/LIePIAFS6deUe/aal8ts0=;
-        b=ebyJmW29cnP8b2LOYqiUBPnfB1rSfJg5t6NwVUgWShmPm2lDYmdG94d2k/HSC5YdwX
-         yLnO4P8O3vfGdIVbI9kh8uno2OcHeDpKTGWhBu1TRcQk6iYg5WFQMUe5y4JlDklb1lBQ
-         Crt7NvFRZOAn/kEhxQAdf6yqVLAbPuSR8Mh7G2BK+olbi4hj7XhyEHmOWi0PkviyMckX
-         XB5cV+BH5ORQraoa0gtotOPhSAYszqN4B6GFyhuPeDn90T1ip9CEu+Evc+r1hnSnAjAM
-         5YH9CTlg+oJOR2WljqLCnRz1WC4E8uN5U6OzhwAayjgLIk9OSRJ6161vBt2l0YAwzqdn
-         a7kg==
-X-Gm-Message-State: AOAM531LmG0JNJe6IoVs490smpIoQ5N3f9xgCqujtmiASaGSqHIRoXGP
-        rVToqr5qK+xAip2xcAauDMSJOg==
-X-Google-Smtp-Source: ABdhPJwPiJZucbHV+gTb5R7I/kfPLblHKKXb+EIub7hcvBOP41sFKxi/Q6epHu0YRXyVvO62JSl/PA==
-X-Received: by 2002:a54:4619:: with SMTP id p25mr42850oip.5.1629132675579;
-        Mon, 16 Aug 2021 09:51:15 -0700 (PDT)
+        bh=xO5EMmY8sQ8S/tQm52A7GQ7bDU6ioSSVSLGS4hhhAGw=;
+        b=VyAgBr0xlWn3s2XJd8UGSVInm5CKp17XhjGQs5QCfskMMK/wwfCURpyAW9cXdJE97U
+         uwayA9z/vUIYQAz+KdUwwzHmOC8OIy1ikXK3dvsJpyhYlhY5TqonAg6JePJtYj06fbF8
+         KDweeaMpJUkENNuAz7vkKhx4rDYEm2Te7wD/NVMoSRI26ROT4LWH4bCvFt45zjcQXn2U
+         OVox2/7rO88N41K7c9cYeTL3U2Ye/mthABrxGE4SqfHf+JfYqclpiYKVewGk8jgCd0ZE
+         c5SJ/CxDX1UUgv/rKdCVrIgOA4AD53pm4IH6pfuQFtOD8taCZj5SNlJNfrjgLwEZL3+w
+         oHsQ==
+X-Gm-Message-State: AOAM53122ULrzXX+TmlHNeIJrFuat0r4CaE2F8TPMkoht7TsCpqHOKkJ
+        8KuyNpF3C+qwAXZ7MGeKoTwh5w==
+X-Google-Smtp-Source: ABdhPJzFMiQ5HbZK/pICulgA1JdF5qH8hgDHlnDpwG+eUzUgtthcXvNCZVHyDbeUqPXXCSuc/3r5Wg==
+X-Received: by 2002:a05:6808:1301:: with SMTP id y1mr55854oiv.156.1629132736985;
+        Mon, 16 Aug 2021 09:52:16 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id u18sm2018498ooi.40.2021.08.16.09.51.13
+        by smtp.gmail.com with ESMTPSA id i1sm642326ooo.15.2021.08.16.09.52.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Aug 2021 09:51:15 -0700 (PDT)
-Subject: Re: add a bvec_virt helper
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Geoff Levand <geoff@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Song Liu <song@kernel.org>, Mike Snitzer <snitzer@redhat.com>,
-        Coly Li <colyli@suse.de>, Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-um@lists.infradead.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20210804095634.460779-1-hch@lst.de>
+        Mon, 16 Aug 2021 09:52:16 -0700 (PDT)
+Subject: Re: paride initialization cleanup
+To:     Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        Ondrej Zary <linux@rainbow-software.org>
+References: <20210816161110.909076-1-hch@lst.de>
+ <953db079-d556-f0c5-31eb-932d7f78a3c7@acm.org> <20210816164218.GA5244@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4e321dab-188d-ca0a-a98c-4a587e7b5f27@kernel.dk>
-Date:   Mon, 16 Aug 2021 10:51:13 -0600
+Message-ID: <181bb486-c102-0938-5649-67fa1942982c@kernel.dk>
+Date:   Mon, 16 Aug 2021 10:52:15 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210804095634.460779-1-hch@lst.de>
+In-Reply-To: <20210816164218.GA5244@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -91,16 +78,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/4/21 3:56 AM, Christoph Hellwig wrote:
-> Hi Jens,
+On 8/16/21 10:42 AM, Christoph Hellwig wrote:
+> On Mon, Aug 16, 2021 at 09:33:10AM -0700, Bart Van Assche wrote:
+>> On 8/16/21 9:11 AM, Christoph Hellwig wrote:
+>>> the paride drivers currently have a major Linux 1.x-style mess for
+>>> initializing the gendisks.  This series refactors them to be modular
+>>> and self-contained in preparation of error handling for add_disk.
+>>
+>> Hi Christoph,
+>>
+>> My understanding is that both the parallel port and IDE are obsolete 
+>> technologies. Is anyone still using the paride drivers?
 > 
-> this series adds a bvec_virt helper to return the virtual address of the
-> data in bvec to replace the open coded calculation, and as a reminder
-> that generall bio/bvec data can be in high memory unless it is caller
-> controller or in an architecture specific driver where highmem is
-> impossible.
+> It is fairly obsolete indeed.  But three years ago Ondrej still had
+> some and did test the blk-mq conversion.
 
-Applied, thanks.
+Was thinking the same, but if someone is actually using it... Ondrej,
+are you still using it? And if so, any chance you can test these
+patches?
 
 -- 
 Jens Axboe
