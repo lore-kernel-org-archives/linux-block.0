@@ -2,134 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ED7C4320A
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 01:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AA3C4320A
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 01:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7C55613A4
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 01:04:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58AF06140B
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 01:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232109AbhHPBFL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Aug 2021 21:05:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42491 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232077AbhHPBFL (ORCPT
+        id S229726AbhHPBpa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Aug 2021 21:45:30 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:37260 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229527AbhHPBpa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Aug 2021 21:05:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629075880;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HbfvwkokljU3OH/PzyLtJVDerFx7CfrHkMttzBcnp30=;
-        b=LJgPK+V4UlLe9K+z0E2k7HNPP3XQM86vu+QLx85WnsO344ZGrM9AL8oEOUQnli1hfNV7Ic
-        UM1TAWqRyZB5F+DBtBEJPzLEyA7eIFSYnnc9+6ES/PFGbq3w4UQ/4qtP5gEHM0BT7ht0g1
-        iqPAkDmq+y3bY1lHRrd7DUtIBNgONvI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-T7wyzkvIN2yAlijX0tPMew-1; Sun, 15 Aug 2021 21:04:36 -0400
-X-MC-Unique: T7wyzkvIN2yAlijX0tPMew-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F56F108292D;
-        Mon, 16 Aug 2021 01:04:35 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F184B5D9D3;
-        Mon, 16 Aug 2021 01:04:26 +0000 (UTC)
-Date:   Mon, 16 Aug 2021 09:04:21 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        clang-built-linux@googlegroups.com, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 5/7] genirq/affinity: move group_cpus_evenly() into lib/
-Message-ID: <YRm5lXfnukXU8Ebh@T590>
-References: <20210814123532.229494-6-ming.lei@redhat.com>
- <202108150001.EBuNGcQ8-lkp@intel.com>
+        Sun, 15 Aug 2021 21:45:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1629078298; x=1660614298;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=MrpnXIKWUC0dmE7Z0g2CW1TV4HRoAliflafQGfaYq/c=;
+  b=B+BnoU2KXRDVFbrXM7EABWvipV9LVZLZJpDL0AmJrmLneX1tj2hHLvIt
+   rcas6LvQqs1oPJVZbMJzLoflf5ZQpmgo4mzB66naOUUA8SweZ0lVpvyMj
+   9ifeQIVr21inPQ3oZBVajsgVm3GnRLFRnmEwSYAtVVJa5o9Ln0NW7NKpy
+   iMQ9pykXB7lRyny23wIdnYoV6w+fP8C1uQ6T4JTW2q951RCYVpJgutky/
+   unmLjFVboxI6W8YQWBEJR6efvE51hVbNfn5cjp1dzZxcLFjzGVHlwVEb3
+   x/x9gNeIe3euFI7EhsOv6c8hTDrhYnv/SQaUC9m8OrPdXdNLi6yKSep3a
+   w==;
+X-IronPort-AV: E=Sophos;i="5.84,324,1620662400"; 
+   d="scan'208";a="177326671"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Aug 2021 09:44:57 +0800
+IronPort-SDR: 6jR4k2qgRZ7Wxgx3iv8vQtu2QUGqtcmZfww593AKtXKE/rqMp/MppBD58AsjU/8bFrnKAj5avU
+ szaCkSDqCefR9TN2blr9Vq+B/N1NNpO3ioSfcgb4WaGtfMfYm6+tQrqAntD5XLaifaTgxqicqx
+ Dhi6evl4oy0xoxquecb3j5MNeKIuE+iHWSsqohxzw/yp7RdBiQWXhI20iwPD1Ju5sm4AUx3py+
+ 6BN+oiaAepBY+6/YsdZILWcvbWLBBN1CBz2Kfxu0cZNaX21mRNac/oA53GccJpD5rPK82ZBvLD
+ Rlvrvh0+qnx4KU7yJUr/Z3sf
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2021 18:20:24 -0700
+IronPort-SDR: Tir6s5ElN8753P2n5auBKgpEG5U059nla13Qpy/humnfEXNXwu/+PuDbP8Xj8t/bLLPxXAto7m
+ ZIbqP7sAhKBGFiFkg4rCeuR8Lni6fxPUS4sfN43B0yKTWmBeHYyhI063e+CiIWkDE/EPGzNi+E
+ ep3/FX8un0Xw+qoRE2G80b7cz5Zj8GZL4sZvzibeRUuLAz+W5a/bS9z88YC2dY0VsuFgWx3uZE
+ VGuNQBozwAgJ2XzfkqkoIQyA2HLawVTwmhluGmq7N5uTkIlWGVNK7W84C4+J8hqsWfquM/pBwE
+ Csw=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 15 Aug 2021 18:44:59 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-ide@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH v7 00/11] libata cleanups and improvements
+Date:   Mon, 16 Aug 2021 10:44:45 +0900
+Message-Id: <20210816014456.2191776-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202108150001.EBuNGcQ8-lkp@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+The first three patches of this series fix sparse and kernel bot
+warnings (potential NULL pointer dereference and locking imbalance).
 
-On Sun, Aug 15, 2021 at 01:01:07AM +0800, kernel test robot wrote:
-> Hi Ming,
-> 
-> Thank you for the patch! Perhaps something to improve:
-> 
-> [auto build test WARNING on tip/irq/core]
-> [also build test WARNING on next-20210813]
-> [cannot apply to block/for-next linux/master linus/master v5.14-rc5]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Ming-Lei/genirq-affinity-abstract-new-API-from-managed-irq-affinity-spread/20210814-203741
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git 04c2721d3530f0723b4c922a8fa9f26b202a20de
-> config: hexagon-randconfig-r041-20210814 (attached as .config)
-> compiler: clang version 12.0.0
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # https://github.com/0day-ci/linux/commit/759f72186bfdd5c3ba8b53ac0749cf7ba930012c
->         git remote add linux-review https://github.com/0day-ci/linux
->         git fetch --no-tags linux-review Ming-Lei/genirq-affinity-abstract-new-API-from-managed-irq-affinity-spread/20210814-203741
->         git checkout 759f72186bfdd5c3ba8b53ac0749cf7ba930012c
->         # save the attached .config to linux build tree
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=hexagon 
-> 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> All warnings (new ones prefixed by >>):
-> 
-> >> lib/group_cpus.c:344:17: warning: no previous prototype for function 'group_cpus_evenly' [-Wmissing-prototypes]
->    struct cpumask *group_cpus_evenly(unsigned int numgrps)
->                    ^
->    lib/group_cpus.c:344:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
->    struct cpumask *group_cpus_evenly(unsigned int numgrps)
->    ^
->    static 
->    1 warning generated.
-> 
-> 
-> vim +/group_cpus_evenly +344 lib/group_cpus.c
-> 
->    328	
->    329	/**
->    330	 * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
->    331	 * @numgrps: number of groups
->    332	 *
->    333	 * Return: cpumask array if successful, NULL otherwise. And each element
->    334	 * includes CPUs assigned to this group
->    335	 *
->    336	 * Try to put close CPUs from viewpoint of CPU and NUMA locality into
->    337	 * same group, and run two-stage grouping:
->    338	 *	1) allocate present CPUs on these groups evenly first
->    339	 *	2) allocate other possible CPUs on these groups evenly
->    340	 *
->    341	 * We guarantee in the resulted grouping that all CPUs are covered, and
->    342	 * no same CPU is assigned to different groups
->    343	 */
->  > 344	struct cpumask *group_cpus_evenly(unsigned int numgrps)
+The following three patches cleanup libata-core code in the area of
+device configuration (ata_dev_configure() function).
 
-But the above symbol is exported via EXPORT_SYMBOL_GPL(), in current
-kernel tree, we usually keep such exported symbol as global, or is there
-some change in kernel coding style recently?
+Patch 7 improves ata_read_log_page() to avoid unnecessary warning
+messages and patch 8 adds an informational message on device scan to
+advertize the features supported by a device.
 
+Path 9 adds the new sysfs ahci device attribute ncq_prio_supported to
+indicate that a disk supports NCQ priority.
 
+Patch 10 and 11 update the ABI user documentation files.
 
-Thanks,
-Ming
+Changes from v6:
+* Added patch 10 and 11
+
+Changes from v5:
+* Updated patch 9 to include adding the new ncq_prio_supported sysfs
+  attribute for SATA adapters other than AHCI. Changed the patch title
+  and commit message accordingly.
+
+Changes from v4:
+* Fixed patch 1 to avoid an out-of-bounds array access
+* Changed title of patch 3 to describe the change (as opposed to only
+  mentioning the tool that found the problem)
+* Removed patch 10 from this series as Martin took it through the scsi
+  tree
+* Added reviewed-by tags
+
+Changes from v3:
+* Reworked patch 1
+* Added patch 3 to fix a sparse warning discovered while checking
+  patch 1 & 2
+* Added reviewed-by tags
+
+Changes from v2:
+* Reworked patch 4 to avoid the need for an additional on-stack string
+  for device information messages
+* Added reviewed-by tags
+
+Changes from v1:
+* Added patch 1 and 2 to fix problems reported by the kernel test robot
+* Use strscpy() instead of strcpy in patch 4
+* Use sysfs_emit in patch 8 and 9 as suggested by Bart
+* Fix typos in comments of the new sas_ncq_prio_supported attribute in
+  patch 9
+
+Damien Le Moal (10):
+  libata: fix ata_host_alloc_pinfo()
+  libata: fix ata_host_start()
+  libata: simplify ata_scsi_rbuf_fill()
+  libata: cleanup device sleep capability detection
+  libata: cleanup ata_dev_configure()
+  libata: cleanup NCQ priority handling
+  libata: fix ata_read_log_page() warning
+  libata: print feature list on device scan
+  libata: Introduce ncq_prio_supported sysfs sttribute
+  docs: sysfs-block-device: document ncq_prio_supported
+
+Niklas Cassel (1):
+  docs: sysfs-block-device: improve ncq_prio_enable documentation
+
+ Documentation/ABI/testing/sysfs-block-device |  43 ++-
+ drivers/ata/libahci.c                        |   1 +
+ drivers/ata/libata-core.c                    | 290 ++++++++++---------
+ drivers/ata/libata-sata.c                    |  62 ++--
+ drivers/ata/libata-scsi.c                    |  60 +---
+ include/linux/libata.h                       |   5 +
+ 6 files changed, 252 insertions(+), 209 deletions(-)
+
+-- 
+2.31.1
 
