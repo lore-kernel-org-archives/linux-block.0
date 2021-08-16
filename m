@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D95C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CB0C4338F
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:54:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D692560F38
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:53:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E709360F11
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230442AbhHPQx7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 12:53:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42302 "EHLO
+        id S230051AbhHPQyv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 12:54:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbhHPQx4 (ORCPT
+        with ESMTP id S229587AbhHPQyv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 12:53:56 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A27A6C0613C1
-        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:53:24 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id 108-20020a9d01750000b029050e5cc11ae3so21718536otu.5
-        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:53:24 -0700 (PDT)
+        Mon, 16 Aug 2021 12:54:51 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE5DC061764
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:54:19 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id r16-20020a0568304190b02904f26cead745so21677469otu.10
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=g7L5+WzsIvTLUERtXFkH56DdEnmU2g0oMI370Ugvcmg=;
-        b=vTis+s4hlAm+FTr++090MtQwF0P5/lh0FBWDSi8RTA1wUVCr0BpRfK/us9pFVxUpog
-         uu6jEUL2BHfveOB48loIkRaHp5bz5albTobFZvpvuwPRAEzMEGIuPI5kuvuubBK+AOQ0
-         E55mGtikm7jUclvHQ2OBlF2FM0V2wuXIbbWCANJa4VATG6XRRBq0jlpJJliUp0uUwgwB
-         oVjeRBwvP53F5AFe9UvDWGAGJK354/coFul8xwoLl0TFA4DBRK1WEWtza51fjJyL/6hp
-         2ENq6H7kNagObY44cbihm3AMlndCLLsjuoR24ZxXM6HUn4PiQF9lftOMb/v4/GrY6jra
-         QGww==
+        bh=HpuepmFQr0ts7R+prQxEpV0BW2N1Xo7/i6KDZNHi/hI=;
+        b=R2xxBa78PYOPoU/KY/yn88zpKivpgjgMdTt10Hzr4OLKXEqD+KRxSX2jYwXujSLMHb
+         CdG6wuXXZdp9lH5/dNmNdHkGaJmuuiMVJD9yWIyrMLzMWHy1k/1/jFbgQaTSMsrHRxvJ
+         /xcr0c5XRhVtCC9FJ6jx/TKasFkteyGtwI0WPa+B3+abtLb2pEWpDiMPgtQtTLwcD7Kd
+         ah0Gk0FhEqfPGdXlY5gAc2IX0jT1A6Gi9nYbS7lZPI3/h8lS9ZtX/a50lCgXK4Tia5J3
+         oc14CZN0BoDNPKOFX3pVBUk21DO4bPTtJ1zyRaqObmOUxuRSaW62OlNjsNY9+AaiSVbi
+         zBCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=g7L5+WzsIvTLUERtXFkH56DdEnmU2g0oMI370Ugvcmg=;
-        b=hkTH5dt9qn90FUBlBzWprKqDoFjck82XQdW5uK8+LWTPsxOwYJ/IdJRaklEOTQS+Z7
-         IlHdyb8KImV+c4iQdJEWD1jLAxA64TRFuGUcCXbYTSHprFZrGSR5Wj/tsOjg1XVVhGrT
-         f+rFNV9RQmQ10CXzTej4fieBNpNv8EAf0SlItbLGNXTc/dzJuw2i2FEFBm+AsrOpt40Z
-         OqC5ME6Jn/gGK9TGzMYisZw0waeZ0P5nnQ25O4frZor4BoAdWXjco/0F1YBOanfZXkWD
-         llPgqrTEoGF0fxss4Yjg5wSk5qkG+TisZv2DPet55Vg2rCxEhvAoGDjZkk7QVMRvw82S
-         sB8w==
-X-Gm-Message-State: AOAM533Hl42WAqiJ6VQlvozf1NeKs0DEUuvE2Ypmzuly9HdkvO0FYViT
-        1oMk8tCpnGOfMdPCX1PCGGXxVJtjxeo2cpbg
-X-Google-Smtp-Source: ABdhPJwl6C1pb1r7w6BRQRHMIIyRy460EQOcX121G30c+MwpxTGtjhNnwgFPpxDCyviQI/c+7nJkxQ==
-X-Received: by 2002:a05:6830:31ac:: with SMTP id q12mr3809057ots.152.1629132803747;
-        Mon, 16 Aug 2021 09:53:23 -0700 (PDT)
+        bh=HpuepmFQr0ts7R+prQxEpV0BW2N1Xo7/i6KDZNHi/hI=;
+        b=CgrslT87nS7OjzDHvXAN5DVMWQZwpCh3Kttg8iWNfTfMzXtk/QmJ/aSGBjb2MMt4Pz
+         4+77LgxnpG7BpDCJMb6hQ/pY0obgq9a9BamWdQVZua2+QiQRKHZcY+1rRHsQdOmHmxZF
+         6nudbuYHDR8bzXEYsVbBkfqwnV7GYfHSmKNREWNOd9sg65FHMM2/SAysTna33eScncfo
+         kNVbERlg9HdR85J/EFlSXEVS2CQUScXVdqPvvnA6g4kLrAjj4RHt9yn4CEvBDWFJxY4N
+         LReZhrp9mXG6Xnu5ymjoSkCE/XMJo1Z7a3H42pA/hzCaW8LrNBLXdPPTguHL9HClGzBS
+         ubpg==
+X-Gm-Message-State: AOAM532cdCm5h6+LNauOjr+VyrfZVZvdtIg42yQ0pPnEh6sc5ucdrwR1
+        tT0m9uwN4/5cTUJAjNPXA3uVyDk7G2kgTbju
+X-Google-Smtp-Source: ABdhPJxpuZOtaMXfTcgDjx0o/K3AOdnkk4P1MogCHk3+I3Fcstfkv3FZqTbYlJR1o2L2OItkveA05A==
+X-Received: by 2002:a9d:887:: with SMTP id 7mr13468380otf.120.1629132858944;
+        Mon, 16 Aug 2021 09:54:18 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v29sm1190332ooe.31.2021.08.16.09.53.23
+        by smtp.gmail.com with ESMTPSA id b1sm2383609ots.29.2021.08.16.09.54.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Aug 2021 09:53:23 -0700 (PDT)
-Subject: Re: [PATCH 1/2] blk-cgroup: refactor blkcg_print_stat
+        Mon, 16 Aug 2021 09:54:18 -0700 (PDT)
+Subject: Re: [PATCH] block: unexport blk_register_queue
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     tj@kernel.org, cgroups@vger.kernel.org, linux-block@vger.kernel.org
-References: <20210810152623.1796144-1-hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20210816123649.601591-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e090f6f4-6f15-f917-79fd-b516c6cca656@kernel.dk>
-Date:   Mon, 16 Aug 2021 10:53:22 -0600
+Message-ID: <071b5fd7-a3cb-ed21-80bc-be9ffb7e6e3b@kernel.dk>
+Date:   Mon, 16 Aug 2021 10:54:17 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210810152623.1796144-1-hch@lst.de>
+In-Reply-To: <20210816123649.601591-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,11 +75,10 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/21 9:26 AM, Christoph Hellwig wrote:
-> Factor out a helper to deal with a single blkcg_gq to make the code a
-> little bit easier to follow.
+On 8/16/21 6:36 AM, Christoph Hellwig wrote:
+> Not actually used in any modular code.
 
-Applied 1-2, thanks.
+Applied, thanks.
 
 -- 
 Jens Axboe
