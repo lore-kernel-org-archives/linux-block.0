@@ -7,67 +7,69 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CB0C4338F
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF43C4320A
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:56:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E709360F11
-	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 359F360F14
+	for <linux-block@archiver.kernel.org>; Mon, 16 Aug 2021 16:56:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbhHPQyv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 12:54:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42550 "EHLO
+        id S231940AbhHPQ52 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 12:57:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbhHPQyv (ORCPT
+        with ESMTP id S231880AbhHPQ52 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 12:54:51 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE5DC061764
-        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:54:19 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id r16-20020a0568304190b02904f26cead745so21677469otu.10
-        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:54:19 -0700 (PDT)
+        Mon, 16 Aug 2021 12:57:28 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A090C0613C1
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:56:56 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id bd1so20162034oib.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Aug 2021 09:56:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HpuepmFQr0ts7R+prQxEpV0BW2N1Xo7/i6KDZNHi/hI=;
-        b=R2xxBa78PYOPoU/KY/yn88zpKivpgjgMdTt10Hzr4OLKXEqD+KRxSX2jYwXujSLMHb
-         CdG6wuXXZdp9lH5/dNmNdHkGaJmuuiMVJD9yWIyrMLzMWHy1k/1/jFbgQaTSMsrHRxvJ
-         /xcr0c5XRhVtCC9FJ6jx/TKasFkteyGtwI0WPa+B3+abtLb2pEWpDiMPgtQtTLwcD7Kd
-         ah0Gk0FhEqfPGdXlY5gAc2IX0jT1A6Gi9nYbS7lZPI3/h8lS9ZtX/a50lCgXK4Tia5J3
-         oc14CZN0BoDNPKOFX3pVBUk21DO4bPTtJ1zyRaqObmOUxuRSaW62OlNjsNY9+AaiSVbi
-         zBCA==
+        bh=QX4ks5jEbADrBKL2S0MNfqw+r43q1WO7tEHO0nENCIk=;
+        b=BbATPvyySBsHiD4X6LlcNoorERrrsncim8+jXRiFqDA2nT5I6DauYiw88uZzfw5ygm
+         ZAZ1HXAB4FtrHpzN7K4m9krfenv65F8WB0DHFatV2SXdv3hW7YVzIWWV1P9lOs8oV7b+
+         Ad8+RxMAmgyk7nQhPGxsU9Mjzps7hMfpoNRfWbrt0/bTfGKNRbE/jF+xwv96/A5nHhJN
+         A7QzK3QfrdSjySEve6URoWlGw+5c3IR2yM+Fno9TPP5lKT/7yxmPEj3rPZf6/ejiULpN
+         ZAybaMEqfIhLwM/bG8OnVEWMXBdpL2TzsKfM1Fs4AR4VPB4aZ0PFS/RZUebR9PHBppYM
+         7giA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=HpuepmFQr0ts7R+prQxEpV0BW2N1Xo7/i6KDZNHi/hI=;
-        b=CgrslT87nS7OjzDHvXAN5DVMWQZwpCh3Kttg8iWNfTfMzXtk/QmJ/aSGBjb2MMt4Pz
-         4+77LgxnpG7BpDCJMb6hQ/pY0obgq9a9BamWdQVZua2+QiQRKHZcY+1rRHsQdOmHmxZF
-         6nudbuYHDR8bzXEYsVbBkfqwnV7GYfHSmKNREWNOd9sg65FHMM2/SAysTna33eScncfo
-         kNVbERlg9HdR85J/EFlSXEVS2CQUScXVdqPvvnA6g4kLrAjj4RHt9yn4CEvBDWFJxY4N
-         LReZhrp9mXG6Xnu5ymjoSkCE/XMJo1Z7a3H42pA/hzCaW8LrNBLXdPPTguHL9HClGzBS
-         ubpg==
-X-Gm-Message-State: AOAM532cdCm5h6+LNauOjr+VyrfZVZvdtIg42yQ0pPnEh6sc5ucdrwR1
-        tT0m9uwN4/5cTUJAjNPXA3uVyDk7G2kgTbju
-X-Google-Smtp-Source: ABdhPJxpuZOtaMXfTcgDjx0o/K3AOdnkk4P1MogCHk3+I3Fcstfkv3FZqTbYlJR1o2L2OItkveA05A==
-X-Received: by 2002:a9d:887:: with SMTP id 7mr13468380otf.120.1629132858944;
-        Mon, 16 Aug 2021 09:54:18 -0700 (PDT)
+        bh=QX4ks5jEbADrBKL2S0MNfqw+r43q1WO7tEHO0nENCIk=;
+        b=KBlkwg/sWVgacINMmP4oIoRDfOMtqQZrp8Kzcf9gO8yZ6OBzF0a5H6I/hp6jyE60Uh
+         ZBpknTj2EYsN3oVTtYfI+ikAWtO9PwwpM5Td7fHq1L/rP8H31UVXJfAvLqyDIWd1mouB
+         Sr7BRrqB4TGNVWl44pqW0PGkMv0xpt7BXnhWiFp/gUE9P17jk1ldy8fEzVGTVN4vEOKf
+         3S4hbGIIw2JdBBdYgXQsl50lZGhWPKuj88hla1JFLgoDfAz1B/NIRzEjvo2ENJ+8A1f7
+         5g62WRtUXSshLzUt3IvsGw94a3pLeVw0tQUwzK1Uv3a/AJIbDAXRduTyqAsdAwpUMvF7
+         K1sA==
+X-Gm-Message-State: AOAM531kOXGlDKum43UQFbhuRk4g39Di9fByzu6sLYKooIkNPfbG1Sfq
+        Sa6DnsEyRWq0NkSw49RwQ0fbSQ==
+X-Google-Smtp-Source: ABdhPJyBPgXPWG1S8us14BFNk3bFnMIsL9w6Le25xuw3T3je5uxgT9MBjZb1fDsz6TYd/TRax+JiOQ==
+X-Received: by 2002:aca:ea54:: with SMTP id i81mr65816oih.174.1629133015798;
+        Mon, 16 Aug 2021 09:56:55 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id b1sm2383609ots.29.2021.08.16.09.54.18
+        by smtp.gmail.com with ESMTPSA id y66sm1181002oia.12.2021.08.16.09.56.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Aug 2021 09:54:18 -0700 (PDT)
-Subject: Re: [PATCH] block: unexport blk_register_queue
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20210816123649.601591-1-hch@lst.de>
+        Mon, 16 Aug 2021 09:56:55 -0700 (PDT)
+Subject: Re: [PATCH] block: nbd: add sanity check for first_minor
+To:     Pavel Skripkin <paskripkin@gmail.com>, josef@toxicpanda.com
+Cc:     hch@lst.de, linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+9937dc42271cd87d4b98@syzkaller.appspotmail.com
+References: <20210812091501.22648-1-paskripkin@gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <071b5fd7-a3cb-ed21-80bc-be9ffb7e6e3b@kernel.dk>
-Date:   Mon, 16 Aug 2021 10:54:17 -0600
+Message-ID: <a04bfff4-bb38-0d21-3432-5086efaa6c69@kernel.dk>
+Date:   Mon, 16 Aug 2021 10:56:54 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210816123649.601591-1-hch@lst.de>
+In-Reply-To: <20210812091501.22648-1-paskripkin@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,8 +77,23 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/16/21 6:36 AM, Christoph Hellwig wrote:
-> Not actually used in any modular code.
+On 8/12/21 3:15 AM, Pavel Skripkin wrote:
+> Syzbot hit WARNING in internal_create_group(). The problem was in
+> too big disk->first_minor.
+> 
+> disk->first_minor is initialized by value, which comes from userspace
+> and there wasn't any sanity checks about value correctness. It can cause
+> duplicate creation of sysfs files/links, because disk->first_minor will
+> be passed to MKDEV() which causes truncation to byte. Since maximum
+> minor value is 0xff, let's check if first_minor is correct minor number.
+> 
+> NOTE: the root case of the reported warning was in wrong error handling
+> in register_disk(), but we can avoid passing knowingly wrong values to
+> sysfs API, because sysfs error messages can confuse users. For example:
+> user passed 1048576 as index, but sysfs complains about duplicate
+> creation of /dev/block/43:0. It's not obvious how 1048576 becomes 0.
+> Log and reproducer for above example can be found on syzkaller bug
+> report page.
 
 Applied, thanks.
 
