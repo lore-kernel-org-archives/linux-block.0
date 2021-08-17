@@ -4,45 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46963C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 00:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DEEC4338F
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 00:36:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F58160FA0
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 00:36:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FC9360FD7
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 00:36:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236026AbhHQAgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 20:36:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35328 "EHLO mail.kernel.org"
+        id S236010AbhHQAg6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 20:36:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35862 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235999AbhHQAgX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 20:36:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8D4C160F55;
-        Tue, 17 Aug 2021 00:35:50 +0000 (UTC)
+        id S236360AbhHQAgg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Aug 2021 20:36:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A48F560F14;
+        Tue, 17 Aug 2021 00:36:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629160551;
-        bh=qGPaQj73xkmgPoSQwd6WKS5+iUqYTWAl4B6wMKaSzwQ=;
+        s=k20201202; t=1629160564;
+        bh=4gyxiK/n9KX7xbOFQ97wN+1L5/y2dlCEb5MXDADMqBk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HsKtiItlJGLXPoqmvNUyauEy0c8ybg068usodItQUG0OVE3VYbHUa2Ln/81qljRL/
-         Xx+NXaeZiOCZzJKZ0aDb5g44daIYmMkyA4Qbzwiuiwb14vrh00cGi+H1EhttByx5im
-         mOwt8OThnl6FIYjpa5BV0X9mKlaLyEqIL7BaWq1PW+xvCYWaPJmGPWv2cqVNpyl1uY
-         +HI92Gzb1sgxoe9d3smQdHDha4j71xnWBGj1dR3hakJTHTbZPvUJGpQDuIgOUegwVY
-         MVfaMmroJF7CJ2BJUfAchhI7EFDgGfIgV/hmklaDllfRVcsUhhaPp0Tdlkaha8bHZs
-         KyxwWy7483YaA==
+        b=pvyh/B90lvdiF9ns6yOc8O+1EirhQkowqp+D4ntCTgy6vZBFdRIGcLWDdWZQjY3Ab
+         v5rdDTIUQwuN4D7BDtvuMbY83rQOuogNm2GlTNavpYvM+qP2Zz0fShsYCqFlaDCtoW
+         JOJn34AZbCLsQZKEVhaJqas2jdNFXcUzep2jtXBWZUEvmyGMfVCNo/PUY8AoeMLMna
+         6JgjvgedQWaaYngFYwaan5nNTFlDnbUum4Fh2mZZ/Lg6OfRrj8QIjcq3/EyVLp4Jt5
+         SptcrvULbFaDdeSG/gQfTvsC1drVnP6wUNTup1parfUctuJYfX9+abWuwkj1jyVBs5
+         i4VaPO1YmeHUQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
         Bruno Goncalves <bgoncalv@redhat.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 10/12] blk-iocost: fix lockdep warning on blkcg->lock
-Date:   Mon, 16 Aug 2021 20:35:34 -0400
-Message-Id: <20210817003536.83063-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 7/9] blk-iocost: fix lockdep warning on blkcg->lock
+Date:   Mon, 16 Aug 2021 20:35:52 -0400
+Message-Id: <20210817003554.83213-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210817003536.83063-1-sashal@kernel.org>
-References: <20210817003536.83063-1-sashal@kernel.org>
+In-Reply-To: <20210817003554.83213-1-sashal@kernel.org>
+References: <20210817003554.83213-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -87,10 +87,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 5fac3757e6e0..0e56557cacf2 100644
+index b7d8a954d99c..e95b93f72bd5 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -3061,19 +3061,19 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
+@@ -3039,19 +3039,19 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
  		if (v < CGROUP_WEIGHT_MIN || v > CGROUP_WEIGHT_MAX)
  			return -EINVAL;
  
