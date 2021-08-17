@@ -2,92 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93656C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 14:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3E9C4320E
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 14:42:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 764E660EFE
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 14:35:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7C5460FD7
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 14:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240213AbhHQOfc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 10:35:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57326 "EHLO
+        id S238070AbhHQOnY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 10:43:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239873AbhHQOdm (ORCPT
+        with ESMTP id S233426AbhHQOnY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 10:33:42 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49358C061764
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 07:33:09 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id hv22-20020a17090ae416b0290178c579e424so6675096pjb.3
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 07:33:09 -0700 (PDT)
+        Tue, 17 Aug 2021 10:43:24 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CFD3C061764;
+        Tue, 17 Aug 2021 07:42:50 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id y34so41818924lfa.8;
+        Tue, 17 Aug 2021 07:42:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=isGxWOTd5shMg5EAgo6PA5diCL2W6al9cYd9Z1D7xus=;
-        b=GfdPkYOtP4rhHMyKJMYfl9O4KfTR81yOpB11oGxRr4snKRGkMGuDVIFm9k4VaI3bl2
-         6YCEEmkbQ52KpyNf5HDMNNiN+rHvjFRlib6CqpQcoBwv+ehyBWIcOwBPLhkpValSuQw5
-         ck1cML3GY4EHFKS417XSfj+1v2GVsEAipQWla/6Pl2A3WY4lJ7uUDdy8USpgWIT8ouZJ
-         fIj1dlue7rt0ndSFSRAgWGkZMvKU0AuY3i8CNPpf7LxWXewHoDX7+m3bwGbckIbK0hPl
-         f6ymUA82Z/eJOMKMigFXKA5AnGE5Uhrlwzd1U4oW0vz/0NHaNOQVs843+qdRnp+Gh/PX
-         ChyQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IYqEXJfiN18yCZI6p8+AKI7fLyyfIF/2Rhy4MgWxORs=;
+        b=Cgp4XiI/ioCeNTwNFXQjYKGi8WTg8i/ZA62xg8W1eygB/LANHDdvZYsFESebJx2ZAc
+         Vargn/+b9VLuUwubXGGnlicEBibS6etHatqnaIU46lk8Nq4ropCtsNzo8bJysznslVR/
+         wxrsfuZgKKLdz9lgV/gyyFiPtIi4v8V+10nDlf7NMCO+44d/2+1PPh90WTFfpJKbOmGl
+         ljZkn5z+W5MYjMdGbe4Nl5SivKnId+8q4e5yaJF0d+uINN/2D2+AhT+2iYqLyVZcTl3n
+         vQGsm5l8HGzrRuV1JEUYDn8d1QuhzCYgcUEdGYERT0cWlFGVVOUKaQrHF8eE813oKSvP
+         EfLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=isGxWOTd5shMg5EAgo6PA5diCL2W6al9cYd9Z1D7xus=;
-        b=OwwNUvj8hkXGC3LluRSVoA0QtvS9b+fNbFx+251nPAyaI5JXct0lUJJBWS7NlMOgWb
-         LHAXfiJ57ka5e70gTRn2vMLzAzvvOiwKFYYy91Xe9MiLhqAyBQGxhioLDol05IUI2Yeo
-         n33UCB3t2n+JcPB4hHR5rEUL/eFbsefv0YoBm6kSRDj/prYSBVHcdcR9mfE3NYFIKGdv
-         OeYhx/i105TTzzqcWpNFIt2wFMifgR8ZXMRWTty3n6aO7szAvd0qUNEmPT/Z5vHzri7V
-         tF5N5JCtKgvNng+vXw7n1XDaVzjxPr3Qk4/LfYaYH4MDUA3ibWXUdQNbycC3g5lIFiVM
-         zsEw==
-X-Gm-Message-State: AOAM531RvvKOCxc5Xyv2oTcixUrX3md1/Nq5pJo1zUYuMbCEUOCIEfPl
-        +kb1mDsFIB/aTfnpeF69bBKlGg==
-X-Google-Smtp-Source: ABdhPJz6Srqy23ixsmudsSlEEYQ4uMlG6hoCFjmTuJRe3/TgL+lKhk+i3Oyev5etj53QCleXhErHOQ==
-X-Received: by 2002:a17:902:c406:b0:12d:d0ff:4aa with SMTP id k6-20020a170902c40600b0012dd0ff04aamr3145532plk.48.1629210788567;
-        Tue, 17 Aug 2021 07:33:08 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id pj14sm2190827pjb.35.2021.08.17.07.33.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Aug 2021 07:33:08 -0700 (PDT)
-Subject: Re: [PATCH V2] blk-mq: don't grab rq's refcount in
- blk_mq_check_expired()
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        John Garry <john.garry@huawei.com>,
-        Keith Busch <kbusch@kernel.org>
-References: <20210811155202.629575-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <38484926-becf-4aea-8a92-5d209657722a@kernel.dk>
-Date:   Tue, 17 Aug 2021 08:33:06 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IYqEXJfiN18yCZI6p8+AKI7fLyyfIF/2Rhy4MgWxORs=;
+        b=FpgOJsR+faR2mL8ShdThxp9do8gXwZgsYWgJUkg5LRDM4vvZtFg/SMbYWl6DcAG5gu
+         FhwA5gUkA5mw0teH7HDEkk+uRMS/0/CJlI6AoW8mIjozqXSimTfqloNhNXzXdEh3dNjn
+         51D11jGE29SL5e4LI7EmdEEifSheoDte7o3RhnOuhL2W8hcFVqubcigBrNF2tx7Hht0r
+         RWegD2zHg9VBHYTjANb+hjyq+zhyAifzTj1Xo9IQwphxMZMEvWU6vDzrTzsKm32uodI7
+         I5AJ1OobD0Pu9GXa+CuUMfYE66XBMhqPPOk2foGi2vBRleQnnIo7ZWo4AxkBDlcguel9
+         chTw==
+X-Gm-Message-State: AOAM530ritbDITvv70IJCNbIq64L798i1yQ5ms1t6+28dSyXbLm3NTba
+        Tt0TwqL/iXuEctzU/XjdDPUewtANiU3swEqsn0w=
+X-Google-Smtp-Source: ABdhPJzaMq7CWUOoMolITqe/TuYuwS1QvR8N16pqlMH4rqZKY4UMF98ZToXGodeF25valw2giFNpcKQdBw8IOwnP8Gc=
+X-Received: by 2002:ac2:5b9d:: with SMTP id o29mr2734522lfn.26.1629211368980;
+ Tue, 17 Aug 2021 07:42:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210811155202.629575-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
+ <CGME20210817101753epcas5p4f4257f8edda27e184ecbb273b700ccbc@epcas5p4.samsung.com>
+ <20210817101423.12367-3-selvakuma.s1@samsung.com> <YRu02+RgnZekKSqi@kroah.com>
+In-Reply-To: <YRu02+RgnZekKSqi@kroah.com>
+From:   Nitesh Shetty <nitheshshetty@gmail.com>
+Date:   Tue, 17 Aug 2021 20:12:37 +0530
+Message-ID: <CAOSviJ3tziyBmeP5Op_NAPhyt5vDprjPLaGH8Fu_rbK8UcQYPA@mail.gmail.com>
+Subject: Re: [PATCH 2/7] block: Introduce queue limits for copy-offload support
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
+        kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
+        asml.silence@gmail.com, johannes.thumshirn@wdc.com, hch@lst.de,
+        willy@infradead.org, kch@kernel.org, martin.petersen@oracle.com,
+        mpatocka@redhat.com, bvanassche@acm.org, djwong@kernel.org,
+        snitzer@redhat.com, agk@redhat.com, selvajove@gmail.com,
+        joshiiitr@gmail.com, nj.shetty@samsung.com, joshi.k@samsung.com,
+        javier.gonz@samsung.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/11/21 9:52 AM, Ming Lei wrote:
-> Inside blk_mq_queue_tag_busy_iter() we already grabbed request's
-> refcount before calling ->fn(), so needn't to grab it one more time
-> in blk_mq_check_expired().
-> 
-> Meantime remove extra request expire check in blk_mq_check_expired().
+On Tue, Aug 17, 2021 at 6:38 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Tue, Aug 17, 2021 at 03:44:18PM +0530, SelvaKumar S wrote:
+> > From: Nitesh Shetty <nj.shetty@samsung.com>
+> >
+> > Add device limits as sysfs entries,
+> >         - copy_offload (READ_WRITE)
+> >         - max_copy_sectors (READ_ONLY)
+> >         - max_copy_ranges_sectors (READ_ONLY)
+> >         - max_copy_nr_ranges (READ_ONLY)
+>
+> You forgot to add Documentation/ABI/ entries for your new sysfs files,
+> so we can't properly review them :(
+>
 
-Applied, thanks Ming.
+Sorry, we will update the documentation in the next version.
 
--- 
-Jens Axboe
-
+Thanks,
+Nitesh Shetty
