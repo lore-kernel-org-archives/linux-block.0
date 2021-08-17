@@ -2,165 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC7EDC43214
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 14:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8209EC4320A
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 16:10:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F6E861038
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 14:48:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6098661038
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 16:10:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237768AbhHQOtB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 10:49:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60856 "EHLO
+        id S229716AbhHQQLQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 12:11:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237387AbhHQOtB (ORCPT
+        with ESMTP id S229696AbhHQQLQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 10:49:01 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09F0C061764;
-        Tue, 17 Aug 2021 07:48:26 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id z2so41934333lft.1;
-        Tue, 17 Aug 2021 07:48:26 -0700 (PDT)
+        Tue, 17 Aug 2021 12:11:16 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EE66C061764;
+        Tue, 17 Aug 2021 09:10:42 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id p38so42544161lfa.0;
+        Tue, 17 Aug 2021 09:10:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LkI5q0Ud7n3yU60UTm3c6JeteGC7wMUAGiEejPjFM0g=;
-        b=Vnd8MvzcyIJss0OkwpMOukq2mHc6qzT3i2r3F2v8Rq3m4IyAu38H3oi2pVyzXM9G+s
-         9VecOZWA8UAF+urrr+2W519JaLBlHuWQzG+UDOngpQkbSQIj0M/0ws8PZhy6xLhG07Wa
-         Vz/DJoYr8NWlmQtvDqIea+oR7xpJHXXiqxGFF3SOwH7uyLdNstSbjKZJ2uXuFYYwEX4r
-         fr0NXkker9zxQM8m6Q9vTdYWONIUCHPKEIJ0MuujaeG25SlMoKnMoV0oCv6SIjnOz5rU
-         sugq1U8oav7TjjWnQTEBM/oIZ7yUGwYL0iDYaL2+yIIAxr4gb+Bxv6Th8TCaf6NRLBLn
-         4brg==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7EsSxl39cnHJja2G2J/O+57zySrqheydwkiXWPHpeog=;
+        b=pknb8Iwg6Wl0GrlCt5h7y/6odqUz1chqSifQ6c+WJZWfRWbBf+jQ4Axqsgm30hM0oz
+         Zs9p8JgxtJ87Tcfe3qAeRpp4w5ZrEXo4ZP+h5nwfi8SSI7JYe0fihaqbj+c5MPNe/iGy
+         BQ65IAJzTcBmyWh147FwDBCA1HuU+/muem/pdWqEYVXITv4HkJOVMfN/WCEvetE3kOEa
+         u3XM/TdesXGAtMpc2jA9iry62Txk8iNmr5CfumazxFGIGV0zAUP4ZL8dvG0bn+t+Eez8
+         XxYTLnc1Z85I/ygDacuqz33vfTxkpbm7ivbK17UaRgxtAaNmxQ5iApfg/OnsSdsHy3PV
+         uUAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LkI5q0Ud7n3yU60UTm3c6JeteGC7wMUAGiEejPjFM0g=;
-        b=ggeSSe0+VIq09hlpo4BnoMUHHT3bZBNwS1pnkZhFgn8LsuzApV/CIaOsXK1UfqNqCI
-         iZDlHh2UQG93phNS//zmaFeLfwKxrNPfP8nDRF3vgTGaesyERXp/8Aw3XpMvbjVpP0c7
-         6VdddArZpu5kV34sr0ZnQjV1EClbPqR1VLSrBZgxb5BDlMPXTxjwM8RMEA38dr0WyVDk
-         V1tkD3Jw0Z6fLUNaWoGhgkJcQCCdu+Ie55Qe7xjGyBdOOcc4SayEmt9tYdt0jQ4OgY2d
-         lm9iJ68tK+grP/YjiJEexs0EFyQ0ohKUwxawfxI1A8holxDa4PAid5mX4pPwAlSs+Q8g
-         BKTw==
-X-Gm-Message-State: AOAM531TDoc2yCzxAZs6yaq1yo1Y8T3nICzL3SG1YpzDqSc3wfGf8I5q
-        SbCGT/HltTeAKuLaAwW2Pn0fwggIkx4Vnqw0EPA=
-X-Google-Smtp-Source: ABdhPJy78VibbpwFw9aY9bJD6KbF0FN0r9oY1sz4LqrxVQ5ggLWZJqClrS+h2E/ukIwkOys47vQF7tDbHI+OS3kdo5Q=
-X-Received: by 2002:ac2:4573:: with SMTP id k19mr2666539lfm.459.1629211705214;
- Tue, 17 Aug 2021 07:48:25 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7EsSxl39cnHJja2G2J/O+57zySrqheydwkiXWPHpeog=;
+        b=FAP1HDNLhb3jxx6O5i5ZXdJEf3y5RyZ9i6nTjZiL67Co4lxvCE9qeSVwwsHUxkGnkT
+         B2GZORk+6BBmUuspsAtYrM6mkn7psEcW44+j0J0Xs8I7QKV/JMLptiOUR3UpmJctVN7s
+         7WX5dC5TGjA/NoZ2YKAE3ektehBkcrh/LkyEztPAo7sEbJH2102Nlv0BdJx1SEYpBz7X
+         Q2paACIIyxIoraWFiptuOJZoGhhedsFj7cVGglwn1/bWXg70XbtyVmFQDoXO2tBIaZqG
+         auYgCZByKg/hEQvzEn37rMssmA6TXzkB8KPFWqtgIoIPF73q11Edo50/gfXt+6PWVPXW
+         zdXg==
+X-Gm-Message-State: AOAM531BZhddF/xT6bcl1UVDBOHNmroxlUsO0ji40wkWAF1cRoKzDKyA
+        ARmcCvQts24+J5Wdcy/KzjFdZMS3QKM=
+X-Google-Smtp-Source: ABdhPJxH46JFUMbvOHtZ3nQwfA6gAr6ZDLs2MPQM66pU2Gxwmrdf4tTUrylG/o7O3c1z3b3hclea4w==
+X-Received: by 2002:ac2:508d:: with SMTP id f13mr13485lfm.576.1629216639785;
+        Tue, 17 Aug 2021 09:10:39 -0700 (PDT)
+Received: from [192.168.2.145] (46-138-85-91.dynamic.spd-mgts.ru. [46.138.85.91])
+        by smtp.googlemail.com with ESMTPSA id y27sm248487lfa.260.2021.08.17.09.10.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Aug 2021 09:10:39 -0700 (PDT)
+Subject: Re: [PATCH v4 2/3] mmc: block: Add mmc_bdev_to_card() helper
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Micha?? Miros??aw <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+References: <20210817013643.13061-1-digetx@gmail.com>
+ <20210817013643.13061-3-digetx@gmail.com> <YRs8/zfrU06No+Qv@infradead.org>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <3d3d1fe8-cad8-6ff8-9f70-a5580af6d6b5@gmail.com>
+Date:   Tue, 17 Aug 2021 19:10:38 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
- <CGME20210817101803epcas5p10cda1d52f8a8f1172e34b1f9cf8eef3b@epcas5p1.samsung.com>
- <20210817101423.12367-5-selvakuma.s1@samsung.com> <YRu1WFImFulfpk7s@kroah.com>
-In-Reply-To: <YRu1WFImFulfpk7s@kroah.com>
-From:   Nitesh Shetty <nitheshshetty@gmail.com>
-Date:   Tue, 17 Aug 2021 20:18:13 +0530
-Message-ID: <CAOSviJ2q-y8h=Pf4t7oUZoL7WHdYeFQQOnoeN6Ta07iPNjX-wg@mail.gmail.com>
-Subject: Re: [PATCH 4/7] block: Introduce a new ioctl for simple copy
-To:     Greg KH <greg@kroah.com>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
-        asml.silence@gmail.com, johannes.thumshirn@wdc.com, hch@lst.de,
-        willy@infradead.org, kch@kernel.org, martin.petersen@oracle.com,
-        mpatocka@redhat.com, bvanassche@acm.org, djwong@kernel.org,
-        snitzer@redhat.com, agk@redhat.com, selvajove@gmail.com,
-        joshiiitr@gmail.com, nj.shetty@samsung.com, joshi.k@samsung.com,
-        javier.gonz@samsung.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YRs8/zfrU06No+Qv@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 6:40 PM Greg KH <greg@kroah.com> wrote:
->
-> On Tue, Aug 17, 2021 at 03:44:20PM +0530, SelvaKumar S wrote:
-> > From: Nitesh Shetty <nj.shetty@samsung.com>
-> >
-> > Add new BLKCOPY ioctl that offloads copying of one or more sources ranges
-> > to a destination in the device. COPY ioctl accepts a 'copy_range'
-> > structure that contains destination (in sectors), no of sources and
-> > pointer to the array of source ranges. Each source range is represented by
-> > 'range_entry' that contains start and length of source ranges (in sectors)
-> >
-> > MAX_COPY_NR_RANGE, limits the number of entries for the IOCTL and
-> > MAX_COPY_TOTAL_LENGTH limits the total copy length, IOCTL can handle.
-> >
-> > Example code, to issue BLKCOPY:
-> > /* Sample example to copy three source-ranges [0, 8] [16, 8] [32,8] to
-> >  * [64,24], on the same device */
-> >
-> > int main(void)
-> > {
-> >       int ret, fd;
-> >       struct range_entry source_range[] = {{.src = 0, .len = 8},
-> >               {.src = 16, .len = 8}, {.src = 32, .len = 8},};
-> >       struct copy_range cr;
-> >
-> >       cr.dest = 64;
-> >       cr.nr_range = 3;
-> >       cr.range_list = (__u64)&source_range;
-> >
-> >       fd = open("/dev/nvme0n1", O_RDWR);
-> >       if (fd < 0) return 1;
-> >
-> >       ret = ioctl(fd, BLKCOPY, &cr);
-> >       if (ret < 0) printf("copy failure\n");
-> >
-> >       close(fd);
-> >
-> >       return ret;
-> > }
-> >
-> > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> > Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
-> > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> > ---
-> >  block/ioctl.c           | 33 +++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/fs.h |  8 ++++++++
-> >  2 files changed, 41 insertions(+)
-> >
-> > diff --git a/block/ioctl.c b/block/ioctl.c
-> > index eb0491e90b9a..2af56d01e9fe 100644
-> > --- a/block/ioctl.c
-> > +++ b/block/ioctl.c
-> > @@ -143,6 +143,37 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
-> >                                   GFP_KERNEL, flags);
-> >  }
-> >
-> > +static int blk_ioctl_copy(struct block_device *bdev, fmode_t mode,
-> > +             unsigned long arg)
-> > +{
-> > +     struct copy_range crange;
-> > +     struct range_entry *rlist;
-> > +     int ret;
-> > +
-> > +     if (!(mode & FMODE_WRITE))
-> > +             return -EBADF;
-> > +
-> > +     if (copy_from_user(&crange, (void __user *)arg, sizeof(crange)))
-> > +             return -EFAULT;
-> > +
-> > +     rlist = kmalloc_array(crange.nr_range, sizeof(*rlist),
-> > +                     GFP_KERNEL);
->
-> No error checking for huge values of nr_range?  Is that wise?  You
-> really want userspace to be able to allocate "all" of the kernel memory
-> in the system?
->
-> thanks,
->
-> greg k-h
+17.08.2021 07:37, Christoph Hellwig пишет:
+> On Tue, Aug 17, 2021 at 04:36:42AM +0300, Dmitry Osipenko wrote:
+>> +	if (bdev->bd_disk->major != MMC_BLOCK_MAJOR)
+>> +		return NULL;
+> 
+> The major is a dangerous check as we have all kinds of ways to override
+> it.  Please check the block device operations as they must be unique.
+> 
 
-We added a kernel imposed limit MAX_COPY_NR_RANGE for that purpose,
-but missed adding the check here.
-Will have that fixed. Thanks for pointing this out.
-
-Nitesh Shetty
+Alright, thank you for the suggestion.
