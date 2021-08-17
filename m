@@ -2,120 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA8DC432BE
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 16:16:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07DD8C43214
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 17:14:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F96060E90
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 16:16:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE88360FE6
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 17:14:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbhHQQQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 12:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbhHQQQi (ORCPT
+        id S229723AbhHQRPF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 13:15:05 -0400
+Received: from mail-pj1-f43.google.com ([209.85.216.43]:52770 "EHLO
+        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229699AbhHQRPD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 12:16:38 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B213FC061764;
-        Tue, 17 Aug 2021 09:16:04 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id g13so42345984lfj.12;
-        Tue, 17 Aug 2021 09:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Sr3avq56PYejYeB2Me2mzHjNTPeEs3a02cpJLO7/D6U=;
-        b=qwhpvCTYuEpxYyDJgSBovtiE85s5rKgmF+DxhtA5V5lOcFt6CISL+8RHcWMkQ4tp68
-         SbO6IjG2y25leDfUv+RvQAG9HWaj7jrF8OnchWfyEOXX1Tb8DUABMpwsnBGRqe11RC/6
-         GP5x8Xa5N/tvitCfqTmCrMyuzRee25bE9LthZZvP4QBnr6jCqZwv7DaLePzg3Na5tBMx
-         jKRwLIs/I4uhTU3UeKgEp1U8CgoJ7dVXDwGARzW6pyOsZHa9IRBfeHV/HPID7l1xQ+zc
-         zyXM6K0R9Z+ZYi9W7Q0BIW+qwhPK90dVrEbUrmfX7iVItX8SXbv4fAbbAA1lQE/wqN8p
-         MQEg==
+        Tue, 17 Aug 2021 13:15:03 -0400
+Received: by mail-pj1-f43.google.com with SMTP id nt11so152347pjb.2;
+        Tue, 17 Aug 2021 10:14:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Sr3avq56PYejYeB2Me2mzHjNTPeEs3a02cpJLO7/D6U=;
-        b=Cyffk0pKvc1vIByAe2R1CnNYR734bpHdqmOlZzY2Y+1iYpr7P9Lmx7R4JJt0+YfyfV
-         1HwaT6KDXy/+U7G9xxd+n442/Ocou/0bdaIku13q/mD61BfUqoO88FYizYahdv3JIivR
-         GKIoLHuBJs/BzNEk7Fqf9GKUepWeb7N6vgF3MI7egv1bikFvD6wTQ8csHTcLCKxcM4CC
-         vnFppwnziBBG7l2jOeJ7HjLopBtRIuphzI7E0ixGJi6t5OjOqWJHeo+nKlRgoVjh/4aM
-         XNcD2/LrBcFdMl9UlF0tA4T5sLK1I4GtFYzkQkl/1EshvMX1fXLBg6BSUNL7Y5b6RHXi
-         Syog==
-X-Gm-Message-State: AOAM533P+vbmaYnlHE5XU5mmdIxQ3gKUvHQRH38PVjKbQUCAXfvPiemI
-        qGa5NPUhdmJyPJYqg2YFvGyCSDUOdFQ=
-X-Google-Smtp-Source: ABdhPJwVPpaQiTFgxDrurEO/5BlrPD6UoCBghjkErm6OjS4O+FIeprnIovhj8Ym0bfe7h/BF10OFwQ==
-X-Received: by 2002:a05:6512:3091:: with SMTP id z17mr3069736lfd.207.1629216962947;
-        Tue, 17 Aug 2021 09:16:02 -0700 (PDT)
-Received: from [192.168.2.145] (46-138-85-91.dynamic.spd-mgts.ru. [46.138.85.91])
-        by smtp.googlemail.com with ESMTPSA id w14sm228979lfk.161.2021.08.17.09.16.02
+        bh=v2ezKXtmZ+KjzYhpA8Y6VRyR3KOD/971FoOogNR18Hs=;
+        b=AH0Pf/fxVX60UAFVupMs2HrhXm/SeXCyGTdjRPsamQF/3aZsZHK1c7X3oF1ccKup9m
+         8X/i722eoiiGnVAkeabMka6Odu0OIJNmwd0ztRKT+7r0qN13Bo9dMzsl3T88K1EN8gws
+         33lbu7QGIcVeZaFNUXE2DLXd/4/ToB1oNXsVNQokhNwjjtVuwtXy0q2TYhGk4QINv3vX
+         QblcpR+ujJ3/FdzXbje5uftWevEyBr+5XdJFukmMhtjIdtulZp8KDotYRjFfZDcO9XRj
+         cB8PyXuAXUOMBPOj1vFAneMYuNHMfQUbbxhl5bjFnCxOeywjADUcP3l9AZUmpI6J/B0p
+         zR4g==
+X-Gm-Message-State: AOAM531p4Ei5/9qdGJx2W266mjHtPG+KAvjWIX/3PSsN/9iVV+eSYlM+
+        mZ05yLWtLz1mP8TITDHeCiI=
+X-Google-Smtp-Source: ABdhPJxyRl0ks4xxfdYxuKBl/CqSpHH1tc/kfe77IZhXj/2ic6tgtgAm7bavNRKoa2tEHngKC7nW9Q==
+X-Received: by 2002:a17:90a:3b4b:: with SMTP id t11mr4532753pjf.182.1629220470271;
+        Tue, 17 Aug 2021 10:14:30 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:ae3f:1e44:e6d0:4a44])
+        by smtp.gmail.com with ESMTPSA id x13sm2822931pjh.30.2021.08.17.10.14.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Aug 2021 09:16:02 -0700 (PDT)
-Subject: Re: [PATCH v4 3/3] partitions/efi: Support NVIDIA Tegra devices
-To:     Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>
-References: <20210817013643.13061-1-digetx@gmail.com>
- <20210817013643.13061-4-digetx@gmail.com>
- <CAPDyKFr3d5tTsKVhgvqw1C-Np=6N2onJ+bo_hoFqtD6JSPn2Bg@mail.gmail.com>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <7268eb54-614c-df98-c685-6cc360116941@gmail.com>
-Date:   Tue, 17 Aug 2021 19:16:01 +0300
+        Tue, 17 Aug 2021 10:14:29 -0700 (PDT)
+Subject: Re: [PATCH 3/7] block: copy offload support infrastructure
+To:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Cc:     linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
+        kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
+        asml.silence@gmail.com, johannes.thumshirn@wdc.com, hch@lst.de,
+        willy@infradead.org, kch@kernel.org, martin.petersen@oracle.com,
+        mpatocka@redhat.com, djwong@kernel.org, snitzer@redhat.com,
+        agk@redhat.com, selvajove@gmail.com, joshiiitr@gmail.com,
+        nj.shetty@samsung.com, nitheshshetty@gmail.com,
+        joshi.k@samsung.com, javier.gonz@samsung.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
+ <CGME20210817101758epcas5p1ec353b3838d64654e69488229256d9eb@epcas5p1.samsung.com>
+ <20210817101423.12367-4-selvakuma.s1@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <ad3561b9-775d-dd4d-0d92-6343440b1f8f@acm.org>
+Date:   Tue, 17 Aug 2021 10:14:27 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <CAPDyKFr3d5tTsKVhgvqw1C-Np=6N2onJ+bo_hoFqtD6JSPn2Bg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210817101423.12367-4-selvakuma.s1@samsung.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-17.08.2021 11:24, Ulf Hansson пишет:
->> +int tegra_partition_forced_gpt(struct parsed_partitions *state)
->> +{
->> +       struct gendisk *disk = state->disk;
->> +       struct block_device *bdev = disk->part0;
->> +       struct mmc_card *card = mmc_bdev_to_card(bdev);
->> +       int ret, boot_offset;
->> +
->> +       if (!soc_is_tegra())
->> +               return 0;
->> +
->> +       /* filter out unrelated and untested boot sources */
->> +       if (!card || card->ext_csd.rev < 3 ||
->> +           !mmc_card_is_blockaddr(card) ||
->> +            mmc_card_is_removable(card->host) ||
->> +            bdev_logical_block_size(bdev) != SZ_512 ||
->> +           !of_match_node(tegra_sdhci_match, card->host->parent->of_node)) {
-> I think you need to convince Rob Herring that the location of the GPT
-> table in the eMMC flash memory is allowed to depend on the compatible
-> string of the sdhci controller.
+On 8/17/21 3:14 AM, SelvaKumar S wrote:
+> Introduce REQ_OP_COPY, a no-merge copy offload operation. Create
+> bio with control information as payload and submit to the device.
+> Larger copy operation may be divided if necessary by looking at device
+> limits. REQ_OP_COPY(19) is a write op and takes zone_write_lock when
+> submitted to zoned device.
+> Native copy offload is not supported for stacked devices.
 
-I'll CC Rob on the next revision, although I think he doesn't care much
-about this.
+Using a single operation for copy-offloading instead of separate 
+operations for reading and writing is fundamentally incompatible with 
+the device mapper. I think we need a copy-offloading implementation that 
+is compatible with the device mapper.
 
-> In any case, I think Christoph raised some interesting ideas in his
-> reply. Moving more of this code into the mmc core/block layer seems
-> reasonable to me as well.
+Storing the parameters of the copy operation in the bio payload is 
+incompatible with the current implementation of bio_split().
 
-Will prepare v5, thanks.
+In other words, I think there are fundamental problems with this patch 
+series.
+
+Bart.
