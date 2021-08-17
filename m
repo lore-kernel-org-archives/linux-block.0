@@ -2,84 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5BFC4338F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 01:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F038C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 01:37:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0B2160E52
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 01:04:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB99560EAF
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 01:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233121AbhHQBEq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Aug 2021 21:04:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58452 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231649AbhHQBEp (ORCPT
+        id S235511AbhHQBhg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Aug 2021 21:37:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49586 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229773AbhHQBhf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Aug 2021 21:04:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629162253;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zG5Fcyxm6S4hnyaO0xkZZn4/EVP6ILH79aGGHJXsp5U=;
-        b=axg/vRgxfTSaBcHwXANVthuK3quPn6E/s4zV8jqDe2uf2aRv4wkqx3IwGQl86kyckF/znH
-        V/ymr8PlHDuzfohDWcK2Tk+hGhVzY32quhU1J2B5O5jSyPeI+p2oX7S1FKiZJDUQPcThiC
-        ShUq8EH3Z6MtuTwgbhnTip3G6svc++s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-I-Xts_sVNROY6j4sQcp46w-1; Mon, 16 Aug 2021 21:04:10 -0400
-X-MC-Unique: I-Xts_sVNROY6j4sQcp46w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 812A21853026;
-        Tue, 17 Aug 2021 01:04:08 +0000 (UTC)
-Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EE755D6A8;
-        Tue, 17 Aug 2021 01:03:56 +0000 (UTC)
-Date:   Tue, 17 Aug 2021 09:03:51 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        John Garry <john.garry@huawei.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V2] blk-mq: don't grab rq's refcount in
- blk_mq_check_expired()
-Message-ID: <YRsK9/ewQFLaRtLZ@T590>
-References: <20210811155202.629575-1-ming.lei@redhat.com>
+        Mon, 16 Aug 2021 21:37:35 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF90C061764;
+        Mon, 16 Aug 2021 18:37:03 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id d4so38130866lfk.9;
+        Mon, 16 Aug 2021 18:37:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y13ssgfr6sKUkeUKlxkE5t/sIHmN7oG9hneGkaoPog4=;
+        b=HTmG7uMHTcKj2CNO6v36hEPhj00NFrlE80NEDH+zHeojdyZkWVuhZQGZEmlNEkvH7g
+         ew1SZpIbNk/bq8iaMwRKJ4v8rhdwFOrZm6RaoPePji0ndGR49VTsJ0UT2P2TvlSgeMhq
+         tXOyB6AATcz9/VTt0yOUotQYEkWUKQbGbG/wuz/+3kwi8gTY73HMpHtZ0XanhQeoS9xA
+         ugXME5zkTuelXZewyXLZ9jGBJSsAqJxxC0mXhV0b9QUtdWxJGxXSd3bKhJmjn8h6V9EQ
+         keOa9wODuQDutNVdQuDqeRwONO5eYpDm46ieeVH9RnvVve/mZErBs47x294li+7Zgnl7
+         jVQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y13ssgfr6sKUkeUKlxkE5t/sIHmN7oG9hneGkaoPog4=;
+        b=a0pKftuHZYpDxlDbBXZfj9/23rUmuF1fxJziCeC6gwF2d99pCPD0ftHVrGP0LlGOm7
+         bpY7wvzS2YHde8B7wKpIAee2JSmMNcCjnzQ4XB9MIi3Q36MmvIP7l19x1JlMqgwwiekd
+         R+VucG6ZrEnXxWz0I+3FoI62Y4LVktR2yvF3bdat6K9diZ9eqGpusjZ3LJM8T1srak4D
+         jCuFBq8yPCt7QL166XjkJU3UcxKysD07eNoieslWmfIh0L8pFe05mXT3s1OYSR8i321y
+         2UPbHjMFv7tFHB12vkmb8s4acLZ+KVXjkQ6y2b7EJZhrt9aeijkoGZkB+tB1BmZIT9Lp
+         t5Kw==
+X-Gm-Message-State: AOAM532Vsc9EeIS7fAg3p12XDOYJy8RSL7782GEN1DQGJWxRtZ4SaM9R
+        F4ig+Wpj/uxb64RKXydcN/w=
+X-Google-Smtp-Source: ABdhPJxRPENKda40qWNOWkQl41qMWmI0e+3KTqYXF5TovPBTtKNHJHlY+Pur3Wdx0urrmcdihJX+aw==
+X-Received: by 2002:ac2:4c2a:: with SMTP id u10mr511478lfq.631.1629164221740;
+        Mon, 16 Aug 2021 18:37:01 -0700 (PDT)
+Received: from localhost.localdomain (46-138-85-91.dynamic.spd-mgts.ru. [46.138.85.91])
+        by smtp.gmail.com with ESMTPSA id br33sm49699lfb.46.2021.08.16.18.37.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Aug 2021 18:37:01 -0700 (PDT)
+From:   Dmitry Osipenko <digetx@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>
+Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+Subject: [PATCH v4 0/3] Support EFI partition on NVIDIA Tegra devices
+Date:   Tue, 17 Aug 2021 04:36:40 +0300
+Message-Id: <20210817013643.13061-1-digetx@gmail.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210811155202.629575-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 11:52:02PM +0800, Ming Lei wrote:
-> Inside blk_mq_queue_tag_busy_iter() we already grabbed request's
-> refcount before calling ->fn(), so needn't to grab it one more time
-> in blk_mq_check_expired().
-> 
-> Meantime remove extra request expire check in blk_mq_check_expired().
-> 
-> Cc: Keith Busch <kbusch@kernel.org>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
-> 	- remove extra request expire check as suggested by Keith
-> 	- modify comment a bit
-> 
+This series adds the most minimal EFI partition support for NVIDIA Tegra
+consumer devices, like Android tablets and game consoles, making theirs
+EMMC accessible out-of-the-box using downstream bootloader and mainline
+Linux kernel.  EMMC now works on Acer A500 tablet and Ouya game console
+that are already well supported in mainline and internal storage is the
+only biggest thing left to support.
 
-Hello Jens,
+Changelog:
 
-Ping...
+v4: - Rebased on top of recent linux-next.
 
-Thanks,
-Ming
+v3: - Removed unnecessary v1 hunk that was left by accident in efi.c of v2.
+
+v2: - This is continuation of [1] where Davidlohr Bueso suggested that it
+      should be better to avoid supporting in mainline the custom gpt_sector
+      kernel cmdline parameter that downstream Android kernels use.  We can
+      do this for the devices that are already mainlined, so I dropped the
+      cmdline from the v2 and left only the variant with a fixed GPT address.
+
+[1] https://lore.kernel.org/linux-efi/20210327212100.3834-3-digetx@gmail.com/T/
+
+Dmitry Osipenko (3):
+  mmc: core: Add raw_boot_mult field to mmc_ext_csd
+  mmc: block: Add mmc_bdev_to_card() helper
+  partitions/efi: Support NVIDIA Tegra devices
+
+ block/partitions/Kconfig   |  8 ++++
+ block/partitions/Makefile  |  1 +
+ block/partitions/check.h   |  2 +
+ block/partitions/core.c    |  3 ++
+ block/partitions/efi.c     |  9 +++++
+ block/partitions/tegra.c   | 75 ++++++++++++++++++++++++++++++++++++++
+ drivers/mmc/core/block.c   | 15 ++++++++
+ drivers/mmc/core/mmc.c     |  2 +
+ include/linux/mmc/blkdev.h | 13 +++++++
+ include/linux/mmc/card.h   |  1 +
+ 10 files changed, 129 insertions(+)
+ create mode 100644 block/partitions/tegra.c
+ create mode 100644 include/linux/mmc/blkdev.h
+
+-- 
+2.32.0
 
