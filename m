@@ -2,127 +2,270 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 136E1C432BE
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 07:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8F2C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 08:24:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF02A6054F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 07:02:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45A1460F58
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 08:24:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234595AbhHQHDB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 03:03:01 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3653 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234284AbhHQHDA (ORCPT
+        id S239498AbhHQIZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 04:25:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56892 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239458AbhHQIZX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 03:03:00 -0400
-Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Gphlc1rRfz6FH0J;
-        Tue, 17 Aug 2021 15:01:32 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Tue, 17 Aug 2021 09:02:25 +0200
-Received: from [10.47.93.112] (10.47.93.112) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Tue, 17 Aug
- 2021 08:02:24 +0100
-Subject: Re: [PATCH v2 00/11] blk-mq: Reduce static requests memory footprint
- for shared sbitmap
-To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <kashyap.desai@broadcom.com>,
-        <hare@suse.de>, <ming.lei@redhat.com>
-References: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <2bb17ba5-2c7e-f1e3-6369-541369efd6b6@huawei.com>
-Date:   Tue, 17 Aug 2021 08:02:11 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Tue, 17 Aug 2021 04:25:23 -0400
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088A1C0613C1
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 01:24:50 -0700 (PDT)
+Received: by mail-ua1-x92f.google.com with SMTP id ay4so6780065uab.3
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 01:24:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NANAeHbZiQyWuhfenDwun7W+L0Tu32AbJv1dk8kR1E4=;
+        b=BO63hECkdsaSgtfDHlf58J4sqJkeHBr2/HELnfV7eRv+DvUhZu7y3vFlBpOseL+lz8
+         6+LqsRaH7FIGMZMYF676JIXQQ3Ue396tTinaiBZrTqhdKQ8GNm9WxlY0eadhcY/oCIfX
+         YgVfqleJEKkLAAA+r5HrPUm1mV6oIaSrRb6BgVGLrIgRhYh+MDubdQV8IIOtXhpE93Iu
+         wgrne4YJCfZg3NG+lzr/B3+g/7qj/Ai6XO4IJzHcCxS/iSg919iiD+CMBrviFJe+KWjW
+         DdAJvXQjpXbg9JatyowWGYbZoO6LSPBBvby8aYs3mTVCk3ODWlpey/g5lIgkk8pieJyg
+         Glyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NANAeHbZiQyWuhfenDwun7W+L0Tu32AbJv1dk8kR1E4=;
+        b=ZoSViBvXCNVxrbw3huiILxhNUHvf03Q64WpYnIen5mq8eX5AsdYlH3TJxAj7lcD7dB
+         bCABEpKr94Pwxodwg/VBxiVg7sYIr6kJMyBcYQdL5rQSbIo8otEbCJIMpQY3oC8A+Es8
+         yh3z9kkZdrWXmm5Qkb9hjXOsVG0pB0VC6fPC7vPtyKzilusgmgsNjLZBlxfg+Q40KGXh
+         VMYABxB2SStVGswjud3H2CE2rvFkDbjsqfgyWyAWAfyT5CPb0DzVXGVwyWSEpnOFKeYC
+         b8WeA5g/ju8K1EIn/3QSj5opMsgLMPfpSDwTYHPhP3Ee64GyLZEepynXNUNz38RYo4Br
+         eT+w==
+X-Gm-Message-State: AOAM532sZOABooAaUAsC4pAXj3jRF6yjZSQ43cPVt2wtXCqMrGZaFEIE
+        UVIFwo4H8F9tJ/IA2Wk0coougOupSo7P/Em6BZh1PA==
+X-Google-Smtp-Source: ABdhPJy9Sny95yIqpvu+19oA1LqUTUHjeGk3CBH8OBP6Z7x9GBG9OuU1+FI5pCNp0F6iV00JoXN9lHYUYfhPYoAKWxs=
+X-Received: by 2002:ab0:72c2:: with SMTP id g2mr1214196uap.104.1629188689169;
+ Tue, 17 Aug 2021 01:24:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.93.112]
-X-ClientProxiedBy: lhreml728-chm.china.huawei.com (10.201.108.79) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <20210817013643.13061-1-digetx@gmail.com> <20210817013643.13061-4-digetx@gmail.com>
+In-Reply-To: <20210817013643.13061-4-digetx@gmail.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Tue, 17 Aug 2021 10:24:12 +0200
+Message-ID: <CAPDyKFr3d5tTsKVhgvqw1C-Np=6N2onJ+bo_hoFqtD6JSPn2Bg@mail.gmail.com>
+Subject: Re: [PATCH v4 3/3] partitions/efi: Support NVIDIA Tegra devices
+To:     Dmitry Osipenko <digetx@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/08/2021 15:29, John Garry wrote:
+On Tue, 17 Aug 2021 at 03:37, Dmitry Osipenko <digetx@gmail.com> wrote:
+>
+> NVIDIA Tegra consumer devices have EMMC storage that has GPT entry at a
+> non-standard location. Support looking up GPT entry at a special sector
+> to enable such devices.
+>
+> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+> ---
+>  block/partitions/Kconfig  |  8 +++++
+>  block/partitions/Makefile |  1 +
+>  block/partitions/check.h  |  2 ++
+>  block/partitions/core.c   |  3 ++
+>  block/partitions/efi.c    |  9 +++++
+>  block/partitions/tegra.c  | 75 +++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 98 insertions(+)
+>  create mode 100644 block/partitions/tegra.c
+>
+> diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
+> index 278593b8e4e9..5db25e7efbb7 100644
+> --- a/block/partitions/Kconfig
+> +++ b/block/partitions/Kconfig
+> @@ -267,3 +267,11 @@ config CMDLINE_PARTITION
+>         help
+>           Say Y here if you want to read the partition table from bootargs.
+>           The format for the command line is just like mtdparts.
+> +
+> +config TEGRA_PARTITION
+> +       bool "NVIDIA Tegra Partition support" if PARTITION_ADVANCED
+> +       default y if ARCH_TEGRA
+> +       depends on EFI_PARTITION && MMC_BLOCK && (ARCH_TEGRA || COMPILE_TEST)
+> +       help
+> +         Say Y here if you would like to be able to read the hard disk
+> +         partition table format used by NVIDIA Tegra machines.
+> diff --git a/block/partitions/Makefile b/block/partitions/Makefile
+> index a7f05cdb02a8..83cb70c6d08d 100644
+> --- a/block/partitions/Makefile
+> +++ b/block/partitions/Makefile
+> @@ -20,3 +20,4 @@ obj-$(CONFIG_IBM_PARTITION) += ibm.o
+>  obj-$(CONFIG_EFI_PARTITION) += efi.o
+>  obj-$(CONFIG_KARMA_PARTITION) += karma.o
+>  obj-$(CONFIG_SYSV68_PARTITION) += sysv68.o
+> +obj-$(CONFIG_TEGRA_PARTITION) += tegra.o
+> diff --git a/block/partitions/check.h b/block/partitions/check.h
+> index d5b28e309d64..bd4b66443cf4 100644
+> --- a/block/partitions/check.h
+> +++ b/block/partitions/check.h
+> @@ -22,6 +22,7 @@ struct parsed_partitions {
+>         int limit;
+>         bool access_beyond_eod;
+>         char *pp_buf;
+> +       sector_t force_gpt_sector;
+>  };
+>
+>  typedef struct {
+> @@ -67,4 +68,5 @@ int osf_partition(struct parsed_partitions *state);
+>  int sgi_partition(struct parsed_partitions *state);
+>  int sun_partition(struct parsed_partitions *state);
+>  int sysv68_partition(struct parsed_partitions *state);
+> +int tegra_partition_forced_gpt(struct parsed_partitions *state);
+>  int ultrix_partition(struct parsed_partitions *state);
+> diff --git a/block/partitions/core.c b/block/partitions/core.c
+> index 9265936df77e..bbfbb1621581 100644
+> --- a/block/partitions/core.c
+> +++ b/block/partitions/core.c
+> @@ -82,6 +82,9 @@ static int (*check_part[])(struct parsed_partitions *) = {
+>  #endif
+>  #ifdef CONFIG_SYSV68_PARTITION
+>         sysv68_partition,
+> +#endif
+> +#ifdef CONFIG_TEGRA_PARTITION
+> +       tegra_partition_forced_gpt,
+>  #endif
+>         NULL
+>  };
+> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+> index aaa3dc487cb5..4ad151176204 100644
+> --- a/block/partitions/efi.c
+> +++ b/block/partitions/efi.c
+> @@ -619,6 +619,15 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
+>          if (!good_agpt && force_gpt)
+>                  good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
+>
+> +       /*
+> +        * The force_gpt_sector is used by NVIDIA Tegra partition parser in
+> +        * order to convey a non-standard location of the GPT entry for lookup.
+> +        * By default force_gpt_sector is set to 0 and has no effect.
+> +        */
+> +       if (!good_agpt && force_gpt && state->force_gpt_sector)
+> +               good_agpt = is_gpt_valid(state, state->force_gpt_sector,
+> +                                        &agpt, &aptes);
+> +
+>          /* The obviously unsuccessful case */
+>          if (!good_pgpt && !good_agpt)
+>                  goto fail;
+> diff --git a/block/partitions/tegra.c b/block/partitions/tegra.c
+> new file mode 100644
+> index 000000000000..4937e9f62398
+> --- /dev/null
+> +++ b/block/partitions/tegra.c
+> @@ -0,0 +1,75 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#define pr_fmt(fmt) "tegra-partition: " fmt
+> +
+> +#include <linux/blkdev.h>
+> +#include <linux/kernel.h>
+> +#include <linux/of.h>
+> +#include <linux/sizes.h>
+> +
+> +#include <linux/mmc/blkdev.h>
+> +#include <linux/mmc/card.h>
+> +#include <linux/mmc/host.h>
+> +
+> +#include <soc/tegra/common.h>
+> +
+> +#include "check.h"
+> +
+> +static const struct of_device_id tegra_sdhci_match[] = {
+> +       { .compatible = "nvidia,tegra20-sdhci", },
+> +       { .compatible = "nvidia,tegra30-sdhci", },
+> +       { .compatible = "nvidia,tegra114-sdhci", },
+> +       { .compatible = "nvidia,tegra124-sdhci", },
+> +       {}
+> +};
+> +
+> +int tegra_partition_forced_gpt(struct parsed_partitions *state)
+> +{
+> +       struct gendisk *disk = state->disk;
+> +       struct block_device *bdev = disk->part0;
+> +       struct mmc_card *card = mmc_bdev_to_card(bdev);
+> +       int ret, boot_offset;
+> +
+> +       if (!soc_is_tegra())
+> +               return 0;
+> +
+> +       /* filter out unrelated and untested boot sources */
+> +       if (!card || card->ext_csd.rev < 3 ||
+> +           !mmc_card_is_blockaddr(card) ||
+> +            mmc_card_is_removable(card->host) ||
+> +            bdev_logical_block_size(bdev) != SZ_512 ||
+> +           !of_match_node(tegra_sdhci_match, card->host->parent->of_node)) {
 
-Hi guys,
+I think you need to convince Rob Herring that the location of the GPT
+table in the eMMC flash memory is allowed to depend on the compatible
+string of the sdhci controller.
 
-Any chance to review or test this?
+In any case, I think Christoph raised some interesting ideas in his
+reply. Moving more of this code into the mmc core/block layer seems
+reasonable to me as well.
 
-Thanks!
+> +               pr_debug("%s: unexpected boot source\n", disk->disk_name);
+> +               return 0;
+> +       }
+> +
+> +       /*
+> +        * eMMC storage has two special boot partitions in addition to the
+> +        * main one.  NVIDIA's bootloader linearizes eMMC boot0->boot1->main
+> +        * accesses, this means that the partition table addresses are shifted
+> +        * by the size of boot partitions.  In accordance with the eMMC
+> +        * specification, the boot partition size is calculated as follows:
+> +        *
+> +        *      boot partition size = 128K byte x BOOT_SIZE_MULT
+> +        *
+> +        * This function returns number of sectors occupied by the both boot
+> +        * partitions.
+> +        */
+> +       boot_offset = card->ext_csd.raw_boot_mult * SZ_128K /
+> +                     SZ_512 * MMC_NUM_BOOT_PARTITION;
+> +
+> +       /*
+> +        * The fixed GPT entry address is calculated like this:
+> +        *
+> +        * gpt_sector = ext_csd.sectors_num - ext_csd.boot_sectors_num - 1
+> +        *
+> +        * This algorithm is defined by NVIDIA and used by Android devices.
+> +        */
+> +       state->force_gpt_sector  = get_capacity(disk);
+> +       state->force_gpt_sector -= boot_offset + 1;
+> +
+> +       ret = efi_partition(state);
+> +       state->force_gpt_sector = 0;
+> +
+> +       return ret;
+> +}
+> --
+> 2.32.0
+>
 
-> Currently a full set of static requests are allocated per hw queue per
-> tagset when shared sbitmap is used.
-> 
-> However, only tagset->queue_depth number of requests may be active at
-> any given time. As such, only tagset->queue_depth number of static
-> requests are required.
-> 
-> The same goes for using an IO scheduler, which allocates a full set of
-> static requests per hw queue per request queue.
-> 
-> This series changes shared sbitmap support by using a shared tags per
-> tagset and request queue. Ming suggested something along those lines in
-> v1. But we'll keep name "shared sbitmap" name as it is fimilar. In using
-> a shared tags, the static rqs also become shared, reducing the number of
-> sets of static rqs, reducing memory usage.
-> 
-> Patch "blk-mq: Use shared tags for shared sbitmap support" is a bit big,
-> and could be broken down. But then maintaining ability to bisect
-> becomes harder and each sub-patch would get more convoluted.
-> 
-> For megaraid sas driver on my 128-CPU arm64 system with 1x SATA disk, we
-> save approx. 300MB(!) [370MB -> 60MB]
-> 
-> Baseline is 2112f5c1330a (for-5.15/block) loop: Select I/O scheduler ...
-> 
-> Changes since v1:
-> - Switch to use blk_mq_tags for shared sbitmap
-> - Add new blk_mq_ops init request callback
-> - Add some RB tags (thanks!)
-> 
-> John Garry (11):
->    blk-mq: Change rqs check in blk_mq_free_rqs()
->    block: Rename BLKDEV_MAX_RQ -> BLKDEV_DEFAULT_RQ
->    blk-mq: Relocate shared sbitmap resize in blk_mq_update_nr_requests()
->    blk-mq: Invert check in blk_mq_update_nr_requests()
->    blk-mq-sched: Rename blk_mq_sched_alloc_{tags -> map_and_request}()
->    blk-mq: Pass driver tags to blk_mq_clear_rq_mapping()
->    blk-mq: Add blk_mq_tag_update_sched_shared_sbitmap()
->    blk-mq: Add blk_mq_ops.init_request_no_hctx()
->    scsi: Set blk_mq_ops.init_request_no_hctx
->    blk-mq: Use shared tags for shared sbitmap support
->    blk-mq: Stop using pointers for blk_mq_tags bitmap tags
-> 
->   block/bfq-iosched.c      |   4 +-
->   block/blk-core.c         |   2 +-
->   block/blk-mq-debugfs.c   |   8 +--
->   block/blk-mq-sched.c     |  92 +++++++++++++------------
->   block/blk-mq-sched.h     |   2 +-
->   block/blk-mq-tag.c       | 111 +++++++++++++-----------------
->   block/blk-mq-tag.h       |  12 ++--
->   block/blk-mq.c           | 144 +++++++++++++++++++++++----------------
->   block/blk-mq.h           |   8 +--
->   block/kyber-iosched.c    |   4 +-
->   block/mq-deadline-main.c |   2 +-
->   drivers/block/rbd.c      |   2 +-
->   drivers/scsi/scsi_lib.c  |   6 +-
->   include/linux/blk-mq.h   |  20 +++---
->   include/linux/blkdev.h   |   5 +-
->   15 files changed, 218 insertions(+), 204 deletions(-)
-> 
-
+Kind regards
+Uffe
