@@ -2,50 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54008C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 04:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34D6AC4320A
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 04:46:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A21C60F5C
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 04:45:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D8E860F41
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 04:46:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237825AbhHQEqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 00:46:16 -0400
-Received: from verein.lst.de ([213.95.11.211]:56994 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238011AbhHQEqM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 00:46:12 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 3A04A6736F; Tue, 17 Aug 2021 06:45:36 +0200 (CEST)
-Date:   Tue, 17 Aug 2021 06:45:36 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 1/7] genirq/affinity: remove the 'firstvec' parameter
- from irq_build_affinity_masks
-Message-ID: <20210817044536.GA3874@lst.de>
-References: <20210814123532.229494-1-ming.lei@redhat.com> <20210814123532.229494-2-ming.lei@redhat.com>
+        id S234202AbhHQErA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 00:47:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35696 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234145AbhHQEq7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Aug 2021 00:46:59 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4BD9C061764;
+        Mon, 16 Aug 2021 21:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0TwuFERteGkTjs0WmOuEENX+1L+W9XO1POA8I6FbVMc=; b=rbcX3KFgn2fALjf6OT95H5c0AG
+        yAQMHm+mU0q/jHpsh3ZHhkw/7OCWWfDnoGuaf9K5G0r5zHT92gWikxVmjWj5PdyVlwNMpxTDp7DU6
+        5xsx/wn6R9n1evn+uA0Pk5TC+SLtejSGkvXOiqnkrVGMpY5Kb5l/7dbWse0/Cc7FEcCp3WtFNpjd/
+        10goi7gHkM4shjx6yvyf6SP9dPDeUi38Qmjt+l5PwlRXnHrOU+bgdRJIUW1+98TSoTt8uF/HyNYl9
+        fzUyv0lK0Qn8NfTYYqlzQMzcvDqwP+iAwmxZRqf8M+ZQTNPx56910Iff6eU7QE358c5N3sGyCiEs2
+        rmPx7uWA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mFqwp-0028nF-4P; Tue, 17 Aug 2021 04:43:46 +0000
+Date:   Tue, 17 Aug 2021 05:43:35 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Dmitry Osipenko <digetx@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Micha?? Miros??aw <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+Subject: Re: [PATCH v4 3/3] partitions/efi: Support NVIDIA Tegra devices
+Message-ID: <YRs+dx1E72/R4Ael@infradead.org>
+References: <20210817013643.13061-1-digetx@gmail.com>
+ <20210817013643.13061-4-digetx@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210814123532.229494-2-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210817013643.13061-4-digetx@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 14, 2021 at 08:35:26PM +0800, Ming Lei wrote:
-> The 'firstvec' parameter is always same with the parameter of
-> 'startvec', so use 'startvec' directly inside irq_build_affinity_masks().
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-
-Looks good,
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Just curious, why not add a new block_device_operations member
+'alternative_gpt_sector', then move all the code calculating it to
+the mmc layer?
