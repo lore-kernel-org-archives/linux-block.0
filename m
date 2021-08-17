@@ -2,270 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8F2C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 08:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E06C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 10:18:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45A1460F58
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 08:24:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7506260232
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 10:18:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239498AbhHQIZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 04:25:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56892 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239458AbhHQIZX (ORCPT
+        id S235204AbhHQKSz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 06:18:55 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:54874 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236486AbhHQKSz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 04:25:23 -0400
-Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088A1C0613C1
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 01:24:50 -0700 (PDT)
-Received: by mail-ua1-x92f.google.com with SMTP id ay4so6780065uab.3
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 01:24:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NANAeHbZiQyWuhfenDwun7W+L0Tu32AbJv1dk8kR1E4=;
-        b=BO63hECkdsaSgtfDHlf58J4sqJkeHBr2/HELnfV7eRv+DvUhZu7y3vFlBpOseL+lz8
-         6+LqsRaH7FIGMZMYF676JIXQQ3Ue396tTinaiBZrTqhdKQ8GNm9WxlY0eadhcY/oCIfX
-         YgVfqleJEKkLAAA+r5HrPUm1mV6oIaSrRb6BgVGLrIgRhYh+MDubdQV8IIOtXhpE93Iu
-         wgrne4YJCfZg3NG+lzr/B3+g/7qj/Ai6XO4IJzHcCxS/iSg919iiD+CMBrviFJe+KWjW
-         DdAJvXQjpXbg9JatyowWGYbZoO6LSPBBvby8aYs3mTVCk3ODWlpey/g5lIgkk8pieJyg
-         Glyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NANAeHbZiQyWuhfenDwun7W+L0Tu32AbJv1dk8kR1E4=;
-        b=ZoSViBvXCNVxrbw3huiILxhNUHvf03Q64WpYnIen5mq8eX5AsdYlH3TJxAj7lcD7dB
-         bCABEpKr94Pwxodwg/VBxiVg7sYIr6kJMyBcYQdL5rQSbIo8otEbCJIMpQY3oC8A+Es8
-         yh3z9kkZdrWXmm5Qkb9hjXOsVG0pB0VC6fPC7vPtyKzilusgmgsNjLZBlxfg+Q40KGXh
-         VMYABxB2SStVGswjud3H2CE2rvFkDbjsqfgyWyAWAfyT5CPb0DzVXGVwyWSEpnOFKeYC
-         b8WeA5g/ju8K1EIn/3QSj5opMsgLMPfpSDwTYHPhP3Ee64GyLZEepynXNUNz38RYo4Br
-         eT+w==
-X-Gm-Message-State: AOAM532sZOABooAaUAsC4pAXj3jRF6yjZSQ43cPVt2wtXCqMrGZaFEIE
-        UVIFwo4H8F9tJ/IA2Wk0coougOupSo7P/Em6BZh1PA==
-X-Google-Smtp-Source: ABdhPJy9Sny95yIqpvu+19oA1LqUTUHjeGk3CBH8OBP6Z7x9GBG9OuU1+FI5pCNp0F6iV00JoXN9lHYUYfhPYoAKWxs=
-X-Received: by 2002:ab0:72c2:: with SMTP id g2mr1214196uap.104.1629188689169;
- Tue, 17 Aug 2021 01:24:49 -0700 (PDT)
+        Tue, 17 Aug 2021 06:18:55 -0400
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17HAI8C7041403;
+        Tue, 17 Aug 2021 19:18:08 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Tue, 17 Aug 2021 19:18:08 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17HAI8V2041399
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Tue, 17 Aug 2021 19:18:08 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH v3] block: genhd: don't call probe function with
+ major_names_lock held
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>
+References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
+ <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp>
+ <20210816073313.GA27275@lst.de> <20210817081045.3609-1-hdanton@sina.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <3cf9d371-50e4-76a0-4024-64eca22befdf@i-love.sakura.ne.jp>
+Date:   Tue, 17 Aug 2021 19:18:09 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210817013643.13061-1-digetx@gmail.com> <20210817013643.13061-4-digetx@gmail.com>
-In-Reply-To: <20210817013643.13061-4-digetx@gmail.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Tue, 17 Aug 2021 10:24:12 +0200
-Message-ID: <CAPDyKFr3d5tTsKVhgvqw1C-Np=6N2onJ+bo_hoFqtD6JSPn2Bg@mail.gmail.com>
-Subject: Re: [PATCH v4 3/3] partitions/efi: Support NVIDIA Tegra devices
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210817081045.3609-1-hdanton@sina.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 17 Aug 2021 at 03:37, Dmitry Osipenko <digetx@gmail.com> wrote:
->
-> NVIDIA Tegra consumer devices have EMMC storage that has GPT entry at a
-> non-standard location. Support looking up GPT entry at a special sector
-> to enable such devices.
->
-> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
-> ---
->  block/partitions/Kconfig  |  8 +++++
->  block/partitions/Makefile |  1 +
->  block/partitions/check.h  |  2 ++
->  block/partitions/core.c   |  3 ++
->  block/partitions/efi.c    |  9 +++++
->  block/partitions/tegra.c  | 75 +++++++++++++++++++++++++++++++++++++++
->  6 files changed, 98 insertions(+)
->  create mode 100644 block/partitions/tegra.c
->
-> diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
-> index 278593b8e4e9..5db25e7efbb7 100644
-> --- a/block/partitions/Kconfig
-> +++ b/block/partitions/Kconfig
-> @@ -267,3 +267,11 @@ config CMDLINE_PARTITION
->         help
->           Say Y here if you want to read the partition table from bootargs.
->           The format for the command line is just like mtdparts.
-> +
-> +config TEGRA_PARTITION
-> +       bool "NVIDIA Tegra Partition support" if PARTITION_ADVANCED
-> +       default y if ARCH_TEGRA
-> +       depends on EFI_PARTITION && MMC_BLOCK && (ARCH_TEGRA || COMPILE_TEST)
-> +       help
-> +         Say Y here if you would like to be able to read the hard disk
-> +         partition table format used by NVIDIA Tegra machines.
-> diff --git a/block/partitions/Makefile b/block/partitions/Makefile
-> index a7f05cdb02a8..83cb70c6d08d 100644
-> --- a/block/partitions/Makefile
-> +++ b/block/partitions/Makefile
-> @@ -20,3 +20,4 @@ obj-$(CONFIG_IBM_PARTITION) += ibm.o
->  obj-$(CONFIG_EFI_PARTITION) += efi.o
->  obj-$(CONFIG_KARMA_PARTITION) += karma.o
->  obj-$(CONFIG_SYSV68_PARTITION) += sysv68.o
-> +obj-$(CONFIG_TEGRA_PARTITION) += tegra.o
-> diff --git a/block/partitions/check.h b/block/partitions/check.h
-> index d5b28e309d64..bd4b66443cf4 100644
-> --- a/block/partitions/check.h
-> +++ b/block/partitions/check.h
-> @@ -22,6 +22,7 @@ struct parsed_partitions {
->         int limit;
->         bool access_beyond_eod;
->         char *pp_buf;
-> +       sector_t force_gpt_sector;
->  };
->
->  typedef struct {
-> @@ -67,4 +68,5 @@ int osf_partition(struct parsed_partitions *state);
->  int sgi_partition(struct parsed_partitions *state);
->  int sun_partition(struct parsed_partitions *state);
->  int sysv68_partition(struct parsed_partitions *state);
-> +int tegra_partition_forced_gpt(struct parsed_partitions *state);
->  int ultrix_partition(struct parsed_partitions *state);
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index 9265936df77e..bbfbb1621581 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -82,6 +82,9 @@ static int (*check_part[])(struct parsed_partitions *) = {
->  #endif
->  #ifdef CONFIG_SYSV68_PARTITION
->         sysv68_partition,
-> +#endif
-> +#ifdef CONFIG_TEGRA_PARTITION
-> +       tegra_partition_forced_gpt,
->  #endif
->         NULL
->  };
-> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-> index aaa3dc487cb5..4ad151176204 100644
-> --- a/block/partitions/efi.c
-> +++ b/block/partitions/efi.c
-> @@ -619,6 +619,15 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
->          if (!good_agpt && force_gpt)
->                  good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
->
-> +       /*
-> +        * The force_gpt_sector is used by NVIDIA Tegra partition parser in
-> +        * order to convey a non-standard location of the GPT entry for lookup.
-> +        * By default force_gpt_sector is set to 0 and has no effect.
-> +        */
-> +       if (!good_agpt && force_gpt && state->force_gpt_sector)
-> +               good_agpt = is_gpt_valid(state, state->force_gpt_sector,
-> +                                        &agpt, &aptes);
-> +
->          /* The obviously unsuccessful case */
->          if (!good_pgpt && !good_agpt)
->                  goto fail;
-> diff --git a/block/partitions/tegra.c b/block/partitions/tegra.c
-> new file mode 100644
-> index 000000000000..4937e9f62398
-> --- /dev/null
-> +++ b/block/partitions/tegra.c
-> @@ -0,0 +1,75 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#define pr_fmt(fmt) "tegra-partition: " fmt
-> +
-> +#include <linux/blkdev.h>
-> +#include <linux/kernel.h>
-> +#include <linux/of.h>
-> +#include <linux/sizes.h>
-> +
-> +#include <linux/mmc/blkdev.h>
-> +#include <linux/mmc/card.h>
-> +#include <linux/mmc/host.h>
-> +
-> +#include <soc/tegra/common.h>
-> +
-> +#include "check.h"
-> +
-> +static const struct of_device_id tegra_sdhci_match[] = {
-> +       { .compatible = "nvidia,tegra20-sdhci", },
-> +       { .compatible = "nvidia,tegra30-sdhci", },
-> +       { .compatible = "nvidia,tegra114-sdhci", },
-> +       { .compatible = "nvidia,tegra124-sdhci", },
-> +       {}
-> +};
-> +
-> +int tegra_partition_forced_gpt(struct parsed_partitions *state)
-> +{
-> +       struct gendisk *disk = state->disk;
-> +       struct block_device *bdev = disk->part0;
-> +       struct mmc_card *card = mmc_bdev_to_card(bdev);
-> +       int ret, boot_offset;
-> +
-> +       if (!soc_is_tegra())
-> +               return 0;
-> +
-> +       /* filter out unrelated and untested boot sources */
-> +       if (!card || card->ext_csd.rev < 3 ||
-> +           !mmc_card_is_blockaddr(card) ||
-> +            mmc_card_is_removable(card->host) ||
-> +            bdev_logical_block_size(bdev) != SZ_512 ||
-> +           !of_match_node(tegra_sdhci_match, card->host->parent->of_node)) {
+On 2021/08/17 17:10, Hillf Danton wrote:
+> See if it is safe to kfree(lo) after removing it from idr, with the
+> deadlock dissolved.
 
-I think you need to convince Rob Herring that the location of the GPT
-table in the eMMC flash memory is allowed to depend on the compatible
-string of the sdhci controller.
+It is not safe to call loop_remove() after idr_remove(). Please see HIDDEN_LOOP_DEVICE magic
+in "[PATCH] loop: break loop_ctl_mutex into loop_idr_spinlock and loop_removal_mutex".
 
-In any case, I think Christoph raised some interesting ideas in his
-reply. Moving more of this code into the mmc core/block layer seems
-reasonable to me as well.
-
-> +               pr_debug("%s: unexpected boot source\n", disk->disk_name);
-> +               return 0;
-> +       }
-> +
-> +       /*
-> +        * eMMC storage has two special boot partitions in addition to the
-> +        * main one.  NVIDIA's bootloader linearizes eMMC boot0->boot1->main
-> +        * accesses, this means that the partition table addresses are shifted
-> +        * by the size of boot partitions.  In accordance with the eMMC
-> +        * specification, the boot partition size is calculated as follows:
-> +        *
-> +        *      boot partition size = 128K byte x BOOT_SIZE_MULT
-> +        *
-> +        * This function returns number of sectors occupied by the both boot
-> +        * partitions.
-> +        */
-> +       boot_offset = card->ext_csd.raw_boot_mult * SZ_128K /
-> +                     SZ_512 * MMC_NUM_BOOT_PARTITION;
-> +
-> +       /*
-> +        * The fixed GPT entry address is calculated like this:
-> +        *
-> +        * gpt_sector = ext_csd.sectors_num - ext_csd.boot_sectors_num - 1
-> +        *
-> +        * This algorithm is defined by NVIDIA and used by Android devices.
-> +        */
-> +       state->force_gpt_sector  = get_capacity(disk);
-> +       state->force_gpt_sector -= boot_offset + 1;
-> +
-> +       ret = efi_partition(state);
-> +       state->force_gpt_sector = 0;
-> +
-> +       return ret;
-> +}
+> 
+> --- x/drivers/block/loop.c
+> +++ y/drivers/block/loop.c
+> @@ -2459,7 +2459,9 @@ static int loop_control_remove(int idx)
+>  	mutex_unlock(&lo->lo_mutex);
+>  
+>  	idr_remove(&loop_index_idr, lo->lo_number);
+> +	mutex_unlock(&loop_ctl_mutex);
+>  	loop_remove(lo);
+> +	return 0;
+>  out_unlock_ctrl:
+>  	mutex_unlock(&loop_ctl_mutex);
+>  	return ret;
 > --
-> 2.32.0
->
+> 
 
-Kind regards
-Uffe
+"[PATCH] loop: break loop_ctl_mutex into loop_idr_spinlock and loop_removal_mutex" can be a further
+improvement after "[PATCH v3] block: genhd: don't call probe function with major_names_lock held".
+
+I really would like to apply "[PATCH v3] block: genhd: don't call probe function with major_names_lock held" first.
