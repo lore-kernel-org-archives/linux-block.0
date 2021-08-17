@@ -4,92 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D35C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 12:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7085DC432BE
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 13:08:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2843360E76
-	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 12:33:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5147D60F41
+	for <linux-block@archiver.kernel.org>; Tue, 17 Aug 2021 13:08:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231478AbhHQMdk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 08:33:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40623 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230323AbhHQMdh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 08:33:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629203584;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=U+2Yus84hIugUWcGN23eW/FcOG0akl8Mx705tKe61RM=;
-        b=BPztK/a1acLQ50BvMvkNJNziUZ1cSqiHbDYeruMfdnMPxk0Ticktz7PIemo/6IiXg23Tgi
-        tV3tAfeBwI76ZXgg/Q+ikpnEV3GHTtr1pdOTgZbmPSRNN11Wz5JSOCZdtjYJ0ZXk03ANAK
-        rNqMHTVP2kj2Enl5WsVvLS2+/CTw2Mc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-UW29Z0szPfKY3RMkeZj6ng-1; Tue, 17 Aug 2021 08:33:03 -0400
-X-MC-Unique: UW29Z0szPfKY3RMkeZj6ng-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB30D1008060;
-        Tue, 17 Aug 2021 12:33:00 +0000 (UTC)
-Received: from T590 (ovpn-8-40.pek2.redhat.com [10.72.8.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C58375DA60;
-        Tue, 17 Aug 2021 12:32:47 +0000 (UTC)
-Date:   Tue, 17 Aug 2021 20:32:42 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Guoqing Jiang <guoqing.jiang@linux.dev>, song@kernel.org,
-        linux-raid@vger.kernel.org, jens@chianterastutte.eu,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] raid1: ensure bio doesn't have more than BIO_MAX_VECS
- sectors
-Message-ID: <YRusakafZq0NMqLe@T590>
-References: <20210813060510.3545109-1-guoqing.jiang@linux.dev>
- <YRYj8A+mDfAQBo/E@infradead.org>
- <0eac4589-ffd2-fb1a-43cc-87722731438a@linux.dev>
- <YRd26VGAnBiYeHrH@infradead.org>
- <YReFYrjtWr9MvfBr@T590>
- <YRox8gMjl/Y5Yt/k@infradead.org>
- <YRpOwFewTw4imskn@T590>
- <YRtDxEw7Zp2H7mxp@infradead.org>
+        id S237531AbhHQNJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 09:09:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46706 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230251AbhHQNJT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Aug 2021 09:09:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C925E6054F;
+        Tue, 17 Aug 2021 13:08:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1629205726;
+        bh=J1u5EkWGe1vhFroD1IkbImRAmY2cS/NhgJTldLkgdQ0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=G4sEWuIHg7dPIAdb+CNrXrzTwB17LGwdPnAKkHBjeFaDSeu0zgdgJ3WtuSvwm7Ke5
+         qxE2jqR/gnytpY4Px0tGv4k+kTSRxfZiGjlylGou8T6pgSEfNOHaYfOBoA5tol2NwA
+         1w+n/Xyy20t5QAhTAy0o9AYp+44fdacT9SJtE6lI=
+Date:   Tue, 17 Aug 2021 15:08:43 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     SelvaKumar S <selvakuma.s1@samsung.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
+        kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
+        asml.silence@gmail.com, johannes.thumshirn@wdc.com, hch@lst.de,
+        willy@infradead.org, kch@kernel.org, martin.petersen@oracle.com,
+        mpatocka@redhat.com, bvanassche@acm.org, djwong@kernel.org,
+        snitzer@redhat.com, agk@redhat.com, selvajove@gmail.com,
+        joshiiitr@gmail.com, nj.shetty@samsung.com,
+        nitheshshetty@gmail.com, joshi.k@samsung.com,
+        javier.gonz@samsung.com
+Subject: Re: [PATCH 2/7] block: Introduce queue limits for copy-offload
+ support
+Message-ID: <YRu02+RgnZekKSqi@kroah.com>
+References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
+ <CGME20210817101753epcas5p4f4257f8edda27e184ecbb273b700ccbc@epcas5p4.samsung.com>
+ <20210817101423.12367-3-selvakuma.s1@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YRtDxEw7Zp2H7mxp@infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20210817101423.12367-3-selvakuma.s1@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 06:06:12AM +0100, Christoph Hellwig wrote:
-> On Mon, Aug 16, 2021 at 07:40:48PM +0800, Ming Lei wrote:
-> > > > 
-> > > > 0 ~ 254: each bvec's length is 512
-> > > > 255: bvec's length is 8192
-> > > > 
-> > > > the total length is just 512*255 + 8192 = 138752 bytes = 271 sectors, but it
-> > > > still may need 257 bvecs, which can't be allocated via bio_alloc_bioset().
-> > > 
-> > > Yes, we still need the rounding magic that alloc_behind_master_bio uses
-> > > here.
-> > 
-> > But it is wrong to use max sectors to limit number of bvecs(segments), isn't it?
+On Tue, Aug 17, 2021 at 03:44:18PM +0530, SelvaKumar S wrote:
+> From: Nitesh Shetty <nj.shetty@samsung.com>
 > 
-> The raid1 write behind code cares about the size ofa bio it can reach by
-> adding order 0 pages to it.  The bvecs are part of that and I think the
-> calculation in the patch documents that a well.
+> Add device limits as sysfs entries,
+>         - copy_offload (READ_WRITE)
+>         - max_copy_sectors (READ_ONLY)
+>         - max_copy_ranges_sectors (READ_ONLY)
+>         - max_copy_nr_ranges (READ_ONLY)
 
-Thinking of further, your and Guoqing's patch are correct & enough since
-bio_copy_data() just copies bytes(sectors) stream from fs bio to the
-write behind bio.
+You forgot to add Documentation/ABI/ entries for your new sysfs files,
+so we can't properly review them :(
 
+thanks,
 
-Thanks,
-Ming
-
+greg k-h
