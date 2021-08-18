@@ -2,166 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-24.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBEB5C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA532C43214
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9A5A604AC
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 977EF61058
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239320AbhHRGR3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45504 "EHLO
+        id S240285AbhHRGRd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:17:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240146AbhHRGQn (ORCPT
+        with ESMTP id S240319AbhHRGQr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:16:43 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77428C033279
+        Wed, 18 Aug 2021 02:16:47 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E67C029829
         for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:24 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id mq2-20020a17090b3802b0290178911d298bso1654000pjb.1
+Received: by mail-pj1-x102c.google.com with SMTP id cp15-20020a17090afb8fb029017891959dcbso8247255pjb.2
         for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=CRODLTs8x0Qtm/Ptv5tWUChhln5VJpkNvKJjBk8/td0=;
-        b=XzrlZ/y5zwdpS/YJfRaa7Pon4GvdH7CLIrvdHg1SwgGSYlKhjRZ3TGVbYl9Uz2EMR6
-         DmEOD2KhxAa3t0uuDB86CMHd3fOUJumBVJBOXOji0V55L+ZC8vnyAlvKeCi+xG9eP7b+
-         sNyj58Ru/pj7AqU9rwaxc3vtA/ktDXFAaliyc=
+        bh=xqHRpTF29XKCvHESFQ890ZRLt8tV/z5c3XHhrLDSkrI=;
+        b=eDnWZw9KRm46hwXvZT4C7S5d+90hyINh4v1SZZHIktQhca39Kv5j4305RFuRZO4r+N
+         FpSZgAZO8EAZPKCqstt9sYRz4H1aNUG21Hkzfac89V2BS6o4rE2tpIfJtZvJgvvE0tGw
+         8wAP/HK8m8mUdps9C8RUZGGooYOTstKeYh1Yo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=CRODLTs8x0Qtm/Ptv5tWUChhln5VJpkNvKJjBk8/td0=;
-        b=gOszILWk5CdhkFi0VpJgm7to9A2G17KnZE2wJNfwoIt/AWPR/1MS8pLqZzDcmnAScp
-         FnzkiKFzDDg1UZxpFR4VS24RQ8B8rQGQamIv5lzu4v87JFT1bqkklAIRMLRaniDXG2Wm
-         8bLQhuc9rpAxK466kmffMQnES7EgsjlA5AqTXzCdCg9A6oJPe794pzslOVt8I56eOnjV
-         zWhi4ITYt0YmjrlSwNWq5I5/mEYUPLgfUT5vfg3VzfnnmVGAUXyY07udtCXODMx/J4V3
-         uysVbMD/FieF+WuznOCwJX28ITiXa9a9VzBDtHxCeG8zwfDvmatMbstJ67Xf8W6vhJgm
-         W9vg==
-X-Gm-Message-State: AOAM5301+fuvCnwdtx8UE6Kzaobw9SHOLhX21VoCB7pAfh9R/nV2imYQ
-        glHmNuBgsX+6nF+DRIbrXhhZgw==
-X-Google-Smtp-Source: ABdhPJw2O2kfFvEOnoehfcZ59jDqdYXp3MteV8gF92EfkMnChHRROnoigwIWoeiy+ab3LBtOKRgccQ==
-X-Received: by 2002:a17:90a:9f93:: with SMTP id o19mr7581672pjp.166.1629267264063;
+        bh=xqHRpTF29XKCvHESFQ890ZRLt8tV/z5c3XHhrLDSkrI=;
+        b=cBFwA0/TCta3ABqCCLqdCF62cLqnP3CvCeqmoKmLaaZFRD5zj4+zc5xYNCJMwOD1TT
+         Gs/iBAvQnwQ/WVVfFuV9Q2BjIds+6b1qE/zHz6F9P2SRsb5nBwdl/BLwt4hkpk+ZFUYv
+         0S+r1FS5z1TqAFsBCDv+hjnmcpymRLCvQaZCjH7ptu5lN3HI80aj4xw9YfR/8aZFlLmR
+         6X+8rQFLnPo4fUBcht6RUXfzos2lLVh2TziEyxHoTbk54zUSpZ9KlHT8ZEg+dvXjwYx4
+         wLfwY180/8zFWqS0QIpDNDfKcmlc45fKWUN/q6QGd1vwOd45Y4sX9bQA1sv2BD5QfWa+
+         oeOA==
+X-Gm-Message-State: AOAM532QZMRUvS1HhdNGizFqNgpF8Qx3p91aSmchWSQGzjgLloVfMvoh
+        SkKuox8j5yz0FfvdizRI7Fl1AmLoAQWPww==
+X-Google-Smtp-Source: ABdhPJzs0l6+96q5WrJaIq9sc6XvKb4+TMWLp34figTZCCyBwzySh6PWPIKNRtNT4xpSHHkkTwp3EA==
+X-Received: by 2002:a17:902:cec3:b0:12d:92c4:1ea6 with SMTP id d3-20020a170902cec300b0012d92c41ea6mr5883424plg.36.1629267264338;
         Tue, 17 Aug 2021 23:14:24 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id j13sm5326102pgp.29.2021.08.17.23.14.19
+        by smtp.gmail.com with ESMTPSA id u10sm5718071pgj.48.2021.08.17.23.14.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:14:21 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        Will Deacon <will@kernel.org>, Marco Elver <elver@google.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Oleg Nesterov <oleg@redhat.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
         linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
         linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 25/63] compiler_types.h: Remove __compiletime_object_size()
-Date:   Tue, 17 Aug 2021 23:04:55 -0700
-Message-Id: <20210818060533.3569517-26-keescook@chromium.org>
+Subject: [PATCH v2 50/63] tracing: Use memset_startat() to zero struct trace_iterator
+Date:   Tue, 17 Aug 2021 23:05:20 -0700
+Message-Id: <20210818060533.3569517-51-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2922; h=from:subject; bh=MDjEPu+0JYKYu2Xmf51UoTuGhtFMUlaN8gkl0rN2LiE=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMjfBwoewCUYNgCuB0jumG0NCJivrA+YgTkE1KH MccXxVSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIwAKCRCJcvTf3G3AJm3mEA C1cBGrrgs2la3rIyvrEHW+BRoF9MD1FEFa9+24jUy+7EhTKj5KuskH2wadAz6TmifU9D+cLgGgfC/n amHBb++ivEXxSJhc4y91umgpxGq1S8LFyrlOWOgZqtGNwFOE4L+A6hPQOzVfQqImZrKbUsXQiOTxQF 7grjdlvdZoEFDWPebAGQTCgPQNbtVYVKWoz7N0rUF0q+U6KKngVHIiryXSBI7/jo7JX1xs7kwTa5yb j5ABB3DV0p5m3h+eGdK/o4dtNK3lb7ccrpoMB2vKnfDPiunmk9/NFQdWQDhhPGB20LOuYWqb2DMI5F 8ra6j3oQzxzlnAmyDYk0Ooa7tUqhfIXEiH7BoEFHO1Labygo8HuW7nnfy2MT+oXLprIG0my4K40djX 27uS65O8HaTRBABOICKEnhMZCAjtBXHZrTzmpy/IjAFCLLdhJ/jhsknAVr4PuO4MNgfpjTce+yDc2f q9P+f7KqhEZTR5/XfPySXV6MEI82XEMO1yyRrSeCAUKNaSpY90jIcOl+jIvBSF1AlFB5Heg/LRjEc5 2Rgx7CjVAVaOJW15x45Insq5iN40SQ3HKQy3SVHVdQwKifffNqMWgk4LPRATYF7inKbMWmxUlWu57e y9Y+fqktoIPFyiL5IUhAbNoDS4ngHbm3l04H/saAMuvQX3Z78YJ6a+2ACeqw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1037; h=from:subject; bh=tJ+Y8mubd5vChiEdKyhrwIAPkGIRLmuKu7c5cVoFF8E=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMpD14ogHSXr5bFvuUHYu3T5qJe0zYALPCZMtZa BMo6QAuJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKQAKCRCJcvTf3G3AJmAwD/ 0a3+zKByTlHW7da31ew04MLWM2GyDtX5IWTWqZsa8eYoXbBB5X7LZRQLJ1vlQZHRLhepR9ZpITXmne EiQC9Yi2RCSGHYXs1DT8c2kWev59MckO9Ru6PbJsXCCCEtTQ6DMpe/Jx5fGA8+6uai2MdlkbPr1hcJ pBSeJNFQs0Pv1vqmL283XNUPLYaVRRlPmA9Gp6u3cYUEC+MvJh//1ksZAZO4Nyg2WQnN8olRr3f3NE /FPwlpkC0jjYP6MOJqAsGXQsShWeRQihUK27+fSMl0qP0sQvOypGdnWB5Xt9pHnrb59B+NoIWV3usD tlUXL9PjYEJYMDWPQTUUNPBMZZKOHI+48wGm37V+dXOW7TWP6k1ZaORRpaSbK4ePyA4y/UOyFr9kg/ uCpCZQbVxO0XsyHwZnPxyR0ffSAr5pZsGQoIXVSdGOiCT/l0l3GHYuulIqOqhrbldUvZjy3etP7MiI hx1VUn4EjkhIMB8HWOeouTN9VqnOXsp0Uoh3nMHIAOMLkJS8l1ptPjxUjAbP1ZRctjIKVTGS6xk+Mc BWlhshbZH64vEGQ9HoKgHm6UlwyYt5R2mkzOSjk0VSY4jGO4wg5giXsw55wRe6w4igcWbd0lCpFOWG qRUJgP1YlRnTAtp59niaAQ2aRXBKcpue4WIdo6iOcrFKIwc2EolBb7yDoGAA==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since all compilers support __builtin_object_size(), and there is only
-one user of __compiletime_object_size, remove it to avoid the needless
-indirection. This lets Clang reason about check_copy_size() correctly.
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memset(), avoid intentionally writing across
+neighboring fields.
 
-Link: https://github.com/ClangBuiltLinux/linux/issues/1179
-Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>
-Cc: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Marco Elver <elver@google.com>
-Cc: Arvind Sankar <nivedita@alum.mit.edu>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Sami Tolvanen <samitolvanen@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Gabriel Krisman Bertazi <krisman@collabora.com>
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Oleg Nesterov <oleg@redhat.com>
+Use memset_startat() to avoid confusing memset() about writing beyond
+the target struct member.
+
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@redhat.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/linux/compiler-gcc.h   | 2 --
- include/linux/compiler_types.h | 4 ----
- include/linux/thread_info.h    | 2 +-
- 3 files changed, 1 insertion(+), 7 deletions(-)
+ kernel/trace/trace.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index cb9217fc60af..01985821944b 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -41,8 +41,6 @@
+diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+index 13587e771567..9ff8c31975cd 100644
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -6691,9 +6691,7 @@ tracing_read_pipe(struct file *filp, char __user *ubuf,
+ 		cnt = PAGE_SIZE - 1;
  
- #define __UNIQUE_ID(prefix) __PASTE(__PASTE(__UNIQUE_ID_, prefix), __COUNTER__)
- 
--#define __compiletime_object_size(obj) __builtin_object_size(obj, 0)
--
- #define __compiletime_warning(message) __attribute__((__warning__(message)))
- #define __compiletime_error(message) __attribute__((__error__(message)))
- 
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index e4ea86fc584d..c43308b0a9a9 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -290,10 +290,6 @@ struct ftrace_likely_data {
- 	(sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
- 	 sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
- 
--/* Compile time object size, -1 for unknown */
--#ifndef __compiletime_object_size
--# define __compiletime_object_size(obj) -1
--#endif
- #ifndef __compiletime_warning
- # define __compiletime_warning(message)
- #endif
-diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
-index 0999f6317978..ad0c4e041030 100644
---- a/include/linux/thread_info.h
-+++ b/include/linux/thread_info.h
-@@ -203,7 +203,7 @@ static inline void copy_overflow(int size, unsigned long count)
- static __always_inline __must_check bool
- check_copy_size(const void *addr, size_t bytes, bool is_source)
- {
--	int sz = __compiletime_object_size(addr);
-+	int sz = __builtin_object_size(addr, 0);
- 	if (unlikely(sz >= 0 && sz < bytes)) {
- 		if (!__builtin_constant_p(bytes))
- 			copy_overflow(sz, bytes);
+ 	/* reset all but tr, trace, and overruns */
+-	memset(&iter->seq, 0,
+-	       sizeof(struct trace_iterator) -
+-	       offsetof(struct trace_iterator, seq));
++	memset_startat(iter, 0, seq);
+ 	cpumask_clear(iter->started);
+ 	trace_seq_init(&iter->seq);
+ 	iter->pos = -1;
 -- 
 2.30.2
 
