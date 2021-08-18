@@ -2,152 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC2BC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E1FDC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE24160FDA
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:27:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2916761056
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:29:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238377AbhHRG16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:27:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49086 "EHLO
+        id S238034AbhHRG3m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:29:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238168AbhHRG16 (ORCPT
+        with ESMTP id S237947AbhHRG3k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:27:58 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AC4C061764
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:27:22 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=bjornoya.blackshift.org)
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <mkl@pengutronix.de>)
-        id 1mGF2W-0007Xm-Bs; Wed, 18 Aug 2021 08:27:04 +0200
-Received: from pengutronix.de (unknown [IPv6:2a02:810a:8940:aa0:ed04:8488:5061:54d4])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        (Authenticated sender: mkl-all@blackshift.org)
-        by smtp.blackshift.org (Postfix) with ESMTPSA id 7335C66975A;
-        Wed, 18 Aug 2021 06:26:59 +0000 (UTC)
-Date:   Wed, 18 Aug 2021 08:26:57 +0200
-From:   Marc Kleine-Budde <mkl@pengutronix.de>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, linux-can@vger.kernel.org,
-        netdev@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 59/63] can: flexcan: Use struct_group() to zero struct
- flexcan_regs regions
-Message-ID: <20210818062657.6hvn75kf5o5cgey2@pengutronix.de>
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-60-keescook@chromium.org>
+        Wed, 18 Aug 2021 02:29:40 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A83DC061764
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:29:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=VfmFqXAC8QuM0wNvbIHk3b5015A2OwBAcO6LYyZ52bg=; b=FK0jygseuedOgzcRawU4o2J6SC
+        8mLefmI9xhWpYWrhJD8pXKOdPpZgqslHHZDVqloKyFTmF2HMdosAYRrebRACwy1SmRQmukoEL3oOy
+        YJKE1sdSFPvLcjCEFPyIkwHv1w+h7MabL6UwVLEA4cJtABBoPt0GLBnxwWtZK6n+S4alcjd2V7ltp
+        /Lj/amPItt1V+6oBA9SNNov/YPpYIItxFckhZ83pitOhwFB+FZkH//9eyxOtpm8B/BPNmTqe1e/La
+        X0ri5kF5xdLTE7mTagH+eceqzpCl9BgDZhemZjpgYBoIb/U307EQjiwFBuDwmtGz7IrPogCEVWsCU
+        lU1HmwMA==;
+Received: from 213-225-12-39.nat.highway.a1.net ([213.225.12.39] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mGF0S-003Qxw-6N; Wed, 18 Aug 2021 06:25:20 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Hillf Danton <hdanton@sina.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
+        linux-block@vger.kernel.org
+Subject: sort out the lock order in the loop driver
+Date:   Wed, 18 Aug 2021 08:24:48 +0200
+Message-Id: <20210818062455.211065-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="kduqcl3tf4g5uel5"
-Content-Disposition: inline
-In-Reply-To: <20210818060533.3569517-60-keescook@chromium.org>
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Jens,
 
---kduqcl3tf4g5uel5
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+this series sorts out lock order reversals involving the block layer
+open_mutex by drastically reducing the scope of loop_ctl_mutex.  To do
+so it first merges the cryptoloop module into the main loop driver
+as the unregistrtion of transfers on live loop devices was causing
+some nasty locking interactions.
 
-On 17.08.2021 23:05:29, Kees Cook wrote:
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memset(), avoid intentionally writing across
-> neighboring fields.
->=20
-> Add struct_group() to mark both regions of struct flexcan_regs that get
-> initialized to zero. Avoid the future warnings:
->=20
-> In function 'fortify_memset_chk',
->     inlined from 'memset_io' at ./include/asm-generic/io.h:1169:2,
->     inlined from 'flexcan_ram_init' at drivers/net/can/flexcan.c:1403:2:
-> ./include/linux/fortify-string.h:199:4: warning: call to '__write_overflo=
-w_field' declared with attribute warning: detected write beyond size of fie=
-ld (1st parameter); maybe use struct_group()? [-Wattribute-warning]
->   199 |    __write_overflow_field(p_size_field, size);
->       |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> In function 'fortify_memset_chk',
->     inlined from 'memset_io' at ./include/asm-generic/io.h:1169:2,
->     inlined from 'flexcan_ram_init' at drivers/net/can/flexcan.c:1408:3:
-> ./include/linux/fortify-string.h:199:4: warning: call to '__write_overflo=
-w_field' declared with attribute warning: detected write beyond size of fie=
-ld (1st parameter); maybe use struct_group()? [-Wattribute-warning]
->   199 |    __write_overflow_field(p_size_field, size);
->       |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Cc: Wolfgang Grandegger <wg@grandegger.com>
-> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: linux-can@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-> -	memset_io(&regs->mb[0][0], 0,
-> -		  offsetof(struct flexcan_regs, rx_smb1[3]) -
-> -		  offsetof(struct flexcan_regs, mb[0][0]) + 0x4);
-> +	memset_io(&regs->init, 0, sizeof(regs->init));
-
-This even makes the code more readable! \o/
-
->  	if (priv->can.ctrlmode & CAN_CTRLMODE_FD)
-> -		memset_io(&regs->tx_smb_fd[0], 0,
-> -			  offsetof(struct flexcan_regs, rx_smb1_fd[17]) -
-> -			  offsetof(struct flexcan_regs, tx_smb_fd[0]) + 0x4);
-> +		memset_io(&regs->init_fd, 0, sizeof(regs->init_fd));
-> =20
->  	reg_ctrl2 &=3D ~FLEXCAN_CTRL2_WRMFRZ;
->  	priv->write(reg_ctrl2, &regs->ctrl2);
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde           |
-Embedded Linux                   | https://www.pengutronix.de  |
-Vertretung West/Dortmund         | Phone: +49-231-2826-924     |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-5555 |
-
---kduqcl3tf4g5uel5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEK3kIWJt9yTYMP3ehqclaivrt76kFAmEcqC4ACgkQqclaivrt
-76lMtAf+PLTf+69ONg9/KGwncoo4yvZ5m8bSKHLYfYYuCITf4oOnHWQIBFT3P8Fn
-GMKihDcISmFKjqSbFu8aJSqtNFhYzGB0uIUjuhW+15TJRH7SUTZCuT/U6VPXrEWi
-qWCGvkl3szxqSpDVrbCW5ChnnsAZ3Nj2pXV+gkB62mvtcwTdqFBczMfbKHNhLHgv
-BYjF2uWTN51iadHR3Kese6EccsTaIoCrqZjnGrlJSBVLtt66BT101RY0pE9890e+
-+p/LRFYivNeT0DnAObs8TDghwzxWlqfE3nR1QLSvENRbMBSzhEbipc7oz3DQJC4v
-WM/41iCaZScHUFfgxPrBqtGtM1p9RA==
-=LXIZ
------END PGP SIGNATURE-----
-
---kduqcl3tf4g5uel5--
+Diffstat:
+ b/drivers/block/Kconfig    |    6 
+ b/drivers/block/Makefile   |    1 
+ b/drivers/block/loop.c     |  327 ++++++++++++++++++++++++---------------------
+ b/drivers/block/loop.h     |   30 ----
+ drivers/block/cryptoloop.c |  204 ----------------------------
+ 5 files changed, 188 insertions(+), 380 deletions(-)
