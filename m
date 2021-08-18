@@ -2,249 +2,369 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA9AC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3872C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:20:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D52016109E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:47:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1D0360187
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:20:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237104AbhHRNsa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 09:48:30 -0400
-Received: from verein.lst.de ([213.95.11.211]:33923 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236970AbhHRNsa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 09:48:30 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 37F2C67373; Wed, 18 Aug 2021 15:47:52 +0200 (CEST)
-Date:   Wed, 18 Aug 2021 15:47:52 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>
-Subject: Re: [PATCH v4] block: genhd: don't call probe function with
- major_names_lock held
-Message-ID: <20210818134752.GA7453@lst.de>
-References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp> <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp> <YRi9EQJqfK6ldrZG@kroah.com> <a3f43d54-8d10-3272-1fbb-1193d9f1b6dd@i-love.sakura.ne.jp> <YRjcHJE0qEIIJ9gA@kroah.com> <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
+        id S239606AbhHROV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 10:21:29 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3666 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240449AbhHROTh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 10:19:37 -0400
+Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GqVNp380qz6D9Mx;
+        Wed, 18 Aug 2021 22:18:02 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 18 Aug 2021 16:19:01 +0200
+Received: from [10.202.227.179] (10.202.227.179) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 18 Aug 2021 15:19:00 +0100
+Subject: Re: [PATCH v2 10/11] blk-mq: Use shared tags for shared sbitmap
+ support
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
+        "hare@suse.de" <hare@suse.de>
+References: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
+ <1628519378-211232-11-git-send-email-john.garry@huawei.com>
+ <YRzB+aCVVSP+OmE4@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <e8fdad10-f162-78be-c24a-417d7aee45df@huawei.com>
+Date:   Wed, 18 Aug 2021 15:18:59 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <YRzB+aCVVSP+OmE4@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.179]
+X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Tetsuo,
+On 18/08/2021 09:16, Ming Lei wrote:
+> On Mon, Aug 09, 2021 at 10:29:37PM +0800, John Garry wrote:
+>> Currently we use separate sbitmap pairs and active_queues atomic_t for
+>> shared sbitmap support.
+>>
+>> However a full set of static requests are used per HW queue, which is
+>> quite wasteful, considering that the total number of requests usable at
+>> any given time across all HW queues is limited by the shared sbitmap depth.
+>>
+>> As such, it is considerably more memory efficient in the case of shared
+>> sbitmap to allocate a set of static rqs per tag set or request queue, and
+>> not per HW queue.
+>>
+>> So replace the sbitmap pairs and active_queues atomic_t with a shared
+>> tags per tagset and request queue.
+> 
+> This idea looks good and the current implementation is simplified a bit
+> too.
 
-I might sound like a broken record, but we need to reduce the locking
-complexity, not make it worse and fall down the locking cliff.  I did
-send a suggested series this morning, in which you found a bunch of
-bugs.  I'd appreciate it if you could use your superior skills to
-actually help explain the issue and arrive at a common solution that
-actually simplifies things instead of steaming down the locking cliff
-full speed.  Thank you very much.
+Good, but you did hint at it :)
 
-On Wed, Aug 18, 2021 at 08:07:32PM +0900, Tetsuo Handa wrote:
-> syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
-> commit a160c6159d4a0cf8 ("block: add an optional probe callback to
-> major_names") is calling the module's probe function with major_names_lock
-> held.
 > 
-> When copying content of /proc/devices to another file via sendfile(),
+>>
+>> Continue to use term "shared sbitmap" for now, as the meaning is known.
 > 
->   sb_writers#$N => &p->lock => major_names_lock
+> I guess shared tags is better.
+
+Yeah, agreed. My preference would be to change later, once things settle 
+down.
+
+As I see, the only thing close to an ABI is the debugfs "flags" code, 
+but that's debugfs, so not stable.
+
 > 
-> dependency is recorded.
+>>
+>> Signed-off-by: John Garry <john.garry@huawei.com>
+>> ---
+>>   block/blk-mq-sched.c   | 77 ++++++++++++++++++++-----------------
+>>   block/blk-mq-tag.c     | 65 ++++++++++++-------------------
+>>   block/blk-mq-tag.h     |  4 +-
+>>   block/blk-mq.c         | 86 +++++++++++++++++++++++++-----------------
+>>   block/blk-mq.h         |  8 ++--
+>>   include/linux/blk-mq.h | 13 +++----
+>>   include/linux/blkdev.h |  3 +-
+>>   7 files changed, 131 insertions(+), 125 deletions(-)
+>>
+>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+
+...
+
+>> +
+>>   static int blk_mq_init_sched_shared_sbitmap(struct request_queue *queue)
+>>   {
+>>   	struct blk_mq_tag_set *set = queue->tag_set;
+>> -	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags);
+>> -	struct blk_mq_hw_ctx *hctx;
+>> -	int ret, i;
+>> +	struct blk_mq_tags *tags;
+>> +	int ret;
+>>   
+>>   	/*
+>>   	 * Set initial depth at max so that we don't need to reallocate for
+>>   	 * updating nr_requests.
+>>   	 */
+>> -	ret = blk_mq_init_bitmaps(&queue->sched_bitmap_tags,
+>> -				  &queue->sched_breserved_tags,
+>> -				  MAX_SCHED_RQ, set->reserved_tags,
+>> -				  set->numa_node, alloc_policy);
+>> -	if (ret)
+>> -		return ret;
+>> +	tags = queue->shared_sbitmap_tags = blk_mq_alloc_rq_map(set, 0,
+>> +					  set->queue_depth,
+>> +					  set->reserved_tags);
+>> +	if (!queue->shared_sbitmap_tags)
+>> +		return -ENOMEM;
+>>   
+>> -	queue_for_each_hw_ctx(queue, hctx, i) {
+>> -		hctx->sched_tags->bitmap_tags =
+>> -					&queue->sched_bitmap_tags;
+>> -		hctx->sched_tags->breserved_tags =
+>> -					&queue->sched_breserved_tags;
+>> +	ret = blk_mq_alloc_rqs(set, tags, 0, set->queue_depth);
+>> +	if (ret) {
+>> +		blk_mq_exit_sched_shared_sbitmap(queue);
+>> +		return ret;
 > 
-> When loop_process_work() from WQ context performs a write request,
+> There are two such patterns for allocate rq map and request pool
+> together, please put them into one helper(such as blk_mq_alloc_map_and_rqs)
+> which can return the allocated tags and handle failure inline. Also we may
+> convert current users into this helper.
+
+I'll have a look, but I will mention about "free" helper below
+
 > 
->   (wq_completion)loop$M => (work_completion)&lo->rootcg_work =>
->   sb_writers#$N
+>>   	}
+>>   
+>>   	blk_mq_tag_update_sched_shared_sbitmap(queue);
+>> @@ -580,12 +589,6 @@ static int blk_mq_init_sched_shared_sbitmap(struct request_queue *queue)
+>>   	return 0;
+>>   }
+>>   
+>> -static void blk_mq_exit_sched_shared_sbitmap(struct request_queue *queue)
+>> -{
+>> -	sbitmap_queue_free(&queue->sched_bitmap_tags);
+>> -	sbitmap_queue_free(&queue->sched_breserved_tags);
+>> -}
+>> -
+
+...
+
+>>   
+>> -void blk_mq_free_tags(struct blk_mq_tags *tags, unsigned int flags)
+>> +void blk_mq_free_tags(struct blk_mq_tags *tags)
+>>   {
+>> -	if (!blk_mq_is_sbitmap_shared(flags)) {
+>> -		sbitmap_queue_free(tags->bitmap_tags);
+>> -		sbitmap_queue_free(tags->breserved_tags);
+>> -	}
+>> +	sbitmap_queue_free(tags->bitmap_tags);
+>> +	sbitmap_queue_free(tags->breserved_tags);
+>>   	kfree(tags);
+>>   }
+>>   
+>> @@ -604,18 +580,25 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+>>   		if (tdepth > MAX_SCHED_RQ)
+>>   			return -EINVAL;
+>>   
+>> +		if (blk_mq_is_sbitmap_shared(set->flags)) {
+>> +			/* No point in allowing this to happen */
+>> +			if (tdepth > set->queue_depth)
+>> +				return -EINVAL;
+>> +			return 0;
+>> +		}
 > 
-> dependency is recorded.
+> The above looks wrong, it isn't unusual to see small queue depth
+> hardware meantime we often have scheduler queue depth of 2 * set->queue_depth.
+
+ok, I suppose you're right.
+
 > 
-> When flush_workqueue() from drain_workqueue() from destroy_workqueue()
->  from __loop_clr_fd() from blkdev_put() from blkdev_close() from __fput()
-> is called,
+>> +
+>>   		new = blk_mq_alloc_rq_map(set, hctx->queue_num, tdepth,
+>> -				tags->nr_reserved_tags, set->flags);
+>> +				tags->nr_reserved_tags);
+>>   		if (!new)
+>>   			return -ENOMEM;
+>>   		ret = blk_mq_alloc_rqs(set, new, hctx->queue_num, tdepth);
+>>   		if (ret) {
+>> -			blk_mq_free_rq_map(new, set->flags);
+>> +			blk_mq_free_rq_map(new);
+>>   			return -ENOMEM;
+>>   		}
+>>   
+>>   		blk_mq_free_rqs(set, *tagsptr, hctx->queue_num);
+>> -		blk_mq_free_rq_map(*tagsptr, set->flags);
+>> +		blk_mq_free_rq_map(*tagsptr);
+>>   		*tagsptr = new;
+>>   	} else {
+>>   		/*
+>> @@ -631,12 +614,14 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+>>   
+>>   void blk_mq_tag_resize_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int size)
+>>   {
+>> -	sbitmap_queue_resize(&set->__bitmap_tags, size - set->reserved_tags);
+>> +	struct blk_mq_tags *tags = set->shared_sbitmap_tags;
+>> +
+>> +	sbitmap_queue_resize(&tags->__bitmap_tags, size - set->reserved_tags);
+>>   }
+>>   
+>>   void blk_mq_tag_update_sched_shared_sbitmap(struct request_queue *q)
+>>   {
+>> -	sbitmap_queue_resize(&q->sched_bitmap_tags,
+>> +	sbitmap_queue_resize(q->shared_sbitmap_tags->bitmap_tags,
+>>   			     q->nr_requests - q->tag_set->reserved_tags);
+>>   }
+>>   
+>> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+>> index 88f3c6485543..c9fc52ee07c4 100644
+>> --- a/block/blk-mq-tag.h
+>> +++ b/block/blk-mq-tag.h
+>> @@ -30,8 +30,8 @@ struct blk_mq_tags {
+>>   
+>>   extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
+>>   					unsigned int reserved_tags,
+>> -					int node, unsigned int flags);
+>> -extern void blk_mq_free_tags(struct blk_mq_tags *tags, unsigned int flags);
+>> +					int node, int alloc_policy);
+>> +extern void blk_mq_free_tags(struct blk_mq_tags *tags);
+>>   extern int blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
+>>   			       struct sbitmap_queue *breserved_tags,
+>>   			       unsigned int queue_depth,
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 4d6723cfa582..d3dd5fab3426 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2348,6 +2348,9 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>>   	struct blk_mq_tags *drv_tags;
+>>   	struct page *page;
+>>   
+>> +	if (blk_mq_is_sbitmap_shared(set->flags))
+>> +		drv_tags = set->shared_sbitmap_tags;
+>> +	else
+>>   		drv_tags = set->tags[hctx_idx];
 > 
->   &disk->open_mutex => &lo->lo_mutex => (wq_completion)loop$M
+> Here I guess you need to avoid to double ->exit_request()?
+
+I'll check that doesn't occur, but I didn't think it did.
+
 > 
-> dependency is recorded.
+>>   
+>>   	if (tags->static_rqs && set->ops->exit_request) {
+>> @@ -2377,21 +2380,20 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>>   	}
+>>   }
+>>   
+>> -void blk_mq_free_rq_map(struct blk_mq_tags *tags, unsigned int flags)
+>> +void blk_mq_free_rq_map(struct blk_mq_tags *tags)
+>>   {
+>>   	kfree(tags->rqs);
+>>   	tags->rqs = NULL;
+>>   	kfree(tags->static_rqs);
+>>   	tags->static_rqs = NULL;
+>>   
+>> -	blk_mq_free_tags(tags, flags);
+>> +	blk_mq_free_tags(tags);
+>>   }
+>>   
+
+...
+
+>>   }
+>> @@ -2877,11 +2886,11 @@ static bool __blk_mq_alloc_map_and_request(struct blk_mq_tag_set *set,
+>>   static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+>>   					 unsigned int hctx_idx)
+>>   {
+>> -	unsigned int flags = set->flags;
+>> -
+>>   	if (set->tags && set->tags[hctx_idx]) {
+>> -		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
+>> -		blk_mq_free_rq_map(set->tags[hctx_idx], flags);
+>> +		if (!blk_mq_is_sbitmap_shared(set->flags)) {
 > 
-> When loop_control_remove() from loop_control_ioctl(LOOP_CTL_REMOVE) is
-> called,
+> I remember you hate negative check, :-)
+
+Not always, but sometimes I think the code harder to read with them.
+
 > 
->   loop_ctl_mutex => &lo->lo_mutex
+>> +			blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
+>> +			blk_mq_free_rq_map(set->tags[hctx_idx]);
 > 
-> dependency is recorded.
+> We can add one helper of blk_mq_free_map_and_rqs(), and there seems
+> several such pattern.
+
+ok, I can check, but I don't think it's useful in the blk-mq sched code 
+as the tags and rqs are freed separately there, so not sure on how much 
+we gain.
+
 > 
-> As a result, lockdep thinks that there is
+>> +		}
+>>   		set->tags[hctx_idx] = NULL;
+>>   	}
+>>   }
+>> @@ -3348,6 +3357,21 @@ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+>>   {
+>>   	int i;
+>>   
+>> +	if (blk_mq_is_sbitmap_shared(set->flags)) {
+>> +		int ret;
+>> +
+>> +		set->shared_sbitmap_tags = blk_mq_alloc_rq_map(set, 0,
+>> +						  set->queue_depth,
+>> +						  set->reserved_tags);
+>> +		if (!set->shared_sbitmap_tags)
+>> +			return -ENOMEM;
+>> +
+>> +		ret = blk_mq_alloc_rqs(set, set->shared_sbitmap_tags, 0,
+>> +				       set->queue_depth);
+>> +		if (ret)
+>> +			goto out_free_sbitmap_tags;
+>> +	}
+>> +
+>>   	for (i = 0; i < set->nr_hw_queues; i++) {
+>>   		if (!__blk_mq_alloc_map_and_request(set, i))
+>>   			goto out_unwind;
+>> @@ -3359,6 +3383,11 @@ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+>>   out_unwind:
+>>   	while (--i >= 0)
+>>   		blk_mq_free_map_and_requests(set, i);
+>> +	if (blk_mq_is_sbitmap_shared(set->flags))
+>> +		blk_mq_free_rqs(set, set->shared_sbitmap_tags, 0);
+>> +out_free_sbitmap_tags:
+>> +	if (blk_mq_is_sbitmap_shared(set->flags))
+>> +		blk_mq_exit_shared_sbitmap(set);
 > 
->   loop_ctl_mutex => &lo->lo_mutex => (wq_completion)loop$M =>
->   (work_completion)&lo->rootcg_work => sb_writers#$N => &p->lock =>
->   major_names_lock
+> Once a helper of blk_mq_alloc_map_and_rqs() is added, the above failure
+> handling can be simplified too.
 > 
-> dependency chain.
 > 
-> Then, if loop_add() from loop_probe() from blk_request_module() from
-> blkdev_get_no_open() from blkdev_get_by_dev() from blkdev_open() from
-> do_dentry_open() from path_openat() from do_filp_open() is called,
-> 
->   major_names_lock => loop_ctl_mutex
-> 
-> dependency is appended to the dependency chain.
-> 
-> There would be two approaches for breaking this circular dependency.
-> One is to kill loop_ctl_mutex => &lo->lo_mutex chain. The other is to
-> kill major_names_lock => loop_ctl_mutex chain. This patch implements
-> the latter, due to the following reasons.
-> 
->  (1) sb_writers#$N => &p->lock => major_names_lock chain is unavoidable
-> 
->  (2) this patch can also fix similar problem in other modules [2] which
->      is caused by calling the probe function with major_names_lock held
-> 
->  (3) I believe that this patch is principally safer than e.g.
->      commit bd5c39edad535d9f ("loop: reduce loop_ctl_mutex coverage in
->      loop_exit") which waits until the probe function finishes using
->      global mutex in order to fix deadlock reproducible by sleep
->      injection [3]
-> 
-> This patch adds THIS_MODULE parameter to __register_blkdev() as with
-> usb_register(), and drops major_names_lock before calling probe function
-> by holding a reference to that module which contains that probe function.
-> 
-> Since cdev uses register_chrdev() and __register_chrdev(), bdev should be
-> able to preserve register_blkdev() and __register_blkdev() naming scheme.
-> Thus, use register_blkdev_with_probe() as an inline function for
-> automagically appending THIS_MODULE parameter.
-> 
-> Link: https://syzkaller.appspot.com/bug?id=7bb10e8b62f83e4d445cdf4c13d69e407e629558 [1]
-> Link: https://syzkaller.appspot.com/bug?id=7bd106c28e846d1023d4ca915718b1a0905444cb [2]
-> Link: https://lkml.kernel.org/r/c4edf07f-92e1-a350-2743-f0b0234a2b6c@i-love.sakura.ne.jp [3]
-> Reported-by: syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>
-> Reported-by: syzbot <syzbot+6a8a0d93c91e8fbf2e80@syzkaller.appspotmail.com>
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Tested-by: syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>
-> Fixes: a160c6159d4a0cf8 ("block: add an optional probe callback to major_names")
-> ---
->  block/genhd.c         | 33 ++++++++++++++++++++++++++-------
->  include/linux/genhd.h | 11 +++++++++--
->  2 files changed, 35 insertions(+), 9 deletions(-)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 298ee78c1bda..a3e2e5666457 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -162,6 +162,7 @@ static struct blk_major_name {
->  	int major;
->  	char name[16];
->  	void (*probe)(dev_t devt);
-> +	struct module *owner;
->  } *major_names[BLKDEV_MAJOR_HASH_SIZE];
->  static DEFINE_MUTEX(major_names_lock);
->  
-> @@ -190,7 +191,8 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
->   * @major: the requested major device number [1..BLKDEV_MAJOR_MAX-1]. If
->   *         @major = 0, try to allocate any unused major number.
->   * @name: the name of the new block device as a zero terminated string
-> - * @probe: allback that is called on access to any minor number of @major
-> + * @probe: callback that is called on access to any minor number of @major
-> + * @owner: THIS_MODULE if @probe is not NULL, ignored if @probe is NULL.
->   *
->   * The @name must be unique within the system.
->   *
-> @@ -207,8 +209,9 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
->   *
->   * Use register_blkdev instead for any new code.
->   */
-> +#undef __register_blkdev
->  int __register_blkdev(unsigned int major, const char *name,
-> -		void (*probe)(dev_t devt))
-> +		      void (*probe)(dev_t devt), struct module *owner)
->  {
->  	struct blk_major_name **n, *p;
->  	int index, ret = 0;
-> @@ -248,6 +251,7 @@ int __register_blkdev(unsigned int major, const char *name,
->  
->  	p->major = major;
->  	p->probe = probe;
-> +	p->owner = owner;
->  	strlcpy(p->name, name, sizeof(p->name));
->  	p->next = NULL;
->  	index = major_to_index(major);
-> @@ -653,14 +657,29 @@ void blk_request_module(dev_t devt)
->  {
->  	unsigned int major = MAJOR(devt);
->  	struct blk_major_name **n;
-> +	void (*probe_fn)(dev_t devt);
->  
->  	mutex_lock(&major_names_lock);
->  	for (n = &major_names[major_to_index(major)]; *n; n = &(*n)->next) {
-> -		if ((*n)->major == major && (*n)->probe) {
-> -			(*n)->probe(devt);
-> -			mutex_unlock(&major_names_lock);
-> -			return;
-> -		}
-> +		if ((*n)->major != major || !(*n)->probe)
-> +			continue;
-> +		if (!try_module_get((*n)->owner))
-> +			break;
-> +		/*
-> +		 * Calling probe function with major_names_lock held causes
-> +		 * circular locking dependency problem. Thus, call it after
-> +		 * releasing major_names_lock.
-> +		 */
-> +		probe_fn = (*n)->probe;
-> +		mutex_unlock(&major_names_lock);
-> +		/*
-> +		 * Assuming that unregister_blkdev() is called from module's
-> +		 * __exit function, a module refcount taken above allows us
-> +		 * to safely call probe function without major_names_lock held.
-> +		 */
-> +		probe_fn(devt);
-> +		module_put((*n)->owner);
-> +		return;
->  	}
->  	mutex_unlock(&major_names_lock);
->  
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index 13b34177cc85..2ed856616d47 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -303,9 +303,16 @@ struct gendisk *__blk_alloc_disk(int node);
->  void blk_cleanup_disk(struct gendisk *disk);
->  
->  int __register_blkdev(unsigned int major, const char *name,
-> -		void (*probe)(dev_t devt));
-> +		      void (*probe)(dev_t devt), struct module *owner);
-> +static inline int register_blkdev_with_probe(unsigned int major, const char *name,
-> +					     void (*probe)(dev_t devt), struct module *owner)
-> +{
-> +	return __register_blkdev(major, name, probe, owner);
-> +}
-> +#define __register_blkdev(major, name, probe) \
-> +	register_blkdev_with_probe(major, name, probe, THIS_MODULE)
->  #define register_blkdev(major, name) \
-> -	__register_blkdev(major, name, NULL)
-> +	register_blkdev_with_probe(major, name, NULL, NULL)
->  void unregister_blkdev(unsigned int major, const char *name);
->  
->  bool bdev_check_media_change(struct block_device *bdev);
-> -- 
-> 2.25.1
-> 
----end quoted text---
+
+OK
+
+Thanks a lot,
+John
+
+
