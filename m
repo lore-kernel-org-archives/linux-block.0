@@ -2,169 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 503FAC4320A
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 19:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46769C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 20:21:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 378E96113C
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 19:18:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EBF160ED3
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 20:21:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbhHRTTW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 15:19:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33448 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231743AbhHRTTW (ORCPT
+        id S232969AbhHRUV5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 16:21:57 -0400
+Received: from smtprelay0011.hostedemail.com ([216.40.44.11]:49906 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232564AbhHRUVz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 15:19:22 -0400
-X-Greylist: delayed 567 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 18 Aug 2021 12:18:44 PDT
-Received: from confino.investici.org (confino.investici.org [IPv6:2a00:c38:11e:ffff::a020])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC70C061764;
-        Wed, 18 Aug 2021 12:18:44 -0700 (PDT)
-Received: from mx1.investici.org (unknown [127.0.0.1])
-        by confino.investici.org (Postfix) with ESMTP id 4Gqcrh08nxz10yG;
-        Wed, 18 Aug 2021 19:09:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=privacyrequired.com;
-        s=stigmate; t=1629313748;
-        bh=zZRv+nXoCrBil3F5oNtg2nOIZFdUyNScEfpQhHkWs20=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XuNyCGrF4TFImYa8YkqQMbYM79KtRR5mjYpqhKJM6XXrw3sAON1jt+Y/v45iEN+cy
-         Nbzj3fNcPYxB8NOjFzB0xdXNDXJvqNY6iamhJ9vb6u8qWPeDiUAbgsciFPC3g7lCn0
-         bKt0uIxCi4lHr8vwhgUg7zZ7PXj3VH8B7+AkRuxE=
-Received: from [212.103.72.250] (mx1.investici.org [212.103.72.250]) (Authenticated sender: laniel_francis@privacyrequired.com) by localhost (Postfix) with ESMTPSA id 4Gqcrf3wsYz10y6;
-        Wed, 18 Aug 2021 19:09:06 +0000 (UTC)
-From:   Francis Laniel <laniel_francis@privacyrequired.com>
-To:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Daniel Axtens <dja@axtens.net>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 27/63] fortify: Move remaining fortify helpers into fortify-string.h
-Date:   Wed, 18 Aug 2021 21:05:58 +0200
-Message-ID: <77588349.MC4sUV1sfq@machine>
-In-Reply-To: <20210818060533.3569517-28-keescook@chromium.org>
-References: <20210818060533.3569517-1-keescook@chromium.org> <20210818060533.3569517-28-keescook@chromium.org>
+        Wed, 18 Aug 2021 16:21:55 -0400
+Received: from omf11.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay03.hostedemail.com (Postfix) with ESMTP id C7C3D837F27B;
+        Wed, 18 Aug 2021 20:21:19 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf11.hostedemail.com (Postfix) with ESMTPA id 755AE20A293;
+        Wed, 18 Aug 2021 20:21:18 +0000 (UTC)
+Message-ID: <71535d629266751273c15cc05dd7c987cb9c43b6.camel@perches.com>
+Subject: Re: [RFC PATCH 1/5] checkpatch: improve handling of revert commits
+From:   Joe Perches <joe@perches.com>
+To:     Denis Efremov <efremov@linux.com>, linux-kselftest@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Jiri Kosina <jkosina@suse.cz>,
+        Willy Tarreau <w@1wt.eu>
+Date:   Wed, 18 Aug 2021 13:21:16 -0700
+In-Reply-To: <3d347d4b-1576-754f-8633-ba6084cc0661@linux.com>
+References: <20210818154646.925351-1-efremov@linux.com>
+         <20210818154646.925351-2-efremov@linux.com>
+         <cc5801790fea258e20fa6b7e26de7806ae8e0dda.camel@perches.com>
+         <3d347d4b-1576-754f-8633-ba6084cc0661@linux.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.0-1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8bit
+X-Stat-Signature: hhfmrgmbujahqjyp41s16enabxmyxkkm
+X-Rspamd-Server: rspamout03
+X-Rspamd-Queue-Id: 755AE20A293
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1/Jl11ClCXS3+2aw80kHkkrPC9TM8JV7qY=
+X-HE-Tag: 1629318078-364882
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi.
+On Wed, 2021-08-18 at 19:21 +0300, Denis Efremov wrote:
+> 
+> On 8/18/21 7:00 PM, Joe Perches wrote:
+> > On Wed, 2021-08-18 at 18:46 +0300, Denis Efremov wrote:
+> > > Properly handle commits like:
+> > > commit f2791e7eadf4 ("Revert "floppy: refactor open() flags handling"")
+> > 
+> > Try this one:
+> > 
+> > https://lore.kernel.org/lkml/7f55d9d0369f1ea840fab83eeb77f9f3601fee41.camel@perches.com/
+> > 
+> 
+> It works but why not to use .+? then?
+> I'm not sure that non-greedy patterns will properly handle commits like:
+> $ git log --oneline | fgrep '")'
+> 
+> e.g. 
+> commit ece2619fe8ed ("extcon: arizona: Fix flags parameter to the gpiod_get("wlf,micd-pol") call")
 
+The only way to handle that is to use the $balanced_parens test but
+it wouldn't work on Andrew's perl version 5.8
 
-Le mercredi 18 ao=FBt 2021, 08:04:57 CEST Kees Cook a =E9crit :
-> When commit a28a6e860c6c ("string.h: move fortified functions definitions
-> in a dedicated header.") moved the fortify-specific code, some helpers
-> were left behind. Moves the remaining fortify-specific helpers into
-> fortify-string.h so they're together where they're used. This requires
-> that any FORTIFY helper function prototypes be conditionally built to
-> avoid "no prototype" warnings. Additionally removes unused helpers.
->=20
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Francis Laniel <laniel_francis@privacyrequired.com>
-> Cc: Daniel Axtens <dja@axtens.net>
-> Cc: Vincenzo Frascino <vincenzo.frascino@arm.com>
-> Cc: Andrey Konovalov <andreyknvl@google.com>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  include/linux/fortify-string.h | 7 +++++++
->  include/linux/string.h         | 9 ---------
->  lib/string_helpers.c           | 2 ++
->  3 files changed, 9 insertions(+), 9 deletions(-)
->=20
-> diff --git a/include/linux/fortify-string.h b/include/linux/fortify-strin=
-g.h
-> index c1be37437e77..7e67d02764db 100644
-> --- a/include/linux/fortify-string.h
-> +++ b/include/linux/fortify-string.h
-> @@ -2,6 +2,13 @@
->  #ifndef _LINUX_FORTIFY_STRING_H_
->  #define _LINUX_FORTIFY_STRING_H_
->=20
-> +#define __FORTIFY_INLINE extern __always_inline __attribute__((gnu_inlin=
-e))
-> +#define __RENAME(x) __asm__(#x)
-> +
-> +void fortify_panic(const char *name) __noreturn __cold;
-> +void __read_overflow(void) __compiletime_error("detected read beyond size
-> of object (1st parameter)"); +void __read_overflow2(void)
-> __compiletime_error("detected read beyond size of object (2nd parameter)"=
-);
-> +void __write_overflow(void) __compiletime_error("detected write beyond
-> size of object (1st parameter)");
->=20
->  #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
->  extern void *__underlying_memchr(const void *p, int c, __kernel_size_t
-> size) __RENAME(memchr); diff --git a/include/linux/string.h
-> b/include/linux/string.h
-> index b48d2d28e0b1..9473f81b9db2 100644
-> --- a/include/linux/string.h
-> +++ b/include/linux/string.h
-> @@ -249,15 +249,6 @@ static inline const char *kbasename(const char *path)
->  	return tail ? tail + 1 : path;
->  }
->=20
-> -#define __FORTIFY_INLINE extern __always_inline __attribute__((gnu_inlin=
-e))
-> -#define __RENAME(x) __asm__(#x)
-> -
-> -void fortify_panic(const char *name) __noreturn __cold;
-> -void __read_overflow(void) __compiletime_error("detected read beyond size
-> of object passed as 1st parameter"); -void __read_overflow2(void)
-> __compiletime_error("detected read beyond size of object passed as 2nd
-> parameter"); -void __read_overflow3(void) __compiletime_error("detected
-> read beyond size of object passed as 3rd parameter"); -void
-> __write_overflow(void) __compiletime_error("detected write beyond size of
-> object passed as 1st parameter"); -
->  #if !defined(__NO_FORTIFY) && defined(__OPTIMIZE__) &&
-> defined(CONFIG_FORTIFY_SOURCE) #include <linux/fortify-string.h>
->  #endif
-> diff --git a/lib/string_helpers.c b/lib/string_helpers.c
-> index bde13612c25d..faa9d8e4e2c5 100644
-> --- a/lib/string_helpers.c
-> +++ b/lib/string_helpers.c
-> @@ -883,9 +883,11 @@ char *strreplace(char *s, char old, char new)
->  }
->  EXPORT_SYMBOL(strreplace);
->=20
-> +#ifdef CONFIG_FORTIFY_SOURCE
->  void fortify_panic(const char *name)
->  {
->  	pr_emerg("detected buffer overflow in %s\n", name);
->  	BUG();
->  }
->  EXPORT_SYMBOL(fortify_panic);
-> +#endif /* CONFIG_FORTIFY_SOURCE */
+Andrew?  Do you still use perl 5.8?  It's almost 20 years old now.
+Does anyone still use perl versions 5.8 or lower?
 
-If I remember correctly, I let these helpers in string.h because I thought=
-=20
-they could be used by code not related to fortify-string.h.
+From checkpatch:
 
-But you are right and I think it is better to have all the code related to =
-one=20
-feature in the same place.
-I am happy to see the kernel is fortifying, and this contribution is good, =
-so=20
-here is what I can give:
-Acked-by: Francis Laniel <laniel_francis@privacyrequired.com>
+# Using $balanced_parens, $LvalOrFunc, or $FuncArg
+# requires at least perl version v5.10.0
+# Any use must be runtime checked with $^V
 
+our $balanced_parens = qr/(\((?:[^\(\)]++|(?-1))*\))/;
+our $LvalOrFunc	= qr{((?:[\&\*]\s*)?$Lval)\s*($balanced_parens{0,1})\s*};
+our $FuncArg = qr{$Typecast{0,1}($LvalOrFunc|$Constant|$String)};
 
-Best regards.
+So maybe:
+
+> > > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+[]
+> > > @@ -3200,20 +3200,20 @@ sub process {
+> > >  			$long = 1 if ($line =~ /\bcommit\s+[0-9a-f]{41,}/i);
+> > >  			$space = 0 if ($line =~ /\bcommit [0-9a-f]/i);
+> > >  			$case = 0 if ($line =~ /\b[Cc]ommit\s+[0-9a-f]{5,40}[^A-F]/);
+> > > -			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)"\)/i) {
+> > > +			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("(.+)"\)/i) {
+
+So that could be:
+			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+($balanced_parens)/i
+
+> > >  				$orig_desc = $1;
+> > >  				$hasparens = 1;
+> > >  			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s*$/i &&
+> > >  				 defined $rawlines[$linenr] &&
+> > > -				 $rawlines[$linenr] =~ /^\s*\("([^"]+)"\)/) {
+> > > +				 $rawlines[$linenr] =~ /^\s*\("(.+)"\)/) {
+
+and
+
+  			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s*$/i &&
+ 				 defined $rawlines[$linenr] &&
+				"$line $rawlines[$linenr]" =~ /\bcommit\s+[0-9a-f]{5,}\s+($balanced_parens)/i
+
+> > >  				$orig_desc = $1;
+> > >  				$hasparens = 1;
+> > > -			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("[^"]+$/i &&
+> > > +			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\(".+$/i &&
+> > >  				 defined $rawlines[$linenr] &&
+> > > -				 $rawlines[$linenr] =~ /^\s*[^"]+"\)/) {
+> > > -				$line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)$/i;
+> > > +				 $rawlines[$linenr] =~ /^\s*.+"\)/) {
+> > > +				$line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("(.+)$/i;
+
+etc...
+
+> > >  				$orig_desc = $1;
+> > > -				$rawlines[$linenr] =~ /^\s*([^"]+)"\)/;
+> > > +				$rawlines[$linenr] =~ /^\s*(.+)"\)/;
+> > >  				$orig_desc .= " " . $1;
+> > >  				$hasparens = 1;
+> > >  			}
+> > 
 
 
