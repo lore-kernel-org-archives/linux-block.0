@@ -2,96 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4313CC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 857E5C43216
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:52:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2841D610D2
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:51:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68351610D2
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239506AbhHROwa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 10:52:30 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:53174 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239422AbhHROw3 (ORCPT
+        id S238721AbhHROw7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 10:52:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55822 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239606AbhHROw6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 10:52:29 -0400
-Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17IEpR7x009504;
-        Wed, 18 Aug 2021 23:51:27 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
- Wed, 18 Aug 2021 23:51:27 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17IEpRL1009501
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 18 Aug 2021 23:51:27 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH v4] block: genhd: don't call probe function with
- major_names_lock held
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>
-References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
- <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp>
- <YRi9EQJqfK6ldrZG@kroah.com>
- <a3f43d54-8d10-3272-1fbb-1193d9f1b6dd@i-love.sakura.ne.jp>
- <YRjcHJE0qEIIJ9gA@kroah.com>
- <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
- <20210818134752.GA7453@lst.de>
- <1f4218ca-9bfa-7d80-1c69-f5902715d8d9@i-love.sakura.ne.jp>
- <YR0cGE1sgS8+UhXV@kroah.com>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <a6fee3cb-6e5b-bc91-415d-2b100a1d7c83@i-love.sakura.ne.jp>
-Date:   Wed, 18 Aug 2021 23:51:24 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Wed, 18 Aug 2021 10:52:58 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C258C061764
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 07:52:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=8mOfo5CAn4drO/2dqEnobIxexcb3A3V9vsqqifptuwA=; b=KBeCY4zh0j9yfBn+9KEHnMZeep
+        N8OZxIUp61v82ZGUqaXRCl6f02tf60FKZjzP1miwl58unQTNbqWG5D4MQugprLP2zlIlB/NxaJzOR
+        t9D/7YvuowW3Fw9e3jUoI73A7FV6pFPx2eJOc3yPqGdv6LqLMvtyWcoYe9CBSEVNHoUTarCJsrAVB
+        iL+TG69GS+RyxWRLbH2wKdAmJ5EGbvXUWz71oJ4RoxzF72nyMKp29YY9Ld75A4hGbcKM2GZ0RAh2t
+        och8DgavTK0xMv5d0Sp6xSwRnPE0h2xCmAcGU2FC6+bKkJcUkLjqYN2IfGFbmT7m4K89QMcenYOGg
+        mrLYmRtw==;
+Received: from [2001:4bb8:188:1b1:5a9e:9f39:5a86:b20c] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mGMtv-003woj-Un; Wed, 18 Aug 2021 14:50:57 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 05/11] block: call blk_integrity_add earlier in device_add_disk
+Date:   Wed, 18 Aug 2021 16:45:36 +0200
+Message-Id: <20210818144542.19305-6-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210818144542.19305-1-hch@lst.de>
+References: <20210818144542.19305-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <YR0cGE1sgS8+UhXV@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/08/18 23:41, Greg KH wrote:
-> On Wed, Aug 18, 2021 at 11:34:15PM +0900, Tetsuo Handa wrote:
->> On 2021/08/18 22:47, Christoph Hellwig wrote:
->>> Hi Tetsuo,
->>>
->>> I might sound like a broken record, but we need to reduce the locking
->>> complexity, not make it worse and fall down the locking cliff.  I did
->>> send a suggested series this morning, in which you found a bunch of
->>> bugs.  I'd appreciate it if you could use your superior skills to
->>> actually help explain the issue and arrive at a common solution that
->>> actually simplifies things instead of steaming down the locking cliff
->>> full speed.  Thank you very much.
->>
->> I posted "[PATCH] loop: break loop_ctl_mutex into loop_idr_spinlock and loop_removal_mutex"
->> which reduces the locking complexity while fixing bugs, but you ignored it. Instead,
->> you decided to remove cryptoloop module (where userspace doing "modprobe cryptoloop"
->> will break). That is, you decided not to provide patches which can be backported.
-> 
-> Do not ever worry about backporting patches.  Worry about getting the
-> changes and code correct, stable work can come afterwards, if needed.
+Doing all the sysfs file creation before adding the bdev and thus
+allowing it to be opened will simplify the about to be added error
+handling.
 
-The loop module is one of critical components for syzkaller fuzzing.
-Bugs which involves the loop module prevents syzkaller from finding/testing
-other bugs. But changes are continuously applied without careful review.
-Therefore, the changes and code are not getting correct. Stable work cannot
-come afterwards...
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index f05e58f214d2..75d900e4c82f 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -492,6 +492,8 @@ void device_add_disk(struct device *parent, struct gendisk *disk,
+ 	 */
+ 	pm_runtime_set_memalloc_noio(ddev, true);
+ 
++	blk_integrity_add(disk);
++
+ 	disk->part0->bd_holder_dir =
+ 		kobject_create_and_add("holders", &ddev->kobj);
+ 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
+@@ -538,7 +540,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk,
+ 	blk_register_queue(disk);
+ 
+ 	disk_add_events(disk);
+-	blk_integrity_add(disk);
+ }
+ EXPORT_SYMBOL(device_add_disk);
+ 
+-- 
+2.30.2
 
