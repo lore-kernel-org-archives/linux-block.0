@@ -8,78 +8,76 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B4CDC432BE
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ACE8C43214
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44E1F61058
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E47326109E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238921AbhHRGPy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:15:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45518 "EHLO
+        id S239407AbhHRGQC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:16:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238543AbhHRGPr (ORCPT
+        with ESMTP id S238264AbhHRGPt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:15:47 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1C30C061292
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id 28-20020a17090a031cb0290178dcd8a4d1so4641601pje.0
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
+        Wed, 18 Aug 2021 02:15:49 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42276C06122F
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:14 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so8260073pjr.1
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qcRMFUHVF6QqGnr97K+ATth5rLyNBKP5psUqyaewiPQ=;
-        b=a6bTyF6xsvXmJVaSI8AKs77+P0oFTI1gTPlsYa6mh59pACM92P1VFzFqvqU9+X+jNr
-         vTM9CS3vOAuRCBsVzn6N7KgVHI6W6ooLD8DmaYQuGxrolCI4Xru2kAG7C7jmtZ5uZ8PR
-         VDy1iToF9Tpap2g7DTRp0rqJ6lJwmpqW0wJjo=
+        bh=2xy8/Tts2Q0pCjtb48qnJm2SajC5SEAfbYkA07Au0YI=;
+        b=N1IWhHeIGBOPznpFmYcWRZnJUNwykvj7PFgOHlWYvKaPc+cPgY1O8yVwcgQcJCfF0O
+         1wIrsy0WvqMxKkjPp7ddmtLZ7u0JBo0fSPMSf4XEMdcOmOVzMLubsGfeG4F7+aLs4Anz
+         DBivjnb6cRK6FqL5VKQ3cy4DFeYHbbZmjbWPA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qcRMFUHVF6QqGnr97K+ATth5rLyNBKP5psUqyaewiPQ=;
-        b=JVzT+dk76obeRKKIGsk8zdOqYl6LradTVHmy2Xb3YnRR0NwwQM4AxWoan7jjNaySta
-         RWBWdMB/bG5PT232N4ylgWK53NTCfkx9LA3I90kGTeR9c3FjorSfnTy/drTtgaMYUA09
-         eN5w8mMa5MMQsJT5AeIa0khH10Ubn0NItBcJobz5BZRO05neuQ4Fxukhf/sa+UVXmjuQ
-         FuydaHlN8VsoF0PjpLmm0L/rVAmv9uGUENFziP2MlM/Z7m0LhjFNWVIxK/vwn32qmkqf
-         aVVrEhgD3MaOU8SG+hot56r1X7V6a2vuZmY8SgKa9100Bgi8l8XZ5JArWnIc9DnIMUIw
-         38WA==
-X-Gm-Message-State: AOAM530xOEAZI/OIt2yr6YZHjQTocZ+hM4dqXevSemUwJsn/zQgzTxyu
-        D9ohF/etfa/eks/avBLkka8vvKHmeLu70A==
-X-Google-Smtp-Source: ABdhPJxYy9uajyke8AmxVdXcCpVPxEVIqn6teRhyhxiibQmTAmVANSe3Um2YhA94u6j4OQrmXZTUYg==
-X-Received: by 2002:a17:902:e9c6:b029:12d:4cb3:3985 with SMTP id 6-20020a170902e9c6b029012d4cb33985mr5959378plk.56.1629267253269;
+        bh=2xy8/Tts2Q0pCjtb48qnJm2SajC5SEAfbYkA07Au0YI=;
+        b=uUWnNLGS8Zp4NkZwX55u7YhxRMTY259oZp2dexjqgQPefMrbqdwDM3KOsOEJiN7c51
+         ooziQn7wBRloQ+Tc+IYW9HABgOKkihcGo3A7EaqYJ8u06G6tA3Z+XyVUCfv1mIo0Y0qp
+         xVtTbG6HWf9YqV3I4rUdz4y0i7rfOHov4MGEBRlzlsgJS2KbPFKR6ACbJn4r6f/JUADl
+         mTbYKFA7kqWF99vv+o/84qLSpzJJNHPtsgyI7NoYRUL/idJE2zZHw3wG/aRF+2eAWlCL
+         V/LSCuCfvnOsd72GfFddQUeRclF8CT+BgedY5ygwpwtuFD/yvSMPIA4NN+P6wDslSiX5
+         W9Lg==
+X-Gm-Message-State: AOAM532tHftpv1fIo4LmYO3rvuKSUowpmi2Qt2iTrmyd3PiJmx9C824W
+        V8ZWNGNmOtk6dsRT8lhLvq/asQ==
+X-Google-Smtp-Source: ABdhPJwZVI61yBxbgc94xcpC0vKFM8RdsF+Geat411+/6IprYSspNUgcCL5/LDmLoHHLCl5CFFI5+A==
+X-Received: by 2002:a17:903:41c2:b0:12d:a7aa:40a8 with SMTP id u2-20020a17090341c200b0012da7aa40a8mr6069996ple.61.1629267253835;
         Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id l12sm5631661pgc.41.2021.08.17.23.14.12
+        by smtp.gmail.com with ESMTPSA id p29sm4918970pfw.141.2021.08.17.23.14.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:14:12 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Qinglang Miao <miaoqinglang@huawei.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Sudarsana Kalluru <skalluru@marvell.com>,
+        GR-everest-linux-l2@marvell.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Hulk Robot <hulkci@huawei.com>,
-        Wang Wensheng <wangwensheng4@huawei.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
+        linux-wireless@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 61/63] powerpc: Split memset() to avoid multi-field overflow
-Date:   Tue, 17 Aug 2021 23:05:31 -0700
-Message-Id: <20210818060533.3569517-62-keescook@chromium.org>
+Subject: [PATCH v2 17/63] bnx2x: Use struct_group() for memcpy() region
+Date:   Tue, 17 Aug 2021 23:04:47 -0700
+Message-Id: <20210818060533.3569517-18-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1360; h=from:subject; bh=JCECg/Hewr4d9JO4WQR5kDd0IjByC1o9V4GNPJaYPKM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMrEHk87hiQVCzgI18EL/HOEsDc4MJhIkHkaVTZ DZKWkUOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKwAKCRCJcvTf3G3AJjKnD/ 9vO5rK1NcyiJFD1V1xX5Q3QwJPN1EMRWYcJsr5dTRrhYDef2VBoAd3vGVJhv5tPWCziVR95zI+LgIL d02IU4Ow0Hf/RnPFBOD9Lk1pR4bdZqy2udFH1tE06S0wBxz6HBgDxKiHg0hd49XAZs+xsJCSVXM+ks ZJe+gXBJkwU0QQlyx97a3srOeF6TBCIwRbfsc1ny8kqeq7rHXhuez2Nl/jEpDrSY7P6MGZ0RS9pwGp BG8XE5jwyatTqBbwztRYJO6EDxF1oljeN+vw6wXSMzHTs0P0jZF+xhBsDePue4SrU1uYVK4eI314VF ytJTqzumiq1LoMoetRo7XbnZL9HC+8KQkD7iex+cbwbl0vBuTQNERQCXbWiuHcR7WbrVndhdzqr/qr 7kpYWqqHhGYN42VOTCoEV+CxxyGt6O1oEwupEs9JwlhAHT0ET/3m5v95ln9sj4q/idsJQyugW9w9wS B+pdNyiwZvnrIR6r8PjnSHwflJuJYyRkP28Ci+HZxNLOE9WlE6UmnuDmdrcVKpWz+nctnlPQ9JHhAq vpfGhXMnm0qF1zx5IYh+d69+ZRtUQbUKz2k4hFKSxvSse3CvWfi63pBT3m1O556umLnQD6zZbq4vQZ p0vLhJOR+anh57gwE1CG5ilwh9jU07xLpPrNzUQkHrIgJsiMsfqPJrC73E9g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3830; h=from:subject; bh=GkN0LVVLNQH/53cAo4VYkKN66rn+11NBIFFE2ztC6YM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMhRw9LfaYvUc+sf+L0uY8MlzrAk1ef7MCxvB9t k6OtDqOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIQAKCRCJcvTf3G3AJifDD/ 9c0n+kvuNRhg8rqC3IlmdQj3GSvDZWsG+FKvThaAwsrcm5zgUTbPwQ6iL1wr4Jk3ViFO6PKwpuQs+W kYs8Ff8+E5QKNzTFYv9f3U+QrUgXZuliPkgx2C9OIEVvt2UEnDYPUhUqHBMLx0BXSCvr7kVoiYR8b2 iu457PTEfCQPJdDfKt78EEPnPsrqkubZweDgt/Gq/PsCcnEku9oGBRvz1KKVnO8QWy9TYdunjBP41s 792+Xj9Zh+GH4ISZfO3dP/vihbtHZcRxlUtqy2yT76MawS9BzD6PInHIpTeYQxnPOICMfQPusrHTT7 ndnKvr9GSg7peInc8FmZqYcs6y4mjJE/eklW07D6UJI9TtDjmKiqTTBOdNU43zM6qWjHal537hZmIe 9zFtdGwmUuRUgeltJDGJ4yXIugnOVn6G6DSwMAlT/S3hVGlxpguq6rEv6/0IWLa23jWt9JpGwJ1Jjj o+t/SbwzCJ0ClfKocBAik/2Za+ZKR9dJgOeM/G8xa98QQfHOvYYuIP//mv1JYcM1fvVbNymKySQfVs 8/HAgbbCc54arSAMkCFxkUT/fPiS/v1RbgtjVl9VmyC/p3ATw++a51ydTf5AAZxt2GMj+TS/xSz84B SiFL9TGxlTtdNqLwvPbVXHgt96CGuJjKFxAMufc9C7Zx6iAgBZyMu4MpCY0w==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -87,39 +85,100 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memset(), avoid intentionally writing across
-neighboring fields.
+field bounds checking for memcpy(), memmove(), and memset(), avoid
+intentionally writing across neighboring fields.
 
-Instead of writing across a field boundary with memset(), move the call
-to just the array, and an explicit zeroing of the prior field.
+Use struct_group() in struct nig_stats around members egress_mac_pkt0_lo,
+egress_mac_pkt0_hi, egress_mac_pkt1_lo, and egress_mac_pkt1_hi (and the
+respective members in struct bnx2x_eth_stats), so they can be referenced
+together. This will allow memcpy() and sizeof() to more easily reason
+about sizes, improve readability, and avoid future warnings about writing
+beyond the end of struct bnx2x_eth_stats's rx_stat_ifhcinbadoctets_hi.
 
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Qinglang Miao <miaoqinglang@huawei.com>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Hulk Robot <hulkci@huawei.com>
-Cc: Wang Wensheng <wangwensheng4@huawei.com>
-Cc: linuxppc-dev@lists.ozlabs.org
+"pahole" shows no size nor member offset changes to either struct.
+"objdump -d" shows no meaningful object code changes (i.e. only source
+line number induced differences and optimizations).
+
+Additionally adds BUILD_BUG_ON() to compare the separate struct group
+sizes.
+
+Cc: Ariel Elior <aelior@marvell.com>
+Cc: Sudarsana Kalluru <skalluru@marvell.com>
+Cc: GR-everest-linux-l2@marvell.com
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/lkml/87czqsnmw9.fsf@mpe.ellerman.id.au
 ---
- drivers/macintosh/smu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c |  7 ++++---
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h | 14 ++++++++++----
+ 2 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/macintosh/smu.c b/drivers/macintosh/smu.c
-index 94fb63a7b357..59ce431da7ef 100644
---- a/drivers/macintosh/smu.c
-+++ b/drivers/macintosh/smu.c
-@@ -848,7 +848,8 @@ int smu_queue_i2c(struct smu_i2c_cmd *cmd)
- 	cmd->read = cmd->info.devaddr & 0x01;
- 	switch(cmd->info.type) {
- 	case SMU_I2C_TRANSFER_SIMPLE:
--		memset(&cmd->info.sublen, 0, 4);
-+		cmd->info.sublen = 0;
-+		memset(&cmd->info.subaddr, 0, 3);
- 		break;
- 	case SMU_I2C_TRANSFER_COMBINED:
- 		cmd->info.devaddr &= 0xfe;
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
+index 0b193edb73b8..2bb133ae61c3 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
+@@ -849,7 +849,8 @@ static int bnx2x_hw_stats_update(struct bnx2x *bp)
+ 
+ 	memcpy(old, new, sizeof(struct nig_stats));
+ 
+-	memcpy(&(estats->rx_stat_ifhcinbadoctets_hi), &(pstats->mac_stx[1]),
++	BUILD_BUG_ON(sizeof(estats->shared) != sizeof(pstats->mac_stx[1]));
++	memcpy(&(estats->shared), &(pstats->mac_stx[1]),
+ 	       sizeof(struct mac_stx));
+ 	estats->brb_drop_hi = pstats->brb_drop_hi;
+ 	estats->brb_drop_lo = pstats->brb_drop_lo;
+@@ -1634,9 +1635,9 @@ void bnx2x_stats_init(struct bnx2x *bp)
+ 			REG_RD(bp, NIG_REG_STAT0_BRB_TRUNCATE + port*0x38);
+ 	if (!CHIP_IS_E3(bp)) {
+ 		REG_RD_DMAE(bp, NIG_REG_STAT0_EGRESS_MAC_PKT0 + port*0x50,
+-			    &(bp->port.old_nig_stats.egress_mac_pkt0_lo), 2);
++			    &(bp->port.old_nig_stats.egress_mac_pkt0), 2);
+ 		REG_RD_DMAE(bp, NIG_REG_STAT0_EGRESS_MAC_PKT1 + port*0x50,
+-			    &(bp->port.old_nig_stats.egress_mac_pkt1_lo), 2);
++			    &(bp->port.old_nig_stats.egress_mac_pkt1), 2);
+ 	}
+ 
+ 	/* Prepare statistics ramrod data */
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h
+index d55e63692cf3..ae93c078707b 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.h
+@@ -36,10 +36,14 @@ struct nig_stats {
+ 	u32 pbf_octets;
+ 	u32 pbf_packet;
+ 	u32 safc_inp;
+-	u32 egress_mac_pkt0_lo;
+-	u32 egress_mac_pkt0_hi;
+-	u32 egress_mac_pkt1_lo;
+-	u32 egress_mac_pkt1_hi;
++	struct_group(egress_mac_pkt0,
++		u32 egress_mac_pkt0_lo;
++		u32 egress_mac_pkt0_hi;
++	);
++	struct_group(egress_mac_pkt1,
++		u32 egress_mac_pkt1_lo;
++		u32 egress_mac_pkt1_hi;
++	);
+ };
+ 
+ enum bnx2x_stats_event {
+@@ -83,6 +87,7 @@ struct bnx2x_eth_stats {
+ 	u32 no_buff_discard_hi;
+ 	u32 no_buff_discard_lo;
+ 
++	struct_group(shared,
+ 	u32 rx_stat_ifhcinbadoctets_hi;
+ 	u32 rx_stat_ifhcinbadoctets_lo;
+ 	u32 tx_stat_ifhcoutbadoctets_hi;
+@@ -159,6 +164,7 @@ struct bnx2x_eth_stats {
+ 	u32 tx_stat_dot3statsinternalmactransmiterrors_lo;
+ 	u32 tx_stat_bmac_ufl_hi;
+ 	u32 tx_stat_bmac_ufl_lo;
++	);
+ 
+ 	u32 pause_frames_received_hi;
+ 	u32 pause_frames_received_lo;
 -- 
 2.30.2
 
