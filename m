@@ -8,56 +8,55 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D67C43216
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18563C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:10:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD7D0610A6
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 041926108E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:10:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238232AbhHRGKb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:10:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44300 "EHLO
+        id S240392AbhHRGKh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:10:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238932AbhHRGJh (ORCPT
+        with ESMTP id S239334AbhHRGJl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:09:37 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE20C0604C9
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:06:01 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id w13-20020a17090aea0db029017897a5f7bcso1593594pjy.5
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:06:01 -0700 (PDT)
+        Wed, 18 Aug 2021 02:09:41 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46FE7C0698C1
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:06:02 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id t13so1059592pfl.6
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:06:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Ps9jShnfYkcW7CF3s3J9G8+oGaQDbHRpYLWBXR8U5HA=;
-        b=hJ+1pw+QR8SAzBduLeTRl7IL8WmBzmKdGAGA6oK7/b7O4sS34IuV1dVSvfAtXQZ8H6
-         1+G1v4Tqmg5dSvosNjNMogPfbguMo4ntV0wpYm3/J+c9PeLMlM0pj3RQV41NuXQrnYYq
-         S1XAq2zikRpAp6sdSo1lnGzaSXIhWByiPdi1o=
+        bh=6lG0U8bM2TUXGlj9bAHKfwVFEdBo2YZlvkgJ69Lo3ko=;
+        b=Y/DVgqUz//veWIPGInRHjxd8QhbyKfsy0kdugXO1nEyKRG4J+RATjtzLJoSS87jCco
+         VSjAoqrkaHNZh0+mHRdYJBCbqV9xxVXdwGu7uaa7PR+N6pyz9+QKjSd2/AWYtac6EKNc
+         sHLZn6ndy938GBH63DZ5ESf+mXsv8jS252ytM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Ps9jShnfYkcW7CF3s3J9G8+oGaQDbHRpYLWBXR8U5HA=;
-        b=m+2SZdOneFg1QdRSCEp52kYupn5MRE4N14Xq+lX87IvPGXI9WSZkUE38j4Gmp/P7HO
-         6eZ7dbm9HWoKmWxAhh1HxmRD7tZyGYGu5tYMpK6Lbj6MkETOOFxDgfbd+pZy0Stql3oW
-         EG4tDw9KZ2fpx9ioo7kq4VRW5xHeQ3bZC2rfhcAbLBE79+TtrW/fO3sjNhAtW14ENUlv
-         CfkwAxkS2aO/l1+2bV5c9rvD0aoFKJrTXwBGFUa7kUabQ4hHkkjqYVB2WkrRBzgmON83
-         BCmPnqIcjy9akxjlgjGb+97oS4q6qgRdNoaklhKAsVeQUJlMkFo5Ejamwr6XhXzVEomz
-         wyDw==
-X-Gm-Message-State: AOAM533IS/boEppbCUDDm3TZBUV3HZutgBTGLAOJSunX+Cx1Xh2et47I
-        UNDv1KeXadOTq7YKpEwzxjtLDA==
-X-Google-Smtp-Source: ABdhPJxsNLILAxQG10XCyPYjemMd7a+ckBg4K7TIyR7mHtdyoVONVT0Fx6+Gjges8rNdRNesUHRD7A==
-X-Received: by 2002:a17:90b:4a05:: with SMTP id kk5mr7900521pjb.174.1629266760808;
-        Tue, 17 Aug 2021 23:06:00 -0700 (PDT)
+        bh=6lG0U8bM2TUXGlj9bAHKfwVFEdBo2YZlvkgJ69Lo3ko=;
+        b=lPVnv0ZMDKL2m8vwqnt+UoHD9weGxd2xipGF+IV8FEVZPw/9N5AfwZmsBQ+loIX6Q9
+         bwjJscY5pZAEYeH2iGlWCCHtnGT0Q63PuFaJ0hWlB0pmFMLSa27TbZrMbdqUwhQJt6rQ
+         N3DMfVWjU2zhNIZlueDYTz2Lkj8tuxS1sl9HM3vzGKKjM+mYID/76ofNQ1zRQScWOlHC
+         bwIxHjizGj2fnbTpkPaUjY6D5NEAzDXKu8BT8oB8nyBvkIktCHQySDPmL2xz/Jjbiirx
+         OBs6S5wYspJRr85uQnD2PEKUTdIS2RPxN8otDjwI3sTgRx6Ei/GHFDa17p5Eh+ytmgOX
+         GYIg==
+X-Gm-Message-State: AOAM530mqAtUi8vbGv5KHYr7SskSlfHp4ltoHO7pQGmT7KDBfafxN/6L
+        BBRTN/cMoMza1P65WrOnMsiCEg==
+X-Google-Smtp-Source: ABdhPJx9i0gP/tEqucjw5t2MRNzXtgPICZZmJol3/cEVKCeeDWJ8qCew27BG46wra+MkbfYjKbKkfg==
+X-Received: by 2002:a05:6a00:cd0:b0:3e2:209e:4e30 with SMTP id b16-20020a056a000cd000b003e2209e4e30mr7598474pfv.59.1629266761883;
+        Tue, 17 Aug 2021 23:06:01 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id b9sm4817746pfo.175.2021.08.17.23.05.57
+        by smtp.gmail.com with ESMTPSA id r10sm4624434pff.7.2021.08.17.23.05.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:05:58 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-ide@vger.kernel.org,
+Cc:     Kees Cook <keescook@chromium.org>,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -67,70 +66,56 @@ Cc:     Kees Cook <keescook@chromium.org>, Jens Axboe <axboe@kernel.dk>,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 24/63] sata_fsl: Use struct_group() for memcpy() region
-Date:   Tue, 17 Aug 2021 23:04:54 -0700
-Message-Id: <20210818060533.3569517-25-keescook@chromium.org>
+Subject: [PATCH v2 28/63] fortify: Explicitly disable Clang support
+Date:   Tue, 17 Aug 2021 23:04:58 -0700
+Message-Id: <20210818060533.3569517-29-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2051; h=from:subject; bh=490IGoO3mtJCjh0g8l7zMoK6+vhQucUWQpUj+3laYeM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMjgKcbQTO9FDMOsyq/janGS26xgJD+GS/2zaUs ZM2eCZeJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIwAKCRCJcvTf3G3AJptmEA Cfi+co78goyBBrH+Zm1R/id0yh2CmjqSZTgJNwAn+IsBhLLep3r74z/+4G0L5HEEsO7K/F763D7FzV qyqSu18qX5XPvdiy0atubLyGda3UuI3umIbTFgsLY66SeEZbWNudGvJ5l2NlJeuEupRNrDDp6WTB04 +juq9wzztFjSrw5OPlb7mi4UllFs8pzBTlwgp0MlwVSG57JFMFv3kGQXHjlEXuWNfiINs3OZhr2g1Y +V2oJMY1cAXD57fne3MAALUSSuHcL59yIGtul0hNa5VmLGIBBdUwcorbjRgNqEvsgFoL3oWb78eC53 eWKn72M+cBfKnBw6p7ak9Y1aXrUbhCOU0IpIrNgQ0fS1/AWVyGj7M9WTeK4POwXFQcsbBMmsXeAVId SmQi/80UCLxGlC80dJmtFJJg794N+o2TMvlfe8RQc2xEp4HDqVCG6xAiA6VL1biQl/bMXi2/gnsZGk 5vEIc8263QtaFStfx8cXsh5/D1ZLtfxcqc99evQE+x1Z2AtFfCRvPXqUEnA5uL9Ird97I148pH2vsi YUgkY8gs+vLWH/DcLD8PuWXxZqes8m+snkfJjISzYk1/D7Vt1hdG9XS5SowqP4R1A/de8CANYlKoki VgBCMKLldP0qegznO020Xhe22ClCpYaDlUaI3GR0HC98cUXBvOfGGnUJ/5Fw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1427; h=from:subject; bh=MScHo/g3fAm2U5yn8644/6JAGaRCvw+x4s3NMxUkYP4=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMkDmaoP7/LrBvrUTwAq8PIwkOtE8yNEb1/iGaE eotqJxGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjJAAKCRCJcvTf3G3AJvkeD/ wK2I9wXb6VkTqNx8ve7VdNSMmlz+1i164ClH9CGR/35x6hLdSQ8qayX0H9g6LrgzVflJDSu0VPqZq6 B60wT0GUsaN+NPYsGb2bVu1Rg3uumqZGiK90AHNJmSYkYU2G3Fqfi/WbeuSh9MygcOeGp/a9x/PQH5 e8dULezGq6dCpC7cs5Zl3okkhjEBCJNG2UsDzKuR/shPokEXvmczONNPE0wD9SGKoJlCrtTATmKvin 4tu2+3vQYizkssvftVjPL/zU+2R6x89hzrj96XdH+uAmeG5P820sWztifwnAHNcLVL5gq7wUOMrJ+f Z4XjIAC/G5EaSS4AhVIu9sD/iX8aeWmFJWF/Y21WLVPcvT0CbToC2WmKfl6Cf/5cmduks3BDmUc73D LWQ9JncTl44MKCvuBhARaFmlaFAJHnLG2EvjMIRi62WS27zMVn6Had7IAo/qffp70xB+LqBNwHlEFR 1DOf7RDGukFMS2YPB64C7srE0otlJasITjwoT2VlC8SUubfSWf2Xs29w2K9ID2LufJo4jW+DES/y1x In7sKpTi8O1ywlBFrMpRGpBZemeuMVX+n2a4KW0Dlmr8PJZVEczotW0P4mEO8JYhohZFLrpQR/oM0d v1l42WB3iKEQLRJlt/B8Os8r3w8Ad46AyHq8GE3PhyPABlRRPciSKq8TGApQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memcpy(), memmove(), and memset(), avoid
-intentionally writing across neighboring fields.
+Clang has never correctly compiled the FORTIFY_SOURCE defenses due to
+a couple bugs:
 
-Use struct_group() in struct command_desc around members acmd and fill,
-so they can be referenced together. This will allow memset(), memcpy(),
-and sizeof() to more easily reason about sizes, improve readability,
-and avoid future warnings about writing beyond the end of acmd:
+	Eliding inlines with matching __builtin_* names
+	https://bugs.llvm.org/show_bug.cgi?id=50322
 
-In function 'fortify_memset_chk',
-    inlined from 'sata_fsl_qc_prep' at drivers/ata/sata_fsl.c:534:3:
-./include/linux/fortify-string.h:199:4: warning: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Wattribute-warning]
-  199 |    __write_overflow_field();
-      |    ^~~~~~~~~~~~~~~~~~~~~~~~
+	Incorrect __builtin_constant_p() of some globals
+	https://bugs.llvm.org/show_bug.cgi?id=41459
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-ide@vger.kernel.org
+In the process of making improvements to the FORTIFY_SOURCE defenses, the
+first (silent) bug (coincidentally) becomes worked around, but exposes
+the latter which breaks the build. As such, Clang must not be used with
+CONFIG_FORTIFY_SOURCE until at least latter bug is fixed (in Clang 13),
+and the fortify routines have been rearranged.
+
+Update the Kconfig to reflect the reality of the current situation.
+
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/ata/sata_fsl.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ security/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/ata/sata_fsl.c b/drivers/ata/sata_fsl.c
-index e5838b23c9e0..fec3c9032606 100644
---- a/drivers/ata/sata_fsl.c
-+++ b/drivers/ata/sata_fsl.c
-@@ -246,8 +246,10 @@ enum {
- struct command_desc {
- 	u8 cfis[8 * 4];
- 	u8 sfis[8 * 4];
--	u8 acmd[4 * 4];
--	u8 fill[4 * 4];
-+	struct_group(cdb,
-+		u8 acmd[4 * 4];
-+		u8 fill[4 * 4];
-+	);
- 	u32 prdt[SATA_FSL_MAX_PRD_DIRECT * 4];
- 	u32 prdt_indirect[(SATA_FSL_MAX_PRD - SATA_FSL_MAX_PRD_DIRECT) * 4];
- };
-@@ -531,8 +533,8 @@ static enum ata_completion_errors sata_fsl_qc_prep(struct ata_queued_cmd *qc)
- 	/* setup "ACMD - atapi command" in cmd. desc. if this is ATAPI cmd */
- 	if (ata_is_atapi(qc->tf.protocol)) {
- 		desc_info |= ATAPI_CMD;
--		memset((void *)&cd->acmd, 0, 32);
--		memcpy((void *)&cd->acmd, qc->cdb, qc->dev->cdb_len);
-+		memset(&cd->cdb, 0, sizeof(cd->cdb));
-+		memcpy(&cd->cdb, qc->cdb, qc->dev->cdb_len);
- 	}
- 
- 	if (qc->flags & ATA_QCFLAG_DMAMAP)
+diff --git a/security/Kconfig b/security/Kconfig
+index 0ced7fd33e4d..fe6c0395fa02 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -191,6 +191,9 @@ config HARDENED_USERCOPY_PAGESPAN
+ config FORTIFY_SOURCE
+ 	bool "Harden common str/mem functions against buffer overflows"
+ 	depends on ARCH_HAS_FORTIFY_SOURCE
++	# https://bugs.llvm.org/show_bug.cgi?id=50322
++	# https://bugs.llvm.org/show_bug.cgi?id=41459
++	depends on !CC_IS_CLANG
+ 	help
+ 	  Detect overflows of buffers in common string and memory functions
+ 	  where the compiler can determine and validate the buffer sizes.
 -- 
 2.30.2
 
