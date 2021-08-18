@@ -2,139 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1B4C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC90C4320E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:29:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2342660F4C
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:28:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0561260F4C
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238365AbhHRN2w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 09:28:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37372 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237204AbhHRN2P (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 09:28:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1CEDA60FE6;
-        Wed, 18 Aug 2021 13:27:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1629293260;
-        bh=l2Cm3tSoUaEYuG6eGCNI85E157UIrFk3V+XhEqHXlr4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=orWKtVcyp1dUoVKId6ZdKwedKfWNIUZGhmig+CqEKbIvMGPS4B/HsrO6mCSajmvMx
-         6WOdjvbuVA6Cy/1WdJI/gGQCrScSV3Na0ofm4inOvDYrXgmIM0KwXWNnQgnRXnzFhb
-         I6tfhbklz9q5FauIMmlu6p5BF0aDiFyEVKWp+sJg=
-Date:   Wed, 18 Aug 2021 15:27:37 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>
-Subject: Re: [PATCH v4] block: genhd: don't call probe function with
- major_names_lock held
-Message-ID: <YR0KySFfiDk+s7pn@kroah.com>
-References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
- <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp>
- <YRi9EQJqfK6ldrZG@kroah.com>
- <a3f43d54-8d10-3272-1fbb-1193d9f1b6dd@i-love.sakura.ne.jp>
- <YRjcHJE0qEIIJ9gA@kroah.com>
- <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
+        id S233722AbhHRN3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 09:29:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35516 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236825AbhHRN3i (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 09:29:38 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8BC0C06179A
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 06:29:03 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id fa24-20020a17090af0d8b0290178bfa69d97so2399612pjb.0
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 06:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=YZfF52HpL/UKlefpqFZVekLhQrr9CceEDqqOQlI/5cs=;
+        b=VANPbhOvUtEl7/HmLunl0gKjYeFV8bzE5NJu9BuCgf17P3e4Cg2Hc8PFMJN34YAOKT
+         V+q5UJzXGLd8M+jOMoq/stNCyu2FVR/0XZ7t4qb/RRCklaW1HPbRWe5nfdugKg9KQxgp
+         ryK/Xr4Nh72g2cA/xAMroLzGqcXxIsh/KTTu7723+GwXvSDlFqDUCQXLMFflZYUFT06p
+         UGsa0eak99ACPYKKx5gKPgca2t7puUcLZ7vOZTMRewUxp81lC55DYOfXsU6X0gC6h4ip
+         BNqwj12qcJaD1P+WmR4MGgolBPE1Y0SjeoSrZRaXTHsbTeEc/TQfRpJaPLNjetFmgLSs
+         uT0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YZfF52HpL/UKlefpqFZVekLhQrr9CceEDqqOQlI/5cs=;
+        b=IlQfHoW7Q7hsTrILV6X8+5aVfUoOAH5swfFJn/d6eSgOGPhyLrHDHkTTQ8Y+UJhcID
+         CcVXwdHBhEOKWinX2wPeJirK/jWmufp+8OujVHYzwFFTR4EC246gacbYDy6J55MBsTuj
+         sYxvusR4sui4L/H9h6do2HH2K/eMoItY3/7j4IaKO0Fs7J7ExMKl6CkvjQQ7S34lJUht
+         xKCUIihpeqjp6KVrJMp1/7ex8VH8qZnwU19VU9RYnHFRkHjrsXs0idRnXdTQllzP+crM
+         NFtsXf3wTDu6fJz0p45Q8kRL+UObxDkNnDcNJTq/7wpwVPO4351cYWQw+Hl0nfaNU4xx
+         EWKg==
+X-Gm-Message-State: AOAM532lWi9Gzhgpizd+H3zYuOco3n1Fg4qZwZAR6yCYutOgOOFYksqf
+        iu6mbeHfZ0poXMXLSpVP3SqLKQ==
+X-Google-Smtp-Source: ABdhPJzcG4MuuyYGSYc5aRovMBAKdtgr0/c+TmaEGwcn6bvlGOd9c/rLwCWsd7uFwB1rb5YeBKY0Ow==
+X-Received: by 2002:a17:90a:5801:: with SMTP id h1mr9105659pji.63.1629293343263;
+        Wed, 18 Aug 2021 06:29:03 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id s46sm6663515pfw.89.2021.08.18.06.29.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 06:29:02 -0700 (PDT)
+Subject: Re: [GIT PULL] first round of nvme updates for Linux 5.15
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YRy5uawonM5ERm3D@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e2e66212-d555-18df-c9db-957b43d584aa@kernel.dk>
+Date:   Wed, 18 Aug 2021 07:29:01 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
+In-Reply-To: <YRy5uawonM5ERm3D@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 08:07:32PM +0900, Tetsuo Handa wrote:
-> syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
-> commit a160c6159d4a0cf8 ("block: add an optional probe callback to
-> major_names") is calling the module's probe function with major_names_lock
-> held.
+On 8/18/21 1:41 AM, Christoph Hellwig wrote:
+> The following changes since commit 9ea9b9c48387edc101d56349492ad9c0492ff78d:
 > 
-> When copying content of /proc/devices to another file via sendfile(),
+>   remove the lightnvm subsystem (2021-08-14 15:54:09 -0600)
 > 
->   sb_writers#$N => &p->lock => major_names_lock
+> are available in the Git repository at:
 > 
-> dependency is recorded.
-> 
-> When loop_process_work() from WQ context performs a write request,
-> 
->   (wq_completion)loop$M => (work_completion)&lo->rootcg_work =>
->   sb_writers#$N
-> 
-> dependency is recorded.
-> 
-> When flush_workqueue() from drain_workqueue() from destroy_workqueue()
->  from __loop_clr_fd() from blkdev_put() from blkdev_close() from __fput()
-> is called,
-> 
->   &disk->open_mutex => &lo->lo_mutex => (wq_completion)loop$M
-> 
-> dependency is recorded.
-> 
-> When loop_control_remove() from loop_control_ioctl(LOOP_CTL_REMOVE) is
-> called,
-> 
->   loop_ctl_mutex => &lo->lo_mutex
-> 
-> dependency is recorded.
-> 
-> As a result, lockdep thinks that there is
-> 
->   loop_ctl_mutex => &lo->lo_mutex => (wq_completion)loop$M =>
->   (work_completion)&lo->rootcg_work => sb_writers#$N => &p->lock =>
->   major_names_lock
-> 
-> dependency chain.
-> 
-> Then, if loop_add() from loop_probe() from blk_request_module() from
-> blkdev_get_no_open() from blkdev_get_by_dev() from blkdev_open() from
-> do_dentry_open() from path_openat() from do_filp_open() is called,
-> 
->   major_names_lock => loop_ctl_mutex
-> 
-> dependency is appended to the dependency chain.
-> 
-> There would be two approaches for breaking this circular dependency.
-> One is to kill loop_ctl_mutex => &lo->lo_mutex chain. The other is to
-> kill major_names_lock => loop_ctl_mutex chain. This patch implements
-> the latter, due to the following reasons.
-> 
->  (1) sb_writers#$N => &p->lock => major_names_lock chain is unavoidable
-> 
->  (2) this patch can also fix similar problem in other modules [2] which
->      is caused by calling the probe function with major_names_lock held
-> 
->  (3) I believe that this patch is principally safer than e.g.
->      commit bd5c39edad535d9f ("loop: reduce loop_ctl_mutex coverage in
->      loop_exit") which waits until the probe function finishes using
->      global mutex in order to fix deadlock reproducible by sleep
->      injection [3]
-> 
-> This patch adds THIS_MODULE parameter to __register_blkdev() as with
-> usb_register(), and drops major_names_lock before calling probe function
-> by holding a reference to that module which contains that probe function.
-> 
-> Since cdev uses register_chrdev() and __register_chrdev(), bdev should be
-> able to preserve register_blkdev() and __register_blkdev() naming scheme.
+>   git://git.infradead.org/nvme.git tags/nvme-5.15-2021-08-18
 
-Note, the cdev api is anything but good, so should not be used as an
-excuse for anything.  Don't copy it unless you have a very good reason.
+Pulled, thanks.
 
-Also, what changed in this version?  I see no patch history here :(
+-- 
+Jens Axboe
 
-thanks,
-
-greg k-h
