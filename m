@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0579C43214
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81851C432BE
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:16:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F875610A1
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:16:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B689604AC
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238747AbhHRGQt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:16:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45660 "EHLO
+        id S240238AbhHRGRW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:17:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238902AbhHRGQa (ORCPT
+        with ESMTP id S239298AbhHRGQb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:16:30 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C67C033271
+        Wed, 18 Aug 2021 02:16:31 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD7DC033278
         for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:23 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id x16so1083536pfh.2
+Received: by mail-pl1-x629.google.com with SMTP id o10so1207713plg.0
         for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:14:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=hsGHodQW7BgMepqmaGaetFXuKMTT3ZW1whu3YzYCf8E=;
-        b=chkB2Egl3g4Hj/WoopucGSp8JEGrZQBb17iw+f5FZVJ88kmKbQgr9VmudEIjafNmTE
-         FU+5/DnwuxN2T0PQuBqDKLSVlxbWgQNmuDbo93m2QOjwn8S/Nmj1KRmXQbdeWCM95LZY
-         12niQpi/k6iQ3pEmgTEwMOYCV0dGWkKcHe2PI=
+        bh=OUj8oRrB7MxugyxrrPjBU6cYuiAw0IG2BHh9L0frR4M=;
+        b=K5/QOCQ1GvHen4il+zts6aBVpR/MUixrVtFBh2u/OTX9/NfLMzS8Z3/B82bDko5rUs
+         +eln7mM7MgpGb5g2fE+0/q4b2GAEHUqQx+fWFvhMosxIkDyZCevOdwe60Fbd9V0q1eOl
+         0CFRhL0TI0b8ZFszkcA5toy3dO5yGBBGUx4X4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hsGHodQW7BgMepqmaGaetFXuKMTT3ZW1whu3YzYCf8E=;
-        b=QR6vDDIyvyk5SQHytDsIYFQbyxqV9+vX9SogreKTrJbajKpUFsweDjSs4kmWJqadQi
-         k30zOU14UxZtz8qLOGNSehlRDwVsMyHcsImvvwglQCMYEledcm2W+b+uxiyjgK0uf6zq
-         McvQqAgYEXYmMgQWuQFtxPFv9siKJGw/NyMkig28YVwcZW+JBjMAHXRZ1T+BVOAD/K7H
-         n/oniBgKMGRc4DvDsr/qbG9jIHj6Bjq5FShfv7D19EErAn2U237JXjvwGvlEGZJY1HvJ
-         o21e7NdFocxB0hZCQvRmxART9Z8Qk5B6rs1GBNi2ln2oylPa9Lc3ugNlbxYfNFWsK9Vs
-         Gfjg==
-X-Gm-Message-State: AOAM532ekTKTkwGgNN8gkyUvfiedOGnpZGKHIb7nEXGkGvF9MpHVywQx
-        6MWqTKhuT87DDokD3VnF8P+2tw==
-X-Google-Smtp-Source: ABdhPJzyxDStzvV0SEJOZX6pzOD1ZhMBNkc4S43QSApxA2j4lcyMvoA5D5UGsMDwrMeS2qx+i1yP6w==
-X-Received: by 2002:a63:5902:: with SMTP id n2mr7166965pgb.305.1629267262822;
-        Tue, 17 Aug 2021 23:14:22 -0700 (PDT)
+        bh=OUj8oRrB7MxugyxrrPjBU6cYuiAw0IG2BHh9L0frR4M=;
+        b=pMzH6qVFHnF4172Cn+aIFcVm26jslcF2v6uTjhz25aRL/a0FCZpjP77BCtQDbSH/LX
+         gwfpC5gcgBEtfB6fPXRQpl3jk4uKP+1vUaxtafwHNWu/ag6rpOATUDxOD8EXrQ3QfukN
+         RrZ3h6sc0kJe1UKJePCyPza1JCZ6jPd87YkAan/h4z52WS/DgVxO8HGgUMcF2J30bRuR
+         4mZdJeNmfTRCjgxQ7EZCuzb5NCO5YvkhzRqYt9xWQ/xcBlJlZ7EtETDyNXRHPPH/M08k
+         V9jIuE8EYbtzBuy2AjYa3aiinUWlJs/t19tf9A/PShwtCuchl4m7Cdosx1ny0WA8X5+y
+         NrbQ==
+X-Gm-Message-State: AOAM533Tb13pEJqQ+nFK8E2ETyp7cFpTxSk3Dcrg1Ewozr7bHqIbodmz
+        0/1YbCxdwdJDyoNtLdXRhfJJZg==
+X-Google-Smtp-Source: ABdhPJxbVOgs77pmnTYxvMPZHd1kccPxvYaRj3SbBhPFubv/TnK5SJeyMbp4QCzFpEAy80w5v2ECHw==
+X-Received: by 2002:a17:90a:ad07:: with SMTP id r7mr7764155pjq.110.1629267263131;
+        Tue, 17 Aug 2021 23:14:23 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id q26sm4699734pff.174.2021.08.17.23.14.19
+        by smtp.gmail.com with ESMTPSA id w3sm4782286pfn.96.2021.08.17.23.14.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:14:21 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Max Gurtovoy <maxg@mellanox.com>, linux-rdma@vger.kernel.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 48/63] IB/mthca: Use memset_startat() for clearing mpt_entry
-Date:   Tue, 17 Aug 2021 23:05:18 -0700
-Message-Id: <20210818060533.3569517-49-keescook@chromium.org>
+Subject: [PATCH v2 51/63] drbd: Use struct_group() to zero algs
+Date:   Tue, 17 Aug 2021 23:05:21 -0700
+Message-Id: <20210818060533.3569517-52-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1273; h=from:subject; bh=6zw6bd38jtlUGiQNcgA+7Vj02RWEpIKH1rjaE20U52M=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMoltYN7PTWawkHd68VShtA89JYpvOPT9nwsL7B vMD1Gn+JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKAAKCRCJcvTf3G3AJgWLEA CA0G8Um7L9QM3tAuk76gzDtGgj6wfZwbHC3gmdPYC4fe5ViwFuFPhPDIlMHnL5Oaft4DZAwvc4TUnI oTxi1AdRfYTfE3lw4LW1em7VDzoYiVdw68YpBJ6do2fEl9ZGK/0mX3zcOafcrAhiHBuet2CjOfPy6t Tq/8ys2f8EU1h6DXTZ5tCPSIi63+7bfI5g0u1GpcBNVQxt4gUaxR4O//oIO5lDG9qKBGuDeUG4v6MF sHcWe6CfAarnlC0ya+ORhjNk8xnbf+b/imo8zl4s0q9DrLXdZ7MNrxO3aI+5yaF2he2ea/hR5kliNG YKO8GWAbKimKYTi8SSFhhsLXFP/6Cks+GGfoihg9Z61PjIiHMhORoWY/P5pTQd90wKeXB9yySfHyeZ isD2ZFnlRhy403y1grxuLe0zaAw5SJXbwyy8thi3DDo7KeX4P92gmWueLuIvjcNP5Kj+GbCcV6vLSm nxByMIRVJuZ4ixj94olxP7vKtNZVvUPh4Ov/qwOFpG7f9rOHf1gXBcckiuBMeL+pZcSr/txM5+0jYN bYjM3KyxyB1TZMYtX1+WjrDISwqn5Gx8m/HAuDxJZ1l4CvotvblNbCStzkY4CxA2N1gZ+rSUQBe+yU YuRbJ6v7hrWUPvepMgl5M8bAqRbVyqW4hTUVa18TP98a9UAYJi8u4E2DpSiQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2518; h=from:subject; bh=Q2Uw9RXFjMIXKo2IteRobBuJ9t0Fke5gpQvhXOFkzbw=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMpAyrkrjCd9Sudd2DfvVM313Dv4J16Pprur7BE R2yLw5iJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKQAKCRCJcvTf3G3AJllsD/ wMjgK1D0usgaVPmcG7ap73L0KQ/QF2TmwlTkN7ZYJNbPcOUTgH5qCBiL4kXD4qvPRMMk0z6M1MOXdD ad40Qjj391s1LOtbrXKzB6J0ACE6yMl0izT0iLKpKz+DHNtX6SXR4SCElIRw7Oe+D3OKvp8ncq6h/L m13yHC4gKfbb79IqU0KWkeB5qij4Ou7trqxTVeSvJLXgH5H6vMpMIrwWdj1jMXJgy2G8nUmOkFIh0c 0ivZjFBnwVNyQGo2OJAUvyz7W+qHXTnM5y/SfhabHHCHfGMD1LGZjB64ItBJUK+pcOykcIH49b9FnO h5fpUcqYNY7PRCXpb3rxN6MHOUY3PGy+gXlfy1Vx3CvXI1nI+OvBPvO8wi/whnPXp+BTOePiw4Blh+ 8bAGX27nZlzfW1jE3Y0VKrvKEieIn/i0YS3XfaCmMPn2OjPgaFjZMQTtKm9F61UAlxVlnSXOyRWiAa m+Binjs5N0XDni6qQxE+PwYb4X6+L5pWbOSWdiBOGY85wCWrqAF6DrTw4mXIB61ww03FHpMrwNH9ra 8yuAKhS3W2V+UbAd/ToTq0/JvDMwmWZGu/z6EIbBy/wAWPT3+RGq1gfMcM6HmInqPQk3SfLeIsEZHe jsEogyBmIWFi3hcxJwpocYVxG6KAlMgJp3sy7ctAUBzS5sy3VSG31B8l/x7Q==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -87,33 +87,66 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Use memset_startat() so memset() doesn't get confused about writing
-beyond the destination member that is intended to be the starting point
-of zeroing through the end of the struct.
+Add a struct_group() for the algs so that memset() can correctly reason
+about the size.
 
-Cc: Doug Ledford <dledford@redhat.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Cc: linux-rdma@vger.kernel.org
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linbit.com
+Cc: linux-block@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/infiniband/hw/mthca/mthca_mr.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/drbd/drbd_main.c     | 3 ++-
+ drivers/block/drbd/drbd_protocol.h | 6 ++++--
+ drivers/block/drbd/drbd_receiver.c | 3 ++-
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/infiniband/hw/mthca/mthca_mr.c b/drivers/infiniband/hw/mthca/mthca_mr.c
-index ce0e0867e488..1208e92ca3d3 100644
---- a/drivers/infiniband/hw/mthca/mthca_mr.c
-+++ b/drivers/infiniband/hw/mthca/mthca_mr.c
-@@ -469,8 +469,7 @@ int mthca_mr_alloc(struct mthca_dev *dev, u32 pd, int buffer_size_shift,
- 	mpt_entry->start     = cpu_to_be64(iova);
- 	mpt_entry->length    = cpu_to_be64(total_size);
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 55234a558e98..b824679cfcb2 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -729,7 +729,8 @@ int drbd_send_sync_param(struct drbd_peer_device *peer_device)
+ 	cmd = apv >= 89 ? P_SYNC_PARAM89 : P_SYNC_PARAM;
  
--	memset(&mpt_entry->lkey, 0,
--	       sizeof *mpt_entry - offsetof(struct mthca_mpt_entry, lkey));
-+	memset_startat(mpt_entry, 0, lkey);
+ 	/* initialize verify_alg and csums_alg */
+-	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
++	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
++	memset(&p->algs, 0, sizeof(p->algs));
  
- 	if (mr->mtt)
- 		mpt_entry->mtt_seg =
+ 	if (get_ldev(peer_device->device)) {
+ 		dc = rcu_dereference(peer_device->device->ldev->disk_conf);
+diff --git a/drivers/block/drbd/drbd_protocol.h b/drivers/block/drbd/drbd_protocol.h
+index dea59c92ecc1..a882b65ab5d2 100644
+--- a/drivers/block/drbd/drbd_protocol.h
++++ b/drivers/block/drbd/drbd_protocol.h
+@@ -283,8 +283,10 @@ struct p_rs_param_89 {
+ 
+ struct p_rs_param_95 {
+ 	u32 resync_rate;
+-	char verify_alg[SHARED_SECRET_MAX];
+-	char csums_alg[SHARED_SECRET_MAX];
++	struct_group(algs,
++		char verify_alg[SHARED_SECRET_MAX];
++		char csums_alg[SHARED_SECRET_MAX];
++	);
+ 	u32 c_plan_ahead;
+ 	u32 c_delay_target;
+ 	u32 c_fill_target;
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 1f740e42e457..6df2539e215b 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -3921,7 +3921,8 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+ 
+ 	/* initialize verify_alg and csums_alg */
+ 	p = pi->data;
+-	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
++	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
++	memset(&p->algs, 0, sizeof(p->algs));
+ 
+ 	err = drbd_recv_all(peer_device->connection, p, header_size);
+ 	if (err)
 -- 
 2.30.2
 
