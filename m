@@ -2,239 +2,249 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DA5C4320E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA9AC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:47:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A9A660F4C
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:35:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D52016109E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:47:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236725AbhHRNgV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 09:36:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233722AbhHRNgV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 09:36:21 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38B4FC061764;
-        Wed, 18 Aug 2021 06:35:46 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id f10so1658554wml.2;
-        Wed, 18 Aug 2021 06:35:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=DthKa3X7J67lnJcE+psAH6WMu5xghWQjfpmVnxuXZkY=;
-        b=OWvsLPklkVuXUzGcq4Vn3RTniheuYd18rv8U5574kX+IKGwv1GBfM155sk38FXNsm+
-         rf7GVlZQAtaMVDU8bp33wvLuf5eqKDUgw8WjjuiOHJ/M19p0Bok0vYS+v2/5VIbXfTeh
-         eJgXvVaPKvlzFdOdYvIA12H8JjMcc+nRa7Mtp8c4TyZ55x1k2swUOjkJShmfFoBbJUFF
-         VTt7yzFdD+O1nuy42z2eweiTPZ9NHxOD5L/WAEggh68YUUINHEqeAAZuyM+2srsn2eZp
-         wQ4acy31yprABVEZPaOnRU1h54ETEPbiFt282HD4Ke/Mp7uFNtHSjVf5/y58KqaMjh9k
-         qjWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=DthKa3X7J67lnJcE+psAH6WMu5xghWQjfpmVnxuXZkY=;
-        b=al8Oxa0Xd5gjmlDe9mEE/Ovn9+QwTrZJaE+cUlHv07GsK0bywFz+mitrY8hQG4bRoo
-         GJcJ7vC1yY+pEXWkGG1AUJ+FT12tk0j0G+RGvvjcpjHcH1I0wKx1iv6piFSpjBVWudWX
-         CkHW6Kf4Nd+1VAPDUjtexHGQ6q8+u4AXJYpy04o4h3t60QAdBDztGkxesvqjniR4ZzCY
-         Bcl3fRUZ4jb/ZqK06EN+mS19VwA/EXU77/SszT55gXf8U5eNbxOuWj/OkVJEoU6tjUpX
-         Q72twTTCJ337C3THpu+T6/LVTGFF3sfSOxnIBGBt+ySaObQWCYKmbQCjgQUW58OoJPZ0
-         Y8vQ==
-X-Gm-Message-State: AOAM532P8UrzTgRgFIH0qc5kF3rmz1MYgTvns7QbmQ4nW0R4T/r6lHd3
-        byvHvruZV42ZITDA2rDJt1E=
-X-Google-Smtp-Source: ABdhPJyC6Z3pw7oMHgghz75BdjG+2G4bMawsJFPJhR70xadEWmNlssYvZAFSY1W/ckwoxrb/IUBoGA==
-X-Received: by 2002:a1c:23d6:: with SMTP id j205mr8818671wmj.185.1629293744832;
-        Wed, 18 Aug 2021 06:35:44 -0700 (PDT)
-Received: from localhost ([217.111.27.204])
-        by smtp.gmail.com with ESMTPSA id r129sm5255234wmr.7.2021.08.18.06.35.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 06:35:43 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 15:35:42 +0200
-From:   Thierry Reding <thierry.reding@gmail.com>
-To:     Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     Dmitry Osipenko <digetx@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
+        id S237104AbhHRNsa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 09:48:30 -0400
+Received: from verein.lst.de ([213.95.11.211]:33923 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236970AbhHRNsa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 09:48:30 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 37F2C67373; Wed, 18 Aug 2021 15:47:52 +0200 (CEST)
+Date:   Wed, 18 Aug 2021 15:47:52 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
         linux-block <linux-block@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: Re: [PATCH v5 4/5] mmc: sdhci-tegra: Implement
- alternative_gpt_sector()
-Message-ID: <YR0MrlxFLTpsR628@orome.fritz.box>
-References: <20210818005547.14497-1-digetx@gmail.com>
- <20210818005547.14497-5-digetx@gmail.com>
- <CAPDyKFqQbe4k-Sem436Fzsr6mbvwZr83VtEaEZTF8oWYoHHQwg@mail.gmail.com>
+        Greg KH <gregkh@linuxfoundation.org>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>
+Subject: Re: [PATCH v4] block: genhd: don't call probe function with
+ major_names_lock held
+Message-ID: <20210818134752.GA7453@lst.de>
+References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp> <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp> <YRi9EQJqfK6ldrZG@kroah.com> <a3f43d54-8d10-3272-1fbb-1193d9f1b6dd@i-love.sakura.ne.jp> <YRjcHJE0qEIIJ9gA@kroah.com> <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="YsFHapze9CfLadea"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAPDyKFqQbe4k-Sem436Fzsr6mbvwZr83VtEaEZTF8oWYoHHQwg@mail.gmail.com>
-User-Agent: Mutt/2.1.1 (e2a89abc) (2021-07-12)
+In-Reply-To: <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Tetsuo,
 
---YsFHapze9CfLadea
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I might sound like a broken record, but we need to reduce the locking
+complexity, not make it worse and fall down the locking cliff.  I did
+send a suggested series this morning, in which you found a bunch of
+bugs.  I'd appreciate it if you could use your superior skills to
+actually help explain the issue and arrive at a common solution that
+actually simplifies things instead of steaming down the locking cliff
+full speed.  Thank you very much.
 
-On Wed, Aug 18, 2021 at 11:55:05AM +0200, Ulf Hansson wrote:
-> On Wed, 18 Aug 2021 at 02:57, Dmitry Osipenko <digetx@gmail.com> wrote:
-> >
-> > Tegra20/30/114/124 Android devices place GPT at a non-standard location.
-> > Implement alternative_gpt_sector() callback of the MMC host ops which
-> > specifies that GPT location for the partition scanner.
-> >
-> > Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
-> > ---
-> >  drivers/mmc/host/sdhci-tegra.c | 42 ++++++++++++++++++++++++++++++++++
-> >  1 file changed, 42 insertions(+)
-> >
-> > diff --git a/drivers/mmc/host/sdhci-tegra.c b/drivers/mmc/host/sdhci-te=
-gra.c
-> > index 387ce9cdbd7c..24a713689d5b 100644
-> > --- a/drivers/mmc/host/sdhci-tegra.c
-> > +++ b/drivers/mmc/host/sdhci-tegra.c
-> > @@ -116,6 +116,8 @@
-> >   */
-> >  #define NVQUIRK_HAS_TMCLK                              BIT(10)
-> >
-> > +#define NVQUIRK_HAS_ANDROID_GPT_SECTOR                 BIT(11)
-> > +
-> >  /* SDMMC CQE Base Address for Tegra Host Ver 4.1 and Higher */
-> >  #define SDHCI_TEGRA_CQE_BASE_ADDR                      0xF000
-> >
-> > @@ -1361,6 +1363,7 @@ static const struct sdhci_tegra_soc_data soc_data=
-_tegra20 =3D {
-> >         .pdata =3D &sdhci_tegra20_pdata,
-> >         .dma_mask =3D DMA_BIT_MASK(32),
-> >         .nvquirks =3D NVQUIRK_FORCE_SDHCI_SPEC_200 |
-> > +                   NVQUIRK_HAS_ANDROID_GPT_SECTOR |
-> >                     NVQUIRK_ENABLE_BLOCK_GAP_DET,
-> >  };
-> >
-> > @@ -1390,6 +1393,7 @@ static const struct sdhci_tegra_soc_data soc_data=
-_tegra30 =3D {
-> >         .nvquirks =3D NVQUIRK_ENABLE_SDHCI_SPEC_300 |
-> >                     NVQUIRK_ENABLE_SDR50 |
-> >                     NVQUIRK_ENABLE_SDR104 |
-> > +                   NVQUIRK_HAS_ANDROID_GPT_SECTOR |
-> >                     NVQUIRK_HAS_PADCALIB,
-> >  };
-> >
-> > @@ -1422,6 +1426,7 @@ static const struct sdhci_pltfm_data sdhci_tegra1=
-14_pdata =3D {
-> >  static const struct sdhci_tegra_soc_data soc_data_tegra114 =3D {
-> >         .pdata =3D &sdhci_tegra114_pdata,
-> >         .dma_mask =3D DMA_BIT_MASK(32),
-> > +       .nvquirks =3D NVQUIRK_HAS_ANDROID_GPT_SECTOR,
-> >  };
-> >
-> >  static const struct sdhci_pltfm_data sdhci_tegra124_pdata =3D {
-> > @@ -1438,6 +1443,7 @@ static const struct sdhci_pltfm_data sdhci_tegra1=
-24_pdata =3D {
-> >  static const struct sdhci_tegra_soc_data soc_data_tegra124 =3D {
-> >         .pdata =3D &sdhci_tegra124_pdata,
-> >         .dma_mask =3D DMA_BIT_MASK(34),
-> > +       .nvquirks =3D NVQUIRK_HAS_ANDROID_GPT_SECTOR,
-> >  };
-> >
-> >  static const struct sdhci_ops tegra210_sdhci_ops =3D {
-> > @@ -1590,6 +1596,38 @@ static int sdhci_tegra_add_host(struct sdhci_hos=
-t *host)
-> >         return ret;
-> >  }
-> >
-> > +static int sdhci_tegra_alternative_gpt_sector(struct mmc_card *card,
-> > +                                             sector_t *gpt_sector)
-> > +{
-> > +       unsigned int boot_sectors_num;
-> > +
-> > +       /* filter out unrelated cards */
-> > +       if (card->ext_csd.rev < 3 ||
-> > +           !mmc_card_mmc(card) ||
-> > +           !mmc_card_is_blockaddr(card) ||
-> > +            mmc_card_is_removable(card->host))
-> > +               return -ENOENT;
-> > +
-> > +       /*
-> > +        * eMMC storage has two special boot partitions in addition to =
-the
-> > +        * main one.  NVIDIA's bootloader linearizes eMMC boot0->boot1-=
->main
-> > +        * accesses, this means that the partition table addresses are =
-shifted
-> > +        * by the size of boot partitions.  In accordance with the eMMC
-> > +        * specification, the boot partition size is calculated as foll=
-ows:
-> > +        *
-> > +        *      boot partition size =3D 128K byte x BOOT_SIZE_MULT
-> > +        *
-> > +        * Calculate number of sectors occupied by the both boot partit=
-ions.
-> > +        */
-> > +       boot_sectors_num =3D card->ext_csd.raw_boot_mult * SZ_128K /
-> > +                          SZ_512 * MMC_NUM_BOOT_PARTITION;
-> > +
-> > +       /* Defined by NVIDIA and used by Android devices. */
-> > +       *gpt_sector =3D card->ext_csd.sectors - boot_sectors_num - 1;
-> > +
-> > +       return 0;
-> > +}
->=20
-> I suggest you move this code into the mmc core/block layer instead (it
-> better belongs there).
->=20
-> Additionally, let's add a new host cap, MMC_CAP_ALTERNATIVE_GPT, to
-> let the core know when it should use the code above.
-
-Couldn't a generic "alternative GPT" mean pretty much anything? As far
-as I know this is very specific to a series of Tegra chips and firmware
-running on them. On some of these devices you can even replace the OEM
-firmware by something custom that's less quirky.
-
-I'm not aware of anyone else employing this kind of quirk, so I don't
-want anyone to get any ideas that this is a good thing. Putting it into
-the core runs the risk of legitimizing this.
-
-Thierry
-
---YsFHapze9CfLadea
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmEdDKsACgkQ3SOs138+
-s6FtIw//V/GnAyD/VAGosaUf38C4hqMB1AJ4bDuwQT9AT4gX8IoZinxrKlfTv8E1
-qp0MDApPw2Lqivhd2eAVG6RekK34TGTS933ocNPRFgR6W74MrKImmFINIvIFseCy
-X5ZgxP4yjM9YX6kbgUD7DncOzQFcGqjxQoRAlhCBdGd5nO9VyZwWzFqlT3vvvS4t
-GG6gzZH7yieuvzoW2wNNi+Llsn68krvrxNDJo2qzIAtf00l6IGxRuPCNfIRakMMZ
-YrKZ1XIBkZLiYDdu8BzVv99Ng+2CcesPuhiXx41xEf3IkrylFJUNJ1A3KXGzIoPt
-aTseq307wkpKOnRKsfSw4cS0Y8AEbNGjtkDeEuWB5WRhyDzmzzQOVBB++lvZo0vE
-pNsvlwc8p8kdUwKLMRDxqRKbCcl+azla6XSXXDeuzKJLiT0B1gIvrZkcZ5KEGmDs
-0h4nRuhABUuozqVcCRkcDY0DAhhVwC1Z+YLLIjeq0ksi4YC+GSgNr3b3HGQms5nq
-85Kson9ouXaOGMh0rYmxtRjotolxnO0bQxHYbo7sct4Mhv/NTo/QYXXDuAEQ2MvK
-XOP0s5oxcBUH/FGNbIupCVky4SoNnG5EQh9jmm6BmD9jLfCyCt6dAlvFR4nj/DUh
-JHV388UVIqOOexOKvkVYSCTQiD7zueR2KlT6WtG70Bf50pq3/EQ=
-=Ht4G
------END PGP SIGNATURE-----
-
---YsFHapze9CfLadea--
+On Wed, Aug 18, 2021 at 08:07:32PM +0900, Tetsuo Handa wrote:
+> syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
+> commit a160c6159d4a0cf8 ("block: add an optional probe callback to
+> major_names") is calling the module's probe function with major_names_lock
+> held.
+> 
+> When copying content of /proc/devices to another file via sendfile(),
+> 
+>   sb_writers#$N => &p->lock => major_names_lock
+> 
+> dependency is recorded.
+> 
+> When loop_process_work() from WQ context performs a write request,
+> 
+>   (wq_completion)loop$M => (work_completion)&lo->rootcg_work =>
+>   sb_writers#$N
+> 
+> dependency is recorded.
+> 
+> When flush_workqueue() from drain_workqueue() from destroy_workqueue()
+>  from __loop_clr_fd() from blkdev_put() from blkdev_close() from __fput()
+> is called,
+> 
+>   &disk->open_mutex => &lo->lo_mutex => (wq_completion)loop$M
+> 
+> dependency is recorded.
+> 
+> When loop_control_remove() from loop_control_ioctl(LOOP_CTL_REMOVE) is
+> called,
+> 
+>   loop_ctl_mutex => &lo->lo_mutex
+> 
+> dependency is recorded.
+> 
+> As a result, lockdep thinks that there is
+> 
+>   loop_ctl_mutex => &lo->lo_mutex => (wq_completion)loop$M =>
+>   (work_completion)&lo->rootcg_work => sb_writers#$N => &p->lock =>
+>   major_names_lock
+> 
+> dependency chain.
+> 
+> Then, if loop_add() from loop_probe() from blk_request_module() from
+> blkdev_get_no_open() from blkdev_get_by_dev() from blkdev_open() from
+> do_dentry_open() from path_openat() from do_filp_open() is called,
+> 
+>   major_names_lock => loop_ctl_mutex
+> 
+> dependency is appended to the dependency chain.
+> 
+> There would be two approaches for breaking this circular dependency.
+> One is to kill loop_ctl_mutex => &lo->lo_mutex chain. The other is to
+> kill major_names_lock => loop_ctl_mutex chain. This patch implements
+> the latter, due to the following reasons.
+> 
+>  (1) sb_writers#$N => &p->lock => major_names_lock chain is unavoidable
+> 
+>  (2) this patch can also fix similar problem in other modules [2] which
+>      is caused by calling the probe function with major_names_lock held
+> 
+>  (3) I believe that this patch is principally safer than e.g.
+>      commit bd5c39edad535d9f ("loop: reduce loop_ctl_mutex coverage in
+>      loop_exit") which waits until the probe function finishes using
+>      global mutex in order to fix deadlock reproducible by sleep
+>      injection [3]
+> 
+> This patch adds THIS_MODULE parameter to __register_blkdev() as with
+> usb_register(), and drops major_names_lock before calling probe function
+> by holding a reference to that module which contains that probe function.
+> 
+> Since cdev uses register_chrdev() and __register_chrdev(), bdev should be
+> able to preserve register_blkdev() and __register_blkdev() naming scheme.
+> Thus, use register_blkdev_with_probe() as an inline function for
+> automagically appending THIS_MODULE parameter.
+> 
+> Link: https://syzkaller.appspot.com/bug?id=7bb10e8b62f83e4d445cdf4c13d69e407e629558 [1]
+> Link: https://syzkaller.appspot.com/bug?id=7bd106c28e846d1023d4ca915718b1a0905444cb [2]
+> Link: https://lkml.kernel.org/r/c4edf07f-92e1-a350-2743-f0b0234a2b6c@i-love.sakura.ne.jp [3]
+> Reported-by: syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>
+> Reported-by: syzbot <syzbot+6a8a0d93c91e8fbf2e80@syzkaller.appspotmail.com>
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Tested-by: syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>
+> Fixes: a160c6159d4a0cf8 ("block: add an optional probe callback to major_names")
+> ---
+>  block/genhd.c         | 33 ++++++++++++++++++++++++++-------
+>  include/linux/genhd.h | 11 +++++++++--
+>  2 files changed, 35 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 298ee78c1bda..a3e2e5666457 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -162,6 +162,7 @@ static struct blk_major_name {
+>  	int major;
+>  	char name[16];
+>  	void (*probe)(dev_t devt);
+> +	struct module *owner;
+>  } *major_names[BLKDEV_MAJOR_HASH_SIZE];
+>  static DEFINE_MUTEX(major_names_lock);
+>  
+> @@ -190,7 +191,8 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
+>   * @major: the requested major device number [1..BLKDEV_MAJOR_MAX-1]. If
+>   *         @major = 0, try to allocate any unused major number.
+>   * @name: the name of the new block device as a zero terminated string
+> - * @probe: allback that is called on access to any minor number of @major
+> + * @probe: callback that is called on access to any minor number of @major
+> + * @owner: THIS_MODULE if @probe is not NULL, ignored if @probe is NULL.
+>   *
+>   * The @name must be unique within the system.
+>   *
+> @@ -207,8 +209,9 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
+>   *
+>   * Use register_blkdev instead for any new code.
+>   */
+> +#undef __register_blkdev
+>  int __register_blkdev(unsigned int major, const char *name,
+> -		void (*probe)(dev_t devt))
+> +		      void (*probe)(dev_t devt), struct module *owner)
+>  {
+>  	struct blk_major_name **n, *p;
+>  	int index, ret = 0;
+> @@ -248,6 +251,7 @@ int __register_blkdev(unsigned int major, const char *name,
+>  
+>  	p->major = major;
+>  	p->probe = probe;
+> +	p->owner = owner;
+>  	strlcpy(p->name, name, sizeof(p->name));
+>  	p->next = NULL;
+>  	index = major_to_index(major);
+> @@ -653,14 +657,29 @@ void blk_request_module(dev_t devt)
+>  {
+>  	unsigned int major = MAJOR(devt);
+>  	struct blk_major_name **n;
+> +	void (*probe_fn)(dev_t devt);
+>  
+>  	mutex_lock(&major_names_lock);
+>  	for (n = &major_names[major_to_index(major)]; *n; n = &(*n)->next) {
+> -		if ((*n)->major == major && (*n)->probe) {
+> -			(*n)->probe(devt);
+> -			mutex_unlock(&major_names_lock);
+> -			return;
+> -		}
+> +		if ((*n)->major != major || !(*n)->probe)
+> +			continue;
+> +		if (!try_module_get((*n)->owner))
+> +			break;
+> +		/*
+> +		 * Calling probe function with major_names_lock held causes
+> +		 * circular locking dependency problem. Thus, call it after
+> +		 * releasing major_names_lock.
+> +		 */
+> +		probe_fn = (*n)->probe;
+> +		mutex_unlock(&major_names_lock);
+> +		/*
+> +		 * Assuming that unregister_blkdev() is called from module's
+> +		 * __exit function, a module refcount taken above allows us
+> +		 * to safely call probe function without major_names_lock held.
+> +		 */
+> +		probe_fn(devt);
+> +		module_put((*n)->owner);
+> +		return;
+>  	}
+>  	mutex_unlock(&major_names_lock);
+>  
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 13b34177cc85..2ed856616d47 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -303,9 +303,16 @@ struct gendisk *__blk_alloc_disk(int node);
+>  void blk_cleanup_disk(struct gendisk *disk);
+>  
+>  int __register_blkdev(unsigned int major, const char *name,
+> -		void (*probe)(dev_t devt));
+> +		      void (*probe)(dev_t devt), struct module *owner);
+> +static inline int register_blkdev_with_probe(unsigned int major, const char *name,
+> +					     void (*probe)(dev_t devt), struct module *owner)
+> +{
+> +	return __register_blkdev(major, name, probe, owner);
+> +}
+> +#define __register_blkdev(major, name, probe) \
+> +	register_blkdev_with_probe(major, name, probe, THIS_MODULE)
+>  #define register_blkdev(major, name) \
+> -	__register_blkdev(major, name, NULL)
+> +	register_blkdev_with_probe(major, name, NULL, NULL)
+>  void unregister_blkdev(unsigned int major, const char *name);
+>  
+>  bool bdev_check_media_change(struct block_device *bdev);
+> -- 
+> 2.25.1
+> 
+---end quoted text---
