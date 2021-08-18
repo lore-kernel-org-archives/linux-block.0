@@ -2,218 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E23C43214
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F0DC4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:54:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1912610CD
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09E0B6101A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:54:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239943AbhHRPs2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 11:48:28 -0400
-Received: from mail-lf1-f44.google.com ([209.85.167.44]:43712 "EHLO
-        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240125AbhHRPs0 (ORCPT
+        id S237494AbhHRPyg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 11:54:36 -0400
+Received: from mail-lf1-f53.google.com ([209.85.167.53]:41676 "EHLO
+        mail-lf1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236905AbhHRPyg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 11:48:26 -0400
-Received: by mail-lf1-f44.google.com with SMTP id i9so5535008lfg.10;
-        Wed, 18 Aug 2021 08:47:51 -0700 (PDT)
+        Wed, 18 Aug 2021 11:54:36 -0400
+Received: by mail-lf1-f53.google.com with SMTP id y34so5597360lfa.8;
+        Wed, 18 Aug 2021 08:54:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=9bvaZZWUnooV8Jw75jd8qrJDvM8A6y9DHRPhc6M+/sI=;
-        b=chnDyw5zPdhgShW1Q4A0tvohOju0LM8CNqRVMsT4x0h+OeeXph8jlNa+WcdcHzedst
-         7WDLIxf0bdE8vyV6e1wvuhNoOKyjv9y+rqZbcnPV96/3Jn1VL8RbnH0hUMj5ihychl5k
-         F1w2wGwcuudm51JtjWcd6Lb8h8DNYe+XQsQwW0QdhKK3rVT+crWHKQ8GrMyrZGf6g+Zj
-         J1HjL9eRU7GfN0gN0iVltRprU6zR3SVgCvkto5doyP45TcY3oN5u1KzSZbq7o91bh8HF
-         OZnTBaClSIlphquOBSwhRr6GlZBhzb7tc5ZImGwAOU1/W/kdN8lOL7Z2RU9QoFwI60Py
-         ovrg==
-X-Gm-Message-State: AOAM531YqiF0Yvj+krmrPtzz2Xn62hiTlTbR6AqWMNn4MlF1UYl7b04G
-        AVQkXknJavb0gt1QG2xdXoXUeRF74WogIqXu
-X-Google-Smtp-Source: ABdhPJyr8G1yfTuq0VreQDkFsJJ0P7+twk1JxBRGT3Ai6uEwI88aRpUUOkMZx89CEUKflZadKZdEpQ==
-X-Received: by 2002:a05:6512:3091:: with SMTP id z17mr7043553lfd.207.1629301670115;
-        Wed, 18 Aug 2021 08:47:50 -0700 (PDT)
-Received: from localhost.localdomain (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
-        by smtp.googlemail.com with ESMTPSA id j4sm23808ljh.120.2021.08.18.08.47.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 08:47:49 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=BHMjZ/i4Omck1upCZSLIcKpTxWs6ScKdudtkHXwFkLE=;
+        b=kIAGGTZeQM0Ibms+kJwy8pA8L6EfqqeVEwF3moFKOrx6ov3go2zXy4J1DcI/Wj4X5u
+         4AOIsAaOpd0czWRqpxQWC2eN3c9PEceL70s2ofS8YphQsquo9K/k3wn+q+tk0r4K+Ch3
+         4UVWjPoVU0ph112LKSsNF6POt339wYGwVZ4vCp/SvY/Weq0MVEF9jxSWaRDyX7sGnjJs
+         w/n5/AnBSWe+vO0vZrQ+G1krGMioxgky5l0nk8V2aMzA2ex41uIeLoG66UtP1KMha4zD
+         hEEyz1wkNRVKk9Vv1ML1wpUrlx7CkE5zoPWe32D31U5zXlPFqJFhlMSGnlJsg15WaXcs
+         EG1Q==
+X-Gm-Message-State: AOAM531AAwqr08LI/ctkYCW4zqT5sAR7rvlVnBHgSafzlx2zUFuk4zdp
+        ibwZ6J4dGhFbKmhr3AJEm5PIbyibRzofIQh8
+X-Google-Smtp-Source: ABdhPJzX63+YdtxMD3d2t0KhRquyfJSWRbwehMnKvCRyitRNSB4q0CCa4GjIT1G2HjeO+ujGwlCaDg==
+X-Received: by 2002:a05:6512:1501:: with SMTP id bq1mr7028514lfb.286.1629302040079;
+        Wed, 18 Aug 2021 08:54:00 -0700 (PDT)
+Received: from [10.68.32.40] (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.gmail.com with ESMTPSA id n18sm27302ljg.40.2021.08.18.08.53.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 08:53:59 -0700 (PDT)
+Subject: Re: [PATCH] Revert "floppy: reintroduce O_NDELAY fix"
+To:     Jiri Kosina <jikos@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        regressions@lists.linux.dev, Mark Hounschell <markh@compro.net>,
+        Wim Osterholt <wim@djo.tudelft.nl>,
+        Kurt Garloff <kurt@garloff.de>, stable@vger.kernel.org
+References: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
+ <20210808074246.33449-1-efremov@linux.com>
+ <nycvar.YFH.7.76.2108160914070.8253@cbobk.fhfr.pm>
 From:   Denis Efremov <efremov@linux.com>
-To:     linux-kselftest@vger.kernel.org
-Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Jiri Kosina <jkosina@suse.cz>, Willy Tarreau <w@1wt.eu>
-Subject: [RFC PATCH 5/5] selftests: floppy: add basic rdwr tests
-Date:   Wed, 18 Aug 2021 18:46:46 +0300
-Message-Id: <20210818154646.925351-6-efremov@linux.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210818154646.925351-1-efremov@linux.com>
-References: <20210818154646.925351-1-efremov@linux.com>
+Message-ID: <5ca95b90-c6e0-99b3-b129-75dc05cfb1d4@linux.com>
+Date:   Wed, 18 Aug 2021 18:53:58 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <nycvar.YFH.7.76.2108160914070.8253@cbobk.fhfr.pm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add basic tests for a floppy with writable disk. "rdwr" test
-works under following assumptions:
- - writable disk in "/dev/fd0"
+Hi,
 
-To simulate the conditions and automate the testing process there is
-"run_rdwr.sh".
+On 8/16/21 10:17 AM, Jiri Kosina wrote:
+> On Sun, 8 Aug 2021, Denis Efremov wrote:
+> 
+>> The patch breaks userspace implementations (e.g. fdutils) and introduces
+>> regressions in behaviour. Previously, it was possible to O_NDELAY open a
+>> floppy device with no media inserted or with write protected media without
+>> an error. Some userspace tools use this particular behavior for probing.
+>>
+>> It's not the first time when we revert this patch. Previous revert is in
+>> commit f2791e7eadf4 (Revert "floppy: refactor open() flags handling").
+>>
+>> This reverts commit 8a0c014cd20516ade9654fc13b51345ec58e7be8.
+> 
+> By reverting it you bring back the bugs that were fixed by it
 
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
- tools/testing/selftests/floppy/.gitignore  |  1 +
- tools/testing/selftests/floppy/Makefile    |  4 +-
- tools/testing/selftests/floppy/lib.sh      |  4 ++
- tools/testing/selftests/floppy/rdwr.c      | 67 ++++++++++++++++++++++
- tools/testing/selftests/floppy/run_rdwr.sh | 22 +++++++
- 5 files changed, 96 insertions(+), 2 deletions(-)
- create mode 100644 tools/testing/selftests/floppy/rdwr.c
- create mode 100755 tools/testing/selftests/floppy/run_rdwr.sh
+I agree with you, that O_NDELAY is broken for floppies (and always been).
+However, just by removing O_NDELAY we break many existing tools that use
+it for probing and ioctl-only opens. With the patch tools fail to open the
+device without a diskette and try to read a diskette if there is one (this is
+not as fast on a real hardware as in QEMU).
+I think that there should be a better fix that doesn't break existing tools.
+It appears that people still use software that depends on O_NDELAY in floppies.
+Same patch was already reverted in 2016 (presumably) by the same reason.
 
-diff --git a/tools/testing/selftests/floppy/.gitignore b/tools/testing/selftests/floppy/.gitignore
-index 7642dc0ef281..f53e70197edd 100644
---- a/tools/testing/selftests/floppy/.gitignore
-+++ b/tools/testing/selftests/floppy/.gitignore
-@@ -5,3 +5,4 @@ testdir/
- 
- empty
- rdonly
-+rdwr
-diff --git a/tools/testing/selftests/floppy/Makefile b/tools/testing/selftests/floppy/Makefile
-index ed8fdeb79aea..c5d010dd4445 100644
---- a/tools/testing/selftests/floppy/Makefile
-+++ b/tools/testing/selftests/floppy/Makefile
-@@ -1,8 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- CFLAGS := -static -I../../../../usr/include
- 
--TEST_PROGS := run_empty.sh run_rdonly.sh
--TEST_GEN_FILES := init empty rdonly
-+TEST_PROGS := run_empty.sh run_rdonly.sh run_rdwr.sh
-+TEST_GEN_FILES := init empty rdonly rdwr
- TEST_FILES := lib.sh
- 
- include ../lib.mk
-diff --git a/tools/testing/selftests/floppy/lib.sh b/tools/testing/selftests/floppy/lib.sh
-index 9988be187bc9..0eab702b355a 100644
---- a/tools/testing/selftests/floppy/lib.sh
-+++ b/tools/testing/selftests/floppy/lib.sh
-@@ -61,3 +61,7 @@ run_qemu_rdonly_fat() {
-   $run -drive file=fat:floppy:"$1",index=0,if=floppy,readonly
- }
- 
-+run_qemu_rdwr_img() {
-+  detect_debug "$2"
-+  $run -drive file="$1",index=0,if=floppy,format=raw
-+}
-diff --git a/tools/testing/selftests/floppy/rdwr.c b/tools/testing/selftests/floppy/rdwr.c
-new file mode 100644
-index 000000000000..44ad18701530
---- /dev/null
-+++ b/tools/testing/selftests/floppy/rdwr.c
-@@ -0,0 +1,67 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <sys/mount.h>
-+#include <errno.h>
-+#include <linux/fd.h>
-+#include "../kselftest_harness.h"
-+
-+FIXTURE(floppy) {
-+	const char *dev;
-+};
-+
-+FIXTURE_SETUP(floppy)
-+{
-+	int fd;
-+	struct floppy_drive_params params;
-+
-+	self->dev = "/dev/fd0";
-+	if (access(self->dev, F_OK))
-+		ksft_exit_skip("No floppy device found\n");
-+	if (access(self->dev, R_OK))
-+		ksft_exit_skip("Floppy is not read accessible\n");
-+	if (access(self->dev, W_OK))
-+		ksft_exit_skip("Floppy is not write accessible\n");
-+
-+	fd = open("/dev/fd0", O_ACCMODE|O_NDELAY);
-+	EXPECT_EQ(0, ioctl(fd, FDGETDRVPRM, &params));
-+	params.flags |= FD_DEBUG;
-+	EXPECT_EQ(0, ioctl(fd, FDSETDRVPRM, &params));
-+	close(fd);
-+}
-+
-+FIXTURE_TEARDOWN(floppy)
-+{
-+}
-+
-+TEST_F(floppy, write)
-+{
-+#define TEST_DATA "TEST_WRITE"
-+	int fd;
-+	char test[] = TEST_DATA;
-+
-+	fd = open(self->dev, O_RDWR);
-+	ASSERT_GT(fd, 0);
-+
-+	ASSERT_EQ(sizeof(test), write(fd, test, sizeof(test)));
-+	ASSERT_EQ(sizeof(test), read(fd, test, sizeof(test)));
-+	ASSERT_NE(0, strncmp(TEST_DATA, test, sizeof(TEST_DATA)));
-+
-+	ASSERT_EQ(close(fd), 0);
-+#undef TEST_DATA
-+}
-+
-+TEST_F(floppy, ioctl_disk_writable)
-+{
-+	int fd;
-+	struct floppy_drive_struct drive;
-+
-+	fd = open(self->dev, O_RDONLY|O_NDELAY);
-+	ASSERT_GT(fd, 0);
-+	ASSERT_EQ(0, ioctl(fd, FDGETDRVSTAT, &drive));
-+	ASSERT_TRUE(drive.flags & FD_DISK_WRITABLE);
-+	ASSERT_EQ(close(fd), 0);
-+}
-+
-+TEST_HARNESS_MAIN
-diff --git a/tools/testing/selftests/floppy/run_rdwr.sh b/tools/testing/selftests/floppy/run_rdwr.sh
-new file mode 100755
-index 000000000000..0ebe8bd6bc69
---- /dev/null
-+++ b/tools/testing/selftests/floppy/run_rdwr.sh
-@@ -0,0 +1,22 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+
-+set -e
-+
-+source "$(dirname $0)"/lib.sh
-+
-+while getopts d flag; do
-+  case "${flag}" in
-+    d) debug=1;;
-+  esac
-+done
-+
-+if [ -z $debug ]; then
-+  trap "rm -rf testdir" EXIT
-+fi
-+mkdir -p testdir
-+head -c 1474560 /dev/zero > testdir/floppy.raw
-+
-+gen_cpio_list rdwr
-+gen_initrd rdwr
-+run_qemu_rdwr_img testdir/floppy.raw $debug
--- 
-2.31.1
+>  -- e.g. the 
+> possibility to livelock mmap() on the returned fd to keep waiting on the 
+> page unlock bit forever
 
+As far as I understand this is a problem only for syzkaller.
+And this is not a security issue nowadays since most distributions
+(I don't know exceptions) require at least "disk" group to access floppies.
+Do you know a link for the syzkaller reproducer?
+
+> or the functionality bug reported at [1], and 
+> likely others.
+> 
+> [1] https://bugzilla.suse.com/show_bug.cgi?id=1181018
+
+The patch starts to return -ENXIO for O_NDELAY|O_RDONLY opens and devices
+without a diskette. I don't think this is an expected behavior during 
+libblkid probing.
+
+Probably there is a better fix for [1], maybe even an additional workaround
+for floppies in libblkid. They already have workarounds for cdroms
+https://github.com/karelzak/util-linux/commit/dc30fd4383e57a0440cdb0e16ba5c4336a43b290
+
+I started to add simple tests https://lkml.org/lkml/2021/8/18/845
+However, I failed to reproduce mount bug [1], probably
+because I don't know how to configure cloudinit properly. I tried to reproduce
+a mount fail bug with open("/dev/fd0", O_NDELAY|O_RDONLY) and mount("/dev/fd0", ...)
+but it works. Looks like there should be something else in between...
+
+Regards,
+Denis
