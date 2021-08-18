@@ -2,144 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255A3C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 01:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2422AC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 02:02:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B13860FD7
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 01:09:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAD0B6103A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 02:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237398AbhHRBKY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 21:10:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45127 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237387AbhHRBKY (ORCPT
+        id S234723AbhHRCCs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 22:02:48 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:14272 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229466AbhHRCCq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 21:10:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629248990;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=RCCWvDjY3Q5IUVIs6QPft/4AsaIoSIpdIehWy1LmRPw=;
-        b=KVIlxSHlxcIMo90i6tn1bknsi0b7R2emGgsTPjFMxQpxWC/+1fpPXthsx4rtlOk9WBJwsM
-        iEq7lO7+NgYLpD+UOuZBDlItPioApbQhzD3GY9vnrp9GZtY0Q/mhIisg4a6lt0s5aMxM2X
-        YigYfaHbA6An7Jg4vhXZB+UkOWE9Fy4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-595-EplxXfUgPSybCuxqFm9pLA-1; Tue, 17 Aug 2021 21:09:46 -0400
-X-MC-Unique: EplxXfUgPSybCuxqFm9pLA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EFF5760C0;
-        Wed, 18 Aug 2021 01:09:45 +0000 (UTC)
-Received: from localhost (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DCFD91B46B;
-        Wed, 18 Aug 2021 01:09:39 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>,
-        Yufen Yu <yuyufen@huawei.com>
-Subject: [PATCH] blk-mq: fix is_flush_rq
-Date:   Wed, 18 Aug 2021 09:09:25 +0800
-Message-Id: <20210818010925.607383-1-ming.lei@redhat.com>
+        Tue, 17 Aug 2021 22:02:46 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GqB3b3Ps6z87Nn;
+        Wed, 18 Aug 2021 10:02:03 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Wed, 18 Aug 2021 10:02:10 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Wed, 18 Aug 2021 10:02:10 +0800
+Subject: Re: [PATCH RFC] blk_mq: clear rq mapping in driver tags before
+ freeing rqs in sched tags
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <bvanassche@acm.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>, Keith Busch <kbusch@kernel.org>
+References: <20210817022306.1622027-1-yukuai3@huawei.com>
+ <YRxZ44tu8o1MPruT@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <11ef6a06-4b6f-44d0-af79-f96e16456b55@huawei.com>
+Date:   Wed, 18 Aug 2021 10:02:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <YRxZ44tu8o1MPruT@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-is_flush_rq() is called from bt_iter()/bt_tags_iter(), and runs the
-following check:
+On 2021/08/18 8:52, Ming Lei wrote:
+> On Tue, Aug 17, 2021 at 10:23:06AM +0800, Yu Kuai wrote:
+>> If ioscheduler is not none, hctx->tags->rq[tag] will point to
+>> hctx->sched_tags->static_rq[internel_tag] in blk_mq_get_driver_tag().
+>> However, static_rq of sched_tags might be freed through switching
+>> elevator or increasing nr_requests. Thus leave a window for some drivers
+>> to get the freed request through blk_mq_tag_to_rq(tags, tag).
+> 
+> I believe I have explained that it is bug of driver which has knowledge
+> if the passed tag is valid or not. We are clear that driver need to cover
+> race between normal completion and timeout/error handling.
+> 
+>>
+>> It's difficult to fix this uaf from driver side, I'm thinking about
+> 
+> So far not see any analysis on why the uaf is triggered, care to
+> investigate the reason?
 
-	hctx->fq->flush_rq == req
+Hi, Ming
 
-but the passed hctx from bt_iter()/bt_tags_iter() may be NULL because:
+I'm sorry if I didn't explian the uaf clearly.
 
-1) memory re-order in blk_mq_rq_ctx_init():
+1) At first, a normal io is submitted and completed with scheduler:
 
-	rq->mq_hctx = data->hctx;
-	...
-	refcount_set(&rq->ref, 1);
+internel_tag = blk_mq_get_tag -> get tag from sched_tags
+  blk_mq_rq_ctx_init
+   sched_tags->rq[internel_tag] = sched_tag->static_rq[internel_tag]
+...
+blk_mq_get_driver_tag
+  __blk_mq_get_driver_tag -> get tag from tags
+  tags->rq[tag] = sched_tag->static_rq[internel_tag]
 
-OR
+So, both tags->rq[tag] and sched_tags->rq[internel_tag] are pointing
+to the request: sched_tags->static_rq[internal_tag].
 
-2) tag re-use and ->rqs[] isn't updated with new request.
+2) Then, if the sched_tags->static_rq is freed:
 
-Fix the issue by re-writing is_flush_rq() as:
+blk_mq_sched_free_requests
+  blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i)
+   blk_mq_clear_rq_mapping(set, tags, hctx_idx);
+    -> sched_tags->rq[internel_tag] is set to null here
 
-	return rq->end_io == flush_end_io;
+After switching elevator, tags->rq[tag] still point to the request
+that is just freed.
 
-which turns out simpler to follow and immune to data race since we have
-ordered WRITE rq->end_io and refcount_set(&rq->ref, 1).
+3) nbd server send a reply with random tag directly:
 
-Fixes: 2e315dc07df0 ("blk-mq: grab rq->refcount before calling ->fn in
-    blk_mq_tagset_busy_iter")
-Cc: "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>
-Cc: Yufen Yu <yuyufen@huawei.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-flush.c | 5 +++++
- block/blk-mq.c    | 2 +-
- block/blk.h       | 6 +-----
- 3 files changed, 7 insertions(+), 6 deletions(-)
+recv_work
+  nbd_read_stat
+   blk_mq_tag_to_rq(tags, tag)
+    rq = tags->rq[tag] -> rq is freed
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 4912c8dbb1d8..4201728bf3a5 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -262,6 +262,11 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- }
- 
-+bool is_flush_rq(struct request *rq)
-+{
-+	return rq->end_io == flush_end_io;
-+}
-+
- /**
-  * blk_kick_flush - consider issuing flush request
-  * @q: request_queue being kicked
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b5237211ccb7..6d7395ad6d94 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -911,7 +911,7 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
- 
- void blk_mq_put_rq_ref(struct request *rq)
- {
--	if (is_flush_rq(rq, rq->mq_hctx))
-+	if (is_flush_rq(rq))
- 		rq->end_io(rq, 0);
- 	else if (refcount_dec_and_test(&rq->ref))
- 		__blk_mq_free_request(rq);
-diff --git a/block/blk.h b/block/blk.h
-index 56f33fbcde59..d4fb5b72d12b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -44,11 +44,7 @@ static inline void __blk_get_queue(struct request_queue *q)
- 	kobject_get(&q->kobj);
- }
- 
--static inline bool
--is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx)
--{
--	return hctx->fq->flush_rq == req;
--}
-+bool is_flush_rq(struct request *req);
- 
- struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- 					      gfp_t flags);
--- 
-2.31.1
+Usually, nbd will get tag and send a request to server first, and then
+handle the reply. However, if the request is skipped, such uaf problem
+can be triggered.
 
+> 
+> The request reference has been cleared too in blk_mq_tag_update_depth():
+> 
+> 	blk_mq_tag_update_depth
+> 		blk_mq_free_rqs
+> 			blk_mq_clear_rq_mapping
+> 
+
+What I'm trying to do is to clear rq mapping in both
+hctx->sched_tags->rq and hctx->tags->rq when sched_tags->static_rq
+is freed. However, I forgot about the case when tags is shared in
+multiple device. Thus what this patch does is clearly wrong...
+
+So, what do you think about adding a new interface to iterate the
+request in tags->rq[], find what is pointing to the
+sched_tags->static_rq[], and use cmpxchg() to clear them?
+
+Thanks
+Kuai
