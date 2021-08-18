@@ -2,384 +2,309 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAA4C19F33
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3529C41537
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:06:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C841610F7
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:06:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A23C9610FF
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:06:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238376AbhHRGGm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:06:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44304 "EHLO
+        id S238362AbhHRGGk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:06:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238081AbhHRGG1 (ORCPT
+        with ESMTP id S238203AbhHRGGa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:06:27 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27F4C06179A
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:52 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id q2so1103707plr.11
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:52 -0700 (PDT)
+        Wed, 18 Aug 2021 02:06:30 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914F8C061764
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:55 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id qe12-20020a17090b4f8c00b00179321cbae7so1636510pjb.2
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QsA0oh7yAOymBHHrtGuA27rl3B+Rg4NMTCmamVBdTcg=;
-        b=J2NWNl9OwfpTxiuRdyjMsbJBnRuEJSKHnea03wQkqNVRgkB3/7VH6GHkLGRr1EFns0
-         SIjV5BzJlIxDIccgsJTP9qc6wqNS7TTcwVHCASfU2mfAtJ/4KUGzNOmVuKwj8+UQ41IM
-         0Z3eZLlzRgTzzEDCsnfPmd5Q0A/8sPDGpbvSw=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=0+ejbkcqZbFXmITuXlL7CDyZypzmre+l3eRsA92DuBs=;
+        b=L0akKXK1kGy5WH++Js4ID4keOQyLjU4nvMwtS4cqGsjwS1xFU9Y8zURE3dmo5F8V05
+         KIsW1RPt4T0R/W281PDW0H0fLfSOQuYUBawn1F1dPLAhZ37UhSTyialAAe7HbhBBWbsu
+         f/DFvbhPjRGc+B3F90LL457312QDPssIXH+XM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QsA0oh7yAOymBHHrtGuA27rl3B+Rg4NMTCmamVBdTcg=;
-        b=FcF60DopFN/MiHTEujZgIFAoJ+jiCqYmJYe2d/aBXyIzo27bWrE69V2NaNdYQF63L0
-         Npd4hXZbqQf2ZWJHzgVdx0IcRbk8KtzBujf1PKN6h8VuPcQMSongTJI5GDpx7wGwC1K3
-         /TeN4WtEjfksJB1ob8HXT7YjG4c1Z4Jc8RGprkq5sOnyemI2jBEVJgSuIz5z6gFafJkv
-         hYVnXIOHCIev5czoJriRTGzKH5kJMBdy31OYK+bQzlU1RHood2py2OYldhyjpGso+Phj
-         BwK2S8NcTVoovIPcwOe2vze7kZtq60AUjkYu8Eg/vhV1FoYjdSTc/uKh94nN+a2OlNEX
-         CmXg==
-X-Gm-Message-State: AOAM532lRq+VFEqRqacfdLU6B2AUybCoz68/xYcKemZPxnMDkHLszvlr
-        kFBf5xA4pMEW0NwspP/4XAZXiw==
-X-Google-Smtp-Source: ABdhPJwmW3bcTajTzHFiF2nf50nWymitSK2Y0qa1psdd3A0MooK5FK0RJ56li4csZblRWA0S/ziwqg==
-X-Received: by 2002:a17:90b:4b4d:: with SMTP id mi13mr8044460pjb.20.1629266752195;
-        Tue, 17 Aug 2021 23:05:52 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=0+ejbkcqZbFXmITuXlL7CDyZypzmre+l3eRsA92DuBs=;
+        b=AbYEYu/WTv0vUchHTAeEXjdRxrM4vtAyvF/HiCSGk4lVXTMIMMgebjFO5fPWijbNrp
+         AUq8Lqyd/NChdgwbVFACkooaWo/hs5iCTIwmadtOBEkYPrR/Yjt3Kdmd/gmi+g1rXiL3
+         KfLoF8juWz1QmiU3fdPl5/GU9DPiCh/IjD4Vv3KKjNIrFsEwCEzSLzXQkOs0FFFeF0fQ
+         5b5pFv5o3PI4ssqRU3pXSO89/8njvoQ+ZroUQcurxMt1u2nqa0Xnb9d7yJVStZMbfBhT
+         v15BZAg1Siz6yHxvHFQQK5pfvGVxx569fqo8C+cn5QzuHN82ob9Jh3lGA3MVmpxh5IJ1
+         vAgQ==
+X-Gm-Message-State: AOAM532YVJCjzceS1JOASsZwdqXuFD4ZP5ydYYnJwyLi2aAcbV8I6a5O
+        7yy7xjOoojegzDd9Enz9II+UsQ==
+X-Google-Smtp-Source: ABdhPJygr1g/bi1zRYFaNXMg6waYnoKPl9E3e4Tfp/TWXQO+BinSpm8T001OPFMZUDUxgc42WizUMA==
+X-Received: by 2002:a17:90b:3442:: with SMTP id lj2mr7420058pjb.81.1629266755106;
+        Tue, 17 Aug 2021 23:05:55 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 8sm4700350pfo.153.2021.08.17.23.05.50
+        by smtp.gmail.com with ESMTPSA id b20sm4633796pfl.9.2021.08.17.23.05.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 23:05:51 -0700 (PDT)
+        Tue, 17 Aug 2021 23:05:53 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithp@keithp.com>,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
         linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: [PATCH v2 00/63] Introduce strict memcpy() bounds checking
-Date:   Tue, 17 Aug 2021 23:04:30 -0700
-Message-Id: <20210818060533.3569517-1-keescook@chromium.org>
+        clang-built-linux@googlegroups.com, linux-hardening@vger.kernel.org
+Subject: [PATCH v2 05/63] stddef: Introduce struct_group() helper macro
+Date:   Tue, 17 Aug 2021 23:04:35 -0700
+Message-Id: <20210818060533.3569517-6-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
+References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=15909; h=from:subject; bh=pJy+CM1ieoc+cSFa9SKg1KCyk8UvV7a/sKoDllusz8M=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMdEttpUtFX03U0A4V8aSiJpGXcJskHNASqB07k ZHcSazeJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjHQAKCRCJcvTf3G3AJsW2D/ 9PDmDCmPBXsfs6FtL//+hL+/y/SsuC3uRKM7L+3mWeTW726bHJ/2hmQA/m1WwZYjsoanUfAHLtpm/I 9wRe9+m31tYyyzMxSgHc8vjXCXe9lbrOQQ5awfflR2TpvCwnF75bXcJmeoDKECH2c5f+bnkfpoIdZx BMgmWD67rXJd49vLhG8uoTrM9ubXXrjBaELYALZ2fL6oNTe6+18qT82Pis2Qk4OUJoO7eF1o1xJwr/ szG1wX/7vWlPlcmY+WgtzZPf8mS+Q/1iPkC17WcGiKi4Hnf5R0waCedmfpbsqr73B4ijg3DC/gRevQ kFWp3i9MOM+Colz7jky21hfS8c9fXWCBySxK+gAHoCT+YKrB8EvUpv+HKj5y2YcuZUJBl0AxCwZowB PWEewnTuMisH+tA2zTty+LNwlm/kOodrvyH5/VYCT9tNwcHl0eXmL7LwDqodqq9y7eB7du/nqeTn0V 1FDI08WpjYL7MPkKQBM/oMsMv7nCRuiIClREX10rXrj73zjoHwV9QwUV70UZCH+TWGurYfxv8M/Tda LY5/b1iFGMVtG7e+KH1cr4YxAG3pvHhAQtGcqSqEEci84yakB7Bc+nxBhaX2KEB2owp02ZI53piSga 61EvJOFWnJN45wbgUl6FzqUT5SGi3AMRyPFxrOYYrKgsw/fU85rXKL0rxWrw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8609; h=from:subject; bh=8Qg6O9rjkiwOKAeKIVGdgdvKDjqINmqyRAtZrlXXnIA=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMeD0CHW+uuEt76ResWyKF8pbMpqH18BMp8/Pj9 U4ZtvnmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjHgAKCRCJcvTf3G3AJqb/D/ 93GZOK8t0sjGW1TI4a1tTQBtjO+BfS5KTMQeA3a7Uce4PVwGGMi8plmIGq+Rfhww6bDSGUR3D5Tq8i C/Jxt4JuoLgnD9VoTjkw5H7tFIpQ44zNRI+8ZDaxmiu1VD47VHbY1vE6wOYdGHBrNCSHNYWUAi2vaS E4fN8LuFsXWsMK8sLlZGt8eIxJGzmRPQOsOb31OTMfNyRY6gvuiRFsc+CYTgT/2Rwwg8x5TnOqMHLR 8LQNRHT7vu6QbAeAziCQskZWLxnFAg1+Wjkn7rq24wRdar7ztcqG5+psYuIvRugHU+Igp+JYFpGAxS 512FKT2Yno2+cAIO9/aKyo48MArIW0R0nMBtN9AeeF3y6C5I1GEiDLvBoWZrcmpSmxR/UPgex5+W50 5YzAGHXmLPDsRHR0GuHHnxgbjUWdMHHwN9EmP/KnqmG7v9csbjgCpZm8dBQu9viUOpVGFWXfMFRoAQ umTD8Z//E8AM9XTfe490LNcpHh/WNq93DLwwP5q3HrUb3G113UWGJx+nuf91GKOllfV3S/sJrASX23 sEQ2nIoj+nqPPAU77dYdz6kJa/SnPmKWce5NU111vhOoPjmDoZYruwnsDc3WCGZAmidp5Naz1aYPpb qsNP1TeGqq2MhskDz580+XWS+9E9gVOtBY6COlRwGVpPKMX4dGct/QGB5r4A==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Kernel code has a regular need to describe groups of members within a
+structure usually when they need to be copied or initialized separately
+from the rest of the surrounding structure. The generally accepted design
+pattern in C is to use a named sub-struct:
 
-This patch series (based on next-20210816) implements stricter (no struct
-member overflows) bounds checking for memcpy(), memmove(), and memset()
-under CONFIG_FORTIFY_SOURCE. To quote a later patch in the series:
+	struct foo {
+		int one;
+		struct {
+			int two;
+			int three, four;
+		} thing;
+		int five;
+	};
 
-    tl;dr: In order to eliminate a large class of common buffer overflow
-    flaws that continue to persist in the kernel, have memcpy() (under
-    CONFIG_FORTIFY_SOURCE) perform bounds checking of the destination struct
-    member when they have a known size. This would have caught all of the
-    memcpy()-related buffer write overflow flaws identified in at least the
-    last three years.
+This would allow for traditional references and sizing:
 
-As this series introduces various helpers and performs several phases of
-treewide cleanups, I'm expecting to carry this series in my tree, so I'd
-love to get some Reviews and Acks. Given the size, I've mostly aimed this
-series at various mailing lists, otherwise the CC size got really big. :)
+	memcpy(&dst.thing, &src.thing, sizeof(dst.thing));
 
-I have separated a few things off of this submission, as things continue
-to grow:
-- run-time bounds checking (which now has a better solution for unknown
-			    bounds besides "oh well")
-- __alloc_size enablement (sent separately[1])
-- -Warray-bounds enablement (several cleanups have been sent)
+However, doing this would mean that referencing struct members enclosed
+by such named structs would always require including the sub-struct name
+in identifiers:
 
-The remaining portions (here) haven't seen as much change, so I think
-it's better to get these compile-time portions landed first -- they're
-big enough. My intention is to put this in -next soon via my "overflow"
-tree, assuming people are happy with it. :)
+	do_something(dst.thing.three);
 
-Another random thing of note, I'm using the "Enhanced-by:" tag to mean
-"this was improved by...", inspired by the existing "Fixed-by:" tag (for
-"folded fixes"). "Fixed-by:" seemed inaccurate (it wasn't broken; it is
-just better now), and "Suggested-by:" seemed too nebulous (what was
-suggested?).
+This has tended to be quite inflexible, especially when such groupings
+need to be added to established code which causes huge naming churn.
+Three workarounds exist in the kernel for this problem, and each have
+other negative properties.
 
-Thanks!
+To avoid the naming churn, there is a design pattern of adding macro
+aliases for the named struct:
 
--Kees
+	#define f_three thing.three
 
-[1] https://lore.kernel.org/lkml/20210818050841.2226600-1-keescook@chromium.org/
+This ends up polluting the global namespace, and makes it difficult to
+search for identifiers.
 
-v2:
-- fix CC_IS_CLANG typo (nathan)
-- bug.h hunk moved later (ndesaulnier)
-- various commit log typos (ndesaulnier)
-- omap3isp: fix read source (gustavo)
-- struct_group can be variadic (rasmus)
-- add struct_group_tagged (dan williams)
-- move raw __struct_group() to UAPI (gregkh, dan vetter)
-- ibmvscsi: add BUILD_BUG_ON() size checks
-- net: use memset_after() instead of struct_group() (jakob)
-- swap some memset_after() to memset_startat() for readability
-- add missing __NO_FORTIFY to arm boot stub (lkp)
-- powerpc signal32 struct_group() added (lkp)
-- powerpc sata_fsl struct_group() added
-- add fortify failure condition arguments to warning funcs to assist debugging
-- add ray_cs compile-time fix
-- add flexcan compile-time fix
-- add af_iucv compile-time fix
-- fix dropped strcpy() compile-time write overflow check
-- add missing strscpy() compile-time read overflow check
-- fix more boot stub build instances where fortification must be disabled
-- add reviewed-bys/acks
-v1: https://lore.kernel.org/lkml/20210727205855.411487-1-keescook@chromium.org/
+Another common work-around in kernel code avoids the pollution by avoiding
+the named struct entirely, instead identifying the group's boundaries using
+either a pair of empty anonymous structs of a pair of zero-element arrays:
 
-Specifically, this series is logically split into several steps:
+	struct foo {
+		int one;
+		struct { } start;
+		int two;
+		int three, four;
+		struct { } finish;
+		int five;
+	};
 
-Clean up remaining simple compile-time memcpy() warnings:
-  ipw2x00: Avoid field-overflowing memcpy()
-  net/mlx5e: Avoid field-overflowing memcpy()
-  rpmsg: glink: Replace strncpy() with strscpy_pad()
-  pcmcia: ray_cs: Split memcpy() to avoid bounds check warning
+	struct foo {
+		int one;
+		int start[0];
+		int two;
+		int three, four;
+		int finish[0];
+		int five;
+	};
 
-Introduce struct_group() and apply it treewide to avoid compile-time
-memcpy() warnings:
-  stddef: Introduce struct_group() helper macro
-  cxl/core: Replace unions with struct_group()
-  skbuff: Switch structure bounds to struct_group()
-  bnxt_en: Use struct_group_attr() for memcpy() region
-  mwl8k: Use struct_group() for memcpy() region
-  libertas: Use struct_group() for memcpy() region
-  libertas_tf: Use struct_group() for memcpy() region
-  thermal: intel: int340x_thermal: Use struct_group() for memcpy() region
-  iommu/amd: Use struct_group() for memcpy() region
-  cxgb3: Use struct_group() for memcpy() region
-  intersil: Use struct_group() for memcpy() region
-  cxgb4: Use struct_group() for memcpy() region
-  bnx2x: Use struct_group() for memcpy() region
-  drm/amd/pm: Use struct_group() for memcpy() region
-  staging: wlan-ng: Use struct_group() for memcpy() region
-  drm/mga/mga_ioc32: Use struct_group() for memcpy() region
-  net/mlx5e: Use struct_group() for memcpy() region
-  HID: cp2112: Use struct_group() for memcpy() region
-  media: omap3isp: Use struct_group() for memcpy() region
-  sata_fsl: Use struct_group() for memcpy() region
+This allows code to avoid needing to use a sub-struct named for member
+references within the surrounding structure, but loses the benefits of
+being able to actually use such a struct, making it rather fragile. Using
+these requires open-coded calculation of sizes and offsets. The efforts
+made to avoid common mistakes include lots of comments, or adding various
+BUILD_BUG_ON()s. Such code is left with no way for the compiler to reason
+about the boundaries (e.g. the "start" object looks like it's 0 bytes
+in length), making bounds checking depend on open-coded calculations:
 
-Prepare fortify for additional hardening:
-  compiler_types.h: Remove __compiletime_object_size()
-  lib/string: Move helper functions out of string.c
-  fortify: Move remaining fortify helpers into fortify-string.h
-  fortify: Explicitly disable Clang support
-  fortify: Fix dropped strcpy() compile-time write overflow check
-  fortify: Prepare to improve strnlen() and strlen() warnings
-  fortify: Allow strlen() and strnlen() to pass compile-time known lengths
+	if (length > offsetof(struct foo, finish) -
+		     offsetof(struct foo, start))
+		return -EINVAL;
+	memcpy(&dst.start, &src.start, offsetof(struct foo, finish) -
+				       offsetof(struct foo, start));
 
-Add compile-time and run-time tests:
-  fortify: Add compile-time FORTIFY_SOURCE tests
-  lib: Introduce CONFIG_TEST_MEMCPY
+However, the vast majority of places in the kernel that operate on
+groups of members do so without any identification of the grouping,
+relying either on comments or implicit knowledge of the struct contents,
+which is even harder for the compiler to reason about, and results in
+even more fragile manual sizing, usually depending on member locations
+outside of the region (e.g. to copy "two" and "three", use the start of
+"four" to find the size):
 
-Enable new compile-time memcpy() and memmove() bounds checking:
-  fortify: Detect struct member overflows in memcpy() at compile-time
-  fortify: Detect struct member overflows in memmove() at compile-time
+	BUILD_BUG_ON((offsetof(struct foo, four) <
+		      offsetof(struct foo, two)) ||
+		     (offsetof(struct foo, four) <
+		      offsetof(struct foo, three));
+	if (length > offsetof(struct foo, four) -
+		     offsetof(struct foo, two))
+		return -EINVAL;
+	memcpy(&dst.two, &src.two, length);
 
-Clean up remaining simple compile-time memset() warnings:
-  scsi: ibmvscsi: Avoid multi-field memset() overflow by aiming at srp
+In order to have a regular programmatic way to describe a struct
+region that can be used for references and sizing, can be examined for
+bounds checking, avoids forcing the use of intermediate identifiers,
+and avoids polluting the global namespace, introduce the struct_group()
+macro. This macro wraps the member declarations to create an anonymous
+union of an anonymous struct (no intermediate name) and a named struct
+(for references and sizing):
 
-Introduce memset_after() and memset_startat() helpers and apply them
-(and struct_group()):
-  string.h: Introduce memset_after() for wiping trailing members/padding
-  xfrm: Use memset_after() to clear padding
-  ipv6: Use memset_after() to zero rt6_info
-  netfilter: conntrack: Use memset_startat() to zero struct nf_conn
-  net: 802: Use memset_startat() to clear struct fields
-  net: dccp: Use memset_startat() for TP zeroing
-  net: qede: Use memset_startat() for counters
-  mac80211: Use memset_after() to clear tx status
-  ath11k: Use memset_startat() for clearing queue descriptors
-  iw_cxgb4: Use memset_startat() for cpl_t5_pass_accept_rpl
-  intel_th: msu: Use memset_startat() for clearing hw header
-  IB/mthca: Use memset_startat() for clearing mpt_entry
-  btrfs: Use memset_startat() to clear end of struct
-  tracing: Use memset_startat() to zero struct trace_iterator
-  drbd: Use struct_group() to zero algs
-  cm4000_cs: Use struct_group() to zero struct cm4000_dev region
-  KVM: x86: Use struct_group() to zero decode cache
-  dm integrity: Use struct_group() to zero struct journal_sector
-  HID: roccat: Use struct_group() to zero kone_mouse_event
-  RDMA/mlx5: Use struct_group() to zero struct mlx5_ib_mr
-  powerpc/signal32: Use struct_group() to zero spe regs
-  ethtool: stats: Use struct_group() to clear all stats at once
-  can: flexcan: Use struct_group() to zero struct flexcan_regs regions
-  net/af_iucv: Use struct_group() to zero struct iucv_sock region
-  powerpc: Split memset() to avoid multi-field overflow
+	struct foo {
+		int one;
+		struct_group(thing,
+			int two;
+			int three, four;
+		);
+		int five;
+	};
 
-Enable new compile-time memset() bounds checking:
-  fortify: Detect struct member overflows in memset() at compile-time
+	if (length > sizeof(src.thing))
+		return -EINVAL;
+	memcpy(&dst.thing, &src.thing, length);
+	do_something(dst.three);
 
-Enable Clang support:
-  fortify: Work around Clang inlining bugs
+There are some rare cases where the resulting struct_group() needs
+attributes added, so struct_group_attr() is also introduced to allow
+for specifying struct attributes (e.g. __align(x) or __packed).
+Additionally, there are places where such declarations would like to
+have the struct be typed, so struct_group_typed() is added.
 
- arch/arm/boot/compressed/string.c             |   1 +
- arch/powerpc/include/asm/processor.h          |   6 +-
- arch/powerpc/kernel/signal_32.c               |   6 +-
- arch/s390/lib/string.c                        |   3 +
- arch/x86/boot/compressed/misc.c               |   3 +-
- arch/x86/boot/compressed/misc.h               |   2 +
- arch/x86/boot/compressed/pgtable_64.c         |   2 +
- arch/x86/kvm/emulate.c                        |   3 +-
- arch/x86/kvm/kvm_emulate.h                    |  19 +-
- arch/x86/lib/memcpy_32.c                      |   1 +
- arch/x86/lib/string_32.c                      |   1 +
- drivers/ata/sata_fsl.c                        |  10 +-
- drivers/block/drbd/drbd_main.c                |   3 +-
- drivers/block/drbd/drbd_protocol.h            |   6 +-
- drivers/block/drbd/drbd_receiver.c            |   3 +-
- drivers/char/pcmcia/cm4000_cs.c               |   9 +-
- drivers/cxl/cxl.h                             |  61 +---
- drivers/gpu/drm/amd/include/atomfirmware.h    |   9 +-
- .../drm/amd/pm/inc/smu11_driver_if_arcturus.h |   3 +-
- .../drm/amd/pm/inc/smu11_driver_if_navi10.h   |   3 +-
- .../amd/pm/inc/smu13_driver_if_aldebaran.h    |   3 +-
- .../gpu/drm/amd/pm/swsmu/smu11/arcturus_ppt.c |   6 +-
- .../gpu/drm/amd/pm/swsmu/smu11/navi10_ppt.c   |  12 +-
- .../drm/amd/pm/swsmu/smu13/aldebaran_ppt.c    |   6 +-
- drivers/gpu/drm/mga/mga_ioc32.c               |  27 +-
- drivers/hid/hid-cp2112.c                      |  14 +-
- drivers/hid/hid-roccat-kone.c                 |   2 +-
- drivers/hid/hid-roccat-kone.h                 |  12 +-
- drivers/hwtracing/intel_th/msu.c              |   4 +-
- drivers/infiniband/hw/cxgb4/cm.c              |   5 +-
- drivers/infiniband/hw/mlx5/mlx5_ib.h          |   4 +-
- drivers/infiniband/hw/mthca/mthca_mr.c        |   3 +-
- drivers/iommu/amd/init.c                      |   9 +-
- drivers/macintosh/smu.c                       |   3 +-
- drivers/md/dm-integrity.c                     |   9 +-
- drivers/media/platform/omap3isp/ispstat.c     |   5 +-
- drivers/net/can/flexcan.c                     |  68 ++--
- .../net/ethernet/broadcom/bnx2x/bnx2x_stats.c |   7 +-
- .../net/ethernet/broadcom/bnx2x/bnx2x_stats.h |  14 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |   4 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h |  14 +-
- drivers/net/ethernet/chelsio/cxgb3/sge.c      |   9 +-
- drivers/net/ethernet/chelsio/cxgb4/sge.c      |   8 +-
- drivers/net/ethernet/chelsio/cxgb4/t4_msg.h   |   2 +-
- drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h |  10 +-
- drivers/net/ethernet/chelsio/cxgb4vf/sge.c    |   7 +-
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
- .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |   4 +-
- .../net/ethernet/mellanox/mlx5/core/en_tx.c   |   2 +-
- drivers/net/ethernet/qlogic/qede/qede_main.c  |   2 +-
- drivers/net/wireguard/queueing.h              |   4 +-
- drivers/net/wireless/ath/ath11k/hal_rx.c      |  13 +-
- drivers/net/wireless/ath/carl9170/tx.c        |  11 +-
- .../net/wireless/intel/ipw2x00/libipw_rx.c    |  56 +---
- .../net/wireless/intersil/hostap/hostap_hw.c  |   5 +-
- .../wireless/intersil/hostap/hostap_wlan.h    |  14 +-
- drivers/net/wireless/intersil/p54/txrx.c      |   6 +-
- drivers/net/wireless/marvell/libertas/host.h  |  10 +-
- drivers/net/wireless/marvell/libertas/tx.c    |   5 +-
- .../marvell/libertas_tf/libertas_tf.h         |  10 +-
- .../net/wireless/marvell/libertas_tf/main.c   |   3 +-
- drivers/net/wireless/marvell/mwl8k.c          |  10 +-
- drivers/net/wireless/ray_cs.c                 |   4 +-
- drivers/rpmsg/qcom_glink_native.c             |   2 +-
- drivers/scsi/ibmvscsi/ibmvscsi.c              |   3 +-
- drivers/staging/wlan-ng/hfa384x.h             |  16 +-
- drivers/staging/wlan-ng/hfa384x_usb.c         |   4 +-
- .../intel/int340x_thermal/acpi_thermal_rel.c  |   5 +-
- .../intel/int340x_thermal/acpi_thermal_rel.h  |  48 +--
- fs/btrfs/root-tree.c                          |   6 +-
- include/linux/compiler-gcc.h                  |   2 -
- include/linux/compiler_types.h                |   4 -
- include/linux/fortify-string.h                | 308 +++++++++++++-----
- include/linux/if_vlan.h                       |   6 +-
- include/linux/skbuff.h                        |   9 +-
- include/linux/stddef.h                        |  47 +++
- include/linux/string.h                        |  43 ++-
- include/linux/thread_info.h                   |   2 +-
- include/net/iucv/af_iucv.h                    |  10 +-
- include/net/mac80211.h                        |   7 +-
- include/uapi/drm/mga_drm.h                    |  22 +-
- include/uapi/linux/omap3isp.h                 |  21 +-
- include/uapi/linux/stddef.h                   |  21 ++
- kernel/trace/trace.c                          |   4 +-
- lib/.gitignore                                |   2 +
- lib/Kconfig.debug                             |   7 +
- lib/Makefile                                  |  35 ++
- lib/string.c                                  | 210 +-----------
- lib/string_helpers.c                          | 201 ++++++++++++
- lib/test_fortify/read_overflow-memchr.c       |   5 +
- lib/test_fortify/read_overflow-memchr_inv.c   |   5 +
- lib/test_fortify/read_overflow-memcmp.c       |   5 +
- lib/test_fortify/read_overflow-memscan.c      |   5 +
- lib/test_fortify/read_overflow2-memcmp.c      |   5 +
- lib/test_fortify/read_overflow2-memcpy.c      |   5 +
- lib/test_fortify/read_overflow2-memmove.c     |   5 +
- .../read_overflow2_field-memcpy.c             |   5 +
- .../read_overflow2_field-memmove.c            |   5 +
- lib/test_fortify/test_fortify.h               |  35 ++
- lib/test_fortify/write_overflow-memcpy.c      |   5 +
- lib/test_fortify/write_overflow-memmove.c     |   5 +
- lib/test_fortify/write_overflow-memset.c      |   5 +
- lib/test_fortify/write_overflow-strcpy-lit.c  |   5 +
- lib/test_fortify/write_overflow-strcpy.c      |   5 +
- lib/test_fortify/write_overflow-strlcpy-src.c |   5 +
- lib/test_fortify/write_overflow-strlcpy.c     |   5 +
- lib/test_fortify/write_overflow-strncpy-src.c |   5 +
- lib/test_fortify/write_overflow-strncpy.c     |   5 +
- lib/test_fortify/write_overflow-strscpy.c     |   5 +
- .../write_overflow_field-memcpy.c             |   5 +
- .../write_overflow_field-memmove.c            |   5 +
- .../write_overflow_field-memset.c             |   5 +
- lib/test_memcpy.c                             | 288 ++++++++++++++++
- net/802/hippi.c                               |   2 +-
- net/core/skbuff.c                             |  14 +-
- net/dccp/trace.h                              |   4 +-
- net/ethtool/stats.c                           |  15 +-
- net/ipv6/route.c                              |   4 +-
- net/iucv/af_iucv.c                            |   2 +-
- net/netfilter/nf_conntrack_core.c             |   4 +-
- net/xfrm/xfrm_policy.c                        |   4 +-
- net/xfrm/xfrm_user.c                          |   2 +-
- scripts/test_fortify.sh                       |  59 ++++
- security/Kconfig                              |   3 +
- 124 files changed, 1489 insertions(+), 686 deletions(-)
- create mode 100644 lib/test_fortify/read_overflow-memchr.c
- create mode 100644 lib/test_fortify/read_overflow-memchr_inv.c
- create mode 100644 lib/test_fortify/read_overflow-memcmp.c
- create mode 100644 lib/test_fortify/read_overflow-memscan.c
- create mode 100644 lib/test_fortify/read_overflow2-memcmp.c
- create mode 100644 lib/test_fortify/read_overflow2-memcpy.c
- create mode 100644 lib/test_fortify/read_overflow2-memmove.c
- create mode 100644 lib/test_fortify/read_overflow2_field-memcpy.c
- create mode 100644 lib/test_fortify/read_overflow2_field-memmove.c
- create mode 100644 lib/test_fortify/test_fortify.h
- create mode 100644 lib/test_fortify/write_overflow-memcpy.c
- create mode 100644 lib/test_fortify/write_overflow-memmove.c
- create mode 100644 lib/test_fortify/write_overflow-memset.c
- create mode 100644 lib/test_fortify/write_overflow-strcpy-lit.c
- create mode 100644 lib/test_fortify/write_overflow-strcpy.c
- create mode 100644 lib/test_fortify/write_overflow-strlcpy-src.c
- create mode 100644 lib/test_fortify/write_overflow-strlcpy.c
- create mode 100644 lib/test_fortify/write_overflow-strncpy-src.c
- create mode 100644 lib/test_fortify/write_overflow-strncpy.c
- create mode 100644 lib/test_fortify/write_overflow-strscpy.c
- create mode 100644 lib/test_fortify/write_overflow_field-memcpy.c
- create mode 100644 lib/test_fortify/write_overflow_field-memmove.c
- create mode 100644 lib/test_fortify/write_overflow_field-memset.c
- create mode 100644 lib/test_memcpy.c
- create mode 100644 scripts/test_fortify.sh
+Given there is a need for a handful of UAPI uses too, the underlying
+__struct_group() macro has been defined in UAPI so it can be used there
+too.
 
+Co-developed-by: Keith Packard <keithp@keithp.com>
+Signed-off-by: Keith Packard <keithp@keithp.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Link: https://lore.kernel.org/lkml/20210728023217.GC35706@embeddedor
+Enhanced-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Link: https://lore.kernel.org/lkml/41183a98-bdb9-4ad6-7eab-5a7292a6df84@rasmusvillemoes.dk
+Enhanced-by: Dan Williams <dan.j.williams@intel.com>
+Link: https://lore.kernel.org/lkml/1d9a2e6df2a9a35b2cdd50a9a68cac5991e7e5f0.camel@intel.com
+Enhanced-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+Link: https://lore.kernel.org/lkml/YQKa76A6XuFqgM03@phenom.ffwll.local
+---
+ include/linux/stddef.h      | 47 +++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/stddef.h | 21 +++++++++++++++++
+ 2 files changed, 68 insertions(+)
+
+diff --git a/include/linux/stddef.h b/include/linux/stddef.h
+index 998a4ba28eba..f2aefdb22d1d 100644
+--- a/include/linux/stddef.h
++++ b/include/linux/stddef.h
+@@ -36,4 +36,51 @@ enum {
+ #define offsetofend(TYPE, MEMBER) \
+ 	(offsetof(TYPE, MEMBER)	+ sizeof_field(TYPE, MEMBER))
+ 
++/**
++ * struct_group(NAME, MEMBERS)
++ *
++ * Used to create an anonymous union of two structs with identical
++ * layout and size: one anonymous and one named. The former can be
++ * used normally without sub-struct naming, and the latter can be
++ * used to reason about the start, end, and size of the group of
++ * struct members.
++ *
++ * @NAME: The identifier name of the mirrored sub-struct
++ * @MEMBERS: The member declarations for the mirrored structs
++ */
++#define struct_group(NAME, MEMBERS...)	\
++	__struct_group(/* no tag */, NAME, /* no attrs */, MEMBERS)
++
++/**
++ * struct_group_attr(NAME, ATTRS, MEMBERS)
++ *
++ * Used to create an anonymous union of two structs with identical
++ * layout and size: one anonymous and one named. The former can be
++ * used normally without sub-struct naming, and the latter can be
++ * used to reason about the start, end, and size of the group of
++ * struct members. Includes structure attributes argument.
++ *
++ * @NAME: The identifier name of the mirrored sub-struct
++ * @ATTRS: Any struct attributes
++ * @MEMBERS: The member declarations for the mirrored structs
++ */
++#define struct_group_attr(NAME, ATTRS, MEMBERS...) \
++	__struct_group(/* no tag */, NAME, ATTRS, MEMBERS)
++
++/**
++ * struct_group_tagged(TAG, NAME, MEMBERS)
++ *
++ * Used to create an anonymous union of two structs with identical
++ * layout and size: one anonymous and one named. The former can be
++ * used normally without sub-struct naming, and the latter can be
++ * used to reason about the start, end, and size of the group of
++ * struct members. Includes struct tag argument for the named copy.
++ *
++ * @TAG: The tag name for the named sub-struct
++ * @NAME: The identifier name of the mirrored sub-struct
++ * @MEMBERS: The member declarations for the mirrored structs
++ */
++#define struct_group_tagged(TAG, NAME, MEMBERS...) \
++	__struct_group(TAG, NAME, /* no attrs */, MEMBERS)
++
+ #endif
+diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
+index ee8220f8dcf5..0fbdf2f711aa 100644
+--- a/include/uapi/linux/stddef.h
++++ b/include/uapi/linux/stddef.h
+@@ -4,3 +4,24 @@
+ #ifndef __always_inline
+ #define __always_inline inline
+ #endif
++
++/**
++ * __struct_group(TAG, NAME, ATTRS, MEMBERS)
++ *
++ * Used to create an anonymous union of two structs with identical layout
++ * and size: one anonymous and one named. The former's members can be used
++ * normally without sub-struct naming, and the latter can be used to
++ * reason about the start, end, and size of the group of struct members.
++ * The named struct can also be explicitly tagged, as well as both having
++ * struct attributes.
++ *
++ * @TAG: The tag name for the named sub-struct (usually empty)
++ * @NAME: The identifier name of the mirrored sub-struct
++ * @ATTRS: Any struct attributes (usually empty)
++ * @MEMBERS: The member declarations for the mirrored structs
++ */
++#define __struct_group(TAG, NAME, ATTRS, MEMBERS...) \
++	union { \
++		struct { MEMBERS } ATTRS; \
++		struct TAG { MEMBERS } ATTRS NAME; \
++	}
 -- 
 2.30.2
 
