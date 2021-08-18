@@ -2,132 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52F0C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1580EC4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:50:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BECEA60F11
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB6816108F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238116AbhHRGhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:37:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237981AbhHRGhX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:37:23 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F4BC061764
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:36:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=FXmTMF6Ajh70k0duCWm0jFiKANkPK/mgbhge+anQB8U=; b=AyDStgbo3Wg90sV+CuhwoX0jeQ
-        Dj7QnuifN+rI6qt9MLD2vYF/shSBkMYwnE0CATzfq5Vw+9GjFJyYme1gr3zpVMqZtM5MJOQJxtGix
-        45s01yGVl1OZ0WnBykc29PWZTInH5hjf5UCHdky/A3UysN2sHcAujxatI62TbsnWUg7zlqJCncWmt
-        yrk5MHZyxXXcSQpQwS8zGy7cTJk8LoV2t9Skm00TzgjobOfESB/NeRzYE+afMuZ1t6QpXPMDZnMQU
-        4KcePiMj57DKNg/w5dAp7IUFoLf0sY+zBOEji0p5z3m0969E8WdkqolnBBbAKBtTC3CewUMmjUJcO
-        VAuLWs0g==;
-Received: from 213-225-12-39.nat.highway.a1.net ([213.225.12.39] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mGF9p-003Rmb-10; Wed, 18 Aug 2021 06:34:46 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Hillf Danton <hdanton@sina.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 7/7] loop: avoid holding loop_ctl_mutex over add_disk
-Date:   Wed, 18 Aug 2021 08:24:55 +0200
-Message-Id: <20210818062455.211065-8-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210818062455.211065-1-hch@lst.de>
-References: <20210818062455.211065-1-hch@lst.de>
+        id S238093AbhHRGuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:50:52 -0400
+Received: from pegase2.c-s.fr ([93.17.235.10]:34005 "EHLO pegase2.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238515AbhHRGuw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 02:50:52 -0400
+X-Greylist: delayed 475 seconds by postgrey-1.27 at vger.kernel.org; Wed, 18 Aug 2021 02:50:51 EDT
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+        by localhost (Postfix) with ESMTP id 4GqJH06ckGz9sVX;
+        Wed, 18 Aug 2021 08:42:20 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id BlboCUcmPLhC; Wed, 18 Aug 2021 08:42:20 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase2.c-s.fr (Postfix) with ESMTP id 4GqJH05SCXz9sVD;
+        Wed, 18 Aug 2021 08:42:20 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 9988E8B7D3;
+        Wed, 18 Aug 2021 08:42:20 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id KISUn5YdRZul; Wed, 18 Aug 2021 08:42:20 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id B20628B766;
+        Wed, 18 Aug 2021 08:42:19 +0200 (CEST)
+Subject: Re: [PATCH v2 61/63] powerpc: Split memset() to avoid multi-field
+ overflow
+To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
+Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wang Wensheng <wangwensheng4@huawei.com>,
+        linux-staging@lists.linux.dev, linux-wireless@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>,
+        linux-block@vger.kernel.org, Hulk Robot <hulkci@huawei.com>,
+        clang-built-linux@googlegroups.com, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-62-keescook@chromium.org>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Message-ID: <7630b0bc-4389-6283-d8b9-c532df916d60@csgroup.eu>
+Date:   Wed, 18 Aug 2021 08:42:18 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
+In-Reply-To: <20210818060533.3569517-62-keescook@chromium.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To avoid complex lock ordering issues loop_ctl_mutex should not
-be held over add_disk.  Add a new Lo_new state for a loop device
-that has just been created but which is not live yet.
 
-Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 16 ++++++++++++----
- drivers/block/loop.h |  1 +
- 2 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 043673bda8b3..80f462edc39f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2329,7 +2329,7 @@ static int loop_add(int i)
- 	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
- 	if (!lo)
- 		goto out;
--	lo->lo_state = Lo_unbound;
-+	lo->lo_state = Lo_new;
- 
- 	err = mutex_lock_killable(&loop_ctl_mutex);
- 	if (err)
-@@ -2343,8 +2343,9 @@ static int loop_add(int i)
- 	} else {
- 		err = idr_alloc(&loop_index_idr, lo, 0, 0, GFP_KERNEL);
- 	}
-+	mutex_unlock(&loop_ctl_mutex);
- 	if (err < 0)
--		goto out_unlock;
-+		goto out_free_dev;
- 	i = err;
- 
- 	err = -ENOMEM;
-@@ -2414,15 +2415,22 @@ static int loop_add(int i)
- 	disk->event_flags	= DISK_EVENT_FLAG_UEVENT;
- 	sprintf(disk->disk_name, "loop%d", i);
- 	add_disk(disk);
-+
-+	err = mutex_lock_killable(&loop_ctl_mutex);
-+	if (err)
-+		goto out_del_gendisk;
-+	lo->lo_state = Lo_unbound;
- 	mutex_unlock(&loop_ctl_mutex);
-+
- 	return i;
- 
-+out_del_gendisk:
-+	del_gendisk(lo->lo_disk);
-+	blk_cleanup_disk(lo->lo_disk);
- out_cleanup_tags:
- 	blk_mq_free_tag_set(&lo->tag_set);
- out_free_idr:
- 	idr_remove(&loop_index_idr, i);
--out_unlock:
--	mutex_unlock(&loop_ctl_mutex);
- out_free_dev:
- 	kfree(lo);
- out:
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index d14ce6bdc014..608a20c23c64 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -24,6 +24,7 @@ enum {
- 	Lo_bound,
- 	Lo_rundown,
- 	Lo_deleting,
-+	Lo_new,
- };
- 
- struct loop_func_table;
--- 
-2.30.2
+Le 18/08/2021 à 08:05, Kees Cook a écrit :
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memset(), avoid intentionally writing across
+> neighboring fields.
+> 
+> Instead of writing across a field boundary with memset(), move the call
+> to just the array, and an explicit zeroing of the prior field.
+> 
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Qinglang Miao <miaoqinglang@huawei.com>
+> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+> Cc: Hulk Robot <hulkci@huawei.com>
+> Cc: Wang Wensheng <wangwensheng4@huawei.com>
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Michael Ellerman <mpe@ellerman.id.au>
+> Link: https://lore.kernel.org/lkml/87czqsnmw9.fsf@mpe.ellerman.id.au
+> ---
+>   drivers/macintosh/smu.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/macintosh/smu.c b/drivers/macintosh/smu.c
+> index 94fb63a7b357..59ce431da7ef 100644
+> --- a/drivers/macintosh/smu.c
+> +++ b/drivers/macintosh/smu.c
+> @@ -848,7 +848,8 @@ int smu_queue_i2c(struct smu_i2c_cmd *cmd)
+>   	cmd->read = cmd->info.devaddr & 0x01;
+>   	switch(cmd->info.type) {
+>   	case SMU_I2C_TRANSFER_SIMPLE:
+> -		memset(&cmd->info.sublen, 0, 4);
+> +		cmd->info.sublen = 0;
+> +		memset(&cmd->info.subaddr, 0, 3);
 
+subaddr[] is a table, should the & be avoided ?
+And while at it, why not use sizeof(subaddr) instead of 3 ?
+
+
+>   		break;
+>   	case SMU_I2C_TRANSFER_COMBINED:
+>   		cmd->info.devaddr &= 0xfe;
+> 
