@@ -2,223 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 650B0C4320E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 530D7C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:21:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 449B3610FD
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:17:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38CA7610A6
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:21:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231218AbhHRQSZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 12:18:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43382 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229517AbhHRQSZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 12:18:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8EDA6610A5;
-        Wed, 18 Aug 2021 16:17:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629303470;
-        bh=KPxieBci0vXg8rmYUy2so8SGtGACKhwfHUnpqQywB2U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YuZGxSb/qbJrnZ105zWsST1nzc3m5MixjmBIDb4Cqpf+Tw8XhntQlWVGRMwhIoXA7
-         PTtnTQEfAVvrGpcExRjt1ERSU8HOof1WS87z7lpzbE0XvNK4dmam1hUQ3Cb5tmEtl4
-         LQdsyFAHM06VRTXPscO6q5RGPRNYJ/p7auy1fidt0ulyrYV7J2rObWzPJh2wayByhW
-         dD+K4DCpaPYtgRQUC0W7yQJz5RhyNsOdzq4PlthfwTFNMccSyBzUQf5XqVN5Xpf+0R
-         eu2xlTZQILiBAamLWqT4orjL/dDPccR6l4KllQOYQis8vh+mMut2C5ziIwpIkHE3eK
-         usfw3LYHare6w==
-Date:   Wed, 18 Aug 2021 09:17:50 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Nitesh Shetty <nitheshshetty@gmail.com>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
-        asml.silence@gmail.com, johannes.thumshirn@wdc.com, hch@lst.de,
-        willy@infradead.org, kch@kernel.org, martin.petersen@oracle.com,
-        mpatocka@redhat.com, bvanassche@acm.org, snitzer@redhat.com,
-        agk@redhat.com, selvajove@gmail.com, joshiiitr@gmail.com,
-        nj.shetty@samsung.com, joshi.k@samsung.com, javier.gonz@samsung.com
-Subject: Re: [PATCH 4/7] block: Introduce a new ioctl for simple copy
-Message-ID: <20210818161750.GF12664@magnolia>
-References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
- <CGME20210817101803epcas5p10cda1d52f8a8f1172e34b1f9cf8eef3b@epcas5p1.samsung.com>
- <20210817101423.12367-5-selvakuma.s1@samsung.com>
- <20210817233613.GA12597@magnolia>
- <CAOSviJ2+deUdDXTWbWXaSxNX2t6cnhPg7KCDA4C2qm74KD9vdQ@mail.gmail.com>
+        id S231143AbhHRQWA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 12:22:00 -0400
+Received: from mail-io1-f52.google.com ([209.85.166.52]:34368 "EHLO
+        mail-io1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230335AbhHRQV7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 12:21:59 -0400
+Received: by mail-io1-f52.google.com with SMTP id i7so3616684iow.1;
+        Wed, 18 Aug 2021 09:21:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=g0gC+WjafyAckvmR2jgKWhTEEwfe3iTWJAbJzTBop3Y=;
+        b=qaNnVTTenGBBwVQYiZNGKQxtSYeD0voImZtowRcvA1K82JCxDKiG/lZPpLwmp8uT8p
+         zm4TgmXmYlR7zIJzq+99nPaWxD1Bfhbj+HhWTkay4q683d2vzptvnJtez0/LmTaXNJFM
+         SvCOaxR1IaFxbvcTU3bUSZSe4EPLYmFX1Dj6ra0xt1CnXDg5Uik9lgXGf5zpYLcPg0lz
+         oCxk+WyU7uoQode0jNBZ8oNh/nwze6mh0mmffVrqXp6q9xflIzS5Ssw9syWdvamRDx0v
+         FBS7gbAOThjwTnSINl1WT8st71RionMTFJCu/g6BARVOKyd72Tqlwvldi+Sl9zUOUlKg
+         Myig==
+X-Gm-Message-State: AOAM532nqalWE3iz9olvaAu+eYqSTilGf1/rVQ7o3NPTSFG0QlpqrOTu
+        g2/bwSCTcv//hQxjL2IbWbE=
+X-Google-Smtp-Source: ABdhPJxyCAXZZk17cmWbI2Hyif0mg+efhnTUqCkpRprycPO3ktyBAjtCIokfL8Wbv8TNGNohwm0Oww==
+X-Received: by 2002:a05:6638:2613:: with SMTP id m19mr6725966jat.11.1629303683988;
+        Wed, 18 Aug 2021 09:21:23 -0700 (PDT)
+Received: from [10.68.32.40] (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.gmail.com with ESMTPSA id a11sm63956ilf.79.2021.08.18.09.21.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 09:21:23 -0700 (PDT)
+Subject: Re: [RFC PATCH 1/5] checkpatch: improve handling of revert commits
+To:     Joe Perches <joe@perches.com>, linux-kselftest@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Jiri Kosina <jkosina@suse.cz>,
+        Willy Tarreau <w@1wt.eu>
+References: <20210818154646.925351-1-efremov@linux.com>
+ <20210818154646.925351-2-efremov@linux.com>
+ <cc5801790fea258e20fa6b7e26de7806ae8e0dda.camel@perches.com>
+From:   Denis Efremov <efremov@linux.com>
+Message-ID: <3d347d4b-1576-754f-8633-ba6084cc0661@linux.com>
+Date:   Wed, 18 Aug 2021 19:21:19 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOSviJ2+deUdDXTWbWXaSxNX2t6cnhPg7KCDA4C2qm74KD9vdQ@mail.gmail.com>
+In-Reply-To: <cc5801790fea258e20fa6b7e26de7806ae8e0dda.camel@perches.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 09:07:54PM +0530, Nitesh Shetty wrote:
-> On Wed, Aug 18, 2021 at 5:06 AM Darrick J. Wong <djwong@kernel.org> wrote:
-> >
-> > On Tue, Aug 17, 2021 at 03:44:20PM +0530, SelvaKumar S wrote:
-> > > From: Nitesh Shetty <nj.shetty@samsung.com>
-> > >
-> > > Add new BLKCOPY ioctl that offloads copying of one or more sources ranges
-> > > to a destination in the device. COPY ioctl accepts a 'copy_range'
-> > > structure that contains destination (in sectors), no of sources and
-> > > pointer to the array of source ranges. Each source range is represented by
-> > > 'range_entry' that contains start and length of source ranges (in sectors)
-> > >
-> > > MAX_COPY_NR_RANGE, limits the number of entries for the IOCTL and
-> > > MAX_COPY_TOTAL_LENGTH limits the total copy length, IOCTL can handle.
-> > >
-> > > Example code, to issue BLKCOPY:
-> > > /* Sample example to copy three source-ranges [0, 8] [16, 8] [32,8] to
-> > >  * [64,24], on the same device */
-> > >
-> > > int main(void)
-> > > {
-> > >       int ret, fd;
-> > >       struct range_entry source_range[] = {{.src = 0, .len = 8},
-> > >               {.src = 16, .len = 8}, {.src = 32, .len = 8},};
-> > >       struct copy_range cr;
-> > >
-> > >       cr.dest = 64;
-> > >       cr.nr_range = 3;
-> > >       cr.range_list = (__u64)&source_range;
-> > >
-> > >       fd = open("/dev/nvme0n1", O_RDWR);
-> > >       if (fd < 0) return 1;
-> > >
-> > >       ret = ioctl(fd, BLKCOPY, &cr);
-> > >       if (ret < 0) printf("copy failure\n");
-> > >
-> > >       close(fd);
-> > >
-> > >       return ret;
-> > > }
-> > >
-> > > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> > > Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
-> > > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> > > ---
-> > >  block/ioctl.c           | 33 +++++++++++++++++++++++++++++++++
-> > >  include/uapi/linux/fs.h |  8 ++++++++
-> > >  2 files changed, 41 insertions(+)
-> > >
-> > > diff --git a/block/ioctl.c b/block/ioctl.c
-> > > index eb0491e90b9a..2af56d01e9fe 100644
-> > > --- a/block/ioctl.c
-> > > +++ b/block/ioctl.c
-> > > @@ -143,6 +143,37 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
-> > >                                   GFP_KERNEL, flags);
-> > >  }
-> > >
-> > > +static int blk_ioctl_copy(struct block_device *bdev, fmode_t mode,
-> > > +             unsigned long arg)
-> > > +{
-> > > +     struct copy_range crange;
-> > > +     struct range_entry *rlist;
-> > > +     int ret;
-> > > +
-> > > +     if (!(mode & FMODE_WRITE))
-> > > +             return -EBADF;
-> > > +
-> > > +     if (copy_from_user(&crange, (void __user *)arg, sizeof(crange)))
-> > > +             return -EFAULT;
-> > > +
-> > > +     rlist = kmalloc_array(crange.nr_range, sizeof(*rlist),
-> > > +                     GFP_KERNEL);
-> > > +     if (!rlist)
-> > > +             return -ENOMEM;
-> > > +
-> > > +     if (copy_from_user(rlist, (void __user *)crange.range_list,
-> > > +                             sizeof(*rlist) * crange.nr_range)) {
-> > > +             ret = -EFAULT;
-> > > +             goto out;
-> > > +     }
-> > > +
-> > > +     ret = blkdev_issue_copy(bdev, crange.nr_range, rlist, bdev, crange.dest,
-> > > +                     GFP_KERNEL, 0);
-> > > +out:
-> > > +     kfree(rlist);
-> > > +     return ret;
-> > > +}
-> > > +
-> > >  static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
-> > >               unsigned long arg)
-> > >  {
-> > > @@ -468,6 +499,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
-> > >       case BLKSECDISCARD:
-> > >               return blk_ioctl_discard(bdev, mode, arg,
-> > >                               BLKDEV_DISCARD_SECURE);
-> > > +     case BLKCOPY:
-> > > +             return blk_ioctl_copy(bdev, mode, arg);
-> > >       case BLKZEROOUT:
-> > >               return blk_ioctl_zeroout(bdev, mode, arg);
-> > >       case BLKGETDISKSEQ:
-> > > diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> > > index 7a97b588d892..4183688ff398 100644
-> > > --- a/include/uapi/linux/fs.h
-> > > +++ b/include/uapi/linux/fs.h
-> > > @@ -76,6 +76,13 @@ struct range_entry {
-> > >       __u64 len;
-> > >  };
-> > >
-> > > +struct copy_range {
-> > > +     __u64 dest;
-> > > +     __u64 nr_range;
-> >
-> > If the maximum number of elements in the range list is 1<<12, there's no
-> > need for this to be larger than a u16, right?
-> >
-> > > +     __u64 range_list;
-> >
-> > Pointers embedded in a structure are /not/ a good idea, because this
-> > will create a lot of compatibility headaches for 32-bit binaries running
-> > on 64-bit kernels.  Please just make the size of this header structure
-> > a multiple of 8 bytes and put the range_entry list immediately after it.
-> >
-> > struct copy_range {
-> >         __s64 dest_offset;
-> >         __u32 nr_range_entries;
-> >         __u32 flags;
-> >         __u64 reserved[2];
-> > };
-> >
-> > struct __user range_entry *re = ((struct range_entry *)(copyhead + 1));
-> >
-> > copy_from_user(&urk, re...);
-> >
-> > --D
-> >
-> Thanks, this is better. 'Reserved' field was there to be used for
-> future extension of the interface.
-> Now that you mentioned 'flags', it seems we can do away with
-> 'reserved' fields altogether?
 
-We still want the reserved-must-be-zero fields so that adding the first
-field or two doesn't require changes to the pointer arithmetic.
 
-Also, I suppose you could make the relationship between copy_range and
-range_entry more explicit:
-
-struct copy_range {
-        __s64 dest_offset;
-        __u32 nr_range_entries;
-        __u32 flags;
-        __u64 reserved[2];
-
-	/* must come last */
-	struct range_entry entries[];
-};
-
-struct __user range_entry *re = &copyhead->entries[0];
-
---D
-
+On 8/18/21 7:00 PM, Joe Perches wrote:
+> On Wed, 2021-08-18 at 18:46 +0300, Denis Efremov wrote:
+>> Properly handle commits like:
+>> commit f2791e7eadf4 ("Revert "floppy: refactor open() flags handling"")
 > 
-> Regards,
-> Nitesh Shetty
+> Try this one:
+> 
+> https://lore.kernel.org/lkml/7f55d9d0369f1ea840fab83eeb77f9f3601fee41.camel@perches.com/
+> 
+
+It works but why not to use .+? then?
+I'm not sure that non-greedy patterns will properly handle commits like:
+$ git log --oneline | fgrep '")'
+
+e.g. 
+commit ece2619fe8ed ("extcon: arizona: Fix flags parameter to the gpiod_get("wlf,micd-pol") call")
+
+
+>>
+>> Cc: Joe Perches <joe@perches.com>
+>> Signed-off-by: Denis Efremov <efremov@linux.com>
+>> ---
+>>  scripts/checkpatch.pl | 12 ++++++------
+>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+>> index 461d4221e4a4..cf31e8c994d3 100755
+>> --- a/scripts/checkpatch.pl
+>> +++ b/scripts/checkpatch.pl
+>> @@ -3200,20 +3200,20 @@ sub process {
+>>  			$long = 1 if ($line =~ /\bcommit\s+[0-9a-f]{41,}/i);
+>>  			$space = 0 if ($line =~ /\bcommit [0-9a-f]/i);
+>>  			$case = 0 if ($line =~ /\b[Cc]ommit\s+[0-9a-f]{5,40}[^A-F]/);
+>> -			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)"\)/i) {
+>> +			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("(.+)"\)/i) {
+>>  				$orig_desc = $1;
+>>  				$hasparens = 1;
+>>  			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s*$/i &&
+>>  				 defined $rawlines[$linenr] &&
+>> -				 $rawlines[$linenr] =~ /^\s*\("([^"]+)"\)/) {
+>> +				 $rawlines[$linenr] =~ /^\s*\("(.+)"\)/) {
+>>  				$orig_desc = $1;
+>>  				$hasparens = 1;
+>> -			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("[^"]+$/i &&
+>> +			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\(".+$/i &&
+>>  				 defined $rawlines[$linenr] &&
+>> -				 $rawlines[$linenr] =~ /^\s*[^"]+"\)/) {
+>> -				$line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)$/i;
+>> +				 $rawlines[$linenr] =~ /^\s*.+"\)/) {
+>> +				$line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("(.+)$/i;
+>>  				$orig_desc = $1;
+>> -				$rawlines[$linenr] =~ /^\s*([^"]+)"\)/;
+>> +				$rawlines[$linenr] =~ /^\s*(.+)"\)/;
+>>  				$orig_desc .= " " . $1;
+>>  				$hasparens = 1;
+>>  			}
+> 
