@@ -8,173 +8,150 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F67C19F37
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C309BC4338F
 	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:06:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE8A7610E8
+	by mail.kernel.org (Postfix) with ESMTP id A4FE06108F
 	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:06:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238366AbhHRGHR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:07:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44324 "EHLO
+        id S238304AbhHRGHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:07:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238093AbhHRGGg (ORCPT
+        with ESMTP id S238280AbhHRGGg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 18 Aug 2021 02:06:36 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A97C0611C2
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:55 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id u1so1163213plr.1
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:55 -0700 (PDT)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13208C0611C6
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:56 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id f3so1150921plg.3
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=AvplAjAyy7Xo+ijXhvo31OZi4yHKm9FY1a+n2JGpi4g=;
-        b=NeXzORZmOiduwjDAC0+j3ijPK837yd7AOHICtcf8M5fH8xvkQaB+Uf/aJua6kMoa7W
-         1vXTWMRBK40BOeZtiWp1NgAe4zigCd52vkBHJFcstCUi0JREIRyq+cWP2cxIfpt3Py5d
-         YQECpl2DUZNSwXCNLd5C5w9uHmFHklnzQCqEg=
+        bh=gUjXHriNI60ZMiX98O41J0RBUaJAOzuxCN136yOtJx8=;
+        b=PFR7uYpP3VrpE4Zr8VMf97aLHDhHs7MCH87WL+gpOmTOK1WCgqayKERpAzNjnF+s4i
+         9ajmen1yXG+vpJNm8m9nhLHe3xml94z7vjPinj8nzZWRd+UvkObZQmTbKhHOgjie9KGY
+         GwGNjjyCQL5UCD3lxRE1kWmJhtmjWT2CNQkZk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=AvplAjAyy7Xo+ijXhvo31OZi4yHKm9FY1a+n2JGpi4g=;
-        b=JcOYzV3YQ+fxu8qwWgFHulQBcZ9fY29Z5bhrnzp4tIeKadROWNvxTR6MDZvv5uRgnR
-         pRfKlYtejJcxbCSv4oEb5CG1w15lLBqWHljupA1/7Vn1nUWOqvq7dmgiakZqJP4SbHEM
-         qhD/3wacLxq2ZA8SJYGYLGzCLSr/vxh2XT6C0TkFdMlOUj5/szh93ujQ5yykERe2ykLs
-         anBgVY1pJ0bOF8zgS+fSxEZGlT19Bg4LqSVFXpyh1XKT5zGPUXGyBN8InjSS49VxK3ek
-         0v0pLqA+Dokr6zEryJ04BqxosuStMaJfPhccaGxQLSleHDcC59+vpvGFWnD21E+YDpi8
-         /kVQ==
-X-Gm-Message-State: AOAM531LZsUKMVFLiUB81gtSyylhsFLhRTismyAYWpbYlHcT/hV1zFYR
-        WBIIECoiyaU0A0/7K249OYmjEA==
-X-Google-Smtp-Source: ABdhPJxY62Rs0zD7LqgByaLcYUzxicRfdtBpOOnXndlcdy7gi8jpEy7wbHdOuHGHf2lbmjFtmXZneg==
-X-Received: by 2002:a17:902:e84f:b0:12d:c616:a402 with SMTP id t15-20020a170902e84f00b0012dc616a402mr5833254plg.77.1629266755373;
+        bh=gUjXHriNI60ZMiX98O41J0RBUaJAOzuxCN136yOtJx8=;
+        b=NAmu5DoIGGrQt2OebEy5qBrQ/SMWqz1m+bxu2LL0KhVtlCVFwON4LvWkJMsr+IyHB8
+         TzY7j+5pAYUJVZwCL+g/2dnuxLJaV6Kz+VNtq1lVaMh4x2oFXGA0jMIMoLzWYmSRX+fH
+         27arxG/W0iFc+uz2EbqlmXD6BQONcqDq0QU/gu5mNSAmm6W0powZDuaNeLeS32iSFHsL
+         dC9w9kaJIHO9yQhOQNPrN2BZN6BZGaIdUBip/dMn4WS3H18N5+VxlJ5h2C3e6z+hLNWK
+         pydnQsosxTaH/gCHTRDwJcGjF5rCO7FrUw/nAKcekaYNnb9XJtAeoFLK0WgHNpjJr9qF
+         Q5hA==
+X-Gm-Message-State: AOAM533AhZKB0gtdTNLwny5o5uRvxSr6Kf9DwphtQYuvl7BESWRdN4dL
+        U5OFz0hiALyY7TguNFoTsrtVfQ==
+X-Google-Smtp-Source: ABdhPJx12eVE2s9aJqrT8X6wYbgyP7wX5Q41/S0rPW3qXiQMC3iYutyI7oCSghqi1s9SYy0llSUR8w==
+X-Received: by 2002:a17:90b:11c2:: with SMTP id gv2mr3328920pjb.227.1629266755654;
         Tue, 17 Aug 2021 23:05:55 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id y67sm4550662pfg.218.2021.08.17.23.05.52
+        by smtp.gmail.com with ESMTPSA id p34sm4534140pfh.172.2021.08.17.23.05.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:05:53 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        linux-cxl@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Michael Chan <michael.chan@broadcom.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
+        linux-wireless@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 06/63] cxl/core: Replace unions with struct_group()
-Date:   Tue, 17 Aug 2021 23:04:36 -0700
-Message-Id: <20210818060533.3569517-7-keescook@chromium.org>
+Subject: [PATCH v2 08/63] bnxt_en: Use struct_group_attr() for memcpy() region
+Date:   Tue, 17 Aug 2021 23:04:38 -0700
+Message-Id: <20210818060533.3569517-9-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2984; h=from:subject; bh=gH2l7MUrimYDJJHL5/kGu3UEiSd7agDYsUtnIqIDLGg=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMfFeE+SAeXV7TlGs5W5Dan0qJQ1dt63HKDzfHG juo8T9CJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjHwAKCRCJcvTf3G3AJlH/EA CnsBzSF5pyrctJZ6ieH+8X8zUFVzCAy3+BR6FX4EgEQJkJRkPWwnEynE2qGmzAQmsEHsp55I/GrJX4 JR1eEWAvgU7ZjlCsPIcv1hCYd1m27MgsvOjeZZPQo8r02lm4PTiaybJvP6THoSxUoZ7x7i+BLdqnLN CJ2Tai+1QWBg/z5BfgXsolu04ACMdQY4zZdNixxfxbVmz8EfwVyWUFyP3k0U0O43Mhc0n+Pi9sfLdY gqM7Y/4yJ/qOqjNqkAP2FR+u7pDMCwF5q6mugy3ReHQbJ3WUCsx/h6iW6XpvzpLtDmU4PnwCizNbDJ 65jHpkXZBwccb2yWZL3xbfcqAc4M9w9cYxNpLdtt8NZ+rde81+4KjY3RjmaYJ6kbOdG2jTQ2uB7QBR 8IB6Vp3VcelKvfe2D6gT91BL8IxzqodAw+yqwCP18Gg1nRBdVdzBLvr5+AFn9w0jjp98MtTKa6P7ii gkZ2UwvygAIG4rcijtB/7meDfJT0C/h40i2avmZ5bb1UndNmOtfoixIiUnumnomu9UUwzxEUdhNb57 KS5dfN7XmkBAwIOqhTGzOAtYHWmH1VyhVLJnBQ2VfGR39r5zOPfmnkT1aic2J3QdRCTgo2AZbLBI6F DcMPWmOtMJYmAJpqZMcje5nPsclSh7Hq7uJSZSzWOq0scZlLODKdzRVPuALg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2801; h=from:subject; bh=TrncHbsmiWtnPjfAh2YkxN9s4bIlTDfFJMFZjUYKPP8=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMfghAlM5KHg2hODEFSil5MEnhHr6UFtvkVIcLZ UTb+yCiJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjHwAKCRCJcvTf3G3AJrOJD/ 9hJH7jjz6tTkXVy3qRA527RgZiJeLECLzI6DoacBsPBfgyoKgz38PgicK9SwNgGvknQLWXJVluWAP3 E6rfbFiFlaM+Ah7i9TxwUplp60bQ8YQ6iLUK1jH7hES5/9GBkUaUVkVD3QjkV+GFMjzQAoawZjdUpr bE2gauE7tXilXaSUlWcyJfI07eT+K1XAEXoEY25zZpgxMGLL9yt/EbtvJcI+IrQuzSk/npjqhtQ2T3 d1nN9lTpRoS2zYNWrlVJJwNxvF1D1OBofuImaHDiDSNHXNKeThXLcbj1UYQqw/Ysgyk3p6pUd21lZB EuXd1zc9Yz9IEs6aPE6YEdm0AdAKR4pu8NCfI2LOYoDFMavYA+UDx+3rb/38ISxKIokoPZG0aHpP4c ezu4gtgECYTqz+PxbA2YWRttoBtOT9wi+rXSXOrtuHdJ9I1SuKBFQ8dMZXVFk0b2j6eA/u33kPuF+X I7KNJW1I+qU7lmi4iGjzDA1ALhfCCbWN78KpBUzwnIJbehj6BXZr2B04FaSAWa5Qe1BlLaaCW2szcx ScEByKBugc990sVUSUI2bY2JLlU8S6kgDfe8tUa7onXMNbGcnY2eexNnUsFBVySVYvcIQmVaSDF/u/ corCu6p0SQZQCPWdEE3UyQoxqtTSfoiIghXXJkxUfXrbaG5HgaIbs8lXLpJA==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the newly introduced struct_group_typed() macro to clean up the
-declaration of struct cxl_regs.
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memcpy(), memmove(), and memset(), avoid
+intentionally writing across neighboring fields.
 
-Cc: Alison Schofield <alison.schofield@intel.com>
-Cc: Vishal Verma <vishal.l.verma@intel.com>
-Cc: Ira Weiny <ira.weiny@intel.com>
-Cc: Ben Widawsky <ben.widawsky@intel.com>
-Cc: linux-cxl@vger.kernel.org
-Suggested-by: Dan Williams <dan.j.williams@intel.com>
-Link: https://lore.kernel.org/lkml/1d9a2e6df2a9a35b2cdd50a9a68cac5991e7e5f0.camel@intel.com
+Use struct_group() around members queue_id, min_bw, max_bw, tsa, pri_lvl,
+and bw_weight so they can be referenced together. This will allow memcpy()
+and sizeof() to more easily reason about sizes, improve readability,
+and avoid future warnings about writing beyond the end of queue_id.
+
+"pahole" shows no size nor member offset changes to struct bnxt_cos2bw_cfg.
+"objdump -d" shows no meaningful object code changes (i.e. only source
+line number induced differences and optimizations).
+
+Cc: Michael Chan <michael.chan@broadcom.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Link: https://lore.kernel.org/lkml/CACKFLinDc6Y+P8eZ=450yA1nMC7swTURLtcdyiNR=9J6dfFyBg@mail.gmail.com
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Link: https://lore.kernel.org/lkml/20210728044517.GE35706@embeddedor
 ---
- drivers/cxl/cxl.h | 61 ++++++++++++++---------------------------------
- 1 file changed, 18 insertions(+), 43 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  4 ++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h | 14 ++++++++------
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-index 53927f9fa77e..9db0c402c9ce 100644
---- a/drivers/cxl/cxl.h
-+++ b/drivers/cxl/cxl.h
-@@ -75,52 +75,27 @@ static inline int cxl_hdm_decoder_count(u32 cap_hdr)
- #define CXLDEV_MBOX_BG_CMD_STATUS_OFFSET 0x18
- #define CXLDEV_MBOX_PAYLOAD_OFFSET 0x20
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+index 8a68df4d9e59..95c636f89329 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+@@ -148,10 +148,10 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
+ 	}
  
--#define CXL_COMPONENT_REGS() \
--	void __iomem *hdm_decoder
--
--#define CXL_DEVICE_REGS() \
--	void __iomem *status; \
--	void __iomem *mbox; \
--	void __iomem *memdev
--
--/* See note for 'struct cxl_regs' for the rationale of this organization */
--/*
-- * CXL_COMPONENT_REGS - Common set of CXL Component register block base pointers
-- * @hdm_decoder: CXL 2.0 8.2.5.12 CXL HDM Decoder Capability Structure
-- */
--struct cxl_component_regs {
--	CXL_COMPONENT_REGS();
--};
--
--/* See note for 'struct cxl_regs' for the rationale of this organization */
--/*
-- * CXL_DEVICE_REGS - Common set of CXL Device register block base pointers
-- * @status: CXL 2.0 8.2.8.3 Device Status Registers
-- * @mbox: CXL 2.0 8.2.8.4 Mailbox Registers
-- * @memdev: CXL 2.0 8.2.8.5 Memory Device Registers
-- */
--struct cxl_device_regs {
--	CXL_DEVICE_REGS();
--};
--
- /*
-- * Note, the anonymous union organization allows for per
-- * register-block-type helper routines, without requiring block-type
-- * agnostic code to include the prefix.
-+ * Using struct_group() allows for per register-block-type helper routines,
-+ * without requiring block-type agnostic code to include the prefix.
-  */
- struct cxl_regs {
--	union {
--		struct {
--			CXL_COMPONENT_REGS();
--		};
--		struct cxl_component_regs component;
--	};
--	union {
--		struct {
--			CXL_DEVICE_REGS();
--		};
--		struct cxl_device_regs device_regs;
--	};
-+	/*
-+	 * Common set of CXL Component register block base pointers
-+	 * @hdm_decoder: CXL 2.0 8.2.5.12 CXL HDM Decoder Capability Structure
-+	 */
-+	struct_group_tagged(cxl_component_regs, component,
-+		void __iomem *hdm_decoder;
+ 	data = &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, queue_id);
+-	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw) - 4) {
++	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw.cfg)) {
+ 		int tc;
+ 
+-		memcpy(&cos2bw.queue_id, data, sizeof(cos2bw) - 4);
++		memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
+ 		if (i == 0)
+ 			cos2bw.queue_id = resp->queue_id0;
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
+index 6eed231de565..716742522161 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
+@@ -23,13 +23,15 @@ struct bnxt_dcb {
+ 
+ struct bnxt_cos2bw_cfg {
+ 	u8			pad[3];
+-	u8			queue_id;
+-	__le32			min_bw;
+-	__le32			max_bw;
++	struct_group_attr(cfg, __packed,
++		u8		queue_id;
++		__le32		min_bw;
++		__le32		max_bw;
+ #define BW_VALUE_UNIT_PERCENT1_100		(0x1UL << 29)
+-	u8			tsa;
+-	u8			pri_lvl;
+-	u8			bw_weight;
++		u8		tsa;
++		u8		pri_lvl;
++		u8		bw_weight;
 +	);
-+	/*
-+	 * Common set of CXL Device register block base pointers
-+	 * @status: CXL 2.0 8.2.8.3 Device Status Registers
-+	 * @mbox: CXL 2.0 8.2.8.4 Mailbox Registers
-+	 * @memdev: CXL 2.0 8.2.8.5 Memory Device Registers
-+	 */
-+	struct_group_tagged(cxl_device_regs, device_regs,
-+		void __iomem *status, *mbox, *memdev;
-+	);
+ 	u8			unused;
  };
  
- struct cxl_reg_map {
 -- 
 2.30.2
 
