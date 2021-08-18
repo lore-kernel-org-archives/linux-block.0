@@ -2,128 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 421F8C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 00:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255A3C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 01:09:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23C8760F41
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 00:57:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B13860FD7
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 01:09:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237339AbhHRA5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 20:57:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237271AbhHRA5v (ORCPT
+        id S237398AbhHRBKY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 21:10:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45127 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237387AbhHRBKY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 20:57:51 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC3AC061764;
-        Tue, 17 Aug 2021 17:57:17 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id p38so1009676lfa.0;
-        Tue, 17 Aug 2021 17:57:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=I01H5a6uHWni87egbbK4J+JI32iz47EYQ+sGtHJn9C8=;
-        b=N6JSsp07CpZCty+GpUO8Ix550NiKbjjfrr3MgQs6vBbp0jeZ2mo4YGpEwCfpOyU2fS
-         XbLBOGzidYQAvvw8vr521Wfpl+G2A0uhBOv5Ao/+qI26ERIW6HSeqZLCqYDifZcjDq7V
-         9pYnMVA8yeHjOAcvrbyHnCEaB6qUMYtaIpihhyQIVj5zwzxDkX3Ku8fXTkHrxv4yO0gd
-         4gvZLn8FQk0/6d40xcXz0BDe5lbAZSWFO1PZ8yABdh2ImVq9iJ/txZD2BbBFpnRHtKx7
-         Di2clJlPnhcSvfIcXGgy8BEivwI85p1b2C8e22q8TlT7KjTgiK9pzkW2eaUG1gSu6aps
-         cQgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=I01H5a6uHWni87egbbK4J+JI32iz47EYQ+sGtHJn9C8=;
-        b=ibwHReew4h90c7iobA+39RBGbbzJllBg5SHAflYA3TcYr+jl0OC/AVw4BxNwQtkT9k
-         olC810k00mCjnf/HJMEz/xVY2WIVOeZX+XSlJVE/SkP+Y2JWV6g/GdsxQ9ij42HhfCvF
-         BJWri+JrHZk7quRN69h0q7SQfT7SZV1VBCdRze6OKn/ab051GTtBWhE8U1IoVtlRBqWg
-         H2v+7GURP6sm4HKYTod+dPiFiJJHp+3W5mUG2UMvg1WadJsHAvqWFmN8tMWW94ej5g2k
-         BBMvLMT3pljQPTLfxixUcBfZrOUA+sXKTX0rbEHe7Zj7HA34BwzTWOoP8igkfYIrqhDw
-         0JDg==
-X-Gm-Message-State: AOAM533BZxYgAhdi2c9hyLxWYqt/vr2vMGVQtKAg1xMJliV/H28Qmu+Q
-        JZGQKuKhEHs3nBJtqJl70kI=
-X-Google-Smtp-Source: ABdhPJyM2Pw5uNedmsQZXhYwx6gDYixKDMuB77RrrxaMT/g2PWwc2DQwvCordjK6ChUFqDanxd6hBA==
-X-Received: by 2002:ac2:428a:: with SMTP id m10mr4503044lfh.636.1629248235291;
-        Tue, 17 Aug 2021 17:57:15 -0700 (PDT)
-Received: from localhost.localdomain (46-138-85-91.dynamic.spd-mgts.ru. [46.138.85.91])
-        by smtp.gmail.com with ESMTPSA id h19sm335879lfu.138.2021.08.17.17.57.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 17:57:14 -0700 (PDT)
-From:   Dmitry Osipenko <digetx@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>
-Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: [PATCH v5 5/5] partitions/efi: Support non-standard GPT location
-Date:   Wed, 18 Aug 2021 03:55:47 +0300
-Message-Id: <20210818005547.14497-6-digetx@gmail.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210818005547.14497-1-digetx@gmail.com>
-References: <20210818005547.14497-1-digetx@gmail.com>
+        Tue, 17 Aug 2021 21:10:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629248990;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RCCWvDjY3Q5IUVIs6QPft/4AsaIoSIpdIehWy1LmRPw=;
+        b=KVIlxSHlxcIMo90i6tn1bknsi0b7R2emGgsTPjFMxQpxWC/+1fpPXthsx4rtlOk9WBJwsM
+        iEq7lO7+NgYLpD+UOuZBDlItPioApbQhzD3GY9vnrp9GZtY0Q/mhIisg4a6lt0s5aMxM2X
+        YigYfaHbA6An7Jg4vhXZB+UkOWE9Fy4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-595-EplxXfUgPSybCuxqFm9pLA-1; Tue, 17 Aug 2021 21:09:46 -0400
+X-MC-Unique: EplxXfUgPSybCuxqFm9pLA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EFF5760C0;
+        Wed, 18 Aug 2021 01:09:45 +0000 (UTC)
+Received: from localhost (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DCFD91B46B;
+        Wed, 18 Aug 2021 01:09:39 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>,
+        Yufen Yu <yuyufen@huawei.com>
+Subject: [PATCH] blk-mq: fix is_flush_rq
+Date:   Wed, 18 Aug 2021 09:09:25 +0800
+Message-Id: <20210818010925.607383-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Support looking up GPT at a non-standard location specified by a block
-device driver.
+is_flush_rq() is called from bt_iter()/bt_tags_iter(), and runs the
+following check:
 
-Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+	hctx->fq->flush_rq == req
+
+but the passed hctx from bt_iter()/bt_tags_iter() may be NULL because:
+
+1) memory re-order in blk_mq_rq_ctx_init():
+
+	rq->mq_hctx = data->hctx;
+	...
+	refcount_set(&rq->ref, 1);
+
+OR
+
+2) tag re-use and ->rqs[] isn't updated with new request.
+
+Fix the issue by re-writing is_flush_rq() as:
+
+	return rq->end_io == flush_end_io;
+
+which turns out simpler to follow and immune to data race since we have
+ordered WRITE rq->end_io and refcount_set(&rq->ref, 1).
+
+Fixes: 2e315dc07df0 ("blk-mq: grab rq->refcount before calling ->fn in
+    blk_mq_tagset_busy_iter")
+Cc: "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>
+Cc: Yufen Yu <yuyufen@huawei.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/partitions/efi.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block/blk-flush.c | 5 +++++
+ block/blk-mq.c    | 2 +-
+ block/blk.h       | 6 +-----
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index aaa3dc487cb5..b9509f445b3c 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -585,6 +585,8 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
- 	gpt_header *pgpt = NULL, *agpt = NULL;
- 	gpt_entry *pptes = NULL, *aptes = NULL;
- 	legacy_mbr *legacymbr;
-+	struct gendisk *disk = state->disk;
-+	const struct block_device_operations *fops = disk->fops;
- 	sector_t total_sectors = get_capacity(state->disk);
- 	u64 lastlba;
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 4912c8dbb1d8..4201728bf3a5 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -262,6 +262,11 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+ }
  
-@@ -619,6 +621,17 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
-         if (!good_agpt && force_gpt)
-                 good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
++bool is_flush_rq(struct request *rq)
++{
++	return rq->end_io == flush_end_io;
++}
++
+ /**
+  * blk_kick_flush - consider issuing flush request
+  * @q: request_queue being kicked
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b5237211ccb7..6d7395ad6d94 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -911,7 +911,7 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
  
-+	if (!good_agpt && force_gpt && fops->alternative_gpt_sector) {
-+		struct block_device *bdev = disk->part0;
-+		sector_t agpt_sector;
-+		int err;
-+
-+		err = fops->alternative_gpt_sector(bdev, &agpt_sector);
-+		if (!err)
-+			good_agpt = is_gpt_valid(state, agpt_sector,
-+						 &agpt, &aptes);
-+	}
-+
-         /* The obviously unsuccessful case */
-         if (!good_pgpt && !good_agpt)
-                 goto fail;
+ void blk_mq_put_rq_ref(struct request *rq)
+ {
+-	if (is_flush_rq(rq, rq->mq_hctx))
++	if (is_flush_rq(rq))
+ 		rq->end_io(rq, 0);
+ 	else if (refcount_dec_and_test(&rq->ref))
+ 		__blk_mq_free_request(rq);
+diff --git a/block/blk.h b/block/blk.h
+index 56f33fbcde59..d4fb5b72d12b 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -44,11 +44,7 @@ static inline void __blk_get_queue(struct request_queue *q)
+ 	kobject_get(&q->kobj);
+ }
+ 
+-static inline bool
+-is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx)
+-{
+-	return hctx->fq->flush_rq == req;
+-}
++bool is_flush_rq(struct request *req);
+ 
+ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
+ 					      gfp_t flags);
 -- 
-2.32.0
+2.31.1
 
