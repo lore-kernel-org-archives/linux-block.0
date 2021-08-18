@@ -2,179 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5B5C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 02:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A0FC4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 02:45:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D7C161051
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 02:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FB876023D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 02:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234477AbhHRCqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 22:46:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32354 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234302AbhHRCqL (ORCPT
+        id S234090AbhHRCqb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 22:46:31 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:47804 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231449AbhHRCqa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 22:46:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629254737;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7Ly4hMgmcduWmjk7R138XN1c7rishTtsrNhm8UdX1fs=;
-        b=RV43urOQo8sisR/Uf6Dh5Gi8kAFD0qUKWkdKt9I3WB9guU/uBLQG/ACqeD1hiWG9SUe3Vt
-        XSiiIAtV2ythBZJcpp5g5pa7nqnUPCxoorMluBuByZjuBLBGcfP0VFAQ/a/xmGvQ1ELQU5
-        oASA7FMTCOK7qw9KKYKNVjTVbMaN7R4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-ErqW5xKFOrGx03r8uvmf8Q-1; Tue, 17 Aug 2021 22:45:36 -0400
-X-MC-Unique: ErqW5xKFOrGx03r8uvmf8Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 090EA801AC5;
-        Wed, 18 Aug 2021 02:45:35 +0000 (UTC)
-Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A317D5D9CA;
-        Wed, 18 Aug 2021 02:45:25 +0000 (UTC)
-Date:   Wed, 18 Aug 2021 10:45:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, bvanassche@acm.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH RFC] blk_mq: clear rq mapping in driver tags before
- freeing rqs in sched tags
-Message-ID: <YRx0QE8T4RJONlA8@T590>
-References: <20210817022306.1622027-1-yukuai3@huawei.com>
- <YRxZ44tu8o1MPruT@T590>
- <11ef6a06-4b6f-44d0-af79-f96e16456b55@huawei.com>
+        Tue, 17 Aug 2021 22:46:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1629254756; x=1660790756;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=1QIZYqvDUQIjZADl4XsDdTSvfgGB/kacw0J4Q+/XNhI=;
+  b=XL1Ux/jTUpi7K5VlEldmeXG6uCZcellUfhsrPGjlSXUC7EQ2J5z8rVf2
+   4tyHS0lr4Xh3EYiJTrgZqwgARvpELKMWaLYKzm/X+uDi2w+aW8OnFuAj7
+   OsL993XXhMazVleNFqMyDbWiGngEBZ/mcmxmf8MeQKmFhAKrzVCZFAslx
+   7ms2vh/mynXqtUWMMeAuxdmYkDbZkLc6vITKbt+8BsoOthHv+hD+r4eUY
+   3O2yjQ7W2MMEAoPxUF3iGe3BEanbUDqZUwh2XYBP2xe5RxA3TSHcA1H0+
+   DgCOLwCf+pBUYfJpxG2azeae93uqLxjqxUvm5sGml5zehVBeYyRL/hMMr
+   g==;
+X-IronPort-AV: E=Sophos;i="5.84,330,1620662400"; 
+   d="scan'208";a="176758570"
+Received: from mail-mw2nam10lp2104.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.104])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Aug 2021 10:45:55 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X+ritEuT4a2J5/kElpHQpGJRsRb6+RZ4URiTXmVNxuX0S1RuNC4Me5sTEBSpBiU3ErUc9CXjrqVIqEQVYGPojLiGTOq+CmMhhJ2gyE/NM+EQ6b3+i74T3Au5fQphXLNLgH4RHsfaqNK1ln/7/MbnsRV+LoBO/aGp4EvcQEk7Lj/P+iJchvWyS9eLzrfFoQIL0/0Iv1tlcYyGglDIKYj311CcNAQ5vSqALwILdzoDS3c1dhy20aKGtxk4ydffDkQdtl2ji9JfcnBO3H6qRk4evElR2Ye4ME5y2F+et9EIRuh6B9pSmxCxrOoXW033R2wg3YGkgrW98fZZVRnEl21Giw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MuJA2eUm/6/1ksslCfmGR9ew0cOqbjokA86wNwciQp4=;
+ b=LtYJO0DjUQahM3RjwQnbngBFO8dh5nXlxONrHg6QPRS7/xLF0Sj7+oDM8dp7WATzkdMRCz2wPqEAwh1U2PAYA8LOCO9KG5nQ/dfjzFs+g55nbayY5Bwess4UMJBI6Fo8n+vo6t2PvxbOWn8ie/AfHY2HiD34YieFRVW/5sODAMOW6yS5fwpVOmjVbwhwakaWsU0zGdGxo2tMgCf1UIMClftA28LHyoDyhKQIbg9m00DxbnudKPZD1APFIudDcK9kEZcZIudvzuMb/cmrtY8s6FTbi6sQ0aplr8WNOEWcef0pZzuYks2clr8zHw0+TpPJ8DaJn6o5VBZG+E6KrWogpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MuJA2eUm/6/1ksslCfmGR9ew0cOqbjokA86wNwciQp4=;
+ b=aRQ6/j1V39uOc3QRgbTRUrEEdBRM/cI3umvnDA5dWGsU6+wZ41xgjOmxgQtafazHishQYuePk4vcEHiTOlbvk3pXPNfCPUQnUzFz5zybxtcIuw14d1BG2jdyv13I1wUWau6aX4PWhmGdTP/fpROwfT4AvqPw8O4zeUWj9aoCaOA=
+Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
+ by DM6PR04MB4923.namprd04.prod.outlook.com (2603:10b6:5:fc::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.21; Wed, 18 Aug
+ 2021 02:45:54 +0000
+Received: from DM6PR04MB7081.namprd04.prod.outlook.com
+ ([fe80::e521:352:1d70:31c]) by DM6PR04MB7081.namprd04.prod.outlook.com
+ ([fe80::e521:352:1d70:31c%9]) with mapi id 15.20.4415.024; Wed, 18 Aug 2021
+ 02:45:54 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH v5 0/5] Initial support for multi-actuator HDDs
+Thread-Topic: [PATCH v5 0/5] Initial support for multi-actuator HDDs
+Thread-Index: AQHXj060+x8p8fG9EkmgObG6vBUOOw==
+Date:   Wed, 18 Aug 2021 02:45:54 +0000
+Message-ID: <DM6PR04MB708192A9DAE8BDC018B30420E7FF9@DM6PR04MB7081.namprd04.prod.outlook.com>
+References: <20210812075015.1090959-1-damien.lemoal@wdc.com>
+ <yq18s11qqfk.fsf@ca-mkp.ca.oracle.com>
+ <DM6PR04MB7081F31C7933E6C50E10CBB3E7FE9@DM6PR04MB7081.namprd04.prod.outlook.com>
+ <yq1fsv7mrrf.fsf@ca-mkp.ca.oracle.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: oracle.com; dkim=none (message not signed)
+ header.d=none;oracle.com; dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 963d11af-5b77-47ad-9196-08d961f24c90
+x-ms-traffictypediagnostic: DM6PR04MB4923:
+x-microsoft-antispam-prvs: <DM6PR04MB492351D7F30415C29419A49FE7FF9@DM6PR04MB4923.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0ZW331xEHkHJm2vTks77N53kdV+z56OFiZpPU1JL8aDvYBm5SD6vFKHOiBPvR5TX/O9xB6x4zhAhnF3yXVIeAy2OnOCBjjIovT7nVHlI9zavYZv4R5sMVa3OgcY8P9pEKSBkf+DJw+3xWtcpkVkYGHGxDhZYLvIT1GcrfZ6wmOlYaCxTRy3OQtwMfLMQgO7FwdgEUovFKPWU7Jgrm+NZgoMIbpCkzs9rLsFI2GDkzDEf0LgNKnRGYcyJ02DtlZ/n3fBgjdIJX1dXpsEZeDcSaX8XpWDeiZlZ5kF2SrNMkFWlL2oGGC78RF85qysR943L0G2hoMxhVvpQJnOzR7aTH21Evdb3CWQUojSstO2SdS5FZzarup0rv/8dMqPfF3m6Q92R8h2uwSpeNsc1zkhXmMXKLkMvEtTM+aVCmsvh4PDurlHrcRyMVL/cniHbNMCX+6gmXDVZtG72rcR7vPxMbZTHK/vvul2YW1WZLSHhFOMgLjJdOB+c2+yQ2y3ePe7+3RpwOv6unFcMR2X+mDKDn6Csn2ejmVojXnlEvkh+HHfovRIRW/Y1NimuhX8nRPWFElTQCUWXZE/nE3l0UWBgRg1aXDOuO95MgNbMt5EAPN51jzoMaVkyqzp9C8kdkOYOZJpfBKS1OwqNg8eHSfsr8gOssR9ZvD9NQ2gph3QWQMStBVM2Utg5y/ZS0So3GaT6vtvCWq2OGSmpLi+QTPveRw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(39860400002)(136003)(396003)(376002)(91956017)(478600001)(4326008)(6506007)(38070700005)(66946007)(53546011)(2906002)(186003)(7696005)(316002)(9686003)(76116006)(66556008)(26005)(66446008)(64756008)(66476007)(55016002)(8936002)(52536014)(5660300002)(83380400001)(8676002)(6916009)(86362001)(71200400001)(122000001)(33656002)(38100700002)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?vx1YqbvkHQixLhpcOm4F0JzxLaPpsiTuDfWmnAi3UGG8IX/o0vZHwKGb4fdl?=
+ =?us-ascii?Q?Bbys7+cW9mxEwIwgpWST7z+RnvM+Vl+XAdTmsDMFHOBeWraMPCuG0ueB2cnu?=
+ =?us-ascii?Q?1Iig8lovgKPSrXuWIGhJZNzgLQw0uP5x81XviUlQIonQO80K18uUyJR8nJ59?=
+ =?us-ascii?Q?dTh/IEynNLc8G7eogH2Sg7Aus8gHb/Izx1qTjjwjgz25Uc5e3QkCmtQt95u0?=
+ =?us-ascii?Q?76Gkc0cwPaVrMNolwnMfAYodOYcvukV/Qg/5tNn+aG+lCLOHTqxXAazS97Cv?=
+ =?us-ascii?Q?ZroNydsB46LpuybDcArkhFwqGHUKC8TyLbnDcesJsM1tGloR3fs3qNOZOnk9?=
+ =?us-ascii?Q?Q96lahcmruQ/mN0vTAmQtQN4r5QBpV3Ivqgp4ZD8jSTEXhNmSIVwKubwC1QR?=
+ =?us-ascii?Q?HG2ZyY8CfRf9VBdrngcUbHI3jqLcqB8k2QFiQchkGVVtwsYGXoDSszBKnjGU?=
+ =?us-ascii?Q?mflC1A+/WGdqlqWHgoyaU+MHTILUAn82EgkIO88GJ6YgJvUFNTAKpZ8+e63M?=
+ =?us-ascii?Q?kWr7MI+LlLkDn8bFypXZIn2hJqzy9vIXw+Mnfth9bQGBfb20qe0IFoeYcqwj?=
+ =?us-ascii?Q?jNnL//oe/QK/oViX1P45p6V5Oyh9HQ+4J1t/26mwRaT9caANgTvrlffqg1Eh?=
+ =?us-ascii?Q?4OdfhmRFqyKAj1lfxP79Xnp62F/FZKP5KfG9A5y/wmeENO1qlJk7TWnVYuec?=
+ =?us-ascii?Q?AeljDg66uKHuK4YuCJB3JQji1Sd9WsmVvBya8Reqxzk/iFf9dcI++I30LJ6v?=
+ =?us-ascii?Q?lbLIfx98u4zpYhs8Sali7cxIlyqll2SZuKRdUQO2V8xvZk+PKHkdFO0FuFqT?=
+ =?us-ascii?Q?sAPe8axJaC9VgHxSDhiy/yavVdbaCRxbKgL+ht+EkWUtCaDwmCwxJxEmwUKF?=
+ =?us-ascii?Q?Wh5T28i1QEz9pi7R7Ca9rJ625l03WreFF4zPHjAd26TFbT8dXrXohLtQ+jbU?=
+ =?us-ascii?Q?nXRN4WD37+LhB9vmiNFdv0M9n0AwE+BKAUz4xdOx5J3dnUXH37iIuZ83rXuA?=
+ =?us-ascii?Q?KLoGt9KmWBwuAwyy9fF2bZq7Ey0s/E8xp00iilA2UYdaga5mdADvaJhgwgXG?=
+ =?us-ascii?Q?x3h2AXmabgH9bTZ2bvesGAeVZ5dnWT1PfXf3l9sTCPzV0SwVTXMhRWvVqxOD?=
+ =?us-ascii?Q?ALyTX1subhYY1MK4ypC33PG0JcXaKpdasesJ6jtXXXYOP1z+Ah1DRTx4XXgB?=
+ =?us-ascii?Q?IvWHBDvKFT7BL1vSILz4rne4OR+yqkRdScVCG4lgTVtU42iShk+pubYk9L4D?=
+ =?us-ascii?Q?C1Uv7Au+Jq/07tyOOdyr95G6YWPJMgWJhMSbqwFbrWue137EcrkwFPfT7uYf?=
+ =?us-ascii?Q?QYSNpclHnkzEMqqyko8kF5W5pXvVj5+VU9CSXa+LNWAhxQ=3D=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11ef6a06-4b6f-44d0-af79-f96e16456b55@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 963d11af-5b77-47ad-9196-08d961f24c90
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Aug 2021 02:45:54.3103
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Rx7HD8Wc/WcPXKOEZJo0+zLRTpBIh3XAHEGsZyNEUjLqeKGyQW8G2OOeR3kh2nhMco1Umb/K9rwUtJqs1QhMDA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4923
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 10:02:09AM +0800, yukuai (C) wrote:
-> On 2021/08/18 8:52, Ming Lei wrote:
-> > On Tue, Aug 17, 2021 at 10:23:06AM +0800, Yu Kuai wrote:
-> > > If ioscheduler is not none, hctx->tags->rq[tag] will point to
-> > > hctx->sched_tags->static_rq[internel_tag] in blk_mq_get_driver_tag().
-> > > However, static_rq of sched_tags might be freed through switching
-> > > elevator or increasing nr_requests. Thus leave a window for some drivers
-> > > to get the freed request through blk_mq_tag_to_rq(tags, tag).
-> > 
-> > I believe I have explained that it is bug of driver which has knowledge
-> > if the passed tag is valid or not. We are clear that driver need to cover
-> > race between normal completion and timeout/error handling.
-> > 
-> > > 
-> > > It's difficult to fix this uaf from driver side, I'm thinking about
-> > 
-> > So far not see any analysis on why the uaf is triggered, care to
-> > investigate the reason?
-> 
-> Hi, Ming
-> 
-> I'm sorry if I didn't explian the uaf clearly.
-> 
-> 1) At first, a normal io is submitted and completed with scheduler:
-> 
-> internel_tag = blk_mq_get_tag -> get tag from sched_tags
->  blk_mq_rq_ctx_init
->   sched_tags->rq[internel_tag] = sched_tag->static_rq[internel_tag]
-> ...
-> blk_mq_get_driver_tag
->  __blk_mq_get_driver_tag -> get tag from tags
->  tags->rq[tag] = sched_tag->static_rq[internel_tag]
-> 
-> So, both tags->rq[tag] and sched_tags->rq[internel_tag] are pointing
-> to the request: sched_tags->static_rq[internal_tag].
-> 
-> 2) Then, if the sched_tags->static_rq is freed:
-> 
-> blk_mq_sched_free_requests
->  blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i)
->   blk_mq_clear_rq_mapping(set, tags, hctx_idx);
->    -> sched_tags->rq[internel_tag] is set to null here
-
-Please take a look at blk_mq_clear_rq_mapping():
-
-	//drv_tags points to set->tags[] which is shared in host wide
-	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
-	...
-
-	//tags points to sched_tags
-	list_for_each_entry(page, &tags->page_list, lru) {
-		unsigned long start = (unsigned long)page_address(page);
-		unsigned long end = start + order_to_size(page->private);
-		int i;
-
-		/* clear drv_tags->rq[i] in case it is from this sched tags*/
-		for (i = 0; i < set->queue_depth; i++) {
-			struct request *rq = drv_tags->rqs[i];
-			unsigned long rq_addr = (unsigned long)rq;
-
-			if (rq_addr >= start && rq_addr < end) {
-				WARN_ON_ONCE(refcount_read(&rq->ref) != 0);
-				cmpxchg(&drv_tags->rqs[i], rq, NULL);
-			}
-		}
-	}
-
-So we do clear tags->rq[] instead of sched_tag->rq[].
-
-> 
-> After switching elevator, tags->rq[tag] still point to the request
-> that is just freed.
-
-No.
-
-> 
-> 3) nbd server send a reply with random tag directly:
-> 
-> recv_work
->  nbd_read_stat
->   blk_mq_tag_to_rq(tags, tag)
->    rq = tags->rq[tag] -> rq is freed
-> 
-> Usually, nbd will get tag and send a request to server first, and then
-> handle the reply. However, if the request is skipped, such uaf problem
-> can be triggered.
-
-When or how is such reply with random tag replied to nbd client? Is it
-possible for nbd client to detect such un-expected/bad situation?
-What if blk_mq_tag_to_rq() is just called before/when we clear tags->rq[]?
-
-> 
-> > 
-> > The request reference has been cleared too in blk_mq_tag_update_depth():
-> > 
-> > 	blk_mq_tag_update_depth
-> > 		blk_mq_free_rqs
-> > 			blk_mq_clear_rq_mapping
-> > 
-> 
-> What I'm trying to do is to clear rq mapping in both
-> hctx->sched_tags->rq and hctx->tags->rq when sched_tags->static_rq
-> is freed. However, I forgot about the case when tags is shared in
-> multiple device. Thus what this patch does is clearly wrong...
-> 
-> So, what do you think about adding a new interface to iterate the
-> request in tags->rq[], find what is pointing to the
-> sched_tags->static_rq[], and use cmpxchg() to clear them?
-
-See above, we already clear tags->rq[] if the rq is from to-be-freed
-sched_tags.
-
-
-Thanks,
-Ming
-
+On 2021/08/18 11:24, Martin K. Petersen wrote:=0A=
+> =0A=
+> Damien,=0A=
+> =0A=
+>> With the single LUN approach, the fault domain does not really change=0A=
+>> from a regular device. The typical use in case of bad heads would be=0A=
+>> to replace the drive or reformat it at lower capacity with head=0A=
+>> depop. That could be avoided with dm-linear on top (one DM per=0A=
+>> actuator) though.=0A=
+> =0A=
+> I was more thinking along the lines of btrfs making sure to place=0A=
+> dup metadata on different actuators or similar.=0A=
+> =0A=
+>> The above point led me to this informational only implementation.=0A=
+>> Without optimization, we get the same as today. No changes in=0A=
+>> performance and use.  Better IOPS is gain for lucky workloads=0A=
+>> (typically random ones). Going forward, more reliable IOPS &=0A=
+>> throughput gains are possible with some additional changes.=0A=
+> =0A=
+> Sure, but that means the ranges need to affect both I/O scheduling and=0A=
+> data placement. We need to make sure that the data placement interface=0A=
+> semantics are applicable to other types of media than multi actuator=0A=
+> drives. Filesystems shouldn't have to look at different queue limits if=
+=0A=
+> they sit on top of dm-linear instead of sd. From an I/O scheduling=0A=
+> perspective I concur that device implementation details are pertinent.=0A=
+=0A=
+Currently, FSes cannot know the dm-linear config. The queue crange interfac=
+e can=0A=
+actually unify this for split/dual actuator and dm-linear like logical disk=
+s.=0A=
+=0A=
+I need to send patches to dm-devel for that though as currently, dm-linear =
+does=0A=
+not expose its config as cranges. If I recall correctly, Hannes was also=0A=
+interested in playing with that too :)=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
