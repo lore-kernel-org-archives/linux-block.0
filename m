@@ -2,253 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA1EC43214
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76794C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1192610CD
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:40:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B9286101A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239865AbhHRPlV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 11:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39030 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237598AbhHRPlS (ORCPT
+        id S239980AbhHRPro (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 11:47:44 -0400
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:46658 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238689AbhHRPrn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 11:41:18 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2DFC061764;
-        Wed, 18 Aug 2021 08:40:43 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id u22so5479005lfq.13;
-        Wed, 18 Aug 2021 08:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AtAhgc/cdtdzOpUDiq7xYnKI2s3eNwZmdV1LdaG9ySo=;
-        b=PWcYhEYYtZjTfKDZMdN0WFm25zWU6vUnEefdgNPih6QwJ4e5NnO1itZZ1z1zd+A2RU
-         xbkYngFQPwxL14gfyz8aQFErBFx2jLEjNEHFknMIvJJtURxUEdxLi05hwsbYhnjIQqHp
-         PmyNYUo+2I4gNGOYXsiBAJM8F68rTG39YBp8Ov2dTh60SnKE84Tc1nNa15KlqgerEbO1
-         /OS3iNwnU8HNiXDucG3hVJCSznV2bRCqz0B+A5lAq1+nCz6cd81q7sJ23RqCAYfeizBJ
-         pG8Hv45xxi5e8Y6bIdzGC17dmLTPU06HEW1daIvzgluzf5ZvuyIYnpueSArX3cJQHGjU
-         kH2Q==
+        Wed, 18 Aug 2021 11:47:43 -0400
+Received: by mail-lj1-f182.google.com with SMTP id w4so4429212ljh.13;
+        Wed, 18 Aug 2021 08:47:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AtAhgc/cdtdzOpUDiq7xYnKI2s3eNwZmdV1LdaG9ySo=;
-        b=WWYpQCjj3z4QXDRihx74q5PWBnqzGyyGs3MoFg107ba0jJX4hsaRdu3xkdZhGG4jEG
-         wlfP55J+zkDj237rerfnfEmPUE5T/NRoYlvRfRVIy9fGo4jpIwIn48dJIOnT0+Ip+0pn
-         fIivzyiLQm2/AuAkUBnupeKxwPeFAz3tHcMRho4p276Ou4Wy1JJIyoOxMDvxwPuCnykP
-         H+PzIo+t/Tb/d9dTuY32ntcHyNFYEjkPrwlC4/emGl40QLDRtNtBI1mwVXJaXYvTl2N9
-         cv3aDdFCe5aVxtPH/DYyL30Rlp3go58qvFFMhaiEAczBqe3TDRo1dWLIUv7fFrST3Uvz
-         rxgA==
-X-Gm-Message-State: AOAM531lj9ENHcodiYv5SNCgwNx797saDXdSZif03GTV4I2kocG0OydM
-        GWBNWvOjTZLHjkO2wiZNx/VKZH1m5hegOVBZamU=
-X-Google-Smtp-Source: ABdhPJxdbKKZ7HzWf73HynFAAtUBdYY23NO4eYcF1dkerR0DWdHpzlIlPrMdLWA5PYdjRCSguNfZNXVeUUh1TMNdro0=
-X-Received: by 2002:a05:6512:1283:: with SMTP id u3mr7005906lfs.390.1629301242041;
- Wed, 18 Aug 2021 08:40:42 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mHbP3ABUJl2fRmSfnSzcJy4bszTULYmLIBF16edHZtQ=;
+        b=c2Hx/f7SpHM30ip3mLjrdlN7oM8SvDEg3yz7Ah1i1Qx1ol10DbtcLf4IusfFGPxR2Z
+         rRfFd0w+0fUGRGBsEvHFhLWs/911uJqDE4dXrdzYLWo2uGugVltUkMJDAZFqQMrkRzDb
+         jQXwobnWF1XsQii1f6LEuBHVwgzkk4H2EpbTFCagyv+p+mhnGdHYLM3QQ459MYR95RyG
+         /99PM6Ju8iG5n/hL8uKV0kPHE0md5PgLCmEWtt+cvfIhbchNSVQs87Gt4MEdEIaYtMiE
+         wloWl71FR1FthhGh5akLDsdALmuWGdgXyNTTALOJNBGKwi2Gcqj+kX1NVbMk6tfp+LPx
+         2bWg==
+X-Gm-Message-State: AOAM533ie4idy4dwUMKpTqLYZe855SRjh+3jnaDCuDD6VSCDGq2J/160
+        goxr8r6/aC68nfSA6YG/zCEcYr07+yIGhnPE
+X-Google-Smtp-Source: ABdhPJyB5ToTInt2FJ82VXAP/Gb6bcHEMZKkgcVjy/UeoaZC9vRABZgjzP85t6vm97XQKegkUlD++Q==
+X-Received: by 2002:a2e:2a46:: with SMTP id q67mr7062904ljq.286.1629301626215;
+        Wed, 18 Aug 2021 08:47:06 -0700 (PDT)
+Received: from localhost.localdomain (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.googlemail.com with ESMTPSA id j4sm23808ljh.120.2021.08.18.08.47.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Aug 2021 08:47:05 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     linux-kselftest@vger.kernel.org
+Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Jiri Kosina <jkosina@suse.cz>, Willy Tarreau <w@1wt.eu>
+Subject: [RFC PATCH 0/5] selftests: floppy: basic tests
+Date:   Wed, 18 Aug 2021 18:46:41 +0300
+Message-Id: <20210818154646.925351-1-efremov@linux.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <CGME20210817101741epcas5p174ca0a539587da6a67b9f58cd13f2bad@epcas5p1.samsung.com>
- <20210817101423.12367-1-selvakuma.s1@samsung.com> <20210817233758.GB12597@magnolia>
-In-Reply-To: <20210817233758.GB12597@magnolia>
-From:   Nitesh Shetty <nitheshshetty@gmail.com>
-Date:   Wed, 18 Aug 2021 21:10:29 +0530
-Message-ID: <CAOSviJ0qbkg9WPtmxuvf6HAgQ9sBYWVRGisGRgwed77uK86byg@mail.gmail.com>
-Subject: Re: [PATCH 0/7] add simple copy support
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
-        asml.silence@gmail.com, johannes.thumshirn@wdc.com, hch@lst.de,
-        willy@infradead.org, kch@kernel.org, martin.petersen@oracle.com,
-        mpatocka@redhat.com, bvanassche@acm.org, snitzer@redhat.com,
-        agk@redhat.com, selvajove@gmail.com, joshiiitr@gmail.com,
-        nj.shetty@samsung.com, joshi.k@samsung.com, javier.gonz@samsung.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 5:07 AM Darrick J. Wong <djwong@kernel.org> wrote:
->
-> On Tue, Aug 17, 2021 at 03:44:16PM +0530, SelvaKumar S wrote:
-> > This started out as an attempt to support NVMe Simple Copy Command (SCC),
-> > and evolved during the RFC review process.
-> >
-> > The patchset, at this point, contains -
-> > 1. SCC support in NVMe driver
-> > 2. Block-layer infra for copy-offload operation
-> > 3. ioctl interface to user-space
-> > 4. copy-emulation infra in the block-layer
-> > 5. copy-offload plumbing to dm-kcopyd (thus creating couple of in-kernel
-> >       users such as dm-clone)
-> >
-> >
-> > The SCC specification, i.e. TP4065a can be found in following link
-> >
-> > https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs.zip
-> >
-> > Simple copy is a copy offloading feature and can be used to copy multiple
-> > contiguous ranges (source_ranges) of LBA's to a single destination LBA
-> > within the device, reducing traffic between host and device.
-> >
-> > We define a block ioctl for copy and copy payload format similar to
-> > discard. For device supporting native simple copy, we attach the control
-> > information as payload to the bio and submit to the device. Copy emulation
-> > is implemented incase underlaying device does not support copy offload or
-> > based on sysfs choice. Copy emulation is done by reading each source range
-> > into buffer and writing it to the destination.
->
-> Seems useful.  Would you mind adapting the loop driver to call
-> copy_file_range (for files) so that anyone interested in making a
-> filesystem use this capability (cough) can write fstests?
+Add basic tests to cover some regressions that we had.
+It's hard to test floppy because some tests require
+presence or absense of a diskette in a drive. To simulate
+test conditions and automate the testing I added
+"run_*.sh" wrapper scripts that run tests in QEMU.
 
-We are planning to look into copy_file_range plumbing after settling
-on the current series,
- which already became heavyweight for the first drop.
+The first patch just improves check for reverted commits
+in a commit message. The second patch is required to
+generate a minimal initrd used in next commits. Rest of
+commits are basic floppy tests.
 
-Nitesh Shetty
->
-> --D
->
-> > At present this implementation does not support copy offload for stacked/dm
-> > devices, rather copy operation is completed through emulation.
-> >
-> > One of the in-kernel use case for copy-offload is implemented by this
-> > patchset. dm-kcopyd infra has been changed to leverage the copy-offload if
-> > it is natively available. Other future use-cases could be F2FS GC, BTRFS
-> > relocation/balance and copy_file_range.
-> >
-> > Following limits are added to queue limits and are exposed via sysfs to
-> > userspace, which user can use to form a payload.
-> >
-> >  - copy_offload:
-> >       configurable, can be used set emulation or copy offload
-> >               0 to disable copy offload,
-> >               1 to enable copy offloading support. Offload can be only
-> >                       enabled, if underlaying device supports offload
-> >
-> >  - max_copy_sectors:
-> >       total copy length supported by copy offload feature in device.
-> >       0 indicates copy offload is not supported.
-> >
-> >  - max_copy_nr_ranges:
-> >       maximum number of source range entries supported by copy offload
-> >                       feature in device
-> >
-> >  - max_copy_range_sectors:
-> >       maximum copy length per source range entry
-> >
-> > *blkdev_issue_copy* takes source bdev, no of sources, array of source
-> > ranges (in sectors), destination bdev and destination offset(in sectors).
-> > If both source and destination block devices are same and queue parameter
-> > copy_offload is 1, then copy is done through native copy offloading.
-> > Copy emulation is used in otherwise.
-> >
-> > Changes from  RFC v5
-> >
-> > 1. Handle copy larger than maximum copy limits
-> > 2. Create copy context and submit copy offload asynchronously
-> > 3. Remove BLKDEV_COPY_NOEMULATION opt-in option of copy offload and
-> > check for copy support before submission from dm and other layers
-> > 4. Allocate maximum possible allocatable buffer for copy emulation
-> > rather failing very large copy offload.
-> > 5. Fix copy_offload sysfs to be either have 0 or 1
-> >
-> > Changes from RFC v4
-> >
-> > 1. Extend dm-kcopyd to leverage copy-offload, while copying within the
-> > same device. The other approach was to have copy-emulation by moving
-> > dm-kcopyd to block layer. But it also required moving core dm-io infra,
-> > causing a massive churn across multiple dm-targets.
-> > 2. Remove export in bio_map_kern()
-> > 3. Change copy_offload sysfs to accept 0 or else
-> > 4. Rename copy support flag to QUEUE_FLAG_SIMPLE_COPY
-> > 5. Rename payload entries, add source bdev field to be used while
-> > partition remapping, remove copy_size
-> > 6. Change the blkdev_issue_copy() interface to accept destination and
-> > source values in sector rather in bytes
-> > 7. Add payload to bio using bio_map_kern() for copy_offload case
-> > 8. Add check to return error if one of the source range length is 0
-> > 9. Add BLKDEV_COPY_NOEMULATION flag to allow user to not try copy
-> > emulation incase of copy offload is not supported. Caller can his use
-> > his existing copying logic to complete the io.
-> > 10. Bug fix copy checks and reduce size of rcu_lock()
-> >
-> > Changes from RFC v3
-> >
-> > 1. gfp_flag fixes.
-> > 2. Export bio_map_kern() and use it to allocate and add pages to bio.
-> > 3. Move copy offload, reading to buf, writing from buf to separate functions
-> > 4. Send read bio of copy offload by chaining them and submit asynchronously
-> > 5. Add gendisk->part0 and part->bd_start_sect changes to blk_check_copy().
-> > 6. Move single source range limit check to blk_check_copy()
-> > 7. Rename __blkdev_issue_copy() to blkdev_issue_copy and remove old helper.
-> > 8. Change blkdev_issue_copy() interface generic to accepts destination bdev
-> >         to support XCOPY as well.
-> > 9. Add invalidate_kernel_vmap_range() after reading data for vmalloc'ed memory.
-> > 10. Fix buf allocoation logic to allocate buffer for the total size of copy.
-> > 11. Reword patch commit description.
-> >
-> > Changes from RFC v2
-> >
-> > 1. Add emulation support for devices not supporting copy.
-> > 2. Add *copy_offload* sysfs entry to enable and disable copy_offload
-> >         in devices supporting simple copy.
-> > 3. Remove simple copy support for stacked devices.
-> >
-> > Changes from RFC v1:
-> >
-> > 1. Fix memory leak in __blkdev_issue_copy
-> > 2. Unmark blk_check_copy inline
-> > 3. Fix line break in blk_check_copy_eod
-> > 4. Remove p checks and made code more readable
-> > 5. Don't use bio_set_op_attrs and remove op and set
-> >    bi_opf directly
-> > 6. Use struct_size to calculate total_size
-> > 7. Fix partition remap of copy destination
-> > 8. Remove mcl,mssrl,msrc from nvme_ns
-> > 9. Initialize copy queue limits to 0 in nvme_config_copy
-> > 10. Remove return in QUEUE_FLAG_COPY check
-> > 11. Remove unused OCFS
-> >
-> >
-> > Nitesh Shetty (4):
-> >   block: Introduce queue limits for copy-offload support
-> >   block: copy offload support infrastructure
-> >   block: Introduce a new ioctl for simple copy
-> >   block: add emulation for simple copy
-> >
-> > SelvaKumar S (3):
-> >   block: make bio_map_kern() non static
-> >   nvme: add simple copy support
-> >   dm kcopyd: add simple copy offload support
-> >
-> >  block/blk-core.c          |  84 ++++++++-
-> >  block/blk-lib.c           | 352 ++++++++++++++++++++++++++++++++++++++
-> >  block/blk-map.c           |   2 +-
-> >  block/blk-settings.c      |   4 +
-> >  block/blk-sysfs.c         |  51 ++++++
-> >  block/blk-zoned.c         |   1 +
-> >  block/bounce.c            |   1 +
-> >  block/ioctl.c             |  33 ++++
-> >  drivers/md/dm-kcopyd.c    |  56 +++++-
-> >  drivers/nvme/host/core.c  |  83 +++++++++
-> >  drivers/nvme/host/trace.c |  19 ++
-> >  include/linux/bio.h       |   1 +
-> >  include/linux/blk_types.h |  20 +++
-> >  include/linux/blkdev.h    |  21 +++
-> >  include/linux/nvme.h      |  43 ++++-
-> >  include/uapi/linux/fs.h   |  20 +++
-> >  16 files changed, 775 insertions(+), 16 deletions(-)
-> >
-> > --
-> > 2.25.1
-> >
+Please, comment the approach, selftests integration
+and suggest tests that you would like to add.
+
+I thought about adding a possibility to remove/insert
+diskettes inside a test. This is possible if we give
+the guest an access to the QEMU monitor (eject/change cmds).
+But I didn't find a better way to do it than to map a
+monitor to an external port:
+  -monitor tcp:<ip>:<port>,server,nowait
+  and access this ip from the guest.
+Maybe it's also possible to do with virtserialport.
+
+Denis Efremov (5):
+  checkpatch: improve handling of revert commits
+  gen_initramfs.sh: use absolute path for gen_init_cpio
+  selftests: floppy: add basic tests for opening an empty device
+  selftests: floppy: add basic tests for a readonly disk
+  selftests: floppy: add basic rdwr tests
+
+ MAINTAINERS                                  |  1 +
+ scripts/checkpatch.pl                        | 12 +--
+ tools/testing/selftests/floppy/.gitignore    |  8 ++
+ tools/testing/selftests/floppy/Makefile      | 10 ++
+ tools/testing/selftests/floppy/config        |  1 +
+ tools/testing/selftests/floppy/empty.c       | 58 ++++++++++++
+ tools/testing/selftests/floppy/init.c        | 43 +++++++++
+ tools/testing/selftests/floppy/lib.sh        | 67 +++++++++++++
+ tools/testing/selftests/floppy/rdonly.c      | 99 ++++++++++++++++++++
+ tools/testing/selftests/floppy/rdwr.c        | 67 +++++++++++++
+ tools/testing/selftests/floppy/run_empty.sh  | 16 ++++
+ tools/testing/selftests/floppy/run_rdonly.sh | 22 +++++
+ tools/testing/selftests/floppy/run_rdwr.sh   | 22 +++++
+ usr/gen_initramfs.sh                         |  2 +-
+ 14 files changed, 421 insertions(+), 7 deletions(-)
+ create mode 100644 tools/testing/selftests/floppy/.gitignore
+ create mode 100644 tools/testing/selftests/floppy/Makefile
+ create mode 100644 tools/testing/selftests/floppy/config
+ create mode 100644 tools/testing/selftests/floppy/empty.c
+ create mode 100644 tools/testing/selftests/floppy/init.c
+ create mode 100644 tools/testing/selftests/floppy/lib.sh
+ create mode 100644 tools/testing/selftests/floppy/rdonly.c
+ create mode 100644 tools/testing/selftests/floppy/rdwr.c
+ create mode 100755 tools/testing/selftests/floppy/run_empty.sh
+ create mode 100755 tools/testing/selftests/floppy/run_rdonly.sh
+ create mode 100755 tools/testing/selftests/floppy/run_rdwr.sh
+
+-- 
+2.31.1
+
