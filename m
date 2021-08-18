@@ -2,45 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FC5C4320A
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8365C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:45:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BCA8610E5
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 959176108D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:45:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238593AbhHROpQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 10:45:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59670 "EHLO
+        id S239422AbhHROpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 10:45:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28572 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239422AbhHROpP (ORCPT
+        by vger.kernel.org with ESMTP id S239565AbhHROpX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 10:45:15 -0400
+        Wed, 18 Aug 2021 10:45:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629297880;
+        s=mimecast20190719; t=1629297888;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ohxRW5B1dcCxo1hzkltnZYQPDrZIXytR6PXe3YOTHYA=;
-        b=ihx9FVepbli8EQWKi1DEcmGF/BXXssd+1sDSJBlA8owEsIOTclcH8Jmwdudz4CUdtTu018
-        GkpEt7eEPvt10+jRxuXNem074N+8V6VyK21n1WhXVOTUfJoFt2tL9yRxJc3XT53HVzJW38
-        KZtcdsB095DCZMUYgirZsjPnCA7NtJY=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iuvcYtFumwjyV+wo2LskpKtpPys22iiOt3Pdd+iWq6k=;
+        b=Sx2uvthDnCZxsTlNyiEoqowXdzv7/WnSxve7qaQM94zy+SZwmbw4coYUUd0oVCx3ZIGXcx
+        RUNoO9cP1ocA0DoLmpPGwz4/1TexzWAWpzVxuidnOD87u9P+nfSvweoJyjw40rqHshTh9v
+        qwfPm/SWs3nIpid0G5XcuAmWFowrTmc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-LU7xoahGNtSjU-NG4W8V4Q-1; Wed, 18 Aug 2021 10:44:39 -0400
-X-MC-Unique: LU7xoahGNtSjU-NG4W8V4Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-191-Z-EzM46gMiKGbQidRJIH3g-1; Wed, 18 Aug 2021 10:44:47 -0400
+X-MC-Unique: Z-EzM46gMiKGbQidRJIH3g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B9541082925;
-        Wed, 18 Aug 2021 14:44:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0B2094DC8;
+        Wed, 18 Aug 2021 14:44:45 +0000 (UTC)
 Received: from localhost (ovpn-8-40.pek2.redhat.com [10.72.8.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D371C60657;
-        Wed, 18 Aug 2021 14:44:33 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 35B1F60BF4;
+        Wed, 18 Aug 2021 14:44:40 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
@@ -48,75 +49,86 @@ Cc:     John Garry <john.garry@huawei.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         Daniel Wagner <dwagner@suse.de>,
         Wen Xiong <wenxiong@us.ibm.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V7 0/3] blk-mq: fix blk_mq_alloc_request_hctx
-Date:   Wed, 18 Aug 2021 22:44:25 +0800
-Message-Id: <20210818144428.896216-1-ming.lei@redhat.com>
+Subject: [PATCH V7 1/3] genirq: add device_has_managed_msi_irq
+Date:   Wed, 18 Aug 2021 22:44:26 +0800
+Message-Id: <20210818144428.896216-2-ming.lei@redhat.com>
+In-Reply-To: <20210818144428.896216-1-ming.lei@redhat.com>
+References: <20210818144428.896216-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+irq vector allocation with managed affinity may be used by driver, and
+blk-mq needs this info for draining queue because genirq core will shutdown
+managed irq when all CPUs in the affinity mask are offline.
 
-blk_mq_alloc_request_hctx() is used by NVMe fc/rdma/tcp/loop to connect
-io queue. Also the sw ctx is chosen as the 1st online cpu in hctx->cpumask.
-However, all cpus in hctx->cpumask may be offline.
+The info of using managed irq is often produced by drivers, and it is
+consumed by blk-mq, so different subsystems are involved in this info flow.
 
-This usage model isn't well supported by blk-mq which supposes allocator is
-always done on one online CPU in hctx->cpumask. This assumption is
-related with managed irq, which also requires blk-mq to drain inflight
-request in this hctx when the last cpu in hctx->cpumask is going to
-offline.
+Address this issue by adding one helper of device_has_managed_msi_irq()
+which is suggested by John Garry.
 
-However, NVMe fc/rdma/tcp/loop don't use managed irq, so we should allow
-them to ask for request allocation when the specified hctx is inactive
-(all cpus in hctx->cpumask are offline). Fix blk_mq_alloc_request_hctx() by
-allowing to allocate request when all CPUs of this hctx are offline.
+Tested-by: Wen Xiong <wenxiong@us.ibm.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Suggested-by: John Garry <john.garry@huawei.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/msi.h |  5 +++++
+ kernel/irq/msi.c    | 18 ++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-Wen Xiong has verified V4 in her nvmef test.
-
-V7:
-	- move blk_mq_hctx_use_managed_irq() into block/blk-mq.c, 3/3
-
-V6:
-	- move device_has_managed_msi_irq() into kernel/irq/msi.c
-
-V5:
-	- take John Garry's suggestion to replace device field with
-	new helper of device_has_managed_msi_irq()
-V4:
-	- remove patches for cleanup queue map helpers
-	- take Christoph's suggestion to add field into 'struct device' for
-	describing if managed irq is allocated from one device
-
-V3:
-	- cleanup map queues helpers, and remove pci/virtio/rdma queue
-	  helpers
-	- store use managed irq info into qmap
-
-V2:
-	- use flag of BLK_MQ_F_MANAGED_IRQ
-	- pass BLK_MQ_F_MANAGED_IRQ from driver explicitly
-	- kill BLK_MQ_F_STACKING
-
-
-Ming Lei (3):
-  genirq: add device_has_managed_msi_irq
-  blk-mq: mark if one queue map uses managed irq
-  blk-mq: don't deactivate hctx if managed irq isn't used
-
- block/blk-mq-pci.c                     |  2 ++
- block/blk-mq-rdma.c                    |  7 ++++++
- block/blk-mq-virtio.c                  |  2 ++
- block/blk-mq.c                         | 35 ++++++++++++++++++--------
- drivers/scsi/hisi_sas/hisi_sas_v2_hw.c |  1 +
- include/linux/blk-mq.h                 |  3 ++-
- include/linux/msi.h                    |  5 ++++
- kernel/irq/msi.c                       | 18 +++++++++++++
- 8 files changed, 62 insertions(+), 11 deletions(-)
-
+diff --git a/include/linux/msi.h b/include/linux/msi.h
+index a20dc66b9946..b4511c606072 100644
+--- a/include/linux/msi.h
++++ b/include/linux/msi.h
+@@ -59,10 +59,15 @@ struct platform_msi_priv_data;
+ void __get_cached_msi_msg(struct msi_desc *entry, struct msi_msg *msg);
+ #ifdef CONFIG_GENERIC_MSI_IRQ
+ void get_cached_msi_msg(unsigned int irq, struct msi_msg *msg);
++bool device_has_managed_msi_irq(struct device *dev);
+ #else
+ static inline void get_cached_msi_msg(unsigned int irq, struct msi_msg *msg)
+ {
+ }
++static inline bool device_has_managed_msi_irq(struct device *dev)
++{
++	return false;
++}
+ #endif
+ 
+ typedef void (*irq_write_msi_msg_t)(struct msi_desc *desc,
+diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+index 00f89d5bd6f6..167bc1d8bf4a 100644
+--- a/kernel/irq/msi.c
++++ b/kernel/irq/msi.c
+@@ -71,6 +71,24 @@ void get_cached_msi_msg(unsigned int irq, struct msi_msg *msg)
+ }
+ EXPORT_SYMBOL_GPL(get_cached_msi_msg);
+ 
++/**
++ * device_has_managed_msi_irq - Query if device has managed irq entry
++ * @dev:	Pointer to the device for which we want to query
++ *
++ * Return true if there is managed irq vector allocated on this device
++ */
++bool device_has_managed_msi_irq(struct device *dev)
++{
++	struct msi_desc *desc;
++
++	for_each_msi_entry(desc, dev) {
++		if (desc->affinity && desc->affinity->is_managed)
++			return true;
++	}
++	return false;
++}
++EXPORT_SYMBOL_GPL(device_has_managed_msi_irq);
++
+ #ifdef CONFIG_GENERIC_MSI_IRQ_DOMAIN
+ static inline void irq_chip_write_msi_msg(struct irq_data *data,
+ 					  struct msi_msg *msg)
 -- 
 2.31.1
 
