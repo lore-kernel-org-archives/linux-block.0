@@ -2,137 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B915FC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 07:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E0EC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 07:39:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F0EC606A5
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 07:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2CD2606A5
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 07:39:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239128AbhHRHj1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 03:39:27 -0400
-Received: from out0.migadu.com ([94.23.1.103]:59355 "EHLO out0.migadu.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238718AbhHRHjO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 03:39:14 -0400
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1629272317;
+        id S238791AbhHRHjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 03:39:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23441 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238603AbhHRHjm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 03:39:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629272347;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=hP9HW//B3NoX9LwkEHKK/gCPkZG5tN3oUHI8WD99sBQ=;
-        b=m7pL9uRMb0zz5TvuiVQHjPX6RmPmZjUNzr8ZYd/uROuymj5cfHgXzKrhFrzbOovbNIYd9e
-        UP3+N7ztESb+0fHHMOepX0XS0MsZ098oQxDZZfq3AQOljeLcEmaLq8deRL+Lt/9SLh3dyf
-        VmRsEWkPr2WVohhU/eZ00npYGAtQdc0=
-From:   Guoqing Jiang <guoqing.jiang@linux.dev>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: [PATCH V2] raid1: ensure write behind bio has less than BIO_MAX_VECS sectors
-Date:   Wed, 18 Aug 2021 15:37:38 +0800
-Message-Id: <20210818073738.1271033-1-guoqing.jiang@linux.dev>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LCsUAX7qCf8kQi+TyECU3+D4leV6a/JZLtzwwZWNnR0=;
+        b=QZCKWl1k8lZicWCfYwHaDb2tJ0pIddUDMrzsjUCyfHOPPtgyC/u/9KbnSrUbErS4dtbChX
+        LUuaZw7q/Ep0iDj4rOWNWKCJyUo2BWZq678I2gj8xaZolJteJWEcm9HpzahDKNwMTPu3bK
+        CLLloojDO+g+sPkf22lcI9QeD9f04VA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-560-BTz8WkvsMZG-DzqPP69k4w-1; Wed, 18 Aug 2021 03:39:06 -0400
+X-MC-Unique: BTz8WkvsMZG-DzqPP69k4w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A2DA108BC7B;
+        Wed, 18 Aug 2021 07:39:05 +0000 (UTC)
+Received: from T590 (ovpn-8-40.pek2.redhat.com [10.72.8.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CB3A5D9C6;
+        Wed, 18 Aug 2021 07:38:56 +0000 (UTC)
+Date:   Wed, 18 Aug 2021 15:38:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, kashyap.desai@broadcom.com,
+        hare@suse.de
+Subject: Re: [PATCH v2 08/11] blk-mq: Add blk_mq_ops.init_request_no_hctx()
+Message-ID: <YRy5C1s0HetZCHQ1@T590>
+References: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
+ <1628519378-211232-9-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: guoqing.jiang@linux.dev
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1628519378-211232-9-git-send-email-john.garry@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <jiangguoqing@kylinos.cn>
+On Mon, Aug 09, 2021 at 10:29:35PM +0800, John Garry wrote:
+> Add a variant of the init_request function which does not pass a hctx_idx
+> arg.
+> 
+> This is important for shared sbitmap support, as it needs to be ensured for
+> introducing shared static rqs that the LLDD cannot think that requests
+> are associated with a specific HW queue.
+> 
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> ---
+>  block/blk-mq.c         | 15 ++++++++++-----
+>  include/linux/blk-mq.h |  7 +++++++
+>  2 files changed, 17 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f14cc2705f9b..4d6723cfa582 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2427,13 +2427,15 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+>  static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
+>  			       unsigned int hctx_idx, int node)
+>  {
+> -	int ret;
+> +	int ret = 0;
+>  
+> -	if (set->ops->init_request) {
+> +	if (set->ops->init_request)
+>  		ret = set->ops->init_request(set, rq, hctx_idx, node);
+> -		if (ret)
+> -			return ret;
+> -	}
+> +	else if (set->ops->init_request_no_hctx)
+> +		ret = set->ops->init_request_no_hctx(set, rq, node);
 
-We can't split write behind bio with more than BIO_MAX_VECS sectors,
-otherwise the below call trace was triggered because we could allocate
-oversized write behind bio later.
+The only shared sbitmap user of SCSI does not use passed hctx_idx, not
+sure we need such new callback.
 
-[ 8.097936] bvec_alloc+0x90/0xc0
-[ 8.098934] bio_alloc_bioset+0x1b3/0x260
-[ 8.099959] raid1_make_request+0x9ce/0xc50 [raid1]
-[ 8.100988] ? __bio_clone_fast+0xa8/0xe0
-[ 8.102008] md_handle_request+0x158/0x1d0 [md_mod]
-[ 8.103050] md_submit_bio+0xcd/0x110 [md_mod]
-[ 8.104084] submit_bio_noacct+0x139/0x530
-[ 8.105127] submit_bio+0x78/0x1d0
-[ 8.106163] ext4_io_submit+0x48/0x60 [ext4]
-[ 8.107242] ext4_writepages+0x652/0x1170 [ext4]
-[ 8.108300] ? do_writepages+0x41/0x100
-[ 8.109338] ? __ext4_mark_inode_dirty+0x240/0x240 [ext4]
-[ 8.110406] do_writepages+0x41/0x100
-[ 8.111450] __filemap_fdatawrite_range+0xc5/0x100
-[ 8.112513] file_write_and_wait_range+0x61/0xb0
-[ 8.113564] ext4_sync_file+0x73/0x370 [ext4]
-[ 8.114607] __x64_sys_fsync+0x33/0x60
-[ 8.115635] do_syscall_64+0x33/0x40
-[ 8.116670] entry_SYSCALL_64_after_hwframe+0x44/0xae
+If you really want to do this, just wondering why not pass '-1' as
+hctx_idx in case of shared sbitmap?
 
-Thanks for the comment from Christoph.
-
-[1]. https://bugs.archlinux.org/task/70992
-
-Cc: Song Liu <song@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Reported-by: Jens Stutte <jens@chianterastutte.eu>
-Tested-by: Jens Stutte <jens@chianterastutte.eu>
-Signed-off-by: Guoqing Jiang <jiangguoqing@kylinos.cn>
----
-Hi Jens,
-
-Could you consider apply this to block tree? Since it depends
-on commit 018eca456c4b4dca56aaf1ec27f309c74d0fe246 in block
-tree for-next branch, otherwise lkp would complain about compile
-issue again.
 
 Thanks,
-Guoqing
-
-V2 change:
-1. add checking for write-behind case and relevant comments from Christoph.
-
- drivers/md/raid1.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 3c44c4bb40fc..e8c8e6bb0439 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1329,6 +1329,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 	struct raid1_plug_cb *plug = NULL;
- 	int first_clone;
- 	int max_sectors;
-+	bool write_behind = false;
- 
- 	if (mddev_is_clustered(mddev) &&
- 	     md_cluster_ops->area_resyncing(mddev, WRITE,
-@@ -1381,6 +1382,10 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 	max_sectors = r1_bio->sectors;
- 	for (i = 0;  i < disks; i++) {
- 		struct md_rdev *rdev = rcu_dereference(conf->mirrors[i].rdev);
-+
-+		if (test_bit(WriteMostly, &mirror->rdev->flags))
-+			write_behind = true;
-+
- 		if (rdev && unlikely(test_bit(Blocked, &rdev->flags))) {
- 			atomic_inc(&rdev->nr_pending);
- 			blocked_rdev = rdev;
-@@ -1454,6 +1459,14 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 		goto retry_write;
- 	}
- 
-+	/*
-+	 * When using a bitmap, we may call alloc_behind_master_bio below.
-+	 * alloc_behind_master_bio allocates a copy of the data payload a page
-+	 * at a time and thus needs a new bio that can fit the whole payload
-+	 * this bio in page sized chunks.
-+	 */
-+	if (write_behind && bitmap)
-+		max_sectors = min_t(int, max_sectors, BIO_MAX_VECS * PAGE_SECTORS);
- 	if (max_sectors < bio_sectors(bio)) {
- 		struct bio *split = bio_split(bio, max_sectors,
- 					      GFP_NOIO, &conf->bio_split);
--- 
-2.25.1
+Ming
 
