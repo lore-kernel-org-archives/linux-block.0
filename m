@@ -2,169 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAA1C4320A
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 00:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4234EC4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 00:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F08A61053
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 00:53:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F22C61059
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 00:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234919AbhHRAxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Aug 2021 20:53:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58138 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237071AbhHRAxo (ORCPT
+        id S234789AbhHRA5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Aug 2021 20:57:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234119AbhHRA5q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Aug 2021 20:53:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629247990;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OlpWao7vU3JW787/tdi8ZHrj116Lw/4JmcqJlEJe7xY=;
-        b=S20DlWRQ0zmnI+j7KvQxUQTkCaYwCofl7QjGWlJTIf9xJQyFj7FhsrCQeUJuupfGwiBlbD
-        2Yf9WV7agqfWdSWAQiMjeiM3RTawng2oEo0Azkquikmwd5yAHvoiBQsLILyxNTM32xUDDB
-        lh8kI2EmL65ax+f7GDcO9GC0U1GXNAk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-OQKfPFW7OvaMR3DEyJhmbg-1; Tue, 17 Aug 2021 20:53:06 -0400
-X-MC-Unique: OQKfPFW7OvaMR3DEyJhmbg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F4CD18C8C00;
-        Wed, 18 Aug 2021 00:53:05 +0000 (UTC)
-Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DA3BC19D9D;
-        Wed, 18 Aug 2021 00:52:56 +0000 (UTC)
-Date:   Wed, 18 Aug 2021 08:52:51 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, bvanassche@acm.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH RFC] blk_mq: clear rq mapping in driver tags before
- freeing rqs in sched tags
-Message-ID: <YRxZ44tu8o1MPruT@T590>
-References: <20210817022306.1622027-1-yukuai3@huawei.com>
+        Tue, 17 Aug 2021 20:57:46 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7394BC061764;
+        Tue, 17 Aug 2021 17:57:12 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id i9so850070lfg.10;
+        Tue, 17 Aug 2021 17:57:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6oXFRATTxmrl3SJwMn5v8ibx/U35v05GN+b9HBgF4II=;
+        b=Y7IwiZDEdy8gPIViPEbbMQjQXS5l4Erre5oEW4j/LI12gPxk3cibcrNItMNtR96tsx
+         /hEJzyp0nadZgHFZU3YLI6CI3nVv+Vg4HrKskOrxzRp5X8P5hA7g/P/w9/OGPITxwZ16
+         OBAMw4A+qH9oqjumL1dQLrQ63VnoLOFUmGsn939jf14yyC86nMjn8yIealtadn7fzCNs
+         vKgjmto3Zo1yenrqWnp/AXTxeC/0CfaaxHROypDqEj8XaEjwiH67JJLK98i02hKjoy+m
+         OuWNez6TdBoXup1jkXZkuZlZ6EKhVFzaCng0ZkuDFSliuH+wr7FyypbDmnTqWmcCF8NC
+         nXjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6oXFRATTxmrl3SJwMn5v8ibx/U35v05GN+b9HBgF4II=;
+        b=tuXyZGbXSOArbGOdocxNLpOV6IpXYiEKpBoxsUPIM2aDzA7VmyMe9dx8Wj6k+wnp84
+         uO7x0uNQMMLsOdZrZBrQaPOYflozD4YgoM8ZCgwjL68cEPeBJUnsiH0mz2HS/DSKDBgI
+         NJYEBXiBN9JTUxr4ZPec/Ewwck2Sm9yQHhY1LGBf1YC2RMh/G7xGpSRxYg1VmIOH86pO
+         pxwshu1HvRIEnyKV7gNhKuubdiVCuufYnhAuAcKLW/IrWz/2oMdeDJ3WabefUvYuWms8
+         kpXurO8Fnb+vFqIDGj1eMc8zi4i5HYeFvSR+h/s/LawhGr9n965/tlMlY0jC4Wzj4k5Y
+         0jvg==
+X-Gm-Message-State: AOAM533dPqF6AcyM3VlOqrGrxGbx+WO9csufaULi2KywVxiztpq2fyWO
+        nrE2zIgZfjp0qLTrvNf/6i8=
+X-Google-Smtp-Source: ABdhPJw8Z/4ekKldrzBctMm8kW58h+zzRE3NliyLzY/6Vn0vOYvfANTZPW9ueqHKvEwJTjvphgCJQQ==
+X-Received: by 2002:ac2:5e84:: with SMTP id b4mr4249474lfq.169.1629248230867;
+        Tue, 17 Aug 2021 17:57:10 -0700 (PDT)
+Received: from localhost.localdomain (46-138-85-91.dynamic.spd-mgts.ru. [46.138.85.91])
+        by smtp.gmail.com with ESMTPSA id h19sm335879lfu.138.2021.08.17.17.57.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Aug 2021 17:57:10 -0700 (PDT)
+From:   Dmitry Osipenko <digetx@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>
+Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+Subject: [PATCH v5 0/5] Support EFI partition on NVIDIA Tegra devices
+Date:   Wed, 18 Aug 2021 03:55:42 +0300
+Message-Id: <20210818005547.14497-1-digetx@gmail.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210817022306.1622027-1-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 10:23:06AM +0800, Yu Kuai wrote:
-> If ioscheduler is not none, hctx->tags->rq[tag] will point to
-> hctx->sched_tags->static_rq[internel_tag] in blk_mq_get_driver_tag().
-> However, static_rq of sched_tags might be freed through switching
-> elevator or increasing nr_requests. Thus leave a window for some drivers
-> to get the freed request through blk_mq_tag_to_rq(tags, tag).
+This series adds the most minimal EFI partition support for NVIDIA Tegra
+consumer devices, like Android tablets and game consoles, making theirs
+eMMC accessible out-of-the-box using downstream bootloader and mainline
+Linux kernel.  eMMC now works on Acer A500 tablet and Ouya game console
+that are already well supported in mainline and internal storage is the
+only biggest thing left to support.
 
-I believe I have explained that it is bug of driver which has knowledge
-if the passed tag is valid or not. We are clear that driver need to cover
-race between normal completion and timeout/error handling.
+Changelog:
 
-> 
-> It's difficult to fix this uaf from driver side, I'm thinking about
+v5: - Implemented alternative_gpt_sector() blk/mmc callback that was
+      suggested by Christoph Hellwig in a comment to v4.
 
-So far not see any analysis on why the uaf is triggered, care to
-investigate the reason?
+    - mmc_bdev_to_card() now checks blk fops instead of the major number,
+      like it was suggested by Christoph Hellwig in a comment to v4.
 
-> following solution:
-> 
-> a. clear rq mapping in driver tags before freeing rqs in sched tags
+    - Emailed Rob Herring, which was asked by Ulf Hansson in a comment
+      to v4. Although the of-match change is gone now in v5, the matching
+      is transformed into the new SDHCI quirk of the Tegra driver.
 
-We have done that already, see blk_mq_free_rqs().
+v4: - Rebased on top of recent linux-next.
 
-> b. provide a new interface to replace blk_mq_tag_to_rq(), the new
-> interface will make sure it won't return freed rq.
+v3: - Removed unnecessary v1 hunk that was left by accident in efi.c of v2.
 
-b) in your previous patch can't avoid uaf:
+v2: - This is continuation of [1] where Davidlohr Bueso suggested that it
+      should be better to avoid supporting in mainline the custom gpt_sector
+      kernel cmdline parameter that downstream Android kernels use.  We can
+      do this for the devices that are already mainlined, so I dropped the
+      cmdline from the v2 and left only the variant with a fixed GPT address.
 
-https://lore.kernel.org/linux-block/YRHa%2FkeJ4pHP3hnL@T590/
+[1] https://lore.kernel.org/linux-efi/20210327212100.3834-3-digetx@gmail.com/T/
 
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/blk-mq-sched.c | 10 +++++++++-
->  block/blk-mq.c       | 13 +++++++++++--
->  block/blk-mq.h       |  2 ++
->  3 files changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 0f006cabfd91..9f11f17b8380 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -662,8 +662,16 @@ void blk_mq_sched_free_requests(struct request_queue *q)
->  	int i;
->  
->  	queue_for_each_hw_ctx(q, hctx, i) {
-> -		if (hctx->sched_tags)
-> +		if (hctx->sched_tags) {
-> +			/*
-> +			 * We are about to free requests in 'sched_tags[]',
-> +			 * however, 'tags[]' may still point to these requests.
-> +			 * Thus we need to clear rq mapping in 'tags[]' before
-> +			 * freeing requests in sched_tags[].
-> +			 */
-> +			blk_mq_clear_rq_mapping(q->tag_set, hctx->tags, i);
->  			blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i);
+Dmitry Osipenko (5):
+  block: Add alternative_gpt_sector() operation
+  mmc: block: Support alternative_gpt_sector() operation
+  mmc: core: Add raw_boot_mult field to mmc_ext_csd
+  mmc: sdhci-tegra: Implement alternative_gpt_sector()
+  partitions/efi: Support non-standard GPT location
 
-blk_mq_clear_rq_mapping() has been called in blk_mq_free_rqs()
-for clearing the request reference.
+ block/partitions/efi.c         | 13 +++++++++++
+ drivers/mmc/core/block.c       | 30 ++++++++++++++++++++++++
+ drivers/mmc/core/mmc.c         |  2 ++
+ drivers/mmc/host/sdhci-tegra.c | 42 ++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h         |  1 +
+ include/linux/mmc/card.h       |  1 +
+ include/linux/mmc/host.h       |  4 ++++
+ 7 files changed, 93 insertions(+)
 
-In theory, we only need to clear it in case of real io sched, but
-so far we do it for both io sched and none.
-
-> +		}
->  	}
->  }
->  
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d185be64c85f..b1e30464f87f 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2314,8 +2314,8 @@ static size_t order_to_size(unsigned int order)
->  }
->  
->  /* called before freeing request pool in @tags */
-> -static void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
-> -		struct blk_mq_tags *tags, unsigned int hctx_idx)
-> +void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
-> +			     struct blk_mq_tags *tags, unsigned int hctx_idx)
->  {
->  	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
->  	struct page *page;
-> @@ -3632,6 +3632,15 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->  			if (!ret && blk_mq_is_sbitmap_shared(set->flags))
->  				blk_mq_tag_resize_shared_sbitmap(set, nr);
->  		} else {
-> +			/*
-> +			 * We are about to free requests in 'sched_tags[]',
-> +			 * however, 'tags[]' may still point to these requests.
-> +			 * Thus we need to clear rq mapping in 'tags[]' before
-> +			 * freeing requests in sched_tags[].
-> +			 */
-> +			if (nr > hctx->sched_tags->nr_tags)
-> +				blk_mq_clear_rq_mapping(set, hctx->tags, i);
-> +
->  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
->  							nr, true);
-
-The request reference has been cleared too in blk_mq_tag_update_depth():
-
-	blk_mq_tag_update_depth
-		blk_mq_free_rqs
-			blk_mq_clear_rq_mapping
-
-
-Thanks, 
-Ming
+-- 
+2.32.0
 
