@@ -7,67 +7,70 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3630C432BE
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E74C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:24:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9D556108F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6217360232
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 13:24:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236690AbhHRNU4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 09:20:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33926 "EHLO
+        id S236365AbhHRNYs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 09:24:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236615AbhHRNU4 (ORCPT
+        with ESMTP id S236270AbhHRNYq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 09:20:56 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8C1C0613CF
-        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 06:20:21 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id g14so2108633pfm.1
-        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 06:20:21 -0700 (PDT)
+        Wed, 18 Aug 2021 09:24:46 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55229C061764
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 06:24:12 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id n12so1808668plf.4
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 06:24:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=MhAcwTmHxIAd4QFbOxVpg7wOWs84Q98Cer8hoXchdek=;
-        b=NVOwObjdIFoEbxF1XKZPzChGZXuZE/g+BpaPO5TLr44UaP5tY8KjyfATi22pXQtWan
-         aw7OAVz0spM5GoRwsIffIpkgUIcl496SJQ+z3rJbwuh5JFBWltsoom4HpdOb9LbU48Th
-         atnFM2by41h6JmoCRwBucAb8RZzv/FnEkhxDXtL6/RtRkpLlj246jZxlnfnxJGuPGsM1
-         nhRdYYwOegg8rd9/YzJGsm7+UyYBJU2G2gHNkbO607/25flTYRcDLzA+p+jAvUaUDPxH
-         8gguDMfkZm1tP4k7b6YY3elYaxwj1E2M5cSX/Rrbx+iNe+kk1GrLabg4dzMyFGfe5jXQ
-         yoow==
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=wG0Jsk1J07jpKpJSfxE2x1g+CeG4Hcc15pP5LaOetew=;
+        b=iQwolJeKqd+VyevgcX3xE+f9wOK/AsPbqlKCg565RYfUuC95BhVQ1FR2TxcDdqWCJI
+         gT1UoTFE8YrKBGnD7uzXD7LSFgg5vs3TueA3apeGEKi1UJi8EZKbOLP78mtTeKd938e/
+         E5iJ0epPcPFA9ggyVj7aZL8zibzRrw3XcrQhKI65RJNbK8iPTWAptbEesJ5QdsNjwogc
+         s7DtdNHStzH7YEEKey8CV5rHCI608ehPIwK+Qftqc4iqJkDlXvZQ6M8TyrmctMB3bWtk
+         iLwrE6maxveUXwhc/8Edrca/YhrNveH92cI/W0DgGnsKwu0shZpIWBvwUSSlTT47LKsI
+         yJ0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=MhAcwTmHxIAd4QFbOxVpg7wOWs84Q98Cer8hoXchdek=;
-        b=ILy2T8dW0comNa7qOgoIzoMyMxq020ytNaSu3A7nC7PwKpNS9prnRGqogOCInNJV6Z
-         l6u8SSkZewTdsin16BNwFHafJ2/lUG4e7/lTY8X91wZsy/8CLFfHjwIVt5YJ+3wa1ug8
-         ZsV+ANvmrhv2SbIKQO9LRTZpMAetQZPx9bujhAvw9ukDkHLmt797BawZFu6UMdFDyrZ0
-         IuI66rzqmVEgJYUth9E1rW96ba/W52Bhj6Q5z0akFueDjCII5lgU3ypCbD+neOmQSHBo
-         E+V80idtte4x2erCl2/1K2u6rZ8/pp50y0Gm02zoEI2OGDPVd/mlE5bnbjgRLZQi8BrF
-         KNVw==
-X-Gm-Message-State: AOAM533ugWTOa+3SIRwCJwtt8qXxtqv/Bcn/85In4h17SMjo3wJUyAtP
-        sfpPYDq7expgDsZIfDnK9diD4BzdFQvwgiLG
-X-Google-Smtp-Source: ABdhPJwffJWAKC4Zll3QD2/A3uRNlLIUf8tiqDSzFTiSEiVs5PPdbXEKBxCy/wINIbG/mXnGa7LcOA==
-X-Received: by 2002:a05:6a00:a18:b029:382:e172:653e with SMTP id p24-20020a056a000a18b0290382e172653emr9394640pfh.19.1629292820948;
-        Wed, 18 Aug 2021 06:20:20 -0700 (PDT)
+        bh=wG0Jsk1J07jpKpJSfxE2x1g+CeG4Hcc15pP5LaOetew=;
+        b=Lemw/4/deacHc0qe1LJyWOpOwHxBgwMszM+8mtL4WvTk43QHR3j3CWxI+onnZ0NwV1
+         2pw7iy7ptiqx5woDMG5UqXj/thhevHnJCODGGx6hXANOPvC+gMcTwaWBR/sguG9Qy5Io
+         E8jZvQuWdbgwBhawbXglNNZcArQX2EIvW3tcx3/eqbUgKwQ693StwiQfTHEoAktlBiYi
+         WgO1PbJI/wmP0GvNPJuNuSigIIXQBREMtdHtHsmbng30e4rdpTkL/cWGSStkHRzzDMe2
+         GG1I5BgidEnYP1xm4G6fl0Q/BfPZ4BNWozKoWioNpx2aXQ5ItQziLQLg/YiWme9eWqUJ
+         EVkA==
+X-Gm-Message-State: AOAM5333b4Dn7mIl/hFv+5BAVMiBuVBOQyeQoUh2HELEJ01a2+u1Lweh
+        B6GouUALWMtkeQatbUdWdnuIzQ==
+X-Google-Smtp-Source: ABdhPJx6mkK1HEgeioEM+efuhhVDx/bR4NWxut/EUJTWBN8nm2olTPV1U1LosI3J3LSaVcNoI2m7lg==
+X-Received: by 2002:a17:902:7c87:b029:12c:8f2d:4238 with SMTP id y7-20020a1709027c87b029012c8f2d4238mr7389520pll.50.1629293051791;
+        Wed, 18 Aug 2021 06:24:11 -0700 (PDT)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id h24sm6657086pfn.180.2021.08.18.06.20.20
+        by smtp.gmail.com with ESMTPSA id ne3sm5428108pjb.51.2021.08.18.06.24.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Aug 2021 06:20:20 -0700 (PDT)
-Subject: Re: [PATCH v7 00/11] libata cleanups and improvements
-To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-ide@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20210816014456.2191776-1-damien.lemoal@wdc.com>
+        Wed, 18 Aug 2021 06:24:11 -0700 (PDT)
+Subject: Re: [PATCH v4 0/6] IO priority fixes and improvements
+To:     Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
+References: <20210811033702.368488-1-damien.lemoal@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <18c2f2e2-b7b6-b8b8-35ef-89ee59001cac@kernel.dk>
-Date:   Wed, 18 Aug 2021 07:20:18 -0600
+Message-ID: <e998936b-5452-1048-80f2-4161bb77b3de@kernel.dk>
+Date:   Wed, 18 Aug 2021 07:24:10 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210816014456.2191776-1-damien.lemoal@wdc.com>
+In-Reply-To: <20210811033702.368488-1-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,23 +78,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/15/21 7:44 PM, Damien Le Moal wrote:
-> The first three patches of this series fix sparse and kernel bot
-> warnings (potential NULL pointer dereference and locking imbalance).
-> 
-> The following three patches cleanup libata-core code in the area of
-> device configuration (ata_dev_configure() function).
-> 
-> Patch 7 improves ata_read_log_page() to avoid unnecessary warning
-> messages and patch 8 adds an informational message on device scan to
-> advertize the features supported by a device.
-> 
-> Path 9 adds the new sysfs ahci device attribute ncq_prio_supported to
-> indicate that a disk supports NCQ priority.
-> 
-> Patch 10 and 11 update the ABI user documentation files.
+On 8/10/21 9:36 PM, Damien Le Moal wrote:
+> This series fixes problems with IO priority values handling and cleans
+> up several macro names and code for clarity.
 
-Applied 2-11, thanks.
+Applied for 5.15 - note that I dropped the lightnvm change from 6/6,
+as it isn't strictly needed and lightnvm is deleted from the 5.15
+drivers branch anyway.
 
 -- 
 Jens Axboe
