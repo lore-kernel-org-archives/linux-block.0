@@ -2,79 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80394C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 08:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D45AC4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 08:46:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 628666109F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 08:38:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 470BF61058
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 08:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238967AbhHRIi7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 04:38:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39070 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239209AbhHRIi4 (ORCPT
+        id S233076AbhHRIrJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 04:47:09 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3657 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232482AbhHRIrI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 04:38:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629275902;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=b+amw47qxCoKw4icq6FPPyv77CAwQdV1ZQlpMJar6JI=;
-        b=S0OQGdtOOvx2VP4z2vbnQYFgWTZmabF5C9m7cDFAavPPGwPTfusd5hF6ZlD1mZN/LzxnBy
-        F9/SFk7Gqzd5+b/dVfawtWpDACzceUCMJiIxSuqKyPgZ48bN8UdsC82+pCzxPgrZX8jvQX
-        6AiQLrDawhvNfrUj9CdtU6zrB8SFrOA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-1o05g6u4O7SX6qdbTA33lA-1; Wed, 18 Aug 2021 04:38:20 -0400
-X-MC-Unique: 1o05g6u4O7SX6qdbTA33lA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1A61344B3;
-        Wed, 18 Aug 2021 08:38:19 +0000 (UTC)
-Received: from T590 (ovpn-8-40.pek2.redhat.com [10.72.8.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6791510013D6;
-        Wed, 18 Aug 2021 08:38:12 +0000 (UTC)
-Date:   Wed, 18 Aug 2021 16:38:06 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/7] genirq/affinity: rename irq_build_affinity_masks as
- group_cpus_evenly
-Message-ID: <YRzG7mMFI+n/QJyG@T590>
-References: <20210814123532.229494-1-ming.lei@redhat.com>
- <20210814123532.229494-5-ming.lei@redhat.com>
- <20210817045027.GD3874@lst.de>
+        Wed, 18 Aug 2021 04:47:08 -0400
+Received: from fraeml704-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GqM1B5KVFz6D9Cn;
+        Wed, 18 Aug 2021 16:45:34 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml704-chm.china.huawei.com (10.206.15.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Wed, 18 Aug 2021 10:46:32 +0200
+Received: from [10.202.227.179] (10.202.227.179) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 18 Aug 2021 09:46:31 +0100
+Subject: Re: [PATCH v2 08/11] blk-mq: Add blk_mq_ops.init_request_no_hctx()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <kashyap.desai@broadcom.com>, <hare@suse.de>
+References: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
+ <1628519378-211232-9-git-send-email-john.garry@huawei.com>
+ <YRy5C1s0HetZCHQ1@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <9a723528-3d4f-4b80-b10a-12ef50b00c50@huawei.com>
+Date:   Wed, 18 Aug 2021 09:46:30 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210817045027.GD3874@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <YRy5C1s0HetZCHQ1@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.179]
+X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 06:50:27AM +0200, Christoph Hellwig wrote:
-> s/as/to/ in the subjects.
-> 
-> On Sat, Aug 14, 2021 at 08:35:29PM +0800, Ming Lei wrote:
-> > Map irq vector into group, so we can abstract the algorithm for generic
-> > use case.
-> 
-> s/vector/vectors/
+On 18/08/2021 08:38, Ming Lei wrote:
+> On Mon, Aug 09, 2021 at 10:29:35PM +0800, John Garry wrote:
+>> Add a variant of the init_request function which does not pass a hctx_idx
+>> arg.
+>>
+>> This is important for shared sbitmap support, as it needs to be ensured for
+>> introducing shared static rqs that the LLDD cannot think that requests
+>> are associated with a specific HW queue.
+>>
+>> Signed-off-by: John Garry<john.garry@huawei.com>
+>> ---
+>>   block/blk-mq.c         | 15 ++++++++++-----
+>>   include/linux/blk-mq.h |  7 +++++++
+>>   2 files changed, 17 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index f14cc2705f9b..4d6723cfa582 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2427,13 +2427,15 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+>>   static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
+>>   			       unsigned int hctx_idx, int node)
+>>   {
+>> -	int ret;
+>> +	int ret = 0;
+>>   
+>> -	if (set->ops->init_request) {
+>> +	if (set->ops->init_request)
+>>   		ret = set->ops->init_request(set, rq, hctx_idx, node);
+>> -		if (ret)
+>> -			return ret;
+>> -	}
+>> +	else if (set->ops->init_request_no_hctx)
+>> +		ret = set->ops->init_request_no_hctx(set, rq, node);
 
-One group actually is abstracted from one irq vector, and it can represent
-vector, blk-mq hw queue and others. Currently genirq/affinity spreads
-vectors across all possible cpus, since this patch we spread groups
-among all possible cpus evenly.
+Hi Ming,
+
+> The only shared sbitmap user of SCSI does not use passed hctx_idx, not
+> sure we need such new callback.
+
+Sure, actually most versions of init_request callback don't use 
+hctx_idx. Or numa_node arg.
+> If you really want to do this, just wondering why not pass '-1' as
+> hctx_idx in case of shared sbitmap?
+
+Yeah, I did consider that. hctx_idx is an unsigned, and I generally 
+don't like -1U - but that's no big deal. But I also didn't like how it 
+relies on the driver init_request callback to check the value, which 
+changes the semantics.
+
+Obviously we don't add new versions of init_request for new block 
+drivers which use shared sbitmap everyday, and any new ones would get it 
+right.
+
+I suppose I can go the way you suggest - I just thought that this method 
+was neat as well.
 
 Thanks,
-Ming
+John
 
