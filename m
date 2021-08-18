@@ -2,218 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7877C43214
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E7BC4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:28:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A79E66104F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:11:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36A7A610E8
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239794AbhHRPMO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 11:12:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60380 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239524AbhHRPML (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 11:12:11 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E64C0617A8
-        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 08:11:35 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id w6so1970061plg.9
-        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 08:11:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BATSV86SaK5afBXIFxzdzZX4j4EhGdui2K0OHBJGQcw=;
-        b=nKyY7H15ZclPASn0mrCWStoJsQEVzP5/BmW4V3jtYB1HxVdnZRQQ4l+PtPCRG/dTV6
-         xfDqZKumuBc2DNoifQ7E+k+2RHNCKiMDNP3onIJnlrl5OiL/2iza72Z9iX+5k4rKwpSO
-         /m3Ffp/F03wd5BcOk1ihua3YxRddIsYpot1qTBRf+xRtenjeQ4qFFoOSIN66Jft6TSfW
-         c2t4wMFRzHKGD7LvgQQ/GVhG8mAh1vCDNxP/Inly9yMM79tpqdyKRQdjifrNITzwA6c7
-         yGxl1c2NhdVpvxPZ2G3/l6okDceS2O7mIXsDYuviCR6t29nOh+UDrTcg3BH0FRZEUvzE
-         zLIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BATSV86SaK5afBXIFxzdzZX4j4EhGdui2K0OHBJGQcw=;
-        b=JTqWo0lGN8hQnT5lR3EfHxx21IL6aX64kNx3g6ALXccflTESDkiwUPtNCWivyhm29M
-         l51GxE8w+ibdgWHvpXLRV/35bdIc551kAKXwLGLSCQOW+CLebJE1D6g5xDxOP3q+7O+q
-         tUlE53gZUdJGkJ22xXE9EpUFC+dvc6+bvc7dPKjdem8MVXd4YiWyBi5GeK+vPj5QWWUc
-         rh1LKM5MvYj09U7N4LHhhXgoYQmFW9ZSudvyBKKHM1xcCnTZy/FeyCgrFQ2Ph9u8Ltpr
-         ai+DYEsQdZJ55LPev7P75OdTZpEGSVk0pVhN4plpplQXOvbwa2osyEk224sYMElDL7eT
-         hTug==
-X-Gm-Message-State: AOAM533i7DHcjlu94tYf6AI3pHQ3g5QL231WQFIPk64BUrX1rfbHnUNB
-        INMOvXs06Yu0uLlEx6iKVcEfbA==
-X-Google-Smtp-Source: ABdhPJyb9v3aI2ukGkg+KeS46DSybL7HwTNvsJIGANZduqIYX0SVbX0PrpsQIc/aOBu7eADDQMvgoA==
-X-Received: by 2002:a17:90b:1e03:: with SMTP id pg3mr9751970pjb.203.1629299494765;
-        Wed, 18 Aug 2021 08:11:34 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m7sm28291pfc.212.2021.08.18.08.11.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 08:11:34 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 15:11:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 53/63] KVM: x86: Use struct_group() to zero decode
- cache
-Message-ID: <YR0jIEzEcUom/7rd@google.com>
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-54-keescook@chromium.org>
+        id S239940AbhHRP3W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 11:29:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53730 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238837AbhHRP3W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 11:29:22 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 46A3D6108D;
+        Wed, 18 Aug 2021 15:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1629300527;
+        bh=uUvkZoVLR5bWAmJre78Z4EYXJnQf7ulpfcF3RH5A8tc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=M6Whza/n37tjWo/ohy03NjT+pQlSSDEE+iAIY4v6vI+7dNs9UAxWz6TGQEkEodD5t
+         aLYg2Gql9iA6iIlmmZpXPo/2v95hOYuithk40/vJ5ZzZxHHGjbedWLnUT7n22rxZLu
+         XpVX5hAfpfCDyfkWXS98jSc/g32BmwW2rOV9BD+o=
+Date:   Wed, 18 Aug 2021 17:28:44 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>
+Subject: Re: [PATCH v4] block: genhd: don't call probe function with
+ major_names_lock held
+Message-ID: <YR0nLGdH3zVMSRXm@kroah.com>
+References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
+ <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp>
+ <YRi9EQJqfK6ldrZG@kroah.com>
+ <a3f43d54-8d10-3272-1fbb-1193d9f1b6dd@i-love.sakura.ne.jp>
+ <YRjcHJE0qEIIJ9gA@kroah.com>
+ <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
+ <YR0KySFfiDk+s7pn@kroah.com>
+ <a9056084-8a9a-40b3-1a20-1052135c1ee2@i-love.sakura.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210818060533.3569517-54-keescook@chromium.org>
+In-Reply-To: <a9056084-8a9a-40b3-1a20-1052135c1ee2@i-love.sakura.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 17, 2021, Kees Cook wrote:
->  arch/x86/kvm/emulate.c     |  3 +--
->  arch/x86/kvm/kvm_emulate.h | 19 +++++++++++--------
->  2 files changed, 12 insertions(+), 10 deletions(-)
+On Wed, Aug 18, 2021 at 11:44:14PM +0900, Tetsuo Handa wrote:
+> On 2021/08/18 22:27, Greg KH wrote:
+> > On Wed, Aug 18, 2021 at 08:07:32PM +0900, Tetsuo Handa wrote:
+> >> This patch adds THIS_MODULE parameter to __register_blkdev() as with
+> >> usb_register(), and drops major_names_lock before calling probe function
+> >> by holding a reference to that module which contains that probe function.
+> >>
+> >> Since cdev uses register_chrdev() and __register_chrdev(), bdev should be
+> >> able to preserve register_blkdev() and __register_blkdev() naming scheme.
+> > 
+> > Note, the cdev api is anything but good, so should not be used as an
+> > excuse for anything.  Don't copy it unless you have a very good reason.
+> > 
+> > Also, what changed in this version?  I see no patch history here :(
 > 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 2837110e66ed..2608a047e769 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -5377,8 +5377,7 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
->  
->  void init_decode_cache(struct x86_emulate_ctxt *ctxt)
->  {
-> -	memset(&ctxt->rip_relative, 0,
-> -	       (void *)&ctxt->modrm - (void *)&ctxt->rip_relative);
-> +	memset(&ctxt->decode_cache, 0, sizeof(ctxt->decode_cache));
->  
->  	ctxt->io_read.pos = 0;
->  	ctxt->io_read.end = 0;
-> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-> index 68b420289d7e..9b8afcb8ad39 100644
-> --- a/arch/x86/kvm/kvm_emulate.h
-> +++ b/arch/x86/kvm/kvm_emulate.h
-> @@ -341,14 +341,17 @@ struct x86_emulate_ctxt {
->  	 * the rest are initialized unconditionally in x86_decode_insn
->  	 * or elsewhere
->  	 */
-> -	bool rip_relative;
-> -	u8 rex_prefix;
-> -	u8 lock_prefix;
-> -	u8 rep_prefix;
-> -	/* bitmaps of registers in _regs[] that can be read */
-> -	u32 regs_valid;
-> -	/* bitmaps of registers in _regs[] that have been written */
-> -	u32 regs_dirty;
-> +	struct_group(decode_cache,
-
-This is somewhat misleading because half of this struct is the so called "decode
-cache", not just these six fields.
-
-KVM's "optimization" is quite ridiculous as this has never been such a hot path
-that saving a few mov instructions would be noticeable.  And hilariously, the
-"optimization" is completely unnecessary because both gcc and clang are clever
-enough to batch the first five into a movq even when zeroing the fields individually.
-
-So, I would much prefer to go with the following:
-
-From dbdca1f4cd01fee418c252e54c360d518b2b1ad6 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Wed, 18 Aug 2021 08:03:08 -0700
-Subject: [PATCH] KVM: x86: Replace memset() "optimization" with normal
- per-field writes
-
-Explicitly zero select fields in the emulator's decode cache instead of
-zeroing the fields via a gross memset() that spans six fields.  gcc and
-clang are both clever enough to batch the first five fields into a single
-quadword MOV, i.e. memset() and individually zeroing generate identical
-code.
-
-Removing the wart also prepares KVM for FORTIFY_SOURCE performing
-compile-time and run-time field bounds checking for memset().
-
-No functional change intended.
-
-Reported-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/emulate.c     | 9 +++++++--
- arch/x86/kvm/kvm_emulate.h | 6 +-----
- 2 files changed, 8 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 2837110e66ed..bf81fd017e7f 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5377,8 +5377,13 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
-
- void init_decode_cache(struct x86_emulate_ctxt *ctxt)
- {
--	memset(&ctxt->rip_relative, 0,
--	       (void *)&ctxt->modrm - (void *)&ctxt->rip_relative);
-+	/* Clear fields that are set conditionally but read without a guard. */
-+	ctxt->rip_relative = false;
-+	ctxt->rex_prefix = 0;
-+	ctxt->lock_prefix = 0;
-+	ctxt->rep_prefix = 0;
-+	ctxt->regs_valid = 0;
-+	ctxt->regs_dirty = 0;
-
- 	ctxt->io_read.pos = 0;
- 	ctxt->io_read.end = 0;
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 68b420289d7e..bc1fecacccd4 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -336,11 +336,7 @@ struct x86_emulate_ctxt {
- 		fastop_t fop;
- 	};
- 	int (*check_perm)(struct x86_emulate_ctxt *ctxt);
--	/*
--	 * The following six fields are cleared together,
--	 * the rest are initialized unconditionally in x86_decode_insn
--	 * or elsewhere
--	 */
-+
- 	bool rip_relative;
- 	u8 rex_prefix;
- 	u8 lock_prefix;
---
-2.33.0.rc1.237.g0d66db33f3-goog
-
-> +		bool rip_relative;
-> +		u8 rex_prefix;
-> +		u8 lock_prefix;
-> +		u8 rep_prefix;
-> +		/* bitmaps of registers in _regs[] that can be read */
-> +		u32 regs_valid;
-> +		/* bitmaps of registers in _regs[] that have been written */
-> +		u32 regs_dirty;
-> +	);
-> +
->  	/* modrm */
->  	u8 modrm;
->  	u8 modrm_mod;
-> -- 
-> 2.30.2
+> Nothing but passing THIS_MODULE automagically using macro, as a response to
 > 
+>   > Do not force modules to put their own THIS_MODULE macro as a parameter,
+>   > put it in the .h file so that it happens automagically, much like the
+>   > usb_register() define in include/linux/usb.h is created.
+
+Then properly document it as you should when sending new versions of
+patches.
+
+thanks,
+
+greg k-h
