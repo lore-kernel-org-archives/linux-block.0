@@ -2,87 +2,218 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1791DC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7877C43214
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:11:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5CAC610CB
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 14:57:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A79E66104F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:11:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239664AbhHRO6Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 10:58:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57070 "EHLO
+        id S239794AbhHRPMO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 11:12:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239048AbhHRO6O (ORCPT
+        with ESMTP id S239524AbhHRPML (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 10:58:14 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE6AC061764
-        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 07:57:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=u6sEDEKJeyn9agbo4RDBEcfLQX3zqAiVl3J9mU164jo=; b=cK5PHZyBu1zPCgh9RW9JlNUKY/
-        9iH0Qc/tdTCdxS248AKd9K3H3ddDYHQJy4mQG/4PDNmYG4tBBejJAvkeFpWijr245NaUFuwVeNabU
-        PPlc6Wgr3Taco6Y0PWMwP8EjpiMw1sKbY//n8vxPj1r/NpY9dw/LGNDdJ/Sji8tPyOmeUvo0tQo+F
-        Y2tVQ3uj7mOOvenrkpwlKfoBKG/Z/R9ag+UGpNPQIXt5LK5VSf3ItbfMa/rmRl/UfpiSAajj40EhK
-        rjdL8l0ISfBhP9p/GaDpm+lOq135fDlW6n77hEFodVJ+JzigUZS/p+34l+k59BWt/dJdcrOBpXQlB
-        M+jngDmQ==;
-Received: from [2001:4bb8:188:1b1:5a9e:9f39:5a86:b20c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mGMzd-003x9R-W7; Wed, 18 Aug 2021 14:56:47 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 11/11] null_blk: add error handling support for add_disk()
-Date:   Wed, 18 Aug 2021 16:45:42 +0200
-Message-Id: <20210818144542.19305-12-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210818144542.19305-1-hch@lst.de>
-References: <20210818144542.19305-1-hch@lst.de>
+        Wed, 18 Aug 2021 11:12:11 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E64C0617A8
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 08:11:35 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id w6so1970061plg.9
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 08:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BATSV86SaK5afBXIFxzdzZX4j4EhGdui2K0OHBJGQcw=;
+        b=nKyY7H15ZclPASn0mrCWStoJsQEVzP5/BmW4V3jtYB1HxVdnZRQQ4l+PtPCRG/dTV6
+         xfDqZKumuBc2DNoifQ7E+k+2RHNCKiMDNP3onIJnlrl5OiL/2iza72Z9iX+5k4rKwpSO
+         /m3Ffp/F03wd5BcOk1ihua3YxRddIsYpot1qTBRf+xRtenjeQ4qFFoOSIN66Jft6TSfW
+         c2t4wMFRzHKGD7LvgQQ/GVhG8mAh1vCDNxP/Inly9yMM79tpqdyKRQdjifrNITzwA6c7
+         yGxl1c2NhdVpvxPZ2G3/l6okDceS2O7mIXsDYuviCR6t29nOh+UDrTcg3BH0FRZEUvzE
+         zLIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BATSV86SaK5afBXIFxzdzZX4j4EhGdui2K0OHBJGQcw=;
+        b=JTqWo0lGN8hQnT5lR3EfHxx21IL6aX64kNx3g6ALXccflTESDkiwUPtNCWivyhm29M
+         l51GxE8w+ibdgWHvpXLRV/35bdIc551kAKXwLGLSCQOW+CLebJE1D6g5xDxOP3q+7O+q
+         tUlE53gZUdJGkJ22xXE9EpUFC+dvc6+bvc7dPKjdem8MVXd4YiWyBi5GeK+vPj5QWWUc
+         rh1LKM5MvYj09U7N4LHhhXgoYQmFW9ZSudvyBKKHM1xcCnTZy/FeyCgrFQ2Ph9u8Ltpr
+         ai+DYEsQdZJ55LPev7P75OdTZpEGSVk0pVhN4plpplQXOvbwa2osyEk224sYMElDL7eT
+         hTug==
+X-Gm-Message-State: AOAM533i7DHcjlu94tYf6AI3pHQ3g5QL231WQFIPk64BUrX1rfbHnUNB
+        INMOvXs06Yu0uLlEx6iKVcEfbA==
+X-Google-Smtp-Source: ABdhPJyb9v3aI2ukGkg+KeS46DSybL7HwTNvsJIGANZduqIYX0SVbX0PrpsQIc/aOBu7eADDQMvgoA==
+X-Received: by 2002:a17:90b:1e03:: with SMTP id pg3mr9751970pjb.203.1629299494765;
+        Wed, 18 Aug 2021 08:11:34 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m7sm28291pfc.212.2021.08.18.08.11.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Aug 2021 08:11:34 -0700 (PDT)
+Date:   Wed, 18 Aug 2021 15:11:28 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 53/63] KVM: x86: Use struct_group() to zero decode
+ cache
+Message-ID: <YR0jIEzEcUom/7rd@google.com>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-54-keescook@chromium.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210818060533.3569517-54-keescook@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luis Chamberlain <mcgrof@kernel.org>
+On Tue, Aug 17, 2021, Kees Cook wrote:
+>  arch/x86/kvm/emulate.c     |  3 +--
+>  arch/x86/kvm/kvm_emulate.h | 19 +++++++++++--------
+>  2 files changed, 12 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 2837110e66ed..2608a047e769 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -5377,8 +5377,7 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
+>  
+>  void init_decode_cache(struct x86_emulate_ctxt *ctxt)
+>  {
+> -	memset(&ctxt->rip_relative, 0,
+> -	       (void *)&ctxt->modrm - (void *)&ctxt->rip_relative);
+> +	memset(&ctxt->decode_cache, 0, sizeof(ctxt->decode_cache));
+>  
+>  	ctxt->io_read.pos = 0;
+>  	ctxt->io_read.end = 0;
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index 68b420289d7e..9b8afcb8ad39 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -341,14 +341,17 @@ struct x86_emulate_ctxt {
+>  	 * the rest are initialized unconditionally in x86_decode_insn
+>  	 * or elsewhere
+>  	 */
+> -	bool rip_relative;
+> -	u8 rex_prefix;
+> -	u8 lock_prefix;
+> -	u8 rep_prefix;
+> -	/* bitmaps of registers in _regs[] that can be read */
+> -	u32 regs_valid;
+> -	/* bitmaps of registers in _regs[] that have been written */
+> -	u32 regs_dirty;
+> +	struct_group(decode_cache,
 
-We never checked for errors on add_disk() as this function
-returned void. Now that this is fixed, use the shiny new
-error handling. The actual cleanup in case of error is
-already handled by the caller of null_gendisk_register().
+This is somewhat misleading because half of this struct is the so called "decode
+cache", not just these six fields.
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+KVM's "optimization" is quite ridiculous as this has never been such a hot path
+that saving a few mov instructions would be noticeable.  And hilariously, the
+"optimization" is completely unnecessary because both gcc and clang are clever
+enough to batch the first five into a movq even when zeroing the fields individually.
+
+So, I would much prefer to go with the following:
+
+From dbdca1f4cd01fee418c252e54c360d518b2b1ad6 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Wed, 18 Aug 2021 08:03:08 -0700
+Subject: [PATCH] KVM: x86: Replace memset() "optimization" with normal
+ per-field writes
+
+Explicitly zero select fields in the emulator's decode cache instead of
+zeroing the fields via a gross memset() that spans six fields.  gcc and
+clang are both clever enough to batch the first five fields into a single
+quadword MOV, i.e. memset() and individually zeroing generate identical
+code.
+
+Removing the wart also prepares KVM for FORTIFY_SOURCE performing
+compile-time and run-time field bounds checking for memset().
+
+No functional change intended.
+
+Reported-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/block/null_blk/main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/x86/kvm/emulate.c     | 9 +++++++--
+ arch/x86/kvm/kvm_emulate.h | 6 +-----
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index f128242d1170..187d779c8ca0 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1717,8 +1717,7 @@ static int null_gendisk_register(struct nullb *nullb)
- 			return ret;
- 	}
- 
--	add_disk(disk);
--	return 0;
-+	return add_disk(disk);
- }
- 
- static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
--- 
-2.30.2
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 2837110e66ed..bf81fd017e7f 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -5377,8 +5377,13 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
 
+ void init_decode_cache(struct x86_emulate_ctxt *ctxt)
+ {
+-	memset(&ctxt->rip_relative, 0,
+-	       (void *)&ctxt->modrm - (void *)&ctxt->rip_relative);
++	/* Clear fields that are set conditionally but read without a guard. */
++	ctxt->rip_relative = false;
++	ctxt->rex_prefix = 0;
++	ctxt->lock_prefix = 0;
++	ctxt->rep_prefix = 0;
++	ctxt->regs_valid = 0;
++	ctxt->regs_dirty = 0;
+
+ 	ctxt->io_read.pos = 0;
+ 	ctxt->io_read.end = 0;
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 68b420289d7e..bc1fecacccd4 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -336,11 +336,7 @@ struct x86_emulate_ctxt {
+ 		fastop_t fop;
+ 	};
+ 	int (*check_perm)(struct x86_emulate_ctxt *ctxt);
+-	/*
+-	 * The following six fields are cleared together,
+-	 * the rest are initialized unconditionally in x86_decode_insn
+-	 * or elsewhere
+-	 */
++
+ 	bool rip_relative;
+ 	u8 rex_prefix;
+ 	u8 lock_prefix;
+--
+2.33.0.rc1.237.g0d66db33f3-goog
+
+> +		bool rip_relative;
+> +		u8 rex_prefix;
+> +		u8 lock_prefix;
+> +		u8 rep_prefix;
+> +		/* bitmaps of registers in _regs[] that can be read */
+> +		u32 regs_valid;
+> +		/* bitmaps of registers in _regs[] that have been written */
+> +		u32 regs_dirty;
+> +	);
+> +
+>  	/* modrm */
+>  	u8 modrm;
+>  	u8 modrm_mod;
+> -- 
+> 2.30.2
+> 
