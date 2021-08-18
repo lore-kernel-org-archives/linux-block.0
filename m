@@ -2,94 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B2BC432BE
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D52F0C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:36:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D933161056
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:35:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BECEA60F11
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:36:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238176AbhHRGga (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:36:30 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:56688 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238043AbhHRGg3 (ORCPT
+        id S238116AbhHRGhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:37:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237981AbhHRGhX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:36:29 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C053F20057;
-        Wed, 18 Aug 2021 06:35:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1629268553; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fij3l61/xOvY9xkA2rhC457DvUyZYyMCemEsKNJK46s=;
-        b=XDMzVDgBtDC7yRNArmQ0BKIinRgOWB+efdA1H0+ebgwjbfLCfF+8a2ZOEuT9+k91pkWHZX
-        BmACw4eGI7d81xSNmBOPJ+mDY3uSPw7vAnBindp03Pzs6up3gJDZfNwouf150wutf2oaY7
-        5H/lpDv28QMd/ycTaiXldfoYo0u4drE=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id E40EA134B1;
-        Wed, 18 Aug 2021 06:35:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id l0UZNUiqHGGPcwAAGKfGzw
-        (envelope-from <nborisov@suse.com>); Wed, 18 Aug 2021 06:35:52 +0000
-Subject: Re: [PATCH v2 49/63] btrfs: Use memset_startat() to clear end of
- struct
-To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
-Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-50-keescook@chromium.org>
-From:   Nikolay Borisov <nborisov@suse.com>
-Message-ID: <cf6282b6-2f8f-2441-d3b8-437ba44b95c6@suse.com>
-Date:   Wed, 18 Aug 2021 09:35:52 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Wed, 18 Aug 2021 02:37:23 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F4BC061764
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:36:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=FXmTMF6Ajh70k0duCWm0jFiKANkPK/mgbhge+anQB8U=; b=AyDStgbo3Wg90sV+CuhwoX0jeQ
+        Dj7QnuifN+rI6qt9MLD2vYF/shSBkMYwnE0CATzfq5Vw+9GjFJyYme1gr3zpVMqZtM5MJOQJxtGix
+        45s01yGVl1OZ0WnBykc29PWZTInH5hjf5UCHdky/A3UysN2sHcAujxatI62TbsnWUg7zlqJCncWmt
+        yrk5MHZyxXXcSQpQwS8zGy7cTJk8LoV2t9Skm00TzgjobOfESB/NeRzYE+afMuZ1t6QpXPMDZnMQU
+        4KcePiMj57DKNg/w5dAp7IUFoLf0sY+zBOEji0p5z3m0969E8WdkqolnBBbAKBtTC3CewUMmjUJcO
+        VAuLWs0g==;
+Received: from 213-225-12-39.nat.highway.a1.net ([213.225.12.39] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mGF9p-003Rmb-10; Wed, 18 Aug 2021 06:34:46 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Hillf Danton <hdanton@sina.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 7/7] loop: avoid holding loop_ctl_mutex over add_disk
+Date:   Wed, 18 Aug 2021 08:24:55 +0200
+Message-Id: <20210818062455.211065-8-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210818062455.211065-1-hch@lst.de>
+References: <20210818062455.211065-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20210818060533.3569517-50-keescook@chromium.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+To avoid complex lock ordering issues loop_ctl_mutex should not
+be held over add_disk.  Add a new Lo_new state for a loop device
+that has just been created but which is not live yet.
 
+Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/loop.c | 16 ++++++++++++----
+ drivers/block/loop.h |  1 +
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
-On 18.08.21 г. 9:05, Kees Cook wrote:
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memset(), avoid intentionally writing across
-> neighboring fields.
-> 
-> Use memset_startat() so memset() doesn't get confused about writing
-> beyond the destination member that is intended to be the starting point
-> of zeroing through the end of the struct.
-> 
-> Cc: Chris Mason <clm@fb.com>
-> Cc: Josef Bacik <josef@toxicpanda.com>
-> Cc: David Sterba <dsterba@suse.com>
-> Cc: linux-btrfs@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 043673bda8b3..80f462edc39f 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2329,7 +2329,7 @@ static int loop_add(int i)
+ 	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
+ 	if (!lo)
+ 		goto out;
+-	lo->lo_state = Lo_unbound;
++	lo->lo_state = Lo_new;
+ 
+ 	err = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (err)
+@@ -2343,8 +2343,9 @@ static int loop_add(int i)
+ 	} else {
+ 		err = idr_alloc(&loop_index_idr, lo, 0, 0, GFP_KERNEL);
+ 	}
++	mutex_unlock(&loop_ctl_mutex);
+ 	if (err < 0)
+-		goto out_unlock;
++		goto out_free_dev;
+ 	i = err;
+ 
+ 	err = -ENOMEM;
+@@ -2414,15 +2415,22 @@ static int loop_add(int i)
+ 	disk->event_flags	= DISK_EVENT_FLAG_UEVENT;
+ 	sprintf(disk->disk_name, "loop%d", i);
+ 	add_disk(disk);
++
++	err = mutex_lock_killable(&loop_ctl_mutex);
++	if (err)
++		goto out_del_gendisk;
++	lo->lo_state = Lo_unbound;
+ 	mutex_unlock(&loop_ctl_mutex);
++
+ 	return i;
+ 
++out_del_gendisk:
++	del_gendisk(lo->lo_disk);
++	blk_cleanup_disk(lo->lo_disk);
+ out_cleanup_tags:
+ 	blk_mq_free_tag_set(&lo->tag_set);
+ out_free_idr:
+ 	idr_remove(&loop_index_idr, i);
+-out_unlock:
+-	mutex_unlock(&loop_ctl_mutex);
+ out_free_dev:
+ 	kfree(lo);
+ out:
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index d14ce6bdc014..608a20c23c64 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -24,6 +24,7 @@ enum {
+ 	Lo_bound,
+ 	Lo_rundown,
+ 	Lo_deleting,
++	Lo_new,
+ };
+ 
+ struct loop_func_table;
+-- 
+2.30.2
 
-Reviewed-by: Nikolay Borisov <nborisov@suse.com>
