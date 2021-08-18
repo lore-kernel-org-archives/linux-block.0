@@ -8,74 +8,74 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C6FC4338F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCF6C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:08:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B39C610A6
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:07:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7D26610CF
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 06:08:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238454AbhHRGIb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:08:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44278 "EHLO
+        id S238577AbhHRGI4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:08:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238763AbhHRGHc (ORCPT
+        with ESMTP id S238597AbhHRGIO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:07:32 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A697C06114B
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:58 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so8249201pjr.1
-        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:58 -0700 (PDT)
+        Wed, 18 Aug 2021 02:08:14 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A35C061152
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:59 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id q2so1141053pgt.6
+        for <linux-block@vger.kernel.org>; Tue, 17 Aug 2021 23:05:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qoEKEQz6V+86Or8qeKX5Yf4kWfMbF2QL0Db0kr0lz4g=;
-        b=WlAKi22Aaxd66aE7c+5MNAXbM8FHEvSvKzaUuHnR9khMLMSWG4+MoK+yl2AxzSeyBL
-         0oOnLRoNLvr/TBkuuoRdc5S0LXzxct+MemC0GpBBq4/rob2GaI4AsUJyVBJ0Mi2qIHKU
-         TK85IEQc1tX7BUJWo8e7hcKQC3q5yrO4G+IS4=
+        bh=NTYV2vCojWGaRvoj20z4daltbaCLEHm5I23EtSqrsdc=;
+        b=gcLhrbC6oh1Q4v7lBnuyaS91t4jaL8TehpxBKFXFSBMm2H8MVSQk2tUC2P0GUeSeUv
+         h/dbuSnQtyawGoL6LpCi/+xx7NsJ21uSVxeAivgSkoywKe+OIiou9Fs+GBDr8IzotyVN
+         9YcRY+LtNaBwMh5J6OjEP2f59D4wukYLAQ6gs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qoEKEQz6V+86Or8qeKX5Yf4kWfMbF2QL0Db0kr0lz4g=;
-        b=PKTybTKa2/LOigvTWQHShIRrSpPJwbozLzo7DPo/R0OUW4mIHlPu1dSqhkvvL9cp0v
-         luQ4WsYBDnxcSWW9REb7Z1hYPhxMqUuOSbdJ9Tuv61lDwqbgLcRE5lRxanR7WNTWZQXA
-         UtfkMdwGKQc5qLllScEUnWVjIIQqpAnyntNCTf6Dr15FBBgwnGuNoaGdpVurbuym/WYR
-         tR+o0JXNhebrz7hkXxQrpzfWGt86cIasff7+1ol2nlaeD6ZS6jG6S2VY0ZYEQaHJ2dUz
-         As5yXSNO0PWlxxZmgA3KTHpkzsXeNNxiNxg03VrBswC2zC8wMRjW6mUAtLn+nh0rktHu
-         j8gA==
-X-Gm-Message-State: AOAM533xVxJJaYyJCWpc/Z6WKW1a01tCu65wFOWqcjjWDvotjoP4D+gT
-        mGc+umkBbeabov3wiX7eJt+7yg==
-X-Google-Smtp-Source: ABdhPJxpJFXNWAYeCCCFJZIlEATzNRZ2aSFGR938kI5Z+spsDKnKwOVP6z3feYwVg3UGuU+iIGtdmQ==
-X-Received: by 2002:a17:902:a986:b029:12d:21a9:74e5 with SMTP id bh6-20020a170902a986b029012d21a974e5mr5948924plb.1.1629266758174;
+        bh=NTYV2vCojWGaRvoj20z4daltbaCLEHm5I23EtSqrsdc=;
+        b=GQ2jiHqi+/XiHLgKVvx/xDsabmZIpzKMbf2JIcoiZpx8nKDEu8Q0BviiTnUTpfj5qn
+         IV2XdIAaQPcofD8Kwz9ApZ1C6Rhox3LaOuyK+a0JB6VAYfS80gIGs6RDnsN+P46WRt78
+         tP3KOGOuGbxJyJGSHTE6RszsekqF3WgmncYciMCDcNJvo5RuqkcWaX6ZTvI/mb4n/k3+
+         OPeS1dNtNnZgeMp2NbaqsNy6msKJG/kxirqxMDDe+qPX5161h6wksBJcUbnaXMizAPDM
+         Tka6UCNJQoVi2MXV+BMUTAbySiA4OepigJXMOCPq6ln5quINvFdmk4sO0YJrqOefc5Ks
+         UQiA==
+X-Gm-Message-State: AOAM5307iNwNAHn7R6SUy7MKO8D/WCSE+FBHzZOOlaArupWuynNCcNPm
+        oMtvAjCay4yQND9FnIYrRdkB+A==
+X-Google-Smtp-Source: ABdhPJzKHoX3yyU+dnBla/w9sJktvSQulGP69FZGHBDzf2nPRtzqPXfJGufcOa8NTqoZzja7AHU62Q==
+X-Received: by 2002:a05:6a00:2d6:b0:3e2:e023:c6cd with SMTP id b22-20020a056a0002d600b003e2e023c6cdmr1988068pft.19.1629266758722;
         Tue, 17 Aug 2021 23:05:58 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id t20sm2997336pgb.16.2021.08.17.23.05.54
+        by smtp.gmail.com with ESMTPSA id n23sm5008845pgv.76.2021.08.17.23.05.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:05:57 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        Raju Rangoju <rajur@chelsio.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+Cc:     Kees Cook <keescook@chromium.org>, Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>, linux-pm@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 14/63] cxgb3: Use struct_group() for memcpy() region
-Date:   Tue, 17 Aug 2021 23:04:44 -0700
-Message-Id: <20210818060533.3569517-15-keescook@chromium.org>
+Subject: [PATCH v2 12/63] thermal: intel: int340x_thermal: Use struct_group() for memcpy() region
+Date:   Tue, 17 Aug 2021 23:04:42 -0700
+Message-Id: <20210818060533.3569517-13-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1772; h=from:subject; bh=dC6mcEspFz77gHbxWbBozA/2WMcBANzLR6HyJHBb8Uk=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMgVl8joI0ywpJ0LBjKJdVvCciANpNIOWTCAd0k tQdZJNSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIAAKCRCJcvTf3G3AJpJlD/ 94VIp465N4ZikuyhCqr9oOxy3hfC8wSJm8aVEwloaG01XD1LFCR8s27vmn7TaR3Onvi0mShPzxfZVp z/0QHutcgzRmdKNmqUJplk8jCLV/Ka51qcE6BTRvOMGquGDo2ct0ChYwMZDk1LMPNJ2jm64OPw5nKY y0crYHeld2bi9RXWQ+Ukx77u16N/RWqpwUyRVbAqD1S4Bdan5KxpbN5Xq0t50nCnvKAyIzHv9Nk/+s bLOdz5lavXExfcEWBkCycCMFlNEl2riJKH5C9yoaPdGxylxjbWhFDsGBeTnUOVoiCNnlTV9RdcJl3R s029/Oh4nOA1H+Vg7mE0DW/vIHISxFXQ702NKF0D8XG5CuW1PTI6qbzGffXYHTDzApNzS7NmjkFTJs qvjyLJeTlYxFgqXgwtjvR2JZMsu/QY2tSZGxcZ2t2Vot8PoU19q6BtLBv2htxt/A1VgnpntQz8w3T9 2g3JsgEdrrRmIRG0jtyJgCi968GluQnrByGPGL0PLPvgKluk4p/jLJDYvjZg6GaoB0zLXOy3sXtYYt nnmde30+gam1BpjliHZbYIEqoSqGNVd0iwK8Deo4DkRqqFVT7CfbSDCPFub2TYNvLMWHfrp/zvIIXS uVJup0qetCqvbanZgkYM4YYEZmZ41k/RQ1gFaZ/uMI2ZTumZZrqJt1PlHysQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3430; h=from:subject; bh=eWRxzyg8ZHcfvuxChrH1G3MSkKagVjV8YQYyT7daR/o=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMgzFFZrngl6f/ha2lcQf7jZ0XOwEEmDffMqDAl g1Ks8xmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIAAKCRCJcvTf3G3AJr4LEA CsX0wkoSQ5k+eRw495v98ZukqiRSRwtgtvHDRZg+FSzpTwOnEEYMAyH7uOTV2xyt//wSEjLpityQkQ 6DJYoi8exVReP0/IGENdNgCX9CSvnY4mKgOStyQOF6wF6zUmA49X9+fDt/me/CXdx2hYbg0vtLMnkq 5gBvKdXtWgWRoELEugEmh2t5qHjUpqpCNnyRtLha7bTKgabmSOmpcevXF1HoOvOs1cRNXoPcdx5CV0 bDoINmq6Xyh/tk0h4pIdo6SfZAOs0c3ErkSnT15sehzyggOoDkGVjJG5VBR3mukUg7mBnWnktHwIHX /tYJqO+CdgwVMhdFRyKr6l6llZ3FYBwNYN/FLkfP1rnu6FXfH0LeQTTnuKm5YeiGKMK3k9oxRcqmp2 gMgnuYcTxVZ3rCDIYJJ6MzSIQtwWs9qBXZvHiQV4DaUG4xlsdQl73NhV0kA1qUrWu1KG3ET05Fm+c4 HDpZitCNYo0GvcGDfWBeLQqlbQ7IfL2V3I6YLWINVfJEsKl+g2+ctBb19ZzFmusloqZCbrZPyTc+0S NmmotsEztnwmtEBmMhE7LJfL4We9u8itUfkywd+2pr4j4z1E7U8Zv+BycFc/U8vYneKZZgYxcHGWiO T+ntRlh8llbsS1IRx6+6G4JBfFq6XbT/Hv9hLw4FXNSrDM+N5Np9vPDUT0Ow==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -83,53 +83,110 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memcpy(), memmove(), and memset(), avoid
-intentionally writing across neighboring fields.
+field bounds checking for memcpy(), avoid intentionally writing across
+neighboring fields.
 
-Use struct_group() in struct rss_hdr around members imm_data and intr_gen,
+Use struct_group() in struct art around members weight, and ac[0-9]_max,
 so they can be referenced together. This will allow memcpy() and sizeof()
 to more easily reason about sizes, improve readability, and avoid future
-warnings about writing beyond the end of imm_data.
+warnings about writing beyond the end of weight.
 
-"pahole" shows no size nor member offset changes to struct rss_hdr.
-"objdump -d" shows no object code changes.
+"pahole" shows no size nor member offset changes to struct art.
+"objdump -d" shows no meaningful object code changes (i.e. only source
+line number induced differences).
 
-Cc: Raju Rangoju <rajur@chelsio.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
+Cc: Zhang Rui <rui.zhang@intel.com>
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc: Amit Kucheria <amitk@kernel.org>
+Cc: linux-pm@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/ethernet/chelsio/cxgb3/sge.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ .../intel/int340x_thermal/acpi_thermal_rel.c  |  5 +-
+ .../intel/int340x_thermal/acpi_thermal_rel.h  | 48 ++++++++++---------
+ 2 files changed, 29 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb3/sge.c b/drivers/net/ethernet/chelsio/cxgb3/sge.c
-index cb5c79c43bc9..1ab1bd86a3a6 100644
---- a/drivers/net/ethernet/chelsio/cxgb3/sge.c
-+++ b/drivers/net/ethernet/chelsio/cxgb3/sge.c
-@@ -126,8 +126,10 @@ struct rsp_desc {		/* response queue descriptor */
- 	struct rss_header rss_hdr;
- 	__be32 flags;
- 	__be32 len_cq;
--	u8 imm_data[47];
--	u8 intr_gen;
-+	struct_group(immediate,
-+		u8 imm_data[47];
-+		u8 intr_gen;
-+	);
- };
- 
- /*
-@@ -929,7 +931,8 @@ static inline struct sk_buff *get_imm_packet(const struct rsp_desc *resp)
- 
- 	if (skb) {
- 		__skb_put(skb, IMMED_PKT_SIZE);
--		skb_copy_to_linear_data(skb, resp->imm_data, IMMED_PKT_SIZE);
-+		BUILD_BUG_ON(IMMED_PKT_SIZE != sizeof(resp->immediate));
-+		skb_copy_to_linear_data(skb, &resp->immediate, IMMED_PKT_SIZE);
+diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+index a478cff8162a..e90690a234c4 100644
+--- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
++++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+@@ -250,8 +250,9 @@ static int fill_art(char __user *ubuf)
+ 		get_single_name(arts[i].source, art_user[i].source_device);
+ 		get_single_name(arts[i].target, art_user[i].target_device);
+ 		/* copy the rest int data in addition to source and target */
+-		memcpy(&art_user[i].weight, &arts[i].weight,
+-			sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
++		BUILD_BUG_ON(sizeof(art_user[i].data) !=
++			     sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
++		memcpy(&art_user[i].data, &arts[i].data, sizeof(art_user[i].data));
  	}
- 	return skb;
- }
+ 
+ 	if (copy_to_user(ubuf, art_user, art_len))
+diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+index 58822575fd54..78d942477035 100644
+--- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
++++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+@@ -17,17 +17,19 @@
+ struct art {
+ 	acpi_handle source;
+ 	acpi_handle target;
+-	u64 weight;
+-	u64 ac0_max;
+-	u64 ac1_max;
+-	u64 ac2_max;
+-	u64 ac3_max;
+-	u64 ac4_max;
+-	u64 ac5_max;
+-	u64 ac6_max;
+-	u64 ac7_max;
+-	u64 ac8_max;
+-	u64 ac9_max;
++	struct_group(data,
++		u64 weight;
++		u64 ac0_max;
++		u64 ac1_max;
++		u64 ac2_max;
++		u64 ac3_max;
++		u64 ac4_max;
++		u64 ac5_max;
++		u64 ac6_max;
++		u64 ac7_max;
++		u64 ac8_max;
++		u64 ac9_max;
++	);
+ } __packed;
+ 
+ struct trt {
+@@ -47,17 +49,19 @@ union art_object {
+ 	struct {
+ 		char source_device[8]; /* ACPI single name */
+ 		char target_device[8]; /* ACPI single name */
+-		u64 weight;
+-		u64 ac0_max_level;
+-		u64 ac1_max_level;
+-		u64 ac2_max_level;
+-		u64 ac3_max_level;
+-		u64 ac4_max_level;
+-		u64 ac5_max_level;
+-		u64 ac6_max_level;
+-		u64 ac7_max_level;
+-		u64 ac8_max_level;
+-		u64 ac9_max_level;
++		struct_group(data,
++			u64 weight;
++			u64 ac0_max_level;
++			u64 ac1_max_level;
++			u64 ac2_max_level;
++			u64 ac3_max_level;
++			u64 ac4_max_level;
++			u64 ac5_max_level;
++			u64 ac6_max_level;
++			u64 ac7_max_level;
++			u64 ac8_max_level;
++			u64 ac9_max_level;
++		);
+ 	};
+ 	u64 __data[ACPI_NR_ART_ELEMENTS];
+ };
 -- 
 2.30.2
 
