@@ -2,148 +2,223 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDBAC4320E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 650B0C4320E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:17:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57E12610E5
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 449B3610FD
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 16:17:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230424AbhHRQQW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 12:16:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47208 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbhHRQQV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 12:16:21 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99616C061764;
-        Wed, 18 Aug 2021 09:15:46 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id f2so6124633ljn.1;
-        Wed, 18 Aug 2021 09:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1hKEYv+Fr6C7EKch69Wd8Zt8f3YFEBcPg/InLCEUJH0=;
-        b=DlGZ4gR97mpf2cthrcTkSHnW4ubQjP55OzuLMZ5FJ3WzJHWmXdMj9I1J/wa3iFKxbV
-         reTTXA1FdeH0Lnh7LeCaYAsP1ms5xymPaIc89etWdd6ilpV7DqzkeUDODydlbS3g57LY
-         OLQw33yl9EcKWcKzoHwZuOmGQX84H+5l5uwCCjxd7Zl3zvf3BHCHy+74SMwVQCdSUfyk
-         LtDRs10b5IWjRfJqbs8v5eUano+zIMC5NNZuXSmeoy7IYGyppN3BkFVeK+xwimNrtSM2
-         YRknBJPkpGCj6lbmhS/4y5plsqLJFZTd9neXaL+CFUC1+SqOvfJj32YmKEvvzUoZJZrj
-         n50A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1hKEYv+Fr6C7EKch69Wd8Zt8f3YFEBcPg/InLCEUJH0=;
-        b=W8qJ7Ca5KlZA3IGhOBfeMaQE/PtmomSf4UeJOUGclDN5hqVYz1gktcwSTIqnH7Ekad
-         gstFDFpnymVoVT+Nl4jz+GUmzOGAHEyhXb7XWLr97OjrwQ94mlmGFO4Fh6ZthIuTNkOb
-         sHlEJ5umZbQ81Jm8uS3xmfbts/bVPenxyhl+gvt4oZ7m8imDIf13QXW2fuV5MtlyTIA6
-         jwuizFLtp0w7rad3Ymg4MtGZdrAIcMlLgKf8MEW3FM4LbVHqI1beefQEC2xF5wPkKUX2
-         CodkWWzQUAXBgqlQeEJSSzLfmEDU5P87ysqQe0fg3SEp5X4HKTkWeiPsA31KMJDMLp5G
-         jFiQ==
-X-Gm-Message-State: AOAM532cTQCA79ynSycYNDngMNeFQR2QuCCd512gS++JC3wMliVFnpsA
-        gUkbdQgmaBrq5M/UDoUJpojzgW0t1Go=
-X-Google-Smtp-Source: ABdhPJxWo8J3/Yk16JNcOWy4IODSkq8yj5RsFCPqgmTt0th+73KqVgrS8LlFvPMGpwmXw+uMKaFBEw==
-X-Received: by 2002:a2e:a88b:: with SMTP id m11mr8603688ljq.51.1629303344842;
-        Wed, 18 Aug 2021 09:15:44 -0700 (PDT)
-Received: from [192.168.2.145] (46-138-85-91.dynamic.spd-mgts.ru. [46.138.85.91])
-        by smtp.googlemail.com with ESMTPSA id d9sm35914ljq.54.2021.08.18.09.15.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Aug 2021 09:15:44 -0700 (PDT)
-Subject: Re: [PATCH v5 4/5] mmc: sdhci-tegra: Implement
- alternative_gpt_sector()
-To:     Thierry Reding <thierry.reding@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>
-References: <20210818005547.14497-1-digetx@gmail.com>
- <20210818005547.14497-5-digetx@gmail.com>
- <CAPDyKFqQbe4k-Sem436Fzsr6mbvwZr83VtEaEZTF8oWYoHHQwg@mail.gmail.com>
- <YR0MrlxFLTpsR628@orome.fritz.box>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <90dcb1e9-30df-e721-5ddc-156ae295636e@gmail.com>
-Date:   Wed, 18 Aug 2021 19:15:43 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231218AbhHRQSZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 12:18:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43382 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229517AbhHRQSZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Aug 2021 12:18:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8EDA6610A5;
+        Wed, 18 Aug 2021 16:17:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629303470;
+        bh=KPxieBci0vXg8rmYUy2so8SGtGACKhwfHUnpqQywB2U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YuZGxSb/qbJrnZ105zWsST1nzc3m5MixjmBIDb4Cqpf+Tw8XhntQlWVGRMwhIoXA7
+         PTtnTQEfAVvrGpcExRjt1ERSU8HOof1WS87z7lpzbE0XvNK4dmam1hUQ3Cb5tmEtl4
+         LQdsyFAHM06VRTXPscO6q5RGPRNYJ/p7auy1fidt0ulyrYV7J2rObWzPJh2wayByhW
+         dD+K4DCpaPYtgRQUC0W7yQJz5RhyNsOdzq4PlthfwTFNMccSyBzUQf5XqVN5Xpf+0R
+         eu2xlTZQILiBAamLWqT4orjL/dDPccR6l4KllQOYQis8vh+mMut2C5ziIwpIkHE3eK
+         usfw3LYHare6w==
+Date:   Wed, 18 Aug 2021 09:17:50 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Nitesh Shetty <nitheshshetty@gmail.com>
+Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
+        kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
+        asml.silence@gmail.com, johannes.thumshirn@wdc.com, hch@lst.de,
+        willy@infradead.org, kch@kernel.org, martin.petersen@oracle.com,
+        mpatocka@redhat.com, bvanassche@acm.org, snitzer@redhat.com,
+        agk@redhat.com, selvajove@gmail.com, joshiiitr@gmail.com,
+        nj.shetty@samsung.com, joshi.k@samsung.com, javier.gonz@samsung.com
+Subject: Re: [PATCH 4/7] block: Introduce a new ioctl for simple copy
+Message-ID: <20210818161750.GF12664@magnolia>
+References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
+ <CGME20210817101803epcas5p10cda1d52f8a8f1172e34b1f9cf8eef3b@epcas5p1.samsung.com>
+ <20210817101423.12367-5-selvakuma.s1@samsung.com>
+ <20210817233613.GA12597@magnolia>
+ <CAOSviJ2+deUdDXTWbWXaSxNX2t6cnhPg7KCDA4C2qm74KD9vdQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YR0MrlxFLTpsR628@orome.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOSviJ2+deUdDXTWbWXaSxNX2t6cnhPg7KCDA4C2qm74KD9vdQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-18.08.2021 16:35, Thierry Reding пишет:
->>> +static int sdhci_tegra_alternative_gpt_sector(struct mmc_card *card,
->>> +                                             sector_t *gpt_sector)
->>> +{
->>> +       unsigned int boot_sectors_num;
->>> +
->>> +       /* filter out unrelated cards */
->>> +       if (card->ext_csd.rev < 3 ||
->>> +           !mmc_card_mmc(card) ||
->>> +           !mmc_card_is_blockaddr(card) ||
->>> +            mmc_card_is_removable(card->host))
->>> +               return -ENOENT;
->>> +
->>> +       /*
->>> +        * eMMC storage has two special boot partitions in addition to the
->>> +        * main one.  NVIDIA's bootloader linearizes eMMC boot0->boot1->main
->>> +        * accesses, this means that the partition table addresses are shifted
->>> +        * by the size of boot partitions.  In accordance with the eMMC
->>> +        * specification, the boot partition size is calculated as follows:
->>> +        *
->>> +        *      boot partition size = 128K byte x BOOT_SIZE_MULT
->>> +        *
->>> +        * Calculate number of sectors occupied by the both boot partitions.
->>> +        */
->>> +       boot_sectors_num = card->ext_csd.raw_boot_mult * SZ_128K /
->>> +                          SZ_512 * MMC_NUM_BOOT_PARTITION;
->>> +
->>> +       /* Defined by NVIDIA and used by Android devices. */
->>> +       *gpt_sector = card->ext_csd.sectors - boot_sectors_num - 1;
->>> +
->>> +       return 0;
->>> +}
->> I suggest you move this code into the mmc core/block layer instead (it
->> better belongs there).
->>
->> Additionally, let's add a new host cap, MMC_CAP_ALTERNATIVE_GPT, to
->> let the core know when it should use the code above.
-> Couldn't a generic "alternative GPT" mean pretty much anything? As far
-> as I know this is very specific to a series of Tegra chips and firmware
-> running on them. On some of these devices you can even replace the OEM
-> firmware by something custom that's less quirky.
+On Wed, Aug 18, 2021 at 09:07:54PM +0530, Nitesh Shetty wrote:
+> On Wed, Aug 18, 2021 at 5:06 AM Darrick J. Wong <djwong@kernel.org> wrote:
+> >
+> > On Tue, Aug 17, 2021 at 03:44:20PM +0530, SelvaKumar S wrote:
+> > > From: Nitesh Shetty <nj.shetty@samsung.com>
+> > >
+> > > Add new BLKCOPY ioctl that offloads copying of one or more sources ranges
+> > > to a destination in the device. COPY ioctl accepts a 'copy_range'
+> > > structure that contains destination (in sectors), no of sources and
+> > > pointer to the array of source ranges. Each source range is represented by
+> > > 'range_entry' that contains start and length of source ranges (in sectors)
+> > >
+> > > MAX_COPY_NR_RANGE, limits the number of entries for the IOCTL and
+> > > MAX_COPY_TOTAL_LENGTH limits the total copy length, IOCTL can handle.
+> > >
+> > > Example code, to issue BLKCOPY:
+> > > /* Sample example to copy three source-ranges [0, 8] [16, 8] [32,8] to
+> > >  * [64,24], on the same device */
+> > >
+> > > int main(void)
+> > > {
+> > >       int ret, fd;
+> > >       struct range_entry source_range[] = {{.src = 0, .len = 8},
+> > >               {.src = 16, .len = 8}, {.src = 32, .len = 8},};
+> > >       struct copy_range cr;
+> > >
+> > >       cr.dest = 64;
+> > >       cr.nr_range = 3;
+> > >       cr.range_list = (__u64)&source_range;
+> > >
+> > >       fd = open("/dev/nvme0n1", O_RDWR);
+> > >       if (fd < 0) return 1;
+> > >
+> > >       ret = ioctl(fd, BLKCOPY, &cr);
+> > >       if (ret < 0) printf("copy failure\n");
+> > >
+> > >       close(fd);
+> > >
+> > >       return ret;
+> > > }
+> > >
+> > > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> > > Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+> > > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> > > ---
+> > >  block/ioctl.c           | 33 +++++++++++++++++++++++++++++++++
+> > >  include/uapi/linux/fs.h |  8 ++++++++
+> > >  2 files changed, 41 insertions(+)
+> > >
+> > > diff --git a/block/ioctl.c b/block/ioctl.c
+> > > index eb0491e90b9a..2af56d01e9fe 100644
+> > > --- a/block/ioctl.c
+> > > +++ b/block/ioctl.c
+> > > @@ -143,6 +143,37 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+> > >                                   GFP_KERNEL, flags);
+> > >  }
+> > >
+> > > +static int blk_ioctl_copy(struct block_device *bdev, fmode_t mode,
+> > > +             unsigned long arg)
+> > > +{
+> > > +     struct copy_range crange;
+> > > +     struct range_entry *rlist;
+> > > +     int ret;
+> > > +
+> > > +     if (!(mode & FMODE_WRITE))
+> > > +             return -EBADF;
+> > > +
+> > > +     if (copy_from_user(&crange, (void __user *)arg, sizeof(crange)))
+> > > +             return -EFAULT;
+> > > +
+> > > +     rlist = kmalloc_array(crange.nr_range, sizeof(*rlist),
+> > > +                     GFP_KERNEL);
+> > > +     if (!rlist)
+> > > +             return -ENOMEM;
+> > > +
+> > > +     if (copy_from_user(rlist, (void __user *)crange.range_list,
+> > > +                             sizeof(*rlist) * crange.nr_range)) {
+> > > +             ret = -EFAULT;
+> > > +             goto out;
+> > > +     }
+> > > +
+> > > +     ret = blkdev_issue_copy(bdev, crange.nr_range, rlist, bdev, crange.dest,
+> > > +                     GFP_KERNEL, 0);
+> > > +out:
+> > > +     kfree(rlist);
+> > > +     return ret;
+> > > +}
+> > > +
+> > >  static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
+> > >               unsigned long arg)
+> > >  {
+> > > @@ -468,6 +499,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+> > >       case BLKSECDISCARD:
+> > >               return blk_ioctl_discard(bdev, mode, arg,
+> > >                               BLKDEV_DISCARD_SECURE);
+> > > +     case BLKCOPY:
+> > > +             return blk_ioctl_copy(bdev, mode, arg);
+> > >       case BLKZEROOUT:
+> > >               return blk_ioctl_zeroout(bdev, mode, arg);
+> > >       case BLKGETDISKSEQ:
+> > > diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+> > > index 7a97b588d892..4183688ff398 100644
+> > > --- a/include/uapi/linux/fs.h
+> > > +++ b/include/uapi/linux/fs.h
+> > > @@ -76,6 +76,13 @@ struct range_entry {
+> > >       __u64 len;
+> > >  };
+> > >
+> > > +struct copy_range {
+> > > +     __u64 dest;
+> > > +     __u64 nr_range;
+> >
+> > If the maximum number of elements in the range list is 1<<12, there's no
+> > need for this to be larger than a u16, right?
+> >
+> > > +     __u64 range_list;
+> >
+> > Pointers embedded in a structure are /not/ a good idea, because this
+> > will create a lot of compatibility headaches for 32-bit binaries running
+> > on 64-bit kernels.  Please just make the size of this header structure
+> > a multiple of 8 bytes and put the range_entry list immediately after it.
+> >
+> > struct copy_range {
+> >         __s64 dest_offset;
+> >         __u32 nr_range_entries;
+> >         __u32 flags;
+> >         __u64 reserved[2];
+> > };
+> >
+> > struct __user range_entry *re = ((struct range_entry *)(copyhead + 1));
+> >
+> > copy_from_user(&urk, re...);
+> >
+> > --D
+> >
+> Thanks, this is better. 'Reserved' field was there to be used for
+> future extension of the interface.
+> Now that you mentioned 'flags', it seems we can do away with
+> 'reserved' fields altogether?
+
+We still want the reserved-must-be-zero fields so that adding the first
+field or two doesn't require changes to the pointer arithmetic.
+
+Also, I suppose you could make the relationship between copy_range and
+range_entry more explicit:
+
+struct copy_range {
+        __s64 dest_offset;
+        __u32 nr_range_entries;
+        __u32 flags;
+        __u64 reserved[2];
+
+	/* must come last */
+	struct range_entry entries[];
+};
+
+struct __user range_entry *re = &copyhead->entries[0];
+
+--D
+
 > 
-> I'm not aware of anyone else employing this kind of quirk, so I don't
-> want anyone to get any ideas that this is a good thing. Putting it into
-> the core runs the risk of legitimizing this.
-
-I also think it's better to keep it internal to Tegra. Ulf, could you
-please clarify why do you want to have it moved into the core? Are you
-aware of any other platforms that want exactly the same quirk? Thierry
-should be correct that it's relevant only to Tegra SoCs.
-
-Regarding the 'legitimizing', it's not a bad thing to me at all. If we
-want to run more devices with a mainline kernel, then such quirks are
-inevitable.
+> Regards,
+> Nitesh Shetty
