@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3113C4320E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE50C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83983610CE
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87540610FA
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 15:47:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238689AbhHRPsE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 11:48:04 -0400
-Received: from mail-lf1-f46.google.com ([209.85.167.46]:46828 "EHLO
-        mail-lf1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240052AbhHRPry (ORCPT
+        id S236531AbhHRPsP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 11:48:15 -0400
+Received: from mail-lf1-f44.google.com ([209.85.167.44]:46887 "EHLO
+        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240060AbhHRPsM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 11:47:54 -0400
-Received: by mail-lf1-f46.google.com with SMTP id u22so5519459lfq.13;
-        Wed, 18 Aug 2021 08:47:18 -0700 (PDT)
+        Wed, 18 Aug 2021 11:48:12 -0400
+Received: by mail-lf1-f44.google.com with SMTP id u22so5520954lfq.13;
+        Wed, 18 Aug 2021 08:47:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Ly8XYYipoD2ui1uOI6rBTuBqM3/79CjvaDtgsH2un6s=;
-        b=XW3u26JgYxM1wF0meHea8JFbo6/nBp8Tbq8k/8JqspU60V3D0cWPitDsQNVpzGucGi
-         e5idfJPecmpzQxuLu3YYTg+6/pIjMRj/wljhkLs3CiLRoc8tcGNsy3zx2fJPJu23vWFp
-         qQ73j/UO8BhCvQfwblYcQExEZNk+nhshrwyq/U7N/m5uzkOuuG+/eC7WBHJ9Xmh+aR3k
-         8C1AO1GG/Lwy/w7LpcLdxkpg9mwpmH6WIYQG+OD+x5bfZjKVwp9bg1/eXzyKcKSWjdW6
-         ko0xT73YYqpjcY1GITCy5/ZMOhLqObx28zK+39Gd8uudmY+N/Q0e6QF4fW5XvmoBui+V
-         hUaw==
-X-Gm-Message-State: AOAM532l9FtUfIYm3uu5EcrGsjaX0QqmPDP+NklBVgj8eD8RZTJvUYRb
-        +8d3SiV4Fuam9jy+SAeLzc1rJUH25uTOUXt+
-X-Google-Smtp-Source: ABdhPJxSW5NiBVI2AeSdHNUlHFh2wl5ZhVlKxtXub5Ms8sBmwEilPwk668+BiEqh3eJrzR2ehxSh9A==
-X-Received: by 2002:ac2:4185:: with SMTP id z5mr6821837lfh.391.1629301637805;
-        Wed, 18 Aug 2021 08:47:17 -0700 (PDT)
+        bh=dEDUliLc2qrFYYbpwGoL3AeOYmTJ041IXVBP+u79Zy0=;
+        b=PuW+7NltJ0sMKCWza9vpojkwxQ7xAKZqOEMCq8/9MIfWL59rDm/9hZaiz3NG5awhXX
+         wCK/AzD3J54KG3ReaufsfOoR82lyOKWllBNE4vH6j6ndYnv+lhFBePOu7+7cPE+O1rie
+         7e/nD5hgrxjZFO54Pi/ywAMflvXwPCTEO8g2XneABwm3+ETDI0z0HIJfr/ZNHz6sGXSS
+         R08bS+lirhuQK1B+9jpSgjPuhpDffP42RwjY/47XPeNfSmE+PZGDv8QyRz/xbaGLmGk1
+         A065VXCji6SO7x2vBhraVJp5nYhGeBluT7DlUgaw8CrEezZOPUYRyuYl+kCJkWK9LLhC
+         iwrw==
+X-Gm-Message-State: AOAM532Nut5CHNHFPgvMKTrBfRMogcCg3WFiYR2uADk2XLqb3tiFBIN6
+        PP4oQafZVy0qyj1dMxfKdH+9m7PhUeiMBaK4
+X-Google-Smtp-Source: ABdhPJwtnKUf8dXunIBVcILoF/7iUwhJlN+CcBF7EUEtUNE8kE0EEYVLyZ36O8kFfcN2zSzuUFHoLQ==
+X-Received: by 2002:ac2:4856:: with SMTP id 22mr5918526lfy.638.1629301653187;
+        Wed, 18 Aug 2021 08:47:33 -0700 (PDT)
 Received: from localhost.localdomain (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
-        by smtp.googlemail.com with ESMTPSA id j4sm23808ljh.120.2021.08.18.08.47.16
+        by smtp.googlemail.com with ESMTPSA id j4sm23808ljh.120.2021.08.18.08.47.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 08:47:17 -0700 (PDT)
+        Wed, 18 Aug 2021 08:47:32 -0700 (PDT)
 From:   Denis Efremov <efremov@linux.com>
 To:     linux-kselftest@vger.kernel.org
 Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Jiri Kosina <jkosina@suse.cz>, Willy Tarreau <w@1wt.eu>,
-        Joe Perches <joe@perches.com>
-Subject: [RFC PATCH 1/5] checkpatch: improve handling of revert commits
-Date:   Wed, 18 Aug 2021 18:46:42 +0300
-Message-Id: <20210818154646.925351-2-efremov@linux.com>
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [RFC PATCH 2/5] gen_initramfs.sh: use absolute path for gen_init_cpio
+Date:   Wed, 18 Aug 2021 18:46:43 +0300
+Message-Id: <20210818154646.925351-3-efremov@linux.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210818154646.925351-1-efremov@linux.com>
 References: <20210818154646.925351-1-efremov@linux.com>
@@ -60,46 +60,25 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Properly handle commits like:
-commit f2791e7eadf4 ("Revert "floppy: refactor open() flags handling"")
+Use absolute path to call gen_init_cpio. This allows one
+to use gen_initramfs.sh from any directory.
 
-Cc: Joe Perches <joe@perches.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
 Signed-off-by: Denis Efremov <efremov@linux.com>
 ---
- scripts/checkpatch.pl | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ usr/gen_initramfs.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 461d4221e4a4..cf31e8c994d3 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -3200,20 +3200,20 @@ sub process {
- 			$long = 1 if ($line =~ /\bcommit\s+[0-9a-f]{41,}/i);
- 			$space = 0 if ($line =~ /\bcommit [0-9a-f]/i);
- 			$case = 0 if ($line =~ /\b[Cc]ommit\s+[0-9a-f]{5,40}[^A-F]/);
--			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)"\)/i) {
-+			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("(.+)"\)/i) {
- 				$orig_desc = $1;
- 				$hasparens = 1;
- 			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s*$/i &&
- 				 defined $rawlines[$linenr] &&
--				 $rawlines[$linenr] =~ /^\s*\("([^"]+)"\)/) {
-+				 $rawlines[$linenr] =~ /^\s*\("(.+)"\)/) {
- 				$orig_desc = $1;
- 				$hasparens = 1;
--			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("[^"]+$/i &&
-+			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\(".+$/i &&
- 				 defined $rawlines[$linenr] &&
--				 $rawlines[$linenr] =~ /^\s*[^"]+"\)/) {
--				$line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)$/i;
-+				 $rawlines[$linenr] =~ /^\s*.+"\)/) {
-+				$line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("(.+)$/i;
- 				$orig_desc = $1;
--				$rawlines[$linenr] =~ /^\s*([^"]+)"\)/;
-+				$rawlines[$linenr] =~ /^\s*(.+)"\)/;
- 				$orig_desc .= " " . $1;
- 				$hasparens = 1;
- 			}
+diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
+index 63476bb70b41..2e4a86181c79 100755
+--- a/usr/gen_initramfs.sh
++++ b/usr/gen_initramfs.sh
+@@ -244,4 +244,4 @@ if test -n "$KBUILD_BUILD_TIMESTAMP"; then
+ 		timestamp="-t $timestamp"
+ 	fi
+ fi
+-usr/gen_init_cpio $timestamp $cpio_list > $output
++"$(dirname "$0")"/gen_init_cpio $timestamp $cpio_list > $output
 -- 
 2.31.1
 
