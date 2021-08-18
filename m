@@ -2,152 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 439BDC19F3E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 22:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B78C4320A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 22:30:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B6CB6108B
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 22:19:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A98D16023D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 22:30:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234603AbhHRWUV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 18:20:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46846 "EHLO
+        id S234669AbhHRWaj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 18:30:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234537AbhHRWUV (ORCPT
+        with ESMTP id S232456AbhHRWai (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 18:20:21 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5D2C0613D9;
-        Wed, 18 Aug 2021 15:19:45 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id o10so7914138lfr.11;
-        Wed, 18 Aug 2021 15:19:45 -0700 (PDT)
+        Wed, 18 Aug 2021 18:30:38 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4D4C061764
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 15:30:03 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id w13-20020a17090aea0db029017897a5f7bcso3390005pjy.5
+        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 15:30:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=xtGQgjxMEZMlhC/xeDEiMn9ep1RQCyByheCct7MRol4=;
-        b=fqBqV/qWwyuboVt+vWtn58b/iJu8+z3vqWQuC9BB8si+QCQ3xNbWfZQrGBmGzwfNlk
-         /zil+y5Svz6VxOIOCS8ZCr+tUNCYDLrRi/efgwwsN97hLg/mD9nAZ/L33DWmtEzEw4MT
-         XHVRvEKRgAm1qsuVPbH182NyjXpvJQA9Tl9fw8kwc9gRpX931zIZHhoRMx+utU7Mxu51
-         zMiqsdfGmYpBFOdx/3y8Jq4/zcIoSInKWKYYlSKZ9Z9MgMOFEzqv/f8xnzHkigt5uzBe
-         15KNwSu8ePKYy6AdfLxkBQ5TZn2solVhnQopukQLaA+io7L0nvGY69CMd3u1iNqFR3+F
-         Uf7Q==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=DUTuMfsQqxqX+3pR2oz9dVJNWsHg80kq142ck8zdj0s=;
+        b=HXqi8rpNQlqRCRobulkOlcaA4+c6J/4aW1kHG07w5z+LW3VAsPY7L3ovHbYLAvr6BW
+         z8PYA40q5a4/E1aSSd1f0X7nRnd2FNDMsOqvNHCn+M7iSwPw+3HB842oCYFV1odUjD4+
+         aowm4n1LLC28ISLDG0efepefjXmirvRMkeWhE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=xtGQgjxMEZMlhC/xeDEiMn9ep1RQCyByheCct7MRol4=;
-        b=T9Lo/UUwy8//nuislkHzYvYDRjcaycuXA8zQpTPK4vhy0k5Y1r0yB8yefiDZgpb8BK
-         8JxSO9T9SSpbKUPLAzCOW1ljAxaYe5ccW1RBWI6vOISeddqYq5aGYzQiim9HIUh06w+3
-         77Lt3D5u9C63ICo82pAT2nMxGXClxOM82ObfBlYZl9l4nZWjVLPYB7XaQbwTO10MSMmX
-         pRuh+qI75WbtvVo9o0v/UEJ450G7TmUp+WP3IocOovciPUlwnGGlufrSQtkprV9CgoG6
-         i6kiZm54MefyVIzC1UtwpvRHN/VrN5rpypRwU9ShJY3XwbvMChytWDTXxOVZej5kMT61
-         BG2A==
-X-Gm-Message-State: AOAM533zhjq0b/gmfSNVp5fEIlbp46DqnKhVaj5jZ8L+DYhv0bbnUNqd
-        qZr0bLzAku2YSfezZ2hbX7On29sQ74g=
-X-Google-Smtp-Source: ABdhPJzk8Bz3BIudvvqL9aNZo0PYlxdeHsaXV3MzYKZ+EdYIdH7reEaf1RQNTstLluu7sWur6PjKpA==
-X-Received: by 2002:a05:6512:1518:: with SMTP id bq24mr7681150lfb.271.1629325184128;
-        Wed, 18 Aug 2021 15:19:44 -0700 (PDT)
-Received: from localhost.localdomain (46-138-85-91.dynamic.spd-mgts.ru. [46.138.85.91])
-        by smtp.gmail.com with ESMTPSA id v23sm93300lfr.208.2021.08.18.15.19.43
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=DUTuMfsQqxqX+3pR2oz9dVJNWsHg80kq142ck8zdj0s=;
+        b=F1dQxZgih9RcHb/MWNkZ+kG4QpYvXm9qx2IeUkQuhVg+i4/DBs8P4c1TjFn9VQBlIO
+         BamtSRbuXfRiQmdIEuk1muFkYmq45lmItfCP7oL+V5RgTxHoBedyGHIc8i3qDEKL0+Ip
+         Hv+M9M+Xty2NjiHR/gZ7mpbA0yum+nKi1F9OLx9f/oJAxwKsZ3qNlsfdDiUQIPDBsriC
+         zb3vY1xf5+hDyfahVEPlxzxKR69aSYMT8nSm/fG0wr9DVyLW5qTfHxvKHfz6Hzyryjsg
+         O0jF6+bZV+iQ4YrM+CXyFA2ZmqfUdnit+H5eoUuPDLubpoea/V20k40fivo1uhEZERFI
+         IUtA==
+X-Gm-Message-State: AOAM532Ncmxc/7jy3qhV8LmUwX/Y/OWWPRel9LDBRuQoP4habFCcJd3J
+        Ib3D5+K87/qS/3YM9bHBh9vu7w==
+X-Google-Smtp-Source: ABdhPJwejqek+pQNgEJHoUL+LD8id8sswOa0BezZLWGyCwRRYJ3BmiAhJE1bgJAMyKte9lbr8NDHRw==
+X-Received: by 2002:a17:90a:a581:: with SMTP id b1mr1663300pjq.153.1629325803017;
+        Wed, 18 Aug 2021 15:30:03 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id n185sm862325pfn.171.2021.08.18.15.30.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 15:19:43 -0700 (PDT)
-From:   Dmitry Osipenko <digetx@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>
-Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: [PATCH v6 5/5] mmc: sdhci-tegra: Enable MMC_CAP2_ALT_GPT_SECTOR
-Date:   Thu, 19 Aug 2021 01:19:20 +0300
-Message-Id: <20210818221920.3893-6-digetx@gmail.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210818221920.3893-1-digetx@gmail.com>
-References: <20210818221920.3893-1-digetx@gmail.com>
+        Wed, 18 Aug 2021 15:30:02 -0700 (PDT)
+Date:   Wed, 18 Aug 2021 15:30:01 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     linux-kernel@vger.kernel.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wang Wensheng <wangwensheng4@huawei.com>,
+        linux-staging@lists.linux.dev, linux-wireless@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>,
+        linux-block@vger.kernel.org, Hulk Robot <hulkci@huawei.com>,
+        clang-built-linux@googlegroups.com, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 61/63] powerpc: Split memset() to avoid multi-field
+ overflow
+Message-ID: <202108181528.9CDB56FEC@keescook>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-62-keescook@chromium.org>
+ <7630b0bc-4389-6283-d8b9-c532df916d60@csgroup.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <7630b0bc-4389-6283-d8b9-c532df916d60@csgroup.eu>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Tegra20/30/114/124 Android devices place GPT at a non-standard location.
-Enable GPT entry scanning at that location.
+On Wed, Aug 18, 2021 at 08:42:18AM +0200, Christophe Leroy wrote:
+> 
+> 
+> Le 18/08/2021 à 08:05, Kees Cook a écrit :
+> > In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> > field bounds checking for memset(), avoid intentionally writing across
+> > neighboring fields.
+> > 
+> > Instead of writing across a field boundary with memset(), move the call
+> > to just the array, and an explicit zeroing of the prior field.
+> > 
+> > Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> > Cc: Qinglang Miao <miaoqinglang@huawei.com>
+> > Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+> > Cc: Hulk Robot <hulkci@huawei.com>
+> > Cc: Wang Wensheng <wangwensheng4@huawei.com>
+> > Cc: linuxppc-dev@lists.ozlabs.org
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > Reviewed-by: Michael Ellerman <mpe@ellerman.id.au>
+> > Link: https://lore.kernel.org/lkml/87czqsnmw9.fsf@mpe.ellerman.id.au
+> > ---
+> >   drivers/macintosh/smu.c | 3 ++-
+> >   1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/macintosh/smu.c b/drivers/macintosh/smu.c
+> > index 94fb63a7b357..59ce431da7ef 100644
+> > --- a/drivers/macintosh/smu.c
+> > +++ b/drivers/macintosh/smu.c
+> > @@ -848,7 +848,8 @@ int smu_queue_i2c(struct smu_i2c_cmd *cmd)
+> >   	cmd->read = cmd->info.devaddr & 0x01;
+> >   	switch(cmd->info.type) {
+> >   	case SMU_I2C_TRANSFER_SIMPLE:
+> > -		memset(&cmd->info.sublen, 0, 4);
+> > +		cmd->info.sublen = 0;
+> > +		memset(&cmd->info.subaddr, 0, 3);
+> 
+> subaddr[] is a table, should the & be avoided ?
 
-Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
----
- drivers/mmc/host/sdhci-tegra.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+It results in the same thing, but it's better form to not have the &; I
+will fix this.
 
-diff --git a/drivers/mmc/host/sdhci-tegra.c b/drivers/mmc/host/sdhci-tegra.c
-index 387ce9cdbd7c..39cfbb28ccc3 100644
---- a/drivers/mmc/host/sdhci-tegra.c
-+++ b/drivers/mmc/host/sdhci-tegra.c
-@@ -116,6 +116,8 @@
-  */
- #define NVQUIRK_HAS_TMCLK				BIT(10)
- 
-+#define NVQUIRK_HAS_ANDROID_GPT_SECTOR			BIT(11)
-+
- /* SDMMC CQE Base Address for Tegra Host Ver 4.1 and Higher */
- #define SDHCI_TEGRA_CQE_BASE_ADDR			0xF000
- 
-@@ -1361,6 +1363,7 @@ static const struct sdhci_tegra_soc_data soc_data_tegra20 = {
- 	.pdata = &sdhci_tegra20_pdata,
- 	.dma_mask = DMA_BIT_MASK(32),
- 	.nvquirks = NVQUIRK_FORCE_SDHCI_SPEC_200 |
-+		    NVQUIRK_HAS_ANDROID_GPT_SECTOR |
- 		    NVQUIRK_ENABLE_BLOCK_GAP_DET,
- };
- 
-@@ -1390,6 +1393,7 @@ static const struct sdhci_tegra_soc_data soc_data_tegra30 = {
- 	.nvquirks = NVQUIRK_ENABLE_SDHCI_SPEC_300 |
- 		    NVQUIRK_ENABLE_SDR50 |
- 		    NVQUIRK_ENABLE_SDR104 |
-+		    NVQUIRK_HAS_ANDROID_GPT_SECTOR |
- 		    NVQUIRK_HAS_PADCALIB,
- };
- 
-@@ -1422,6 +1426,7 @@ static const struct sdhci_pltfm_data sdhci_tegra114_pdata = {
- static const struct sdhci_tegra_soc_data soc_data_tegra114 = {
- 	.pdata = &sdhci_tegra114_pdata,
- 	.dma_mask = DMA_BIT_MASK(32),
-+	.nvquirks = NVQUIRK_HAS_ANDROID_GPT_SECTOR,
- };
- 
- static const struct sdhci_pltfm_data sdhci_tegra124_pdata = {
-@@ -1438,6 +1443,7 @@ static const struct sdhci_pltfm_data sdhci_tegra124_pdata = {
- static const struct sdhci_tegra_soc_data soc_data_tegra124 = {
- 	.pdata = &sdhci_tegra124_pdata,
- 	.dma_mask = DMA_BIT_MASK(34),
-+	.nvquirks = NVQUIRK_HAS_ANDROID_GPT_SECTOR,
- };
- 
- static const struct sdhci_ops tegra210_sdhci_ops = {
-@@ -1616,6 +1622,9 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
- 	tegra_host->pad_control_available = false;
- 	tegra_host->soc_data = soc_data;
- 
-+	if (soc_data->nvquirks & NVQUIRK_HAS_ANDROID_GPT_SECTOR)
-+		host->mmc->caps2 |= MMC_CAP2_ALT_GPT_SECTOR;
-+
- 	if (soc_data->nvquirks & NVQUIRK_NEEDS_PAD_CONTROL) {
- 		rc = tegra_sdhci_init_pinctrl_info(&pdev->dev, tegra_host);
- 		if (rc == 0)
+> And while at it, why not use sizeof(subaddr) instead of 3 ?
+
+Agreed. :)
+
+Thanks!
+
 -- 
-2.32.0
-
+Kees Cook
