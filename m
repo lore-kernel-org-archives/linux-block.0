@@ -2,126 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33FDC4320A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 20:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A53AC4338F
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 21:33:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBE03610A0
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 20:51:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 027536109E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 21:33:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230052AbhHSUwY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 16:52:24 -0400
-Received: from mail-lf1-f41.google.com ([209.85.167.41]:46621 "EHLO
-        mail-lf1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230031AbhHSUwY (ORCPT
+        id S235170AbhHSVeb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 17:34:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231951AbhHSVeX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 16:52:24 -0400
-Received: by mail-lf1-f41.google.com with SMTP id u22so15597278lfq.13;
-        Thu, 19 Aug 2021 13:51:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=A3cvCpxfRoQDlHVtpQTz35oWEBjIU7MK3I1RSPqUnTI=;
-        b=Ci2M2cmrls84+ZsnE6g8PE1F4sbF+AIJoR/E/rGxXu5lFC+ofNb0jf68fdoJbKr4ls
-         ww28XMfq9Laceu0zxAnbfNxaTSR+3ass0YBDRMS8Od8AJA+DgakunNCjaQ8bfjrwPrgb
-         OKBF4iP9WAk1KBDbAVhhW5EjCwIo1axge/VCg/XJK/cPRijDMMwcwpRDJwiGYlyIeBlr
-         2HXHBbO1quS4y3JTSI3yOFkTaFUBb9BDN0C35kfVkYqEUrcH5D6WZSpdDmmKHcZtjzeR
-         Tk4bGOsDtAiyQ4e3MIYZdOW4FJFKnm+T8TRWiRspnwBEU5V2VLMrcSI8iF9DHNi++oRc
-         f3Rw==
-X-Gm-Message-State: AOAM533VZXzXYx9esgEl0toi94pHhqOJLwO1y+JX6WQX74RIFeb+gSow
-        D3n9lD7leq7DVoA8csCOmY8=
-X-Google-Smtp-Source: ABdhPJyH+1pHjJRPJ/Gv9OmJagVmP+KiDmOpZseeuc6ergP/QT3L2z4VNpY4WbR51bSnxOspglp28w==
-X-Received: by 2002:a05:6512:3890:: with SMTP id n16mr11644678lft.240.1629406306010;
-        Thu, 19 Aug 2021 13:51:46 -0700 (PDT)
-Received: from [192.168.1.109] ([213.87.152.233])
-        by smtp.gmail.com with ESMTPSA id w32sm254878lfu.158.2021.08.19.13.51.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Aug 2021 13:51:45 -0700 (PDT)
-Subject: Re: [RFC PATCH 2/5] gen_initramfs.sh: use absolute path for
- gen_init_cpio
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Jiri Kosina <jkosina@suse.cz>, Willy Tarreau <w@1wt.eu>
-References: <20210818154646.925351-1-efremov@linux.com>
- <20210818154646.925351-3-efremov@linux.com>
- <CAK7LNASTa+_d17wF6NW6GHC7Y+_RrXYZuo0MzzbsNnaRn8KJuQ@mail.gmail.com>
-From:   Denis Efremov <efremov@linux.com>
-Message-ID: <e90603ee-61e0-4530-34dc-087e40c94aa1@linux.com>
-Date:   Thu, 19 Aug 2021 23:51:43 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Thu, 19 Aug 2021 17:34:23 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECB94C061575;
+        Thu, 19 Aug 2021 14:33:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=bdxkc83q6kJ9qh/y52VwJ2v/evqQNeNYte2MxskUxaw=; b=PYIoEvu47yHxjeJFlOgfoulVr6
+        38dUcO4XtoUg5flQQQD4fX57Dr1j6r8oWfKgYVwqtJaCSXZn3FSeqVMskWEs8uFtFxz0pqb4QIgbt
+        2MSGFNeWHNs/TY4SNW9ofWq4fax2udeqCDliT8toqoW7p/r562qKpBsRrj/pu3n2QiHima7OKtnHB
+        dBKDZ+I65TWPs09aNHYhDIC+Pol6vFj60Zhku72xFIvHKuiIcnYL/qxmOjXqoaA/k3vH+rt9ALmYZ
+        8XYAdiAMmP74JkCeVMxue10vEtb4RJUnAPePdXpNH1b7PdUZfEi3x4d3oWrm8N14MsU24oxL+0PUn
+        nel/OOjw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mGpfD-009Tx4-26; Thu, 19 Aug 2021 21:33:27 +0000
+Date:   Thu, 19 Aug 2021 14:33:27 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 3/9] sg: do not allocate a gendisk
+Message-ID: <YR7OJ+lmps2H2fN/@bombadil.infradead.org>
+References: <20210816131910.615153-1-hch@lst.de>
+ <20210816131910.615153-4-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASTa+_d17wF6NW6GHC7Y+_RrXYZuo0MzzbsNnaRn8KJuQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210816131910.615153-4-hch@lst.de>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Aug 16, 2021 at 03:19:04PM +0200, Christoph Hellwig wrote:
+> sg is a character driver and thus does not need to allocate a gendisk,
+> which is only used for file system-like block layer I/O on block
+> devices.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+You forgot to do something like this too:
 
 
-On 8/19/21 3:24 AM, Masahiro Yamada wrote:
-> On Thu, Aug 19, 2021 at 12:47 AM Denis Efremov <efremov@linux.com> wrote:
->>
->> Use absolute path to call gen_init_cpio. This allows one
->> to use gen_initramfs.sh from any directory.
-> 
-> I do not mind this, but $(dirname "$0")
-> is not necessarily an absolute path, is it?
-> 
-> 
-> I added test code:
-> 
->    echo dirname is $(dirname $0)
-> 
-> in this script, and I saw
-> 
->    dirname is usr
+diff --git a/drivers/scsi/st.c b/drivers/scsi/st.c
+index c7d2c1c5a299..9d04929f03a1 100644
+--- a/drivers/scsi/st.c
++++ b/drivers/scsi/st.c
+@@ -3827,7 +3827,7 @@ static long st_ioctl(struct file *file, unsigned int cmd_in, unsigned long arg)
+ 		break;
+ 	}
+ 
+-	retval = scsi_ioctl(STp->device, STp->disk, file->f_mode, cmd_in, p);
++	retval = scsi_ioctl(STp->device, NULL, file->f_mode, cmd_in, p);
+ 	if (!retval && cmd_in == SCSI_IOCTL_STOP_UNIT) {
+ 		/* unload */
+ 		STp->rew_at_close = 0;
 
-Oh, sorry, commit message is wrong. Would that be ok for you if I will change
-it in v2 to something like:
+Other than that:
 
-Prepend gen_init_cpio call with the same path as gen_initramfs.sh called. This
-allows one to use gen_initramfs.sh from any directory, not only from the
-kernel's topdir.
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 
-> 
-> 
-> 
-> 
->>
->> Cc: Masahiro Yamada <masahiroy@kernel.org>
->> Signed-off-by: Denis Efremov <efremov@linux.com>
->> ---
->>  usr/gen_initramfs.sh | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
->> index 63476bb70b41..2e4a86181c79 100755
->> --- a/usr/gen_initramfs.sh
->> +++ b/usr/gen_initramfs.sh
->> @@ -244,4 +244,4 @@ if test -n "$KBUILD_BUILD_TIMESTAMP"; then
->>                 timestamp="-t $timestamp"
->>         fi
->>  fi
->> -usr/gen_init_cpio $timestamp $cpio_list > $output
->> +"$(dirname "$0")"/gen_init_cpio $timestamp $cpio_list > $output
->> --
->> 2.31.1
->>
-> 
-> 
-> --
-> Best Regards
-> Masahiro Yamada
-> 
+  Luis
