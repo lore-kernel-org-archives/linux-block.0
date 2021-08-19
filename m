@@ -2,260 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78055C4320E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 23:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DD1C4320A
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 00:34:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5FB4E61056
-	for <linux-block@archiver.kernel.org>; Wed, 18 Aug 2021 23:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C00B610A4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 00:34:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235099AbhHSAAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 20:00:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41120 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234986AbhHRX76 (ORCPT
+        id S234546AbhHSAfO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 20:35:14 -0400
+Received: from condef-09.nifty.com ([202.248.20.74]:20081 "EHLO
+        condef-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234511AbhHSAfN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 19:59:58 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F87BC0613CF
-        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 16:59:23 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id q2so2844474plr.11
-        for <linux-block@vger.kernel.org>; Wed, 18 Aug 2021 16:59:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=ihRSUosZ1n/QH58LU5drX97jQNk+oYE3vHV9UEG8bhY=;
-        b=ll0X1F/1yJb+64r0U9YpjrHHbzyCyA3JdVLIsZBGSDD5G8By6g0Da0FvU5ma5PfPOz
-         QC4sz18rY2gpOQxJm5PmQyk9q0bDlmToRffwWKkDWOoZx6TCSYGWys/Yplpd7VScrov4
-         Ino9fR/0iet8k+NaPzK7xaA5zNSBEEQ3I0jbc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ihRSUosZ1n/QH58LU5drX97jQNk+oYE3vHV9UEG8bhY=;
-        b=PifoLweBHGQqoDpFS7LzC9Y/AJAYD3GGj2RJKQFv6C3l2xBUmHgQmhQgC8Chx+SXIS
-         stQ6DdD7ebSI/8taVXnfhTjVqG3QArh/Qz0IWWLNJW8VqHo1vLkPB4PnjAVbZmAKoT3f
-         BklPclSlzMe74PP1ExVBew+Jt/MxwmigwLZoHFd3hZ1U1QPNzSMXT2othFSD51+FnK5I
-         pu7z4idO5Oc9Dcm6p2dq+l54NQs7RAu+WnsB5uo5GJtOJ4GBRUFEoMwFVQ2v4eyQejwb
-         XAlTFq+RvV7H3cfKdmZbAdp8GeZy7xoyI8Ch6y26hTTGqFrNmF7kRWIFaDt0kYInZy4A
-         cxpg==
-X-Gm-Message-State: AOAM531AGqBApGnU7tQ6R7lpfRkceZwcczdVLgSdrph2PMoVJ7nl1frI
-        i+lEjItgwnxQsuYLSYQb14svTw==
-X-Google-Smtp-Source: ABdhPJyqLAVutuhaUvZwqCN9mzT6ajj2JdJOPLObLJIeTaHnjuorpiaj1FYbc1rllZLoCI06EyvNXg==
-X-Received: by 2002:a17:90a:c006:: with SMTP id p6mr11982780pjt.144.1629331163071;
-        Wed, 18 Aug 2021 16:59:23 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id q4sm834430pjd.52.2021.08.18.16.59.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 16:59:22 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 16:59:21 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     "Lazar, Lijo" <lijo.lazar@amd.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Hawking Zhang <Hawking.Zhang@amd.com>,
-        Feifei Xu <Feifei.Xu@amd.com>, Likun Gao <Likun.Gao@amd.com>,
-        Jiawei Gu <Jiawei.Gu@amd.com>, Evan Quan <evan.quan@amd.com>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        Alex Deucher <alexander.deucher@amd.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 18/63] drm/amd/pm: Use struct_group() for memcpy()
- region
-Message-ID: <202108181619.B603481527@keescook>
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-19-keescook@chromium.org>
- <753ef2d1-0f7e-c930-c095-ed86e1518395@amd.com>
+        Wed, 18 Aug 2021 20:35:13 -0400
+X-Greylist: delayed 356 seconds by postgrey-1.27 at vger.kernel.org; Wed, 18 Aug 2021 20:35:13 EDT
+Received: from conssluserg-04.nifty.com ([10.126.8.83])by condef-09.nifty.com with ESMTP id 17J0PJUK024005;
+        Thu, 19 Aug 2021 09:25:19 +0900
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id 17J0P0f1032108;
+        Thu, 19 Aug 2021 09:25:01 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 17J0P0f1032108
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1629332701;
+        bh=PF53kQPV3ZMQ1IqBpnzqJejKPfOrn59+hm0ztTTG2rc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=N9WJQSvGetK7IX3nXyVZDUEVRRQIaWMxCKvnH8S4AW6s6ALnTS7u000Cz4XTD2EOh
+         PyRfTomhxspXVNFhUVM/TTXMADH5Std/HkRMtLue3L6vsn57d9dprw7KnVDWurbxOe
+         T+UoNoVpxIN2I6S+WGHhDOgJdVigAYqURBX9l6/P5H2qe8m2c4kIzwWUkr4cot4xJz
+         8MwmcTksICp2B+ef+8bwuRM3ztuoOGD/jMlpVpGhbcFfR3cISKOhluzcKhPOk6XpDx
+         w+Dn0kxYImvWlaTUikoDWpwvLqXMyvXSmCbzYhaBTR1ZmJ3+9t5oL2Q8LfvyQM50cj
+         gOIDMaADXI56A==
+X-Nifty-SrcIP: [209.85.210.175]
+Received: by mail-pf1-f175.google.com with SMTP id m26so3854800pff.3;
+        Wed, 18 Aug 2021 17:25:01 -0700 (PDT)
+X-Gm-Message-State: AOAM5322Ar5nIgMMzOjJB6txHAsuIlR9v0zcaMZQIkCVjFeQ1qH0bCTr
+        IZLEWPWQC2wjXqzIenYToIzYdd4pU2odgN/J75Y=
+X-Google-Smtp-Source: ABdhPJyI48U6UoIuNg/t0/Wmc0kyshBQu8l/PGLPbEpDRALt1hRHHdvzrQwxGK0TmPPg7RKq3ivTo+X4kEATHr7Yk/w=
+X-Received: by 2002:a63:dd51:: with SMTP id g17mr11336425pgj.47.1629332700384;
+ Wed, 18 Aug 2021 17:25:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <753ef2d1-0f7e-c930-c095-ed86e1518395@amd.com>
+References: <20210818154646.925351-1-efremov@linux.com> <20210818154646.925351-3-efremov@linux.com>
+In-Reply-To: <20210818154646.925351-3-efremov@linux.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 19 Aug 2021 09:24:23 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASTa+_d17wF6NW6GHC7Y+_RrXYZuo0MzzbsNnaRn8KJuQ@mail.gmail.com>
+Message-ID: <CAK7LNASTa+_d17wF6NW6GHC7Y+_RrXYZuo0MzzbsNnaRn8KJuQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/5] gen_initramfs.sh: use absolute path for gen_init_cpio
+To:     Denis Efremov <efremov@linux.com>
+Cc:     "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Jiri Kosina <jkosina@suse.cz>, Willy Tarreau <w@1wt.eu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 05:12:28PM +0530, Lazar, Lijo wrote:
-> 
-> On 8/18/2021 11:34 AM, Kees Cook wrote:
-> > In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> > field bounds checking for memcpy(), memmove(), and memset(), avoid
-> > intentionally writing across neighboring fields.
-> > 
-> > Use struct_group() in structs:
-> > 	struct atom_smc_dpm_info_v4_5
-> > 	struct atom_smc_dpm_info_v4_6
-> > 	struct atom_smc_dpm_info_v4_7
-> > 	struct atom_smc_dpm_info_v4_10
-> > 	PPTable_t
-> > so the grouped members can be referenced together. This will allow
-> > memcpy() and sizeof() to more easily reason about sizes, improve
-> > readability, and avoid future warnings about writing beyond the end of
-> > the first member.
-> > 
-> > "pahole" shows no size nor member offset changes to any structs.
-> > "objdump -d" shows no object code changes.
-> > 
-> > Cc: "Christian König" <christian.koenig@amd.com>
-> > Cc: "Pan, Xinhui" <Xinhui.Pan@amd.com>
-> > Cc: David Airlie <airlied@linux.ie>
-> > Cc: Daniel Vetter <daniel@ffwll.ch>
-> > Cc: Hawking Zhang <Hawking.Zhang@amd.com>
-> > Cc: Feifei Xu <Feifei.Xu@amd.com>
-> > Cc: Lijo Lazar <lijo.lazar@amd.com>
-> > Cc: Likun Gao <Likun.Gao@amd.com>
-> > Cc: Jiawei Gu <Jiawei.Gu@amd.com>
-> > Cc: Evan Quan <evan.quan@amd.com>
-> > Cc: amd-gfx@lists.freedesktop.org
-> > Cc: dri-devel@lists.freedesktop.org
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > Acked-by: Alex Deucher <alexander.deucher@amd.com>
-> > Link: https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Flkml%2FCADnq5_Npb8uYvd%2BR4UHgf-w8-cQj3JoODjviJR_Y9w9wqJ71mQ%40mail.gmail.com&amp;data=04%7C01%7Clijo.lazar%40amd.com%7C92b8d2f072f0444b9f8508d9620f6971%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637648640625729624%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=rKh5LUXCRUsorYM3kSpG2tkB%2Fczwl9I9EBnWBCtbg6Q%3D&amp;reserved=0
-> > ---
-> >   drivers/gpu/drm/amd/include/atomfirmware.h           |  9 ++++++++-
-> >   .../gpu/drm/amd/pm/inc/smu11_driver_if_arcturus.h    |  3 ++-
-> >   drivers/gpu/drm/amd/pm/inc/smu11_driver_if_navi10.h  |  3 ++-
-> >   .../gpu/drm/amd/pm/inc/smu13_driver_if_aldebaran.h   |  3 ++-
-> 
-> Hi Kees,
+On Thu, Aug 19, 2021 at 12:47 AM Denis Efremov <efremov@linux.com> wrote:
+>
+> Use absolute path to call gen_init_cpio. This allows one
+> to use gen_initramfs.sh from any directory.
 
-Hi! Thanks for looking into this.
+I do not mind this, but $(dirname "$0")
+is not necessarily an absolute path, is it?
 
-> The headers which define these structs are firmware/VBIOS interfaces and are
-> picked directly from those components. There are difficulties in grouping
-> them to structs at the original source as that involves other component
-> changes.
 
-So, can you help me understand this a bit more? It sounds like these are
-generated headers, yes? I'd like to understand your constraints and
-weight them against various benefits that could be achieved here.
+I added test code:
 
-The groupings I made do appear to be roughly documented already,
-for example:
+   echo dirname is $(dirname $0)
 
-   struct   atom_common_table_header  table_header;
-     // SECTION: BOARD PARAMETERS
-+  struct_group(dpm_info,
+in this script, and I saw
 
-Something emitted the "BOARD PARAMETERS" section heading as a comment,
-so it likely also would know where it ends, yes? The good news here is
-that for the dpm_info groups, they all end at the end of the existing
-structs, see:
-	struct atom_smc_dpm_info_v4_5
-	struct atom_smc_dpm_info_v4_6
-	struct atom_smc_dpm_info_v4_7
-	struct atom_smc_dpm_info_v4_10
+   dirname is usr
 
-The matching regions in the PPTable_t structs are similarly marked with a
-"BOARD PARAMETERS" section heading comment:
 
---- a/drivers/gpu/drm/amd/pm/inc/smu11_driver_if_arcturus.h
-+++ b/drivers/gpu/drm/amd/pm/inc/smu11_driver_if_arcturus.h
-@@ -643,6 +643,7 @@ typedef struct {
-   // SECTION: BOARD PARAMETERS
- 
-   // SVI2 Board Parameters
-+  struct_group(v4_6,
-   uint16_t     MaxVoltageStepGfx; // In mV(Q2) Max voltage step that SMU will request. Multiple steps are taken if voltage change exceeds this value.
-   uint16_t     MaxVoltageStepSoc; // In mV(Q2) Max voltage step that SMU will request. Multiple steps are taken if voltage change exceeds this value.
- 
-@@ -728,10 +729,10 @@ typedef struct {
-   uint32_t     BoardVoltageCoeffB;    // decode by /1000
- 
-   uint32_t     BoardReserved[7];
-+  );
- 
-   // Padding for MMHUB - do not modify this
-   uint32_t     MmHubPadding[8]; // SMU internal use
--
- } PPTable_t;
 
-Where they end seems known as well (the padding switches from a "Board"
-to "MmHub" prefix at exactly the matching size).
 
-So, given that these regions are already known by the export tool, how
-about just updating the export tool to emit a struct there? I imagine
-the problem with this would be the identifier churn needed, but that's
-entirely mechanical.
+>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Signed-off-by: Denis Efremov <efremov@linux.com>
+> ---
+>  usr/gen_initramfs.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
+> index 63476bb70b41..2e4a86181c79 100755
+> --- a/usr/gen_initramfs.sh
+> +++ b/usr/gen_initramfs.sh
+> @@ -244,4 +244,4 @@ if test -n "$KBUILD_BUILD_TIMESTAMP"; then
+>                 timestamp="-t $timestamp"
+>         fi
+>  fi
+> -usr/gen_init_cpio $timestamp $cpio_list > $output
+> +"$(dirname "$0")"/gen_init_cpio $timestamp $cpio_list > $output
+> --
+> 2.31.1
+>
 
-However, I'm curious about another aspect of these regions: they are,
-by definition, the same. Why isn't there a single struct describing
-them already, given the existing redundancy? For example, look at the
-member names: maxvoltagestepgfx vs MaxVoltageStepGfx. Why aren't these
-the same? And then why aren't they described separately?
 
-Fixing that would cut down on the redundancy here, and in the renaming,
-you can fix the identifiers as well. It should be straight forward to
-write a Coccinelle script to do this renaming for you after extracting
-the structure.
-
-> The driver_if_* files updates are frequent and it is error prone to manually
-> group them each time we pick them for any update.
-
-Why are these structs updated? It looks like they're specifically
-versioned, and aren't expected to change (i.e. v4.5, v4.6, v4.10, etc).
-
-> Our usage of memcpy in this way is restricted only to a very few places.
-
-True, there's 1 per PPTable_t duplication. With a proper struct, you
-wouldn't even need a memcpy().
-
-Instead of the existing:
-               memcpy(smc_pptable->I2cControllers, smc_dpm_table_v4_7->I2cControllers,
-                       sizeof(*smc_dpm_table_v4_7) - sizeof(smc_dpm_table_v4_7->table_header));
-
-or my proposed:
-               memcpy(&smc_pptable->v4, &smc_dpm_table_v4_7->dpm_info,
-                      sizeof(smc_dpm_table_v4_7->dpm_info));
-
-you could just have:
-		smc_pptable->v4 = smc_dpm_table_v4_7->dpm_info;
-
-since they'd be explicitly the same type.
-
-That looks like a much cleaner solution to this. It greatly improves
-readability, reduces the redundancy in the headers, and should be a
-simple mechanical refactoring.
-
-Oh my, I just noticed append_vbios_pptable() in
-drivers/gpu/drm/amd/pm/powerplay/hwmgr/vega12_processpptables.c
-which does an open-coded assignment of the entire PPTable_t, including
-padding, and, apparently, the i2c address twice:
-
-        ppsmc_pptable->Vr2_I2C_address = smc_dpm_table.Vr2_I2C_address;
-
-        ppsmc_pptable->Vr2_I2C_address = smc_dpm_table.Vr2_I2C_address;
-
-> As another option - is it possible to have a helper function/macro like
-> memcpy_fortify() which takes the extra arguments and does the extra compile
-> time checks? We will use the helper whenever we have such kind of usage.
-
-I'd rather avoid special cases just for this, especially when the code
-here is already doing a couple things we try to avoid in the rest of
-the kernel (i.e. open coded redundant struct contents, etc).
-
-If something mechanically produced append_vbios_pptable() above, I bet
-we can get rid of the memcpy()s entirely and save a lot of code doing a
-member-to-member assignment.
-
-What do you think?
-
--Kees
-
--- 
-Kees Cook
+--
+Best Regards
+Masahiro Yamada
