@@ -2,96 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C87CC4338F
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28785C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:57:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FFAC60462
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:39:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0985E6109E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:57:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236732AbhHSWjw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 18:39:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53484 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236811AbhHSWjq (ORCPT
+        id S236398AbhHSW6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 18:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48708 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229522AbhHSW6I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 18:39:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629412749;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WvW8FSkVp/VZ7wZBkabn/sUX6jEw55BCyhO8wvyuUhg=;
-        b=LaAbbwyilh04Cog6OEPZ9tRhkNmzMj1/AMqfpQybA7aR9yrbyHIXtPpXSwSAoSGhzH6D0c
-        fFuqstaHAfgC6iiVF+0vGnYEi1IDDNaztp2IOexTIbV9o1N/b2d5pC9n8e7aagAZfHCCW0
-        fMyjaSpn4k55PPwYcmkIGfbdf3e7ZGo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-bq2_hmHiNNCr_P7CtL99bg-1; Thu, 19 Aug 2021 18:39:05 -0400
-X-MC-Unique: bq2_hmHiNNCr_P7CtL99bg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54AD2801B3D;
-        Thu, 19 Aug 2021 22:39:04 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13F4760938;
-        Thu, 19 Aug 2021 22:38:55 +0000 (UTC)
-Date:   Fri, 20 Aug 2021 06:38:50 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Cc:     John Garry <john.garry@huawei.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Daniel Wagner <dwagner@suse.de>,
-        Wen Xiong <wenxiong@us.ibm.com>
-Subject: Re: [PATCH V7 0/3] blk-mq: fix blk_mq_alloc_request_hctx
-Message-ID: <YR7demOSG6MKFVAF@T590>
-References: <20210818144428.896216-1-ming.lei@redhat.com>
+        Thu, 19 Aug 2021 18:58:08 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C57C061575;
+        Thu, 19 Aug 2021 15:57:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=jN6ytmfG1G2fsajoHZih2MkPavNSC55GOqTyscGelew=; b=cILTUHVymX/jwm1VvrbYRNeWre
+        wFxQJDEe5WkQhUZ1WkKXFProOz2CgrmP78tWTHlqQxBxd4F5TUxx6XjfKAxxQS1WBx734fxwXDDDs
+        4eTe1rL/Z29gO6b2WRz+U/iS6xBKajXPhbtGPvpwkLK8zf2jHT5c3DP2vPc6koY/TKOkubvSPojpK
+        cuSNdcn3v5Xl/ImvrFn/zOyANJ9pgH+YlGkPpAAn74/pqu2gQsfpavTv+Evd1P5RjdipOPt50UNuk
+        7vAFHEpFQUWxIzj2guU5bNWhudoAqSE9JDJOCPO3UCM7+JEYVE5ZBinCRj1viC8eYbFd8PG69aDXp
+        isrdPZRw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mGqyR-009gVU-HW; Thu, 19 Aug 2021 22:57:23 +0000
+Date:   Thu, 19 Aug 2021 15:57:23 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 1/9] nvme: use blk_mq_alloc_disk
+Message-ID: <YR7h0w6rJc9GYpaf@bombadil.infradead.org>
+References: <20210816131910.615153-1-hch@lst.de>
+ <20210816131910.615153-2-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210818144428.896216-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210816131910.615153-2-hch@lst.de>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 10:44:25PM +0800, Ming Lei wrote:
-> Hi,
+On Mon, Aug 16, 2021 at 03:19:02PM +0200, Christoph Hellwig wrote:
+> Switch to use the blk_mq_alloc_disk helper for allocating the
+> request_queue and gendisk.
 > 
-> blk_mq_alloc_request_hctx() is used by NVMe fc/rdma/tcp/loop to connect
-> io queue. Also the sw ctx is chosen as the 1st online cpu in hctx->cpumask.
-> However, all cpus in hctx->cpumask may be offline.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/nvme/host/core.c | 33 +++++++++++++--------------------
+>  1 file changed, 13 insertions(+), 20 deletions(-)
 > 
-> This usage model isn't well supported by blk-mq which supposes allocator is
-> always done on one online CPU in hctx->cpumask. This assumption is
-> related with managed irq, which also requires blk-mq to drain inflight
-> request in this hctx when the last cpu in hctx->cpumask is going to
-> offline.
-> 
-> However, NVMe fc/rdma/tcp/loop don't use managed irq, so we should allow
-> them to ask for request allocation when the specified hctx is inactive
-> (all cpus in hctx->cpumask are offline). Fix blk_mq_alloc_request_hctx() by
-> allowing to allocate request when all CPUs of this hctx are offline.
-> 
-> Wen Xiong has verified V4 in her nvmef test.
-> 
-> V7:
-> 	- move blk_mq_hctx_use_managed_irq() into block/blk-mq.c, 3/3
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 1478d825011d..a5878ba14c55 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -3762,15 +3759,14 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+>  	if (!nvme_mpath_set_disk_name(ns, disk->disk_name, &disk->flags))
+>  		sprintf(disk->disk_name, "nvme%dn%d", ctrl->instance,
+>  			ns->head->instance);
+> -	ns->disk = disk;
+>  
+>  	if (nvme_update_ns_info(ns, id))
+> -		goto out_put_disk;
+> +		goto out_unlink_ns;
+>  
+>  	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] == 0x1) {
+>  		if (nvme_nvm_register(ns, disk->disk_name, node)) {
+>  			dev_warn(ctrl->device, "LightNVM init failure\n");
+> -			goto out_put_disk;
+> +			goto out_unlink_ns;
+>  		}
+>  	}
 
-Hello Jens,
+This hunk will fail because of the now removed NVME_QUIRK_LIGHTNVM. The
+last part of the patch  then can be removed to apply to linux-next.
 
-NVMe TCP and others have been a bit popular recent days, and the kernel panic
-of blk_mq_alloc_request_hctx() has annoyed people for a bit long.
-
-Any chance to pull the three patches in so we can fix them in 5.15?
-
-
-Thanks,
-Ming
-
+  Luis
