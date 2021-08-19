@@ -2,80 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE04C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9772C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:27:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9692B61051
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:17:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9431E6108E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:27:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236099AbhHSWRz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 18:17:55 -0400
-Received: from smtprelay0017.hostedemail.com ([216.40.44.17]:36608 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235852AbhHSWRy (ORCPT
+        id S229564AbhHSW1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 18:27:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41780 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229532AbhHSW1l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 18:17:54 -0400
-Received: from omf16.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay02.hostedemail.com (Postfix) with ESMTP id 6794025F3A;
-        Thu, 19 Aug 2021 22:17:17 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf16.hostedemail.com (Postfix) with ESMTPA id 21E1D255104;
-        Thu, 19 Aug 2021 22:17:16 +0000 (UTC)
-Message-ID: <ac2587d3d4b7ce87e8922380e36d7864bfb54262.camel@perches.com>
-Subject: Re: [RFC PATCH 1/5] checkpatch: improve handling of revert commits
-From:   Joe Perches <joe@perches.com>
-To:     Denis Efremov <efremov@linux.com>, linux-kselftest@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Jiri Kosina <jkosina@suse.cz>,
-        Willy Tarreau <w@1wt.eu>
-Date:   Thu, 19 Aug 2021 15:17:15 -0700
-In-Reply-To: <c31b2007-26a9-34e0-8c9a-8e11a00ce69f@linux.com>
-References: <20210818154646.925351-1-efremov@linux.com>
-         <20210818154646.925351-2-efremov@linux.com>
-         <cc5801790fea258e20fa6b7e26de7806ae8e0dda.camel@perches.com>
-         <3d347d4b-1576-754f-8633-ba6084cc0661@linux.com>
-         <23c8ebaa0921d5597df9fc1d6cbbcc4f354f80c5.camel@perches.com>
-         <c31b2007-26a9-34e0-8c9a-8e11a00ce69f@linux.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.0-1 
+        Thu, 19 Aug 2021 18:27:41 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E34C061575;
+        Thu, 19 Aug 2021 15:27:04 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id x27so16139394lfu.5;
+        Thu, 19 Aug 2021 15:27:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ArctQfOIhjZxst06RUvgPGOnETI6tONN6GEIYocngV0=;
+        b=HZGb3hQqffUQpm2UygIvPhr7J+CcPe75PvUHZszdG5WQ8+8osFXAOdArU5kbBHvV65
+         V6lrfFz8i9RZSl3R2+snCC5hGr6Q0NEgNgj3Ar/ApLxV+sVN6q23mgnBZqZuaxdQluDF
+         fn52V75hSg5RFjn7PZS8whd0yFzCnigTeuLYe0piov+N7iJiK6Bw0/PN/uCL+XHJuXhE
+         8z1gad0PLfXf6gYdXASTeoUgpd/lotTMJSVwVo/GYsOySnQoCfC7yYXt4eUTch4jASVf
+         8o9PPge+zhQHGXyTEzMerdcgq6M1tYHaDGpAxqgC8B3B/IjsIMfup2XYyzntDtixZg8K
+         Eu9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ArctQfOIhjZxst06RUvgPGOnETI6tONN6GEIYocngV0=;
+        b=XGi2k01MMXytJsrlOBxZipynrmChNEiksibmtQgNDaTpKHT9/pmP/ZluF09NEtOIrB
+         xlOYOUjMX23LtrNjkkT2yKOpiObCkhk43h40lv24AFRps45aqzKT716nxco5zs1Zv/+s
+         3uKQ9IXv+Ap4NBPBG0uPhebFFG+ic8/KX63rUUxiSBRU3eDc1bbkOaOhY6TGOvLdVSwB
+         RIEjUeR6+uLcSbs/kg19UHtlN5aOkYSgBGjwEStuVtqzJZ04/Ke0KB8kZAs7TNWAoMQ4
+         EMR5PAXDMPK2Oh2bwUHE38I6Ay78uhzOyKtLaCt9hje3WNVtqziTPMxNFxhxl8U+3ceZ
+         XPBQ==
+X-Gm-Message-State: AOAM5336HmHZ3JH7GVS7b2EdBVInujz+MH8uxq77exOoSsSR9QbqIzhk
+        g4Mfxj3R/97QUxvFUWKVx4nH8dIohTQ=
+X-Google-Smtp-Source: ABdhPJyNXEwOXNdUmb07P+xqn34rOJ9QIDaeZqy8GoElyylu+BjbrOTAADRbeT8TMAVrUTRS9PBRDA==
+X-Received: by 2002:a05:6512:3a90:: with SMTP id q16mr12150830lfu.448.1629412022333;
+        Thu, 19 Aug 2021 15:27:02 -0700 (PDT)
+Received: from [192.168.2.145] (46-138-120-72.dynamic.spd-mgts.ru. [46.138.120.72])
+        by smtp.googlemail.com with ESMTPSA id j2sm384140ljc.49.2021.08.19.15.27.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Aug 2021 15:27:01 -0700 (PDT)
+Subject: Re: [PATCH v6 0/5] Support EFI partition on NVIDIA Tegra devices
+To:     Davidlohr Bueso <dave@stgolabs.net>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Micha?? Miros??aw <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+References: <20210818221920.3893-1-digetx@gmail.com>
+ <20210819171854.hmpycxs5pqiwq4qg@offworld>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <cd8db560-a117-3592-57d6-bfd25738e3ae@gmail.com>
+Date:   Fri, 20 Aug 2021 01:27:01 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: skshep1bqut9k49n7cu9y6o5pd3jjqfi
-X-Rspamd-Server: rspamout03
-X-Rspamd-Queue-Id: 21E1D255104
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX18xeMNU5Xm3A6JVpFd9ED1ZFoW48dmRWWo=
-X-HE-Tag: 1629411436-234901
+In-Reply-To: <20210819171854.hmpycxs5pqiwq4qg@offworld>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2021-08-19 at 22:52 +0300, Denis Efremov wrote:
-> Hi,
-
-
+19.08.2021 20:18, Davidlohr Bueso пишет:
+> On Thu, 19 Aug 2021, Dmitry Osipenko wrote:
 > 
-> Why do you want to add "if ($orig_desc =~ /^".*"$/);" here? and not just substr($orig_desc, 2, -2);?
+>>    - Moved GPT calculation into MMC core and added
+>> MMC_CAP2_ALT_GPT_SECTOR
+>>      flag, like it was asked by Ulf Hansson. Me and Thierry have concerns
+>>      about whether it's better to have Tegra-specific function in a core
+>>      instead of Tegra driver, but it also works, so I decided to try that
+>>      variant.
+> 
+> I think this is better as you had it in v5. This is specific to tegra and
+> shouldn't be in generic code.
 
-Because commit descriptions sometimes to not have quotes like
-
-commit <deadbeef> (Multiple word description)
-
-btw:
-
-I tested the last proposal with this script:
-
-$ git log --grep="commit [0-9a-f]" -i --format=%h -1000 | \
-  while read commit ; do \
-    echo $commit; \
-    ./scripts/checkpatch.pl --git --no-summary --quiet --types=GIT_COMMIT_ID $commit ; \
-  done
-
-and there are still a fair number of ERRORs.
-
-And I'm not sure if this particular ERROR is that useful overall.
-
+Yeah, but Ulf wants it to be in core. On the other hand, MMC core
+already carries all kinds of quirks for hosts and cards, so it's not
+something extraordinary for the MMC.
