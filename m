@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21919C19F37
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6248C4320E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0036A61106
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D16A76102A
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235832AbhHSCvo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 22:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51352 "EHLO
+        id S235907AbhHSCvp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 22:51:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235809AbhHSCvm (ORCPT
+        with ESMTP id S235853AbhHSCvo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 22:51:42 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AAFEC061764;
-        Wed, 18 Aug 2021 19:51:07 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id h63-20020a9d14450000b02904ce97efee36so6837170oth.7;
-        Wed, 18 Aug 2021 19:51:07 -0700 (PDT)
+        Wed, 18 Aug 2021 22:51:44 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F6BAC0613CF;
+        Wed, 18 Aug 2021 19:51:09 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id l36-20020a0568302b24b0290517526ce5e3so6808882otv.11;
+        Wed, 18 Aug 2021 19:51:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qbI1pPRxf25pr2Ei2jsbhNXjyN2At2UDUcIa0sXZlcc=;
-        b=jXCqHfVzezbg84KWtIvjU7ss5ey/Rscavur5r8e3DywfgBSXVBtUkY0NzxSGKM2Pzd
-         TnKa5l+QAyOXOczLXa9CIxleWka6VNkPvFj5L345VIsLGeZu1b5gxa7BVTMnuR7LyrkN
-         w0KVQeBbisl1VJD8oQqaB/lQLbQKSF1kENggJbztncIFrIwp1a38AIHtU8Q18KV8rIcV
-         XMSrxER3QcZE/N2X/D3/An7Z5JaIvlU3rkR2wP5stZFxjYNqoLfhHjt0CG7vYHwFsqtn
-         g0Zy81YI8T647dIpQSK2lZQMJqqjcO7D4MCpApxvKIUvdkKC9hGhpq4VUns8zAdoArIM
-         qweA==
+        bh=sHJ6xIxDt3XA246U2lV+K6FnAovAAMr3EploK9JC5Ks=;
+        b=a7KK94iCAmI+6eXFYg75GNAI0bmgDA59ZXccCeX+9omBlPmR2885dUYbm5qktM9uMU
+         wjKBRRBv/sPXB1EQVOQAxTFj1949ZxnF1OI0d3xHzYW+4liJVf2Y7LVdYPBPSdh9f4zy
+         SGe+JhLOjC/JrkHOgW7ibBlf56WxpCmi8BtX+eiG8pKDzshXPXFfPU1woigl34w9G/bK
+         7sh0st3vvQdWpkqX7NfVvRz6dQEtx6KUp8m5rz1tOLxuEBpW6HZHKdvKM7jiLfu4mlBs
+         NkV4i5iuYuOaLponvku/SuqrQ1cStxcFpkqV8Vyod9nNykVXz/T4Q2PanWAU0jUqJq1w
+         jt8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qbI1pPRxf25pr2Ei2jsbhNXjyN2At2UDUcIa0sXZlcc=;
-        b=WrzaMcfNS5QRGXXlCd/A0CSjPVdEPGk6oNuqsCpEdwO+/8XlpTKe6vJBbYFg/fmCMg
-         XiJobii35ZMGgqUAqxw7aTj54KrF1qy32GA6AtmUlw4TUShcWcFHsqLyms64YtvHQFg3
-         4F8XLrlpLGLMmYaon1oW5H+WawK4nCujrhLzzwF+mpzKIEOrB0naLEkXq857Fl/iKpWs
-         9Ii8wsH2ILWwaCoFt+yPXEJ63iBmYVZuIN2dakGb6+xhaZH2p5SvWwa4tvJbtMhpsmFq
-         jCwbzjhEGXqxWKS0K9KaJbBPoPq8JDgOW7mtSE924CmtGBznUFydwZpqCnA47DQ9TxNM
-         PUww==
-X-Gm-Message-State: AOAM533Vw+tsUthGZT6GNNXCNrukkeHuFtbBpZHWf/Yl4tP/BdZz31Of
-        SOpu3e9Wrim/VNX5dXMCvLABac4ZDBvuHO7R
-X-Google-Smtp-Source: ABdhPJxhwdZVhIqT/etxLmyLnab1ijJigyk+plkkQknuZwxkylxcmMbHRDdpygEecfT5B5vYKjBhPQ==
-X-Received: by 2002:a9d:560a:: with SMTP id e10mr9928797oti.219.1629341466512;
-        Wed, 18 Aug 2021 19:51:06 -0700 (PDT)
+        bh=sHJ6xIxDt3XA246U2lV+K6FnAovAAMr3EploK9JC5Ks=;
+        b=BEgNMwBlJ8c4QVpKWJ+nY5bflJSbLyynVv5SGaBz8opNY4M9tK3BnVYMoiUN0hcTtP
+         uoyWKdafXJn/RTqgv0tgMkjylGuadQEI6un2zuV4UGqPwJTiS10bFWS+QNjh29rNxKBZ
+         /oI7D99hlqcXucA7lqOIn+PQY2xZ1MYBODSEsU/QhF5yg/x1CdDuxFXg4G8BUAlTaZaU
+         kxqA7OBlbzOqNOfYE7CN+5/hFTPi/QGQX8as13/ibfOv2j8adm1hllsuaoBOdXLcYlVW
+         4FKLxzkt4rgXpjUtRAfFbRz0Cj9kWj7pj+BOEQTTluRm/ksnkMUKUmbgAcbK7pqoBcOc
+         Trng==
+X-Gm-Message-State: AOAM532RX8D9zsU9Gt6ZWbsvpyNWikXTrl2u6JR4SAE+cUuFg2cZwcLu
+        X5dT4Z+sf3nNxOaw2cav0cG+HfC6Gm1UPlA/
+X-Google-Smtp-Source: ABdhPJyI82d41Fqs8kmor5RQK8H67itumoTrNSJPEf/KsY05snzSy/2jpn8MtLGyho0JZPUGQA/4sw==
+X-Received: by 2002:a9d:2de1:: with SMTP id g88mr9980024otb.84.1629341468225;
+        Wed, 18 Aug 2021 19:51:08 -0700 (PDT)
 Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id w15sm156792oiw.19.2021.08.18.19.51.05
+        by smtp.gmail.com with ESMTPSA id w15sm156792oiw.19.2021.08.18.19.51.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 19:51:06 -0700 (PDT)
+        Wed, 18 Aug 2021 19:51:07 -0700 (PDT)
 From:   Ian Pilcher <arequipeno@gmail.com>
 To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org
 Cc:     axboe@kernel.dk, pavel@ucw.cz, kabel@kernel.org,
         linux-kernel@vger.kernel.org, kernelnewbies@kernelnewbies.org
-Subject: [RFC PATCH v3 04/18] ledtrig-blkdev: Add misc. helper functions to blkdev LED trigger
-Date:   Wed, 18 Aug 2021 21:50:39 -0500
-Message-Id: <20210819025053.222710-5-arequipeno@gmail.com>
+Subject: [RFC PATCH v3 06/18] block: Add LED trigger pointer to struct gendisk
+Date:   Wed, 18 Aug 2021 21:50:41 -0500
+Message-Id: <20210819025053.222710-7-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210819025053.222710-1-arequipeno@gmail.com>
 References: <20210819025053.222710-1-arequipeno@gmail.com>
@@ -73,111 +73,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add various helper functions to the block device LED trigger:
-
-  * blkdev_mkdir() - create a sysfs directory (and don't swallow error
-    codes)
-
-  * blkdev_streq(), blkdev_skip_space() & blkdev_find_space() - for
-    parsing writes to sysfs attributes
-
-  * blkdev_read_mode() & blkdev_write_mode() - LED mode activity type
-    helpers
+Needed by ledtrig_blkdev_disk_cleanup(), which removes all monitoring of a
+block device by the blkdev LED trigger when the device is removed
 
 Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 ---
- drivers/leds/trigger/ledtrig-blkdev.c | 74 +++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+ include/linux/genhd.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
-index 28ccbd7946ba..fcae7ce63b92 100644
---- a/drivers/leds/trigger/ledtrig-blkdev.c
-+++ b/drivers/leds/trigger/ledtrig-blkdev.c
-@@ -6,6 +6,7 @@
-  *	Copyright 2021 Ian Pilcher <arequipeno@gmail.com>
-  */
- 
-+#include <linux/ctype.h>
- #include <linux/leds.h>
- #include <linux/list.h>
- #include <linux/mutex.h>
-@@ -64,3 +65,76 @@ static unsigned int ledtrig_blkdev_count;
- 
- /* How often to check for drive activity - in jiffies */
- static unsigned int ledtrig_blkdev_interval;
-+
-+
-+/*
-+ *
-+ *	Miscellaneous helper functions
-+ *
-+ */
-+
-+/* Like kobject_create_and_add(), but doesn't swallow error codes */
-+static struct kobject *blkdev_mkdir(const char *const name,
-+				    struct kobject *const parent)
-+{
-+	struct kobject *dir;
-+	int ret;
-+
-+	dir = kobject_create();
-+	if (dir == NULL)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ret = kobject_add(dir, parent, "%s", name);
-+	if (ret != 0) {
-+		kobject_put(dir);
-+		return ERR_PTR(ret);
-+	}
-+
-+	return dir;
-+}
-+
-+/*
-+ * Compare a null-terminated C string with a non-null-terminated character
-+ * sequence of a known length.  Returns true if equal, false if not.
-+ */
-+static bool blkdev_streq(const char *const cstr,
-+			 const char *const cbuf, const size_t buf_len)
-+{
-+	return (strlen(cstr) == buf_len) && (memcmp(cstr, cbuf, buf_len) == 0);
-+}
-+
-+/*
-+ * Returns a pointer to the first non-whitespace character in s
-+ * (or a pointer to the terminating null).
-+ */
-+static const char *blkdev_skip_space(const char *s)
-+{
-+	while (*s != 0 && isspace(*s))
-+		++s;
-+
-+	return s;
-+}
-+
-+/*
-+ * Returns a pointer to the first whitespace character in s (or a pointer to the
-+ * terminating null), which is effectively a pointer to the position *after* the
-+ * last character in the non-whitespace token at the beginning of s.  (s is
-+ * expected to be the result of a previous call to blkdev_skip_space()).
-+ */
-+static const char *blkdev_find_space(const char *s)
-+{
-+	while (*s != 0 && !isspace(*s))
-+		++s;
-+
-+	return s;
-+}
-+
-+static bool blkdev_read_mode(const enum ledtrig_blkdev_mode mode)
-+{
-+	return mode != LEDTRIG_BLKDEV_MODE_WO;
-+}
-+
-+static bool blkdev_write_mode(const enum ledtrig_blkdev_mode mode)
-+{
-+	return mode != LEDTRIG_BLKDEV_MODE_RO;
-+}
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index b26bbf2d9048..66e2760702cb 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -168,6 +168,9 @@ struct gendisk {
+ #endif	/* CONFIG_BLK_DEV_INTEGRITY */
+ #if IS_ENABLED(CONFIG_CDROM)
+ 	struct cdrom_device_info *cdi;
++#endif
++#ifdef CONFIG_LEDS_TRIGGER_BLKDEV
++	struct ledtrig_blkdev_disk *ledtrig;
+ #endif
+ 	int node_id;
+ 	struct badblocks *bb;
 -- 
 2.31.1
 
