@@ -2,76 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E40C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 07:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F634C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 07:32:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2181B6112E
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 07:13:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12129610FF
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 07:32:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232003AbhHSHOE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 03:14:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229909AbhHSHOD (ORCPT
+        id S232038AbhHSHdC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 03:33:02 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3670 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229501AbhHSHdB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 03:14:03 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE97C061575;
-        Thu, 19 Aug 2021 00:13:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=JM+txvbbN9qHKR6HmDE1hJhvustedDdZ+eM/QD9oSHI=; b=gQgvT9kcUIWjm/IdZ7EPLPxNzA
-        wKA3BC4kV5Deq0rZtlxPVpTj1tvBnpiI4EeTtualny7a2z4VAaT6/pkWoamlSbfFsnsbBshIwMcn6
-        sVFQ0FzQDww7YeFn82Lf4DrBnOAGTyWbYKbdcjgap3OXysU+wLa0sIX4UvLknZimW+i2Y3kBTw7Nr
-        asGnGErH6FCOrsjj5AfhmyB7LoHFVSz422lXZdaEViGCD6iCGLd6TpRgIGNFSmAsX6TsqbCghYixB
-        dY5yv6ZDxfCvD5JyFr9rkXsHt85iYA4CTfRzoq6uR5sAowGHklDUYLdFvhA1vEekZZS/H0PZg0jq2
-        sbTMbwmQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mGcDG-004lF9-PX; Thu, 19 Aug 2021 07:11:53 +0000
-Date:   Thu, 19 Aug 2021 08:11:42 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Micha?? Miros??aw <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: Re: [PATCH v6 2/5] partitions/efi: Support non-standard GPT location
-Message-ID: <YR4ELm5/8BQkicxI@infradead.org>
-References: <20210818221920.3893-1-digetx@gmail.com>
- <20210818221920.3893-3-digetx@gmail.com>
+        Thu, 19 Aug 2021 03:33:01 -0400
+Received: from fraeml714-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GqxK65Qvsz6FGMl;
+        Thu, 19 Aug 2021 15:31:22 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml714-chm.china.huawei.com (10.206.15.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Thu, 19 Aug 2021 09:32:22 +0200
+Received: from [10.47.81.140] (10.47.81.140) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Thu, 19 Aug
+ 2021 08:32:21 +0100
+Subject: Re: [PATCH v2 06/11] blk-mq: Pass driver tags to
+ blk_mq_clear_rq_mapping()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <kashyap.desai@broadcom.com>, <hare@suse.de>
+References: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
+ <1628519378-211232-7-git-send-email-john.garry@huawei.com>
+ <YRyGb/Ay3lvUZs/V@T590> <23448833-593c-139f-6051-9b8e7d3deade@huawei.com>
+ <YR2oO8hhtDx1Wd+P@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <c957c544-4040-e462-47f6-3514ab3da617@huawei.com>
+Date:   Thu, 19 Aug 2021 08:32:20 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210818221920.3893-3-digetx@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YR2oO8hhtDx1Wd+P@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.81.140]
+X-ClientProxiedBy: lhreml712-chm.china.huawei.com (10.201.108.63) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 01:19:17AM +0300, Dmitry Osipenko wrote:
-> Support looking up GPT at a non-standard location specified by a block
-> device driver.
-> 
-> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+On 19/08/2021 01:39, Ming Lei wrote:
+>> That's intentional, as we have from later patch:
+>>
+>> void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>> unsigned int hctx_idx)
+>> {
+>> 	struct blk_mq_tags *drv_tags;
+>> 	struct page *page;
+>>
+>> +	if (blk_mq_is_sbitmap_shared(set->flags))
+>> +		drv_tags = set->shared_sbitmap_tags;
+>> +	else
+>> 		drv_tags = set->tags[hctx_idx];
+>>
+>> 	...
+>>
+>> 	blk_mq_clear_rq_mapping(drv_tags, tags);
+>>
+>> }
+>>
+>> And it's just nice to not re-indent later.
+> But this way is weird, and I don't think checkpatch.pl is happy with
+> it.
 
-Looks good,
+There is the idea to try to not remove/change code earlier in a series - 
+I am taking it to an extreme! I can stop.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+On another related topic, how about this change also:
+
+---8<---
+void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
+			     struct blk_mq_tags *tags)
+  {
+
++	/* There is no need to clear a driver tags own mapping */
++	if (drv_tags == tags)
++		return;
+--->8---
+
+Thanks,
+John
