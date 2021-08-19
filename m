@@ -2,194 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92806C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 21:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D336AC4338F
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:08:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D1A36108F
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 21:44:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FBE560FDA
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 22:08:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233890AbhHSVo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 17:44:58 -0400
-Received: from smtprelay0095.hostedemail.com ([216.40.44.95]:36108 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232769AbhHSVo5 (ORCPT
+        id S229818AbhHSWJR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 18:09:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33425 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229605AbhHSWJR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 17:44:57 -0400
-Received: from omf10.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 1D1DA182B0301;
-        Thu, 19 Aug 2021 21:44:20 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf10.hostedemail.com (Postfix) with ESMTPA id EAFD52351F6;
-        Thu, 19 Aug 2021 21:44:18 +0000 (UTC)
-Message-ID: <8db9a7d938b2b1a1bdbd0224246e047c83581334.camel@perches.com>
-Subject: Re: [RFC PATCH 1/5] checkpatch: improve handling of revert commits
-From:   Joe Perches <joe@perches.com>
-To:     Denis Efremov <efremov@linux.com>, linux-kselftest@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Jiri Kosina <jkosina@suse.cz>,
-        Willy Tarreau <w@1wt.eu>
-Date:   Thu, 19 Aug 2021 14:44:17 -0700
-In-Reply-To: <c31b2007-26a9-34e0-8c9a-8e11a00ce69f@linux.com>
-References: <20210818154646.925351-1-efremov@linux.com>
-         <20210818154646.925351-2-efremov@linux.com>
-         <cc5801790fea258e20fa6b7e26de7806ae8e0dda.camel@perches.com>
-         <3d347d4b-1576-754f-8633-ba6084cc0661@linux.com>
-         <23c8ebaa0921d5597df9fc1d6cbbcc4f354f80c5.camel@perches.com>
-         <c31b2007-26a9-34e0-8c9a-8e11a00ce69f@linux.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.0-1 
+        Thu, 19 Aug 2021 18:09:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629410919;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xkspXG8hxbvDqLFevLus8MJ8WZKNmd5YtLC8hca/MbA=;
+        b=G9ASgtTrDFcVncjYddArKifsJTOdxVnKttL+cY9CEAGFbS5vxNkUtJJqqpM8Q+L4aIM1MP
+        q0gMuQYYeiA+FcJADts4LBUqgzTf/DDmhtXT/9w64LtxNWXwpV33rN/s+vwQyfiwqmvz4w
+        /I4auP8/FVE1ycfMY+OWzPIXt9brz7Q=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-19-qdkyaQH1PiyvrnjaiNB76w-1; Thu, 19 Aug 2021 18:08:38 -0400
+X-MC-Unique: qdkyaQH1PiyvrnjaiNB76w-1
+Received: by mail-qk1-f197.google.com with SMTP id d20-20020a05620a1414b02903d24f3e6540so5195930qkj.7
+        for <linux-block@vger.kernel.org>; Thu, 19 Aug 2021 15:08:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xkspXG8hxbvDqLFevLus8MJ8WZKNmd5YtLC8hca/MbA=;
+        b=unXWYcIUpRj+6Yrbo9K8UsoDlljYNpKc76JnnYndGgIjHXEvb8jbvG6aaLHnc+hhwi
+         91GuaFKBJTD/T5gcCAAr2GCKAQCXDhVNGPTFwm3W9IkKOsf70Am5vwI+EVZllOlVsFVu
+         2THEmqLmkhrS8YlWioL+WoqWXlMoFRHlS4/3+Xhqs/WoGIrDcUSqe1hlHId+hINHQi7J
+         MUUOwJmEofH366RNook5SUwPTCx2VzIFbnrYZ6bLjS2hzInvD0LCwYOL8iWvkLUuNcsn
+         CDqFMOfKUjHw70Vvm4nYMWYUsnlivHOeWo2eLs6ZhyW4HDb5VfEm70nPUDJ2UZeO/D8N
+         G05Q==
+X-Gm-Message-State: AOAM5330GLJunepoJOgGRVHAPbVlnaAshnKVN3uReSG8OCsjomDNEAEt
+        Cvb6vJbbz6tDsyPch3r2MdKIRC9mI/X+sjYXqypkrKOy2Ns4P1LZNO82HEvuZHDpqWlSNWS352S
+        +Zm3zkHBK5H5kw4irs+/G/g==
+X-Received: by 2002:a05:6214:aa8:: with SMTP id ew8mr16900248qvb.43.1629410918166;
+        Thu, 19 Aug 2021 15:08:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJywm4rLEeaipm0n2jLzSiRC/vpgsoEKNvs8yaeY/GnmilqaKXYkZjRRVU1i4zcMh9j7mDyFlg==
+X-Received: by 2002:a05:6214:aa8:: with SMTP id ew8mr16900225qvb.43.1629410917907;
+        Thu, 19 Aug 2021 15:08:37 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id s185sm2291159qkd.2.2021.08.19.15.08.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 15:08:37 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 18:08:36 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org,
+        Tushar Sugandhi <tusharsu@linux.microsoft.com>
+Subject: Re: holders not working properly, regression [was: Re: use regular
+ gendisk registration in device mapper v2]
+Message-ID: <YR7WZEZgxw6hI369@redhat.com>
+References: <20210804094147.459763-1-hch@lst.de>
+ <YR5/wMEkr1TwV7FD@redhat.com>
+ <20210819180559.GA14001@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Server: rspamout04
-X-Rspamd-Queue-Id: EAFD52351F6
-X-Stat-Signature: t1zx9hhwubbw8oxjsooka7fycowycjj3
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX189U7Bie0w4hCCQnlgtLr596sKKfNprumI=
-X-HE-Tag: 1629409458-37529
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210819180559.GA14001@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2021-08-19 at 22:52 +0300, Denis Efremov wrote:
-> Hi,
+On Thu, Aug 19 2021 at  2:05P -0400,
+Christoph Hellwig <hch@lst.de> wrote:
+
+> Manually reverting "block: remove the extra kobject reference in
+> bd_link_disk_holder" as show below fixed the issue for me.  I'll spend
+> some more time tomorrow trying to fully understan the life time rules
+> tomorrow before sending a patch, though.
 > 
-> On 8/19/21 12:22 AM, Joe Perches wrote:
-> > Hey Denis:
-> > 
-> > Try this one please and let me know what you think...
+> ---
+> From 6b94f5435900d23769db8d07ff47415aab4ac63e Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Thu, 19 Aug 2021 20:01:43 +0200
+> Subject: Revert "block: remove the extra kobject reference in
+>  bd_link_disk_holder"
 > 
-> Looks good to me. Couple of nitpicks below
+> This reverts commit fbd9a39542ecdd2ade55869c13856b2590db3df8.
+> ---
+>  block/holder.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/block/holder.c b/block/holder.c
+> index 4568cc4f6827..ecbc6941e7d8 100644
+> --- a/block/holder.c
+> +++ b/block/holder.c
+> @@ -106,6 +106,12 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+>  	}
+>  
+>  	list_add(&holder->list, &disk->slave_bdevs);
+> +	/*
+> +	 * bdev could be deleted beneath us which would implicitly destroy
+> +	 * the holder directory.  Hold on to it.
+> +	 */
+> +	kobject_get(bdev->bd_holder_dir);
+> +
+>  out_unlock:
+>  	mutex_unlock(&disk->open_mutex);
+>  	return ret;
+> @@ -138,6 +144,7 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
+>  	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
+>  		if (disk->slave_dir)
+>  			__unlink_disk_holder(bdev, disk);
+> +		kobject_put(bdev->bd_holder_dir);
+>  		list_del_init(&holder->list);
+>  		kfree(holder);
+>  	}
+> -- 
+> 2.30.2
+> 
 
-yeah, thanks.
+OK, this fixed it for me too, thanks.
 
-How about this one:
----
- scripts/checkpatch.pl | 72 ++++++++++++++++++++++++++++++---------------------
- 1 file changed, 43 insertions(+), 29 deletions(-)
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 161ce7fe5d1e5..4988515a0dfb3 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -1181,7 +1181,8 @@ sub git_commit_info {
- #		    git log --format='%H %s' -1 $line |
- #		    echo "commit $(cut -c 1-12,41-)"
- #		done
--	} elsif ($lines[0] =~ /^fatal: ambiguous argument '$commit': unknown revision or path not in the working tree\./) {
-+	} elsif ($lines[0] =~ /^fatal: ambiguous argument '$commit': unknown revision or path not in the working tree\./ ||
-+		 $lines[0] =~ /^fatal: bad object $commit/) {
- 		$id = undef;
- 	} else {
- 		$id = substr($lines[0], 0, 12);
-@@ -2587,6 +2588,8 @@ sub process {
- 	my $reported_maintainer_file = 0;
- 	my $non_utf8_charset = 0;
- 
-+	my $last_git_commit_id_linenr = -1;
-+
- 	my $last_blank_line = 0;
- 	my $last_coalesced_string_linenr = -1;
- 
-@@ -3173,7 +3176,8 @@ sub process {
- 		if ($in_commit_log && !$commit_log_possible_stack_dump &&
- 		    $line !~ /^\s*(?:Link|Patchwork|http|https|BugLink|base-commit):/i &&
- 		    $line !~ /^This reverts commit [0-9a-f]{7,40}/ &&
--		    ($line =~ /\bcommit\s+[0-9a-f]{5,}\b/i ||
-+		    (($line =~ /\bcommit\s+[0-9a-f]{5,}\b/i ||
-+		      ($line =~ /\bcommit\s*$/i && defined($rawlines[$linenr]) && $rawlines[$linenr] =~ /^\s*[0-9a-f]{5,}\b/i)) ||
- 		     ($line =~ /(?:\s|^)[0-9a-f]{12,40}(?:[\s"'\(\[]|$)/i &&
- 		      $line !~ /[\<\[][0-9a-f]{12,40}[\>\]]/i &&
- 		      $line !~ /\bfixes:\s*[0-9a-f]{12,40}/i))) {
-@@ -3183,49 +3187,59 @@ sub process {
- 			my $long = 0;
- 			my $case = 1;
- 			my $space = 1;
--			my $hasdesc = 0;
- 			my $hasparens = 0;
- 			my $id = '0123456789ab';
- 			my $orig_desc = "commit description";
- 			my $description = "";
-+			my $herectx = $herecurr;
-+			my $has_parens = 0;
-+
-+			my $input = $line;
-+			if ($line =~ /(?:\bcommit\s+[0-9a-f]{5,}|\bcommit\s*$)/i) {
-+				for (my $n = 0; $n < 2; $n++) {
-+					if ($input =~ /\bcommit\s+[0-9a-f]{5,}\s*$balanced_parens/i) {
-+						$has_parens = 1;
-+						last;
-+					}
-+					last if ($#lines < $linenr + $n);
-+					$input .= " " . trim($rawlines[$linenr + $n]);
-+					$herectx .= "$rawlines[$linenr + $n]\n";
-+				}
-+				$herectx = $herecurr if (!$has_parens);
-+			}
- 
--			if ($line =~ /\b(c)ommit\s+([0-9a-f]{5,})\b/i) {
-+			if ($input =~ /\b(c)ommit\s+([0-9a-f]{5,})\b/i) {
- 				$init_char = $1;
- 				$orig_commit = lc($2);
--			} elsif ($line =~ /\b([0-9a-f]{12,40})\b/i) {
-+				$short = 0 if ($input =~ /\bcommit\s+[0-9a-f]{12,40}/i);
-+				$long = 1 if ($input =~ /\bcommit\s+[0-9a-f]{41,}/i);
-+				$space = 0 if ($input =~ /\bcommit [0-9a-f]/i);
-+				$case = 0 if ($input =~ /\b[Cc]ommit\s+[0-9a-f]{5,40}[^A-F]/);
-+
-+				if ($input =~ /\bcommit\s+[0-9a-f]{5,}\s+($balanced_parens)/i) {
-+					$orig_desc = $1;
-+					# Always strip leading/trailing parens then double quotes if existing
-+					$orig_desc = substr($orig_desc, 1, -1);
-+					if ($orig_desc =~ /^".*"$/) {
-+						$orig_desc = substr($orig_desc, 1, -1);
-+						$hasparens = 1;
-+					}
-+				}
-+			} elsif ($input =~ /\b([0-9a-f]{12,40})\b/i) {
- 				$orig_commit = lc($1);
- 			}
- 
--			$short = 0 if ($line =~ /\bcommit\s+[0-9a-f]{12,40}/i);
--			$long = 1 if ($line =~ /\bcommit\s+[0-9a-f]{41,}/i);
--			$space = 0 if ($line =~ /\bcommit [0-9a-f]/i);
--			$case = 0 if ($line =~ /\b[Cc]ommit\s+[0-9a-f]{5,40}[^A-F]/);
--			if ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)"\)/i) {
--				$orig_desc = $1;
--				$hasparens = 1;
--			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s*$/i &&
--				 defined $rawlines[$linenr] &&
--				 $rawlines[$linenr] =~ /^\s*\("([^"]+)"\)/) {
--				$orig_desc = $1;
--				$hasparens = 1;
--			} elsif ($line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("[^"]+$/i &&
--				 defined $rawlines[$linenr] &&
--				 $rawlines[$linenr] =~ /^\s*[^"]+"\)/) {
--				$line =~ /\bcommit\s+[0-9a-f]{5,}\s+\("([^"]+)$/i;
--				$orig_desc = $1;
--				$rawlines[$linenr] =~ /^\s*([^"]+)"\)/;
--				$orig_desc .= " " . $1;
--				$hasparens = 1;
--			}
--
- 			($id, $description) = git_commit_info($orig_commit,
- 							      $id, $orig_desc);
- 
- 			if (defined($id) &&
--			   ($short || $long || $space || $case || ($orig_desc ne $description) || !$hasparens)) {
-+			    ($short || $long || $space || $case || ($orig_desc ne $description) || !$hasparens) &&
-+			    $last_git_commit_id_linenr != $linenr - 1) {
- 				ERROR("GIT_COMMIT_ID",
--				      "Please use git commit description style 'commit <12+ chars of sha1> (\"<title line>\")' - ie: '${init_char}ommit $id (\"$description\")'\n" . $herecurr);
-+				      "Please use git commit description style 'commit <12+ chars of sha1> (\"<title line>\")' - ie: '${init_char}ommit $id (\"$description\")'\n" . $herectx);
- 			}
-+			#don't report the next line if this line ends in commit and the sha1 hash is the next line
-+			$last_git_commit_id_linenr = $linenr if ($line =~ /\bcommit\s*$/i);
- 		}
- 
- # Check for added, moved or deleted files
-
+Mike
 
