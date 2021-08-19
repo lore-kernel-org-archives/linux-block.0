@@ -2,133 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 100EAC43214
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 12:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AEEC4338F
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 13:10:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F18DF61152
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 12:27:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCF0961152
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 13:10:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239257AbhHSM16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 08:27:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42798 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238924AbhHSM1z (ORCPT
+        id S233416AbhHSNLd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 09:11:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53556 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231826AbhHSNLd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 08:27:55 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739EBC061756
-        for <linux-block@vger.kernel.org>; Thu, 19 Aug 2021 05:27:19 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id b1so4429252qtx.0
-        for <linux-block@vger.kernel.org>; Thu, 19 Aug 2021 05:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5h8DRQ7Bx+eFzlj90sftRVtoQw5ByFsjYM5vOznvNjM=;
-        b=Lh2+mUHm/NzMtpiU3c8gY3ZdaGQ0hTG/m9kvEQgXEg1RKz+3FaF0xDsca30ygZMj4U
-         71tVT3HVfOJ+uq/ae3O+V2/wNz1ZKRL5oXrfJMrT9ZLS8IGqK1WZlS1VIy7/pMZF5p1U
-         iJ4mL0UEz55891lYfc4fFzXB5mnKfGVvXu5qR2IqQy99MvlG8TXgE0bJRzU78LOMzryT
-         7Xl+HKBwG9bWchW9H2+S/GBzGWNkuVy8E57+OfP+v2vJHi/dIPH6q7xZxwuYZQV9zBN7
-         98qA2j6Yif6IJCGo5nBcNVo6T60PWrjlYnFBGmvL3mwjjuqqvooktAaU5gBmctIMOXRS
-         0LWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5h8DRQ7Bx+eFzlj90sftRVtoQw5ByFsjYM5vOznvNjM=;
-        b=tJT78JFFMqFn8eJ3F+bXqiPE5VEGjXycwkBhhF9ShuY2pWf3EqDaYgaFEMRqtVeaOJ
-         arO+9MOL1PYavF5HLn2d4tGL9sKHfLHQc2eedXG1YaGblvSoz5X5eOSqM48dWFY2Z+gc
-         PVyfJL5JEZj1vGji1bbkkxz14LVaJfuttMA3FoyZiQAGiSYHPmJdpxfYfdcV2pdhQK1z
-         P/F+J+KfiCuZ8HZjVSr+HU+8zqtIYGndEKe5IAUSl4lod+xXINwjfepOktANzq9ge+nd
-         1sY2qJddkgj/xeSj3rJBxDTP5Ur/ZwN4vAVA7gGf4GUAQHxus4MwVwzh/FT+7KNOViA8
-         Kjaw==
-X-Gm-Message-State: AOAM5314Ld8FxG4WsuwTUqsvGVmkmtL7viYbxlgred0uFXExQtgxhJrM
-        yBoS00iIVFDWNNsfvLpneNUwMw==
-X-Google-Smtp-Source: ABdhPJxwk7vI3dEd2/mwgiJx7X4NGPWrwVGFe3LSMD/MyzGQMgDurTmsWQFQ5lpblgS6WBAbFYMPPg==
-X-Received: by 2002:a05:622a:11cc:: with SMTP id n12mr12404820qtk.363.1629376038633;
-        Thu, 19 Aug 2021 05:27:18 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id d7sm1266808qth.70.2021.08.19.05.27.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 05:27:18 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mGh8e-0016LT-A5; Thu, 19 Aug 2021 09:27:16 -0300
-Date:   Thu, 19 Aug 2021 09:27:16 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>, linux-rdma@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 56/63] RDMA/mlx5: Use struct_group() to zero struct
- mlx5_ib_mr
-Message-ID: <20210819122716.GP543798@ziepe.ca>
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-57-keescook@chromium.org>
+        Thu, 19 Aug 2021 09:11:33 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17JD3Z9m142273;
+        Thu, 19 Aug 2021 09:10:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : references : date : in-reply-to : message-id : content-type :
+ mime-version; s=pp1; bh=5egLuETDuH4mIhzuJh+/6Ycie5fFKtUxs6bWe30isgA=;
+ b=hf/gZEhbA8El1EjwyqJ6qpICwPO8tFr+faEl0klDBU0W4F5m9wkIPRr2tPiY0Ieg/1Oc
+ G4Kl8cCAh+8qPuJmMioEEYJlWQLGXq2UBMW9HyoWh/PdKEQwMVj15HxnZGYElHyeR1b7
+ VwcS+St1UuBa28GJJCfpfnH6pnOyvhhUru8cTCLRsP2wEMNo4e0zkZldv0FRlj/7Y4hN
+ LTkP3EHxvq4xk7EPTyB8dxrohpVMT4pt4JcR3XKg8La7FqSWg92V1CB5HX7NOBpPKZkL
+ ia7y3SfSSWiscAYHiMgyUPI29s2kbPpA4Zxb6LCqsUO65GGUBlDlrqKi2Ut30s/iiomb IQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ahhqkan7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Aug 2021 09:10:43 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17JD49LY145411;
+        Thu, 19 Aug 2021 09:10:43 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ahhqkan6b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Aug 2021 09:10:43 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17JD1Ixt005663;
+        Thu, 19 Aug 2021 13:10:40 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3ae53j0b33-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Aug 2021 13:10:40 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17JD75Fg59572718
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Aug 2021 13:07:06 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3CFF74203F;
+        Thu, 19 Aug 2021 13:10:38 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D2BAF42049;
+        Thu, 19 Aug 2021 13:10:37 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 19 Aug 2021 13:10:37 +0000 (GMT)
+From:   Sven Schnelle <svens@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Hillf Danton <hdanton@sina.com>,
+        syzbot <syzbot+aa0801b6b32dca9dda82@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] general protection fault in wb_timer_fn
+References: <00000000000072e53a05c983ab22@google.com>
+        <20210816091041.3313-1-hdanton@sina.com>
+        <20210816093336.GA3950@lst.de> <yt9dim01iz69.fsf@linux.ibm.com>
+        <20210819090510.GA12194@lst.de>
+Date:   Thu, 19 Aug 2021 15:10:37 +0200
+In-Reply-To: <20210819090510.GA12194@lst.de> (Christoph Hellwig's message of
+        "Thu, 19 Aug 2021 11:05:10 +0200")
+Message-ID: <yt9dr1eph96a.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: dfLNQNtovBbxNIaVGPzzG_AJkBZsJ0MV
+X-Proofpoint-ORIG-GUID: 1EHAt_kdhh9IGDInKJNhKKzK0A_l-eOV
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210818060533.3569517-57-keescook@chromium.org>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-19_04:2021-08-17,2021-08-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ phishscore=0 mlxlogscore=730 lowpriorityscore=0 bulkscore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108190076
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 11:05:26PM -0700, Kees Cook wrote:
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memset(), avoid intentionally writing across
-> neighboring fields.
-> 
-> Add struct_group() to mark region of struct mlx5_ib_mr that should be
-> initialized to zero.
-> 
-> Cc: Leon Romanovsky <leon@kernel.org>
-> Cc: Doug Ledford <dledford@redhat.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: linux-rdma@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  drivers/infiniband/hw/mlx5/mlx5_ib.h | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/infiniband/hw/mlx5/mlx5_ib.h b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-> index bf20a388eabe..f63bf204a7a1 100644
-> --- a/drivers/infiniband/hw/mlx5/mlx5_ib.h
-> +++ b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-> @@ -644,6 +644,7 @@ struct mlx5_ib_mr {
->  	struct ib_umem *umem;
->  
->  	/* This is zero'd when the MR is allocated */
-> +	struct_group(cleared,
->  	union {
->  		/* Used only while the MR is in the cache */
->  		struct {
-> @@ -691,12 +692,13 @@ struct mlx5_ib_mr {
->  			bool is_odp_implicit;
->  		};
->  	};
-> +	);
->  };
->  
->  /* Zero the fields in the mr that are variant depending on usage */
->  static inline void mlx5_clear_mr(struct mlx5_ib_mr *mr)
->  {
-> -	memset(mr->out, 0, sizeof(*mr) - offsetof(struct mlx5_ib_mr, out));
-> +	memset(&mr->cleared, 0, sizeof(mr->cleared));
->  }
+Christoph Hellwig <hch@lst.de> writes:
 
-Why not use the memset_after(mr->umem) here?
+> On Thu, Aug 19, 2021 at 11:03:42AM +0200, Sven Schnelle wrote:
+>> I'm seeing a similar crash in our CI:
+>
+> This series:
+>
+> https://lore.kernel.org/linux-block/20210816131910.615153-1-hch@lst.de/T/#t
+>
+> should fi it.  Can you give it a spin?
 
-Jason
+I tested it without your patchset and it crashed around every second
+try. With that patchset, i wasn't able to reproduce it.
+
+Thanks!
+Sven
