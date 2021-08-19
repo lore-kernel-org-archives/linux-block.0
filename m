@@ -2,84 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC77BC4338F
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 15:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EBFC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 15:15:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94E7B6044F
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 15:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B334F60E93
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 15:15:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239513AbhHSPLf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:11:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52256 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238587AbhHSPLf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:11:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 64EA060720;
-        Thu, 19 Aug 2021 15:10:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1629385859;
-        bh=fFcBzjRflM4hbrLqEs20aoBGIxT7NSWEqPWR6k/lJEI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qrI0MsZ6IufDjbnFUYYplXD5Ff0hSdbMNqYlP/tgxJ39SwixwRchl7mX6KK69e8dU
-         /3NJ8IDae2uiBCrkKqLiZ7bIAcZlYS0KBtO3ecSCy6xHwNEj8FnsR5ZqQYYFtZY3JB
-         L3enac+IRV9axidrDNKbgg2sQnMpezefUo/G66UM=
-Date:   Thu, 19 Aug 2021 17:10:55 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>
-Subject: Re: [PATCH v4] block: genhd: don't call probe function with
- major_names_lock held
-Message-ID: <YR50f6cQp0mdyeOf@kroah.com>
-References: <f790f8fb-5758-ea4e-a527-0ee4af82dd44@i-love.sakura.ne.jp>
- <4e153910-bf60-2cca-fa02-b46d22b6e2c5@i-love.sakura.ne.jp>
- <YRi9EQJqfK6ldrZG@kroah.com>
- <a3f43d54-8d10-3272-1fbb-1193d9f1b6dd@i-love.sakura.ne.jp>
- <YRjcHJE0qEIIJ9gA@kroah.com>
- <d7d31bf1-33d3-b817-0ce3-943e6835de33@i-love.sakura.ne.jp>
- <20210818134752.GA7453@lst.de>
- <1f4218ca-9bfa-7d80-1c69-f5902715d8d9@i-love.sakura.ne.jp>
- <20210819091941.GB12883@lst.de>
- <1668a287-091b-4a4b-01c9-e0fa8740ce9d@i-love.sakura.ne.jp>
+        id S238634AbhHSPPp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 11:15:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232821AbhHSPPo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Aug 2021 11:15:44 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739BDC061575
+        for <linux-block@vger.kernel.org>; Thu, 19 Aug 2021 08:15:08 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id n27so9059444oij.0
+        for <linux-block@vger.kernel.org>; Thu, 19 Aug 2021 08:15:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=tdmg6TTFQ/Ot8jb2adMxctxRWhiV2wL5JMi4BPla+4U=;
+        b=1hSpz+5yXZtubJfQF4N8v8tl9W6NAL9aZbfe3iuPM2KeMIj7l6Lrv3Tabidov2rVhE
+         TXrEngwakqnbSTvW45CugI7t97zP9MfIPVgr5cAHN9SsNdMKYShcLoztva5RjvvFoUj4
+         wtCNA+vqDbN/8FzZkr9J7+Os1SIdNCGISHeGQd4tn+dX/qGmF8PiSCu3fkGNZfY0M+/O
+         kVwSYwsFIhRyYxBeeQnl6nJ3l7fFFwk9KqRwb4dRpAz6RB09RFZsjBzoHZJ+hXZPbqDx
+         RjH6DtKd4vlowRWSW12iS8G3y80SA/kDpXlcSnYew/FaNfFRXwETpefQWZwPf4UcFTLF
+         vP3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tdmg6TTFQ/Ot8jb2adMxctxRWhiV2wL5JMi4BPla+4U=;
+        b=YsKLFf6AcKcSfl9EhNJ3OCju0jlo1ObD0+K+Lb0uo4mvHyXbusHkPnILLulrHYBWOt
+         4RJ2y6z3CeDgRrGkUXyNsGtWMPFb4seFJyWHzDkS481h8NP/KNCsejJAtK/zxyaQcrnd
+         IARhpNzQdoEsGu11NMzKV2xoVSYCiV03JYdqpll9h/MeKbGbm6SkcA91qVh+zXgnhlBS
+         DUnp3Uo+MY24Luog7QQGVdYqRY+S/jxnQYPu8o2jm0JUXltyodcsympup5W/o5ruYriB
+         372huqbEeNuL6g9QAtcUoHO0eDeLdZIu4bpjCn1RO95TuKKAa4mi3cuYiYMVDNf825VG
+         nrvA==
+X-Gm-Message-State: AOAM532+Z37wgeGfDpXwAH5N3b0fxWzSZgsdjmGPyouKZGIIEvXUjS6a
+        Zw6gCPkiLPsOuAPSZCIRAoWtCA==
+X-Google-Smtp-Source: ABdhPJyaieB8cT5A/g8uvMeiUBogH2EI0ASLSoldGHgceQUcAcMvDfxgQy6B6md0yraoPqLXxmUq2w==
+X-Received: by 2002:a05:6808:cd:: with SMTP id t13mr2919899oic.111.1629386107801;
+        Thu, 19 Aug 2021 08:15:07 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id l13sm299001otp.29.2021.08.19.08.15.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Aug 2021 08:15:07 -0700 (PDT)
+Subject: Re: [PATCH RFC] Enable bio cache for IRQ driven IO from io_uring
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        io-uring <io-uring@vger.kernel.org>
+References: <3bff2a83-cab2-27b6-6e67-bdae04440458@kernel.dk>
+ <20210819090150.GA11498@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6ed3237b-573d-029a-4cc2-0b6cbc22e32a@kernel.dk>
+Date:   Thu, 19 Aug 2021 09:15:06 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1668a287-091b-4a4b-01c9-e0fa8740ce9d@i-love.sakura.ne.jp>
+In-Reply-To: <20210819090150.GA11498@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 11:23:36PM +0900, Tetsuo Handa wrote:
-> You need to also read Documentation/process/stable-kernel-rules.rst .
+On 8/19/21 3:01 AM, Christoph Hellwig wrote:
+> On Wed, Aug 18, 2021 at 10:54:45AM -0600, Jens Axboe wrote:
+>> We previously enabled this for O_DIRECT polled IO, however io_uring
+>> completes all IO from task context these days, so it can be enabled for
+>> that path too. This requires moving the bio_put() from IRQ context, and
+>> this can be accomplished by passing the ownership back to the issuer.
+>>
+>> Use kiocb->private for that, which should be (as far as I can tell) free
+>> once we get to the completion side of things. Add a IOCB_PUT_CACHE flag
+>> to tell the issuer that we passed back the ownership, then the issuer
+>> can put the bio from a safe context.
+>>
+>> Like the polled IO ditto, this is good for a 10% performance increase.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>
+>> ---
+>>
+>> Just hacked this up and tested it, Works For Me. Would welcome input on
+>> alternative methods here, if anyone has good suggestions.
 > 
->  - It must be obviously correct and tested.
->  - It cannot be bigger than 100 lines, with context.
->  - It must fix only one thing.
->  - It must fix a real bug that bothers people (not a, "This could be a
->    problem..." type thing).
-> 
-> Your series is far away from conforming to the stable kernel rules.
+> 10% performance improvement looks really nice, but I don't think we can
+> just hardcode assumptions about bios in iomap->private.  The easiest
+> would be to call back into the file systems for the freeing, but that
+> would add an indirect call.
 
-Again DO NOT WORRY ABOUT STABLE KERNELS when trying to fix a problem
-correctly.  Fix it right, and then, if needed, we can worry about the
-stable trees.
+That's why it's an RFC - while it's not the prettiest, the ->ki_complete
+assigner is also the one that sets IOCB_ALLOC_CACHE, and hence it's not
+that hard to verify that it does IOCB_PUT_CACHE correctly too. That
+said, I would prefer a better way of passing the bio back. There are
+other optimizations that could be done if we do that. But I have no good
+ideas on how to do the passing differently right now.
 
-The first goal of the stable kernels is to NOT cause extra work for the
-upstream kernel developers for those that do not want to care about
-them.
+-- 
+Jens Axboe
 
-thanks,
-
-greg k-h
