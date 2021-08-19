@@ -2,68 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C857C43216
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E1DC4320E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 471496113B
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20FDD610FB
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 02:51:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236498AbhHSCwS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 22:52:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51398 "EHLO
+        id S236556AbhHSCwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 22:52:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236250AbhHSCwB (ORCPT
+        with ESMTP id S236304AbhHSCwC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 22:52:01 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A40C0613D9;
-        Wed, 18 Aug 2021 19:51:14 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id w22-20020a056830411600b0048bcf4c6bd9so6844628ott.8;
-        Wed, 18 Aug 2021 19:51:14 -0700 (PDT)
+        Wed, 18 Aug 2021 22:52:02 -0400
+Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC177C0612A9;
+        Wed, 18 Aug 2021 19:51:18 -0700 (PDT)
+Received: by mail-oo1-xc2c.google.com with SMTP id e3-20020a4ab9830000b029026ada3b6b90so1390733oop.0;
+        Wed, 18 Aug 2021 19:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=1HN2fz/hl6o2IBWHxShTKoPIjV7uYpHR0/UMxqc+5q4=;
-        b=fL4NgS5Shmo0+2ZqQYXfjcMKUtmFnqgekgokuEHiBLQRNPdP0WPjVgVa8Agy3Mwq3b
-         lq9OI39oggQIH1oIfp+k4gr72zrVtr1b2fBjTst4NoAMJuewdj6dDC7tnNsJHLSqfsvV
-         hU9J0cEeDCU8cV/8Oz+MmCq/T+I4EO5/yG7CIBI7Drgdms819BCbyuX+8MhvgxFmBvCs
-         H6+HhNGv1U1Mvb7wJ3NWL20MxhrlLpX64iU3wMN64lH81bLdy+Kgu95pjPEvZUDTCbJH
-         Q8eAxyhE7pLti0gkLMUiOwJ7VspGZRcK3i6u9YeRRw9PnhX368CN3J82ODMDKirdMWFA
-         vfLA==
+        bh=+ctrum5PuRodGtsvX5XCOy4ikb9APYy6K15rvAPhxuw=;
+        b=ILzIQBfS2ieAWmqJdJ9cbsAvbtpfNrmW6+mzp+yOQe8ZXBA5RJgvyDuK32xdtAMmcD
+         +cXbntu9cxNLEYwpTguKKlrTm+nONpoSFsNszNJJ6roNR40dSLUsmV3NkHjb2GTM/UxH
+         CDxBg5zX3JV/2nwuTH9YTOWYRUnKLPqeHB8tjtIwxMIZO4ud7QNxR8uyXQM4Hf0WwLlt
+         TQjxq24MvGA7J6SfkA5aWi0OUbHodsgCBDjOBcDbD4OvFJBiJhmowgOWOLDgL5aSyOaT
+         r7WyTe0jvkwny1Vk/tp+vDhCI0qLsYSScTx8DvANWVALO5TOPvUCVw1ffBA9yIFnADL6
+         az7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=1HN2fz/hl6o2IBWHxShTKoPIjV7uYpHR0/UMxqc+5q4=;
-        b=uYDsgi04D8/6fCKeMH3Hhnzh9X7JobTLWjc0jvJHzGg6c5tB94uGKBQj+snRq6gHZ6
-         7AomcCzpALEIw2odPU5L7Uihkdl2E1lkFTWl605DCnsMXleMiim7/H6rTkL1UWuzM296
-         Ur4PKcQ1OEwTnkqMlUeHC/p0YLsBI8uDxFAf2gP5f5QLK3ZsoZghWBjZK9hWQnQdfL6K
-         w/meFhyhZWsbXaM0uHQhKx8JvEyoEDX3WOph233ZfIPsvAGEoKcf3J5OQ5I1AWndu7/N
-         jCnJ6wmhIf4tPPvsKp331QptUdweUFXDKiTV60R78uQDoDwELI4Q+6yZY8rMduKAuXPk
-         4Ilg==
-X-Gm-Message-State: AOAM532s5v2bPMvulMt9/ogVIpHlt4viy/x7zJRf0WVoIDehWrz+Ttoq
-        rd0XEIdMK5tJRZi3dbxon4uU802/4XmwfJMn
-X-Google-Smtp-Source: ABdhPJxlr17Uf/8YuP9vAZoS2kOLGIeaDcFO5/DaXhnwSLeMr9ioHwmpBQsJP3O2Y+0A887WKZG81Q==
-X-Received: by 2002:a9d:7653:: with SMTP id o19mr9992677otl.236.1629341473842;
-        Wed, 18 Aug 2021 19:51:13 -0700 (PDT)
+        bh=+ctrum5PuRodGtsvX5XCOy4ikb9APYy6K15rvAPhxuw=;
+        b=JN/TC0fGPc4HR9crQ/l3HGQDNBp7IskquIF6W2n8aOzUxoJoLyJXLmh2cLFFSNtIzC
+         URkkEipMCq7VuGPF5XMYSWOm4PAjJwgNVkpZnJK6HP9lrH+uDUWotf4HxhgM87mbo/K2
+         BrkedLhTs3XkiHiFnWI1SmDPRlvxytlup1W4LEWQlKHFLyYIx7jrTstNbPMVf+32u5/h
+         0w7xfFsTUitpzD3IdvwS9iBw52ED8ZtZhF3G9if0Xoh20G95baMcPVdFvMCQjRGxrvS9
+         7YKeiXsmXo9/BCLGyGb8J/TEwhKgpcqpYYk0U9/uhoiYkuZOARI4wjIxgxDXlNsqsv/q
+         xI8g==
+X-Gm-Message-State: AOAM532Nt6DPEo4OkEOlIngkidene3jzT2iOe67FCRCi61+09z9ExJ91
+        YU08/of8JV8ILBxu8JsWy7thU/4YJuqcTLgK
+X-Google-Smtp-Source: ABdhPJx8S06js5H4EW3aYT8LArDwry3Rs/BieIVbBdinWG2VSo7OvaTf1BEnioLv+62oWxdySEW9gw==
+X-Received: by 2002:a4a:9464:: with SMTP id j33mr9415660ooi.5.1629341477751;
+        Wed, 18 Aug 2021 19:51:17 -0700 (PDT)
 Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id w15sm156792oiw.19.2021.08.18.19.51.13
+        by smtp.gmail.com with ESMTPSA id w15sm156792oiw.19.2021.08.18.19.51.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 19:51:13 -0700 (PDT)
+        Wed, 18 Aug 2021 19:51:17 -0700 (PDT)
 From:   Ian Pilcher <arequipeno@gmail.com>
 To:     linux-block@vger.kernel.org, linux-leds@vger.kernel.org
 Cc:     axboe@kernel.dk, pavel@ucw.cz, kabel@kernel.org,
         linux-kernel@vger.kernel.org, kernelnewbies@kernelnewbies.org
-Subject: [RFC PATCH v3 13/18] ledtrig-blkdev: Add blink_time & interval sysfs attributes
-Date:   Wed, 18 Aug 2021 21:50:48 -0500
-Message-Id: <20210819025053.222710-14-arequipeno@gmail.com>
+Subject: [RFC PATCH v3 18/18] ledtrig-blkdev: Add config option to enable the trigger
+Date:   Wed, 18 Aug 2021 21:50:53 -0500
+Message-Id: <20210819025053.222710-19-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210819025053.222710-1-arequipeno@gmail.com>
 References: <20210819025053.222710-1-arequipeno@gmail.com>
@@ -73,89 +73,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-/sys/class/leds/<led>/blink_time controls - per-LED blink duration
-
-/sys/class/leds/<led>/interval - global frequency with which devices
-are checked for activity and LEDs are blinked
-
-Enforce 25 millisecond minimum for both attributes
-
 Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 ---
- drivers/leds/trigger/ledtrig-blkdev.c | 63 +++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ drivers/leds/trigger/Kconfig  | 9 +++++++++
+ drivers/leds/trigger/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
-diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
-index 15b15aefdfd8..481b2d142db2 100644
---- a/drivers/leds/trigger/ledtrig-blkdev.c
-+++ b/drivers/leds/trigger/ledtrig-blkdev.c
-@@ -528,3 +528,66 @@ static ssize_t blkdev_add_or_del(struct device *const dev,
- 	 */
- 	return blkdev_skip_space(endp) - buf;
- }
+diff --git a/drivers/leds/trigger/Kconfig b/drivers/leds/trigger/Kconfig
+index b77a01bd27f4..f15d38b3a632 100644
+--- a/drivers/leds/trigger/Kconfig
++++ b/drivers/leds/trigger/Kconfig
+@@ -153,4 +153,13 @@ config LEDS_TRIGGER_TTY
+ 
+ 	  When build as a module this driver will be called ledtrig-tty.
+ 
++config LEDS_TRIGGER_BLKDEV
++	bool "LED Trigger for block devices"
++	depends on BLOCK
++	help
++	  The blkdev LED trigger allows LEDs to be controlled by block device
++	  activity (reads and writes).
 +
++	  See Documentation/leds/ledtrig-blkdev.rst.
 +
-+/*
-+ *
-+ *	blink_time & interval device attributes
-+ *
-+ */
-+
-+static ssize_t blkdev_time_show(struct device *const dev,
-+				      struct device_attribute *const attr,
-+				      char *const buf);
-+
-+static ssize_t blkdev_time_store(struct device *const dev,
-+				 struct device_attribute *const attr,
-+				 const char *const buf, const size_t count);
-+
-+static struct device_attribute ledtrig_blkdev_attr_blink_time =
-+	__ATTR(blink_time, 0644, blkdev_time_show, blkdev_time_store);
-+
-+static struct device_attribute ledtrig_blkdev_attr_interval =
-+	__ATTR(interval, 0644, blkdev_time_show, blkdev_time_store);
-+
-+static ssize_t blkdev_time_show(struct device *const dev,
-+				struct device_attribute *const attr,
-+				char *const buf)
-+{
-+	const struct ledtrig_blkdev_led *const led =
-+						led_trigger_get_drvdata(dev);
-+	unsigned int value;
-+
-+	if (attr == &ledtrig_blkdev_attr_blink_time)
-+		value = READ_ONCE(led->blink_msec);
-+	else	// attr == &ledtrig_blkdev_attr_interval
-+		value = jiffies_to_msecs(READ_ONCE(ledtrig_blkdev_interval));
-+
-+	return sprintf(buf, "%u\n", value);
-+}
-+
-+static ssize_t blkdev_time_store(struct device *const dev,
-+				 struct device_attribute *const attr,
-+				 const char *const buf, const size_t count)
-+{
-+	struct ledtrig_blkdev_led *const led = led_trigger_get_drvdata(dev);
-+	unsigned int value;
-+	int ret;
-+
-+	ret = kstrtouint(buf, 0, &value);
-+	if (ret != 0)
-+		return ret;
-+
-+	if (value < LEDTRIG_BLKDEV_MIN_TIME) {
-+		pr_info("blkdev LED: attempt to set time < %s milliseconds\n",
-+			__stringify(LEDTRIG_BLKDEV_MIN_TIME));
-+		return -ERANGE;
-+	}
-+
-+	if (attr == &ledtrig_blkdev_attr_blink_time)
-+		WRITE_ONCE(led->blink_msec, value);
-+	else	// attr == &ledtrig_blkdev_attr_interval
-+		WRITE_ONCE(ledtrig_blkdev_interval, msecs_to_jiffies(value));
-+
-+	return count;
-+}
+ endif # LEDS_TRIGGERS
+diff --git a/drivers/leds/trigger/Makefile b/drivers/leds/trigger/Makefile
+index 25c4db97cdd4..d53bab5d93f1 100644
+--- a/drivers/leds/trigger/Makefile
++++ b/drivers/leds/trigger/Makefile
+@@ -16,3 +16,4 @@ obj-$(CONFIG_LEDS_TRIGGER_NETDEV)	+= ledtrig-netdev.o
+ obj-$(CONFIG_LEDS_TRIGGER_PATTERN)	+= ledtrig-pattern.o
+ obj-$(CONFIG_LEDS_TRIGGER_AUDIO)	+= ledtrig-audio.o
+ obj-$(CONFIG_LEDS_TRIGGER_TTY)		+= ledtrig-tty.o
++obj-$(CONFIG_LEDS_TRIGGER_BLKDEV)	+= ledtrig-blkdev.o
 -- 
 2.31.1
 
