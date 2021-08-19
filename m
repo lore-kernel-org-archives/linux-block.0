@@ -2,96 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F91CC4338F
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 10:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 100EAC43214
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 12:27:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBB8061153
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 10:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F18DF61152
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 12:27:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237957AbhHSKtP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Aug 2021 06:49:15 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:46292 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237866AbhHSKtP (ORCPT
+        id S239257AbhHSM16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Aug 2021 08:27:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42798 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238924AbhHSM1z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Aug 2021 06:49:15 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B2D511FD8A;
-        Thu, 19 Aug 2021 10:48:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629370118; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1rlLwsJo8s+V0p1ahIY8HOBEIIwfRO0dwAo701j5Pl4=;
-        b=v0bU3WVKyZVZESwlo8X08rmaCgvvZFQb60opd1jsayx5RsSFupCpN1gTXcJb8FTN72+/pS
-        ilvwdLESq6smt4Dh4exWNiSzNp9MZUMJLcuEPhm29iHbE8R/QHIng6KxETu6w4kEc1qudy
-        TjENBo93UUjevDqR3Omq5AV4q1ha8fs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629370118;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1rlLwsJo8s+V0p1ahIY8HOBEIIwfRO0dwAo701j5Pl4=;
-        b=4bBWbzN9CxBeD2IbMWOfZyqPeBfyMz+szkBAOiSGFmzQsRCS6fKFlAi596j8Gpwje2xHaE
-        0yq2q23jHseDj8Dg==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 757FA139BA;
-        Thu, 19 Aug 2021 10:48:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id +SWcGgY3HmFZRQAAGKfGzw
-        (envelope-from <hare@suse.de>); Thu, 19 Aug 2021 10:48:38 +0000
-Subject: Re: [PATCH 02/11] block: fold register_disk into device_add_disk
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org
-References: <20210818144542.19305-1-hch@lst.de>
- <20210818144542.19305-3-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <e9218377-69ac-2b79-e96b-62c61018de0c@suse.de>
-Date:   Thu, 19 Aug 2021 12:48:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Thu, 19 Aug 2021 08:27:55 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739EBC061756
+        for <linux-block@vger.kernel.org>; Thu, 19 Aug 2021 05:27:19 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id b1so4429252qtx.0
+        for <linux-block@vger.kernel.org>; Thu, 19 Aug 2021 05:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5h8DRQ7Bx+eFzlj90sftRVtoQw5ByFsjYM5vOznvNjM=;
+        b=Lh2+mUHm/NzMtpiU3c8gY3ZdaGQ0hTG/m9kvEQgXEg1RKz+3FaF0xDsca30ygZMj4U
+         71tVT3HVfOJ+uq/ae3O+V2/wNz1ZKRL5oXrfJMrT9ZLS8IGqK1WZlS1VIy7/pMZF5p1U
+         iJ4mL0UEz55891lYfc4fFzXB5mnKfGVvXu5qR2IqQy99MvlG8TXgE0bJRzU78LOMzryT
+         7Xl+HKBwG9bWchW9H2+S/GBzGWNkuVy8E57+OfP+v2vJHi/dIPH6q7xZxwuYZQV9zBN7
+         98qA2j6Yif6IJCGo5nBcNVo6T60PWrjlYnFBGmvL3mwjjuqqvooktAaU5gBmctIMOXRS
+         0LWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5h8DRQ7Bx+eFzlj90sftRVtoQw5ByFsjYM5vOznvNjM=;
+        b=tJT78JFFMqFn8eJ3F+bXqiPE5VEGjXycwkBhhF9ShuY2pWf3EqDaYgaFEMRqtVeaOJ
+         arO+9MOL1PYavF5HLn2d4tGL9sKHfLHQc2eedXG1YaGblvSoz5X5eOSqM48dWFY2Z+gc
+         PVyfJL5JEZj1vGji1bbkkxz14LVaJfuttMA3FoyZiQAGiSYHPmJdpxfYfdcV2pdhQK1z
+         P/F+J+KfiCuZ8HZjVSr+HU+8zqtIYGndEKe5IAUSl4lod+xXINwjfepOktANzq9ge+nd
+         1sY2qJddkgj/xeSj3rJBxDTP5Ur/ZwN4vAVA7gGf4GUAQHxus4MwVwzh/FT+7KNOViA8
+         Kjaw==
+X-Gm-Message-State: AOAM5314Ld8FxG4WsuwTUqsvGVmkmtL7viYbxlgred0uFXExQtgxhJrM
+        yBoS00iIVFDWNNsfvLpneNUwMw==
+X-Google-Smtp-Source: ABdhPJxwk7vI3dEd2/mwgiJx7X4NGPWrwVGFe3LSMD/MyzGQMgDurTmsWQFQ5lpblgS6WBAbFYMPPg==
+X-Received: by 2002:a05:622a:11cc:: with SMTP id n12mr12404820qtk.363.1629376038633;
+        Thu, 19 Aug 2021 05:27:18 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id d7sm1266808qth.70.2021.08.19.05.27.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 05:27:18 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mGh8e-0016LT-A5; Thu, 19 Aug 2021 09:27:16 -0300
+Date:   Thu, 19 Aug 2021 09:27:16 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>, linux-rdma@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 56/63] RDMA/mlx5: Use struct_group() to zero struct
+ mlx5_ib_mr
+Message-ID: <20210819122716.GP543798@ziepe.ca>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-57-keescook@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <20210818144542.19305-3-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210818060533.3569517-57-keescook@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/18/21 4:45 PM, Christoph Hellwig wrote:
-> There is no real reason these should be separate.  Also simplify the
-> groups assignment a bit.
+On Tue, Aug 17, 2021 at 11:05:26PM -0700, Kees Cook wrote:
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memset(), avoid intentionally writing across
+> neighboring fields.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Add struct_group() to mark region of struct mlx5_ib_mr that should be
+> initialized to zero.
+> 
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Doug Ledford <dledford@redhat.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: linux-rdma@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 > ---
->   block/genhd.c | 131 +++++++++++++++++++++++---------------------------
->   1 file changed, 60 insertions(+), 71 deletions(-)
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+>  drivers/infiniband/hw/mlx5/mlx5_ib.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/infiniband/hw/mlx5/mlx5_ib.h b/drivers/infiniband/hw/mlx5/mlx5_ib.h
+> index bf20a388eabe..f63bf204a7a1 100644
+> --- a/drivers/infiniband/hw/mlx5/mlx5_ib.h
+> +++ b/drivers/infiniband/hw/mlx5/mlx5_ib.h
+> @@ -644,6 +644,7 @@ struct mlx5_ib_mr {
+>  	struct ib_umem *umem;
+>  
+>  	/* This is zero'd when the MR is allocated */
+> +	struct_group(cleared,
+>  	union {
+>  		/* Used only while the MR is in the cache */
+>  		struct {
+> @@ -691,12 +692,13 @@ struct mlx5_ib_mr {
+>  			bool is_odp_implicit;
+>  		};
+>  	};
+> +	);
+>  };
+>  
+>  /* Zero the fields in the mr that are variant depending on usage */
+>  static inline void mlx5_clear_mr(struct mlx5_ib_mr *mr)
+>  {
+> -	memset(mr->out, 0, sizeof(*mr) - offsetof(struct mlx5_ib_mr, out));
+> +	memset(&mr->cleared, 0, sizeof(mr->cleared));
+>  }
 
-Cheers,
+Why not use the memset_after(mr->umem) here?
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Jason
