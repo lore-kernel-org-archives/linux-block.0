@@ -2,109 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DD1C4320A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 00:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2563FC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 00:39:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C00B610A4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 00:34:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0250B610CB
+	for <linux-block@archiver.kernel.org>; Thu, 19 Aug 2021 00:39:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234546AbhHSAfO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Aug 2021 20:35:14 -0400
-Received: from condef-09.nifty.com ([202.248.20.74]:20081 "EHLO
-        condef-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234511AbhHSAfN (ORCPT
+        id S234523AbhHSAkT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Aug 2021 20:40:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28368 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235009AbhHSAkS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Aug 2021 20:35:13 -0400
-X-Greylist: delayed 356 seconds by postgrey-1.27 at vger.kernel.org; Wed, 18 Aug 2021 20:35:13 EDT
-Received: from conssluserg-04.nifty.com ([10.126.8.83])by condef-09.nifty.com with ESMTP id 17J0PJUK024005;
-        Thu, 19 Aug 2021 09:25:19 +0900
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 17J0P0f1032108;
-        Thu, 19 Aug 2021 09:25:01 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 17J0P0f1032108
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1629332701;
-        bh=PF53kQPV3ZMQ1IqBpnzqJejKPfOrn59+hm0ztTTG2rc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=N9WJQSvGetK7IX3nXyVZDUEVRRQIaWMxCKvnH8S4AW6s6ALnTS7u000Cz4XTD2EOh
-         PyRfTomhxspXVNFhUVM/TTXMADH5Std/HkRMtLue3L6vsn57d9dprw7KnVDWurbxOe
-         T+UoNoVpxIN2I6S+WGHhDOgJdVigAYqURBX9l6/P5H2qe8m2c4kIzwWUkr4cot4xJz
-         8MwmcTksICp2B+ef+8bwuRM3ztuoOGD/jMlpVpGhbcFfR3cISKOhluzcKhPOk6XpDx
-         w+Dn0kxYImvWlaTUikoDWpwvLqXMyvXSmCbzYhaBTR1ZmJ3+9t5oL2Q8LfvyQM50cj
-         gOIDMaADXI56A==
-X-Nifty-SrcIP: [209.85.210.175]
-Received: by mail-pf1-f175.google.com with SMTP id m26so3854800pff.3;
-        Wed, 18 Aug 2021 17:25:01 -0700 (PDT)
-X-Gm-Message-State: AOAM5322Ar5nIgMMzOjJB6txHAsuIlR9v0zcaMZQIkCVjFeQ1qH0bCTr
-        IZLEWPWQC2wjXqzIenYToIzYdd4pU2odgN/J75Y=
-X-Google-Smtp-Source: ABdhPJyI48U6UoIuNg/t0/Wmc0kyshBQu8l/PGLPbEpDRALt1hRHHdvzrQwxGK0TmPPg7RKq3ivTo+X4kEATHr7Yk/w=
-X-Received: by 2002:a63:dd51:: with SMTP id g17mr11336425pgj.47.1629332700384;
- Wed, 18 Aug 2021 17:25:00 -0700 (PDT)
+        Wed, 18 Aug 2021 20:40:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629333582;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=t7HjgcfyIm369W11HV7x4h2DtrAmkaaUtdzcfD19c1U=;
+        b=grmPgSvmuJbRD7ESFIKPlX+vTuVvvDWzFrC/jomwjYarz6lJRF/y9b6TC0ECKcP2oBiigp
+        FaHoZsMpv3147OJwmffknfNOT8N0XVUdHdabnx3ovp5ei0nuZvPNpoU09HLtOyEaqKeN5X
+        7W8Jsqimht9A3bxbPbL4OLLUcqZO+jI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-292-oU9l-s0jOB2qcEgggaEdcg-1; Wed, 18 Aug 2021 20:39:39 -0400
+X-MC-Unique: oU9l-s0jOB2qcEgggaEdcg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1246E107ACF5;
+        Thu, 19 Aug 2021 00:39:38 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A58F119D9D;
+        Thu, 19 Aug 2021 00:39:27 +0000 (UTC)
+Date:   Thu, 19 Aug 2021 08:39:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, kashyap.desai@broadcom.com,
+        hare@suse.de
+Subject: Re: [PATCH v2 06/11] blk-mq: Pass driver tags to
+ blk_mq_clear_rq_mapping()
+Message-ID: <YR2oO8hhtDx1Wd+P@T590>
+References: <1628519378-211232-1-git-send-email-john.garry@huawei.com>
+ <1628519378-211232-7-git-send-email-john.garry@huawei.com>
+ <YRyGb/Ay3lvUZs/V@T590>
+ <23448833-593c-139f-6051-9b8e7d3deade@huawei.com>
 MIME-Version: 1.0
-References: <20210818154646.925351-1-efremov@linux.com> <20210818154646.925351-3-efremov@linux.com>
-In-Reply-To: <20210818154646.925351-3-efremov@linux.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 19 Aug 2021 09:24:23 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASTa+_d17wF6NW6GHC7Y+_RrXYZuo0MzzbsNnaRn8KJuQ@mail.gmail.com>
-Message-ID: <CAK7LNASTa+_d17wF6NW6GHC7Y+_RrXYZuo0MzzbsNnaRn8KJuQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/5] gen_initramfs.sh: use absolute path for gen_init_cpio
-To:     Denis Efremov <efremov@linux.com>
-Cc:     "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Jiri Kosina <jkosina@suse.cz>, Willy Tarreau <w@1wt.eu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <23448833-593c-139f-6051-9b8e7d3deade@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 12:47 AM Denis Efremov <efremov@linux.com> wrote:
->
-> Use absolute path to call gen_init_cpio. This allows one
-> to use gen_initramfs.sh from any directory.
+On Wed, Aug 18, 2021 at 01:00:13PM +0100, John Garry wrote:
+> > > @@ -2346,8 +2345,11 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
+> > >   void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+> > >   		     unsigned int hctx_idx)
+> > >   {
+> > > +	struct blk_mq_tags *drv_tags;
+> > >   	struct page *page;
+> > > +		drv_tags = set->tags[hctx_idx];
+> > 
+> 
+> Hi Ming,
+> 
+> > Indent.
+> 
+> That's intentional, as we have from later patch:
+> 
+> void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+> unsigned int hctx_idx)
+> {
+> 	struct blk_mq_tags *drv_tags;
+> 	struct page *page;
+> 
+> +	if (blk_mq_is_sbitmap_shared(set->flags))
+> +		drv_tags = set->shared_sbitmap_tags;
+> +	else
+> 		drv_tags = set->tags[hctx_idx];
+> 
+> 	...
+> 
+> 	blk_mq_clear_rq_mapping(drv_tags, tags);
+> 
+> }
+> 
+> And it's just nice to not re-indent later.
 
-I do not mind this, but $(dirname "$0")
-is not necessarily an absolute path, is it?
+But this way is weird, and I don't think checkpatch.pl is happy with
+it.
 
+-- 
+Ming
 
-I added test code:
-
-   echo dirname is $(dirname $0)
-
-in this script, and I saw
-
-   dirname is usr
-
-
-
-
->
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Signed-off-by: Denis Efremov <efremov@linux.com>
-> ---
->  usr/gen_initramfs.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
-> index 63476bb70b41..2e4a86181c79 100755
-> --- a/usr/gen_initramfs.sh
-> +++ b/usr/gen_initramfs.sh
-> @@ -244,4 +244,4 @@ if test -n "$KBUILD_BUILD_TIMESTAMP"; then
->                 timestamp="-t $timestamp"
->         fi
->  fi
-> -usr/gen_init_cpio $timestamp $cpio_list > $output
-> +"$(dirname "$0")"/gen_init_cpio $timestamp $cpio_list > $output
-> --
-> 2.31.1
->
-
-
---
-Best Regards
-Masahiro Yamada
