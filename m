@@ -2,121 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6137C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 11:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CAAC4320A
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 11:27:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C05156103B
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 11:11:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A07A61051
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 11:27:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237660AbhHTLMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 07:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45490 "EHLO
+        id S239624AbhHTL2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 07:28:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229847AbhHTLMU (ORCPT
+        with ESMTP id S232681AbhHTL2H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 07:12:20 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3682C061575;
-        Fri, 20 Aug 2021 04:11:42 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id v10so2467864wrd.4;
-        Fri, 20 Aug 2021 04:11:42 -0700 (PDT)
+        Fri, 20 Aug 2021 07:28:07 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7224DC061575;
+        Fri, 20 Aug 2021 04:27:29 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id w24so5708210wmi.5;
+        Fri, 20 Aug 2021 04:27:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XTV41ORucx8ryF7oB1eYwysBWiCN8gKMFeTRn1Zj7AM=;
-        b=MYvcDMXR87iOi7JK63t8cj54EEq9i8ZzrMq9tTqiUnWhDTDpZ+z4a4GCYAjq653LTa
-         I0zDS4sQg1eW6rUqQCv1JNBNE6zrArt6rTFvGCFeg0Dbin816j8YZy9tgx6PsYbcoTGo
-         pRvXznFW67AYmCqrOL/h4QHkXw0BeMbcThfam8AJkm+2c4RjnYPossT/rYuEPniF4uUP
-         lgU4P6t/RauHcpJ985qi72+0T/B06GHTCsAkiEiv0WJP3v8HUf+Y+HDJVlu8p0kLKiGO
-         1NAaZJYEaqA0vmmOG6yNGc7LwnVlknJMuXwP7kGJLpVCuwHngy0M5vjxVKd3AAzIoPHD
-         6J+g==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=SjDUab6ES3/gB1KniFBQUp8JcOQkZIMPeFbdvqfdXv0=;
+        b=UHWERN8f9quI2rSUCk1WrRW97eftUnzajyYEM3pAovhRjKnbUtDoCXTQ88snOI+9in
+         pwwOimSs5UE5xFdTBxiSPxTxOJ2WdnziXzeqkWHBC3vKkB/gCCs3cfnIe5p43usX8drp
+         VIw9W2HvM9DT+QZoE3I62YBWirejOhst0auA5UlfMPd165AmcYRH+nSCfVF+QNzPaUy0
+         CYjUtJ9bGnj3qzHXD7AfeCXVF1Q8v1NOU4x5h72Cdzmvp6BbJtC3NWb7oufzG8+eV5Lw
+         SMzHbpEfAnUWhQ/kIjlRksYLXGoCiVB31gNhMofNVK7W8aH9fsP0br8xCx/+Tb21UaOk
+         Uqog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XTV41ORucx8ryF7oB1eYwysBWiCN8gKMFeTRn1Zj7AM=;
-        b=din9tUTwECWjTuz3y/YTtyHp2IxJbKlUz8bB6sS8JQQ1loaKMKTPghsBtE97uos58y
-         yL1urZRYERvN4qKmkUhMDk2n7GgzFOhu7LIOuLplipLY40CJwhX2fKSZRK/4hS/Y+b6W
-         4GpsfFwU0AA4AtQLSXDJypXh92gsuWIGMbki2wZMdnZlNjML9XvIwrPeKBryVnfY8iZY
-         65Rhzc5dPVkZuAEnNnEjlx9mmV8TyjGbccyLwNWKvCCwYtPRyg31m21W/vPaUWk2I6V7
-         mAp6uJQCU+Y4xGCrlpGBGPcT0mgkV2aA+96Bp2rEs9qXXZkctz2uykBSxQutU3VFla/e
-         keZA==
-X-Gm-Message-State: AOAM531+MiQjj00idO+VkZLpQm32GnH/T9ciNvbdF1jD/+kfZ0/8iPWH
-        yTcMriFCGs5XYtaFESxy1YzzmCClX9cOgHDgWdo=
-X-Google-Smtp-Source: ABdhPJyHLBn4cAqZhoblha8bwzOCJdvxUWt4EpC0AJmYcZ2sxKZSuvBjXl3YiZg/qrMlyWLl4b6/2Ts3GXLe812W024=
-X-Received: by 2002:a5d:6991:: with SMTP id g17mr9619476wru.253.1629457901314;
- Fri, 20 Aug 2021 04:11:41 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=SjDUab6ES3/gB1KniFBQUp8JcOQkZIMPeFbdvqfdXv0=;
+        b=U1aFYusnt0rJkFvOpLl+NtkTLfyRtgah0aLgZyYghAa7BpXNRxjci3gFIFGhGHkpAM
+         64euBLK7OQUs5rt+cpi+gLlIdz5M7WFCj1k+zRFXyrqeX058GQI08fQy0YHLC/NVGCcw
+         DugglT5Pa9wV1jqDrABC7zyrwVpvSnmFy58mVS0AvW2Q8/Drr8W2zDqUO7DY+3kDY8T2
+         rDomBdd6wKtHIVgzF8t85ixloK0cQfjUwoWYF7I7sWqqVMzcQaZKmDwliBPSOzmknMPH
+         81cVn3AHkU8qo7b2j6uz8/8rISbe6s46ixe2CWedYCmdpwJoN9entzzLEwY+ZYbCq4Ks
+         9LMg==
+X-Gm-Message-State: AOAM532hy1dRrRuc6Svv1K85d204t+yfdQ4VMqVV60bjpf8VaSu6rVcx
+        EUaJrNylR3S8VGwpbIzU6Kw=
+X-Google-Smtp-Source: ABdhPJz+RA7GGLxzMpCDOim6PSXwiUzFn+BklCCbmBg0rZ/eVC8IfFtPsUdIDQgifT4ZichVAhIcxg==
+X-Received: by 2002:a05:600c:198a:: with SMTP id t10mr3397445wmq.181.1629458848076;
+        Fri, 20 Aug 2021 04:27:28 -0700 (PDT)
+Received: from localhost ([217.111.27.204])
+        by smtp.gmail.com with ESMTPSA id d8sm6007515wrv.20.2021.08.20.04.27.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Aug 2021 04:27:26 -0700 (PDT)
+Date:   Fri, 20 Aug 2021 13:27:25 +0200
+From:   Thierry Reding <thierry.reding@gmail.com>
+To:     Dmitry Osipenko <digetx@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+Subject: Re: [PATCH v7 4/4] mmc: sdhci-tegra: Enable MMC_CAP2_ALT_GPT_TEGRA
+Message-ID: <YR+RnXmtvDHk7mU3@orome.fritz.box>
+References: <20210820004536.15791-1-digetx@gmail.com>
+ <20210820004536.15791-5-digetx@gmail.com>
 MIME-Version: 1.0
-References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
- <CGME20210817101758epcas5p1ec353b3838d64654e69488229256d9eb@epcas5p1.samsung.com>
- <20210817101423.12367-4-selvakuma.s1@samsung.com> <yq1sfz6loh9.fsf@ca-mkp.ca.oracle.com>
-In-Reply-To: <yq1sfz6loh9.fsf@ca-mkp.ca.oracle.com>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Fri, 20 Aug 2021 16:41:15 +0530
-Message-ID: <CA+1E3rKmS6LSPDb9C8S7Ap-b40TB9dfogC-PYm7ehLeBTn+Ukw@mail.gmail.com>
-Subject: Re: [PATCH 3/7] block: copy offload support infrastructure
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, kch@kernel.org,
-        mpatocka@redhat.com, bvanassche@acm.org, djwong@kernel.org,
-        snitzer@redhat.com, agk@redhat.com,
-        Selva Jove <selvajove@gmail.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>, nitheshshetty@gmail.com,
-        KANCHAN JOSHI <joshi.k@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="P4L/5MMHcPJXc6os"
+Content-Disposition: inline
+In-Reply-To: <20210820004536.15791-5-digetx@gmail.com>
+User-Agent: Mutt/2.1.1 (e2a89abc) (2021-07-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 12:05 AM Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->
->
-> > Native copy offload is not supported for stacked devices.
->
-> One of the main reasons that the historic attempts at supporting copy
-> offload did not get merged was that the ubiquitous deployment scenario,
-> stacked block devices, was not handled well.
->
-> Pitfalls surrounding stacking has been brought up several times in
-> response to your series. It is critically important that both kernel
-> plumbing and user-facing interfaces are defined in a way that works for
-> the most common use cases. This includes copying between block devices
-> and handling block device stacking. Stacking being one of the most
-> fundamental operating principles of the Linux block layer!
->
-> Proposing a brand new interface that out of the gate is incompatible
-> with both stacking and the copy offload capability widely implemented in
-> shipping hardware makes little sense. While NVMe currently only supports
-> copy operations inside a single namespace, it is surely only a matter of
-> time before that restriction is lifted.
->
-> Changing existing interfaces is painful, especially when these are
-> exposed to userland. We obviously can't predict every field or feature
-> that may be needed in the future. But we should at the very least build
-> the infrastructure around what already exists. And that's where the
-> proposed design falls short...
->
-Certainly, on user-space interface. We've got few cracks to be filled
-there, missing the future viability.
-But on stacking, can that be additive. Could you please take a look at
-the other response (comment from Bart) for the trade-offs.
 
+--P4L/5MMHcPJXc6os
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Joshi
+On Fri, Aug 20, 2021 at 03:45:36AM +0300, Dmitry Osipenko wrote:
+> Tegra20/30/114/124 Android devices place GPT at a non-standard location.
+> Enable GPT entry scanning at that location.
+>=20
+> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+> ---
+>  drivers/mmc/host/sdhci-tegra.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/drivers/mmc/host/sdhci-tegra.c b/drivers/mmc/host/sdhci-tegr=
+a.c
+> index 387ce9cdbd7c..a5001875876b 100644
+> --- a/drivers/mmc/host/sdhci-tegra.c
+> +++ b/drivers/mmc/host/sdhci-tegra.c
+> @@ -116,6 +116,8 @@
+>   */
+>  #define NVQUIRK_HAS_TMCLK				BIT(10)
+> =20
+> +#define NVQUIRK_HAS_ANDROID_GPT_SECTOR			BIT(11)
+
+_HAS_ could be taken to imply that it always has that GPT sector,
+whereas it really depends on how the system was flashed. But that's a
+bit pedantic, so I think this is okay:
+
+Acked-by: Thierry Reding <treding@nvidia.com>
+
+--P4L/5MMHcPJXc6os
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmEfkZsACgkQ3SOs138+
+s6F2XhAAjZLI6fstxyhGIOp5rNCJqNDYou4sOxqEn5Lt4KC1XGOIXynv/zEhFeG4
+I8w1fL5oCql8CHpsj+IN/d81K4PkM+tV5nPBt+eMUh8NkDGFhjHBRBrM1T08k7fj
+vFOTJcDG0BnzevEYgY1fX0U5mFnZEOKlkUrcQXGmJRXyb3XBMCY8siuYRurnXRTu
+hQMoM+MFZDQlbP7GBAihc3LY4sCUB8UGvkIpJ3VmTMydgizkv6wfY0ZK2Q3oC6Gr
+lKHQj202ORXX6OTYSiDkGd7jH85viUhVSjiHgtqyy/u4dCLx94V/Zn6GXf9sKusp
+p2WYSGklDiuw7ZtI8D6vllDkvqvFSkOSfLAvstZlfRPkfNweEJfW9Ks28vcp8GkR
+YcOtQ/rt3hin7oArC73G9qLZG0zzoYVrlFWsQLouodS1saIVMCCwvh8xZ1vbFxuM
+HYaBM8qVhGMXM5TDNpx9ALiQjmQriHovyOXi6FAZb/ZS9YH8cIUgwwE6CQMLzFlo
+qOs2NRMqvr+sKW4WeDJvzj7IKg5GReEKp6BEGI0V3H2ySBJ/DC5kT8D6d349F8Pc
+BXvLe7zStMP/FIY1aUH+LBPnfIdEqBXtSwYFkqqAV+iDGgR4qMPrimrASBYu4hMa
+XqdjGmxxDMykYJLygZYwgcL729a0pm15VULpw8Cb+SceMxKM15s=
+=pZM7
+-----END PGP SIGNATURE-----
+
+--P4L/5MMHcPJXc6os--
