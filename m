@@ -2,96 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB32C4320A
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 16:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440D5C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 17:20:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B326460FE8
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 16:11:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2582060FE6
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 17:20:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233925AbhHTQME (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 12:12:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47630 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235634AbhHTQLx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 12:11:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D147E61244;
-        Fri, 20 Aug 2021 16:11:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629475875;
-        bh=QtHvxXjD6Lxo5RaKara/Y2QvqxDS6ThacQcb91QFjy8=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=Cm8q6m2PtljGp+99RX9+Khsax5QCk8ma2yXHvKEh8RrOqdQSjmdQD2FlsFBC5lfPd
-         hDf7fZUEaGki4tlDFutbg5ca6FLVXGfPxHWaOBD4XhqmxjD5ePMawLPi6bmTjgSHcj
-         8DgCDWq5VV5OHyCMsJm5rGAQ/UScpbb7txwU6ToO1lJuBsRHIKQLuxTBS3CKRDxgkY
-         zbUcPhLTjOj0CWY3U2jpczxlNukz8oI1saQ7GA/O6BTQCSTo/8mMx+D4koYcDYvj2z
-         VhBU9Lvgl0wa0B8f5+WyDtCS3bjffcF1LCILvKtgT/qWDSeF7AMzYCV7dZ3fCz/Xm4
-         QMcNMCjdf825A==
-Date:   Fri, 20 Aug 2021 18:11:10 +0200 (CEST)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-cc:     LKML <linux-kernel@vger.kernel.org>,
-        Stefan Achatz <erazor_de@users.sourceforge.net>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        linux-input <linux-input@vger.kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, linux-staging@lists.linux.dev,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 55/63] HID: roccat: Use struct_group() to zero
- kone_mouse_event
-In-Reply-To: <202108200857.FA4AA13@keescook>
-Message-ID: <nycvar.YFH.7.76.2108201810560.15313@cbobk.fhfr.pm>
-References: <20210818060533.3569517-1-keescook@chromium.org> <20210818060533.3569517-56-keescook@chromium.org> <nycvar.YFH.7.76.2108201501510.15313@cbobk.fhfr.pm> <CAJr-aD=6-g7VRw2Hw0dhs+RrtA=Tago5r6Dukfw_gGPB0YYKOQ@mail.gmail.com>
- <nycvar.YFH.7.76.2108201725360.15313@cbobk.fhfr.pm> <202108200857.FA4AA13@keescook>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        id S233409AbhHTRVf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 13:21:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31750 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233455AbhHTRVe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Aug 2021 13:21:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629480056;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=84KgFhe0KBgW9+2WOyyInUYxCF6IYc93sWP+ad5crAQ=;
+        b=h7BhHJdz3xDGnXbH4k1GHu5zFUUJVO4oS2XH7KM82FKMUd5aLRaLitgXzb37afdUFXZCu0
+        2bW39U09UFtop2Z6PVbg9vf9900PbtdiDNl1rrYXwJBcKVchk8NBG9WIkSibtm+J+RkoeJ
+        ebBLlHMaZ8uoA8zikOJbvd3LrUJyZ2s=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-ojJxOMY-Oqqj55Rhri3TIw-1; Fri, 20 Aug 2021 13:20:54 -0400
+X-MC-Unique: ojJxOMY-Oqqj55Rhri3TIw-1
+Received: by mail-qk1-f198.google.com with SMTP id 13-20020a05620a06cdb02903d28ef96942so6907241qky.19
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 10:20:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=84KgFhe0KBgW9+2WOyyInUYxCF6IYc93sWP+ad5crAQ=;
+        b=GrIzkRmWAWgcsPTeTlhDj6r9eGz2lrQJXrSWxYkPHKarCiN8gVXgzV3voDc6jshvfx
+         RnEpM4gO9D7hQ15gsGGm9gGRndzXwCPNZqTkJkGmUNpr9qN5+O1L0G9MPc7uZVJMyAFK
+         TqC0vOpVdCHJFP3CaONOzCNBaiSFjtefrmw9/Z5wJtsW9u0XcFtYTOXTYu/A/MDASKpl
+         FiPLJ9QWCda+vgRP4k0MITbbv+x3QC8IgBZgLS3ctCwgdJkB8rpBKe7tmnHDQsCVFKSh
+         VfrpuHGfmGqO+6pJMMwXTvNhXg+HAUAmJuZjg/zKM+rpMUKK+tgTVIQQEPOBmx7j47uN
+         Jt5Q==
+X-Gm-Message-State: AOAM531dAm6kmxzirDHVv/K2JBQ7YYB94yokC+lTo+FcxgPkx/TWJZES
+        QdQmAv0CzMF+DlVLPl9EFPlzguQOnt9adzZazI8E6TCCZYiiHgoCEabpM2VfG8MUmKogbv3E38+
+        w5cGHhB5qRr9XjD6K4Dq1BQ==
+X-Received: by 2002:a05:6214:1d25:: with SMTP id f5mr19647879qvd.26.1629480054131;
+        Fri, 20 Aug 2021 10:20:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwoB15XBX7/Fzi8pLSIiqgllwujiL22ylqJXVxhPsYebX9mFnWITVQofFMC/yNTu6n9lJ7zgg==
+X-Received: by 2002:a05:6214:1d25:: with SMTP id f5mr19647858qvd.26.1629480053959;
+        Fri, 20 Aug 2021 10:20:53 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id w20sm3258814qkj.116.2021.08.20.10.20.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Aug 2021 10:20:53 -0700 (PDT)
+Date:   Fri, 20 Aug 2021 13:20:52 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        tusharsu@linux.microsoft.com
+Subject: Re: block: add back the bd_holder_dir reference in
+ bd_link_disk_holder
+Message-ID: <YR/kdG/J0odIzGsF@redhat.com>
+References: <20210820094929.444848-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210820094929.444848-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 20 Aug 2021, Kees Cook wrote:
+On Fri, Aug 20 2021 at  5:49P -0400,
+Christoph Hellwig <hch@lst.de> wrote:
 
-> > > > > In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> > > > > field bounds checking for memset(), avoid intentionally writing across
-> > > > > neighboring fields.
-> > > > >
-> > > > > Add struct_group() to mark region of struct kone_mouse_event that should
-> > > > > be initialized to zero.
-> > > > >
-> > > > > Cc: Stefan Achatz <erazor_de@users.sourceforge.net>
-> > > > > Cc: Jiri Kosina <jikos@kernel.org>
-> > > > > Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-> > > > > Cc: linux-input@vger.kernel.org
-> > > > > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > > >
-> > > > Applied, thank you Kees.
-> > > >
-> > > 
-> > > Eek! No, this will break the build: struct_group() is not yet in the tree.
-> > > I can carry this with an Ack, etc.
-> > 
-> > I was pretty sure I saw struct_group() already in linux-next, but that was 
-> > apparently a vacation-induced brainfart, sorry. Dropping.
+> This essentially reverts "block: remove the extra kobject reference in
+> bd_link_disk_holder".  That commit dropped the extra reference because
+> the condition in the comment can't be true.  But it turns out that
+> comment did not actually describe the problematic situation, so add
+> back the extra reference and document it properly.
 > 
-> Oh, for these two patches, can I add your Acked-by while I carry them?
+> Fixes: fbd9a39542ec ("block: remove the extra kobject reference in bd_link_disk_holder")
+> Reported-by: Tushar Sugandhi <tusharsu@linux.microsoft.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Yes, thanks, and sorry for the noise.
+Looks good, thanks.
+(btw, your linux-block cc had a typo, Jens are you able to pick this fix up regardless?)
 
--- 
-Jiri Kosina
-SUSE Labs
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
 
