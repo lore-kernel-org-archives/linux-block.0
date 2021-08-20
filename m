@@ -2,165 +2,250 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E80C4320A
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 07:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E8F6C4320E
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 08:17:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FAE66103C
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 07:53:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30740610D2
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 08:17:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238848AbhHTHy0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 03:54:26 -0400
-Received: from pegase2.c-s.fr ([93.17.235.10]:41517 "EHLO pegase2.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236378AbhHTHy0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 03:54:26 -0400
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-        by localhost (Postfix) with ESMTP id 4GrYmV3rRlz9sTr;
-        Fri, 20 Aug 2021 09:53:46 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id E8Ffz9K-cCxD; Fri, 20 Aug 2021 09:53:46 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase2.c-s.fr (Postfix) with ESMTP id 4GrYmV2jCFz9sTj;
-        Fri, 20 Aug 2021 09:53:46 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 3A2918B868;
-        Fri, 20 Aug 2021 09:53:46 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id GYJg-josgfgQ; Fri, 20 Aug 2021 09:53:46 +0200 (CEST)
-Received: from [192.168.4.90] (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 0AEB28B862;
-        Fri, 20 Aug 2021 09:53:45 +0200 (CEST)
-Subject: Re: [PATCH v2 57/63] powerpc/signal32: Use struct_group() to zero spe
- regs
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        linuxppc-dev@lists.ozlabs.org, kernel test robot <lkp@intel.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-58-keescook@chromium.org>
- <877dggeesw.fsf@mpe.ellerman.id.au>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-Message-ID: <0f6e508e-62b6-3840-5ff4-eb5a77635bd1@csgroup.eu>
-Date:   Fri, 20 Aug 2021 09:53:41 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S231841AbhHTIR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 04:17:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33414 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231672AbhHTIR5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Aug 2021 04:17:57 -0400
+Received: from mail-vk1-xa2b.google.com (mail-vk1-xa2b.google.com [IPv6:2607:f8b0:4864:20::a2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4892EC061764
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 01:17:12 -0700 (PDT)
+Received: by mail-vk1-xa2b.google.com with SMTP id 13so2244131vke.8
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 01:17:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=y5t+2Oo5yym0OJ3etipsjRBTyv7Vn0GjQI8wMxvms5k=;
+        b=mxFXngFqSxmVJjIcBJy/PJZ2TZWD4D5JgMEkMuzRL0oGlZFRZ9zL5SwmdMPPbE/vma
+         1AO5vPktkKK5CNZ9usJdbW1SXZqYKUV1u08LPaDbkMtiuPINpDQkHiReRpZPx7D0EbQY
+         AU1ZC/2cX+ZExtSdZHMcBho5essfmpQhJC/a9JQNHFoGhaM1IcsP0fRD3H1fbSYqbkwd
+         Pq3YFwLf1qU9W9gP57vSn2z+//1jkgMXqbL83W5GWBPSxtZGnfCH3mzyC2cnjdPojhiZ
+         yQTL5cY980LMxa4KnuBnXmE6o72yA6dNoXoeceG9wooQSrV5DCP//ide8LOdfVNJdLoG
+         quog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=y5t+2Oo5yym0OJ3etipsjRBTyv7Vn0GjQI8wMxvms5k=;
+        b=rHyMSnP5R5nUw5G86SWy8wokATqbJAIwoSxE1IFwfZzmp8/MthF2EHfIWxt7hkqxxq
+         VAbnT4koPv18Fxm39UojR5g1ZZXbLK4rOY0KaTWg4g1hSPiklKcNscqmwtY//lsffKtC
+         ywyIGVTl4QbpAMo3YKIwMNDuwKt9Y7b9UUbCKaeCdLE7dNxK7qV1RvsjY+v6Cqo8Ybbz
+         /XF/KTdVSRxjrqjFxQnAf0+R6PRodnlThToESv6C8pbOUMOZs34ijk4iI93V8vwRXXp6
+         UFvk10o2wTlMORIZyV3abg3eNEAvyP8iboniuq8I2ExsWH2gnh2xmzoUNKn/WxWvK2mY
+         zHfg==
+X-Gm-Message-State: AOAM533SCZfJwkp0vflaoBkhn4uWUk/Imcjv6phPaElTqCZK/cgx99gZ
+        YopfW+VzCGRcFPiULlm8RdcyXDt+Wu2ybIDRATYULQ==
+X-Google-Smtp-Source: ABdhPJwnXcF5jSuimmLI3XIw81d0SDbFuLoIO4o4UILtPyGEj2uz+uCsImanEERqS9WiyHwD5N9GEei+p0qvMLjeqbs=
+X-Received: by 2002:a1f:a555:: with SMTP id o82mr14607010vke.8.1629447430991;
+ Fri, 20 Aug 2021 01:17:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <877dggeesw.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+References: <20210818005547.14497-1-digetx@gmail.com> <20210818005547.14497-5-digetx@gmail.com>
+ <CAPDyKFqQbe4k-Sem436Fzsr6mbvwZr83VtEaEZTF8oWYoHHQwg@mail.gmail.com>
+ <YR0MrlxFLTpsR628@orome.fritz.box> <CAPDyKFpObGwWhnwDKG59wdt6Pr35DodogXbDjzPJGoshMD7piQ@mail.gmail.com>
+ <YR6SuVxJ37IoxyBF@orome.fritz.box>
+In-Reply-To: <YR6SuVxJ37IoxyBF@orome.fritz.box>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Fri, 20 Aug 2021 10:16:34 +0200
+Message-ID: <CAPDyKFoT3Qw47ecnZbhBtGNB=NruWW9VnKPEb+ST3ozX4H+-sA@mail.gmail.com>
+Subject: Re: [PATCH v5 4/5] mmc: sdhci-tegra: Implement alternative_gpt_sector()
+To:     Thierry Reding <thierry.reding@gmail.com>
+Cc:     Dmitry Osipenko <digetx@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, 19 Aug 2021 at 19:19, Thierry Reding <thierry.reding@gmail.com> wrote:
+>
+> On Thu, Aug 19, 2021 at 03:20:57PM +0200, Ulf Hansson wrote:
+> > On Wed, 18 Aug 2021 at 15:35, Thierry Reding <thierry.reding@gmail.com> wrote:
+> > >
+> > > On Wed, Aug 18, 2021 at 11:55:05AM +0200, Ulf Hansson wrote:
+> > > > On Wed, 18 Aug 2021 at 02:57, Dmitry Osipenko <digetx@gmail.com> wrote:
+> > > > >
+> > > > > Tegra20/30/114/124 Android devices place GPT at a non-standard location.
+> > > > > Implement alternative_gpt_sector() callback of the MMC host ops which
+> > > > > specifies that GPT location for the partition scanner.
+> > > > >
+> > > > > Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+> > > > > ---
+> > > > >  drivers/mmc/host/sdhci-tegra.c | 42 ++++++++++++++++++++++++++++++++++
+> > > > >  1 file changed, 42 insertions(+)
+> > > > >
+> > > > > diff --git a/drivers/mmc/host/sdhci-tegra.c b/drivers/mmc/host/sdhci-tegra.c
+> > > > > index 387ce9cdbd7c..24a713689d5b 100644
+> > > > > --- a/drivers/mmc/host/sdhci-tegra.c
+> > > > > +++ b/drivers/mmc/host/sdhci-tegra.c
+> > > > > @@ -116,6 +116,8 @@
+> > > > >   */
+> > > > >  #define NVQUIRK_HAS_TMCLK                              BIT(10)
+> > > > >
+> > > > > +#define NVQUIRK_HAS_ANDROID_GPT_SECTOR                 BIT(11)
+> > > > > +
+> > > > >  /* SDMMC CQE Base Address for Tegra Host Ver 4.1 and Higher */
+> > > > >  #define SDHCI_TEGRA_CQE_BASE_ADDR                      0xF000
+> > > > >
+> > > > > @@ -1361,6 +1363,7 @@ static const struct sdhci_tegra_soc_data soc_data_tegra20 = {
+> > > > >         .pdata = &sdhci_tegra20_pdata,
+> > > > >         .dma_mask = DMA_BIT_MASK(32),
+> > > > >         .nvquirks = NVQUIRK_FORCE_SDHCI_SPEC_200 |
+> > > > > +                   NVQUIRK_HAS_ANDROID_GPT_SECTOR |
+> > > > >                     NVQUIRK_ENABLE_BLOCK_GAP_DET,
+> > > > >  };
+> > > > >
+> > > > > @@ -1390,6 +1393,7 @@ static const struct sdhci_tegra_soc_data soc_data_tegra30 = {
+> > > > >         .nvquirks = NVQUIRK_ENABLE_SDHCI_SPEC_300 |
+> > > > >                     NVQUIRK_ENABLE_SDR50 |
+> > > > >                     NVQUIRK_ENABLE_SDR104 |
+> > > > > +                   NVQUIRK_HAS_ANDROID_GPT_SECTOR |
+> > > > >                     NVQUIRK_HAS_PADCALIB,
+> > > > >  };
+> > > > >
+> > > > > @@ -1422,6 +1426,7 @@ static const struct sdhci_pltfm_data sdhci_tegra114_pdata = {
+> > > > >  static const struct sdhci_tegra_soc_data soc_data_tegra114 = {
+> > > > >         .pdata = &sdhci_tegra114_pdata,
+> > > > >         .dma_mask = DMA_BIT_MASK(32),
+> > > > > +       .nvquirks = NVQUIRK_HAS_ANDROID_GPT_SECTOR,
+> > > > >  };
+> > > > >
+> > > > >  static const struct sdhci_pltfm_data sdhci_tegra124_pdata = {
+> > > > > @@ -1438,6 +1443,7 @@ static const struct sdhci_pltfm_data sdhci_tegra124_pdata = {
+> > > > >  static const struct sdhci_tegra_soc_data soc_data_tegra124 = {
+> > > > >         .pdata = &sdhci_tegra124_pdata,
+> > > > >         .dma_mask = DMA_BIT_MASK(34),
+> > > > > +       .nvquirks = NVQUIRK_HAS_ANDROID_GPT_SECTOR,
+> > > > >  };
+> > > > >
+> > > > >  static const struct sdhci_ops tegra210_sdhci_ops = {
+> > > > > @@ -1590,6 +1596,38 @@ static int sdhci_tegra_add_host(struct sdhci_host *host)
+> > > > >         return ret;
+> > > > >  }
+> > > > >
+> > > > > +static int sdhci_tegra_alternative_gpt_sector(struct mmc_card *card,
+> > > > > +                                             sector_t *gpt_sector)
+> > > > > +{
+> > > > > +       unsigned int boot_sectors_num;
+> > > > > +
+> > > > > +       /* filter out unrelated cards */
+> > > > > +       if (card->ext_csd.rev < 3 ||
+> > > > > +           !mmc_card_mmc(card) ||
+> > > > > +           !mmc_card_is_blockaddr(card) ||
+> > > > > +            mmc_card_is_removable(card->host))
+> > > > > +               return -ENOENT;
+> > > > > +
+> > > > > +       /*
+> > > > > +        * eMMC storage has two special boot partitions in addition to the
+> > > > > +        * main one.  NVIDIA's bootloader linearizes eMMC boot0->boot1->main
+> > > > > +        * accesses, this means that the partition table addresses are shifted
+> > > > > +        * by the size of boot partitions.  In accordance with the eMMC
+> > > > > +        * specification, the boot partition size is calculated as follows:
+> > > > > +        *
+> > > > > +        *      boot partition size = 128K byte x BOOT_SIZE_MULT
+> > > > > +        *
+> > > > > +        * Calculate number of sectors occupied by the both boot partitions.
+> > > > > +        */
+> > > > > +       boot_sectors_num = card->ext_csd.raw_boot_mult * SZ_128K /
+> > > > > +                          SZ_512 * MMC_NUM_BOOT_PARTITION;
+> > > > > +
+> > > > > +       /* Defined by NVIDIA and used by Android devices. */
+> > > > > +       *gpt_sector = card->ext_csd.sectors - boot_sectors_num - 1;
+> > > > > +
+> > > > > +       return 0;
+> > > > > +}
+> > > >
+> > > > I suggest you move this code into the mmc core/block layer instead (it
+> > > > better belongs there).
+> > > >
+> > > > Additionally, let's add a new host cap, MMC_CAP_ALTERNATIVE_GPT, to
+> > > > let the core know when it should use the code above.
+> > >
+> > > Couldn't a generic "alternative GPT" mean pretty much anything? As far
+> > > as I know this is very specific to a series of Tegra chips and firmware
+> > > running on them. On some of these devices you can even replace the OEM
+> > > firmware by something custom that's less quirky.
+> >
+> > Good point!
+> >
+> > Perhaps naming the cap MMC_CAP_TEGRA_GPT would make this more clear.
+>
+> Yeah, that sounds like a better name. Or if people are hung up on
+> "alternative", perhaps MMC_CAP_ALTERNATIVE_GPT_TEGRA.
 
+That works too. Dmitry can pick what he prefers.
 
-Le 20/08/2021 à 09:49, Michael Ellerman a écrit :
-> Kees Cook <keescook@chromium.org> writes:
->> In preparation for FORTIFY_SOURCE performing compile-time and run-time
->> field bounds checking for memset(), avoid intentionally writing across
->> neighboring fields.
->>
->> Add a struct_group() for the spe registers so that memset() can correctly reason
->> about the size:
->>
->>     In function 'fortify_memset_chk',
->>         inlined from 'restore_user_regs.part.0' at arch/powerpc/kernel/signal_32.c:539:3:
->>>> include/linux/fortify-string.h:195:4: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
->>       195 |    __write_overflow_field();
->>           |    ^~~~~~~~~~~~~~~~~~~~~~~~
->>
->> Cc: Michael Ellerman <mpe@ellerman.id.au>
->> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> Cc: Paul Mackerras <paulus@samba.org>
->> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
->> Cc: Sudeep Holla <sudeep.holla@arm.com>
->> Cc: linuxppc-dev@lists.ozlabs.org
->> Reported-by: kernel test robot <lkp@intel.com>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>   arch/powerpc/include/asm/processor.h | 6 ++++--
->>   arch/powerpc/kernel/signal_32.c      | 6 +++---
->>   2 files changed, 7 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/powerpc/include/asm/processor.h b/arch/powerpc/include/asm/processor.h
->> index f348e564f7dd..05dc567cb9a8 100644
->> --- a/arch/powerpc/include/asm/processor.h
->> +++ b/arch/powerpc/include/asm/processor.h
->> @@ -191,8 +191,10 @@ struct thread_struct {
->>   	int		used_vsr;	/* set if process has used VSX */
->>   #endif /* CONFIG_VSX */
->>   #ifdef CONFIG_SPE
->> -	unsigned long	evr[32];	/* upper 32-bits of SPE regs */
->> -	u64		acc;		/* Accumulator */
->> +	struct_group(spe,
->> +		unsigned long	evr[32];	/* upper 32-bits of SPE regs */
->> +		u64		acc;		/* Accumulator */
->> +	);
->>   	unsigned long	spefscr;	/* SPE & eFP status */
->>   	unsigned long	spefscr_last;	/* SPEFSCR value on last prctl
->>   					   call or trap return */
->> diff --git a/arch/powerpc/kernel/signal_32.c b/arch/powerpc/kernel/signal_32.c
->> index 0608581967f0..77b86caf5c51 100644
->> --- a/arch/powerpc/kernel/signal_32.c
->> +++ b/arch/powerpc/kernel/signal_32.c
->> @@ -532,11 +532,11 @@ static long restore_user_regs(struct pt_regs *regs,
->>   	regs_set_return_msr(regs, regs->msr & ~MSR_SPE);
->>   	if (msr & MSR_SPE) {
->>   		/* restore spe registers from the stack */
->> -		unsafe_copy_from_user(current->thread.evr, &sr->mc_vregs,
->> -				      ELF_NEVRREG * sizeof(u32), failed);
->> +		unsafe_copy_from_user(&current->thread.spe, &sr->mc_vregs,
->> +				      sizeof(current->thread.spe), failed);
-> 
-> This makes me nervous, because the ABI is that we copy ELF_NEVRREG *
-> sizeof(u32) bytes, not whatever sizeof(current->thread.spe) happens to
-> be.
-> 
-> ie. if we use sizeof an inadvertent change to the fields in
-> thread_struct could change how many bytes we copy out to userspace,
-> which would be an ABI break.
-> 
-> And that's not that hard to do, because it's not at all obvious that the
-> size and layout of fields in thread_struct affects the user ABI.
-> 
-> At the same time we don't want to copy the right number of bytes but
-> the wrong content, so from that point of view using sizeof is good :)
-> 
-> The way we handle it in ptrace is to have BUILD_BUG_ON()s to verify that
-> things match up, so maybe we should do that here too.
-> 
-> ie. add:
-> 
-> 	BUILD_BUG_ON(sizeof(current->thread.spe) == ELF_NEVRREG * sizeof(u32));
+>
+> > > I'm not aware of anyone else employing this kind of quirk, so I don't
+> > > want anyone to get any ideas that this is a good thing. Putting it into
+> > > the core runs the risk of legitimizing this.
+> >
+> > I certainly don't want to legitimize this. But no matter what, that is
+> > exactly what we are doing, anyways.
+>
+> I think there's a difference between supporting a quirk and legitimizing
+> it. I certainly would hate for anyone to come across this "feature" and
+> then go: "Oh, this is neat, let's implement this on our new platform!".
+>
+> > In summary, I still prefer code to be put in their proper layers, and
+> > there aren't any host specific things going on here, except for
+> > parsing a compatible string.
+>
+> Fair enough. Perhaps if we put enough warnings in the comments
+> surrounding this and are vigilant enough during code review we can
+> prevent this from proliferating. Obviously, once somebody implements
+> this in their flash/boot stack, it can become difficult to change it,
+> so by the time we get to review the kernel bits it might already be
+> set in stone.
 
-You mean != I guess ?
+Sure, good idea. Some recommendations in the form of comments in the
+code would be nice.
 
+>
+> Then again, like you hinted at already, once we support it, we support
+> it. So no real harm is done if anyone copies this.
+>
+> I don't exactly know how this came about in the first place, but it's
+> pretty exotic, so I doubt that anyone else will come up with something
+> like this anytime soon.
 
-> 
-> 
-> Not sure if you are happy doing that as part of this patch. I can always
-> do it later if not.
-> 
-> cheers
-> 
+Hopefully, but who knows. :-)
+
+In the end, I think a lot of these homebrewed flash layouts, have been
+invented to store bootbinararies in a robust way, tolerating data loss
+and sudden power failures.
+
+That said, let me take the opportunity to highlight the work
+ARM/Linaro is doing on EBBR [1]. We should have done that many years
+ago, but better late than never.
+
+Kind regards
+Uffe
+
+[1] EBBR - Embedded Base Boot Requirements
+https://github.com/ARM-software/ebbr
