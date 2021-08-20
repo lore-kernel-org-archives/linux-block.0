@@ -2,81 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54FE8C43214
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 13:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00201C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 13:44:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D11460F91
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 13:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC27C61130
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 13:44:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240686AbhHTNCq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 09:02:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42578 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240685AbhHTNCq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 09:02:46 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 60A9660F39;
-        Fri, 20 Aug 2021 13:02:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629464528;
-        bh=XmK3LL/kczQ8Z+mWS0jnuPNaTKva71BKQybVqIajn2U=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=aYMABfEHFn+7Kxh2/MCRF/AHSGEXnmm1wwYZV/SiISnuS7QAg8vC8A8gHUcJQHHJU
-         jndvWKCbmKREp+Q+csliLWq1xfVo9N1ThE9t9PC3acSXLZUZd8ZV+43etboNIfFSU4
-         elTORRr93PV1FUprfZYqHAQtChsRVKZLcib11SGIunO2FEuIUTOfXEmOzVFWIIAfpi
-         Gpu4L7iSStDO8sT6ED1OTcs1Qu/7AmVe3IQTNXsGFPhv2pIFnV1eYeNYrTX8r8c+XZ
-         KZt7w4RnLsX1Bh7LiMJY7mFit8tljzKmeylhW39zI5+LMFsGOrnGgg9dGOurKa5wA1
-         /AbeTWLFaERiQ==
-Date:   Fri, 20 Aug 2021 15:02:03 +0200 (CEST)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-cc:     linux-kernel@vger.kernel.org,
-        Stefan Achatz <erazor_de@users.sourceforge.net>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        linux-input@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 55/63] HID: roccat: Use struct_group() to zero
- kone_mouse_event
-In-Reply-To: <20210818060533.3569517-56-keescook@chromium.org>
-Message-ID: <nycvar.YFH.7.76.2108201501510.15313@cbobk.fhfr.pm>
-References: <20210818060533.3569517-1-keescook@chromium.org> <20210818060533.3569517-56-keescook@chromium.org>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        id S231202AbhHTNp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 09:45:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57499 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232665AbhHTNp2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Aug 2021 09:45:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629467090;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a+ZiHy0S2JzjGTtry4ktJ98yuVUDhxplVu+BcUWdd38=;
+        b=CcXCwajz8mWmteEy63fET0Xt0fRhxyL8tDRc0Kkwbx3bgABkQbwKRjpxGE5DvIWX/l1CGj
+        7Ebl+srftwOk43KT42EtQv8R5sL9pgKlJejvNIfl3/1mFy0e1kl1oiKfYjwbff8CDPXUFk
+        2iq2Yz/YFELuoORtA5UpNQtPDGBPxeE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-IPnf2KVKP76iHbEqplX-Sw-1; Fri, 20 Aug 2021 09:44:46 -0400
+X-MC-Unique: IPnf2KVKP76iHbEqplX-Sw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C53F6192D785;
+        Fri, 20 Aug 2021 13:44:44 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D9D315D741;
+        Fri, 20 Aug 2021 13:44:23 +0000 (UTC)
+Date:   Fri, 20 Aug 2021 21:42:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        blankburian@uni-muenster.de
+Subject: Re: [PATCH 8/9] block: hold a request_queue reference for the
+ lifetime of struct gendisk
+Message-ID: <YR+xYi3VX8MFilud@T590>
+References: <20210816131910.615153-1-hch@lst.de>
+ <20210816131910.615153-9-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210816131910.615153-9-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 17 Aug 2021, Kees Cook wrote:
+On Mon, Aug 16, 2021 at 03:19:09PM +0200, Christoph Hellwig wrote:
+> Acquire the queue ref dropped in disk_release in __blk_alloc_disk so any
+> allocate gendisk always has a queue reference.
 
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memset(), avoid intentionally writing across
-> neighboring fields.
-> 
-> Add struct_group() to mark region of struct kone_mouse_event that should
-> be initialized to zero.
-> 
-> Cc: Stefan Achatz <erazor_de@users.sourceforge.net>
-> Cc: Jiri Kosina <jikos@kernel.org>
-> Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-> Cc: linux-input@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+BTW, today Markus reported that request queue is released when the
+disk is still live.
 
-Applied, thank you Kees.
+And looks it is triggered when running virtio-scsi hotplug from qemu
+side, and the reason could be that we grab the request queue refcount
+after disk is added to driver core, so there is small race window in
+which the request queue is released before we grab it in __device_add_disk().
 
--- 
-Jiri Kosina
-SUSE Labs
+I guess this patch could fix the issue, but it is hard to verify
+since it takes days to reproduce.
+
+
+Thanks,
+Ming
 
