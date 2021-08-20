@@ -2,147 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDC6C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 20:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C7BFC4320E
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 21:18:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E083610FF
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 20:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C24A6115C
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 21:18:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238656AbhHTUVl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 16:21:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57502 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238717AbhHTUVl (ORCPT
+        id S240465AbhHTVTL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 17:19:11 -0400
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:43868 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231200AbhHTVTK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 16:21:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629490862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=e0xk0PCgbvrI9oL4egy0zV/DTKLD6KkoLQ6vPavMKGE=;
-        b=jCCL2WHwOt2USIMK9PuQ4i/CjYpB7oKqKJMUcsj768JoJ5kDC8s2m5QjNSCUUlKb0O7qwa
-        LOsVtmKJcRiFWBN25Mjyf5ftmi3nV9BSpw1/SrqI6NuT/7tL9jjUBYlIW25xqe4tPaCaOd
-        dq/OpVHv+wVrfhnk90sODGau0Ei3m4s=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-lk__hVGwNayuwSE3bw0Dtw-1; Fri, 20 Aug 2021 16:19:27 -0400
-X-MC-Unique: lk__hVGwNayuwSE3bw0Dtw-1
-Received: by mail-qk1-f200.google.com with SMTP id x19-20020a05620a099300b003f64d79cbbaso1548998qkx.7
-        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 13:19:27 -0700 (PDT)
+        Fri, 20 Aug 2021 17:19:10 -0400
+Received: by mail-pj1-f42.google.com with SMTP id qe12-20020a17090b4f8c00b00179321cbae7so8182281pjb.2;
+        Fri, 20 Aug 2021 14:18:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=e0xk0PCgbvrI9oL4egy0zV/DTKLD6KkoLQ6vPavMKGE=;
-        b=AaBxoLxnM8GySH3D/+GGiSPKX235YEJGB88ftZhRtwgVMIBHM+Etw963aBZcupxek8
-         Yol3qB+zl6B5kxDIky3nFc5epdcWITf4DLECUSYIh/dLYFvAfxntcsVki7+7h4F3rAE+
-         YRyWQiPiioENRVhzrY81cLO81qmLPmu4umnzIm4qm8UUqIKrZrpiKaP6i9cdC+22oY2c
-         Ho6JCku3R3LkRrqZrSEhAFmBX6ho3k3A2oSLNmh1K132xRlm7SiQcYhYRQW0+O//KDpn
-         eobmncHjoPYsSbzUoLPrxZOEzLXG0f0QafICjuG+Ce3nlK6woVddsDaWHwJ5w1AspDZz
-         03mQ==
-X-Gm-Message-State: AOAM533SM/YvOuvo1QMBpg9uFeq12VRowqkfVImnSbS+tmLjMOjeOgT7
-        HH4B1/jNii06qNkH7jWbkVGHLUROaPcqqiTx0OhPMh4OkxfchOo78v+S/PvZLBES+WqJOZpzONj
-        tdGMcEDbxUk9xqN5la4DF+A==
-X-Received: by 2002:ae9:f701:: with SMTP id s1mr4317133qkg.223.1629490766944;
-        Fri, 20 Aug 2021 13:19:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyb2iDL3pszKH41Z1jgPp9S39r1QoXK1jvTsWR2PAHnl9VBPP2M+hZZXFZGgTA1ObYjix4Usw==
-X-Received: by 2002:ae9:f701:: with SMTP id s1mr4317111qkg.223.1629490766730;
-        Fri, 20 Aug 2021 13:19:26 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id a14sm2768090qtb.57.2021.08.20.13.19.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Aug 2021 13:19:26 -0700 (PDT)
-Date:   Fri, 20 Aug 2021 16:19:25 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Tushar Sugandhi <tusharsu@linux.microsoft.com>
-Cc:     dm-devel@redhat.com, agk@redhat.com, zohar@linux.ibm.com,
-        linux-integrity@vger.kernel.org, sfr@canb.auug.org.au,
-        public@thson.de, nramas@linux.microsoft.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/6] updates to device mapper target measurement using ima
-Message-ID: <YSAOTX+TQwaCUeCn@redhat.com>
-References: <20210813213801.297051-1-tusharsu@linux.microsoft.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ghNGDEZc2SSWn9VvNAd7fmG9UBe/rSvbMP1W9zaThGE=;
+        b=SEnLEQUxIVibXs6otREF5t6EJrIKF+27lrW0UalWPjSXnywwKpVoTrsxaDyS8ckJNe
+         rnxHDUBsRsI7ha1rP9hY4iWZBwH52FldONkaaEvXRzyWoxjQfYhTjh2g/Mo+At/sbTZW
+         piy2N7X8a9COYSMgqDahU45TKSd62k8se4jiZqqmOr+4kKdp0xUEY2cGvUvgmlkbuTO9
+         k8he07q9U+3M4ERnB5kG1saWA1FAHDqaDs29skX2u0+x44dEnalCXWXBkG70oF2tMH7v
+         B4MElaILZjlAF9ZqQ+71gp3FxBnBi4oHJYvHqY9Qw8C4N5FhJPfFN6L+qGJ5CnAj6N0N
+         T7fg==
+X-Gm-Message-State: AOAM532zunrGXnJrobEelonoVeZiSfvkxb2i0/IWiBHFtxIqURQW8+pm
+        9+E5OO5FI65Nwo4op/dkDYo=
+X-Google-Smtp-Source: ABdhPJzuE+NZzfM/vev5NRgk1CFObdVgW7MtwdoY7ko+PcKgdRS+PzinaHKAfWWwgZcHMP+PbGE5lA==
+X-Received: by 2002:a17:90a:4a95:: with SMTP id f21mr6714960pjh.122.1629494311917;
+        Fri, 20 Aug 2021 14:18:31 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:ddfe:8579:6783:9ed8])
+        by smtp.gmail.com with ESMTPSA id 8sm8164521pfo.153.2021.08.20.14.18.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Aug 2021 14:18:31 -0700 (PDT)
+Subject: Re: [PATCH 3/7] block: copy offload support infrastructure
+To:     Kanchan Joshi <joshiiitr@gmail.com>
+Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>, kch@kernel.org,
+        mpatocka@redhat.com, djwong@kernel.org, agk@redhat.com,
+        Selva Jove <selvajove@gmail.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>, nitheshshetty@gmail.com,
+        KANCHAN JOSHI <joshi.k@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
+ <CGME20210817101758epcas5p1ec353b3838d64654e69488229256d9eb@epcas5p1.samsung.com>
+ <20210817101423.12367-4-selvakuma.s1@samsung.com>
+ <ad3561b9-775d-dd4d-0d92-6343440b1f8f@acm.org>
+ <CA+1E3rK2ULVajQRkNTZJdwKoqBeGvkfoVYNF=WyK6Net85YkhA@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <fb9931ae-de27-820a-1333-f24e020913ff@acm.org>
+Date:   Fri, 20 Aug 2021 14:18:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210813213801.297051-1-tusharsu@linux.microsoft.com>
+In-Reply-To: <CA+1E3rK2ULVajQRkNTZJdwKoqBeGvkfoVYNF=WyK6Net85YkhA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 13 2021 at  5:37P -0400,
-Tushar Sugandhi <tusharsu@linux.microsoft.com> wrote:
+On 8/20/21 3:39 AM, Kanchan Joshi wrote:
+> Bart, Mikulas
+> 
+> On Tue, Aug 17, 2021 at 10:44 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>
+>> On 8/17/21 3:14 AM, SelvaKumar S wrote:
+>>> Introduce REQ_OP_COPY, a no-merge copy offload operation. Create
+>>> bio with control information as payload and submit to the device.
+>>> Larger copy operation may be divided if necessary by looking at device
+>>> limits. REQ_OP_COPY(19) is a write op and takes zone_write_lock when
+>>> submitted to zoned device.
+>>> Native copy offload is not supported for stacked devices.
+>>
+>> Using a single operation for copy-offloading instead of separate
+>> operations for reading and writing is fundamentally incompatible with
+>> the device mapper. I think we need a copy-offloading implementation that
+>> is compatible with the device mapper.
+>>
+> 
+> While each read/write command is for a single contiguous range of
+> device, with simple-copy we get to operate on multiple discontiguous
+> ranges, with a single command.
+> That seemed like a good opportunity to reduce control-plane traffic
+> (compared to read/write operations) as well.
+> 
+> With a separate read-and-write bio approach, each source-range will
+> spawn at least one read, one write and eventually one SCC command. And
+> it only gets worse as there could be many such discontiguous ranges (for
+> GC use-case at least) coming from user-space in a single payload.
+> Overall sequence will be
+> - Receive a payload from user-space
+> - Disassemble into many read-write pair bios at block-layer
+> - Assemble those (somehow) in NVMe to reduce simple-copy commands
+> - Send commands to device
+> 
+> We thought payload could be a good way to reduce the
+> disassembly/assembly work and traffic between block-layer to nvme.
+> How do you see this tradeoff?  What seems necessary for device-mapper
+> usecase, appears to be a cost when device-mapper isn't used.
+> Especially for SCC (since copy is within single ns), device-mappers
+> may not be too compelling anyway.
+> 
+> Must device-mapper support be a requirement for the initial support atop SCC?
+> Or do you think it will still be a progress if we finalize the
+> user-space interface to cover all that is foreseeable.And for
+> device-mapper compatible transport between block-layer and NVMe - we
+> do it in the later stage when NVMe too comes up with better copy
+> capabilities?
 
-> 
-> There were several improvements suggested for the original device mapper
-> target measurement patch series [1].
-> 
-> Those improvement suggestions include: 
->  - Prefixing hashes for the DM tables being measured in ima log with the
->    hash algorithm.
->  - Adding version information for DM related events being measured in the
->    ima log.
->  - Prefixing DM related event names with "dm_".
->  - Including the verity target attribute - "root_hash_sig_key_desc"
->    in the ima measurement log.
-> 
-> This series incorporates the above suggestions.
-> 
-> This series also has the following fixes:
->  - Adding a one-time warning to dmesg during dm_init if
->    CONFIG_IMA_DISABLE_HTABLE is set to 'n'.
->  - Updating 'integrity' target to remove the duplicate measurement of
->    the attribute "mode=%c".
->  - Indexing various attributes in 'multipath' target, and adding
->    "nr_priority_groups=%u" attribute to the measurements.
->  - Fixing 'make htmldocs' warnings in dm-ima.rst.
->  - Adding missing documentation for the targets - 'cache', 'integrity',
->    'multipath', and 'snapshot' in dm-ima.rst.
->  - Updating dm-ima.rst documentation with the grammar for various DM
->    events and targets in Backus Naur form.
->  - Updating dm-ima.rst documentation to be consistent with the code
->    changes described above.
-> 
-> This series is based on top of the following git repo/branch/commit:
->  Repo: https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
->  Branch: dm-5.15
->  Commit: commit 5a2a33884f0b ("dm crypt: Avoid percpu_counter spinlock contention in crypt_page_alloc()")
-> 
-> 
-> [1] https://patchwork.kernel.org/project/dm-devel/cover/20210713004904.8808-1-tusharsu@linux.microsoft.com/
-> 
-> Tushar Sugandhi (6):
->   dm ima: prefix dm table hashes in ima log with hash algorithm
->   dm ima: add version info to dm related events in ima log
->   dm ima: prefix ima event name related to device mapper with dm_
->   dm ima: add a warning in dm_init if duplicate ima events are not
->     measured
->   dm ima: update dm target attributes for ima measurements
->   dm ima: update dm documentation for ima measurement support
+Hi Kanchan,
 
-Hi,
-
-I reviewed and staged these changes in dm-5.15 (and for-next) with
-minimal tweaks. Really just some whitespace and a simplification of
-the conditional for the warning in dm_init().
-
-Please make sure that you manually apply Christoph's fix for the issue
-you reported earlier in the week, you were cc'd on the ultimate fix
-which has a different patch header than this patch but on a code level
-it is identical (and only patch that landed on a public mailing list
-due to typo in linux-block email address when hch sent the final fix):
-https://listman.redhat.com/archives/dm-devel/2021-August/msg00154.html
-
-It is an issue that'll linger in the dm-5.15 because I cannot rebase
-at this late hour even once Jens picks the fix up into the
-linux-block tree.
+These days there might be more systems that run the device mapper on top 
+of the NVMe driver or a SCSI driver than systems that do use the device 
+mapper. It is common practice these days to use dm-crypt on personal 
+workstations and laptops. LVM (dm-linear) is popular because it is more 
+flexible than a traditional partition table. Android phones use 
+dm-verity on top of hardware encryption. In other words, not supporting 
+the device mapper means that a very large number of use cases is 
+excluded. So I think supporting the device mapper from the start is 
+important, even if that means combining individual bios at the bottom of 
+the storage stack into simple copy commands.
 
 Thanks,
-Mike
+
+Bart.
 
