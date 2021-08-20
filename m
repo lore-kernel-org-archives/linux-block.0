@@ -2,102 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 214F3C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 06:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EED3C4320E
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 07:49:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 010B36108E
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 06:13:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 131FA610A0
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 07:49:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235390AbhHTGOB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 02:14:01 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:49886 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235243AbhHTGOA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 02:14:00 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        id S238646AbhHTHuY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 03:50:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:36029 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238603AbhHTHuY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Aug 2021 03:50:24 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id ED4C7220D5;
-        Fri, 20 Aug 2021 06:13:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629440001; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Sohk8MoRnkOjCLDoFVhXeDt7nB25Cs/215UIkzNZbB8=;
-        b=c3m60VJWDqi6ZHvSZisEAifit+a5CBeLotGNRcaeB7wHF7aAs9BQUoBBMEkgMHpuHi2F58
-        6ZVYnNQkRlt9Bi43kiIwPp0A3LBQJowSl18LkFGBxg94qBiV2WUX2+lGqi82LwdiYpjnHU
-        EkvgNxf+8VO3UpZjXFu53ssgj722jH8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629440001;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Sohk8MoRnkOjCLDoFVhXeDt7nB25Cs/215UIkzNZbB8=;
-        b=Y7VCfZZuvmQcZlYWjxrijF+p5t8/TbqGQxBgHFFeVmW9PWgdLCRPJPpsQ3oSX9ayg96a3V
-        ZLF4oN6QLb/fWYAg==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 74C8213883;
-        Fri, 20 Aug 2021 06:13:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id y/oSGgFIH2GFLwAAGKfGzw
-        (envelope-from <hare@suse.de>); Fri, 20 Aug 2021 06:13:21 +0000
-Subject: Re: [PATCH 11/11] null_blk: add error handling support for add_disk()
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org
-References: <20210818144542.19305-1-hch@lst.de>
- <20210818144542.19305-12-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <7619da30-da5e-fe3b-e0b7-277a85d229af@suse.de>
-Date:   Fri, 20 Aug 2021 08:13:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GrYgn1dHhz9sW5;
+        Fri, 20 Aug 2021 17:49:41 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1629445784;
+        bh=J88K3uaWPTCJyDGiM5or1YoD8rBCAEgZEcryK0u/Zo8=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=Z88hVJChPLNbFu7va+/1tqYNPa130kSyesJQV170fqBHtyrBHgsoYQ2vG7jWAFenK
+         UnM2Xa2WgoEuieSkc1ZLVVCug9f3+zRWbhv+8Kwz9lJ0T0OnirC7rGiJCfhmiQugbk
+         Gsb7MIcErTNH7IqyHIXf4NSUrbbL24pfQhAXgxRcFTJzWh3imrJnTVx0viKKp/yGsL
+         l2OmzlfcafH3m4gmgvP4ByLj0MCm/9nnxFrtr8KESxwRDR7p6qbKr/nDLbVfTi5zPT
+         FKKzWNEL1TGEoS3kCLjjXXVT5+f+vjk1mCNrPw4HFdJEtcPLwmj4uEVdYODVh2zgGX
+         +3YZnoSC4+cKQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
+Cc:     Kees Cook <keescook@chromium.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        linuxppc-dev@lists.ozlabs.org, kernel test robot <lkp@intel.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 57/63] powerpc/signal32: Use struct_group() to zero
+ spe regs
+In-Reply-To: <20210818060533.3569517-58-keescook@chromium.org>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-58-keescook@chromium.org>
+Date:   Fri, 20 Aug 2021 17:49:35 +1000
+Message-ID: <877dggeesw.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20210818144542.19305-12-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/18/21 4:45 PM, Christoph Hellwig wrote:
-> From: Luis Chamberlain <mcgrof@kernel.org>
-> 
-> We never checked for errors on add_disk() as this function
-> returned void. Now that this is fixed, use the shiny new
-> error handling. The actual cleanup in case of error is
-> already handled by the caller of null_gendisk_register().
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Kees Cook <keescook@chromium.org> writes:
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memset(), avoid intentionally writing across
+> neighboring fields.
+>
+> Add a struct_group() for the spe registers so that memset() can correctly reason
+> about the size:
+>
+>    In function 'fortify_memset_chk',
+>        inlined from 'restore_user_regs.part.0' at arch/powerpc/kernel/signal_32.c:539:3:
+>>> include/linux/fortify-string.h:195:4: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+>      195 |    __write_overflow_field();
+>          |    ^~~~~~~~~~~~~~~~~~~~~~~~
+>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Cc: Sudeep Holla <sudeep.holla@arm.com>
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 > ---
->   drivers/block/null_blk/main.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+>  arch/powerpc/include/asm/processor.h | 6 ++++--
+>  arch/powerpc/kernel/signal_32.c      | 6 +++---
+>  2 files changed, 7 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/powerpc/include/asm/processor.h b/arch/powerpc/include/asm/processor.h
+> index f348e564f7dd..05dc567cb9a8 100644
+> --- a/arch/powerpc/include/asm/processor.h
+> +++ b/arch/powerpc/include/asm/processor.h
+> @@ -191,8 +191,10 @@ struct thread_struct {
+>  	int		used_vsr;	/* set if process has used VSX */
+>  #endif /* CONFIG_VSX */
+>  #ifdef CONFIG_SPE
+> -	unsigned long	evr[32];	/* upper 32-bits of SPE regs */
+> -	u64		acc;		/* Accumulator */
+> +	struct_group(spe,
+> +		unsigned long	evr[32];	/* upper 32-bits of SPE regs */
+> +		u64		acc;		/* Accumulator */
+> +	);
+>  	unsigned long	spefscr;	/* SPE & eFP status */
+>  	unsigned long	spefscr_last;	/* SPEFSCR value on last prctl
+>  					   call or trap return */
+> diff --git a/arch/powerpc/kernel/signal_32.c b/arch/powerpc/kernel/signal_32.c
+> index 0608581967f0..77b86caf5c51 100644
+> --- a/arch/powerpc/kernel/signal_32.c
+> +++ b/arch/powerpc/kernel/signal_32.c
+> @@ -532,11 +532,11 @@ static long restore_user_regs(struct pt_regs *regs,
+>  	regs_set_return_msr(regs, regs->msr & ~MSR_SPE);
+>  	if (msr & MSR_SPE) {
+>  		/* restore spe registers from the stack */
+> -		unsafe_copy_from_user(current->thread.evr, &sr->mc_vregs,
+> -				      ELF_NEVRREG * sizeof(u32), failed);
+> +		unsafe_copy_from_user(&current->thread.spe, &sr->mc_vregs,
+> +				      sizeof(current->thread.spe), failed);
 
-Cheers,
+This makes me nervous, because the ABI is that we copy ELF_NEVRREG *
+sizeof(u32) bytes, not whatever sizeof(current->thread.spe) happens to
+be.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+ie. if we use sizeof an inadvertent change to the fields in
+thread_struct could change how many bytes we copy out to userspace,
+which would be an ABI break.
+
+And that's not that hard to do, because it's not at all obvious that the
+size and layout of fields in thread_struct affects the user ABI.
+
+At the same time we don't want to copy the right number of bytes but
+the wrong content, so from that point of view using sizeof is good :)
+
+The way we handle it in ptrace is to have BUILD_BUG_ON()s to verify that
+things match up, so maybe we should do that here too.
+
+ie. add:
+
+	BUILD_BUG_ON(sizeof(current->thread.spe) == ELF_NEVRREG * sizeof(u32));
+
+
+Not sure if you are happy doing that as part of this patch. I can always
+do it later if not.
+
+cheers
