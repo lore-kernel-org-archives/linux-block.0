@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B41DAC4320A
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 04:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF46C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 05:22:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BBFB608FE
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 04:06:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07A6861051
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 05:22:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229888AbhHTEGo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 00:06:44 -0400
-Received: from verein.lst.de ([213.95.11.211]:39544 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229457AbhHTEGo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 00:06:44 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0EC686736F; Fri, 20 Aug 2021 06:06:05 +0200 (CEST)
-Date:   Fri, 20 Aug 2021 06:06:04 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 1/9] nvme: use blk_mq_alloc_disk
-Message-ID: <20210820040604.GB26305@lst.de>
-References: <20210816131910.615153-1-hch@lst.de> <20210816131910.615153-2-hch@lst.de> <YR7h0w6rJc9GYpaf@bombadil.infradead.org>
+        id S233661AbhHTFWk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 01:22:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49978 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232500AbhHTFWj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Aug 2021 01:22:39 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4567AC061575;
+        Thu, 19 Aug 2021 22:22:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l9q89ZWuhs36CiMrTpXwflYRe1/NvDwzZ/5qpa+mR4Q=; b=ShvOeGjjTYeoPrdQ2Kallr+avo
+        T0pwSWZjB777T32OEsWKA/KWYEJrxKmgBwAtaybAiTu2WfUsgw6mAf9VDxuYRtulgb9SUZz2eYqir
+        Q33KgSsqY4w5cDrQsPTQFrIIe1MSQadzewCfQNsHqBQ5lYSwCReS1mkHRHwbdvkvFXsXsAVHk8YwL
+        OwoS+kQX5Qj7zRRD9VSNo/yKd0ZMZtNV6Va96v/reFD8qJzTF9ITi6wXDC61qMTf4NxuczAbo84Q1
+        iIwpcKR2hrRnUAKBYvTfn2CN+66YaCBlrGXvflnJnSvOfkoAOI54lxXuk07cSoNCwLrOupVR+QU6I
+        syiaX0HA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mGwy2-0065Ud-EQ; Fri, 20 Aug 2021 05:21:32 +0000
+Date:   Fri, 20 Aug 2021 06:21:22 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     brookxu <brookxu.cn@gmail.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: use enumerate instead of integer in op_is_write()
+Message-ID: <YR870nMzpojlhR3l@infradead.org>
+References: <1629424512-29553-1-git-send-email-brookxu.cn@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YR7h0w6rJc9GYpaf@bombadil.infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <1629424512-29553-1-git-send-email-brookxu.cn@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 03:57:23PM -0700, Luis Chamberlain wrote:
-> >  		if (nvme_nvm_register(ns, disk->disk_name, node)) {
-> >  			dev_warn(ctrl->device, "LightNVM init failure\n");
-> > -			goto out_put_disk;
-> > +			goto out_unlink_ns;
-> >  		}
-> >  	}
+On Fri, Aug 20, 2021 at 09:55:12AM +0800, brookxu wrote:
+> From: Chunguang Xu <brookxu@tencent.com>
 > 
-> This hunk will fail because of the now removed NVME_QUIRK_LIGHTNVM. The
-> last part of the patch  then can be removed to apply to linux-next.
+> For mask operation, using enumerate may be safer than integer.
 
-So this is not in the for-5.15/block tree, just the drivers one.
-
-Jens, do you want to start a -late branch ontop of the block and drivers
-branches so that we can pre-resolve these mergeѕ?
+Except that we are explicitly checking for least significant bit as
+that is part of the encoding, not a specific enum value.
