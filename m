@@ -2,105 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F59C4338F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 15:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B56C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 15:26:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9481F60FDA
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 15:08:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E5B061214
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 15:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240958AbhHTPIs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 11:08:48 -0400
-Received: from verein.lst.de ([213.95.11.211]:41320 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238570AbhHTPIo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 11:08:44 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 20D2D6736F; Fri, 20 Aug 2021 17:08:04 +0200 (CEST)
-Date:   Fri, 20 Aug 2021 17:08:03 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [dm-devel] [PATCH 4/8] block: support delayed holder
- registration
-Message-ID: <20210820150803.GA490@lst.de>
-References: <20210804094147.459763-1-hch@lst.de> <20210804094147.459763-5-hch@lst.de> <20210814211309.GA616511@roeck-us.net> <20210815070724.GA23276@lst.de> <a8d66952-ee44-d3fa-d699-439415b9abfe@roeck-us.net> <20210816072158.GA27147@lst.de> <20210816141702.GA3449320@roeck-us.net>
+        id S241226AbhHTP1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 11:27:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241147AbhHTP1O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Aug 2021 11:27:14 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F0FC0698C7
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 08:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pbJvv4A9FM8VIR/Ol6q6b/S4QPVrH1l7eAzEUZ1W24U=; b=brI2tc488hLBXHNhQ7egC9s5SE
+        XsmmbufcXHtjZDc2VaTdQwxgZ1L1o15CFnlbUV90z/GfO/KZFYAeyawKPieVq39i+gGZ3On0c63Qs
+        TKVY64cMPWc1Rg2ONjmaZzBaA68fmJVHlBFayBsaXM+pLQW2DLYSMLytER8U57eaiJpxMrBBYlbTn
+        oZxoLPCpmTGDXmIz/ffrXwkZmec83PibkGGuh03oKghNOlCMt6T73CCARSHIh04ELUEQWH1YbDm8Z
+        mD6uYgVMxrLVYoErZlY52gjvp4nMtX6volbr+4+hiol7wsXBAiN0V5tK5uhRTLCAvPbkkl9bziLUv
+        uBKGfeNQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mH6Ka-006dic-UC; Fri, 20 Aug 2021 15:21:52 +0000
+Date:   Fri, 20 Aug 2021 16:21:16 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Douglas Miller <dougmill@linux.vnet.ibm.com>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH RESEND] block: sed-opal: Add ioctl to return device status
+Message-ID: <YR/IbHc5Mv826TQk@infradead.org>
+References: <c43a9295-1dad-fa0a-590d-0182bba643a1@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210816141702.GA3449320@roeck-us.net>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <c43a9295-1dad-fa0a-590d-0182bba643a1@linux.vnet.ibm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Please try the patch below:
+On Wed, Aug 18, 2021 at 07:22:09AM -0500, Douglas Miller wrote:
+> +++ b/block/sed-opal.c
+> @@ -75,7 +75,11 @@ struct parsed_resp {
+>  struct opal_dev {
+>  	bool supported;
+> +	bool locking_supported;
+> +	bool locking_enabled;
+> +	bool locked;
+>  	bool mbr_enabled;
+> +	bool mbr_done;
 
----
-From 7609266da56160d211662cd2fbe26570aad11b15 Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Fri, 20 Aug 2021 17:00:11 +0200
-Subject: mtd_blkdevs: don't hold del_mtd_blktrans_dev in
- blktrans_{open,release}
-
-There is nothing that this protects against except for slightly reducing
-the window when new opens can appear just before calling del_gendisk.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/mtd/mtd_blkdevs.c | 5 -----
- 1 file changed, 5 deletions(-)
-
-diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-index 44bea3f65060..6b81a1c9ccbe 100644
---- a/drivers/mtd/mtd_blkdevs.c
-+++ b/drivers/mtd/mtd_blkdevs.c
-@@ -207,7 +207,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
- 	if (!dev)
- 		return -ERESTARTSYS; /* FIXME: busy loop! -arnd*/
- 
--	mutex_lock(&mtd_table_mutex);
- 	mutex_lock(&dev->lock);
- 
- 	if (dev->open)
-@@ -233,7 +232,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
- unlock:
- 	dev->open++;
- 	mutex_unlock(&dev->lock);
--	mutex_unlock(&mtd_table_mutex);
- 	blktrans_dev_put(dev);
- 	return ret;
- 
-@@ -244,7 +242,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
- 	module_put(dev->tr->owner);
- 	kref_put(&dev->ref, blktrans_dev_release);
- 	mutex_unlock(&dev->lock);
--	mutex_unlock(&mtd_table_mutex);
- 	blktrans_dev_put(dev);
- 	return ret;
- }
-@@ -256,7 +253,6 @@ static void blktrans_release(struct gendisk *disk, fmode_t mode)
- 	if (!dev)
- 		return;
- 
--	mutex_lock(&mtd_table_mutex);
- 	mutex_lock(&dev->lock);
- 
- 	if (--dev->open)
-@@ -272,7 +268,6 @@ static void blktrans_release(struct gendisk *disk, fmode_t mode)
- 	}
- unlock:
- 	mutex_unlock(&dev->lock);
--	mutex_unlock(&mtd_table_mutex);
- 	blktrans_dev_put(dev);
- }
- 
--- 
-2.30.2
-
+Please switch all these bools (or u8s in the user space ABI) to
+flags with descriptive names on an u32 variable.
