@@ -2,87 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00201C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 13:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F59C4338F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 15:08:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC27C61130
-	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 13:44:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9481F60FDA
+	for <linux-block@archiver.kernel.org>; Fri, 20 Aug 2021 15:08:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbhHTNp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 09:45:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57499 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232665AbhHTNp2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 09:45:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629467090;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a+ZiHy0S2JzjGTtry4ktJ98yuVUDhxplVu+BcUWdd38=;
-        b=CcXCwajz8mWmteEy63fET0Xt0fRhxyL8tDRc0Kkwbx3bgABkQbwKRjpxGE5DvIWX/l1CGj
-        7Ebl+srftwOk43KT42EtQv8R5sL9pgKlJejvNIfl3/1mFy0e1kl1oiKfYjwbff8CDPXUFk
-        2iq2Yz/YFELuoORtA5UpNQtPDGBPxeE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-IPnf2KVKP76iHbEqplX-Sw-1; Fri, 20 Aug 2021 09:44:46 -0400
-X-MC-Unique: IPnf2KVKP76iHbEqplX-Sw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C53F6192D785;
-        Fri, 20 Aug 2021 13:44:44 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D9D315D741;
-        Fri, 20 Aug 2021 13:44:23 +0000 (UTC)
-Date:   Fri, 20 Aug 2021 21:42:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        blankburian@uni-muenster.de
-Subject: Re: [PATCH 8/9] block: hold a request_queue reference for the
- lifetime of struct gendisk
-Message-ID: <YR+xYi3VX8MFilud@T590>
-References: <20210816131910.615153-1-hch@lst.de>
- <20210816131910.615153-9-hch@lst.de>
+        id S240958AbhHTPIs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 11:08:48 -0400
+Received: from verein.lst.de ([213.95.11.211]:41320 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238570AbhHTPIo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Aug 2021 11:08:44 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 20D2D6736F; Fri, 20 Aug 2021 17:08:04 +0200 (CEST)
+Date:   Fri, 20 Aug 2021 17:08:03 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: Re: [dm-devel] [PATCH 4/8] block: support delayed holder
+ registration
+Message-ID: <20210820150803.GA490@lst.de>
+References: <20210804094147.459763-1-hch@lst.de> <20210804094147.459763-5-hch@lst.de> <20210814211309.GA616511@roeck-us.net> <20210815070724.GA23276@lst.de> <a8d66952-ee44-d3fa-d699-439415b9abfe@roeck-us.net> <20210816072158.GA27147@lst.de> <20210816141702.GA3449320@roeck-us.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210816131910.615153-9-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20210816141702.GA3449320@roeck-us.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 16, 2021 at 03:19:09PM +0200, Christoph Hellwig wrote:
-> Acquire the queue ref dropped in disk_release in __blk_alloc_disk so any
-> allocate gendisk always has a queue reference.
+Please try the patch below:
 
-BTW, today Markus reported that request queue is released when the
-disk is still live.
+---
+From 7609266da56160d211662cd2fbe26570aad11b15 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 20 Aug 2021 17:00:11 +0200
+Subject: mtd_blkdevs: don't hold del_mtd_blktrans_dev in
+ blktrans_{open,release}
 
-And looks it is triggered when running virtio-scsi hotplug from qemu
-side, and the reason could be that we grab the request queue refcount
-after disk is added to driver core, so there is small race window in
-which the request queue is released before we grab it in __device_add_disk().
+There is nothing that this protects against except for slightly reducing
+the window when new opens can appear just before calling del_gendisk.
 
-I guess this patch could fix the issue, but it is hard to verify
-since it takes days to reproduce.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/mtd/mtd_blkdevs.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-
-Thanks,
-Ming
+diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+index 44bea3f65060..6b81a1c9ccbe 100644
+--- a/drivers/mtd/mtd_blkdevs.c
++++ b/drivers/mtd/mtd_blkdevs.c
+@@ -207,7 +207,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
+ 	if (!dev)
+ 		return -ERESTARTSYS; /* FIXME: busy loop! -arnd*/
+ 
+-	mutex_lock(&mtd_table_mutex);
+ 	mutex_lock(&dev->lock);
+ 
+ 	if (dev->open)
+@@ -233,7 +232,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
+ unlock:
+ 	dev->open++;
+ 	mutex_unlock(&dev->lock);
+-	mutex_unlock(&mtd_table_mutex);
+ 	blktrans_dev_put(dev);
+ 	return ret;
+ 
+@@ -244,7 +242,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
+ 	module_put(dev->tr->owner);
+ 	kref_put(&dev->ref, blktrans_dev_release);
+ 	mutex_unlock(&dev->lock);
+-	mutex_unlock(&mtd_table_mutex);
+ 	blktrans_dev_put(dev);
+ 	return ret;
+ }
+@@ -256,7 +253,6 @@ static void blktrans_release(struct gendisk *disk, fmode_t mode)
+ 	if (!dev)
+ 		return;
+ 
+-	mutex_lock(&mtd_table_mutex);
+ 	mutex_lock(&dev->lock);
+ 
+ 	if (--dev->open)
+@@ -272,7 +268,6 @@ static void blktrans_release(struct gendisk *disk, fmode_t mode)
+ 	}
+ unlock:
+ 	mutex_unlock(&dev->lock);
+-	mutex_unlock(&mtd_table_mutex);
+ 	blktrans_dev_put(dev);
+ }
+ 
+-- 
+2.30.2
 
