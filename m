@@ -2,79 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D231C4320A
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 02:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4041C4338F
+	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 02:57:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1540E611C7
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 02:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D85F1610A3
+	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 02:57:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233055AbhHUC3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 22:29:45 -0400
-Received: from mail-il1-f200.google.com ([209.85.166.200]:40574 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231430AbhHUC3p (ORCPT
+        id S231513AbhHUC6e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 22:58:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229610AbhHUC6e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 22:29:45 -0400
-Received: by mail-il1-f200.google.com with SMTP id f13-20020a056e02168d00b002244a6aa233so6473593ila.7
-        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 19:29:06 -0700 (PDT)
+        Fri, 20 Aug 2021 22:58:34 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E59BC061575
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 19:57:55 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id h29so11428460ila.2
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 19:57:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=bnK6Durr7GpI1fh8t3az4Lpynl38WpxrWNykOMtfCOk=;
+        b=W2B0xR3tvuH28/mIALbALab8JTjcoNAsBaCJCNPYoeLvGffVQqPXIE+8zq1afpy/fg
+         qAQWFtLjM3ltu4VN2HHhK1pjpQJXX2ewDBHz14tniAE1vFIsMqIioqn4RJHq1IzrIM0n
+         uAm/EeNz0sbnqwqbAhbXqvpIPJPAqPoBwbpq0ZNAJ/UYK5p0Gru5WVDaoW+XX0KMZsCS
+         DVEkX+YlybzLhQGiQqArksJJGBs2Ocr5VFr/PDhD/xzBefWl45rgIgxBoL+yWpKf5VuU
+         OJ51MfNK2iIG1nS9enlLD9V4IaeVIiDMexl3H6sNuIvBFs+EI3Ae5Qq0vZtLLhqYe7f7
+         06CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=iHf8LUR6Ovn1Eydbqz2P3rlkkwnXm6QsDeIBC7GD3Qg=;
-        b=n9JymDLMzmTJNHl86UKSncz45wVcVKq2rdnExXz5elPmABsc8M3kBGP54O6mywSwTl
-         M7TEmxf7+4NtVcTM61xKDZA4Qt4az72WjcVfmeipMZd36amzQM3add4KglB4jHG3XLwa
-         N+QOhOJFgmwmQ5DjS6l2xkTISSPt8grHr24pGqMwg4MODkm+MJWz2jsVMHl1K+1QaQCT
-         DygI4nCnsrokG82w+Aeo38aimtLGUiVcyH0NoUuP4LlQi36macPGzv6Dpdhs9rQloGK7
-         WfFfciVAo/4l2M9U9lrd+dBiYkjLl3zKui92F6JnIDYy54c7SYMVj0vAXd8OroEQOs8H
-         QKNA==
-X-Gm-Message-State: AOAM531l350yqZbbeN7trULVjB702QcnHCsPndH1oSOfSAxCy4cWMpbP
-        rKX2HBV46r/KTvVL93vjf9R7zbKGZei2Tex8R8Inwvi3T0wT
-X-Google-Smtp-Source: ABdhPJzK0a8DAE41lfsQEjn583iPFBrbzLkXnZnYep9X4S+LuDPXekPfSUKswjhPhf9qYgtRx0WLpEqRtx7gWnRPEARQrCKJT9xa
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=bnK6Durr7GpI1fh8t3az4Lpynl38WpxrWNykOMtfCOk=;
+        b=MNP6ORmM45NC39C6JUxjONC9ukQ9476kIdJLQtt80Ygpx+Ndj5W0R25nEpOVCUq66r
+         0ayOqJfHd3OuLwfzkyWE8NadUW8e6TAzSHb0zkVRkhBO30sSK4/N9l9tMnVVoZFis3j1
+         TtukuNvph9p/pw7TT9o5EWNNVO1tYY91d1eJbOqqdTsxbS0U+5jLBKXY3dTsWcvGp6G/
+         9ZABe/4yFeRJ4XJ535Re/FGg7EEdTCB1aXLDI8sfzdmoAftLYZqPXFXrAxnQ2yjoy9gC
+         GoP2hT0VUXe882Tnz2x50QYNCrA5rAl/pyfUEQ793QHgplkjCI5E4lMvZ6spOmeNR6wF
+         ODgA==
+X-Gm-Message-State: AOAM530MsRUowjnsPppieeihMIxQDMmp4fm7blbAuY+U25pNaOM08szK
+        CS0To0SPR6fgqnxswPxTHOYg5oyYuhauvI41
+X-Google-Smtp-Source: ABdhPJxMFIo1Gk9pr6kxdDRH0VQbWUE0L0u802wYzBIgJBHbmj8oL8BShKNAApLvxUdktacJptksiQ==
+X-Received: by 2002:a92:d20d:: with SMTP id y13mr12835729ily.294.1629514674483;
+        Fri, 20 Aug 2021 19:57:54 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id m1sm4363346ilf.24.2021.08.20.19.57.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Aug 2021 19:57:54 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.14-rc7
+Message-ID: <d8ec384e-9c35-7a79-5bc3-14c8c0739e43@kernel.dk>
+Date:   Fri, 20 Aug 2021 20:57:52 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:5c8:: with SMTP id l8mr16040022ils.282.1629512946491;
- Fri, 20 Aug 2021 19:29:06 -0700 (PDT)
-Date:   Fri, 20 Aug 2021 19:29:06 -0700
-In-Reply-To: <00000000000000410c05c8e29289@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000552aaf05ca088c20@google.com>
-Subject: Re: [syzbot] KASAN: invalid-free in bdev_free_inode (2)
-From:   syzbot <syzbot+5fa698422954b6b9307b@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, balbi@kernel.org, corbet@lwn.net,
-        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        lorenzo@google.com, manish.narani@xilinx.com, maze@google.com,
-        netdev@vger.kernel.org, phind.uet@gmail.com,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+Hi Linus,
 
-commit 63d152149b2d0860ccf8c4e6596b6175b2b7ace6
-Author: Lorenzo Colitti <lorenzo@google.com>
-Date:   Wed Jan 13 23:42:22 2021 +0000
+Three fixes from Ming Lei that should go into 5.14:
 
-    usb: gadget: u_ether: support configuring interface names.
+- Fix for a kernel panic when iterating over tags for some cases where a
+  flush request is present, a regression in this cycle.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=155abcc1300000
-start commit:   d3432bf10f17 net: Support filtering interfaces on no master
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=175abcc1300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=135abcc1300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8075b2614f3db143
-dashboard link: https://syzkaller.appspot.com/bug?extid=5fa698422954b6b9307b
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=174ebaf6300000
+- Request timeout fix
 
-Reported-by: syzbot+5fa698422954b6b9307b@syzkaller.appspotmail.com
-Fixes: 63d152149b2d ("usb: gadget: u_ether: support configuring interface names.")
+- Fix flush request checking
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Please pull!
+
+
+The following changes since commit cddce01160582a5f52ada3da9626c052d852ec42:
+
+  nbd: Aovid double completion of a request (2021-08-13 09:46:48 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.14-2021-08-20
+
+for you to fetch changes up to a9ed27a764156929efe714033edb3e9023c5f321:
+
+  blk-mq: fix is_flush_rq (2021-08-17 20:17:34 -0600)
+
+----------------------------------------------------------------
+block-5.14-2021-08-20
+
+----------------------------------------------------------------
+Ming Lei (3):
+      blk-mq: don't grab rq's refcount in blk_mq_check_expired()
+      blk-mq: fix kernel panic during iterating over flush request
+      blk-mq: fix is_flush_rq
+
+ block/blk-core.c  |  1 -
+ block/blk-flush.c | 13 +++++++++++++
+ block/blk-mq.c    | 32 ++++++--------------------------
+ block/blk.h       |  6 +-----
+ 4 files changed, 20 insertions(+), 32 deletions(-)
+
+-- 
+Jens Axboe
+
