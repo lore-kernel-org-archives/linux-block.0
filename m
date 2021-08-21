@@ -2,99 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8AE5C4338F
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 03:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8828C4338F
+	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 03:17:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 840BA61178
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 03:15:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBA5961183
+	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 03:17:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232465AbhHUDPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Aug 2021 23:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39376 "EHLO
+        id S231847AbhHUDRo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Aug 2021 23:17:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbhHUDPi (ORCPT
+        with ESMTP id S231789AbhHUDRn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Aug 2021 23:15:38 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0BE8C061575
-        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 20:14:59 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id i7so14747101iow.1
-        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 20:14:59 -0700 (PDT)
+        Fri, 20 Aug 2021 23:17:43 -0400
+Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13DDBC061575
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 20:17:05 -0700 (PDT)
+Received: by mail-oo1-xc31.google.com with SMTP id f33-20020a4a89240000b029027c19426fbeso3479668ooi.8
+        for <linux-block@vger.kernel.org>; Fri, 20 Aug 2021 20:17:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
+        d=gmail.com; s=20161025;
+        h=sender:to:cc:references:from:subject:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CxUCvmjcBRFq4m4dqLAxpbGmHPHIelGpMmv1fs6RFQI=;
-        b=Hm6notkOzdrGazAxfSApq1eWmnoMDuhiH64VhYtuosajG8fnEDzJUOWWsM8nShTw+7
-         BJLiyuoPxi0jETPlqccE2q8n+1V0MbKnwr5TtOGOirLnzxWnKTnvIPG6Isf29A7OU2uK
-         KM7bzH59gnz1TcY7RFGOCZ2EuRbghAJ2tCl2fKP0uvsg6pizwZslHrd0vJ0YhDXZDY3T
-         TcMBMH4aTLHdrLibfUSyZzbzqQrQvvjgttWeK3r+ZDmJw4vqeFkr0WYa71i6DyiNTxRY
-         7Z4EJK2JQ2BcHC0Ish/WOd6iEOMaj9w0bU+XJeeiGNtGOEpxFKNSPLKPBfWLpmf1bPs+
-         M5JQ==
+        bh=MSn7rAHilGstrynTKOQuRFaHHLuxeNAIbh4aZ/yLE2M=;
+        b=b1cLw1NWAckGRZtttfnN7dH6CBO8ZJ4HEKbJjoytnyZrUasmEgvLn4FFFNPRk3FxW0
+         T+/V6LjoBJJiFGzTROOJ/EFdQvxRfG0FR/PHtz1jDpejLtcO7ObJRMC5RewV7CncuVKK
+         TNoYkPllS0Nu+CgW128gAHfCScGf4lv3aBa6vincwNHu455BYDC0gPg+Ymj/v0AcNyej
+         p6wPmX+sXkGsOA6JnFn1SAsEGmjV6NKuV8oFu1gJpbLRhUVDcQxzhkKdGrGWeqghuQCr
+         GSREUa8kZqcoGXqcfiM+UOMDe/SUXyBNSQhquy+aqR4fnnbLzmZnn76JyZfQXWoArtKd
+         NijA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:sender:to:cc:references:from:subject:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=CxUCvmjcBRFq4m4dqLAxpbGmHPHIelGpMmv1fs6RFQI=;
-        b=lZhvfWCqJy6CV5iF8+k4KfEGnYxNV0lkkBFp+WrmpvIlkTBGj4D6RCHPgxUQV2EI+N
-         LLD3rW+Gr3kBZmsdRmNHNvdcs/vyXhLQe1t248ewZmo4utKWzGcnry4MSKqtcxjN+drx
-         m5cru7QjJXPpt2iFjWSat7PFUwPf36DmMGxWriml+3GFPHsksOv/ZhjLUY6HgVgJINCh
-         GZmTtq6+3nm+i/KPQwMQQSp1rxhOgni7R9yCbSA2rUFHzWR7PsApXrVaRtt0FNxSw43m
-         9UPYs0I1BEw55mIUsTVlOhGCwj05WXlu19gEFK/UkovuYJBZMbFHj+Sxb0c30uxWF1FS
-         w1QQ==
-X-Gm-Message-State: AOAM531g0ESOVsUuDiJ6oiUxl73+rm6AilYKXEuUFAAJGRMJs/Ylqm7q
-        Kz/T6HE1tHblbVGuZAODAjqQjA==
-X-Google-Smtp-Source: ABdhPJzQtvXO2c651dfie5D6MxeCtD2vEpi+4+KSF18A2i1wUjVuxOR7Vz8d1X0yUXAvhWTDC/VcqQ==
-X-Received: by 2002:a5e:dc02:: with SMTP id b2mr17660736iok.197.1629515699335;
-        Fri, 20 Aug 2021 20:14:59 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id a17sm4739903ilm.27.2021.08.20.20.14.58
+        bh=MSn7rAHilGstrynTKOQuRFaHHLuxeNAIbh4aZ/yLE2M=;
+        b=n/Jr05mAD2H6D5/CLhC5aiDzg66hg5X/7UPaOoRriOI5f5emUqzrRHpkY8FdDtILbD
+         hpmZey0/j1k1nM/ESXgxuFrc32sPrtc6ajuwi4+wRfCGsClIfeYbToUdhXv/b9h/Vp13
+         FW4sQK54ijebgePh7JHJme5nEiZnj+a9RwmH5ww2m4BT2iWkds0skOZ0gESSSVbt+8eh
+         PpLqaLih4FwRy7SQlGZbeJD6EzEc+FMhC55SBi+u3CjKrZuhSWSHHn5T1MS66yniouVC
+         qtc8yglQ6dv2FAX3kyJZGNEldgD3LecsNUSxzdWkg92wHAsxN2PLFq+2Aofqm0tNwEEe
+         B0yQ==
+X-Gm-Message-State: AOAM533GMJoN+c2WTdYJYstjDnQznie5ayxoo+HjNXIJq8Iiax+J96TI
+        VoOfmu6JiNOtcaDNm44U5bY=
+X-Google-Smtp-Source: ABdhPJz5QoGE5JSa2c7qhLnCr2DfM5AAEX5WXbVUcUlWlBtw/2nBLJjOv+IU9Qi2MRv4sv3YLAZfdw==
+X-Received: by 2002:a4a:8d41:: with SMTP id x1mr18707795ook.46.1629515824292;
+        Fri, 20 Aug 2021 20:17:04 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id s35sm1892362otv.44.2021.08.20.20.17.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Aug 2021 20:14:58 -0700 (PDT)
-Subject: Re: block: add back the bd_holder_dir reference in
- bd_link_disk_holder
-To:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, tusharsu@linux.microsoft.com
-References: <20210820094929.444848-1-hch@lst.de> <YR/kdG/J0odIzGsF@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <86e6cbfc-997b-10b1-2547-0ec243d1ee1d@kernel.dk>
-Date:   Fri, 20 Aug 2021 21:14:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 20 Aug 2021 20:17:03 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+References: <20210804094147.459763-1-hch@lst.de>
+ <20210804094147.459763-5-hch@lst.de> <20210814211309.GA616511@roeck-us.net>
+ <20210815070724.GA23276@lst.de>
+ <a8d66952-ee44-d3fa-d699-439415b9abfe@roeck-us.net>
+ <20210816072158.GA27147@lst.de> <20210816141702.GA3449320@roeck-us.net>
+ <20210820150803.GA490@lst.de>
+From:   Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [dm-devel] [PATCH 4/8] block: support delayed holder registration
+Message-ID: <9c2943fd-b540-1f49-43c3-906cbaddd1a5@roeck-us.net>
+Date:   Fri, 20 Aug 2021 20:17:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <YR/kdG/J0odIzGsF@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210820150803.GA490@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/20/21 11:20 AM, Mike Snitzer wrote:
-> On Fri, Aug 20 2021 at  5:49P -0400,
-> Christoph Hellwig <hch@lst.de> wrote:
+On 8/20/21 8:08 AM, Christoph Hellwig wrote:
+> Please try the patch below:
 > 
->> This essentially reverts "block: remove the extra kobject reference in
->> bd_link_disk_holder".  That commit dropped the extra reference because
->> the condition in the comment can't be true.  But it turns out that
->> comment did not actually describe the problematic situation, so add
->> back the extra reference and document it properly.
->>
->> Fixes: fbd9a39542ec ("block: remove the extra kobject reference in bd_link_disk_holder")
->> Reported-by: Tushar Sugandhi <tusharsu@linux.microsoft.com>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>>From 7609266da56160d211662cd2fbe26570aad11b15 Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Fri, 20 Aug 2021 17:00:11 +0200
+> Subject: mtd_blkdevs: don't hold del_mtd_blktrans_dev in
+>   blktrans_{open,release}
 > 
-> Looks good, thanks.
-> (btw, your linux-block cc had a typo, Jens are you able to pick this fix up regardless?)
+> There is nothing that this protects against except for slightly reducing
+> the window when new opens can appear just before calling del_gendisk.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Yep, just did it manually.
+A cautious
 
--- 
-Jens Axboe
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+
+Cautious because -next is a bit broken right now and I can not run a complete
+test for all images.
+
+Guenter
+
+> ---
+>   drivers/mtd/mtd_blkdevs.c | 5 -----
+>   1 file changed, 5 deletions(-)
+> 
+> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+> index 44bea3f65060..6b81a1c9ccbe 100644
+> --- a/drivers/mtd/mtd_blkdevs.c
+> +++ b/drivers/mtd/mtd_blkdevs.c
+> @@ -207,7 +207,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
+>   	if (!dev)
+>   		return -ERESTARTSYS; /* FIXME: busy loop! -arnd*/
+>   
+> -	mutex_lock(&mtd_table_mutex);
+>   	mutex_lock(&dev->lock);
+>   
+>   	if (dev->open)
+> @@ -233,7 +232,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
+>   unlock:
+>   	dev->open++;
+>   	mutex_unlock(&dev->lock);
+> -	mutex_unlock(&mtd_table_mutex);
+>   	blktrans_dev_put(dev);
+>   	return ret;
+>   
+> @@ -244,7 +242,6 @@ static int blktrans_open(struct block_device *bdev, fmode_t mode)
+>   	module_put(dev->tr->owner);
+>   	kref_put(&dev->ref, blktrans_dev_release);
+>   	mutex_unlock(&dev->lock);
+> -	mutex_unlock(&mtd_table_mutex);
+>   	blktrans_dev_put(dev);
+>   	return ret;
+>   }
+> @@ -256,7 +253,6 @@ static void blktrans_release(struct gendisk *disk, fmode_t mode)
+>   	if (!dev)
+>   		return;
+>   
+> -	mutex_lock(&mtd_table_mutex);
+>   	mutex_lock(&dev->lock);
+>   
+>   	if (--dev->open)
+> @@ -272,7 +268,6 @@ static void blktrans_release(struct gendisk *disk, fmode_t mode)
+>   	}
+>   unlock:
+>   	mutex_unlock(&dev->lock);
+> -	mutex_unlock(&mtd_table_mutex);
+>   	blktrans_dev_put(dev);
+>   }
+>   
+> 
 
