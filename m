@@ -2,112 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A47CC432BE
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 10:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 774DAC432BE
+	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 15:16:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41CA16120E
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 10:18:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5681661163
+	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 15:16:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233859AbhHUKSm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Aug 2021 06:18:42 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:14161 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229819AbhHUKSl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Aug 2021 06:18:41 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1629541083; h=Content-Type: MIME-Version: Message-ID:
- In-Reply-To: Date: References: Subject: Cc: To: From: Sender;
- bh=UpM1DyTEkig259V+pL57ps65feNkTSUqUFyxt1prq3Y=; b=dycITJdaFNTz/HvKFWl5e9rx2vFuE6onbdmoFncCW0p0sXvOAAFz6eEQxNvwH722nCSvBavE
- uR5hhlg5oHyHRJi/lWwuZcyJE81XTlGKKngQtEmoxdXeuaagFqL0sG5up+VfKhwZRmBBd8tf
- wupo3Uq1jGiw+qOBlHRmcmFexww=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n06.prod.us-east-1.postgun.com with SMTP id
- 6120d2c989fbdf3ffed16f80 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Sat, 21 Aug 2021 10:17:45
- GMT
-Sender: kvalo=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 1D71BC43460; Sat, 21 Aug 2021 10:17:45 +0000 (UTC)
-Received: from tykki (tynnyri.adurom.net [51.15.11.48])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: kvalo)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 1ED37C4338F;
-        Sat, 21 Aug 2021 10:17:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 1ED37C4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Kalle Valo <kvalo@codeaurora.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, ath11k@lists.infradead.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 45/63] ath11k: Use memset_startat() for clearing queue descriptors
-References: <20210818060533.3569517-1-keescook@chromium.org>
-        <20210818060533.3569517-46-keescook@chromium.org>
-        <87eeapbmhi.fsf@tynnyri.adurom.net> <202108190923.30FD4FC6E@keescook>
-Date:   Sat, 21 Aug 2021 13:17:36 +0300
-In-Reply-To: <202108190923.30FD4FC6E@keescook> (Kees Cook's message of "Thu,
-        19 Aug 2021 09:25:01 -0700")
-Message-ID: <87pmu7t83j.fsf@codeaurora.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S231848AbhHUPQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Aug 2021 11:16:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49394 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230259AbhHUPQw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 21 Aug 2021 11:16:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 6734661042;
+        Sat, 21 Aug 2021 15:16:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629558972;
+        bh=+k6xmuVQyj3NHdODNHcqqXBfCCtfkxHeQllgUwn0tPA=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=uFM7oNJQ1j+VfFLWEo6wbEz+RS1NY4vuiOw4orrziz+HKp58UsV1THo6BAfvnFEgs
+         jRxTPdDW0K5o8ZXTZ4FPaXEsUcEq1+v4+K5MjS5SI1Tg75sqoyEms4buMzfb3ccapC
+         KZNppbuQoyYGQfooMc5VAPMN2k3NbtcuR8fTWs/IRH/NE8tFmdrPhlggSeJZfuMdHr
+         y15CxLHJZ+GnJQezytHMEhUanTuudaOkk4mrwJoT32RrXb2ygR+5dG94hRRGrUztxN
+         R2m2Imom//o06dMSjVjhocoxknarJz8Gcn8eNUBm8ujlW7UjJgyKqMdSZ9bQBZNYOb
+         YoRnFCWhke1sQ==
+Subject: Re: [GIT PULL] Block fixes for 5.14-rc7
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <d8ec384e-9c35-7a79-5bc3-14c8c0739e43@kernel.dk>
+References: <d8ec384e-9c35-7a79-5bc3-14c8c0739e43@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <d8ec384e-9c35-7a79-5bc3-14c8c0739e43@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.14-2021-08-20
+X-PR-Tracked-Commit-Id: a9ed27a764156929efe714033edb3e9023c5f321
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 002c0aef109067168ae68ee69b5ce67edc2e63c1
+Message-Id: <162955897229.29440.5224935780417005985.pr-tracker-bot@kernel.org>
+Date:   Sat, 21 Aug 2021 15:16:12 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
+The pull request you sent on Fri, 20 Aug 2021 20:57:52 -0600:
 
-> On Thu, Aug 19, 2021 at 04:19:37PM +0300, Kalle Valo wrote:
->> Kees Cook <keescook@chromium.org> writes:
->> 
->> > In preparation for FORTIFY_SOURCE performing compile-time and run-time
->> > field bounds checking for memset(), avoid intentionally writing across
->> > neighboring fields.
->> >
->> > Use memset_startat() so memset() doesn't get confused about writing
->> > beyond the destination member that is intended to be the starting point
->> > of zeroing through the end of the struct. Additionally split up a later
->> > field-spanning memset() so that memset() can reason about the size.
->> >
->> > Cc: Kalle Valo <kvalo@codeaurora.org>
->> > Cc: "David S. Miller" <davem@davemloft.net>
->> > Cc: Jakub Kicinski <kuba@kernel.org>
->> > Cc: ath11k@lists.infradead.org
->> > Cc: linux-wireless@vger.kernel.org
->> > Cc: netdev@vger.kernel.org
->> > Signed-off-by: Kees Cook <keescook@chromium.org>
->> 
->> To avoid conflicts I prefer taking this via my ath tree.
->
-> The memset helpers are introduced as part of this series, so that makes
-> things more difficult. Do you want me to create a branch with the
-> helpers that you can merge?
+> git://git.kernel.dk/linux-block.git tags/block-5.14-2021-08-20
 
-Is this patch really worth the extra complexity? Why can't I apply this
-ath11k patch after the helpers have landed Linus' tree? That would be
-very simple.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/002c0aef109067168ae68ee69b5ce67edc2e63c1
+
+Thank you!
 
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
