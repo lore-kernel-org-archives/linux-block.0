@@ -2,174 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E79AC4338F
-	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 03:12:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A728FC4320E
+	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 08:11:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A9386128C
-	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 03:12:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B2A260EB3
+	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 08:11:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232180AbhHVDMv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Aug 2021 23:12:51 -0400
-Received: from mail-pl1-f179.google.com ([209.85.214.179]:37864 "EHLO
-        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231336AbhHVDMt (ORCPT
+        id S231858AbhHVIMU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Aug 2021 04:12:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48964 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231670AbhHVIMT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Aug 2021 23:12:49 -0400
-Received: by mail-pl1-f179.google.com with SMTP id n12so8202718plf.4
-        for <linux-block@vger.kernel.org>; Sat, 21 Aug 2021 20:12:09 -0700 (PDT)
+        Sun, 22 Aug 2021 04:12:19 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44503C061757
+        for <linux-block@vger.kernel.org>; Sun, 22 Aug 2021 01:11:35 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id mq3so9979110pjb.5
+        for <linux-block@vger.kernel.org>; Sun, 22 Aug 2021 01:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zWkjWEvskowDV9RuOm1icxTsINafWKFQlH8OIXXrrz4=;
+        b=RQdXywP6yts45USpiw/5k2ZmYqVHMSbk9lus7YCqnHd8h/dka/Mtc/dvJ9OXe5Otvy
+         Sqan4jaX0EaO6pSp84INK0mTwB48SVVmVb4c2YqbHrlCvd6ldJuCPTsbKqBjRTW6P8oo
+         9Ux/xZOvOXbIQtNK3Akl22kbAtyj0C7ROjsaU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=qMCpuWaEfNTQUh5eND1Sa7DeXSQ2On1WwMKMv4ql/AU=;
-        b=uEAtFcG/1bxlPdvibRMltQ5TVGC9qat7TRh0riFB0NLB67VzUCweIov0ikp24BLKYX
-         6MNX+2MpgoppqwX7yl5b10FSah6PTYwg1i2suwnhBgaNkRrdhmIgQOuutJnNGDpLEdMO
-         Scy13juAdADIqAjVkVsrNdv4ALkeFkKFTJHNXTduiq3eD4LxDz7IJRlBxldcVu8JaLYj
-         UL4GKHzkU8RTozfD0LERFIwG1Hhe1cJr6jCA/ovH9UhmTCeX+ECBudbhSskUPuKEui0w
-         u8TJewrlnxX35OBIaFhdlXSWPgwQ+ywLGW3IpYyGPQxgXrZ1dHMzTidweIACTsk4i2Ud
-         vKHQ==
-X-Gm-Message-State: AOAM533w5mrET+AXG4adVBzyhZcN5L1ik4GfFF5teYYiXtID56QZ7+GA
-        s4rANV71FSOOqQDk/r8PbBQ5yexShxc=
-X-Google-Smtp-Source: ABdhPJyPTkZ6wwQJrONGqAr9A7kfGALtIJTa/bezSizxnr+fL8V1LUnT42f+NyTdAYC/ZQgXmZ5nmA==
-X-Received: by 2002:a17:90b:3ec5:: with SMTP id rm5mr12867091pjb.110.1629601929075;
-        Sat, 21 Aug 2021 20:12:09 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:5c14:c983:6add:f6c9? ([2601:647:4000:d7:5c14:c983:6add:f6c9])
-        by smtp.gmail.com with ESMTPSA id nl9sm15419937pjb.33.2021.08.21.20.12.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Aug 2021 20:12:08 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Mike Snitzer <snitzer@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Use-after-free related to dm_put_table_device()
-Message-ID: <a5057305-9864-df8c-0657-ff33c85dc4f6@acm.org>
-Date:   Sat, 21 Aug 2021 20:12:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zWkjWEvskowDV9RuOm1icxTsINafWKFQlH8OIXXrrz4=;
+        b=J7uxUcX9kVfAVDxLypDTc0udb3mGkFc8tgmD1SxrtoXQOzhrXPy7eks9yNXzSZIJ76
+         jp4wfyrmezeXKtmLiWjmI1QxZZjFr+nVQ6tPHhH6PhkxDBJZ2hh7QfBf6D5LJvXKqkyv
+         cxmcjtb/skQSjz2rWI78G4wSZ+Y3yn+mGYmbVfa87rPJ60ilWykjhmpCzA05hcuwsv9b
+         hAO/lQXcOp+O1A+nE0xgVanjaa9mu94k4F2oLQG54HqsFAEbznEfCuLjf8VVqekDapEH
+         AqyUyMEH6vyrwNWvKkw7faoa8cyONzHBlm/Q/zA6XW7W0LASm9Ptez8PMbVV6mMiftIx
+         cIQg==
+X-Gm-Message-State: AOAM531vWuOmVFQ1CXoJmwMk37zEONwM8oOdDq7CwgJINfxcyIpHOSn0
+        smvakSuOXic4Aij0JX0eShzjJw==
+X-Google-Smtp-Source: ABdhPJwd1ju8xuF6lspQHjJq0552r+HoTrwzTs5HEFbQVZzpc/fLKP3ldMoQP6w86dYwBror2p+DQQ==
+X-Received: by 2002:a17:902:c643:b0:130:eab4:bd22 with SMTP id s3-20020a170902c64300b00130eab4bd22mr9764805pls.13.1629619894669;
+        Sun, 22 Aug 2021 01:11:34 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id 186sm12621542pfg.11.2021.08.22.01.11.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Aug 2021 01:11:33 -0700 (PDT)
+Date:   Sun, 22 Aug 2021 01:11:32 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Kalle Valo <kvalo@codeaurora.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, ath11k@lists.infradead.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 45/63] ath11k: Use memset_startat() for clearing queue
+ descriptors
+Message-ID: <202108220107.3E26FE6C9C@keescook>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-46-keescook@chromium.org>
+ <87eeapbmhi.fsf@tynnyri.adurom.net>
+ <202108190923.30FD4FC6E@keescook>
+ <87pmu7t83j.fsf@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87pmu7t83j.fsf@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Sat, Aug 21, 2021 at 01:17:36PM +0300, Kalle Valo wrote:
+> Kees Cook <keescook@chromium.org> writes:
+> 
+> > On Thu, Aug 19, 2021 at 04:19:37PM +0300, Kalle Valo wrote:
+> >> Kees Cook <keescook@chromium.org> writes:
+> >> 
+> >> > In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> >> > field bounds checking for memset(), avoid intentionally writing across
+> >> > neighboring fields.
+> >> >
+> >> > Use memset_startat() so memset() doesn't get confused about writing
+> >> > beyond the destination member that is intended to be the starting point
+> >> > of zeroing through the end of the struct. Additionally split up a later
+> >> > field-spanning memset() so that memset() can reason about the size.
+> >> >
+> >> > Cc: Kalle Valo <kvalo@codeaurora.org>
+> >> > Cc: "David S. Miller" <davem@davemloft.net>
+> >> > Cc: Jakub Kicinski <kuba@kernel.org>
+> >> > Cc: ath11k@lists.infradead.org
+> >> > Cc: linux-wireless@vger.kernel.org
+> >> > Cc: netdev@vger.kernel.org
+> >> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> >> 
+> >> To avoid conflicts I prefer taking this via my ath tree.
+> >
+> > The memset helpers are introduced as part of this series, so that makes
+> > things more difficult. Do you want me to create a branch with the
+> > helpers that you can merge?
+> 
+> Is this patch really worth the extra complexity? Why can't I apply this
+> ath11k patch after the helpers have landed Linus' tree? That would be
+> very simple.
 
-If I run blktests nvmeof-mp/012 then a KASAN use-after-free complaint
-appears. Since I haven't seen this warning with previous kernel versions,
-I think this is a regression. Given the presence of bd_unlink_disk_holder()
-in the call trace, can you take a look Christoph?
+Not singularly, no. But I have a bit of a catch-22 in that I can't turn
+on greater FORTIFY strictness without first fixing the false positives,
+and I can't fix the false positives in "other" trees without those trees
+first having the helpers that get introduced by the FORTIFY series. :)
 
-Thanks,
+Anyway, since we're close to the merge window anyway, the FORTIFY series
+won't land in 1 release at this point regardless, so I'll just get
+the helpers landed and we can do the individual pieces once the merge
+window closes.
 
-Bart.
+Wheee :)
 
-root[15974]: run blktests nvmeof-mp/012
-unknown: run blktests nvmeof-mp/012 at 2021-08-21 19:41:59
-kernel: null_blk: module loaded
-[ ... ]
-kernel: nvme nvme0: Removing ctrl: NQN "nvme-test"
-multipathd[16007]: BUG: orphaning path nvme0n1 that holds hwe of mpathaeq
-kernel: ==================================================================
-kernel: BUG: KASAN: use-after-free in sysfs_remove_link+0x20/0x60
-kernel: Read of size 8 at addr ffff88811baecc30 by task multipathd/16017
-kernel:
-kernel: CPU: 3 PID: 16017 Comm: multipathd Not tainted 5.14.0-rc5-dbg+ #8
-kernel: Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
-kernel: Call Trace:
-kernel:  show_stack+0x52/0x58
-kernel:  dump_stack_lvl+0x5b/0x82
-kernel:  print_address_description.constprop.0+0x22/0xb0
-kernel:  kasan_report+0xca/0x110
-kernel:  __asan_load8+0x69/0x90
-kernel:  sysfs_remove_link+0x20/0x60
-kernel:  bd_unlink_disk_holder+0xf6/0x170
-kernel:  dm_put_table_device+0x99/0x180 [dm_mod]
-kernel:  dm_put_device+0xe6/0x180 [dm_mod]
-kernel:  free_priority_group+0x110/0x150 [dm_multipath]
-kernel:  free_multipath+0xe1/0x160 [dm_multipath]
-kernel:  multipath_dtr+0x39/0x40 [dm_multipath]
-kernel:  dm_table_destroy+0xa7/0x200 [dm_mod]
-kernel:  __dm_destroy+0x22e/0x320 [dm_mod]
-kernel:  dm_destroy+0x13/0x20 [dm_mod]
-kernel:  dev_remove+0x156/0x1d0 [dm_mod]
-kernel:  ctl_ioctl+0x2a7/0x4e0 [dm_mod]
-kernel:  dm_ctl_ioctl+0xe/0x20 [dm_mod]
-kernel:  __x64_sys_ioctl+0xc2/0xe0
-kernel:  do_syscall_64+0x35/0xb0
-kernel:  entry_SYSCALL_64_after_hwframe+0x44/0xae
-kernel: RIP: 0033:0x7f178a84decb
-kernel: Code: ff ff ff 85 c0 79 8b 49 c7 c4 ff ff ff ff 5b 5d 4c 89 e0 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 6d 1f 0d 00 f7 d8 64 89 01 48
-kernel: RSP: 002b:00007f178a1e9598 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
-kernel: RAX: ffffffffffffffda RBX: 00007f178aa428f8 RCX: 00007f178a84decb
-kernel: RDX: 00007f177801b900 RSI: 00000000c138fd04 RDI: 0000000000000004
-kernel: RBP: 00007f178a1e9650 R08: 00007f178a1e7310 R09: 00007f178ab197d0
-kernel: R10: 0000000000000001 R11: 0000000000000206 R12: 00007f178aa918a2
-kernel: R13: 00007f178aa918a2 R14: 00007f178aa918a2 R15: 00007f178aa918a2
-kernel:
-kernel: Allocated by task 7160:
-kernel:  kasan_save_stack+0x23/0x50
-kernel:  __kasan_kmalloc+0x83/0xa0
-kernel:  kmem_cache_alloc_trace+0x1b0/0x2d0
-kernel:  kobject_create_and_add+0x32/0x80
-kernel:  register_disk+0x119/0x320
-kernel:  device_add_disk+0xb8/0x2c0
-kernel:  nvme_alloc_ns+0x4eb/0x8b0 [nvme_core]
-kernel:  nvme_validate_or_alloc_ns+0x155/0x1c0 [nvme_core]
-kernel:  nvme_scan_ns_list+0x1c5/0x450 [nvme_core]
-kernel:  nvme_scan_work+0xeb/0x1d0 [nvme_core]
-kernel:  process_one_work+0x582/0xad0
-kernel:  worker_thread+0x8f/0x5c0
-kernel:  kthread+0x1fc/0x230
-kernel:  ret_from_fork+0x1f/0x30
-kernel:
-kernel: Freed by task 16259:
-kernel:  kasan_save_stack+0x23/0x50
-kernel:  kasan_set_track+0x20/0x30
-kernel:  kasan_set_free_info+0x24/0x40
-kernel:  __kasan_slab_free+0xf2/0x130
-kernel:  slab_free_freelist_hook+0xb4/0x1b0
-kernel:  kfree+0xdc/0x490
-kernel:  dynamic_kobj_release+0x13/0x50
-kernel:  kobject_cleanup+0x7f/0x1c0
-kernel:  kobject_put+0x76/0x90
-kernel:  del_gendisk+0x1a2/0x340
-kernel:  nvme_ns_remove.part.0+0x15d/0x3c0 [nvme_core]
-kernel:  nvme_ns_remove+0x2e/0x40 [nvme_core]
-kernel:  nvme_remove_namespaces+0x19d/0x200 [nvme_core]
-kernel:  nvme_do_delete_ctrl+0x73/0xa6 [nvme_core]
-kernel:  nvme_sysfs_delete.cold+0x8/0xd [nvme_core]
-kernel:  dev_attr_store+0x3e/0x60
-kernel:  sysfs_kf_write+0x87/0xa0
-kernel:  kernfs_fop_write_iter+0x1cb/0x270
-kernel:  new_sync_write+0x26b/0x380
-kernel:  vfs_write+0x3b5/0x4f0
-kernel:  ksys_write+0xd9/0x180
-kernel:  __x64_sys_write+0x43/0x50
-kernel:  do_syscall_64+0x35/0xb0
-kernel:  entry_SYSCALL_64_after_hwframe+0x44/0xae
-kernel:
-kernel: The buggy address belongs to the object at ffff88811baecc00
-         which belongs to the cache kmalloc-64 of size 64
-kernel: The buggy address is located 48 bytes inside of
-         64-byte region [ffff88811baecc00, ffff88811baecc40)
-kernel: The buggy address belongs to the page:
-kernel: page:00000000e5179bbf refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88811baecf80 pfn:0x11baec
-kernel: flags: 0x2000000000000200(slab|node=0|zone=2)
-kernel: raw: 2000000000000200 ffffea0004051f48 ffffea00044e9588 ffff888100042640
-kernel: raw: ffff88811baecf80 000000000020001b 00000001ffffffff 0000000000000000
-kernel: page dumped because: kasan: bad access detected
-kernel:
-kernel: Memory state around the buggy address:
-kernel:  ffff88811baecb00: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
-kernel:  ffff88811baecb80: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
-kernel: >ffff88811baecc00: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-kernel:                                      ^
-kernel:  ffff88811baecc80: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-kernel:  ffff88811baecd00: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-kernel: ==================================================================
+-- 
+Kees Cook
