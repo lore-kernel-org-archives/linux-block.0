@@ -2,132 +2,210 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A728FC4320E
-	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 08:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B70C4338F
+	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 23:17:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B2A260EB3
-	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 08:11:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC57061267
+	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 23:17:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231858AbhHVIMU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Aug 2021 04:12:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48964 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231670AbhHVIMT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Aug 2021 04:12:19 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44503C061757
-        for <linux-block@vger.kernel.org>; Sun, 22 Aug 2021 01:11:35 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id mq3so9979110pjb.5
-        for <linux-block@vger.kernel.org>; Sun, 22 Aug 2021 01:11:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zWkjWEvskowDV9RuOm1icxTsINafWKFQlH8OIXXrrz4=;
-        b=RQdXywP6yts45USpiw/5k2ZmYqVHMSbk9lus7YCqnHd8h/dka/Mtc/dvJ9OXe5Otvy
-         Sqan4jaX0EaO6pSp84INK0mTwB48SVVmVb4c2YqbHrlCvd6ldJuCPTsbKqBjRTW6P8oo
-         9Ux/xZOvOXbIQtNK3Akl22kbAtyj0C7ROjsaU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zWkjWEvskowDV9RuOm1icxTsINafWKFQlH8OIXXrrz4=;
-        b=J7uxUcX9kVfAVDxLypDTc0udb3mGkFc8tgmD1SxrtoXQOzhrXPy7eks9yNXzSZIJ76
-         jp4wfyrmezeXKtmLiWjmI1QxZZjFr+nVQ6tPHhH6PhkxDBJZ2hh7QfBf6D5LJvXKqkyv
-         cxmcjtb/skQSjz2rWI78G4wSZ+Y3yn+mGYmbVfa87rPJ60ilWykjhmpCzA05hcuwsv9b
-         hAO/lQXcOp+O1A+nE0xgVanjaa9mu94k4F2oLQG54HqsFAEbznEfCuLjf8VVqekDapEH
-         AqyUyMEH6vyrwNWvKkw7faoa8cyONzHBlm/Q/zA6XW7W0LASm9Ptez8PMbVV6mMiftIx
-         cIQg==
-X-Gm-Message-State: AOAM531vWuOmVFQ1CXoJmwMk37zEONwM8oOdDq7CwgJINfxcyIpHOSn0
-        smvakSuOXic4Aij0JX0eShzjJw==
-X-Google-Smtp-Source: ABdhPJwd1ju8xuF6lspQHjJq0552r+HoTrwzTs5HEFbQVZzpc/fLKP3ldMoQP6w86dYwBror2p+DQQ==
-X-Received: by 2002:a17:902:c643:b0:130:eab4:bd22 with SMTP id s3-20020a170902c64300b00130eab4bd22mr9764805pls.13.1629619894669;
-        Sun, 22 Aug 2021 01:11:34 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 186sm12621542pfg.11.2021.08.22.01.11.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Aug 2021 01:11:33 -0700 (PDT)
-Date:   Sun, 22 Aug 2021 01:11:32 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Kalle Valo <kvalo@codeaurora.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, ath11k@lists.infradead.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 45/63] ath11k: Use memset_startat() for clearing queue
- descriptors
-Message-ID: <202108220107.3E26FE6C9C@keescook>
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-46-keescook@chromium.org>
- <87eeapbmhi.fsf@tynnyri.adurom.net>
- <202108190923.30FD4FC6E@keescook>
- <87pmu7t83j.fsf@codeaurora.org>
+        id S233965AbhHVXSK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Aug 2021 19:18:10 -0400
+Received: from mail-dm6nam11on2060.outbound.protection.outlook.com ([40.107.223.60]:25472
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233949AbhHVXSJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 22 Aug 2021 19:18:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cRNpBIfSljd/zJ+qoUXw429/kj2tUNRkzMJO1t2FzjHGegPv/Wnul03D/huywiBaVLnPBH8J3lt2ZYn0Mv0zHkgWwlvoc8mu+xZ3UqKo6rBs2GWt/xutcxJgXySxeqFdswuYce61DiLjZXJDO6g0g1RBYmxYkSqSop4K+nBVryrj+Ztl6ncmRsaoCQKUD2LywsVpDf1hDl0Xcpn5R7pYS6fW8CvNg5DFKVw10LGkp/Dy0FhB7nsexGm6Q3mPgoH548MXQ2sltKFDACQ61mI/NpL3ntwI4jcfuRzp3hdJ0AdtBcE7TzX4idi79RSSOqfxILmr3FzQ++aLWF3K4InGMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rdkIo4WX9HjNgblGNLupdbC1wtHI0+D6453hAXagQFk=;
+ b=f0vby5VqjQGYk8WdEY6kikeJiixC5eGgGjh2U+2uBP3XEwKCocXILi+pMh21VXn6nt8Gwwt6r8nD/JxkkC8Nu4p9mZt47bn+tnymDVrbDNDkdrUF+vBUqtX3G2AQU/mMegr1xmEVD01bu6YWXAWONKFL+ZsuxckfshhsI6pfajlI+GbjXOKjuPNoMPnKLBa04wvwLqk3UTbVkddKaQ8Hw2V1X3GugeD5G8onjKIPGjM/inrJJFCy8zFSyMfyrYHXtVJbhCJ9qIlTEwOUTVX6jZBFDzvLM7ZVZcMIDH+gpG6g8uMB0KWznI6ZWtP6WZIoSKYvLSuw8+YcnR58x4am3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rdkIo4WX9HjNgblGNLupdbC1wtHI0+D6453hAXagQFk=;
+ b=BSKhAWbWqF8B74meR3gIttBwM0NPTqk0zGsSfpNZC9R61vqX5vy/gdNYETblYerKe+Td/rwG8E8+ZV71eYsAIxfJFym1XyLIyOVlaXIVnLFkARmDH/1FTN3rBe80uwToxHOCd24CJRKeDkGRyvjuvBPB6O69tM5/Y/sViqswIEUTEmUekHiCsgOWLB8FSTNcjjd/3zOtvx0oQnoCaWIQIeo/xq34oY2ortw4VHUAtZ/6pHbovIPpZ126cjMw4wVapCyGxYDiUlimXboRpqRPRpNQPQavrebF9FUtKXqc5znR7lYNoU9Jcvvnb9Z9i1xwdljcbbRkQzrUrAOuiwb7HQ==
+Received: from DM5PR16CA0043.namprd16.prod.outlook.com (2603:10b6:4:15::29) by
+ BN6PR12MB1300.namprd12.prod.outlook.com (2603:10b6:404:1a::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4436.22; Sun, 22 Aug 2021 23:17:26 +0000
+Received: from DM6NAM11FT067.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:4:15:cafe::4e) by DM5PR16CA0043.outlook.office365.com
+ (2603:10b6:4:15::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend
+ Transport; Sun, 22 Aug 2021 23:17:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT067.mail.protection.outlook.com (10.13.172.76) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4436.19 via Frontend Transport; Sun, 22 Aug 2021 23:17:25 +0000
+Received: from [172.27.0.239] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 22 Aug
+ 2021 23:17:23 +0000
+Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
+ space
+To:     Xie Yongji <xieyongji@bytedance.com>, <mst@redhat.com>,
+        <jasowang@redhat.com>, <stefanha@redhat.com>
+CC:     <virtualization@lists.linux-foundation.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20210809101609.148-1-xieyongji@bytedance.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <e6ab104e-a18b-3f17-9cd8-6a6b689b56b4@nvidia.com>
+Date:   Mon, 23 Aug 2021 02:17:21 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pmu7t83j.fsf@codeaurora.org>
+In-Reply-To: <20210809101609.148-1-xieyongji@bytedance.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f93e9ee6-2a51-40f6-857c-08d965c3012c
+X-MS-TrafficTypeDiagnostic: BN6PR12MB1300:
+X-Microsoft-Antispam-PRVS: <BN6PR12MB1300A35ABA3603DAAB32A92DDEC39@BN6PR12MB1300.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:546;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AZIzszDahTutGV4OA3pXiHORDnmWCc1O2Jt86vPUZUGUFDArB+IgDKLTfKy5VhTX7DPNnShgEeo8y8S9gNTNxqrc8uYjhSjecBjNxXwBA5HQz1i9pTXAHW3wDLvRFp8FLw0iR5Mi5Zc/R6apdVvM8q3I3joE4R32+g0rGn0NHJDrcKt61BmAY4MulHaK7wZlhPGtU5I66oVhmPxG5KcjAEJNCg/UDsJS0lrmemnglDo6KitMA1hbquOMQ8ZNs5M3ubR52zitVwotKfHiKY1IwSWghwj/jiqPPXgtZfgnFIM8T+t5lVr50qQXwPyI6L64TPrpe4DSBvpzB6eSESZeimz2ukibcf+Dq0kd52dngOBZ9Rg5/K4Sf7Y+7u+6/qHPByEDZv3/q1FkIWXQloDw+4hgvFF64/nyA0lIT32t04uSdMO38uZ/8SHp3TZ/IEqeToi+qX4cPc5BhQ+skWbWeJ+pLG5oC4WKYcE6vTn5oq+CNK71EjOvEZ47r9qbPNn9UUgaINzWO8lYr+zAAaOCyzp9nyFGwhMx/a5REpQCd6c4yQldiq44exkQtwR8aESEcql+peu4T20orINXtWJCcDOyE3kYVOSOWDz6vxFgoxpcHJfgtOaFfBHtl7BGfu3+l/9EfGHiy7i3axAxPV78lNFmNAEwwATc/RXzXAJ+/9OeaRxue6Jl0/pLyTwnmTlAGWK0u7O5FTYNC4mvm/PVblBr7BReIHalppCaSG3NRvc=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(346002)(39860400002)(396003)(136003)(36840700001)(46966006)(82740400003)(426003)(36756003)(7636003)(336012)(478600001)(31686004)(110136005)(5660300002)(2906002)(31696002)(83380400001)(53546011)(16526019)(2616005)(26005)(186003)(36860700001)(82310400003)(8676002)(8936002)(356005)(4326008)(16576012)(54906003)(36906005)(70586007)(70206006)(316002)(47076005)(86362001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2021 23:17:25.9590
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f93e9ee6-2a51-40f6-857c-08d965c3012c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT067.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1300
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 21, 2021 at 01:17:36PM +0300, Kalle Valo wrote:
-> Kees Cook <keescook@chromium.org> writes:
-> 
-> > On Thu, Aug 19, 2021 at 04:19:37PM +0300, Kalle Valo wrote:
-> >> Kees Cook <keescook@chromium.org> writes:
-> >> 
-> >> > In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> >> > field bounds checking for memset(), avoid intentionally writing across
-> >> > neighboring fields.
-> >> >
-> >> > Use memset_startat() so memset() doesn't get confused about writing
-> >> > beyond the destination member that is intended to be the starting point
-> >> > of zeroing through the end of the struct. Additionally split up a later
-> >> > field-spanning memset() so that memset() can reason about the size.
-> >> >
-> >> > Cc: Kalle Valo <kvalo@codeaurora.org>
-> >> > Cc: "David S. Miller" <davem@davemloft.net>
-> >> > Cc: Jakub Kicinski <kuba@kernel.org>
-> >> > Cc: ath11k@lists.infradead.org
-> >> > Cc: linux-wireless@vger.kernel.org
-> >> > Cc: netdev@vger.kernel.org
-> >> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> >> 
-> >> To avoid conflicts I prefer taking this via my ath tree.
-> >
-> > The memset helpers are introduced as part of this series, so that makes
-> > things more difficult. Do you want me to create a branch with the
-> > helpers that you can merge?
-> 
-> Is this patch really worth the extra complexity? Why can't I apply this
-> ath11k patch after the helpers have landed Linus' tree? That would be
-> very simple.
 
-Not singularly, no. But I have a bit of a catch-22 in that I can't turn
-on greater FORTIFY strictness without first fixing the false positives,
-and I can't fix the false positives in "other" trees without those trees
-first having the helpers that get introduced by the FORTIFY series. :)
+On 8/9/2021 1:16 PM, Xie Yongji wrote:
+> An untrusted device might presents an invalid block size
+> in configuration space. This tries to add validation for it
+> in the validate callback and clear the VIRTIO_BLK_F_BLK_SIZE
+> feature bit if the value is out of the supported range.
 
-Anyway, since we're close to the merge window anyway, the FORTIFY series
-won't land in 1 release at this point regardless, so I'll just get
-the helpers landed and we can do the individual pieces once the merge
-window closes.
+This is not clear to me. What is untrusted device ? is it a buggy device ?
 
-Wheee :)
+What is the return value for the blk_size in this case that you try to 
+override ?
 
--- 
-Kees Cook
+
+>
+> And we also double check the value in virtblk_probe() in
+> case that it's changed after the validation.
+>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>   drivers/block/virtio_blk.c | 39 +++++++++++++++++++++++++++++++++------
+>   1 file changed, 33 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 4b49df2dfd23..afb37aac09e8 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -692,6 +692,28 @@ static const struct blk_mq_ops virtio_mq_ops = {
+>   static unsigned int virtblk_queue_depth;
+>   module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
+>   
+> +static int virtblk_validate(struct virtio_device *vdev)
+> +{
+> +	u32 blk_size;
+> +
+> +	if (!vdev->config->get) {
+> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
+> +			__func__);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!virtio_has_feature(vdev, VIRTIO_BLK_F_BLK_SIZE))
+> +		return 0;
+> +
+> +	blk_size = virtio_cread32(vdev,
+> +			offsetof(struct virtio_blk_config, blk_size));
+> +
+> +	if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)
+> +		__virtio_clear_bit(vdev, VIRTIO_BLK_F_BLK_SIZE);
+
+is it PAGE_SIZE or SZ_4K ?
+
+Do we support a 64K blk size (PPC PAGE_SIZE)
+
+> +
+> +	return 0;
+> +}
+> +
+>   static int virtblk_probe(struct virtio_device *vdev)
+>   {
+>   	struct virtio_blk *vblk;
+> @@ -703,12 +725,6 @@ static int virtblk_probe(struct virtio_device *vdev)
+>   	u8 physical_block_exp, alignment_offset;
+>   	unsigned int queue_depth;
+>   
+> -	if (!vdev->config->get) {
+> -		dev_err(&vdev->dev, "%s failure: config access disabled\n",
+> -			__func__);
+> -		return -EINVAL;
+> -	}
+> -
+>   	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
+>   			     GFP_KERNEL);
+>   	if (err < 0)
+> @@ -823,6 +839,14 @@ static int virtblk_probe(struct virtio_device *vdev)
+>   	else
+>   		blk_size = queue_logical_block_size(q);
+>   
+> +	if (unlikely(blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)) {
+> +		dev_err(&vdev->dev,
+> +			"block size is changed unexpectedly, now is %u\n",
+> +			blk_size);
+> +		err = -EINVAL;
+> +		goto err_cleanup_disk;
+> +	}
+> +
+>   	/* Use topology information if available */
+>   	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
+>   				   struct virtio_blk_config, physical_block_exp,
+> @@ -881,6 +905,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+>   	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
+>   	return 0;
+>   
+> +err_cleanup_disk:
+> +	blk_cleanup_disk(vblk->disk);
+>   out_free_tags:
+>   	blk_mq_free_tag_set(&vblk->tag_set);
+>   out_free_vq:
+> @@ -983,6 +1009,7 @@ static struct virtio_driver virtio_blk = {
+>   	.driver.name			= KBUILD_MODNAME,
+>   	.driver.owner			= THIS_MODULE,
+>   	.id_table			= id_table,
+> +	.validate			= virtblk_validate,
+>   	.probe				= virtblk_probe,
+>   	.remove				= virtblk_remove,
+>   	.config_changed			= virtblk_config_changed,
