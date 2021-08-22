@@ -2,107 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C484C4320E
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 17:27:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F865C4338F
+	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 03:01:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15BA96124F
-	for <linux-block@archiver.kernel.org>; Sat, 21 Aug 2021 17:27:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 643426128B
+	for <linux-block@archiver.kernel.org>; Sun, 22 Aug 2021 03:01:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231925AbhHUR16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Aug 2021 13:27:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231969AbhHUR16 (ORCPT
+        id S232341AbhHVDBo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Aug 2021 23:01:44 -0400
+Received: from mail-pl1-f178.google.com ([209.85.214.178]:44839 "EHLO
+        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231336AbhHVDBo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Aug 2021 13:27:58 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B395C061575;
-        Sat, 21 Aug 2021 10:27:18 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id l18so15327295lji.12;
-        Sat, 21 Aug 2021 10:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=K0MMdaxEKcNrN2KQbtwROF5fRZNqNXPZUbaS3G92l9A=;
-        b=j19BOOy8umcex6QY99aQ0ZZCQuTIYeFSYAp5MV38IhTAmBz17PBb0+91b/6/wb1kGK
-         6BWlS8CqnCPD/2I+v0cievEBo6XQDh3Dmi0JmfGTQlAl05PQgOZ39P2YDupWOLOb5zWG
-         28+0f4+9utiDASsiFSsQJ0RJs0Ex3oOLufisQCvy5e3XJF6gpBqgXna22gRbk5J0wT05
-         UDFZBY6EZxAQ5LxVSrVuHO2HDe1MMdokgwmGLrsqvUOdPDSKXUDyLPJk3OYu89oBY8sQ
-         O6kxSyVsn/pvNVNsGIWiHSsbAfAZIEJiEb8F/gYNwjuVinu5UfdHVeMa3x7f0keZbLFm
-         sGQg==
+        Sat, 21 Aug 2021 23:01:44 -0400
+Received: by mail-pl1-f178.google.com with SMTP id e1so1235313plt.11
+        for <linux-block@vger.kernel.org>; Sat, 21 Aug 2021 20:01:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=K0MMdaxEKcNrN2KQbtwROF5fRZNqNXPZUbaS3G92l9A=;
-        b=hN95oT6sz9/bZq6Lmnn91UEcTYZsmZQCv6ERoFu5Q3FeiGYTAIV72BIPf0g98l5B2Y
-         0UNBg7Lfc2Sx1tgdhBAY2KtiqqA4QnZKRHRVWpKJ82GaY+dkItAAtH9hIgnS9uDqNyBW
-         tePJzIm14AVrNBtH7VGUOCtPRqslOpkqhHJ+1Gu86DBfP5cWsri8eG3GCxI3Hd1qFsEK
-         h4tvdr0e2Fgi/cJzqm73Mx1UL8yNgq+zABt6mu7imJLFvJ2Qb3si/ydcBw4GYs6jB9jJ
-         WcNn3q9lKPLP5eh/xrzTyIDg9e3L5Ad/07OLm+qbPCNSMGzDxvRZ68Mo/ZfZYjq1zFna
-         SPhg==
-X-Gm-Message-State: AOAM530ot7Iw8nkiZLPsdtlMxphWQ0WNG+V81e4vMo0sFnIG/eTrDrb4
-        /CwBCqjV6z8Fha7fEsmzSUCznb2E7rE=
-X-Google-Smtp-Source: ABdhPJx7BAQ0zHjQEplRMaUm+CnQrb8Md8PEiZ4sLIOTtDxl3tVa4zYusy23n24tOG7zyLj1xwlfsw==
-X-Received: by 2002:a2e:8185:: with SMTP id e5mr21033591ljg.31.1629566836805;
-        Sat, 21 Aug 2021 10:27:16 -0700 (PDT)
-Received: from [192.168.2.145] (46-138-120-72.dynamic.spd-mgts.ru. [46.138.120.72])
-        by smtp.googlemail.com with ESMTPSA id b20sm146199ljp.104.2021.08.21.10.27.16
+        bh=40N7JTkN+9UxQHnUzXIBMOf8lkM+yv6fPQhyahzugJ8=;
+        b=gkl1wujhGEhIZaesSeBHEgrKRFIkMcaAxf5YmOps2lUQ+RQ84XQj8v+KMByCtEntEk
+         9RrKy7T7k/lzuSdobcALmQue5gvt8o/1SQgiBap93hcau/4PqocHZNLf20UwZ4WVNqDf
+         KsgTRYyJr5R/3xUcW/Z3wvR47WWuLdKMR5O0zSJ/3UmqCdzaMxtDUCmdI12a/CpMO6qG
+         FjSM9Ibw6cLhw6lNxHHBYdtiJmhgGbGf9F5BRvGQBxWOt6YaE1tXHNA4FcGvrFFmuo8+
+         fx7zH6sB0BgPiyOsemg9eAqF6HirrMnEElUK4qAYXajxUPyAF1MlTUiqzQPn3XrXcP07
+         HKrA==
+X-Gm-Message-State: AOAM532Rmsvtol+RBZ2Ljkwrnn8iqMy0W0zYMUvNDAk+55U4EZ5Jf+7a
+        f/Pq9tZGraUAQ+yjZdTf+IdDDvO0m/k=
+X-Google-Smtp-Source: ABdhPJyv48rGcSYoXopoyG04hUOSHSeKGvJUxthDX2Dkch6eBkTV7gWdHkWPUHfjO11Sk/0ak7oy3A==
+X-Received: by 2002:a17:90a:5285:: with SMTP id w5mr12551162pjh.78.1629601263379;
+        Sat, 21 Aug 2021 20:01:03 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:5c14:c983:6add:f6c9? ([2601:647:4000:d7:5c14:c983:6add:f6c9])
+        by smtp.gmail.com with ESMTPSA id l6sm11531622pff.74.2021.08.21.20.01.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Aug 2021 10:27:16 -0700 (PDT)
-Subject: Re: [PATCH v6 0/5] Support EFI partition on NVIDIA Tegra devices
-To:     =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-References: <20210818221920.3893-1-digetx@gmail.com>
- <YSAvnQb29XlhqY7k@qmqm.qmqm.pl>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <e35a9053-a793-d189-ff79-04212e1227c2@gmail.com>
-Date:   Sat, 21 Aug 2021 20:27:15 +0300
+        Sat, 21 Aug 2021 20:01:02 -0700 (PDT)
+Subject: Re: slab-out-of-bounds access in bio_integrity_alloc()
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <4b6318fb-0008-1747-64d5-b31991324acf@acm.org>
+ <7ed9a751-8874-14d1-cbc1-af39768cce95@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <4743ad4d-6ec0-9ea8-ded4-a2657329fb80@acm.org>
+Date:   Sat, 21 Aug 2021 20:01:01 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <YSAvnQb29XlhqY7k@qmqm.qmqm.pl>
+In-Reply-To: <7ed9a751-8874-14d1-cbc1-af39768cce95@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-21.08.2021 01:41, Michał Mirosław пишет:
-> On Thu, Aug 19, 2021 at 01:19:15AM +0300, Dmitry Osipenko wrote:
->> This series adds the most minimal EFI partition support for NVIDIA Tegra
->> consumer devices, like Android tablets and game consoles, making theirs
->> eMMC accessible out-of-the-box using downstream bootloader and mainline
->> Linux kernel.  eMMC now works on Acer A500 tablet and Ouya game console
->> that are already well supported in mainline and internal storage is the
->> only biggest thing left to support.
-> [...]
+On 8/20/21 8:06 PM, Jens Axboe wrote:
+> On 8/20/21 4:58 PM, Bart Van Assche wrote:
+>> Hi,
+>>
+>> It's been a while since I ran blktests. If I run it against Jens' for-next
+>> branch (39916d4054e7 ("Merge branch 'for-5.15/io_uring' into for-next")) a
+>> slab-out-of-bounds access complaint appears. Is anyone already looking into
+>> this?
 > 
-> Could we provide the GPT sector via DT? As I understand this is for
-> non-removable eMMC storage. It would remove the need for a cap bit and
-> hardcoded calculations instead just checking if DT node of the controller
-> contains a magic entry with a number.
+> Does this help?
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index ae9085b97deb..94a0c01465a8 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -282,8 +282,9 @@ void bio_init(struct bio *bio, struct bio_vec *table,
+>  	atomic_set(&bio->__bi_remaining, 1);
+>  	atomic_set(&bio->__bi_cnt, 1);
+>  
+> -	bio->bi_io_vec = table;
+>  	bio->bi_max_vecs = max_vecs;
+> +	bio->bi_io_vec = table;
+> +	bio->bi_pool = NULL;
+>  }
+>  EXPORT_SYMBOL(bio_init);
 
-The same device model usually comes in different flavors that have a
-different eMMC unit and size. So no, it can't be hardcoded in DT.
+Hi Jens,
+
+That patch makes the KASAN complaint disappear. Thanks!
+
+Bart.
+
