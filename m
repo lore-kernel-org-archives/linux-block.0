@@ -2,177 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84368C4338F
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 13:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB19C4338F
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 16:03:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60CFC613A5
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 13:58:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF466613D5
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 16:03:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229725AbhHWN7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 09:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbhHWN7M (ORCPT
+        id S230315AbhHWQDs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 12:03:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29417 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229465AbhHWQDs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 09:59:12 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65F6BC061575
-        for <linux-block@vger.kernel.org>; Mon, 23 Aug 2021 06:58:29 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id i6so26359528edu.1
-        for <linux-block@vger.kernel.org>; Mon, 23 Aug 2021 06:58:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=WX1ehOUsUxkPxZH7RkUnUxxcQ85HX+NQzLUrF1ef8mE=;
-        b=L7LBOQo/c8YwrF3id6S1pN1pKfI1xG1HLGCih6AYDiwiwzDv6c3h/1JarHtJPHp1Q6
-         gSy8M2fkbwV8gmosyvzb9ifJT2L2CEJoWT7uM6NozOPxcYTZzAPCm2OuzS0ToVbC5C5W
-         GCDO9icJV9ZDrfowPc9/iBfwAJ1mnx4gtZ26P3l6vTUZoKF/E0k1yAyhPd+Q/9/u7dWM
-         jO2s0NDAK6Fx6jFEFw28XWuawbr4j1KDnLSFPx+cCU9gIN4arFoEQBsYdjcwx9L+H3hX
-         Ol26gKNfIwVpUkYhR3ComLGn+aUS74EpWXfyBxNkKhnciqeLitaH/551okwT5kWjIX3k
-         jDog==
+        Mon, 23 Aug 2021 12:03:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629734585;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VGHv+t7XJoBwzuDgFH5TfVqMsvYX/VooC0Y/PX4tAJg=;
+        b=G7DcbcK+yr8woorkZOtfubxTkFMR3gHlASe4k8l07BFzJ2E2nrHjwVyuTEhnyvmfsFMFc2
+        MEpzZ6nvo9WZzMtpf7TveF6PwL+97eIlORiaKKwF5kYPQAFFTN8Rew4UUfxoP74eg0Rqbm
+        GWsGqITtCEN6wKeK2cCdjve1ikZGgQE=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-S_J1f2t4PS6z6wnWMSAsfg-1; Mon, 23 Aug 2021 12:03:03 -0400
+X-MC-Unique: S_J1f2t4PS6z6wnWMSAsfg-1
+Received: by mail-ej1-f69.google.com with SMTP id yz13-20020a170906dc4d00b005c61ad936f0so1086160ejb.12
+        for <linux-block@vger.kernel.org>; Mon, 23 Aug 2021 09:03:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=WX1ehOUsUxkPxZH7RkUnUxxcQ85HX+NQzLUrF1ef8mE=;
-        b=Fhy0II43RPIt+mP8PZ71/smWIIKBng6TPzohgRatcTKujIEgeR5SOZp1a1cVlfeYFi
-         ERzgU5toLlvNjg05Xpiy5gQF4P+IOgP/hmvyMgq//qOKfUZZeh9FdKdEeec39gQrtol4
-         NjAN7eKvTfF/75BfaGIB0wkcOBwZ7QPgGtlZuaSgh0dmKnjrtHlj7FewNGFMJXwjro+6
-         9WQ2XUwcqORAnObeAkf43Y5y4NDgRoT/ENYw8K1DCc7mMY0iKhU9ReuJt9xZrTYZI3vK
-         ehTQ+oeUsrLFub8AB0Br4gKz0I6/njUCg6yMl4Speegau2P+B4ak4Fqxu9KI+TEtszKK
-         iW0w==
-X-Gm-Message-State: AOAM533PfiqBTA8xQ7bMRRnxGvg2PBXdlOeJ6vIHb0u/Bf4rENxmakX7
-        sAoC0CEi+bJR7eyPA40I8dsCUg+bKnMkSA==
-X-Google-Smtp-Source: ABdhPJySaakZOYVDiJ4QCOzS/7V0OmYNCi+KvVxdNgskmTZmoAWN1Nwp5B7M2cnTwhXma7+BrqoW3Q==
-X-Received: by 2002:a05:6402:d6f:: with SMTP id ec47mr5853235edb.95.1629727108005;
-        Mon, 23 Aug 2021 06:58:28 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id g10sm7469097ejj.44.2021.08.23.06.58.26
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Aug 2021 06:58:27 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: False waker detection in BFQ
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20210813140111.GG11955@quack2.suse.cz>
-Date:   Mon, 23 Aug 2021 15:58:25 +0200
-Cc:     linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A72B321A-3952-4C00-B7DB-67954B05B99A@linaro.org>
-References: <20210505162050.GA9615@quack2.suse.cz>
- <FFFA8EE2-3635-4873-9F2C-EC3206CC002B@linaro.org>
- <20210813140111.GG11955@quack2.suse.cz>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VGHv+t7XJoBwzuDgFH5TfVqMsvYX/VooC0Y/PX4tAJg=;
+        b=DAjE30LBY8Jy8Z442uXvgxE6MgYybuhG6C3uHxYaV9wqRH9hbtBNQhKDT2jo4hWSeb
+         GQR1L9mEEOrLbI5nGwEiysf13kLwVIKtROcj9/Y/N7Z3c+Dk6mpce4tjOYtQGd/c2nqS
+         yUUCbc2qcObVBqlsZLthKLwkkPk77qJNrHqW8djBghl+2h22MBatOpWdw4GpL4hCmUCs
+         CBCkFp0iPh9cKo+9WhZt4zQUa7yf5p0pdBNAb/Ow/RckVWQ09s7FgDjTfsj6wGQLu4VH
+         SMbLw1zQ9iRjZ7yQq2sS5T48JHuBvb8Wkd51t50nFzv8U2WJgplU/gWW/R7gPD3YZIli
+         ViLA==
+X-Gm-Message-State: AOAM531o8h+DNZdr/2OVKk0eUgfTwjAROroP9t7Ft3sW7c5NoDLb1F78
+        g+WmdL3PiLPZNLgWTuiSBj40oirJ4Y6korpW219rIWPg9H3l14TYGD3VbTO5RTWKMHcT016Vy+X
+        +hSqeLPvNn3JGPz1FZxvS6wU=
+X-Received: by 2002:a17:906:7d83:: with SMTP id v3mr36533878ejo.216.1629734582613;
+        Mon, 23 Aug 2021 09:03:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxxp+uh6vvWHOggK+XZVQUmVCS8/2sf2bFFTaajhAycYy86aqPRfIaBgTC4eogFB5ay7zzGmA==
+X-Received: by 2002:a17:906:7d83:: with SMTP id v3mr36533860ejo.216.1629734582438;
+        Mon, 23 Aug 2021 09:03:02 -0700 (PDT)
+Received: from redhat.com ([2.55.137.225])
+        by smtp.gmail.com with ESMTPSA id f8sm9832100edy.57.2021.08.23.09.03.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Aug 2021 09:03:01 -0700 (PDT)
+Date:   Mon, 23 Aug 2021 12:02:58 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
+ space
+Message-ID: <20210823120229-mutt-send-email-mst@kernel.org>
+References: <CACycT3sNRRBrSTJOUr=POc-+BOAgfT7+qgFE2BLBTGJ30cZVsQ@mail.gmail.com>
+ <dc8e7f6d-9aa6-58c6-97f7-c30391aeac5d@nvidia.com>
+ <CACycT3v83sVvUWxZ-+SDyeXMPiYd0zi5mtmg8AkXYgVLxVpTvA@mail.gmail.com>
+ <06af4897-7339-fca7-bdd9-e0f9c2c6195b@nvidia.com>
+ <CACycT3usFyVyBuJBz2n5TRPveKKUXTqRDMo76VkGu7NCowNmvg@mail.gmail.com>
+ <6d6154d7-7947-68be-4e1e-4c1d0a94b2bc@nvidia.com>
+ <CACycT3sxeUQa7+QA0CAx47Y3tVHKigcQEfEHWi04aWA5xbgA9A@mail.gmail.com>
+ <7f0181d7-ff5c-0346-66ee-1de3ed23f5dd@nvidia.com>
+ <20210823080952-mutt-send-email-mst@kernel.org>
+ <CACycT3sR6Y5XiK6_xX2ni8w9mqmSxkrb639ByDzV2W+Jz79Dnw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACycT3sR6Y5XiK6_xX2ni8w9mqmSxkrb639ByDzV2W+Jz79Dnw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Aug 23, 2021 at 08:40:30PM +0800, Yongji Xie wrote:
+> On Mon, Aug 23, 2021 at 8:13 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Aug 23, 2021 at 01:45:31PM +0300, Max Gurtovoy wrote:
+> > > It helpful if there is a justification for this.
+> > >
+> > > In this case, no such HW device exist and the only device that can cause
+> > > this trouble today is user space VDUSE device that must be validated by the
+> > > emulation VDUSE kernel driver.
+> > >
+> > > Otherwise, will can create 1000 commit like this in the virtio level (for
+> > > example for each feature for each virtio device).
+> >
+> > Yea, it's a lot of work but I don't think it's avoidable.
+> >
+> > > >
+> > > > > > > > And regardless of userspace device, we still need to fix it for other cases.
+> > > > > > > which cases ? Do you know that there is a buggy HW we need to workaround ?
+> > > > > > >
+> > > > > > No, there isn't now. But this could be a potential attack surface if
+> > > > > > the host doesn't trust the device.
+> > > > > If the host doesn't trust a device, why it continues using it ?
+> > > > >
+> > > > IIUC this is the case for the encrypted VMs.
+> > >
+> > > what do you mean encrypted VM ?
+> > >
+> > > And how this small patch causes a VM to be 100% encryption supported ?
+> > >
+> > > > > Do you suggest we do these workarounds in all device drivers in the kernel ?
+> > > > >
+> > > > Isn't it the driver's job to validate some unreasonable configuration?
+> > >
+> > > The check should be in different layer.
+> > >
+> > > Virtio blk driver should not cover on some strange VDUSE stuff.
+> >
+> > Yes I'm not convinced VDUSE is a valid use-case. I think that for
+> > security and robustness it should validate data it gets from userspace
+> > right there after reading it.
+> > But I think this is useful for the virtio hardening thing.
+> > https://lwn.net/Articles/865216/
+> >
+> > Yongji - I think the commit log should be much more explicit that
+> > this is hardening. Otherwise people get confused and think this
+> > needs a CVE or a backport for security.
+> >
+> 
+> OK, do I need to send a v6? This patch seems to be already merged into
+> Linus's tree.
+> 
+> Thanks,
+> Yongji
 
+No, it's a comment for the future - I assume you will keep adding this
+kind of validation in other places.
 
-> Il giorno 13 ago 2021, alle ore 16:01, Jan Kara <jack@suse.cz> ha =
-scritto:
->=20
-> Hi Paolo!
->=20
-> On Thu 20-05-21 17:05:45, Paolo Valente wrote:
->>> Il giorno 5 mag 2021, alle ore 18:20, Jan Kara <jack@suse.cz> ha =
-scritto:
->>>=20
->>> Hi Paolo!
->>>=20
->>> I have two processes doing direct IO writes like:
->>>=20
->>> dd if=3D/dev/zero of=3D/mnt/file$i bs=3D128k oflag=3Ddirect =
-count=3D4000M
->>>=20
->>> Now each of these processes belongs to a different cgroup and it has
->>> different bfq.weight. I was looking into why these processes do not =
-split
->>> bandwidth according to BFQ weights. Or actually the bandwidth is =
-split
->>> accordingly initially but eventually degrades into 50/50 split. =
-After some
->>> debugging I've found out that due to luck, one of the processes is =
-decided
->>> to be a waker of the other process and at that point we loose =
-isolation
->>> between the two cgroups. This pretty reliably happens sometime =
-during the
->>> run of these two processes on my test VM. So can we tweak the waker =
-logic
->>> to reduce the chances for false positives? Essentially when there =
-are only
->>> two processes doing heavy IO against the device, the logic in
->>> bfq_check_waker() is such that they are very likely to eventually =
-become
->>> wakers of one another. AFAICT the only condition that needs to get
->>> fulfilled is that they need to submit IO within 4 ms of the =
-completion of
->>> IO of the other process 3 times.
->>>=20
->>=20
->> Hi Jan!
->> as I happened to tell you moths ago, I feared some likely cover case
->> to show up eventually.  Actually, I was even more pessimistic than =
-how
->> reality proved to be :)
->>=20
->> I'm sorry for my delay, but I've had to think about this issue for a
->> while.  Being too strict would easily run out journald as a waker for
->> processes belonging to a different group.
->>=20
->> So, what do you think of this proposal: add the extra filter that a
->> waker must belong to the same group of the woken, or, at most, to the
->> root group?
->=20
-> Returning back to this :). I've been debugging other BFQ problems with =
-IO
-> priorities not really leading to service differentiation (mostly =
-because
-> scheduler tag exhaustion, false waker detection, and how we inject IO =
-for a
-> waker) and as a result I have come up with a couple of patches that =
-also
-> address this issue as a side effect - I've added an upper time limit
-> (128*slice_idle) for the "third cooperation" detection and that mostly =
-got
-> rid of these false waker detections.
-
-Great!
-
-> We could fail to detect waker-wakee
-> processes if they do not cooperate frequently but then the value of =
-the
-> detection is small and the lack of isolation may do more harm than =
-good
-> anyway.
->=20
-
-IIRC, dbench was our best benchmark for checking whether the detection =
-is
-(still) effective.
-
-
-> Currently I'm running wider set of benchmarks for the patches to see
-> whether I didn't regress anything else. If not, I'll post the patches =
-to
-> the list.
->=20
-
-Any news?
-
-Thanks,
-Paolo
-
-> 								Honza
-> --=20
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+-- 
+MST
 
