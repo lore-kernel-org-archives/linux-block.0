@@ -2,106 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD51BC4338F
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 12:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AADCDC4320A
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 13:36:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0E76613AD
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 12:50:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91C1361178
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 13:36:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237099AbhHWMvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 08:51:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36203 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237070AbhHWMvG (ORCPT
+        id S230032AbhHWNhH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 09:37:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38050 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230009AbhHWNhG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 08:51:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629723024;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OFTm09P5LyoQVIUNtr43h/G3XCJIvH4h4XxosBFOzR4=;
-        b=fbkLREV+o1GQ+LHyOKxAGPU60dHcXt8h/R07WQYSQkm9oVM6JaPKUO8SspyyGS3wyIDvXQ
-        TD8/OqxVCRILjkgmko/LPvkuQLm5YXwPcee1Ym2bYkP0N5lojRdqk2VfvuptHK6E1MqGM9
-        njJU0/jyBLh9HJMZaNU3DEIabD5S0/0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-cDuADdTmNbyFHI7jTK7Hjg-1; Mon, 23 Aug 2021 08:50:23 -0400
-X-MC-Unique: cDuADdTmNbyFHI7jTK7Hjg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C3101B18BC0;
-        Mon, 23 Aug 2021 12:50:21 +0000 (UTC)
-Received: from T590 (ovpn-8-41.pek2.redhat.com [10.72.8.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B28AA60861;
-        Mon, 23 Aug 2021 12:50:13 +0000 (UTC)
-Date:   Mon, 23 Aug 2021 20:50:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Joseph Qi <jiangqi903@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        John Garry <john.garry@huawei.com>,
-        "Blank-Burian, Markus, Dr." <blankburian@uni-muenster.de>,
-        Yufen Yu <yuyufen@huawei.com>
-Subject: Re: [PATCH] blk-mq: fix is_flush_rq
-Message-ID: <YSOZgPtd4xkeAzeI@T590>
-References: <20210818010925.607383-1-ming.lei@redhat.com>
- <ae6c32cc-0bd1-601a-559e-8d6e2578f0ec@gmail.com>
+        Mon, 23 Aug 2021 09:37:06 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17NDZRSr026716;
+        Mon, 23 Aug 2021 09:35:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=bhKCun4hG0phkMjgRaAZpPwZ+pB8WymZD+p/xnZ24B8=;
+ b=D3Mpjx8ZpgY1b4ZweVdx95H/ltWNKv9JrG04nDHbEEzRa3R/z6iY+Snhn2Zq5IJ89YxY
+ yojEFfKFcmA9JZMZraURFHDAwKpGvdNcYtqGaoGpVgKxP2eYNGcH64eQhw3rhk7teqIn
+ F/8i/dJjunapVHBFi11uZogp27wofNpNqfyU5ngu4pkf1Dzey/wkUSuHTjtv5N/BbMSs
+ IOOCZ5Nb+fxqnvvxefcGKBI3Xj12KH+Bxd5Nqm6fK1JKPK9Pq4+4mpIc2kANAWVdfMWg
+ 9MkUpnzaNQHL3EGRiTWWYNHqbeO/bAyXsKD6bkOEVoiqTHshqeFEkr5UBmbWm3vEW0Ak fA== 
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ambxj1f0m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Aug 2021 09:35:50 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17NDTNIc025388;
+        Mon, 23 Aug 2021 13:35:47 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04fra.de.ibm.com with ESMTP id 3ajs48jwb5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Aug 2021 13:35:47 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17NDZgsv53215530
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Aug 2021 13:35:42 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9AD4A42056;
+        Mon, 23 Aug 2021 13:35:42 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA1C142045;
+        Mon, 23 Aug 2021 13:35:41 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 23 Aug 2021 13:35:41 +0000 (GMT)
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Halil Pasic <pasic@linux.ibm.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        =?UTF-8?q?Kai=20M=C3=A4kisara?= <Kai.Makisara@kolumbus.fi>,
+        linux-block@vger.kernel.org, oliver.sang@intel.com
+Subject: [PATCH] scsi: scsi_ioctl: fix error code propagation in SG_IO
+Date:   Mon, 23 Aug 2021 15:34:58 +0200
+Message-Id: <20210823133458.3536824-1-pasic@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: AV64in1NJPDY5rpmIHunw6aDR4Xn60SN
+X-Proofpoint-ORIG-GUID: AV64in1NJPDY5rpmIHunw6aDR4Xn60SN
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ae6c32cc-0bd1-601a-559e-8d6e2578f0ec@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-23_02:2021-08-23,2021-08-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ mlxlogscore=685 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ adultscore=0 suspectscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108230094
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 23, 2021 at 08:42:45PM +0800, Joseph Qi wrote:
-> Hi Ming,
-> 
-> On 8/18/21 9:09 AM, Ming Lei wrote:
-> > is_flush_rq() is called from bt_iter()/bt_tags_iter(), and runs the
-> > following check:
-> > 
-> > 	hctx->fq->flush_rq == req
-> > 
-> > but the passed hctx from bt_iter()/bt_tags_iter() may be NULL because:
-> > 
-> > 1) memory re-order in blk_mq_rq_ctx_init():
-> > 
-> > 	rq->mq_hctx = data->hctx;
-> > 	...
-> > 	refcount_set(&rq->ref, 1);
-> > 
-> > OR
-> > 
-> > 2) tag re-use and ->rqs[] isn't updated with new request.
-> > 
-> > Fix the issue by re-writing is_flush_rq() as:
-> > 
-> > 	return rq->end_io == flush_end_io;
-> > 
-> > which turns out simpler to follow and immune to data race since we have
-> > ordered WRITE rq->end_io and refcount_set(&rq->ref, 1).
-> > 
-> Recently we've run into a similar crash due to NULL rq->mq_hctx in
-> blk_mq_put_rq_ref() on ARM, and it is a normal write request.
-> Since memory reorder truly exists, we may also risk other uninitialized
-> member accessing after this commit, at least we have to be more careful
-> in busy_iter_fn...
-> So here you don't use memory barrier before refcount_set() is for
-> performance consideration?
+Fixes: f2542a3be327 ("scsi: scsi_ioctl: Move the "block layer" SCSI
+ioctl handling to drivers/scsi")
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+This is a patch against the for-next branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git and/or
+linux-next/master.
+---
+ drivers/scsi/scsi_ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes, also it is much simpler to check ->end_io in concept.
-
-
-Thanks,
-Ming
+diff --git a/drivers/scsi/scsi_ioctl.c b/drivers/scsi/scsi_ioctl.c
+index 7b2b0a1581f4..6ff2207bd45a 100644
+--- a/drivers/scsi/scsi_ioctl.c
++++ b/drivers/scsi/scsi_ioctl.c
+@@ -874,7 +874,7 @@ static int scsi_ioctl_sg_io(struct scsi_device *sdev, struct gendisk *disk,
+ 		return error;
+ 	if (put_sg_io_hdr(&hdr, argp))
+ 		return -EFAULT;
+-	return 0;
++	return error;
+ }
+ 
+ /**
+-- 
+2.25.1
 
