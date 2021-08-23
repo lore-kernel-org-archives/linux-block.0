@@ -2,168 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED93BC4338F
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 22:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BCA7C4338F
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 23:01:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C2DF060F4C
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 22:31:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D86CE61052
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 23:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233061AbhHWWcB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 18:32:01 -0400
-Received: from mail-mw2nam12on2086.outbound.protection.outlook.com ([40.107.244.86]:36193
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229760AbhHWWcA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 18:32:00 -0400
+        id S233178AbhHWXCD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 19:02:03 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:34072 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233165AbhHWXCB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Aug 2021 19:02:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1629759678; x=1661295678;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=ZxVHNX9dx1zsT3HI1pB4p6wUtR7+Ot+utKpLwMVnsWY=;
+  b=jx2Ai3LEGQBlJDKInildhc3AVjzlLbCn6Q2CSDmEXrgnB1bRU4WkobbE
+   4xg7AUhTsvBAsjZ2Q6rQS12wtwW6HoJMfieEEOsJGlsZicSNgToqgd1M/
+   bxQDZgLFmNwqUiNQexYJ5VminW8hDWIzZq1qCx17b50th8JXMbIWBuwKD
+   Vx8ujRiZPV3iriJR0YHoYovAhXjmwCeA38rsHCh/ben9KtWkK4Yq44LmY
+   X3ZwZzvZOH0X79elKP7mhqsJWdVX0XSr92jmVYe6MOhwq+Xk4KozTheFj
+   K1AFG0gNiuQwcZruh5W3Agmg75T1hELSdl9JNgfV7Yvggyb9oSV5TgZRv
+   w==;
+X-IronPort-AV: E=Sophos;i="5.84,344,1620662400"; 
+   d="scan'208";a="289754279"
+Received: from mail-dm6nam11lp2168.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.168])
+  by ob1.hgst.iphmx.com with ESMTP; 24 Aug 2021 07:01:17 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aIjCFa+OgAJqx1h3XPuTqYrtgjn2KM53iNPsN5tylhXX4DCY2PKa1HJP1uF7lG6uEyJq/nOGtMF7mSLIcuvFNrFfZo3DEtyOS8B3j3yvxSmm2sfdauGYZxJbD7kJGzkFpgJei+MYOClcNgKPZU08ulgJPBR5HhGm6y2wLsTBMxVFOwtwo5H4lX5ZNzJ50xt/u92t7xdDz76UROuWdm2vXEDyTOYxvgly0sc3L48WNX7MP1J1p8zfG9BZaiXPFnvFgvCtT7UuLv9ow+BGajy9rfACdAWZ5nWWnUfLzjFTsXjPQNhcu8wa5BwKAgHsj8ohmkLRrDR4dXmAPBDReTeP5g==
+ b=ChkfjqQocgP2e9FfyrEwZ9b/rk1smHcxAOXz6GAR6CGe0xl0KWCavgoyTK0bA13Ck3knnJ5xwerckDaZDsvEeIo+J2u2+HmwVx2HH1sxy495hMCtnbgwltgClGmvkDCtC3CIWGTc2t3NxYUKeaoxeHiR08OLuxs5XwvPHu+5ZjgRPQDeZD5faC5hDo4Pzx/chRXel+0EDJjjKg2UdiT+YzotQSAc8t2rjRgeXWlRbpxafYeGq76OrbY3riHaeLMpdlE1iy8NxHyYy91QGHQz/LL1RbeuE8+wbMKvYCAShSr2upSAsSrD+l96ofWz+5ksAPJmBgY1DX8CAS0i1LnkPw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TomfH4lnNNRczpdPZu9K6StUDQXO27kkWoOuagf+NdQ=;
- b=etsWDKgjYzGRdWWf+vYHugk6OABxu7KUMRuDu4iGmTMrzCZXd5n/NZ+sp0YkkyGj/SpaG8wCRMGdHGo8W8qRnaatcA7UlFxH7/jUk4irAaD32UWXXAi/KViPQ9yhH/cvMCkEaLl77mshBjmIyMXqt1quD+MdVc2X2I1uamsOwc0TnX6DgzWOe5wDpS7WIFEYRMA9ujp3tXLxTtOzkFcvXO5crWpWk6rcYr4QP7xDszEi638dAXu1qwdMC+FRyi3ofEGspPkSo4x7M5c302PMfrs6yKfylJIt9pMj02oOxQvy4Ttu5SRK2fuhOp6zyk/Q5QTuLGWMHk8Ac0Mo11wCnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.32) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=ZxVHNX9dx1zsT3HI1pB4p6wUtR7+Ot+utKpLwMVnsWY=;
+ b=QiqmPP4wOzkswkvPa7H3YVrgprrGGfSOcBhYDFydt8Rgmxo7KRMWCcojwCA52Tg08iNhaB/yePb3nZmKddFTT5IXtkf60yGW81PATnSQVa5fkyhBYUT2Nd1x5o0gg09aBV0L5JQ0HAftEaTYk/9CTL4Lad2+Us06oJw56k5pGLmRknQYoNOnLGCK4Tp6tOJsC97OoQuxnH1/lGJh/2zdSTfQOsJAE3Vl+CXMTX5a55vr6DkPhKL9hXsK1JnzEsYzwPC0N7JXzb7C+sE75VUb2ctURuO2GxHMgumeDVcPsHiJLfOoY1T5H436bQxIn8i/cIrzNaTSbv69q3nlMruoIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TomfH4lnNNRczpdPZu9K6StUDQXO27kkWoOuagf+NdQ=;
- b=kMXP22/h/8KdVko9lV+mfDTwBUF5/2lS7qdb46KInLEGM8esffODEa1w2LQN0hlTU/Fr39WlIpH03miqNPiGxfmZdImS+immIdMEz4N4RKYLo7e8tKu/yllTQWOibI1gNu04ApPEfBB5cflLg6mkUOU+uBYl5H7uyWuo+4CgyxFNXvgNV4pJfdCBMTN2X3XtcCSewAuc77haD90lwiR0gsS4391KOOEuRZjmiXjExfT7nn5Q0dT82IzD1OBZOLVFlrBc8Hp/QlPELyrxRMFV0R5/d3+LYm+t1OVGZkGK56pNpXycbbwnu7tYa1yCG0csZrAkHvHvntBuKRfE+gnsog==
-Received: from DM6PR03CA0079.namprd03.prod.outlook.com (2603:10b6:5:333::12)
- by BY5PR12MB4801.namprd12.prod.outlook.com (2603:10b6:a03:1b1::30) with
+ bh=ZxVHNX9dx1zsT3HI1pB4p6wUtR7+Ot+utKpLwMVnsWY=;
+ b=uKJ7LEWKb1/q9y9rIx2JHldRdZteji71gNmxmT8Ow0rXgIIOL+a6YoiEOhcFA89zGlPDHKa3JYGzoWcOvgrPisOJCCGmvRT5BhwYpeIC83tsxttbWmuud9bo1y4yjiziTfmHe33eKQZgxO2qGEmhtPImLKwjLgujAb1AUfNHCT0=
+Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
+ by DM6PR04MB4346.namprd04.prod.outlook.com (2603:10b6:5:a3::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Mon, 23 Aug
- 2021 22:31:16 +0000
-Received: from DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:333:cafe::a1) by DM6PR03CA0079.outlook.office365.com
- (2603:10b6:5:333::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend
- Transport; Mon, 23 Aug 2021 22:31:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.32; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.32) by
- DM6NAM11FT006.mail.protection.outlook.com (10.13.173.104) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4436.19 via Frontend Transport; Mon, 23 Aug 2021 22:31:15 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 23 Aug
- 2021 15:31:15 -0700
-Received: from [172.27.0.198] (172.20.187.6) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 23 Aug
- 2021 22:31:12 +0000
-Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
- space
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Yongji Xie <xieyongji@bytedance.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20210809101609.148-1-xieyongji@bytedance.com>
- <e6ab104e-a18b-3f17-9cd8-6a6b689b56b4@nvidia.com>
- <CACycT3sNRRBrSTJOUr=POc-+BOAgfT7+qgFE2BLBTGJ30cZVsQ@mail.gmail.com>
- <dc8e7f6d-9aa6-58c6-97f7-c30391aeac5d@nvidia.com>
- <CACycT3v83sVvUWxZ-+SDyeXMPiYd0zi5mtmg8AkXYgVLxVpTvA@mail.gmail.com>
- <06af4897-7339-fca7-bdd9-e0f9c2c6195b@nvidia.com>
- <CACycT3usFyVyBuJBz2n5TRPveKKUXTqRDMo76VkGu7NCowNmvg@mail.gmail.com>
- <6d6154d7-7947-68be-4e1e-4c1d0a94b2bc@nvidia.com>
- <CACycT3sxeUQa7+QA0CAx47Y3tVHKigcQEfEHWi04aWA5xbgA9A@mail.gmail.com>
- <7f0181d7-ff5c-0346-66ee-1de3ed23f5dd@nvidia.com>
- <20210823080952-mutt-send-email-mst@kernel.org>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <b9636f39-1237-235e-d1fe-8f5c0d422c7d@nvidia.com>
-Date:   Tue, 24 Aug 2021 01:31:10 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <20210823080952-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+ 2021 23:01:16 +0000
+Received: from DM6PR04MB7081.namprd04.prod.outlook.com
+ ([fe80::e521:352:1d70:31c]) by DM6PR04MB7081.namprd04.prod.outlook.com
+ ([fe80::e521:352:1d70:31c%9]) with mapi id 15.20.4436.024; Mon, 23 Aug 2021
+ 23:01:16 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+Subject: Re: [PATCH v3 16/16] block/mq-deadline: Prioritize high-priority
+ requests
+Thread-Topic: [PATCH v3 16/16] block/mq-deadline: Prioritize high-priority
+ requests
+Thread-Index: AQHXY9tAcljGY1JaPE+BA6SKWl07GQ==
+Date:   Mon, 23 Aug 2021 23:01:16 +0000
+Message-ID: <DM6PR04MB7081B83F99942E45212817EEE7C49@DM6PR04MB7081.namprd04.prod.outlook.com>
+References: <20210618004456.7280-1-bvanassche@acm.org>
+ <20210618004456.7280-17-bvanassche@acm.org> <YR77J/aE6sWZ6Els@x1-carbon>
+ <5aa99b39-c342-abd4-00a4-dc0fbfac96aa@acm.org> <YSA1JWt9soMSs23Z@x1-carbon>
+ <e94f62c4-a329-398d-5003-d369506d7f89@acm.org> <YSNQAu9uXrmEteXc@x1-carbon>
+ <b6131780-8b67-8efb-a942-e40b68df082e@acm.org>
+Accept-Language: en-US
 Content-Language: en-US
-X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8ee8a483-ac08-4b6b-dc4b-08d96685b845
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4801:
-X-Microsoft-Antispam-PRVS: <BY5PR12MB4801113B750352B33DA64AEFDEC49@BY5PR12MB4801.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2qWfUSeX2vnZoNeQlYRMjGPU0C0duWgQdsgT9EdVOeqybyP9Xn8fSqq+3dxqhWQfykFNCSr2llg7qljOJZC9Y1jQ7D7PQ59LKK62wiOswZxlA652dB0WvR5Qc/NTQQ8xEIeGeRWUD1EQ1OpPNSxGEN1/AWNrs12fotS7zt32YRztt8M48yC4CfxozKAx+bZrPrhpgPgR1r7X73gHxMrcEi4wurjZbqYGiaIKN9Xz/czYZI+g/vQaf81PO+pvBGMEKl4utVL03DJ05T15MjW42Z9JcnisSPHF85w1JsorjB4KvsU2Xf07xUK5993MgryT/pXNaUgyMnKZqAPG7S2YnOPDknWB7yAfIBeMAlBNbbWILZ4aDjdqh+zD0O7ZiODgDq8frogOzHB4daCU1FLu+jvF0H8zR9wc4xwsUxF1ZzVpi9SuJBKiKn6QDUJMccXxRpf8+6h1MxToyxaGy8j2xgT0Z8zU+BihEU51G0oJEh4Hmjsnoyhg5q8a3jBVHeIxUUMEQZkNaHeRnXGEQ8U3/nI1u9SzkacLgiqQOWwZhObfEbv7ud4RSLe5rt31uBlfWHB89y0pWltp8h7tiWOXZmx9mzAxhSdcEKDwqitZ+F3FbwwxJnmP6cJXdxVqKpHwMLfZMyL6iHD+JzrfwaHBa5RNc/FLXkyfirqVvs/nrDWojdJcR/E/tgYg4d8cGHxtqEx3nojmlx2EnqVZYffErsvwJRKZ/Hb4IPlJzftJDiZNjn4a3G5oswHIdew58paWrVgoeTS0HWBbDs8xHqWbeVJImD6LKhSqAMjISHp6jKnvKkhNz38UxZABwkJ+SK4T
-X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(136003)(346002)(396003)(39860400002)(46966006)(36840700001)(5660300002)(356005)(47076005)(7636003)(82740400003)(70206006)(2906002)(86362001)(316002)(82310400003)(16576012)(36860700001)(83380400001)(36756003)(31696002)(16526019)(70586007)(4326008)(26005)(8936002)(186003)(8676002)(966005)(53546011)(336012)(426003)(2616005)(478600001)(31686004)(6916009)(54906003)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2021 22:31:15.5316
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: acm.org; dkim=none (message not signed)
+ header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 695719a9-cfea-4815-fea4-08d96689e986
+x-ms-traffictypediagnostic: DM6PR04MB4346:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR04MB4346544E6AA928734D6DE184E7C49@DM6PR04MB4346.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tKPSpHcequTNGc8TexYZZ2BG0FKDZvqSCNHSsYBY4Qw1lqJOz1hcIEfNkjVm4DG/AFXKAMsoR+KNYYXeHCqkpMkRUHMRn10T62LCi4lYOiWWoqvrPYt2UFB2rztm4Kc0ncXshlxkrkQCGAMQJLyOzCfIk1BRbxWIkxsr9bYC/H+TQNBzL4Y0k+LLE4e3VhPfpRAlmNzEQOL38PHHNZW5nrBg0vIwWQ5Qb5eemLO7MtKuxMymAVCr00TRrnqyVea1JSbVXQmRnAoBWFn8VyGBM9LaiDes9fHfAcY0Q3OmWLwfwRLPZmjjIKxU3mlt3b/1h5iy46f96x35MObk66GPF97tK5XvUKIelnloEMPDz56BIwY7KKUu3tcpNHh89+vrso8kBG2m+1QiRIJGuM5i1u4uhAcY1pOjEVkdfcVxggLzRbQ4cutqiD0SXVl6sD+QKtAnq202zfvc0c7lbfq4iVqnnG1cSoNf+eCjXjCvW9vnTMIr//fbrEfzM6WtCVl0Ax+aQ2lqlbTC47J2BJqvSa4V0BdcRLk/7UB3JSBTQ1r+GfNNwCxBv+MGVJfU5dDgAhf6n455V+8ATA4eRE0tysz1NH1HpxEUuFt2jyFy/Lx4ZCCLVYGQN4kUac0WT9Myuo8ZSC4AhSneuKQ63sgW9kSy+gJs5lm+bZLXV3U/QCAkGUHf1eVtPHspSIy+ISulEebITxGpqMJHCC1z+jPstg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(396003)(366004)(39860400002)(136003)(53546011)(6506007)(66476007)(66556008)(76116006)(38070700005)(66946007)(33656002)(122000001)(64756008)(478600001)(316002)(55016002)(86362001)(38100700002)(110136005)(91956017)(66446008)(186003)(54906003)(8936002)(5660300002)(4326008)(8676002)(71200400001)(6636002)(52536014)(9686003)(7696005)(83380400001)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?bh70JNcAmvh4cKXBMDHJLzX5CALf1Iw4oJDuz5uOnpws++oaHLS/CP/FvNxp?=
+ =?us-ascii?Q?abWFxd1ZD1gy2vHSKf2fCpayqx9jDNpdEAw7BLK4BgU91dLoiKB3pbY7f/AH?=
+ =?us-ascii?Q?F8llh9wThGoablwbgJtleWntiB6SMUtcjQ7w2ArYJ7p6lfAMPyzHj1Xv3qfx?=
+ =?us-ascii?Q?Fx2NJy7kH2+i6kqxKHK6lkngErZa1E2eEgk+XpovVgkx436wEn/jZMDJWbQT?=
+ =?us-ascii?Q?X78w6yB5+R4PgTNmg1vjnwL9xqWCipKpRRnOVougFcO51mjzmcdh/GaP0SG/?=
+ =?us-ascii?Q?s0Nlo4C6P423Gbni3UswrPK6rd9Ta3gwMf8jaQQW5P3CfXgvtHduiH6SlUNd?=
+ =?us-ascii?Q?0bdBAm9piiegO18notoiV3Ezm45+YID8g49OwfFWwn1zh4l0OHpnr1IwX+jh?=
+ =?us-ascii?Q?DbzYaAMYZTJrsbRRydwJIG/+86Zkvq6zUNIVGSt754zbDBhHjg6X1+UJT4Ce?=
+ =?us-ascii?Q?1v4L6C/S54cGBOxj7Z0vzKMipOzQHYIA0oWu1Sl1EG+gjuhfko0beODn4Y9J?=
+ =?us-ascii?Q?ASsR2Mf6GHXNahJpzwR0oL2L8Zzxv7n2iCmHF024e7PUE9Fj7fOgxeaj+J/8?=
+ =?us-ascii?Q?fEazCFYXv+AU7DPaqjJyp3hjYfihOo5dP1xJMQfSVHbRsBQVbddDqN7k3sWO?=
+ =?us-ascii?Q?G3lPdEZyxwl+54GSlO0v1GzsWmKf1swEs50sCG4recBmp9XEElcXVmzQNXBz?=
+ =?us-ascii?Q?GdcgHAU/b6TzH1pRjRLBdfCrHFqOxIVpgbZF6ti7HRhqMTVZu2C7tWeG8l/g?=
+ =?us-ascii?Q?19Qo8eklxetNQFBeuWzXrtNjPsj5zov8SZQ+La/NzTPxezAGKPLrUfgkPYwl?=
+ =?us-ascii?Q?ieJLnda7/Gj3hXgO/gMSnLTmTgmVlllqOiV3U/q/ml/DanAeKTjpXUG9ibXR?=
+ =?us-ascii?Q?5roNbkJdGozXNh6jRaRtporsf+1oRRKEephPdK91q+g5BrnBKRmNi9mdb9RS?=
+ =?us-ascii?Q?KZt5Uf+hBBkQWzcwKulKx//v1nO32+EkocgK+wbSHIdk6I7V67B2e8aOADTg?=
+ =?us-ascii?Q?FumER1yhO0Hfla+w4GG71u89AQ8INIblT++zI3ZnFblw6Fcw7LONzvUxyNVl?=
+ =?us-ascii?Q?iUJDCN+/9n4zFqSStcO+89agnn8LU8XF6LvbY4gl3FlMwDYRgjq1ViYmRHx+?=
+ =?us-ascii?Q?9I3T1xaJZXckIn7GQdU0geMp00oLSnw2Il17PP6Kxo/Na5JgmBepv09RRJKA?=
+ =?us-ascii?Q?rbI+fAHjVGLjUen6x/xoGG8vXEkkPfT3Ym4Zghe1MKTv5jQOOBwEVhJhtWmT?=
+ =?us-ascii?Q?5BuyYUgYKNQuF/FeRfILKGUqOK3tYq+41W6gs+zJK8i6XzEEYupHPKt4TgK7?=
+ =?us-ascii?Q?xWQAFcNdsnoFyXW2WPpwp46Pc9nr1Sr7dS/GtluVK37e0MaPvtFyae+tCqu6?=
+ =?us-ascii?Q?vOKH0GM8LMweBkjum8dqvvT47N9DiWMdpPuQZBUx77uhM4kIUA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 695719a9-cfea-4815-fea4-08d96689e986
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Aug 2021 23:01:16.2573
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ee8a483-ac08-4b6b-dc4b-08d96685b845
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4801
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: W2ysOaj/331PpLct2JH9e2jyWYXF8I1VUDq5cYadkyvq2OH09ILISftgZbUo8GTMm7S2mCFk4Ynsb/KUwr8OTw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4346
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 8/23/2021 3:13 PM, Michael S. Tsirkin wrote:
-> On Mon, Aug 23, 2021 at 01:45:31PM +0300, Max Gurtovoy wrote:
->> It helpful if there is a justification for this.
->>
->> In this case, no such HW device exist and the only device that can cause
->> this trouble today is user space VDUSE device that must be validated by the
->> emulation VDUSE kernel driver.
->>
->> Otherwise, will can create 1000 commit like this in the virtio level (for
->> example for each feature for each virtio device).
-> Yea, it's a lot of work but I don't think it's avoidable.
->
->>>>>>> And regardless of userspace device, we still need to fix it for other cases.
->>>>>> which cases ? Do you know that there is a buggy HW we need to workaround ?
->>>>>>
->>>>> No, there isn't now. But this could be a potential attack surface if
->>>>> the host doesn't trust the device.
->>>> If the host doesn't trust a device, why it continues using it ?
->>>>
->>> IIUC this is the case for the encrypted VMs.
->> what do you mean encrypted VM ?
->>
->> And how this small patch causes a VM to be 100% encryption supported ?
->>
->>>> Do you suggest we do these workarounds in all device drivers in the kernel ?
->>>>
->>> Isn't it the driver's job to validate some unreasonable configuration?
->> The check should be in different layer.
->>
->> Virtio blk driver should not cover on some strange VDUSE stuff.
-> Yes I'm not convinced VDUSE is a valid use-case. I think that for
-> security and robustness it should validate data it gets from userspace
-> right there after reading it.
-> But I think this is useful for the virtio hardening thing.
-> https://lwn.net/Articles/865216/
-
-I don't see how this change is assisting confidential computing.
-
-Confidential computingtalks about encrypting guest memory from the host, 
-and not adding some quirks to devices.
-
->
-> Yongji - I think the commit log should be much more explicit that
-> this is hardening. Otherwise people get confused and think this
-> needs a CVE or a backport for security.
->
+On 2021/08/24 2:15, Bart Van Assche wrote:=0A=
+> On 8/23/21 12:36 AM, Niklas Cassel wrote:=0A=
+>> I was mainly thinking that it should be possible to do a generic fix,=0A=
+>> such that we eventually won't need a similar fix as yours in all the=0A=
+>> different I/O schedulers.=0A=
+> =0A=
+> Coming up with a generic fix would be great but I have not yet found an =
+=0A=
+> elegant approach ...=0A=
+> =0A=
+> Another question is what the impact is of scheduler bypass on zoned =0A=
+> block devices? Is the zone locking performed by the mq-deadline =0A=
+> scheduler for writes to zoned block devices compatible with I/O =0A=
+> scheduler bypass?=0A=
+=0A=
+Without mq-deadline, in the general case, regular writes to the same zone m=
+ay=0A=
+end up being reordered and IO errors will follow. Only zone append writes c=
+an=0A=
+survive the scheduler bypass as zone write locking in that case is done at =
+the=0A=
+scsi disk driver level using the dispatch queue. So bypassing the scheduler=
+ for=0A=
+writes can work only with very special cases, namely, the user issuign smal=
+l=0A=
+request that are never split and at QD=3D1 at most per zone. Any other work=
+load=0A=
+(larger requests and/or higher write QD per zone) can easily trigger write=
+=0A=
+errors (that is fairly easy to check).=0A=
+=0A=
+> =0A=
+>> However, it does not apply on top of Torvalds master or Jens's for-next=
+=0A=
+>> branch because they both have reverted your cgroup support patch.=0A=
+>>=0A=
+>> If you rebase your fix and send it out, I will be happy to send out=0A=
+>> a Reviewed-by/Tested-by.=0A=
+> =0A=
+> I will rebase, retest and resend my patch.=0A=
+> =0A=
+> Thanks,=0A=
+> =0A=
+> Bart.=0A=
+> =0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
