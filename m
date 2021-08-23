@@ -2,67 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019FAC4320A
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 06:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3522CC4320A
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 06:51:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8D7D61284
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 06:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0733961250
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 06:51:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231779AbhHWGuV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 02:50:21 -0400
-Received: from verein.lst.de ([213.95.11.211]:46542 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231715AbhHWGuV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 02:50:21 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 46DD467373; Mon, 23 Aug 2021 08:49:36 +0200 (CEST)
-Date:   Mon, 23 Aug 2021 08:49:36 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        oliver.sang@intel.com
-Subject: Re: [PATCH 18/24] scsi_ioctl: move the "block layer" SCSI ioctl
- handling to drivers/scsi
-Message-ID: <20210823064936.GA21806@lst.de>
-References: <20210724072033.1284840-1-hch@lst.de> <20210724072033.1284840-19-hch@lst.de> <20210823084316.4bb224e0.pasic@linux.ibm.com>
+        id S234258AbhHWGwV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 02:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36318 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231715AbhHWGwU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Aug 2021 02:52:20 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A43C061575;
+        Sun, 22 Aug 2021 23:51:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=uCWVwv/sQJESLZJQECzCX6ToUOh94WzFyNlwTL+HvI8=; b=IcdOj4/dCT4DM8XqWkWaLbaQYa
+        PB7anTyh7nGtPhQ3gQXSk/afJbWxH0Zk5QdUUVnuebPJonJ5V363Sbtrz5Tg2eEK1GQVx+6fjCZ2e
+        unvfyXhJgRjPxI+ziKx54VBdOIS1V9+4yGcZNYqx9Tb1oNrF0YyQYUrIQUSWoryZYrXp3O+iPQA1c
+        n7bGyEmrciwacsWc3EsLNkmk5mmRK9XERgPxXkAPTJmUCWhIWAVMgk0LcxJcehko6Xq7fVE/9qG+t
+        VSkZLg4POsR1p49KptMthqjQHntVgnTVUk2OEWkdrzjkbCzQ462TFqs/z0wvYWX7Z+LhnisPdr+So
+        ESPWDr0g==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mI3mn-009OVX-4U; Mon, 23 Aug 2021 06:50:31 +0000
+Date:   Mon, 23 Aug 2021 07:50:21 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Guoqing Jiang <guoqing.jiang@linux.dev>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: [PATCH V2] raid1: ensure write behind bio has less than
+ BIO_MAX_VECS sectors
+Message-ID: <YSNFLXpY2ZY1hvSE@infradead.org>
+References: <20210818073738.1271033-1-guoqing.jiang@linux.dev>
+ <YR4ckyTCiOXCRnue@infradead.org>
+ <207ca922-4223-632b-ed68-4e78e40ac3dc@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210823084316.4bb224e0.pasic@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <207ca922-4223-632b-ed68-4e78e40ac3dc@linux.dev>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 23, 2021 at 08:43:16AM +0200, Halil Pasic wrote:
-> I believe there is a small problem with this patch. I think it is
-> easiest to explain with the diff that fixes it. Please see the patch
-> at the end of this email.
+On Fri, Aug 20, 2021 at 04:19:22PM +0800, Guoqing Jiang wrote:
+> How about this?
 > 
-> Otherwise your patch looks great!
-> 
-> This may or may not be related to the problem reported here:
-> https://lkml.org/lkml/2021/7/29/157
-> Adding Oliver, maybe he can test if this fixes his testcases as well.
-> (It did fix ours.:)
-> 
-> If you like I can respin my fix with an extended patch description.
+> +???????????????????????????? /*
+> +?????????????????????????????? * The write-behind io is only attempted on drives marked as
+> +?????????????????????????????? * write-mostly, which means we will allocate write behind
+> +?????????????????????????????? * bio later.
+> +?????????????????????????????? */
+> ?????????????????????????????? if (test_bit(WriteMostly, &mirror->rdev->flags))
+> ?????????????????????????????????????????????? write_behind = true;
 
-No this looks good, but to make sure Martin picks it up please send it
-as a separate thread.  It would be great it this fixes Olives issue,
-but at least on my Debian systems blkid don't even call into SG_IO.
-But maybe he has a different one or it is a cascading effect on that
-particular setup.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Except for the weird formatting of the whitespaces this looks good.
