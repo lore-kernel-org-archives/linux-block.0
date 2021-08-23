@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B61ADC4320A
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 20:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4120C432BE
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 20:30:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A02096103A
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 20:30:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D4DF613DB
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 20:30:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232791AbhHWUbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 16:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57398 "EHLO
+        id S232823AbhHWUbP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 16:31:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232683AbhHWUa4 (ORCPT
+        with ESMTP id S232638AbhHWUa7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 16:30:56 -0400
+        Mon, 23 Aug 2021 16:30:59 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C6B4C061575;
-        Mon, 23 Aug 2021 13:30:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D1DC061760;
+        Mon, 23 Aug 2021 13:30:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ZwxyFXcOiGq8qChS2d1Notj23dWo1Us0XnbUDLeBwX8=; b=gwLOjM3XIyBov1gksucnFV6ooL
-        M14P6xtIFkqJWDvnJ+/ICsQQuOeHg3bNCCgwD6eLd1QGFRv9hRZPIwrwVVrc4GRJ2n6pYIZ5XmSrw
-        rcx7adfg7jhXfbkhk5O7HByT/5+LX1pVl9RViZEXYV9+8xJ3lT8eOaknnO+IUd6QKllMR3/xq5hgf
-        N/goUQWSvkvYz8acad20DJCfe0uNYcHhGoEl2FNlkDkG744ujAzQBIJJRxGvJnJbLar1t7aga4T7o
-        AhjcvHCAtsXTrVTXcoPwJ/DRxC2CyMVvuuTQ1zXJ5xHiLfHnsJzmkEfKV0hbmwsmiMIBYmw4pns41
-        bG+HsJfw==;
+        bh=JwOWbBzkAnZ+cmq3j7KTpY4gX689ENExo/ts1u/1X/M=; b=oLoArWLSpDzDh0QIiWovAO+FVB
+        WZVxwCC8x6MEcP2VL8z1RZZ/YStJ6ekAkvjA+VIVyJ2f+6L2JuRG94A8vco2j0HZ2VHjdZ1NEsjb6
+        uRXqh03SmhIQVd+aVXFzwlyQrHdYoHWtQ83jVGUFDbgELpfmegdKdOdDPIY07Pmk4c+5durRv2hKQ
+        5mKchatT2Op1+GMj5rJGMvvpm+YGR4/CwokOVNPxHDDxbF8/chbrRc2x/eJgDbMunVXFwfvl6yJzw
+        HoEmoAcu+TKvxFSABoEDzpMsBH5uIWRqBkUcwm5Q4zQ+A+qlom774cSMcSlJGHxFdVoreF7pifkQl
+        G4K3X9pQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mIGZa-000ZjY-Cl; Mon, 23 Aug 2021 20:29:34 +0000
+        id 1mIGZa-000ZjQ-6z; Mon, 23 Aug 2021 20:29:34 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
         kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
@@ -47,9 +47,9 @@ Cc:     hch@infradead.org, hare@suse.de, bvanassche@acm.org,
         dm-devel@redhat.com, nbd@other.debian.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 08/10] dm: add add_disk() error handling
-Date:   Mon, 23 Aug 2021 13:29:28 -0700
-Message-Id: <20210823202930.137278-9-mcgrof@kernel.org>
+Subject: [PATCH 04/10] scsi/sr: add error handling support for add_disk()
+Date:   Mon, 23 Aug 2021 13:29:24 -0700
+Message-Id: <20210823202930.137278-5-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210823202930.137278-1-mcgrof@kernel.org>
 References: <20210823202930.137278-1-mcgrof@kernel.org>
@@ -66,40 +66,25 @@ error handling.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/md/dm.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ drivers/scsi/sr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 7981b7287628..cd26fde4ab56 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -2077,15 +2077,21 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
- 	if (r)
- 		return r;
- 
--	add_disk(md->disk);
-+	r = add_disk(md->disk);
-+	if (r)
-+		goto out_cleanup_disk;
- 
- 	r = dm_sysfs_init(md);
--	if (r) {
--		del_gendisk(md->disk);
--		return r;
--	}
-+	if (r)
-+		goto out_del_gendisk;
- 	md->type = type;
- 	return 0;
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index dc78ad96e6f9..3e0c6f881521 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -779,7 +779,10 @@ static int sr_probe(struct device *dev)
+ 	dev_set_drvdata(dev, cd);
+ 	disk->flags |= GENHD_FL_REMOVABLE;
+ 	sr_revalidate_disk(cd);
+-	device_add_disk(&sdev->sdev_gendev, disk, NULL);
 +
-+out_cleanup_disk:
-+	blk_cleanup_disk(md->disk);
-+out_del_gendisk:
-+	del_gendisk(md->disk);
-+	return r;
- }
++	error = device_add_disk(&sdev->sdev_gendev, disk, NULL);
++	if (error)
++		goto fail_minor;
  
- struct mapped_device *dm_get_md(dev_t dev)
+ 	sdev_printk(KERN_DEBUG, sdev,
+ 		    "Attached scsi CD-ROM %s\n", cd->cdi.name);
 -- 
 2.30.2
 
