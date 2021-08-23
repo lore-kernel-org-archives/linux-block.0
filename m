@@ -2,161 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49233C43214
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 04:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F81C4338F
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 06:43:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2BF4661186
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 04:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1D9F61356
+	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 06:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231689AbhHWE4v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 00:56:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbhHWE4u (ORCPT
+        id S233584AbhHWGo3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 02:44:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57214 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231779AbhHWGo3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 00:56:50 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB190C061575;
-        Sun, 22 Aug 2021 21:56:08 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GtKh13JJDz9sWS;
-        Mon, 23 Aug 2021 14:56:01 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1629694564;
-        bh=R8PBxC/HynH4xEcQANJCH6rE1jH+u8gsKBuxIbMNLTs=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=a1iW2Pt1kHHliRzWnsgUWnUPXzAPa6K0czSeVW/lgopJWaUMSBdXd9RvxA2oo+2Bi
-         pmRIJH5PBg6bByQY/cxKNxkoprS4/Y5ACVbXiYIchmTaPZGQCOlmNym0Z7HGM2wM4c
-         4Fp2ulP/ZaQxpRgJz4EDHxe4xx6yYeKW+hpsTCDkiHP5QbMve8C48MLs61Q+vEPfdI
-         VTqXFsDNZDd3tnl+2/9gl12uMzzs6VCYFegjMVs0YdD8TM9avqLkWjZK74C6aBMExz
-         Etv9zteIN82cJPx68a7lGtZT15hKDTFtgcJJIQISdDBokbfeJWLCrCJY//wTldYX9G
-         LRVCHoyBJgAkQ==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        linuxppc-dev@lists.ozlabs.org, kernel test robot <lkp@intel.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 57/63] powerpc/signal32: Use struct_group() to zero
- spe regs
-In-Reply-To: <202108200851.8AF09CDB71@keescook>
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-58-keescook@chromium.org>
- <877dggeesw.fsf@mpe.ellerman.id.au> <202108200851.8AF09CDB71@keescook>
-Date:   Mon, 23 Aug 2021 14:55:58 +1000
-Message-ID: <87k0kcdajl.fsf@mpe.ellerman.id.au>
+        Mon, 23 Aug 2021 02:44:29 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17N6Y58c087043;
+        Mon, 23 Aug 2021 02:43:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=P9fw4VLP/J/ALHiiFAin6o7BcfNci/tdgswv/X+Hwt0=;
+ b=Ar3pjw3xFYBiFkz4VNuD4fQ0yNb631OF7LReid0vrKq9gpVH/kQbWPUg1U/wZHnr1mjg
+ sCZkdU1cqDL1M8b9aRsXyhEbLzE3FaicTZOkNundva9ihHZmb7W+Q3N3kusoEfEYiHR9
+ zlXtIfW+Er1jwVArLYhNLdqv9ep4/HC67PNYQBnv1SjhYr9zMcHLT1NkQ/iuocCdXcOl
+ emSEIdBieYrj/n/qer1d912OZUHR/B0OfttNygf5C5sXuOP0sBUzk2GV1CH9TOy7Nlww
+ gm10nTHSQscbO09g4whn57lnzBC5l1fBWSo/zFTobWcPK9jEouZPHL9cyngIpuVFqn6H 4A== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3akejapcen-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Aug 2021 02:43:27 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17N6gpWt024691;
+        Mon, 23 Aug 2021 06:43:25 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3ajs48ac6p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Aug 2021 06:43:25 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17N6di8E58655066
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Aug 2021 06:39:44 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 03AAF4C052;
+        Mon, 23 Aug 2021 06:43:22 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 224FD4C044;
+        Mon, 23 Aug 2021 06:43:20 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.34.43])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon, 23 Aug 2021 06:43:19 +0000 (GMT)
+Date:   Mon, 23 Aug 2021 08:43:16 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?UTF-8?B?TcOka2lzYXJh?= <Kai.Makisara@kolumbus.fi>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>, oliver.sang@intel.com
+Subject: Re: [PATCH 18/24] scsi_ioctl: move the "block layer" SCSI ioctl
+ handling to drivers/scsi
+Message-ID: <20210823084316.4bb224e0.pasic@linux.ibm.com>
+In-Reply-To: <20210724072033.1284840-19-hch@lst.de>
+References: <20210724072033.1284840-1-hch@lst.de>
+        <20210724072033.1284840-19-hch@lst.de>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: b7z-rbOCxBf46qRXly_rqVnwyFAm9nJz
+X-Proofpoint-ORIG-GUID: b7z-rbOCxBf46qRXly_rqVnwyFAm9nJz
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-23_02:2021-08-20,2021-08-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0 mlxscore=0
+ impostorscore=0 clxscore=1011 mlxlogscore=999 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108230043
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
-> On Fri, Aug 20, 2021 at 05:49:35PM +1000, Michael Ellerman wrote:
->> Kees Cook <keescook@chromium.org> writes:
->> > In preparation for FORTIFY_SOURCE performing compile-time and run-time
->> > field bounds checking for memset(), avoid intentionally writing across
->> > neighboring fields.
->> >
->> > Add a struct_group() for the spe registers so that memset() can correctly reason
->> > about the size:
->> >
->> >    In function 'fortify_memset_chk',
->> >        inlined from 'restore_user_regs.part.0' at arch/powerpc/kernel/signal_32.c:539:3:
->> >>> include/linux/fortify-string.h:195:4: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
->> >      195 |    __write_overflow_field();
->> >          |    ^~~~~~~~~~~~~~~~~~~~~~~~
->> >
->> > Cc: Michael Ellerman <mpe@ellerman.id.au>
->> > Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> > Cc: Paul Mackerras <paulus@samba.org>
->> > Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
->> > Cc: Sudeep Holla <sudeep.holla@arm.com>
->> > Cc: linuxppc-dev@lists.ozlabs.org
->> > Reported-by: kernel test robot <lkp@intel.com>
->> > Signed-off-by: Kees Cook <keescook@chromium.org>
->> > ---
->> >  arch/powerpc/include/asm/processor.h | 6 ++++--
->> >  arch/powerpc/kernel/signal_32.c      | 6 +++---
->> >  2 files changed, 7 insertions(+), 5 deletions(-)
->> >
->> > diff --git a/arch/powerpc/include/asm/processor.h b/arch/powerpc/include/asm/processor.h
->> > index f348e564f7dd..05dc567cb9a8 100644
->> > --- a/arch/powerpc/include/asm/processor.h
->> > +++ b/arch/powerpc/include/asm/processor.h
->> > @@ -191,8 +191,10 @@ struct thread_struct {
->> >  	int		used_vsr;	/* set if process has used VSX */
->> >  #endif /* CONFIG_VSX */
->> >  #ifdef CONFIG_SPE
->> > -	unsigned long	evr[32];	/* upper 32-bits of SPE regs */
->> > -	u64		acc;		/* Accumulator */
->> > +	struct_group(spe,
->> > +		unsigned long	evr[32];	/* upper 32-bits of SPE regs */
->> > +		u64		acc;		/* Accumulator */
->> > +	);
->> >  	unsigned long	spefscr;	/* SPE & eFP status */
->> >  	unsigned long	spefscr_last;	/* SPEFSCR value on last prctl
->> >  					   call or trap return */
->> > diff --git a/arch/powerpc/kernel/signal_32.c b/arch/powerpc/kernel/signal_32.c
->> > index 0608581967f0..77b86caf5c51 100644
->> > --- a/arch/powerpc/kernel/signal_32.c
->> > +++ b/arch/powerpc/kernel/signal_32.c
->> > @@ -532,11 +532,11 @@ static long restore_user_regs(struct pt_regs *regs,
->> >  	regs_set_return_msr(regs, regs->msr & ~MSR_SPE);
->> >  	if (msr & MSR_SPE) {
->> >  		/* restore spe registers from the stack */
->> > -		unsafe_copy_from_user(current->thread.evr, &sr->mc_vregs,
->> > -				      ELF_NEVRREG * sizeof(u32), failed);
->> > +		unsafe_copy_from_user(&current->thread.spe, &sr->mc_vregs,
->> > +				      sizeof(current->thread.spe), failed);
->> 
->> This makes me nervous, because the ABI is that we copy ELF_NEVRREG *
->> sizeof(u32) bytes, not whatever sizeof(current->thread.spe) happens to
->> be.
->> 
->> ie. if we use sizeof an inadvertent change to the fields in
->> thread_struct could change how many bytes we copy out to userspace,
->> which would be an ABI break.
->> 
->> And that's not that hard to do, because it's not at all obvious that the
->> size and layout of fields in thread_struct affects the user ABI.
->> 
->> At the same time we don't want to copy the right number of bytes but
->> the wrong content, so from that point of view using sizeof is good :)
->> 
->> The way we handle it in ptrace is to have BUILD_BUG_ON()s to verify that
->> things match up, so maybe we should do that here too.
->> 
->> ie. add:
->> 
->> 	BUILD_BUG_ON(sizeof(current->thread.spe) == ELF_NEVRREG * sizeof(u32));
->> 
->> Not sure if you are happy doing that as part of this patch. I can always
->> do it later if not.
->
-> Sounds good to me; I did that in a few other cases in the series where
-> the relationships between things seemed tenuous. :) I'll add this (as
-> !=) in v3.
+On Sat, 24 Jul 2021 09:20:27 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-Thanks.
+> Merge the ioctl handling in block/scsi_ioctl.c into its only caller in
+> drivers/scsi/scsi_ioctl.c.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-cheers
+
+Hi Christoph!
+
+I believe there is a small problem with this patch. I think it is
+easiest to explain with the diff that fixes it. Please see the patch
+at the end of this email.
+
+Otherwise your patch looks great!
+
+This may or may not be related to the problem reported here:
+https://lkml.org/lkml/2021/7/29/157
+Adding Oliver, maybe he can test if this fixes his testcases as well.
+(It did fix ours.:)
+
+If you like I can respin my fix with an extended patch description.
+
+-----------------------8<-------------------------------------------
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Mon, 23 Aug 2021 08:11:53 +0200
+Subject: [PATCH] scsi: scsi_ioctl: fix error code propagation in SG_IO
+
+Fixes: f2542a3be327 ("scsi: scsi_ioctl: Move the "block layer" SCSI
+ioctl handling to drivers/scsi")
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+---
+ drivers/scsi/scsi_ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/scsi/scsi_ioctl.c b/drivers/scsi/scsi_ioctl.c
+index 2c4cdd0fc26e..dbb24a3720ac 100644
+--- a/drivers/scsi/scsi_ioctl.c
++++ b/drivers/scsi/scsi_ioctl.c
+@@ -952,7 +952,7 @@ int scsi_ioctl(struct scsi_device *sdev, struct gendisk *disk, fmode_t mode,
+
+                if (put_sg_io_hdr(&hdr, arg))
+                        return -EFAULT;
+-               return 0;
++               return error;
+        }
+        case SCSI_IOCTL_SEND_COMMAND:
+                return sg_scsi_ioctl(q, disk, mode, arg);
+-- 
+2.31.1
