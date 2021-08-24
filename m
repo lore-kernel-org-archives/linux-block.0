@@ -2,95 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B727AC4320E
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9CCC4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:53:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C4EB6125F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73BA86135F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:53:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235008AbhHXHi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 03:38:56 -0400
-Received: from mga03.intel.com ([134.134.136.65]:32305 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234616AbhHXHiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 03:38:55 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10085"; a="217283964"
-X-IronPort-AV: E=Sophos;i="5.84,346,1620716400"; 
-   d="scan'208";a="217283964"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2021 00:38:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,346,1620716400"; 
-   d="scan'208";a="515317618"
-Received: from um.fi.intel.com (HELO um) ([10.237.72.62])
-  by fmsmga004.fm.intel.com with ESMTP; 24 Aug 2021 00:38:07 -0700
-From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
-To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org, alexander.shishkin@linux.intel.com
-Subject: Re: [PATCH v2 47/63] intel_th: msu: Use memset_startat() for
- clearing hw header
-In-Reply-To: <20210818060533.3569517-48-keescook@chromium.org>
-References: <20210818060533.3569517-1-keescook@chromium.org>
- <20210818060533.3569517-48-keescook@chromium.org>
-Date:   Tue, 24 Aug 2021 10:38:06 +0300
-Message-ID: <87sfyzi97l.fsf@ashishki-desk.ger.corp.intel.com>
+        id S235116AbhHXHyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 03:54:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41276 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234999AbhHXHyH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Aug 2021 03:54:07 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466A5C061575
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 00:53:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=M1dtIQSuJoglJXvW/+msAv181482a5Lu31gmC2TPC4E=; b=CQVP+0B1AyPwF6t6wwyOnWbAlC
+        F2qEtIG5aAnOFPJoZRf9Mu/JdBwoGgCnfB6jeQHQsnwOrFw06Uv8e+6iPg+nh+Lmfu9Dz6konJtmQ
+        nl0MLl4Bih/8CKCUu1c5rw58+fA+9wJR/1YvL3rK0Hm1AyKsdAj8cnVviLWoOFrXW8Juuk+Gm5e3P
+        EOlXfOhzoFhHYD7qxfbJd5GRZH431Tq+dvH2wv0mfQIYVquguMPjbSf//LouixSndiqNOEeeLghVC
+        Z8HZwxxhxxUQXxLivgoFeTmbG+DSIEq8ZMpDUAIbesFQhUwgijeI/i8mqnSRoHjn8O8XI20xDtySa
+        ppVROm8Q==;
+Received: from [2001:4bb8:193:fd10:f8c0:1a4c:b688:f5a6] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mIREI-00AkM5-0V; Tue, 24 Aug 2021 07:52:39 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: extended dev_t tidyups
+Date:   Tue, 24 Aug 2021 09:52:14 +0200
+Message-Id: <20210824075216.1179406-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
+Hi Jens,
 
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memset(), avoid intentionally writing across
-> neighboring fields.
->
-> Use memset_startat() so memset() doesn't get confused about writing
-> beyond the destination member that is intended to be the starting point
-> of zeroing through the end of the struct.
->
-> Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-
-Acked-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
-
-> ---
->  drivers/hwtracing/intel_th/msu.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/drivers/hwtracing/intel_th/msu.c b/drivers/hwtracing/intel_th/msu.c
-> index 432ade0842f6..70a07b4e9967 100644
-> --- a/drivers/hwtracing/intel_th/msu.c
-> +++ b/drivers/hwtracing/intel_th/msu.c
-> @@ -658,13 +658,11 @@ static void msc_buffer_clear_hw_header(struct msc *msc)
->  
->  	list_for_each_entry(win, &msc->win_list, entry) {
->  		unsigned int blk;
-> -		size_t hw_sz = sizeof(struct msc_block_desc) -
-> -			offsetof(struct msc_block_desc, hw_tag);
->  
->  		for_each_sg(win->sgt->sgl, sg, win->nr_segs, blk) {
->  			struct msc_block_desc *bdesc = sg_virt(sg);
->  
-> -			memset(&bdesc->hw_tag, 0, hw_sz);
-> +			memset_startat(bdesc, 0, hw_tag);
->  		}
->  	}
->  }
-> -- 
-> 2.30.2
+two small tidyups for the extended dev_t code.  One removes
+a not necessary maksing of a variable that already contains
+the minor number, and the other removes some long obsolete
+debugging code.
