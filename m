@@ -2,107 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83816C4320A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0AAC4320A
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:54:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69A7461212
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A88D561414
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:54:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233473AbhHXAoT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 20:44:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57690 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233330AbhHXAoQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 20:44:16 -0400
-Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FE0C061575
-        for <linux-block@vger.kernel.org>; Mon, 23 Aug 2021 17:43:29 -0700 (PDT)
-Subject: Re: [PATCH V3] raid1: ensure write behind bio has less than
- BIO_MAX_VECS sectors
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1629765805;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JnRJoSVaRqHIZkKhzvuzuQ1A7N7puBWYd81TcQ3vXYQ=;
-        b=GpfEjz3z1TVApq0OANpSKTkarBWo9RcsQFV4mfpMQDkxiGYLw9ITddIzZHRYTSbdvp+RPX
-        odvzyMdUE9Qybwuadx+tUY3q3nVVagJYtUNR0nGo2+XOdVNaz4/0mkFl9FIRiajwI/ebl4
-        axZ6Wn8SUm/DWI66GY3N3zkrtnJcWvo=
-To:     kernel test robot <lkp@intel.com>, axboe@kernel.dk
-Cc:     kbuild-all@lists.01.org, song@kernel.org, hch@infradead.org,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org
-References: <20210823074513.3208278-1-guoqing.jiang@linux.dev>
- <202108232012.No5kysqW-lkp@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Guoqing Jiang <guoqing.jiang@linux.dev>
-Message-ID: <f9748b7c-2c3f-ce4e-66a0-46c126c6b7dd@linux.dev>
-Date:   Tue, 24 Aug 2021 08:43:18 +0800
+        id S234397AbhHXAzd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 20:55:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47770 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233693AbhHXAzC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Aug 2021 20:55:02 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 911F6613D2;
+        Tue, 24 Aug 2021 00:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629766459;
+        bh=FmJrPgqahJSF3AYRo7ObxDBx//CyYZDRWcmP0H4tFRc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=qGCRo8HoX/QZcTW2IW+dpLui1y/UHZWUiBJ+PQPCJ3JL54ceSgxgKQBfXhlpcT3Wa
+         DxE0zUoFSP7kYNkmju/g7dP7mdcyAlwA9jpcTZYseTgeoiKhNPmOxcT6ZvaOreh3YY
+         XUiQ6CEK8eu3YdKHVn4Jox8XXkuphzYu2SW0sc1+J0k09q6MXjkgpDQsxgOQprhJaT
+         hkgTBfIkb7YBZiTX1TAcwvFAGUUY68XGjmMgXC2vWaj1UtSayME8QGvbTkl7pQBQav
+         qUemkVdKifscB6DiWGHL2PSK7+xSRilFpoXXMBH4Boua1bJviY04kJowpWQL1chgBV
+         qqGT98U5pMwJA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        John Garry <john.garry@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 17/26] blk-mq: don't grab rq's refcount in blk_mq_check_expired()
+Date:   Mon, 23 Aug 2021 20:53:47 -0400
+Message-Id: <20210824005356.630888-17-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210824005356.630888-1-sashal@kernel.org>
+References: <20210824005356.630888-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <202108232012.No5kysqW-lkp@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: guoqing.jiang@linux.dev
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Ming Lei <ming.lei@redhat.com>
 
-Thanks for the report!
+[ Upstream commit c797b40ccc340b8a66f7a7842aecc90bf749f087 ]
 
-On 8/23/21 8:19 PM, kernel test robot wrote:
-> Hi Guoqing,
->
-> Thank you for the patch! Yet something to improve:
->
-> [auto build test ERROR on song-md/md-next]
-> [also build test ERROR on v5.14-rc7 next-20210820]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
->
-> url:    https://github.com/0day-ci/linux/commits/Guoqing-Jiang/raid1-ensure-write-behind-bio-has-less-than-BIO_MAX_VECS-sectors/20210823-154653
-> base:   git://git.kernel.org/pub/scm/linux/kernel/git/song/md.git md-next
-> config: sh-allmodconfig (attached as .config)
-> compiler: sh4-linux-gcc (GCC) 11.2.0
-> reproduce (this is a W=1 build):
->          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->          chmod +x ~/bin/make.cross
->          # https://github.com/0day-ci/linux/commit/302a06a55fac4a9fb10f57dc96f6a618f3e853b4
->          git remote add linux-review https://github.com/0day-ci/linux
->          git fetch --no-tags linux-review Guoqing-Jiang/raid1-ensure-write-behind-bio-has-less-than-BIO_MAX_VECS-sectors/20210823-154653
->          git checkout 302a06a55fac4a9fb10f57dc96f6a618f3e853b4
->          # save the attached .config to linux build tree
->          mkdir build_dir
->          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=sh SHELL=/bin/bash drivers/md/
->
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
->     drivers/md/raid1.c: In function 'raid1_write_request':
->>> drivers/md/raid1.c:1393:44: error: 'mirror' undeclared (first use in this function); did you mean 'md_error'?
->      1393 |                 if (test_bit(WriteMostly, &mirror->rdev->flags))
->           |                                            ^~~~~~
->           |                                            md_error
+Inside blk_mq_queue_tag_busy_iter() we already grabbed request's
+refcount before calling ->fn(), so needn't to grab it one more time
+in blk_mq_check_expired().
 
-Oops, will fix it.
+Meantime remove extra request expire check in blk_mq_check_expired().
 
-> drivers/md/raid1.c:1477:52: error: 'PAGE_SECTORS' undeclared (first use in this function)
->      1477 |                                     BIO_MAX_VECS * PAGE_SECTORS);
->           |                                                    ^~~~~~~~~~~~
+Cc: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: John Garry <john.garry@huawei.com>
+Link: https://lore.kernel.org/r/20210811155202.629575-1-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-mq.c | 30 +++++-------------------------
+ 1 file changed, 5 insertions(+), 25 deletions(-)
 
-This patch is supposed to be merged by block tree due to dependency.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c732aa581124..6dfa572ac1fc 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -923,34 +923,14 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 	unsigned long *next = priv;
+ 
+ 	/*
+-	 * Just do a quick check if it is expired before locking the request in
+-	 * so we're not unnecessarilly synchronizing across CPUs.
+-	 */
+-	if (!blk_mq_req_expired(rq, next))
+-		return true;
+-
+-	/*
+-	 * We have reason to believe the request may be expired. Take a
+-	 * reference on the request to lock this request lifetime into its
+-	 * currently allocated context to prevent it from being reallocated in
+-	 * the event the completion by-passes this timeout handler.
+-	 *
+-	 * If the reference was already released, then the driver beat the
+-	 * timeout handler to posting a natural completion.
+-	 */
+-	if (!refcount_inc_not_zero(&rq->ref))
+-		return true;
+-
+-	/*
+-	 * The request is now locked and cannot be reallocated underneath the
+-	 * timeout handler's processing. Re-verify this exact request is truly
+-	 * expired; if it is not expired, then the request was completed and
+-	 * reallocated as a new request.
++	 * blk_mq_queue_tag_busy_iter() has locked the request, so it cannot
++	 * be reallocated underneath the timeout handler's processing, then
++	 * the expire check is reliable. If the request is not expired, then
++	 * it was completed and reallocated as a new request after returning
++	 * from blk_mq_check_expired().
+ 	 */
+ 	if (blk_mq_req_expired(rq, next))
+ 		blk_mq_rq_timed_out(rq, reserved);
+-
+-	blk_mq_put_rq_ref(rq);
+ 	return true;
+ }
+ 
+-- 
+2.30.2
 
-Thanks,
-Guoqing
