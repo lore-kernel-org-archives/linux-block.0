@@ -2,91 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDEC3C4320E
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 23:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83816C4320A
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:43:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C44A4613D2
-	for <linux-block@archiver.kernel.org>; Mon, 23 Aug 2021 23:40:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69A7461212
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:43:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233182AbhHWXkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 19:40:51 -0400
-Received: from rere.qmqm.pl ([91.227.64.183]:61298 "EHLO rere.qmqm.pl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233093AbhHWXkv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 19:40:51 -0400
-Received: from remote.user (localhost [127.0.0.1])
-        by rere.qmqm.pl (Postfix) with ESMTPSA id 4Gtpd03NltzKc;
-        Tue, 24 Aug 2021 01:40:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-        t=1629762006; bh=qwPmxSCbcInO/eyiUPjnhxEQ5MqYKo21su0OGAIP8zk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DJrSKNpoXRQS5hFI7c50USjwJClWUGt5vZOZp2UAXk0WyKSRzlIg9rrFRN1JqtVue
-         X7V8gCHcP1jjj5XCIMw2Va5XH/DgXiEAcxjru7FbEOEXtVpZgiNUmh3uNZI7/AEMAt
-         Bi5cP8LqxNnvMrcgZLTDUjc5njiamlbwEk03dPWwW/yV3cHxEgURdDHAi06tzXy9Nn
-         wibl6Uy5qScKoW2zHAR+eRuCDS0SPbSYomRn2sL4aLE0w1tHticWo8I6/9/3XPi1sW
-         7pfj1GvOxdNZd8yvqHZU4Jdi5I1t5MKSSZ1+/i2hT2OdzU38OMbjsAX/kWbr4Vq5hx
-         YIHU8R7pXCxrA==
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.103.2 at mail
-Date:   Tue, 24 Aug 2021 01:40:02 +0200
-From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: Re: [PATCH v6 0/5] Support EFI partition on NVIDIA Tegra devices
-Message-ID: <YSQx0vRrpIGb4OIj@qmqm.qmqm.pl>
-References: <20210818221920.3893-1-digetx@gmail.com>
- <YSAvnQb29XlhqY7k@qmqm.qmqm.pl>
- <e35a9053-a793-d189-ff79-04212e1227c2@gmail.com>
+        id S233473AbhHXAoT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 20:44:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57690 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233330AbhHXAoQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Aug 2021 20:44:16 -0400
+Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FE0C061575
+        for <linux-block@vger.kernel.org>; Mon, 23 Aug 2021 17:43:29 -0700 (PDT)
+Subject: Re: [PATCH V3] raid1: ensure write behind bio has less than
+ BIO_MAX_VECS sectors
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1629765805;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JnRJoSVaRqHIZkKhzvuzuQ1A7N7puBWYd81TcQ3vXYQ=;
+        b=GpfEjz3z1TVApq0OANpSKTkarBWo9RcsQFV4mfpMQDkxiGYLw9ITddIzZHRYTSbdvp+RPX
+        odvzyMdUE9Qybwuadx+tUY3q3nVVagJYtUNR0nGo2+XOdVNaz4/0mkFl9FIRiajwI/ebl4
+        axZ6Wn8SUm/DWI66GY3N3zkrtnJcWvo=
+To:     kernel test robot <lkp@intel.com>, axboe@kernel.dk
+Cc:     kbuild-all@lists.01.org, song@kernel.org, hch@infradead.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org
+References: <20210823074513.3208278-1-guoqing.jiang@linux.dev>
+ <202108232012.No5kysqW-lkp@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+Message-ID: <f9748b7c-2c3f-ce4e-66a0-46c126c6b7dd@linux.dev>
+Date:   Tue, 24 Aug 2021 08:43:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e35a9053-a793-d189-ff79-04212e1227c2@gmail.com>
+In-Reply-To: <202108232012.No5kysqW-lkp@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: guoqing.jiang@linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 21, 2021 at 08:27:15PM +0300, Dmitry Osipenko wrote:
-> 21.08.2021 01:41, Michał Mirosław пишет:
-> > On Thu, Aug 19, 2021 at 01:19:15AM +0300, Dmitry Osipenko wrote:
-> >> This series adds the most minimal EFI partition support for NVIDIA Tegra
-> >> consumer devices, like Android tablets and game consoles, making theirs
-> >> eMMC accessible out-of-the-box using downstream bootloader and mainline
-> >> Linux kernel.  eMMC now works on Acer A500 tablet and Ouya game console
-> >> that are already well supported in mainline and internal storage is the
-> >> only biggest thing left to support.
-> > [...]
-> > 
-> > Could we provide the GPT sector via DT? As I understand this is for
-> > non-removable eMMC storage. It would remove the need for a cap bit and
-> > hardcoded calculations instead just checking if DT node of the controller
-> > contains a magic entry with a number.
-> 
-> The same device model usually comes in different flavors that have a
-> different eMMC unit and size. So no, it can't be hardcoded in DT.
+Hi,
 
-I see. I was thinking how to avoid of going the whole way and creating
-another controller capability (since this is going to be core code) -
-could this workaround be enabled just by a boolean DT property at
-controller's node instead? Or do we expect non-DT platforms to be
-similarly broken?
+Thanks for the report!
 
-Best Regards
-Michał Mirosław
+On 8/23/21 8:19 PM, kernel test robot wrote:
+> Hi Guoqing,
+>
+> Thank you for the patch! Yet something to improve:
+>
+> [auto build test ERROR on song-md/md-next]
+> [also build test ERROR on v5.14-rc7 next-20210820]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+>
+> url:    https://github.com/0day-ci/linux/commits/Guoqing-Jiang/raid1-ensure-write-behind-bio-has-less-than-BIO_MAX_VECS-sectors/20210823-154653
+> base:   git://git.kernel.org/pub/scm/linux/kernel/git/song/md.git md-next
+> config: sh-allmodconfig (attached as .config)
+> compiler: sh4-linux-gcc (GCC) 11.2.0
+> reproduce (this is a W=1 build):
+>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>          chmod +x ~/bin/make.cross
+>          # https://github.com/0day-ci/linux/commit/302a06a55fac4a9fb10f57dc96f6a618f3e853b4
+>          git remote add linux-review https://github.com/0day-ci/linux
+>          git fetch --no-tags linux-review Guoqing-Jiang/raid1-ensure-write-behind-bio-has-less-than-BIO_MAX_VECS-sectors/20210823-154653
+>          git checkout 302a06a55fac4a9fb10f57dc96f6a618f3e853b4
+>          # save the attached .config to linux build tree
+>          mkdir build_dir
+>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=sh SHELL=/bin/bash drivers/md/
+>
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+>
+> All errors (new ones prefixed by >>):
+>
+>     drivers/md/raid1.c: In function 'raid1_write_request':
+>>> drivers/md/raid1.c:1393:44: error: 'mirror' undeclared (first use in this function); did you mean 'md_error'?
+>      1393 |                 if (test_bit(WriteMostly, &mirror->rdev->flags))
+>           |                                            ^~~~~~
+>           |                                            md_error
+
+Oops, will fix it.
+
+> drivers/md/raid1.c:1477:52: error: 'PAGE_SECTORS' undeclared (first use in this function)
+>      1477 |                                     BIO_MAX_VECS * PAGE_SECTORS);
+>           |                                                    ^~~~~~~~~~~~
+
+This patch is supposed to be merged by block tree due to dependency.
+
+Thanks,
+Guoqing
