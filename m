@@ -3,101 +3,141 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 671AFC4338F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 01:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD02BC4320A
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 01:17:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47CC36127B
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 01:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A34D56138B
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 01:17:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233495AbhHXBKb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 21:10:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233487AbhHXBKa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 21:10:30 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6B4C061575;
-        Mon, 23 Aug 2021 18:09:47 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id g11so15474502qtk.5;
-        Mon, 23 Aug 2021 18:09:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=B0sN6y0IbgY+TOAhIwpepHTBKMbUoRecX1PtvCcLmrc=;
-        b=C6JVMXtWOzf6OXCZ+BAsRGqUokcbRsF+JSSQhaBg9coB1PUkA9Iil1Sp8o55ThajT/
-         uUMdcdTYyb0unguigxmU2P8f9iPNZ+n0gj8wUaetVlAJ5AU5qNKsLBiAxw3t4wsUXYTQ
-         XKS/9FMv7zxxSHQm/OMF4Nqh2SDPv+sfTkrQFmy72WdL3k4Ksj3L19yF/gMDiA4Aco1R
-         AHxBku+fq1mDKWEfMeTkat8AB/zxRiDwYHcH51PKkw2HfzvD6rRCayuOjXyVsDqVbuoZ
-         0rlk4N15L4L383y47GKPRUtnoEscY3L1FxQGc0qTSOUDFjOgpJKPM0+Ludb5JyhlWDQC
-         vI9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=B0sN6y0IbgY+TOAhIwpepHTBKMbUoRecX1PtvCcLmrc=;
-        b=GDZyHiym1VUxBwvPwCUd/S33PoGqdh76n61+8YwUYgElvta3+vyXScQRvwSf0IN6KO
-         bcCiKXiIQBnVNfsAnOfr0pzYPwEgfcETutge+e/yG52Y1B3sO+J6ukIP17lIMjqQg8p2
-         g1OIXkpEFhkfY8X73b651v9WMC1Xt3Mj7sAX6SGv/J2WoTF39vQygDPeomsS4ohdJOy5
-         gS6Soc6YLAy8Jnr1w8fPzlY0J9efjgosiWl99Tlyog4Id1HGgAaHnEaCEv+SSAw4c2kZ
-         SIIRp3UXa0wUjvWXkqzbfwyRuLTU9Zo5Re7HPrB1N9f+prF+2tYTeMSK8s7tla8UMoGB
-         5GxQ==
-X-Gm-Message-State: AOAM532dpzFPo8xUYOALE011ZXrCFPnbmIxwVXxj8+ou2/dAHRe4Ymbl
-        tl3v0SsRE1MOpCV+nCJwLSExaKkJiuM=
-X-Google-Smtp-Source: ABdhPJw99vwHr4Zzk3jRuNK3pFll9zrZlKbU5ThB7gwOyf/NOBmfgh4NplMMi4FXiV5nIrhdlhPvdw==
-X-Received: by 2002:a05:622a:207:: with SMTP id b7mr33524146qtx.377.1629767386180;
-        Mon, 23 Aug 2021 18:09:46 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id m16sm9482836qka.84.2021.08.23.18.09.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Aug 2021 18:09:45 -0700 (PDT)
-From:   CGEL <cgel.zte@gmail.com>
-X-Google-Original-From: CGEL <jing.yangyang@zte.com.cn>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jing Yangyang <jing.yangyang@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH linux-next] drivers:ataflop: fix warning comparing pointer to 0
-Date:   Mon, 23 Aug 2021 18:09:37 -0700
-Message-Id: <20210824010937.56395-1-jing.yangyang@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        id S229742AbhHXBSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 21:18:18 -0400
+Received: from out1.migadu.com ([91.121.223.63]:29485 "EHLO out1.migadu.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229697AbhHXBSS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Aug 2021 21:18:18 -0400
+X-Greylist: delayed 2048 seconds by postgrey-1.27 at vger.kernel.org; Mon, 23 Aug 2021 21:18:18 EDT
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1629767854;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+p/y4+X96U0IPsl0qhnYFKY9iIZpihn52Q9b7rWcaCI=;
+        b=KszRba48ZOjNYm7/U/KFc0BQofezUoJfrriiZTL1fec5SWonTOfVRgriUf2+0d5Z/s33SX
+        UJgCvoDuRHKhRtOOIuza6Ez1QEfxuZwXlBjkMMHDv515L4x8VkQqM7JBXet0zmcm1wfC9J
+        w4UXg2lOhmz0VrsoH34HGHQRZZ6Kimc=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+To:     axboe@kernel.dk
+Cc:     song@kernel.org, hch@infradead.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH] raid1: ensure write behind bio has less than BIO_MAX_VECS sectors
+Date:   Tue, 24 Aug 2021 09:16:54 +0800
+Message-Id: <20210824011654.3829681-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: guoqing.jiang@linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jing Yangyang <jing.yangyang@zte.com.cn>
+From: Guoqing Jiang <jiangguoqing@kylinos.cn>
 
-Fix the following coccicheck warning:
-./drivers/block/ataflop.c:1439:20-21:WARNING: comparing pointer to 0
+We can't split write behind bio with more than BIO_MAX_VECS sectors,
+otherwise the below call trace was triggered because we could allocate
+oversized write behind bio later.
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Jing Yangyang <jing.yangyang@zte.com.cn>
+[ 8.097936] bvec_alloc+0x90/0xc0
+[ 8.098934] bio_alloc_bioset+0x1b3/0x260
+[ 8.099959] raid1_make_request+0x9ce/0xc50 [raid1]
+[ 8.100988] ? __bio_clone_fast+0xa8/0xe0
+[ 8.102008] md_handle_request+0x158/0x1d0 [md_mod]
+[ 8.103050] md_submit_bio+0xcd/0x110 [md_mod]
+[ 8.104084] submit_bio_noacct+0x139/0x530
+[ 8.105127] submit_bio+0x78/0x1d0
+[ 8.106163] ext4_io_submit+0x48/0x60 [ext4]
+[ 8.107242] ext4_writepages+0x652/0x1170 [ext4]
+[ 8.108300] ? do_writepages+0x41/0x100
+[ 8.109338] ? __ext4_mark_inode_dirty+0x240/0x240 [ext4]
+[ 8.110406] do_writepages+0x41/0x100
+[ 8.111450] __filemap_fdatawrite_range+0xc5/0x100
+[ 8.112513] file_write_and_wait_range+0x61/0xb0
+[ 8.113564] ext4_sync_file+0x73/0x370 [ext4]
+[ 8.114607] __x64_sys_fsync+0x33/0x60
+[ 8.115635] do_syscall_64+0x33/0x40
+[ 8.116670] entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Thanks for the comment from Christoph.
+
+[1]. https://bugs.archlinux.org/task/70992
+
+Reported-by: Jens Stutte <jens@chianterastutte.eu>
+Tested-by: Jens Stutte <jens@chianterastutte.eu>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Guoqing Jiang <jiangguoqing@kylinos.cn>
 ---
- drivers/block/ataflop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+V4 change:
+1. fix issue reported by lkp.
+2. add Reviewed-by tag.
 
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index a093644..6cd28df 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -1436,7 +1436,7 @@ static int floppy_revalidate(struct gendisk *disk)
+V3 change:
+1. add comment before test WriteMostly.
+2. reduce line length.
+
+V2 change:
+1. add checking for write-behind case and relevant comments from Christoph.
+
+ drivers/md/raid1.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 3c44c4bb40fc..ad51a60f1a93 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1329,6 +1329,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 	struct raid1_plug_cb *plug = NULL;
+ 	int first_clone;
+ 	int max_sectors;
++	bool write_behind = false;
  
- 	if (test_bit(drive, &changed_floppies) ||
- 	    test_bit(drive, &fake_change) ||
--	    p->disktype == 0) {
-+	    !p->disktype) {
- 		if (UD.flags & FTD_MSG)
- 			printk(KERN_ERR "floppy: clear format %p!\n", UDT);
- 		BufferDrive = -1;
+ 	if (mddev_is_clustered(mddev) &&
+ 	     md_cluster_ops->area_resyncing(mddev, WRITE,
+@@ -1381,6 +1382,15 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 	max_sectors = r1_bio->sectors;
+ 	for (i = 0;  i < disks; i++) {
+ 		struct md_rdev *rdev = rcu_dereference(conf->mirrors[i].rdev);
++
++		/*
++		 * The write-behind io is only attempted on drives marked as
++		 * write-mostly, which means we could allocate write behind
++		 * bio later.
++		 */
++		if (rdev && test_bit(WriteMostly, &rdev->flags))
++			write_behind = true;
++
+ 		if (rdev && unlikely(test_bit(Blocked, &rdev->flags))) {
+ 			atomic_inc(&rdev->nr_pending);
+ 			blocked_rdev = rdev;
+@@ -1454,6 +1464,15 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 		goto retry_write;
+ 	}
+ 
++	/*
++	 * When using a bitmap, we may call alloc_behind_master_bio below.
++	 * alloc_behind_master_bio allocates a copy of the data payload a page
++	 * at a time and thus needs a new bio that can fit the whole payload
++	 * this bio in page sized chunks.
++	 */
++	if (write_behind && bitmap)
++		max_sectors = min_t(int, max_sectors,
++				    BIO_MAX_VECS * PAGE_SECTORS);
+ 	if (max_sectors < bio_sectors(bio)) {
+ 		struct bio *split = bio_split(bio, max_sectors,
+ 					      GFP_NOIO, &conf->bio_split);
 -- 
-1.8.3.1
-
+2.25.1
 
