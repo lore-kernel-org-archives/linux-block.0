@@ -2,98 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C20C432BE
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 10:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55785C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 10:56:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E74A61357
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 10:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 363EB60FE6
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 10:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236285AbhHXKi7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 06:38:59 -0400
-Received: from rere.qmqm.pl ([91.227.64.183]:41387 "EHLO rere.qmqm.pl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235952AbhHXKi6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 06:38:58 -0400
-Received: from remote.user (localhost [127.0.0.1])
-        by rere.qmqm.pl (Postfix) with ESMTPSA id 4Gv5DL3XbNz9C;
-        Tue, 24 Aug 2021 12:38:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-        t=1629801492; bh=bkSdTTCk57d8iy5mRqGsesttYt2yqy5GM4QwwvILfew=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FQgzHrnyVfo331tJOis3V6XAxhJXw/t45DLBRHtwzBsIlC6xyeLdd98Ar5oAvofrF
-         Y/or9S6TOHzWi8FcGELvF9eU1ybAcykOQ+gqAbCd3oU4mchPL7emggASIvSWubKN4f
-         LuvpywMLZSWt3VesdTrzGFJHn2zY3rOO/Bll4WQRBSiNJYFXeMW/58h/6usdbysZ/O
-         k9sr7y7PMUGfqpT0AXwOSAyrVWlQxtKO8HuDcB5/uR2Z3UbDb/nOfid+GBVWh/gqwn
-         KBC1VuCsljcgWi171dH/a61B/ORGN8/ha38Ar9kNx9xwVaYBZFye3EFY9fQf+GzK0W
-         nLG5evIGhQVBg==
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.103.2 at mail
-Date:   Tue, 24 Aug 2021 12:38:08 +0200
-From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: Re: [PATCH v6 0/5] Support EFI partition on NVIDIA Tegra devices
-Message-ID: <YSTMEM8JwwypL8Me@qmqm.qmqm.pl>
-References: <20210818221920.3893-1-digetx@gmail.com>
- <YSAvnQb29XlhqY7k@qmqm.qmqm.pl>
- <e35a9053-a793-d189-ff79-04212e1227c2@gmail.com>
- <YSQx0vRrpIGb4OIj@qmqm.qmqm.pl>
+        id S236341AbhHXK5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 06:57:09 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:38094 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235905AbhHXK5I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Aug 2021 06:57:08 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CCD24220C7;
+        Tue, 24 Aug 2021 10:56:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1629802583; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type;
+        bh=CLQ5LRkCAUHdpOjMD6UCE/qgR2x0+lYuAsaFLX+AyZI=;
+        b=cHbhO+8xvTOzQMAn6Ynh2mrBOsXXsclPudSDH/nb1g4Tt6IEFjYOm4O3Woif/dT+H3FxlP
+        wO8L2w+a0CdUJx2ot57K/Gg6qMU9LaqXQe0v1oMrvggugKxk8xK1m55XFmPrz46vaEpKFm
+        n3+Y2AlurdJFZ3K35AP76Oops/10I10=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id B919D137F3;
+        Tue, 24 Aug 2021 10:56:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id l52oLFfQJGHOFAAAGKfGzw
+        (envelope-from <mkoutny@suse.com>); Tue, 24 Aug 2021 10:56:23 +0000
+Date:   Tue, 24 Aug 2021 12:56:26 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Subject: BFQ cgroup weights range
+Message-ID: <20210824105626.GA11367@blackbody.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YSQx0vRrpIGb4OIj@qmqm.qmqm.pl>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 24, 2021 at 01:40:02AM +0200, Michał Mirosław wrote:
-> On Sat, Aug 21, 2021 at 08:27:15PM +0300, Dmitry Osipenko wrote:
-> > 21.08.2021 01:41, Michał Mirosław пишет:
-> > > On Thu, Aug 19, 2021 at 01:19:15AM +0300, Dmitry Osipenko wrote:
-> > >> This series adds the most minimal EFI partition support for NVIDIA Tegra
-> > >> consumer devices, like Android tablets and game consoles, making theirs
-> > >> eMMC accessible out-of-the-box using downstream bootloader and mainline
-> > >> Linux kernel.  eMMC now works on Acer A500 tablet and Ouya game console
-> > >> that are already well supported in mainline and internal storage is the
-> > >> only biggest thing left to support.
-> > > [...]
-> > > 
-> > > Could we provide the GPT sector via DT? As I understand this is for
-> > > non-removable eMMC storage. It would remove the need for a cap bit and
-> > > hardcoded calculations instead just checking if DT node of the controller
-> > > contains a magic entry with a number.
-> > 
-> > The same device model usually comes in different flavors that have a
-> > different eMMC unit and size. So no, it can't be hardcoded in DT.
-> 
-> I see. I was thinking how to avoid of going the whole way and creating
-> another controller capability (since this is going to be core code) -
-> could this workaround be enabled just by a boolean DT property at
-> controller's node instead? Or do we expect non-DT platforms to be
-> similarly broken?
+Hello.
 
-Rewording my concern: I believe that this is platform's and not 
-a controller's misfeature, so the controller driver feels like wrong
-place fix. That's why I'd prefer that the enable came from the DT
-and not from driver's code.
+The default weight for proportional IO control associated with a cgroup
+is 100 [1]. The minimum allowed weight is 1 [2] and the maximum weight
+1000 [3].  This is a bit inconsistent with general cgroup weight
+semantic where def/min == max/def (i.e. symmetric adjustments to both
+sides) [4].
 
-Best Regards
-Michał Mirosław
+1) Is there a reason why the maximum allowed weight is (only) 1000?
+   (E.g. it won't be possible to ensure 10^4 ratio of proportional
+   control but 10^3 is achievable.)
+2) Is the default value 100 special or absolute in a sense? (I suspect
+   it is, the unchangeable weight of root cgroup members. Therefore two
+   siblings with equal ratios 10:100 and 100:1000 would behave same only
+   when there's no interfering IO from the root.)
+
+Thanks,
+Michal
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/block/bfq-cgroup.c?h=v5.14-rc7#n513
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/block/bfq-iosched.h?h=v5.14-rc7#n18
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/block/bfq-iosched.h?h=v5.14-rc7#n19
+[4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/cgroup-v2.rst?h=v5.14-rc7#n602
