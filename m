@@ -2,123 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D80F9C43214
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 17:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C38C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 17:07:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDBB561409
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 17:05:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51FD461BB1
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 17:07:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238854AbhHXRG0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 13:06:26 -0400
-Received: from rere.qmqm.pl ([91.227.64.183]:45301 "EHLO rere.qmqm.pl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239555AbhHXRE1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 13:04:27 -0400
-Received: from remote.user (localhost [127.0.0.1])
-        by rere.qmqm.pl (Postfix) with ESMTPSA id 4GvFn64S48z9C;
-        Tue, 24 Aug 2021 19:03:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-        t=1629824619; bh=Gi98RIyFxIAwT/ummlw73IPkyZzTIzAx+S3ca4JwLOQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZnwnuJh1yIhuJ141FvbpAtf+SNScolAUBpOrU+5Gy4LXh7Oxujhl/r+SVn+3nogdD
-         H0JdA3ob5W8ZpbEyYOtMttHuX0cCuoFv1K2FlF5tFO+TMoGJYuIAARrFpohYSQcy8e
-         WgLJY+YrudnoTWGvKgTlg6Q4fsvyglqZT9LhcBYsGlieAz79J0IMZY/yZcahCzUUnr
-         i7pk0y37vPRCamkw1c6NTarhNTPWBCj06HPROBFfR8FBJjAfKUtQxcmh7hbaPbMZqS
-         6E2YTIHcWBgE9Ugmr9Uqr6cI0tQTzT/Mj47JvqbRy6yTHrs9KcKubHLdvKN+O+05LJ
-         vOtbgidvdQHdQ==
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.103.2 at mail
-Date:   Tue, 24 Aug 2021 19:03:36 +0200
-From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Ion Agorria <AG0RRIA@yahoo.com>,
-        Svyatoslav Ryhel <clamor95@gmail.com>,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-efi <linux-efi@vger.kernel.org>
-Subject: Re: [PATCH v6 0/5] Support EFI partition on NVIDIA Tegra devices
-Message-ID: <YSUmaAiRx1Q4eEc/@qmqm.qmqm.pl>
-References: <20210818221920.3893-1-digetx@gmail.com>
- <YSAvnQb29XlhqY7k@qmqm.qmqm.pl>
- <e35a9053-a793-d189-ff79-04212e1227c2@gmail.com>
- <YSQx0vRrpIGb4OIj@qmqm.qmqm.pl>
- <YSTMEM8JwwypL8Me@qmqm.qmqm.pl>
- <390673a8-f275-fd96-50a3-15db416aa6e6@gmail.com>
+        id S238992AbhHXRID (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 13:08:03 -0400
+Received: from mail-pf1-f172.google.com ([209.85.210.172]:33692 "EHLO
+        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238541AbhHXRGM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Aug 2021 13:06:12 -0400
+Received: by mail-pf1-f172.google.com with SMTP id w68so18926985pfd.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 10:05:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NOHZr9sjQWL47aREJziCWByq5yNZI7U5chRYYhpFbmk=;
+        b=FTkwIveIYJIykSUAF8h9SxJb1Dt1uZOA1HJ4flVZCpvBoay9m/aMl9yvY+ebSqzYIw
+         bHg+MZyCHfgmx8rCzgnAFzBNd52lVr+Lz906Er9A62wUHdUvVafvPZajgfvvo0tuPJ+c
+         Z/cqRq9a4VEsTu4HBuAtspnBNyGMlnjQQK2TQKYDEBGTzRAKqkwi+qasW0Lo/PR03uCa
+         6BSbpiBZHqluRAPXESLWzDQat/N7jQ3wjsFRbRbNIdk0UkQHwbRUI+dMF1PQwDeUrLwM
+         u2CbWU31kggmaWLgHFu+curu5AOWsjZGvCP3HT/V2Eo68NucAXCJL8BEnA4sSIrGJhqs
+         2CoQ==
+X-Gm-Message-State: AOAM531eNtOTI+/jp5DJrUVbogtF/2+J39D+NBwJKiAPevUpRaiE8VqF
+        GbTHppbQNWO63FcUU2rCEeI=
+X-Google-Smtp-Source: ABdhPJwzXcmpRmOn96XZymyngQheRQGASv7KtEXrW24aZWmL+QADM35pRiDK/es5atzOFB8sZaUmJA==
+X-Received: by 2002:a65:664f:: with SMTP id z15mr34991106pgv.252.1629824727641;
+        Tue, 24 Aug 2021 10:05:27 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:3f6e:b7f7:7ad7:acb7])
+        by smtp.gmail.com with ESMTPSA id gl12sm2950097pjb.40.2021.08.24.10.05.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Aug 2021 10:05:26 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH] mq-deadline: Fix request accounting
+Date:   Tue, 24 Aug 2021 10:05:20 -0700
+Message-Id: <20210824170520.1659173-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <390673a8-f275-fd96-50a3-15db416aa6e6@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 24, 2021 at 07:06:18PM +0300, Dmitry Osipenko wrote:
-> 24.08.2021 13:38, Michał Mirosław пишет:
-> > On Tue, Aug 24, 2021 at 01:40:02AM +0200, Michał Mirosław wrote:
-> >> On Sat, Aug 21, 2021 at 08:27:15PM +0300, Dmitry Osipenko wrote:
-> >>> 21.08.2021 01:41, Michał Mirosław пишет:
-> >>>> On Thu, Aug 19, 2021 at 01:19:15AM +0300, Dmitry Osipenko wrote:
-> >>>>> This series adds the most minimal EFI partition support for NVIDIA Tegra
-> >>>>> consumer devices, like Android tablets and game consoles, making theirs
-> >>>>> eMMC accessible out-of-the-box using downstream bootloader and mainline
-> >>>>> Linux kernel.  eMMC now works on Acer A500 tablet and Ouya game console
-> >>>>> that are already well supported in mainline and internal storage is the
-> >>>>> only biggest thing left to support.
-> >>>> [...]
-> >>>>
-> >>>> Could we provide the GPT sector via DT? As I understand this is for
-> >>>> non-removable eMMC storage. It would remove the need for a cap bit and
-> >>>> hardcoded calculations instead just checking if DT node of the controller
-> >>>> contains a magic entry with a number.
-> >>>
-> >>> The same device model usually comes in different flavors that have a
-> >>> different eMMC unit and size. So no, it can't be hardcoded in DT.
-> >>
-> >> I see. I was thinking how to avoid of going the whole way and creating
-> >> another controller capability (since this is going to be core code) -
-> >> could this workaround be enabled just by a boolean DT property at
-> >> controller's node instead? Or do we expect non-DT platforms to be
-> >> similarly broken?
-> > 
-> > Rewording my concern: I believe that this is platform's and not 
-> > a controller's misfeature, so the controller driver feels like wrong
-> > place fix. That's why I'd prefer that the enable came from the DT
-> > and not from driver's code.
-> 
-> The alternative GPT entry requires user to add 'gpt' argument to
-> kernel's cmdline. If board already uses proper alternative GPT entry at
-> the last sector, then nothing changed for that board.
-> 
-> The case where board uses 'gpt' cmdline + it had stale GPT entry at the
-> special location used by Android devices and chance that now suddenly
-> that GPT entry will pop up is close to zero.
-> 
-> All old partition table entries should be erased on reparation. If it
-> wasn't done, then it's not a kernel's problem, it's much more a user's
-> problem. Even though kernel could help that poor user if will be really
-> needed.
-> 
-> There is no reason to over-engineer unless somebody will tell that it
-> broke the very special board. Neither of currently supported boards
-> should require more quirks. Hence, why bother?
+The block layer may call the I/O scheduler .finish_request() callback
+without having called the .insert_requests() callback. Make sure that the
+mq-deadline I/O statistics are correct if the block layer inserts an I/O
+request that bypasses the I/O scheduler. This patch prevents that lower
+priority I/O is delayed longer than necessary for mixed I/O priority
+workloads.
 
-You could drop patch 4 from v7 if you checked DT boolean property
-instead of adding a capability in patch 3. (Patch 4 would be replaced
-by DT changes for relevant boards.)
+Cc: Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Reported-by: Niklas Cassel <Niklas.Cassel@wdc.com>
+Fixes: 08a9ad8bf607 ("block/mq-deadline: Add cgroup support")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/mq-deadline.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-Best Regards
-Michał Mirosław
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index dbd74bae9f11..28f2e7655a5f 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -713,6 +713,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 
+ 	prio = ioprio_class_to_prio[ioprio_class];
+ 	dd_count(dd, inserted, prio);
++	rq->elv.priv[0] = (void *)(uintptr_t)1;
+ 
+ 	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
+ 		blk_mq_free_requests(&free);
+@@ -761,12 +762,10 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 	spin_unlock(&dd->lock);
+ }
+ 
+-/*
+- * Nothing to do here. This is defined only to ensure that .finish_request
+- * method is called upon request completion.
+- */
++/* Callback from inside blk_mq_rq_ctx_init(). */
+ static void dd_prepare_request(struct request *rq)
+ {
++	rq->elv.priv[0] = NULL;
+ }
+ 
+ /*
+@@ -793,7 +792,14 @@ static void dd_finish_request(struct request *rq)
+ 	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
+ 	struct dd_per_prio *per_prio = &dd->per_prio[prio];
+ 
+-	dd_count(dd, completed, prio);
++	/*
++	 * The block layer core may call dd_finish_request() without having
++	 * called dd_insert_requests(). Hence only update statistics for
++	 * requests for which dd_insert_requests() has been called. See also
++	 * blk_mq_request_bypass_insert().
++	 */
++	if (rq->elv.priv[0])
++		dd_count(dd, completed, prio);
+ 
+ 	if (blk_queue_is_zoned(q)) {
+ 		unsigned long flags;
