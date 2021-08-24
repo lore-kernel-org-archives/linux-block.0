@@ -2,101 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29654C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 15:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBE8C4320E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 16:06:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06A8B6128A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 15:19:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39286610A7
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 16:06:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238247AbhHXPUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 11:20:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33110 "EHLO
+        id S231612AbhHXQHI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 12:07:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230341AbhHXPUD (ORCPT
+        with ESMTP id S231454AbhHXQHH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 11:20:03 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E81DC061757
-        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 08:19:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=TS3plikARb9oHXwa9tCoRD0jeVnL2l6419OBNsWIpIg=; b=UinpYX6rdVkquVDXVVqI3Ui1rq
-        0MS53MjvJH9FDdijtsSOWXx0VsM8fCy0ds4CBSuYDJFGkLhERpeud9jpF/x0h0FTWgK6CoA4atk2p
-        lxvT6h9rFU7RTkVqGpc/n1w8REGtD7P7cPI0eJz7TzO1KBLfI6EE4maRAFrIHrIaE/IHeGVlA/Pva
-        jv6J3HDnBRRjAOeAMKzXH+GtsEP9UaYkPTQS6L7OjsWamT1XDsIEs6+SfJZB4WMAeOqZ3oaD8zTCc
-        8UC/P52174ZAHgY/RCFlE4Dn3B+GkMtQrO7APYMaYO/TQNlrqdy3iSYOOQovph1AjZQ1ihZ/DI+Iq
-        /02QkJqw==;
-Received: from [2001:4bb8:193:fd10:b8ba:7bad:652e:75fa] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mIYC1-00BDP2-3F; Tue, 24 Aug 2021 15:18:32 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: mark blkdev_fsync static
-Date:   Tue, 24 Aug 2021 17:18:23 +0200
-Message-Id: <20210824151823.1575100-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+        Tue, 24 Aug 2021 12:07:07 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C53FC061757;
+        Tue, 24 Aug 2021 09:06:23 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id y34so46567024lfa.8;
+        Tue, 24 Aug 2021 09:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=D11sK5S4u0k92UmGqoMMxhYoHykBWojrgFuEY2ExXmU=;
+        b=j5oO4YKmEtjSrdR/LRj29FWm7ZWscvf0YAlLIfAbyma3i3xrWYkpvj23lq/s4jKLE+
+         DavhkxNmCpeksmEa9ILWNvefGO5sHEir4OmqgbcJHJOUoMNicjxztDcPvd0W6llZqodk
+         iLM3ma7BKISG56oSvWcS2EkPq41rxN5jwXF6P1godZkgsiOAEGOclX4qjzZq6Kf8Tvnk
+         TAACxyA0bO/whCciVK3/tdeWV5EdbIHK9i0gjc6j4qOZNMx+7Mzls9NTzzBIXwRsvp8U
+         CY4mjXdFvKQG9Z6DEm9VZQETRLwTRkE3aKWkkJygXsUGz/Ob2E4kDB89q2XBS4XuMUKd
+         xwyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=D11sK5S4u0k92UmGqoMMxhYoHykBWojrgFuEY2ExXmU=;
+        b=awXpaQRGL3fw/201gd9DQ0AUqCebv243gaFwe+nbUfqrRVTDDUxoSzf5DB61Ltaiki
+         zIOzD022BZgRdnAh0V8bwDhwNJN+AFvuoeJMgHaufngJsRmTombZmLD66LT5HwZj3abr
+         /KfXTi4R1mh8c8g4Yprydl2fqaB25Vl6bsvTRfoa/Nkr62d1MQwQ+hWRJXtlBySE5eQD
+         JEVU4YJ3YIuS/ZVvC/8WbuxXA5BvOiUSLhfXL7OqfEDhLBYqtk8MEn1441oUx4F+XtgV
+         jOHPIAs7wYzgExw9elgZcn4kRkfytoMTl5fFNcnsHKtI0dPfefaWxrcy13/Zudgm6haL
+         yqow==
+X-Gm-Message-State: AOAM531AQRFY++DmUx9jOmsMeLptFjjg4CvKrDXO53wd06eN2dOuvSs6
+        AFvJIRBe8sx6hmBbsM23tgHUMxEztYU=
+X-Google-Smtp-Source: ABdhPJzA1IM5inZCgPtbYZdKRO7U/f1qher0J7t9nwf9UI0Buk/Ky3hyycBUfekwwW2FBGLU2f9KvA==
+X-Received: by 2002:a05:6512:b09:: with SMTP id w9mr12937661lfu.394.1629821181740;
+        Tue, 24 Aug 2021 09:06:21 -0700 (PDT)
+Received: from [192.168.2.145] (46-138-120-72.dynamic.spd-mgts.ru. [46.138.120.72])
+        by smtp.googlemail.com with ESMTPSA id z7sm1787878lft.302.2021.08.24.09.06.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Aug 2021 09:06:20 -0700 (PDT)
+Subject: Re: [PATCH v6 0/5] Support EFI partition on NVIDIA Tegra devices
+To:     =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+References: <20210818221920.3893-1-digetx@gmail.com>
+ <YSAvnQb29XlhqY7k@qmqm.qmqm.pl>
+ <e35a9053-a793-d189-ff79-04212e1227c2@gmail.com>
+ <YSQx0vRrpIGb4OIj@qmqm.qmqm.pl> <YSTMEM8JwwypL8Me@qmqm.qmqm.pl>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <390673a8-f275-fd96-50a3-15db416aa6e6@gmail.com>
+Date:   Tue, 24 Aug 2021 19:06:18 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <YSTMEM8JwwypL8Me@qmqm.qmqm.pl>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blkdev_fsync is only used inside of block_dev.c since the
-removal of the raw drіver.
+24.08.2021 13:38, Michał Mirosław пишет:
+> On Tue, Aug 24, 2021 at 01:40:02AM +0200, Michał Mirosław wrote:
+>> On Sat, Aug 21, 2021 at 08:27:15PM +0300, Dmitry Osipenko wrote:
+>>> 21.08.2021 01:41, Michał Mirosław пишет:
+>>>> On Thu, Aug 19, 2021 at 01:19:15AM +0300, Dmitry Osipenko wrote:
+>>>>> This series adds the most minimal EFI partition support for NVIDIA Tegra
+>>>>> consumer devices, like Android tablets and game consoles, making theirs
+>>>>> eMMC accessible out-of-the-box using downstream bootloader and mainline
+>>>>> Linux kernel.  eMMC now works on Acer A500 tablet and Ouya game console
+>>>>> that are already well supported in mainline and internal storage is the
+>>>>> only biggest thing left to support.
+>>>> [...]
+>>>>
+>>>> Could we provide the GPT sector via DT? As I understand this is for
+>>>> non-removable eMMC storage. It would remove the need for a cap bit and
+>>>> hardcoded calculations instead just checking if DT node of the controller
+>>>> contains a magic entry with a number.
+>>>
+>>> The same device model usually comes in different flavors that have a
+>>> different eMMC unit and size. So no, it can't be hardcoded in DT.
+>>
+>> I see. I was thinking how to avoid of going the whole way and creating
+>> another controller capability (since this is going to be core code) -
+>> could this workaround be enabled just by a boolean DT property at
+>> controller's node instead? Or do we expect non-DT platforms to be
+>> similarly broken?
+> 
+> Rewording my concern: I believe that this is platform's and not 
+> a controller's misfeature, so the controller driver feels like wrong
+> place fix. That's why I'd prefer that the enable came from the DT
+> and not from driver's code.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/block_dev.c     | 4 ++--
- include/linux/fs.h | 4 ----
- 2 files changed, 2 insertions(+), 6 deletions(-)
+The alternative GPT entry requires user to add 'gpt' argument to
+kernel's cmdline. If board already uses proper alternative GPT entry at
+the last sector, then nothing changed for that board.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 7b8deda57e74..45df6cbccf12 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -689,7 +689,8 @@ static loff_t block_llseek(struct file *file, loff_t offset, int whence)
- 	return retval;
- }
- 	
--int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
-+static int blkdev_fsync(struct file *filp, loff_t start, loff_t end,
-+		int datasync)
- {
- 	struct inode *bd_inode = bdev_file_inode(filp);
- 	struct block_device *bdev = I_BDEV(bd_inode);
-@@ -710,7 +711,6 @@ int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
- 
- 	return error;
- }
--EXPORT_SYMBOL(blkdev_fsync);
- 
- /**
-  * bdev_read_page() - Start reading a page from a block device
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 96a0affa7b2d..0e49b0e9b943 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3249,10 +3249,6 @@ ssize_t vfs_iocb_iter_read(struct file *file, struct kiocb *iocb,
- ssize_t vfs_iocb_iter_write(struct file *file, struct kiocb *iocb,
- 			    struct iov_iter *iter);
- 
--/* fs/block_dev.c */
--extern int blkdev_fsync(struct file *filp, loff_t start, loff_t end,
--			int datasync);
--
- /* fs/splice.c */
- extern ssize_t generic_file_splice_read(struct file *, loff_t *,
- 		struct pipe_inode_info *, size_t, unsigned int);
--- 
-2.30.2
+The case where board uses 'gpt' cmdline + it had stale GPT entry at the
+special location used by Android devices and chance that now suddenly
+that GPT entry will pop up is close to zero.
 
+All old partition table entries should be erased on reparation. If it
+wasn't done, then it's not a kernel's problem, it's much more a user's
+problem. Even though kernel could help that poor user if will be really
+needed.
+
+There is no reason to over-engineer unless somebody will tell that it
+broke the very special board. Neither of currently supported boards
+should require more quirks. Hence, why bother?
