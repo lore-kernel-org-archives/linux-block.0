@@ -2,49 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E47EFC4338F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B727AC4320E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:38:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB5FC6115A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:23:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C4EB6125F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 07:38:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233481AbhHXHYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 03:24:33 -0400
-Received: from verein.lst.de ([213.95.11.211]:50524 "EHLO verein.lst.de"
+        id S235008AbhHXHi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 03:38:56 -0400
+Received: from mga03.intel.com ([134.134.136.65]:32305 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231945AbhHXHY1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 03:24:27 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 820E567373; Tue, 24 Aug 2021 09:23:40 +0200 (CEST)
-Date:   Tue, 24 Aug 2021 09:23:40 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Hillf Danton <hdanton@sina.com>,
-        syzbot <syzbot+aa0801b6b32dca9dda82@syzkaller.appspotmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] general protection fault in wb_timer_fn
-Message-ID: <20210824072340.GA25108@lst.de>
-References: <00000000000072e53a05c983ab22@google.com> <20210816091041.3313-1-hdanton@sina.com> <20210816093336.GA3950@lst.de> <yt9dim01iz69.fsf@linux.ibm.com> <20210819090510.GA12194@lst.de> <yt9dr1eph96a.fsf@linux.ibm.com> <20210819135308.GB3395@lst.de> <CAHj4cs-S7sTEMZ=zSreW5_PgQQVxvf-4netHy-paPR2kfY=-hQ@mail.gmail.com>
+        id S234616AbhHXHiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Aug 2021 03:38:55 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10085"; a="217283964"
+X-IronPort-AV: E=Sophos;i="5.84,346,1620716400"; 
+   d="scan'208";a="217283964"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2021 00:38:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,346,1620716400"; 
+   d="scan'208";a="515317618"
+Received: from um.fi.intel.com (HELO um) ([10.237.72.62])
+  by fmsmga004.fm.intel.com with ESMTP; 24 Aug 2021 00:38:07 -0700
+From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
+To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
+Cc:     Kees Cook <keescook@chromium.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org, alexander.shishkin@linux.intel.com
+Subject: Re: [PATCH v2 47/63] intel_th: msu: Use memset_startat() for
+ clearing hw header
+In-Reply-To: <20210818060533.3569517-48-keescook@chromium.org>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-48-keescook@chromium.org>
+Date:   Tue, 24 Aug 2021 10:38:06 +0300
+Message-ID: <87sfyzi97l.fsf@ashishki-desk.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHj4cs-S7sTEMZ=zSreW5_PgQQVxvf-4netHy-paPR2kfY=-hQ@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 21, 2021 at 03:48:01PM +0800, Yi Zhang wrote:
-> I also met similar issue with blktests, I tried to apply the patchset
-> but with no luck to apply them, any suggestions to fix it.
+Kees Cook <keescook@chromium.org> writes:
 
-Please just retests the latest for-5.15/block or for-next branch in
-Jens' tree.
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memset(), avoid intentionally writing across
+> neighboring fields.
+>
+> Use memset_startat() so memset() doesn't get confused about writing
+> beyond the destination member that is intended to be the starting point
+> of zeroing through the end of the struct.
+>
+> Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+
+Acked-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+
+> ---
+>  drivers/hwtracing/intel_th/msu.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/drivers/hwtracing/intel_th/msu.c b/drivers/hwtracing/intel_th/msu.c
+> index 432ade0842f6..70a07b4e9967 100644
+> --- a/drivers/hwtracing/intel_th/msu.c
+> +++ b/drivers/hwtracing/intel_th/msu.c
+> @@ -658,13 +658,11 @@ static void msc_buffer_clear_hw_header(struct msc *msc)
+>  
+>  	list_for_each_entry(win, &msc->win_list, entry) {
+>  		unsigned int blk;
+> -		size_t hw_sz = sizeof(struct msc_block_desc) -
+> -			offsetof(struct msc_block_desc, hw_tag);
+>  
+>  		for_each_sg(win->sgt->sgl, sg, win->nr_segs, blk) {
+>  			struct msc_block_desc *bdesc = sg_virt(sg);
+>  
+> -			memset(&bdesc->hw_tag, 0, hw_sz);
+> +			memset_startat(bdesc, 0, hw_tag);
+>  		}
+>  	}
+>  }
+> -- 
+> 2.30.2
