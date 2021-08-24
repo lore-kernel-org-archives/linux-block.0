@@ -2,189 +2,219 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1954EC432BE
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 13:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E191C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 13:56:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05E86610CD
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 13:52:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AF9E61212
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 13:56:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237692AbhHXNwy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 09:52:54 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:21204 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237667AbhHXNwv (ORCPT
+        id S237310AbhHXN5a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 09:57:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41460 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237559AbhHXN5Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 09:52:51 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 17O7c7kr001613;
-        Tue, 24 Aug 2021 06:51:46 -0700
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2177.outbound.protection.outlook.com [104.47.58.177])
-        by mx0b-0016f401.pphosted.com with ESMTP id 3amkrkaym1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Aug 2021 06:51:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GTZ9mW4HHzCzXONiLA/akogyGeGNEP2e8RvITWE2o8ErUxtFNn8okYPKI8Qn4jdRTACV/soCiAZNUk81zjIgRDdLFiA6lF5l23j16HCQP9lOMOOJuCUhkobfTLVpUw+Lgvc0+fshvTQG6W2qdWHMvm/VVZTm2VMIt4vkvgnYjXR31cgmwomPC1umsdOhot007tqLRmhP7FTD3mFVgL4mnF3qIzElIDGtmB6Pwj7nO/uxMNhLTTMTJTcfWrH3cJAdIHHgdUV1bFe2CTxzWORA6JbxEX+kqYaN4xRISo3dVghewriaT0r/cAdamPZmxohenU5iafSZYV5V058simfsWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d7Q/8UGudqLi8wcwPle43t+wM7F6ZcDGUqZV6Wh/DQM=;
- b=TB5y/reqXD+V6Bcw8hTQTrXsBByjtayUV7wywozhTQeEiqhqrmqeaq2yQ8+Yjs9ukNY4a3DWXI0u1Gx3zDHbqYy0VAL1CALIn7MF78EQ6xy2XYyI6hjJTs2UWQD5893+DbUlCNwfjYg+bPhxrxJXTAjNQK71aKultLE+7vxirBWNZF0ItQ5X2nBVml01el66BWTjjnu6hxPbqCNsFvFHRLOZbgARGnkodyr9WOwOy/80InNXfzAlZj3rYaA/4xrmIFOMA1rpaNKe6+XAXfquS6HpxX7t1vOo8O1+81rV8vjadNtL9iqBtIedUVBB5wWhPGUQP/WiZDf1Zr/QKBJozQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
+        Tue, 24 Aug 2021 09:57:25 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB894C0613C1
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 06:56:41 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id j18so26378403ioj.8
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 06:56:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d7Q/8UGudqLi8wcwPle43t+wM7F6ZcDGUqZV6Wh/DQM=;
- b=CHtBS7WCUilc9iwor4XjRsrnL3RjZXhIsCO5FHsvjHUrgOVGNpfAMwdrJW9+NS+qYZjDU45D+67hP9vm3EyQNu2m2yKs7fuDPB4eOrWnRbPp7EB1DsvX/x07wX1BKivUUwDwy47f4dduEnRToszoem+B/aLB2IzUebCAdjGw/14=
-Received: from DM5PR18MB2229.namprd18.prod.outlook.com (2603:10b6:4:b9::24) by
- DM4PR18MB4173.namprd18.prod.outlook.com (2603:10b6:5:390::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4436.21; Tue, 24 Aug 2021 13:51:45 +0000
-Received: from DM5PR18MB2229.namprd18.prod.outlook.com
- ([fe80::a9c9:dccf:5e59:fdec]) by DM5PR18MB2229.namprd18.prod.outlook.com
- ([fe80::a9c9:dccf:5e59:fdec%2]) with mapi id 15.20.4436.024; Tue, 24 Aug 2021
- 13:51:44 +0000
-From:   Prabhakar Kushwaha <pkushwaha@marvell.com>
-To:     Kees Cook <keescook@chromium.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     Ariel Elior <aelior@marvell.com>,
-        Sudarsana Reddy Kalluru <skalluru@marvell.com>,
-        GR-everest-linux-l2 <GR-everest-linux-l2@marvell.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Shai Malin <smalin@marvell.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "clang-built-linux@googlegroups.com" 
-        <clang-built-linux@googlegroups.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
-Subject: RE: [PATCH v2 17/63] bnx2x: Use struct_group() for memcpy() region
-Thread-Topic: [PATCH v2 17/63] bnx2x: Use struct_group() for memcpy() region
-Thread-Index: AdeY7yGdR9cZvhLdSru1pL8aUI2KKQ==
-Date:   Tue, 24 Aug 2021 13:51:44 +0000
-Message-ID: <DM5PR18MB2229B0413C372CC6E49D59A3B2C59@DM5PR18MB2229.namprd18.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: chromium.org; dkim=none (message not signed)
- header.d=none;chromium.org; dmarc=none action=none header.from=marvell.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cff11d0b-a9d6-4ef8-79a0-08d967064f71
-x-ms-traffictypediagnostic: DM4PR18MB4173:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM4PR18MB4173859078969B3FB6DD878CB2C59@DM4PR18MB4173.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2276;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: A48KM2JlMSMYgGArSHWjjJVD6xTijC+sMFJ/pdep2lhNAEFu8S31wBryajCFXqph1dRnIb99zR/ENyy8ItUiE0CFHDOe959R0Rz3AYK2RO0nD9QRVEjed97DVP6Em8VexOUJ4gp4n3srtbnjkZza4sTa1gVn9rtKWI+UzbZcnLIRubvaM7u8Uehs0owExl52VjGqitNFeGD6eHxfvxpGfuz3NESmJUoDntwzWPZ8NJqeSgGOxc09aPp4o80qA1HbHnpo+tgGh+YoCLlj2m/s2qsOwtT5UmCdrm4woUOmmWXU1vArd1mz7o4CGRypHhaGUXeZfB9nT3vvda//LMjg1Cc/cKLV0AaJvTDSUFdopdbazasd+Z1UDk6sK3U7AwHZm2hVb04LwnAFyz/5voGihLiW30RVWFr4n2MHdLZU/I6NQJCMZCW/XrTEQWh8/R1NWWYbrnqV2lYvMnu9G5vNm98DmH3IaBYmLuK4YT4xvB9UoAEGLe9zstngepVwURFphINW425nh2ScKQJqC+pL7PinCB7OZso3V3kq8+wpfyMgYL8iS62bXyuVn41s3n1sX06Vi5UVNm5maXbj+zFocVTY7AZlpHxb0AypIqD6+8WF5Q8dOCo8NBL4yCUJdz7d5M2wF769p7RyEsrXwKoPsD4jdtaGOacajg4oDMEXePRAstuX4LdF4vCEAx0CX7Fo0eYeX6jT8+cmc40mFJHTEQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR18MB2229.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(396003)(136003)(376002)(39860400002)(6506007)(83380400001)(26005)(76116006)(66946007)(53546011)(122000001)(9686003)(64756008)(55016002)(86362001)(66446008)(38100700002)(66556008)(66476007)(54906003)(33656002)(4326008)(71200400001)(316002)(186003)(8676002)(8936002)(7416002)(478600001)(38070700005)(5660300002)(7696005)(52536014)(2906002)(110136005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?EMDIb0DJI8NV0xiWg7/D5hHaDWHCeDakcGy/278+cHfPg4FEvj1RULd+LY1V?=
- =?us-ascii?Q?mvT/JOTAOIJvK6HqD/vlPwz+dhLIzBFNiWXADKZlC/INcG+INVr7/vM1Wsiw?=
- =?us-ascii?Q?O23P9w2+qJxzteL3TrWDr95dnVkZBnSkBQLym6qkwt1JY+0lWtnAFq2wTa0N?=
- =?us-ascii?Q?xFfZH0vtOex/q0v/noaqvI4vL0A1jlqYpimb2pM1qqH4anPQDVTZkIXDDpGU?=
- =?us-ascii?Q?56gQF0Pjo8Lq6+DP4lSVaBnAPmVxwVE02YgkINn3bxTa98Vf5tXQHEZdi8H7?=
- =?us-ascii?Q?KWbmHRRRalXBU4cDvvMZyi6gXGO4a+eD+j8ZKMG59FQBW3n0cBdIHfPUlMRh?=
- =?us-ascii?Q?TsTltdQogzI7BvGQzUX0BzWdkb49YwF2QST7+Ol/0Rv4UeveJr4H3NzvzjuP?=
- =?us-ascii?Q?1UxL05n3SrnHK7RnGcDJbJOGGt4awXNsnPbUvIyjh7ni09Zv61zeyYiHq5g+?=
- =?us-ascii?Q?8/x3wOrpleWlXp66e9gy+/2/c9gxNfLbSMOI6XwCpaCKaVnJN+hQmjCQ8AIq?=
- =?us-ascii?Q?8MoRFl4j+jt1n8ca0MkPO3rJMELlxlR4kgm8dWRCkiDT0QArszs6hsaDdZY1?=
- =?us-ascii?Q?z7NX9aFdbS5WnOXtEkZdueyNj2Ovho3QfAzofKT2Zrl5fzAgOXWKiRxYkq6u?=
- =?us-ascii?Q?PDevoZ2dRFa5jgfhLVLmbO+/eJEuVkUJQFtXOm3abUrTr/w4oTIIHySIM04v?=
- =?us-ascii?Q?JCMUDkiEB4M0JTh9XIxMDubek566tSQIcg6SLNHJTZ1XXywNOC8zy9zeI04h?=
- =?us-ascii?Q?bgz6LpJmmNUlxR1SdFT4anRbfI1P2gXbZVUkdTMgbO3kS/m/6eOSr/jdVtHU?=
- =?us-ascii?Q?7eo7cIFVLCy5PwzpaGKPhfv/0qUBvIG9b1aZ9LRDKOzP57pHIKc/WZra0VGM?=
- =?us-ascii?Q?fbaAw6nQcRfnvmepUxBGFVSpMtJLT+vsFkxvPPYM8qTfQvb4MjM3UWcpYVUh?=
- =?us-ascii?Q?oaYJuFhu7QLpeRhMkiZGFdKArTEMbKOSBPe8jQLHnP9NNrwx/6Sq1ZpOH3de?=
- =?us-ascii?Q?kKnuukJ21vXn9ZkhGxDfLXYELdemQEcsuZITqvgAh9GKf1uXwEoqO5NRrjBN?=
- =?us-ascii?Q?QESh8lLi/IbI4rQln+J+S5sPzRJtd2FPe5u5ylMs+UledCu6GIGg6nonOzrs?=
- =?us-ascii?Q?CNZsrucVDyhaH+ST31Gn1cS7U/83K8usv3bBSmEVznXXUkEV6rpwXIi5j+2Q?=
- =?us-ascii?Q?vw/DNoIaqzsSRXNe3TpdweF4AUaSFOmq0YFaUheWZRWTeGQ4XS3+3WOwPfOV?=
- =?us-ascii?Q?PaZC9Jb4CpTONNpbwkASp2EVSAA5PqVwP6RTa7iy9311VQ6zpcw9HPEszm8h?=
- =?us-ascii?Q?wB0aQqxTrFzOGhs1b8PziTyd?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=r92XhMGEKEPNoNZ1gklqn+rggeEIAN7hUVIbCgCkkXg=;
+        b=qBcAEurEYgrqrHsx6xuo6YnGkrpcZQoNywLBJ9Pz68QY7Qw+Y1k8fHEaVeMG9yBp7+
+         6zihjvotYkOiPjpIt9K+8s3yn9MXaj+kThB0SEPq1+L4taGd9o5aYf8vAyR44KrZ+R3i
+         mJkeaBniW5FhiJbCEYKiR5F06wUhNUmTebo1oqnOEcTI5CRlWmZI/VhOUDh3qVSSUqTp
+         2owq3pjJYny4BpbH21tBbcQPkEFIN//pNjMTRspqW//BKSwtoEI7Jug0Nv5fbwQYjPrC
+         ldjg2DogWelygogmdSYiRaeNrOv04jh8EOG9q8j2/WCOa8TzY38z80bEC+erVZ5V4Eej
+         PPfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=r92XhMGEKEPNoNZ1gklqn+rggeEIAN7hUVIbCgCkkXg=;
+        b=lqK/gFKtXLAq2f+eCIa+DVEKD4EbHD2cftgiMo+6zH9MiqdaYhR3up31zgmzcvX3tk
+         RHa6vU/YUw+RvzP/cA99w6l5a6IXAu7/uuKWdY2qzEAlwRyJ4YPG8KwC7OGQ2mDWQd2w
+         5c3ebCu/3Iv8/1VRFhT+huX61K6SHPjIDXqo9uMkCeJd6ihrHGAjmYpcxiwzqGFvdOkW
+         yr81rRhz8vX5F6huJ/2dEeWdOFot/qo1HwMpSwSdFcZBE9bkyJqvt8eI6yrtuzBDpuvL
+         RxoP7m5oHF4U9p8GGo1ui8MVTh/EsjzXnyKrBQXUzXrZszGwkK7RkJV9k6g1sPrfzm3R
+         Nunw==
+X-Gm-Message-State: AOAM530awUtP0KHaYXCS1n15PEphufWNdcsS6XFiQNmkgq5g+I/6u4Ck
+        SHF+8HQ+1vxWy5AfRjB6hEDpbQ==
+X-Google-Smtp-Source: ABdhPJyoUFcBI+H+zussZSoBiGjrjGv9gXEcG8k6Bo0Ygy1s0FVF7SNxBYS81HWNu4TMZJznaKJLMg==
+X-Received: by 2002:a5d:9eda:: with SMTP id a26mr31606481ioe.166.1629813401094;
+        Tue, 24 Aug 2021 06:56:41 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id a11sm9729722ilf.79.2021.08.24.06.56.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Aug 2021 06:56:40 -0700 (PDT)
+Subject: Re: WARNING: CPU: 0 PID: 11219 at block/genhd.c:594
+ del_gendisk+0x1f8/0x218
+To:     Bruno Goncalves <bgoncalv@redhat.com>, linux-block@vger.kernel.org,
+        Yi Zhang <yizhan@redhat.com>
+Cc:     CKI Project <cki-project@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>
+References: <CA+QYu4oZN2Z-z1uRjPQO6UL4d5CuRM6NCsSAPG0+BKb5K2o23A@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bb197903-2f01-5a64-9856-2767d3aba103@kernel.dk>
+Date:   Tue, 24 Aug 2021 07:56:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR18MB2229.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cff11d0b-a9d6-4ef8-79a0-08d967064f71
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Aug 2021 13:51:44.7798
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: S07K5TsDOEM1fYOyl4L5sHc6IFKNL8HtJzGfPubKFD6+2Z+PKq+bOkDAl63rre8IrpHApOzgGQ5mrJm/p90OxA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR18MB4173
-X-Proofpoint-GUID: lLSeim5oVrTVDfdXvJxQPHeUBF8phhVS
-X-Proofpoint-ORIG-GUID: lLSeim5oVrTVDfdXvJxQPHeUBF8phhVS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-08-24_04,2021-08-24_01,2020-04-07_01
+In-Reply-To: <CA+QYu4oZN2Z-z1uRjPQO6UL4d5CuRM6NCsSAPG0+BKb5K2o23A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Addding Christoph/Luis
 
-> -----Original Message-----
-> From: Kees Cook <keescook@chromium.org>
-> Sent: Wednesday, August 18, 2021 11:35 AM
-> To: linux-kernel@vger.kernel.org
-> Cc: Kees Cook <keescook@chromium.org>; Ariel Elior <aelior@marvell.com>;
-> Sudarsana Reddy Kalluru <skalluru@marvell.com>; GR-everest-linux-l2 <GR-
-> everest-linux-l2@marvell.com>; David S. Miller <davem@davemloft.net>; Jak=
-ub
-> Kicinski <kuba@kernel.org>; netdev@vger.kernel.org; Gustavo A. R. Silva
-> <gustavoars@kernel.org>; Greg Kroah-Hartman <gregkh@linuxfoundation.org>;
-> Andrew Morton <akpm@linux-foundation.org>; linux-wireless@vger.kernel.org=
-;
-> dri-devel@lists.freedesktop.org; linux-staging@lists.linux.dev; linux-
-> block@vger.kernel.org; linux-kbuild@vger.kernel.org; clang-built-
-> linux@googlegroups.com; Rasmus Villemoes <linux@rasmusvillemoes.dk>;
-> linux-hardening@vger.kernel.org
-> Subject: [PATCH v2 17/63] bnx2x: Use struct_group() for memcpy() region
->=20
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memcpy(), memmove(), and memset(), avoid
-> intentionally writing across neighboring fields.
->=20
-> Use struct_group() in struct nig_stats around members egress_mac_pkt0_lo,
-> egress_mac_pkt0_hi, egress_mac_pkt1_lo, and egress_mac_pkt1_hi (and the
-> respective members in struct bnx2x_eth_stats), so they can be referenced
-> together. This will allow memcpy() and sizeof() to more easily reason
-> about sizes, improve readability, and avoid future warnings about writing
-> beyond the end of struct bnx2x_eth_stats's rx_stat_ifhcinbadoctets_hi.
->=20
-> "pahole" shows no size nor member offset changes to either struct.
-> "objdump -d" shows no meaningful object code changes (i.e. only source
-> line number induced differences and optimizations).
->=20
-> Additionally adds BUILD_BUG_ON() to compare the separate struct group
-> sizes.
->=20
-> Cc: Ariel Elior <aelior@marvell.com>
-> Cc: Sudarsana Kalluru <skalluru@marvell.com>
-> Cc: GR-everest-linux-l2@marvell.com
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
 
-Reviewed-by: Prabhakar Kushwaha <pkushwaha@marvell.com>
+On 8/24/21 6:58 AM, Bruno Goncalves wrote:
+> Hello,
+> 
+> When testing commit "9d09cba59515 - Merge branch
+> 'io_uring-bio-cache.5'" we hit the following issue during the nvme
+> test part of blktests [1]. We've reproduced the issue on aarch64,
+> ppc64le and s390x.
+> 
+> [ 2785.043085] run blktests nvme/004 at 2021-08-23 17:55:00
+> [ 2785.085351] loop0: detected capacity change from 0 to 2097152
+> [ 2785.262427] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+> [ 2785.367706] nvmet: creating controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:e154be55ec2a4a138eb3b9b18d514d7e.
+> [ 2785.381385] nvme nvme0: creating 128 I/O queues.
+> [ 2785.396302] nvme nvme0: new ctrl: "blktests-subsystem-1"
+> [ 2786.428981] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
+> [ 2786.508421] ------------[ cut here ]------------
+> [ 2786.513027] WARNING: CPU: 90 PID: 906579 at block/genhd.c:594
+> del_gendisk+0x1b4/0x1c0
+> [ 2786.520851] Modules linked in: nvme_loop nvme_fabrics nvmet
+> nvme_core loop dm_log_writes dm_flakey mlx5_ib ib_uverbs ib_core
+> rfkill sunrpc coresight_etm4x i2c_smbus coresight_replicator
+> coresight_tpiu coresight_tmc joydev mlx5_core mlxfw psample tls
+> acpi_ipmi ipmi_ssif ipmi_devintf ipmi_msghandler coresight_funnel
+> thunderx2_pmu coresight vfat fat fuse zram ip_tables xfs ast
+> i2c_algo_bit crct10dif_ce drm_vram_helper ghash_ce drm_kms_helper
+> syscopyarea sysfillrect sysimgblt fb_sys_fops cec drm_ttm_helper ttm
+> drm gpio_xlp i2c_xlp9xx uas usb_storage aes_neon_bs [last unloaded:
+> null_blk]
+> [ 2786.572480] CPU: 90 PID: 906579 Comm: nvme Not tainted 5.14.0-rc7 #1
+> [ 2786.578823] Hardware name: HPE Apollo 70             /C01_APACHE_MB
+>         , BIOS L50_5.13_1.15 05/08/2020
+> [ 2786.588548] pstate: 20400009 (nzCv daif +PAN -UAO -TCO BTYPE=--)
+> [ 2786.594542] pc : del_gendisk+0x1b4/0x1c0
+> [ 2786.598453] lr : del_gendisk+0x24/0x1c0
+> [ 2786.602276] sp : ffff800026ee3b90
+> [ 2786.605577] x29: ffff800026ee3b90 x28: ffff0008c019c180 x27: 0000000000000000
+> [ 2786.612702] x26: 0000000000000000 x25: 0000000000000000 x24: ffff00080dcd2720
+> [ 2786.619825] x23: ffff800026ee3d50 x22: fffffffffffffff2 x21: ffff0008cc2dc530
+> [ 2786.626948] x20: ffff800026ee3c40 x19: ffff0008ca50fa00 x18: 0000000000000000
+> [ 2786.634071] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000030
+> [ 2786.641194] x14: 0000000000000000 x13: 0000000000000030 x12: 0101010101010101
+> [ 2786.648318] x11: ffff80001162b370 x10: 0000000000001c60 x9 : ffff80001116219c
+> [ 2786.655441] x8 : ffff0008c019de40 x7 : 0000000000000004 x6 : 00000008cbf74261
+> [ 2786.662564] x5 : 0000000000001cd0 x4 : 0000000000000000 x3 : ffffffffffffefff
+> [ 2786.669687] x2 : 0000000000000000 x1 : ffff800011a6bc80 x0 : 0000000000000000
+> [ 2786.676811] Call trace:
+> [ 2786.679245]  del_gendisk+0x1b4/0x1c0
+> [ 2786.682808]  nvme_ns_remove.part.0+0x9c/0x224 [nvme_core]
+> [ 2786.688209]  nvme_ns_remove+0x3c/0x5c [nvme_core]
+> [ 2786.692908]  nvme_remove_namespaces+0xac/0xe0 [nvme_core]
+> [ 2786.698301]  nvme_do_delete_ctrl+0x4c/0x74 [nvme_core]
+> [ 2786.703434]  nvme_sysfs_delete+0x84/0x90 [nvme_core]
+> [ 2786.708392]  dev_attr_store+0x24/0x40
+> [ 2786.712044]  sysfs_kf_write+0x50/0x60
+> [ 2786.715696]  kernfs_fop_write_iter+0x134/0x1c4
+> [ 2786.720127]  new_sync_write+0xdc/0x15c
+> [ 2786.723866]  vfs_write+0x22c/0x2c0
+> [ 2786.727255]  ksys_write+0x64/0xec
+> [ 2786.730558]  __arm64_sys_write+0x28/0x34
+> [ 2786.734469]  invoke_syscall+0x50/0x120
+> [ 2786.738206]  el0_svc_common+0x48/0x100
+> [ 2786.741942]  do_el0_svc+0x34/0xa0
+> [ 2786.745244]  el0_svc+0x2c/0x54
+> [ 2786.748288]  el0t_64_sync_handler+0x1a4/0x1b0
+> [ 2786.752632]  el0t_64_sync+0x19c/0x1a0
+> [ 2786.756283] ---[ end trace 6548b7e0fd94a185 ]---
+> [ 2786.760916] ------------[ cut here ]------------
+> [ 2786.765521] WARNING: CPU: 90 PID: 906579 at block/blk-core.c:373
+> blk_cleanup_queue+0x100/0x110
+> [ 2786.774122] Modules linked in: nvme_loop nvme_fabrics nvmet
+> nvme_core loop dm_log_writes dm_flakey mlx5_ib ib_uverbs ib_core
+> rfkill sunrpc coresight_etm4x i2c_smbus coresight_replicator
+> coresight_tpiu coresight_tmc joydev mlx5_core mlxfw psample tls
+> acpi_ipmi ipmi_ssif ipmi_devintf ipmi_msghandler coresight_funnel
+> thunderx2_pmu coresight vfat fat fuse zram ip_tables xfs ast
+> i2c_algo_bit crct10dif_ce drm_vram_helper ghash_ce drm_kms_helper
+> syscopyarea sysfillrect sysimgblt fb_sys_fops cec drm_ttm_helper ttm
+> drm gpio_xlp i2c_xlp9xx uas usb_storage aes_neon_bs [last unloaded:
+> null_blk]
+> [ 2786.825734] CPU: 90 PID: 906579 Comm: nvme Tainted: G        W
+>    5.14.0-rc7 #1
+> [ 2786.833464] Hardware name: HPE Apollo 70             /C01_APACHE_MB
+>         , BIOS L50_5.13_1.15 05/08/2020
+> [ 2786.843188] pstate: 20400009 (nzCv daif +PAN -UAO -TCO BTYPE=--)
+> [ 2786.849182] pc : blk_cleanup_queue+0x100/0x110
+> [ 2786.853613] lr : blk_cleanup_queue+0x24/0x110
+> [ 2786.857957] sp : ffff800026ee3bb0
+> [ 2786.861258] x29: ffff800026ee3bb0 x28: ffff0008c019c180 x27: 0000000000000000
+> [ 2786.868381] x26: 0000000000000000 x25: 0000000000000000 x24: ffff00080dcd2720
+> [ 2786.875504] x23: ffff800026ee3d50 x22: fffffffffffffff2 x21: ffff0008cc2dc530
+> [ 2786.882627] x20: ffff800026ee3c40 x19: ffff0008c75d54b0 x18: 0000000000000000
+> [ 2786.889750] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000030
+> [ 2786.896873] x14: 0000000000000000 x13: 0000000000000030 x12: 0101010101010101
+> [ 2786.903996] x11: ffff80001162b370 x10: 0000000000001c60 x9 : ffff8000102d340c
+> [ 2786.911119] x8 : 0000000000000019 x7 : 0000000000000000 x6 : 0000000000006541
+> [ 2786.918242] x5 : 0000000000000022 x4 : ffff000f5c955968 x3 : dead000000000122
+> [ 2786.925365] x2 : ffff000f5c955968 x1 : 0000000000000001 x0 : 00000000205641d0
+> [ 2786.932489] Call trace:
+> [ 2786.934922]  blk_cleanup_queue+0x100/0x110
+> [ 2786.939006]  nvme_ns_remove.part.0+0xa4/0x224 [nvme_core]
+> [ 2786.944400]  nvme_ns_remove+0x3c/0x5c [nvme_core]
+> [ 2786.949098]  nvme_remove_namespaces+0xac/0xe0 [nvme_core]
+> [ 2786.954491]  nvme_do_delete_ctrl+0x4c/0x74 [nvme_core]
+> [ 2786.959623]  nvme_sysfs_delete+0x84/0x90 [nvme_core]
+> [ 2786.964581]  dev_attr_store+0x24/0x40
+> [ 2786.968232]  sysfs_kf_write+0x50/0x60
+> [ 2786.971882]  kernfs_fop_write_iter+0x134/0x1c4
+> [ 2786.976313]  new_sync_write+0xdc/0x15c
+> [ 2786.980050]  vfs_write+0x22c/0x2c0
+> [ 2786.983440]  ksys_write+0x64/0xec
+> [ 2786.986742]  __arm64_sys_write+0x28/0x34
+> [ 2786.990653]  invoke_syscall+0x50/0x120
+> [ 2786.994389]  el0_svc_common+0x48/0x100
+> [ 2786.998124]  do_el0_svc+0x34/0xa0
+> [ 2787.001426]  el0_svc+0x2c/0x54
+> [ 2787.004468]  el0t_64_sync_handler+0x1a4/0x1b0
+> [ 2787.008813]  el0t_64_sync+0x19c/0x1a0
+> [ 2787.012462] ---[ end trace 6548b7e0fd94a186 ]---
+> 
+> More logs can be found checking out dmesg logs on:
+> https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/08/23/358062328/build_aarch64_redhat%3A1527263217/tests/Storage_blktests/10535235_aarch64_1_dmesg.log
+> https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/08/23/358062328/build_ppc64le_redhat%3A1527263220/tests/Storage_blktests/10535245_ppc64le_1_dmesg.log
+> https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/08/23/358062328/build_s390x_redhat%3A1527263223/tests/Storage_blktests/10535243_s390x_1_dmesg.log
+> 
+> [1] https://gitlab.com/cki-project/kernel-tests/-/tree/main/storage/blktests/blk
+> 
+> Thank you,
+> Bruno Goncalves
+> 
+
+
+-- 
+Jens Axboe
+
