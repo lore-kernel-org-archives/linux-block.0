@@ -5,32 +5,32 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0AAC4320A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE255C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:55:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A88D561414
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:54:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B80AD6152A
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234397AbhHXAzd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 20:55:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47770 "EHLO mail.kernel.org"
+        id S233836AbhHXA4Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 20:56:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48636 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233693AbhHXAzC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 20:55:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 911F6613D2;
-        Tue, 24 Aug 2021 00:54:18 +0000 (UTC)
+        id S233982AbhHXAzf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Aug 2021 20:55:35 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2E07C6154B;
+        Tue, 24 Aug 2021 00:54:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629766459;
-        bh=FmJrPgqahJSF3AYRo7ObxDBx//CyYZDRWcmP0H4tFRc=;
+        s=k20201202; t=1629766490;
+        bh=uhKcURRTaR98vy+GE7WWHU6+2pr5t+cRJvCfXo7cuEY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qGCRo8HoX/QZcTW2IW+dpLui1y/UHZWUiBJ+PQPCJ3JL54ceSgxgKQBfXhlpcT3Wa
-         DxE0zUoFSP7kYNkmju/g7dP7mdcyAlwA9jpcTZYseTgeoiKhNPmOxcT6ZvaOreh3YY
-         XUiQ6CEK8eu3YdKHVn4Jox8XXkuphzYu2SW0sc1+J0k09q6MXjkgpDQsxgOQprhJaT
-         hkgTBfIkb7YBZiTX1TAcwvFAGUUY68XGjmMgXC2vWaj1UtSayME8QGvbTkl7pQBQav
-         qUemkVdKifscB6DiWGHL2PSK7+xSRilFpoXXMBH4Boua1bJviY04kJowpWQL1chgBV
-         qqGT98U5pMwJA==
+        b=EzZ7KC7QWFL8hTl0juVTu5evw7fcyXo3+pPgBDeBtEbEoczHyJSxU70+FcbMhN5IO
+         XRrLo8mvx6UzQj3viADrLWRLbYvmOkpN0kk+lP/bI7QGtuyRxMhQy15Mv7LmtxFl/k
+         OzllThHek5EKThJAskX0YrDjy0G2wF9Ss5vOVK1FIrI0eNUzR23iaRbGG6u/S6x+3v
+         1brJDuKGJO7XkimwU0lws5SmdZslTFl9jFrUmMpXW8BL0oS7PXHz7uVF82muwp7drB
+         +KBDjJKnUzSqnCwXSjiMr+sVCZxsuoAO5HrGW4fRjJqExJqV0kCSTpu8R5pyzFiB49
+         cBUVY4cC/WqPQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
@@ -38,12 +38,12 @@ Cc:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
         John Garry <john.garry@huawei.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 17/26] blk-mq: don't grab rq's refcount in blk_mq_check_expired()
-Date:   Mon, 23 Aug 2021 20:53:47 -0400
-Message-Id: <20210824005356.630888-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 13/18] blk-mq: don't grab rq's refcount in blk_mq_check_expired()
+Date:   Mon, 23 Aug 2021 20:54:27 -0400
+Message-Id: <20210824005432.631154-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210824005356.630888-1-sashal@kernel.org>
-References: <20210824005356.630888-1-sashal@kernel.org>
+In-Reply-To: <20210824005432.631154-1-sashal@kernel.org>
+References: <20210824005432.631154-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -74,10 +74,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 25 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c732aa581124..6dfa572ac1fc 100644
+index a368eb6dc647..044d0e3a15ad 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -923,34 +923,14 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+@@ -941,34 +941,14 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
  	unsigned long *next = priv;
  
  	/*
