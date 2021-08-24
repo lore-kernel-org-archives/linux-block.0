@@ -2,121 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE255C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:55:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 671AFC4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 01:09:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B80AD6152A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 00:55:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47CC36127B
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 01:09:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233836AbhHXA4Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 20:56:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48636 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233982AbhHXAzf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 20:55:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2E07C6154B;
-        Tue, 24 Aug 2021 00:54:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629766490;
-        bh=uhKcURRTaR98vy+GE7WWHU6+2pr5t+cRJvCfXo7cuEY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EzZ7KC7QWFL8hTl0juVTu5evw7fcyXo3+pPgBDeBtEbEoczHyJSxU70+FcbMhN5IO
-         XRrLo8mvx6UzQj3viADrLWRLbYvmOkpN0kk+lP/bI7QGtuyRxMhQy15Mv7LmtxFl/k
-         OzllThHek5EKThJAskX0YrDjy0G2wF9Ss5vOVK1FIrI0eNUzR23iaRbGG6u/S6x+3v
-         1brJDuKGJO7XkimwU0lws5SmdZslTFl9jFrUmMpXW8BL0oS7PXHz7uVF82muwp7drB
-         +KBDjJKnUzSqnCwXSjiMr+sVCZxsuoAO5HrGW4fRjJqExJqV0kCSTpu8R5pyzFiB49
-         cBUVY4cC/WqPQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        John Garry <john.garry@huawei.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 13/18] blk-mq: don't grab rq's refcount in blk_mq_check_expired()
-Date:   Mon, 23 Aug 2021 20:54:27 -0400
-Message-Id: <20210824005432.631154-13-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210824005432.631154-1-sashal@kernel.org>
-References: <20210824005432.631154-1-sashal@kernel.org>
+        id S233495AbhHXBKb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 21:10:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233487AbhHXBKa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Aug 2021 21:10:30 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6B4C061575;
+        Mon, 23 Aug 2021 18:09:47 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id g11so15474502qtk.5;
+        Mon, 23 Aug 2021 18:09:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=B0sN6y0IbgY+TOAhIwpepHTBKMbUoRecX1PtvCcLmrc=;
+        b=C6JVMXtWOzf6OXCZ+BAsRGqUokcbRsF+JSSQhaBg9coB1PUkA9Iil1Sp8o55ThajT/
+         uUMdcdTYyb0unguigxmU2P8f9iPNZ+n0gj8wUaetVlAJ5AU5qNKsLBiAxw3t4wsUXYTQ
+         XKS/9FMv7zxxSHQm/OMF4Nqh2SDPv+sfTkrQFmy72WdL3k4Ksj3L19yF/gMDiA4Aco1R
+         AHxBku+fq1mDKWEfMeTkat8AB/zxRiDwYHcH51PKkw2HfzvD6rRCayuOjXyVsDqVbuoZ
+         0rlk4N15L4L383y47GKPRUtnoEscY3L1FxQGc0qTSOUDFjOgpJKPM0+Ludb5JyhlWDQC
+         vI9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=B0sN6y0IbgY+TOAhIwpepHTBKMbUoRecX1PtvCcLmrc=;
+        b=GDZyHiym1VUxBwvPwCUd/S33PoGqdh76n61+8YwUYgElvta3+vyXScQRvwSf0IN6KO
+         bcCiKXiIQBnVNfsAnOfr0pzYPwEgfcETutge+e/yG52Y1B3sO+J6ukIP17lIMjqQg8p2
+         g1OIXkpEFhkfY8X73b651v9WMC1Xt3Mj7sAX6SGv/J2WoTF39vQygDPeomsS4ohdJOy5
+         gS6Soc6YLAy8Jnr1w8fPzlY0J9efjgosiWl99Tlyog4Id1HGgAaHnEaCEv+SSAw4c2kZ
+         SIIRp3UXa0wUjvWXkqzbfwyRuLTU9Zo5Re7HPrB1N9f+prF+2tYTeMSK8s7tla8UMoGB
+         5GxQ==
+X-Gm-Message-State: AOAM532dpzFPo8xUYOALE011ZXrCFPnbmIxwVXxj8+ou2/dAHRe4Ymbl
+        tl3v0SsRE1MOpCV+nCJwLSExaKkJiuM=
+X-Google-Smtp-Source: ABdhPJw99vwHr4Zzk3jRuNK3pFll9zrZlKbU5ThB7gwOyf/NOBmfgh4NplMMi4FXiV5nIrhdlhPvdw==
+X-Received: by 2002:a05:622a:207:: with SMTP id b7mr33524146qtx.377.1629767386180;
+        Mon, 23 Aug 2021 18:09:46 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id m16sm9482836qka.84.2021.08.23.18.09.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Aug 2021 18:09:45 -0700 (PDT)
+From:   CGEL <cgel.zte@gmail.com>
+X-Google-Original-From: CGEL <jing.yangyang@zte.com.cn>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jing Yangyang <jing.yangyang@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH linux-next] drivers:ataflop: fix warning comparing pointer to 0
+Date:   Mon, 23 Aug 2021 18:09:37 -0700
+Message-Id: <20210824010937.56395-1-jing.yangyang@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+From: Jing Yangyang <jing.yangyang@zte.com.cn>
 
-[ Upstream commit c797b40ccc340b8a66f7a7842aecc90bf749f087 ]
+Fix the following coccicheck warning:
+./drivers/block/ataflop.c:1439:20-21:WARNING: comparing pointer to 0
 
-Inside blk_mq_queue_tag_busy_iter() we already grabbed request's
-refcount before calling ->fn(), so needn't to grab it one more time
-in blk_mq_check_expired().
-
-Meantime remove extra request expire check in blk_mq_check_expired().
-
-Cc: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: John Garry <john.garry@huawei.com>
-Link: https://lore.kernel.org/r/20210811155202.629575-1-ming.lei@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Jing Yangyang <jing.yangyang@zte.com.cn>
 ---
- block/blk-mq.c | 30 +++++-------------------------
- 1 file changed, 5 insertions(+), 25 deletions(-)
+ drivers/block/ataflop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a368eb6dc647..044d0e3a15ad 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -941,34 +941,14 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 	unsigned long *next = priv;
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index a093644..6cd28df 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -1436,7 +1436,7 @@ static int floppy_revalidate(struct gendisk *disk)
  
- 	/*
--	 * Just do a quick check if it is expired before locking the request in
--	 * so we're not unnecessarilly synchronizing across CPUs.
--	 */
--	if (!blk_mq_req_expired(rq, next))
--		return true;
--
--	/*
--	 * We have reason to believe the request may be expired. Take a
--	 * reference on the request to lock this request lifetime into its
--	 * currently allocated context to prevent it from being reallocated in
--	 * the event the completion by-passes this timeout handler.
--	 *
--	 * If the reference was already released, then the driver beat the
--	 * timeout handler to posting a natural completion.
--	 */
--	if (!refcount_inc_not_zero(&rq->ref))
--		return true;
--
--	/*
--	 * The request is now locked and cannot be reallocated underneath the
--	 * timeout handler's processing. Re-verify this exact request is truly
--	 * expired; if it is not expired, then the request was completed and
--	 * reallocated as a new request.
-+	 * blk_mq_queue_tag_busy_iter() has locked the request, so it cannot
-+	 * be reallocated underneath the timeout handler's processing, then
-+	 * the expire check is reliable. If the request is not expired, then
-+	 * it was completed and reallocated as a new request after returning
-+	 * from blk_mq_check_expired().
- 	 */
- 	if (blk_mq_req_expired(rq, next))
- 		blk_mq_rq_timed_out(rq, reserved);
--
--	blk_mq_put_rq_ref(rq);
- 	return true;
- }
- 
+ 	if (test_bit(drive, &changed_floppies) ||
+ 	    test_bit(drive, &fake_change) ||
+-	    p->disktype == 0) {
++	    !p->disktype) {
+ 		if (UD.flags & FTD_MSG)
+ 			printk(KERN_ERR "floppy: clear format %p!\n", UDT);
+ 		BufferDrive = -1;
 -- 
-2.30.2
+1.8.3.1
+
 
