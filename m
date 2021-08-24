@@ -2,90 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AFAC4320A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 03:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F64C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 03:18:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2062D600D1
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 03:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96949611C9
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 03:18:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234220AbhHXDCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Aug 2021 23:02:52 -0400
-Received: from mail-pf1-f171.google.com ([209.85.210.171]:45911 "EHLO
-        mail-pf1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234514AbhHXDBz (ORCPT
+        id S233836AbhHXDSy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Aug 2021 23:18:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43392 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234418AbhHXDSx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Aug 2021 23:01:55 -0400
-Received: by mail-pf1-f171.google.com with SMTP id t42so14494796pfg.12;
-        Mon, 23 Aug 2021 20:01:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=1DRHsv6N/K/YIyXINEkpLksZfI85v8MrvkBX6U2/RP4=;
-        b=JwgmZqoOTGY5ywh21pYXI4lJc3a2YxGPfiW5RpXB0QtKRpBcxv4irpIGfqJXaPHQZ6
-         7sGz17sd30kG7D72waeLz05d5EN8VIXFePYoLxsMphTQwGfVV+HUKGkHkPfMFP0OEf7y
-         XfLAdjfwssysIrVOelghrIe848Q+vaR0oe5xkrgCOc+09W+YHq3KwHtQuoECMEelSmp4
-         QVmQks9fPJ+f2DCDsEBWcrRSIAp7G4dQcw/shJzGlz+JfIOKQOUyp3+Uqc2lZ7DS3HIT
-         XY250XkJjQt+vzTpsLznk36LWfBM6yVaY2tNYMvSv4CfdxRiSFzZ0lwtoj8Wwb7roW2x
-         DmFg==
-X-Gm-Message-State: AOAM533YTcltc0IdBlkCzikEoJ/6bjhozCk6nrAc4r9nIDIUoAUN/drQ
-        mkprsrNu5xCbRpdIdSzBauIpNh243wY=
-X-Google-Smtp-Source: ABdhPJyZrY71VpkdUdDodaxUJuPm+yix8Agd8eVI0C6Z2QMb4AGWq6d7m1MFBj/cstjZIv0gJZ8Kgg==
-X-Received: by 2002:a63:7883:: with SMTP id t125mr34556613pgc.243.1629774065136;
-        Mon, 23 Aug 2021 20:01:05 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:68:8a8:39ff:312? ([2601:647:4000:d7:68:8a8:39ff:312])
-        by smtp.gmail.com with ESMTPSA id w14sm17538160pfn.91.2021.08.23.20.01.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Aug 2021 20:01:04 -0700 (PDT)
-To:     Bob Pearson <rpearsonhpe@gmail.com>
-Cc:     "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: v5.14 RXE driver broken?
-Message-ID: <c3d1a966-b9b0-d015-38ec-86270b5045fc@acm.org>
-Date:   Mon, 23 Aug 2021 20:01:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Mon, 23 Aug 2021 23:18:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629775089;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4FMgMmVU2uNnPaVr5geFa8doDQXcH7H2fPDk7t5xrWo=;
+        b=RYbRc22PEKlNLxFs1wuU8XuiDFbYQDlydxe1mYhwtwH0OT8Li4fCAU0l5Bgrago3N3eS79
+        krVygmMlf0K+mY/ruwMxuTRLq57hkS0p1ZArrHY8D2v9SKwsx597A8DDB6daJrmkVcOatE
+        ruqrzoMwEyTKc6crPjYLHROcy8B9Y+A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-uUaqnZAUPCuazUtVAcGI_g-1; Mon, 23 Aug 2021 23:18:08 -0400
+X-MC-Unique: uUaqnZAUPCuazUtVAcGI_g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09C1C875049;
+        Tue, 24 Aug 2021 03:18:07 +0000 (UTC)
+Received: from localhost (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 459A25D6AD;
+        Tue, 24 Aug 2021 03:18:01 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Subject: [PATCH] block/001: wait until device is added
+Date:   Tue, 24 Aug 2021 11:17:53 +0800
+Message-Id: <20210824031753.1397579-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bob,
+Writing to the scan attribute of scsi host is usually one sync scan, but
+devices in this sync scan may be delay added if there is concurrent
+asnyc scan.
 
-If I run the following test against Linus' master branch then that test
-passes (commit d5ae8d7f85b7 ("Revert "media: dvb header files: move some
-headers to staging"")):
+So wait until the device is added in block/001 for avoiding to fail
+the test.
 
-# export use_siw=1 && modprobe brd && (cd blktests && ./check -q srp/002)
-srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [passed]
-    runtime    ...  48.849s
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ tests/block/001 | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-The following test fails:
+diff --git a/tests/block/001 b/tests/block/001
+index 51ec9d8..01356d0 100755
+--- a/tests/block/001
++++ b/tests/block/001
+@@ -21,15 +21,20 @@ stress_scsi_debug() {
+ 		return
+ 	fi
+ 
+-	local host target
++	local host target target_path
+ 	for target in "${SCSI_DEBUG_TARGETS[@]}"; do
+ 		(
+ 		host="${target%%:*}"
+ 		scan="${target#*:}"
+ 		scan="${scan//:/ }"
++		target_path="/sys/class/scsi_device/${target}"
+ 		while [[ ! -e "$TMPDIR/stop" ]]; do
+ 			echo "${scan}" > "/sys/class/scsi_host/host${host}/scan"
+-			echo 1 > "/sys/class/scsi_device/${target}/device/delete"
++			while [ ! -d ${target_path} ]; do
++				sleep 0.01;
++				[[ -e "$TMPDIR/stop" ]] && break
++			done
++			[ -d ${target_path} ] && echo 1 > ${target_path}/device/delete
+ 		done
+ 		) &
+ 	done
+-- 
+2.31.1
 
-# export use_siw= && modprobe brd && (cd blktests && ./check -q srp/002)
-srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [failed]
-    runtime  48.849s  ...  15.024s
-    --- tests/srp/002.out       2018-09-08 19:43:42.291664821 -0700
-    +++ /home/bart/software/blktests/results/nodev/srp/002.out.bad      2021-08-23 19:51:05.182958728 -0700
-    @@ -1,2 +1 @@
-     Configured SRP target driver
-    -Passed
-
-The only difference between these two tests is that test (1) use the siw
-(soft-iWARP) driver while test (2) uses the rdma_rxe driver (soft-RoCE).
-Both tests run reliably against previous Linux kernel versions, e.g.
-v5.13. Can you take a look at this? The blktests software is available at
-https://github.com/osandov/blktests/.
-
-Thanks,
-
-Bart.
