@@ -4,80 +4,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBA1C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 16:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99FE2C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 16:13:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 075AE61357
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 16:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80A8661220
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 16:13:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbhHXQL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 12:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45328 "EHLO
+        id S232206AbhHXQO3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 12:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229837AbhHXQL3 (ORCPT
+        with ESMTP id S232110AbhHXQO2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 12:11:29 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A267C061757
-        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 09:10:44 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id g9so27041548ioq.11
-        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 09:10:44 -0700 (PDT)
+        Tue, 24 Aug 2021 12:14:28 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FB4C061757
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 09:13:44 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id r6so21012887ilt.13
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 09:13:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=pjgXVFaTSfw1r9Dt/9U1Pnsp8Og3rRQO2QjSt8xkqzM=;
-        b=rHi4g7rRRHlBzwOc66OzBQwNo8iv5T60jSoYSQYAKl7fcT9qurY5m+nVLAQsv7Sj/P
-         A1iM9b7R6EWWQlX0pp7rKJs13KmrASkdzYbvlSB1ym5L8cjfvpgcPVhQWsQD74bSxoOC
-         /3fgsgUdg7a5Cafb2NHJJjuQu7H8FYM+XBUgQuIEBZCQWOdJQkIpu/H7Y3O0UIJLgkVt
-         j2EzYjp+Vq/z4+Tlg6bLA3DAUHgLVSHxlNMKVvutFpSlvIeIrL8zRaUukamRZySf/LBR
-         vZmyC19qOD97BQ+xo0P6NnNTTj9nsRhlfTMktKRt69zpij6HzpaiwmD39s53BLXz6hBn
-         q1Lg==
+        bh=fL6M5M+ZQf9tkzwQfSg/E8Nzzkt+d6QKhAddz9kDrLw=;
+        b=QcKBXjqgCdKIog3MSnLBEtFgC7Wtxz1vqnDq+Kg/nmaPgFNTeKoHg/Rw36MZwZxDsO
+         bgnvECrfd7y0aueCtNDQORvsMR6E7ZNWgrNC4Ak1/96SZapOFioWMy+GjU+TOvMpjzW8
+         oXSfbc2wyUOXtmqinq+5F0hI2Y5MaHIDTXI8+u9tKF/nXyTjO3dvnN2FsGbAMzXNG618
+         ACEvUwvW/09lqao3vQAs/FmpA0esnExWHoRi4cplCWqNdZ8toZuQTVaZc8fNE8sHg2ur
+         pvdL+XTo70hfw2gl/Vy2ZKo0prnI0cdU4umbwKUkWeHFM6uGBhYjDpn+NBQ3M7RyXmwv
+         1CeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=pjgXVFaTSfw1r9Dt/9U1Pnsp8Og3rRQO2QjSt8xkqzM=;
-        b=WLGe3mr6cD55zJKiwdHnnIhMthKtGRZOi6+zpAfGkKavuIewFTGWyNiQ7qZaHmre5F
-         sIOVGzcxXxYfeQAX/9jiCeJcIbrw/z05U2RRQ5JCpJpmND1DfVG5EIwQQsktz+Z8kxGZ
-         sV7K/XnPtxFIbBJQfNn58q7acHUTFCN/H6QctUiRFmpYqG/zd+vbvawxORE3TBgiEoFY
-         tq2swSC8mayuTZVRMGNxsTwnIruBNZs0ekYlRaJRF86lkciXQrSzugicv5h8IoU4kbL1
-         Q51domhqNOInNdr66vDc6UrF8rrTb+YS7C/u7/eZjwfPoB5K6kGJGonyuRd0ERAcAY9s
-         3ceQ==
-X-Gm-Message-State: AOAM532TQta5qfreJ6T3hYPJM2TfD/96YpS8ut4YwNCKUVWhh66gll3R
-        3UHOS8foO7Ts3ToKv01oPhRm1uL5vit5VQ==
-X-Google-Smtp-Source: ABdhPJw0PGC8F0WvhBDyUzbuzzGJsXXDy7bxpP2NOP3r8pGSWthioO/N7/e4WTxFC5fZKlBkJC9pKg==
-X-Received: by 2002:a02:6995:: with SMTP id e143mr2118804jac.3.1629821443917;
-        Tue, 24 Aug 2021 09:10:43 -0700 (PDT)
+        bh=fL6M5M+ZQf9tkzwQfSg/E8Nzzkt+d6QKhAddz9kDrLw=;
+        b=pnZScH8AFJutG2dBznbLxbhfyaaMzHCu9pR5LTuOPDiAmzFBnZRI0s0K5YhJA/gBJ4
+         WMuTfJoGeC/N21felITKbKIcOqULfwR0EiqfQlxdEr8wzVo6flmofmIDPkKALhK7Sy3l
+         1qMIwD/BR5PmIorRYd/mv6hkpkqV/kDZXfnRWJ+dQ/ihJvMbbsCKOzQoX/sfifwXY1pP
+         i+b3o0eD3m9KKFyytzy69KR3WSlsMn4wRjdnRXfDe6l8Zs2624PuZMjrvpEvNdmavvn1
+         ukfzMlXVywyHcDM+eoJSKdnR0pu8T6qO2vfd5Pl68TZtE0BTFLAUuRSSsPf45w3dN5SX
+         0E+g==
+X-Gm-Message-State: AOAM5339VI3ATpRp9nfBIz9XRfdldLz2JQi7V4JAw3k5kVJTlDzWJ/hO
+        hdrhQN89l/e8CnRRfApZO2AWjQ==
+X-Google-Smtp-Source: ABdhPJziirSX8gjQLqc3AQRcQQHS7PUSqIE4ljRCP8jio00Kp8Ixuj1HbGq2QsL38XhoQ4k5UcHqZw==
+X-Received: by 2002:a05:6e02:1044:: with SMTP id p4mr26857255ilj.227.1629821623851;
+        Tue, 24 Aug 2021 09:13:43 -0700 (PDT)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id k2sm10143700ior.40.2021.08.24.09.10.43
+        by smtp.gmail.com with ESMTPSA id e1sm10224562ils.76.2021.08.24.09.13.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Aug 2021 09:10:43 -0700 (PDT)
-Subject: Re: [PATCH] block: mark blkdev_fsync static
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20210824151823.1575100-1-hch@lst.de>
+        Tue, 24 Aug 2021 09:13:43 -0700 (PDT)
+Subject: Re: [PATCH v5 0/2] allow blk-zoned ioctls without CAP_SYS_ADMIN
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Shaun Tancheff <shaun@tancheff.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20210811110505.29649-1-Niklas.Cassel@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <dcb7d140-7321-8f72-b45f-9b0b4102dfdd@kernel.dk>
-Date:   Tue, 24 Aug 2021 10:10:43 -0600
+Message-ID: <15e827b8-5bf9-eed4-7358-80f9e2a7766a@kernel.dk>
+Date:   Tue, 24 Aug 2021 10:13:42 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210824151823.1575100-1-hch@lst.de>
+In-Reply-To: <20210811110505.29649-1-Niklas.Cassel@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/24/21 9:18 AM, Christoph Hellwig wrote:
-> blkdev_fsync is only used inside of block_dev.c since the
-> removal of the raw drіver.
+On 8/11/21 5:05 AM, Niklas Cassel wrote:
+> From: Niklas Cassel <niklas.cassel@wdc.com>
+> 
+> Allow the following blk-zoned ioctls: BLKREPORTZONE, BLKRESETZONE,
+> BLKOPENZONE, BLKCLOSEZONE, and BLKFINISHZONE to be performed without
+> CAP_SYS_ADMIN.
+> 
+> Neither read() nor write() requires CAP_SYS_ADMIN, and considering
+> the close relationship between read()/write() and these ioctls, there
+> is no reason to require CAP_SYS_ADMIN for these ioctls either.
 
 Applied, thanks.
 
