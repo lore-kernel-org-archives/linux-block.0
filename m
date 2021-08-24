@@ -2,176 +2,252 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6EEAC432BE
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 18:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BAD9C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 21:34:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B91261212
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 18:19:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43C4461374
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 21:34:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233318AbhHXSUG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 14:20:06 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:51804 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233049AbhHXSUG (ORCPT
+        id S234442AbhHXVes (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 17:34:48 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:28037 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231474AbhHXVes (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 14:20:06 -0400
-Received: by mail-io1-f71.google.com with SMTP id l4-20020a6bd104000000b005bb1bd35b3eso8511413iob.18
-        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 11:19:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=xFg7LNFI3jZQyCqLc7N7YhQ4foPfvQrMQWd2IF54/do=;
-        b=rODtjZaDouqOdMvO0WEMNQr1DieyWlyhvFSLHokPmRe0xN2ip6YZHeZUBaQpOwybdp
-         R7eTekLbiRLgwV+4PBcWePSdHRq8tr9aFbi8T/mqc1XZLh7ylSCsK3s2JzchHVhBbYFv
-         5ZNiDerKfMByvWmG13/A/WQtR5P9nw1oJzOrCDRhcTeYDZG+0jYHiD//ZP/KpTaAbKXh
-         QtN3tsJIC28WxCflGvCHyWzE/cYb5173Y1GvJ0LELfYde8FOAjETv5XjbKmbPPVF5aWd
-         fDodtrykvplOPA/SZaQAkdLWFCnsUiaAUzpHpYsMIZEUYi8bi/5EQ6PAWTqu6AOzUpc8
-         Ning==
-X-Gm-Message-State: AOAM532UO+2H/U+mxOj0LA5bMeUOvDfhMqltkcDtp4VrfB159jUUWkTP
-        ImUnYdg+XgR6u0zWLKZEdljHcJBSODjUn91eDKB+lRRXXfY7
-X-Google-Smtp-Source: ABdhPJzZ0HX0/0IIyK28ijbUuf6x7IGP4mtBrq49u1w9HOyDxnfMDTqfJnm7ebHV290RdOMSCz1cSZkx3cd0xS60xQ86H4gGtTrq
+        Tue, 24 Aug 2021 17:34:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1629840844; x=1661376844;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=sx1/lRTobES4+meH6tvg1QF/WJKfYZCBWN/LFabZAyc=;
+  b=CnMtlT5nHXMFGjAxhzBuhaIM3U7+m4KxiUlqY1B4QCj34upATDEGO+OB
+   bTg9KWCBj+AVEB927JDmYWUp9vAZY3eBWPLihzXFfHnfrcIbhvWfLeUBO
+   QdO4f2vb8uUMSwxfH+ZhmFAf7uq1rUptho3BxepTKGqVFTfew/lKQRIpt
+   xkmG1Wf7FH04GwXVI381az3QCqff7Flu3IBkHDSzyqfgbm8Yyz9U6cPeF
+   mK07Xh5PeECOdauRsefZXIMqDZ9ZTEJJG8sNoZ0pruvUunWPodJVQuc2K
+   P9xFU/7XTx6utxwUzPiysNm0Io56Bhp1MYa9fMZuOAI1zZD8dNB3NasL2
+   A==;
+X-IronPort-AV: E=Sophos;i="5.84,348,1620662400"; 
+   d="scan'208";a="178840250"
+Received: from mail-bn8nam08lp2044.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.44])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Aug 2021 05:34:02 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cVhXcn0OlfDuqw47aj09x2s8o5r+2Gu0R47xkCiJviNU0NuUdKBLkX01eT2X5aXLwqzG7sSgL3CN/FJ5pleWpuLka1M61otYYnz70OdfJXmAMnYAZKSzeLq/pzrSHfvKe8Ym591baJMcwoecGVtQsj4Gwp/A6y2P5XSk89ae4+WolzQWiMoygxlJxjp0t4Ym6nqfGd7WotbuobNT2pa+6QPHgZtqxVwAz4lPwo3OzVRJYIyDR4II0/xuYEPi0PWXVqTkvjY31pdFm6fvdQHgFiHPBM7H5LSc3zH0z/g6dGuMZbSUQn1JVHntz8I6OS9HNRlNUlMIBhgkuJuOXZHJtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FDi2S5PpecFzf6IaRJYfXN1qQESn15rHsCEKqiwe5kc=;
+ b=l3KLwkN9OJVtRRIlXd/su0gl2J5WxS1T85st4v5GiUpaFVJ1Qgl73ndlemzYMRDBZdVRFm5rOZbtwHFO/g5rrz9IVmF9uVp2snbK56P5RYwF3QXR7UDXAG66ZZ5xvhVvizYZmTfOpZ3gePDlVr6uip5DPHwoDonbjjDjK5Twt5Uokj8Sl9fbRnyP+wGoLlKRDWc/FE0/HLin8pUERF8SsRXpH9jHv/M2erxWFvh3RtwpvmDghec7xke+cb8oqTSxjv4eBv+eWwAu6H7vBdFzdiwWw+1bJq4rltHQVk76B9k26Z/guWYeBSt2+78FhKRplODWerMQ1FWLnYhs2ltRkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FDi2S5PpecFzf6IaRJYfXN1qQESn15rHsCEKqiwe5kc=;
+ b=AWuysBr0+fD7T/RNQBqLyPLxvyMxn2ItRpD+DmPw4OzRqqVAP2LWFWVaDTLX3bSu3IrtAzcRc0Z8Dp4YMmWQfBCMaJBqV15c9pkIQjOPNr4xIw9Q/wvBP8YMyTcjvIM5WZVToniFSz1fCkVcdVd8GqZphgeSxA/BZHzMTPnUesI=
+Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
+ by PH0PR04MB7304.namprd04.prod.outlook.com (2603:10b6:510:d::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17; Tue, 24 Aug
+ 2021 21:33:58 +0000
+Received: from PH0PR04MB7158.namprd04.prod.outlook.com
+ ([fe80::ad69:c016:10d5:a3e9]) by PH0PR04MB7158.namprd04.prod.outlook.com
+ ([fe80::ad69:c016:10d5:a3e9%8]) with mapi id 15.20.4436.024; Tue, 24 Aug 2021
+ 21:33:58 +0000
+From:   Niklas Cassel <Niklas.Cassel@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+Subject: Re: [PATCH v3 16/16] block/mq-deadline: Prioritize high-priority
+ requests
+Thread-Topic: [PATCH v3 16/16] block/mq-deadline: Prioritize high-priority
+ requests
+Thread-Index: AQHXlVysvcZeBwZKNkSbW/SgpyhLO6t8sO0AgABT/oCAAAlKAIADqkMAgAChy4CAAdqAgA==
+Date:   Tue, 24 Aug 2021 21:33:58 +0000
+Message-ID: <YSVlxRutpVkfo7W/@x1-carbon>
+References: <20210618004456.7280-1-bvanassche@acm.org>
+ <20210618004456.7280-17-bvanassche@acm.org> <YR77J/aE6sWZ6Els@x1-carbon>
+ <5aa99b39-c342-abd4-00a4-dc0fbfac96aa@acm.org> <YSA1JWt9soMSs23Z@x1-carbon>
+ <e94f62c4-a329-398d-5003-d369506d7f89@acm.org> <YSNQAu9uXrmEteXc@x1-carbon>
+ <b6131780-8b67-8efb-a942-e40b68df082e@acm.org>
+In-Reply-To: <b6131780-8b67-8efb-a942-e40b68df082e@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: acm.org; dkim=none (message not signed)
+ header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7dc8ac93-bc31-440f-ca0e-08d96746e1f7
+x-ms-traffictypediagnostic: PH0PR04MB7304:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <PH0PR04MB7304C66EADB21F3EFDD92C0AF2C59@PH0PR04MB7304.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tTtqncPVyjcCQ0ld4Atba6czzufoylPaXdkSlJBXeqh7slDWURypEFj3AZTtz8TgelO+acGhh2UjyFKIMiU1e0bWLJ+iOfgUdayW6THhOVKQSJz3Ip9QlhayxuZxiW6FisojNAHPgQAWQbfmMi1KYbWoCGOgdIsh05rbHdiLuWVwAGf2e9I/Uh/ibBZUuIIlMiFaBUSrUXSp6oBunpnLskoBL2QhGtGgL4VyAOEcJnSomaTVqRDGsKysxwv8m7TfR6wBx4h2cOAhyYVtq0ul9p2kSwq7wuOh53XytoN2ADHa+DkNv3O82yC/yvGMxyf+d7XzgAMCIOa6MVCECafvP5wyuDibHpeae+vl5xL+VRy1ZpxJeFz/FfQS8zsFv6n8b5YujE2maMZC11N5lCTlCRPJWQqTB/4YqzC4uo7bPaI79+yDYT1LwlpuFV+NXILqwtNZczT/nN2ZpyTzirGhsNqwnSQ/Dj3uozwwEGb+brviGb0kealXehBpJJBub+Bq7mJ01HpOPyXD8uDXvvd8o9HlFUMTHySIn/UTl/tzj9ZlBOTzdvGUOEL98On6SuHMU1QZdN9F0n9d4E8cjl9aBt6ndRFtFxBIh+oHsIPJt4Ty/7srveGQOxxdjsDda6aNjnNWsTJ5CVvX+zllG3QbfZaYBbkacQAwAF4lD8ws6urSFLYf3aCHbJ4WjbxYkjFlxeGe+HZV7UFlztIbgUIcgQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(346002)(376002)(366004)(396003)(39860400002)(136003)(54906003)(38100700002)(8936002)(6916009)(478600001)(26005)(8676002)(38070700005)(122000001)(316002)(83380400001)(33716001)(66446008)(66946007)(64756008)(91956017)(66476007)(76116006)(66556008)(2906002)(6512007)(9686003)(6486002)(5660300002)(4326008)(53546011)(6506007)(186003)(86362001)(71200400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?M6Wr2NaIfnL6oSyfVgA6EpLIffxrDItvFfZXHBjs0ENPugR/AI0TMRxXwYMB?=
+ =?us-ascii?Q?25whxwIeWbUqzo0t5zWiSAXorDYVqRmFrRRmIuTARinvtomdsCb1tVyzXSwU?=
+ =?us-ascii?Q?al1TTFURmonHKj78n0Znpe2Jt34P87Am1Sp/71iUGx95fE3qtfjgrSv62q0b?=
+ =?us-ascii?Q?JB/kUGoXckKdMWDhFB0yykdU9iLlEcITbok5w9Zglne/UQlaLAnYHiqYS8up?=
+ =?us-ascii?Q?Ico0DJOQlgX6Kw7P/z1gCi0yqfMaWK7mYVJcLJ+zBZ5gtlFKmiYAMab2Ollj?=
+ =?us-ascii?Q?6W9KkhmXcKRu+Cw3iWL/7bdiku7n0wfjPTO4qsZVvJriD7dvB7+nVvL8hftT?=
+ =?us-ascii?Q?ITUhQoVuittKLafycv0OXxtWAlOrielyFPllFQEiwnUHoRLkHvoWJ2mxxVMW?=
+ =?us-ascii?Q?MNMjOp3xO9Hl+cYCivuAaAj2JjYUmti/OfFk+JNlpmPBlz4T7mjej7PEKG2H?=
+ =?us-ascii?Q?bGMMEXrsTBTYgXZzjN4L8ADvk1X+y7XvCfJpHAeNV56mtmkg52mb0wnh3iDX?=
+ =?us-ascii?Q?WV49GZHIO/JtWv8GkAoF09S8w9MoqBCmecSijKNMqO05rFdCKSm7FTu1s/DB?=
+ =?us-ascii?Q?69Lh//WHdddEsGZacBwhtzlTpK0dyw9gxRHGuHdL8qx/6VSdTZZ0q7sAiKRI?=
+ =?us-ascii?Q?gv/3mDbuv0EWPvfJWcQHFrcNYm4zU7dWIghizDnGG56Fj0EmieeI4VcPzFmu?=
+ =?us-ascii?Q?rp7zXie3Qjsk5RPFpJcRXA4Ogm7wvkJM607285ZqYeGVwZChm2zhlUSqvUsY?=
+ =?us-ascii?Q?qkbo5yJAukYyrfDkn4edZRpczb0hAaW66ZBWV308ZJ3AJ1o3t4+w/YT0L3bO?=
+ =?us-ascii?Q?P0BNfD3gh506RbqeJO8+eGQlHC13HkEXnvRGTR+QJY9ORxWMTERuHdm7TNSS?=
+ =?us-ascii?Q?Acx4LJ8+ysonye6wkifkU2zQthJC3OfNjFK+DsL7mxVM7Sj7ZIXxFXtAjSPb?=
+ =?us-ascii?Q?w6Tk5hjcH3Yx6fZYZAaSslFYwCjg6CKSp39+75kU0xlbiJMwQ7noq39RUgRh?=
+ =?us-ascii?Q?MGbuOn5PTXiIrveV3x8T3ktDZZFvgZBv9qmyEBCVgcvMTNVfyMjPmWdfX25b?=
+ =?us-ascii?Q?oeZcfcnrMgiOA9dec3RMDa/j4IupPw5AIbC7P/GBjw3bD68g+pvSF1IKAhzT?=
+ =?us-ascii?Q?Jfe7uQrRCGMZx3eUOS+6BXZORsJIVoS74xHVttxgz2LyfVd/s9kyT5auLZTw?=
+ =?us-ascii?Q?1x3PFZI1O6fZz1anrIMk0MeY6g8f8Nr0LaCbs58+G5MBzscmv1VSKd08ktWc?=
+ =?us-ascii?Q?9T8AoZa1PMITP2L6q2XTweOY04mAZD0gYImHEH3gTop+jI63B+wU8UwY6ea+?=
+ =?us-ascii?Q?sXZkUp8Ci47QA0/+SWIHQAqvBCa/cbetVklsllzbO2i0bA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <47822B4D31899043931C44AEBFD303E1@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:547:: with SMTP id i7mr27531008ils.102.1629829161558;
- Tue, 24 Aug 2021 11:19:21 -0700 (PDT)
-Date:   Tue, 24 Aug 2021 11:19:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003830e105ca522cba@google.com>
-Subject: [syzbot] general protection fault in do_blk_trace_setup
-From:   syzbot <syzbot+f74aa89114a236643919@syzkaller.appspotmail.com>
-To:     Kai.Makisara@kolumbus.fi, axboe@kernel.dk, davem@davemloft.net,
-        hch@lst.de, jejb@linux.ibm.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-block@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, martin.petersen@oracle.com, mingo@redhat.com,
-        netdev@vger.kernel.org, rostedt@goodmis.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7dc8ac93-bc31-440f-ca0e-08d96746e1f7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Aug 2021 21:33:58.4089
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SzfgUrerCed+/ZdbrNxW4/7dFijNfGUdmq4Te/jvGoJRTBrlBWQUJ8Sl7Wp6dmfERwoLgmlcjf9VfWMJhZA9bA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7304
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Mon, Aug 23, 2021 at 10:15:39AM -0700, Bart Van Assche wrote:
+> On 8/23/21 12:36 AM, Niklas Cassel wrote:
+> > I was mainly thinking that it should be possible to do a generic fix,
+> > such that we eventually won't need a similar fix as yours in all the
+> > different I/O schedulers.
+>=20
+> Coming up with a generic fix would be great but I have not yet found an
+> elegant approach ...
+>=20
+> Another question is what the impact is of scheduler bypass on zoned block
+> devices? Is the zone locking performed by the mq-deadline scheduler for
+> writes to zoned block devices compatible with I/O scheduler bypass?
 
-syzbot found the following issue on:
+If anyone is curious of how the stack trace looks:
 
-HEAD commit:    372b2891c15a Add linux-next specific files for 20210824
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15dc8389300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=18ce42745c8b0dd6
-dashboard link: https://syzkaller.appspot.com/bug?extid=f74aa89114a236643919
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10979275300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10fe84a9300000
-
-The issue was bisected to:
-
-commit 45938335d0a9773d65a82a7ca722bb76e4b997a8
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Mon Aug 16 13:19:03 2021 +0000
-
-    st: do not allocate a gendisk
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14682399300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16682399300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12682399300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f74aa89114a236643919@syzkaller.appspotmail.com
-Fixes: 45938335d0a9 ("st: do not allocate a gendisk")
-
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 6540 Comm: syz-executor323 Not tainted 5.14.0-rc7-next-20210824-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:strncpy+0x32/0xb0 lib/string.c:130
-Code: 54 55 53 48 83 ec 08 48 85 d2 74 5c 4c 8d 2c 17 48 89 fb 49 bc 00 00 00 00 00 fc ff df 48 89 f0 48 89 f2 48 c1 e8 03 83 e2 07 <42> 0f b6 04 20 38 d0 7f 04 84 c0 75 41 48 89 d8 48 89 da 0f b6 2e
-RSP: 0018:ffffc90002d2fb98 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffc90002d2fc70 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffc90002d2fc70
-RBP: 0000000000000000 R08: 0000000000000000 R09: ffffc90002d2fcb7
-R10: ffffffff817c66f5 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffffc90002d2fc90 R14: ffffc90002d2fc70 R15: ffffc90002d2fc94
-FS:  0000000001ff3300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f5c7fb696c0 CR3: 000000001ae25000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- strncpy include/linux/fortify-string.h:59 [inline]
- do_blk_trace_setup+0x113/0xcd0 kernel/trace/blktrace.c:485
- __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:589
- blk_trace_setup+0x43/0x60 kernel/trace/blktrace.c:607
- sg_ioctl_common drivers/scsi/sg.c:1122 [inline]
- sg_ioctl+0x252/0x2760 drivers/scsi/sg.c:1164
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x4434b9
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd335501e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 00000000004434b9
-RDX: 0000000020000100 RSI: 00000000c0481273 RDI: 0000000000000004
-RBP: 0000000000403060 R08: 00000000004004a0 R09: 00000000004004a0
-R10: 002367732f766564 R11: 0000000000000246 R12: 00000000004030f0
-R13: 0000000000000000 R14: 00000000004b1018 R15: 00000000004004a0
-Modules linked in:
----[ end trace c8de7dc978626109 ]---
-RIP: 0010:strncpy+0x32/0xb0 lib/string.c:130
-Code: 54 55 53 48 83 ec 08 48 85 d2 74 5c 4c 8d 2c 17 48 89 fb 49 bc 00 00 00 00 00 fc ff df 48 89 f0 48 89 f2 48 c1 e8 03 83 e2 07 <42> 0f b6 04 20 38 d0 7f 04 84 c0 75 41 48 89 d8 48 89 da 0f b6 2e
-RSP: 0018:ffffc90002d2fb98 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffc90002d2fc70 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffc90002d2fc70
-RBP: 0000000000000000 R08: 0000000000000000 R09: ffffc90002d2fcb7
-R10: ffffffff817c66f5 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffffc90002d2fc90 R14: ffffc90002d2fc70 R15: ffffc90002d2fc94
-FS:  0000000001ff3300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8125f40018 CR3: 000000001ae25000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	54                   	push   %rsp
-   1:	55                   	push   %rbp
-   2:	53                   	push   %rbx
-   3:	48 83 ec 08          	sub    $0x8,%rsp
-   7:	48 85 d2             	test   %rdx,%rdx
-   a:	74 5c                	je     0x68
-   c:	4c 8d 2c 17          	lea    (%rdi,%rdx,1),%r13
-  10:	48 89 fb             	mov    %rdi,%rbx
-  13:	49 bc 00 00 00 00 00 	movabs $0xdffffc0000000000,%r12
-  1a:	fc ff df
-  1d:	48 89 f0             	mov    %rsi,%rax
-  20:	48 89 f2             	mov    %rsi,%rdx
-  23:	48 c1 e8 03          	shr    $0x3,%rax
-  27:	83 e2 07             	and    $0x7,%edx
-* 2a:	42 0f b6 04 20       	movzbl (%rax,%r12,1),%eax <-- trapping instruction
-  2f:	38 d0                	cmp    %dl,%al
-  31:	7f 04                	jg     0x37
-  33:	84 c0                	test   %al,%al
-  35:	75 41                	jne    0x78
-  37:	48 89 d8             	mov    %rbx,%rax
-  3a:	48 89 da             	mov    %rbx,%rdx
-  3d:	0f b6 2e             	movzbl (%rsi),%ebp
+#0  dd_finish_request (rq=3D0xffff8881051b0000) at block/mq-deadline.c:790
+#1  0xffffffff81741fcf in blk_mq_free_request (rq=3Drq@entry=3D0xffff888105=
+1b0000)
+    at block/blk-mq.c:516
+#2  0xffffffff8172e4fa in blk_put_request (req=3Dreq@entry=3D0xffff8881051b=
+0000)
+    at block/blk-core.c:644
+#3  0xffffffff819c51c2 in __scsi_execute (sdev=3D0xffff888106064000,
+    cmd=3Dcmd@entry=3D0xffffc900002c78d8 "", data_direction=3Ddata_directio=
+n@entry=3D3,
+    buffer=3Dbuffer@entry=3D0x0 <fixed_percpu_data>, bufflen=3Dbufflen@entr=
+y=3D0,
+    sense=3Dsense@entry=3D0x0 <fixed_percpu_data>, sshdr=3D0xffffc900002c78=
+78, timeout=3D30000, retries=3D5,
+    flags=3D0, rq_flags=3D0, resid=3D0x0 <fixed_percpu_data>) at drivers/sc=
+si/scsi_lib.c:260
+#4  0xffffffff819e12b6 in scsi_execute_req (resid=3D0x0 <fixed_percpu_data>=
+, retries=3D5,
+    timeout=3D30000, sshdr=3D0xffffc900002c7878, bufflen=3D0, buffer=3D0x0 =
+<fixed_percpu_data>,
+    data_direction=3D3, cmd=3D0xffffc900002c78d8 "", sdev=3D<optimized out>=
+)
+    at ./include/scsi/scsi_device.h:463
+#5  sd_spinup_disk (sdkp=3D<optimized out>) at drivers/scsi/sd.c:2177
+#6  sd_revalidate_disk (disk=3D<optimized out>) at drivers/scsi/sd.c:3302
+#7  0xffffffff819e479d in sd_open (bdev=3D0xffff888102b45800, mode=3D1) at =
+drivers/scsi/sd.c:1443
+#8  0xffffffff81422285 in blkdev_get_whole (bdev=3Dbdev@entry=3D0xffff88810=
+2b45800, mode=3Dmode@entry=3D1)
+    at fs/block_dev.c:1253
+#9  0xffffffff8142348a in blkdev_get_by_dev (dev=3D<optimized out>, mode=3D=
+mode@entry=3D1,
+    holder=3Dholder@entry=3D0x0 <fixed_percpu_data>) at fs/block_dev.c:1417
+#10 0xffffffff8175632c in disk_scan_partitions (disk=3D0xffff88810514dc00) =
+at block/genhd.c:388
+#11 register_disk (groups=3D<optimized out>, disk=3D0xffff88810514dc00, par=
+ent=3D0xffff888106064268)
+    at block/genhd.c:435
+#12 __device_add_disk (parent=3Dparent@entry=3D0xffff888106064268, disk=3Dd=
+isk@entry=3D0xffff88810514dc00,
+    groups=3Dgroups@entry=3D0x0 <fixed_percpu_data>, register_queue=3Dregis=
+ter_queue@entry=3Dtrue)
+    at block/genhd.c:527
+#13 0xffffffff8175640f in device_add_disk (parent=3Dparent@entry=3D0xffff88=
+8106064268,
+    disk=3Ddisk@entry=3D0xffff88810514dc00, groups=3Dgroups@entry=3D0x0 <fi=
+xed_percpu_data>)
+    at block/genhd.c:548
+#14 0xffffffff819e4d0f in sd_probe (dev=3D0xffff888106064268) at drivers/sc=
+si/sd.c:3581
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+This stack trace is simply the first one, it can be traced back to
+sd_revalidate_disk(). All the other dd_finish_request() calls (which doesn'=
+t
+have a matching insert) also originate from sd_revalidate_disk().
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Like we suspected, this is because of scheduler bypass.
+
+E.g.
+sd_revalidate_disk() -> read_capacity_16() -> __scsi_execute() ->
+blk_execute_rq() -> blk_execute_rq_nowait() -> blk_mq_sched_insert_request(=
+)
+-> blk_mq_sched_bypass_insert() -> blk_mq_request_bypass_insert()
+
+__scsi_execute() sets req op to REQ_OP_DRV_OUT or REQ_OP_DRV_IN.
+
+blk_mq_sched_insert_request() bypasses the scheduler when
+blk_mq_sched_bypass_insert() returns true, which it does if
+blk_rq_is_passthrough().
+blk_rq_is_passthrough() returns true if req op is REQ_OP_DRV_OUT
+or REQ_OP_DRV_IN.
+
+Basically __scsi_execute() is the equivalent of __nvme_submit_sync_cmd(),
+but with a worse name :)
+
+
+"Is the zone locking performed by the mq-deadline scheduler for
+writes to zoned block devices compatible with I/O scheduler bypass?"
+
+Since sd_revalidate_disk() doesn't do any writes, everything is fine.
+(And like Damien said, if any kernel code did passthrough writes,
+we would have seen errors from the drive a long time ago.)
+
+Yes, a user submitting passthrough writes can of course do "bad things",
+but that is expected :)
+
+
+Kind regards,
+Niklas=
