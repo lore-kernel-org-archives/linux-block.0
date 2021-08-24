@@ -2,195 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1E5C4338F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 12:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2B5C4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 13:30:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 461CA61183
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 12:58:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9069600D1
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 13:30:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237310AbhHXM7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 08:59:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50144 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237234AbhHXM7E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 08:59:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629809900;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=hOke2fYZKQH5YpPMVyniPmmS5X/O46jFtYpCuo5pIEQ=;
-        b=MBRmnKO1iRdQgEeoGRdkidThGDcO4nqFMhepVTfN87m+KwwypQroAiQUeo6dX4RICdx70P
-        WmzIe70s9UiDI3LvOiIDCbtFQ1hxhhstk0DtFwjqivN5Ut7iFuQkMWJA4vOz3Xii2IPV93
-        5rapEwi/iu9ibu8x4ILkLp06twNUWQc=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-xG1Z4vWmMIOI-AWtkHTVCQ-1; Tue, 24 Aug 2021 08:58:19 -0400
-X-MC-Unique: xG1Z4vWmMIOI-AWtkHTVCQ-1
-Received: by mail-ot1-f70.google.com with SMTP id m32-20020a9d1d230000b02905103208125aso12351196otm.3
-        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 05:58:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=hOke2fYZKQH5YpPMVyniPmmS5X/O46jFtYpCuo5pIEQ=;
-        b=C9VFt0MrjoZhoWtmk+5bOmAw0prdsWWj+Py3VTvn4YoAF0h+7OC5WJbvJkOGENYRiC
-         C1CK+GoHWcgPVNvqVQd0KYDZZJHSPzADQ6uv+0/0dm4T8lFNZ4YrGpFHVdbRvxdoDzdr
-         RpFCmQq7gmUKsFEHXNUTJw9UiHs/nUoS3Igxn4XZaSpGj46eryFdIyEOnrjf1tfeHrtc
-         GFUJpNBymjXNx7zcYL8pvA8nt5a9sRSvaqpgqnMfZkZzIpixpHztwwTZ9JDie3+RVHqq
-         9i2K6YJ5qvTZaiwjRAmsCRM1qh6QBOZPQ01LWTTIjC9Og3KhXNTaeXbGkwu7Ka0ZdffL
-         dY8w==
-X-Gm-Message-State: AOAM532vcV842XQ3JN2AeqqqgVlOvwhJVAiOUoendYH9J3ipOvyMFC1R
-        r8ZKfnc2aWIuMl2iw7mbkwP0Q48rIf00ZzsgfG/rBcgRIhtGQ3qA6akUOGLrh8FcGT+PkeQi6SY
-        R7HoznGmjg5s0sfvuX+gzBdaS/T8GPGrFzjMRZkE=
-X-Received: by 2002:a9d:6046:: with SMTP id v6mr28675216otj.234.1629809897679;
-        Tue, 24 Aug 2021 05:58:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXbTCyaxvlHxCZHFn1cvNNVZZrmTXvzyQfKTQXneNlsaKIvX3sle57zm3YrWTze7v7ghobg3/mI6Rxodgj/Ug=
-X-Received: by 2002:a9d:6046:: with SMTP id v6mr28675206otj.234.1629809897415;
- Tue, 24 Aug 2021 05:58:17 -0700 (PDT)
+        id S237289AbhHXNbk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 09:31:40 -0400
+Received: from mail-bn8nam11on2088.outbound.protection.outlook.com ([40.107.236.88]:6112
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229601AbhHXNbk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Aug 2021 09:31:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GdqR2cS1PSc/BvfTMkAdPT4xBv/BWZzbNFY/BHQ4CLG4+tX1ssJ/JAVQxR5a3omxRrTuFHlwsb5aJ7SuNOwwePnduPJBCEWWiAJGkku3rXZaEX/91KWJyDpyshU/TgdJdXL0xomTa2LirOgz1MxNDaSYJo2higse58heeOQFAbC1Doqqr5R1ekjXTQC4N3EhDJYCzOYkQ6eXhBmKvfoQLnAhgG8bJFfa2Hul5ez9ZiLKyGVFtbwE55C3/mcipdSQJin7RRBDW5OX89h8C/1OdAaoEMxj3PSMqH/UKnDxzTiVY14G4i+xrWBmvLHiqyYjnCGrrIfrS0AdX36MbaHeUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SiixubQU2GjAepNOdhPr42fUO0OWV2GBDyBz0wYJeU8=;
+ b=MiS/fWCliem7h+E7uXAJTQxahQ4on7BEJXnqohlt86xILRTHt80hXKDYi4JVrioWDABALdg4yvptYNw+8mmAEc7rLJygMXwED+eugMvCmP/9D7NCAKfR12VS+9XPXgf/Xl3/7qwAd2CIo3Hlb+Nl9M6vCZ3sh59yJufsO4ZOPAO44Ga1WPKzbjdG+MP7D0d4AlIBu6gDLLShYLRQWjtQjr6lZKXu49aYm0hE7UsndJmUvLqsTk47zceklLegJ2e0C3VPWVxKFGQDAM+W/+1B7uHyPrfSfFZesJuYi/NoZSCHejXuWA1w/2rg5tvSDBUVU90nGMwKkzxntg/YrzBg1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SiixubQU2GjAepNOdhPr42fUO0OWV2GBDyBz0wYJeU8=;
+ b=s+JR9xGFfigJG8F8Byc6UQBmpMX20giOC/XZW57I+KUVadPExsejkEt9FTZdGlz29BVD3seqiIQoBD+WDCLeHTgRlQs1HP9pyGP36Mxayf8wdSz1qZxoiTDBeYHQL35oUIB09Vo3iMLX+OPHf6qDPeDj5QIaEutDVIWDTAcqkGAQV09wrHFTn0C0fc1v3FXf67sFv1NzbcC6ssXG+Bfi6ACn9po5U+vjMsBetItSXy94+2ywMgQOt+XdUY8YnEtTchBzsNX+sG/RsoaxX++mT5g0J5gsC+rbQ3mKIyY01l0x3kPCvmt7TynDTLYidt4N3yQVtvADK6iEZPDc0foIVg==
+Received: from BN9PR03CA0726.namprd03.prod.outlook.com (2603:10b6:408:110::11)
+ by DM5PR12MB2503.namprd12.prod.outlook.com (2603:10b6:4:b2::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Tue, 24 Aug
+ 2021 13:30:54 +0000
+Received: from BN8NAM11FT053.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:110:cafe::54) by BN9PR03CA0726.outlook.office365.com
+ (2603:10b6:408:110::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend
+ Transport; Tue, 24 Aug 2021 13:30:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT053.mail.protection.outlook.com (10.13.177.209) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4436.19 via Frontend Transport; Tue, 24 Aug 2021 13:30:54 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 24 Aug
+ 2021 13:30:53 +0000
+Received: from [172.27.13.92] (172.20.187.5) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 24 Aug
+ 2021 13:30:51 +0000
+Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
+ space
+To:     Yongji Xie <xieyongji@bytedance.com>
+CC:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20210809101609.148-1-xieyongji@bytedance.com>
+ <e6ab104e-a18b-3f17-9cd8-6a6b689b56b4@nvidia.com>
+ <CACycT3sNRRBrSTJOUr=POc-+BOAgfT7+qgFE2BLBTGJ30cZVsQ@mail.gmail.com>
+ <dc8e7f6d-9aa6-58c6-97f7-c30391aeac5d@nvidia.com>
+ <CACycT3v83sVvUWxZ-+SDyeXMPiYd0zi5mtmg8AkXYgVLxVpTvA@mail.gmail.com>
+ <06af4897-7339-fca7-bdd9-e0f9c2c6195b@nvidia.com>
+ <CACycT3usFyVyBuJBz2n5TRPveKKUXTqRDMo76VkGu7NCowNmvg@mail.gmail.com>
+ <6d6154d7-7947-68be-4e1e-4c1d0a94b2bc@nvidia.com>
+ <CACycT3sxeUQa7+QA0CAx47Y3tVHKigcQEfEHWi04aWA5xbgA9A@mail.gmail.com>
+ <7f0181d7-ff5c-0346-66ee-1de3ed23f5dd@nvidia.com>
+ <20210823080952-mutt-send-email-mst@kernel.org>
+ <b9636f39-1237-235e-d1fe-8f5c0d422c7d@nvidia.com>
+ <CACGkMEuc0C0=te3O6z76BniiuHJgfxHnaAZoX=+PCy4Y7DxRow@mail.gmail.com>
+ <c238448b-9915-a4fc-4ec8-c807a06b359f@nvidia.com>
+ <CACycT3vCfydrCq8vR9-WMq+-KDJx1Z+q1saOmp0yW0TRvLrqGg@mail.gmail.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <fe2d623c-c0aa-a27e-fbe3-2c012b863140@nvidia.com>
+Date:   Tue, 24 Aug 2021 16:30:48 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-From:   Bruno Goncalves <bgoncalv@redhat.com>
-Date:   Tue, 24 Aug 2021 14:58:06 +0200
-Message-ID: <CA+QYu4oZN2Z-z1uRjPQO6UL4d5CuRM6NCsSAPG0+BKb5K2o23A@mail.gmail.com>
-Subject: WARNING: CPU: 0 PID: 11219 at block/genhd.c:594 del_gendisk+0x1f8/0x218
-To:     linux-block@vger.kernel.org, Yi Zhang <yizhan@redhat.com>
-Cc:     CKI Project <cki-project@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CACycT3vCfydrCq8vR9-WMq+-KDJx1Z+q1saOmp0yW0TRvLrqGg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5d2d7630-49c5-4b13-64ac-08d967036606
+X-MS-TrafficTypeDiagnostic: DM5PR12MB2503:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB25038D5549C9DBC391212049DEC59@DM5PR12MB2503.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SxWs7H40Re6ktutVLj+f7RgiQCcF5OT0j/lSpPtqJ0uBTkxC20uAnqqQvoDO2nh63JTHFINEQ6WxHBzs/vS2ui4kgkozkbVRABOI/cCvY1YDgrGzRBBX7doghtBjQuENncaSSAlAQpfz9kFYT/ytUn1j43Fzf2TSYXfzBhyonnDc4xdt0WPYyhPYCl4KoubwfCBOPQ2IUQyFTwHG8Bw3enWIRj3dKsIwv91RHmfWpZAYIBxTMVNvG0YZ+q7mxFBIzBegonUaFjzd5NJocsvr5uQvcMFPaH8zBn/w+7WbxaX12a5rppv0az64Wbo2uQb1FyxjDqnXld8qzoX8Pe6MWiuqcBAxhiufQVV2T2ifz+/OX2Qf+IudAZPKgJmuDpsu0lULROr/u/+J2Bxr+ndv57PW+3nOpMX1HZVcWsSKILS0rg/i2ZTEWRdo+mknan6eohbeCzNk4J5bujMGjUcZ4QSHdmWQ7uJoTELScrokWUnkBFEZ7XZKISFn2cd97o7kZOsRWDJrGEuHiquC4Rslv0ZvDMyPvwt6P8WapdUZdeCu5AovtN6CEI7qYTLKs8quYy20RK3YruT7TacCSMB1LX/61kgWy/s8BE2zKQYZe8gITRFeIw0Pds5BcO37IdUa8qXMAcipPSZnnKsxhT4RHQ502YOXmyzPh/seLqVeq8rkJFWzKgp31PxfZgL3F9sR1jrbBGM36P/ZqTYTq+QXJegD/m3xJxD39Tp9IZ+njVR7902K/KNKGrT2AqJ2qU8xVif7yydQqhDpE7TYEeW126nyAHYpnYelyAE0dE+2ywM5C4gSCnO/DpDkLZPzJjXK
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(6666004)(4326008)(7636003)(36756003)(8676002)(8936002)(2616005)(86362001)(6916009)(82310400003)(70206006)(31696002)(83380400001)(5660300002)(47076005)(26005)(336012)(966005)(508600001)(53546011)(356005)(70586007)(36906005)(16576012)(186003)(54906003)(16526019)(31686004)(36860700001)(426003)(316002)(2906002)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2021 13:30:54.1025
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d2d7630-49c5-4b13-64ac-08d967036606
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT053.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2503
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
 
-When testing commit "9d09cba59515 - Merge branch
-'io_uring-bio-cache.5'" we hit the following issue during the nvme
-test part of blktests [1]. We've reproduced the issue on aarch64,
-ppc64le and s390x.
+On 8/24/2021 3:52 PM, Yongji Xie wrote:
+> On Tue, Aug 24, 2021 at 6:11 PM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>>
+>> On 8/24/2021 5:47 AM, Jason Wang wrote:
+>>> On Tue, Aug 24, 2021 at 6:31 AM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>>>> On 8/23/2021 3:13 PM, Michael S. Tsirkin wrote:
+>>>>> On Mon, Aug 23, 2021 at 01:45:31PM +0300, Max Gurtovoy wrote:
+>>>>>> It helpful if there is a justification for this.
+>>>>>>
+>>>>>> In this case, no such HW device exist and the only device that can cause
+>>>>>> this trouble today is user space VDUSE device that must be validated by the
+>>>>>> emulation VDUSE kernel driver.
+>>>>>>
+>>>>>> Otherwise, will can create 1000 commit like this in the virtio level (for
+>>>>>> example for each feature for each virtio device).
+>>>>> Yea, it's a lot of work but I don't think it's avoidable.
+>>>>>
+>>>>>>>>>>> And regardless of userspace device, we still need to fix it for other cases.
+>>>>>>>>>> which cases ? Do you know that there is a buggy HW we need to workaround ?
+>>>>>>>>>>
+>>>>>>>>> No, there isn't now. But this could be a potential attack surface if
+>>>>>>>>> the host doesn't trust the device.
+>>>>>>>> If the host doesn't trust a device, why it continues using it ?
+>>>>>>>>
+>>>>>>> IIUC this is the case for the encrypted VMs.
+>>>>>> what do you mean encrypted VM ?
+>>>>>>
+>>>>>> And how this small patch causes a VM to be 100% encryption supported ?
+>>>>>>
+>>>>>>>> Do you suggest we do these workarounds in all device drivers in the kernel ?
+>>>>>>>>
+>>>>>>> Isn't it the driver's job to validate some unreasonable configuration?
+>>>>>> The check should be in different layer.
+>>>>>>
+>>>>>> Virtio blk driver should not cover on some strange VDUSE stuff.
+>>>>> Yes I'm not convinced VDUSE is a valid use-case. I think that for
+>>>>> security and robustness it should validate data it gets from userspace
+>>>>> right there after reading it.
+>>>>> But I think this is useful for the virtio hardening thing.
+>>>>> https://lwn.net/Articles/865216/
+>>>> I don't see how this change is assisting confidential computing.
+>>>>
+>>>> Confidential computingtalks about encrypting guest memory from the host,
+>>>> and not adding some quirks to devices.
+>>> In the case of confidential computing, the hypervisor and hard device
+>>> is not in the trust zone. It means the guest doesn't trust the cloud
+>>> vendor.
+>> Confidential computing protects data during processing ("in-use" data).
+>>
+>> Nothing to do with virtio feature negotiation.
+>>
+> But if a misbehaving device can corrupt the guest memory, I think it
+> should be avoided.
 
-[ 2785.043085] run blktests nvme/004 at 2021-08-23 17:55:00
-[ 2785.085351] loop0: detected capacity change from 0 to 2097152
-[ 2785.262427] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-[ 2785.367706] nvmet: creating controller 1 for subsystem
-blktests-subsystem-1 for NQN
-nqn.2014-08.org.nvmexpress:uuid:e154be55ec2a4a138eb3b9b18d514d7e.
-[ 2785.381385] nvme nvme0: creating 128 I/O queues.
-[ 2785.396302] nvme nvme0: new ctrl: "blktests-subsystem-1"
-[ 2786.428981] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
-[ 2786.508421] ------------[ cut here ]------------
-[ 2786.513027] WARNING: CPU: 90 PID: 906579 at block/genhd.c:594
-del_gendisk+0x1b4/0x1c0
-[ 2786.520851] Modules linked in: nvme_loop nvme_fabrics nvmet
-nvme_core loop dm_log_writes dm_flakey mlx5_ib ib_uverbs ib_core
-rfkill sunrpc coresight_etm4x i2c_smbus coresight_replicator
-coresight_tpiu coresight_tmc joydev mlx5_core mlxfw psample tls
-acpi_ipmi ipmi_ssif ipmi_devintf ipmi_msghandler coresight_funnel
-thunderx2_pmu coresight vfat fat fuse zram ip_tables xfs ast
-i2c_algo_bit crct10dif_ce drm_vram_helper ghash_ce drm_kms_helper
-syscopyarea sysfillrect sysimgblt fb_sys_fops cec drm_ttm_helper ttm
-drm gpio_xlp i2c_xlp9xx uas usb_storage aes_neon_bs [last unloaded:
-null_blk]
-[ 2786.572480] CPU: 90 PID: 906579 Comm: nvme Not tainted 5.14.0-rc7 #1
-[ 2786.578823] Hardware name: HPE Apollo 70             /C01_APACHE_MB
-        , BIOS L50_5.13_1.15 05/08/2020
-[ 2786.588548] pstate: 20400009 (nzCv daif +PAN -UAO -TCO BTYPE=--)
-[ 2786.594542] pc : del_gendisk+0x1b4/0x1c0
-[ 2786.598453] lr : del_gendisk+0x24/0x1c0
-[ 2786.602276] sp : ffff800026ee3b90
-[ 2786.605577] x29: ffff800026ee3b90 x28: ffff0008c019c180 x27: 0000000000000000
-[ 2786.612702] x26: 0000000000000000 x25: 0000000000000000 x24: ffff00080dcd2720
-[ 2786.619825] x23: ffff800026ee3d50 x22: fffffffffffffff2 x21: ffff0008cc2dc530
-[ 2786.626948] x20: ffff800026ee3c40 x19: ffff0008ca50fa00 x18: 0000000000000000
-[ 2786.634071] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000030
-[ 2786.641194] x14: 0000000000000000 x13: 0000000000000030 x12: 0101010101010101
-[ 2786.648318] x11: ffff80001162b370 x10: 0000000000001c60 x9 : ffff80001116219c
-[ 2786.655441] x8 : ffff0008c019de40 x7 : 0000000000000004 x6 : 00000008cbf74261
-[ 2786.662564] x5 : 0000000000001cd0 x4 : 0000000000000000 x3 : ffffffffffffefff
-[ 2786.669687] x2 : 0000000000000000 x1 : ffff800011a6bc80 x0 : 0000000000000000
-[ 2786.676811] Call trace:
-[ 2786.679245]  del_gendisk+0x1b4/0x1c0
-[ 2786.682808]  nvme_ns_remove.part.0+0x9c/0x224 [nvme_core]
-[ 2786.688209]  nvme_ns_remove+0x3c/0x5c [nvme_core]
-[ 2786.692908]  nvme_remove_namespaces+0xac/0xe0 [nvme_core]
-[ 2786.698301]  nvme_do_delete_ctrl+0x4c/0x74 [nvme_core]
-[ 2786.703434]  nvme_sysfs_delete+0x84/0x90 [nvme_core]
-[ 2786.708392]  dev_attr_store+0x24/0x40
-[ 2786.712044]  sysfs_kf_write+0x50/0x60
-[ 2786.715696]  kernfs_fop_write_iter+0x134/0x1c4
-[ 2786.720127]  new_sync_write+0xdc/0x15c
-[ 2786.723866]  vfs_write+0x22c/0x2c0
-[ 2786.727255]  ksys_write+0x64/0xec
-[ 2786.730558]  __arm64_sys_write+0x28/0x34
-[ 2786.734469]  invoke_syscall+0x50/0x120
-[ 2786.738206]  el0_svc_common+0x48/0x100
-[ 2786.741942]  do_el0_svc+0x34/0xa0
-[ 2786.745244]  el0_svc+0x2c/0x54
-[ 2786.748288]  el0t_64_sync_handler+0x1a4/0x1b0
-[ 2786.752632]  el0t_64_sync+0x19c/0x1a0
-[ 2786.756283] ---[ end trace 6548b7e0fd94a185 ]---
-[ 2786.760916] ------------[ cut here ]------------
-[ 2786.765521] WARNING: CPU: 90 PID: 906579 at block/blk-core.c:373
-blk_cleanup_queue+0x100/0x110
-[ 2786.774122] Modules linked in: nvme_loop nvme_fabrics nvmet
-nvme_core loop dm_log_writes dm_flakey mlx5_ib ib_uverbs ib_core
-rfkill sunrpc coresight_etm4x i2c_smbus coresight_replicator
-coresight_tpiu coresight_tmc joydev mlx5_core mlxfw psample tls
-acpi_ipmi ipmi_ssif ipmi_devintf ipmi_msghandler coresight_funnel
-thunderx2_pmu coresight vfat fat fuse zram ip_tables xfs ast
-i2c_algo_bit crct10dif_ce drm_vram_helper ghash_ce drm_kms_helper
-syscopyarea sysfillrect sysimgblt fb_sys_fops cec drm_ttm_helper ttm
-drm gpio_xlp i2c_xlp9xx uas usb_storage aes_neon_bs [last unloaded:
-null_blk]
-[ 2786.825734] CPU: 90 PID: 906579 Comm: nvme Tainted: G        W
-   5.14.0-rc7 #1
-[ 2786.833464] Hardware name: HPE Apollo 70             /C01_APACHE_MB
-        , BIOS L50_5.13_1.15 05/08/2020
-[ 2786.843188] pstate: 20400009 (nzCv daif +PAN -UAO -TCO BTYPE=--)
-[ 2786.849182] pc : blk_cleanup_queue+0x100/0x110
-[ 2786.853613] lr : blk_cleanup_queue+0x24/0x110
-[ 2786.857957] sp : ffff800026ee3bb0
-[ 2786.861258] x29: ffff800026ee3bb0 x28: ffff0008c019c180 x27: 0000000000000000
-[ 2786.868381] x26: 0000000000000000 x25: 0000000000000000 x24: ffff00080dcd2720
-[ 2786.875504] x23: ffff800026ee3d50 x22: fffffffffffffff2 x21: ffff0008cc2dc530
-[ 2786.882627] x20: ffff800026ee3c40 x19: ffff0008c75d54b0 x18: 0000000000000000
-[ 2786.889750] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000030
-[ 2786.896873] x14: 0000000000000000 x13: 0000000000000030 x12: 0101010101010101
-[ 2786.903996] x11: ffff80001162b370 x10: 0000000000001c60 x9 : ffff8000102d340c
-[ 2786.911119] x8 : 0000000000000019 x7 : 0000000000000000 x6 : 0000000000006541
-[ 2786.918242] x5 : 0000000000000022 x4 : ffff000f5c955968 x3 : dead000000000122
-[ 2786.925365] x2 : ffff000f5c955968 x1 : 0000000000000001 x0 : 00000000205641d0
-[ 2786.932489] Call trace:
-[ 2786.934922]  blk_cleanup_queue+0x100/0x110
-[ 2786.939006]  nvme_ns_remove.part.0+0xa4/0x224 [nvme_core]
-[ 2786.944400]  nvme_ns_remove+0x3c/0x5c [nvme_core]
-[ 2786.949098]  nvme_remove_namespaces+0xac/0xe0 [nvme_core]
-[ 2786.954491]  nvme_do_delete_ctrl+0x4c/0x74 [nvme_core]
-[ 2786.959623]  nvme_sysfs_delete+0x84/0x90 [nvme_core]
-[ 2786.964581]  dev_attr_store+0x24/0x40
-[ 2786.968232]  sysfs_kf_write+0x50/0x60
-[ 2786.971882]  kernfs_fop_write_iter+0x134/0x1c4
-[ 2786.976313]  new_sync_write+0xdc/0x15c
-[ 2786.980050]  vfs_write+0x22c/0x2c0
-[ 2786.983440]  ksys_write+0x64/0xec
-[ 2786.986742]  __arm64_sys_write+0x28/0x34
-[ 2786.990653]  invoke_syscall+0x50/0x120
-[ 2786.994389]  el0_svc_common+0x48/0x100
-[ 2786.998124]  do_el0_svc+0x34/0xa0
-[ 2787.001426]  el0_svc+0x2c/0x54
-[ 2787.004468]  el0t_64_sync_handler+0x1a4/0x1b0
-[ 2787.008813]  el0t_64_sync+0x19c/0x1a0
-[ 2787.012462] ---[ end trace 6548b7e0fd94a186 ]---
+So don't say it's related to confidential computing, and fix it in the 
+VDUSE kernel driver in the hypervisor.
 
-More logs can be found checking out dmesg logs on:
-https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/08/23/358062328/build_aarch64_redhat%3A1527263217/tests/Storage_blktests/10535235_aarch64_1_dmesg.log
-https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/08/23/358062328/build_ppc64le_redhat%3A1527263220/tests/Storage_blktests/10535245_ppc64le_1_dmesg.log
-https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/08/23/358062328/build_s390x_redhat%3A1527263223/tests/Storage_blktests/10535243_s390x_1_dmesg.log
+If this is existing device and we want to add a quirk to it, so be it. 
+But it's not the case.
 
-[1] https://gitlab.com/cki-project/kernel-tests/-/tree/main/storage/blktests/blk
-
-Thank you,
-Bruno Goncalves
-
+> Thanks,
+> Yongji
