@@ -2,149 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8901BC41537
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 14:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF7FC4338F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 14:05:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E19B611CB
-	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 14:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D1BE611CB
+	for <linux-block@archiver.kernel.org>; Tue, 24 Aug 2021 14:05:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237618AbhHXODC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 10:03:02 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:14317 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237558AbhHXODA (ORCPT
+        id S237582AbhHXOGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 10:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237576AbhHXOGG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 10:03:00 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Gv9lR5f8jz89cr;
-        Tue, 24 Aug 2021 22:01:55 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Tue, 24 Aug 2021 22:02:09 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Tue, 24
- Aug 2021 22:02:09 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH v3 4/5] nbd: make sure request completion won't concurrent
-Date:   Tue, 24 Aug 2021 22:12:26 +0800
-Message-ID: <20210824141227.808340-5-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210824141227.808340-1-yukuai3@huawei.com>
-References: <20210824141227.808340-1-yukuai3@huawei.com>
+        Tue, 24 Aug 2021 10:06:06 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47AAEC0613C1
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 07:05:22 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id b7so26492809iob.4
+        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 07:05:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Nw4sTpUNgZ91n+tpkyucZrTxjzDAr9k+GWnIeUz1zEM=;
+        b=RpmcbbU9SAFt4TRzy0Rf7Y7cjgsvmxmv4X/mXEpqVHuvNojuds0BcCzUJ35yu4t28g
+         WRuigI6a4XMITPP4T87ATpzZc6qYbHNDn3ZE6D33WsvIUbLhsXCq16SWTVig55AhAFfx
+         LqeME3pEDWQSaW8Hm77wL4zrCI+YKmGe1ZEKXNUV2x6tUBEFWZs03UDN1A5Me/afmIQf
+         UovEA7lZ1qPFH9Jy3QmUb8qELpz5wQIio2j+hAUZt8LGt1c3SD3NRM1Fb7KzzGULauUN
+         sh89VdhyAlVIX/it51ZPVDfHPG+R3QLL7QRd/Gfgo2GUVZCaKlmMHkLBaGUg9K1gyPlJ
+         15Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Nw4sTpUNgZ91n+tpkyucZrTxjzDAr9k+GWnIeUz1zEM=;
+        b=hQr2NnzvDN0u5U1lpKUtnpbHrEDKzm6XsnQesK7QSQOtKlTnXuXaSJkgiQ3169auiL
+         bUF4OceFDQx4miXqasec0c7u1iDk0k1eqhgaja0fpJMg5vPIDXFQuVmQvqxNHOOfiArK
+         TWYVryPOsHz0CeJ4/aRI+TgvZ7YF9ftVVpF7WsCNR3ZQ7ZYH0T5ou4TCwtKSvoawLcr/
+         j8mkIa8k9w2toWCrVVHQFhgf51UZCfijRAXDJlmYT7+is2J52DijUGUSFauCIGtWwc1T
+         60ld3iaPbaFtu9LFnW8IE1RiveWky0GG1kTuNYgHEhy0qmK0LLk6NaE5qehsWP5PwMYA
+         NoYg==
+X-Gm-Message-State: AOAM532DxWCdWHjtVIS//Q6db0vfW6MxTHfe04YlcK1nwOMu1ve579kR
+        zqiADN+SNA3dw5Fxfldj8vmkvw==
+X-Google-Smtp-Source: ABdhPJyQjd1lgxFqhQEeITg5uHPGBOyqC6jap0Wkfu45PtQAH/+j6XoyBxZTwGHgKIdQMeaip6KMjw==
+X-Received: by 2002:a05:6638:338a:: with SMTP id h10mr11452181jav.8.1629813921630;
+        Tue, 24 Aug 2021 07:05:21 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id g14sm9920161ioe.55.2021.08.24.07.05.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Aug 2021 07:05:20 -0700 (PDT)
+Subject: Re: [RFC] bio: fix page leak bio_add_hw_page failure
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org
+Cc:     Keith Busch <kbusch@kernel.org>
+References: <1edfa6a2ffd66d55e6345a477df5387d2c1415d0.1626653825.git.asml.silence@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e009dc29-6b05-184d-513c-ffcb175ab34c@kernel.dk>
+Date:   Tue, 24 Aug 2021 08:05:19 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+In-Reply-To: <1edfa6a2ffd66d55e6345a477df5387d2c1415d0.1626653825.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit cddce0116058 ("nbd: Aovid double completion of a request")
-try to fix that nbd_clear_que() and recv_work() can complete a
-request concurrently. However, the problem still exists:
+On 7/19/21 4:53 AM, Pavel Begunkov wrote:
+> __bio_iov_append_get_pages() doesn't put not appended pages on
+> bio_add_hw_page() failure, so potentially leaking them, fix it. Also, do
+> the same for __bio_iov_iter_get_pages(), even though it looks like it
+> can't be triggered by userspace in this case.
 
-t1                    t2                     t3
+Applied for 5.15, thanks.
 
-nbd_disconnect_and_put
- flush_workqueue
-                      recv_work
-                       blk_mq_complete_request
-                        blk_mq_complete_request_remote -> this is true
-                         WRITE_ONCE(rq->state, MQ_RQ_COMPLETE)
-                          blk_mq_raise_softirq
-                                             blk_done_softirq
-                                              blk_complete_reqs
-                                               nbd_complete_rq
-                                                blk_mq_end_request
-                                                 blk_mq_free_request
-                                                  WRITE_ONCE(rq->state, MQ_RQ_IDLE)
-  nbd_clear_que
-   blk_mq_tagset_busy_iter
-    nbd_clear_req
-                                                   __blk_mq_free_request
-                                                    blk_mq_put_tag
-     blk_mq_complete_request
-
-There are three places where request can be completed in nbd:
-recv_work(), nbd_clear_que() and nbd_xmit_timeout(). Since they
-all hold cmd->lock before completing the request, it's easy to
-avoid the problem by setting and checking a cmd flag.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/block/nbd.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7b9e19675224..4d5098d01758 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -416,12 +416,15 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
- 	struct nbd_device *nbd = cmd->nbd;
- 	struct nbd_config *config;
-+	bool need_complete;
- 
- 	if (!mutex_trylock(&cmd->lock))
- 		return BLK_EH_RESET_TIMER;
- 
- 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
- 		cmd->status = BLK_STS_TIMEOUT;
-+		need_complete =
-+			test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
- 		mutex_unlock(&cmd->lock);
- 		goto done;
- 	}
-@@ -490,11 +493,13 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	dev_err_ratelimited(nbd_to_dev(nbd), "Connection timed out\n");
- 	set_bit(NBD_RT_TIMEDOUT, &config->runtime_flags);
- 	cmd->status = BLK_STS_IOERR;
-+	need_complete = test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
- 	mutex_unlock(&cmd->lock);
- 	sock_shutdown(nbd);
- 	nbd_config_put(nbd);
- done:
--	blk_mq_complete_request(req);
-+	if (need_complete)
-+		blk_mq_complete_request(req);
- 	return BLK_EH_DONE;
- }
- 
-@@ -849,6 +854,7 @@ static void recv_work(struct work_struct *work)
- static bool nbd_clear_req(struct request *req, void *data, bool reserved)
- {
- 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
-+	bool need_complete;
- 
- 	/* don't abort one completed request */
- 	if (blk_mq_request_completed(req))
-@@ -856,9 +862,11 @@ static bool nbd_clear_req(struct request *req, void *data, bool reserved)
- 
- 	mutex_lock(&cmd->lock);
- 	cmd->status = BLK_STS_IOERR;
-+	need_complete = test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
- 	mutex_unlock(&cmd->lock);
- 
--	blk_mq_complete_request(req);
-+	if (need_complete)
-+		blk_mq_complete_request(req);
- 	return true;
- }
- 
 -- 
-2.31.1
+Jens Axboe
 
