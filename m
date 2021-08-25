@@ -2,115 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAB0C4320A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 00:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4141C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 03:02:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60458611AF
-	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 00:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97E906128A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 03:02:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234602AbhHYA5e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Aug 2021 20:57:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52666 "EHLO
+        id S236811AbhHYDDT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Aug 2021 23:03:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231552AbhHYA5d (ORCPT
+        with ESMTP id S230021AbhHYDDL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Aug 2021 20:57:33 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A081C061764
-        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 17:56:49 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id u15so13284643plg.13
-        for <linux-block@vger.kernel.org>; Tue, 24 Aug 2021 17:56:49 -0700 (PDT)
+        Tue, 24 Aug 2021 23:03:11 -0400
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA1BC061757;
+        Tue, 24 Aug 2021 20:02:26 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id x10-20020a056830408a00b004f26cead745so51800824ott.10;
+        Tue, 24 Aug 2021 20:02:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hDmA88AGRY/vwa+gGKxIK+/H24lAkykEt+wHqqXlCXE=;
-        b=P4GuDJeRVVhudmZI0u/uwgue6Kjrok+r6cIijY3U9m3HnBE9NpbWgsfh6G/s0y1bel
-         w5+4yfF06qam48qOwPOPuHVgB6hVfowJEdilUzYcWCCURTL4c+gjpl7LjVM6iktCExmH
-         ATetYYtz1VgnAipAKAt3kEcaTm2Gf+4TZDyA2FD98rmswB3KYcu5qz/X0ry9U9eRNGqf
-         e3g0dPqKML9WiKGRiPYHS0uxWos7MXJ1eebirZMT2TPiB+SDRM6UWiY2gEy6ac0MmyT0
-         +fmFhdtMEg/anpcvZtaCgvWFlozXf/mGGbQ0Qz3oUDIv5EwkfWSNvXbZq8aj8yBq7dKi
-         YiRQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6CJu4ryWmmhPfIqi+5GEQZx1ws6z7aiz7H2DyEgUiD0=;
+        b=bUvX0Wqsi/ScMzguDUhCOkuCSpWbyqEGIiW5GtyHdwfL5MHC/2miqSVPyWG+siNH7F
+         5vyszzE+XRlzUOffljQPGW1VkU1pNwbqJYF6anFXFpYOFXiL1db4XRAgFtqZtJlc0O6i
+         NYMoQj4Nf8/UpPZbIBsK0RYIJCMAT1t5+kv/f12M8lVfvyWP4OZBqB4uzuJEcZVr5W65
+         g3Rr89f5u8fKcDK7fKMtvjOXTdEFtBWv8ft81gHOm7W5fzLqi1iW5rrRZOLE4ZcZkYbG
+         CmnPaTVglo8Yxgu9G+AFAanjXg/+pehgAvvZdU/nUh+mdf/q16dFNhQGQNGv3TN7A1q7
+         1VPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hDmA88AGRY/vwa+gGKxIK+/H24lAkykEt+wHqqXlCXE=;
-        b=EIEdZ8XwEOuFoLLBHmRb5qYVjHtgBQwxNtPnnwTmp3C4Vm40kRHgkKQikOT0mSSuhh
-         AeJzs33CIAOIXisUk6UqFKLAxAU5sLL1fznCB443xBNmooIqO4gtLpqxXw1zvkv8xf1N
-         ZxH9Cj/5GWRsQUOEzX602LCs5F4wpeRQwcw5ZXWsEqJzV9eT36dl8acwFPE5HirLW64Y
-         K9xbbKmGjwAg4qQ69nXDYfAV5XkPPyRNzgIGOu/JoOg43p50b/bVPlAYqOCO6MJq9pFb
-         Og4e3n/EDHf0ycm64RLXYEI49RNAW4lh6pu4n1amc33RJZMFHtJCybdUvSQC2A2Gb/GO
-         tMgg==
-X-Gm-Message-State: AOAM533hWODcTC9jtpO+ApOqgQZYiOHso4O9oG+djvokNU2xJVx5wDBH
-        3cG+sPBNe2c6FmO35GCvfMzYfQ==
-X-Google-Smtp-Source: ABdhPJzEbsbxIKFkhGP3ddFUby75YgoJoOMwYM1WFQsZCXKHIZkwkFbGXjDml41unr/U4CBZo1Nv2g==
-X-Received: by 2002:a17:90b:1897:: with SMTP id mn23mr7361948pjb.61.1629853008633;
-        Tue, 24 Aug 2021 17:56:48 -0700 (PDT)
-Received: from relinquished.localdomain ([2620:10d:c090:400::5:f616])
-        by smtp.gmail.com with ESMTPSA id v63sm23428489pgv.59.2021.08.24.17.56.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Aug 2021 17:56:48 -0700 (PDT)
-Date:   Tue, 24 Aug 2021 17:56:46 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH] block/001: wait until device is added
-Message-ID: <YSWVTjSYegn/wGX2@relinquished.localdomain>
-References: <20210824031753.1397579-1-ming.lei@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6CJu4ryWmmhPfIqi+5GEQZx1ws6z7aiz7H2DyEgUiD0=;
+        b=cLV+hOjKUyJmUjq6sYzp3O470WoO27HWPx5EG6Z9+UYlMStdhAZzNBxPNrY4efgNpL
+         cgsaKlBWa+NMu+cG0rbjLwwWoVXF7R8G5/TPV0Ns1gRO2AB0bkFxl/1FrUnrisRw0E38
+         9+pf35s9KcHCJ1qiuBpfWo+qeroUIY495NDXQxL0gFG9JxssgONEB/0zmUP93AKlfhub
+         Igv/++k109E7uTcjou3kTC1OBA8WdNw8oQmsLjS9WNxsYRklFUApNfINUadaptTf04xe
+         563M5PgRTCBxruXMs+xWRkeCIwPUzyiHtfytOk4XN+o3qPyN9NFggAwu6FWgAvysqAb4
+         iidw==
+X-Gm-Message-State: AOAM532P4CPrKVFOeYJzUpuz5E1c8ii4O7M8b3Qzm/3alNpNWOHYyLC6
+        SVhsxqksdBm5aU7k6tjeT6HO2v3M9Qx1hW7OqyI=
+X-Google-Smtp-Source: ABdhPJy1p5I+xDIjsqcsw/BcyZ4dbCp03S8J7YhMHmQiCaFw4hOvoBf0h5jHc05iRp3zejVLPtCv/GLcEnnYlagLtZs=
+X-Received: by 2002:aca:2216:: with SMTP id b22mr5005428oic.163.1629860545872;
+ Tue, 24 Aug 2021 20:02:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210824031753.1397579-1-ming.lei@redhat.com>
+References: <c3d1a966-b9b0-d015-38ec-86270b5045fc@acm.org>
+In-Reply-To: <c3d1a966-b9b0-d015-38ec-86270b5045fc@acm.org>
+From:   Zhu Yanjun <zyjzyj2000@gmail.com>
+Date:   Wed, 25 Aug 2021 11:02:14 +0800
+Message-ID: <CAD=hENcriq-mwnvzY3UdowuGpKb=Uekvk-v8Lj0G=QB-qK0kJg@mail.gmail.com>
+Subject: Re: v5.14 RXE driver broken?
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Bob Pearson <rpearsonhpe@gmail.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 24, 2021 at 11:17:53AM +0800, Ming Lei wrote:
-> Writing to the scan attribute of scsi host is usually one sync scan, but
-> devices in this sync scan may be delay added if there is concurrent
-> asnyc scan.
-> 
-> So wait until the device is added in block/001 for avoiding to fail
-> the test.
-> 
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: linux-scsi@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  tests/block/001 | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/block/001 b/tests/block/001
-> index 51ec9d8..01356d0 100755
-> --- a/tests/block/001
-> +++ b/tests/block/001
-> @@ -21,15 +21,20 @@ stress_scsi_debug() {
->  		return
->  	fi
->  
-> -	local host target
-> +	local host target target_path
->  	for target in "${SCSI_DEBUG_TARGETS[@]}"; do
->  		(
->  		host="${target%%:*}"
->  		scan="${target#*:}"
->  		scan="${scan//:/ }"
-> +		target_path="/sys/class/scsi_device/${target}"
->  		while [[ ! -e "$TMPDIR/stop" ]]; do
->  			echo "${scan}" > "/sys/class/scsi_host/host${host}/scan"
-> -			echo 1 > "/sys/class/scsi_device/${target}/device/delete"
-> +			while [ ! -d ${target_path} ]; do
-> +				sleep 0.01;
-> +				[[ -e "$TMPDIR/stop" ]] && break
-> +			done
-> +			[ -d ${target_path} ] && echo 1 > ${target_path}/device/delete
+On Tue, Aug 24, 2021 at 11:02 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> Hi Bob,
+>
+> If I run the following test against Linus' master branch then that test
+> passes (commit d5ae8d7f85b7 ("Revert "media: dvb header files: move some
+> headers to staging"")):
+>
+> # export use_siw=1 && modprobe brd && (cd blktests && ./check -q srp/002)
+> srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [passed]
+>     runtime    ...  48.849s
+>
+> The following test fails:
+>
+> # export use_siw= && modprobe brd && (cd blktests && ./check -q srp/002)
+> srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [failed]
+>     runtime  48.849s  ...  15.024s
+>     --- tests/srp/002.out       2018-09-08 19:43:42.291664821 -0700
+>     +++ /home/bart/software/blktests/results/nodev/srp/002.out.bad      2021-08-23 19:51:05.182958728 -0700
+>     @@ -1,2 +1 @@
+>      Configured SRP target driver
+>     -Passed
 
-Applied, with the shellcheck errors fixed and simplified logic. Thanks.
+Can this commit "RDMA/rxe: Zero out index member of struct rxe_queue"
+in the link https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/commit/?h=wip/jgg-for-rc
+fix this problem?
+
+And the commit will be merged into linux upstream very soon.
+
+Zhu Yanjun
+
+>
+> The only difference between these two tests is that test (1) use the siw
+> (soft-iWARP) driver while test (2) uses the rdma_rxe driver (soft-RoCE).
+> Both tests run reliably against previous Linux kernel versions, e.g.
+> v5.13. Can you take a look at this? The blktests software is available at
+> https://github.com/osandov/blktests/.
+>
+> Thanks,
+>
+> Bart.
