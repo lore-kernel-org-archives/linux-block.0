@@ -2,178 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC360C4338F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 16:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96469C4338F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 16:47:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE70E61027
-	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 16:43:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7675060F42
+	for <linux-block@archiver.kernel.org>; Wed, 25 Aug 2021 16:47:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230490AbhHYQn6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Aug 2021 12:43:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44964 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237319AbhHYQn6 (ORCPT
+        id S232606AbhHYQrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Aug 2021 12:47:47 -0400
+Received: from mail-pg1-f182.google.com ([209.85.215.182]:46822 "EHLO
+        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230363AbhHYQrr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Aug 2021 12:43:58 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C20C0613CF
-        for <linux-block@vger.kernel.org>; Wed, 25 Aug 2021 09:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=NlcZ0gDKD5494C/Zv3cmBbCH5hjShYV7uw5GYvnsZOQ=; b=MHeTNzP6eObKSZGJWpILX98C9m
-        4Lwuh8CEDzM+Y365xmZNAbptgzAe5grnBxpnqI+skf7GFUMRBdAxOGmYQhxl/c2eJx0B/6FZb9sQU
-        hjTgjPJHQ637801HgVn2IxA3lqsVdHnUra3J4Olp0gFHcvqWTc6geNf9086UnrTb5zzESLElWsa63
-        LWDShrMSGaq8K7R5w1fJEWWe1iG9ChDFYpTQONzBsoeF06CKThuPQ0ht1PhYt5lwcjbzPsS02EcYv
-        CUEBlJOWv0YiDAQE2w2clbMlSy4RZv1FLqthWeYLEn9n4oCcLGFQ3VZQ8u+VJ+fqAFzwSwPw46tHd
-        M7iCUPcA==;
-Received: from [2001:4bb8:193:fd10:a3f9:5689:21a4:711f] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mIvy6-00CUIz-Ln; Wed, 25 Aug 2021 16:42:07 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        Xiubo Li <xiubli@redhat.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        syzbot+2c98885bcd769f56b6d6@syzkaller.appspotmail.com
-Subject: [PATCH 6/6] nbd: remove nbd->destroy_complete
-Date:   Wed, 25 Aug 2021 18:31:08 +0200
-Message-Id: <20210825163108.50713-7-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210825163108.50713-1-hch@lst.de>
-References: <20210825163108.50713-1-hch@lst.de>
+        Wed, 25 Aug 2021 12:47:47 -0400
+Received: by mail-pg1-f182.google.com with SMTP id k14so262217pga.13;
+        Wed, 25 Aug 2021 09:47:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1UMuzaedawDrJ7sHnjIktSUIvpk6VsWPkXjY/IRHZ3A=;
+        b=KtbaY/c5YIaT+5iv2o9d4PkX6B2Gzlk/6EP42tFvA7rNKo+kRVTo64Okcj7L8J/wmV
+         76v+xRIFuIZI3pSl+0GmEddJYtLSIyzMJqZNBqCyV0cnOI2M/IhkJcFuYxZ+EqDdQ7Lb
+         2bUyvLzqvJ74xCOltSiKJVPyCI/JLI/mCWQuPgSkLeHNfzsnQ1Dx93nLTbNRSZfxNJg/
+         pS2hw+UB6nVWEc7tB9hBv904ExjMI1cCnBKFeffM4f4tmS6zhjRVAM9j1/Ix+ISPSgvB
+         tumcPe0zbo4HUVALkLCOp0EDeynQ9K7r/WWyUoY5GAfuBWd/WAczbgemrzT+/bc+9Irh
+         mhoQ==
+X-Gm-Message-State: AOAM531Qvdz64NKmFRbIpw29Xy594lEZgBnAH2Nek9kz2wS/KYIhQjZB
+        eBsueTInOR3XleMAK/g5ksZ8OlEbuyg=
+X-Google-Smtp-Source: ABdhPJyZTPqR+r8H7dS3kFtMU4hv76aDbhMxlB5PhIx5PM2s0ws5fZ1E/ns+FyqXq7r+qMqvbFf+kg==
+X-Received: by 2002:a63:fc20:: with SMTP id j32mr43007431pgi.283.1629910020302;
+        Wed, 25 Aug 2021 09:47:00 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5f7b:5bac:8246:4328])
+        by smtp.gmail.com with ESMTPSA id n3sm306936pfo.101.2021.08.25.09.46.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Aug 2021 09:46:59 -0700 (PDT)
+Subject: Re: v5.14 RXE driver broken?
+To:     Zhu Yanjun <zyjzyj2000@gmail.com>
+Cc:     Bob Pearson <rpearsonhpe@gmail.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <c3d1a966-b9b0-d015-38ec-86270b5045fc@acm.org>
+ <CAD=hENcriq-mwnvzY3UdowuGpKb=Uekvk-v8Lj0G=QB-qK0kJg@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <98fb7274-8563-e54b-3c6d-c99d3f3e68bf@acm.org>
+Date:   Wed, 25 Aug 2021 09:46:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CAD=hENcriq-mwnvzY3UdowuGpKb=Uekvk-v8Lj0G=QB-qK0kJg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The nbd->destroy_complete pointer is not really needed.  For creating
-a device without a specific index we now simplify skip devices marked
-NBD_DESTROY_ON_DISCONNECT as there is not much point to reuse them.
-For device creation with a specific index there is no real need to
-treat the case of a requested but not finished disconnect different
-than any other device that is being shutdown, i.e. we can just return
-an error, as a slightly different race window would anyway.
+On 8/24/21 8:02 PM, Zhu Yanjun wrote:
+> On Tue, Aug 24, 2021 at 11:02 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>>
+>> Hi Bob,
+>>
+>> If I run the following test against Linus' master branch then that test
+>> passes (commit d5ae8d7f85b7 ("Revert "media: dvb header files: move some
+>> headers to staging"")):
+>>
+>> # export use_siw=1 && modprobe brd && (cd blktests && ./check -q srp/002)
+>> srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [passed]
+>>      runtime    ...  48.849s
+>>
+>> The following test fails:
+>>
+>> # export use_siw= && modprobe brd && (cd blktests && ./check -q srp/002)
+>> srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [failed]
+>>      runtime  48.849s  ...  15.024s
+>>      --- tests/srp/002.out       2018-09-08 19:43:42.291664821 -0700
+>>      +++ /home/bart/software/blktests/results/nodev/srp/002.out.bad      2021-08-23 19:51:05.182958728 -0700
+>>      @@ -1,2 +1 @@
+>>       Configured SRP target driver
+>>      -Passed
+> 
+> Can this commit "RDMA/rxe: Zero out index member of struct rxe_queue"
+> in the link https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/commit/?h=wip/jgg-for-rc
+> fix this problem?
+> 
+> And the commit will be merged into linux upstream very soon.
 
-Fixes: 6e4df4c64881 ("nbd: reduce the nbd_index_mutex scope")
-Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: syzbot+2c98885bcd769f56b6d6@syzkaller.appspotmail.com
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/nbd.c | 52 ++++++++++++---------------------------------
- 1 file changed, 14 insertions(+), 38 deletions(-)
+Hi Zhu,
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 5c03f3eb3129..5170a630778d 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -120,7 +120,6 @@ struct nbd_device {
- 	struct task_struct *task_recv;
- 	struct task_struct *task_setup;
- 
--	struct completion *destroy_complete;
- 	unsigned long flags;
- 
- 	char *backend;
-@@ -235,19 +234,6 @@ static const struct device_attribute backend_attr = {
- 	.show = backend_show,
- };
- 
--/*
-- * Place this in the last just before the nbd is freed to
-- * make sure that the disk and the related kobject are also
-- * totally removed to avoid duplicate creation of the same
-- * one.
-- */
--static void nbd_notify_destroy_completion(struct nbd_device *nbd)
--{
--	if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) &&
--	    nbd->destroy_complete)
--		complete(nbd->destroy_complete);
--}
--
- static void nbd_dev_remove(struct nbd_device *nbd)
- {
- 	struct gendisk *disk = nbd->disk;
-@@ -262,7 +248,6 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 	 */
- 	mutex_lock(&nbd_index_mutex);
- 	idr_remove(&nbd_index_idr, nbd->index);
--	nbd_notify_destroy_completion(nbd);
- 	mutex_unlock(&nbd_index_mutex);
- 
- 	kfree(nbd);
-@@ -1706,7 +1691,6 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 		BLK_MQ_F_BLOCKING;
- 	nbd->tag_set.driver_data = nbd;
- 	INIT_WORK(&nbd->remove_work, nbd_dev_remove_work);
--	nbd->destroy_complete = NULL;
- 	nbd->backend = NULL;
- 
- 	err = blk_mq_alloc_tag_set(&nbd->tag_set);
-@@ -1858,7 +1842,6 @@ static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
- 
- static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- {
--	DECLARE_COMPLETION_ONSTACK(destroy_complete);
- 	struct nbd_device *nbd;
- 	struct nbd_config *config;
- 	int index = -1;
-@@ -1880,31 +1863,24 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	}
- again:
- 	mutex_lock(&nbd_index_mutex);
--	if (index == -1)
-+	if (index == -1) {
- 		nbd = nbd_find_get_unused();
--	else
-+	} else {
- 		nbd = idr_find(&nbd_index_idr, index);
--	if (nbd && index != -1) {
--		if (test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) &&
--		    test_bit(NBD_DISCONNECT_REQUESTED, &nbd->flags)) {
--			nbd->destroy_complete = &destroy_complete;
--			mutex_unlock(&nbd_index_mutex);
--
--			/* wait until the nbd device is completely destroyed */
--			wait_for_completion(&destroy_complete);
--			goto again;
--		}
--
--		if (!refcount_inc_not_zero(&nbd->refs)) {
--			mutex_unlock(&nbd_index_mutex);
--			pr_err("nbd: device at index %d is going down\n",
--				index);
--			return -EINVAL;
-+		if (nbd) {
-+			if ((test_bit(NBD_DESTROY_ON_DISCONNECT, &nbd->flags) &&
-+			     test_bit(NBD_DISCONNECT_REQUESTED, &nbd->flags)) ||
-+			    !refcount_inc_not_zero(&nbd->refs)) {
-+				mutex_unlock(&nbd_index_mutex);
-+				pr_err("nbd: device at index %d is going down\n",
-+					index);
-+				return -EINVAL;
-+			}
- 		}
--		mutex_unlock(&nbd_index_mutex);
--	} else {
--		mutex_unlock(&nbd_index_mutex);
-+	}
-+	mutex_unlock(&nbd_index_mutex);
- 
-+	if (!nbd) {
- 		nbd = nbd_dev_add(index, 2);
- 		if (IS_ERR(nbd)) {
- 			pr_err("nbd: failed to add new device\n");
--- 
-2.30.2
+Thanks for having taken a look.
+
+Isn't commit cc4f596cf85e ("RDMA/rxe: Zero out index member of struct
+rxe_queue") already in Linus' tree? I think it was merged yesterday (August
+24). Unfortunately the test I mentioned still fails on top of that patch.
+
+Thanks,
+
+Bart.
 
