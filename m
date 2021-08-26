@@ -2,77 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 962E6C4320E
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 19:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D156C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 19:17:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E61461040
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 19:03:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B83C61037
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 19:17:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243384AbhHZTEi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Aug 2021 15:04:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39124 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243241AbhHZTEh (ORCPT
+        id S243489AbhHZTSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Aug 2021 15:18:13 -0400
+Received: from mail-pf1-f171.google.com ([209.85.210.171]:39672 "EHLO
+        mail-pf1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243388AbhHZTSM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Aug 2021 15:04:37 -0400
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2738EC061757;
-        Thu, 26 Aug 2021 12:03:50 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id i3-20020a056830210300b0051af5666070so4861519otc.4;
-        Thu, 26 Aug 2021 12:03:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QVJge+2AS8TC5IJErVGgCRPnUKEkPLQKxcJt3H4xrwE=;
-        b=psMcUV4NooKaQwSKkDNm4xdsjbDEPVRU8ZQwvzjSjrXRVcOz4wUzn5ELSBf1J3mV/o
-         WQx1+DmICcOMRbpte/ayi2Oyvd/qgpUSQ/EVnDUrauQaL7tiaEVmrxPFf8LhjMj5ypMf
-         Gc5xNrPURjYoWSW7SdicW0ZMdfP+XMTFVGeGRV+X95qTbZhyggGBh/X7+RCK5Y5ekINW
-         Xx+NfmonpcPZkFhNLO4PK3AtH+9DStqoPr9Yez5AlChhSUlpnCfWM601EfgYuxZuB1n3
-         ao0inKg033Rd8hz70W8Q11YuGDmx85HvxUL2Pe9iSclaWA7C6Dt4pOWf+WJ4i6/gB6SV
-         c0pg==
+        Thu, 26 Aug 2021 15:18:12 -0400
+Received: by mail-pf1-f171.google.com with SMTP id e16so3162504pfc.6
+        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 12:17:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QVJge+2AS8TC5IJErVGgCRPnUKEkPLQKxcJt3H4xrwE=;
-        b=of1YKGcAgLX7Pu6wVUhtb0JERe7oEipDBAacuWuBlGqeZFVPJSQk8thyvj2A00/CIJ
-         trZ1wOqgauekFMkC2LIvNu/ixjUgUk0JUH/T81ApxMACPNlWiWFnSEkS+dd2KBXfgPi1
-         xNoVaywd+ylp/bB8YLXWOY+c4yhUYIGjLvhh1QdAJVpcu3GQ0Tc5AAwWem6snxUbJcCT
-         v4arcwzLcvQb2fO/a/KBlQ/HVeeDv1KD1CDGLzZPM1dLtpTc+2ndeKJAvdft2IGRyV1A
-         a3UZpZS+0ftrjg5YAqmd73WGOwZyk3DoPnPHdHgkX7z/pUStYhRVazRPFPYNHOX3rT1i
-         2abA==
-X-Gm-Message-State: AOAM530dYftxRqDKQ1ulW0ngqFd1srmIF621aiajNBXRECji7OvYaMcm
-        JxaG2fhLYAvbMXVI2UT52EHuYBIL2P8=
-X-Google-Smtp-Source: ABdhPJwlyd4HrjoAMGxpHWGl4lo2hG5L8zL37ymgGMWqpgzojSmXNj1dbee2V2U9+vWUopAHxeHDxA==
-X-Received: by 2002:a05:6830:2a06:: with SMTP id y6mr4362786otu.134.1630004629073;
-        Thu, 26 Aug 2021 12:03:49 -0700 (PDT)
-Received: from ?IPv6:2603:8081:140c:1a00:3615:bca2:7e39:65f1? (2603-8081-140c-1a00-3615-bca2-7e39-65f1.res6.spectrum.com. [2603:8081:140c:1a00:3615:bca2:7e39:65f1])
-        by smtp.gmail.com with ESMTPSA id r15sm757992oth.7.2021.08.26.12.03.48
+        bh=87xtzhguPu66DgEqdVXhkAJQsftTA0hur2kbsv86gyA=;
+        b=EuBdSkrYaYYbnIT8UnFYquCYFTOKzz2CBOPN5/euFInkUsX/aJZ6gHkflPmZDXZ3/D
+         NQeakpl0xKP1HFf6gY6pQ1kV8lZmPKTIgl6aqmy2RUT8jAA/zO1bGd6kHaIBTw8vkN8p
+         DxdcBUcCike85JRDdkAgkKDwOgFeTpEusJ/hPeqO3TvSOSQnyTkFulO4+yFXaRb94JqV
+         IdmmMx0lWMHIn/6mqT8QVpYUFP0jFO/Ax4j7FFljZkjF+vI9lbjoLr+h1uzD5McTFLP2
+         n3NsIUCQP0eArbZgydY7OAO6gdTbQ3BA8oewDL1Q9nPPXxUR8AHELinnPmvj+8sprPPU
+         tI2Q==
+X-Gm-Message-State: AOAM530g5woTjjMCLuGigqLSLalsT15ZzBYUmd7+KMCoWcYriciegk5b
+        HGgmKgRSLPoPZQ74B+qQVENyWqatvj4=
+X-Google-Smtp-Source: ABdhPJyQf/LGhydQjZA5FVvWpf1ddIHolx9BG454imhlFdpGghCMYJcteMnl4BafkHnZDZnDtZMh4Q==
+X-Received: by 2002:a63:f410:: with SMTP id g16mr4606338pgi.201.1630005444268;
+        Thu, 26 Aug 2021 12:17:24 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:22e3:6079:e5ce:5e45? ([2601:647:4000:d7:22e3:6079:e5ce:5e45])
+        by smtp.gmail.com with ESMTPSA id x1sm3673274pfn.64.2021.08.26.12.17.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Aug 2021 12:03:48 -0700 (PDT)
-Subject: Re: v5.14 RXE driver broken?
-To:     Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <c3d1a966-b9b0-d015-38ec-86270b5045fc@acm.org>
- <CAD=hENcriq-mwnvzY3UdowuGpKb=Uekvk-v8Lj0G=QB-qK0kJg@mail.gmail.com>
- <20210825163219.GY543798@ziepe.ca>
-From:   Bob Pearson <rpearsonhpe@gmail.com>
-Message-ID: <5ab2f7f1-2e76-b3f2-7dee-39d38dfeb25e@gmail.com>
-Date:   Thu, 26 Aug 2021 14:03:48 -0500
+        Thu, 26 Aug 2021 12:17:23 -0700 (PDT)
+Subject: Re: [PATCH] block/mq-deadline: Speed up the dispatch of low-priority
+ requests
+To:     Jens Axboe <axboe@kernel.dk>,
+        Zhen Lei <thunder.leizhen@huawei.com>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>
+References: <20210826144039.2143-1-thunder.leizhen@huawei.com>
+ <fc1f2664-fc4f-7b3e-5542-d9e4800a5bde@acm.org>
+ <537620de-646d-e78e-ccb8-4105bac398b3@kernel.dk>
+ <82612be1-d61e-1ad5-8fb5-d592a5bc4789@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <a1c76c24-5013-02b4-85f1-2d2896cca6dd@acm.org>
+Date:   Thu, 26 Aug 2021 12:17:22 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210825163219.GY543798@ziepe.ca>
+In-Reply-To: <82612be1-d61e-1ad5-8fb5-d592a5bc4789@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,56 +66,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/25/21 11:32 AM, Jason Gunthorpe wrote:
-> On Wed, Aug 25, 2021 at 11:02:14AM +0800, Zhu Yanjun wrote:
->> On Tue, Aug 24, 2021 at 11:02 AM Bart Van Assche <bvanassche@acm.org> wrote:
->>>
->>> Hi Bob,
->>>
->>> If I run the following test against Linus' master branch then that test
->>> passes (commit d5ae8d7f85b7 ("Revert "media: dvb header files: move some
->>> headers to staging"")):
->>>
->>> # export use_siw=1 && modprobe brd && (cd blktests && ./check -q srp/002)
->>> srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [passed]
->>>     runtime    ...  48.849s
->>>
->>> The following test fails:
->>>
->>> # export use_siw= && modprobe brd && (cd blktests && ./check -q srp/002)
->>> srp/002 (File I/O on top of multipath concurrently with logout and login (mq)) [failed]
->>>     runtime  48.849s  ...  15.024s
->>>     +++ /home/bart/software/blktests/results/nodev/srp/002.out.bad      2021-08-23 19:51:05.182958728 -0700
->>>     @@ -1,2 +1 @@
->>>      Configured SRP target driver
->>>     -Passed
->>
->> Can this commit "RDMA/rxe: Zero out index member of struct rxe_queue"
->> in the link https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/commit/?h=wip/jgg-for-rc
->> fix this problem?
->>
->> And the commit will be merged into linux upstream very soon.
-> 
-> Please let me know Bart, if the rxe driver is still broken I will
-> definitely punt all the changes for RXE to the next cycle until it can
-> be fixed.
-> 
-> Jason
-> 
+On 8/26/21 11:45 AM, Jens Axboe wrote:
+> Bart, either we fix this up ASAP and get rid of the percpu counters in
+> the hot path, or we revert this patch.
 
-Jason, Bart, Zhu
+I'm at home taking care of my son because he is sick.
 
-I have succeeded in getting blktest to pass on 5.14. There is a bug in rxe that I had to fix. In
-loopback mode when an RNR NAK is received it requests the requester to start a retry sequence
-before the rnr timer fires which results in the command being retried immediately regardless of the
-value of the timeout. I made a small change which requires the requester to wait for either the
-timer to fire or an ack to arrive. The srp/002 test case in blktest spends a long time before posting
-a receive in some cases which caused a soft lockup. There is a second non-bug which is the number of
-MRs was too small to run the test. I increased these by a factor of 256 which fixed that.
+Do you want to wait for Zhen to post a fixed version of his patch or do you
+want me to fix his patch?
 
-My test setup has for-next + 5 recent rxe fix patches applied in addition to the RNR timing one above.
+Bart.
 
-I will submit a patch for the rnr fix.
-
-Bob
 
