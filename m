@@ -2,112 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E70EEC43214
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 16:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7163C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 16:31:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB3386109F
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 16:17:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A00C60FD9
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 16:31:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243002AbhHZQR5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Aug 2021 12:17:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43960 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232555AbhHZQR4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Aug 2021 12:17:56 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7130361073;
-        Thu, 26 Aug 2021 16:17:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629994629;
-        bh=ys6he2EKXxTAf6clEHiF8vGsFUEvrMasLHaxf8mzwqU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=qWlV8X3zhQL7ddx2KWYFTqr5EdBwa+JOIt5Zoj3+tMKIkib6ug1aLVBIxz0zIYdlX
-         WSqNUL9oY5ZEhUvWAbD3izq/iRjGMNE/wjh0bK5bIjLcGo7iEjM3aolPoQnayp2Xea
-         G5OXIlE/iCJ6JbArRdywGR3X2D5Hs1Pzh6xClcyyeN66xVWaj561t8N3q3c7yJjkIB
-         LklFoKHJuNywIqH556gBKBvhiEP42a13pnpAIU8OutKN6/LKuyiXzo/Hzonh8rcXoM
-         +grJ8wShIWw+05PCIObZFP/xumGzMuJdzTleqgFdaKgN7WZJMcorvKIoLu1GbAntZY
-         I/OHk9Y4ScYYA==
-Received: by mail-lj1-f174.google.com with SMTP id h1so6114718ljl.9;
-        Thu, 26 Aug 2021 09:17:09 -0700 (PDT)
-X-Gm-Message-State: AOAM530K7HhJvzbAUNEGyyLmTTGvoZLuuFQ+Owu6igg03r7afQtB1Rtf
-        GR9h352eAvLhtED0aoEmEVkcKpVLwYPENF8iayQ=
-X-Google-Smtp-Source: ABdhPJxyDEbUewF9N87rEwVKZgJsGCp9TEPJLavwLve9L9gaQWOUW1NNuSAlENQ1pmdyFn6c6Bslr/c0nv3m2rn5Pl4=
-X-Received: by 2002:a2e:9247:: with SMTP id v7mr3837591ljg.97.1629994627859;
- Thu, 26 Aug 2021 09:17:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210824011654.3829681-1-guoqing.jiang@linux.dev>
- <CAPhsuW6mivBeA0uYGT-Z9UR7h_B=4Mp+BGqzrAW9BmNysQcGTw@mail.gmail.com> <01dec1bc-5e3a-4237-6280-f0a480e6231f@linux.dev>
-In-Reply-To: <01dec1bc-5e3a-4237-6280-f0a480e6231f@linux.dev>
-From:   Song Liu <song@kernel.org>
-Date:   Thu, 26 Aug 2021 09:16:56 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW7jYhOCsTcoT54_y12RWLw-wj3iPGO1a=vd37L7khxn3g@mail.gmail.com>
-Message-ID: <CAPhsuW7jYhOCsTcoT54_y12RWLw-wj3iPGO1a=vd37L7khxn3g@mail.gmail.com>
-Subject: Re: [PATCH V4] raid1: ensure write behind bio has less than
- BIO_MAX_VECS sectors
-To:     Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
+        id S243050AbhHZQcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Aug 2021 12:32:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60376 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230200AbhHZQcl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Aug 2021 12:32:41 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36F4EC061757
+        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 09:31:54 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id u9so5996842wrg.8
+        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 09:31:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=mskyHXQjMXJtt7a3IypmzlzyZVMi2psCG3mkvklLjWo=;
+        b=fZMYjUiN/a9RznhX8FskmVdEiKijpvifY08UWJdikgmGur7iLbU/zawoh4lBuF3JmY
+         wCYP9YBo6A+0akGBCrAlkaKk3RVFZG7SR6zVUu1/JpD0Kepg+R5eenNie3KwZ1kB/EqS
+         F7orFKNeHanj4ec7EUHajS27acCUlFJMkk8o9afRiHpRXITqM+2N+9zH1VsMo4avWhwd
+         89nhg42jPrAShPqli+3jn0W4zQrF9XRANorBYIPQb4SSczOH6gtA8L3aJhbbctn2fUuG
+         iZM8UGZ5+ns5fp2CTPwKQ4zGH16sWlBezp8DhEVxVWf8C3OoVKyvtnnpfNooo88Ue4Mj
+         1rXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mskyHXQjMXJtt7a3IypmzlzyZVMi2psCG3mkvklLjWo=;
+        b=qz9WSiYwV1gveXXeBoem9zPWUn5UZtfFAQch7QKx7+5/3lP0Hfw4fZUR8eAVkp/523
+         vunXI35nr7q1MrMEJ5Yy5xXjSwHCysCrWs9whdGHulExEvsTPNPX4j6N112uB9mdZ1b3
+         u3wPdXDppHPoyPwk1A1/SE7wn/bDsl7DzQNtnWiFZyBD1yzMqcxuq/Zruk0K0Iq2Eg2w
+         AR2IeO/SjDnWFJVO/chW0MgKpgSmKhLNyI1qAXqjfXPpn3hsAJoQujKYjj0mNaSuK57D
+         vt9Hkf5aM4EAMl5+PpcOIqjk1uOzodh+UTRJNfQsIYhYFXC5bqLNutfIl5NipSJ+8rZG
+         5Dww==
+X-Gm-Message-State: AOAM533dNkMUo/yWOxei1yIcJxtZY4f+YyefTDqBrDxIVKcFKXqdCAR1
+        hl35lyi4uwYQt2VznC3EKR7FO4dWeLQ=
+X-Google-Smtp-Source: ABdhPJxt2zDOF++zkNYvgIfi/5YbQa9l45/RVtFsHlR0gXOkp55ahDu1yzW1Nb2jHp2r8HQVn5QYsw==
+X-Received: by 2002:a05:6000:184e:: with SMTP id c14mr5075780wri.186.1629995512765;
+        Thu, 26 Aug 2021 09:31:52 -0700 (PDT)
+Received: from [192.168.2.27] (39.35.broadband4.iol.cz. [85.71.35.39])
+        by smtp.gmail.com with ESMTPSA id f2sm3565193wru.31.2021.08.26.09.31.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Aug 2021 09:31:52 -0700 (PDT)
+Subject: Re: [PATCH 5/8] loop: merge the cryptoloop module into the main loop
+ module
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Hillf Danton <hdanton@sina.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
         linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20210826133810.3700-1-hch@lst.de>
+ <20210826133810.3700-6-hch@lst.de>
+From:   Milan Broz <gmazyland@gmail.com>
+Message-ID: <977860f6-efc4-a55e-50e3-c5204fc762c5@gmail.com>
+Date:   Thu, 26 Aug 2021 18:31:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <20210826133810.3700-6-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 24, 2021 at 5:44 PM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
->
->
->
-> On 8/25/21 5:55 AM, Song Liu wrote:
-> > On Mon, Aug 23, 2021 at 6:17 PM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
-> >> From: Guoqing Jiang <jiangguoqing@kylinos.cn>
-> >>
-> >> We can't split write behind bio with more than BIO_MAX_VECS sectors,
-> >> otherwise the below call trace was triggered because we could allocate
-> >> oversized write behind bio later.
-> >>
-> >> [ 8.097936] bvec_alloc+0x90/0xc0
-> >> [ 8.098934] bio_alloc_bioset+0x1b3/0x260
-> >> [ 8.099959] raid1_make_request+0x9ce/0xc50 [raid1]
-> >> [ 8.100988] ? __bio_clone_fast+0xa8/0xe0
-> >> [ 8.102008] md_handle_request+0x158/0x1d0 [md_mod]
-> >> [ 8.103050] md_submit_bio+0xcd/0x110 [md_mod]
-> >> [ 8.104084] submit_bio_noacct+0x139/0x530
-> >> [ 8.105127] submit_bio+0x78/0x1d0
-> >> [ 8.106163] ext4_io_submit+0x48/0x60 [ext4]
-> >> [ 8.107242] ext4_writepages+0x652/0x1170 [ext4]
-> >> [ 8.108300] ? do_writepages+0x41/0x100
-> >> [ 8.109338] ? __ext4_mark_inode_dirty+0x240/0x240 [ext4]
-> >> [ 8.110406] do_writepages+0x41/0x100
-> >> [ 8.111450] __filemap_fdatawrite_range+0xc5/0x100
-> >> [ 8.112513] file_write_and_wait_range+0x61/0xb0
-> >> [ 8.113564] ext4_sync_file+0x73/0x370 [ext4]
-> >> [ 8.114607] __x64_sys_fsync+0x33/0x60
-> >> [ 8.115635] do_syscall_64+0x33/0x40
-> >> [ 8.116670] entry_SYSCALL_64_after_hwframe+0x44/0xae
-> >>
-> >> Thanks for the comment from Christoph.
-> >>
-> >> [1]. https://bugs.archlinux.org/task/70992
-> >>
-> >> Reported-by: Jens Stutte <jens@chianterastutte.eu>
-> >> Tested-by: Jens Stutte <jens@chianterastutte.eu>
-> >> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> >> Signed-off-by: Guoqing Jiang <jiangguoqing@kylinos.cn>
-> > I am confused. Which tree does this apply to?
->
-> Sorry, I forgot to mention it in this version (actually it is v4). It
-> depends
-> on commit 018eca456c4b4dca56aaf1ec27f309c74d0fe246 in block tree
-> for-next branch, so it would be better to be picked by block tree for now
-> to avoid compile issue,  or after you rebase md tree from block tree with
-> that commit included.
+On 26/08/2021 15:38, Christoph Hellwig wrote:
+> No need to keep a separate loadable module infrastructure for a tiny
+> amount of cryptoapi glue, especially as unloading of the cryptoloop
+> module leads to nasty interactions with the loop device state machine
+> through loop_unregister_transfer.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
- I replaced PAGE_SECTORS with (PAGE_SIZE >> 9). And applied it to md-next.
+Hi Christoph,
 
-Thanks,
-Song
+the cryptoloop is insecure, most of the encryption modes are deprecated
+(and known to be problematic); util-linux no longer support cryptoloop
+options in losetup.
+
+Isn't the better way to go just to remove cryptoloop completely?
+
+(I tried this years ago, because dm-crypt can actually implement all,
+even insecure, options, see https://lkml.org/lkml/2012/11/2/162 )
+
+I know that loopAES still use this interface, but it implements
+own modes anyway, replacing kernel code.
+
+I really think that the best option here is just to kill this mess :-)
+(Or implement sector-level crypto properly in loop.)
+
+Just my 2 eorocents... :)
+
+Milan
