@@ -2,180 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB33C432BE
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 09:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C57BC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 13:12:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7772600CC
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 09:45:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 607E860F92
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 13:12:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234183AbhHZJqI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Aug 2021 05:46:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49650 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233249AbhHZJqI (ORCPT
+        id S231371AbhHZNNC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Aug 2021 09:13:02 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:52518 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229844AbhHZNNC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Aug 2021 05:46:08 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538B5C061757
-        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 02:45:21 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id i6so3765852edu.1
-        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 02:45:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=rZFactmh8+QxEY3gA+2s+3GnpVG/RFLpPoVnTconPAY=;
-        b=EB/7d9h5KlVTHcRcU/zuje03iv6+DKgj6hPihRHXf9F0h/C75hE1OTVEeGLf3jbRCQ
-         jevH6kcycVfp9YaAxZFcD5eOIBMDg0v2rECFuuZGrdFTsiNkkX2Br+kiNjtJ+q/bSGbr
-         /lo6DMvlSvIwLuGP1t5/nP7UkJEa2DttHGFgbyvlPlK7dxxZePFguF408fUVAjRngj5o
-         LaJkoJgIrrluRIO6CVQ+/1JTAN4E8m8dcsC13wCkQZaje1i4GMuB9ElI2UO+BBpUrfHg
-         xKlSBID5jBRwXkk4/eAu7eu7+WgqziCloH7vXhMt5/bsfVT6XtUyjfCAlR1oXQqjqZDw
-         m7RQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=rZFactmh8+QxEY3gA+2s+3GnpVG/RFLpPoVnTconPAY=;
-        b=gJVlZaPOIbWxepx4hWf8bPc/cPaKzppqdM+NUppBOVCKrbEv53Ndl2IIC5HaBtAITs
-         oAJrWhoQo6aYscZsJ4+bA0e9gBlwRhJ5IFzYZottgXpwOwrMtQZqKPTHmRCj3ymcJVDd
-         lbx6GiDlukLuJoJ2FnO+WcTBplMlqVtaWcSkwqgNiqcI2Cqzs6OZ0+sfYCDhdKsOrKm/
-         QxrjIPP7S0FeqORnb/K63f7ka6tkz8g2HwFey51pFoIR11z7WsEkA23g1wC2eMt5xct2
-         WDHR/0hpJAHPcQxz149v/9ROXMqPEqsDeQjuOJfPe4nK7+hlu7cvG+EiWv7UUF2xglwV
-         mwsA==
-X-Gm-Message-State: AOAM531+MKbGpjuiLuAPuo6pZ4Tebnt08Yvipe1A7A+7SMtVrVeRMdqM
-        3ChS7Mjiw4YP3pBw0x2kJgWFtA==
-X-Google-Smtp-Source: ABdhPJwpbsSt5unq+T3/PG9odNQXFq7tDpZSquDqPu+CtzbN9bb3aEdqQS5ET7/PYycZr9/QC42pNg==
-X-Received: by 2002:a05:6402:2292:: with SMTP id cw18mr3183151edb.109.1629971119084;
-        Thu, 26 Aug 2021 02:45:19 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id cr9sm1480646edb.17.2021.08.26.02.45.18
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 26 Aug 2021 02:45:18 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: False waker detection in BFQ
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20210825164301.GB14270@quack2.suse.cz>
-Date:   Thu, 26 Aug 2021 11:45:17 +0200
-Cc:     linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DF2D1482-0CF4-4CDF-B31C-FA3354AC831C@linaro.org>
-References: <20210505162050.GA9615@quack2.suse.cz>
- <FFFA8EE2-3635-4873-9F2C-EC3206CC002B@linaro.org>
- <20210813140111.GG11955@quack2.suse.cz>
- <A72B321A-3952-4C00-B7DB-67954B05B99A@linaro.org>
- <20210823160618.GI21467@quack2.suse.cz>
- <20210825164301.GB14270@quack2.suse.cz>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Thu, 26 Aug 2021 09:13:02 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 38A931FD3F;
+        Thu, 26 Aug 2021 13:12:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1629983534; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yDDVzWBIyA6YbwDsNboXLU1D63o94APUAg+7fxjXrqw=;
+        b=VAOrEfSZ5nMlMZoT/Qz9t7idhIUjt4cLZY8SfRvhsPnZTAhFV9+EP0/MZ+H8rmA7OftVbg
+        6vfwMGGbezOhvVj5sjYrW60KgbsxYRIcqDysh5haTXPn7fHQOretWUo0EIChjlBuNU3aNY
+        CNi5tkMwK/fhXl51m7AXITTZRL3Vits=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 1E74A132FD;
+        Thu, 26 Aug 2021 13:12:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id FGlkBi6TJ2GMTwAAGKfGzw
+        (envelope-from <mkoutny@suse.com>); Thu, 26 Aug 2021 13:12:14 +0000
+Date:   Thu, 26 Aug 2021 15:12:12 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org
+Subject: Re: BFQ cgroup weights range
+Message-ID: <20210826131212.GE4520@blackbody.suse.cz>
+References: <20210824105626.GA11367@blackbody.suse.cz>
+ <EC36D67F-D7CC-4059-8D3B-E0E64DFC3ADB@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <EC36D67F-D7CC-4059-8D3B-E0E64DFC3ADB@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Aug 24, 2021 at 02:51:47PM +0200, Paolo Valente <paolo.valente@linaro.org> wrote:
+> BFQ inherited these constants when we forked it from CFQ.  I'm ok with
+> increasing max weight to 10000.  I only wonder whether this would
+> break some configuration, as the currently maximum weight would not be
+> the maximum weight any longer.
 
+Thanks for the reply. Let me form the idea as a patch (and commit
+message) and discuss based on that if needed (+ccrosspost into cgroups
+ML).
 
-> Il giorno 25 ago 2021, alle ore 18:43, Jan Kara <jack@suse.cz> ha =
-scritto:
->=20
-> On Mon 23-08-21 18:06:18, Jan Kara wrote:
->> On Mon 23-08-21 15:58:25, Paolo Valente wrote:
->>>> Currently I'm running wider set of benchmarks for the patches to =
-see
->>>> whether I didn't regress anything else. If not, I'll post the =
-patches to
->>>> the list.
->>>=20
->>> Any news?
->>=20
->> It took a while for all those benchmarks to run. Overall results look =
-sane,
->> I'm just verifying by hand now whether some of the localized =
-regressions
->> (usually specific to a particular fs+machine config) are due to a =
-measurement
->> noise or real regressions...
->=20
-> OK, so after some manual analysis I've found out that dbench indeed =
-becomes
-> more noisy with my changes for high numbers of processes. I'm leaving =
-for
-> vacation soon so I will not be probably able to debug it before I =
-leave but
-> let me ask you one thing: The problematic change seems to be mostly a
-> revert of 7cc4ffc55564 ("block, bfq: put reqs of waker and woken in
-> dispatch list") and I'm currently puzzled why it has such an effect. =
-What
-> I've found out is that 7cc4ffc55564 results in IO of higher priority
-> process being injected into the time slice of lower priority process =
-and
-> thus there's always only single busy queue (of the lower priority =
-process)
-> and thus higher priority process queue never gets scheduled. As a =
-result
-> higher priority IO always competes with lower priority IO and there's =
-no
-> service differentiation (we get 50/50 split of throughput between the
-> processes despite different IO priorities).
+-- >8 --
+From: Michal Koutný <mkoutny@suse.com>
+Subject: [PATCH] block, bfq: Accept symmetric weight adjustments
 
-I need a little help here.  Since high-priority I/O is immediately
-injected, I wonder why it does not receive all the bandwidth it
-demands.  Maybe, from your analysis, you have an answer.  Perhaps it
-happens because:
-1) high-priority I/O is FIFO-queued with lower-priority I/O in the
-   dispatch list?
-or
-2) immediate injection prevents idling from being performed in favor
-   of high-priority I/O?
+The allowed range for BFQ weights is currently 1..1000 with 100 being
+the default. There is no apparent reason to not accept weight
+adjustments of same ratio on both sides of the default. This change
+makes the attribute domain consistent with other cgroup (v2) knobs with
+the weight semantics.
 
+This extension of the range does not restrict existing configurations
+(quite the opposite). This may affect setups where weights >1000 were
+attempted to be set but failed with the default 100. Such cgroups would
+attain their intended weight now. This is a changed behavior but it
+rectifies the situation (similar intention to the commit 69d7fde5909b
+("blkcg: use CGROUP_WEIGHT_* scale for io.weight on the unified
+hierarchy") for CFQ formerly (and v2 only)).
 
->  And this scenario shows that
-> always injecting IO of waker/wakee isn't desirable, especially in a =
-way as
-> done in 7cc4ffc55564 where injected IO isn't accounted within BFQ at =
-all
-> (which easily allows for service degradation unnoticed by BFQ).
+Additionally, the changed range does not imply all IO workloads can be
+really controlled to achieve the widest possible ratio 1:10^4.
 
-Not sure that accounting would help high-priority I/O in your scenario.
+Signed-off-by: Michal Koutný <mkoutny@suse.com>
+---
+ Documentation/admin-guide/cgroup-v1/blkio-controller.rst | 2 +-
+ Documentation/block/bfq-iosched.rst                      | 2 +-
+ block/bfq-iosched.h                                      | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
->  That's why
-> I've basically reverted that commit on the ground that on next =
-dispatch we
-> call bfq_select_queue() which will see waker/wakee has IO to do and =
-can
-> decide to inject the IO anyway. We do more CPU work but the IO pattern
-> should be similar. But apparently I was wrong :)
-
-For the pattern to be similar, I guess that, when new high-priority
-I/O arrives, this I/O should preempt lower-priority I/O.
-Unfortunately, this is not always the case, depending on other
-parameters.  Waker/wakee I/O is guaranteed to be injected only when the
-in-service queue has no I/O.
-
-At any rate, probably we can solve this puzzle by just analyzing a
-trace in which you detect a loss of throughput without 7cc4ffc55564.
-The best case would be one with the minimum possible number of
-threads, to get a simpler trace.
-
-> I just wanted to bounce
-> this off of you if you have any suggestion what to look for or any =
-tips
-> regarding why 7cc4ffc55564 apparently achieves much more reliable =
-request
-> injection for dbench.
-
-I hope my considerations above help a little bit.
-
-Thanks,
-Paolo
-
-> 								Honza
-> --=20
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+diff --git a/Documentation/admin-guide/cgroup-v1/blkio-controller.rst b/Documentation/admin-guide/cgroup-v1/blkio-controller.rst
+index 16253eda192e..48559541c9d8 100644
+--- a/Documentation/admin-guide/cgroup-v1/blkio-controller.rst
++++ b/Documentation/admin-guide/cgroup-v1/blkio-controller.rst
+@@ -102,7 +102,7 @@ Proportional weight policy files
+ 	  on all the devices until and unless overridden by per device rule
+ 	  (see `blkio.bfq.weight_device` below).
+ 
+-	  Currently allowed range of weights is from 1 to 1000. For more details,
++	  Currently allowed range of weights is from 1 to 10000. For more details,
+           see Documentation/block/bfq-iosched.rst.
+ 
+   blkio.bfq.weight_device
+diff --git a/Documentation/block/bfq-iosched.rst b/Documentation/block/bfq-iosched.rst
+index df3a8a47f58c..88b5251734ce 100644
+--- a/Documentation/block/bfq-iosched.rst
++++ b/Documentation/block/bfq-iosched.rst
+@@ -560,7 +560,7 @@ For each group, the following parameters can be set:
+ 
+   weight
+         This specifies the default weight for the cgroup inside its parent.
+-        Available values: 1..1000 (default: 100).
++        Available values: 1..10000 (default: 100).
+ 
+         For cgroup v1, it is set by writing the value to `blkio.bfq.weight`.
+ 
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 99c2a3cb081e..786b7f926dd2 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -16,7 +16,7 @@
+ #define BFQ_CL_IDLE_TIMEOUT	(HZ/5)
+ 
+ #define BFQ_MIN_WEIGHT			1
+-#define BFQ_MAX_WEIGHT			1000
++#define BFQ_MAX_WEIGHT			10000
+ #define BFQ_WEIGHT_CONVERSION_COEFF	10
+ 
+ #define BFQ_DEFAULT_QUEUE_IOPRIO	4
+-- 
+2.32.0
 
