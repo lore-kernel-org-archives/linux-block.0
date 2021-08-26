@@ -2,143 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20491C4320E
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 17:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CEEC432BE
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 18:09:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 028F360E75
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 17:51:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18F3E60F4A
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 18:09:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240401AbhHZRvw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Aug 2021 13:51:52 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:51878 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234450AbhHZRvw (ORCPT
+        id S243217AbhHZSK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Aug 2021 14:10:26 -0400
+Received: from mail-pj1-f51.google.com ([209.85.216.51]:39675 "EHLO
+        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243092AbhHZSK0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Aug 2021 13:51:52 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id BAA4D22201;
-        Thu, 26 Aug 2021 17:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1630000263; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hb/qm1jrnqY/KdKwTRoSgfMFLNJXuGtT8ndi41k1R1o=;
-        b=IoLQyDf2AneEHC6W4tovxowAEqgAXFT4yVy0FJFziZeZz/wTlLan/tTgMz6srkTdZlfnZJ
-        KnCe51d0d2pKjpQc20UCRfFf91FHxi2co14ANHLE6QUsbxXJW84+J2eaaw5rM834MsE4EN
-        7mS2oTFkfyYjHXS3E/dUt1WWepv8Sfw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1630000263;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hb/qm1jrnqY/KdKwTRoSgfMFLNJXuGtT8ndi41k1R1o=;
-        b=5YmrnN9wd0oZjE+VBqa7uH85c+YK6Of2l+Avn8sapS5sNwhQvkjHPHoDBT/7nK/RZRbHDr
-        ttkeNa9w4Lk8VbCA==
-Received: from quack2.suse.cz (unknown [10.100.224.230])
-        by relay2.suse.de (Postfix) with ESMTP id A9E09A3B8B;
-        Thu, 26 Aug 2021 17:51:03 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id E8CE31E0BD5; Thu, 26 Aug 2021 19:51:03 +0200 (CEST)
-Date:   Thu, 26 Aug 2021 19:51:03 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Subject: Re: False waker detection in BFQ
-Message-ID: <20210826175103.GA919@quack2.suse.cz>
-References: <20210505162050.GA9615@quack2.suse.cz>
- <FFFA8EE2-3635-4873-9F2C-EC3206CC002B@linaro.org>
- <20210813140111.GG11955@quack2.suse.cz>
- <A72B321A-3952-4C00-B7DB-67954B05B99A@linaro.org>
- <20210823160618.GI21467@quack2.suse.cz>
- <20210825164301.GB14270@quack2.suse.cz>
- <DF2D1482-0CF4-4CDF-B31C-FA3354AC831C@linaro.org>
+        Thu, 26 Aug 2021 14:10:26 -0400
+Received: by mail-pj1-f51.google.com with SMTP id oc2-20020a17090b1c0200b00179e56772d6so7151541pjb.4;
+        Thu, 26 Aug 2021 11:09:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=j0mt7AWcGZvt97QcESxgo4rDmKH0RfGdg9W8LlCYkLQ=;
+        b=BVArMxorTUNQfUowQX36xKsqXt29xYa8KHRwvYfCYrPmJm+X7tg2wcPecmSBGcvKqc
+         tREEZTQAX+JuVaKzOv+LVVVJjRoPcU708CTyWGpFYFHw+ptNL5QM/Al/0h55UaKbsN8k
+         H0M6AaNk1x0IAnK0TZiOoYf9JoaEig/ZV9/hyXdUOY/+LreSbvlbL+PLhk9v4kj31Z2b
+         2ZocViT66GH56sPxNF8VxyVpHe/WlIXE492qvu0vvcD1XZfFqyyvC3shWC7ipkA85Ymk
+         cS1OzMHz3kHrW8NhS+P+ADvl222kdWyFdFLbxqD2RH/IE5amEdGPUGGvgmhtCwlzhiaR
+         HImA==
+X-Gm-Message-State: AOAM531MkX6v0GO/W63YTNzcYd8UHnJOjK6TzK1iPD6/TmFhE34okBES
+        ySBXgAZgVFR0QrsuQEAiLmE=
+X-Google-Smtp-Source: ABdhPJwsw62jBWgm4+d4gnDL12k+csfjNX1WJnG8wU7slFky9TJwv1DrkqwtpnkUvjQTbJH7GVhFeg==
+X-Received: by 2002:a17:90a:a404:: with SMTP id y4mr5929010pjp.52.1630001378136;
+        Thu, 26 Aug 2021 11:09:38 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:22e3:6079:e5ce:5e45? ([2601:647:4000:d7:22e3:6079:e5ce:5e45])
+        by smtp.gmail.com with ESMTPSA id nk17sm3539792pjb.18.2021.08.26.11.09.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Aug 2021 11:09:37 -0700 (PDT)
+Subject: Re: [PATCH] block/mq-deadline: Speed up the dispatch of low-priority
+ requests
+To:     Zhen Lei <thunder.leizhen@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>
+References: <20210826144039.2143-1-thunder.leizhen@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <fc1f2664-fc4f-7b3e-5542-d9e4800a5bde@acm.org>
+Date:   Thu, 26 Aug 2021 11:09:35 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DF2D1482-0CF4-4CDF-B31C-FA3354AC831C@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210826144039.2143-1-thunder.leizhen@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 26-08-21 11:45:17, Paolo Valente wrote:
-> 
-> 
-> > Il giorno 25 ago 2021, alle ore 18:43, Jan Kara <jack@suse.cz> ha scritto:
-> > 
-> > On Mon 23-08-21 18:06:18, Jan Kara wrote:
-> >> On Mon 23-08-21 15:58:25, Paolo Valente wrote:
-> >>>> Currently I'm running wider set of benchmarks for the patches to see
-> >>>> whether I didn't regress anything else. If not, I'll post the patches to
-> >>>> the list.
-> >>> 
-> >>> Any news?
-> >> 
-> >> It took a while for all those benchmarks to run. Overall results look sane,
-> >> I'm just verifying by hand now whether some of the localized regressions
-> >> (usually specific to a particular fs+machine config) are due to a measurement
-> >> noise or real regressions...
-> > 
-> > OK, so after some manual analysis I've found out that dbench indeed becomes
-> > more noisy with my changes for high numbers of processes. I'm leaving for
-> > vacation soon so I will not be probably able to debug it before I leave but
-> > let me ask you one thing: The problematic change seems to be mostly a
-> > revert of 7cc4ffc55564 ("block, bfq: put reqs of waker and woken in
-> > dispatch list") and I'm currently puzzled why it has such an effect. What
-> > I've found out is that 7cc4ffc55564 results in IO of higher priority
-> > process being injected into the time slice of lower priority process and
-> > thus there's always only single busy queue (of the lower priority process)
-> > and thus higher priority process queue never gets scheduled. As a result
-> > higher priority IO always competes with lower priority IO and there's no
-> > service differentiation (we get 50/50 split of throughput between the
-> > processes despite different IO priorities).
-> 
-> I need a little help here.  Since high-priority I/O is immediately
-> injected, I wonder why it does not receive all the bandwidth it
-> demands.  Maybe, from your analysis, you have an answer.  Perhaps it
-> happens because:
-> 1) high-priority I/O is FIFO-queued with lower-priority I/O in the
->    dispatch list?
+On 8/26/21 7:40 AM, Zhen Lei wrote:
+> lock protection needs to be added only in
+> dd_finish_request(), which is unlikely to cause significant performance
+> side effects.
 
-Yes, this is the case.
+Not sure the above is correct. Every new atomic instruction has a measurable
+performance overhead. But I guess in this case that overhead is smaller than
+the time needed to sum 128 per-CPU variables.
 
-> >  And this scenario shows that
-> > always injecting IO of waker/wakee isn't desirable, especially in a way as
-> > done in 7cc4ffc55564 where injected IO isn't accounted within BFQ at all
-> > (which easily allows for service degradation unnoticed by BFQ).
+> Tested on my 128-core board with two ssd disks.
+> fio bs=4k rw=read iodepth=128 cpus_allowed=0-95 <others>
+> Before:
+> [183K/0/0 iops]
+> [172K/0/0 iops]
 > 
-> Not sure that accounting would help high-priority I/O in your scenario.
+> After:
+> [258K/0/0 iops]
+> [258K/0/0 iops]
 
-It did help noticeably. Because then both high and low priority bfq queues
-become busy so bfq_select_queue() sees both queues and schedules higher
-priority queue.
+Nice work!
 
-> >  That's why
-> > I've basically reverted that commit on the ground that on next dispatch we
-> > call bfq_select_queue() which will see waker/wakee has IO to do and can
-> > decide to inject the IO anyway. We do more CPU work but the IO pattern
-> > should be similar. But apparently I was wrong :)
-> 
-> For the pattern to be similar, I guess that, when new high-priority
-> I/O arrives, this I/O should preempt lower-priority I/O.
-> Unfortunately, this is not always the case, depending on other
-> parameters.  Waker/wakee I/O is guaranteed to be injected only when the
-> in-service queue has no I/O.
-> 
-> At any rate, probably we can solve this puzzle by just analyzing a
-> trace in which you detect a loss of throughput without 7cc4ffc55564.
-> The best case would be one with the minimum possible number of
-> threads, to get a simpler trace.
+> Fixes: fb926032b320 ("block/mq-deadline: Prioritize high-priority requests")
 
-Yeah, OK, I'll gather the trace once I return from vacation and look into
-it. Thanks for help!
+Shouldn't the Fixes: tag be used only for patches that modify functionality?
+I'm not sure it is appropriate to use this tag for performance improvements.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>  struct deadline_data {
+> @@ -277,9 +278,9 @@ deadline_move_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>  }
+>  
+>  /* Number of requests queued for a given priority level. */
+> -static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
+> +static __always_inline u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
+>  {
+> -	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);
+> +	return dd->per_prio[prio].nr_queued;
+>  }
+
+Please leave out "__always_inline". Modern compilers are smart enough to
+inline this function without using the "inline" keyword.
+
+> @@ -711,6 +712,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  
+>  	prio = ioprio_class_to_prio[ioprio_class];
+>  	dd_count(dd, inserted, prio);
+> +	per_prio = &dd->per_prio[prio];
+> +	per_prio->nr_queued++;
+>  
+>  	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
+>  		blk_mq_free_requests(&free);
+
+I think the above is wrong - nr_queued should not be incremented if the
+request is merged into another request. Please move the code that increments
+nr_queued past the above if-statement.
+
+Thanks,
+
+Bart.
