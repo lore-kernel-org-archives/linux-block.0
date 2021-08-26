@@ -2,164 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D86C43214
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 07:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBBAC4320A
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 09:16:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3097A61100
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 07:47:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFE386108E
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 09:16:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240109AbhHZHrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Aug 2021 03:47:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50876 "EHLO
+        id S240953AbhHZJRK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Aug 2021 05:17:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240023AbhHZHrr (ORCPT
+        with ESMTP id S240933AbhHZJRI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Aug 2021 03:47:47 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA449C061757;
-        Thu, 26 Aug 2021 00:46:59 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id o10so4815798lfr.11;
-        Thu, 26 Aug 2021 00:46:59 -0700 (PDT)
+        Thu, 26 Aug 2021 05:17:08 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E7A7C0617AE
+        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 02:16:21 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id h9so4778446ejs.4
+        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 02:16:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WFfBSeUoIkVFq2c+wyysTynFg5YjCpP2+vF7k66ApRg=;
-        b=uyQzTrBldhPBh5nnQ72jaL9ktwnDpjD+4r8yAyDP7End8hK4tImCX0vowpGHE7hmLS
-         8izi65eqLg79JdYWSVhXIsX+BCZfavs+2RzUBWIrPpKo0Op9znWybT+xFyfGrOzNy8m/
-         e2jotR+rDmbQ7VRtpLgSYvBI27SHetTz8WHtP8fmLYjEIooMCsXjvYsfy64tH6oChXA/
-         wXochubuastNo9MazCpWht5fF4C5FhRNPgBm0M9HSKDpjkoh9vsRCZ5UPxq/aJy0NheJ
-         TK4XrpeBYwfk9KSL5aW8NGnWHFvupKUfr0mRT1s83xaNu35b+c2Ni4GeM4IJe36Ichhv
-         Clhw==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=90TIyffent6yuxV6QDlLnnHkqBnMdkJ8+S8MmEfNLOU=;
+        b=xdP1R9EOVxkWxskVHUZ/6xAsVNeqvfrL6EWPaBrwt0zzv1x7+KpvYWzehCoPPZgqmv
+         fis70gWGZZVTCglX8vYu45fR+FRrWqVn1xDuPSTkUie1I9xx/01IfCkzgxI1bO0nRhva
+         OCjfC3+aOK+hJnZ+D0+hCwZCgnpseKwvRoexv/yToXVSTAZjtrXR5AF97Txz82oTDLI+
+         Ch8YrZeU0oZOCfURGJhBOzyICWdt5Ax7/LFrUfsxIuLQp1D6CZs9OpXHIGjQmaVxmtjj
+         S8nTPtniHdJdSzFGvuy4xK2V4y4Dxl0DHb7kXF7Tq7CcWIITQozNispEw75MHmPAMlF5
+         ujCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WFfBSeUoIkVFq2c+wyysTynFg5YjCpP2+vF7k66ApRg=;
-        b=dUh8LO9bM3+oniQWD4dJGObmSUsC2jgy9Qfgefi6F0+LfFQZ/9BNzk2NuAToxjl+pu
-         iBjsm5GPuNTAX9876yL0tojLWjUWUzoZcDjmm7VbLFziRLHCArckiAtBG4VmMvBG03xU
-         dJZw+Uent+Wk1UG8fFTL2fPO1CEjUVLNAJs0JEDM0s2lAtcL/FGEY66w1BbIkgDs81jR
-         1qD3pz4TZuuNTwXql6yLc8YlbKeYHo3SZh8FiybxRfoROOcyaL7aRE9vjkOpl4BlSsT2
-         bwRxJBquMI3CcOgk39/2N2fXdvUKerTOAnbIb7PGLAXAo5bl992W3+lsL34rPV+b16dN
-         LZ0g==
-X-Gm-Message-State: AOAM531s+99oqnXGLoHuyMRncZzZFHFDNkifz4M1l4DtkN1oGPYaa6lK
-        JPC5h0XRQarj7ORmZQHB0aKNtJ7VTCS9dyLAa9Y=
-X-Google-Smtp-Source: ABdhPJyjbSulKVzeS1ayorUS6e0PDTdjH/3YKsApr3OabyEwjGfG27IO4vB7ZiqR7/y8lcLFPtK9qboXnc4pB3rdlck=
-X-Received: by 2002:a05:6512:1114:: with SMTP id l20mr1781869lfg.550.1629964017693;
- Thu, 26 Aug 2021 00:46:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210817101423.12367-1-selvakuma.s1@samsung.com>
- <CGME20210817101758epcas5p1ec353b3838d64654e69488229256d9eb@epcas5p1.samsung.com>
- <20210817101423.12367-4-selvakuma.s1@samsung.com> <ad3561b9-775d-dd4d-0d92-6343440b1f8f@acm.org>
- <CA+1E3rK2ULVajQRkNTZJdwKoqBeGvkfoVYNF=WyK6Net85YkhA@mail.gmail.com> <fb9931ae-de27-820a-1333-f24e020913ff@acm.org>
-In-Reply-To: <fb9931ae-de27-820a-1333-f24e020913ff@acm.org>
-From:   Nitesh Shetty <nitheshshetty@gmail.com>
-Date:   Thu, 26 Aug 2021 13:16:46 +0530
-Message-ID: <CAOSviJ1uQo=O8trN71t5p+qYU8GRgGerSvkE9y5tDR+4pM4f1g@mail.gmail.com>
-Subject: Re: [PATCH 3/7] block: copy offload support infrastructure
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Kanchan Joshi <joshiiitr@gmail.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, kch@kernel.org,
-        mpatocka@redhat.com, "Darrick J. Wong" <djwong@kernel.org>,
-        agk@redhat.com, Selva Jove <selvajove@gmail.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        KANCHAN JOSHI <joshi.k@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=90TIyffent6yuxV6QDlLnnHkqBnMdkJ8+S8MmEfNLOU=;
+        b=ulPxmsOVVKE2NUnBOzYkw983Dj+y3Hlbwmov4E+muCTnalynuaFO4FEjUuKUoAtDVb
+         UaXis/OqCSqJ5rcsGv1IWKjlnRVqFPwp9kIY25QsayH9FjZqeeLLVkbQeyDe+nBWQQxA
+         lpfO3IIumZ6oYWCZmzrCUZxXbhLvdAQl0mGr82Mk87mXfmdgadkbd3dtAbZ8hn9lTpCf
+         ynz65+eHChOpydAaxDMCt1f3wEGNd/5ayW/yJlWvH84sdKQUay0nv0qahFFl+otCESdS
+         1WXBGUiKRtsKfifAZF0/FaYcNFuAJgzegcwveKapIvId5DW0FJF+rE3VQmo/iUXN0fuy
+         pciw==
+X-Gm-Message-State: AOAM532fJB0jeNUDqWKEvMRnpd8404KAk7tLc1496xwf01GgPEYP2mZ9
+        PxFfg23EPDh9MDayrQVchtnjiIwg2yuy5w==
+X-Google-Smtp-Source: ABdhPJylWjVA4kpr0V8eWdrrFPQWt78ndRnXS0UO2Dwe8Y60vHYtCBMJCMP55/DytJUDSf5SO8vR1Q==
+X-Received: by 2002:a17:906:b4d:: with SMTP id v13mr3242614ejg.468.1629969379325;
+        Thu, 26 Aug 2021 02:16:19 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id ca4sm1058557ejb.1.2021.08.26.02.16.18
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 26 Aug 2021 02:16:18 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH BUGFIX 1/1] block, bfq: honor already-setup queue merges
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20210802141352.74353-2-paolo.valente@linaro.org>
+Date:   Thu, 26 Aug 2021 11:16:17 +0200
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        davidezini2@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <3BDD27BD-F49B-43B6-B41D-F7534B596A9A@linaro.org>
+References: <20210802141352.74353-1-paolo.valente@linaro.org>
+ <20210802141352.74353-2-paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bart,Mikulas,Martin,Douglas,
 
-We will go through your previous work and use this thread as a medium for
-further discussion, if we come across issues to be sorted out.
 
-Thank you,
-Nitesh Shetty
+> Il giorno 2 ago 2021, alle ore 16:13, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+> The function bfq_setup_merge prepares the merging between two
+> bfq_queues, say bfqq and new_bfqq. To this goal, it assigns
+> bfqq->new_bfqq =3D new_bfqq. Then, each time some I/O for bfqq =
+arrives,
+> the process that generated that I/O is disassociated from bfqq and
+> associated with new_bfqq (merging is actually a redirection). In this
+> respect, bfq_setup_merge increases new_bfqq->ref in advance, adding
+> the number of processes that are expected to be associated with
+> new_bfqq.
+>=20
+> Unfortunately, the stable-merging mechanism interferes with this
+> setup. After bfqq->new_bfqq has been set by bfq_setup_merge, and
+> before all the expected processes have been associated with
+> bfqq->new_bfqq, bfqq may happen to be stably merged with a different
+> queue than the current bfqq->new_bfqq. In this case, bfqq->new_bfqq
+> gets changed. So, some of the processes that have been already
+> accounted for in the ref counter of the previous new_bfqq will not be
+> associated with that queue.  This creates an unbalance, because those
+> references will never be decremented.
+>=20
+> This commit fixes this issue by reestablishing the previous, natural
+> behaviour: once bfqq->new_bfqq has been set, it will not be changed
+> until all expected redirections have occurred.
+>=20
 
-On Sat, Aug 21, 2021 at 2:48 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 8/20/21 3:39 AM, Kanchan Joshi wrote:
-> > Bart, Mikulas
-> >
-> > On Tue, Aug 17, 2021 at 10:44 PM Bart Van Assche <bvanassche@acm.org> wrote:
-> >>
-> >> On 8/17/21 3:14 AM, SelvaKumar S wrote:
-> >>> Introduce REQ_OP_COPY, a no-merge copy offload operation. Create
-> >>> bio with control information as payload and submit to the device.
-> >>> Larger copy operation may be divided if necessary by looking at device
-> >>> limits. REQ_OP_COPY(19) is a write op and takes zone_write_lock when
-> >>> submitted to zoned device.
-> >>> Native copy offload is not supported for stacked devices.
-> >>
-> >> Using a single operation for copy-offloading instead of separate
-> >> operations for reading and writing is fundamentally incompatible with
-> >> the device mapper. I think we need a copy-offloading implementation that
-> >> is compatible with the device mapper.
-> >>
-> >
-> > While each read/write command is for a single contiguous range of
-> > device, with simple-copy we get to operate on multiple discontiguous
-> > ranges, with a single command.
-> > That seemed like a good opportunity to reduce control-plane traffic
-> > (compared to read/write operations) as well.
-> >
-> > With a separate read-and-write bio approach, each source-range will
-> > spawn at least one read, one write and eventually one SCC command. And
-> > it only gets worse as there could be many such discontiguous ranges (for
-> > GC use-case at least) coming from user-space in a single payload.
-> > Overall sequence will be
-> > - Receive a payload from user-space
-> > - Disassemble into many read-write pair bios at block-layer
-> > - Assemble those (somehow) in NVMe to reduce simple-copy commands
-> > - Send commands to device
-> >
-> > We thought payload could be a good way to reduce the
-> > disassembly/assembly work and traffic between block-layer to nvme.
-> > How do you see this tradeoff?  What seems necessary for device-mapper
-> > usecase, appears to be a cost when device-mapper isn't used.
-> > Especially for SCC (since copy is within single ns), device-mappers
-> > may not be too compelling anyway.
-> >
-> > Must device-mapper support be a requirement for the initial support atop SCC?
-> > Or do you think it will still be a progress if we finalize the
-> > user-space interface to cover all that is foreseeable.And for
-> > device-mapper compatible transport between block-layer and NVMe - we
-> > do it in the later stage when NVMe too comes up with better copy
-> > capabilities?
->
-> Hi Kanchan,
->
-> These days there might be more systems that run the device mapper on top
-> of the NVMe driver or a SCSI driver than systems that do use the device
-> mapper. It is common practice these days to use dm-crypt on personal
-> workstations and laptops. LVM (dm-linear) is popular because it is more
-> flexible than a traditional partition table. Android phones use
-> dm-verity on top of hardware encryption. In other words, not supporting
-> the device mapper means that a very large number of use cases is
-> excluded. So I think supporting the device mapper from the start is
-> important, even if that means combining individual bios at the bottom of
-> the storage stack into simple copy commands.
->
-> Thanks,
->
-> Bart.
->
+Hi Jens,
+did you have time to look at this fix?
+
+Thanks,
+Paolo
+
+
+> Signed-off-by: Davide Zini <davidezini2@gmail.com>
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+> ---
+> block/bfq-iosched.c | 16 +++++++++++++---
+> 1 file changed, 13 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 727955918563..08d9122dd4c0 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -2659,6 +2659,15 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct =
+bfq_queue *new_bfqq)
+> 	 * are likely to increase the throughput.
+> 	 */
+> 	bfqq->new_bfqq =3D new_bfqq;
+> +	/*
+> +	 * The above assignment schedules the following redirections:
+> +	 * each time some I/O for bfqq arrives, the process that
+> +	 * generated that I/O is disassociated from bfqq and
+> +	 * associated with new_bfqq. Here we increases new_bfqq->ref
+> +	 * in advance, adding the number of processes that are
+> +	 * expected to be associated with new_bfqq as they happen to
+> +	 * issue I/O.
+> +	 */
+> 	new_bfqq->ref +=3D process_refs;
+> 	return new_bfqq;
+> }
+> @@ -2721,6 +2730,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, =
+struct bfq_queue *bfqq,
+> {
+> 	struct bfq_queue *in_service_bfqq, *new_bfqq;
+>=20
+> +	/* if a merge has already been setup, then proceed with that =
+first */
+> +	if (bfqq->new_bfqq)
+> +		return bfqq->new_bfqq;
+> +
+> 	/*
+> 	 * Check delayed stable merge for rotational or non-queueing
+> 	 * devs. For this branch to be executed, bfqq must not be
+> @@ -2822,9 +2835,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, =
+struct bfq_queue *bfqq,
+> 	if (bfq_too_late_for_merging(bfqq))
+> 		return NULL;
+>=20
+> -	if (bfqq->new_bfqq)
+> -		return bfqq->new_bfqq;
+> -
+> 	if (!io_struct || unlikely(bfqq =3D=3D &bfqd->oom_bfqq))
+> 		return NULL;
+>=20
+> --=20
+> 2.20.1
+>=20
+
