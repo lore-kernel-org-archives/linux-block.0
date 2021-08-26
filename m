@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F120C432BE
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 13:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD01C432BE
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 13:42:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6391E60F44
-	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 13:41:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCE3060E73
+	for <linux-block@archiver.kernel.org>; Thu, 26 Aug 2021 13:42:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242751AbhHZNmk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Aug 2021 09:42:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49118 "EHLO
+        id S242714AbhHZNnf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Aug 2021 09:43:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242760AbhHZNmj (ORCPT
+        with ESMTP id S242681AbhHZNne (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Aug 2021 09:42:39 -0400
+        Thu, 26 Aug 2021 09:43:34 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079BAC0613D9
-        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 06:41:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB819C0613C1
+        for <linux-block@vger.kernel.org>; Thu, 26 Aug 2021 06:42:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=OtiK5aG5B0h6GUp744XKsyYpxdt0kmLykLnDyPJAboo=; b=wAAnXyn8kYuvH2lDvdxtMnRhZT
-        ze/1aQoxO7oNRp7t16q3UcxAFogBLHOFg9eYoeXuuj9unDtFrG2rqJrXTWpa4D0CFXw9b4G4I+eDB
-        HnPlU7nYOjXKfTmrzKhe34kyIs+LxcKY2IrxakV0QweJyOICa80e8UQ8kKGHAjPqe8o2hYIFMsqGF
-        JbIoqmmPsIOTNMQwr9O5Bf/jtWxvrHRU093/a1pRY98VEv564QRPAlAj0riTup5yJkYf9HGYgT0tD
-        C4ExmITKvWWO7foe/1xSYMXxYe4fQzhWkzmxKRnqeFN4eOo5Qg59lSkQ/DjdBBf0A/+pEUnNJnvPh
-        H5voTLYQ==;
+        bh=l/vvH8ep7Cg6Uc2JSBAfZPqD1n4+BOKWz+reen01+Eg=; b=JnQf/kzv3xyllmaZta0TePoE8R
+        qPWY+ghwODEypcUmCeml9iexAbOTOOsQVHzR6ORSm6rnZR6yvGGs3O4h/pVo6F5RSmziCRm3YMi1/
+        b3bpu5Hm5J8FclhoeDp4NoesRYk5XoPNBI33iqWvv+w6AGEVjvLMOCYwBmQZy85oAQ1uUVADzQL9V
+        DHNjTW+hx0OquYZuTLKoMTW3qRGThYI0G/vts5trZVvU6hVjV73UXh2MJ6s5IqVCFEac9aX1q45BZ
+        QS2MYtIriPAVGb7krmajtObx9mrp5aj+cS5V66sF6/Zh49JZYT8KmSb9hbSU5B9mZZQesjk97/WiH
+        ZhBZxt4g==;
 Received: from [2001:4bb8:193:fd10:d9d9:6c15:481b:99c4] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mJFbG-00DL88-Rg; Thu, 26 Aug 2021 13:39:53 +0000
+        id 1mJFcl-00DLFR-GM; Thu, 26 Aug 2021 13:41:16 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Hillf Danton <hdanton@sina.com>,
@@ -43,9 +43,9 @@ Cc:     Hillf Danton <hdanton@sina.com>,
         Pavel Tatashin <pasha.tatashin@soleen.com>,
         "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
         linux-block@vger.kernel.org
-Subject: [PATCH 1/8] cryptoloop: fix a sparse annotation
-Date:   Thu, 26 Aug 2021 15:38:03 +0200
-Message-Id: <20210826133810.3700-2-hch@lst.de>
+Subject: [PATCH 2/8] loop: remove the unused idx argument to loop_control_get_free
+Date:   Thu, 26 Aug 2021 15:38:04 +0200
+Message-Id: <20210826133810.3700-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210826133810.3700-1-hch@lst.de>
 References: <20210826133810.3700-1-hch@lst.de>
@@ -56,28 +56,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-iv is used as a little endian value, so use a __le32 type for it.  Also
-move the initialization into the declaration to simplify it a bit.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/cryptoloop.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/loop.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
-index 3cabc335ae74..1a65dec47b07 100644
---- a/drivers/block/cryptoloop.c
-+++ b/drivers/block/cryptoloop.c
-@@ -130,8 +130,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index fa1c298a8cfb..35d8b30d1f25 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2466,7 +2466,7 @@ static int loop_control_remove(int idx)
+ 	return ret;
+ }
  
- 	while (size > 0) {
- 		const int sz = min(size, LOOP_IV_SECTOR_SIZE);
--		u32 iv[4] = { 0, };
--		iv[0] = cpu_to_le32(IV & 0xffffffff);
-+		__le32 iv[4] = { cpu_to_le32(IV & 0xffffffff), };
- 
- 		sg_set_page(&sg_in, in_page, sz, in_offs);
- 		sg_set_page(&sg_out, out_page, sz, out_offs);
+-static int loop_control_get_free(int idx)
++static int loop_control_get_free(void)
+ {
+ 	struct loop_device *lo;
+ 	int id, ret;
+@@ -2494,7 +2494,7 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 	case LOOP_CTL_REMOVE:
+ 		return loop_control_remove(parm);
+ 	case LOOP_CTL_GET_FREE:
+-		return loop_control_get_free(parm);
++		return loop_control_get_free();
+ 	default:
+ 		return -ENOSYS;
+ 	}
 -- 
 2.30.2
 
