@@ -2,83 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3B9C43214
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 20:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A74DC432BE
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 22:31:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0112060F92
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 20:29:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F4E460FD8
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 22:31:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231526AbhH0UaZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 16:30:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41968 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230171AbhH0UaZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 16:30:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 977CB60FD8;
-        Fri, 27 Aug 2021 20:29:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630096176;
-        bh=88bih5eGKB9i2ESLsafMWzYIwyGke7MVW8Rm8LZaCJM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VqgAkXLSFQ2s8YBhV0/BkRbyvjYS7iN8wS3+vPnrfYwjeVZbT3EcOkpsbz+6iOIIg
-         K59JPqJADG5mnk2BZMwXfm+2K/QX3GabYmGmJMq75CAhfxkg4e7sYb4W90iqXt4wjY
-         CCBcmFMkK/fitfaaSpE06RYuhbvQkR1xSjgZLyqV+ldHSk85VfL/sYK3yuWYBDlle0
-         4C9yBY22Kb164kHW1308QMn1cbMYjo7ekT+NZW9nIbbZyeN7dvOl3QZ8uGzlQBiwYO
-         xvNRlNxn6B/Q+DSji3QgnHGBcKriUM+BPc6qVP1hIdIo6lvljcLrqIlc4i6mgmBrgk
-         KvuManA4RC1Fw==
-Date:   Fri, 27 Aug 2021 13:29:32 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, colyli@suse.de, kent.overstreet@gmail.com,
-        sagi@grimberg.me, vishal.l.verma@intel.com,
-        dan.j.williams@intel.com, dave.jiang@intel.com,
-        ira.weiny@intel.com, konrad.wilk@oracle.com, roger.pau@citrix.com,
-        boris.ostrovsky@oracle.com, jgross@suse.com,
-        sstabellini@kernel.org, minchan@kernel.org, ngupta@vflare.org,
-        senozhatsky@chromium.org, xen-devel@lists.xenproject.org,
-        nvdimm@lists.linux.dev, linux-nvme@lists.infradead.org,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/10] nvme-multipath: add error handling support for
- add_disk()
-Message-ID: <20210827202932.GA82376@dhcp-10-100-145-180.wdc.com>
-References: <20210827191809.3118103-1-mcgrof@kernel.org>
- <20210827191809.3118103-4-mcgrof@kernel.org>
+        id S232135AbhH0Wcd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 18:32:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46836 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232094AbhH0Wcd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Aug 2021 18:32:33 -0400
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10769C0613D9
+        for <linux-block@vger.kernel.org>; Fri, 27 Aug 2021 15:31:44 -0700 (PDT)
+Received: by mail-io1-xd2d.google.com with SMTP id f6so10724271iox.0
+        for <linux-block@vger.kernel.org>; Fri, 27 Aug 2021 15:31:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=yk5Ji43ngXbbo8J/72kK78Lyb5MNvCAGNnbB0kan7nE=;
+        b=Mi1g+8yo/1abXg+I5TMf1VtjbBymdZujyL82lEkaDDLDzdpHa1Vem6EzYEDnrQbgbe
+         Vu6p3zmFgs+MoZ1F/Ys490R36YcqOfNKWRauXKrV8L0T794UC5iYx1iRjZgdCC+8VuQ3
+         9OYiv8ADHwMYI0HdgFJpXU9OstgvdByNyVYqr5taEbju2HtoFpgaSW3D3/5kZqf4ARjy
+         Hh7p5Hr0iVAgqkvg/7uorK3lcoPjcGknhXpN4hssfh+SsEiuCNyFEw25Ib3IBCw6u3vt
+         bS2HUaoqneB7YfDZ9lre3PZrR8TPVKPFApBwXujx4wKZl/hi9RuMeemENqGKNBY5s26d
+         eIgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=yk5Ji43ngXbbo8J/72kK78Lyb5MNvCAGNnbB0kan7nE=;
+        b=ADKTT+poN9JegJTl7Vy6q1r5zAf0m3N+QPcOx0tmbpyttAbC0diWouaHSM0jb4sB/z
+         m0ZFazQexzDco7u2ibz7PtCC6PjUxlnF83v1GGC1RZf/Z7NkUdEz9mKyt5TuLBkyZti3
+         0JfZDjy6PulrfO5ifBuZwhtp2z2aGJoBmXcKQ1GdMdmv7px4xLnEStcJFbscaToxxGs6
+         eue0QjdNhbHZ4g/TU14XIqqfhF/1zFudigRrHLUC9NOi8/9NpbGf1VcoRzO+bgN+/AGH
+         7wTox/gZsTy2OHBjIIawe0tyJt7AtKhDS9WKvbpr4YUkqMR1aMjFNXL72pHwDrMxYP6Z
+         9x7Q==
+X-Gm-Message-State: AOAM530nIiW2hGEKa77oHKDVqmYLvEHJ6RhJ8zJ58mM9oTysuSWMBJ1b
+        P022tMNj+ocS9NtDwBs9aggKDnotB696mA==
+X-Google-Smtp-Source: ABdhPJy9UeqQIzGx4j2YnWAe+sfTMvLKgyaQhgNqBuivN+SsJaDD9zku4y565EzjsgX7llmBdqM5vg==
+X-Received: by 2002:a6b:fb03:: with SMTP id h3mr9149459iog.198.1630103503268;
+        Fri, 27 Aug 2021 15:31:43 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id t15sm4078539ilq.88.2021.08.27.15.31.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Aug 2021 15:31:42 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.14-final
+Message-ID: <2d7d0f57-b8f4-cd34-4034-25b9047652fa@kernel.dk>
+Date:   Fri, 27 Aug 2021 16:31:42 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210827191809.3118103-4-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 12:18:02PM -0700, Luis Chamberlain wrote:
-> @@ -479,13 +479,17 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
->  static void nvme_mpath_set_live(struct nvme_ns *ns)
->  {
->  	struct nvme_ns_head *head = ns->head;
-> +	int rc;
->  
->  	if (!head->disk)
->  		return;
->  
-> -	if (!test_and_set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
-> -		device_add_disk(&head->subsys->dev, head->disk,
-> -				nvme_ns_id_attr_groups);
-> +	if (!test_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
+Hi Linus,
 
-This should still be test_and_set_bit() because it is protecting against
-two nvme paths simultaneously calling device_add_disk() on the same
-namespace head.
+- Revert the mq-deadline priority handling, it's causing serious
+  performance regressions. While experimental patches exists to fix this
+  up, it's too late to do so now. Revert it and re-do it properly for
+  5.15 instead.
 
-> +		rc = device_add_disk(&head->subsys->dev, head->disk,
-> +				     nvme_ns_id_attr_groups);
-> +		if (rc)
-> +			return;
-> +		set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags);
->  		nvme_add_ns_head_cdev(head);
->  	}
+- Fix a NULL vs IS_ERR() regression in this release (Dan)
+
+- Fix a mq-deadline accounting regression in this release (Bart)
+
+- Mark cryptoloop as deprecated. It's broken and dm-crypt fully supports
+  it, and it's actively intefering with loop. Plan on removal for 5.16.
+  (Christoph)
+
+Please pull!
+
+
+The following changes since commit a9ed27a764156929efe714033edb3e9023c5f321:
+
+  blk-mq: fix is_flush_rq (2021-08-17 20:17:34 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.14-2021-08-27
+
+for you to fetch changes up to 222013f9ac30b9cec44301daa8dbd0aae38abffb:
+
+  cryptoloop: add a deprecation warning (2021-08-27 10:44:54 -0600)
+
+----------------------------------------------------------------
+block-5.14-2021-08-27
+
+----------------------------------------------------------------
+Bart Van Assche (1):
+      mq-deadline: Fix request accounting
+
+Christoph Hellwig (1):
+      cryptoloop: add a deprecation warning
+
+Dan Carpenter (1):
+      pd: fix a NULL vs IS_ERR() check
+
+Jens Axboe (1):
+      Revert "block/mq-deadline: Prioritize high-priority requests"
+
+ block/mq-deadline.c        | 58 +++++++++++++---------------------------------
+ drivers/block/Kconfig      |  4 ++--
+ drivers/block/cryptoloop.c |  2 ++
+ drivers/block/paride/pd.c  |  2 +-
+ 4 files changed, 21 insertions(+), 45 deletions(-)
+
+-- 
+Jens Axboe
+
