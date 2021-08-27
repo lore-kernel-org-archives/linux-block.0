@@ -2,108 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26555C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 11:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5C0C4320A
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 12:06:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0438D60F58
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 11:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73EAE60FE7
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 12:06:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235295AbhH0LeV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 07:34:21 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:60871 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233296AbhH0LeT (ORCPT
+        id S245084AbhH0MHj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 08:07:39 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3695 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231191AbhH0MHj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 07:34:19 -0400
-Received: from fsav120.sakura.ne.jp (fsav120.sakura.ne.jp [27.133.134.247])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17RBXBbw099775;
-        Fri, 27 Aug 2021 20:33:11 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav120.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp);
- Fri, 27 Aug 2021 20:33:11 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17RBXBOW099772
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 27 Aug 2021 20:33:11 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH 5/8] loop: merge the cryptoloop module into the main loop
- module
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Milan Broz <gmazyland@gmail.com>
-Cc:     Hillf Danton <hdanton@sina.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
-        linux-block@vger.kernel.org
-References: <20210826133810.3700-1-hch@lst.de>
- <20210826133810.3700-6-hch@lst.de>
- <977860f6-efc4-a55e-50e3-c5204fc762c5@gmail.com>
- <20210826163422.GA28718@lst.de>
- <ebfe4404-e251-ec0d-e46d-0a02b031bcb2@gmail.com>
- <20210827064505.GA23147@lst.de>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <3a2fcf7b-f5d6-bb12-65c7-c2ebc5975383@i-love.sakura.ne.jp>
-Date:   Fri, 27 Aug 2021 20:33:10 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Fri, 27 Aug 2021 08:07:39 -0400
+Received: from fraeml702-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Gwz1l2PBKz67dBP;
+        Fri, 27 Aug 2021 20:05:31 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml702-chm.china.huawei.com (10.206.15.51) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Fri, 27 Aug 2021 14:06:48 +0200
+Received: from localhost.localdomain (10.69.192.58) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Fri, 27 Aug 2021 13:06:46 +0100
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <ming.lei@redhat.com>, <linux-scsi@vger.kernel.org>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH v3 00/13] blk-mq: Reduce static requests memory footprint for shared sbitmap
+Date:   Fri, 27 Aug 2021 20:01:51 +0800
+Message-ID: <1630065724-69146-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210827064505.GA23147@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/08/27 15:45, Christoph Hellwig wrote:
-> On Thu, Aug 26, 2021 at 06:44:32PM +0200, Milan Broz wrote:
->> Yes, I know that removal is far disturbing thing here, if it
->> can be planned for removal later, I think it is the best thing to do...
->>
->> And I would like to know actually if there are existing users
->> (and how and why they are using this interface - it cannot be configured
->> through losetup for years IIRC).
-> 
-> We could just try to drop it entirely and see if anyone screams.  You
-> are probably right that no one will.
-> 
+Currently a full set of static requests are allocated per hw queue per
+tagset when shared sbitmap is used.
 
-I recommend that we only add a patch to deprecate cryptoloop module with
-a printk() when people actually try to use cryptoloop module, and then
-eventually remove cryptoloop module. But that is absolutely after my patches.
+However, only tagset->queue_depth number of requests may be active at
+any given time. As such, only tagset->queue_depth number of static
+requests are required.
 
-You are repeatedly failing to fix this problem because you are trying to fix
-a different extra thing simply because you don't like the nasty locking interactions.
+The same goes for using an IO scheduler, which allocates a full set of
+static requests per hw queue per request queue.
 
-I posted "[PATCH v5] block: genhd: don't call probe function with major_names_lock held"
-( https://lkml.kernel.org/r/b2af8a5b-3c1b-204e-7f56-bea0b15848d6@i-love.sakura.ne.jp ) for v5.14 (and also stable),
-and "[PATCH] loop: replace loop_ctl_mutex with loop_idr_spinlock"
-( https://lkml.kernel.org/r/2642808b-a7d0-28ff-f288-0f4eabc562f7@i-love.sakura.ne.jp ) for v5.15 (but not stable).
+This series changes shared sbitmap support by using a shared tags per
+tagset and request queue. Ming suggested something along those lines in
+v1 review. But we'll keep name "shared sbitmap" name as it is familiar. In
+using a shared tags, the static rqs also become shared, reducing the
+number of sets of static rqs, reducing memory usage.
 
-Any of your further series that claims to fix this problem is invalid
-until you review and fully understand my patches. You are still missing what
-the loop_ctl_mutex is serializing. The loop_ctl_mutex is used for serializing
-"idr_alloc() + add_disk()" sequence versus "del_gendisk() + idr_remove()"
-sequence.
+Patch "blk-mq: Use shared tags for shared sbitmap support" is a bit big,
+and could potentially be broken down. But then maintaining ability to
+bisect becomes harder and each sub-patch would get more convoluted.
 
-Your assumption in PATCH 7/8 is broken because idr_alloc() will succeed and
-add_disk() will be called as soon as idr_remove() is called, and you wrongly
-assumes that the Lo_deleting state can prevent further lookups. No, idr_remove()
-cannot prevent further "idr_alloc() + add_disk()". In other words, idr_remove()
-must not be called before del_gendisk() completes. That serialization is currently
-handled by the loop_ctl_mutex, and my latter patch safely removes the loop_ctl_mutex
-(at the risk of possibly changing the userspace's behavior; that's why my latter
-patch is not for v5.14 but for v5.15. My former patch is for v5.14 because it has
-no risk of possibly changing the userspace's behavior).
+For megaraid sas driver on my 128-CPU arm64 system with 1x SATA disk, we
+save approx. 300MB(!) [370MB -> 60MB]
 
-Don't try to merge the cryptoloop module into the loop module now; it makes
-backporting the fix difficult. After applying my patches, applying your PATCH 1,2,3/8
-will be OK as a cleanup, and your PATCH 4/8 would be OK given that several weeks
-of testing are done in linux-next tree. But never your PATCH 5,6,7,8/8. You can't
-fix this problem now if you try to do a different thing together.
+Baseline is 1d1cf156dc17 (block/for-5.15/block) sg: pass the device...
+
+Changes since v2:
+- Make blk_mq_clear_rq_mapping() static again
+- Various function renaming for conciseness and consistency
+- Add/refactor alloc/free map and rqs function
+- Drop the new blk_mq_ops init_request method in favour of passing an
+  invalid HW queue index for shared sbitmap
+- Add patch to not clear rq mapping for driver tags
+- Remove blk_mq_init_bitmap_tags()
+- Add some more RB tags (thanks!)
+
+Changes since v1:
+- Switch to use blk_mq_tags for shared sbitmap
+- Add new blk_mq_ops init request callback
+- Add some RB tags (thanks!)
+
+John Garry (13):
+  blk-mq: Change rqs check in blk_mq_free_rqs()
+  block: Rename BLKDEV_MAX_RQ -> BLKDEV_DEFAULT_RQ
+  blk-mq: Relocate shared sbitmap resize in blk_mq_update_nr_requests()
+  blk-mq: Invert check in blk_mq_update_nr_requests()
+  blk-mq-sched: Rename blk_mq_sched_alloc_{tags -> map_and_rqs}()
+  blk-mq-sched: Rename blk_mq_sched_free_{requests -> rqs}()
+  blk-mq: Pass driver tags to blk_mq_clear_rq_mapping()
+  blk-mq: Don't clear driver tags own mapping
+  blk-mq: Add blk_mq_tag_update_sched_shared_sbitmap()
+  blk-mq: Add blk_mq_alloc_map_and_rqs()
+  blk-mq: Refactor and rename blk_mq_free_map_and_{requests->rqs}()
+  blk-mq: Use shared tags for shared sbitmap support
+  blk-mq: Stop using pointers for blk_mq_tags bitmap tags
+
+ block/bfq-iosched.c      |   4 +-
+ block/blk-core.c         |   4 +-
+ block/blk-mq-debugfs.c   |   8 +-
+ block/blk-mq-sched.c     | 116 ++++++++++------------
+ block/blk-mq-sched.h     |   4 +-
+ block/blk-mq-tag.c       | 125 ++++++++---------------
+ block/blk-mq-tag.h       |  14 +--
+ block/blk-mq.c           | 209 +++++++++++++++++++++++----------------
+ block/blk-mq.h           |  18 ++--
+ block/blk.h              |   2 +-
+ block/kyber-iosched.c    |   4 +-
+ block/mq-deadline-main.c |   2 +-
+ drivers/block/rbd.c      |   2 +-
+ include/linux/blk-mq.h   |  15 ++-
+ include/linux/blkdev.h   |   5 +-
+ 15 files changed, 256 insertions(+), 276 deletions(-)
+
+-- 
+2.26.2
+
