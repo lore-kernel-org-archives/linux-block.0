@@ -6,54 +6,55 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52496C4320E
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 15:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24115C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 15:38:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 366D060FD9
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 15:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E443F604D7
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 15:38:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244943AbhH0PfH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 11:35:07 -0400
-Received: from verein.lst.de ([213.95.11.211]:34339 "EHLO verein.lst.de"
+        id S231964AbhH0PjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 11:39:05 -0400
+Received: from verein.lst.de ([213.95.11.211]:34357 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233303AbhH0PfG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 11:35:06 -0400
+        id S231730AbhH0PjE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Aug 2021 11:39:04 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 50F5667373; Fri, 27 Aug 2021 17:34:16 +0200 (CEST)
-Date:   Fri, 27 Aug 2021 17:34:16 +0200
+        id 7988567373; Fri, 27 Aug 2021 17:38:12 +0200 (CEST)
+Date:   Fri, 27 Aug 2021 17:38:11 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Milan Broz <gmazyland@gmail.com>,
         Hillf Danton <hdanton@sina.com>,
         Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: sort out the lock order in the loop driver v2
-Message-ID: <20210827153416.GB20687@lst.de>
-References: <20210826133810.3700-1-hch@lst.de> <b34196f3-c407-1d8a-175c-485c4bf0b5d8@i-love.sakura.ne.jp> <20210827064049.GA23112@lst.de> <67aa49f1-c3d4-205f-fd08-0bc0dbcd3689@i-love.sakura.ne.jp>
+        "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 5/8] loop: merge the cryptoloop module into the main
+ loop module
+Message-ID: <20210827153811.GA21217@lst.de>
+References: <20210826133810.3700-1-hch@lst.de> <20210826133810.3700-6-hch@lst.de> <977860f6-efc4-a55e-50e3-c5204fc762c5@gmail.com> <20210826163422.GA28718@lst.de> <ebfe4404-e251-ec0d-e46d-0a02b031bcb2@gmail.com> <20210827064505.GA23147@lst.de> <3a2fcf7b-f5d6-bb12-65c7-c2ebc5975383@i-love.sakura.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67aa49f1-c3d4-205f-fd08-0bc0dbcd3689@i-love.sakura.ne.jp>
+In-Reply-To: <3a2fcf7b-f5d6-bb12-65c7-c2ebc5975383@i-love.sakura.ne.jp>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 04:46:42PM +0900, Tetsuo Handa wrote:
-> On 2021/08/27 15:40, Christoph Hellwig wrote:
-> > On Fri, Aug 27, 2021 at 09:30:12AM +0900, Tetsuo Handa wrote:
-> >> Again crashed in 3 seconds. We can't accept this series.
-> > 
-> > Would you gladly point to the reproducer?
-> > 
-> 
-> You can reach dashboard at https://syzkaller.appspot.com/bug?extid=$hashid where
-> $hashid is Reporter's mail address <syzbot+$hashid@syzkaller.appspotmail.com> .
-> For this bug report, the dashboard is https://syzkaller.appspot.com/bug?extid=f61766d5763f9e7a118f .
-> Then, please find C repro column within the dashboard page. For this bug report, the C reproducer is
-> https://syzkaller.appspot.com/text?tag=ReproC&x=13d20adc300000 .
+On Fri, Aug 27, 2021 at 08:33:10PM +0900, Tetsuo Handa wrote:
+> I posted "[PATCH v5] block: genhd: don't call probe function with major_names_lock held"
+> ( https://lkml.kernel.org/r/b2af8a5b-3c1b-204e-7f56-bea0b15848d6@i-love.sakura.ne.jp ) for v5.14 (and also stable),
 
-Thank you very much!
+And I've already told you that I think this is going in the wrong direction and
+do not thing it is a good idea.
+
+> and "[PATCH] loop: replace loop_ctl_mutex with loop_idr_spinlock"
+> ( https://lkml.kernel.org/r/2642808b-a7d0-28ff-f288-0f4eabc562f7@i-love.sakura.ne.jp ) for v5.15 (but not stable).
+
+I will review this.
+
+> Don't try to merge the cryptoloop module into the loop module now; it makes
+> backporting the fix difficult.
+
+Which is on the one true, on the other hand simply does not matter.
