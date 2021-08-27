@@ -2,93 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E73A1C4320E
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 07:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4685C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 08:33:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD2A6601FE
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 07:51:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABAA360F92
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 08:33:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244472AbhH0Hv6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 03:51:58 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:42493 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244534AbhH0Hvl (ORCPT
+        id S232688AbhH0Idx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 04:33:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52046 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231824AbhH0Idw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 03:51:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1630050652; x=1661586652;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=KLnIFkGLgwZ03ml7AypC27RGZyBe1s3zdaw+yhWbdmA=;
-  b=IB8Ie+VrDkGHSnGD7cN7Nw+YWDyNOjzNj8dpK5PRUuneeGtUOlnhNAvN
-   f/a4/6nwYWMlWdPqV/DRjgB508U5xnQp7oFqTlyXHQ/1vDlGZWBbTDJK5
-   oB9m0vdhPFOBninz9ETkay1tqIwRJNqjcPZ7hOAGp+UbiI8u7mnV1qJKn
-   qS7Qou1E+5e17FB2SjTJzdlaf6dzWBc8RUBEgf8fJl+ldQljvvrOjIe6/
-   VnJ05tAZW25xcwypp7j40elAeuNUjCsBm9waMWqYHG+rr1shwijIJRJW0
-   dMeN3ZiYRHjnYIoKSDffNkdkhajfBmbecE8HZKvhHBZsDHbY786AAbqjv
-   A==;
-X-IronPort-AV: E=Sophos;i="5.84,356,1620662400"; 
-   d="scan'208";a="183342797"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Aug 2021 15:50:52 +0800
-IronPort-SDR: A6FSCnJb0cgdm2npNxWIHDQbQ+Xt4YEJdGE4/K5bPlwXjpCp8K6LgoZvi0NDlJxvh3WW8snOM9
- s8PGEwTzDrjq6LD8HGWg4SYZwL5E6iYOr91P9VpCjAfiCfBcjiT2wWZalemAuBxrK4amhG68yt
- nttBh2HGatPbpCb1kHUq7PH/iUkgbcwA5rO6pNJk5V7SJYZrZA+DY769VM7Mw3TCg8xDRl+ivp
- pyTa6/268F0pY59rzUDPY8jBHJYSrQpJug51s0zrFDaz7QdnFk6uQYa8mgjpnojLIj0uUUrrri
- 4bX0v2AQiu1rwTJIw4D0JvOA
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2021 00:26:05 -0700
-IronPort-SDR: GH4lzFBNTInV6OQROMZHSVXJnjzOpbAaoVHEkHHead8JnSqBuVKuhw4EVu+ZZOPlwxHcg1UMd5
- zHSMdxF9iAaIiry/vXFAyq5JPwHkeShZe2qVo4/rQJlNndFryZNl01z1j9g3RffjaM9TSuu3z7
- XDXAkAVOzEk2n8Gz9y3DmoVqNfz38Xvr3JgVHv6wx/Nac9Qhrc4Mz+6GdsmQ4GXPLbVH4khqpj
- 6+oXd1gJM5B9v/9eVH5eWCyYm7pAsElB3ZbCIHNh4s5GhYWYUf+MNzjliJhI+1zDMo0KIP+IsO
- h80=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 27 Aug 2021 00:50:52 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Subject: [PATCH v6 5/5] doc: Fix typo in request queue sysfs documentation
-Date:   Fri, 27 Aug 2021 16:50:44 +0900
-Message-Id: <20210827075045.642269-6-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210827075045.642269-1-damien.lemoal@wdc.com>
-References: <20210827075045.642269-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Fri, 27 Aug 2021 04:33:52 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA18C061757
+        for <linux-block@vger.kernel.org>; Fri, 27 Aug 2021 01:33:04 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id u16so9190728wrn.5
+        for <linux-block@vger.kernel.org>; Fri, 27 Aug 2021 01:33:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=VtoCWVqLTV/heRDzLkHFfB6NsN56tLaUOwMyBzk6DsQ=;
+        b=p/XqSfnZUooWAr8lgDeoBRdn3K1+CVOMlLcHv640+uENvSRHmZHL/Jgt4NXBeRRIQU
+         9S6RPb4u0xmPpipOcWiNh7NacH3f3BaGFhl8BBDRVL2cylmQ205R5dzp4/iEci705arm
+         eeXKeDNPCjU/T0lcP0GWvReSEMchHGSqNrjwY3Q5vpumbt1rClmdOUI4ZSdtFPX2aZm1
+         mQdRkS3hP+lKNWwYmOJTM7wLs/I1e1Q3EgJVBWBxRqOIIDDkkKGQsaE5YYf8lSOs9i4a
+         LOSebZMZ+Yylt+8h7WM1IMps85gmmCfO5RAcc2gh3nnfpdPWCNuAGvkDAIBujwTDFrq/
+         38Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=VtoCWVqLTV/heRDzLkHFfB6NsN56tLaUOwMyBzk6DsQ=;
+        b=PrpvfbJpKrE+sGtS+nYBK2kqH8qk1+C+o84KV9NbSQxfGCVRL7dxZTmk0YwFYwZQ1x
+         Xkw60j9bCU3ppuM53KpOaS+3NJVIBNY6IIYoYoEkbseFMLb47cH3gcUqkRVx1XNpxMqf
+         +PAnyRDxevnLbiHQdyzsGNHgx65UYUdkie2kvO+4zO6ISAJhVZqaAxW1Qn8FmQjXCTn6
+         SW7mRmUTTciW57dz+GzG4HLv3zFz+tCKYVZ/pzWZmn/NrQ6QfqP5YVNznDim/SZ7JI6y
+         A9aDFGs9s3Yq9fo1S6Tq98HFeEPNvH0Ztiy9s9vGMmbGK41TLj4fkmjGVT12dJ6DxG/H
+         Z8WA==
+X-Gm-Message-State: AOAM531h7OkLFpC2T9S4BeVTkjWAHEPAI1aVSdQEqKC6ZlA2qA5Vp3qS
+        FZOWaL3UBAFzSQ88LkfBxVuDSg==
+X-Google-Smtp-Source: ABdhPJxVx6afc47YInNnteHGfK0p5HZ4m/TugBVCsf93N3hJ3wlglrcgrmLCRpLOttrbzg2VTuJiIA==
+X-Received: by 2002:adf:d081:: with SMTP id y1mr8969546wrh.148.1630053182963;
+        Fri, 27 Aug 2021 01:33:02 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id h11sm12269724wmc.23.2021.08.27.01.33.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 27 Aug 2021 01:33:02 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: BFQ cgroup weights range
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <YSfOhM9+uJ5/FzY2@mtj.duckdns.org>
+Date:   Fri, 27 Aug 2021 10:33:01 +0200
+Cc:     =?utf-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <72DB38C2-196C-4F55-B1A1-B8EA55667057@linaro.org>
+References: <20210824105626.GA11367@blackbody.suse.cz>
+ <EC36D67F-D7CC-4059-8D3B-E0E64DFC3ADB@linaro.org>
+ <20210826131212.GE4520@blackbody.suse.cz> <YSfOhM9+uJ5/FzY2@mtj.duckdns.org>
+To:     Tejun Heo <tj@kernel.org>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix a typo (are -> as) in the introduction paragraph of
-Documentation/block/queue-sysfs.rst.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- Documentation/block/queue-sysfs.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-index 17eef55434e7..f4cf9e20f878 100644
---- a/Documentation/block/queue-sysfs.rst
-+++ b/Documentation/block/queue-sysfs.rst
-@@ -4,7 +4,7 @@ Queue sysfs files
- 
- This text file will detail the queue files that are located in the sysfs tree
- for each block device. Note that stacked devices typically do not export
--any settings, since their queue merely functions are a remapping target.
-+any settings, since their queue merely functions as a remapping target.
- These files are the ones found in the /sys/block/xxx/queue/ directory.
- 
- Files denoted with a RO postfix are readonly and the RW postfix means
--- 
-2.31.1
+> Il giorno 26 ago 2021, alle ore 19:25, Tejun Heo <tj@kernel.org> ha =
+scritto:
+>=20
+> On Thu, Aug 26, 2021 at 03:12:12PM +0200, Michal Koutn=C3=BD wrote:
+>> On Tue, Aug 24, 2021 at 02:51:47PM +0200, Paolo Valente =
+<paolo.valente@linaro.org> wrote:
+>>> BFQ inherited these constants when we forked it from CFQ.  I'm ok =
+with
+>>> increasing max weight to 10000.  I only wonder whether this would
+>>> break some configuration, as the currently maximum weight would not =
+be
+>>> the maximum weight any longer.
+>>=20
+>> Thanks for the reply. Let me form the idea as a patch (and commit
+>> message) and discuss based on that if needed (+ccrosspost into =
+cgroups
+>> ML).
+>>=20
+>> -- >8 --
+>> From: Michal Koutn=C3=BD <mkoutny@suse.com>
+>> Subject: [PATCH] block, bfq: Accept symmetric weight adjustments
+>>=20
+>> The allowed range for BFQ weights is currently 1..1000 with 100 being
+>> the default. There is no apparent reason to not accept weight
+>> adjustments of same ratio on both sides of the default. This change
+>> makes the attribute domain consistent with other cgroup (v2) knobs =
+with
+>> the weight semantics.
+>>=20
+>> This extension of the range does not restrict existing configurations
+>> (quite the opposite). This may affect setups where weights >1000 were
+>> attempted to be set but failed with the default 100. Such cgroups =
+would
+>> attain their intended weight now. This is a changed behavior but it
+>> rectifies the situation (similar intention to the commit 69d7fde5909b
+>> ("blkcg: use CGROUP_WEIGHT_* scale for io.weight on the unified
+>> hierarchy") for CFQ formerly (and v2 only)).
+>>=20
+>> Additionally, the changed range does not imply all IO workloads can =
+be
+>> really controlled to achieve the widest possible ratio 1:10^4.
+>>=20
+>> Signed-off-by: Michal Koutn=C3=BD <mkoutny@suse.com>
+>=20
+> Looks fine to me.
+>=20
+> Acked-by: Tejun Heo <tj@kernel.org>
+>=20
+
+Acked-by: Paolo Valente <paolo.valente@linaro.org>
+
+Thanks for this improvement,
+Paolo
+
+> Thanks.
+>=20
+> --=20
+> tejun
 
