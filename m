@@ -2,59 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D71C4320A
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 14:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D7FBC432BE
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 14:11:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88B2C60F42
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 14:09:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEF5F60EBD
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 14:10:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236500AbhH0OKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 10:10:39 -0400
-Received: from vps.thesusis.net ([34.202.238.73]:35896 "EHLO vps.thesusis.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231571AbhH0OKj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 10:10:39 -0400
-X-Greylist: delayed 452 seconds by postgrey-1.27 at vger.kernel.org; Fri, 27 Aug 2021 10:10:38 EDT
-Received: by vps.thesusis.net (Postfix, from userid 1000)
-        id DEF3E47FAC; Fri, 27 Aug 2021 10:01:47 -0400 (EDT)
-References: <20210827075045.642269-1-damien.lemoal@wdc.com>
-User-agent: mu4e 1.5.13; emacs 27.1
-From:   Phillip Susi <phill@thesusis.net>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v6 0/5] Initial support for multi-actuator HDDs
-Date:   Fri, 27 Aug 2021 09:58:38 -0400
-In-reply-to: <20210827075045.642269-1-damien.lemoal@wdc.com>
-Message-ID: <874kbbugtw.fsf@vps.thesusis.net>
+        id S238436AbhH0OLr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 10:11:47 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:64421 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232884AbhH0OLn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Aug 2021 10:11:43 -0400
+Received: from fsav113.sakura.ne.jp (fsav113.sakura.ne.jp [27.133.134.240])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17REAr50028366;
+        Fri, 27 Aug 2021 23:10:53 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav113.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp);
+ Fri, 27 Aug 2021 23:10:53 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17REArWV028363
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Fri, 27 Aug 2021 23:10:53 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: sort out the lock order in the loop driver v2
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Milan Broz <gmazyland@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20210826133810.3700-1-hch@lst.de>
+ <20210827130259.2622-1-hdanton@sina.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <3687e469-d9d5-7489-0011-d643ad41cd0f@i-love.sakura.ne.jp>
+Date:   Fri, 27 Aug 2021 23:10:53 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210827130259.2622-1-hdanton@sina.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2021/08/27 22:02, Hillf Danton wrote:
+> This is a known issue [1] and the quick fix is destroy workqueue without
+> holding lo_mutex.
+> 
+> Please post a link to the drivers/block/loop.c you tested, Tetsuo.
+> 
+> [1] https://lore.kernel.org/linux-block/0000000000005b27b805c853007b@google.com/
+> 
 
-Damien Le Moal <damien.lemoal@wdc.com> writes:
-
-> Single LUN multi-actuator hard-disks are cappable to seek and execute
-> multiple commands in parallel. This capability is exposed to the host
-> using the Concurrent Positioning Ranges VPD page (SCSI) and Log (ATA).
-> Each positioning range describes the contiguous set of LBAs that an
-> actuator serves.
-
-Are these ranges exlusive to each actuator or can they overlap?
-
-> This series does not attempt in any way to optimize accesses to
-> multi-actuator devices (e.g. block IO schedulers or filesystems). This
-> initial support only exposes the independent access ranges information
-> to user space through sysfs.
-
-Is the plan to eventually change the IO scheduler to maintain two
-different queues, one for each actuator, and send down commands for two
-different IO streams that the elevator attempts to keep sequential?
-
+Which link? https://lkml.kernel.org/r/2901b9c2-f798-413e-4073-451259718288@i-love.sakura.ne.jp ?
+Too many failures to remember...
