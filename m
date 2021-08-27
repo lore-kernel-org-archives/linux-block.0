@@ -2,59 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24115C432BE
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 15:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8567C432BE
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 16:33:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E443F604D7
-	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 15:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1BF960F25
+	for <linux-block@archiver.kernel.org>; Fri, 27 Aug 2021 16:33:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231964AbhH0PjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 11:39:05 -0400
-Received: from verein.lst.de ([213.95.11.211]:34357 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231730AbhH0PjE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 11:39:04 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7988567373; Fri, 27 Aug 2021 17:38:12 +0200 (CEST)
-Date:   Fri, 27 Aug 2021 17:38:11 +0200
+        id S231318AbhH0Qe0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 12:34:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49268 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229675AbhH0Qe0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Aug 2021 12:34:26 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 845A1C061757
+        for <linux-block@vger.kernel.org>; Fri, 27 Aug 2021 09:33:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=1URcjbbjZ3swUwmmZMnRIG3GA8SEb0BVjblaSkTy8To=; b=I5x1pXmJ15yOM92n5fWyoW60Uw
+        Pi5/CFojG04bDP8pAP2rXu+8KL89NP6aNh2Hov7ePk6jO3gl5KYELrMm4xg9LEGKq7dMCe+eIqeKM
+        bn9cPKublFHSnfQpcR99CN0JF0cYeRvMqG9D3JTvU93k7FhqwOD3oNnNvuPtbUUzEMBddwvDb4hje
+        VpzJeS6hUUHWkdyG0XYNPcaP/KuYxPTCqfni6Cw5KO9zXCbF7/p8HrWdwMS834+E1QWzc7RpQYLef
+        OcLF3dlQx8fAfISktvE0USg6g3wCqZyqiHS7gK5iCzXTxc5racpvAHY66CvsTxKvWOwReLLYGXSgH
+        jkedjM7Q==;
+Received: from [2001:4bb8:193:fd10:3bcd:92e:c61e:4ad5] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mJemh-00EkkT-LD; Fri, 27 Aug 2021 16:33:11 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Milan Broz <gmazyland@gmail.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        "Reviewed-by : Tyler Hicks" <tyhicks@linux.microsoft.com>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 5/8] loop: merge the cryptoloop module into the main
- loop module
-Message-ID: <20210827153811.GA21217@lst.de>
-References: <20210826133810.3700-1-hch@lst.de> <20210826133810.3700-6-hch@lst.de> <977860f6-efc4-a55e-50e3-c5204fc762c5@gmail.com> <20210826163422.GA28718@lst.de> <ebfe4404-e251-ec0d-e46d-0a02b031bcb2@gmail.com> <20210827064505.GA23147@lst.de> <3a2fcf7b-f5d6-bb12-65c7-c2ebc5975383@i-love.sakura.ne.jp>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH for-5.14] cryptoloop: add a deprecation warning
+Date:   Fri, 27 Aug 2021 18:32:50 +0200
+Message-Id: <20210827163250.255325-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a2fcf7b-f5d6-bb12-65c7-c2ebc5975383@i-love.sakura.ne.jp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 08:33:10PM +0900, Tetsuo Handa wrote:
-> I posted "[PATCH v5] block: genhd: don't call probe function with major_names_lock held"
-> ( https://lkml.kernel.org/r/b2af8a5b-3c1b-204e-7f56-bea0b15848d6@i-love.sakura.ne.jp ) for v5.14 (and also stable),
+Support for cryptoloop has been officially marked broken and deprecated
+in favor of dm-crypt (which supports the same broken algorithms if
+needed) in Linux 2.6.4 (released in March 2004), and support for it has
+been entirely removed from losetup in util-linux 2.23 (released in April
+2013).  Add a warning and a deprecation schedule.
 
-And I've already told you that I think this is going in the wrong direction and
-do not thing it is a good idea.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/Kconfig      | 4 ++--
+ drivers/block/cryptoloop.c | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-> and "[PATCH] loop: replace loop_ctl_mutex with loop_idr_spinlock"
-> ( https://lkml.kernel.org/r/2642808b-a7d0-28ff-f288-0f4eabc562f7@i-love.sakura.ne.jp ) for v5.15 (but not stable).
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 63056cfd4b62c..fbb3a558139fc 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -213,7 +213,7 @@ config BLK_DEV_LOOP_MIN_COUNT
+ 	  dynamically allocated with the /dev/loop-control interface.
+ 
+ config BLK_DEV_CRYPTOLOOP
+-	tristate "Cryptoloop Support"
++	tristate "Cryptoloop Support (DEPRECATED)"
+ 	select CRYPTO
+ 	select CRYPTO_CBC
+ 	depends on BLK_DEV_LOOP
+@@ -225,7 +225,7 @@ config BLK_DEV_CRYPTOLOOP
+ 	  WARNING: This device is not safe for journaled file systems like
+ 	  ext3 or Reiserfs. Please use the Device Mapper crypto module
+ 	  instead, which can be configured to be on-disk compatible with the
+-	  cryptoloop device.
++	  cryptoloop device.  cryptoloop support will be removed in Linux 5.16.
+ 
+ source "drivers/block/drbd/Kconfig"
+ 
+diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
+index 3cabc335ae744..f0a91faa43a89 100644
+--- a/drivers/block/cryptoloop.c
++++ b/drivers/block/cryptoloop.c
+@@ -189,6 +189,8 @@ init_cryptoloop(void)
+ 
+ 	if (rc)
+ 		printk(KERN_ERR "cryptoloop: loop_register_transfer failed\n");
++	else
++		pr_warn("the cryptoloop driver has been deprecated and will be removed in in Linux 5.16\n");
+ 	return rc;
+ }
+ 
+-- 
+2.30.2
 
-I will review this.
-
-> Don't try to merge the cryptoloop module into the loop module now; it makes
-> backporting the fix difficult.
-
-Which is on the one true, on the other hand simply does not matter.
