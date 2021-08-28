@@ -3,70 +3,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C048FC432BE
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 02:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52735C432BE
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 02:23:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 96DC260F45
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 02:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27F2A60F44
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 02:23:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232997AbhH1CUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 22:20:44 -0400
-Received: from mail-pg1-f173.google.com ([209.85.215.173]:42823 "EHLO
-        mail-pg1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232953AbhH1CUn (ORCPT
+        id S230461AbhH1CYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 22:24:10 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:60562 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229873AbhH1CYK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 22:20:43 -0400
-Received: by mail-pg1-f173.google.com with SMTP id q68so7492079pga.9
-        for <linux-block@vger.kernel.org>; Fri, 27 Aug 2021 19:19:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OlIVUEfF1xWoBQ8ZBlcDpfHgWjgs/Zg/GqF0cmyO0pI=;
-        b=GEwO5+W0ovRcyahcmWlj3iEwx6qNPa3ExQGpDtUqr5fOsESpU4/xLyy6tGrLAR4Vv+
-         b3ssr118dCqrQgu+3h9OY2gO/+G0UUwJV3mXcNBhV1lud0k5fQnZ2+63WiF941K3IYGZ
-         XLzD82lG8wNos7O+16VDphyUeDw/7yQGy5WP04epDfm7A1uJGd+PNq5/1FojyPEeZYlW
-         5IJN27RHluR0ZgiONT55Up2kI1oNdHWZp8dXZuwMzBqFV+fq+H2/doOr2rAaollMYv3w
-         6BN9H/upwDMR5gB4k6ffrWIqKy7fE+lkHhnt54lC6QbOWaqG7AfJGjR57ldd7S31HgMk
-         /ugw==
-X-Gm-Message-State: AOAM530iv3C8mWOKDGH2bF/UpKNBtvcg4rzyzAqZEQyLpACZdB1brJdJ
-        DCPnkIY3+2o+h87KWV6Ixz4=
-X-Google-Smtp-Source: ABdhPJz2+rj/OKZba0+OUiZ7vhvCr6uPmrDVrM5W9q5asKrCZcedrRzuzpR/kJl2rE64XMrJmYQ+2Q==
-X-Received: by 2002:a05:6a00:1789:b0:3f9:5ce1:9677 with SMTP id s9-20020a056a00178900b003f95ce19677mr1022596pfg.50.1630117193593;
-        Fri, 27 Aug 2021 19:19:53 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:7c18:2fe1:2126:c371? ([2601:647:4000:d7:7c18:2fe1:2126:c371])
-        by smtp.gmail.com with ESMTPSA id u9sm8237326pgp.83.2021.08.27.19.19.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Aug 2021 19:19:53 -0700 (PDT)
-Subject: Re: [PATCH] block/mq-deadline: Speed up the dispatch of low-priority
- requests
-To:     "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>,
-        Jens Axboe <axboe@kernel.dk>,
+        Fri, 27 Aug 2021 22:24:10 -0400
+Received: from fsav118.sakura.ne.jp (fsav118.sakura.ne.jp [27.133.134.245])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17S2N3ns024887;
+        Sat, 28 Aug 2021 11:23:04 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav118.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav118.sakura.ne.jp);
+ Sat, 28 Aug 2021 11:23:03 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav118.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17S2N3OS024884
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 28 Aug 2021 11:23:03 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH] loop: replace loop_ctl_mutex with loop_idr_spinlock
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Hillf Danton <hdanton@sina.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
         linux-block <linux-block@vger.kernel.org>
-Cc:     Damien Le Moal <damien.lemoal@wdc.com>
-References: <20210826144039.2143-1-thunder.leizhen@huawei.com>
- <fc1f2664-fc4f-7b3e-5542-d9e4800a5bde@acm.org>
- <537620de-646d-e78e-ccb8-4105bac398b3@kernel.dk>
- <82612be1-d61e-1ad5-8fb5-d592a5bc4789@kernel.dk>
- <59c19a63-f321-94e8-cb31-87e88bd4e3d5@acm.org>
- <0ef7865d-a9ce-c5d9-ff7f-c0ef58de3d21@kernel.dk>
- <2332cba0-efe6-3b35-0587-ee6355a3567d@acm.org>
- <dd1f2b01-abe5-4e6f-14cf-c3bef90eb6f9@kernel.dk>
- <fdd60ef5-285c-964b-818a-6e0ee0481751@acm.org>
- <6ad27546-d61f-a98a-1633-9a4808a829ba@kernel.dk>
- <e2571b1b-2dde-9b6d-8373-579fdee1218c@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <b9b243b2-4eaf-9acf-fccb-f028c359a2a9@acm.org>
-Date:   Fri, 27 Aug 2021 19:19:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+References: <2642808b-a7d0-28ff-f288-0f4eabc562f7@i-love.sakura.ne.jp>
+ <20210827184302.GA29967@lst.de>
+ <73c53177-be1b-cff1-a09e-ef7979a95200@i-love.sakura.ne.jp>
+Message-ID: <b9d7b6b1-236a-438b-bee7-6d65b7b58905@i-love.sakura.ne.jp>
+Date:   Sat, 28 Aug 2021 11:22:59 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <e2571b1b-2dde-9b6d-8373-579fdee1218c@huawei.com>
+In-Reply-To: <73c53177-be1b-cff1-a09e-ef7979a95200@i-love.sakura.ne.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,26 +57,99 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/27/21 6:45 PM, Leizhen (ThunderTown) wrote:
-> On 2021/8/27 11:13, Jens Axboe wrote:
->> On 8/26/21 8:48 PM, Bart Van Assche wrote:
->>> With the patch series that is available at
->>> https://github.com/bvanassche/linux/tree/block-for-next the same test reports
->>> 1090 K IOPS or only 1% below the v5.11 result. I will post that series on the
->>> linux-block mailing list after I have finished testing that series.
->>
->> OK sounds good. I do think we should just do the revert at this point,
->> any real fix is going to end up being bigger than I'd like at this
->> point. Then we can re-introduce the feature once we're happy with the
->> results.
+On 2021/08/28 10:10, Tetsuo Handa wrote:
+> If we don't ignore forced module unload, we could update my patch to keep only
+> mutex_destroy() and kfree() deferred by a refcount, for only lo->lo_state,
+> lo->lo_refcnt and lo->lo_encryption would be accessed under lo->lo_mutex
+> serialization. There is no need to defer "del_gendisk() + idr_remove()"
+> sequence for concurrent callers.
 > 
-> Yes, It's already rc7 and it's no longer good for big changes. Revert is the
-> best solution, and apply my patch is a compromise solution.
 
-Please take a look at the patch series that is available at
-https://github.com/bvanassche/linux/tree/block-for-next. Performance for
-that patch series is significantly better than with your patch.
+OK, here is a delta patch to make it no longer best effort.
+We can consider removal of cryptoloop module after this patch,
+starting from a printk() for deprecated message.
 
-Thanks,
+ drivers/block/loop.c | 31 +++++++++++++------------------
+ 1 file changed, 13 insertions(+), 18 deletions(-)
 
-Bart.
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2113,7 +2113,11 @@ int loop_register_transfer(struct loop_func_table *funcs)
+ 	return 0;
+ }
+ 
+-static void loop_remove(struct loop_device *lo);
++static void loop_destroy(struct loop_device *lo)
++{
++	mutex_destroy(&lo->lo_mutex);
++	kfree(lo);
++}
+ 
+ int loop_unregister_transfer(int number)
+ {
+@@ -2137,7 +2141,7 @@ int loop_unregister_transfer(int number)
+ 			loop_release_xfer(lo);
+ 		mutex_unlock(&lo->lo_mutex);
+ 		if (refcount_dec_and_test(&lo->idr_visible))
+-			loop_remove(lo);
++			loop_destroy(lo);
+ 		spin_lock(&loop_idr_spinlock);
+ 	}
+ 	spin_unlock(&loop_idr_spinlock);
+@@ -2426,9 +2430,6 @@ static void loop_remove(struct loop_device *lo)
+ 	spin_lock(&loop_idr_spinlock);
+ 	idr_remove(&loop_index_idr, lo->lo_number);
+ 	spin_unlock(&loop_idr_spinlock);
+-	/* There is no route which can find this loop device. */
+-	mutex_destroy(&lo->lo_mutex);
+-	kfree(lo);
+ }
+ 
+ static void loop_probe(dev_t dev)
+@@ -2452,7 +2453,7 @@ static int loop_control_remove(int idx)
+ 
+ 	/*
+ 	 * Identify the loop device to remove. Skip the device if it is owned by
+-	 * loop_remove()/loop_add() where it is not safe to access lo_mutex.
++	 * loop_add() where it is not safe to access lo_mutex.
+ 	 */
+ 	spin_lock(&loop_idr_spinlock);
+ 	lo = idr_find(&loop_index_idr, idx);
+@@ -2479,19 +2480,11 @@ static int loop_control_remove(int idx)
+ 	mutex_unlock(&lo->lo_mutex);
+ 	/* Hide this loop device. */
+ 	refcount_dec(&lo->idr_visible);
+-	/*
+-	 * Try to wait for concurrent callers (they should complete shortly due to
+-	 * lo->lo_state == Lo_deleting) operating on this loop device, in order to
+-	 * help that subsequent loop_add() will not to fail with -EEXIST.
+-	 * Note that this is best effort.
+-	 */
+-	for (ret = 0; refcount_read(&lo->idr_visible) != 1 && ret < HZ; ret++)
+-		schedule_timeout_killable(1);
+-	ret = 0;
++	/* Remove this loop device, but wait concurrent callers before destroy. */
++	loop_remove(lo);
+ out:
+-	/* Remove this loop device. */
+ 	if (refcount_dec_and_test(&lo->idr_visible))
+-		loop_remove(lo);
++		loop_destroy(lo);
+ 	return ret;
+ }
+ 
+@@ -2623,8 +2616,10 @@ static void __exit loop_exit(void)
+ 	 * There is no need to use loop_idr_spinlock here, for nobody else can
+ 	 * access loop_index_idr when this module is unloading.
+ 	 */
+-	idr_for_each_entry(&loop_index_idr, lo, id)
++	idr_for_each_entry(&loop_index_idr, lo, id) {
+ 		loop_remove(lo);
++		loop_destroy(lo);
++	}
+ 
+ 	idr_destroy(&loop_index_idr);
+ }
+-- 
+2.25.1
+
