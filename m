@@ -3,160 +3,96 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46C1C432BE
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 01:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF267C432BE
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 01:45:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DCB9604D7
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 01:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 873BC60EB3
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 01:45:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232763AbhH1BLs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 21:11:48 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:58318 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230238AbhH1BLr (ORCPT
+        id S232987AbhH1BqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 21:46:10 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:9374 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232861AbhH1BqI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 21:11:47 -0400
-Received: from fsav312.sakura.ne.jp (fsav312.sakura.ne.jp [153.120.85.143])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17S1AfbL073427;
-        Sat, 28 Aug 2021 10:10:41 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav312.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav312.sakura.ne.jp);
- Sat, 28 Aug 2021 10:10:41 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav312.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17S1Af82073354
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 28 Aug 2021 10:10:41 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH] loop: replace loop_ctl_mutex with loop_idr_spinlock
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Hillf Danton <hdanton@sina.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Fri, 27 Aug 2021 21:46:08 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GxK6n3Xv7z8tGM;
+        Sat, 28 Aug 2021 09:41:05 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 28 Aug 2021 09:45:16 +0800
+Received: from [10.174.178.242] (10.174.178.242) by
+ dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 28 Aug 2021 09:45:16 +0800
+Subject: Re: [PATCH] block/mq-deadline: Speed up the dispatch of low-priority
+ requests
+To:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
         linux-block <linux-block@vger.kernel.org>
-References: <2642808b-a7d0-28ff-f288-0f4eabc562f7@i-love.sakura.ne.jp>
- <20210827184302.GA29967@lst.de>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <73c53177-be1b-cff1-a09e-ef7979a95200@i-love.sakura.ne.jp>
-Date:   Sat, 28 Aug 2021 10:10:36 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+CC:     Damien Le Moal <damien.lemoal@wdc.com>
+References: <20210826144039.2143-1-thunder.leizhen@huawei.com>
+ <fc1f2664-fc4f-7b3e-5542-d9e4800a5bde@acm.org>
+ <537620de-646d-e78e-ccb8-4105bac398b3@kernel.dk>
+ <82612be1-d61e-1ad5-8fb5-d592a5bc4789@kernel.dk>
+ <59c19a63-f321-94e8-cb31-87e88bd4e3d5@acm.org>
+ <0ef7865d-a9ce-c5d9-ff7f-c0ef58de3d21@kernel.dk>
+ <2332cba0-efe6-3b35-0587-ee6355a3567d@acm.org>
+ <dd1f2b01-abe5-4e6f-14cf-c3bef90eb6f9@kernel.dk>
+ <fdd60ef5-285c-964b-818a-6e0ee0481751@acm.org>
+ <6ad27546-d61f-a98a-1633-9a4808a829ba@kernel.dk>
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <e2571b1b-2dde-9b6d-8373-579fdee1218c@huawei.com>
+Date:   Sat, 28 Aug 2021 09:45:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210827184302.GA29967@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <6ad27546-d61f-a98a-1633-9a4808a829ba@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.242]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500006.china.huawei.com (7.185.36.236)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/08/28 3:43, Christoph Hellwig wrote:
-> On Fri, Aug 27, 2021 at 01:03:45AM +0900, Tetsuo Handa wrote:
+
+
+On 2021/8/27 11:13, Jens Axboe wrote:
+> On 8/26/21 8:48 PM, Bart Van Assche wrote:
+>> On 8/26/21 5:05 PM, Jens Axboe wrote:
+>>> On 8/26/21 6:03 PM, Bart Van Assche wrote:
+>>>> Here is an overview of the tests I ran so far, all on the same test
+>>>> setup:
+>>>> * No I/O scheduler:               about 5630 K IOPS.
+>>>> * Kernel v5.11 + mq-deadline:     about 1100 K IOPS.
+>>>> * block-for-next + mq-deadline:   about  760 K IOPS.
+>>>> * block-for-next with improved mq-deadline performance: about 970 K IOPS.
+>>>
+>>> So we're still off by about 12%, I don't think that is good enough.
+>>> That's assuming that v5.11 + mq-deadline is the same as for-next with
+>>> the mq-deadline change reverted? Because that would be the key number to
+>>> compare it with.
 >>
->> loop_unregister_transfer() which is called from cleanup_cryptoloop()
->> currently lacks serialization between kfree() from loop_remove() from
->> loop_control_remove() and mutex_lock() from unregister_transfer_cb().
->> We can use refcount and loop_idr_spinlock for serialization between
->> these functions.
+>> With the patch series that is available at
+>> https://github.com/bvanassche/linux/tree/block-for-next the same test reports
+>> 1090 K IOPS or only 1% below the v5.11 result. I will post that series on the
+>> linux-block mailing list after I have finished testing that series.
 > 
-> 
-> So before we start complicating things for loop_release_xfer - how
-> do you actually reproduce loop_unregister_transfer finding a loop
-> device with a transfer set?  AFAICS loop_unregister_transfer is only
-> called form exit_cryptoloop, which can only be called when
-> cryptoloop has a zero reference count.  But as long as a transfer
-> is registered an extra refcount is held on its owner.
+> OK sounds good. I do think we should just do the revert at this point,
+> any real fix is going to end up being bigger than I'd like at this
+> point. Then we can re-introduce the feature once we're happy with the
+> results.
 
-Indeed, lo->lo_encryption is set to non-NULL by loop_init_xfer() after a refcount
-is taken and lo->lo_encryption is reset to NULL by loop_release_xfer() before
-that refount is dropped, and these operations are serialized by lo->lo_mutex. Then,
-lo->lo_encryption == xfer can't happen unless forced module unload is requested.
-
-That is, it seems that unregister_transfer_cb() is there in case forced module
-unload of cryptoloop module was requested. And in that case, there is no point
-with crashing the kernel via panic_on_warn == 1 && WARN_ON_ONCE(). Simple printk()
-will be sufficient.
-
-Removing unregister_transfer_cb() (if we ignore forced module unload) will be
-a separate patch.
+Yes, It's already rc7 and it's no longer good for big changes. Revert is the
+best solution, and apply my patch is a compromise solution.
 
 > 
->> @@ -2313,20 +2320,20 @@ static int loop_add(int i)
->>  		goto out;
->>  	lo->lo_state = Lo_unbound;
->>  
->> -	err = mutex_lock_killable(&loop_ctl_mutex);
->> -	if (err)
->> -		goto out_free_dev;
->> -
->>  	/* allocate id, if @id >= 0, we're requesting that specific id */
->> +	idr_preload(GFP_KERNEL);
->> +	spin_lock(&loop_idr_spinlock);
->>  	if (i >= 0) {
->> -		err = idr_alloc(&loop_index_idr, lo, i, i + 1, GFP_KERNEL);
->> +		err = idr_alloc(&loop_index_idr, lo, i, i + 1, GFP_ATOMIC);
->>  		if (err == -ENOSPC)
->>  			err = -EEXIST;
->>  	} else {
->> -		err = idr_alloc(&loop_index_idr, lo, 0, 0, GFP_KERNEL);
->> +		err = idr_alloc(&loop_index_idr, lo, 0, 0, GFP_ATOMIC);
->>  	}
->> +	spin_unlock(&loop_idr_spinlock);
->> +	idr_preload_end();
-> 
-> Can you explain why the mutex is switched to a spinlock?  I could not
-> find any caller that can't block, so there doesn't seem to be a real
-> need for a spinlock, while a spinlock requires extra work and GFP_ATOMIC
-> allocations here.  Dropping the _killable probably makes some sense,
-> but seems like a separate cleanup.
-
-In order to annotate that extra operations that might sleep should not be
-added inside this section. Use of sleepable locks tends to get extra
-operations (e.g. wait for a different mutex / completion) and makes it unclear
-what the lock is protecting. I can imagine a future that someone adds an
-unwanted dependency inside this section if we use mutex here.
-
-Technically, we can add preempt_diable() after mutex_lock() and
-preempt_enable() before mutex_unlock() in order to annotate that
-extra operations that might sleep should be avoided.
-But idr_alloc(GFP_ATOMIC)/idr_find()/idr_for_each_entry() etc. will be
-fast enough.
-
-> 
->> +	if (!lo || !refcount_inc_not_zero(&lo->idr_visible)) {
->> +		spin_unlock(&loop_idr_spinlock);
->> +		return -ENODEV;
->>  	}
->> +	spin_unlock(&loop_idr_spinlock);
-> 
->> +	refcount_dec(&lo->idr_visible);
->> +	/*
->> +	 * Try to wait for concurrent callers (they should complete shortly due to
->> +	 * lo->lo_state == Lo_deleting) operating on this loop device, in order to
->> +	 * help that subsequent loop_add() will not to fail with -EEXIST.
->> +	 * Note that this is best effort.
->> +	 */
->> +	for (ret = 0; refcount_read(&lo->idr_visible) != 1 && ret < HZ; ret++)
->> +		schedule_timeout_killable(1);
->> +	ret = 0;
-> 
-> This dance looks pretty strange to me.  I think just making idr_visible
-> an atomic_t and using atomic_cmpxchg with just 0 and 1 as valid versions
-> will make this much simpler, as it avoids the need to deal with a > 1
-> count, and it also serializes multiple removal calls.
-
-Yes if we ignore forced module unload (which needs to synchronously check
-lo->lo_encryption) of cryptoloop module.
-
-If we don't ignore forced module unload, we could update my patch to keep only
-mutex_destroy() and kfree() deferred by a refcount, for only lo->lo_state,
-lo->lo_refcnt and lo->lo_encryption would be accessed under lo->lo_mutex
-serialization. There is no need to defer "del_gendisk() + idr_remove()"
-sequence for concurrent callers.
-
