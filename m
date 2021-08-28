@@ -3,139 +3,231 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6233C43216
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 00:39:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1759AC25AF0
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 00:39:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D37560C3E
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 00:39:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F034760C3E
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 00:39:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232816AbhH1AkN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Aug 2021 20:40:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57488 "EHLO mail.kernel.org"
+        id S232979AbhH1AkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Aug 2021 20:40:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57520 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232754AbhH1AkJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Aug 2021 20:40:09 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B6EE560ED5;
-        Sat, 28 Aug 2021 00:39:19 +0000 (UTC)
+        id S232854AbhH1AkL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Aug 2021 20:40:11 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 94EFE60FD9;
+        Sat, 28 Aug 2021 00:39:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630111159;
-        bh=x8xm7Zu1FSSKdY8WmtQ+VGn86yR2UwhQHXTTFsESEJc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=gz5LtA7lJ/qFiUQmXe7XKmH6+A3ERshpWUN3sU8Vaf8/kpaO18cF39ziXFFribGGd
-         6hfVlT+ol1nYECDeOYzfjmspZL0HbVSIkT/qclNq02FTSzugC3R6hxEbTXm7eiyPJQ
-         dfl7isFdJZJd4bLH0mOuuAHXjWi+JW5BHifgUaMAcKzGkjruL+SN4Zivo7IyHC+gGL
-         c5GSfSgHmJAYlnMIAP0cbAn3T7z9Fq0u58ctj01VuA5/aTpNvLAZ3S2mK5EMLZldAZ
-         ytJsutkZa2S7G3R1YvbjeXZPXafzHx2xD85GXlj0IFj6rrOi030/h/VxeJAlkej7yf
-         eNtVsbmlbAAag==
+        s=k20201202; t=1630111160;
+        bh=Pcb9LguJG/IekBjhF/+KIpyiXRSksr2RsXIKGXyHRME=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=SM5nb/8DQd+l3iFMEj5GH2S2nghGCQShMRRTGWFGM+zUD5EA+HTyXgcdezYWZS7U4
+         5iElEoRmOGb1/ZlH7eeFEjd0HGwieB7LJnorE8wx+9tTY3qKLiqAQBg6KLTHdgJGMI
+         fml4WGEzg16NtD0TjFwsFE7YQMTGGbwejQ+Dc7T0ULEA5TnUru0dkYq4FwxiVsCuIv
+         jR0kdFe+im9aMNwyLjY8pQycJ7j5BLIGgLjZWMW4oR/xVkL+xu5DWC+Cdp21vtf80L
+         /b5uGimfO4r5q6+F+Cv+t+I+uOt5chVU8gpXkWw+GVOPyxH2aYBP6L30K7CT0c5F3+
+         ifK/7d1LvytPQ==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
 Cc:     linux-arm-msm@vger.kernel.org, kernel-team@android.com,
         Thara Gopinath <thara.gopinath@linaro.org>,
         Gaurav Kashyap <gaurkash@codeaurora.org>,
         Satya Tangirala <satyaprateek2357@gmail.com>
-Subject: [RFC PATCH 0/4] Support for hardware-wrapped inline encryption keys
-Date:   Fri, 27 Aug 2021 17:32:20 -0700
-Message-Id: <20210828003224.33346-1-ebiggers@kernel.org>
+Subject: [RFC PATCH 3/4] fscrypt: allow 256-bit master keys with AES-256-XTS
+Date:   Fri, 27 Aug 2021 17:32:23 -0700
+Message-Id: <20210828003224.33346-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210828003224.33346-1-ebiggers@kernel.org>
+References: <20210828003224.33346-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[ NOTE: this patchset is an RFC that isn't ready for merging yet because
-  it doesn't yet include the vendor-specific UFS or eMMC driver changes
-  needed to actually use the feature.  I.e., this patchset isn't
-  sufficient to actually use hardware-wrapped keys with upstream yet.
+From: Eric Biggers <ebiggers@google.com>
 
-  For context, hardware-wrapped key support has been out-of-tree in the
-  Android kernels since early last year; upstreaming has been blocked on
-  hardware availability and support.  However, an SoC that supports this
-  feature (SM8350, a.k.a. Qualcomm Snapdragon 888) finally has been
-  publicly released and had basic SoC support upstreamed.  Also, some
-  other hardware will support the same feature soon.  So, things should
-  be progressing soon.  So while the driver changes are gotten into an
-  upstream-ready form, I wanted to get things started and give people a
-  chance to give early feedback on the plan for how the kernel will
-  support this type of hardware.  Also, anyone please let me know if
-  you're interested in helping with the Qualcomm driver changes.]
+fscrypt currently requires a 512-bit master key when AES-256-XTS is
+used, since AES-256-XTS keys are 512-bit and fscrypt requires that the
+master key be at least as long any key that will be derived from it.
 
-This patchset adds framework-level support (i.e., block and fscrypt
-support) for hardware-wrapped keys when the inline encryption hardware
-supports them.  Hardware-wrapped keys are keys that are wrapped
-(encrypted) by a key internal to the hardware.  Except at initial
-unlocking time, the wrapping key is an ephemeral, per-boot key.
-Hardware-wrapped keys can only be unwrapped (decrypted) by the hardware,
-e.g. when a key is programmed into a keyslot.  They are never visible to
-software in raw form, except optionally during key generation (the
-hardware supports importing keys as well as generating keys itself).
+However, this is overly strict because AES-256-XTS doesn't actually have
+a 512-bit security strength, but rather 256-bit.  The fact that XTS
+takes twice the expected key size is a quirk of the XTS mode.  It is
+sufficient to use 256 bits of entropy for AES-256-XTS, provided that it
+is first properly expanded into a 512-bit key, which HKDF-SHA512 does.
 
-This feature protects the encryption keys from read-only compromises of
-kernel memory, such as that which can occur during a cold boot attack.
-It does this without limiting the number of keys that can be used, as
-would be the case with solutions that didn't use key wrapping.
+Therefore, relax the check of the master key size to use the security
+strength of the derived key rather than the size of the derived key
+(except for v1 encryption policies, which don't use HKDF).
 
-The kernel changes to support this feature basically consist of changes
-to blk-crypto to allow a blk_crypto_key to be hardware-wrapped and to
-allow storage drivers to support hardware-wrapped keys, and changes to
-fscrypt to allow the fscrypt master keys to be hardware-wrapped.
+Besides making things more flexible for userspace, this is needed in
+order for the use of a KDF which only takes a 256-bit key to be
+introduced into the fscrypt key hierarchy.  This will happen with
+hardware-wrapped keys support, as all known hardware which supports that
+feature uses an SP800-108 KDF using AES-256-CMAC, so the wrapped keys
+are wrapped 256-bit AES keys.  Moreover, there is interest in fscrypt
+supporting the same type of AES-256-CMAC based KDF in software as an
+alternative to HKDF-SHA512.  There is no security problem with such
+features, so fix the key length check to work properly with them.
 
-Key generation and import, as well as the conversion of keys from
-long-term wrapped form to ephemerally-wrapped form, are currently
-considered out-of-scope.  An open question is if/how the kernel can
-provide a generic UAPI for these parts (new block ioctls that call
-through to new methods in blk_ksm_ll_ops, maybe)?
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/crypto/fscrypt_private.h |  5 ++--
+ fs/crypto/hkdf.c            | 11 +++++--
+ fs/crypto/keysetup.c        | 57 +++++++++++++++++++++++++++++--------
+ 3 files changed, 56 insertions(+), 17 deletions(-)
 
-For full details, see the individual patches, especially the detailed
-documentation they add to Documentation/block/inline-encryption.rst and
-Documentation/filesystems/fscrypt.rst.
-
-This patchset is organized as follows:
-
-- Patch 1 adds the block support and documentation.
-
-- Patches 2-3 are cleanups to fscrypt documentation and key validation.
-  These aren't specific to hardware-wrapped keys per se, so these don't
-  need to wait for the rest of the patches.
-
-- Patch 4 adds the fscrypt support and documentation.
-
-This patchset applies to v5.14-rc7.  It can also be retrieved from tag
-"wrapped-keys-v1" of
-https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git.
-
-Eric Biggers (4):
-  block: add hardware-wrapped key support
-  fscrypt: improve documentation for inline encryption
-  fscrypt: allow 256-bit master keys with AES-256-XTS
-  fscrypt: add support for hardware-wrapped keys
-
- Documentation/block/inline-encryption.rst | 222 ++++++++++++++++++++-
- Documentation/filesystems/fscrypt.rst     | 223 ++++++++++++++++++----
- block/blk-crypto-fallback.c               |   5 +-
- block/blk-crypto-internal.h               |   1 +
- block/blk-crypto.c                        |  45 ++++-
- block/keyslot-manager.c                   |  67 +++++--
- drivers/md/dm-table.c                     |   1 +
- drivers/mmc/host/cqhci-crypto.c           |   2 +
- drivers/scsi/ufs/ufshcd-crypto.c          |   1 +
- fs/crypto/fscrypt_private.h               |  88 ++++++++-
- fs/crypto/hkdf.c                          |  15 +-
- fs/crypto/inline_crypt.c                  |  64 ++++++-
- fs/crypto/keyring.c                       | 119 ++++++++----
- fs/crypto/keysetup.c                      | 131 +++++++++++--
- fs/crypto/keysetup_v1.c                   |   5 +-
- fs/crypto/policy.c                        |  11 +-
- include/linux/blk-crypto.h                |  70 ++++++-
- include/linux/keyslot-manager.h           |  20 ++
- include/uapi/linux/fscrypt.h              |   7 +-
- 19 files changed, 959 insertions(+), 138 deletions(-)
-
-base-commit: e22ce8eb631bdc47a4a4ea7ecf4e4ba499db4f93
+diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+index 3fa965eb3336d..cb25ef0cdf1f3 100644
+--- a/fs/crypto/fscrypt_private.h
++++ b/fs/crypto/fscrypt_private.h
+@@ -549,8 +549,9 @@ int __init fscrypt_init_keyring(void);
+ struct fscrypt_mode {
+ 	const char *friendly_name;
+ 	const char *cipher_str;
+-	int keysize;
+-	int ivsize;
++	int keysize;		/* key size in bytes */
++	int security_strength;	/* security strength in bytes */
++	int ivsize;		/* IV size in bytes */
+ 	int logged_impl_name;
+ 	enum blk_crypto_mode_num blk_crypto_mode;
+ };
+diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
+index e0ec210555053..7607d18b35fc0 100644
+--- a/fs/crypto/hkdf.c
++++ b/fs/crypto/hkdf.c
+@@ -16,9 +16,14 @@
+ 
+ /*
+  * HKDF supports any unkeyed cryptographic hash algorithm, but fscrypt uses
+- * SHA-512 because it is reasonably secure and efficient; and since it produces
+- * a 64-byte digest, deriving an AES-256-XTS key preserves all 64 bytes of
+- * entropy from the master key and requires only one iteration of HKDF-Expand.
++ * SHA-512 because it is well-established, secure, and reasonably efficient.
++ *
++ * HKDF-SHA256 was also considered, as its 256-bit security strength would be
++ * sufficient here.  A 512-bit security strength is "nice to have", though.
++ * Also, on 64-bit CPUs, SHA-512 is usually just as fast as SHA-256.  In the
++ * common case of deriving an AES-256-XTS key (512 bits), that can result in
++ * HKDF-SHA512 being much faster than HKDF-SHA256, as the longer digest size of
++ * SHA-512 causes HKDF-Expand to only need to do one iteration rather than two.
+  */
+ #define HKDF_HMAC_ALG		"hmac(sha512)"
+ #define HKDF_HASHLEN		SHA512_DIGEST_SIZE
+diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
+index bca9c6658a7c5..89cd533a88bff 100644
+--- a/fs/crypto/keysetup.c
++++ b/fs/crypto/keysetup.c
+@@ -19,6 +19,7 @@ struct fscrypt_mode fscrypt_modes[] = {
+ 		.friendly_name = "AES-256-XTS",
+ 		.cipher_str = "xts(aes)",
+ 		.keysize = 64,
++		.security_strength = 32,
+ 		.ivsize = 16,
+ 		.blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_256_XTS,
+ 	},
+@@ -26,12 +27,14 @@ struct fscrypt_mode fscrypt_modes[] = {
+ 		.friendly_name = "AES-256-CTS-CBC",
+ 		.cipher_str = "cts(cbc(aes))",
+ 		.keysize = 32,
++		.security_strength = 32,
+ 		.ivsize = 16,
+ 	},
+ 	[FSCRYPT_MODE_AES_128_CBC] = {
+ 		.friendly_name = "AES-128-CBC-ESSIV",
+ 		.cipher_str = "essiv(cbc(aes),sha256)",
+ 		.keysize = 16,
++		.security_strength = 16,
+ 		.ivsize = 16,
+ 		.blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_128_CBC_ESSIV,
+ 	},
+@@ -39,12 +42,14 @@ struct fscrypt_mode fscrypt_modes[] = {
+ 		.friendly_name = "AES-128-CTS-CBC",
+ 		.cipher_str = "cts(cbc(aes))",
+ 		.keysize = 16,
++		.security_strength = 16,
+ 		.ivsize = 16,
+ 	},
+ 	[FSCRYPT_MODE_ADIANTUM] = {
+ 		.friendly_name = "Adiantum",
+ 		.cipher_str = "adiantum(xchacha12,aes)",
+ 		.keysize = 32,
++		.security_strength = 32,
+ 		.ivsize = 32,
+ 		.blk_crypto_mode = BLK_ENCRYPTION_MODE_ADIANTUM,
+ 	},
+@@ -357,6 +362,45 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_info *ci,
+ 	return 0;
+ }
+ 
++/*
++ * Check whether the size of the given master key (@mk) is appropriate for the
++ * encryption settings which a particular file will use (@ci).
++ *
++ * If the file uses a v1 encryption policy, then the master key must be at least
++ * as long as the derived key, as this is a requirement of the v1 KDF.
++ *
++ * Otherwise, the KDF can accept any size key, so we enforce a slightly looser
++ * requirement: we require that the size of the master key be at least the
++ * maximum security strength of any algorithm whose key will be derived from it
++ * (but in practice we only need to consider @ci->ci_mode, since any other
++ * possible subkeys such as DIRHASH and INODE_HASH will never increase the
++ * required key size over @ci->ci_mode).  This allows AES-256-XTS keys to be
++ * derived from a 256-bit master key, which is cryptographically sufficient,
++ * rather than requiring a 512-bit master key which is unnecessarily long.  (We
++ * still allow 512-bit master keys if the user chooses to use them, though.)
++ */
++static bool fscrypt_valid_master_key_size(const struct fscrypt_master_key *mk,
++					  const struct fscrypt_info *ci)
++{
++	unsigned int min_keysize;
++
++	if (ci->ci_policy.version == FSCRYPT_POLICY_V1)
++		min_keysize = ci->ci_mode->keysize;
++	else
++		min_keysize = ci->ci_mode->security_strength;
++
++	if (mk->mk_secret.size < min_keysize) {
++		fscrypt_warn(NULL,
++			     "key with %s %*phN is too short (got %u bytes, need %u+ bytes)",
++			     master_key_spec_type(&mk->mk_spec),
++			     master_key_spec_len(&mk->mk_spec),
++			     (u8 *)&mk->mk_spec.u,
++			     mk->mk_secret.size, min_keysize);
++		return false;
++	}
++	return true;
++}
++
+ /*
+  * Find the master key, then set up the inode's actual encryption key.
+  *
+@@ -422,18 +466,7 @@ static int setup_file_encryption_key(struct fscrypt_info *ci,
+ 		goto out_release_key;
+ 	}
+ 
+-	/*
+-	 * Require that the master key be at least as long as the derived key.
+-	 * Otherwise, the derived key cannot possibly contain as much entropy as
+-	 * that required by the encryption mode it will be used for.  For v1
+-	 * policies it's also required for the KDF to work at all.
+-	 */
+-	if (mk->mk_secret.size < ci->ci_mode->keysize) {
+-		fscrypt_warn(NULL,
+-			     "key with %s %*phN is too short (got %u bytes, need %u+ bytes)",
+-			     master_key_spec_type(&mk_spec),
+-			     master_key_spec_len(&mk_spec), (u8 *)&mk_spec.u,
+-			     mk->mk_secret.size, ci->ci_mode->keysize);
++	if (!fscrypt_valid_master_key_size(mk, ci)) {
+ 		err = -ENOKEY;
+ 		goto out_release_key;
+ 	}
 -- 
 2.32.0
 
