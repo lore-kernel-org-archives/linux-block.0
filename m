@@ -2,75 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686BEC43214
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 07:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0664FC432BE
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 13:14:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42A81610CA
-	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 07:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBE2260EB3
+	for <linux-block@archiver.kernel.org>; Sat, 28 Aug 2021 13:14:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233473AbhH1Hje (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Aug 2021 03:39:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54208 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233466AbhH1Hje (ORCPT
+        id S234272AbhH1NPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Aug 2021 09:15:44 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:8796 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232574AbhH1NPn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Aug 2021 03:39:34 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BA9C0613D9;
-        Sat, 28 Aug 2021 00:38:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0ts55k9K+AeTzI9UinkPG1HeoaDA8i8L+H7cb7KVKcM=; b=gQt5y7F7KIDyZaXkososCL+fcG
-        T2PIBhRo7HPDBmFHt+eO5KVFvLgVeZGwIKrYR2niVA+3/g2ZgL6e5pKHzjoJmm0lyXek03Dv0Du9P
-        aZPQdbYOqZW9kGWcEzCGEYiBC3pfLH7iGVFSfZM5kWNvH0m++Rshqf/nGe+kSXO61lpgRAxS2aPru
-        Uo7s6HzZswFEg9QYlOpn1F2dRXGqoTY6EN01HI7Kx5/EERLBx+3USkpv/0tBhHPTid8VxgaTIH1K8
-        0szPfLe0HpykgcgAKjnsv0AbqbOddfn9BTTTgLf36cdVT819hgNoou8J9itvpsS1yuvX6iIb4uQTj
-        9lt1aQUw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mJssf-00FNYs-A6; Sat, 28 Aug 2021 07:36:12 +0000
-Date:   Sat, 28 Aug 2021 08:35:57 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        martin.petersen@oracle.com, jejb@linux.ibm.com, kbusch@kernel.org,
-        sagi@grimberg.me, adrian.hunter@intel.com, beanhuo@micron.com,
-        ulf.hansson@linaro.org, avri.altman@wdc.com, swboyd@chromium.org,
-        agk@redhat.com, snitzer@redhat.com, josef@toxicpanda.com,
-        hare@suse.de, bvanassche@acm.org, ming.lei@redhat.com,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-mmc@vger.kernel.org, dm-devel@redhat.com,
-        nbd@other.debian.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/10] dm: add add_disk() error handling
-Message-ID: <YSnnXdKLvxEY8yay@infradead.org>
-References: <20210823202930.137278-1-mcgrof@kernel.org>
- <20210823202930.137278-9-mcgrof@kernel.org>
- <YSSP6ujNQttGN2sZ@infradead.org>
- <YSk1EhUIr9OjIoVv@bombadil.infradead.org>
+        Sat, 28 Aug 2021 09:15:43 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GxcVY3MHwzYrBw;
+        Sat, 28 Aug 2021 21:14:13 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 28 Aug 2021 21:14:50 +0800
+Received: from [10.174.178.242] (10.174.178.242) by
+ dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 28 Aug 2021 21:14:50 +0800
+Subject: Re: [PATCH] block/mq-deadline: Speed up the dispatch of low-priority
+ requests
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+CC:     Damien Le Moal <damien.lemoal@wdc.com>
+References: <20210826144039.2143-1-thunder.leizhen@huawei.com>
+ <fc1f2664-fc4f-7b3e-5542-d9e4800a5bde@acm.org>
+ <537620de-646d-e78e-ccb8-4105bac398b3@kernel.dk>
+ <82612be1-d61e-1ad5-8fb5-d592a5bc4789@kernel.dk>
+ <59c19a63-f321-94e8-cb31-87e88bd4e3d5@acm.org>
+ <0ef7865d-a9ce-c5d9-ff7f-c0ef58de3d21@kernel.dk>
+ <2332cba0-efe6-3b35-0587-ee6355a3567d@acm.org>
+ <dd1f2b01-abe5-4e6f-14cf-c3bef90eb6f9@kernel.dk>
+ <fdd60ef5-285c-964b-818a-6e0ee0481751@acm.org>
+ <6ad27546-d61f-a98a-1633-9a4808a829ba@kernel.dk>
+ <e2571b1b-2dde-9b6d-8373-579fdee1218c@huawei.com>
+ <b9b243b2-4eaf-9acf-fccb-f028c359a2a9@acm.org>
+ <27232c95-c6cb-f6c6-929b-0ecf0b527daa@huawei.com>
+Message-ID: <6f9799f7-1f14-963d-7803-19f10d53b96b@huawei.com>
+Date:   Sat, 28 Aug 2021 21:14:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YSk1EhUIr9OjIoVv@bombadil.infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <27232c95-c6cb-f6c6-929b-0ecf0b527daa@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.242]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500006.china.huawei.com (7.185.36.236)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 11:55:14AM -0700, Luis Chamberlain wrote:
-> > I think the add_disk should just return r.  If you look at the
-> > callers they eventualy end up in dm_table_destroy, which does
-> > this cleanup.
-> 
-> I don't see it. What part of dm_table_destroy() does this?
 
-Sorry, dm_destroy, not dm_table_destroy.  For dm_early_create it's
-trivial as that calls both dm_table_destroy and dm_destroy in the error
-path.  The normal table_load case is a separate ioctl, but if that
-fails userspace needs to call the DM_DEV_REMOVE_CMD to cleanup
-the state - similar to any other failure.
+
+On 2021/8/28 10:42, Leizhen (ThunderTown) wrote:
+> 
+> 
+> On 2021/8/28 10:19, Bart Van Assche wrote:
+>> On 8/27/21 6:45 PM, Leizhen (ThunderTown) wrote:
+>>> On 2021/8/27 11:13, Jens Axboe wrote:
+>>>> On 8/26/21 8:48 PM, Bart Van Assche wrote:
+>>>>> With the patch series that is available at
+>>>>> https://github.com/bvanassche/linux/tree/block-for-next the same test reports
+>>>>> 1090 K IOPS or only 1% below the v5.11 result. I will post that series on the
+>>>>> linux-block mailing list after I have finished testing that series.
+>>>>
+>>>> OK sounds good. I do think we should just do the revert at this point,
+>>>> any real fix is going to end up being bigger than I'd like at this
+>>>> point. Then we can re-introduce the feature once we're happy with the
+>>>> results.
+>>>
+>>> Yes, It's already rc7 and it's no longer good for big changes. Revert is the
+>>> best solution, and apply my patch is a compromise solution.
+>>
+>> Please take a look at the patch series that is available at
+>> https://github.com/bvanassche/linux/tree/block-for-next. Performance for
+>> that patch series is significantly better than with your patch.
+> 
+> Yes, this patch is better than mine. However, Jens prefers to avoid the risk of
+> functional stability in v5.14. v5.15 doesn't need my patch or revert.
+> 
+> I'll test your patch this afternoon. I don't have the environment yet.
+
+
+Revert:
+253K/0/0
+258K/0/0
+
+With your patch:
+258K/0/0
+252K/0/0
+
+With my patch:
+245K/0/0
+258K/0/0
+244K/0/0
+
+I see that Jens has already pushed "revert" into v5.14-rc8.
+
+
+> 
+>>
+>> Thanks,
+>>
+>> Bart.
+>> .
+>>
