@@ -2,288 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 744E3C432BE
-	for <linux-block@archiver.kernel.org>; Sun, 29 Aug 2021 13:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F3AC4320A
+	for <linux-block@archiver.kernel.org>; Sun, 29 Aug 2021 22:50:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F58360F25
-	for <linux-block@archiver.kernel.org>; Sun, 29 Aug 2021 13:47:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61B4660234
+	for <linux-block@archiver.kernel.org>; Sun, 29 Aug 2021 22:50:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229504AbhH2Nsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Aug 2021 09:48:45 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:51693 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbhH2Nsp (ORCPT
+        id S235598AbhH2Wvr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Aug 2021 18:51:47 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:58031 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230134AbhH2Wvq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Aug 2021 09:48:45 -0400
-Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17TDlYN3005221;
-        Sun, 29 Aug 2021 22:47:34 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
- Sun, 29 Aug 2021 22:47:34 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17TDlYeu005218
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 29 Aug 2021 22:47:34 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: [PATCH v3] loop: reduce the loop_ctl_mutex scope
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Hillf Danton <hdanton@sina.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        linux-block <linux-block@vger.kernel.org>
-References: <2642808b-a7d0-28ff-f288-0f4eabc562f7@i-love.sakura.ne.jp>
- <20210827184302.GA29967@lst.de>
- <73c53177-be1b-cff1-a09e-ef7979a95200@i-love.sakura.ne.jp>
- <20210828071832.GA31755@lst.de>
- <c5e509ec-2361-af25-ec73-e033b5b46ebb@i-love.sakura.ne.jp>
- <33a0a1e5-a79f-1887-6417-c5a81f58e47d@i-love.sakura.ne.jp>
-Message-ID: <cc5c215f-4b3b-94e9-560b-a02d0e23c97c@i-love.sakura.ne.jp>
-Date:   Sun, 29 Aug 2021 22:47:31 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <33a0a1e5-a79f-1887-6417-c5a81f58e47d@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset=utf-8
+        Sun, 29 Aug 2021 18:51:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1630277454; x=1661813454;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=9ThEJZrH48tcOKJNlSLifLtNkzQgyliztdzyhjhPeDU=;
+  b=i7297CivlL9o1oRcDNefs11cPeERQ/7RUb9q5Xwxg9AUXMHQmXD+fKhV
+   sN66FQzLtjXg3amfMHBj9LUvnOhb83CFog8i9Epn10hvKxVMS2Wecvqru
+   JxnVpBZklx3Kb1SY2EjP/oOT8tpx2pSQxUv7cyWIWH5vxG/FUDTtpkIBZ
+   EX6n0GDf0qs6CRVqpuKZjF0+ji3pEQrESNRUUe7X6p+qW+q/KcDbP0IY/
+   Fi1zFSg0uADbMQdM6mvccLEkmtGZw0ljsn528SN2ocZHYLmyg906djAE7
+   qBMBgWqVk9q6e9QKH7XAUzqmNcaQIsLsS3bNVddxMObGmue10j9lwGJzk
+   w==;
+X-IronPort-AV: E=Sophos;i="5.84,362,1620662400"; 
+   d="scan'208";a="179269283"
+Received: from mail-bn8nam12lp2174.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.174])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Aug 2021 06:50:51 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BpDHhrkRsCRFhu8MKlTdyeL35AkYBvyDWEDuTBPTzftXKSzzeDfeghDGBt+U8xn8IDw77+muu+QsWTXt7YflJEfXKYURWSJ7JRArC0I4wj/zwij+lzjFsabyLe8nSgt6YpW2BMuJ5kjXzAyKWPh++wYgtzEJfdm86+0ux+4WaRjDyyyF5d4yuG1CDWRsxOr6rQ//7tG0bTIn5j/X1WcgO3yzaStsl9XNYg00nfy2fYElqmDOFimY+UVHR/M24AinpE+kxYy4k+i0peJhMnQBxJyDJFF2i//VEcZW9UVHMVmaBzAf5fmRDIedHhFls92IouBsxIhrfCy9+0h00jE88A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9ThEJZrH48tcOKJNlSLifLtNkzQgyliztdzyhjhPeDU=;
+ b=dSXKgHzqv/dLNssGkNswh2SyTvPz5Q8GayBBTI05LunaRCdC1eklKzHYP4stj7n/NP2fXVLNstksc11ow/983wI5VqQWG/Rn0Ayu90jwAS90JxQQZaugCHZl7MBNKaKQz+l5nqMDxWw4HpP2gQxZrv/pl+ovPcxrHjSa3ppQCiLYOl8kRPDgpYci7b9E8YpldeFeMCMN2LaQDicxv4+lQHuXP08P8KE5AxesZ5Nd+hmU2P4RccT3+H+Dxfll4JdrXPeI84PnXspfa3YLK0Fh4kMW224xxAxOLQYijKRYCk1XcWq+LNMG4Z2aKGJ0i5g94dGUh7Lpo3N2vmjuEKfrvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9ThEJZrH48tcOKJNlSLifLtNkzQgyliztdzyhjhPeDU=;
+ b=hHP2EWNdnkcY7OMJNqZN4OvowYY34j27b7dIf1G7j7NWP7PtgYVm0RgduunMaNt9Bz3dCYdLfIR1xqpnmmbGDhIolb6Y8uO5ZwmRecdmy6yEIr22ISj4K7i8SUofp9feMg3sdR3DUoLqg8kQGhrOPrVEs2l42HwZJ5GQYE3e4Lk=
+Received: from DM6PR04MB7081.namprd04.prod.outlook.com (2603:10b6:5:244::21)
+ by DM6PR04MB6828.namprd04.prod.outlook.com (2603:10b6:5:22a::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.23; Sun, 29 Aug
+ 2021 22:50:49 +0000
+Received: from DM6PR04MB7081.namprd04.prod.outlook.com
+ ([fe80::7c0e:3e95:80d3:7a70]) by DM6PR04MB7081.namprd04.prod.outlook.com
+ ([fe80::7c0e:3e95:80d3:7a70%6]) with mapi id 15.20.4457.024; Sun, 29 Aug 2021
+ 22:50:49 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Phillip Susi <phill@thesusis.net>,
+        Tim Walker <tim.t.walker@seagate.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH v6 0/5] Initial support for multi-actuator HDDs
+Thread-Topic: [PATCH v6 0/5] Initial support for multi-actuator HDDs
+Thread-Index: AQHXmxim3oZIy1vm80ixsAdRU+BqXw==
+Date:   Sun, 29 Aug 2021 22:50:49 +0000
+Message-ID: <DM6PR04MB708184344F53156F284DEE8AE7CA9@DM6PR04MB7081.namprd04.prod.outlook.com>
+References: <20210827075045.642269-1-damien.lemoal@wdc.com>
+ <874kbbugtw.fsf@vps.thesusis.net>
+ <63D90989-AFAF-410B-AD11-EDF71CEEE666@seagate.com>
+ <87ilzqu6to.fsf@vps.thesusis.net>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: thesusis.net; dkim=none (message not signed)
+ header.d=none;thesusis.net; dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c99771b3-ff0f-451b-1d03-08d96b3f7284
+x-ms-traffictypediagnostic: DM6PR04MB6828:
+x-microsoft-antispam-prvs: <DM6PR04MB68283A374495F71B7C62676FE7CA9@DM6PR04MB6828.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ADIsLjaZiyxY2AIqaT2SABUBoeSXlfN6Znj2FyZjDhlRzbvYspWG5JM8I7oIheYQCN9d8ubJlF5U4F2MA1sJEc7jX+PXNao/r03jo6BSoeOJ0QmsSnmMfe+EvDtrQBw+cG8D4RxEGIswlTNhP4/4Z84y8o83ztMIxyyJltJIEas8r+yhbrMibRbiC9UH+IX9ToIqr3qdQ8vgBf0ZHDobjEkIJynF+wyPgmstqyDkYawMzxu9dnuG81h9b3HQuMwgBCO5AR4+1nWbvuYOSxWR1p9GWsqvlge+yCVLbrXTBkIerc5CgJy6jeeALJHYDKul+bfM+MHJoNYYnKYXqMq8NCOP+lnTfUIB+J6n+ptD6bq3nCgTYcT1C/IcmhmtSSjZYCT2B0pgMBMdW2Kt0ieVGu8K2NO2rwZRD2GeZerm53Hw0igvfzxwBdQ54wh8qhRHtBH+eN7Vdd4J/CKLli0SkR79xoVH/dFHuJ1AUnEVVSpUIiJYDzDf39C7yY17j4/mj1+n6dExcKx8r+PtQVFw0lcrMRDMlY7DoaoHPL5o/soVo5viYpuplmiHD+asX7XAMQjIjaRRKCZPhc1i0jy/ThWV3okSwSK/6N3gjjhhmVnfepAm+oepNeRd2bL91/8UkJPbqQfYCGR60u1xSSadzW6yVIm05/ux6oQbKgyrLQejv3SWdVrPEtk18kX0+gQrwgNk5dRc0o6OXesvUgVdbw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB7081.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(366004)(396003)(376002)(346002)(9686003)(55016002)(478600001)(71200400001)(8676002)(86362001)(110136005)(91956017)(54906003)(33656002)(122000001)(38100700002)(38070700005)(66476007)(53546011)(7696005)(64756008)(66446008)(83380400001)(2906002)(66946007)(52536014)(4326008)(66556008)(186003)(5660300002)(316002)(6506007)(76116006)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NK39THPDtTC4dTmv2WMwkrcRij7ENehQiDNpHVf1Kl0HvGjDXwYRArFBTPA8?=
+ =?us-ascii?Q?AvxMkE7w7nf7HZ8prMBIMMaw1exIRiphOeIhOro9o+b6CwdBEO2xdwyGZUcB?=
+ =?us-ascii?Q?rvpUbQsp9Narl0nML5jkAl6zPBxb68oI4+oqROxy7a/qwvIGAq8RWLd51dxd?=
+ =?us-ascii?Q?nzCdg3ppfhAhloKViQiCt2VAAetzwIBClXDQ4AN5kguCFW1P2Lzf6BEkAJgl?=
+ =?us-ascii?Q?w8PSF0EW5Vc+lgJpZkaWSU/hNFNYxb1pRXRbjMVH9DHjPjwEq8/2vGB26Etp?=
+ =?us-ascii?Q?dpqrDQf0YLgGer3PCDrvhQFhhvBxQ6dFv1hPLgf9UlsYhUPidrATNw3/6r0N?=
+ =?us-ascii?Q?M+2uXF9WAHvPmklx/WHFlFtGNXEPZLVd79ux/zF9VUdF1zq1j2R1Hn1tMqoL?=
+ =?us-ascii?Q?k2EIJbwxAYRK3pBUxkbahzG9RdhPo3Eh7My5p98/VdysAX5OrdO6M3/gURwD?=
+ =?us-ascii?Q?eckQuJ4XpLqysnYPIvwpMeeCvvo78Y5dyvpSBfPOwEgLYXKuoYbIOw305ple?=
+ =?us-ascii?Q?mtPwTc7ud1HBAnGMQ03W584ym3Avrh/tVBuJ2KRrQAJFG3yTVTkhwvcuPIli?=
+ =?us-ascii?Q?HQ3bkwYZNzl3EytLjfur6/q2Ar0fSHIBWuNdDVTYyPH9Q21wf8cuGH7gEdDM?=
+ =?us-ascii?Q?NXsRpFMpRmeaGqzgZeKOT2tJn52AjnyRThAtZkPwxGEc9LzZjK5JNA9vgyDN?=
+ =?us-ascii?Q?8CohDlHDBW/zd9/vOwj6F9pEBsU1VUqf48vvb7mH4OWNdYV5Rs0zUBa8+dAV?=
+ =?us-ascii?Q?Kcgyevk4sHX7EROYkl/E5gB1sqkD7l4NwQpjIXJgYDKgSmtFRrITFCaYGPNY?=
+ =?us-ascii?Q?lje2nmKF+ZN4hOwmNJwTJFcFehcG6p5fBw0FsOKTCPr068zm/AU0yMkWsvJL?=
+ =?us-ascii?Q?rXwbzaq6xLBVR0nS8P2ErM3caI4QUSBX9a1kDr2xzyq9vqtfr/2Otom/hQfX?=
+ =?us-ascii?Q?EGTrpC4ir1I+vEf7kSw1QU2Z2v9o1pNmlpfHdcp9Q89SE/AgzQvW+c05XRxb?=
+ =?us-ascii?Q?IwBQJhNoGc27NUkjV7zsZSy/l5sbckdBGoskMwgbTPtgXlThMmi0jtfZgaQb?=
+ =?us-ascii?Q?IGtLPqJXHIBo1rZVTzqbFpji47qo/eJptihp488sImfyvOQrZqkzHMIEXnDK?=
+ =?us-ascii?Q?2YoYjyUik3sP2lEtdYw54WCRKLsMWs9rS+loMgnNzvx6h/+uY1DtWVMUuWHd?=
+ =?us-ascii?Q?d5lvh7aiJlTIXL1ckeZ1IdJA28BWS61v/U6soRTbO9e2OkqAxI8lyMrHf8re?=
+ =?us-ascii?Q?8FEVWt6bHbjtQZF/7tAI8pLgtD0ARLUfOPa+Z/K6fkgETZErwUzdOoFyoA4O?=
+ =?us-ascii?Q?CnfOLr/1DW9BpM5/s9L2O8UQnzOD8p9+0e/uSwxDLRjcEr2HEgI8cY0vpjes?=
+ =?us-ascii?Q?jDIwcgS2f45LjDf/Tn7QcCLyfxhx0FLCXk1NbtnKOGMjnnJj/g=3D=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB7081.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c99771b3-ff0f-451b-1d03-08d96b3f7284
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2021 22:50:49.7391
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Y9WHFggCD2nUZ9qen0/mER3aKqwVrst6tJ3+MYvxtgkLU1N9byoYbX8CSp1roCkcqvTggRN6dp8t3tHRn+ZoaA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6828
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
-commit a160c6159d4a0cf8 ("block: add an optional probe callback to
-major_names") is calling the module's probe function with major_names_lock
-held.
-
-Fortunately, since commit 990e78116d38059c ("block: loop: fix deadlock
-between open and remove") stopped holding loop_ctl_mutex in lo_open(),
-current role of loop_ctl_mutex is to serialize access to loop_index_idr
-and loop_add()/loop_remove(); in other words, management of id for IDR.
-To avoid holding loop_ctl_mutex during whole add/remove operation, use
-a bool flag to indicate whether the loop device is ready for use.
-
-loop_unregister_transfer() which is called from cleanup_cryptoloop()
-currently has possibility of use-after-free access due to lack of
-serialization between kfree() from loop_remove() from loop_control_remove()
-and mutex_lock() from unregister_transfer_cb(). But since lo->lo_encryption
-should be already NULL when this function is called due to module unload,
-and commit 222013f9ac30b9ce ("cryptoloop: add a deprecation warning")
-indicates that we will remove this function shortly, this patch updates
-this function to emit warning instead of checking lo->lo_encryption.
-
-Holding loop_ctl_mutex in loop_exit() is pointless, for all users must
-close /dev/loop-control and /dev/loop$num (in order to drop module's
-refcount to 0) before loop_exit() starts, and nobody can open
-/dev/loop-control or /dev/loop$num afterwards.
-
-Link: https://syzkaller.appspot.com/bug?id=7bb10e8b62f83e4d445cdf4c13d69e407e629558 [1]
-Reported-by: syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-Changes in v3:
-  Don't use cmpxchg(), for kernel test robot <lkp@intel.com> reported
-  that some archtectures do not support cmpxchg() on bool.
-  Add data_race() annotation to loop_control_get_free().
-
-Changes in v2:
-  Don't replace loop_ctl_mutex mutex with loop_idr_spinlock spinlock.
-  Don't traverse on loop_index_idr at loop_unregister_transfer().
-  Don't use refcount for handling duplicated removal requests.
----
- drivers/block/loop.c | 75 +++++++++++++++++++++++++++++---------------
- drivers/block/loop.h |  1 +
- 2 files changed, 50 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f0cdff0c5fbf..478ff6650dab 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2113,18 +2113,6 @@ int loop_register_transfer(struct loop_func_table *funcs)
- 	return 0;
- }
- 
--static int unregister_transfer_cb(int id, void *ptr, void *data)
--{
--	struct loop_device *lo = ptr;
--	struct loop_func_table *xfer = data;
--
--	mutex_lock(&lo->lo_mutex);
--	if (lo->lo_encryption == xfer)
--		loop_release_xfer(lo);
--	mutex_unlock(&lo->lo_mutex);
--	return 0;
--}
--
- int loop_unregister_transfer(int number)
- {
- 	unsigned int n = number;
-@@ -2132,9 +2120,20 @@ int loop_unregister_transfer(int number)
- 
- 	if (n == 0 || n >= MAX_LO_CRYPT || (xfer = xfer_funcs[n]) == NULL)
- 		return -EINVAL;
-+	/*
-+	 * This function is called from only cleanup_cryptoloop().
-+	 * Given that each loop device that has a transfer enabled holds a
-+	 * reference to the module implementing it we should never get here
-+	 * with a transfer that is set (unless forced module unloading is
-+	 * requested). Thus, check module's refcount and warn if this is
-+	 * not a clean unloading.
-+	 */
-+#ifdef CONFIG_MODULE_UNLOAD
-+	if (xfer->owner && module_refcount(xfer->owner) != -1)
-+		pr_err("Danger! Unregistering an in use transfer function.\n");
-+#endif
- 
- 	xfer_funcs[n] = NULL;
--	idr_for_each(&loop_index_idr, &unregister_transfer_cb, xfer);
- 	return 0;
- }
- 
-@@ -2325,8 +2324,9 @@ static int loop_add(int i)
- 	} else {
- 		err = idr_alloc(&loop_index_idr, lo, 0, 0, GFP_KERNEL);
- 	}
-+	mutex_unlock(&loop_ctl_mutex);
- 	if (err < 0)
--		goto out_unlock;
-+		goto out_free_dev;
- 	i = err;
- 
- 	err = -ENOMEM;
-@@ -2392,15 +2392,19 @@ static int loop_add(int i)
- 	disk->private_data	= lo;
- 	disk->queue		= lo->lo_queue;
- 	sprintf(disk->disk_name, "loop%d", i);
-+	/* Make this loop device reachable from pathname. */
- 	add_disk(disk);
-+	/* Show this loop device. */
-+	mutex_lock(&loop_ctl_mutex);
-+	lo->idr_visible = true;
- 	mutex_unlock(&loop_ctl_mutex);
- 	return i;
- 
- out_cleanup_tags:
- 	blk_mq_free_tag_set(&lo->tag_set);
- out_free_idr:
-+	mutex_lock(&loop_ctl_mutex);
- 	idr_remove(&loop_index_idr, i);
--out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
- out_free_dev:
- 	kfree(lo);
-@@ -2410,9 +2414,14 @@ static int loop_add(int i)
- 
- static void loop_remove(struct loop_device *lo)
- {
-+	/* Make this loop device unreachable from pathname. */
- 	del_gendisk(lo->lo_disk);
- 	blk_cleanup_disk(lo->lo_disk);
- 	blk_mq_free_tag_set(&lo->tag_set);
-+	mutex_lock(&loop_ctl_mutex);
-+	idr_remove(&loop_index_idr, lo->lo_number);
-+	mutex_unlock(&loop_ctl_mutex);
-+	/* There is no route which can find this loop device. */
- 	mutex_destroy(&lo->lo_mutex);
- 	kfree(lo);
- }
-@@ -2436,31 +2445,40 @@ static int loop_control_remove(int idx)
- 		return -EINVAL;
- 	}
- 		
-+	/* Hide this loop device for serialization. */
- 	ret = mutex_lock_killable(&loop_ctl_mutex);
- 	if (ret)
- 		return ret;
--
- 	lo = idr_find(&loop_index_idr, idx);
--	if (!lo) {
-+	if (!lo || !lo->idr_visible)
- 		ret = -ENODEV;
--		goto out_unlock_ctrl;
--	}
-+	else
-+		lo->idr_visible = false;
-+	mutex_unlock(&loop_ctl_mutex);
-+	if (ret)
-+		return ret;
- 
-+	/* Check whether this loop can be removed. */
- 	ret = mutex_lock_killable(&lo->lo_mutex);
- 	if (ret)
--		goto out_unlock_ctrl;
-+		goto mark_visible;
- 	if (lo->lo_state != Lo_unbound ||
- 	    atomic_read(&lo->lo_refcnt) > 0) {
- 		mutex_unlock(&lo->lo_mutex);
- 		ret = -EBUSY;
--		goto out_unlock_ctrl;
-+		goto mark_visible;
- 	}
-+	/* Mark this loop device no longer open()-able. */
- 	lo->lo_state = Lo_deleting;
- 	mutex_unlock(&lo->lo_mutex);
- 
--	idr_remove(&loop_index_idr, lo->lo_number);
- 	loop_remove(lo);
--out_unlock_ctrl:
-+	return 0;
-+
-+mark_visible:
-+	/* Show this loop device again. */
-+	mutex_lock(&loop_ctl_mutex);
-+	lo->idr_visible = true;
- 	mutex_unlock(&loop_ctl_mutex);
- 	return ret;
- }
-@@ -2474,7 +2492,8 @@ static int loop_control_get_free(int idx)
- 	if (ret)
- 		return ret;
- 	idr_for_each_entry(&loop_index_idr, lo, id) {
--		if (lo->lo_state == Lo_unbound)
-+		/* Hitting a race results in creating a new loop device which is harmless. */
-+		if (lo->idr_visible && data_race(lo->lo_state) == Lo_unbound)
- 			goto found;
- 	}
- 	mutex_unlock(&loop_ctl_mutex);
-@@ -2590,10 +2609,14 @@ static void __exit loop_exit(void)
- 	unregister_blkdev(LOOP_MAJOR, "loop");
- 	misc_deregister(&loop_misc);
- 
--	mutex_lock(&loop_ctl_mutex);
-+	/*
-+	 * There is no need to use loop_ctl_mutex here, for nobody else can
-+	 * access loop_index_idr when this module is unloading (unless forced
-+	 * module unloading is requested). If this is not a clean unloading,
-+	 * we have no means to avoid kernel crash.
-+	 */
- 	idr_for_each_entry(&loop_index_idr, lo, id)
- 		loop_remove(lo);
--	mutex_unlock(&loop_ctl_mutex);
- 
- 	idr_destroy(&loop_index_idr);
- }
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 1988899db63a..04c88dd6eabd 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -68,6 +68,7 @@ struct loop_device {
- 	struct blk_mq_tag_set	tag_set;
- 	struct gendisk		*lo_disk;
- 	struct mutex		lo_mutex;
-+	bool			idr_visible;
- };
- 
- struct loop_cmd {
--- 
-2.25.1
-
+On 2021/08/28 2:38, Phillip Susi wrote:=0A=
+> =0A=
+> Tim Walker <tim.t.walker@seagate.com> writes:=0A=
+> =0A=
+>> The IO Scheduler is a useful place to implement per-actuator load=0A=
+>> management, but with the LBA-to-actuator mapping available to user=0A=
+>> space (via sysfs) it could also be done at the user level. Or pretty=0A=
+>> much anywhere else where we have knowledge and control of the various=0A=
+>> streams.=0A=
+> =0A=
+> I suppose there may be some things user space could do with the=0A=
+> information, but mainly doesn't it have to be done in the IO scheduler?=
+=0A=
+=0A=
+Correct, if the user does not use a file system then optimizations will dep=
+end=0A=
+on the user application and the IO scheduler.=0A=
+=0A=
+> As it stands now, it is going to try to avoid seeking between the two=0A=
+> regions even though the drive can service a contiguous stream from both=
+=0A=
+> just fine, right?=0A=
+=0A=
+Correct. But any IO scheduler optimization will kick-in only and only if th=
+e=0A=
+user is accessing the drive at a queue depth beyond the drive max QD, 32 fo=
+r=0A=
+SATA. If the drive is exercised at a QD less than its maximum, the schedule=
+r=0A=
+does not hold on to requests (at least mq-deadline does not, not sure about=
+=0A=
+bfq). So even with only this patch set (no optimizations at the kernel leve=
+l),=0A=
+the user can still make things work as expected, that is, get multiple stre=
+ams=0A=
+of IOs to execute in parallel.=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
