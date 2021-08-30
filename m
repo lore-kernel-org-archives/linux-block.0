@@ -2,253 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27DA4C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 10:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77A5C19F35
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:00:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D25D610C7
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 10:16:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9032D61153
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:00:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233248AbhH3KRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 06:17:05 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:58184 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236305AbhH3KRE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 06:17:04 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 3540821DA8;
-        Mon, 30 Aug 2021 10:16:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1630318570; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ySRnwFql9fJfhf6kdA57y05yvy5Kk5ptSmd+4e4b6pk=;
-        b=kPJomYUbTAZHYlrsyur/wPutc0svGikTLhpj/vQXX/mI9FeF0jAHrBX7b9olhHaAStq8a+
-        +rpVTfk29aAxSScH/jMP8NUedrxDkamqEkACihEHFeDA6SlGesTYGLK7hRBI6G3HmXeOKZ
-        RAyfYJBXSHh2zIlBaDtQWn3NDpvLxzU=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id EC75D13670;
-        Mon, 30 Aug 2021 10:16:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id W8g5OOmvLGE0QwAAGKfGzw
-        (envelope-from <jgross@suse.com>); Mon, 30 Aug 2021 10:16:09 +0000
-Subject: Re: [PATCH v3 0/3] xen: harden blkfront against malicious backends
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20210730103854.12681-1-jgross@suse.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <324eab71-86ae-790a-d19c-97bb35b4f354@suse.com>
-Date:   Mon, 30 Aug 2021 12:16:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S236703AbhH3MA4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 08:00:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47296 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236692AbhH3MAz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Aug 2021 08:00:55 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5FF7060232;
+        Mon, 30 Aug 2021 12:00:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630324802;
+        bh=xsD3OpnHmDWYg5pIy4jE8yd4rGk9PIdNbR+vQmGCa1w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=kMzJ2QYQzQQwdiUOVoOGTmjNZGAGgACFt5uiDLlZep1MJpsCDl3DP7qXhylFhHAGe
+         BCiTVGZsTjxVTUIo7KejcJvDXBFcizQoSo0gLUu484OmvkAxhDswAhC1+sApZeLUFj
+         MG5Y5+A+stMX62bklmDuIG2YqH5fbn+RSMpatVr/0nnA0IAFT0mVqXMtJTn/hzmjCc
+         EZiAwDwBZ1E3civupY939KIJ1ri8gJXc5pQF23UMDOGGG8SGbET8yD7SkK6uUOhvCT
+         Vk/g15yfePgX8C9OZNWXZNZEaCvJMWuAf+NbOjGbkccYalFKnfDt39E3CNS1UMB84n
+         se4tXPpX/Js5w==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 14/14] cryptoloop: add a deprecation warning
+Date:   Mon, 30 Aug 2021 07:59:42 -0400
+Message-Id: <20210830115942.1017300-14-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210830115942.1017300-1-sashal@kernel.org>
+References: <20210830115942.1017300-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210730103854.12681-1-jgross@suse.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq
-Content-Type: multipart/mixed; boundary="00oaAymQLL261J1A92SoY0uiKtAQrzaQn";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>
-Message-ID: <324eab71-86ae-790a-d19c-97bb35b4f354@suse.com>
-Subject: Re: [PATCH v3 0/3] xen: harden blkfront against malicious backends
-References: <20210730103854.12681-1-jgross@suse.com>
-In-Reply-To: <20210730103854.12681-1-jgross@suse.com>
+From: Christoph Hellwig <hch@lst.de>
 
---00oaAymQLL261J1A92SoY0uiKtAQrzaQn
-Content-Type: multipart/mixed;
- boundary="------------62439A08F1A8B23EA617671E"
-Content-Language: en-US
+[ Upstream commit 222013f9ac30b9cec44301daa8dbd0aae38abffb ]
 
-This is a multi-part message in MIME format.
---------------62439A08F1A8B23EA617671E
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Support for cryptoloop has been officially marked broken and deprecated
+in favor of dm-crypt (which supports the same broken algorithms if
+needed) in Linux 2.6.4 (released in March 2004), and support for it has
+been entirely removed from losetup in util-linux 2.23 (released in April
+2013).  Add a warning and a deprecation schedule.
 
-On 30.07.21 12:38, Juergen Gross wrote:
-> Xen backends of para-virtualized devices can live in dom0 kernel, dom0
-> user land, or in a driver domain. This means that a backend might
-> reside in a less trusted environment than the Xen core components, so
-> a backend should not be able to do harm to a Xen guest (it can still
-> mess up I/O data, but it shouldn't be able to e.g. crash a guest by
-> other means or cause a privilege escalation in the guest).
->=20
-> Unfortunately blkfront in the Linux kernel is fully trusting its
-> backend. This series is fixing blkfront in this regard.
->=20
-> It was discussed to handle this as a security problem, but the topic
-> was discussed in public before, so it isn't a real secret.
->=20
-> It should be mentioned that a similar series has been posted some years=
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20210827163250.255325-1-hch@lst.de
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/Kconfig      | 4 ++--
+ drivers/block/cryptoloop.c | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-> ago by Marek Marczykowski-G=C3=B3recki, but this series has not been ap=
-plied
-> due to a Xen header not having been available in the Xen git repo at
-> that time. Additionally my series is fixing some more DoS cases.
->=20
-> Changes in V3:
-> - patch 3: insert missing unlock in error case (kernel test robot)
-> - patch 3: use %#x as format for printing wrong operation value
->    (Roger Pau Monn=C3=A9)
->=20
-> Changes in V2:
-> - put blkfront patches into own series
-> - some minor comments addressed
->=20
-> Juergen Gross (3):
->    xen/blkfront: read response from backend only once
->    xen/blkfront: don't take local copy of a request from the ring page
->    xen/blkfront: don't trust the backend response data blindly
->=20
->   drivers/block/xen-blkfront.c | 126 +++++++++++++++++++++++-----------=
--
->   1 file changed, 84 insertions(+), 42 deletions(-)
->=20
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 63056cfd4b62..fbb3a558139f 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -213,7 +213,7 @@ config BLK_DEV_LOOP_MIN_COUNT
+ 	  dynamically allocated with the /dev/loop-control interface.
+ 
+ config BLK_DEV_CRYPTOLOOP
+-	tristate "Cryptoloop Support"
++	tristate "Cryptoloop Support (DEPRECATED)"
+ 	select CRYPTO
+ 	select CRYPTO_CBC
+ 	depends on BLK_DEV_LOOP
+@@ -225,7 +225,7 @@ config BLK_DEV_CRYPTOLOOP
+ 	  WARNING: This device is not safe for journaled file systems like
+ 	  ext3 or Reiserfs. Please use the Device Mapper crypto module
+ 	  instead, which can be configured to be on-disk compatible with the
+-	  cryptoloop device.
++	  cryptoloop device.  cryptoloop support will be removed in Linux 5.16.
+ 
+ source "drivers/block/drbd/Kconfig"
+ 
+diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
+index 3cabc335ae74..f0a91faa43a8 100644
+--- a/drivers/block/cryptoloop.c
++++ b/drivers/block/cryptoloop.c
+@@ -189,6 +189,8 @@ init_cryptoloop(void)
+ 
+ 	if (rc)
+ 		printk(KERN_ERR "cryptoloop: loop_register_transfer failed\n");
++	else
++		pr_warn("the cryptoloop driver has been deprecated and will be removed in in Linux 5.16\n");
+ 	return rc;
+ }
+ 
+-- 
+2.30.2
 
-Series pushed to xen/tip.git for-linus-5.15
-
-
-Juergen
-
---------------62439A08F1A8B23EA617671E
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------62439A08F1A8B23EA617671E--
-
---00oaAymQLL261J1A92SoY0uiKtAQrzaQn--
-
---wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmEsr+kFAwAAAAAACgkQsN6d1ii/Ey/V
-fwgAiwttMoeaRjT6z90Dj0C5RVj2ypvjEckWpDvZFDUrKyiw7/SvtoeWj97jUaYHqDqJe7Z33p4K
-HlXOStVkIGTF/6E17EsHLPC2vq7Wk9A1evnZ4BvGdRhOKRA/2qK/n05Pcp82k6XKJsM4Ctgkqr27
-X1YkxWsagi3oVu5Sl4aBvvckOucCyPhJ8eLGx4d+F55EAAOjZBZpN9jnYbdmZ4NJmDn+MfAkq16s
-CGArI31OVOLLzD43LjxGJ2Y5n+TNGACOF4BNy++WrIVfVgtU7BkpwUbO8JTBHSu94dej6wmUUb5V
-ExlOmIDGqerbEAUHn7ccjMZu+U5g+V8jEAAoRzKxkw==
-=1i13
------END PGP SIGNATURE-----
-
---wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq--
