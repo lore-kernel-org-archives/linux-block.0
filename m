@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9EF7C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 14:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4677EC432BE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 14:39:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B493D60240
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 14:32:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E5D76023E
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 14:39:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237182AbhH3OdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 10:33:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49432 "EHLO
+        id S237047AbhH3Okq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 10:40:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237180AbhH3OdX (ORCPT
+        with ESMTP id S231757AbhH3Okq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 10:33:23 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0993DC061575
-        for <linux-block@vger.kernel.org>; Mon, 30 Aug 2021 07:32:30 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id e186so20136455iof.12
-        for <linux-block@vger.kernel.org>; Mon, 30 Aug 2021 07:32:30 -0700 (PDT)
+        Mon, 30 Aug 2021 10:40:46 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC60FC061575
+        for <linux-block@vger.kernel.org>; Mon, 30 Aug 2021 07:39:52 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id e186so20171123iof.12
+        for <linux-block@vger.kernel.org>; Mon, 30 Aug 2021 07:39:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+        h=to:from:subject:cc:message-id:date:user-agent:mime-version
          :content-language:content-transfer-encoding;
-        bh=wSeItNf2j2BTB0N5riOuXhZPxFPxsZfWW9GKHLK8ubg=;
-        b=C29j9IGFZj+AbV3R0Nxur1XEdcj/0ZCu78Rd3NvM6n3ARUnFKhgYSw1tAbxlS03hDY
-         5ifaKbTWRoHYMMdo41QZO5LUkm2VU3TVSJRQXqQQoLVoGz80UxUPYoImYEW2fS/FAciA
-         e0BFf/X1u+EZJZug3YpP7kcTOH1lfvDf0589qZ5s4Qt3dE5uMbKwgtV3dsSTh/QGzKRw
-         +qPN/+yKJeSRfWLA33LFLYCY643H/wYIT7u65ovkhdUVY9dCAbzzrZqsmHUOFkfDUNbd
-         Tsx1DbRGXm2yPmzXomVNXPMrGA3wwuC+XLss3s9SOw/tssBMqi1YvQXjD3qaJ2aoDa7h
-         ZzOA==
+        bh=t7gRIB3ULkbi+YOlk8DmUxku33Kes9bRf5fMyDiIJjE=;
+        b=bMFLxzrOqS8QhUcz+7WZrvSNo8Ru/oF1gC08s3+ZrjpsXkE4oCxXHW5Brh6pJ4xmYy
+         n7PWC7NVRDfEvqYoFTAYSbBWvABgNk44G1THwhhhlJC+dozIxkc6a7cdWajHmdJI0K4e
+         dIefc3Zq3pp5Y6bfgafOr2HCmGoQmIO0JYgRFzqUXn63JM/+dhPRgLyRiQe+ssp2xKpP
+         GpcUmNje3RO7nja5xtwAkauRFjw866a4iXXhG1bB90axU3Qk7YPqFTHrPH5JnjriemFp
+         Fwo+Fgi7rYnkRY06sQlKAoBX+oaKGsSt+oKPyd+x8LbyM3uCSghaF9zeQG2dRhopHQxf
+         iiAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+        h=x-gm-message-state:to:from:subject:cc:message-id:date:user-agent
          :mime-version:content-language:content-transfer-encoding;
-        bh=wSeItNf2j2BTB0N5riOuXhZPxFPxsZfWW9GKHLK8ubg=;
-        b=ibV5CIE7TH4iB54CVkiJ/QQ8o487UHINelrmI522mDbqGQd9Q+WqVNOK1+c89j/hik
-         e51HEayu1Pqt1zmdILfTPbTNB/GtQslQjoR54wdw66q+UALk7laFWRBb2zVn14b2yOpF
-         dV2vSNO6mZQhmJxXd+8t6dw9p5ZYRnBfTq+LQDfRzTV5Eoy6yJ97nOhr4VC5Yg6rKAau
-         ocsqJRmcGEBnZqS6iZ3PvBo1ZB774q4axbu7Ur1/5lYRNfv7ggcUNSubSNkehyTCcYF4
-         mOMcjdgjqxJKX9CyiHdIuV0bWtn1VuII5XO749SI5R7KP1cFiMwDOwpTHu3D9H9GPvwp
-         nQtg==
-X-Gm-Message-State: AOAM530RFrQeev4CwZQaoX4OHP0YjHFjgsrqY6Owwn9STOEBcg3SJ9Le
-        89LdNnemr5EL2LP9DpgABUjBYFh1nvPPgg==
-X-Google-Smtp-Source: ABdhPJwvwV+2qLik/AQdlF3PwOULCnvPjQl64Daan8lRk57SUve62+1ZQ+vq33QEqnnECvIla6vUag==
-X-Received: by 2002:a5e:d60e:: with SMTP id w14mr18572371iom.135.1630333949060;
-        Mon, 30 Aug 2021 07:32:29 -0700 (PDT)
+        bh=t7gRIB3ULkbi+YOlk8DmUxku33Kes9bRf5fMyDiIJjE=;
+        b=MZyWUEZfwuSf+Ln0Uxu8UzU0/ov2AUnXtXdrqIFzZgd5/xlFS5rYRb/xfiBE/i0EFq
+         dknVEYOkZl/Jtz4BafMV4e+kaOQ63r6oUxE1dBvt4ry7H5O4N3q3uZs0zdMU7UnotUce
+         /6dMk1EE8JbgYa+vrhBKMJt/47JFPhdonPGNaWrnFoN63brvmkrW4v1CnuAphFEdHJsz
+         kVFNmE92ZwNkx93+w4E0/6ASvRsSerOQc0CyNzNI7AZnBNQAL0NkAj56wyL9sx1DpX2i
+         gyaWmyjVMTtQ5VLhUph5ymz9kRjALWlxv6AVMYQvK0HoLDZNzWSFyq+TqNxHWIWSQ646
+         p1qQ==
+X-Gm-Message-State: AOAM532EQIdiwRYm403uwIBV1DzjRCMrta42w3rZOA9q43xzGMi+pvEs
+        9loUjfZeHeh6587OVsSUF7fXoqq/MmFiyw==
+X-Google-Smtp-Source: ABdhPJylEfI0A4WuE5fnnR4LK8ZB/i9B0p0LVq3RKnO/0sIrqf201L612lOt98ra/t+ja4HxGGdnZA==
+X-Received: by 2002:a6b:7a03:: with SMTP id h3mr18639834iom.39.1630334391837;
+        Mon, 30 Aug 2021 07:39:51 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id i14sm8954148ilc.51.2021.08.30.07.32.28
+        by smtp.gmail.com with ESMTPSA id f5sm8740078ils.3.2021.08.30.07.39.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Aug 2021 07:32:28 -0700 (PDT)
+        Mon, 30 Aug 2021 07:39:51 -0700 (PDT)
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block changes for 5.15-rc1
-Message-ID: <e1a3e2aa-ad96-c9c6-af38-16b7300a5612@kernel.dk>
-Date:   Mon, 30 Aug 2021 08:32:27 -0600
+Subject: [GIT PULL] Block driver changes for 5.15-rc1
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <8e3f076e-4af2-8aa4-64a2-de65e231bfd7@kernel.dk>
+Date:   Mon, 30 Aug 2021 08:39:51 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
@@ -74,386 +74,241 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-Nothing major in here - lots of good cleanups and tech debt handling,
-which is also evident in the diffstats. In particular:
+Sitting on top of the core block changes, here are the driver changes
+for the 5.15 merge window:
 
-- Add disk sequence numbers (Matteo)
+- NVMe updates via Christoph:
+	- suspend improvements for devices with an HMB (Keith Busch)
+	- handle double completions more gacefull (Sagi Grimberg)
+	- cleanup the selects for the nvme core code a bit
+	  (Sagi Grimberg)
+	- don't update queue count when failing to set io queues
+	  (Ruozhu Li)
+	- various nvmet connect fixes (Amit Engel)
+	- cleanup lightnvm leftovers (Keith Busch, me)
+	- small cleanups (Colin Ian King, Hou Pu)
+	- add tracing for the Set Features command (Hou Pu)
+	- CMB sysfs cleanups (Keith Busch)
+	- add a mutex_destroy call (Keith Busch)
 
-- Discard merge fix (Ming)
+- Remove lightnvm subsystem. It's served its purpose and ultimately led
+  to zoned nvme support, we no longer need it (Christoph)
 
-- Relax disk zoned reporting restrictions (Niklas)
+- Revert floppy O_NDELAY fix (Denis)
 
-- Bio error handling zoned leak fix (Pavel)
+- nbd fixes (Hou, Pavel, Baokun)
 
-- Start of proper add_disk() error handling (Luis, Christoph)
+- nbd locking fixes (Tetsuo)
 
-- blk crypto fix (Eric)
+- nbd device removal fixes (Christoph)
 
-- Non-standard GPT location support (Dmitry)
+- raid10 rcu warning fix (Xiao)
 
-- IO priority improvements and cleanups (Damien)o
+- raid1 write behind fix (Guoqing)
 
-- blk-throtl improvements (Chunguang)
+- rnbd fixes (Gioh, Md Haris)
 
-- diskstats_show() stack reduction (Abd-Alrhman)
+- Misc fixes (Colin)
 
-- Loop scheduler selection (Bart)
+Note that this will throw a single merge conflict, due to lightnvm being
+removed. The resolution is simple:
 
-- Switch block layer to use kmap_local_page() (Christoph)
-
-- Remove obsolete disk_name helper (Christoph)
-
-- block_device refcounting improvements (Christoph)
-
-- Ensure gendisk always has a request queue reference (Christoph)
-
-- Misc fixes/cleanups (Shaokun, Oliver, Guoqing)
-
-Note that this will throw two conflicts when being pulled in:
-
-1) block/mq-deadline-cgroup.c - this one got reverted late in the 5.14
-   cycle, git rm is the right resolution here.
-
-2) drivers/block/virtio_blk.c - error handling fix later in the 5.14
-   cycle ends up touching the same out path. My resolution:
-
-diff --cc drivers/block/virtio_blk.c
-index afb37aac09e8,63dc121a4c43..2a5e27bb8e59
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@@ -902,10 -875,13 +899,13 @@@ static int virtblk_probe(struct virtio_
-  	virtblk_update_capacity(vblk, false);
-  	virtio_device_ready(vdev);
+diff --cc drivers/nvme/host/core.c
+index 68acd33c3856,b9a46c54f714..8679a108f571
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@@ -3758,17 -3757,11 +3753,10 @@@ static void nvme_alloc_ns(struct nvme_c
+  	if (!nvme_mpath_set_disk_name(ns, disk->disk_name, &disk->flags))
+  		sprintf(disk->disk_name, "nvme%dn%d", ctrl->instance,
+  			ns->head->instance);
+ -	ns->disk = disk;
   
-- 	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
-+ 	err = device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
-+ 	if (err)
- -		goto out_cleanup_disk;
-++		goto err_cleanup_disk;
-+ 
-  	return 0;
+  	if (nvme_update_ns_info(ns, id))
+ -		goto out_put_disk;
+ +		goto out_unlink_ns;
   
- -out_cleanup_disk:
- +err_cleanup_disk:
-  	blk_cleanup_disk(vblk->disk);
-  out_free_tags:
-  	blk_mq_free_tag_set(&vblk->tag_set);
+- 	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] == 0x1) {
+- 		if (nvme_nvm_register(ns, disk->disk_name, node)) {
+- 			dev_warn(ctrl->device, "LightNVM init failure\n");
+- 			goto out_unlink_ns;
+- 		}
+- 	}
+- 
+  	down_write(&ctrl->namespaces_rwsem);
+  	list_add_tail(&ns->list, &ctrl->namespaces);
+  	up_write(&ctrl->namespaces_rwsem);
 
-Apart from that, all clean.
-
-Please pull!
+Apart from that, merges cleanly. Please pull!
 
 
-The following changes since commit c500bee1c5b2f1d59b1081ac879d73268ab0ff17:
+The following changes since commit 2bc1f6e442eec88fa60f1ee6bef2c9871227cf8a:
 
-  Linux 5.14-rc4 (2021-08-01 17:04:17 -0700)
+  block: remove blk-mq-sysfs dead code (2021-08-02 13:37:29 -0600)
 
 are available in the Git repository at:
 
-  git://git.kernel.dk/linux-block.git tags/for-5.15/block-2021-08-30
+  git://git.kernel.dk/linux-block.git tags/for-5.15/drivers-2021-08-30
 
-for you to fetch changes up to 1d1cf156dc176e30eeaced5cf1450d582d387b81:
+for you to fetch changes up to b5b0eba590f08e2b06c830b8343c1da7059c7a88:
 
-  sg: pass the device name to blk_trace_setup (2021-08-25 06:46:54 -0600)
-
-----------------------------------------------------------------
-for-5.15/block-2021-08-30
+  Merge tag 'floppy-for-5.15' of https://github.com/evdenis/linux-floppy into for-5.15/drivers (2021-08-29 06:50:58 -0600)
 
 ----------------------------------------------------------------
-Abd-Alrhman Masalkhi (1):
-      block: reduce stack usage in diskstats_show
+for-5.15/drivers-2021-08-30
 
-Bart Van Assche (2):
-      blk-mq: Introduce the BLK_MQ_F_NO_SCHED_BY_DEFAULT flag
-      loop: Select I/O scheduler 'none' from inside add_disk()
+----------------------------------------------------------------
+Amit Engel (3):
+      nvmet: pass back cntlid on successful completion
+      nvmet: avoid duplicate qid in connect cmd
+      nvmet: check that host sqsize does not exceed ctrl MQES
 
-Christoph Hellwig (95):
-      MIPS: don't include <linux/genhd.h> in <asm/mach-rc32434/rb.h>
-      bvec: fix the include guards for bvec.h
-      bvec: add a bvec_kmap_local helper
-      bvec: add memcpy_{from,to}_bvec and memzero_bvec helper
-      block: use memzero_page in zero_fill_bio
-      rbd: use memzero_bvec
-      dm-writecache: use bvec_kmap_local instead of bvec_kmap_irq
-      ps3disk: use memcpy_{from,to}_bvec
-      block: remove bvec_kmap_irq and bvec_kunmap_irq
-      block: rewrite bio_copy_data_iter to use bvec_kmap_local and memcpy_to_bvec
-      block: use memcpy_to_bvec in copy_to_high_bio_irq
-      block: use memcpy_from_bvec in bio_copy_kern_endio_read
-      block: use memcpy_from_bvec in __blk_queue_bounce
-      block: use bvec_kmap_local in t10_pi_type1_{prepare,complete}
-      block: use bvec_kmap_local in bio_integrity_process
-      block: assert the locking state in delete_partition
-      block: unhash the whole device inode earlier
-      block: allocate bd_meta_info later in add_partitions
-      block: change the refcounting for partitions
-      loop: don't grab a reference to the block device
-      block: remove bdgrab
-      block: remove bdput
-      block: use the %pg format specifier in printk_all_partitions
-      block: use the %pg format specifier in show_partition
-      block: simplify printing the device names disk_stack_limits
-      block: simplify disk name formatting in check_partition
-      block: remove disk_name()
-      block: remove cmdline-parser.c
-      block: make the block holder code optional
-      block: remove the extra kobject reference in bd_link_disk_holder
-      block: look up holders by bdev
-      block: support delayed holder registration
-      dm: cleanup cleanup_mapped_device
-      dm: move setting md->type into dm_setup_md_queue
-      dm: delay registering the gendisk
-      block: remove support for delayed queue registrations
-      mm: hide laptop_mode_wb_timer entirely behind the BDI API
-      block: pass a gendisk to blk_queue_update_readahead
-      block: add a queue_has_disk helper
-      block: move the bdi from the request_queue to the gendisk
-      block: remove the bd_bdi in struct block_device
-      writeback: make the laptop_mode prototypes available unconditionally
-      mmc: block: let device_add_disk create disk attributes
-      mmc: block: cleanup gendisk creation
-      nvme: remove the GENHD_FL_UP check in nvme_ns_remove
-      nvme: replace the GENHD_FL_UP check in nvme_mpath_shutdown_disk
-      sx8: use the internal state machine to check if del_gendisk needs to be called
-      bcache: add proper error unwinding in bcache_device_init
-      bcache: move the del_gendisk call out of bcache_device_free
-      block: remove GENHD_FL_UP
-      block: store a gendisk in struct parsed_partitions
-      block: pass a gendisk to bdev_add_partition
-      block: pass a gendisk to bdev_del_partition
-      block: pass a gendisk to bdev_resize_partition
-      block: free the extended dev_t minor later
-      block: ensure the bdi is freed after inode_detach_wb
-      bvec: add a bvec_virt helper
-      block: use bvec_virt in bio_integrity_{process,free}
-      dm: make EBS depend on !HIGHMEM
-      dm-ebs: use bvec_virt
-      dm-integrity: use bvec_virt
-      squashfs: use bvec_virt
-      rbd: use bvec_virt
-      virtio_blk: use bvec_virt
-      bcache: use bvec_virt
-      sd: use bvec_virt
-      ubd: use bvec_virt
-      ps3vram: use bvec_virt
-      dasd: use bvec_virt
-      dcssblk: use bvec_virt
-      nvme: use bvec_virt
-      blk-cgroup: refactor blkcg_print_stat
-      blk-cgroup: stop using seq_get_buf
-      block: unexport blk_register_queue
-      block: add back the bd_holder_dir reference in bd_link_disk_holder
-      nvme: use blk_mq_alloc_disk
-      st: do not allocate a gendisk
-      sg: do not allocate a gendisk
-      block: cleanup the lockdep handling in *alloc_disk
-      block: remove alloc_disk and alloc_disk_node
-      block: remove the minors argument to __alloc_disk_node
-      block: pass a request_queue to __blk_alloc_disk
-      block: hold a request_queue reference for the lifetime of struct gendisk
-      block: add an explicit ->disk backpointer to the request_queue
-      block: add a sanity check for a live disk in del_gendisk
-      block: fold register_disk into device_add_disk
-      block: call bdev_add later in device_add_disk
-      block: create the bdi link earlier in device_add_disk
-      block: call blk_integrity_add earlier in device_add_disk
-      block: call blk_register_queue earlier in device_add_disk
-      block: remove a pointless call to MINOR() in device_add_disk
-      block: remove CONFIG_DEBUG_BLOCK_EXT_DEVT
-      block: refine the disk_live check in del_gendisk
-      block: mark blkdev_fsync static
-      sg: pass the device name to blk_trace_setup
+Baokun Li (1):
+      nbd: add the check to prevent overflow in __nbd_ioctl()
 
-Chunguang Xu (1):
-      blk-throtl: optimize IOPS throttle for large IO scenarios
+Christoph Hellwig (10):
+      nbd: refactor device removal
+      nbd: remove nbd_del_disk
+      nbd: return the allocated nbd_device from nbd_dev_add
+      nbd: refactor device search and allocation in nbd_genl_connect
+      nbd: reduce the nbd_index_mutex scope
+      remove the lightnvm subsystem
+      nvme: remove the unused NVME_NS_* enum
+      nbd: reset NBD to NULL when restarting in nbd_genl_connect
+      nbd: only return usable devices from nbd_find_unused
+      nbd: remove nbd->destroy_complete
 
-Damien Le Moal (7):
-      block: remove blk-mq-sysfs dead code
-      block: bfq: fix bfq_set_next_ioprio_data()
-      block: improve ioprio class description comment
-      block: change ioprio_valid() to an inline function
-      block: fix IOPRIO_PRIO_CLASS() and IOPRIO_PRIO_VALUE() macros
-      block: Introduce IOPRIO_NR_LEVELS
-      block: fix default IO priority handling
+Colin Ian King (2):
+      xen-blkfront: Remove redundant assignment to variable err
+      nvmet: remove redundant assignments of variable status
 
-Dmitry Osipenko (4):
-      block: Add alternative_gpt_sector() operation
-      partitions/efi: Support non-standard GPT location
-      mmc: block: Support alternative_gpt_sector() operation
-      mmc: sdhci-tegra: Enable MMC_CAP2_ALT_GPT_TEGRA
+Denis Efremov (1):
+      Revert "floppy: reintroduce O_NDELAY fix"
 
-Eric Biggers (1):
-      blk-crypto: fix check for too-large dun_bytes
+Gioh Kim (1):
+      block/rnbd-clt: Use put_cpu_ptr after get_cpu_ptr
 
 Guoqing Jiang (1):
-      block: move some macros to blkdev.h
+      raid1: ensure write behind bio has less than BIO_MAX_VECS sectors
 
-Luis Chamberlain (5):
-      block: return errors from blk_integrity_add
-      block: return errors from disk_alloc_events
-      block: add error handling for device_add_disk / add_disk
-      virtio_blk: add error handling support for add_disk()
-      null_blk: add error handling support for add_disk()
+Hou Pu (3):
+      nvme-fabrics: remove superfluous nvmf_host_put in nvmf_parse_options
+      nvme: add set feature tracing support
+      nvmet: add set feature tracing support
 
-Matteo Croce (6):
-      block: add disk sequence number
-      block: export the diskseq in uevents
-      block: add ioctl to read the disk sequence number
-      block: export diskseq in sysfs
-      block: add a helper to raise a media changed event
-      loop: raise media_change event
+Hou Tao (1):
+      nbd: do del_gendisk() asynchronously for NBD_DESTROY_ON_DISCONNECT
 
-Ming Lei (1):
-      block: return ELEVATOR_DISCARD_MERGE if possible
+Jens Axboe (3):
+      Merge tag 'nvme-5.15-2021-08-18' of git://git.infradead.org/nvme into for-5.15/drivers
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.15/drivers
+      Merge tag 'floppy-for-5.15' of https://github.com/evdenis/linux-floppy into for-5.15/drivers
 
-Niklas Cassel (2):
-      blk-zoned: allow zone management send operations without CAP_SYS_ADMIN
-      blk-zoned: allow BLKREPORTZONE without CAP_SYS_ADMIN
+Keith Busch (6):
+      nvme-pci: use attribute group for cmb sysfs
+      nvme-pci: cmb sysfs: one file, one value
+      nvme-pci: disable hmb on idle suspend
+      nvme: allow user toggling hmb usage
+      nvme-tcp: pair send_mutex init with destroy
+      nvme: remove nvm_ndev from ns
 
-Oliver Hartkopp (1):
-      ioprio: move user space relevant ioprio bits to UAPI includes
+Md Haris Iqbal (1):
+      block/rnbd: Use sysfs_emit instead of s*printf function for sysfs show
 
-Pavel Begunkov (1):
-      bio: fix page leak bio_add_hw_page failure
+Pavel Skripkin (1):
+      block: nbd: add sanity check for first_minor
 
-Shaokun Zhang (1):
-      block, bfq: cleanup the repeated declaration
+Ruozhu Li (2):
+      nvme-tcp: don't update queue count when failing to set io queues
+      nvme-rdma: don't update queue count when failing to set io queues
 
- Documentation/ABI/testing/sysfs-block   |  12 +
- arch/m68k/configs/stmark2_defconfig     |   1 -
- arch/mips/include/asm/mach-rc32434/rb.h |   2 -
- arch/riscv/configs/defconfig            |   1 -
- arch/riscv/configs/rv32_defconfig       |   1 -
- arch/um/drivers/ubd_kern.c              |   3 +-
- block/Kconfig                           |  14 +-
- block/Makefile                          |   2 +-
- block/bfq-iosched.c                     |  17 +-
- block/bfq-iosched.h                     |   6 +-
- block/bfq-wf2q.c                        |   6 +-
- block/bio-integrity.c                   |  21 +-
- block/bio.c                             |  52 ++---
- block/blk-cgroup.c                      | 139 +++++-------
- block/blk-core.c                        |  18 +-
- block/blk-crypto.c                      |   2 +-
- block/blk-integrity.c                   |  12 +-
- block/blk-iocost.c                      |  23 +-
- block/blk-iolatency.c                   |  38 ++--
- block/blk-map.c                         |   2 +-
- block/blk-merge.c                       |  18 +-
- block/blk-mq-sysfs.c                    |  55 -----
- block/blk-mq.c                          |   8 +-
- block/blk-settings.c                    |  34 +--
- block/blk-sysfs.c                       |  35 +--
- block/blk-throttle.c                    |  32 +++
- block/blk-wbt.c                         |   8 +-
- block/blk-zoned.c                       |   6 -
- block/blk.h                             |  20 +-
- block/bounce.c                          |  39 +---
- block/cmdline-parser.c                  | 255 ---------------------
- block/disk-events.c                     |  69 ++++--
- block/elevator.c                        |   7 +-
- block/genhd.c                           | 385 ++++++++++++++++----------------
- block/holder.c                          | 174 +++++++++++++++
- block/ioctl.c                           |  16 +-
- block/ioprio.c                          |   9 +-
- block/mq-deadline-cgroup.c              |   8 +-
- block/mq-deadline-main.c                |   2 +
- block/partitions/Kconfig                |   1 -
- block/partitions/acorn.c                |   4 +-
- block/partitions/aix.c                  |  20 +-
- block/partitions/amiga.c                |   7 +-
- block/partitions/atari.c                |   4 +-
- block/partitions/check.h                |   2 +-
- block/partitions/cmdline.c              | 273 +++++++++++++++++++++-
- block/partitions/core.c                 |  73 +++---
- block/partitions/efi.c                  |  48 ++--
- block/partitions/ibm.c                  |   4 +-
- block/partitions/ldm.c                  |  18 +-
- block/partitions/mac.c                  |   2 +-
- block/partitions/msdos.c                |   6 +-
- block/partitions/sgi.c                  |   5 +-
- block/partitions/sun.c                  |   5 +-
- block/t10-pi.c                          |  16 +-
- drivers/block/brd.c                     |   3 -
- drivers/block/drbd/drbd_nl.c            |   2 +-
- drivers/block/drbd/drbd_req.c           |   5 +-
- drivers/block/loop.c                    |  13 +-
- drivers/block/null_blk/main.c           |   7 +-
- drivers/block/pktcdvd.c                 |   8 +-
- drivers/block/ps3disk.c                 |  18 +-
- drivers/block/ps3vram.c                 |   2 +-
- drivers/block/rbd.c                     |  18 +-
- drivers/block/sx8.c                     |   2 +-
- drivers/block/virtio_blk.c              |  14 +-
- drivers/md/Kconfig                      |   4 +-
- drivers/md/bcache/Kconfig               |   1 +
- drivers/md/bcache/btree.c               |   2 +-
- drivers/md/bcache/super.c               |  26 ++-
- drivers/md/bcache/util.h                |   2 -
- drivers/md/dm-ebs-target.c              |   2 +-
- drivers/md/dm-integrity.c               |   4 +-
- drivers/md/dm-ioctl.c                   |   4 -
- drivers/md/dm-rq.c                      |   1 -
- drivers/md/dm-table.c                   |   2 +-
- drivers/md/dm-writecache.c              |   5 +-
- drivers/md/dm.c                         |  32 ++-
- drivers/md/md.h                         |   4 +-
- drivers/mmc/core/block.c                | 164 +++++++-------
- drivers/mmc/core/core.c                 |  35 +++
- drivers/mmc/core/core.h                 |   2 +
- drivers/mmc/core/mmc.c                  |   2 +
- drivers/mmc/host/sdhci-tegra.c          |   9 +
- drivers/nvme/host/core.c                |  56 ++---
- drivers/nvme/host/multipath.c           |   2 +-
- drivers/s390/block/dasd_diag.c          |   2 +-
- drivers/s390/block/dasd_eckd.c          |  14 +-
- drivers/s390/block/dasd_fba.c           |   4 +-
- drivers/s390/block/dasd_genhd.c         |   7 +-
- drivers/s390/block/dcssblk.c            |   3 +-
- drivers/scsi/sd.c                       |   8 +-
- drivers/scsi/sg.c                       |  32 +--
- drivers/scsi/sr.c                       |   7 +-
- drivers/scsi/st.c                       |  49 +---
- drivers/scsi/st.h                       |   2 +-
- fs/block_dev.c                          | 257 +++------------------
- fs/f2fs/sysfs.c                         |   2 +-
- fs/fat/fatent.c                         |   1 +
- fs/nilfs2/super.c                       |   2 +-
- fs/squashfs/block.c                     |   7 +-
- fs/squashfs/lz4_wrapper.c               |   2 +-
- fs/squashfs/lzo_wrapper.c               |   2 +-
- fs/squashfs/xz_wrapper.c                |   2 +-
- fs/squashfs/zlib_wrapper.c              |   2 +-
- fs/squashfs/zstd_wrapper.c              |   2 +-
- fs/super.c                              |   2 +-
- fs/xfs/xfs_buf.c                        |   2 +-
- include/linux/backing-dev.h             |   2 +-
- include/linux/bio.h                     |  42 ----
- include/linux/blk-cgroup.h              |   4 +-
- include/linux/blk-mq.h                  |  16 +-
- include/linux/blk_types.h               |   4 -
- include/linux/blkdev.h                  |  38 +++-
- include/linux/bvec.h                    |  64 +++++-
- include/linux/cmdline-parser.h          |  46 ----
- include/linux/device-mapper.h           |   1 -
- include/linux/fs.h                      |   4 -
- include/linux/genhd.h                   |  70 +++---
- include/linux/ioprio.h                  |  44 +---
- include/linux/mmc/card.h                |   1 +
- include/linux/mmc/host.h                |   1 +
- include/linux/writeback.h               |   5 -
- include/trace/events/kyber.h            |   6 +-
- include/uapi/linux/fs.h                 |   1 +
- include/uapi/linux/ioprio.h             |  52 +++++
- init/do_mounts.c                        |   4 -
- lib/Kconfig.debug                       |  27 ---
- mm/backing-dev.c                        |   3 +
- mm/page-writeback.c                     |   2 -
- 130 files changed, 1584 insertions(+), 1755 deletions(-)
- delete mode 100644 block/cmdline-parser.c
- create mode 100644 block/holder.c
- delete mode 100644 include/linux/cmdline-parser.h
- create mode 100644 include/uapi/linux/ioprio.h
+Sagi Grimberg (5):
+      params: lift param_set_uint_minmax to common code
+      nvme-pci: limit maximum queue depth to 4095
+      nvme-tcp: don't check blk_mq_tag_to_rq when receiving pdu data
+      nvme: code command_id with a genctr for use-after-free validation
+      nvme: Have NVME_FABRICS select NVME_CORE instead of transport drivers
+
+Tetsuo Handa (3):
+      nbd: add missing locking to the nbd_dev_add error path
+      nbd: prevent IDR lookups from finding partially initialized devices
+      nbd: set nbd->index before releasing nbd_index_mutex
+
+Xiao Ni (1):
+      md/raid10: Remove unnecessary rcu_dereference in raid10_handle_discard
+
+ Documentation/driver-api/index.rst                 |    1 -
+ Documentation/driver-api/lightnvm-pblk.rst         |   21 -
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    1 -
+ MAINTAINERS                                        |    9 -
+ drivers/Kconfig                                    |    2 -
+ drivers/Makefile                                   |    1 -
+ drivers/block/floppy.c                             |   30 +-
+ drivers/block/nbd.c                                |  178 +-
+ drivers/block/rnbd/rnbd-clt-sysfs.c                |   33 +-
+ drivers/block/rnbd/rnbd-clt.c                      |    2 +-
+ drivers/block/rnbd/rnbd-srv-sysfs.c                |   14 +-
+ drivers/block/xen-blkfront.c                       |    1 -
+ drivers/lightnvm/Kconfig                           |   44 -
+ drivers/lightnvm/Makefile                          |   11 -
+ drivers/lightnvm/core.c                            | 1440 -------------
+ drivers/lightnvm/pblk-cache.c                      |  137 --
+ drivers/lightnvm/pblk-core.c                       | 2151 --------------------
+ drivers/lightnvm/pblk-gc.c                         |  726 -------
+ drivers/lightnvm/pblk-init.c                       | 1324 ------------
+ drivers/lightnvm/pblk-map.c                        |  210 --
+ drivers/lightnvm/pblk-rb.c                         |  858 --------
+ drivers/lightnvm/pblk-read.c                       |  474 -----
+ drivers/lightnvm/pblk-recovery.c                   |  874 --------
+ drivers/lightnvm/pblk-rl.c                         |  254 ---
+ drivers/lightnvm/pblk-sysfs.c                      |  728 -------
+ drivers/lightnvm/pblk-trace.h                      |  145 --
+ drivers/lightnvm/pblk-write.c                      |  665 ------
+ drivers/lightnvm/pblk.h                            | 1358 ------------
+ drivers/md/raid1.c                                 |   19 +
+ drivers/md/raid10.c                                |   14 +-
+ drivers/nvme/host/Kconfig                          |    4 +-
+ drivers/nvme/host/Makefile                         |    1 -
+ drivers/nvme/host/core.c                           |   16 +-
+ drivers/nvme/host/fabrics.c                        |    1 -
+ drivers/nvme/host/ioctl.c                          |    4 +-
+ drivers/nvme/host/lightnvm.c                       | 1274 ------------
+ drivers/nvme/host/nvme.h                           |   79 +-
+ drivers/nvme/host/pci.c                            |  187 +-
+ drivers/nvme/host/rdma.c                           |    8 +-
+ drivers/nvme/host/tcp.c                            |   44 +-
+ drivers/nvme/host/trace.c                          |   18 +-
+ drivers/nvme/target/Kconfig                        |    2 -
+ drivers/nvme/target/core.c                         |    1 +
+ drivers/nvme/target/fabrics-cmd.c                  |   38 +-
+ drivers/nvme/target/loop.c                         |    4 +-
+ drivers/nvme/target/trace.c                        |   18 +-
+ drivers/nvme/target/zns.c                          |    5 +-
+ include/linux/lightnvm.h                           |  697 -------
+ include/linux/moduleparam.h                        |    2 +
+ include/uapi/linux/lightnvm.h                      |  224 --
+ kernel/params.c                                    |   18 +
+ net/sunrpc/xprtsock.c                              |   18 -
+ 52 files changed, 462 insertions(+), 13926 deletions(-)
+ delete mode 100644 Documentation/driver-api/lightnvm-pblk.rst
+ delete mode 100644 drivers/lightnvm/Kconfig
+ delete mode 100644 drivers/lightnvm/Makefile
+ delete mode 100644 drivers/lightnvm/core.c
+ delete mode 100644 drivers/lightnvm/pblk-cache.c
+ delete mode 100644 drivers/lightnvm/pblk-core.c
+ delete mode 100644 drivers/lightnvm/pblk-gc.c
+ delete mode 100644 drivers/lightnvm/pblk-init.c
+ delete mode 100644 drivers/lightnvm/pblk-map.c
+ delete mode 100644 drivers/lightnvm/pblk-rb.c
+ delete mode 100644 drivers/lightnvm/pblk-read.c
+ delete mode 100644 drivers/lightnvm/pblk-recovery.c
+ delete mode 100644 drivers/lightnvm/pblk-rl.c
+ delete mode 100644 drivers/lightnvm/pblk-sysfs.c
+ delete mode 100644 drivers/lightnvm/pblk-trace.h
+ delete mode 100644 drivers/lightnvm/pblk-write.c
+ delete mode 100644 drivers/lightnvm/pblk.h
+ delete mode 100644 drivers/nvme/host/lightnvm.c
+ delete mode 100644 include/linux/lightnvm.h
+ delete mode 100644 include/uapi/linux/lightnvm.h
 
 -- 
 Jens Axboe
