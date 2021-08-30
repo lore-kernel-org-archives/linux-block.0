@@ -3,38 +3,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A53C4320E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41AC4C4320A
 	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:26:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEEFE60F3A
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:26:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D0FD60F3A
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:26:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238013AbhH3V1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 17:27:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33098 "EHLO
+        id S237838AbhH3V1h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 17:27:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237685AbhH3V1I (ORCPT
+        with ESMTP id S231791AbhH3V1I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 30 Aug 2021 17:27:08 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C43C061796;
-        Mon, 30 Aug 2021 14:26:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 742B3C06179A;
+        Mon, 30 Aug 2021 14:26:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=1YUk7uUX188ex4Qeqb2q2FbA+vqSeistafw96wSb9q8=; b=lEZUf7GgHMbX1+8gRrsrsvmyDn
-        I+l8qrzbBpIWozAGTLTsWh0ax350SK798hajnAmKrtIYwcj70N+TaMp/HanMyyRUp054bd1I72PoR
-        tx8Hq7NMaNET0LOlyYCx0TsGyJCTqk6w1OvYvpXbRKuuMRQd2pUNw7KlIMpg2IIjBZ+zvhlvLDIXl
-        uJ3BiUfzRZCBBpNJqKtyJRWmGjjAIWHZWiJAynl3xGzd17VZHRg2LRBXRyRNRBZ7p564JgTHzY+67
-        cukqYn6bVuTsu0iduaOcSEpdZaD/+3zQZbDczNcUC1Z4qd2F8DLoqpMTdUu6EcUbL56xrdqtLrnTN
-        YcfMXpzQ==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=5zQ5zmFlRLt8Vc/PBo5Ci+3uvu0k1+9yu+E5gjjsKZw=; b=snJ/8Ec5mA4+GvreJ9eOfHQHzS
+        wwp7fOpqa2AuI5CcB6OggAYTtUBOnXYaI0utVKbQfaKOdnEVcxczLsqFPvH643E+K7cnFT4Db2iFt
+        HczBtfHcnKchZX2zk+U4n2kRx75BZj2xgPWkPdtIHGF4BoAktogQ/4aKRlCJ8Pvm3hVCL1Q93bqDc
+        dAFyb9sMlodHKmN9YBqTAoeNsACiEEKwKKpeNACGZf6j/U/ng+AKstQBzksDKVxKthlywnSwqd36m
+        TgD+TeXgEuuyFtgB/BPIRHMTShX3bs6/UqxjA/BTIN8gOA3M5xPw3a8wjqC9SpboHJDtW2bisXiOV
+        021KAy+A==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mKomk-000ci4-DU; Mon, 30 Aug 2021 21:25:42 +0000
+        id 1mKomk-000ciF-OG; Mon, 30 Aug 2021 21:25:42 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
         kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
@@ -46,11 +46,14 @@ Cc:     hch@infradead.org, hare@suse.de, bvanassche@acm.org,
         linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
         dm-devel@redhat.com, nbd@other.debian.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v3 0/8] block: first batch of add_disk() error handling conversions
-Date:   Mon, 30 Aug 2021 14:25:30 -0700
-Message-Id: <20210830212538.148729-1-mcgrof@kernel.org>
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v3 5/8] md: add error handling support for add_disk()
+Date:   Mon, 30 Aug 2021 14:25:35 -0700
+Message-Id: <20210830212538.148729-6-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210830212538.148729-1-mcgrof@kernel.org>
+References: <20210830212538.148729-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
@@ -58,43 +61,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens,
+We never checked for errors on add_disk() as this function
+returned void. Now that this is fixed, use the shiny new
+error handling.
 
-I think this first set is ready, but pending review of just two patches:
+We just do the unwinding of what was not done before, and are
+sure to unlock prior to bailing.
 
-  * mmc/core/block
-  * dm
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ drivers/md/md.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-All other patches have a respective Reviewed-by tag. The above two
-patches were integrated back into the series once I understood
-Christoph's concerns, and adjusted the patch as such.
-
-This goes rebased onto your for-next as of today. If anyone wants to
-explore the pending full set this is up on my linux-next branch
-20210830-for-axboe-add-disk-error-handling-next [0].
-
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210830-for-axboe-add-disk-error-handling-next
-
-Luis Chamberlain (8):
-  scsi/sd: add error handling support for add_disk()
-  scsi/sr: add error handling support for add_disk()
-  nvme: add error handling support for add_disk()
-  mmc/core/block: add error handling support for add_disk()
-  md: add error handling support for add_disk()
-  dm: add add_disk() error handling
-  loop: add error handling support for add_disk()
-  nbd: add error handling support for add_disk()
-
- drivers/block/loop.c     | 9 ++++++++-
- drivers/block/nbd.c      | 6 +++++-
- drivers/md/dm.c          | 4 +++-
- drivers/md/md.c          | 7 ++++++-
- drivers/mmc/core/block.c | 7 ++++++-
- drivers/nvme/host/core.c | 9 ++++++++-
- drivers/scsi/sd.c        | 6 +++++-
- drivers/scsi/sr.c        | 5 ++++-
- 8 files changed, 45 insertions(+), 8 deletions(-)
-
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index ae8fe54ea358..5c0d3536d7c7 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -5704,7 +5704,11 @@ static int md_alloc(dev_t dev, char *name)
+ 	 * through to md_open, so make sure it doesn't get too far
+ 	 */
+ 	mutex_lock(&mddev->open_mutex);
+-	add_disk(disk);
++	error = add_disk(disk);
++	if (error) {
++		blk_cleanup_disk(disk);
++		goto abort_unlock;
++	}
+ 
+ 	error = kobject_add(&mddev->kobj, &disk_to_dev(disk)->kobj, "%s", "md");
+ 	if (error) {
+@@ -5718,6 +5722,7 @@ static int md_alloc(dev_t dev, char *name)
+ 	if (mddev->kobj.sd &&
+ 	    sysfs_create_group(&mddev->kobj, &md_bitmap_group))
+ 		pr_debug("pointless warning\n");
++ abort_unlock:
+ 	mutex_unlock(&mddev->open_mutex);
+  abort:
+ 	mutex_unlock(&disks_mutex);
 -- 
 2.30.2
 
