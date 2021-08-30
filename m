@@ -2,81 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 068C4C4320A
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:01:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B68C4320E
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:09:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E80E560FC0
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4E7F60E98
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235740AbhH3VCW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 17:02:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55590 "EHLO
+        id S235846AbhH3VKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 17:10:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229923AbhH3VCW (ORCPT
+        with ESMTP id S235412AbhH3VKB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 17:02:22 -0400
+        Mon, 30 Aug 2021 17:10:01 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18734C061575;
-        Mon, 30 Aug 2021 14:01:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB32C061575;
+        Mon, 30 Aug 2021 14:09:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YLeyIh36W9KZ0EdnGoneLXaI1P2Sf43R5mGsowkdW0g=; b=rHUGs8PC9SNCLr8+68pmjJ6j+O
-        LtaWTZh9Q5B1+nQ2hrTGPF1fcfbSR3Bc4MaZvFu5VphNn3uzQki+n35xkL0bVrh1LapvtJXCTf9x2
-        aX8wRYUgYbB46/sh+IyauBD/d0v+EUJxIYc5tPiQ59XAdDbtIw4Bl5TuloVoTzanjLZH6B4zEyu9Z
-        cJfxaSEUPDqzy73KINJtfXG3JQEC+OVcdV8NY+mlstsLgVUnda0SZf0UpWRWmmrSNYHh6ccI4qX6Q
-        jujgcYNbGhmMrYwBPve3x8mENOXlAOUdzlGIdtNTAxg2GKSXah81G/vdsWSHpKSkvVupm5BhcGwQl
-        0RhmffIA==;
+        bh=xFWTIefdsBbNHRGePjMVKB25ot+nXFfcxkVreKDH86Y=; b=FgSmTd/fRmS0xbTiIlIubbvcQF
+        l8NXkScGBRAvafpu0rVHoH9iy35oqe0ZVhZrGw9F+vPsXmVAXAHRi9bLTOz/vVwm017PysQxzjdwR
+        2Z7yKblSpY23X+mBYcbPR7HSt5+du9vMR0yd4OGtU//TsQa3L9dQPWUzn+aBwsb7TTLrFsa5Z1yBC
+        cHAjsVtZF1FFvy5cgIFuUbxSa/UXcDJEnINnwNpFBMc/dx4nsSKskeqvJF2m/6ZEJ/y+wT83/RDx5
+        Pxwk7umAbXCBGozfp+iGo+sUQFP9mBj3TSyahaTBMA85l5Ypzlz3qTA3rqa10UKRTSgpCacUNkUG2
+        tjolFDlQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mKoOo-000ZII-6j; Mon, 30 Aug 2021 21:00:58 +0000
-Date:   Mon, 30 Aug 2021 14:00:58 -0700
+        id 1mKoWS-000bKI-22; Mon, 30 Aug 2021 21:08:52 +0000
+Date:   Mon, 30 Aug 2021 14:08:52 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
-        kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
-        beanhuo@micron.com, ulf.hansson@linaro.org, avri.altman@wdc.com,
-        swboyd@chromium.org, agk@redhat.com, snitzer@redhat.com,
-        josef@toxicpanda.com, hare@suse.de, bvanassche@acm.org,
-        ming.lei@redhat.com, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
-        dm-devel@redhat.com, nbd@other.debian.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/10] dm: add add_disk() error handling
-Message-ID: <YS1HCgP/XdWmMtFN@bombadil.infradead.org>
-References: <20210823202930.137278-1-mcgrof@kernel.org>
- <20210823202930.137278-9-mcgrof@kernel.org>
- <YSSP6ujNQttGN2sZ@infradead.org>
- <YSk1EhUIr9OjIoVv@bombadil.infradead.org>
- <YSnnXdKLvxEY8yay@infradead.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     axboe@kernel.dk, colyli@suse.de, kent.overstreet@gmail.com,
+        sagi@grimberg.me, vishal.l.verma@intel.com,
+        dan.j.williams@intel.com, dave.jiang@intel.com,
+        ira.weiny@intel.com, konrad.wilk@oracle.com, roger.pau@citrix.com,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        sstabellini@kernel.org, minchan@kernel.org, ngupta@vflare.org,
+        senozhatsky@chromium.org, xen-devel@lists.xenproject.org,
+        nvdimm@lists.linux.dev, linux-nvme@lists.infradead.org,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/10] nvme-multipath: add error handling support for
+ add_disk()
+Message-ID: <YS1I5DuGr0q7/uow@bombadil.infradead.org>
+References: <20210827191809.3118103-1-mcgrof@kernel.org>
+ <20210827191809.3118103-4-mcgrof@kernel.org>
+ <20210827202932.GA82376@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YSnnXdKLvxEY8yay@infradead.org>
+In-Reply-To: <20210827202932.GA82376@dhcp-10-100-145-180.wdc.com>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 28, 2021 at 08:35:57AM +0100, Christoph Hellwig wrote:
-> On Fri, Aug 27, 2021 at 11:55:14AM -0700, Luis Chamberlain wrote:
-> > > I think the add_disk should just return r.  If you look at the
-> > > callers they eventualy end up in dm_table_destroy, which does
-> > > this cleanup.
-> > 
-> > I don't see it. What part of dm_table_destroy() does this?
+On Fri, Aug 27, 2021 at 01:29:32PM -0700, Keith Busch wrote:
+> On Fri, Aug 27, 2021 at 12:18:02PM -0700, Luis Chamberlain wrote:
+> > @@ -479,13 +479,17 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
+> >  static void nvme_mpath_set_live(struct nvme_ns *ns)
+> >  {
+> >  	struct nvme_ns_head *head = ns->head;
+> > +	int rc;
+> >  
+> >  	if (!head->disk)
+> >  		return;
+> >  
+> > -	if (!test_and_set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
+> > -		device_add_disk(&head->subsys->dev, head->disk,
+> > -				nvme_ns_id_attr_groups);
+> > +	if (!test_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
 > 
-> Sorry, dm_destroy, not dm_table_destroy.  For dm_early_create it's
-> trivial as that calls both dm_table_destroy and dm_destroy in the error
-> path.  The normal table_load case is a separate ioctl, but if that
-> fails userspace needs to call the DM_DEV_REMOVE_CMD to cleanup
-> the state - similar to any other failure.
+> This should still be test_and_set_bit() because it is protecting against
+> two nvme paths simultaneously calling device_add_disk() on the same
+> namespace head.
 
-I see, ok sure I'll document this on the commit log as its not so
-obvious.
+Interesting, I'll add a comment as well, as this was not clear with the drive
+by effort.
 
   Luis
