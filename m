@@ -2,132 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B764C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9626EC43216
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:02:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 646376023F
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:02:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 819C560240
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:02:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236946AbhH3MDR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 08:03:17 -0400
-Received: from mail-dm6nam10on2081.outbound.protection.outlook.com ([40.107.93.81]:55328
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237127AbhH3MCK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 08:02:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KLVPJxOQQ00JsBZ4UJpk8YlKD3mTf71G25AE0u4nVzYK9GMTi7b5InYiG/bXvPFpu/HNkEKVR4a90Icx9TEOdgMxwLXNi9slVElGl6QE3j0y3PsNaw/cu03I7dsZvH+DgbCrj9jS8bmf6vZOKkpJ5CWbhEtFprU5O/uRxyEcxMMJ557L6eeM+JxNexgPfQEn+fy+7OSGM/h/F8ih15r/hDjsr30re++kg8MV4aCrbDQNV+8bhz+1d3q6GHH5oP+mZOoYCxFgKDaKAlBgDXHyuST+ZIzhvRsO61n9EGV+NKPDbJ462Nu1E0+3y0C5BcWR6UZSg5ZM6eOeyspzpSo0Lw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cR2jzuPUe3VVqgZb4denocdp6w1fWNYhXzn+EaXmiP8=;
- b=b5vUwjXAJwUmy5JnMTkFsHwwMJ397MIEHCaAfJ5yVdjnvtdKh57XI/s/w7riaxChaaI8sv2qnQEGxGYFoWpgxMBXp9eN+tg3bASoE1PMzYSzFO0TfGqz0eCWGBPaTpi03Mnuyfupp/c4vlnXlQZ577WCXsrxsM5R7VwKKVuailXsd9Igob79TFLSi6MQ+0wojy/ZVKbycKE9ppZmpuCU1MY9UuhAf2cPLGi2tL9wYMJ5aDjCp1S0Rz0lSOoRqZsreCAYdxLd6HnYoo4Q+H5ZfpT+LISxWADjhuqjS2JGzOy2vARKZ/0kOYIyC8dA5ZrpFUFYNobeg+kuZKf7fCvf4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.36) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cR2jzuPUe3VVqgZb4denocdp6w1fWNYhXzn+EaXmiP8=;
- b=TG33YbGFd0OkPIWW/zLjIRaLE2vFZUpIG1RRpX1k0Q2/netzOsB63llHLIwmkgNcNa7ePEPjwYdgV8UlFRrXHUHfbT/sPvXD/iS59eF+Xn0nM6Td2fVwiMLrUhP5HiTCXHm3RPl6QGS1hcWmRdoO0q+IrxP+1cKhnY2sQTOJryOMuoZA2xtAQtJ8ztiLG2vxOphaCJgb24SgLnLHSv2QMoJwH6ZXwnR0yNqeNntrgSor6S5sNb95Xf5wbBiMxm7FUDFiinvQD9mfzHT1ZqCd5YkUFYnuaA1miBAAGh4WI0KktE1EobmhcULIXbcz+WWyw0A7n0PTZ+KNRWKfaYqnSA==
-Received: from BN6PR11CA0006.namprd11.prod.outlook.com (2603:10b6:405:2::16)
- by DM5PR12MB2375.namprd12.prod.outlook.com (2603:10b6:4:b3::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Mon, 30 Aug
- 2021 12:01:15 +0000
-Received: from BN8NAM11FT025.eop-nam11.prod.protection.outlook.com
- (2603:10b6:405:2:cafe::37) by BN6PR11CA0006.outlook.office365.com
- (2603:10b6:405:2::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17 via Frontend
- Transport; Mon, 30 Aug 2021 12:01:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.36; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.36) by
- BN8NAM11FT025.mail.protection.outlook.com (10.13.177.136) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4457.17 via Frontend Transport; Mon, 30 Aug 2021 12:01:15 +0000
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 30 Aug
- 2021 12:01:14 +0000
-Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.6) by mail.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Mon, 30 Aug 2021 12:01:12 +0000
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <stefanha@redhat.com>
-CC:     <oren@nvidia.com>, <linux-block@vger.kernel.org>,
-        <axboe@kernel.dk>, "Max Gurtovoy" <mgurtovoy@nvidia.com>
-Subject: [PATCH 1/1] virtio-blk: remove unneeded "likely" statements
-Date:   Mon, 30 Aug 2021 15:01:11 +0300
-Message-ID: <20210830120111.22661-1-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.18.1
+        id S236989AbhH3MDX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 08:03:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48078 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237002AbhH3MBq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Aug 2021 08:01:46 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 29B0261157;
+        Mon, 30 Aug 2021 12:00:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630324852;
+        bh=2yxhDNo2r6BFNcZIstUafih3qJBNAhv7EDmPBauYkXA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iulbepXRd8eD0QmIPd2pCOd8B6gnEceoWFAMgbe+0Wqeod/PMN4/VsH+73XQ6K2iM
+         TD0jMvxq0QNDO1B4Y0wTwGi26J1/L/f+pDj5y260NgfkExPzu33/+1AgkLcwNXmh6l
+         xvIQjL58B2ZOlwgUNvKvYC/QakbuYvqvIS+LHPTqB/z30UGSrakFRFcRzo4Q8x+E42
+         hkGDRre00uK2gnWVzEJblN3tbbIspzHix0w0AhepZaOqOAlFGf0Fc87JTfRx2XOFF8
+         SfREctW/q0V9o4iFgu4ovGtt1Y8VBvlYX+q0dCk9X8atwxaELJoXGt3GhrZ1R6bPuO
+         odQeRDGgCWQNQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 7/7] cryptoloop: add a deprecation warning
+Date:   Mon, 30 Aug 2021 08:00:43 -0400
+Message-Id: <20210830120043.1018096-7-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210830120043.1018096-1-sashal@kernel.org>
+References: <20210830120043.1018096-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6b0a8c85-1d4e-4767-8c6a-08d96badde7d
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2375:
-X-Microsoft-Antispam-PRVS: <DM5PR12MB2375918867BAAD3A9C78FC3CDECB9@DM5PR12MB2375.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sp4VWzQpWGsZBbFa/riP5qOs38GmVmSAFCwJIjZ4RhmXzAq3aOYHP+FHs/bUexzXWrJR8H3pV0FzLy0huz+Oq5L0wrTGCANbFjZ6Qv8ErgOv1NSvqHpRrxLlS14doVa/i5V0DDU/SHvGfs3ip7F5xFLPcEjOhVwWjnoAJVLfbGS1rzdSBpoGsiMJs3h2iWn8XsataV6LFHaBObKh55eRheXCyAInovuyl8sy891KNUPWdqZs28P7ZOoYHhFdEgsN17GZRp41pkPWpTCQhwElwHs+6UCzJtHiQoPKid88XzwdSIZ9WNet/axtFhdChsmQ3DGngm7XqjGoU9Txtf9Vmf0BJWFA2mBHaYBP7mCXoyf8L080RCd4rrSBu2/KuFpvE6NoRVqj4yhOuBqxJX2fyxPgnJPYuxa7t+Q/xLB04F5nzkaLTL5tv9W+U/X05UpW+556DhY0Rx+PP/mHhtI61p+A6RlS3mXxHYHrgM7wq7Ft2AYCRSDiC3hotEkbYMv2kHJIR3/vQdal25etjpip3KCKOFilcdYL6bvxQcIgoBkFKRvMXQrab9za5THQQOAPppH3PjA+d2OprEohbH0diScmRFFj3S896CmXC3msgl6k0jlGze8iMd3FRbf9fYThBJpk8+QSZDVt1b9XsX44mz6By1qbuTRFXGbC9FkSuwbO3iThO2thPJbb09lraPW24i1LV+03KS1O4R/KtYy8LA==
-X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(39860400002)(136003)(376002)(346002)(36840700001)(46966006)(1076003)(5660300002)(36906005)(8676002)(110136005)(70206006)(36756003)(7636003)(356005)(2616005)(316002)(2906002)(4326008)(26005)(83380400001)(47076005)(336012)(86362001)(426003)(82310400003)(36860700001)(70586007)(8936002)(186003)(107886003)(478600001)(54906003)(82740400003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2021 12:01:15.4350
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b0a8c85-1d4e-4767-8c6a-08d96badde7d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT025.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2375
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Usually we use "likely/unlikely" to optimize the fast path. Remove
-redundant "likely" statements in the control path to ease on the code.
+From: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+[ Upstream commit 222013f9ac30b9cec44301daa8dbd0aae38abffb ]
+
+Support for cryptoloop has been officially marked broken and deprecated
+in favor of dm-crypt (which supports the same broken algorithms if
+needed) in Linux 2.6.4 (released in March 2004), and support for it has
+been entirely removed from losetup in util-linux 2.23 (released in April
+2013).  Add a warning and a deprecation schedule.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20210827163250.255325-1-hch@lst.de
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/virtio_blk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/Kconfig      | 4 ++--
+ drivers/block/cryptoloop.c | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index afb37aac09e8..e574fbf5e6df 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -765,7 +765,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 		goto out_free_vblk;
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 01091c08e999..ef702fdb2f92 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -234,7 +234,7 @@ config BLK_DEV_LOOP_MIN_COUNT
+ 	  dynamically allocated with the /dev/loop-control interface.
  
- 	/* Default queue sizing is to fill the ring. */
--	if (likely(!virtblk_queue_depth)) {
-+	if (!virtblk_queue_depth) {
- 		queue_depth = vblk->vqs[0].vq->num_free;
- 		/* ... but without indirect descs, we use 2 descs per req */
- 		if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC))
-@@ -839,7 +839,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	else
- 		blk_size = queue_logical_block_size(q);
+ config BLK_DEV_CRYPTOLOOP
+-	tristate "Cryptoloop Support"
++	tristate "Cryptoloop Support (DEPRECATED)"
+ 	select CRYPTO
+ 	select CRYPTO_CBC
+ 	depends on BLK_DEV_LOOP
+@@ -246,7 +246,7 @@ config BLK_DEV_CRYPTOLOOP
+ 	  WARNING: This device is not safe for journaled file systems like
+ 	  ext3 or Reiserfs. Please use the Device Mapper crypto module
+ 	  instead, which can be configured to be on-disk compatible with the
+-	  cryptoloop device.
++	  cryptoloop device.  cryptoloop support will be removed in Linux 5.16.
  
--	if (unlikely(blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)) {
-+	if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE) {
- 		dev_err(&vdev->dev,
- 			"block size is changed unexpectedly, now is %u\n",
- 			blk_size);
+ source "drivers/block/drbd/Kconfig"
+ 
+diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
+index 74e03aa537ad..32363816cb04 100644
+--- a/drivers/block/cryptoloop.c
++++ b/drivers/block/cryptoloop.c
+@@ -203,6 +203,8 @@ init_cryptoloop(void)
+ 
+ 	if (rc)
+ 		printk(KERN_ERR "cryptoloop: loop_register_transfer failed\n");
++	else
++		pr_warn("the cryptoloop driver has been deprecated and will be removed in in Linux 5.16\n");
+ 	return rc;
+ }
+ 
 -- 
-2.18.1
+2.30.2
 
