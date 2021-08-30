@@ -2,119 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A134C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 17:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65A2C43214
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 20:42:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56B8960F56
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 17:29:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 995CD60FC0
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 20:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232236AbhH3RaX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 13:30:23 -0400
-Received: from mail-pf1-f177.google.com ([209.85.210.177]:35672 "EHLO
-        mail-pf1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbhH3RaW (ORCPT
+        id S235334AbhH3Unh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 16:43:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51092 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235057AbhH3Ung (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 13:30:22 -0400
-Received: by mail-pf1-f177.google.com with SMTP id x16so12773850pfh.2
-        for <linux-block@vger.kernel.org>; Mon, 30 Aug 2021 10:29:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ByXImmwoeMaTaIFmVg6cKohAgL9nKGwc65NiX5pnMag=;
-        b=IA8RuyhxFWOMDW+RFDNME5pFew/IFtRRwh+hEYiU4OSQBfwvjM3N+LzUxDFEFtcY0v
-         aKiw2TeO6X1Zubxc+Bj7ql7WoZ50fIpTzxBIpON/lEeH6zJIrwgQGTTJGas9wbEj1GWY
-         mAuf34yuqmRya6lanHjYUeLTf1QAnlLQt9l7+V/g3PsVCG44WlWXy/bc/OLstW+SbqmD
-         nGrc2sprtmmsrMybRMBZxtveA5YPdJ8S9eaw+Dk+MLeiEplplHLc0LhgD+8VvA2BunzK
-         +Z1IddRT5LtBrtpl+tYc+25qotYc3DU02jkfTMikvbRRIbheVA8kHwiNTc8kZyPDY+vq
-         6/DA==
-X-Gm-Message-State: AOAM530txhwyIxRmGqB27yt6jBUAKlUS2qzVWLtGf/bAun4TJk02Qbpb
-        6r50WIv3Fcu/oY3dba67jN0Yxw5f7Sc=
-X-Google-Smtp-Source: ABdhPJzaGED9u+3e+hO7j53vBRneLr/9nRQ0FxGcQM1sKstUAYiYxU3tBaICgUX/ul5SywxcfoBYYQ==
-X-Received: by 2002:a63:704f:: with SMTP id a15mr22596009pgn.120.1630344568499;
-        Mon, 30 Aug 2021 10:29:28 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:86a7:224:3596:de63])
-        by smtp.gmail.com with ESMTPSA id x17sm14952083pfa.3.2021.08.30.10.29.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Aug 2021 10:29:27 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: Use helpers to access rq->state
-To:     Nikolay Borisov <nborisov@suse.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-References: <20210512095017.235295-1-nborisov@suse.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <36615406-97c4-5273-364b-8f2b5b1fb35f@acm.org>
-Date:   Mon, 30 Aug 2021 10:29:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Mon, 30 Aug 2021 16:43:36 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05B8DC061575;
+        Mon, 30 Aug 2021 13:42:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=s8sN/nm91BxBuEePx1oK1Ip0xK3fNhEwWe4+zuk6ceg=; b=4v7ISjCjGyaDn8TkXmebdJ4hKv
+        PYx8skNRQRgbxfe4rRQMsvdVqvz6VsOfG9X+ROPMHVGQ4OJA5hAo5lE2j0lBIGhBMuJO1IOmg+FTW
+        Baz+6nCnSYe3ZmhnuxdkpAmokYK10l/Ya7AG5MqiR+lD1nmC8JOlQ969ZzIpbc1fur6demSAe5MMr
+        C2BQu/AgInu/iK6+i6nB3CZiOREMoI+7P48WwQrSYGGvuhP+V5R6VnsWpAN/CQqgW38xrJ61oM8JV
+        aPng4azQlAs9WpIqkFSGrCtxrK/b3zVILCxHQ9PBfuLp0BPIxBCinyxszKB9hpiE2mepEls2HYCFQ
+        4ovZX2pA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mKo6Z-000Wv2-7h; Mon, 30 Aug 2021 20:42:07 +0000
+Date:   Mon, 30 Aug 2021 13:42:07 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
+        kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
+        beanhuo@micron.com, ulf.hansson@linaro.org, avri.altman@wdc.com,
+        swboyd@chromium.org, agk@redhat.com, snitzer@redhat.com,
+        josef@toxicpanda.com, hare@suse.de, bvanassche@acm.org,
+        ming.lei@redhat.com, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
+        dm-devel@redhat.com, nbd@other.debian.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 06/10] mmc/core/block: add error handling support for
+ add_disk()
+Message-ID: <YS1Cn6yMbpQGFOYe@bombadil.infradead.org>
+References: <20210823202930.137278-1-mcgrof@kernel.org>
+ <20210823202930.137278-7-mcgrof@kernel.org>
+ <YSSN+eac2aCFXTAA@infradead.org>
+ <YSkyHINtV/djFEej@bombadil.infradead.org>
+ <YSnme1mfHS/HCguW@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20210512095017.235295-1-nborisov@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YSnme1mfHS/HCguW@infradead.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/21 2:50 AM, Nikolay Borisov wrote:
-> Instead of having a mixed bag of opencoded usage and helper usage,
-> simply replace opencoded sites with the appropriate helper. No
-> functional changes.
+On Sat, Aug 28, 2021 at 08:32:11AM +0100, Christoph Hellwig wrote:
+> On Fri, Aug 27, 2021 at 11:42:36AM -0700, Luis Chamberlain wrote:
+> > > >  	if (area_type == MMC_BLK_DATA_AREA_MAIN)
+> > > >  		dev_set_drvdata(&card->dev, md);
+> > > > -	device_add_disk(md->parent, md->disk, mmc_disk_attr_groups);
+> > > > +	ret = device_add_disk(md->parent, md->disk, mmc_disk_attr_groups);
+> > > > +	if (ret)
+> > > > +		goto out;
+> > > 
+> > > This needs to do a blk_cleanup_queue and also te kfree of md.
+> > 
+> > If mmc_blk_alloc_parts() fails mmc_blk_remove_req() is called which
+> > does both for us?
 > 
-> Signed-off-by: Nikolay Borisov <nborisov@suse.com>
-> ---
->   block/blk-mq.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d4d7c1caa439..d1cfacf2734c 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -644,7 +644,7 @@ static void blk_mq_raise_softirq(struct request *rq)
->   
->   bool blk_mq_complete_request_remote(struct request *rq)
->   {
-> -	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-> +	blk_mq_set_request_complete(rq);
->   
->   	/*
->   	 * For a polled request, always complete locallly, it's pointless
-> @@ -721,7 +721,7 @@ void blk_mq_start_request(struct request *rq)
->   		rq_qos_issue(q, rq);
->   	}
->   
-> -	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
-> +	WARN_ON_ONCE(blk_mq_request_started(rq));
->   
->   	blk_add_timer(rq);
->   	WRITE_ONCE(rq->state, MQ_RQ_IN_FLIGHT);
-> @@ -3812,7 +3812,7 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
->   	hrtimer_set_expires(&hs.timer, kt);
->   
->   	do {
-> -		if (blk_mq_rq_state(rq) == MQ_RQ_COMPLETE)
-> +		if (blk_mq_request_completed(rq))
->   			break;
->   		set_current_state(TASK_UNINTERRUPTIBLE);
->   		hrtimer_sleeper_start_expires(&hs, mode);
+> Yes, but only for the main gendisk, and those parts already added to
+> the list which happens after device_add_disk succeeded.
 
-Is the above patch complete? I think even with the above patch applied
-there are still two functions in the block layer that use WRITE_ONCE() to
-modify rq->state directly:
+Ah yes I see that now. Will fix up. The tag also needs to be cleaned up.
 
-$ git grep -nH 'WRITE_ONCE(rq->state,'
-block/blk-mq.c:532:	WRITE_ONCE(rq->state, MQ_RQ_IDLE);
-block/blk-mq.c:648:	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-block/blk-mq.c:728:	WRITE_ONCE(rq->state, MQ_RQ_IN_FLIGHT);
-block/blk-mq.c:747:		WRITE_ONCE(rq->state, MQ_RQ_IDLE);
-block/blk-mq.c:2416:	WRITE_ONCE(rq->state, MQ_RQ_IDLE);
-include/linux/blk-mq.h:521:	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-
-Thanks,
-
-Bart.
+  Luis
