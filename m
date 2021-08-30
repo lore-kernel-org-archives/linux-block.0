@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB87C43214
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D14FC432BE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:03:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D57EC60525
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E66860240
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:03:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237304AbhH3MDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 08:03:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49474 "EHLO mail.kernel.org"
+        id S236541AbhH3MEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 08:04:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48524 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236864AbhH3MBa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 08:01:30 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4EA4A611AD;
-        Mon, 30 Aug 2021 12:00:30 +0000 (UTC)
+        id S236797AbhH3MBP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Aug 2021 08:01:15 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8BAB66117A;
+        Mon, 30 Aug 2021 12:00:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630324831;
-        bh=OBUJ/1McE9fHUIdKsOYpeaQiu0q8A0By/0mG5jaZVqw=;
+        s=k20201202; t=1630324817;
+        bh=Xul5IBRdGFdvKaXnW2vbVJHMh8bEFMV50GdRfD1BXfY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jK/QU8ZCcKL/eKpRDxaUPR1u8pH/z2RoZaaKb+g8fFHaK+2TZ+WJ/A5XQtPDhJie0
-         TSJAw2xNkt0YVbYP5VfyulbKXgx+PaKWJPrJ0qDtphP08b3sM3blYA+euY2ONPKLnR
-         V5bQSrM6al7u0UsLnK7p+v9PHKkjuq6Q9DhBa+s0FrWzi6cPP/BwdwFMAcZrB3Uyk4
-         rFUiBTenOUU9dWdmaqFHUGPJ72v0uHkuF18rU0WiSwG4xaybihR9WFQ1zeIObqq2CN
-         YxnkxsZsF8y2VR/jDOibaity+JRE22GOuGL8bdVjO/WfHeUN9nedjudgn9zAWg2xmO
-         tUiMDXWx7b/cA==
+        b=atkf8cq9fUsd+q2ejhWNNTnDC0tinwtRVXAag6x1Dt4PO1JfdxRqwMBXBx7pPjpZe
+         XXqLmAQxPJgGnmFZ8RpOJwely7fxpYFtJePrdOb5Mkk2Isj/XqWbZtcUUiedULGkSi
+         8iePcvSLjkoyBiaPuDDutd34RFpBWCCrXfd4uQDM3axdiiCJ6WiQDvPf5aWegoZAdO
+         oNBbkdJtuRFpOa0uO3/oicB9ZRQeBG8derUYh2DBUng0lJGW+lBVZz4b9Z23G8HBQ+
+         ZEAnp+97V20rlU7SWOG8O7dPiSw+8R127/mB8hjXdjXTqcUSdsSir4Xc7p79clvND4
+         TRuktm/WKfLvQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 10/10] cryptoloop: add a deprecation warning
-Date:   Mon, 30 Aug 2021 08:00:17 -0400
-Message-Id: <20210830120018.1017841-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 11/11] cryptoloop: add a deprecation warning
+Date:   Mon, 30 Aug 2021 08:00:02 -0400
+Message-Id: <20210830120002.1017700-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210830120018.1017841-1-sashal@kernel.org>
-References: <20210830120018.1017841-1-sashal@kernel.org>
+In-Reply-To: <20210830120002.1017700-1-sashal@kernel.org>
+References: <20210830120002.1017700-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -69,7 +69,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 0fc27ac14f29..9f6782329a23 100644
+index f40ebe9f5047..f2548049aa0e 100644
 --- a/drivers/block/Kconfig
 +++ b/drivers/block/Kconfig
 @@ -230,7 +230,7 @@ config BLK_DEV_LOOP_MIN_COUNT
