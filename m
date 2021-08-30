@@ -2,198 +2,253 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B4FC432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 10:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27DA4C432BE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 10:16:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6837610A8
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 10:11:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D25D610C7
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 10:16:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236367AbhH3KMh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 06:12:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29808 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236343AbhH3KMZ (ORCPT
+        id S233248AbhH3KRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 06:17:05 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:58184 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236305AbhH3KRE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 06:12:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630318291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GNS9WvnZ0xw8x+G4OAVRsDet7iU5hb6uy6leUR087lI=;
-        b=WcPKysc8UGw2z56FBZ/dP85BwaNXJYauTxW7pAS4ZB8mF55SCNVkWpeLxJWRsoFbndXwMQ
-        aDrrlaOiWk6TunwQuobAUkuL0XUnHvokW7HOG4aKhAhCLoFDa9RnFfuwDPwNGi6ag2WnQ4
-        8k6XrHdhyqhU51H3dOEzJCjn4VCK5TQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-10RyjYvuMOSbnW5b1QszLQ-1; Mon, 30 Aug 2021 06:11:27 -0400
-X-MC-Unique: 10RyjYvuMOSbnW5b1QszLQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 30 Aug 2021 06:17:04 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65D506409B;
-        Mon, 30 Aug 2021 10:11:26 +0000 (UTC)
-Received: from T590 (ovpn-8-36.pek2.redhat.com [10.72.8.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 759AB10074E5;
-        Mon, 30 Aug 2021 10:11:17 +0000 (UTC)
-Date:   Mon, 30 Aug 2021 18:11:12 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 1/2] blk-mq: don't call callbacks for requests that
- bypassed the scheduler
-Message-ID: <YSyuwCKi2sS/RaXS@T590>
-References: <20210827124100.98112-1-Niklas.Cassel@wdc.com>
- <20210827124100.98112-2-Niklas.Cassel@wdc.com>
- <YSjoZ/cul4w2l8tG@T590>
- <YSypVLe8vxmA+pUn@x1-carbon>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3540821DA8;
+        Mon, 30 Aug 2021 10:16:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1630318570; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ySRnwFql9fJfhf6kdA57y05yvy5Kk5ptSmd+4e4b6pk=;
+        b=kPJomYUbTAZHYlrsyur/wPutc0svGikTLhpj/vQXX/mI9FeF0jAHrBX7b9olhHaAStq8a+
+        +rpVTfk29aAxSScH/jMP8NUedrxDkamqEkACihEHFeDA6SlGesTYGLK7hRBI6G3HmXeOKZ
+        RAyfYJBXSHh2zIlBaDtQWn3NDpvLxzU=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id EC75D13670;
+        Mon, 30 Aug 2021 10:16:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id W8g5OOmvLGE0QwAAGKfGzw
+        (envelope-from <jgross@suse.com>); Mon, 30 Aug 2021 10:16:09 +0000
+Subject: Re: [PATCH v3 0/3] xen: harden blkfront against malicious backends
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20210730103854.12681-1-jgross@suse.com>
+From:   Juergen Gross <jgross@suse.com>
+Message-ID: <324eab71-86ae-790a-d19c-97bb35b4f354@suse.com>
+Date:   Mon, 30 Aug 2021 12:16:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YSypVLe8vxmA+pUn@x1-carbon>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20210730103854.12681-1-jgross@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 30, 2021 at 09:48:06AM +0000, Niklas Cassel wrote:
-> On Fri, Aug 27, 2021 at 09:28:07PM +0800, Ming Lei wrote:
-> > On Fri, Aug 27, 2021 at 12:41:31PM +0000, Niklas Cassel wrote:
-> > > From: Niklas Cassel <niklas.cassel@wdc.com>
-> > > 
-> > > Currently, __blk_mq_alloc_request() calls ops.prepare_request and sets
-> > > RQF_ELVPRIV.
-> > > 
-> > > Therefore, (if the request is not a flush) the RQF_ELVPRIV flag will be
-> > > set for the request in blk_mq_submit_bio(), regardless if the request
-> > > was submitted to a scheduler, or bypassed the scheduler.
-> > > 
-> > > Later, blk_mq_free_request() checks if the RQF_ELVPRIV flag is set,
-> > > if it is, the ops.finish_request callback will be called.
-> > > 
-> > > The problem with this is that the finish_request scheduler callback
-> > > will be called for requests that bypassed the scheduler.
-> > > 
-> > > Fix this by calling the scheduler ops.prepare_request callback, and
-> > > set the RQF_ELVPRIV flag only immediately before calling the insert
-> > > callback.
-> > 
-> > One request could be inserted more than one times, such as requeue,
-> > however __blk_mq_alloc_request() is just run once, so is it fine to
-> > call ->prepare_request more than one time for same request?
-> 
-> Calling ->prepare_request multiple times is fine.
-> All the different I/O schedulers (BFQ, mq-deadline, kyber)
-> simply use .prepare_request to clear/set elv->priv to a fixed value.
-> 
-> > 
-> > Or I am wondering why not call ->prepare_request when the following
-> > check is true?
-> > 
-> > 	if (e && e->type->ops.prepare_request && !op_is_flush(data->cmd_flags) &&
-> > 		!blk_op_is_passthrough(data->cmd_flags))
-> > 		e->type->ops.prepare_request()
-> 
-> 
-> That might work, and might be a nicer solution indeed.
-> 
-> If a request got plugged, it will be inserted to the scheduler through
-> blk_flush_plug_list() -> blk_mq_flush_plug_list() -> blk_mq_sched_insert_requests()
-> which will insert them unconditionally.
-> In this case. we know that !op_is_flush() (because if it was, blk_mq_submit_bio()
-> would have inserted directly.)
-> 
-> 
-> If we didn't plug, we do blk_mq_sched_insert_request(), which will add it if
-> blk_mq_sched_bypass_insert() returns false:
-> 
-> blk_mq_sched_bypass_insert() is defined as:
-> 
->         if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
->                 return true;
-> Also in this case. we know that !op_is_flush() (blk_mq_submit_bio() would have
-> inserted directly.)
-> 
-> 
-> So, we could easily add && !blk_op_is_passthrough(data->cmd_flags) to the
-> ->prepare_request condition in blk_mq_rq_ctx_init() like you suggested,
-> but since the bypass condition also seems to look at RQF_FLUSH_SEQ, wouldn't
-> we need to add RQF_FLUSH_SEQ to the condition in blk_mq_rq_ctx_init() as well?
-> 
-> This flag is set after blk_mq_rq_ctx_init(). Are we sure that RQF_FLUSH_SEQ
-> flag will only be set for a request which op_is_flush() returned true?
-> 
-> (If so, then only adding  && !blk_op_is_passthrough(data->cmd_flags) should
-> be fine.)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq
+Content-Type: multipart/mixed; boundary="00oaAymQLL261J1A92SoY0uiKtAQrzaQn";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>
+Message-ID: <324eab71-86ae-790a-d19c-97bb35b4f354@suse.com>
+Subject: Re: [PATCH v3 0/3] xen: harden blkfront against malicious backends
+References: <20210730103854.12681-1-jgross@suse.com>
+In-Reply-To: <20210730103854.12681-1-jgross@suse.com>
 
-BTW, what I meant is the following change, is it fine?
+--00oaAymQLL261J1A92SoY0uiKtAQrzaQn
+Content-Type: multipart/mixed;
+ boundary="------------62439A08F1A8B23EA617671E"
+Content-Language: en-US
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0a33d16a7298..f98f8cc05644 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -327,20 +327,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 
- 	data->ctx->rq_dispatched[op_is_sync(data->cmd_flags)]++;
- 	refcount_set(&rq->ref, 1);
--
--	if (!op_is_flush(data->cmd_flags)) {
--		struct elevator_queue *e = data->q->elevator;
--
--		rq->elv.icq = NULL;
--		if (e && e->type->ops.prepare_request) {
--			if (e->type->icq_cache)
--				blk_mq_sched_assign_ioc(rq);
--
--			e->type->ops.prepare_request(rq);
--			rq->rq_flags |= RQF_ELVPRIV;
--		}
--	}
--
- 	data->hctx->queued++;
- 	return rq;
- }
-@@ -359,17 +345,25 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 	if (data->cmd_flags & REQ_NOWAIT)
- 		data->flags |= BLK_MQ_REQ_NOWAIT;
- 
--	if (e) {
-+	if (e && !op_is_flush(data->cmd_flags) &&
-+			!blk_op_is_passthrough(data->cmd_flags)) {
- 		/*
- 		 * Flush/passthrough requests are special and go directly to the
- 		 * dispatch list. Don't include reserved tags in the
- 		 * limiting, as it isn't useful.
- 		 */
--		if (!op_is_flush(data->cmd_flags) &&
--		    !blk_op_is_passthrough(data->cmd_flags) &&
--		    e->type->ops.limit_depth &&
--		    !(data->flags & BLK_MQ_REQ_RESERVED))
-+		if (e->type->ops.limit_depth &&
-+			    !(data->flags & BLK_MQ_REQ_RESERVED))
- 			e->type->ops.limit_depth(data->cmd_flags, data);
-+
-+		rq->elv.icq = NULL;
-+		if (e->type->ops.prepare_request) {
-+			if (e->type->icq_cache)
-+				blk_mq_sched_assign_ioc(rq);
-+
-+			e->type->ops.prepare_request(rq);
-+			rq->rq_flags |= RQF_ELVPRIV;
-+		}
- 	}
- 
- retry:
+This is a multi-part message in MIME format.
+--------------62439A08F1A8B23EA617671E
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, 
-Ming
+On 30.07.21 12:38, Juergen Gross wrote:
+> Xen backends of para-virtualized devices can live in dom0 kernel, dom0
+> user land, or in a driver domain. This means that a backend might
+> reside in a less trusted environment than the Xen core components, so
+> a backend should not be able to do harm to a Xen guest (it can still
+> mess up I/O data, but it shouldn't be able to e.g. crash a guest by
+> other means or cause a privilege escalation in the guest).
+>=20
+> Unfortunately blkfront in the Linux kernel is fully trusting its
+> backend. This series is fixing blkfront in this regard.
+>=20
+> It was discussed to handle this as a security problem, but the topic
+> was discussed in public before, so it isn't a real secret.
+>=20
+> It should be mentioned that a similar series has been posted some years=
 
+> ago by Marek Marczykowski-G=C3=B3recki, but this series has not been ap=
+plied
+> due to a Xen header not having been available in the Xen git repo at
+> that time. Additionally my series is fixing some more DoS cases.
+>=20
+> Changes in V3:
+> - patch 3: insert missing unlock in error case (kernel test robot)
+> - patch 3: use %#x as format for printing wrong operation value
+>    (Roger Pau Monn=C3=A9)
+>=20
+> Changes in V2:
+> - put blkfront patches into own series
+> - some minor comments addressed
+>=20
+> Juergen Gross (3):
+>    xen/blkfront: read response from backend only once
+>    xen/blkfront: don't take local copy of a request from the ring page
+>    xen/blkfront: don't trust the backend response data blindly
+>=20
+>   drivers/block/xen-blkfront.c | 126 +++++++++++++++++++++++-----------=
+-
+>   1 file changed, 84 insertions(+), 42 deletions(-)
+>=20
+
+Series pushed to xen/tip.git for-linus-5.15
+
+
+Juergen
+
+--------------62439A08F1A8B23EA617671E
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: OpenPGP public key
+Content-Disposition: attachment;
+ filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
+cWx
+w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
+f8Z
+d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
+9bf
+IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
+G7/
+377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
+3Jv
+c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
+QIe
+AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
+hpw
+dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
+MbD
+1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
+oPH
+Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
+5QL
++qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
+2Vu
+IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
+QoL
+BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
+Wf0
+teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
+/nu
+AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
+ITT
+d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
+XBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
+80h
+SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
+AcD
+AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
+FOX
+gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
+jnD
+kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
+N51
+N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
+otu
+fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
+tqS
+EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
+hsD
+BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
+g3O
+ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
+dM7
+wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
+D+j
+LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
+V2x
+AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
+Eaw
+QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
+nHI
+s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
+wgn
+BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
+bVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
+pEd
+IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
+QAB
+wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
+Tbe
+8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
+vJz
+Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
+VGi
+wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
+svi
+uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
+zXs
+ZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------62439A08F1A8B23EA617671E--
+
+--00oaAymQLL261J1A92SoY0uiKtAQrzaQn--
+
+--wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmEsr+kFAwAAAAAACgkQsN6d1ii/Ey/V
+fwgAiwttMoeaRjT6z90Dj0C5RVj2ypvjEckWpDvZFDUrKyiw7/SvtoeWj97jUaYHqDqJe7Z33p4K
+HlXOStVkIGTF/6E17EsHLPC2vq7Wk9A1evnZ4BvGdRhOKRA/2qK/n05Pcp82k6XKJsM4Ctgkqr27
+X1YkxWsagi3oVu5Sl4aBvvckOucCyPhJ8eLGx4d+F55EAAOjZBZpN9jnYbdmZ4NJmDn+MfAkq16s
+CGArI31OVOLLzD43LjxGJ2Y5n+TNGACOF4BNy++WrIVfVgtU7BkpwUbO8JTBHSu94dej6wmUUb5V
+ExlOmIDGqerbEAUHn7ccjMZu+U5g+V8jEAAoRzKxkw==
+=1i13
+-----END PGP SIGNATURE-----
+
+--wZC1IgbKDVH7XgM8ykJVZAWRogJ2eOmeq--
