@@ -2,101 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6575C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 09:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A8C0C4320E
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 09:44:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B29816101B
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 09:11:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 255D661058
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 09:44:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235319AbhH3JM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 05:12:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58738 "EHLO
+        id S235859AbhH3JpV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 05:45:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235258AbhH3JMZ (ORCPT
+        with ESMTP id S235733AbhH3JpV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 05:12:25 -0400
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85764C06175F
-        for <linux-block@vger.kernel.org>; Mon, 30 Aug 2021 02:11:32 -0700 (PDT)
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:99a5:7017:6f3e:f1d2])
-        by albert.telenet-ops.be with bizsmtp
-        id nlBW2500Y30rvgn06lBWZq; Mon, 30 Aug 2021 11:11:30 +0200
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan.of.borg with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1mKdKE-000UIr-BI; Mon, 30 Aug 2021 11:11:30 +0200
-Received: from geert by rox.of.borg with local (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1mKdKD-007mOH-In; Mon, 30 Aug 2021 11:11:29 +0200
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH] block/mq-deadline: Move dd_queued() to fix defined but not used warning
-Date:   Mon, 30 Aug 2021 11:11:28 +0200
-Message-Id: <20210830091128.1854266-1-geert@linux-m68k.org>
-X-Mailer: git-send-email 2.25.1
+        Mon, 30 Aug 2021 05:45:21 -0400
+X-Greylist: delayed 1460 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 30 Aug 2021 02:44:28 PDT
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F63C061575;
+        Mon, 30 Aug 2021 02:44:27 -0700 (PDT)
+Received: from ip4d14bdef.dynamic.kabel-deutschland.de ([77.20.189.239] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1mKdSW-0000d5-Kl; Mon, 30 Aug 2021 11:20:04 +0200
+Message-ID: <a11ba91f-a520-e6ab-5566-dfc9fd934440@leemhuis.info>
+Date:   Mon, 30 Aug 2021 11:20:04 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.0.3
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+Subject: Re: [PATCH] Revert "floppy: reintroduce O_NDELAY fix"
+To:     Denis Efremov <efremov@linux.com>, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
+        Mark Hounschell <markh@compro.net>,
+        Jiri Kosina <jkosina@suse.cz>,
+        Wim Osterholt <wim@djo.tudelft.nl>,
+        Kurt Garloff <kurt@garloff.de>, stable@vger.kernel.org
+References: <de10cb47-34d1-5a88-7751-225ca380f735@compro.net>
+ <20210808074246.33449-1-efremov@linux.com>
+Content-Language: en-US
+In-Reply-To: <20210808074246.33449-1-efremov@linux.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1630316668;fb9dddbd;
+X-HE-SMSGID: 1mKdSW-0000d5-Kl
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If CONFIG_BLK_DEBUG_FS=n:
+On 08.08.21 09:42, Denis Efremov wrote:
+> The patch breaks userspace implementations (e.g. fdutils) and introduces
+> regressions in behaviour. Previously, it was possible to O_NDELAY open a
+> floppy device with no media inserted or with write protected media without
+> an error. Some userspace tools use this particular behavior for probing.
+> 
+> It's not the first time when we revert this patch. Previous revert is in
+> commit f2791e7eadf4 (Revert "floppy: refactor open() flags handling").
+> 
+> This reverts commit 8a0c014cd20516ade9654fc13b51345ec58e7be8.
+> 
+> Link: https://lore.kernel.org/linux-block/de10cb47-34d1-5a88-7751-225ca380f735@compro.net/
 
-    block/mq-deadline.c:274:12: warning: ‘dd_queued’ defined but not used [-Wunused-function]
-      274 | static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
-	  |            ^~~~~~~~~
+FYI, I'm just starting to act as regression tracker again and will add
+this to the list of tracked regressions.
 
-Fix this by moving dd_queued() just before the sole function that calls
-it.
+Feel free to ignore the rest of this message, it's intended for the
+regression tracking bot I'm writing. This "regzbot" in fact is running
+now and this is the first regression that gets added to the database
+(I'm sure despite a lot of testing something will go wrong, but don't
+worry about it, I'll deal with it on my side). See also:
+https://linux-regtracking.leemhuis.info/post/inital-regzbot-running/
+https://linux-regtracking.leemhuis.info/post/regzbot-approach/
 
-Fixes: 7b05bf771084ff78 ("Revert "block/mq-deadline: Prioritize high-priority requests"")
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
-v2:
-  - Fix prefix in one-line summary.
----
- block/mq-deadline.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+#regzbot ^introduced 8a0c014cd20516ade9654fc13b51345ec58e7be8
+#regzbot monitor
+https://lore.kernel.org/lkml/20210818154646.925351-1-efremov@linux.com/
+#regzbot monitor
+https://lore.kernel.org/lkml/388418f4-2b9a-6fed-836c-a004369dc7c0@linux.com/
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 36920670dccc35f3..c2c724d4e668ebea 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -270,12 +270,6 @@ deadline_move_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 	deadline_remove_request(rq->q, per_prio, rq);
- }
- 
--/* Number of requests queued for a given priority level. */
--static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
--{
--	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);
--}
--
- /*
-  * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
-  * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
-@@ -951,6 +945,12 @@ static int dd_async_depth_show(void *data, struct seq_file *m)
- 	return 0;
- }
- 
-+/* Number of requests queued for a given priority level. */
-+static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
-+{
-+	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);
-+}
-+
- static int dd_queued_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
--- 
-2.25.1
+Ciao, Thorsten
 
