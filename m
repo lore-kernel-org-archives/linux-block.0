@@ -2,87 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08BF0C432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 22:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 900E6C432BE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 23:12:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6F8A600D4
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 22:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EDE360F42
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 23:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238930AbhH3WLf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 18:11:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43448 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238773AbhH3WLZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 18:11:25 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B26F6C0617AF;
-        Mon, 30 Aug 2021 15:10:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=lal2NXQqjpgVXT5qKBKMi1UaOalfu5XptBbZ07KGrZw=; b=QVHiTlNbaPcesPvOauCe7X1MmY
-        9OZgT7JOImNgPMZS5Tl5Mhov3exlnqyg0ntEMixp7CZEX738tgCR0/noKGbjAI5qSiD9Os4zDEPBD
-        ztYSTAxwK4QMQZVHttVH4VOB20LGJYHU11zMWiZBze9VeiIjiswuPPDHaXwziWrMZQap8F5Dy4t/C
-        WwRBvxBJdOrWZhfrtNA21KNeq7JWMltJg+o2bMcC5mMy5wS48aKyRP34eFvaHSIF7NADt2cQME4yx
-        XsqYy9MgCq5ZCIamQID/iTS67vsVcn1kfYfFUlPC/+4jSrBoQciNpNAh2mkXZYp1GXSK4dVBuxJD9
-        I46T5glg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mKpTk-000khi-C0; Mon, 30 Aug 2021 22:10:08 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, justin@coraid.com, geert@linux-m68k.org,
-        ulf.hansson@linaro.org, hare@suse.de, tj@kernel.org,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
-        johannes.berg@intel.com, chris.obbard@collabora.com,
-        krisman@collabora.com, zhuyifei1999@gmail.com, thehajime@gmail.com,
-        chris@zankel.net, jcmvbkbc@gmail.com, tim@cyberelk.net
-Cc:     linux-xtensa@linux-xtensa.org, linux-um@lists.infradead.org,
-        linux-m68k@lists.linux-m68k.org, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 14/15] pcd: capture errors on cdrom_register()
-Date:   Mon, 30 Aug 2021 15:09:59 -0700
-Message-Id: <20210830221000.179369-15-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210830221000.179369-1-mcgrof@kernel.org>
-References: <20210830221000.179369-1-mcgrof@kernel.org>
+        id S238914AbhH3XNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 19:13:47 -0400
+Received: from mail-dm6nam12on2075.outbound.protection.outlook.com ([40.107.243.75]:6241
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232217AbhH3XNr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Aug 2021 19:13:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QvK65rNEHDeznR9hqhSnCxP7Rl3MhaeoFvcy2z7YnaV5/2CYr+3CGdaEMzySwTR1Pa/MpxdquzHV7MMaxXH+Pew+UzjjpwKoxcPGLAECmibUxuIVTxgPg7a7FF97LWdtkuM2/136Cl8nvSvkSDBvsbQw2rcgvM2uudEFExuU+DdZLPNScuTXehKHZyEHsCUp6ND4NXLK/yia/xdjJ0dsqn9nIs0USHM8G51w7ovSxaRI2T/FFbdPYsJPAO/y1LtVN1t4z7La1/yhqIYtpiaADgcooxPK2QM5bO4JgsPMuqSxuTfHspVEqFAlITsMpudmwK7WxiV7zTwWsIvw+/ExyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WATPr2r5RBHJTIh4ecGQd6ZakZtex5hPykcAI3xY7cE=;
+ b=F5tzidGtNyjCV0CtOcIShlwyN1drTMYkICUwY8JAVL0tG6VUaCKXL7jVIj2c2QwTIxTmrwWDZvJFJGYNiQw0FGflcHgJNbfYEoRZ37UTGMUl8E9kase/FY1LVgDyPlICtoLcWY7lz/F3tU9wBc/nSoZO0sO2SAJ90WpKfzL0YlvJENvgto5RoVksjifzyCixaDNPnoO6dUlVIjJBEJVktuIEPZT0Ljn1iTEIWKWGcQySvs3WVc02avxz44wJVijsgWOUl3fLiUoKXY9MBohXv4FeJs/0T7iWkMSLZtrfntPXp6ILUROl3hFL54V/TBwvkCYrVL/jefv6CtJJVTgg2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.36) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WATPr2r5RBHJTIh4ecGQd6ZakZtex5hPykcAI3xY7cE=;
+ b=nPbY+/ru3bHzw+Jm9ORqGbZvk+LFhAlI/+oBvju8qh9juXEVP9wjginA7RV7+KLAMsjDSumESupcLIqqlDgkkynyhQcNIuNCxjGz0o1/PdDHjlisxKaQ5gcOym4efeNOo5xNpIBajv3kf7AOmEeGEDYsLP3Qffh8uReLbUKFAgq381UFs8Rz5OXNphy/X0oA2/mwEXeGujyVvoz1HXZLnQHQ05/OiItrlddp3kpWJxas/HTTW31DxAJdJMWEaBhOIKFjOxQkhMJZlAyeCNzYkEwC4JTRdGETU11xNnSZQJzQwTvR7oGc0QwVkEIz8ZdMiA+HUwu8DRK9updUeCVtDA==
+Received: from BN0PR04CA0037.namprd04.prod.outlook.com (2603:10b6:408:e8::12)
+ by DM5PR12MB1402.namprd12.prod.outlook.com (2603:10b6:3:73::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17; Mon, 30 Aug
+ 2021 23:12:51 +0000
+Received: from BN8NAM11FT044.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e8:cafe::55) by BN0PR04CA0037.outlook.office365.com
+ (2603:10b6:408:e8::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend
+ Transport; Mon, 30 Aug 2021 23:12:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.36; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.36) by
+ BN8NAM11FT044.mail.protection.outlook.com (10.13.177.219) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4457.17 via Frontend Transport; Mon, 30 Aug 2021 23:12:51 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 30 Aug
+ 2021 23:12:51 +0000
+Received: from [172.27.1.120] (172.20.187.5) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 30 Aug
+ 2021 23:12:48 +0000
+Subject: Re: [PATCH 1/1] virtio-blk: add num_io_queues module parameter
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+CC:     <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <stefanha@redhat.com>, <oren@nvidia.com>,
+        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+References: <20210830120023.22202-1-mgurtovoy@nvidia.com>
+ <20210830174345-mutt-send-email-mst@kernel.org>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <a34524d0-3a77-c560-8544-1dae92a92172@nvidia.com>
+Date:   Tue, 31 Aug 2021 02:12:44 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20210830174345-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fc23c2b8-0634-408f-b00e-08d96c0bb0c9
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1402:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB140273D61463BDFAE4965866DECB9@DM5PR12MB1402.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NfhoMygH/3KRyZodl7XYQuMEayy2f5Ik+mGU0RIO7BlZcqPElek/jIkUEYXZPUWv24TQcCwsGc1jXp++brbHoJGLHY2rE1FmAhglXXjCM6gCsgysvJOKfZrLyhzLhFovOTgmWJp5UXiAvCyMJpk/HPrJjc4j5vGvptIn1uJlKbdVvoFxA2mrp4ed68S80X2wZFMtGz7JoiWCmDOCVwPpduZr1HovXdnIlF1jEsR6DlfAbSS6gsO/wr4SC0Iqrre9vPK3aIyUP30bQj5pHajWzA/M8US4Ii/H9CvG1NWamuHUDKmyB/6ShLACHhhYjXXDEsO9EayHmmKfaiwDL2KSQYJWSQ7e2p7PHmm6rDUlIwdteW2UdnMfrUwHxmAZjsWsZqBzBfDabQsgXTRsISxJy6PoFgGUQ3OOHSAHp0gCT5e1HPYCj8/U1/+L5+txvtmANANoH5w/uejYflKFZMtyCZJ4FX2noV30he2+rEd0WKc0TsD6GJsPe2pBGuItQtsjR70qYq1jRgVZpWZBATjRK/1TgoNHpynVxjrncppHA+sA6ildU6uUv1aWdj93ExTcHwJBo2iuOcQZ/CBaptSnLQ7J2LbScWQDyxnR8o8EZSDlKWVVEfv6Y+gCU/KlDjKCvGCkHL2g7htiQyMd6i8gJTY/A5kyCA4ZAE32B0w+oHTgGE5OW6BOHVClWW9Gw2uifR5RFrcq3Sk+g1oBEGnbAcY1WkTbV6X5JZbHuBus+eM=
+X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(39860400002)(136003)(396003)(376002)(36840700001)(46966006)(16526019)(36756003)(5660300002)(54906003)(6916009)(6666004)(316002)(186003)(36906005)(336012)(31686004)(4326008)(2616005)(7636003)(26005)(8936002)(47076005)(70586007)(8676002)(53546011)(2906002)(83380400001)(82310400003)(31696002)(36860700001)(70206006)(478600001)(356005)(426003)(16576012)(82740400003)(86362001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2021 23:12:51.4284
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc23c2b8-0634-408f-b00e-08d96c0bb0c9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT044.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1402
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-No errors were being captured wehen cdrom_register() fails,
-capture the error and return the error.
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- drivers/block/paride/pcd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On 8/31/2021 12:48 AM, Michael S. Tsirkin wrote:
+> On Mon, Aug 30, 2021 at 03:00:23PM +0300, Max Gurtovoy wrote:
+>> Sometimes a user would like to control the amount of IO queues to be
+>> created for a block device. For example, for limiting the memory
+>> footprint of virtio-blk devices.
+>>
+>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>
+> Hmm. It's already limited by # of CPUs... Why not just limit
+> from the hypervisor side? What's the actual use-case here?
 
-diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
-index 82a654fc4db8..4cc0d141db78 100644
---- a/drivers/block/paride/pcd.c
-+++ b/drivers/block/paride/pcd.c
-@@ -940,7 +940,9 @@ static int pcd_init_unit(struct pcd_unit *cd, bool autoprobe, int port,
- 
- 	cd->present = 1;
- 	pcd_probe_capabilities(cd);
--	register_cdrom(cd->disk, &cd->info);
-+	ret = register_cdrom(cd->disk, &cd->info);
-+	if (ret)
-+		goto out_pi_release;
- 	ret = add_disk(cd->disk);
- 	if (ret)
- 		goto out_unreg_cdrom;
--- 
-2.30.2
+Limiting and minimizing resource allocation is a real use case.
 
+# of CPUs today might be 64 or 128. HW virtio-blk device might have this 
+amount of queues (or at least 32).
+
+But it's a waste to use all the queues since the device may reach to max 
+IOPs with less queues. Multiply this by 16 or 32 devices we get a lot of 
+memory wasted without a real need.
+
+It's a common configuration we do in NVMf connect command and it can 
+also be seen in other drivers in some variation (null_blk.submit_queues, 
+ib_srp.ch_count and more).
+
+Another use case is to add some flexibility for QOS.
+
+Also if we can set the queue depth, it's a good idea to control the 
+queue count as well.
+
+If no objections, I'll take the comment from Christoph and send v2.
+
+>
+>> ---
+>>   drivers/block/virtio_blk.c | 26 +++++++++++++++++++++++++-
+>>   1 file changed, 25 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+>> index e574fbf5e6df..77e8468e8593 100644
+>> --- a/drivers/block/virtio_blk.c
+>> +++ b/drivers/block/virtio_blk.c
+>> @@ -24,6 +24,28 @@
+>>   /* The maximum number of sg elements that fit into a virtqueue */
+>>   #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+>>   
+>> +static int virtblk_queue_count_set(const char *val,
+>> +		const struct kernel_param *kp)
+>> +{
+>> +	unsigned int n;
+>> +	int ret;
+>> +
+>> +	ret = kstrtouint(val, 10, &n);
+>> +	if (ret != 0 || n > nr_cpu_ids)
+>> +		return -EINVAL;
+>> +	return param_set_uint(val, kp);
+>> +}
+>> +
+>> +static const struct kernel_param_ops queue_count_ops = {
+>> +	.set = virtblk_queue_count_set,
+>> +	.get = param_get_uint,
+>> +};
+>> +
+>> +static unsigned int num_io_queues;
+>> +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
+>> +MODULE_PARM_DESC(num_io_queues,
+>> +		 "Number of IO virt queues to use for blk device.");
+>> +
+>>   static int major;
+>>   static DEFINE_IDA(vd_index_ida);
+>>   
+>> @@ -501,7 +523,9 @@ static int init_vq(struct virtio_blk *vblk)
+>>   	if (err)
+>>   		num_vqs = 1;
+>>   
+>> -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
+>> +	num_vqs = min_t(unsigned int,
+>> +			min_not_zero(num_io_queues, nr_cpu_ids),
+>> +			num_vqs);
+>>   
+>>   	vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs), GFP_KERNEL);
+>>   	if (!vblk->vqs)
+>> -- 
+>> 2.18.1
