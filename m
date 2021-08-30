@@ -2,138 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F0BCC432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1046FC43214
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 22:10:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BA8060E90
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E782E60241
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 22:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238423AbhH3Vtd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 17:49:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58771 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237167AbhH3Vtd (ORCPT
+        id S238797AbhH3WLZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 18:11:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43410 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237713AbhH3WLU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 17:49:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630360118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AmK5AK//VpDNOflKYrie75fU9H15kJEGNG5tiW/9pzA=;
-        b=RVODUNDAVOSbrtZemWwsw+8SdJ1FaYLDkXY/+aINyP3f3oeXYTMcphyz5D0JSRwuEn4GCb
-        5R3HUrNhSVZgzMUT2sr9FWUc0BnJ6OI4WphZXhu/aToc4NXyY0A3eGcodLOhc6jTqiPM3Q
-        dL7Rro/flEF+xsW21kE9oLunBERa3RQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-TqQuL7QdNpGLm8eZaywa0w-1; Mon, 30 Aug 2021 17:48:37 -0400
-X-MC-Unique: TqQuL7QdNpGLm8eZaywa0w-1
-Received: by mail-wr1-f70.google.com with SMTP id z15-20020adff74f000000b001577d70c98dso3559087wrp.12
-        for <linux-block@vger.kernel.org>; Mon, 30 Aug 2021 14:48:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AmK5AK//VpDNOflKYrie75fU9H15kJEGNG5tiW/9pzA=;
-        b=QAMKv9LHU4pTLl7nXAvq+aRASIgmg36Y2K4IrAp3pjarZyM0C8T5E3VXvRjhNTqlmK
-         NNbyHUflt9Tp31ChKiwpQ94A7pzat2OWbo4YIzx/Ko9s6tabg60RyVxQTfDhzETXo/i3
-         62tmFbJ+vDeP//VO3iZoixcC5ajolkUGWy8clKGIm9ODXYXl0xUyQsdz7LWTL+HEEkF8
-         X0blZhqUyA7brwRplCfZXxQOgQd/uc6NmRiEpW6+BgF5GKOqv/417z5ooBs+IX//bBPr
-         xVCKrhqewGbbrzuJzxmlGRZIyzUlI9VmnmGvOhs/1d1/x4TX1UUIh5jVa/B0ldI9kSjH
-         ADlQ==
-X-Gm-Message-State: AOAM533gut5TQ6EJKZBlCC/eFWYpKTL0E0iYT1Kp0+35VvrGmWjygD2p
-        5rX9WP1584d9Z8y91fvPuFOrC46YxH6ptukKkTIl/tmVoBAS8CxR/SjFk/cB85cGZl1zQeEjmH+
-        uBBAQ2trB41aMJZ9+4WnbCc0=
-X-Received: by 2002:a1c:35c9:: with SMTP id c192mr967735wma.121.1630360115920;
-        Mon, 30 Aug 2021 14:48:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy5fhrlu0kEOzo1cvWkb9o9z8Fn1FmpxfqvNOtZoj6358rRlPDpe9fYiRVrse76ReP25wmvgw==
-X-Received: by 2002:a1c:35c9:: with SMTP id c192mr967723wma.121.1630360115695;
-        Mon, 30 Aug 2021 14:48:35 -0700 (PDT)
-Received: from redhat.com ([2.55.138.60])
-        by smtp.gmail.com with ESMTPSA id v62sm68440wme.21.2021.08.30.14.48.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Aug 2021 14:48:35 -0700 (PDT)
-Date:   Mon, 30 Aug 2021 17:48:31 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        stefanha@redhat.com, oren@nvidia.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH 1/1] virtio-blk: add num_io_queues module parameter
-Message-ID: <20210830174345-mutt-send-email-mst@kernel.org>
-References: <20210830120023.22202-1-mgurtovoy@nvidia.com>
+        Mon, 30 Aug 2021 18:11:20 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DE12C061575;
+        Mon, 30 Aug 2021 15:10:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=36SL0wDTuPKE88DN3bn6CHYvWFCssDMr/vLYk5vdXW4=; b=D2xTVTYV2/R0+e0G3GBfPfTMt2
+        pw0sjSo97A8CT8qrUzQncZ508kfl1FcrxxX7NqSCPiVpNc1urI85Aym19fKi4B+xU+rV/2W3mQRvn
+        OMmfbKN3nrAbpu0u3DDkuz4eSf6ClexUSd1HCAdJvzn/d8EaYTFbzfxji/DrDgvlZCT6QVu5lFCmM
+        J+BXc/Trv1LW6U/mp716JwXzWAr4jqAbZrp1uM2lFHhhgfyqI5gNmHn5Dv8XgVew/ug388mgNVyyX
+        gJYDBofc36tTUcxbJv839KQ/+v6JOI+1ovoWL6muc3pmz5SZKnzX1JRjL70si8oz258csqk/fLfJO
+        gK7mFADg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mKpTk-000khS-17; Mon, 30 Aug 2021 22:10:08 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, justin@coraid.com, geert@linux-m68k.org,
+        ulf.hansson@linaro.org, hare@suse.de, tj@kernel.org,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
+        johannes.berg@intel.com, chris.obbard@collabora.com,
+        krisman@collabora.com, zhuyifei1999@gmail.com, thehajime@gmail.com,
+        chris@zankel.net, jcmvbkbc@gmail.com, tim@cyberelk.net
+Cc:     linux-xtensa@linux-xtensa.org, linux-um@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH 07/15] n64cart: add error handling support for add_disk()
+Date:   Mon, 30 Aug 2021 15:09:52 -0700
+Message-Id: <20210830221000.179369-8-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210830221000.179369-1-mcgrof@kernel.org>
+References: <20210830221000.179369-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210830120023.22202-1-mgurtovoy@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 30, 2021 at 03:00:23PM +0300, Max Gurtovoy wrote:
-> Sometimes a user would like to control the amount of IO queues to be
-> created for a block device. For example, for limiting the memory
-> footprint of virtio-blk devices.
-> 
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+We never checked for errors on add_disk() as this function
+returned void. Now that this is fixed, use the shiny new
+error handling.
 
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ drivers/block/n64cart.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Hmm. It's already limited by # of CPUs... Why not just limit
-from the hypervisor side? What's the actual use-case here?
-
-> ---
->  drivers/block/virtio_blk.c | 26 +++++++++++++++++++++++++-
->  1 file changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index e574fbf5e6df..77e8468e8593 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -24,6 +24,28 @@
->  /* The maximum number of sg elements that fit into a virtqueue */
->  #define VIRTIO_BLK_MAX_SG_ELEMS 32768
->  
-> +static int virtblk_queue_count_set(const char *val,
-> +		const struct kernel_param *kp)
-> +{
-> +	unsigned int n;
-> +	int ret;
-> +
-> +	ret = kstrtouint(val, 10, &n);
-> +	if (ret != 0 || n > nr_cpu_ids)
-> +		return -EINVAL;
-> +	return param_set_uint(val, kp);
-> +}
-> +
-> +static const struct kernel_param_ops queue_count_ops = {
-> +	.set = virtblk_queue_count_set,
-> +	.get = param_get_uint,
-> +};
-> +
-> +static unsigned int num_io_queues;
-> +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
-> +MODULE_PARM_DESC(num_io_queues,
-> +		 "Number of IO virt queues to use for blk device.");
-> +
->  static int major;
->  static DEFINE_IDA(vd_index_ida);
->  
-> @@ -501,7 +523,9 @@ static int init_vq(struct virtio_blk *vblk)
->  	if (err)
->  		num_vqs = 1;
->  
-> -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-> +	num_vqs = min_t(unsigned int,
-> +			min_not_zero(num_io_queues, nr_cpu_ids),
-> +			num_vqs);
->  
->  	vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs), GFP_KERNEL);
->  	if (!vblk->vqs)
-> -- 
-> 2.18.1
+diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
+index c84be0028f63..1ba9137bdf30 100644
+--- a/drivers/block/n64cart.c
++++ b/drivers/block/n64cart.c
+@@ -117,6 +117,7 @@ static const struct block_device_operations n64cart_fops = {
+ static int __init n64cart_probe(struct platform_device *pdev)
+ {
+ 	struct gendisk *disk;
++	int err = -ENOMEM;
+ 
+ 	if (!start || !size) {
+ 		pr_err("start or size not specified\n");
+@@ -134,7 +135,7 @@ static int __init n64cart_probe(struct platform_device *pdev)
+ 
+ 	disk = blk_alloc_disk(NUMA_NO_NODE);
+ 	if (!disk)
+-		return -ENOMEM;
++		goto out;
+ 
+ 	disk->first_minor = 0;
+ 	disk->flags = GENHD_FL_NO_PART_SCAN;
+@@ -149,11 +150,18 @@ static int __init n64cart_probe(struct platform_device *pdev)
+ 	blk_queue_physical_block_size(disk->queue, 4096);
+ 	blk_queue_logical_block_size(disk->queue, 4096);
+ 
+-	add_disk(disk);
++	err = add_disk(disk);
++	if (err)
++		goto out_cleanup_disk;
+ 
+ 	pr_info("n64cart: %u kb disk\n", size / 1024);
+ 
+ 	return 0;
++
++out_cleanup_disk:
++	blk_cleanup_disk(disk);
++out:
++	return err;
+ }
+ 
+ static struct platform_driver n64cart_driver = {
+-- 
+2.30.2
 
