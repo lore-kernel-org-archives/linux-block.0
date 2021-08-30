@@ -3,38 +3,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC2DC4320E
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A53C4320E
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:26:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B8C460F3A
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEEFE60F3A
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 21:26:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238271AbhH3V1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 17:27:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33080 "EHLO
+        id S238013AbhH3V1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 17:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbhH3V1F (ORCPT
+        with ESMTP id S237685AbhH3V1I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 17:27:05 -0400
+        Mon, 30 Aug 2021 17:27:08 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56461C061760;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C43C061796;
         Mon, 30 Aug 2021 14:26:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=WZDOVyRqrotfblM3MrNHqoihizZi1dQWZqaOZFp5Q1M=; b=i8ELcjA/anrU1TOHpT3BXlv5sQ
-        9q5jw+XOVVb/qUvV9ig0gbEr9CrSUmV3KpTOZDXHGFakrCIS18jy03q+1JzG3IWwARLfGn1Z/7fo/
-        XOcVbLQBZElwJbcert/XSMBhSrXd977VdHJk+2AXpHpLvWfDd6FWkkd+Ie9d+lv89upJrOWSbAJSK
-        nT0oSWfCoTlrFojFLLJ3zXxMvwbM0j0ElnF6FO/lzdjKqXXgHhhs3sE1xiVRyqkLqBTwNloi2o17C
-        S6tz5a9SINyP3qxdan7AtdeT2cf48qweDik29nXili4ONS2xfgWdyOpQF8Qksp4ZnyNcDGVKJS1LK
-        1iirUqCg==;
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=1YUk7uUX188ex4Qeqb2q2FbA+vqSeistafw96wSb9q8=; b=lEZUf7GgHMbX1+8gRrsrsvmyDn
+        I+l8qrzbBpIWozAGTLTsWh0ax350SK798hajnAmKrtIYwcj70N+TaMp/HanMyyRUp054bd1I72PoR
+        tx8Hq7NMaNET0LOlyYCx0TsGyJCTqk6w1OvYvpXbRKuuMRQd2pUNw7KlIMpg2IIjBZ+zvhlvLDIXl
+        uJ3BiUfzRZCBBpNJqKtyJRWmGjjAIWHZWiJAynl3xGzd17VZHRg2LRBXRyRNRBZ7p564JgTHzY+67
+        cukqYn6bVuTsu0iduaOcSEpdZaD/+3zQZbDczNcUC1Z4qd2F8DLoqpMTdUu6EcUbL56xrdqtLrnTN
+        YcfMXpzQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mKomk-000ciA-Km; Mon, 30 Aug 2021 21:25:42 +0000
+        id 1mKomk-000ci4-DU; Mon, 30 Aug 2021 21:25:42 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
         kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
@@ -46,14 +46,11 @@ Cc:     hch@infradead.org, hare@suse.de, bvanassche@acm.org,
         linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
         dm-devel@redhat.com, nbd@other.debian.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v3 3/8] nvme: add error handling support for add_disk()
-Date:   Mon, 30 Aug 2021 14:25:33 -0700
-Message-Id: <20210830212538.148729-4-mcgrof@kernel.org>
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v3 0/8] block: first batch of add_disk() error handling conversions
+Date:   Mon, 30 Aug 2021 14:25:30 -0700
+Message-Id: <20210830212538.148729-1-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210830212538.148729-1-mcgrof@kernel.org>
-References: <20210830212538.148729-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
@@ -61,43 +58,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We never checked for errors on add_disk() as this function
-returned void. Now that this is fixed, use the shiny new
-error handling.
+Jens,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
+I think this first set is ready, but pending review of just two patches:
+
+  * mmc/core/block
+  * dm
+
+All other patches have a respective Reviewed-by tag. The above two
+patches were integrated back into the series once I understood
+Christoph's concerns, and adjusted the patch as such.
+
+This goes rebased onto your for-next as of today. If anyone wants to
+explore the pending full set this is up on my linux-next branch
+20210830-for-axboe-add-disk-error-handling-next [0].
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210830-for-axboe-add-disk-error-handling-next
+
+Luis Chamberlain (8):
+  scsi/sd: add error handling support for add_disk()
+  scsi/sr: add error handling support for add_disk()
+  nvme: add error handling support for add_disk()
+  mmc/core/block: add error handling support for add_disk()
+  md: add error handling support for add_disk()
+  dm: add add_disk() error handling
+  loop: add error handling support for add_disk()
+  nbd: add error handling support for add_disk()
+
+ drivers/block/loop.c     | 9 ++++++++-
+ drivers/block/nbd.c      | 6 +++++-
+ drivers/md/dm.c          | 4 +++-
+ drivers/md/md.c          | 7 ++++++-
+ drivers/mmc/core/block.c | 7 ++++++-
  drivers/nvme/host/core.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/scsi/sd.c        | 6 +++++-
+ drivers/scsi/sr.c        | 5 ++++-
+ 8 files changed, 45 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 8679a108f571..687d3be563a3 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3763,7 +3763,9 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 
- 	nvme_get_ctrl(ctrl);
- 
--	device_add_disk(ctrl->device, ns->disk, nvme_ns_id_attr_groups);
-+	if (device_add_disk(ctrl->device, ns->disk, nvme_ns_id_attr_groups))
-+		goto out_cleanup_ns_from_list;
-+
- 	if (!nvme_ns_head_multipath(ns->head))
- 		nvme_add_ns_cdev(ns);
- 
-@@ -3773,6 +3775,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 
- 	return;
- 
-+ out_cleanup_ns_from_list:
-+	nvme_put_ctrl(ctrl);
-+	down_write(&ctrl->namespaces_rwsem);
-+	list_del_init(&ns->list);
-+	up_write(&ctrl->namespaces_rwsem);
-  out_unlink_ns:
- 	mutex_lock(&ctrl->subsys->lock);
- 	list_del_rcu(&ns->siblings);
 -- 
 2.30.2
 
