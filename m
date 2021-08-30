@@ -2,107 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D14FC432BE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB4CC432BE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 14:24:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E66860240
-	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 12:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8589E60F25
+	for <linux-block@archiver.kernel.org>; Mon, 30 Aug 2021 14:24:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236541AbhH3MEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 08:04:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48524 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236797AbhH3MBP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 08:01:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8BAB66117A;
-        Mon, 30 Aug 2021 12:00:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630324817;
-        bh=Xul5IBRdGFdvKaXnW2vbVJHMh8bEFMV50GdRfD1BXfY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=atkf8cq9fUsd+q2ejhWNNTnDC0tinwtRVXAag6x1Dt4PO1JfdxRqwMBXBx7pPjpZe
-         XXqLmAQxPJgGnmFZ8RpOJwely7fxpYFtJePrdOb5Mkk2Isj/XqWbZtcUUiedULGkSi
-         8iePcvSLjkoyBiaPuDDutd34RFpBWCCrXfd4uQDM3axdiiCJ6WiQDvPf5aWegoZAdO
-         oNBbkdJtuRFpOa0uO3/oicB9ZRQeBG8derUYh2DBUng0lJGW+lBVZz4b9Z23G8HBQ+
-         ZEAnp+97V20rlU7SWOG8O7dPiSw+8R127/mB8hjXdjXTqcUSdsSir4Xc7p79clvND4
-         TRuktm/WKfLvQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 11/11] cryptoloop: add a deprecation warning
-Date:   Mon, 30 Aug 2021 08:00:02 -0400
-Message-Id: <20210830120002.1017700-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210830120002.1017700-1-sashal@kernel.org>
-References: <20210830120002.1017700-1-sashal@kernel.org>
+        id S237015AbhH3OZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Aug 2021 10:25:44 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:47254 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237108AbhH3OZn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Aug 2021 10:25:43 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D181922045;
+        Mon, 30 Aug 2021 14:24:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1630333488; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YDItVvyZwFZxV21BA7w3UOhFlQb9BLHQxAKev2Zt2d4=;
+        b=AJowyQbnEV49vkUTNXeMyFmCLZzR3y+NX+vLRT7bYN9DhPKCVCRrpPqqxN38kKtSU+xxU7
+        dCFQ+hKl9zxVrK9RrrukBOTvQ/th1ZZkcmUhANu1U64x9lIQd2laQEi21Am1Xjcdv7O+3A
+        mDDPFhujvUF+TMYyZ/8/bbNGKp9A9VI=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id A41F113990;
+        Mon, 30 Aug 2021 14:24:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id 3tTKJDDqLGEsBQAAGKfGzw
+        (envelope-from <nborisov@suse.com>); Mon, 30 Aug 2021 14:24:48 +0000
+Subject: Re: [PATCH] blk-mq: Use helpers to access rq->state
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+References: <20210512095017.235295-1-nborisov@suse.com>
+From:   Nikolay Borisov <nborisov@suse.com>
+Message-ID: <f87da2cd-93d0-663d-15be-30d64f69a5bc@suse.com>
+Date:   Mon, 30 Aug 2021 17:24:48 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <20210512095017.235295-1-nborisov@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
 
-[ Upstream commit 222013f9ac30b9cec44301daa8dbd0aae38abffb ]
 
-Support for cryptoloop has been officially marked broken and deprecated
-in favor of dm-crypt (which supports the same broken algorithms if
-needed) in Linux 2.6.4 (released in March 2004), and support for it has
-been entirely removed from losetup in util-linux 2.23 (released in April
-2013).  Add a warning and a deprecation schedule.
+On 12.05.21 г. 12:50, Nikolay Borisov wrote:
+> Instead of having a mixed bag of opencoded usage and helper usage,
+> simply replace opencoded sites with the appropriate helper. No
+> functional changes.
+> 
+> Signed-off-by: Nikolay Borisov <nborisov@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20210827163250.255325-1-hch@lst.de
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/Kconfig      | 4 ++--
- drivers/block/cryptoloop.c | 2 ++
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index f40ebe9f5047..f2548049aa0e 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -230,7 +230,7 @@ config BLK_DEV_LOOP_MIN_COUNT
- 	  dynamically allocated with the /dev/loop-control interface.
- 
- config BLK_DEV_CRYPTOLOOP
--	tristate "Cryptoloop Support"
-+	tristate "Cryptoloop Support (DEPRECATED)"
- 	select CRYPTO
- 	select CRYPTO_CBC
- 	depends on BLK_DEV_LOOP
-@@ -242,7 +242,7 @@ config BLK_DEV_CRYPTOLOOP
- 	  WARNING: This device is not safe for journaled file systems like
- 	  ext3 or Reiserfs. Please use the Device Mapper crypto module
- 	  instead, which can be configured to be on-disk compatible with the
--	  cryptoloop device.
-+	  cryptoloop device.  cryptoloop support will be removed in Linux 5.16.
- 
- source "drivers/block/drbd/Kconfig"
- 
-diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
-index 3cabc335ae74..f0a91faa43a8 100644
---- a/drivers/block/cryptoloop.c
-+++ b/drivers/block/cryptoloop.c
-@@ -189,6 +189,8 @@ init_cryptoloop(void)
- 
- 	if (rc)
- 		printk(KERN_ERR "cryptoloop: loop_register_transfer failed\n");
-+	else
-+		pr_warn("the cryptoloop driver has been deprecated and will be removed in in Linux 5.16\n");
- 	return rc;
- }
- 
--- 
-2.30.2
-
+Ping
