@@ -2,64 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D9CC4320A
-	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 02:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A43C432BE
+	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 06:42:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66C1D60FED
-	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 02:58:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D76960724
+	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 06:42:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239401AbhHaC70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Aug 2021 22:59:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60040 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239317AbhHaC70 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Aug 2021 22:59:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 9C23F61004;
-        Tue, 31 Aug 2021 02:58:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630378711;
-        bh=nsGIPinlH5h/JDi1gy6Eve4ENDYJPYs8DA2FJi2z3E8=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=TzjijQp3505tf5eIRupQDGQeVNzXq3fNbo5ktO3a4PIHVsv4s9B5jnYPBHANVP/S3
-         CewSu66Y5OOWAFv+tm/cwcrM1kzpNHGhYvu+DMD+b3f8e3UAuvi8mJWPirLqlE+hwF
-         a9NE9ZI23Ijpbqf1gTz9RFhAVEfwq+aFnaJ8/4b7fbUF95fs7NOytuo1yMJKxqi907
-         EDmYZV7iIsFmFHjfpJ4o4O6Uw6R2cg7vZIVemKo2+RCBYcVu6fDB/cwlBJbsG2vjQT
-         61VT5QsWtBcuZ9D8bNaqE5ERw3//xS3owAi3ans/SyVnT/XdKd2sV0dODdh8cNGvye
-         lXPYWOHRGcNvA==
-Subject: Re: [GIT PULL] bio recycling support
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <baf16ffa-1c31-95e8-dae5-ac4b98ee984a@kernel.dk>
-References: <baf16ffa-1c31-95e8-dae5-ac4b98ee984a@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <baf16ffa-1c31-95e8-dae5-ac4b98ee984a@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/io_uring-bio-cache.5-2021-08-30
-X-PR-Tracked-Commit-Id: 3d5b3fbedad65088ec079a4c4d1a2f47e11ae1e7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3b629f8d6dc04d3af94429c18fe17239d6fbe2c3
-Message-Id: <163037871151.18446.12415632165848863516.pr-tracker-bot@kernel.org>
-Date:   Tue, 31 Aug 2021 02:58:31 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        io-uring <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S235477AbhHaGnY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Aug 2021 02:43:24 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:46076 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234268AbhHaGnY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Aug 2021 02:43:24 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 6552F22169;
+        Tue, 31 Aug 2021 06:42:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1630392148; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P4bO1uDoPyVjXMyarbRCwKRvMnsekjXSwph97qcH7zY=;
+        b=JO4eC3QcygtWx5imvpsA2ldcboiSaDXucxQpLO8sktYQGLuwi/4nTdoIaWtL7ewTotMfKk
+        oNn8lrDdQ1HCjc/3WCV8VzradAHtzgxsEV+HZtTyRg3Dz0TPB3dPyeCE1uiMtXLA8qDbda
+        YXw+31I0uGBteCMZP9BNu/Z4a0DWErM=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 248FD12FC5;
+        Tue, 31 Aug 2021 06:42:28 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id EW61BVTPLWFIQAAAGKfGzw
+        (envelope-from <nborisov@suse.com>); Tue, 31 Aug 2021 06:42:28 +0000
+Subject: Re: [PATCH] blk-mq: Use helpers to access rq->state
+To:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+References: <20210512095017.235295-1-nborisov@suse.com>
+ <36615406-97c4-5273-364b-8f2b5b1fb35f@acm.org>
+From:   Nikolay Borisov <nborisov@suse.com>
+Message-ID: <4ec372d9-a234-8208-b8e3-e545d6658bd2@suse.com>
+Date:   Tue, 31 Aug 2021 09:42:27 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <36615406-97c4-5273-364b-8f2b5b1fb35f@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Mon, 30 Aug 2021 08:57:41 -0600:
 
-> git://git.kernel.dk/linux-block.git tags/io_uring-bio-cache.5-2021-08-30
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3b629f8d6dc04d3af94429c18fe17239d6fbe2c3
+On 30.08.21 г. 20:29, Bart Van Assche wrote:
+<snip>
 
-Thank you!
+> Is the above patch complete? I think even with the above patch applied
+> there are still two functions in the block layer that use WRITE_ONCE() to
+> modify rq->state directly:
+> 
+> $ git grep -nH 'WRITE_ONCE(rq->state,'
+> block/blk-mq.c:532:    WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+> block/blk-mq.c:648:    WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+> block/blk-mq.c:728:    WRITE_ONCE(rq->state, MQ_RQ_IN_FLIGHT);
+> block/blk-mq.c:747:        WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+> block/blk-mq.c:2416:    WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+> include/linux/blk-mq.h:521:    WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+On just-updated master I get:
+
+$ git grep 'WRITE_ONCE(rq->state,'
+block/blk-mq.c: WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+block/blk-mq.c: WRITE_ONCE(rq->state, MQ_RQ_IN_FLIGHT);
+block/blk-mq.c:         WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+block/blk-mq.c: WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+include/linux/blk-mq.h: WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+
+
+> 
+> Thanks,
+> 
+> Bart.
+> 
