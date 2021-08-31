@@ -2,69 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E27B2C432BE
-	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 22:49:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B3EC43214
+	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 23:42:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C45F561056
-	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 22:49:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7465361027
+	for <linux-block@archiver.kernel.org>; Tue, 31 Aug 2021 23:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240604AbhHaWum (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Aug 2021 18:50:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44444 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240492AbhHaWuk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Aug 2021 18:50:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id A210B610A2;
-        Tue, 31 Aug 2021 22:49:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630450184;
-        bh=Li+/OY2/JxNT3svnasSUp9RCaY8cReM7pAD+dQdzN30=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=AvDE9XN5LaUDeJ1tMHINYdsIkEbvNU2bsfOlLnmPw05RJnvQN2YwDzNApxBlhzIR6
-         KTT0q6yuvpkgMnv3OrriVTLGngIQTFc/Zxre2JOK1/sOw5aYcHil4SOv7BD50pq2bD
-         BTcxuJJRHNBAfMTyof8TnpvTbSNNshCXhj6ayTzwH/BOwxLIBcEH+d8uHBFb7JQSKB
-         CcqxDgNlLcr50VEawZMFcyiqmgUVecKMzFOR/4lwSW4VjdWNgALzdflSxuOqDVf+11
-         wPk2EDZ8XDT2WNuhEat/7Cepwkdi41APmo/scg4OPvv5WIkIKsgcyM9sPnkDoe2mkD
-         YPxx1PcfwY9kw==
-Subject: Re: [git pull] device mapper changes for 5.15
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <YS5aLC4FSqL31PLI@redhat.com>
-References: <YS5aLC4FSqL31PLI@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <YS5aLC4FSqL31PLI@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.15/dm-changes
-X-PR-Tracked-Commit-Id: d3703ef331297b6daa97f5228cbe2a657d0cfd21
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: efa916af13206eb15916e102c45c99a13ea78f33
-Message-Id: <163045018463.32002.7512936844641360922.pr-tracker-bot@kernel.org>
-Date:   Tue, 31 Aug 2021 22:49:44 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Arne Welzel <arne.welzel@corelight.com>,
-        Changbin Du <changbin.du@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Tushar Sugandhi <tusharsu@linux.microsoft.com>
+        id S235942AbhHaXnB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Aug 2021 19:43:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51700 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232350AbhHaXnB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Aug 2021 19:43:01 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACBEC061760
+        for <linux-block@vger.kernel.org>; Tue, 31 Aug 2021 16:42:05 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 17so893754pgp.4
+        for <linux-block@vger.kernel.org>; Tue, 31 Aug 2021 16:42:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Kvzhf+3RsKiOClW18InqWDffCAEpvbvcEytauDg5dBI=;
+        b=clXSDUEgN3jUuMOzV1jXXOX+LtpeGDWxkgPu3htj+QLDQjdRePj7tEjTY9srirtNZH
+         M2jbpc85QPlacRGba7QPm8kPk7xZBQy+bI9/dZfKegvID19aZeoFRkfb8fEinkwvlCEs
+         3SAgV67FuXW8ykJW/7LdcZ7IEsTHoicEooQrETjf+RQ0BXWJwjBwHTnHtWFD+cdrM0j6
+         BFaNOXsR7vZx+IN2HRrRac0LJBpwBCRP4mb39C/xCj+lK0KA1aS0Dljht4NuAvqocB6P
+         PLUOCsOcNdALS26Atq/5kyj0NOLXk0w9f2mPlOF23ViMR/YK26AtdQLoUc7CgjsYxwkX
+         iOTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Kvzhf+3RsKiOClW18InqWDffCAEpvbvcEytauDg5dBI=;
+        b=uPsCkgXvFCGXFJ/PhrLQupcuwzi20Id+LUlpFrqjY4SPonolj/bU+seDsoWhVmrhtG
+         GqFXc5PTJIhVGc6uWOwZaZkpVR5XERE70qLb9v58z/qiL+NMr/lVsDkbePA180srZARu
+         En08tSVRRz4dymfPnUttnbgEpdifeTSRnbYgv94YIti5rdE1wYeP8+cC8YzCSHoTx+Ez
+         63UvYz5xhthCbS0a8yAcW6WmnePHDE+Fd76VE/zrHIbSgi4PMtyySzDXfJ4d9yUZelfq
+         yyL4qO5HNrloTMKxZC9SRNVGUU3d37YUMpxs+vPc0ySZXw2u/IIrChHfKDbmXazFzxAM
+         ZJyQ==
+X-Gm-Message-State: AOAM532YzQswXwWZTnz/kMuxv/tk5Wj7WwoNVS7RvaLyvNoepmK4iCoA
+        uHTW7J8vjTr2ZjdHXT/yA17qPeYBZtvbfA==
+X-Google-Smtp-Source: ABdhPJyjdl+hJ+P2YnLvZ1VDeLEu0NHMqXllx25IMHTtgvB51JsuN4A7S+LmNwAR2Tba+Q0KcCTt9w==
+X-Received: by 2002:a63:e50a:: with SMTP id r10mr5401421pgh.84.1630453324780;
+        Tue, 31 Aug 2021 16:42:04 -0700 (PDT)
+Received: from relinquished.localdomain ([2620:10d:c090:400::5:3f9a])
+        by smtp.gmail.com with ESMTPSA id b17sm22058104pgl.61.2021.08.31.16.42.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Aug 2021 16:42:04 -0700 (PDT)
+Date:   Tue, 31 Aug 2021 16:42:02 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: Re: [PATCH] block/001: don't exit test with pending async scan
+Message-ID: <YS6+Skn65PQTeZDt@relinquished.localdomain>
+References: <20210830023844.1870471-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210830023844.1870471-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Tue, 31 Aug 2021 12:34:52 -0400:
+On Mon, Aug 30, 2021 at 10:38:44AM +0800, Ming Lei wrote:
+> We have to run scan and delete together, otherwise pending async
+> may prevent scsi_debug from being unloaded, and cause failure of
+> 'modprobe: FATAL: Module scsi_debug is in use.'
+> 
+> Fix the issue by always running both scan and delete together.
+> 
+> Fixes: f3bcd8c ("block/001: wait until device is added")
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  tests/block/001 | 9 ++-------
+>  1 file changed, 2 insertions(+), 7 deletions(-)
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.15/dm-changes
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/efa916af13206eb15916e102c45c99a13ea78f33
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Applied, thanks.
