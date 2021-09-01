@@ -2,204 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9838C4320A
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 03:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 731E4C432BE
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 04:20:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7A6D6069E
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 03:39:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3765B60F4B
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 04:20:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241796AbhIADka (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Aug 2021 23:40:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48162 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241754AbhIADkX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Aug 2021 23:40:23 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC4B3C061575;
-        Tue, 31 Aug 2021 20:39:27 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id r21so1460850qtw.11;
-        Tue, 31 Aug 2021 20:39:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5eznzShYwADvzOPKSZ3hcyxH8Z6TpaitcBld3wKT2jE=;
-        b=ZxUdmpWYYqXOgdOl8kR7OgR2kVnqQRcp4rRXZr+R7cy65vJiXCHdgOWVZnhT0QtC8a
-         ScDNNQg4VZXKi8CaUvdBeE8NLW+Ox2pC2v8ZE5I8Rcw399wvHI3bDWpmmfgLsduorgTw
-         F7yLAFSrLXmyJEM68xdWvdWU0zdB6TM3/ixNz/i8y8ipbu8JXv4/gKrGbFyjVRCP7uRJ
-         3aH5BeFhh43sCkPkHlckSA31ChXXAFITyeX9cOvfOOMlwRFZMUCNP/5W2yJHdsuj5IwV
-         gf0elhSjhFFk29uOXSQFEjA5Sz/eXw/ggkK7Z+VnaXoReynveSPT9MBZqis88UHvEZs4
-         KWGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5eznzShYwADvzOPKSZ3hcyxH8Z6TpaitcBld3wKT2jE=;
-        b=lxzvh0CC69Xl6xoRGiNIlef32ukL+4XhdXwofQeC5Mejkm7AWaM4ISZasTpYWY3XdZ
-         t8f2CeAC5CKhJSGPTxoXnxswDTaJXX9JTZFVL9RTBxP/4ZTWBYHoQOpSZFMeC1NlFh8T
-         rg4W4FFm6oZVMM9e6khJuu0L6ZRxdo40P9ojnAX6T4+xzkRTJXfzXFb5BVHF4KH0btXf
-         k4PWZyCvmj81hw64xcpu5n5oQeOfGm7Avn/V1Uv8jiYCe+K+8jjNYfOd18yNbKeccZxO
-         anzLFtMx3uKRqNPIx2XpWEKWYbUyl1OseYh+6HElE/n2W2Es2jAVjvoGKGdyh1PIjEWA
-         bLvg==
-X-Gm-Message-State: AOAM531+UEqUFEltcjwlkshs3+Gfq3dvYBStyJFeBWlDT+X69JRU7arJ
-        dSR6kTojPQ74NA+0x3x6ll9Wkg0hFFvUecjS2Ko=
-X-Google-Smtp-Source: ABdhPJwzpNMXnzYmkEqSbzN6M0/DOilpaMfT+4BNsm9fEUHLO+pAMb6YMzzmyOn6E8EqKKX82IRDtYijHlMwWzRYuZU=
-X-Received: by 2002:ac8:4e0c:: with SMTP id c12mr6239885qtw.173.1630467565374;
- Tue, 31 Aug 2021 20:39:25 -0700 (PDT)
+        id S232298AbhIAEVT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 00:21:19 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:51713 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229441AbhIAEVS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 00:21:18 -0400
+Received: from fsav413.sakura.ne.jp (fsav413.sakura.ne.jp [133.242.250.112])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1814JjgC033046;
+        Wed, 1 Sep 2021 13:19:45 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav413.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp);
+ Wed, 01 Sep 2021 13:19:45 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1814Jj4Y033043
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 1 Sep 2021 13:19:45 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Subject: Re: [PATCH v3 0/8] block: first batch of add_disk() error handling
+ conversions
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     hch@infradead.org, linux-block@vger.kernel.org, axboe@kernel.dk
+References: <20210830212538.148729-1-mcgrof@kernel.org>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Message-ID: <cc6470a2-7e32-c582-2c45-1358d3f6de1b@I-love.SAKURA.ne.jp>
+Date:   Wed, 1 Sep 2021 13:19:44 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210830233500.51395-1-mgurtovoy@nvidia.com>
-In-Reply-To: <20210830233500.51395-1-mgurtovoy@nvidia.com>
-From:   Feng Li <lifeng1519@gmail.com>
-Date:   Wed, 1 Sep 2021 11:38:59 +0800
-Message-ID: <CAEK8JBBU3zNAWpC36-Lq0UBM1Dp+jYQG105psE38Fy8KRy=M-g@mail.gmail.com>
-Subject: Re: [PATCH 1/1] virtio-blk: avoid preallocating big SGL for data
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     hch@infradead.org, mst@redhat.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
-        oren@nvidia.com, linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210830212538.148729-1-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Does this hurt the performance of virtio-blk?
-I think a fio result is needed here.
+On 2021/08/31 6:25, Luis Chamberlain wrote:
+> Jens,
+> 
+> I think this first set is ready, but pending review of just two patches:
+> 
+>   * mmc/core/block
+>   * dm
+> 
+> All other patches have a respective Reviewed-by tag. The above two
+> patches were integrated back into the series once I understood
+> Christoph's concerns, and adjusted the patch as such.
+> 
+> This goes rebased onto your for-next as of today. If anyone wants to
+> explore the pending full set this is up on my linux-next branch
+> 20210830-for-axboe-add-disk-error-handling-next [0].
 
-On Tue, Aug 31, 2021 at 7:36 AM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
->
-> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
-> has lots of deep queues, preallocation for the sg list can consume
-> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
-> can be 64 or 128 and each queue's depth might be 128. This means the
-> resulting preallocation for the data SGLs is big.
->
-> Switch to runtime allocation for SGL for lists longer than 2 entries.
-> This is the approach used by NVMe drivers so it should be reasonable for
-> virtio block as well. Runtime SGL allocation has always been the case
-> for the legacy I/O path so this is nothing new.
->
-> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
-> support SG_CHAIN, use only runtime allocation for the SGL.
->
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
-> ---
->  drivers/block/virtio_blk.c | 37 ++++++++++++++++++++++---------------
->  1 file changed, 22 insertions(+), 15 deletions(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 77e8468e8593..9a4c5d428b58 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -24,6 +24,12 @@
->  /* The maximum number of sg elements that fit into a virtqueue */
->  #define VIRTIO_BLK_MAX_SG_ELEMS 32768
->
-> +#ifdef CONFIG_ARCH_NO_SG_CHAIN
-> +#define VIRTIO_BLK_INLINE_SG_CNT       0
-> +#else
-> +#define VIRTIO_BLK_INLINE_SG_CNT       2
-> +#endif
-> +
->  static int virtblk_queue_count_set(const char *val,
->                 const struct kernel_param *kp)
->  {
-> @@ -99,7 +105,7 @@ struct virtio_blk {
->  struct virtblk_req {
->         struct virtio_blk_outhdr out_hdr;
->         u8 status;
-> -       struct scatterlist sg[];
-> +       struct sg_table sg_table;
->  };
->
->  static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
-> @@ -188,6 +194,8 @@ static inline void virtblk_request_done(struct request *req)
->  {
->         struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
->
-> +       sg_free_table_chained(&vbr->sg_table, VIRTIO_BLK_INLINE_SG_CNT);
-> +
->         if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
->                 kfree(page_address(req->special_vec.bv_page) +
->                       req->special_vec.bv_offset);
-> @@ -291,7 +299,15 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->                         return BLK_STS_RESOURCE;
->         }
->
-> -       num = blk_rq_map_sg(hctx->queue, req, vbr->sg);
-> +       vbr->sg_table.sgl = (struct scatterlist *)(vbr + 1);
-> +       err = sg_alloc_table_chained(&vbr->sg_table,
-> +                                    blk_rq_nr_phys_segments(req),
-> +                                    vbr->sg_table.sgl,
-> +                                    VIRTIO_BLK_INLINE_SG_CNT);
-> +       if (err)
-> +               return BLK_STS_RESOURCE;
-> +
-> +       num = blk_rq_map_sg(hctx->queue, req, vbr->sg_table.sgl);
->         if (num) {
->                 if (rq_data_dir(req) == WRITE)
->                         vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_OUT);
-> @@ -300,7 +316,7 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->         }
->
->         spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
-> -       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
-> +       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
->         if (err) {
->                 virtqueue_kick(vblk->vqs[qid].vq);
->                 /* Don't stop the queue if -ENOMEM: we may have failed to
-> @@ -309,6 +325,8 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->                 if (err == -ENOSPC)
->                         blk_mq_stop_hw_queue(hctx);
->                 spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
-> +               sg_free_table_chained(&vbr->sg_table,
-> +                                     VIRTIO_BLK_INLINE_SG_CNT);
->                 switch (err) {
->                 case -ENOSPC:
->                         return BLK_STS_DEV_RESOURCE;
-> @@ -687,16 +705,6 @@ static const struct attribute_group *virtblk_attr_groups[] = {
->         NULL,
->  };
->
-> -static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
-> -               unsigned int hctx_idx, unsigned int numa_node)
-> -{
-> -       struct virtio_blk *vblk = set->driver_data;
-> -       struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
-> -
-> -       sg_init_table(vbr->sg, vblk->sg_elems);
-> -       return 0;
-> -}
-> -
->  static int virtblk_map_queues(struct blk_mq_tag_set *set)
->  {
->         struct virtio_blk *vblk = set->driver_data;
-> @@ -709,7 +717,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
->         .queue_rq       = virtio_queue_rq,
->         .commit_rqs     = virtio_commit_rqs,
->         .complete       = virtblk_request_done,
-> -       .init_request   = virtblk_init_request,
->         .map_queues     = virtblk_map_queues,
->  };
->
-> @@ -805,7 +812,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->         vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
->         vblk->tag_set.cmd_size =
->                 sizeof(struct virtblk_req) +
-> -               sizeof(struct scatterlist) * sg_elems;
-> +               sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
->         vblk->tag_set.driver_data = vblk;
->         vblk->tag_set.nr_hw_queues = vblk->num_vqs;
->
-> --
-> 2.18.1
->
+Are the changes by add_disk() made atomically against the caller?
+If there is a moment where "struct block_device_operations"->open can be
+called when add_disk() might still fail, how is it protected from the
+kfree() path?
+
+> 
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210830-for-axboe-add-disk-error-handling-next
+> 
+> Luis Chamberlain (8):
+>   scsi/sd: add error handling support for add_disk()
+>   scsi/sr: add error handling support for add_disk()
+>   nvme: add error handling support for add_disk()
+>   mmc/core/block: add error handling support for add_disk()
+>   md: add error handling support for add_disk()
+>   dm: add add_disk() error handling
+>   loop: add error handling support for add_disk()
+>   nbd: add error handling support for add_disk()
+> 
+>  drivers/block/loop.c     | 9 ++++++++-
+>  drivers/block/nbd.c      | 6 +++++-
+>  drivers/md/dm.c          | 4 +++-
+>  drivers/md/md.c          | 7 ++++++-
+>  drivers/mmc/core/block.c | 7 ++++++-
+>  drivers/nvme/host/core.c | 9 ++++++++-
+>  drivers/scsi/sd.c        | 6 +++++-
+>  drivers/scsi/sr.c        | 5 ++++-
+>  8 files changed, 45 insertions(+), 8 deletions(-)
+> 
+
