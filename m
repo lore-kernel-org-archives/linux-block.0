@@ -2,115 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E8BC4320A
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 15:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4849FC4320A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 15:27:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 473316108E
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 15:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A23C610A1
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 15:27:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343703AbhIAPZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 11:25:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42222 "EHLO
+        id S1343627AbhIAP17 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 11:27:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343529AbhIAPZ5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 11:25:57 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED55C061575;
-        Wed,  1 Sep 2021 08:25:00 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: krisman)
-        with ESMTPSA id 8ECC91F43EF3
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, justin@coraid.com, geert@linux-m68k.org,
-        ulf.hansson@linaro.org, hare@suse.de, tj@kernel.org,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
-        johannes.berg@intel.com, chris.obbard@collabora.com,
-        zhuyifei1999@gmail.com, thehajime@gmail.com, chris@zankel.net,
-        jcmvbkbc@gmail.com, tim@cyberelk.net,
-        linux-xtensa@linux-xtensa.org, linux-um@lists.infradead.org,
-        linux-m68k@lists.linux-m68k.org, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 05/15] um/drivers/ubd_kern: add error handling support
- for add_disk()
-Organization: Collabora
-References: <20210830221000.179369-1-mcgrof@kernel.org>
-        <20210830221000.179369-6-mcgrof@kernel.org>
-Date:   Wed, 01 Sep 2021 11:24:55 -0400
-In-Reply-To: <20210830221000.179369-6-mcgrof@kernel.org> (Luis Chamberlain's
-        message of "Mon, 30 Aug 2021 15:09:50 -0700")
-Message-ID: <8735qotj20.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+        with ESMTP id S1343623AbhIAP17 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 11:27:59 -0400
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A519CC061760
+        for <linux-block@vger.kernel.org>; Wed,  1 Sep 2021 08:27:02 -0700 (PDT)
+Received: by mail-il1-x134.google.com with SMTP id v16so3658443ilo.10
+        for <linux-block@vger.kernel.org>; Wed, 01 Sep 2021 08:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=P4hWmiVCsoalS+MUxb6yp9qen+G/lJg4S4KtX6kUkIg=;
+        b=bAVSIYQ+ja4RwQISg4uNNKJLNh45xtISDhVk9AR2uD9C8rzMnOwI7smTNyDDsjvVhp
+         5lv/E6d/3OL3YUt7CYKIdA9UQOJTPCcGJC0rIsN3eAu9DGf2SzQkphQ9T5JuIkySfLPX
+         8cOOZ3V4znimIUsO1BfrNI4Ctub7u3AviThY62yo8rYSfzQk3MYasYAdXaWcBS9Uu2W/
+         fiTsLtF+iv8UIKeRRfZKzT4XaDuWDlrIQbs7dE+RI0oRYQoAPqdRmzarG9xvclxdYpCZ
+         1YfnL+2c2MGnyUgjN33eQkWFnfrMgbyKqLp5piKS0lFyRs3ODqVW2i8bVKSCB0052vbM
+         JB0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=P4hWmiVCsoalS+MUxb6yp9qen+G/lJg4S4KtX6kUkIg=;
+        b=QtkoXO3fIxRGin+6UHg8isPgECv/um74PoPUMF2Os3r60Ge6fYQfRuJciM/GVZklnQ
+         7fRxef+7/e0QNk0fAX4ZLLIMNs2JAq5plshjS5POZ9tnYPxTWWEQRdbVCiG0TvKzIZQX
+         2cp7gBgWpowrnJ2uIGoMJixC+Bnl8DK88362hdR68cS38hcA7Up7+LHGT39uKR/cqeVC
+         84uzgWv5qnNdp4l6QQ4rNzYKfICv22vYlrpPzMy/K0GWmw0MmakpdBS97BskbtOymvOi
+         3DFA9GTyTZQytxSTiHxgiwlrd3i/nJYqySYsYsY6wR50CJICxxVV9vmWHfcOUCzKbC/G
+         Yk6Q==
+X-Gm-Message-State: AOAM530jBYp2evX3IwIDEEW9DUluELE6cwATrj+hbyRbEkorwYwHg7O+
+        a6OZJ0+4tMmW7fxXhMlTTuelBhOSXgaYEg==
+X-Google-Smtp-Source: ABdhPJzu7OecURDkdeuTRcdqGYhldWEarwW4nuDTPdc7m9jAK9+iiAPcpIvGYEtV9JmBvvSla+EqVA==
+X-Received: by 2002:a92:c5cf:: with SMTP id s15mr80745ilt.62.1630510021791;
+        Wed, 01 Sep 2021 08:27:01 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id c5sm175541ilr.54.2021.09.01.08.27.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Sep 2021 08:27:01 -0700 (PDT)
+Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     hch@infradead.org, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, israelr@nvidia.com,
+        nitzanc@nvidia.com, oren@nvidia.com, linux-block@vger.kernel.org
+References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
+ <20210901102623-mutt-send-email-mst@kernel.org>
+ <89d6dc30-a876-b1b0-4ff4-605415113611@nvidia.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6a648daf-dd93-0c16-58d6-e4a59334bf0b@kernel.dk>
+Date:   Wed, 1 Sep 2021 09:27:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <89d6dc30-a876-b1b0-4ff4-605415113611@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Luis Chamberlain <mcgrof@kernel.org> writes:
+On 9/1/21 8:58 AM, Max Gurtovoy wrote:
+> 
+> On 9/1/2021 5:50 PM, Michael S. Tsirkin wrote:
+>> On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
+>>> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+>>> has lots of deep queues, preallocation for the sg list can consume
+>>> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+>>> can be 64 or 128 and each queue's depth might be 128. This means the
+>>> resulting preallocation for the data SGLs is big.
+>>>
+>>> Switch to runtime allocation for SGL for lists longer than 2 entries.
+>>> This is the approach used by NVMe drivers so it should be reasonable for
+>>> virtio block as well. Runtime SGL allocation has always been the case
+>>> for the legacy I/O path so this is nothing new.
+>>>
+>>> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+>>> support SG_CHAIN, use only runtime allocation for the SGL.
+>>>
+>>> Re-organize the setup of the IO request to fit the new sg chain
+>>> mechanism.
+>>>
+>>> No performance degradation was seen (fio libaio engine with 16 jobs and
+>>> 128 iodepth):
+>>>
+>>> IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
+>>> --------     ---------------------------------    ----------------------------------
+>>> 512B          318K/316K                                    329K/325K
+>>>
+>>> 4KB           323K/321K                                    353K/349K
+>>>
+>>> 16KB          199K/208K                                    250K/275K
+>>>
+>>> 128KB         36K/36.1K                                    39.2K/41.7K
+>>>
+>>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>>> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+>> Could you use something to give confidence intervals maybe?
+>> As it is it looks like a 1-2% regression for 512B and 4KB.
+> 
+> 1%-2% is not a regression. It's a device/env/test variance.
+> 
+> This is just one test results. I run it many times and got difference by 
+> +/- 2%-3% in each run for each sides.
+> 
+> Even if I run same driver without changes I get 2%-3% difference between 
+> runs.
+> 
+> If you have a perf test suite for virtio-blk it will be great if you can 
+> run it, or maybe Feng Li has.
 
-> We never checked for errors on add_disk() as this function
-> returned void. Now that this is fixed, use the shiny new
-> error handling.
->
-> ubd_disk_register() never returned an error, so just fix
-> that now and let the caller handle the error condition.
->
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+You're adding an allocation to the hot path, and a free to the
+completion hot path. It's not unreasonable to expect that there could be
+performance implications associated with that. Which would be
+particularly evident with 1 segment requests, as the results would seem
+to indicate as well.
 
-Reviewed-by: Gabriel Krisman Bertazi <krisman@collabora.com>
+Probably needs better testing. A profile of a peak run before and after
+and a diff of the two might also be interesting.
 
-> ---
->  arch/um/drivers/ubd_kern.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
-> index cd9dc0556e91..81045c199c30 100644
-> --- a/arch/um/drivers/ubd_kern.c
-> +++ b/arch/um/drivers/ubd_kern.c
-> @@ -854,8 +854,8 @@ static const struct attribute_group *ubd_attr_groups[] = {
->  	NULL,
->  };
->  
-> -static void ubd_disk_register(int major, u64 size, int unit,
-> -			      struct gendisk *disk)
-> +static int ubd_disk_register(int major, u64 size, int unit,
-> +			     struct gendisk *disk)
->  {
->  	disk->major = major;
->  	disk->first_minor = unit << UBD_SHIFT;
-> @@ -872,7 +872,7 @@ static void ubd_disk_register(int major, u64 size, int unit,
->  
->  	disk->private_data = &ubd_devs[unit];
->  	disk->queue = ubd_devs[unit].queue;
-> -	device_add_disk(&ubd_devs[unit].pdev.dev, disk, ubd_attr_groups);
-> +	return device_add_disk(&ubd_devs[unit].pdev.dev, disk, ubd_attr_groups);
->  }
->  
->  #define ROUND_BLOCK(n) ((n + (SECTOR_SIZE - 1)) & (-SECTOR_SIZE))
-> @@ -919,10 +919,15 @@ static int ubd_add(int n, char **error_out)
->  	blk_queue_write_cache(ubd_dev->queue, true, false);
->  	blk_queue_max_segments(ubd_dev->queue, MAX_SG);
->  	blk_queue_segment_boundary(ubd_dev->queue, PAGE_SIZE - 1);
-> -	ubd_disk_register(UBD_MAJOR, ubd_dev->size, n, disk);
-> +	err = ubd_disk_register(UBD_MAJOR, ubd_dev->size, n, disk);
-> +	if (err)
-> +		goto out_cleanup_disk;
-> +
->  	ubd_gendisk[n] = disk;
->  	return 0;
->  
-> +out_cleanup_disk:
-> +	blk_cleanup_disk(disk);
->  out_cleanup_tags:
->  	blk_mq_free_tag_set(&ubd_dev->tag_set);
->  out:
+The common idiom for situations like this is to have an inline part that
+holds 1-2 segments, and then only punt to alloc if you need more than
+that. As the number of segments grows, the cost per request matters
+less.
 
 -- 
-Gabriel Krisman Bertazi
+Jens Axboe
+
