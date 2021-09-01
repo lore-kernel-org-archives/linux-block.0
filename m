@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D9FC19F3A
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDAF9C432BE
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8397860F42
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC4C160F42
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244521AbhIAVCr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 17:02:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36680 "EHLO
+        id S244663AbhIAVCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 17:02:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239646AbhIAVCl (ORCPT
+        with ESMTP id S239759AbhIAVCl (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 17:02:41 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE642C061796;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F020FC0617AD;
         Wed,  1 Sep 2021 14:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=HyZ2KI/h/gpVdjlPSyGH7uhBE8wL3JrrLi6b2qQqvAU=; b=EOqxTbNOyndcPdkBUFhiAhPMN5
-        413vPh22yPJcoJDmyvwUiOH9aDCTtIKhM8SJxIsgzOG8/1Cqm4wtg9m4GzHvwvUqcTHpn8hjirIko
-        5aw8oJFKJKbdARhpyaHkPiGG/E4Eh6RML6bh3rvdQ6nvYvAns1Z5yKbbgWQ2P2tQtDiymztJnPoj3
-        WKbJRnFm8hO0zZJGrA5GQ/2s3eEbSR5E6AROlb8dZobj/HuiW0PQ2L4gZi/+0a2N08rHyYxQ7Nplj
-        1LligqDndKGBJa20//DV7qCxJlofa/C0sUJyXXCURQsVsQVGoQb0mK7e1EVog+gszsE3humVCiq3X
-        m6BoEbsA==;
+        bh=xF9PVD7Ak7b7GuU3fNOPsWCRtdNWIk6mhEkq/XYjRic=; b=IIPX+4lgHPMvrA2kWbqHJjbvcO
+        Og6N+aQ91JcErUj3gisaqoYlJpzMIxKNZN9Wpuhq3xsO9tTuVzfn+iCL/tvt/HzjFq/ivq07Ig0XT
+        MCOOSWx1O2pGcHxt6qkScHqJZT1pKtJjPJQy6jjBUxu1oK2ATkt4qM2+L6dETjyLNE2k3GNZLsiGM
+        TEI+8NPoQMC4Q+R+WEx41PvIHQRWRluMsZFLvSjaKneNeiLRu0mFN8jE/JurNBwqJIcDoJSVQHot0
+        OEAFjW3wIh3/ieurXo93Wle7XQmI6ch24aZ/ZImvIln4KkvKm+Bej+6O1o5ocbCVL/aQaymiFOw3y
+        +AvcMSlg==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mLXLR-007LWH-K0; Wed, 01 Sep 2021 21:00:29 +0000
+        id 1mLXLR-007LWL-Md; Wed, 01 Sep 2021 21:00:29 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
         thunder.leizhen@huawei.com, lee.jones@linaro.org,
@@ -45,9 +45,9 @@ To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
 Cc:     linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 07/10] block/sunvdc: add error handling support for add_disk()
-Date:   Wed,  1 Sep 2021 14:00:25 -0700
-Message-Id: <20210901210028.1750956-8-mcgrof@kernel.org>
+Subject: [PATCH 09/10] pf: add error handling support for add_disk()
+Date:   Wed,  1 Sep 2021 14:00:27 -0700
+Message-Id: <20210901210028.1750956-10-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210901210028.1750956-1-mcgrof@kernel.org>
 References: <20210901210028.1750956-1-mcgrof@kernel.org>
@@ -62,48 +62,26 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
-We re-use the same free tag call, so we also add a label for
-that as well.
-
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/sunvdc.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ drivers/block/paride/pf.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
-index 4d4bb810c2ae..6f45a53f7cbf 100644
---- a/drivers/block/sunvdc.c
-+++ b/drivers/block/sunvdc.c
-@@ -826,8 +826,8 @@ static int probe_disk(struct vdc_port *port)
- 	if (IS_ERR(g)) {
- 		printk(KERN_ERR PFX "%s: Could not allocate gendisk.\n",
- 		       port->vio.name);
--		blk_mq_free_tag_set(&port->tag_set);
--		return PTR_ERR(g);
-+		err = PTR_ERR(g);
-+		goto out_free_tag;
- 	}
+diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
+index f471d48a87bc..380d80e507c7 100644
+--- a/drivers/block/paride/pf.c
++++ b/drivers/block/paride/pf.c
+@@ -962,7 +962,9 @@ static int __init pf_init_unit(struct pf_unit *pf, bool autoprobe, int port,
+ 	if (pf_probe(pf))
+ 		goto out_pi_release;
  
- 	port->disk = g;
-@@ -879,9 +879,17 @@ static int probe_disk(struct vdc_port *port)
- 	       port->vdisk_size, (port->vdisk_size >> (20 - 9)),
- 	       port->vio.ver.major, port->vio.ver.minor);
- 
--	device_add_disk(&port->vio.vdev->dev, g, NULL);
-+	err = device_add_disk(&port->vio.vdev->dev, g, NULL);
-+	if (err)
-+		goto out_cleanup_disk;
- 
+-	add_disk(disk);
++	ret = add_disk(disk);
++	if (ret)
++		goto out_pi_release;
+ 	pf->present = 1;
  	return 0;
-+
-+out_cleanup_disk:
-+	blk_cleanup_disk(g);
-+out_free_tag:
-+	blk_mq_free_tag_set(&port->tag_set);
-+	return err;
- }
  
- static struct ldc_channel_config vdc_ldc_cfg = {
 -- 
 2.30.2
 
