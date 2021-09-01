@@ -2,242 +2,253 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AEABC432BE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 09:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF4CEC432BE
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 10:19:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DF7660FED
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 09:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2EE76102A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 10:19:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243741AbhIAJvR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 05:51:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41283 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232817AbhIAJvQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Sep 2021 05:51:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630489819;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=a9pkxPeIT3jfPlp49Tf0bbQtBACmuxy4I9myE5ofaSw=;
-        b=G4785QbbNGVgOz0caW7Z8iKxbFJvmBQQZwPcYZ+WHK5W24jXHwTfsvF3jJ0ge2h/l41MB1
-        VYYdQlTuht1xl37H0GflbceN9cFDhGLfISMLmrgt3d37H5ISbXwK4QTzeVmpNg4bSWMLL3
-        +4KyCfYeQDjxAaNShdDoITw8KcLdARo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-592-yff_s_iENneDkG3hQbVroA-1; Wed, 01 Sep 2021 05:50:16 -0400
-X-MC-Unique: yff_s_iENneDkG3hQbVroA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C502F6D252;
-        Wed,  1 Sep 2021 09:50:14 +0000 (UTC)
-Received: from T590 (ovpn-8-31.pek2.redhat.com [10.72.8.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6147C100164C;
-        Wed,  1 Sep 2021 09:50:06 +0000 (UTC)
-Date:   Wed, 1 Sep 2021 17:50:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     luojiaxing <luojiaxing@huawei.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        john.garry@huawei.com
-Subject: Re: rq pointer in tags->rqs[] is not cleared in time and make SCSI
- error handle can not be triggered
-Message-ID: <YS9Myajg+h4io1F5@T590>
-References: <fe5cf6c4-ce5e-4a0f-f4ab-5c10539492cb@huawei.com>
- <YSdCfSeEv9s9OUMX@T590>
- <ebda23e8-0fa2-e96c-ee09-e0b2e783c40e@huawei.com>
- <YS9Jt8wTScNBIPlj@T590>
+        id S233617AbhIAKU1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 06:20:27 -0400
+Received: from mail-dm6nam11on2075.outbound.protection.outlook.com ([40.107.223.75]:1280
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233214AbhIAKU0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Sep 2021 06:20:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RNSCCcJOn6q52QM+621CwVWabFt50Ex+72LGzaNgJvCJcckdq/PrBGu90BX1m9hdhfEZD3wuE34x+xpPCMGo6J2QjWDvsB7RUYMGGPUvSHWayBHivxqz9ThXiKkJt1NlIWY1ogNMBQyhjafaFPnCg6XuyfV+FcJowZ78OCNSh74U9B3qAJIolkDtCYEdJVN1efld85PZklJeD9nCSYjbCIUXhoEuY4NM4BpaFbSADAWJI9USrFm9MC0cgSzJdD4bPX1SS4wkvZJ4rAr9nUOiK5GoYNhyT3KkuOn5OHHVXZcn5/uOneZ7m3YyqBZKCI3NvZqU1zgP99K+dGXRvZAwXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oPQaiFO/ZfNP9yVUQLcQyezxQBXgP8bWBHbAweMc8Ng=;
+ b=lD08Cda7cP+sLHZaIVp912Iqzl0jWHMrcVS6muWjRf+NwXeXbuGzRGRAfHAAwKtmhGrGYf6nLeKcot7jq8wSHilX0VBzeE3CHIRUWc1uthXJFSBZRHPo1DBVTn5jLhxnJfkUG2EBLfMM7CSElazizgwqjpBgTHaroc/s9lPY3B1CzLdiiHF1L8YWmlkH5N42mKEq/mQsvDyBYHinUi+Mimi0SWNqHyWMnXERZ5n5gVEzjrsdzIRE50orXntiMBRSBL0itrPUODbA6dia11fxuvnX0OBvku97+3z0YXPR3HNntl9f6eiicbClKVzCFZoBqsebg2U5omkBHqbLOw6lvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.32) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oPQaiFO/ZfNP9yVUQLcQyezxQBXgP8bWBHbAweMc8Ng=;
+ b=fNqXvgdJ/61YiDWAVkv3pLp/am8IE6AXGwO0U+Si0HoojYgMNRMKpu2DIJ+8s9fQKHaHfJtkUAP1uuRPVbxbfF3yC0EUuMYQUSB2uizKAOELT/iLnUTUdtTI9T4gKkzPU2JvL175P6DaWOp1kKL2DnSVQBpazunnDhq8snoYrc9oz94Qn2WuHGmoqIAysaL8YAgTJGrC14HZ2VeQxhC+8RT9CqJeVf4NqHI72Q5AVt3cUfUAPJAmCqatRJtH81E5ZOT/K4dlC+ZSfjmw3bqkH9EdEj6dLkYsx5lQkarAGkjTqoGC4BCCN7nsrvLylE7iEVBWd572+8nkSW5AlyY4dg==
+Received: from BN6PR22CA0032.namprd22.prod.outlook.com (2603:10b6:404:37::18)
+ by MWHPR1201MB0016.namprd12.prod.outlook.com (2603:10b6:300:e4::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.23; Wed, 1 Sep
+ 2021 10:19:28 +0000
+Received: from BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:37:cafe::79) by BN6PR22CA0032.outlook.office365.com
+ (2603:10b6:404:37::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend
+ Transport; Wed, 1 Sep 2021 10:19:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.32; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.32) by
+ BN8NAM11FT057.mail.protection.outlook.com (10.13.177.49) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4478.19 via Frontend Transport; Wed, 1 Sep 2021 10:19:27 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Sep
+ 2021 03:19:26 -0700
+Received: from [172.27.12.69] (172.20.187.6) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Sep 2021
+ 10:19:23 +0000
+Subject: Re: [PATCH 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Feng Li <lifeng1519@gmail.com>
+CC:     <hch@infradead.org>, <mst@redhat.com>,
+        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <stefanha@redhat.com>, <israelr@nvidia.com>, <nitzanc@nvidia.com>,
+        <oren@nvidia.com>, linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20210830233500.51395-1-mgurtovoy@nvidia.com>
+ <CAEK8JBBU3zNAWpC36-Lq0UBM1Dp+jYQG105psE38Fy8KRy=M-g@mail.gmail.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <165359fc-8f97-ede3-8ab5-35329ca61dbd@nvidia.com>
+Date:   Wed, 1 Sep 2021 13:19:09 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YS9Jt8wTScNBIPlj@T590>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CAEK8JBBU3zNAWpC36-Lq0UBM1Dp+jYQG105psE38Fy8KRy=M-g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 489a32a6-609b-49a9-83d4-08d96d31fae5
+X-MS-TrafficTypeDiagnostic: MWHPR1201MB0016:
+X-Microsoft-Antispam-PRVS: <MWHPR1201MB001669BB715297AD939B343FDECD9@MWHPR1201MB0016.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:565;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b8X9mrEuzISIHJVC57983QVTvXZdft+T8+q8gQb7bBUkrIhLaq3VDzCehD8nw+fnGBzDTdg1Q3GJwtWjM9cHOoRJ9KItSpdwEXjGtco8wmvxXIWoYwszzvJQYM8R+Mk3yRrkRJ3aGZXPqWPusPEqaH1iRGX+sCKZvQVQVcwqvUvJ06nM6iAxpIbY+I1U4yI19YcBnn5vvDY9sF31mnOxPJ2siCpoooEoyBqbnIFjgjrBBY3RTorS5nWOcoRVKuNuZ52T3QIiFh7RGclO754+3HxcrIMdox8bUqNzhluxwe2v/vTnS43SCs1Nrsf0L3bNxousQYdgz1C98NdknZvDZU6gnq3TnT31aKT4IITykY4BDLaQecWr9ws/g1nYJP7YBMca2CUKsdgqRfXfAfGNmh9DT9JF2XEl1NHUI+ldEw3/Tw8BdbnVT3jpcWBFbTqIkw77ZH9z9sKGb18Wb+l1t7C6DYXg6eYGieoQr2M3el/ooRstNMO8WHC0wVSti5m9LxHnDebKGkC4+P5U1KGryAMQUkXAW534AKm/Xt7Xwx2+WIb2FWdAEBCK/FwCqk8zeuMihLh5G3ABlPb2yd70UGnfvuccp0IUO6ZlEse61VZse+a9KNYCJzCFYE2SYPNk3H1M4Szk2umaxOnYa3Nt/+B96dHusM6VBa8vBnckHi+MGkGJcscdDGnorEO9o/FAFbDZjq/tHY47ziOW6zyIPRYLShsjPznQdjyZK5MkaqQ=
+X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(39860400002)(136003)(46966006)(36840700001)(5660300002)(356005)(8936002)(4326008)(36860700001)(7636003)(31696002)(36756003)(47076005)(86362001)(16576012)(6916009)(53546011)(478600001)(31686004)(186003)(82310400003)(6666004)(82740400003)(8676002)(83380400001)(54906003)(426003)(16526019)(336012)(70206006)(316002)(70586007)(26005)(2906002)(2616005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2021 10:19:27.8137
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 489a32a6-609b-49a9-83d4-08d96d31fae5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0016
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 01, 2021 at 05:36:55PM +0800, Ming Lei wrote:
-> On Tue, Aug 31, 2021 at 10:27:28AM +0800, luojiaxing wrote:
-> > Hi, Ming
-> > 
-> > 
-> > Sorry to reply so late, This issue occur in low probability,
-> > 
-> > so it take some time to confirm.
-> > 
-> > 
-> > On 2021/8/26 15:29, Ming Lei wrote:
-> > > On Thu, Aug 26, 2021 at 11:00:34AM +0800, luojiaxing wrote:
-> > > > Dear all:
-> > > > 
-> > > > 
-> > > > I meet some problem when test hisi_sas driver(under SCSI) based on 5.14-rc4
-> > > > kernel, it's found that error handle can not be triggered after
-> > > > 
-> > > > abnormal IO occur in some test with a low probability. For example,
-> > > > circularly run disk hardreset or disable all local phy of expander when
-> > > > running fio.
-> > > > 
-> > > > 
-> > > > We add some tracepoint and print to see what happen, and we got the
-> > > > following information:
-> > > > 
-> > > > (1).print rq and rq_state at bt_tags_iter() to confirm how many IOs is
-> > > > running now.
-> > > > 
-> > > > <4>[  897.431182] bt_tags_iter: rqs[2808]: 0xffff202007bd3000; rq_state: 1
-> > > > <4>[  897.437514] bt_tags_iter: rqs[3185]: 0xffff0020c5261e00; rq_state: 1
-> > > > <4>[  897.443841] bt_tags_iter: rqs[3612]: 0xffff00212f242a00; rq_state: 1
-> > > > <4>[  897.450167] bt_tags_iter: rqs[2808]: 0xffff00211d208100; rq_state: 1
-> > > > <4>[  897.456492] bt_tags_iter: rqs[2921]: 0xffff00211d208100; rq_state: 1
-> > > > <4>[  897.462818] bt_tags_iter: rqs[1214]: 0xffff002151d21b00; rq_state: 1
-> > > > <4>[  897.469143] bt_tags_iter: rqs[2648]: 0xffff0020c4bfa200; rq_state: 1
-> > > > 
-> > > > The preceding information show that rq with tag[2808] is found in different
-> > > > hctx by bt_tags_iter() and with different pointer saved in tags->rqs[].
-> > > > 
-> > > > And tag[2808] own the same pointer value saved in rqs[] with tag[2921]. It's
-> > > > wrong because our driver share tag between all hctx, so it's not possible
-> > > What is your io scheduler? I guess it is deadline,
-> > 
-> > 
-> > yes
-> > 
-> > 
-> > >   and can you observe
-> > > such issue by switching to none?
-> > 
-> > 
-> > Yes, it happen when switched to none
-> > 
-> > 
-> > > 
-> > > The tricky thing is that one request dumped may be re-allocated to other tag
-> > > after returning from bt_tags_iter().
-> > > 
-> > > > to allocate one tag to different rq.
-> > > > 
-> > > > 
-> > > > (2).check tracepoints(temporarily add) in blk_mq_get_driver_tag() and
-> > > > blk_mq_put_tag() to see where this tag is come from.
-> > > > 
-> > > >      Line 1322969:            <...>-20189   [013] .... 893.427707:
-> > > > blk_mq_get_driver_tag: rqs[2808]: 0xffff00211d208100
-> > > >      Line 1322997:  irq/1161-hisi_s-7602    [012] d..1 893.427814:
-> > > > blk_mq_put_tag_in_free_request: rqs[2808]: 0xffff00211d208100
-> > > >      Line 1331257:            <...>-20189   [013] .... 893.462663:
-> > > > blk_mq_get_driver_tag: rqs[2860]: 0xffff00211d208100
-> > > >      Line 1331289:  irq/1161-hisi_s-7602    [012] d..1 893.462785:
-> > > > blk_mq_put_tag_in_free_request: rqs[2860]: 0xffff00211d208100
-> > > >      Line 1338493:            <...>-20189   [013] .... 893.493519:
-> > > > blk_mq_get_driver_tag: rqs[2921]: 0xffff00211d208100
-> > > > 
-> > > > As we can see this rq is allocated to tag[2808] once, and finially come to
-> > > > tag[2921], but rqs[2808] still save the pointer.
-> > > Yeah, we know this kind of handling, but not see it as issue.
-> > > 
-> > > > There will be no problem until we encounter a rare situation.
-> > > > 
-> > > > For example, tag[2808] is reassigned to another hctx for execution, then
-> > > > some IO meet some error.
-> > > I guess the race is triggered when 2808 is just assigned, meantime
-> > > ->rqs[] isn't updated.
-> > 
-> > 
-> > As we shared tag between hctx, so if 2808 was assinged to other hctx.
-> > 
-> > So previous hctx's rqs will not updated。
-> > 
-> > 
-> > > > Before waking up the error handle thread, SCSI compares the values of
-> > > > scsi_host_busy() and shost->host_failed.
-> > > > 
-> > > > If the values are different, SCSI waits for the completion of some I/Os.
-> > > > According to the print provided by (1), the return value of scsi_host_busy()
-> > > > should be 7 for tag [2808] is calculated twice,
-> > > > 
-> > > > and the value of shost->host_failed is 6. As a result, this two values are
-> > > > never equal, and error handle cannot be triggered.
-> > > > 
-> > > > 
-> > > > A temporary workaround is provided and can solve the problem as:
-> > > > 
-> > > > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > > > index 2a37731..e3dc773 100644
-> > > > --- a/block/blk-mq-tag.c
-> > > > +++ b/block/blk-mq-tag.c
-> > > > @@ -190,6 +190,7 @@ void blk_mq_put_tag(struct blk_mq_tags *tags, struct
-> > > > blk_mq_ctx *ctx,
-> > > >                  BUG_ON(tag >= tags->nr_reserved_tags);
-> > > >                  sbitmap_queue_clear(tags->breserved_tags, tag, ctx->cpu);
-> > > >          }
-> > > > +       tags->rqs[tag] = NULL;
-> > > >   }
-> > > > 
-> > > > 
-> > > > Since we did not encounter this problem in some previous kernel versions, we
-> > > > wondered if the community already knew about the problem or could provide
-> > > > some solutions.
-> > > Can you try the following patch?
-> > 
-> > 
-> > I tested it. it can fix the bug.
-> > 
-> > 
-> > However, if there is still a problem in the following scenario? For example,
-> > driver tag 0 is assigned
-> > 
-> > to rq0 in hctx0, and reclaimed after rq completed. Next time driver tag 0 is
-> > still assigned to rq0 but
-> > 
-> > in hctx1. So at this time,  bt_tags_iter will still got two rqs.
-> 
-> Each hctx has its own rq pool so far, so no such issue you worried.
-> 
-> John's patch works towards sharing rq pool among hctxs in case of
-> shared sbitmap, not merged yet, but ->rqs[] should be shared too, still
-> no such issue.
-> 
-> Follows the revised patch for handling the stale request in ->rqs[] issue:
-> 
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 86f87346232a..ff5caeb82542 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -208,7 +208,7 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
->  
->  	spin_lock_irqsave(&tags->lock, flags);
->  	rq = tags->rqs[bitnr];
-> -	if (!rq || !refcount_inc_not_zero(&rq->ref))
-> +	if (!rq || rq->tag != bitnr || !refcount_inc_not_zero(&rq->ref))
->  		rq = NULL;
->  	spin_unlock_irqrestore(&tags->lock, flags);
->  	return rq;
 
-Explain the issue a bit in detail:
+On 9/1/2021 6:38 AM, Feng Li wrote:
+> Does this hurt the performance of virtio-blk?
+> I think a fio result is needed here.
 
-scsi_host_check_in_flight() is used to counting scsi in-flight requests
-after scsi host is blocked, so no new scsi command can be marked as
-SCMD_STATE_INFLIGHT. However, driver tag allocation still can be run at
-that time by blk-mq core.
+No, we use this mechanism in NVMe/NVMf for few years already and didn't 
+see any performance issues.
 
-The issue is in blk_mq_tagset_busy_iter(). One request is in-flight, but
-this request may be kept in another slot of ->rqs[], meantime the slot
-can be allocated out but ->rqs[] isn't updated yet. Then the in-flight
-request is counted twice as SCMD_STATE_INFLIGHT.
+Also with the fio tests I run with our NVIDIA's Virtio-blk SNAP devices 
+showed same perf numbers.
 
+I can add it to v2.
 
-Thanks,
-Ming
-
+>
+> On Tue, Aug 31, 2021 at 7:36 AM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+>> has lots of deep queues, preallocation for the sg list can consume
+>> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+>> can be 64 or 128 and each queue's depth might be 128. This means the
+>> resulting preallocation for the data SGLs is big.
+>>
+>> Switch to runtime allocation for SGL for lists longer than 2 entries.
+>> This is the approach used by NVMe drivers so it should be reasonable for
+>> virtio block as well. Runtime SGL allocation has always been the case
+>> for the legacy I/O path so this is nothing new.
+>>
+>> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+>> support SG_CHAIN, use only runtime allocation for the SGL.
+>>
+>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+>> ---
+>>   drivers/block/virtio_blk.c | 37 ++++++++++++++++++++++---------------
+>>   1 file changed, 22 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+>> index 77e8468e8593..9a4c5d428b58 100644
+>> --- a/drivers/block/virtio_blk.c
+>> +++ b/drivers/block/virtio_blk.c
+>> @@ -24,6 +24,12 @@
+>>   /* The maximum number of sg elements that fit into a virtqueue */
+>>   #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+>>
+>> +#ifdef CONFIG_ARCH_NO_SG_CHAIN
+>> +#define VIRTIO_BLK_INLINE_SG_CNT       0
+>> +#else
+>> +#define VIRTIO_BLK_INLINE_SG_CNT       2
+>> +#endif
+>> +
+>>   static int virtblk_queue_count_set(const char *val,
+>>                  const struct kernel_param *kp)
+>>   {
+>> @@ -99,7 +105,7 @@ struct virtio_blk {
+>>   struct virtblk_req {
+>>          struct virtio_blk_outhdr out_hdr;
+>>          u8 status;
+>> -       struct scatterlist sg[];
+>> +       struct sg_table sg_table;
+>>   };
+>>
+>>   static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
+>> @@ -188,6 +194,8 @@ static inline void virtblk_request_done(struct request *req)
+>>   {
+>>          struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+>>
+>> +       sg_free_table_chained(&vbr->sg_table, VIRTIO_BLK_INLINE_SG_CNT);
+>> +
+>>          if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
+>>                  kfree(page_address(req->special_vec.bv_page) +
+>>                        req->special_vec.bv_offset);
+>> @@ -291,7 +299,15 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>                          return BLK_STS_RESOURCE;
+>>          }
+>>
+>> -       num = blk_rq_map_sg(hctx->queue, req, vbr->sg);
+>> +       vbr->sg_table.sgl = (struct scatterlist *)(vbr + 1);
+>> +       err = sg_alloc_table_chained(&vbr->sg_table,
+>> +                                    blk_rq_nr_phys_segments(req),
+>> +                                    vbr->sg_table.sgl,
+>> +                                    VIRTIO_BLK_INLINE_SG_CNT);
+>> +       if (err)
+>> +               return BLK_STS_RESOURCE;
+>> +
+>> +       num = blk_rq_map_sg(hctx->queue, req, vbr->sg_table.sgl);
+>>          if (num) {
+>>                  if (rq_data_dir(req) == WRITE)
+>>                          vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_OUT);
+>> @@ -300,7 +316,7 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>          }
+>>
+>>          spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+>> -       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
+>> +       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
+>>          if (err) {
+>>                  virtqueue_kick(vblk->vqs[qid].vq);
+>>                  /* Don't stop the queue if -ENOMEM: we may have failed to
+>> @@ -309,6 +325,8 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>                  if (err == -ENOSPC)
+>>                          blk_mq_stop_hw_queue(hctx);
+>>                  spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+>> +               sg_free_table_chained(&vbr->sg_table,
+>> +                                     VIRTIO_BLK_INLINE_SG_CNT);
+>>                  switch (err) {
+>>                  case -ENOSPC:
+>>                          return BLK_STS_DEV_RESOURCE;
+>> @@ -687,16 +705,6 @@ static const struct attribute_group *virtblk_attr_groups[] = {
+>>          NULL,
+>>   };
+>>
+>> -static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
+>> -               unsigned int hctx_idx, unsigned int numa_node)
+>> -{
+>> -       struct virtio_blk *vblk = set->driver_data;
+>> -       struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+>> -
+>> -       sg_init_table(vbr->sg, vblk->sg_elems);
+>> -       return 0;
+>> -}
+>> -
+>>   static int virtblk_map_queues(struct blk_mq_tag_set *set)
+>>   {
+>>          struct virtio_blk *vblk = set->driver_data;
+>> @@ -709,7 +717,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
+>>          .queue_rq       = virtio_queue_rq,
+>>          .commit_rqs     = virtio_commit_rqs,
+>>          .complete       = virtblk_request_done,
+>> -       .init_request   = virtblk_init_request,
+>>          .map_queues     = virtblk_map_queues,
+>>   };
+>>
+>> @@ -805,7 +812,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>>          vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+>>          vblk->tag_set.cmd_size =
+>>                  sizeof(struct virtblk_req) +
+>> -               sizeof(struct scatterlist) * sg_elems;
+>> +               sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
+>>          vblk->tag_set.driver_data = vblk;
+>>          vblk->tag_set.nr_hw_queues = vblk->num_vqs;
+>>
+>> --
+>> 2.18.1
+>>
