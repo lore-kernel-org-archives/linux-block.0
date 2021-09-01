@@ -2,98 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 731E4C432BE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 04:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6EA4C432BE
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 05:21:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3765B60F4B
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 04:20:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9338F60232
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 05:21:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232298AbhIAEVT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 00:21:19 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:51713 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbhIAEVS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 00:21:18 -0400
-Received: from fsav413.sakura.ne.jp (fsav413.sakura.ne.jp [133.242.250.112])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1814JjgC033046;
-        Wed, 1 Sep 2021 13:19:45 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav413.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp);
- Wed, 01 Sep 2021 13:19:45 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1814Jj4Y033043
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 1 Sep 2021 13:19:45 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Subject: Re: [PATCH v3 0/8] block: first batch of add_disk() error handling
- conversions
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     hch@infradead.org, linux-block@vger.kernel.org, axboe@kernel.dk
-References: <20210830212538.148729-1-mcgrof@kernel.org>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Message-ID: <cc6470a2-7e32-c582-2c45-1358d3f6de1b@I-love.SAKURA.ne.jp>
-Date:   Wed, 1 Sep 2021 13:19:44 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S237454AbhIAFWp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 01:22:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232095AbhIAFWp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 01:22:45 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE9FC061575;
+        Tue, 31 Aug 2021 22:21:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=Sm8cG8stcqpgFKiVBKuUxhVdzU
+        l9LuxUIXxe5uaSLQw2HR5QYlPcFDTQNZ9e3rdJX0kxY0H4iSXs+4I7z6Fxmkgj8BtbMnRLZlvW6T3
+        1rCg8wrshgo4lVc9tWjurZ5z0M5+2AGVXAzq1fiSCaVlhWXxlV+yB9i1+IZkMcRU6cAYpuLuD1Z0V
+        1KjzGTssbQgGjH+jJD5zHQ9kJCb3PzvYprU3JyFZy13Z8rBQjVjguetMDihYW8h6RYoB/gySrljQ3
+        co2kdSCrb0i+/tZ8qT3gzcsHvhYRDdxJfGEcZkkzfnP8xvHJdcIH3Hdlr/n94ZfYQBsWC/4aHVXSF
+        jikXeuBA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mLIgG-001tZC-44; Wed, 01 Sep 2021 05:21:10 +0000
+Date:   Wed, 1 Sep 2021 06:21:00 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     hch@infradead.org, mst@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
+        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
+Message-ID: <YS8NvPbGODs5ZVmB@infradead.org>
+References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20210830212538.148729-1-mcgrof@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210831135035.6443-1-mgurtovoy@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/08/31 6:25, Luis Chamberlain wrote:
-> Jens,
-> 
-> I think this first set is ready, but pending review of just two patches:
-> 
->   * mmc/core/block
->   * dm
-> 
-> All other patches have a respective Reviewed-by tag. The above two
-> patches were integrated back into the series once I understood
-> Christoph's concerns, and adjusted the patch as such.
-> 
-> This goes rebased onto your for-next as of today. If anyone wants to
-> explore the pending full set this is up on my linux-next branch
-> 20210830-for-axboe-add-disk-error-handling-next [0].
+Looks good,
 
-Are the changes by add_disk() made atomically against the caller?
-If there is a moment where "struct block_device_operations"->open can be
-called when add_disk() might still fail, how is it protected from the
-kfree() path?
-
-> 
-> [0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210830-for-axboe-add-disk-error-handling-next
-> 
-> Luis Chamberlain (8):
->   scsi/sd: add error handling support for add_disk()
->   scsi/sr: add error handling support for add_disk()
->   nvme: add error handling support for add_disk()
->   mmc/core/block: add error handling support for add_disk()
->   md: add error handling support for add_disk()
->   dm: add add_disk() error handling
->   loop: add error handling support for add_disk()
->   nbd: add error handling support for add_disk()
-> 
->  drivers/block/loop.c     | 9 ++++++++-
->  drivers/block/nbd.c      | 6 +++++-
->  drivers/md/dm.c          | 4 +++-
->  drivers/md/md.c          | 7 ++++++-
->  drivers/mmc/core/block.c | 7 ++++++-
->  drivers/nvme/host/core.c | 9 ++++++++-
->  drivers/scsi/sd.c        | 6 +++++-
->  drivers/scsi/sr.c        | 5 ++++-
->  8 files changed, 45 insertions(+), 8 deletions(-)
-> 
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
