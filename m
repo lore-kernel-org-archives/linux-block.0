@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C2C6C43216
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D0A6C43214
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 144D360F42
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 766EE6069E
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244064AbhIAVCn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S243816AbhIAVCn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 1 Sep 2021 17:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36678 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239058AbhIAVCl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 17:02:41 -0400
+        with ESMTP id S238758AbhIAVCk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 17:02:40 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE2D2C0613D9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92DAC0613C1;
         Wed,  1 Sep 2021 14:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=6NZfHmNoX5N/dbslA9tEZ3wm71g//v2MOeHuD/3FoC0=; b=JbKHmZMaqVAxm6cl00sFMC5SCj
-        aCjZcL7uSMwtO8GUwPvTU6v18DXdVUTNyRQ/ZUCRYcD4XxYgslxZbtB82QNykdkKIANHunCzsHrAB
-        iDpLzyPWFcXhf2ofBZaCZB7Q0CcrfIZBKysT24q8obus8VZk6WrH4u/vSm/R/zDVnWaKgn3lIBU4l
-        9PV9qK4XzK06i2ZyBnQeBNKGWp5D7NPqSHeyQm7V92qj5hmJ3/RWw4X++wxFObgSq1yjOyIfITWcx
-        S238uMNcCFzbSZ1IrrJVUYLA4WMCA1RaVN1Jbbgk/YggT3Fk0XMeFUC9NoD3ugPbyCRKXxNI8wVz1
-        C30MKfvQ==;
+        bh=o2jFAXs2S20ugcqcgWqTKDs1dtJRAdxtjSIxmQce0yE=; b=dbtMU/12XHhPiB9HTZczz4LIbL
+        /SGIKdCY+MBcFiD6mSeE2V0upDnAm0UTQt69AsWTcGeJPTyukWEtJzB+8dKexiUmI6K+N0ZvKWbdJ
+        VccAlCXnv79qwvdgVpOHFZlxYmCySO1bBcO5FC20wsXdFFrVWqISnO8yNKqMTttDTypOPmbpA+lnr
+        7yGKtvOKhzeSvCksN8fjFTeu1vXblO9nV8CW4WTdSdvPZ4lAJvZosM5WETwI/JVjVXymr6V9JI4dV
+        b0sWE7OTUZY6z39q2bMgKPla8ajMRMcIgtJqWHuAe96VaI+ewqEYt5IhI+bazR2V87pIsp4nnEkeC
+        En+/5xnw==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mLXLR-007LW9-E5; Wed, 01 Sep 2021 21:00:29 +0000
+        id 1mLXLR-007LWF-Ik; Wed, 01 Sep 2021 21:00:29 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
         thunder.leizhen@huawei.com, lee.jones@linaro.org,
@@ -45,9 +45,9 @@ To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
 Cc:     linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 04/10] ps3vram: add error handling support for add_disk()
-Date:   Wed,  1 Sep 2021 14:00:22 -0700
-Message-Id: <20210901210028.1750956-5-mcgrof@kernel.org>
+Subject: [PATCH 06/10] block/rsxx: add error handling support for add_disk()
+Date:   Wed,  1 Sep 2021 14:00:24 -0700
+Message-Id: <20210901210028.1750956-7-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210901210028.1750956-1-mcgrof@kernel.org>
 References: <20210901210028.1750956-1-mcgrof@kernel.org>
@@ -64,29 +64,59 @@ error handling.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/ps3vram.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/block/rsxx/core.c |  4 +++-
+ drivers/block/rsxx/dev.c  | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
-index c7b19e128b03..af2a0d09c598 100644
---- a/drivers/block/ps3vram.c
-+++ b/drivers/block/ps3vram.c
-@@ -755,9 +755,14 @@ static int ps3vram_probe(struct ps3_system_bus_device *dev)
- 	dev_info(&dev->core, "%s: Using %llu MiB of GPU memory\n",
- 		 gendisk->disk_name, get_capacity(gendisk) >> 11);
+diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
+index 83636714b8d7..8d9d69f5dfbc 100644
+--- a/drivers/block/rsxx/core.c
++++ b/drivers/block/rsxx/core.c
+@@ -935,7 +935,9 @@ static int rsxx_pci_probe(struct pci_dev *dev,
+ 			card->size8 = 0;
+ 	}
  
--	device_add_disk(&dev->core, gendisk, NULL);
-+	error = device_add_disk(&dev->core, gendisk, NULL);
-+	if (error)
-+		goto out_cleanup_disk;
+-	rsxx_attach_dev(card);
++	st = rsxx_attach_dev(card);
++	if (st)
++		goto failed_create_dev;
+ 
+ 	/************* Setup Debugfs *************/
+ 	rsxx_debugfs_dev_new(card);
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index 1cc40b0ea761..b2d3ac3efce2 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -192,6 +192,8 @@ static bool rsxx_discard_supported(struct rsxx_cardinfo *card)
+ 
+ int rsxx_attach_dev(struct rsxx_cardinfo *card)
+ {
++	int err = 0;
 +
- 	return 0;
+ 	mutex_lock(&card->dev_lock);
  
-+out_cleanup_disk:
-+	blk_cleanup_disk(gendisk);
- out_cache_cleanup:
- 	remove_proc_entry(DEVICE_NAME, NULL);
- 	ps3vram_cache_cleanup(dev);
+ 	/* The block device requires the stripe size from the config. */
+@@ -200,13 +202,17 @@ int rsxx_attach_dev(struct rsxx_cardinfo *card)
+ 			set_capacity(card->gendisk, card->size8 >> 9);
+ 		else
+ 			set_capacity(card->gendisk, 0);
+-		device_add_disk(CARD_TO_DEV(card), card->gendisk, NULL);
+-		card->bdev_attached = 1;
++		err = device_add_disk(CARD_TO_DEV(card), card->gendisk, NULL);
++		if (err == 0)
++			card->bdev_attached = 1;
+ 	}
+ 
+ 	mutex_unlock(&card->dev_lock);
+ 
+-	return 0;
++	if (err)
++		blk_cleanup_disk(card->gendisk);
++
++	return err;
+ }
+ 
+ void rsxx_detach_dev(struct rsxx_cardinfo *card)
 -- 
 2.30.2
 
