@@ -3,37 +3,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECA9C4320E
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62744C4320A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0718861054
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C0DB61054
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238362AbhIAVCv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 17:02:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36684 "EHLO
+        id S244165AbhIAVCx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 17:02:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239704AbhIAVCl (ORCPT
+        with ESMTP id S239661AbhIAVCl (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 17:02:41 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9930C0617A8;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96AFC06179A;
         Wed,  1 Sep 2021 14:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=adUhWGLmSwGDCmYJPL/wycZ+ESyOItTDyVeSKbBPSXk=; b=umTaGx9xje14epeqy42Bbujh2A
-        ZoC7wjPbm0+6zTaI3JWxcPFpd1SVuV1aWnauPvnimangWfy+s2Q/9VLcTt+voKJrcvpRTX0fJ2CES
-        NT/0sepfsS9ivwzi2NOdZd4iSZ9TwsfzkuMb2ctH5tDNebMFO47+gZ5rIVGt5OnqM2V30qnsnbcx4
-        Ylej2AKlmxgrLM6SxK4y7zhh1gC4GI1pdBKhkwmoa4mG9XwIx8+sleU4H1apJfXOQW+g6YnAs86IC
-        RZ6mRnhU/RRwmEAkiOrd5UI+ZZkV3+tBQuqo92zVqMai3LjlBs/pqRB+PT6kXrAfGLy7gxG1F4zcu
-        HSqMoUvQ==;
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=z+SxEsknd8tI+kUyzRYwWaYVqREcohaFxxJlN0ygQ94=; b=KQaQ7eFjqUbKqNvnzDssT/Ggjw
+        mD4OcL+VRUeCxPHjxtIiAxctsEFC+XTBYOvYR1tKx3uEYQYDw0SkD8/RcJn5CvwNsm1SYtL/6jVnT
+        P1XNxcnRxP6C5I8iP8Z+vbroaN2hk3CKuvA+j9Gr75D8nE+EStMszSPu184BVXzee3nA1McZHjL1Y
+        LzHBYfcqvCzbbaFm9wev7pH5jko+MYDhUMDH7zWjO6y0H3dtNljnqOaS3TqSMXeXygbbLdBXBTmBZ
+        XLyqk8ZOsFk+lhqocqUMUDaObKN/lZ+WvzVVWiN7MH5Db1z9pPRu9QqJWsxy4jMvhdbP35R/pcqEy
+        VjuWrd2g==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mLXLR-007LW3-7L; Wed, 01 Sep 2021 21:00:29 +0000
+        id 1mLXLR-007LW1-53; Wed, 01 Sep 2021 21:00:29 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
         thunder.leizhen@huawei.com, lee.jones@linaro.org,
@@ -45,12 +45,10 @@ To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
 Cc:     linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 01/10] mtip32xx: add error handling support for add_disk()
-Date:   Wed,  1 Sep 2021 14:00:19 -0700
-Message-Id: <20210901210028.1750956-2-mcgrof@kernel.org>
+Subject: [PATCH 00/10] block: fourth batch of add_disk() error handling conversions                                                                                           
+Date:   Wed,  1 Sep 2021 14:00:18 -0700
+Message-Id: <20210901210028.1750956-1-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210901210028.1750956-1-mcgrof@kernel.org>
-References: <20210901210028.1750956-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
@@ -58,33 +56,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We never checked for errors on add_disk() as this function
-returned void. Now that this is fixed, use the shiny new
-error handling.
+The full set of changes can be found on my branch titled
+20210901-for-axboe-add-disk-error-handling [0] which is
+now based on axboe/master.
 
-The read_capacity_error error label already does what we need,
-so just re-use that.
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210901-for-axboe-add-disk-error-handling
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- drivers/block/mtip32xx/mtip32xx.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Luis Chamberlain (10):
+  mtip32xx: add error handling support for add_disk()
+  pktcdvd: add error handling support for add_disk()
+  ps3disk: add error handling support for add_disk()
+  ps3vram: add error handling support for add_disk()
+  rnbd: add error handling support for add_disk()
+  block/rsxx: add error handling support for add_disk()
+  block/sunvdc: add error handling support for add_disk()
+  block/sx8: add error handling support for add_disk()
+  pf: add error handling support for add_disk()
+  mtd/ubi/block: add error handling support for add_disk()
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 901855717cb5..d0b40309f47e 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3633,7 +3633,9 @@ static int mtip_block_initialize(struct driver_data *dd)
- 	set_capacity(dd->disk, capacity);
- 
- 	/* Enable the block device and add it to /dev */
--	device_add_disk(&dd->pdev->dev, dd->disk, mtip_disk_attr_groups);
-+	rv = device_add_disk(&dd->pdev->dev, dd->disk, mtip_disk_attr_groups);
-+	if (rv)
-+		goto read_capacity_error;
- 
- 	if (dd->mtip_svc_handler) {
- 		set_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag);
+ drivers/block/mtip32xx/mtip32xx.c |  4 +++-
+ drivers/block/paride/pf.c         |  4 +++-
+ drivers/block/pktcdvd.c           |  4 +++-
+ drivers/block/ps3disk.c           |  8 ++++++--
+ drivers/block/ps3vram.c           |  7 ++++++-
+ drivers/block/rnbd/rnbd-clt.c     | 13 +++++++++----
+ drivers/block/rsxx/core.c         |  4 +++-
+ drivers/block/rsxx/dev.c          | 12 +++++++++---
+ drivers/block/sunvdc.c            | 14 +++++++++++---
+ drivers/block/sx8.c               | 13 +++++++++----
+ drivers/mtd/ubi/block.c           |  8 +++++++-
+ 11 files changed, 69 insertions(+), 22 deletions(-)
+
 -- 
 2.30.2
 
