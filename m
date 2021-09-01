@@ -2,147 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4849FC4320A
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 15:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD028C4320A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 19:38:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A23C610A1
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 15:27:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94D8561059
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 19:38:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343627AbhIAP17 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 11:27:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42732 "EHLO
+        id S245031AbhIATjp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 15:39:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343623AbhIAP17 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 11:27:59 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A519CC061760
-        for <linux-block@vger.kernel.org>; Wed,  1 Sep 2021 08:27:02 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id v16so3658443ilo.10
-        for <linux-block@vger.kernel.org>; Wed, 01 Sep 2021 08:27:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=P4hWmiVCsoalS+MUxb6yp9qen+G/lJg4S4KtX6kUkIg=;
-        b=bAVSIYQ+ja4RwQISg4uNNKJLNh45xtISDhVk9AR2uD9C8rzMnOwI7smTNyDDsjvVhp
-         5lv/E6d/3OL3YUt7CYKIdA9UQOJTPCcGJC0rIsN3eAu9DGf2SzQkphQ9T5JuIkySfLPX
-         8cOOZ3V4znimIUsO1BfrNI4Ctub7u3AviThY62yo8rYSfzQk3MYasYAdXaWcBS9Uu2W/
-         fiTsLtF+iv8UIKeRRfZKzT4XaDuWDlrIQbs7dE+RI0oRYQoAPqdRmzarG9xvclxdYpCZ
-         1YfnL+2c2MGnyUgjN33eQkWFnfrMgbyKqLp5piKS0lFyRs3ODqVW2i8bVKSCB0052vbM
-         JB0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=P4hWmiVCsoalS+MUxb6yp9qen+G/lJg4S4KtX6kUkIg=;
-        b=QtkoXO3fIxRGin+6UHg8isPgECv/um74PoPUMF2Os3r60Ge6fYQfRuJciM/GVZklnQ
-         7fRxef+7/e0QNk0fAX4ZLLIMNs2JAq5plshjS5POZ9tnYPxTWWEQRdbVCiG0TvKzIZQX
-         2cp7gBgWpowrnJ2uIGoMJixC+Bnl8DK88362hdR68cS38hcA7Up7+LHGT39uKR/cqeVC
-         84uzgWv5qnNdp4l6QQ4rNzYKfICv22vYlrpPzMy/K0GWmw0MmakpdBS97BskbtOymvOi
-         3DFA9GTyTZQytxSTiHxgiwlrd3i/nJYqySYsYsY6wR50CJICxxVV9vmWHfcOUCzKbC/G
-         Yk6Q==
-X-Gm-Message-State: AOAM530jBYp2evX3IwIDEEW9DUluELE6cwATrj+hbyRbEkorwYwHg7O+
-        a6OZJ0+4tMmW7fxXhMlTTuelBhOSXgaYEg==
-X-Google-Smtp-Source: ABdhPJzu7OecURDkdeuTRcdqGYhldWEarwW4nuDTPdc7m9jAK9+iiAPcpIvGYEtV9JmBvvSla+EqVA==
-X-Received: by 2002:a92:c5cf:: with SMTP id s15mr80745ilt.62.1630510021791;
-        Wed, 01 Sep 2021 08:27:01 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id c5sm175541ilr.54.2021.09.01.08.27.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Sep 2021 08:27:01 -0700 (PDT)
-Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     hch@infradead.org, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, stefanha@redhat.com, israelr@nvidia.com,
-        nitzanc@nvidia.com, oren@nvidia.com, linux-block@vger.kernel.org
-References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
- <20210901102623-mutt-send-email-mst@kernel.org>
- <89d6dc30-a876-b1b0-4ff4-605415113611@nvidia.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6a648daf-dd93-0c16-58d6-e4a59334bf0b@kernel.dk>
-Date:   Wed, 1 Sep 2021 09:27:00 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S230458AbhIATjo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 15:39:44 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562B8C061575;
+        Wed,  1 Sep 2021 12:38:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=wGnx/rmz0OqMpEcvhGWrN84A7v4283xqEJSD+WpfhBU=; b=WrYWDlmxdtUHZZUeFY6LJYlLFt
+        y57bI6R7XBLggF1C9/BdG718ZnykUK1PEksOdZI3/zipDNGy9cOpLHeCby3lYwt0Pkmd3f1nXyud+
+        jooZeSTzWBk+Czt58gK83qjjWGzP8NKQD1W1eFcM8zzN9djcFH5JuSIOjFmdJZvHGXUbMqa5L+Meu
+        IeXG2IuLmb2+likZOUZX6+zrC/qx7UHXBNe/2/tEk0NygberUWqrlKTW79Zynag2KyIN4TC7urN5h
+        66AOUiA2DBy+e4ST7s3rJPmDRy/VSLVGbvbC9lGGeCF2iuJzF7iWO5bS5vP7SVe/NGjTp7nexSxxN
+        +0h+dHCQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mLW43-0077KJ-TT; Wed, 01 Sep 2021 19:38:27 +0000
+Date:   Wed, 1 Sep 2021 12:38:27 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, justin@coraid.com, geert@linux-m68k.org,
+        ulf.hansson@linaro.org, hare@suse.de, tj@kernel.org,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
+        johannes.berg@intel.com, chris.obbard@collabora.com,
+        krisman@collabora.com, zhuyifei1999@gmail.com, thehajime@gmail.com,
+        chris@zankel.net, jcmvbkbc@gmail.com, tim@cyberelk.net
+Cc:     linux-xtensa@linux-xtensa.org, linux-um@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 15/15] pd: add error handling support for add_disk()
+Message-ID: <YS/Ws2iD1suaut39@bombadil.infradead.org>
+References: <20210830221000.179369-1-mcgrof@kernel.org>
+ <20210830221000.179369-16-mcgrof@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <89d6dc30-a876-b1b0-4ff4-605415113611@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210830221000.179369-16-mcgrof@kernel.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/1/21 8:58 AM, Max Gurtovoy wrote:
+On Mon, Aug 30, 2021 at 03:10:00PM -0700, Luis Chamberlain wrote:
+> We never checked for errors on add_disk() as this function
+> returned void. Now that this is fixed, use the shiny new
+> error handling.
 > 
-> On 9/1/2021 5:50 PM, Michael S. Tsirkin wrote:
->> On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
->>> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
->>> has lots of deep queues, preallocation for the sg list can consume
->>> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
->>> can be 64 or 128 and each queue's depth might be 128. This means the
->>> resulting preallocation for the data SGLs is big.
->>>
->>> Switch to runtime allocation for SGL for lists longer than 2 entries.
->>> This is the approach used by NVMe drivers so it should be reasonable for
->>> virtio block as well. Runtime SGL allocation has always been the case
->>> for the legacy I/O path so this is nothing new.
->>>
->>> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
->>> support SG_CHAIN, use only runtime allocation for the SGL.
->>>
->>> Re-organize the setup of the IO request to fit the new sg chain
->>> mechanism.
->>>
->>> No performance degradation was seen (fio libaio engine with 16 jobs and
->>> 128 iodepth):
->>>
->>> IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
->>> --------     ---------------------------------    ----------------------------------
->>> 512B          318K/316K                                    329K/325K
->>>
->>> 4KB           323K/321K                                    353K/349K
->>>
->>> 16KB          199K/208K                                    250K/275K
->>>
->>> 128KB         36K/36.1K                                    39.2K/41.7K
->>>
->>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->>> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
->> Could you use something to give confidence intervals maybe?
->> As it is it looks like a 1-2% regression for 512B and 4KB.
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  drivers/block/paride/pd.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> 1%-2% is not a regression. It's a device/env/test variance.
-> 
-> This is just one test results. I run it many times and got difference by 
-> +/- 2%-3% in each run for each sides.
-> 
-> Even if I run same driver without changes I get 2%-3% difference between 
-> runs.
-> 
-> If you have a perf test suite for virtio-blk it will be great if you can 
-> run it, or maybe Feng Li has.
+> diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
+> index 500b89a4bdaf..226ed5c93b68 100644
+> --- a/drivers/block/paride/pd.c
+> +++ b/drivers/block/paride/pd.c
+> @@ -938,8 +938,12 @@ static int pd_probe_drive(struct pd_unit *disk, int autoprobe, int port,
+>  	if (ret)
+>  		goto put_disk;
+>  	set_capacity(disk->gd, disk->capacity);
+> -	add_disk(disk->gd);
+> +	ret = add_disk(disk->gd);
+> +	if (ret)
+> +		goto cleanup_disk;
+>  	return 0;
+> +cleanup_disk:
+> +	blk_cleanup_disk(&disk);
 
-You're adding an allocation to the hot path, and a free to the
-completion hot path. It's not unreasonable to expect that there could be
-performance implications associated with that. Which would be
-particularly evident with 1 segment requests, as the results would seem
-to indicate as well.
+This should be blk_cleanup_disk(disk->gd); Will fix up in my v2.
 
-Probably needs better testing. A profile of a peak run before and after
-and a diff of the two might also be interesting.
-
-The common idiom for situations like this is to have an inline part that
-holds 1-2 segments, and then only punt to alloc if you need more than
-that. As the number of segments grows, the cost per request matters
-less.
-
--- 
-Jens Axboe
-
+  Luis
