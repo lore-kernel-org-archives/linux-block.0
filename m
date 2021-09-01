@@ -2,76 +2,204 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9C6C432BE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 01:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9838C4320A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 03:39:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60DA161027
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 01:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7A6D6069E
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 03:39:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241477AbhIABgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Aug 2021 21:36:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29514 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241192AbhIABgx (ORCPT
+        id S241796AbhIADka (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Aug 2021 23:40:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241754AbhIADkX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Aug 2021 21:36:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630460157;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ig4axNJNT0Dq5sJr3sZt7gc+PdhIceOOKtmcIYoEfDI=;
-        b=f08bM1BxGRDY0hYU1vql+ik1ZkWmFsM2v58gR5bekMtIQjDIFXSVtZdTl/ZQaQxR4Vaeqq
-        tGg8/7jV61eHuTTUiDpoqZ93BfTvwFZkO6tZ9Q5eEy4bo78Ovkdt3ugelFlPzD2u4FscK8
-        GsNtci13yChmZMzDpkbkPG54mJoND0I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-xK9uHLSNOXmXZ24bQc0QJg-1; Tue, 31 Aug 2021 21:35:56 -0400
-X-MC-Unique: xK9uHLSNOXmXZ24bQc0QJg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 172801853028;
-        Wed,  1 Sep 2021 01:35:55 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 25B3C27CA8;
-        Wed,  1 Sep 2021 01:35:49 +0000 (UTC)
-Date:   Wed, 1 Sep 2021 09:35:44 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Martin Svec <martin.svec@zoner.cz>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: NULL pointer dereference in blk_mq_put_rq_ref (LTS kernel
- 5.10.56)
-Message-ID: <YS7Y8Ej3BKLR175+@T590>
-References: <1706c570-6c07-4eb7-219f-de3366e54077@zoner.cz>
- <YS33g6bLXCeB7Pue@T590>
- <996b8008-f7ec-4752-e207-669fe88021df@zoner.cz>
+        Tue, 31 Aug 2021 23:40:23 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC4B3C061575;
+        Tue, 31 Aug 2021 20:39:27 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id r21so1460850qtw.11;
+        Tue, 31 Aug 2021 20:39:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5eznzShYwADvzOPKSZ3hcyxH8Z6TpaitcBld3wKT2jE=;
+        b=ZxUdmpWYYqXOgdOl8kR7OgR2kVnqQRcp4rRXZr+R7cy65vJiXCHdgOWVZnhT0QtC8a
+         ScDNNQg4VZXKi8CaUvdBeE8NLW+Ox2pC2v8ZE5I8Rcw399wvHI3bDWpmmfgLsduorgTw
+         F7yLAFSrLXmyJEM68xdWvdWU0zdB6TM3/ixNz/i8y8ipbu8JXv4/gKrGbFyjVRCP7uRJ
+         3aH5BeFhh43sCkPkHlckSA31ChXXAFITyeX9cOvfOOMlwRFZMUCNP/5W2yJHdsuj5IwV
+         gf0elhSjhFFk29uOXSQFEjA5Sz/eXw/ggkK7Z+VnaXoReynveSPT9MBZqis88UHvEZs4
+         KWGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5eznzShYwADvzOPKSZ3hcyxH8Z6TpaitcBld3wKT2jE=;
+        b=lxzvh0CC69Xl6xoRGiNIlef32ukL+4XhdXwofQeC5Mejkm7AWaM4ISZasTpYWY3XdZ
+         t8f2CeAC5CKhJSGPTxoXnxswDTaJXX9JTZFVL9RTBxP/4ZTWBYHoQOpSZFMeC1NlFh8T
+         rg4W4FFm6oZVMM9e6khJuu0L6ZRxdo40P9ojnAX6T4+xzkRTJXfzXFb5BVHF4KH0btXf
+         k4PWZyCvmj81hw64xcpu5n5oQeOfGm7Avn/V1Uv8jiYCe+K+8jjNYfOd18yNbKeccZxO
+         anzLFtMx3uKRqNPIx2XpWEKWYbUyl1OseYh+6HElE/n2W2Es2jAVjvoGKGdyh1PIjEWA
+         bLvg==
+X-Gm-Message-State: AOAM531+UEqUFEltcjwlkshs3+Gfq3dvYBStyJFeBWlDT+X69JRU7arJ
+        dSR6kTojPQ74NA+0x3x6ll9Wkg0hFFvUecjS2Ko=
+X-Google-Smtp-Source: ABdhPJwzpNMXnzYmkEqSbzN6M0/DOilpaMfT+4BNsm9fEUHLO+pAMb6YMzzmyOn6E8EqKKX82IRDtYijHlMwWzRYuZU=
+X-Received: by 2002:ac8:4e0c:: with SMTP id c12mr6239885qtw.173.1630467565374;
+ Tue, 31 Aug 2021 20:39:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <996b8008-f7ec-4752-e207-669fe88021df@zoner.cz>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20210830233500.51395-1-mgurtovoy@nvidia.com>
+In-Reply-To: <20210830233500.51395-1-mgurtovoy@nvidia.com>
+From:   Feng Li <lifeng1519@gmail.com>
+Date:   Wed, 1 Sep 2021 11:38:59 +0800
+Message-ID: <CAEK8JBBU3zNAWpC36-Lq0UBM1Dp+jYQG105psE38Fy8KRy=M-g@mail.gmail.com>
+Subject: Re: [PATCH 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     hch@infradead.org, mst@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
+        oren@nvidia.com, linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 31, 2021 at 12:30:57PM +0200, Martin Svec wrote:
-> Hello Ming,
-> 
-> thanks a lot. I don't see the patches in 5.10 stable queue yet, is it safe to apply them on top of
-> 5.10.60 LTS kernel?
+Does this hurt the performance of virtio-blk?
+I think a fio result is needed here.
 
-Yeah, both are fix on 2e315dc07df0 ("blk-mq: grab rq->refcount before calling
-->fn in blk_mq_tagset_busy_iter") which is in 5.10.60 stable tree, so
-safe to apply them.
-
-
-
-Thanks,
-Ming
-
+On Tue, Aug 31, 2021 at 7:36 AM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>
+> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+> has lots of deep queues, preallocation for the sg list can consume
+> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+> can be 64 or 128 and each queue's depth might be 128. This means the
+> resulting preallocation for the data SGLs is big.
+>
+> Switch to runtime allocation for SGL for lists longer than 2 entries.
+> This is the approach used by NVMe drivers so it should be reasonable for
+> virtio block as well. Runtime SGL allocation has always been the case
+> for the legacy I/O path so this is nothing new.
+>
+> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+> support SG_CHAIN, use only runtime allocation for the SGL.
+>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+> ---
+>  drivers/block/virtio_blk.c | 37 ++++++++++++++++++++++---------------
+>  1 file changed, 22 insertions(+), 15 deletions(-)
+>
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 77e8468e8593..9a4c5d428b58 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -24,6 +24,12 @@
+>  /* The maximum number of sg elements that fit into a virtqueue */
+>  #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+>
+> +#ifdef CONFIG_ARCH_NO_SG_CHAIN
+> +#define VIRTIO_BLK_INLINE_SG_CNT       0
+> +#else
+> +#define VIRTIO_BLK_INLINE_SG_CNT       2
+> +#endif
+> +
+>  static int virtblk_queue_count_set(const char *val,
+>                 const struct kernel_param *kp)
+>  {
+> @@ -99,7 +105,7 @@ struct virtio_blk {
+>  struct virtblk_req {
+>         struct virtio_blk_outhdr out_hdr;
+>         u8 status;
+> -       struct scatterlist sg[];
+> +       struct sg_table sg_table;
+>  };
+>
+>  static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
+> @@ -188,6 +194,8 @@ static inline void virtblk_request_done(struct request *req)
+>  {
+>         struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+>
+> +       sg_free_table_chained(&vbr->sg_table, VIRTIO_BLK_INLINE_SG_CNT);
+> +
+>         if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
+>                 kfree(page_address(req->special_vec.bv_page) +
+>                       req->special_vec.bv_offset);
+> @@ -291,7 +299,15 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>                         return BLK_STS_RESOURCE;
+>         }
+>
+> -       num = blk_rq_map_sg(hctx->queue, req, vbr->sg);
+> +       vbr->sg_table.sgl = (struct scatterlist *)(vbr + 1);
+> +       err = sg_alloc_table_chained(&vbr->sg_table,
+> +                                    blk_rq_nr_phys_segments(req),
+> +                                    vbr->sg_table.sgl,
+> +                                    VIRTIO_BLK_INLINE_SG_CNT);
+> +       if (err)
+> +               return BLK_STS_RESOURCE;
+> +
+> +       num = blk_rq_map_sg(hctx->queue, req, vbr->sg_table.sgl);
+>         if (num) {
+>                 if (rq_data_dir(req) == WRITE)
+>                         vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_OUT);
+> @@ -300,7 +316,7 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>         }
+>
+>         spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+> -       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
+> +       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
+>         if (err) {
+>                 virtqueue_kick(vblk->vqs[qid].vq);
+>                 /* Don't stop the queue if -ENOMEM: we may have failed to
+> @@ -309,6 +325,8 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>                 if (err == -ENOSPC)
+>                         blk_mq_stop_hw_queue(hctx);
+>                 spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+> +               sg_free_table_chained(&vbr->sg_table,
+> +                                     VIRTIO_BLK_INLINE_SG_CNT);
+>                 switch (err) {
+>                 case -ENOSPC:
+>                         return BLK_STS_DEV_RESOURCE;
+> @@ -687,16 +705,6 @@ static const struct attribute_group *virtblk_attr_groups[] = {
+>         NULL,
+>  };
+>
+> -static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
+> -               unsigned int hctx_idx, unsigned int numa_node)
+> -{
+> -       struct virtio_blk *vblk = set->driver_data;
+> -       struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+> -
+> -       sg_init_table(vbr->sg, vblk->sg_elems);
+> -       return 0;
+> -}
+> -
+>  static int virtblk_map_queues(struct blk_mq_tag_set *set)
+>  {
+>         struct virtio_blk *vblk = set->driver_data;
+> @@ -709,7 +717,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
+>         .queue_rq       = virtio_queue_rq,
+>         .commit_rqs     = virtio_commit_rqs,
+>         .complete       = virtblk_request_done,
+> -       .init_request   = virtblk_init_request,
+>         .map_queues     = virtblk_map_queues,
+>  };
+>
+> @@ -805,7 +812,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>         vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+>         vblk->tag_set.cmd_size =
+>                 sizeof(struct virtblk_req) +
+> -               sizeof(struct scatterlist) * sg_elems;
+> +               sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
+>         vblk->tag_set.driver_data = vblk;
+>         vblk->tag_set.nr_hw_queues = vblk->num_vqs;
+>
+> --
+> 2.18.1
+>
