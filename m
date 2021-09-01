@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B92A5C4320E
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 504BFC4320A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97EC2610A2
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C17461090
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242634AbhIAVCl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 17:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
+        id S243220AbhIAVCm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 17:02:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238362AbhIAVCk (ORCPT
+        with ESMTP id S233472AbhIAVCk (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 17:02:40 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6E4BC061760;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6689C061757;
         Wed,  1 Sep 2021 14:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=IGHq/zn5r0bFrYNjymK6TXitnBNWw/sSmMius/3bC28=; b=QJ5f7z+OE61XbaAFEq2U1l3Fy5
-        isECM2X2glqEsQygexTtwsU+FK7Kt84fO215nlhGmSeWEI8dkR2nsYBSiGZK08xLI2twc3NKJqT2G
-        tlfuVts2g2QyCw4NnqeKp/wOFcfV+Sz4Bzi6gXdFivWnL6aMy8353RHitW8wCEkycmFh75epy6Ctt
-        LfGR8Kp9UwI6AWO1+faElk5/zNZd/vZs+DO1PKNj7uUoUZxeHW6hF6BRT2gQ+UJ6qtXOslVC5o42W
-        bmXviV3Vo/btQqMLp60lRhz4FjceTB0NZAeSA90keRnPgHRwEBix15hO9W5kToBJRw7Ig9IqkrXZQ
-        mxVoHhMg==;
+        bh=04BFNx7N8AagL+vNhaEBLuBBGegCSEgU71z7cal6rBA=; b=a2Rfm3WYHPSjWFgE/uOw0Syt8o
+        kSumcGeM9ydP9COGnikr1e9X5VHlm70Iz8IB5sW3pQx7Vw1x8gOr4gbqt9FkIcwOaaT4G3POAbwD0
+        S2IbV0iAFlPsxHneY2cgG1ZTZ29+QzzDf2DuyrggHf54BrJoBl28Mi3lZV21wekrhhtV+JR4ASMU1
+        HyqD6z9tJCeJi0AxqYp7EIypGoTizN6C1D2HNnJ2OCHRDojKIglWqWebZJKoGqv9MAZaQZd/YXTME
+        goMp2yU6KOiIMEBNCG5ro/UI5snOEuI2Cc4M7vY9EH+mJP2EE2joSCzt7z00uy9IAqY2eflcw7b2q
+        2/XUv0fQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mLXLR-007LW7-Bq; Wed, 01 Sep 2021 21:00:29 +0000
+        id 1mLXLR-007LWJ-LJ; Wed, 01 Sep 2021 21:00:29 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
         thunder.leizhen@huawei.com, lee.jones@linaro.org,
@@ -45,9 +45,9 @@ To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
 Cc:     linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 03/10] ps3disk: add error handling support for add_disk()
-Date:   Wed,  1 Sep 2021 14:00:21 -0700
-Message-Id: <20210901210028.1750956-4-mcgrof@kernel.org>
+Subject: [PATCH 08/10] block/sx8: add error handling support for add_disk()
+Date:   Wed,  1 Sep 2021 14:00:26 -0700
+Message-Id: <20210901210028.1750956-9-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210901210028.1750956-1-mcgrof@kernel.org>
 References: <20210901210028.1750956-1-mcgrof@kernel.org>
@@ -62,31 +62,68 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
+A completion is used to notify the initial probe what is
+happening and so we must defer error handling on completion.
+Do this by remembering the error and using the shared cleanup
+function.
+
+The tags are shared and so are hanlded later for the
+driver already.
+
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/ps3disk.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/block/sx8.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/ps3disk.c b/drivers/block/ps3disk.c
-index 8d51efbe045d..3054adf77460 100644
---- a/drivers/block/ps3disk.c
-+++ b/drivers/block/ps3disk.c
-@@ -467,9 +467,13 @@ static int ps3disk_probe(struct ps3_system_bus_device *_dev)
- 		 gendisk->disk_name, priv->model, priv->raw_capacity >> 11,
- 		 get_capacity(gendisk) >> 11);
+diff --git a/drivers/block/sx8.c b/drivers/block/sx8.c
+index 420cd952ddc4..1c79248c4826 100644
+--- a/drivers/block/sx8.c
++++ b/drivers/block/sx8.c
+@@ -297,6 +297,7 @@ struct carm_host {
  
--	device_add_disk(&dev->sbd.core, gendisk, NULL);
--	return 0;
-+	error = device_add_disk(&dev->sbd.core, gendisk, NULL);
-+	if (error)
-+		goto fail_cleanup_disk;
+ 	struct work_struct		fsm_task;
  
-+	return 0;
-+fail_cleanup_disk:
-+	blk_cleanup_disk(gendisk);
- fail_free_tag_set:
- 	blk_mq_free_tag_set(&priv->tag_set);
- fail_teardown:
++	int probe_err;
+ 	struct completion		probe_comp;
+ };
+ 
+@@ -1181,8 +1182,11 @@ static void carm_fsm_task (struct work_struct *work)
+ 				struct gendisk *disk = port->disk;
+ 
+ 				set_capacity(disk, port->capacity);
+-				add_disk(disk);
+-				activated++;
++				host->probe_err = add_disk(disk);
++				if (!host->probe_err)
++					activated++;
++				else
++					break;
+ 			}
+ 
+ 		printk(KERN_INFO DRV_NAME "(%s): %d ports activated\n",
+@@ -1192,11 +1196,9 @@ static void carm_fsm_task (struct work_struct *work)
+ 		reschedule = 1;
+ 		break;
+ 	}
+-
+ 	case HST_PROBE_FINISHED:
+ 		complete(&host->probe_comp);
+ 		break;
+-
+ 	case HST_ERROR:
+ 		/* FIXME: TODO */
+ 		break;
+@@ -1507,7 +1509,10 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_out_free_irq;
+ 
+ 	DPRINTK("waiting for probe_comp\n");
++	host->probe_err = -ENODEV;
+ 	wait_for_completion(&host->probe_comp);
++	if (host->probe_err)
++		goto err_out_free_irq;
+ 
+ 	printk(KERN_INFO "%s: pci %s, ports %d, io %llx, irq %u, major %d\n",
+ 	       host->name, pci_name(pdev), (int) CARM_MAX_PORTS,
 -- 
 2.30.2
 
