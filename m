@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDAF9C432BE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECA9C4320E
 	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC4C160F42
+	by mail.kernel.org (Postfix) with ESMTP id 0718861054
 	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 21:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244663AbhIAVCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 17:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36686 "EHLO
+        id S238362AbhIAVCv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 17:02:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239759AbhIAVCl (ORCPT
+        with ESMTP id S239704AbhIAVCl (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 17:02:41 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F020FC0617AD;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9930C0617A8;
         Wed,  1 Sep 2021 14:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=xF9PVD7Ak7b7GuU3fNOPsWCRtdNWIk6mhEkq/XYjRic=; b=IIPX+4lgHPMvrA2kWbqHJjbvcO
-        Og6N+aQ91JcErUj3gisaqoYlJpzMIxKNZN9Wpuhq3xsO9tTuVzfn+iCL/tvt/HzjFq/ivq07Ig0XT
-        MCOOSWx1O2pGcHxt6qkScHqJZT1pKtJjPJQy6jjBUxu1oK2ATkt4qM2+L6dETjyLNE2k3GNZLsiGM
-        TEI+8NPoQMC4Q+R+WEx41PvIHQRWRluMsZFLvSjaKneNeiLRu0mFN8jE/JurNBwqJIcDoJSVQHot0
-        OEAFjW3wIh3/ieurXo93Wle7XQmI6ch24aZ/ZImvIln4KkvKm+Bej+6O1o5ocbCVL/aQaymiFOw3y
-        +AvcMSlg==;
+        bh=adUhWGLmSwGDCmYJPL/wycZ+ESyOItTDyVeSKbBPSXk=; b=umTaGx9xje14epeqy42Bbujh2A
+        ZoC7wjPbm0+6zTaI3JWxcPFpd1SVuV1aWnauPvnimangWfy+s2Q/9VLcTt+voKJrcvpRTX0fJ2CES
+        NT/0sepfsS9ivwzi2NOdZd4iSZ9TwsfzkuMb2ctH5tDNebMFO47+gZ5rIVGt5OnqM2V30qnsnbcx4
+        Ylej2AKlmxgrLM6SxK4y7zhh1gC4GI1pdBKhkwmoa4mG9XwIx8+sleU4H1apJfXOQW+g6YnAs86IC
+        RZ6mRnhU/RRwmEAkiOrd5UI+ZZkV3+tBQuqo92zVqMai3LjlBs/pqRB+PT6kXrAfGLy7gxG1F4zcu
+        HSqMoUvQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mLXLR-007LWL-Md; Wed, 01 Sep 2021 21:00:29 +0000
+        id 1mLXLR-007LW3-7L; Wed, 01 Sep 2021 21:00:29 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
         thunder.leizhen@huawei.com, lee.jones@linaro.org,
@@ -45,9 +45,9 @@ To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
 Cc:     linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 09/10] pf: add error handling support for add_disk()
-Date:   Wed,  1 Sep 2021 14:00:27 -0700
-Message-Id: <20210901210028.1750956-10-mcgrof@kernel.org>
+Subject: [PATCH 01/10] mtip32xx: add error handling support for add_disk()
+Date:   Wed,  1 Sep 2021 14:00:19 -0700
+Message-Id: <20210901210028.1750956-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210901210028.1750956-1-mcgrof@kernel.org>
 References: <20210901210028.1750956-1-mcgrof@kernel.org>
@@ -62,26 +62,29 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
+The read_capacity_error error label already does what we need,
+so just re-use that.
+
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/paride/pf.c | 4 +++-
+ drivers/block/mtip32xx/mtip32xx.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
-index f471d48a87bc..380d80e507c7 100644
---- a/drivers/block/paride/pf.c
-+++ b/drivers/block/paride/pf.c
-@@ -962,7 +962,9 @@ static int __init pf_init_unit(struct pf_unit *pf, bool autoprobe, int port,
- 	if (pf_probe(pf))
- 		goto out_pi_release;
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 901855717cb5..d0b40309f47e 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3633,7 +3633,9 @@ static int mtip_block_initialize(struct driver_data *dd)
+ 	set_capacity(dd->disk, capacity);
  
--	add_disk(disk);
-+	ret = add_disk(disk);
-+	if (ret)
-+		goto out_pi_release;
- 	pf->present = 1;
- 	return 0;
+ 	/* Enable the block device and add it to /dev */
+-	device_add_disk(&dd->pdev->dev, dd->disk, mtip_disk_attr_groups);
++	rv = device_add_disk(&dd->pdev->dev, dd->disk, mtip_disk_attr_groups);
++	if (rv)
++		goto read_capacity_error;
  
+ 	if (dd->mtip_svc_handler) {
+ 		set_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag);
 -- 
 2.30.2
 
