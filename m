@@ -2,93 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD6BC4320A
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 13:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 286D0C4320E
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 13:46:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF16A60234
-	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 13:44:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D4F3610CC
+	for <linux-block@archiver.kernel.org>; Wed,  1 Sep 2021 13:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244136AbhIANoz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Sep 2021 09:44:55 -0400
-Received: from mail-ua1-f53.google.com ([209.85.222.53]:37710 "EHLO
-        mail-ua1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242470AbhIANoz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Sep 2021 09:44:55 -0400
-Received: by mail-ua1-f53.google.com with SMTP id g2so1363941uad.4;
-        Wed, 01 Sep 2021 06:43:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gWwkSDKtYGpqljVYI1y+WfrFXR09Q3LdZi5r8xigkjk=;
-        b=m1HTLPNjsWXmfN6HerDCFvrWzQD7uaJ6ME2c79x3oWwCbeGW71g729vuzQuVWK1amV
-         m/gG5PdsI9OW8YZmKhxGoQTD9UZozHxkRlbdjwSkfPytpnH4cLS2gpQiDKg6lfqnmvak
-         ek3y+mHOPP2KGM01N0HSvx+hGNSvqNUwnfhUr5/lXdCXgfChRahtJpJrQYBb59qaAYvF
-         yL5awjgGtNGjRIS0ZnP+GgigOMLps3gnu8wBZ+mJ2mDDdfOkfTU0i+3CjljsB2UrRbJ1
-         W/pDdTk8x5VF49bzjVlsQYFiR4n1FleQOCHcUACBpK5fxsCA6yk0B3KSp7sngMpZbWTZ
-         Sc4A==
-X-Gm-Message-State: AOAM532hra/ABhnITQ9bz/3V7nHBPjrXVhxf/CzwoFujfzBfij8xD/aw
-        vqUeQ5XDwQiousuy3qJk9DYzWvkZSQ9qZaFtpDE=
-X-Google-Smtp-Source: ABdhPJwQuBYdXPN25peyItUun+pLAld/i8v6Ep8jdmiUeF2ltHZxB5QeDFZxYSpkK7+IOC5bnXvgZm+ETQziLUn4arE=
-X-Received: by 2002:ab0:2989:: with SMTP id u9mr22973907uap.122.1630503838209;
- Wed, 01 Sep 2021 06:43:58 -0700 (PDT)
+        id S244550AbhIANra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Sep 2021 09:47:30 -0400
+Received: from mail.zx2c4.com ([104.131.123.232]:34368 "EHLO mail.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242520AbhIANra (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Sep 2021 09:47:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1630503988;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oEJ7+xDrfegvHPd4H20eNZprosFZd2jsqVEjo8Jcnxw=;
+        b=SGQQH3JoawGmnDpJaGDzks0mY5k1M8wQpgw/7cX+ROHj7mozjqffOYC6xWJsRQnpWX7BZg
+        GMJrdMiin97makl/RLVMA2PZmqAKKl/lWA8e49L3G0hMH0wM212CK2/UQG+dvCVFvJIf9e
+        yt3B15i4X9C+FZ6oC+oSQr1bZZrAmcs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0066b0a1 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 1 Sep 2021 13:46:28 +0000 (UTC)
+Received: by mail-yb1-f176.google.com with SMTP id v26so3054564ybd.9;
+        Wed, 01 Sep 2021 06:46:25 -0700 (PDT)
+X-Gm-Message-State: AOAM532UeEHG8wpwVZBk6wd/BSG9dTN32JiA/ULkHs6/1DL81F1OJ3ed
+        N+dQVxxQZygxQHujW5rOYkpW959k/Lgcklg0Qgo=
+X-Google-Smtp-Source: ABdhPJwCJ3tyALmcXHVYLaH4zERaZiv00OI4bgNOKTp76A4CtFuSANq5jEv5HqsEZEgVmgxOCHnx97wU3xfV52xZ2Jw=
+X-Received: by 2002:a25:4589:: with SMTP id s131mr1779731yba.279.1630503985074;
+ Wed, 01 Sep 2021 06:46:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210830221000.179369-1-mcgrof@kernel.org> <20210830221000.179369-4-mcgrof@kernel.org>
-In-Reply-To: <20210830221000.179369-4-mcgrof@kernel.org>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Wed, 1 Sep 2021 15:43:46 +0200
-Message-ID: <CAMuHMdXCUhrnXSmjFP7nJKHZp2joVRz-Ka2BUNMcZFA06CJ1wQ@mail.gmail.com>
-Subject: Re: [PATCH 03/15] m68k/emu/nfblock: add error handling support for add_disk()
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, justin@coraid.com,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Hannes Reinecke <hare@suse.de>, Tejun Heo <tj@kernel.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        chris.obbard@collabora.com,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        YiFei Zhu <zhuyifei1999@gmail.com>, thehajime@gmail.com,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Tim Waugh <tim@cyberelk.net>,
-        "open list:TENSILICA XTENSA PORT (xtensa)" 
-        <linux-xtensa@linux-xtensa.org>,
-        linux-um <linux-um@lists.infradead.org>,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>,
-        Lars Ellenberg <drbd-dev@lists.linbit.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20210818060533.3569517-1-keescook@chromium.org> <20210818060533.3569517-8-keescook@chromium.org>
+In-Reply-To: <20210818060533.3569517-8-keescook@chromium.org>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 1 Sep 2021 15:46:14 +0200
+X-Gmail-Original-Message-ID: <CAHmME9pmXsfgiavSrv6+Eh8C0qrfuYRoQoLvT5EQZz4OdZj=Ww@mail.gmail.com>
+Message-ID: <CAHmME9pmXsfgiavSrv6+Eh8C0qrfuYRoQoLvT5EQZz4OdZj=Ww@mail.gmail.com>
+Subject: Re: [PATCH v2 07/63] skbuff: Switch structure bounds to struct_group()
+To:     Kees Cook <keescook@chromium.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jonathan Lemon <jonathan.lemon@gmail.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Jakub Sitnicki <jakub@cloudflare.com>,
+        Marco Elver <elver@google.com>,
+        Willem de Bruijn <willemb@google.com>,
+        WireGuard mailing list <wireguard@lists.zx2c4.com>,
+        Netdev <netdev@vger.kernel.org>,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 31, 2021 at 12:10 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> We never checked for errors on add_disk() as this function
-> returned void. Now that this is fixed, use the shiny new
-> error handling.
->
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+For the drivers/net/wireguard part,
 
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
