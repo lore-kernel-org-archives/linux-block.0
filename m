@@ -2,101 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B37AC432BE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 15:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 039FAC83029
+	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 17:41:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C98C610A4
-	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 15:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D291A61101
+	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 17:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345370AbhIBPBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Sep 2021 11:01:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58381 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229941AbhIBPBh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Sep 2021 11:01:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630594839;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NhX65RT1ifaHwGOlvzI1CW4C3zVZPOJhKK0Ufgw3iQA=;
-        b=AltfSdXLJK+WZRlqSfErRdZLaPtlidHct3OZ8Tf0D8wyyuiHPwUCv2vHYS6M6Dl9VT7lE0
-        g3drDdFBy3GDasoHcNFp2ApANDLuKuqdhZm/3Bb3m0GVCxbmQEj8FhpwjhEdcynkt3YKP4
-        EVpvLVVRUx0327IbAKqBpfQnD0CEMsU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-q_HuT_iJNrmGjPs7czfHew-1; Thu, 02 Sep 2021 11:00:37 -0400
-X-MC-Unique: q_HuT_iJNrmGjPs7czfHew-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC6E0100C60C;
-        Thu,  2 Sep 2021 15:00:35 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.169])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 64D651AC7E;
-        Thu,  2 Sep 2021 15:00:32 +0000 (UTC)
-Date:   Thu, 2 Sep 2021 16:00:31 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, oren@nvidia.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH 1/1] virtio-blk: remove unneeded "likely" statements
-Message-ID: <YTDnD1c8rk3SWcx9@stefanha-x1.localdomain>
-References: <20210830120111.22661-1-mgurtovoy@nvidia.com>
+        id S1346649AbhIBRmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Sep 2021 13:42:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346632AbhIBRmQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Sep 2021 13:42:16 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 575FEC061575;
+        Thu,  2 Sep 2021 10:41:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=bq7aygA/HlITheyoOHX4TDfVgRy1coZaxPOc4Dj9QXQ=; b=dXAtDVZTAgUbP9IB7I6GZ486uQ
+        a0TNXad+2o7Gn9TsGoapvByiWqL5vJwhHo5WzweXMHbySRmpGB/cF/Xa91cL5cqT7HvCaYcfr0XGe
+        +IXl01u13V/qnAzTnki5UJez2+pYCUVrY2nlHvOI998w8KYWfO5lUQhrw+rMDy+DBmU9bDAjyG7xC
+        SkyLoqr4Ephh62sazlqQJM+ndk83dL+8yHfpqoMzkKYXb5wGZyBiP57PSZ7aJHp8R3VhKngkfMFBq
+        OE/FdbsfCoNshb82/Hiw0+3/gKMNQWVIPn0ivWs3gDAREtUBBNRpVWC9kzYiq05jPfJAaHB+B23aA
+        rBOunPrg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mLqi1-00A9FA-My; Thu, 02 Sep 2021 17:41:05 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, gregkh@linuxfoundation.org,
+        chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
+        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
+        colin.king@canonical.com, shubhankarvk@gmail.com,
+        baijiaju1990@gmail.com, trix@redhat.com,
+        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, oberpar@linux.ibm.com,
+        tj@kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH 0/9] block: 5th batch of add_disk() error handling conversions 
+Date:   Thu,  2 Sep 2021 10:40:56 -0700
+Message-Id: <20210902174105.2418771-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="wVBj43Tcb8AeCyD2"
-Content-Disposition: inline
-In-Reply-To: <20210830120111.22661-1-mgurtovoy@nvidia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This is the 5th of 7 set of driver conversion over to use the new
+add_disk() error handling. Please let me know if you spot
+any issues. This set deals with miscellaneous block drivers.
 
---wVBj43Tcb8AeCyD2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch set is based on axboe/master, you can find the
+full set of changes on my 20210901-for-axboe-add-disk-error-handling
+branch [0].
 
-On Mon, Aug 30, 2021 at 03:01:11PM +0300, Max Gurtovoy wrote:
-> Usually we use "likely/unlikely" to optimize the fast path. Remove
-> redundant "likely" statements in the control path to ease on the code.
->=20
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->  drivers/block/virtio_blk.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+It would seem there are going to be a total of 7 sets of patches. The
+next one will be the wonderful and exciting world of floppy drivers.
+The last is the required changes to add a __must_check for the return
+value for the caller.
 
-It would be nice to tweak the commit description before merging this. I
-had trouble parsing the second sentence. If I understand correctly the
-purpose of this patch is to make the code simpler and easier to read:
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210901-for-axboe-add-disk-error-handling
 
-  s/ease on the code/simplify the code and make it easier to read/
+Luis Chamberlain (9):
+  cdrom/gdrom: add error handling support for add_disk()
+  ms_block: add error handling support for add_disk()
+  mspro_block: add error handling support for add_disk()
+  rbd: add add_disk() error handling
+  mtd: add add_disk() error handling
+  s390/block/dasd_genhd: add error handling support for add_disk()
+  s390/block/dcssblk: add error handling support for add_disk()
+  s390/block/scm_blk: add error handling support for add_disk()
+  s390/block/xpram: add error handling support for add_disk()
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+ drivers/block/rbd.c                 | 6 +++++-
+ drivers/cdrom/gdrom.c               | 7 ++++++-
+ drivers/memstick/core/ms_block.c    | 6 +++++-
+ drivers/memstick/core/mspro_block.c | 6 +++++-
+ drivers/mtd/mtd_blkdevs.c           | 6 +++++-
+ drivers/s390/block/dasd_genhd.c     | 8 ++++++--
+ drivers/s390/block/dcssblk.c        | 4 +++-
+ drivers/s390/block/scm_blk.c        | 7 ++++++-
+ drivers/s390/block/xpram.c          | 4 +++-
+ 9 files changed, 44 insertions(+), 10 deletions(-)
 
---wVBj43Tcb8AeCyD2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmEw5w8ACgkQnKSrs4Gr
-c8jUHQf/VJ5hb++9DIHpheWC7yNi4OPiAS2B/1vypNz2ryOtT/6dEWtuLPgyw/fy
-eD2d5GkdqujwQvl09h4esZpK1zVAdCj5J6L4R1m5RH6DqVG2GYnNzx1AdD8w0tgG
-kMlizFNxPdlU6LSbJ+CPIky0FaleRbYEKjtUTJ9rjLwEYg9gCbEfZhR8dGt3jXca
-tYM81eATEMjuUSa+G6tePeTUCuGX/zljWb+IjEfLONNy4cNWCfwY1+77iLDAf62q
-bARLaXudlC/tyKjQguEF8GqvkvMRnYv9uQRV6YjpY6uchBaNh+X4kBF9XnQnBvtU
-Nws0aRuTL+wQcNp9/vwVW9i6e+JFCQ==
-=sHMp
------END PGP SIGNATURE-----
-
---wVBj43Tcb8AeCyD2--
+-- 
+2.30.2
 
