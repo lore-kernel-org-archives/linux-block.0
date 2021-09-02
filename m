@@ -2,106 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76436C432BE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 12:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D7EC432BE
+	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 12:41:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 559DD610A2
-	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 12:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94A58610CD
+	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 12:41:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344631AbhIBMiS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Sep 2021 08:38:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344626AbhIBMiR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Sep 2021 08:38:17 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7409C061757
-        for <linux-block@vger.kernel.org>; Thu,  2 Sep 2021 05:37:19 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id u7so1602666ilk.7
-        for <linux-block@vger.kernel.org>; Thu, 02 Sep 2021 05:37:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dBeUfUN5jD/JlFS2rAqlRD6MfCD/VygLrQHRAZUBmEE=;
-        b=NMUoUC1ZM+tbRGXcyKRC4Suo6c/iJudflLokmiLJu3K5AZbfjbR3RWkqCEeEt/6obH
-         YUU17lhEs0ryZ8aQMS9Vf1kXzLnvQAK6a9aykzly1O4MXqvsbdy3xqz4pbi6d7O/KImP
-         OFrUvCAD8n/G/pyY8fS+yIXDlYZdXz0mmni7L5xsdN+kLptX/eojOwnwgb8rwx6f8ltL
-         fFfdpRpnrK5glbI6BEs1/wxisRh+O2WcsOPeUJ60po+y0B9sDsCM4sqvTWH8Hs4E/iUR
-         RE0nuiB4JVUZ9/AHwBnYBtLkVLdnx2xtMJVvUz/Ppx0rNLtfi7B021uW+Xfkgy8YZNN0
-         wrsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dBeUfUN5jD/JlFS2rAqlRD6MfCD/VygLrQHRAZUBmEE=;
-        b=lM81H0gFJyOOomzbonqcQpu4fohvZz4xiv4gGse/QwStftNOeueXmwxhvUfz0QqRL8
-         Y2jGOkGz98PpuIrhVC2yma1CwWt4yMsSLmGVcBvQmetK07K3FZVmiQtgwP/5eN2S/0e5
-         9Rwa2Q+IoftoPHkmj4S/j5/dEwaASdI+utWy1jUdqw0ByQgic5R3FItRlLs/uDF0ybZi
-         hzJz+LWYpP6g51rpd5A47CNea6sZpzZZyBFzpqrO7uO+Vema+ZqSyYD/mbTRsx21HJDn
-         K0FF7A79ss7EQhgs1r2uAIabz3tQG4CnFy2zqUbrtGh3urTDGZfy5ybyfjW1xS7nrenF
-         3/ag==
-X-Gm-Message-State: AOAM533jxPBuIoP29nm8UaqZeGdv/gh+B/Hx81T8+YMycSYmIR9eoCb0
-        Bv5sx+0zyVCqx5y/cfTLJLfZbA==
-X-Google-Smtp-Source: ABdhPJyv4XE2V7XQN/ri4A7eSEUHIyiS5yz9T47Rn2SJml+M/3iAczWiymxX5ha/j0iLQc2PxwdJPg==
-X-Received: by 2002:a05:6e02:961:: with SMTP id q1mr2261821ilt.76.1630586238976;
-        Thu, 02 Sep 2021 05:37:18 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id v14sm924412ilc.65.2021.09.02.05.37.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Sep 2021 05:37:17 -0700 (PDT)
-Subject: Re: [PATCH BUGFIX 1/1] block, bfq: honor already-setup queue merges
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        davidezini2@gmail.com
-References: <20210802141352.74353-1-paolo.valente@linaro.org>
- <20210802141352.74353-2-paolo.valente@linaro.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <df5c8291-9282-1512-cdbf-28aad60beaec@kernel.dk>
-Date:   Thu, 2 Sep 2021 06:37:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1344476AbhIBMmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Sep 2021 08:42:10 -0400
+Received: from mail-dm3nam07on2061.outbound.protection.outlook.com ([40.107.95.61]:57988
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234098AbhIBMmK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Sep 2021 08:42:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TU0/Fg1W5YeTfz03Jc1nUnrWPD0e7q5/VMGtuC6dhuGuwKjGQuqcA4U9hoLfEAEqJW5u/Pr8Xldwx6iZG6MxnLQxEbYMu3gsvwKqQE2F5kKa7uAj282e+qatgO+sN0FHWCIxg9Px7WKJMaanAhmEgvXLTII7FC0LFUPgkOarhR5K2Hs4Ca9qHHIBnJkTTgciRfPfm2R9ztYnwPkKGZ+YdjdbwLzxcPo+91KA9OAhboCIDjmeFcNJ49iUoxh+BSte1ZEVryoGgGo7e6gqtLysm08FG1Tf9R8kPqhbLw9nQsC0MKpea/cygPA7b/P68/IvV0KWErwfE6v+DOaqDCeYvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=SARnDv7ZMhH2eqwgqjUe+EEnuThwlm2xat6htonBLAE=;
+ b=IxDNf429XMzAA0Q/aOpGP8OiOobo1FOWx8tppD4IMPHQOUFtShexTdDcvcT32ZswMdSOalc3eNOXGA6UnXl9vnYEMF0L9vZjyyZpJIpdW88U5xQ+HYY/iAPqnUQm8jreLtY9xpS70/wLH0P3Hym7TEZjTZXJMWc/iBAm4uvrXHVNosfPzUh8qeo7QavZZwDuxSDyemh8dayFsYXzsIhBoj2G0WOFHhOEq6ZUAw+xPO5X6E9ExXsChP5glTnDrPpzeJPcoeAjwtTzueklj8KERTsHf1qMbkJMN5UYor09jdVonljQDAq3BGw5h55WPSjXXqnCZY8Gl9B8HssL54ALzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.36) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SARnDv7ZMhH2eqwgqjUe+EEnuThwlm2xat6htonBLAE=;
+ b=sddEB2jf42XYL714SyqYEuFWukSjlMNw18mmFMsKhhCVdHK2WEfCMgHJpv1rAhXLtAYATq+ZQImc0lw/tdJk6gLALsqBrhHQWdkmyi5nIv8tLxzFUa9hYARRVzDEcorOCoAIVXtzt2gjUMAeollDG2RSTt/qcOSpb8hUmn/p0mRSEyfSPLwaFTsC80w9zZWJcc95CbI/ASRSCowK0CifIES1rxwgL+Q1+4vvGp5UJaasBSJxA2Qw1MJa1M2m4W+rF8PKOvc9DYbn4fqlAi+bxv/dEw+n9zJYYoy4euD+QIbf8NFXf7K5iaIVtyfIep6s1FP4dSNS1O45V4dxKxw/JQ==
+Received: from DM6PR02CA0080.namprd02.prod.outlook.com (2603:10b6:5:1f4::21)
+ by BL0PR12MB2370.namprd12.prod.outlook.com (2603:10b6:207:47::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19; Thu, 2 Sep
+ 2021 12:41:10 +0000
+Received: from DM6NAM11FT004.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:1f4:cafe::90) by DM6PR02CA0080.outlook.office365.com
+ (2603:10b6:5:1f4::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19 via Frontend
+ Transport; Thu, 2 Sep 2021 12:41:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
+ smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.36; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.36) by
+ DM6NAM11FT004.mail.protection.outlook.com (10.13.172.217) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4478.19 via Frontend Transport; Thu, 2 Sep 2021 12:41:09 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 2 Sep
+ 2021 12:41:08 +0000
+Received: from [172.27.1.153] (172.20.187.6) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 2 Sep 2021
+ 12:41:05 +0000
+Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+CC:     <hch@infradead.org>, <mst@redhat.com>,
+        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <israelr@nvidia.com>, <nitzanc@nvidia.com>, <oren@nvidia.com>,
+        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
+ <YTDBx/E/UJZWTFlG@stefanha-x1.localdomain>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <c8107800-63fa-2ab5-235f-6f365e22abe1@nvidia.com>
+Date:   Thu, 2 Sep 2021 15:41:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210802141352.74353-2-paolo.valente@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <YTDBx/E/UJZWTFlG@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e9b295f6-062a-4b39-79e8-08d96e0ef0b1
+X-MS-TrafficTypeDiagnostic: BL0PR12MB2370:
+X-Microsoft-Antispam-PRVS: <BL0PR12MB2370B9C0056BE946ADCECEA0DECE9@BL0PR12MB2370.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yUMaIYeNHq1ikoZLNQH/M32uq4g+ahsT5qGN1c3zwLxzmyoUZ6QQQtOSjQ6GTLsus41sc+frl4K2asVRUO5/MDlK3jpj/zkwbbuSdifoisbKGofTNF8E3VNiEDpkC1N+bbKpuuAnSsvq53rF6zqNYG5sQm3IO4krKIK0Nz6BJCV9xT9YoUf5y3FM2UafsS7vsOzHIGlp3NTz1HXpoYNp3MLeWRHETjq40I0UYuUHfg3RAtWLFDj6P8/fjSlOPRR+KT+5LO26Q5TShoqTflFkjKQKWZ2zNOZziqMPlXZrFfFbCab9Mw51d1X3XZP+bOp78ML46squIjfGH96+CwW62wlXXwHJDibxyrtyteXuNkrn6PYYnXhfGvchFTQ/a2QbXJ0fSaI2l/KLpuMFrxWI0qshn5TNgsNXA6gjgyLDrNP+5Nk8vxWmkrsy21mr4fYW9SXL/VknI2fW52HMpyeNPT71PNIo/wQjwOo3ViOidjxzLRJE9OzlvjFZnCnOx/9MI7W18yPQSfR2TGVQR1/wMBfU0GB7CiVmgAWx0KxH/8wgRLjYqEQd15rq9Ee0gf8x2cqc8wY3ijd3VVr/eX1cDWjjx2NN0pwwhRN7vJ34/uYA8hSpe/F+FU3vIOcRlcBOy7rir5r99YqzzZWIquqhkN9PAc20B9taLzYGdZ2ckJ1BjLLb4c/MfmHCu1T7NmxewPFsjAX89aLDzQh0yenhtGaencFf7LKFUrLG+8KagaE=
+X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(16576012)(316002)(36906005)(54906003)(83380400001)(6916009)(2906002)(26005)(508600001)(36756003)(5660300002)(8936002)(4326008)(6666004)(7636003)(8676002)(336012)(186003)(16526019)(426003)(2616005)(356005)(47076005)(53546011)(70586007)(31696002)(70206006)(82310400003)(36860700001)(31686004)(86362001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2021 12:41:09.5306
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9b295f6-062a-4b39-79e8-08d96e0ef0b1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT004.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2370
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/2/21 8:13 AM, Paolo Valente wrote:
-> The function bfq_setup_merge prepares the merging between two
-> bfq_queues, say bfqq and new_bfqq. To this goal, it assigns
-> bfqq->new_bfqq = new_bfqq. Then, each time some I/O for bfqq arrives,
-> the process that generated that I/O is disassociated from bfqq and
-> associated with new_bfqq (merging is actually a redirection). In this
-> respect, bfq_setup_merge increases new_bfqq->ref in advance, adding
-> the number of processes that are expected to be associated with
-> new_bfqq.
-> 
-> Unfortunately, the stable-merging mechanism interferes with this
-> setup. After bfqq->new_bfqq has been set by bfq_setup_merge, and
-> before all the expected processes have been associated with
-> bfqq->new_bfqq, bfqq may happen to be stably merged with a different
-> queue than the current bfqq->new_bfqq. In this case, bfqq->new_bfqq
-> gets changed. So, some of the processes that have been already
-> accounted for in the ref counter of the previous new_bfqq will not be
-> associated with that queue.  This creates an unbalance, because those
-> references will never be decremented.
-> 
-> This commit fixes this issue by reestablishing the previous, natural
-> behaviour: once bfqq->new_bfqq has been set, it will not be changed
-> until all expected redirections have occurred.
 
-Applied, thanks.
+On 9/2/2021 3:21 PM, Stefan Hajnoczi wrote:
+> On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
+>> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+>> has lots of deep queues, preallocation for the sg list can consume
+>> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+>> can be 64 or 128 and each queue's depth might be 128. This means the
+>> resulting preallocation for the data SGLs is big.
+>>
+>> Switch to runtime allocation for SGL for lists longer than 2 entries.
+>> This is the approach used by NVMe drivers so it should be reasonable for
+>> virtio block as well. Runtime SGL allocation has always been the case
+>> for the legacy I/O path so this is nothing new.
+>>
+>> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+>> support SG_CHAIN, use only runtime allocation for the SGL.
+>>
+>> Re-organize the setup of the IO request to fit the new sg chain
+>> mechanism.
+>>
+>> No performance degradation was seen (fio libaio engine with 16 jobs and
+>> 128 iodepth):
+>>
+>> IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
+>> --------     ---------------------------------    ----------------------------------
+>> 512B          318K/316K                                    329K/325K
+>>
+>> 4KB           323K/321K                                    353K/349K
+>>
+>> 16KB          199K/208K                                    250K/275K
+>>
+>> 128KB         36K/36.1K                                    39.2K/41.7K
+>>
+>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+>> ---
+>>
+>> changes from V2:
+>>   - initialize vbr->out_hdr.sector during virtblk_setup_cmd
+>>
+>> changes from V1:
+>>   - Kconfig update (from Christoph)
+>>   - Re-order cmd setup (from Christoph)
+>>   - use flexible sg pointer in the cmd (from Christoph)
+>>   - added perf numbers to commit msg (from Feng Li)
+>>
+>> ---
+>>   drivers/block/Kconfig      |   1 +
+>>   drivers/block/virtio_blk.c | 155 +++++++++++++++++++++++--------------
+>>   2 files changed, 100 insertions(+), 56 deletions(-)
+> Hi Max,
+> I can run benchmark to give everyone more confidence about this change.
+> Should I test this version or are you still planning to make code
+> changes?
 
--- 
-Jens Axboe
+Yes you can test v3.
 
+Thanks,
+
+Max.
+
+>
+> Stefan
