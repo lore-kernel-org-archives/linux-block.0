@@ -4,36 +4,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC33C83030
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6121EC8302C
 	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 17:41:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31B8B61106
+	by mail.kernel.org (Postfix) with ESMTP id 44A5D6113D
 	for <linux-block@archiver.kernel.org>; Thu,  2 Sep 2021 17:41:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347020AbhIBRmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1347024AbhIBRmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 2 Sep 2021 13:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36920 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346712AbhIBRmR (ORCPT
+        with ESMTP id S1346791AbhIBRmR (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 2 Sep 2021 13:42:17 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAAE1C061575;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFD7CC061757;
         Thu,  2 Sep 2021 10:41:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=PDzjS+dr10ndkrHE9asrJrwhiTPnedHV5fGVL8VIm34=; b=wFrUeTIQiVlCJMmbc0haxWL8cr
-        ZtLHi5qjHqc8Gx+iVj/pRj4alPjXxvUOBZwM5VlBgXPA4q1WlYzZWxdB6w02oOklBEj5LXPUzhtPq
-        PUuufFNWSbpZMzhicWxYDQrK5glPn1kQtjZol7KRAnd2JJpY0hQHqFtrho1iobrOdNQSemrgYkKJt
-        jWfevQBE13OzFT4LlsAoZpDJARfY8hG+UZUTzMSkpZ6gej/9pLgwHEHDQlTgfifz2TkCwbmBT/ybb
-        EJjIsLvvW8K72raohKTtmnnoBOP0ulkB5hiY6JXlTI/KGVuG+iAqOQ1yDAKWwfqflxyN/DFh68zf6
-        q3UxIJoA==;
+        bh=7V8FZ80qIliivCO2ypIuGl2Awrc5ZK57tRJ4fo+fTPQ=; b=kjbVAj8y8kqrHOxzh5HG+PkbB9
+        Y6I1Ri0p1OX8ZojE1JOAtx4zNb9br0bIT6kKcK0pwb43OF/nWHFc+nzS0JUAXe3mIT6QK9s5vu4ue
+        fVEEbUgJeTgtw4VwPNvigT+lKIU6Dc8233ERbzZkIIXiwvWz4Hyfz6tf4LrQ28A1u9dDSaA6rYFq9
+        35uMQ4WV2bbPVzdnA4rPEVZgLiAh6l2P8UTq9MmGpEaNGRNmvPKTLrfXBUgdDd1mjX1O5JxBV7YmM
+        e8r3pzUqdi2C5GoAQ05/qJlFjCC4Bdm93rQ4fhe1239c5f20fXZ37R5oExtjYihS2xkkljbg05j1x
+        Sjh2fZXQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mLqi1-00A9FG-UL; Thu, 02 Sep 2021 17:41:05 +0000
+        id 1mLqi2-00A9FS-An; Thu, 02 Sep 2021 17:41:06 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, gregkh@linuxfoundation.org,
         chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
@@ -48,9 +48,9 @@ To:     axboe@kernel.dk, gregkh@linuxfoundation.org,
 Cc:     linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
         linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 3/9] mspro_block: add error handling support for add_disk()
-Date:   Thu,  2 Sep 2021 10:40:59 -0700
-Message-Id: <20210902174105.2418771-4-mcgrof@kernel.org>
+Subject: [PATCH 9/9] s390/block/xpram: add error handling support for add_disk()
+Date:   Thu,  2 Sep 2021 10:41:05 -0700
+Message-Id: <20210902174105.2418771-10-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210902174105.2418771-1-mcgrof@kernel.org>
 References: <20210902174105.2418771-1-mcgrof@kernel.org>
@@ -65,36 +65,26 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
-Contrary to the typical removal which delays the put_disk()
-until later, since we are failing on a probe we immediately
-put the disk on failure from add_disk by using
-blk_cleanup_disk().
-
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/memstick/core/mspro_block.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/s390/block/xpram.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
-index 22778d0e24f5..c0450397b673 100644
---- a/drivers/memstick/core/mspro_block.c
-+++ b/drivers/memstick/core/mspro_block.c
-@@ -1239,10 +1239,14 @@ static int mspro_block_init_disk(struct memstick_dev *card)
- 	set_capacity(msb->disk, capacity);
- 	dev_dbg(&card->dev, "capacity set %ld\n", capacity);
+diff --git a/drivers/s390/block/xpram.c b/drivers/s390/block/xpram.c
+index ce98fab4d43c..ed3904b6a9c8 100644
+--- a/drivers/s390/block/xpram.c
++++ b/drivers/s390/block/xpram.c
+@@ -371,7 +371,9 @@ static int __init xpram_setup_blkdev(void)
+ 		disk->private_data = &xpram_devices[i];
+ 		sprintf(disk->disk_name, "slram%d", i);
+ 		set_capacity(disk, xpram_sizes[i] << 1);
+-		add_disk(disk);
++		rc = add_disk(disk);
++		if (rc)
++			goto out;
+ 	}
  
--	device_add_disk(&card->dev, msb->disk, NULL);
-+	rc = device_add_disk(&card->dev, msb->disk, NULL);
-+	if (rc)
-+		goto out_cleanup_disk;
- 	msb->active = 1;
  	return 0;
- 
-+out_cleanup_disk:
-+	blk_cleanup_disk(msb->disk);
- out_free_tag_set:
- 	blk_mq_free_tag_set(&msb->tag_set);
- out_release_id:
 -- 
 2.30.2
 
