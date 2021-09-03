@@ -2,110 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD2C2C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 09:04:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A840C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 14:06:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A56C7610A1
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 09:04:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D4B460EE3
+	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 14:06:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348581AbhICJFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Sep 2021 05:05:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36948 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348580AbhICJFt (ORCPT
+        id S1349000AbhICOHw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Sep 2021 10:07:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23060 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235668AbhICOHv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Sep 2021 05:05:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630659886;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a35OZamz4FhULMDWjA+MIpzd8IbhFlUnBRFIx65TG18=;
-        b=Zt4azUur3K5JP76jjkcBUcrgj6sagIWwhRb0BV5U+R5pIrRdRakAjFcJI1tzEXaapHvLrl
-        TbnOMZcS6p3bMn2mO24JsecV+eewtVDR/gSXmRtT/smdc3ZMOvZXNuwlfORkVw6ScxSkVI
-        UkHHszdLfi+GH1LqODC/M0yQe2JJy7g=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-9XnlTQRiPRCwoxssEmIx_g-1; Fri, 03 Sep 2021 05:04:44 -0400
-X-MC-Unique: 9XnlTQRiPRCwoxssEmIx_g-1
-Received: by mail-wm1-f72.google.com with SMTP id j33-20020a05600c48a100b002e879427915so1668697wmp.5
-        for <linux-block@vger.kernel.org>; Fri, 03 Sep 2021 02:04:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=a35OZamz4FhULMDWjA+MIpzd8IbhFlUnBRFIx65TG18=;
-        b=FxapZJV9IWvDitgRoG5O4PyErG0QaCUvbxdK7ILRqnGJ9DLDg64AZNwNtYox4ELCAY
-         ao+k0dUOWxT9zPOPcGApimo0g4YTI5BL/66charvTOdIbmzY73LK+n/WkqjgbYlAEr25
-         1odheloywNV3QeWPg/HLiYLG91Qho+IkkYCZQiGLznCfemM2z/iEIrZ35KI8g3La0zSE
-         xURL5yhN1iriedWVBFVGCFnzQT7wyN+5e6esa+4M0FYqU/kbXE/Bj3icnuSTR/GPzBDQ
-         2Mr9fSXx623OjB+wJXiVJndt6/bKcuwiTAHKfNMp+6j0q0aWbrM0GX3vGoUQFoW0PUAP
-         Oz9A==
-X-Gm-Message-State: AOAM533hrHv+oaZa6Ldp70K9NCF9fGTTI8pel8b+XRg3FYO+nUNOAeUm
-        XdMYfNICwKcAEC4YpT4pgA/okX8kd4i+JDEKERJ08bp2sZt62SUyMGJJfkzenp7aCHx+3DyhVrU
-        utJeWvhIiGipj6u7Ad8FqG0Y=
-X-Received: by 2002:a7b:cd82:: with SMTP id y2mr7316060wmj.4.1630659883833;
-        Fri, 03 Sep 2021 02:04:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxq1o45OPMNe+RtszcnJRaHC5co9mJquGrSZkuN/bgyyco2U6W6QjJBBk7GWQODKEhxLdyBqQ==
-X-Received: by 2002:a7b:cd82:: with SMTP id y2mr7316037wmj.4.1630659883591;
-        Fri, 03 Sep 2021 02:04:43 -0700 (PDT)
-Received: from redhat.com ([2a03:c5c0:207f:7f47:ccd3:7600:6a2d:c5a])
-        by smtp.gmail.com with ESMTPSA id h8sm3665497wmb.35.2021.09.03.02.04.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 02:04:42 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 05:04:38 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH 1/1] virtio-blk: remove unneeded "likely" statements
-Message-ID: <20210903050418-mutt-send-email-mst@kernel.org>
-References: <20210830120111.22661-1-mgurtovoy@nvidia.com>
- <YTDnD1c8rk3SWcx9@stefanha-x1.localdomain>
- <6800aad7-038a-b251-4ad5-3dc005b0a8a1@nvidia.com>
+        Fri, 3 Sep 2021 10:07:51 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 183E3UbD181380;
+        Fri, 3 Sep 2021 10:06:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=c5dtoeuWVsQu+Kx8qJUPUNaZorSC3QCCcGga7tN4sMM=;
+ b=ScX/mNrpjpVGSx7jnWReoQPFcq12svD7XPCLBc9+6TcavrCpFAUGPoIUBGeID0O3nUQ8
+ aG2XqrMHeI1H6uH7Bz5TxvciGjxAU+sdozMlFUgeWFBXfLNgYtqng2x7evKyHE7CSCmn
+ 4qvRCZDSoMunMRURUbVVrLC0nPgqByu2VIOhDqKf/0qKkrztBc3ddgbIuEFNRIYG3qlI
+ 4OxZa+v6kbClDzirNILXgdEG0wTxsWg+s0bg0AmFLE/P/U/FtTlcIfoeB2MszbyFM8Eb
+ O6/4oYtU414B8YjaaKASZa+PwGVaLZEnJi4SjdP/5bMcv31V3PkLxnO5DfFZJ3o954ME 6w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aujf14aj5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Sep 2021 10:06:25 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 183E58pp001197;
+        Fri, 3 Sep 2021 10:06:24 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aujf14agu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Sep 2021 10:06:24 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 183DwGLW004761;
+        Fri, 3 Sep 2021 14:06:21 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3au6q7h8bn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Sep 2021 14:06:21 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 183E2Ese61866466
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 3 Sep 2021 14:02:14 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DA6AA52050;
+        Fri,  3 Sep 2021 14:06:17 +0000 (GMT)
+Received: from osiris (unknown [9.145.159.114])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id CFE815206B;
+        Fri,  3 Sep 2021 14:06:16 +0000 (GMT)
+Date:   Fri, 3 Sep 2021 16:06:15 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, gregkh@linuxfoundation.org,
+        chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
+        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
+        colin.king@canonical.com, shubhankarvk@gmail.com,
+        baijiaju1990@gmail.com, trix@redhat.com,
+        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
+        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 9/9] s390/block/xpram: add error handling support for
+ add_disk()
+Message-ID: <YTIr1w/qPvgioUfL@osiris>
+References: <20210902174105.2418771-1-mcgrof@kernel.org>
+ <20210902174105.2418771-10-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6800aad7-038a-b251-4ad5-3dc005b0a8a1@nvidia.com>
+In-Reply-To: <20210902174105.2418771-10-mcgrof@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: cnjpHgTUs8-WIbHVAJtbBq5h0cPzkyvT
+X-Proofpoint-GUID: XAog2zEDSgH4nXCPv9bkGtJovoNDgwBR
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-03_05:2021-09-03,2021-09-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
+ mlxscore=0 adultscore=0 clxscore=1011 suspectscore=0 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2108310000 definitions=main-2109030088
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 02, 2021 at 10:13:04PM +0300, Max Gurtovoy wrote:
+On Thu, Sep 02, 2021 at 10:41:05AM -0700, Luis Chamberlain wrote:
+> We never checked for errors on add_disk() as this function
+> returned void. Now that this is fixed, use the shiny new
+> error handling.
 > 
-> On 9/2/2021 6:00 PM, Stefan Hajnoczi wrote:
-> > On Mon, Aug 30, 2021 at 03:01:11PM +0300, Max Gurtovoy wrote:
-> > > Usually we use "likely/unlikely" to optimize the fast path. Remove
-> > > redundant "likely" statements in the control path to ease on the code.
-> > > 
-> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > ---
-> > >   drivers/block/virtio_blk.c | 4 ++--
-> > >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > It would be nice to tweak the commit description before merging this. I
-> > had trouble parsing the second sentence. If I understand correctly the
-> > purpose of this patch is to make the code simpler and easier to read:
-> > 
-> >    s/ease on the code/simplify the code and make it easier to read/
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  drivers/s390/block/xpram.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> I'm ok with this change in commit message.
-> 
-> MST,
-> 
-> can you apply this change if you'll pick this commit ?
-> 
-> -Max.
+> diff --git a/drivers/s390/block/xpram.c b/drivers/s390/block/xpram.c
+> index ce98fab4d43c..ed3904b6a9c8 100644
+> --- a/drivers/s390/block/xpram.c
+> +++ b/drivers/s390/block/xpram.c
+> @@ -371,7 +371,9 @@ static int __init xpram_setup_blkdev(void)
+>  		disk->private_data = &xpram_devices[i];
+>  		sprintf(disk->disk_name, "slram%d", i);
+>  		set_capacity(disk, xpram_sizes[i] << 1);
+> -		add_disk(disk);
+> +		rc = add_disk(disk);
+> +		if (rc)
+> +			goto out;
 
+Hmm, this is a more or less dead device driver, and I'm wondering if
+we shouldn't remove it instead. But anyway, your patch is not correct:
 
-Just repost with a fixed commit log pls, easier for me.
-Thanks!
+- del_gendisk for all registered disks has to be called
+- unregister_blkdev(XPRAM_MAJOR, XPRAM_NAME) is missing as well
 
-> > 
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+That would be more or or less xpram_exit with parameter.
 
+You can send a new patch or I can provide a proper one, whatever you
+prefer.
