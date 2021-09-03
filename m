@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC06EC43219
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AD2C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC2A260041
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33A6460C3E
+	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351054AbhICUrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1351042AbhICUrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 3 Sep 2021 16:47:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41524 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351041AbhICUrM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Sep 2021 16:47:12 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 349C6C0617A8;
-        Fri,  3 Sep 2021 13:46:06 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id s20so695702oiw.3;
-        Fri, 03 Sep 2021 13:46:06 -0700 (PDT)
+        with ESMTP id S1351043AbhICUrN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Sep 2021 16:47:13 -0400
+Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB559C0617AF;
+        Fri,  3 Sep 2021 13:46:07 -0700 (PDT)
+Received: by mail-oo1-xc34.google.com with SMTP id y16-20020a4ad6500000b0290258a7ff4058so55230oos.10;
+        Fri, 03 Sep 2021 13:46:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Z3IpWY6hC6vHRC5+LJLa1BK+7bWdECMM9FiUHKFu/VA=;
-        b=oqSzxLsNghPexCOOhno0g6Lv//8JbqpywNeCIiF8cuseSEpzr0W9szJr+630j/2fYR
-         9zqIrXOnlO6RdDm4UZ8WS/WasTNlesC2ei//QCBBmim00iC/uYS6cMsXm2fb86N5SEgR
-         HP1otL7KshsSzgFSyZzi4zVfJZEJUuuZZh5sbtVl+AQA2GUW2wPmU4qFmMo96csesr+F
-         ZD6eyglZsOLN1I53gKx6mPYSqHsomL0YYAF1Vwsg1n/Iv2v0yOe/HOvQc/bIasGQbvT4
-         z0hsl9q1WgNy2RLNrIWKWfwsNtlsDiM2Vi9Rh3lzrTNo8VanjloF0JLQ+Juw3D2AYdo9
-         zRQw==
+        bh=YznRyopAqCuw4dasqam73G99JKILnKKYOqYTDQveRLc=;
+        b=ApHkhu7d9UY4CRXhqDNsI5BKnDvxO49SCBiD98MAuaQJ68Wx3Dhg0ufBg93iLQWkcM
+         bBGDlngKX8HptIZpLV+iRWHyeHSJz5wyJ2k8IHu83h7P5v8QZ5xQAZ6Ax9YfRy2F796y
+         Ubgqi13+gnXVa8cOpVtTIRZy7Vm+q2EaH9Kv5Tdj/MXYYBmYkAXO1ke6XRPpGr9Qfsbh
+         g2t/nc6RJ6SbdnF2FXwhVTnBq1EvZ+041ZrM6i5SfOPpLkeMhVBsODqlizubSSAm2d+b
+         c0aNf5/lDYhj4tQrT+S0lhe0WLy5cC8ELJin43bxEM2lnhoCNZdjnn23hOVakLcJER3Z
+         Z98g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Z3IpWY6hC6vHRC5+LJLa1BK+7bWdECMM9FiUHKFu/VA=;
-        b=rgb5Zn+3Q8P90f77tS6bP/sH/1NvIMVegsyvhl0wQwprgoQegtP/6jyOZo+HkERA5V
-         08WcRLriPpnzILLt7NCf8/R/EtCiy5FUPHyzNrmXcsdcNiRIZGYYfGvq7u0hRmrSo8zt
-         a/0U4gBOVkf6K0uvx1SOfSSRUys6WhbdkoiUbpX89wBgSy6Dgq6J4Jpcyy9BMsoY3KiQ
-         +Aziupt96tUby0T0+i04NYnPK2p2sAJEp3dz007E8hYO52LUk3pV+e11Esdbd7eLoHzh
-         jtUXctxzko33bczG8HOl0ggBarbkz6I3GkoebdRydLn0wwDjPHiULBRqM02pE4ExLCaA
-         /N8w==
-X-Gm-Message-State: AOAM532BpKoZm5rAwu1cPZtc00OaRr9dt3V3BQxTwFG6zUtEljgx/oTo
-        6ioPePqu0SSmWIYeXbFRwo6lRDEXBFr0Nw==
-X-Google-Smtp-Source: ABdhPJzLcOQXa3N/OD1cL1ho5sT+kfch84I/CVG+3Ubt8gmtcXkolDXBVTkHKmVWaRUQqQwbUp9Sng==
-X-Received: by 2002:a05:6808:5c7:: with SMTP id d7mr525910oij.147.1630701965608;
-        Fri, 03 Sep 2021 13:46:05 -0700 (PDT)
+        bh=YznRyopAqCuw4dasqam73G99JKILnKKYOqYTDQveRLc=;
+        b=h6XXDVx2XhA/wsnF5ngN2ZMYiqZ+FwAddZSTJyr9aSjokyrByOdKjgk/faJyODM0h+
+         yhd9qAX7zq2yklw7sJ9kBGLvjD13vsscZm16Iek3S2/POnGsiL0ank3gCanLNDVDWraM
+         7T8Nmp4ZyrBCTDjARyffxaH+Rd/T16v10O9qICVRag4uU5YCqXX2jx5sxoX5FOe4nMKV
+         2+V7tKPB3BJqpoW5kzVAu7DPWm0MqZqVt63fjh4ZjIo8EjZGtSY1tBNOrAHsHBG0SdLd
+         0ehNi+ICo9T3PdjI4AwvXHLjw/ayFGJrQoVrXCpks2p4pmXpqc275q0Tk3sIdZSW3yLp
+         I3pg==
+X-Gm-Message-State: AOAM530seks3ESBxO0m3vyGzUELkHuujcwW4l9fR0iq4NISXD+pdDXwP
+        45U4wVMU4PqMDmC1qWjFJS4=
+X-Google-Smtp-Source: ABdhPJyjs48bGxrVmYa8aihJ83miReXzopPurZYGQcVdQv2a4B/Y6McdisFYko2MTXXe2b6fwR9tfg==
+X-Received: by 2002:a4a:a2c5:: with SMTP id r5mr4591113ool.66.1630701967050;
+        Fri, 03 Sep 2021 13:46:07 -0700 (PDT)
 Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id be5sm90023oib.10.2021.09.03.13.46.04
+        by smtp.gmail.com with ESMTPSA id be5sm90023oib.10.2021.09.03.13.46.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 13:46:05 -0700 (PDT)
+        Fri, 03 Sep 2021 13:46:06 -0700 (PDT)
 From:   Ian Pilcher <arequipeno@gmail.com>
 To:     axboe@kernel.dk, pavel@ucw.cz
 Cc:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
         linux@vger.kernel.org, gregkh@linuxfoundation.org, kabel@kernel.org
-Subject: [PATCH 10/18] ledtrig-blkdev: Add function to associate the trigger with an LED
-Date:   Fri,  3 Sep 2021 15:45:40 -0500
-Message-Id: <20210903204548.2745354-11-arequipeno@gmail.com>
+Subject: [PATCH 12/18] ledtrig-blkdev: Add function to remove LED/device association
+Date:   Fri,  3 Sep 2021 15:45:42 -0500
+Message-Id: <20210903204548.2745354-13-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210903204548.2745354-1-arequipeno@gmail.com>
 References: <20210903204548.2745354-1-arequipeno@gmail.com>
@@ -72,79 +72,82 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allocate per-LED data structure and initialize with default values
+Remove symlinks in /sys/class/leds/<led>/block_devices and
+/sys/block/<disk>/blkdev_leds
 
-Create /sys/class/leds/<led>/block_devices directory
+Decrement reference count on /sys/block/<disk>/blkdev_leds
+directory (removes directory when empty)
 
-Increment module reference count.  Module can only be removed when no LEDs
-are associated with the trigger.
+Cancel delayed work if no device is associated with any LED
 
 Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 ---
- drivers/leds/trigger/ledtrig-blkdev.c | 54 +++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ drivers/leds/trigger/ledtrig-blkdev.c | 56 +++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
-index 37ba9bb3542e..bbf71ff18057 100644
+index e3169d1f0e38..7edbc48050a5 100644
 --- a/drivers/leds/trigger/ledtrig-blkdev.c
 +++ b/drivers/leds/trigger/ledtrig-blkdev.c
-@@ -198,3 +198,57 @@ static void blkdev_process(struct work_struct *const work)
- 	delay = READ_ONCE(ledtrig_blkdev_interval);
- 	WARN_ON_ONCE(!schedule_delayed_work(&ledtrig_blkdev_work, delay));
+@@ -409,3 +409,59 @@ static int blkdev_disk_add(struct ledtrig_blkdev_led *const led,
+ exit_return:
+ 	return ret;
  }
 +
 +
 +/*
 + *
-+ *	Associate an LED with the blkdev trigger
++ *	Disassociate a block device from an LED
 + *
 + */
 +
-+static int blkdev_activate(struct led_classdev *const led_dev)
++static void blkdev_disk_del_locked(struct ledtrig_blkdev_led *const led,
++				   struct ledtrig_blkdev_link *const link,
++				   struct ledtrig_blkdev_disk *const disk)
 +{
-+	struct ledtrig_blkdev_led *led;
-+	int ret;
++	--ledtrig_blkdev_count;
 +
-+	if (WARN_ON(!try_module_get(THIS_MODULE))) {
-+		ret = -ENODEV;		/* -ESHOULDNEVERHAPPEN */
-+		goto exit_return;
++	if (ledtrig_blkdev_count == 0)
++		WARN_ON(!cancel_delayed_work_sync(&ledtrig_blkdev_work));
++
++	sysfs_remove_link(led->dir, disk->gd->disk_name);
++	sysfs_remove_link(disk->dir, led->led_dev->name);
++	kobject_put(disk->dir);
++
++	hlist_del(&link->led_disks_node);
++	hlist_del(&link->disk_leds_node);
++	kfree(link);
++
++	if (hlist_empty(&disk->leds)) {
++		disk->gd->ledtrig = NULL;
++		kfree(disk);
 +	}
 +
-+	led = kmalloc(sizeof(*led), GFP_KERNEL);
-+	if (led == NULL) {
-+		ret = -ENOMEM;
-+		goto exit_put_module;
++	put_disk(disk->gd);
++}
++
++static void blkdev_disk_delete(struct ledtrig_blkdev_led *const led,
++			       const char *const disk_name,
++			       const size_t name_len)
++{
++	struct ledtrig_blkdev_link *link;
++
++	mutex_lock(&ledtrig_blkdev_mutex);
++
++	hlist_for_each_entry(link, &led->disks, led_disks_node) {
++
++		if (ledtrig_blkdev_streq(link->disk->gd->disk_name,
++						disk_name, name_len)) {
++			blkdev_disk_del_locked(led, link, link->disk);
++			goto exit_unlock;
++		}
 +	}
 +
-+	led->led_dev = led_dev;
-+	led->blink_msec = LEDTRIG_BLKDEV_BLINK_MSEC;
-+	led->mode = LEDTRIG_BLKDEV_MODE_RW;
-+	INIT_HLIST_HEAD(&led->disks);
-+
-+	ret = mutex_lock_interruptible(&ledtrig_blkdev_mutex);
-+	if (ret != 0)
-+		goto exit_free;
-+
-+	led->dir = kobject_create_and_add("block_devices", &led_dev->dev->kobj);
-+	if (led->dir == NULL) {
-+		ret = -ENOMEM;
-+		goto exit_unlock;
-+	}
-+
-+	hlist_add_head(&led->leds_node, &ledtrig_blkdev_leds);
-+	led_set_trigger_data(led_dev, led);
-+	ret = 0;
++	pr_info("blkdev LED: %.*s not associated with LED %s\n",
++		(int)name_len, disk_name, led->led_dev->name);
 +
 +exit_unlock:
 +	mutex_unlock(&ledtrig_blkdev_mutex);
-+exit_free:
-+	if (ret != 0)
-+		kfree(led);
-+exit_put_module:
-+	if (ret != 0)
-+		module_put(THIS_MODULE);
-+exit_return:
-+	return ret;
 +}
 -- 
 2.31.1
