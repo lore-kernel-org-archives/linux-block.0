@@ -2,112 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 970DAC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 14:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA9DC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:45:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81655610CE
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 14:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83C8E610C8
+	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:45:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349484AbhICOcM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Sep 2021 10:32:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11016 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S245253AbhICOcK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Sep 2021 10:32:10 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 183E6ICT026116;
-        Fri, 3 Sep 2021 10:30:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=K1dk/P2wTpVI0p3QS3od3mHTburBeWR5dUPZNm4udps=;
- b=j0I0w/iXGypIbDpx/9Wc7NKetsfLRypj6wFIqBJkCaIZgssBV0fHHzA3gt8HYyR/oWCM
- sMPBRS/SP0EYikutM+CLa2xxvB4dM+EI2yxw6+qt3L9x8q/NDvgFgE/B/9l/mQg/42dO
- fzmt/9lDlWjijJGNhKXys6/A8qVoD7qIBS247VhF5ycLZt5Awlxqhf2xfus7c8ENwWhk
- nIFYVZHgNV5wKBB1Koa+uj+hVLC/70npbU7CHAwqRaHSCz+HovzmXRP49QMbQjSQty/d
- KrV9LAdprASeGVVaLeXONQtlIO6T6PjmPRSwj1mGaNAdaWtbuQJ4/dJs5DzXZ7PEKsTU mQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3aukatbgkh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Sep 2021 10:30:48 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 183E6fhJ028767;
-        Fri, 3 Sep 2021 10:30:48 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3aukatbghf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Sep 2021 10:30:48 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 183ECDI1003658;
-        Fri, 3 Sep 2021 14:30:45 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 3au6q7h7vs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Sep 2021 14:30:44 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 183EUf9J45679086
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Sep 2021 14:30:41 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3572EA4064;
-        Fri,  3 Sep 2021 14:30:41 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22229A4072;
-        Fri,  3 Sep 2021 14:30:40 +0000 (GMT)
-Received: from osiris (unknown [9.145.159.114])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri,  3 Sep 2021 14:30:40 +0000 (GMT)
-Date:   Fri, 3 Sep 2021 16:30:38 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, gregkh@linuxfoundation.org,
-        chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
-        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
-        colin.king@canonical.com, shubhankarvk@gmail.com,
-        baijiaju1990@gmail.com, trix@redhat.com,
-        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
-        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
-        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 8/9] s390/block/scm_blk: add error handling support for
- add_disk()
-Message-ID: <YTIxjn1X0ES8my2a@osiris>
-References: <20210902174105.2418771-1-mcgrof@kernel.org>
- <20210902174105.2418771-9-mcgrof@kernel.org>
+        id S1350828AbhICUq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Sep 2021 16:46:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350253AbhICUq6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Sep 2021 16:46:58 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17CB7C061575;
+        Fri,  3 Sep 2021 13:45:58 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id l7-20020a0568302b0700b0051c0181deebso502273otv.12;
+        Fri, 03 Sep 2021 13:45:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J9S0kpV5mlX6BkGy78Jg15IjjkuNjYYMU9acmesUiW8=;
+        b=l6cEfKTpUhmCQInDxqV5sMQJUyLmKx9RP4RLk4GvLHmwEyyCsa02mM4FH65Jra4WjK
+         t3xIEU4uwIofgcRr2V1kCm+ttTHYgeXEJj1T4L8oOMbThudw8Asc0tSC47k9NEe/eOIe
+         NUNKMCGfg6Z1Hjj6qT/ggA25rJKMNazieiK6ESGAwrmq2UM1Frbv0lz5tP6PV/q9kxnh
+         Z5KbTW9+Fceyz7/d0Kn30S6AK4hUk+dab6ZacIsFr2NQ+I4nHw2fMTYYGjNkXg3BHgTi
+         NLWmOG8kuYOlw3TxIllrjkuNMiB0tkrle34fNO4Mg8tMdLPPRV6lPUnBrvYlyOF7wmS/
+         5FEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J9S0kpV5mlX6BkGy78Jg15IjjkuNjYYMU9acmesUiW8=;
+        b=VsdESxiusDNr/UkoJeqL67ZUw3gHa9A3obKHJJpWV2OJ1xjvx+ugAAUtwjew/sOD+q
+         fhUQTQYKmDJuKsp4SJNj1G1C/W3UNncrCx+q399HyFmukAS8mZIZyXb71zCcqaw/LcNU
+         m/pDTK2nV7Kp5Sqw4GatCn7Vt50sxY0bbpwq7yT99BMzN422Cv1UMv3TGXP3pgU0cqEm
+         WOOvwOQ24KthQn9R0oyY/msRzobkJTZYufPztXStmJZ/Bkh7/VmpHqQ1bvm5YV347VRD
+         abcvQn8oSaALr67OfGhbJSEW8eOXywlvk+Bw6GzXkf1qswFucYBX6vcP80A+gg3U0Gq7
+         G21g==
+X-Gm-Message-State: AOAM533GNx1mshFlMmv6f3USsmGQYE1c9UamTn4pfYjCaVn4rGIKUsH9
+        7K/USkxGyDqbb8djJiO/OVrHXtVsWDjIJA==
+X-Google-Smtp-Source: ABdhPJw12y/mpqmW7pi3b3/sKAlDEfSBdmWr4cw/oGORZJi8mWumS5JqDtY62F1wKbmYPSi6yEHThQ==
+X-Received: by 2002:a9d:411d:: with SMTP id o29mr794908ote.111.1630701957500;
+        Fri, 03 Sep 2021 13:45:57 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id be5sm90023oib.10.2021.09.03.13.45.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Sep 2021 13:45:56 -0700 (PDT)
+From:   Ian Pilcher <arequipeno@gmail.com>
+To:     axboe@kernel.dk, pavel@ucw.cz
+Cc:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
+        linux@vger.kernel.org, gregkh@linuxfoundation.org, kabel@kernel.org
+Subject: [PATCH 00/18] Introduce block device LED trigger
+Date:   Fri,  3 Sep 2021 15:45:30 -0500
+Message-Id: <20210903204548.2745354-1-arequipeno@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210902174105.2418771-9-mcgrof@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: V2U5m9F_lW0BS0QMZW1f02Rb7B-NE_bq
-X-Proofpoint-ORIG-GUID: mLI1i5uQ2HrD42lfDNoMT2JI_B9gbecH
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-09-03_05:2021-09-03,2021-09-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- mlxscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2108310000
- definitions=main-2109030088
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 02, 2021 at 10:41:04AM -0700, Luis Chamberlain wrote:
-> We never checked for errors on add_disk() as this function
-> returned void. Now that this is fixed, use the shiny new
-> error handling.
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  drivers/s390/block/scm_blk.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+This patch series adds a new "blkdev" LED trigger for disk (or other block
+device) activity LEDs.
 
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+It has the following functionality.
+
+* Supports all types of block devices, including virtual devices
+  (unlike the existing disk trigger which only works with ATA devices).
+
+* LEDs can be configured to show read activity, write activity, or both.
+
+* Supports multiple devices and multiple LEDs in arbitrary many-to-many
+  configurations.  For example, it is possible to configure multiple
+  devices with device-specific read activity LEDs and a shared write
+  activity LED.  (See Documentation/leds/ledtrig-blkdev.rst in the first
+  patch.)
+
+* Doesn't add any overhead in the I/O path.  Like the netdev LED trigger,
+  it periodically checks the configured devices for activity and blinks
+  its LEDs as appropriate.
+
+* Blink duration (per LED) and interval between activity checks (global)
+  are configurable.
+
+* Requires minimal changes to the block subsystem.
+
+  - Adds 1 pointer to struct gendisk,
+
+  - Adds (inline function) call in device_add_disk() to ensure that the
+    pointer is initialized to NULL (as protection against any drivers
+    that allocate a gendisk themselves and don't use kzalloc()), and
+
+  - Adds call in del_gendisk() to remove a device from the trigger when
+    that device is being removed.
+
+  These changes are all in patch #4, "block: Add block device LED trigger
+  integrations."
+
+* The trigger can be mostly built as a module.
+
+  When the trigger is modular, a small portion is built in to provide a
+  "stub" function which can be called from del_gendisk().  The stub calls
+  into the modular code via a function pointer when needed.  The trigger
+  also needs the ability to find gendisk's by name, which requires access
+  to the un-exported block_class and disk_type symbols.
+
+NOTES:
+
+* This patch series applies cleanly to the linux-block and linux-next
+  (20210903) trees.  All patches other than the block subsystem patch
+  (patch #4) apply cleanly to the linux-leds tree.
+
+* All patches compile (modulo warnings) with the trigger disabled,
+  modular, or built-in.
+
+Ian Pilcher (18):
+  docs: Add block device (blkdev) LED trigger documentation
+  ledtrig-blkdev: Add build infra for block device LED trigger
+  ledtrig-blkdev: Add function placeholders needed by block changes
+  block: Add block device LED trigger integrations
+  ledtrig-blkdev: Implement functions called from block subsystem
+  ledtrig-blkdev: Add function to get gendisk by name
+  ledtrig-blkdev: Add constants, data types, and global variables
+  ledtrig-blkdev: Add miscellaneous helper functions
+  ledtrig-blkdev: Periodically check devices for activity & blink LEDs
+  ledtrig-blkdev: Add function to associate the trigger with an LED
+  ledtrig-blkdev: Add function to associate a device with an LED
+  ledtrig-blkdev: Add function to remove LED/device association
+  ledtrig-blkdev: Add function to disassociate a device from all LEDs
+  ledtrig-blkdev: Add function to disassociate an LED from the trigger
+  ledtrig-blkdev: Add sysfs attributes to [un]link LEDs & devices
+  ledtrig-blkdev: Add blink_time & interval sysfs attributes
+  ledtrig-blkdev: Add mode (read/write/rw) sysfs attributue
+  ledtrig-blkdev: Add initialization & exit functions
+
+ Documentation/ABI/testing/sysfs-block         |   9 +
+ .../testing/sysfs-class-led-trigger-blkdev    |  48 ++
+ Documentation/leds/index.rst                  |   1 +
+ Documentation/leds/ledtrig-blkdev.rst         | 144 ++++
+ block/genhd.c                                 |   4 +
+ drivers/leds/trigger/Kconfig                  |  18 +
+ drivers/leds/trigger/Makefile                 |   2 +
+ drivers/leds/trigger/ledtrig-blkdev-core.c    |  78 ++
+ drivers/leds/trigger/ledtrig-blkdev.c         | 767 ++++++++++++++++++
+ drivers/leds/trigger/ledtrig-blkdev.h         |  27 +
+ include/linux/genhd.h                         |   3 +
+ include/linux/leds.h                          |  20 +
+ 12 files changed, 1121 insertions(+)
+ create mode 100644 Documentation/ABI/testing/sysfs-class-led-trigger-blkdev
+ create mode 100644 Documentation/leds/ledtrig-blkdev.rst
+ create mode 100644 drivers/leds/trigger/ledtrig-blkdev-core.c
+ create mode 100644 drivers/leds/trigger/ledtrig-blkdev.c
+ create mode 100644 drivers/leds/trigger/ledtrig-blkdev.h
+
+-- 
+2.31.1
+
