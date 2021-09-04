@@ -2,110 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91632C433F5
-	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 01:39:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5B0C433FE
+	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 01:45:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7959C6101A
-	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 01:39:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1AFA61051
+	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 01:45:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351078AbhIDBkp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Sep 2021 21:40:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50576 "EHLO
+        id S1351182AbhIDBqI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Sep 2021 21:46:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351057AbhIDBko (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Sep 2021 21:40:44 -0400
+        with ESMTP id S231389AbhIDBqH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Sep 2021 21:46:07 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4EBC061575;
-        Fri,  3 Sep 2021 18:39:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0678BC061575;
+        Fri,  3 Sep 2021 18:45:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=U7qsjNpZBkuuNQ3f0wVuSbAq2dxl5cyjOFVGEywo1xo=; b=RPNeY5S553G86UCtACRRsuReWA
-        Pf7d8IkN00oqTTx3vsnZiaK2pyXsMjqkQ/QhL6BzprrfTQEe42gLBIb59YZADPtuV9Tn8BuYUQpTB
-        N+u3oumOvhPHYeNzsFKK86V6ZEz96h7HT7Vn4+rCxdV53DFo4onHN+6/eNu9zzyNxravRpzP9C+gC
-        19/flcXayVqI8laB77OfwS8mF83K9UuV3xA9mw7+l3L7V1oH0yatBvcyhiYnrUW84ZGMzdovHPofb
-        Ra/b5dENtOvSiMXA8Z6v2niqRYzqW0j41STDDxLuQFc45jgRHHt3BJB0yM/wRLJ1c2MSxEewEFtTc
-        F6qEPVsw==;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=uPQkDJ1VLKwXdfWErXDT45f84FK2QVIicjx4PbKGh3A=; b=bNJedXy1Kcy9YJ7ZgSP0ssuRoq
+        5/vnhn9kTtboYQGK+zUAUyvrHpk6waeUmsrspruaChXP+WKsrE8DgttonEQXfIg1veyHp1Ank7aCO
+        j8M8XJtvPJPkje15WOPf+TG52Vp+5uH7EZ3H9Fyv0PdOwdkHkmamKS+RFnzqycY5VVRC5/P8TgZCv
+        M+u8QQtMm2CIv3CpDaRvWTqyEzw3SAGXxikHYAkNRZMRk/oCaiD5eJ7lH92fDVV8wiqzOZNMXgzwG
+        H03CfV/o4m6WH2Xr5VLXZCpXzIvR6igGZKnHZLZAXajy5snahLiyX8k4YNkG1OXvCqf2F9aEbcLZC
+        XbNCXHZA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mMKeb-00DLzv-7F; Sat, 04 Sep 2021 01:39:33 +0000
+        id 1mMKjm-00DMAS-PL; Sat, 04 Sep 2021 01:44:54 +0000
+Date:   Fri, 3 Sep 2021 18:44:54 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, hch@lst.de, efremov@linux.com, song@kernel.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        viro@zeniv.linux.org.uk, hare@suse.de, jack@suse.cz,
-        ming.lei@redhat.com, tj@kernel.org
-Cc:     linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 2/2] block: add __must_check for *add_disk*() callers
-Date:   Fri,  3 Sep 2021 18:39:32 -0700
-Message-Id: <20210904013932.3182778-3-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210904013932.3182778-1-mcgrof@kernel.org>
-References: <20210904013932.3182778-1-mcgrof@kernel.org>
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     axboe@kernel.dk, gregkh@linuxfoundation.org,
+        chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
+        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
+        colin.king@canonical.com, shubhankarvk@gmail.com,
+        baijiaju1990@gmail.com, trix@redhat.com,
+        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
+        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 9/9] s390/block/xpram: add error handling support for
+ add_disk()
+Message-ID: <YTLPlmWMhL4+03UH@bombadil.infradead.org>
+References: <20210902174105.2418771-1-mcgrof@kernel.org>
+ <20210902174105.2418771-10-mcgrof@kernel.org>
+ <YTIr1w/qPvgioUfL@osiris>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YTIr1w/qPvgioUfL@osiris>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we have done a spring cleaning on all drivers and added
-error checking / handling, let's keep it that way and ensure
-no new drivers fail to stick with it.
+On Fri, Sep 03, 2021 at 04:06:15PM +0200, Heiko Carstens wrote:
+> On Thu, Sep 02, 2021 at 10:41:05AM -0700, Luis Chamberlain wrote:
+> > We never checked for errors on add_disk() as this function
+> > returned void. Now that this is fixed, use the shiny new
+> > error handling.
+> > 
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >  drivers/s390/block/xpram.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/s390/block/xpram.c b/drivers/s390/block/xpram.c
+> > index ce98fab4d43c..ed3904b6a9c8 100644
+> > --- a/drivers/s390/block/xpram.c
+> > +++ b/drivers/s390/block/xpram.c
+> > @@ -371,7 +371,9 @@ static int __init xpram_setup_blkdev(void)
+> >  		disk->private_data = &xpram_devices[i];
+> >  		sprintf(disk->disk_name, "slram%d", i);
+> >  		set_capacity(disk, xpram_sizes[i] << 1);
+> > -		add_disk(disk);
+> > +		rc = add_disk(disk);
+> > +		if (rc)
+> > +			goto out;
+> 
+> Hmm, this is a more or less dead device driver, and I'm wondering if
+> we shouldn't remove it instead. But anyway, your patch is not correct:
+> 
+> - del_gendisk for all registered disks has to be called
+> - unregister_blkdev(XPRAM_MAJOR, XPRAM_NAME) is missing as well
+> 
+> That would be more or or less xpram_exit with parameter.
+> 
+> You can send a new patch or I can provide a proper one, whatever you
+> prefer.
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- block/genhd.c         | 6 +++---
- include/linux/genhd.h | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+You are more familiar with the code so it would be great if you can send
+a patch replacement and I will drop mine. I have quite a bit of other
+conversions to deal with.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index c4836296a974..4c80e6c3d8dd 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -383,8 +383,8 @@ static void disk_scan_partitions(struct gendisk *disk)
-  * This function registers the partitioning information in @disk
-  * with the kernel.
-  */
--int device_add_disk(struct device *parent, struct gendisk *disk,
--		     const struct attribute_group **groups)
-+int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups)
- 
- {
- 	struct device *ddev = disk_to_dev(disk);
-@@ -529,7 +529,7 @@ int device_add_disk(struct device *parent, struct gendisk *disk,
- out_free_ext_minor:
- 	if (disk->major == BLOCK_EXT_MAJOR)
- 		blk_free_ext_minor(disk->first_minor);
--	return WARN_ON_ONCE(ret); /* keep until all callers handle errors */
-+	return ret;
- }
- EXPORT_SYMBOL(device_add_disk);
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5828ecda5c49..8d78d36c424e 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -214,9 +214,9 @@ static inline dev_t disk_devt(struct gendisk *disk)
- void disk_uevent(struct gendisk *disk, enum kobject_action action);
- 
- /* block/genhd.c */
--int device_add_disk(struct device *parent, struct gendisk *disk,
--		const struct attribute_group **groups);
--static inline int add_disk(struct gendisk *disk)
-+int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups);
-+static inline int __must_check add_disk(struct gendisk *disk)
- {
- 	return device_add_disk(NULL, disk, NULL);
- }
--- 
-2.30.2
-
+ Luis
