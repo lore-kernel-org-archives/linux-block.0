@@ -7,69 +7,76 @@ X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE99C433F5
-	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 04:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51241C433F5
+	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 04:16:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E100A61057
-	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 04:14:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F1DA60F51
+	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 04:16:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231874AbhIDEP1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Sep 2021 00:15:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55934 "EHLO
+        id S229918AbhIDERm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Sep 2021 00:17:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231470AbhIDEP1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Sep 2021 00:15:27 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAA9C061575
-        for <linux-block@vger.kernel.org>; Fri,  3 Sep 2021 21:14:26 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id w8so983026pgf.5
-        for <linux-block@vger.kernel.org>; Fri, 03 Sep 2021 21:14:26 -0700 (PDT)
+        with ESMTP id S229605AbhIDERl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Sep 2021 00:17:41 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBACC061575
+        for <linux-block@vger.kernel.org>; Fri,  3 Sep 2021 21:16:40 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id z24-20020a17090acb1800b0018e87a24300so891557pjt.0
+        for <linux-block@vger.kernel.org>; Fri, 03 Sep 2021 21:16:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=UcWvFhD5MwoDOY9PK4UK1BXsroFoPK/symV/Mv/nYak=;
-        b=jo/iov4YMXoolTUq5oPel3fZyNKHfn6f5Y+AIfX6NcvOa1M26TpPb0Bh3qsOr8mxsS
-         UYPr72NJiTj3kVO+bKXhbhzj3kVmgpdNBSTN0SxM1v+NAoeeKG7ffqNgGVqGkr+QxadX
-         JbdvaV6ZTbNV9d2OyIydb6OnEZKxT7xCQKpNa4PQU8F0yPRXOoZUE6vGfnLk3dWsAQa1
-         3pbcHuXTMfs/DfZGXZulXy54NsbF7pB+aPJ18TNwLUJcLlNQXh4lUXO/FzkUZHGdwfp6
-         iGnZNi4rm2EDWCYvN2AgZ78gVbJR18QIEXpMuoujflk6tjY55HFg0ffLcyhshW/bERE8
-         /xvA==
+        bh=lebEMYnaBXWh/oOEd+GyspTLYi3am3ekjBpDHXWvtL0=;
+        b=EGVAtaztNlvVeen+iRB6J4VVSWTUwahaDRHvSBrAVRGIAL96ckc8FHgz/SIGPN+py9
+         mGlpq/DiZ/dLbjF2lA/fSAlPiR9hkwDkj2YHyft9HWENXAGOoqxwKFGbU0om0c7SYsqY
+         9nJBmY7SghaPCiESkhd9jTrPIGEtAZnpS845m4J48Kk14B7agvwHTAGjmYiBWKyPuK90
+         icrt/FWD2VAWRBcnkil0j1CnXb4x3pOO/UTd2KdmPpVh07bf00v/2FfNuEeOnq04op1Z
+         m6udH6eHwcGzuPjJQpjpNLleqFt+N1XKnHENKzDE0IhvvEXqSa8y1kxOrPF12rw4dl9q
+         7+5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=UcWvFhD5MwoDOY9PK4UK1BXsroFoPK/symV/Mv/nYak=;
-        b=swWLJihUXIU7iP9hQP4eJUxfPRb+bAcubF0RvP1wdlU7MRHHW6ubOtjufHfLw0t3/v
-         tSXZnyIyuJcwD00hC9sVK/eRbtYemJFPnKi8saQUly0hMsHb466AUpBS6hLl/gnat4FY
-         uELMWW+CEPWs9p0XYZ0eQLK1GDW27MaZ2+jU/f7QRNmWwhlXHv7Cg3+KLX2p5D/5NmC5
-         1G13OFd/B6Cd0UHBwFPUIjqDgQ6+O6F4qwab2/qcxhDbmsMB3eXT+XjcMSMrwvu0DOUK
-         b+pUbidXe3tO9EIHucR0Bl4daUWJjVb3/sZ4SL8lLeLPuTrswQcwhhE3z4cEqhhicaiY
-         rT0w==
-X-Gm-Message-State: AOAM530gEhrqnU2erSPcHWkUXMRdSHvNtmlDRYp8pG2yD7npHnkHiu8o
-        kulo4vD5AQQO6SgfAwVTe8qRE0pECfK1SQ==
-X-Google-Smtp-Source: ABdhPJw0BwcU6L5s0iWqnrPjqUKsSN3rK4/PCGHgeE0xpxGbPuvkKdOUwwFScJg+urdS8+VWqTT/mg==
-X-Received: by 2002:a63:7211:: with SMTP id n17mr2023331pgc.456.1630728865216;
-        Fri, 03 Sep 2021 21:14:25 -0700 (PDT)
+        bh=lebEMYnaBXWh/oOEd+GyspTLYi3am3ekjBpDHXWvtL0=;
+        b=ITQj0poZPd+BAwEuTjyXdmVnY3j/8C2Jdb/RrcVdzKiLV0OX4qqKEjXwWq+urp27hC
+         7j3wKW0cgP/fEBAZQaNiO2LmmJ0EGrZN4dOFRZSMZUB/1UA9ZGTubT1vJ8FntN6fbmij
+         raf1iyujZpHvNO2OSYZzhz4WpGEWQ1xpdY1oPrtZdUnZ2lhoR8FcSlWk8XgPo9VvaIMp
+         gKoB788m0aySpWDWhzYxVgX3on9xz1GLARy2b5gRONKwaX5bQbluhuC3rOPmYwh4Yf9P
+         hWzUpJcNzEfWQ0IG4NtE6atuhmBCzCgTkktyeVe2Ywo7ZEOPUphJvM1cF5PbwgtJl7Iq
+         a3wg==
+X-Gm-Message-State: AOAM532u4l0YrCVc17/CaMq685Com+P1MikUez8Gky7nzhCBagKKdqA0
+        iYObgOEqMaoJJToTt4ZjpURRN+vcF29HBg==
+X-Google-Smtp-Source: ABdhPJwn2uAXkUOGbDP3NLXeXgakdHwr/xKMBMiCEvGaf6rk9KCbOIBiVi3Gh0mMpa2TvQzRhJ4dfw==
+X-Received: by 2002:a17:90a:c8b:: with SMTP id v11mr2364937pja.114.1630729000111;
+        Fri, 03 Sep 2021 21:16:40 -0700 (PDT)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id p4sm869536pgc.15.2021.09.03.21.14.23
+        by smtp.gmail.com with ESMTPSA id u123sm765402pfb.123.2021.09.03.21.16.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Sep 2021 21:14:24 -0700 (PDT)
-Subject: Re: [PATCH 1/2] block: make __register_blkdev() return an error
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Luis Chamberlain <mcgrof@kernel.org>, hch@lst.de
-Cc:     linux-block@vger.kernel.org
-References: <20210904013932.3182778-1-mcgrof@kernel.org>
- <20210904013932.3182778-2-mcgrof@kernel.org>
- <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
+        Fri, 03 Sep 2021 21:16:39 -0700 (PDT)
+Subject: Re: [PATCH v3] loop: reduce the loop_ctl_mutex scope
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Hillf Danton <hdanton@sina.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        linux-block <linux-block@vger.kernel.org>
+References: <2642808b-a7d0-28ff-f288-0f4eabc562f7@i-love.sakura.ne.jp>
+ <20210827184302.GA29967@lst.de>
+ <73c53177-be1b-cff1-a09e-ef7979a95200@i-love.sakura.ne.jp>
+ <20210828071832.GA31755@lst.de>
+ <c5e509ec-2361-af25-ec73-e033b5b46ebb@i-love.sakura.ne.jp>
+ <33a0a1e5-a79f-1887-6417-c5a81f58e47d@i-love.sakura.ne.jp>
+ <cc5c215f-4b3b-94e9-560b-a02d0e23c97c@i-love.sakura.ne.jp>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5ae5f0d7-66f3-83f3-8692-389587369a5d@kernel.dk>
-Date:   Fri, 3 Sep 2021 22:14:21 -0600
+Message-ID: <c47bb93f-2265-7901-58f6-4327842d9247@kernel.dk>
+Date:   Fri, 3 Sep 2021 22:16:37 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
+In-Reply-To: <cc5c215f-4b3b-94e9-560b-a02d0e23c97c@i-love.sakura.ne.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,13 +84,34 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/3/21 8:49 PM, Tetsuo Handa wrote:
-> By the way, Jens, will you pick up
-> https://lkml.kernel.org/r/adb1e792-fc0e-ee81-7ea0-0906fc36419d@i-love.sakura.ne.jp
-> before these "add error handling" changes?
+On 8/29/21 7:47 AM, Tetsuo Handa wrote:
+> syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
+> commit a160c6159d4a0cf8 ("block: add an optional probe callback to
+> major_names") is calling the module's probe function with major_names_lock
+> held.
+> 
+> Fortunately, since commit 990e78116d38059c ("block: loop: fix deadlock
+> between open and remove") stopped holding loop_ctl_mutex in lo_open(),
+> current role of loop_ctl_mutex is to serialize access to loop_index_idr
+> and loop_add()/loop_remove(); in other words, management of id for IDR.
+> To avoid holding loop_ctl_mutex during whole add/remove operation, use
+> a bool flag to indicate whether the loop device is ready for use.
+> 
+> loop_unregister_transfer() which is called from cleanup_cryptoloop()
+> currently has possibility of use-after-free access due to lack of
+> serialization between kfree() from loop_remove() from loop_control_remove()
+> and mutex_lock() from unregister_transfer_cb(). But since lo->lo_encryption
+> should be already NULL when this function is called due to module unload,
+> and commit 222013f9ac30b9ce ("cryptoloop: add a deprecation warning")
+> indicates that we will remove this function shortly, this patch updates
+> this function to emit warning instead of checking lo->lo_encryption.
+> 
+> Holding loop_ctl_mutex in loop_exit() is pointless, for all users must
+> close /dev/loop-control and /dev/loop$num (in order to drop module's
+> refcount to 0) before loop_exit() starts, and nobody can open
+> /dev/loop-control or /dev/loop$num afterwards.
 
-Yes, that one is 5.15 material, the rest of the error handling changes
-are not. Hence the ordering follows naturally from that.
+Applied, thanks.
 
 -- 
 Jens Axboe
