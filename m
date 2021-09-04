@@ -2,176 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B78BAC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 929D1C433F5
+	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 01:35:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A51B2610D2
-	for <linux-block@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66F62610A2
+	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 01:35:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351012AbhICUrS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Sep 2021 16:47:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41524 "EHLO
+        id S1350871AbhIDBgk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Sep 2021 21:36:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351048AbhICUrO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Sep 2021 16:47:14 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D380C061575;
-        Fri,  3 Sep 2021 13:46:12 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id h133so673379oib.7;
-        Fri, 03 Sep 2021 13:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=6RxZPutweWrWoAFf03RV/RX9kRQZgKxHijlvrwy4xeA=;
-        b=RgPP6Ox8lfChSOGOvKCshakVU8K42fiVf9AekVvRd+sls6YR9BWYOJ+QnHFvLtCbUc
-         dTp3QoWjxs673/bsgaCYI017mIXxfw+Gyt+lveYDg1Q+r781kFq9zYR/EIwtWn9NXVlU
-         LhL8oIFMmsmoTliD/nwOy3xx/kXd7O3pIhX/YkHjTd7UMXS6KZPNXyPEzfRFufCyjY2f
-         HfuabWsWmYWjAFYMEEIgru67GE0vlvLvkcp4t9pYZHZ9CU4cyFBAbDocmbsf2acXLdaW
-         hwOgBKbuplFY2AEvr9tD8Dj9vF3bD/Yq3pL1mLNPJfGnD/i/3gVL2ZOfIlRZlMqRZUW/
-         TL1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6RxZPutweWrWoAFf03RV/RX9kRQZgKxHijlvrwy4xeA=;
-        b=IQwzDF23iYvXN7x1uxrszURvoBLLvHQOMRUIVC1+Jx4W/l/h8/9LBRrJpIjbJubj4Q
-         rDiVkEjS5rJYzwZo66JO1HhY40N8GoVLwvlzZ1HWbqc3lc2rKkuLOvnhzylxMMGJB4N9
-         Ic+sPpMSHEhEpxWPxJE9i2fLiv7J96HxFF1ZVCZOVc3l3+AyGt0Wm/N5A+zqnaAnvAg7
-         vcRLZAMZuu6dqLZ6K8lMdKE927Id1C6eOjpxC99rFiWWCMRE4UZmblPU9dl9K0ofI4vV
-         vNR1SB4iHZyrV5QIfyAOqxa/WoTsKhvb/EDeqTfj6ZDtaBKnTA8TxI47oiBfK3ukI6gh
-         G3qw==
-X-Gm-Message-State: AOAM532FjmSAOejPHHlOqPquVUiDcVxMri5CctzIG9HTGXlUsa03zhRm
-        Cs0g4dCUvR+/XIO31w4tGx4=
-X-Google-Smtp-Source: ABdhPJyX1DP4KjospELGfmNuC3H0LsiPs0SiUM4J8LnFz91opZoawTlnBvfOqwgEOVpLq7a95+oUaA==
-X-Received: by 2002:a05:6808:1911:: with SMTP id bf17mr536077oib.91.1630701971737;
-        Fri, 03 Sep 2021 13:46:11 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id be5sm90023oib.10.2021.09.03.13.46.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 13:46:11 -0700 (PDT)
-From:   Ian Pilcher <arequipeno@gmail.com>
-To:     axboe@kernel.dk, pavel@ucw.cz
-Cc:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
-        linux@vger.kernel.org, gregkh@linuxfoundation.org, kabel@kernel.org
-Subject: [PATCH 18/18] ledtrig-blkdev: Add initialization & exit functions
-Date:   Fri,  3 Sep 2021 15:45:48 -0500
-Message-Id: <20210903204548.2745354-19-arequipeno@gmail.com>
+        with ESMTP id S242102AbhIDBgk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Sep 2021 21:36:40 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F332EC061575;
+        Fri,  3 Sep 2021 18:35:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=5/KxCfQiey/MtVRClHtspmiQ1YyvZXCUQ0jBAHLWIRA=; b=nNxjmuRKSBgbrgOslmRl1e8Yys
+        tpZbl2fGmNOY3pzs9qNfk35JkwU6ERi7wtkNtqT+FJSU7L5Bh1oFeSiCfz35WtG2r0o+Zej8c49iV
+        feb4fJXtsA8HMMFyneR7V+vWKhfI9Er2bBjCb8Ajyx8I+Bo9C4+pSLEED31tc9NBflswiIg/S/MIE
+        vVhIK3sFvR1LLF1V1epFyU7bW8yOCsRgXQSLLwjZOAfu/XWqea5LgTlYvNe0c7zmWvd+wjpMCaXqC
+        C6Gyx33WgYqd1GUplEd+yIk9aGQ0BDd1ghgyS+KkGTL7S8Hg+df2O5cTfO+RrcF5Ir0erHw9VMfiH
+        F417lsNw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mMKan-00DLbC-Fx; Sat, 04 Sep 2021 01:35:37 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, efremov@linux.com, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH 06/14] amiflop: add error handling support for add_disk()
+Date:   Fri,  3 Sep 2021 18:35:28 -0700
+Message-Id: <20210904013536.3181237-7-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210903204548.2745354-1-arequipeno@gmail.com>
-References: <20210903204548.2745354-1-arequipeno@gmail.com>
+In-Reply-To: <20210904013536.3181237-1-mcgrof@kernel.org>
+References: <20210904013536.3181237-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Init function:
- * Initialize interval (convert default value to jiffies)
- * Initialize __ledtrig_blkdev_disk_cleanup function pointer
- * Register the block device LED trigger
+We never checked for errors on add_disk() as this function
+returned void. Now that this is fixed, use the shiny new
+error handling. The caller for fd_alloc_disk() deals with
+the rest of the cleanup like the tag.
 
-Exit functioon:
- * Unregister the LED trigger
- * Set __ledtrig_blkdev_disk_cleanup back to NULL
-
-Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/leds/trigger/ledtrig-blkdev.c | 78 +++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+ drivers/block/amiflop.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
-index ec167633e329..e6ff5baada2e 100644
---- a/drivers/leds/trigger/ledtrig-blkdev.c
-+++ b/drivers/leds/trigger/ledtrig-blkdev.c
-@@ -687,3 +687,81 @@ static ssize_t blkdev_mode_store(struct device *const dev,
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 8b1714021498..7da6a7532cde 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1780,6 +1780,7 @@ static const struct blk_mq_ops amiflop_mq_ops = {
+ static int fd_alloc_disk(int drive, int system)
+ {
+ 	struct gendisk *disk;
++	int err;
  
- static struct device_attribute ledtrig_blkdev_attr_mode =
- 	__ATTR(mode, 0644, blkdev_mode_show, blkdev_mode_store);
-+
-+
-+/*
-+ *
-+ *	Initialization - register the trigger
-+ *
-+ */
-+
-+static struct attribute *ledtrig_blkdev_attrs[] = {
-+	&ledtrig_blkdev_attr_add.attr,
-+	&ledtrig_blkdev_attr_del.attr,
-+	&ledtrig_blkdev_attr_blink_time.attr,
-+	&ledtrig_blkdev_attr_interval.attr,
-+	&ledtrig_blkdev_attr_mode.attr,
-+	NULL
-+};
-+
-+static const struct attribute_group ledtrig_blkdev_attr_group = {
-+	.attrs	= ledtrig_blkdev_attrs,
-+};
-+
-+static const struct attribute_group *ledtrig_blkdev_attr_groups[] = {
-+	&ledtrig_blkdev_attr_group,
-+	NULL
-+};
-+
-+static struct led_trigger ledtrig_blkdev_trigger = {
-+	.name		= "blkdev",
-+	.activate	= blkdev_activate,
-+	.deactivate	= blkdev_deactivate,
-+	.groups		= ledtrig_blkdev_attr_groups,
-+};
-+
-+static int __init blkdev_init(void)
-+{
-+	int ret;
-+
-+	ret = mutex_lock_interruptible(&ledtrig_blkdev_mutex);
-+	if (ret != 0)
-+		return ret;
-+
-+	ledtrig_blkdev_interval = msecs_to_jiffies(LEDTRIG_BLKDEV_INTERVAL);
-+	__ledtrig_blkdev_disk_cleanup = blkdev_disk_cleanup;
-+
-+	/*
-+	 * Can't call led_trigger_register() with ledtrig_blkdev_mutex locked.
-+	 * If an LED has blkdev as its default_trigger, blkdev_activate() will
-+	 * be called for that LED, and it will try to lock the mutex, which will
-+	 * hang.
-+	 */
-+	mutex_unlock(&ledtrig_blkdev_mutex);
-+
-+	ret = led_trigger_register(&ledtrig_blkdev_trigger);
-+	if (ret != 0) {
-+		mutex_lock(&ledtrig_blkdev_mutex);
-+		__ledtrig_blkdev_disk_cleanup = NULL;
-+		mutex_unlock(&ledtrig_blkdev_mutex);
-+	}
-+
-+	return ret;
-+}
-+module_init(blkdev_init);
-+
-+static void __exit blkdev_exit(void)
-+{
-+	mutex_lock(&ledtrig_blkdev_mutex);
-+
-+	/*
-+	 * It's OK to call led_trigger_unregister() with the mutex locked,
-+	 * because the module can only be unloaded when no LEDs are using
-+	 * the blkdev trigger, so blkdev_deactivate() won't be called.
-+	 */
-+	led_trigger_unregister(&ledtrig_blkdev_trigger);
-+	__ledtrig_blkdev_disk_cleanup = NULL;
-+
-+	mutex_unlock(&ledtrig_blkdev_mutex);
-+}
-+module_exit(blkdev_exit);
+ 	disk = blk_mq_alloc_disk(&unit[drive].tag_set, NULL);
+ 	if (IS_ERR(disk))
+@@ -1798,8 +1799,10 @@ static int fd_alloc_disk(int drive, int system)
+ 	set_capacity(disk, 880 * 2);
+ 
+ 	unit[drive].gendisk[system] = disk;
+-	add_disk(disk);
+-	return 0;
++	err = add_disk(disk);
++	if (err)
++		blk_cleanup_disk(disk);
++	return err;
+ }
+ 
+ static int fd_alloc_drive(int drive)
 -- 
-2.31.1
+2.30.2
 
