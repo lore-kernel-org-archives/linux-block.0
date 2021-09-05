@@ -2,78 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DD5C433EF
-	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 18:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2B9C433F5
+	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 18:42:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 955F560232
-	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 18:11:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C560560F6D
+	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 18:42:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238139AbhIESMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Sep 2021 14:12:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42512 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238124AbhIESMo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Sep 2021 14:12:44 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217C4C061575
-        for <linux-block@vger.kernel.org>; Sun,  5 Sep 2021 11:11:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=p8aku6deYsnC1Rl2Pv2bYisBKiEg/qHT0F2g7t0ztIE=; b=IxALWL/lWGme5SHk7Br8S8fEQF
-        AAJgnKQuiIZhHMzwTU7RNAVfnGocinY5yyJQaFLRGCrr2EY1Ey271csVrD3qHhFeGUH6a9zD6Md4a
-        Gi61tUrz5o53q2ITXpN8/y1cmCq4i57rLkWMcrwoq76RHuOODfHyy9E4BQid2d3HotdaRUscghj/5
-        NfjFxSDPG1FR/Zcxh67xgKp7RE58tt342EsOFlGOSsa3MdBWcK1y4oGbgC84A12corar/w4cM2k8N
-        F5l5C/0jtQBJVR6syoXyyKUaGDZ7mTKTUhCZEKPYVqFfgqQkakuaAx4Lxh7LQ6rIortianwei3QlA
-        oSp/SwuA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mMwcB-00GDQ7-VP; Sun, 05 Sep 2021 18:11:35 +0000
-Date:   Sun, 5 Sep 2021 11:11:35 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: make __register_blkdev() return an error
-Message-ID: <YTUIV0mSJHfgtMov@bombadil.infradead.org>
-References: <20210904013932.3182778-1-mcgrof@kernel.org>
- <20210904013932.3182778-2-mcgrof@kernel.org>
- <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
+        id S233368AbhIESn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Sep 2021 14:43:56 -0400
+Received: from jabberwock.ucw.cz ([46.255.230.98]:55186 "EHLO
+        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232996AbhIESn4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Sep 2021 14:43:56 -0400
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 44D921C0B77; Sun,  5 Sep 2021 20:42:51 +0200 (CEST)
+Date:   Sun, 5 Sep 2021 20:42:50 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Ian Pilcher <arequipeno@gmail.com>
+Cc:     axboe@kernel.dk, linux-leds@vger.kernel.org,
+        linux-block@vger.kernel.org, gregkh@linuxfoundation.org,
+        kabel@kernel.org
+Subject: Re: [PATCH 01/18] docs: Add block device (blkdev) LED trigger
+ documentation
+Message-ID: <20210905184250.GA9022@amd>
+References: <20210903204548.2745354-1-arequipeno@gmail.com>
+ <20210903204548.2745354-2-arequipeno@gmail.com>
+ <20210904062938.GA25286@amd>
+ <63839834-d383-d224-8bbd-d37c6803a68f@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
 Content-Disposition: inline
-In-Reply-To: <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <63839834-d383-d224-8bbd-d37c6803a68f@gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 04, 2021 at 11:49:06AM +0900, Tetsuo Handa wrote:
-> On 2021/09/04 10:39, Luis Chamberlain wrote:
-> > diff --git a/fs/block_dev.c b/fs/block_dev.c
-> > index 45df6cbccf12..81a4738910a8 100644
-> > --- a/fs/block_dev.c
-> > +++ b/fs/block_dev.c
-> > @@ -1144,10 +1144,13 @@ struct block_device *blkdev_get_no_open(dev_t dev)
-> >  {
-> >  	struct block_device *bdev;
-> >  	struct inode *inode;
-> > +	int ret;
-> >  
-> >  	inode = ilookup(blockdev_superblock, dev);
-> >  	if (!inode) {
-> > -		blk_request_module(dev);
-> > +		ret = blk_request_module(dev);
-> > +		if (ret)
-> > +			return NULL;
-> 
-> Since e.g. loop_add() from loop_probe() returns -EEXIST when /dev/loop$num already
-> exists (e.g. raced with ioctl(LOOP_CTL_ADD)), isn't unconditionally failing an over-failing?
 
-It's not clear to me how. What do we loose by capturing the failure on
-blk_request_module()?
+--HlL+5n6rz5pIUxbD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  Luis
+Hi!
+
+> >>+What:		/sys/class/leds/<led>/add_blkdev
+> >>+Date:		September 2021
+> >>+Contact:	Ian Pilcher <arequipeno@gmail.com>
+> >>+Description:
+> >>+		Associate a block device with this LED by writing its kernel
+> >>+		name (as shown in /sys/block) to this attribute.  Multiple
+> >>+		device names may be written at once, separated by whitespace.
+> >
+> >This is seriously strange interface.
+>=20
+> It's the netdev-like interface that Marek described in an earlier note
+> (adapted for the fact that the trigger supports many-to-many
+> relationships).
+>=20
+> >If you have directory with symlinks, why not use symlink() syscall
+> >instead of add_blkdev, and unlink() syscall instead of delete_blkdev?
+>=20
+> I'd actually had that thought as well, but I didn't see any obvious way
+> to do that in sysfs when I looked.  If you know how to do it or know of
+> an example, please let me know.
+
+We got Greg in the Cc list, he'd be right person to talk to...
+
+> If using symlink()/unlink() isn't an option, do you have a suggestion
+> for a less seriously strange interface?
+
+Let us explore this possibility, first.
+
+Best regards,
+								Pavel
+
+--=20
+http://www.livejournal.com/~pavelmachek
+
+--HlL+5n6rz5pIUxbD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAmE1D6oACgkQMOfwapXb+vJMWgCginEN4Y9uJOdO0H7JnjicsLqx
+yjIAoJXBr/8EHsWbDG3d+hS3W5luf+HM
+=eTQh
+-----END PGP SIGNATURE-----
+
+--HlL+5n6rz5pIUxbD--
