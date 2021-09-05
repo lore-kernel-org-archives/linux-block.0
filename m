@@ -2,93 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B87AC433F5
-	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 22:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F21BC433F5
+	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 07:46:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C0D760F56
-	for <linux-block@archiver.kernel.org>; Sat,  4 Sep 2021 22:43:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1565960F6D
+	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 07:46:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232386AbhIDWod (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Sep 2021 18:44:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42854 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231791AbhIDWoc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Sep 2021 18:44:32 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1BCBC061575;
-        Sat,  4 Sep 2021 15:43:30 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id k18-20020a4abd92000000b002915ed21fb8so808610oop.11;
-        Sat, 04 Sep 2021 15:43:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=K1KBH14ukRdTqfxlfcYpnpFAkXW2p3PaOBEyhrjt3Rs=;
-        b=krFuniIcEKgkIVKBB130U6mKXmMpZJYZd0KFW0qsMFUIXW5/ZR9iQ+fkmyn612UUvZ
-         iqUF3gslW5B0vbMbcetU+Cm/4+SgvEPePE3VqrOiL0PdPCHy/7PebIt6NaK8Iu8ISLd9
-         GCQMdtXP2gCT/7KL0Y8Jrr10bxMa3XdqXkhgFgvA8u2qm5W3xNysAJ9NY2Bl861k1wTx
-         YJlqTKe5Pf7h/P4ftGH1kQ2iwIf2uNYPQdsVhJIMnRNmM/cHpYoriPkd8B3+n6fd7g8E
-         6E2QO6sSPBO2+mPFFohApq4gUvTjwv5kdeTdjV5SqTdG3/1+yYlyA0wKDsk4US9Xv+Cv
-         wzaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K1KBH14ukRdTqfxlfcYpnpFAkXW2p3PaOBEyhrjt3Rs=;
-        b=Mf78fdfz8Qwb1sZAAH6AixtKvxeDWqINvwmQIhtbQf4K2fEE1iAK4BXYoy2aKcyvNB
-         Kes6bLn+bmQ8jdZ3q1UwuqajOQatgOKndawtCpV2bcSPJ63I0IDUsdIRqcdDbsN1I2/D
-         U1j+7hloMw7goYuR+TVLoVr2hpEFwKCpcnEy6GkNr+EELg4TFSw3WxfXwo9S8yDkBE6p
-         rqbgVeSFLlXhMrvgocRi3GRB604HgyEuSkeDQfbWt7K/LW0sIserl9RrYrPkVzKTnM+R
-         q6O/WoeR7A3znvPt7Q2xeRZTyy7XbIkPWQmpB/RyMvon0YLSAayZEQgvld/A562dnvVb
-         8XSw==
-X-Gm-Message-State: AOAM532aXiBLLNtmk8s4ySvrhuN6cYdfwnlQR0Oo9HwWH/915z/TzORK
-        8xNwlbXw9/PCztBFRYvu9Dc=
-X-Google-Smtp-Source: ABdhPJzecL7CPopjagtjkn7rHueLxNbP5Iz5na41HkDvQ09mHfeOTaPr8C6ednieHNXLUwlP4qpHgg==
-X-Received: by 2002:a4a:d088:: with SMTP id i8mr8558728oor.68.1630795410221;
-        Sat, 04 Sep 2021 15:43:30 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id o24sm688398oie.17.2021.09.04.15.43.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Sep 2021 15:43:29 -0700 (PDT)
-Subject: Re: [PATCH 08/18] ledtrig-blkdev: Add miscellaneous helper functions
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
-        linux-block@vger.kernel.org, kabel@kernel.org
-References: <20210903204548.2745354-1-arequipeno@gmail.com>
- <20210903204548.2745354-9-arequipeno@gmail.com> <YTMLmHBHas3ViJdM@kroah.com>
-From:   Ian Pilcher <arequipeno@gmail.com>
-Message-ID: <4b903bfc-0756-ce67-d066-5be2ec5c986a@gmail.com>
-Date:   Sat, 4 Sep 2021 17:43:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S234942AbhIEHrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Sep 2021 03:47:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53184 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229599AbhIEHrj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 5 Sep 2021 03:47:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C849360555;
+        Sun,  5 Sep 2021 07:46:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630827996;
+        bh=O/ZxP3FhOz37k0frdZmwLZpa5oBRB8mmxRGdut1wTDs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l/n5ExtJ0lN140PPLg37CRQXuH3DT+TA3Oki8D+6E8+aoYkaeS3r68Rucy5CGcKbI
+         mpp9ne8wEbkSqnLUxI2hGXfIdxTvYXYkEmfEUzPMGn3FYHzNmjmCkMLagls1eJqpRh
+         wWVoCqII96pbG56Tt6e9mjtgw9QcVdTbs3hU5lGdOBJEibeq9n/uNR3xnormFYb1f9
+         9c2tNLosDtsYTePJ6Y/c+SXGfD/3uJd+SGXSS4LXw8O74bNXXqWleV9E7f79nzkw0C
+         WCTE+4WdfdKFbLhkQFWG9TChM2kWIJXtPjkuCvV0gopzPjDXiG8Uqj5ItTWHdAr+Af
+         THLmYI/iz//nA==
+Date:   Sun, 5 Sep 2021 10:46:32 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     hch@infradead.org, mst@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
+        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
+ parameter
+Message-ID: <YTR12AHOGs1nhfz1@unreal>
+References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <YTMLmHBHas3ViJdM@kroah.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210902204622.54354-1-mgurtovoy@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/4/21 1:00 AM, Greg KH wrote:
-> Why are block devices odd and need to have spaces found in their names?
+On Thu, Sep 02, 2021 at 11:46:22PM +0300, Max Gurtovoy wrote:
+> Sometimes a user would like to control the amount of request queues to
+> be created for a block device. For example, for limiting the memory
+> footprint of virtio-blk devices.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> ---
+> 
+> changes from v2:
+>  - renamed num_io_queues to num_request_queues (from Stefan)
+>  - added Reviewed-by signatures (from Stefan and Christoph)
+> 
+> changes from v1:
+>  - use param_set_uint_minmax (from Christoph)
+>  - added "Should > 0" to module description
+> 
+> Note: This commit apply on top of Jens's branch for-5.15/drivers
+> 
+> ---
+>  drivers/block/virtio_blk.c | 21 ++++++++++++++++++++-
+>  1 file changed, 20 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 4b49df2dfd23..aaa2833a4734 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -24,6 +24,23 @@
+>  /* The maximum number of sg elements that fit into a virtqueue */
+>  #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+>  
+> +static int virtblk_queue_count_set(const char *val,
+> +		const struct kernel_param *kp)
+> +{
+> +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
+> +}
+> +
+> +static const struct kernel_param_ops queue_count_ops = {
+> +	.set = virtblk_queue_count_set,
+> +	.get = param_get_uint,
+> +};
+> +
+> +static unsigned int num_request_queues;
+> +module_param_cb(num_request_queues, &queue_count_ops, &num_request_queues,
+> +		0644);
+> +MODULE_PARM_DESC(num_request_queues,
+> +		 "Number of request queues to use for blk device. Should > 0");
+> +
 
-They aren't.  The functions are used to identify the block device names
-within the buffer that is passed to attribute store functions, which may
-contain whitespace.
+Won't it limit all virtio block devices to the same limit?
 
-> And are you sure we do not already have string functions that do this?
+It is very common to see multiple virtio-blk devices on the same system
+and they probably need different limits.
 
-I did look a bit.  I can't be sure, but I didn't find anything similar.
-
--- 
-========================================================================
-                  In Soviet Russia, Google searches you!
-========================================================================
+Thanks
