@@ -2,86 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2FFEC433F5
-	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 16:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DD5C433EF
+	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 18:11:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBEBB60F92
-	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 16:55:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 955F560232
+	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 18:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238063AbhIEQ4T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Sep 2021 12:56:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49670 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231804AbhIEQ4S (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 5 Sep 2021 12:56:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0575E60698;
-        Sun,  5 Sep 2021 16:55:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630860915;
-        bh=peja4UsmMQfd8162o4jydzYRnQjZBpaPQebO4NjOaUk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ktr3orceGvMj7XfR74R6yCylxjd9QrwRFY1SWdvll0KqAECbe1zchQPWF01tTr1oL
-         ZAix4FOO8sro4/YJvX1OyuH5P4y94DfSImBKalZEu1Y1SQvfio6JHZnLpw1Fn0jfM2
-         EhMA2X1dQg6nmJ/3yndktwEUgsZTORhGzjmdV8Alo2JF3rqLcFvlF/cYmzflkn5nP+
-         O4Dpg/MhTzVpCTBdmXfoj+TR95WfEVUNGT7VZeP25uSeCYiXp2eFnhaSnq2ml8moe9
-         cXDdIFtAktAod0s1FIyUR5v2Xeb4vFnVig9VaT+zmScOhPgbHOayhCdnmOCVuFqTvB
-         7B1jiodwN6i6g==
-Date:   Sun, 5 Sep 2021 09:55:13 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Ian Pilcher <arequipeno@gmail.com>, axboe@kernel.dk, pavel@ucw.cz,
-        linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
-        kabel@kernel.org
-Subject: Re: [PATCH 09/18] ledtrig-blkdev: Periodically check devices for
- activity & blink LEDs
-Message-ID: <YTT2cbhFkxtWw0mO@sol.localdomain>
-References: <20210903204548.2745354-1-arequipeno@gmail.com>
- <20210903204548.2745354-10-arequipeno@gmail.com>
- <YTMLxdQ3TFKPN+WH@kroah.com>
- <8b0a2244-d81c-1099-927f-cfe9b04a4285@gmail.com>
- <YTTZiBWz0Rc7+IGZ@kroah.com>
- <cf19e61d-97a6-1463-3072-d3527d8a1e3a@gmail.com>
- <YTTeZ1kSQMRZNpz7@kroah.com>
+        id S238139AbhIESMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Sep 2021 14:12:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42512 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238124AbhIESMo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Sep 2021 14:12:44 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217C4C061575
+        for <linux-block@vger.kernel.org>; Sun,  5 Sep 2021 11:11:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=p8aku6deYsnC1Rl2Pv2bYisBKiEg/qHT0F2g7t0ztIE=; b=IxALWL/lWGme5SHk7Br8S8fEQF
+        AAJgnKQuiIZhHMzwTU7RNAVfnGocinY5yyJQaFLRGCrr2EY1Ey271csVrD3qHhFeGUH6a9zD6Md4a
+        Gi61tUrz5o53q2ITXpN8/y1cmCq4i57rLkWMcrwoq76RHuOODfHyy9E4BQid2d3HotdaRUscghj/5
+        NfjFxSDPG1FR/Zcxh67xgKp7RE58tt342EsOFlGOSsa3MdBWcK1y4oGbgC84A12corar/w4cM2k8N
+        F5l5C/0jtQBJVR6syoXyyKUaGDZ7mTKTUhCZEKPYVqFfgqQkakuaAx4Lxh7LQ6rIortianwei3QlA
+        oSp/SwuA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mMwcB-00GDQ7-VP; Sun, 05 Sep 2021 18:11:35 +0000
+Date:   Sun, 5 Sep 2021 11:11:35 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: make __register_blkdev() return an error
+Message-ID: <YTUIV0mSJHfgtMov@bombadil.infradead.org>
+References: <20210904013932.3182778-1-mcgrof@kernel.org>
+ <20210904013932.3182778-2-mcgrof@kernel.org>
+ <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YTTeZ1kSQMRZNpz7@kroah.com>
+In-Reply-To: <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Sep 05, 2021 at 05:12:39PM +0200, Greg KH wrote:
-> On Sun, Sep 05, 2021 at 09:56:58AM -0500, Ian Pilcher wrote:
-> > On 9/5/21 9:51 AM, Greg KH wrote:
-> > > On Sun, Sep 05, 2021 at 09:39:57AM -0500, Ian Pilcher wrote:
-> > > > On 9/4/21 1:01 AM, Greg KH wrote:
-> > > > > Please never use WARN_ON() in new code unless the machine is really
-> > > > > broken and you can not do anything else here.
-> > > > 
-> > > > Wait what?  I thought that was BUG_ON.
-> > > 
-> > > Not whan panic-on-warn is set, which is getting more and more common
-> > > these days.
-> > 
-> > Fair enough.  What is the recommend approach to reporting a "this should
-> > never" happen situation these days?
+On Sat, Sep 04, 2021 at 11:49:06AM +0900, Tetsuo Handa wrote:
+> On 2021/09/04 10:39, Luis Chamberlain wrote:
+> > diff --git a/fs/block_dev.c b/fs/block_dev.c
+> > index 45df6cbccf12..81a4738910a8 100644
+> > --- a/fs/block_dev.c
+> > +++ b/fs/block_dev.c
+> > @@ -1144,10 +1144,13 @@ struct block_device *blkdev_get_no_open(dev_t dev)
+> >  {
+> >  	struct block_device *bdev;
+> >  	struct inode *inode;
+> > +	int ret;
+> >  
+> >  	inode = ilookup(blockdev_superblock, dev);
+> >  	if (!inode) {
+> > -		blk_request_module(dev);
+> > +		ret = blk_request_module(dev);
+> > +		if (ret)
+> > +			return NULL;
 > 
-> dev_err() and handle the error properly.
-> 
-> 
+> Since e.g. loop_add() from loop_probe() returns -EEXIST when /dev/loop$num already
+> exists (e.g. raced with ioctl(LOOP_CTL_ADD)), isn't unconditionally failing an over-failing?
 
-WARN_ON is the right choice for reporting recoverable kernel bugs, and BUG_ON
-for unrecoverable ones; see the two comments in include/asm-generic/bug.h which
-explain this.  Please don't use dev_err() if it's a kernel bug (and not just
-unexpected input from userspace or hardware behaving weirdly), as that prevents
-the bug from being reported if it occurs.
+It's not clear to me how. What do we loose by capturing the failure on
+blk_request_module()?
 
-Greg, you've been corrected on this before, e.g.
-https://lore.kernel.org/linux-fsdevel/20210707023548.15872-1-desmondcheongzx@gmail.com/T/#u.
-Please stop spreading false information as it is destroying your credibility :-(
-
-- Eric
+  Luis
