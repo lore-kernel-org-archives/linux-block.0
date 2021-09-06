@@ -2,99 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57270C433FE
-	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 23:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 754FFC4167B
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2744F60F4A
-	for <linux-block@archiver.kernel.org>; Sun,  5 Sep 2021 23:13:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EC5261050
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232677AbhIEXOL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Sep 2021 19:14:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52402 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbhIEXOL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Sep 2021 19:14:11 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C32A1C061575;
-        Sun,  5 Sep 2021 16:13:07 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id q11-20020a9d4b0b000000b0051acbdb2869so6598053otf.2;
-        Sun, 05 Sep 2021 16:13:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9V7Q8GI/TqQmdot0u+T3jPQv2cYpKk0ofFHeNMLopg8=;
-        b=eAobxRbWcGWVPMl1ri9Ahhvz/St326GOPO4m8WMcHyO6AKnVcE7rIvrcINaqcPvmxH
-         Qn0/NxPEZR45/FJ4FkYs4lMsKabjGJWIkTtazotOe9C2tOOPhf6cJiIKgXzW2D0lICaZ
-         7p8M261F4bVbGTI4uSRhrHah358wndsYI/fOeF81wwMjUSe+xLXWINR2WK39emMmLiGb
-         TSu7A7Q7e5StrFNwY8RURR14tH0cK2FV+krrk5BQ7Yq0ZhPGdCU738d4ImFXzkEeMoJX
-         PHzauFoMzqjR+qxmPzObLKJLXkyLE1N69EeW4IyPq+slXrErqFvt7mSivaSPLxNn5/Ug
-         TvtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9V7Q8GI/TqQmdot0u+T3jPQv2cYpKk0ofFHeNMLopg8=;
-        b=GWX2v9sCkHZfViKW+Fk+huGOPMg1DL6RIhEP6BaA15g+fbtGP4GKB3venB+hBVuwvR
-         A4mnrDyUN0L93v7EzdPHmy8pYHEuSF8Aya3RxRsySMiOfXTYT6xrIHfE94Hko3B0R7G5
-         xj/js1SgkUePqjJrofMm1AiLqHC8EzF1nZEGxishxoGJMPbKp0T6ZUe4gs9VySyj4S91
-         uVNdAr1+NVUpXvXIY0sNTbfmuB5ZSnS/FfSbHLAOLCQ+Q5T2l2DgA2BKxE+cwHnhs+Bw
-         5gaYmPikEiy5kh8Zex+W+GDng16iLHBcozDEfjEVW0qQ+QlTLOrwVN139xamRRQQD2k2
-         0LdQ==
-X-Gm-Message-State: AOAM530t6T/NIFkcgQO3/YlEXMj82SJP/js91CA147uiNytanVRMWwoK
-        35s+g1fDSls9qopdRYzsxU0=
-X-Google-Smtp-Source: ABdhPJxDr2QyXamxFr4GsQXBb03lz58moFk4nVQzgByKbogKvJvVZ5zcfMxYnDKa2I21GQHiwbEH1Q==
-X-Received: by 2002:a9d:719b:: with SMTP id o27mr8741297otj.257.1630883586482;
-        Sun, 05 Sep 2021 16:13:06 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id h3sm1413512otu.7.2021.09.05.16.13.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Sep 2021 16:13:06 -0700 (PDT)
-Subject: Re: [PATCH 01/18] docs: Add block device (blkdev) LED trigger
- documentation
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     axboe@kernel.dk, linux-leds@vger.kernel.org,
-        linux-block@vger.kernel.org, gregkh@linuxfoundation.org,
-        kabel@kernel.org
-References: <20210903204548.2745354-1-arequipeno@gmail.com>
- <20210903204548.2745354-2-arequipeno@gmail.com> <20210904062938.GA25286@amd>
- <63839834-d383-d224-8bbd-d37c6803a68f@gmail.com> <20210905184250.GA9022@amd>
-From:   Ian Pilcher <arequipeno@gmail.com>
-Message-ID: <4a295f62-b61a-81ae-72c5-43e15408c2a4@gmail.com>
-Date:   Sun, 5 Sep 2021 18:13:05 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S238866AbhIFBVb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:21:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37826 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238679AbhIFBVR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:21:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E12CA6108E;
+        Mon,  6 Sep 2021 01:20:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630891213;
+        bh=mABDKOQrNOYmohIEZGbu+NdedYH3RHu/VM8TY9sq2bI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=aGXpONY9NGBiLz4IqcKjkJsOMnhBSlomI8IcdCMPvGobasPM8d4/IJNOVg9dHfaUC
+         kGHguuB28U5Xvxu21j8HbktJ+nk4RdEkArtylbknJQLMI3hBbRCcl5XU8a0i5XEiF4
+         j8ZFiimTJUjT+gYeaH430psDGWyJJQq+SBhPH+K4Mad1ehlZZgpbsTvcjnk9E+8It/
+         baYl1p/h2Kudkr7mmL0zK5xiKRYFhOpWG6ip+VWk5spCz4inWawRuZG793aU6Lc4A6
+         i44Ue8Z7N+M010EnR29xz2DVtwwohIQKV9AAiRmNrMYHXFM3/9K+W2A13aRGhtrWjV
+         VWdlHMbLomwuw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Baokun Li <libaokun1@huawei.com>, Hulk Robot <hulkci@huawei.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH AUTOSEL 5.14 18/47] nbd: add the check to prevent overflow in __nbd_ioctl()
+Date:   Sun,  5 Sep 2021 21:19:22 -0400
+Message-Id: <20210906011951.928679-18-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210906011951.928679-1-sashal@kernel.org>
+References: <20210906011951.928679-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210905184250.GA9022@amd>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/5/21 1:42 PM, Pavel Machek wrote:
->> If using symlink()/unlink() isn't an option, do you have a suggestion
->> for a less seriously strange interface?
-> 
-> Let us explore this possibility, first.
+From: Baokun Li <libaokun1@huawei.com>
 
-It doesn't look like either sysfs or configfs is set up to react to
-symlink()/unlink() calls so, I don't think it's possible to implement
-that interface.
+[ Upstream commit fad7cd3310db3099f95dd34312c77740fbc455e5 ]
 
-I don't personally know of any current sysfs API that manages a set of
-things like this, so I don't have anything on which to model an
-interface right now.
+If user specify a large enough value of NBD blocks option, it may trigger
+signed integer overflow which may lead to nbd->config->bytesize becomes a
+large or small value, zero in particular.
 
+UBSAN: Undefined behaviour in drivers/block/nbd.c:325:31
+signed integer overflow:
+1024 * 4611686155866341414 cannot be represented in type 'long long int'
+[...]
+Call trace:
+[...]
+ handle_overflow+0x188/0x1dc lib/ubsan.c:192
+ __ubsan_handle_mul_overflow+0x34/0x44 lib/ubsan.c:213
+ nbd_size_set drivers/block/nbd.c:325 [inline]
+ __nbd_ioctl drivers/block/nbd.c:1342 [inline]
+ nbd_ioctl+0x998/0xa10 drivers/block/nbd.c:1395
+ __blkdev_driver_ioctl block/ioctl.c:311 [inline]
+[...]
+
+Although it is not a big deal, still silence the UBSAN by limit
+the input value.
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Baokun Li <libaokun1@huawei.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Link: https://lore.kernel.org/r/20210804021212.990223-1-libaokun1@huawei.com
+[axboe: dropped unlikely()]
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/nbd.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 19f5d5a8b16a..acf3f85bf3c7 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1388,6 +1388,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 		       unsigned int cmd, unsigned long arg)
+ {
+ 	struct nbd_config *config = nbd->config;
++	loff_t bytesize;
+ 
+ 	switch (cmd) {
+ 	case NBD_DISCONNECT:
+@@ -1402,8 +1403,9 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 	case NBD_SET_SIZE:
+ 		return nbd_set_size(nbd, arg, config->blksize);
+ 	case NBD_SET_SIZE_BLOCKS:
+-		return nbd_set_size(nbd, arg * config->blksize,
+-				    config->blksize);
++		if (check_mul_overflow((loff_t)arg, config->blksize, &bytesize))
++			return -EINVAL;
++		return nbd_set_size(nbd, bytesize, config->blksize);
+ 	case NBD_SET_TIMEOUT:
+ 		nbd_set_cmd_timeout(nbd, arg);
+ 		return 0;
 -- 
-========================================================================
-                  In Soviet Russia, Google searches you!
-========================================================================
+2.30.2
+
