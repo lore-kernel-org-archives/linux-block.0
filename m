@@ -2,166 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3894C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 11:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D85C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 11:44:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAE4A6056B
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 11:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 501D260FBF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 11:44:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240647AbhIFLWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Sep 2021 07:22:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37286 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241070AbhIFLWA (ORCPT
+        id S236388AbhIFLp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Sep 2021 07:45:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34828 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231173AbhIFLpZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Sep 2021 07:22:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630927255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PwCcwobqarvdp7b4ZxKmDRuHy822IrmJf431Zj87HGM=;
-        b=c8VndKIXRd3uk4l/vu4ezfYK7J6KNb0Du+QtllfoiroG7oy8SwZ5+hyF2SrGCYDxLuV/Ql
-        zcHohVvcsFXhk/2YAsJnKZUrSd9gJBp40zD5ZI72ZIIdNmFrboxR9CZxwYuz8qU/BvdLrI
-        4YpWkmsd8VLqyRiDxAjh9InDSaMipyM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-ktTCRRWsMEmKd597qESsOw-1; Mon, 06 Sep 2021 07:20:54 -0400
-X-MC-Unique: ktTCRRWsMEmKd597qESsOw-1
-Received: by mail-ej1-f69.google.com with SMTP id ak17-20020a170906889100b005c5d1e5e707so2185839ejc.16
-        for <linux-block@vger.kernel.org>; Mon, 06 Sep 2021 04:20:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PwCcwobqarvdp7b4ZxKmDRuHy822IrmJf431Zj87HGM=;
-        b=HpsakGoc/Fo19CvFzUEdPU53uzNcn+ds94S8riBYSb7KMQ0VupXziTegFZKuKFbBFc
-         sMMUSD63cT9Fbw0tONXKU4JI3hXgNAQmbge3Wf+1mU/IcYUWPvofJGr8+VDOZ7XS3WNk
-         I80ashhcAro0cedEByR/pnlZmyTxCFoIZI/ZqvH7VU01ffiTeoY4o2xA9F1gWJK5WHEu
-         Bc2owsyVxH4vSJLlOD0NvI/dyiGyQKU4hANH9NYCw80uOQ5iYqHfuONk3V9lppccVsAO
-         vOFOJ9ruKOChaP/1/HmoYfdZMZLQriiJylBjGfP1hOtdAzd/Obcs9RFmCdP+aV19QFsT
-         NL5Q==
-X-Gm-Message-State: AOAM530/9OHYPSIZP5pAgQcz7NIdWM5arWtNGiy/MeMwc02hY+nnHlZa
-        i5hfnfBFAZnfxoA5AhPAq0+4mq6g69o1CgQdxaATf9XsmOZSTFc70Rk8oYAljIU8gnCxziyBQvM
-        UcpnDpF60GmWGI+c6ACe2Dq4=
-X-Received: by 2002:a50:fb08:: with SMTP id d8mr12725040edq.160.1630927253392;
-        Mon, 06 Sep 2021 04:20:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwnXiZkAIDU73uVyPn+3O20GkHTxFw7vX6uAGTN6zNHOCvY8p6FyX/5L/Q7XXf2IlUH+ouktQ==
-X-Received: by 2002:a50:fb08:: with SMTP id d8mr12725016edq.160.1630927253147;
-        Mon, 06 Sep 2021 04:20:53 -0700 (PDT)
-Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id f1sm4406891edq.89.2021.09.06.04.20.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Sep 2021 04:20:51 -0700 (PDT)
-Date:   Mon, 6 Sep 2021 07:20:47 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, hch@infradead.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
-Message-ID: <20210906071957-mutt-send-email-mst@kernel.org>
-References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
- <YTDVkDIr5WLdlRsK@stefanha-x1.localdomain>
- <20210905120234-mutt-send-email-mst@kernel.org>
- <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
+        Mon, 6 Sep 2021 07:45:25 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 186BXrJc036697;
+        Mon, 6 Sep 2021 07:43:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=YDq2fdygf8Y3QfqeYgjO/iDMTPx1mMqDc6x9GEPkVK8=;
+ b=rXGDkgyuwG12cXOP7sKpTlrDfxf78vS+ERlDVQCznYwY5Umu8fLmsvJUXjC5BHfSGofC
+ mNZLMiKDL4Pej8yeE74rxKpkwA6ruFPgvcgdkod+CtyruxDbqBiM7l0TRHnXzBae4/kc
+ gleUWs3TeQju2cuGcS33ONcK2nO9ltXSFCx/VXaqcgb8oytTbnYbaQHzPi5FqSrVVY+x
+ FSQ0ordEbBK0kmS4GWXSfP4mo5ddON6BAOT/n5lSJ+/1sAR7UCL/FnPvnhXwNf5cRgkB
+ X1h0P192iHYvBq71WsaqpcK+siTe0Tf9Ogc7eOakqhmdwAs6sGnyxW2fZUFNmf6ePqiG ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3awj5t0901-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 07:43:56 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 186BYkTj039013;
+        Mon, 6 Sep 2021 07:43:55 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3awj5t08yj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 07:43:55 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 186BhLge007528;
+        Mon, 6 Sep 2021 11:43:53 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3av0e938eu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 11:43:53 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 186BhnlL43975164
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 Sep 2021 11:43:49 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C8747A4054;
+        Mon,  6 Sep 2021 11:43:49 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 36C25A405C;
+        Mon,  6 Sep 2021 11:43:48 +0000 (GMT)
+Received: from thinkpad (unknown [9.171.78.139])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon,  6 Sep 2021 11:43:48 +0000 (GMT)
+Date:   Mon, 6 Sep 2021 13:43:46 +0200
+From:   Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Heiko Carstens <hca@linux.ibm.com>, axboe@kernel.dk,
+        gregkh@linuxfoundation.org, chaitanya.kulkarni@wdc.com,
+        atulgopinathan@gmail.com, hare@suse.de, maximlevitsky@gmail.com,
+        oakad@yahoo.com, ulf.hansson@linaro.org, colin.king@canonical.com,
+        shubhankarvk@gmail.com, baijiaju1990@gmail.com, trix@redhat.com,
+        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
+        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 7/9] s390/block/dcssblk: add error handling support for
+ add_disk()
+Message-ID: <20210906134346.19c14246@thinkpad>
+In-Reply-To: <YTLP8mYBX37R++9E@bombadil.infradead.org>
+References: <20210902174105.2418771-1-mcgrof@kernel.org>
+        <20210902174105.2418771-8-mcgrof@kernel.org>
+        <YTIscKy+jg5L/TMh@osiris>
+        <YTLP8mYBX37R++9E@bombadil.infradead.org>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: lKjoO_-t65aECnh67DPT1WhBnwVtT5Mm
+X-Proofpoint-GUID: koNu9BnZWKx9Oz09ckXYLCDs_6zcUj8t
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-06_05:2021-09-03,2021-09-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ adultscore=0 mlxscore=0 spamscore=0 clxscore=1011 malwarescore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2108310000 definitions=main-2109060073
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
-> 
-> On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
-> > On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
-> > > On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
-> > > > Sometimes a user would like to control the amount of IO queues to be
-> > > > created for a block device. For example, for limiting the memory
-> > > > footprint of virtio-blk devices.
-> > > > 
-> > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > > ---
-> > > > 
-> > > > changes from v1:
-> > > >   - use param_set_uint_minmax (from Christoph)
-> > > >   - added "Should > 0" to module description
-> > > > 
-> > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
-> > > > ---
-> > > >   drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
-> > > >   1 file changed, 19 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > index 4b49df2dfd23..9332fc4e9b31 100644
-> > > > --- a/drivers/block/virtio_blk.c
-> > > > +++ b/drivers/block/virtio_blk.c
-> > > > @@ -24,6 +24,22 @@
-> > > >   /* The maximum number of sg elements that fit into a virtqueue */
-> > > >   #define VIRTIO_BLK_MAX_SG_ELEMS 32768
-> > > > +static int virtblk_queue_count_set(const char *val,
-> > > > +		const struct kernel_param *kp)
-> > > > +{
-> > > > +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
-> > > > +}
+On Fri, 3 Sep 2021 18:46:26 -0700
+Luis Chamberlain <mcgrof@kernel.org> wrote:
 
+> On Fri, Sep 03, 2021 at 04:08:48PM +0200, Heiko Carstens wrote:
+> > On Thu, Sep 02, 2021 at 10:41:03AM -0700, Luis Chamberlain wrote:
+> > > We never checked for errors on add_disk() as this function
+> > > returned void. Now that this is fixed, use the shiny new
+> > > error handling.
+> > >=20
+> > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > > ---
+> > >  drivers/s390/block/dcssblk.c | 4 +++-
+> > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssbl=
+k.c
+> > > index 5be3d1c39a78..b0fd5009a12e 100644
+> > > --- a/drivers/s390/block/dcssblk.c
+> > > +++ b/drivers/s390/block/dcssblk.c
+> > > @@ -696,7 +696,9 @@ dcssblk_add_store(struct device *dev, struct devi=
+ce_attribute *attr, const char
+> > >  	}
+> > > =20
+> > >  	get_device(&dev_info->dev);
+> > > -	device_add_disk(&dev_info->dev, dev_info->gd, NULL);
+> > > +	rc =3D device_add_disk(&dev_info->dev, dev_info->gd, NULL);
+> > > +	if (rc)
+> > > +		goto put_dev;
+> >=20
+> > This looks not correct to me. We seem to have now in case of an error:
+> >=20
+> > - reference count imbalance (=3D memory leak)
+> > - dax cleanup is missing
+>=20
+> Care to provide an alternative?
 
-Hmm which tree is this for?
+See patch below:
 
-> > > > +
-> > > > +static const struct kernel_param_ops queue_count_ops = {
-> > > > +	.set = virtblk_queue_count_set,
-> > > > +	.get = param_get_uint,
-> > > > +};
-> > > > +
-> > > > +static unsigned int num_io_queues;
-> > > > +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
-> > > > +MODULE_PARM_DESC(num_io_queues,
-> > > > +		 "Number of IO virt queues to use for blk device. Should > 0");
+=46rom 7053b5f8c0a126c3ef450de3668d9963bd68ceaa Mon Sep 17 00:00:00 2001
+From: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+Date: Mon, 6 Sep 2021 13:18:53 +0200
+Subject: [PATCH] s390/block/dcssblk: add error handling support for add_dis=
+k()
 
+Signed-off-by: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+---
+ drivers/s390/block/dcssblk.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-
-better:
-
-+MODULE_PARM_DESC(num_io_request_queues,
-+                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-
-
-> > > > +
-> > > >   static int major;
-> > > >   static DEFINE_IDA(vd_index_ida);
-> > > > @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
-> > > >   	if (err)
-> > > >   		num_vqs = 1;
-> > > > -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-> > > > +	num_vqs = min_t(unsigned int,
-> > > > +			min_not_zero(num_io_queues, nr_cpu_ids),
-> > > > +			num_vqs);
-> > > If you respin, please consider calling them request queues. That's the
-> > > terminology from the VIRTIO spec and it's nice to keep it consistent.
-> > > But the purpose of num_io_queues is clear, so:
-> > > 
-> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > I did this:
-> > +static unsigned int num_io_request_queues;
-> > +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
-> > +MODULE_PARM_DESC(num_io_request_queues,
-> > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-> 
-> The parameter is writable and can be changed and then new devices might be
-> probed with new value.
-> 
-> It can't be zero in the code. we can change param_set_uint_minmax args and
-> say that 0 says nr_cpus.
-> 
-> I'm ok with the renaming but I prefer to stick to the description we gave in
-> V3 of this patch (and maybe enable value of 0 as mentioned above).
+diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
+index 5be3d1c39a78..0741a9321712 100644
+--- a/drivers/s390/block/dcssblk.c
++++ b/drivers/s390/block/dcssblk.c
+@@ -696,7 +696,9 @@ dcssblk_add_store(struct device *dev, struct device_att=
+ribute *attr, const char
+ 	}
+=20
+ 	get_device(&dev_info->dev);
+-	device_add_disk(&dev_info->dev, dev_info->gd, NULL);
++	rc =3D device_add_disk(&dev_info->dev, dev_info->gd, NULL);
++	if (rc)
++		goto out_dax;
+=20
+ 	switch (dev_info->segment_type) {
+ 		case SEG_TYPE_SR:
+@@ -712,6 +714,10 @@ dcssblk_add_store(struct device *dev, struct device_at=
+tribute *attr, const char
+ 	rc =3D count;
+ 	goto out;
+=20
++out_dax:
++	put_device(&dev_info->dev);
++	kill_dax(dev_info->dax_dev);
++	put_dax(dev_info->dax_dev);
+ put_dev:
+ 	list_del(&dev_info->lh);
+ 	blk_cleanup_disk(dev_info->gd);
+--=20
+2.25.1
 
