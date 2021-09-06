@@ -2,100 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C323C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 06:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E3EC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 06:56:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34D9D60F92
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 06:50:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9194D60F92
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 06:56:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239795AbhIFGva (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Sep 2021 02:51:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38140 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239832AbhIFGvR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Sep 2021 02:51:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630911013;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=qnzDfejYmhnz+7BovVT3U6Ivvhyjw+CAVfiG7DYXSTE=;
-        b=Hy9snunJqfKLYCVelGwysN6uaD2y+p3a0YC52t5leVlPC0Ud30P1iUj8FfwXi9SM5GVSQN
-        3Jfad5Lga1ORH3rQ8d1vkwVdicJ2dGEdZ0wIiofkRmdp1b/Hhuqd/KJW83swkMHk1yZ2YN
-        KRLLf2leK7l8yGTNc5kJyQabxPlFKKk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-iwgMxG35OTOHjCT1sahnyQ-1; Mon, 06 Sep 2021 02:50:12 -0400
-X-MC-Unique: iwgMxG35OTOHjCT1sahnyQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S238906AbhIFG5T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Sep 2021 02:57:19 -0400
+Received: from ozlabs.org ([203.11.71.1]:38799 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238731AbhIFG5T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Sep 2021 02:57:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1630911373;
+        bh=jcQ/6Pc2/Mt2USwYnSLPOKPRTPl5IBzg5wdJ+DsqOfU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lVjpohUObh6Y3PtsCAvjMPA4kN4HEgpAyFQG1/va5qROWZw5H2KaHx2kjUESB1uQn
+         JZNLQRFrIC71SUGvqtnHI/sQsmOnmfv4pPgPAp/NuEl0n/L+V0UuBf7FA5x07rJJxB
+         BN8hIB/fklXGRv9yWe/8kEMLDiOg3WMdd7Jk+VcicHXOl80v1BeIcdrJTEM8e+7DXM
+         8SYtVeNNm9o8gClgIiVZ1ixbv3TiKt8laGOicxcF6206kcP2Ox+ou5VIouZw34Nbkf
+         3R8xE/Bp8W05QXHaRmqMGiXh3Hw+BDpx8tFm6F96M2rJDar6VRc29v0YadJ0feAQnY
+         xrSVFachn/muA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDD5480006E;
-        Mon,  6 Sep 2021 06:50:10 +0000 (UTC)
-Received: from localhost (ovpn-8-35.pek2.redhat.com [10.72.8.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 10D751970F;
-        Mon,  6 Sep 2021 06:50:06 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4H2zhF2Pt3z9sCD;
+        Mon,  6 Sep 2021 16:56:12 +1000 (AEST)
+Date:   Mon, 6 Sep 2021 16:56:11 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        luojiaxing <luojiaxing@huawei.com>
-Subject: [PATCH] blk-mq: avoid to iterate over stale request
-Date:   Mon,  6 Sep 2021 14:50:03 +0800
-Message-Id: <20210906065003.439019-1-ming.lei@redhat.com>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block/mq-deadline: Move dd_queued() to fix defined but
+ not used warning
+Message-ID: <20210906165611.0e52f096@canb.auug.org.au>
+In-Reply-To: <a0592ddf-306a-a833-785f-750a601487dd@kernel.dk>
+References: <20210830091128.1854266-1-geert@linux-m68k.org>
+        <caf2449c-e86d-195d-3635-9be49159166a@kernel.dk>
+        <20210906125605.658fe211@canb.auug.org.au>
+        <a0592ddf-306a-a833-785f-750a601487dd@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: multipart/signed; boundary="Sig_/dmmp0/GyNKKoKjoHbF.jZAc";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk-mq can't run allocating driver tag and updating ->rqs[tag]
-atomically, meantime blk-mq doesn't clear ->rqs[tag] after the driver
-tag is released.
+--Sig_/dmmp0/GyNKKoKjoHbF.jZAc
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-So there is chance to iterating over one stale request just after the
-tag is allocated and before updating ->rqs[tag].
+Hi Jens,
 
-scsi_host_busy_iter() calls scsi_host_check_in_flight() to count scsi
-in-flight requests after scsi host is blocked, so no new scsi command can
-be marked as SCMD_STATE_INFLIGHT. However, driver tag allocation still can
-be run by blk-mq core. One request is marked as SCMD_STATE_INFLIGHT,
-but this request may have been kept in another slot of ->rqs[], meantime
-the slot can be allocated out but ->rqs[] isn't updated yet. Then this
-in-flight request is counted twice as SCMD_STATE_INFLIGHT. This way causes
-trouble in handling scsi error.
+On Sun, 5 Sep 2021 21:04:17 -0600 Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Sure, it's actually the only branch I haven't sent off yet today. Will
+> do so now.
 
-Fixes the issue by not iterating over stale request.
+Excellent, thanks.
 
-Cc: linux-scsi@vger.kernel.org
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Reported-by: luojiaxing <luojiaxing@huawei.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-tag.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--=20
+Cheers,
+Stephen Rothwell
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 86f87346232a..ff5caeb82542 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -208,7 +208,7 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
- 
- 	spin_lock_irqsave(&tags->lock, flags);
- 	rq = tags->rqs[bitnr];
--	if (!rq || !refcount_inc_not_zero(&rq->ref))
-+	if (!rq || rq->tag != bitnr || !refcount_inc_not_zero(&rq->ref))
- 		rq = NULL;
- 	spin_unlock_irqrestore(&tags->lock, flags);
- 	return rq;
--- 
-2.31.1
+--Sig_/dmmp0/GyNKKoKjoHbF.jZAc
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmE1u4sACgkQAVBC80lX
+0Gy41wf9FCzS6NlUsQLBdscrRA81iTYhS9n4HRGSyuEjmj/9/Vz2PCj/gmSt4XcE
+81IIpVI/deTJOPYsRiMJU1Wp252Z0/FNeZ7Iw7Qkh5k+3Y4mtw8VVYLUCJ1w4csq
+3nOYl8QxVvFY0qpR93e10wsqH4Um0OOajQYL4EjKzUuPyJsgtbyIb4cksP2u3/UV
+LXyDLWVmIC8lXiglj0XaXYsuV56+fESkWuqjDhBmRNdWod8XutHAlwAvUkRpMlU5
+xLsgpKpjQoNMY41flj9Ye3tElsF9pxiCjaupdIdQ77RLiES6ZuR8P+YK7mFMlw1M
+SpJCffgw63RAfKmaPSlogXd5QMI6uw==
+=aQJc
+-----END PGP SIGNATURE-----
+
+--Sig_/dmmp0/GyNKKoKjoHbF.jZAc--
