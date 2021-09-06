@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63BA0C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A44C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 01:22:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D5D361050
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E6FB61183
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 01:22:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238867AbhIFBVb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:21:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37640 "EHLO mail.kernel.org"
+        id S239412AbhIFBXk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:23:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38826 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238772AbhIFBVT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:21:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6B0046103C;
-        Mon,  6 Sep 2021 01:20:14 +0000 (UTC)
+        id S238638AbhIFBWl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:22:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BF4A3610F9;
+        Mon,  6 Sep 2021 01:21:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891215;
-        bh=65vUzIHosokjdaiU2mI3mWtnnhk7OoCsr8Qsm8mX+t4=;
+        s=k20201202; t=1630891276;
+        bh=5a2B2wEQdX4iBESIH14jy80cKIeGSwVc0TLqChQrICo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WtOdBUubrSoZ7RPQlwWyZ+nbq6ACpGDLsakZ9GT1PwqDfjbKZ1MIw9jyGEz/Dst9e
-         TVH8mrP51w+Fwko+Mm1aUOaP4xZZfVdRlRVcAneUTQMUwPERKf0pi7AXL3s0l2XKM0
-         C7Q5/8QQ9LrTEbOMHN7ocb6ba/+thZ4w9aeoMEOYmtPY43PhXexMQKczxtfd6ybGF5
-         +EhM3lEMBpt3Q7WL/QUE0bBx7xy3yS7bljz4rzFQZs//6osm0qVj6g3i5zFohG2D6E
-         gK3OzbNYT4ex+T9OgGn0TYceB8Z6MkISdiM8MDRs/0attl6JvVpOYvBecZtqjebmoB
-         ZZ7wg14073fjw==
+        b=hzL1TmIlViNSVuC2ZZVXthuVwRUpne2m8T7MY0H7vpBuMpgLWrM3M432KEBEjjCln
+         acdDoMwsOd5Wje490IbzgO68N3/8BNaD+vpY2qbVFGHfNnXapJcCBBhoWVuImOwKdm
+         ug1ywoKpu2EYyfCcFkI3SN9vQkIYasbKNvyvMOqCVIo2PnE6dfyk3umMzvZEhef6V6
+         YHP+/563oe3GZGSmyzOk9C/09tRechAnxhIF2WJFX74UGNgjPmLZ83KRpn8GMr+svr
+         36z8I39yOgKParjoJDfbVAmnea5+u2ZWIUHS1nh1vVlgO9Qjcc0tiza6ZdWnXirkso
+         AM0fCNKnUKH4w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Chunguang Xu <brookxu@tencent.com>, Tejun Heo <tj@kernel.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.14 19/47] blk-throtl: optimize IOPS throttle for large IO scenarios
-Date:   Sun,  5 Sep 2021 21:19:23 -0400
-Message-Id: <20210906011951.928679-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.13 19/46] blk-throtl: optimize IOPS throttle for large IO scenarios
+Date:   Sun,  5 Sep 2021 21:20:24 -0400
+Message-Id: <20210906012052.929174-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210906011951.928679-1-sashal@kernel.org>
-References: <20210906011951.928679-1-sashal@kernel.org>
+In-Reply-To: <20210906012052.929174-1-sashal@kernel.org>
+References: <20210906012052.929174-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -83,7 +83,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 36 insertions(+)
 
 diff --git a/block/blk-merge.c b/block/blk-merge.c
-index a11b3b53717e..22eeaad190d7 100644
+index bcdff1879c34..410ea45027c9 100644
 --- a/block/blk-merge.c
 +++ b/block/blk-merge.c
 @@ -348,6 +348,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
@@ -180,10 +180,10 @@ index b1b22d863bdf..55c49015e533 100644
  {
  	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
 diff --git a/block/blk.h b/block/blk.h
-index cb01429c162c..f10cc9b2c27f 100644
+index 8b3591aee0a5..6cff1af51c57 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -289,11 +289,13 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_mask, int node);
+@@ -294,11 +294,13 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_mask, int node);
  extern int blk_throtl_init(struct request_queue *q);
  extern void blk_throtl_exit(struct request_queue *q);
  extern void blk_throtl_register_queue(struct request_queue *q);
