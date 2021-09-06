@@ -2,192 +2,258 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD9FC433EF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 05:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC8AC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 06:05:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F3C060FBF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 05:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92EA061004
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 06:05:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238640AbhIFGA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Sep 2021 02:00:58 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:63068 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234899AbhIFGA5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Sep 2021 02:00:57 -0400
-Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1865xgke066103;
-        Mon, 6 Sep 2021 14:59:42 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
- Mon, 06 Sep 2021 14:59:42 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1865xfpj066097
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Mon, 6 Sep 2021 14:59:42 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH 1/2] block: make __register_blkdev() return an error
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
-References: <20210904013932.3182778-1-mcgrof@kernel.org>
- <20210904013932.3182778-2-mcgrof@kernel.org>
- <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
- <YTUIV0mSJHfgtMov@bombadil.infradead.org>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <d5c7f0e6-8ded-581c-cb10-00e785a7f7b3@i-love.sakura.ne.jp>
-Date:   Mon, 6 Sep 2021 14:59:38 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S237920AbhIFGGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Sep 2021 02:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59036 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230046AbhIFGGN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Sep 2021 02:06:13 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9AFC061575;
+        Sun,  5 Sep 2021 23:05:09 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id r2so5683727pgl.10;
+        Sun, 05 Sep 2021 23:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=PGva41knd7GM3e5YVH8FUV9yeKh0+xyyOXoFtssO9cY=;
+        b=nJdV6r6soby4QjRonWL3nJUwxmO/+GkCuort/5Rosenq3w/Sq6FYohbQOECao+RUxj
+         fTijTU9vfUNMNk2Wc2sJef6MJPwMzZqITogio9P+Uh2KCE+iAncnWJjPtSwlLjuvGHNU
+         WFQdi1TMa4lycEYihaxePWn9o1a2H+3mbpdRgogU9Bd82XVKJxzHu9wIjKYeNq6ugccq
+         irvvTqjBwnSwWTd7X0BVJzrTgkrYJkd0voovPhN1ge9hd0q0YEGQVCVJ4du06/dNig7m
+         2ljI+TfBvScum7EUpwJ9hzK/RoPLEy/F2Twu06kMqdWYve0Dsy9euT/QE8fxBtxoQBMz
+         7CBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=PGva41knd7GM3e5YVH8FUV9yeKh0+xyyOXoFtssO9cY=;
+        b=eNcFBkJa4kmK5eivPQ8bhixa2RyYGuqcGxybcygntGvVEZVVweBldSydv13+3JQ2Yv
+         PeXYjAsS3K/MBcGn6IjjMsxFQ/ak+zguJXcmcm/cb6nCulgxjzlmTEFARXcsfwP4RTzw
+         rMeiJQBzMo/d14AT8k44fi5lGAGyPWKFaPsx4w8lucVydeMklvfbDYl8/4kOO+bMp1Rr
+         GSvJbENiUD10TLmBk/LbY8f7pnn6BRR7bws2o/t/GknroNGssj6du0KoYlWltTWTwiWE
+         5D7B/HC5sxtEf1hpeTUU0tVC0bpimYNK1w/795oOSGxi0ZEImp7gK45hAq7sbDmvQceI
+         d0aA==
+X-Gm-Message-State: AOAM532JiKq1XV9/850fJx+VyCoq12CxuXHFdVMXcCpVlrmJPO/Nmgco
+        BswZ71ByDj6TUrgH+AO2RvwqnoB+MckkPuy6FcjneYFaE+CIuas=
+X-Google-Smtp-Source: ABdhPJwiQUT4m/4hOkNAnEj3QRw5BWkk0k+r8PmEXecoIGKCCxp3TJrSkc3kZxZFlWnPmnP2RmU2tyK2o9xtL6uSJuo=
+X-Received: by 2002:a63:36c4:: with SMTP id d187mr6573799pga.205.1630908308782;
+ Sun, 05 Sep 2021 23:05:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YTUIV0mSJHfgtMov@bombadil.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   Hao Sun <sunhao.th@gmail.com>
+Date:   Mon, 6 Sep 2021 14:04:58 +0800
+Message-ID: <CACkBjsbWHkfNWRuGWkLrjoyTRbnwLHdm35KYfCfsKB5vP399dQ@mail.gmail.com>
+Subject: INFO: task hung in blkdev_put
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        viro@zeniv.linux.org.uk
+Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/09/06 3:11, Luis Chamberlain wrote:
-> On Sat, Sep 04, 2021 at 11:49:06AM +0900, Tetsuo Handa wrote:
->> On 2021/09/04 10:39, Luis Chamberlain wrote:
->>> diff --git a/fs/block_dev.c b/fs/block_dev.c
->>> index 45df6cbccf12..81a4738910a8 100644
->>> --- a/fs/block_dev.c
->>> +++ b/fs/block_dev.c
->>> @@ -1144,10 +1144,13 @@ struct block_device *blkdev_get_no_open(dev_t dev)
->>>  {
->>>  	struct block_device *bdev;
->>>  	struct inode *inode;
->>> +	int ret;
->>>  
->>>  	inode = ilookup(blockdev_superblock, dev);
->>>  	if (!inode) {
->>> -		blk_request_module(dev);
->>> +		ret = blk_request_module(dev);
->>> +		if (ret)
->>> +			return NULL;
->>
->> Since e.g. loop_add() from loop_probe() returns -EEXIST when /dev/loop$num already
->> exists (e.g. raced with ioctl(LOOP_CTL_ADD)), isn't unconditionally failing an over-failing?
-> 
-> It's not clear to me how. What do we loose by capturing the failure on
-> blk_request_module()?
-> 
+Hello,
 
-We loose ability to handle concurrent request.
+When using Healer to fuzz the latest Linux kernel, the following crash
+was triggered.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 45df6cbccf12..9559c8aabc88 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -36,6 +36,7 @@
- #include <linux/suspend.h>
- #include "internal.h"
- #include "../block/blk.h"
-+#include <linux/debug_locks.h>
+HEAD commit: 7d2a07b76933 Linux 5.14
+git tree: upstream
+console output:
+https://drive.google.com/file/d/15bKzfm25-e8kS5RDgiqoT024VpaOBhju/view?usp=sharing
+kernel config: https://drive.google.com/file/d/1XD9WYDViQLSXN7RGwH8AGGDvP9JvOghx/view?usp=sharing
+Similar bug reported by Syzbot:
+https://syzkaller.appspot.com/bug?id=9b6cad151b16cc24fe15fc086a3e53c0a3b2a43c
 
- struct bdev_inode {
-        struct block_device bdev;
-@@ -1147,7 +1148,11 @@ struct block_device *blkdev_get_no_open(dev_t dev)
+Sorry, I don't have a reproducer for this crash, hope the symbolized
+report can help.
+If you fix this issue, please add the following tag to the commit:
+Reported-by: Hao Sun <sunhao.th@gmail.com>
 
-        inode = ilookup(blockdev_superblock, dev);
-        if (!inode) {
-+               dump_stack();
-+               debug_show_held_locks(current);
-                blk_request_module(dev);
-+               if (!strcmp(current->comm, "cat"))
-+                       schedule_timeout_killable(10 * HZ);
-                inode = ilookup(blockdev_superblock, dev);
-                if (!inode)
-                        return NULL;
-
-Try "mknod /dev/loop$num b 7 $num" followed by concurrent "cat /dev/loop$num" requests.
-
-[  535.847823] [ T5261] CPU: 1 PID: 5261 Comm: cat Tainted: G            E     5.14.0-next-20210903+ #3
-[  535.851419] [ T5261] Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 02/27/2020
-[  535.855563] [ T5261] Call Trace:
-[  535.856746] [ T5261]  dump_stack_lvl+0x79/0xbf
-[  535.858332] [ T5261]  blkdev_get_no_open+0x86/0xe0
-[  535.860036] [ T5261]  blkdev_get_by_dev+0x5f/0x540
-[  535.861747] [ T5261]  ? block_ioctl+0x40/0x40
-[  535.863305] [ T5261]  blkdev_open+0x58/0x90
-[  535.864865] [ T5261]  do_dentry_open+0x144/0x3a0
-[  535.866538] [ T5261]  path_openat+0xa57/0xda0
-[  535.868139] [ T5261]  do_filp_open+0x9f/0x140
-[  535.869933] [ T5261]  ? _raw_spin_unlock+0x1a/0x30
-[  535.871570] [ T5261]  do_sys_openat2+0x71/0x150
-[  535.873195] [ T5261]  __x64_sys_openat+0x78/0xa0
-[  535.874740] [ T5261]  do_syscall_64+0x3d/0xb0
-[  535.876234] [ T5261]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  535.878428] [ T5261] RIP: 0033:0x7f6b997d28db
-[  535.879927] [ T5261] Code: 25 00 00 41 00 3d 00 00 41 00 74 4b 64 8b 04 25 18 00 00 00 85 c0 75 67 44 89 e2 48 89 ee bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 91 00 00 00 48 8b 4c 24 28 64 48 2b 0c 25
-[  535.886778] [ T5261] RSP: 002b:00007ffe8bdad880 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-[  535.889727] [ T5261] RAX: ffffffffffffffda RBX: 000055f741e5b634 RCX: 00007f6b997d28db
-[  535.892466] [ T5261] RDX: 0000000000000000 RSI: 00007ffe8bdaf764 RDI: 00000000ffffff9c
-[  535.895226] [ T5261] RBP: 00007ffe8bdaf764 R08: 0000000000000001 R09: 0000000000000000
-[  535.898162] [ T5261] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-[  535.900858] [ T5261] R13: 00007ffe8bdadb68 R14: 0000000000000000 R15: 0000000000020000
-[  535.903752] [ T5262] CPU: 2 PID: 5262 Comm: cat Tainted: G            E     5.14.0-next-20210903+ #3
-[  535.904759] [ T5261] no locks held by cat/5261.
-[  535.906905] [ T5262] Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 02/27/2020
-[  535.906908] [ T5262] Call Trace:
-[  535.906912] [ T5262]  dump_stack_lvl+0x79/0xbf
-[  535.915279] [ T5262]  blkdev_get_no_open+0x86/0xe0
-[  535.916942] [ T5262]  blkdev_get_by_dev+0x5f/0x540
-[  535.918608] [ T5262]  ? block_ioctl+0x40/0x40
-[  535.920250] [ T5262]  blkdev_open+0x58/0x90
-[  535.921696] [ T5262]  do_dentry_open+0x144/0x3a0
-[  535.923291] [ T5262]  path_openat+0xa57/0xda0
-[  535.924816] [ T5262]  do_filp_open+0x9f/0x140
-[  535.926359] [ T5262]  ? _raw_spin_unlock+0x1a/0x30
-[  535.928030] [ T5262]  do_sys_openat2+0x71/0x150
-[  535.929600] [ T5262]  __x64_sys_openat+0x78/0xa0
-[  535.931215] [ T5262]  do_syscall_64+0x3d/0xb0
-[  535.932768] [ T5262]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  535.934817] [ T5262] RIP: 0033:0x7efe3a0aa8db
-[  535.936354] [ T5262] Code: 25 00 00 41 00 3d 00 00 41 00 74 4b 64 8b 04 25 18 00 00 00 85 c0 75 67 44 89 e2 48 89 ee bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 91 00 00 00 48 8b 4c 24 28 64 48 2b 0c 25
-[  535.943021] [ T5262] RSP: 002b:00007ffe1697dfb0 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-[  535.945883] [ T5262] RAX: ffffffffffffffda RBX: 000055982a4e1634 RCX: 00007efe3a0aa8db
-[  535.948580] [ T5262] RDX: 0000000000000000 RSI: 00007ffe1697e764 RDI: 00000000ffffff9c
-[  535.951298] [ T5262] RBP: 00007ffe1697e764 R08: 0000000000000001 R09: 0000000000000000
-[  535.954064] [ T5262] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-[  535.956789] [ T5262] R13: 00007ffe1697e298 R14: 0000000000000000 R15: 0000000000020000
-[  535.959522] [ T5263] CPU: 0 PID: 5263 Comm: cat Tainted: G            E     5.14.0-next-20210903+ #3
-[  535.962995] [ T5263] Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 02/27/2020
-[  535.965787] [ T5262] no locks held by cat/5262.
-[  535.966998] [ T5263] Call Trace:
-[  535.970068] [ T5263]  dump_stack_lvl+0x79/0xbf
-[  535.971572] [ T5263]  blkdev_get_no_open+0x86/0xe0
-[  535.973199] [ T5263]  blkdev_get_by_dev+0x5f/0x540
-[  535.974893] [ T5263]  ? block_ioctl+0x40/0x40
-[  535.976364] [ T5263]  blkdev_open+0x58/0x90
-[  535.977781] [ T5263]  do_dentry_open+0x144/0x3a0
-[  535.979378] [ T5263]  path_openat+0xa57/0xda0
-[  535.980882] [ T5263]  do_filp_open+0x9f/0x140
-[  535.982333] [ T5263]  ? _raw_spin_unlock+0x1a/0x30
-[  535.984002] [ T5263]  do_sys_openat2+0x71/0x150
-[  535.985554] [ T5263]  __x64_sys_openat+0x78/0xa0
-[  535.987232] [ T5263]  do_syscall_64+0x3d/0xb0
-[  535.988790] [ T5263]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  535.990804] [ T5263] RIP: 0033:0x7ff84ab408db
-[  535.992275] [ T5263] Code: 25 00 00 41 00 3d 00 00 41 00 74 4b 64 8b 04 25 18 00 00 00 85 c0 75 67 44 89 e2 48 89 ee bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 91 00 00 00 48 8b 4c 24 28 64 48 2b 0c 25
-[  535.998888] [ T5263] RSP: 002b:00007ffda9b89a70 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-[  536.001628] [ T5263] RAX: ffffffffffffffda RBX: 000055626f376634 RCX: 00007ff84ab408db
-[  536.004350] [ T5263] RDX: 0000000000000000 RSI: 00007ffda9b8a764 RDI: 00000000ffffff9c
-[  536.007009] [ T5263] RBP: 00007ffda9b8a764 R08: 0000000000000001 R09: 0000000000000000
-[  536.009753] [ T5263] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-[  536.012493] [ T5263] R13: 00007ffda9b89d58 R14: 0000000000000000 R15: 0000000000020000
-[  536.015854] [ T5263] no locks held by cat/5263.
-
-If blk_request_module() does not ignore -EEXIST error, only the first open() request would succeed
-because loop_add() returns 0 and all other concurrent requests would fail because loop_add() returns -EEXIST.
-
-Actually, blk_request_module() failures should be ignored, for subsequent ilookup() will
-fail if blk_request_module() failed to create the requested block device.
+INFO: task syz-executor:10684 blocked for more than 143 seconds.
+      Not tainted 5.14.0 #25
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:27880 pid:10684 ppid:  9037 flags:0x00004004
+Call Trace:
+ context_switch kernel/sched/core.c:4695 [inline]
+ __schedule+0x974/0x2510 kernel/sched/core.c:6026
+ schedule+0xd3/0x270 kernel/sched/core.c:6105
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6164
+ __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
+ __mutex_lock+0x92e/0x1390 kernel/locking/mutex.c:1104
+ blkdev_put+0x98/0x720 fs/block_dev.c:1534
+ blkdev_close+0x8c/0xb0 fs/block_dev.c:1586
+ __fput+0x288/0x920 fs/file_table.c:280
+ task_work_run+0xe0/0x1a0 kernel/task_work.c:164
+ tracehook_notify_resume include/linux/tracehook.h:189 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:175 [inline]
+ exit_to_user_mode_prepare+0x28d/0x2a0 kernel/entry/common.c:209
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:291 [inline]
+ syscall_exit_to_user_mode+0x19/0x50 kernel/entry/common.c:302
+ do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4739cd
+RSP: 002b:00007f1d42ba6198 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: 0000000000000000 RBX: 000000000059c0a0 RCX: 00000000004739cd
+RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000003
+RBP: 00000000004ebd80 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000059c0a0
+R13: 00007fffd3a7039f R14: 00007fffd3a70540 R15: 00007f1d42ba6300
+INFO: task syz-executor:10690 blocked for more than 143 seconds.
+      Not tainted 5.14.0 #25
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:27456 pid:10690 ppid:  9037 flags:0x00004004
+Call Trace:
+ context_switch kernel/sched/core.c:4695 [inline]
+ __schedule+0x974/0x2510 kernel/sched/core.c:6026
+ schedule+0xd3/0x270 kernel/sched/core.c:6105
+ io_schedule+0x17/0x70 kernel/sched/core.c:8076
+ bit_wait_io+0x12/0xd0 kernel/sched/wait_bit.c:209
+ __wait_on_bit+0x60/0x190 kernel/sched/wait_bit.c:49
+ out_of_line_wait_on_bit+0xd5/0x110 kernel/sched/wait_bit.c:64
+ wait_on_bit_io include/linux/wait_bit.h:101 [inline]
+ __wait_on_buffer fs/buffer.c:122 [inline]
+ wait_on_buffer include/linux/buffer_head.h:356 [inline]
+ __block_write_begin_int+0x944/0x1f00 fs/buffer.c:2044
+ __block_write_begin fs/buffer.c:2056 [inline]
+ block_write_begin+0x58/0x2e0 fs/buffer.c:2116
+ generic_perform_write+0x1fe/0x510 mm/filemap.c:3656
+ __generic_file_write_iter+0x24e/0x610 mm/filemap.c:3783
+ blkdev_write_iter+0x2a3/0x560 fs/block_dev.c:1645
+ call_write_iter include/linux/fs.h:2114 [inline]
+ new_sync_write+0x42f/0x660 fs/read_write.c:518
+ vfs_write+0x67a/0xa50 fs/read_write.c:605
+ ksys_write+0x12d/0x250 fs/read_write.c:658
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4739cd
+RSP: 002b:00007f1d42b85198 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 000000000059c158 RCX: 00000000004739cd
+RDX: 0000000000000078 RSI: 00000000200000c0 RDI: 0000000000000006
+RBP: 00000000004ebd80 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000059c158
+R13: 00007fffd3a7039f R14: 00007fffd3a70540 R15: 00007f1d42b85300
+INFO: task syz-executor:10693 blocked for more than 143 seconds.
+      Not tainted 5.14.0 #25
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:28400 pid:10693 ppid:  9037 flags:0x00004004
+Call Trace:
+ context_switch kernel/sched/core.c:4695 [inline]
+ __schedule+0x974/0x2510 kernel/sched/core.c:6026
+ schedule+0xd3/0x270 kernel/sched/core.c:6105
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6164
+ __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
+ __mutex_lock+0x92e/0x1390 kernel/locking/mutex.c:1104
+ blkdev_get_by_dev fs/block_dev.c:1410 [inline]
+ blkdev_get_by_dev+0x457/0xb80 fs/block_dev.c:1383
+ blkdev_open+0x154/0x2b0 fs/block_dev.c:1512
+ do_dentry_open+0x4c8/0x11d0 fs/open.c:826
+ do_open fs/namei.c:3374 [inline]
+ path_openat+0x1bf9/0x27a0 fs/namei.c:3507
+ do_filp_open+0x1c1/0x290 fs/namei.c:3534
+ do_sys_openat2+0x61b/0x8f0 fs/open.c:1204
+ do_sys_open+0xc3/0x140 fs/open.c:1220
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x41a334
+RSP: 002b:00007f1d42b63cc0 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 6666666666666667 RCX: 000000000041a334
+RDX: 0000000000000000 RSI: 00007f1d42b63d60 RDI: 00000000ffffff9c
+RBP: 00007f1d42b63d60 R08: 0000000000000000 R09: 002364626e2f7665
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
+R13: 00007fffd3a7039f R14: 00007fffd3a70540 R15: 00007f1d42b64300
+INFO: task systemd-udevd:10692 blocked for more than 143 seconds.
+      Not tainted 5.14.0 #25
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:systemd-udevd   state:D stack:27640 pid:10692 ppid:  4542 flags:0x00004220
+Call Trace:
+ context_switch kernel/sched/core.c:4695 [inline]
+ __schedule+0x974/0x2510 kernel/sched/core.c:6026
+ schedule+0xd3/0x270 kernel/sched/core.c:6105
+ io_schedule+0x17/0x70 kernel/sched/core.c:8076
+ wait_on_page_bit_common+0x57c/0xf10 mm/filemap.c:1301
+ wait_on_page_bit mm/filemap.c:1362 [inline]
+ wait_on_page_locked include/linux/pagemap.h:689 [inline]
+ do_read_cache_page+0x26d/0x1440 mm/filemap.c:3394
+ read_mapping_page include/linux/pagemap.h:515 [inline]
+ read_part_sector+0x146/0x670 block/partitions/core.c:726
+ adfspart_check_ICS+0x9d/0xc90 block/partitions/acorn.c:360
+ check_partition block/partitions/core.c:147 [inline]
+ blk_add_partitions block/partitions/core.c:611 [inline]
+ bdev_disk_changed block/partitions/core.c:697 [inline]
+ bdev_disk_changed+0x753/0x1130 block/partitions/core.c:664
+ blkdev_get_whole+0x216/0x3f0 fs/block_dev.c:1269
+ blkdev_get_by_dev fs/block_dev.c:1417 [inline]
+ blkdev_get_by_dev+0x4c0/0xb80 fs/block_dev.c:1383
+ blkdev_open+0x154/0x2b0 fs/block_dev.c:1512
+ do_dentry_open+0x4c8/0x11d0 fs/open.c:826
+ do_open fs/namei.c:3374 [inline]
+ path_openat+0x1bf9/0x27a0 fs/namei.c:3507
+ do_filp_open+0x1c1/0x290 fs/namei.c:3534
+ do_sys_openat2+0x61b/0x8f0 fs/open.c:1204
+ do_sys_open+0xc3/0x140 fs/open.c:1220
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f5595f12840
+RSP: 002b:00007ffd28c6bbb8 EFLAGS: 00000246 ORIG_RAX: 0000000000000002
+RAX: ffffffffffffffda RBX: 000055f37228aa00 RCX: 00007f5595f12840
+RDX: 000055f371560fe3 RSI: 00000000000a0800 RDI: 000055f372286c80
+RBP: 00007ffd28c6bd30 R08: 000055f371560670 R09: 0000000000000010
+R10: 000055f371560d0c R11: 0000000000000246 R12: 00007ffd28c6bc80
+R13: 000055f3722878f0 R14: 0000000000000003 R15: 000000000000000e
+Showing all locks held in the system:
+1 lock held by khungtaskd/1630:
+ #0: ffffffff8b979b80 (rcu_read_lock){....}-{1:2}, at:
+debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6446
+1 lock held by in:imklog/7561:
+ #0: ffff888101e1dc70 (&f->f_pos_lock){+.+.}-{3:3}, at:
+__fdget_pos+0xe9/0x100 fs/file.c:974
+2 locks held by agetty/7569:
+ #0: ffff888108bbf098 (&tty->ldisc_sem){++++}-{0:0}, at:
+tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:252
+ #1: ffffc900002a42e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at:
+n_tty_read+0x8db/0x1250 drivers/tty/n_tty.c:2113
+1 lock held by syz-executor/10684:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+blkdev_put+0x98/0x720 fs/block_dev.c:1534
+1 lock held by syz-executor/10693:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+blkdev_get_by_dev fs/block_dev.c:1410 [inline]
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+blkdev_get_by_dev+0x457/0xb80 fs/block_dev.c:1383
+1 lock held by systemd-udevd/10692:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+blkdev_get_by_dev fs/block_dev.c:1410 [inline]
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+blkdev_get_by_dev+0x457/0xb80 fs/block_dev.c:1383
+1 lock held by syz-executor/11137:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+iterate_bdevs+0xe0/0x2d0 fs/block_dev.c:1869
+1 lock held by syz-executor/11425:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+iterate_bdevs+0xe0/0x2d0 fs/block_dev.c:1869
+1 lock held by syz-executor/11428:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+iterate_bdevs+0xe0/0x2d0 fs/block_dev.c:1869
+1 lock held by syz-executor/11843:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+iterate_bdevs+0xe0/0x2d0 fs/block_dev.c:1869
+1 lock held by syz-executor/12538:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+iterate_bdevs+0xe0/0x2d0 fs/block_dev.c:1869
+1 lock held by syz-executor/12540:
+ #0: ffff888100c14d18 (&disk->open_mutex){+.+.}-{3:3}, at:
+iterate_bdevs+0xe0/0x2d0 fs/block_dev.c:1869
