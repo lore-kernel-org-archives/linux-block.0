@@ -2,187 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97E1C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 12:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1414CC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 14:35:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F30161027
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 12:48:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB94060F6B
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 14:35:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242131AbhIFMtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Sep 2021 08:49:24 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:52009 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242088AbhIFMtJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Sep 2021 08:49:09 -0400
-Received: from fsav413.sakura.ne.jp (fsav413.sakura.ne.jp [133.242.250.112])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 186CluMO020304;
-        Mon, 6 Sep 2021 21:47:56 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav413.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp);
- Mon, 06 Sep 2021 21:47:56 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 186CltHc020301
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Mon, 6 Sep 2021 21:47:56 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block <linux-block@vger.kernel.org>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: [PATCH] brd: reduce the brd_devices_mutex scope
-Message-ID: <65b57a74-34db-d466-df67-c7a7bb529ae3@i-love.sakura.ne.jp>
-Date:   Mon, 6 Sep 2021 21:47:54 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S243437AbhIFOhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Sep 2021 10:37:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:65104 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243421AbhIFOhB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Sep 2021 10:37:01 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 186EYWcw092852;
+        Mon, 6 Sep 2021 10:35:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=t5OR0eUDklpD1WGcingITtl2OO+Tv7Am9adn1Pg8ob8=;
+ b=Fg5yauhmATD6QI5Na7k8vSPW5iTgGoMSjYH5iBmL2WQAHem/LLdTfeyfvHKh/Ta5fuOu
+ u2cQFR2ixl8pEwImQgKY5qk2q1bNRqY9w/LCTSNtkKdE+6Di68i3mKZeeMTw7cDsBCjN
+ lP3qqMU/HCRWZfFaKElSULlrf9L12xixT63jXCC1HqoV/R7ujHNzZA+iZYezwPDaxgWO
+ 6hVLfY/TJwmcDZAL8wwEBkKOA/UDBAImf38T7LQNH6fqBbdQqRvYpVb6U4uRZoKY9rZG
+ 4qk9cTJEO6YzOC8M7BxWdldZdzFnFH5EuchBQLQrG4J0UMabuxBnaQcAS2KvX+VSviXW Tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3awh9cwbev-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 10:35:18 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 186EZImE100053;
+        Mon, 6 Sep 2021 10:35:18 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3awh9cwbdx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 10:35:17 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 186EXUwh023137;
+        Mon, 6 Sep 2021 14:35:15 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3av02j4kq3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 14:35:15 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 186EZBZp46072230
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 Sep 2021 14:35:11 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 722F8AE065;
+        Mon,  6 Sep 2021 14:35:11 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6C4D9AE055;
+        Mon,  6 Sep 2021 14:35:10 +0000 (GMT)
+Received: from osiris (unknown [9.145.3.161])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon,  6 Sep 2021 14:35:10 +0000 (GMT)
+Date:   Mon, 6 Sep 2021 16:35:09 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        gregkh@linuxfoundation.org, chaitanya.kulkarni@wdc.com,
+        atulgopinathan@gmail.com, hare@suse.de, maximlevitsky@gmail.com,
+        oakad@yahoo.com, ulf.hansson@linaro.org, colin.king@canonical.com,
+        shubhankarvk@gmail.com, baijiaju1990@gmail.com, trix@redhat.com,
+        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
+        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 9/9] s390/block/xpram: add error handling support for
+ add_disk()
+Message-ID: <YTYnHUYSfB6YElnh@osiris>
+References: <20210902174105.2418771-1-mcgrof@kernel.org>
+ <20210902174105.2418771-10-mcgrof@kernel.org>
+ <YTIr1w/qPvgioUfL@osiris>
+ <YTXcPBph323n2WJ8@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YTXcPBph323n2WJ8@infradead.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hBKOiASlRVgdP6m0ZVyfrL0h5Yz4Ft1A
+X-Proofpoint-ORIG-GUID: sRBTe9g0KJq9hO82J9XVDCM7Uj8j1L5y
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-06_06:2021-09-03,2021-09-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 spamscore=0
+ phishscore=0 impostorscore=0 mlxscore=0 adultscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2108310000 definitions=main-2109060092
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As with commit 8b52d8be86d72308 ("loop: reorder loop_exit"),
-unregister_blkdev() needs to be called first in order to avoid calling
-brd_alloc() from brd_probe() after brd_del_one() from brd_exit(). Then,
-we can avoid holding global mutex during add_disk()/del_gendisk() as with
-commit 1c500ad706383f1a ("loop: reduce the loop_ctl_mutex scope").
+On Mon, Sep 06, 2021 at 10:15:40AM +0100, Christoph Hellwig wrote:
+> On Fri, Sep 03, 2021 at 04:06:15PM +0200, Heiko Carstens wrote:
+> > Hmm, this is a more or less dead device driver, and I'm wondering if
+> > we shouldn't remove it instead. But anyway, your patch is not correct:
+> 
+> I'm all for removing it.  I think we need to do a little more spring
+> cleaning on unmaintained and likely to be unused block drivers.
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-I thought that this patch can fix similar circular locking problem at __loop_clr_fd()
-(e.g. https://syzkaller.appspot.com/text?tag=CrashReport&x=1026e92e300000 ) in
-https://syzkaller.appspot.com/bug?id=7bb10e8b62f83e4d445cdf4c13d69e407e629558 , but
-it turned out that breaking major_names_lock => brd_devices_mutex => disk->open_mutex
-chain is not sufficient (it might be "block: support delayed holder registration"
-that is causing major_names_lock => &disk->open_mutex => &lo->lo_mutex chain).
-Thus, submitting as a normal patch.
-
- drivers/block/brd.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 58ec167aa018..fceeff796e07 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -373,10 +373,22 @@ static int brd_alloc(int i)
- 	struct gendisk *disk;
- 	char buf[DISK_NAME_LEN];
- 
-+	mutex_lock(&brd_devices_mutex);
-+	list_for_each_entry(brd, &brd_devices, brd_list) {
-+		if (brd->brd_number != i)
-+			continue;
-+		mutex_unlock(&brd_devices_mutex);
-+		return -EEXIST;
-+	}
- 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
--	if (!brd)
-+	if (!brd) {
-+		mutex_unlock(&brd_devices_mutex);
- 		return -ENOMEM;
-+	}
- 	brd->brd_number		= i;
-+	list_add_tail(&brd->brd_list, &brd_devices);
-+	mutex_unlock(&brd_devices_mutex);
-+
- 	spin_lock_init(&brd->brd_lock);
- 	INIT_RADIX_TREE(&brd->brd_pages, GFP_ATOMIC);
- 
-@@ -411,37 +423,30 @@ static int brd_alloc(int i)
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
- 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, disk->queue);
- 	add_disk(disk);
--	list_add_tail(&brd->brd_list, &brd_devices);
- 
- 	return 0;
- 
- out_free_dev:
-+	mutex_lock(&brd_devices_mutex);
-+	list_del(&brd->brd_list);
-+	mutex_unlock(&brd_devices_mutex);
- 	kfree(brd);
- 	return -ENOMEM;
- }
- 
- static void brd_probe(dev_t dev)
- {
--	int i = MINOR(dev) / max_part;
--	struct brd_device *brd;
--
--	mutex_lock(&brd_devices_mutex);
--	list_for_each_entry(brd, &brd_devices, brd_list) {
--		if (brd->brd_number == i)
--			goto out_unlock;
--	}
--
--	brd_alloc(i);
--out_unlock:
--	mutex_unlock(&brd_devices_mutex);
-+	brd_alloc(MINOR(dev) / max_part);
- }
- 
- static void brd_del_one(struct brd_device *brd)
- {
--	list_del(&brd->brd_list);
- 	del_gendisk(brd->brd_disk);
- 	blk_cleanup_disk(brd->brd_disk);
- 	brd_free_pages(brd);
-+	mutex_lock(&brd_devices_mutex);
-+	list_del(&brd->brd_list);
-+	mutex_unlock(&brd_devices_mutex);
- 	kfree(brd);
- }
- 
-@@ -491,25 +496,21 @@ static int __init brd_init(void)
- 
- 	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
- 
--	mutex_lock(&brd_devices_mutex);
- 	for (i = 0; i < rd_nr; i++) {
- 		err = brd_alloc(i);
- 		if (err)
- 			goto out_free;
- 	}
- 
--	mutex_unlock(&brd_devices_mutex);
--
- 	pr_info("brd: module loaded\n");
- 	return 0;
- 
- out_free:
-+	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
- 	debugfs_remove_recursive(brd_debugfs_dir);
- 
- 	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
- 		brd_del_one(brd);
--	mutex_unlock(&brd_devices_mutex);
--	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
- 
- 	pr_info("brd: module NOT loaded !!!\n");
- 	return err;
-@@ -519,13 +520,12 @@ static void __exit brd_exit(void)
- {
- 	struct brd_device *brd, *next;
- 
-+	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
- 	debugfs_remove_recursive(brd_debugfs_dir);
- 
- 	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
- 		brd_del_one(brd);
- 
--	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
--
- 	pr_info("brd: module unloaded\n");
- }
- 
--- 
-2.30.2
-
+Yes, we'll remove it. I'll schedule it even for this merge
+window. Should be away with -rc1.
