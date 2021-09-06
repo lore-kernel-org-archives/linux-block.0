@@ -2,94 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A99BC433EF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 03:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8A3C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 05:36:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1722B60F5E
-	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 03:12:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF7BC604AC
+	for <linux-block@archiver.kernel.org>; Mon,  6 Sep 2021 05:36:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230228AbhIFDNd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Sep 2021 23:13:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49358 "EHLO
+        id S238640AbhIFFhH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Sep 2021 01:37:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239270AbhIFDNc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Sep 2021 23:13:32 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D50FC061575
-        for <linux-block@vger.kernel.org>; Sun,  5 Sep 2021 20:12:29 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id f129so5353806pgc.1
-        for <linux-block@vger.kernel.org>; Sun, 05 Sep 2021 20:12:29 -0700 (PDT)
+        with ESMTP id S236124AbhIFFhG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Sep 2021 01:37:06 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5FFC061575;
+        Sun,  5 Sep 2021 22:36:02 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id a13so7238725iol.5;
+        Sun, 05 Sep 2021 22:36:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0aYegbSdO1FiBlBWI80aWTW7O5daH/lQmVZ3sA4ZzqQ=;
-        b=dXDsfstAi1nwSKNQPFc4yUdvxR7lswwqgUZ6mH9AXmO7D84gxGtW5ZpWQr8wX0BBRp
-         guQqJXC27/rEL83giZKOX7RsV6eY/4QLNp8JKtKPpAe3b74YYtmCssXbuSxzk98PQupH
-         WbNRAg/UrX4tREkeTFaS8+o1K9sRyfdgbMEGa8joVhiP77ruaYEfcVf5PjvhPDKKiseB
-         KhmD5chslTCfDlqAlnbB97Lzg7HTX6vpm0xTLWTTKQ/Tvk9zyhenXpswSnlP5f+hLE+/
-         heTwmNJC3ltSvXlXckhmTf4K/Hcw2w9zuPtQ9UBW0doXSJKzpYmP+pG4ElhDf1pyV6t7
-         AXCw==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SueHKYkxrfnV7M4ec6sVbN4VWy4YIBLTLnDQ1kZYr3w=;
+        b=BLhDr5XMVFBQtj2pSsEY10kwQUjdmVv63WfkUbfpCb9PoPRwe6fUD7VTa8g7XDwXj7
+         KTmYQkpYobuIaf8BxeHLO0cUTQspfB0m0TisdZRugGrq4n006f8SIW2u8heo2C9YwP7o
+         FNLWCvcAe2+Qyvi/kFuMArdetwAUuw3UT8YdeIRQUWgXiTdGG2QY2CHJiE+N9KX+33h5
+         ptaeF1wVb6m3zYPWbQre2QDlJsvgbT+i4PyrOb0IxVZA/HqVwAJiAK4idy+hgMlfzXwp
+         bsr+sd0PcsJm8Gznc8XxpBhBzIKA9wXkFft8w+O4443BPitt9xTu5JQQBvWgvafz801y
+         uAag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0aYegbSdO1FiBlBWI80aWTW7O5daH/lQmVZ3sA4ZzqQ=;
-        b=ECK0MyzLNFOm3c75oR+L8YEKI+M08FPoxoP0YOLEK9leeODqx7dMwRQH14A6Udqa6a
-         UgsWBcJI6KJSlcA/zyc0Dt9Jp/28dQTKFg+P2zENbHIfkxAHf/Zvj8tr3WnpfN60Vt+U
-         Q0OHQS/BdUwRgkAPdAsmMewGSKl9GREL1sFpB0n47GCs0AMTGorL/wM1XVhY0QLRZZWt
-         7Ijsfq0NL78+iBGOZnn+wVBXGeMOebX4aBSmJxNWh7t3dzk2Zsr8kid4eLwrEwV/Mxcb
-         3gVTeGjuktMRzUffIkYtAL3HWTKcUKQS8u924eKHmiwzdvNrvyS7HK+CjmIxMrS5IhUZ
-         yEOw==
-X-Gm-Message-State: AOAM530ZLv5JeGlg9Fo2RVnCz/JLIusvcxTUJRp8aaZrphTgbPdgYVTp
-        6G7k4fwGLflIYrLz5sn4iIBZ9w==
-X-Google-Smtp-Source: ABdhPJzucBpcVDmS1+5Zg1wfMR3rlA068aDQSarztWzxXv2zpAXEVkANgx4TW6cPMc7AMCubTuHv1w==
-X-Received: by 2002:a62:a513:0:b0:3f1:e19c:a23 with SMTP id v19-20020a62a513000000b003f1e19c0a23mr9904179pfm.43.1630897948086;
-        Sun, 05 Sep 2021 20:12:28 -0700 (PDT)
-Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id h24sm5847316pfn.180.2021.09.05.20.12.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Sep 2021 20:12:27 -0700 (PDT)
-Subject: Re: [PATCH] mq-deadline: Fix build error for !BLK_DEBUG_FS
-To:     Huacai Chen <chenhuacai@loongson.cn>
-Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        Xuefeng Li <lixuefeng@loongson.cn>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <20210906030918.3901521-1-chenhuacai@loongson.cn>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2985f817-9195-528b-b814-1929058fe085@kernel.dk>
-Date:   Sun, 5 Sep 2021 21:12:25 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SueHKYkxrfnV7M4ec6sVbN4VWy4YIBLTLnDQ1kZYr3w=;
+        b=SwY5ulvHN/ygWnPaxLDdj3jJ/QD10QfZt+DfCv1p+zpHkzayDyByj5xgAM9x/+ecvs
+         ZByJjvRqSEG9xYG1LqPpEk1NoalBCZNCon9R/+jzRzCYSTGTBaYKDFV72dVulpVD7VSZ
+         MJMK4/GHbF1ZzCfampvDa73AMbG1KfD/K12JXnE7qtS0CcM4Zzqh40fhA06RzkjJw7gJ
+         6uvH+z/98JMFtqtYNb/4Q7JATH3cqizj1x/3jEMGSit75i4gPK1vzV5h3DNjXj9J1GSM
+         zJOPpJLzdsZdFpGmUA0GXVLmS1rjxJOjF9528h+RXzA5q9u/cIzJIc8vFCFH8083/vzo
+         X4Ow==
+X-Gm-Message-State: AOAM5332jpvr6cVoE2IHP9PWxmgZipzZCQN9PYg8ODE3utDnfa+IW8e4
+        hlBMZCampEVybUJB+5zTGmm1OJ9hiqc8j+8u0h+UDWRu3OA=
+X-Google-Smtp-Source: ABdhPJwWGsa8Mbr0GhlJTm89mecRNOpmMG9dT703P5euTuQR4V+0TUGa0YzJae1MbtSD8MzrnZtn4SDkgo+gCf2UuYg=
+X-Received: by 2002:a6b:3f02:: with SMTP id m2mr7734264ioa.136.1630906561896;
+ Sun, 05 Sep 2021 22:36:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210906030918.3901521-1-chenhuacai@loongson.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210905085717.7427-1-mgurtovoy@nvidia.com>
+In-Reply-To: <20210905085717.7427-1-mgurtovoy@nvidia.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Mon, 6 Sep 2021 07:35:51 +0200
+Message-ID: <CAM9Jb+ii_YthttHt7Jbs337zzJ-0FRU6LtjXwOUmPzfXGDDKgQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] virtio-blk: remove unneeded "likely" statements
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/5/21 9:09 PM, Huacai Chen wrote:
-> Function dd_queued() is only used in dd_queued_show(), but dd_queued_
-> show() is only defined for BLK_DEBUG_FS enabled. However, in the commit
-> 3fe617ccafd6f5bb3 ("Enable '-Werror' by default for all kernel builds")
-> Werror is enabled by default, which cause a build error if DEBUG_FS is
-> not enabled.
-> 
-> So we move dd_queued() in the CONFIG_BLK_DEBUG_FS block to fix it.
+> Usually we use "likely/unlikely" to optimize the fast path. Remove
+> redundant "likely/unlikely" statements in the control path to simplify
+> the code and make it easier to read.
+>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> ---
+>
+> changes from v1:
+>  - added "Reviewed-by" (Stefan)
+>  - commit description update (Stefan)
+>
+> ---
+>  drivers/block/virtio_blk.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index afb37aac09e8..e574fbf5e6df 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -765,7 +765,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>                 goto out_free_vblk;
+>
+>         /* Default queue sizing is to fill the ring. */
+> -       if (likely(!virtblk_queue_depth)) {
+> +       if (!virtblk_queue_depth) {
+>                 queue_depth = vblk->vqs[0].vq->num_free;
+>                 /* ... but without indirect descs, we use 2 descs per req */
+>                 if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC))
+> @@ -839,7 +839,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>         else
+>                 blk_size = queue_logical_block_size(q);
+>
+> -       if (unlikely(blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)) {
+> +       if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE) {
+>                 dev_err(&vdev->dev,
+>                         "block size is changed unexpectedly, now is %u\n",
+>                         blk_size);
+> --
 
-This has already been queued up for a while:
 
-https://git.kernel.dk/cgit/linux-block/commit/?h=block-5.15&id=55a51ea14094a1e7dd0d7f33237d246033dd39ab
-
--- 
-Jens Axboe
-
+Reviewed-by: Pankaj Gupta <pankaj.gupta@ionos.com>
