@@ -2,119 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB28C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 23:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F66C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 23:04:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FEE061131
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 23:03:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C192461139
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 23:04:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243371AbhIGXEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Sep 2021 19:04:54 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:9318 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234396AbhIGXEx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Sep 2021 19:04:53 -0400
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 187N16oT002201
-        for <linux-block@vger.kernel.org>; Tue, 7 Sep 2021 16:03:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=facebook; bh=VUoTFlhx6ooKf/JHMPEG/qv91AtQXS7pbRLQledGpaQ=;
- b=UPDdqF0tSI/W7Rz6qhiR8ONWgNI9TtvMPgoJLqlpJawBDYQis8M+dbh9Dwr2d1tkgBVZ
- wDZw78fUfKTv9MS3cS32RvdnEKRD+RVWspUCYa0ZFD1CWJYyTQQnUb6n3q3NoUnSoCFe
- nYdFqspxyEiZ+33WnwNs2uO7e7ed/FxUI38= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com with ESMTP id 3axcmw1ua4-4
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 07 Sep 2021 16:03:46 -0700
-Received: from intmgw002.06.ash9.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c085:21d::5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.14; Tue, 7 Sep 2021 16:03:45 -0700
-Received: by devbig006.ftw2.facebook.com (Postfix, from userid 4523)
-        id 96F8E102AA260; Tue,  7 Sep 2021 16:03:40 -0700 (PDT)
-From:   Song Liu <songliubraving@fb.com>
-To:     <linux-block@vger.kernel.org>, <linux-raid@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <marcin.wanat@gmail.com>,
-        Song Liu <songliubraving@fb.com>
-Subject: [PATCH] blk-mq: allow 4x BLK_MAX_REQUEST_COUNT at blk_plug for multiple_queues
-Date:   Tue, 7 Sep 2021 16:03:38 -0700
-Message-ID: <20210907230338.227903-1-songliubraving@fb.com>
-X-Mailer: git-send-email 2.30.2
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-FB-Source: Intern
-X-Proofpoint-ORIG-GUID: cIXOCcbXWDIYi_WI7WHvMuZmgB94Arpg
-X-Proofpoint-GUID: cIXOCcbXWDIYi_WI7WHvMuZmgB94Arpg
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S1344087AbhIGXFn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Sep 2021 19:05:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48822 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240690AbhIGXFk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Sep 2021 19:05:40 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 365DD61102;
+        Tue,  7 Sep 2021 23:04:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631055873;
+        bh=U4r90XGeMFMBTYQzJqJqJ72n/aEzus0q4Z98AOX2grc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sKXNN3dc3jccHx69/sKD47gbQLIRPr5FvdMGBsnJ/eUfbMNTLqUqNfWSvns+I69ck
+         U25GKT7tGRJbAWVj0zvnCcxOB6w4HzBT1Fe6R/PlLWnsRJcpQuvxrlr71Ab0Gl0r/g
+         yCUbkzUr9DQXvBlG7STLjsnFeql70rUCYRhVNXo5P9Gd5NRMXopOXF68LZg0JtLbDj
+         NWDsTld22BYYdo8O+Vk07IJEW02ZwlwcdChvtN2kzeHNXcIDL0mt9ZFToQ/iPeAFMS
+         FGhfCRqW9/t3Jn7umP3x8hpJMQ+gNd+0TD6+cH0YIKQMIROMhf40SlprUdwNv8QkXz
+         HpLc51HwA2u3Q==
+Date:   Wed, 8 Sep 2021 02:04:30 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>, hch@infradead.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
+        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
+ parameter
+Message-ID: <YTfv/s8v0MsCya5r@unreal>
+References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
+ <YTR12AHOGs1nhfz1@unreal>
+ <b2e60035-2e63-3162-6222-d8c862526a28@gmail.com>
+ <YTSZ6CYM6BCsbVmk@unreal>
+ <20210905111415-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-09-07_08:2021-09-07,2021-09-07 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 adultscore=0
- mlxlogscore=677 phishscore=0 impostorscore=0 spamscore=0 bulkscore=0
- mlxscore=0 priorityscore=1501 clxscore=1011 suspectscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109030001 definitions=main-2109070145
-X-FB-Internal: deliver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210905111415-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Limiting number of request to BLK_MAX_REQUEST_COUNT at blk_plug hurts
-performance for large md arrays. [1] shows resync speed of md array drops
-for md array with more than 16 HDDs.
+On Sun, Sep 05, 2021 at 11:15:16AM -0400, Michael S. Tsirkin wrote:
+> On Sun, Sep 05, 2021 at 01:20:24PM +0300, Leon Romanovsky wrote:
+> > On Sun, Sep 05, 2021 at 01:49:46AM -0700, Chaitanya Kulkarni wrote:
+> > > 
+> > > On 9/5/2021 12:46 AM, Leon Romanovsky wrote:
+> > > > > +static unsigned int num_request_queues;
+> > > > > +module_param_cb(num_request_queues, &queue_count_ops, &num_request_queues,
+> > > > > +		0644);
+> > > > > +MODULE_PARM_DESC(num_request_queues,
+> > > > > +		 "Number of request queues to use for blk device. Should > 0");
+> > > > > +
+> > > > Won't it limit all virtio block devices to the same limit?
+> > > > 
+> > > > It is very common to see multiple virtio-blk devices on the same system
+> > > > and they probably need different limits.
+> > > > 
+> > > > Thanks
+> > > 
+> > > 
+> > > Without looking into the code, that can be done adding a configfs
+> > > 
+> > > interface and overriding a global value (module param) when it is set from
+> > > 
+> > > configfs.
+> > 
+> > So why should we do double work instead of providing one working
+> > interface from the beginning?
+> > 
+> > Thanks
+> > 
+> > > 
+> > > 
+> 
+> The main way to do it is really from the hypervisor. This one
+> is a pretty blunt instrument, Max here says it's useful to reduce
+> memory usage of the driver. If that's the usecase then a global limit
+> seems sufficient.
 
-Fix this by allowing more request at plug queue. The multiple_queue flag
-is used to only apply higher limit to multiple queue cases.
+How memory will you reduce? It is worth to write it in the commit message.
 
-[1] https://lore.kernel.org/linux-raid/CAFDAVznS71BXW8Jxv6k9dXc2iR3ysX3iZRB=
-ww_rzA8WifBFxGg@mail.gmail.com/
-Tested-by: Marcin Wanat <marcin.wanat@gmail.com>
-Signed-off-by: Song Liu <songliubraving@fb.com>
----
- block/blk-mq.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Thanks
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2c4ac51e54eba..d4025c15bd108 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2155,6 +2155,18 @@ static void blk_add_rq_to_plug(struct blk_plug *plug=
-, struct request *rq)
- 	}
- }
-=20
-+/*
-+ * Allow 4x BLK_MAX_REQUEST_COUNT requests on plug queue for multiple
-+ * queues. This is important for md arrays to benefit from merging
-+ * requests.
-+ */
-+static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
-+{
-+	if (plug->multiple_queues)
-+		return BLK_MAX_REQUEST_COUNT * 4;
-+	return BLK_MAX_REQUEST_COUNT;
-+}
-+
- /**
-  * blk_mq_submit_bio - Create and send a request to block device.
-  * @bio: Bio pointer.
-@@ -2251,7 +2263,7 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 		else
- 			last =3D list_entry_rq(plug->mq_list.prev);
-=20
--		if (request_count >=3D BLK_MAX_REQUEST_COUNT || (last &&
-+		if (request_count >=3D blk_plug_max_rq_count(plug) || (last &&
- 		    blk_rq_bytes(last) >=3D BLK_PLUG_FLUSH_SIZE)) {
- 			blk_flush_plug_list(plug, false);
- 			trace_block_plug(q);
---=20
-2.30.2
-
+> 
+> -- 
+> MST
+> 
