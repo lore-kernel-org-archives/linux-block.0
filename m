@@ -2,91 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5398DC43217
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 13:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80469C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:10:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E65F610FE
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 13:52:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56E5561101
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:10:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236311AbhIGNxO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Sep 2021 09:53:14 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:9010 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231153AbhIGNxM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 09:53:12 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4H3mrd02mqzVsc4;
-        Tue,  7 Sep 2021 21:51:13 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Tue, 7 Sep 2021 21:52:03 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Tue, 7 Sep
- 2021 21:52:02 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH v4 6/6] nbd: don't start request if nbd_queue_rq() failed
-Date:   Tue, 7 Sep 2021 22:01:54 +0800
-Message-ID: <20210907140154.2134091-7-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210907140154.2134091-1-yukuai3@huawei.com>
-References: <20210907140154.2134091-1-yukuai3@huawei.com>
+        id S231486AbhIGOLs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Sep 2021 10:11:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231431AbhIGOLs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 10:11:48 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FBAC061575
+        for <linux-block@vger.kernel.org>; Tue,  7 Sep 2021 07:10:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=joojLOVghtAY4SpDPhudBjFXh84mnGtADh74ijXfAho=; b=o9uh0TquyjFTy1lV/gGcfDlOEc
+        FASgWAq1SQhjDtRnH59ar1FyQRj6n+gAaGdB/j/9MREa5OeUdWbEraXmXnlYxIsBLRYneLPS0I9W4
+        LkYqjRmKgcapGGwG7utJsm8+Yw8vyFP0wvuCuOtIbMtjMpEFWK+HYffvKw4r94OADZRZ1zqx4vXfQ
+        8NqElyVc0wwSVMsMHe4BaYVEfrk2yIsMjTaXU7dYRZq8/ZV+3ZwUAfFkVMLzV/iwgu/3jWCSghY/Q
+        bI5FfSTcKKBvGlWwsWqtqtbUvtk1YJBsVDG9R6R3kffE/k9cUYA5fzyrenFtpVSxr73ZqO6qpCRCy
+        quxocanw==;
+Received: from 089144201074.atnat0010.highway.a1.net ([89.144.201.74] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mNbnZ-007vh6-R0; Tue, 07 Sep 2021 14:10:10 +0000
+Date:   Tue, 7 Sep 2021 16:10:03 +0200
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 5.15
+Message-ID: <YTdyu/Y/d9woHINJ@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, blk_mq_end_request() will be called if nbd_queue_rq()
-failed, thus start request in such situation is useless.
+The following changes since commit 1c500ad706383f1a6609e63d0b5d1723fd84dab9:
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/block/nbd.c | 3 ---
- 1 file changed, 3 deletions(-)
+  loop: reduce the loop_ctl_mutex scope (2021-09-03 22:14:40 -0600)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 807c8cbccaae..122e49ae86fb 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -938,7 +938,6 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 				    "Socks array is empty\n");
--		blk_mq_start_request(req);
- 		return -EINVAL;
- 	}
- 	config = nbd->config;
-@@ -947,7 +946,6 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 				    "Attempted send on invalid socket\n");
- 		nbd_config_put(nbd);
--		blk_mq_start_request(req);
- 		return -EINVAL;
- 	}
- 	cmd->status = BLK_STS_OK;
-@@ -971,7 +969,6 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 			 */
- 			sock_shutdown(nbd);
- 			nbd_config_put(nbd);
--			blk_mq_start_request(req);
- 			return -EIO;
- 		}
- 		goto again;
--- 
-2.31.1
+are available in the Git repository at:
 
+  git://git.infradead.org/nvme.git tags/nvme-5.15-2021-09-07
+
+for you to fetch changes up to aff959c2840858d55d9ee155d555b3aa7e068b32:
+
+  nvme: update MAINTAINERS email address (2021-09-06 10:08:09 +0200)
+
+----------------------------------------------------------------
+nvme fixes for Linux 5.15
+
+ - fix nvmet command set reporting for passthrough controllers
+   (Adam Manzanares)
+ - updated
+ - update a MAINTAINERS email address (Chaitanya Kulkarni)
+ - set QUEUE_FLAG_NOWAIT for nvme-multipth (me)
+ - handle errors from add_disk() (Luis Chamberlain)
+ - update the keep alive interval when kato is modified (Tatsuya Sasaki)
+ - fix a buffer overrun in nvmet_subsys_attr_serial (Hannes Reinecke)
+ - do not reset transport on data digest errors in nvme-tcp (Daniel Wagner)
+ - only call synchronize_srcu when clearing current path (Daniel Wagner)
+ - revalidate paths during rescan (Hannes Reinecke)
+
+----------------------------------------------------------------
+Adam Manzanares (2):
+      nvme: move nvme_multi_css into nvme.h
+      nvmet: looks at the passthrough controller when initializing CAP
+
+Chaitanya Kulkarni (1):
+      nvme: update MAINTAINERS email address
+
+Christoph Hellwig (2):
+      nvme-multipath: set QUEUE_FLAG_NOWAIT
+      nvmet: return bool from nvmet_passthru_ctrl and nvmet_is_passthru_req
+
+Daniel Wagner (2):
+      nvme-tcp: Do not reset transport on data digest errors
+      nvme: only call synchronize_srcu when clearing current path
+
+Hannes Reinecke (2):
+      nvme-multipath: revalidate paths during rescan
+      nvmet: fixup buffer overrun in nvmet_subsys_attr_serial()
+
+Luis Chamberlain (1):
+      nvme: add error handling support for add_disk()
+
+Tatsuya Sasaki (1):
+      nvme: update keep alive interval when kato is modified
+
+ MAINTAINERS                     |  2 +-
+ drivers/nvme/host/core.c        | 68 ++++++++++++++++++++++++++++++++++-------
+ drivers/nvme/host/multipath.c   | 19 +++++++++++-
+ drivers/nvme/host/nvme.h        | 10 ++++++
+ drivers/nvme/host/tcp.c         | 22 ++++++++++---
+ drivers/nvme/target/admin-cmd.c |  2 +-
+ drivers/nvme/target/configfs.c  |  5 +--
+ drivers/nvme/target/core.c      | 10 +++---
+ drivers/nvme/target/nvmet.h     | 11 ++++---
+ drivers/nvme/target/passthru.c  | 14 +++++++--
+ 10 files changed, 132 insertions(+), 31 deletions(-)
