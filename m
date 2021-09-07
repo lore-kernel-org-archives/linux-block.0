@@ -2,71 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034F3C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2C1C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:42:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0025610E9
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 074EA610FE
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:42:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232105AbhIGOl5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Sep 2021 10:41:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231362AbhIGOl5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 10:41:57 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0AEEC061575
-        for <linux-block@vger.kernel.org>; Tue,  7 Sep 2021 07:40:50 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id a22so5011118iok.12
-        for <linux-block@vger.kernel.org>; Tue, 07 Sep 2021 07:40:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wW7nDkAHdnr9E6lho99qrzF6q0AQdn4I37de/4jvj+Y=;
-        b=seup/c4gyZDLP2geh/XwDGrHkqRiCN4KJXSd1jkF3GTeivEEI73a3Th0w8w01t4KWd
-         BtAPVPzynhHQgJ2XwJ44L8fueKVFR9LHcjgjN+s/EC8XLbXeDchWYVKZaaYzD42pPsSN
-         3YVdcKTdURDNHf39NuCFi8cGeNFTZ5D7KFjj/1g8EabKRmdJHPdStJZUmgrFUAWJnfeO
-         j0XGF21K39Gmam1nFpflABDkZxK6zEa5huJ2uJHxdge41Y5/GX0C5+XAdK0Y5IpyxcCU
-         DzOK8m9oWOFRnmC9W4bkmgwa3Mvghzyhtio9NeS8AZWPe1toyBoj3ATFcVNmWwHNKZFr
-         n76A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wW7nDkAHdnr9E6lho99qrzF6q0AQdn4I37de/4jvj+Y=;
-        b=Si/2/YyE/+ZOROv8TdUdMf5ZdYIRuHQbPep1NJt68673FMkHcWDs2hkl/LixBnHfUO
-         x9iRhUA/hVZNGJdCYXXAcnn/K6lnc6QlSV6bUrvlYe72am5GIiVCJmIuCSIWR65NrLo/
-         h2cepj3y9n0XUMEm9mcrR7kn/6fKIdvlrampEGIjinC8ozPbLJAFHs5DE4dkYrwZIM9Y
-         iKgDjz7shg5fNp/HnCmWSW6mVUopwA/J3Zo2DKgFjeUqQvLIfFfHq0Z1jffFGvJ0a8gX
-         EspBDL+rvisyWokS/eepkOZ0q2CFzNG6FjHOq/Pld+uatjqNhGhlShNTwgOcY/PdEfQS
-         bzgg==
-X-Gm-Message-State: AOAM533xzmbKzDdk+z8RfzHJuRLfrYfvxFYovuGYG/78uneHVYRC55BW
-        W386ye2teZh/J9tvC7NtiEPCXif3+8UuaQ==
-X-Google-Smtp-Source: ABdhPJzluBjWTL8JFOmWMMPD3Iq5KOrHLFrxarQNuC4dE+KYcQfEpURur7w5pF6clMoVjrT6fDsuCA==
-X-Received: by 2002:a02:c64a:: with SMTP id k10mr16262751jan.112.1631025649855;
-        Tue, 07 Sep 2021 07:40:49 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v3sm6294956ilg.54.2021.09.07.07.40.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Sep 2021 07:40:49 -0700 (PDT)
-Subject: Re: split and move block_dev.c
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20210907141303.1371844-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9b4c9d9b-a881-4796-6f18-1c57efd690b6@kernel.dk>
-Date:   Tue, 7 Sep 2021 08:40:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S231174AbhIGOnt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Sep 2021 10:43:49 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:54278 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231362AbhIGOns (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 10:43:48 -0400
+Received: from fsav314.sakura.ne.jp (fsav314.sakura.ne.jp [153.120.85.145])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 187EgVeN033731;
+        Tue, 7 Sep 2021 23:42:31 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav314.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp);
+ Tue, 07 Sep 2021 23:42:31 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 187EgUc9033725
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Tue, 7 Sep 2021 23:42:31 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH] block: genhd: don't call blkdev_show() with
+ major_names_lock held
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block <linux-block@vger.kernel.org>
+References: <18a02da2-0bf3-550e-b071-2b4ab13c49f0@i-love.sakura.ne.jp>
+ <75efddd1-726c-4065-709c-0c88c03c38ed@kernel.dk>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <0123937a-2e94-a1f8-110a-ecd0d3d7f0c6@i-love.sakura.ne.jp>
+Date:   Tue, 7 Sep 2021 23:42:25 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210907141303.1371844-1-hch@lst.de>
+In-Reply-To: <75efddd1-726c-4065-709c-0c88c03c38ed@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,16 +52,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/7/21 8:13 AM, Christoph Hellwig wrote:
-> Hi Jens,
+On 2021/09/07 23:36, Jens Axboe wrote:
+> On 9/7/21 5:52 AM, Tetsuo Handa wrote:
+>> The simplest fix is to call probe function without holding
+>> major_names_lock [1], but Christoph Hellwig does not like such idea.
+>> Therefore, instead of holding major_names_lock in blkdev_show(),
+>> introduce a different lock for blkdev_show() in order to break
+>> "sb_writers#$N => &p->lock => major_names_lock" dependency chain.
 > 
-> block_dev.c has been mis-placed in the fs/ directory forever, and
-> also contains a weird mix.  This series splits it into two files,
-> and moves both of them to block.  The second week of the -rc1 window
-> might be the best time to do something like this to avoid conflicts.
+> Agree, that's probably the easiest fix here. Applied, thanks.
+> 
 
-Agree, easier than juggling this until the next merge window.
+Sorry, can you update the patch title to:
 
--- 
-Jens Axboe
-
+block: genhd: don't hold major_names_lock in blkdev_show()
