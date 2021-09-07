@@ -4,71 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 882DAC433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60BF0C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:37:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64E03610A3
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 418596109F
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230427AbhIGOh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Sep 2021 10:37:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
+        id S237261AbhIGOiQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Sep 2021 10:38:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232120AbhIGOh6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 10:37:58 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07DEBC061575
-        for <linux-block@vger.kernel.org>; Tue,  7 Sep 2021 07:36:52 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id f6so13185935iox.0
-        for <linux-block@vger.kernel.org>; Tue, 07 Sep 2021 07:36:52 -0700 (PDT)
+        with ESMTP id S235028AbhIGOiP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 10:38:15 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4FFC061575
+        for <linux-block@vger.kernel.org>; Tue,  7 Sep 2021 07:37:09 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id b7so13126872iob.4
+        for <linux-block@vger.kernel.org>; Tue, 07 Sep 2021 07:37:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=SruVr+U0/ZU+9t7XIBWrNzVvwLEsEgetqnj4R5a9Ojw=;
-        b=xupl/ukNNH3AcTsoRgTp9NA6Rx9NTK8OuwmHkbPFfkxFnDZl5LNPaDkmjvl/wsSflc
-         DL2gmMcPOVXNAPTtwFPtfmvre1Z3XOr73VUm6NIq04ZjHTVtGTaLnaUCvMPx8X3wIFII
-         X7X32GGvQ4JM3kY0uPtbs0zrdrHIUMLNq1hvhAM8tjzLljpCVFHE/BMlaTQOZ8xBrxr6
-         qdmQF2px4sbfr/r515hnH9I+JxHVXB+bZlLia1jhkAnV/l/CzGgeTswXWBh2zoSF3yR/
-         mIoYM1gDY3droB5m5WI7A7ahZhqc8wjkgyQ/rYveWiY1QnW51kpuCmmIWUxCS5KJc8kT
-         CatA==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/S6NVKS+rAl9aR4n3SE5uAuU4aZe4mciq8781mBYsjY=;
+        b=VOSgUj1wc8knZeRVbNf3FAbpUzXJwSywrL5pYnfp/MjmVmoTrq28kVxU5DqwyIILlZ
+         DT2SMXaXjzmzG4AZ7rXZwgKHeXg8KqB4S3W/w36ws2XAxAswl50Xo3REg9dt+BN3TdLW
+         lmBD1A+fLx4oLlSeJVpuaGEhe/i+1snel97IOVR21KRTIlS3aFXdtIaNnIxXygIZbgXV
+         cmC9VAeQ7K4sFJwKTadlgI46iF7/Uk2OrUEcLBQDiUGlQJbAu2htDS0OpSjh9tCcX0Y/
+         YnCYlMXiUrsklhsGY+zQCX5/Z4Odevd6KG+8Eq5B0+D8gagDAARC/GOuTv9KYRdH0Hjx
+         kzRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SruVr+U0/ZU+9t7XIBWrNzVvwLEsEgetqnj4R5a9Ojw=;
-        b=JCOI29NkFVZnCYnm5Xtwp08R4Cy0i6ZyU37hLRfTEq3fcO3Ey3sJeUnI1Mooihb5Ay
-         QmOFfxyeDfwwMtTp0tJvrigPQ+/G/UfwHKXAcd/QmBthbgCdthmMZtybzu7fhJVwIzjB
-         cmUX/Lt+Tlmp1iO6V+syrhtDV2xdEfXBB/TpyBzORJEQyin22H8eYZp2PPbyxZPnipsv
-         WQBb0qmbR9DOWr6Dt1JC0u5dEH9PsIURdQzL3eVUYwkoflJ9sXLD7sTL0tOX092AnDM1
-         UxSL8VKggZbJidRNhwYkzMgAE03Tdy/fuv9yZUTbsg2Z0sZhbzZCtY4GHRflDXRG4/IJ
-         2a2g==
-X-Gm-Message-State: AOAM530QL8daD8Fm/y18QaGRHgke2EgVKY0FtRZKsl14OqNrrV4j3OQK
-        68j1JJXDF/+zFz+8BOYD4aJgVeAWBdgcHA==
-X-Google-Smtp-Source: ABdhPJztNthpV0r8mJ8UrwlwPI3s3c/+Ktsr1VpF4u4WQvOvLeV+9X+uzLACW6MxQ5gXUOQdw6eRUw==
-X-Received: by 2002:a05:6638:150c:: with SMTP id b12mr15955323jat.110.1631025411120;
-        Tue, 07 Sep 2021 07:36:51 -0700 (PDT)
+        bh=/S6NVKS+rAl9aR4n3SE5uAuU4aZe4mciq8781mBYsjY=;
+        b=G/RYoqXlWJSifcrGLAoCfHGOhQIRCt+MSArwOIX0g2ghpYWg81B/9OG7jbDHe1OA7S
+         +yhHJXIL1qMA5TkdTCn1holtalCjXT5gJNjXrI/d17LLbnoGvMQKqFvNSDzT4sYChrT2
+         UisE6/B1EKEg+Vu2gHbbtrrPIU8jw/zIsFkXi2A5971Qa1G+p6u8aGaiJtm/LR0klHnr
+         1oXfwbW0/yY9voLgoiIpWDd7UY6NHZEC2ivCcXWoEQ6BxG14rrI66Tmis/TZr+PMUh+Y
+         jZfqR/S9GNvQYJMd1jaUr9i0rOJvadU8t31U4mJAxXo9F7d78UT+DMsKM1SrkLJ7+xvr
+         ByFQ==
+X-Gm-Message-State: AOAM533vGb/BQCJMSA56a5CPg4YmxH47c/ao3FqzSilfLn+m9SqnDPA/
+        Z8x6p8qzVKbYRPVYiYOH7BkJvQ==
+X-Google-Smtp-Source: ABdhPJxCFz1RVkSXmkxnoFMSLRVGtw+KyJ9h6cFRIdCUSz6PRJxUpW/2mXD2QFUHzuf5zVNN1O6PoQ==
+X-Received: by 2002:a5e:da44:: with SMTP id o4mr13768582iop.147.1631025428502;
+        Tue, 07 Sep 2021 07:37:08 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id r18sm6872216ioa.13.2021.09.07.07.36.49
+        by smtp.gmail.com with ESMTPSA id u17sm6343646iln.81.2021.09.07.07.37.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Sep 2021 07:36:49 -0700 (PDT)
-Subject: Re: [PATCH] block: genhd: don't call blkdev_show() with
- major_names_lock held
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Christoph Hellwig <hch@lst.de>,
-        linux-block <linux-block@vger.kernel.org>
-References: <18a02da2-0bf3-550e-b071-2b4ab13c49f0@i-love.sakura.ne.jp>
+        Tue, 07 Sep 2021 07:37:07 -0700 (PDT)
+Subject: Re: [PATCH] blk-throttle: fix UAF by deleteing timer in
+ blk_throtl_exit()
+To:     Li Jinlin <lijinlin3@huawei.com>, tj@kernel.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linfeilong@huawei.com,
+        louhongxiang@huawei.com
+References: <20210907121242.2885564-1-lijinlin3@huawei.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <75efddd1-726c-4065-709c-0c88c03c38ed@kernel.dk>
-Date:   Tue, 7 Sep 2021 08:36:48 -0600
+Message-ID: <1f962850-06d6-f50b-2c2f-e6d5bfd3823a@kernel.dk>
+Date:   Tue, 7 Sep 2021 08:37:06 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <18a02da2-0bf3-550e-b071-2b4ab13c49f0@i-love.sakura.ne.jp>
+In-Reply-To: <20210907121242.2885564-1-lijinlin3@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,14 +77,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/7/21 5:52 AM, Tetsuo Handa wrote:
-> The simplest fix is to call probe function without holding
-> major_names_lock [1], but Christoph Hellwig does not like such idea.
-> Therefore, instead of holding major_names_lock in blkdev_show(),
-> introduce a different lock for blkdev_show() in order to break
-> "sb_writers#$N => &p->lock => major_names_lock" dependency chain.
+On 9/7/21 6:12 AM, Li Jinlin wrote:
+> From: Li Jinlin <lijinlin3@huawei.com>
+> 
+> The pending timer has been set up in blk_throtl_init(). However, the
+> timer is not deleted in blk_throtl_exit(). This means that the timer
+> handler may still be running after freeing the timer, which would
+> result in a use-after-free.
+> 
+> Fix by calling del_timer_sync() to delete the timer in blk_throtl_exit().
 
-Agree, that's probably the easiest fix here. Applied, thanks.
+Applied, thanks.
 
 -- 
 Jens Axboe
