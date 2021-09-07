@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E50AEC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D66C433FE
 	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 13:52:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C14CB610C7
+	by mail.kernel.org (Postfix) with ESMTP id D7C3E60F70
 	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 13:52:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231431AbhIGNxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232439AbhIGNxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 7 Sep 2021 09:53:11 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:15389 "EHLO
+Received: from szxga02-in.huawei.com ([45.249.212.188]:15390 "EHLO
         szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230320AbhIGNxK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 09:53:10 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H3mmw6Fl4zQtrf;
-        Tue,  7 Sep 2021 21:48:00 +0800 (CST)
+        with ESMTP id S230404AbhIGNxL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 09:53:11 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H3mmy1tpvzQyMT;
+        Tue,  7 Sep 2021 21:48:02 +0800 (CST)
 Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
  dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Tue, 7 Sep 2021 21:52:01 +0800
+ 15.1.2308.8; Tue, 7 Sep 2021 21:52:02 +0800
 Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
  (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Tue, 7 Sep
- 2021 21:52:00 +0800
+ 2021 21:52:01 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <ming.lei@redhat.com>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <nbd@other.debian.org>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH v4 1/6] blk-mq: export two symbols to get request by tag
-Date:   Tue, 7 Sep 2021 22:01:49 +0800
-Message-ID: <20210907140154.2134091-2-yukuai3@huawei.com>
+Subject: [PATCH v4 4/6] nbd: make sure request completion won't concurrent
+Date:   Tue, 7 Sep 2021 22:01:52 +0800
+Message-ID: <20210907140154.2134091-5-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210907140154.2134091-1-yukuai3@huawei.com>
 References: <20210907140154.2134091-1-yukuai3@huawei.com>
@@ -51,68 +51,71 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-nbd has a defect that blk_mq_tag_to_rq() might return a freed
-request in nbd_read_stat(). We need a new mechanism if we want to
-fix this in nbd driver, which is rather complicated.
+commit cddce0116058 ("nbd: Aovid double completion of a request")
+try to fix that nbd_clear_que() and recv_work() can complete a
+request concurrently. However, the problem still exists:
 
-Thus use blk_mq_find_and_get_req() to replace blk_mq_tag_to_rq(),
-which can make sure the returned request is not freed, and then we
-can do more checking while 'cmd->lock' is hold.
+t1                    t2                     t3
+
+nbd_disconnect_and_put
+ flush_workqueue
+                      recv_work
+                       blk_mq_complete_request
+                        blk_mq_complete_request_remote -> this is true
+                         WRITE_ONCE(rq->state, MQ_RQ_COMPLETE)
+                          blk_mq_raise_softirq
+                                             blk_done_softirq
+                                              blk_complete_reqs
+                                               nbd_complete_rq
+                                                blk_mq_end_request
+                                                 blk_mq_free_request
+                                                  WRITE_ONCE(rq->state, MQ_RQ_IDLE)
+  nbd_clear_que
+   blk_mq_tagset_busy_iter
+    nbd_clear_req
+                                                   __blk_mq_free_request
+                                                    blk_mq_put_tag
+     blk_mq_complete_request -> complete again
+
+There are three places where request can be completed in nbd:
+recv_work(), nbd_clear_que() and nbd_xmit_timeout(). Since they
+all hold cmd->lock before completing the request, it's easy to
+avoid the problem by setting and checking a cmd flag.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-mq-tag.c     | 5 +++--
- block/blk-mq.c         | 1 +
- include/linux/blk-mq.h | 3 +++
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ drivers/block/nbd.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 86f87346232a..b4f66b75b4d1 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -200,8 +200,8 @@ struct bt_iter_data {
- 	bool reserved;
- };
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 521a8d913741..6e22e80a5488 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -406,7 +406,11 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+ 	if (!mutex_trylock(&cmd->lock))
+ 		return BLK_EH_RESET_TIMER;
  
--static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
--		unsigned int bitnr)
-+struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
-+					unsigned int bitnr)
- {
- 	struct request *rq;
- 	unsigned long flags;
-@@ -213,6 +213,7 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
- 	spin_unlock_irqrestore(&tags->lock, flags);
- 	return rq;
- }
-+EXPORT_SYMBOL(blk_mq_find_and_get_req);
+-	__clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
++	if (!__test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
++		mutex_unlock(&cmd->lock);
++		return BLK_EH_DONE;
++	}
++
+ 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
+ 		cmd->status = BLK_STS_TIMEOUT;
+ 		mutex_unlock(&cmd->lock);
+@@ -846,7 +850,10 @@ static bool nbd_clear_req(struct request *req, void *data, bool reserved)
  
- static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 08626cb0534c..5113aa3788a2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -916,6 +916,7 @@ void blk_mq_put_rq_ref(struct request *rq)
- 	else if (refcount_dec_and_test(&rq->ref))
- 		__blk_mq_free_request(rq);
- }
-+EXPORT_SYMBOL(blk_mq_put_rq_ref);
+ 	mutex_lock(&cmd->lock);
+ 	cmd->status = BLK_STS_IOERR;
+-	__clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
++	if (!__test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
++		mutex_unlock(&cmd->lock);
++		return true;
++	}
+ 	mutex_unlock(&cmd->lock);
  
- static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq, void *priv, bool reserved)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 13ba1861e688..03e02990609d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -637,4 +637,7 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio);
- void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
- 		struct lock_class_key *key);
- 
-+void blk_mq_put_rq_ref(struct request *rq);
-+struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
-+					unsigned int bitnr);
- #endif
+ 	blk_mq_complete_request(req);
 -- 
 2.31.1
 
