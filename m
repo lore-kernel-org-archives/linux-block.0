@@ -2,132 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F276C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 09:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C3CC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 10:18:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A99D61106
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 09:10:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 504AC610FE
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 10:18:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244850AbhIGJLR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Sep 2021 05:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54408 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244799AbhIGJLQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 05:11:16 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18031C061757
-        for <linux-block@vger.kernel.org>; Tue,  7 Sep 2021 02:10:10 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id h9so18340406ejs.4
-        for <linux-block@vger.kernel.org>; Tue, 07 Sep 2021 02:10:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=n5+hR87J9jGsWkS18UhQx1xHYTAbX3jyL7zc+byYnoE=;
-        b=J6WXwrXM6MdanWnIZTBBErxz8LsqiBupx2Hk+Qs04dCov+47QRyfhsn0Whb+ii1Ir7
-         CZinwkkKrXjXlx1t7HWzAg74O1S0dghPmdZy9FQY9atom9A6shfizVVmq2oy/iiXN9Gw
-         6HyJAAWLK96z6VzsWqPWuJj/Bg4F/2MHmHSAhIvdnz8AM1QIJgqYh+LfQJx4ZjfgWPK7
-         3czXE3s/2HG+EU+KsT0Xe9L/PRrAqYDD2vUmMMDbYmeOK/jIrnHPWw5WGMqTClwMSkYH
-         tKhFW+zIycZxNlyacYrdDxXy+f3SYv7DEGG1W+214oadaY13qnBnyZzLuEGSi1kEfHA9
-         70Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=n5+hR87J9jGsWkS18UhQx1xHYTAbX3jyL7zc+byYnoE=;
-        b=OjrMa8ChqtcyY9ECRBVhpd/kwblHE6mscithAobqk2i8aiG98GZliadMrq1WItdg3x
-         Y0dX5oKZ81AKn7TUeFSV0omy+Oeo1KmudNUX7Ddlk3n4hE8Vjv+yGuQf4kBYzzg8ah9G
-         g1NUfbO69R3VhXyboDHxJS3pryKXR6qr65DobGa8fwxuSbM3TB+7RXWRV9WZ275X3rqy
-         1PGqgbuC45xv4PZSAtNXMdbYT/88hMkYcgVRAyuoB8BBci5OZWPce7HvTuAE7uypM1da
-         iY/TNdxipwZL1hPO7OQAheeliO4FJrDZCrFcXt+VHIUAGk2vSCZ2J1C2gIWcfoHNOn6j
-         493w==
-X-Gm-Message-State: AOAM530ZvMndivt6w2iJyei5pkHaieVhRRCnI4iqMSzsdsFf5If8ksXO
-        2DzLIFXYJyF/ehttjcic9CyzLg==
-X-Google-Smtp-Source: ABdhPJy/YBmN91bP9G+ttPy7MX183v9h/jDq0tqOedtJk2zJwFGmDKT/uiQ89oLmV+arDTeAnMIjEw==
-X-Received: by 2002:a17:906:681:: with SMTP id u1mr17366604ejb.499.1631005808680;
-        Tue, 07 Sep 2021 02:10:08 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id w13sm6525460ede.24.2021.09.07.02.10.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 07 Sep 2021 02:10:08 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2 2/4] block, bfq: do not idle if only one cgroup is
- activated
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <da0e53b4-e947-9c91-832e-36da67037f0f@huawei.com>
-Date:   Tue, 7 Sep 2021 11:10:02 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F1ADC992-11AE-4511-9033-D233CBCA6F26@linaro.org>
-References: <20210806020826.1407257-1-yukuai3@huawei.com>
- <20210806020826.1407257-3-yukuai3@huawei.com>
- <21FA636D-2C21-4ACD-B7DE-180ABB1F3562@linaro.org>
- <da0e53b4-e947-9c91-832e-36da67037f0f@huawei.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S245475AbhIGKTa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Sep 2021 06:19:30 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:63922 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245525AbhIGKTQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 06:19:16 -0400
+Received: from fsav114.sakura.ne.jp (fsav114.sakura.ne.jp [27.133.134.241])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 187AI0QK099781;
+        Tue, 7 Sep 2021 19:18:00 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav114.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav114.sakura.ne.jp);
+ Tue, 07 Sep 2021 19:18:00 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav114.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 187AI0C0099777
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Tue, 7 Sep 2021 19:18:00 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: [PATCH v2] brd: reduce the brd_devices_mutex scope
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <65b57a74-34db-d466-df67-c7a7bb529ae3@i-love.sakura.ne.jp>
+ <20210907064958.GA29211@lst.de>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <e205f13d-18ff-a49c-0988-7de6ea5ff823@i-love.sakura.ne.jp>
+Date:   Tue, 7 Sep 2021 19:18:00 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <20210907064958.GA29211@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+As with commit 8b52d8be86d72308 ("loop: reorder loop_exit"),
+unregister_blkdev() needs to be called first in order to avoid calling
+brd_alloc() from brd_probe() after brd_del_one() from brd_exit(). Then,
+we can avoid holding global mutex during add_disk()/del_gendisk() as with
+commit 1c500ad706383f1a ("loop: reduce the loop_ctl_mutex scope").
 
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+Changes in v2:
+  s/brd->brd_number != i/brd->brd_number == i/
 
-> Il giorno 2 set 2021, alle ore 15:31, yukuai (C) <yukuai3@huawei.com> =
-ha scritto:
->=20
-> On 2021/08/27 1:00, Paolo Valente wrote:
->> Why do you make these extensive changes, while you can leave all the
->> function unchanged and just modify the above condition to something
->> like
->> || bfqd->num_groups_with_pending_reqs > 1
->> || (bfqd->num_groups_with_pending_reqs && =
-bfqd->num_queues_with_pending_reqs_in_root)
->=20
-> Hi, Paolo
->=20
-> I was thinking that if CONFIG_BFQ_GROUP_IOSCHED is enabled, there is =
-no
-> need to caculate smallest_weight, varied_queue_weights, and
-> multiple_classes_busy:
->=20
-> If we count root group into num_groups_with_pending_reqs
-> - If num_groups_with_pending_reqs <=3D 1, idle is not needed
+ drivers/block/brd.c | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
 
-Unfortunately, if active queues have different weights or belong to
-different classes, then idling is needed to preserve per-queue
-bandwidths.
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 58ec167aa018..530b31240203 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -373,10 +373,22 @@ static int brd_alloc(int i)
+ 	struct gendisk *disk;
+ 	char buf[DISK_NAME_LEN];
+ 
++	mutex_lock(&brd_devices_mutex);
++	list_for_each_entry(brd, &brd_devices, brd_list) {
++		if (brd->brd_number == i) {
++			mutex_unlock(&brd_devices_mutex);
++			return -EEXIST;
++		}
++	}
+ 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
+-	if (!brd)
++	if (!brd) {
++		mutex_unlock(&brd_devices_mutex);
+ 		return -ENOMEM;
++	}
+ 	brd->brd_number		= i;
++	list_add_tail(&brd->brd_list, &brd_devices);
++	mutex_unlock(&brd_devices_mutex);
++
+ 	spin_lock_init(&brd->brd_lock);
+ 	INIT_RADIX_TREE(&brd->brd_pages, GFP_ATOMIC);
+ 
+@@ -411,37 +423,30 @@ static int brd_alloc(int i)
+ 	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
+ 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, disk->queue);
+ 	add_disk(disk);
+-	list_add_tail(&brd->brd_list, &brd_devices);
+ 
+ 	return 0;
+ 
+ out_free_dev:
++	mutex_lock(&brd_devices_mutex);
++	list_del(&brd->brd_list);
++	mutex_unlock(&brd_devices_mutex);
+ 	kfree(brd);
+ 	return -ENOMEM;
+ }
+ 
+ static void brd_probe(dev_t dev)
+ {
+-	int i = MINOR(dev) / max_part;
+-	struct brd_device *brd;
+-
+-	mutex_lock(&brd_devices_mutex);
+-	list_for_each_entry(brd, &brd_devices, brd_list) {
+-		if (brd->brd_number == i)
+-			goto out_unlock;
+-	}
+-
+-	brd_alloc(i);
+-out_unlock:
+-	mutex_unlock(&brd_devices_mutex);
++	brd_alloc(MINOR(dev) / max_part);
+ }
+ 
+ static void brd_del_one(struct brd_device *brd)
+ {
+-	list_del(&brd->brd_list);
+ 	del_gendisk(brd->brd_disk);
+ 	blk_cleanup_disk(brd->brd_disk);
+ 	brd_free_pages(brd);
++	mutex_lock(&brd_devices_mutex);
++	list_del(&brd->brd_list);
++	mutex_unlock(&brd_devices_mutex);
+ 	kfree(brd);
+ }
+ 
+@@ -491,25 +496,21 @@ static int __init brd_init(void)
+ 
+ 	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
+ 
+-	mutex_lock(&brd_devices_mutex);
+ 	for (i = 0; i < rd_nr; i++) {
+ 		err = brd_alloc(i);
+ 		if (err)
+ 			goto out_free;
+ 	}
+ 
+-	mutex_unlock(&brd_devices_mutex);
+-
+ 	pr_info("brd: module loaded\n");
+ 	return 0;
+ 
+ out_free:
++	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
+ 	debugfs_remove_recursive(brd_debugfs_dir);
+ 
+ 	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
+ 		brd_del_one(brd);
+-	mutex_unlock(&brd_devices_mutex);
+-	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
+ 
+ 	pr_info("brd: module NOT loaded !!!\n");
+ 	return err;
+@@ -519,13 +520,12 @@ static void __exit brd_exit(void)
+ {
+ 	struct brd_device *brd, *next;
+ 
++	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
+ 	debugfs_remove_recursive(brd_debugfs_dir);
+ 
+ 	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
+ 		brd_del_one(brd);
+ 
+-	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
+-
+ 	pr_info("brd: module unloaded\n");
+ }
+ 
+-- 
+2.30.2
 
-Thanks,
-Paolo
-
-> - If num_groups_with_pending_reqs  > 1, idle is needed
->=20
-> Thus such changes can save some additional overhead.
->=20
-> Thanks
-> Yu Kuai
->=20
->> In addition, I still wonder whether you can simply add also the root
->> group to bfqd->num_groups_with_pending_reqs (when the root group is
->> active).  This would make the design much cleaner.
->> Thanks,
->> Paolo
->>> -#endif
->>> -		;
->>> +	return varied_queue_weights || multiple_classes_busy;
->>> }
->>>=20
->>> /*
->>> --=20
->>> 2.31.1
->>>=20
->> .
 
