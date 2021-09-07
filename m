@@ -3,62 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1A9C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A5EC4332F
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:21:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0FAE6103B
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:21:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 543DC6103D
+	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 14:21:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237804AbhIGOXC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Sep 2021 10:23:02 -0400
+        id S237928AbhIGOXD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Sep 2021 10:23:03 -0400
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:17679 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233856AbhIGOXC (ORCPT
+        with ESMTP id S235580AbhIGOXC (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 10:23:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1631024515; x=1662560515;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=CCjGXlIFKAvSqwDCiM+j9euV6uJgQIC5PyrIfnajK/Q=;
-  b=gUlpJ5yGjfbtqnaM9GlzI+OLi2SzqWvCDuXdKBzrRPCmmFbAlK1t1XHq
-   RJf2GzTM7hBLzYVga3uARu97K27kih+6VL7iOq4EW+HCiaSWD542y3JZi
-   DECzTk2MmwVvIgremB1d0shSBQ43dMs9tRUC2x8aqChh68Xp6zp7rj4Ud
-   bavhP9C4CMEoE0YgtEV2YuxVBuQX4mN7KZeeMQ8/jOsX34zVj07fIH5cH
-   iyyydGnbXdkHksWmmI8AxW66Jz0BDtsmML/gdJ95L4JCvcDocQOGeMtYT
-   2W/GZmVdVDHvIG5znJKAySNqpSkfr9S6FRVY2M0wTEbfG0XClmrLt97Nz
-   w==;
+  t=1631024516; x=1662560516;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=NfKgIZnJTpnqdTH7n+03JPvfkUkveonE5vDXeKwOr7g=;
+  b=E0EGMAAcwjgq/tMVEGSLwwANe8WLq2A21BJUprZvpIvRgJdU0ZpVnxXI
+   HD7MQ6jm4P/ziiOO1NmGXZJAZ8GBnTL+b4Vr24NY4A6S4jewPNW6Qa3G1
+   rOejIjoFz8JcB1iaInrwu7BuwScYRNhA4jePQwlXuPSdV1bdX+XPFOeSw
+   ELtGXOxfT5M5Mw7FNS6D7h4C6+qkxKFctQ3Gis/tx20LQVaa5tNlb9lfk
+   tGcLXQtIoCViL35xKp4CARW4yQv6EZXTsMVjpJLyKyL6NrkQFcbKBAtad
+   e5eZB2rsWTsC3lPcQaGL2FYrP/E/tBWHwdk5zx+4+gRQRH90BJuq0prk2
+   g==;
 X-IronPort-AV: E=Sophos;i="5.85,274,1624291200"; 
-   d="scan'208";a="184162945"
+   d="scan'208";a="184162950"
 Received: from mail-mw2nam10lp2105.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.105])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Sep 2021 22:21:54 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 07 Sep 2021 22:21:55 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TvAZrs+zq8vo0VkRGEnWJDlFGalOPJ8PKFSAqL1HLmjJD9NN9kLwtWEuw8fapwg7zzj4YSbRjVXpDr0IC0SnrA3/e0lQXDyRAtcd/5Xg3ztorZS6YdGVGY8ufucmdg9xMBdRjSgaLlUNzpLxk1mEByXM1IotOuWq2vSvk1grArfdFXOf2wO4dYzStcrfCsv/cXUymI7ZfFdHCJuvnCEaPzb4tctvibQ5GhZwF2P4RKB7r2kivSX4X+vieu0izKQXOQ+sP8rMXNV4eWBsCtRSd72aipHPurRE9Q5m2l4bak0HlMNKaeFMtkUly4vKbHNrx16l7DmqkM3JjCS6SsIXRQ==
+ b=J6h0jrxShObqfBT7nsQszLKtmzQY+sXghNgsmbP+kboOS/VWJp7E6qctgkq2Ano8+8FAzv7JE7DBye3bA0sWGsa4tstPTwWwi6jDXFC2mJsq5oYyCQz+dtw70slYR/GMYxesCED2xdWYOWWi5eDsXpHfsoeG3M6pHPPiu3/FM9sPgqB2GB2IEv1cB+rIxqyJ7++sFawIo+nawJ1W99V8Fy70ehwh4pmXLJrYpT3hwhzxBX3WrRYTwBdAfcrjfD/YlLyS9Yq0xWp39+82vRUuzV5Q5cI9Wv4sBeTCCTeWo4xtuvpe+FEmVqV2HQwNObg16i+1LtDr/iM7mC0xVVhH3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=UeTrvjV6dCfm4FFAYkNOEFEcrGl7TG9y4GYSXqs3ujA=;
- b=KHFzUYVz6EEEgZsloCDGAio6KAGrydwypvX5TADG/fYkLS+EQj+6AjnlOQ/BOGs5Mq3SlmE4ijX2rLIvS+leYZA73xLCpQnT022W+iNo59VwPwCJJ58tuOzxwIwOfJ75BVEvR/1RFScsHeyRgKl8Wx0XHUFmTnxsJljHN6Sdi4PZgvdtaUxI1hKllb8HpDFXkq6jkQAcjtJPOKVx+64RIHWOEtn0825JRZ+7nLl85/bTYAF2xRFjwoRheNiKwbwbZa82lTILaGDrK3mAlAkIxAmCmcW651Pp6VTRi1uRmFD4s2diN5HEvjgUap/yNJaXh2TXmRHVwpe52plBjY7l3g==
+ bh=cRbK6/CmJgEd3dgnXdcRLqexu2Y4uNocW/0E58DQUA0=;
+ b=VDd8Qln8fB5k1ZIP/2mGxXOYzCiiBEYt54QI0g7kXCEm9jL5tZ4dWvWHuqkvN60LS9/ez8oc3j05cHcjMI4h0D4OGlQa3Xnh3xaf00gGT4uGBUR1xJh918oYe+fD95zFdguQwrI1iKeZ/GnBXXhLc4MkxcIkPtZjUYQTnog6XY4fFeeh3vw9wlzmE0etrernsamDb8pUCVwm5GyAD2uh4lKucwIv8e0z5b8CCvPKeCF0S8wcl/WgNcM1ICwm+ujkurbpH5miX3dBBDi2MtTx8Npt/auC9lyqL0wn4XrYHtkjEB0YUVHjcgvlp7UoSVdKeOxgu7YnAw76UdQca7IlWQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UeTrvjV6dCfm4FFAYkNOEFEcrGl7TG9y4GYSXqs3ujA=;
- b=s5NF8x2IW42h7VIa62HHeK8Cbc6xF3aOK5pLGt+pFyT881YNPYoJtnwwwghYsb0fXm0kv1RlIAD2rhdwwMFDcp5XRf/U7NzizGRAusBmYHk+YFjoGbPC3UGhbBmUgNFQxz3zwYcRLkxtvz9nF+q35q8YIAqdkihME0v2Z2hIiI8=
+ bh=cRbK6/CmJgEd3dgnXdcRLqexu2Y4uNocW/0E58DQUA0=;
+ b=Tuq5bIgDaYQflyiHEPuB/QZAe+YM9b9i+sVHi+OG/J4jMEf6NYwz6UMUCnnQBrl6Ty8R3JJPnapyuacExTHrcdGE39iDnkyT9feE2nZT/eDTQpVrSoPbgdU0K57h5TZqtGdYPMK5nnCiKLSjKdWU1sQEc2yvfhvIaEUHX/xh8ks=
 Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
  by PH0PR04MB7382.namprd04.prod.outlook.com (2603:10b6:510:1e::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.21; Tue, 7 Sep
- 2021 14:21:54 +0000
+ 2021 14:21:55 +0000
 Received: from PH0PR04MB7158.namprd04.prod.outlook.com
  ([fe80::3d04:c2fb:e69f:27e8]) by PH0PR04MB7158.namprd04.prod.outlook.com
  ([fe80::3d04:c2fb:e69f:27e8%6]) with mapi id 15.20.4478.025; Tue, 7 Sep 2021
- 14:21:54 +0000
+ 14:21:55 +0000
 From:   Niklas Cassel <Niklas.Cassel@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>
 CC:     Bart Van Assche <bvanassche@acm.org>,
@@ -68,13 +68,15 @@ CC:     Bart Van Assche <bvanassche@acm.org>,
         Niklas Cassel <Niklas.Cassel@wdc.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH 0/2] don't call io scheduler callbacks for passthrough
- requests
-Thread-Topic: [PATCH 0/2] don't call io scheduler callbacks for passthrough
- requests
-Thread-Index: AQHXo/O1SmyNM8u59EWUacCSWXPwmA==
-Date:   Tue, 7 Sep 2021 14:21:54 +0000
-Message-ID: <20210907142145.112096-1-Niklas.Cassel@wdc.com>
+Subject: [PATCH 1/2] blk-mq: don't call callbacks for requests that bypassed
+ the scheduler
+Thread-Topic: [PATCH 1/2] blk-mq: don't call callbacks for requests that
+ bypassed the scheduler
+Thread-Index: AQHXo/O1j+Dxeg06HkOKzFhsF9jhAg==
+Date:   Tue, 7 Sep 2021 14:21:55 +0000
+Message-ID: <20210907142145.112096-2-Niklas.Cassel@wdc.com>
+References: <20210907142145.112096-1-Niklas.Cassel@wdc.com>
+In-Reply-To: <20210907142145.112096-1-Niklas.Cassel@wdc.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -83,55 +85,55 @@ x-mailer: git-send-email 2.31.1
 authentication-results: kernel.dk; dkim=none (message not signed)
  header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 188ea190-c8d1-42f7-bab9-08d9720ad7c0
+x-ms-office365-filtering-correlation-id: 3eac2590-4489-4a9a-9f43-08d9720ad84e
 x-ms-traffictypediagnostic: PH0PR04MB7382:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR04MB738292A49D778759D9188DE1F2D39@PH0PR04MB7382.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <PH0PR04MB7382AD7E97EC4769290F8BD3F2D39@PH0PR04MB7382.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DkPD0enj3ZRzTFnYcXCl+af+gxBc1U4bKx8cvt+ME8Ak1+wVZ8Bq43jde1/Nu0IlN2cjHH+7PzqbhlPFGYnDg8HzHeYSPRX812Sq5w3o81qo3SJgzEjBs/0WiWFlXHpzoWcFAsrlZVPnJRG3ApgP1T3CoUHIkk9s3CrW4vkXVKrRvqXG4sOsL7R9GCTBaeMvpvYtfAs2dKUh+UVb9Am4LnEeIGpcGwhyV4DINdIZRDJyqmbkWkENSdxkwsuui/HPKVWMLeUAberd0RdEjRfaGHOfuBycSiGIhUqs1+HP9A/8aPF9a1LzysWKza+g5qgjV4KrfTW4Na1JFnElk8cPuohM6dNxLzAHEgJTCPmQsldpTzHK+y0j4H9axqQlRFou9RvrxkoZyPEwD5FwaiJAd1y0U69G5qPXEU0aoDU6P0oGlfusjuNxHwrfxvdQOku8acputj9aBJHLuNk6AJZdhvsTRv17/CLw1Z1h6qqTQfqXqR6mPyUR0Oju+w7Mtckdu+tU6UOaMJGF74PNEu8BVVn+HedCzc0PrB6kbvXoFNQ2SEO2VFUMoxPnZx8oBNt0DpYKYzOEKDpXQUOAUjzTtwJPSVbc3fvf5rRJaTBNyYzfQ99oBu3LDPpvBMVuRrpzYf1c9rnwT8qeRIH8kxO7cyNiD5fmr1EBR6ziPbICVmLPVYtdoe2QJH3/saj2J4xXb1nhjFFXswC2DfCXANJP3lcKma/rnweLaV6O2Mn975A5GWAhp9WzykBH5KLe1rkYn3bDQuMcVtBrM3t4/Yqpl4xd0qiY//ELHA/eJAclTAE=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(39860400002)(366004)(136003)(346002)(6916009)(2906002)(478600001)(5660300002)(8936002)(2616005)(36756003)(186003)(1076003)(64756008)(66476007)(26005)(38070700005)(38100700002)(71200400001)(6512007)(122000001)(66446008)(86362001)(66556008)(76116006)(83380400001)(4326008)(6486002)(8676002)(6506007)(966005)(91956017)(316002)(54906003)(66946007);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: EI5LCfTFsZJMmLO4WfD62UuKP/VgnoKMKFQI1LG8yceaXrydwxQy/p7hq6JG8Qx2ORqFKH1tA5NykWKRT5jL8vSNj66YzlwVxJL9lRj6TJZt7x6uotPqh3AAy5mBYKQsn/6j4+f4cmMN/PXV4VOM/8QnC1Ino0Ji2D5kO8jednHV0BcgqufChO+wKsiSdGX3fxhBcMzfJcz/boZShvvDiPkQm/xp0ANmkES25UZAeZjUrnlsuKBUZgYgV0ZEVqDie6cZBqNeUQH4r6Hq3aJ8vnlmZu9jg1B9qA04QH0KvpGh3MdjKfhdumplO+faH9CsTKYEb0pOBqSVZ249N18piR7njWije6ORsaN/ZowDs56NsOKFUDq2+ExO/h8VZ6LtlhpMUcOe2LSwgRsPDhJG0OEdWvWKRJj+OhE84RZlcuqgQi1l+Vops/qCEuAu5XogN4s9PGAuHR1OV8B/KooJ+rNr0plv+RngHK+VuZGX+Z2YyHiI4YtEtsI2lu/aLaoIIRPcCSLvKxdmTH8H5VRtLKVHDtXlbQn7vi3zOQFFBtoiMHyxggvRcmdz+x1nKmZpTInPIDjRalMabp+PO/ll1YNoJAPe69OQvBrI7JCcHL4oXgxgo4yOVjI59FLUjfrxSOjxeZpmVtsLmUJFB9KzjFDB9sfNiQbjuDFqivXKQOOYbYoY/By1TiCvE+2FQqPI8tdA9tAUAhQVSadAcFBnug==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(39860400002)(366004)(136003)(346002)(6916009)(2906002)(478600001)(5660300002)(8936002)(2616005)(36756003)(186003)(1076003)(64756008)(66476007)(26005)(38070700005)(38100700002)(71200400001)(6512007)(122000001)(66446008)(86362001)(66556008)(76116006)(83380400001)(4326008)(6486002)(8676002)(6506007)(91956017)(316002)(54906003)(66946007);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?yM8FrrizDfsNEFfoAT6jq8xeKgczVQ72HkgBjFi0QnGwIuHoQH8HF6ZyhQ?=
- =?iso-8859-1?Q?sQ+Mq8s6RFNJI0NIF+pgHQgIX/0ccElql1PzGBssKEx99J+FKgMnQeG6Ir?=
- =?iso-8859-1?Q?+ehrJz3TMQ0qvdkgxY3vEZiLM1sd8EXatPPhGlBJguYDOMlszSv3kLRf2d?=
- =?iso-8859-1?Q?E0KwfT5mGs/VZTbgT6M791vK/Eo9SMfLNKW3OEHgyBfAklW9UF3cZjOHsP?=
- =?iso-8859-1?Q?EE6IyE4LF/g9FXD36oj1tjpCCzm9VM7C6snbJLCHwlUazQA/2FXRJJ0BAP?=
- =?iso-8859-1?Q?Q95tflWGY/5e2oD56uetHsBS3e/1fgzJYPsEmjSinms93vpnclxbo6fR0y?=
- =?iso-8859-1?Q?GmYj+Ptb3ig4fxaYmjDh82OKrrcj5YiiZAuGrGIe28aPlTQfCsvkZzD6Ht?=
- =?iso-8859-1?Q?WVDQYTo9LyUf7j7T0dnM+91Kf1I+b3OWaITc8ej9wAVD9IHtNccIJTx3sn?=
- =?iso-8859-1?Q?C7+6VYednGxjZp8mzHfiuW6SIdxy/dxhVYnox3bzeqDpjvjeG0BwDp/8V1?=
- =?iso-8859-1?Q?AwuACESZ8xqdycRmdbEhg1q0uxyPjoaOzn22xkqJwqY60ue5RDeaGqGhkT?=
- =?iso-8859-1?Q?B7NJ9XD7UliFLiaP2EMUoRjv5WjNlsxFZLXlFGTT1YaBxd9cslF36wjFKM?=
- =?iso-8859-1?Q?OjSrYu6uSA9Q2uISDW5PUBehEwUR0G9CF9ZdfuGd3qHUVwHwNnxNwCFfCb?=
- =?iso-8859-1?Q?xVLM5fdg2X8CDOr70xzviOzND3HdPnEi4Hy4lOWCtIaZLILcjRxKNzl4rO?=
- =?iso-8859-1?Q?PsM4AFVTGLqs1ixlRIvnYppASxBvcMl4SFmoUKk2fp7RKW7lprDTYOcbJX?=
- =?iso-8859-1?Q?dvwhwXVBhPdNPHoBKsaqyIa1GeTdN4AvXTBZPFtFY04ZGxzWuk3L18sZnF?=
- =?iso-8859-1?Q?CpscLoxUml1MnT4XaYJTiDdizDNhERVOaNMXCsT58cgnk6e+A447RPHWHP?=
- =?iso-8859-1?Q?oKks6Vvjj2cr6coILB411JJqZF7KMUK/+uFTfLFBqNcXC3bTk4CaBu1ikN?=
- =?iso-8859-1?Q?I/c/Tl5HdJhNL31PGkCVd0Z/r9DTkfe78BLgmcjsiYTJN2d97MyQ4nFgrG?=
- =?iso-8859-1?Q?sEVAsLEQhteZKZb11WcCZEKjvx4n3qk0KhZz9+BsE32CdU0/b7usum8AyY?=
- =?iso-8859-1?Q?pdlKLI5riDI1et2ceYmaoYVRQFp2NqjuJeQwcNTh1YSEFweGcwkkrkpwAA?=
- =?iso-8859-1?Q?f8zHDlbfSydj2G4oOz4bJAKYuN7OcQi28fx5cPIXWguvdy2YAwYKt01gDy?=
- =?iso-8859-1?Q?UIcnWad+dPa5/xzjLUm0LQX9GP1Inyelzxq/ezkp5QZMIAJi3LgSmphcMe?=
- =?iso-8859-1?Q?8ADmjQU98gZZLTuUMOeXTOsSlOOhkKzjeMsdrnuk1f5cITC/4wfQ6QIoVA?=
- =?iso-8859-1?Q?q3JKD893nNPDH9jf5OqD21UXcn7RxUNA=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?TxTU0HNC2n0uFsHex8u1RDbMceoUu74vp8a4FUVJOhzuiIhs+oGkfaJ4iY?=
+ =?iso-8859-1?Q?D//jz+RcHoNHtohbnF1HhGrStz9Vjad0KUlA7lhLLrGDz9YP5N664Vri4h?=
+ =?iso-8859-1?Q?iox5px6lJ7MfwhcdNFwPVonnc8cwTUWvXg77b8BdnkWj1gP8YwNLd0ptMP?=
+ =?iso-8859-1?Q?FQkfXL40WPCJwzFSeSpy3lZVqkihTnNnzjEQTk7jnJs+EAGJgxAVr3cY61?=
+ =?iso-8859-1?Q?ADrTcsXDGiFEVCxYJn33lzHAcsoEjFR7yF218BMZ6Qic2TUCy79mfThGdm?=
+ =?iso-8859-1?Q?MZ5jZhIkkVDmlb76OpisHNTGLra00fw5p57T/NIbF5Gh7ro1C+HwLLpFYP?=
+ =?iso-8859-1?Q?9FDX2hoHRv3pZzMnIuFy7lnaqCzk1ONS3qy0bKgAMWW6hq/CnfM7OPHrKf?=
+ =?iso-8859-1?Q?l8HK49Ij3glQ7FlKiUgRN1SDk8isxrWSXSrDwo2ChSI2x110gSnnIO/RC5?=
+ =?iso-8859-1?Q?5c9eoufN6Igid49iD8GhZSZd6ZQADseQ2bSQzDQj9W6D3ydVeLKTASyxd+?=
+ =?iso-8859-1?Q?tbVRZhH1kFe2v6LwKhBiMv/aBOuwLreIXINwdgUi0r1e6ONiyg93gdgrX7?=
+ =?iso-8859-1?Q?rJYq/J3u3RhwD8msBcvMnZaeRK56Cr/LC7HjUi8DfXSRXJitBYAnTd5ewu?=
+ =?iso-8859-1?Q?DGvBI9qax4nSuGSpUW1CpOQJ/coWKRGxNfhjvdfxPDd1+sgDR7oKlVVR+M?=
+ =?iso-8859-1?Q?aOBmJQ0s1cnuGtX0g5BctvwV4Flk9kYNcX3bO43IXk5seJ8TVnR7TnXXfr?=
+ =?iso-8859-1?Q?9SYvWyKVBzhSbaViIJcgWsxVcwhu2arT77QzomqXeMgsiRL0vnnGvFO/mF?=
+ =?iso-8859-1?Q?RqgV1An3DOdTsj1847C1KgaKQSEw7bobfP0BkpB0GTA/Lqha461qqxSDqI?=
+ =?iso-8859-1?Q?mGjEQw8w3+t76NporHNFUs28cWKjWplVZ8L1sYM6wcNFLNCF3B/iO/Fsy/?=
+ =?iso-8859-1?Q?P1sQZxteBprSSGaPNHtTQIX6J8upPvxpmNe99zHGmHB8DZSK4iMZ9y+f7T?=
+ =?iso-8859-1?Q?ZiEyo3kYpTzy+Bu6ELCR/TqQTrPN9sSTbZsrMTvzakG2VgTfofnp6F5g0E?=
+ =?iso-8859-1?Q?rn8tQb1+CaoWX/KhV2DUvsWZfvPTRvpHJQNpEgMzlYiEh64t0lWPDI0aH5?=
+ =?iso-8859-1?Q?OPRQFEDO4ouhAwffQ7l4BOKstfBR0afXp5ipRBlMjHU0fkZEViDNNLUYdt?=
+ =?iso-8859-1?Q?puqKmUNZGC0y9X/w8g2erO3imL6uIVhQQifrN2FwsA6if9u37anpkSOxDq?=
+ =?iso-8859-1?Q?5OEOo3MvhQcxuyB3NrYhSykMGhuBmgCLYXTevwaw18CIGypUd+XvLcorEL?=
+ =?iso-8859-1?Q?dMi7aNmXEGsfjW3b9G//48ZbKG6tPjohQtcAlY6HBxkBcLgtq+mIqmoPKB?=
+ =?iso-8859-1?Q?FbRDki+I0PC+Kebc0mhkBwZ9BQqi1DMQ=3D=3D?=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 188ea190-c8d1-42f7-bab9-08d9720ad7c0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2021 14:21:54.2775
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3eac2590-4489-4a9a-9f43-08d9720ad84e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2021 14:21:55.2243
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OYn9hipk9xnDQ40AF0EZonEn2+PpN65FRxBwRIAZFucuh4lkDdP9Eqq6lghj3hqwQTEdtREaSTv2my9RQnZ8Vw==
+X-MS-Exchange-CrossTenant-userprincipalname: CZ7xs9Ti7QGdeBSldJyHMhsv5b6NUWyKRQPXJn/I/h5JCLUGSLi2mI/IiVdpRn3YZRWAOBki/M1sdF67XP7F9g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7382
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -139,37 +141,48 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Niklas Cassel <niklas.cassel@wdc.com>
 
-Recently, there were some extra "dummy" data added into mq-deadline
-rq->elv.priv, that was added for the solve purpose of working around
-quirky behavior in blk-mq (which called the scheduler callbacks even
-for requests that bypassed the scheduler).
+Currently, __blk_mq_alloc_request() (via blk_mq_rq_ctx_init()) calls the
+I/O scheduler callback e->type->ops.prepare_request(), which will set
+RQF_ELVPRIV, even though passthrough (and flush) requests will later
+bypass the I/O scheduler in blk_mq_submit_bio().
 
-Fix blk-mq to not call the I/O scheduler callbacks for passthrough requests=
-,
-since they will later bypass the I/O scheduler anyway.
+Later, blk_mq_free_request() checks if the RQF_ELVPRIV flag is set,
+if it is, the e->type->ops.finish_request() I/O scheduler callback
+will be called.
 
-This way, we can remove unnecessary logic in mq-deadline that was added to
-deal with this quirky behavior.
+i.e., the prepare_request and finish_request I/O scheduler callbacks
+will be called for requests which were never inserted to the I/O
+scheduler.
 
-BFQ should be able to perform a similar cleanup, if they wish, and should
-then be able to drop this comment from the code:
-https://github.com/torvalds/linux/blob/v5.14/block/bfq-iosched.c#L6456-L646=
-2
+Fix this by not calling e->type->ops.prepare_request(), nor setting
+the RQF_ELVPRIV flag for passthrough requests.
+Since the RQF_ELVPRIV flag will not get set for passthrough requests,
+e->type->ops.prepare_request() will no longer get called for
+passthrough requests which were never inserted to the I/O scheduler.
 
-Considering that I'm quite unfamiliar with the BFQ code, I'd rather
-someone who is a bit more familiar with BFQ performs that cleanup.
+Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+---
+ block/blk-mq.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-
-Kind regards,
-Niklas
-
-Niklas Cassel (2):
-  blk-mq: don't call callbacks for requests that bypassed the scheduler
-  Revert "mq-deadline: Fix request accounting"
-
- block/blk-mq.c      |  7 ++++++-
- block/mq-deadline.c | 16 +++++-----------
- 2 files changed, 11 insertions(+), 12 deletions(-)
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 65d3a63aecc6..0816af125059 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -328,7 +328,12 @@ static struct request *blk_mq_rq_ctx_init(struct blk_m=
+q_alloc_data *data,
+ 	data->ctx->rq_dispatched[op_is_sync(data->cmd_flags)]++;
+ 	refcount_set(&rq->ref, 1);
+=20
+-	if (!op_is_flush(data->cmd_flags)) {
++	/*
++	 * Flush/passthrough requests are special and go directly to the
++	 * dispatch list, bypassing the scheduler.
++	 */
++	if (!op_is_flush(data->cmd_flags) &&
++	    !blk_op_is_passthrough(data->cmd_flags)) {
+ 		struct elevator_queue *e =3D data->q->elevator;
+=20
+ 		rq->elv.icq =3D NULL;
 --=20
 2.31.1
