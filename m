@@ -2,172 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1384DC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 13:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C99DC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 14:00:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F02256115C
-	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 13:03:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F09D6113A
+	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 14:00:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233779AbhIHNEj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Sep 2021 09:04:39 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:9407 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232097AbhIHNEj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Sep 2021 09:04:39 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H4Mf43gTQz8yLR;
-        Wed,  8 Sep 2021 20:59:08 +0800 (CST)
-Received: from dggpeml500025.china.huawei.com (7.185.36.35) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 8 Sep 2021 21:03:29 +0800
-Received: from [10.174.176.117] (10.174.176.117) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 8 Sep 2021 21:03:28 +0800
-Subject: Re: [PATCH v2 3/3] nbd: fix race between nbd_alloc_config() and
- module removal
-From:   Hou Tao <houtao1@huawei.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
-References: <20210904122519.1963983-1-houtao1@huawei.com>
- <20210904122519.1963983-4-houtao1@huawei.com> <20210906093051.GC30790@lst.de>
- <ce3e1ea8-ebda-4372-42ce-e8a4b2d12514@huawei.com>
- <20210906102521.GA3082@lst.de>
- <730dae5e-5af8-3554-18bf-e22ff576e2b1@huawei.com>
-Message-ID: <319b5ef6-3d73-8795-e252-3c35fbe1b5bc@huawei.com>
-Date:   Wed, 8 Sep 2021 21:03:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S235446AbhIHOBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Sep 2021 10:01:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235767AbhIHOBh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Sep 2021 10:01:37 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87265C061575
+        for <linux-block@vger.kernel.org>; Wed,  8 Sep 2021 07:00:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=6AxC6oCsSfAyqhwx3Kpc0CB2wC62kyU10XqVk+1JOcQ=; b=gFTXTJQya1IqAb3KQdfoHsaxAo
+        K05vUN3P5XYh2X+LRkQEUhh8kXy3Dd/evq4rb+LipfBFn70hNWSfh6uGMyU+ubAyIyIp866SyJD68
+        q61Ne89P97Y9nB94G47cq2Pb4hoh2MFqkIYiq0bpUsjpP0YVndQzJ3otuEqGuPtefunlEt9DDktIG
+        FB6CkwjE7vvVYCTqBtp2GKUdbGIi6fKOVdLJ6hT6mfEJu1yXgQiO4v2jLEMScUES1Yai8jcDMveG1
+        Sc/wyIfKObQQ/K7YN0TC7+jOgfEE5C8PzCg5x49dwjLVOx7ZSEIjzFEIpnKkBtSCLRAq3LYqxVcEP
+        DV4T4pqw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mNy7l-006s74-Np; Wed, 08 Sep 2021 14:00:25 +0000
+Date:   Wed, 8 Sep 2021 07:00:25 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: make __register_blkdev() return an error
+Message-ID: <YTjB+ad2chvRNsS7@bombadil.infradead.org>
+References: <20210904013932.3182778-1-mcgrof@kernel.org>
+ <20210904013932.3182778-2-mcgrof@kernel.org>
+ <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
+ <YTUIV0mSJHfgtMov@bombadil.infradead.org>
+ <d5c7f0e6-8ded-581c-cb10-00e785a7f7b3@i-love.sakura.ne.jp>
+ <YTd98oss0WgCwVzY@bombadil.infradead.org>
+ <1c795252-3bc8-1b6c-8a2b-3ef01fd73247@i-love.sakura.ne.jp>
+ <YTeFButum63FZUTo@bombadil.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <730dae5e-5af8-3554-18bf-e22ff576e2b1@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [10.174.176.117]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500025.china.huawei.com (7.185.36.35)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YTeFButum63FZUTo@bombadil.infradead.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On Tue, Sep 07, 2021 at 08:28:06AM -0700, Luis Chamberlain wrote:
+> On Wed, Sep 08, 2021 at 12:23:02AM +0900, Tetsuo Handa wrote:
+> > On 2021/09/07 23:57, Luis Chamberlain wrote:
+> > >> Actually, blk_request_module() failures should be ignored, for
+> > >> subsequent ilookup() will fail if blk_request_module() failed to
+> > >> create the requested block device.
+> > > 
+> > > Then how about this:
+> > > 
+> > > Since we would like to use __must_check for add_disk() we proceed with
+> > > the change to capture the errors and propagate them and we just document on
+> > > fs/block_dev.c's use of blk_request_module() about the above issue and
+> > > how we prefer the errror that ilookup() would return.
+> > 
+> > Marking add_disk() as __must_check makes it possible to enforce "don't leave
+> > partially initialized devices". That's already an enough improvement.
+> > 
+> > Probe functions can remain "void", and hence blk_request_module() can remain "void".
+> > That is, I would drop "[PATCH 1/2] block: make __register_blkdev() return an error".
+> 
+> Probe calls can be left voide, but because of the new __must_check we'd
+> still have to modify all probe calls as they use add_disk() and it would
+> seem odd to just capture the error to ignore it without documenting
+> any of this.
 
-Any comments for this patch ?
+So indeed, all probe() routines would need to be modified anyway because
+of the added final __must_check. Because of this I still think that if
+we want to *ignore* the error, we should just document and ignore it on
+the caller side. That is, still modify __register_blkdev() to propagate
+the error, and the caller can decide to ignore or not. In this case
+we can document on fs/block_dev.c *why* we are ignoring the error.
 
-On 9/7/2021 11:04 AM, Hou Tao wrote:
-> Hi,
->
-> On 9/6/2021 6:25 PM, Christoph Hellwig wrote:
->> On Mon, Sep 06, 2021 at 06:08:54PM +0800, Hou Tao wrote:
->>>>> +	if (!try_module_get(THIS_MODULE))
->>>>> +		return ERR_PTR(-ENODEV);
->>>> try_module_get(THIS_MODULE) is an indicator for an unsafe pattern.  If
->>>> we don't already have a reference it could never close the race.
->>>>
->>>> Looking at the callers:
->>>>
->>>>  - nbd_open like all block device operations must have a reference
->>>>    already.
->>> Yes. nbd_open() has already taken a reference in dentry_open().
->>>>  - for nbd_genl_connect I'm not an expert, but given that struct
->>>>    nbd_genl_family has a module member I suspect the networkinh
->>>>    code already takes a reference.
->>> That was my original though, but the fact is netlink code doesn't take a module reference
->>>
->>> in genl_family_rcv_msg_doit() and netlink uses genl_lock_all() to serialize between module removal
->>>
->>> and nbd_connect_genl_ops calling, so I think use try_module_get() is OK here.
->> How it this going to work?  If there was a race you just shortened it,
->> but it can still happen before you call try_module_get.  So I think we
->> need to look into how the netlink calling conventions are supposed to
->> look and understand the issues there first.
->> .
-> Let me explain first. The reason it works is due to genl_lock_all() in netlink code.
->
-> If the module removal happens before calling try_module_get(), nbd_cleanup() will
->
-> call genl_unregister_family() first, and then genl_lock_all(). genl_lock_all() will
->
-> prevent ops in nbd_connect_genl_ops() from being called, because the calling
->
-> of nbd ops happens in genl_rcv() which needs to acquire cb_lock first.
->
->
-> process A                                       process B
->
-> module removal
->
-> genl_unregister_family()
->
->   genl_lock_all()
->
->     down_write(&cb_lock)
->
->                                                 receive a new netlink message
->
->                                                 genl_rcv()
->
->                                                    // will wait for the removal of nbd ops
->
->                                                    down_read(&cb_lock)
->
-> If nbd_alloc_config() happens before the module removal, genl_rcv() must
->
-> have been acquired cb_lock & genl_mutex, so nbd_cleanup() will block in
->
-> genl_unregister_family(). When nbd_alloc_config() calls try_module_get(),
->
-> it will find out the module is dying, so fail nbd_genl_connect().
->
->
-> process A                                     process B
->
-> a new netlink message
->
-> genl_rcv()
->
->   down_read(&cb_lock)
->
->     mutex_lock(&genl_mutex)
->
->       nbd_genl_connect()
->
->         nbd_alloc_config()
->
->                                                module removal
->
->                                                genl_unregister_family
->
->           // module is dying, so fail
->
->           try_module_get()
->
->                                                  genl_lock_all()
->
->                                                    // wait for the completion of nbd ops
->
->                                                    down_write(&cb_lock)
->
-> I have checked multiple genl_ops, it seems that the reason why these genl_ops
->
-> don't need try_module_get() is that these ops don't create new object through
->
-> genl_ops and just control it. However genl_family_rcv_msg_dumpit() will try to
->
-> call try_module_get(), but according to the history (6dc878a8ca39 "netlink: add reference of module in netlink_dump_start"),
->
-> it is because inet_diag_handler_cmd() will call __netlink_dump_start().
->
-> Regards,
->
-> Tao
->
->
-> .
+Thoughts?
+
+  Luis
