@@ -2,90 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C888C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 23:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FF0C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 07:30:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4398F61102
-	for <linux-block@archiver.kernel.org>; Tue,  7 Sep 2021 23:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4362361051
+	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 07:30:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347032AbhIGXGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Sep 2021 19:06:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49122 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240690AbhIGXGm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Sep 2021 19:06:42 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61726C061575
-        for <linux-block@vger.kernel.org>; Tue,  7 Sep 2021 16:05:35 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id y18so699779ioc.1
-        for <linux-block@vger.kernel.org>; Tue, 07 Sep 2021 16:05:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/WqGdTadLCtXXo2y/kR/SCyjXiwUCBFZHM8m7zSgBq4=;
-        b=ZeZ+12BAIiillN1quw9HtNbnsbBpRYvadFQPd1qT/RKk6Ma3+8A4wVxtWMq82N9pP7
-         fXmnGkz66jgOVcfmO4ULXPBWITfunTYijvJICK2vJDyREWjmlstRlOnVn028yQ9jJq68
-         Sm59cWiEJtlLxqCmhukG1MnsbZtdGmIQmsJ45Gh1/ZNEOUCq+5+vYYfDnFsWZVGzVb0I
-         4DxH+xRZt6GfAf9U58X4yduUao2q59Zva9fHsI9uIalnkYj41C0xTzZArV7C79tN54UT
-         6mBliiodfePrMtFa0XNpJk/cl2RBD0HuKVhDqWOALwuK62mP9GQrmL38ob6jxf3NdgLH
-         UmpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/WqGdTadLCtXXo2y/kR/SCyjXiwUCBFZHM8m7zSgBq4=;
-        b=GxX28DbdkZh76km607fo5wfwLPpf4GA/3fSZEgbFCVHjpjf4nhuTRKPJbZ0JJvtEuD
-         tGZPkKadKtB1+0rLRXXYK2wuI2NSb29RhwtQqrYxzM5iYcEPBWyb//hGpG07cH5rQxa0
-         4FV6MhJ0DxaMN0OE7OHXaP9CyQW2cGJGjVy+SlI0sc0tnaTVH+YQjCoESEU9FvQ9nH0E
-         FUPwiHATXx/s38Pw7ZYBdvM5kpQZQLoETNqixvtWuWXDA7Bav1R9we8Q3shg1+voQu7w
-         6J3ezPt5ol2CgVHQ+pTI9r6dLQID+E5DoGGtImdN0D4g462N8jkq1s5WgZV0dRFzNaKN
-         hkxQ==
-X-Gm-Message-State: AOAM533lxu/Q4hZWD9DxaZI0rpkdA7vQyWqKKCCOeD3u2gXi0qonFtVi
-        9cKyFULvKUNNEWDbHVFePogiNpMKdCxrrQ==
-X-Google-Smtp-Source: ABdhPJxBWhJg3BewEfgj77vyghzozcl09E8uSOxe9n6t0/3BjeM+dZopb0kYT4NeYjPcZYK9K4GF3g==
-X-Received: by 2002:a05:6602:1581:: with SMTP id e1mr516323iow.49.1631055934716;
-        Tue, 07 Sep 2021 16:05:34 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id j5sm238994ilu.11.2021.09.07.16.05.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Sep 2021 16:05:34 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: allow 4x BLK_MAX_REQUEST_COUNT at blk_plug for
- multiple_queues
-To:     Song Liu <songliubraving@fb.com>, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org
-Cc:     marcin.wanat@gmail.com
-References: <20210907230338.227903-1-songliubraving@fb.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f64a938a-372c-aac1-4c5c-4b9456af5a69@kernel.dk>
-Date:   Tue, 7 Sep 2021 17:05:33 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1350523AbhIHHbi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Sep 2021 03:31:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27632 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1350428AbhIHHbe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 8 Sep 2021 03:31:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631086226;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vkqGjkxzxSPrvDa6nFo8JJGNfAA6j1Mj5Wob9D9BFCs=;
+        b=B8BjKUmMaKL/sOi+fjOw2qDh60U8apZxHuQs1GdZ2MtzbdMaXTXK7nwg2pI371Q/NMMpGV
+        0IR2WbF562xBjUs9kaKmiBx4gKC7qZLdCs6AH7aSvlvGFzbo63Ze14JgR+cGNygT3cY7Sd
+        t4hiRA7XkwzPTWeSNIOBMH5iK7EBziM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-e8Mtu1L4NlapVx1NWYf7Pg-1; Wed, 08 Sep 2021 03:30:23 -0400
+X-MC-Unique: e8Mtu1L4NlapVx1NWYf7Pg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A66E6801A92;
+        Wed,  8 Sep 2021 07:30:21 +0000 (UTC)
+Received: from T590 (ovpn-12-207.pek2.redhat.com [10.72.12.207])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7842D5D9F4;
+        Wed,  8 Sep 2021 07:30:12 +0000 (UTC)
+Date:   Wed, 8 Sep 2021 15:30:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v4 2/6] nbd: convert to use blk_mq_find_and_get_req()
+Message-ID: <YThmhhI1/fZd29b1@T590>
+References: <20210907140154.2134091-1-yukuai3@huawei.com>
+ <20210907140154.2134091-3-yukuai3@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20210907230338.227903-1-songliubraving@fb.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210907140154.2134091-3-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/7/21 5:03 PM, Song Liu wrote:
-> Limiting number of request to BLK_MAX_REQUEST_COUNT at blk_plug hurts
-> performance for large md arrays. [1] shows resync speed of md array drops
-> for md array with more than 16 HDDs.
+On Tue, Sep 07, 2021 at 10:01:50PM +0800, Yu Kuai wrote:
+> blk_mq_tag_to_rq() can only ensure to return valid request in
+> following situation:
 > 
-> Fix this by allowing more request at plug queue. The multiple_queue flag
-> is used to only apply higher limit to multiple queue cases.
+> 1) client send request message to server first
+> submit_bio
+> ...
+>  blk_mq_get_tag
+>  ...
+>  blk_mq_get_driver_tag
+>  ...
+>  nbd_queue_rq
+>   nbd_handle_cmd
+>    nbd_send_cmd
+> 
+> 2) client receive respond message from server
+> recv_work
+>  nbd_read_stat
+>   blk_mq_tag_to_rq
+> 
+> If step 1) is missing, blk_mq_tag_to_rq() will return a stale
+> request, which might be freed. Thus convert to use
+> blk_mq_find_and_get_req() to make sure the returned request is not
+> freed. However, there are still some problems if the request is
+> started, and this will be fixed in next patch.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  drivers/block/nbd.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5170a630778d..920da390635c 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -718,12 +718,13 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+>  	tag = nbd_handle_to_tag(handle);
+>  	hwq = blk_mq_unique_tag_to_hwq(tag);
+>  	if (hwq < nbd->tag_set.nr_hw_queues)
+> -		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
+> -				       blk_mq_unique_tag_to_tag(tag));
+> +		req = blk_mq_find_and_get_req(nbd->tag_set.tags[hwq],
+> +					      blk_mq_unique_tag_to_tag(tag));
+>  	if (!req || !blk_mq_request_started(req)) {
+>  		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
+>  			tag, req);
+> -		return ERR_PTR(-ENOENT);
+> +		ret = -ENOENT;
+> +		goto put_req;
+>  	}
+>  	trace_nbd_header_received(req, handle);
+>  	cmd = blk_mq_rq_to_pdu(req);
+> @@ -785,6 +786,9 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+>  out:
+>  	trace_nbd_payload_received(req, handle);
+>  	mutex_unlock(&cmd->lock);
+> +put_req:
+> +	if (req)
+> +		blk_mq_put_rq_ref(req);
+>  	return ret ? ERR_PTR(ret) : cmd;
 
-Applied, thanks.
+After the request's refcnt is dropped, it can be freed immediately, then
+one stale command is returned to caller.
 
--- 
-Jens Axboe
+Thanks,
+Ming
 
