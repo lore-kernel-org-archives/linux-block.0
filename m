@@ -2,92 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C99DC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 14:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C92BC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 16:57:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F09D6113A
-	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 14:00:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29F4C61157
+	for <linux-block@archiver.kernel.org>; Wed,  8 Sep 2021 16:57:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235446AbhIHOBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Sep 2021 10:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53396 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235767AbhIHOBh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Sep 2021 10:01:37 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87265C061575
-        for <linux-block@vger.kernel.org>; Wed,  8 Sep 2021 07:00:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=6AxC6oCsSfAyqhwx3Kpc0CB2wC62kyU10XqVk+1JOcQ=; b=gFTXTJQya1IqAb3KQdfoHsaxAo
-        K05vUN3P5XYh2X+LRkQEUhh8kXy3Dd/evq4rb+LipfBFn70hNWSfh6uGMyU+ubAyIyIp866SyJD68
-        q61Ne89P97Y9nB94G47cq2Pb4hoh2MFqkIYiq0bpUsjpP0YVndQzJ3otuEqGuPtefunlEt9DDktIG
-        FB6CkwjE7vvVYCTqBtp2GKUdbGIi6fKOVdLJ6hT6mfEJu1yXgQiO4v2jLEMScUES1Yai8jcDMveG1
-        Sc/wyIfKObQQ/K7YN0TC7+jOgfEE5C8PzCg5x49dwjLVOx7ZSEIjzFEIpnKkBtSCLRAq3LYqxVcEP
-        DV4T4pqw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mNy7l-006s74-Np; Wed, 08 Sep 2021 14:00:25 +0000
-Date:   Wed, 8 Sep 2021 07:00:25 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: make __register_blkdev() return an error
-Message-ID: <YTjB+ad2chvRNsS7@bombadil.infradead.org>
-References: <20210904013932.3182778-1-mcgrof@kernel.org>
- <20210904013932.3182778-2-mcgrof@kernel.org>
- <9b9e8bfd-a2a6-4b78-413b-7c6c7eb83e05@I-love.SAKURA.ne.jp>
- <YTUIV0mSJHfgtMov@bombadil.infradead.org>
- <d5c7f0e6-8ded-581c-cb10-00e785a7f7b3@i-love.sakura.ne.jp>
- <YTd98oss0WgCwVzY@bombadil.infradead.org>
- <1c795252-3bc8-1b6c-8a2b-3ef01fd73247@i-love.sakura.ne.jp>
- <YTeFButum63FZUTo@bombadil.infradead.org>
+        id S1349999AbhIHQ6H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Sep 2021 12:58:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49960 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235666AbhIHQ6G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 8 Sep 2021 12:58:06 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 67C8B61100;
+        Wed,  8 Sep 2021 16:56:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631120218;
+        bh=PqcBl1KQZaLj2UYPjvgmgug1mUEXiPMNAK6+xOcOsHA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mbVliIBERcN/usqu1zlgBACEyAyoxT96QZVlh+NQ4n+dZT9LU53SPEyDE4/PZaiPs
+         ISkbyKheF5/z3ylZtrBXdmRDKmC68UVoa85j4A+Z8PkHr+LwNH1u2JBeyGHhw6Z3OZ
+         gq2bsdUdxPDGB4n8WVNVGoYvHHgCZRd6wKPDiOUnX8ZM/pA7FmaAUb+jyy1RJaJ7ZI
+         2s1WadrJOT4gtCdepAKPlewRE7CWbaLEP+DqCRSTAofjuNfBYafdHPKkpsBglRgCfl
+         uYSj0ettDYJZFkWs001XHq/zhCg80vyn5Y+Q1hYJ5IKf7U3+qkdPdLB2eaI7cSxKiN
+         GGEKX+Xs2mhOg==
+Date:   Wed, 8 Sep 2021 09:56:53 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     linux-block <linux-block@vger.kernel.org>, nbd@other.debian.org,
+        open list <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, lkft-triage@lists.linaro.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Arnd Bergmann <arnd@arndb.de>, llvm@lists.linux.dev
+Subject: Re: ERROR: modpost: __mulodi4 [drivers/block/nbd.ko] undefined!
+Message-ID: <YTjrVWaTIA5ZZumW@archlinux-ax161>
+References: <CA+G9fYvThAuTu1-Tg+7BaFofxfBkvBuTAnycuws-U4p473MeZQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YTeFButum63FZUTo@bombadil.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <CA+G9fYvThAuTu1-Tg+7BaFofxfBkvBuTAnycuws-U4p473MeZQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 07, 2021 at 08:28:06AM -0700, Luis Chamberlain wrote:
-> On Wed, Sep 08, 2021 at 12:23:02AM +0900, Tetsuo Handa wrote:
-> > On 2021/09/07 23:57, Luis Chamberlain wrote:
-> > >> Actually, blk_request_module() failures should be ignored, for
-> > >> subsequent ilookup() will fail if blk_request_module() failed to
-> > >> create the requested block device.
-> > > 
-> > > Then how about this:
-> > > 
-> > > Since we would like to use __must_check for add_disk() we proceed with
-> > > the change to capture the errors and propagate them and we just document on
-> > > fs/block_dev.c's use of blk_request_module() about the above issue and
-> > > how we prefer the errror that ilookup() would return.
-> > 
-> > Marking add_disk() as __must_check makes it possible to enforce "don't leave
-> > partially initialized devices". That's already an enough improvement.
-> > 
-> > Probe functions can remain "void", and hence blk_request_module() can remain "void".
-> > That is, I would drop "[PATCH 1/2] block: make __register_blkdev() return an error".
+Hi Naresh,
+
+On Wed, Sep 08, 2021 at 04:58:11PM +0530, Naresh Kamboju wrote:
+> Following build warnings/ errors noticed while building linux next
+> master branch with clang-13 for arm architecture with following configs.
+>   - footbridge_defconfig
+>   - mini2440_defconfig
+>   - s3c2410_defconfig
 > 
-> Probe calls can be left voide, but because of the new __must_check we'd
-> still have to modify all probe calls as they use add_disk() and it would
-> seem odd to just capture the error to ignore it without documenting
-> any of this.
+> ERROR: modpost: __mulodi4 [drivers/block/nbd.ko] undefined!
+> make[2]: *** [/builds/linux/scripts/Makefile.modpost:134:
+> modules-only.symvers] Error 1
+> make[2]: *** Deleting file 'modules-only.symvers'
+> make[2]: Target '__modpost' not remade because of errors.
+> make[1]: *** [/builds/linux/Makefile:1952: modules] Error 2
+> make[1]: Target '__all' not remade because of errors.
+> make: *** [Makefile:226: __sub-make] Error 2
+> make: Target '__all' not remade because of errors.
 
-So indeed, all probe() routines would need to be modified anyway because
-of the added final __must_check. Because of this I still think that if
-we want to *ignore* the error, we should just document and ignore it on
-the caller side. That is, still modify __register_blkdev() to propagate
-the error, and the caller can decide to ignore or not. In this case
-we can document on fs/block_dev.c *why* we are ignoring the error.
+Thanks for the report. This is a known issue that we have been tracking
+and it is now resolved in LLVM 14:
 
-Thoughts?
+https://github.com/ClangBuiltLinux/linux/issues/1438
 
-  Luis
+Nick said he should have a kernel patch to work around this in the
+kernel for older versions of LLVM soon.
+
+By the way, can you use our new mailing list and my kernel.org address
+for future reports (llvm@lists.linux.devi, nathan@kernel.org)? It will
+make it easier to find these reports in the archives in the future and
+my filters will catch this better.
+
+Cheers,
+Nathan
