@@ -2,149 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C0AC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 08:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751EBC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 09:00:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD6636113E
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 08:47:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CDBC61139
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 09:00:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231906AbhIIIsg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 04:48:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58877 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231234AbhIIIsf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Sep 2021 04:48:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631177246;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type;
-        bh=M5q4BwPXNeAfn9sJLPwyrIlaPqHnzNYHcHdNI2hZwvE=;
-        b=b/Nwt1K75Bjaeuet8n05YebFSdv4Xw5n0JcCfuN0A26x5wLLT0GMgeCgLD6KzONPs2l3Ot
-        CSqKdK00IjVJ+on1yhEkgPgJXpefz30YWXAiXEzVoYH5zB1DXTZblT79ONwihMl7ZiEVkM
-        WgclJWRxC8MtKXr4qUB0cKhFJHdYB5Q=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-ztDs84J2P9eSNUpd5AfCZw-1; Thu, 09 Sep 2021 04:47:25 -0400
-X-MC-Unique: ztDs84J2P9eSNUpd5AfCZw-1
-Received: by mail-yb1-f200.google.com with SMTP id j9-20020a2581490000b02905897d81c63fso1541014ybm.8
-        for <linux-block@vger.kernel.org>; Thu, 09 Sep 2021 01:47:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=M5q4BwPXNeAfn9sJLPwyrIlaPqHnzNYHcHdNI2hZwvE=;
-        b=TA4qPfWyCckmp7dD2QB8+QNxH4yAfih76lRcD40M0xebzUN7XkreI9orzsl02she6W
-         PNYGhkwa60X9xj31CwExK1SIP7Y0782rMIHfl1yX5eoHQe2nawtAx5HR/iHy77zlTyBt
-         31s07+6N626V0fhCk4EytlUYSMV3U2Sw/+JsVCCxn3tm8EEEbQTtlTFEvhxhESTFVeZN
-         Wl86jbz5U/Bp3QZvghqXJBZkyxxbGVZtY2XUkpthGCxtzAjx2aud7dFnopbziANsO60K
-         XCkj5YiZC2Zw9WXmmx1RVGulLCSqE44OZkvuL9a7ZqsrSdq1DdJ7rSdMc1QTbv+6/sy3
-         XlrQ==
-X-Gm-Message-State: AOAM530erVX44z05WUodxvsEg+FQyxMrU7HCn5eUWw5J+WOXscs0O0ks
-        vf2s/IyjCPHPH4jb5F8VB6/lZPsJ2lZlbJqKihsc6LiGhfNG5RANjNztdEysgTtXFIY3BSUOLvI
-        1FShwZ0FnN7HhRw5wSqWFCQ9Cp6Yu4gE2jahFHME=
-X-Received: by 2002:a25:ad97:: with SMTP id z23mr2473383ybi.412.1631177244654;
-        Thu, 09 Sep 2021 01:47:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzPfOAeCT9yHz2A1BrmZLQOuxNKA7ums4Zf0PoR+I/Pw5rnXRfA3Lsh/1CtWLIrzEFADbIi04uZv7/Vf9lDyKM=
-X-Received: by 2002:a25:ad97:: with SMTP id z23mr2473353ybi.412.1631177244268;
- Thu, 09 Sep 2021 01:47:24 -0700 (PDT)
+        id S231825AbhIIJB7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 05:01:59 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:19019 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231281AbhIIJB6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 05:01:58 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4H4tCy73dqzbmFN;
+        Thu,  9 Sep 2021 16:56:46 +0800 (CST)
+Received: from dggpeml500017.china.huawei.com (7.185.36.243) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Thu, 9 Sep 2021 17:00:48 +0800
+Received: from huawei.com (10.175.103.91) by dggpeml500017.china.huawei.com
+ (7.185.36.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Thu, 9 Sep 2021
+ 17:00:48 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     <axboe@kernel.dk>
+Subject: [PATCH] n64cart: fix return value check in n64cart_probe()
+Date:   Thu, 9 Sep 2021 17:06:08 +0800
+Message-ID: <20210909090608.2989716-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Thu, 9 Sep 2021 16:47:13 +0800
-Message-ID: <CAHj4cs-noupgFn3QjB96Z20hv-BhFLHOyFZFEtrhGpESkeoRSA@mail.gmail.com>
-Subject: [bug report] NULL pointer at blk_mq_put_rq_ref+0x20/0xb4 observed
- with blktests on 5.13.15
-To:     linux-block <linux-block@vger.kernel.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500017.china.huawei.com (7.185.36.243)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello
+In case of error, the function devm_platform_ioremap_resource()
+returns ERR_PTR() and never returns NULL. The NULL test in the
+return value check should be replaced with IS_ERR().
 
-I found this issue with blktests on[1], did we miss some patch on stable?
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
-queue/5.13
+Fixes: d9b2a2bbbb4d ("block: Add n64 cart driver")
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+---
+ drivers/block/n64cart.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-[   68.989907] run blktests block/006 at 2021-09-09 04:34:35
-[   69.085724] null_blk: module loaded
-[   74.271624] Unable to handle kernel NULL pointer dereference at
-virtual address 00000000000002b8
-[   74.280414] Mem abort info:
-[   74.283195]   ESR = 0x96000004
-[   74.286245]   EC = 0x25: DABT (current EL), IL = 32 bits
-[   74.291545]   SET = 0, FnV = 0
-[   74.294587]   EA = 0, S1PTW = 0
-[   74.297720] Data abort info:
-[   74.300588]   ISV = 0, ISS = 0x00000004
-[   74.304411]   CM = 0, WnR = 0
-[   74.307368] user pgtable: 4k pages, 48-bit VAs, pgdp=000008004366e000
-[   74.313796] [00000000000002b8] pgd=0000000000000000, p4d=0000000000000000
-[   74.320577] Internal error: Oops: 96000004 [#1] SMP
-[   74.325443] Modules linked in: null_blk mlx5_ib ib_uverbs ib_core
-rfkill sunrpc vfat fat joydev acpi_ipmi ipmi_ssif cdc_ether usbnet mii
-mlx5_core psample ipmi_devintf mlxfw tls ipmi_msghandler arm_cmn
-cppc_cpufreq arm_dsu_pmu acpi_tad fuse zram ip_tables xfs ast
-i2c_algo_bit drm_vram_helper drm_kms_helper crct10dif_ce syscopyarea
-ghash_ce sysfillrect uas sysimgblt sbsa_gwdt fb_sys_fops cec
-drm_ttm_helper ttm nvme usb_storage nvme_core drm xgene_hwmon
-aes_neon_bs
-[   74.366458] CPU: 31 PID: 2511 Comm: fio Not tainted 5.13.15+ #1
-[   74.372367] Hardware name: WIWYNN Mt.Jade Server System
-B81.030Z1.0007/Mt.Jade Motherboard, BIOS 1.6.20210526 (SCP:
-1.06.20210526) 2021/05/26
-[   74.385045] pstate: 00400009 (nzcv daif +PAN -UAO -TCO BTYPE=--)
-[   74.391040] pc : blk_mq_put_rq_ref+0x20/0xb4
-[   74.395301] lr : bt_iter+0x64/0xd0
-[   74.398690] sp : ffff800049153980
-[   74.401992] x29: ffff800049153980 x28: ffff07ff8f694520 x27: 0000000000400cc0
-[   74.409116] x26: ffff07ffbff407f0 x25: 00000000000000c0 x24: 0000000000000010
-[   74.416240] x23: 0000000000000000 x22: 0000000000000001 x21: ffff07ffc50d0000
-[   74.423363] x20: ffff800049153a50 x19: ffff07ffc5188c40 x18: 0000000000000000
-[   74.430486] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-[   74.437609] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
-[   74.444732] x11: 0000000000000000 x10: 0000000000000000 x9 : ffffaae6737ae164
-[   74.451855] x8 : ffff800049153c00 x7 : ffffffffffffff80 x6 : 0000000000000007
-[   74.458978] x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff07ffc5188d28
-[   74.466100] x2 : 0000000000000000 x1 : ffff07ffc5188c40 x0 : ffff07ffc5188c40
-[   74.473224] Call trace:
-[   74.475657]  blk_mq_put_rq_ref+0x20/0xb4
-[   74.479567]  bt_iter+0x64/0xd0
-[   74.482609]  blk_mq_queue_tag_busy_iter+0x1a0/0x300
-[   74.487475]  blk_mq_in_flight+0x30/0x44
-[   74.491298]  part_stat_show+0x60/0x160
-[   74.495036]  dev_attr_show+0x2c/0x6c
-[   74.498599]  sysfs_kf_seq_show+0x94/0x140
-[   74.502598]  kernfs_seq_show+0x38/0x44
-[   74.506336]  seq_read_iter+0x1dc/0x4f0
-[   74.510075]  kernfs_fop_read_iter+0x44/0x50
-[   74.514245]  new_sync_read+0xdc/0x154
-[   74.517896]  vfs_read+0x158/0x1e4
-[   74.521199]  ksys_read+0x64/0xf0
-[   74.524414]  __arm64_sys_read+0x28/0x34
-[   74.528237]  invoke_syscall+0x50/0x120
-[   74.531976]  el0_svc_common.constprop.0+0x4c/0x100
-[   74.536755]  do_el0_svc+0x34/0xa0
-[   74.540057]  el0_svc+0x2c/0x54
-[   74.543100]  el0_sync_handler+0xa4/0x130
-[   74.547011]  el0_sync+0x19c/0x1c0
-[   74.550320] Code: a9bf7bfd aa0003e1 910003fd f9400802 (f9415c42)
-[   74.556503] ---[ end trace 76adda8a4ccf9d09 ]---
-[   74.561107] Kernel panic - not syncing: Oops: Fatal exception
-[   74.566897] SMP: stopping secondary CPUs
-[   74.570914] Kernel Offset: 0x2ae6630e0000 from 0xffff800010000000
-[   74.576994] PHYS_OFFSET: 0x80000000
-[   74.580469] CPU features: 0x000042c1,a3302e42
-[   74.584813] Memory Limit: none
-[   74.587902] ---[ end Kernel panic - not syncing: Oops: Fatal exception ]---
-
-
+diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
+index c84be0028f63..26798da661bd 100644
+--- a/drivers/block/n64cart.c
++++ b/drivers/block/n64cart.c
+@@ -129,8 +129,8 @@ static int __init n64cart_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	reg_base = devm_platform_ioremap_resource(pdev, 0);
+-	if (!reg_base)
+-		return -EINVAL;
++	if (IS_ERR(reg_base))
++		return PTR_ERR(reg_base);
+ 
+ 	disk = blk_alloc_disk(NUMA_NO_NODE);
+ 	if (!disk)
 -- 
-Best Regards,
-  Yi Zhang
+2.25.1
 
