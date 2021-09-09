@@ -2,183 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE28C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC80AC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:59:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A72D560F4A
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:46:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4B616127A
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:59:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356121AbhIINry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 09:47:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33247 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1356157AbhIINoB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Sep 2021 09:44:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631194966;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=n9yyglc648zrXRd4AVW4tP74FHofD3/df+6dNncY9Pg=;
-        b=CO8vWqg4jxBXqdTdjSJ50KB/h3GlikvsbEYC3bpvdzdV/q9C01hnztEQNm4a5HkzY0w6KO
-        nb3oFwG6BUOXu0WESlCH/XgL3989SBe2mtzct2ajLUmCTnJSIG/w5C2qLpJ1YOX8rHJ/yW
-        H31BzQ29GN8WOEX69xIZbzsm8Ecbz/8=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-530-8QHh8eRlMdmwbGJmgGvG0g-1; Thu, 09 Sep 2021 09:42:45 -0400
-X-MC-Unique: 8QHh8eRlMdmwbGJmgGvG0g-1
-Received: by mail-ej1-f72.google.com with SMTP id ne21-20020a1709077b95b029057eb61c6fdfso805067ejc.22
-        for <linux-block@vger.kernel.org>; Thu, 09 Sep 2021 06:42:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=n9yyglc648zrXRd4AVW4tP74FHofD3/df+6dNncY9Pg=;
-        b=r02T7GmM5VjMXF16wryxyIzkpdybQBh7H0o3qGlKTLQLeF/vgTdZzhwDJcZuLUIwTA
-         6ZHMY0LWxYlfVA8ECxipZks7BZK7qlVd4KyD/rR0EyZw+qliU0riWHqNnUzzMKpZ7BrM
-         CNlYcowXL9gdwjrDc6HCUQW+hx24FjnwHXBk0JG93s/d4by0ml2gOWotru2MLX8nltzM
-         lRcwahI2gTaB3TMkUf6SBnA3xKI1ILKJuIIVeaARVeLlQwpBbPkDe+TI2HgktTLv9/Ou
-         emUXl9WhtqqWo7v8ik3InuLY3eVnHWzjz2FBTF3iLPB9qh+JtXWKaHrQMS8EYymVCYPH
-         PKyA==
-X-Gm-Message-State: AOAM532bi9fdEzyUtVqg6S94v6OAjWbf3g283/SmC8e3JVxfNno3Pi4C
-        m/B+wYemhN+x64ugjmQ+otf8mWGr5vwCPGQD+Gi4tHCkF8Gn82EZGT39sjD8G+xHw3nN9eujQef
-        /BdR3+MioD9t3zN51hWH0weQ=
-X-Received: by 2002:a17:907:8693:: with SMTP id qa19mr3393409ejc.497.1631194964155;
-        Thu, 09 Sep 2021 06:42:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJywg/VJhF4XMVecjE+sPO8g/1PS5O4JAqpPXl2kjl3hyVJTihD7bfJVln+dRryMMPsNiUjk1w==
-X-Received: by 2002:a17:907:8693:: with SMTP id qa19mr3393389ejc.497.1631194963948;
-        Thu, 09 Sep 2021 06:42:43 -0700 (PDT)
-Received: from redhat.com ([2.55.145.189])
-        by smtp.gmail.com with ESMTPSA id o21sm1078830edc.47.2021.09.09.06.42.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 06:42:43 -0700 (PDT)
-Date:   Thu, 9 Sep 2021 09:42:39 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, hch@infradead.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
-Message-ID: <20210909094001-mutt-send-email-mst@kernel.org>
-References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
- <YTDVkDIr5WLdlRsK@stefanha-x1.localdomain>
- <20210905120234-mutt-send-email-mst@kernel.org>
- <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
- <20210906071957-mutt-send-email-mst@kernel.org>
- <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
+        id S244224AbhIIOBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 10:01:05 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:15400 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1354430AbhIIN7c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 09:59:32 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H50qH03yczQslG;
+        Thu,  9 Sep 2021 21:54:19 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Thu, 9 Sep 2021 21:58:20 +0800
+Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
+ (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Thu, 9 Sep
+ 2021 21:58:20 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [RFC PATCH] blk-throttle: enable io throttle for root in cgroup v2
+Date:   Thu, 9 Sep 2021 22:08:15 +0800
+Message-ID: <20210909140815.2600858-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 06, 2021 at 02:59:40PM +0300, Max Gurtovoy wrote:
-> 
-> On 9/6/2021 2:20 PM, Michael S. Tsirkin wrote:
-> > On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
-> > > On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
-> > > > On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
-> > > > > On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
-> > > > > > Sometimes a user would like to control the amount of IO queues to be
-> > > > > > created for a block device. For example, for limiting the memory
-> > > > > > footprint of virtio-blk devices.
-> > > > > > 
-> > > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > > > > ---
-> > > > > > 
-> > > > > > changes from v1:
-> > > > > >    - use param_set_uint_minmax (from Christoph)
-> > > > > >    - added "Should > 0" to module description
-> > > > > > 
-> > > > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
-> > > > > > ---
-> > > > > >    drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
-> > > > > >    1 file changed, 19 insertions(+), 1 deletion(-)
-> > > > > > 
-> > > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > > > index 4b49df2dfd23..9332fc4e9b31 100644
-> > > > > > --- a/drivers/block/virtio_blk.c
-> > > > > > +++ b/drivers/block/virtio_blk.c
-> > > > > > @@ -24,6 +24,22 @@
-> > > > > >    /* The maximum number of sg elements that fit into a virtqueue */
-> > > > > >    #define VIRTIO_BLK_MAX_SG_ELEMS 32768
-> > > > > > +static int virtblk_queue_count_set(const char *val,
-> > > > > > +		const struct kernel_param *kp)
-> > > > > > +{
-> > > > > > +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
-> > > > > > +}
-> > 
-> > Hmm which tree is this for?
-> 
-> I've mentioned in the note that it apply on branch for-5.15/drivers. But now
-> you can apply it on linus/master as well.
-> 
-> 
-> > 
-> > > > > > +
-> > > > > > +static const struct kernel_param_ops queue_count_ops = {
-> > > > > > +	.set = virtblk_queue_count_set,
-> > > > > > +	.get = param_get_uint,
-> > > > > > +};
-> > > > > > +
-> > > > > > +static unsigned int num_io_queues;
-> > > > > > +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
-> > > > > > +MODULE_PARM_DESC(num_io_queues,
-> > > > > > +		 "Number of IO virt queues to use for blk device. Should > 0");
-> > 
-> > 
-> > better:
-> > 
-> > +MODULE_PARM_DESC(num_io_request_queues,
-> > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-> 
-> You proposed it and I replied on it bellow.
+We want to limit the overall iops/bps of the device in cgroup v2,
+however "io.max" or "io.min" do not exist in root cgroup currently,
+which makes it impossible.
 
+This patch enables io throttle for root cgroup:
+ - enable "io.max" and "io.min" in root
+ - don't skip root group in tg_iops_limit() and tg_bps_limit()
+ - don't skip root group in tg_conf_updated()
 
-Can't say I understand 100% what you are saying. Want to send
-a description that does make sense to you but
-also reflects reality? 0 is the default so
-"should > 0" besides being ungrammatical does not seem t"
-reflect what it does ...
+I'm not sure why this feature is disabled in the first place, is
+there any problem or design constraint?
 
-> 
-> > 
-> > 
-> > > > > > +
-> > > > > >    static int major;
-> > > > > >    static DEFINE_IDA(vd_index_ida);
-> > > > > > @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
-> > > > > >    	if (err)
-> > > > > >    		num_vqs = 1;
-> > > > > > -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-> > > > > > +	num_vqs = min_t(unsigned int,
-> > > > > > +			min_not_zero(num_io_queues, nr_cpu_ids),
-> > > > > > +			num_vqs);
-> > > > > If you respin, please consider calling them request queues. That's the
-> > > > > terminology from the VIRTIO spec and it's nice to keep it consistent.
-> > > > > But the purpose of num_io_queues is clear, so:
-> > > > > 
-> > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > I did this:
-> > > > +static unsigned int num_io_request_queues;
-> > > > +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
-> > > > +MODULE_PARM_DESC(num_io_request_queues,
-> > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-> > > The parameter is writable and can be changed and then new devices might be
-> > > probed with new value.
-> > > 
-> > > It can't be zero in the code. we can change param_set_uint_minmax args and
-> > > say that 0 says nr_cpus.
-> > > 
-> > > I'm ok with the renaming but I prefer to stick to the description we gave in
-> > > V3 of this patch (and maybe enable value of 0 as mentioned above).
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-throttle.c | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 55c49015e533..fffe072de538 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -302,9 +302,6 @@ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ 	struct throtl_data *td;
+ 	uint64_t ret;
+ 
+-	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+-		return U64_MAX;
+-
+ 	td = tg->td;
+ 	ret = tg->bps[rw][td->limit_index];
+ 	if (ret == 0 && td->limit_index == LIMIT_LOW) {
+@@ -332,9 +329,6 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ 	struct throtl_data *td;
+ 	unsigned int ret;
+ 
+-	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+-		return UINT_MAX;
+-
+ 	td = tg->td;
+ 	ret = tg->iops[rw][td->limit_index];
+ 	if (ret == 0 && tg->td->limit_index == LIMIT_LOW) {
+@@ -1430,9 +1424,8 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
+ 		struct throtl_grp *parent_tg;
+ 
+ 		tg_update_has_rules(this_tg);
+-		/* ignore root/second level */
+-		if (!cgroup_subsys_on_dfl(io_cgrp_subsys) || !blkg->parent ||
+-		    !blkg->parent->parent)
++		/* ignore root level */
++		if (!cgroup_subsys_on_dfl(io_cgrp_subsys) || !blkg->parent)
+ 			continue;
+ 		parent_tg = blkg_to_tg(blkg->parent);
+ 		/*
+@@ -1771,7 +1764,6 @@ static struct cftype throtl_files[] = {
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	{
+ 		.name = "low",
+-		.flags = CFTYPE_NOT_ON_ROOT,
+ 		.seq_show = tg_print_limit,
+ 		.write = tg_set_limit,
+ 		.private = LIMIT_LOW,
+@@ -1779,7 +1771,6 @@ static struct cftype throtl_files[] = {
+ #endif
+ 	{
+ 		.name = "max",
+-		.flags = CFTYPE_NOT_ON_ROOT,
+ 		.seq_show = tg_print_limit,
+ 		.write = tg_set_limit,
+ 		.private = LIMIT_MAX,
+-- 
+2.31.1
 
