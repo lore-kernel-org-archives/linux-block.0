@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE601C4167D
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D0AC4167E
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B776761206
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECE93611AF
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346660AbhIIW0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 18:26:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40790 "EHLO
+        id S1345235AbhIIW0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 18:26:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345284AbhIIW0h (ORCPT
+        with ESMTP id S1345349AbhIIW0h (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 18:26:37 -0400
-Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC190C061760;
-        Thu,  9 Sep 2021 15:25:26 -0700 (PDT)
-Received: by mail-oo1-xc2b.google.com with SMTP id m11-20020a056820034b00b0028bb60b551fso1070035ooe.5;
-        Thu, 09 Sep 2021 15:25:26 -0700 (PDT)
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D69AFC061575;
+        Thu,  9 Sep 2021 15:25:27 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id m7-20020a9d4c87000000b0051875f56b95so4565999otf.6;
+        Thu, 09 Sep 2021 15:25:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=t5T+AFlgbNoGcPrVLT53gG0D4KLaxBBE1fEOtdfcLqE=;
-        b=Cg1rpKDFgQ3EhEFN0AzLXlkGd/m9G1+XdFsD8fySprsOVbAmlByxUGxW0OTh7Xtjzl
-         sSKwvR1QXvYlO00x7RouJ/jvIVkJgvxru8cfVd9DtXubdVr2xqTjcTjlMuIN6uQ1wKV7
-         I4Lu1HgWw4dqZ8QXXelY7ylGffElTqTX+zPPvzvljTT8hhZeQ1OXaQYLKwmpMs/BHM9+
-         VDJxHGXOlgKgbnHk5J7wzXSF8EJHfeZJMN3ISBPgnlSxXkjPJdMGEL6SXficb3k3DsyY
-         RayuJUuqgzQpF7zhMaVbJ97IjsQjMH3H1c7fNKeJ+uXwlQcoWdI1vZ6BX+NDS17YcmpJ
-         hCSw==
+        bh=ZLOPme3bTnjA2h6AchbcXlnzuUCG5BQ91CmIdjqTch4=;
+        b=LtponteebQeI+Jw8nG5IkAAZtIy0uuRsADT1LEelc7mhkRfU6dT4xN/bTUpevL3O3R
+         BUQHn2ij7mY2Y/IWgVEwZVuWG4NKHF75At+3ly4UbWR74ZfI4BpVcSUWYxL+zJiZq+f0
+         uWBRlSLoTsMHO9eRvv398Qpzh285jIA2kmc0isMnuMyjeyAZJWbdQuRwPRLgSy35RRYA
+         HK3aa/7rXYBAHod21AFUAWMfqgEQvCC4eGCLsWN4upLOWVKlubmOWDtgvDvYTvJJepQm
+         CvuWltVSJczZMdzd4dU6Rrmh3FdKHUpkn3zBN4OL3nxLZyx2pzIYPO17XGDkf+kGTXDE
+         HWSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=t5T+AFlgbNoGcPrVLT53gG0D4KLaxBBE1fEOtdfcLqE=;
-        b=2zpccEbidYfrrdvOHawFbOkkO0E3MGjtk+RBl1sZ7KZ07Zi4HbJ9fEgfdKLvlwRNz3
-         bBx1A0E/EJ2QlsTqL8R6f9lxxb3d5HFqT2onuKfce8HSIT/P1Qpko0xikvun7usuGyx7
-         OHJ5+kd8PWS/mRnv8mD6t/Fjk006dcnixZA6X22S80NVVWGtYUEFMK10QnAayuOaFKJT
-         yU16y1Vzlq8jOwQoIJFG7fkgeHrIaDrc8uBI9Qi4KLsklN0HdSoBpXlYwaghRd20GPPx
-         4UDtgf6A+caUAKN5tw3c+2be0xwKtTXbi7+kOQNhciYt2S+3pkyxh8Pjpsz6rUXqXZ9s
-         DFww==
-X-Gm-Message-State: AOAM533xUlzxqNbg/jWEZUxbpOccnsOBGg/3MKvkA74GijoVeT1MTnQx
-        5jdMGIdOtg2ionYMdWA53Ww=
-X-Google-Smtp-Source: ABdhPJyYrYBPaw6ekxeII0CMS8TKIPFMx/YqnPYNX0Lp7CUmQiAxXUJnw79CVApfd8k5tzKMiqx7TA==
-X-Received: by 2002:a05:6820:613:: with SMTP id e19mr1798819oow.67.1631226326272;
-        Thu, 09 Sep 2021 15:25:26 -0700 (PDT)
+        bh=ZLOPme3bTnjA2h6AchbcXlnzuUCG5BQ91CmIdjqTch4=;
+        b=AvP6w2UVwCUG1YTnxF/WJQYHNComzhgkUbzbvGPKBBUTil2sa8AvPDcD2Em532JNvM
+         qRsM7HBolhR9TnuQtKiXZgUL+jJjTqhADx1ieUy9kEiFUVmixjKZvebZxJmxIINSjZht
+         wJOamRWsLc6FW0N23VKEHTNkQVUq9Tb0ul6q5r139gpGtclpq5t25dn/CZVLDHZMfyA1
+         YGwUqUF/b2VHVDWNaL+UqyMiLROHOznEqP5xcnhEc8mWdIPtQ1QnX88P+PmXUCD26/X5
+         kBxfZRQKlF6VbzQOc6WUEGqIM4TAlb6dldY0i1px7nIrxwGh4RJyNe5AkGn4w4D9HKLv
+         7yow==
+X-Gm-Message-State: AOAM531ZB5Z3YNBdDiivdb+rPf2xf92iH44AJDSytlz1Hrz8pqlDQ1AQ
+        hg0506cwqSjZQTi5JBUEg1Y=
+X-Google-Smtp-Source: ABdhPJymhcAar4MC37SQkwoGEHEL+ZOu0WpDW4mlRmyEcb8UmY18fPxgWhceTeD9mVthrLwBuYE/4Q==
+X-Received: by 2002:a9d:4910:: with SMTP id e16mr1893390otf.170.1631226327264;
+        Thu, 09 Sep 2021 15:25:27 -0700 (PDT)
 Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id 4sm747293oil.38.2021.09.09.15.25.25
+        by smtp.gmail.com with ESMTPSA id 4sm747293oil.38.2021.09.09.15.25.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 09 Sep 2021 15:25:26 -0700 (PDT)
 From:   Ian Pilcher <arequipeno@gmail.com>
@@ -61,9 +61,9 @@ To:     axboe@kernel.dk, pavel@ucw.cz
 Cc:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
         kabel@kernel.org
-Subject: [PATCH v2 07/15] leds: trigger: blkdev: Add constants and types
-Date:   Thu,  9 Sep 2021 17:25:05 -0500
-Message-Id: <20210909222513.2184795-8-arequipeno@gmail.com>
+Subject: [PATCH v2 09/15] leds: trigger: blkdev: Check devices for activity and blink LEDs
+Date:   Thu,  9 Sep 2021 17:25:07 -0500
+Message-Id: <20210909222513.2184795-10-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210909222513.2184795-1-arequipeno@gmail.com>
 References: <20210909222513.2184795-1-arequipeno@gmail.com>
@@ -73,71 +73,136 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid bloating gendisk structure by storing per-device trigger data in
-ledtrig_blkdev_disk
-
-Support many-to-many device/LED associations with ledtrig_blkdev_link
-struct.  Per-device (ledtrig_blkdev_disk) and per-LED (ledtrig_blkdev_led)
-structures both include a list of links, so a device can be linked to
-multiple LEDs, and an LED can be linked to multiple devices.
+Use a delayed workqueue to periodically check configured block devices for
+activity since the last check.  Blink LEDs associated with devices on which
+the configured type of activity (read/write) has occurred.
 
 Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 ---
- drivers/leds/trigger/ledtrig-blkdev.c | 44 +++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ drivers/leds/trigger/ledtrig-blkdev.c | 103 ++++++++++++++++++++++++++
+ 1 file changed, 103 insertions(+)
 
 diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
-index 7f85e6080ea1..38a2cd2df85c 100644
+index 53b62e320491..40dc55e5d4f3 100644
 --- a/drivers/leds/trigger/ledtrig-blkdev.c
 +++ b/drivers/leds/trigger/ledtrig-blkdev.c
-@@ -15,3 +15,47 @@ MODULE_DESCRIPTION("Block device LED trigger");
- MODULE_AUTHOR("Ian Pilcher <arequipeno@gmail.com>");
- MODULE_LICENSE("GPL v2");
- MODULE_IMPORT_NS(LEDTRIG_BLKDEV);
+@@ -8,6 +8,7 @@
+ 
+ #include <linux/leds.h>
+ #include <linux/module.h>
++#include <linux/part_stat.h>
+ 
+ #include "ledtrig-blkdev.h"
+ 
+@@ -60,6 +61,108 @@ struct ledtrig_blkdev_led {
+ 	enum ledtrig_blkdev_mode	mode;
+ };
+ 
++/* All LEDs associated with the trigger */
++static HLIST_HEAD(ledtrig_blkdev_leds);
 +
-+/* Default blink time & check interval (milliseconds) */
-+#define LEDTRIG_BLKDEV_BLINK_MSEC	75
-+#define LEDTRIG_BLKDEV_INTERVAL		100
++/* How often to check for drive activity - in jiffies */
++static unsigned int ledtrig_blkdev_interval;
 +
-+/* Minimum blink time & check interval (milliseconds) */
-+#define LEDTRIG_BLKDEV_MIN_BLINK	10
-+#define LEDTRIG_BLKDEV_MIN_INT		25
++/* Delayed work used to periodically check for activity & blink LEDs */
++static void blkdev_process(struct work_struct *const work);
++static DECLARE_DELAYED_WORK(ledtrig_blkdev_work, blkdev_process);
 +
-+enum ledtrig_blkdev_mode {
-+	LEDTRIG_BLKDEV_MODE_RO	= 0,	/* blink for reads */
-+	LEDTRIG_BLKDEV_MODE_WO	= 1,	/* blink for writes */
-+	LEDTRIG_BLKDEV_MODE_RW	= 2	/* blink for reads and writes */
-+};
 +
-+/* Per-block device information */
-+struct ledtrig_blkdev_disk {
-+	struct gendisk		*gd;
-+	struct kobject		*dir;		/* linked_leds dir */
-+	struct hlist_head	leds;
-+	unsigned long		read_ios;
-+	unsigned long		write_ios;
-+	unsigned int		generation;
-+	bool			read_act;
-+	bool			write_act;
-+};
++/*
++ *
++ *	Periodically check for device acitivity and blink LEDs
++ *
++ */
 +
-+/* For many-to-many relationships between "disks" (block devices) and LEDs */
-+struct ledtrig_blkdev_link {
-+	struct hlist_node		disk_leds_node;
-+	struct hlist_node		led_disks_node;
-+	struct ledtrig_blkdev_disk	*disk;
-+	struct ledtrig_blkdev_led	*led;
-+};
++static void blkdev_blink(const struct ledtrig_blkdev_led *const led)
++{
++	unsigned long delay_on = READ_ONCE(led->blink_msec);
++	unsigned long delay_off = 1;	/* 0 leaves LED turned on */
 +
-+/* Every LED associated with the blkdev trigger gets one of these */
-+struct ledtrig_blkdev_led {
-+	struct kobject			*dir;		/* linked_devices dir */
-+	struct led_classdev		*led_dev;
-+	unsigned int			blink_msec;
-+	struct hlist_head		disks;		/* linked block devs */
-+	struct hlist_node		leds_node;
-+	enum ledtrig_blkdev_mode	mode;
-+};
++	led_blink_set_oneshot(led->led_dev, &delay_on, &delay_off, 0);
++}
++
++static void blkdev_update_disk(struct ledtrig_blkdev_disk *const disk,
++			       const unsigned int generation)
++{
++	const struct block_device *const part0 = disk->gd->part0;
++	const unsigned long read_ios = part_stat_read(part0, ios[STAT_READ]);
++	const unsigned long write_ios = part_stat_read(part0, ios[STAT_WRITE])
++				+ part_stat_read(part0, ios[STAT_DISCARD])
++				+ part_stat_read(part0, ios[STAT_FLUSH]);
++
++	if (disk->read_ios != read_ios) {
++		disk->read_act = true;
++		disk->read_ios = read_ios;
++	} else {
++		disk->read_act = false;
++	}
++
++	if (disk->write_ios != write_ios) {
++		disk->write_act = true;
++		disk->write_ios = write_ios;
++	} else {
++		disk->write_act = false;
++	}
++
++	disk->generation = generation;
++}
++
++static bool blkdev_read_mode(const enum ledtrig_blkdev_mode mode)
++{
++	return mode != LEDTRIG_BLKDEV_MODE_WO;
++}
++
++static bool blkdev_write_mode(const enum ledtrig_blkdev_mode mode)
++{
++	return mode != LEDTRIG_BLKDEV_MODE_RO;
++}
++
++static void blkdev_process(struct work_struct *const work)
++{
++	static unsigned int generation;
++
++	struct ledtrig_blkdev_led *led;
++	struct ledtrig_blkdev_link *link;
++	unsigned long delay;
++
++	if (!mutex_trylock(&ledtrig_blkdev_mutex))
++		goto exit_reschedule;
++
++	hlist_for_each_entry(led, &ledtrig_blkdev_leds, leds_node) {
++
++		hlist_for_each_entry(link, &led->disks, led_disks_node) {
++
++			struct ledtrig_blkdev_disk *const disk = link->disk;
++
++			if (disk->generation != generation)
++				blkdev_update_disk(disk, generation);
++
++			if (disk->read_act && blkdev_read_mode(led->mode)) {
++				blkdev_blink(led);
++				break;
++			}
++
++			if (disk->write_act && blkdev_write_mode(led->mode)) {
++				blkdev_blink(led);
++				break;
++			}
++		}
++	}
++
++	++generation;
++
++	mutex_unlock(&ledtrig_blkdev_mutex);
++
++exit_reschedule:
++	delay = READ_ONCE(ledtrig_blkdev_interval);
++	WARN_ON_ONCE(!schedule_delayed_work(&ledtrig_blkdev_work, delay));
++}
++
+ 
+ /*
+  *
 -- 
 2.31.1
 
