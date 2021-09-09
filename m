@@ -2,136 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDFFC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 16:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41754C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 16:31:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32CDA6115B
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 16:17:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19851610C9
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 16:31:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236363AbhIIQSg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 12:18:36 -0400
-Received: from mail-bn8nam11on2044.outbound.protection.outlook.com ([40.107.236.44]:52961
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236606AbhIIQSf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Sep 2021 12:18:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VA4a+6gDrmNptFzugaw5HIt76fvo+5XyvDPKpTiDXXadrcyBoSC+oCYPkDi6KlMaEPSFz1MFanSFMhc4rBFA5QsRdcTM7dnLUyZghumnXDRqmPyGlhTNibTyKYJRLR3zpa4jwCxQMts/nZiZmY5ZTaSPoJcR/VD0Mi0z8OrYZopnTGwVJ4UyR1Ytz2irG2FXLACb6QctIhxhCIdCb/NoKMEZNDAaNrKdpwhG/Ypz1IFtZZg75FnuKk/VsA4522RdXRKZcvDjTfHHmx/WWv9/S824jMmAjWf3cWOJSzvAHElZHLTve7mGcl+8c2KWjm7dv4krehK/e9Sc+fFg7gNHmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=bJCGnGVEB08oHEMYbWy7s2m/qhD7U220rHC8bv0G3sQ=;
- b=W8R2XIkDmBD12NTXFpesko+H/XzKmoNfWbESRxs/He+HHU1Ss54WOz5b63ZNFAfwjrnV6MFuLspNmGI0LnP569xKlPc/4W2ca3HwKHVQJQ0c4d7XeaYnnglv0my4DzZ/DKmN3wsCbqihluPFfEP5168LbygOpuC24ow+X2A3EjF79CQKBJM6Rbs8GawCfjzOBk9aHTbnUcWpa09LV73WP0Lp06HWWjhqwljBUFnKDej9uPQEGApUmtB2TfE0rTzmVM5m/pjUCTOmwphEaaGVWd9WWAIG3FyHicvwWDN8Y/9ou7+P+jvdMMos5FoO5EKUAz25t1TRHzoyXcHtvrxjWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bJCGnGVEB08oHEMYbWy7s2m/qhD7U220rHC8bv0G3sQ=;
- b=Y3f+D/Eeb70E8KNPjrP8mA+E2qcupVmxHKlYPD76KPiYQdZxtN8DZG+iIQ48g5lmRvAOQ0S/AnoblThEg5vtu8Pg58PPpjFK4UoiUpfALX51TKl38fLaSrtFJlJedlB2CqIVb01BiznBZ6WUsLBd9eSSToH5Crj9WnpfkdJLgDASNIfm7DWI7HIl/sohrxRH9ywADML1OxJ02UmSk0/XB1oIR1GOFD+cqdGLULwFIhWrIELYsgtvM6Cf0cmgQ+YZ7EeMIBiIbry5cJViLnywMku8wQZM/e+V3RqDp/NVQc5olwrbf/HAfZd7vANfcEiIfEETfI2aA4zUDwW82F6myw==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by MWHPR1201MB0221.namprd12.prod.outlook.com (2603:10b6:301:56::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.16; Thu, 9 Sep
- 2021 16:17:24 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::498a:4620:df52:2e9f]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::498a:4620:df52:2e9f%5]) with mapi id 15.20.4500.016; Thu, 9 Sep 2021
- 16:17:24 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Yang Yingliang <yangyingliang@huawei.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH] n64cart: fix return value check in n64cart_probe()
-Thread-Topic: [PATCH] n64cart: fix return value check in n64cart_probe()
-Thread-Index: AQHXpVkwZNpNFSpMREyq7qwIWmGsbaub4aYA
-Date:   Thu, 9 Sep 2021 16:17:24 +0000
-Message-ID: <3cf4c5fd-d1c5-7f80-6197-c82c9cda6240@nvidia.com>
-References: <20210909090608.2989716-1-yangyingliang@huawei.com>
-In-Reply-To: <20210909090608.2989716-1-yangyingliang@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-authentication-results: huawei.com; dkim=none (message not signed)
- header.d=none;huawei.com; dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 90f0f726-675e-4405-c620-08d973ad4f4c
-x-ms-traffictypediagnostic: MWHPR1201MB0221:
-x-microsoft-antispam-prvs: <MWHPR1201MB022128F4BA56F4A2941F7797A3D59@MWHPR1201MB0221.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1388;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: VzRC/+CukluO/sBqpQcL9DM5wVqjOqxQj35lOWUnQdUa+fbNEZopiRrSbsJ2Ho4Dpk5J6NnvSANb58bOhx8IK2baJob6E5WJM+BMOMYWvLHZXLUwulwB9EI4pJB01Mkdag0B5KPOGqNTsj8gJV8+GpTg2M9nd/+1jZwO3m4vibV9LlFQ2hrlMkwH476z8a9CGSj/hmOycMm5BSByecZaHbvDGGsbD61cr4fbYoGdiVIpg6K+BBKzW/t0FqzqR54CFxvVf1XBbzmjD8LqMYNwxp+sMjZni4bUh16vB2gW3n816KBkosxj+CzkETPCuIm0WUk8wQu0u5KM+NezUG0by7LNNsfTm2+X31Gi97qnL0VKBsPB+XmPiBcjF3/i3hcUpfpjzdfMpJkMIb7yW/EwOYRVCt+FsWjJ/FI5C+KXx5io1xYZjbbgx2Z8wWjBTpvEvf6SxAbCkHj/G13/yCfnKfRH53+sOqUnslRn8s6utLZuCcAHiNMEG1M+9+5cd80cBcNHX/WuE8m7yVKdDd1Etov9AT5X3yF5EanEs9kGRF3fA7PQokQRWfPolcq66UlzYReBAzIpQChhBAFt6n3w6GGLd1KN6oaldM/l5kLij+hLHarLs0xyfjMdpkHDJURlyKhsWgLYhSpt9X/yUaibuexMGDUkx7S1Y1aGXf06Ur3tHzmj7XB729wF9X98t5lEfVUvCr2zXgqYNFgwqtuYnPLE0knhkcuHLn1YQyAC+MBBY66HSZgGxYvxsgpDCHL6rBRpgm4C0a8u+Ln09n8nxg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(39860400002)(346002)(376002)(366004)(8936002)(83380400001)(6506007)(110136005)(122000001)(76116006)(64756008)(66946007)(91956017)(53546011)(6512007)(86362001)(5660300002)(478600001)(8676002)(66556008)(36756003)(71200400001)(2906002)(4744005)(6486002)(186003)(66446008)(38070700005)(31686004)(4326008)(38100700002)(316002)(31696002)(66476007)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VVoydDczd0lYR203ekluaGlMVEJPV0twWEx6ZC9SYzUyN1hvZm03NHBPSFJF?=
- =?utf-8?B?YTdPcy9Ka3hhK0MyQUFwd0k2V1dnVUs4NTFHLy8vbzFZSXgxVnp4aDNkcUJ2?=
- =?utf-8?B?U2hQQnVKY0NpRmY5bFZScy9meUdGZTJIQlRKM24zdDh5T1J4Ym5HRHEvb0hX?=
- =?utf-8?B?SlllbDRCY25hTklUbGlPTUFremZMVmRidDJ3OEJZZlBadjBFVHA5SEJlVU1j?=
- =?utf-8?B?TmEweTQzcTlxUG5MOG1JZ2o5MExZN3VTbUp6djZrK1V0SjBUOHQzWEJBZzRl?=
- =?utf-8?B?emdhMENFQ2FBVmNBN2loNENGWUhrR0s1NEtnRzk0SUZBL09hQmpFWXpFYXRN?=
- =?utf-8?B?T2J0eGFTV0JGTDNNalhUYVBVbWtqSmdaeGQvMEd3ZVRoSnlxS2x6aDhQL2xI?=
- =?utf-8?B?ZjVFU1AxQ0djeG9DSG5vUVlJajdOc2lNa3BLSHVQcUNVQktYaWY2TWgzZnln?=
- =?utf-8?B?bWl2NlplaFR5OEg0dER0NTdmZS9ZWkJueWVHcFhXZ09CekRVVlphUHZSRUhP?=
- =?utf-8?B?RUNXMFZ6dGxvYmprd3JrMWpWcWM5ZlR6bDljVHRCZDdBY1Nta1EvZTE3bXRH?=
- =?utf-8?B?Nkc3T01wQnJSMnhvbjk5RDFpMkpWRGNiNU82cnhCclBHZU10TG9oTzdDa3dj?=
- =?utf-8?B?VEVwVkNzNXpDcFJ5ZVFDQkErRDJNclgrd2lEZjF2Zy85Q2pKNVRWSFBBcFI1?=
- =?utf-8?B?WEovSnYxb3BPRVBsWGxtMWVKbC91WWlGY2dtdUZsVHVIZEEwQU81N2laZ0Mz?=
- =?utf-8?B?TFpOY2FtWlRBQlQ4UFJETzJNNzRhbDlDTW5HZUR4WWdaTWRUTVo4WG5kRHdl?=
- =?utf-8?B?czhlK2ZSbDNCUW9jNWpxS0orR3F6RzlzL1k0OTdzdERKMm5wb28xTE9uNkdy?=
- =?utf-8?B?aGVsUVFubWRJWE9wZ1B2S0ZmeFhKOHVybEltaTRLRENFR3JXR2ZOMHpUTmtP?=
- =?utf-8?B?TFIycVoyOHBJK1ZSUytLUWhKaXErc3FqSVJ0QmlDekNJeWJPUXFsZTV4MVhW?=
- =?utf-8?B?UzFtR1BzR0NzUnJxd25mS2FTVFlzVFBmTU1yVUhPTWJXU0VGMnpZQzgvWC8r?=
- =?utf-8?B?WXUwNXI2bGtIZkUyRUwvOERIWnJwc2ZqL0R4SUhHZFdSQk81Q3B4R3FTOVBl?=
- =?utf-8?B?MFB2c2FabklZeEI1Z1Bid2xidHN0Vy8rOXFIQ3FabkpLdFRZZytUQVBtb2Vk?=
- =?utf-8?B?cHBwS2JOMDBPbHFNTldPclYyQldrUDFJdVB5V3RtcmU2ZEZ1NjMwSmJlSEY4?=
- =?utf-8?B?aCtYelpHalY2Q2RsMjlVQUpXQkRzNWpqYXArY1lEZmV4ejNzcmxTUm9BNXBa?=
- =?utf-8?B?VHRNdlFTZGlJbkpESkNJZCsyM3M0bVVlbEswTk1XSzMrZmRJOHF0YmRoUG8v?=
- =?utf-8?B?YTRMMXR4Tlg0OTZ4cDJrd1UzUHI4dDkycEZSYkM3c3JHQUs4MmJJOVhCTDU5?=
- =?utf-8?B?bmFkYzc1NC9RVERRSHoxbVBiVmpGTi83S0UrUzJtL2NxbTNjbUNEL2F6TDVK?=
- =?utf-8?B?dXR3UkdJWHhNdWhxZ2gvSFZxK2hoem05V3ZuOWpJRk9FWXczemdPVGR0M0dT?=
- =?utf-8?B?bUx1OTdFejNXQVpzeGlkN2NDQktjTHJCWDFMclRZK1lJRWdDYThEVkU2Uk9N?=
- =?utf-8?B?bTJXRWtVZlBPT01XaDVTQlJPQ0VtUnZZcXlqcS9aRHY3QlhzMlB6VDdBeG0w?=
- =?utf-8?B?U3ZlTTVyeUltSzJpTDRBMHBrOXlyNWhhRGw2ZWZNNkV6TE1pVE5CeUZMUzdB?=
- =?utf-8?B?L0xScTZ5MHA2czdINXZIeEl0UzgvSVFjZUJ4bU9lMjQwSnBtcW04OUhMQ0c3?=
- =?utf-8?Q?T7AdfEkYA/eSreBNqxUmfy7BojBFEcVP/vWPw=3D?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ACB5CF965DA7BB4E98A38C22F4559411@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S236840AbhIIQdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 12:33:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33373 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232192AbhIIQdA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Sep 2021 12:33:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631205110;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kbWrdHL+fdDQU8XR6jLdk3HO8KdzpLz8n5o6kPIv+0s=;
+        b=fGocEdq219QXIdWPOyNNn4VL6YwJ1PagX9XZHOcAR/WILoQoOe/lMlMv5kBOqLl8+83HQ+
+        NNRjBv55cB8hR0+WX85l9X+Mc2lUf7RTvKoL5s1ptOMHGkfiyVJQOR0LKdmSASHOqokICd
+        jqjC+zMtpCUSgvBr3YjBQad30w1bSc4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-282-DZBxAkopMMWSGkBAPmgeGg-1; Thu, 09 Sep 2021 12:31:49 -0400
+X-MC-Unique: DZBxAkopMMWSGkBAPmgeGg-1
+Received: by mail-wr1-f70.google.com with SMTP id j1-20020adff541000000b001593715d384so700200wrp.1
+        for <linux-block@vger.kernel.org>; Thu, 09 Sep 2021 09:31:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kbWrdHL+fdDQU8XR6jLdk3HO8KdzpLz8n5o6kPIv+0s=;
+        b=EbmffZhT3uyRcoDchr99puPr9mopNArVQZbRWbVnGs1sOqiiiTd8rjTufAuO3wgdws
+         7GKF+Pvf56IfUy19Eh8aXyWgFpdiaS8eieNDAv2J8m4xwOyRWXe/JDk7tX+4CxLDX4hb
+         bYdUvFcVulePpM/gLV97PKhgmS0j/oOvSzLTWvsvXUsPr0PV9qPrRrPLx9TgECyjyAtx
+         ryV3zYZGEZqUkO0C6s0UbIWQ3tTYGxpWTlbO4Fe2qXZUocEaaQeYYpGb4SnzvAyqMlUo
+         pYNuKXHBtY4P4yDiEWXc/h4T90S9F8UUFvEOnUTSxkgEegUgxkop/Anrt07hWVUOJVnI
+         5zSg==
+X-Gm-Message-State: AOAM531mA6UTvIbIErUkHdWRKf3ONSiKPSATRDq20MRYNJM655rssNGv
+        yrzOHuy4VLStgJeE1h5Oln3gaGpM8gEoLcpnwfCk3TmIhslgXa1ig08XDOpycuvSaKQxcRhzTBl
+        jIrQfBktqhhjXP6U0H6vbx6w=
+X-Received: by 2002:adf:914e:: with SMTP id j72mr4702974wrj.428.1631205107927;
+        Thu, 09 Sep 2021 09:31:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxp7upXiPwUXg299EvKs1hS+EOTStEfwVLBh4g5I/i4ZUQHiWFs0OTx8Avoo+tEPTJYsi97LQ==
+X-Received: by 2002:adf:914e:: with SMTP id j72mr4702945wrj.428.1631205107708;
+        Thu, 09 Sep 2021 09:31:47 -0700 (PDT)
+Received: from redhat.com ([2.55.145.189])
+        by smtp.gmail.com with ESMTPSA id w15sm1948863wmi.4.2021.09.09.09.31.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Sep 2021 09:31:45 -0700 (PDT)
+Date:   Thu, 9 Sep 2021 12:31:42 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, hch@infradead.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
+Message-ID: <20210909123035-mutt-send-email-mst@kernel.org>
+References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
+ <YTDVkDIr5WLdlRsK@stefanha-x1.localdomain>
+ <20210905120234-mutt-send-email-mst@kernel.org>
+ <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
+ <20210906071957-mutt-send-email-mst@kernel.org>
+ <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
+ <20210909094001-mutt-send-email-mst@kernel.org>
+ <456e1704-67e9-aac9-a82a-44fed65dd153@nvidia.com>
+ <20210909114029-mutt-send-email-mst@kernel.org>
+ <da61fec0-e90f-0020-c836-c2e58d32be27@nvidia.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90f0f726-675e-4405-c620-08d973ad4f4c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2021 16:17:24.5704
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: O2L7303i0E8MQFklPfLVumE7mOcGFSOh1wReH8SFJix0YUk0xkQTMT9Txr016RZelHjZkJB0Cpubf8pUN3Nrow==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0221
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <da61fec0-e90f-0020-c836-c2e58d32be27@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gOS85LzIxIDI6MDYgQU0sIFlhbmcgWWluZ2xpYW5nIHdyb3RlOg0KPiBFeHRlcm5hbCBlbWFp
-bDogVXNlIGNhdXRpb24gb3BlbmluZyBsaW5rcyBvciBhdHRhY2htZW50cw0KPiANCj4gDQo+IElu
-IGNhc2Ugb2YgZXJyb3IsIHRoZSBmdW5jdGlvbiBkZXZtX3BsYXRmb3JtX2lvcmVtYXBfcmVzb3Vy
-Y2UoKQ0KPiByZXR1cm5zIEVSUl9QVFIoKSBhbmQgbmV2ZXIgcmV0dXJucyBOVUxMLiBUaGUgTlVM
-TCB0ZXN0IGluIHRoZQ0KPiByZXR1cm4gdmFsdWUgY2hlY2sgc2hvdWxkIGJlIHJlcGxhY2VkIHdp
-dGggSVNfRVJSKCkuDQo+IA0KPiBGaXhlczogZDliMmEyYmJiYjRkICgiYmxvY2s6IEFkZCBuNjQg
-Y2FydCBkcml2ZXIiKQ0KPiBSZXBvcnRlZC1ieTogSHVsayBSb2JvdCA8aHVsa2NpQGh1YXdlaS5j
-b20+DQo+IFNpZ25lZC1vZmYtYnk6IFlhbmcgWWluZ2xpYW5nIDx5YW5neWluZ2xpYW5nQGh1YXdl
-aS5jb20+DQoNCkxvb2tzIGdvb2QuDQoNClJldmlld2VkLWJ5OiBDaGFpdGFueWEgS3Vsa2Fybmkg
-PGtjaEBudmlkaWEuY29tPg0KDQoNCg==
+On Thu, Sep 09, 2021 at 06:51:56PM +0300, Max Gurtovoy wrote:
+> 
+> On 9/9/2021 6:40 PM, Michael S. Tsirkin wrote:
+> > On Thu, Sep 09, 2021 at 06:37:37PM +0300, Max Gurtovoy wrote:
+> > > On 9/9/2021 4:42 PM, Michael S. Tsirkin wrote:
+> > > > On Mon, Sep 06, 2021 at 02:59:40PM +0300, Max Gurtovoy wrote:
+> > > > > On 9/6/2021 2:20 PM, Michael S. Tsirkin wrote:
+> > > > > > On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
+> > > > > > > On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
+> > > > > > > > On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
+> > > > > > > > > On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
+> > > > > > > > > > Sometimes a user would like to control the amount of IO queues to be
+> > > > > > > > > > created for a block device. For example, for limiting the memory
+> > > > > > > > > > footprint of virtio-blk devices.
+> > > > > > > > > > 
+> > > > > > > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > > > > > > > ---
+> > > > > > > > > > 
+> > > > > > > > > > changes from v1:
+> > > > > > > > > >      - use param_set_uint_minmax (from Christoph)
+> > > > > > > > > >      - added "Should > 0" to module description
+> > > > > > > > > > 
+> > > > > > > > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
+> > > > > > > > > > ---
+> > > > > > > > > >      drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
+> > > > > > > > > >      1 file changed, 19 insertions(+), 1 deletion(-)
+> > > > > > > > > > 
+> > > > > > > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > > > > > > > > index 4b49df2dfd23..9332fc4e9b31 100644
+> > > > > > > > > > --- a/drivers/block/virtio_blk.c
+> > > > > > > > > > +++ b/drivers/block/virtio_blk.c
+> > > > > > > > > > @@ -24,6 +24,22 @@
+> > > > > > > > > >      /* The maximum number of sg elements that fit into a virtqueue */
+> > > > > > > > > >      #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+> > > > > > > > > > +static int virtblk_queue_count_set(const char *val,
+> > > > > > > > > > +		const struct kernel_param *kp)
+> > > > > > > > > > +{
+> > > > > > > > > > +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
+> > > > > > > > > > +}
+> > > > > > Hmm which tree is this for?
+> > > > > I've mentioned in the note that it apply on branch for-5.15/drivers. But now
+> > > > > you can apply it on linus/master as well.
+> > > > > 
+> > > > > 
+> > > > > > > > > > +
+> > > > > > > > > > +static const struct kernel_param_ops queue_count_ops = {
+> > > > > > > > > > +	.set = virtblk_queue_count_set,
+> > > > > > > > > > +	.get = param_get_uint,
+> > > > > > > > > > +};
+> > > > > > > > > > +
+> > > > > > > > > > +static unsigned int num_io_queues;
+> > > > > > > > > > +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
+> > > > > > > > > > +MODULE_PARM_DESC(num_io_queues,
+> > > > > > > > > > +		 "Number of IO virt queues to use for blk device. Should > 0");
+> > > > > > better:
+> > > > > > 
+> > > > > > +MODULE_PARM_DESC(num_io_request_queues,
+> > > > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
+> > > > > You proposed it and I replied on it bellow.
+> > > > Can't say I understand 100% what you are saying. Want to send
+> > > > a description that does make sense to you but
+> > > > also reflects reality? 0 is the default so
+> > > > "should > 0" besides being ungrammatical does not seem t"
+> > > > reflect what it does ...
+> > > if you "modprobe virtio_blk" the previous behavior will happen.
+> > > 
+> > > You can't "modprobe virtio_blk num_io_request_queues=0" since the minimal
+> > > value is 1.
+> > > 
+> > > So your description is not reflecting the code.
+> > > 
+> > > We can do:
+> > > 
+> > > MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to use for blk device. Minimum value is 1 queue");
+> > What's the default value? We should document that.
+> 
+> default value for static global variables is 0.
+> 
+> MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to
+> use for blk device. Minimum value is 1 queue. Default and Maximum value is
+> equal to the total number of CPUs");
+
+So it says it's the # of cpus but yoiu inspect it with
+sysfs and it's actually 0. Let's say that's confusing
+at the least. why not just let users set it to 0
+and document that?
+
+
+> 
+> > 
+> > > > > > > > > > +
+> > > > > > > > > >      static int major;
+> > > > > > > > > >      static DEFINE_IDA(vd_index_ida);
+> > > > > > > > > > @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
+> > > > > > > > > >      	if (err)
+> > > > > > > > > >      		num_vqs = 1;
+> > > > > > > > > > -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
+> > > > > > > > > > +	num_vqs = min_t(unsigned int,
+> > > > > > > > > > +			min_not_zero(num_io_queues, nr_cpu_ids),
+> > > > > > > > > > +			num_vqs);
+> > > > > > > > > If you respin, please consider calling them request queues. That's the
+> > > > > > > > > terminology from the VIRTIO spec and it's nice to keep it consistent.
+> > > > > > > > > But the purpose of num_io_queues is clear, so:
+> > > > > > > > > 
+> > > > > > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > > > > > I did this:
+> > > > > > > > +static unsigned int num_io_request_queues;
+> > > > > > > > +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
+> > > > > > > > +MODULE_PARM_DESC(num_io_request_queues,
+> > > > > > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
+> > > > > > > The parameter is writable and can be changed and then new devices might be
+> > > > > > > probed with new value.
+> > > > > > > 
+> > > > > > > It can't be zero in the code. we can change param_set_uint_minmax args and
+> > > > > > > say that 0 says nr_cpus.
+> > > > > > > 
+> > > > > > > I'm ok with the renaming but I prefer to stick to the description we gave in
+> > > > > > > V3 of this patch (and maybe enable value of 0 as mentioned above).
+
