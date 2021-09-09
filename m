@@ -2,219 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56696C4332F
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE28C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:46:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 408EE60E94
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A72D560F4A
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 13:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359423AbhIINSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 09:18:45 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:9023 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358881AbhIINJy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 09:09:54 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4H4znc6gplzVnrl;
-        Thu,  9 Sep 2021 21:07:48 +0800 (CST)
-Received: from dggema773-chm.china.huawei.com (10.1.198.217) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Thu, 9 Sep 2021 21:08:42 +0800
-Received: from localhost.huawei.com (10.175.124.27) by
- dggema773-chm.china.huawei.com (10.1.198.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Thu, 9 Sep 2021 21:08:41 +0800
-From:   Li Jinlin <lijinlin3@huawei.com>
-To:     <paolo.valente@linaro.org>, <tj@kernel.org>, <axboe@kernel.dk>,
-        <fchecconi@gmail.com>, <avanzini.arianna@gmail.com>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linfeilong@huawei.com>,
-        <louhongxiang@huawei.com>
-Subject: [PATCH] fix UAF in bfq_io_set_weight_legacy()
-Date:   Thu, 9 Sep 2021 21:37:37 +0800
-Message-ID: <20210909133737.1930835-1-lijinlin3@huawei.com>
-X-Mailer: git-send-email 2.27.0
+        id S1356121AbhIINry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 09:47:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33247 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1356157AbhIINoB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Sep 2021 09:44:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631194966;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=n9yyglc648zrXRd4AVW4tP74FHofD3/df+6dNncY9Pg=;
+        b=CO8vWqg4jxBXqdTdjSJ50KB/h3GlikvsbEYC3bpvdzdV/q9C01hnztEQNm4a5HkzY0w6KO
+        nb3oFwG6BUOXu0WESlCH/XgL3989SBe2mtzct2ajLUmCTnJSIG/w5C2qLpJ1YOX8rHJ/yW
+        H31BzQ29GN8WOEX69xIZbzsm8Ecbz/8=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-530-8QHh8eRlMdmwbGJmgGvG0g-1; Thu, 09 Sep 2021 09:42:45 -0400
+X-MC-Unique: 8QHh8eRlMdmwbGJmgGvG0g-1
+Received: by mail-ej1-f72.google.com with SMTP id ne21-20020a1709077b95b029057eb61c6fdfso805067ejc.22
+        for <linux-block@vger.kernel.org>; Thu, 09 Sep 2021 06:42:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=n9yyglc648zrXRd4AVW4tP74FHofD3/df+6dNncY9Pg=;
+        b=r02T7GmM5VjMXF16wryxyIzkpdybQBh7H0o3qGlKTLQLeF/vgTdZzhwDJcZuLUIwTA
+         6ZHMY0LWxYlfVA8ECxipZks7BZK7qlVd4KyD/rR0EyZw+qliU0riWHqNnUzzMKpZ7BrM
+         CNlYcowXL9gdwjrDc6HCUQW+hx24FjnwHXBk0JG93s/d4by0ml2gOWotru2MLX8nltzM
+         lRcwahI2gTaB3TMkUf6SBnA3xKI1ILKJuIIVeaARVeLlQwpBbPkDe+TI2HgktTLv9/Ou
+         emUXl9WhtqqWo7v8ik3InuLY3eVnHWzjz2FBTF3iLPB9qh+JtXWKaHrQMS8EYymVCYPH
+         PKyA==
+X-Gm-Message-State: AOAM532bi9fdEzyUtVqg6S94v6OAjWbf3g283/SmC8e3JVxfNno3Pi4C
+        m/B+wYemhN+x64ugjmQ+otf8mWGr5vwCPGQD+Gi4tHCkF8Gn82EZGT39sjD8G+xHw3nN9eujQef
+        /BdR3+MioD9t3zN51hWH0weQ=
+X-Received: by 2002:a17:907:8693:: with SMTP id qa19mr3393409ejc.497.1631194964155;
+        Thu, 09 Sep 2021 06:42:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJywg/VJhF4XMVecjE+sPO8g/1PS5O4JAqpPXl2kjl3hyVJTihD7bfJVln+dRryMMPsNiUjk1w==
+X-Received: by 2002:a17:907:8693:: with SMTP id qa19mr3393389ejc.497.1631194963948;
+        Thu, 09 Sep 2021 06:42:43 -0700 (PDT)
+Received: from redhat.com ([2.55.145.189])
+        by smtp.gmail.com with ESMTPSA id o21sm1078830edc.47.2021.09.09.06.42.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Sep 2021 06:42:43 -0700 (PDT)
+Date:   Thu, 9 Sep 2021 09:42:39 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, hch@infradead.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
+Message-ID: <20210909094001-mutt-send-email-mst@kernel.org>
+References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
+ <YTDVkDIr5WLdlRsK@stefanha-x1.localdomain>
+ <20210905120234-mutt-send-email-mst@kernel.org>
+ <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
+ <20210906071957-mutt-send-email-mst@kernel.org>
+ <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggema773-chm.china.huawei.com (10.1.198.217)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Jinlin <lijinlin3@huawei.com>
+On Mon, Sep 06, 2021 at 02:59:40PM +0300, Max Gurtovoy wrote:
+> 
+> On 9/6/2021 2:20 PM, Michael S. Tsirkin wrote:
+> > On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
+> > > On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
+> > > > On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
+> > > > > On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
+> > > > > > Sometimes a user would like to control the amount of IO queues to be
+> > > > > > created for a block device. For example, for limiting the memory
+> > > > > > footprint of virtio-blk devices.
+> > > > > > 
+> > > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > > > ---
+> > > > > > 
+> > > > > > changes from v1:
+> > > > > >    - use param_set_uint_minmax (from Christoph)
+> > > > > >    - added "Should > 0" to module description
+> > > > > > 
+> > > > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
+> > > > > > ---
+> > > > > >    drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
+> > > > > >    1 file changed, 19 insertions(+), 1 deletion(-)
+> > > > > > 
+> > > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > > > > index 4b49df2dfd23..9332fc4e9b31 100644
+> > > > > > --- a/drivers/block/virtio_blk.c
+> > > > > > +++ b/drivers/block/virtio_blk.c
+> > > > > > @@ -24,6 +24,22 @@
+> > > > > >    /* The maximum number of sg elements that fit into a virtqueue */
+> > > > > >    #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+> > > > > > +static int virtblk_queue_count_set(const char *val,
+> > > > > > +		const struct kernel_param *kp)
+> > > > > > +{
+> > > > > > +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
+> > > > > > +}
+> > 
+> > Hmm which tree is this for?
+> 
+> I've mentioned in the note that it apply on branch for-5.15/drivers. But now
+> you can apply it on linus/master as well.
+> 
+> 
+> > 
+> > > > > > +
+> > > > > > +static const struct kernel_param_ops queue_count_ops = {
+> > > > > > +	.set = virtblk_queue_count_set,
+> > > > > > +	.get = param_get_uint,
+> > > > > > +};
+> > > > > > +
+> > > > > > +static unsigned int num_io_queues;
+> > > > > > +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
+> > > > > > +MODULE_PARM_DESC(num_io_queues,
+> > > > > > +		 "Number of IO virt queues to use for blk device. Should > 0");
+> > 
+> > 
+> > better:
+> > 
+> > +MODULE_PARM_DESC(num_io_request_queues,
+> > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
+> 
+> You proposed it and I replied on it bellow.
 
-KASAN reports a use-after-free report when doing fuzz test:
 
-[693354.104835] ==================================================================
-[693354.105094] BUG: KASAN: use-after-free in bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105336] Read of size 4 at addr ffff888be0a35664 by task sh/1453338
+Can't say I understand 100% what you are saying. Want to send
+a description that does make sense to you but
+also reflects reality? 0 is the default so
+"should > 0" besides being ungrammatical does not seem t"
+reflect what it does ...
 
-[693354.105607] CPU: 41 PID: 1453338 Comm: sh Kdump: loaded Not tainted 4.18.0-147
-[693354.105610] Hardware name: Huawei 2288H V5/BC11SPSCB0, BIOS 0.81 07/02/2018
-[693354.105612] Call Trace:
-[693354.105621]  dump_stack+0xf1/0x19b
-[693354.105626]  ? show_regs_print_info+0x5/0x5
-[693354.105634]  ? printk+0x9c/0xc3
-[693354.105638]  ? cpumask_weight+0x1f/0x1f
-[693354.105648]  print_address_description+0x70/0x360
-[693354.105654]  kasan_report+0x1b2/0x330
-[693354.105659]  ? bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105665]  ? bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105670]  bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105675]  ? bfq_cpd_init+0x20/0x20
-[693354.105683]  cgroup_file_write+0x3aa/0x510
-[693354.105693]  ? ___slab_alloc+0x507/0x540
-[693354.105698]  ? cgroup_file_poll+0x60/0x60
-[693354.105702]  ? 0xffffffff89600000
-[693354.105708]  ? usercopy_abort+0x90/0x90
-[693354.105716]  ? mutex_lock+0xef/0x180
-[693354.105726]  kernfs_fop_write+0x1ab/0x280
-[693354.105732]  ? cgroup_file_poll+0x60/0x60
-[693354.105738]  vfs_write+0xe7/0x230
-[693354.105744]  ksys_write+0xb0/0x140
-[693354.105749]  ? __ia32_sys_read+0x50/0x50
-[693354.105760]  do_syscall_64+0x112/0x370
-[693354.105766]  ? syscall_return_slowpath+0x260/0x260
-[693354.105772]  ? do_page_fault+0x9b/0x270
-[693354.105779]  ? prepare_exit_to_usermode+0xf9/0x1a0
-[693354.105784]  ? enter_from_user_mode+0x30/0x30
-[693354.105793]  entry_SYSCALL_64_after_hwframe+0x65/0xca
-
-[693354.105875] Allocated by task 1453337:
-[693354.106001]  kasan_kmalloc+0xa0/0xd0
-[693354.106006]  kmem_cache_alloc_node_trace+0x108/0x220
-[693354.106010]  bfq_pd_alloc+0x96/0x120
-[693354.106015]  blkcg_activate_policy+0x1b7/0x2b0
-[693354.106020]  bfq_create_group_hierarchy+0x1e/0x80
-[693354.106026]  bfq_init_queue+0x678/0x8c0
-[693354.106031]  blk_mq_init_sched+0x1f8/0x460
-[693354.106037]  elevator_switch_mq+0xe1/0x240
-[693354.106041]  elevator_switch+0x25/0x40
-[693354.106045]  elv_iosched_store+0x1a1/0x230
-[693354.106049]  queue_attr_store+0x78/0xb0
-[693354.106053]  kernfs_fop_write+0x1ab/0x280
-[693354.106056]  vfs_write+0xe7/0x230
-[693354.106060]  ksys_write+0xb0/0x140
-[693354.106064]  do_syscall_64+0x112/0x370
-[693354.106069]  entry_SYSCALL_64_after_hwframe+0x65/0xca
-
-[693354.106114] Freed by task 1453336:
-[693354.106225]  __kasan_slab_free+0x130/0x180
-[693354.106229]  kfree+0x90/0x1b0
-[693354.106233]  blkcg_deactivate_policy+0x12c/0x220
-[693354.106238]  bfq_exit_queue+0xf5/0x110
-[693354.106241]  blk_mq_exit_sched+0x104/0x130
-[693354.106245]  __elevator_exit+0x45/0x60
-[693354.106249]  elevator_switch_mq+0xd6/0x240
-[693354.106253]  elevator_switch+0x25/0x40
-[693354.106257]  elv_iosched_store+0x1a1/0x230
-[693354.106261]  queue_attr_store+0x78/0xb0
-[693354.106264]  kernfs_fop_write+0x1ab/0x280
-[693354.106268]  vfs_write+0xe7/0x230
-[693354.106271]  ksys_write+0xb0/0x140
-[693354.106275]  do_syscall_64+0x112/0x370
-[693354.106280]  entry_SYSCALL_64_after_hwframe+0x65/0xca
-
-[693354.106329] The buggy address belongs to the object at ffff888be0a35580
-                 which belongs to the cache kmalloc-1k of size 1024
-[693354.106736] The buggy address is located 228 bytes inside of
-                 1024-byte region [ffff888be0a35580, ffff888be0a35980)
-[693354.107114] The buggy address belongs to the page:
-[693354.107273] page:ffffea002f828c00 count:1 mapcount:0 mapping:ffff888107c17080 index:0x0 compound_mapcount: 0
-[693354.107606] flags: 0x17ffffc0008100(slab|head)
-[693354.107760] raw: 0017ffffc0008100 ffffea002fcbc808 ffffea0030bd3a08 ffff888107c17080
-[693354.108020] raw: 0000000000000000 00000000001c001c 00000001ffffffff 0000000000000000
-[693354.108278] page dumped because: kasan: bad access detected
-
-[693354.108511] Memory state around the buggy address:
-[693354.108671]  ffff888be0a35500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[693354.116396]  ffff888be0a35580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.124473] >ffff888be0a35600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.132421]                                                        ^
-[693354.140284]  ffff888be0a35680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.147912]  ffff888be0a35700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.155281] ==================================================================
-
-Freeing bfqg is protected by queue lock in blkcg_deactivate_policy(), 
-but getting/using bfqg is protected by blkcg lock in
-bfq_io_set_weight_legacy(). If bfq_io_set_weight_legacy() get bfqg
-before freeing bfqg and use bfqg in the after, the use-after-free
-will occur.
-
-CPU0                             CPU1
-blkcg_deactivate_policy
-  spin_lock_irq(&q->queue_lock)
-                                 bfq_io_set_weight_legacy  
-                                   spin_lock_irq(&blkcg->lock)
-                                   blkg_to_bfqg(blkg)
-                                     pd_to_bfqg(blkg->pd[pol->plid])
-                                     ^^^^^^blkg->pd[pol->plid] != NULL
-                                           bfqg != NULL
-  pol->pd_free_fn(blkg->pd[pol->plid])
-    pd_to_bfqg(blkg->pd[pol->plid])
-    bfqg_put(bfqg)
-      kfree(bfqg)
-  blkg->pd[pol->plid] = NULL
-  spin_unlock_irq(q->queue_lock);
-                                   bfq_group_set_weight(bfqg, val, 0)
-                                     bfqg->entity.new_weight
-                                     ^^^^^^trigger uaf here 
-                                   spin_unlock_irq(&blkcg->lock);
-
-To fix this use-after-free, instead of holding blkcg->lock while
-walking ->blkg_list and getting/using bfqg, RCU walk ->blkg_list and
-hold the blkg's queue lock while getting/using bfqg.
-
-Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
-Signed-off-by: Li Jinlin <lijinlin3@huawei.com>
----
- block/bfq-cgroup.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index e2f14508f2d6..7209060caa90 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1025,21 +1025,25 @@ static int bfq_io_set_weight_legacy(struct cgroup_subsys_state *css,
- 	struct blkcg *blkcg = css_to_blkcg(css);
- 	struct bfq_group_data *bfqgd = blkcg_to_bfqgd(blkcg);
- 	struct blkcg_gq *blkg;
-+	struct bfq_group *bfqg;
- 	int ret = -ERANGE;
- 
- 	if (val < BFQ_MIN_WEIGHT || val > BFQ_MAX_WEIGHT)
- 		return ret;
- 
- 	ret = 0;
--	spin_lock_irq(&blkcg->lock);
- 	bfqgd->weight = (unsigned short)val;
--	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
--		struct bfq_group *bfqg = blkg_to_bfqg(blkg);
-+
-+	rcu_read_lock();
-+	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-+		spin_lock_irq(&blkg->q->queue_lock);
-+		bfqg = blkg_to_bfqg(blkg);
- 
- 		if (bfqg)
- 			bfq_group_set_weight(bfqg, val, 0);
-+		spin_unlock_irq(&blkg->q->queue_lock);
- 	}
--	spin_unlock_irq(&blkcg->lock);
-+	rcu_read_unlock();
- 
- 	return ret;
- }
--- 
-2.27.0
+> 
+> > 
+> > 
+> > > > > > +
+> > > > > >    static int major;
+> > > > > >    static DEFINE_IDA(vd_index_ida);
+> > > > > > @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
+> > > > > >    	if (err)
+> > > > > >    		num_vqs = 1;
+> > > > > > -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
+> > > > > > +	num_vqs = min_t(unsigned int,
+> > > > > > +			min_not_zero(num_io_queues, nr_cpu_ids),
+> > > > > > +			num_vqs);
+> > > > > If you respin, please consider calling them request queues. That's the
+> > > > > terminology from the VIRTIO spec and it's nice to keep it consistent.
+> > > > > But the purpose of num_io_queues is clear, so:
+> > > > > 
+> > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > I did this:
+> > > > +static unsigned int num_io_request_queues;
+> > > > +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
+> > > > +MODULE_PARM_DESC(num_io_request_queues,
+> > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
+> > > The parameter is writable and can be changed and then new devices might be
+> > > probed with new value.
+> > > 
+> > > It can't be zero in the code. we can change param_set_uint_minmax args and
+> > > say that 0 says nr_cpus.
+> > > 
+> > > I'm ok with the renaming but I prefer to stick to the description we gave in
+> > > V3 of this patch (and maybe enable value of 0 as mentioned above).
 
