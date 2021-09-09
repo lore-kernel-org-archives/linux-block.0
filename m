@@ -5,65 +5,65 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B88C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B09E2C43217
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2E0A6103D
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9274D611F2
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236975AbhIIW0l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1346180AbhIIW0l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 9 Sep 2021 18:26:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40778 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345073AbhIIW0f (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 18:26:35 -0400
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB8CC061756;
-        Thu,  9 Sep 2021 15:25:25 -0700 (PDT)
-Received: by mail-oo1-xc35.google.com with SMTP id y3-20020a4ab403000000b00290e2a52c71so1071222oon.2;
-        Thu, 09 Sep 2021 15:25:25 -0700 (PDT)
+        with ESMTP id S1345294AbhIIW0h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 18:26:37 -0400
+Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610D8C061574;
+        Thu,  9 Sep 2021 15:25:27 -0700 (PDT)
+Received: by mail-oo1-xc2d.google.com with SMTP id m14-20020a4ad50e000000b002912a944a47so1058145oos.12;
+        Thu, 09 Sep 2021 15:25:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=5IvB2ie/eR/p0ZXjKpNOoLs51YY8X2DxXyaLyjEGU5s=;
-        b=O7Lrxvdjp9rmXnWXN6cN3wCovZwHVrpRw+J8dHaOE1IHnLxOyOprFhm6t6nkjJ0XLn
-         c3PxliT2pHGWQqNcuht6a3BVZKYFVd3FkYRTXpa4k4UqCCG+ZkPyyTHdbmMsQSc+1Oyl
-         3vRABWfn2lUyrAfshml7FY0iuvmcgzlZ2NJNZqPVnUNwhU8kqPxIatF9AJOGIkt7vP//
-         S08grsbyjPbrBTkcv37taFMoV53FpoinEskk3u7DjiHeKbQZ3KIPzANwudBLwyua7cIe
-         2iKFiSAacrC1RSJ7lujclmKJvzKylL7lRvs7XJdBClyMCYmLIo28iNYEXS9C5QxXxOBN
-         FcBQ==
+        bh=GdOcaIt+lEs3P/5jE6RLnbfIIvqFBGA/JhoMskjrSdU=;
+        b=hCMclT5Mqq4sU+Yr0lvxe+xbbwa0bmJ8/8QFGcmhfAsJs7mGj3WMBkP4REPpn1Y49Q
+         XTS1RBL190LzsPM5VgmKOWOqoTyBGCNLHoCjkyiLQtM3Mlnw4yaR9oCBAenIDve9qm5B
+         s9pS4SqZFXGhiaddxJ7f8TQ7quoPYDHtUnQwESp1ipRLCMRKeu+lTJWDtwPCFBM4vXjd
+         YbL2ESZydO0TxFC6KpqkxBjgqg9hSgILIAIRGrv2WWlBpPAzUQ8dM/RQOZ3CF1GocIyP
+         V3qtiRp7JCKzQrbu6kgjdswc1Aa6+zMZs8rgXgVJnsohNoUOp8hfeG61ixsmBMHhBhaf
+         Vvmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=5IvB2ie/eR/p0ZXjKpNOoLs51YY8X2DxXyaLyjEGU5s=;
-        b=aL0eRcdY2n8/bySCvhJdp8ldr621fSmX+gwMJR4O/npa4PkSoQxx1UDswaIhZlWXuj
-         J2aTbU0+Nl/W7628cnn36qD4702cMm8+IiNiV5IpgttgkCcgJlkReJsFtvdjmIn6ynYb
-         4Mza/Ra8Bms6PtutChzFr/X77hiaP0RMZU5k9W2MYu7FO09IEOcyxt6rOmHysu5zCRsZ
-         hmSemHH5ycMX6qLTcAha5Xa5VlrM5WZq81x1ISG+uwOg8Ba7alogg0/FHnG6kBdQtYZO
-         WA/zrslq7MF28X60SkgUJATXZdTJ92HtPHFCHlrX0NkC2YKt9vt4vmnqdTEifPgCQmgr
-         0iow==
-X-Gm-Message-State: AOAM530AduKtcgUWKuLRgF1x2btp8VKEP66x4vojI9iQwHNphwAf1uJq
-        lzSzBL8J3t/K06qiGrFaO70=
-X-Google-Smtp-Source: ABdhPJz1DcaFu/ilKPUNbaGKdUBmyHS98IMiktlfW3megURnCIqFZQwdWUaccOOWGIvFcF2QYa5ZSg==
-X-Received: by 2002:a4a:e942:: with SMTP id v2mr1798582ood.96.1631226324934;
-        Thu, 09 Sep 2021 15:25:24 -0700 (PDT)
+        bh=GdOcaIt+lEs3P/5jE6RLnbfIIvqFBGA/JhoMskjrSdU=;
+        b=nNqlwJKK7PGHdUIioZ3I/a+Fx4ON9GoJN9B/hwlBZfULeLR5mDB7OaUQmiUR3hPFrW
+         Of9Z3jQGgOC485KnuI8SV2fzDSNgzYhOr8aSgP+KPP3oxlgPWtZzJN0LyKt4HSoAHCm6
+         +6nmGwnA0/8aEH60gUX5loPbUfu3WqhtITSkFUl5VIt98Pv/UIldo/oG/2wASn7h+Twj
+         eEw6/3ho9W6qL1K6df2NA9+Vx43tC68+O25duMzOq7m7SOCo/e8uHalsyLQbw7xMblIa
+         2jUqnwP7LD4yuR9ue2t258G78WaLKU2I0KLlGGIYXLb9s9gJCJjT3Ob/RLeWErbNIt9T
+         THNw==
+X-Gm-Message-State: AOAM533IY7b8WozlQE4fYdB2O+JNQI0XBPvO4KTjEAu/rCYS2ztwZDJJ
+        zc7tAiygbL140DI0c83bG8Y=
+X-Google-Smtp-Source: ABdhPJwkjpFiiNvLdHXbnfuH2r8Lk2hJNSCAkfhUOmt3idGydzd3vpNQEFdl+gjVbpxhFOXiMjH3OQ==
+X-Received: by 2002:a4a:a78a:: with SMTP id l10mr1809670oom.30.1631226326744;
+        Thu, 09 Sep 2021 15:25:26 -0700 (PDT)
 Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id 4sm747293oil.38.2021.09.09.15.25.24
+        by smtp.gmail.com with ESMTPSA id 4sm747293oil.38.2021.09.09.15.25.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 15:25:24 -0700 (PDT)
+        Thu, 09 Sep 2021 15:25:26 -0700 (PDT)
 From:   Ian Pilcher <arequipeno@gmail.com>
 To:     axboe@kernel.dk, pavel@ucw.cz
 Cc:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
         kabel@kernel.org
-Subject: [PATCH v2 04/15] block: Add block device LED trigger integrations
-Date:   Thu,  9 Sep 2021 17:25:02 -0500
-Message-Id: <20210909222513.2184795-5-arequipeno@gmail.com>
+Subject: [PATCH v2 08/15] leds: trigger: blkdev: Add stub LED trigger structure
+Date:   Thu,  9 Sep 2021 17:25:06 -0500
+Message-Id: <20210909222513.2184795-9-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210909222513.2184795-1-arequipeno@gmail.com>
 References: <20210909222513.2184795-1-arequipeno@gmail.com>
@@ -73,64 +73,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add LED trigger disk info pointer to gendisk structure
+Needed to avoid unused function warnings/errors from subsequent patches
 
-Call ledtrig_blkdev_disk_init() from device_add_disk() to ensure that
-ledtrig is initialized to NULL, in case a driver allocates the structure
-itself and doesn't use kzalloc()
-
-Call ledtrig_blkdev_disk_cleanup() from del_gendisk() to ensure that the
-LED trigger stops trying to check the disk for activity
+Make ledtrig_blkdev_trigger non-static for now to avoid unused variable
+warning/error
 
 Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 ---
- block/genhd.c         | 4 ++++
- include/linux/genhd.h | 3 +++
- 2 files changed, 7 insertions(+)
+ drivers/leds/trigger/ledtrig-blkdev.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 567549a011d1..6f340a717099 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -24,6 +24,7 @@
- #include <linux/log2.h>
- #include <linux/pm_runtime.h>
- #include <linux/badblocks.h>
-+#include <linux/leds.h>
- 
- #include "blk.h"
- 
-@@ -390,6 +391,8 @@ int device_add_disk(struct device *parent, struct gendisk *disk,
- 	struct device *ddev = disk_to_dev(disk);
- 	int ret;
- 
-+	ledtrig_blkdev_disk_init(disk);
+diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
+index 38a2cd2df85c..53b62e320491 100644
+--- a/drivers/leds/trigger/ledtrig-blkdev.c
++++ b/drivers/leds/trigger/ledtrig-blkdev.c
+@@ -59,3 +59,28 @@ struct ledtrig_blkdev_led {
+ 	struct hlist_node		leds_node;
+ 	enum ledtrig_blkdev_mode	mode;
+ };
 +
- 	/*
- 	 * The disk queue should now be all set with enough information about
- 	 * the device for the elevator code to pick an adequate default
-@@ -559,6 +562,7 @@ void del_gendisk(struct gendisk *disk)
- 	if (WARN_ON_ONCE(!disk_live(disk) && !(disk->flags & GENHD_FL_HIDDEN)))
- 		return;
- 
-+	ledtrig_blkdev_disk_cleanup(disk);
- 	blk_integrity_del(disk);
- 	disk_del_events(disk);
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index c68d83c87f83..29039367ccad 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -166,6 +166,9 @@ struct gendisk {
- #endif	/* CONFIG_BLK_DEV_INTEGRITY */
- #if IS_ENABLED(CONFIG_CDROM)
- 	struct cdrom_device_info *cdi;
-+#endif
-+#if IS_ENABLED(CONFIG_LEDS_TRIGGER_BLKDEV)
-+	struct ledtrig_blkdev_disk *ledtrig;
- #endif
- 	int node_id;
- 	struct badblocks *bb;
++
++/*
++ *
++ *	Initialization - register the trigger
++ *
++ */
++
++static struct attribute *ledtrig_blkdev_attrs[] = {
++	NULL
++};
++
++static const struct attribute_group ledtrig_blkdev_attr_group = {
++	.attrs	= ledtrig_blkdev_attrs,
++};
++
++static const struct attribute_group *ledtrig_blkdev_attr_groups[] = {
++	&ledtrig_blkdev_attr_group,
++	NULL
++};
++
++struct led_trigger ledtrig_blkdev_trigger = {
++	.name		= "blkdev",
++	.groups		= ledtrig_blkdev_attr_groups,
++};
 -- 
 2.31.1
 
