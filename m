@@ -2,94 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE38C4321E
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 02:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FBDC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 03:46:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAC9A6023D
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 02:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 931C261181
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 03:46:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238723AbhIIChK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Sep 2021 22:37:10 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:42529 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236247AbhIIChC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Sep 2021 22:37:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1631154954; x=1662690954;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=3JeErjhCOeicdhDxDeTDah+4oAV2vjbhTuPsGM0V3P0=;
-  b=MtitKjQxrqFuhpNYgm87CQNuLvdcxNrnV9J3vovzO1mKEtTH3SiVjxud
-   YhML5HG/Lch3xd4I/vwbcZTKkpcpd8+nDXteGR4ph1hhPQexyPaBcut8D
-   RhM/xCmHpl0fltahJkJfWQdMqBkFJPDRv4XrRyLnQ29L1RCsPtaGQ6jAO
-   htOfDVHbtOFIBnATj+QXc9RXdmewG82+mT3zLqCDeuqC6g+fMtyRDd8Jl
-   kB6+aMHtrjCyZGKmv3nvrZggxJ/2qBm7twSIytT7zBQjXUvb2ifCXiRkt
-   yinoqpWXW4NFLWcvt27ybeIytXcfEdEAdN8/QOvGbGGNcl77ZtidpW8p7
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.85,279,1624291200"; 
-   d="scan'208";a="180062219"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Sep 2021 10:35:53 +0800
-IronPort-SDR: EXYvubKZgZJpPiq+j2YPIuOWpFkDl3SZ2tazwzFMyGRQUt4CdP+BiAOaGUIlG9JDnjA9QuNny3
- ztbqfJ5Qk51xjmtNweUJzhETollwpMU8o+nkU8uie36XK/5giFXoLrhTMFSJywFg2wdJQRgeDK
- 4ct0haURdnG0dtIm7hGGnzH33c3Ca/ie0nadN9GVQTH9vQPKLDEBVO7GIfvJCZlSRRjiRvZpng
- t3zIOMNEGHyeqYn+GiSHBtVKH40To3KFxlpLUCJzQnxmUf2oiOh7R4M/0FM6C+0a2ndsLq5ceO
- WVFsaHXbgDgrgLdkQKf1udMe
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2021 19:12:28 -0700
-IronPort-SDR: mR7H0Nr8Gkjfb5QWSVCaYbWG5kQ/0nkzNG0jw7yK8YkHxz9HsSGaX5s4FEeoLrhzKNQiIt7027
- HEjcghKhYl0bSNyxZr/4Ppw2EnGn+mzUwVVUsahQwhB7ySpkwrgkG69X6RbfckKGp+qER3GyMa
- KLcjiFlEQ//rI2h+qYM+n5ai0mD1lb75+cImfHLIJpN5sXQbRjx6m9rcG/Ng+OWNyUtuQUmhl1
- 3QtE4K1b6tHZZWY8BJ9ZPU3SRTdSy1cUiOTFk7Huc4MRXb3lMAQ1Kysh7yN/reVvF+dKqzt83B
- AVY=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 08 Sep 2021 19:35:52 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Subject: [PATCH v8 5/5] doc: Fix typo in request queue sysfs documentation
-Date:   Thu,  9 Sep 2021 11:35:45 +0900
-Message-Id: <20210909023545.1101672-6-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210909023545.1101672-1-damien.lemoal@wdc.com>
-References: <20210909023545.1101672-1-damien.lemoal@wdc.com>
+        id S232829AbhIIDsA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Sep 2021 23:48:00 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:15311 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230153AbhIIDr7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Sep 2021 23:47:59 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4H4lKk1ZSnz8t02;
+        Thu,  9 Sep 2021 11:46:18 +0800 (CST)
+Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Thu, 9 Sep 2021 11:46:48 +0800
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.185.179) by
+ dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Thu, 9 Sep 2021 11:46:47 +0800
+From:   Zenghui Yu <yuzenghui@huawei.com>
+To:     <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <fujita.tomonori@lab.ntt.co.jp>, <axboe@kernel.dk>,
+        <martin.petersen@oracle.com>, <hch@lst.de>,
+        <gregkh@linuxfoundation.org>, <wanghaibin.wang@huawei.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] scsi: bsg: Fix device unregistration
+Date:   Thu, 9 Sep 2021 11:46:08 +0800
+Message-ID: <20210909034608.1435-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggema764-chm.china.huawei.com (10.1.198.206)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix a typo (are -> as) in the introduction paragraph of
-Documentation/block/queue-sysfs.rst.
+We use device_initialize() to take refcount for the device but forget to
+put_device() on device teardown, which ends up leaking private data of the
+driver core, dev_name(), etc. This is reported by kmemleak at boot time if
+we compile kernel with DEBUG_TEST_DRIVER_REMOVE.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Note that adding the missing put_device() is _not_ sufficient to fix device
+unregistration. As we don't provide the .release() method for device, which
+turned out to be typically wrong and will be complained loudly by the
+driver core.
+
+Fix both of them.
+
+Fixes: ead09dd3aed5 ("scsi: bsg: Simplify device registration")
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 ---
- Documentation/block/queue-sysfs.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bsg.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-index b6e8983d8eda..e8c74306f70a 100644
---- a/Documentation/block/queue-sysfs.rst
-+++ b/Documentation/block/queue-sysfs.rst
-@@ -4,7 +4,7 @@ Queue sysfs files
+diff --git a/block/bsg.c b/block/bsg.c
+index 351095193788..c3bb92b9af7e 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -165,13 +165,20 @@ static const struct file_operations bsg_fops = {
+ 	.llseek		=	default_llseek,
+ };
  
- This text file will detail the queue files that are located in the sysfs tree
- for each block device. Note that stacked devices typically do not export
--any settings, since their queue merely functions are a remapping target.
-+any settings, since their queue merely functions as a remapping target.
- These files are the ones found in the /sys/block/xxx/queue/ directory.
++static void bsg_device_release(struct device *dev)
++{
++	struct bsg_device *bd = container_of(dev, struct bsg_device, device);
++
++	ida_simple_remove(&bsg_minor_ida, MINOR(bd->device.devt));
++	kfree(bd);
++}
++
+ void bsg_unregister_queue(struct bsg_device *bd)
+ {
+ 	if (bd->queue->kobj.sd)
+ 		sysfs_remove_link(&bd->queue->kobj, "bsg");
+ 	cdev_device_del(&bd->cdev, &bd->device);
+-	ida_simple_remove(&bsg_minor_ida, MINOR(bd->device.devt));
+-	kfree(bd);
++	put_device(&bd->device);
+ }
+ EXPORT_SYMBOL_GPL(bsg_unregister_queue);
  
- Files denoted with a RO postfix are readonly and the RW postfix means
+@@ -198,6 +205,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
+ 	bd->device.devt = MKDEV(bsg_major, ret);
+ 	bd->device.class = bsg_class;
+ 	bd->device.parent = parent;
++	bd->device.release = bsg_device_release;
+ 	dev_set_name(&bd->device, "%s", name);
+ 	device_initialize(&bd->device);
+ 
+@@ -218,6 +226,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
+ out_device_del:
+ 	cdev_device_del(&bd->cdev, &bd->device);
+ out_ida_remove:
++	put_device(&bd->device);
+ 	ida_simple_remove(&bsg_minor_ida, MINOR(bd->device.devt));
+ out_kfree:
+ 	kfree(bd);
 -- 
-2.31.1
+2.19.1
 
