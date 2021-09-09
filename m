@@ -2,79 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF475C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 14:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DB4C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 14:15:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA589610FF
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 14:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D94661132
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 14:15:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345541AbhIIOFE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 10:05:04 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:15313 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345439AbhIIOEK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 10:04:10 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4H510f0ZJSz8srS;
-        Thu,  9 Sep 2021 22:02:26 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Thu, 9 Sep 2021 22:02:57 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Thu, 9 Sep
- 2021 22:02:56 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <ming.lei@redhat.com>,
-        <hch@infradead.org>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH v5 3/6] nbd: check sock index in nbd_read_stat()
-Date:   Thu, 9 Sep 2021 22:12:53 +0800
-Message-ID: <20210909141256.2606682-4-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210909141256.2606682-1-yukuai3@huawei.com>
-References: <20210909141256.2606682-1-yukuai3@huawei.com>
+        id S244347AbhIIOQm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 10:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41610 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239783AbhIIOQk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 10:16:40 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1324DC06175F
+        for <linux-block@vger.kernel.org>; Thu,  9 Sep 2021 05:34:21 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id g21so2436954edw.4
+        for <linux-block@vger.kernel.org>; Thu, 09 Sep 2021 05:34:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oX4Dj9ZXgOv8yaBPcUaPEk5dnnNEO7xIQcrdkFjSHKA=;
+        b=E7uWS8yDE751Ij1pZzX4IMB9dvJ8U1MM4xw6zcVfKZ+vmEXQwWzK5ANY3O7DpaV969
+         5zRN8Y35JaFlIJmo13bnSJICIDtbZiqChEzk3N5yyKzSFdMn4uxT/kkgRJPQeg7jHEVY
+         GdQYjardLGHClo9/FL6L5+ufQJontEEcX/CPh3BwgEDcKrcIHSkK60b9h4xs0rGZjZ44
+         026ldb7eMP5hqAuaYydZ5NJEHeREsSq1EIYb1GL4wmO0nNuloxVxoxFuAapM7lBYY2zn
+         Gj4/HaP2E6vGv73PJjI4bzKtwfwSY5LyQy/tBbORi+jgZsWx1wDJxDiFylCOlPkE/RFy
+         1mNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oX4Dj9ZXgOv8yaBPcUaPEk5dnnNEO7xIQcrdkFjSHKA=;
+        b=2WGgrpX/LnpzWVfc7kZJAJbAcA/d/Bnn0PY+YkNbSoHIiJAr7nSObtEYLwvTIp0RGc
+         XaaRACHF24iIGHOM3D6GhXqs3mXjkQPd4L7CAOjESpkoZFdqA2d1CaWMu/p1gs6grSYe
+         TjWa3JNsVR86gDMMtJtV1sEewsM2b+pqzb1yU7zsZ6iu0YNGxCQMXhJfpSedcVai/1Aq
+         0n0sB/P0GL91s7u/lWhIr5adyBFxc9jAJHeBXmqN2qapaEM9stONFdQp10hsGJ8vMX7m
+         vceuoqDNkpbuTvmuVjXlCfAg2dX3B4/klUAUIcEBY7VaPVC7eXUiiTXiITis23bH7aLz
+         040A==
+X-Gm-Message-State: AOAM531liAa1k76cwYzAz0YEVlK0ZFKmFkB3sJ+RvMKyP5efc0xH6WHO
+        UMJZ0s15D84RVJfxP8AP/WTso1mfGJj6IGjbhB1A
+X-Google-Smtp-Source: ABdhPJz7R5rWq5PdHrd+/9R7VKFyY4khAyM8rWwNp9zT3ExKuPkyRb2KXZ0SObAbCNjw/gtpQznwZm9lJDmQ8UkOjRo=
+X-Received: by 2002:a05:6402:4247:: with SMTP id g7mr2925993edb.287.1631190859581;
+ Thu, 09 Sep 2021 05:34:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+References: <20210907121425.91-1-xieyongji@bytedance.com> <YTmqJHd7YWAQ2lZ7@infradead.org>
+In-Reply-To: <YTmqJHd7YWAQ2lZ7@infradead.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 9 Sep 2021 20:34:12 +0800
+Message-ID: <CACycT3vHrN3tgeH91gdzr08DXd8KCXyAuxUb5k-HcwB7coi4iA@mail.gmail.com>
+Subject: Re: [PATCH] nbd: clear wb_err in bd_inode on disconnect
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        yixingchen@bytedance.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The sock that clent send request in nbd_send_cmd() and receive reply
-in nbd_read_stat() should be the same.
+On Thu, Sep 9, 2021 at 2:31 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Tue, Sep 07, 2021 at 08:14:25PM +0800, Xie Yongji wrote:
+> > When a nbd device encounters a writeback error, that error will
+> > get propagated to the bd_inode's wb_err field. Then if this nbd
+> > device's backend is disconnected and another is attached, we will
+> > get back the previous writeback error on fsync, which is unexpected.
+> > To fix it, let's clear out the wb_err on disconnect.
+>
+> I really do not like how internals of the implementation like into
+> drivers here.  Can you add a block layer helper to clear any state
+> instead? This should incude e.g. the size just cleared above and should
+> also be used by the loop driver as well.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/block/nbd.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Sure, will do it.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 550c8dc438ac..6d8cbf8be231 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -746,6 +746,10 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 		ret = -ENOENT;
- 		goto out;
- 	}
-+	if (cmd->index != index) {
-+		dev_err(disk_to_dev(nbd->disk), "Unexpected reply %d from different sock %d (expected %d)",
-+			tag, index, cmd->index);
-+	}
- 	if (cmd->cmd_cookie != nbd_handle_to_cookie(handle)) {
- 		dev_err(disk_to_dev(nbd->disk), "Double reply on req %p, cmd_cookie %u, handle cookie %u\n",
- 			req, cmd->cmd_cookie, nbd_handle_to_cookie(handle));
--- 
-2.31.1
-
+Thanks,
+Yongji
