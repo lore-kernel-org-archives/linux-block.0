@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C48C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0642C43217
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1175C611C7
-	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B27E6611CA
+	for <linux-block@archiver.kernel.org>; Thu,  9 Sep 2021 22:25:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344823AbhIIW0f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 18:26:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40766 "EHLO
+        id S1345378AbhIIW0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 18:26:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236975AbhIIW0e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 18:26:34 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9504AC061574;
-        Thu,  9 Sep 2021 15:25:24 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id r26so105399oij.2;
-        Thu, 09 Sep 2021 15:25:24 -0700 (PDT)
+        with ESMTP id S1345235AbhIIW0g (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Sep 2021 18:26:36 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74F1FC06175F;
+        Thu,  9 Sep 2021 15:25:26 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id l16-20020a9d6a90000000b0053b71f7dc83so4559121otq.7;
+        Thu, 09 Sep 2021 15:25:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=oE2dmDo4LT1pVf6VTHd6IbjQP+KgGw77nfi53BDXduM=;
-        b=S16JJiZrgD3R6keXvN/r8v3uH+XTwhEjNThmCeNDgkocLm93wivja+wmCtrhzAhP5Z
-         EmLLw6gYvZydbppgp3jWN+zbAiYO9kcapSIXFrcmq0bZB1NBL9JhpKDzMq0QYCiroHCX
-         gN0eVMeLwbBHhBlla84IMtWV4z1fg/e8rGDrdQRr24qxc6yjo6typaIWwbvdc8XJUeHc
-         prOIeWvli8r15sv/pdGIxP656QD97rHU93pl7uy0leKtRakC6QWcOU0+5lrzYmDsGNLW
-         stkdKBJALNe6vry/lw1Y+g03T0kfEGPvfYZZQzoktt0M+iTYOQaEMi3+OyCQ9cXAo0Mh
-         pctw==
+        bh=6ytqfu1+r4YEz0nqSMNay+oDma8axhIPc/igiM7FRwE=;
+        b=XSmErYRWdzMOC+MCLstVHqd9cwXygzDnbVImyZGh5WrECSfUbKkIhY+Z9kjAAHYPfh
+         pnxoo3h/x4D58u7mVL2KmcA6qlx1e8VFOFWkCwk2Xk1lL0lVXSoC0fzmAfhupd6cljjx
+         sXZX3bs+326Qe+S5704phqCBt2QIEp0yY+kNLByZAiOoYZQ6oBHtTEFQwL/jdof0HgI4
+         slC8AZGH2q5+w0NZOWq3lR/DNlGllCIuPNrSeGOpkGEqFgNSfLJexam+UxhO2LqVMHRb
+         E+ZGIdH2usWMZ/cxdHVGZ2V2faIPZz3WvXEJJx41BbQTK1vqeBdR7Gjjph3jULyg2xmR
+         mu+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=oE2dmDo4LT1pVf6VTHd6IbjQP+KgGw77nfi53BDXduM=;
-        b=RifOCGNzUSvKGmiRwI2QTxF1YuwWnfRDhp3paN3xjHiAZ+tH8AKV+ZcQac/mZ02fr6
-         oOCUDTMo6qZF8wNcyBm1nYMXn9L+YYu2Lm67fFAAucSx333tIF0jrMP0ep5qM4DK0YzX
-         cMn7p1vOM31iRkx60Q1sIqfA0CiddRnqz9bD/2yWeLwnXUITvptNdW9H4PCVENYuQl9u
-         lGlo/upnrItE7mf+YqgS5La4c/bNFG+yGB7S61x3cXuCVg12hxTSdsZBg5PimWjEHNSg
-         B4aQfKua2tguGLeg/3TwNiG4Yz+mjjDTA+zLUsL/wUokPzyIXWrrM6RAyMuThIKYQ043
-         VjQA==
-X-Gm-Message-State: AOAM531EOPytYw/jmCRLwiJkU/+MmvutcqLldjGcn0kdsyJkSHKQcX5G
-        XCSl65YI6Jy5IqnwEleURI0=
-X-Google-Smtp-Source: ABdhPJx81UtcafQ/b9mUND8pAEly10N1ZOs6UvDF/ZPCkhNEveY1Ev60KsbUP5LjL6RcP5qsWwyagw==
-X-Received: by 2002:aca:4344:: with SMTP id q65mr1757970oia.70.1631226323966;
-        Thu, 09 Sep 2021 15:25:23 -0700 (PDT)
+        bh=6ytqfu1+r4YEz0nqSMNay+oDma8axhIPc/igiM7FRwE=;
+        b=T6mriN9TnJxkELtgoHrv24isR534qm9zN/DI8B+CJaM/5Ku0H+s6GmYevNEVHpZoaV
+         obQNgaOXQGpYBx7zG238eMrJdeAEwRW6ckhTQCl/DEEb8V4TKiACqt+2iqT4N9LKGuuM
+         ixOdZNAxEzBaHgCUbCtOsNifYCb6uuk2JMPf0mPp6HvVwUUjLitH5IQJBAzet6s/rbVT
+         WVJGr/yJhlUj1g2++iu7kJ46AjVMUr4nlCfkiBPJzygjg5JPkLubGYiFsZRhyEH9HBMw
+         +hoxVkWTAQREbzv6UEZwmNqbrORMOD0sXyF/grlob3ijePxQML2Fo1B1i+Bt6R5g1Uh/
+         7lLw==
+X-Gm-Message-State: AOAM533ST2ymXcuRmmTbSBTTxjPWExcF3oYgpbJU8ZfOhJ6isM+gHmNW
+        jFNFZhNuRNi33I1T486af5dwLwjjmJk=
+X-Google-Smtp-Source: ABdhPJwZSoxLn1QDZiP9fMUjHH/Q9JkWuwdkzt0CTHbRERk43Od+wJroZzPmarH5V1BYxiMtJEztxg==
+X-Received: by 2002:a9d:4914:: with SMTP id e20mr2012120otf.324.1631226325850;
+        Thu, 09 Sep 2021 15:25:25 -0700 (PDT)
 Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id 4sm747293oil.38.2021.09.09.15.25.23
+        by smtp.gmail.com with ESMTPSA id 4sm747293oil.38.2021.09.09.15.25.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 15:25:23 -0700 (PDT)
+        Thu, 09 Sep 2021 15:25:25 -0700 (PDT)
 From:   Ian Pilcher <arequipeno@gmail.com>
 To:     axboe@kernel.dk, pavel@ucw.cz
 Cc:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
         kabel@kernel.org
-Subject: [PATCH v2 02/15] leds: trigger: blkdev: Add build infrastructure
-Date:   Thu,  9 Sep 2021 17:25:00 -0500
-Message-Id: <20210909222513.2184795-3-arequipeno@gmail.com>
+Subject: [PATCH v2 06/15] leds: trigger: blkdev: Add function to get gendisk by name
+Date:   Thu,  9 Sep 2021 17:25:04 -0500
+Message-Id: <20210909222513.2184795-7-arequipeno@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210909222513.2184795-1-arequipeno@gmail.com>
 References: <20210909222513.2184795-1-arequipeno@gmail.com>
@@ -73,122 +73,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add files:
-  * ledtrig-blkdev-core.c - trigger components that are always built-in
-  * ledtrig-blkdev.c - trigger components that can be built as a module
-  * ledtrig-blkdev.h - common declarations
-
-Add Kconfig options - CONFIG_LEDS_TRIGGER_BLKDEV (visible, tristate) and
-CONFIG_LEDS_TRIGGER_BLKDEV_CORE (hidden, boolean)
-
-Make CONFIG_LEDS_TRIGGER_BLKDEV select CONFIG_LEDS_TRIGGER_BLKDEV_CORE, so
-built-in portion of the trigger is enabled when trigger is either built-in
-or modular
+Add ledtrig_blkdev_get_disk() to find block device by name and increment
+its reference count.  (Caller must call put_disk().)  Must be built-in to
+access block_class and disk_type symbols.
 
 Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
 ---
- drivers/leds/trigger/Kconfig               | 18 ++++++++++++++++++
- drivers/leds/trigger/Makefile              |  2 ++
- drivers/leds/trigger/ledtrig-blkdev-core.c |  9 +++++++++
- drivers/leds/trigger/ledtrig-blkdev.c      | 16 ++++++++++++++++
- drivers/leds/trigger/ledtrig-blkdev.h      | 12 ++++++++++++
- 5 files changed, 57 insertions(+)
- create mode 100644 drivers/leds/trigger/ledtrig-blkdev-core.c
- create mode 100644 drivers/leds/trigger/ledtrig-blkdev.c
- create mode 100644 drivers/leds/trigger/ledtrig-blkdev.h
+ drivers/leds/trigger/ledtrig-blkdev-core.c | 20 ++++++++++++++++++++
+ drivers/leds/trigger/ledtrig-blkdev.h      |  3 +++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/drivers/leds/trigger/Kconfig b/drivers/leds/trigger/Kconfig
-index 1f1d57288085..ad49d92713fb 100644
---- a/drivers/leds/trigger/Kconfig
-+++ b/drivers/leds/trigger/Kconfig
-@@ -153,4 +153,22 @@ config LEDS_TRIGGER_TTY
- 
- 	  When build as a module this driver will be called ledtrig-tty.
- 
-+config LEDS_TRIGGER_BLKDEV
-+	tristate "LED Trigger for block devices"
-+	depends on BLOCK
-+	select LEDS_TRIGGER_BLKDEV_CORE
-+	help
-+	  The blkdev LED trigger allows LEDs to be controlled by block device
-+	  activity (reads and writes).
-+
-+	  See Documentation/leds/ledtrig-blkdev.rst.
-+
-+config LEDS_TRIGGER_BLKDEV_CORE
-+	bool
-+	depends on LEDS_TRIGGER_BLKDEV
-+	help
-+	  This enables the portion of the block device LED trigger that must
-+	  be built-in to the kernel, even when the trigger is built as a
-+	  module.
-+
- endif # LEDS_TRIGGERS
-diff --git a/drivers/leds/trigger/Makefile b/drivers/leds/trigger/Makefile
-index 25c4db97cdd4..3732eeb86775 100644
---- a/drivers/leds/trigger/Makefile
-+++ b/drivers/leds/trigger/Makefile
-@@ -16,3 +16,5 @@ obj-$(CONFIG_LEDS_TRIGGER_NETDEV)	+= ledtrig-netdev.o
- obj-$(CONFIG_LEDS_TRIGGER_PATTERN)	+= ledtrig-pattern.o
- obj-$(CONFIG_LEDS_TRIGGER_AUDIO)	+= ledtrig-audio.o
- obj-$(CONFIG_LEDS_TRIGGER_TTY)		+= ledtrig-tty.o
-+obj-$(CONFIG_LEDS_TRIGGER_BLKDEV)	+= ledtrig-blkdev.o
-+obj-$(CONFIG_LEDS_TRIGGER_BLKDEV_CORE)	+= ledtrig-blkdev-core.o
 diff --git a/drivers/leds/trigger/ledtrig-blkdev-core.c b/drivers/leds/trigger/ledtrig-blkdev-core.c
-new file mode 100644
-index 000000000000..bd9e5f09b7e3
---- /dev/null
+index d7b02e760b06..5fd741aa14a6 100644
+--- a/drivers/leds/trigger/ledtrig-blkdev-core.c
 +++ b/drivers/leds/trigger/ledtrig-blkdev-core.c
-@@ -0,0 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0-only
+@@ -33,3 +33,23 @@ void ledtrig_blkdev_disk_cleanup(struct gendisk *const gd)
+ 
+ 	mutex_unlock(&ledtrig_blkdev_mutex);
+ }
 +
-+/*
-+ *	Block device LED trigger - built-in components
-+ *
-+ *	Copyright 2021 Ian Pilcher <arequipeno@gmail.com>
-+ */
++/* class_find_device() callback.  Must be built-in to access disk_type. */
++static int blkdev_match_name(struct device *const dev, const void *const name)
++{
++	return dev->type == &disk_type
++			&& sysfs_streq(dev_to_disk(dev)->disk_name, name);
++}
 +
-+#include "ledtrig-blkdev.h"
-diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
-new file mode 100644
-index 000000000000..b615a8bf38e2
---- /dev/null
-+++ b/drivers/leds/trigger/ledtrig-blkdev.c
-@@ -0,0 +1,16 @@
-+// SPDX-License-Identifier: GPL-2.0-only
++/* Must be built-in to access block_class */
++struct gendisk *ledtrig_blkdev_get_disk(const char *const name)
++{
++	struct device *dev;
 +
-+/*
-+ *	Block device LED trigger - modular components
-+ *
-+ *	Copyright 2021 Ian Pilcher <arequipeno@gmail.com>
-+ */
++	dev = class_find_device(&block_class, NULL, name, blkdev_match_name);
++	if (dev == NULL)
++		return NULL;
 +
-+#include <linux/module.h>
-+
-+#include "ledtrig-blkdev.h"
-+
-+MODULE_DESCRIPTION("Block device LED trigger");
-+MODULE_AUTHOR("Ian Pilcher <arequipeno@gmail.com>");
-+MODULE_LICENSE("GPL v2");
-+MODULE_IMPORT_NS(LEDTRIG_BLKDEV);
++	return dev_to_disk(dev);
++}
++EXPORT_SYMBOL_NS_GPL(ledtrig_blkdev_get_disk, LEDTRIG_BLKDEV);
 diff --git a/drivers/leds/trigger/ledtrig-blkdev.h b/drivers/leds/trigger/ledtrig-blkdev.h
-new file mode 100644
-index 000000000000..6264d8a9201b
---- /dev/null
+index b1294da17ba3..a6ff24fad0c2 100644
+--- a/drivers/leds/trigger/ledtrig-blkdev.h
 +++ b/drivers/leds/trigger/ledtrig-blkdev.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
+@@ -12,4 +12,7 @@
+ extern struct mutex ledtrig_blkdev_mutex;
+ extern void (*__ledtrig_blkdev_disk_cleanup)(struct gendisk *gd);
+ 
++/* Caller must call put_disk() */
++struct gendisk *ledtrig_blkdev_get_disk(const char *const name);
 +
-+/*
-+ *	Block device LED trigger
-+ *
-+ *	Copyright 2021 Ian Pilcher <arequipeno@gmail.com>
-+ */
-+
-+#ifndef __LEDTRIG_BLKDEV_H
-+#define __LEDTRIG_BLKDEV_H
-+
-+#endif	/* __LEDTRIG_BLKDEV_H */
+ #endif	/* __LEDTRIG_BLKDEV_H */
 -- 
 2.31.1
 
