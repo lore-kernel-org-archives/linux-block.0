@@ -2,77 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E7B1C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 02:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A39EC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 02:31:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1067961153
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 02:17:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B3C9610C7
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 02:31:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229670AbhIJCS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 22:18:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33054 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229628AbhIJCS1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Sep 2021 22:18:27 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DDD0860F94;
-        Fri, 10 Sep 2021 02:17:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631240237;
-        bh=c3RRvTlhhK0ZHI/AL1jQEm27c30eexogLcOnN7PKsdQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=GBh6KPY8KGsZnBUrLVJHkfpVmFJ0F4wvxUnXwaYUFlQwgGBnE58WfIAK5LKN2YDsi
-         fGQaSHOQ1JQ1h7p1adt94UKUhxZ19qspyTFSvPONf4tcXdU2/i9eA6p4eAZ388URaC
-         llA+6EFoLWaZBJTDthsn1k8aPV26ttdcCr0TsyGl/trS8Aot8N3Gx2ZPvOAby8t5E/
-         0a16f9bEhHYnfFWof9HCf1+jIjgHu2/Cs6dqa4kyS3hQVSd7KcMekF9cGfx+t0qJG0
-         9GIPIXL94/NPSueE5rvI+ld+Fx8HCm4mjh4K3bl9Uy5evyBJSonCmbfi+XMI8nq1x3
-         u25n6NTZhihAg==
-Date:   Fri, 10 Sep 2021 04:17:13 +0200
-From:   Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gregkh@linuxfoundation.org
-Subject: Re: [PATCH v2 09/15] leds: trigger: blkdev: Check devices for
- activity and blink LEDs
-Message-ID: <20210910041713.4722760a@thinkpad>
-In-Reply-To: <20210909222513.2184795-10-arequipeno@gmail.com>
-References: <20210909222513.2184795-1-arequipeno@gmail.com>
-        <20210909222513.2184795-10-arequipeno@gmail.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S229776AbhIJCcr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 22:32:47 -0400
+Received: from smtp23.cstnet.cn ([159.226.251.23]:43662 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229441AbhIJCcp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Sep 2021 22:32:45 -0400
+X-Greylist: delayed 451 seconds by postgrey-1.27 at vger.kernel.org; Thu, 09 Sep 2021 22:32:45 EDT
+Received: from localhost.localdomain (unknown [124.16.141.243])
+        by APP-03 (Coremail) with SMTP id rQCowADHznqtwTphvvIJAA--.9900S2;
+        Fri, 10 Sep 2021 10:23:41 +0800 (CST)
+From:   Xu Wang <vulab@iscas.ac.cn>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-zoned: Remove needless request_queue NULL pointer checks
+Date:   Fri, 10 Sep 2021 02:23:38 +0000
+Message-Id: <20210910022338.22878-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: rQCowADHznqtwTphvvIJAA--.9900S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw4fCry8Gr15Cw45Xw17GFg_yoW3KFc_Xr
+        10v397Xrs5XFs8ur4qyFyUZ3Zavas7GF4IgFWIqasFgas3W3ZxArW3Wrn8urZrW3yUGr15
+        Zr45urZxXr1xXjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbcxYjsxI4VWkCwAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I
+        6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
+        8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0
+        cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+        C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
+        Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8Jr
+        0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY02Avz4vE14v_Gr1l
+        42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJV
+        WUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1Y6r17MIIYrxkI7VAK
+        I48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r
+        4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+        0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8k-BtUUUUU==
+X-Originating-IP: [124.16.141.243]
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCgkAA1z4j8R70gAAsG
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu,  9 Sep 2021 17:25:07 -0500
-Ian Pilcher <arequipeno@gmail.com> wrote:
+The request_queue pointer returned from bdev_get_queue() shall
+never be NULL, so the NULL checks are unnecessary, just remove them.
 
-> +static void blkdev_update_disk(struct ledtrig_blkdev_disk *const disk,
-> +			       const unsigned int generation)
-> +{
-> +	const struct block_device *const part0 = disk->gd->part0;
-> +	const unsigned long read_ios = part_stat_read(part0, ios[STAT_READ]);
-> +	const unsigned long write_ios = part_stat_read(part0, ios[STAT_WRITE])
-> +				+ part_stat_read(part0, ios[STAT_DISCARD])
-> +				+ part_stat_read(part0, ios[STAT_FLUSH]);
+Signed-off-by: Xu Wang <vulab@iscas.ac.cn>
+---
+ block/blk-zoned.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-So your code allows me to use a partition block device (like sda2) to
-register with the blkdev LED trigger, but when I do this, the code will
-disregard that I just want the LED to blink on activity on that one
-partition. Instead you will blink for whole sda, since you are looking
-at stats of only part0.
-
-Am I right?
-
-If so, this in unacceptable. The whole point of blkdev trigger is that
-you can reliably use it for any block device, and then it will blink
-the LED for that device, be it partition or whole disk.
-
-Marek
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 1d0c76c18fc5..5160972a009a 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -354,8 +354,6 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+ 		return -EINVAL;
+ 
+ 	q = bdev_get_queue(bdev);
+-	if (!q)
+-		return -ENXIO;
+ 
+ 	if (!blk_queue_is_zoned(q))
+ 		return -ENOTTY;
+@@ -412,8 +410,6 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+ 		return -EINVAL;
+ 
+ 	q = bdev_get_queue(bdev);
+-	if (!q)
+-		return -ENXIO;
+ 
+ 	if (!blk_queue_is_zoned(q))
+ 		return -ENOTTY;
+-- 
+2.17.1
 
