@@ -2,104 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8577CC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 12:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12707C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 14:04:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D12561026
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 12:45:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA897611CB
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 14:04:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233425AbhIJMq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Sep 2021 08:46:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41150 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233424AbhIJMq1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Sep 2021 08:46:27 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 68D6160E94;
-        Fri, 10 Sep 2021 12:45:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631277916;
-        bh=u82foOMSBD2SO3pdy2Df3/FLyJdVMTCjSxcxbQ2H6Ss=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ec5mXp8myPUPpCCPqmnP/jTIcA49WxLNi2F+BEGPfUeGlOKRBx+v2ub/x7AEpb2Ry
-         hQdc3DNWqyTbTZz6C0rmrKvvJvqgy9sBu6uXh3nbfSKjyMtWcMoAZrfdziym0kQ0b/
-         EyNFbDxzt+6dggmkyNoNmm8Na428uLchP6GMDdnSP0/i0DuG+EKGGL8IjuTyCVeNdf
-         NJu1cuUdj5X9rLbRq/MaQJGdIv7xNp8dJbsPV8Ee/0GY28Oe8qBmKVXtCI6BwITS35
-         1pKmPd9qYi8+jqRnEBU7mW+yVF/fA5IOZwlzrkfP/4slw5gmCq2zkZWQar2GOk33J2
-         59Kin0IHNAriw==
-Received: from johan by xi.lan with local (Exim 4.94.2)
-        (envelope-from <johan@kernel.org>)
-        id 1mOftz-0004zV-Bh; Fri, 10 Sep 2021 14:45:07 +0200
-Date:   Fri, 10 Sep 2021 14:45:07 +0200
-From:   Johan Hovold <johan@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, fujita.tomonori@lab.ntt.co.jp,
-        axboe@kernel.dk, martin.petersen@oracle.com, hch@lst.de,
-        gregkh@linuxfoundation.org, wanghaibin.wang@huawei.com
-Subject: Re: [PATCH] scsi: bsg: Fix device unregistration
-Message-ID: <YTtTU4+DZEb4WRkR@hovoldconsulting.com>
-References: <20210909034608.1435-1-yuzenghui@huawei.com>
+        id S233762AbhIJOFc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Sep 2021 10:05:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51632 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233658AbhIJOFc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Sep 2021 10:05:32 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F80DC061574;
+        Fri, 10 Sep 2021 07:04:21 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id c79so3029432oib.11;
+        Fri, 10 Sep 2021 07:04:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=vJjeudOkWUoFMSYNX0QtgVnYF0e2Ukp7ANPKWtsKcPo=;
+        b=XzXUNAqK+4M64tKFY0hbT/X2Z36aB3SvtQ2iXS+xf40NT2o/MUn7/Y/L4apOgEC3+H
+         ImL/YY0+6QKRUz1gKzvbRMr5yjWo9eQN2FHV3wbmsGmNgAL/fGtaFOqJRdEDqg0XwiJE
+         eZvavNm93obhHRDnFkUnCQGGiIygHnzuwvpYSHeiTJMxzwfPBjv/kA7RbzetOUkA8qnO
+         pqwWKYeO3fjWUfu8+xyCrAzLYYebydHuBcWtNvLqwTy3O/rfsiDxa/maD0u1ngjotPIO
+         nxkFh1/lrjMM5xiQXTfgYLHuOP4aPH6DDuF8ZINu6dIrhB+WdaO+CqfCykB+aJ02wRlX
+         TXBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vJjeudOkWUoFMSYNX0QtgVnYF0e2Ukp7ANPKWtsKcPo=;
+        b=Yn9Es5u76qDu5CndU6+KI0MjqvaGVhaADd2xDIKOGSYl5eH6i2zjwPzfEqjyGWoEnJ
+         yF47srlPU6dJ9XlLGDmvu4gNNjsW+HRNvPpUTJEJJiinip95ZGiVmS82bTb3U8aLOWjz
+         zyMDGvd1RmuU7BdIkVlxXsA7508VGclEr5n5jwM+BRFRMpjlEr+VwxRPj5AG/HJPpgTv
+         6kddDv5cm/LR0jLH+YruHpGv1Hrqf4Af00FJTZAX3GxCpDVp7wp+TLVG2dAUR+elA93y
+         d3aOTlpk6dRI4wVzsKQgvQ29LhZKoEe+8Ldo0+kc5m7hfaiepUYcqko7dALzo9ArTv7H
+         3G/g==
+X-Gm-Message-State: AOAM530weKuEi3MHwJZxzH1tovCgMM0DI60nVyrG6DQhoGEsf+gltoQE
+        LVTYAv8pK31V5rZb0OG+kaI=
+X-Google-Smtp-Source: ABdhPJzhnP8E1dPJ7nnLfS0dCdEpiHopVOlubF63RgNWlNbCTmR+QU2i8f/qhLi0XfDy9Mfo/ixqVw==
+X-Received: by 2002:aca:eb97:: with SMTP id j145mr4277157oih.33.1631282660571;
+        Fri, 10 Sep 2021 07:04:20 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id x12sm1245856oie.56.2021.09.10.07.04.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Sep 2021 07:04:20 -0700 (PDT)
+Subject: Re: [PATCH v2 00/15] Introduce block device LED trigger
+To:     =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>
+Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gregkh@linuxfoundation.org
+References: <20210909222513.2184795-1-arequipeno@gmail.com>
+ <20210910040959.5ae4a6a1@thinkpad>
+From:   Ian Pilcher <arequipeno@gmail.com>
+Message-ID: <06581fe9-f9b2-5bee-07d6-e5b276a5e7f8@gmail.com>
+Date:   Fri, 10 Sep 2021 09:04:19 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210909034608.1435-1-yuzenghui@huawei.com>
+In-Reply-To: <20210910040959.5ae4a6a1@thinkpad>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 09, 2021 at 11:46:08AM +0800, Zenghui Yu wrote:
-> We use device_initialize() to take refcount for the device but forget to
-> put_device() on device teardown, which ends up leaking private data of the
-> driver core, dev_name(), etc. This is reported by kmemleak at boot time if
-> we compile kernel with DEBUG_TEST_DRIVER_REMOVE.
+On 9/9/21 9:09 PM, Marek Behún wrote:
+> I have tried to look into this and replied to some of your patches.
 > 
-> Note that adding the missing put_device() is _not_ sufficient to fix device
-> unregistration. As we don't provide the .release() method for device, which
-> turned out to be typically wrong and will be complained loudly by the
-> driver core.
+> There are still many things to do, and I think the reviewing would be
+> much easier to review if you sent all the code changes as one patch
+> (since the changes are doing an atomic change: adding support for blkdev
+> LED trigger). Keep only the sysfs doc change in a separate patch.
+
+Marek -
+
+I'll try to get a simplified version out as soon as I can.  It will
+probably be 3 patches, because I do think that the block subsystem
+changes should be in a separate patch.
+
+(I agree that it will be simpler to review - not to mention easier for
+me to create.  Past experience does tell me that there are likely some
+folks who will object to that format, however.)
+
+> You are unnecessary using the const keyword in places where it is not
+> needed and not customary for Linux kernel codebase. See in another of
+> my replies.
+
+I did see that.  I'm a believer in declaring anything that should not
+change as const (to the extent that C allows).  It documents the
+fact that the value is expected to remain unchanged throughout the
+function call, and it enlists the compiler to enforce it.
+
+So while it's true that they aren't necessary, they do result in code
+that is at least slightly less likely to be broken by future changes.
+
+> You are using a weird comment style, i.e.
+>    /*
+>     *
+>     *	Disassociate an LED from the trigger
+>     *
+>     */
 > 
-> Fix both of them.
+>    static void blkdev_deactivate(struct led_classdev *const led_dev)
 > 
-> Fixes: ead09dd3aed5 ("scsi: bsg: Simplify device registration")
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  block/bsg.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
- 
-> +static void bsg_device_release(struct device *dev)
-> +{
-> +	struct bsg_device *bd = container_of(dev, struct bsg_device, device);
-> +
-> +	ida_simple_remove(&bsg_minor_ida, MINOR(bd->device.devt));
-> +	kfree(bd);
-> +}
+> Please look at how functions are documented in led-class.c, for example.
 
-> @@ -198,6 +205,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
->  	bd->device.devt = MKDEV(bsg_major, ret);
->  	bd->device.class = bsg_class;
->  	bd->device.parent = parent;
-> +	bd->device.release = bsg_device_release;
->  	dev_set_name(&bd->device, "%s", name);
->  	device_initialize(&bd->device);
->  
-> @@ -218,6 +226,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
->  out_device_del:
->  	cdev_device_del(&bd->cdev, &bd->device);
->  out_ida_remove:
-> +	put_device(&bd->device);
->  	ida_simple_remove(&bsg_minor_ida, MINOR(bd->device.devt));
->  out_kfree:
->  	kfree(bd);
+Well ... that comment isn't documenting that function.  It's intended to
+identify a section of the file whose contents are related.  If there's a
+different comment style that I should be using for that purpose, please
+let me know.
 
-Ehh, what about the blatant use-after-free and double-free you just
-added here?
+I'll respond to your other feedback separately.
 
-Martin, can this still be dropped from the scsi tree or does it need to
-be fixed incrementally?
+Thanks for taking your time on this.  I really do appreciate it!
 
-Johan
+-- 
+========================================================================
+                  In Soviet Russia, Google searches you!
+========================================================================
