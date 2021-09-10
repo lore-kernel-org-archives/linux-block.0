@@ -2,75 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED56C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 16:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD96FC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:23:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83FDE6108B
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 16:58:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F39E60F23
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:23:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230243AbhIJQ7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Sep 2021 12:59:13 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:58643 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230482AbhIJQ7M (ORCPT
+        id S233891AbhIJVYT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Sep 2021 17:24:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38096 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234331AbhIJVYR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Sep 2021 12:59:12 -0400
-Received: from fsav119.sakura.ne.jp (fsav119.sakura.ne.jp [27.133.134.246])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 18AGvsnc044636;
-        Sat, 11 Sep 2021 01:57:54 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav119.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav119.sakura.ne.jp);
- Sat, 11 Sep 2021 01:57:54 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav119.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 18AGvsYi044633
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 11 Sep 2021 01:57:54 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Subject: Re: [syzbot] possible deadlock in bd_register_pending_holders
-To:     syzbot <syzbot+f5608de5d89cc0d998c7@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <000000000000e272fb05cba51fe4@google.com>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Message-ID: <d4d71dc8-0373-b7a9-2a95-ba2d3c87f968@I-love.SAKURA.ne.jp>
-Date:   Sat, 11 Sep 2021 01:57:53 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Fri, 10 Sep 2021 17:24:17 -0400
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1E8C061574;
+        Fri, 10 Sep 2021 14:23:04 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id l7-20020a0568302b0700b0051c0181deebso4055266otv.12;
+        Fri, 10 Sep 2021 14:23:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=kiPr0VA4llBq0cLdvqK4IheV72+wX8xwDjal038cGwk=;
+        b=NAJiZg1Qp+Vzk6wNyzdhAxYX9E3T4PYTAEka2KCcCEyt6TC0a/oOB2jIvCpI9rbJCj
+         e2iRyCxbizmDW+pwNJyEDuDIfz86ClTHu8BlOJ6bRqaJObcUNiv9/GPggiw4dh0WE2DB
+         mbpvbFB74ArOke8Dg2J4vn1/1ZH9IezJ/EYBbgGsGFArLplzg/cMSSPd2xIs0+g4LPaO
+         Ho40TAiIpUHQgVeONJu/ybII5riuk2r/A51SdAo8y7LXUYjFSnRul77zTdTEmnosMcGF
+         Osg0vYlYAiNKOlf72jGsKqKL8cMfG2WGWhFwYX6h2hY1/9ArgwyhgCrSg1gn6V0R8lY/
+         RQxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kiPr0VA4llBq0cLdvqK4IheV72+wX8xwDjal038cGwk=;
+        b=OEIkTGiPgb/R+CiltY1pvOie6ZjMohvgiUmttzfeNo9z3PQp06es3PHrZdYhD0pHjI
+         EOAbEHnrrZONMjgJbvuzSy1vLKOYoJIq3cEYMkkkq6tESyDdFMTApNtgSoSckTdxG2Ka
+         O2cMrY9YbkbEhVeDdCALMMmd9Gu6H89iOhKuDvGow6imRRk9N1Bwy2ulX9dUv0yp7i4D
+         R0KbhGiKVHijKB/pwh4aJQQ/aT8l0lUkLnzopHPPVbjGDt8t7JIBaQfoxzz9u5wOzB4A
+         AxHCzY+V6I8Dgsw6wHjYU6E7qs+w6Tu+o/5UsK+E1ciWmdH6PcPcg2n6MjIeLrYgzJRv
+         hPxQ==
+X-Gm-Message-State: AOAM531sOMD9baI1xIrkiUeV9wTiLlcyjtNvzXyVttCuamZHbLAlgPQa
+        eBM+Z0IqzEPvfKAUCwjyVEU=
+X-Google-Smtp-Source: ABdhPJyZdrUeixHbtvWTBYk8MjtJJAy8X0S9xfPjQWwd/cuNQHBdNtqJ0YEiugNUDd8GKqud10c+SA==
+X-Received: by 2002:a9d:4a88:: with SMTP id i8mr6198525otf.290.1631308983739;
+        Fri, 10 Sep 2021 14:23:03 -0700 (PDT)
+Received: from ian.penurio.us ([47.184.51.90])
+        by smtp.gmail.com with ESMTPSA id k8sm1397988oom.20.2021.09.10.14.23.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Sep 2021 14:23:03 -0700 (PDT)
+Subject: Re: [PATCH v2 09/15] leds: trigger: blkdev: Check devices for
+ activity and blink LEDs
+To:     =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>
+Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gregkh@linuxfoundation.org
+References: <20210909222513.2184795-1-arequipeno@gmail.com>
+ <20210909222513.2184795-10-arequipeno@gmail.com>
+ <20210910041713.4722760a@thinkpad>
+ <77111c57-dfb5-44c6-c4e9-e18afb468b6e@gmail.com>
+ <20210910171211.3c2236c3@thinkpad>
+From:   Ian Pilcher <arequipeno@gmail.com>
+Message-ID: <1e4986e2-53ba-9a0f-06d1-7cfb25d9f0e6@gmail.com>
+Date:   Fri, 10 Sep 2021 16:23:02 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <000000000000e272fb05cba51fe4@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210910171211.3c2236c3@thinkpad>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since commit dfbb3409b27fa42b in axboe/linux-block.git#block-5.15 breaks
-"sb_writers#$N => &p->lock => major_names_lock" dependency chain,
-I think that this dependency chain should be no longer possible.
+On 9/10/21 10:12 AM, Marek Behún wrote:
+> On Fri, 10 Sep 2021 10:09:09 -0500
+> Ian Pilcher <arequipeno@gmail.com> wrote:
+>> You can't add partitions, only whole devices.
+> 
+> But I should be able to, since partition is a block device in /dev.
+> Any block device from /sys/class/block should be possible to add.
 
-#syz fix: block: genhd: don't call blkdev_show() with major_names_lock held
+I wasn't aware that was something that you were interested in doing.
+This will require working with the block_device structure rather than
+the gendisk.
 
-On 2021/09/10 23:42, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    27151f177827 Merge tag 'perf-tools-for-v5.15-2021-09-04' o..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=104612b3300000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=ac2f9cc43f6b17e4
-> dashboard link: https://syzkaller.appspot.com/bug?extid=f5608de5d89cc0d998c7
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+f5608de5d89cc0d998c7@syzkaller.appspotmail.com
+One possible benefit of this change ... Assuming that block_device
+structures are always allocated by bdev_alloc() *and* I'm correct in
+thinking that this means that they are always allocated from the inode
+cache, then they are always zeroed out when allocated, so there won't
+be any need to explicitly initialize the pointer.
+
+-- 
+========================================================================
+                  In Soviet Russia, Google searches you!
+========================================================================
