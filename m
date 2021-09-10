@@ -2,70 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C91F9C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE68EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:43:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE0D56113E
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:38:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE8D161132
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:43:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231395AbhIJBjg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 21:39:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52048 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229721AbhIJBjg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Sep 2021 21:39:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8CD8360235;
-        Fri, 10 Sep 2021 01:38:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631237906;
-        bh=86uwgpv3XHY0LHOHBnztwjKU6xGaIlZvY44jUqB/nFI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JIlwnRuWGDHWC8ATcmRLJCe4j81R/96waGMmJaWgbtoMA8xb4kffUdDKvRvx1ZQ5W
-         pohPcgke1aaJ52uWIXoxLlZWk+wAylAX74PTlrlJHfDpCa5V24gcpOuY2u+FShPty0
-         jUyMwwWqKS9az/f5EFCT96UaZPb9b24THLeVbJxT/7U5Xj1nU+HAXohPHjG8GnTB78
-         rn69jKK/QWOGiYt//9Bl8pSjd10x7XylFJJNF9Uf+fGi1pvz/lsT0xblbE1q9wE6cR
-         5KgQskJxiXrgs0UJdvN7U/GptuJwSNh6aJOmA3beK20RChA9r7JUKf8mBHWPFxCw51
-         798UeW9yHUBPQ==
-Date:   Fri, 10 Sep 2021 03:38:21 +0200
-From:   Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gregkh@linuxfoundation.org
-Subject: Re: [PATCH v2 04/15] block: Add block device LED trigger
- integrations
-Message-ID: <20210910033821.7da8299b@thinkpad>
-In-Reply-To: <20210909222513.2184795-5-arequipeno@gmail.com>
-References: <20210909222513.2184795-1-arequipeno@gmail.com>
-        <20210909222513.2184795-5-arequipeno@gmail.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        id S229459AbhIJBos (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 21:44:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42583 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229452AbhIJBor (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Sep 2021 21:44:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631238217;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o7i81vt0ogrQwLehvxvlqLBNWf909L5fVcLE5L9Z+hE=;
+        b=Z+Bu9AdnWa1AX9K+ujMJNtVa5vRYt+CN5Oc4BsEAIBSMlauRywX835jx4EDH+VMfo3HoF/
+        AU9Uv7daUP8YS8+LRU17GK6Ye08qk+zvsyzzbXn1PCNjer/xpdzJkiK3gKaMqCXDOddAs3
+        fQPzeI7NmyxO31Lt2nlVuN0LRr9MRDs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-445-u9DriWUvN8-1w0T8mFFi3Q-1; Thu, 09 Sep 2021 21:43:36 -0400
+X-MC-Unique: u9DriWUvN8-1w0T8mFFi3Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC74A79EDD;
+        Fri, 10 Sep 2021 01:43:34 +0000 (UTC)
+Received: from T590 (ovpn-12-112.pek2.redhat.com [10.72.12.112])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B907F6D980;
+        Fri, 10 Sep 2021 01:43:24 +0000 (UTC)
+Date:   Fri, 10 Sep 2021 09:43:28 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Greg KH <greg@kroah.com>
+Cc:     Yi Zhang <yi.zhang@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>, stable@vger.kernel.org
+Subject: Re: [bug report] NULL pointer at blk_mq_put_rq_ref+0x20/0xb4
+ observed with blktests on 5.13.15
+Message-ID: <YTq4QFWexPF9aQvG@T590>
+References: <CAHj4cs-noupgFn3QjB96Z20hv-BhFLHOyFZFEtrhGpESkeoRSA@mail.gmail.com>
+ <CAFj5m9J4sxRwQb7+nHzYOurX9QRpEgsEMCqdx4SHA4THnsJXBA@mail.gmail.com>
+ <YTnc5Ja/DKR30Euy@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YTnc5Ja/DKR30Euy@kroah.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu,  9 Sep 2021 17:25:02 -0500
-Ian Pilcher <arequipeno@gmail.com> wrote:
+On Thu, Sep 09, 2021 at 12:07:32PM +0200, Greg KH wrote:
+> On Thu, Sep 09, 2021 at 05:14:18PM +0800, Ming Lei wrote:
+> > On Thu, Sep 9, 2021 at 4:47 PM Yi Zhang <yi.zhang@redhat.com> wrote:
+> > >
+> > > Hello
+> > >
+> > > I found this issue with blktests on[1], did we miss some patch on stable?
+> > > [1]
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
+> > > queue/5.13
+> > >
+> > > [   68.989907] run blktests block/006 at 2021-09-09 04:34:35
+> > > [   69.085724] null_blk: module loaded
+> > > [   74.271624] Unable to handle kernel NULL pointer dereference at
+> > > virtual address 00000000000002b8
+> > > [   74.280414] Mem abort info:
+> > > [   74.283195]   ESR = 0x96000004
+> > > [   74.286245]   EC = 0x25: DABT (current EL), IL = 32 bits
+> > > [   74.291545]   SET = 0, FnV = 0
+> > > [   74.294587]   EA = 0, S1PTW = 0
+> > > [   74.297720] Data abort info:
+> > > [   74.300588]   ISV = 0, ISS = 0x00000004
+> > > [   74.304411]   CM = 0, WnR = 0
+> > > [   74.307368] user pgtable: 4k pages, 48-bit VAs, pgdp=000008004366e000
+> > > [   74.313796] [00000000000002b8] pgd=0000000000000000, p4d=0000000000000000
+> > > [   74.320577] Internal error: Oops: 96000004 [#1] SMP
+> > > [   74.325443] Modules linked in: null_blk mlx5_ib ib_uverbs ib_core
+> > > rfkill sunrpc vfat fat joydev acpi_ipmi ipmi_ssif cdc_ether usbnet mii
+> > > mlx5_core psample ipmi_devintf mlxfw tls ipmi_msghandler arm_cmn
+> > > cppc_cpufreq arm_dsu_pmu acpi_tad fuse zram ip_tables xfs ast
+> > > i2c_algo_bit drm_vram_helper drm_kms_helper crct10dif_ce syscopyarea
+> > > ghash_ce sysfillrect uas sysimgblt sbsa_gwdt fb_sys_fops cec
+> > > drm_ttm_helper ttm nvme usb_storage nvme_core drm xgene_hwmon
+> > > aes_neon_bs
+> > > [   74.366458] CPU: 31 PID: 2511 Comm: fio Not tainted 5.13.15+ #1
+> > 
+> > Looks the fixes haven't land on linux-5.13.y:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a9ed27a764156929efe714033edb3e9023c5f321
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c2da19ed50554ce52ecbad3655c98371fe58599f
+> 
+> Now queued up.  Someone could have told us they were needed :)
 
-> @@ -166,6 +166,9 @@ struct gendisk {
->  #endif	/* CONFIG_BLK_DEV_INTEGRITY */
->  #if IS_ENABLED(CONFIG_CDROM)
->  	struct cdrom_device_info *cdi;
-> +#endif
-> +#if IS_ENABLED(CONFIG_LEDS_TRIGGER_BLKDEV)
-> +	struct ledtrig_blkdev_disk *ledtrig;
->  #endif
+Thanks for queuing it up, sorry for not Cc stable.
 
-So in this patch you are adding pointer to a structure, but the
-structure is introduced in a later patch (07/15).
+BTW, the following two patches are missed too in linux-5.13-y:
 
-Please send these changes as one patch, it is easier to review.
+364b61818f65 blk-mq: clearing flush request reference in tags->rqs[]
+bd63141d585b blk-mq: clear stale request in tags->rq[] before freeing one request pool
 
-Marek
+Both can fix request UAF issue.
+
+Thanks, 
+Ming
+
