@@ -2,117 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE68EC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32954C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:48:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE8D161132
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:43:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14BE96113A
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 01:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229459AbhIJBos (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Sep 2021 21:44:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42583 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229452AbhIJBor (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Sep 2021 21:44:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631238217;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=o7i81vt0ogrQwLehvxvlqLBNWf909L5fVcLE5L9Z+hE=;
-        b=Z+Bu9AdnWa1AX9K+ujMJNtVa5vRYt+CN5Oc4BsEAIBSMlauRywX835jx4EDH+VMfo3HoF/
-        AU9Uv7daUP8YS8+LRU17GK6Ye08qk+zvsyzzbXn1PCNjer/xpdzJkiK3gKaMqCXDOddAs3
-        fQPzeI7NmyxO31Lt2nlVuN0LRr9MRDs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-u9DriWUvN8-1w0T8mFFi3Q-1; Thu, 09 Sep 2021 21:43:36 -0400
-X-MC-Unique: u9DriWUvN8-1w0T8mFFi3Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC74A79EDD;
-        Fri, 10 Sep 2021 01:43:34 +0000 (UTC)
-Received: from T590 (ovpn-12-112.pek2.redhat.com [10.72.12.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B907F6D980;
-        Fri, 10 Sep 2021 01:43:24 +0000 (UTC)
-Date:   Fri, 10 Sep 2021 09:43:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Greg KH <greg@kroah.com>
-Cc:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>, stable@vger.kernel.org
-Subject: Re: [bug report] NULL pointer at blk_mq_put_rq_ref+0x20/0xb4
- observed with blktests on 5.13.15
-Message-ID: <YTq4QFWexPF9aQvG@T590>
-References: <CAHj4cs-noupgFn3QjB96Z20hv-BhFLHOyFZFEtrhGpESkeoRSA@mail.gmail.com>
- <CAFj5m9J4sxRwQb7+nHzYOurX9QRpEgsEMCqdx4SHA4THnsJXBA@mail.gmail.com>
- <YTnc5Ja/DKR30Euy@kroah.com>
+        id S229455AbhIJBty (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Sep 2021 21:49:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54510 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229452AbhIJBtw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Sep 2021 21:49:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1135D61101;
+        Fri, 10 Sep 2021 01:48:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631238522;
+        bh=4rEbcia9klYRhMFk/xM9Aun4Pm5+wzcxNJqHpHv6N24=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Cd1xvSkX6QDqPQTuZ8Z5JfPye1PwZKNKBwQcdAxXpPiQ4Wv4/YO4bu7392VM1NImm
+         XuqIRhXVDQOmNq6KSr8rWzexPOcCPMDghVxucL/kYlgg2NEUou0rGKI4DQIyM2g3Fy
+         mTI9iVfW7eexcWE6vVBtjxAQvSmoU7mFjQLMDUwSWuju4wbAJbEuu/6ThH0xt17RqL
+         SIS1ANlgNOPIEgRj4P/eVVLtktiFqy/YnCHyHLePIE2xLTjWgYF7zbT0aY/6PRyG/c
+         Lhk66ZB9V/wbFnuqyPdyND3JA8N/JXNsLfrWL+k3ZMB/mEgVAI6ETvK757e2MJofFD
+         yJthpusIGSAFA==
+Date:   Fri, 10 Sep 2021 03:48:38 +0200
+From:   Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To:     Ian Pilcher <arequipeno@gmail.com>
+Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gregkh@linuxfoundation.org
+Subject: Re: [PATCH v2 09/15] leds: trigger: blkdev: Check devices for
+ activity and blink LEDs
+Message-ID: <20210910034838.4331512d@thinkpad>
+In-Reply-To: <20210909222513.2184795-10-arequipeno@gmail.com>
+References: <20210909222513.2184795-1-arequipeno@gmail.com>
+        <20210909222513.2184795-10-arequipeno@gmail.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YTnc5Ja/DKR30Euy@kroah.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 09, 2021 at 12:07:32PM +0200, Greg KH wrote:
-> On Thu, Sep 09, 2021 at 05:14:18PM +0800, Ming Lei wrote:
-> > On Thu, Sep 9, 2021 at 4:47 PM Yi Zhang <yi.zhang@redhat.com> wrote:
-> > >
-> > > Hello
-> > >
-> > > I found this issue with blktests on[1], did we miss some patch on stable?
-> > > [1]
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
-> > > queue/5.13
-> > >
-> > > [   68.989907] run blktests block/006 at 2021-09-09 04:34:35
-> > > [   69.085724] null_blk: module loaded
-> > > [   74.271624] Unable to handle kernel NULL pointer dereference at
-> > > virtual address 00000000000002b8
-> > > [   74.280414] Mem abort info:
-> > > [   74.283195]   ESR = 0x96000004
-> > > [   74.286245]   EC = 0x25: DABT (current EL), IL = 32 bits
-> > > [   74.291545]   SET = 0, FnV = 0
-> > > [   74.294587]   EA = 0, S1PTW = 0
-> > > [   74.297720] Data abort info:
-> > > [   74.300588]   ISV = 0, ISS = 0x00000004
-> > > [   74.304411]   CM = 0, WnR = 0
-> > > [   74.307368] user pgtable: 4k pages, 48-bit VAs, pgdp=000008004366e000
-> > > [   74.313796] [00000000000002b8] pgd=0000000000000000, p4d=0000000000000000
-> > > [   74.320577] Internal error: Oops: 96000004 [#1] SMP
-> > > [   74.325443] Modules linked in: null_blk mlx5_ib ib_uverbs ib_core
-> > > rfkill sunrpc vfat fat joydev acpi_ipmi ipmi_ssif cdc_ether usbnet mii
-> > > mlx5_core psample ipmi_devintf mlxfw tls ipmi_msghandler arm_cmn
-> > > cppc_cpufreq arm_dsu_pmu acpi_tad fuse zram ip_tables xfs ast
-> > > i2c_algo_bit drm_vram_helper drm_kms_helper crct10dif_ce syscopyarea
-> > > ghash_ce sysfillrect uas sysimgblt sbsa_gwdt fb_sys_fops cec
-> > > drm_ttm_helper ttm nvme usb_storage nvme_core drm xgene_hwmon
-> > > aes_neon_bs
-> > > [   74.366458] CPU: 31 PID: 2511 Comm: fio Not tainted 5.13.15+ #1
-> > 
-> > Looks the fixes haven't land on linux-5.13.y:
-> > 
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a9ed27a764156929efe714033edb3e9023c5f321
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c2da19ed50554ce52ecbad3655c98371fe58599f
-> 
-> Now queued up.  Someone could have told us they were needed :)
+On Thu,  9 Sep 2021 17:25:07 -0500
+Ian Pilcher <arequipeno@gmail.com> wrote:
 
-Thanks for queuing it up, sorry for not Cc stable.
+> +static void blkdev_blink(const struct ledtrig_blkdev_led *const led)
+> +{
 
-BTW, the following two patches are missed too in linux-5.13-y:
+Why are you declaring the led variable as const? This is not needed.
+Sure, you do not change it, but I have never seen this being used in
+this way in kernel.
 
-364b61818f65 blk-mq: clearing flush request reference in tags->rqs[]
-bd63141d585b blk-mq: clear stale request in tags->rq[] before freeing one request pool
+> +	unsigned long delay_on = READ_ONCE(led->blink_msec);
+> +	unsigned long delay_off = 1;	/* 0 leaves LED turned on */
+> +
+> +	led_blink_set_oneshot(led->led_dev, &delay_on, &delay_off, 0);
+> +}
+> +
+> +static void blkdev_update_disk(struct ledtrig_blkdev_disk *const disk,
+> +			       const unsigned int generation)
+> +{
+> +	const struct block_device *const part0 = disk->gd->part0;
+> +	const unsigned long read_ios = part_stat_read(part0, ios[STAT_READ]);
+> +	const unsigned long write_ios = part_stat_read(part0, ios[STAT_WRITE])
+> +				+ part_stat_read(part0, ios[STAT_DISCARD])
+> +				+ part_stat_read(part0, ios[STAT_FLUSH]);
 
-Both can fix request UAF issue.
+Again, yes, you do not change part0, read_ios or write_ios in this
+function, but this does not mean you need to declare them const.
 
-Thanks, 
-Ming
+Const is good when you want to declare that a place where a pointer
+points to should be constant. You don't need to do it for the pointer
+itself, I don't see any benefit from this.
+
+> +
+> +	if (disk->read_ios != read_ios) {
+> +		disk->read_act = true;
+> +		disk->read_ios = read_ios;
+> +	} else {
+> +		disk->read_act = false;
+> +	}
+> +
+> +	if (disk->write_ios != write_ios) {
+> +		disk->write_act = true;
+> +		disk->write_ios = write_ios;
+> +	} else {
+> +		disk->write_act = false;
+> +	}
+> +
+> +	disk->generation = generation;
+> +}
+> +
+> +static bool blkdev_read_mode(const enum ledtrig_blkdev_mode mode)
+> +{
+> +	return mode != LEDTRIG_BLKDEV_MODE_WO;
+> +}
+> +
+> +static bool blkdev_write_mode(const enum ledtrig_blkdev_mode mode)
+> +{
+> +	return mode != LEDTRIG_BLKDEV_MODE_RO;
+> +}
+
+It would be better to simply do the comparison where it is needed,
+since it is so short. These functions aren't needed, they do not
+shorten code in any significant way, nor do they make it more readable
+(in fact, they make it a little less readable).
+
+> +
+> +static void blkdev_process(struct work_struct *const work)
+
+You are again using const where it is not needed.
+In fact the work_func_t type does not have it:
+  typedef void (*work_func_t)(struct work_struct *work);
+
+> +{
+> +	static unsigned int generation;
+> +
+> +	struct ledtrig_blkdev_led *led;
+> +	struct ledtrig_blkdev_link *link;
+> +	unsigned long delay;
+> +
+> +	if (!mutex_trylock(&ledtrig_blkdev_mutex))
+> +		goto exit_reschedule;
+> +
+> +	hlist_for_each_entry(led, &ledtrig_blkdev_leds, leds_node) {
+> +
+> +		hlist_for_each_entry(link, &led->disks, led_disks_node) {
+> +
+> +			struct ledtrig_blkdev_disk *const disk = link->disk;
+> +
+> +			if (disk->generation != generation)
+> +				blkdev_update_disk(disk, generation);
+> +
+> +			if (disk->read_act && blkdev_read_mode(led->mode)) {
+> +				blkdev_blink(led);
+> +				break;
+> +			}
+> +
+> +			if (disk->write_act && blkdev_write_mode(led->mode)) {
+> +				blkdev_blink(led);
+> +				break;
+> +			}
+
+These two blinks should be one blink, i.e.
+  if ((read_act && read_mode) || (write_act && write_mode))
+    blink();
+
+> +		}
+> +	}
+> +
+> +	++generation;
+> +
+> +	mutex_unlock(&ledtrig_blkdev_mutex);
+> +
+> +exit_reschedule:
+> +	delay = READ_ONCE(ledtrig_blkdev_interval);
+> +	WARN_ON_ONCE(!schedule_delayed_work(&ledtrig_blkdev_work, delay));
+> +}
+> +
+>  
+>  /*
+>   *
 
