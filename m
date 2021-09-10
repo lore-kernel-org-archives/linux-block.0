@@ -2,105 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD96FC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D18C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:41:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F39E60F23
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:23:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8023F61074
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:41:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233891AbhIJVYT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Sep 2021 17:24:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38096 "EHLO
+        id S233100AbhIJVm4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Sep 2021 17:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234331AbhIJVYR (ORCPT
+        with ESMTP id S229543AbhIJVm4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Sep 2021 17:24:17 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1E8C061574;
-        Fri, 10 Sep 2021 14:23:04 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id l7-20020a0568302b0700b0051c0181deebso4055266otv.12;
-        Fri, 10 Sep 2021 14:23:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=kiPr0VA4llBq0cLdvqK4IheV72+wX8xwDjal038cGwk=;
-        b=NAJiZg1Qp+Vzk6wNyzdhAxYX9E3T4PYTAEka2KCcCEyt6TC0a/oOB2jIvCpI9rbJCj
-         e2iRyCxbizmDW+pwNJyEDuDIfz86ClTHu8BlOJ6bRqaJObcUNiv9/GPggiw4dh0WE2DB
-         mbpvbFB74ArOke8Dg2J4vn1/1ZH9IezJ/EYBbgGsGFArLplzg/cMSSPd2xIs0+g4LPaO
-         Ho40TAiIpUHQgVeONJu/ybII5riuk2r/A51SdAo8y7LXUYjFSnRul77zTdTEmnosMcGF
-         Osg0vYlYAiNKOlf72jGsKqKL8cMfG2WGWhFwYX6h2hY1/9ArgwyhgCrSg1gn6V0R8lY/
-         RQxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kiPr0VA4llBq0cLdvqK4IheV72+wX8xwDjal038cGwk=;
-        b=OEIkTGiPgb/R+CiltY1pvOie6ZjMohvgiUmttzfeNo9z3PQp06es3PHrZdYhD0pHjI
-         EOAbEHnrrZONMjgJbvuzSy1vLKOYoJIq3cEYMkkkq6tESyDdFMTApNtgSoSckTdxG2Ka
-         O2cMrY9YbkbEhVeDdCALMMmd9Gu6H89iOhKuDvGow6imRRk9N1Bwy2ulX9dUv0yp7i4D
-         R0KbhGiKVHijKB/pwh4aJQQ/aT8l0lUkLnzopHPPVbjGDt8t7JIBaQfoxzz9u5wOzB4A
-         AxHCzY+V6I8Dgsw6wHjYU6E7qs+w6Tu+o/5UsK+E1ciWmdH6PcPcg2n6MjIeLrYgzJRv
-         hPxQ==
-X-Gm-Message-State: AOAM531sOMD9baI1xIrkiUeV9wTiLlcyjtNvzXyVttCuamZHbLAlgPQa
-        eBM+Z0IqzEPvfKAUCwjyVEU=
-X-Google-Smtp-Source: ABdhPJyZdrUeixHbtvWTBYk8MjtJJAy8X0S9xfPjQWwd/cuNQHBdNtqJ0YEiugNUDd8GKqud10c+SA==
-X-Received: by 2002:a9d:4a88:: with SMTP id i8mr6198525otf.290.1631308983739;
-        Fri, 10 Sep 2021 14:23:03 -0700 (PDT)
-Received: from ian.penurio.us ([47.184.51.90])
-        by smtp.gmail.com with ESMTPSA id k8sm1397988oom.20.2021.09.10.14.23.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Sep 2021 14:23:03 -0700 (PDT)
-Subject: Re: [PATCH v2 09/15] leds: trigger: blkdev: Check devices for
- activity and blink LEDs
-To:     =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>
-Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gregkh@linuxfoundation.org
-References: <20210909222513.2184795-1-arequipeno@gmail.com>
- <20210909222513.2184795-10-arequipeno@gmail.com>
- <20210910041713.4722760a@thinkpad>
- <77111c57-dfb5-44c6-c4e9-e18afb468b6e@gmail.com>
- <20210910171211.3c2236c3@thinkpad>
-From:   Ian Pilcher <arequipeno@gmail.com>
-Message-ID: <1e4986e2-53ba-9a0f-06d1-7cfb25d9f0e6@gmail.com>
-Date:   Fri, 10 Sep 2021 16:23:02 -0500
+        Fri, 10 Sep 2021 17:42:56 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 990B3C061574;
+        Fri, 10 Sep 2021 14:41:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=leZ9gAJesxiaYyECvXAC95tfjrMi+xyfNBHPusNmXhc=; b=jOxNEkflIY8q+uoW+nXRu9FQ7U
+        nFWTvXtl1dJ9Pdrc9LEPeJMj6UZYxV45Kbrks3XU1zNWuNHv7P/xx3oeYZ5zY0wPTPNZm8YiNSbKJ
+        /I/GJbGoeqCrx83c/VDLP24V7Wy9FePPlXS4m4OP8fOma/KSJ9QB9Hd5bpc1cPbw2zEDp25wMk66X
+        pWz6S+8VNX+Mv6ePijXJdLrwWLLnj/jzSXs8gP5kG/k/4HSmFmY08LNzNIWtTKAiCGeLYH7077uX8
+        PdaX1OJM0a/1qAxKBUkSIjZyAsN2m3eOTA3c/rSQyjB4vNt2zLcj9/gjYCNOuIdF/9wS2gSs+DvBq
+        e/wW9kow==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mOoHH-00DtxH-El; Fri, 10 Sep 2021 21:41:43 +0000
+Subject: Re: [PATCH v3] drivers/cdrom: improved ioctl for media change
+ detection
+To:     Lukas Prediger <lumip@lumip.de>, phil@philpotter.co.uk
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@infradead.org
+References: <20210910211600.5663-1-lumip@lumip.de>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <e3efb5ea-0884-c02a-cb81-408ec421463d@infradead.org>
+Date:   Fri, 10 Sep 2021 14:41:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210910171211.3c2236c3@thinkpad>
+In-Reply-To: <20210910211600.5663-1-lumip@lumip.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/10/21 10:12 AM, Marek Behún wrote:
-> On Fri, 10 Sep 2021 10:09:09 -0500
-> Ian Pilcher <arequipeno@gmail.com> wrote:
->> You can't add partitions, only whole devices.
-> 
-> But I should be able to, since partition is a block device in /dev.
-> Any block device from /sys/class/block should be possible to add.
+Hi Lukas,
 
-I wasn't aware that was something that you were interested in doing.
-This will require working with the block_device structure rather than
-the gendisk.
+Just a minor nit:
 
-One possible benefit of this change ... Assuming that block_device
-structures are always allocated by bdev_alloc() *and* I'm correct in
-thinking that this means that they are always allocated from the inode
-cache, then they are always zeroed out when allocated, so there won't
-be any need to explicitly initialize the pointer.
+On 9/10/21 2:16 PM, Lukas Prediger wrote:
+> +#define MEDIA_CHANGED_FLAG	0x1	/* Last detected media change was more \
+> +					 * recent than last_media_change set by\
+> +					 * caller.                             \
+> +					 */
 
+Drop the "continuation" backslashes.
+They are not needed.
+
+thanks.
 -- 
-========================================================================
-                  In Soviet Russia, Google searches you!
-========================================================================
+~Randy
+
