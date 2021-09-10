@@ -5,179 +5,278 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EBAC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 02:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DA0C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 02:48:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A668661213
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 02:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1582610C9
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 02:48:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235061AbhIKCnB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Sep 2021 22:43:01 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:15404 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231864AbhIKCnB (ORCPT
+        id S235118AbhIKCtV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Sep 2021 22:49:21 -0400
+Received: from smtprelay05.ispgateway.de ([80.67.18.28]:49144 "EHLO
+        smtprelay05.ispgateway.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231864AbhIKCtV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Sep 2021 22:43:01 -0400
-Received: from dggeme760-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H5xjh6N9SzQvgZ;
-        Sat, 11 Sep 2021 10:37:44 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggeme760-chm.china.huawei.com
- (10.3.19.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Sat, 11
- Sep 2021 10:41:47 +0800
-From:   Lihong Kou <koulihong@huawei.com>
-To:     <axboe@kernel.dk>, <kbusch@kernel.org>, <hch@lst.de>,
-        <sagi@grimberg.me>
-CC:     <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
-Subject: [PATCH v2] block: nvme: fix the NULL ptr bug in bio_integrity_verify_fn
-Date:   Sat, 11 Sep 2021 10:49:06 +0800
-Message-ID: <20210911024906.1125259-1-koulihong@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        Fri, 10 Sep 2021 22:49:21 -0400
+X-Greylist: delayed 19812 seconds by postgrey-1.27 at vger.kernel.org; Fri, 10 Sep 2021 22:49:20 EDT
+Received: from [87.92.210.171] (helo=lumip-notebook.fritz.box)
+        by smtprelay05.ispgateway.de with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <lumip@lumip.de>)
+        id 1mOnu3-0004he-E8; Fri, 10 Sep 2021 23:17:43 +0200
+From:   Lukas Prediger <lumip@lumip.de>
+To:     phil@philpotter.co.uk
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@infradead.org,
+        rdunlap@infradead.org, Lukas Prediger <lumip@lumip.de>
+Subject: [PATCH v3] drivers/cdrom: improved ioctl for media change detection
+Date:   Sat, 11 Sep 2021 00:16:02 +0300
+Message-Id: <20210910211600.5663-1-lumip@lumip.de>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggeme760-chm.china.huawei.com (10.3.19.106)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Df-Sender: bHVrYXMucHJlZGlnZXJAbHVtaXAuZGU=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We encouter a null ptr problem in our system with the block integrity
-feature enabled. The call trace is:
-[  221.903927] ==================================================================
-[  221.904648] BUG: KASAN: null-ptr-deref in bio_integrity_verify_fn+0xbd/0xe3
-[  221.905160] Read of size 8 at addr 0000000000000008 by task kworker/1:1H/135
-[  221.905683]
-[  221.905797] CPU: 1 PID: 135 Comm: kworker/1:1H Not tainted 5.14.0-02729-gb91db6a0b52e-dirty #8
-[  221.906407] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS ?-20190727_073836-buildvm-ppc64le-16.ppc.fedoraproject.org-3.fc31 04/01/2014
-[  221.907339] Workqueue: kintegrityd bio_integrity_verify_fn
-[  221.907749] Call Trace:
-[  221.907936]  dump_stack_lvl+0x34/0x44
-[  221.908222]  kasan_report.cold+0x66/0xdf
-[  221.908511]  ? bio_integrity_verify_fn+0xbd/0xe3
-[  221.908865]  bio_integrity_verify_fn+0xbd/0xe3
-[  221.909205]  process_one_work+0x39f/0x690
-[  221.909515]  worker_thread+0x78/0x600
-[  221.909779]  ? process_one_work+0x690/0x690
-[  221.910085]  kthread+0x1cf/0x200
-[  221.910325]  ? set_kthread_struct+0x80/0x80
-[  221.910635]  ret_from_fork+0x1f/0x30
-[  221.910902] ==================================================================
-[  221.911426] Disabling lock debugging due to kernel taint
-[  221.911819] BUG: kernel NULL pointer dereference, address: 0000000000000008
-[  221.912323] #PF: supervisor read access in kernel mode
-[  221.912690] #PF: error_code(0x0000) - not-present page
-[  221.913064] PGD 0 P4D 0
-[  221.913263] Oops: 0000 [#1] SMP KASAN
-[  221.913532] CPU: 1 PID: 135 Comm: kworker/1:1H Tainted: G    B             5.14.0-02729-gb91db6a0b52e-dirty #8
-[  221.914242] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS ?-20190727_073836-buildvm-ppc64le-16.ppc.fedoraproject.org-3.fc31 04/01/2014
-[  221.915222] Workqueue: kintegrityd bio_integrity_verify_fn
-[  221.915636] RIP: 0010:bio_integrity_verify_fn+0xbd/0xe3
-[  221.916024] Code: 2e ff 48 83 7d 00 00 75 0c 48 c7 c7 c0 b9 8b 8f e8 3f ea fd ff 48 89 ef e8 6a fc 2e ff 48 8b 6d 00 48 8d 7d 08 e8 5d fc 2e ff <48> 8b 55 08 48 8d 73 e8 4c 89 e7 e8 bd 10 8c ff 4c 89d
-[  221.917402] RSP: 0018:ffff8881068ffde8 EFLAGS: 00010286
-[  221.917807] RAX: 0000000000000001 RBX: ffff888102d0eb40 RCX: ffffffff8f1bbe22
-[  221.918349] RDX: 1ffffffff3431d80 RSI: 0000000000000246 RDI: ffffffff9a18ec00
-[  221.918872] RBP: 0000000000000000 R08: 0000000000000001 R09: fffffbfff3011121
-[  221.919461] R10: ffffffff98088907 R11: fffffbfff3011120 R12: ffff8881171e7740
-[  221.920132] R13: 0000000000000000 R14: ffff8883d3073000 R15: 0000000000000040
-[  221.920817] FS:  0000000000000000(0000) GS:ffff8883d3040000(0000) knlGS:0000000000000000
-[  221.921601] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  221.922093] CR2: 0000000000000008 CR3: 0000000118df5000 CR4: 00000000000006e0
-[  221.922750] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  221.923431] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  221.924087] Call Trace:
-[  221.924317]  process_one_work+0x39f/0x690
-[  221.924710]  worker_thread+0x78/0x600
-[  221.925047]  ? process_one_work+0x690/0x690
-[  221.925459]  kthread+0x1cf/0x200
-[  221.925732]  ? set_kthread_struct+0x80/0x80
-[  221.926148]  ret_from_fork+0x1f/0x30
-[  221.926514] Modules linked in:
-[  221.926796] CR2: 0000000000000008
-[  221.927225] ---[ end trace 35c0b7896d001c06 ]---
-[  221.927688] RIP: 0010:bio_integrity_verify_fn+0xbd/0xe3
-[  221.928289] Code: 2e ff 48 83 7d 00 00 75 0c 48 c7 c7 c0 b9 8b 8f e8 3f ea fd ff 48 89 ef e8 6a fc 2e ff 48 8b 6d 00 48 8d 7d 08 e8 5d fc 2e ff <48> 8b 55 08 48 8d 73 e8 4c 89 e7 e8 bd 10 8c ff 4c 89d
-[  221.930413] RSP: 0018:ffff8881068ffde8 EFLAGS: 00010286
-[  221.930948] RAX: 0000000000000001 RBX: ffff888102d0eb40 RCX: ffffffff8f1bbe22
-[  221.931628] RDX: 1ffffffff3431d80 RSI: 0000000000000246 RDI: ffffffff9a18ec00
-[  221.932195] RBP: 0000000000000000 R08: 0000000000000001 R09: fffffbfff3011121
-[  221.932739] R10: ffffffff98088907 R11: fffffbfff3011120 R12: ffff8881171e7740
-[  221.933277] R13: 0000000000000000 R14: ffff8883d3073000 R15: 0000000000000040
-[  221.933819] FS:  0000000000000000(0000) GS:ffff8883d3040000(0000) knlGS:0000000000000000
-[  221.934430] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  221.934850] CR2: 0000000000000008 CR3: 0000000118df5000 CR4: 00000000000006e0
-[  221.935391] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  221.935934] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+The current implementation of the CDROM_MEDIA_CHANGED ioctl relies on
+global state, meaning that only one process can detect a disc change
+while the ioctl call will return 0 for other calling processes afterwards
+(see bug 213267 ).
 
-Because the  bio verify work is done in the worker thread, someone can
-unregister the bio intergity concurrently as below:
+This introduces a new cdrom ioctl, CDROM_TIMED_MEDIA_CHANGE, that
+works by maintaining a timestamp of the last detected disc change instead
+of a boolean flag: Processes calling this ioctl command can provide
+a timestamp of the last disc change known to them and receive
+an indication whether the disc was changed since then and the updated
+timestamp.
 
-CPU0                                    CPU1
-  process_one_work                      nvme_validate_ns
-    bio_integrity_verify_fn                nvme_update_ns_info
-	                                     nvme_update_disk_info
-	                                       blk_integrity_unregister
-                                               ---set queue->integrity as 0
-	bio_integrity_process
-	--access bi->profile->veryfy_fn(bi is a pointer of queue->integity)
+I considered fixing the buggy behavior in the original
+CDROM_MEDIA_CHANGED ioctl but that would require maintaining state
+for each calling process in the kernel, which seems like a worse
+solution than introducing this new ioctl.
 
-Before calling blk_integrity_unregister in nvme_update_disk_info, we must
-make sure that there is no work item in the kintegrityd_wq. Just call
-blk_flush_integrity to flush the work queue so the bug can be resolved.
-
-Signed-off-by: Lihong Kou <koulihong@huawei.com>
+Signed-off-by: Lukas Prediger <lumip@lumip.de>
 ---
- block/blk-core.c         | 3 ---
- block/blk-integrity.c    | 3 +++
- drivers/nvme/host/core.c | 3 ++-
- 3 files changed, 5 insertions(+), 4 deletions(-)
+I have now incorporated the suggestions of Phil, Christoph and Randy for v2.
+- fixed overly long lines
+- has_changed is now media_flags in the new ioctl struct
+- fixed brace on new line after struct definition
+- using if instead of cryptic assignment for better readability
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5454db2fa263..62a653e45054 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -389,9 +389,6 @@ void blk_cleanup_queue(struct request_queue *q)
- 
- 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
- 
--	/* for synchronous bio-based driver finish in-flight integrity i/o */
--	blk_flush_integrity();
--
- 	blk_sync_queue(q);
- 	if (queue_is_mq(q))
- 		blk_mq_exit_queue(q);
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 69a12177dfb6..94138a2184e3 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -426,6 +426,9 @@ EXPORT_SYMBOL(blk_integrity_register);
-  */
- void blk_integrity_unregister(struct gendisk *disk)
- {
-+	/* for synchronous bio-based driver finish in-flight integrity i/o */
-+	blk_flush_integrity();
+Hope everyone is happy with it now. However, if anything still comes up, let me know.
+Thanks for all the feedback so far.
+
+Best,
+Lukas
+---
+ Documentation/cdrom/cdrom-standard.rst | 11 +++++
+ Documentation/ioctl/cdrom.rst          |  3 ++
+ drivers/cdrom/cdrom.c                  | 59 ++++++++++++++++++++++++--
+ include/linux/cdrom.h                  |  1 +
+ include/uapi/linux/cdrom.h             | 19 +++++++++
+ 5 files changed, 89 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/cdrom/cdrom-standard.rst b/Documentation/cdrom/cdrom-standard.rst
+index dde4f7f7fdbf..4d69515df864 100644
+--- a/Documentation/cdrom/cdrom-standard.rst
++++ b/Documentation/cdrom/cdrom-standard.rst
+@@ -923,6 +923,17 @@ commands can be identified by the underscores in their names.
+ 	specifies the slot for which the information is given. The special
+ 	value *CDSL_CURRENT* requests that information about the currently
+ 	selected slot be returned.
++`CDROM_TIMED_MEDIA_CHANGE`
++	Checks whether the disc has been changed since a user supplied time
++	and returns the time of the last disc change.
 +
- 	blk_queue_flag_clear(QUEUE_FLAG_STABLE_WRITES, disk->queue);
- 	memset(&disk->queue->integrity, 0, sizeof(struct blk_integrity));
- }
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 8679a108f571..d937771e456a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1758,7 +1758,8 @@ static void nvme_update_disk_info(struct gendisk *disk,
- 		bs = (1 << 9);
++	*arg* is a pointer to a *cdrom_timed_media_change_info* struct.
++	*arg->last_media_change* may be set by calling code to signal
++	the timestamp of the last known media change (by the caller).
++	Upon successful return, this ioctl call will set
++	*arg->last_media_change* to the latest media change timestamp (in ms)
++	known by the kernel/driver and set *arg->has_changed* to 1 if
++	that timestamp is more recent than the timestamp set by the caller.
+ `CDROM_DRIVE_STATUS`
+ 	Returns the status of the drive by a call to
+ 	*drive_status()*. Return values are defined in cdrom_drive_status_.
+diff --git a/Documentation/ioctl/cdrom.rst b/Documentation/ioctl/cdrom.rst
+index 3b4c0506de46..bac5bbf93ca0 100644
+--- a/Documentation/ioctl/cdrom.rst
++++ b/Documentation/ioctl/cdrom.rst
+@@ -54,6 +54,9 @@ are as follows:
+ 	CDROM_SELECT_SPEED	Set the CD-ROM speed
+ 	CDROM_SELECT_DISC	Select disc (for juke-boxes)
+ 	CDROM_MEDIA_CHANGED	Check is media changed
++	CDROM_TIMED_MEDIA_CHANGE	Check if media changed
++					since given time
++					(struct cdrom_timed_media_change_info)
+ 	CDROM_DRIVE_STATUS	Get tray position, etc.
+ 	CDROM_DISC_STATUS	Get disc type, etc.
+ 	CDROM_CHANGER_NSLOTS	Get number of slots
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index ac42ae4651ce..0bc811a629e1 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -344,6 +344,12 @@ static void cdrom_sysctl_register(void);
+ 
+ static LIST_HEAD(cdrom_list);
+ 
++static void signal_media_change(struct cdrom_device_info *cdi)
++{
++	cdi->mc_flags = 0x3; /* set media changed bits, on both queues */
++	cdi->last_media_change_ms = ktime_to_ms(ktime_get());
++}
++
+ int cdrom_dummy_generic_packet(struct cdrom_device_info *cdi,
+ 			       struct packet_command *cgc)
+ {
+@@ -613,6 +619,7 @@ int register_cdrom(struct cdrom_device_info *cdi)
+ 	ENSURE(cdo, generic_packet, CDC_GENERIC_PACKET);
+ 	cdi->mc_flags = 0;
+ 	cdi->options = CDO_USE_FFLAGS;
++	cdi->last_media_change_ms = ktime_to_ms(ktime_get());
+ 
+ 	if (autoclose == 1 && CDROM_CAN(CDC_CLOSE_TRAY))
+ 		cdi->options |= (int) CDO_AUTO_CLOSE;
+@@ -1413,8 +1420,7 @@ static int cdrom_select_disc(struct cdrom_device_info *cdi, int slot)
+ 		cdi->ops->media_changed(cdi, slot);
+ 
+ 	if (slot == CDSL_NONE) {
+-		/* set media changed bits, on both queues */
+-		cdi->mc_flags = 0x3;
++		signal_media_change(cdi);
+ 		return cdrom_load_unload(cdi, -1);
  	}
  
--	blk_integrity_unregister(disk);
-+	if (blk_get_integrity(disk))
-+		blk_integrity_unregister(disk);
+@@ -1447,7 +1453,7 @@ static int cdrom_select_disc(struct cdrom_device_info *cdi, int slot)
+ 		slot = curslot;
  
- 	atomic_bs = phys_bs = bs;
- 	nvme_setup_streams_ns(ns->ctrl, ns, &phys_bs, &io_opt);
+ 	/* set media changed bits on both queues */
+-	cdi->mc_flags = 0x3;
++	signal_media_change(cdi);
+ 	if ((ret = cdrom_load_unload(cdi, slot)))
+ 		return ret;
+ 
+@@ -1516,7 +1522,7 @@ int media_changed(struct cdrom_device_info *cdi, int queue)
+ 		changed = cdi->ops->media_changed(cdi, CDSL_CURRENT);
+ 
+ 	if (changed) {
+-		cdi->mc_flags = 0x3;    /* set bit on both queues */
++		signal_media_change(cdi);
+ 		ret |= 1;
+ 		cdi->media_written = 0;
+ 	}
+@@ -2389,6 +2395,49 @@ static int cdrom_ioctl_media_changed(struct cdrom_device_info *cdi,
+ 	return ret;
+ }
+ 
++/*
++ * Media change detection with timing information.
++ *
++ * arg is a pointer to a cdrom_timed_media_change_info struct.
++ * arg->last_media_change may be set by calling code to signal
++ * the timestamp (in ms) of the last known media change (by the caller).
++ * Upon successful return, ioctl call will set arg->last_media_change
++ * to the latest media change timestamp known by the kernel/driver
++ * and set arg->has_changed to 1 if that timestamp is more recent
++ * than the timestamp set by the caller.
++ */
++static int cdrom_ioctl_timed_media_change(struct cdrom_device_info *cdi,
++		unsigned long arg)
++{
++	int ret;
++	struct cdrom_timed_media_change_info __user *info;
++	struct cdrom_timed_media_change_info tmp_info;
++
++	if (!CDROM_CAN(CDC_MEDIA_CHANGED))
++		return -ENOSYS;
++
++	info = (struct cdrom_timed_media_change_info __user *)arg;
++	cd_dbg(CD_DO_IOCTL, "entering CDROM_TIMED_MEDIA_CHANGE\n");
++
++	ret = cdrom_ioctl_media_changed(cdi, CDSL_CURRENT);
++	if (ret < 0)
++		return ret;
++
++	if (copy_from_user(&tmp_info, info, sizeof(tmp_info)) != 0)
++		return -EFAULT;
++
++	tmp_info.media_flags = 0;
++	if (tmp_info.last_media_change - cdi->last_media_change_ms < 0)
++		tmp_info.media_flags |= MEDIA_CHANGED_FLAG;
++
++	tmp_info.last_media_change = cdi->last_media_change_ms;
++
++	if (copy_to_user(info, &tmp_info, sizeof(*info)) != 0)
++		return -EFAULT;
++
++	return 0;
++}
++
+ static int cdrom_ioctl_set_options(struct cdrom_device_info *cdi,
+ 		unsigned long arg)
+ {
+@@ -3340,6 +3389,8 @@ int cdrom_ioctl(struct cdrom_device_info *cdi, struct block_device *bdev,
+ 		return cdrom_ioctl_eject_sw(cdi, arg);
+ 	case CDROM_MEDIA_CHANGED:
+ 		return cdrom_ioctl_media_changed(cdi, arg);
++	case CDROM_TIMED_MEDIA_CHANGE:
++		return cdrom_ioctl_timed_media_change(cdi, arg);
+ 	case CDROM_SET_OPTIONS:
+ 		return cdrom_ioctl_set_options(cdi, arg);
+ 	case CDROM_CLEAR_OPTIONS:
+diff --git a/include/linux/cdrom.h b/include/linux/cdrom.h
+index 528271c60018..165d2c803670 100644
+--- a/include/linux/cdrom.h
++++ b/include/linux/cdrom.h
+@@ -64,6 +64,7 @@ struct cdrom_device_info {
+ 	int for_data;
+ 	int (*exit)(struct cdrom_device_info *);
+ 	int mrw_mode_page;
++	__s64 last_media_change_ms;
+ };
+ 
+ struct cdrom_device_ops {
+diff --git a/include/uapi/linux/cdrom.h b/include/uapi/linux/cdrom.h
+index 2817230148fd..0c7043b5607f 100644
+--- a/include/uapi/linux/cdrom.h
++++ b/include/uapi/linux/cdrom.h
+@@ -147,6 +147,8 @@
+ #define CDROM_NEXT_WRITABLE	0x5394	/* get next writable block */
+ #define CDROM_LAST_WRITTEN	0x5395	/* get last block written on disc */
+ 
++#define CDROM_TIMED_MEDIA_CHANGE   0x5396  /* get the timestamp of the last media change */
++
+ /*******************************************************
+  * CDROM IOCTL structures
+  *******************************************************/
+@@ -292,6 +294,23 @@ struct cdrom_generic_command
+ 	void			__user *reserved[1];	/* unused, actually */
+ };
+ 
++/* This struct is used by CDROM_TIMED_MEDIA_CHANGE */
++struct cdrom_timed_media_change_info {
++	__s64	last_media_change;	/* Timestamp of the last detected media
++					 * change in ms. May be set by caller,
++					 * updated upon successful return of
++					 * ioctl.
++					 */
++	__u64	media_flags;		/* Flags returned by ioctl to indicate
++					 * media status.
++					 */
++};
++#define MEDIA_CHANGED_FLAG	0x1	/* Last detected media change was more \
++					 * recent than last_media_change set by\
++					 * caller.                             \
++					 */
++/* other bits of media_flags available for future use */
++
+ /*
+  * A CD-ROM physical sector size is 2048, 2052, 2056, 2324, 2332, 2336, 
+  * 2340, or 2352 bytes long.  
 -- 
-2.25.4
+2.25.1
 
