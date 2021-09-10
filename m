@@ -2,139 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E847C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:49:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F4AC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:50:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5278F611BD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:49:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7E5F611C0
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:50:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbhIJGuL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Sep 2021 02:50:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38756 "EHLO mail.kernel.org"
+        id S231237AbhIJGvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Sep 2021 02:51:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40592 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231223AbhIJGuK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Sep 2021 02:50:10 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9FA6960F9C;
-        Fri, 10 Sep 2021 06:48:59 +0000 (UTC)
+        id S231223AbhIJGvs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Sep 2021 02:51:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EC13F60F9C;
+        Fri, 10 Sep 2021 06:50:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1631256540;
-        bh=vXJAXbhhRVXEIInC57PKl2Etg+1VL0ZTnPPtyJWXfQE=;
+        s=korg; t=1631256637;
+        bh=JmXKbuN8Nd1iPptW4uq9nfAmi+t1fzNup71N0W0sBqQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=g3/0iqK+l0/n6VvnkF0pXW7nCoy+Qy8uqoRX55nHBcMT0rP5IStNe5aBlGnE1+QwB
-         kLAu3CKJ2LXdPiiA5s3jmDP6SeIBhDT57NHkAj562QrzcJhJlra+qy7kSITaDZ16MC
-         ITYahQcfTmvsQqQ49FxBdevomUXLMuf14NIXAujo=
-Date:   Fri, 10 Sep 2021 08:48:57 +0200
+        b=xjMEyol4EaF4x1VFpGpXgcJGDP9E7ajSXD2gWtagaRRO6+jyKjNpPp3ep/MuxSVA6
+         q0pudu9z82pv6aqR37GMvXre6TgWPIrScPeyb4pQGaSdP+uLKfR7IDae9WIoXAacLr
+         8qUxKdpW6JIad0V88Xg6+61hu9uqI/jUOFhUSFHU=
+Date:   Fri, 10 Sep 2021 08:50:34 +0200
 From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Ian Pilcher <arequipeno@gmail.com>
-Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kabel@kernel.org
-Subject: Re: [PATCH v2 11/15] leds: trigger: blkdev: Enable linking block
- devices to LEDs
-Message-ID: <YTr/2bflThomjHqL@kroah.com>
-References: <20210909222513.2184795-1-arequipeno@gmail.com>
- <20210909222513.2184795-12-arequipeno@gmail.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Yi Zhang <yi.zhang@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>, stable@vger.kernel.org
+Subject: Re: [bug report] NULL pointer at blk_mq_put_rq_ref+0x20/0xb4
+ observed with blktests on 5.13.15
+Message-ID: <YTsAOtychCR8m3WA@kroah.com>
+References: <CAHj4cs-noupgFn3QjB96Z20hv-BhFLHOyFZFEtrhGpESkeoRSA@mail.gmail.com>
+ <CAFj5m9J4sxRwQb7+nHzYOurX9QRpEgsEMCqdx4SHA4THnsJXBA@mail.gmail.com>
+ <YTnc5Ja/DKR30Euy@kroah.com>
+ <YTq4QFWexPF9aQvG@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210909222513.2184795-12-arequipeno@gmail.com>
+In-Reply-To: <YTq4QFWexPF9aQvG@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 09, 2021 at 05:25:09PM -0500, Ian Pilcher wrote:
-> Add /sys/class/leds/<led>/link_device sysfs attribute
+On Fri, Sep 10, 2021 at 09:43:28AM +0800, Ming Lei wrote:
+> On Thu, Sep 09, 2021 at 12:07:32PM +0200, Greg KH wrote:
+> > On Thu, Sep 09, 2021 at 05:14:18PM +0800, Ming Lei wrote:
+> > > On Thu, Sep 9, 2021 at 4:47 PM Yi Zhang <yi.zhang@redhat.com> wrote:
+> > > >
+> > > > Hello
+> > > >
+> > > > I found this issue with blktests on[1], did we miss some patch on stable?
+> > > > [1]
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
+> > > > queue/5.13
+> > > >
+> > > > [   68.989907] run blktests block/006 at 2021-09-09 04:34:35
+> > > > [   69.085724] null_blk: module loaded
+> > > > [   74.271624] Unable to handle kernel NULL pointer dereference at
+> > > > virtual address 00000000000002b8
+> > > > [   74.280414] Mem abort info:
+> > > > [   74.283195]   ESR = 0x96000004
+> > > > [   74.286245]   EC = 0x25: DABT (current EL), IL = 32 bits
+> > > > [   74.291545]   SET = 0, FnV = 0
+> > > > [   74.294587]   EA = 0, S1PTW = 0
+> > > > [   74.297720] Data abort info:
+> > > > [   74.300588]   ISV = 0, ISS = 0x00000004
+> > > > [   74.304411]   CM = 0, WnR = 0
+> > > > [   74.307368] user pgtable: 4k pages, 48-bit VAs, pgdp=000008004366e000
+> > > > [   74.313796] [00000000000002b8] pgd=0000000000000000, p4d=0000000000000000
+> > > > [   74.320577] Internal error: Oops: 96000004 [#1] SMP
+> > > > [   74.325443] Modules linked in: null_blk mlx5_ib ib_uverbs ib_core
+> > > > rfkill sunrpc vfat fat joydev acpi_ipmi ipmi_ssif cdc_ether usbnet mii
+> > > > mlx5_core psample ipmi_devintf mlxfw tls ipmi_msghandler arm_cmn
+> > > > cppc_cpufreq arm_dsu_pmu acpi_tad fuse zram ip_tables xfs ast
+> > > > i2c_algo_bit drm_vram_helper drm_kms_helper crct10dif_ce syscopyarea
+> > > > ghash_ce sysfillrect uas sysimgblt sbsa_gwdt fb_sys_fops cec
+> > > > drm_ttm_helper ttm nvme usb_storage nvme_core drm xgene_hwmon
+> > > > aes_neon_bs
+> > > > [   74.366458] CPU: 31 PID: 2511 Comm: fio Not tainted 5.13.15+ #1
+> > > 
+> > > Looks the fixes haven't land on linux-5.13.y:
+> > > 
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a9ed27a764156929efe714033edb3e9023c5f321
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c2da19ed50554ce52ecbad3655c98371fe58599f
+> > 
+> > Now queued up.  Someone could have told us they were needed :)
 > 
-> If this is the first LED associated with the device, create the
-> /sys/block/<disk>/blkdev_leds directory.  Otherwise, increment its
-> reference count.
+> Thanks for queuing it up, sorry for not Cc stable.
 > 
-> Create symlinks in /sys/class/leds/<led>/block_devices and
-> /sys/block/<disk>/blkdev_leds
+> BTW, the following two patches are missed too in linux-5.13-y:
 > 
-> If this the first device associated with *any* LED, schedule delayed work
-> to periodically check associated devices and blink LEDs
-> 
-> Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
-> ---
->  drivers/leds/trigger/ledtrig-blkdev.c | 160 ++++++++++++++++++++++++++
->  1 file changed, 160 insertions(+)
-> 
-> diff --git a/drivers/leds/trigger/ledtrig-blkdev.c b/drivers/leds/trigger/ledtrig-blkdev.c
-> index 6f78a9515976..26509837f037 100644
-> --- a/drivers/leds/trigger/ledtrig-blkdev.c
-> +++ b/drivers/leds/trigger/ledtrig-blkdev.c
-> @@ -71,6 +71,9 @@ static unsigned int ledtrig_blkdev_interval;
->  static void blkdev_process(struct work_struct *const work);
->  static DECLARE_DELAYED_WORK(ledtrig_blkdev_work, blkdev_process);
->  
-> +/* Total number of device-to-LED associations */
-> +static unsigned int ledtrig_blkdev_count;
-> +
->  
->  /*
->   *
-> @@ -220,6 +223,162 @@ static int blkdev_activate(struct led_classdev *const led_dev)
->  }
->  
->  
-> +/*
-> + *
-> + *	link_device sysfs attribute - assocate a block device with this LED
-> + *
-> + */
-> +
-> +/* Gets or allocs & initializes the blkdev disk for a gendisk */
-> +static int blkdev_get_disk(struct gendisk *const gd)
-> +{
-> +	struct ledtrig_blkdev_disk *disk;
-> +	struct kobject *dir;
-> +
-> +	if (gd->ledtrig != NULL) {
-> +		kobject_get(gd->ledtrig->dir);
+> 364b61818f65 blk-mq: clearing flush request reference in tags->rqs[]
 
-When do you decrement this kobject?
+This one applies, but,
 
-> +		return 0;
-> +	}
-> +
-> +	disk = kmalloc(sizeof(*disk), GFP_KERNEL);
-> +	if (disk == NULL)
-> +		return -ENOMEM;
-> +
-> +	dir = kobject_create_and_add("linked_leds", &disk_to_dev(gd)->kobj);
-> +	if (dir == NULL) {
-> +		kfree(disk);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	INIT_HLIST_HEAD(&disk->leds);
-> +	disk->gd = gd;
-> +	disk->dir = dir;
-> +	disk->read_ios = 0;
-> +	disk->write_ios = 0;
-> +
-> +	gd->ledtrig = disk;
-> +
-> +	return 0;
-> +}
-> +
-> +static void blkdev_put_disk(struct ledtrig_blkdev_disk *const disk)
-> +{
-> +	kobject_put(disk->dir);
-> +
-> +	if (hlist_empty(&disk->leds)) {
-> +		disk->gd->ledtrig = NULL;
-> +		kfree(disk);
+> bd63141d585b blk-mq: clear stale request in tags->rq[] before freeing one request pool
 
-This should happen in the kobject release function, not here, right?
+This one does not.
 
-Did you try this out with removable block devices yet?
+Please provide working backports for both of these if you want to see
+them merged into the stable trees.  And what about 5.10 for them as
+well?
 
 thanks,
 
