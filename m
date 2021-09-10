@@ -2,108 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44463C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E19C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:45:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21BA461186
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:44:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75D4D611B0
+	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 06:45:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbhIJGpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Sep 2021 02:45:46 -0400
-Received: from smtp25.cstnet.cn ([159.226.251.25]:38372 "EHLO cstnet.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231223AbhIJGpq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Sep 2021 02:45:46 -0400
-Received: from localhost.localdomain (unknown [124.16.141.243])
-        by APP-05 (Coremail) with SMTP id zQCowAA3GKG__jphrh4RAA--.18302S2;
-        Fri, 10 Sep 2021 14:44:15 +0800 (CST)
-From:   Xu Wang <vulab@iscas.ac.cn>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] blk-zoned: Remove needless request_queue NULL pointer checks
-Date:   Fri, 10 Sep 2021 06:44:12 +0000
-Message-Id: <20210910064412.80446-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: zQCowAA3GKG__jphrh4RAA--.18302S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CrWrGFy7GFy8WFW8GryDWrg_yoW8XryDpF
-        y5Ga4SkrW0grWIgFy8t3WUJrnFgw42kw4xJayxJ34Sy3y3try2vFn5Zr1jvrWFkrWkGF4U
-        uryjqF90qr1UCFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkSb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-        A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
-        jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
-        8E87Iv6xkF7I0E14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWrXwAv7VC2z280aVAFwI0_Gr1j6F
-        4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc2xSY4AK67AK6r47MxAI
-        w28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr
-        4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUXVWUAwCIc40Y0x0EwIxG
-        rwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8Jw
-        CI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY
-        6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUxqXdUUUUU
-X-Originating-IP: [124.16.141.243]
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCQoAA102ag5bSAABsd
+        id S231255AbhIJGqT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Sep 2021 02:46:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34178 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231223AbhIJGqT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Sep 2021 02:46:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 71E3E6109F;
+        Fri, 10 Sep 2021 06:45:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1631256308;
+        bh=zs4kHzRc2dEOg/Ypc3inBLRklRqv/MDp+aMdgAMUJvo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=arZpI6Vbkd1Q4i3uXv3VOMwXkAB9fZUzJYRhC8canCV48cmeaid4vVaHL6S35gBYk
+         1r2JfmDm9NFy+1X6JVvhICj3bQFHl/EVf52LImze8YXwP8PGLdAUmQV84ndyDMvxTv
+         NXCgtswiAFDW6aYrzFAElN/he9LdzZHmHPxjjlG0=
+Date:   Fri, 10 Sep 2021 08:45:06 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Ian Pilcher <arequipeno@gmail.com>
+Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kabel@kernel.org
+Subject: Re: [PATCH v2 06/15] leds: trigger: blkdev: Add function to get
+ gendisk by name
+Message-ID: <YTr+8h12z7kMLlV/@kroah.com>
+References: <20210909222513.2184795-1-arequipeno@gmail.com>
+ <20210909222513.2184795-7-arequipeno@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210909222513.2184795-7-arequipeno@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The request_queue pointer returned from bdev_get_queue() shall
-never be NULL, so the NULL checks are unnecessary, just remove them.
+On Thu, Sep 09, 2021 at 05:25:04PM -0500, Ian Pilcher wrote:
+> Add ledtrig_blkdev_get_disk() to find block device by name and increment
+> its reference count.  (Caller must call put_disk().)  Must be built-in to
+> access block_class and disk_type symbols.
+> 
+> Signed-off-by: Ian Pilcher <arequipeno@gmail.com>
+> ---
+>  drivers/leds/trigger/ledtrig-blkdev-core.c | 20 ++++++++++++++++++++
+>  drivers/leds/trigger/ledtrig-blkdev.h      |  3 +++
+>  2 files changed, 23 insertions(+)
+> 
+> diff --git a/drivers/leds/trigger/ledtrig-blkdev-core.c b/drivers/leds/trigger/ledtrig-blkdev-core.c
+> index d7b02e760b06..5fd741aa14a6 100644
+> --- a/drivers/leds/trigger/ledtrig-blkdev-core.c
+> +++ b/drivers/leds/trigger/ledtrig-blkdev-core.c
+> @@ -33,3 +33,23 @@ void ledtrig_blkdev_disk_cleanup(struct gendisk *const gd)
+>  
+>  	mutex_unlock(&ledtrig_blkdev_mutex);
+>  }
+> +
+> +/* class_find_device() callback.  Must be built-in to access disk_type. */
+> +static int blkdev_match_name(struct device *const dev, const void *const name)
+> +{
+> +	return dev->type == &disk_type
+> +			&& sysfs_streq(dev_to_disk(dev)->disk_name, name);
+> +}
+> +
+> +/* Must be built-in to access block_class */
+> +struct gendisk *ledtrig_blkdev_get_disk(const char *const name)
+> +{
+> +	struct device *dev;
+> +
+> +	dev = class_find_device(&block_class, NULL, name, blkdev_match_name);
+> +	if (dev == NULL)
+> +		return NULL;
 
-Signed-off-by: Xu Wang <vulab@iscas.ac.cn>
-Changes since v2:
-- Make the q variable assignment together with declaration.
----
- block/blk-zoned.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+You now have bumped the reference count on this structure.  Where do you
+decrement it when you are finished with it?
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 1d0c76c18fc5..a406ead05ab7 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -346,17 +346,13 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
- {
- 	void __user *argp = (void __user *)arg;
- 	struct zone_report_args args;
--	struct request_queue *q;
-+	struct request_queue *q = dev_get_queue(bdev);
- 	struct blk_zone_report rep;
- 	int ret;
- 
- 	if (!argp)
- 		return -EINVAL;
- 
--	q = bdev_get_queue(bdev);
--	if (!q)
--		return -ENXIO;
--
- 	if (!blk_queue_is_zoned(q))
- 		return -ENOTTY;
- 
-@@ -403,7 +399,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
- 			   unsigned int cmd, unsigned long arg)
- {
- 	void __user *argp = (void __user *)arg;
--	struct request_queue *q;
-+	struct request_queue *q = bdev_get_queue(bdev);
- 	struct blk_zone_range zrange;
- 	enum req_opf op;
- 	int ret;
-@@ -411,10 +407,6 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
- 	if (!argp)
- 		return -EINVAL;
- 
--	q = bdev_get_queue(bdev);
--	if (!q)
--		return -ENXIO;
--
- 	if (!blk_queue_is_zoned(q))
- 		return -ENOTTY;
- 
--- 
-2.17.1
+thanks,
 
+greg k-h
