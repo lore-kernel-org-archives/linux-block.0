@@ -2,74 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D18C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98947C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 01:41:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8023F61074
-	for <linux-block@archiver.kernel.org>; Fri, 10 Sep 2021 21:41:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7053E611AD
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 01:41:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233100AbhIJVm4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Sep 2021 17:42:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42242 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbhIJVm4 (ORCPT
+        id S235088AbhIKBmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Sep 2021 21:42:23 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:9028 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231864AbhIKBmU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Sep 2021 17:42:56 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 990B3C061574;
-        Fri, 10 Sep 2021 14:41:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=leZ9gAJesxiaYyECvXAC95tfjrMi+xyfNBHPusNmXhc=; b=jOxNEkflIY8q+uoW+nXRu9FQ7U
-        nFWTvXtl1dJ9Pdrc9LEPeJMj6UZYxV45Kbrks3XU1zNWuNHv7P/xx3oeYZ5zY0wPTPNZm8YiNSbKJ
-        /I/GJbGoeqCrx83c/VDLP24V7Wy9FePPlXS4m4OP8fOma/KSJ9QB9Hd5bpc1cPbw2zEDp25wMk66X
-        pWz6S+8VNX+Mv6ePijXJdLrwWLLnj/jzSXs8gP5kG/k/4HSmFmY08LNzNIWtTKAiCGeLYH7077uX8
-        PdaX1OJM0a/1qAxKBUkSIjZyAsN2m3eOTA3c/rSQyjB4vNt2zLcj9/gjYCNOuIdF/9wS2gSs+DvBq
-        e/wW9kow==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mOoHH-00DtxH-El; Fri, 10 Sep 2021 21:41:43 +0000
-Subject: Re: [PATCH v3] drivers/cdrom: improved ioctl for media change
- detection
-To:     Lukas Prediger <lumip@lumip.de>, phil@philpotter.co.uk
-Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, hch@infradead.org
-References: <20210910211600.5663-1-lumip@lumip.de>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <e3efb5ea-0884-c02a-cb81-408ec421463d@infradead.org>
-Date:   Fri, 10 Sep 2021 14:41:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Fri, 10 Sep 2021 21:42:20 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4H5wRH077jzVmty;
+        Sat, 11 Sep 2021 09:40:11 +0800 (CST)
+Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Sat, 11 Sep 2021 09:41:06 +0800
+Received: from [10.174.185.179] (10.174.185.179) by
+ dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Sat, 11 Sep 2021 09:41:04 +0800
+Subject: Re: [PATCH] scsi: bsg: Fix device unregistration
+To:     Johan Hovold <johan@kernel.org>
+CC:     <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <fujita.tomonori@lab.ntt.co.jp>,
+        <axboe@kernel.dk>, <martin.petersen@oracle.com>, <hch@lst.de>,
+        <gregkh@linuxfoundation.org>, <wanghaibin.wang@huawei.com>
+References: <20210909034608.1435-1-yuzenghui@huawei.com>
+ <YTtTU4+DZEb4WRkR@hovoldconsulting.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <0506e034-e186-a73b-3046-6b0e1f397756@huawei.com>
+Date:   Sat, 11 Sep 2021 09:41:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20210910211600.5663-1-lumip@lumip.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <YTtTU4+DZEb4WRkR@hovoldconsulting.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggema764-chm.china.huawei.com (10.1.198.206)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Lukas,
+On 2021/9/10 20:45, Johan Hovold wrote:
+> On Thu, Sep 09, 2021 at 11:46:08AM +0800, Zenghui Yu wrote:
 
-Just a minor nit:
+>> @@ -218,6 +226,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
+>>  out_device_del:
+>>  	cdev_device_del(&bd->cdev, &bd->device);
+>>  out_ida_remove:
+>> +	put_device(&bd->device);
+>>  	ida_simple_remove(&bsg_minor_ida, MINOR(bd->device.devt));
+>>  out_kfree:
+>>  	kfree(bd);
+> 
+> Ehh, what about the blatant use-after-free and double-free you just
+> added here?
 
-On 9/10/21 2:16 PM, Lukas Prediger wrote:
-> +#define MEDIA_CHANGED_FLAG	0x1	/* Last detected media change was more \
-> +					 * recent than last_media_change set by\
-> +					 * caller.                             \
-> +					 */
+Yeah, whoops. That's definitely wrong. I'm squash the following fix
+in this patch.
 
-Drop the "continuation" backslashes.
-They are not needed.
+Thanks for the heads up!
 
-thanks.
--- 
-~Randy
-
+|diff --git a/block/bsg.c b/block/bsg.c
+|index c3bb92b9af7e..882f56bff14f 100644
+|--- a/block/bsg.c
+|+++ b/block/bsg.c
+|@@ -200,7 +200,8 @@ struct bsg_device *bsg_register_queue(struct 
+request_queue *q,
+|        if (ret < 0) {
+|                if (ret == -ENOSPC)
+|                        dev_err(parent, "bsg: too many bsg devices\n");
+|-               goto out_kfree;
+|+               kfree(bd);
+|+               return ERR_PTR(ret);
+|        }
+|        bd->device.devt = MKDEV(bsg_major, ret);
+|        bd->device.class = bsg_class;
+|@@ -213,7 +214,7 @@ struct bsg_device *bsg_register_queue(struct 
+request_queue *q,
+|        bd->cdev.owner = THIS_MODULE;
+|        ret = cdev_device_add(&bd->cdev, &bd->device);
+|        if (ret)
+|-               goto out_ida_remove;
+|+               goto out_put_device;
+|
+|        if (q->kobj.sd) {
+|                ret = sysfs_create_link(&q->kobj, &bd->device.kobj, "bsg");
+|@@ -225,11 +226,8 @@ struct bsg_device *bsg_register_queue(struct 
+request_queue *q,
+|
+| out_device_del:
+|        cdev_device_del(&bd->cdev, &bd->device);
+|-out_ida_remove:
+|+out_put_device:
+|        put_device(&bd->device);
+|-       ida_simple_remove(&bsg_minor_ida, MINOR(bd->device.devt));
+|-out_kfree:
+|-       kfree(bd);
+|        return ERR_PTR(ret);
+| }
+| EXPORT_SYMBOL_GPL(bsg_register_queue);
