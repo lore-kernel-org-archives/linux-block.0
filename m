@@ -2,173 +2,198 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2169FC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 21:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D97C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 22:01:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9A1B611AD
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 21:47:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94D5C60F38
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 22:01:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231441AbhIKVsz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Sep 2021 17:48:55 -0400
-Received: from mail-pj1-f54.google.com ([209.85.216.54]:51058 "EHLO
-        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231415AbhIKVsz (ORCPT
+        id S231295AbhIKWCb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Sep 2021 18:02:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229800AbhIKWCb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Sep 2021 17:48:55 -0400
-Received: by mail-pj1-f54.google.com with SMTP id k23so3724767pji.0
-        for <linux-block@vger.kernel.org>; Sat, 11 Sep 2021 14:47:42 -0700 (PDT)
+        Sat, 11 Sep 2021 18:02:31 -0400
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28941C061574
+        for <linux-block@vger.kernel.org>; Sat, 11 Sep 2021 15:01:18 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id b15so5503373ils.10
+        for <linux-block@vger.kernel.org>; Sat, 11 Sep 2021 15:01:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=tQSkm6tCbl9Wf/cyiD5+MIIKsbApY2RlMKuMatkf1ZY=;
+        b=jpaMkAttgkd0x1sc8sa//V9ndlQx7vYA2oKsOFoaijSGFp4H1lTzzqV0mBezfRXVpj
+         9WWYiVftNrcZtLLaISHuEpV32JsgKGtWtjYJpKO/kkzumy2ag9m5U8P4b6OGzwp2H63L
+         7tELljXb1jlIwrfGmMec+VfsvqcYbtl/N0VFTs9fUdZY9XAX9OhSyxXzEA8yyoYpXtX4
+         wZzjJoNfLZve+R71JiHSQdFDvAd1onJ6jOlk2eabHWAqzRyP8Sdms4sAUaH+8e9J4RL6
+         ugJPCLCXgRZjZGEBW1DT0wvYTxLVi2LGthHtTencbBaUo0uMGFllBaaEid2b8A6H7pJ0
+         WGjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=duU6elpbWThTuSplJOTkl7u0agKkufdEWYuSm3PD6iU=;
-        b=S+Rah8ErYG5K33CGhdmWaA/sm1eqRh7p2mkzVDvvT2ntyw0VuD3Qmtp9OQ+T+XeUrA
-         fpwWvXB5fISYjLT6GP5Wrr1ZUbeKFTW7xBco0DgO8XgNBjAaRDS3+5C5LuYRLH4rufiJ
-         avF1PX+aIE82hv27jg3reHHWo/5afpR5Wo5PHoyk1qg1yHUEorIWjDQVHN87UgMhEbzT
-         2hi2vxpzdgYehwZyud9qASfvjGwKzzdcCcm9yswO4o1M2x/tbov86AgRcaL87j3FWZAV
-         ePwEmdEmmwJJzFPKZ5xMNfjtDZCpEZKymDB/7WjhESjgpguqsl2glpYD0x/txnfJO1zT
-         B34g==
-X-Gm-Message-State: AOAM530zNpHju8Q/iRo0G9nTK1O9gjPGcybztPum5FdyrUObws25X2L0
-        Z2yo+iKFUYngxfVxwAKNxxg=
-X-Google-Smtp-Source: ABdhPJwTQ9i0VaPluB/gHgtcNMlDBwu//uTOJOgVcH/IMXLCXQVaCNMdyhv3wEnW8m518cCzeStUXA==
-X-Received: by 2002:a17:902:ce84:b0:138:9422:512e with SMTP id f4-20020a170902ce8400b001389422512emr3964235plg.12.1631396861554;
-        Sat, 11 Sep 2021 14:47:41 -0700 (PDT)
-Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:8e23:83c0:a404:a54f])
-        by smtp.gmail.com with ESMTPSA id d3sm2577786pjc.49.2021.09.11.14.47.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Sep 2021 14:47:40 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH] block: Optimize bio_init()
-Date:   Sat, 11 Sep 2021 14:47:34 -0700
-Message-Id: <20210911214734.4692-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.33.0
+        bh=tQSkm6tCbl9Wf/cyiD5+MIIKsbApY2RlMKuMatkf1ZY=;
+        b=8GNTggc9nPBwDtxeFeaTs2aNCbNO2ATjbuvWgnjDeXK4gGYZf9zstYJx4JmTRt0bCW
+         WwA6FSW5d+jiH3faE2WPhL7Y3e12qTfvpOFTEFw+qRSnaOqHpSpvt93l1iBzNV0XVFiV
+         SDhvd6nKbD6nsxPKd4mf8lTgT4CLK0kVki2DGR2Sr+RFrnXqt4p0xPdwe894nRAEgPOB
+         6ekvt5tVEbKU8ARZzD3gncoc6rxLDxaHsmwqsQo8aLyDAE0JaTGJa4PLYT7xmCiaQc6B
+         gD0a6XPaBuBCrThvDulhfEtQyRnZJ0pnQH+VwmRz5sJ2cUbfFgYLCdc7X5Hy7Hf6cTgi
+         bggw==
+X-Gm-Message-State: AOAM533P3xvK/J9lxZjskNJjRBJt7bvTXObym4xv6nNCModQuhk3zljD
+        VWj+EOkxjk1ptPRl21SVQzFTcQ==
+X-Google-Smtp-Source: ABdhPJxNrCFovEy9MlSgaJYElflh/c0wSpbpImYIkAhUq59DyHACAqk6gXcOEqQYqjaiv88ZGad6Zg==
+X-Received: by 2002:a92:ca84:: with SMTP id t4mr2571339ilo.41.1631397677327;
+        Sat, 11 Sep 2021 15:01:17 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id h11sm1620128ilc.7.2021.09.11.15.01.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 11 Sep 2021 15:01:16 -0700 (PDT)
+Subject: Re: [PATCH] block: Optimize bio_init()
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20210911214734.4692-1-bvanassche@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c61afcb0-dcee-8c02-d216-58f263093951@kernel.dk>
+Date:   Sat, 11 Sep 2021 16:01:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210911214734.4692-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following test:
+On 9/11/21 3:47 PM, Bart Van Assche wrote:
+> The following test:
+> 
+> sudo taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 /dev/nullb0
+> 
+> reports 1366 K IOPS on my test setup without this patch and 1380 K IOPS
+> with this patch applied. In other words, this patch realizes a 1%
+> performance improvement. I think this is because this patch makes the
+> compiler generate better code. See also commit da521626ac62 ("bio:
+> optimize initialization of a bio").
+> 
+> The assembler code generated by gcc without this patch is as follows:
+> 
+>    0x0000000000000000 <+0>:     call   0x5 <bio_init+5>
+>    0x0000000000000005 <+5>:     xor    %eax,%eax
+>    0x0000000000000007 <+7>:     xor    %ecx,%ecx
+>    0x0000000000000009 <+9>:     movl   $0x1,0x1c(%rdi)
+>    0x0000000000000010 <+16>:    movq   $0x0,(%rdi)
+>    0x0000000000000017 <+23>:    movq   $0x0,0x8(%rdi)
+>    0x000000000000001f <+31>:    movq   $0x0,0x10(%rdi)
+>    0x0000000000000027 <+39>:    mov    %ax,0x18(%rdi)
+>    0x000000000000002b <+43>:    movb   $0x0,0x1a(%rdi)
+>    0x000000000000002f <+47>:    movq   $0x0,0x20(%rdi)
+>    0x0000000000000037 <+55>:    movq   $0x0,0x28(%rdi)
+>    0x000000000000003f <+63>:    movl   $0x0,0x30(%rdi)
+>    0x0000000000000046 <+70>:    movq   $0x0,0x38(%rdi)
+>    0x000000000000004e <+78>:    movq   $0x0,0x40(%rdi)
+>    0x0000000000000056 <+86>:    movq   $0x0,0x48(%rdi)
+>    0x000000000000005e <+94>:    movq   $0x0,0x50(%rdi)
+>    0x0000000000000066 <+102>:   movq   $0x0,0x58(%rdi)
+>    0x000000000000006e <+110>:   movq   $0x0,0x60(%rdi)
+>    0x0000000000000076 <+118>:   mov    %cx,0x68(%rdi)
+>    0x000000000000007a <+122>:   movl   $0x1,0x6c(%rdi)
+>    0x0000000000000081 <+129>:   mov    %dx,0x6a(%rdi)
+>    0x0000000000000085 <+133>:   mov    %rsi,0x70(%rdi)
+>    0x0000000000000089 <+137>:   movq   $0x0,0x78(%rdi)
+>    0x0000000000000091 <+145>:   ret
+> 
+> With this patch bio_init() is compiled into the following assembly code:
+> 
+>    0x0000000000000000 <+0>:     call   0x5 <bio_init+5>
+>    0x0000000000000005 <+5>:     mov    %rdi,%r8
+>    0x0000000000000008 <+8>:     mov    $0x10,%ecx
+>    0x000000000000000d <+13>:    xor    %eax,%eax
+>    0x000000000000000f <+15>:    rep stos %rax,%es:(%rdi)
+>    0x0000000000000012 <+18>:    movl   $0x1,0x1c(%r8)
+>    0x000000000000001a <+26>:    mov    %dx,0x6a(%r8)
+>    0x000000000000001f <+31>:    movl   $0x1,0x6c(%r8)
+>    0x0000000000000027 <+39>:    mov    %rsi,0x70(%r8)
+>    0x000000000000002b <+43>:    ret
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/bio.c | 45 ++++++++-------------------------------------
+>  1 file changed, 8 insertions(+), 37 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 5df3dd282e40..775cd4274523 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -244,47 +244,18 @@ static void bio_free(struct bio *bio)
+>  }
+>  
+>  /*
+> - * Users of this function have their own bio allocation. Subsequently,
+> - * they must remember to pair any call to bio_init() with bio_uninit()
+> - * when IO has completed, or when the bio is released.
+> + * Users of this function must pair any call to bio_init() with a call to
+> + * bio_uninit() after IO has completed or when the bio is released.
+>   */
+>  void bio_init(struct bio *bio, struct bio_vec *table,
+>  	      unsigned short max_vecs)
+>  {
+> -	bio->bi_next = NULL;
+> -	bio->bi_bdev = NULL;
+> -	bio->bi_opf = 0;
+> -	bio->bi_flags = 0;
+> -	bio->bi_ioprio = 0;
+> -	bio->bi_write_hint = 0;
+> -	bio->bi_status = 0;
+> -	bio->bi_iter.bi_sector = 0;
+> -	bio->bi_iter.bi_size = 0;
+> -	bio->bi_iter.bi_idx = 0;
+> -	bio->bi_iter.bi_bvec_done = 0;
+> -	bio->bi_end_io = NULL;
+> -	bio->bi_private = NULL;
+> -#ifdef CONFIG_BLK_CGROUP
+> -	bio->bi_blkg = NULL;
+> -	bio->bi_issue.value = 0;
+> -#ifdef CONFIG_BLK_CGROUP_IOCOST
+> -	bio->bi_iocost_cost = 0;
+> -#endif
+> -#endif
+> -#ifdef CONFIG_BLK_INLINE_ENCRYPTION
+> -	bio->bi_crypt_context = NULL;
+> -#endif
+> -#ifdef CONFIG_BLK_DEV_INTEGRITY
+> -	bio->bi_integrity = NULL;
+> -#endif
+> -	bio->bi_vcnt = 0;
+> -
+> -	atomic_set(&bio->__bi_remaining, 1);
+> -	atomic_set(&bio->__bi_cnt, 1);
+> -
+> -	bio->bi_max_vecs = max_vecs;
+> -	bio->bi_io_vec = table;
+> -	bio->bi_pool = NULL;
+> +	*bio = (struct bio) {
+> +		.__bi_remaining	= ATOMIC_INIT(1),
+> +		.__bi_cnt	= ATOMIC_INIT(1),
+> +		.bi_max_vecs	= max_vecs,
+> +		.bi_io_vec	= table,
+> +	};
+>  }
 
-sudo taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 /dev/nullb0
+I'll give this a whirl too, another upside is that it's less prone to
+errors if struct bio is changed.
 
-reports 1366 K IOPS on my test setup without this patch and 1380 K IOPS
-with this patch applied. In other words, this patch realizes a 1%
-performance improvement. I think this is because this patch makes the
-compiler generate better code. See also commit da521626ac62 ("bio:
-optimize initialization of a bio").
+-- 
+Jens Axboe
 
-The assembler code generated by gcc without this patch is as follows:
-
-   0x0000000000000000 <+0>:     call   0x5 <bio_init+5>
-   0x0000000000000005 <+5>:     xor    %eax,%eax
-   0x0000000000000007 <+7>:     xor    %ecx,%ecx
-   0x0000000000000009 <+9>:     movl   $0x1,0x1c(%rdi)
-   0x0000000000000010 <+16>:    movq   $0x0,(%rdi)
-   0x0000000000000017 <+23>:    movq   $0x0,0x8(%rdi)
-   0x000000000000001f <+31>:    movq   $0x0,0x10(%rdi)
-   0x0000000000000027 <+39>:    mov    %ax,0x18(%rdi)
-   0x000000000000002b <+43>:    movb   $0x0,0x1a(%rdi)
-   0x000000000000002f <+47>:    movq   $0x0,0x20(%rdi)
-   0x0000000000000037 <+55>:    movq   $0x0,0x28(%rdi)
-   0x000000000000003f <+63>:    movl   $0x0,0x30(%rdi)
-   0x0000000000000046 <+70>:    movq   $0x0,0x38(%rdi)
-   0x000000000000004e <+78>:    movq   $0x0,0x40(%rdi)
-   0x0000000000000056 <+86>:    movq   $0x0,0x48(%rdi)
-   0x000000000000005e <+94>:    movq   $0x0,0x50(%rdi)
-   0x0000000000000066 <+102>:   movq   $0x0,0x58(%rdi)
-   0x000000000000006e <+110>:   movq   $0x0,0x60(%rdi)
-   0x0000000000000076 <+118>:   mov    %cx,0x68(%rdi)
-   0x000000000000007a <+122>:   movl   $0x1,0x6c(%rdi)
-   0x0000000000000081 <+129>:   mov    %dx,0x6a(%rdi)
-   0x0000000000000085 <+133>:   mov    %rsi,0x70(%rdi)
-   0x0000000000000089 <+137>:   movq   $0x0,0x78(%rdi)
-   0x0000000000000091 <+145>:   ret
-
-With this patch bio_init() is compiled into the following assembly code:
-
-   0x0000000000000000 <+0>:     call   0x5 <bio_init+5>
-   0x0000000000000005 <+5>:     mov    %rdi,%r8
-   0x0000000000000008 <+8>:     mov    $0x10,%ecx
-   0x000000000000000d <+13>:    xor    %eax,%eax
-   0x000000000000000f <+15>:    rep stos %rax,%es:(%rdi)
-   0x0000000000000012 <+18>:    movl   $0x1,0x1c(%r8)
-   0x000000000000001a <+26>:    mov    %dx,0x6a(%r8)
-   0x000000000000001f <+31>:    movl   $0x1,0x6c(%r8)
-   0x0000000000000027 <+39>:    mov    %rsi,0x70(%r8)
-   0x000000000000002b <+43>:    ret
-
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/bio.c | 45 ++++++++-------------------------------------
- 1 file changed, 8 insertions(+), 37 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 5df3dd282e40..775cd4274523 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -244,47 +244,18 @@ static void bio_free(struct bio *bio)
- }
- 
- /*
-- * Users of this function have their own bio allocation. Subsequently,
-- * they must remember to pair any call to bio_init() with bio_uninit()
-- * when IO has completed, or when the bio is released.
-+ * Users of this function must pair any call to bio_init() with a call to
-+ * bio_uninit() after IO has completed or when the bio is released.
-  */
- void bio_init(struct bio *bio, struct bio_vec *table,
- 	      unsigned short max_vecs)
- {
--	bio->bi_next = NULL;
--	bio->bi_bdev = NULL;
--	bio->bi_opf = 0;
--	bio->bi_flags = 0;
--	bio->bi_ioprio = 0;
--	bio->bi_write_hint = 0;
--	bio->bi_status = 0;
--	bio->bi_iter.bi_sector = 0;
--	bio->bi_iter.bi_size = 0;
--	bio->bi_iter.bi_idx = 0;
--	bio->bi_iter.bi_bvec_done = 0;
--	bio->bi_end_io = NULL;
--	bio->bi_private = NULL;
--#ifdef CONFIG_BLK_CGROUP
--	bio->bi_blkg = NULL;
--	bio->bi_issue.value = 0;
--#ifdef CONFIG_BLK_CGROUP_IOCOST
--	bio->bi_iocost_cost = 0;
--#endif
--#endif
--#ifdef CONFIG_BLK_INLINE_ENCRYPTION
--	bio->bi_crypt_context = NULL;
--#endif
--#ifdef CONFIG_BLK_DEV_INTEGRITY
--	bio->bi_integrity = NULL;
--#endif
--	bio->bi_vcnt = 0;
--
--	atomic_set(&bio->__bi_remaining, 1);
--	atomic_set(&bio->__bi_cnt, 1);
--
--	bio->bi_max_vecs = max_vecs;
--	bio->bi_io_vec = table;
--	bio->bi_pool = NULL;
-+	*bio = (struct bio) {
-+		.__bi_remaining	= ATOMIC_INIT(1),
-+		.__bi_cnt	= ATOMIC_INIT(1),
-+		.bi_max_vecs	= max_vecs,
-+		.bi_io_vec	= table,
-+	};
- }
- EXPORT_SYMBOL(bio_init);
- 
