@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8122FC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47026C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:21:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68D8B611CC
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:19:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DD18611C3
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236781AbhIKNVH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Sep 2021 09:21:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38942 "EHLO mail.kernel.org"
+        id S236306AbhIKNWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Sep 2021 09:22:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49210 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236639AbhIKNSz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Sep 2021 09:18:55 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D4ECB6136A;
-        Sat, 11 Sep 2021 13:13:57 +0000 (UTC)
+        id S237534AbhIKNTY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 11 Sep 2021 09:19:24 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0A8E661242;
+        Sat, 11 Sep 2021 13:14:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631366038;
-        bh=Yu0Lev839zlQOINVo/zXvKNhf+YMYZWs6EN5crSXk9g=;
+        s=k20201202; t=1631366051;
+        bh=dwEcqMTSN0SdgmCMZeR4nMe5F1PvT6H6wBHQSSDG7rM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rwtCs8TsWHcYJn5F5RgbVArBIwFDi1gzMvHk/fOZTdPrZOf2sZPd4MyBnpY7ttJ33
-         /yGVxsnR4kMQPdQxx7GZfFT6D2q0ZsXDEu4UlsW0y5R/Nw8Zvc1m2hu74/NIL5/4to
-         7SOAE1p7IVM6Q6dAiHTd1crjjFPiySIQPXZRQSHBun8SMpUuL10GYao/iuIPwn3kgq
-         7jjZ55rdG0pIuSwUzCOkX2OZOZuTSq53aaPn7wb18Su6OdOnVp2D0ToTOlwPp7kBl1
-         KwbJQdG6PTOHJuatm/b5ljqAUIY65hZH4yKvfQ4lq96/4ucBDE8jGM8MEkUYcGQywg
-         L/KQkVRCDMdzA==
+        b=KQ82dfi+RBiU03LwxdhhRPNmNFv9pfHNH5NVJjIaRwvN3KWg4JOoNmg4HOUdmPH8T
+         GpkzHBHKrxIr8kFTdtfFoiQBWuNCfQ2a6CwcdYjucbeg7iEr4el3WYDpXFW0VfIziu
+         igHjX3+yqz//ZBk/U6GywLs4EyOI+WVQL4nNcquIQONubBzRUyANsbtD0qlYFLp+/s
+         HTCr2qCA7wEgIHFhFPeluxSQv2KwvdpVGd+FeIq7PnPerWh5Yqp9sP3FUPjFbh9RkT
+         VfQNZQKRdzW32PqtoFgz3k0Oid+CFm23H53Ew8FjLzDRyEMXnQztGfn7p7KtGjG2J5
+         flYrd5/wkl8sA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paolo Valente <paolo.valente@linaro.org>,
         Davide Zini <davidezini2@gmail.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 10/14] block, bfq: honor already-setup queue merges
-Date:   Sat, 11 Sep 2021 09:13:41 -0400
-Message-Id: <20210911131345.285564-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 5/7] block, bfq: honor already-setup queue merges
+Date:   Sat, 11 Sep 2021 09:14:02 -0400
+Message-Id: <20210911131404.286005-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210911131345.285564-1-sashal@kernel.org>
-References: <20210911131345.285564-1-sashal@kernel.org>
+In-Reply-To: <20210911131404.286005-1-sashal@kernel.org>
+References: <20210911131404.286005-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -88,10 +88,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 136232a01f71..3942855569e8 100644
+index 5b3e5483c657..047eb0cce7b5 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2523,6 +2523,15 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
+@@ -2137,6 +2137,15 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
  	 * are likely to increase the throughput.
  	 */
  	bfqq->new_bfqq = new_bfqq;
@@ -107,7 +107,7 @@ index 136232a01f71..3942855569e8 100644
  	new_bfqq->ref += process_refs;
  	return new_bfqq;
  }
-@@ -2582,6 +2591,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+@@ -2196,6 +2205,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  {
  	struct bfq_queue *in_service_bfqq, *new_bfqq;
  
@@ -116,9 +116,9 @@ index 136232a01f71..3942855569e8 100644
 +		return bfqq->new_bfqq;
 +
  	/*
- 	 * Do not perform queue merging if the device is non
- 	 * rotational and performs internal queueing. In fact, such a
-@@ -2636,9 +2649,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	 * Prevent bfqq from being merged if it has been created too
+ 	 * long ago. The idea is that true cooperating processes, and
+@@ -2210,9 +2223,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  	if (bfq_too_late_for_merging(bfqq))
  		return NULL;
  
