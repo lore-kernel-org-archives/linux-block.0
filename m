@@ -7,39 +7,40 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66051C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AF1C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:13:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5236661248
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:12:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CBB261205
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 13:13:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236412AbhIKNNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Sep 2021 09:13:52 -0400
+        id S236529AbhIKNOM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Sep 2021 09:14:12 -0400
 Received: from mail.kernel.org ([198.145.29.99]:37760 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236238AbhIKNNf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Sep 2021 09:13:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 72EE8611BF;
-        Sat, 11 Sep 2021 13:12:22 +0000 (UTC)
+        id S236302AbhIKNNi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 11 Sep 2021 09:13:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E32F8611CC;
+        Sat, 11 Sep 2021 13:12:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631365943;
-        bh=1lER5U1URVwqHEHX8YR2oWa3ASTDOq2WHBg4RUMgXtI=;
+        s=k20201202; t=1631365945;
+        bh=reP2nw3f/wq9zc5LUNGRzm1dBvkE3dZ1Ok0yArTwbO8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=U0vRmuA1+tYON50Pjh/eSVKNzwcvyv3SCzYEXNnvjODAsl8rf2OJt1XyE+ibW0QMm
-         y4gNTLaS59vdyKt6zpbsOAO+eLbAGJkVbQ0N68KCYEB1ShrmGOpugCWD1Sa5fHUYzv
-         3zgPpHT84dgy/fCv41UkhmZnFpATuWhPrtHk5WLifuHPqga7nzx06VU7bOBHWvDxse
-         ROr+OIAOaOFeC9XrFtwvvhEoL8y7lRd/61SdTMptwM3q3i94td8EsW6IY7TWVrFt0t
-         Rdyl7+xA/xupb/FS9MKm/QJy3mEqqX/OumqRuHCIQzmIIbnh81idAy0pIe8Oqb8HF4
-         XVBSSXlYpENPQ==
+        b=WWwU1rJ3d2fdLsIVRhv5faWT6wrkqxHGoJ9SAW2bHkzmszg5fJ/uDrClUE+GUOLOT
+         ynSrIzqSOw89KNrzXsjaskxwTy11rwTnpLRF5N3KFylNwOj7T+N+YxRrfSuUse87o2
+         ohtfSBW375Y32ZZw3Q5nQ2RYEuj3sS1zwxVe7rY5D1m80QcesRcnD4JchPtszzV3dH
+         L3ccnPFYeIhR9ULCGg43DPytyA2/M2TXIwvy06jsGUdew0rbfLAR0W4nwhvY/Yw1kE
+         j/gVLYHkNSeSVrOSmrWbxNv9Z0gF6CHg7zvtQ4qC6rCrcRxlr77d/AEw4QosrlQex+
+         0FYbrYBRnfQiA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Davide Zini <davidezini2@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.14 25/32] block, bfq: honor already-setup queue merges
-Date:   Sat, 11 Sep 2021 09:11:42 -0400
-Message-Id: <20210911131149.284397-25-sashal@kernel.org>
+Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.14 27/32] loop: reduce the loop_ctl_mutex scope
+Date:   Sat, 11 Sep 2021 09:11:44 -0400
+Message-Id: <20210911131149.284397-27-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210911131149.284397-1-sashal@kernel.org>
 References: <20210911131149.284397-1-sashal@kernel.org>
@@ -51,83 +52,228 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Paolo Valente <paolo.valente@linaro.org>
+From: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 
-[ Upstream commit 2d52c58b9c9bdae0ca3df6a1eab5745ab3f7d80b ]
+[ Upstream commit 1c500ad706383f1a6609e63d0b5d1723fd84dab9 ]
 
-The function bfq_setup_merge prepares the merging between two
-bfq_queues, say bfqq and new_bfqq. To this goal, it assigns
-bfqq->new_bfqq = new_bfqq. Then, each time some I/O for bfqq arrives,
-the process that generated that I/O is disassociated from bfqq and
-associated with new_bfqq (merging is actually a redirection). In this
-respect, bfq_setup_merge increases new_bfqq->ref in advance, adding
-the number of processes that are expected to be associated with
-new_bfqq.
+syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
+commit a160c6159d4a0cf8 ("block: add an optional probe callback to
+major_names") is calling the module's probe function with major_names_lock
+held.
 
-Unfortunately, the stable-merging mechanism interferes with this
-setup. After bfqq->new_bfqq has been set by bfq_setup_merge, and
-before all the expected processes have been associated with
-bfqq->new_bfqq, bfqq may happen to be stably merged with a different
-queue than the current bfqq->new_bfqq. In this case, bfqq->new_bfqq
-gets changed. So, some of the processes that have been already
-accounted for in the ref counter of the previous new_bfqq will not be
-associated with that queue.  This creates an unbalance, because those
-references will never be decremented.
+Fortunately, since commit 990e78116d38059c ("block: loop: fix deadlock
+between open and remove") stopped holding loop_ctl_mutex in lo_open(),
+current role of loop_ctl_mutex is to serialize access to loop_index_idr
+and loop_add()/loop_remove(); in other words, management of id for IDR.
+To avoid holding loop_ctl_mutex during whole add/remove operation, use
+a bool flag to indicate whether the loop device is ready for use.
 
-This commit fixes this issue by reestablishing the previous, natural
-behaviour: once bfqq->new_bfqq has been set, it will not be changed
-until all expected redirections have occurred.
+loop_unregister_transfer() which is called from cleanup_cryptoloop()
+currently has possibility of use-after-free problem due to lack of
+serialization between kfree() from loop_remove() from loop_control_remove()
+and mutex_lock() from unregister_transfer_cb(). But since lo->lo_encryption
+should be already NULL when this function is called due to module unload,
+and commit 222013f9ac30b9ce ("cryptoloop: add a deprecation warning")
+indicates that we will remove this function shortly, this patch updates
+this function to emit warning instead of checking lo->lo_encryption.
 
-Signed-off-by: Davide Zini <davidezini2@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Link: https://lore.kernel.org/r/20210802141352.74353-2-paolo.valente@linaro.org
+Holding loop_ctl_mutex in loop_exit() is pointless, for all users must
+close /dev/loop-control and /dev/loop$num (in order to drop module's
+refcount to 0) before loop_exit() starts, and nobody can open
+/dev/loop-control or /dev/loop$num afterwards.
+
+Link: https://syzkaller.appspot.com/bug?id=7bb10e8b62f83e4d445cdf4c13d69e407e629558 [1]
+Reported-by: syzbot <syzbot+f61766d5763f9e7a118f@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/adb1e792-fc0e-ee81-7ea0-0906fc36419d@i-love.sakura.ne.jp
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/bfq-iosched.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ drivers/block/loop.c | 75 +++++++++++++++++++++++++++++---------------
+ drivers/block/loop.h |  1 +
+ 2 files changed, 50 insertions(+), 26 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 727955918563..08d9122dd4c0 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2659,6 +2659,15 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- 	 * are likely to increase the throughput.
- 	 */
- 	bfqq->new_bfqq = new_bfqq;
-+	/*
-+	 * The above assignment schedules the following redirections:
-+	 * each time some I/O for bfqq arrives, the process that
-+	 * generated that I/O is disassociated from bfqq and
-+	 * associated with new_bfqq. Here we increases new_bfqq->ref
-+	 * in advance, adding the number of processes that are
-+	 * expected to be associated with new_bfqq as they happen to
-+	 * issue I/O.
-+	 */
- 	new_bfqq->ref += process_refs;
- 	return new_bfqq;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f0cdff0c5fbf..1f91bd41a29b 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2113,18 +2113,6 @@ int loop_register_transfer(struct loop_func_table *funcs)
+ 	return 0;
  }
-@@ -2721,6 +2730,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- {
- 	struct bfq_queue *in_service_bfqq, *new_bfqq;
  
-+	/* if a merge has already been setup, then proceed with that first */
-+	if (bfqq->new_bfqq)
-+		return bfqq->new_bfqq;
-+
- 	/*
- 	 * Check delayed stable merge for rotational or non-queueing
- 	 * devs. For this branch to be executed, bfqq must not be
-@@ -2822,9 +2835,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	if (bfq_too_late_for_merging(bfqq))
- 		return NULL;
- 
--	if (bfqq->new_bfqq)
--		return bfqq->new_bfqq;
+-static int unregister_transfer_cb(int id, void *ptr, void *data)
+-{
+-	struct loop_device *lo = ptr;
+-	struct loop_func_table *xfer = data;
 -
- 	if (!io_struct || unlikely(bfqq == &bfqd->oom_bfqq))
- 		return NULL;
+-	mutex_lock(&lo->lo_mutex);
+-	if (lo->lo_encryption == xfer)
+-		loop_release_xfer(lo);
+-	mutex_unlock(&lo->lo_mutex);
+-	return 0;
+-}
+-
+ int loop_unregister_transfer(int number)
+ {
+ 	unsigned int n = number;
+@@ -2132,9 +2120,20 @@ int loop_unregister_transfer(int number)
  
+ 	if (n == 0 || n >= MAX_LO_CRYPT || (xfer = xfer_funcs[n]) == NULL)
+ 		return -EINVAL;
++	/*
++	 * This function is called from only cleanup_cryptoloop().
++	 * Given that each loop device that has a transfer enabled holds a
++	 * reference to the module implementing it we should never get here
++	 * with a transfer that is set (unless forced module unloading is
++	 * requested). Thus, check module's refcount and warn if this is
++	 * not a clean unloading.
++	 */
++#ifdef CONFIG_MODULE_UNLOAD
++	if (xfer->owner && module_refcount(xfer->owner) != -1)
++		pr_err("Danger! Unregistering an in use transfer function.\n");
++#endif
+ 
+ 	xfer_funcs[n] = NULL;
+-	idr_for_each(&loop_index_idr, &unregister_transfer_cb, xfer);
+ 	return 0;
+ }
+ 
+@@ -2325,8 +2324,9 @@ static int loop_add(int i)
+ 	} else {
+ 		err = idr_alloc(&loop_index_idr, lo, 0, 0, GFP_KERNEL);
+ 	}
++	mutex_unlock(&loop_ctl_mutex);
+ 	if (err < 0)
+-		goto out_unlock;
++		goto out_free_dev;
+ 	i = err;
+ 
+ 	err = -ENOMEM;
+@@ -2392,15 +2392,19 @@ static int loop_add(int i)
+ 	disk->private_data	= lo;
+ 	disk->queue		= lo->lo_queue;
+ 	sprintf(disk->disk_name, "loop%d", i);
++	/* Make this loop device reachable from pathname. */
+ 	add_disk(disk);
++	/* Show this loop device. */
++	mutex_lock(&loop_ctl_mutex);
++	lo->idr_visible = true;
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	return i;
+ 
+ out_cleanup_tags:
+ 	blk_mq_free_tag_set(&lo->tag_set);
+ out_free_idr:
++	mutex_lock(&loop_ctl_mutex);
+ 	idr_remove(&loop_index_idr, i);
+-out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ out_free_dev:
+ 	kfree(lo);
+@@ -2410,9 +2414,14 @@ static int loop_add(int i)
+ 
+ static void loop_remove(struct loop_device *lo)
+ {
++	/* Make this loop device unreachable from pathname. */
+ 	del_gendisk(lo->lo_disk);
+ 	blk_cleanup_disk(lo->lo_disk);
+ 	blk_mq_free_tag_set(&lo->tag_set);
++	mutex_lock(&loop_ctl_mutex);
++	idr_remove(&loop_index_idr, lo->lo_number);
++	mutex_unlock(&loop_ctl_mutex);
++	/* There is no route which can find this loop device. */
+ 	mutex_destroy(&lo->lo_mutex);
+ 	kfree(lo);
+ }
+@@ -2436,31 +2445,40 @@ static int loop_control_remove(int idx)
+ 		return -EINVAL;
+ 	}
+ 		
++	/* Hide this loop device for serialization. */
+ 	ret = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (ret)
+ 		return ret;
+-
+ 	lo = idr_find(&loop_index_idr, idx);
+-	if (!lo) {
++	if (!lo || !lo->idr_visible)
+ 		ret = -ENODEV;
+-		goto out_unlock_ctrl;
+-	}
++	else
++		lo->idr_visible = false;
++	mutex_unlock(&loop_ctl_mutex);
++	if (ret)
++		return ret;
+ 
++	/* Check whether this loop device can be removed. */
+ 	ret = mutex_lock_killable(&lo->lo_mutex);
+ 	if (ret)
+-		goto out_unlock_ctrl;
++		goto mark_visible;
+ 	if (lo->lo_state != Lo_unbound ||
+ 	    atomic_read(&lo->lo_refcnt) > 0) {
+ 		mutex_unlock(&lo->lo_mutex);
+ 		ret = -EBUSY;
+-		goto out_unlock_ctrl;
++		goto mark_visible;
+ 	}
++	/* Mark this loop device no longer open()-able. */
+ 	lo->lo_state = Lo_deleting;
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	idr_remove(&loop_index_idr, lo->lo_number);
+ 	loop_remove(lo);
+-out_unlock_ctrl:
++	return 0;
++
++mark_visible:
++	/* Show this loop device again. */
++	mutex_lock(&loop_ctl_mutex);
++	lo->idr_visible = true;
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	return ret;
+ }
+@@ -2474,7 +2492,8 @@ static int loop_control_get_free(int idx)
+ 	if (ret)
+ 		return ret;
+ 	idr_for_each_entry(&loop_index_idr, lo, id) {
+-		if (lo->lo_state == Lo_unbound)
++		/* Hitting a race results in creating a new loop device which is harmless. */
++		if (lo->idr_visible && data_race(lo->lo_state) == Lo_unbound)
+ 			goto found;
+ 	}
+ 	mutex_unlock(&loop_ctl_mutex);
+@@ -2590,10 +2609,14 @@ static void __exit loop_exit(void)
+ 	unregister_blkdev(LOOP_MAJOR, "loop");
+ 	misc_deregister(&loop_misc);
+ 
+-	mutex_lock(&loop_ctl_mutex);
++	/*
++	 * There is no need to use loop_ctl_mutex here, for nobody else can
++	 * access loop_index_idr when this module is unloading (unless forced
++	 * module unloading is requested). If this is not a clean unloading,
++	 * we have no means to avoid kernel crash.
++	 */
+ 	idr_for_each_entry(&loop_index_idr, lo, id)
+ 		loop_remove(lo);
+-	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	idr_destroy(&loop_index_idr);
+ }
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 1988899db63a..04c88dd6eabd 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -68,6 +68,7 @@ struct loop_device {
+ 	struct blk_mq_tag_set	tag_set;
+ 	struct gendisk		*lo_disk;
+ 	struct mutex		lo_mutex;
++	bool			idr_visible;
+ };
+ 
+ struct loop_cmd {
 -- 
 2.30.2
 
