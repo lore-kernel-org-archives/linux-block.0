@@ -2,64 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B0BC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 17:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2169FC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 21:47:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71F0861213
-	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 17:30:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9A1B611AD
+	for <linux-block@archiver.kernel.org>; Sat, 11 Sep 2021 21:47:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232615AbhIKRbS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Sep 2021 13:31:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49536 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232447AbhIKRbS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Sep 2021 13:31:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id BF0DF61039;
-        Sat, 11 Sep 2021 17:30:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631381405;
-        bh=05udhESN44bMnRAK5nd1rdhVr4JRM8c12NBYZqbdErg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Xdk8paseDai/BMuR9KneufsXWq/g4sIUdTaqmpAtaxTCgYe6liHEVd5iozZG2he5+
-         PLia+nakLiTU5XOXaaq0L0H5sOuFvWHmgyY/DcAI4xzxGNvuj/0mfJzPo2E3BDVOBX
-         d/VP85qHLnNHYit/E1ZfEPiwCvumYwHSqfAQI/CPteDi9hQw4WkAl/o1RJiggnmBuY
-         SYo27f0xPsuIcL+mojLTtoNigRS5HV6Gh1U2Cq0SgTYUOAZv8mT5QU+R2fRwK2Nwhw
-         KW9C6xFwskAntNvhdthfHAVsyWgu4aPGwl5tLVCE9luFx2NDMC9lhyNG7lRRUemB3P
-         YVlHb5UCCk9yQ==
-Subject: Re: [GIT PULL] Block fixes for 5.15-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <e165b1c8-2e0d-13d9-36a5-2a58191d8b0f@kernel.dk>
-References: <e165b1c8-2e0d-13d9-36a5-2a58191d8b0f@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <e165b1c8-2e0d-13d9-36a5-2a58191d8b0f@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.15-2021-09-11
-X-PR-Tracked-Commit-Id: 221e8360834c59f0c9952630fa5904a94ebd2bb8
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c0f7e49fc480a97770e448e0c0493e7ba46a9852
-Message-Id: <163138140574.31565.13076476979859448479.pr-tracker-bot@kernel.org>
-Date:   Sat, 11 Sep 2021 17:30:05 +0000
+        id S231441AbhIKVsz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Sep 2021 17:48:55 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:51058 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231415AbhIKVsz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 11 Sep 2021 17:48:55 -0400
+Received: by mail-pj1-f54.google.com with SMTP id k23so3724767pji.0
+        for <linux-block@vger.kernel.org>; Sat, 11 Sep 2021 14:47:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=duU6elpbWThTuSplJOTkl7u0agKkufdEWYuSm3PD6iU=;
+        b=S+Rah8ErYG5K33CGhdmWaA/sm1eqRh7p2mkzVDvvT2ntyw0VuD3Qmtp9OQ+T+XeUrA
+         fpwWvXB5fISYjLT6GP5Wrr1ZUbeKFTW7xBco0DgO8XgNBjAaRDS3+5C5LuYRLH4rufiJ
+         avF1PX+aIE82hv27jg3reHHWo/5afpR5Wo5PHoyk1qg1yHUEorIWjDQVHN87UgMhEbzT
+         2hi2vxpzdgYehwZyud9qASfvjGwKzzdcCcm9yswO4o1M2x/tbov86AgRcaL87j3FWZAV
+         ePwEmdEmmwJJzFPKZ5xMNfjtDZCpEZKymDB/7WjhESjgpguqsl2glpYD0x/txnfJO1zT
+         B34g==
+X-Gm-Message-State: AOAM530zNpHju8Q/iRo0G9nTK1O9gjPGcybztPum5FdyrUObws25X2L0
+        Z2yo+iKFUYngxfVxwAKNxxg=
+X-Google-Smtp-Source: ABdhPJwTQ9i0VaPluB/gHgtcNMlDBwu//uTOJOgVcH/IMXLCXQVaCNMdyhv3wEnW8m518cCzeStUXA==
+X-Received: by 2002:a17:902:ce84:b0:138:9422:512e with SMTP id f4-20020a170902ce8400b001389422512emr3964235plg.12.1631396861554;
+        Sat, 11 Sep 2021 14:47:41 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:8e23:83c0:a404:a54f])
+        by smtp.gmail.com with ESMTPSA id d3sm2577786pjc.49.2021.09.11.14.47.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Sep 2021 14:47:40 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH] block: Optimize bio_init()
+Date:   Sat, 11 Sep 2021 14:47:34 -0700
+Message-Id: <20210911214734.4692-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.33.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sat, 11 Sep 2021 08:29:38 -0600:
+The following test:
 
-> git://git.kernel.dk/linux-block.git tags/block-5.15-2021-09-11
+sudo taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 /dev/nullb0
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c0f7e49fc480a97770e448e0c0493e7ba46a9852
+reports 1366 K IOPS on my test setup without this patch and 1380 K IOPS
+with this patch applied. In other words, this patch realizes a 1%
+performance improvement. I think this is because this patch makes the
+compiler generate better code. See also commit da521626ac62 ("bio:
+optimize initialization of a bio").
 
-Thank you!
+The assembler code generated by gcc without this patch is as follows:
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+   0x0000000000000000 <+0>:     call   0x5 <bio_init+5>
+   0x0000000000000005 <+5>:     xor    %eax,%eax
+   0x0000000000000007 <+7>:     xor    %ecx,%ecx
+   0x0000000000000009 <+9>:     movl   $0x1,0x1c(%rdi)
+   0x0000000000000010 <+16>:    movq   $0x0,(%rdi)
+   0x0000000000000017 <+23>:    movq   $0x0,0x8(%rdi)
+   0x000000000000001f <+31>:    movq   $0x0,0x10(%rdi)
+   0x0000000000000027 <+39>:    mov    %ax,0x18(%rdi)
+   0x000000000000002b <+43>:    movb   $0x0,0x1a(%rdi)
+   0x000000000000002f <+47>:    movq   $0x0,0x20(%rdi)
+   0x0000000000000037 <+55>:    movq   $0x0,0x28(%rdi)
+   0x000000000000003f <+63>:    movl   $0x0,0x30(%rdi)
+   0x0000000000000046 <+70>:    movq   $0x0,0x38(%rdi)
+   0x000000000000004e <+78>:    movq   $0x0,0x40(%rdi)
+   0x0000000000000056 <+86>:    movq   $0x0,0x48(%rdi)
+   0x000000000000005e <+94>:    movq   $0x0,0x50(%rdi)
+   0x0000000000000066 <+102>:   movq   $0x0,0x58(%rdi)
+   0x000000000000006e <+110>:   movq   $0x0,0x60(%rdi)
+   0x0000000000000076 <+118>:   mov    %cx,0x68(%rdi)
+   0x000000000000007a <+122>:   movl   $0x1,0x6c(%rdi)
+   0x0000000000000081 <+129>:   mov    %dx,0x6a(%rdi)
+   0x0000000000000085 <+133>:   mov    %rsi,0x70(%rdi)
+   0x0000000000000089 <+137>:   movq   $0x0,0x78(%rdi)
+   0x0000000000000091 <+145>:   ret
+
+With this patch bio_init() is compiled into the following assembly code:
+
+   0x0000000000000000 <+0>:     call   0x5 <bio_init+5>
+   0x0000000000000005 <+5>:     mov    %rdi,%r8
+   0x0000000000000008 <+8>:     mov    $0x10,%ecx
+   0x000000000000000d <+13>:    xor    %eax,%eax
+   0x000000000000000f <+15>:    rep stos %rax,%es:(%rdi)
+   0x0000000000000012 <+18>:    movl   $0x1,0x1c(%r8)
+   0x000000000000001a <+26>:    mov    %dx,0x6a(%r8)
+   0x000000000000001f <+31>:    movl   $0x1,0x6c(%r8)
+   0x0000000000000027 <+39>:    mov    %rsi,0x70(%r8)
+   0x000000000000002b <+43>:    ret
+
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/bio.c | 45 ++++++++-------------------------------------
+ 1 file changed, 8 insertions(+), 37 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 5df3dd282e40..775cd4274523 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -244,47 +244,18 @@ static void bio_free(struct bio *bio)
+ }
+ 
+ /*
+- * Users of this function have their own bio allocation. Subsequently,
+- * they must remember to pair any call to bio_init() with bio_uninit()
+- * when IO has completed, or when the bio is released.
++ * Users of this function must pair any call to bio_init() with a call to
++ * bio_uninit() after IO has completed or when the bio is released.
+  */
+ void bio_init(struct bio *bio, struct bio_vec *table,
+ 	      unsigned short max_vecs)
+ {
+-	bio->bi_next = NULL;
+-	bio->bi_bdev = NULL;
+-	bio->bi_opf = 0;
+-	bio->bi_flags = 0;
+-	bio->bi_ioprio = 0;
+-	bio->bi_write_hint = 0;
+-	bio->bi_status = 0;
+-	bio->bi_iter.bi_sector = 0;
+-	bio->bi_iter.bi_size = 0;
+-	bio->bi_iter.bi_idx = 0;
+-	bio->bi_iter.bi_bvec_done = 0;
+-	bio->bi_end_io = NULL;
+-	bio->bi_private = NULL;
+-#ifdef CONFIG_BLK_CGROUP
+-	bio->bi_blkg = NULL;
+-	bio->bi_issue.value = 0;
+-#ifdef CONFIG_BLK_CGROUP_IOCOST
+-	bio->bi_iocost_cost = 0;
+-#endif
+-#endif
+-#ifdef CONFIG_BLK_INLINE_ENCRYPTION
+-	bio->bi_crypt_context = NULL;
+-#endif
+-#ifdef CONFIG_BLK_DEV_INTEGRITY
+-	bio->bi_integrity = NULL;
+-#endif
+-	bio->bi_vcnt = 0;
+-
+-	atomic_set(&bio->__bi_remaining, 1);
+-	atomic_set(&bio->__bi_cnt, 1);
+-
+-	bio->bi_max_vecs = max_vecs;
+-	bio->bi_io_vec = table;
+-	bio->bi_pool = NULL;
++	*bio = (struct bio) {
++		.__bi_remaining	= ATOMIC_INIT(1),
++		.__bi_cnt	= ATOMIC_INIT(1),
++		.bi_max_vecs	= max_vecs,
++		.bi_io_vec	= table,
++	};
+ }
+ EXPORT_SYMBOL(bio_init);
+ 
