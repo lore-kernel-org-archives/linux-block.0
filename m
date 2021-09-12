@@ -2,145 +2,294 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C99C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 12 Sep 2021 18:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C20C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 12 Sep 2021 19:16:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06F8E60F24
-	for <linux-block@archiver.kernel.org>; Sun, 12 Sep 2021 18:07:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E592960F46
+	for <linux-block@archiver.kernel.org>; Sun, 12 Sep 2021 19:16:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230158AbhILSGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Sep 2021 14:06:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbhILSGC (ORCPT
+        id S236032AbhILTRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Sep 2021 15:17:50 -0400
+Received: from smtprelay06.ispgateway.de ([80.67.18.29]:61181 "EHLO
+        smtprelay06.ispgateway.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235510AbhILTRt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Sep 2021 14:06:02 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957C5C06175F
-        for <linux-block@vger.kernel.org>; Sun, 12 Sep 2021 11:04:47 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id x6so10972922wrv.13
-        for <linux-block@vger.kernel.org>; Sun, 12 Sep 2021 11:04:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=30MIuYuFKdJf40vmfRkFfYIkgojb9w4Sveh8T6JqTIY=;
-        b=NQU0LrbVkBNcnuE2ohqjZ/xmUuag5caPUvJrfNXkWCF9Qwe3iXppFRcY1MiYVP46Ya
-         7HSxwcrxKGi9dNwWW6SoZwY9w+lS0XmBkK7yJz/ua85jti/89+/v4aIQ62eRhP1P6t3z
-         vwOiJ8SVBD/+MEV6rixg3AYjDGPwOLeLu3bkmKFL8szCrtL2dWsS9Nt3yRgrNe/v85Tx
-         tLGJVhIxrK0dXHPLnAqq6HRBf4kB/Td6staVXeVHw1VfWwEfMS8Q1mhleoJcUrPZqkXb
-         fO/xa1qrOVzthCYYD0S2/9oBVo+PDVilKUcKcbwkVSeQhop5a/ixNSxKSvx18A3g6RpH
-         8Y0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=30MIuYuFKdJf40vmfRkFfYIkgojb9w4Sveh8T6JqTIY=;
-        b=nZRUKU988XRnJGOXPzncAdX7QfQ2xeSziWCZ651p7vIUzhhd6l3Pj21HayqOubmP4u
-         aR4IF8W80NH0+36TNwXn3OpSo1sF7kzLsZA8/fPW6n15q051qebh+2Eu1POpcCbP+UCh
-         AiFruilsUTRERXm4s4NylA5FYMFvpxFRt/bSR56w6VnLhLYOhNQnBtj2RbLd2x61RKwh
-         jakJCAZZoDpN5lE8cpms+L2USucmNxBvvwnXcA88e6brUlfPUXBFiHu2SM0xw9LUX9Ef
-         hw4gF8RWSaKyGn6ErAOf7aUK4tFs1yxGo7X+4weKjCFueNpIm/WLUOuYCj25+BoBBQrB
-         uMfg==
-X-Gm-Message-State: AOAM531W+vdgoTsJNLwvygEb5k4x/7edK3aBJLMiWUGzIk589madd45M
-        r19gWOUqwa4TsKSL49IPmicAk9NIZ+L91Q==
-X-Google-Smtp-Source: ABdhPJwHgNmJMorq848Kg2GjnJwUfIU+y1oJqvt87fYXadc5494OVps3HFkGWneUfBvNHJRiVFyThg==
-X-Received: by 2002:a5d:6a81:: with SMTP id s1mr3482075wru.274.1631469885977;
-        Sun, 12 Sep 2021 11:04:45 -0700 (PDT)
-Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
-        by smtp.gmail.com with ESMTPSA id m29sm5337397wrb.89.2021.09.12.11.04.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Sep 2021 11:04:45 -0700 (PDT)
-Date:   Sun, 12 Sep 2021 19:04:43 +0100
-From:   Phillip Potter <phil@philpotter.co.uk>
-To:     Lukas Prediger <lumip@lumip.de>
+        Sun, 12 Sep 2021 15:17:49 -0400
+Received: from [87.92.210.171] (helo=lumip-notebook.fritz.box)
+        by smtprelay06.ispgateway.de with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <lumip@lumip.de>)
+        id 1mPUxU-0008MT-Nu; Sun, 12 Sep 2021 21:16:08 +0200
+From:   Lukas Prediger <lumip@lumip.de>
+To:     phil@philpotter.co.uk
 Cc:     axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rdunlap@infradead.org
-Subject: Re: [PATCH v3] drivers/cdrom: improved ioctl for media change
- detection
-Message-ID: <YT5BO7bUMMkwNCTh@equinox>
-References: <CAA=Fs0mEprM0hErRY-kw7bOVqEw3o6X=--OixQ=_fNXdV_-QGQ@mail.gmail.com>
- <20210911174816.55538-1-lumip@lumip.de>
+        linux-kernel@vger.kernel.org, rdunlap@infradead.org,
+        Lukas Prediger <lumip@lumip.de>
+Subject: [PATCH v3] drivers/cdrom: improved ioctl for media change detection
+Date:   Sun, 12 Sep 2021 22:12:08 +0300
+Message-Id: <20210912191207.74449-1-lumip@lumip.de>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <YT5BO7bUMMkwNCTh@equinox>
+References: <YT5BO7bUMMkwNCTh@equinox>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210911174816.55538-1-lumip@lumip.de>
+Content-Transfer-Encoding: 8bit
+X-Df-Sender: bHVrYXMucHJlZGlnZXJAbHVtaXAuZGU=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 11, 2021 at 08:48:17PM +0300, Lukas Prediger wrote:
-> Hi Randy, Hi Phil,
-> 
-> >>
-> >> Hi Lukas,
-> >>
-> >> Just a minor nit:
-> >>
-> >> On 9/10/21 2:16 PM, Lukas Prediger wrote:
-> >> > +#define MEDIA_CHANGED_FLAG   0x1     /* Last detected media change was more \
-> >> > +                                      * recent than last_media_change set by\
-> >> > +                                      * caller.                             \
-> >> > +                                      */
-> >>
-> >> Drop the "continuation" backslashes.
-> >> They are not needed.
-> >>
-> >> thanks.
-> >> --
-> >> ~Randy
-> >>
-> 
-> Hm, my IDE was complaining about these but I just tested building without and
-> that worked fine. No idea what that was about then..
-> 
-> >
-> > Dear Lukas,
-> >
-> > Happy to take these out for you and save you resubmitting.
-> > I'm very happy with patch anyway. Once I hear back from
-> > you I'll send onto Jens with my approval after one final test :-)
-> >
-> 
-> That would be very nice of you!
-> 
-> >
-> > Thanks again for the code.
-> >
-> 
-> My pleasure, and thanks for the helpful feedback!
-> 
-> >
-> > Regards,
-> > Phil
-> 
-> Best regards,
-> Lukas
+The current implementation of the CDROM_MEDIA_CHANGED ioctl relies on
+global state, meaning that only one process can detect a disc change
+while the ioctl call will return 0 for other calling processes afterwards
+(see bug 213267 ).
 
-Dear Lukas,
+This introduces a new cdrom ioctl, CDROM_TIMED_MEDIA_CHANGE, that
+works by maintaining a timestamp of the last detected disc change instead
+of a boolean flag: Processes calling this ioctl command can provide
+a timestamp of the last disc change known to them and receive
+an indication whether the disc was changed since then and the updated
+timestamp.
 
-This v3 patch does not apply to my tree, or the mainline one for that
-matter. A few problems I've noticed that are the cause of this:
+I considered fixing the buggy behavior in the original
+CDROM_MEDIA_CHANGED ioctl but that would require maintaining state
+for each calling process in the kernel, which seems like a worse
+solution than introducing this new ioctl.
 
-Misnamed file:
-Documentation/ioctl/cdrom.rst - this file should actually be:
-Documentation/userspace-api/ioctl/cdrom.rst (and is in v2)
+Signed-off-by: Lukas Prediger <lumip@lumip.de>
+---
 
-Failed hunks:
-v3 fails on applying the changes to drivers/cdrom/cdrom.c as well, due
-to two hunks failing (because of different lines preceding your
-changes).
+> Dear Lukas,
+> 
+> This v3 patch does not apply to my tree, or the mainline one for that
+> matter. A few problems I've noticed that are the cause of this:
+>
+> [..] 
+>
+> Please advise, many thanks. As mentioned before, v2 applied perfectly
+> fine for me.
+>
+> Regards,
+> Phil
 
-It also fails to apply the second hunk to include/uapi/linux/cdrom.h,
-again due to differences in pre-existing content. Did you base this v3
-patch against a different/older tree/branch?
+Hey Phil,
+it seems I had accidentally formated the patch off my v5.4 testing branch.
+Here's the proper version based on current master, that should apply cleanly.
 
-Please advise, many thanks. As mentioned before, v2 applied perfectly
-fine for me.
+I've also removed the continuation backslashes that Randy pointed out now.
 
-Regards,
-Phil
+Sorry for the troubles,
+Lukas
+
+---
+ Documentation/cdrom/cdrom-standard.rst      | 11 ++++
+ Documentation/userspace-api/ioctl/cdrom.rst |  3 ++
+ drivers/cdrom/cdrom.c                       | 59 +++++++++++++++++++--
+ include/linux/cdrom.h                       |  1 +
+ include/uapi/linux/cdrom.h                  | 19 +++++++
+ 5 files changed, 89 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/cdrom/cdrom-standard.rst b/Documentation/cdrom/cdrom-standard.rst
+index 5845960ca382..52ea7b6b2fe8 100644
+--- a/Documentation/cdrom/cdrom-standard.rst
++++ b/Documentation/cdrom/cdrom-standard.rst
+@@ -907,6 +907,17 @@ commands can be identified by the underscores in their names.
+ 	specifies the slot for which the information is given. The special
+ 	value *CDSL_CURRENT* requests that information about the currently
+ 	selected slot be returned.
++`CDROM_TIMED_MEDIA_CHANGE`
++	Checks whether the disc has been changed since a user supplied time
++	and returns the time of the last disc change.
++
++	*arg* is a pointer to a *cdrom_timed_media_change_info* struct.
++	*arg->last_media_change* may be set by calling code to signal
++	the timestamp of the last known media change (by the caller).
++	Upon successful return, this ioctl call will set
++	*arg->last_media_change* to the latest media change timestamp (in ms)
++	known by the kernel/driver and set *arg->has_changed* to 1 if
++	that timestamp is more recent than the timestamp set by the caller.
+ `CDROM_DRIVE_STATUS`
+ 	Returns the status of the drive by a call to
+ 	*drive_status()*. Return values are defined in cdrom_drive_status_.
+diff --git a/Documentation/userspace-api/ioctl/cdrom.rst b/Documentation/userspace-api/ioctl/cdrom.rst
+index 3b4c0506de46..bac5bbf93ca0 100644
+--- a/Documentation/userspace-api/ioctl/cdrom.rst
++++ b/Documentation/userspace-api/ioctl/cdrom.rst
+@@ -54,6 +54,9 @@ are as follows:
+ 	CDROM_SELECT_SPEED	Set the CD-ROM speed
+ 	CDROM_SELECT_DISC	Select disc (for juke-boxes)
+ 	CDROM_MEDIA_CHANGED	Check is media changed
++	CDROM_TIMED_MEDIA_CHANGE	Check if media changed
++					since given time
++					(struct cdrom_timed_media_change_info)
+ 	CDROM_DRIVE_STATUS	Get tray position, etc.
+ 	CDROM_DISC_STATUS	Get disc type, etc.
+ 	CDROM_CHANGER_NSLOTS	Get number of slots
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index bd2e5b1560f5..89a68457820a 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -344,6 +344,12 @@ static void cdrom_sysctl_register(void);
+ 
+ static LIST_HEAD(cdrom_list);
+ 
++static void signal_media_change(struct cdrom_device_info *cdi)
++{
++	cdi->mc_flags = 0x3; /* set media changed bits, on both queues */
++	cdi->last_media_change_ms = ktime_to_ms(ktime_get());
++}
++
+ int cdrom_dummy_generic_packet(struct cdrom_device_info *cdi,
+ 			       struct packet_command *cgc)
+ {
+@@ -616,6 +622,7 @@ int register_cdrom(struct gendisk *disk, struct cdrom_device_info *cdi)
+ 	ENSURE(cdo, generic_packet, CDC_GENERIC_PACKET);
+ 	cdi->mc_flags = 0;
+ 	cdi->options = CDO_USE_FFLAGS;
++	cdi->last_media_change_ms = ktime_to_ms(ktime_get());
+ 
+ 	if (autoclose == 1 && CDROM_CAN(CDC_CLOSE_TRAY))
+ 		cdi->options |= (int) CDO_AUTO_CLOSE;
+@@ -1421,8 +1428,7 @@ static int cdrom_select_disc(struct cdrom_device_info *cdi, int slot)
+ 		cdi->ops->check_events(cdi, 0, slot);
+ 
+ 	if (slot == CDSL_NONE) {
+-		/* set media changed bits, on both queues */
+-		cdi->mc_flags = 0x3;
++		signal_media_change(cdi);
+ 		return cdrom_load_unload(cdi, -1);
+ 	}
+ 
+@@ -1455,7 +1461,7 @@ static int cdrom_select_disc(struct cdrom_device_info *cdi, int slot)
+ 		slot = curslot;
+ 
+ 	/* set media changed bits on both queues */
+-	cdi->mc_flags = 0x3;
++	signal_media_change(cdi);
+ 	if ((ret = cdrom_load_unload(cdi, slot)))
+ 		return ret;
+ 
+@@ -1521,7 +1527,7 @@ int media_changed(struct cdrom_device_info *cdi, int queue)
+ 	cdi->ioctl_events = 0;
+ 
+ 	if (changed) {
+-		cdi->mc_flags = 0x3;    /* set bit on both queues */
++		signal_media_change(cdi);
+ 		ret |= 1;
+ 		cdi->media_written = 0;
+ 	}
+@@ -2336,6 +2342,49 @@ static int cdrom_ioctl_media_changed(struct cdrom_device_info *cdi,
+ 	return ret;
+ }
+ 
++/*
++ * Media change detection with timing information.
++ *
++ * arg is a pointer to a cdrom_timed_media_change_info struct.
++ * arg->last_media_change may be set by calling code to signal
++ * the timestamp (in ms) of the last known media change (by the caller).
++ * Upon successful return, ioctl call will set arg->last_media_change
++ * to the latest media change timestamp known by the kernel/driver
++ * and set arg->has_changed to 1 if that timestamp is more recent
++ * than the timestamp set by the caller.
++ */
++static int cdrom_ioctl_timed_media_change(struct cdrom_device_info *cdi,
++		unsigned long arg)
++{
++	int ret;
++	struct cdrom_timed_media_change_info __user *info;
++	struct cdrom_timed_media_change_info tmp_info;
++
++	if (!CDROM_CAN(CDC_MEDIA_CHANGED))
++		return -ENOSYS;
++
++	info = (struct cdrom_timed_media_change_info __user *)arg;
++	cd_dbg(CD_DO_IOCTL, "entering CDROM_TIMED_MEDIA_CHANGE\n");
++
++	ret = cdrom_ioctl_media_changed(cdi, CDSL_CURRENT);
++	if (ret < 0)
++		return ret;
++
++	if (copy_from_user(&tmp_info, info, sizeof(tmp_info)) != 0)
++		return -EFAULT;
++
++	tmp_info.media_flags = 0;
++	if (tmp_info.last_media_change - cdi->last_media_change_ms < 0)
++		tmp_info.media_flags |= MEDIA_CHANGED_FLAG;
++
++	tmp_info.last_media_change = cdi->last_media_change_ms;
++
++	if (copy_to_user(info, &tmp_info, sizeof(*info)) != 0)
++		return -EFAULT;
++
++	return 0;
++}
++
+ static int cdrom_ioctl_set_options(struct cdrom_device_info *cdi,
+ 		unsigned long arg)
+ {
+@@ -3313,6 +3362,8 @@ int cdrom_ioctl(struct cdrom_device_info *cdi, struct block_device *bdev,
+ 		return cdrom_ioctl_eject_sw(cdi, arg);
+ 	case CDROM_MEDIA_CHANGED:
+ 		return cdrom_ioctl_media_changed(cdi, arg);
++	case CDROM_TIMED_MEDIA_CHANGE:
++		return cdrom_ioctl_timed_media_change(cdi, arg);
+ 	case CDROM_SET_OPTIONS:
+ 		return cdrom_ioctl_set_options(cdi, arg);
+ 	case CDROM_CLEAR_OPTIONS:
+diff --git a/include/linux/cdrom.h b/include/linux/cdrom.h
+index c4fef00abdf3..0a89f111e00e 100644
+--- a/include/linux/cdrom.h
++++ b/include/linux/cdrom.h
+@@ -64,6 +64,7 @@ struct cdrom_device_info {
+ 	int for_data;
+ 	int (*exit)(struct cdrom_device_info *);
+ 	int mrw_mode_page;
++	__s64 last_media_change_ms;
+ };
+ 
+ struct cdrom_device_ops {
+diff --git a/include/uapi/linux/cdrom.h b/include/uapi/linux/cdrom.h
+index 6c34f6e2f1f7..6d528a7a1a59 100644
+--- a/include/uapi/linux/cdrom.h
++++ b/include/uapi/linux/cdrom.h
+@@ -147,6 +147,8 @@
+ #define CDROM_NEXT_WRITABLE	0x5394	/* get next writable block */
+ #define CDROM_LAST_WRITTEN	0x5395	/* get last block written on disc */
+ 
++#define CDROM_TIMED_MEDIA_CHANGE   0x5396  /* get the timestamp of the last media change */
++
+ /*******************************************************
+  * CDROM IOCTL structures
+  *******************************************************/
+@@ -295,6 +297,23 @@ struct cdrom_generic_command
+ 	};
+ };
+ 
++/* This struct is used by CDROM_TIMED_MEDIA_CHANGE */
++struct cdrom_timed_media_change_info {
++	__s64	last_media_change;	/* Timestamp of the last detected media
++					 * change in ms. May be set by caller,
++					 * updated upon successful return of
++					 * ioctl.
++					 */
++	__u64	media_flags;		/* Flags returned by ioctl to indicate
++					 * media status.
++					 */
++};
++#define MEDIA_CHANGED_FLAG	0x1	/* Last detected media change was more 
++					 * recent than last_media_change set by
++					 * caller.                             
++					 */
++/* other bits of media_flags available for future use */
++
+ /*
+  * A CD-ROM physical sector size is 2048, 2052, 2056, 2324, 2332, 2336, 
+  * 2340, or 2352 bytes long.  
+-- 
+2.25.1
+
