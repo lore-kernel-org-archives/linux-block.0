@@ -4,107 +4,96 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5C4C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 16:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5AEDC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 17:21:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E0E360F36
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 16:53:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8242C60ED8
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 17:21:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239851AbhIMQyo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 12:54:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51158 "EHLO
+        id S230318AbhIMRXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 13:23:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238901AbhIMQyh (ORCPT
+        with ESMTP id S229778AbhIMRXK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 12:54:37 -0400
+        Mon, 13 Sep 2021 13:23:10 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B54ADC061766;
-        Mon, 13 Sep 2021 09:53:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E9FC061574;
+        Mon, 13 Sep 2021 10:21:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=m/3a5AY41rDqUNNKgbTN21eo535vkOk2RbK4QApErFo=; b=mTXsFDP3UjsDKBPdRKXLQ4tfgC
-        S0zlEqfitx1WA0aIQ0vmmKB0Kf4xhs+9iAE5T774WOW/Nid9YwGKfiUDd3HD66KAVNPlAy+dqbXxj
-        O4b2PMt4VGjwMa3kZqKWfuYixnaEHETy5vVqLguYmyjOtuQeiGX1lFe8vK0gLYz164Fxfco3Ini+P
-        PAueX2/2lwte2kAxUNi8+DI6bnhVvNVc6yg9B3DSFUYUT/UAFASVN6tQPFWt2FqQyWR5BDNS0G/hh
-        hgbtMPcqgRJeqXEFRoFZsshHQibor6ae94i0cm4pEU5sNewvSC8aTSwa3iCPuZVwIavUjHYTWw0xu
-        IFizBO1w==;
+        bh=ozDu2C9KwJDzUHmqI8L8ZS+TLMmJ1vttUQXVZymGuXw=; b=luWWEIGyIZ+r8nBZzOJgzAJsGx
+        N7oDNxgPF3OFmLGgbOPfFjf02fv1ISLc3zvjj4zwkR3ngVeDFoBg7Rkyv8mSPTvmKkXt7bSAXti/9
+        R9iY/fZEkesX3BRkVDPaUYhI5ZVJAmf9pJ9amuMKXN9I1A0qj9K6hB9CNHTxNXjZ4LiDoRa1aKw6u
+        OUGwFvrmsqa3QOnqAltvdpvADc9fuLcHfFKdTOuFM26DVcVbWUL0CHsaQPCf1HTG5zJqz5CVqQ2VF
+        UsurmMzg0xrJvEN2AiG/3SjuJJXUQG1qj45oxztVARgLk7FaNR9pDlE3SjbrPxclCpERbHXedjJr2
+        dSlpvPyQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mPpCk-002WmJ-2M; Mon, 13 Sep 2021 16:53:14 +0000
-Date:   Mon, 13 Sep 2021 09:53:14 -0700
+        id 1mPpe0-002eih-G4; Mon, 13 Sep 2021 17:21:24 +0000
+Date:   Mon, 13 Sep 2021 10:21:24 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>, axboe@kernel.dk,
-        gregkh@linuxfoundation.org, chaitanya.kulkarni@wdc.com,
-        atulgopinathan@gmail.com, hare@suse.de, maximlevitsky@gmail.com,
-        oakad@yahoo.com, ulf.hansson@linaro.org, colin.king@canonical.com,
-        shubhankarvk@gmail.com, baijiaju1990@gmail.com, trix@redhat.com,
-        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
-        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
-        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 7/9] s390/block/dcssblk: add error handling support for
- add_disk()
-Message-ID: <YT+B+vCUcpZEq8hM@bombadil.infradead.org>
-References: <20210902174105.2418771-1-mcgrof@kernel.org>
- <20210902174105.2418771-8-mcgrof@kernel.org>
- <YTIscKy+jg5L/TMh@osiris>
- <YTLP8mYBX37R++9E@bombadil.infradead.org>
- <20210906134346.19c14246@thinkpad>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
+        kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
+        beanhuo@micron.com, ulf.hansson@linaro.org, avri.altman@wdc.com,
+        swboyd@chromium.org, agk@redhat.com, snitzer@redhat.com,
+        josef@toxicpanda.com, hch@infradead.org, hare@suse.de,
+        bvanassche@acm.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
+        dm-devel@redhat.com, nbd@other.debian.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 1/8] scsi/sd: add error handling support for add_disk()
+Message-ID: <YT+IlJnSZzG0j0ON@bombadil.infradead.org>
+References: <20210830212538.148729-1-mcgrof@kernel.org>
+ <20210830212538.148729-2-mcgrof@kernel.org>
+ <YTbAYyo0+rqUZ+L0@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210906134346.19c14246@thinkpad>
+In-Reply-To: <YTbAYyo0+rqUZ+L0@T590>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 06, 2021 at 01:43:46PM +0200, Gerald Schaefer wrote:
-> On Fri, 3 Sep 2021 18:46:26 -0700
-> Luis Chamberlain <mcgrof@kernel.org> wrote:
-> 
-> > On Fri, Sep 03, 2021 at 04:08:48PM +0200, Heiko Carstens wrote:
-> > > On Thu, Sep 02, 2021 at 10:41:03AM -0700, Luis Chamberlain wrote:
-> > > > We never checked for errors on add_disk() as this function
-> > > > returned void. Now that this is fixed, use the shiny new
-> > > > error handling.
-> > > > 
-> > > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > > > ---
-> > > >  drivers/s390/block/dcssblk.c | 4 +++-
-> > > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
-> > > > index 5be3d1c39a78..b0fd5009a12e 100644
-> > > > --- a/drivers/s390/block/dcssblk.c
-> > > > +++ b/drivers/s390/block/dcssblk.c
-> > > > @@ -696,7 +696,9 @@ dcssblk_add_store(struct device *dev, struct device_attribute *attr, const char
-> > > >  	}
-> > > >  
-> > > >  	get_device(&dev_info->dev);
-> > > > -	device_add_disk(&dev_info->dev, dev_info->gd, NULL);
-> > > > +	rc = device_add_disk(&dev_info->dev, dev_info->gd, NULL);
-> > > > +	if (rc)
-> > > > +		goto put_dev;
-> > > 
-> > > This looks not correct to me. We seem to have now in case of an error:
-> > > 
-> > > - reference count imbalance (= memory leak)
-> > > - dax cleanup is missing
+On Tue, Sep 07, 2021 at 09:29:07AM +0800, Ming Lei wrote:
+> On Mon, Aug 30, 2021 at 02:25:31PM -0700, Luis Chamberlain wrote:
+> > We never checked for errors on add_disk() as this function
+> > returned void. Now that this is fixed, use the shiny new
+> > error handling.
 > > 
-> > Care to provide an alternative?
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >  drivers/scsi/sd.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> > index 610ebba0d66e..8c1273fff23e 100644
+> > --- a/drivers/scsi/sd.c
+> > +++ b/drivers/scsi/sd.c
+> > @@ -3487,7 +3487,11 @@ static int sd_probe(struct device *dev)
+> >  		pm_runtime_set_autosuspend_delay(dev,
+> >  			sdp->host->hostt->rpm_autosuspend_delay);
+> >  	}
+> > -	device_add_disk(dev, gd, NULL);
+> > +
+> > +	error = device_add_disk(dev, gd, NULL);
+> > +	if (error)
+> > +		goto out_free_index;
+> > +
 > 
-> See patch below:
+> The error handling is actually wrong, see 
+> 
+> 	https://lore.kernel.org/linux-scsi/c93f3010-13c9-e07f-1458-b6b47a27057b@acm.org/T/#t
+> 
+> Maybe you can base on that patch.
 
-Thanks! Will you queue this up on your end or do would you
-prefer for me to roll this into my tree and eventually resend
-with the rest?
+Done, thanks!
 
-  Luis
+ Luis
