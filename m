@@ -2,82 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC26C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 15:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C86CC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 15:26:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E19A610A3
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 15:18:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32B876108B
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 15:26:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346760AbhIMPUI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 11:20:08 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3780 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346248AbhIMPSy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 11:18:54 -0400
-Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4H7VR65gJGz67nJX;
-        Mon, 13 Sep 2021 23:15:30 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 13 Sep 2021 17:17:36 +0200
-Received: from localhost.localdomain (10.69.192.58) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 13 Sep 2021 16:17:34 +0100
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <ming.lei@redhat.com>, <linux-scsi@vger.kernel.org>,
-        John Garry <john.garry@huawei.com>
-Subject: [PATCH RESEND v3 08/13] blk-mq: Don't clear driver tags own mapping
-Date:   Mon, 13 Sep 2021 23:12:25 +0800
-Message-ID: <1631545950-56586-9-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1631545950-56586-1-git-send-email-john.garry@huawei.com>
-References: <1631545950-56586-1-git-send-email-john.garry@huawei.com>
+        id S243775AbhIMP1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 11:27:22 -0400
+Received: from verein.lst.de ([213.95.11.211]:55765 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229926AbhIMP1S (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Sep 2021 11:27:18 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7281F67357; Mon, 13 Sep 2021 17:25:58 +0200 (CEST)
+Date:   Mon, 13 Sep 2021 17:25:58 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: Re: [PATCH v2 3/3] nbd: fix race between nbd_alloc_config() and
+ module removal
+Message-ID: <20210913152558.GA3998@lst.de>
+References: <20210904122519.1963983-1-houtao1@huawei.com> <20210904122519.1963983-4-houtao1@huawei.com> <20210906093051.GC30790@lst.de> <ce3e1ea8-ebda-4372-42ce-e8a4b2d12514@huawei.com> <20210906102521.GA3082@lst.de> <730dae5e-5af8-3554-18bf-e22ff576e2b1@huawei.com> <20210909064035.GA26290@lst.de> <6434d4e8-984d-97df-34e5-b86a0e69cf58@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6434d4e8-984d-97df-34e5-b86a0e69cf58@huawei.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Function blk_mq_clear_rq_mapping() is required to clear the sched tags
-mappings in driver tags rqs[].
+On Mon, Sep 13, 2021 at 12:32:37PM +0800, Hou Tao wrote:
+> > Did you try just removing the extra module refcounting?
+> Yes, removing the module refcounting in nbd_alloc_config() and cleaning
+> the nbd_config in nbd_cleanup() also work, but not sure whether or not
+> it will break some nbd user-case which depends on the extra module
+> reference count. I prefer to keep the extra module refcounting considering
+> that loop driver does it as well, so what is your suggestion ?
 
-But there is no need for a driver tags to clear its own mapping, so skip
-clearing the mapping in this scenario.
-
-Signed-off-by: John Garry <john.garry@huawei.com>
----
- block/blk-mq.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4bae8afdfbe1..5229c5420b85 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2308,6 +2308,10 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
- 	struct page *page;
- 	unsigned long flags;
- 
-+	/* There is no need to clear a driver tags own mapping */
-+	if (drv_tags == tags)
-+		return;
-+
- 	list_for_each_entry(page, &tags->page_list, lru) {
- 		unsigned long start = (unsigned long)page_address(page);
- 		unsigned long end = start + order_to_size(page->private);
--- 
-2.26.2
-
+Can you respin the patch with a comment explaining this in detail
+so that the next person tripping over it doesn't have to do the research
+again?
