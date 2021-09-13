@@ -2,63 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97AE1C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 13:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7CDC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 13:14:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B43260E9B
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 13:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA4A461051
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 13:14:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbhIMNJc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 09:09:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54480 "EHLO
+        id S238540AbhIMNQK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 09:16:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240549AbhIMNIZ (ORCPT
+        with ESMTP id S236180AbhIMNQI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 09:08:25 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E651C0613E3
-        for <linux-block@vger.kernel.org>; Mon, 13 Sep 2021 06:04:25 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id g8so14265627edt.7
-        for <linux-block@vger.kernel.org>; Mon, 13 Sep 2021 06:04:25 -0700 (PDT)
+        Mon, 13 Sep 2021 09:16:08 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AB6C061574
+        for <linux-block@vger.kernel.org>; Mon, 13 Sep 2021 06:14:50 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id b10so14272726ejg.11
+        for <linux-block@vger.kernel.org>; Mon, 13 Sep 2021 06:14:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=RdZIbAXToH2hKnMoOgcNJetW3sB4TakM6/Gu+YymAek=;
-        b=izZyz2feW7dGhCXYTMMF4aZ3jsrOSm9wZoPL4GYBVpH0iqzNDTBI6QonCQndXTo8B1
-         G6nQMUCTup9+QxJDfo+X/ouparDGBcwr1VLaVWNd7+K7XDdDZZIeOlPzGhiy2h6q4nay
-         /I2jEbXQI9NT6c+FEo/4LGSAo4eWPCsg4fsOGkysVqBC94KGXhC0gAY98vKhZK64WJj7
-         knrN7UwBw6uAwRfnZZ/MpvhKy5R414BYs7DubqVHLTsHatfn/Cm2mWC2b6qR5loTAPnM
-         G63mNfTzu9Wfj+fUzIDrV3IaiWKevCQ3NY/zC77sld87++CljjvKFoScqUwOgCOtszgm
-         FWFg==
+        bh=FMkvd2XitPzUDN1Wycio35V+4AIrXPwaQ/vDiDQjWK0=;
+        b=KkDyl0Ifgt2aRdU6fbVozbKCUgJd/sQ+d+HyOCqH4KPJRHGcw+Ijbd628Lazz2zf13
+         qfRssLX/YJgrq2MdmqVIbqdO5W7n8DZIy//VSqNG96Dyas/9Xx+m/1jqNvflyr0zJ3ai
+         KlRQWR/v4kOWDOeP7VCI2n+5QcknY3SRD1mHmXWR0+I+ES+jW0raqwthvhg4bjKktVnW
+         aXaf+bMgQq52xezeLd3KA5ugo4URLNlBOYN66C91lBa9m5i5i0GcnHX2zxZevyg3wtEi
+         ZH0QG2au97VLX716H+2FpPBIQ3LKAK2X++0gDjVwXny2BdB6n6K4KnFYcc5TXOplqJ7F
+         ohAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=RdZIbAXToH2hKnMoOgcNJetW3sB4TakM6/Gu+YymAek=;
-        b=EVemGJBMKc74+V2tOUs3H3OjO6PIed+xAhJzaQcuoKGJBy9pfhv7ArdRz59mo0kuix
-         p425pNw/6QCOnGGoeN5rGyT+rKKZpxQak1bDy/3rcZJcJywqyX/LLshySiyuMSJiZ51E
-         61RnHLf04JjwjqMJ++58x6g+wpTkg22T0tEYhYlU7auKv8GI1CKzdGMxuP1kF8EXwO3m
-         Hm9cv7iUnMJD+YSny5e+6AEoy4BQcZOpqVmnqdZF4uMr64VyfkaIc6vA+qPPkLMK/tfd
-         h1p7Bc4n21LrRsydr39DUzopUrg+u9CbpHM1+PhZtgSLE23QQ3KHxBiWKriHF2FWCVf9
-         wmHg==
-X-Gm-Message-State: AOAM531xiKSmpJmQ7R4fFlaMUTox9HZnTbJ0fPLz6Q1vZK2ptMzpTuI0
-        Z6DsJr4A2eBEGLxKqgxyGP7B7yJttwsxBYcb0n5g
-X-Google-Smtp-Source: ABdhPJxOPGkgUMqV406W6cTQRA3871Dh3U5yHZzeFHo/tYTiO+Qb4cIm7gKZb5H41heGhAFw+wvjdi8+TobrjHA2l2g=
-X-Received: by 2002:a05:6402:2048:: with SMTP id bc8mr13154783edb.114.1631538264046;
- Mon, 13 Sep 2021 06:04:24 -0700 (PDT)
+        bh=FMkvd2XitPzUDN1Wycio35V+4AIrXPwaQ/vDiDQjWK0=;
+        b=dE07a3+dEEszRtgcNx/b6r9+sfdpcaWbcjHtt1RznJuTDRvEqp0Uz2hGwCDaI18vLs
+         mKFepk0N4HMSrT194rdWWWgCqwx7TKO5Qz1g5LRECrzf/Ai3Shi9Fu04lHq/LCY5JQqS
+         A3bBFLok7F3GexhVEc/UxfdKq0G/E+sVf8L8zdcbe1KQPyXSuAHDqtsUz/SwpH+G5Tv5
+         2QkbjNr9fWCl8Y1cQgzvK97u3S2+Q0bWdR7lxxOb4U6Vd1K2GgIJh+p9Fy3xVfgZQU3v
+         c7cAjt6oLaiNorQM8vKFaDdAf0cnDGR0fszTtOySlEzyMsWMkMs2IB3g/tEpAIJMBAq5
+         /q0A==
+X-Gm-Message-State: AOAM533JcD7sccAyZ3edtUf1u7SrkiBGsm+6r54VmEeA24RMD4u3VJ//
+        ffD8X1mr01wK1S/5gOxwooOE0Ysv24qXRzwZ5WFfpf755RTU
+X-Google-Smtp-Source: ABdhPJwHOmQse5JaEJZ9pdSms9x3cPQBvPXsPcnevtEzlANE5PG+3T95s3z+9oFoZWNK01UJ3aS4eVhx326VZNRqn+M=
+X-Received: by 2002:a17:906:1484:: with SMTP id x4mr12677672ejc.72.1631538888667;
+ Mon, 13 Sep 2021 06:14:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210913112557.191-1-xieyongji@bytedance.com> <20210913112557.191-4-xieyongji@bytedance.com>
- <YT9HFOTnBFWMUE74@infradead.org>
-In-Reply-To: <YT9HFOTnBFWMUE74@infradead.org>
+References: <20210913112557.191-1-xieyongji@bytedance.com> <20210913112557.191-3-xieyongji@bytedance.com>
+ <YT9FVrXcaUdaXlu6@infradead.org>
+In-Reply-To: <YT9FVrXcaUdaXlu6@infradead.org>
 From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Mon, 13 Sep 2021 21:04:12 +0800
-Message-ID: <CACycT3uo6GqLx8i=rtn9P2kaSGHjnNnamX3KR0Xgq_5QEhWWUA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] nbd: Use invalidate_gendisk() helper on disconnect
+Date:   Mon, 13 Sep 2021 21:14:36 +0800
+Message-ID: <CACycT3uY0BA1ax_fMpUq9rtbboDdAcTMLZeMmkLNBQMrgHAVig@mail.gmail.com>
+Subject: Re: [PATCH 2/3] loop: Use invalidate_gendisk() helper to invalidate gendisk
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, nbd@other.debian.org,
@@ -68,21 +69,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 8:43 PM Christoph Hellwig <hch@infradead.org> wrote:
+On Mon, Sep 13, 2021 at 8:35 PM Christoph Hellwig <hch@infradead.org> wrote:
 >
-> On Mon, Sep 13, 2021 at 07:25:57PM +0800, Xie Yongji wrote:
-> > +             invalidate_gendisk(nbd->disk);
-> > +             if (nbd->config->bytesize)
-> > +                     kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
+> On Mon, Sep 13, 2021 at 07:25:56PM +0800, Xie Yongji wrote:
+> > Use invalidate_gendisk() helper to simplify the code for gendisk
+> > invalidation.
 >
-> I wonder if the invalidate helper should just use
-> set_capacity_and_notify to take care of the notification in the proper
-> way.  This adds an uevent to loop, and adds the RESIZE=1 argument to
-> nbd, but it feels like the right thing to do.
+> bdev can't be null here so this looks good:
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>
+> Can you also add a cleanup patch to remove the bdev checks and the
+> entire bdev variable in __loop_clr_fd?
 
-Looks like set_capacity_and_notify() would not do notification if we
-set capacity to zero. How about calling kobject_uevent() directly in
-the helper?
+Sure.
 
 Thanks,
 Yongji
