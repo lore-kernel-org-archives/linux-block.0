@@ -2,134 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93330C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 06:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E646C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 07:03:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7338860FC0
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 06:28:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7F0160FDA
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 07:03:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237323AbhIMG32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 02:29:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44966 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230003AbhIMG32 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 02:29:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 09A0160FC0;
-        Mon, 13 Sep 2021 06:28:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1631514491;
-        bh=JV9RZ7EErzNlYAw0A/uXNJiRmBcBN/9BrP+lNa3euYY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hTqqGY90fkIrFjXckNWGz/Z5seWChRrfUY6uYIPfaJfdXUC0voqKAzW5oIFxUf4i/
-         zKXIsSbxMVGP262QM+DEo7ejYUM8TGcMx+co3nsJ7+Gw4LmBhbIOjv+kNdWg/aJF30
-         vVzTwo0fY2Z5EGd8WyZFApJcv7B6EbktCxJFBihg=
-Date:   Mon, 13 Sep 2021 08:27:50 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
-Message-ID: <YT7vZthsMCM1uKxm@kroah.com>
-References: <20210913054121.616001-1-hch@lst.de>
- <20210913054121.616001-14-hch@lst.de>
+        id S237496AbhIMHFK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 03:05:10 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:32958 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237492AbhIMHFJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Sep 2021 03:05:09 -0400
+Received: from [192.168.1.87] (unknown [223.184.74.135])
+        by linux.microsoft.com (Postfix) with ESMTPSA id A817120B713A;
+        Mon, 13 Sep 2021 00:03:52 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A817120B713A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1631516634;
+        bh=oXUTh+VKtreR97Vl7n/nyzvuA6UQzHaEaikohl+yWtk=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=NQyfVnOQqcKtcvA4uC2JlSAWZB9hx351ivJX5BvOG6Xd3oA/3Pp20BkZ3v9Nu0whv
+         NT5qReB1X+niABOU7qQ25ajY9RDiTn+PR9gTVLEFvcqKs+DViyoYLpNKunoZeiXAHD
+         KrgBryp+5URNYe9xFboyBsi2mAF/pzqcZ1TMZ4sw=
+Subject: Re: [PATCH] blk-mq: export blk_mq_submit_bio symbol
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        schakrabarti@linux.microsoft.com, lalita.muppana@microsoft.com
+References: <20210909053653.144360-1-kumarpraveen@linux.microsoft.com>
+ <7e80b65b-51a4-3ca1-da43-e87612b8ca5f@nvidia.com>
+ <f7add831-ecf0-6599-158b-cd2f15543da5@linux.microsoft.com>
+ <YT7rL4PhovDOHfHO@infradead.org>
+From:   Praveen Kumar <kumarpraveen@linux.microsoft.com>
+Message-ID: <75f77917-a8ba-0138-750b-8dedd8f7ce7d@linux.microsoft.com>
+Date:   Mon, 13 Sep 2021 12:33:50 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210913054121.616001-14-hch@lst.de>
+In-Reply-To: <YT7rL4PhovDOHfHO@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 07:41:21AM +0200, Christoph Hellwig wrote:
-> Trivial conversion to the seq_file based sysfs attributes.
+On 13-09-2021 11:39, Christoph Hellwig wrote:
+> On Mon, Sep 13, 2021 at 09:54:54AM +0530, Praveen Kumar wrote:
+>>>> +EXPORT_SYMBOL_GPL(blk_mq_submit_bio);
+>>>>
+>>>
+>>> Where is the code that used this API ?
+>>>
+>>
+>> Thanks Chaitanya for your response. Please check my response to Christoph.
+>> That should give overall understanding of the use-case.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/xfs/xfs_stats.c | 24 +++++-------
->  fs/xfs/xfs_stats.h |  2 +-
->  fs/xfs/xfs_sysfs.c | 96 +++++++++++++++++++++++-----------------------
->  3 files changed, 58 insertions(+), 64 deletions(-)
+> Which really doesn't matter, while you keep ingoring the relevant
+> question.  If you code is not upstream or at least actively being
+> submitted upstream your questions have no relevance whatsoever.
+> If you do not undertand that basic fact your are in the wrong place
+> here.
 > 
-> diff --git a/fs/xfs/xfs_stats.c b/fs/xfs/xfs_stats.c
-> index 20e0534a772c9..71e7a84ba0403 100644
-> --- a/fs/xfs/xfs_stats.c
-> +++ b/fs/xfs/xfs_stats.c
-> @@ -16,10 +16,9 @@ static int counter_val(struct xfsstats __percpu *stats, int idx)
->  	return val;
->  }
->  
-> -int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
-> +void xfs_stats_format(struct xfsstats __percpu *stats, struct seq_file *sf)
->  {
->  	int		i, j;
-> -	int		len = 0;
->  	uint64_t	xs_xstrat_bytes = 0;
->  	uint64_t	xs_write_bytes = 0;
->  	uint64_t	xs_read_bytes = 0;
-> @@ -58,13 +57,12 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
->  	/* Loop over all stats groups */
->  
->  	for (i = j = 0; i < ARRAY_SIZE(xstats); i++) {
-> -		len += scnprintf(buf + len, PATH_MAX - len, "%s",
-> -				xstats[i].desc);
-> +		seq_printf(sf, "%s", xstats[i].desc);
-> +
->  		/* inner loop does each group */
->  		for (; j < xstats[i].endpoint; j++)
-> -			len += scnprintf(buf + len, PATH_MAX - len, " %u",
-> -					counter_val(stats, j));
-> -		len += scnprintf(buf + len, PATH_MAX - len, "\n");
-> +			seq_printf(sf, " %u", counter_val(stats, j));
-> +		seq_printf(sf, "\n");
->  	}
->  	/* extra precision counters */
->  	for_each_possible_cpu(i) {
-> @@ -74,18 +72,14 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
->  		defer_relog += per_cpu_ptr(stats, i)->s.defer_relog;
->  	}
->  
-> -	len += scnprintf(buf + len, PATH_MAX-len, "xpc %Lu %Lu %Lu\n",
-> +	seq_printf(sf, "xpc %Lu %Lu %Lu\n",
->  			xs_xstrat_bytes, xs_write_bytes, xs_read_bytes);
-> -	len += scnprintf(buf + len, PATH_MAX-len, "defer_relog %llu\n",
-> -			defer_relog);
-> -	len += scnprintf(buf + len, PATH_MAX-len, "debug %u\n",
-> +	seq_printf(sf, "defer_relog %llu\n", defer_relog);
->  #if defined(DEBUG)
-> -		1);
-> +	seq_printf(sf, "debug 1\n");
->  #else
-> -		0);
-> +	seq_printf(sf, "debug 0\n");
->  #endif
-> -
-> -	return len;
->  }
 
-That is a sysfs file?  What happened to the "one value per file" rule
-here?
+Hi Christoph,
 
-Ugh.
+The upstream activity is being planned and will take sometime to reach to
+that state as we have to make it ready for latest kernel.
 
-Anyway, I like the idea, but as you can see here, it could lead to even
-more abuse of sysfs files.  We are just now getting people to use
-sysfs_emit() and that is showing us where people have been abusing the
-api in bad ways.
+To achieve the same, we were finding some solutions to handle latest changes.
+If you have scanned my previous email where I have provided a detail what the driver
+is doing, I did mention that we plan to use "blk_mq_submit_bio" but failed to do
+so, as code is not exported. So, to the specific answer, this API is NOT being
+used anywhere as of now.
 
-Is there any way that sysfs can keep the existing show functionality and
-just do the seq_printf() for the buffer returned by the attribute file
-inside of the sysfs core?  That would allow us to keep all of the
-existing attribute file functions as-is, and still get rid of the sysfs
-core usage here?
+However, as you mentioned, the API cannot be exported for any specific driver,
+is there any solution or way if a custom driver wants to hook the existing bio path
+and massage it and then fall back to original flow ?
 
-thanks,
+Regards,
 
-greg k-h
+~Praveen.
