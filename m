@@ -2,199 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D397C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 07:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5D5C43217
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 08:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4402F60F92
-	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 07:58:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D47560FBF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Sep 2021 08:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235914AbhIMIAE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 04:00:04 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:16194 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237725AbhIMIAE (ORCPT
+        id S237968AbhIMITl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 04:19:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41282 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237966AbhIMITk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 04:00:04 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4H7Jk30tSGz1DGxK;
-        Mon, 13 Sep 2021 15:57:47 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 13 Sep 2021 15:58:44 +0800
-Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
- (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Mon, 13 Sep
- 2021 15:58:44 +0800
-From:   Laibin Qiu <qiulaibin@huawei.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <martin.petersen@oracle.com>, <ming.lei@redhat.com>,
-        <hare@suse.de>, <asml.silence@gmail.com>, <bvanassche@acm.org>
-Subject: [PATCH -next] blk-mq: fix tag_get wait task can't be awakened
-Date:   Mon, 13 Sep 2021 16:12:48 +0800
-Message-ID: <20210913081248.3201596-1-qiulaibin@huawei.com>
-X-Mailer: git-send-email 2.22.0
+        Mon, 13 Sep 2021 04:19:40 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18D7H3eH032230;
+        Mon, 13 Sep 2021 04:17:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/QzFF3fZPcOazDgK94YUNtDPRVXwWmwYXrgzAl0cjS8=;
+ b=LZ1IatJS4Vf8fkMOpw3nPsnMsWvXi1zKOHNtdoJR3WA1JOBt6akxtAUeaFcmfSrgtfzv
+ 4NRm+1ZMgBCrY9RGl4dUX70gpcEuR/zoFChDQB/2NaF/00szr5Oq+z1uBI4QDWhfD6zc
+ P4rPwNr4fozCqJ0RGb+LWgtoO6TFVqtlItWyJVzIn+2xzExDULNQ2sA1K5ofpZpOPT8T
+ 41lEG9BrbDHup3b+CuJPl0uLd2nP2dTMKAS/okY1PdF2CEfrb2UeKEaug1ngWcpv8R0f
+ l5A1Tv0GjOGn+bmD16W5XhxbS2fbbACIEnfaoLzXVgrhfKN3kKq+UCiD6E2iiWjFNGh3 QQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b19j7cd6k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Sep 2021 04:17:57 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18D7xD27005324;
+        Mon, 13 Sep 2021 04:17:56 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b19j7cd5w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Sep 2021 04:17:56 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18D8DW0J022837;
+        Mon, 13 Sep 2021 08:17:53 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3b0kqj52da-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Sep 2021 08:17:53 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18D8HnQ554067622
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Sep 2021 08:17:49 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 75FA24C091;
+        Mon, 13 Sep 2021 08:17:49 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7AD8A4C0A0;
+        Mon, 13 Sep 2021 08:17:48 +0000 (GMT)
+Received: from [9.145.51.25] (unknown [9.145.51.25])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Sep 2021 08:17:48 +0000 (GMT)
+Subject: Re: [PATCH 6/9] s390/block/dasd_genhd: add error handling support for
+ add_disk()
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        gregkh@linuxfoundation.org, chaitanya.kulkarni@wdc.com,
+        atulgopinathan@gmail.com, hare@suse.de, maximlevitsky@gmail.com,
+        oakad@yahoo.com, ulf.hansson@linaro.org, colin.king@canonical.com,
+        shubhankarvk@gmail.com, baijiaju1990@gmail.com, trix@redhat.com,
+        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        sth@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210902174105.2418771-1-mcgrof@kernel.org>
+ <20210902174105.2418771-7-mcgrof@kernel.org>
+From:   =?UTF-8?Q?Jan_H=c3=b6ppner?= <hoeppner@linux.ibm.com>
+Message-ID: <d6140e40-a472-e732-9893-99e1839b717e@linux.ibm.com>
+Date:   Mon, 13 Sep 2021 10:17:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+In-Reply-To: <20210902174105.2418771-7-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: iIf5PatQK3tLGbkyIENHhS0UWFy_EX4T
+X-Proofpoint-GUID: iNtwPwv-S4pcIL1NuHAo4zaBrJP6dp5o
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 clxscore=1011 priorityscore=1501 lowpriorityscore=0
+ adultscore=0 impostorscore=0 mlxscore=0 phishscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109120024
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When multiple hctx share one tagset. The wake_batch is calculated
-during initialization by queue_depth. But when multiple hctx share one
-tagset. The queue depth assigned to each user may be smaller than
-wakup_batch. This may cause the waiting queue to fail to wakup and leads
-to Hang.
+On 02/09/2021 19:41, Luis Chamberlain wrote:
+> We never checked for errors on add_disk() as this function
+> returned void. Now that this is fixed, use the shiny new
+> error handling.
+> 
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  drivers/s390/block/dasd_genhd.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
+> index fa966e0db6ca..ba07022283bc 100644
+> --- a/drivers/s390/block/dasd_genhd.c
+> +++ b/drivers/s390/block/dasd_genhd.c
+> @@ -33,7 +33,7 @@ int dasd_gendisk_alloc(struct dasd_block *block)
+>  {
+>  	struct gendisk *gdp;
+>  	struct dasd_device *base;
+> -	int len;
+> +	int len, rc;
+>  
+>  	/* Make sure the minor for this device exists. */
+>  	base = block->base;
+> @@ -79,7 +79,11 @@ int dasd_gendisk_alloc(struct dasd_block *block)
+>  	dasd_add_link_to_gendisk(gdp, base);
+>  	block->gdp = gdp;
+>  	set_capacity(block->gdp, 0);
+> -	device_add_disk(&base->cdev->dev, block->gdp, NULL);
+> +
+> +	rc = device_add_disk(&base->cdev->dev, block->gdp, NULL);
+> +	if (rc)
+> +		return rc;
+> +
 
-Fix this by recalculating wake_batch when inc or dec active_queues.
+I think, just like with some of the other changes, there is some
+cleanup required before returning. I'll prepare a patch and
+come back to you.
 
-Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
-Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
----
- block/blk-mq-tag.c      | 44 +++++++++++++++++++++++++++++++++++++++--
- include/linux/sbitmap.h |  8 ++++++++
- lib/sbitmap.c           |  3 ++-
- 3 files changed, 52 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 86f87346232a..d02f5ac0004c 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -16,6 +16,27 @@
- #include "blk-mq-sched.h"
- #include "blk-mq-tag.h"
- 
-+static void bt_update_wake_batch(struct sbitmap_queue *bt, unsigned int users)
-+{
-+	unsigned int depth;
-+
-+	depth = max((bt->sb.depth + users - 1) / users, 4U);
-+	sbitmap_queue_update_wake_batch(bt, depth);
-+}
-+
-+/*
-+ * Recalculate wakeup batch when tag is shared by hctx.
-+ */
-+static void blk_mq_update_wake_batch(struct sbitmap_queue *bitmap_tags,
-+		struct sbitmap_queue *breserved_tags, unsigned int users)
-+{
-+	if (!users)
-+		return;
-+
-+	bt_update_wake_batch(bitmap_tags, users);
-+	bt_update_wake_batch(breserved_tags, users);
-+}
-+
- /*
-  * If a previously inactive queue goes active, bump the active user count.
-  * We need to do this before try to allocate driver tag, then even if fail
-@@ -24,17 +45,29 @@
-  */
- bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
-+	unsigned int users;
-+
- 	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
- 		struct blk_mq_tag_set *set = q->tag_set;
- 
- 		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
--		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
-+		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
- 			atomic_inc(&set->active_queues_shared_sbitmap);
-+
-+			users = atomic_read(&set->active_queues_shared_sbitmap);
-+			blk_mq_update_wake_batch(&set->__bitmap_tags,
-+					&set->__breserved_tags, users);
-+		}
- 	} else {
- 		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
--		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-+		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
- 			atomic_inc(&hctx->tags->active_queues);
-+
-+			users = atomic_read(&hctx->tags->active_queues);
-+			blk_mq_update_wake_batch(&hctx->tags->__bitmap_tags,
-+					&hctx->tags->__breserved_tags, users);
-+		}
- 	}
- 
- 	return true;
-@@ -59,16 +92,23 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 	struct blk_mq_tags *tags = hctx->tags;
- 	struct request_queue *q = hctx->queue;
- 	struct blk_mq_tag_set *set = q->tag_set;
-+	unsigned int users;
- 
- 	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
- 		if (!test_and_clear_bit(QUEUE_FLAG_HCTX_ACTIVE,
- 					&q->queue_flags))
- 			return;
- 		atomic_dec(&set->active_queues_shared_sbitmap);
-+		users = atomic_read(&set->active_queues_shared_sbitmap);
-+		blk_mq_update_wake_batch(&set->__bitmap_tags,
-+				&set->__breserved_tags, users);
- 	} else {
- 		if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
- 			return;
- 		atomic_dec(&tags->active_queues);
-+		users = atomic_read(&tags->active_queues);
-+		blk_mq_update_wake_batch(&tags->__bitmap_tags,
-+				&tags->__breserved_tags, users);
- 	}
- 
- 	blk_mq_tag_wakeup_all(tags, false);
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 2713e689ad66..d49e4f054bfe 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -406,6 +406,14 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
- 	sbitmap_free(&sbq->sb);
- }
- 
-+/**
-+ * sbitmap_queue_update_wake_batch() - Recalucate wake batch.
-+ * @sbq: Bitmap queue.
-+ * @depth: New number of queue depth.
-+ */
-+void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-+				     unsigned int depth);
-+
- /**
-  * sbitmap_queue_resize() - Resize a &struct sbitmap_queue.
-  * @sbq: Bitmap queue to resize.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index b25db9be938a..bbe1d663763f 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -457,7 +457,7 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
- 
--static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-+void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
- 					    unsigned int depth)
- {
- 	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
-@@ -475,6 +475,7 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
- 			atomic_set(&sbq->ws[i].wait_cnt, 1);
- 	}
- }
-+EXPORT_SYMBOL_GPL(sbitmap_queue_update_wake_batch);
- 
- void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
- {
--- 
-2.22.0
+>  	return 0;
+>  }
+>  
+> 
 
