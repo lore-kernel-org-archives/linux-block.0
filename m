@@ -2,98 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4420C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 775F4C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:13:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87D2161151
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5909261163
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:13:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240484AbhINHN1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 03:13:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48800 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240575AbhINHN0 (ORCPT
+        id S240468AbhINHPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 03:15:01 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:15410 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240437AbhINHPA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 03:13:26 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B25C061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 00:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=AzL4+XF2Digv1HL+rJARVaK5sLuH/C/MZkJ5+CGwmbg=; b=o67CinCtb/+reCqvp/wJj/5xpj
-        MsLN8+SI7FpsSM4paxccZ0oSkbo5K8pRXUxkQRv4rMSRPuhpQa8dA7VNRo488JNUZcZtyk0ivMiCo
-        NQqYLT1pfe/jTVE9CBHrAslNmpXmgAs0VDfwr3C1DPPVTjCBQ1Na5LMXRN36khSexlvPQj9Q2AAH3
-        jGKIJHnRekv3QqTr2S2Rlzn15n2yFcTWXYsnvW8jtdIGwSzfX4u6VeS4kVyUd9/3D3J4rtvOlz4nf
-        kaUmwQQ5Hoxf7d33XqO8/qE7NshejNM2Iu78+Ge1nnzK1TmKw1n6GLodv3gGm/fzi0Acxrj0bBYmT
-        IiEvdmgQ==;
-Received: from [2001:4bb8:184:72db:7baf:b601:6734:7149] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQ2Z7-00EMt4-3w; Tue, 14 Sep 2021 07:09:54 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk, martin.petersen@oracle.com
-Cc:     Lihong Kou <koulihong@huawei.com>, kbusch@kernel.org,
-        sagi@grimberg.me, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 2/3] block: flush the integrity workqueue in blk_integrity_unregister
-Date:   Tue, 14 Sep 2021 09:06:56 +0200
-Message-Id: <20210914070657.87677-3-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210914070657.87677-1-hch@lst.de>
-References: <20210914070657.87677-1-hch@lst.de>
+        Tue, 14 Sep 2021 03:15:00 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H7vbz4N7rzR1Ml;
+        Tue, 14 Sep 2021 15:09:35 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Tue, 14 Sep 2021 15:13:39 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Tue, 14 Sep 2021 15:13:38 +0800
+Subject: Re: [PATCH v5 5/6] nbd: convert to use blk_mq_find_and_get_req()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <hch@infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <nbd@other.debian.org>, <yi.zhang@huawei.com>
+References: <20210909141256.2606682-1-yukuai3@huawei.com>
+ <20210909141256.2606682-6-yukuai3@huawei.com> <YT/2z4PSeW5oJWMq@T590>
+ <c6af73a2-f12d-eeef-616e-ae0cdb4f6f2d@huawei.com> <YUBE4BJ7+kN1c4l8@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <374c6b37-b4b2-fe01-66be-ca2dbbc283e9@huawei.com>
+Date:   Tue, 14 Sep 2021 15:13:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YUBE4BJ7+kN1c4l8@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Lihong Kou <koulihong@huawei.com>
+On 2021/09/14 14:44, Ming Lei wrote:
+> On Tue, Sep 14, 2021 at 11:11:06AM +0800, yukuai (C) wrote:
+>> On 2021/09/14 9:11, Ming Lei wrote:
+>>> On Thu, Sep 09, 2021 at 10:12:55PM +0800, Yu Kuai wrote:
+>>>> blk_mq_tag_to_rq() can only ensure to return valid request in
+>>>> following situation:
+>>>>
+>>>> 1) client send request message to server first
+>>>> submit_bio
+>>>> ...
+>>>>    blk_mq_get_tag
+>>>>    ...
+>>>>    blk_mq_get_driver_tag
+>>>>    ...
+>>>>    nbd_queue_rq
+>>>>     nbd_handle_cmd
+>>>>      nbd_send_cmd
+>>>>
+>>>> 2) client receive respond message from server
+>>>> recv_work
+>>>>    nbd_read_stat
+>>>>     blk_mq_tag_to_rq
+>>>>
+>>>> If step 1) is missing, blk_mq_tag_to_rq() will return a stale
+>>>> request, which might be freed. Thus convert to use
+>>>> blk_mq_find_and_get_req() to make sure the returned request is not
+>>>> freed.
+>>>
+>>> But NBD_CMD_INFLIGHT has been added for checking if the reply is
+>>> expected, do we still need blk_mq_find_and_get_req() for covering
+>>> this issue? BTW, request and its payload is pre-allocated, so there
+>>> isn't real use-after-free.
+>>
+>> Hi, Ming
+>>
+>> Checking NBD_CMD_INFLIGHT relied on the request founded by tag is valid,
+>> not the other way round.
+>>
+>> nbd_read_stat
+>>   req = blk_mq_tag_to_rq()
+>>   cmd = blk_mq_rq_to_pdu(req)
+>>   mutex_lock(cmd->lock)
+>>   checking NBD_CMD_INFLIGHT
+> 
+> Request and its payload is pre-allocated, and either req->ref or cmd->lock can
+> serve the same purpose here. Once cmd->lock is held, you can check if the cmd is
+> inflight or not. If it isn't inflight, just return -ENOENT. Is there any
+> problem to handle in this way?
 
-When the integrity profile is unregistered there can still be integrity
-reads queued up which could see a NULL verify_fn as shown by the race
-window below:
+Hi, Ming
 
-CPU0                                    CPU1
-  process_one_work                      nvme_validate_ns
-    bio_integrity_verify_fn                nvme_update_ns_info
-	                                     nvme_update_disk_info
-	                                       blk_integrity_unregister
-                                               ---set queue->integrity as 0
-	bio_integrity_process
-	--access bi->profile->verify_fn(bi is a pointer of queue->integity)
+in nbd_read_stat:
 
-Before calling blk_integrity_unregister in nvme_update_disk_info, we must
-make sure that there is no work item in the kintegrityd_wq. Just call
-blk_flush_integrity to flush the work queue so the bug can be resolved.
+1) get a request by tag first
+2) get nbd_cmd by the request
+3) hold cmd->lock and check if cmd is inflight
 
-Signed-off-by: Lihong Kou <koulihong@huawei.com>
-[hch: split up and shortened the changelog]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-integrity.c | 3 +++
- 1 file changed, 3 insertions(+)
+If we want to check if the cmd is inflight in step 3), we have to do
+setp 1) and 2) first. As I explained in patch 0, blk_mq_tag_to_rq()
+can't make sure the returned request is not freed:
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 48bfb53aa8571..16d5d5338392a 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -430,6 +430,9 @@ void blk_integrity_unregister(struct gendisk *disk)
- 
- 	if (!bi->profile)
- 		return;
-+
-+	/* ensure all bios are off the integrity workqueue */
-+	blk_flush_integrity();
- 	blk_queue_flag_clear(QUEUE_FLAG_STABLE_WRITES, disk->queue);
- 	memset(bi, 0, sizeof(*bi));
- }
--- 
-2.30.2
+nbd_read_stat
+			blk_mq_sched_free_requests
+			 blk_mq_free_rqs
+   blk_mq_tag_to_rq
+   -> get rq before clear mapping
+			  blk_mq_clear_rq_mapping
+			  __free_pages -> rq is freed
+   blk_mq_request_started -> UAF
+
+
+Thanks,
+Kuai
+
+
+
 
