@@ -2,200 +2,190 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB38C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 064FDC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 14:33:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0ABE26108B
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:44:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E23846108B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 14:33:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232779AbhINMp3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 08:45:29 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:15414 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232613AbhINMp2 (ORCPT
+        id S233974AbhINOew (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 10:34:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34473 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233992AbhINOev (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 08:45:28 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H82xJ20yBzQyM4;
-        Tue, 14 Sep 2021 20:40:04 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Tue, 14 Sep 2021 20:44:09 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Tue, 14
- Sep 2021 20:44:09 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <linux-block@vger.kernel.org>, <stable@vger.kernel.org>,
-        <axboe@kernel.dk>, <gregkh@linuxfoundation.org>, <hch@lst.de>
-CC:     <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH linux-4.19.y] blk-mq: fix divide by zero crash in tg_may_dispatch()
-Date:   Tue, 14 Sep 2021 20:54:02 +0800
-Message-ID: <20210914125402.4068844-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 14 Sep 2021 10:34:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631630013;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=chATlUeF4N2elSt4fnYjmQllXyvDEPn10NBT5Xpx3Lc=;
+        b=bPFtm/39YT0DUCi0Dh7hM3PJaoJcl3JrpSTaQIofS1dg0Mob3dAD1ZzenPEGWHmtxP/3wg
+        V6qAWRU3YYndW1L4SCfCf9dcKUmhSDFuAVtmuckyaQCb7PLSk938wGyi06OzbCEuuAqUJI
+        A9X0sS9ADRDoDQ+bhbrJlCWwRVkkjNk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-xqTRlyvPP4GVeILmnWrUCw-1; Tue, 14 Sep 2021 10:33:31 -0400
+X-MC-Unique: xqTRlyvPP4GVeILmnWrUCw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 556671060DAB;
+        Tue, 14 Sep 2021 14:33:30 +0000 (UTC)
+Received: from T590 (ovpn-12-32.pek2.redhat.com [10.72.12.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B65585D9DC;
+        Tue, 14 Sep 2021 14:33:22 +0000 (UTC)
+Date:   Tue, 14 Sep 2021 22:33:32 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, josef@toxicpanda.com, hch@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        nbd@other.debian.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v5 5/6] nbd: convert to use blk_mq_find_and_get_req()
+Message-ID: <YUCyvDDG0gOzaFfR@T590>
+References: <20210909141256.2606682-1-yukuai3@huawei.com>
+ <20210909141256.2606682-6-yukuai3@huawei.com>
+ <YT/2z4PSeW5oJWMq@T590>
+ <c6af73a2-f12d-eeef-616e-ae0cdb4f6f2d@huawei.com>
+ <YUBE4BJ7+kN1c4l8@T590>
+ <374c6b37-b4b2-fe01-66be-ca2dbbc283e9@huawei.com>
+ <YUBTVBioqJ7qas2R@T590>
+ <39e628cc-496c-ba20-b53a-fbeecc1d7e4e@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <39e628cc-496c-ba20-b53a-fbeecc1d7e4e@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If blk-throttle is enabled and io is issued before
-blk_throtl_register_queue() is done. Divide by zero crash will be
-triggered in tg_may_dispatch() because 'throtl_slice' is uninitialized.
+On Tue, Sep 14, 2021 at 05:08:00PM +0800, yukuai (C) wrote:
+> On 2021/09/14 15:46, Ming Lei wrote:
+> > On Tue, Sep 14, 2021 at 03:13:38PM +0800, yukuai (C) wrote:
+> > > On 2021/09/14 14:44, Ming Lei wrote:
+> > > > On Tue, Sep 14, 2021 at 11:11:06AM +0800, yukuai (C) wrote:
+> > > > > On 2021/09/14 9:11, Ming Lei wrote:
+> > > > > > On Thu, Sep 09, 2021 at 10:12:55PM +0800, Yu Kuai wrote:
+> > > > > > > blk_mq_tag_to_rq() can only ensure to return valid request in
+> > > > > > > following situation:
+> > > > > > > 
+> > > > > > > 1) client send request message to server first
+> > > > > > > submit_bio
+> > > > > > > ...
+> > > > > > >     blk_mq_get_tag
+> > > > > > >     ...
+> > > > > > >     blk_mq_get_driver_tag
+> > > > > > >     ...
+> > > > > > >     nbd_queue_rq
+> > > > > > >      nbd_handle_cmd
+> > > > > > >       nbd_send_cmd
+> > > > > > > 
+> > > > > > > 2) client receive respond message from server
+> > > > > > > recv_work
+> > > > > > >     nbd_read_stat
+> > > > > > >      blk_mq_tag_to_rq
+> > > > > > > 
+> > > > > > > If step 1) is missing, blk_mq_tag_to_rq() will return a stale
+> > > > > > > request, which might be freed. Thus convert to use
+> > > > > > > blk_mq_find_and_get_req() to make sure the returned request is not
+> > > > > > > freed.
+> > > > > > 
+> > > > > > But NBD_CMD_INFLIGHT has been added for checking if the reply is
+> > > > > > expected, do we still need blk_mq_find_and_get_req() for covering
+> > > > > > this issue? BTW, request and its payload is pre-allocated, so there
+> > > > > > isn't real use-after-free.
+> > > > > 
+> > > > > Hi, Ming
+> > > > > 
+> > > > > Checking NBD_CMD_INFLIGHT relied on the request founded by tag is valid,
+> > > > > not the other way round.
+> > > > > 
+> > > > > nbd_read_stat
+> > > > >    req = blk_mq_tag_to_rq()
+> > > > >    cmd = blk_mq_rq_to_pdu(req)
+> > > > >    mutex_lock(cmd->lock)
+> > > > >    checking NBD_CMD_INFLIGHT
+> > > > 
+> > > > Request and its payload is pre-allocated, and either req->ref or cmd->lock can
+> > > > serve the same purpose here. Once cmd->lock is held, you can check if the cmd is
+> > > > inflight or not. If it isn't inflight, just return -ENOENT. Is there any
+> > > > problem to handle in this way?
+> > > 
+> > > Hi, Ming
+> > > 
+> > > in nbd_read_stat:
+> > > 
+> > > 1) get a request by tag first
+> > > 2) get nbd_cmd by the request
+> > > 3) hold cmd->lock and check if cmd is inflight
+> > > 
+> > > If we want to check if the cmd is inflight in step 3), we have to do
+> > > setp 1) and 2) first. As I explained in patch 0, blk_mq_tag_to_rq()
+> > > can't make sure the returned request is not freed:
+> > > 
+> > > nbd_read_stat
+> > > 			blk_mq_sched_free_requests
+> > > 			 blk_mq_free_rqs
+> > >    blk_mq_tag_to_rq
+> > >    -> get rq before clear mapping
+> > > 			  blk_mq_clear_rq_mapping
+> > > 			  __free_pages -> rq is freed
+> > >    blk_mq_request_started -> UAF
+> > 
+> > If the above can happen, blk_mq_find_and_get_req() may not fix it too, just
+> 
+> Hi, Ming
+> 
+> Why can't blk_mq_find_and_get_req() fix it? I can't think of any
+> scenario that might have problem currently.
 
-The problem is fixed in commit 75f4dca59694 ("block: call
-blk_register_queue earlier in device_add_disk") from mainline, however
-it's too hard to backport this patch due to lots of refactoring.
+The principle behind blk_mq_find_and_get_req() is that if one request's
+ref is grabbed, the queue's usage counter is guaranteed to be grabbed,
+and this way isn't straight-forward.
 
-Thus introduce a new flag QUEUE_FLAG_THROTL_INIT_DONE. It will be set
-after blk_throtl_register_queue() is done, and will be checked before
-applying any config.
+Yeah, it can fix the issue, but I don't think it is good to call it in
+fast path cause tags->lock is required.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-sysfs.c      |  2 ++
- block/blk-throttle.c   | 41 +++++++++++++++++++++++++++++++++++++++--
- include/linux/blkdev.h |  1 +
- 3 files changed, 42 insertions(+), 2 deletions(-)
+> 
+> > wondering why not take the following simpler way for avoiding the UAF?
+> > 
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index 5170a630778d..dfa5cce71f66 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -795,9 +795,13 @@ static void recv_work(struct work_struct *work)
+> >   						     work);
+> >   	struct nbd_device *nbd = args->nbd;
+> >   	struct nbd_config *config = nbd->config;
+> > +	struct request_queue *q = nbd->disk->queue;
+> >   	struct nbd_cmd *cmd;
+> >   	struct request *rq;
+> > +	if (!percpu_ref_tryget(&q->q_usage_counter))
+> > +                return;
+> > +
+> 
+> We can't make sure freeze_queue is called before this, thus this approch
+> can't fix the problem, right?
+>  nbd_read_stat
+>     blk_mq_tag_to_rq
+> 			elevator_switch
+> 			 blk_mq_freeze_queue(q);
+> 			 elevator_switch_mq
+> 			  elevator_exit
+> 			   blk_mq_sched_free_requests
+>     blk_mq_request_started -> UAF
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 07494deb1a26..7d250acf8ece 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -954,6 +954,7 @@ int blk_register_queue(struct gendisk *disk)
- 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
- 	wbt_enable_default(q);
- 	blk_throtl_register_queue(q);
-+	blk_queue_flag_set(QUEUE_FLAG_THROTL_INIT_DONE, q);
- 
- 	/* Now everything is ready and send out KOBJ_ADD uevent */
- 	kobject_uevent(&q->kobj, KOBJ_ADD);
-@@ -986,6 +987,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (!blk_queue_registered(q))
- 		return;
- 
-+	blk_queue_flag_clear(QUEUE_FLAG_THROTL_INIT_DONE, q);
- 	/*
- 	 * Since sysfs_remove_dir() prevents adding new directory entries
- 	 * before removal of existing entries starts, protect against
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index caee658609d7..b2eeca9a9962 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -11,6 +11,8 @@
- #include <linux/bio.h>
- #include <linux/blktrace_api.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/sched/signal.h>
-+#include <linux/delay.h>
- #include "blk.h"
- 
- /* Max dispatch from a group in 1 round */
-@@ -1428,6 +1430,31 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 	}
- }
- 
-+static inline int throtl_check_init_done(struct request_queue *q)
-+{
-+	if (test_bit(QUEUE_FLAG_THROTL_INIT_DONE, &q->queue_flags))
-+		return 0;
-+
-+	return blk_queue_dying(q) ? -ENODEV : -EBUSY;
-+}
-+
-+/*
-+ * If throtl_check_init_done() return -EBUSY, we should retry after a short
-+ * msleep(), since that throttle init will be completed in blk_register_queue()
-+ * soon.
-+ */
-+static inline int throtl_restart_syscall_when_busy(int errno)
-+{
-+	int ret = errno;
-+
-+	if (ret == -EBUSY) {
-+		msleep(10);
-+		ret = restart_syscall();
-+	}
-+
-+	return ret;
-+}
-+
- static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 			   char *buf, size_t nbytes, loff_t off, bool is_u64)
- {
-@@ -1441,6 +1468,10 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 	if (ret)
- 		return ret;
- 
-+	ret = throtl_check_init_done(ctx.disk->queue);
-+	if (ret)
-+		goto out_finish;
-+
- 	ret = -EINVAL;
- 	if (sscanf(ctx.body, "%llu", &v) != 1)
- 		goto out_finish;
-@@ -1448,7 +1479,6 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 		v = U64_MAX;
- 
- 	tg = blkg_to_tg(ctx.blkg);
--
- 	if (is_u64)
- 		*(u64 *)((void *)tg + of_cft(of)->private) = v;
- 	else
-@@ -1458,6 +1488,8 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 	ret = 0;
- out_finish:
- 	blkg_conf_finish(&ctx);
-+	ret = throtl_restart_syscall_when_busy(ret);
-+
- 	return ret ?: nbytes;
- }
- 
-@@ -1607,8 +1639,11 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	if (ret)
- 		return ret;
- 
--	tg = blkg_to_tg(ctx.blkg);
-+	ret = throtl_check_init_done(ctx.disk->queue);
-+	if (ret)
-+		goto out_finish;
- 
-+	tg = blkg_to_tg(ctx.blkg);
- 	v[0] = tg->bps_conf[READ][index];
- 	v[1] = tg->bps_conf[WRITE][index];
- 	v[2] = tg->iops_conf[READ][index];
-@@ -1704,6 +1739,8 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	ret = 0;
- out_finish:
- 	blkg_conf_finish(&ctx);
-+	ret = throtl_restart_syscall_when_busy(ret);
-+
- 	return ret ?: nbytes;
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 209ba8e7bd31..22be9f090bf1 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -684,6 +684,7 @@ struct request_queue {
- #define QUEUE_FLAG_NOMERGES     5	/* disable merge attempts */
- #define QUEUE_FLAG_SAME_COMP	6	/* complete on same CPU-group */
- #define QUEUE_FLAG_FAIL_IO	7	/* fake timeout */
-+#define QUEUE_FLAG_THROTL_INIT_DONE 8	/* io throttle can be online */
- #define QUEUE_FLAG_NONROT	9	/* non-rotational device (SSD) */
- #define QUEUE_FLAG_VIRT        QUEUE_FLAG_NONROT /* paravirt device */
- #define QUEUE_FLAG_IO_STAT     10	/* do IO stats */
--- 
-2.31.1
+No, blk_mq_freeze_queue() waits until .q_usage_counter becomes zero, so
+there won't be any concurrent nbd_read_stat() during switching elevator
+if ->q_usage_counter is grabbed in recv_work().
+
+Thanks,
+Ming
 
