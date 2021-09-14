@@ -2,207 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1998CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 05:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF57C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 05:35:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01E2861164
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 05:13:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E6FF610A2
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 05:35:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239459AbhINFOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 01:14:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49992 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239500AbhINFOV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 01:14:21 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DBAB860F21;
-        Tue, 14 Sep 2021 05:13:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1631596384;
-        bh=AUC88WAiX+VR+fTnlcmenz58rltr9CQ7tv88IFx/wQQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gtm192x0anPgl38s8NNt3Wc46OwSlcp1LPVgM7PqMhdMDKdSPFD1Q4IclJL6sBYta
-         0BHtaIko7qK2PtfubiSe9GirD3MujUh3/nvebHmjtO4OdZDw1NHjwSlQiDXtJh2t9G
-         kAq4V7av/nhvVE56YXW3AU6pps/ZzeUu247yxXzM=
-Date:   Tue, 14 Sep 2021 07:12:43 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
-Message-ID: <YUAvSx42abg5S2ym@kroah.com>
-References: <20210913054121.616001-1-hch@lst.de>
- <20210913054121.616001-14-hch@lst.de>
- <YT7vZthsMCM1uKxm@kroah.com>
- <20210914012029.GF2361455@dread.disaster.area>
+        id S239580AbhINFhI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 01:37:08 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:33434 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237341AbhINFhH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Sep 2021 01:37:07 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 6BECD1FDCA;
+        Tue, 14 Sep 2021 05:35:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1631597749; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0a/VnN2wn6kf3CRj3bkdHFe/CL4cRuLtEaRPbeckjQ4=;
+        b=KsjLS31ATYXTnlL4QvHJ/ThAcNB3xoCMosE6QzcP1t2e/HO1CIEPaJjmzqWoSPkbgBqTpA
+        p5xUfuwKGf2WFjNgkGEsT2ZcadRYw34yjsCGSHV6IiB6nrVaZSVKWJ7fTJAmkMU9nsQSXJ
+        dkiBtoEnOTeSQNBYhcrxvOFwcwhZyuk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1631597749;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0a/VnN2wn6kf3CRj3bkdHFe/CL4cRuLtEaRPbeckjQ4=;
+        b=FKOY6uS0FUh60q5rvrz+RVtV1Rb1Oika+KRaosu8ykFoYfSekYTiv6+Qw0GMPGV7n/xeWe
+        oefhygvPfR60ddDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2244F13E4A;
+        Tue, 14 Sep 2021 05:35:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id iZ5EArU0QGEOTwAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 14 Sep 2021 05:35:48 +0000
+Subject: Re: [PATCH RESEND v3 01/13] blk-mq: Change rqs check in
+ blk_mq_free_rqs()
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        ming.lei@redhat.com, linux-scsi@vger.kernel.org
+References: <1631545950-56586-1-git-send-email-john.garry@huawei.com>
+ <1631545950-56586-2-git-send-email-john.garry@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <7a75a9e0-5467-e4fa-d059-8154f5568854@suse.de>
+Date:   Tue, 14 Sep 2021 07:35:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210914012029.GF2361455@dread.disaster.area>
+In-Reply-To: <1631545950-56586-2-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 11:20:29AM +1000, Dave Chinner wrote:
-> On Mon, Sep 13, 2021 at 08:27:50AM +0200, Greg Kroah-Hartman wrote:
-> > On Mon, Sep 13, 2021 at 07:41:21AM +0200, Christoph Hellwig wrote:
-> > > Trivial conversion to the seq_file based sysfs attributes.
-> > > 
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > ---
-> > >  fs/xfs/xfs_stats.c | 24 +++++-------
-> > >  fs/xfs/xfs_stats.h |  2 +-
-> > >  fs/xfs/xfs_sysfs.c | 96 +++++++++++++++++++++++-----------------------
-> > >  3 files changed, 58 insertions(+), 64 deletions(-)
-> > > 
-> > > diff --git a/fs/xfs/xfs_stats.c b/fs/xfs/xfs_stats.c
-> > > index 20e0534a772c9..71e7a84ba0403 100644
-> > > --- a/fs/xfs/xfs_stats.c
-> > > +++ b/fs/xfs/xfs_stats.c
-> > > @@ -16,10 +16,9 @@ static int counter_val(struct xfsstats __percpu *stats, int idx)
-> > >  	return val;
-> > >  }
-> > >  
-> > > -int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
-> > > +void xfs_stats_format(struct xfsstats __percpu *stats, struct seq_file *sf)
-> > >  {
-> > >  	int		i, j;
-> > > -	int		len = 0;
-> > >  	uint64_t	xs_xstrat_bytes = 0;
-> > >  	uint64_t	xs_write_bytes = 0;
-> > >  	uint64_t	xs_read_bytes = 0;
-> > > @@ -58,13 +57,12 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
-> > >  	/* Loop over all stats groups */
-> > >  
-> > >  	for (i = j = 0; i < ARRAY_SIZE(xstats); i++) {
-> > > -		len += scnprintf(buf + len, PATH_MAX - len, "%s",
-> > > -				xstats[i].desc);
-> > > +		seq_printf(sf, "%s", xstats[i].desc);
-> > > +
-> > >  		/* inner loop does each group */
-> > >  		for (; j < xstats[i].endpoint; j++)
-> > > -			len += scnprintf(buf + len, PATH_MAX - len, " %u",
-> > > -					counter_val(stats, j));
-> > > -		len += scnprintf(buf + len, PATH_MAX - len, "\n");
-> > > +			seq_printf(sf, " %u", counter_val(stats, j));
-> > > +		seq_printf(sf, "\n");
-> > >  	}
-> > >  	/* extra precision counters */
-> > >  	for_each_possible_cpu(i) {
-> > > @@ -74,18 +72,14 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
-> > >  		defer_relog += per_cpu_ptr(stats, i)->s.defer_relog;
-> > >  	}
-> > >  
-> > > -	len += scnprintf(buf + len, PATH_MAX-len, "xpc %Lu %Lu %Lu\n",
-> > > +	seq_printf(sf, "xpc %Lu %Lu %Lu\n",
-> > >  			xs_xstrat_bytes, xs_write_bytes, xs_read_bytes);
-> > > -	len += scnprintf(buf + len, PATH_MAX-len, "defer_relog %llu\n",
-> > > -			defer_relog);
-> > > -	len += scnprintf(buf + len, PATH_MAX-len, "debug %u\n",
-> > > +	seq_printf(sf, "defer_relog %llu\n", defer_relog);
-> > >  #if defined(DEBUG)
-> > > -		1);
-> > > +	seq_printf(sf, "debug 1\n");
-> > >  #else
-> > > -		0);
-> > > +	seq_printf(sf, "debug 0\n");
-> > >  #endif
-> > > -
-> > > -	return len;
-> > >  }
-> > 
-> > That is a sysfs file?  What happened to the "one value per file" rule
-> > here?
+On 9/13/21 5:12 PM, John Garry wrote:
+> The original code in commit 24d2f90309b23 ("blk-mq: split out tag
+> initialization, support shared tags") would check tags->rqs is non-NULL and
+> then dereference tags->rqs[].
 > 
+> Then in commit 2af8cbe30531 ("blk-mq: split tag ->rqs[] into two"), we
+> started to dereference tags->static_rqs[], but continued to check non-NULL
+> tags->rqs.
 > 
-> There is no "rule" that says syfs files must contain one value per
-> file; the documentation says that one value per file is the
-> "preferred" format.  Documentation/filesystems/sysfs.rst:
+> Check tags->static_rqs as non-NULL instead, which is more logical.
 > 
-> [...]
-> Attributes
-> ...
-> Attributes should be ASCII text files, preferably with only one value
-> per file. It is noted that it may not be efficient to contain only one
-> value per file, so it is socially acceptable to express an array of
-> values of the same type.
-> [...]
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-mq.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 108a352051be..2316ff27c1f5 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2340,7 +2340,7 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>   {
+>   	struct page *page;
+>   
+> -	if (tags->rqs && set->ops->exit_request) {
+> +	if (tags->static_rqs && set->ops->exit_request) {
+>   		int i;
+>   
+>   		for (i = 0; i < tags->nr_tags; i++) {
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-An array of values is one thing like "what is the power states for this
-device".  A list of different key/value pairs is a totally different
-thing entirely.
+Cheers,
 
-> We are exposing a large array of integer values here, so multiple
-> values per file are explicitly considered an acceptible format.
-
-Not really, that was not the goal of sysfs at all.
-
-> Further, as there are roughly 200 individual stats in this file and
-> calculating each stat requires per-cpu aggregation, the the cost of
-> calculating and reading each stat individually is prohibitive, not
-> just inefficient.
-
-Have you measured it?  How often does the file get read and by what
-tools?
-
-We have learned from our past mistakes in /proc where we did this in the
-past and required keeping obsolete values and constantly tweaking
-userspace parsers.  That is why we made sysfs one-value-per-file.  If
-the file is not there, the value is not there, much easier to handle
-future changes.
-
-> So, yes, we might have multiple lines in the file that you can frown
-> about, but OTOH the file format has been exposed as a kernel ABI for
-> a couple of decades via /proc/fs/xfs/stat.
-
-proc had no such rules, but we have learned :)
-
-> Hence exposing it in
-> sysfs to provide a more fine-grained breakdown of the stats (per
-> mount instead of global) is a no-brainer. We don't have to rewrite
-> the parsing engines in multiple userspace monitoring programs to
-> extract this information from the kernel - they just create a new
-> instance and read a different file and it all just works.
-
-But then you run into the max size restriction on sysfs files
-(PAGE_SIZE) and things break down.
-
-Please don't do this.
-
-> Indeed, there's precedence for such /proc file formats in more
-> fine-grained sysfs files. e.g.  /sys/bus/node/devices/node<n>/vmstat
-> and /sys/bus/node/devices/node<n>/meminfo retain the same format
-> (and hence userspace parsers) for the per-node stats as /proc/vmstat
-> and /proc/meminfo use for the global stats...
-
-And I have complained about those files in the past many times.  And
-they are running into problems in places dealing with them too.
-
-> tl;dr: the file contains arrays of values, it's inefficient to read
-> values one at a time, it's a pre-existing ABI-constrainted file
-> format, there's precedence in core kernel statistics
-> implementations and the documented guidelines allow this sort of
-> usage in these cases.
-
-I would prefer not to do this, and I will not take core sysfs changes to
-make this any easier.
-
-Which is one big reason why I don't like just making sysfs use the seq
-file api, it would allow stuff like this to propagate to other places in
-the kernel.
-
-Maybe I should cut the file size of a sysfs file down to PAGE_SIZE/4 or
-less, that might be better :)
-
-thanks,
-
-greg k-h
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
