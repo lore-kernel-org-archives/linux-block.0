@@ -2,95 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6293DC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 01:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE118C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 01:51:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 477B760F26
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 01:11:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5BE96113B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 01:51:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237344AbhINBNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 21:13:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47990 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237193AbhINBND (ORCPT
+        id S231183AbhINBwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 21:52:20 -0400
+Received: from mail107.syd.optusnet.com.au ([211.29.132.53]:34346 "EHLO
+        mail107.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230340AbhINBwT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 21:13:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631581906;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sAmERlnzgu6E6drIi7Ej5aFj4eTItZbD2NbSWsNlmtQ=;
-        b=In9RLAtlE4rjx/2K0/ZbJqhGf28D/hBzpBK9d4mebPKEzXG2yuGAabm8pUifD1xKr9rMWd
-        xKpHLeDUhZQxg53y2Sn1cxRbwRN7dsm7hTq/Fs8Rn4+mBNkJplf/5mdy0wlUsJ4QMWhwi6
-        sxjJTGLMm24J8YTbN8vI+tCdoAJR2TA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-AWq1OgyxOhaXC5VvJWxvPQ-1; Mon, 13 Sep 2021 21:11:45 -0400
-X-MC-Unique: AWq1OgyxOhaXC5VvJWxvPQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC277802936;
-        Tue, 14 Sep 2021 01:11:43 +0000 (UTC)
-Received: from T590 (ovpn-12-85.pek2.redhat.com [10.72.12.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9220A60C82;
-        Tue, 14 Sep 2021 01:11:34 +0000 (UTC)
-Date:   Tue, 14 Sep 2021 09:11:43 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, josef@toxicpanda.com, hch@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        nbd@other.debian.org, yi.zhang@huawei.com
-Subject: Re: [PATCH v5 5/6] nbd: convert to use blk_mq_find_and_get_req()
-Message-ID: <YT/2z4PSeW5oJWMq@T590>
-References: <20210909141256.2606682-1-yukuai3@huawei.com>
- <20210909141256.2606682-6-yukuai3@huawei.com>
+        Mon, 13 Sep 2021 21:52:19 -0400
+X-Greylist: delayed 1829 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 Sep 2021 21:52:19 EDT
+Received: from dread.disaster.area (pa49-195-238-16.pa.nsw.optusnet.com.au [49.195.238.16])
+        by mail107.syd.optusnet.com.au (Postfix) with ESMTPS id 3CFD9ECB25A;
+        Tue, 14 Sep 2021 11:20:30 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1mPx7d-00CCJV-0Z; Tue, 14 Sep 2021 11:20:29 +1000
+Date:   Tue, 14 Sep 2021 11:20:29 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
+Message-ID: <20210914012029.GF2361455@dread.disaster.area>
+References: <20210913054121.616001-1-hch@lst.de>
+ <20210913054121.616001-14-hch@lst.de>
+ <YT7vZthsMCM1uKxm@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210909141256.2606682-6-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <YT7vZthsMCM1uKxm@kroah.com>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0
+        a=DzKKRZjfViQTE5W6EVc0VA==:117 a=DzKKRZjfViQTE5W6EVc0VA==:17
+        a=kj9zAlcOel0A:10 a=7QKq2e-ADPsA:10 a=7-415B0cAAAA:8
+        a=hM_N2pAvqWJ6tqKoahEA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 09, 2021 at 10:12:55PM +0800, Yu Kuai wrote:
-> blk_mq_tag_to_rq() can only ensure to return valid request in
-> following situation:
+On Mon, Sep 13, 2021 at 08:27:50AM +0200, Greg Kroah-Hartman wrote:
+> On Mon, Sep 13, 2021 at 07:41:21AM +0200, Christoph Hellwig wrote:
+> > Trivial conversion to the seq_file based sysfs attributes.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >  fs/xfs/xfs_stats.c | 24 +++++-------
+> >  fs/xfs/xfs_stats.h |  2 +-
+> >  fs/xfs/xfs_sysfs.c | 96 +++++++++++++++++++++++-----------------------
+> >  3 files changed, 58 insertions(+), 64 deletions(-)
+> > 
+> > diff --git a/fs/xfs/xfs_stats.c b/fs/xfs/xfs_stats.c
+> > index 20e0534a772c9..71e7a84ba0403 100644
+> > --- a/fs/xfs/xfs_stats.c
+> > +++ b/fs/xfs/xfs_stats.c
+> > @@ -16,10 +16,9 @@ static int counter_val(struct xfsstats __percpu *stats, int idx)
+> >  	return val;
+> >  }
+> >  
+> > -int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
+> > +void xfs_stats_format(struct xfsstats __percpu *stats, struct seq_file *sf)
+> >  {
+> >  	int		i, j;
+> > -	int		len = 0;
+> >  	uint64_t	xs_xstrat_bytes = 0;
+> >  	uint64_t	xs_write_bytes = 0;
+> >  	uint64_t	xs_read_bytes = 0;
+> > @@ -58,13 +57,12 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
+> >  	/* Loop over all stats groups */
+> >  
+> >  	for (i = j = 0; i < ARRAY_SIZE(xstats); i++) {
+> > -		len += scnprintf(buf + len, PATH_MAX - len, "%s",
+> > -				xstats[i].desc);
+> > +		seq_printf(sf, "%s", xstats[i].desc);
+> > +
+> >  		/* inner loop does each group */
+> >  		for (; j < xstats[i].endpoint; j++)
+> > -			len += scnprintf(buf + len, PATH_MAX - len, " %u",
+> > -					counter_val(stats, j));
+> > -		len += scnprintf(buf + len, PATH_MAX - len, "\n");
+> > +			seq_printf(sf, " %u", counter_val(stats, j));
+> > +		seq_printf(sf, "\n");
+> >  	}
+> >  	/* extra precision counters */
+> >  	for_each_possible_cpu(i) {
+> > @@ -74,18 +72,14 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
+> >  		defer_relog += per_cpu_ptr(stats, i)->s.defer_relog;
+> >  	}
+> >  
+> > -	len += scnprintf(buf + len, PATH_MAX-len, "xpc %Lu %Lu %Lu\n",
+> > +	seq_printf(sf, "xpc %Lu %Lu %Lu\n",
+> >  			xs_xstrat_bytes, xs_write_bytes, xs_read_bytes);
+> > -	len += scnprintf(buf + len, PATH_MAX-len, "defer_relog %llu\n",
+> > -			defer_relog);
+> > -	len += scnprintf(buf + len, PATH_MAX-len, "debug %u\n",
+> > +	seq_printf(sf, "defer_relog %llu\n", defer_relog);
+> >  #if defined(DEBUG)
+> > -		1);
+> > +	seq_printf(sf, "debug 1\n");
+> >  #else
+> > -		0);
+> > +	seq_printf(sf, "debug 0\n");
+> >  #endif
+> > -
+> > -	return len;
+> >  }
 > 
-> 1) client send request message to server first
-> submit_bio
-> ...
->  blk_mq_get_tag
->  ...
->  blk_mq_get_driver_tag
->  ...
->  nbd_queue_rq
->   nbd_handle_cmd
->    nbd_send_cmd
-> 
-> 2) client receive respond message from server
-> recv_work
->  nbd_read_stat
->   blk_mq_tag_to_rq
-> 
-> If step 1) is missing, blk_mq_tag_to_rq() will return a stale
-> request, which might be freed. Thus convert to use
-> blk_mq_find_and_get_req() to make sure the returned request is not
-> freed.
-
-But NBD_CMD_INFLIGHT has been added for checking if the reply is
-expected, do we still need blk_mq_find_and_get_req() for covering
-this issue? BTW, request and its payload is pre-allocated, so there
-isn't real use-after-free.
+> That is a sysfs file?  What happened to the "one value per file" rule
+> here?
 
 
-Thanks,
-Ming
+There is no "rule" that says syfs files must contain one value per
+file; the documentation says that one value per file is the
+"preferred" format.  Documentation/filesystems/sysfs.rst:
 
+[...]
+Attributes
+...
+Attributes should be ASCII text files, preferably with only one value
+per file. It is noted that it may not be efficient to contain only one
+value per file, so it is socially acceptable to express an array of
+values of the same type.
+[...]
+
+We are exposing a large array of integer values here, so multiple
+values per file are explicitly considered an acceptible format.
+Further, as there are roughly 200 individual stats in this file and
+calculating each stat requires per-cpu aggregation, the the cost of
+calculating and reading each stat individually is prohibitive, not
+just inefficient.
+
+So, yes, we might have multiple lines in the file that you can frown
+about, but OTOH the file format has been exposed as a kernel ABI for
+a couple of decades via /proc/fs/xfs/stat. Hence exposing it in
+sysfs to provide a more fine-grained breakdown of the stats (per
+mount instead of global) is a no-brainer. We don't have to rewrite
+the parsing engines in multiple userspace monitoring programs to
+extract this information from the kernel - they just create a new
+instance and read a different file and it all just works.
+
+Indeed, there's precedence for such /proc file formats in more
+fine-grained sysfs files. e.g.  /sys/bus/node/devices/node<n>/vmstat
+and /sys/bus/node/devices/node<n>/meminfo retain the same format
+(and hence userspace parsers) for the per-node stats as /proc/vmstat
+and /proc/meminfo use for the global stats...
+
+tl;dr: the file contains arrays of values, it's inefficient to read
+values one at a time, it's a pre-existing ABI-constrainted file
+format, there's precedence in core kernel statistics
+implementations and the documented guidelines allow this sort of
+usage in these cases.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
