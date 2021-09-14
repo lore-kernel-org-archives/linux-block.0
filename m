@@ -2,132 +2,186 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF98C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 09:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8D9C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 09:08:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D29CE61108
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 09:04:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C378661155
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 09:08:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231424AbhINJGP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 05:06:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46732 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbhINJGP (ORCPT
+        id S229863AbhINJJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 05:09:20 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:19972 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229656AbhINJJU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 05:06:15 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6738CC061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 02:04:58 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id h1so22441727ljl.9
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 02:04:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hJGnWAchz/HDqF7HydjX2fUZvRJTYMKYHvyvKYF6LTA=;
-        b=gsRYdLNT2BSVgBpZbeqTFVqbuZ67wWkrXvsQwtq0WLXmHe/pl4s2ggGSn5W150c6NX
-         fqT6OzdCP/P+GMEGsvZfkMrRsKlKoV3bs+aoh/pJox88oCfQMj88wXcJE7q+p0vyhBwM
-         4Z3Hfsw8LQ9OEXmd1bMlCw/9a0W4y/J57kJYDMkw8QFf+RZVkF1pgx66wlTAyPzANWAB
-         EDg5+DOWidgpAJINmPs8zJ6LA2IrDSsIJkDGlR+E6bSssBbgs0qkB4oM8g1NGMpIdX16
-         KVwjrQ8QX9r0CbMGHrPAXko2ja5ROaV1asQSeSU6nAMbC8+DA0OSoV/OUL75BLVJ5Y8b
-         iKBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hJGnWAchz/HDqF7HydjX2fUZvRJTYMKYHvyvKYF6LTA=;
-        b=BmDPfpg1qxfDPK5EXZLD3nuG/V3U+Kju7wI7W62gbkOve+YJExuGwiwZT3Sfik5UZL
-         wL3ASmiFExL/zjGqbp6e1OiEHaGkK7TcVwgt6g7xWelbLUCBU3VXUL5nWbXRcU7nPfKc
-         465GvQuE/exzehYkce+I2ry5iHT5ON8rHD2IkpQ94WaYZ36p1Mb6/z1ZNEQtlALlCt65
-         NEgq9WOkgc9I5azaPNrafTRmouSqN4uzqBgdGV3DMsT97Lh3b4uNVcNX+CnQtXF4V1kn
-         W+BpDo6mA5hsa+9dqVTHBWuwhmZUKsoHbigWq2Pz4lw/+QztcKXlWmWfnBuJQwPYf4NO
-         T26A==
-X-Gm-Message-State: AOAM533qA3BQHAMmMLSc9dtG0JU6wylbHdrlzy45I50QzBzqpVSm6Szk
-        blS7vyq+N3dhgKFp3NNM1anbMYR1COZcmYzqdKV82A==
-X-Google-Smtp-Source: ABdhPJxZC/j49j+CcIzIqzNYUN//TpHs73k6VRwmbWS0R4xoDibBWk/HYQNi25ajG7KIqw46sDy4K+S8GNnu6KTzYqE=
-X-Received: by 2002:a2e:960c:: with SMTP id v12mr14672590ljh.300.1631610296769;
- Tue, 14 Sep 2021 02:04:56 -0700 (PDT)
+        Tue, 14 Sep 2021 05:09:20 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4H7y7v6cRzzbmSt;
+        Tue, 14 Sep 2021 17:03:55 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Tue, 14 Sep 2021 17:08:01 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Tue, 14 Sep 2021 17:08:00 +0800
+Subject: Re: [PATCH v5 5/6] nbd: convert to use blk_mq_find_and_get_req()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <hch@infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <nbd@other.debian.org>, <yi.zhang@huawei.com>
+References: <20210909141256.2606682-1-yukuai3@huawei.com>
+ <20210909141256.2606682-6-yukuai3@huawei.com> <YT/2z4PSeW5oJWMq@T590>
+ <c6af73a2-f12d-eeef-616e-ae0cdb4f6f2d@huawei.com> <YUBE4BJ7+kN1c4l8@T590>
+ <374c6b37-b4b2-fe01-66be-ca2dbbc283e9@huawei.com> <YUBTVBioqJ7qas2R@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <39e628cc-496c-ba20-b53a-fbeecc1d7e4e@huawei.com>
+Date:   Tue, 14 Sep 2021 17:08:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20210913013135.102404-1-ebiggers@kernel.org> <20210913013135.102404-5-ebiggers@kernel.org>
-In-Reply-To: <20210913013135.102404-5-ebiggers@kernel.org>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Tue, 14 Sep 2021 11:04:20 +0200
-Message-ID: <CAPDyKFpvZAQ+5niZkw2tk-q_6w=VAuK=P-OVGjQA7QbJW7OvgQ@mail.gmail.com>
-Subject: Re: [PATCH 4/5] blk-crypto: rename blk_keyslot_manager to blk_crypto_profile
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>, dm-devel@redhat.com,
-        Satya Tangirala <satyaprateek2357@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YUBTVBioqJ7qas2R@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 13 Sept 2021 at 03:35, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> blk_keyslot_manager is misnamed because it doesn't necessarily manage
-> keyslots.  It actually does several different things:
->
->   - Contains the crypto capabilities of the device.
->
->   - Provides functions to control the inline encryption hardware.
->     Originally these were just for programming/evicting keyslots;
->     however, new functionality (hardware-wrapped keys) will require new
->     functions here which are unrelated to keyslots.  Moreover,
->     device-mapper devices already (ab)use "keyslot_evict" to pass key
->     eviction requests to their underlying devices even though
->     device-mapper devices don't have any keyslots themselves (so it
->     really should be "evict_key", not "keyslot_evict").
->
->   - Sometimes (but not always!) it manages keyslots.  Originally it
->     always did, but device-mapper devices don't have keyslots
->     themselves, so they use a "passthrough keyslot manager" which
->     doesn't actually manage keyslots.  This hack works, but the
->     terminology is unnatural.  Also, some hardware doesn't have keyslots
->     and thus also uses a "passthrough keyslot manager" (support for such
->     hardware is yet to be upstreamed, but it will happen eventually).
->
-> Let's stop having keyslot managers which don't actually manage keyslots.
-> Instead, rename blk_keyslot_manager to blk_crypto_profile.
->
-> This is a fairly big change, since for consistency it also has to update
-> keyslot manager-related function names, variable names, and comments --
-> not just the actual struct name.  However it's still a fairly
-> straightforward change, as it doesn't change any actual functionality.
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  block/blk-crypto-fallback.c        |  60 ++--
->  block/blk-crypto-profile.c         | 518 ++++++++++++++---------------
->  block/blk-crypto.c                 |  25 +-
->  block/blk-integrity.c              |   2 +-
->  drivers/md/dm-core.h               |   2 +-
->  drivers/md/dm-table.c              | 168 +++++-----
->  drivers/md/dm.c                    |   8 +-
->  drivers/mmc/core/crypto.c          |  11 +-
->  drivers/mmc/host/cqhci-crypto.c    |  31 +-
->  drivers/scsi/ufs/ufshcd-crypto.c   |  32 +-
->  drivers/scsi/ufs/ufshcd-crypto.h   |   9 +-
->  drivers/scsi/ufs/ufshcd.c          |   2 +-
->  drivers/scsi/ufs/ufshcd.h          |   4 +-
->  include/linux/blk-crypto-profile.h | 164 +++++----
->  include/linux/blkdev.h             |  18 +-
->  include/linux/device-mapper.h      |   4 +-
->  include/linux/mmc/host.h           |   2 +-
->  17 files changed, 548 insertions(+), 512 deletions(-)
->
+On 2021/09/14 15:46, Ming Lei wrote:
+> On Tue, Sep 14, 2021 at 03:13:38PM +0800, yukuai (C) wrote:
+>> On 2021/09/14 14:44, Ming Lei wrote:
+>>> On Tue, Sep 14, 2021 at 11:11:06AM +0800, yukuai (C) wrote:
+>>>> On 2021/09/14 9:11, Ming Lei wrote:
+>>>>> On Thu, Sep 09, 2021 at 10:12:55PM +0800, Yu Kuai wrote:
+>>>>>> blk_mq_tag_to_rq() can only ensure to return valid request in
+>>>>>> following situation:
+>>>>>>
+>>>>>> 1) client send request message to server first
+>>>>>> submit_bio
+>>>>>> ...
+>>>>>>     blk_mq_get_tag
+>>>>>>     ...
+>>>>>>     blk_mq_get_driver_tag
+>>>>>>     ...
+>>>>>>     nbd_queue_rq
+>>>>>>      nbd_handle_cmd
+>>>>>>       nbd_send_cmd
+>>>>>>
+>>>>>> 2) client receive respond message from server
+>>>>>> recv_work
+>>>>>>     nbd_read_stat
+>>>>>>      blk_mq_tag_to_rq
+>>>>>>
+>>>>>> If step 1) is missing, blk_mq_tag_to_rq() will return a stale
+>>>>>> request, which might be freed. Thus convert to use
+>>>>>> blk_mq_find_and_get_req() to make sure the returned request is not
+>>>>>> freed.
+>>>>>
+>>>>> But NBD_CMD_INFLIGHT has been added for checking if the reply is
+>>>>> expected, do we still need blk_mq_find_and_get_req() for covering
+>>>>> this issue? BTW, request and its payload is pre-allocated, so there
+>>>>> isn't real use-after-free.
+>>>>
+>>>> Hi, Ming
+>>>>
+>>>> Checking NBD_CMD_INFLIGHT relied on the request founded by tag is valid,
+>>>> not the other way round.
+>>>>
+>>>> nbd_read_stat
+>>>>    req = blk_mq_tag_to_rq()
+>>>>    cmd = blk_mq_rq_to_pdu(req)
+>>>>    mutex_lock(cmd->lock)
+>>>>    checking NBD_CMD_INFLIGHT
+>>>
+>>> Request and its payload is pre-allocated, and either req->ref or cmd->lock can
+>>> serve the same purpose here. Once cmd->lock is held, you can check if the cmd is
+>>> inflight or not. If it isn't inflight, just return -ENOENT. Is there any
+>>> problem to handle in this way?
+>>
+>> Hi, Ming
+>>
+>> in nbd_read_stat:
+>>
+>> 1) get a request by tag first
+>> 2) get nbd_cmd by the request
+>> 3) hold cmd->lock and check if cmd is inflight
+>>
+>> If we want to check if the cmd is inflight in step 3), we have to do
+>> setp 1) and 2) first. As I explained in patch 0, blk_mq_tag_to_rq()
+>> can't make sure the returned request is not freed:
+>>
+>> nbd_read_stat
+>> 			blk_mq_sched_free_requests
+>> 			 blk_mq_free_rqs
+>>    blk_mq_tag_to_rq
+>>    -> get rq before clear mapping
+>> 			  blk_mq_clear_rq_mapping
+>> 			  __free_pages -> rq is freed
+>>    blk_mq_request_started -> UAF
+> 
+> If the above can happen, blk_mq_find_and_get_req() may not fix it too, just
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org> # For MMC
+Hi, Ming
 
-[...]
+Why can't blk_mq_find_and_get_req() fix it? I can't think of any
+scenario that might have problem currently.
 
-Kind regards
-Uffe
+> wondering why not take the following simpler way for avoiding the UAF?
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5170a630778d..dfa5cce71f66 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -795,9 +795,13 @@ static void recv_work(struct work_struct *work)
+>   						     work);
+>   	struct nbd_device *nbd = args->nbd;
+>   	struct nbd_config *config = nbd->config;
+> +	struct request_queue *q = nbd->disk->queue;
+>   	struct nbd_cmd *cmd;
+>   	struct request *rq;
+>   
+> +	if (!percpu_ref_tryget(&q->q_usage_counter))
+> +                return;
+> +
+
+We can't make sure freeze_queue is called before this, thus this approch
+can't fix the problem, right?
+  nbd_read_stat
+     blk_mq_tag_to_rq
+			elevator_switch
+			 blk_mq_freeze_queue(q);
+			 elevator_switch_mq
+			  elevator_exit
+			   blk_mq_sched_free_requests
+     blk_mq_request_started -> UAF
+
+Thanks,
+Kuai
+
+>   	while (1) {
+>   		cmd = nbd_read_stat(nbd, args->index);
+>   		if (IS_ERR(cmd)) {
+> @@ -813,6 +817,7 @@ static void recv_work(struct work_struct *work)
+>   		if (likely(!blk_should_fake_timeout(rq->q)))
+>   			blk_mq_complete_request(rq);
+>   	}
+> +	blk_queue_exit(q);
+>   	nbd_config_put(nbd);
+>   	atomic_dec(&config->recv_threads);
+>   	wake_up(&config->recv_wq);
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
