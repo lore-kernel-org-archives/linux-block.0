@@ -2,67 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26EA8C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3EE1C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:30:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0D20610A6
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:19:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A90F961165
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:30:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240591AbhINHU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 03:20:58 -0400
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:41720 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235026AbhINHU5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 03:20:57 -0400
-Received: by mail-wr1-f44.google.com with SMTP id w29so17758679wra.8
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 00:19:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=dZ44BHZct1Lo8kn+NaqU2RIadaSU4Gc1d0UEwmNARqHkWytXspOf/a6Dye/6k3io/B
-         XeNMSoEzzxszcVs0f/mx9nlyIAF6Gb/Rwg4HkA8e8zUJQILdAPCwa6bHlNFHKfWqRJUP
-         Xbf0oPlvuteA1BQOAjsDP0y2u9AGFcrbvfP/1dTFNwN0m/42dXU/vvzfBAL22bi3J1Rr
-         OYeeBqxN3MMgwTRAl5K3iK2oxf84sCHxb1aDwnYg39ywuD/nvNB+s4mz5nscrJeCpumy
-         GWCQP9tgPnq3ZmpPEOrtA8kTXQ26+f5FD1Mob+DrZEGMT30SMlhn2p8VKOnb+9GRNXRN
-         J7kQ==
-X-Gm-Message-State: AOAM531Hxz/lkoVCabSXkjr49jNuncE3BJ6iZ5BkDvRunzaFTolop6Yl
-        45jx2obDphAcwbZxxifr7DRPUYokEr8=
-X-Google-Smtp-Source: ABdhPJy9z6CpITP67ev5Ol8EfatoT8ipd25xq3VsulzVTvvzDTCzJ1JtAavl6Y6hJgM8XBImgbNQUQ==
-X-Received: by 2002:adf:b748:: with SMTP id n8mr17074321wre.133.1631603979895;
-        Tue, 14 Sep 2021 00:19:39 -0700 (PDT)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id k17sm9500325wrq.7.2021.09.14.00.19.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Sep 2021 00:19:39 -0700 (PDT)
-Subject: Re: [PATCH 3/3] nvme: remove the call to nvme_update_disk_info in
- nvme_ns_remove
-To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        martin.petersen@oracle.com
-Cc:     Lihong Kou <koulihong@huawei.com>, kbusch@kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <20210914070657.87677-1-hch@lst.de>
- <20210914070657.87677-4-hch@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <dbb48ddd-dc90-782f-c129-275ad2f96ebf@grimberg.me>
-Date:   Tue, 14 Sep 2021 10:19:38 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S240150AbhINHbZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 03:31:25 -0400
+Received: from verein.lst.de ([213.95.11.211]:58878 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239257AbhINHbZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Sep 2021 03:31:25 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 9922B67373; Tue, 14 Sep 2021 09:30:04 +0200 (CEST)
+Date:   Tue, 14 Sep 2021 09:30:03 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
+Message-ID: <20210914073003.GA31077@lst.de>
+References: <20210913054121.616001-1-hch@lst.de> <20210913054121.616001-14-hch@lst.de> <YT7vZthsMCM1uKxm@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <20210914070657.87677-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YT7vZthsMCM1uKxm@kroah.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On Mon, Sep 13, 2021 at 08:27:50AM +0200, Greg Kroah-Hartman wrote:
+> Anyway, I like the idea, but as you can see here, it could lead to even
+> more abuse of sysfs files.  We are just now getting people to use
+> sysfs_emit() and that is showing us where people have been abusing the
+> api in bad ways.
+
+To be honest I've always seen sysfs_emit as at best a horrible band aid
+to enforce the PAGE_SIZE bounds checking.  Better than nothing, but
+not a solution at all, as you can't force anyone to actually use it.
+
+> Is there any way that sysfs can keep the existing show functionality and
+> just do the seq_printf() for the buffer returned by the attribute file
+> inside of the sysfs core?
+
+Well, you'd need one page allocated in the seq_file code, and one in
+the sysfs code.  At which point we might as well drop using seq_file
+at all.  But in general seq_file seems like a very nice helper for
+over flow free printing into a buffer.  If sysfs files actually were
+all limited to a single print we wouldn't really need it, and could
+just have something like sysfs_emit just with the buffer hidden inside
+a structure that is opaqueue to the caller.  But looking at various
+attributes that is not exactly the case.  While the majority certainly
+uses a single value and a single print statement there is plenty where
+this is not the case.  Either because they use multiple values, or
+often also because they dynamically append to the string to print
+things like comma-separated flags.
