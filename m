@@ -2,75 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DF1C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 15:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 607B4C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 16:20:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1D0060ED8
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 15:41:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48D8B610FB
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 16:20:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234846AbhINPnB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 11:43:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40682 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234803AbhINPm5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 11:42:57 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2CD3A60E9B;
-        Tue, 14 Sep 2021 15:41:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1631634099;
-        bh=V6SyrZ3vPVHh40d+w/uevjVMUXwmNmk4y04a1VhSuNY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CMsNilTIuECmzmoxX++29DydrSWX03iJ65SmrVPT0kvIf75zOd6/O+QOvp4m4hLSD
-         7J1Usmf/DbcoyV7w7RYk9WKK6qCxjjSjVCMXpiAx8Kkl6/J3Jz/J+OjyOGSl8sUHkN
-         1VKuQGCf1ViTtBu0RQEflFYd76oJdVBPoZWOng/4=
-Date:   Tue, 14 Sep 2021 17:41:37 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
-Message-ID: <YUDCsXXNFfUyiMCk@kroah.com>
-References: <20210913054121.616001-1-hch@lst.de>
- <20210913054121.616001-14-hch@lst.de>
- <YT7vZthsMCM1uKxm@kroah.com>
- <20210914073003.GA31077@lst.de>
- <YUC/iH9yLlxblM09@kroah.com>
- <20210914153011.GA815@lst.de>
+        id S229637AbhINQV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 12:21:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36480 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229448AbhINQV1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Sep 2021 12:21:27 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B2BAC061574;
+        Tue, 14 Sep 2021 09:20:10 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id b7so280049pfo.11;
+        Tue, 14 Sep 2021 09:20:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1FvZRHk3SBPfHYet08WVNMbl9U9iubGfahKVS5kswgA=;
+        b=jc4VIL8AuuvPriT9n13HDBh5j6ZGD7KA06UejblD3JhzLbO5fAnpivCvtJQ2E37qHo
+         jUQwIYB23+YszX35Yk3eoM8QSBlZUFfpdQgPflf528djjT7wwouIiSERkL78Chl1UXcN
+         g+QqwKq2pRC+SGgCbnl/HwPF7q5FScmOqEhIBLgtiBm/rspHX2g3SKI/FAMPooYMfoTb
+         0lgosZAGSu2CrpN93F4J+d5UqiABgG6FE0dwOIg2dFhmlOxW2krtwQ0Vd/Uoio3dbx3W
+         zYD8MsBZwc0rp9/FetxAIjvq0xbr5Jc2xuDyNDlplDip0VgzIySG2AGYfmqhVUNx8hs5
+         UhgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=1FvZRHk3SBPfHYet08WVNMbl9U9iubGfahKVS5kswgA=;
+        b=IgsfBpHOLY5XhlC2JCmLUMUcmFaRbzS7lpG62B+OZFqvXq5N9+FBFUWuRUTfOKme7k
+         m5LdikxWy0Zot9SyGuc7yBGGjZw9b1vxI0t4bZcs5J69pAXoycAo/mbP4ww73wtmCC/6
+         RLOpDU+mVA993grPNNI30NukNd42vQtM2Mo1YZvTmvKwqP69ID3P07wtyZJrkoHEQNVS
+         wlKlfhalgN2UbdYEKbr1s8crs3aw49u92jhxA5agR04JjrV79QM0HIy4gF544A0wmj/W
+         X6aN+ixyByYotM23agjVmhzmvHGIEhTS+YSz5fX94aPnIHexdxBFmHZhDJTXDBXI9oFk
+         Lq7w==
+X-Gm-Message-State: AOAM531HxgpoqAp90HeMCd6AQ58YnL0Qvtet+hQPYnuAd0UWrDgkvxF5
+        ezPCMla4YFt9b0PpISDkrnWd3gih8LA=
+X-Google-Smtp-Source: ABdhPJze5MUrZlClXZZEq1gMjyyzUOftInWdHvOkqr6XpnbpGK3SMsoz5I98t8wW3sasO/4LYWfQHg==
+X-Received: by 2002:a62:ee11:0:b029:3e0:88dc:193f with SMTP id e17-20020a62ee110000b02903e088dc193fmr5514807pfi.78.1631636409520;
+        Tue, 14 Sep 2021 09:20:09 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id x15sm11839238pgt.34.2021.09.14.09.20.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Sep 2021 09:20:09 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 14 Sep 2021 06:20:07 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Li Jinlin <lijinlin3@huawei.com>
+Cc:     axboe@kernel.dk, paolo.valente@linaro.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linfeilong@huawei.com, louhongxiang@huawei.com
+Subject: Re: [PATCH v3] blk-cgroup: fix UAF by grabbing blkcg lock before
+ destroying blkg pd
+Message-ID: <YUDLt9uBNLhWL6Gt@slm.duckdns.org>
+References: <20210914042605.3260596-1-lijinlin3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210914153011.GA815@lst.de>
+In-Reply-To: <20210914042605.3260596-1-lijinlin3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 05:30:11PM +0200, Christoph Hellwig wrote:
-> On Tue, Sep 14, 2021 at 05:28:08PM +0200, Greg Kroah-Hartman wrote:
-> > We can "force" it by not allowing buffers to be bigger than that, which
-> > is what the code has always done.  I think we want to keep that for now
-> > and not add the new seq_show api.
+On Tue, Sep 14, 2021 at 12:26:05PM +0800, Li Jinlin wrote:
+...
+> Fix by garbbing the matching blkcg lock before trying to
+> destroy blkg policy data.
 > 
-> The buffer already is not larger than that.  The problem is that
-> sysfs_emit does not actually work for the non-trivial attributes,
-> which generally are the source of bugs.
+> Suggested-by: Tejun Heo <tj@kernel.org>
+> Signed-off-by: Li Jinlin <lijinlin3@huawei.com>
 
-They huge majority of sysfs attributes are "trivial".  So for maybe at
-least 95% of the users, if not more, using sysfs_emit() is just fine as
-all you "should" be doing is emitting a single value.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-For those that are non-trivial, yes, that will be harder, but as the xfs
-discussion shows, those are not normal at all, and I do not want to make
-creating them easier as that is not the model that sysfs was designed
-for if at all possible.
+Thanks.
 
-thanks,
-
-greg k-h
+-- 
+tejun
