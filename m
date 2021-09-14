@@ -2,116 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FC8C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 14:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED5FC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 15:28:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6856960698
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 14:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 482A761164
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 15:28:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233923AbhINOjA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 10:39:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43939 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234029AbhINOiz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 10:38:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631630257;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OttAcz4NMYxVushPx3IV+Bq6AS7PXnqsl2qz+4gqrCQ=;
-        b=jVmgF+GAjEP1eiOYyEtYfX10OyuiJrHOI1vBr2dmJST9dfjnu7uhDWrXHl84s0wJSrtzGM
-        AbAQula9RCpRo99vruWhibTzHvSirvOcXkxsOz8BRR2goPYlNzJPex+HUDaQwZ/stDS3Gg
-        jA3ueRyL1hoG5JaMffJDLVfIt2AuvA8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-GwTGfonYOOqIdWIiu4MWrw-1; Tue, 14 Sep 2021 10:37:35 -0400
-X-MC-Unique: GwTGfonYOOqIdWIiu4MWrw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FB7710053FB;
-        Tue, 14 Sep 2021 14:37:34 +0000 (UTC)
-Received: from T590 (ovpn-12-32.pek2.redhat.com [10.72.12.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9588369FC8;
-        Tue, 14 Sep 2021 14:37:25 +0000 (UTC)
-Date:   Tue, 14 Sep 2021 22:37:35 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, josef@toxicpanda.com, hch@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        nbd@other.debian.org, yi.zhang@huawei.com
-Subject: Re: [PATCH v5 5/6] nbd: convert to use blk_mq_find_and_get_req()
-Message-ID: <YUCzr2ysb+vJ1x0W@T590>
-References: <20210909141256.2606682-1-yukuai3@huawei.com>
- <20210909141256.2606682-6-yukuai3@huawei.com>
- <YT/2z4PSeW5oJWMq@T590>
- <c6af73a2-f12d-eeef-616e-ae0cdb4f6f2d@huawei.com>
- <YUBE4BJ7+kN1c4l8@T590>
- <374c6b37-b4b2-fe01-66be-ca2dbbc283e9@huawei.com>
- <YUBTVBioqJ7qas2R@T590>
- <b8301834-5541-76ee-13a9-0fa565fce7e3@huawei.com>
+        id S234088AbhINP32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 11:29:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34784 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233202AbhINP32 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Sep 2021 11:29:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3706460234;
+        Tue, 14 Sep 2021 15:28:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1631633290;
+        bh=uIk3pIzYCj67iKBpiYBKsYeqo7a5UjJ13ORlR6ji/Kk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Jox5mamjWIxKYyEisZVncK1fTvx+5gWa1WND1w4SoytDRknTu9MYjxjTEnG+mhOv+
+         0XUnGtNOHzMT2NlfWzzFfv5ploG8qeiY883t2qP8WCy5soxs7BaIwDPaes1YFaPdxo
+         C9qeh3acGxvxRIpViddaJuziiuwiq+ZeiFav7m4s=
+Date:   Tue, 14 Sep 2021 17:28:08 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
+Message-ID: <YUC/iH9yLlxblM09@kroah.com>
+References: <20210913054121.616001-1-hch@lst.de>
+ <20210913054121.616001-14-hch@lst.de>
+ <YT7vZthsMCM1uKxm@kroah.com>
+ <20210914073003.GA31077@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b8301834-5541-76ee-13a9-0fa565fce7e3@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20210914073003.GA31077@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 05:19:31PM +0800, yukuai (C) wrote:
-> On 在 2021/09/14 15:46, Ming Lei wrote:
+On Tue, Sep 14, 2021 at 09:30:03AM +0200, Christoph Hellwig wrote:
+> On Mon, Sep 13, 2021 at 08:27:50AM +0200, Greg Kroah-Hartman wrote:
+> > Anyway, I like the idea, but as you can see here, it could lead to even
+> > more abuse of sysfs files.  We are just now getting people to use
+> > sysfs_emit() and that is showing us where people have been abusing the
+> > api in bad ways.
 > 
-> > If the above can happen, blk_mq_find_and_get_req() may not fix it too, just
-> > wondering why not take the following simpler way for avoiding the UAF?
-> > 
-> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > index 5170a630778d..dfa5cce71f66 100644
-> > --- a/drivers/block/nbd.c
-> > +++ b/drivers/block/nbd.c
-> > @@ -795,9 +795,13 @@ static void recv_work(struct work_struct *work)
-> >   						     work);
-> >   	struct nbd_device *nbd = args->nbd;
-> >   	struct nbd_config *config = nbd->config;
-> > +	struct request_queue *q = nbd->disk->queue;
-> >   	struct nbd_cmd *cmd;
-> >   	struct request *rq;
-> > +	if (!percpu_ref_tryget(&q->q_usage_counter))
-> > +                return;
-> > +
-> >   	while (1) {
-> >   		cmd = nbd_read_stat(nbd, args->index);
-> >   		if (IS_ERR(cmd)) {
-> > @@ -813,6 +817,7 @@ static void recv_work(struct work_struct *work)
-> >   		if (likely(!blk_should_fake_timeout(rq->q)))
-> >   			blk_mq_complete_request(rq);
-> >   	}
-> > +	blk_queue_exit(q);
-> >   	nbd_config_put(nbd);
-> >   	atomic_dec(&config->recv_threads);
-> >   	wake_up(&config->recv_wq);
-> > 
-> 
-> Hi, Ming
-> 
-> This apporch is wrong.
-> 
-> If blk_mq_freeze_queue() is called, and nbd is waiting for all
-> request to complete. percpu_ref_tryget() will fail here, and deadlock
-> will occur because request can't complete in recv_work().
+> To be honest I've always seen sysfs_emit as at best a horrible band aid
+> to enforce the PAGE_SIZE bounds checking.  Better than nothing, but
+> not a solution at all, as you can't force anyone to actually use it.
 
-No, percpu_ref_tryget() won't fail until ->q_usage_counter is zero, when
-it is perfectly fine to do nothing in recv_work().
+We can "force" it by not allowing buffers to be bigger than that, which
+is what the code has always done.  I think we want to keep that for now
+and not add the new seq_show api.
 
-Thanks,
-Ming
+I've taken patches 2-6 in this series now, as those were great sysfs
+and kernfs cleanups, thanks for those.
 
+I can also take patch 1 if no one objects (I can edit the typo.)
+
+I agree that getting rid of seq_get_buf() is good, and can work on
+getting rid of the use here in sysfs if it's annoying people.
+
+thanks,
+
+greg k-h
