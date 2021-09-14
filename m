@@ -6,99 +6,97 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 889CCC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 02:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD7E2C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 03:11:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6569461108
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 02:53:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B49FF6112E
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 03:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237553AbhINCyX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 22:54:23 -0400
-Received: from mail-pf1-f170.google.com ([209.85.210.170]:43766 "EHLO
-        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237098AbhINCyW (ORCPT
+        id S238318AbhINDMh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 23:12:37 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:15409 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238366AbhINDMh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 22:54:22 -0400
-Received: by mail-pf1-f170.google.com with SMTP id f65so10756661pfb.10;
-        Mon, 13 Sep 2021 19:53:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=n9QXTYQ7gFuOAX5ceoQmW2i5wwUUt7ZoVGuJ1Q+ByGg=;
-        b=Xu7WPbsrPN/H+b1DejJAqwAADVjtRHXlZNzHN3jFdg2o21KfB3RwROJdeCtCJbXLlB
-         65edHKblIYVM9SHpma6ysixqv5C2xNhWbnpdzk2xKTwmM8vGdTyDguIi/r/rdVnDoESH
-         nHk4vKq2q9iPgUlYZSEdqlNVQKhzgLr5EJ3hLl5k0Vca6astmsBN/ehG3/X+8C3X18EL
-         zloK1YPTt4IwSokWVD5XUMv6niZR+/mVoBB2DFSEd0IGfHEyiD0BHE52JB/wp5d+qtyG
-         dMlba5viScpxoxQKS8xkMqPJ9R0M7qVN2nYVZnWHUAgh/FOcSLbWG45MEyy/ZFgQ9xAl
-         UT4Q==
-X-Gm-Message-State: AOAM531or95cbgc9Kb3zRcIlhiP613AfKSCydnBxum4dSE63iaduCJSM
-        uc8cq+hciMVCkGIzZcVoGo4Wwpe4W3M=
-X-Google-Smtp-Source: ABdhPJzCjlQBAM65nrozLAPtaHZ9hK+go73Jw+Nd11yG0bcOtFL3vUliYNYADVorc5fyGErB4WJf2w==
-X-Received: by 2002:aa7:9e4b:0:b0:43d:fb1d:39cb with SMTP id z11-20020aa79e4b000000b0043dfb1d39cbmr1736166pfq.69.1631587985821;
-        Mon, 13 Sep 2021 19:53:05 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:e47e:ab85:4d9e:deba? ([2601:647:4000:d7:e47e:ab85:4d9e:deba])
-        by smtp.gmail.com with ESMTPSA id o22sm8168010pji.18.2021.09.13.19.53.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Sep 2021 19:53:04 -0700 (PDT)
-Message-ID: <2bd7d03e-c2d0-0cb5-76fc-f5601324a18d@acm.org>
-Date:   Mon, 13 Sep 2021 19:53:03 -0700
+        Mon, 13 Sep 2021 23:12:37 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H7pDJ74X3zR5xN;
+        Tue, 14 Sep 2021 11:07:12 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Tue, 14 Sep 2021 11:11:13 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Tue, 14 Sep 2021 11:11:06 +0800
+Subject: Re: [PATCH v5 5/6] nbd: convert to use blk_mq_find_and_get_req()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <josef@toxicpanda.com>, <hch@infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <nbd@other.debian.org>, <yi.zhang@huawei.com>
+References: <20210909141256.2606682-1-yukuai3@huawei.com>
+ <20210909141256.2606682-6-yukuai3@huawei.com> <YT/2z4PSeW5oJWMq@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <c6af73a2-f12d-eeef-616e-ae0cdb4f6f2d@huawei.com>
+Date:   Tue, 14 Sep 2021 11:11:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.0.3
-Subject: Re: start switching sysfs attributes to expose the seq_file
-Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210913054121.616001-1-hch@lst.de>
- <21413ac5-f934-efe2-25ee-115c4dcc86a5@acm.org> <YT+AbumufeL6nRss@kroah.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <YT+AbumufeL6nRss@kroah.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <YT/2z4PSeW5oJWMq@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/13/21 09:46, Greg Kroah-Hartman wrote:
-> On Mon, Sep 13, 2021 at 09:39:56AM -0700, Bart Van Assche wrote:
->> On 9/12/21 10:41 PM, Christoph Hellwig wrote:
->>> Al pointed out multiple times that seq_get_buf is highly dangerous as
->>> it opens up the tight seq_file abstractions to buffer overflows.  The
->>> last such caller now is sysfs.
->>>
->>> This series allows attributes to implement a seq_show method and switch
->>> the block and XFS code as users that I'm most familiar with to use
->>> seq_files directly after a few preparatory cleanups.  With this series
->>> "leaf" users of sysfs_ops can be converted one at at a time, after that
->>> we can move the seq_get_buf into the multiplexers (e.g. kobj, device,
->>> class attributes) and remove the show method in sysfs_ops and repeat the
->>> process until all attributes are converted.  This will probably take a
->>> fair amount of time.
+On 2021/09/14 9:11, Ming Lei wrote:
+> On Thu, Sep 09, 2021 at 10:12:55PM +0800, Yu Kuai wrote:
+>> blk_mq_tag_to_rq() can only ensure to return valid request in
+>> following situation:
 >>
->> Hi Christoph,
+>> 1) client send request message to server first
+>> submit_bio
+>> ...
+>>   blk_mq_get_tag
+>>   ...
+>>   blk_mq_get_driver_tag
+>>   ...
+>>   nbd_queue_rq
+>>    nbd_handle_cmd
+>>     nbd_send_cmd
 >>
->> Thanks for having done this work. In case you would need it, some time ago
->> I posted the following sysfs patch but did not receive any feedback:
->> "[PATCH] kernfs: Improve lockdep annotation for files which implement mmap"
->> (https://lore.kernel.org/linux-kernel/20191004161124.111376-1-bvanassche@acm.org/).
+>> 2) client receive respond message from server
+>> recv_work
+>>   nbd_read_stat
+>>    blk_mq_tag_to_rq
 >>
+>> If step 1) is missing, blk_mq_tag_to_rq() will return a stale
+>> request, which might be freed. Thus convert to use
+>> blk_mq_find_and_get_req() to make sure the returned request is not
+>> freed.
 > 
-> That was from back in 2019, sorry I must have missed it.
-> 
-> Care to rebase and resend it if it is still needed?
+> But NBD_CMD_INFLIGHT has been added for checking if the reply is
+> expected, do we still need blk_mq_find_and_get_req() for covering
+> this issue? BTW, request and its payload is pre-allocated, so there
+> isn't real use-after-free.
 
-Hi Greg,
+Hi, Ming
 
-I think that patch is still relevant. It removes some ugly code from 
-sysfs. I will rebase, retest and resend it.
+Checking NBD_CMD_INFLIGHT relied on the request founded by tag is valid,
+not the other way round.
+
+nbd_read_stat
+  req = blk_mq_tag_to_rq()
+  cmd = blk_mq_rq_to_pdu(req)
+  mutex_lock(cmd->lock)
+  checking NBD_CMD_INFLIGHT
+
+The checking doesn't have any effect on blk_mq_tag_to_rq().
 
 Thanks,
-
-Bart.
+Kuai
