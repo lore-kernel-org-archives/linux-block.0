@@ -2,166 +2,200 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6661DC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB38C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:44:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4308B60F26
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:22:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ABE26108B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:44:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232627AbhINMYN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 08:24:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26585 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232341AbhINMYN (ORCPT
+        id S232779AbhINMp3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 08:45:29 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:15414 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232613AbhINMp2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 08:24:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631622175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=crCMDIQfbcqlNNuWe8wMVzG0binTQZ+93JYNDaWlRUQ=;
-        b=KH7Vml8bFo6kt7Fr8VHfkZMT8ehjI7s00CCICT65AWHCULNgEc1j3pojlmz4t9aCFA2muQ
-        HK2NWuoAj4d0LUK/MAdsX+NSr1+o7m5yWNLWMH39699fSXd8jw69/7fMuh8qaJWlmJX5cx
-        /E1oMFhSYytOHjeQrBompDyyg699QgA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-A_E-DCZaMKK9c-ke32RRYw-1; Tue, 14 Sep 2021 08:22:54 -0400
-X-MC-Unique: A_E-DCZaMKK9c-ke32RRYw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0ED355074C;
-        Tue, 14 Sep 2021 12:22:53 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6FA1F60C7F;
-        Tue, 14 Sep 2021 12:22:48 +0000 (UTC)
-Date:   Tue, 14 Sep 2021 13:22:47 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     hch@infradead.org, mst@redhat.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
-Message-ID: <YUCUF7co94CRGkGU@stefanha-x1.localdomain>
-References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
- <YTYvOetMHvocg9UZ@stefanha-x1.localdomain>
- <692f8e81-8585-1d39-e7a4-576ae01438a1@nvidia.com>
+        Tue, 14 Sep 2021 08:45:28 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H82xJ20yBzQyM4;
+        Tue, 14 Sep 2021 20:40:04 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Tue, 14 Sep 2021 20:44:09 +0800
+Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
+ (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Tue, 14
+ Sep 2021 20:44:09 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <linux-block@vger.kernel.org>, <stable@vger.kernel.org>,
+        <axboe@kernel.dk>, <gregkh@linuxfoundation.org>, <hch@lst.de>
+CC:     <yukuai3@huawei.com>, <yi.zhang@huawei.com>
+Subject: [PATCH linux-4.19.y] blk-mq: fix divide by zero crash in tg_may_dispatch()
+Date:   Tue, 14 Sep 2021 20:54:02 +0800
+Message-ID: <20210914125402.4068844-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="aGmDvTLAe56x7DHM"
-Content-Disposition: inline
-In-Reply-To: <692f8e81-8585-1d39-e7a4-576ae01438a1@nvidia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+If blk-throttle is enabled and io is issued before
+blk_throtl_register_queue() is done. Divide by zero crash will be
+triggered in tg_may_dispatch() because 'throtl_slice' is uninitialized.
 
---aGmDvTLAe56x7DHM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The problem is fixed in commit 75f4dca59694 ("block: call
+blk_register_queue earlier in device_add_disk") from mainline, however
+it's too hard to backport this patch due to lots of refactoring.
 
-On Mon, Sep 13, 2021 at 05:50:21PM +0300, Max Gurtovoy wrote:
->=20
-> On 9/6/2021 6:09 PM, Stefan Hajnoczi wrote:
-> > On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
-> > > No need to pre-allocate a big buffer for the IO SGL anymore. If a dev=
-ice
-> > > has lots of deep queues, preallocation for the sg list can consume
-> > > substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
-> > > can be 64 or 128 and each queue's depth might be 128. This means the
-> > > resulting preallocation for the data SGLs is big.
-> > >=20
-> > > Switch to runtime allocation for SGL for lists longer than 2 entries.
-> > > This is the approach used by NVMe drivers so it should be reasonable =
-for
-> > > virtio block as well. Runtime SGL allocation has always been the case
-> > > for the legacy I/O path so this is nothing new.
-> > >=20
-> > > The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
-> > > support SG_CHAIN, use only runtime allocation for the SGL.
-> > >=20
-> > > Re-organize the setup of the IO request to fit the new sg chain
-> > > mechanism.
-> > >=20
-> > > No performance degradation was seen (fio libaio engine with 16 jobs a=
-nd
-> > > 128 iodepth):
-> > >=20
-> > > IO size      IOPs Rand Read (before/after)         IOPs Rand Write (b=
-efore/after)
-> > > --------     ---------------------------------    -------------------=
----------------
-> > > 512B          318K/316K                                    329K/325K
-> > >=20
-> > > 4KB           323K/321K                                    353K/349K
-> > >=20
-> > > 16KB          199K/208K                                    250K/275K
-> > >=20
-> > > 128KB         36K/36.1K                                    39.2K/41.7K
-> > I ran fio randread benchmarks with 4k, 16k, 64k, and 128k at iodepth 1,
-> > 8, and 64 on two vCPUs. The results look fine, there is no significant
-> > regression.
-> >=20
-> > iodepth=3D1 and iodepth=3D64 are very consistent. For some reason the
-> > iodepth=3D8 has significant variance but I don't think it's the fault of
-> > this patch.
-> >=20
-> > Fio results and the Jupyter notebook export are available here (check
-> > out benchmark.html to see the graphs):
-> >=20
-> > https://gitlab.com/stefanha/virt-playbooks/-/tree/virtio-blk-sgl-alloca=
-tion-benchmark/notebook
-> >=20
-> > Guest:
-> > - Fedora 34
-> > - Linux v5.14
-> > - 2 vCPUs (pinned), 4 GB RAM (single host NUMA node)
-> > - 1 IOThread (pinned)
-> > - virtio-blk aio=3Dnative,cache=3Dnone,format=3Draw
-> > - QEMU 6.1.0
-> >=20
-> > Host:
-> > - RHEL 8.3
-> > - Linux 4.18.0-240.22.1.el8_3.x86_64
-> > - Intel(R) Xeon(R) Silver 4214 CPU @ 2.20GHz
-> > - Intel Optane DC P4800X
-> >=20
-> > Stefan
->=20
-> Thanks, Stefan.
->=20
-> Would you like me to add some of the results in my commit msg ? or Tested=
--By
-> sign ?
+Thus introduce a new flag QUEUE_FLAG_THROTL_INIT_DONE. It will be set
+after blk_throtl_register_queue() is done, and will be checked before
+applying any config.
 
-Thanks, there's no need to change the commit description.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-sysfs.c      |  2 ++
+ block/blk-throttle.c   | 41 +++++++++++++++++++++++++++++++++++++++--
+ include/linux/blkdev.h |  1 +
+ 3 files changed, 42 insertions(+), 2 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---aGmDvTLAe56x7DHM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFAlBcACgkQnKSrs4Gr
-c8irGwgAifRcb8J6P8Ki4ql4+nWOw59zpPqBsh8+wmslHwj+5Sj5x040BOGESY6V
-peZCMYgqgdWV7Ckgyd/4Er+L85wo41zn7+ylsi/NqkRVnZBg7HgRTiLL7GbBX8Zz
-eLYIqr4aFpRE93y/RAFbnPTU4cEGK8GnhdbLgODHrnmg+VQ8DT9Lb0Ov/1UqcB5i
-+EWw4mLhlDAHOcuz0YQpiGTbKe9kvTnwTjZh+DmMi4FjH6xnyEYCq4JfFmkVLC3Q
-H7TgCz5EQ5QzXDVsMR7HmYPcU0s0Fofq1dlexF2Fx7riubX7oIn6+UZnSh+XxLlL
-2lswIFATfoBLB4VfjgimVUD51zOt2w==
-=QoZd
------END PGP SIGNATURE-----
-
---aGmDvTLAe56x7DHM--
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 07494deb1a26..7d250acf8ece 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -954,6 +954,7 @@ int blk_register_queue(struct gendisk *disk)
+ 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+ 	wbt_enable_default(q);
+ 	blk_throtl_register_queue(q);
++	blk_queue_flag_set(QUEUE_FLAG_THROTL_INIT_DONE, q);
+ 
+ 	/* Now everything is ready and send out KOBJ_ADD uevent */
+ 	kobject_uevent(&q->kobj, KOBJ_ADD);
+@@ -986,6 +987,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 	if (!blk_queue_registered(q))
+ 		return;
+ 
++	blk_queue_flag_clear(QUEUE_FLAG_THROTL_INIT_DONE, q);
+ 	/*
+ 	 * Since sysfs_remove_dir() prevents adding new directory entries
+ 	 * before removal of existing entries starts, protect against
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index caee658609d7..b2eeca9a9962 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -11,6 +11,8 @@
+ #include <linux/bio.h>
+ #include <linux/blktrace_api.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/sched/signal.h>
++#include <linux/delay.h>
+ #include "blk.h"
+ 
+ /* Max dispatch from a group in 1 round */
+@@ -1428,6 +1430,31 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
+ 	}
+ }
+ 
++static inline int throtl_check_init_done(struct request_queue *q)
++{
++	if (test_bit(QUEUE_FLAG_THROTL_INIT_DONE, &q->queue_flags))
++		return 0;
++
++	return blk_queue_dying(q) ? -ENODEV : -EBUSY;
++}
++
++/*
++ * If throtl_check_init_done() return -EBUSY, we should retry after a short
++ * msleep(), since that throttle init will be completed in blk_register_queue()
++ * soon.
++ */
++static inline int throtl_restart_syscall_when_busy(int errno)
++{
++	int ret = errno;
++
++	if (ret == -EBUSY) {
++		msleep(10);
++		ret = restart_syscall();
++	}
++
++	return ret;
++}
++
+ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 			   char *buf, size_t nbytes, loff_t off, bool is_u64)
+ {
+@@ -1441,6 +1468,10 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 	if (ret)
+ 		return ret;
+ 
++	ret = throtl_check_init_done(ctx.disk->queue);
++	if (ret)
++		goto out_finish;
++
+ 	ret = -EINVAL;
+ 	if (sscanf(ctx.body, "%llu", &v) != 1)
+ 		goto out_finish;
+@@ -1448,7 +1479,6 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 		v = U64_MAX;
+ 
+ 	tg = blkg_to_tg(ctx.blkg);
+-
+ 	if (is_u64)
+ 		*(u64 *)((void *)tg + of_cft(of)->private) = v;
+ 	else
+@@ -1458,6 +1488,8 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 	ret = 0;
+ out_finish:
+ 	blkg_conf_finish(&ctx);
++	ret = throtl_restart_syscall_when_busy(ret);
++
+ 	return ret ?: nbytes;
+ }
+ 
+@@ -1607,8 +1639,11 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 	if (ret)
+ 		return ret;
+ 
+-	tg = blkg_to_tg(ctx.blkg);
++	ret = throtl_check_init_done(ctx.disk->queue);
++	if (ret)
++		goto out_finish;
+ 
++	tg = blkg_to_tg(ctx.blkg);
+ 	v[0] = tg->bps_conf[READ][index];
+ 	v[1] = tg->bps_conf[WRITE][index];
+ 	v[2] = tg->iops_conf[READ][index];
+@@ -1704,6 +1739,8 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 	ret = 0;
+ out_finish:
+ 	blkg_conf_finish(&ctx);
++	ret = throtl_restart_syscall_when_busy(ret);
++
+ 	return ret ?: nbytes;
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 209ba8e7bd31..22be9f090bf1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -684,6 +684,7 @@ struct request_queue {
+ #define QUEUE_FLAG_NOMERGES     5	/* disable merge attempts */
+ #define QUEUE_FLAG_SAME_COMP	6	/* complete on same CPU-group */
+ #define QUEUE_FLAG_FAIL_IO	7	/* fake timeout */
++#define QUEUE_FLAG_THROTL_INIT_DONE 8	/* io throttle can be online */
+ #define QUEUE_FLAG_NONROT	9	/* non-rotational device (SSD) */
+ #define QUEUE_FLAG_VIRT        QUEUE_FLAG_NONROT /* paravirt device */
+ #define QUEUE_FLAG_IO_STAT     10	/* do IO stats */
+-- 
+2.31.1
 
