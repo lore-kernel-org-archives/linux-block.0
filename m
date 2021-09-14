@@ -2,67 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3BB6C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCDEC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:10:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 804BB61164
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 874B661163
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:10:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240467AbhINHLl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 03:11:41 -0400
-Received: from mail-wm1-f46.google.com ([209.85.128.46]:41665 "EHLO
-        mail-wm1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240407AbhINHLh (ORCPT
+        id S240413AbhINHMB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 03:12:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240407AbhINHMA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 03:11:37 -0400
-Received: by mail-wm1-f46.google.com with SMTP id g19-20020a1c9d13000000b003075062d4daso1709857wme.0
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 00:10:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=IiINBX3YO3NsYfPfcxgfWP6Ep5EKOEns/Ok0gUTvVaKKb0Z6MS3qT0iVfyCsN9A2D8
-         00Tv+X4aMkdGnmKrFyTpKCJGzB+yzBw6QuZxOAnJ3asUujU2Qfv80z+w4YC2YJutOfcC
-         XSrencJqjhaY80d1rVfXxL81pxU2fCGajD/EyDt0R3yFgDUC2l2Q0kHW3dyS/PPELsCG
-         6D89ixKvdTd65WeyLWYILaPqaotPjYL5ImCMxotTGt78Puwa4/JL2Ns2Ba6UuIqxMJs0
-         VG53XIjpBYazLonmVDGQM1kBOqL4EG0wfTrgDmGGDhURuR7gcMgFj80bZTjofUo6x0q1
-         wiWw==
-X-Gm-Message-State: AOAM533O7B+BTax73Xemv/7wNH3Te8FRzRxBUihP1v4VDGRUMdA0HF8U
-        Pw2kkVBjDPerMOgDEEhDZVM=
-X-Google-Smtp-Source: ABdhPJx7sgMPw0ZveAhlsfNR05BybpsNgXDeSWAWCXYwgqr7q8we2bjrntKcjsDyOtsJWIFczNrzsw==
-X-Received: by 2002:a7b:c447:: with SMTP id l7mr462543wmi.15.1631603419971;
-        Tue, 14 Sep 2021 00:10:19 -0700 (PDT)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id z7sm11919641wre.72.2021.09.14.00.10.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Sep 2021 00:10:19 -0700 (PDT)
-Subject: Re: [PATCH 1/3] block: check if a profile is actually registered in
- blk_integrity_unregister
-To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        martin.petersen@oracle.com
+        Tue, 14 Sep 2021 03:12:00 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DEF7C061574
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 00:10:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=KWp8vmMbO3DtgMY56aSxL6xJpVznvKrsjuA6ZN3BFII=; b=jvhcc4Dmh6JGN2s9dUbyLwHkPo
+        guM0ns2j0mujP1pPqyVnJjMoTKEikOu0LCMVU2C34ED6HjKo4V+RM/kmH9N2Hgys5pmF7cWU08Wky
+        RPpfe5+ZyPlnAw5qyulvOfPRDOEmXB+jJAEF9vUgSnW0TVgQTEQsscllqv3Q2RYA5viMDiDKZgLIP
+        /fQrEAfKkCxaKBI8osl0XUGAZspM3E+9g5+VOw1r5VPRangFrZSxD2chuTT/by01Oon5vDvqY8njR
+        RYjN/pAykXa/kkYIKYc9C/q3MkCvmsyv5jOxBhNMUZuG/40rBsgT2aaH2aQjHfBLSyw7aN5iKKg60
+        stSkZhVA==;
+Received: from [2001:4bb8:184:72db:7baf:b601:6734:7149] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mQ2Xx-00EMpg-FX; Tue, 14 Sep 2021 07:08:11 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk, martin.petersen@oracle.com
 Cc:     Lihong Kou <koulihong@huawei.com>, kbusch@kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+        sagi@grimberg.me, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: [PATCH 1/3] block: check if a profile is actually registered in blk_integrity_unregister
+Date:   Tue, 14 Sep 2021 09:06:55 +0200
+Message-Id: <20210914070657.87677-2-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210914070657.87677-1-hch@lst.de>
 References: <20210914070657.87677-1-hch@lst.de>
- <20210914070657.87677-2-hch@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <f9ed98d5-daee-7206-59c6-88bbbc49ed25@grimberg.me>
-Date:   Tue, 14 Sep 2021 10:10:18 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210914070657.87677-2-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+While clearing the profile itself is harmless, we really should not clear
+the stable writes flag if it wasn't set due to a registered integrity
+profile.
+
+Reported-by: Lihong Kou <koulihong@huawei.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-integrity.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 69a12177dfb62..48bfb53aa8571 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -426,8 +426,12 @@ EXPORT_SYMBOL(blk_integrity_register);
+  */
+ void blk_integrity_unregister(struct gendisk *disk)
+ {
++	struct blk_integrity *bi = &disk->queue->integrity;
++
++	if (!bi->profile)
++		return;
+ 	blk_queue_flag_clear(QUEUE_FLAG_STABLE_WRITES, disk->queue);
+-	memset(&disk->queue->integrity, 0, sizeof(struct blk_integrity));
++	memset(bi, 0, sizeof(*bi));
+ }
+ EXPORT_SYMBOL(blk_integrity_unregister);
+ 
+-- 
+2.30.2
+
