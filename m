@@ -2,79 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58ECBC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFB3C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:19:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E4A361163
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5319760F44
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 07:19:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240662AbhINHPN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 03:15:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49244 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240672AbhINHPN (ORCPT
+        id S240597AbhINHUa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 03:20:30 -0400
+Received: from mail-wr1-f45.google.com ([209.85.221.45]:42934 "EHLO
+        mail-wr1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235026AbhINHU3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 03:15:13 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27881C061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 00:13:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=Df9SelIUYBc0yVIr3NKOtMbMq+ENDsJbIcDBQ82Woao=; b=I3S6UN9HoeiIfMU2tlMAjjNoPU
-        9+xzYED3dpLFGNCT12RtZfLNwaBM88oO5EHQ7jJ177lh0QuRJnCVQnGVNBcKcmp3HzKx54T1V2BQr
-        OmBYJ4hObv+rxOhXbxTAMMtpgaxXC6Sp/htiFsoB0mn3ngqNAsc7sbJNmEwxqfP5gjB005chvT+7U
-        Wrah02H5wY0w25rHJsmczxSk/i6ee2r5nd2YVqIaKSUUjT76VVQ14/5lqizU6lOlm1FRpI4R08Q08
-        SJP9pBsQUmuxO0iDO4+KpiyaWbE3REs6bGto6gCZwk3luBv6FhiF6fJfb9NTjlzPtvk/VN1HMePm+
-        bV7hTHZg==;
-Received: from [2001:4bb8:184:72db:7baf:b601:6734:7149] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQ2aZ-00EMxO-PE; Tue, 14 Sep 2021 07:10:59 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk, martin.petersen@oracle.com
+        Tue, 14 Sep 2021 03:20:29 -0400
+Received: by mail-wr1-f45.google.com with SMTP id q11so18509482wrr.9
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 00:19:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=LMfkzU7BNoFQxEWJF9BNog0oLM7MdnEPplz73JQTOQO02vHpn0poyV3tuiIpZN4vYZ
+         rR1Sz/5fDDRdclsXBLRjA9hf+QtW1AXp2PhgrhMAKRqCd0rmBZMNfoXVodYWLlX1yQNl
+         8voyinTUItEzrQfEQH/vZRagW8bPp2mPurESOGsJRiDjL+waGkiGk3tgtpTT+Sw9kV3U
+         81eOcwEjfWXNvQzQIsa4C3KQgh56BkaoiHOwxxkRAopefsrL0tS/JR4vMM6WbC5UHBxo
+         omZkPp3DjRL/vUnxGKvNdR71vk3F49SvqAWVlqEh9yPfw8nbh/DWgRkqAP9FJFt1RUid
+         zuUw==
+X-Gm-Message-State: AOAM533XnuXAnyZ/FgAoeR48hIADOU0NPI9A1M57AEXxhI3ggkh/CTx2
+        Mhbz4vx3X3pEh+EQ7nMT+ds=
+X-Google-Smtp-Source: ABdhPJxR799W7iZRWsnn/gvqBdGPd4O8oQj1ua+YcV6wiwAcLEmqUJdizidlrmz1Tsb2uOZU2cGpxQ==
+X-Received: by 2002:adf:9e4d:: with SMTP id v13mr17055511wre.419.1631603952058;
+        Tue, 14 Sep 2021 00:19:12 -0700 (PDT)
+Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id o26sm261015wmc.17.2021.09.14.00.19.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Sep 2021 00:19:11 -0700 (PDT)
+Subject: Re: [PATCH 2/3] block: flush the integrity workqueue in
+ blk_integrity_unregister
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        martin.petersen@oracle.com
 Cc:     Lihong Kou <koulihong@huawei.com>, kbusch@kernel.org,
-        sagi@grimberg.me, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 3/3] nvme: remove the call to nvme_update_disk_info in nvme_ns_remove
-Date:   Tue, 14 Sep 2021 09:06:57 +0200
-Message-Id: <20210914070657.87677-4-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210914070657.87677-1-hch@lst.de>
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 References: <20210914070657.87677-1-hch@lst.de>
+ <20210914070657.87677-3-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <0057deed-40b0-b86b-e4c4-fbd77b45bbbb@grimberg.me>
+Date:   Tue, 14 Sep 2021 10:19:10 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210914070657.87677-3-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to explicitly unregister the integrity profile when
-deleting the gendisk.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 97f8211cf92c1..6600e138945e2 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3862,8 +3862,6 @@ static void nvme_ns_remove(struct nvme_ns *ns)
- 		nvme_cdev_del(&ns->cdev, &ns->cdev_device);
- 	del_gendisk(ns->disk);
- 	blk_cleanup_queue(ns->queue);
--	if (blk_get_integrity(ns->disk))
--		blk_integrity_unregister(ns->disk);
- 
- 	down_write(&ns->ctrl->namespaces_rwsem);
- 	list_del_init(&ns->list);
--- 
-2.30.2
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
