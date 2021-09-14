@@ -2,227 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB98AC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 03:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4581BC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 04:41:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3B04610CC
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 03:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 257D96113E
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 04:41:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239202AbhIND6k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 23:58:40 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:19971 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238366AbhIND6k (ORCPT
+        id S239039AbhINEmZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 00:42:25 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:41460 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239328AbhINEmZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 23:58:40 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4H7qFQ4kZ7zbmF1;
-        Tue, 14 Sep 2021 11:53:14 +0800 (CST)
-Received: from dggema773-chm.china.huawei.com (10.1.198.217) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Tue, 14 Sep 2021 11:57:19 +0800
-Received: from localhost.huawei.com (10.175.124.27) by
- dggema773-chm.china.huawei.com (10.1.198.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Tue, 14 Sep 2021 11:57:19 +0800
-From:   Li Jinlin <lijinlin3@huawei.com>
-To:     <axboe@kernel.dk>, <tj@kernel.org>
-CC:     <paolo.valente@linaro.org>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linfeilong@huawei.com>, <louhongxiang@huawei.com>
-Subject: [PATCH v3] blk-cgroup: fix UAF by grabbing blkcg lock before destroying blkg pd
-Date:   Tue, 14 Sep 2021 12:26:05 +0800
-Message-ID: <20210914042605.3260596-1-lijinlin3@huawei.com>
-X-Mailer: git-send-email 2.27.0
+        Tue, 14 Sep 2021 00:42:25 -0400
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18E37ARg020204;
+        Tue, 14 Sep 2021 04:40:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=Ak2eDe40sPIEEPrnXEl7Tl7CmliEMFmP95+Wt/ygxpk=;
+ b=mbVjgng9/t52Pp+ohY7JV+5B6NwS9kuzffubzNMTZz0sJNrCczEO4nys304nUsqZmqdL
+ 6o2QhiFajocHUb5NONPKRtxvMJ8ZslpFvyIJ6WJQkeOAdXcxObHggj5k3mHOe1m/hfJO
+ 6PsXJrjLTuJh8WCA5cRKcbZGmmLeKI37MmpdkOS6W4TXpIyXzIDoVA59zJfnnVcGEPcH
+ USCPZTcWa4idqtSx+QmAqIxZUohmnQjNWJybcEF/W05Fg+UynYyKKOvmQhoknbChqtba
+ 6EuG+UTvNCYDZnmna5NmBdj0QZLXAbC4Uc9475LKg9lQwrTjJMuoxgr/DzMe9kJavFt1 nA== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=Ak2eDe40sPIEEPrnXEl7Tl7CmliEMFmP95+Wt/ygxpk=;
+ b=YqXSmLckrgmjy8T4aFnUbbLVTXu1C+VCDcM9bchGGZ2jOHn5YckfFvC/tIThdB1aI5dk
+ QhK+MIPXKkE3o8SJ6mK7FF5rfvVDAEyNDiHQpE9ezyWKJwHlSKPbvehBv1jjqO6i3CsB
+ DjW1/vEEixMxtHEyRgBZmwFA5KhFtBH+SPcrwt248hGoN8BMSlK42eqYrjndlnJhE0YC
+ 7oam9xGmlpO4L+O9hieybX69H4sTRkYXsgoJMWRDmmKtDJ007sXF/i2q8gBof2c3/c9x
+ /vybx8Gd0L2W7QTjWg24goTdkT5gpEn1XqXzLmpU8FZpSYeMWb+ClptUIpCGIYRUl+s1 9Q== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3b2kj5r62t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Sep 2021 04:40:57 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 18E4ZRvM061807;
+        Tue, 14 Sep 2021 04:40:55 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2174.outbound.protection.outlook.com [104.47.58.174])
+        by userp3020.oracle.com with ESMTP id 3b167remju-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Sep 2021 04:40:55 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B0XTAFXtt8EIaeYBdyqDzWpUs+4b1/XrGD8NPi3S0evDxf31AwqdvZVP6MvgWgQPTQ6CmUbhSqE+RPqUDTh0fAztYNhT+X+N2HcKxdPvLWdLZq6mdnmkQ7U5b2RSbervuMwnrZ3x3I/O4DRtbeX3YsyzJaXxUEWK6dm/+qMIy4QUVApV00qfYMgSUduXjzRPzOhslfJFtf7lzgyOKKc2zzrVU4RH3s/RGo4C80nVEZ0UbetV7YSUGDGC2Yu9pQUqnUUz+3IhdsBBTbgXaXcXGyGktzQRl7c3IKDyDHSENYHNdDUJSHmsVqd5v9fEZUZK9y78IJFz8Y1rpnfXRXvaQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=Ak2eDe40sPIEEPrnXEl7Tl7CmliEMFmP95+Wt/ygxpk=;
+ b=dkoHyKfRA4UYW2OaygqL/esQncYZvyFHSSpv2iuyD6Jr7Mcl4MyKTecWFOnW06fQVoxcpigNuREuUncy8EULwYqlP4CB3FOD4etY4tUu4gcZHpZMMLYz0Ye5fDiOYxVBiwVTztbULZ0VBJSZWpOxBHr20N4Dqthe9RuPQ5Q//CzBvCVqzLFY79wntauSAm7VKntEYKEgr7ja6de01lJpPstBV28H5wTYoW5BpQ4IEdrwhgkjWHVzDMQtTmGkSp3mjn5asbtpFrDvd3EUE2Y5ZZDAkf8d/U+BBQUCL6LHRajCAE4Zzqa4YF5tqRl/D+UZMMvGwDm171gc30riybaJBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ak2eDe40sPIEEPrnXEl7Tl7CmliEMFmP95+Wt/ygxpk=;
+ b=XzEMx/ZKb0E149pyaKEOxrjpBKTUD5di6ZGOMrjv4JR5yEGsVZGzSm/Vnz2d3oVJYt3ITHN9qP2Hy/iMLfL8n3VYFGJDfDupI3dutTePkDJSYanfI9hdJsRDb6hplogZDVjWv+5Or2rjovG2Kjj/N21wX9owrGO91pQS0iiWarc=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by PH0PR10MB4502.namprd10.prod.outlook.com (2603:10b6:510:31::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.14; Tue, 14 Sep
+ 2021 04:40:54 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::c0ed:36a0:7bc8:f2dc]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::c0ed:36a0:7bc8:f2dc%7]) with mapi id 15.20.4500.019; Tue, 14 Sep 2021
+ 04:40:54 +0000
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        johan@kernel.org, fujita.tomonori@lab.ntt.co.jp, hch@lst.de,
+        gregkh@linuxfoundation.org, wanghaibin.wang@huawei.com,
+        axboe@kernel.dk
+Subject: Re: [PATCH v2] scsi: bsg: Fix device unregistration
+Date:   Tue, 14 Sep 2021 00:40:49 -0400
+Message-Id: <163159443486.11082.13793603628764579473.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210911105306.1511-1-yuzenghui@huawei.com>
+References: <20210911105306.1511-1-yuzenghui@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR13CA0104.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c5::19) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggema773-chm.china.huawei.com (10.1.198.217)
-X-CFilter-Loop: Reflected
+Received: from ca-mkp.mkp.ca.oracle.com (138.3.201.9) by SJ0PR13CA0104.namprd13.prod.outlook.com (2603:10b6:a03:2c5::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.9 via Frontend Transport; Tue, 14 Sep 2021 04:40:52 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1fd9c421-ed45-4d7e-c270-08d97739d643
+X-MS-TrafficTypeDiagnostic: PH0PR10MB4502:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <PH0PR10MB450203928471EC5E9BF3944A8EDA9@PH0PR10MB4502.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /FFZeZnERhHaIE3ff37bi+hWfkmufPTst88YKrBMcwiD9mWf5/jvlK8whdT+DX3RQit7wu7R8ZgfewGkGgAEEX3BqingiAuYINevmtKG6tqkrCczsa2iQPCBJCn2n6RQIBZlYluyTKp/mhuX2IehOlQTqqlewAAJ1Dzi8zA1pCmhiutl552mP/JXx+LqVzGVrLT/v4VozwGm0jcDiNs9h697/OpdGw2iKkDosDrDvg+tU/LI/Pvb/lCedrUw/XCxpFN5/vFQWXY/F74bzH8Gs95kif+eYYFFcJ0rvmfgTfLOPChHs89iWL0P4ng+GXMBngVjyhco0M0H7Yu7tSm1rrpvTjoqXIkSqEBQxjccn/2CYShcuzTh+xLnKD5ZCBDi0PSzcA2pb7XyMHaYHOGDO6oRjdQWFveBFOZ3YLuh/VkB1Ymf8bVWDbIpOFF4YwN0mjAv24shUFELXBb0UgT1NG+NlvT2vYeAxCr7WChPOwOFcxoIBE9M4V8qQ2QtKHSopQuoX+ZzOAojOxHmm4lVuRe6uNp7eeCga9zcaAZARDxNVzH+uXPfiZsUM1HmZnxxe+iLR035bQiGxy3Lt7233/K/0Mz3UwpzCxMIW7FmbKx2rIJPcE8kaAWu9PpVRwGiJXC1Pt8xBRBosl6KXXN1fjAlgvRgozZ+/xrVS2ACCwbRJk58FU4sSxa4dJbmJXCdJnp3VBm/wkYw2sAqq6eZyLCstpYGMVhqp93MtspSHcl3bumA6TgO3uuP0x30l7hWasxpvYvOc9qPEod6a+hUZg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(136003)(396003)(39860400002)(366004)(376002)(4326008)(186003)(26005)(4744005)(2616005)(966005)(7696005)(52116002)(5660300002)(103116003)(36756003)(6486002)(2906002)(316002)(38100700002)(86362001)(66556008)(66476007)(478600001)(6666004)(38350700002)(66946007)(956004)(8676002)(8936002)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bzlwQm5ZUmpkUjV0YTBoMnpJUnRVRWRUNEFlNCtCczZMMUFOZlhsSnFkTzZG?=
+ =?utf-8?B?SEZLUDBsWFlxSTg1QTkwc1l6RkxrMVJ2b2pVN0gyZCtpYmlKRjFSTlNDbTFw?=
+ =?utf-8?B?b2V5Y2dady9BRldMTHFIVC80bXJXMkRNQWU2NGF3U2VKSW9uWHRJOGVvUSt4?=
+ =?utf-8?B?UHlibVJLME9uN2xUN2dMc1ZwYk8vdjY5ZjBhT1E2QklQS0xxZVlxNVk3VFBC?=
+ =?utf-8?B?Zy9aZUxIc2tXOHdmMnROWFpEM2M1UEdGR21JRGlKN3JvazZIdWNobHlobWRR?=
+ =?utf-8?B?cXdOb0JxTFMxQld6TVlHdnZ2ZTNXUTVJTjV3RG5DT3gvNTZQMTF5UWZWbXZ0?=
+ =?utf-8?B?THVPYzRMZm93ZUtpak0xaDUrOUVFWkZWTFdzbHZEaWJhY2JKWGRNYlBQTmVQ?=
+ =?utf-8?B?N0NRUk1UNWpIZTk4U3JoYWd2VWxGMitkdld6SDZWcHZYUE9MSnNUQnpyWGQ3?=
+ =?utf-8?B?aFd0UEo2RUg1VDdFMU4yb2dpNUU2Yms4Y2NWUnFtQ0lqMWRvd1dzT1AvY3hD?=
+ =?utf-8?B?NTJZZ3V1c1A1R1BxUjB0V2U3Zk91NlBYaEUyUDlOSmdpb1d2Q1FUSFMrd2tC?=
+ =?utf-8?B?TmlMZzNSbUhydjgwbmNGK3MraVdlTTR6NnppTllBL2ZxWnV1b21rVnBmcTdD?=
+ =?utf-8?B?eDBkU2s5VUpsMWpIVzJiRXp2d2xhSUtZT0dTQVBUUjkvRy94a05sTWVPd2J3?=
+ =?utf-8?B?aXcyekxNMUM0b0tkLzdVdzM5NUp0Tm5TQmp2aW1SaWdoQVA2Z25QL2ltSHpO?=
+ =?utf-8?B?NytzUzZCYmQwYk96cWQyY2RNK3YyUnJ3ZTlwVHZqZDdzNmd5bzZlNU5semd6?=
+ =?utf-8?B?U05Sa0xZazNVaitSc2V5dVlwWmFLVGtKdGtQeklxTndsMlhkWVgvWnV5WWlx?=
+ =?utf-8?B?QTF0YzIzRzRBQ0hFYVhxMHdiV3AxWkRCdmw4VzVtWElCSXlkRVFZTHJNZDNF?=
+ =?utf-8?B?ZkxDWVlCL0xRTDBMb0lpRk9wSDk4NEhObFJpUnNqWkJIemx1MlhtVm9lRERL?=
+ =?utf-8?B?RFJ5YnprZnplRE82Nis4OVdNbjE4ZWtTZTJja0VhMFk3Q0plczhGUlo5dldx?=
+ =?utf-8?B?MG9WS1I3Ylc0MW5IaCs2d01GdFZ6VnJMcjFDOXJ6K24xMnk0T1luYXlubXBY?=
+ =?utf-8?B?KzMvMzcwZUx1eUNUODExYnAyS3lodk5ndFVKSzVqRjlDZktXQUU4djVSRjdW?=
+ =?utf-8?B?ZFB0eUNpRy9yTzhieVZOL3ZVRExWU2Y2RGU0SVAzZmhZK08zcDl0VjNldVJx?=
+ =?utf-8?B?UXVoZDhpc3R0cmlaQytZb2lHNGEwWUlUTGtad0VYZDd3MmkrWjVmUVI5cW44?=
+ =?utf-8?B?ZExzVkd0dXEyTllzZktPc0FkU2p5emNJU0RIUlJFbjJTZnNqNFR4OVl1SzZB?=
+ =?utf-8?B?bXRManQ5aHVCbEx4T3dFTVNEUnpOcWNkQUwxTnEvM1lER29TY2RuaDBiR2J4?=
+ =?utf-8?B?cEJVeVZ6ZEVnalc4cGdKdWNCTnhwanViRWFJQk9SeFBKTjhpZ3FKZkNRMzVt?=
+ =?utf-8?B?VUxNcFZVSmtzU1dFNDR1ZW5UeEp5Z3VjendTbCs1UmErKzQ2eW4zdkxLdk8y?=
+ =?utf-8?B?Vk5BRERhNHkrS25YbFJ1d0V3azcxSlQwYW55bGIra2Rwd2pURFBycG5aeE5I?=
+ =?utf-8?B?enZ0ZHhyNmh0eXE5WjhiN0lmNTdXdFJNMDFYOGk1bEMwcWhMRlE3NStrUEY5?=
+ =?utf-8?B?ME1OU01xUEgxdFpQbnNnUzAvRkptTWxFZEh0OEdFeVZMcXMwRndxWVZWblpr?=
+ =?utf-8?Q?DI8urbc1g131mrh9TWTIacpP5C/8MbIcCzNmo9w?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1fd9c421-ed45-4d7e-c270-08d97739d643
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2021 04:40:54.3292
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 61QEDV/XFiSWFY7YJPZB6clmq8OhdXupGbqKIhouzKfb4idrJJKbPvbGNv4RmbHfgolnMQJjrgaCsr1qP9nVgAo1BH61Ll0s7tkJn/goE4w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4502
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10106 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=927 malwarescore=0 mlxscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109030001
+ definitions=main-2109140026
+X-Proofpoint-ORIG-GUID: -3lxiwhJRkWrhApT7lBE0eGa9-gQjJ91
+X-Proofpoint-GUID: -3lxiwhJRkWrhApT7lBE0eGa9-gQjJ91
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-KASAN reports a use-after-free report when doing fuzz test:
+On Sat, 11 Sep 2021 18:53:06 +0800, Zenghui Yu wrote:
 
-[693354.104835] ==================================================================
-[693354.105094] BUG: KASAN: use-after-free in bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105336] Read of size 4 at addr ffff888be0a35664 by task sh/1453338
+> We use device_initialize() to take refcount for the device but forget to
+> put_device() on device teardown, which ends up leaking private data of the
+> driver core, dev_name(), etc. This is reported by kmemleak at boot time if
+> we compile kernel with DEBUG_TEST_DRIVER_REMOVE.
+> 
+> Note that adding the missing put_device() is _not_ sufficient to fix device
+> unregistration. As we don't provide the .release() method for device, which
+> turned out to be typically wrong and will be complained loudly by the
+> driver core.
+> 
+> [...]
 
-[693354.105607] CPU: 41 PID: 1453338 Comm: sh Kdump: loaded Not tainted 4.18.0-147
-[693354.105610] Hardware name: Huawei 2288H V5/BC11SPSCB0, BIOS 0.81 07/02/2018
-[693354.105612] Call Trace:
-[693354.105621]  dump_stack+0xf1/0x19b
-[693354.105626]  ? show_regs_print_info+0x5/0x5
-[693354.105634]  ? printk+0x9c/0xc3
-[693354.105638]  ? cpumask_weight+0x1f/0x1f
-[693354.105648]  print_address_description+0x70/0x360
-[693354.105654]  kasan_report+0x1b2/0x330
-[693354.105659]  ? bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105665]  ? bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105670]  bfq_io_set_weight_legacy+0xd3/0x160
-[693354.105675]  ? bfq_cpd_init+0x20/0x20
-[693354.105683]  cgroup_file_write+0x3aa/0x510
-[693354.105693]  ? ___slab_alloc+0x507/0x540
-[693354.105698]  ? cgroup_file_poll+0x60/0x60
-[693354.105702]  ? 0xffffffff89600000
-[693354.105708]  ? usercopy_abort+0x90/0x90
-[693354.105716]  ? mutex_lock+0xef/0x180
-[693354.105726]  kernfs_fop_write+0x1ab/0x280
-[693354.105732]  ? cgroup_file_poll+0x60/0x60
-[693354.105738]  vfs_write+0xe7/0x230
-[693354.105744]  ksys_write+0xb0/0x140
-[693354.105749]  ? __ia32_sys_read+0x50/0x50
-[693354.105760]  do_syscall_64+0x112/0x370
-[693354.105766]  ? syscall_return_slowpath+0x260/0x260
-[693354.105772]  ? do_page_fault+0x9b/0x270
-[693354.105779]  ? prepare_exit_to_usermode+0xf9/0x1a0
-[693354.105784]  ? enter_from_user_mode+0x30/0x30
-[693354.105793]  entry_SYSCALL_64_after_hwframe+0x65/0xca
+Applied to 5.15/scsi-fixes, thanks!
 
-[693354.105875] Allocated by task 1453337:
-[693354.106001]  kasan_kmalloc+0xa0/0xd0
-[693354.106006]  kmem_cache_alloc_node_trace+0x108/0x220
-[693354.106010]  bfq_pd_alloc+0x96/0x120
-[693354.106015]  blkcg_activate_policy+0x1b7/0x2b0
-[693354.106020]  bfq_create_group_hierarchy+0x1e/0x80
-[693354.106026]  bfq_init_queue+0x678/0x8c0
-[693354.106031]  blk_mq_init_sched+0x1f8/0x460
-[693354.106037]  elevator_switch_mq+0xe1/0x240
-[693354.106041]  elevator_switch+0x25/0x40
-[693354.106045]  elv_iosched_store+0x1a1/0x230
-[693354.106049]  queue_attr_store+0x78/0xb0
-[693354.106053]  kernfs_fop_write+0x1ab/0x280
-[693354.106056]  vfs_write+0xe7/0x230
-[693354.106060]  ksys_write+0xb0/0x140
-[693354.106064]  do_syscall_64+0x112/0x370
-[693354.106069]  entry_SYSCALL_64_after_hwframe+0x65/0xca
+[1/1] scsi: bsg: Fix device unregistration
+      https://git.kernel.org/mkp/scsi/c/1a0db7744e45
 
-[693354.106114] Freed by task 1453336:
-[693354.106225]  __kasan_slab_free+0x130/0x180
-[693354.106229]  kfree+0x90/0x1b0
-[693354.106233]  blkcg_deactivate_policy+0x12c/0x220
-[693354.106238]  bfq_exit_queue+0xf5/0x110
-[693354.106241]  blk_mq_exit_sched+0x104/0x130
-[693354.106245]  __elevator_exit+0x45/0x60
-[693354.106249]  elevator_switch_mq+0xd6/0x240
-[693354.106253]  elevator_switch+0x25/0x40
-[693354.106257]  elv_iosched_store+0x1a1/0x230
-[693354.106261]  queue_attr_store+0x78/0xb0
-[693354.106264]  kernfs_fop_write+0x1ab/0x280
-[693354.106268]  vfs_write+0xe7/0x230
-[693354.106271]  ksys_write+0xb0/0x140
-[693354.106275]  do_syscall_64+0x112/0x370
-[693354.106280]  entry_SYSCALL_64_after_hwframe+0x65/0xca
-
-[693354.106329] The buggy address belongs to the object at ffff888be0a35580
-                 which belongs to the cache kmalloc-1k of size 1024
-[693354.106736] The buggy address is located 228 bytes inside of
-                 1024-byte region [ffff888be0a35580, ffff888be0a35980)
-[693354.107114] The buggy address belongs to the page:
-[693354.107273] page:ffffea002f828c00 count:1 mapcount:0 mapping:ffff888107c17080 index:0x0 compound_mapcount: 0
-[693354.107606] flags: 0x17ffffc0008100(slab|head)
-[693354.107760] raw: 0017ffffc0008100 ffffea002fcbc808 ffffea0030bd3a08 ffff888107c17080
-[693354.108020] raw: 0000000000000000 00000000001c001c 00000001ffffffff 0000000000000000
-[693354.108278] page dumped because: kasan: bad access detected
-
-[693354.108511] Memory state around the buggy address:
-[693354.108671]  ffff888be0a35500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[693354.116396]  ffff888be0a35580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.124473] >ffff888be0a35600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.132421]                                                        ^
-[693354.140284]  ffff888be0a35680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.147912]  ffff888be0a35700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[693354.155281] ==================================================================
-
-blkgs are protected by both queue and blkcg locks and holding
-either should stabilize them. However, the path of destroying
-blkg policy data is only protected by queue lock in
-blkcg_activate_policy()/blkcg_deactivate_policy(). Other tasks
-can get the blkg policy data before the blkg policy data is
-destroyed, and use it after destroyed, which will result in a 
-use-after-free.
-
-CPU0                             CPU1
-blkcg_deactivate_policy
-  spin_lock_irq(&q->queue_lock)
-                                 bfq_io_set_weight_legacy  
-                                   spin_lock_irq(&blkcg->lock)
-                                   blkg_to_bfqg(blkg)
-                                     pd_to_bfqg(blkg->pd[pol->plid])
-                                     ^^^^^^blkg->pd[pol->plid] != NULL
-                                           bfqg != NULL
-  pol->pd_free_fn(blkg->pd[pol->plid])
-    pd_to_bfqg(blkg->pd[pol->plid])
-    bfqg_put(bfqg)
-      kfree(bfqg)
-  blkg->pd[pol->plid] = NULL
-  spin_unlock_irq(q->queue_lock);
-                                   bfq_group_set_weight(bfqg, val, 0)
-                                     bfqg->entity.new_weight
-                                     ^^^^^^trigger uaf here 
-                                   spin_unlock_irq(&blkcg->lock);
-
-Fix by garbbing the matching blkcg lock before trying to
-destroy blkg policy data.
-
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Li Jinlin <lijinlin3@huawei.com>
----
-changes since v2 send with Message-ID:
-20210910034642.2838054-1-lijinlin3@huawei.com
-
- - grab the matching blkcg lock before trying to destroy
-   blkg policy data as suggested by Tejun
- - modify the subject and message to match the content
-
- block/blk-cgroup.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 3c88a79a319b..6c17ee6db20f 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1364,10 +1364,14 @@ int blkcg_activate_policy(struct request_queue *q,
- 	/* alloc failed, nothing's initialized yet, free everything */
- 	spin_lock_irq(&q->queue_lock);
- 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
-+		struct blkcg *blkcg = blkg->blkcg;
-+
-+		spin_lock(&blkcg->lock);
- 		if (blkg->pd[pol->plid]) {
- 			pol->pd_free_fn(blkg->pd[pol->plid]);
- 			blkg->pd[pol->plid] = NULL;
- 		}
-+		spin_unlock(&blkcg->lock);
- 	}
- 	spin_unlock_irq(&q->queue_lock);
- 	ret = -ENOMEM;
-@@ -1399,12 +1403,16 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 	__clear_bit(pol->plid, q->blkcg_pols);
- 
- 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
-+		struct blkcg *blkcg = blkg->blkcg;
-+
-+		spin_lock(&blkcg->lock);
- 		if (blkg->pd[pol->plid]) {
- 			if (pol->pd_offline_fn)
- 				pol->pd_offline_fn(blkg->pd[pol->plid]);
- 			pol->pd_free_fn(blkg->pd[pol->plid]);
- 			blkg->pd[pol->plid] = NULL;
- 		}
-+		spin_unlock(&blkcg->lock);
- 	}
- 
- 	spin_unlock_irq(&q->queue_lock);
 -- 
-2.27.0
-
+Martin K. Petersen	Oracle Linux Engineering
