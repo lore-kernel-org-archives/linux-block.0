@@ -2,305 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E71C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 10:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC3FC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 11:42:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6726460724
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 10:56:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBF5A60F4A
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 11:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231844AbhINK5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 06:57:46 -0400
-Received: from mail110.syd.optusnet.com.au ([211.29.132.97]:37055 "EHLO
-        mail110.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231667AbhINK5o (ORCPT
+        id S232056AbhINLn5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 07:43:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232050AbhINLn5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 06:57:44 -0400
-Received: from dread.disaster.area (pa49-195-238-16.pa.nsw.optusnet.com.au [49.195.238.16])
-        by mail110.syd.optusnet.com.au (Postfix) with ESMTPS id 1E48A106CD1;
-        Tue, 14 Sep 2021 20:56:25 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1mQ66x-00CLor-TA; Tue, 14 Sep 2021 20:56:23 +1000
-Date:   Tue, 14 Sep 2021 20:56:23 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
-Message-ID: <20210914105623.GK2361455@dread.disaster.area>
-References: <20210913054121.616001-1-hch@lst.de>
- <20210913054121.616001-14-hch@lst.de>
- <YT7vZthsMCM1uKxm@kroah.com>
- <20210914012029.GF2361455@dread.disaster.area>
- <YUAvSx42abg5S2ym@kroah.com>
+        Tue, 14 Sep 2021 07:43:57 -0400
+Received: from lounge.grep.be (lounge.grep.be [IPv6:2a01:4f8:200:91e8::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F26FC061574
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 04:42:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
+        s=2021.lounge; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=OyulxNPZRJQgaxJ96lzfK3AcGP7GDS0fymvFsAXQtFY=; b=pUqwFGX7BXtZE0/dUsE09428Y/
+        gKHcYX0z89Hh1muNfQlGW6+2HKw61W8NtlUMh1SW3Gp1CZ3AfUoYI9eprCp1N6zWjIQAkBsXi3PdF
+        g0+s5/EANhnD3A6fZrbfZBq2hV6oZvIn+sReHR3D+MuBI7CgtvAhkbhyzR4x6YGU4umIK8HvDcExh
+        kwFNjJmzfAqVdnk4C72xmqB7MwhUAVIutqCnboejoIpP8YDhT5HpgFaZpFMyXwFXEc8bgnXu0/YoR
+        zLZcKuPnajBi62nPh6qi4PeVHSjWN9CJz3c4F6rMDGZqDaS8N1whKLVGUgvTE2EMIoT2zeTw8WIn/
+        2mkZJiqQ==;
+Received: from [196.251.239.242] (helo=pc181009)
+        by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <w@uter.be>)
+        id 1mQ6pa-00HJIn-Vx; Tue, 14 Sep 2021 13:42:30 +0200
+Received: from wouter by pc181009 with local (Exim 4.95-RC2)
+        (envelope-from <w@uter.be>)
+        id 1mQ6pX-0005AP-Lg;
+        Tue, 14 Sep 2021 13:42:27 +0200
+Date:   Tue, 14 Sep 2021 13:42:27 +0200
+From:   Wouter Verhelst <w@uter.be>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: Re: [PATCH v2 3/3] nbd: fix race between nbd_alloc_config() and
+ module removal
+Message-ID: <YUCKoySdM9WZlUH9@pc181009.grep.be>
+References: <20210904122519.1963983-1-houtao1@huawei.com>
+ <20210904122519.1963983-4-houtao1@huawei.com>
+ <20210906093051.GC30790@lst.de>
+ <ce3e1ea8-ebda-4372-42ce-e8a4b2d12514@huawei.com>
+ <20210906102521.GA3082@lst.de>
+ <730dae5e-5af8-3554-18bf-e22ff576e2b1@huawei.com>
+ <20210909064035.GA26290@lst.de>
+ <6434d4e8-984d-97df-34e5-b86a0e69cf58@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YUAvSx42abg5S2ym@kroah.com>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0
-        a=DzKKRZjfViQTE5W6EVc0VA==:117 a=DzKKRZjfViQTE5W6EVc0VA==:17
-        a=kj9zAlcOel0A:10 a=7QKq2e-ADPsA:10 a=7-415B0cAAAA:8
-        a=vTDO8LzAJrJoscva19kA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <6434d4e8-984d-97df-34e5-b86a0e69cf58@huawei.com>
+X-Speed: Gates' Law: Every 18 months, the speed of software halves.
+Organization: none
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 07:12:43AM +0200, Greg Kroah-Hartman wrote:
-> On Tue, Sep 14, 2021 at 11:20:29AM +1000, Dave Chinner wrote:
-> > On Mon, Sep 13, 2021 at 08:27:50AM +0200, Greg Kroah-Hartman wrote:
-> > > On Mon, Sep 13, 2021 at 07:41:21AM +0200, Christoph Hellwig wrote:
-> > > That is a sysfs file?  What happened to the "one value per file" rule
-> > > here?
-> > 
-> > 
-> > There is no "rule" that says syfs files must contain one value per
-> > file; the documentation says that one value per file is the
-> > "preferred" format.  Documentation/filesystems/sysfs.rst:
-> > 
-> > [...]
-> > Attributes
-> > ...
-> > Attributes should be ASCII text files, preferably with only one value
-> > per file. It is noted that it may not be efficient to contain only one
-> > value per file, so it is socially acceptable to express an array of
-> > values of the same type.
-> > [...]
-> > 
+On Mon, Sep 13, 2021 at 12:32:37PM +0800, Hou Tao wrote:
+> Hi Christoph,
 > 
-> An array of values is one thing like "what is the power states for this
-> device".  A list of different key/value pairs is a totally different
-> thing entirely.
+> On 9/9/2021 2:40 PM, Christoph Hellwig wrote:
+> > On Tue, Sep 07, 2021 at 11:04:16AM +0800, Hou Tao wrote:
+> >> Let me explain first. The reason it works is due to genl_lock_all() in netlink code.
+> > Btw, please properly format your mail.  These overly long lines are really
+> > hard to read.
+> Thanks for reminding.
+> >> If the module removal happens before calling try_module_get(), nbd_cleanup() will
+> >>
+> >> call genl_unregister_family() first, and then genl_lock_all(). genl_lock_all() will
+> >>
+> >> prevent ops in nbd_connect_genl_ops() from being called, because the calling
+> >>
+> >> of nbd ops happens in genl_rcv() which needs to acquire cb_lock first.
+> > Good.
+> >
+> >> I have checked multiple genl_ops, it seems that the reason why these genl_ops
+> >>
+> >> don't need try_module_get() is that these ops don't create new object through
+> >>
+> >> genl_ops and just control it. However genl_family_rcv_msg_dumpit() will try to
+> >>
+> >> call try_module_get(), but according to the history (6dc878a8ca39 "netlink: add reference of module in netlink_dump_start"),
+> >>
+> >> it is because inet_diag_handler_cmd() will call __netlink_dump_start().
+> > And now taking a step back:  Why do we even need this extra module
+> > reference?  For the case where nbd_alloc_config is called from nbd_open
+> > we obviously don't need it.  In the case where it is called from
+> > nbd_genl_connect that prevents unloading nbd when there is a configured
+> > but not actually nbd device.  Which isn't reallyed need and counter to
+> > how other drivers work.
+> Yes, the purpose of module ref-counting in nbd_alloc_config() is to force
+> the user to disconnect the nbd device manually before module removal.
+> And loop device works in the same way. If a file is attached to a loop device,
+> an extra module reference will be taken in loop_configure() and the removal
+> of loop module will fail. The only difference is that loop driver takes the
+> extra ref-count by ioctl, and nbd does it through netlink.
 
-Sure, that's your opinion. Nothing more, nothing less. I could
-easily argue that "what power states does this thing have" is a
-list and not an array, but this would be just another opinion and
-completely beside the point of the discussion.
+Haven't checked the actual patch, but just wanted to point out:
 
-> > We are exposing a large array of integer values here, so multiple
-> > values per file are explicitly considered an acceptible format.
-> 
-> Not really, that was not the goal of sysfs at all.
+nbd should do it through netlink *and* ioctl -- the older way to
+configure nbd was through ioctl, which we should still support for
+backcompat reasons.
 
-Sure. We all know this and we follow the guidelines in most cases.
-Indeed, every other sysfs file that XFS exposes is a value-per-file
-object. This makes sense for most things we expose through sysfs,
+(if that's already the case, then ignore what I said :-)
 
-Not everything maps to value-per-file cleanly or efficiently and the
-documentation acknowledges that there are alternative use cases for
-sysfs files like this. Just because you don't like it doesn't mean
-there aren't cases where multiple values per file is the best thing
-to do.
-
-Blind obedience to rules almost always results in poor outcomes.
-
-> > Further, as there are roughly 200 individual stats in this file and
-> > calculating each stat requires per-cpu aggregation, the the cost of
-> > calculating and reading each stat individually is prohibitive, not
-> > just inefficient.
-> 
-> Have you measured it?  How often does the file get read and by what
-> tools?
-
-Of course I've measured it. I sample and graph hundreds of stats in
-realtime at 10-20Hz across multiple machines as part of my daily
-development routine with PCP?  I see the overhead of reading stats
-out of the kernel in kernel profiles and dropped samples in recorded
-archives all the time.
-
-For example, reading the global XFS stats at 20Hz via pmcd/pmdaxfs
-during testing on a 32p machine results in xfs_stats_format()
-consuming about 1% of a CPU.  From the flat perf top profile:
-
-0.93  [kernel]  [k] xfs_stats_format
-
-That's typical high frequency sampling overhead of a single
-filesystem being actively used.
-
-Note that micro-benchmarks give highly unrealistic results. If I pin
-a cpu in a tight loop doing like this:
-
-       for (i = 0; i < cnt; i++) {
-                fd = open("/sys/fs/xfs/stats/stats", O_RDONLY);
-                read(fd, buf, 4096);
-                close(fd);
-       }
-
-It gives an number of 20,000 reads a second, with 90% of teh CPU
-usage being in xfs_stats_format(). This is unrealistic because it is
-hitting hot, clean caches and doing absolutely nothing with the data
-that is returned.
-
-Userspace needs to do work with the data, and that is as least as
-much CPU overhead as formatting the stats to turn them back into
-proper integer values and dumping them into a shared memory segment
-for another process to collate before it can read more data from the
-kernel (the underlying PCP userspace architecture). So,
-realistically, sampling from 5,000 XFS stats files per CPU per
-second from userspace on a 32p machine is about the max rate we can
-reliably sustain on a single CPU.
-
-The biggest cost is the read() cost (open/close is less than 10% of
-the cost of the above loop), and the flat profile shows:
-
-	27.47%  [k] xfs_stats_format
-	16.11%  [k] _find_next_bit
-	11.11%  [k] cpumask_next
-	 4.36%  [k] vsnprintf
-	 4.07%  [k] format_decode
-	 3.99%  [k] number
-
-70% of the "cpu usage" of xfs_stats_format() is the L1 cacheline
-miss in the for_each_possible_cpu() loop reading the percpu stats
-values.  That's despite the cachelines being clean and likely hot in
-other larger local CPU caches.  The percpu loop also accounts for
-the cpumask_next() CPU usage, and the _find_next_bit CPU usage comes
-from cpumask_next() calling it.
-
-IOWs, about half of the kernel CPU usage reading the XFS stats in a
-tight loop on a 32p machine comes from the per-cpu aggregation
-overhead. That aggregation overhead will be the overall limiting
-factor for XFS stats sampling.
-
-With 100 filesystems we could, in theory, sample them all at about
-50Hz if we're doing nothing else with that CPU.  But the data set
-size we are reading has gone up by a factor of 100, and the stats
-data is not going to be hot in CPU caches anymore (neither in the
-kernel or userspace).  Per-cpu aggregation will also hit dirty
-remote cachelines on active systems, so it's *much* slower than the
-above loop would indicate. The original profile indicates maybe 20Hz
-is acheivable, not 50Hz.
-
-With this in mind, we then have to consider the overhead on machines
-with thousands of CPUs rather than a few tens of CPUs. The cost of
-per-cpu aggregation on those machines is a couple of magnitudes
-higher than these machines (aggregation overhead increases linearly
-with CPU count), so if we are burning the same amount of CPU time
-doing aggregation, then the number of times we can aggregate the
-stats goes down by a couple of orders of magnitude.  That's the
-behavioural characteristics that we have to design for, not what my
-tiny little 32p system can do.
-
-IOWs, our "all stats in one file" setup on a system with a hundred
-filesystems and a thousand CPUs can currently manage (roughly) a 1Hz
-sampling rate on all filesystems using a single CPU and the existing
-"all stats in one file" setup.
-
-Now, let's put that in a value-per-file setup.
-
-This means we have to read 200 individual files per filesystem to
-build the entire sample set. This means we do 200 per-cpu
-aggregations instead of 1 for this sample set. Given that the
-majority of overhead is the per-cpu aggregation, the filesystem
-stats set takes 100-200x longer to sample than a "all in one file"
-setup.
-
-IOWs, a sample set for a *single* filesystem on a 1000 CPU machine
-now takes 1-2s to complete.  At 100 filesystems, we now take
-100-200s of CPU time to sample all the filesystem stats once. That's
-a massive amount of extra overhead, and simply not acceptible nor
-necessary. 
-
-To compound the regression caused by moving to a value per file, we
-then have to spend another whole chunk of engineering work to
-mitigate it. We'd have to completely rewrite the stats aggregation
-code and we'd probably end up losing high frequency aggregation
-capabilities as a result.
-
-This is a lose-lose-lose-lose scenario, and no one in their right
-mind would consider a viable way forward. The "efficiency exception"
-in the documentation was intended for exactly this sort of
-situation. So, really it doesn't make what you like or not, it's the
-only viable solution we currently have.
-
-> We have learned from our past mistakes in /proc where we did this in the
-> past and required keeping obsolete values and constantly tweaking
-> userspace parsers.  That is why we made sysfs one-value-per-file.  If
-> the file is not there, the value is not there, much easier to handle
-> future changes.
-
-We've had rules for extending the xfs stats file to avoid breaking
-the userspace parsers for a couple of decades, too. There are some
-advantages to value-per-file when it comes to deprecation, but
-really that's not a problem we need to solve for the XFS stats.
-
-> > So, yes, we might have multiple lines in the file that you can frown
-> > about, but OTOH the file format has been exposed as a kernel ABI for
-> > a couple of decades via /proc/fs/xfs/stat.
-> 
-> proc had no such rules, but we have learned :)
-
-And so now you know better than everyone else. :/
-
-> > Hence exposing it in
-> > sysfs to provide a more fine-grained breakdown of the stats (per
-> > mount instead of global) is a no-brainer. We don't have to rewrite
-> > the parsing engines in multiple userspace monitoring programs to
-> > extract this information from the kernel - they just create a new
-> > instance and read a different file and it all just works.
-> 
-> But then you run into the max size restriction on sysfs files
-> (PAGE_SIZE) and things break down.
-
-Yup, but we're nowhere near the max size restriction. Output
-currently requires 12 bytes per stat maximum, so we're still
-good to add another 100-150 or so stats before we have to worry
-about PAGE_SIZE limits...
-
-> Please don't do this.
-
-Please don't take us for idiots - you know full well that the ABI
-horse bolted long ago and we don't break userspace like this.
-
-If you've got a more efficient generic way of exporting large
-volumes of dynamically instanced stats arrays at high frequency than
-what we do right now, then I'm all ears. But if all you are going to
-say is "I say you can't do that" then you're not being helpful or
-constructive.
-
-> > Indeed, there's precedence for such /proc file formats in more
-> > fine-grained sysfs files. e.g.  /sys/bus/node/devices/node<n>/vmstat
-> > and /sys/bus/node/devices/node<n>/meminfo retain the same format
-> > (and hence userspace parsers) for the per-node stats as /proc/vmstat
-> > and /proc/meminfo use for the global stats...
-> 
-> And I have complained about those files in the past many times.  And
-> they are running into problems in places dealing with them too.
-
-So come up with a generic, scalable, low overhead solution to the
-stats export problem, convert all the kernel code and userspace
-applications to use it, address all the regressions on large CPU
-count machines it causes, start a long term deprecation period for
-the existing stats files (because it's part of the kernel ABI), and
-then maybe in 10 or 15 years time we can get rid of this stuff.
-
-> > tl;dr: the file contains arrays of values, it's inefficient to read
-> > values one at a time, it's a pre-existing ABI-constrainted file
-> > format, there's precedence in core kernel statistics
-> > implementations and the documented guidelines allow this sort of
-> > usage in these cases.
-> 
-> I would prefer not to do this, and I will not take core sysfs changes to
-> make this any easier.
-> 
-> Which is one big reason why I don't like just making sysfs use the seq
-> file api, it would allow stuff like this to propagate to other places in
-> the kernel.
->
-> Maybe I should cut the file size of a sysfs file down to PAGE_SIZE/4 or
-> less, that might be better :)
-
-Yeah, good on yah, Greg. That'll show everyone who's boss, won't it?
-
--Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+     w@uter.{be,co.za}
+wouter@{grep.be,fosdem.org,debian.org}
