@@ -2,33 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE118C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 01:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 889CCC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 02:53:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5BE96113B
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 01:51:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6569461108
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 02:53:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbhINBwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Sep 2021 21:52:20 -0400
-Received: from mail107.syd.optusnet.com.au ([211.29.132.53]:34346 "EHLO
-        mail107.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230340AbhINBwT (ORCPT
+        id S237553AbhINCyX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Sep 2021 22:54:23 -0400
+Received: from mail-pf1-f170.google.com ([209.85.210.170]:43766 "EHLO
+        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237098AbhINCyW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Sep 2021 21:52:19 -0400
-X-Greylist: delayed 1829 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 Sep 2021 21:52:19 EDT
-Received: from dread.disaster.area (pa49-195-238-16.pa.nsw.optusnet.com.au [49.195.238.16])
-        by mail107.syd.optusnet.com.au (Postfix) with ESMTPS id 3CFD9ECB25A;
-        Tue, 14 Sep 2021 11:20:30 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1mPx7d-00CCJV-0Z; Tue, 14 Sep 2021 11:20:29 +1000
-Date:   Tue, 14 Sep 2021 11:20:29 +1000
-From:   Dave Chinner <david@fromorbit.com>
+        Mon, 13 Sep 2021 22:54:22 -0400
+Received: by mail-pf1-f170.google.com with SMTP id f65so10756661pfb.10;
+        Mon, 13 Sep 2021 19:53:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=n9QXTYQ7gFuOAX5ceoQmW2i5wwUUt7ZoVGuJ1Q+ByGg=;
+        b=Xu7WPbsrPN/H+b1DejJAqwAADVjtRHXlZNzHN3jFdg2o21KfB3RwROJdeCtCJbXLlB
+         65edHKblIYVM9SHpma6ysixqv5C2xNhWbnpdzk2xKTwmM8vGdTyDguIi/r/rdVnDoESH
+         nHk4vKq2q9iPgUlYZSEdqlNVQKhzgLr5EJ3hLl5k0Vca6astmsBN/ehG3/X+8C3X18EL
+         zloK1YPTt4IwSokWVD5XUMv6niZR+/mVoBB2DFSEd0IGfHEyiD0BHE52JB/wp5d+qtyG
+         dMlba5viScpxoxQKS8xkMqPJ9R0M7qVN2nYVZnWHUAgh/FOcSLbWG45MEyy/ZFgQ9xAl
+         UT4Q==
+X-Gm-Message-State: AOAM531or95cbgc9Kb3zRcIlhiP613AfKSCydnBxum4dSE63iaduCJSM
+        uc8cq+hciMVCkGIzZcVoGo4Wwpe4W3M=
+X-Google-Smtp-Source: ABdhPJzCjlQBAM65nrozLAPtaHZ9hK+go73Jw+Nd11yG0bcOtFL3vUliYNYADVorc5fyGErB4WJf2w==
+X-Received: by 2002:aa7:9e4b:0:b0:43d:fb1d:39cb with SMTP id z11-20020aa79e4b000000b0043dfb1d39cbmr1736166pfq.69.1631587985821;
+        Mon, 13 Sep 2021 19:53:05 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:e47e:ab85:4d9e:deba? ([2601:647:4000:d7:e47e:ab85:4d9e:deba])
+        by smtp.gmail.com with ESMTPSA id o22sm8168010pji.18.2021.09.13.19.53.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Sep 2021 19:53:04 -0700 (PDT)
+Message-ID: <2bd7d03e-c2d0-0cb5-76fc-f5601324a18d@acm.org>
+Date:   Mon, 13 Sep 2021 19:53:03 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.0.3
+Subject: Re: start switching sysfs attributes to expose the seq_file
+Content-Language: en-US
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc:     Christoph Hellwig <hch@lst.de>,
         "Rafael J. Wysocki" <rafael@kernel.org>,
@@ -36,139 +56,49 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
-Message-ID: <20210914012029.GF2361455@dread.disaster.area>
 References: <20210913054121.616001-1-hch@lst.de>
- <20210913054121.616001-14-hch@lst.de>
- <YT7vZthsMCM1uKxm@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YT7vZthsMCM1uKxm@kroah.com>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0
-        a=DzKKRZjfViQTE5W6EVc0VA==:117 a=DzKKRZjfViQTE5W6EVc0VA==:17
-        a=kj9zAlcOel0A:10 a=7QKq2e-ADPsA:10 a=7-415B0cAAAA:8
-        a=hM_N2pAvqWJ6tqKoahEA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+ <21413ac5-f934-efe2-25ee-115c4dcc86a5@acm.org> <YT+AbumufeL6nRss@kroah.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <YT+AbumufeL6nRss@kroah.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 08:27:50AM +0200, Greg Kroah-Hartman wrote:
-> On Mon, Sep 13, 2021 at 07:41:21AM +0200, Christoph Hellwig wrote:
-> > Trivial conversion to the seq_file based sysfs attributes.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  fs/xfs/xfs_stats.c | 24 +++++-------
-> >  fs/xfs/xfs_stats.h |  2 +-
-> >  fs/xfs/xfs_sysfs.c | 96 +++++++++++++++++++++++-----------------------
-> >  3 files changed, 58 insertions(+), 64 deletions(-)
-> > 
-> > diff --git a/fs/xfs/xfs_stats.c b/fs/xfs/xfs_stats.c
-> > index 20e0534a772c9..71e7a84ba0403 100644
-> > --- a/fs/xfs/xfs_stats.c
-> > +++ b/fs/xfs/xfs_stats.c
-> > @@ -16,10 +16,9 @@ static int counter_val(struct xfsstats __percpu *stats, int idx)
-> >  	return val;
-> >  }
-> >  
-> > -int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
-> > +void xfs_stats_format(struct xfsstats __percpu *stats, struct seq_file *sf)
-> >  {
-> >  	int		i, j;
-> > -	int		len = 0;
-> >  	uint64_t	xs_xstrat_bytes = 0;
-> >  	uint64_t	xs_write_bytes = 0;
-> >  	uint64_t	xs_read_bytes = 0;
-> > @@ -58,13 +57,12 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
-> >  	/* Loop over all stats groups */
-> >  
-> >  	for (i = j = 0; i < ARRAY_SIZE(xstats); i++) {
-> > -		len += scnprintf(buf + len, PATH_MAX - len, "%s",
-> > -				xstats[i].desc);
-> > +		seq_printf(sf, "%s", xstats[i].desc);
-> > +
-> >  		/* inner loop does each group */
-> >  		for (; j < xstats[i].endpoint; j++)
-> > -			len += scnprintf(buf + len, PATH_MAX - len, " %u",
-> > -					counter_val(stats, j));
-> > -		len += scnprintf(buf + len, PATH_MAX - len, "\n");
-> > +			seq_printf(sf, " %u", counter_val(stats, j));
-> > +		seq_printf(sf, "\n");
-> >  	}
-> >  	/* extra precision counters */
-> >  	for_each_possible_cpu(i) {
-> > @@ -74,18 +72,14 @@ int xfs_stats_format(struct xfsstats __percpu *stats, char *buf)
-> >  		defer_relog += per_cpu_ptr(stats, i)->s.defer_relog;
-> >  	}
-> >  
-> > -	len += scnprintf(buf + len, PATH_MAX-len, "xpc %Lu %Lu %Lu\n",
-> > +	seq_printf(sf, "xpc %Lu %Lu %Lu\n",
-> >  			xs_xstrat_bytes, xs_write_bytes, xs_read_bytes);
-> > -	len += scnprintf(buf + len, PATH_MAX-len, "defer_relog %llu\n",
-> > -			defer_relog);
-> > -	len += scnprintf(buf + len, PATH_MAX-len, "debug %u\n",
-> > +	seq_printf(sf, "defer_relog %llu\n", defer_relog);
-> >  #if defined(DEBUG)
-> > -		1);
-> > +	seq_printf(sf, "debug 1\n");
-> >  #else
-> > -		0);
-> > +	seq_printf(sf, "debug 0\n");
-> >  #endif
-> > -
-> > -	return len;
-> >  }
+On 9/13/21 09:46, Greg Kroah-Hartman wrote:
+> On Mon, Sep 13, 2021 at 09:39:56AM -0700, Bart Van Assche wrote:
+>> On 9/12/21 10:41 PM, Christoph Hellwig wrote:
+>>> Al pointed out multiple times that seq_get_buf is highly dangerous as
+>>> it opens up the tight seq_file abstractions to buffer overflows.  The
+>>> last such caller now is sysfs.
+>>>
+>>> This series allows attributes to implement a seq_show method and switch
+>>> the block and XFS code as users that I'm most familiar with to use
+>>> seq_files directly after a few preparatory cleanups.  With this series
+>>> "leaf" users of sysfs_ops can be converted one at at a time, after that
+>>> we can move the seq_get_buf into the multiplexers (e.g. kobj, device,
+>>> class attributes) and remove the show method in sysfs_ops and repeat the
+>>> process until all attributes are converted.  This will probably take a
+>>> fair amount of time.
+>>
+>> Hi Christoph,
+>>
+>> Thanks for having done this work. In case you would need it, some time ago
+>> I posted the following sysfs patch but did not receive any feedback:
+>> "[PATCH] kernfs: Improve lockdep annotation for files which implement mmap"
+>> (https://lore.kernel.org/linux-kernel/20191004161124.111376-1-bvanassche@acm.org/).
+>>
 > 
-> That is a sysfs file?  What happened to the "one value per file" rule
-> here?
+> That was from back in 2019, sorry I must have missed it.
+> 
+> Care to rebase and resend it if it is still needed?
 
+Hi Greg,
 
-There is no "rule" that says syfs files must contain one value per
-file; the documentation says that one value per file is the
-"preferred" format.  Documentation/filesystems/sysfs.rst:
+I think that patch is still relevant. It removes some ugly code from 
+sysfs. I will rebase, retest and resend it.
 
-[...]
-Attributes
-...
-Attributes should be ASCII text files, preferably with only one value
-per file. It is noted that it may not be efficient to contain only one
-value per file, so it is socially acceptable to express an array of
-values of the same type.
-[...]
+Thanks,
 
-We are exposing a large array of integer values here, so multiple
-values per file are explicitly considered an acceptible format.
-Further, as there are roughly 200 individual stats in this file and
-calculating each stat requires per-cpu aggregation, the the cost of
-calculating and reading each stat individually is prohibitive, not
-just inefficient.
-
-So, yes, we might have multiple lines in the file that you can frown
-about, but OTOH the file format has been exposed as a kernel ABI for
-a couple of decades via /proc/fs/xfs/stat. Hence exposing it in
-sysfs to provide a more fine-grained breakdown of the stats (per
-mount instead of global) is a no-brainer. We don't have to rewrite
-the parsing engines in multiple userspace monitoring programs to
-extract this information from the kernel - they just create a new
-instance and read a different file and it all just works.
-
-Indeed, there's precedence for such /proc file formats in more
-fine-grained sysfs files. e.g.  /sys/bus/node/devices/node<n>/vmstat
-and /sys/bus/node/devices/node<n>/meminfo retain the same format
-(and hence userspace parsers) for the per-node stats as /proc/vmstat
-and /proc/meminfo use for the global stats...
-
-tl;dr: the file contains arrays of values, it's inefficient to read
-values one at a time, it's a pre-existing ABI-constrainted file
-format, there's precedence in core kernel statistics
-implementations and the documented guidelines allow this sort of
-usage in these cases.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Bart.
