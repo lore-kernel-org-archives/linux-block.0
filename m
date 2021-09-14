@@ -2,122 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC3FC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 11:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6661DC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:22:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBF5A60F4A
-	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 11:42:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4308B60F26
+	for <linux-block@archiver.kernel.org>; Tue, 14 Sep 2021 12:22:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbhINLn5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Sep 2021 07:43:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54988 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232050AbhINLn5 (ORCPT
+        id S232627AbhINMYN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Sep 2021 08:24:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26585 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232341AbhINMYN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Sep 2021 07:43:57 -0400
-Received: from lounge.grep.be (lounge.grep.be [IPv6:2a01:4f8:200:91e8::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F26FC061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 04:42:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
-        s=2021.lounge; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=OyulxNPZRJQgaxJ96lzfK3AcGP7GDS0fymvFsAXQtFY=; b=pUqwFGX7BXtZE0/dUsE09428Y/
-        gKHcYX0z89Hh1muNfQlGW6+2HKw61W8NtlUMh1SW3Gp1CZ3AfUoYI9eprCp1N6zWjIQAkBsXi3PdF
-        g0+s5/EANhnD3A6fZrbfZBq2hV6oZvIn+sReHR3D+MuBI7CgtvAhkbhyzR4x6YGU4umIK8HvDcExh
-        kwFNjJmzfAqVdnk4C72xmqB7MwhUAVIutqCnboejoIpP8YDhT5HpgFaZpFMyXwFXEc8bgnXu0/YoR
-        zLZcKuPnajBi62nPh6qi4PeVHSjWN9CJz3c4F6rMDGZqDaS8N1whKLVGUgvTE2EMIoT2zeTw8WIn/
-        2mkZJiqQ==;
-Received: from [196.251.239.242] (helo=pc181009)
-        by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <w@uter.be>)
-        id 1mQ6pa-00HJIn-Vx; Tue, 14 Sep 2021 13:42:30 +0200
-Received: from wouter by pc181009 with local (Exim 4.95-RC2)
-        (envelope-from <w@uter.be>)
-        id 1mQ6pX-0005AP-Lg;
-        Tue, 14 Sep 2021 13:42:27 +0200
-Date:   Tue, 14 Sep 2021 13:42:27 +0200
-From:   Wouter Verhelst <w@uter.be>
-To:     Hou Tao <houtao1@huawei.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Subject: Re: [PATCH v2 3/3] nbd: fix race between nbd_alloc_config() and
- module removal
-Message-ID: <YUCKoySdM9WZlUH9@pc181009.grep.be>
-References: <20210904122519.1963983-1-houtao1@huawei.com>
- <20210904122519.1963983-4-houtao1@huawei.com>
- <20210906093051.GC30790@lst.de>
- <ce3e1ea8-ebda-4372-42ce-e8a4b2d12514@huawei.com>
- <20210906102521.GA3082@lst.de>
- <730dae5e-5af8-3554-18bf-e22ff576e2b1@huawei.com>
- <20210909064035.GA26290@lst.de>
- <6434d4e8-984d-97df-34e5-b86a0e69cf58@huawei.com>
+        Tue, 14 Sep 2021 08:24:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631622175;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=crCMDIQfbcqlNNuWe8wMVzG0binTQZ+93JYNDaWlRUQ=;
+        b=KH7Vml8bFo6kt7Fr8VHfkZMT8ehjI7s00CCICT65AWHCULNgEc1j3pojlmz4t9aCFA2muQ
+        HK2NWuoAj4d0LUK/MAdsX+NSr1+o7m5yWNLWMH39699fSXd8jw69/7fMuh8qaJWlmJX5cx
+        /E1oMFhSYytOHjeQrBompDyyg699QgA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-A_E-DCZaMKK9c-ke32RRYw-1; Tue, 14 Sep 2021 08:22:54 -0400
+X-MC-Unique: A_E-DCZaMKK9c-ke32RRYw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0ED355074C;
+        Tue, 14 Sep 2021 12:22:53 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6FA1F60C7F;
+        Tue, 14 Sep 2021 12:22:48 +0000 (UTC)
+Date:   Tue, 14 Sep 2021 13:22:47 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     hch@infradead.org, mst@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+Message-ID: <YUCUF7co94CRGkGU@stefanha-x1.localdomain>
+References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
+ <YTYvOetMHvocg9UZ@stefanha-x1.localdomain>
+ <692f8e81-8585-1d39-e7a4-576ae01438a1@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="aGmDvTLAe56x7DHM"
 Content-Disposition: inline
-In-Reply-To: <6434d4e8-984d-97df-34e5-b86a0e69cf58@huawei.com>
-X-Speed: Gates' Law: Every 18 months, the speed of software halves.
-Organization: none
+In-Reply-To: <692f8e81-8585-1d39-e7a4-576ae01438a1@nvidia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 12:32:37PM +0800, Hou Tao wrote:
-> Hi Christoph,
-> 
-> On 9/9/2021 2:40 PM, Christoph Hellwig wrote:
-> > On Tue, Sep 07, 2021 at 11:04:16AM +0800, Hou Tao wrote:
-> >> Let me explain first. The reason it works is due to genl_lock_all() in netlink code.
-> > Btw, please properly format your mail.  These overly long lines are really
-> > hard to read.
-> Thanks for reminding.
-> >> If the module removal happens before calling try_module_get(), nbd_cleanup() will
-> >>
-> >> call genl_unregister_family() first, and then genl_lock_all(). genl_lock_all() will
-> >>
-> >> prevent ops in nbd_connect_genl_ops() from being called, because the calling
-> >>
-> >> of nbd ops happens in genl_rcv() which needs to acquire cb_lock first.
-> > Good.
-> >
-> >> I have checked multiple genl_ops, it seems that the reason why these genl_ops
-> >>
-> >> don't need try_module_get() is that these ops don't create new object through
-> >>
-> >> genl_ops and just control it. However genl_family_rcv_msg_dumpit() will try to
-> >>
-> >> call try_module_get(), but according to the history (6dc878a8ca39 "netlink: add reference of module in netlink_dump_start"),
-> >>
-> >> it is because inet_diag_handler_cmd() will call __netlink_dump_start().
-> > And now taking a step back:  Why do we even need this extra module
-> > reference?  For the case where nbd_alloc_config is called from nbd_open
-> > we obviously don't need it.  In the case where it is called from
-> > nbd_genl_connect that prevents unloading nbd when there is a configured
-> > but not actually nbd device.  Which isn't reallyed need and counter to
-> > how other drivers work.
-> Yes, the purpose of module ref-counting in nbd_alloc_config() is to force
-> the user to disconnect the nbd device manually before module removal.
-> And loop device works in the same way. If a file is attached to a loop device,
-> an extra module reference will be taken in loop_configure() and the removal
-> of loop module will fail. The only difference is that loop driver takes the
-> extra ref-count by ioctl, and nbd does it through netlink.
 
-Haven't checked the actual patch, but just wanted to point out:
+--aGmDvTLAe56x7DHM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-nbd should do it through netlink *and* ioctl -- the older way to
-configure nbd was through ioctl, which we should still support for
-backcompat reasons.
+On Mon, Sep 13, 2021 at 05:50:21PM +0300, Max Gurtovoy wrote:
+>=20
+> On 9/6/2021 6:09 PM, Stefan Hajnoczi wrote:
+> > On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
+> > > No need to pre-allocate a big buffer for the IO SGL anymore. If a dev=
+ice
+> > > has lots of deep queues, preallocation for the sg list can consume
+> > > substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+> > > can be 64 or 128 and each queue's depth might be 128. This means the
+> > > resulting preallocation for the data SGLs is big.
+> > >=20
+> > > Switch to runtime allocation for SGL for lists longer than 2 entries.
+> > > This is the approach used by NVMe drivers so it should be reasonable =
+for
+> > > virtio block as well. Runtime SGL allocation has always been the case
+> > > for the legacy I/O path so this is nothing new.
+> > >=20
+> > > The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+> > > support SG_CHAIN, use only runtime allocation for the SGL.
+> > >=20
+> > > Re-organize the setup of the IO request to fit the new sg chain
+> > > mechanism.
+> > >=20
+> > > No performance degradation was seen (fio libaio engine with 16 jobs a=
+nd
+> > > 128 iodepth):
+> > >=20
+> > > IO size      IOPs Rand Read (before/after)         IOPs Rand Write (b=
+efore/after)
+> > > --------     ---------------------------------    -------------------=
+---------------
+> > > 512B          318K/316K                                    329K/325K
+> > >=20
+> > > 4KB           323K/321K                                    353K/349K
+> > >=20
+> > > 16KB          199K/208K                                    250K/275K
+> > >=20
+> > > 128KB         36K/36.1K                                    39.2K/41.7K
+> > I ran fio randread benchmarks with 4k, 16k, 64k, and 128k at iodepth 1,
+> > 8, and 64 on two vCPUs. The results look fine, there is no significant
+> > regression.
+> >=20
+> > iodepth=3D1 and iodepth=3D64 are very consistent. For some reason the
+> > iodepth=3D8 has significant variance but I don't think it's the fault of
+> > this patch.
+> >=20
+> > Fio results and the Jupyter notebook export are available here (check
+> > out benchmark.html to see the graphs):
+> >=20
+> > https://gitlab.com/stefanha/virt-playbooks/-/tree/virtio-blk-sgl-alloca=
+tion-benchmark/notebook
+> >=20
+> > Guest:
+> > - Fedora 34
+> > - Linux v5.14
+> > - 2 vCPUs (pinned), 4 GB RAM (single host NUMA node)
+> > - 1 IOThread (pinned)
+> > - virtio-blk aio=3Dnative,cache=3Dnone,format=3Draw
+> > - QEMU 6.1.0
+> >=20
+> > Host:
+> > - RHEL 8.3
+> > - Linux 4.18.0-240.22.1.el8_3.x86_64
+> > - Intel(R) Xeon(R) Silver 4214 CPU @ 2.20GHz
+> > - Intel Optane DC P4800X
+> >=20
+> > Stefan
+>=20
+> Thanks, Stefan.
+>=20
+> Would you like me to add some of the results in my commit msg ? or Tested=
+-By
+> sign ?
 
-(if that's already the case, then ignore what I said :-)
+Thanks, there's no need to change the commit description.
 
--- 
-     w@uter.{be,co.za}
-wouter@{grep.be,fosdem.org,debian.org}
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--aGmDvTLAe56x7DHM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFAlBcACgkQnKSrs4Gr
+c8irGwgAifRcb8J6P8Ki4ql4+nWOw59zpPqBsh8+wmslHwj+5Sj5x040BOGESY6V
+peZCMYgqgdWV7Ckgyd/4Er+L85wo41zn7+ylsi/NqkRVnZBg7HgRTiLL7GbBX8Zz
+eLYIqr4aFpRE93y/RAFbnPTU4cEGK8GnhdbLgODHrnmg+VQ8DT9Lb0Ov/1UqcB5i
++EWw4mLhlDAHOcuz0YQpiGTbKe9kvTnwTjZh+DmMi4FjH6xnyEYCq4JfFmkVLC3Q
+H7TgCz5EQ5QzXDVsMR7HmYPcU0s0Fofq1dlexF2Fx7riubX7oIn6+UZnSh+XxLlL
+2lswIFATfoBLB4VfjgimVUD51zOt2w==
+=QoZd
+-----END PGP SIGNATURE-----
+
+--aGmDvTLAe56x7DHM--
+
