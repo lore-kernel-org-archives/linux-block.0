@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DD8C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B92C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:43:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14A0261029
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:42:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB8DC61179
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:43:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231152AbhIOGny (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 02:43:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36608 "EHLO
+        id S231166AbhIOGoh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 02:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbhIOGny (ORCPT
+        with ESMTP id S229484AbhIOGoh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 02:43:54 -0400
+        Wed, 15 Sep 2021 02:44:37 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5DBC061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:42:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE47BC061574
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:43:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=8ZI14oBmDaNEcQ5OCaRY2wf7sNE0O3jQYQOJNwbTc+c=; b=qX3lJ1X73hjDZvjxvM2HQMbNus
-        +1HXg2ZscJx4z8h/9IVozwVa0RLSuIMNpcivNg1Mtv0SeE2NrHPz/Ob94fmwsGt0ES2cAXZMBML+m
-        6aDVmt12Wr1XtUaeVafn0JP0jir9f1LCJ7f46bWZcXlFfkcI7q5hpmF3NLisC2o3ChFN4oz53NmZ0
-        E72B3i0rnP94X8oJydRe1VgxUE22hy5l8QvwVQ2QiJeroyUGWY5PMxcdY3unfSiGnl/68OhZm08DE
-        kCDNFlFb59n7IMe7MCH1sQJtAAJAeNEzuA+XokGXa1arylQg0URG2YLCY0wkoh9BC1/uDNycI/L9E
-        j+B4SLAg==;
+        bh=6iFJ9Ub/lBsvA8/1D2iOLzrPt6g9dUL3ioEooa9DP8Y=; b=OFf77O31hHga6EVP/DjwUOn4oK
+        zHRL8fuJ0cPkukOk/kg2ZCQynGSKvkC0oz4mV77Gw+z69Gx0X4Z3ly1PmJhAt2NFiVbILkNFFZ/lu
+        IkZ5Ayi30PdpcdHQqQX9q+gyjn48nJ5mSqb+qC4wDaoSQQ4JmsW2xm5oFgriRruKfuG3bYAH+EfG6
+        QS4vl/YtFLElHGPZMeQId4Iq/5/Pp11FiCGASMkKlB9xKz+TYqGZjW9AxpzLGRwBpu9oaANXH8A1W
+        hhChQmWRxnWe/jPAwvJtMdc24OryJpgZvBsmNfvkCMgmpxWNCCiKWZEgOppiOcIu1boJHai9uzHIv
+        ALmYOq2g==;
 Received: from [2001:4bb8:184:72db:8457:d7a:6e21:dd20] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQObx-00FQdC-RM; Wed, 15 Sep 2021 06:41:49 +0000
+        id 1mQOct-00FQey-7g; Wed, 15 Sep 2021 06:42:43 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 01/17] mm: don't include <linux/blk-cgroup.h> in <linux/writeback.h>
-Date:   Wed, 15 Sep 2021 08:40:28 +0200
-Message-Id: <20210915064044.950534-2-hch@lst.de>
+Subject: [PATCH 02/17] mm: don't include <linux/blk-cgroup.h> in <linux/backing-dev.h>
+Date:   Wed, 15 Sep 2021 08:40:29 +0200
+Message-Id: <20210915064044.950534-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210915064044.950534-1-hch@lst.de>
 References: <20210915064044.950534-1-hch@lst.de>
@@ -52,100 +52,165 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk-cgroup.h pulls in blkdev.h and thus pretty much all the block
-headers.  Break this dependency chain by turning wbc_blkcg_css into a
-macro and dropping the blk-cgroup.h include.
+There is no need to pull blk-cgroup.h and thus blkdev.h in here, so
+break the include chain.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/gpu/drm/i915/i915_utils.h |  1 +
- fs/btrfs/inode.c                  |  1 +
- fs/quota/quota.c                  |  1 +
- include/linux/writeback.h         | 14 +++++---------
- lib/random32.c                    |  1 +
- 5 files changed, 9 insertions(+), 9 deletions(-)
+ block/blk-iolatency.c       | 1 +
+ block/blk-mq.c              | 1 +
+ block/bounce.c              | 1 +
+ fs/btrfs/compression.c      | 1 +
+ fs/btrfs/ctree.c            | 1 +
+ fs/f2fs/compress.c          | 1 +
+ fs/orangefs/super.c         | 1 +
+ fs/ramfs/inode.c            | 1 +
+ include/linux/backing-dev.h | 3 ++-
+ mm/backing-dev.c            | 3 ++-
+ mm/swapfile.c               | 2 +-
+ 11 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/gpu/drm/i915/i915_utils.h b/drivers/gpu/drm/i915/i915_utils.h
-index 5259edacde380..066a9118c3748 100644
---- a/drivers/gpu/drm/i915/i915_utils.h
-+++ b/drivers/gpu/drm/i915/i915_utils.h
-@@ -30,6 +30,7 @@
- #include <linux/sched.h>
- #include <linux/types.h>
- #include <linux/workqueue.h>
-+#include <linux/sched/clock.h>
- 
- struct drm_i915_private;
- struct timer_list;
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 487533c35ddb6..4a9077c524448 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -6,6 +6,7 @@
- #include <crypto/hash.h>
- #include <linux/kernel.h>
- #include <linux/bio.h>
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index c0545f9da549c..6593c7123b97e 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -74,6 +74,7 @@
+ #include <linux/sched/signal.h>
+ #include <trace/events/block.h>
+ #include <linux/blk-mq.h>
 +#include <linux/blk-cgroup.h>
- #include <linux/file.h>
+ #include "blk-rq-qos.h"
+ #include "blk-stat.h"
+ #include "blk.h"
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 108a352051be5..61264bff6103a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -16,6 +16,7 @@
+ #include <linux/slab.h>
+ #include <linux/workqueue.h>
+ #include <linux/smp.h>
++#include <linux/interrupt.h>
+ #include <linux/llist.h>
+ #include <linux/list_sort.h>
+ #include <linux/cpu.h>
+diff --git a/block/bounce.c b/block/bounce.c
+index 05fc7148489d7..7af1a72835b99 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -14,6 +14,7 @@
+ #include <linux/pagemap.h>
+ #include <linux/mempool.h>
+ #include <linux/blkdev.h>
++#include <linux/blk-cgroup.h>
+ #include <linux/backing-dev.h>
+ #include <linux/init.h>
+ #include <linux/hash.h>
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 7869ad12bc6e1..ddc4f5436cc91 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -9,6 +9,7 @@
  #include <linux/fs.h>
  #include <linux/pagemap.h>
-diff --git a/fs/quota/quota.c b/fs/quota/quota.c
-index 2bcc9a6f1bfc0..052f143e2e0e1 100644
---- a/fs/quota/quota.c
-+++ b/fs/quota/quota.c
-@@ -10,6 +10,7 @@
- #include <linux/namei.h>
+ #include <linux/highmem.h>
++#include <linux/kthread.h>
+ #include <linux/time.h>
+ #include <linux/init.h>
+ #include <linux/string.h>
+diff --git a/fs/btrfs/ctree.c b/fs/btrfs/ctree.c
+index 84627cbd5b5b5..66290b214f2bc 100644
+--- a/fs/btrfs/ctree.c
++++ b/fs/btrfs/ctree.c
+@@ -7,6 +7,7 @@
  #include <linux/slab.h>
- #include <asm/current.h>
-+#include <linux/blkdev.h>
+ #include <linux/rbtree.h>
+ #include <linux/mm.h>
++#include <linux/error-injection.h>
+ #include "ctree.h"
+ #include "disk-io.h"
+ #include "transaction.h"
+diff --git a/fs/f2fs/compress.c b/fs/f2fs/compress.c
+index c1bf9ad4c2207..20a083dc90423 100644
+--- a/fs/f2fs/compress.c
++++ b/fs/f2fs/compress.c
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/fs.h>
+ #include <linux/f2fs_fs.h>
++#include <linux/moduleparam.h>
+ #include <linux/writeback.h>
+ #include <linux/backing-dev.h>
+ #include <linux/lzo.h>
+diff --git a/fs/orangefs/super.c b/fs/orangefs/super.c
+index 2f2e430461b21..8bb0a53a658b0 100644
+--- a/fs/orangefs/super.c
++++ b/fs/orangefs/super.c
+@@ -11,6 +11,7 @@
+ 
+ #include <linux/parser.h>
+ #include <linux/hashtable.h>
++#include <linux/seq_file.h>
+ 
+ /* a cache for orangefs-inode objects (i.e. orangefs inode private data) */
+ static struct kmem_cache *orangefs_inode_cache;
+diff --git a/fs/ramfs/inode.c b/fs/ramfs/inode.c
+index 65e7e56005b8f..e2302342a67f4 100644
+--- a/fs/ramfs/inode.c
++++ b/fs/ramfs/inode.c
+@@ -38,6 +38,7 @@
  #include <linux/uaccess.h>
- #include <linux/kernel.h>
- #include <linux/security.h>
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index d1f65adf6a266..8eb165760752b 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -11,7 +11,6 @@
- #include <linux/flex_proportions.h>
- #include <linux/backing-dev-defs.h>
- #include <linux/blk_types.h>
+ #include <linux/fs_context.h>
+ #include <linux/fs_parser.h>
++#include <linux/seq_file.h>
+ #include "internal.h"
+ 
+ struct ramfs_mount_opts {
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index ac7f231b88258..843bf4be675f3 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -15,10 +15,11 @@
+ #include <linux/blkdev.h>
+ #include <linux/device.h>
+ #include <linux/writeback.h>
 -#include <linux/blk-cgroup.h>
+ #include <linux/backing-dev-defs.h>
+ #include <linux/slab.h>
  
- struct bio;
++struct blkcg;
++
+ static inline struct backing_dev_info *bdi_get(struct backing_dev_info *bdi)
+ {
+ 	kref_get(&bdi->refcnt);
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 4a9d4e27d0d9b..5245744437dc9 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -2,8 +2,9 @@
  
-@@ -109,15 +108,12 @@ static inline int wbc_to_write_flags(struct writeback_control *wbc)
- 	return flags;
- }
- 
--static inline struct cgroup_subsys_state *
--wbc_blkcg_css(struct writeback_control *wbc)
--{
- #ifdef CONFIG_CGROUP_WRITEBACK
--	if (wbc->wb)
--		return wbc->wb->blkcg_css;
--#endif
--	return blkcg_root_css;
--}
-+#define wbc_blkcg_css(wbc) \
-+	((wbc)->wb ? (wbc)->wb->blkcg_css : blkcg_root_css)
-+#else
-+#define wbc_blkcg_css(wbc)		(blkcg_root_css)
-+#endif /* CONFIG_CGROUP_WRITEBACK */
- 
- /*
-  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
-diff --git a/lib/random32.c b/lib/random32.c
-index 4d0e05e471d72..a57a0e18819d0 100644
---- a/lib/random32.c
-+++ b/lib/random32.c
-@@ -39,6 +39,7 @@
+ #include <linux/wait.h>
+ #include <linux/rbtree.h>
+-#include <linux/backing-dev.h>
+ #include <linux/kthread.h>
++#include <linux/backing-dev.h>
++#include <linux/blk-cgroup.h>
+ #include <linux/freezer.h>
+ #include <linux/fs.h>
+ #include <linux/pagemap.h>
+diff --git a/mm/swapfile.c b/mm/swapfile.c
+index 22d10f7138487..30db362749c06 100644
+--- a/mm/swapfile.c
++++ b/mm/swapfile.c
+@@ -18,7 +18,7 @@
+ #include <linux/pagemap.h>
+ #include <linux/namei.h>
+ #include <linux/shmem_fs.h>
+-#include <linux/blkdev.h>
++#include <linux/blk-cgroup.h>
  #include <linux/random.h>
- #include <linux/sched.h>
- #include <linux/bitops.h>
-+#include <linux/slab.h>
- #include <asm/unaligned.h>
- #include <trace/events/random.h>
- 
+ #include <linux/writeback.h>
+ #include <linux/proc_fs.h>
 -- 
 2.30.2
 
