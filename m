@@ -2,72 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C519CC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8D4C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:09:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB2E16115B
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAA9A6115B
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231345AbhIOHIx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 03:08:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53864 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231305AbhIOHIw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 03:08:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B932461178;
-        Wed, 15 Sep 2021 07:07:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1631689654;
-        bh=7z7Mazz8BLgGjouZIDVxIflsK7icf1h/qdtmII0eixg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LCojtIhXy/qUMIEOJqeqqFKLYrQ/LAg9g3nhSpz1Tb17caxZiQbGMm8Go9sVfrrIC
-         JMmd3mJ2uNiYW6d21z5Jv6GAIEO1AL3Di77DszWHd6j34A0DrMAmfeTM4popRLD5ts
-         PNpzBv0KHsD7ZiVbWSGaP8e4o350E6KO7P2Pt/xo=
-Date:   Wed, 15 Sep 2021 09:07:26 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] xfs: convert xfs_sysfs attrs to use ->seq_show
-Message-ID: <YUGbruik5nGJIBKk@kroah.com>
-References: <20210913054121.616001-1-hch@lst.de>
- <20210913054121.616001-14-hch@lst.de>
- <YT7vZthsMCM1uKxm@kroah.com>
- <20210914073003.GA31077@lst.de>
- <YUC/iH9yLlxblM09@kroah.com>
- <20210914153011.GA815@lst.de>
- <YUDCsXXNFfUyiMCk@kroah.com>
- <20210915070445.GA17384@lst.de>
+        id S236639AbhIOHKk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 03:10:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42752 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236514AbhIOHKg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Sep 2021 03:10:36 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4BCC061766;
+        Wed, 15 Sep 2021 00:09:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=MstlZ/WGGsTWSrOweLURi5+38ovZzPTCPxZkss3yN9s=; b=iqFJ/xWdvH0ifN9x+IuK+5Joxy
+        Bh53Ce32009lkactxK/FrXCR++gOoHCI38CMzPZNbD9vAsbKzfj8EA2Pz9D7oaoM9Zbswxh+YKZzo
+        aylKl8X5taqcuDtQqHu5WKmRrvnM5RomhnLSMaMD9aRiMN2QlZPlWT0NCyXu3jIr6vMiZ/M/o72KK
+        cvz4/4ZOxqsk7cViyc3rwUrOOhSoFjJdNE0oSCDpxZz7MWjVX3nZP46cDa15R9c2CE8eD/XJGcwl0
+        PQaf8r11akBoCsUVBGu65vxRUBTmzbSQg3/vPMuK/iG7kSrXXtr90De/d6twENL+soTSMcVvr/Pzs
+        MbGdXq5Q==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mQP1T-00FRqg-QF; Wed, 15 Sep 2021 07:08:21 +0000
+Date:   Wed, 15 Sep 2021 08:07:59 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ian Pilcher <arequipeno@gmail.com>
+Cc:     axboe@kernel.dk, pavel@ucw.cz, linux-leds@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gregkh@linuxfoundation.org, kabel@kernel.org, chaitanyak@nvidia.com
+Subject: Re: [PATCH v3 2/3] block: export block_class for use by the blkdev
+ LED trigger
+Message-ID: <YUGbz1uxPNLTz6tA@infradead.org>
+References: <20210914201713.14922-1-arequipeno@gmail.com>
+ <20210914201713.14922-3-arequipeno@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210915070445.GA17384@lst.de>
+In-Reply-To: <20210914201713.14922-3-arequipeno@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 09:04:45AM +0200, Christoph Hellwig wrote:
-> On Tue, Sep 14, 2021 at 05:41:37PM +0200, Greg Kroah-Hartman wrote:
-> > They huge majority of sysfs attributes are "trivial".  So for maybe at
-> > least 95% of the users, if not more, using sysfs_emit() is just fine as
-> > all you "should" be doing is emitting a single value.
-> 
-> It is just fine if no one does the obvious mistakes that an interface
-> with a char * pointer leads to.  And 5% of all attributes is still a huge
-> attack surface.
-
-It is probably less, I just pulled that number out of the air.  With the
-other work we are doing to make sure we have documentation for all sysfs
-attributes in the kernel, we will soon know the real number.
-
-thanks,
-
-greg k-h
+NAK.  block_class has no business being used outside the core block
+layer.
