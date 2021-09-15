@@ -2,251 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B25C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 12:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F477C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 13:15:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6F8E60F6D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 12:56:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C7AC6121E
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 13:15:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233541AbhIOM55 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 08:57:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233450AbhIOM54 (ORCPT
+        id S234205AbhIONQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 09:16:34 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:58792 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234083AbhIONQd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 08:57:56 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAACFC061766
-        for <linux-block@vger.kernel.org>; Wed, 15 Sep 2021 05:56:37 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id b6so2845819ilv.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Sep 2021 05:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dXoOHg9SNkJN2hvBGTGJHW37/pmCoCX7mlyOBk9rdEM=;
-        b=ufP8Y90A+cxSruk6u1XgfbEuRnrO5ZlEwVaw6KCD6XTNDqDV7km6yhScRfYyft2jxG
-         jk1uw9K0YIDW6ZrMW6It+mgtDC6utgKHF6KjFTm3ObT1tmiHy59mPWXVunSq6VnOEJg3
-         sRQCP5o+SKblWPX8R1hI2AAYOV7CJAUMAuFTCIVjDDtK0Siq8TLgQNgLNANdsZWH88WJ
-         XzGSPNiyYbqPH5PkliiEdgFsOLtISYtNPlVAvsFiUElDKhbFn+PTzYXZKaUZ9HIq1fYd
-         iPDbbkrl4hyRkTmIsa1zI5jfE+3Mo9l62rHCyaFKX+PB6mWWfULO2CsV64UY/5Qs7EXG
-         UU8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dXoOHg9SNkJN2hvBGTGJHW37/pmCoCX7mlyOBk9rdEM=;
-        b=iDlJ6344THp16M3PB91hwynq1xH1TX0EbOL61trehq1/W4YztHm4qNbtcVamFBF9BX
-         0zyZq2+NL8qatXIkSn3aH7vwi5sKt9seefPXaUi8tsKrc839j0xnEpy5FzmiJY79lY6f
-         Z7zBojzQ/9BphMI3EQYvGoUpXCSqvD26gnF1rUOwWv9IFJJf63ALe+4ueqoS3C+vghX/
-         VpeHK9vRyu/UTMNAwWXl/wJFR4A7uRIoMOvUIzDMM94J1RpyJeKJmwR2rogFqZvzt55A
-         6t/wUpR8d6aFDwm8zNPbw7brGM7dD2zB+xekiYgbcJwUr5ct8YjeZdkzwVhnaBRZVduK
-         yCuA==
-X-Gm-Message-State: AOAM533dmOg4DRbnAamtv5Vol6ui30i+n4LNm+n4yvzMr+5Vt6UpnSnY
-        KMFrG/92atWfpuLuz0YEIFqDFA==
-X-Google-Smtp-Source: ABdhPJxGiErtp/uGDmq/UnhNLBUcJsEvZn3BnwPBqlxU2I74mAYFHv9k4DChm3Na2O4d/ZKxCG2VIQ==
-X-Received: by 2002:a05:6e02:20c7:: with SMTP id 7mr12708392ilq.118.1631710596948;
-        Wed, 15 Sep 2021 05:56:36 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id b12sm8532656ios.0.2021.09.15.05.56.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Sep 2021 05:56:36 -0700 (PDT)
-Subject: Re: [PATCH] fix UAF in bfq_io_set_weight_legacy()
-To:     Li Jinlin <lijinlin3@huawei.com>, paolo.valente@linaro.org,
-        tj@kernel.org, fchecconi@gmail.com, avanzini.arianna@gmail.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linfeilong@huawei.com,
-        louhongxiang@huawei.com
-References: <20210909133737.1930835-1-lijinlin3@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <00ce4789-d4c5-e385-f3fb-bbd0faca0c92@kernel.dk>
-Date:   Wed, 15 Sep 2021 06:56:34 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 15 Sep 2021 09:16:33 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 21FEB221F4;
+        Wed, 15 Sep 2021 13:15:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1631711713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rEF7u8XU7SpeSaF4r255WFI/LWFnrYPZGiAayeaOZJU=;
+        b=PrXj/5CckEFQedXHwOTos5jEI+itNwZQiSUhAHss2DYyRC5jlpNe5mta4wc5NtVZlyV8X5
+        /k48GLs+GpZzuyeusScj6hz7Vj8JpPrWPXdbhXLSNwBgjpH+x/ZIDfhHNn8foLwXYKoJU0
+        SHyl70JOseJmjwLo5FRDAste27y6UsA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1631711713;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rEF7u8XU7SpeSaF4r255WFI/LWFnrYPZGiAayeaOZJU=;
+        b=HLkXkMI0URAR8Q4SAWr96N9biMt2ZReC6q1ZjRa3DvNDCxEQ7Hx7gp9BBVHYmGe3Yo7qEd
+        wm9EiT1jV5E/U5Dg==
+Received: from quack2.suse.cz (unknown [10.100.224.230])
+        by relay2.suse.de (Postfix) with ESMTP id 12F75A3B99;
+        Wed, 15 Sep 2021 13:15:13 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id C673E1E4318; Wed, 15 Sep 2021 15:15:12 +0200 (CEST)
+Date:   Wed, 15 Sep 2021 15:15:12 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Paolo Valente <paolo.valente@linaro.org>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/3 v2] bfq: Limit number of allocated scheduler tags per
+ cgroup
+Message-ID: <20210915131512.GB6166@quack2.suse.cz>
+References: <20210715132047.20874-1-jack@suse.cz>
+ <751F4AB5-1FDF-45B0-88E1-0C76ED1AAAD6@linaro.org>
+ <20210831095930.GB17119@blackbody.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20210909133737.1930835-1-lijinlin3@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210831095930.GB17119@blackbody.suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/9/21 7:37 AM, Li Jinlin wrote:
-> From: Li Jinlin <lijinlin3@huawei.com>
+On Tue 31-08-21 11:59:30, Michal Koutný wrote:
+> Hello Paolo.
 > 
-> KASAN reports a use-after-free report when doing fuzz test:
+> On Fri, Aug 27, 2021 at 12:07:20PM +0200, Paolo Valente <paolo.valente@linaro.org> wrote:
+> > Before discussing your patches in detail, I need a little help on this
+> > point.  You state that the number of scheduler tags must be larger
+> > than the number of device tags.  So, I expected some of your patches
+> > to address somehow this issue, e.g., by increasing the number of
+> > scheduler tags.  Yet I have not found such a change.  Did I miss
+> > something?
 > 
-> [693354.104835] ==================================================================
-> [693354.105094] BUG: KASAN: use-after-free in bfq_io_set_weight_legacy+0xd3/0x160
-> [693354.105336] Read of size 4 at addr ffff888be0a35664 by task sh/1453338
-> 
-> [693354.105607] CPU: 41 PID: 1453338 Comm: sh Kdump: loaded Not tainted 4.18.0-147
-> [693354.105610] Hardware name: Huawei 2288H V5/BC11SPSCB0, BIOS 0.81 07/02/2018
-> [693354.105612] Call Trace:
-> [693354.105621]  dump_stack+0xf1/0x19b
-> [693354.105626]  ? show_regs_print_info+0x5/0x5
-> [693354.105634]  ? printk+0x9c/0xc3
-> [693354.105638]  ? cpumask_weight+0x1f/0x1f
-> [693354.105648]  print_address_description+0x70/0x360
-> [693354.105654]  kasan_report+0x1b2/0x330
-> [693354.105659]  ? bfq_io_set_weight_legacy+0xd3/0x160
-> [693354.105665]  ? bfq_io_set_weight_legacy+0xd3/0x160
-> [693354.105670]  bfq_io_set_weight_legacy+0xd3/0x160
-> [693354.105675]  ? bfq_cpd_init+0x20/0x20
-> [693354.105683]  cgroup_file_write+0x3aa/0x510
-> [693354.105693]  ? ___slab_alloc+0x507/0x540
-> [693354.105698]  ? cgroup_file_poll+0x60/0x60
-> [693354.105702]  ? 0xffffffff89600000
-> [693354.105708]  ? usercopy_abort+0x90/0x90
-> [693354.105716]  ? mutex_lock+0xef/0x180
-> [693354.105726]  kernfs_fop_write+0x1ab/0x280
-> [693354.105732]  ? cgroup_file_poll+0x60/0x60
-> [693354.105738]  vfs_write+0xe7/0x230
-> [693354.105744]  ksys_write+0xb0/0x140
-> [693354.105749]  ? __ia32_sys_read+0x50/0x50
-> [693354.105760]  do_syscall_64+0x112/0x370
-> [693354.105766]  ? syscall_return_slowpath+0x260/0x260
-> [693354.105772]  ? do_page_fault+0x9b/0x270
-> [693354.105779]  ? prepare_exit_to_usermode+0xf9/0x1a0
-> [693354.105784]  ? enter_from_user_mode+0x30/0x30
-> [693354.105793]  entry_SYSCALL_64_after_hwframe+0x65/0xca
-> 
-> [693354.105875] Allocated by task 1453337:
-> [693354.106001]  kasan_kmalloc+0xa0/0xd0
-> [693354.106006]  kmem_cache_alloc_node_trace+0x108/0x220
-> [693354.106010]  bfq_pd_alloc+0x96/0x120
-> [693354.106015]  blkcg_activate_policy+0x1b7/0x2b0
-> [693354.106020]  bfq_create_group_hierarchy+0x1e/0x80
-> [693354.106026]  bfq_init_queue+0x678/0x8c0
-> [693354.106031]  blk_mq_init_sched+0x1f8/0x460
-> [693354.106037]  elevator_switch_mq+0xe1/0x240
-> [693354.106041]  elevator_switch+0x25/0x40
-> [693354.106045]  elv_iosched_store+0x1a1/0x230
-> [693354.106049]  queue_attr_store+0x78/0xb0
-> [693354.106053]  kernfs_fop_write+0x1ab/0x280
-> [693354.106056]  vfs_write+0xe7/0x230
-> [693354.106060]  ksys_write+0xb0/0x140
-> [693354.106064]  do_syscall_64+0x112/0x370
-> [693354.106069]  entry_SYSCALL_64_after_hwframe+0x65/0xca
-> 
-> [693354.106114] Freed by task 1453336:
-> [693354.106225]  __kasan_slab_free+0x130/0x180
-> [693354.106229]  kfree+0x90/0x1b0
-> [693354.106233]  blkcg_deactivate_policy+0x12c/0x220
-> [693354.106238]  bfq_exit_queue+0xf5/0x110
-> [693354.106241]  blk_mq_exit_sched+0x104/0x130
-> [693354.106245]  __elevator_exit+0x45/0x60
-> [693354.106249]  elevator_switch_mq+0xd6/0x240
-> [693354.106253]  elevator_switch+0x25/0x40
-> [693354.106257]  elv_iosched_store+0x1a1/0x230
-> [693354.106261]  queue_attr_store+0x78/0xb0
-> [693354.106264]  kernfs_fop_write+0x1ab/0x280
-> [693354.106268]  vfs_write+0xe7/0x230
-> [693354.106271]  ksys_write+0xb0/0x140
-> [693354.106275]  do_syscall_64+0x112/0x370
-> [693354.106280]  entry_SYSCALL_64_after_hwframe+0x65/0xca
-> 
-> [693354.106329] The buggy address belongs to the object at ffff888be0a35580
->                  which belongs to the cache kmalloc-1k of size 1024
-> [693354.106736] The buggy address is located 228 bytes inside of
->                  1024-byte region [ffff888be0a35580, ffff888be0a35980)
-> [693354.107114] The buggy address belongs to the page:
-> [693354.107273] page:ffffea002f828c00 count:1 mapcount:0 mapping:ffff888107c17080 index:0x0 compound_mapcount: 0
-> [693354.107606] flags: 0x17ffffc0008100(slab|head)
-> [693354.107760] raw: 0017ffffc0008100 ffffea002fcbc808 ffffea0030bd3a08 ffff888107c17080
-> [693354.108020] raw: 0000000000000000 00000000001c001c 00000001ffffffff 0000000000000000
-> [693354.108278] page dumped because: kasan: bad access detected
-> 
-> [693354.108511] Memory state around the buggy address:
-> [693354.108671]  ffff888be0a35500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> [693354.116396]  ffff888be0a35580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [693354.124473] >ffff888be0a35600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [693354.132421]                                                        ^
-> [693354.140284]  ffff888be0a35680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [693354.147912]  ffff888be0a35700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [693354.155281] ==================================================================
-> 
-> Freeing bfqg is protected by queue lock in blkcg_deactivate_policy(), 
-> but getting/using bfqg is protected by blkcg lock in
-> bfq_io_set_weight_legacy(). If bfq_io_set_weight_legacy() get bfqg
-> before freeing bfqg and use bfqg in the after, the use-after-free
-> will occur.
-> 
-> CPU0                             CPU1
-> blkcg_deactivate_policy
->   spin_lock_irq(&q->queue_lock)
->                                  bfq_io_set_weight_legacy  
->                                    spin_lock_irq(&blkcg->lock)
->                                    blkg_to_bfqg(blkg)
->                                      pd_to_bfqg(blkg->pd[pol->plid])
->                                      ^^^^^^blkg->pd[pol->plid] != NULL
->                                            bfqg != NULL
->   pol->pd_free_fn(blkg->pd[pol->plid])
->     pd_to_bfqg(blkg->pd[pol->plid])
->     bfqg_put(bfqg)
->       kfree(bfqg)
->   blkg->pd[pol->plid] = NULL
->   spin_unlock_irq(q->queue_lock);
->                                    bfq_group_set_weight(bfqg, val, 0)
->                                      bfqg->entity.new_weight
->                                      ^^^^^^trigger uaf here 
->                                    spin_unlock_irq(&blkcg->lock);
-> 
-> To fix this use-after-free, instead of holding blkcg->lock while
-> walking ->blkg_list and getting/using bfqg, RCU walk ->blkg_list and
-> hold the blkg's queue lock while getting/using bfqg.
-> 
-> Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
-> Signed-off-by: Li Jinlin <lijinlin3@huawei.com>
-> ---
->  block/bfq-cgroup.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index e2f14508f2d6..7209060caa90 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -1025,21 +1025,25 @@ static int bfq_io_set_weight_legacy(struct cgroup_subsys_state *css,
->  	struct blkcg *blkcg = css_to_blkcg(css);
->  	struct bfq_group_data *bfqgd = blkcg_to_bfqgd(blkcg);
->  	struct blkcg_gq *blkg;
-> +	struct bfq_group *bfqg;
->  	int ret = -ERANGE;
->  
->  	if (val < BFQ_MIN_WEIGHT || val > BFQ_MAX_WEIGHT)
->  		return ret;
->  
->  	ret = 0;
-> -	spin_lock_irq(&blkcg->lock);
->  	bfqgd->weight = (unsigned short)val;
-> -	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
-> -		struct bfq_group *bfqg = blkg_to_bfqg(blkg);
-> +
-> +	rcu_read_lock();
-> +	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-> +		spin_lock_irq(&blkg->q->queue_lock);
-> +		bfqg = blkg_to_bfqg(blkg);
->  
->  		if (bfqg)
->  			bfq_group_set_weight(bfqg, val, 0);
-> +		spin_unlock_irq(&blkg->q->queue_lock);
->  	}
-> -	spin_unlock_irq(&blkcg->lock);
-> +	rcu_read_unlock();
->  
->  	return ret;
->  }
+> I believe Jan's conclusions so far are based on "manual" modifications
+> of available scheduler tags by /sys/block/$dev/queue/nr_requests.
+> Finding a good default value may be an additional change.
 
-Ping Paolo.
+Exactly. So far I was manually increasing nr_requests. I agree that
+improving the default nr_requests value selection would be desirable as
+well so that manual tuning is not needed. But for now I've left that aside.
 
-
+								Honza
 -- 
-Jens Axboe
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
