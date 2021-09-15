@@ -7,127 +7,134 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA7BC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 884A0C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:37:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2ADF60F3A
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:32:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6890160F51
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 07:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234862AbhIOHdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 03:33:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47924 "EHLO
+        id S231482AbhIOHiV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 03:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231228AbhIOHdW (ORCPT
+        with ESMTP id S231480AbhIOHiV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 03:33:22 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EB15C061574;
-        Wed, 15 Sep 2021 00:32:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=EWvc+q9s1X7xJOMLCiV8ECkEXtDe5FQ0U3D7Zlj18qg=; b=enAQlBdJgwtG7Zlgh7SXmTWZKK
-        RLlwrNTTyJjUB85LBACpvf45Mj/sTBD0uIn29bFznTlLH1Ld8p5RMKWHfDJo/UkzucWlqOezhmkGi
-        gCqU+B3S3YlxZp/K4aREfdwrbmnpSVPIWCebR4evFzRrBnVNAGGHfpoD6wIucs72mduM3z6gFciR9
-        FEHmTOlnPzcYGV7Hm/5lQcD3Hx9X3uPbUZoStV3qsjB8T+0BvfJjbhex7pG03J587ZXo5Ki6HCDtB
-        2crYeD7XOg9574c5ZuEwjnGh0uqTI2/38JxLjQh7GLD+Abbzaf5N1ex8B2jB+Nku9IIYuuLm04eZg
-        rjo7Owmw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQPMX-00FSj6-ML; Wed, 15 Sep 2021 07:30:07 +0000
-Date:   Wed, 15 Sep 2021 08:29:45 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Hao Sun <sunhao.th@gmail.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: general protection fault in wb_timer_fn
-Message-ID: <YUGg6aVAPKoYZ+8V@infradead.org>
-References: <CACkBjsZxsm=91sf-ihJgEtx7tmBJr-yTrPbrvg6tP-_J4pGdGw@mail.gmail.com>
- <YUB9Pn4CrqYu7TMC@infradead.org>
- <CACkBjsYwLYLRmX8GpsDpMthagWOjWWrNxqY6ZLNQVr6yx+f5vA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACkBjsYwLYLRmX8GpsDpMthagWOjWWrNxqY6ZLNQVr6yx+f5vA@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        Wed, 15 Sep 2021 03:38:21 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D594C061574
+        for <linux-block@vger.kernel.org>; Wed, 15 Sep 2021 00:37:02 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id hx25so4116948ejc.6
+        for <linux-block@vger.kernel.org>; Wed, 15 Sep 2021 00:37:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=415Blr3Q/Gqr6sE+2qW0icFFyR7iU8ysTZ1/UKJFKvk=;
+        b=gS7tx1MuDrOQeAB0qPWwo5Rou2795lkeTLNHk1iErOumxHljeKE+36FKX0LkSmKG6L
+         znZCynIIyUdX+ccYI01/s9IJafOENawwt4vokbUkPaxmdqxk1+TJdCcXGQJKAW+sH+Kc
+         1klnd8l9rEYajeqnwymD+UYS5ySmE4qKU23Od9XrurcFWyBQu9ZHmlf+FJD+A8ScfSKI
+         fxTolFKzO97rGtYq6KSzrR7J0B9kyNiVCIMGVcfT5qInc7vfJe6B0CEPLLlxV8zG/k42
+         j7PdLXLNKWf7iF+RmXVYcayEIH7aM9ncbo7OLho/Rz6NyrR1FUWrRIEgzreAE5Al45CV
+         Q3Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=415Blr3Q/Gqr6sE+2qW0icFFyR7iU8ysTZ1/UKJFKvk=;
+        b=SdYd7HZOGSKSKzjGq/xuH5SGh7lWe4Cb9e8eXbR1aUtm0x0Y/5Xe+cIBut7uePjNUO
+         emVja1qoPzR3js5/zPX49Muna4zVaP8xqQzWjP5dIxZHE3YILkscFhQ0umpc+LCltrme
+         +xtsv60ze2cqVXA88+oKn+NmRDexPPLDjjh/SFPRSM0BXvov/4VUrAchg1TmXXvNR+Js
+         NEDW0ynSjsKi0hAiyfO4eH6gopcD1xxJunymK5euLYvQn4lB2hkZ1aKHn82XXhC/kC5T
+         p7Rq+jwz1FM5NsEALKe3Eguqwj1qh42qqNW6o3+JzORj5BTdARF+QU6dwNFLw69DXauq
+         K90Q==
+X-Gm-Message-State: AOAM531LUrSRJdMt7VoxdFeAyoH9TrkWL5mpO+eWbzPoMJkCDnh+iOLd
+        pVIqUGJMjnTyRty1gEBDp2//yQ==
+X-Google-Smtp-Source: ABdhPJxEPsmiA59Fnh54y6VEPVQUfyGawMpxS8b0tugd2vhbZmZAyqpkOCTpQmHmEUVwk/N0fRRv0g==
+X-Received: by 2002:a17:906:2cd6:: with SMTP id r22mr22921688ejr.398.1631691421078;
+        Wed, 15 Sep 2021 00:37:01 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id t3sm6609895edt.61.2021.09.15.00.36.59
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 Sep 2021 00:37:00 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v2 4/4] block, bfq: consider request size in
+ bfq_asymmetric_scenario()
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <143fa1a2-de5f-b18a-73d9-8e105844709c@huawei.com>
+Date:   Wed, 15 Sep 2021 09:36:58 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <68A2B4C8-48A5-45F3-8782-2440C0028161@linaro.org>
+References: <20210806020826.1407257-1-yukuai3@huawei.com>
+ <20210806020826.1407257-5-yukuai3@huawei.com>
+ <8601F280-2F16-446A-95BA-37A07D1A1055@linaro.org>
+ <143fa1a2-de5f-b18a-73d9-8e105844709c@huawei.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 09:49:49AM +0800, Hao Sun wrote:
-> console output: https://paste.ubuntu.com/p/5qHqPXWmCQ/
-> kernel config: https://paste.ubuntu.com/p/VsVbFh9ZpQ/
-> C reproducer: https://paste.ubuntu.com/p/yrYsn4zpcn/
-> Syzlang reproducer: https://paste.ubuntu.com/p/bCWyNyHncJ/
-> 
-> Just tried the C reproducer on the latest Linux kernel (6880fa6c5660
-> Linux 5.15-rc1).
-> The reproducer still crashed the kernel but with a different backtrace.
 
-Well, that trace looks very much like an issue in the MM truncate code.
-Adding the linux-mm list.
 
-> 
-> IPv6: ADDRCONF(NETDEV_CHANGE): wlan0: link becomes ready
-> IPv6: ADDRCONF(NETDEV_CHANGE): wlan1: link becomes ready
-> Bluetooth: hci0: command 0x0409 tx timeout
-> ------------[ cut here ]------------
-> kernel BUG at fs/buffer.c:1510!
-> invalid opcode: 0000 [#1] PREEMPT SMP
-> CPU: 0 PID: 5 Comm: kworker/0:0 Not tainted 5.14.0+ #15
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-> Workqueue: events delayed_fput
-> RIP: 0010:block_invalidatepage+0x27f/0x2a0 -origin/fs/buffer.c:1510
-> Code: ff ff e8 b4 07 d7 ff b9 02 00 00 00 be 02 00 00 00 4c 89 ff 48
-> c7 c2 40 4e 25 84 e8 2b c2 c4 02 e9 c9 fe ff ff e8 91 07 d7 ff <0f> 0b
-> e8 8a 07 d7 ff 0f 0b e8 83 07 d7 ff 48 8d 5d ff e9 57 ff ff
-> RSP: 0018:ffffc9000065bb60 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: ffffea0000670000 RCX: 0000000000000000
-> RDX: ffff8880097fa240 RSI: ffffffff81608a9f RDI: ffffea0000670000
-> RBP: ffffea0000670000 R08: 0000000000000001 R09: 0000000000000000
-> R10: ffffc9000065b9f8 R11: 0000000000000003 R12: ffffffff81608820
-> R13: ffffc9000065bc68 R14: 0000000000000000 R15: ffffc9000065bbf0
-> FS:  0000000000000000(0000) GS:ffff88807dc00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f4aef93fb08 CR3: 0000000108cf2000 CR4: 0000000000750ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->  do_invalidatepage -origin/mm/truncate.c:157 [inline]
->  truncate_cleanup_page+0x15c/0x280 -origin/mm/truncate.c:176
->  truncate_inode_pages_range+0x169/0xc30 -origin/mm/truncate.c:325
->  kill_bdev.isra.29+0x28/0x30
->  blkdev_flush_mapping+0x4c/0x130 -origin/block/bdev.c:658
->  blkdev_put_whole+0x54/0x60 -origin/block/bdev.c:689
->  blkdev_put+0x6f/0x210 -origin/block/bdev.c:953
->  blkdev_close+0x25/0x30 -origin/block/fops.c:459
->  __fput+0xdf/0x380 -origin/fs/file_table.c:280
->  delayed_fput+0x25/0x40 -origin/fs/file_table.c:308
->  process_one_work+0x359/0x850 -origin/kernel/workqueue.c:2297
->  worker_thread+0x41/0x4d0 -origin/kernel/workqueue.c:2444
->  kthread+0x178/0x1b0 -origin/kernel/kthread.c:319
->  ret_from_fork+0x1f/0x30 -origin/arch/x86/entry/entry_64.S:295
-> Modules linked in:
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> ---[ end trace 9dbb8f58f2109f10 ]---
-> RIP: 0010:block_invalidatepage+0x27f/0x2a0 -origin/fs/buffer.c:1510
-> Code: ff ff e8 b4 07 d7 ff b9 02 00 00 00 be 02 00 00 00 4c 89 ff 48
-> c7 c2 40 4e 25 84 e8 2b c2 c4 02 e9 c9 fe ff ff e8 91 07 d7 ff <0f> 0b
-> e8 8a 07 d7 ff 0f 0b e8 83 07 d7 ff 48 8d 5d ff e9 57 ff ff
-> RSP: 0018:ffffc9000065bb60 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: ffffea0000670000 RCX: 0000000000000000
-> RDX: ffff8880097fa240 RSI: ffffffff81608a9f RDI: ffffea0000670000
-> RBP: ffffea0000670000 R08: 0000000000000001 R09: 0000000000000000
-> R10: ffffc9000065b9f8 R11: 0000000000000003 R12: ffffffff81608820
-> R13: ffffc9000065bc68 R14: 0000000000000000 R15: ffffc9000065bbf0
-> FS:  0000000000000000(0000) GS:ffff88807dc00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ff98674f000 CR3: 0000000106b2e000 CR4: 0000000000750ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
----end quoted text---
+> Il giorno 7 set 2021, alle ore 13:29, yukuai (C) <yukuai3@huawei.com> =
+ha scritto:
+>=20
+> On 2021/08/27 1:00, Paolo Valente wrote:
+>>> Il giorno 6 ago 2021, alle ore 04:08, Yu Kuai <yukuai3@huawei.com> =
+ha scritto:
+>>>=20
+>>> There is a special case when bfq do not need to idle when more than
+>>> one groups is active:
+>>>=20
+>> Unfortunately, there is a misunderstanding here.  If more than one
+>> group is active, then idling is not needed only if a lot of symmetry
+>> conditions also hold:
+>> - all active groups have the same weight
+>> - all active groups contain the same number of active queues
+>=20
+> Hi, Paolo
+>=20
+> I didn't think of this contition.
+>=20
+> It's seems that if we want to idle when more than one group is active,
+> there are two additional conditions:
+>=20
+> - all dispatched requests have the same size
+> - all active groups contain the same number of active queues
+>=20
+
+Also the weights and the I/O priorities of the queues inside the
+groups needs to be controlled, unfortunately.
+
+> Thus we still need to track how many queues are active in each group.
+> The conditions seems to be too much, do you think is it worth it to
+> add support to idle when more than one group is active?
+>=20
+
+I think I see your point.  The problem is that these states are
+dynamic.  So, if we suspend tracking all the above information while
+more than one group is active, then we are with no state in case only
+one group remains active.
+
+Thanks,
+Paolo
+
+> Thanks
+> Kuai
+>=20
+>> - all active queues have the same weight
+>> - all active queues belong to the same I/O-priority class
+>> - all dispatched requests have the same size
+>> Similarly, if only one group is active, then idling is not needed =
+only
+>> if the above last three conditions hold.
+>> The current logic, including your changes up to your previous patch,
+>> is simply ignoring the last condition above.
+>> So, unfortunately, your extra information about varied request size
+>> should be used in the opposite way than how you propose to use it.
+
