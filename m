@@ -2,108 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A09D2C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 11:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CE6C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 12:35:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FEC061262
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 11:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0749D611C2
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 12:35:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237606AbhIOMAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 08:00:09 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:9875 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232793AbhIOMAI (ORCPT
+        id S233011AbhIOMhB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 08:37:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38358 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232921AbhIOMhA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 08:00:08 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H8dt60m1tz8yZY;
-        Wed, 15 Sep 2021 19:54:22 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Wed, 15 Sep 2021 19:58:45 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Wed, 15 Sep 2021 19:58:45 +0800
-Subject: Re: [PATCH linux-4.19.y] blk-mq: fix divide by zero crash in
- tg_may_dispatch()
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     <linux-block@vger.kernel.org>, <stable@vger.kernel.org>,
-        <axboe@kernel.dk>, <hch@lst.de>, <yi.zhang@huawei.com>
-References: <20210914125402.4068844-1-yukuai3@huawei.com>
- <YUHYqwVeeXtfD0qf@kroah.com>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <0380c476-9cf5-d621-e432-ba5f5c7138c5@huawei.com>
-Date:   Wed, 15 Sep 2021 19:58:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 15 Sep 2021 08:37:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631709341;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=tYQm4LMb0WZkGy8QTiFE0aEl6fYLKHvVrM4pDnTLibU=;
+        b=UL9/N8RjW6uyCdXNKyicPA59JtqskRwK4AdYbfgJAFoxeeftI5THGE3vKmSD6TxywDREcV
+        85SRM26xtvD0O+2Crzac86cldNYBVRYrwhG7NVvdCnY2kZie6kfp72fxdCJukczC01gQkX
+        VBF4FAueQKf4BI+Fl2tTaV+gEQWXFDs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-LjIzIsSkOBaV65WhPxAWEg-1; Wed, 15 Sep 2021 08:35:40 -0400
+X-MC-Unique: LjIzIsSkOBaV65WhPxAWEg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B117819200C0;
+        Wed, 15 Sep 2021 12:35:39 +0000 (UTC)
+Received: from localhost (ovpn-12-59.pek2.redhat.com [10.72.12.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 41A39196F1;
+        Wed, 15 Sep 2021 12:35:35 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH] block: hold ->invalidate_lock in blkdev_fallocate
+Date:   Wed, 15 Sep 2021 20:35:45 +0800
+Message-Id: <20210915123545.1000534-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YUHYqwVeeXtfD0qf@kroah.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/09/15 19:27, Greg KH wrote:
-> On Tue, Sep 14, 2021 at 08:54:02PM +0800, Yu Kuai wrote:
->> If blk-throttle is enabled and io is issued before
->> blk_throtl_register_queue() is done. Divide by zero crash will be
->> triggered in tg_may_dispatch() because 'throtl_slice' is uninitialized.
->>
->> The problem is fixed in commit 75f4dca59694 ("block: call
->> blk_register_queue earlier in device_add_disk") from mainline, however
->> it's too hard to backport this patch due to lots of refactoring.
->>
->> Thus introduce a new flag QUEUE_FLAG_THROTL_INIT_DONE. It will be set
->> after blk_throtl_register_queue() is done, and will be checked before
->> applying any config.
->>
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/blk-sysfs.c      |  2 ++
->>   block/blk-throttle.c   | 41 +++++++++++++++++++++++++++++++++++++++--
->>   include/linux/blkdev.h |  1 +
->>   3 files changed, 42 insertions(+), 2 deletions(-)
-> 
-> 
-> The commit you reference above is in 5.15-rc1.  What about all of the
-> other stable kernel releases newer than 4.19.y?  You do not want to move
-> to a newer release and have a regression.
+When running ->fallocate(), blkdev_fallocate() should hold
+mapping->invalidate_lock to prevent page cache from being
+accessed, otherwise stale data may be read in page cache.
 
-All other kernel releases without this patch have the same issure,
-including v5.14.
-> 
-> And I would _REALLY_ like to take the identical commits that are
-> upstream if at all possible.  What is needed to backport instead of
-> doing this one-off patch instead?
+Without this patch, blktests block/009 fails sometimes. With
+this patch, block/009 can pass always.
 
-The function __device_add_disk() is quite different compared from
-4.19.y to mainline, I haven't finish to collect that how many patches is
-needed yet, which is not easy to do...
-> 
-> When we take changes that are not upstream, almost always they are
-> broken so we almost never want to do that.
+Cc: Jan Kara <jack@suse.cz>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/block_dev.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-I understand that, more proper fix should be calling blk_register_queue
-earlier in device_add_disk like the commit did. I'll try to do that and
-hope conflicts are not too much...
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 45df6cbccf12..f55e14ae89a0 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1516,7 +1516,8 @@ static const struct address_space_operations def_blk_aops = {
+ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 			     loff_t len)
+ {
+-	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
++	struct inode *inode = bdev_file_inode(file);
++	struct block_device *bdev = I_BDEV(inode);
+ 	loff_t end = start + len - 1;
+ 	loff_t isize;
+ 	int error;
+@@ -1543,10 +1544,12 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
+ 
++	filemap_invalidate_lock(inode->i_mapping);
++
+ 	/* Invalidate the page cache, including dirty pages. */
+ 	error = truncate_bdev_range(bdev, file->f_mode, start, end);
+ 	if (error)
+-		return error;
++		goto fail;
+ 
+ 	switch (mode) {
+ 	case FALLOC_FL_ZERO_RANGE:
+@@ -1563,17 +1566,18 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 					     GFP_KERNEL, 0);
+ 		break;
+ 	default:
+-		return -EOPNOTSUPP;
++		error = -EOPNOTSUPP;
+ 	}
+-	if (error)
+-		return error;
+-
+ 	/*
+ 	 * Invalidate the page cache again; if someone wandered in and dirtied
+ 	 * a page, we just discard it - userspace has no way of knowing whether
+ 	 * the write happened before or after discard completing...
+ 	 */
+-	return truncate_bdev_range(bdev, file->f_mode, start, end);
++	if (!error)
++		error = truncate_bdev_range(bdev, file->f_mode, start, end);
++ fail:
++	filemap_invalidate_unlock(inode->i_mapping);
++	return error;
+ }
+ 
+ const struct file_operations def_blk_fops = {
+-- 
+2.31.1
 
-Thanks,
-Kuai
-> 
-> thanks,
-> 
-> greg k-h
-> .
-> 
