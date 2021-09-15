@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7602FC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB87C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:56:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CC21610E8
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12CAD60EE0
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:56:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236429AbhIOG4o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 02:56:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39578 "EHLO
+        id S236356AbhIOG5u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 02:57:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236408AbhIOG4o (ORCPT
+        with ESMTP id S236469AbhIOG5s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 02:56:44 -0400
+        Wed, 15 Sep 2021 02:57:48 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA29AC061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:55:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437E8C061574
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:56:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=lmf8/SO/cQ5/smd0fwFRf1oT5ZgsqGCX/QDltKlGBew=; b=fFnaCgS+FugLGt9z+xJ8UxX1kg
-        MLictbYAYd10M9BaT9XS9nOxu1y6K/1aQrBWcgZp2G9zxDLTKAGCn0o8QwdzvtBE46BtxEjgqMH7D
-        rIKKieBy+GTf1xwPeOhETxLFNeUgRMICGeekNJZ3AoteBDcsx2DuRt1wprxlq2E6ZEoz83QMQd84u
-        KS0hEbGUjrLisMkC6d07D6YQ9Mwkx1p8ek0zQrv588Tx2lOyzw3zGLhcrB4jd+pT+hGrBTVnfJtZU
-        6TyFSsrOrAT7R+b/k7wM47BPySQuh4EwNGULcLz4CeNpXHhybvQNdYLIIAwhvwyo7xGzzNSd7z0w4
-        UDb5edGg==;
+        bh=EpBUyeSd+Szah6t8M2aahLrgiSD8AqmN+7eRi7eZ3Is=; b=RnRTnZ/q7TKscysSs+I7rioNmM
+        w/a6xMkEux6GcspAyhDEw++et0HfLdb8ZUv2pB4CqGPScyfogS3iVxvI4w6ErK6pAb8OLotttAx0s
+        bxl3zVW4wBC7pTz+0NpzLtM4jcNh6ZIRJjOTp1HLbZaZLPofXoKp4ku264dN6ZsW5aqCLqIh1ewpq
+        7Ud0EE+9cnJyzJdzPJq46qicdQWum2PmItfoIgDDQpl5+UH5qPNyflsOBidJQsxOd9V8YS4PQO8dY
+        VwmTmx3XgQkqQtaluZ05bZ+jGG+R1225h/snzWT9/inJMhQCcnyCRHEa+zZqzQiEGJ3jhc9XZKK1a
+        Nb5KeuGQ==;
 Received: from [2001:4bb8:184:72db:8457:d7a:6e21:dd20] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQOoD-00FRD8-Nn; Wed, 15 Sep 2021 06:54:37 +0000
+        id 1mQOpJ-00FRF2-CW; Wed, 15 Sep 2021 06:55:42 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 16/17] block: move integrity handling out of <linux/blkdev.h>
-Date:   Wed, 15 Sep 2021 08:40:43 +0200
-Message-Id: <20210915064044.950534-17-hch@lst.de>
+Subject: [PATCH 17/17] block: move struct request to blk-mq.h
+Date:   Wed, 15 Sep 2021 08:40:44 +0200
+Message-Id: <20210915064044.950534-18-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210915064044.950534-1-hch@lst.de>
 References: <20210915064044.950534-1-hch@lst.de>
@@ -52,688 +52,1220 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split the integrity/metadata handling definitions out into a new header.
+struct request is only used by blk-mq drivers, so move it and all
+related declarations to blk-mq.h.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bdev.c                        |   1 +
- block/bio-integrity.c               |   2 +-
- block/blk-core.c                    |   1 +
- block/blk-integrity.c               |   2 +-
- block/blk-merge.c                   |   1 +
- block/blk-mq.c                      |   1 +
- block/keyslot-manager.c             |   1 +
- block/t10-pi.c                      |   2 +-
- drivers/md/dm-bio-record.h          |   1 +
- drivers/md/dm-crypt.c               |   1 +
- drivers/md/dm-table.c               |   1 +
- drivers/md/md.c                     |   1 +
- drivers/nvdimm/core.c               |   1 +
- drivers/nvme/host/core.c            |   1 +
- drivers/nvme/host/pci.c             |   1 +
- drivers/nvme/host/rdma.c            |   1 +
- drivers/nvme/target/io-cmd-bdev.c   |   1 +
- drivers/nvme/target/rdma.c          |   1 +
- drivers/scsi/scsi_lib.c             |   1 +
- drivers/scsi/sd_dif.c               |   2 +-
- drivers/scsi/virtio_scsi.c          |   1 +
+ block/blk-crypto-fallback.c         |   1 +
+ block/blk-crypto-internal.h         |   2 +-
+ drivers/block/rnbd/rnbd-proto.h     |   2 +-
+ drivers/md/dm-verity-target.c       |   1 +
+ drivers/mmc/core/sd.c               |   1 +
+ drivers/target/target_core_file.c   |   1 +
  drivers/target/target_core_iblock.c |   1 +
- include/linux/blk-integrity.h       | 183 ++++++++++++++++++++++++++++
- include/linux/blkdev.h              | 183 ----------------------------
- 24 files changed, 205 insertions(+), 187 deletions(-)
- create mode 100644 include/linux/blk-integrity.h
+ include/linux/blk-mq.h              | 465 +++++++++++++++++++++++++++
+ include/linux/blk_types.h           |   2 -
+ include/linux/blkdev.h              | 469 +---------------------------
+ include/linux/blktrace_api.h        |   2 +-
+ include/linux/t10-pi.h              |   2 +-
+ include/scsi/scsi_device.h          |   2 +-
+ 13 files changed, 476 insertions(+), 475 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index cf2780cb44a74..567534c63f3d5 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -12,6 +12,7 @@
- #include <linux/major.h>
- #include <linux/device_cgroup.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/backing-dev.h>
- #include <linux/module.h>
- #include <linux/blkpg.h>
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 6b47cddbbca17..21234ff966d9b 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -6,7 +6,7 @@
-  * Written by: Martin K. Petersen <martin.petersen@oracle.com>
-  */
- 
--#include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/mempool.h>
- #include <linux/export.h>
- #include <linux/bio.h>
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5454db2fa263b..22c2982bb0bdf 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index c322176a1e099..ec4c7823541c8 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
 @@ -18,6 +18,7 @@
- #include <linux/blkdev.h>
- #include <linux/blk-mq.h>
- #include <linux/blk-pm.h>
-+#include <linux/blk-integrity.h>
- #include <linux/highmem.h>
- #include <linux/mm.h>
- #include <linux/pagemap.h>
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 69a12177dfb62..35e948ea7e625 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -6,7 +6,7 @@
-  * Written by: Martin K. Petersen <martin.petersen@oracle.com>
-  */
- 
--#include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/backing-dev.h>
  #include <linux/mempool.h>
- #include <linux/bio.h>
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 39f210da399a6..5b4f23014df8a 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -6,6 +6,7 @@
  #include <linux/module.h>
+ #include <linux/random.h>
++#include <linux/scatterlist.h>
+ 
+ #include "blk-crypto-internal.h"
+ 
+diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+index 0d36aae538d7b..2fb0d65a464ca 100644
+--- a/block/blk-crypto-internal.h
++++ b/block/blk-crypto-internal.h
+@@ -7,7 +7,7 @@
+ #define __LINUX_BLK_CRYPTO_INTERNAL_H
+ 
  #include <linux/bio.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/scatterlist.h>
- 
- #include <trace/events/block.h>
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 61264bff6103a..21bf4c3f08259 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -10,6 +10,7 @@
- #include <linux/backing-dev.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/kmemleak.h>
- #include <linux/mm.h>
- #include <linux/init.h>
-diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
-index 2c4a55bea6ca1..1792159d12d18 100644
---- a/block/keyslot-manager.c
-+++ b/block/keyslot-manager.c
-@@ -35,6 +35,7 @@
- #include <linux/pm_runtime.h>
- #include <linux/wait.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- 
- struct blk_ksm_keyslot {
- 	atomic_t slot_refs;
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 00c203b2a921e..25a52a2a09a88 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -5,7 +5,7 @@
-  */
- 
- #include <linux/t10-pi.h>
 -#include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/crc-t10dif.h>
- #include <linux/module.h>
- #include <net/checksum.h>
-diff --git a/drivers/md/dm-bio-record.h b/drivers/md/dm-bio-record.h
-index a3b71350eec84..745e3ab4aa0af 100644
---- a/drivers/md/dm-bio-record.h
-+++ b/drivers/md/dm-bio-record.h
-@@ -8,6 +8,7 @@
- #define DM_BIO_RECORD_H
++#include <linux/blk-mq.h>
  
- #include <linux/bio.h>
-+#include <linux/blk-integrity.h>
+ /* Represents a crypto mode supported by blk-crypto  */
+ struct blk_crypto_mode {
+diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-proto.h
+index c1bc5c0fef71d..de5d5a8df81d7 100644
+--- a/drivers/block/rnbd/rnbd-proto.h
++++ b/drivers/block/rnbd/rnbd-proto.h
+@@ -10,7 +10,7 @@
+ #define RNBD_PROTO_H
  
- /*
-  * There are lots of mutable fields in the bio struct that get
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 916b7da16de25..292f7896f7333 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -15,6 +15,7 @@
- #include <linux/key.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/mempool.h>
- #include <linux/slab.h>
- #include <linux/crypto.h>
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 2111daaacabaf..1fa4d5582dca5 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -10,6 +10,7 @@
- #include <linux/module.h>
- #include <linux/vmalloc.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/namei.h>
- #include <linux/ctype.h>
- #include <linux/string.h>
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 0c7018462eaee..5e6232386b0ce 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -41,6 +41,7 @@
- #include <linux/sched/signal.h>
- #include <linux/kthread.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/badblocks.h>
- #include <linux/sysctl.h>
- #include <linux/seq_file.h>
-diff --git a/drivers/nvdimm/core.c b/drivers/nvdimm/core.c
-index 7de592d7eff45..6a45fa91e8a3e 100644
---- a/drivers/nvdimm/core.c
-+++ b/drivers/nvdimm/core.c
-@@ -7,6 +7,7 @@
- #include <linux/export.h>
- #include <linux/module.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/device.h>
- #include <linux/ctype.h>
- #include <linux/ndctl.h>
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 7efb31b87f37a..408392ec4600c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -6,6 +6,7 @@
- 
- #include <linux/blkdev.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-integrity.h>
- #include <linux/compat.h>
- #include <linux/delay.h>
- #include <linux/errno.h>
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index b82492cd75033..ca5bda26226ae 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -10,6 +10,7 @@
- #include <linux/blkdev.h>
- #include <linux/blk-mq.h>
- #include <linux/blk-mq-pci.h>
-+#include <linux/blk-integrity.h>
- #include <linux/dmi.h>
- #include <linux/init.h>
- #include <linux/interrupt.h>
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index a68704e39084e..61e22c7c28025 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -13,6 +13,7 @@
- #include <linux/atomic.h>
- #include <linux/blk-mq.h>
- #include <linux/blk-mq-rdma.h>
-+#include <linux/blk-integrity.h>
  #include <linux/types.h>
- #include <linux/list.h>
- #include <linux/mutex.h>
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 0fc2781ab9708..6139e1de50a66 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -5,6 +5,7 @@
-  */
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
+-#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ #include <linux/limits.h>
+ #include <linux/inet.h>
+ #include <linux/in.h>
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index 22a5ac82446a6..88e2702b473b0 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -18,6 +18,7 @@
+ #include "dm-verity-verify-sig.h"
  #include <linux/module.h>
- #include "nvmet.h"
+ #include <linux/reboot.h>
++#include <linux/scatterlist.h>
  
-diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index 891174ccd44bb..38d1f292ecc20 100644
---- a/drivers/nvme/target/rdma.c
-+++ b/drivers/nvme/target/rdma.c
-@@ -5,6 +5,7 @@
-  */
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- #include <linux/atomic.h>
-+#include <linux/blk-integrity.h>
- #include <linux/ctype.h>
- #include <linux/delay.h>
- #include <linux/err.h>
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 572673873ddf8..33fd9a01330ce 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -21,6 +21,7 @@
- #include <linux/hardirq.h>
- #include <linux/scatterlist.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-integrity.h>
- #include <linux/ratelimit.h>
+ #define DM_MSG_PREFIX			"verity"
+ 
+diff --git a/drivers/mmc/core/sd.c b/drivers/mmc/core/sd.c
+index 4646b7a03db6b..c9db24e16af13 100644
+--- a/drivers/mmc/core/sd.c
++++ b/drivers/mmc/core/sd.c
+@@ -12,6 +12,7 @@
+ #include <linux/slab.h>
+ #include <linux/stat.h>
+ #include <linux/pm_runtime.h>
++#include <linux/scatterlist.h>
+ 
+ #include <linux/mmc/host.h>
+ #include <linux/mmc/card.h>
+diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
+index ef4a8e189fba0..02f64453b4c5f 100644
+--- a/drivers/target/target_core_file.c
++++ b/drivers/target/target_core_file.c
+@@ -20,6 +20,7 @@
+ #include <linux/vmalloc.h>
+ #include <linux/falloc.h>
+ #include <linux/uio.h>
++#include <linux/scatterlist.h>
+ #include <scsi/scsi_proto.h>
  #include <asm/unaligned.h>
  
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index 4cadb26070a8f..349950616adc5 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -6,7 +6,7 @@
-  * Written by: Martin K. Petersen <martin.petersen@oracle.com>
-  */
- 
--#include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/t10-pi.h>
- 
- #include <scsi/scsi.h>
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index c25ce8f0e0afc..b7c69b97f43ab 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -22,6 +22,7 @@
- #include <linux/virtio_scsi.h>
- #include <linux/cpu.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <scsi/scsi_host.h>
- #include <scsi/scsi_device.h>
- #include <scsi/scsi_cmnd.h>
 diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 4069a1edcfa34..d39b87e2ed100 100644
+index d39b87e2ed100..31df20abe141f 100644
 --- a/drivers/target/target_core_iblock.c
 +++ b/drivers/target/target_core_iblock.c
-@@ -16,6 +16,7 @@
- #include <linux/timer.h>
- #include <linux/fs.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-integrity.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
- #include <linux/bio.h>
-diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
-new file mode 100644
-index 0000000000000..8a038ea0717e4
---- /dev/null
-+++ b/include/linux/blk-integrity.h
-@@ -0,0 +1,183 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _LINUX_BLK_INTEGRITY_H
-+#define _LINUX_BLK_INTEGRITY_H
+@@ -23,6 +23,7 @@
+ #include <linux/genhd.h>
+ #include <linux/file.h>
+ #include <linux/module.h>
++#include <linux/scatterlist.h>
+ #include <scsi/scsi_proto.h>
+ #include <asm/unaligned.h>
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 13ba1861e688f..bd4086a6f28e0 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -6,10 +6,218 @@
+ #include <linux/sbitmap.h>
+ #include <linux/srcu.h>
+ #include <linux/lockdep.h>
++#include <linux/scatterlist.h>
+ 
+ struct blk_mq_tags;
+ struct blk_flush_queue;
+ 
++#define BLKDEV_MIN_RQ	4
++#define BLKDEV_MAX_RQ	128	/* Default maximum */
 +
-+#include <linux/blk-mq.h>
++typedef void (rq_end_io_fn)(struct request *, blk_status_t);
 +
-+struct request;
++/*
++ * request flags */
++typedef __u32 __bitwise req_flags_t;
 +
-+enum blk_integrity_flags {
-+	BLK_INTEGRITY_VERIFY		= 1 << 0,
-+	BLK_INTEGRITY_GENERATE		= 1 << 1,
-+	BLK_INTEGRITY_DEVICE_CAPABLE	= 1 << 2,
-+	BLK_INTEGRITY_IP_CHECKSUM	= 1 << 3,
++/* drive already may have started this one */
++#define RQF_STARTED		((__force req_flags_t)(1 << 1))
++/* may not be passed by ioscheduler */
++#define RQF_SOFTBARRIER		((__force req_flags_t)(1 << 3))
++/* request for flush sequence */
++#define RQF_FLUSH_SEQ		((__force req_flags_t)(1 << 4))
++/* merge of different types, fail separately */
++#define RQF_MIXED_MERGE		((__force req_flags_t)(1 << 5))
++/* track inflight for MQ */
++#define RQF_MQ_INFLIGHT		((__force req_flags_t)(1 << 6))
++/* don't call prep for this one */
++#define RQF_DONTPREP		((__force req_flags_t)(1 << 7))
++/* vaguely specified driver internal error.  Ignored by the block layer */
++#define RQF_FAILED		((__force req_flags_t)(1 << 10))
++/* don't warn about errors */
++#define RQF_QUIET		((__force req_flags_t)(1 << 11))
++/* elevator private data attached */
++#define RQF_ELVPRIV		((__force req_flags_t)(1 << 12))
++/* account into disk and partition IO statistics */
++#define RQF_IO_STAT		((__force req_flags_t)(1 << 13))
++/* runtime pm request */
++#define RQF_PM			((__force req_flags_t)(1 << 15))
++/* on IO scheduler merge hash */
++#define RQF_HASHED		((__force req_flags_t)(1 << 16))
++/* track IO completion time */
++#define RQF_STATS		((__force req_flags_t)(1 << 17))
++/* Look at ->special_vec for the actual data payload instead of the
++   bio chain. */
++#define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
++/* The per-zone write lock is held for this request */
++#define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
++/* already slept for hybrid poll */
++#define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
++/* ->timeout has been called, don't expire again */
++#define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
++
++/* flags that prevent us from merging requests: */
++#define RQF_NOMERGE_FLAGS \
++	(RQF_STARTED | RQF_SOFTBARRIER | RQF_FLUSH_SEQ | RQF_SPECIAL_PAYLOAD)
++
++enum mq_rq_state {
++	MQ_RQ_IDLE		= 0,
++	MQ_RQ_IN_FLIGHT		= 1,
++	MQ_RQ_COMPLETE		= 2,
 +};
 +
-+struct blk_integrity_iter {
-+	void			*prot_buf;
-+	void			*data_buf;
-+	sector_t		seed;
-+	unsigned int		data_size;
-+	unsigned short		interval;
-+	const char		*disk_name;
-+};
++/*
++ * Try to put the fields that are referenced together in the same cacheline.
++ *
++ * If you modify this structure, make sure to update blk_rq_init() and
++ * especially blk_mq_rq_ctx_init() to take care of the added fields.
++ */
++struct request {
++	struct request_queue *q;
++	struct blk_mq_ctx *mq_ctx;
++	struct blk_mq_hw_ctx *mq_hctx;
 +
-+typedef blk_status_t (integrity_processing_fn) (struct blk_integrity_iter *);
-+typedef void (integrity_prepare_fn) (struct request *);
-+typedef void (integrity_complete_fn) (struct request *, unsigned int);
++	unsigned int cmd_flags;		/* op and common flags */
++	req_flags_t rq_flags;
 +
-+struct blk_integrity_profile {
-+	integrity_processing_fn		*generate_fn;
-+	integrity_processing_fn		*verify_fn;
-+	integrity_prepare_fn		*prepare_fn;
-+	integrity_complete_fn		*complete_fn;
-+	const char			*name;
-+};
++	int tag;
++	int internal_tag;
++
++	/* the following two fields are internal, NEVER access directly */
++	unsigned int __data_len;	/* total data len */
++	sector_t __sector;		/* sector cursor */
++
++	struct bio *bio;
++	struct bio *biotail;
++
++	struct list_head queuelist;
++
++	/*
++	 * The hash is used inside the scheduler, and killed once the
++	 * request reaches the dispatch list. The ipi_list is only used
++	 * to queue the request for softirq completion, which is long
++	 * after the request has been unhashed (and even removed from
++	 * the dispatch list).
++	 */
++	union {
++		struct hlist_node hash;	/* merge hash */
++		struct llist_node ipi_list;
++	};
++
++	/*
++	 * The rb_node is only used inside the io scheduler, requests
++	 * are pruned when moved to the dispatch queue. So let the
++	 * completion_data share space with the rb_node.
++	 */
++	union {
++		struct rb_node rb_node;	/* sort/lookup */
++		struct bio_vec special_vec;
++		void *completion_data;
++		int error_count; /* for legacy drivers, don't use */
++	};
++
++	/*
++	 * Three pointers are available for the IO schedulers, if they need
++	 * more they have to dynamically allocate it.  Flush requests are
++	 * never put on the IO scheduler. So let the flush fields share
++	 * space with the elevator data.
++	 */
++	union {
++		struct {
++			struct io_cq		*icq;
++			void			*priv[2];
++		} elv;
++
++		struct {
++			unsigned int		seq;
++			struct list_head	list;
++			rq_end_io_fn		*saved_end_io;
++		} flush;
++	};
++
++	struct gendisk *rq_disk;
++	struct block_device *part;
++#ifdef CONFIG_BLK_RQ_ALLOC_TIME
++	/* Time that the first bio started allocating this request. */
++	u64 alloc_time_ns;
++#endif
++	/* Time that this request was allocated for this IO. */
++	u64 start_time_ns;
++	/* Time that I/O was submitted to the device. */
++	u64 io_start_time_ns;
++
++#ifdef CONFIG_BLK_WBT
++	unsigned short wbt_flags;
++#endif
++	/*
++	 * rq sectors used for blk stats. It has the same value
++	 * with blk_rq_sectors(rq), except that it never be zeroed
++	 * by completion.
++	 */
++	unsigned short stats_sectors;
++
++	/*
++	 * Number of scatter-gather DMA addr+len pairs after
++	 * physical address coalescing is performed.
++	 */
++	unsigned short nr_phys_segments;
 +
 +#ifdef CONFIG_BLK_DEV_INTEGRITY
-+void blk_integrity_register(struct gendisk *, struct blk_integrity *);
-+void blk_integrity_unregister(struct gendisk *);
-+int blk_integrity_compare(struct gendisk *, struct gendisk *);
-+int blk_rq_map_integrity_sg(struct request_queue *, struct bio *,
-+				   struct scatterlist *);
-+int blk_rq_count_integrity_sg(struct request_queue *, struct bio *);
++	unsigned short nr_integrity_segments;
++#endif
 +
-+static inline struct blk_integrity *blk_get_integrity(struct gendisk *disk)
++#ifdef CONFIG_BLK_INLINE_ENCRYPTION
++	struct bio_crypt_ctx *crypt_ctx;
++	struct blk_ksm_keyslot *crypt_keyslot;
++#endif
++
++	unsigned short write_hint;
++	unsigned short ioprio;
++
++	enum mq_rq_state state;
++	refcount_t ref;
++
++	unsigned int timeout;
++	unsigned long deadline;
++
++	union {
++		struct __call_single_data csd;
++		u64 fifo_time;
++	};
++
++	/*
++	 * completion callback.
++	 */
++	rq_end_io_fn *end_io;
++	void *end_io_data;
++};
++
++#define req_op(req) \
++	((req)->cmd_flags & REQ_OP_MASK)
++
++static inline bool blk_rq_is_passthrough(struct request *rq)
 +{
-+	struct blk_integrity *bi = &disk->queue->integrity;
-+
-+	if (!bi->profile)
-+		return NULL;
-+
-+	return bi;
++	return blk_op_is_passthrough(req_op(rq));
 +}
 +
-+static inline struct blk_integrity *
-+bdev_get_integrity(struct block_device *bdev)
++static inline unsigned short req_get_ioprio(struct request *req)
 +{
-+	return blk_get_integrity(bdev->bd_disk);
++	return req->ioprio;
 +}
 +
-+static inline bool
-+blk_integrity_queue_supports_integrity(struct request_queue *q)
++#define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
++
++#define rq_dma_dir(rq) \
++	(op_is_write(req_op(rq)) ? DMA_TO_DEVICE : DMA_FROM_DEVICE)
++
++enum blk_eh_timer_return {
++	BLK_EH_DONE,		/* drivers has completed the command */
++	BLK_EH_RESET_TIMER,	/* reset timer and try again */
++};
++
++#define BLK_TAG_ALLOC_FIFO 0 /* allocate starting from 0 */
++#define BLK_TAG_ALLOC_RR 1 /* allocate starting from last allocated tag */
++
+ /**
+  * struct blk_mq_hw_ctx - State for a hardware queue facing the hardware
+  * block device
+@@ -637,4 +845,261 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio);
+ void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
+ 		struct lock_class_key *key);
+ 
++static inline bool rq_is_sync(struct request *rq)
 +{
-+	return q->integrity.profile;
++	return op_is_sync(rq->cmd_flags);
 +}
 +
-+static inline void blk_queue_max_integrity_segments(struct request_queue *q,
-+						    unsigned int segs)
-+{
-+	q->limits.max_integrity_segments = segs;
-+}
++void blk_rq_init(struct request_queue *q, struct request *rq);
++void blk_put_request(struct request *rq);
++struct request *blk_get_request(struct request_queue *q, unsigned int op,
++		blk_mq_req_flags_t flags);
++int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
++		struct bio_set *bs, gfp_t gfp_mask,
++		int (*bio_ctr)(struct bio *, struct bio *, void *), void *data);
++void blk_rq_unprep_clone(struct request *rq);
++blk_status_t blk_insert_cloned_request(struct request_queue *q,
++		struct request *rq);
 +
-+static inline unsigned short
-+queue_max_integrity_segments(const struct request_queue *q)
-+{
-+	return q->limits.max_integrity_segments;
-+}
++struct rq_map_data {
++	struct page **pages;
++	int page_order;
++	int nr_entries;
++	unsigned long offset;
++	int null_mapped;
++	int from_user;
++};
 +
-+/**
-+ * bio_integrity_intervals - Return number of integrity intervals for a bio
-+ * @bi:		blk_integrity profile for device
-+ * @sectors:	Size of the bio in 512-byte sectors
-+ *
-+ * Description: The block layer calculates everything in 512 byte
-+ * sectors but integrity metadata is done in terms of the data integrity
-+ * interval size of the storage device.  Convert the block layer sectors
-+ * to the appropriate number of integrity intervals.
++int blk_rq_map_user(struct request_queue *, struct request *,
++		struct rq_map_data *, void __user *, unsigned long, gfp_t);
++int blk_rq_map_user_iov(struct request_queue *, struct request *,
++		struct rq_map_data *, const struct iov_iter *, gfp_t);
++int blk_rq_unmap_user(struct bio *);
++int blk_rq_map_kern(struct request_queue *, struct request *, void *,
++		unsigned int, gfp_t);
++int blk_rq_append_bio(struct request *rq, struct bio *bio);
++void blk_execute_rq_nowait(struct gendisk *, struct request *, int,
++		rq_end_io_fn *);
++blk_status_t blk_execute_rq(struct gendisk *bd_disk, struct request *rq,
++		int at_head);
++
++struct req_iterator {
++	struct bvec_iter iter;
++	struct bio *bio;
++};
++
++#define __rq_for_each_bio(_bio, rq)	\
++	if ((rq->bio))			\
++		for (_bio = (rq)->bio; _bio; _bio = _bio->bi_next)
++
++#define rq_for_each_segment(bvl, _rq, _iter)			\
++	__rq_for_each_bio(_iter.bio, _rq)			\
++		bio_for_each_segment(bvl, _iter.bio, _iter.iter)
++
++#define rq_for_each_bvec(bvl, _rq, _iter)			\
++	__rq_for_each_bio(_iter.bio, _rq)			\
++		bio_for_each_bvec(bvl, _iter.bio, _iter.iter)
++
++#define rq_iter_last(bvec, _iter)				\
++		(_iter.bio->bi_next == NULL &&			\
++		 bio_iter_last(bvec, _iter.iter))
++
++/*
++ * blk_rq_pos()			: the current sector
++ * blk_rq_bytes()		: bytes left in the entire request
++ * blk_rq_cur_bytes()		: bytes left in the current segment
++ * blk_rq_err_bytes()		: bytes left till the next error boundary
++ * blk_rq_sectors()		: sectors left in the entire request
++ * blk_rq_cur_sectors()		: sectors left in the current segment
++ * blk_rq_stats_sectors()	: sectors of the entire request used for stats
 + */
-+static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
-+						   unsigned int sectors)
++static inline sector_t blk_rq_pos(const struct request *rq)
 +{
-+	return sectors >> (bi->interval_exp - 9);
++	return rq->__sector;
 +}
 +
-+static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
-+					       unsigned int sectors)
++static inline unsigned int blk_rq_bytes(const struct request *rq)
 +{
-+	return bio_integrity_intervals(bi, sectors) * bi->tuple_size;
++	return rq->__data_len;
 +}
 +
-+static inline bool blk_integrity_rq(struct request *rq)
++static inline int blk_rq_cur_bytes(const struct request *rq)
 +{
-+	return rq->cmd_flags & REQ_INTEGRITY;
++	return rq->bio ? bio_cur_bytes(rq->bio) : 0;
++}
++
++unsigned int blk_rq_err_bytes(const struct request *rq);
++
++static inline unsigned int blk_rq_sectors(const struct request *rq)
++{
++	return blk_rq_bytes(rq) >> SECTOR_SHIFT;
++}
++
++static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
++{
++	return blk_rq_cur_bytes(rq) >> SECTOR_SHIFT;
++}
++
++static inline unsigned int blk_rq_stats_sectors(const struct request *rq)
++{
++	return rq->stats_sectors;
 +}
 +
 +/*
-+ * Return the first bvec that contains integrity data.  Only drivers that are
-+ * limited to a single integrity segment should use this helper.
++ * Some commands like WRITE SAME have a payload or data transfer size which
++ * is different from the size of the request.  Any driver that supports such
++ * commands using the RQF_SPECIAL_PAYLOAD flag needs to use this helper to
++ * calculate the data transfer size.
 + */
-+static inline struct bio_vec *rq_integrity_vec(struct request *rq)
++static inline unsigned int blk_rq_payload_bytes(struct request *rq)
 +{
-+	if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
-+		return NULL;
-+	return rq->bio->bi_integrity->bip_vec;
++	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
++		return rq->special_vec.bv_len;
++	return blk_rq_bytes(rq);
 +}
-+#else /* CONFIG_BLK_DEV_INTEGRITY */
-+static inline int blk_rq_count_integrity_sg(struct request_queue *q,
-+					    struct bio *b)
++
++/*
++ * Return the first full biovec in the request.  The caller needs to check that
++ * there are any bvecs before calling this helper.
++ */
++static inline struct bio_vec req_bvec(struct request *rq)
 +{
-+	return 0;
++	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
++		return rq->special_vec;
++	return mp_bvec_iter_bvec(rq->bio->bi_io_vec, rq->bio->bi_iter);
 +}
-+static inline int blk_rq_map_integrity_sg(struct request_queue *q,
-+					  struct bio *b,
-+					  struct scatterlist *s)
++
++static inline unsigned int blk_rq_count_bios(struct request *rq)
 +{
-+	return 0;
++	unsigned int nr_bios = 0;
++	struct bio *bio;
++
++	__rq_for_each_bio(bio, rq)
++		nr_bios++;
++
++	return nr_bios;
 +}
-+static inline struct blk_integrity *bdev_get_integrity(struct block_device *b)
++
++void blk_steal_bios(struct bio_list *list, struct request *rq);
++
++/*
++ * Request completion related functions.
++ *
++ * blk_update_request() completes given number of bytes and updates
++ * the request without completing it.
++ */
++bool blk_update_request(struct request *rq, blk_status_t error,
++			       unsigned int nr_bytes);
++void blk_abort_request(struct request *);
++
++/*
++ * Number of physical segments as sent to the device.
++ *
++ * Normally this is the number of discontiguous data segments sent by the
++ * submitter.  But for data-less command like discard we might have no
++ * actual data segments submitted, but the driver might have to add it's
++ * own special payload.  In that case we still return 1 here so that this
++ * special payload will be mapped.
++ */
++static inline unsigned short blk_rq_nr_phys_segments(struct request *rq)
 +{
-+	return NULL;
++	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
++		return 1;
++	return rq->nr_phys_segments;
 +}
-+static inline struct blk_integrity *blk_get_integrity(struct gendisk *disk)
++
++/*
++ * Number of discard segments (or ranges) the driver needs to fill in.
++ * Each discard bio merged into a request is counted as one segment.
++ */
++static inline unsigned short blk_rq_nr_discard_segments(struct request *rq)
 +{
-+	return NULL;
++	return max_t(unsigned short, rq->nr_phys_segments, 1);
 +}
-+static inline bool
-+blk_integrity_queue_supports_integrity(struct request_queue *q)
++
++int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
++		struct scatterlist *sglist, struct scatterlist **last_sg);
++static inline int blk_rq_map_sg(struct request_queue *q, struct request *rq,
++		struct scatterlist *sglist)
++{
++	struct scatterlist *last_sg = NULL;
++
++	return __blk_rq_map_sg(q, rq, sglist, &last_sg);
++}
++void blk_dump_rq_flags(struct request *, char *);
++
++#ifdef CONFIG_BLK_DEV_ZONED
++static inline unsigned int blk_rq_zone_no(struct request *rq)
++{
++	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
++}
++
++static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
++{
++	return blk_queue_zone_is_seq(rq->q, blk_rq_pos(rq));
++}
++
++bool blk_req_needs_zone_write_lock(struct request *rq);
++bool blk_req_zone_write_trylock(struct request *rq);
++void __blk_req_zone_write_lock(struct request *rq);
++void __blk_req_zone_write_unlock(struct request *rq);
++
++static inline void blk_req_zone_write_lock(struct request *rq)
++{
++	if (blk_req_needs_zone_write_lock(rq))
++		__blk_req_zone_write_lock(rq);
++}
++
++static inline void blk_req_zone_write_unlock(struct request *rq)
++{
++	if (rq->rq_flags & RQF_ZONE_WRITE_LOCKED)
++		__blk_req_zone_write_unlock(rq);
++}
++
++static inline bool blk_req_zone_is_write_locked(struct request *rq)
++{
++	return rq->q->seq_zones_wlock &&
++		test_bit(blk_rq_zone_no(rq), rq->q->seq_zones_wlock);
++}
++
++static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
++{
++	if (!blk_req_needs_zone_write_lock(rq))
++		return true;
++	return !blk_req_zone_is_write_locked(rq);
++}
++#else /* CONFIG_BLK_DEV_ZONED */
++static inline bool blk_req_needs_zone_write_lock(struct request *rq)
 +{
 +	return false;
 +}
-+static inline int blk_integrity_compare(struct gendisk *a, struct gendisk *b)
++
++static inline void blk_req_zone_write_lock(struct request *rq)
 +{
-+	return 0;
-+}
-+static inline void blk_integrity_register(struct gendisk *d,
-+					 struct blk_integrity *b)
-+{
-+}
-+static inline void blk_integrity_unregister(struct gendisk *d)
-+{
-+}
-+static inline void blk_queue_max_integrity_segments(struct request_queue *q,
-+						    unsigned int segs)
-+{
-+}
-+static inline unsigned short
-+queue_max_integrity_segments(const struct request_queue *q)
-+{
-+	return 0;
 +}
 +
-+static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
-+						   unsigned int sectors)
++static inline void blk_req_zone_write_unlock(struct request *rq)
 +{
-+	return 0;
++}
++static inline bool blk_req_zone_is_write_locked(struct request *rq)
++{
++	return false;
 +}
 +
-+static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
-+					       unsigned int sectors)
++static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
 +{
-+	return 0;
++	return true;
 +}
-+static inline int blk_integrity_rq(struct request *rq)
-+{
-+	return 0;
-+}
++#endif /* CONFIG_BLK_DEV_ZONED */
 +
-+static inline struct bio_vec *rq_integrity_vec(struct request *rq)
++#ifndef ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
++# error	"You should define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE for your platform"
+ #endif
++#if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
++void rq_flush_dcache_pages(struct request *rq);
++#else
++static inline void rq_flush_dcache_pages(struct request *rq)
 +{
-+	return NULL;
 +}
-+#endif /* CONFIG_BLK_DEV_INTEGRITY */
-+#endif /* _LINUX_BLK_INTEGRITY_H */
++#endif /* ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE */
++#endif /* BLK_MQ_H */
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index be622b5a21ed5..3b967053e9f5a 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -431,8 +431,6 @@ enum stat_group {
+ 
+ #define bio_op(bio) \
+ 	((bio)->bi_opf & REQ_OP_MASK)
+-#define req_op(req) \
+-	((req)->cmd_flags & REQ_OP_MASK)
+ 
+ /* obsolete, don't use in new code */
+ static inline void bio_set_op_attrs(struct bio *bio, unsigned op,
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index be534040ca9c3..56e60e5c09d07 100644
+index 56e60e5c09d07..0e960d74615ec 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -1555,189 +1555,6 @@ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned lo
- #define MODULE_ALIAS_BLOCKDEV_MAJOR(major) \
- 	MODULE_ALIAS("block-major-" __stringify(major) "-*")
+@@ -14,7 +14,6 @@
+ #include <linux/gfp.h>
+ #include <linux/rcupdate.h>
+ #include <linux/percpu-refcount.h>
+-#include <linux/scatterlist.h>
+ #include <linux/blkzoned.h>
+ #include <linux/sbitmap.h>
  
--#if defined(CONFIG_BLK_DEV_INTEGRITY)
+@@ -32,9 +31,6 @@ struct blk_queue_stats;
+ struct blk_stat_callback;
+ struct blk_keyslot_manager;
+ 
+-#define BLKDEV_MIN_RQ	4
+-#define BLKDEV_MAX_RQ	128	/* Default maximum */
 -
--enum blk_integrity_flags {
--	BLK_INTEGRITY_VERIFY		= 1 << 0,
--	BLK_INTEGRITY_GENERATE		= 1 << 1,
--	BLK_INTEGRITY_DEVICE_CAPABLE	= 1 << 2,
--	BLK_INTEGRITY_IP_CHECKSUM	= 1 << 3,
--};
+ /* Must be consistent with blk_mq_poll_stats_bkt() */
+ #define BLK_MQ_POLL_STATS_BKTS 16
+ 
+@@ -47,213 +43,12 @@ struct blk_keyslot_manager;
+  */
+ #define BLKCG_MAX_POLS		6
+ 
+-typedef void (rq_end_io_fn)(struct request *, blk_status_t);
 -
--struct blk_integrity_iter {
--	void			*prot_buf;
--	void			*data_buf;
--	sector_t		seed;
--	unsigned int		data_size;
--	unsigned short		interval;
--	const char		*disk_name;
--};
+-/*
+- * request flags */
+-typedef __u32 __bitwise req_flags_t;
 -
--typedef blk_status_t (integrity_processing_fn) (struct blk_integrity_iter *);
--typedef void (integrity_prepare_fn) (struct request *);
--typedef void (integrity_complete_fn) (struct request *, unsigned int);
+-/* drive already may have started this one */
+-#define RQF_STARTED		((__force req_flags_t)(1 << 1))
+-/* may not be passed by ioscheduler */
+-#define RQF_SOFTBARRIER		((__force req_flags_t)(1 << 3))
+-/* request for flush sequence */
+-#define RQF_FLUSH_SEQ		((__force req_flags_t)(1 << 4))
+-/* merge of different types, fail separately */
+-#define RQF_MIXED_MERGE		((__force req_flags_t)(1 << 5))
+-/* track inflight for MQ */
+-#define RQF_MQ_INFLIGHT		((__force req_flags_t)(1 << 6))
+-/* don't call prep for this one */
+-#define RQF_DONTPREP		((__force req_flags_t)(1 << 7))
+-/* vaguely specified driver internal error.  Ignored by the block layer */
+-#define RQF_FAILED		((__force req_flags_t)(1 << 10))
+-/* don't warn about errors */
+-#define RQF_QUIET		((__force req_flags_t)(1 << 11))
+-/* elevator private data attached */
+-#define RQF_ELVPRIV		((__force req_flags_t)(1 << 12))
+-/* account into disk and partition IO statistics */
+-#define RQF_IO_STAT		((__force req_flags_t)(1 << 13))
+-/* runtime pm request */
+-#define RQF_PM			((__force req_flags_t)(1 << 15))
+-/* on IO scheduler merge hash */
+-#define RQF_HASHED		((__force req_flags_t)(1 << 16))
+-/* track IO completion time */
+-#define RQF_STATS		((__force req_flags_t)(1 << 17))
+-/* Look at ->special_vec for the actual data payload instead of the
+-   bio chain. */
+-#define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
+-/* The per-zone write lock is held for this request */
+-#define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
+-/* already slept for hybrid poll */
+-#define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
+-/* ->timeout has been called, don't expire again */
+-#define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
 -
--struct blk_integrity_profile {
--	integrity_processing_fn		*generate_fn;
--	integrity_processing_fn		*verify_fn;
--	integrity_prepare_fn		*prepare_fn;
--	integrity_complete_fn		*complete_fn;
--	const char			*name;
--};
+-/* flags that prevent us from merging requests: */
+-#define RQF_NOMERGE_FLAGS \
+-	(RQF_STARTED | RQF_SOFTBARRIER | RQF_FLUSH_SEQ | RQF_SPECIAL_PAYLOAD)
 -
--extern void blk_integrity_register(struct gendisk *, struct blk_integrity *);
--extern void blk_integrity_unregister(struct gendisk *);
--extern int blk_integrity_compare(struct gendisk *, struct gendisk *);
--extern int blk_rq_map_integrity_sg(struct request_queue *, struct bio *,
--				   struct scatterlist *);
--extern int blk_rq_count_integrity_sg(struct request_queue *, struct bio *);
--
--static inline struct blk_integrity *blk_get_integrity(struct gendisk *disk)
--{
--	struct blk_integrity *bi = &disk->queue->integrity;
--
--	if (!bi->profile)
--		return NULL;
--
--	return bi;
--}
--
--static inline
--struct blk_integrity *bdev_get_integrity(struct block_device *bdev)
--{
--	return blk_get_integrity(bdev->bd_disk);
--}
--
--static inline bool
--blk_integrity_queue_supports_integrity(struct request_queue *q)
--{
--	return q->integrity.profile;
--}
--
--static inline bool blk_integrity_rq(struct request *rq)
--{
--	return rq->cmd_flags & REQ_INTEGRITY;
--}
--
--static inline void blk_queue_max_integrity_segments(struct request_queue *q,
--						    unsigned int segs)
--{
--	q->limits.max_integrity_segments = segs;
--}
--
--static inline unsigned short
--queue_max_integrity_segments(const struct request_queue *q)
--{
--	return q->limits.max_integrity_segments;
--}
--
--/**
-- * bio_integrity_intervals - Return number of integrity intervals for a bio
-- * @bi:		blk_integrity profile for device
-- * @sectors:	Size of the bio in 512-byte sectors
-- *
-- * Description: The block layer calculates everything in 512 byte
-- * sectors but integrity metadata is done in terms of the data integrity
-- * interval size of the storage device.  Convert the block layer sectors
-- * to the appropriate number of integrity intervals.
+-/*
+- * Request state for blk-mq.
 - */
--static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
--						   unsigned int sectors)
+-enum mq_rq_state {
+-	MQ_RQ_IDLE		= 0,
+-	MQ_RQ_IN_FLIGHT		= 1,
+-	MQ_RQ_COMPLETE		= 2,
+-};
+-
+-/*
+- * Try to put the fields that are referenced together in the same cacheline.
+- *
+- * If you modify this structure, make sure to update blk_rq_init() and
+- * especially blk_mq_rq_ctx_init() to take care of the added fields.
+- */
+-struct request {
+-	struct request_queue *q;
+-	struct blk_mq_ctx *mq_ctx;
+-	struct blk_mq_hw_ctx *mq_hctx;
+-
+-	unsigned int cmd_flags;		/* op and common flags */
+-	req_flags_t rq_flags;
+-
+-	int tag;
+-	int internal_tag;
+-
+-	/* the following two fields are internal, NEVER access directly */
+-	unsigned int __data_len;	/* total data len */
+-	sector_t __sector;		/* sector cursor */
+-
+-	struct bio *bio;
+-	struct bio *biotail;
+-
+-	struct list_head queuelist;
+-
+-	/*
+-	 * The hash is used inside the scheduler, and killed once the
+-	 * request reaches the dispatch list. The ipi_list is only used
+-	 * to queue the request for softirq completion, which is long
+-	 * after the request has been unhashed (and even removed from
+-	 * the dispatch list).
+-	 */
+-	union {
+-		struct hlist_node hash;	/* merge hash */
+-		struct llist_node ipi_list;
+-	};
+-
+-	/*
+-	 * The rb_node is only used inside the io scheduler, requests
+-	 * are pruned when moved to the dispatch queue. So let the
+-	 * completion_data share space with the rb_node.
+-	 */
+-	union {
+-		struct rb_node rb_node;	/* sort/lookup */
+-		struct bio_vec special_vec;
+-		void *completion_data;
+-		int error_count; /* for legacy drivers, don't use */
+-	};
+-
+-	/*
+-	 * Three pointers are available for the IO schedulers, if they need
+-	 * more they have to dynamically allocate it.  Flush requests are
+-	 * never put on the IO scheduler. So let the flush fields share
+-	 * space with the elevator data.
+-	 */
+-	union {
+-		struct {
+-			struct io_cq		*icq;
+-			void			*priv[2];
+-		} elv;
+-
+-		struct {
+-			unsigned int		seq;
+-			struct list_head	list;
+-			rq_end_io_fn		*saved_end_io;
+-		} flush;
+-	};
+-
+-	struct gendisk *rq_disk;
+-	struct block_device *part;
+-#ifdef CONFIG_BLK_RQ_ALLOC_TIME
+-	/* Time that the first bio started allocating this request. */
+-	u64 alloc_time_ns;
+-#endif
+-	/* Time that this request was allocated for this IO. */
+-	u64 start_time_ns;
+-	/* Time that I/O was submitted to the device. */
+-	u64 io_start_time_ns;
+-
+-#ifdef CONFIG_BLK_WBT
+-	unsigned short wbt_flags;
+-#endif
+-	/*
+-	 * rq sectors used for blk stats. It has the same value
+-	 * with blk_rq_sectors(rq), except that it never be zeroed
+-	 * by completion.
+-	 */
+-	unsigned short stats_sectors;
+-
+-	/*
+-	 * Number of scatter-gather DMA addr+len pairs after
+-	 * physical address coalescing is performed.
+-	 */
+-	unsigned short nr_phys_segments;
+-
+-#if defined(CONFIG_BLK_DEV_INTEGRITY)
+-	unsigned short nr_integrity_segments;
+-#endif
+-
+-#ifdef CONFIG_BLK_INLINE_ENCRYPTION
+-	struct bio_crypt_ctx *crypt_ctx;
+-	struct blk_ksm_keyslot *crypt_keyslot;
+-#endif
+-
+-	unsigned short write_hint;
+-	unsigned short ioprio;
+-
+-	enum mq_rq_state state;
+-	refcount_t ref;
+-
+-	unsigned int timeout;
+-	unsigned long deadline;
+-
+-	union {
+-		struct __call_single_data csd;
+-		u64 fifo_time;
+-	};
+-
+-	/*
+-	 * completion callback.
+-	 */
+-	rq_end_io_fn *end_io;
+-	void *end_io_data;
+-};
+-
+ static inline bool blk_op_is_passthrough(unsigned int op)
+ {
+ 	op &= REQ_OP_MASK;
+ 	return op == REQ_OP_DRV_IN || op == REQ_OP_DRV_OUT;
+ }
+ 
+-static inline bool blk_rq_is_passthrough(struct request *rq)
 -{
--	return sectors >> (bi->interval_exp - 9);
+-	return blk_op_is_passthrough(req_op(rq));
 -}
 -
--static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
--					       unsigned int sectors)
+-static inline unsigned short req_get_ioprio(struct request *req)
 -{
--	return bio_integrity_intervals(bi, sectors) * bi->tuple_size;
+-	return req->ioprio;
+-}
+-
+-struct bio_vec;
+-
+-enum blk_eh_timer_return {
+-	BLK_EH_DONE,		/* drivers has completed the command */
+-	BLK_EH_RESET_TIMER,	/* reset timer and try again */
+-};
+-
+-#define BLK_TAG_ALLOC_FIFO 0 /* allocate starting from 0 */
+-#define BLK_TAG_ALLOC_RR 1 /* allocate starting from last allocated tag */
+-
+ /*
+  * Zoned block device models (zoned limit).
+  *
+@@ -620,11 +415,6 @@ extern void blk_clear_pm_only(struct request_queue *q);
+ 
+ #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
+ 
+-#define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
+-
+-#define rq_dma_dir(rq) \
+-	(op_is_write(req_op(rq)) ? DMA_TO_DEVICE : DMA_FROM_DEVICE)
+-
+ #define dma_map_bvec(dev, bv, dir, attrs) \
+ 	dma_map_page_attrs(dev, (bv)->bv_page, (bv)->bv_offset, (bv)->bv_len, \
+ 	(dir), (attrs))
+@@ -740,11 +530,6 @@ static inline unsigned int queue_max_active_zones(const struct request_queue *q)
+ }
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+-static inline bool rq_is_sync(struct request *rq)
+-{
+-	return op_is_sync(rq->cmd_flags);
+-}
+-
+ static inline unsigned int blk_queue_depth(struct request_queue *q)
+ {
+ 	if (q->queue_depth)
+@@ -759,83 +544,20 @@ static inline unsigned int blk_queue_depth(struct request_queue *q)
+ #define BLK_DEFAULT_SG_TIMEOUT	(60 * HZ)
+ #define BLK_MIN_SG_TIMEOUT	(7 * HZ)
+ 
+-struct rq_map_data {
+-	struct page **pages;
+-	int page_order;
+-	int nr_entries;
+-	unsigned long offset;
+-	int null_mapped;
+-	int from_user;
+-};
+-
+-struct req_iterator {
+-	struct bvec_iter iter;
+-	struct bio *bio;
+-};
+-
+ /* This should not be used directly - use rq_for_each_segment */
+ #define for_each_bio(_bio)		\
+ 	for (; _bio; _bio = _bio->bi_next)
+-#define __rq_for_each_bio(_bio, rq)	\
+-	if ((rq->bio))			\
+-		for (_bio = (rq)->bio; _bio; _bio = _bio->bi_next)
+-
+-#define rq_for_each_segment(bvl, _rq, _iter)			\
+-	__rq_for_each_bio(_iter.bio, _rq)			\
+-		bio_for_each_segment(bvl, _iter.bio, _iter.iter)
+ 
+-#define rq_for_each_bvec(bvl, _rq, _iter)			\
+-	__rq_for_each_bio(_iter.bio, _rq)			\
+-		bio_for_each_bvec(bvl, _iter.bio, _iter.iter)
+-
+-#define rq_iter_last(bvec, _iter)				\
+-		(_iter.bio->bi_next == NULL &&			\
+-		 bio_iter_last(bvec, _iter.iter))
+-
+-#ifndef ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+-# error	"You should define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE for your platform"
+-#endif
+-#if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+-extern void rq_flush_dcache_pages(struct request *rq);
+-#else
+-static inline void rq_flush_dcache_pages(struct request *rq)
+-{
+-}
+-#endif
+ 
+ extern int blk_register_queue(struct gendisk *disk);
+ extern void blk_unregister_queue(struct gendisk *disk);
+ blk_qc_t submit_bio_noacct(struct bio *bio);
+-extern void blk_rq_init(struct request_queue *q, struct request *rq);
+-extern void blk_put_request(struct request *);
+-extern struct request *blk_get_request(struct request_queue *, unsigned int op,
+-				       blk_mq_req_flags_t flags);
++
+ extern int blk_lld_busy(struct request_queue *q);
+-extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+-			     struct bio_set *bs, gfp_t gfp_mask,
+-			     int (*bio_ctr)(struct bio *, struct bio *, void *),
+-			     void *data);
+-extern void blk_rq_unprep_clone(struct request *rq);
+-extern blk_status_t blk_insert_cloned_request(struct request_queue *q,
+-				     struct request *rq);
+-int blk_rq_append_bio(struct request *rq, struct bio *bio);
+ extern void blk_queue_split(struct bio **);
+ extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_sync_queue(struct request_queue *q);
+-extern int blk_rq_map_user(struct request_queue *, struct request *,
+-			   struct rq_map_data *, void __user *, unsigned long,
+-			   gfp_t);
+-extern int blk_rq_unmap_user(struct bio *);
+-extern int blk_rq_map_kern(struct request_queue *, struct request *, void *, unsigned int, gfp_t);
+-extern int blk_rq_map_user_iov(struct request_queue *, struct request *,
+-			       struct rq_map_data *, const struct iov_iter *,
+-			       gfp_t);
+-extern void blk_execute_rq_nowait(struct gendisk *,
+-				  struct request *, int, rq_end_io_fn *);
+-
+-blk_status_t blk_execute_rq(struct gendisk *bd_disk, struct request *rq,
+-			    int at_head);
+ 
+ /* Helper to convert REQ_OP_XXX to its string format XXX */
+ extern const char *blk_op_str(unsigned int op);
+@@ -867,47 +589,6 @@ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+ #define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+ #define SECTOR_MASK		(PAGE_SECTORS - 1)
+ 
+-/*
+- * blk_rq_pos()			: the current sector
+- * blk_rq_bytes()		: bytes left in the entire request
+- * blk_rq_cur_bytes()		: bytes left in the current segment
+- * blk_rq_err_bytes()		: bytes left till the next error boundary
+- * blk_rq_sectors()		: sectors left in the entire request
+- * blk_rq_cur_sectors()		: sectors left in the current segment
+- * blk_rq_stats_sectors()	: sectors of the entire request used for stats
+- */
+-static inline sector_t blk_rq_pos(const struct request *rq)
+-{
+-	return rq->__sector;
+-}
+-
+-static inline unsigned int blk_rq_bytes(const struct request *rq)
+-{
+-	return rq->__data_len;
+-}
+-
+-static inline int blk_rq_cur_bytes(const struct request *rq)
+-{
+-	return rq->bio ? bio_cur_bytes(rq->bio) : 0;
+-}
+-
+-extern unsigned int blk_rq_err_bytes(const struct request *rq);
+-
+-static inline unsigned int blk_rq_sectors(const struct request *rq)
+-{
+-	return blk_rq_bytes(rq) >> SECTOR_SHIFT;
+-}
+-
+-static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
+-{
+-	return blk_rq_cur_bytes(rq) >> SECTOR_SHIFT;
+-}
+-
+-static inline unsigned int blk_rq_stats_sectors(const struct request *rq)
+-{
+-	return rq->stats_sectors;
+-}
+-
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 
+ /* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */
+@@ -924,42 +605,8 @@ static inline unsigned int bio_zone_is_seq(struct bio *bio)
+ 	return blk_queue_zone_is_seq(bdev_get_queue(bio->bi_bdev),
+ 				     bio->bi_iter.bi_sector);
+ }
+-
+-static inline unsigned int blk_rq_zone_no(struct request *rq)
+-{
+-	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
+-}
+-
+-static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
+-{
+-	return blk_queue_zone_is_seq(rq->q, blk_rq_pos(rq));
+-}
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+-/*
+- * Some commands like WRITE SAME have a payload or data transfer size which
+- * is different from the size of the request.  Any driver that supports such
+- * commands using the RQF_SPECIAL_PAYLOAD flag needs to use this helper to
+- * calculate the data transfer size.
+- */
+-static inline unsigned int blk_rq_payload_bytes(struct request *rq)
+-{
+-	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+-		return rq->special_vec.bv_len;
+-	return blk_rq_bytes(rq);
 -}
 -
 -/*
-- * Return the first bvec that contains integrity data.  Only drivers that are
-- * limited to a single integrity segment should use this helper.
+- * Return the first full biovec in the request.  The caller needs to check that
+- * there are any bvecs before calling this helper.
 - */
--static inline struct bio_vec *rq_integrity_vec(struct request *rq)
+-static inline struct bio_vec req_bvec(struct request *rq)
 -{
--	if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
--		return NULL;
--	return rq->bio->bi_integrity->bip_vec;
+-	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+-		return rq->special_vec;
+-	return mp_bvec_iter_bvec(rq->bio->bi_io_vec, rq->bio->bi_iter);
 -}
 -
--#else /* CONFIG_BLK_DEV_INTEGRITY */
+ static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
+ 						     int op)
+ {
+@@ -999,30 +646,6 @@ static inline unsigned int blk_max_size_offset(struct request_queue *q,
+ 	return min(q->limits.max_sectors, chunk_sectors);
+ }
+ 
+-static inline unsigned int blk_rq_count_bios(struct request *rq)
+-{
+-	unsigned int nr_bios = 0;
+-	struct bio *bio;
 -
--struct bio;
--struct block_device;
--struct gendisk;
--struct blk_integrity;
+-	__rq_for_each_bio(bio, rq)
+-		nr_bios++;
 -
--static inline int blk_integrity_rq(struct request *rq)
--{
--	return 0;
+-	return nr_bios;
 -}
--static inline int blk_rq_count_integrity_sg(struct request_queue *q,
--					    struct bio *b)
+-
+-void blk_steal_bios(struct bio_list *list, struct request *rq);
+-
+-/*
+- * Request completion related functions.
+- *
+- * blk_update_request() completes given number of bytes and updates
+- * the request without completing it.
+- */
+-extern bool blk_update_request(struct request *rq, blk_status_t error,
+-			       unsigned int nr_bytes);
+-
+-extern void blk_abort_request(struct request *);
+-
+ /*
+  * Access functions for manipulating queue properties
+  */
+@@ -1081,42 +704,6 @@ extern void blk_queue_required_elevator_features(struct request_queue *q,
+ extern bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
+ 					      struct device *dev);
+ 
+-/*
+- * Number of physical segments as sent to the device.
+- *
+- * Normally this is the number of discontiguous data segments sent by the
+- * submitter.  But for data-less command like discard we might have no
+- * actual data segments submitted, but the driver might have to add it's
+- * own special payload.  In that case we still return 1 here so that this
+- * special payload will be mapped.
+- */
+-static inline unsigned short blk_rq_nr_phys_segments(struct request *rq)
 -{
--	return 0;
+-	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+-		return 1;
+-	return rq->nr_phys_segments;
 -}
--static inline int blk_rq_map_integrity_sg(struct request_queue *q,
--					  struct bio *b,
--					  struct scatterlist *s)
+-
+-/*
+- * Number of discard segments (or ranges) the driver needs to fill in.
+- * Each discard bio merged into a request is counted as one segment.
+- */
+-static inline unsigned short blk_rq_nr_discard_segments(struct request *rq)
 -{
--	return 0;
+-	return max_t(unsigned short, rq->nr_phys_segments, 1);
 -}
--static inline struct blk_integrity *bdev_get_integrity(struct block_device *b)
+-
+-int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
+-		struct scatterlist *sglist, struct scatterlist **last_sg);
+-static inline int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+-		struct scatterlist *sglist)
 -{
--	return NULL;
+-	struct scatterlist *last_sg = NULL;
+-
+-	return __blk_rq_map_sg(q, rq, sglist, &last_sg);
 -}
--static inline struct blk_integrity *blk_get_integrity(struct gendisk *disk)
+-extern void blk_dump_rq_flags(struct request *, char *);
+-
+ bool __must_check blk_get_queue(struct request_queue *);
+ extern void blk_put_queue(struct request_queue *);
+ extern void blk_set_queue_dying(struct request_queue *);
+@@ -1613,60 +1200,6 @@ extern int bdev_read_page(struct block_device *, sector_t, struct page *);
+ extern int bdev_write_page(struct block_device *, sector_t, struct page *,
+ 						struct writeback_control *);
+ 
+-#ifdef CONFIG_BLK_DEV_ZONED
+-bool blk_req_needs_zone_write_lock(struct request *rq);
+-bool blk_req_zone_write_trylock(struct request *rq);
+-void __blk_req_zone_write_lock(struct request *rq);
+-void __blk_req_zone_write_unlock(struct request *rq);
+-
+-static inline void blk_req_zone_write_lock(struct request *rq)
 -{
--	return NULL;
+-	if (blk_req_needs_zone_write_lock(rq))
+-		__blk_req_zone_write_lock(rq);
 -}
--static inline bool
--blk_integrity_queue_supports_integrity(struct request_queue *q)
+-
+-static inline void blk_req_zone_write_unlock(struct request *rq)
+-{
+-	if (rq->rq_flags & RQF_ZONE_WRITE_LOCKED)
+-		__blk_req_zone_write_unlock(rq);
+-}
+-
+-static inline bool blk_req_zone_is_write_locked(struct request *rq)
+-{
+-	return rq->q->seq_zones_wlock &&
+-		test_bit(blk_rq_zone_no(rq), rq->q->seq_zones_wlock);
+-}
+-
+-static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
+-{
+-	if (!blk_req_needs_zone_write_lock(rq))
+-		return true;
+-	return !blk_req_zone_is_write_locked(rq);
+-}
+-#else
+-static inline bool blk_req_needs_zone_write_lock(struct request *rq)
 -{
 -	return false;
 -}
--static inline int blk_integrity_compare(struct gendisk *a, struct gendisk *b)
+-
+-static inline void blk_req_zone_write_lock(struct request *rq)
 -{
--	return 0;
--}
--static inline void blk_integrity_register(struct gendisk *d,
--					 struct blk_integrity *b)
--{
--}
--static inline void blk_integrity_unregister(struct gendisk *d)
--{
--}
--static inline void blk_queue_max_integrity_segments(struct request_queue *q,
--						    unsigned int segs)
--{
--}
--static inline unsigned short queue_max_integrity_segments(const struct request_queue *q)
--{
--	return 0;
 -}
 -
--static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
--						   unsigned int sectors)
+-static inline void blk_req_zone_write_unlock(struct request *rq)
 -{
--	return 0;
+-}
+-static inline bool blk_req_zone_is_write_locked(struct request *rq)
+-{
+-	return false;
 -}
 -
--static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
--					       unsigned int sectors)
+-static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
 -{
--	return 0;
+-	return true;
 -}
+-#endif /* CONFIG_BLK_DEV_ZONED */
 -
--static inline struct bio_vec *rq_integrity_vec(struct request *rq)
--{
--	return NULL;
--}
--
--#endif /* CONFIG_BLK_DEV_INTEGRITY */
--
- #ifdef CONFIG_BLK_INLINE_ENCRYPTION
+ static inline void blk_wake_io_task(struct task_struct *waiter)
+ {
+ 	/*
+diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+index a083e15df6087..22501a293fa54 100644
+--- a/include/linux/blktrace_api.h
++++ b/include/linux/blktrace_api.h
+@@ -2,7 +2,7 @@
+ #ifndef BLKTRACE_H
+ #define BLKTRACE_H
  
- bool blk_ksm_register(struct blk_keyslot_manager *ksm, struct request_queue *q);
+-#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ #include <linux/relay.h>
+ #include <linux/compat.h>
+ #include <uapi/linux/blktrace_api.h>
+diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
+index 96305a64a5a7b..c635c2e014e3d 100644
+--- a/include/linux/t10-pi.h
++++ b/include/linux/t10-pi.h
+@@ -3,7 +3,7 @@
+ #define _LINUX_T10_PI_H
+ 
+ #include <linux/types.h>
+-#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ 
+ /*
+  * A T10 PI-capable target device can be formatted with different
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 09a17f6e93a79..76d9ee98f6c15 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -5,7 +5,7 @@
+ #include <linux/list.h>
+ #include <linux/spinlock.h>
+ #include <linux/workqueue.h>
+-#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ #include <scsi/scsi.h>
+ #include <linux/atomic.h>
+ #include <linux/sbitmap.h>
 -- 
 2.30.2
 
