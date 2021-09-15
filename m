@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B92C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 396C1C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:44:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB8DC61179
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:43:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B62961179
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:44:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231166AbhIOGoh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 02:44:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
+        id S231247AbhIOGpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 02:45:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbhIOGoh (ORCPT
+        with ESMTP id S229484AbhIOGpq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 02:44:37 -0400
+        Wed, 15 Sep 2021 02:45:46 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE47BC061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:43:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FC35C061574
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=6iFJ9Ub/lBsvA8/1D2iOLzrPt6g9dUL3ioEooa9DP8Y=; b=OFf77O31hHga6EVP/DjwUOn4oK
-        zHRL8fuJ0cPkukOk/kg2ZCQynGSKvkC0oz4mV77Gw+z69Gx0X4Z3ly1PmJhAt2NFiVbILkNFFZ/lu
-        IkZ5Ayi30PdpcdHQqQX9q+gyjn48nJ5mSqb+qC4wDaoSQQ4JmsW2xm5oFgriRruKfuG3bYAH+EfG6
-        QS4vl/YtFLElHGPZMeQId4Iq/5/Pp11FiCGASMkKlB9xKz+TYqGZjW9AxpzLGRwBpu9oaANXH8A1W
-        hhChQmWRxnWe/jPAwvJtMdc24OryJpgZvBsmNfvkCMgmpxWNCCiKWZEgOppiOcIu1boJHai9uzHIv
-        ALmYOq2g==;
+        bh=tnhpzZXm161/s6Z0/Ca61iqLk/E4L57vqHSRc5j3Q/Y=; b=RTpLbfRGX++Dt0iQfskmJDqoRB
+        3MP8mBc1fBvd/ZsgY2wC+Myi17FX5WHRtzo/pW8BWAmVp5VB2EOPTwPbTTKXUiKzNNZfJkb0siOUA
+        +U+L1V6QGWIqOa+HLyNmwas8cArjKjLM5lDf9ZTiDtu2fXPCt9sjBh1UDxJoDdgR4lcWbO/pzt4qr
+        tqBnM833+/dM3DU4chIwUWkRl6x4oJjJoEuXwQn+XP0b+9LY/gbRryQ4CW1Xq6Eyk6Aury5Mao67k
+        9hC4lUDURbIuv9PbaU5ERpV+uAe9GWzM9InrLVGW1heQZjX25p28D0yLIeuo83eBH2Dp37WODOSO7
+        09d/fLfQ==;
 Received: from [2001:4bb8:184:72db:8457:d7a:6e21:dd20] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQOct-00FQey-7g; Wed, 15 Sep 2021 06:42:43 +0000
+        id 1mQOda-00FQgW-4m; Wed, 15 Sep 2021 06:43:30 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 02/17] mm: don't include <linux/blk-cgroup.h> in <linux/backing-dev.h>
-Date:   Wed, 15 Sep 2021 08:40:29 +0200
-Message-Id: <20210915064044.950534-3-hch@lst.de>
+Subject: [PATCH 03/17] mm: don't include <linux/blkdev.h> in <linux/backing-dev.h>
+Date:   Wed, 15 Sep 2021 08:40:30 +0200
+Message-Id: <20210915064044.950534-4-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210915064044.950534-1-hch@lst.de>
 References: <20210915064044.950534-1-hch@lst.de>
@@ -52,165 +52,128 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to pull blk-cgroup.h and thus blkdev.h in here, so
-break the include chain.
+Move inode_to_bdi out of line to avoid having to include blkdev.h.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-iolatency.c       | 1 +
- block/blk-mq.c              | 1 +
- block/bounce.c              | 1 +
- fs/btrfs/compression.c      | 1 +
- fs/btrfs/ctree.c            | 1 +
- fs/f2fs/compress.c          | 1 +
- fs/orangefs/super.c         | 1 +
- fs/ramfs/inode.c            | 1 +
- include/linux/backing-dev.h | 3 ++-
- mm/backing-dev.c            | 3 ++-
- mm/swapfile.c               | 2 +-
- 11 files changed, 13 insertions(+), 3 deletions(-)
+ drivers/mtd/mtdsuper.c      |  1 +
+ fs/ntfs/file.c              |  1 +
+ fs/ntfs3/file.c             |  1 +
+ fs/orangefs/inode.c         |  2 +-
+ include/linux/backing-dev.h | 16 +---------------
+ mm/backing-dev.c            | 16 ++++++++++++++++
+ 6 files changed, 21 insertions(+), 16 deletions(-)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index c0545f9da549c..6593c7123b97e 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -74,6 +74,7 @@
- #include <linux/sched/signal.h>
- #include <trace/events/block.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-cgroup.h>
- #include "blk-rq-qos.h"
- #include "blk-stat.h"
- #include "blk.h"
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 108a352051be5..61264bff6103a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -16,6 +16,7 @@
+diff --git a/drivers/mtd/mtdsuper.c b/drivers/mtd/mtdsuper.c
+index 38b6aa849c638..5ff001140ef4a 100644
+--- a/drivers/mtd/mtdsuper.c
++++ b/drivers/mtd/mtdsuper.c
+@@ -15,6 +15,7 @@
  #include <linux/slab.h>
- #include <linux/workqueue.h>
- #include <linux/smp.h>
-+#include <linux/interrupt.h>
- #include <linux/llist.h>
- #include <linux/list_sort.h>
- #include <linux/cpu.h>
-diff --git a/block/bounce.c b/block/bounce.c
-index 05fc7148489d7..7af1a72835b99 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -14,6 +14,7 @@
- #include <linux/pagemap.h>
- #include <linux/mempool.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-cgroup.h>
+ #include <linux/major.h>
  #include <linux/backing-dev.h>
- #include <linux/init.h>
- #include <linux/hash.h>
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 7869ad12bc6e1..ddc4f5436cc91 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -9,6 +9,7 @@
- #include <linux/fs.h>
- #include <linux/pagemap.h>
- #include <linux/highmem.h>
-+#include <linux/kthread.h>
- #include <linux/time.h>
- #include <linux/init.h>
- #include <linux/string.h>
-diff --git a/fs/btrfs/ctree.c b/fs/btrfs/ctree.c
-index 84627cbd5b5b5..66290b214f2bc 100644
---- a/fs/btrfs/ctree.c
-+++ b/fs/btrfs/ctree.c
-@@ -7,6 +7,7 @@
- #include <linux/slab.h>
- #include <linux/rbtree.h>
- #include <linux/mm.h>
-+#include <linux/error-injection.h>
- #include "ctree.h"
- #include "disk-io.h"
- #include "transaction.h"
-diff --git a/fs/f2fs/compress.c b/fs/f2fs/compress.c
-index c1bf9ad4c2207..20a083dc90423 100644
---- a/fs/f2fs/compress.c
-+++ b/fs/f2fs/compress.c
-@@ -7,6 +7,7 @@
- 
- #include <linux/fs.h>
- #include <linux/f2fs_fs.h>
-+#include <linux/moduleparam.h>
- #include <linux/writeback.h>
- #include <linux/backing-dev.h>
- #include <linux/lzo.h>
-diff --git a/fs/orangefs/super.c b/fs/orangefs/super.c
-index 2f2e430461b21..8bb0a53a658b0 100644
---- a/fs/orangefs/super.c
-+++ b/fs/orangefs/super.c
-@@ -11,6 +11,7 @@
- 
- #include <linux/parser.h>
- #include <linux/hashtable.h>
-+#include <linux/seq_file.h>
- 
- /* a cache for orangefs-inode objects (i.e. orangefs inode private data) */
- static struct kmem_cache *orangefs_inode_cache;
-diff --git a/fs/ramfs/inode.c b/fs/ramfs/inode.c
-index 65e7e56005b8f..e2302342a67f4 100644
---- a/fs/ramfs/inode.c
-+++ b/fs/ramfs/inode.c
-@@ -38,6 +38,7 @@
- #include <linux/uaccess.h>
++#include <linux/blkdev.h>
  #include <linux/fs_context.h>
- #include <linux/fs_parser.h>
-+#include <linux/seq_file.h>
- #include "internal.h"
+ #include "mtdcore.h"
  
- struct ramfs_mount_opts {
+diff --git a/fs/ntfs/file.c b/fs/ntfs/file.c
+index ab4f3362466d0..373dbb6276570 100644
+--- a/fs/ntfs/file.c
++++ b/fs/ntfs/file.c
+@@ -5,6 +5,7 @@
+  * Copyright (c) 2001-2015 Anton Altaparmakov and Tuxera Inc.
+  */
+ 
++#include <linux/blkdev.h>
+ #include <linux/backing-dev.h>
+ #include <linux/buffer_head.h>
+ #include <linux/gfp.h>
+diff --git a/fs/ntfs3/file.c b/fs/ntfs3/file.c
+index 424450e77ad52..7592ba8944572 100644
+--- a/fs/ntfs3/file.c
++++ b/fs/ntfs3/file.c
+@@ -8,6 +8,7 @@
+  */
+ 
+ #include <linux/backing-dev.h>
++#include <linux/blkdev.h>
+ #include <linux/buffer_head.h>
+ #include <linux/compat.h>
+ #include <linux/falloc.h>
+diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
+index c1bb4c4b5d672..e5e3e500ed462 100644
+--- a/fs/orangefs/inode.c
++++ b/fs/orangefs/inode.c
+@@ -10,7 +10,7 @@
+  *  Linux VFS inode operations.
+  */
+ 
+-#include <linux/bvec.h>
++#include <linux/blkdev.h>
+ #include <linux/fileattr.h>
+ #include "protocol.h"
+ #include "orangefs-kernel.h"
 diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index ac7f231b88258..843bf4be675f3 100644
+index 843bf4be675f3..4ac7ce0960139 100644
 --- a/include/linux/backing-dev.h
 +++ b/include/linux/backing-dev.h
-@@ -15,10 +15,11 @@
- #include <linux/blkdev.h>
+@@ -12,7 +12,6 @@
+ #include <linux/kernel.h>
+ #include <linux/fs.h>
+ #include <linux/sched.h>
+-#include <linux/blkdev.h>
  #include <linux/device.h>
  #include <linux/writeback.h>
--#include <linux/blk-cgroup.h>
  #include <linux/backing-dev-defs.h>
- #include <linux/slab.h>
+@@ -134,20 +133,7 @@ static inline bool writeback_in_progress(struct bdi_writeback *wb)
+ 	return test_bit(WB_writeback_running, &wb->state);
+ }
  
-+struct blkcg;
-+
- static inline struct backing_dev_info *bdi_get(struct backing_dev_info *bdi)
+-static inline struct backing_dev_info *inode_to_bdi(struct inode *inode)
+-{
+-	struct super_block *sb;
+-
+-	if (!inode)
+-		return &noop_backing_dev_info;
+-
+-	sb = inode->i_sb;
+-#ifdef CONFIG_BLOCK
+-	if (sb_is_blkdev_sb(sb))
+-		return I_BDEV(inode)->bd_disk->bdi;
+-#endif
+-	return sb->s_bdi;
+-}
++struct backing_dev_info *inode_to_bdi(struct inode *inode);
+ 
+ static inline int wb_congested(struct bdi_writeback *wb, int cong_bits)
  {
- 	kref_get(&bdi->refcnt);
 diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 4a9d4e27d0d9b..5245744437dc9 100644
+index 5245744437dc9..c878d995af06e 100644
 --- a/mm/backing-dev.c
 +++ b/mm/backing-dev.c
-@@ -2,8 +2,9 @@
+@@ -978,6 +978,22 @@ void bdi_put(struct backing_dev_info *bdi)
+ }
+ EXPORT_SYMBOL(bdi_put);
  
- #include <linux/wait.h>
- #include <linux/rbtree.h>
--#include <linux/backing-dev.h>
- #include <linux/kthread.h>
-+#include <linux/backing-dev.h>
-+#include <linux/blk-cgroup.h>
- #include <linux/freezer.h>
- #include <linux/fs.h>
- #include <linux/pagemap.h>
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 22d10f7138487..30db362749c06 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -18,7 +18,7 @@
- #include <linux/pagemap.h>
- #include <linux/namei.h>
- #include <linux/shmem_fs.h>
--#include <linux/blkdev.h>
-+#include <linux/blk-cgroup.h>
- #include <linux/random.h>
- #include <linux/writeback.h>
- #include <linux/proc_fs.h>
++struct backing_dev_info *inode_to_bdi(struct inode *inode)
++{
++	struct super_block *sb;
++
++	if (!inode)
++		return &noop_backing_dev_info;
++
++	sb = inode->i_sb;
++#ifdef CONFIG_BLOCK
++	if (sb_is_blkdev_sb(sb))
++		return I_BDEV(inode)->bd_disk->bdi;
++#endif
++	return sb->s_bdi;
++}
++EXPORT_SYMBOL(inode_to_bdi);
++
+ const char *bdi_dev_name(struct backing_dev_info *bdi)
+ {
+ 	if (!bdi || !bdi->dev)
 -- 
 2.30.2
 
