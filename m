@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3265AC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6314AC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:48:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 128D76103C
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:47:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B88A6103C
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:48:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236401AbhIOGs2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 02:48:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37636 "EHLO
+        id S236508AbhIOGtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 02:49:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236368AbhIOGs2 (ORCPT
+        with ESMTP id S236600AbhIOGtL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 02:48:28 -0400
+        Wed, 15 Sep 2021 02:49:11 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F70C061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:47:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6FCC061575
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:47:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=bQi9ZQFdXjVwKH+MQOYPxGMUArFPwRgqU+pxtXHUe3w=; b=lKJdsERpKwEPGGcS1e+GTv+LP1
-        3PkpwLqK+C3srzFVIY27nTi1RrkwGz833lWWm5KhZ99Nrc/QPpK6nZ3rM54IzZABOYVh7PeT4xfQ1
-        0+lE1Mq8daqDWNQm+IvTtO1LXcFJiC86OSxxurskUHVKZDpj84hU8so2U9XLS4wZYS7OiaofJz+oU
-        sZn3P++0oP094aS3UId2qcx+3o5esbq0W2XmyFInz3PlVJa13DNu/5+R22lPvtHrdBr/DFoiGaquU
-        aJs4EE0HEhtAVZcYRUwvczyqQ2R630g8Q1FoSCEfP4mMlIcTicVI5x/MAU6/9ioqluiy6R4a5Ckfh
-        bI35tTeQ==;
+        bh=hOWn0oOcbtNVNaQYWHu1z+Xns4EP79rgG66Uf+o3nAw=; b=jsVZHK5kK22e577HJPpFpefeg2
+        HWvfWnb2AXRXrYP9LkkEgdoqgdy+zOt7fp9I+C3Bp9EhdUd0amEv5mFzET5SP0BGgyvxnn8PeGEVU
+        aH21iqhFYuokiSVd+0F0G6Y36Vfr9nqfKmXkAJFwNpqqdjm2FBVzzXd8HmGh5hlkhFqA7GxaMYaYy
+        S1OmbUKFYBTwdhi2PAo3CKDAmgkCA56JWDgbu4ggTs8KEjnUdZLU1FiqNj4bzJQhZZJ3inouXqefV
+        g5qScxDngNITCLDwm/J+l/oJEXS7QSWZ+/qHBKXe7lCjOahE7RK3ZSxY8GaG3mkjzryQMepcJ7qQW
+        TKoJRatg==;
 Received: from [2001:4bb8:184:72db:8457:d7a:6e21:dd20] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQOgc-00FQpU-Q4; Wed, 15 Sep 2021 06:46:40 +0000
+        id 1mQOhJ-00FQtK-7g; Wed, 15 Sep 2021 06:47:19 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 07/17] sched: move the <linux/blkdev.h> include out of kernel/sched/sched.h
-Date:   Wed, 15 Sep 2021 08:40:34 +0200
-Message-Id: <20210915064044.950534-8-hch@lst.de>
+Subject: [PATCH 08/17] block: remove the unused rq_end_sector macro
+Date:   Wed, 15 Sep 2021 08:40:35 +0200
+Message-Id: <20210915064044.950534-9-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210915064044.950534-1-hch@lst.de>
 References: <20210915064044.950534-1-hch@lst.de>
@@ -52,39 +52,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Only core.c needs blkdev.h, so move the #include statement there.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- kernel/sched/core.c  | 2 +-
- kernel/sched/sched.h | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ drivers/md/dm-rq.c       | 1 -
+ include/linux/elevator.h | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 1bba4128a3e68..92ef7b68198c4 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -13,7 +13,7 @@
- #include "sched.h"
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 5b95eea517d1b..79974bb0d250f 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -7,7 +7,6 @@
+ #include "dm-core.h"
+ #include "dm-rq.h"
  
- #include <linux/nospec.h>
--
-+#include <linux/blkdev.h>
- #include <linux/kcov.h>
- #include <linux/scs.h>
+-#include <linux/elevator.h> /* for rq_end_sector() */
+ #include <linux/blk-mq.h>
  
-diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
-index 3d3e5793e1172..66128dfc05fb3 100644
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -37,7 +37,6 @@
+ #define DM_MSG_PREFIX "core-rq"
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index ef9ceead3db13..80633f3b600c2 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -162,7 +162,6 @@ extern struct request *elv_rb_find(struct rb_root *, sector_t);
+ #define ELEVATOR_INSERT_FLUSH	5
+ #define ELEVATOR_INSERT_SORT_MERGE	6
  
- #include <linux/binfmts.h>
- #include <linux/bitops.h>
--#include <linux/blkdev.h>
- #include <linux/compat.h>
- #include <linux/context_tracking.h>
- #include <linux/cpufreq.h>
+-#define rq_end_sector(rq)	(blk_rq_pos(rq) + blk_rq_sectors(rq))
+ #define rb_entry_rq(node)	rb_entry((node), struct request, rb_node)
+ 
+ #define rq_entry_fifo(ptr)	list_entry((ptr), struct request, queuelist)
 -- 
 2.30.2
 
