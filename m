@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5DBC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6C6C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:54:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 762D861108
-	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F37F61108
+	for <linux-block@archiver.kernel.org>; Wed, 15 Sep 2021 06:54:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236368AbhIOGy4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 02:54:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39144 "EHLO
+        id S236445AbhIOGzh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 02:55:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236356AbhIOGyz (ORCPT
+        with ESMTP id S236408AbhIOGzg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 02:54:55 -0400
+        Wed, 15 Sep 2021 02:55:36 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073B4C061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:53:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B99C061574
+        for <linux-block@vger.kernel.org>; Tue, 14 Sep 2021 23:54:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=YbeZICAAM8lxxV7BX9xMNPzlMaue/p38Pno8WnpHlUM=; b=T5wNp9SeMjdsYmbjeexIg5tyLi
-        GTf9g6B1a2IHzTa1QqfmN0ot7LGeyRojGFbpp4mDNYrp2xt0dbY+Z9SeXEMassE+daJfkkx6g4OBx
-        pJ1lNWwyvE8q9DKWFF5mX564bdhoSZ4wZ3X/4JmV/czqE0kdiBELJh3e9cmqbNOp3rF8IsEJJCFEt
-        kmbMFLc4jfpC2jfHs4WB3kTo6H6cQb8AXMIp/Q+q/ZVzxQhIZY0sEFxkTNqz5TbnjekoGLVqSieXL
-        ZavSV5+wbWodG+0imtkOIvxFCDxN5bGs+w1zh+cZPCaWHxW4h5qPnBnj56UpvSChknpvdYHoEz59u
-        bjAQRo5A==;
+        bh=dvl3IjP320WN7jFGcMqxo0ahrbl9XkG2F+fcMYXSPVI=; b=wMzMiHgsIEMgANvUG6kOLY96Vd
+        uj3jS0oPLGU96T/OZBVZK+QlA/CUF1+efeW1LmbKCHSsDO0msM13L0P1BlQBnGDiJtseL0s1bX3Qn
+        hHiQF4uwq5qgXit3bPO/RaIvpptyX+CpskoR7x3UiKyr0+1u70ICoMM+JwJ4zNq32KoV7GDxrlG/K
+        CMrNKkKtYVTLp64+E+JvL7FdlOfZCO+M0itG2bWz4BnT/avkyxQGB+tFEJ7c6sOxRaEG8xpBf3iwl
+        hM9AddNb0ei6RdQzTlk6WFgb3P/G6cBeCvOH9aywMIlkZVQtHRq3wLWwPC2olfde/TJEV0tYbrC9f
+        ep+rfLJQ==;
 Received: from [2001:4bb8:184:72db:8457:d7a:6e21:dd20] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mQOmh-00FRA2-Cq; Wed, 15 Sep 2021 06:52:57 +0000
+        id 1mQOnY-00FRBn-Jd; Wed, 15 Sep 2021 06:53:53 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 14/17] block: drop unused includes in <linux/genhd.h>
-Date:   Wed, 15 Sep 2021 08:40:41 +0200
-Message-Id: <20210915064044.950534-15-hch@lst.de>
+Subject: [PATCH 15/17] block: move a few merge helpers out of <linux/blkdev.h>
+Date:   Wed, 15 Sep 2021 08:40:42 +0200
+Message-Id: <20210915064044.950534-16-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210915064044.950534-1-hch@lst.de>
 References: <20210915064044.950534-1-hch@lst.de>
@@ -52,255 +52,196 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Drop various include not actually used in genhd.h itself, and
-move the remaning includes closer together.
+These are lock-layer internal helper, so move them to block/blk.h and
+block/blk-mergec.  Also update a comment a bit to use better grammar.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- arch/um/drivers/ubd_kern.c      |  1 +
- block/genhd.c                   |  1 +
- block/holder.c                  |  1 +
- block/partitions/core.c         |  1 +
- drivers/block/amiflop.c         |  1 +
- drivers/block/ataflop.c         |  1 +
- drivers/block/floppy.c          |  1 +
- drivers/block/swim.c            |  1 +
- drivers/block/xen-blkfront.c    |  1 +
- drivers/md/md.c                 |  1 +
- drivers/s390/block/dasd_genhd.c |  1 +
- drivers/scsi/sd.c               |  1 +
- drivers/scsi/sg.c               |  1 +
- drivers/scsi/sr.c               |  1 +
- drivers/scsi/st.c               |  1 +
- include/linux/genhd.h           | 14 ++------------
- include/linux/part_stat.h       |  1 +
- 17 files changed, 18 insertions(+), 12 deletions(-)
+ block/blk-merge.c      | 24 ++++++++++++++++
+ block/blk.h            | 38 +++++++++++++++++++++++++
+ include/linux/blkdev.h | 64 ------------------------------------------
+ 3 files changed, 62 insertions(+), 64 deletions(-)
 
-diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
-index cd9dc0556e913..4352ef3ea7e04 100644
---- a/arch/um/drivers/ubd_kern.c
-+++ b/arch/um/drivers/ubd_kern.c
-@@ -27,6 +27,7 @@
- #include <linux/blk-mq.h>
- #include <linux/ata.h>
- #include <linux/hdreg.h>
-+#include <linux/kernel.h>
- #include <linux/cdrom.h>
- #include <linux/proc_fs.h>
- #include <linux/seq_file.h>
-diff --git a/block/genhd.c b/block/genhd.c
-index 7b6e5e1cf9564..5e8aa0ab66c2a 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -19,6 +19,7 @@
- #include <linux/seq_file.h>
- #include <linux/slab.h>
- #include <linux/kmod.h>
-+#include <linux/major.h>
- #include <linux/mutex.h>
- #include <linux/idr.h>
- #include <linux/log2.h>
-diff --git a/block/holder.c b/block/holder.c
-index 9dc084182337f..27cddce1b4461 100644
---- a/block/holder.c
-+++ b/block/holder.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include <linux/genhd.h>
-+#include <linux/slab.h>
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 7a5c81c02c800..39f210da399a6 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -558,6 +558,23 @@ static inline unsigned int blk_rq_get_max_segments(struct request *rq)
+ 	return queue_max_segments(rq->q);
+ }
  
- struct bd_holder_disk {
- 	struct list_head	list;
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 58c4c362c94f9..3a4898433c434 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -5,6 +5,7 @@
-  * Copyright (C) 2020 Christoph Hellwig
-  */
- #include <linux/fs.h>
-+#include <linux/major.h>
- #include <linux/slab.h>
- #include <linux/ctype.h>
- #include <linux/genhd.h>
-diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
-index b892e5185d6fa..2909fd9e72fb8 100644
---- a/drivers/block/amiflop.c
-+++ b/drivers/block/amiflop.c
-@@ -61,6 +61,7 @@
- #include <linux/hdreg.h>
- #include <linux/delay.h>
- #include <linux/init.h>
-+#include <linux/major.h>
- #include <linux/mutex.h>
- #include <linux/fs.h>
- #include <linux/blk-mq.h>
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index a093644ac39fb..58e921ab57298 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -68,6 +68,7 @@
- #include <linux/delay.h>
- #include <linux/init.h>
- #include <linux/blk-mq.h>
-+#include <linux/major.h>
- #include <linux/mutex.h>
- #include <linux/completion.h>
- #include <linux/wait.h>
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index fef79ea52e3ed..6288ce8884147 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -184,6 +184,7 @@ static int print_unex = 1;
- #include <linux/ioport.h>
- #include <linux/interrupt.h>
- #include <linux/init.h>
-+#include <linux/major.h>
- #include <linux/platform_device.h>
- #include <linux/mod_devicetable.h>
- #include <linux/mutex.h>
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 7ccc8d2a41bc6..3911d0833e1b9 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -16,6 +16,7 @@
- #include <linux/fd.h>
- #include <linux/slab.h>
- #include <linux/blk-mq.h>
-+#include <linux/major.h>
- #include <linux/mutex.h>
- #include <linux/hdreg.h>
- #include <linux/kernel.h>
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 72902104f1112..df0deb9277601 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -42,6 +42,7 @@
- #include <linux/cdrom.h>
- #include <linux/module.h>
- #include <linux/slab.h>
-+#include <linux/major.h>
- #include <linux/mutex.h>
- #include <linux/scatterlist.h>
- #include <linux/bitmap.h>
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index ae8fe54ea3581..0c7018462eaee 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -51,6 +51,7 @@
- #include <linux/hdreg.h>
- #include <linux/proc_fs.h>
- #include <linux/random.h>
-+#include <linux/major.h>
- #include <linux/module.h>
- #include <linux/reboot.h>
- #include <linux/file.h>
-diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
-index fa966e0db6ca9..3a6f3af240fa7 100644
---- a/drivers/s390/block/dasd_genhd.c
-+++ b/drivers/s390/block/dasd_genhd.c
-@@ -14,6 +14,7 @@
- #define KMSG_COMPONENT "dasd"
++static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
++						  sector_t offset)
++{
++	struct request_queue *q = rq->q;
++
++	if (blk_rq_is_passthrough(rq))
++		return q->limits.max_hw_sectors;
++
++	if (!q->limits.chunk_sectors ||
++	    req_op(rq) == REQ_OP_DISCARD ||
++	    req_op(rq) == REQ_OP_SECURE_ERASE)
++		return blk_queue_get_max_sectors(q, req_op(rq));
++
++	return min(blk_max_size_offset(q, offset, 0),
++			blk_queue_get_max_sectors(q, req_op(rq)));
++}
++
+ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
+ 		unsigned int nr_phys_segs)
+ {
+@@ -718,6 +735,13 @@ static enum elv_merge blk_try_req_merge(struct request *req,
+ 	return ELEVATOR_NO_MERGE;
+ }
  
- #include <linux/interrupt.h>
-+#include <linux/major.h>
- #include <linux/fs.h>
- #include <linux/blkpg.h>
- 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index cbd9999f93a6b..a18ae0950c491 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -48,6 +48,7 @@
- #include <linux/blkpg.h>
- #include <linux/blk-pm.h>
- #include <linux/delay.h>
-+#include <linux/major.h>
- #include <linux/mutex.h>
- #include <linux/string_helpers.h>
- #include <linux/async.h>
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 8f05248920e8e..3c98f08dc25d9 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -31,6 +31,7 @@ static int sg_version_num = 30536;	/* 2 digits for each component */
- #include <linux/errno.h>
- #include <linux/mtio.h>
- #include <linux/ioctl.h>
-+#include <linux/major.h>
- #include <linux/slab.h>
- #include <linux/fcntl.h>
- #include <linux/init.h>
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 8b17b35283aa5..115f7ef7a5def 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -44,6 +44,7 @@
- #include <linux/cdrom.h>
- #include <linux/interrupt.h>
- #include <linux/init.h>
-+#include <linux/major.h>
- #include <linux/blkdev.h>
- #include <linux/blk-pm.h>
- #include <linux/mutex.h>
-diff --git a/drivers/scsi/st.c b/drivers/scsi/st.c
-index 9d04929f03a10..8cc02f5264ba7 100644
---- a/drivers/scsi/st.c
-+++ b/drivers/scsi/st.c
-@@ -32,6 +32,7 @@ static const char *verstr = "20160209";
- #include <linux/slab.h>
- #include <linux/errno.h>
- #include <linux/mtio.h>
-+#include <linux/major.h>
- #include <linux/cdrom.h>
- #include <linux/ioctl.h>
- #include <linux/fcntl.h>
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index c68d83c87f83f..c1639c16b74c3 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -12,12 +12,10 @@
- 
- #include <linux/types.h>
- #include <linux/kdev_t.h>
--#include <linux/rcupdate.h>
--#include <linux/slab.h>
--#include <linux/percpu-refcount.h>
- #include <linux/uuid.h>
- #include <linux/blk_types.h>
--#include <asm/local.h>
-+#include <linux/device.h>
-+#include <linux/xarray.h>
- 
- extern const struct device_type disk_type;
- extern struct device_type part_type;
-@@ -26,14 +24,6 @@ extern struct class block_class;
- #define DISK_MAX_PARTS			256
- #define DISK_NAME_LEN			32
- 
--#include <linux/major.h>
--#include <linux/device.h>
--#include <linux/smp.h>
--#include <linux/string.h>
--#include <linux/fs.h>
--#include <linux/workqueue.h>
--#include <linux/xarray.h>
--
- #define PARTITION_META_INFO_VOLNAMELTH	64
++static inline bool blk_write_same_mergeable(struct bio *a, struct bio *b)
++{
++	if (bio_page(a) == bio_page(b) && bio_offset(a) == bio_offset(b))
++		return true;
++	return false;
++}
++
  /*
-  * Enough for the string representation of any kind of UUID plus NULL.
-diff --git a/include/linux/part_stat.h b/include/linux/part_stat.h
-index d2558121d48c0..6f7949b2fd8dc 100644
---- a/include/linux/part_stat.h
-+++ b/include/linux/part_stat.h
-@@ -3,6 +3,7 @@
- #define _LINUX_PART_STAT_H
+  * For non-mq, this has to be called with the request spinlock acquired.
+  * For mq with scheduling, the appropriate queue wide lock should be held.
+diff --git a/block/blk.h b/block/blk.h
+index 82ab26add08df..deb8393e34eec 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -94,6 +94,44 @@ static inline bool bvec_gap_to_prev(struct request_queue *q,
+ 	return __bvec_gap_to_prev(q, bprv, offset);
+ }
  
- #include <linux/genhd.h>
-+#include <asm/local.h>
++static inline bool rq_mergeable(struct request *rq)
++{
++	if (blk_rq_is_passthrough(rq))
++		return false;
++
++	if (req_op(rq) == REQ_OP_FLUSH)
++		return false;
++
++	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
++		return false;
++
++	if (req_op(rq) == REQ_OP_ZONE_APPEND)
++		return false;
++
++	if (rq->cmd_flags & REQ_NOMERGE_FLAGS)
++		return false;
++	if (rq->rq_flags & RQF_NOMERGE_FLAGS)
++		return false;
++
++	return true;
++}
++
++/*
++ * There are two different ways to handle DISCARD merges:
++ *  1) If max_discard_segments > 1, the driver treats every bio as a range and
++ *     send the bios to controller together. The ranges don't need to be
++ *     contiguous.
++ *  2) Otherwise, the request will be normal read/write requests.  The ranges
++ *     need to be contiguous.
++ */
++static inline bool blk_discard_mergable(struct request *req)
++{
++	if (req_op(req) == REQ_OP_DISCARD &&
++	    queue_max_discard_segments(req->q) > 1)
++		return true;
++	return false;
++}
++
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+ void blk_flush_integrity(void);
+ bool __bio_integrity_endio(struct bio *);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 46a703394f7f4..be534040ca9c3 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -745,37 +745,6 @@ static inline bool rq_is_sync(struct request *rq)
+ 	return op_is_sync(rq->cmd_flags);
+ }
  
- struct disk_stats {
- 	u64 nsecs[NR_STAT_GROUPS];
+-static inline bool rq_mergeable(struct request *rq)
+-{
+-	if (blk_rq_is_passthrough(rq))
+-		return false;
+-
+-	if (req_op(rq) == REQ_OP_FLUSH)
+-		return false;
+-
+-	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
+-		return false;
+-
+-	if (req_op(rq) == REQ_OP_ZONE_APPEND)
+-		return false;
+-
+-	if (rq->cmd_flags & REQ_NOMERGE_FLAGS)
+-		return false;
+-	if (rq->rq_flags & RQF_NOMERGE_FLAGS)
+-		return false;
+-
+-	return true;
+-}
+-
+-static inline bool blk_write_same_mergeable(struct bio *a, struct bio *b)
+-{
+-	if (bio_page(a) == bio_page(b) &&
+-	    bio_offset(a) == bio_offset(b))
+-		return true;
+-
+-	return false;
+-}
+-
+ static inline unsigned int blk_queue_depth(struct request_queue *q)
+ {
+ 	if (q->queue_depth)
+@@ -1030,23 +999,6 @@ static inline unsigned int blk_max_size_offset(struct request_queue *q,
+ 	return min(q->limits.max_sectors, chunk_sectors);
+ }
+ 
+-static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
+-						  sector_t offset)
+-{
+-	struct request_queue *q = rq->q;
+-
+-	if (blk_rq_is_passthrough(rq))
+-		return q->limits.max_hw_sectors;
+-
+-	if (!q->limits.chunk_sectors ||
+-	    req_op(rq) == REQ_OP_DISCARD ||
+-	    req_op(rq) == REQ_OP_SECURE_ERASE)
+-		return blk_queue_get_max_sectors(q, req_op(rq));
+-
+-	return min(blk_max_size_offset(q, offset, 0),
+-			blk_queue_get_max_sectors(q, req_op(rq)));
+-}
+-
+ static inline unsigned int blk_rq_count_bios(struct request *rq)
+ {
+ 	unsigned int nr_bios = 0;
+@@ -1490,22 +1442,6 @@ static inline int queue_limit_discard_alignment(struct queue_limits *lim, sector
+ 	return offset << SECTOR_SHIFT;
+ }
+ 
+-/*
+- * Two cases of handling DISCARD merge:
+- * If max_discard_segments > 1, the driver takes every bio
+- * as a range and send them to controller together. The ranges
+- * needn't to be contiguous.
+- * Otherwise, the bios/requests will be handled as same as
+- * others which should be contiguous.
+- */
+-static inline bool blk_discard_mergable(struct request *req)
+-{
+-	if (req_op(req) == REQ_OP_DISCARD &&
+-	    queue_max_discard_segments(req->q) > 1)
+-		return true;
+-	return false;
+-}
+-
+ static inline int bdev_discard_alignment(struct block_device *bdev)
+ {
+ 	struct request_queue *q = bdev_get_queue(bdev);
 -- 
 2.30.2
 
