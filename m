@@ -2,106 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F07F1C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 01:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE4BC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 02:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C39FD611C6
-	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 01:57:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDD9C60F4A
+	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 02:17:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232171AbhIPB6h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Sep 2021 21:58:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbhIPB6h (ORCPT
+        id S233744AbhIPCSk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Sep 2021 22:18:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38627 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231674AbhIPCSj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Sep 2021 21:58:37 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70710C061574
-        for <linux-block@vger.kernel.org>; Wed, 15 Sep 2021 18:57:17 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id j18so5947709ioj.8
-        for <linux-block@vger.kernel.org>; Wed, 15 Sep 2021 18:57:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=mbZDMGQjWpQ+gxbToWOCapJIyG5E9b9I4gWLDQXaSQA=;
-        b=JhUmQ4qpr71CUyqIum+7DaxlPLov7NxANsSmoi6jPs2721+yQpvfZpWePAE92uampN
-         VOz/vnQnFTPThIaRq0BupUgGLTBvR9sKazT0ZGvnvkWxAmHIga3dtZXp0BRQ2MQEp4nD
-         rEX8uNA657MLpGN/Lg0QmY6mGT52twQP7tPTbNCdz0UdGJ58M+NxuJQRQT5kvtMnPwpE
-         No2ENhHzIYw4aKrtgRrzQqTsriGR/i16KXh4g2TXQfRxrwypLOpMyW1YrMUBiZqQo1lO
-         Z4Rkjomudq4vw8vmAUt/Akaj6BCxMShUH1YoFgpOE7jUIoa42E2qf8gYLwV2DojZjBwQ
-         FH/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mbZDMGQjWpQ+gxbToWOCapJIyG5E9b9I4gWLDQXaSQA=;
-        b=2ONQ/qajeUTTV2+EsES/TQTsFeKqavriatrRze/+PLTtf3X34ZAz4dxCVeHXR6fAyN
-         N3rnAN+XU1ZhNCwxB4mQ4tuvrR4qCZGHHjS61SaflJaYvrlwIq2VUjnQuTFeZ/oU4WJ7
-         bJ+LcmNeQd4bKsytNFMqJN+rPxqm/NKJ7NZG4YNXWAdy3YT30umPAoWSWHdyGrcVhRXz
-         CvOZGSG+ATbNG3vuNyau69gyM4ZaI1psVwEUP9cL8muDTFekK3GsjxEvh6tIVoTG9M7r
-         10wiqtI2gzH/R+OsSDlbAYWqRa6wTNZ2hy+ZiGctILKapd2itLnatba6oPdUAAb3xo8d
-         7vdw==
-X-Gm-Message-State: AOAM533p+/GrmyqGQOmkQgyLQ63q1oTbp8fzKfRzzpkX8BR3Hhoq3Br1
-        VOGRyZbCv3G/0zYQpCFMXXH0Skz69/wsZg==
-X-Google-Smtp-Source: ABdhPJzccFBO/elMLEvUj3TYgjS8IjeqV+Kzd/3EObDYV4dExu3FvWjSFe71Id0jzFvrJW3BzgEL3Q==
-X-Received: by 2002:a5e:c70c:: with SMTP id f12mr2443793iop.166.1631757436676;
-        Wed, 15 Sep 2021 18:57:16 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id i14sm950663ilc.51.2021.09.15.18.57.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Sep 2021 18:57:16 -0700 (PDT)
-Subject: Re: [PATCH] null_blk: poll queue support
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <baca710d-0f2a-16e2-60bd-b105b854e0ae@kernel.dk>
- <1a63be84-3024-722b-232b-90f606a2addd@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1002cd58-63b6-453a-93c0-774928690e5f@kernel.dk>
-Date:   Wed, 15 Sep 2021 19:57:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 15 Sep 2021 22:18:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631758639;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y/iLmkx3P2+W+8y8LQZyQBtm9zHR79tI+Ag4NekFlLU=;
+        b=KQpSr+L2o52bGsHldQExSIl7mp1kN7kz4v1Hd5pYLWR5D7RnEe3uINIaIDeIG8fq4lASSr
+        KxJV9FjLd2eyW6Md+j92yc6s5F8MUcGxGjuzLUcILd0g7uNUAvT1W2vHk57bx6argBXgFB
+        ZvFBs2f/PIwLw+h8qtiayecwoFz5k8w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-520-mTQKEqP-P0eYO9NWWd_9RQ-1; Wed, 15 Sep 2021 22:17:16 -0400
+X-MC-Unique: mTQKEqP-P0eYO9NWWd_9RQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6288B1084688;
+        Thu, 16 Sep 2021 02:17:15 +0000 (UTC)
+Received: from T590 (ovpn-12-163.pek2.redhat.com [10.72.12.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DBE0B18EC5;
+        Thu, 16 Sep 2021 02:17:06 +0000 (UTC)
+Date:   Thu, 16 Sep 2021 10:17:18 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        John Garry <john.garry@huawei.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Wen Xiong <wenxiong@us.ibm.com>,
+        James Smart <james.smart@broadcom.com>
+Subject: Re: [PATCH V7 3/3] blk-mq: don't deactivate hctx if managed irq
+ isn't used
+Message-ID: <YUKpLmOPM1BNN5lF@T590>
+References: <20210818144428.896216-1-ming.lei@redhat.com>
+ <20210818144428.896216-4-ming.lei@redhat.com>
+ <20210915161459.ks3pbqceuj5x3ugu@carbon.lan>
 MIME-Version: 1.0
-In-Reply-To: <1a63be84-3024-722b-232b-90f606a2addd@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210915161459.ks3pbqceuj5x3ugu@carbon.lan>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/14/21 3:38 PM, Pavel Begunkov wrote:
-> On 4/17/21 4:29 PM, Jens Axboe wrote:
->> There's currently no way to experiment with polled IO with null_blk,
->> which seems like an oversight. This patch adds support for polled IO.
->> We keep a list of issued IOs on submit, and then process that list
->> when mq_ops->poll() is invoked.
+On Wed, Sep 15, 2021 at 06:14:59PM +0200, Daniel Wagner wrote:
+> On Wed, Aug 18, 2021 at 10:44:28PM +0800, Ming Lei wrote:
+> >  struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+> >  	unsigned int op, blk_mq_req_flags_t flags, unsigned int hctx_idx)
+> >  {
+> > @@ -468,7 +485,10 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+> >  	data.hctx = q->queue_hw_ctx[hctx_idx];
+> >  	if (!blk_mq_hw_queue_mapped(data.hctx))
+> >  		goto out_queue_exit;
+> > -	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
+> > +
+> > +	WARN_ON_ONCE(blk_mq_hctx_use_managed_irq(data.hctx));
+> > +
+> > +	cpu = blk_mq_first_mapped_cpu(data.hctx);
+> >  	data.ctx = __blk_mq_get_ctx(q, cpu);
 > 
-> That would be pretty useful to have.
+> I was pondering how we could address the issue that the qla2xxx driver
+> is using managed IRQs which makes nvme-fc depending as class on managed
+> IRQ.
 > 
-> to fold in:
+> blk_mq_alloc_request_hctx() is the only place where we really need to
+> distinguish between managed and !managed IRQs. As far I undertand the
+> situation, if all CPUs for a hctx are going offline, the driver wont use
+> this context. So there is only the case we end up in this code path is
+> when the driver tries to reconnect the queues, e.g. after
+> devloss. Couldn't we in this case not just return an error and go into
+> error recovery? Something like this:
 > 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 5914fed8fa56..eb5cfe189e90 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1508,7 +1508,7 @@ static int null_poll(struct blk_mq_hw_ctx *hctx)
->  		cmd = blk_mq_rq_to_pdu(req);
->  		cmd->error = null_process_cmd(cmd, req_op(req), blk_rq_pos(req),
->  						blk_rq_sectors(req));
-> -		nullb_complete_cmd(cmd);
-> +		end_cmd(cmd);
->  		nr++;
->  	}
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index a2db50886a26..52fc8592c72e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -486,9 +486,13 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+>         if (!blk_mq_hw_queue_mapped(data.hctx))
+>                 goto out_queue_exit;
+>  
+> -       WARN_ON_ONCE(blk_mq_hctx_use_managed_irq(data.hctx));
+> -
+> -       cpu = blk_mq_first_mapped_cpu(data.hctx);
+> +       if (blk_mq_hctx_use_managed_irq(data.hctx)) {
 
-Let's try again with that...
+Firstly, even with patches of 'qla2xxx - add nvme map_queues support',
+the knowledge if managed irq is used in nvmef LLD is still missed, so
+blk_mq_hctx_use_managed_irq() may always return false, but that
+shouldn't be hard to solve.
 
--- 
-Jens Axboe
+The problem is that we still should make connect io queue completed
+when all CPUs of this hctx is offline in case of managed irq.
+
+One solution might be to use io polling for connecting io queue, but nvme fc
+doesn't support polling, all the other nvme hosts do support it.
+
+
+
+Thanks,
+Ming
 
