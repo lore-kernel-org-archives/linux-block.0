@@ -2,143 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D93C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 08:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB4BCC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 08:47:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E05760F93
-	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 08:23:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 960D96120C
+	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 08:47:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235076AbhIPIZC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Sep 2021 04:25:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49312 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234904AbhIPIZB (ORCPT
+        id S235186AbhIPIsm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Sep 2021 04:48:42 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:15424 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235249AbhIPIsj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Sep 2021 04:25:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631780621;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2gYTVUstSGum8vCgM4ToltbBv2THH4KeZDSf5iCyLvY=;
-        b=JUxM/kBoAJCalOozO5d+OAnytsfe71chzX7PRZxE+dJE5a+Nqj9j9bKRPGMxEeIWzdTvBL
-        PrCY8Ef+Nx6V4Ohrw62jofe67OI6tqcF/R/QeBPim3pJkTaz34mE1cWq88ryauBfveZFqR
-        0KD0jTajXCHI6iJFkRAqSzZhDtY9HwI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-538-TUBi5zIKMy-P7na6kgC6Ug-1; Thu, 16 Sep 2021 04:23:40 -0400
-X-MC-Unique: TUBi5zIKMy-P7na6kgC6Ug-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08DCF835DE2;
-        Thu, 16 Sep 2021 08:23:39 +0000 (UTC)
-Received: from T590 (ovpn-12-89.pek2.redhat.com [10.72.12.89])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0635C6D982;
-        Thu, 16 Sep 2021 08:23:28 +0000 (UTC)
-Date:   Thu, 16 Sep 2021 16:23:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     pkalever@redhat.com
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org, josef@toxicpanda.com, axboe@kernel.dk,
-        idryomov@redhat.com, xiubli@redhat.com,
-        Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-Subject: Re: [PATCH v1 2/2] nbd: reset the queue/io_timeout to default on
- disconnect
-Message-ID: <YUL/DGZiUnQQGHVX@T590>
-References: <20210806142914.70556-1-pkalever@redhat.com>
- <20210806142914.70556-3-pkalever@redhat.com>
+        Thu, 16 Sep 2021 04:48:39 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4H99b11KqXzRFwZ;
+        Thu, 16 Sep 2021 16:43:09 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Thu, 16 Sep 2021 16:47:09 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Thu, 16 Sep 2021 16:47:09 +0800
+Subject: Re: [PATCH v7 6/6] nbd: fix uaf in nbd_handle_reply()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@infradead.org>,
+        <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20210915092010.2087371-1-yukuai3@huawei.com>
+ <20210915092010.2087371-7-yukuai3@huawei.com> <YUL6gJhaNy58Il3v@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <cb03c008-432e-2b4c-c675-ea2e8f9105dd@huawei.com>
+Date:   Thu, 16 Sep 2021 16:47:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210806142914.70556-3-pkalever@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <YUL6gJhaNy58Il3v@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 06, 2021 at 07:59:14PM +0530, pkalever@redhat.com wrote:
-> From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+On 2021/09/16 16:04, Ming Lei wrote:
+> On Wed, Sep 15, 2021 at 05:20:10PM +0800, Yu Kuai wrote:
+>> There is a problem that nbd_handle_reply() might access freed request:
+>>
+>> 1) At first, a normal io is submitted and completed with scheduler:
+>>
+>> internel_tag = blk_mq_get_tag -> get tag from sched_tags
+>>   blk_mq_rq_ctx_init
+>>    sched_tags->rq[internel_tag] = sched_tag->static_rq[internel_tag]
+>> ...
+>> blk_mq_get_driver_tag
+>>   __blk_mq_get_driver_tag -> get tag from tags
+>>   tags->rq[tag] = sched_tag->static_rq[internel_tag]
+>>
+>> So, both tags->rq[tag] and sched_tags->rq[internel_tag] are pointing
+>> to the request: sched_tags->static_rq[internal_tag]. Even if the
+>> io is finished.
+>>
+>> 2) nbd server send a reply with random tag directly:
+>>
+>> recv_work
+>>   nbd_handle_reply
+>>    blk_mq_tag_to_rq(tags, tag)
+>>     rq = tags->rq[tag]
+>>
+>> 3) if the sched_tags->static_rq is freed:
+>>
+>> blk_mq_sched_free_requests
+>>   blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i)
+>>    -> step 2) access rq before clearing rq mapping
+>>    blk_mq_clear_rq_mapping(set, tags, hctx_idx);
+>>    __free_pages() -> rq is freed here
+>>
+>> 4) Then, nbd continue to use the freed request in nbd_handle_reply
+>>
+>> Fix the problem by get 'q_usage_counter' before blk_mq_tag_to_rq(),
+>> thus request is ensured not to be freed because 'q_usage_counter' is
+>> not zero.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   drivers/block/nbd.c | 18 ++++++++++++++++++
+>>   1 file changed, 18 insertions(+)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index 9a7bbf8ebe74..3e8b70b5d4f9 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -824,6 +824,7 @@ static void recv_work(struct work_struct *work)
+>>   						     work);
+>>   	struct nbd_device *nbd = args->nbd;
+>>   	struct nbd_config *config = nbd->config;
+>> +	struct request_queue *q = nbd->disk->queue;
+>>   	struct nbd_sock *nsock;
+>>   	struct nbd_cmd *cmd;
+>>   	struct request *rq;
+>> @@ -834,7 +835,24 @@ static void recv_work(struct work_struct *work)
+>>   		if (nbd_read_reply(nbd, args->index, &reply))
+>>   			break;
+>>   
+>> +		/*
+>> +		 * Grab ref of q_usage_counter can prevent request being freed
+>> +		 * during nbd_handle_reply(). If q_usage_counter is zero, then
+>> +		 * no request is inflight, which means something is wrong since
+>> +		 * we expect to find a request to complete here.
+>> +		 */
 > 
-> Without any changes to NBD_ATTR_TIMEOUT (default is 30 secs),
-> $ rbd-nbd map rbd-pool/image0 --try-netlink
-> /dev/nbd0
-> $ cat /sys/block/nbd0/queue/io_timeout
-> 30000
-> $ rbd-nbd unmap /dev/nbd0
-> $ cat /sys/block/nbd0/queue/io_timeout
-> 30000
-> 
-> Now user sets NBD_ATTR_TIMEOUT to 60,
-> $ rbd-nbd map rbd-pool/image0 --try-netlink --io-timeout 60
-> /dev/nbd0
-> $ cat /sys/block/nbd0/queue/io_timeout
-> 60000
-> $ rbd-nbd unmap /dev/nbd0
-> $ cat /sys/block/nbd0/queue/io_timeout
-> 60000
-> 
-> Now user doesn't alter NBD_ATTR_TIMEOUT, but sysfs still shows it as 60,
-> $ rbd-nbd map rbd-pool/image0 --try-netlink
-> /dev/nbd0
-> $ cat /sys/block/nbd0/queue/io_timeout
-> 60000
-> $ rbd-nbd unmap /dev/nbd0
-> $ cat /sys/block/nbd0/queue/io_timeout
-> 60000
-> 
-> The problem exists with ioctl interface too.
-> 
-> Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-> ---
->  drivers/block/nbd.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 16a1a14b1fd1..a45aabc4914b 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -158,6 +158,7 @@ static void nbd_connect_reply(struct genl_info *info, int index);
->  static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info);
->  static void nbd_dead_link_work(struct work_struct *work);
->  static void nbd_disconnect_and_put(struct nbd_device *nbd);
-> +static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout);
->  
->  static inline struct device *nbd_to_dev(struct nbd_device *nbd)
->  {
-> @@ -1250,7 +1251,7 @@ static void nbd_config_put(struct nbd_device *nbd)
->  			destroy_workqueue(nbd->recv_workq);
->  		nbd->recv_workq = NULL;
->  
-> -		nbd->tag_set.timeout = 0;
-> +		nbd_set_cmd_timeout(nbd, 0);
->  		nbd->disk->queue->limits.discard_granularity = 0;
->  		nbd->disk->queue->limits.discard_alignment = 0;
->  		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
-> @@ -2124,6 +2125,10 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
->  	if (ret)
->  		goto out;
->  
-> +	/*
-> +	 * On reconfigure, if NBD_ATTR_TIMEOUT is not provided, we will
-> +	 * continue to use the cmd timeout provided with connect initially.
-> +	 */
->  	if (info->attrs[NBD_ATTR_TIMEOUT])
->  		nbd_set_cmd_timeout(nbd,
->  				    nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]));
-> -- 
-> 2.31.1
-> 
+> The above comment is wrong, the purpose is simply for avoiding request
+> pool freed, such as elevator switching won't happen once
+> ->q_usage_counter is grabbed. So no any request UAF can be triggered
+> when calling into nbd_handle_reply().
 
-Looks fine:
+Do you mean the comment about q_usage_counter is zero is wrong ?
+> 
+>> +		if (!percpu_ref_tryget(&q->q_usage_counter)) {
+>> +			dev_err(disk_to_dev(nbd->disk), "%s: no io inflight\n",
+>> +				__func__);
+>> +			break;
+>> +		}
+>> +
+>>   		cmd = nbd_handle_reply(nbd, args->index, &reply);
+>> +		/*
+>> +		 * It's safe to drop ref before request completion, inflight
+>> +		 * request will ensure q_usage_counter won't be zero.
+>> +		 */
+> 
+> The above comment is useless actually.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Will remove the comments.
 
--- 
-Ming
-
+Thanks,
+Kuai
+> 
