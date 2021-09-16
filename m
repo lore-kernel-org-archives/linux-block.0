@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0643FC28CA8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F097C28CAC
 	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 23:41:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBA5661244
-	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 23:41:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36D276108F
+	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 23:41:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241733AbhIPXmi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Sep 2021 19:42:38 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:40604 "EHLO
+        id S241804AbhIPXml (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Sep 2021 19:42:41 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:40650 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241404AbhIPXmc (ORCPT
+        with ESMTP id S241589AbhIPXmf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Sep 2021 19:42:32 -0400
+        Thu, 16 Sep 2021 19:42:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=DL8FuIfLp21l4Cv1YPFXNkjOJmlPVLg2ptxTU5EjJLs=; b=iiwN1ZRE02Rz08NIjhtt5Qi8Bg
-        TqQndz0v6FvvKtpnsaw7xX4AiGV8e+RJ8TJnBrZJOAvrLPklc5SJGydVRak4Meh06AyoE/hgX5w7Q
-        +3EAc652569dtBXXobJRdr1gZC+kO6GYVTKxe8019Mv+lp+WGTIxjBCov7EMWOaNthacaHtBgr81x
-        SJ/OPz2XJR0TMK7ArzgeIAHJ/TE6MKUXwGrohkFYFo9/+pdrxbSu1h2LDuNWpYF98snwijjWqyP/1
-        8JrOg7jidaApL4PobNWYNuxlqD+K5iLwUkCiem0dSFje8XRUMZmfe6fHvXxexeQJaOiEMqb3XHjD5
-        N0LoLscw==;
+        bh=UZWdSRypms7IYS+cRNewb5j8DUKgue0ixiEYd+ytkK0=; b=dI2wFqH8itmU9Tb2ks13oW9X74
+        svf6rjiYbYDxHBosN1+8ljTsntt82C0W1U5Cgg4/t4ktnpOhVBukqvw9QbsacRFM0ACfLyevXpOPs
+        H9kCyu7DUbkTBSoPvsxGJFeQ+89ib7rLeymZ8i71ou2lsH8c0GchHPEMQA2UHIkeCUmD/Tz6LWP5O
+        i9ciwsDTh4QRDAE9a5uvYvPcFjkgLhn8XMILmCaeLBQ4bkb9Z93KeRZTN/fEZsxefmbf8kGtweSHj
+        v15/uDCUTRDwjieYZBzOwyGJcUkhrsa1/meVzmj1xeK0nJ44LWqEKQRM2wmZ5In9GopkB4Uw/al1m
+        43LnBXQQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mR10A-0008I1-Ov; Thu, 16 Sep 2021 17:41:11 -0600
+        id 1mR10C-0008I1-QS; Thu, 16 Sep 2021 17:41:13 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mR106-000Vri-1x; Thu, 16 Sep 2021 17:41:06 -0600
+        id 1mR105-000VrS-BF; Thu, 16 Sep 2021 17:41:05 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -61,8 +61,8 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 16 Sep 2021 17:40:56 -0600
-Message-Id: <20210916234100.122368-17-logang@deltatee.com>
+Date:   Thu, 16 Sep 2021 17:40:52 -0600
+Message-Id: <20210916234100.122368-13-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210916234100.122368-1-logang@deltatee.com>
 References: <20210916234100.122368-1-logang@deltatee.com>
@@ -71,49 +71,214 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v3 16/20] block: set FOLL_PCI_P2PDMA in __bio_iov_iter_get_pages()
+Subject: [PATCH v3 12/20] RDMA/rw: use dma_map_sgtable()
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a bio's queue supports PCI P2PDMA, set FOLL_PCI_P2PDMA for
-iov_iter_get_pages_flags(). This allows PCI P2PDMA pages to be passed
-from userspace and enables the O_DIRECT path in iomap based filesystems
-and direct to block devices.
+dma_map_sg() now supports the use of P2PDMA pages so pci_p2pdma_map_sg()
+is no longer necessary and may be dropped.
+
+Switch to the dma_map_sgtable() interface which will allow for better
+error reporting if the P2PDMA pages are unsupported.
+
+The change to sgtable also appears to fix a couple subtle error path
+bugs:
+
+  - In rdma_rw_ctx_init(), dma_unmap would be called with an sg
+    that could have been incremented from the original call, as
+    well as an nents that was not the original number of nents
+    called when mapped.
+  - Similarly in rdma_rw_ctx_signature_init, both sg and prot_sg
+    were unmapped with the incorrect number of nents.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/bio.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/infiniband/core/rw.c | 75 +++++++++++++++---------------------
+ include/rdma/ib_verbs.h      | 19 +++++++++
+ 2 files changed, 51 insertions(+), 43 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 5df3dd282e40..2436e83fe3b4 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1088,6 +1088,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
- 	bool same_page = false;
-+	unsigned int flags = 0;
- 	ssize_t size, left;
- 	unsigned len, i;
- 	size_t offset;
-@@ -1100,7 +1101,12 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
- 	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+diff --git a/drivers/infiniband/core/rw.c b/drivers/infiniband/core/rw.c
+index 5221cce65675..1bdb56380764 100644
+--- a/drivers/infiniband/core/rw.c
++++ b/drivers/infiniband/core/rw.c
+@@ -273,26 +273,6 @@ static int rdma_rw_init_single_wr(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ 	return 1;
+ }
  
--	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
-+	if (bio->bi_bdev && bio->bi_bdev->bd_disk &&
-+	    blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
-+		flags |= FOLL_PCI_P2PDMA;
+-static void rdma_rw_unmap_sg(struct ib_device *dev, struct scatterlist *sg,
+-			     u32 sg_cnt, enum dma_data_direction dir)
+-{
+-	if (is_pci_p2pdma_page(sg_page(sg)))
+-		pci_p2pdma_unmap_sg(dev->dma_device, sg, sg_cnt, dir);
+-	else
+-		ib_dma_unmap_sg(dev, sg, sg_cnt, dir);
+-}
+-
+-static int rdma_rw_map_sg(struct ib_device *dev, struct scatterlist *sg,
+-			  u32 sg_cnt, enum dma_data_direction dir)
+-{
+-	if (is_pci_p2pdma_page(sg_page(sg))) {
+-		if (WARN_ON_ONCE(ib_uses_virt_dma(dev)))
+-			return 0;
+-		return pci_p2pdma_map_sg(dev->dma_device, sg, sg_cnt, dir);
+-	}
+-	return ib_dma_map_sg(dev, sg, sg_cnt, dir);
+-}
+-
+ /**
+  * rdma_rw_ctx_init - initialize a RDMA READ/WRITE context
+  * @ctx:	context to initialize
+@@ -313,12 +293,16 @@ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u32 port_num,
+ 		u64 remote_addr, u32 rkey, enum dma_data_direction dir)
+ {
+ 	struct ib_device *dev = qp->pd->device;
++	struct sg_table sgt = {
++		.sgl = sg,
++		.orig_nents = sg_cnt,
++	};
+ 	int ret;
+ 
+-	ret = rdma_rw_map_sg(dev, sg, sg_cnt, dir);
+-	if (!ret)
+-		return -ENOMEM;
+-	sg_cnt = ret;
++	ret = ib_dma_map_sgtable(dev, &sgt, dir, 0);
++	if (ret)
++		return ret;
++	sg_cnt = sgt.nents;
+ 
+ 	/*
+ 	 * Skip to the S/G entry that sg_offset falls into:
+@@ -354,7 +338,7 @@ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u32 port_num,
+ 	return ret;
+ 
+ out_unmap_sg:
+-	rdma_rw_unmap_sg(dev, sg, sg_cnt, dir);
++	ib_dma_unmap_sgtable(dev, &sgt, dir, 0);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(rdma_rw_ctx_init);
+@@ -387,6 +371,14 @@ int rdma_rw_ctx_signature_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ 						    qp->integrity_en);
+ 	struct ib_rdma_wr *rdma_wr;
+ 	int count = 0, ret;
++	struct sg_table sgt = {
++		.sgl = sg,
++		.orig_nents = sg_cnt,
++	};
++	struct sg_table prot_sgt = {
++		.sgl = prot_sg,
++		.orig_nents = prot_sg_cnt,
++	};
+ 
+ 	if (sg_cnt > pages_per_mr || prot_sg_cnt > pages_per_mr) {
+ 		pr_err("SG count too large: sg_cnt=%u, prot_sg_cnt=%u, pages_per_mr=%u\n",
+@@ -394,18 +386,14 @@ int rdma_rw_ctx_signature_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ 		return -EINVAL;
+ 	}
+ 
+-	ret = rdma_rw_map_sg(dev, sg, sg_cnt, dir);
+-	if (!ret)
+-		return -ENOMEM;
+-	sg_cnt = ret;
++	ret = ib_dma_map_sgtable(dev, &sgt, dir, 0);
++	if (ret)
++		return ret;
+ 
+ 	if (prot_sg_cnt) {
+-		ret = rdma_rw_map_sg(dev, prot_sg, prot_sg_cnt, dir);
+-		if (!ret) {
+-			ret = -ENOMEM;
++		ret = ib_dma_map_sgtable(dev, &prot_sgt, dir, 0);
++		if (ret)
+ 			goto out_unmap_sg;
+-		}
+-		prot_sg_cnt = ret;
+ 	}
+ 
+ 	ctx->type = RDMA_RW_SIG_MR;
+@@ -426,10 +414,11 @@ int rdma_rw_ctx_signature_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ 
+ 	memcpy(ctx->reg->mr->sig_attrs, sig_attrs, sizeof(struct ib_sig_attrs));
+ 
+-	ret = ib_map_mr_sg_pi(ctx->reg->mr, sg, sg_cnt, NULL, prot_sg,
+-			      prot_sg_cnt, NULL, SZ_4K);
++	ret = ib_map_mr_sg_pi(ctx->reg->mr, sg, sgt.nents, NULL, prot_sg,
++			      prot_sgt.nents, NULL, SZ_4K);
+ 	if (unlikely(ret)) {
+-		pr_err("failed to map PI sg (%u)\n", sg_cnt + prot_sg_cnt);
++		pr_err("failed to map PI sg (%u)\n",
++		       sgt.nents + prot_sgt.nents);
+ 		goto out_destroy_sig_mr;
+ 	}
+ 
+@@ -468,10 +457,10 @@ int rdma_rw_ctx_signature_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ out_free_ctx:
+ 	kfree(ctx->reg);
+ out_unmap_prot_sg:
+-	if (prot_sg_cnt)
+-		rdma_rw_unmap_sg(dev, prot_sg, prot_sg_cnt, dir);
++	if (prot_sgt.nents)
++		ib_dma_unmap_sgtable(dev, &prot_sgt, dir, 0);
+ out_unmap_sg:
+-	rdma_rw_unmap_sg(dev, sg, sg_cnt, dir);
++	ib_dma_unmap_sgtable(dev, &sgt, dir, 0);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(rdma_rw_ctx_signature_init);
+@@ -604,7 +593,7 @@ void rdma_rw_ctx_destroy(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ 		break;
+ 	}
+ 
+-	rdma_rw_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
++	ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
+ }
+ EXPORT_SYMBOL(rdma_rw_ctx_destroy);
+ 
+@@ -632,8 +621,8 @@ void rdma_rw_ctx_destroy_signature(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ 	kfree(ctx->reg);
+ 
+ 	if (prot_sg_cnt)
+-		rdma_rw_unmap_sg(qp->pd->device, prot_sg, prot_sg_cnt, dir);
+-	rdma_rw_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
++		ib_dma_unmap_sg(qp->pd->device, prot_sg, prot_sg_cnt, dir);
++	ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
+ }
+ EXPORT_SYMBOL(rdma_rw_ctx_destroy_signature);
+ 
+diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
+index 2b71c9ca2186..d04f07ab4d1a 100644
+--- a/include/rdma/ib_verbs.h
++++ b/include/rdma/ib_verbs.h
+@@ -4096,6 +4096,25 @@ static inline void ib_dma_unmap_sg_attrs(struct ib_device *dev,
+ 				   dma_attrs);
+ }
+ 
++static inline int ib_dma_map_sgtable(struct ib_device *dev,
++				     struct sg_table *sgt,
++				     enum dma_data_direction direction,
++				     unsigned long dma_attrs)
++{
++	if (ib_uses_virt_dma(dev))
++		return ib_dma_virt_map_sg(dev, sgt->sgl, sgt->orig_nents);
++	return dma_map_sgtable(dev->dma_device, sgt, direction, dma_attrs);
++}
 +
-+	size = iov_iter_get_pages_flags(iter, pages, LONG_MAX, nr_pages,
-+					&offset, flags);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
- 
++static inline void ib_dma_unmap_sgtable(struct ib_device *dev,
++					struct sg_table *sgt,
++					enum dma_data_direction direction,
++					unsigned long dma_attrs)
++{
++	if (!ib_uses_virt_dma(dev))
++		dma_unmap_sgtable(dev->dma_device, sgt, direction, dma_attrs);
++}
++
+ /**
+  * ib_dma_map_sgtable_attrs - Map a scatter/gather table to DMA addresses
+  * @dev: The device for which the DMA addresses are to be created
 -- 
 2.30.2
 
