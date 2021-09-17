@@ -2,276 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50150C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 23:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CB4C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 01:28:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EF8A60F50
-	for <linux-block@archiver.kernel.org>; Thu, 16 Sep 2021 23:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8753B60F25
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 01:28:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238528AbhIPXnG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Sep 2021 19:43:06 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:40688 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241642AbhIPXmg (ORCPT
+        id S242199AbhIQBaH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Sep 2021 21:30:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56602 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232222AbhIQBaH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Sep 2021 19:42:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
-        Message-Id:Date:Cc:To:From:content-disposition;
-        bh=bG2WEjHjwApZ9lpwaAJ7CW7/QJSgPeVj4XexhMfn49w=; b=UN0Njq/0cgqSXOrej4JVP2gjTt
-        r9MzcV6aO042PV0Lc5hyV3tO6nIu3l9plVWY8HYjLzu0SU0rVdpUPUNEyuigeDzkUxm/x3YOsh7sM
-        ZoUDQX+BIRUKn6g2jmc+VizF3OXl9d+vTPnOre4a+sxRAvd+Ek5LTv3ESZ3hRea1EfAOXhZ4g61yb
-        WkTOUA+J3GTogmiJHYSVTe/+WN/cIN4P03uNGEHhl3NOYiiUnepP70LzYRPjNR/AetzrH6Zi6RzgD
-        utWiwoBMiEL6uDspoMeGMRqAS83fX00G5QLRmTfNaSHDPHK4HXIVgtvFSGRIRCijo7UraLWX/MWay
-        tXQ/6RXQ==;
-Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
-        by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <gunthorp@deltatee.com>)
-        id 1mR10E-0008I0-4X; Thu, 16 Sep 2021 17:41:15 -0600
-Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
-        (envelope-from <gunthorp@deltatee.com>)
-        id 1mR104-000VrK-Vb; Thu, 16 Sep 2021 17:41:05 -0600
-From:   Logan Gunthorpe <logang@deltatee.com>
-To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 16 Sep 2021 17:40:50 -0600
-Message-Id: <20210916234100.122368-11-logang@deltatee.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210916234100.122368-1-logang@deltatee.com>
-References: <20210916234100.122368-1-logang@deltatee.com>
+        Thu, 16 Sep 2021 21:30:07 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE7EDC061574;
+        Thu, 16 Sep 2021 18:28:45 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id c1so4709769pfp.10;
+        Thu, 16 Sep 2021 18:28:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=IW326X16nDke3bjh48Gr8eo8fY7bb4ZE8FAMGjGxs2s=;
+        b=ICinTdi/QwxbfCYhYmgNtQqmHQ8reNEBNLl+qtK82WbzVYplwA2Z5IeVymbYkwdYOf
+         KvgFk2LbHa7gpq6+l/+3a5QOae5RMYLcEX+4zZ+EvbobSDXPgXCUD/FfmpOQplpAnkNO
+         cjQoJgsqPU8XfN8S0ypbT+BvXQL64kACjZ8kJfDXheFIINSq+LuvG0OpES/rSkb4u32W
+         T+0R+rPxKLdKOdzTAiXkYgSq8Mxcf6noMrpQfPZ5OaPwxI5OAYAWd99mLiGAlgObj12Z
+         MeYNVtsSaVQs09aWT6BIMoL+aDBD1xIkaVpTZ4Pyy7qBGf7IxRpeuZ7FFHjtIMYaLNMy
+         01bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=IW326X16nDke3bjh48Gr8eo8fY7bb4ZE8FAMGjGxs2s=;
+        b=38xNoyN7tT8qH9aI6O4wII4f494GQpg4aUb7covELie4JKPkGayhhfdKte5ZrSZubc
+         cXM3GsLYoBVMiLeThFofeCNGOZMsmD/HXKzdNFt+B1E75IjkfsY93p+tlK3dBM87mozT
+         SH4VCz42je+VHiTVcUOSYoJbeyGU9VRWbH8PRtPg+5matEJT5LHM3BC9TXjxSlP93t0a
+         a5aDnvg9yP0u+FxUsc0Lu2STjRBboJmCfPvp7mcuP/+/9D9tcsVgphdtU5rQVH/WppF9
+         uIvZ7XU2x0Cz0sfhPXBjbw50GtJVgRTnmuqJDD8Oi08s3haKdam0+bCmjkb+gWtgkfwL
+         rVnQ==
+X-Gm-Message-State: AOAM530wfGLtuaXLWHQfuLR2EuE1XiFzwyDntT5focMAXN78yXYXixEW
+        6LifJAjUcNFtq/dBeKyZstGFfDFZTvJxvM5WoPWl1g29V3XrQQQ=
+X-Google-Smtp-Source: ABdhPJyTKE8KBatvp6pe8Zomn5+TJgE8wNyX6n7usym5uqNknPVe0LjKwYQ0SfhrIFA6WqZMKvDx+BOSLQzMWuqpEs0=
+X-Received: by 2002:a63:36c4:: with SMTP id d187mr7567715pga.205.1631842125213;
+ Thu, 16 Sep 2021 18:28:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com
-X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v3 10/20] nvme-pci: convert to using dma_map_sgtable()
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+From:   Hao Sun <sunhao.th@gmail.com>
+Date:   Fri, 17 Sep 2021 09:28:34 +0800
+Message-ID: <CACkBjsYzTQe2LB6WohxYqaFse8+7sovDh87K0ewKa0vrP9StOw@mail.gmail.com>
+Subject: WARNING in loop_control_ioctl
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The dma_map operations now support P2PDMA pages directly. So remove
-the calls to pci_p2pdma_[un]map_sg_attrs() and replace them with calls
-to dma_map_sgtable().
+Hello,
 
-dma_map_sgtable() returns more complete error codes than dma_map_sg()
-and allows differentiating EREMOTEIO errors in case an unsupported
-P2PDMA transfer is requested. When this happens, return BLK_STS_TARGET
-so the request isn't retried.
+When using Healer to fuzz the latest Linux kernel, the following crash
+was triggered.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- drivers/nvme/host/pci.c | 69 +++++++++++++++++------------------------
- 1 file changed, 29 insertions(+), 40 deletions(-)
+HEAD commit: ff1ffd71d5f0 Merge tag 'hyperv-fixes-signed-20210915
+git tree: upstream
+console output:
+https://drive.google.com/file/d/1cQP1i5Q3j9Pl_AhjWS9smo4hPdvT0psG/view?usp=sharing
+kernel config: https://drive.google.com/file/d/1zXpDhs-IdE7tX17B7MhaYP0VGUfP6m9B/view?usp=sharing
+C reproducer: https://drive.google.com/file/d/1MScGjVksMYc8ro56o0h26qEgiFMUYhB0/view?usp=sharing
+Syzlang reproducer:
+https://drive.google.com/file/d/10DAS3f9gacZwFY_rWLjNvRt2FqGjODRd/view?usp=sharing
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 7d1ef66eac2e..e2cd73129a88 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -228,11 +228,10 @@ struct nvme_iod {
- 	bool use_sgl;
- 	int aborted;
- 	int npages;		/* In the PRP list. 0 means small pool in use */
--	int nents;		/* Used in scatterlist */
- 	dma_addr_t first_dma;
- 	unsigned int dma_len;	/* length of single DMA segment mapping */
- 	dma_addr_t meta_dma;
--	struct scatterlist *sg;
-+	struct sg_table sgt;
- };
- 
- static inline unsigned int nvme_dbbuf_size(struct nvme_dev *dev)
-@@ -523,7 +522,7 @@ static void nvme_commit_rqs(struct blk_mq_hw_ctx *hctx)
- static void **nvme_pci_iod_list(struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	return (void **)(iod->sg + blk_rq_nr_phys_segments(req));
-+	return (void **)(iod->sgt.sgl + blk_rq_nr_phys_segments(req));
- }
- 
- static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req)
-@@ -575,17 +574,6 @@ static void nvme_free_sgls(struct nvme_dev *dev, struct request *req)
- 	}
- }
- 
--static void nvme_unmap_sg(struct nvme_dev *dev, struct request *req)
--{
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--
--	if (is_pci_p2pdma_page(sg_page(iod->sg)))
--		pci_p2pdma_unmap_sg(dev->dev, iod->sg, iod->nents,
--				    rq_dma_dir(req));
--	else
--		dma_unmap_sg(dev->dev, iod->sg, iod->nents, rq_dma_dir(req));
--}
--
- static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-@@ -596,9 +584,10 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 		return;
- 	}
- 
--	WARN_ON_ONCE(!iod->nents);
-+	WARN_ON_ONCE(!iod->sgt.nents);
-+
-+	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
- 
--	nvme_unmap_sg(dev, req);
- 	if (iod->npages == 0)
- 		dma_pool_free(dev->prp_small_pool, nvme_pci_iod_list(req)[0],
- 			      iod->first_dma);
-@@ -606,7 +595,7 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 		nvme_free_sgls(dev, req);
- 	else
- 		nvme_free_prps(dev, req);
--	mempool_free(iod->sg, dev->iod_mempool);
-+	mempool_free(iod->sgt.sgl, dev->iod_mempool);
- }
- 
- static void nvme_print_sgl(struct scatterlist *sgl, int nents)
-@@ -629,7 +618,7 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct dma_pool *pool;
- 	int length = blk_rq_payload_bytes(req);
--	struct scatterlist *sg = iod->sg;
-+	struct scatterlist *sg = iod->sgt.sgl;
- 	int dma_len = sg_dma_len(sg);
- 	u64 dma_addr = sg_dma_address(sg);
- 	int offset = dma_addr & (NVME_CTRL_PAGE_SIZE - 1);
-@@ -702,16 +691,16 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
- 		dma_len = sg_dma_len(sg);
- 	}
- done:
--	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sg));
-+	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sgt.sgl));
- 	cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma);
- 	return BLK_STS_OK;
- free_prps:
- 	nvme_free_prps(dev, req);
- 	return BLK_STS_RESOURCE;
- bad_sgl:
--	WARN(DO_ONCE(nvme_print_sgl, iod->sg, iod->nents),
-+	WARN(DO_ONCE(nvme_print_sgl, iod->sgt.sgl, iod->sgt.nents),
- 			"Invalid SGL for payload:%d nents:%d\n",
--			blk_rq_payload_bytes(req), iod->nents);
-+			blk_rq_payload_bytes(req), iod->sgt.nents);
- 	return BLK_STS_IOERR;
- }
- 
-@@ -737,12 +726,13 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
- }
- 
- static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmd, int entries)
-+		struct request *req, struct nvme_rw_command *cmd)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct dma_pool *pool;
- 	struct nvme_sgl_desc *sg_list;
--	struct scatterlist *sg = iod->sg;
-+	struct scatterlist *sg = iod->sgt.sgl;
-+	int entries = iod->sgt.nents;
- 	dma_addr_t sgl_dma;
- 	int i = 0;
- 
-@@ -840,7 +830,7 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	blk_status_t ret = BLK_STS_RESOURCE;
--	int nr_mapped;
-+	int rc;
- 
- 	if (blk_rq_nr_phys_segments(req) == 1) {
- 		struct bio_vec bv = req_bvec(req);
-@@ -858,26 +848,25 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 	}
- 
- 	iod->dma_len = 0;
--	iod->sg = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
--	if (!iod->sg)
-+	iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
-+	if (!iod->sgt.sgl)
- 		return BLK_STS_RESOURCE;
--	sg_init_table(iod->sg, blk_rq_nr_phys_segments(req));
--	iod->nents = blk_rq_map_sg(req->q, req, iod->sg);
--	if (!iod->nents)
-+	sg_init_table(iod->sgt.sgl, blk_rq_nr_phys_segments(req));
-+	iod->sgt.orig_nents = blk_rq_map_sg(req->q, req, iod->sgt.sgl);
-+	if (!iod->sgt.orig_nents)
- 		goto out_free_sg;
- 
--	if (is_pci_p2pdma_page(sg_page(iod->sg)))
--		nr_mapped = pci_p2pdma_map_sg_attrs(dev->dev, iod->sg,
--				iod->nents, rq_dma_dir(req), DMA_ATTR_NO_WARN);
--	else
--		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
--					     rq_dma_dir(req), DMA_ATTR_NO_WARN);
--	if (!nr_mapped)
-+	rc = dma_map_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req),
-+			     DMA_ATTR_NO_WARN);
-+	if (rc) {
-+		if (rc == -EREMOTEIO)
-+			ret = BLK_STS_TARGET;
- 		goto out_free_sg;
-+	}
- 
- 	iod->use_sgl = nvme_pci_use_sgls(dev, req);
- 	if (iod->use_sgl)
--		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw, nr_mapped);
-+		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
- 	else
- 		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
- 	if (ret != BLK_STS_OK)
-@@ -885,9 +874,9 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 	return BLK_STS_OK;
- 
- out_unmap_sg:
--	nvme_unmap_sg(dev, req);
-+	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
- out_free_sg:
--	mempool_free(iod->sg, dev->iod_mempool);
-+	mempool_free(iod->sgt.sgl, dev->iod_mempool);
- 	return ret;
- }
- 
-@@ -920,7 +909,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	iod->aborted = 0;
- 	iod->npages = -1;
--	iod->nents = 0;
-+	iod->sgt.nents = 0;
- 
- 	/*
- 	 * We should not need to do this, but we're still using this to
--- 
-2.30.2
+If you fix this issue, please add the following tag to the commit:
+Reported-by: Hao Sun <sunhao.th@gmail.com>
 
+FAULT_INJECTION: forcing a failure.
+name failslab, interval 1, probability 0, space 0, times 1
+CPU: 3 PID: 7256 Comm: syz-executor Not tainted 5.15.0-rc1+ #18
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x8d/0xcf lib/dump_stack.c:106
+ fail_dump lib/fault-inject.c:52 [inline]
+ should_fail+0x13c/0x160 lib/fault-inject.c:146
+ should_failslab+0x5/0x10 mm/slab_common.c:1328
+ slab_pre_alloc_hook.constprop.99+0x4e/0xc0 mm/slab.h:494
+ slab_alloc_node mm/slub.c:3120 [inline]
+ slab_alloc mm/slub.c:3214 [inline]
+ kmem_cache_alloc+0x44/0x280 mm/slub.c:3219
+ kmem_cache_zalloc include/linux/slab.h:711 [inline]
+ __kernfs_new_node+0x68/0x350 fs/kernfs/dir.c:585
+ kernfs_new_node+0x5a/0x90 fs/kernfs/dir.c:647
+ __kernfs_create_file+0x56/0x150 fs/kernfs/file.c:985
+ sysfs_add_file_mode_ns+0xe6/0x290 fs/sysfs/file.c:317
+ create_files fs/sysfs/group.c:64 [inline]
+ internal_create_group+0x186/0x4e0 fs/sysfs/group.c:149
+ internal_create_groups.part.4+0x4d/0xb0 fs/sysfs/group.c:189
+ internal_create_groups fs/sysfs/group.c:185 [inline]
+ sysfs_create_groups+0x28/0x40 fs/sysfs/group.c:215
+ device_add_groups drivers/base/core.c:2438 [inline]
+ device_add_attrs drivers/base/core.c:2592 [inline]
+ device_add+0x4c3/0xc60 drivers/base/core.c:3310
+ device_add_disk+0x178/0x4f0 block/genhd.c:446
+ add_disk include/linux/genhd.h:221 [inline]
+ loop_add+0x27c/0x3a0 drivers/block/loop.c:2397
+ loop_control_ioctl+0x72/0x290 drivers/block/loop.c:2512
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0xb6/0x100 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x34/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x46ae99
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f91b3049c48 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000078c0a0 RCX: 000000000046ae99
+RDX: 0000000000000000 RSI: 0000000000004c80 RDI: 0000000000000003
+RBP: 00007f91b3049c80 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000042
+R13: 0000000000000000 R14: 000000000078c0a0 R15: 00007ffeef5d14f0
+------------[ cut here ]------------
+WARNING: CPU: 3 PID: 7256 at block/genhd.c:537
+device_add_disk+0x237/0x4f0 block/genhd.c:537
+Modules linked in:
+CPU: 3 PID: 7256 Comm: syz-executor Not tainted 5.15.0-rc1+ #18
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+RIP: 0010:device_add_disk+0x237/0x4f0 block/genhd.c:537
+Code: 00 0f 85 e7 fe ff ff e9 ce fe ff ff e8 12 6e 15 ff 48 89 df e8
+4a 35 01 00 81 3b 03 01 00 00 0f 84 b5 fe ff ff e8 f9 6d 15 ff <0f> 0b
+bd 01 00 00 00 e9 c5 fe ff ff e8 e8 6d 15 ff 0f 0b bd ea ff
+RSP: 0018:ffffc90003e67e70 EFLAGS: 00010216
+RAX: 0000000000023106 RBX: ffff8880192b0400 RCX: ffffc90001241000
+RDX: 0000000000040000 RSI: ffffffff82222407 RDI: ffffffff853cbf06
+RBP: 00000000fffffff4 R08: 0000000000000001 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff88800d219680
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff88800d2196c0
+FS:  00007f91b304a700(0000) GS:ffff88813dd00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007efde803d148 CR3: 0000000018ef7000 CR4: 0000000000750ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+ loop_control_ioctl+0x72/0x290 drivers/block/loop.c:2512
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0xb6/0x100 fs/ioctl.c:860
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RAX: ffffffffffffffda RBX: 000000000078c0a0 RCX: 000000000046ae99
+RDX: 0000000000000000 RSI: 0000000000004c80 RDI: 0000000000000003
+RBP: 00007f91b3049c80 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000042
+R13: 0000000000000000 R14: 000000000078c0a0 R15: 00007ffeef5d14f0
+----------------
+Code disassembly (best guess):
+   0: f7 d8                neg    %eax
+   2: 64 89 02              mov    %eax,%fs:(%rdx)
+   5: b8 ff ff ff ff        mov    $0xffffffff,%eax
+   a: c3                    retq
+   b: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
+  11: 48 89 f8              mov    %rdi,%rax
+  14: 48 89 f7              mov    %rsi,%rdi
+  17: 48 89 d6              mov    %rdx,%rsi
+  1a: 48 89 ca              mov    %rcx,%rdx
+  1d: 4d 89 c2              mov    %r8,%r10
+  20: 4d 89 c8              mov    %r9,%r8
+  23: 4c 8b 4c 24 08        mov    0x8(%rsp),%r9
+  28: 0f 05                syscall
+* 2a: 48 3d 01 f0 ff ff    cmp    $0xfffffffffffff001,%rax <--
+trapping instruction
+  30: 73 01                jae    0x33
+  32: c3                    retq
+  33: 48 c7 c1 bc ff ff ff mov    $0xffffffffffffffbc,%rcx
+  3a: f7 d8                neg    %eax
+  3c: 64 89 01              mov    %eax,%fs:(%rcx)
+  3f: 48                    rex.W
