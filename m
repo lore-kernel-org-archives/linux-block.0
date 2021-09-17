@@ -2,111 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3DD8C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 03:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B80EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 06:53:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8C4D610C7
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 03:39:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7145B600AA
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 06:53:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244047AbhIQDlD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Sep 2021 23:41:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45365 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244045AbhIQDlD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Sep 2021 23:41:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631849981;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=B9r/+Zs88h2CfccJTBLTJgNfdwtNFfPY6UfBjfQU3/E=;
-        b=Mp6aMp3JL7vVe0h3GQLlol+G61AaZvCg+ejCg3QgLgNEs1nzQy030r9d9KIq/qXY3mN9MH
-        egzYBJwzbKFABstOMzpLttoBaJw+81aB4PsMl8zzL5oa8tOQdkVmPJoUmNgXsjRZ1xGDcs
-        eb6WMJ3g/IdKbeUB0iTTs3G+fYF5k6U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-S64eqPBnPpae_FmZr_hRmw-1; Thu, 16 Sep 2021 23:39:40 -0400
-X-MC-Unique: S64eqPBnPpae_FmZr_hRmw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CB0D8145E6;
-        Fri, 17 Sep 2021 03:39:39 +0000 (UTC)
-Received: from T590.Home (ovpn-12-120.pek2.redhat.com [10.72.12.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F64D5D9D3;
-        Fri, 17 Sep 2021 03:39:35 +0000 (UTC)
-Date:   Fri, 17 Sep 2021 11:39:48 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        id S232865AbhIQGya (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Sep 2021 02:54:30 -0400
+Received: from verein.lst.de ([213.95.11.211]:43793 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229456AbhIQGya (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Sep 2021 02:54:30 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id CCE9B67373; Fri, 17 Sep 2021 08:53:05 +0200 (CEST)
+Date:   Fri, 17 Sep 2021 08:53:05 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         linux-scsi@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>
 Subject: Re: [PATCH] scsi: core: cleanup request queue before releasing
  gendisk
-Message-ID: <YUQOBKa67R9pEunr@T590.Home>
-References: <20210915092547.990285-1-ming.lei@redhat.com>
- <20210915134008.GA13933@lst.de>
- <YUKfl9Qqsluh+5FX@T590>
- <20210916101451.GA26782@lst.de>
- <YUM6uFHqfjWMM5BH@T590>
- <20210916142009.GA12603@lst.de>
+Message-ID: <20210917065305.GA24012@lst.de>
+References: <20210915092547.990285-1-ming.lei@redhat.com> <20210915134008.GA13933@lst.de> <YUKfl9Qqsluh+5FX@T590> <20210916101451.GA26782@lst.de> <YUM6uFHqfjWMM5BH@T590> <20210916142009.GA12603@lst.de> <YUQOBKa67R9pEunr@T590.Home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210916142009.GA12603@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <YUQOBKa67R9pEunr@T590.Home>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 04:20:09PM +0200, Christoph Hellwig wrote:
-> On Thu, Sep 16, 2021 at 08:38:16PM +0800, Ming Lei wrote:
-> > > > and it may cause other trouble at least for scsi disk since sd_shutdown()
-> > > > follows del_gendisk() and has to be called before blk_cleanup_queue().
-> > > 
-> > > Yes.  So we need to move the bits of blk_cleanup_queue that deal with
-> > > the file system I/O state to del_gendisk, and keep blk_cleanup_queue
-> > > for anything actually needed for the low-level queue.
-> > 
-> > Can you explain what the bits are in blk_cleanup_queue() for dealing with FS
-> > I/O state? blk_cleanup_queue() drains and shutdown the queue basically,
-> > all shouldn't be related with gendisk, and it is fine to implement one
-> > queue without gendisk involved, such as nvme admin, connect queue or
-> > sort of stuff.
-> > 
-> > Wrt. this reported issue, rq_qos_exit() needs to run before releasing
-> > gendisk, but queue has to put into freezing before calling
-> > rq_qos_exit(),
+On Fri, Sep 17, 2021 at 11:39:48AM +0800, Ming Lei wrote:
+> If we do that, q->disk is really unnecessary, so looks the fix of
+> 'd152c682f03c block: add an explicit ->disk backpointer to the request_queue'
+> isn't good.
+> The original issue added in 'edb0872f44ec block: move the
+> bdi from the request_queue to the gendisk' can be fixed simply by moving
+> the two lines code in blk_unregister_queue() to blk_cleanup_queue():
 > 
-> I was curious what you hit, but yes rq_qos_exit is obvious.
-> blk_flush_integrity also is very much about fs I/O state.
-> 
-> 
-> 
-> > so looks you suggest to move the following code into
-> > del_gendisk()?
-> 
-> something like that.  I think we need to split the dying flag into
-> one for the gendisk and one for the queue first, and make sure the
-> queue freeze in del_gendisk is released again so that passthrough
-> still works after.
+>         kobject_uevent(&q->kobj, KOBJ_REMOVE);
+>         kobject_del(&q->kobj);
 
-If we do that, q->disk is really unnecessary, so looks the fix of
-'d152c682f03c block: add an explicit ->disk backpointer to the request_queue'
-isn't good. The original issue added in 'edb0872f44ec block: move the
-bdi from the request_queue to the gendisk' can be fixed simply by moving
-the two lines code in blk_unregister_queue() to blk_cleanup_queue():
+Well, it is still useful to not do the device model dance, especially as
+uses of queue->disk will grow in 5.16.
 
-        kobject_uevent(&q->kobj, KOBJ_REMOVE);
-        kobject_del(&q->kobj);
+Anyway, can you give this patch a spin?  I've done some basic testing
+including nvme surprise removal locally.  Note that just like
+blk_cleanup_queue this doesn't actually wait for the freeze to finish.
+Eventually we should do that, but I'm sure this will show tons of issues
+with drivers not properly cleaning up.
 
-
-Thanks,
-Ming
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 5454db2fa263b..18287c443ae81 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -49,7 +49,6 @@
+ #include "blk-mq.h"
+ #include "blk-mq-sched.h"
+ #include "blk-pm.h"
+-#include "blk-rq-qos.h"
+ 
+ struct dentry *blk_debugfs_root;
+ 
+@@ -385,13 +384,8 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 */
+ 	blk_freeze_queue(q);
+ 
+-	rq_qos_exit(q);
+-
+ 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
+ 
+-	/* for synchronous bio-based driver finish in-flight integrity i/o */
+-	blk_flush_integrity();
+-
+ 	blk_sync_queue(q);
+ 	if (queue_is_mq(q))
+ 		blk_mq_exit_queue(q);
+@@ -470,19 +464,26 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 
+ static inline int bio_queue_enter(struct bio *bio)
+ {
+-	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
++	struct gendisk *disk = bio->bi_bdev->bd_disk;
+ 	bool nowait = bio->bi_opf & REQ_NOWAIT;
+ 	int ret;
+ 
+-	ret = blk_queue_enter(q, nowait ? BLK_MQ_REQ_NOWAIT : 0);
++	ret = blk_queue_enter(disk->queue, nowait ? BLK_MQ_REQ_NOWAIT : 0);
+ 	if (unlikely(ret)) {
+-		if (nowait && !blk_queue_dying(q))
++		if (nowait && !blk_queue_dying(disk->queue))
+ 			bio_wouldblock_error(bio);
+ 		else
+ 			bio_io_error(bio);
++		return ret;
+ 	}
+ 
+-	return ret;
++	if (unlikely(!disk_live(disk))) {
++		blk_queue_exit(disk->queue);
++		bio_io_error(bio);
++		return -ENODEV;
++	}
++
++	return 0;
+ }
+ 
+ void blk_queue_exit(struct request_queue *q)
+diff --git a/block/genhd.c b/block/genhd.c
+index 7b6e5e1cf9564..8abe12dca76f2 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -26,6 +26,7 @@
+ #include <linux/badblocks.h>
+ 
+ #include "blk.h"
++#include "blk-rq-qos.h"
+ 
+ static struct kobject *block_depr;
+ 
+@@ -559,6 +560,8 @@ EXPORT_SYMBOL(device_add_disk);
+  */
+ void del_gendisk(struct gendisk *disk)
+ {
++	struct request_queue *q = disk->queue;
++
+ 	might_sleep();
+ 
+ 	if (WARN_ON_ONCE(!disk_live(disk) && !(disk->flags & GENHD_FL_HIDDEN)))
+@@ -572,6 +575,21 @@ void del_gendisk(struct gendisk *disk)
+ 	blk_drop_partitions(disk);
+ 	mutex_unlock(&disk->open_mutex);
+ 
++	/*
++	 * Prevent new I/O from crossing bio_queue_enter().
++	 */
++	blk_freeze_queue_start(q);
++	if (queue_is_mq(q))
++		blk_mq_wake_waiters(q);
++	/* Make blk_queue_enter() reexamine the DYING flag. */
++	wake_up_all(&q->mq_freeze_wq);
++
++	rq_qos_exit(q);
++	blk_sync_queue(q);
++	blk_flush_integrity();
++	/* allow using passthrough request again after the queue is torn down */
++	blk_mq_unfreeze_queue(q);
++
+ 	fsync_bdev(disk->part0);
+ 	__invalidate_device(disk->part0, true);
+ 
