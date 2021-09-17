@@ -2,258 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD9BC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 17:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E71BC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 19:58:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF4536103B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 17:47:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD768611C3
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 19:58:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241237AbhIQRse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Sep 2021 13:48:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54426 "EHLO
+        id S235317AbhIQT7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Sep 2021 15:59:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241102AbhIQRsd (ORCPT
+        with ESMTP id S235036AbhIQT7i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Sep 2021 13:48:33 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6F0C061766
-        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 10:47:11 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id i23so16475996wrb.2
-        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 10:47:11 -0700 (PDT)
+        Fri, 17 Sep 2021 15:59:38 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD93C061764
+        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 12:58:16 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id a13so7158827qvo.9
+        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 12:58:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=SyBCzrN2H1t4tMOe3dvQugP37Sm1iSfEUNMCLVwsx4o=;
-        b=PZIfX93YTe8af+GKbpNUi2889P3xLkYG0AYpgwWcV1pR2sDXGliUziQ4QudkjSf1BL
-         CvXMmzsXQVPL0aqgVIBzC127kiRdBgUk8/8kLLQqAXIPYYdPEfi1iqTp3SJM3jhvO1uB
-         8+bCv4cXtWvfXsbaPpL7EO7hZffxWnIAUuZp4uUzrulucLMb8ryM8MmNE9fSz40HQrUk
-         m31QgZ9MxGEy/NTbfuraeLB4f842REejas9ARD4IVpcxil8OaXMASvvsrunC+F7DGs3m
-         NS7U9ma5Ko3uh51QzPWJrCOkUiw78ID2fOy4NbVHMCXwVwTbIZ5f0HD9fwoM58y+qqvp
-         zKcg==
+        bh=9IrxyXYwEEgJpvS7nlN30YwZ8ZTD/LkVLHFxAuL/b/c=;
+        b=HD5CIK1cNi/ii8VaEfefGbktgqOl/LChdtMtEI+1KzSDMVDtI0RkE11rm84EYe37ab
+         9wEZIiH4COOvjEp4ETX9o8o7afXfeCLxmWKpCwGDF1DNT04k8gmD3VBIKmP/cUQtjMTm
+         Flke/ftriR/MHQPOBl7M/i76Q8bVT7EipNYLWbQlDq2D3IpnH2r/sluw2mj22ZL2FLt3
+         STZKXe2doWu0pPyi//9E/03GlzPwdkZ0U2Nr+ovmLE1BU+bmla5ANg7OolduROq+/02e
+         sR+Sh2BqrbobQItoqqIohEDzbc61nipcPPpU3oPjjVZduSk9V0Wsj9u+Rw3gjnyYT4vR
+         lX/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=SyBCzrN2H1t4tMOe3dvQugP37Sm1iSfEUNMCLVwsx4o=;
-        b=IaNS9Yy047U8KilKPBG/HJa51FVpjPMsNyGhK8D1SQSoWDUcNF2FVwGhh2TPMc82M7
-         zJl4rEUEg96Ag+D7CoJDMYsU/i50yR6ZqKPbHL8xQU56BXf2RpFtZS4dKDWurqsyk6GE
-         ZkeBLkwkWqlT1XpbSvQifeaQ7dqFylr/3Pd5Yv2muF2zxDjALzKuZY5cVkT27PKDWsxE
-         Xz8ItAAq/vxjynRQ2z/h7OamoftK+LMAllreo0YfcXBJhGRSkVdZSwmeFQWSuae02/S+
-         tibJqiJyfGfQ8IT/QNFp7DWat2qQ+ffQHNli6zz3GTnaSIbB/+TIsAP7U/ZxHIptkaGe
-         KHuw==
-X-Gm-Message-State: AOAM533fHVpeNw/F125/3cghgQNs7fxs0YNir/XdvaE1qb84PcKKDp43
-        j0oz+I8bkNQWYpqiII45AXrK4V1wzxRmzBZklfb+TA==
-X-Google-Smtp-Source: ABdhPJxwoBL4YXVsWGVmQypIOuQvHMyGn3Lf/bbQxI+09bbZq/nFUOndrTK7MPfwUbVDcyAP/lVkHq3BSrvSl9TZsOQ=
-X-Received: by 2002:adf:f207:: with SMTP id p7mr13652606wro.166.1631900829338;
- Fri, 17 Sep 2021 10:47:09 -0700 (PDT)
+        bh=9IrxyXYwEEgJpvS7nlN30YwZ8ZTD/LkVLHFxAuL/b/c=;
+        b=js6+GH6CA/yn//6sHAeuaCYpqUrVNCxHqcwAnOZ09LHwb58EQWX4hKhVhcwI6Bpus/
+         jqlcZx2JBal6dCa2AGYqx3gF4CV/yhV+4S07dXL+ses3L7Pa7MHHqVzn9JOR/uqjKoT5
+         bovNP+jgZq4x5zEo6jo+x0TBvGMZYaDsM0lzA9JQHF9ulSPd1CofQWedPzcmdZTFX+L4
+         I6jTuPVf20pbxsi9L2DI8fHLCYYnnFGbluWPpxsKpu+Zmep0ILugaLF67Pmgx1ShuhXM
+         5yGwKwrgV/S/mH5kbHLTuFbi03IRpoyDdGgbw5r17FOgAWJGGlDCj083LUVZ6/5Zafc3
+         Ma4w==
+X-Gm-Message-State: AOAM5308wIqdi9w26t0QhUcxUmLrb2KB2aqe6lBVqky/Iw+t1BP9tybR
+        CBLh1woj8i7OcMoGnLJ+85gQ5O0vU1ijHvTiIGdJ+A==
+X-Google-Smtp-Source: ABdhPJysvju3XJK4m5TLIBko5UdMP99X9nPaX+/RaXTnto8yzzNUOgy9Ubt0YChaRdH/XrJYPig/CcByqqM5VGpMwWA=
+X-Received: by 2002:ad4:436b:: with SMTP id u11mr12932089qvt.26.1631908694821;
+ Fri, 17 Sep 2021 12:58:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210916174928.65529-1-ebiggers@kernel.org> <20210916174928.65529-5-ebiggers@kernel.org>
-In-Reply-To: <20210916174928.65529-5-ebiggers@kernel.org>
-From:   Paul Crowley <paulcrowley@google.com>
-Date:   Fri, 17 Sep 2021 10:46:55 -0700
-Message-ID: <CA+_SqcC5V64Y1d2qOEpCV-25_eXj-kDa4v5kKm+eF1zDkwRZyA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 4/5] fscrypt: allow 256-bit master keys with AES-256-XTS
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, kernel-team@android.com,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        Gaurav Kashyap <gaurkash@codeaurora.org>,
-        Satya Tangirala <satyaprateek2357@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20210909140815.2600858-1-yukuai3@huawei.com> <20210917174103.GC13346@blackbody.suse.cz>
+In-Reply-To: <20210917174103.GC13346@blackbody.suse.cz>
+From:   Khazhy Kumykov <khazhy@google.com>
+Date:   Fri, 17 Sep 2021 12:58:03 -0700
+Message-ID: <CACGdZYJiLuh6kED_tdWkYqbHDXc_18m-XJbevp-ri5ansvbtYg@mail.gmail.com>
+Subject: Re: [RFC PATCH] blk-throttle: enable io throttle for root in cgroup v2
+To:     =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+Cc:     Yu Kuai <yukuai3@huawei.com>, tj@kernel.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="00000000000016fc4f05cc365a1c"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: paulcrowley@google.com
+--00000000000016fc4f05cc365a1c
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Sep 17, 2021 at 10:41 AM Michal Koutn=C3=BD <mkoutny@suse.com> wrot=
+e:
+>
+> Hello Yu.
+>
+> On Thu, Sep 09, 2021 at 10:08:15PM +0800, Yu Kuai <yukuai3@huawei.com> wr=
+ote:
+> > I'm not sure why this feature is disabled in the first place, is
+> > there any problem or design constraint?
+>
+> The idea for v2 is that in the root cgroup remain only kernel threads tha=
+t
+> provide "global" services and any user workload that should be
+> constrained is put into non-root cgroups. Additionally, if kernel
+> threads carry out work associated with a cgroup they can charge it to
+> the respective cgroup.
+>
+> [snip]
+> > We want to limit the overall iops/bps of the device in cgroup v2,
+>
+> Cui bono? (I mean what is the reason for throttling on the global level
+> when there's no other entity utiliting the residual?
+> <joke>Your drives are too fast?</joke>)
 
-On Thu, 16 Sept 2021 at 11:18, Eric Biggers <ebiggers@kernel.org> wrote:
+We'd be interested in something like this as well. (at least for
+io.max). Our use case is providing remote devices which are a shared
+resource. A "global" throttle like this (which is set by a local
+management daemon) allows for throttling before sending network
+traffic. It's also useful since we can put this throttle on a dm, so
+we can enforce an aggregate throttle without needing backchannels to
+coordinate multiple targets.
+(This does also bring up: if this is a useful thing, would it make
+sense to tie to the device, vs. requiring cgroup. We happen to use
+cgroups so that requirement doesn't affect us).
+
+Khazhy
 >
-> From: Eric Biggers <ebiggers@google.com>
->
-> fscrypt currently requires a 512-bit master key when AES-256-XTS is
-> used, since AES-256-XTS keys are 512-bit and fscrypt requires that the
-> master key be at least as long any key that will be derived from it.
->
-> However, this is overly strict because AES-256-XTS doesn't actually have
-> a 512-bit security strength, but rather 256-bit.  The fact that XTS
-> takes twice the expected key size is a quirk of the XTS mode.  It is
-> sufficient to use 256 bits of entropy for AES-256-XTS, provided that it
-> is first properly expanded into a 512-bit key, which HKDF-SHA512 does.
->
-> Therefore, relax the check of the master key size to use the security
-> strength of the derived key rather than the size of the derived key
-> (except for v1 encryption policies, which don't use HKDF).
->
-> Besides making things more flexible for userspace, this is needed in
-> order for the use of a KDF which only takes a 256-bit key to be
-> introduced into the fscrypt key hierarchy.  This will happen with
-> hardware-wrapped keys support, as all known hardware which supports that
-> feature uses an SP800-108 KDF using AES-256-CMAC, so the wrapped keys
-> are wrapped 256-bit AES keys.  Moreover, there is interest in fscrypt
-> supporting the same type of AES-256-CMAC based KDF in software as an
-> alternative to HKDF-SHA512.  There is no security problem with such
-> features, so fix the key length check to work properly with them.
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  fs/crypto/fscrypt_private.h |  5 ++--
->  fs/crypto/hkdf.c            | 11 +++++--
->  fs/crypto/keysetup.c        | 57 +++++++++++++++++++++++++++++--------
->  3 files changed, 56 insertions(+), 17 deletions(-)
->
-> diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-> index 3fa965eb3336d..cb25ef0cdf1f3 100644
-> --- a/fs/crypto/fscrypt_private.h
-> +++ b/fs/crypto/fscrypt_private.h
-> @@ -549,8 +549,9 @@ int __init fscrypt_init_keyring(void);
->  struct fscrypt_mode {
->         const char *friendly_name;
->         const char *cipher_str;
-> -       int keysize;
-> -       int ivsize;
-> +       int keysize;            /* key size in bytes */
-> +       int security_strength;  /* security strength in bytes */
-> +       int ivsize;             /* IV size in bytes */
->         int logged_impl_name;
->         enum blk_crypto_mode_num blk_crypto_mode;
->  };
-> diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
-> index e0ec210555053..7607d18b35fc0 100644
-> --- a/fs/crypto/hkdf.c
-> +++ b/fs/crypto/hkdf.c
-> @@ -16,9 +16,14 @@
->
->  /*
->   * HKDF supports any unkeyed cryptographic hash algorithm, but fscrypt uses
-> - * SHA-512 because it is reasonably secure and efficient; and since it produces
-> - * a 64-byte digest, deriving an AES-256-XTS key preserves all 64 bytes of
-> - * entropy from the master key and requires only one iteration of HKDF-Expand.
-> + * SHA-512 because it is well-established, secure, and reasonably efficient.
-> + *
-> + * HKDF-SHA256 was also considered, as its 256-bit security strength would be
-> + * sufficient here.  A 512-bit security strength is "nice to have", though.
-> + * Also, on 64-bit CPUs, SHA-512 is usually just as fast as SHA-256.  In the
-> + * common case of deriving an AES-256-XTS key (512 bits), that can result in
-> + * HKDF-SHA512 being much faster than HKDF-SHA256, as the longer digest size of
-> + * SHA-512 causes HKDF-Expand to only need to do one iteration rather than two.
->   */
->  #define HKDF_HMAC_ALG          "hmac(sha512)"
->  #define HKDF_HASHLEN           SHA512_DIGEST_SIZE
-> diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
-> index bca9c6658a7c5..89cd533a88bff 100644
-> --- a/fs/crypto/keysetup.c
-> +++ b/fs/crypto/keysetup.c
-> @@ -19,6 +19,7 @@ struct fscrypt_mode fscrypt_modes[] = {
->                 .friendly_name = "AES-256-XTS",
->                 .cipher_str = "xts(aes)",
->                 .keysize = 64,
-> +               .security_strength = 32,
->                 .ivsize = 16,
->                 .blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_256_XTS,
->         },
-> @@ -26,12 +27,14 @@ struct fscrypt_mode fscrypt_modes[] = {
->                 .friendly_name = "AES-256-CTS-CBC",
->                 .cipher_str = "cts(cbc(aes))",
->                 .keysize = 32,
-> +               .security_strength = 32,
->                 .ivsize = 16,
->         },
->         [FSCRYPT_MODE_AES_128_CBC] = {
->                 .friendly_name = "AES-128-CBC-ESSIV",
->                 .cipher_str = "essiv(cbc(aes),sha256)",
->                 .keysize = 16,
-> +               .security_strength = 16,
->                 .ivsize = 16,
->                 .blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_128_CBC_ESSIV,
->         },
-> @@ -39,12 +42,14 @@ struct fscrypt_mode fscrypt_modes[] = {
->                 .friendly_name = "AES-128-CTS-CBC",
->                 .cipher_str = "cts(cbc(aes))",
->                 .keysize = 16,
-> +               .security_strength = 16,
->                 .ivsize = 16,
->         },
->         [FSCRYPT_MODE_ADIANTUM] = {
->                 .friendly_name = "Adiantum",
->                 .cipher_str = "adiantum(xchacha12,aes)",
->                 .keysize = 32,
-> +               .security_strength = 32,
->                 .ivsize = 32,
->                 .blk_crypto_mode = BLK_ENCRYPTION_MODE_ADIANTUM,
->         },
-> @@ -357,6 +362,45 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_info *ci,
->         return 0;
->  }
->
-> +/*
-> + * Check whether the size of the given master key (@mk) is appropriate for the
-> + * encryption settings which a particular file will use (@ci).
-> + *
-> + * If the file uses a v1 encryption policy, then the master key must be at least
-> + * as long as the derived key, as this is a requirement of the v1 KDF.
-> + *
-> + * Otherwise, the KDF can accept any size key, so we enforce a slightly looser
-> + * requirement: we require that the size of the master key be at least the
-> + * maximum security strength of any algorithm whose key will be derived from it
-> + * (but in practice we only need to consider @ci->ci_mode, since any other
-> + * possible subkeys such as DIRHASH and INODE_HASH will never increase the
-> + * required key size over @ci->ci_mode).  This allows AES-256-XTS keys to be
-> + * derived from a 256-bit master key, which is cryptographically sufficient,
-> + * rather than requiring a 512-bit master key which is unnecessarily long.  (We
-> + * still allow 512-bit master keys if the user chooses to use them, though.)
-> + */
-> +static bool fscrypt_valid_master_key_size(const struct fscrypt_master_key *mk,
-> +                                         const struct fscrypt_info *ci)
-> +{
-> +       unsigned int min_keysize;
-> +
-> +       if (ci->ci_policy.version == FSCRYPT_POLICY_V1)
-> +               min_keysize = ci->ci_mode->keysize;
-> +       else
-> +               min_keysize = ci->ci_mode->security_strength;
-> +
-> +       if (mk->mk_secret.size < min_keysize) {
-> +               fscrypt_warn(NULL,
-> +                            "key with %s %*phN is too short (got %u bytes, need %u+ bytes)",
-> +                            master_key_spec_type(&mk->mk_spec),
-> +                            master_key_spec_len(&mk->mk_spec),
-> +                            (u8 *)&mk->mk_spec.u,
-> +                            mk->mk_secret.size, min_keysize);
-> +               return false;
-> +       }
-> +       return true;
-> +}
-> +
->  /*
->   * Find the master key, then set up the inode's actual encryption key.
->   *
-> @@ -422,18 +466,7 @@ static int setup_file_encryption_key(struct fscrypt_info *ci,
->                 goto out_release_key;
->         }
->
-> -       /*
-> -        * Require that the master key be at least as long as the derived key.
-> -        * Otherwise, the derived key cannot possibly contain as much entropy as
-> -        * that required by the encryption mode it will be used for.  For v1
-> -        * policies it's also required for the KDF to work at all.
-> -        */
-> -       if (mk->mk_secret.size < ci->ci_mode->keysize) {
-> -               fscrypt_warn(NULL,
-> -                            "key with %s %*phN is too short (got %u bytes, need %u+ bytes)",
-> -                            master_key_spec_type(&mk_spec),
-> -                            master_key_spec_len(&mk_spec), (u8 *)&mk_spec.u,
-> -                            mk->mk_secret.size, ci->ci_mode->keysize);
-> +       if (!fscrypt_valid_master_key_size(mk, ci)) {
->                 err = -ENOKEY;
->                 goto out_release_key;
->         }
-> --
-> 2.33.0
->
+> Michal
+
+--00000000000016fc4f05cc365a1c
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIPmAYJKoZIhvcNAQcCoIIPiTCCD4UCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ggzyMIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
+IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
+dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
+6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
+c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
+I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
+AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
+BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
+CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
+AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
+MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
+My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
+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
+WSYk04Mfa/vFieowTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
+Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADCBmgYIKwYBBQUHAQEE
+gY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRsYXNy
+M3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29tL2Nh
+Y2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvRzV2V
+b4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9nc2F0
+bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBADnfx9bPzP8a2dQBaApDBlLv
+N1ozXDmnpCJQYwEMGZ9M4eLvmEwcf46+8mad/gYr/M7OOUuUY6luyBj1pJteste0BC/ZsFpqUtaR
+6CqRuUT17zyKv2K+E9ycaaCRe/jgurW0wx1BwtXRElYi+8maFYv/4AVPTFCi9YkiYGZSf/iJTpL0
+/Axe5BBZ4+zrAEcLt4D+hgO1/d0uSL/VucjnCo1HgHdbdDhFFwmihXJyVpH0sHFr9ZwpeWE8vtqE
+l/oCSEZn1ugqU/tYecidUqgRnBf1cc5G+fA1V45eB3j2xPBKhqRJasxH+4hFihk0/tZAzt7tnxAE
+LY1X2VNMpSKLhP8xggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxT
+aWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjACEAEC
+stzjV0qUe4aermAajfswDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMWprKui6Etx
+CiIknhc67FUsDCc9UFqd/SSy7rqYBuIgMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
+hvcNAQkFMQ8XDTIxMDkxNzE5NTgxNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJ
+YIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcN
+AQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQATbQrK9G3URnUEG4p+T0l+sIiMkLq2
+2NDa5FIFac53AGyfCzlzVLKU7ehDhgXqFkIa9oBWa8t6uDIrPFru2Jygz9H/W3y29QfoT8yOtI6a
+DmeOxlTfxS12CKEjbJ5rp4gsn+4aGsQ5TRueso3xGTjXBM9WlSK2+c8OHWg+HGJBwU7uldrmcmjS
+GSvKHRnNkor7igsptp/HA0LvrDgV8F/iAbKT4CEGQLCdKRRtFQa0yNWCjpbgraU2W8rADxPXx3e1
+N0zfZFWzZ63h/uEEcgqKSmTi5d2XTXRrvRWkRVHfRNL23QjX2XsANHtk1Ls8b2SeeTRK9PQUDHh7
+zsZxxdMS
+--00000000000016fc4f05cc365a1c--
