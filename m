@@ -5,43 +5,43 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A16ADC4321E
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 02:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAD0C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 02:36:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CCAF611F2
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 02:35:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4E766113E
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 02:36:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243546AbhIQCg7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Sep 2021 22:36:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33902 "EHLO mail.kernel.org"
+        id S243845AbhIQCha (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Sep 2021 22:37:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33202 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243079AbhIQCgQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Sep 2021 22:36:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BF68B61216;
-        Fri, 17 Sep 2021 02:34:54 +0000 (UTC)
+        id S243356AbhIQCgY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Sep 2021 22:36:24 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B76C06113E;
+        Fri, 17 Sep 2021 02:35:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631846095;
-        bh=CRf4pmmB42oIEfAQAof8E/B+8MPRPrSI6N0MyPDOqts=;
+        s=k20201202; t=1631846103;
+        bh=/CMX3Tqh85fOcGQGzDRAAgK2xgMJcJcFolCJRyt6qpI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RCaV+8XqqfBHz5YbUZf+Plnvr9x15+G+PBKaaxn3YtuPuKS3YIp993qw7oWy3pS84
-         RS1XjPlS4+Ic8kAD3Y4JkIuYLwVBoFSMPiVehofGo8LbMe90HslGe526/yhyMNG4Oo
-         6XsWnApbIKJO1lXapO4hj6xfs0cLZZO+8SHnNeD2FYepwedaSp9k3NY0snBD6LVQLr
-         WFjFSPGPPUclS51MPW+m+Cc6/OSFu685ss98jEh1bpWE68Ju3FuG26H6V18r0E+05w
-         Bb5pKCUc3+yalOK9+Dlh2HrjPRPfa01bMAM4jnY8i2vJI23jIx91WPeGABT1oi5nx/
-         oV3YQo2wolGgg==
+        b=I8MSbblVdxAtzP3Eue3Ur+qHqyHENHkUYXb5cilNfwc+OGFkJS0iWP71YgAnipCXn
+         9IQuxH1gOtv08/iA6zoS22kzEEDXzsrz/c4R4Qb2TWeKkAonCNcaYwiByHvgTVbZlp
+         Iv/mOpPbf3MWjv1+i5FmsUIMWJLbOYGq79VdBGo8BhsWdlf2/yoFpdW07roqXRtYEL
+         7xtJDLVdevSozxj67Ie2PpfdumoMzn6vAgcff8BIfKpcXTfy7GJtK+DBOtrXXPJSRx
+         ZmvPx83dRMtLLdpDMhTyyFis3rKCF9i08ZAwPrgzXHgyiJpcgcHmSBkvFyh/i3TPvX
+         fDpqvOcahjQjg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Li Jinlin <lijinlin3@huawei.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, tj@kernel.org,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 4/5] blk-throttle: fix UAF by deleteing timer in blk_throtl_exit()
-Date:   Thu, 16 Sep 2021 22:34:48 -0400
-Message-Id: <20210917023449.816713-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 4/4] blk-throttle: fix UAF by deleteing timer in blk_throtl_exit()
+Date:   Thu, 16 Sep 2021 22:34:57 -0400
+Message-Id: <20210917023457.816816-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210917023449.816713-1-sashal@kernel.org>
-References: <20210917023449.816713-1-sashal@kernel.org>
+In-Reply-To: <20210917023457.816816-1-sashal@kernel.org>
+References: <20210917023457.816816-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 18f773e52dfb..bd870f9ae458 100644
+index caee658609d7..853b1770df36 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -2414,6 +2414,7 @@ int blk_throtl_init(struct request_queue *q)
+@@ -2437,6 +2437,7 @@ int blk_throtl_init(struct request_queue *q)
  void blk_throtl_exit(struct request_queue *q)
  {
  	BUG_ON(!q->td);
