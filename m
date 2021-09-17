@@ -2,84 +2,258 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD640C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 17:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD9BC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 17:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3B1660F21
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 17:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF4536103B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 17:47:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237238AbhIQRmd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Sep 2021 13:42:33 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:48676 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233099AbhIQRm1 (ORCPT
+        id S241237AbhIQRse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Sep 2021 13:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54426 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241102AbhIQRsd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Sep 2021 13:42:27 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 60A3021A8D;
-        Fri, 17 Sep 2021 17:41:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1631900464; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yGdnRQChmmfug9TJwp/GqG9nQH+or3zg5tguY5oo+D4=;
-        b=cMHI6XJFM9M0KRsFulwCJSBaxKY+SGgZU1ShmWu4BBWJgJXWUslymcRIbNBgnGVyfc2xZF
-        I+qnQnhzLxFMwiYPjH9sGL51bd1pzspozV/uMy7gb8qemsd7KaVa5X8ON5xYzK50nwQLcg
-        jTtHsbjzv3skwLtVW2LjumGvwEwlHcY=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 44CF613B0C;
-        Fri, 17 Sep 2021 17:41:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id dVM0EDDTRGHBbwAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Fri, 17 Sep 2021 17:41:04 +0000
-Date:   Fri, 17 Sep 2021 19:41:03 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [RFC PATCH] blk-throttle: enable io throttle for root in cgroup
- v2
-Message-ID: <20210917174103.GC13346@blackbody.suse.cz>
-References: <20210909140815.2600858-1-yukuai3@huawei.com>
+        Fri, 17 Sep 2021 13:48:33 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6F0C061766
+        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 10:47:11 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id i23so16475996wrb.2
+        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 10:47:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SyBCzrN2H1t4tMOe3dvQugP37Sm1iSfEUNMCLVwsx4o=;
+        b=PZIfX93YTe8af+GKbpNUi2889P3xLkYG0AYpgwWcV1pR2sDXGliUziQ4QudkjSf1BL
+         CvXMmzsXQVPL0aqgVIBzC127kiRdBgUk8/8kLLQqAXIPYYdPEfi1iqTp3SJM3jhvO1uB
+         8+bCv4cXtWvfXsbaPpL7EO7hZffxWnIAUuZp4uUzrulucLMb8ryM8MmNE9fSz40HQrUk
+         m31QgZ9MxGEy/NTbfuraeLB4f842REejas9ARD4IVpcxil8OaXMASvvsrunC+F7DGs3m
+         NS7U9ma5Ko3uh51QzPWJrCOkUiw78ID2fOy4NbVHMCXwVwTbIZ5f0HD9fwoM58y+qqvp
+         zKcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SyBCzrN2H1t4tMOe3dvQugP37Sm1iSfEUNMCLVwsx4o=;
+        b=IaNS9Yy047U8KilKPBG/HJa51FVpjPMsNyGhK8D1SQSoWDUcNF2FVwGhh2TPMc82M7
+         zJl4rEUEg96Ag+D7CoJDMYsU/i50yR6ZqKPbHL8xQU56BXf2RpFtZS4dKDWurqsyk6GE
+         ZkeBLkwkWqlT1XpbSvQifeaQ7dqFylr/3Pd5Yv2muF2zxDjALzKuZY5cVkT27PKDWsxE
+         Xz8ItAAq/vxjynRQ2z/h7OamoftK+LMAllreo0YfcXBJhGRSkVdZSwmeFQWSuae02/S+
+         tibJqiJyfGfQ8IT/QNFp7DWat2qQ+ffQHNli6zz3GTnaSIbB/+TIsAP7U/ZxHIptkaGe
+         KHuw==
+X-Gm-Message-State: AOAM533fHVpeNw/F125/3cghgQNs7fxs0YNir/XdvaE1qb84PcKKDp43
+        j0oz+I8bkNQWYpqiII45AXrK4V1wzxRmzBZklfb+TA==
+X-Google-Smtp-Source: ABdhPJxwoBL4YXVsWGVmQypIOuQvHMyGn3Lf/bbQxI+09bbZq/nFUOndrTK7MPfwUbVDcyAP/lVkHq3BSrvSl9TZsOQ=
+X-Received: by 2002:adf:f207:: with SMTP id p7mr13652606wro.166.1631900829338;
+ Fri, 17 Sep 2021 10:47:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210909140815.2600858-1-yukuai3@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20210916174928.65529-1-ebiggers@kernel.org> <20210916174928.65529-5-ebiggers@kernel.org>
+In-Reply-To: <20210916174928.65529-5-ebiggers@kernel.org>
+From:   Paul Crowley <paulcrowley@google.com>
+Date:   Fri, 17 Sep 2021 10:46:55 -0700
+Message-ID: <CA+_SqcC5V64Y1d2qOEpCV-25_eXj-kDa4v5kKm+eF1zDkwRZyA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 4/5] fscrypt: allow 256-bit master keys with AES-256-XTS
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, kernel-team@android.com,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Gaurav Kashyap <gaurkash@codeaurora.org>,
+        Satya Tangirala <satyaprateek2357@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Yu.
+Reviewed-by: paulcrowley@google.com
 
-On Thu, Sep 09, 2021 at 10:08:15PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
-> I'm not sure why this feature is disabled in the first place, is
-> there any problem or design constraint?
 
-The idea for v2 is that in the root cgroup remain only kernel threads that
-provide "global" services and any user workload that should be
-constrained is put into non-root cgroups. Additionally, if kernel
-threads carry out work associated with a cgroup they can charge it to
-the respective cgroup.
-
-[snip]
-> We want to limit the overall iops/bps of the device in cgroup v2,
-
-Cui bono? (I mean what is the reason for throttling on the global level
-when there's no other entity utiliting the residual?
-<joke>Your drives are too fast?</joke>)
-
-Michal
+On Thu, 16 Sept 2021 at 11:18, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> fscrypt currently requires a 512-bit master key when AES-256-XTS is
+> used, since AES-256-XTS keys are 512-bit and fscrypt requires that the
+> master key be at least as long any key that will be derived from it.
+>
+> However, this is overly strict because AES-256-XTS doesn't actually have
+> a 512-bit security strength, but rather 256-bit.  The fact that XTS
+> takes twice the expected key size is a quirk of the XTS mode.  It is
+> sufficient to use 256 bits of entropy for AES-256-XTS, provided that it
+> is first properly expanded into a 512-bit key, which HKDF-SHA512 does.
+>
+> Therefore, relax the check of the master key size to use the security
+> strength of the derived key rather than the size of the derived key
+> (except for v1 encryption policies, which don't use HKDF).
+>
+> Besides making things more flexible for userspace, this is needed in
+> order for the use of a KDF which only takes a 256-bit key to be
+> introduced into the fscrypt key hierarchy.  This will happen with
+> hardware-wrapped keys support, as all known hardware which supports that
+> feature uses an SP800-108 KDF using AES-256-CMAC, so the wrapped keys
+> are wrapped 256-bit AES keys.  Moreover, there is interest in fscrypt
+> supporting the same type of AES-256-CMAC based KDF in software as an
+> alternative to HKDF-SHA512.  There is no security problem with such
+> features, so fix the key length check to work properly with them.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  fs/crypto/fscrypt_private.h |  5 ++--
+>  fs/crypto/hkdf.c            | 11 +++++--
+>  fs/crypto/keysetup.c        | 57 +++++++++++++++++++++++++++++--------
+>  3 files changed, 56 insertions(+), 17 deletions(-)
+>
+> diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+> index 3fa965eb3336d..cb25ef0cdf1f3 100644
+> --- a/fs/crypto/fscrypt_private.h
+> +++ b/fs/crypto/fscrypt_private.h
+> @@ -549,8 +549,9 @@ int __init fscrypt_init_keyring(void);
+>  struct fscrypt_mode {
+>         const char *friendly_name;
+>         const char *cipher_str;
+> -       int keysize;
+> -       int ivsize;
+> +       int keysize;            /* key size in bytes */
+> +       int security_strength;  /* security strength in bytes */
+> +       int ivsize;             /* IV size in bytes */
+>         int logged_impl_name;
+>         enum blk_crypto_mode_num blk_crypto_mode;
+>  };
+> diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
+> index e0ec210555053..7607d18b35fc0 100644
+> --- a/fs/crypto/hkdf.c
+> +++ b/fs/crypto/hkdf.c
+> @@ -16,9 +16,14 @@
+>
+>  /*
+>   * HKDF supports any unkeyed cryptographic hash algorithm, but fscrypt uses
+> - * SHA-512 because it is reasonably secure and efficient; and since it produces
+> - * a 64-byte digest, deriving an AES-256-XTS key preserves all 64 bytes of
+> - * entropy from the master key and requires only one iteration of HKDF-Expand.
+> + * SHA-512 because it is well-established, secure, and reasonably efficient.
+> + *
+> + * HKDF-SHA256 was also considered, as its 256-bit security strength would be
+> + * sufficient here.  A 512-bit security strength is "nice to have", though.
+> + * Also, on 64-bit CPUs, SHA-512 is usually just as fast as SHA-256.  In the
+> + * common case of deriving an AES-256-XTS key (512 bits), that can result in
+> + * HKDF-SHA512 being much faster than HKDF-SHA256, as the longer digest size of
+> + * SHA-512 causes HKDF-Expand to only need to do one iteration rather than two.
+>   */
+>  #define HKDF_HMAC_ALG          "hmac(sha512)"
+>  #define HKDF_HASHLEN           SHA512_DIGEST_SIZE
+> diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
+> index bca9c6658a7c5..89cd533a88bff 100644
+> --- a/fs/crypto/keysetup.c
+> +++ b/fs/crypto/keysetup.c
+> @@ -19,6 +19,7 @@ struct fscrypt_mode fscrypt_modes[] = {
+>                 .friendly_name = "AES-256-XTS",
+>                 .cipher_str = "xts(aes)",
+>                 .keysize = 64,
+> +               .security_strength = 32,
+>                 .ivsize = 16,
+>                 .blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_256_XTS,
+>         },
+> @@ -26,12 +27,14 @@ struct fscrypt_mode fscrypt_modes[] = {
+>                 .friendly_name = "AES-256-CTS-CBC",
+>                 .cipher_str = "cts(cbc(aes))",
+>                 .keysize = 32,
+> +               .security_strength = 32,
+>                 .ivsize = 16,
+>         },
+>         [FSCRYPT_MODE_AES_128_CBC] = {
+>                 .friendly_name = "AES-128-CBC-ESSIV",
+>                 .cipher_str = "essiv(cbc(aes),sha256)",
+>                 .keysize = 16,
+> +               .security_strength = 16,
+>                 .ivsize = 16,
+>                 .blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_128_CBC_ESSIV,
+>         },
+> @@ -39,12 +42,14 @@ struct fscrypt_mode fscrypt_modes[] = {
+>                 .friendly_name = "AES-128-CTS-CBC",
+>                 .cipher_str = "cts(cbc(aes))",
+>                 .keysize = 16,
+> +               .security_strength = 16,
+>                 .ivsize = 16,
+>         },
+>         [FSCRYPT_MODE_ADIANTUM] = {
+>                 .friendly_name = "Adiantum",
+>                 .cipher_str = "adiantum(xchacha12,aes)",
+>                 .keysize = 32,
+> +               .security_strength = 32,
+>                 .ivsize = 32,
+>                 .blk_crypto_mode = BLK_ENCRYPTION_MODE_ADIANTUM,
+>         },
+> @@ -357,6 +362,45 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_info *ci,
+>         return 0;
+>  }
+>
+> +/*
+> + * Check whether the size of the given master key (@mk) is appropriate for the
+> + * encryption settings which a particular file will use (@ci).
+> + *
+> + * If the file uses a v1 encryption policy, then the master key must be at least
+> + * as long as the derived key, as this is a requirement of the v1 KDF.
+> + *
+> + * Otherwise, the KDF can accept any size key, so we enforce a slightly looser
+> + * requirement: we require that the size of the master key be at least the
+> + * maximum security strength of any algorithm whose key will be derived from it
+> + * (but in practice we only need to consider @ci->ci_mode, since any other
+> + * possible subkeys such as DIRHASH and INODE_HASH will never increase the
+> + * required key size over @ci->ci_mode).  This allows AES-256-XTS keys to be
+> + * derived from a 256-bit master key, which is cryptographically sufficient,
+> + * rather than requiring a 512-bit master key which is unnecessarily long.  (We
+> + * still allow 512-bit master keys if the user chooses to use them, though.)
+> + */
+> +static bool fscrypt_valid_master_key_size(const struct fscrypt_master_key *mk,
+> +                                         const struct fscrypt_info *ci)
+> +{
+> +       unsigned int min_keysize;
+> +
+> +       if (ci->ci_policy.version == FSCRYPT_POLICY_V1)
+> +               min_keysize = ci->ci_mode->keysize;
+> +       else
+> +               min_keysize = ci->ci_mode->security_strength;
+> +
+> +       if (mk->mk_secret.size < min_keysize) {
+> +               fscrypt_warn(NULL,
+> +                            "key with %s %*phN is too short (got %u bytes, need %u+ bytes)",
+> +                            master_key_spec_type(&mk->mk_spec),
+> +                            master_key_spec_len(&mk->mk_spec),
+> +                            (u8 *)&mk->mk_spec.u,
+> +                            mk->mk_secret.size, min_keysize);
+> +               return false;
+> +       }
+> +       return true;
+> +}
+> +
+>  /*
+>   * Find the master key, then set up the inode's actual encryption key.
+>   *
+> @@ -422,18 +466,7 @@ static int setup_file_encryption_key(struct fscrypt_info *ci,
+>                 goto out_release_key;
+>         }
+>
+> -       /*
+> -        * Require that the master key be at least as long as the derived key.
+> -        * Otherwise, the derived key cannot possibly contain as much entropy as
+> -        * that required by the encryption mode it will be used for.  For v1
+> -        * policies it's also required for the KDF to work at all.
+> -        */
+> -       if (mk->mk_secret.size < ci->ci_mode->keysize) {
+> -               fscrypt_warn(NULL,
+> -                            "key with %s %*phN is too short (got %u bytes, need %u+ bytes)",
+> -                            master_key_spec_type(&mk_spec),
+> -                            master_key_spec_len(&mk_spec), (u8 *)&mk_spec.u,
+> -                            mk->mk_secret.size, ci->ci_mode->keysize);
+> +       if (!fscrypt_valid_master_key_size(mk, ci)) {
+>                 err = -ENOKEY;
+>                 goto out_release_key;
+>         }
+> --
+> 2.33.0
+>
