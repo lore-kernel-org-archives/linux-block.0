@@ -2,111 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF7A6C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 03:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3DD8C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 03:39:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABF8461074
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 03:33:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8C4D610C7
+	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 03:39:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242715AbhIQDfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Sep 2021 23:35:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38581 "EHLO
+        id S244047AbhIQDlD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Sep 2021 23:41:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45365 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232440AbhIQDfP (ORCPT
+        by vger.kernel.org with ESMTP id S244045AbhIQDlD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Sep 2021 23:35:15 -0400
+        Thu, 16 Sep 2021 23:41:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631849634;
+        s=mimecast20190719; t=1631849981;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NpjC2vhQxMNwcJykwWES5XKw9YQ1dBU9ER+zWax0kyA=;
-        b=R6tlPCE/s6UcVw7FHm8yYXeeW/iCI/c8Vf0XhJPbuHktqvXAb+2ghovVD1UiVD1SRKhR9m
-        YNnV/TngGegdz8mUqmYCppKbys4VHeRh/qPsTnzCIo4mlnkFyMPh6I8vjxgjTqACL5B1G+
-        hKvBR2GmirVCbxgdOor4WPM9ZAeoMw8=
+        bh=B9r/+Zs88h2CfccJTBLTJgNfdwtNFfPY6UfBjfQU3/E=;
+        b=Mp6aMp3JL7vVe0h3GQLlol+G61AaZvCg+ejCg3QgLgNEs1nzQy030r9d9KIq/qXY3mN9MH
+        egzYBJwzbKFABstOMzpLttoBaJw+81aB4PsMl8zzL5oa8tOQdkVmPJoUmNgXsjRZ1xGDcs
+        eb6WMJ3g/IdKbeUB0iTTs3G+fYF5k6U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-wkzXyDo5MjeoCvg_x25aVw-1; Thu, 16 Sep 2021 23:33:53 -0400
-X-MC-Unique: wkzXyDo5MjeoCvg_x25aVw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-429-S64eqPBnPpae_FmZr_hRmw-1; Thu, 16 Sep 2021 23:39:40 -0400
+X-MC-Unique: S64eqPBnPpae_FmZr_hRmw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A9F71006AA3;
-        Fri, 17 Sep 2021 03:33:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CB0D8145E6;
+        Fri, 17 Sep 2021 03:39:39 +0000 (UTC)
 Received: from T590.Home (ovpn-12-120.pek2.redhat.com [10.72.12.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 964E960BF4;
-        Fri, 17 Sep 2021 03:33:42 +0000 (UTC)
-Date:   Fri, 17 Sep 2021 11:33:55 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F64D5D9D3;
+        Fri, 17 Sep 2021 03:39:35 +0000 (UTC)
+Date:   Fri, 17 Sep 2021 11:39:48 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH v9] nbd: fix uaf in nbd_handle_reply()
-Message-ID: <YUQMo1afA8v5/RJW@T590.Home>
-References: <20210916093350.1410403-8-yukuai3@huawei.com>
- <20210916141810.2325276-1-yukuai3@huawei.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH] scsi: core: cleanup request queue before releasing
+ gendisk
+Message-ID: <YUQOBKa67R9pEunr@T590.Home>
+References: <20210915092547.990285-1-ming.lei@redhat.com>
+ <20210915134008.GA13933@lst.de>
+ <YUKfl9Qqsluh+5FX@T590>
+ <20210916101451.GA26782@lst.de>
+ <YUM6uFHqfjWMM5BH@T590>
+ <20210916142009.GA12603@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210916141810.2325276-1-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210916142009.GA12603@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 10:18:10PM +0800, Yu Kuai wrote:
-> There is a problem that nbd_handle_reply() might access freed request:
+On Thu, Sep 16, 2021 at 04:20:09PM +0200, Christoph Hellwig wrote:
+> On Thu, Sep 16, 2021 at 08:38:16PM +0800, Ming Lei wrote:
+> > > > and it may cause other trouble at least for scsi disk since sd_shutdown()
+> > > > follows del_gendisk() and has to be called before blk_cleanup_queue().
+> > > 
+> > > Yes.  So we need to move the bits of blk_cleanup_queue that deal with
+> > > the file system I/O state to del_gendisk, and keep blk_cleanup_queue
+> > > for anything actually needed for the low-level queue.
+> > 
+> > Can you explain what the bits are in blk_cleanup_queue() for dealing with FS
+> > I/O state? blk_cleanup_queue() drains and shutdown the queue basically,
+> > all shouldn't be related with gendisk, and it is fine to implement one
+> > queue without gendisk involved, such as nvme admin, connect queue or
+> > sort of stuff.
+> > 
+> > Wrt. this reported issue, rq_qos_exit() needs to run before releasing
+> > gendisk, but queue has to put into freezing before calling
+> > rq_qos_exit(),
 > 
-> 1) At first, a normal io is submitted and completed with scheduler:
+> I was curious what you hit, but yes rq_qos_exit is obvious.
+> blk_flush_integrity also is very much about fs I/O state.
 > 
-> internel_tag = blk_mq_get_tag -> get tag from sched_tags
->  blk_mq_rq_ctx_init
->   sched_tags->rq[internel_tag] = sched_tag->static_rq[internel_tag]
-> ...
-> blk_mq_get_driver_tag
->  __blk_mq_get_driver_tag -> get tag from tags
->  tags->rq[tag] = sched_tag->static_rq[internel_tag]
 > 
-> So, both tags->rq[tag] and sched_tags->rq[internel_tag] are pointing
-> to the request: sched_tags->static_rq[internal_tag]. Even if the
-> io is finished.
 > 
-> 2) nbd server send a reply with random tag directly:
+> > so looks you suggest to move the following code into
+> > del_gendisk()?
 > 
-> recv_work
->  nbd_handle_reply
->   blk_mq_tag_to_rq(tags, tag)
->    rq = tags->rq[tag]
-> 
-> 3) if the sched_tags->static_rq is freed:
-> 
-> blk_mq_sched_free_requests
->  blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i)
->   -> step 2) access rq before clearing rq mapping
->   blk_mq_clear_rq_mapping(set, tags, hctx_idx);
->   __free_pages() -> rq is freed here
-> 
-> 4) Then, nbd continue to use the freed request in nbd_handle_reply
-> 
-> Fix the problem by get 'q_usage_counter' before blk_mq_tag_to_rq(),
-> thus request is ensured not to be freed because 'q_usage_counter' is
-> not zero.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
-> Changes in v9:
->  - move percpu_ref_put() behind.
+> something like that.  I think we need to split the dying flag into
+> one for the gendisk and one for the queue first, and make sure the
+> queue freeze in del_gendisk is released again so that passthrough
+> still works after.
 
-Looks fine:
+If we do that, q->disk is really unnecessary, so looks the fix of
+'d152c682f03c block: add an explicit ->disk backpointer to the request_queue'
+isn't good. The original issue added in 'edb0872f44ec block: move the
+bdi from the request_queue to the gendisk' can be fixed simply by moving
+the two lines code in blk_unregister_queue() to blk_cleanup_queue():
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+        kobject_uevent(&q->kobj, KOBJ_REMOVE);
+        kobject_del(&q->kobj);
 
--- 
+
+Thanks,
 Ming
 
