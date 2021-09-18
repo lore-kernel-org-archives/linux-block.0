@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CC6C4727C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3D0C28CAB
 	for <linux-block@archiver.kernel.org>; Sat, 18 Sep 2021 05:05:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACE486126A
+	by mail.kernel.org (Postfix) with ESMTP id 87E186126A
 	for <linux-block@archiver.kernel.org>; Sat, 18 Sep 2021 05:05:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241648AbhIRFGl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Sep 2021 01:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34252 "EHLO
+        id S241485AbhIRFGk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Sep 2021 01:06:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239424AbhIRFGf (ORCPT
+        with ESMTP id S238582AbhIRFGf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 18 Sep 2021 01:06:35 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6112FC06175F;
-        Fri, 17 Sep 2021 22:05:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CB87C061574;
+        Fri, 17 Sep 2021 22:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=dzQDmz7xxO3VvMmtTJfTfYGp1BzfMy8nL3YIn6nOqbs=; b=gvGn0YcA46T57LAqEUumG8T74w
-        WeB6iIfuYPDSkZuRgbl+utpyBEm6OIYDCFFxhLma9zmcJSxoHdkIuJqTBBk1xzu5tmLxlvELfn1h7
-        cDMVlGGNFHx/MU861wddSshlZ9gyN7TjIvEIqwxMkFieZ8cikaCJljbgSwPeOVIYNRfPH4KZewEuR
-        TVa9Wv8BJ7Yao/1K8zubeUf0TmClCyPJIWsBhibpMrpeDfvlFcublaIozWAtFn6jpkmpSz0+gt2wi
-        6VFNzVWB6ZG4Iyqbfx4BrvkBZK6UrL08NTIY2vEW20ov9dIGCLD+iEMGkEPkqSdV0nKoKRwTP61m7
-        lZeGrq3w==;
+        bh=JPiPQLfbh0zvgSweOGGWu9LHmTLKw+6joIwG+XJiktQ=; b=Dl39X2CltgzrunxpQcnNoLMxo2
+        yL4KkYWiiV1BOk10H3QjCsRBM7yEIsJ+oN2pv4v048sGKpvBaNnSOgq8opLqSHnQWt4bgNqQpptfk
+        c2aF7STQXnHcvnPKP5raG9MGs7CPMqKvEszUM2aqZE20bsLTq5Xlqff4CfhpUGfD2dNfHHKz8phO4
+        2gk3BvKPkXM8CWCPbQZIU0atDoaR1oyt1nlV/bESdriPo2xDbk5a5aDruse48XiS0SuuRVvcy7QBI
+        f9haE9y0wl8aDIcah6VjZ9EkbwMFKiPSsZyTdyp5WVh0uaq181JQSQFy67iWp47YnevX69E826+VA
+        pEna2zlQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mRSWe-00FP4S-VY; Sat, 18 Sep 2021 05:04:33 +0000
+        id 1mRSWf-00FP4c-9u; Sat, 18 Sep 2021 05:04:33 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     tj@kernel.org, gregkh@linuxfoundation.org,
         akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
@@ -61,9 +61,9 @@ Cc:     rdunlap@infradead.org, rafael@kernel.org, masahiroy@kernel.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
-Subject: [PATCH v7 04/12] kernfs: add initial failure injection support
-Date:   Fri, 17 Sep 2021 22:04:22 -0700
-Message-Id: <20210918050430.3671227-5-mcgrof@kernel.org>
+Subject: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
+Date:   Fri, 17 Sep 2021 22:04:27 -0700
+Message-Id: <20210918050430.3671227-10-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210918050430.3671227-1-mcgrof@kernel.org>
 References: <20210918050430.3671227-1-mcgrof@kernel.org>
@@ -74,398 +74,559 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds initial failure injection support to kernfs. We start
-off with debug knobs which when enabled allow test drivers, such as
-test_sysfs, to then make use of these to try to force certain
-difficult races to take place with a high degree of certainty.
+When sysfs attributes use a lock also used on module removal we can
+race to deadlock. This happens when for instance a sysfs file on
+a driver is used, then at the same time we have module removal call
+trigger. The module removal call code holds a lock, and then the sysfs
+file entry waits for the same lock. While holding the lock the module
+removal tries to remove the sysfs entries, but these cannot be removed
+yet as one is waiting for a lock. This won't complete as the lock is
+already held. Likewise module removal cannot complete, and so we deadlock.
 
-This only adds runtime code *iff* the new bool CONFIG_FAIL_KERNFS_KNOBS is
-enabled in your kernel. If you don't have this enabled this provides
-no new functional. When CONFIG_FAIL_KERNFS_KNOBS is disabled the new
-routine kernfs_debug_should_wait() ends up being transformed to if
-(false), and so the compiler should optimize these out as dead code
-producing no new effective binary changes.
+This can now be easily reproducible with our sysfs selftest as follows:
 
-We start off with enabling failure injections in kernfs by allowing us to
-alter the way kernfs_fop_write_iter() behaves. We allow for the routine
-kernfs_fop_write_iter() to wait for a certain condition in the kernel to
-occur, after which it will sleep a predefined amount of time. This lets
-kernfs users to time exactly when it want kernfs_fop_write_iter() to
-complete, allowing for developing race conditions and test for correctness
-in kernfs.
+./tools/testing/selftests/sysfs/sysfs.sh -t 0027
 
-You'd boot with this enabled on your kernel command line:
+To fix this we extend the struct kernfs_node with a module reference and
+use the try_module_get() after kernfs_get_active() is called which
+protects integrity and the existence of the kernfs node during the
+operation.
 
-fail_kernfs_fop_write_iter=1,100,0,1
+So long as the kernfs node is protected with kernfs_get_active() we know
+we can rely on its contents. And, as now just documented in the previous
+patch, we also now know that once kernfs_get_active() is called the module
+is also guarded to exist and cannot be removed.
 
-The values are <interval,probability,size,times>, we don't care for
-size, so for now we ignore it. The above ensures a failure will trigger
-only once.
+If try_module_get() fails we fail the operation on the kernfs node.
 
-*How* we allow for this routine to change behaviour is left to knobs we
-expose under debugfs:
+We use a try method as a full lock means we'd then make our sysfs
+attributes busy us out from possible module removal, and so userspace
+could force denying module removal, a silly form of "DOS" against module
+removal. A try lock on the module removal ensures we give priority to
+module removal and interacting with sysfs attributes only comes second.
+Using a full lock could mean for instance that if you don't stop poking
+at sysfs files you cannot remove a module.
 
- # ls -1 /sys/kernel/debug/kernfs/config_fail_kernfs_fop_write_iter/
-wait_after_active
-wait_after_mutex
-wait_at_start
-wait_before_mutex
+Races between removal of sysfs files and the module are not possible
+given sysfs files are created by the same module, and when a sysfs file
+is being used kernfs prevents removal of the sysfs file. So if module
+removal is actually happening the removal would have to wait until
+the sysfs file operation is complete.
 
-A debugfs entry also exists to allow us to sleep a configurabler amount
-of time after the completion:
+This deadlock was first reported with the zram driver, however the live
+patching folks have acknowledged they have observed this as well with
+live patching, when a live patch is removed. I was then able to
+reproduce easily by creating a dedicated selftests.
 
-/sys/kernel/debug/kernfs/sleep_after_wait_ms
+A sketch of how this can happen follows:
 
-These two sets of knobs allow us to construct races and demonstrate
-how the kernfs active reference should suffice to project against
-races.
+CPU A                              CPU B
+                                   whatever_store()
+module_unload
+  mutex_lock(foo)
+                                   mutex_lock(foo)
+   del_gendisk(zram->disk);
+     device_del()
+       device_remove_groups()
 
-Enabling CONFIG_FAULT_INJECTION_DEBUG_FS enables us to configure the
-differnt fault injection parametres for the new fail_kernfs_fop_write_iter
-fault injection at run time:
-
-ls -1 /sys/kernel/debug/kernfs/fail_kernfs_fop_write_iter/
-interval
-probability
-space
-task-filter
-times
-verbose
-verbose_ratelimit_burst
-verbose_ratelimit_interval_ms
+In this situation whatever_store() is waiting for the mutex foo to
+become unlocked, but that won't happen until module removal is complete.
+But module removal won't complete until the sysfs file being poked
+completes which is waiting for a lock already held.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- .../fault-injection/fault-injection.rst       | 22 +++++
- MAINTAINERS                                   |  2 +-
- fs/kernfs/Makefile                            |  1 +
- fs/kernfs/failure-injection.c                 | 91 +++++++++++++++++++
- fs/kernfs/file.c                              | 13 +++
- fs/kernfs/kernfs-internal.h                   | 72 +++++++++++++++
- include/linux/kernfs.h                        |  5 +
- lib/Kconfig.debug                             | 10 ++
- 8 files changed, 215 insertions(+), 1 deletion(-)
- create mode 100644 fs/kernfs/failure-injection.c
+ arch/x86/kernel/cpu/resctrl/rdtgroup.c |  4 +-
+ fs/kernfs/dir.c                        | 41 ++++++++++++++++++--
+ fs/kernfs/file.c                       |  7 +++-
+ fs/kernfs/kernfs-internal.h            |  1 +
+ fs/kernfs/symlink.c                    |  3 +-
+ fs/sysfs/dir.c                         |  4 +-
+ fs/sysfs/file.c                        | 10 +++--
+ fs/sysfs/group.c                       |  1 +
+ include/linux/kernfs.h                 | 11 ++++--
+ include/linux/sysfs.h                  | 52 ++++++++++++++++++++------
+ kernel/cgroup/cgroup.c                 |  2 +-
+ 11 files changed, 106 insertions(+), 30 deletions(-)
 
-diff --git a/Documentation/fault-injection/fault-injection.rst b/Documentation/fault-injection/fault-injection.rst
-index 4a25c5eb6f07..d4d34b082f47 100644
---- a/Documentation/fault-injection/fault-injection.rst
-+++ b/Documentation/fault-injection/fault-injection.rst
-@@ -28,6 +28,28 @@ Available fault injection capabilities
+diff --git a/arch/x86/kernel/cpu/resctrl/rdtgroup.c b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
+index b57b3db9a6a7..d40c486f46b9 100644
+--- a/arch/x86/kernel/cpu/resctrl/rdtgroup.c
++++ b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
+@@ -207,7 +207,7 @@ static int rdtgroup_add_file(struct kernfs_node *parent_kn, struct rftype *rft)
+ 	struct kernfs_node *kn;
+ 	int ret;
  
-   injects kernel RPC client and server failures.
+-	kn = __kernfs_create_file(parent_kn, rft->name, rft->mode,
++	kn = __kernfs_create_file(parent_kn, rft->name, rft->mode, NULL,
+ 				  GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+ 				  0, rft->kf_ops, rft, NULL, NULL);
+ 	if (IS_ERR(kn))
+@@ -2480,7 +2480,7 @@ static int mon_addfile(struct kernfs_node *parent_kn, const char *name,
+ 	struct kernfs_node *kn;
+ 	int ret = 0;
  
-+- fail_kernfs_fop_write_iter
-+
-+  Allows for failures to be enabled inside kernfs_fop_write_iter(). Enabling
-+  this does not immediately enable any errors to occur. You must configure
-+  how you want this routine to fail or change behaviour by using the debugfs
-+  knobs for it:
-+
-+  # ls -1 /sys/kernel/debug/kernfs/config_fail_kernfs_fop_write_iter/
-+  wait_after_active
-+  wait_after_mutex
-+  wait_at_start
-+  wait_before_mutex
-+
-+  You can also configure how long to sleep after a wait under
-+
-+  /sys/kernel/debug/kernfs/sleep_after_wait_ms
-+
-+  If you enable CONFIG_FAULT_INJECTION_DEBUG_FS the fail_add_disk failure
-+  injection parameters are placed under:
-+
-+  /sys/kernel/debug/kernfs/fail_kernfs_fop_write_iter/
-+
- - fail_make_request
+-	kn = __kernfs_create_file(parent_kn, name, 0444,
++	kn = __kernfs_create_file(parent_kn, name, 0444, NULL,
+ 				  GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, 0,
+ 				  &kf_mondata_ops, priv, NULL, NULL);
+ 	if (IS_ERR(kn))
+diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
+index ba581429bf7b..f463878a5bf4 100644
+--- a/fs/kernfs/dir.c
++++ b/fs/kernfs/dir.c
+@@ -14,6 +14,7 @@
+ #include <linux/slab.h>
+ #include <linux/security.h>
+ #include <linux/hash.h>
++#include <linux/module.h>
  
-   injects disk IO errors on devices permitted by setting
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 28a34384f541..acdbf91058d5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10341,7 +10341,7 @@ M:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
- M:	Tejun Heo <tj@kernel.org>
- S:	Supported
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git
--F:	fs/kernfs/
-+F:	fs/kernfs/*
- F:	include/linux/kernfs.h
+ #include "kernfs-internal.h"
  
- KEXEC
-diff --git a/fs/kernfs/Makefile b/fs/kernfs/Makefile
-index 4ca54ff54c98..bc5b32ca39f9 100644
---- a/fs/kernfs/Makefile
-+++ b/fs/kernfs/Makefile
-@@ -4,3 +4,4 @@
- #
+@@ -414,12 +415,32 @@ static bool kernfs_unlink_sibling(struct kernfs_node *kn)
+  */
+ struct kernfs_node *kernfs_get_active(struct kernfs_node *kn)
+ {
++	int v;
++
+ 	if (unlikely(!kn))
+ 		return NULL;
  
- obj-y		:= mount.o inode.o dir.o file.o symlink.o
-+obj-$(CONFIG_FAIL_KERNFS_KNOBS)    += failure-injection.o
-diff --git a/fs/kernfs/failure-injection.c b/fs/kernfs/failure-injection.c
-new file mode 100644
-index 000000000000..4130d202c13b
---- /dev/null
-+++ b/fs/kernfs/failure-injection.c
-@@ -0,0 +1,91 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/fault-inject.h>
-+#include <linux/delay.h>
-+
-+#include "kernfs-internal.h"
-+
-+static DECLARE_FAULT_ATTR(fail_kernfs_fop_write_iter);
-+struct kernfs_config_fail kernfs_config_fail;
-+
-+#define kernfs_config_fail(when) \
-+	kernfs_config_fail.kernfs_fop_write_iter_fail.wait_ ## when
-+
-+#define kernfs_config_fail(when) \
-+	kernfs_config_fail.kernfs_fop_write_iter_fail.wait_ ## when
-+
-+static int __init setup_fail_kernfs_fop_write_iter(char *str)
-+{
-+	return setup_fault_attr(&fail_kernfs_fop_write_iter, str);
-+}
-+
-+__setup("fail_kernfs_fop_write_iter=", setup_fail_kernfs_fop_write_iter);
-+
-+struct dentry *kernfs_debugfs_root;
-+struct dentry *config_fail_kernfs_fop_write_iter;
-+
-+static int __init kernfs_init_failure_injection(void)
-+{
-+	kernfs_config_fail.sleep_after_wait_ms = 100;
-+	kernfs_debugfs_root = debugfs_create_dir("kernfs", NULL);
-+
-+	fault_create_debugfs_attr("fail_kernfs_fop_write_iter",
-+				  kernfs_debugfs_root, &fail_kernfs_fop_write_iter);
-+
-+	config_fail_kernfs_fop_write_iter =
-+		debugfs_create_dir("config_fail_kernfs_fop_write_iter",
-+				   kernfs_debugfs_root);
-+
-+	debugfs_create_u32("sleep_after_wait_ms", 0600,
-+			   kernfs_debugfs_root,
-+			   &kernfs_config_fail.sleep_after_wait_ms);
-+
-+	debugfs_create_bool("wait_at_start", 0600,
-+			    config_fail_kernfs_fop_write_iter,
-+			    &kernfs_config_fail(at_start));
-+	debugfs_create_bool("wait_before_mutex", 0600,
-+			    config_fail_kernfs_fop_write_iter,
-+			    &kernfs_config_fail(before_mutex));
-+	debugfs_create_bool("wait_after_mutex", 0600,
-+			    config_fail_kernfs_fop_write_iter,
-+			    &kernfs_config_fail(after_mutex));
-+	debugfs_create_bool("wait_after_active", 0600,
-+			    config_fail_kernfs_fop_write_iter,
-+			    &kernfs_config_fail(after_active));
-+	return 0;
-+}
-+late_initcall(kernfs_init_failure_injection);
-+
-+int __kernfs_debug_should_wait_kernfs_fop_write_iter(bool evaluate)
-+{
-+	if (!evaluate)
-+		return 0;
-+
-+	return should_fail(&fail_kernfs_fop_write_iter, 0);
-+}
-+
-+DECLARE_COMPLETION(kernfs_debug_wait_completion);
-+EXPORT_SYMBOL_NS_GPL(kernfs_debug_wait_completion, KERNFS_DEBUG_PRIVATE);
-+
-+void kernfs_debug_wait(void)
-+{
-+	unsigned long timeout;
-+
-+	timeout = wait_for_completion_timeout(&kernfs_debug_wait_completion,
-+					      msecs_to_jiffies(3000));
-+	if (!timeout)
-+		pr_info("%s waiting for kernfs_debug_wait_completion timed out\n",
-+			__func__);
-+	else
-+		pr_info("%s received completion with time left on timeout %u ms\n",
-+			__func__, jiffies_to_msecs(timeout));
-+
-+	/**
-+	 * The goal is wait for an event, and *then* once we have
-+	 * reached it, the other side will try to do something which
-+	 * it thinks will break. So we must give it some time to do
-+	 * that. The amount of time is configurable.
+ 	if (!atomic_inc_unless_negative(&kn->active))
+ 		return NULL;
+ 
++	/*
++	 * If a module created the kernfs_node, the module cannot possibly be
++	 * removed if the above atomic_inc_unless_negative() succeeded. So the
++	 * try_module_get() below is not to protect the lifetime of the module
++	 * as that is already guaranteed. The try_module_get() below is used
++	 * to ensure that we don't deadlock in case a kernfs operation and
++	 * module removal used a shared lock.
++	 *
++	 * We use a try method to avoid userspace DOS'ing module removal with
++	 * access to kernfs ops.
 +	 */
-+	msleep(kernfs_config_fail.sleep_after_wait_ms);
-+	pr_info("%s ended\n", __func__);
-+}
++	if (!try_module_get(kn->owner)) {
++		v = atomic_dec_return(&kn->active);
++		if (unlikely(v == KN_DEACTIVATED_BIAS))
++			wake_up_all(&kernfs_root(kn)->deactivate_waitq);
++		return NULL;
++	}
++
+ 	if (kernfs_lockdep(kn))
+ 		rwsem_acquire_read(&kn->dep_map, 0, 1, _RET_IP_);
+ 	return kn;
+@@ -442,6 +463,13 @@ void kernfs_put_active(struct kernfs_node *kn)
+ 	if (kernfs_lockdep(kn))
+ 		rwsem_release(&kn->dep_map, _RET_IP_);
+ 	v = atomic_dec_return(&kn->active);
++
++	/*
++	 * We prevent module exit *until* we know for sure all possible
++	 * kernfs ops are done.
++	 */
++	module_put(kn->owner);
++
+ 	if (likely(v != KN_DEACTIVATED_BIAS))
+ 		return;
+ 
+@@ -571,6 +599,7 @@ struct kernfs_node *kernfs_node_from_dentry(struct dentry *dentry)
+ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 					     struct kernfs_node *parent,
+ 					     const char *name, umode_t mode,
++					     struct module *owner,
+ 					     kuid_t uid, kgid_t gid,
+ 					     unsigned flags)
+ {
+@@ -606,6 +635,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 
+ 	kn->name = name;
+ 	kn->mode = mode;
++	kn->owner = owner;
+ 	kn->flags = flags;
+ 
+ 	if (!uid_eq(uid, GLOBAL_ROOT_UID) || !gid_eq(gid, GLOBAL_ROOT_GID)) {
+@@ -639,13 +669,14 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 
+ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
+ 				    const char *name, umode_t mode,
++				    struct module *owner,
+ 				    kuid_t uid, kgid_t gid,
+ 				    unsigned flags)
+ {
+ 	struct kernfs_node *kn;
+ 
+ 	kn = __kernfs_new_node(kernfs_root(parent), parent,
+-			       name, mode, uid, gid, flags);
++			       name, mode, owner, uid, gid, flags);
+ 	if (kn) {
+ 		kernfs_get(parent);
+ 		kn->parent = parent;
+@@ -926,7 +957,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
+ 		root->id_highbits = 1;
+ 
+ 	kn = __kernfs_new_node(root, NULL, "", S_IFDIR | S_IRUGO | S_IXUGO,
+-			       GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
++			       NULL, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+ 			       KERNFS_DIR);
+ 	if (!kn) {
+ 		idr_destroy(&root->ino_idr);
+@@ -965,6 +996,7 @@ void kernfs_destroy_root(struct kernfs_root *root)
+  * @parent: parent in which to create a new directory
+  * @name: name of the new directory
+  * @mode: mode of the new directory
++ * @owner: if set, the module owner of this directory
+  * @uid: uid of the new directory
+  * @gid: gid of the new directory
+  * @priv: opaque data associated with the new directory
+@@ -974,6 +1006,7 @@ void kernfs_destroy_root(struct kernfs_root *root)
+  */
+ struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
+ 					 const char *name, umode_t mode,
++					 struct module *owner,
+ 					 kuid_t uid, kgid_t gid,
+ 					 void *priv, const void *ns)
+ {
+@@ -982,7 +1015,7 @@ struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
+ 
+ 	/* allocate */
+ 	kn = kernfs_new_node(parent, name, mode | S_IFDIR,
+-			     uid, gid, KERNFS_DIR);
++			     owner, uid, gid, KERNFS_DIR);
+ 	if (!kn)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -1014,7 +1047,7 @@ struct kernfs_node *kernfs_create_empty_dir(struct kernfs_node *parent,
+ 
+ 	/* allocate */
+ 	kn = kernfs_new_node(parent, name, S_IRUGO|S_IXUGO|S_IFDIR,
+-			     GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, KERNFS_DIR);
++			     NULL, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, KERNFS_DIR);
+ 	if (!kn)
+ 		return ERR_PTR(-ENOMEM);
+ 
 diff --git a/fs/kernfs/file.c b/fs/kernfs/file.c
-index 60e2a86c535e..4479c6580333 100644
+index 4479c6580333..73be39ddc856 100644
 --- a/fs/kernfs/file.c
 +++ b/fs/kernfs/file.c
-@@ -259,6 +259,9 @@ static ssize_t kernfs_fop_write_iter(struct kiocb *iocb, struct iov_iter *iter)
- 	const struct kernfs_ops *ops;
- 	char *buf;
+@@ -974,6 +974,7 @@ const struct file_operations kernfs_file_fops = {
+  * @uid: uid of the file
+  * @gid: gid of the file
+  * @size: size of the file
++ * @owner: if set, the module owner of the file
+  * @ops: kernfs operations for the file
+  * @priv: private data for the file
+  * @ns: optional namespace tag of the file
+@@ -983,7 +984,9 @@ const struct file_operations kernfs_file_fops = {
+  */
+ struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
+ 					 const char *name,
+-					 umode_t mode, kuid_t uid, kgid_t gid,
++					 umode_t mode,
++					 struct module *owner,
++					 kuid_t uid, kgid_t gid,
+ 					 loff_t size,
+ 					 const struct kernfs_ops *ops,
+ 					 void *priv, const void *ns,
+@@ -996,7 +999,7 @@ struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
+ 	flags = KERNFS_FILE;
  
-+	if (kernfs_debug_should_wait(kernfs_fop_write_iter, at_start))
-+		kernfs_debug_wait();
-+
- 	if (of->atomic_write_len) {
- 		if (len > of->atomic_write_len)
- 			return -E2BIG;
-@@ -280,17 +283,27 @@ static ssize_t kernfs_fop_write_iter(struct kiocb *iocb, struct iov_iter *iter)
- 	}
- 	buf[len] = '\0';	/* guarantee string termination */
+ 	kn = kernfs_new_node(parent, name, (mode & S_IALLUGO) | S_IFREG,
+-			     uid, gid, flags);
++			     owner, uid, gid, flags);
+ 	if (!kn)
+ 		return ERR_PTR(-ENOMEM);
  
-+	if (kernfs_debug_should_wait(kernfs_fop_write_iter, before_mutex))
-+		kernfs_debug_wait();
-+
- 	/*
- 	 * @of->mutex nests outside active ref and is used both to ensure that
- 	 * the ops aren't called concurrently for the same open file.
- 	 */
- 	mutex_lock(&of->mutex);
-+
-+	if (kernfs_debug_should_wait(kernfs_fop_write_iter, after_mutex))
-+		kernfs_debug_wait();
-+
- 	if (!kernfs_get_active(of->kn)) {
- 		mutex_unlock(&of->mutex);
- 		len = -ENODEV;
- 		goto out_free;
- 	}
- 
-+	if (kernfs_debug_should_wait(kernfs_fop_write_iter, after_active))
-+		kernfs_debug_wait();
-+
- 	ops = kernfs_ops(of->kn);
- 	if (ops->write)
- 		len = ops->write(of, buf, len, iocb->ki_pos);
 diff --git a/fs/kernfs/kernfs-internal.h b/fs/kernfs/kernfs-internal.h
-index f9cc912c31e1..9e3abf597e2d 100644
+index 9e3abf597e2d..3551f62f1449 100644
 --- a/fs/kernfs/kernfs-internal.h
 +++ b/fs/kernfs/kernfs-internal.h
-@@ -18,6 +18,7 @@
+@@ -133,6 +133,7 @@ void kernfs_put_active(struct kernfs_node *kn);
+ int kernfs_add_one(struct kernfs_node *kn);
+ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
+ 				    const char *name, umode_t mode,
++				    struct module *owner,
+ 				    kuid_t uid, kgid_t gid,
+ 				    unsigned flags);
  
- #include <linux/kernfs.h>
- #include <linux/fs_context.h>
-+#include <linux/stringify.h>
+diff --git a/fs/kernfs/symlink.c b/fs/kernfs/symlink.c
+index 19a6c71c6ff5..1d781970bec7 100644
+--- a/fs/kernfs/symlink.c
++++ b/fs/kernfs/symlink.c
+@@ -36,7 +36,8 @@ struct kernfs_node *kernfs_create_link(struct kernfs_node *parent,
+ 		gid = target->iattr->ia_gid;
+ 	}
  
- struct kernfs_iattrs {
- 	kuid_t			ia_uid;
-@@ -147,4 +148,75 @@ void kernfs_drain_open_files(struct kernfs_node *kn);
-  */
- extern const struct inode_operations kernfs_symlink_iops;
+-	kn = kernfs_new_node(parent, name, S_IFLNK|0777, uid, gid, KERNFS_LINK);
++	kn = kernfs_new_node(parent, name, S_IFLNK|0777, target->owner, uid,
++			     gid, KERNFS_LINK);
+ 	if (!kn)
+ 		return ERR_PTR(-ENOMEM);
  
-+/*
-+ * failure-injection.c
-+ */
-+#ifdef CONFIG_FAIL_KERNFS_KNOBS
-+
-+/**
-+ * struct kernfs_fop_write_iter_fail - how kernfs_fop_write_iter_fail fails
-+ *
-+ * This lets you configure what part of kernfs_fop_write_iter() should behave
-+ * in a specific way to allow userspace to capture possible failures in
-+ * kernfs. The wait knobs are allowed to let you design capture possible
-+ * race conditions which would otherwise be difficult to reproduce. A
-+ * secondary driver would tell kernfs's wait completion when it is done.
-+ *
-+ * The point to the wait completion failure injection tests are to confirm
-+ * that the kernfs active refcount suffice to ensure other objects in other
-+ * layers are also gauranteed to exist, even they are opaque to kernfs. This
-+ * includes kobjects, devices, and other objects built on top of this, like
-+ * the block layer when using sysfs block device attributes.
-+ *
-+ * @wait_at_start: waits for completion from a third party at the start of
-+ *	the routine.
-+ * @wait_before_mutex: waits for completion from a third party before we
-+ *	are allowed to continue before the of->mutex is held.
-+ * @wait_after_mutex: waits for completion from a third party after we
-+ *	have held the of->mutex.
-+ * @wait_after_active: waits for completion from a thid party after we
-+ *	have refcounted the struct kernfs_node.
-+ */
-+struct kernfs_fop_write_iter_fail {
-+	bool wait_at_start;
-+	bool wait_before_mutex;
-+	bool wait_after_mutex;
-+	bool wait_after_active;
-+};
-+
-+/**
-+ * struct kernfs_config_fail - kernfs configuration for failure injection
-+ *
-+ * You can kernfs failure injection on boot, and in particular we currently
-+ * only support failures for kernfs_fop_write_iter(). However, we don't
-+ * want to always enable errors on this call when failure injection is enabled
-+ * as this routine is used by many parts of the kernel for proper functionality.
-+ * The compromise we make is we let userspace start enabling which parts it
-+ * wants to fail after boot, if and only if failure injection has been enabled.
-+ *
-+ * @kernfs_fop_write_iter_fail: configuration for how we want to allow
-+ *	for failure injection on kernfs_fop_write_iter()
-+ * @sleep_after_wait_ms: how many ms to wait after completion is received.
-+ */
-+struct kernfs_config_fail {
-+	struct kernfs_fop_write_iter_fail kernfs_fop_write_iter_fail;
-+	u32 sleep_after_wait_ms;
-+};
-+
-+extern struct kernfs_config_fail kernfs_config_fail;
-+
-+#define __kernfs_config_wait_var(func, when) \
-+	(kernfs_config_fail.  func  ## _fail.wait_  ## when)
-+#define __kernfs_debug_should_wait_func_name(func) __kernfs_debug_should_wait_## func
-+
-+#define kernfs_debug_should_wait(func, when) \
-+	__kernfs_debug_should_wait_func_name(func)(__kernfs_config_wait_var(func, when))
-+int __kernfs_debug_should_wait_kernfs_fop_write_iter(bool evaluate);
-+void kernfs_debug_wait(void);
-+#else
-+static inline void kernfs_init_failure_injection(void) {}
-+#define kernfs_debug_should_wait(func, when) (false)
-+static inline void kernfs_debug_wait(void) {}
-+#endif
-+
- #endif	/* __KERNFS_INTERNAL_H */
+diff --git a/fs/sysfs/dir.c b/fs/sysfs/dir.c
+index b6b6796e1616..01a0a53ee18e 100644
+--- a/fs/sysfs/dir.c
++++ b/fs/sysfs/dir.c
+@@ -56,8 +56,8 @@ int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
+ 
+ 	kobject_get_ownership(kobj, &uid, &gid);
+ 
+-	kn = kernfs_create_dir_ns(parent, kobject_name(kobj), 0755, uid, gid,
+-				  kobj, ns);
++	kn = kernfs_create_dir_ns(parent, kobject_name(kobj), 0755, NULL, uid,
++				  gid, kobj, ns);
+ 	if (IS_ERR(kn)) {
+ 		if (PTR_ERR(kn) == -EEXIST)
+ 			sysfs_warn_dup(parent, kobject_name(kobj));
+diff --git a/fs/sysfs/file.c b/fs/sysfs/file.c
+index 42dcf96881b6..5edc6e180a97 100644
+--- a/fs/sysfs/file.c
++++ b/fs/sysfs/file.c
+@@ -291,8 +291,9 @@ int sysfs_add_file_mode_ns(struct kernfs_node *parent,
+ 		key = attr->key ?: (struct lock_class_key *)&attr->skey;
+ #endif
+ 
+-	kn = __kernfs_create_file(parent, attr->name, mode & 0777, uid, gid,
+-				  PAGE_SIZE, ops, (void *)attr, ns, key);
++	kn = __kernfs_create_file(parent, attr->name, mode & 0777, attr->owner,
++				  uid, gid, PAGE_SIZE, ops, (void *)attr, ns,
++				  key);
+ 	if (IS_ERR(kn)) {
+ 		if (PTR_ERR(kn) == -EEXIST)
+ 			sysfs_warn_dup(parent, attr->name);
+@@ -326,8 +327,9 @@ int sysfs_add_bin_file_mode_ns(struct kernfs_node *parent,
+ 		key = attr->key ?: (struct lock_class_key *)&attr->skey;
+ #endif
+ 
+-	kn = __kernfs_create_file(parent, attr->name, mode & 0777, uid, gid,
+-				  battr->size, ops, (void *)attr, ns, key);
++	kn = __kernfs_create_file(parent, attr->name, mode & 0777, attr->owner,
++				  uid, gid, battr->size, ops, (void *)attr, ns,
++				  key);
+ 	if (IS_ERR(kn)) {
+ 		if (PTR_ERR(kn) == -EEXIST)
+ 			sysfs_warn_dup(parent, attr->name);
+diff --git a/fs/sysfs/group.c b/fs/sysfs/group.c
+index eeb0e3099421..283607c22eef 100644
+--- a/fs/sysfs/group.c
++++ b/fs/sysfs/group.c
+@@ -135,6 +135,7 @@ static int internal_create_group(struct kobject *kobj, int update,
+ 		} else {
+ 			kn = kernfs_create_dir_ns(kobj->sd, grp->name,
+ 						  S_IRWXU | S_IRUGO | S_IXUGO,
++						  grp->owner,
+ 						  uid, gid, kobj, NULL);
+ 			if (IS_ERR(kn)) {
+ 				if (PTR_ERR(kn) == -EEXIST)
 diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index 3ccce6f24548..cd968ee2b503 100644
+index cd968ee2b503..8655abd53c85 100644
 --- a/include/linux/kernfs.h
 +++ b/include/linux/kernfs.h
-@@ -411,6 +411,11 @@ void kernfs_init(void);
+@@ -160,6 +160,7 @@ struct kernfs_node {
  
- struct kernfs_node *kernfs_find_and_get_node_by_id(struct kernfs_root *root,
- 						   u64 id);
-+
-+#ifdef CONFIG_FAIL_KERNFS_KNOBS
-+extern struct completion kernfs_debug_wait_completion;
-+#endif
-+
- #else	/* CONFIG_KERNFS */
+ 	unsigned short		flags;
+ 	umode_t			mode;
++	struct module           *owner;
+ 	struct kernfs_iattrs	*iattr;
+ };
  
- static inline enum kernfs_node_type kernfs_type(struct kernfs_node *kn)
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index ae19bf1a21b8..a29b7d398c4e 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1902,6 +1902,16 @@ config FAULT_INJECTION_USERCOPY
- 	  Provides fault-injection capability to inject failures
- 	  in usercopy functions (copy_from_user(), get_user(), ...).
+@@ -369,12 +370,14 @@ void kernfs_destroy_root(struct kernfs_root *root);
  
-+config FAIL_KERNFS_KNOBS
-+	bool "Fault-injection support in kernfs"
-+	depends on FAULT_INJECTION
-+	help
-+	  Provide fault-injection capability for kernfs. This only enables
-+	  the error injection functionality. To use it you must configure which
-+	  which path you want to trigger on error on using debugfs under
-+	  /sys/kernel/debug/kernfs/config_fail_kernfs_fop_write_iter/. By
-+	  default all of these are disabled.
-+
- config FAIL_MAKE_REQUEST
- 	bool "Fault-injection capability for disk IO"
- 	depends on FAULT_INJECTION && BLOCK
+ struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
+ 					 const char *name, umode_t mode,
++					 struct module *owner,
+ 					 kuid_t uid, kgid_t gid,
+ 					 void *priv, const void *ns);
+ struct kernfs_node *kernfs_create_empty_dir(struct kernfs_node *parent,
+ 					    const char *name);
+ struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
+ 					 const char *name, umode_t mode,
++					 struct module *owner,
+ 					 kuid_t uid, kgid_t gid,
+ 					 loff_t size,
+ 					 const struct kernfs_ops *ops,
+@@ -471,13 +474,15 @@ static inline void kernfs_destroy_root(struct kernfs_root *root) { }
+ 
+ static inline struct kernfs_node *
+ kernfs_create_dir_ns(struct kernfs_node *parent, const char *name,
+-		     umode_t mode, kuid_t uid, kgid_t gid,
++		     umode_t mode, struct module *owner,
++		     kuid_t uid, kgid_t gid,
+ 		     void *priv, const void *ns)
+ { return ERR_PTR(-ENOSYS); }
+ 
+ static inline struct kernfs_node *
+ __kernfs_create_file(struct kernfs_node *parent, const char *name,
+-		     umode_t mode, kuid_t uid, kgid_t gid,
++		     umode_t mode, struct module *owner,
++		     kuid_t uid, kgid_t gid,
+ 		     loff_t size, const struct kernfs_ops *ops,
+ 		     void *priv, const void *ns, struct lock_class_key *key)
+ { return ERR_PTR(-ENOSYS); }
+@@ -564,7 +569,7 @@ static inline struct kernfs_node *
+ kernfs_create_dir(struct kernfs_node *parent, const char *name, umode_t mode,
+ 		  void *priv)
+ {
+-	return kernfs_create_dir_ns(parent, name, mode,
++	return kernfs_create_dir_ns(parent, name, mode, parent->owner,
+ 				    GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+ 				    priv, NULL);
+ }
+diff --git a/include/linux/sysfs.h b/include/linux/sysfs.h
+index e3f1e8ac1f85..babbabb460dc 100644
+--- a/include/linux/sysfs.h
++++ b/include/linux/sysfs.h
+@@ -30,6 +30,7 @@ enum kobj_ns_type;
+ struct attribute {
+ 	const char		*name;
+ 	umode_t			mode;
++	struct module           *owner;
+ #ifdef CONFIG_DEBUG_LOCK_ALLOC
+ 	bool			ignore_lockdep:1;
+ 	struct lock_class_key	*key;
+@@ -80,6 +81,7 @@ do {							\
+  * @attrs:	Pointer to NULL terminated list of attributes.
+  * @bin_attrs:	Pointer to NULL terminated list of binary attributes.
+  *		Either attrs or bin_attrs or both must be provided.
++ * @module:	If set, module responsible for this attribute group
+  */
+ struct attribute_group {
+ 	const char		*name;
+@@ -89,6 +91,7 @@ struct attribute_group {
+ 						  struct bin_attribute *, int);
+ 	struct attribute	**attrs;
+ 	struct bin_attribute	**bin_attrs;
++	struct module           *owner;
+ };
+ 
+ /*
+@@ -100,38 +103,52 @@ struct attribute_group {
+ 
+ #define __ATTR(_name, _mode, _show, _store) {				\
+ 	.attr = {.name = __stringify(_name),				\
+-		 .mode = VERIFY_OCTAL_PERMISSIONS(_mode) },		\
++		 .mode = VERIFY_OCTAL_PERMISSIONS(_mode),               \
++		 .owner  = THIS_MODULE,                                 \
++	},                                                             \
+ 	.show	= _show,						\
+ 	.store	= _store,						\
+ }
+ 
+ #define __ATTR_PREALLOC(_name, _mode, _show, _store) {			\
+ 	.attr = {.name = __stringify(_name),				\
+-		 .mode = SYSFS_PREALLOC | VERIFY_OCTAL_PERMISSIONS(_mode) },\
++		 .mode = SYSFS_PREALLOC | VERIFY_OCTAL_PERMISSIONS(_mode),\
++		 .owner  = THIS_MODULE,                                 \
++	},                                                              \
+ 	.show	= _show,						\
+ 	.store	= _store,						\
+ }
+ 
+ #define __ATTR_RO(_name) {						\
+-	.attr	= { .name = __stringify(_name), .mode = 0444 },		\
++	.attr	= { .name = __stringify(_name),                         \
++		    .mode = 0444,					\
++		    .owner  = THIS_MODULE,				\
++		},                                                     \
+ 	.show	= _name##_show,						\
+ }
+ 
+ #define __ATTR_RO_MODE(_name, _mode) {					\
+ 	.attr	= { .name = __stringify(_name),				\
+-		    .mode = VERIFY_OCTAL_PERMISSIONS(_mode) },		\
++		    .mode = VERIFY_OCTAL_PERMISSIONS(_mode),            \
++		    .owner  = THIS_MODULE,				\
++	},                                                              \
+ 	.show	= _name##_show,						\
+ }
+ 
+ #define __ATTR_RW_MODE(_name, _mode) {					\
+ 	.attr	= { .name = __stringify(_name),				\
+-		    .mode = VERIFY_OCTAL_PERMISSIONS(_mode) },		\
++		    .mode = VERIFY_OCTAL_PERMISSIONS(_mode),            \
++		    .owner  = THIS_MODULE,                              \
++	},								\
+ 	.show	= _name##_show,						\
+ 	.store	= _name##_store,					\
+ }
+ 
+ #define __ATTR_WO(_name) {						\
+-	.attr	= { .name = __stringify(_name), .mode = 0200 },		\
++	.attr	= { .name = __stringify(_name),                         \
++		    .mode = 0200,					\
++		    .owner  = THIS_MODULE,				\
++	},                                                              \
+ 	.store	= _name##_store,					\
+ }
+ 
+@@ -141,8 +158,11 @@ struct attribute_group {
+ 
+ #ifdef CONFIG_DEBUG_LOCK_ALLOC
+ #define __ATTR_IGNORE_LOCKDEP(_name, _mode, _show, _store) {	\
+-	.attr = {.name = __stringify(_name), .mode = _mode,	\
+-			.ignore_lockdep = true },		\
++	.attr = {.name = __stringify(_name),                    \
++		 .mode = _mode,					\
++		 .ignore_lockdep = true,                        \
++		 .owner  = THIS_MODULE,                         \
++	},							\
+ 	.show		= _show,				\
+ 	.store		= _store,				\
+ }
+@@ -159,6 +179,7 @@ static const struct attribute_group *_name##_groups[] = {	\
+ #define ATTRIBUTE_GROUPS(_name)					\
+ static const struct attribute_group _name##_group = {		\
+ 	.attrs = _name##_attrs,					\
++	.owner = THIS_MODULE,					\
+ };								\
+ __ATTRIBUTE_GROUPS(_name)
+ 
+@@ -199,20 +220,29 @@ struct bin_attribute {
+ 
+ /* macros to create static binary attributes easier */
+ #define __BIN_ATTR(_name, _mode, _read, _write, _size) {		\
+-	.attr = { .name = __stringify(_name), .mode = _mode },		\
++	.attr = { .name = __stringify(_name),                           \
++		   .mode = _mode,					\
++		   .owner = THIS_MODULE,				\
++	},								\
+ 	.read	= _read,						\
+ 	.write	= _write,						\
+ 	.size	= _size,						\
+ }
+ 
+ #define __BIN_ATTR_RO(_name, _size) {					\
+-	.attr	= { .name = __stringify(_name), .mode = 0444 },		\
++	.attr	= { .name = __stringify(_name),                         \
++		    .mode = 0444,					\
++		    .owner = THIS_MODULE,				\
++	},								\
+ 	.read	= _name##_read,						\
+ 	.size	= _size,						\
+ }
+ 
+ #define __BIN_ATTR_WO(_name, _size) {					\
+-	.attr	= { .name = __stringify(_name), .mode = 0200 },		\
++	.attr	= { .name = __stringify(_name),                         \
++		    .mode = 0200,					\
++		    .owner = THIS_MODULE,				\
++	},								\
+ 	.write	= _name##_write,					\
+ 	.size	= _size,						\
+ }
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 8afa8690d288..b9886db9ecdd 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -3949,7 +3949,7 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
+ 	key = &cft->lockdep_key;
+ #endif
+ 	kn = __kernfs_create_file(cgrp->kn, cgroup_file_name(cgrp, cft, name),
+-				  cgroup_file_mode(cft),
++				  cgroup_file_mode(cft), NULL,
+ 				  GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+ 				  0, cft->kf_ops, cft,
+ 				  NULL, key);
 -- 
 2.30.2
 
