@@ -2,247 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A4FC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 21:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 444C4C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 18 Sep 2021 00:03:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05D3861074
-	for <linux-block@archiver.kernel.org>; Fri, 17 Sep 2021 21:07:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AB5B61179
+	for <linux-block@archiver.kernel.org>; Sat, 18 Sep 2021 00:03:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344320AbhIQVI2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Sep 2021 17:08:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42512 "EHLO
+        id S236737AbhIRAFC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Sep 2021 20:05:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344238AbhIQVI1 (ORCPT
+        with ESMTP id S230379AbhIRAFC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Sep 2021 17:08:27 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000ECC061764
-        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 14:07:04 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id b8-20020a0562141148b02902f1474ce8b7so103493579qvt.20
-        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 14:07:04 -0700 (PDT)
+        Fri, 17 Sep 2021 20:05:02 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 052BEC061574
+        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 17:03:40 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so11135753pjr.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Sep 2021 17:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=1RUt2IvhDUKLquM1kcv9z34EUuW3smlZ2afUa2bIZHg=;
-        b=mBDQt0NeEIlmClEh53VD2jNMytDjF+f478ehVEuynsRp1GhLR4kW4nc8kdusDfUHvf
-         W4LW2+jw6NnX+0xT/t0YI0FgaWlNSz4k+wYfcAOdpt3e8VjWs6aXixTxpA/LLckXq0Rn
-         cNs/9yqN8XOG8iYQ/ZFT2Wtx+OVQYQfp8ScKjBhgH2WCurSVX9YukLnO4aaSLmIFfGCD
-         qFFt5bXowqWDsbY0aywODmPFyYUVu0t33qYV+cWHIwbGZttKzyp5NWs64VZuTs0f1HdS
-         p9xLiBUEDdLpoFo3tjY55HpoHDx/1LPaLvO/KOVUeBWpme1B+KZ5ep2WNmqKNd6aSSWU
-         mf2Q==
+        d=osandov-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=R6i+W+EoLU/2rBj4+e2SaLzuquW8bdEJaHFtJMdW89k=;
+        b=wfwTHnZzjxucMcdequzdsZjnx/UqchPJLWWfJj6UqG8wdXEu2lb+ZG/1HyQ5pKcutR
+         gb4faFtIQ0PMMqooTfEFwz7MQMPwEzhLqyiciHnzax33AoHC+bG8eOP3c0ALPWBu+8zY
+         zKNY7Hze+trGsmtL99aBggItwUzPyTHtOV5I+ANA+CbmVKqFyZk9fsvzDVwGHIU2VfZp
+         d9RbiMzrk9HbXqx0RwiLxQ4M5vSkmQUeDOnH2MX9PNetJLkQ6/FW+UCFgx4eYQObd/pa
+         wzz0/xbjaOoOOL+0lPbtanwRC8ii/SB1VHA9m4FY3nfPwpWszRx7ZQY++DZdzHjhvYE+
+         wFMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=1RUt2IvhDUKLquM1kcv9z34EUuW3smlZ2afUa2bIZHg=;
-        b=an1zATU2VQT/fBbMWIIOodh8GZ7HfRsjwBVCwdwybCKeV1QPhrthj6LqNqwGy+/jsJ
-         Th8XG4t1sVtY32kk3eDCBhSqF6LD6nUQz4GfLzfuO90yd4ObriJ0fa4tUYBw5lO9Xv8C
-         j0ukInFCevpbev3ybuesvPMB5hH13Q4zLhsSLQEusinL6MMWoVLMQImWzbyRfU0+qWPP
-         fXztOoikFHkda4yGRLBeaRNQPeEbAWXY5nQm7fs3ntam76FUTh6gkwts/m9LrHvnJXJx
-         WD6xd9tbPST0td1lI0PnZBbYBwycgy0KacHyz1HNRSuJ83R81pTRmURnE+gfrXADmb6O
-         NA9A==
-X-Gm-Message-State: AOAM532WS53JNivODhSZBDTfpoV3leKwXC4lbQyZwqNfB2ky+fL/cctf
-        hggLtxFJfmnMoz5GQo4+r9IyliNx8TJ7
-X-Google-Smtp-Source: ABdhPJwuhT21pwC4HbZIBKQBRcwBDZARIC5/y4SimyqpdTFIflIFMCV85KKaekuSd1m8ES8YnF7vy4AzjNZD
-X-Received: from bg.sfo.corp.google.com ([2620:15c:11a:202:4316:322d:79c2:7a14])
- (user=bgeffon job=sendgmr) by 2002:a0c:d6cd:: with SMTP id
- l13mr13168135qvi.24.1631912824132; Fri, 17 Sep 2021 14:07:04 -0700 (PDT)
-Date:   Fri, 17 Sep 2021 14:06:40 -0700
-Message-Id: <20210917210640.214211-1-bgeffon@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH] zram: Introduce an aged idle interface
-From:   Brian Geffon <bgeffon@google.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Brian Geffon <bgeffon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=R6i+W+EoLU/2rBj4+e2SaLzuquW8bdEJaHFtJMdW89k=;
+        b=cIdxOg8gc8rd0qWd/aAEBaxeZLpVLQotfCveu29btXYubTAl7eiDKCd6FfoQYUqCTc
+         77qSQpLTbu1Ntd+wo0AuPIhDA9LPbeHpSYqQWd5ppCkHJ28Yy0HNVurUnwQRyLy1FRJy
+         dm6z2my9sxw42hdtV01dGfEqFP5WedvkP4K0vAzOIld3ZyXAdClttwGDXboNVo0i44pg
+         x4x2qjdNadGh8Hs5iOzb8JQPFdeDTEfLyuFIaDkO6UEWGRVO+/wTc0XVQ6E8h77VSYVP
+         Txugw4idnFkPPSO7XqrXe/N8wl144gndSumSS4cL2Yu2sNQln3UL+pXRXwJx7KEpjFNr
+         5/lw==
+X-Gm-Message-State: AOAM531w0qe962jR9kxKJ86M0M9QCJzqL435+wC6AUDLDzNMzrYMoZCM
+        4Shd8xHjC6jIWeReUhxAPqSl6cgKf/zFmg==
+X-Google-Smtp-Source: ABdhPJzuO9f5UV07Uw7hq7nNmmJKa9n5B68Atjf4cKrrA0zH+s70Sr4+FZWOFjYeasnHCJGGeZI9Dw==
+X-Received: by 2002:a17:90a:db95:: with SMTP id h21mr15328732pjv.11.1631923419420;
+        Fri, 17 Sep 2021 17:03:39 -0700 (PDT)
+Received: from relinquished.localdomain ([2601:602:8b80:8e0::8b71])
+        by smtp.gmail.com with ESMTPSA id u24sm7683618pfm.27.2021.09.17.17.03.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Sep 2021 17:03:38 -0700 (PDT)
+Date:   Fri, 17 Sep 2021 17:03:38 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     bvanassche@acm.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH V2 blktests] nvmeof-mp/001: fix failure when
+ CONFIG_NVME_HWMON enabled
+Message-ID: <YUUs2i4RGjUpH2tJ@relinquished.localdomain>
+References: <20210917030911.25646-1-yi.zhang@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210917030911.25646-1-yi.zhang@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This change introduces a new sysfs file for the zram idle interface.
-The current idle interface has only a single mode "all." This is
-severely limiting in that it requires that you have the foresight
-to know that you'll want to have pages idle at some point in the future
-and forces the user to mark everything as idle.
+On Fri, Sep 17, 2021 at 11:09:11AM +0800, Yi Zhang wrote:
+> skip checking ng0n1/hwmon5 in count_devices
+> 
+> $ use_siw=1  ./check nvmeof-mp/001
+> nvmeof-mp/001 (Log in and log out)                           [failed]
+>     runtime  3.695s  ...  4.002s
+>     --- tests/nvmeof-mp/001.out	2021-09-12 05:35:17.866892187 -0400
+>     +++ /root/blktests/results/nodev/nvmeof-mp/001.out.bad	2021-09-12 06:49:25.621880616 -0400
+>     @@ -1,3 +1,3 @@
+>      Configured NVMe target driver
+>     -count_devices(): 1 <> 1
+>     +count_devices(): 3 <> 1
+>      Passed
+> $ ls -l /sys/class/nvme-fabrics/ctl/*/*/device
+> lrwxrwxrwx. 1 root root 0 Sep 12 06:49 /sys/class/nvme-fabrics/ctl/nvme0/hwmon5/device -> ../../nvme0
+> lrwxrwxrwx. 1 root root 0 Sep 12 06:49 /sys/class/nvme-fabrics/ctl/nvme0/ng0n1/device -> ../../nvme0
+> lrwxrwxrwx. 1 root root 0 Sep 12 06:49 /sys/class/nvme-fabrics/ctl/nvme0/nvme0n1/device -> ../../nvme0
+> 
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+> ---
+> V2: update regex to hwmon[0-9]+|ng[0-9]+n[0-9]+
+> 
+> ---
+>  tests/nvmeof-mp/001 | 1 +
+>  1 file changed, 1 insertion(+)
 
-This new proposed file idle_aged takes a single integer argument which
-represents the age of the pages (in seconds since access) to mark as idle.
-Because it requires accessed tracking it is only enabled when
-CONFIG_ZRAM_MEMORY_TRACKING is enabled. There are a few
-reasons why  this is being proposed as a new file rather than extending
-the existing file. The first reason is that it wouldn't allow more code
-sharing as this change already refactors the existing code to do so.
-Secondly, having a standalone file allows a caller to quickly check if this
-idle_aged interface is supported. Finally, it simplifies the parsing
-logic because now you only need to parse an int rather than more complex
-logic which would need to parse things like "aged 50."
-
-Signed-off-by: Brian Geffon <bgeffon@google.com>
----
- Documentation/admin-guide/blockdev/zram.rst | 11 ++-
- drivers/block/zram/zram_drv.c               | 75 +++++++++++++++++----
- 2 files changed, 70 insertions(+), 16 deletions(-)
-
-diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
-index 700329d25f57..ecd1c4916a1c 100644
---- a/Documentation/admin-guide/blockdev/zram.rst
-+++ b/Documentation/admin-guide/blockdev/zram.rst
-@@ -209,6 +209,8 @@ compact           	WO	trigger memory compaction
- debug_stat        	RO	this file is used for zram debugging purposes
- backing_dev	  	RW	set up backend storage for zram to write out
- idle		  	WO	mark allocated slot as idle
-+idle_aged              WO      mark allocated slot older than 'age' seconds
-+                                as idle (see later)
- ======================  ======  ===============================================
- 
- 
-@@ -325,8 +327,13 @@ as idle::
- 
- 	echo all > /sys/block/zramX/idle
- 
--From now on, any pages on zram are idle pages. The idle mark
--will be removed until someone requests access of the block.
-+Alternatively if the config option CONFIG_ZRAM_MEMORY_TRACKING is enabled
-+the idle_aged interface can be used to mark only pages older than 'age'
-+seconds as idle::
-+
-+        echo 86400 > /sys/block/zramX/idle_aged
-+
-+The idle mark will be removed until someone requests access of the block.
- IOW, unless there is access request, those pages are still idle pages.
- 
- Admin can request writeback of those idle pages at right timing via::
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index fcaf2750f68f..a371dc0edf9d 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -291,22 +291,16 @@ static ssize_t mem_used_max_store(struct device *dev,
- 	return len;
- }
- 
--static ssize_t idle_store(struct device *dev,
--		struct device_attribute *attr, const char *buf, size_t len)
-+/*
-+ * Mark all pages which are older than or equal to cutoff as IDLE.
-+ * Callers should hold the zram init lock in read mode
-+ **/
-+static void mark_idle(struct zram *zram, ktime_t cutoff)
- {
--	struct zram *zram = dev_to_zram(dev);
-+	int is_idle = 1;
- 	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
- 	int index;
- 
--	if (!sysfs_streq(buf, "all"))
--		return -EINVAL;
--
--	down_read(&zram->init_lock);
--	if (!init_done(zram)) {
--		up_read(&zram->init_lock);
--		return -EINVAL;
--	}
--
- 	for (index = 0; index < nr_pages; index++) {
- 		/*
- 		 * Do not mark ZRAM_UNDER_WB slot as ZRAM_IDLE to close race.
-@@ -314,16 +308,63 @@ static ssize_t idle_store(struct device *dev,
- 		 */
- 		zram_slot_lock(zram, index);
- 		if (zram_allocated(zram, index) &&
--				!zram_test_flag(zram, index, ZRAM_UNDER_WB))
--			zram_set_flag(zram, index, ZRAM_IDLE);
-+				!zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
-+#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-+			is_idle = (!cutoff || cutoff >= zram->table[index].ac_time);
-+#endif
-+			if (is_idle)
-+				zram_set_flag(zram, index, ZRAM_IDLE);
-+		}
- 		zram_slot_unlock(zram, index);
- 	}
-+}
-+
-+static ssize_t idle_store(struct device *dev,
-+		struct device_attribute *attr, const char *buf, size_t len)
-+{
-+	struct zram *zram = dev_to_zram(dev);
-+
-+	if (!sysfs_streq(buf, "all"))
-+		return -EINVAL;
-+
-+	down_read(&zram->init_lock);
-+	if (!init_done(zram)) {
-+		up_read(&zram->init_lock);
-+		return -EINVAL;
-+	}
- 
-+	/* Mark everything as idle */
-+	mark_idle(zram, 0);
- 	up_read(&zram->init_lock);
- 
- 	return len;
- }
- 
-+#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-+static ssize_t idle_aged_store(struct device *dev,
-+		struct device_attribute *attr, const char *buf, size_t len)
-+{
-+	struct zram *zram = dev_to_zram(dev);
-+	ktime_t cutoff_time;
-+	u64 age_sec;
-+	ssize_t rv = -EINVAL;
-+
-+	down_read(&zram->init_lock);
-+	if (!init_done(zram))
-+		goto out;
-+
-+	if (kstrtoull(buf, 10, &age_sec))
-+		goto out;
-+
-+	rv = len;
-+	cutoff_time = ktime_sub(ktime_get_boottime(), ns_to_ktime(age_sec * NSEC_PER_SEC));
-+	mark_idle(zram, cutoff_time);
-+out:
-+	up_read(&zram->init_lock);
-+	return rv;
-+}
-+#endif
-+
- #ifdef CONFIG_ZRAM_WRITEBACK
- static ssize_t writeback_limit_enable_store(struct device *dev,
- 		struct device_attribute *attr, const char *buf, size_t len)
-@@ -1840,6 +1881,9 @@ static DEVICE_ATTR_WO(reset);
- static DEVICE_ATTR_WO(mem_limit);
- static DEVICE_ATTR_WO(mem_used_max);
- static DEVICE_ATTR_WO(idle);
-+#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-+static DEVICE_ATTR_WO(idle_aged);
-+#endif
- static DEVICE_ATTR_RW(max_comp_streams);
- static DEVICE_ATTR_RW(comp_algorithm);
- #ifdef CONFIG_ZRAM_WRITEBACK
-@@ -1857,6 +1901,9 @@ static struct attribute *zram_disk_attrs[] = {
- 	&dev_attr_mem_limit.attr,
- 	&dev_attr_mem_used_max.attr,
- 	&dev_attr_idle.attr,
-+#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-+	&dev_attr_idle_aged.attr,
-+#endif
- 	&dev_attr_max_comp_streams.attr,
- 	&dev_attr_comp_algorithm.attr,
- #ifdef CONFIG_ZRAM_WRITEBACK
--- 
-2.33.0.464.g1972c5931b-goog
-
+Applied, thanks.
