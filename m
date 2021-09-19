@@ -2,170 +2,220 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E57E4C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 12:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7928C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 13:35:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C31BB61268
-	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 12:41:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0FD460F6B
+	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 13:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229761AbhISMms (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Sep 2021 08:42:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49360 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbhISMmr (ORCPT
+        id S231199AbhISNgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Sep 2021 09:36:44 -0400
+Received: from mail-il1-f198.google.com ([209.85.166.198]:57025 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229948AbhISNgo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Sep 2021 08:42:47 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722F1C061574;
-        Sun, 19 Sep 2021 05:41:22 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1632055280;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fJ+hrUpU5MiPbitihsh+gHOnN+VL18gvd0mwNVsinxQ=;
-        b=LsGM8s+/IMvfPAuufPS6b/LxLmKMVB5d+13eFIC8MkwvaVoctGGb5awDoM40LKBk6G2Rzz
-        te8mT8yYqn3cxJh3SCwLVN3LqSoRBuGN2fUVDZHMNGgkEcxS0W/GkeaTD6tAR6HTAPGDJN
-        VFPa1sFqnMfTyWBYGPX9FfE4HlE/M/h7XNHe8wYwzj4vANeqpReOYfneQNlzUza3Lsao1N
-        b5ABMnuKPhPjk+/Fs/8SrwKz0I6Kbyvrcpiky8s4d2wdWinYJQwwazXjdHS5CCEt6jN7el
-        2TMv4aNICjpz6TP0cQ9How9OSLUIpUtb7rusvVkDOxP9xz3+3ILtKbeWnylTxw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1632055280;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fJ+hrUpU5MiPbitihsh+gHOnN+VL18gvd0mwNVsinxQ=;
-        b=f3GxbVALKFH02fjiUWP/En/F4kQ5sW5RGnLd/GOO8Eumo62RATeY86eimjCpZhU95HmdvX
-        p2fJ3L2WsBlIJgDA==
-To:     Stephen Boyd <sboyd@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        syzbot <syzbot+d6c75f383e01426a40b4@syzkaller.appspotmail.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        syzkaller-bugs@googlegroups.com, Waiman Long <llong@redhat.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [syzbot] WARNING in __init_work
-In-Reply-To: <163175937144.763609.2073508754264771910@swboyd.mtv.corp.google.com>
-References: <000000000000423e0a05cc0ba2c4@google.com>
- <20210915161457.95ad5c9470efc70196d48410@linux-foundation.org>
- <163175937144.763609.2073508754264771910@swboyd.mtv.corp.google.com>
-Date:   Sun, 19 Sep 2021 14:41:18 +0200
-Message-ID: <87sfy07n69.ffs@tglx>
+        Sun, 19 Sep 2021 09:36:44 -0400
+Received: by mail-il1-f198.google.com with SMTP id d11-20020a92d78b000000b0022c670da306so33048394iln.23
+        for <linux-block@vger.kernel.org>; Sun, 19 Sep 2021 06:35:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=FAn6wYlGaJIFZjOfzqVsuUaOAA34Zuaol6Zjsby8oEc=;
+        b=Wrs3oRyFusdvCYE83tGf8XNdicLQ/F0Zn6e/iNboz1Me0grr+FPP6siNY3E++5B+NH
+         tQFlwnZwPlqq1L2DfxHytyiNeagNQUQthMYBOGwYPZ+DSeoM2Mx0mvUuL4wk0DaY6fhw
+         0seG68SwIqE0bHBN5zd6Nmnk5JdPMdcJUNh44rnAcu9lzt2NL0Z1imASRvWq2YUvUfaT
+         d2NhxdrG6XHFBE/H5/rbXNm9htqb2jTyEbJgXeHEPHfWNELn2g0FbejgnuJ9g/8vmDlc
+         JZAUKV7bmZJuvJu1jAtd9L2uffdJyqXYiHEENMTc8Hr6kfPm/VwiiVGnQMQpLmh0dhHM
+         1CwA==
+X-Gm-Message-State: AOAM5323oyjvJdzLmzGL8aMlBJVVEQy3CQaQ+tEdnKS9kBBI5jQl1GQ8
+        GE/XMflTluJkTzfcOrgiQGamC29Cg/JCCTf+RyHb0sSA8Rve
+X-Google-Smtp-Source: ABdhPJywNOZanW45rhZDLBpINIjmDL4Jngodb/9wo5SWbBxrVURhQ/mnLaYaFp5XhKSVFTSQRnG4oO0WO30jVQrLtCmVdk/9Ixcd
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Received: by 2002:a02:6d10:: with SMTP id m16mr16079886jac.60.1632058519213;
+ Sun, 19 Sep 2021 06:35:19 -0700 (PDT)
+Date:   Sun, 19 Sep 2021 06:35:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004a5adf05cc593ca9@google.com>
+Subject: [syzbot] KASAN: use-after-free Read in bdev_free_inode
+From:   syzbot <syzbot+8281086e8a6fbfbd952a@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Stephen,
+Hello,
 
-On Wed, Sep 15 2021 at 19:29, Stephen Boyd wrote:
-> Quoting Andrew Morton (2021-09-15 16:14:57)
->> On Wed, 15 Sep 2021 10:00:22 -0700 syzbot <syzbot+d6c75f383e01426a40b4@syzkaller.appspotmail.com> wrote:
->> > 
->> > ODEBUG: object ffffc90000fd8bc8 is NOT on stack ffffc900022a0000, but annotated.
->
-> This is saying that the object was supposed to be on the stack because
-> debug objects was told that, but it isn't on the stack per the
-> definition of object_is_on_stack().
+syzbot found the following issue on:
 
-Correct.
+HEAD commit:    b7213ffa0e58 qnx4: avoid stringop-overread errors
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=107afc79300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6d93fe4341f98704
+dashboard link: https://syzkaller.appspot.com/bug?extid=8281086e8a6fbfbd952a
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
->> >  <IRQ>
->> >  __init_work+0x2d/0x50 kernel/workqueue.c:519
->> >  synchronize_rcu_expedited+0x392/0x620 kernel/rcu/tree_exp.h:847
->
-> This line looks like
->
->   INIT_WORK_ONSTACK(&rew.rew_work, wait_rcu_exp_gp);
->
-> inside synchronize_rcu_expedited(). The rew structure is declared on the
-> stack
->
->    struct rcu_exp_work rew;
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Yes, but object_is_on_stack() checks for task stacks only. And the splat
-here is entirely correct:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8281086e8a6fbfbd952a@syzkaller.appspotmail.com
 
-softirq()
-  ...
-  synchronize_rcu_expedited()
-     INIT_WORK_ONSTACK()
-     queue_work()
-     wait_event()
+==================================================================
+BUG: KASAN: use-after-free in bdev_free_inode+0x202/0x220 block/bdev.c:407
+Read of size 8 at addr ffff88807b26d948 by task ksoftirqd/0/13
 
-is obviously broken. You cannot wait in soft irq context.
+CPU: 0 PID: 13 Comm: ksoftirqd/0 Not tainted 5.15.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ print_address_description.constprop.0.cold+0x6c/0x309 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x83/0xdf mm/kasan/report.c:459
+ bdev_free_inode+0x202/0x220 block/bdev.c:407
+ i_callback+0x3f/0x70 fs/inode.c:224
+ rcu_do_batch kernel/rcu/tree.c:2508 [inline]
+ rcu_core+0x7ab/0x1470 kernel/rcu/tree.c:2743
+ __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
+ run_ksoftirqd kernel/softirq.c:920 [inline]
+ run_ksoftirqd+0x2d/0x60 kernel/softirq.c:912
+ smpboot_thread_fn+0x645/0x9c0 kernel/smpboot.c:164
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-synchronize_rcu_expedited() should really have a might_sleep() at the
-beginning to make that more obvious.
+Allocated by task 9035:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:434 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:513 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:472 [inline]
+ __kasan_kmalloc+0xa4/0xd0 mm/kasan/common.c:522
+ kmalloc_node include/linux/slab.h:609 [inline]
+ kzalloc_node include/linux/slab.h:732 [inline]
+ __alloc_disk_node+0x77/0x580 block/genhd.c:1238
+ __blk_mq_alloc_disk+0xed/0x160 block/blk-mq.c:3140
+ loop_add+0x340/0x960 drivers/block/loop.c:2344
+ loop_control_ioctl+0x130/0x4a0 drivers/block/loop.c:2512
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-The splat is clobbered btw:
+Freed by task 9035:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:360
+ ____kasan_slab_free mm/kasan/common.c:366 [inline]
+ ____kasan_slab_free mm/kasan/common.c:328 [inline]
+ __kasan_slab_free+0xff/0x130 mm/kasan/common.c:374
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:1700 [inline]
+ slab_free_freelist_hook+0x81/0x190 mm/slub.c:1725
+ slab_free mm/slub.c:3483 [inline]
+ kfree+0xe4/0x530 mm/slub.c:4543
+ __alloc_disk_node+0x474/0x580 block/genhd.c:1275
+ __blk_mq_alloc_disk+0xed/0x160 block/blk-mq.c:3140
+ loop_add+0x340/0x960 drivers/block/loop.c:2344
+ loop_control_ioctl+0x130/0x4a0 drivers/block/loop.c:2512
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-[  416.415111][    C1] ODEBUG: object ffffc90000fd8bc8 is NOT on stack ffffc900022a0000, but annotated.
-[  416.423424][T14850] truncated
-[  416.431623][    C1] ------------[ cut here ]------------
-[  416.438913][T14850] ------------[ cut here ]------------
-[  416.440189][    C1] WARNING: CPU: 1 PID: 2971 at lib/debugobjects.c:548 __debug_object_init.cold+0x252/0x2e5
-[  416.455797][T14850] refcount_t: addition on 0; use-after-free.
+The buggy address belongs to the object at ffff88807b26d800
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 328 bytes inside of
+ 1024-byte region [ffff88807b26d800, ffff88807b26dc00)
+The buggy address belongs to the page:
+page:ffffea0001ec9a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7b268
+head:ffffea0001ec9a00 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000010200 dead000000000100 dead000000000122 ffff888010c41dc0
+raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd2a20(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 6541, ts 204759478755, free_ts 204758542274
+ prep_new_page mm/page_alloc.c:2424 [inline]
+ get_page_from_freelist+0xa72/0x2f80 mm/page_alloc.c:4153
+ __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5375
+ alloc_pages+0x1a7/0x300 mm/mempolicy.c:2197
+ alloc_slab_page mm/slub.c:1763 [inline]
+ allocate_slab mm/slub.c:1900 [inline]
+ new_slab+0x319/0x490 mm/slub.c:1963
+ ___slab_alloc+0x921/0xfe0 mm/slub.c:2994
+ __slab_alloc.constprop.0+0x4d/0xa0 mm/slub.c:3081
+ slab_alloc_node mm/slub.c:3172 [inline]
+ __kmalloc_node_track_caller+0x2d2/0x340 mm/slub.c:4936
+ kmalloc_reserve net/core/skbuff.c:355 [inline]
+ __alloc_skb+0xde/0x340 net/core/skbuff.c:426
+ alloc_skb include/linux/skbuff.h:1116 [inline]
+ __tcp_send_ack.part.0+0x67/0x7a0 net/ipv4/tcp_output.c:3946
+ __tcp_send_ack net/ipv4/tcp_output.c:3978 [inline]
+ tcp_send_ack+0x7d/0xa0 net/ipv4/tcp_output.c:3978
+ tcp_cleanup_rbuf+0x464/0x5a0 net/ipv4/tcp.c:1601
+ tcp_recvmsg_locked+0x7a2/0x2320 net/ipv4/tcp.c:2522
+ tcp_recvmsg+0x134/0x550 net/ipv4/tcp.c:2552
+ inet_recvmsg+0x11b/0x5e0 net/ipv4/af_inet.c:852
+ sock_recvmsg_nosec net/socket.c:944 [inline]
+ sock_recvmsg net/socket.c:962 [inline]
+ sock_recvmsg net/socket.c:958 [inline]
+ sock_read_iter+0x353/0x490 net/socket.c:1035
+ call_read_iter include/linux/fs.h:2157 [inline]
+ new_sync_read+0x590/0x6b0 fs/read_write.c:404
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1338 [inline]
+ free_pcp_prepare+0x2c5/0x780 mm/page_alloc.c:1389
+ free_unref_page_prepare mm/page_alloc.c:3315 [inline]
+ free_unref_page+0x19/0x690 mm/page_alloc.c:3394
+ __put_page+0x105/0x400 mm/swap.c:127
+ put_page include/linux/mm.h:1247 [inline]
+ __skb_frag_unref include/linux/skbuff.h:3107 [inline]
+ skb_release_data+0x49d/0x790 net/core/skbuff.c:671
+ skb_release_all net/core/skbuff.c:741 [inline]
+ __kfree_skb+0x46/0x60 net/core/skbuff.c:755
+ sk_eat_skb include/net/sock.h:2596 [inline]
+ tcp_recvmsg_locked+0x12f7/0x2320 net/ipv4/tcp.c:2506
+ tcp_recvmsg+0x134/0x550 net/ipv4/tcp.c:2552
+ inet_recvmsg+0x11b/0x5e0 net/ipv4/af_inet.c:852
+ sock_recvmsg_nosec net/socket.c:944 [inline]
+ sock_recvmsg net/socket.c:962 [inline]
+ sock_recvmsg net/socket.c:958 [inline]
+ sock_read_iter+0x353/0x490 net/socket.c:1035
+ call_read_iter include/linux/fs.h:2157 [inline]
+ new_sync_read+0x590/0x6b0 fs/read_write.c:404
+ vfs_read+0x35c/0x600 fs/read_write.c:485
+ ksys_read+0x1ee/0x250 fs/read_write.c:623
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-So there is a refcount_t violation as well.
+Memory state around the buggy address:
+ ffff88807b26d800: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807b26d880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88807b26d900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                              ^
+ ffff88807b26d980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807b26da00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
-Nevertheless a hint for finding the culprit is obviously here in that
-call chain:
 
->> >  bdi_remove_from_list mm/backing-dev.c:938 [inline]
->> >  bdi_unregister+0x177/0x5a0 mm/backing-dev.c:946
->> >  release_bdi+0xa1/0xc0 mm/backing-dev.c:968
->> >  kref_put include/linux/kref.h:65 [inline]
->> >  bdi_put+0x72/0xa0 mm/backing-dev.c:976
->> >  bdev_free_inode+0x116/0x220 fs/block_dev.c:819
->> >  i_callback+0x3f/0x70 fs/inode.c:224
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-The inode code uses RCU for freeing an inode object which then ends up
-calling bdi_put() and subsequently in synchronize_rcu_expedited().
-
->> >  rcu_do_batch kernel/rcu/tree.c:2508 [inline]
->> >  rcu_core+0x7ab/0x1470 kernel/rcu/tree.c:2743
->> >  __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
->> >  invoke_softirq kernel/softirq.c:432 [inline]
->> >  __irq_exit_rcu+0x123/0x180 kernel/softirq.c:636
->> >  irq_exit_rcu+0x5/0x20 kernel/softirq.c:648
->> >  sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1097
->> >  </IRQ>
->> 
->> Seems that we have a debugobject in the incorrect state, but it doesn't
->> necessarily mean there's something wrong in the bdi code.  It's just
->> that the bdi code happened to be the place which called
->> synchronize_rcu_expedited().
-
-Again, it cannot do that from a softirq because
-synchronize_rcu_expedited() might sleep.
-
-> Is it possible that object_is_on_stack() doesn't work in IRQ context?
-> I'm not really following along on x86 but I could see where
-> task_stack_page() gets the wrong "stack" pointer because the task has one
-> stack and the irq stack is some per-cpu dedicated allocation?
-
-Even if debug objects would support objects on irq stacks, the above is
-still bogus. But it does not and will not because the operations here
-have to be fully synchronous:
-
-    init() -> queue() or arm() -> wait() -> destroy()
-
-because you obviously cannot queue work or arm a timer which are on stack
-and then leave the function without waiting for the operation to complete.
-
-So these operations have to be synchronous which is a NONO when running
-in hard or soft interrupt context because waiting for the operation to
-complete is not possible there.
-
-Thanks,
-
-        tglx
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
