@@ -2,111 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31779C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 18 Sep 2021 22:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A88C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 10:31:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E96DF610A5
-	for <linux-block@archiver.kernel.org>; Sat, 18 Sep 2021 22:34:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F59F61251
+	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 10:31:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240349AbhIRWf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Sep 2021 18:35:27 -0400
-Received: from mail-lf1-f48.google.com ([209.85.167.48]:42846 "EHLO
-        mail-lf1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232125AbhIRWf1 (ORCPT
+        id S230194AbhISKdI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Sep 2021 06:33:08 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:9895 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229570AbhISKdI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Sep 2021 18:35:27 -0400
-Received: by mail-lf1-f48.google.com with SMTP id bq5so49346277lfb.9
-        for <linux-block@vger.kernel.org>; Sat, 18 Sep 2021 15:34:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Qlc7epnvhUiTqb48DwQxCEm9wDivQTS9ssC9/xibXAE=;
-        b=iZZMtLqTjarFmhvYpaJgyNLLOFPm99m5i2bLs4wCyaoSGYhntLO+OuaG+8Xp4SrnRv
-         8qbdncqTZqcOdmY2h3rowhO4wwrfSGuGPcvUh7/64egvaCIW9BexyEFdDGMBPe0+Ml3K
-         CLhYHgytnt/CJWORUViSEBZ1erVk8V2+00iDsmo8kkoIaYkEE2rb3Gf32VAvaaSLxWuw
-         29I2PEEoHNj7AdlZZXpY8hc4dOX60LFr1VRzTE5KolceL6vkoj/ZGCgipTtEj6aO5DEc
-         J2WF5fg82VrMjDwEBjUJAnCoPjzy9ze2x0OwOz8iHq7wMiIBwU0nA7jH/qV5T1EiTVi5
-         AJyQ==
-X-Gm-Message-State: AOAM533EaVbA8OZDawJmj7nEBjWfU+gA5Ji2cFPKVWDtyFN3CPgHZrLf
-        AidrFFguxZ8m9MhpZATn7EU=
-X-Google-Smtp-Source: ABdhPJxoISslCfpzksiryKnpojqYUIlhbRNsoYG/TC4GsEnAbEmF4fW+xk/Pn09HxUGxBx3KDzjwlQ==
-X-Received: by 2002:a2e:5709:: with SMTP id l9mr9997520ljb.315.1632004441799;
-        Sat, 18 Sep 2021 15:34:01 -0700 (PDT)
-Received: from [10.68.32.40] (broadband-109-173-81-86.ip.moscow.rt.ru. [109.173.81.86])
-        by smtp.gmail.com with ESMTPSA id b8sm871990lff.106.2021.09.18.15.34.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Sep 2021 15:34:01 -0700 (PDT)
-Message-ID: <92da8abb-4270-83c3-6059-44627eb6b42c@linux.com>
-Date:   Sun, 19 Sep 2021 01:33:59 +0300
+        Sun, 19 Sep 2021 06:33:08 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4HC3ld73fSz8yRT;
+        Sun, 19 Sep 2021 18:27:09 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Sun, 19 Sep 2021 18:31:39 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Sun, 19 Sep 2021 18:31:39 +0800
+Subject: Re: [RFC PATCH] blk-throttle: enable io throttle for root in cgroup
+ v2
+To:     Khazhy Kumykov <khazhy@google.com>,
+        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20210909140815.2600858-1-yukuai3@huawei.com>
+ <20210917174103.GC13346@blackbody.suse.cz>
+ <CACGdZYJiLuh6kED_tdWkYqbHDXc_18m-XJbevp-ri5ansvbtYg@mail.gmail.com>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <37f8c687-8549-104a-2501-532a0cfc9a48@huawei.com>
+Date:   Sun, 19 Sep 2021 18:31:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] floppy: Fix hang in watchdog when disk is ejected
-Content-Language: en-US
-To:     Tasos Sahanidis <tasos@tasossah.com>, linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, jkosina@suse.cz
-References: <399e486c-6540-db27-76aa-7a271b061f76@tasossah.com>
-From:   Denis Efremov <efremov@linux.com>
-In-Reply-To: <399e486c-6540-db27-76aa-7a271b061f76@tasossah.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CACGdZYJiLuh6kED_tdWkYqbHDXc_18m-XJbevp-ri5ansvbtYg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On 9/3/21 09:47, Tasos Sahanidis wrote:
-> When the watchdog detects a disk change, it calls cancel_activity(),
-> which in turn tries to cancel the fd_timer delayed work.
+On 2021/09/18 3:58, Khazhy Kumykov wrote:
+> On Fri, Sep 17, 2021 at 10:41 AM Michal Koutný <mkoutny@suse.com> wrote:
+>>
+>> Hello Yu.
+>>
+>> On Thu, Sep 09, 2021 at 10:08:15PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>>> I'm not sure why this feature is disabled in the first place, is
+>>> there any problem or design constraint?
+>>
+>> The idea for v2 is that in the root cgroup remain only kernel threads that
+>> provide "global" services and any user workload that should be
+>> constrained is put into non-root cgroups. Additionally, if kernel
+>> threads carry out work associated with a cgroup they can charge it to
+>> the respective cgroup.
+>>
+>> [snip]
+>>> We want to limit the overall iops/bps of the device in cgroup v2,
+>>
+>> Cui bono? (I mean what is the reason for throttling on the global level
+>> when there's no other entity utiliting the residual?
+>> <joke>Your drives are too fast?</joke>)
 > 
-> In the above scenario, fd_timer_fn is set to fd_watchdog(), meaning
-> it is trying to cancel its own work.
-> This results in a hang as cancel_delayed_work_sync() is waiting for the
-> watchdog (itself) to return, which never happens.
+> We'd be interested in something like this as well. (at least for
+> io.max). Our use case is providing remote devices which are a shared
+> resource. A "global" throttle like this (which is set by a local
+
+Our use case is similair to this, a host can provide several remote
+devices to difierent client. If one client is under high io pressure,
+other client might be affected. Thus we want to limit the overall
+iops/bps from the client.
+
+Thanks,
+Kuai
+
+> management daemon) allows for throttling before sending network
+> traffic. It's also useful since we can put this throttle on a dm, so
+> we can enforce an aggregate throttle without needing backchannels to
+> coordinate multiple targets.
+> (This does also bring up: if this is a useful thing, would it make
+> sense to tie to the device, vs. requiring cgroup. We happen to use
+> cgroups so that requirement doesn't affect us).
 > 
-> This can be reproduced relatively consistently by attempting to read a
-> broken floppy, and ejecting it while IO is being attempted and retried.
-> 
-> To resolve this, this patch calls cancel_delayed_work() instead, which
-> cancels the work without waiting for the watchdog to return and finish.
-> 
-> Before this regression was introduced, the code in this section used
-> del_timer(), and not del_timer_sync() to delete the watchdog timer.
-> 
-> Fixes: 070ad7e793dc ("floppy: convert to delayed work and single-thread wq")
-> Signed-off-by: Tasos Sahanidis <tasos@tasossah.com>
-> ---
->  drivers/block/floppy.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index fef79ea52..85464d72d 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -1014,7 +1014,7 @@ static DECLARE_DELAYED_WORK(fd_timer, fd_timer_workfn);
->  static void cancel_activity(void)
->  {
->  	do_floppy = NULL;
-> -	cancel_delayed_work_sync(&fd_timer);
-> +	cancel_delayed_work(&fd_timer);
->  	cancel_work_sync(&floppy_work);
->  }
-
-
-Sorry for the long response. Applied, thanks!
-https://github.com/evdenis/linux-floppy/commit/4258a7afaf3bde4441e844335170ee310ee29392
-
-I will send it to Jens with other fixes.
-
-Regards,
-Denis
-
-
+> Khazhy
+>>
+>> Michal
