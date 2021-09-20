@@ -2,122 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4774EC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 11:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E71C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 11:40:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2834760F5D
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 11:27:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBF5A60E08
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 11:40:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236824AbhITL20 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 07:28:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36896 "EHLO
+        id S237016AbhITLmG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 07:42:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236823AbhITL20 (ORCPT
+        with ESMTP id S232528AbhITLmG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 07:28:26 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED88FC061574
-        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 04:26:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=rLJOwjEHSR/J3IAXz3ZjCCEPrwz4qVAr5JIRlaNcMMY=; b=mjAa+a0D+Gqhr0IXXThVrkoMK8
-        jZqaUSsx5IfnQGeiNXW/Tt+xhj2NcCPZ6jJlFt5Loh5r/yJt8j2wzQqDrMehWZdNPeYEtItRyStbn
-        MSra7ITSN9M2l1rLB+BRVJMcyNFa5ccJV+/6fn7/oo9p+41x5sNMiWWCQULIC1FG0TUae+ZVLyguo
-        mz7M0F9v8MHQA/B9J6AyLEnpedmSysyYw6Vip9SaxSpQWs2N/4k2/VW53lW0InB9r+K+64JcR6eDE
-        2E5sW/vT1V6ZFddHHGMhaJ0mPjBdQ2Mx2E9haF7tEyZn01LPRUik6z0hHLhlj382q7VTm6fJXbHdV
-        XaAOdWZQ==;
-Received: from 213-225-6-64.nat.highway.a1.net ([213.225.6.64] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mSHR9-002c3r-99; Mon, 20 Sep 2021 11:26:24 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/4] block: keep q_usage_counter in atomic mode after del_gendisk
-Date:   Mon, 20 Sep 2021 13:24:05 +0200
-Message-Id: <20210920112405.1299667-5-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210920112405.1299667-1-hch@lst.de>
-References: <20210920112405.1299667-1-hch@lst.de>
+        Mon, 20 Sep 2021 07:42:06 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651D1C061574
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 04:40:39 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id w29so28731517wra.8
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 04:40:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=SCpMMU+AylYNSMGXi/253/pNji1oh6d5az7brxnQL9E=;
+        b=XXYn6fU7zTb9D9aIxeCKL806MkiHEQffUEDQODylVE00igKyWq/Lzhw2OFSVE9qvE+
+         mLCsKM11qKhlHCkvwEtonxuC9QPYy4yUs3N4XuPu/4VfFIJgIbTLIMplsSj2ZXFjEyAY
+         ezLO7OMn2QDPbv5eQt6PwOK/PTAehXmQrFzt17EeWjohlv1W6vn7OjrIKsPB55xeMg9M
+         D28+6ycLdQJJ1eUl1ARVMLKa1Kw2UaO6jB72QPRFthlneZSuDzYllbK7QEygLaVQ7SEv
+         GJRZ8qOQuAjzFEIlS4qCECajXg8FetM61c5hU38kzkcItV/kwbAf9hOIynKINiba9wCG
+         B1Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SCpMMU+AylYNSMGXi/253/pNji1oh6d5az7brxnQL9E=;
+        b=Tp/i/dD20kC3y9MQoMj6hNqzQorAHFpUCvx3261zNQe7wpeCKj4vfgMwyjo+58KX9L
+         SMnyzjO3qz0WQmZl9b8gQ+rgwNrN1atq+6azeiG7bbTbNAd6fKJgXMvCUGq90KDAcDtq
+         u3nHgt4/A+ymPRVADj8ktuesoEq7kp1sIRCEddSYHutHhtJnqKTnn9UH/Uq/XD0K31Zl
+         d+LoHXPkAv0IGbpjAz36B0ndqOyO1xCq/Si30h8fVe0UO8FRjV3YQ7QlO4oqJ+UHvFHo
+         +R4XrhiOTb3qhwAghpa1GILcwtMd7/ZDzJglFPVlhmdw01cOqsJFw6atI+FZY8V4miV9
+         XtGw==
+X-Gm-Message-State: AOAM531maZerkEsqnUuQ5hA2OGQcUwc2GnQKrwqdtbaxV9boHEQ9LKX0
+        +6htKzoqk+QT7j0HxR5qyl6XKaSedYs=
+X-Google-Smtp-Source: ABdhPJy/Tpea4qr+C5CUFTg5jrPtVxEv2kKxVTWL9le2jsBS2DkccbLb7RhhDnsNqmUfauarQZwW7w==
+X-Received: by 2002:a1c:210a:: with SMTP id h10mr3103254wmh.117.1632138037818;
+        Mon, 20 Sep 2021 04:40:37 -0700 (PDT)
+Received: from [192.168.8.197] ([148.252.128.31])
+        by smtp.gmail.com with ESMTPSA id o19sm6872883wrg.60.2021.09.20.04.40.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Sep 2021 04:40:37 -0700 (PDT)
+Subject: Re: [PATCH] null_blk: poll queue support
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <baca710d-0f2a-16e2-60bd-b105b854e0ae@kernel.dk>
+ <1a63be84-3024-722b-232b-90f606a2addd@gmail.com>
+ <1002cd58-63b6-453a-93c0-774928690e5f@kernel.dk>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Message-ID: <19eecc0f-c7d7-ef4d-3a79-74a57753a3a1@gmail.com>
+Date:   Mon, 20 Sep 2021 12:40:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1002cd58-63b6-453a-93c0-774928690e5f@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't switch back to percpu mode to avoid the double RCU grace period
-when tearing down SCSI devices.  After removing the disk only passthrough
-commands can be send anyway.
+On 9/16/21 2:57 AM, Jens Axboe wrote:
+> On 9/14/21 3:38 PM, Pavel Begunkov wrote:
+>> On 4/17/21 4:29 PM, Jens Axboe wrote:
+>>> There's currently no way to experiment with polled IO with null_blk,
+>>> which seems like an oversight. This patch adds support for polled IO.
+>>> We keep a list of issued IOs on submit, and then process that list
+>>> when mq_ops->poll() is invoked.
+>>
+>> That would be pretty useful to have.
+>>
+>> to fold in:
+>>
+>> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+>> index 5914fed8fa56..eb5cfe189e90 100644
+>> --- a/drivers/block/null_blk/main.c
+>> +++ b/drivers/block/null_blk/main.c
+>> @@ -1508,7 +1508,7 @@ static int null_poll(struct blk_mq_hw_ctx *hctx)
+>>  		cmd = blk_mq_rq_to_pdu(req);
+>>  		cmd->error = null_process_cmd(cmd, req_op(req), blk_rq_pos(req),
+>>  						blk_rq_sectors(req));
+>> -		nullb_complete_cmd(cmd);
+>> +		end_cmd(cmd);
+>>  		nr++;
+>>  	}
+> 
+> Let's try again with that...
 
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 9 ++++++++-
- block/blk.h    | 1 +
- block/genhd.c  | 1 +
- 3 files changed, 10 insertions(+), 1 deletion(-)
+I'm not so sure it fixes the problem Bart mentioned, but at least it
+doesn't crash for me right away (timer mode) and io_uring tests complete
+well.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 108a352051be5..bc026372de439 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -188,9 +188,11 @@ void blk_mq_freeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
- 
--void blk_mq_unfreeze_queue(struct request_queue *q)
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- {
- 	mutex_lock(&q->mq_freeze_lock);
-+	if (force_atomic)
-+		q->q_usage_counter.data->force_atomic = true;
- 	q->mq_freeze_depth--;
- 	WARN_ON_ONCE(q->mq_freeze_depth < 0);
- 	if (!q->mq_freeze_depth) {
-@@ -199,6 +201,11 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- 	}
- 	mutex_unlock(&q->mq_freeze_lock);
- }
-+
-+void blk_mq_unfreeze_queue(struct request_queue *q)
-+{
-+	__blk_mq_unfreeze_queue(q, false);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
- /*
-diff --git a/block/blk.h b/block/blk.h
-index e2ed2257709ae..6c3c00a8fe19d 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -51,6 +51,7 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- void blk_freeze_queue(struct request_queue *q);
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
- void blk_queue_start_drain(struct request_queue *q);
- 
- #define BIO_INLINE_VECS 4
-diff --git a/block/genhd.c b/block/genhd.c
-index b3c33495d7208..fe23085ddddd6 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -596,6 +596,7 @@ void del_gendisk(struct gendisk *disk)
- 	/*
- 	 * Allow using passthrough request again after the queue is torn down.
- 	 */
-+	blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
- 	blk_mq_unfreeze_queue(q);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
 -- 
-2.30.2
-
+Pavel Begunkov
