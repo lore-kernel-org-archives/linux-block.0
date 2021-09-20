@@ -2,100 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D02C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 14:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81045C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 04:03:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B07F361242
-	for <linux-block@archiver.kernel.org>; Sun, 19 Sep 2021 14:44:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65D3F6109E
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 04:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233270AbhISOqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Sep 2021 10:46:15 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:64487 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233184AbhISOqH (ORCPT
+        id S229625AbhITEFI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 00:05:08 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:39656 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229517AbhITEFI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Sep 2021 10:46:07 -0400
-Received: from fsav117.sakura.ne.jp (fsav117.sakura.ne.jp [27.133.134.244])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 18JEiXaH043914;
-        Sun, 19 Sep 2021 23:44:33 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav117.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp);
- Sun, 19 Sep 2021 23:44:33 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 18JEiTKq043904
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 19 Sep 2021 23:44:33 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: [PATCH] block: genhd: fix double kfree() in __alloc_disk_node()
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-To:     axboe@kernel.dk, Christoph Hellwig <hch@lst.de>
-References: <0000000000004a5adf05cc593ca9@google.com>
- <41766564-08cb-e7f2-4cb2-9ad102f21324@I-love.SAKURA.ne.jp>
-Cc:     linux-block@vger.kernel.org
-Message-ID: <3999c511-cd27-1554-d3a6-4288c3eca298@i-love.sakura.ne.jp>
-Date:   Sun, 19 Sep 2021 23:44:29 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Mon, 20 Sep 2021 00:05:08 -0400
+Received: from dread.disaster.area (pa49-195-238-16.pa.nsw.optusnet.com.au [49.195.238.16])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id B46AA88257E;
+        Mon, 20 Sep 2021 14:03:37 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1mSAWm-00EWYg-DZ; Mon, 20 Sep 2021 14:03:36 +1000
+Date:   Mon, 20 Sep 2021 14:03:36 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Stephen Boyd <sboyd@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        syzbot <syzbot+d6c75f383e01426a40b4@syzkaller.appspotmail.com>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        syzkaller-bugs@googlegroups.com, Waiman Long <llong@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, hch@lst.de
+Subject: Re: [syzbot] WARNING in __init_work
+Message-ID: <20210920040336.GV2361455@dread.disaster.area>
+References: <000000000000423e0a05cc0ba2c4@google.com>
+ <20210915161457.95ad5c9470efc70196d48410@linux-foundation.org>
+ <163175937144.763609.2073508754264771910@swboyd.mtv.corp.google.com>
+ <87sfy07n69.ffs@tglx>
 MIME-Version: 1.0
-In-Reply-To: <41766564-08cb-e7f2-4cb2-9ad102f21324@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87sfy07n69.ffs@tglx>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=Tu+Yewfh c=1 sm=1 tr=0
+        a=DzKKRZjfViQTE5W6EVc0VA==:117 a=DzKKRZjfViQTE5W6EVc0VA==:17
+        a=kj9zAlcOel0A:10 a=7QKq2e-ADPsA:10 a=hSkVLCK3AAAA:8 a=7-415B0cAAAA:8
+        a=TsGWvwOLv-xfsXIyvSQA:9 a=CjuIK1q_8ugA:10 a=cQPPKAXgyycSBL8etih5:22
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot is reporting use-after-free read at bdev_free_inode() [1], for
-kfree() from __alloc_disk_node() is called before bdev_free_inode()
-(which is called after RCU grace period) reads bdev->bd_disk and calls
-kfree(bdev->bd_disk).
+On Sun, Sep 19, 2021 at 02:41:18PM +0200, Thomas Gleixner wrote:
+> Stephen,
+> 
+> On Wed, Sep 15 2021 at 19:29, Stephen Boyd wrote:
+> > Quoting Andrew Morton (2021-09-15 16:14:57)
+> >> On Wed, 15 Sep 2021 10:00:22 -0700 syzbot <syzbot+d6c75f383e01426a40b4@syzkaller.appspotmail.com> wrote:
+> >> > 
+> >> > ODEBUG: object ffffc90000fd8bc8 is NOT on stack ffffc900022a0000, but annotated.
+> >
+> > This is saying that the object was supposed to be on the stack because
+> > debug objects was told that, but it isn't on the stack per the
+> > definition of object_is_on_stack().
+> 
+> Correct.
+> 
+> >> >  <IRQ>
+> >> >  __init_work+0x2d/0x50 kernel/workqueue.c:519
+> >> >  synchronize_rcu_expedited+0x392/0x620 kernel/rcu/tree_exp.h:847
+> >
+> > This line looks like
+> >
+> >   INIT_WORK_ONSTACK(&rew.rew_work, wait_rcu_exp_gp);
+> >
+> > inside synchronize_rcu_expedited(). The rew structure is declared on the
+> > stack
+> >
+> >    struct rcu_exp_work rew;
+> 
+> Yes, but object_is_on_stack() checks for task stacks only. And the splat
+> here is entirely correct:
+> 
+> softirq()
+>   ...
+>   synchronize_rcu_expedited()
+>      INIT_WORK_ONSTACK()
+>      queue_work()
+>      wait_event()
+> 
+> is obviously broken. You cannot wait in soft irq context.
+> 
+> synchronize_rcu_expedited() should really have a might_sleep() at the
+> beginning to make that more obvious.
+> 
+> The splat is clobbered btw:
+> 
+> [  416.415111][    C1] ODEBUG: object ffffc90000fd8bc8 is NOT on stack ffffc900022a0000, but annotated.
+> [  416.423424][T14850] truncated
+> [  416.431623][    C1] ------------[ cut here ]------------
+> [  416.438913][T14850] ------------[ cut here ]------------
+> [  416.440189][    C1] WARNING: CPU: 1 PID: 2971 at lib/debugobjects.c:548 __debug_object_init.cold+0x252/0x2e5
+> [  416.455797][T14850] refcount_t: addition on 0; use-after-free.
+> 
+> So there is a refcount_t violation as well.
+> 
+> Nevertheless a hint for finding the culprit is obviously here in that
+> call chain:
+> 
+> >> >  bdi_remove_from_list mm/backing-dev.c:938 [inline]
+> >> >  bdi_unregister+0x177/0x5a0 mm/backing-dev.c:946
+> >> >  release_bdi+0xa1/0xc0 mm/backing-dev.c:968
+> >> >  kref_put include/linux/kref.h:65 [inline]
+> >> >  bdi_put+0x72/0xa0 mm/backing-dev.c:976
+> >> >  bdev_free_inode+0x116/0x220 fs/block_dev.c:819
+> >> >  i_callback+0x3f/0x70 fs/inode.c:224
+> 
+> The inode code uses RCU for freeing an inode object which then ends up
+> calling bdi_put() and subsequently in synchronize_rcu_expedited().
 
-Fix use-after-free read followed by double kfree() problem
-by explicitly resetting bdev->bd_disk to NULL before calling iput().
+Commit 889c05cc5834 ("block: ensure the bdi is freed after
+inode_detach_wb") might be a good place to start looking here. It
+moved the release of the bdi from ->evict context to the RCU freeing
+of the blockdev inode...
 
-Link: https://syzkaller.appspot.com/bug?extid=8281086e8a6fbfbd952a [1]
-Reported-by: syzbot <syzbot+8281086e8a6fbfbd952a@syzkaller.appspotmail.com>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-This patch is not tested due to lack of reproducer. Is this fix correct?
+Christoph?
 
- block/bdev.c  | 1 +
- block/genhd.c | 1 +
- 2 files changed, 2 insertions(+)
+Cheers,
 
-diff --git a/block/bdev.c b/block/bdev.c
-index cf2780cb44a7..f6b8bac83bd8 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -495,6 +495,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
- 	bdev->bd_inode = inode;
- 	bdev->bd_stats = alloc_percpu(struct disk_stats);
- 	if (!bdev->bd_stats) {
-+		bdev->bd_disk = NULL;
- 		iput(inode);
- 		return NULL;
- 	}
-diff --git a/block/genhd.c b/block/genhd.c
-index 7b6e5e1cf956..496e8458c357 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1268,6 +1268,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- 
- out_destroy_part_tbl:
- 	xa_destroy(&disk->part_tbl);
-+	disk->part0->bd_disk = NULL;
- 	iput(disk->part0->bd_inode);
- out_free_bdi:
- 	bdi_put(disk->bdi);
+Dave.
 -- 
-2.18.4
-
-
+Dave Chinner
+david@fromorbit.com
