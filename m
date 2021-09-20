@@ -2,117 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6004C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35531C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90BBE611ED
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BF9C60FA0
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346040AbhIUCRf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 22:17:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33444 "EHLO
+        id S231689AbhIUDSy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 23:18:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237165AbhIUBwr (ORCPT
+        with ESMTP id S1350243AbhIUC2B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 21:52:47 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF7BC0363FB
-        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 16:29:45 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id k17so3351088pff.8
-        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 16:29:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VdIITPa+h+RUAqAcyjeuboukXybzolW0ivWD6AWeUMU=;
-        b=X9tlk2jzFFqSeCp70vdHnCTWnmqEPXquFDjwWPOJI8unenxFU/BN/Zcr0l06PPO/Nw
-         68yaK8I5y7PK0iQrFywmlFda49a7HJGTTqb4GRbCzktgHWVq2O1CjwziUGBOUTqyBQ2V
-         olE3t6bDgK8vhGzW9ngMeNr0hp18YaVN6GWy+Qno6dgP3i6MVTc/04bBSI3K2HxSUsut
-         D7054X0wSG1pERkhnbJiBtSNFgAQOjTwr0FLE3SDkoSHHiyB5Gp71oadlPIVyhN1fPmb
-         SWT2BIz9JEk8KWmCUMiWuZ6dHF24sFGPcCnv6EgJediTXc7+OuwQXesMgQptYjHxm6aA
-         VK8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VdIITPa+h+RUAqAcyjeuboukXybzolW0ivWD6AWeUMU=;
-        b=sqbp3bJ/ACEaShREnoyAOIF4LFVIjuce1rH5G5AjoIUlXXQy5yaMbsYd0/D30n/o8V
-         Dl4pmWLNHd5pqPUZxBWJnhQtUbDuT/aYSPPTo4RTgVaW4xVLWR86G8qK/Obo9CyBLxAf
-         +qVS7H8R7mXcbTQWKpsPxapdBdPPZvL5ytA9j8O5mxfFi7ScB1aM8Wol7nUWXKTwEBi7
-         VM98PT3XQRKIjuh4IxiWZTGo22hw8VjPl2JI+6SR02FfOjTBGm/Wols9lFS4tGbwIoC1
-         uHEPVOsm7e+Dh+ZOY9waJ7o3i66bZPiiWCkSTIEpRNf4rI4U3FjhjAhc0NGxbPyHtHin
-         0CIg==
-X-Gm-Message-State: AOAM5300HlhNkrjuRxDzDRrWV7XZMeGUYWlJsBchHTwr6AClQDSnnDJF
-        bSBP1Lp7Ywzgs7nnfFq44kraM25Td5+l8cSoHxnc0w==
-X-Google-Smtp-Source: ABdhPJxn4C76fLh6bn5Au+td56tzpPGHrUMWl9Eu9RjmbbiNq8TyPELKCaIaZ9A+uEFKfwgHII0LOr1njoqPscbuGoo=
-X-Received: by 2002:a63:3545:: with SMTP id c66mr25377409pga.377.1632180584639;
- Mon, 20 Sep 2021 16:29:44 -0700 (PDT)
+        Mon, 20 Sep 2021 22:28:01 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2FDC1E7C70;
+        Mon, 20 Sep 2021 12:15:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Ce9uaTKd/D6QGSNbhvZvPAgEhomYs3uXfZuXWEuTyDo=; b=369USbNlI+62qdglSNQET5FERT
+        WUvD7ynkbpEFudjb0fzSZMx1jcQ0hKOHBeMIB+Pj2VdvtrEfRI3LKt0bQAnDxpHRqpv5P6niCIlsb
+        vlDnHHYc0zuAPHDcADuSeTRcnr78tG8F+7PK1OVCzWdHqzs8WbAVQXI7ZLfan7YbWZ7KDaPGTxirF
+        ZZUKGCVxE52zlioB/QkdVf6IrxxosbDb/xyQxcCB90Zl17FaLFDtLVrcFXNLdGJErM4FQk4iaUTAV
+        SaWz38ee84P1Ya6hFVMqeeHYnwzGrok3ud5aKaVEzLkEZd9ECbjJ+/ib+sgCJQAbOHqO0IwNeYwk+
+        Wfyl9zcQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mSOl8-002uHl-FF; Mon, 20 Sep 2021 19:15:22 +0000
+Date:   Mon, 20 Sep 2021 12:15:22 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        rdunlap@infradead.org, rafael@kernel.org, masahiroy@kernel.org,
+        ndesaulniers@google.com, yzaikin@google.com, nathan@kernel.org,
+        ojeda@kernel.org, penguin-kernel@i-love.sakura.ne.jp,
+        vitor@massaru.org, elver@google.com, jarkko@kernel.org,
+        glider@google.com, rf@opensource.cirrus.com,
+        stephen@networkplumber.org, David.Laight@aculab.com,
+        bvanassche@acm.org, jolsa@kernel.org,
+        andriy.shevchenko@linux.intel.com, trishalfonso@google.com,
+        andreyknvl@gmail.com, jikos@kernel.org, mbenes@suse.com,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        reinette.chatre@intel.com, fenghua.yu@intel.com, bp@alien8.de,
+        x86@kernel.org, hpa@zytor.com, lizefan.x@bytedance.com,
+        hannes@cmpxchg.org, daniel.vetter@ffwll.ch, bhelgaas@google.com,
+        kw@linux.com, dan.j.williams@intel.com, senozhatsky@chromium.org,
+        hch@lst.de, joe@perches.com, hkallweit1@gmail.com, axboe@kernel.dk,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
+Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
+Message-ID: <YUjdytEDkCughtSz@bombadil.infradead.org>
+References: <20210918050430.3671227-1-mcgrof@kernel.org>
+ <20210918050430.3671227-10-mcgrof@kernel.org>
+ <YUjKjLzqpcxjRyit@slm.duckdns.org>
 MIME-Version: 1.0
-References: <20210920072726.1159572-3-hch@lst.de> <202109210155.7rqblE6U-lkp@intel.com>
-In-Reply-To: <202109210155.7rqblE6U-lkp@intel.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Mon, 20 Sep 2021 16:29:33 -0700
-Message-ID: <CAPcyv4gPf74k7Lz8Uh2ni1bv7Po3pDPyBr24w4ea6ZzdvRjOQw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] nvdimm/pmem: move dax_attribute_group from dax to pmem
-To:     kernel test robot <lkp@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        kbuild-all@lists.01.org, Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, linux-block@vger.kernel.org,
-        Linux NVDIMM <nvdimm@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YUjKjLzqpcxjRyit@slm.duckdns.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 11:01 AM kernel test robot <lkp@intel.com> wrote:
->
-> Hi Christoph,
->
-> I love your patch! Yet something to improve:
->
-> [auto build test ERROR on axboe-block/for-next]
-> [also build test ERROR on linus/master v5.15-rc2 next-20210920]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
->
-> url:    https://github.com/0day-ci/linux/commits/Christoph-Hellwig/nvdimm-pmem-fix-creating-the-dax-group/20210920-162804
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-> config: riscv-buildonly-randconfig-r006-20210920 (attached as .config)
-> compiler: riscv64-linux-gcc (GCC) 11.2.0
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # https://github.com/0day-ci/linux/commit/1a16d0f32f70bcd159a9f8cf32794f4024e8711e
->         git remote add linux-review https://github.com/0day-ci/linux
->         git fetch --no-tags linux-review Christoph-Hellwig/nvdimm-pmem-fix-creating-the-dax-group/20210920-162804
->         git checkout 1a16d0f32f70bcd159a9f8cf32794f4024e8711e
->         # save the attached .config to linux build tree
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross ARCH=riscv
->
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
->    drivers/dax/super.c:375:6: error: no previous prototype for 'run_dax' [-Werror=missing-prototypes]
->      375 | void run_dax(struct dax_device *dax_dev)
->          |      ^~~~~~~
+On Mon, Sep 20, 2021 at 07:53:16AM -1000, Tejun Heo wrote:
+> Hello,
+> 
+> On Fri, Sep 17, 2021 at 10:04:27PM -0700, Luis Chamberlain wrote:
+> > If try_module_get() fails we fail the operation on the kernfs node.
+> > 
+> > We use a try method as a full lock means we'd then make our sysfs
+> > attributes busy us out from possible module removal, and so userspace
+> > could force denying module removal, a silly form of "DOS" against module
+> > removal. A try lock on the module removal ensures we give priority to
+> > module removal and interacting with sysfs attributes only comes second.
+> > Using a full lock could mean for instance that if you don't stop poking
+> > at sysfs files you cannot remove a module.
+> 
+> I find this explanation odd because there's no real equivalent to locking
+> the module (as opposed to try locking) 
 
-In this new -Werror world drivers/dax/bus.c needs:
+Actually there is, __module_get() but I suspect some of these users are
+probably incorrect and should be be moved to try. The documentation
+about "rmmod --wait" for __module_get() is also outdated as that option
+is no longer supported. I'll send an update for that later.
 
-#include "bus.h"
+> because you can't wait for the
+> removal to finish and then grant the lock, so any operation which increases
+> the reference *has* to be a try method unless the caller already holds a
+> reference to the same module and thus knows that the module is already
+> pinned.
 
-> >> drivers/dax/super.c:70:27: error: 'dax_get_by_host' defined but not used [-Werror=unused-function]
->       70 | static struct dax_device *dax_get_by_host(const char *host)
->          |                           ^~~~~~~~~~~~~~~
->    cc1: all warnings being treated as errors
+Right, the reason I mention the alternative is that we technically don't
+need to use try in this case since during a kernfs op it is implied the
+module will be pinned, but we have further motivations to use a try
+method here: to avoid a possible DOS from module removal by userspace
+mucking with ops.
 
-Nice additional cleanup that now fs_dax_get_by_bdev() is the only
-caller of dax_get_by_host().
+> The code isn't wrong, so maybe just drop the related paragraphs in
+> the commit message?
+
+Does it make sense to clarify the above a bit more somehow? Or do think
+its not needed?
+
+> >  static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+> >  					     struct kernfs_node *parent,
+> >  					     const char *name, umode_t mode,
+> > +					     struct module *owner,
+> >  					     kuid_t uid, kgid_t gid,
+> >  					     unsigned flags)
+> 
+> Is there a particular reason why @owner is added between @mode and @uid?
+> Sitting between two fs attributes seems a bit awkward. Maybe it can just be
+> the last one?
+
+No, I just picked an arbitrary place. Sure I'll move it to the end.
+
+  Luis
