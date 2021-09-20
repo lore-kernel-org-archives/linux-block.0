@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FA8C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 01:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C46C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 01:41:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D02760F23
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 01:41:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A61C160F23
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 01:41:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233178AbhIUBnH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 21:43:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59098 "EHLO
+        id S232465AbhIUBnJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 21:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbhIUBjK (ORCPT
+        with ESMTP id S231759AbhIUBkP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 21:39:10 -0400
+        Mon, 20 Sep 2021 21:40:15 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BC88C125F90;
-        Mon, 20 Sep 2021 12:38:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8160C0818CE;
+        Mon, 20 Sep 2021 14:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=qVmGn1sB2+Ujqg7/u2BgWKG/M74nLAjBwZQeoBTm6k4=; b=n2OSSolklt7gOYko3iITzFkPyC
-        0CFZmnl1pIhaRTm5YGVOzTbvRlCC/5cbJo6Ol5dXncFos6LOkeVEHLM2n+RzZEn05VnTKrq3zRWzU
-        XDWlcRZQv+COitTH6USEtWmqcFGeK1vFJZ3+qDzVy3ZT5JivVC2bgCRk+JDE2V/ndiijQRC9gq9TM
-        wAdJ6bsCsa+zWJT6BzVz7DVLWlV3w9BDPq9VkZFJbjaXUJupVY1vq3XYUHtOJ2Zie/nuGNE/RNHOI
-        I95WQELiKoXkadSIaUtm+tDhfcClRPWgG9P9yXMv0rjhNcG8v2yzd/k9dv1zwPaZV0rcYjNrJrQTT
-        wax8de8w==;
+        bh=D26fSnJLbC9XZDfSrbIUPFGxJqUcYaE49d48YeAtGx8=; b=NBcRJuW96wCs2L5yciBjnu4F4c
+        Rn9oYNN1r/1pdLA61JWi8mSh2jw4C197H6PxcOg2RORNnVp0NHy3B2/mVwzXnkDgC9Bnt9SFoFpZq
+        E4HHHEzgLP5+gHSOKUS4bEvDYdobZ6BKb8IOsWWpInVAuyr0pBgxnJp8SXIHvvLfeLKukmB80eL+B
+        HOWdqQdII79WYdIrZ/4XgmeMgjaGc0llYrEViO4WDCrlrjRY4sBOgcW6IYtgGedGJUZuTpyw49ERA
+        cKp1wpEFy0klyQ3ztACi2tVfmneinCUyDoVWNGLeZRw814u7MRUpuq5zDgDHzlfmHeRjcjSf8u/Nl
+        pMB4G/bw==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mSP77-002wrK-SH; Mon, 20 Sep 2021 19:38:05 +0000
-Date:   Mon, 20 Sep 2021 12:38:05 -0700
+        id 1mSR4j-003CEI-VS; Mon, 20 Sep 2021 21:43:45 +0000
+Date:   Mon, 20 Sep 2021 14:43:45 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        rdunlap@infradead.org, rafael@kernel.org, masahiroy@kernel.org,
-        ndesaulniers@google.com, yzaikin@google.com, nathan@kernel.org,
-        ojeda@kernel.org, penguin-kernel@i-love.sakura.ne.jp,
-        vitor@massaru.org, elver@google.com, jarkko@kernel.org,
-        glider@google.com, rf@opensource.cirrus.com,
-        stephen@networkplumber.org, David.Laight@aculab.com,
-        bvanassche@acm.org, jolsa@kernel.org,
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
+        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
+        shuah@kernel.org, rdunlap@infradead.org, rafael@kernel.org,
+        masahiroy@kernel.org, ndesaulniers@google.com, yzaikin@google.com,
+        nathan@kernel.org, ojeda@kernel.org,
+        penguin-kernel@i-love.sakura.ne.jp, vitor@massaru.org,
+        elver@google.com, jarkko@kernel.org, glider@google.com,
+        rf@opensource.cirrus.com, stephen@networkplumber.org,
+        David.Laight@aculab.com, jolsa@kernel.org,
         andriy.shevchenko@linux.intel.com, trishalfonso@google.com,
         andreyknvl@gmail.com, jikos@kernel.org, mbenes@suse.com,
         ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
@@ -61,43 +61,53 @@ Cc:     gregkh@linuxfoundation.org, akpm@linux-foundation.org,
         linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
 Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YUjjHRHWCso1tjeX@bombadil.infradead.org>
+Message-ID: <YUkAkSUQtUZvNvTu@bombadil.infradead.org>
 References: <20210918050430.3671227-1-mcgrof@kernel.org>
  <20210918050430.3671227-10-mcgrof@kernel.org>
- <YUjKjLzqpcxjRyit@slm.duckdns.org>
- <YUjdytEDkCughtSz@bombadil.infradead.org>
- <YUjfeGuSVVq84iHc@mtj.duckdns.org>
+ <6db06c27-e3af-b0aa-6f38-9c31dd8194fa@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YUjfeGuSVVq84iHc@mtj.duckdns.org>
+In-Reply-To: <6db06c27-e3af-b0aa-6f38-9c31dd8194fa@acm.org>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 09:22:32AM -1000, Tejun Heo wrote:
-> On Mon, Sep 20, 2021 at 12:15:22PM -0700, Luis Chamberlain wrote:
+On Mon, Sep 20, 2021 at 02:36:38PM -0700, Bart Van Assche wrote:
+> On 9/17/21 10:04 PM, Luis Chamberlain wrote:
+> > A sketch of how this can happen follows:
+> > 
+> > CPU A                              CPU B
+> >                                     whatever_store()
+> > module_unload
+> >    mutex_lock(foo)
+> >                                     mutex_lock(foo)
+> >     del_gendisk(zram->disk);
+> >       device_del()
+> >         device_remove_groups()
+> > 
+> > In this situation whatever_store() is waiting for the mutex foo to
+> > become unlocked, but that won't happen until module removal is complete.
+> > But module removal won't complete until the sysfs file being poked
+> > completes which is waiting for a lock already held.
 > 
-> > Right, the reason I mention the alternative is that we technically don't
-> > need to use try in this case since during a kernfs op it is implied the
-> > module will be pinned, but we have further motivations to use a try
-> 
-> I'm confused. If the module is already pinned, why are we getting an
-> extra reference? 
+> If I remember correctly I encountered the deadlock scenario described
+> above for the first time about ten years ago while working on the SCST
+> project. We solved this deadlock by removing the sysfs attributes from
+> the module unload code before grabbing mutex_lock(foo), e.g. by calling
+> sysfs_remove_file().
 
-Sorry, I meant its pinned implicitly not through an actual refcount. A module
-exit can happen then in that case, it just that the sysfs removal will
-have to wait until the active reference for the kernfs ops go down.
+Well the sysfs attributes in zram do tons of funky mucking around so
+unfortunately no. It's not the only driver where this can happen. It is
+why I decided to work on a generic solution instead.
 
-> Also, I don't understand how this has that much to do
-> with preventing ddoses. I mean, it does cut down the duration of one
-> operation but the eventual gating is through whoever acquiring the
-> initial reference through try_module_get(), which again is the *only*
-> way to acquire a fresh reference.
+> This works because calling sysfs_remove_file()
+> multiple times in a row is safe. Is that solution good enough for the
+> zram driver?
 
-True. I can just leave that out from the commit log. But it is perhaps
-an implicit gain here that using try alows module exit to trump use
-of an kernfs op. Maybe's that's sufficient to mention.
+The sysfs attributes are group attributes part of the block, and so are
+removed for the driver on a del_gendisk(). So unfortunately no, this
+would not be a good solution in this case.
 
   Luis
