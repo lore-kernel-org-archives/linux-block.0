@@ -2,171 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A65C4321E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6004C433FE
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1FA261268
+	by mail.kernel.org (Postfix) with ESMTP id 90BBE611ED
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346093AbhIUCRk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 22:17:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34052 "EHLO
+        id S1346040AbhIUCRf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 22:17:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237486AbhIUBy7 (ORCPT
+        with ESMTP id S237165AbhIUBwr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 21:54:59 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61CCAC0313FF;
-        Mon, 20 Sep 2021 17:04:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=dFAUFg/mX5umZGWtfy03pLeHbDGj6EjlCd5lUAE3GFQ=; b=dObeiqsndcF+lNoh24bcIlQ0Z4
-        8K6tr6/HQqzHejW7tcCx2uFWkOSwSDGccUZUOO2HSbtwyHL2bzieHlxL/ZHYYKEk4p9CFnO8yXcPK
-        f/HQ2/ZQdndlnXyIUJdZ0aJXLTxz6QwLUg1BzKdC6l5F015c1tMcwzAgGVNaIhiqeaim5LUH14T5q
-        SfrB2JGYzUuVFRpexD44YBdIJt19FFXMuXQ78E+NFAQjPzOw2KYPs158O36UwjUA4HwZgR9XHQuYE
-        ogpEbh3JR5+EHuSxOJT6kAbYkYcwK3PhKk2oYu4rhbOLPFOZheHL/NsJp3sMZeprOIKrHIsh9/J3J
-        bDfWazSw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mSTFv-003Nm8-F2; Tue, 21 Sep 2021 00:03:27 +0000
-Date:   Mon, 20 Sep 2021 17:03:27 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Tejun Heo <tj@kernel.org>, Greg KH <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Minchan Kim <minchan@kernel.org>, jeyu@kernel.org,
-        shuah <shuah@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>, yzaikin@google.com,
-        Nathan Chancellor <nathan@kernel.org>, ojeda@kernel.org,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        vitor@massaru.org, elver@google.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Alexander Potapenko <glider@google.com>,
-        rf@opensource.cirrus.com,
-        Stephen Hemminger <stephen@networkplumber.org>,
-        David Laight <David.Laight@aculab.com>, bvanassche@acm.org,
-        jolsa@kernel.org,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        trishalfonso@google.com, andreyknvl@gmail.com,
-        Jiri Kosina <jikos@kernel.org>, mbenes@suse.com,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Borislav Petkov <bp@alien8.de>, X86 ML <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, lizefan.x@bytedance.com,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-        senozhatsky@chromium.org, Christoph Hellwig <hch@lst.de>,
-        Joe Perches <joe@perches.com>, hkallweit1@gmail.com,
-        Jens Axboe <axboe@kernel.dk>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kees Cook <keescook@chromium.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-spdx@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        copyleft-next@lists.fedorahosted.org
-Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YUkhTxhgPWRxMMJo@bombadil.infradead.org>
-References: <20210918050430.3671227-1-mcgrof@kernel.org>
- <20210918050430.3671227-10-mcgrof@kernel.org>
- <CAPcyv4i0xEwMQ5kSK-xGroV7aZr3j1YNrGMVLiLMr3U8nFCMKA@mail.gmail.com>
- <YUj6TrGbqlNI0OGC@bombadil.infradead.org>
- <CAPcyv4jFaNTfpKq6hQsFrWXTwHz-wG+5K4m-hmsPeteLX4p5AQ@mail.gmail.com>
+        Mon, 20 Sep 2021 21:52:47 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF7BC0363FB
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 16:29:45 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id k17so3351088pff.8
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 16:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VdIITPa+h+RUAqAcyjeuboukXybzolW0ivWD6AWeUMU=;
+        b=X9tlk2jzFFqSeCp70vdHnCTWnmqEPXquFDjwWPOJI8unenxFU/BN/Zcr0l06PPO/Nw
+         68yaK8I5y7PK0iQrFywmlFda49a7HJGTTqb4GRbCzktgHWVq2O1CjwziUGBOUTqyBQ2V
+         olE3t6bDgK8vhGzW9ngMeNr0hp18YaVN6GWy+Qno6dgP3i6MVTc/04bBSI3K2HxSUsut
+         D7054X0wSG1pERkhnbJiBtSNFgAQOjTwr0FLE3SDkoSHHiyB5Gp71oadlPIVyhN1fPmb
+         SWT2BIz9JEk8KWmCUMiWuZ6dHF24sFGPcCnv6EgJediTXc7+OuwQXesMgQptYjHxm6aA
+         VK8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VdIITPa+h+RUAqAcyjeuboukXybzolW0ivWD6AWeUMU=;
+        b=sqbp3bJ/ACEaShREnoyAOIF4LFVIjuce1rH5G5AjoIUlXXQy5yaMbsYd0/D30n/o8V
+         Dl4pmWLNHd5pqPUZxBWJnhQtUbDuT/aYSPPTo4RTgVaW4xVLWR86G8qK/Obo9CyBLxAf
+         +qVS7H8R7mXcbTQWKpsPxapdBdPPZvL5ytA9j8O5mxfFi7ScB1aM8Wol7nUWXKTwEBi7
+         VM98PT3XQRKIjuh4IxiWZTGo22hw8VjPl2JI+6SR02FfOjTBGm/Wols9lFS4tGbwIoC1
+         uHEPVOsm7e+Dh+ZOY9waJ7o3i66bZPiiWCkSTIEpRNf4rI4U3FjhjAhc0NGxbPyHtHin
+         0CIg==
+X-Gm-Message-State: AOAM5300HlhNkrjuRxDzDRrWV7XZMeGUYWlJsBchHTwr6AClQDSnnDJF
+        bSBP1Lp7Ywzgs7nnfFq44kraM25Td5+l8cSoHxnc0w==
+X-Google-Smtp-Source: ABdhPJxn4C76fLh6bn5Au+td56tzpPGHrUMWl9Eu9RjmbbiNq8TyPELKCaIaZ9A+uEFKfwgHII0LOr1njoqPscbuGoo=
+X-Received: by 2002:a63:3545:: with SMTP id c66mr25377409pga.377.1632180584639;
+ Mon, 20 Sep 2021 16:29:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4jFaNTfpKq6hQsFrWXTwHz-wG+5K4m-hmsPeteLX4p5AQ@mail.gmail.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+References: <20210920072726.1159572-3-hch@lst.de> <202109210155.7rqblE6U-lkp@intel.com>
+In-Reply-To: <202109210155.7rqblE6U-lkp@intel.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Mon, 20 Sep 2021 16:29:33 -0700
+Message-ID: <CAPcyv4gPf74k7Lz8Uh2ni1bv7Po3pDPyBr24w4ea6ZzdvRjOQw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] nvdimm/pmem: move dax_attribute_group from dax to pmem
+To:     kernel test robot <lkp@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        kbuild-all@lists.01.org, Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, linux-block@vger.kernel.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 02:55:10PM -0700, Dan Williams wrote:
-> On Mon, Sep 20, 2021 at 2:17 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> >
-> > On Mon, Sep 20, 2021 at 01:52:21PM -0700, Dan Williams wrote:
-> > > On Fri, Sep 17, 2021 at 10:05 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> > > > This deadlock was first reported with the zram driver, however the live
-> > > > patching folks have acknowledged they have observed this as well with
-> > > > live patching, when a live patch is removed. I was then able to
-> > > > reproduce easily by creating a dedicated selftests.
-> > > >
-> > > > A sketch of how this can happen follows:
-> > > >
-> > > > CPU A                              CPU B
-> > > >                                    whatever_store()
-> > > > module_unload
-> > > >   mutex_lock(foo)
-> > > >                                    mutex_lock(foo)
-> > > >    del_gendisk(zram->disk);
-> > > >      device_del()
-> > > >        device_remove_groups()
-> > >
-> > > This flow seems possible to trigger with:
-> > >
-> > >    echo $dev > /sys/bus/$bus/drivers/$driver/unbind
-> > >
-> > > I am missing why module pinning
-> >
-> > The aspect of try_module_get() which comes to value to prevent the
-> > deadlock is it ensures kernfs ops do not run once exit is on the way.
-> >
-> > > is part of the solution when it's the
-> > > device_del() path that is racing?
-> >
-> > But its not, the device_del() path will yield until the kernfs op
-> > completes. It is fine to wait there.
-> >
-> > The deadlock happens if a module exit routine uses a lock which is
-> > also used on a sysfs op. If the lock was first held by module exit,
-> > and module exit is waiting for the kernfs op to complete, and the
-> > kernfs op is waiting to hold the same lock then the exit will wait
-> > forever.
-> >
-> > > Module removal is just a more coarse
-> > > grained way to trigger unbind => device_del().
-> >
-> > Right, but the device_del() path is not sharing a lock with the sysfs op.
-> 
-> The deadlock in the example comes from holding a lock over
-> device_del() [...]
+On Mon, Sep 20, 2021 at 11:01 AM kernel test robot <lkp@intel.com> wrote:
+>
+> Hi Christoph,
+>
+> I love your patch! Yet something to improve:
+>
+> [auto build test ERROR on axboe-block/for-next]
+> [also build test ERROR on linus/master v5.15-rc2 next-20210920]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+>
+> url:    https://github.com/0day-ci/linux/commits/Christoph-Hellwig/nvdimm-pmem-fix-creating-the-dax-group/20210920-162804
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+> config: riscv-buildonly-randconfig-r006-20210920 (attached as .config)
+> compiler: riscv64-linux-gcc (GCC) 11.2.0
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # https://github.com/0day-ci/linux/commit/1a16d0f32f70bcd159a9f8cf32794f4024e8711e
+>         git remote add linux-review https://github.com/0day-ci/linux
+>         git fetch --no-tags linux-review Christoph-Hellwig/nvdimm-pmem-fix-creating-the-dax-group/20210920-162804
+>         git checkout 1a16d0f32f70bcd159a9f8cf32794f4024e8711e
+>         # save the attached .config to linux build tree
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross ARCH=riscv
+>
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+>
+> All errors (new ones prefixed by >>):
+>
+>    drivers/dax/super.c:375:6: error: no previous prototype for 'run_dax' [-Werror=missing-prototypes]
+>      375 | void run_dax(struct dax_device *dax_dev)
+>          |      ^~~~~~~
 
-No sorry, that is my mistake not making it clear that the mutex held
-in the example is on module exit. Or any lock for that matter. That is
-these locks are driver specific.
+In this new -Werror world drivers/dax/bus.c needs:
 
-> > > Isn't the above a bug
-> > > in the driver, not missing synchronization in kernfs?
-> >
-> > We can certainly take the position as an alternative:
-> >
-> >   "thou shalt not use a lock on exit which is also used on a syfs op"
-> >
-> > However that seems counter intuitive, specially if we can resolve the
-> > issue easily with a try_module_get().
-> 
-> Again, I don't see how try_module_get() can affect the ABBA failure
-> case of holding a lock over device_del() that is also held inside
-> sysfs op.
+#include "bus.h"
 
-It is not device_del(), it is on module exit. Sorry for this not being
-clear before. I'll fix the commit log to make it clearer. The subject
-at least was clear but I think the example could be clearer.
+> >> drivers/dax/super.c:70:27: error: 'dax_get_by_host' defined but not used [-Werror=unused-function]
+>       70 | static struct dax_device *dax_get_by_host(const char *host)
+>          |                           ^~~~~~~~~~~~~~~
+>    cc1: all warnings being treated as errors
 
-  Luis
+Nice additional cleanup that now fs_dax_get_by_bdev() is the only
+caller of dax_get_by_host().
