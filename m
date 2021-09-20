@@ -2,93 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D730C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 12:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BABC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 12:39:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CCA06109E
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 12:39:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D8AD610A3
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 12:39:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238507AbhITMk0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 08:40:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59978 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231849AbhITMk0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 08:40:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 428E76109D;
-        Mon, 20 Sep 2021 12:38:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632141539;
-        bh=nUAwaxsJu/Tne+3ivGEuqKG//tC46dmJUGIHdGNfH6A=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=HZ3UHG5HUouRVIAI3UC9PBHuEyWSxBcJ4X2yWeQl0KiUFYepijAYnrir9W1qPf51r
-         35EHmmDx9RY4sc3Qh7/NOkAlE2OXIyP4oRgtq+LAHAawEQnGKXcTR9PqlpenrmTJQn
-         1tSzr/ZI5VYX9QWJCkrBVc6KH4QVxaWqqXwhqAHDH5pgMluiHAoH/EziM9K9C9uHUf
-         NmCE5T+HT1xw+iaFoIBOKD9JV+fj4gaaSBvzrUgjCD8mY/TGBtYNmMM///XE59HrNp
-         1KOBSLxGC948xgTZafZjoMd0KGLWAJvmmskR+xO3SdfiLLoTw49sr3CeOF/F2xW1tv
-         nct3tHwT2EPiw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 13CCE5C07FE; Mon, 20 Sep 2021 05:38:59 -0700 (PDT)
-Date:   Mon, 20 Sep 2021 05:38:59 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        syzbot <syzbot+d6c75f383e01426a40b4@syzkaller.appspotmail.com>,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        syzkaller-bugs@googlegroups.com, Waiman Long <llong@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [syzbot] WARNING in __init_work
-Message-ID: <20210920123859.GE880162@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <000000000000423e0a05cc0ba2c4@google.com>
- <20210915161457.95ad5c9470efc70196d48410@linux-foundation.org>
- <163175937144.763609.2073508754264771910@swboyd.mtv.corp.google.com>
- <87sfy07n69.ffs@tglx>
- <20210920040336.GV2361455@dread.disaster.area>
- <20210920122846.GA16661@lst.de>
+        id S238584AbhITMlJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 08:41:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238578AbhITMlJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Sep 2021 08:41:09 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60430C061574
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 05:39:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=hOWn0oOcbtNVNaQYWHu1z+Xns4EP79rgG66Uf+o3nAw=; b=fH4wQ8HKjaq0zzDMEhjUajuc+I
+        2gqKjl7PMWNgnVW1CKJ0SHGdwP5taJwIWNXfW2/CPJk1KiBmmpAWuhMD0QRbb7Mkyz6X8yccQKuy9
+        LwJmDPM5t2FCpZpQ1HDlU/LWbpVXG6gywDpyPm2FZmyNp2MlOf/OI34qdin0ZFZQsln9rpIwt69Q3
+        LY86abOa6nvuVESDL4i1wFutAgbmLXwaAe4InfUkDbE+iMP6XUCuF/KsgI3egW9OL6dcz1EFR0g8c
+        cjfRO2ufg1f+oE/voQlqvGnstyooiWZvJwxjuEd0rshVpeCZ3bmYdcOjrFDXLLL+jkVbMReXlkfrF
+        FT75pFUw==;
+Received: from [2001:4bb8:184:72db:7ad9:14d9:8599:3025] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mSIYn-002fAV-9F; Mon, 20 Sep 2021 12:38:24 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: [PATCH 08/17] block: remove the unused rq_end_sector macro
+Date:   Mon, 20 Sep 2021 14:33:19 +0200
+Message-Id: <20210920123328.1399408-9-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210920123328.1399408-1-hch@lst.de>
+References: <20210920123328.1399408-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210920122846.GA16661@lst.de>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 02:28:46PM +0200, Christoph Hellwig wrote:
-> On Mon, Sep 20, 2021 at 02:03:36PM +1000, Dave Chinner wrote:
-> > > >> >  bdi_remove_from_list mm/backing-dev.c:938 [inline]
-> > > >> >  bdi_unregister+0x177/0x5a0 mm/backing-dev.c:946
-> > > >> >  release_bdi+0xa1/0xc0 mm/backing-dev.c:968
-> > > >> >  kref_put include/linux/kref.h:65 [inline]
-> > > >> >  bdi_put+0x72/0xa0 mm/backing-dev.c:976
-> > > >> >  bdev_free_inode+0x116/0x220 fs/block_dev.c:819
-> > > >> >  i_callback+0x3f/0x70 fs/inode.c:224
-> > > 
-> > > The inode code uses RCU for freeing an inode object which then ends up
-> > > calling bdi_put() and subsequently in synchronize_rcu_expedited().
-> > 
-> > Commit 889c05cc5834 ("block: ensure the bdi is freed after
-> > inode_detach_wb") might be a good place to start looking here. It
-> > moved the release of the bdi from ->evict context to the RCU freeing
-> > of the blockdev inode...
-> 
-> Well, the block code already does a bdi_unregister in del_gendisk.
-> So if we end up freeing the whole device bdev with a registered bdi
-> something is badly going wrong.  Unfortunately the log in this report
-> isn't much help on how we got there.  IIRC syzbot will eventually spew
-> out a reproducer, so it might be worth to wait for that.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/dm-rq.c       | 1 -
+ include/linux/elevator.h | 1 -
+ 2 files changed, 2 deletions(-)
 
-If it does turn out that you need to block in an RCU callback,
-queue_rcu_work() can be helpful.  This schedules a workqueue from the RCU
-callback, allowing the function passed to the preceding INIT_RCU_WORK()
-to block.
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 5b95eea517d1b..79974bb0d250f 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -7,7 +7,6 @@
+ #include "dm-core.h"
+ #include "dm-rq.h"
+ 
+-#include <linux/elevator.h> /* for rq_end_sector() */
+ #include <linux/blk-mq.h>
+ 
+ #define DM_MSG_PREFIX "core-rq"
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index ef9ceead3db13..80633f3b600c2 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -162,7 +162,6 @@ extern struct request *elv_rb_find(struct rb_root *, sector_t);
+ #define ELEVATOR_INSERT_FLUSH	5
+ #define ELEVATOR_INSERT_SORT_MERGE	6
+ 
+-#define rq_end_sector(rq)	(blk_rq_pos(rq) + blk_rq_sectors(rq))
+ #define rb_entry_rq(node)	rb_entry((node), struct request, rb_node)
+ 
+ #define rq_entry_fifo(ptr)	list_entry((ptr), struct request, queuelist)
+-- 
+2.30.2
 
-							Thanx, Paul
