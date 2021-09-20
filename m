@@ -6,75 +6,69 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5544C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 07:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA009C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 08:03:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DB3E60F43
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 07:41:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDB416109E
+	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 08:03:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234099AbhITHnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 03:43:10 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3843 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234077AbhITHnJ (ORCPT
+        id S235286AbhITIE2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 04:04:28 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:63882 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235257AbhITIES (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 03:43:09 -0400
-Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HCbz95cmqz67bFG;
-        Mon, 20 Sep 2021 15:39:01 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 20 Sep 2021 09:41:41 +0200
-Received: from [10.47.88.85] (10.47.88.85) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Mon, 20 Sep
- 2021 08:41:40 +0100
-Subject: Re: [PATCH RESEND v3 00/13] blk-mq: Reduce static requests memory
- footprint for shared sbitmap
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>
-References: <1631545950-56586-1-git-send-email-john.garry@huawei.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <e5f92ab5-eddd-eaed-3b3c-29b5bc60f0e6@huawei.com>
-Date:   Mon, 20 Sep 2021 08:45:04 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Mon, 20 Sep 2021 04:04:18 -0400
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 18K82JqV025707;
+        Mon, 20 Sep 2021 17:02:19 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Mon, 20 Sep 2021 17:02:19 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 18K82J34025702
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 20 Sep 2021 17:02:19 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH] block: genhd: fix double kfree() in __alloc_disk_node()
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+References: <0000000000004a5adf05cc593ca9@google.com>
+ <41766564-08cb-e7f2-4cb2-9ad102f21324@I-love.SAKURA.ne.jp>
+ <3999c511-cd27-1554-d3a6-4288c3eca298@i-love.sakura.ne.jp>
+ <20210920064028.GB26999@lst.de>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <c5b78df8-1ab7-04fa-d6e8-c7270c3bc373@i-love.sakura.ne.jp>
+Date:   Mon, 20 Sep 2021 17:02:19 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <1631545950-56586-1-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20210920064028.GB26999@lst.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.88.85]
-X-ClientProxiedBy: lhreml729-chm.china.huawei.com (10.201.108.80) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 13/09/2021 16:12, John Garry wrote:
-> Currently a full set of static requests are allocated per hw queue per
-> tagset when shared sbitmap is used.
-> 
-> However, only tagset->queue_depth number of requests may be active at
-> any given time. As such, only tagset->queue_depth number of static
-> requests are required.
-> 
-> The same goes for using an IO scheduler, which allocates a full set of
-> static requests per hw queue per request queue.
-> 
-> This series changes shared sbitmap support by using a shared tags per
-> tagset and request queue. Ming suggested something along those lines in
-> v1 review. But we'll keep name "shared sbitmap" name as it is familiar. In
-> using a shared tags, the static rqs also become shared, reducing the
-> number of sets of static rqs, reducing memory usage.
+On 2021/09/20 15:40, Christoph Hellwig wrote:
+> I was going to suggest to just move the bd_disk initialization after
+> the bd_stats allocations,  but iseems like we currently don't even
+> the zero the bdev on allocation.  So I suspect we should do that first
+> to avoid nasty surprises.
 
-Hi Ming,
+Hmm? bdev_alloc_inode() zeros the bdev on allocation.
+Are you talking about some other function?
 
-Could you kindly check the remaining few un-reviewed patches in this 
-series when you get an opportunity?
+static struct inode *bdev_alloc_inode(struct super_block *sb)
+{
+	struct bdev_inode *ei = kmem_cache_alloc(bdev_cachep, GFP_KERNEL);
 
-Thanks,
-John
+	if (!ei)
+		return NULL;
+	memset(&ei->bdev, 0, sizeof(ei->bdev));
+	return &ei->vfs_inode;
+}
