@@ -2,82 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C42EBC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 22:54:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93130C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 00:05:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C0C261184
-	for <linux-block@archiver.kernel.org>; Mon, 20 Sep 2021 22:54:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A7B86124A
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 00:05:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232542AbhITW4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 18:56:15 -0400
-Received: from mga18.intel.com ([134.134.136.126]:47130 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238939AbhITWyP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 18:54:15 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10113"; a="210329891"
-X-IronPort-AV: E=Sophos;i="5.85,309,1624345200"; 
-   d="scan'208";a="210329891"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2021 15:52:47 -0700
-X-IronPort-AV: E=Sophos;i="5.85,309,1624345200"; 
-   d="scan'208";a="556519969"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2021 15:52:47 -0700
-Date:   Mon, 20 Sep 2021 15:52:47 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>, linux-block@vger.kernel.org,
-        nvdimm@lists.linux.dev
-Subject: Re: [PATCH 3/3] block: warn if ->groups is set when calling add_disk
-Message-ID: <20210920225246.GA3169279@iweiny-DESK2.sc.intel.com>
-References: <20210920072726.1159572-1-hch@lst.de>
- <20210920072726.1159572-4-hch@lst.de>
+        id S233350AbhIUAGm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 20:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38124 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229967AbhIUAEi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Sep 2021 20:04:38 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E44C06121D;
+        Mon, 20 Sep 2021 10:53:19 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id e7so18168031pgk.2;
+        Mon, 20 Sep 2021 10:53:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=d+/BuCVjaN7HPzmC7myyJXzlUqKvf/I929USDd6fV7g=;
+        b=n2GX8jSPxbkZ1xvB8BkjDvmfvLRoaGx/L8DK7Yizh16ZwZutGklps3rdNQcyW2wlcE
+         WTbymYI2YYMfs6YG9PxpSVvBpY+MVK1joh8rgyZur5GDKpN1aHV4ri/DLLqGJQwU7ky8
+         vcKO8VRVYskXez8XRgLxJmVB+sOMjmKcSYO4KsRBzOxT8UOTpBV6xv6+Vh8jL7kXZkzd
+         1lErsAicH4t4aGOLX5bvIyVg7YtwDdEqb9IMj4JcrNIKKTje3aMWd8OZVPRQQrK0DBII
+         9hYF6shA6nMg2BtGSJb6eQI3/M+V81scjHP3HU2ks+AsbE1jeO5w671e8QtBmfndWqlE
+         +L2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=d+/BuCVjaN7HPzmC7myyJXzlUqKvf/I929USDd6fV7g=;
+        b=ZT4cH12w37/HHqGm8C33VDzOMI3iRwc3/NeKcyupSLh7hwthU7q4pVn6PrfHiECGVq
+         pMiyZPvkLMWLTIBvgqu5MSo1LIvBz9Zekk87N2H6L9QrRYWfsuxdWpM9CnsnMu5VP9WQ
+         Zx+VuktO7MN/rDG9dO9HFdyve7OOjsLi6KGqebPZ16G71sArgfiwQaDbMKkN9C+wrw16
+         s02PAKASFr9c9FN33O7Yqckanw5FbTMXzr3jcJ6ePwFUEa7zyU8UBHKavPSKTJQHRCp1
+         Bn6dWfw3dh37w4Y676MzqWqLiFPhbVZyCRWfuZxhrCw6Pw6P8bmcAEhIa/EgXoBBk1yc
+         9fDA==
+X-Gm-Message-State: AOAM533XhZu0V5LcK0W7Mf9swTofQE8mH982V6R+w9HSosky4y+0SUEL
+        RLxD0atDA6Z1MGC3Lqus/Vc=
+X-Google-Smtp-Source: ABdhPJwILNsmiBihNdmI+KOaMEYSRY2KlxbnrExPecCoSE4eeeBmyyC3gmr4JptmLFq8o0YFemwJXw==
+X-Received: by 2002:a62:7997:0:b0:43d:f9e1:939c with SMTP id u145-20020a627997000000b0043df9e1939cmr26229103pfc.2.1632160398453;
+        Mon, 20 Sep 2021 10:53:18 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id e14sm14357841pfv.127.2021.09.20.10.53.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Sep 2021 10:53:17 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 20 Sep 2021 07:53:16 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        rdunlap@infradead.org, rafael@kernel.org, masahiroy@kernel.org,
+        ndesaulniers@google.com, yzaikin@google.com, nathan@kernel.org,
+        ojeda@kernel.org, penguin-kernel@i-love.sakura.ne.jp,
+        vitor@massaru.org, elver@google.com, jarkko@kernel.org,
+        glider@google.com, rf@opensource.cirrus.com,
+        stephen@networkplumber.org, David.Laight@aculab.com,
+        bvanassche@acm.org, jolsa@kernel.org,
+        andriy.shevchenko@linux.intel.com, trishalfonso@google.com,
+        andreyknvl@gmail.com, jikos@kernel.org, mbenes@suse.com,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        reinette.chatre@intel.com, fenghua.yu@intel.com, bp@alien8.de,
+        x86@kernel.org, hpa@zytor.com, lizefan.x@bytedance.com,
+        hannes@cmpxchg.org, daniel.vetter@ffwll.ch, bhelgaas@google.com,
+        kw@linux.com, dan.j.williams@intel.com, senozhatsky@chromium.org,
+        hch@lst.de, joe@perches.com, hkallweit1@gmail.com, axboe@kernel.dk,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
+Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
+Message-ID: <YUjKjLzqpcxjRyit@slm.duckdns.org>
+References: <20210918050430.3671227-1-mcgrof@kernel.org>
+ <20210918050430.3671227-10-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210920072726.1159572-4-hch@lst.de>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+In-Reply-To: <20210918050430.3671227-10-mcgrof@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 09:27:26AM +0200, Christoph Hellwig wrote:
-> The proper API is to pass the groups to device_add_disk, but the code
-> used to also allow groups being set before calling *add_disk.  Warn
-> about that but keep the group pointer intact for now so that it can
-> be removed again after a grace period.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Fixes: 52b85909f85d ("block: fold register_disk into device_add_disk")
+Hello,
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+On Fri, Sep 17, 2021 at 10:04:27PM -0700, Luis Chamberlain wrote:
+> If try_module_get() fails we fail the operation on the kernfs node.
+> 
+> We use a try method as a full lock means we'd then make our sysfs
+> attributes busy us out from possible module removal, and so userspace
+> could force denying module removal, a silly form of "DOS" against module
+> removal. A try lock on the module removal ensures we give priority to
+> module removal and interacting with sysfs attributes only comes second.
+> Using a full lock could mean for instance that if you don't stop poking
+> at sysfs files you cannot remove a module.
 
-> ---
->  block/genhd.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 7b6e5e1cf9564..409cf608cc5bd 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -439,7 +439,8 @@ int device_add_disk(struct device *parent, struct gendisk *disk,
->  	dev_set_uevent_suppress(ddev, 1);
->  
->  	ddev->parent = parent;
-> -	ddev->groups = groups;
-> +	if (!WARN_ON_ONCE(ddev->groups))
-> +		ddev->groups = groups;
->  	dev_set_name(ddev, "%s", disk->disk_name);
->  	if (!(disk->flags & GENHD_FL_HIDDEN))
->  		ddev->devt = MKDEV(disk->major, disk->first_minor);
-> -- 
-> 2.30.2
-> 
+I find this explanation odd because there's no real equivalent to locking
+the module (as opposed to try locking) because you can't wait for the
+removal to finish and then grant the lock, so any operation which increases
+the reference *has* to be a try method unless the caller already holds a
+reference to the same module and thus knows that the module is already
+pinned. The code isn't wrong, so maybe just drop the related paragraphs in
+the commit message?
+
+>  static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+>  					     struct kernfs_node *parent,
+>  					     const char *name, umode_t mode,
+> +					     struct module *owner,
+>  					     kuid_t uid, kgid_t gid,
+>  					     unsigned flags)
+
+Is there a particular reason why @owner is added between @mode and @uid?
+Sitting between two fs attributes seems a bit awkward. Maybe it can just be
+the last one?
+
+Thanks.
+
+-- 
+tejun
