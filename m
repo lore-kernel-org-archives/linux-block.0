@@ -2,179 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 715A2C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD8AC43217
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57B7D60F9D
+	by mail.kernel.org (Postfix) with ESMTP id 839BF61157
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346017AbhIUCRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 22:17:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33286 "EHLO
+        id S1346028AbhIUCRe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 22:17:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236312AbhIUBuE (ORCPT
+        with ESMTP id S230100AbhIUBvw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 21:50:04 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0EAC06AB09
-        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 14:55:22 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id n18so18748374pgm.12
-        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 14:55:22 -0700 (PDT)
+        Mon, 20 Sep 2021 21:51:52 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAFFC0386C0
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 16:09:25 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id u18so18981670pgf.0
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 16:09:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=intel-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=amBkTo8paIO6KKoyr0sD3I13KXEgBWAgALAI9bRUOrY=;
-        b=XL3OFLcRkLeLa9eXRmHa7cKmBwEZybbc9mdJnrjPUsNmyhIp9vj8F3iNcHNSqXTb1K
-         L9OEBMzu/TTeVT/s4PldqIkTZ0HgtlJEgIwwbfok6X1NLdtuYuyvrzXuuS1QyCQHhDf3
-         FY2aphwijxMkpTX43r3twUk5IdFvYJi1wu5sZUQ0IQCbDLg80wgE3Q0dm575Bea3zf1f
-         JfQJ5ifnA2ISAORhBlZA82ZPIyQ2zFi5MELZoyko92jJrrmD7LWhkltsG8XSY3PQ3mqC
-         YdMiNP+ggNC5rUbR8bzVM/xfxgJFK13EPKdACqQQqNx9Bpea47bYvjeXMJ6UV3MCOnZ/
-         JrFg==
+        bh=XOcqHHbkBDFlbtFdYBTqX2Q9Srh+sNAiutBC+Z8jfD0=;
+        b=64MjeUkX5fnk7DBE/PjIi6uxragircvWmGgL8etQwvZ1l5WJ6TUfHYN8QzBi0QMGhg
+         xqZyEl5Dpd2r5u1pSCCPkp0tDmdB6Bcffd1QK+VuxzeKViBhh2y7xkhFg8WiHhfETtlz
+         JoSJhSEr2l9GFYgEtlLxCWUqyCPnqPKzXnAfF8SJEOeFKjb7+MDIADmh8d2PWgm7mtL9
+         wLEi+1HHWrNx2K1TAAfZMH1Xro++PpHG48OZ7W9JCrU49xYLK1PXpVeULNgHdT7PPtMR
+         A7NQNf3IDYSO1p1jogUxQVzP/eBQjVSETWV1KYu8bi7sgDLqo/8Oe2LwPZDHAj/PO6ZO
+         /gDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=amBkTo8paIO6KKoyr0sD3I13KXEgBWAgALAI9bRUOrY=;
-        b=hCq7nM564+WTJpkfr9IUIFalRxPo1ZtjhE3EE+gv43qA1ZVsjWfjGd2fUvYoHeUV7T
-         Lt3GNTNz9uYA8M8dRdTDtFfvGQKKkDbVG/rTwXUz+P0efqkGMrVuF0AomY4McniWy8ep
-         4AcA8jnDjcMxCv6i8dBJuKpVxzi7TesJowarrtlOywLHl9Ax/GjxwQuIM57+jLR5dsy4
-         LYEmxWYGuLLaqQyyfiO2kA83fNcUWETN0dsz/POEw5N0Lj+qi9+XOZz9ksv2/SemPqNt
-         jpUaZfMyMB//ANCVAnTwegnPyEPHCe6Wl2xNaJb3/Za0piq/H9KIqRaT74ujCFd5tQNJ
-         u8kw==
-X-Gm-Message-State: AOAM533HmJ2+y9ImOn58HsY50cjEPpMcotRalAshOTfBXRkqIuctsDoj
-        uyAv+/vO0b8hqgZxgyT13xTiLyR7M1IaA8eYnDN+4Q==
-X-Google-Smtp-Source: ABdhPJwBWi/pa4o5rVuzlrO7QoclxHzSHljmGejbBs+BPyI0/4Ad8yRwI26n/BXik+g+dmpD6uwLMi2rTRHApy0oOl0=
-X-Received: by 2002:a63:1e0e:: with SMTP id e14mr25231633pge.5.1632174921576;
- Mon, 20 Sep 2021 14:55:21 -0700 (PDT)
+        bh=XOcqHHbkBDFlbtFdYBTqX2Q9Srh+sNAiutBC+Z8jfD0=;
+        b=RqbcyKrcuKDCQWjnq/zAxJGENfH3G3Z7t86KN0Fmszs/YFpPlgCO1+TArgN8+15aGa
+         JmZPQdnOyWvX76gjlQOiHzRqXylDyMPE6VeeLEh8x5ZsMXd3CWlWCNaFosVoLkel+RKX
+         QtHOBLNq2Lk9OJIjIERu+VV8tHniOJk053xIrBq2NcR6ULny5jUAFoteksRfp63bXemj
+         vX2axDDg5VL6f3joN++bfhtgQRmmbqzEMVD4CyW0mMawErtDNs6U+luji9apNmfNTpuL
+         X0rpXVLvDg/GyJOHmZV6UBYGF8IfyRA7o3zpy0/yr93+tGRanjlSIo1eCFh0cSxfQmjB
+         5HuQ==
+X-Gm-Message-State: AOAM5334C2VNGKeFGlIa0TaFrWnFB3YT8RBLTmymzdA5pzBt94d2cY4Z
+        ZhDZ9u+jcpFCuyZQEybDc0UjNd6mjGMLm21csgMc3A==
+X-Google-Smtp-Source: ABdhPJxI9Od05DZ0snqOmMgrhp1sI5Y9wYEd+2t40IS3lfIxNj4bseBagecZBBXGVcs2qjrSGmhbjS2ZMrrrLLbeAEo=
+X-Received: by 2002:aa7:9d84:0:b0:447:c2f4:4a39 with SMTP id
+ f4-20020aa79d84000000b00447c2f44a39mr6015200pfq.86.1632179364747; Mon, 20 Sep
+ 2021 16:09:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210918050430.3671227-1-mcgrof@kernel.org> <20210918050430.3671227-10-mcgrof@kernel.org>
- <CAPcyv4i0xEwMQ5kSK-xGroV7aZr3j1YNrGMVLiLMr3U8nFCMKA@mail.gmail.com> <YUj6TrGbqlNI0OGC@bombadil.infradead.org>
-In-Reply-To: <YUj6TrGbqlNI0OGC@bombadil.infradead.org>
+References: <20210920072726.1159572-1-hch@lst.de> <20210920072726.1159572-2-hch@lst.de>
+In-Reply-To: <20210920072726.1159572-2-hch@lst.de>
 From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Mon, 20 Sep 2021 14:55:10 -0700
-Message-ID: <CAPcyv4jFaNTfpKq6hQsFrWXTwHz-wG+5K4m-hmsPeteLX4p5AQ@mail.gmail.com>
-Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Tejun Heo <tj@kernel.org>, Greg KH <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Minchan Kim <minchan@kernel.org>, jeyu@kernel.org,
-        shuah <shuah@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>, yzaikin@google.com,
-        Nathan Chancellor <nathan@kernel.org>, ojeda@kernel.org,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        vitor@massaru.org, elver@google.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Alexander Potapenko <glider@google.com>,
-        rf@opensource.cirrus.com,
-        Stephen Hemminger <stephen@networkplumber.org>,
-        David Laight <David.Laight@aculab.com>, bvanassche@acm.org,
-        jolsa@kernel.org,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        trishalfonso@google.com, andreyknvl@gmail.com,
-        Jiri Kosina <jikos@kernel.org>, mbenes@suse.com,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Borislav Petkov <bp@alien8.de>, X86 ML <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, lizefan.x@bytedance.com,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>,
-        senozhatsky@chromium.org, Christoph Hellwig <hch@lst.de>,
-        Joe Perches <joe@perches.com>, hkallweit1@gmail.com,
-        Jens Axboe <axboe@kernel.dk>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kees Cook <keescook@chromium.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-spdx@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        copyleft-next@lists.fedorahosted.org
+Date:   Mon, 20 Sep 2021 16:09:13 -0700
+Message-ID: <CAPcyv4hVR9J6M+0-KcnmNeRywvF4CobyEtKA9repq9ivtKy77Q@mail.gmail.com>
+Subject: Re: [PATCH 1/3] nvdimm/pmem: fix creating the dax group
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, linux-block@vger.kernel.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 2:17 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+On Mon, Sep 20, 2021 at 12:29 AM Christoph Hellwig <hch@lst.de> wrote:
 >
-> On Mon, Sep 20, 2021 at 01:52:21PM -0700, Dan Williams wrote:
-> > On Fri, Sep 17, 2021 at 10:05 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> > > This deadlock was first reported with the zram driver, however the live
-> > > patching folks have acknowledged they have observed this as well with
-> > > live patching, when a live patch is removed. I was then able to
-> > > reproduce easily by creating a dedicated selftests.
-> > >
-> > > A sketch of how this can happen follows:
-> > >
-> > > CPU A                              CPU B
-> > >                                    whatever_store()
-> > > module_unload
-> > >   mutex_lock(foo)
-> > >                                    mutex_lock(foo)
-> > >    del_gendisk(zram->disk);
-> > >      device_del()
-> > >        device_remove_groups()
-> >
-> > This flow seems possible to trigger with:
-> >
-> >    echo $dev > /sys/bus/$bus/drivers/$driver/unbind
-> >
-> > I am missing why module pinning
+> The recent block layer refactoring broke the way how the pmem driver
+> abused device_add_disk.  Fix this by properly passing the attribute groups
+> to device_add_disk.
 >
-> The aspect of try_module_get() which comes to value to prevent the
-> deadlock is it ensures kernfs ops do not run once exit is on the way.
->
-> > is part of the solution when it's the
-> > device_del() path that is racing?
->
-> But its not, the device_del() path will yield until the kernfs op
-> completes. It is fine to wait there.
->
-> The deadlock happens if a module exit routine uses a lock which is
-> also used on a sysfs op. If the lock was first held by module exit,
-> and module exit is waiting for the kernfs op to complete, and the
-> kernfs op is waiting to hold the same lock then the exit will wait
-> forever.
->
-> > Module removal is just a more coarse
-> > grained way to trigger unbind => device_del().
->
-> Right, but the device_del() path is not sharing a lock with the sysfs op.
+> Fixes: 52b85909f85d ("block: fold register_disk into device_add_disk")
 
-The deadlock in the example comes from holding a lock over
-device_del() that is also taken in a kernfs op.  For example, the code
-above looks like something that runs from driver.remove(), not
-exclusively module_exit(). Yes, module_exit() may trigger
-driver.remove() via driver_unregister(), but there's other ways to
-trigger driver.remove() that do not involve module_exit().
+This also fixes the the way the pmem driver abused device_add_disk(),
+so perhaps add:
 
-> > Isn't the above a bug
-> > in the driver, not missing synchronization in kernfs?
->
-> We can certainly take the position as an alternative:
->
->   "thou shalt not use a lock on exit which is also used on a syfs op"
->
-> However that seems counter intuitive, specially if we can resolve the
-> issue easily with a try_module_get().
+Fixes: fef912bf860e ("block: genhd: add 'groups' argument to device_add_disk")
 
-Again, I don't see how try_module_get() can affect the ABBA failure
-case of holding a lock over device_del() that is also held inside
-sysfs op. I agree that the problem is subtle. Does lockdep not
-complain about this case? If it's going to be avoided in the core it
-seems try_module_get() does not completely cover the hole that
-unsuspecting driver writers might fall into.
+...as well. It's not a stable fix as this is only a cosmetic fixup
+until the most recent refactoring turned it into a bug.
+
+Either way, you can add:
+
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
