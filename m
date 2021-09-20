@@ -2,123 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E863C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 715A2C433F5
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78DCA60F46
+	by mail.kernel.org (Postfix) with ESMTP id 57B7D60F9D
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 02:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346023AbhIUCRc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 22:17:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32966 "EHLO
+        id S1346017AbhIUCRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 22:17:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236374AbhIUBuK (ORCPT
+        with ESMTP id S236312AbhIUBuE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 21:50:10 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404BBC0698FE;
-        Mon, 20 Sep 2021 15:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=yy0EwQ7J0sMHzSOPWcbFHFKHWeUukuqykjyt5I+NDUo=; b=c8ZwljTjtslpLLghi95Cqy1/Hk
-        +Yu0waLRiRkg6H9rbFRN+VMHIJtVt7AIv0NX7aD2Zxg+WTo4aIrL6ma+oPWOwgeGusYXsw7OwAlkx
-        IhrswmJoiAvUAOKqgARM9OaT+CpqaAzyIT2BvFmlN7YW3WBIlGIk0WIBo9/Hf/FH1h1W4s1o9ci1P
-        Z6m7moIAwWub//99wTuoNA6EABZh8wGAsrjxhRp9aClp7olPq89oJmR2XyGPoBvK/TkysYHTP+R0d
-        S5shbYSilOSOaPGSP+4crgkPbescejHhV9c5BIg0rX+4+BEgPCjsyo907BEdHB6bR7DnYGcILYA9x
-        9yOZyurw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mSRLg-003IEY-VT; Mon, 20 Sep 2021 22:01:23 +0000
-Date:   Mon, 20 Sep 2021 23:01:16 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     linux-mm@kvack.org, Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        John Garry <john.garry@huawei.com>,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC v2 PATCH] mm, sl[au]b: Introduce lockless cache
-Message-ID: <YUkErK1vVZMht4s8@casper.infradead.org>
-References: <20210920154816.31832-1-42.hyeyoo@gmail.com>
+        Mon, 20 Sep 2021 21:50:04 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0EAC06AB09
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 14:55:22 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id n18so18748374pgm.12
+        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 14:55:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=amBkTo8paIO6KKoyr0sD3I13KXEgBWAgALAI9bRUOrY=;
+        b=XL3OFLcRkLeLa9eXRmHa7cKmBwEZybbc9mdJnrjPUsNmyhIp9vj8F3iNcHNSqXTb1K
+         L9OEBMzu/TTeVT/s4PldqIkTZ0HgtlJEgIwwbfok6X1NLdtuYuyvrzXuuS1QyCQHhDf3
+         FY2aphwijxMkpTX43r3twUk5IdFvYJi1wu5sZUQ0IQCbDLg80wgE3Q0dm575Bea3zf1f
+         JfQJ5ifnA2ISAORhBlZA82ZPIyQ2zFi5MELZoyko92jJrrmD7LWhkltsG8XSY3PQ3mqC
+         YdMiNP+ggNC5rUbR8bzVM/xfxgJFK13EPKdACqQQqNx9Bpea47bYvjeXMJ6UV3MCOnZ/
+         JrFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=amBkTo8paIO6KKoyr0sD3I13KXEgBWAgALAI9bRUOrY=;
+        b=hCq7nM564+WTJpkfr9IUIFalRxPo1ZtjhE3EE+gv43qA1ZVsjWfjGd2fUvYoHeUV7T
+         Lt3GNTNz9uYA8M8dRdTDtFfvGQKKkDbVG/rTwXUz+P0efqkGMrVuF0AomY4McniWy8ep
+         4AcA8jnDjcMxCv6i8dBJuKpVxzi7TesJowarrtlOywLHl9Ax/GjxwQuIM57+jLR5dsy4
+         LYEmxWYGuLLaqQyyfiO2kA83fNcUWETN0dsz/POEw5N0Lj+qi9+XOZz9ksv2/SemPqNt
+         jpUaZfMyMB//ANCVAnTwegnPyEPHCe6Wl2xNaJb3/Za0piq/H9KIqRaT74ujCFd5tQNJ
+         u8kw==
+X-Gm-Message-State: AOAM533HmJ2+y9ImOn58HsY50cjEPpMcotRalAshOTfBXRkqIuctsDoj
+        uyAv+/vO0b8hqgZxgyT13xTiLyR7M1IaA8eYnDN+4Q==
+X-Google-Smtp-Source: ABdhPJwBWi/pa4o5rVuzlrO7QoclxHzSHljmGejbBs+BPyI0/4Ad8yRwI26n/BXik+g+dmpD6uwLMi2rTRHApy0oOl0=
+X-Received: by 2002:a63:1e0e:: with SMTP id e14mr25231633pge.5.1632174921576;
+ Mon, 20 Sep 2021 14:55:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210920154816.31832-1-42.hyeyoo@gmail.com>
+References: <20210918050430.3671227-1-mcgrof@kernel.org> <20210918050430.3671227-10-mcgrof@kernel.org>
+ <CAPcyv4i0xEwMQ5kSK-xGroV7aZr3j1YNrGMVLiLMr3U8nFCMKA@mail.gmail.com> <YUj6TrGbqlNI0OGC@bombadil.infradead.org>
+In-Reply-To: <YUj6TrGbqlNI0OGC@bombadil.infradead.org>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Mon, 20 Sep 2021 14:55:10 -0700
+Message-ID: <CAPcyv4jFaNTfpKq6hQsFrWXTwHz-wG+5K4m-hmsPeteLX4p5AQ@mail.gmail.com>
+Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Tejun Heo <tj@kernel.org>, Greg KH <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Minchan Kim <minchan@kernel.org>, jeyu@kernel.org,
+        shuah <shuah@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>, yzaikin@google.com,
+        Nathan Chancellor <nathan@kernel.org>, ojeda@kernel.org,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        vitor@massaru.org, elver@google.com,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Alexander Potapenko <glider@google.com>,
+        rf@opensource.cirrus.com,
+        Stephen Hemminger <stephen@networkplumber.org>,
+        David Laight <David.Laight@aculab.com>, bvanassche@acm.org,
+        jolsa@kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        trishalfonso@google.com, andreyknvl@gmail.com,
+        Jiri Kosina <jikos@kernel.org>, mbenes@suse.com,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Borislav Petkov <bp@alien8.de>, X86 ML <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, lizefan.x@bytedance.com,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>,
+        senozhatsky@chromium.org, Christoph Hellwig <hch@lst.de>,
+        Joe Perches <joe@perches.com>, hkallweit1@gmail.com,
+        Jens Axboe <axboe@kernel.dk>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Kees Cook <keescook@chromium.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-spdx@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        copyleft-next@lists.fedorahosted.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 03:48:16PM +0000, Hyeonggon Yoo wrote:
-> +#define KMEM_LOCKLESS_CACHE_QUEUE_SIZE 64
+On Mon, Sep 20, 2021 at 2:17 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>
+> On Mon, Sep 20, 2021 at 01:52:21PM -0700, Dan Williams wrote:
+> > On Fri, Sep 17, 2021 at 10:05 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> > > This deadlock was first reported with the zram driver, however the live
+> > > patching folks have acknowledged they have observed this as well with
+> > > live patching, when a live patch is removed. I was then able to
+> > > reproduce easily by creating a dedicated selftests.
+> > >
+> > > A sketch of how this can happen follows:
+> > >
+> > > CPU A                              CPU B
+> > >                                    whatever_store()
+> > > module_unload
+> > >   mutex_lock(foo)
+> > >                                    mutex_lock(foo)
+> > >    del_gendisk(zram->disk);
+> > >      device_del()
+> > >        device_remove_groups()
+> >
+> > This flow seems possible to trigger with:
+> >
+> >    echo $dev > /sys/bus/$bus/drivers/$driver/unbind
+> >
+> > I am missing why module pinning
+>
+> The aspect of try_module_get() which comes to value to prevent the
+> deadlock is it ensures kernfs ops do not run once exit is on the way.
+>
+> > is part of the solution when it's the
+> > device_del() path that is racing?
+>
+> But its not, the device_del() path will yield until the kernfs op
+> completes. It is fine to wait there.
+>
+> The deadlock happens if a module exit routine uses a lock which is
+> also used on a sysfs op. If the lock was first held by module exit,
+> and module exit is waiting for the kernfs op to complete, and the
+> kernfs op is waiting to hold the same lock then the exit will wait
+> forever.
+>
+> > Module removal is just a more coarse
+> > grained way to trigger unbind => device_del().
+>
+> Right, but the device_del() path is not sharing a lock with the sysfs op.
 
-I would suggest that, to be nice to the percpu allocator, this be
-one less than 2^n.
+The deadlock in the example comes from holding a lock over
+device_del() that is also taken in a kernfs op.  For example, the code
+above looks like something that runs from driver.remove(), not
+exclusively module_exit(). Yes, module_exit() may trigger
+driver.remove() via driver_unregister(), but there's other ways to
+trigger driver.remove() that do not involve module_exit().
 
-> +struct kmem_lockless_cache {
-> +	void *queue[KMEM_LOCKLESS_CACHE_QUEUE_SIZE];
-> +	unsigned int size;
-> +};
+> > Isn't the above a bug
+> > in the driver, not missing synchronization in kernfs?
+>
+> We can certainly take the position as an alternative:
+>
+>   "thou shalt not use a lock on exit which is also used on a syfs op"
+>
+> However that seems counter intuitive, specially if we can resolve the
+> issue easily with a try_module_get().
 
-I would also suggest that 'size' be first as it is going to be accessed
-every time, and then there's a reasonable chance that queue[size - 1] will
-be in the same cacheline.  CPUs will tend to handle that better.
-
-> +/**
-> + * kmem_cache_alloc_cached - try to allocate from cache without lock
-> + * @s: slab cache
-> + * @flags: SLAB flags
-> + *
-> + * Try to allocate from cache without lock. If fails, fill the lockless cache
-> + * using bulk alloc API
-> + *
-> + * Be sure that there's no race condition.
-> + * Must create slab cache with SLAB_LOCKLESS_CACHE flag to use this function.
-> + *
-> + * Return: a pointer to free object on allocation success, NULL on failure.
-> + */
-> +void *kmem_cache_alloc_cached(struct kmem_cache *s, gfp_t gfpflags)
-> +{
-> +	struct kmem_lockless_cache *cache = this_cpu_ptr(s->cache);
-> +
-> +	BUG_ON(!(s->flags & SLAB_LOCKLESS_CACHE));
-> +
-> +	if (cache->size) /* fastpath without lock */
-> +		return cache->queue[--cache->size];
-> +
-> +	/* slowpath */
-> +	cache->size = kmem_cache_alloc_bulk(s, gfpflags,
-> +			KMEM_LOCKLESS_CACHE_QUEUE_SIZE, cache->queue);
-
-Go back to the Bonwick paper and look at the magazine section again.
-You have to allocate _half_ the size of the queue, otherwise you get
-into pathological situations where you start to free and allocate
-every time.
-
-> +void kmem_cache_free_cached(struct kmem_cache *s, void *p)
-> +{
-> +	struct kmem_lockless_cache *cache = this_cpu_ptr(s->cache);
-> +
-> +	BUG_ON(!(s->flags & SLAB_LOCKLESS_CACHE));
-> +
-> +	/* Is there better way to do this? */
-> +	if (cache->size == KMEM_LOCKLESS_CACHE_QUEUE_SIZE)
-> +		kmem_cache_free(s, cache->queue[--cache->size]);
-
-Yes.
-
-	if (cache->size == KMEM_LOCKLESS_CACHE_QUEUE_SIZE) {
-		kmem_cache_free_bulk(s, KMEM_LOCKLESS_CACHE_QUEUE_SIZE / 2,
-			&cache->queue[KMEM_LOCKLESS_CACHE_QUEUE_SIZE / 2));
-		cache->size = KMEM_LOCKLESS_CACHE_QUEUE_SIZE / 2;
-
-(check the maths on that; it might have some off-by-one)
-
+Again, I don't see how try_module_get() can affect the ABBA failure
+case of holding a lock over device_del() that is also held inside
+sysfs op. I agree that the problem is subtle. Does lockdep not
+complain about this case? If it's going to be avoided in the core it
+seems try_module_get() does not completely cover the hole that
+unsuspecting driver writers might fall into.
