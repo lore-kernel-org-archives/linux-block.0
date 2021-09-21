@@ -2,170 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EA5C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 15:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 291BDC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 15:49:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6548460F56
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 15:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03BD5610A1
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 15:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234151AbhIUPoO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Sep 2021 11:44:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234089AbhIUPoO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Sep 2021 11:44:14 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69DCAC061574;
-        Tue, 21 Sep 2021 08:42:45 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id t4so13691310plo.0;
-        Tue, 21 Sep 2021 08:42:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RD5aX+bq0mWaigsgwff4LifiFIskfGBYOuz23IRmF4A=;
-        b=gQysE9fy9UdDCPFaMP9zJNGweHy7ylFyDDUJqj0hCp6Syl8h4CQSjjBIJ5X2PhUdnL
-         bOJLbvXVF1dZZScDOJKeXVDV4okYScgUR4FjIDhVbjMqZ+O5RG2MyTEjwHjpkNfLLHfM
-         aJAIWyWct1v/cLXuCv0Qzbzy0jZzPO6SVWANWrDXS29VPpKgm+M5ueXm/OaKypKWo5nC
-         FgLjm2nHB7V9voFQuIyN/A0/6wfxrnlgDRESguvuXgG0bOfgXnEAotuz3ma+9fBgm5z0
-         shrcwHRe3VeWIRCYwhXKi+vJlgD4HxrXdAoNQNznain0ZjBHHU0p1J6EUyETbz4oZozs
-         KOjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RD5aX+bq0mWaigsgwff4LifiFIskfGBYOuz23IRmF4A=;
-        b=h9DPQ6DfcOimwCsZM2xr6/tbUGn5zQacqekHvv4H0vhkz+HnF6LGO5XnpNzXthc89e
-         E28k7n7XgqnUuVxEkiEcEcC5H09l9dTfENWzrprhATDq1L49TqwIg1eVdHTne4oQqIgB
-         Qn0vA6fUcNJL7aNPB2BJK5fLj9nwoZDtotZvwGMLi4mEIA5DVvCIu765MP8pScFn5z+0
-         Z33hOP+1pIv63SPm4HbCKYa7O2PqF/0mEVC9keKRiMlJucafe0a/XxvZa1I0NbhkZ4t5
-         2qG3tG0eHmVKidp9pq5Sc35Ehtfq6VvbYANcB7NxJXCG28dSfKtnaqjlJZLM+1XwGXcr
-         ZVsQ==
-X-Gm-Message-State: AOAM5321WyZJCXWVT19RQQ8BpY8zJ0JOkn2zo2hgVqzxuv0d85EqhI6u
-        7uDVxFgddi9nD4nwaDYMZ+g=
-X-Google-Smtp-Source: ABdhPJx/Zmb6zD2WZ4KC4j4SUn/d8h/e2zioznqSPJAtibgwO8DI4PddxHOSmQdfF8LHqBQbnbl9MQ==
-X-Received: by 2002:a17:903:102:b0:13a:66a8:f28 with SMTP id y2-20020a170903010200b0013a66a80f28mr28067530plc.62.1632238964906;
-        Tue, 21 Sep 2021 08:42:44 -0700 (PDT)
-Received: from kvm.asia-northeast3-a.c.our-ratio-313919.internal (252.229.64.34.bc.googleusercontent.com. [34.64.229.252])
-        by smtp.gmail.com with ESMTPSA id y6sm17819188pfb.64.2021.09.21.08.42.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 08:42:44 -0700 (PDT)
-Date:   Tue, 21 Sep 2021 15:42:39 +0000
-From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-mm@kvack.org, Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        John Garry <john.garry@huawei.com>,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC v2 PATCH] mm, sl[au]b: Introduce lockless cache
-Message-ID: <20210921154239.GA5092@kvm.asia-northeast3-a.c.our-ratio-313919.internal>
-References: <20210920154816.31832-1-42.hyeyoo@gmail.com>
- <YUkErK1vVZMht4s8@casper.infradead.org>
+        id S234211AbhIUPul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Sep 2021 11:50:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38636 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229804AbhIUPuk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Sep 2021 11:50:40 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2B3B061183;
+        Tue, 21 Sep 2021 15:49:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632239352;
+        bh=SYPIsUeB0QpNl9iOqz8TrUCBGO94e+noRg1ECZdTJME=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=UaaVRIqswzz+NS3S8fQEaKMO9RtdOXsyeprnTEIheXJKQGHNj08P7eyrd/PQOFBCR
+         AN5tBBs86O+nP3GdbvOj2N+vfIACcMw2gY7GyzZmcnfLHUMHWEqqTO8tVeryaAcPBC
+         wa3PUemimJFndCXNOCuGMsRHqw57UEYG+Vl8QmekwFARdVX0/7ufVsMqf8T+9g7Szp
+         diWZkbbph3gXn35UaYmr5cUyleLHlYXnKdZMqMkRG/D9zQZoy6oFBj2a59MNnxAHRK
+         YIYKWUHNZvNhOBYpWGFXq5g7hiH0GMlpMxwr02jYDVngebiKxCzBjK5YB3wvzgzdsQ
+         QI6X04sAKlF5w==
+Received: by mail-qt1-f178.google.com with SMTP id x9so6771427qtv.0;
+        Tue, 21 Sep 2021 08:49:12 -0700 (PDT)
+X-Gm-Message-State: AOAM530DTdfrLatLheUDRErjR0q716Etht84WYtht7AKXxWF0VYHTMnt
+        NVdMaemE2/1nYxdiR7t9kXytp6X1M9drt3Q8/zI=
+X-Google-Smtp-Source: ABdhPJxkbOxqy1A7fvfdyNFD5npSBw9ZclgHN9SR+lhraCwiqhyTzn8pzClLHqd6Gjl1VdDdZRtbIZxWA0QsI3m+TXk=
+X-Received: by 2002:ac8:4113:: with SMTP id q19mr29065258qtl.108.1632239341024;
+ Tue, 21 Sep 2021 08:49:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YUkErK1vVZMht4s8@casper.infradead.org>
+References: <20210917194709.3562413-1-mcgrof@kernel.org> <20210917194709.3562413-10-mcgrof@kernel.org>
+ <c70dcb03e27e43c5b5311e184357df39@AcuMS.aculab.com>
+In-Reply-To: <c70dcb03e27e43c5b5311e184357df39@AcuMS.aculab.com>
+From:   Luis Chamberlain <mcgrof@kernel.org>
+Date:   Tue, 21 Sep 2021 08:48:49 -0700
+X-Gmail-Original-Message-ID: <CAB=NE6WjupsJFwsj94sC_j3gcYn2Qo0sx1=tMv=WUZ83jq_DFw@mail.gmail.com>
+Message-ID: <CAB=NE6WjupsJFwsj94sC_j3gcYn2Qo0sx1=tMv=WUZ83jq_DFw@mail.gmail.com>
+Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
+To:     David Laight <David.Laight@aculab.com>
+Cc:     "tj@kernel.org" <tj@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "jeyu@kernel.org" <jeyu@kernel.org>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "masahiroy@kernel.org" <masahiroy@kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "yzaikin@google.com" <yzaikin@google.com>,
+        "nathan@kernel.org" <nathan@kernel.org>,
+        "ojeda@kernel.org" <ojeda@kernel.org>,
+        "vitor@massaru.org" <vitor@massaru.org>,
+        "elver@google.com" <elver@google.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "glider@google.com" <glider@google.com>,
+        "rf@opensource.cirrus.com" <rf@opensource.cirrus.com>,
+        "stephen@networkplumber.org" <stephen@networkplumber.org>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "jolsa@kernel.org" <jolsa@kernel.org>,
+        "andriy.shevchenko@linux.intel.com" 
+        <andriy.shevchenko@linux.intel.com>,
+        "trishalfonso@google.com" <trishalfonso@google.com>,
+        "andreyknvl@gmail.com" <andreyknvl@gmail.com>,
+        "jikos@kernel.org" <jikos@kernel.org>,
+        "mbenes@suse.com" <mbenes@suse.com>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
+        "sergey.senozhatsky.work@gmail.com" 
+        <sergey.senozhatsky.work@gmail.com>,
+        "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
+        "fenghua.yu@intel.com" <fenghua.yu@intel.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "lizefan.x@bytedance.com" <lizefan.x@bytedance.com>,
+        "hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+        "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "kw@linux.com" <kw@linux.com>,
+        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+        "hch@lst.de" <hch@lst.de>, "joe@perches.com" <joe@perches.com>,
+        "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "jpoimboe@redhat.com" <jpoimboe@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "copyleft-next@lists.fedorahosted.org" 
+        <copyleft-next@lists.fedorahosted.org>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 11:01:16PM +0100, Matthew Wilcox wrote:
-> On Mon, Sep 20, 2021 at 03:48:16PM +0000, Hyeonggon Yoo wrote:
-> > +#define KMEM_LOCKLESS_CACHE_QUEUE_SIZE 64
-> 
-> I would suggest that, to be nice to the percpu allocator, this be
-> one less than 2^n.
+On Tue, Sep 21, 2021 at 1:24 AM David Laight <David.Laight@aculab.com> wrote:
+>
+> From: Luis Chamberlain
+> > Sent: 17 September 2021 20:47
+> >
+> > When sysfs attributes use a lock also used on module removal we can
+> > race to deadlock. This happens when for instance a sysfs file on
+> > a driver is used, then at the same time we have module removal call
+> > trigger. The module removal call code holds a lock, and then the sysfs
+> > file entry waits for the same lock. While holding the lock the module
+> > removal tries to remove the sysfs entries, but these cannot be removed
+> > yet as one is waiting for a lock. This won't complete as the lock is
+> > already held. Likewise module removal cannot complete, and so we deadlock.
+>
+> Isn't the real problem the race between a sysfs file action and the
+> removal of the sysfs node?
 
-I think first we need to discuss if KMEM_LOCKLESS_CACHE_QUEUE_SIZE will be
-okay with constant, or per kmem_cache size, or global boot parameter.
+Nope, that is taken care of by kernfs.
 
-But even before that, we need to discuss how to manage magazine.
-because that affect on what KMEM_LOCKLESS_CACHE_QUEUE_SIZE will be.
+> This isn't really related to module unload - except that may
+> well remove some sysfs nodes.
 
-> > +struct kmem_lockless_cache {
-> > +	void *queue[KMEM_LOCKLESS_CACHE_QUEUE_SIZE];
-> > +	unsigned int size;
-> > +};
-> 
-> I would also suggest that 'size' be first as it is going to be accessed
-> every time, and then there's a reasonable chance that queue[size - 1] will
-> be in the same cacheline.  CPUs will tend to handle that better.
+Nope, the issue is a deadlock that can happen due to a shared lock on
+module removal and a driver sysfs operation.
 
-That looks good to me, as you said there's chance that 'size' and some of
-queue's elements (hopefully queue[size - 1]) are in same cacheline.
+> This is the same problem as removing any other kind of driver callback.
+> There are three basic solutions:
+> 1) Use a global lock - not usually useful.
+> 2) Have the remove call sleep until any callbacks are complete.
+> 3) Have the remove just request removal and have a final
+>    callback (from a different context).
 
-Plus, in v2 I didn't consider cache line when determining position of
-kmem_lockless_cache in kmem_cache, I think we need to reconsider this
-too.
+Kernfs already does a sort of combination of 1) and 2) but 1) is using
+atomic reference counts.
 
-> > +/**
-> > + * kmem_cache_alloc_cached - try to allocate from cache without lock
-> > + * @s: slab cache
-> > + * @flags: SLAB flags
-> > + *
-> > + * Try to allocate from cache without lock. If fails, fill the lockless cache
-> > + * using bulk alloc API
-> > + *
-> > + * Be sure that there's no race condition.
-> > + * Must create slab cache with SLAB_LOCKLESS_CACHE flag to use this function.
-> > + *
-> > + * Return: a pointer to free object on allocation success, NULL on failure.
-> > + */
-> > +void *kmem_cache_alloc_cached(struct kmem_cache *s, gfp_t gfpflags)
-> > +{
-> > +	struct kmem_lockless_cache *cache = this_cpu_ptr(s->cache);
-> > +
-> > +	BUG_ON(!(s->flags & SLAB_LOCKLESS_CACHE));
-> > +
-> > +	if (cache->size) /* fastpath without lock */
-> > +		return cache->queue[--cache->size];
-> > +
-> > +	/* slowpath */
-> > +	cache->size = kmem_cache_alloc_bulk(s, gfpflags,
-> > +			KMEM_LOCKLESS_CACHE_QUEUE_SIZE, cache->queue);
-> 
-> Go back to the Bonwick paper and look at the magazine section again.
-> You have to allocate _half_ the size of the queue, otherwise you get
-> into pathological situations where you start to free and allocate
-> every time.
+> If the remove can sleep (as in 2) then there is a requirement
+> on the driver code to not hold any locks across the 'remove'
+> that can be acquired during the callbacks.
 
-I want to ask you where idea of allocating 'half' the size of queue came from.
-the paper you sent does not work with single queue(magazine). Instead,
-it manages pool of magazines.
+And this is the part that kernfs has no control over since the removal
+and sysfs operation are implementation specific.
 
-And after reading the paper, I see managing pool of magazine (where M is
-an boot parameter) is valid approach to reduce hitting slowpath.
+> Now, for sysfs, you probably only want to sleep the remove code
+> while a read/write is in progress - not just because the node
+> is open.
+> That probably requires marking an open node 'invalid' and
+> deferring delete to close.
 
-Thanks,
-Hyeonggon Yoo
+This is already done by kernfs.
 
-> > +void kmem_cache_free_cached(struct kmem_cache *s, void *p)
-> > +{
-> > +	struct kmem_lockless_cache *cache = this_cpu_ptr(s->cache);
-> > +
-> > +	BUG_ON(!(s->flags & SLAB_LOCKLESS_CACHE));
-> > +
-> > +	/* Is there better way to do this? */
-> > +	if (cache->size == KMEM_LOCKLESS_CACHE_QUEUE_SIZE)
-> > +		kmem_cache_free(s, cache->queue[--cache->size]);
-> 
-> Yes.
-> 
-> 	if (cache->size == KMEM_LOCKLESS_CACHE_QUEUE_SIZE) {
-> 		kmem_cache_free_bulk(s, KMEM_LOCKLESS_CACHE_QUEUE_SIZE / 2,
-> 			&cache->queue[KMEM_LOCKLESS_CACHE_QUEUE_SIZE / 2));
-> 		cache->size = KMEM_LOCKLESS_CACHE_QUEUE_SIZE / 2;
-> 
-> (check the maths on that; it might have some off-by-one)
- 
+> None of this requires a reference count on the module.
+
+You are missing the point to the other aspect of the try_module_get(),
+it lets you also check if module exit has been entered. By using
+try_module_get() you let the module exit trump proceeding with an
+operation, therefore also preventing any potential use of a shared
+lock on module exit and the driver specific sysfs operation.
+
+  Luis
