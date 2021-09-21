@@ -2,83 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 496E7C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 16:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFDAC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 18:40:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A32A60EE7
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 16:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2640361278
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 18:40:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231386AbhIUQXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Sep 2021 12:23:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34702 "EHLO
+        id S229944AbhIUSmY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Sep 2021 14:42:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231297AbhIUQXh (ORCPT
+        with ESMTP id S233372AbhIUSmW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Sep 2021 12:23:37 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6EF0C061574;
-        Tue, 21 Sep 2021 09:22:08 -0700 (PDT)
+        Tue, 21 Sep 2021 14:42:22 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B89C061574;
+        Tue, 21 Sep 2021 11:40:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9/YVI0YfDL2V4vcHeVmIRPEOUQt1TJerDuRFTwKveSE=; b=AVS/5IVt0MCm2i6EdN5eEegLQo
-        y4M1Ea3I0Vii+1zNHmWuCVaMY72NHXxis7XkhIug7SJCSHUJk6gUwX7A8DwjBMrKyoJg7iAWec7OC
-        HV8Bc4tHIM5Of2fmfhIQZarEfk/f5KLKmSpSHBZMvTO76TzWlHhIGnj6i9Auoi4vhN/NizQVQWbuu
-        NFnOYCQZOkgB4KEHzmWWgP/FY3zHJ2D1EBKX3oTEh2sojbj7wjNEpernXSyfyw6Bsjk5hqJXdBAiZ
-        J8zqJb6fNxwgSxO/qnWezM10SOUMPPTyYKldhdco+ZnmPf69EFrzyWdoIzYGrL7WRGt88kWkIMxb0
-        MCgeNkCw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mSiS6-003xNv-8T; Tue, 21 Sep 2021 16:18:00 +0000
-Date:   Tue, 21 Sep 2021 17:17:02 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     linux-mm@kvack.org, Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        John Garry <john.garry@huawei.com>,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC v2 PATCH] mm, sl[au]b: Introduce lockless cache
-Message-ID: <YUoFfrQBmOdPEKpJ@casper.infradead.org>
-References: <20210920154816.31832-1-42.hyeyoo@gmail.com>
- <YUkErK1vVZMht4s8@casper.infradead.org>
- <20210921154239.GA5092@kvm.asia-northeast3-a.c.our-ratio-313919.internal>
+        bh=VCDewzfHbbVh3g/pRbOQUFxbt5WA/PRKwiZLKfGDQGo=; b=BN8N5u5qh8Fz/U0975RdYo6u27
+        Cw+dJJlx9MbHYoL8blt8kjhIP9YlJW3Z07zt2ASJc6CKxpub8T6ZfsKGGtYK4F7xt7zcRAojyBKbr
+        /T5JcwQYAYanMTWU3d+V6lrLSWdl0lXAPNyhl1XOwOkJWnnobkZ+ZBxEJuyELDHz2PNYpQaYuMg03
+        OIcOODNHbkS59B7cp2LcuIUiVlvH20/YZTXEI8Co39N4Z0BjNPfK9URWHk2ZbHJ19ACerCu65//XF
+        tORQkZU1xyGDdjgBNOlf8CyAJtadq8RHf+Qi2hKdCu+/M/7GyVTvm2QNeQgHKajEe+NUugwFVrobi
+        mvOP0VsQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mSkhI-005W8J-I5; Tue, 21 Sep 2021 18:40:52 +0000
+Date:   Tue, 21 Sep 2021 11:40:52 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Lucas De Marchi <lucas.de.marchi@gmail.com>
+Cc:     Lucas De Marchi <lucas.demarchi@intel.com>,
+        linux-modules <linux-modules@vger.kernel.org>,
+        live-patching@vger.kernel.org, fstests@vger.kernel.org,
+        linux-block@vger.kernel.org, hare@suse.de, dgilbert@interlog.com,
+        Jessica Yu <jeyu@kernel.org>, osandov@fb.com,
+        lkml <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] libkmod: add a library notice log level print
+Message-ID: <YUonNDxy+8zU9B52@bombadil.infradead.org>
+References: <20210810051602.3067384-1-mcgrof@kernel.org>
+ <20210810051602.3067384-2-mcgrof@kernel.org>
+ <CAKi4VAKa7LKXdRmA7epgbkUZw2wpUz19JYYdZ35mPCxSL_W_kw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210921154239.GA5092@kvm.asia-northeast3-a.c.our-ratio-313919.internal>
+In-Reply-To: <CAKi4VAKa7LKXdRmA7epgbkUZw2wpUz19JYYdZ35mPCxSL_W_kw@mail.gmail.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 21, 2021 at 03:42:39PM +0000, Hyeonggon Yoo wrote:
-> > > +	/* slowpath */
-> > > +	cache->size = kmem_cache_alloc_bulk(s, gfpflags,
-> > > +			KMEM_LOCKLESS_CACHE_QUEUE_SIZE, cache->queue);
-> > 
-> > Go back to the Bonwick paper and look at the magazine section again.
-> > You have to allocate _half_ the size of the queue, otherwise you get
-> > into pathological situations where you start to free and allocate
-> > every time.
+On Mon, Sep 20, 2021 at 10:53:53PM -0700, Lucas De Marchi wrote:
+> On Mon, Aug 9, 2021 at 11:56 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >
+> > When you use pass the -v argument to modprobe we bump
+> > the log level from the default modprobe log level of
+> > LOG_WARNING (4) to LOG_NOTICE (5), however the library
+> > only has avaiable to print:
+> >
+> >  #define DBG(ctx, arg...) kmod_log_cond(ctx, LOG_DEBUG, ## arg)
+> >  #define INFO(ctx, arg...) kmod_log_cond(ctx, LOG_INFO, ## arg)
+> >  #define ERR(ctx, arg...) kmod_log_cond(ctx, LOG_ERR, ## arg)
+> >
+> > LOG_INFO (6) however is too high of a level for it to be
+> > effective at printing anything when modprobe -v is passed.
+> > And so the only way in which modprobe -v can trigger the
+> > library to print a verbose message is to use ERR() but that
+> > always prints something and we don't want that in some
+> > situations.
+> >
+> > We need to add a new log level macro which uses LOG_NOTICE (5)
+> > for a "normal but significant condition" which users and developers
+> > can use to look underneath the hood to confirm if a situation is
+> > happening.
+> >
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >  libkmod/libkmod-internal.h | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/libkmod/libkmod-internal.h b/libkmod/libkmod-internal.h
+> > index 398af9c..2e5e1bc 100644
+> > --- a/libkmod/libkmod-internal.h
+> > +++ b/libkmod/libkmod-internal.h
+> > @@ -25,10 +25,12 @@ static _always_inline_ _printf_format_(2, 3) void
+> >  #  else
+> >  #    define DBG(ctx, arg...) kmod_log_null(ctx, ## arg)
+> >  #  endif
+> > +#  define NOTICE(ctx, arg...) kmod_log_cond(ctx, LOG_NOTICE, ## arg)
+> >  #  define INFO(ctx, arg...) kmod_log_cond(ctx, LOG_INFO, ## arg)
+> >  #  define ERR(ctx, arg...) kmod_log_cond(ctx, LOG_ERR, ## arg)
+> >  #else
+> >  #  define DBG(ctx, arg...) kmod_log_null(ctx, ## arg)
+> > +#  define NOTICE(ctx, arg...) kmod_log_cond(ctx, LOG_NOTICE, ## arg)
 > 
-> I want to ask you where idea of allocating 'half' the size of queue came from.
-> the paper you sent does not work with single queue(magazine). Instead,
-> it manages pool of magazines.
-> 
-> And after reading the paper, I see managing pool of magazine (where M is
-> an boot parameter) is valid approach to reduce hitting slowpath.
+> did you mean kmod_log_null()?
 
-Bonwick uses two magazines per cpu; if both are empty, one is replaced
-with a full one.  If both are full, one is replaced with an empty one.
-Our slab implementation doesn't provide magazine allocation, but it does
-provide bulk allocation.  So translating the Bonwick implementation to
-our implementation, we need to bulk-allocate or bulk-free half of the
-array at any time.
+Sure, feel free to change on your end or let me know if you would
+prefer if I respin.
+
+  Luis
