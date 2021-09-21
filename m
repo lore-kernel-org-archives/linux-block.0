@@ -2,143 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A42C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAA6C43217
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4AFC61268
+	by mail.kernel.org (Postfix) with ESMTP id C80D061211
 	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231702AbhIUDSz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 23:18:55 -0400
-Received: from mail-il1-f198.google.com ([209.85.166.198]:52063 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231182AbhIUDQs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 23:16:48 -0400
-Received: by mail-il1-f198.google.com with SMTP id f16-20020a92cb50000000b002376905517dso46331317ilq.18
-        for <linux-block@vger.kernel.org>; Mon, 20 Sep 2021 20:15:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=UGDltsKFn3WBC2qKQfBx2EDI2C1CKkNHqWrORPiYZuA=;
-        b=sxOXpgWNfuC/17fDuReU7Sc/LSivWGE5giatD3QfrPdu1FaVSM8WuQnvAXtdz9CQHU
-         Mn69/XaOozZBqVXCdeYdFcSoEMT26oQzme16KNT56OOho7YdK7LJwgMqGuxtL8f+rBPB
-         gjSopwFKbGaFasWImdG9U3hlmthelpVAel2gbzm2Ysu2tfuHVBZPbSumnmTQ0E10huZh
-         9DgxS3hXlEuZRJC25E8xD2TLRRIEL7DrZ4/EhPmYC4zKhny/QYvXOy7mQdAMsvp7i5of
-         Q+8Gfngo7FhjdpvVcJ+JX6t1h+aJVYLalVe31C5ZuATtHwniNoGNfqHsrvXhW6Mo0kiF
-         OXtA==
-X-Gm-Message-State: AOAM531c82M27xYiEhSdWHqmOWWNjBapAZsVrGLEVpepHP6bE8UCRy6E
-        AValv6d48P6T9Rbn5GrnPINe/qVc+qw8xQaNGYGxS21xiOAN
-X-Google-Smtp-Source: ABdhPJzdhOJALIrq9pS1PxXXwQdSBfXqHOpnrVqXuPvGcMdyUiNrB/kIFihgqtGhuD3HTJY4zET7vQczExD8IMRfmRSNnFcBkwOW
+        id S231182AbhIUDS4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 23:18:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59056 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230300AbhIUDSN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Sep 2021 23:18:13 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 898AE60F4B;
+        Tue, 21 Sep 2021 03:16:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632194205;
+        bh=DDriJoNdbLJ77B18uyA437VOfoL8wfE5BYESXgC+4i8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hIJOqgegNG15iGaoH+XgMtwbYgyRvI8wKwtgpyqVIItezy9oPAVSNVClST1dR2V2y
+         obLXfpGK+lFh/3voBYEI6yxEhv4fG1Jrvm/3KJjWgb1O3CPSRSr7xvHVjgTq7Lg4Th
+         qb8Vb3JJzZ1W2Ss9ssyPIMO6KjYUDGIc2P7arNGe6WSdNZMtF5GkDBKrru6xao2CHY
+         ZQrsweJRMyDE6CGI3UOEVuwm614YdEs2UpRwQfUUucrltvW0LMdz7O+Cx7G90TFBmq
+         xSGwypFgJuUtd1vK4FlTXaZtQ6CVBrcifu6o4jKiclQuITLKE+eOVyF0VLBinPJWZL
+         qpM/0HAjEYRdQ==
+Date:   Mon, 20 Sep 2021 20:16:44 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
+Cc:     linux-arm-msm@vger.kernel.org, kernel-team@android.com,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Gaurav Kashyap <gaurkash@codeaurora.org>,
+        Satya Tangirala <satyaprateek2357@gmail.com>
+Subject: Re: [RFC PATCH v2 4/5] fscrypt: allow 256-bit master keys with
+ AES-256-XTS
+Message-ID: <YUlOnG4bfj7beDah@sol.localdomain>
+References: <20210916174928.65529-1-ebiggers@kernel.org>
+ <20210916174928.65529-5-ebiggers@kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:9693:: with SMTP id m19mr21387858ion.72.1632194120200;
- Mon, 20 Sep 2021 20:15:20 -0700 (PDT)
-Date:   Mon, 20 Sep 2021 20:15:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bd3a8005cc78ce14@google.com>
-Subject: [syzbot] WARNING: ODEBUG bug in blk_mq_hw_sysfs_release
-From:   syzbot <syzbot+a10a3d280be23be45d04@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210916174928.65529-5-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Thu, Sep 16, 2021 at 10:49:27AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> fscrypt currently requires a 512-bit master key when AES-256-XTS is
+> used, since AES-256-XTS keys are 512-bit and fscrypt requires that the
+> master key be at least as long any key that will be derived from it.
+> 
+> However, this is overly strict because AES-256-XTS doesn't actually have
+> a 512-bit security strength, but rather 256-bit.  The fact that XTS
+> takes twice the expected key size is a quirk of the XTS mode.  It is
+> sufficient to use 256 bits of entropy for AES-256-XTS, provided that it
+> is first properly expanded into a 512-bit key, which HKDF-SHA512 does.
+> 
+> Therefore, relax the check of the master key size to use the security
+> strength of the derived key rather than the size of the derived key
+> (except for v1 encryption policies, which don't use HKDF).
+> 
+> Besides making things more flexible for userspace, this is needed in
+> order for the use of a KDF which only takes a 256-bit key to be
+> introduced into the fscrypt key hierarchy.  This will happen with
+> hardware-wrapped keys support, as all known hardware which supports that
+> feature uses an SP800-108 KDF using AES-256-CMAC, so the wrapped keys
+> are wrapped 256-bit AES keys.  Moreover, there is interest in fscrypt
+> supporting the same type of AES-256-CMAC based KDF in software as an
+> alternative to HKDF-SHA512.  There is no security problem with such
+> features, so fix the key length check to work properly with them.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  fs/crypto/fscrypt_private.h |  5 ++--
+>  fs/crypto/hkdf.c            | 11 +++++--
+>  fs/crypto/keysetup.c        | 57 +++++++++++++++++++++++++++++--------
+>  3 files changed, 56 insertions(+), 17 deletions(-)
 
-syzbot found the following issue on:
+I've applied this patch to fscrypt.git#master for 5.16, as it's a useful cleanup
+which isn't dependent on the hardware-wrapped keys feature.  I also fixed this
+patch to update the documentation, which I had overlooked in this case.
 
-HEAD commit:    85c698863c15 net/ipv4/tcp_minisocks.c: remove superfluous ..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13d9d3e7300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6d93fe4341f98704
-dashboard link: https://syzkaller.appspot.com/bug?extid=a10a3d280be23be45d04
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11bd98f7300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a10a3d280be23be45d04@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
-WARNING: CPU: 0 PID: 3816 at lib/debugobjects.c:505 debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-Modules linked in:
-CPU: 0 PID: 3816 Comm: syz-executor.0 Not tainted 5.15.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd c0 39 e4 89 4c 89 ee 48 c7 c7 c0 2d e4 89 e8 ef e3 14 05 <0f> 0b 83 05 35 09 91 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
-RSP: 0018:ffffc9000a6770f0 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: ffff88805b3db900 RSI: ffffffff815dbd88 RDI: fffff520014cee10
-RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815d5b2e R11: 0000000000000000 R12: ffffffff898de180
-R13: ffffffff89e43440 R14: ffffffff8164bae0 R15: 1ffff920014cee29
-FS:  00007fee66b3a700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f362471f3a0 CR3: 00000000272af000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- debug_object_assert_init lib/debugobjects.c:895 [inline]
- debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:866
- debug_timer_assert_init kernel/time/timer.c:739 [inline]
- debug_assert_init kernel/time/timer.c:784 [inline]
- try_to_del_timer_sync+0x6d/0x110 kernel/time/timer.c:1229
- del_timer_sync+0x138/0x1b0 kernel/time/timer.c:1382
- cleanup_srcu_struct+0x14c/0x2f0 kernel/rcu/srcutree.c:379
- blk_mq_hw_sysfs_release+0x147/0x190 block/blk-mq-sysfs.c:40
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- blk_mq_release+0x259/0x430 block/blk-mq.c:3094
- blk_release_queue+0x2a7/0x4a0 block/blk-sysfs.c:823
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- __blk_mq_alloc_disk+0x12e/0x160 block/blk-mq.c:3142
- nbd_dev_add+0x3be/0xb90 drivers/block/nbd.c:1716
- nbd_genl_connect+0x11f3/0x1930 drivers/block/nbd.c:1884
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:731
- genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:792
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2504
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
- netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1340
- netlink_sendmsg+0x86d/0xdb0 net/netlink/af_netlink.c:1929
- sock_sendmsg_nosec net/socket.c:704 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:724
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2409
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2463
- __sys_sendmsg+0xf3/0x1c0 net/socket.c:2492
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fee673e4739
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fee66b3a188 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fee674e9038 RCX: 00007fee673e4739
-RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000007
-RBP: 00007fee6743ecc4 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fee674e9038
-R13: 00007ffe3695106f R14: 00007fee66b3a300 R15: 0000000000022000
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+- Eric
