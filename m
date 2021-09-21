@@ -2,126 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59315C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 05:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0F2C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 06:32:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 333F561157
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 05:54:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9169A61166
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 06:32:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229676AbhIUFzf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Sep 2021 01:55:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59886 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbhIUFzf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Sep 2021 01:55:35 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C29C061574;
-        Mon, 20 Sep 2021 22:54:07 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id i4so77534455lfv.4;
-        Mon, 20 Sep 2021 22:54:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bpUkPJQXkk9fBNIxLOKTcbXhkHoX6oXTQwo24b2XE1M=;
-        b=CS3Et8KOOV57xk5PhR6sFVWcizWSm/W05z/gI/FvHjtBdxmlz9UbAP+NQwpwdxtIZq
-         HB19wnN+gJu5dr9XpRcZ1ObJX/CxPCUPUx5WWSE2yvw+R73et2lmN1AKGREs4HO2v1fQ
-         oJ/GZzOAFPho/zQ9se0r+MCBqnfKRAJR+DZjuaGsUbKF5+tqOIh8Sjz9Jnt15rc6JZon
-         TABDYC4htGCJgoETF22MvazJWdc1Q3DI6/7XV+B8/97vToXjOfwK/le1yHhQnaG4Eos2
-         VHosyOiA4cujW05SXN9+Ac/gtpEdE3PANwIE90Azp42J7b7IXq4YMpykLAdB5FqPR461
-         +Rmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bpUkPJQXkk9fBNIxLOKTcbXhkHoX6oXTQwo24b2XE1M=;
-        b=4/KxijOpQE+MkmN3WM9h5BRtz+Rf0laoB+T0Mx0uzsMZvpsXJipVuXCuG9TFLJp7B9
-         CTnIARE6LlYTNIvQdmhufs6aWx8KASKJoK0zkMrJxzSdvy/PVddAHm2aJEt1ucP1NC3t
-         KpoMgWXFntvW1qQL8kSc2jsA1VMM3EYGFKynrUTDKzl3AgBe7Sna8lD1msouzM1tM351
-         VU8AW/VLVsALB6iQWBY+k7d+xa3ONr4tZbX1T1p3yd07jf33XK9tmm0JWhSFuDZiGXkA
-         i7FnD8Qp0dwauK67JxO7TrXsXA3MFIVY6xvs9SBl/gIO/CFqw/KfQzxzBY3Fs7R7Klt1
-         rI8w==
-X-Gm-Message-State: AOAM532nMGvWB2pDjjW0hdns0fuArtB17OPNgcXWLY8n7eclUz4RWUbf
-        LbULOyMm3/HMHDHEy7H0OdfljqkotS/yLibDfMU=
-X-Google-Smtp-Source: ABdhPJwrKvNOA6hoU9pJ2xyCVuHPZ7QAlv6lM0knDKsuFO6gALL2+emOzohvo+cGzSMXmXHkqEd+W9DG3SlbSHH2W6E=
-X-Received: by 2002:a2e:1645:: with SMTP id 5mr7543404ljw.123.1632203645190;
- Mon, 20 Sep 2021 22:54:05 -0700 (PDT)
+        id S229826AbhIUGdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Sep 2021 02:33:41 -0400
+Received: from verein.lst.de ([213.95.11.211]:55122 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229624AbhIUGdk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Sep 2021 02:33:40 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 5C95C67373; Tue, 21 Sep 2021 08:32:09 +0200 (CEST)
+Date:   Tue, 21 Sep 2021 08:32:09 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, linux-block@vger.kernel.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>
+Subject: Re: [PATCH 3/3] block: warn if ->groups is set when calling
+ add_disk
+Message-ID: <20210921063209.GA23736@lst.de>
+References: <20210920072726.1159572-1-hch@lst.de> <20210920072726.1159572-4-hch@lst.de> <CAPcyv4iVL7bevm_MeFnkRK12SkwO4k5aR3-4KOAGMxThmJwOuA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210810051602.3067384-1-mcgrof@kernel.org> <20210810051602.3067384-2-mcgrof@kernel.org>
-In-Reply-To: <20210810051602.3067384-2-mcgrof@kernel.org>
-From:   Lucas De Marchi <lucas.de.marchi@gmail.com>
-Date:   Mon, 20 Sep 2021 22:53:53 -0700
-Message-ID: <CAKi4VAKa7LKXdRmA7epgbkUZw2wpUz19JYYdZ35mPCxSL_W_kw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] libkmod: add a library notice log level print
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Lucas De Marchi <lucas.demarchi@intel.com>,
-        linux-modules <linux-modules@vger.kernel.org>,
-        live-patching@vger.kernel.org, fstests@vger.kernel.org,
-        linux-block@vger.kernel.org, hare@suse.de, dgilbert@interlog.com,
-        Jessica Yu <jeyu@kernel.org>, osandov@fb.com,
-        lkml <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4iVL7bevm_MeFnkRK12SkwO4k5aR3-4KOAGMxThmJwOuA@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 9, 2021 at 11:56 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> When you use pass the -v argument to modprobe we bump
-> the log level from the default modprobe log level of
-> LOG_WARNING (4) to LOG_NOTICE (5), however the library
-> only has avaiable to print:
->
->  #define DBG(ctx, arg...) kmod_log_cond(ctx, LOG_DEBUG, ## arg)
->  #define INFO(ctx, arg...) kmod_log_cond(ctx, LOG_INFO, ## arg)
->  #define ERR(ctx, arg...) kmod_log_cond(ctx, LOG_ERR, ## arg)
->
-> LOG_INFO (6) however is too high of a level for it to be
-> effective at printing anything when modprobe -v is passed.
-> And so the only way in which modprobe -v can trigger the
-> library to print a verbose message is to use ERR() but that
-> always prints something and we don't want that in some
-> situations.
->
-> We need to add a new log level macro which uses LOG_NOTICE (5)
-> for a "normal but significant condition" which users and developers
-> can use to look underneath the hood to confirm if a situation is
-> happening.
->
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  libkmod/libkmod-internal.h | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/libkmod/libkmod-internal.h b/libkmod/libkmod-internal.h
-> index 398af9c..2e5e1bc 100644
-> --- a/libkmod/libkmod-internal.h
-> +++ b/libkmod/libkmod-internal.h
-> @@ -25,10 +25,12 @@ static _always_inline_ _printf_format_(2, 3) void
->  #  else
->  #    define DBG(ctx, arg...) kmod_log_null(ctx, ## arg)
->  #  endif
-> +#  define NOTICE(ctx, arg...) kmod_log_cond(ctx, LOG_NOTICE, ## arg)
->  #  define INFO(ctx, arg...) kmod_log_cond(ctx, LOG_INFO, ## arg)
->  #  define ERR(ctx, arg...) kmod_log_cond(ctx, LOG_ERR, ## arg)
->  #else
->  #  define DBG(ctx, arg...) kmod_log_null(ctx, ## arg)
-> +#  define NOTICE(ctx, arg...) kmod_log_cond(ctx, LOG_NOTICE, ## arg)
+On Mon, Sep 20, 2021 at 04:50:03PM -0700, Dan Williams wrote:
+> >
+> >         ddev->parent = parent;
+> > -       ddev->groups = groups;
+> > +       if (!WARN_ON_ONCE(ddev->groups))
+> > +               ddev->groups = groups;
+> 
+> That feels too compact to me, and dev_WARN_ONCE() might save someone a
+> git blame to look up the reason for the warning:
+> 
+>     dev_WARN_ONCE(parent, ddev->groups, "unexpected pre-populated
+> attribute group\n");
+>     if (!ddev->groups)
+>         ddev->groups = groups;
+> 
+> ...but not a deal breaker. Either way you can add:
+> 
 
-did you mean kmod_log_null()?
-
-Lucas De Marchi
-
->  #  define INFO(ctx, arg...) kmod_log_null(ctx, ## arg)
->  #  define ERR(ctx, arg...) kmod_log_null(ctx, ## arg)
->  #endif
-> --
-> 2.30.2
->
+I'd rather keep it simple and optmize for the normal case..
