@@ -2,171 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 291BDC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 15:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 496E7C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 16:22:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03BD5610A1
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 15:49:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A32A60EE7
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 16:22:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234211AbhIUPul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Sep 2021 11:50:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38636 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229804AbhIUPuk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Sep 2021 11:50:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2B3B061183;
-        Tue, 21 Sep 2021 15:49:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632239352;
-        bh=SYPIsUeB0QpNl9iOqz8TrUCBGO94e+noRg1ECZdTJME=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=UaaVRIqswzz+NS3S8fQEaKMO9RtdOXsyeprnTEIheXJKQGHNj08P7eyrd/PQOFBCR
-         AN5tBBs86O+nP3GdbvOj2N+vfIACcMw2gY7GyzZmcnfLHUMHWEqqTO8tVeryaAcPBC
-         wa3PUemimJFndCXNOCuGMsRHqw57UEYG+Vl8QmekwFARdVX0/7ufVsMqf8T+9g7Szp
-         diWZkbbph3gXn35UaYmr5cUyleLHlYXnKdZMqMkRG/D9zQZoy6oFBj2a59MNnxAHRK
-         YIYKWUHNZvNhOBYpWGFXq5g7hiH0GMlpMxwr02jYDVngebiKxCzBjK5YB3wvzgzdsQ
-         QI6X04sAKlF5w==
-Received: by mail-qt1-f178.google.com with SMTP id x9so6771427qtv.0;
-        Tue, 21 Sep 2021 08:49:12 -0700 (PDT)
-X-Gm-Message-State: AOAM530DTdfrLatLheUDRErjR0q716Etht84WYtht7AKXxWF0VYHTMnt
-        NVdMaemE2/1nYxdiR7t9kXytp6X1M9drt3Q8/zI=
-X-Google-Smtp-Source: ABdhPJxkbOxqy1A7fvfdyNFD5npSBw9ZclgHN9SR+lhraCwiqhyTzn8pzClLHqd6Gjl1VdDdZRtbIZxWA0QsI3m+TXk=
-X-Received: by 2002:ac8:4113:: with SMTP id q19mr29065258qtl.108.1632239341024;
- Tue, 21 Sep 2021 08:49:01 -0700 (PDT)
+        id S231386AbhIUQXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Sep 2021 12:23:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231297AbhIUQXh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Sep 2021 12:23:37 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6EF0C061574;
+        Tue, 21 Sep 2021 09:22:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=9/YVI0YfDL2V4vcHeVmIRPEOUQt1TJerDuRFTwKveSE=; b=AVS/5IVt0MCm2i6EdN5eEegLQo
+        y4M1Ea3I0Vii+1zNHmWuCVaMY72NHXxis7XkhIug7SJCSHUJk6gUwX7A8DwjBMrKyoJg7iAWec7OC
+        HV8Bc4tHIM5Of2fmfhIQZarEfk/f5KLKmSpSHBZMvTO76TzWlHhIGnj6i9Auoi4vhN/NizQVQWbuu
+        NFnOYCQZOkgB4KEHzmWWgP/FY3zHJ2D1EBKX3oTEh2sojbj7wjNEpernXSyfyw6Bsjk5hqJXdBAiZ
+        J8zqJb6fNxwgSxO/qnWezM10SOUMPPTyYKldhdco+ZnmPf69EFrzyWdoIzYGrL7WRGt88kWkIMxb0
+        MCgeNkCw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mSiS6-003xNv-8T; Tue, 21 Sep 2021 16:18:00 +0000
+Date:   Tue, 21 Sep 2021 17:17:02 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
+Cc:     linux-mm@kvack.org, Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        John Garry <john.garry@huawei.com>,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC v2 PATCH] mm, sl[au]b: Introduce lockless cache
+Message-ID: <YUoFfrQBmOdPEKpJ@casper.infradead.org>
+References: <20210920154816.31832-1-42.hyeyoo@gmail.com>
+ <YUkErK1vVZMht4s8@casper.infradead.org>
+ <20210921154239.GA5092@kvm.asia-northeast3-a.c.our-ratio-313919.internal>
 MIME-Version: 1.0
-References: <20210917194709.3562413-1-mcgrof@kernel.org> <20210917194709.3562413-10-mcgrof@kernel.org>
- <c70dcb03e27e43c5b5311e184357df39@AcuMS.aculab.com>
-In-Reply-To: <c70dcb03e27e43c5b5311e184357df39@AcuMS.aculab.com>
-From:   Luis Chamberlain <mcgrof@kernel.org>
-Date:   Tue, 21 Sep 2021 08:48:49 -0700
-X-Gmail-Original-Message-ID: <CAB=NE6WjupsJFwsj94sC_j3gcYn2Qo0sx1=tMv=WUZ83jq_DFw@mail.gmail.com>
-Message-ID: <CAB=NE6WjupsJFwsj94sC_j3gcYn2Qo0sx1=tMv=WUZ83jq_DFw@mail.gmail.com>
-Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
-To:     David Laight <David.Laight@aculab.com>
-Cc:     "tj@kernel.org" <tj@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "jeyu@kernel.org" <jeyu@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "masahiroy@kernel.org" <masahiroy@kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "yzaikin@google.com" <yzaikin@google.com>,
-        "nathan@kernel.org" <nathan@kernel.org>,
-        "ojeda@kernel.org" <ojeda@kernel.org>,
-        "vitor@massaru.org" <vitor@massaru.org>,
-        "elver@google.com" <elver@google.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "glider@google.com" <glider@google.com>,
-        "rf@opensource.cirrus.com" <rf@opensource.cirrus.com>,
-        "stephen@networkplumber.org" <stephen@networkplumber.org>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "jolsa@kernel.org" <jolsa@kernel.org>,
-        "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>,
-        "trishalfonso@google.com" <trishalfonso@google.com>,
-        "andreyknvl@gmail.com" <andreyknvl@gmail.com>,
-        "jikos@kernel.org" <jikos@kernel.org>,
-        "mbenes@suse.com" <mbenes@suse.com>,
-        "ngupta@vflare.org" <ngupta@vflare.org>,
-        "sergey.senozhatsky.work@gmail.com" 
-        <sergey.senozhatsky.work@gmail.com>,
-        "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
-        "fenghua.yu@intel.com" <fenghua.yu@intel.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "lizefan.x@bytedance.com" <lizefan.x@bytedance.com>,
-        "hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-        "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "kw@linux.com" <kw@linux.com>,
-        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "hch@lst.de" <hch@lst.de>, "joe@perches.com" <joe@perches.com>,
-        "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jpoimboe@redhat.com" <jpoimboe@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "copyleft-next@lists.fedorahosted.org" 
-        <copyleft-next@lists.fedorahosted.org>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210921154239.GA5092@kvm.asia-northeast3-a.c.our-ratio-313919.internal>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 21, 2021 at 1:24 AM David Laight <David.Laight@aculab.com> wrote:
->
-> From: Luis Chamberlain
-> > Sent: 17 September 2021 20:47
-> >
-> > When sysfs attributes use a lock also used on module removal we can
-> > race to deadlock. This happens when for instance a sysfs file on
-> > a driver is used, then at the same time we have module removal call
-> > trigger. The module removal call code holds a lock, and then the sysfs
-> > file entry waits for the same lock. While holding the lock the module
-> > removal tries to remove the sysfs entries, but these cannot be removed
-> > yet as one is waiting for a lock. This won't complete as the lock is
-> > already held. Likewise module removal cannot complete, and so we deadlock.
->
-> Isn't the real problem the race between a sysfs file action and the
-> removal of the sysfs node?
+On Tue, Sep 21, 2021 at 03:42:39PM +0000, Hyeonggon Yoo wrote:
+> > > +	/* slowpath */
+> > > +	cache->size = kmem_cache_alloc_bulk(s, gfpflags,
+> > > +			KMEM_LOCKLESS_CACHE_QUEUE_SIZE, cache->queue);
+> > 
+> > Go back to the Bonwick paper and look at the magazine section again.
+> > You have to allocate _half_ the size of the queue, otherwise you get
+> > into pathological situations where you start to free and allocate
+> > every time.
+> 
+> I want to ask you where idea of allocating 'half' the size of queue came from.
+> the paper you sent does not work with single queue(magazine). Instead,
+> it manages pool of magazines.
+> 
+> And after reading the paper, I see managing pool of magazine (where M is
+> an boot parameter) is valid approach to reduce hitting slowpath.
 
-Nope, that is taken care of by kernfs.
-
-> This isn't really related to module unload - except that may
-> well remove some sysfs nodes.
-
-Nope, the issue is a deadlock that can happen due to a shared lock on
-module removal and a driver sysfs operation.
-
-> This is the same problem as removing any other kind of driver callback.
-> There are three basic solutions:
-> 1) Use a global lock - not usually useful.
-> 2) Have the remove call sleep until any callbacks are complete.
-> 3) Have the remove just request removal and have a final
->    callback (from a different context).
-
-Kernfs already does a sort of combination of 1) and 2) but 1) is using
-atomic reference counts.
-
-> If the remove can sleep (as in 2) then there is a requirement
-> on the driver code to not hold any locks across the 'remove'
-> that can be acquired during the callbacks.
-
-And this is the part that kernfs has no control over since the removal
-and sysfs operation are implementation specific.
-
-> Now, for sysfs, you probably only want to sleep the remove code
-> while a read/write is in progress - not just because the node
-> is open.
-> That probably requires marking an open node 'invalid' and
-> deferring delete to close.
-
-This is already done by kernfs.
-
-> None of this requires a reference count on the module.
-
-You are missing the point to the other aspect of the try_module_get(),
-it lets you also check if module exit has been entered. By using
-try_module_get() you let the module exit trump proceeding with an
-operation, therefore also preventing any potential use of a shared
-lock on module exit and the driver specific sysfs operation.
-
-  Luis
+Bonwick uses two magazines per cpu; if both are empty, one is replaced
+with a full one.  If both are full, one is replaced with an empty one.
+Our slab implementation doesn't provide magazine allocation, but it does
+provide bulk allocation.  So translating the Bonwick implementation to
+our implementation, we need to bulk-allocate or bulk-free half of the
+array at any time.
