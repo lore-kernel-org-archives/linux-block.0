@@ -2,127 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F35DC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65D4C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50FAD6124C
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F39D61100
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 03:17:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231698AbhIUDSy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Sep 2021 23:18:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350402AbhIUC2a (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Sep 2021 22:28:30 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58A0C0F3447;
-        Mon, 20 Sep 2021 12:22:38 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso185553pjh.5;
-        Mon, 20 Sep 2021 12:22:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JRnq/4c87bKbiNxvafGN4wtXqF6Tb113NW1CCy3N52o=;
-        b=dP4iFexr0a+J311K54uCPdaewF9LzVRZkY/aDH2dPD9xGtZMHeZBij8v6wTihEifkg
-         bIk6GbffogctONMlgfddQ0fGCNpmpMWipeajx9Kyn00jXWS5Lh89zABYQjixzMBZ+eaL
-         Z57MjvIXj5H4kS2oNAwGRXtw/nv8xi3stLkDBC0ZBQ8vdA44wM0qv9TgId7KYVrQFIIj
-         r9NHcIiUB87XojT59VuOwo9LjdF4v5XE5loPh5rx3Uuhui2pBXa+MAb9l6U3Wrz/18ZN
-         8IPl4GNh1/xWGwqjOGo2nh7ySRJNyY6KBJST84Cnz0eSywHu1cHrx+2hzcPKYFzGH1NN
-         eH2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=JRnq/4c87bKbiNxvafGN4wtXqF6Tb113NW1CCy3N52o=;
-        b=3khiVuJWR+X38WAjkjDZnEngn962KSBLcBfmTMMWQ8sCZYLRvEw+4wdLQEGHLsiUZ0
-         UiUC2twcSzfUk5fCviZ22BEZk+drnYitOgKnJKpKdO3RxgEE1Qw0zoeI2iIRTKscbsN3
-         ul1di0HiE16Dd4mMfRCH8Isrzul91CkBFeU1viY9DIlVX9GpWSuN+CVKhjSF5IL7FRTw
-         gUpmK2UvsgM5oeGWfYGQcytlW9PjocRezBZcyvCo4EJPERdkMnX+NSMZboQpuudo7fXZ
-         /cVYuQuwQQg3H/on74ivxj3Iu+kfdL/GqNbcc8t0CMQRJRFGMNIMq5JwEsyD1+pG3BiO
-         tpQg==
-X-Gm-Message-State: AOAM530Cn/ufB9mOgQ3jDPr0Csg7BD3yMyO/Kb/mc/bcry0GnZC2Pfvn
-        lzXIgcdIJbLKVCGqCJM2aRM=
-X-Google-Smtp-Source: ABdhPJx7yMc6cu+sDCU/f0AwOhQkBHekSPHI+esLDq4+Bgpc7/NHJVGEMkfUVFWiJyicLFaEpDz9wg==
-X-Received: by 2002:a17:902:6b8a:b029:12d:3f99:9e5e with SMTP id p10-20020a1709026b8ab029012d3f999e5emr24030103plk.66.1632165758222;
-        Mon, 20 Sep 2021 12:22:38 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:9d4d])
-        by smtp.gmail.com with ESMTPSA id c23sm16287436pgb.74.2021.09.20.12.22.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Sep 2021 12:22:37 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 20 Sep 2021 09:22:32 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        rdunlap@infradead.org, rafael@kernel.org, masahiroy@kernel.org,
-        ndesaulniers@google.com, yzaikin@google.com, nathan@kernel.org,
-        ojeda@kernel.org, penguin-kernel@i-love.sakura.ne.jp,
-        vitor@massaru.org, elver@google.com, jarkko@kernel.org,
-        glider@google.com, rf@opensource.cirrus.com,
-        stephen@networkplumber.org, David.Laight@aculab.com,
-        bvanassche@acm.org, jolsa@kernel.org,
-        andriy.shevchenko@linux.intel.com, trishalfonso@google.com,
-        andreyknvl@gmail.com, jikos@kernel.org, mbenes@suse.com,
-        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
-        reinette.chatre@intel.com, fenghua.yu@intel.com, bp@alien8.de,
-        x86@kernel.org, hpa@zytor.com, lizefan.x@bytedance.com,
-        hannes@cmpxchg.org, daniel.vetter@ffwll.ch, bhelgaas@google.com,
-        kw@linux.com, dan.j.williams@intel.com, senozhatsky@chromium.org,
-        hch@lst.de, joe@perches.com, hkallweit1@gmail.com, axboe@kernel.dk,
-        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
-        rostedt@goodmis.org, peterz@infradead.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
-Subject: Re: [PATCH v7 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YUjfeGuSVVq84iHc@mtj.duckdns.org>
-References: <20210918050430.3671227-1-mcgrof@kernel.org>
- <20210918050430.3671227-10-mcgrof@kernel.org>
- <YUjKjLzqpcxjRyit@slm.duckdns.org>
- <YUjdytEDkCughtSz@bombadil.infradead.org>
+        id S231699AbhIUDSz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Sep 2021 23:18:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58592 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229922AbhIUDPT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Sep 2021 23:15:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5A80861050;
+        Tue, 21 Sep 2021 03:13:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632194031;
+        bh=4MNBP5Or6e6CSO6qkciRsrJs/FD/1so4A/h0yT3ltVY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lC+KsZbvTWqTD6aLiB+fSH/wza2rnaSl5iFQ0GqjC9+bSMiUfY77eQ+enDog94kWi
+         SkxjFKtlpQ+L6+vUwO+aXGAnuven8pUhjhpuNALP7NgJkRc1ilot/GILDbxOJgijVK
+         KrTsWXHDKCJ+ninkCNlA3vXTBsXLQRUw5wrplhbi8HnKa7P1TMb75VhdbO1H5YfeKW
+         kKPO0/B6XIYzCcy4eawJBznlaanfhmuuy1JTkPe2Ec/VoLdC/dGf8g/OY9IehIIDJS
+         IiNI+1PbLlaNTY84bxahadFQhQpRMI3VDZQ62z47b7+I3LqJ6wQph7+5VQBrH1f64n
+         kAv7KTzoFNdHA==
+Date:   Mon, 20 Sep 2021 20:13:49 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
+Cc:     linux-arm-msm@vger.kernel.org, kernel-team@android.com,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Gaurav Kashyap <gaurkash@codeaurora.org>,
+        Satya Tangirala <satyaprateek2357@gmail.com>
+Subject: Re: [RFC PATCH v2 3/5] fscrypt: improve documentation for inline
+ encryption
+Message-ID: <YUlN7TY7z5/2EcFF@sol.localdomain>
+References: <20210916174928.65529-1-ebiggers@kernel.org>
+ <20210916174928.65529-4-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YUjdytEDkCughtSz@bombadil.infradead.org>
+In-Reply-To: <20210916174928.65529-4-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Mon, Sep 20, 2021 at 12:15:22PM -0700, Luis Chamberlain wrote:
-> > I find this explanation odd because there's no real equivalent to locking
-> > the module (as opposed to try locking) 
+On Thu, Sep 16, 2021 at 10:49:26AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Actually there is, __module_get() but I suspect some of these users are
-> probably incorrect and should be be moved to try. The documentation
+> Currently the fscrypt inline encryption support is documented in the
+> "Implementation details" section, and it doesn't go into much detail.
+> It's really more than just an "implementation detail" though, as there
+> is a user-facing mount option.  Also, hardware-wrapped key support (an
+> upcoming feature) will depend on inline encryption and will affect the
+> on-disk format; by definition that's not just an implementation detail.
+> 
+> Therefore, move this documentation into its own section and expand it.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  Documentation/block/inline-encryption.rst |  2 +
+>  Documentation/filesystems/fscrypt.rst     | 73 +++++++++++++++++------
+>  2 files changed, 58 insertions(+), 17 deletions(-)
 
-__module_get() is just getting an extra ref when the caller already
-has one (or more). It can't be used to freshly acquire a new
-reference. There is no equivalence between the relationship between
-try_module_get() and __module_get() and the one between spin_trylock()
-and spin_lock().
+I've applied this patch to fscrypt.git#master for 5.16, as it's a useful cleanup
+which isn't dependent on the hardware-wrapped keys feature.
 
-> Right, the reason I mention the alternative is that we technically don't
-> need to use try in this case since during a kernfs op it is implied the
-> module will be pinned, but we have further motivations to use a try
-
-I'm confused. If the module is already pinned, why are we getting an
-extra reference? Also, I don't understand how this has that much to do
-with preventing ddoses. I mean, it does cut down the duration of one
-operation but the eventual gating is through whoever acquiring the
-initial reference through try_module_get(), which again is the *only*
-way to acquire a fresh reference.
-
-Thanks.
-
--- 
-tejun
+- Eric
