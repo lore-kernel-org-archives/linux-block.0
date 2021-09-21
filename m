@@ -2,108 +2,200 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFDAC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 18:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F39BC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 18:51:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2640361278
-	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 18:40:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4786F611BD
+	for <linux-block@archiver.kernel.org>; Tue, 21 Sep 2021 18:51:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbhIUSmY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Sep 2021 14:42:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38852 "EHLO
+        id S233369AbhIUSx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Sep 2021 14:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233372AbhIUSmW (ORCPT
+        with ESMTP id S232614AbhIUSxZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Sep 2021 14:42:22 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B89C061574;
-        Tue, 21 Sep 2021 11:40:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VCDewzfHbbVh3g/pRbOQUFxbt5WA/PRKwiZLKfGDQGo=; b=BN8N5u5qh8Fz/U0975RdYo6u27
-        Cw+dJJlx9MbHYoL8blt8kjhIP9YlJW3Z07zt2ASJc6CKxpub8T6ZfsKGGtYK4F7xt7zcRAojyBKbr
-        /T5JcwQYAYanMTWU3d+V6lrLSWdl0lXAPNyhl1XOwOkJWnnobkZ+ZBxEJuyELDHz2PNYpQaYuMg03
-        OIcOODNHbkS59B7cp2LcuIUiVlvH20/YZTXEI8Co39N4Z0BjNPfK9URWHk2ZbHJ19ACerCu65//XF
-        tORQkZU1xyGDdjgBNOlf8CyAJtadq8RHf+Qi2hKdCu+/M/7GyVTvm2QNeQgHKajEe+NUugwFVrobi
-        mvOP0VsQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mSkhI-005W8J-I5; Tue, 21 Sep 2021 18:40:52 +0000
-Date:   Tue, 21 Sep 2021 11:40:52 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Lucas De Marchi <lucas.de.marchi@gmail.com>
-Cc:     Lucas De Marchi <lucas.demarchi@intel.com>,
-        linux-modules <linux-modules@vger.kernel.org>,
-        live-patching@vger.kernel.org, fstests@vger.kernel.org,
-        linux-block@vger.kernel.org, hare@suse.de, dgilbert@interlog.com,
-        Jessica Yu <jeyu@kernel.org>, osandov@fb.com,
-        lkml <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] libkmod: add a library notice log level print
-Message-ID: <YUonNDxy+8zU9B52@bombadil.infradead.org>
-References: <20210810051602.3067384-1-mcgrof@kernel.org>
- <20210810051602.3067384-2-mcgrof@kernel.org>
- <CAKi4VAKa7LKXdRmA7epgbkUZw2wpUz19JYYdZ35mPCxSL_W_kw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKi4VAKa7LKXdRmA7epgbkUZw2wpUz19JYYdZ35mPCxSL_W_kw@mail.gmail.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+        Tue, 21 Sep 2021 14:53:25 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CB7BC061575
+        for <linux-block@vger.kernel.org>; Tue, 21 Sep 2021 11:51:56 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id bl32-20020a05620a1aa000b004330d29d5bfso1058426qkb.23
+        for <linux-block@vger.kernel.org>; Tue, 21 Sep 2021 11:51:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=qxxb2w/M5fiqHKkhvOBDSrBf9iLSsSPoKQsdSta11bU=;
+        b=Pd3yK4io43ZZA6XcTe6q1mRXI8C4EHFbBXhptEwxeD7sLqNdc5ugPi/3s/uBnW6UsV
+         xfWUTffzb3iqfktMlPN3EBM1U0JftxjarIQ0EsXK50Jo5aYJHafX19nbP/ZlxrZ32yhH
+         UaM4mqG/8cWuHTV/s3/cDuvQCclW5bBLfryWnjEyjnwJ7yow+SsI3h/ioquJC3rKN4Xm
+         2Nlv7rsNJAPo6OFcJmkHc/EaQDIPoDO5OXjk+8SBVbJdcA+HTajJEGgFm/3EJZLC3OYT
+         JVl36dED6yfjs2pPQAsYtE9CHY4dHVuXXczwp6O/Io7KXyoOsdFZIl7d3SG725BX77Ia
+         RsGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=qxxb2w/M5fiqHKkhvOBDSrBf9iLSsSPoKQsdSta11bU=;
+        b=Cxx0pxXUbCgdlxa8jnLLH1SBqRe6QoZgMHwGA32bBhZ0Sd6zsccZEGdBb4mVpTjYY2
+         PVvvdbwHcM0RoMh1luSKxHj0biBytVXxrBilLjUwoRwOfikuklS8ZGNEbF/cfn1BmvFV
+         wVZoYQhUZv2m7KK6Z4K9FlG40BxTE7oVlZb7e6R+XBy8TakTc8y7t869M7tVuyhEcynt
+         Mt6hUKXmV0q+j30aFj3YquN+zXdvvBV+feHT02FpQjXqFKFKt9fMXo1IssqCkU6Ndtyo
+         CEU3mx/fsW3k0Ppni8CaPXx2tm7BDT+SifDpgoJrULO8Dj94N3JqmJfSFEBMu5bL0u4X
+         5RkA==
+X-Gm-Message-State: AOAM533ODbHwGWz+RinyLGQEXPpvqVFcbXkLepYvtX3qF4n6GDKoOX1y
+        cQyfMAEn3PkLi3TWjfG4rw7oCG+1mTLz
+X-Google-Smtp-Source: ABdhPJzr3+VvuTdtJ1ZDwvCQh+Off/E60wCu6siZEv/DiSq5zaz12wVOQzpBZRuYj9BDpZpr0TnljeMtnRmr
+X-Received: from bg.sfo.corp.google.com ([2620:15c:11a:202:4ba8:c770:5378:a8b7])
+ (user=bgeffon job=sendgmr) by 2002:a0c:e102:: with SMTP id
+ w2mr32739256qvk.44.1632250315291; Tue, 21 Sep 2021 11:51:55 -0700 (PDT)
+Date:   Tue, 21 Sep 2021 11:51:30 -0700
+In-Reply-To: <20210917210640.214211-1-bgeffon@google.com>
+Message-Id: <20210921185130.944058-1-bgeffon@google.com>
+Mime-Version: 1.0
+References: <20210917210640.214211-1-bgeffon@google.com>
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH v2] zram: Introduce an aged idle interface
+From:   Brian Geffon <bgeffon@google.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        Suleiman Souhlal <suleiman@google.com>,
+        Jesse Barnes <jsbarnes@google.com>,
+        Brian Geffon <bgeffon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 10:53:53PM -0700, Lucas De Marchi wrote:
-> On Mon, Aug 9, 2021 at 11:56 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> >
-> > When you use pass the -v argument to modprobe we bump
-> > the log level from the default modprobe log level of
-> > LOG_WARNING (4) to LOG_NOTICE (5), however the library
-> > only has avaiable to print:
-> >
-> >  #define DBG(ctx, arg...) kmod_log_cond(ctx, LOG_DEBUG, ## arg)
-> >  #define INFO(ctx, arg...) kmod_log_cond(ctx, LOG_INFO, ## arg)
-> >  #define ERR(ctx, arg...) kmod_log_cond(ctx, LOG_ERR, ## arg)
-> >
-> > LOG_INFO (6) however is too high of a level for it to be
-> > effective at printing anything when modprobe -v is passed.
-> > And so the only way in which modprobe -v can trigger the
-> > library to print a verbose message is to use ERR() but that
-> > always prints something and we don't want that in some
-> > situations.
-> >
-> > We need to add a new log level macro which uses LOG_NOTICE (5)
-> > for a "normal but significant condition" which users and developers
-> > can use to look underneath the hood to confirm if a situation is
-> > happening.
-> >
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > ---
-> >  libkmod/libkmod-internal.h | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/libkmod/libkmod-internal.h b/libkmod/libkmod-internal.h
-> > index 398af9c..2e5e1bc 100644
-> > --- a/libkmod/libkmod-internal.h
-> > +++ b/libkmod/libkmod-internal.h
-> > @@ -25,10 +25,12 @@ static _always_inline_ _printf_format_(2, 3) void
-> >  #  else
-> >  #    define DBG(ctx, arg...) kmod_log_null(ctx, ## arg)
-> >  #  endif
-> > +#  define NOTICE(ctx, arg...) kmod_log_cond(ctx, LOG_NOTICE, ## arg)
-> >  #  define INFO(ctx, arg...) kmod_log_cond(ctx, LOG_INFO, ## arg)
-> >  #  define ERR(ctx, arg...) kmod_log_cond(ctx, LOG_ERR, ## arg)
-> >  #else
-> >  #  define DBG(ctx, arg...) kmod_log_null(ctx, ## arg)
-> > +#  define NOTICE(ctx, arg...) kmod_log_cond(ctx, LOG_NOTICE, ## arg)
-> 
-> did you mean kmod_log_null()?
+This change introduces an aged idle interface to the existing
+idle sysfs file for zram.
 
-Sure, feel free to change on your end or let me know if you would
-prefer if I respin.
+When CONFIG_ZRAM_MEMORY_TRACKING is enabled the idle file
+now also accepts an integer argument. This integer is the
+age (in seconds) of pages to mark as idle. The idle file
+still supports 'all' as it always has. This new approach
+allows for much more control over which pages get marked
+as idle.
 
-  Luis
+Signed-off-by: Brian Geffon <bgeffon@google.com>
+---
+ Documentation/admin-guide/blockdev/zram.rst |  8 +++
+ drivers/block/zram/zram_drv.c               | 60 +++++++++++++++------
+ 2 files changed, 52 insertions(+), 16 deletions(-)
+
+diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
+index 700329d25f57..8c8a92e5c00c 100644
+--- a/Documentation/admin-guide/blockdev/zram.rst
++++ b/Documentation/admin-guide/blockdev/zram.rst
+@@ -328,6 +328,14 @@ as idle::
+ From now on, any pages on zram are idle pages. The idle mark
+ will be removed until someone requests access of the block.
+ IOW, unless there is access request, those pages are still idle pages.
++Additionally, when CONFIG_ZRAM_MEMORY_TRACKING is enabled pages can be
++marked as idle based on how long (in seconds) it's been since they were
++last accessed, in seconds::
++
++        echo 86400 > /sys/block/zramX/idle
++
++In this example all pages which haven't been accessed in more than 86400
++seconds (one day) will be marked idle.
+ 
+ Admin can request writeback of those idle pages at right timing via::
+ 
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index fcaf2750f68f..1d1472fe4094 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -291,22 +291,16 @@ static ssize_t mem_used_max_store(struct device *dev,
+ 	return len;
+ }
+ 
+-static ssize_t idle_store(struct device *dev,
+-		struct device_attribute *attr, const char *buf, size_t len)
++/*
++ * Mark all pages which are older than or equal to cutoff as IDLE.
++ * Callers should hold the zram init lock in read mode
++ **/
++static void mark_idle(struct zram *zram, ktime_t cutoff)
+ {
+-	struct zram *zram = dev_to_zram(dev);
++	int is_idle = 1;
+ 	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+ 	int index;
+ 
+-	if (!sysfs_streq(buf, "all"))
+-		return -EINVAL;
+-
+-	down_read(&zram->init_lock);
+-	if (!init_done(zram)) {
+-		up_read(&zram->init_lock);
+-		return -EINVAL;
+-	}
+-
+ 	for (index = 0; index < nr_pages; index++) {
+ 		/*
+ 		 * Do not mark ZRAM_UNDER_WB slot as ZRAM_IDLE to close race.
+@@ -314,14 +308,48 @@ static ssize_t idle_store(struct device *dev,
+ 		 */
+ 		zram_slot_lock(zram, index);
+ 		if (zram_allocated(zram, index) &&
+-				!zram_test_flag(zram, index, ZRAM_UNDER_WB))
+-			zram_set_flag(zram, index, ZRAM_IDLE);
++				!zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
++#ifdef CONFIG_ZRAM_MEMORY_TRACKING
++			is_idle = (!cutoff || ktime_after(cutoff, zram->table[index].ac_time));
++#endif
++			if (is_idle)
++				zram_set_flag(zram, index, ZRAM_IDLE);
++		}
+ 		zram_slot_unlock(zram, index);
+ 	}
++}
+ 
+-	up_read(&zram->init_lock);
++static ssize_t idle_store(struct device *dev,
++		struct device_attribute *attr, const char *buf, size_t len)
++{
++	struct zram *zram = dev_to_zram(dev);
++	u64 age_sec;
++	ktime_t cutoff_time = 0;
++	ssize_t rv = -EINVAL;
+ 
+-	return len;
++	if (!sysfs_streq(buf, "all")) {
++#ifdef CONFIG_ZRAM_MEMORY_TRACKING
++		/* If it did not parse as 'all' try to treat it as an integer */
++		if (!kstrtoull(buf, 10, &age_sec))
++			cutoff_time = ktime_sub(ktime_get_boottime(),
++					ns_to_ktime(age_sec * NSEC_PER_SEC));
++		else
++#endif
++			goto out;
++	}
++
++	down_read(&zram->init_lock);
++	if (!init_done(zram))
++		goto out_unlock;
++
++	/* A age_sec of 0 marks everything as idle, this is the "all" behavior */
++	mark_idle(zram, cutoff_time);
++	rv = len;
++
++out_unlock:
++	up_read(&zram->init_lock);
++out:
++	return rv;
+ }
+ 
+ #ifdef CONFIG_ZRAM_WRITEBACK
+-- 
+2.33.0.464.g1972c5931b-goog
+
