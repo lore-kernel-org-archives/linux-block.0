@@ -2,124 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E13AC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 17:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C516FC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 17:51:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12FB8611C9
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 17:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABF816120E
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 17:51:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236711AbhIVRfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 13:35:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44184 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236701AbhIVRfQ (ORCPT
+        id S236815AbhIVRwe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 13:52:34 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:41801 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233552AbhIVRwe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 13:35:16 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD747C061574
-        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 10:33:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=PHU/tmKdz/LioYZ0QtEvwChzQveuI5d+FV8MRyA1YBg=; b=q1Y4LaCGdPJ0CCgvCsOm7VrnyW
-        XZgTLEuqY/4AB3JJjQrNa6K5AKYceUG47khGvW2iYNHcLkzyCGtuSjNQxpdKRbIJo+zB7F0KLakQi
-        HGS/xyOpN96l/S1rM6M/kSujlu+IKaq2MXq7NyOSEVbxS0kCn875bGP48SJ7crMQejm27Uo0CSDi0
-        jBNJZW52dqyxFd51SUdFXT24lIb8qZmxMmg6KiOOjCyxm1X0vebbXUHkk6yxUQ+ZT0+MitDYFggGc
-        yAi1DWiolC6EKyzxrOBXBQCGzJ5RKIlixMzwnB+7r+WnwNa5RIuuO04a27aE6JF3TeaBvGxlPdKzd
-        1mbJAJRg==;
-Received: from [2001:4bb8:184:72db:3a8e:1992:6715:6960] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mT63m-004zNk-4m; Wed, 22 Sep 2021 17:30:37 +0000
-From:   Christoph Hellwig <hch@lst.de>
+        Wed, 22 Sep 2021 13:52:34 -0400
+Received: by mail-pj1-f54.google.com with SMTP id pf3-20020a17090b1d8300b0019e081aa87bso2968033pjb.0
+        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 10:51:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t+TjEns5XRkvHFMYNNiHbiQpngeEs+IBTyGPaXzO3IA=;
+        b=ScNZkq3jOaPuG516uufjQtlmgbOOr5AFilsDumaGN0CimN2xHy1T1cQIwEfX7+H/by
+         QVdRruUpBnbkU7SNPYUd2C/qqwTnVUXVU8cKYa2YapRET/D0H9NiwPoAgiIJidxA/Url
+         CBxRPXb8BpgAvae933cwbrIyQ6UoscFz6VBM34vlpnr7KPNT6OpCpZRYDwTL8sze4ntk
+         jf0FuyOhI89BevFa9B6HTGpS0NV9FaxjEf666N6P/+YicEvOpOXuu1Y4ylItgNMX42Ir
+         dwcxTH8s6qQ8nr+KIWK3HlQ9ze25LFIsyJQz4LZrdpP3BNBr1+tMiEmJhIC9omxpKB9t
+         rftA==
+X-Gm-Message-State: AOAM531NNwdrvenJ/XPmLwp/D9zCuTuE9ImacUJ9ALE8qq/AfbXz2g5x
+        lowFg3QyfUv2v4lVevV+PAY=
+X-Google-Smtp-Source: ABdhPJycVfnNdX3Q+xBw4Vy9Du2Kw55XT7wAoPC8Q+Dbtovahi5LaL3rEhVRy/hYDyftVUkY38qumQ==
+X-Received: by 2002:a17:90a:1d0:: with SMTP id 16mr13043582pjd.53.1632333064042;
+        Wed, 22 Sep 2021 10:51:04 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:f3b9:da7d:f0c0:c71c])
+        by smtp.gmail.com with ESMTPSA id q18sm3062929pfh.170.2021.09.22.10.51.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Sep 2021 10:51:03 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/4] block: keep q_usage_counter in atomic mode after del_gendisk
-Date:   Wed, 22 Sep 2021 19:22:22 +0200
-Message-Id: <20210922172222.2453343-5-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210922172222.2453343-1-hch@lst.de>
-References: <20210922172222.2453343-1-hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] null_blk: Fix a NULL pointer dereference
+Date:   Wed, 22 Sep 2021 10:50:55 -0700
+Message-Id: <20210922175055.568763-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't switch back to percpu mode to avoid the double RCU grace period
-when tearing down SCSI devices.  After removing the disk only passthrough
-commands can be send anyway.
+Skip queue mapping for shared tag sets. This patch fixes the following bug:
 
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+==================================================================
+BUG: KASAN: null-ptr-deref in null_map_queues+0x131/0x1a0 [null_blk]
+Read of size 8 at addr 0000000000000000 by task modprobe/4320
+
+CPU: 9 PID: 4320 Comm: modprobe Tainted: G         E     5.15.0-rc2-dbg+ #2
+Call Trace:
+ show_stack+0x52/0x58
+ dump_stack_lvl+0x49/0x5e
+ kasan_report.cold+0x64/0xdb
+ __asan_load8+0x69/0x90
+ null_map_queues+0x131/0x1a0 [null_blk]
+ blk_mq_update_queue_map+0x122/0x1a0
+ blk_mq_alloc_tag_set+0x1e8/0x570
+ null_init_tag_set+0x197/0x220 [null_blk]
+ null_init+0x1dc/0x1000 [null_blk]
+ do_one_initcall+0xc7/0x440
+ do_init_module+0x10a/0x3d0
+ load_module+0x115c/0x1220
+ __do_sys_finit_module+0x124/0x1a0
+ __x64_sys_finit_module+0x42/0x50
+ do_syscall_64+0x35/0xb0
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Fixes: 5f7acddf706c ("null_blk: poll queue support")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c | 9 ++++++++-
- block/blk.h    | 1 +
- block/genhd.c  | 3 ++-
- 3 files changed, 11 insertions(+), 2 deletions(-)
+ drivers/block/null_blk/main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 108a352051be5..bc026372de439 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -188,9 +188,11 @@ void blk_mq_freeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index eb5cfe189e90..62b7036f5e8d 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1472,13 +1472,15 @@ static int null_map_queues(struct blk_mq_tag_set *set)
  
--void blk_mq_unfreeze_queue(struct request_queue *q)
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- {
- 	mutex_lock(&q->mq_freeze_lock);
-+	if (force_atomic)
-+		q->q_usage_counter.data->force_atomic = true;
- 	q->mq_freeze_depth--;
- 	WARN_ON_ONCE(q->mq_freeze_depth < 0);
- 	if (!q->mq_freeze_depth) {
-@@ -199,6 +201,11 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- 	}
- 	mutex_unlock(&q->mq_freeze_lock);
- }
-+
-+void blk_mq_unfreeze_queue(struct request_queue *q)
-+{
-+	__blk_mq_unfreeze_queue(q, false);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
- /*
-diff --git a/block/blk.h b/block/blk.h
-index e2ed2257709ae..6c3c00a8fe19d 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -51,6 +51,7 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- void blk_freeze_queue(struct request_queue *q);
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
- void blk_queue_start_drain(struct request_queue *q);
- 
- #define BIO_INLINE_VECS 4
-diff --git a/block/genhd.c b/block/genhd.c
-index b3c33495d7208..edd013a820879 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -596,7 +596,8 @@ void del_gendisk(struct gendisk *disk)
- 	/*
- 	 * Allow using passthrough request again after the queue is torn down.
- 	 */
--	blk_mq_unfreeze_queue(q);
-+	blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
-+	__blk_mq_unfreeze_queue(q, true);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
- 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
--- 
-2.30.2
-
+ 		switch (i) {
+ 		case HCTX_TYPE_DEFAULT:
+-			map->nr_queues = nullb->dev->submit_queues;
++			map->nr_queues = nullb ? nullb->dev->submit_queues :
++						       g_submit_queues;
+ 			break;
+ 		case HCTX_TYPE_READ:
+ 			map->nr_queues = 0;
+ 			continue;
+ 		case HCTX_TYPE_POLL:
+-			map->nr_queues = nullb->dev->poll_queues;
++			map->nr_queues =
++				nullb ? nullb->dev->poll_queues : g_poll_queues;
+ 			break;
+ 		}
+ 		map->queue_offset = qoff;
