@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 984DBC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:37:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2951BC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:38:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78D9E60560
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:37:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07EF760F9D
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:38:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235787AbhIVMjX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 08:39:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58348 "EHLO
+        id S230171AbhIVMj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 08:39:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235335AbhIVMjW (ORCPT
+        with ESMTP id S235871AbhIVMjZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 08:39:22 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F475C061757
-        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 05:37:52 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id mv7-20020a17090b198700b0019c843e7233so2157577pjb.4
-        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 05:37:52 -0700 (PDT)
+        Wed, 22 Sep 2021 08:39:25 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1519FC061756
+        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 05:37:56 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id s11so2467958pgr.11
+        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 05:37:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=b9H/YcNe1Su6v+wAcfOK/V9t4tOEyD2Zp8GPh0hUJH8=;
-        b=GVylT1NldRLz2LWSYbYrzix54Fy6cssx1KG0Dlymj6MxJf5fs1Jg/WPQfp6AR/UWrJ
-         4G9vxn5QQRv7gjG30oBMcK14+KG7tpTQBo+IlRzMfN81+Qr1QTZEiZd0Wv1YA1L73+CG
-         NGNYV4mLo82OVz95Ed+EH2Vgl/xQx41F+dhEbkQD5DvdpUYiMovYkui6z6s/8+Y5SfdT
-         pilKqxBfZHq/iN2yShFzoWy8vF3xtyPGl8t8lC+1pXJou4jq+HpqyG6BrMma4VN+xfin
-         keXVfHLPD0iRvDCux0gJL5OHfNobmbxn2daGazJe2axRZQ3JrIRmbVslKAzJXKJIxSae
-         A8cw==
+        bh=XXo90rCwKov3n8RI+9L+aOvAMX+z/2zpjog89bF1/nY=;
+        b=JwrJmAECNV2t7VRi9uoLEnD/JVjKT4PR28LoO/bRruVMwlOHxUbTfbHj1YZ66qO8vK
+         NGYwVqivM2etFriuk0ET8xVcVNONczJO2K6N8S+cGvamhW9UNAqK9ORaNxNx+wze7QAM
+         5XOYWu9/f+8UmBUMGPWSzXx7fwPr1qF1GbFSGSx7b1dRqkJ/UJ8Z46hzxSMTX1/KnuZV
+         GHyR9vIHtJNxfpUB8Xo+j0Gidj1xnaOYsfwjvJKkWDdEifOA58DjkTvxs1LP+znRLKbC
+         5EN/z5cW6w/DIDEH9/NUfuWuW8OW7FH+i7zIPuolWTPEZ4oWBbclAERBYOJWRwd7oU+I
+         4amg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=b9H/YcNe1Su6v+wAcfOK/V9t4tOEyD2Zp8GPh0hUJH8=;
-        b=LAPvj9Et8Whx2G1uoZ5/qrz671r2aABndNTqTdVvG4LZsD2Qtctv5NQKiz1aysm5CM
-         iDqCIZXbVmVpy9uQGU+lFtEdrtcpkNW2XxLGwlOnNsItc38MMySLH72AM1JEsrSJT3ac
-         8ErbN+kNIf9Z4LXXdy0dG/KTNC3jqwIh50cmFLZJebP7k0gR43OrKxfNbh+4tWVnjjPW
-         Ker+D9DB9ukS7Rd+7rVORptdROUszhhVpOyQEDks0amWGRXlaNprRPKMfcm/qZ+Y9SBz
-         XcC+cHpmGLjS4CjlqOW5xcisrCs4l1KAwGVPgZTAaBaLgwzZmff5vSVDdFIfOnqdsaTl
-         WsSQ==
-X-Gm-Message-State: AOAM5318O6AdcVS4984bfqVmxFO5mOGmRrzsETROnt45LVAVnFcPZRuH
-        CE3gmbFJR5qEVgnhfAsY05Hh
-X-Google-Smtp-Source: ABdhPJzWj6ckkva6gfc1tWPCOz5uAGu3XwQ4XiAYiv1dEbfGvfJxZFTKKZFBnIjJnRW/D0FprXn7gg==
-X-Received: by 2002:a17:902:e153:b0:13b:63ba:7288 with SMTP id d19-20020a170902e15300b0013b63ba7288mr31284297pla.33.1632314271853;
-        Wed, 22 Sep 2021 05:37:51 -0700 (PDT)
+        bh=XXo90rCwKov3n8RI+9L+aOvAMX+z/2zpjog89bF1/nY=;
+        b=k7CtlkKq3ibQvp6T18TW2B/d7MgFdwm0WPqLwtDOz0M7y1i4wWNjyPJLr0t9Kz2PtJ
+         Uasa+nU9W/2ePrI14yILAtQkgkVqHz5C4szzHxXJuIys4pwMuMSN+9AwGVuzckW6DeXI
+         SiWU3/H2I7K3j1wkbnfSJr5lpxoj0eVsGhxY32jHH54lf/hPFY2cNklPFEbzRTZCzTis
+         8ha5sYNPHKmg+D97RmhwgOtU4NQLLhVgHCda0vZOcmBiAOm9SFo/EEbtU6JP4+7yUohO
+         tv5cqFAal7Ap1xsMYCpsU9YNdIcpY2Ej8qL+n/hMvFNEgs+QvoAo/75nZFDy84YZ+vgW
+         Isxw==
+X-Gm-Message-State: AOAM531WF/dX+iQ+ajnF9vj9z5/qiCBDnUAk1945oNE+bRqcR1jF3yoZ
+        /5o2VVxYzatGqO0HVgZiNoq/ILxs+JeLVWY=
+X-Google-Smtp-Source: ABdhPJyF/Cz6OiRZv3oI6P/rXSCH87qxUj4jr8nv+HKYRy0Lhyf1ZC8DmOQFf+VbzXM2zx/BVwKTOw==
+X-Received: by 2002:a62:7b16:0:b0:443:56c4:33dc with SMTP id w22-20020a627b16000000b0044356c433dcmr31836416pfc.47.1632314275647;
+        Wed, 22 Sep 2021 05:37:55 -0700 (PDT)
 Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id g8sm2477038pfv.51.2021.09.22.05.37.50
+        by smtp.gmail.com with ESMTPSA id a27sm2397688pfk.192.2021.09.22.05.37.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 05:37:51 -0700 (PDT)
+        Wed, 22 Sep 2021 05:37:55 -0700 (PDT)
 From:   Xie Yongji <xieyongji@bytedance.com>
 To:     axboe@kernel.dk, josef@toxicpanda.com, hch@infradead.org
 Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         yixingchen@bytedance.com
-Subject: [PATCH v2 1/4] block: Add invalidate_disk() helper to invalidate the gendisk
-Date:   Wed, 22 Sep 2021 20:37:08 +0800
-Message-Id: <20210922123711.187-2-xieyongji@bytedance.com>
+Subject: [PATCH v2 2/4] loop: Use invalidate_disk() helper to invalidate gendisk
+Date:   Wed, 22 Sep 2021 20:37:09 +0800
+Message-Id: <20210922123711.187-3-xieyongji@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210922123711.187-1-xieyongji@bytedance.com>
 References: <20210922123711.187-1-xieyongji@bytedance.com>
@@ -72,61 +72,32 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To hide internal implementation and simplify some driver code,
-this adds a helper to invalidate the gendisk. It will clean the
-gendisk's associated buffer/page caches and reset its internal
-states.
+Use invalidate_disk() helper to simplify the code for gendisk
+invalidation.
 
 Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c         | 20 ++++++++++++++++++++
- include/linux/genhd.h |  2 ++
- 2 files changed, 22 insertions(+)
+ drivers/block/loop.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 7b6e5e1cf956..876c0e478baf 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -601,6 +601,26 @@ void del_gendisk(struct gendisk *disk)
- }
- EXPORT_SYMBOL(del_gendisk);
- 
-+/**
-+ * invalidate_disk - invalidate the disk
-+ * @disk: the struct gendisk to invalidate
-+ *
-+ * A helper to invalidates the disk. It will clean the disk's associated
-+ * buffer/page caches and reset its internal states so that the disk
-+ * can be reused by the drivers.
-+ *
-+ * Context: can sleep
-+ */
-+void invalidate_disk(struct gendisk *disk)
-+{
-+	struct block_device *bdev = disk->part0;
-+
-+	invalidate_bdev(bdev);
-+	bdev->bd_inode->i_mapping->wb_err = 0;
-+	set_capacity(disk, 0);
-+}
-+EXPORT_SYMBOL(invalidate_disk);
-+
- /* sysfs access to bad-blocks list. */
- static ssize_t disk_badblocks_show(struct device *dev,
- 					struct device_attribute *attr,
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index c68d83c87f83..ea815feb3626 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -222,6 +222,8 @@ static inline int add_disk(struct gendisk *disk)
- }
- extern void del_gendisk(struct gendisk *gp);
- 
-+void invalidate_disk(struct gendisk *disk);
-+
- void set_disk_ro(struct gendisk *disk, bool read_only);
- 
- static inline int get_disk_ro(struct gendisk *disk)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 7bf4686af774..eab6906326cc 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1395,11 +1395,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	blk_queue_logical_block_size(lo->lo_queue, 512);
+ 	blk_queue_physical_block_size(lo->lo_queue, 512);
+ 	blk_queue_io_min(lo->lo_queue, 512);
+-	if (bdev) {
+-		invalidate_bdev(bdev);
+-		bdev->bd_inode->i_mapping->wb_err = 0;
+-	}
+-	set_capacity(lo->lo_disk, 0);
++	invalidate_disk(lo->lo_disk);
+ 	loop_sysfs_exit(lo);
+ 	if (bdev) {
+ 		/* let user-space know about this change */
 -- 
 2.11.0
 
