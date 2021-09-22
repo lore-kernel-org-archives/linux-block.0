@@ -2,118 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD15C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 15:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AA0C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 16:11:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A95A61090
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 15:56:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69521610D1
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 16:11:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236330AbhIVP60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 11:58:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49894 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236321AbhIVP6Z (ORCPT
+        id S236578AbhIVQMi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 12:12:38 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:33773 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236550AbhIVQMh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 11:58:25 -0400
-Received: from lounge.grep.be (lounge.grep.be [IPv6:2a01:4f8:200:91e8::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06BC2C061574
-        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 08:56:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
-        s=2021.lounge; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=vX6Qu+emXOBeX55x21xlP5yK5xuZNhWOHbJG5PTxsow=; b=dXaiMB7WWoz7Zu09KijKcG32EI
-        lhOXgJPMh3ProOjEwiW4/7buxU03QPvqXH40kT5kMxKFBQDHotzs10cUIJaE8AUBDiGff3jw17bkA
-        uQRRJcUNymBuDycw8begbgGE3pYl9x0P6sfUBufEbuyKuRITWt1bng+7y0y4SmFY9jXdPnvwUCZbs
-        a0J9KO1HWoqJhZOB6WQXmtZo/zE280weWx7kNi/36CP5QAPdonVU6IJ0gOTp1o2ZWL9j7sYZUeUAU
-        W8ZSa4AhBEu5VQkPY8mgxuFcgB4r4Cjn3hXgrYJrpIChOhu+sB64WrzRyDtI2mylC5WotcPzIhYcN
-        358GTTTQ==;
-Received: from 197-101-72-171.ip.broadband.is ([197.101.72.171] helo=pc181009)
-        by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <w@uter.be>)
-        id 1mT4bu-00Cfvr-R2; Wed, 22 Sep 2021 17:56:38 +0200
-Received: from wouter by pc181009 with local (Exim 4.95-RC2)
-        (envelope-from <w@uter.be>)
-        id 1mT4bg-0003l5-0I;
-        Wed, 22 Sep 2021 17:56:24 +0200
-Date:   Wed, 22 Sep 2021 17:56:23 +0200
-From:   Wouter Verhelst <w@uter.be>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     "yukuai (C)" <yukuai3@huawei.com>, josef@toxicpanda.com,
-        axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [patch v8 3/7] nbd: check sock index in nbd_read_stat()
-Message-ID: <YUtSJ/bfKZ9QJUaY@pc181009.grep.be>
-References: <20210916093350.1410403-1-yukuai3@huawei.com>
- <20210916093350.1410403-4-yukuai3@huawei.com>
- <7e2913ca-1089-9ab7-cfdb-5e8837d36034@huawei.com>
- <YUr1v8zylPOFFXTO@T590>
+        Wed, 22 Sep 2021 12:12:37 -0400
+Received: by mail-io1-f69.google.com with SMTP id g2-20020a6b7602000000b005be59530196so3396472iom.0
+        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 09:11:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=UmA5fLnL3GwryS2xj+yPX5YOnEleOA06k1MW7m7x+TQ=;
+        b=0fph4gY79lONo+iK1wW0GGkY+tWG21Uj5j++OablvY2bB5KrXcgx9M3c8o64/UKQoq
+         lSiotouwvSarTos7kS7Z4JkAJSr+EdxKZGi4/+TLw2EJoHFyq5ZPX6jzRy770ndk13uP
+         34tQjNY5hMXYNCgarB3yQvkcMH3L7hS3DTnw82M64Ah/w+xjkW75y81aCJoQsnoUQ8Sb
+         lZm+NJDnsUDL79tu7nwHb/CVB9sm9Zx5xQj3SEEFryXX/Cm1DOi1mUH9yOK1Bcpnp/Mh
+         i5L0Kl2CeLUrGw7+4iWToMD5rdIhud/1W/fw+kPZ13vfgrKngllvCeXUKNLQeDgihz8c
+         b8MQ==
+X-Gm-Message-State: AOAM533Fk2imryiNQ5pI3XrY1uD47NX3MiwzdIzil22eNvrTifPN3OI1
+        LUJV0w8sEWHtxDzKuhYIYSfEYBDSGeVOeDMmFX8zATyLBYPp
+X-Google-Smtp-Source: ABdhPJxk7hBdI+nl+8MGWPeeiUS55BURR8MW1W0ABkOhmmB6xfRPaH4Zg21gdAytWslsTLtv90L4YtBUY3Dpl8CGzWDD5CQx3GH8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YUr1v8zylPOFFXTO@T590>
-X-Speed: Gates' Law: Every 18 months, the speed of software halves.
-Organization: none
+X-Received: by 2002:a05:6e02:d86:: with SMTP id i6mr378919ilj.28.1632327067566;
+ Wed, 22 Sep 2021 09:11:07 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 09:11:07 -0700
+In-Reply-To: <000000000000e692c905bbe9192c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000050d0d05cc97c35f@google.com>
+Subject: Re: [syzbot] general protection fault in nbd_disconnect_and_put
+From:   syzbot <syzbot+db0c9917f71539bc4ad1@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, cs.temp3@bpchargemaster.com, hdanton@sina.com,
+        josef@toxicpanda.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mail@anirudhrb.com, nbd@other.debian.org, nsd-public@police.gov.hk,
+        stephen.s.brennan@oracle.com, syzkaller-bugs@googlegroups.com,
+        viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 05:22:07PM +0800, Ming Lei wrote:
-> On Sun, Sep 19, 2021 at 06:34:28PM +0800, yukuai (C) wrote:
-> > On 2021/09/16 17:33, Yu Kuai wrote:
-> > > The sock that clent send request in nbd_send_cmd() and receive reply
-> > > in nbd_read_stat() should be the same.
-> > > 
-> > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> > > ---
-> > >   drivers/block/nbd.c | 4 ++++
-> > >   1 file changed, 4 insertions(+)
-> > > 
-> > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > > index 614c6ab2b8fe..c724a5bd7fa4 100644
-> > > --- a/drivers/block/nbd.c
-> > > +++ b/drivers/block/nbd.c
-> > > @@ -746,6 +746,10 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
-> > >   		ret = -ENOENT;
-> > >   		goto out;
-> > >   	}
-> > > +	if (cmd->index != index) {
-> > > +		dev_err(disk_to_dev(nbd->disk), "Unexpected reply %d from different sock %d (expected %d)",
-> > > +			tag, index, cmd->index);
-> > > +	}
-> > >   	if (cmd->cmd_cookie != nbd_handle_to_cookie(handle)) {
-> > >   		dev_err(disk_to_dev(nbd->disk), "Double reply on req %p, cmd_cookie %u, handle cookie %u\n",
-> > >   			req, cmd->cmd_cookie, nbd_handle_to_cookie(handle));
-> > > 
-> > 
-> > Hi, Ming
-> > 
-> > Any suggestions about this patch?
-> 
-> I think this one relies on nbd protocol between server and client, and
-> does the protocol require both request and reply xmitted via same
-> socket?
+syzbot suspects this issue was fixed by commit:
 
-As Eric already answered: yes, the request and reply are specified such
-that they must be transmitted over the same socket.
+commit 794ebcea865bff47231de89269e9d542121ab7be
+Author: Stephen Brennan <stephen.s.brennan@oracle.com>
+Date:   Wed Sep 1 17:51:42 2021 +0000
 
-For more details, you can find the protocol specification at
-https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
+    namei: Standardize callers of filename_lookup()
 
-Please note that the protocol defined there has some options that are
-not currently supported by the Linux nbd implementation -- specifically
-the "structured reply" message format (and all that requires it) is not
-implemented (yet?).
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1163691d300000
+start commit:   acd3d2859453 Merge tag 'fixes-v5.13' of git://git.kernel.o..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f04bb30bd3c55050
+dashboard link: https://syzkaller.appspot.com/bug?extid=db0c9917f71539bc4ad1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f63543d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=122c8ef1d00000
 
--- 
-     w@uter.{be,co.za}
-wouter@{grep.be,fosdem.org,debian.org}
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: namei: Standardize callers of filename_lookup()
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
