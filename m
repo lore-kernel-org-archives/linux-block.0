@@ -2,106 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 384C8C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 900E1C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:37:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16D3C610A1
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:21:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DE1C60560
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 12:37:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234760AbhIVMXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 08:23:10 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:9756 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233626AbhIVMXJ (ORCPT
+        id S234294AbhIVMjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 08:39:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230171AbhIVMjS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 08:23:09 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HDy701J3MzWCST;
-        Wed, 22 Sep 2021 20:20:28 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Wed, 22 Sep 2021 20:21:27 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Wed, 22 Sep 2021 20:21:26 +0800
-Subject: Re: [patch v8 3/7] nbd: check sock index in nbd_read_stat()
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@infradead.org>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20210916093350.1410403-1-yukuai3@huawei.com>
- <20210916093350.1410403-4-yukuai3@huawei.com>
- <7e2913ca-1089-9ab7-cfdb-5e8837d36034@huawei.com> <YUr1v8zylPOFFXTO@T590>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <3bfd595e-20a6-c4ab-b041-9bca28a4584f@huawei.com>
-Date:   Wed, 22 Sep 2021 20:21:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 22 Sep 2021 08:39:18 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A5FC061574
+        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 05:37:48 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id q23so2573974pfs.9
+        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 05:37:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4r5hHsLSqFPjFI5wR4N7KCh9k5AlpvO2LM7FCfFcAxI=;
+        b=hNagVhUiKO3N7yS2MkYebkvw28gd9fBFAbzhqf7VH2GBGjGxL/qe5rIoy1eduDkHFD
+         SfLuyUuwoWQ8asyw3ItuYiLoP/UX6vp1x6FfvGGTwr6+8oFkzMeoNPR/6Yjojx6H8fqn
+         W4+fj962NmO2LoUf5aSppXon2aGSwlQrgZFyQbQjlymg38riwZhg1ZdUMIoGXsLQ7Am4
+         TelQVCzx8ePx8Scxa1bxFt95UagzdOcEoneMTo4rAplvxbNVER9/UfZQLd+Dtc1B9Cbq
+         IfLP6dsDY9QCdDihlxlKUfHsCbQe2YRlTWNCBrnJaHhtltNCWcBXeVJxtTyCHuKtjkkC
+         SSdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4r5hHsLSqFPjFI5wR4N7KCh9k5AlpvO2LM7FCfFcAxI=;
+        b=ayV0Joziroy3rKvtGCqOJj4hEt4UjfUJotIjQWmpDgiAJTGkoUwlgeTZzte+Iie8s8
+         juiSCBrFXiq04X1SKt4p+apEKLBa8Otan9QW5dVjXq6nSoadksvPLJ2so4xiiCYV2gkh
+         WsT7cM76Upiu3kQ9PG8+4YDgSA8lYMrgcDb39L1AQnZnAoQOLbg+TBCk/ZZdMEaW71gV
+         gqthcGKGgjyGUkdWxb2HYklqTA3E+ihp5ylkBEoKVgdZhPlfjoY5S1ViLpFj+1AtX7/v
+         OkaC3Ua6fC6O8aeJ/1bhsfelt7911s+nDzOB1OcznbOAb3kllW6bQndH22LPU+Im/A1Z
+         U5bA==
+X-Gm-Message-State: AOAM53038aIIpC8C2RVGE+YJHeMiunbTlQQIvNF8kKJebAoccu6wmDBP
+        ixxXIolWdEKyOymr82OOMe96
+X-Google-Smtp-Source: ABdhPJzNKppc244/mgKdjew5hR8qxaVzd/w+KiEBaHXaLnfD5kjRtFp/Ve/yoTpNrqiQWoO1x1/Mkg==
+X-Received: by 2002:a62:6587:0:b0:445:824:58f2 with SMTP id z129-20020a626587000000b00445082458f2mr26165014pfb.82.1632314268225;
+        Wed, 22 Sep 2021 05:37:48 -0700 (PDT)
+Received: from localhost ([139.177.225.253])
+        by smtp.gmail.com with ESMTPSA id fr17sm2268552pjb.17.2021.09.22.05.37.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Sep 2021 05:37:46 -0700 (PDT)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     axboe@kernel.dk, josef@toxicpanda.com, hch@infradead.org
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        yixingchen@bytedance.com
+Subject: [PATCH v2 0/4] Add invalidate_disk() helper for drivers to invalidate the gendisk
+Date:   Wed, 22 Sep 2021 20:37:07 +0800
+Message-Id: <20210922123711.187-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <YUr1v8zylPOFFXTO@T590>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/09/22 17:22, Ming Lei wrote:
-> On Sun, Sep 19, 2021 at 06:34:28PM +0800, yukuai (C) wrote:
->> On 2021/09/16 17:33, Yu Kuai wrote:
->>> The sock that clent send request in nbd_send_cmd() and receive reply
->>> in nbd_read_stat() should be the same.
->>>
->>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>> ---
->>>    drivers/block/nbd.c | 4 ++++
->>>    1 file changed, 4 insertions(+)
->>>
->>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->>> index 614c6ab2b8fe..c724a5bd7fa4 100644
->>> --- a/drivers/block/nbd.c
->>> +++ b/drivers/block/nbd.c
->>> @@ -746,6 +746,10 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
->>>    		ret = -ENOENT;
->>>    		goto out;
->>>    	}
->>> +	if (cmd->index != index) {
->>> +		dev_err(disk_to_dev(nbd->disk), "Unexpected reply %d from different sock %d (expected %d)",
->>> +			tag, index, cmd->index);
->>> +	}
->>>    	if (cmd->cmd_cookie != nbd_handle_to_cookie(handle)) {
->>>    		dev_err(disk_to_dev(nbd->disk), "Double reply on req %p, cmd_cookie %u, handle cookie %u\n",
->>>    			req, cmd->cmd_cookie, nbd_handle_to_cookie(handle));
->>>
->>
->> Hi, Ming
->>
->> Any suggestions about this patch?
-> 
-> I think this one relies on nbd protocol between server and client, and
-> does the protocol require both request and reply xmitted via same
-> socket?
-> 
+This series comes from Christoph Hellwig's suggestion [1]. Some block
+device drivers such as loop driver and nbd driver need to invalidate
+the gendisk when the backend is detached so that the gendisk can be
+reused by the new backend. Now the invalidation is done in device
+driver with their own ways. To avoid code duplication and hide
+some internals of the implementation, this series adds a block layer
+helper and makes both loop driver and nbd driver use it.
 
-I searched nbd-server source code, and found that socket_read() and
-send_reply->socket_write() are always come in pares and using the same
-socket.
+[1] https://lore.kernel.org/all/YTmqJHd7YWAQ2lZ7@infradead.org/
 
-BTW, if server reply a read request from a unexpected sock, then
-nbd_read_stat() might stuck in receiving the read data. And for worse,
-nbd_read_stat() can mistake the normal reply message for the read data
-afterwards and corrupt client.
+V1 to V2:
+- Rename invalidate_gendisk() to invalidate_disk()
+- Add a cleanup patch to remove bdev checks and bdev variable in __loop_clr_fd()
 
-Thanks,
-Kuai
+Xie Yongji (4):
+  block: Add invalidate_disk() helper to invalidate the gendisk
+  loop: Use invalidate_disk() helper to invalidate gendisk
+  loop: Remove the unnecessary bdev checks and unused bdev variable
+  nbd: Use invalidate_disk() helper on disconnect
+
+ block/genhd.c         | 20 ++++++++++++++++++++
+ drivers/block/loop.c  | 15 ++++-----------
+ drivers/block/nbd.c   | 12 +++---------
+ include/linux/genhd.h |  2 ++
+ 4 files changed, 29 insertions(+), 20 deletions(-)
+
+-- 
+2.11.0
 
