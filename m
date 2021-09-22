@@ -2,108 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D4D7C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 14:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F99C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 14:33:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EEF6611C9
-	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 14:29:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 491F0611CA
+	for <linux-block@archiver.kernel.org>; Wed, 22 Sep 2021 14:33:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235001AbhIVObI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 10:31:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232401AbhIVObD (ORCPT
+        id S236178AbhIVOfK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 10:35:10 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:47048 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232720AbhIVOfJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 10:31:03 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF9DC061756
-        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 07:29:33 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id q205so3602292iod.8
-        for <linux-block@vger.kernel.org>; Wed, 22 Sep 2021 07:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=LkHNahxe4Opk7ltbXSKSeyp56JUc25N+JObY5cRDFWc=;
-        b=aOrhP0mv2RWtlBrBj3fYKJ0tGdWUe+SEZptNqmFmG1geSe9GAwL8iEvIVWR6CtHLBA
-         wH/mtdrurZkJqTSl2Qh1Z36Y3fkUcmnEiShyhULDfK9t48/tn4oXVg8rpuuMxx9gA9w8
-         Dv9baPveSavSM45XbUTcdGhkqoxFO1MbhU8C3H8r//9FQGYfKN8/mHAP3q/hAQzFR8mu
-         iIyryYgPnYEhO2d0IYgBObntHh6oGJPaX5i8yZF6+ILBzUVK4XwsRDBNpekXF5SY11+e
-         1cQjtxxvCU67UAhzzawbRK8aNQZ3Z/EoV2er4zzgwkZfV334DI1BcGqpOzSXNDa/a9Oy
-         S9+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LkHNahxe4Opk7ltbXSKSeyp56JUc25N+JObY5cRDFWc=;
-        b=rUwOGIy+60WsZ16OrwkVEOet/sQZhfFmLb+41VEutxiCsLYLCwl8reqVH/TQnQumRT
-         A29ohQregkqE/oii16pxfzYTa0/6Z2csSuGjSczV0EG0b37jMWIrJmbc/NIgN8AAXeGa
-         JjfbtfT24dcLXkbkOvMDcg3B1mMR5K0Un7mx9kz9WOUJWWw5R3lXMk7882pC+kyN7oHX
-         ZpWNPe/KHneCCxYh6iCi+Rqmym+NXl8paLxdPQA4tZ8HJ+cE6bT1M/8zBnVPuSZZ5hLU
-         TD6IpN4U/szzUvE5GPTEAi4uBrWDxC+ca87SAByrFxLdennyi3tb0/SJ54witjTi1c6t
-         s6QQ==
-X-Gm-Message-State: AOAM5303S5r6iVEwtrSBiF8qu18GshCgiPkvKOkDiPM9GUdgHB2kjBxS
-        TGdb7NAqraeFyN9nPXzyBzkSHw==
-X-Google-Smtp-Source: ABdhPJxkPMuEngkZ3AMT/nv4SOGP0ecCSItToEOfVDpBlDJWAorvfHe/+T6qxgWAoRXJve5leudqEA==
-X-Received: by 2002:a6b:d209:: with SMTP id q9mr4751648iob.206.1632320972411;
-        Wed, 22 Sep 2021 07:29:32 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v17sm623069ilo.1.2021.09.22.07.29.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Sep 2021 07:29:31 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: export blk_mq_submit_bio symbol
-To:     Prasad Muppana <Lalita.Muppana@microsoft.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Praveen Kumar <kumarpraveen@linux.microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Atin Mukherjee <Atin.MUKHERJEE@microsoft.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "schakrabarti@linux.microsoft.com" <schakrabarti@linux.microsoft.com>
-References: <20210909053653.144360-1-kumarpraveen@linux.microsoft.com>
- <7e80b65b-51a4-3ca1-da43-e87612b8ca5f@nvidia.com>
- <f7add831-ecf0-6599-158b-cd2f15543da5@linux.microsoft.com>
- <YT7rL4PhovDOHfHO@infradead.org>
- <75f77917-a8ba-0138-750b-8dedd8f7ce7d@linux.microsoft.com>
- <PSAP153MB0518F021C769875159C3A03984A09@PSAP153MB0518.APCP153.PROD.OUTLOOK.COM>
- <792dd48b-a246-0456-58a8-00d739201251@nvidia.com>
- <PSAP153MB0518090A749E26814966672684A29@PSAP153MB0518.APCP153.PROD.OUTLOOK.COM>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <36660d33-c02d-27ee-1332-4ea6e7126b88@kernel.dk>
-Date:   Wed, 22 Sep 2021 08:29:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 22 Sep 2021 10:35:09 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 307A91FE9B;
+        Wed, 22 Sep 2021 14:33:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1632321219; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k/gJ/AWM2V+0oCuteAUShxfa63FrnRH0Y7CimawHM5g=;
+        b=PbEqlvOGmHDWX5xfRdEK+7zhxJc9SotNGT7WBtrq3cIBw8KkWdGRok+IIOstRLW2mnHC+/
+        Is3YDZ5ptzMWgWh0PyIq6qkO+KM1YIeSUASUqKAwzsVLjdw+5/e826P+gDIzcK4N/UDfqR
+        2PhS6INVCswXr2K/u3eZGFpqzZK853g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1632321219;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k/gJ/AWM2V+0oCuteAUShxfa63FrnRH0Y7CimawHM5g=;
+        b=OBI3yP9jNUvJvnSlKS7sLEuUGFs2gtA6tGot/A11bwYbUSZB+I9f3b757xJr1IxmJPKhQ5
+        igjk5rO5jwi/1sCQ==
+Received: from quack2.suse.cz (jack.udp.ovpn2.nue.suse.de [10.163.43.118])
+        by relay2.suse.de (Postfix) with ESMTP id 23404A3B81;
+        Wed, 22 Sep 2021 14:33:39 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 85CA51E37A2; Wed, 22 Sep 2021 16:33:36 +0200 (CEST)
+Date:   Wed, 22 Sep 2021 16:33:36 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jan Kara <jack@suse.cz>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/3 v2] bfq: Limit number of allocated scheduler tags per
+ cgroup
+Message-ID: <20210922143336.GA13760@quack2.suse.cz>
+References: <20210715132047.20874-1-jack@suse.cz>
+ <751F4AB5-1FDF-45B0-88E1-0C76ED1AAAD6@linaro.org>
+ <20210831095930.GB17119@blackbody.suse.cz>
+ <20210915131512.GB6166@quack2.suse.cz>
+ <AF7AAF20-7D9E-4305-901A-86A3717A9CFB@linaro.org>
+ <20210920092815.GA6607@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <PSAP153MB0518090A749E26814966672684A29@PSAP153MB0518.APCP153.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210920092815.GA6607@quack2.suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/21/21 11:45 PM, Prasad Muppana wrote:
-> Hi Chaitanya,
+On Mon 20-09-21 11:28:15, Jan Kara wrote:
+> On Sat 18-09-21 12:58:34, Paolo Valente wrote:
+> > > Il giorno 15 set 2021, alle ore 15:15, Jan Kara <jack@suse.cz> ha scritto:
+> > > 
+> > > On Tue 31-08-21 11:59:30, Michal Koutný wrote:
+> > >> Hello Paolo.
+> > >> 
+> > >> On Fri, Aug 27, 2021 at 12:07:20PM +0200, Paolo Valente <paolo.valente@linaro.org> wrote:
+> > >>> Before discussing your patches in detail, I need a little help on this
+> > >>> point.  You state that the number of scheduler tags must be larger
+> > >>> than the number of device tags.  So, I expected some of your patches
+> > >>> to address somehow this issue, e.g., by increasing the number of
+> > >>> scheduler tags.  Yet I have not found such a change.  Did I miss
+> > >>> something?
+> > >> 
+> > >> I believe Jan's conclusions so far are based on "manual" modifications
+> > >> of available scheduler tags by /sys/block/$dev/queue/nr_requests.
+> > >> Finding a good default value may be an additional change.
+> > > 
+> > > Exactly. So far I was manually increasing nr_requests. I agree that
+> > > improving the default nr_requests value selection would be desirable as
+> > > well so that manual tuning is not needed. But for now I've left that aside.
+> > > 
+> > 
+> > Ok. So, IIUC, to recover control on bandwidth you need to
+> > (1) increase nr_requests manually
+> > and
+> > (2) apply your patch
+> > 
+> > If you don't do (1), then (2) is not sufficient, and viceversa. Correct?
 > 
-> Thanks for the response.
-> 
-> Our driver code is not yet public and so Praveen has explained the
-> flow of the code. Please let me know is there any other way to get
-> some help here quickly.
+> Correct, although 1) depends on HW capabilities - e.g. for standard SATA
+> NCQ drive with queue depth of 32, the current nr_requests setting of 256 is
+> fine and just 2) is enough to recover control. If you run on top of virtio
+> device or storage controller card with queue depth of 1024, you need to
+> bump up the nr_requests setting.
 
-The explanation, while appreciated, doesn't solve the problem here. We
-_never_ add any exports for APIs that don't have any in-kernel users.
-That's a hard rule that we've had forever. As such, there is not a path
-for entry for this particular patch right now. It should be submitted
-alongside the upstream submission request for the code using it, as a
-preparatory patch.
+Paolo, do you have any thoughts about the patches? Any estimate when you
+can have a look into them? BTW I have sligthly updated version locally
+which also helps with restoring service differentiation for IO priorities
+but in principle there's no fundamental difference.
 
+								Honza
 -- 
-Jens Axboe
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
