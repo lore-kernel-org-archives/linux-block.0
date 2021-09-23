@@ -2,124 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 154D1C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 19:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AA5C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 22:53:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F155F61241
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 19:48:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4530D6124B
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 22:53:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242955AbhIWTuH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Sep 2021 15:50:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31840 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242940AbhIWTuH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Sep 2021 15:50:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632426514;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Vt7YWjNxWEYJFK3AH8bfC/R43Amq3ybj79IQEHl8+aI=;
-        b=i/qCrMhrRQN+YyUiPDBvIccNEv6o2wQXrHXo6GGj/pq/aTOn0OCriH41vyGl48tPXxVRx5
-        agfrSu4AZskkRgMn+h3HmrpZppnAu49GG9E8Pu2tNBnRver3syb5xptJvP4OoJVcH++G/B
-        W+DilbUE/sglV2THI0Qcr9LnsKJxKgQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-T-FWAu2fPNaInLZae4EhUQ-1; Thu, 23 Sep 2021 15:48:33 -0400
-X-MC-Unique: T-FWAu2fPNaInLZae4EhUQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F65F9126D;
-        Thu, 23 Sep 2021 19:48:32 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E3ED96A900;
-        Thu, 23 Sep 2021 19:48:28 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 18NJmSnx029918;
-        Thu, 23 Sep 2021 15:48:28 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 18NJmRWh029914;
-        Thu, 23 Sep 2021 15:48:27 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Thu, 23 Sep 2021 15:48:27 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>
-cc:     linux-block@vger.kernel.org
-Subject: [PATCH] loop: don't print warnings if the underlying filesystem
- doesn't support discard
-Message-ID: <alpine.LRH.2.02.2109231539520.27863@file01.intranet.prod.int.rdu2.redhat.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S243451AbhIWWym (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Sep 2021 18:54:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40624 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236363AbhIWWyl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Sep 2021 18:54:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4D4EA61050;
+        Thu, 23 Sep 2021 22:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1632437589;
+        bh=C3SYeyDKvKpb/ztYsrD8obNOu9dSdXZY8PFIa55n+74=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KZ3gMZwg4rgJ9cLecymJdeyv6i54jC7zVxLOfjkazVUlux9mYsa73ABGN59P4idUi
+         vuuJ7LslTKcm3niLg6ci5tCI5QkH6FfZMbvf+dXZp6sZAMKa4FePEb/vV/DSlnR+t8
+         rrRhkFGxbVQbFrgWJXjxie+JOSrcd/pPdSnyGya8=
+Date:   Thu, 23 Sep 2021 15:53:08 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Brian Geffon <bgeffon@google.com>
+Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        Suleiman Souhlal <suleiman@google.com>,
+        Jesse Barnes <jsbarnes@google.com>
+Subject: Re: [PATCH v4] zram: Introduce an aged idle interface
+Message-Id: <20210923155308.9b522a77a02ee13b76e9e613@linux-foundation.org>
+In-Reply-To: <20210923130115.1344361-1-bgeffon@google.com>
+References: <20210917210640.214211-1-bgeffon@google.com>
+        <20210923130115.1344361-1-bgeffon@google.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+On Thu, 23 Sep 2021 06:01:15 -0700 Brian Geffon <bgeffon@google.com> wrote:
 
-When running the lvm testsuite, we get a lot of warnings 
-"blk_update_request: operation not supported error, dev loop0, sector 0 op 
-0x9:(WRITE_ZEROES) flags 0x800800 phys_seg 0 prio class 0". The lvm 
-testsuite puts the loop device on tmpfs and the reason for the warning is 
-that tmpfs supports fallocate, but doesn't support FALLOC_FL_ZERO_RANGE.
+> This change introduces an aged idle interface to the existing
+> idle sysfs file for zram.
+> 
+> When CONFIG_ZRAM_MEMORY_TRACKING is enabled the idle file
+> now also accepts an integer argument. This integer is the
+> age (in seconds) of pages to mark as idle. The idle file
+> still supports 'all' as it always has. This new approach
+> allows for much more control over which pages get marked
+> as idle.
+> 
+> @@ -291,22 +291,16 @@ static ssize_t mem_used_max_store(struct device *dev,
+>  	return len;
+>  }
+>  
+> -static ssize_t idle_store(struct device *dev,
+> -		struct device_attribute *attr, const char *buf, size_t len)
+> +/*
+> + * Mark all pages which are older than or equal to cutoff as IDLE.
+> + * Callers should hold the zram init lock in read mode
+> + **/
 
-I've created this patch to silence the warnings.
+A simple "*/" is conventional.
 
-Mikulas
+> +static void mark_idle(struct zram *zram, ktime_t cutoff)
+>  {
+> -	struct zram *zram = dev_to_zram(dev);
+> +	int is_idle = 1;
+>  	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+>  	int index;
+>  
+> -	if (!sysfs_streq(buf, "all"))
+> -		return -EINVAL;
+> -
+> -	down_read(&zram->init_lock);
+> -	if (!init_done(zram)) {
+> -		up_read(&zram->init_lock);
+> -		return -EINVAL;
+> -	}
+> -
+>  	for (index = 0; index < nr_pages; index++) {
+>  		/*
+>  		 * Do not mark ZRAM_UNDER_WB slot as ZRAM_IDLE to close race.
+> @@ -314,14 +308,48 @@ static ssize_t idle_store(struct device *dev,
+>  		 */
+>  		zram_slot_lock(zram, index);
+>  		if (zram_allocated(zram, index) &&
+> -				!zram_test_flag(zram, index, ZRAM_UNDER_WB))
+> -			zram_set_flag(zram, index, ZRAM_IDLE);
+> +				!zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
+> +#ifdef CONFIG_ZRAM_MEMORY_TRACKING
+> +			is_idle = (!cutoff || ktime_after(cutoff, zram->table[index].ac_time));
+> +#endif
+> +			if (is_idle)
+> +				zram_set_flag(zram, index, ZRAM_IDLE);
+> +		}
+>  		zram_slot_unlock(zram, index);
+>  	}
+> +}
+>  
+> -	up_read(&zram->init_lock);
+> +static ssize_t idle_store(struct device *dev,
+> +		struct device_attribute *attr, const char *buf, size_t len)
+> +{
+> +	struct zram *zram = dev_to_zram(dev);
+> +	ktime_t cutoff_time = 0;
+> +	ssize_t rv = -EINVAL;
+>  
+> -	return len;
+> +	if (!sysfs_streq(buf, "all")) {
+> +#ifdef CONFIG_ZRAM_MEMORY_TRACKING
+> +		u64 age_sec;
+> +		/* If it did not parse as 'all' try to treat it as an integer */
+> +		if (!kstrtoull(buf, 0, &age_sec))
+> +			cutoff_time = ktime_sub(ktime_get_boottime(),
+> +					ns_to_ktime(age_sec * NSEC_PER_SEC));
+> +		else
+> +#endif
+> +			goto out;
+> +	}
 
+The ifdef tricks are pretty ugly.  Can things be improved with IS_ENABLED()?
 
-
-From: Mikulas Patocka <mpatocka@redhat.com>
-
-The loop driver checks for the fallocate method and if it is present, it
-assumes that the filesystem can do FALLOC_FL_ZERO_RANGE and
-FALLOC_FL_PUNCH_HOLE requests. However, some filesystems (such as fat, or
-tmpfs) have the fallocate method, but lack the capability to do
-FALLOC_FL_ZERO_RANGE and/or FALLOC_FL_PUNCH_HOLE.
-
-This results in syslog warnings "blk_update_request: operation not
-supported error, dev loop0, sector 0 op 0x9:(WRITE_ZEROES) flags 0x800800
-phys_seg 0 prio class 0"
-
-This patch sets RQF_QUIET to silence the warnings.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Cc: stable@vger.kernel.org
-
----
- drivers/block/loop.c |   11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-Index: linux-2.6/drivers/block/loop.c
-===================================================================
---- linux-2.6.orig/drivers/block/loop.c	2021-09-23 17:06:57.000000000 +0200
-+++ linux-2.6/drivers/block/loop.c	2021-09-23 21:29:39.000000000 +0200
-@@ -493,7 +493,16 @@ static int lo_fallocate(struct loop_devi
- 	ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
- 	if (unlikely(ret && ret != -EINVAL && ret != -EOPNOTSUPP))
- 		ret = -EIO;
-- out:
-+out:
-+
-+	/*
-+	 * Some filesystems have the fallocate method, but lack the capability
-+	 * to do FALLOC_FL_ZERO_RANGE and/or FALLOC_FL_PUNCH_HOLE requests.
-+	 * We do not want a syslog warning in this case.
-+	 */
-+	if (ret == -EOPNOTSUPP)
-+		rq->rq_flags |= RQF_QUIET;
-+
- 	return ret;
- }
- 
 
