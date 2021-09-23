@@ -2,149 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8EBC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 08:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D677C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 09:40:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00BEE61279
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 08:52:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE1BC6121F
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 09:40:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239985AbhIWIyV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Sep 2021 04:54:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33874 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240018AbhIWIyV (ORCPT
+        id S240187AbhIWJmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Sep 2021 05:42:04 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:37430 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238217AbhIWJmD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Sep 2021 04:54:21 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18N7VEMw021941;
-        Thu, 23 Sep 2021 04:52:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=vi//wIVyT+h5+C9jizJGkEb5o7LV4fbjChl0kUpetww=;
- b=ZahMwh30SuExkEvWaCr4uDmzth0/Ynn/aa+vNfgPGvQyFRMZP7bCkaBLi1sy5ObAJiuL
- LR6QwWhhMYvwuzAcrehriLgx+VJn6JTrHTJd+a/CPsF5+o8flAz5raWqxdCIbQGvkjs+
- 3VE4VSyxbCWJZQpU/zj9VL9diXQQm4icfrC7Izb/Pk4ZHDc85pys8hJ0buAizg9eJfOB
- p5GSaOWyBePyx3Cioe1YtKtLM3g0dXpsR4wC9TM7MxnEnfO+VEvwtSjIpl0d+xHKCzGR
- PauF1TgmwASkD1w2mvn0DmP3UD5b1kbRtDtjSsOG2ghcvqqk0cYcnigj89TJnknQm9s7 4g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b8n8q1skh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Sep 2021 04:52:21 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18N87m8F003634;
-        Thu, 23 Sep 2021 04:52:19 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b8n8q1sjg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Sep 2021 04:52:19 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18N8hx4k020988;
-        Thu, 23 Sep 2021 08:52:16 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3b7q6pq4ab-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Sep 2021 08:52:16 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18N8lKmU54133162
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Sep 2021 08:47:20 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 824174C1C0;
-        Thu, 23 Sep 2021 08:52:11 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 71F604C182;
-        Thu, 23 Sep 2021 08:52:10 +0000 (GMT)
-Received: from osiris (unknown [9.145.165.148])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 23 Sep 2021 08:52:10 +0000 (GMT)
-Date:   Thu, 23 Sep 2021 10:52:08 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Gerald Schaefer <gerald.schaefer@linux.ibm.com>, axboe@kernel.dk,
-        gregkh@linuxfoundation.org, chaitanya.kulkarni@wdc.com,
-        atulgopinathan@gmail.com, hare@suse.de, maximlevitsky@gmail.com,
-        oakad@yahoo.com, ulf.hansson@linaro.org, colin.king@canonical.com,
-        shubhankarvk@gmail.com, baijiaju1990@gmail.com, trix@redhat.com,
-        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
-        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
-        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 7/9] s390/block/dcssblk: add error handling support for
- add_disk()
-Message-ID: <YUxAOKY7dXZAABhI@osiris>
-References: <20210902174105.2418771-1-mcgrof@kernel.org>
- <20210902174105.2418771-8-mcgrof@kernel.org>
- <YTIscKy+jg5L/TMh@osiris>
- <YTLP8mYBX37R++9E@bombadil.infradead.org>
- <20210906134346.19c14246@thinkpad>
- <YT+B+vCUcpZEq8hM@bombadil.infradead.org>
+        Thu, 23 Sep 2021 05:42:03 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 262DA22350;
+        Thu, 23 Sep 2021 09:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1632390031; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tdrkbcJaQpQrn/IHpFzCloC4zCeYqpehfTVZ0y9y7nI=;
+        b=qBSKyhMIBtgtRWHLLpJDhaoNwH4u+oB2PSxzsHER0pOc4q5wZw+k6iZri+p179O5dLioqW
+        HwyQLvCbp2KGSbI1s2TMd5qWxeuOO93lRnMXr88/k45KFl1Dcu+S5BLas6IFddp7163qLk
+        9TFpVYNTdRse6meyWLSH4iT0A0hKVX0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1632390031;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tdrkbcJaQpQrn/IHpFzCloC4zCeYqpehfTVZ0y9y7nI=;
+        b=aZDce/tZEfKNoJsQXI6WrZNYLS9HtSRFb2Ci9DEHRZhTbHbKGfCo9OF0L/0tvHG1/boff6
+        GViBT5kbtk34PmAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0BC7A13DCE;
+        Thu, 23 Sep 2021 09:40:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id qaNfAo9LTGEiRQAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 23 Sep 2021 09:40:31 +0000
+Subject: Re: Too large badblocks sysfs file (was: [PATCH v3 0/7] badblocks
+ improvement for multiple bad block ranges)
+To:     Coly Li <colyli@suse.de>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        nvdimm@lists.linux.dev
+Cc:     antlists@youngman.org.uk, Dan Williams <dan.j.williams@intel.com>,
+        Jens Axboe <axboe@kernel.dk>, NeilBrown <neilb@suse.de>,
+        Richard Fan <richard.fan@suse.com>,
+        Vishal L Verma <vishal.l.verma@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rafael@kernel.org
+References: <20210913163643.10233-1-colyli@suse.de>
+ <a0f7b021-4816-6785-a9a4-507464b55895@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <6bd61a93-6fb6-2bd5-c1a6-b782e87845a4@suse.de>
+Date:   Thu, 23 Sep 2021 11:40:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YT+B+vCUcpZEq8hM@bombadil.infradead.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2XeQEdid_UYFD9jsrBRsyb10jcGxIyKO
-X-Proofpoint-GUID: oI5-SgomwrvMO_toFwGrIdfrCQ0BSo8E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-23_02,2021-09-22_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- phishscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 mlxlogscore=999 adultscore=0 impostorscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109200000 definitions=main-2109230052
+In-Reply-To: <a0f7b021-4816-6785-a9a4-507464b55895@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 09:53:14AM -0700, Luis Chamberlain wrote:
-> On Mon, Sep 06, 2021 at 01:43:46PM +0200, Gerald Schaefer wrote:
-> > On Fri, 3 Sep 2021 18:46:26 -0700
-> > Luis Chamberlain <mcgrof@kernel.org> wrote:
-> > 
-> > > On Fri, Sep 03, 2021 at 04:08:48PM +0200, Heiko Carstens wrote:
-> > > > On Thu, Sep 02, 2021 at 10:41:03AM -0700, Luis Chamberlain wrote:
-> > > > > We never checked for errors on add_disk() as this function
-> > > > > returned void. Now that this is fixed, use the shiny new
-> > > > > error handling.
-> > > > > 
-> > > > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > > > > ---
-> > > > >  drivers/s390/block/dcssblk.c | 4 +++-
-> > > > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
-> > > > > index 5be3d1c39a78..b0fd5009a12e 100644
-> > > > > --- a/drivers/s390/block/dcssblk.c
-> > > > > +++ b/drivers/s390/block/dcssblk.c
-> > > > > @@ -696,7 +696,9 @@ dcssblk_add_store(struct device *dev, struct device_attribute *attr, const char
-> > > > >  	}
-> > > > >  
-> > > > >  	get_device(&dev_info->dev);
-> > > > > -	device_add_disk(&dev_info->dev, dev_info->gd, NULL);
-> > > > > +	rc = device_add_disk(&dev_info->dev, dev_info->gd, NULL);
-> > > > > +	if (rc)
-> > > > > +		goto put_dev;
-> > > > 
-> > > > This looks not correct to me. We seem to have now in case of an error:
-> > > > 
-> > > > - reference count imbalance (= memory leak)
-> > > > - dax cleanup is missing
-> > > 
-> > > Care to provide an alternative?
-> > 
-> > See patch below:
+On 9/23/21 7:59 AM, Coly Li wrote:
+> Hi all the kernel gurus, and folks in mailing lists,
 > 
-> Thanks! Will you queue this up on your end or do would you
-> prefer for me to roll this into my tree and eventually resend
-> with the rest?
+> This is a question about exporting 4KB+ text information via sysfs
+> interface. I need advice on how to handle the problem.
+> 
+> Recently I work on the bad blocks API (block/badblocks.c) improvement,
+> there is a sysfs file to export the bad block ranges for me raid. E.g
+> for a md raid1 device, file
+>     /sys/block/md0/md/rd0/bad_blocks
+> may contain the following text content,
+>     64 32
+>    128 8
+> The above lines mean there are two bad block ranges, one starts at LBA
+> 64, length 32 sectors, another one starts at LBA 128 and length 8
+> sectors. All the content is generated from the internal bad block
+> records with 512 elements. In my testing the worst case only 185 from
+> 512 records can be displayed via the sysfs file if the LBA string is
+> very long, e.g.the following content,
+>   17668164135030776 512
+>   17668164135029776 512
+>   17668164135028776 512
+>   17668164135027776 512
+>   ... ...
+> The bad block ranges stored in internal bad blocks array are correct,
+> but the output message is truncated. This is the problem I encountered.
+> 
+> I don't see sysfs has seq_file support (correct me if I am wrong), and I
+> know it is improper to transfer 4KB+ text via sysfs interface, but the
+> code is here already for long time.
+> 
+> There are 2 ideas to fix showing up in my brain,
+> 1) Do not fix the problem
+>     Normally it is rare that a storage media has 100+ bad block ranges,
+> maybe in real world all the existing bad blocks information won't exceed
+> the page size limitation of sysfs file.
+> 2) Add seq_file support to sysfs interface if there is no
+> 
+> It is probably there is other better solution to fix. So I do want to
+> get hint/advice from you.
+> 
+> Thanks in advance for any comment :-)
+> 
+> Coly Li
+> 
+> On 9/14/21 12:36 AM, Coly Li wrote:
+>> This is the second effort to improve badblocks code APIs to handle
+>> multiple ranges in bad block table.
+>>
+>> There are 2 changes from previous version,
+>> - Fixes 2 bugs in front_overwrite() which are detected by the user
+>>    space testing code.
+>> - Provide the user space testing code in last patch.
+>>
+>> There is NO in-memory or on-disk format change in the whole series, all
+>> existing API and data structures are consistent. This series just only
+>> improve the code algorithm to handle more corner cases, the interfaces
+>> are same and consistency to all existing callers (md raid and nvdimm
+>> drivers).
+>>
+>> The original motivation of the change is from the requirement from our
+>> customer, that current badblocks routines don't handle multiple ranges.
+>> For example if the bad block setting range covers multiple ranges from
+>> bad block table, only the first two bad block ranges merged and rested
+>> ranges are intact. The expected behavior should be all the covered
+>> ranges to be handled.
+>>
+>> All the patches are tested by modified user space code and the code
+>> logic works as expected. The modified user space testing code is
+>> provided in last patch. The testing code detects 2 defects in helper
+>> front_overwrite() and fixed in this version.
+>>
+>> The whole change is divided into 6 patches to make the code review more
+>> clear and easier. If people prefer, I'd like to post a single large
+>> patch finally after the code review accomplished.
+>>
+>> This version is seriously tested, and so far no more defect observed.
+>>
+>>
+>> Coly Li
+>>
+>> Cc: Dan Williams <dan.j.williams@intel.com>
+>> Cc: Hannes Reinecke <hare@suse.de>
+>> Cc: Jens Axboe <axboe@kernel.dk>
+>> Cc: NeilBrown <neilb@suse.de>
+>> Cc: Richard Fan <richard.fan@suse.com>
+>> Cc: Vishal L Verma <vishal.l.verma@intel.com>
+>> ---
+>> Changelog:
+>> v3: add tester Richard Fan <richard.fan@suse.com>
+>> v2: the improved version, and with testing code.
+>> v1: the first completed version.
+>>
+>>
+>> Coly Li (6):
+>>    badblocks: add more helper structure and routines in badblocks.h
+>>    badblocks: add helper routines for badblock ranges handling
+>>    badblocks: improvement badblocks_set() for multiple ranges handling
+>>    badblocks: improve badblocks_clear() for multiple ranges handling
+>>    badblocks: improve badblocks_check() for multiple ranges handling
+>>    badblocks: switch to the improved badblock handling code
+>> Coly Li (1):
+>>    test: user space code to test badblocks APIs
+>>
+>>   block/badblocks.c         | 1599 ++++++++++++++++++++++++++++++-------
+>>   include/linux/badblocks.h |   32 +
+>>   2 files changed, 1340 insertions(+), 291 deletions(-)
+>>
+> 
 
-Please add the patch to your tree.
+Please have a look at the patchset 'start switching sysfs attributes to
+expose the seq_file' from Christoph Hellwig on linux-block; that seems
+to be the approach you are looking for.
+
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
