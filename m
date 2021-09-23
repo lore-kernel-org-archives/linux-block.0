@@ -2,154 +2,236 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 643CEC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 03:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4793FC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 03:35:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B2BB60EFF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 03:03:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FC3C6103D
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 03:35:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238905AbhIWDE6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 23:04:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26619 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238914AbhIWDE6 (ORCPT
+        id S239065AbhIWDgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 23:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39646 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235623AbhIWDgb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 23:04:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632366207;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wud0mbVOd87a6R67icIKZ1G5DitrJve2cTW9a5xlpqg=;
-        b=L0hKYYnieQFYQNMz361IVYqMWu4HMPeAp0YyCCTSgMI8g1kGaLBjcWHaYIXjC5699jzXEh
-        FBB8FWCCZm4qTy+gU3aHvoaDStchxt2CwBq4q09whga+yGpUV0n57w1ny/GFxcWWUBUPY/
-        hEGAcahIDE5I6O2yJ3r+nBtXgrsNqGI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-PGPSvEgsNju-TEQcLkBYKA-1; Wed, 22 Sep 2021 23:03:23 -0400
-X-MC-Unique: PGPSvEgsNju-TEQcLkBYKA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5A5A1808311;
-        Thu, 23 Sep 2021 03:03:21 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B92D75F706;
-        Thu, 23 Sep 2021 03:03:11 +0000 (UTC)
-Date:   Thu, 23 Sep 2021 11:03:23 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Paul E. McKenney" <paulmck@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        syzbot <syzbot+a10a3d280be23be45d04@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] WARNING: ODEBUG bug in blk_mq_hw_sysfs_release
-Message-ID: <YUvue9IEtXsX/rT6@T590>
-References: <000000000000bd3a8005cc78ce14@google.com>
- <87mto4gqxk.ffs@tglx>
- <20210922232702.GE880162@paulmck-ThinkPad-P17-Gen-1>
+        Wed, 22 Sep 2021 23:36:31 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89B7C061574;
+        Wed, 22 Sep 2021 20:35:00 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 81so1408379pgb.0;
+        Wed, 22 Sep 2021 20:35:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6wtxktN7r3qAuP3tkW7gYR/0jxmE+kG3y02qg3DUj3o=;
+        b=GDg2liZ+x3QXQwKe1n+6qfegRPtL672Cw4qCp/lEEFcDwyFeVs6PIOAbdVXoajgCv7
+         9jEsh89LCQcBqEeEWAjraS6DOHFVOq80yCe3i7duJOer7QBROfTkB9ugR2cLcOlWk72s
+         kuglnmRID2sFxtOWrAUfeeHoymH2xzo6A5rXM7gCjxtgUKekmik4Sfx0aidLl/YS/FE3
+         opdB8evHBLOLvVtDw4BfAMB0Zxba8DEl3XoiFGkdD/1v6CBsX3EwS85yrDFcVbDtr/SC
+         1egxEU/c475ZoSiWeUrGrko7593ixXQhu38iTbQQMj/laCWx5J31xXtlG9HuhhzjvgW8
+         tPDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6wtxktN7r3qAuP3tkW7gYR/0jxmE+kG3y02qg3DUj3o=;
+        b=7Qr12XfkGgnZKxa7aQIu+hcS/HgTHl6uPaiIU5QwZgwm/bZ9cT+dyMDLVwaA+ajpkg
+         G/6Ayi4jCv/ucgDF5kk4qTNVqp99Ae7Mwkg8tbJ0Ud7dg8YiORCK6Ll8KB2ImGkTK446
+         x0cZH3w2lzAm7QAgFzztNZU7PLMfUW05NM1+OS7sGZ1BpgxQtV8fbYs+Ulx3z3pftILH
+         CgttJrFeQRm1P1f0VA9n0PZriKm8uDFcEjFIuwJoSdPz2uiufrAztF845C4KaopCfx8X
+         5S/E/q6F76r4A3HYVqj5PdjQglpfb3Pa7+uQk8EmB/aDS9NskqixHwwy9pXnO7mgmzl3
+         TCSg==
+X-Gm-Message-State: AOAM530Ltgd2ZZtU57rtcozxV9I5MH+ludeDtLfYUQJflh2gwePKn4RH
+        quFZrD1981a3JkQ0lXCSrLM=
+X-Google-Smtp-Source: ABdhPJwhwpWmtfW0kFrjMmxVNOe5WUC/aA4ifx5mX/4aqbRqjHUCPq6NOE1BuU+VaFXpRiNDdmrcng==
+X-Received: by 2002:a63:79c7:: with SMTP id u190mr2213717pgc.378.1632368100268;
+        Wed, 22 Sep 2021 20:35:00 -0700 (PDT)
+Received: from kvm.asia-northeast3-a.c.our-ratio-313919.internal (252.229.64.34.bc.googleusercontent.com. [34.64.229.252])
+        by smtp.gmail.com with ESMTPSA id q1sm3591221pfu.4.2021.09.22.20.34.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Sep 2021 20:34:59 -0700 (PDT)
+Date:   Thu, 23 Sep 2021 03:34:54 +0000
+From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-mm@kvack.org, Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>,
+        John Garry <john.garry@huawei.com>,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC v2 PATCH] mm, sl[au]b: Introduce lockless cache
+Message-ID: <20210923033454.GA3145@kvm.asia-northeast3-a.c.our-ratio-313919.internal>
+References: <20210920154816.31832-1-42.hyeyoo@gmail.com>
+ <ebea2af2-90d0-248f-8461-80f2e834dfea@kernel.dk>
+ <20210922081906.GA78305@kvm.asia-northeast3-a.c.our-ratio-313919.internal>
+ <688e6750-87e9-fb44-ce40-943bad072e48@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210922232702.GE880162@paulmck-ThinkPad-P17-Gen-1>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <688e6750-87e9-fb44-ce40-943bad072e48@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 04:27:02PM -0700, Paul E. McKenney wrote:
-> On Thu, Sep 23, 2021 at 12:56:39AM +0200, Thomas Gleixner wrote:
-> > On Mon, Sep 20 2021 at 20:15, syzbot wrote:
+On Wed, Sep 22, 2021 at 06:58:00AM -0600, Jens Axboe wrote:
+> On 9/22/21 2:19 AM, Hyeonggon Yoo wrote:
+> > On Tue, Sep 21, 2021 at 09:37:40AM -0600, Jens Axboe wrote:
+> >>> @@ -424,6 +431,57 @@ kmem_cache_create(const char *name, unsigned int size, unsigned int align,
+> >>>  }
+> >>>  EXPORT_SYMBOL(kmem_cache_create);
+> >>>  
+> >>> +/**
+> >>> + * kmem_cache_alloc_cached - try to allocate from cache without lock
+> >>> + * @s: slab cache
+> >>> + * @flags: SLAB flags
+> >>> + *
+> >>> + * Try to allocate from cache without lock. If fails, fill the lockless cache
+> >>> + * using bulk alloc API
+> >>> + *
+> >>> + * Be sure that there's no race condition.
+> >>> + * Must create slab cache with SLAB_LOCKLESS_CACHE flag to use this function.
+> >>> + *
+> >>> + * Return: a pointer to free object on allocation success, NULL on failure.
+> >>> + */
+> >>> +void *kmem_cache_alloc_cached(struct kmem_cache *s, gfp_t gfpflags)
+> >>> +{
+> >>> +	struct kmem_lockless_cache *cache = this_cpu_ptr(s->cache);
+> >>> +
+> >>> +	BUG_ON(!(s->flags & SLAB_LOCKLESS_CACHE));
+> >>> +
+> >>> +	if (cache->size) /* fastpath without lock */
+> >>> +		return cache->queue[--cache->size];
+> >>> +
+> >>> +	/* slowpath */
+> >>> +	cache->size = kmem_cache_alloc_bulk(s, gfpflags,
+> >>> +			KMEM_LOCKLESS_CACHE_QUEUE_SIZE, cache->queue);
+> >>> +	if (cache->size)
+> >>> +		return cache->queue[--cache->size];
+> >>> +	else
+> >>> +		return NULL;
+> >>> +}
+> >>> +EXPORT_SYMBOL(kmem_cache_alloc_cached);
 > > 
-> > Cc+: paulmck
+> > Hello Jens, I'm so happy that you gave comment.
 > > 
-> > > Hello,
-> > >
-> > > syzbot found the following issue on:
-> > >
-> > > HEAD commit:    85c698863c15 net/ipv4/tcp_minisocks.c: remove superfluous ..
-> > > git tree:       net-next
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=13d9d3e7300000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=6d93fe4341f98704
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=a10a3d280be23be45d04
-> > > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11bd98f7300000
-> > >
-> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > Reported-by: syzbot+a10a3d280be23be45d04@syzkaller.appspotmail.com
-> > >
-> > > ------------[ cut here ]------------
-> > > ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
-> > > WARNING: CPU: 0 PID: 3816 at lib/debugobjects.c:505 debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-> > > Modules linked in:
-> > > CPU: 0 PID: 3816 Comm: syz-executor.0 Not tainted 5.15.0-rc1-syzkaller #0
-> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> > > RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-> > > Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd c0 39 e4 89 4c 89 ee 48 c7 c7 c0 2d e4 89 e8 ef e3 14 05 <0f> 0b 83 05 35 09 91 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
-> > > RSP: 0018:ffffc9000a6770f0 EFLAGS: 00010282
-> > > RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-> > > RDX: ffff88805b3db900 RSI: ffffffff815dbd88 RDI: fffff520014cee10
-> > > RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
-> > > R10: ffffffff815d5b2e R11: 0000000000000000 R12: ffffffff898de180
-> > > R13: ffffffff89e43440 R14: ffffffff8164bae0 R15: 1ffff920014cee29
-> > > FS:  00007fee66b3a700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > CR2: 00007f362471f3a0 CR3: 00000000272af000 CR4: 00000000001506f0
-> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > > Call Trace:
-> > >  debug_object_assert_init lib/debugobjects.c:895 [inline]
-> > >  debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:866
-> > >  debug_timer_assert_init kernel/time/timer.c:739 [inline]
-> > >  debug_assert_init kernel/time/timer.c:784 [inline]
-> > >  try_to_del_timer_sync+0x6d/0x110 kernel/time/timer.c:1229
-> > >  del_timer_sync+0x138/0x1b0 kernel/time/timer.c:1382
-> > >  cleanup_srcu_struct+0x14c/0x2f0 kernel/rcu/srcutree.c:379
+> >> What I implemented for IOPOLL doesn't need to care about interrupts,
+> >> hence preemption disable is enough. But we do need that, at least.
 > > 
-> > So cleanup_srcu_struct() tries to delete a timer which was never initialized....
-> 
-> That does not sound like a way to keep a kernel running...
-> 
-> For dynamically allocated srcu_struct structures, what is supposed to
-> happen is that init_srcu_struct() is invoked at some point before the
-> first use.  Then init_srcu_struct() invokes init_srcu_struct_fields()
-> which invokes init_srcu_struct_nodes() which initializes that timer.
-> Unless the memory allocations in init_srcu_struct_fields() failed,
-> in which case init_srcu_struct() should have handed you back a -ENOMEM.
-> 
-> OK, there is a call to init_srcu_struct() in blk_mq_alloc_hctx().
-> It does ignore the init_srcu_struct() return value, so maybe a
-> WARN_ON_ONCE(init_srcu_struct(hctx->srcu)) would be good.
+> > To be honest, that was my mistake. I was mistakenly using percpu API.
+> > it's a shame :> Thank you for pointing that.
+> > 
+> > Fixed it in v3 (work in progress now)
 
-Yeah.
+Hello Jens, thank you so much for reviewing this. Your thoughtful review helps
+a lot And I feel we're going into right direction.
 
-That should be the issue because del_timer_sync() from flush_delayed_work() in
-cleanup_srcu_struct() isn't complained from the stack trace log, and
-just the timer in perpcu field of ->sda isn't initialized, and ->sda is
-allocated via alloc_percpu().
+Anyway, let's start discussion again.
 
 > 
-> The ->srcu field is declared as follows:
+> Another thing to fix from there, just make it:
 > 
-> 	struct srcu_struct	srcu[];
+> if (cache->size)
+> 	return cached item
+> return NULL;
 > 
-> The blk_mq_hw_ctx_size() function adjusts the size.  All of this is
-> controlled by a BLK_MQ_F_BLOCKING flag.  If this flag were to change,
-> clearly bad things could happen.  The places where it is set look to me
-> to be initialization time, but it might be good to have someone familiar
-> with this code double-check this.  Or have a separate bit that records
-> the state of BLK_MQ_F_BLOCKING at blk_mq_alloc_hctx() time and complain
-> bitterly if there was a change at blk_mq_hw_sysfs_release() time.
+> No need for an if/else with the return.
 
-BLK_MQ_F_BLOCKING is set from the beginning and never changed.
+That looks better. I'll consider that in next version.
 
+> >> How does this work for preempt? You seem to assume that the function is
+> >> invoked with preempt disabled, but then it could only be used with
+> >> GFP_ATOMIC.
+> > 
+> > I wrote it just same prototype with kmem_cache_alloc, and the gfpflags
+> > parameter is unnecessary as you said. Okay, let's remove it in v3.
+> 
+> Please also run some actual comparitative benchmarks on this, with a
+> real workload. You also need an internal user of this, a stand-alone
+> feature isn't really useful. It needs someone using it, and the
+> benchmarks would be based on that (or those) use cases.
+>
+
+Yeah, That's important point too. as my project affects performance,
+I should measure the impact. And as you said, to measure impact, I should
+find use cases. For test, I made NAPI (network layer IO Polling) to use
+this. it may help measuring.
+
+So, Okay. I'll show its impact on performance, as work progresses.
+
+> Another consideration - is it going to be OK to ignore slab pruning for
+> this? Probably. But it needs to be thought about.
+>
+
+I think I should consider slab pruning too. That's one of benefits of
+using slab allocator. I'll add this in TODOs.
+
+> In terms of API, not sure why these are separate functions. Creating the
+> cache with SLAB_FOO should be enough, and then kmem_cache_alloc() tries
+> the cache first. If nothing there, fallback to the regular path.
+> Something like this would only be used for cases that have a high
+> alloc+free rate, would seem like a shame to need two function calls for
+> the case where you just want a piece of memory and the cache is empty.
+> 
+
+It would be wonderful if we can do that. And I'm working on this.
+I'm testing this in my private repository and looking at what happens.
+it seems there's some issues to solve.
+
+> >> There are basically two types of use cases for this:
+> >>
+> >> 1) Freeing can happen from interrupts
+> >> 2) Freeing cannot happen from interrupts
+> >>
+> > 
+> > I considered only case 2) when writing code. Well, To support 1),
+> > I think there are two ways:
+> > 
+> >  a) internally call kmem_cache_free when in_interrupt() is true
+> >  b) caller must disable interrupt when freeing
+> > 
+> > I think a) is okay, how do you think?
+> 
+> If the API doesn't support freeing from interrupts, then I'd make that
+> the rule. Caller should know better if that can happen, and then just
+> use kmem_cache_free() if in a problematic context. That avoids polluting
+> the fast path with that check. I'd still make it a WARN_ON_ONCE() as
+> described and it can get removed later, hopefully.
+
+Hmm.. As you mentioned above, to provide unified API, we should check
+its context in kmem_cache_alloc anyway. But yes, it is better not to allow
+calling from interrupt kmem_cache_{alloc,free}_cached.
+
+> But note it's not just the freeing side that would be problematic. If
+> you do support from-irq freeing, then the alloc side would need
+> local_irq_save/restore() instead of just basic preempt protection. That
+> would make it more expensive all around
+
+I think so too. One reason of this work is to reduce cost of disabling
+interrupts. That's costly.
+
+> > note that b) can be problematic with kmem_cache_free_bulk
+> > as it says interrupts must be enabled.
+> 
+> Not sure that's actually true, apart from being bitrot.
+
+I don't get what you mean.
+Can you tell me in detail?
+
+(Yeah, maybe I'm misunderstanding kmem_cache_{alloc,free}_bulk.)
 
 Thanks,
-Ming
+Hyeonggon Yoo
 
+> -- 
+> Jens Axboe
+> 
