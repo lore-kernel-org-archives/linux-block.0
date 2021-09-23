@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6E7C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 23:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E41F9C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 23:27:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A531360F6F
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 23:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B779560F6D
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 23:27:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243381AbhIWX2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Sep 2021 19:28:38 -0400
-Received: from mail-pj1-f53.google.com ([209.85.216.53]:52737 "EHLO
-        mail-pj1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235628AbhIWX2i (ORCPT
+        id S243550AbhIWX2k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Sep 2021 19:28:40 -0400
+Received: from mail-pj1-f41.google.com ([209.85.216.41]:56258 "EHLO
+        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243400AbhIWX2j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Sep 2021 19:28:38 -0400
-Received: by mail-pj1-f53.google.com with SMTP id v19so5525914pjh.2
-        for <linux-block@vger.kernel.org>; Thu, 23 Sep 2021 16:27:06 -0700 (PDT)
+        Thu, 23 Sep 2021 19:28:39 -0400
+Received: by mail-pj1-f41.google.com with SMTP id t20so5502240pju.5
+        for <linux-block@vger.kernel.org>; Thu, 23 Sep 2021 16:27:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=W1+ihNENtaOKfFRhllTtY8Ka3bwanKzRizQI2gu09y0=;
-        b=6WYzglPi5VmKp6RPCiM6BUVwOmkGRV81QKxzSAE3iyqBNMN6RyoYO6iRMSdHuN4HD0
-         f7qRM4F8OgWMg1MDQ27Er1jlL/oJ9kw+FRSEgi5lRb3xmqo1rCRwH1qewTicY5DsPwJG
-         w0J7kdPjPvP/5JFx3f3eoKnU8x//lcQl46BWzf0mX6bwOkCCuoiQCJVLbyyaxjOwWyt6
-         lib4RPZDuhntBP/OLQZ+rE6Eo3jdLGaXumDuaw2emlHyQsqdlwBMuKI6uAYSurPcbOir
-         lov0v/BpvvPiPS0mMRW6bpv1DvOUrqhPc3roLqH8ZX8Ffp03/K9T9+6t0q2ZbWrCryTH
-         77cQ==
-X-Gm-Message-State: AOAM531sTUbI1uPCY4DG9gLMEPxFoVmLtXVLBin81AIXtA2nuDpGH45k
-        fkYN3frGU/akmtRMCkgCL14=
-X-Google-Smtp-Source: ABdhPJwWR0HsU7YQPJjOZMTbVZU1El7Z815Ccl970rJjQmVieOwcBx8SFBmTpDB8OZRhCDJ+7JjiRw==
-X-Received: by 2002:a17:90a:352:: with SMTP id 18mr8278194pjf.116.1632439625825;
-        Thu, 23 Sep 2021 16:27:05 -0700 (PDT)
+        bh=a3Nr7yvQYh2LhcnHCVBvuOZMF01yI2XYwV6hRDodYkE=;
+        b=cpczxnr+aM/IODNBiu+VzF++R8q2fA+r/fB/CY0Z/bAKFzwjtZVFoQNq7cWmfxRZjH
+         pEBmyAfhhxFFinih3t5AoDQd6MFnlio6SgwmS6Jak7fJsdIk17odbzywKQ1zs0ex5ika
+         ClZRge1mJ8YEPtMyW1xwGqnXfrmib3ZJWQ6MhsFzrhXuIgPHDb+qcn/15jcBc/DHNFqL
+         pPD+zXkBr6Yv6AnpAlQoNm7Rt89Gl/CGIU8Ca4pHJlGB5cT2kEdH3OrkirumzXyBLQDp
+         TetASywe0PrDZcpH7PTx/3ee3URdLPTDKAyoo965PiTx2bjgHRRPm+HNmOBtOpARQgxH
+         D5qA==
+X-Gm-Message-State: AOAM532ZQkM3HrdoOmgj3R/rC0g1ccozcVZw4vaBhGwoi3OFT1dIxkYm
+        dG2rg/1Gr1Or0RXptbGTME8=
+X-Google-Smtp-Source: ABdhPJxGL6HPjJXtujEN85Qcj9GHCOY0R7an/4R87Enuf9Mvj2cfgw5oQqDbENRUE0oUTPIy0leJAQ==
+X-Received: by 2002:a17:902:8ec5:b0:13a:2789:cbb0 with SMTP id x5-20020a1709028ec500b0013a2789cbb0mr6459965plo.60.1632439627131;
+        Thu, 23 Sep 2021 16:27:07 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:bf91:ebe7:eabf:7473])
-        by smtp.gmail.com with ESMTPSA id o14sm6969807pfh.84.2021.09.23.16.27.04
+        by smtp.gmail.com with ESMTPSA id o14sm6969807pfh.84.2021.09.23.16.27.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Sep 2021 16:27:05 -0700 (PDT)
+        Thu, 23 Sep 2021 16:27:06 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -50,67 +50,71 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Niklas Cassel <Niklas.Cassel@wdc.com>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 1/4] block/mq-deadline: Improve request accounting further
-Date:   Thu, 23 Sep 2021 16:26:52 -0700
-Message-Id: <20210923232655.3907383-1-bvanassche@acm.org>
+Subject: [PATCH 2/4] block/mq-deadline: Add an invariant check
+Date:   Thu, 23 Sep 2021 16:26:53 -0700
+Message-Id: <20210923232655.3907383-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-In-Reply-To: <20210923232358.3907118-1-bvanassche@acm.org>
+In-Reply-To: <20210923232655.3907383-1-bvanassche@acm.org>
 References: <20210923232358.3907118-1-bvanassche@acm.org>
+ <20210923232655.3907383-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The scheduler .insert_requests() callback is called when a request is
-queued for the first time and also when it is requeued. Only count a
-request the first time it is queued. Additionally, since the mq-deadline
-scheduler only performs zone locking for requests that have been
-inserted, skip the zone unlock code for requests that have not been
-inserted into the mq-deadline scheduler.
+Check a statistics invariant at module unload time. When running
+blktests, the invariant is verified every time a request queue is
+removed and hence is verified at least once per test.
 
-Fixes: 38ba64d12d4c ("block/mq-deadline: Track I/O statistics")
 Cc: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: Niklas Cassel <Niklas.Cassel@wdc.com>
 Cc: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ block/mq-deadline.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 7f3c3932b723..b1175e4560ad 100644
+index b1175e4560ad..6deb4306bcf3 100644
 --- a/block/mq-deadline.c
 +++ b/block/mq-deadline.c
-@@ -677,8 +677,10 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	blk_req_zone_write_unlock(rq);
+@@ -270,6 +270,12 @@ deadline_move_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+ 	deadline_remove_request(rq->q, per_prio, rq);
+ }
  
- 	prio = ioprio_class_to_prio[ioprio_class];
--	dd_count(dd, inserted, prio);
--	rq->elv.priv[0] = (void *)(uintptr_t)1;
-+	if (!rq->elv.priv[0]) {
-+		dd_count(dd, inserted, prio);
-+		rq->elv.priv[0] = (void *)(uintptr_t)1;
-+	}
- 
- 	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
- 		blk_mq_free_requests(&free);
-@@ -759,12 +761,13 @@ static void dd_finish_request(struct request *rq)
- 
- 	/*
- 	 * The block layer core may call dd_finish_request() without having
--	 * called dd_insert_requests(). Hence only update statistics for
--	 * requests for which dd_insert_requests() has been called. See also
--	 * blk_mq_request_bypass_insert().
-+	 * called dd_insert_requests(). Skip requests that bypassed I/O
-+	 * scheduling. See also blk_mq_request_bypass_insert().
- 	 */
--	if (rq->elv.priv[0])
--		dd_count(dd, completed, prio);
-+	if (!rq->elv.priv[0])
-+		return;
++/* Number of requests queued for a given priority level. */
++static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
++{
++	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);
++}
 +
-+	dd_count(dd, completed, prio);
+ /*
+  * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
+  * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
+@@ -539,6 +545,12 @@ static void dd_exit_sched(struct elevator_queue *e)
  
- 	if (blk_queue_is_zoned(q)) {
- 		unsigned long flags;
+ 		WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_READ]));
+ 		WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_WRITE]));
++		WARN_ONCE(dd_queued(dd, prio) != 0,
++			  "statistics for priority %d: i %u m %u d %u c %u\n",
++			  prio, dd_sum(dd, inserted, prio),
++			  dd_sum(dd, merged, prio),
++			  dd_sum(dd, dispatched, prio),
++			  dd_sum(dd, completed, prio));
+ 	}
+ 
+ 	free_percpu(dd->stats);
+@@ -950,12 +962,6 @@ static int dd_async_depth_show(void *data, struct seq_file *m)
+ 	return 0;
+ }
+ 
+-/* Number of requests queued for a given priority level. */
+-static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
+-{
+-	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);
+-}
+-
+ static int dd_queued_show(void *data, struct seq_file *m)
+ {
+ 	struct request_queue *q = data;
