@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04265C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF528C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB1CE60FC1
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B244B6115A
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238832AbhIWBwa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 21:52:30 -0400
-Received: from mail-bn1nam07on2067.outbound.protection.outlook.com ([40.107.212.67]:7755
-        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
+        id S238840AbhIWBwk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 21:52:40 -0400
+Received: from mail-bn7nam10on2071.outbound.protection.outlook.com ([40.107.92.71]:14915
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238817AbhIWBw3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 21:52:29 -0400
+        id S238817AbhIWBwk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Sep 2021 21:52:40 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IVWnJ30vQUaNxihC2hRw0A04dPvLAQ5OhAqJyHU6T/KEt2FWeBW1Y6y2wxVnwkh39su7zTC57K/L0piAHk2EEYr+I93txS72NlIfSZA2RF0uP0b+YZ7XJzkoNnn3PAd7rgvtzTCS6NvAydGPh2GSn8KzNORlMHhyi1zHLRDixPFKMHDtyEX4FhkNByHbFsph2x4RS0tkEBax6wJdPzHPYyZjV34SvZ863UPNyx0m+EU7/dP+INvK48ax9raVcVm64vsQ5LQXhfgIe3WUmtplyCgBXSQBiZbU/8kdNPUh9p4upRnWG3AFFUg4mSnqp6wJYopQ2FOJ9jpzMbXZ+uSdZw==
+ b=cz6twmDyXU4O6r3nY3X2aq82o1mE1GpBZnpIshXQsqmmL1w4Fnl6jNOfmtaQOMy4P2+hY469li0drGvSHOyUtCW7VGRnm71msLSMhJenV7grjLItBS4M1Dtc0VqJlqW9wlXSZ+wVJV6iAv6UPhawITMQnEsdRFQMHIY4Ju4of+7IyCWIDoQBJ1W9sjvjTDe8InY8MjsoZmBs62u0X8VNL6Tqfm8HDxt1pLxYSaku2nGflOZm3Ag+rECfMO2Xq/OBf4plWMODKKKAJPRgNCkUsmm7m79Rplmn3WbhWWDChIu/SYOvBLOapcBl46J7W3Ckw68XkTm+AImorRHBSFxZ5g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=Gl2WszHW5c7knAkG206RrWW9l/E9N/SnUN07GajKMXY=;
- b=VrLpR6Fixy/mzSOMa8U/XjtPwdOyZIWQhJU4wrleIze6gFhKM11RQ0qpjNJaLrCOXAEXgIFhFd/i397823dET9v8QbcqjnV4181DpP+PO5PgAWAzAuuHu/DPfVFsSzHsM5a3WSsIqAnZIRZu+GahAbBAL/4V8tqoaaUeU8XdWl10MwT76f72ugoWF1VUaMy65XhTpKvV3NgtpyZheGw0qaUoP6N/lC/j8bWYw0IzmiXdOCkz9R3WEVXq9sNOjwizOii3Oc6SETS0w7fvV/r0JV8onHQk9XHQzppscEsqmjwQQfOsqsf1nNIul46D8BzTJf1CyERV5jqKkWmCKXQeHw==
+ bh=3KvSj+h078RU2g6dCUQIzA4y1ESajFKmU8Vl9gMI4d8=;
+ b=OLtnv2nlfTG10t7AEqVTInT5EBkHfobK3ZFSkv9f41PRpte87PJ4my9mw3Rcd3b7KNKGpvrldnFxX1UqQRLHlLgr60QNVWUH3UsY0NNmMDVkQpMvPVQSu1GaHmqAb7a58tvkQfLaG9T8vvZCzMpr0U+feuX514styX6q89ubyaB1Zj25iG0w+Y5WR/hv4hnoHRt3uWJ2N1odZx5ktVvb+jwtizYUcCOOpU9nwgGVdcsqtl9V6axavSZd41fu0d5RVvQa3V1Q1BWaqw9ZmEN9DKS02nmAngqeVYgbDk8Mk7hcjOn3xYmMiXV2jdBvwAVTxO4wgELZX+QDjjhMWrZ3rQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.35) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.112.32) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gl2WszHW5c7knAkG206RrWW9l/E9N/SnUN07GajKMXY=;
- b=ItoMrZSIerTC74bolIMHWBGLEv62nszGU0/nv+H39haHmbwVZM2mueFoiDSxB7caxT8PxVr7X+d23qqr8RqM00ffyNURuPLrGkRuaX9Ujox6oBPzM3xG7OkHMjbXJ5JpTcTLa2eKvID8G/vl57B7ioVRHYvJbm+XRigQJrSrX7UQUPmjZ83Jp44BGSL/0pRfcI6y6n10sbimdPOAuTCKf3NyK3Y4ZOdzeAjmxtIt3D2HtDR/gdmpj+eTPmEkSvitG8sHqtVeNRKk1IYIYli+r9cAjQBzY8f9YIpxRABDrXSKF1dYngST1rzeZlNv54k6BnIgNEcMeQZqXC/zK/4udQ==
-Received: from DM5PR06CA0077.namprd06.prod.outlook.com (2603:10b6:3:4::15) by
- DM6PR12MB4941.namprd12.prod.outlook.com (2603:10b6:5:1b8::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4544.15; Thu, 23 Sep 2021 01:50:57 +0000
-Received: from DM6NAM11FT068.eop-nam11.prod.protection.outlook.com
- (2603:10b6:3:4:cafe::70) by DM5PR06CA0077.outlook.office365.com
- (2603:10b6:3:4::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend
- Transport; Thu, 23 Sep 2021 01:50:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
+ bh=3KvSj+h078RU2g6dCUQIzA4y1ESajFKmU8Vl9gMI4d8=;
+ b=FRnrTEcXq9Dd+K+3dUPiVCiHwvDLnpeFVt5+0s/BYa09e1GLGM55FTkWN+IS5LX0cid1fcxHe1Qy1s+xx0DAmpF83fiZd3F+xVLSxzIrEYgMVzzkuW0DiGAUhhmhFQMoZkL2Fkthg2g56zA7Kd/Q2wo3tPOk8HSvpNQa0YhRPc6lMbKP/KZsGOihLatA7R642etsfV2NGrXxSFgpRph0GXd1wQExJl3CC+TiX2See37GB5rSFETQf/I57hKlId2V1/JT13WIfLacXKf57iUMLbsZYC3fhf5uje06lxgt2hlojbPCQ4KvQnK74OcqLQWWGA9FtRFSFIjA9qo7U2vlow==
+Received: from DM6PR18CA0029.namprd18.prod.outlook.com (2603:10b6:5:15b::42)
+ by CH2PR12MB4024.namprd12.prod.outlook.com (2603:10b6:610:2a::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Thu, 23 Sep
+ 2021 01:51:08 +0000
+Received: from DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:15b:cafe::fa) by DM6PR18CA0029.outlook.office365.com
+ (2603:10b6:5:15b::42) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14 via Frontend
+ Transport; Thu, 23 Sep 2021 01:51:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
  smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.35; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.35) by
- DM6NAM11FT068.mail.protection.outlook.com (10.13.173.67) with Microsoft SMTP
+ 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.32; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.32) by
+ DM6NAM11FT060.mail.protection.outlook.com (10.13.173.63) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4544.13 via Frontend Transport; Thu, 23 Sep 2021 01:50:57 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 23 Sep
- 2021 01:50:56 +0000
+ 15.20.4544.13 via Frontend Transport; Thu, 23 Sep 2021 01:51:08 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 22 Sep
+ 2021 18:51:07 -0700
 Received: from dev.nvidia.com (172.20.187.6) by DRHQMAIL107.nvidia.com
  (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 23 Sep
- 2021 01:50:56 +0000
+ 2021 01:51:06 +0000
 From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
 To:     <linux-block@vger.kernel.org>
 CC:     Chaitanya Kulkarni <kch@nvidia.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: [PATCH V2 6/8] loop: remove extra variable in lo_fallocate()
-Date:   Wed, 22 Sep 2021 18:49:43 -0700
-Message-ID: <20210923014945.6229-7-chaitanyak@nvidia.com>
+Subject: [PATCH V2 7/8] loop: remove extra variable in lo_req_flush
+Date:   Wed, 22 Sep 2021 18:49:44 -0700
+Message-ID: <20210923014945.6229-8-chaitanyak@nvidia.com>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20210923014945.6229-1-chaitanyak@nvidia.com>
 References: <20210923014945.6229-1-chaitanyak@nvidia.com>
@@ -78,33 +79,33 @@ X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
  DRHQMAIL107.nvidia.com (10.27.9.16)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e77c32cc-e06d-4e51-a2ac-08d97e349638
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4941:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4941FE6F3BE6171F0F0FE53BA3A39@DM6PR12MB4941.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: fe73300c-50fe-46eb-f3ae-08d97e349cb6
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4024:
+X-Microsoft-Antispam-PRVS: <CH2PR12MB402470CDACF1B09F48E7FDD8A3A39@CH2PR12MB4024.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kCM7Jc0oevMNpXpxJMwTpDKvZoLuL/q2JRYI72085lbcTQExEcONhTnruyTt3ItD2aCEunOUacOsSh6prDbPT3PZP9LPuDJDQto6RX6J1GQ/PuOtIOWPW817ZuNws+WId1d+5GcqUVzrpJ5j2iQSFPQJ1vYEyi+GhEmhUKMsWyvra/neFZ9F1jmmByj4NMYt3aUN0PbsOvp9eYVx0qbfMHBcNfFM50Co22cQ7EXrytzTd80tKKXAVHXE1+ZVmpu5J8ouX5Dvlgk1YjMYXrLfUXPTmRUoYiMOp0AVEoJ4uOteXCHpXd3vUP4VCjpy3t/X+Pbl6dXV4BQp8uHxziLA/aVIUTmTecrh6IVYxY0AcBCtxP9xiUFJo308HqtHy+QjAFEkJTmAN0HLmqH/tEauhAspvtNcwuA2q5CRrqKPzZc43YCTZSagdhVuSfHj3r1mYGBZlPwYCTQq7+yeFpHPwrYDL1CXmlOdF20hm8NqA4GOrGD/T/NFI/iD0pBPkhUvyigoTzFqlTpgdeW+w7dkTc+2XEULhT2JyJMKKTBYtcPQyXAxHln/qySR7qcpjxx97PKSWjhoZm7N0p0nnDjfEkUKV/B9vHQ32hrRsLOuZlpyPLfpuWZP6+hDcl6pNT1cH9gIWd8pNyhpxJh4WxEoYQLCHKR615H+oeEJ3WqzySUPK9ZoIM/p5WJEc0pb0V+OkhW/zI2Dq3GShxPfezFMmw==
-X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(26005)(16526019)(186003)(7696005)(508600001)(1076003)(36756003)(47076005)(36860700001)(86362001)(82310400003)(83380400001)(336012)(2616005)(426003)(6916009)(4326008)(8676002)(54906003)(70206006)(8936002)(36906005)(70586007)(5660300002)(6666004)(2906002)(316002)(7636003)(356005)(4744005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: JZCXc/7fPoIhLZORiY6ayw3XHttsRzjIUfcc+u13z4qPKcDBwxIf7yO89E9mwniLtESsR0nKYK5pq/PQcb9XoZttS+hi31N81TaGUvL4rqROUgmeU/T5aeEghLCaMEf0+cYd0h+eE3GxwAf027GpE6Hbi/XKwOlxeYcpMepAICYZ/aDTEqHNeuHj8pOfbfKOMnVzjfsdIFuZFPUBSp+yIyHf35Zg+ALeojlekArhskkc5BxsWjtF7Ojn2wN/My012TPzbud8V4gOEnmEFedtdF9T+IlCcq4COmOehQ4/E73m+tLrhLTyl3UmatHY/v6I8FPTGevrF9SaB51rZA6fo6sl8uKc4zpE7dxCESsKvRw3QEK6Y1JYqSNr/irlVdvij91fBOOvc5HqIraNUdnCFkBzolIpHdoxgonw6kNt/6olppS4123gQZ3e4lz1b0F8S2zLJ9FIazWEIs34C/bQ83fYxtWaCIVDFEPdP6v44QmmOkLQjLCWbcT7Q37y51isaJbmVoWbRmMDylRIpvDdgcZzz2JSGuXzO+AloPL/9zw/XwFyhn1XZ3MVX3YGaMEO6VYqk/9rABuFdPUEDajMhK2zKB5p6GmxEpQQZ3Cqrpfu9Pg+xRcjME/ebhynjVIDMn4lUUghnOCZ56QpJP1dHxtxVTiJw/vtMxEPgJZDbPvjvdQRRKEKUXq4PM/qMphYVmT96rgcga40scZmLM3zPQ==
+X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(83380400001)(2616005)(86362001)(82310400003)(36860700001)(2906002)(16526019)(4744005)(5660300002)(508600001)(4326008)(1076003)(70586007)(426003)(8936002)(6666004)(8676002)(316002)(186003)(6916009)(7696005)(7636003)(47076005)(54906003)(356005)(36756003)(70206006)(336012)(26005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2021 01:50:57.2159
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2021 01:51:08.1171
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e77c32cc-e06d-4e51-a2ac-08d97e349638
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe73300c-50fe-46eb-f3ae-08d97e349cb6
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT068.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4941
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4024
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chaitanya Kulkarni <kch@nvidia.com>
 
-The local variable q is used to pass it to the blk_queue_discard(). We
-can get away with using lo->lo_queue instead of storing in a local
+The local variable file is used to pass it to the vfs_fsync(). We can
+get away with using lo->lo_backing_file instead of storing in a local
 variable which is not used anywhere else.
 
 No functional change in this patch.
@@ -116,23 +117,19 @@ Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index fedb8d63b4c6..51c42788731a 100644
+index 51c42788731a..6478d3b0dd2a 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -480,12 +480,11 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 	 * information.
- 	 */
- 	struct file *file = lo->lo_backing_file;
--	struct request_queue *q = lo->lo_queue;
- 	int ret;
+@@ -498,8 +498,7 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
  
- 	mode |= FALLOC_FL_KEEP_SIZE;
+ static int lo_req_flush(struct loop_device *lo, struct request *rq)
+ {
+-	struct file *file = lo->lo_backing_file;
+-	int ret = vfs_fsync(file, 0);
++	int ret = vfs_fsync(lo->lo_backing_file, 0);
+ 	if (unlikely(ret && ret != -EINVAL))
+ 		ret = -EIO;
  
--	if (!blk_queue_discard(q)) {
-+	if (!blk_queue_discard(lo->lo_queue)) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
- 	}
 -- 
 2.29.0
 
