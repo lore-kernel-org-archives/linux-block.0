@@ -2,221 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FSL_HELO_FAKE,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23AC2C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 00:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAC4C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 00:30:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0710661211
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 00:09:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E5F561019
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 00:30:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238524AbhIWALJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 20:11:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50388 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234042AbhIWALI (ORCPT
+        id S238655AbhIWAbd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 20:31:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48995 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233466AbhIWAbd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 20:11:08 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446C4C061574;
-        Wed, 22 Sep 2021 17:09:38 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id x8so40149plv.8;
-        Wed, 22 Sep 2021 17:09:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iFkB5fme+CelwvcZTt3G4GpebT1AmOGCopDfcgu4IMY=;
-        b=K85On/qxOX5mja29mIJTCOx8QbuXtejSE7cjRrSsQykEb5pzC2EsDIvMD7GR2F9UHf
-         l/YnAm83eAPIyHB4fwfoDGdmRhB/iQwJ+Vn5Bv4C9iLSUuCjdHfd8Sf+PrZH8oTHBJoa
-         WwQ52oYukfwPNtGV/UjasT3IZwZaP18E9fTsezick9dHV4wMdL+pEEd9e7+cmaJdE0cl
-         NKnk/Gu4pX5mLbD+5xzB85t2KKTepllut9hWx+SXtdFQD/asR0ysVfW8lhVS+pg77oDH
-         YiKATt58h+TJZftlgupWn1MoSCgB41r3rHhDFLGXhang2400Ndags2bYCIhuXq3dWsTh
-         Li6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=iFkB5fme+CelwvcZTt3G4GpebT1AmOGCopDfcgu4IMY=;
-        b=4i0AbHw3eH41kpjDWHhBeeKpZmTD49A57APn7ezr9fzRGPId28L490bGKGfX6n5cBX
-         bxMXwFrtqE/jRtdB1cr+ymgNIGhpGbQPgVbEbIjNU4CtaEuvH4ZxGTIsVE0xgDkdXHIg
-         XwzE1H+eAa0qCbIPOOeoIYHj6CJxCVNcqQo3Il8CUbgA8OaLpl2Y60ezszN1i75Nok/1
-         iMvsXxYnZpid0UAI1C6jIiDLxSCT/XUo3KXrJgviyMKsv1oLJIsP2GYEAhSsthHsDyhm
-         pNFU36PeglFin2JpDBjrCgO1MPBUW3fQsCEMW3PQtFajYNKPwUrzSTrNurvE9w2ZYs0d
-         w4eA==
-X-Gm-Message-State: AOAM532JT8YUH1UFJ6Dp74cxg8z5DhWP5o21K6qerY8tpCqFBrdW0j7i
-        g7Qv3ntNbA9YuQ/6L8GDuhU=
-X-Google-Smtp-Source: ABdhPJySc6Flx569FLZ1Ia0GBeEbtzFrD7cac1Bu/QkO/8toiTv+x7ukhynfN9KppgfCYGduXvjjiw==
-X-Received: by 2002:a17:902:ea10:b0:13c:ac71:386 with SMTP id s16-20020a170902ea1000b0013cac710386mr1333653plg.65.1632355777661;
-        Wed, 22 Sep 2021 17:09:37 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:6a2a:9e3c:d2c:e8bc])
-        by smtp.gmail.com with ESMTPSA id nm23sm3443344pjb.26.2021.09.22.17.09.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 17:09:36 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Wed, 22 Sep 2021 17:09:34 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Brian Geffon <bgeffon@google.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>,
-        Jesse Barnes <jsbarnes@google.com>
-Subject: Re: [PATCH v3] zram: Introduce an aged idle interface
-Message-ID: <YUvFvsyrp86mbjbY@google.com>
-References: <20210917210640.214211-1-bgeffon@google.com>
- <20210921194336.947226-1-bgeffon@google.com>
+        Wed, 22 Sep 2021 20:31:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632357002;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GQ4nKO9QLZyOaq5KobOVDwUgQKCMwd+DmtbeAAuRsqo=;
+        b=fYy9/f4zviyKDIkVNuRG6OJbY2OPIPCgjb5k72NQzmTAOwxuYPAWmBaHlVyeqBh843CIUw
+        7nXH8KT3RzHtfTMfSJF2QGuElb7wDlZrg/yad6D7D90FdMCetf+UE9FbmHSAqrGtVZzv8z
+        OgPJR7rmN68Ci8bErTA/i26PbcNQlFk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-483-51W_odj_PrevgNel2Mccng-1; Wed, 22 Sep 2021 20:29:58 -0400
+X-MC-Unique: 51W_odj_PrevgNel2Mccng-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13C77180830E;
+        Thu, 23 Sep 2021 00:29:57 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9644B60BF1;
+        Thu, 23 Sep 2021 00:29:48 +0000 (UTC)
+Date:   Thu, 23 Sep 2021 08:29:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, hch@infradead.org,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [patch v8 3/7] nbd: check sock index in nbd_read_stat()
+Message-ID: <YUvKhQUVp9J+s8WY@T590>
+References: <20210916093350.1410403-1-yukuai3@huawei.com>
+ <20210916093350.1410403-4-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210921194336.947226-1-bgeffon@google.com>
+In-Reply-To: <20210916093350.1410403-4-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 21, 2021 at 12:43:36PM -0700, Brian Geffon wrote:
-> This change introduces an aged idle interface to the existing
-> idle sysfs file for zram.
+On Thu, Sep 16, 2021 at 05:33:46PM +0800, Yu Kuai wrote:
+> The sock that clent send request in nbd_send_cmd() and receive reply
+> in nbd_read_stat() should be the same.
 > 
-> When CONFIG_ZRAM_MEMORY_TRACKING is enabled the idle file
-> now also accepts an integer argument. This integer is the
-> age (in seconds) of pages to mark as idle. The idle file
-> still supports 'all' as it always has. This new approach
-> allows for much more control over which pages get marked
-> as idle.
-> 
->   v2 -> v3:
-> 	- Correct unused variable warning when
-> 	  CONFIG_ZRAM_MEMORY_TRACKING is not enabled.
->   v1 -> v2:
-> 	- Switch to using existing idle file.
-> 	- Dont compare ktime directly.
-> 
-> Signed-off-by: Brian Geffon <bgeffon@google.com>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 > ---
->  Documentation/admin-guide/blockdev/zram.rst |  8 +++
->  drivers/block/zram/zram_drv.c               | 60 +++++++++++++++------
->  2 files changed, 52 insertions(+), 16 deletions(-)
+>  drivers/block/nbd.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
-> index 700329d25f57..8c8a92e5c00c 100644
-> --- a/Documentation/admin-guide/blockdev/zram.rst
-> +++ b/Documentation/admin-guide/blockdev/zram.rst
-> @@ -328,6 +328,14 @@ as idle::
->  From now on, any pages on zram are idle pages. The idle mark
->  will be removed until someone requests access of the block.
->  IOW, unless there is access request, those pages are still idle pages.
-> +Additionally, when CONFIG_ZRAM_MEMORY_TRACKING is enabled pages can be
-> +marked as idle based on how long (in seconds) it's been since they were
-> +last accessed, in seconds::
-> +
-> +        echo 86400 > /sys/block/zramX/idle
-> +
-> +In this example all pages which haven't been accessed in more than 86400
-> +seconds (one day) will be marked idle.
->  
->  Admin can request writeback of those idle pages at right timing via::
->  
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index fcaf2750f68f..2af5cdb8da1a 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -291,22 +291,16 @@ static ssize_t mem_used_max_store(struct device *dev,
->  	return len;
->  }
->  
-> -static ssize_t idle_store(struct device *dev,
-> -		struct device_attribute *attr, const char *buf, size_t len)
-> +/*
-> + * Mark all pages which are older than or equal to cutoff as IDLE.
-> + * Callers should hold the zram init lock in read mode
-> + **/
-> +static void mark_idle(struct zram *zram, ktime_t cutoff)
->  {
-> -	struct zram *zram = dev_to_zram(dev);
-> +	int is_idle = 1;
->  	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
->  	int index;
->  
-> -	if (!sysfs_streq(buf, "all"))
-> -		return -EINVAL;
-> -
-> -	down_read(&zram->init_lock);
-> -	if (!init_done(zram)) {
-> -		up_read(&zram->init_lock);
-> -		return -EINVAL;
-> -	}
-> -
->  	for (index = 0; index < nr_pages; index++) {
->  		/*
->  		 * Do not mark ZRAM_UNDER_WB slot as ZRAM_IDLE to close race.
-> @@ -314,14 +308,48 @@ static ssize_t idle_store(struct device *dev,
->  		 */
->  		zram_slot_lock(zram, index);
->  		if (zram_allocated(zram, index) &&
-> -				!zram_test_flag(zram, index, ZRAM_UNDER_WB))
-> -			zram_set_flag(zram, index, ZRAM_IDLE);
-> +				!zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
-> +#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-> +			is_idle = (!cutoff || ktime_after(cutoff, zram->table[index].ac_time));
-> +#endif
-> +			if (is_idle)
-> +				zram_set_flag(zram, index, ZRAM_IDLE);
-> +		}
->  		zram_slot_unlock(zram, index);
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 614c6ab2b8fe..c724a5bd7fa4 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -746,6 +746,10 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+>  		ret = -ENOENT;
+>  		goto out;
 >  	}
-> +}
->  
-> -	up_read(&zram->init_lock);
-> +static ssize_t idle_store(struct device *dev,
-> +		struct device_attribute *attr, const char *buf, size_t len)
-> +{
-> +	struct zram *zram = dev_to_zram(dev);
-> +	ktime_t cutoff_time = 0;
-> +	ssize_t rv = -EINVAL;
->  
-> -	return len;
-> +	if (!sysfs_streq(buf, "all")) {
-> +#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-> +		u64 age_sec;
-> +		/* If it did not parse as 'all' try to treat it as an integer */
-> +		if (!kstrtoull(buf, 10, &age_sec))
-
-nit:
-Do we need such limit base which work with only 10 base?
-Passing 0 would give more flexibility. 
-
-Otherwise, looks good to me.
-
-Thanks, Brian.
-
-> +			cutoff_time = ktime_sub(ktime_get_boottime(),
-> +					ns_to_ktime(age_sec * NSEC_PER_SEC));
-> +		else
-> +#endif
-> +			goto out;
+> +	if (cmd->index != index) {
+> +		dev_err(disk_to_dev(nbd->disk), "Unexpected reply %d from different sock %d (expected %d)",
+> +			tag, index, cmd->index);
 > +	}
-> +
-> +	down_read(&zram->init_lock);
-> +	if (!init_done(zram))
-> +		goto out_unlock;
-> +
-> +	/* A age_sec of 0 marks everything as idle, this is the "all" behavior */
-> +	mark_idle(zram, cutoff_time);
-> +	rv = len;
-> +
-> +out_unlock:
-> +	up_read(&zram->init_lock);
-> +out:
-> +	return rv;
->  }
->  
->  #ifdef CONFIG_ZRAM_WRITEBACK
+>  	if (cmd->cmd_cookie != nbd_handle_to_cookie(handle)) {
+>  		dev_err(disk_to_dev(nbd->disk), "Double reply on req %p, cmd_cookie %u, handle cookie %u\n",
+>  			req, cmd->cmd_cookie, nbd_handle_to_cookie(handle));
 > -- 
-> 2.33.0.464.g1972c5931b-goog
+> 2.31.1
 > 
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming
+
