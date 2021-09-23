@@ -7,93 +7,103 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E147FC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 06:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E22CC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 06:47:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC0A96109E
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 06:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5274A61107
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 06:47:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239329AbhIWGmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Sep 2021 02:42:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23199 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237097AbhIWGmE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Sep 2021 02:42:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632379232;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Zrr7V6mPZZA/VKw5kQJ98ZtWmHqjzxTny3rVI8cigZk=;
-        b=CD/RpK8/KulUYqxiSx1ivtQq4AcyXamWt07EsxKYIKfQU5shiCLE6dGwHqkm9iBptECO/o
-        QxeCPdfUt2uTaO3lon5/opk5BEZ+BZLh6bgeqtaBJuAVh2q7itrVnvZMXg1Rl8WTOBzoWD
-        EzAFLbyS4/ZUk3BAVCY94MpksGOzguw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-D5h3Pv2AMLCntrGEo3P34A-1; Thu, 23 Sep 2021 02:40:29 -0400
-X-MC-Unique: D5h3Pv2AMLCntrGEo3P34A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC734A40C2;
-        Thu, 23 Sep 2021 06:40:28 +0000 (UTC)
-Received: from T590 (ovpn-8-34.pek2.redhat.com [10.72.8.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F1D5219724;
-        Thu, 23 Sep 2021 06:39:47 +0000 (UTC)
-Date:   Thu, 23 Sep 2021 14:39:59 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/4] block: drain file system I/O on del_gendisk
-Message-ID: <YUwhPy1J8lzHQF77@T590>
-References: <20210922172222.2453343-1-hch@lst.de>
- <20210922172222.2453343-4-hch@lst.de>
- <YUvZi2a0KjxEkiHo@T590>
- <20210923052705.GA5314@lst.de>
+        id S239363AbhIWGt3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Sep 2021 02:49:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47756 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239359AbhIWGt2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Sep 2021 02:49:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B98D2610D1;
+        Thu, 23 Sep 2021 06:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1632379677;
+        bh=AF60ZPwUP8z9XvN4FVZ6x/vIwqknICKlpihnYWy1TEU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Qvh3psuo++MhYg868DDM5/QIZsRvkN1DZFAmj6R7h4FhZS8cXaZN48sQjErG2rb7S
+         boUddQRvLDXjhLRGYM11Oi0rDiEGvdN2L1a30ajG2r4+05xpJYfENvSUBJIqtpjGGz
+         5aYk0UDGTz3PYRcQwT84cMtPjoDUl0XoBVDx+FGo=
+Date:   Thu, 23 Sep 2021 08:47:28 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+        antlists@youngman.org.uk, Dan Williams <dan.j.williams@intel.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        NeilBrown <neilb@suse.de>, Richard Fan <richard.fan@suse.com>,
+        Vishal L Verma <vishal.l.verma@intel.com>, rafael@kernel.org
+Subject: Re: Too large badblocks sysfs file (was: [PATCH v3 0/7] badblocks
+ improvement for multiple bad block ranges)
+Message-ID: <YUwjAJXjFR9tbJiQ@kroah.com>
+References: <20210913163643.10233-1-colyli@suse.de>
+ <a0f7b021-4816-6785-a9a4-507464b55895@suse.de>
+ <YUwZ95Z+L5M3aZ9V@kroah.com>
+ <e227eb59-fcda-8f3e-d305-b4c21f0f2ef2@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210923052705.GA5314@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e227eb59-fcda-8f3e-d305-b4c21f0f2ef2@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 23, 2021 at 07:27:05AM +0200, Christoph Hellwig wrote:
-> On Thu, Sep 23, 2021 at 09:34:03AM +0800, Ming Lei wrote:
-> > > +	set_bit(GD_DEAD, &disk->state);
-> > >  	set_capacity(disk, 0);
-> > >  
-> > > +	/*
-> > > +	 * Prevent new I/O from crossing bio_queue_enter().
-> > > +	 */
-> > > +	blk_queue_start_drain(q);
-> > > +	blk_mq_freeze_queue_wait(q);
-> > > +
-> > > +	rq_qos_exit(q);
-> > > +	blk_sync_queue(q);
-> > > +	blk_flush_integrity();
-> > > +	/*
-> > > +	 * Allow using passthrough request again after the queue is torn down.
-> > > +	 */
-> > > +	blk_mq_unfreeze_queue(q);
-> > 
-> > After blk_mq_unfreeze_queue() returns, blk_try_enter_queue() will return
-> > true, so new FS I/O from opened bdev still won't be blocked, right?
+On Thu, Sep 23, 2021 at 02:14:12PM +0800, Coly Li wrote:
+> On 9/23/21 2:08 PM, Greg Kroah-Hartman wrote:
+> > On Thu, Sep 23, 2021 at 01:59:28PM +0800, Coly Li wrote:
+> > > Hi all the kernel gurus, and folks in mailing lists,
+> > > 
+> > > This is a question about exporting 4KB+ text information via sysfs
+> > > interface. I need advice on how to handle the problem.
 > 
-> It won't be blocked by blk_mq_unfreeze_queue, but because the capacity
-> is set to 0 it still won't make it to the driver.
+> Hi Greg,
+> 
+> This is the code in mainline kernel for quite long time.
 
-One bio could be made & checked before set_capacity(0), then is
-submitted after blk_mq_unfreeze_queue() returns.
+{sigh}
 
-blk_mq_freeze_queue_wait() doesn't always imply RCU grace period, for
-example, the .q_usage_counter may have been in atomic mode before
-calling blk_queue_start_drain() & blk_mq_freeze_queue_wait().
+What tools rely on this?  If none, just don't add new stuff to the file
+and work to create a new api instead.
 
+> > Please do not do that.  Seriously, that is not what sysfs is for, and is
+> > an abuse of it.
+> > 
+> > sysfs is for "one value per file" and should never even get close to a
+> > 4kb limit.  If it does, you are doing something really really wrong and
+> > should just remove that sysfs file from the system and redesign your
+> > api.
+> 
+> I understand this. And what I addressed is the problem I need to fix.
+> 
+> The code is there for almost 10 years, I just find it during my work on bad
+> blocks API fixing.
+> 
+> 
+> > > Recently I work on the bad blocks API (block/badblocks.c) improvement, there
+> > > is a sysfs file to export the bad block ranges for me raid. E.g for a md
+> > > raid1 device, file
+> > >      /sys/block/md0/md/rd0/bad_blocks
+> > > may contain the following text content,
+> > >      64 32
+> > >     128 8
+> > Ick, again, that's not ok at all.  sysfs files should never have to be
+> > parsed like this.
+> 
+> I cannot agree more with you. What I am asking for was ---- how to fix it ?
 
-Thanks,
-Ming
+Best solution, come up with a new api.
 
+Worst solution, you are stuck with the existing file and I can show you
+the "way out" of dealing with files larger than 4kb in sysfs that a
+number of other apis are being forced to do as they grow over time.
+
+But ideally, just drop ths api and make a new one please.
+
+thanks,
+
+greg k-h
