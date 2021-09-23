@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF528C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C124C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B244B6115A
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E92F6115A
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 01:51:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238840AbhIWBwk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Sep 2021 21:52:40 -0400
-Received: from mail-bn7nam10on2071.outbound.protection.outlook.com ([40.107.92.71]:14915
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S238851AbhIWBwv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Sep 2021 21:52:51 -0400
+Received: from mail-mw2nam12on2080.outbound.protection.outlook.com ([40.107.244.80]:55520
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238817AbhIWBwk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Sep 2021 21:52:40 -0400
+        id S238817AbhIWBwv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Sep 2021 21:52:51 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cz6twmDyXU4O6r3nY3X2aq82o1mE1GpBZnpIshXQsqmmL1w4Fnl6jNOfmtaQOMy4P2+hY469li0drGvSHOyUtCW7VGRnm71msLSMhJenV7grjLItBS4M1Dtc0VqJlqW9wlXSZ+wVJV6iAv6UPhawITMQnEsdRFQMHIY4Ju4of+7IyCWIDoQBJ1W9sjvjTDe8InY8MjsoZmBs62u0X8VNL6Tqfm8HDxt1pLxYSaku2nGflOZm3Ag+rECfMO2Xq/OBf4plWMODKKKAJPRgNCkUsmm7m79Rplmn3WbhWWDChIu/SYOvBLOapcBl46J7W3Ckw68XkTm+AImorRHBSFxZ5g==
+ b=RpvJU0ZM9R6PEGGlK2pV1QLd9SqTPhvT0ZyCtL3rL2Ir689lMyzoBDXXGcwcXOxnGc2pkyPrJIu1otMIrCX1Vt6/wocWAExHqRKOi5fEQI057plxvOH3rhZwfdh9NaVqDE3dmGVIhd3Drlon1ggh4WL3YDWwMBXsFzEPqu7Rz8Lzk2p9l6oBMKZSR/XI52AgsPVGlG8e4kyHqqmnlMoiFRZBqOyVG8NAAkI9EvcTk5Gn9TVBSwvT6tcDrFF0nPQlEOA2crWaQK7PM90mpI+yP4PZM+YfNEAq3GXVLvPZHmAZ4eeUBKOIWzGBu6BGSJQCSASvyuDnIFCELeItw1NYjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=3KvSj+h078RU2g6dCUQIzA4y1ESajFKmU8Vl9gMI4d8=;
- b=OLtnv2nlfTG10t7AEqVTInT5EBkHfobK3ZFSkv9f41PRpte87PJ4my9mw3Rcd3b7KNKGpvrldnFxX1UqQRLHlLgr60QNVWUH3UsY0NNmMDVkQpMvPVQSu1GaHmqAb7a58tvkQfLaG9T8vvZCzMpr0U+feuX514styX6q89ubyaB1Zj25iG0w+Y5WR/hv4hnoHRt3uWJ2N1odZx5ktVvb+jwtizYUcCOOpU9nwgGVdcsqtl9V6axavSZd41fu0d5RVvQa3V1Q1BWaqw9ZmEN9DKS02nmAngqeVYgbDk8Mk7hcjOn3xYmMiXV2jdBvwAVTxO4wgELZX+QDjjhMWrZ3rQ==
+ bh=WhegZps1GvwBN9JBNm4GtwfYiV3aHgaDGOveINy+oYg=;
+ b=Iuno+0V9VVM+cjqs1PUYgTCJigEI6E5xtxttB6RVdmHwPTp/Vyl7Y2llCL22zLdlqtNVeFuq/voDVXGaxSa/7iWRKgd8+ZoJaOkVusbvHzr7j3G8Swwhpyt49FsTRGZXHyeqCIqMVkzZoMfDH9EWPQfbJqDojBW070Dus7JXqqgyG4XR1Niy0Ho0f/Lsew3J+8K/KllltNZFiL8wSoXBVGBcpZH7U6IqK/26Dpc/ssKTMpPrRfUWLVuH0YH99XCTYK7iCkUifZwP25IcfKDfVpjZ/XmZfabpXWdrVQ6zM59qW1Ey+L4AZVXpHXoYtcPzVIAJ3uDFizNPlxIcOVIrYw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.32) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3KvSj+h078RU2g6dCUQIzA4y1ESajFKmU8Vl9gMI4d8=;
- b=FRnrTEcXq9Dd+K+3dUPiVCiHwvDLnpeFVt5+0s/BYa09e1GLGM55FTkWN+IS5LX0cid1fcxHe1Qy1s+xx0DAmpF83fiZd3F+xVLSxzIrEYgMVzzkuW0DiGAUhhmhFQMoZkL2Fkthg2g56zA7Kd/Q2wo3tPOk8HSvpNQa0YhRPc6lMbKP/KZsGOihLatA7R642etsfV2NGrXxSFgpRph0GXd1wQExJl3CC+TiX2See37GB5rSFETQf/I57hKlId2V1/JT13WIfLacXKf57iUMLbsZYC3fhf5uje06lxgt2hlojbPCQ4KvQnK74OcqLQWWGA9FtRFSFIjA9qo7U2vlow==
-Received: from DM6PR18CA0029.namprd18.prod.outlook.com (2603:10b6:5:15b::42)
- by CH2PR12MB4024.namprd12.prod.outlook.com (2603:10b6:610:2a::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Thu, 23 Sep
- 2021 01:51:08 +0000
-Received: from DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:15b:cafe::fa) by DM6PR18CA0029.outlook.office365.com
- (2603:10b6:5:15b::42) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14 via Frontend
- Transport; Thu, 23 Sep 2021 01:51:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
+ bh=WhegZps1GvwBN9JBNm4GtwfYiV3aHgaDGOveINy+oYg=;
+ b=q5aoG8a+0/aAPMGhTtRM/vI8mBx/59SHJfIroFRZR2lUxAYXZ/G0o8Q4Md3VSuSVC3KQnR1Q9Gbu6+cF1bnG3jtr1IAbCGmWqJ2XqtTedKDEaLPd1w2XZfIALY/LUDqvCpGgXPGcB6a9C00fkHPRh30q7BKmXcQMegffPcVb5L83bjQowQ4+W4otSTb27Cr3+NIiQ4dgC0EdZ7BAskauPhbxy6FpskeW8QYvZ7UezbeKTVOhyfQ2eQSiZebteMbY2JcLCjdhiXao4BltLvHTAZwqbLJFE36oBurL3Zb8LAabsw0FhGP6HH6EVZc4XnOnop2MJJXUlbIHvh0uLYtCVw==
+Received: from DM6PR03CA0011.namprd03.prod.outlook.com (2603:10b6:5:40::24) by
+ SA0PR12MB4382.namprd12.prod.outlook.com (2603:10b6:806:9a::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4544.14; Thu, 23 Sep 2021 01:51:18 +0000
+Received: from DM6NAM11FT018.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:40:cafe::e6) by DM6PR03CA0011.outlook.office365.com
+ (2603:10b6:5:40::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend
+ Transport; Thu, 23 Sep 2021 01:51:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
  smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.32; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.32) by
- DM6NAM11FT060.mail.protection.outlook.com (10.13.173.63) with Microsoft SMTP
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT018.mail.protection.outlook.com (10.13.172.110) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4544.13 via Frontend Transport; Thu, 23 Sep 2021 01:51:08 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 22 Sep
- 2021 18:51:07 -0700
+ 15.20.4544.13 via Frontend Transport; Thu, 23 Sep 2021 01:51:18 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 23 Sep
+ 2021 01:51:18 +0000
 Received: from dev.nvidia.com (172.20.187.6) by DRHQMAIL107.nvidia.com
  (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 23 Sep
- 2021 01:51:06 +0000
+ 2021 01:51:17 +0000
 From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
 To:     <linux-block@vger.kernel.org>
 CC:     Chaitanya Kulkarni <kch@nvidia.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: [PATCH V2 7/8] loop: remove extra variable in lo_req_flush
-Date:   Wed, 22 Sep 2021 18:49:44 -0700
-Message-ID: <20210923014945.6229-8-chaitanyak@nvidia.com>
+Subject: [PATCH V2 8/8] loop: allow user to set the queue depth
+Date:   Wed, 22 Sep 2021 18:49:45 -0700
+Message-ID: <20210923014945.6229-9-chaitanyak@nvidia.com>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20210923014945.6229-1-chaitanyak@nvidia.com>
 References: <20210923014945.6229-1-chaitanyak@nvidia.com>
@@ -79,57 +78,64 @@ X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
  DRHQMAIL107.nvidia.com (10.27.9.16)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fe73300c-50fe-46eb-f3ae-08d97e349cb6
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4024:
-X-Microsoft-Antispam-PRVS: <CH2PR12MB402470CDACF1B09F48E7FDD8A3A39@CH2PR12MB4024.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Office365-Filtering-Correlation-Id: 18dde720-d8cf-4258-6c13-08d97e34a303
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4382:
+X-Microsoft-Antispam-PRVS: <SA0PR12MB438249B3AB8BE8FFAFDA0C2CA3A39@SA0PR12MB4382.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JZCXc/7fPoIhLZORiY6ayw3XHttsRzjIUfcc+u13z4qPKcDBwxIf7yO89E9mwniLtESsR0nKYK5pq/PQcb9XoZttS+hi31N81TaGUvL4rqROUgmeU/T5aeEghLCaMEf0+cYd0h+eE3GxwAf027GpE6Hbi/XKwOlxeYcpMepAICYZ/aDTEqHNeuHj8pOfbfKOMnVzjfsdIFuZFPUBSp+yIyHf35Zg+ALeojlekArhskkc5BxsWjtF7Ojn2wN/My012TPzbud8V4gOEnmEFedtdF9T+IlCcq4COmOehQ4/E73m+tLrhLTyl3UmatHY/v6I8FPTGevrF9SaB51rZA6fo6sl8uKc4zpE7dxCESsKvRw3QEK6Y1JYqSNr/irlVdvij91fBOOvc5HqIraNUdnCFkBzolIpHdoxgonw6kNt/6olppS4123gQZ3e4lz1b0F8S2zLJ9FIazWEIs34C/bQ83fYxtWaCIVDFEPdP6v44QmmOkLQjLCWbcT7Q37y51isaJbmVoWbRmMDylRIpvDdgcZzz2JSGuXzO+AloPL/9zw/XwFyhn1XZ3MVX3YGaMEO6VYqk/9rABuFdPUEDajMhK2zKB5p6GmxEpQQZ3Cqrpfu9Pg+xRcjME/ebhynjVIDMn4lUUghnOCZ56QpJP1dHxtxVTiJw/vtMxEPgJZDbPvjvdQRRKEKUXq4PM/qMphYVmT96rgcga40scZmLM3zPQ==
-X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(83380400001)(2616005)(86362001)(82310400003)(36860700001)(2906002)(16526019)(4744005)(5660300002)(508600001)(4326008)(1076003)(70586007)(426003)(8936002)(6666004)(8676002)(316002)(186003)(6916009)(7696005)(7636003)(47076005)(54906003)(356005)(36756003)(70206006)(336012)(26005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: kCDNt6sb17dInhcX8anWwi1Yg2BmelvX/hm7FkP13zqWQBhO1RpJ7ZnNOyWQ8/8n544ysX9BBet4Zv8sfjsiBmgiTVenlgzfyQsdQnDeLCehZ2+VV4MMiXPHiCKkyx99wVXkrXSw9sdRjiMn/YAmW73rqyFxzNQc4gstubzRqoNFNMEDH10HMBPz/XJUEodNu326KjWpFE37c8ajdEW68XexDY5kNYHXC2YdtgZlTjEW/JpIyN7lgc4nEgO4+aB9nqK5BLvve+c/RU5NgTdVu+6N8X7i60hizI3wdQ30euTjlPo27ZAnLHiafGtTkHodaT/qp38ktVjexhHVG3ipOsSk4kFDWTFDKiM7e10fqAeeGF9zl+9UEaMqSXQQqB38OTZt1+d1/SElgeoaK/Vs/Lq1t6NLmL9NjHwmJsF5g/9ZMNHKkhNY2CbaL/0oKsc5b8A3JVFJc4r1w79H5JNmlZqndWUUxvwXYuqPTuUIx2Ou1ii85Jc/9N/l91K+Q2pAauh5D0apAjuAQK38aC3ZtJLZjO8F3+NellV95ktA2p5Rp9eXdoOekrCMVtYFW8+NvF91L2FiFyx+vw0yPi68zADX6CHgNPLOwAW0LG86ffL1u/5yP1dC5a4c9tWxAXerdIBiJu/wFyc8KphvF/t8QDqPa3QcopljDLOnt99fj8PKPiNh4F8CFuRCK2Lu79+NOmm/eKomxmwdOCRbfbTdAw==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(82310400003)(426003)(2616005)(356005)(7636003)(36756003)(336012)(86362001)(83380400001)(5660300002)(7696005)(1076003)(8676002)(6916009)(36906005)(8936002)(70206006)(316002)(54906003)(6666004)(70586007)(16526019)(186003)(26005)(36860700001)(47076005)(508600001)(4326008)(2906002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2021 01:51:08.1171
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2021 01:51:18.6836
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe73300c-50fe-46eb-f3ae-08d97e349cb6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18dde720-d8cf-4258-6c13-08d97e34a303
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT018.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4024
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4382
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chaitanya Kulkarni <kch@nvidia.com>
 
-The local variable file is used to pass it to the vfs_fsync(). We can
-get away with using lo->lo_backing_file instead of storing in a local
-variable which is not used anywhere else.
-
-No functional change in this patch.
+Instead of hardcoding queue depth allow user to set the hw queue depth
+using module parameter. Set default value to 128 to retain the existing
+behavior.
 
 Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
 Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
 ---
- drivers/block/loop.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/loop.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 51c42788731a..6478d3b0dd2a 100644
+index 6478d3b0dd2a..aeba72b5dd2d 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -498,8 +498,7 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+@@ -2096,6 +2096,9 @@ module_param(max_loop, int, 0444);
+ MODULE_PARM_DESC(max_loop, "Maximum number of loop devices");
+ module_param(max_part, int, 0444);
+ MODULE_PARM_DESC(max_part, "Maximum number of partitions per loop device");
++static int hw_queue_depth = 128;
++module_param_named(hw_queue_depth, hw_queue_depth, int, 0444);
++MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 128");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_BLOCKDEV_MAJOR(LOOP_MAJOR);
  
- static int lo_req_flush(struct loop_device *lo, struct request *rq)
- {
--	struct file *file = lo->lo_backing_file;
--	int ret = vfs_fsync(file, 0);
-+	int ret = vfs_fsync(lo->lo_backing_file, 0);
- 	if (unlikely(ret && ret != -EINVAL))
- 		ret = -EIO;
- 
+@@ -2328,7 +2331,7 @@ static int loop_add(int i)
+ 	err = -ENOMEM;
+ 	lo->tag_set.ops = &loop_mq_ops;
+ 	lo->tag_set.nr_hw_queues = 1;
+-	lo->tag_set.queue_depth = 128;
++	lo->tag_set.queue_depth = hw_queue_depth;
+ 	lo->tag_set.numa_node = NUMA_NO_NODE;
+ 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
+ 	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING |
 -- 
 2.29.0
 
