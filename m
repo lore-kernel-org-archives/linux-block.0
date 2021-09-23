@@ -2,136 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AA5C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 22:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D073C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 23:24:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4530D6124B
-	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 22:53:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65E2C61242
+	for <linux-block@archiver.kernel.org>; Thu, 23 Sep 2021 23:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243451AbhIWWym (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Sep 2021 18:54:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40624 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236363AbhIWWyl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Sep 2021 18:54:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4D4EA61050;
-        Thu, 23 Sep 2021 22:53:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1632437589;
-        bh=C3SYeyDKvKpb/ztYsrD8obNOu9dSdXZY8PFIa55n+74=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=KZ3gMZwg4rgJ9cLecymJdeyv6i54jC7zVxLOfjkazVUlux9mYsa73ABGN59P4idUi
-         vuuJ7LslTKcm3niLg6ci5tCI5QkH6FfZMbvf+dXZp6sZAMKa4FePEb/vV/DSlnR+t8
-         rrRhkFGxbVQbFrgWJXjxie+JOSrcd/pPdSnyGya8=
-Date:   Thu, 23 Sep 2021 15:53:08 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Brian Geffon <bgeffon@google.com>
-Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>,
-        Jesse Barnes <jsbarnes@google.com>
-Subject: Re: [PATCH v4] zram: Introduce an aged idle interface
-Message-Id: <20210923155308.9b522a77a02ee13b76e9e613@linux-foundation.org>
-In-Reply-To: <20210923130115.1344361-1-bgeffon@google.com>
-References: <20210917210640.214211-1-bgeffon@google.com>
-        <20210923130115.1344361-1-bgeffon@google.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S243294AbhIWXZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Sep 2021 19:25:39 -0400
+Received: from mail-pg1-f169.google.com ([209.85.215.169]:34400 "EHLO
+        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235628AbhIWXZj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Sep 2021 19:25:39 -0400
+Received: by mail-pg1-f169.google.com with SMTP id f129so7984548pgc.1
+        for <linux-block@vger.kernel.org>; Thu, 23 Sep 2021 16:24:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=o506yJuFKAwdjbP7tAU5o29HdbQoaMX/fnruo9Q0654=;
+        b=VfQEttJtUxoQs2xoDpBVNVkpq/NGrd2terai4q0YutmbHF03RGFJ0Wg/vVJ1oK/9sq
+         9Qmz9TL4BSRmFoa4hAKp1ISc6Uly4um1A+YHeEDLOuRGuj2CumApQyz5sTB4C3x392Cz
+         +OUYtUDpYuut5z+in21zuMbIg3/xuOSPzua0CSKrJZTk38VU/jAVdLe7nfU9ib8WJ38B
+         go5MYWhll8rohtSfrM9MUyKq8Cz+as6yv6ZZWDNhdq9sAGRSTHh9Vw67HRL1oVCu8ewd
+         NMyjDh3pwzjr47WyYog352JnbiksYgHPs/M8TzUxgqCKI/oBHBawXPTXHqn6yvxONIlC
+         aZbg==
+X-Gm-Message-State: AOAM531rpRDj1hhcg9uPoXBgE35/H3RJlSbLP6PkjQSorxmw+pVNeZLM
+        FZlX7QYxWqebCPIWTlgJn2I=
+X-Google-Smtp-Source: ABdhPJzK9ZmoDyz8ThEI6oVaL2YToP/fg6TJhblu1u+uDQpltsC7MzYbi1XDrF3kekN7Kh8iIou2pA==
+X-Received: by 2002:a63:4417:: with SMTP id r23mr1125958pga.177.1632439446623;
+        Thu, 23 Sep 2021 16:24:06 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:bf91:ebe7:eabf:7473])
+        by smtp.gmail.com with ESMTPSA id m2sm7984387pgd.70.2021.09.23.16.24.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Sep 2021 16:24:05 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/4] Restore I/O priority support in the mq-deadline scheduler
+Date:   Thu, 23 Sep 2021 16:23:54 -0700
+Message-Id: <20210923232358.3907118-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 23 Sep 2021 06:01:15 -0700 Brian Geffon <bgeffon@google.com> wrote:
+Hi Jens,
 
-> This change introduces an aged idle interface to the existing
-> idle sysfs file for zram.
-> 
-> When CONFIG_ZRAM_MEMORY_TRACKING is enabled the idle file
-> now also accepts an integer argument. This integer is the
-> age (in seconds) of pages to mark as idle. The idle file
-> still supports 'all' as it always has. This new approach
-> allows for much more control over which pages get marked
-> as idle.
-> 
-> @@ -291,22 +291,16 @@ static ssize_t mem_used_max_store(struct device *dev,
->  	return len;
->  }
->  
-> -static ssize_t idle_store(struct device *dev,
-> -		struct device_attribute *attr, const char *buf, size_t len)
-> +/*
-> + * Mark all pages which are older than or equal to cutoff as IDLE.
-> + * Callers should hold the zram init lock in read mode
-> + **/
+This patch series includes the following changes:
+- Fix request accounting by counting requeued requests once.
+- Test correctness of the request accounting code by triggering a kernel
+  warning from inside dd_exit_sched() if an inconsistency has been detected.
+- Switch from per-CPU counters to individual counters.
+- Restore I/O priority support in the mq-deadline scheduler. The performance
+  measurements in the description of patch 4/4 show that the peformance
+  regressions in the previous version of this patch have been fixed. This has
+  been achieved by using 'jiffies' instead of ktime_get() and also by skipping
+  the aging mechanism if all queued requests have the same I/O priority.
 
-A simple "*/" is conventional.
+Please consider this patch series for kernel v5.16.
 
-> +static void mark_idle(struct zram *zram, ktime_t cutoff)
->  {
-> -	struct zram *zram = dev_to_zram(dev);
-> +	int is_idle = 1;
->  	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
->  	int index;
->  
-> -	if (!sysfs_streq(buf, "all"))
-> -		return -EINVAL;
-> -
-> -	down_read(&zram->init_lock);
-> -	if (!init_done(zram)) {
-> -		up_read(&zram->init_lock);
-> -		return -EINVAL;
-> -	}
-> -
->  	for (index = 0; index < nr_pages; index++) {
->  		/*
->  		 * Do not mark ZRAM_UNDER_WB slot as ZRAM_IDLE to close race.
-> @@ -314,14 +308,48 @@ static ssize_t idle_store(struct device *dev,
->  		 */
->  		zram_slot_lock(zram, index);
->  		if (zram_allocated(zram, index) &&
-> -				!zram_test_flag(zram, index, ZRAM_UNDER_WB))
-> -			zram_set_flag(zram, index, ZRAM_IDLE);
-> +				!zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
-> +#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-> +			is_idle = (!cutoff || ktime_after(cutoff, zram->table[index].ac_time));
-> +#endif
-> +			if (is_idle)
-> +				zram_set_flag(zram, index, ZRAM_IDLE);
-> +		}
->  		zram_slot_unlock(zram, index);
->  	}
-> +}
->  
-> -	up_read(&zram->init_lock);
-> +static ssize_t idle_store(struct device *dev,
-> +		struct device_attribute *attr, const char *buf, size_t len)
-> +{
-> +	struct zram *zram = dev_to_zram(dev);
-> +	ktime_t cutoff_time = 0;
-> +	ssize_t rv = -EINVAL;
->  
-> -	return len;
-> +	if (!sysfs_streq(buf, "all")) {
-> +#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-> +		u64 age_sec;
-> +		/* If it did not parse as 'all' try to treat it as an integer */
-> +		if (!kstrtoull(buf, 0, &age_sec))
-> +			cutoff_time = ktime_sub(ktime_get_boottime(),
-> +					ns_to_ktime(age_sec * NSEC_PER_SEC));
-> +		else
-> +#endif
-> +			goto out;
-> +	}
+Thanks,
 
-The ifdef tricks are pretty ugly.  Can things be improved with IS_ENABLED()?
+Bart.
 
+Bart Van Assche (4):
+  block/mq-deadline: Improve request accounting further
+  block/mq-deadline: Add an invariant check
+  block/mq-deadline: Stop using per-CPU counters
+  block/mq-deadline: Prioritize high-priority requests
+
+ block/mq-deadline.c | 221 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 143 insertions(+), 78 deletions(-)
 
