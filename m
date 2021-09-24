@@ -2,74 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E00F5C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 16:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29860C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 17:04:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD40F61241
-	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 16:58:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C06961250
+	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 17:04:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235794AbhIXQ7g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Sep 2021 12:59:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44748 "EHLO
+        id S244692AbhIXRGa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Sep 2021 13:06:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230021AbhIXQ7c (ORCPT
+        with ESMTP id S244626AbhIXRGa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Sep 2021 12:59:32 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84387C061571
-        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 09:57:57 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id 145so9385915pfz.11
-        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 09:57:57 -0700 (PDT)
+        Fri, 24 Sep 2021 13:06:30 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D895C061571
+        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 10:04:56 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id v16so11159946ilg.3
+        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 10:04:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AlGhjQgx1IvFlacw/eSYonV1Ve8whQq5pGs6porzq5E=;
-        b=Phz9SVeG1wjzGZK74F8xJfjFWuABunzJaFBZKaqfu8eL1sywqRy7yqFrIWET42B3sd
-         XYiANpEO9OmlwBo6ugZvYnu+xvjViI8axHAp3GgqkvenvInQHSFlLN9D5oYIWzHaNzy8
-         BpNGd9i1fUZeTPQ+KKcUsK2g3hEK4TXTsrfuOWr8P41N/wX7p7sO3LiFZQhWBAoLOFnT
-         XA2tIq/c93NAqrreWFTjhi6O9wxtHngz3JvsoeTd2wz0PXSIUyu1sR6Rjnl0zQz/dh6i
-         xaaNStTsF4Oj+EpUTytyzYsiFGskvF15vZ+eel2/Hy/PRbeLfwbBYr1NuJBZPOyndIQG
-         ETpA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=QMsoMTe88s3i55EW11Dq47WQEVppwO10AQq1jVa2vSI=;
+        b=qLI22M72wxG/nUFCTNN4fQJSZJAEYzPpE/SAiR4ZAAVXZXV82NndapK+kEFMBzmD/N
+         QAi78uImJjG1s07psAC1ZHnHLD8vbv1IQ+ou+091OQIzZ61E7uUPllwXWgKFwY0RQnGB
+         W8sSkU85peAKCdWvVN9x6SxHlYaTY0VMKyb+OQwi5Y854thXoMOnMXIs1MDbkIVZVC2h
+         hJhXB4jImd4j/Ft6zK2vyH6yAbInRb6tct3yrWXDzNL6NSbZovqoEPhjSXQZCOsRAkEX
+         poCXuq9Iraq9izTBz4aTj7jCLpIqbd6fX/+c/g0APl4UzFNbwCor05NVpfdA0yKvhrk1
+         9BtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=AlGhjQgx1IvFlacw/eSYonV1Ve8whQq5pGs6porzq5E=;
-        b=Qa94I5e96vB3F91UxOI6KJK4WNOIJjkLSRjao9GoGpZ8pkKZbFwpFXIjyocaGSu6L2
-         p3dSjGv2Kgm+StQNvYgs1M1papL8P+O3P5+Y2iPEISMntNitG32xdW1fr2C1H30t9hza
-         NsvdBbjHNVfI2KDMmV+MEjlLxkFM0cdJkw6tUo/I9fXcF63VQ493ArESvS06HO4945p/
-         OYThC1kjUAZ7/tfDbi/lWJgrI5TE4KD3SeJ2XJrPwtl/CPK/D8tpt/6tIETDyWARgQT8
-         PUUogprpyZaPi0pB3yPBfFICEeVF2/92ttDtggrNgZ7mdG8160xWuWMKfnXn8AmC1EpE
-         5T9A==
-X-Gm-Message-State: AOAM533ll+ycjSf9KOhx3+Uw6WeONGvIEbllp1XR8ZWGAAsTcX4d+Fm+
-        ErG529eYhg14LEoCt767/H4=
-X-Google-Smtp-Source: ABdhPJyB4Zi+zJXy7R9yDJA+zx0UAwxzpLY6ZvgB/WSoz6NAeanhQn8UeMlsrrdkuNDMralQLkr8rg==
-X-Received: by 2002:a63:4614:: with SMTP id t20mr4673318pga.372.1632502677330;
-        Fri, 24 Sep 2021 09:57:57 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id 21sm9301788pfh.103.2021.09.24.09.57.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Sep 2021 09:57:56 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 24 Sep 2021 06:57:55 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Yu Kuai <yukuai3@huawei.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QMsoMTe88s3i55EW11Dq47WQEVppwO10AQq1jVa2vSI=;
+        b=TS9vdDHpZnCNJhTlcQFkOWnKLf9ODoXYh8dnUG+FUcMlSpGdiL9OPpp+NXWcxa1zFZ
+         khR5VZxTfbfQ78IN3ufFZW2RENgJ8yn2IgvdLu1AgeW4W0BmbP7sOuPg1Roi/CKxPFNq
+         phsEBK8sb16QJgpE4R9arnxXBWTqaF90tZBHztxH0vC8A5fZinmsKquoHJuW9lNXTqzQ
+         nt1QRQiy2GWbP08q6J45yvjxwtE89CJ4nkdKkCtqfVnB+uJpJnTKnfFrGZus2CkNLNFS
+         kbo2a/r7xY+bNYokqQWFHttTu4gbx1rM2X5/LxgIAcd7Pi7FcoHs3wJvKQy/HpYUtXCY
+         4FbA==
+X-Gm-Message-State: AOAM533+v0OpotGDbZCCN7zlgQtDxBLUmbBmzBdbRa2efsEb/2Jf5H48
+        TAwvdnEPYvYITBkVrApISAG1Lw==
+X-Google-Smtp-Source: ABdhPJwUgVh7miUoGAQULFEtRjAlZzeQrWmjTzz4JVLy50mJV0YDopAykM/ncXZ4BxlM/87+56LnGQ==
+X-Received: by 2002:a05:6e02:cc5:: with SMTP id c5mr9298469ilj.110.1632503095792;
+        Fri, 24 Sep 2021 10:04:55 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id h23sm4405977ila.32.2021.09.24.10.04.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Sep 2021 10:04:55 -0700 (PDT)
 Subject: Re: [PATCH] block: don't call rq_qos_ops->done_bio if the bio isn't
  tracked
-Message-ID: <YU4DkxBcYeIRO+NL@slm.duckdns.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
+        tj@kernel.org
 References: <20210924110704.1541818-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5c4fb487-0230-6fa4-085d-9da745ec536b@kernel.dk>
+Date:   Fri, 24 Sep 2021 11:04:53 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20210924110704.1541818-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 07:07:04PM +0800, Ming Lei wrote:
+On 9/24/21 5:07 AM, Ming Lei wrote:
 > rq_qos framework is only applied on request based driver, so:
 > 
 > 1) rq_qos_done_bio() needn't to be called for bio based driver
@@ -89,14 +92,9 @@ On Fri, Sep 24, 2021 at 07:07:04PM +0800, Ming Lei wrote:
 > Fix the potential kernel panic by not calling rq_qos_ops->done_bio if
 > the bio isn't tracked. This way is safe because both ioc_rqos_done_bio()
 > and blkcg_iolatency_done_bio() are nop if the bio isn't tracked.
->
-> Reported-by: Yu Kuai <yukuai3@huawei.com>
-> Cc: tj@kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
+Applied, thanks.
 
 -- 
-tejun
+Jens Axboe
+
