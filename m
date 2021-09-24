@@ -2,130 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56EEEC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 12:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF1EC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 13:31:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F9E8610FD
-	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 12:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4A836103D
+	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 13:31:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245429AbhIXMZw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Sep 2021 08:25:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42319 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245047AbhIXMZv (ORCPT
+        id S1346351AbhIXNcx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Sep 2021 09:32:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52146 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346481AbhIXNc0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Sep 2021 08:25:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632486256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=WM6qzuajtDerx7+xJbX90UnsPZusQ5oE4A/EzIJi6m8=;
-        b=ci6q9erGpTSvvynbEXSd1TOpMyu3sSPN44S/vBF7Xnx9aH9bl6G5DNnYOPkK0iccYawsDi
-        yVGxJk8OcoVey4DLACiwvtg2yPPhgqxHY7F9hQFc0cI+A4RVnkx1jXlunwAV0XsQ5fjjsu
-        RxL+0eCj9+GRE3KlXXFCvGoAIC4fZF8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-hTWUkiV3Oyel7UoG2cjRwg-1; Fri, 24 Sep 2021 08:24:15 -0400
-X-MC-Unique: hTWUkiV3Oyel7UoG2cjRwg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A4E0835DE0;
-        Fri, 24 Sep 2021 12:24:14 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C6ECF19C87;
-        Fri, 24 Sep 2021 12:24:02 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Muneendra Kumar <muneendra.kumar@broadcom.com>,
-        Tejun Heo <tj@kernel.org>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: [PATCH] block: only allocate blkcg->fc_app_id when starting to use it
-Date:   Fri, 24 Sep 2021 20:24:16 +0800
-Message-Id: <20210924122416.1552721-1-ming.lei@redhat.com>
+        Fri, 24 Sep 2021 09:32:26 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA5BC0604C1
+        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 06:15:52 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id i13so10307810ilm.4
+        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 06:15:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=IQN9DP0M41u2cr727GWUuFS+FbSRmoFH5BT+NmKfBVo=;
+        b=0ivsGxgqYM7TnLQGtxH5qjhcLwDtPTSjzgb2gzXSWk5YWRAAcXfHTkWOxIEQr6O14a
+         dN1S2DmKdLHolCiP1kXzaa7YX7kJlbua1dmFUX+izljooBJAYVciEi8bJ9hofKKbD/wd
+         KYVPWc1o0/IzHFXSppiWGYJS2fEpSvYm+h3PkrWxQU1PtLUV22mPXJFu3EXUODsdlfmc
+         1oGcQ57nCDgpeWP1G58dAN1cmRXCNqvURVMr5fy431FhE9jneFQJClpd9a40rqJRHS/7
+         uiiX8woixAXBalNgUdUhltv8q12oQrIdRLAcTDCpUEtvgiSL3dm6RYWFOwVWHHygJ1U1
+         GSPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IQN9DP0M41u2cr727GWUuFS+FbSRmoFH5BT+NmKfBVo=;
+        b=yHAfrIfufidANFEkov0Fz7X25stu60kEvUKXp2VZCD4ewDL496ZkxqGe6iH9SFJHNB
+         fT+6qZXJxNbBz+UWYuz95IgKcbVFycX/t0yw9OIQ2ndjDgAum2Ao2Y0VeQa4BEPi5cP/
+         AS6hocFPrS/mll0Vn2TAYxdKErFWw7UI7OyehfcvO0f3+7nIKUhPi2C1ymDjxtRjJ+8I
+         VbUQuexxZSy72ecPzwoyRxLEIyHB4kkqz4ODeKrxZvEc9ucgGq0bUA21uUzm/v0a34J6
+         7yyilNxKB1S196KAlUcsSiNj0KVve9XQrUGkhzSxttR259Lm4QUn9FT3qlBFO7aOPM7i
+         QKkw==
+X-Gm-Message-State: AOAM533XW3aokLuANWnYume/PeXCnnhThcNGXAdBDgDbVBErahYitso2
+        ISWjFqhhPD+J1r/TT76lv8TXfw==
+X-Google-Smtp-Source: ABdhPJy/y4iAfP7x2vzAcTTt2bxFyqaDRkQ2Oj4i3wDUnG7kGhD5OtkI+slaMY38uFkKaMJQKYiO0g==
+X-Received: by 2002:a05:6e02:b23:: with SMTP id e3mr6298407ilu.53.1632489351553;
+        Fri, 24 Sep 2021 06:15:51 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id r3sm4177181ilc.56.2021.09.24.06.15.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Sep 2021 06:15:51 -0700 (PDT)
+Subject: Re: [GIT PULL] nvme fixes for Linux 5.15
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YU1yBgH+CqJu9h5u@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <cc838154-552d-56fc-37dc-393910b34f50@kernel.dk>
+Date:   Fri, 24 Sep 2021 07:15:49 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <YU1yBgH+CqJu9h5u@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So far the feature of BLK_CGROUP_FC_APPID is only used for LPFC, and
-only when it is setup via sysfs. It is very likely for one system to
-never use the feature, so allocate the application id buffer in case
-that someone starts to use it, then we save 129 bytes in each blkcg
-if no one uses the feature.
+On 9/24/21 12:36 AM, Christoph Hellwig wrote:
+> git://git.infradead.org/nvme.git tags/nvme-5.15-2021-09-24
 
-Cc: Muneendra Kumar <muneendra.kumar@broadcom.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-cgroup.c         |  3 +++
- include/linux/blk-cgroup.h | 15 ++++++++++++---
- 2 files changed, 15 insertions(+), 3 deletions(-)
+Pulled, thanks.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 38b9f7684952..e452adf5f4f6 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1061,6 +1061,9 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
- 
- 	mutex_unlock(&blkcg_pol_mutex);
- 
-+#ifdef CONFIG_BLK_CGROUP_FC_APPID
-+	kfree(blkcg->fc_app_id);
-+#endif
- 	kfree(blkcg);
- }
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index b4de2010fba5..75094c0a752b 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -58,7 +58,7 @@ struct blkcg {
- 
- 	struct list_head		all_blkcgs_node;
- #ifdef CONFIG_BLK_CGROUP_FC_APPID
--	char                            fc_app_id[FC_APPID_LEN];
-+	char                            *fc_app_id;
- #endif
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct list_head		cgwb_list;
-@@ -699,7 +699,16 @@ static inline int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_le
- 	 * the vmid from the fabric.
- 	 * Adding the overhead of a lock is not necessary.
- 	 */
--	strlcpy(blkcg->fc_app_id, app_id, app_id_len);
-+	if (!blkcg->fc_app_id) {
-+		char *buf = kzalloc(FC_APPID_LEN, GFP_KERNEL);
-+
-+		if (cmpxchg(&blkcg->fc_app_id, NULL, buf))
-+			kfree(buf);
-+	}
-+	if (blkcg->fc_app_id)
-+		strlcpy(blkcg->fc_app_id, app_id, app_id_len);
-+	else
-+		ret = -ENOMEM;
- 	css_put(css);
- out_cgrp_put:
- 	cgroup_put(cgrp);
-@@ -714,7 +723,7 @@ static inline int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_le
-  */
- static inline char *blkcg_get_fc_appid(struct bio *bio)
- {
--	if (bio && bio->bi_blkg &&
-+	if (bio && bio->bi_blkg && bio->bi_blkg->blkcg->fc_app_id &&
- 		(bio->bi_blkg->blkcg->fc_app_id[0] != '\0'))
- 		return bio->bi_blkg->blkcg->fc_app_id;
- 	return NULL;
 -- 
-2.31.1
+Jens Axboe
 
