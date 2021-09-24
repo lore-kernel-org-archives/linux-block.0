@@ -2,79 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81DB4C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 19:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B44C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 20:16:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6686661050
-	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 19:54:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B919611C8
+	for <linux-block@archiver.kernel.org>; Fri, 24 Sep 2021 20:16:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345939AbhIXTz5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Sep 2021 15:55:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41200 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1345937AbhIXTz5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Sep 2021 15:55:57 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5879F6103D;
-        Fri, 24 Sep 2021 19:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1632513263;
-        bh=ukP31P3ZCbd3SW/z+kSgzmpssJsR08rh0NSjW1DOuw0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=v5cJFMY/oHXiaLx/PcI7cSIIO/6F2NxdLW8DrNvjiHhR/MElw6W//OPe7WJU/DGG0
-         BnVE3pt774VkHH/X+CJ/WADPXKV8uP6kSqXS3s8z2y7ubybfxQPcCLZdJaWj2Kd1dy
-         rHwQK0Lc8z1r0axPSQY52clYcoExli7fIYOFKEvc=
-Date:   Fri, 24 Sep 2021 12:54:22 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Brian Geffon <bgeffon@google.com>
+        id S1345982AbhIXURh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Sep 2021 16:17:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33928 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345521AbhIXURh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Sep 2021 16:17:37 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA53C061571
+        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 13:16:03 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id bx4so40586289edb.4
+        for <linux-block@vger.kernel.org>; Fri, 24 Sep 2021 13:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dma3ODYRAwAqQNgxjoPPmrM71vwSjvGubtDE6+J/Uj4=;
+        b=TCKaE7TNX17wekyhEJMq0Q25AVyKWiZRP+g/+Gp/8PWclgr/jK3NrgttQdr7wcLdXR
+         Q7Vui+5HdK/XtCPVLRA1f3pBVqdfXx9tpC6sVw/nnEysSkKizl2mQK1SQUekXcJnHoZb
+         iKS9R9k/fhu93FJDzD8w8K1oJinhGnJ23XrS0RrTKDPGUkbMcQkqosdn1u9ndrmaqYVX
+         aY+QtdNzVtWH36uUWKCcNE6ZOBnMcRs/Ux8HSJmt9kBinzOvcfA/PBdBGjSEj4T5I68L
+         agEiE1FY6qB/1zx1Jyhcyw1sMqbjO4VrSZY6VVVg4ZwmbJQMY9JC9tCVJhGtQbWB3EHK
+         KETg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dma3ODYRAwAqQNgxjoPPmrM71vwSjvGubtDE6+J/Uj4=;
+        b=GB834pqJ12XpGjTPGYy7ciGscAADdSBsLpa/p+ZheWQ+R5pnO4ZmxTSRvFZOEkel/j
+         GFsKs1pSpBW8Yi043U6xu7ug2hhcFT5UfFYc9jb19l+KyCcFc6pJYH86ZevUjkmwwROM
+         unvWkv6fI3MRoqPChRiFtpuQGFakTx78NADvkD49MW2HpzXysS3idqRUjhpZ3zqq9oRb
+         3Pn8b/Drbvt729A/YDGklRkAdVSPH0KPpAfA9ndYOn5rlWma9Na3asvUlvoYwqdEp4Ax
+         R30ANE/2KMdkBqblQYffmAP4u1kmdumXyriIrFKJxZgDzcOSPL6H2GNOSDNeYRi1Cr2T
+         5vjg==
+X-Gm-Message-State: AOAM533wrMPAa/82GfSsqw6ZRehR4UG0efB7t+ex+C/3KyqiwWVcTpy+
+        5mlPvozzgGhLlXPMUYP2D/rLXpzRNtnqtIYXBHhEAw==
+X-Google-Smtp-Source: ABdhPJy+GO7D85GdcvOuwQ7T61FovB7Jo/xuxyb7T+18+fqF4fp9j9ohG6KW8vkKyjgJq4w4BsZG3i2clMRE46OOnIA=
+X-Received: by 2002:a17:906:2bc3:: with SMTP id n3mr13014432ejg.548.1632514562127;
+ Fri, 24 Sep 2021 13:16:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210917210640.214211-1-bgeffon@google.com> <20210924161128.1508015-1-bgeffon@google.com>
+ <20210924125422.358374d83cdb95db055a4467@linux-foundation.org>
+In-Reply-To: <20210924125422.358374d83cdb95db055a4467@linux-foundation.org>
+From:   Brian Geffon <bgeffon@google.com>
+Date:   Fri, 24 Sep 2021 16:15:26 -0400
+Message-ID: <CADyq12xAc4Y5P4n69oahPNs6M55cUb6=7Nku=J5iEOJVMBOPTQ@mail.gmail.com>
+Subject: Re: [PATCH v5] zram: Introduce an aged idle interface
+To:     Andrew Morton <akpm@linux-foundation.org>
 Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        LKML <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org,
         Suleiman Souhlal <suleiman@google.com>,
         Jesse Barnes <jsbarnes@google.com>
-Subject: Re: [PATCH v5] zram: Introduce an aged idle interface
-Message-Id: <20210924125422.358374d83cdb95db055a4467@linux-foundation.org>
-In-Reply-To: <20210924161128.1508015-1-bgeffon@google.com>
-References: <20210917210640.214211-1-bgeffon@google.com>
-        <20210924161128.1508015-1-bgeffon@google.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 24 Sep 2021 09:11:28 -0700 Brian Geffon <bgeffon@google.com> wrote:
+> Also this?
+>
+> --- a/drivers/block/zram/zram_drv.c~zram-introduce-an-aged-idle-interface-v5-fix
+> +++ a/drivers/block/zram/zram_drv.c
+> @@ -309,9 +309,8 @@ static void mark_idle(struct zram *zram,
+>                 zram_slot_lock(zram, index);
+>                 if (zram_allocated(zram, index) &&
+>                                 !zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
+> -#ifdef CONFIG_ZRAM_MEMORY_TRACKING
+> +                       if (IS_ENABLED(CONFIG_ZRAM_MEMORY_TRACKING))
+>                                 is_idle = (!cutoff || ktime_after(cutoff, zram->table[index].ac_time));
+> -#endif
+>                         if (is_idle)
+>                                 zram_set_flag(zram, index, ZRAM_IDLE);
+>                 }
+> _
+>
 
-> This change introduces an aged idle interface to the existing
-> idle sysfs file for zram.
-> 
-> When CONFIG_ZRAM_MEMORY_TRACKING is enabled the idle file
-> now also accepts an integer argument. This integer is the
-> age (in seconds) of pages to mark as idle. The idle file
-> still supports 'all' as it always has. This new approach
-> allows for much more control over which pages get marked
-> as idle.
-> 
->   v4 -> v5:
-> 	- Andrew's suggestions to use IS_ENABLED and
-> 	  cleanup comment.
+Hi Andrew,
+As written that patch won't compile when
+CONFIG_ZRAM_MEMORY_TRACKING=n, my guess is that the compiler pass that
+removes the dead branch only happens after it attempts to compile the
+branch itself. So it appears that even though IS_ENABLED(..) always
+evaluates to 0, the compile will fail because table[index].ac_time
+does not exist. You should get an error like this:
 
-Also this?
+drivers/block/zram/zram_drv.c:314:57: error: no member named 'ac_time'
+in 'struct zram_table_entry'
+                                                             (!cutoff
+|| ktime_after(cutoff, zram->table[index].ac_time)))
 
---- a/drivers/block/zram/zram_drv.c~zram-introduce-an-aged-idle-interface-v5-fix
-+++ a/drivers/block/zram/zram_drv.c
-@@ -309,9 +309,8 @@ static void mark_idle(struct zram *zram,
- 		zram_slot_lock(zram, index);
- 		if (zram_allocated(zram, index) &&
- 				!zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
--#ifdef CONFIG_ZRAM_MEMORY_TRACKING
-+			if (IS_ENABLED(CONFIG_ZRAM_MEMORY_TRACKING))
- 				is_idle = (!cutoff || ktime_after(cutoff, zram->table[index].ac_time));
--#endif
- 			if (is_idle)
- 				zram_set_flag(zram, index, ZRAM_IDLE);
- 		}
-_
-
+Brian
