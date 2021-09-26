@@ -2,120 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13AE4C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 14:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F735C43217
+	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 21:56:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0A6F61041
-	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 14:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 738AA61041
+	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 21:56:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231865AbhIZO5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Sep 2021 10:57:05 -0400
-Received: from mail-dm6nam12on2063.outbound.protection.outlook.com ([40.107.243.63]:2144
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231849AbhIZO5E (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Sep 2021 10:57:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JiYriGZIP6p8faZSSw+6w35IbGXg16xvGApvvSAluEPqvJkZu2pseLq0IYFkUW8IPfFZqYRVplDFO4wQn9turXb/J6ovewA8piosh7d52yeGiQwXHFqu9H79/0OHS6bsyk+0OikxMFdYMzX/h7x+P2NdX0fH9RPxnNUDNwSwJdZ+86+PVMI797C0Br6H1RIIukFhzdewrlOQVqFo/P7337+8NqILrS5h8QljJIW3v1SoCmyFpXndgrnUDA6E6iSDnwdWJO3vsPnrjnrJaktNrPv48q9hcYyC+DQcC7yj+mRS6RE1pmKTyGF2RiLjwDi6+H6aSfNqdstXftU5yNXaZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=D72RtD+0XIzMVwNEE6NNcRPmkUBQfdVivTc7H6NARuY=;
- b=PsEXtZ0OIgIC2eJDyi+qBB9U0teYAkvHa7CK/g3nCR2FEXOVKuzCG44rfIsdt79juVb3MwQBQcTp2oGUcgX8Ze/bqIu3IUTUJWwE9VV2EjgNf7d3U20UdlP0Lf+Rd6kU/JYOeDtNuBGDJfpESxoqEqjgXzLXug7i6CkWTAtbcsnDGPUNoqSfpaOQRhME9UF+BaNfUAuDmBZJro4wpkkVKOFLKTKGqR5NPmACRJyMR0FNF5WJv3TWYUHQNVhJPamPUBgxJgyrLuF2A4WY2NdBhtL6L5rggIGvXqjS+/gqzyKDVqaqm0YZciIpHMX6j5vPydE4vyr2ElGuLaoDBSbqMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.35) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D72RtD+0XIzMVwNEE6NNcRPmkUBQfdVivTc7H6NARuY=;
- b=sjKI4viRV22NPd8qZWdJ5RR7L0Ueq3tFVfxdlZUXJCTYlfnHhV7gi1FAwxopsaBjEmf6XZSo52fO+vya6VwSm6A3mCmYPru/tJl5vz6hIENw8DjQXrDvUKtlSIFhvO4flINVYZvTJFI9pClM52LX3qsojKamU85xW+Rgom4dnXliVzWG6+IDXVj2SfQfe5gEOFaiy9CE1lUd2JbG3G7IKhc0gA/FofVDmACLBep3jx3oAOuzu3+jTwXnWKipnQM1InenlOeZE6JmtXYmm2Qn9oZW265oz8PpHeHXgRcI02AZ9nix91LC3Iz6lcQwZD9XjVOaZIKFczHYD2d48y1yIA==
-Received: from DM6PR04CA0008.namprd04.prod.outlook.com (2603:10b6:5:334::13)
- by DM6PR12MB3771.namprd12.prod.outlook.com (2603:10b6:5:1ca::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Sun, 26 Sep
- 2021 14:55:26 +0000
-Received: from DM6NAM11FT023.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:334:cafe::c6) by DM6PR04CA0008.outlook.office365.com
- (2603:10b6:5:334::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14 via Frontend
- Transport; Sun, 26 Sep 2021 14:55:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
- smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.35; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.35) by
- DM6NAM11FT023.mail.protection.outlook.com (10.13.173.96) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4544.13 via Frontend Transport; Sun, 26 Sep 2021 14:55:25 +0000
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 26 Sep
- 2021 14:55:25 +0000
-Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.5) by mail.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Sun, 26 Sep 2021 14:55:22 +0000
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <stefanha@redhat.com>
-CC:     <oren@nvidia.com>, <nitzanc@nvidia.com>, <israelr@nvidia.com>,
-        <hch@infradead.org>, <linux-block@vger.kernel.org>,
-        <axboe@kernel.dk>, "Max Gurtovoy" <mgurtovoy@nvidia.com>
-Subject: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-Date:   Sun, 26 Sep 2021 17:55:18 +0300
-Message-ID: <20210926145518.64164-2-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.18.1
-In-Reply-To: <20210926145518.64164-1-mgurtovoy@nvidia.com>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+        id S230298AbhIZV6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Sep 2021 17:58:15 -0400
+Received: from mail107.syd.optusnet.com.au ([211.29.132.53]:35015 "EHLO
+        mail107.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229827AbhIZV6P (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 26 Sep 2021 17:58:15 -0400
+Received: from dread.disaster.area (pa49-195-238-16.pa.nsw.optusnet.com.au [49.195.238.16])
+        by mail107.syd.optusnet.com.au (Postfix) with ESMTPS id C1B96A7FB;
+        Mon, 27 Sep 2021 07:56:34 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1mUc8P-00H5Dz-7k; Mon, 27 Sep 2021 07:56:33 +1000
+Date:   Mon, 27 Sep 2021 07:56:33 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     willy@infradead.org, hch@lst.de, trond.myklebust@primarydata.com,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, darrick.wong@oracle.com,
+        viro@zeniv.linux.org.uk, jlayton@kernel.org,
+        torvalds@linux-foundation.org, linux-nfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/9] Introduce IOCB_SWAP kiocb flag to trigger REQ_SWAP
+Message-ID: <20210926215633.GG2361455@dread.disaster.area>
+References: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+ <163250391274.2330363.16176856646027970865.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a80d816b-8e36-4eb7-87f6-08d980fdac9d
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3771:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB37717912603FA1FE4B0E13A2DEA69@DM6PR12MB3771.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1013;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yHfyDUQ/Peoljwds1xA2XFVEJ1GrJldmagfp120MHGqHvXAVBpu8cSh95US00Gcpfu614IC00iPO7i0a/Zvdhd/MSEdFlKPYqrHJXGFIxPg1rmzQdAU1u/IVmjIvLaVx07LyAiSPEkYGaD2CPZXNRgj9r0QsVlv3+X+yrUfgCMTIpzUpjQjjjuVHKA1XyNabTN9ER5Y6LKG5FiOZOr746X+nfhbzQdPSJtiMU3KOKIV1ih5sdyx39nYpCjmwpjSvsFiPraeDWMNgldFo2HPkxEpCn8cn2urlA8Aag6dThcxBiC28qOki1HQk08aGrba7nLSmznqR1OybwCkH6xfOWlnHtaP1X5Uyjrz6a5QWHDPICLzcGhzUve5zNaPpWf0tRXjfL4xDiC7xgKT77oK5hzaFjJtVOYdK6lgY/rlTSDRLAQ4f5Qorb8aRgqBN0gmo8NZ67ix5yVqYucZNBbuFvflf6kycncvUMcA+c/T0hvXrHKEzS0OhoP3ZE6LPL3oANBsbthdeLnwq6I6/0iS0n6H+CRfaP6q01lMqAXIkFIxvQJTpPFXLXtcRoKOBshGIc6gZQDEMe6X00EbZZuP8zyK1Psps9mSCgMWPps7orQ/xMNG2Itzs9arkFjs6A7LovBvr4th4hc9aD7M9Y9PwVL4TKPNkbVgiFDlw3QoL0c8oHw+CNK29tBaiuQboGn3BeC8Ysjzhe75soWz5E+MZtw==
-X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(508600001)(4744005)(47076005)(36756003)(426003)(2616005)(83380400001)(110136005)(7636003)(107886003)(70206006)(36860700001)(70586007)(54906003)(336012)(356005)(186003)(82310400003)(26005)(8676002)(8936002)(86362001)(2906002)(1076003)(316002)(36906005)(6666004)(4326008)(5660300002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2021 14:55:25.9592
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a80d816b-8e36-4eb7-87f6-08d980fdac9d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT023.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3771
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <163250391274.2330363.16176856646027970865.stgit@warthog.procyon.org.uk>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0
+        a=DzKKRZjfViQTE5W6EVc0VA==:117 a=DzKKRZjfViQTE5W6EVc0VA==:17
+        a=kj9zAlcOel0A:10 a=7QKq2e-ADPsA:10 a=20KFwNOVAAAA:8 a=JfrnYn6hAAAA:8
+        a=VwQbUJbxAAAA:8 a=37rDS-QxAAAA:8 a=7-415B0cAAAA:8 a=4LiqF8mHRpqmJXjidzwA:9
+        a=CjuIK1q_8ugA:10 a=1CNFftbPRP8L7MoqJWF3:22 a=AjGcO6oz07-iQ99wixmX:22
+        a=k1Nq6YrhK2t884LQW06G:22 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To optimize performance, set the affinity of the block device tagset
-according to the virtio device affinity.
+On Fri, Sep 24, 2021 at 06:18:32PM +0100, David Howells wrote:
+> Introduce an IOCB_SWAP flag for the kiocb struct such that the REQ_SWAP
+> will get set on lower level operation structures in generic code.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Darrick J. Wong <djwong@kernel.org>
+> cc: linux-xfs@vger.kernel.org
+> cc: linux-block@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+> 
+>  fs/direct-io.c      |    2 ++
+>  include/linux/bio.h |    2 ++
+>  include/linux/fs.h  |    1 +
+>  3 files changed, 5 insertions(+)
+> 
+> diff --git a/fs/direct-io.c b/fs/direct-io.c
+> index b2e86e739d7a..76eec0a68fa4 100644
+> --- a/fs/direct-io.c
+> +++ b/fs/direct-io.c
+> @@ -1216,6 +1216,8 @@ do_blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+>  	}
+>  	if (iocb->ki_flags & IOCB_HIPRI)
+>  		dio->op_flags |= REQ_HIPRI;
+> +	if (iocb->ki_flags & IOCB_SWAP)
+> +		dio->op_flags |= REQ_SWAP;
+>  
+>  	/*
+>  	 * For AIO O_(D)SYNC writes we need to defer completions to a workqueue
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 00952e92eae1..b01133727494 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -787,6 +787,8 @@ static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
+>  	bio->bi_opf |= REQ_HIPRI;
+>  	if (!is_sync_kiocb(kiocb))
+>  		bio->bi_opf |= REQ_NOWAIT;
+> +	if (kiocb->ki_flags & IOCB_SWAP)
+> +		bio->bi_opf |= REQ_SWAP;
+>  }
+>  
+>  struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index c909ca6c0eb6..c20f4423e2f1 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -321,6 +321,7 @@ enum rw_hint {
+>  #define IOCB_NOIO		(1 << 20)
+>  /* can use bio alloc cache */
+>  #define IOCB_ALLOC_CACHE	(1 << 21)
+> +#define IOCB_SWAP		(1 << 22)	/* Operation on a swapfile */
+>  
+>  struct kiocb {
+>  	struct file		*ki_filp;
 
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
----
- drivers/block/virtio_blk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This doesn't set REQ_SWAP for the iomap based DIO path.
+bio_set_polled() is only called from iomap for IOCB_HIPRI IO.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 9b3bd083b411..1c68c3e0ebf9 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
- 	vblk->tag_set.ops = &virtio_mq_ops;
- 	vblk->tag_set.queue_depth = queue_depth;
--	vblk->tag_set.numa_node = NUMA_NO_NODE;
-+	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
- 	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
- 	vblk->tag_set.cmd_size =
- 		sizeof(struct virtblk_req) +
+Cheers,
+
+Dave.
 -- 
-2.18.1
-
+Dave Chinner
+david@fromorbit.com
