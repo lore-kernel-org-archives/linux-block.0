@@ -2,122 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBA8C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 12:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB72EC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 14:55:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE47060FC2
-	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 12:47:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D0CC61041
+	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 14:55:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231442AbhIZMtW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Sep 2021 08:49:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23671 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231441AbhIZMtV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Sep 2021 08:49:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632660465;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TIU1SliLHR0gPG253uhvPBnlkJkKd7zvq1PnYr5EWUg=;
-        b=KqMbSuLZtpd4EMUZqn3krJZ1ZVV7WInqAv3widCmxOaNNv0PffAOZttRAsqwvkLndp7soj
-        Z+P/uKug/FctFDlCqsIug9o7wHgzuznn8bipYQui0CAZ1v5V9ypJMAhssXJUBR0bzk31Db
-        0HtG0fS0OGuqpc8KEvYHuMqI+tBMRCE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-lrhylb9gPjypIXuBOSCoEw-1; Sun, 26 Sep 2021 08:47:43 -0400
-X-MC-Unique: lrhylb9gPjypIXuBOSCoEw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0D1A1006AA2;
-        Sun, 26 Sep 2021 12:47:41 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 57D2F60C04;
-        Sun, 26 Sep 2021 12:47:32 +0000 (UTC)
-Date:   Sun, 26 Sep 2021 20:47:48 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Laibin Qiu <qiulaibin@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        hare@suse.de, asml.silence@gmail.com, bvanassche@acm.org
-Subject: Re: [PATCH -next] blk-mq: fix tag_get wait task can't be awakened
-Message-ID: <YVBr9Km1p7+uDioG@T590>
-References: <20210913081248.3201596-1-qiulaibin@huawei.com>
+        id S231879AbhIZO5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Sep 2021 10:57:03 -0400
+Received: from mail-bn8nam12on2067.outbound.protection.outlook.com ([40.107.237.67]:51041
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231865AbhIZO5D (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 26 Sep 2021 10:57:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HR71c4gMVygp/IheM+sNgb+EK+ubWH76DaM9oNoVrcMyCPnPad9VshBY690eUtTdb0aw0/YaPH3RtU+lMgvrWBVpKpeb3tDZ2nLQPuS/EiipEbKmUPguAv4eG5H9FwoaHY6a3wdxEx7r4WYY1fAL8zFWhynx7NfwkCNeYcHKO+l1SPDp9s+BIPqN2t8/WMbJJ/UDZxCNU8BzC00FAouy2cws21nut3PWu7R6WnleF6P5XzzwPUzsXYsZlgr9jpSkHogRkktluuV94cpcJbUDpljZ4HzgSLOTuctDY7GnNZGn0QV+zxXvn+goQGlFOQFcgLp/vqknBRDlNY2MGUCvBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=uHRr66ZZatUZhyxix272XCfk+BCj1odz2JKSclFs09s=;
+ b=AamoXTsgPFd4chvX9VNhrNUXh73Y7gnaj86EsFtCfhwyqJowSTLN8oX1becztTJ4j6AixgpI8Q4eer9FbuOrMLCx8hErKYTq2ZTYg8tuzc6zhr3u4RzXg4GFFW3qANDG4HTzZWlWBAxBQ8gyZGPZ8wsD+O535Gx0lMYUdMnA+kFab/croOGCi8FKtTviDv/MPa5S5njagKGHmvli10fBSDJJSbPcUHZyeM165Nz/IKKnDU8fRl6ukVDseuCCCDReGzulIVMq6U8QKOVkMdXZwAQTshEpH4CD20OaW/qdyhDL5pxnDX7AqVgyyLsWmXXqgBlwCPvIdMji7QB5YCO9gQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uHRr66ZZatUZhyxix272XCfk+BCj1odz2JKSclFs09s=;
+ b=C+LPyeCoSXR6glajUmAu0tNaKL+J/ZYXzamVaUwGwPlc+vlmOhBJWvBW9yKrMV059KXGG4+EdLb+73+A1sfBnUCSduyvqo2RodJEuHfPpzqucxXHD/p6/AZ9PBDRnfEcbY8iF8tq6dEoTMNFsk732A2Ul/eHekxdYKL5o6VXUk3x9QAOre6XkYQtuU8JlsUskS9WgBczlxxy/UpdjDMiqEOS5L3DpFHH6ZLE5k2wbeNlKqERRaRWHy6KSZiJMhsduhfKJh+BsC/uw97JThiKlN/N7i+xkOcPAyD7FhOZmSviP1l6Qu4GvmSLptEFC6Th3WJ725ObrS7Rk15XeLO/Lg==
+Received: from DS7PR03CA0197.namprd03.prod.outlook.com (2603:10b6:5:3b6::22)
+ by MN2PR12MB2973.namprd12.prod.outlook.com (2603:10b6:208:cc::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Sun, 26 Sep
+ 2021 14:55:24 +0000
+Received: from DM6NAM11FT056.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3b6:cafe::8e) by DS7PR03CA0197.outlook.office365.com
+ (2603:10b6:5:3b6::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend
+ Transport; Sun, 26 Sep 2021 14:55:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT056.mail.protection.outlook.com (10.13.173.99) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4544.13 via Frontend Transport; Sun, 26 Sep 2021 14:55:22 +0000
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 26 Sep
+ 2021 14:55:22 +0000
+Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.5) by mail.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Sun, 26 Sep 2021 14:55:19 +0000
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+To:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
+        <kvm@vger.kernel.org>, <stefanha@redhat.com>
+CC:     <oren@nvidia.com>, <nitzanc@nvidia.com>, <israelr@nvidia.com>,
+        <hch@infradead.org>, <linux-block@vger.kernel.org>,
+        <axboe@kernel.dk>, "Max Gurtovoy" <mgurtovoy@nvidia.com>
+Subject: [PATCH 1/2] virtio: introduce virtio_dev_to_node helper
+Date:   Sun, 26 Sep 2021 17:55:17 +0300
+Message-ID: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210913081248.3201596-1-qiulaibin@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 21971e1f-abe1-42df-4ad0-08d980fdaabc
+X-MS-TrafficTypeDiagnostic: MN2PR12MB2973:
+X-Microsoft-Antispam-PRVS: <MN2PR12MB2973AB5ECCD75B6C0145DE8DDEA69@MN2PR12MB2973.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: egfdnvEWT393RWJMsAgCSsj9myhQWp2dqW1NhFq0AF+nFjfoC6aJEH8HILOZD6FwXdQHavjMlIR49PGnDqpD2qnWcfHcSrrx5dsEfJCi0vlxmiyt4/oPNekp5Pf7YuTRSnws6KD7pH1M87g60ObEgWQwGeZp5IbX7qonFKdS9DrYpL2zQuQ6oWFZtNobjz77cl9c/9zxZL99tA6keUyzgv4ieoL/RH0fOzpQyf8vdIgSycLp125h8BcL4sZQXRyY/GI8HJf4y9BQCYwNvYTwzW+UWq8kczg8LCufGWCTGJ85e7d3y/5rUlQ0BkqWPsXxO8eeR1galn81ip4iRk7CzJltG3pGfJwKwIBcJLTKQ1xvCubg+U6nAosijU8/xNDxIKBaHlC1EEU1Zy3AbbvK0B/2nKcBATvMmYJVlsW/xBUZx+N4ZTzlrYdKEWRlZRw8p+QJpgQLtCGwA+4OInnLO8YK0tsybqVMpgXllztCoo+AZV9gBVTM00gOzR6afBdpXWPBoLGkD4UobCgz/09P0HFqKGa1OgdnXqAXrpfxguq+Cck48w7aKqV9BCnDUmdXjslFSoCdDU7vo5k3oLHzKTF9jGE4FpGmD9jxUu13b0+dE+d2LbZWO089pEl2v9Y3XH41gzoPoZwBpUvVnF60d24oNXPYmb0JW2LPwex71ONQ/WbtqSGc3Bl3m2T+bln5rxddp270KadvO+Te58/xIQ==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(86362001)(8936002)(70586007)(54906003)(70206006)(47076005)(5660300002)(107886003)(26005)(356005)(316002)(186003)(36860700001)(36906005)(508600001)(82310400003)(4326008)(2616005)(7636003)(1076003)(8676002)(336012)(426003)(36756003)(110136005)(2906002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2021 14:55:22.8004
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21971e1f-abe1-42df-4ad0-08d980fdaabc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT056.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB2973
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Laibin,
+Also expose numa_node field as a sysfs attribute. Now virtio device
+drivers will be able to allocate memory that is node-local to the
+device. This significantly helps performance and it's oftenly used in
+other drivers such as NVMe, for example.
 
-On Mon, Sep 13, 2021 at 04:12:48PM +0800, Laibin Qiu wrote:
-> When multiple hctx share one tagset. The wake_batch is calculated
-> during initialization by queue_depth. But when multiple hctx share one
-> tagset. The queue depth assigned to each user may be smaller than
-> wakup_batch. This may cause the waiting queue to fail to wakup and leads
-> to Hang.
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ drivers/virtio/virtio.c | 10 ++++++++++
+ include/linux/virtio.h  | 13 +++++++++++++
+ 2 files changed, 23 insertions(+)
 
-In case of shared tags, there might be more than one hctx which
-allocates tag from single tags, and each hctx is limited to allocate
-at most:
-
- 	hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
-
-	and
-
-	users = atomic_read(&hctx->tags->active_queues)
-
-See hctx_may_queue().
-
-tag idle detection is lazy, and may be delayed for 30sec, so
-there could be just one real active hctx(queue) but all others are
-actually idle and still accounted as active because of the lazy
-idle detection. Then if wake_batch is > hctx_max_depth, driver
-tag allocation may wait forever on this real active hctx.
-
-Correct me if my understanding is wrong.
-
-> 
-> Fix this by recalculating wake_batch when inc or dec active_queues.
-> 
-> Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
-> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
-> ---
->  block/blk-mq-tag.c      | 44 +++++++++++++++++++++++++++++++++++++++--
->  include/linux/sbitmap.h |  8 ++++++++
->  lib/sbitmap.c           |  3 ++-
->  3 files changed, 52 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 86f87346232a..d02f5ac0004c 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -16,6 +16,27 @@
->  #include "blk-mq-sched.h"
->  #include "blk-mq-tag.h"
->  
-> +static void bt_update_wake_batch(struct sbitmap_queue *bt, unsigned int users)
-> +{
-> +	unsigned int depth;
-> +
-> +	depth = max((bt->sb.depth + users - 1) / users, 4U);
-> +	sbitmap_queue_update_wake_batch(bt, depth);
-> +}
-
-Use the hctx's max queue depth could reduce wake_batch a lot, then
-performance may be degraded.
-
-Just wondering why not set sbq->wake_batch as hctx_max_depth if
-sbq->wake_batch is < hctx_max_depth?
-
-
-
-Thanks,
-Ming
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index 588e02fb91d3..bdbd76c5c58c 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -60,12 +60,22 @@ static ssize_t features_show(struct device *_d,
+ }
+ static DEVICE_ATTR_RO(features);
+ 
++static ssize_t numa_node_show(struct device *_d,
++			      struct device_attribute *attr, char *buf)
++{
++	struct virtio_device *vdev = dev_to_virtio(_d);
++
++	return sysfs_emit(buf, "%d\n", virtio_dev_to_node(vdev));
++}
++static DEVICE_ATTR_RO(numa_node);
++
+ static struct attribute *virtio_dev_attrs[] = {
+ 	&dev_attr_device.attr,
+ 	&dev_attr_vendor.attr,
+ 	&dev_attr_status.attr,
+ 	&dev_attr_modalias.attr,
+ 	&dev_attr_features.attr,
++	&dev_attr_numa_node.attr,
+ 	NULL,
+ };
+ ATTRIBUTE_GROUPS(virtio_dev);
+diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+index 41edbc01ffa4..05b586ac71d1 100644
+--- a/include/linux/virtio.h
++++ b/include/linux/virtio.h
+@@ -125,6 +125,19 @@ static inline struct virtio_device *dev_to_virtio(struct device *_dev)
+ 	return container_of(_dev, struct virtio_device, dev);
+ }
+ 
++/**
++ * virtio_dev_to_node - return the NUMA node for a given virtio device
++ * @vdev:	device to get the NUMA node for.
++ */
++static inline int virtio_dev_to_node(struct virtio_device *vdev)
++{
++	struct device *parent = vdev->dev.parent;
++
++	if (!parent)
++		return NUMA_NO_NODE;
++	return dev_to_node(parent);
++}
++
+ void virtio_add_status(struct virtio_device *dev, unsigned int status);
+ int register_virtio_device(struct virtio_device *dev);
+ void unregister_virtio_device(struct virtio_device *dev);
+-- 
+2.18.1
 
