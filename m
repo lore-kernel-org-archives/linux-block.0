@@ -2,134 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A980C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 25 Sep 2021 23:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6303CC433FE
+	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 01:15:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C9D961050
-	for <linux-block@archiver.kernel.org>; Sat, 25 Sep 2021 23:43:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AA80610F7
+	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 01:15:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230181AbhIYXoc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Sep 2021 19:44:32 -0400
-Received: from mail109.syd.optusnet.com.au ([211.29.132.80]:34355 "EHLO
-        mail109.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230078AbhIYXob (ORCPT
+        id S230231AbhIZBQp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Sep 2021 21:16:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22139 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230207AbhIZBQo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Sep 2021 19:44:31 -0400
-Received: from dread.disaster.area (pa49-195-238-16.pa.nsw.optusnet.com.au [49.195.238.16])
-        by mail109.syd.optusnet.com.au (Postfix) with ESMTPS id 08B668A154;
-        Sun, 26 Sep 2021 09:42:44 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1mUHJb-00GjRM-K9; Sun, 26 Sep 2021 09:42:43 +1000
-Date:   Sun, 26 Sep 2021 09:42:43 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     willy@infradead.org, hch@lst.de, trond.myklebust@primarydata.com,
-        Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Anna Schumaker <anna.schumaker@netapp.com>, linux-mm@kvack.org,
-        Bob Liu <bob.liu@oracle.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Seth Jennings <sjenning@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Steve French <sfrench@samba.org>, NeilBrown <neilb@suse.de>,
-        Dan Magenheimer <dan.magenheimer@oracle.com>,
-        linux-nfs@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        linux-btrfs@vger.kernel.org, viro@zeniv.linux.org.uk,
-        torvalds@linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC][PATCH v3 0/9] mm: Use DIO for swap and fix NFS swapfiles
-Message-ID: <20210925234243.GA1756565@dread.disaster.area>
-References: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+        Sat, 25 Sep 2021 21:16:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632618908;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yPScCXbwrAnP+0zgOQn+0QEIePgNYmpv6jzS1EITj1g=;
+        b=MDFUaH/IwLPMEQNbLQFCWfJ79OO0sz5HHgyNVNKJAm8GNPRM9KaGg1ctQ0EE2zJFx9utKJ
+        LG/69dwR5GI0TSsIiaX3z5wIZ9LQLVfexCSzYzPNuzpPl+cSJzp+7wlc8yVZmt3vSwVc40
+        rXftA9pId86J2s4b1NcafzeAforH4+g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-QeZEWMYzNeiaDL4jf0FJWA-1; Sat, 25 Sep 2021 21:15:07 -0400
+X-MC-Unique: QeZEWMYzNeiaDL4jf0FJWA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F0A91808305;
+        Sun, 26 Sep 2021 01:15:05 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DFE710016FE;
+        Sun, 26 Sep 2021 01:14:57 +0000 (UTC)
+Date:   Sun, 26 Sep 2021 09:15:12 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        hare@suse.de
+Subject: Re: [PATCH v4 06/13] blk-mq-sched: Rename
+ blk_mq_sched_free_{requests -> rqs}()
+Message-ID: <YU/JoASUZbF+bqB5@T590>
+References: <1632472110-244938-1-git-send-email-john.garry@huawei.com>
+ <1632472110-244938-7-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0
-        a=DzKKRZjfViQTE5W6EVc0VA==:117 a=DzKKRZjfViQTE5W6EVc0VA==:17
-        a=kj9zAlcOel0A:10 a=7QKq2e-ADPsA:10 a=7-415B0cAAAA:8
-        a=MUEH3GQPxMcp5Lh2lNUA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <1632472110-244938-7-git-send-email-john.garry@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 06:17:52PM +0100, David Howells wrote:
+On Fri, Sep 24, 2021 at 04:28:23PM +0800, John Garry wrote:
+> To be more concise and consistent in naming, rename
+> blk_mq_sched_free_requests() -> blk_mq_sched_free_rqs().
 > 
-> Hi Willy, Trond, Christoph,
-> 
-> Here's v3 of a change to make reads and writes from the swapfile use async
-> DIO, adding a new ->swap_rw() address_space method, rather than readpage()
-> or direct_IO(), as requested by Willy.  This allows NFS to bypass the write
-> checks that prevent swapfiles from working, plus a bunch of other checks
-> that may or may not be necessary.
-> 
-> Whilst trying to make this work, I found that NFS's support for swapfiles
-> seems to have been non-functional since Aug 2019 (I think), so the first
-> patch fixes that.  Question is: do we actually *want* to keep this
-> functionality, given that it seems that no one's tested it with an upstream
-> kernel in the last couple of years?
-> 
-> There are additional patches to get rid of noop_direct_IO and replace it
-> with a feature bitmask, to make btrfs, ext4, xfs and raw blockdevs use the
-> new ->swap_rw method and thence remove the direct BIO submission paths from
-> swap.
-> 
-> I kept the IOCB_SWAP flag, using it to enable REQ_SWAP.  I'm not sure if
-> that's necessary, but it seems accounting related.
-> 
-> The synchronous DIO I/O code on NFS, raw blockdev, ext4 swapfile and xfs
-> swapfile all seem to work fine.  Btrfs refuses to swapon because the file
-> might be CoW'd.  I've tried doing "chattr +C", but that didn't help.
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Ok, so if the filesystem is doing block mapping in the IO path now,
-why does the swap file still need to map the file into a private
-block mapping now?  i.e all the work that iomap_swapfile_activate()
-does for filesystems like XFS and ext4 - it's this completely
-redundant now that we are doing block mapping during swap file IO
-via iomap_dio_rw()?
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Actually, that path does all the "can we use this file as a swap
-file" checking. So the extent iteration can't go away, just the swap
-file mapping part (iomap_swapfile_add_extent()). This is necessary
-to ensure there aren't any holes in the file, and we still need that
-because the DIO write path will allocate into holes, which leads
-me to my main concern here.
-
-Using the DIO path opens up the possibility that the filesystem
-could want to run transactions are part of the DIO. Right now we
-support unwritten extents for swap files (so they don't have to be
-written to allocate the backing store before activation) and that
-means we'll be doing DIO to unwritten extents. IO completion of a
-DIO write to an unwritten extent will run a transaction to convert
-that extent to written. A similar problem with sparse files exists,
-because allocation of blocks can be done from the DIO path, and that
-requires transactions. File extension is another potential
-transaction path we open up by using DIO writes dor swap.
-
-The problem is that a transaction run in swap IO context will will
-deadlock the filesystem. Either through the unbound memory demand of
-metadata modification, or from needing log space that can't be freed
-up because the metadata IO that will free the log space is waiting
-on memory allocation that is waiting on swap IO...
-
-I think some more thought needs to be put into controlling the
-behaviour/semantics of the DIO path so that it can be safely used
-by swap IO, because it's not a direct 1:1 behavioural mapping with
-existing DIO and there are potential deadlock vectors we need to
-avoid.
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Ming
+
